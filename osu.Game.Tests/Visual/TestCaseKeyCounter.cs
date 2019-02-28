@@ -26,7 +26,7 @@ namespace osu.Game.Tests.Visual
         public TestCaseKeyCounter()
         {
             KeyCounterKeyboard rewindTestKeyCounterKeyboard;
-            KeyCounterCollection kc = new KeyCounterCollection
+            var kc = new KeyCounterCollection
             {
                 Origin = Anchor.Centre,
                 Anchor = Anchor.Centre,
@@ -41,7 +41,7 @@ namespace osu.Game.Tests.Visual
 
             AddStep("Add random", () =>
             {
-                Key key = (Key)((int)Key.A + RNG.Next(26));
+                var key = (Key)((int)Key.A + RNG.Next(26));
                 kc.Add(new KeyCounterKeyboard(key));
             });
             AddSliderStep("Fade time", 0, 200, 50, v => kc.FadeTime = v);

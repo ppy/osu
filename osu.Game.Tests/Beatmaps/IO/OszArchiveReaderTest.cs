@@ -17,7 +17,7 @@ namespace osu.Game.Tests.Beatmaps.IO
         [Test]
         public void TestReadBeatmaps()
         {
-            using (var osz = TestResources.GetTestBeatmapStream())
+            using (Stream osz = TestResources.GetTestBeatmapStream())
             {
                 var reader = new ZipArchiveReader(osz);
                 string[] expected =
@@ -35,8 +35,8 @@ namespace osu.Game.Tests.Beatmaps.IO
                     "Soleily - Renatus (MMzz) [Muzukashii].osu",
                     "Soleily - Renatus (MMzz) [Oni].osu"
                 };
-                var maps = reader.Filenames.ToArray();
-                foreach (var map in expected)
+                string[] maps = reader.Filenames.ToArray();
+                foreach (string map in expected)
                     Assert.Contains(map, maps);
             }
         }
@@ -44,7 +44,7 @@ namespace osu.Game.Tests.Beatmaps.IO
         [Test]
         public void TestReadMetadata()
         {
-            using (var osz = TestResources.GetTestBeatmapStream())
+            using (Stream osz = TestResources.GetTestBeatmapStream())
             {
                 var reader = new ZipArchiveReader(osz);
 
@@ -53,7 +53,7 @@ namespace osu.Game.Tests.Beatmaps.IO
                 using (var stream = new StreamReader(reader.GetStream("Soleily - Renatus (Deif) [Platter].osu")))
                     beatmap = Decoder.GetDecoder<Beatmap>(stream).Decode(stream);
 
-                var meta = beatmap.Metadata;
+                BeatmapMetadata meta = beatmap.Metadata;
 
                 Assert.AreEqual(241526, beatmap.BeatmapInfo.BeatmapSet.OnlineBeatmapSetID);
                 Assert.AreEqual("Soleily", meta.Artist);
@@ -72,7 +72,7 @@ namespace osu.Game.Tests.Beatmaps.IO
         [Test]
         public void TestReadFile()
         {
-            using (var osz = TestResources.GetTestBeatmapStream())
+            using (Stream osz = TestResources.GetTestBeatmapStream())
             {
                 var reader = new ZipArchiveReader(osz);
                 using (var stream = new StreamReader(

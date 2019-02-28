@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Linq.Expressions;
 using Microsoft.EntityFrameworkCore;
@@ -39,7 +40,7 @@ namespace osu.Game.Scoring
             if (archive == null)
                 return null;
 
-            using (var stream = archive.GetStream(archive.Filenames.First(f => f.EndsWith(".osr"))))
+            using (Stream stream = archive.GetStream(archive.Filenames.First(f => f.EndsWith(".osr", StringComparison.Ordinal))))
             {
                 try
                 {

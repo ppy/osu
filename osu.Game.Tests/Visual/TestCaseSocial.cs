@@ -25,7 +25,7 @@ namespace osu.Game.Tests.Visual
 
         public TestCaseSocial()
         {
-            SocialOverlay s = new SocialOverlay
+            var s = new SocialOverlay
             {
                 Users = new[]
                 {

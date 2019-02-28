@@ -27,7 +27,7 @@ namespace osu.Game.Rulesets.Osu.Beatmaps
             if (osuBeatmap.HitObjects.Count > 0)
             {
                 // Reset stacking
-                foreach (var h in osuBeatmap.HitObjects)
+                foreach (OsuHitObject h in osuBeatmap.HitObjects)
                     h.StackHeight = 0;
 
                 if (Beatmap.BeatmapInfo.BeatmapVersion >= 6)

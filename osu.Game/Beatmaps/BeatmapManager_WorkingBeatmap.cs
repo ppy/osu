@@ -68,7 +68,7 @@ namespace osu.Game.Beatmaps
             {
                 try
                 {
-                    var trackData = store.GetStream(getPathForFile(Metadata.AudioFile));
+                    Stream trackData = store.GetStream(getPathForFile(Metadata.AudioFile));
                     return trackData == null ? null : new TrackBass(trackData);
                 }
                 catch
@@ -89,7 +89,7 @@ namespace osu.Game.Beatmaps
             {
                 try
                 {
-                    var trackData = store.GetStream(getPathForFile(Metadata.AudioFile));
+                    Stream trackData = store.GetStream(getPathForFile(Metadata.AudioFile));
                     return trackData == null ? null : new Waveform(trackData);
                 }
                 catch
@@ -105,7 +105,7 @@ namespace osu.Game.Beatmaps
                 {
                     using (var stream = new StreamReader(store.GetStream(getPathForFile(BeatmapInfo.Path))))
                     {
-                        var decoder = Decoder.GetDecoder<Storyboard>(stream);
+                        Decoder<Storyboard> decoder = Decoder.GetDecoder<Storyboard>(stream);
 
                         // todo: support loading from both set-wide storyboard *and* beatmap specific.
                         if (BeatmapSetInfo?.StoryboardFile == null)

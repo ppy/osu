@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
@@ -54,7 +55,7 @@ namespace osu.Game.Screens.Menu
 
             if (!menuMusic.Value)
             {
-                var sets = beatmaps.GetAllUsableBeatmapSets();
+                List<BeatmapSetInfo> sets = beatmaps.GetAllUsableBeatmapSets();
                 if (sets.Count > 0)
                     setInfo = beatmaps.QueryBeatmapSet(s => s.ID == sets[RNG.Next(0, sets.Count - 1)].ID);
             }

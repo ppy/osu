@@ -96,7 +96,7 @@ namespace osu.Game.Overlays.Music
 
             private void removeBeatmapSet(BeatmapSetInfo obj) => Schedule(() =>
             {
-                var itemToRemove = items.FirstOrDefault(i => i.BeatmapSetInfo.ID == obj.ID);
+                PlaylistItem itemToRemove = items.FirstOrDefault(i => i.BeatmapSetInfo.ID == obj.ID);
                 if (itemToRemove != null)
                     items.Remove(itemToRemove);
             });
@@ -137,7 +137,7 @@ namespace osu.Game.Overlays.Music
             protected override bool OnDragEnd(DragEndEvent e)
             {
                 nativeDragPosition = e.ScreenSpaceMousePosition;
-                var handled = draggedItem != null || base.OnDragEnd(e);
+                bool handled = draggedItem != null || base.OnDragEnd(e);
                 draggedItem = null;
 
                 return handled;
@@ -160,14 +160,14 @@ namespace osu.Game.Overlays.Music
                 const double max_power = 50;
                 const double exp_base = 1.05;
 
-                var localPos = ToLocalSpace(nativeDragPosition);
+                Vector2 localPos = ToLocalSpace(nativeDragPosition);
 
                 if (localPos.Y < start_offset)
                 {
                     if (Current <= 0)
                         return;
 
-                    var power = Math.Min(max_power, Math.Abs(start_offset - localPos.Y));
+                    double power = Math.Min(max_power, Math.Abs(start_offset - localPos.Y));
                     ScrollBy(-(float)Math.Pow(exp_base, power));
                 }
                 else if (localPos.Y > DrawHeight - start_offset)
@@ -175,14 +175,14 @@ namespace osu.Game.Overlays.Music
                     if (IsScrolledToEnd())
                         return;
 
-                    var power = Math.Min(max_power, Math.Abs(DrawHeight - start_offset - localPos.Y));
+                    double power = Math.Min(max_power, Math.Abs(DrawHeight - start_offset - localPos.Y));
                     ScrollBy((float)Math.Pow(exp_base, power));
                 }
             }
 
             private void updateDragPosition()
             {
-                var itemsPos = items.ToLocalSpace(nativeDragPosition);
+                Vector2 itemsPos = items.ToLocalSpace(nativeDragPosition);
 
                 int srcIndex = (int)items.GetLayoutPosition(draggedItem);
 

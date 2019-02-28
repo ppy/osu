@@ -116,7 +116,7 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
 
             scalingSettings.ForEach(s => bindPreviewEvent(s.Bindable));
 
-            var resolutions = getResolutions();
+            IReadOnlyList<Size> resolutions = getResolutions();
 
             if (resolutions.Count > 1)
             {

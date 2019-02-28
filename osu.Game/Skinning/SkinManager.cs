@@ -58,7 +58,7 @@ namespace osu.Game.Skinning
         /// <returns>A list of available <see cref="SkinInfo"/>.</returns>
         public List<SkinInfo> GetAllUsableSkins()
         {
-            var userSkins = GetAllUserSkins();
+            List<SkinInfo> userSkins = GetAllUserSkins();
             userSkins.Insert(0, SkinInfo.Default);
             return userSkins;
         }

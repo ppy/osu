@@ -88,7 +88,7 @@ namespace osu.Game.Overlays.Chat.Tabs
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
-            var user = Value.Users.First();
+            User user = Value.Users.First();
 
             BackgroundActive = user.Colour != null ? OsuColour.FromHex(user.Colour) : colours.BlueDark;
             BackgroundInactive = BackgroundActive.Darken(0.5f);

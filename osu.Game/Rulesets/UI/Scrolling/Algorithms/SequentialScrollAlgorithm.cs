@@ -24,7 +24,7 @@ namespace osu.Game.Rulesets.UI.Scrolling.Algorithms
 
         public float GetLength(double startTime, double endTime, double timeRange, float scrollLength)
         {
-            var objectLength = relativePositionAtCached(endTime, timeRange) - relativePositionAtCached(startTime, timeRange);
+            double objectLength = relativePositionAtCached(endTime, timeRange) - relativePositionAtCached(startTime, timeRange);
             return (float)(objectLength * scrollLength);
         }
 
@@ -44,14 +44,14 @@ namespace osu.Game.Rulesets.UI.Scrolling.Algorithms
             // since each timing point individually affects the positions of _all_ hitobjects after its start time
             for (int i = 0; i < controlPoints.Count; i++)
             {
-                var current = controlPoints[i];
-                var next = i < controlPoints.Count - 1 ? controlPoints[i + 1] : null;
+                MultiplierControlPoint current = controlPoints[i];
+                MultiplierControlPoint next = i < controlPoints.Count - 1 ? controlPoints[i + 1] : null;
 
                 // Duration of the current control point
-                var currentDuration = (next?.StartTime ?? double.PositiveInfinity) - current.StartTime;
+                double currentDuration = (next?.StartTime ?? double.PositiveInfinity) - current.StartTime;
 
                 // Figure out the length of control point
-                var currentLength = currentDuration / timeRange * current.Multiplier;
+                double currentLength = currentDuration / timeRange * current.Multiplier;
 
                 if (currentLength > length)
                 {
@@ -92,8 +92,8 @@ namespace osu.Game.Rulesets.UI.Scrolling.Algorithms
             // since each timing point individually affects the positions of _all_ hitobjects after its start time
             for (int i = 0; i < controlPoints.Count; i++)
             {
-                var current = controlPoints[i];
-                var next = i < controlPoints.Count - 1 ? controlPoints[i + 1] : null;
+                MultiplierControlPoint current = controlPoints[i];
+                MultiplierControlPoint next = i < controlPoints.Count - 1 ? controlPoints[i + 1] : null;
 
                 // We don't need to consider any control points beyond the current time, since it will not yet
                 // affect any hitobjects
@@ -101,11 +101,11 @@ namespace osu.Game.Rulesets.UI.Scrolling.Algorithms
                     continue;
 
                 // Duration of the current control point
-                var currentDuration = (next?.StartTime ?? double.PositiveInfinity) - current.StartTime;
+                double currentDuration = (next?.StartTime ?? double.PositiveInfinity) - current.StartTime;
 
                 // We want to consider the minimal amount of time that this control point has affected,
                 // which may be either its duration, or the amount of time that has passed within it
-                var durationInCurrent = Math.Min(currentDuration, time - current.StartTime);
+                double durationInCurrent = Math.Min(currentDuration, time - current.StartTime);
 
                 // Figure out how much of the time range the duration represents, and adjust it by the speed multiplier
                 length += durationInCurrent / timeRange * current.Multiplier;

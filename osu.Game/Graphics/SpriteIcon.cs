@@ -10,6 +10,7 @@ using osu.Framework.IO.Stores;
 using osuTK;
 using osuTK.Graphics;
 using osu.Framework.Caching;
+using osu.Framework.Graphics.Textures;
 
 namespace osu.Game.Graphics
 {
@@ -68,11 +69,11 @@ namespace osu.Game.Graphics
 
         private void updateTexture()
         {
-            var loadableIcon = icon;
+            FontAwesome loadableIcon = icon;
 
             if (loadableIcon == loadedIcon) return;
 
-            var texture = store.Get(((char)loadableIcon).ToString());
+            Texture texture = store.Get(((char)loadableIcon).ToString());
 
             spriteMain.Texture = texture;
             spriteShadow.Texture = texture;

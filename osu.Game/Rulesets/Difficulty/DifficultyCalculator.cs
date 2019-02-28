@@ -52,7 +52,7 @@ namespace osu.Game.Rulesets.Difficulty
         /// <returns>A collection of structures describing the difficulty of the beatmap for each mod combination.</returns>
         public IEnumerable<DifficultyAttributes> CalculateAll()
         {
-            foreach (var combination in CreateDifficultyAdjustmentModCombinations())
+            foreach (Mod combination in CreateDifficultyAdjustmentModCombinations())
             {
                 if (combination is MultiMod multi)
                     yield return Calculate(multi.Mods);
@@ -63,12 +63,12 @@ namespace osu.Game.Rulesets.Difficulty
 
         private DifficultyAttributes calculate(IBeatmap beatmap, Mod[] mods, double clockRate)
         {
-            var skills = CreateSkills(beatmap);
+            Skill[] skills = CreateSkills(beatmap);
 
             if (!beatmap.HitObjects.Any())
                 return CreateDifficultyAttributes(beatmap, mods, skills, clockRate);
 
-            var difficultyHitObjects = CreateDifficultyHitObjects(beatmap, clockRate).OrderBy(h => h.BaseObject.StartTime).ToList();
+            List<DifficultyHitObject> difficultyHitObjects = CreateDifficultyHitObjects(beatmap, clockRate).OrderBy(h => h.BaseObject.StartTime).ToList();
 
             double sectionLength = SectionLength * clockRate;
 
@@ -129,11 +129,11 @@ namespace osu.Game.Rulesets.Difficulty
                 // combinations in further recursions, so a moving subset is used to eliminate this effect
                 for (int i = adjustmentSetStart; i < adjustmentSet.Length; i++)
                 {
-                    var adjustmentMod = adjustmentSet[i];
+                    Mod adjustmentMod = adjustmentSet[i];
                     if (currentSet.Any(c => c.IncompatibleMods.Any(m => m.IsInstanceOfType(adjustmentMod))))
                         continue;
 
-                    foreach (var combo in createDifficultyAdjustmentModCombinations(currentSet.Append(adjustmentMod), adjustmentSet, currentSetCount + 1, i + 1))
+                    foreach (Mod combo in createDifficultyAdjustmentModCombinations(currentSet.Append(adjustmentMod), adjustmentSet, currentSetCount + 1, i + 1))
                         yield return combo;
                 }
             }

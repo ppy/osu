@@ -8,6 +8,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Input;
+using osu.Framework.Lists;
 using osu.Framework.MathUtils;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
@@ -45,7 +46,7 @@ namespace osu.Game.Rulesets.Mania.UI
             // Generate the bar lines
             double lastObjectTime = (Objects.LastOrDefault() as IHasEndTime)?.EndTime ?? Objects.LastOrDefault()?.StartTime ?? double.MaxValue;
 
-            var timingPoints = Beatmap.ControlPointInfo.TimingPoints;
+            SortedList<TimingControlPoint> timingPoints = Beatmap.ControlPointInfo.TimingPoints;
             var barLines = new List<BarLine>();
 
             for (int i = 0; i < timingPoints.Count; i++)

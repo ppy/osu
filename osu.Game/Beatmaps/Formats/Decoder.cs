@@ -15,7 +15,7 @@ namespace osu.Game.Beatmaps.Formats
 
         public TOutput Decode(StreamReader primaryStream, params StreamReader[] otherStreams)
         {
-            var output = CreateTemplateObject();
+            TOutput output = CreateTemplateObject();
             foreach (StreamReader stream in otherStreams.Prepend(primaryStream))
                 ParseStreamInto(stream, output);
             return output;
@@ -45,7 +45,7 @@ namespace osu.Game.Beatmaps.Formats
             if (stream == null)
                 throw new ArgumentNullException(nameof(stream));
 
-            if (!decoders.TryGetValue(typeof(T), out var typedDecoders))
+            if (!decoders.TryGetValue(typeof(T), out Dictionary<string, Func<string, Decoder>> typedDecoders))
                 throw new IOException(@"Unknown decoder type");
 
             string line;
@@ -57,7 +57,7 @@ namespace osu.Game.Beatmaps.Formats
             if (line == null)
                 throw new IOException(@"Unknown file format (null)");
 
-            var decoder = typedDecoders.Select(d => line.StartsWith(d.Key, StringComparison.InvariantCulture) ? d.Value : null).FirstOrDefault();
+            Func<string, Decoder> decoder = typedDecoders.Select(d => line.StartsWith(d.Key, StringComparison.InvariantCulture) ? d.Value : null).FirstOrDefault();
             if (decoder == null)
                 throw new IOException($@"Unknown file format ({line})");
 
@@ -71,7 +71,7 @@ namespace osu.Game.Beatmaps.Formats
         /// <param name="constructor">A function which constructs the <see cref="Decoder"/> given <paramref name="magic"/>.</param>
         protected static void AddDecoder<T>(string magic, Func<string, Decoder> constructor)
         {
-            if (!decoders.TryGetValue(typeof(T), out var typedDecoders))
+            if (!decoders.TryGetValue(typeof(T), out Dictionary<string, Func<string, Decoder>> typedDecoders))
                 decoders.Add(typeof(T), typedDecoders = new Dictionary<string, Func<string, Decoder>>());
 
             typedDecoders[magic] = constructor;

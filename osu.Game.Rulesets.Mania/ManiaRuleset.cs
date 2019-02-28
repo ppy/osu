@@ -210,7 +210,7 @@ namespace osu.Game.Rulesets.Mania
                 case PlayfieldType.Dual:
                     int keys = getDualStageKeyCount(variant);
 
-                    var stage1Bindings = new VariantMappingGenerator
+                    IEnumerable<KeyBinding> stage1Bindings = new VariantMappingGenerator
                     {
                         LeftKeys = new[]
                         {
@@ -229,9 +229,9 @@ namespace osu.Game.Rulesets.Mania
                         SpecialKey = InputKey.Tilde,
                         SpecialAction = ManiaAction.Special1,
                         NormalActionStart = ManiaAction.Key1
-                    }.GenerateKeyBindingsFor(keys, out var nextNormal);
+                    }.GenerateKeyBindingsFor(keys, out ManiaAction nextNormal);
 
-                    var stage2Bindings = new VariantMappingGenerator
+                    IEnumerable<KeyBinding> stage2Bindings = new VariantMappingGenerator
                     {
                         LeftKeys = new[]
                         {
@@ -266,7 +266,7 @@ namespace osu.Game.Rulesets.Mania
                     return $"{variant}K";
                 case PlayfieldType.Dual:
                 {
-                    var keys = getDualStageKeyCount(variant);
+                    int keys = getDualStageKeyCount(variant);
                     return $"{keys}K + {keys}K";
                 }
             }

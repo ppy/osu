@@ -41,8 +41,8 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
         {
             IsForCurrentRuleset = beatmap.BeatmapInfo.Ruleset.Equals(new ManiaRuleset().RulesetInfo);
 
-            var roundedCircleSize = Math.Round(beatmap.BeatmapInfo.BaseDifficulty.CircleSize);
-            var roundedOverallDifficulty = Math.Round(beatmap.BeatmapInfo.BaseDifficulty.OverallDifficulty);
+            double roundedCircleSize = Math.Round(beatmap.BeatmapInfo.BaseDifficulty.CircleSize);
+            double roundedOverallDifficulty = Math.Round(beatmap.BeatmapInfo.BaseDifficulty.OverallDifficulty);
 
             if (IsForCurrentRuleset)
                 TargetColumns = (int)Math.Max(1, roundedCircleSize);
@@ -81,7 +81,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
                 yield break;
             }
 
-            var objects = IsForCurrentRuleset ? generateSpecific(original, beatmap) : generateConverted(original, beatmap);
+            IEnumerable<ManiaHitObject> objects = IsForCurrentRuleset ? generateSpecific(original, beatmap) : generateConverted(original, beatmap);
 
             if (objects == null)
                 yield break;
@@ -122,11 +122,11 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
         {
             var generator = new SpecificBeatmapPatternGenerator(Random, original, beatmap, lastPattern, originalBeatmap);
 
-            foreach (var newPattern in generator.Generate())
+            foreach (Pattern newPattern in generator.Generate())
             {
                 lastPattern = newPattern;
 
-                foreach (var obj in newPattern.HitObjects)
+                foreach (ManiaHitObject obj in newPattern.HitObjects)
                     yield return obj;
             }
         }
@@ -175,12 +175,12 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
             if (conversion == null)
                 yield break;
 
-            foreach (var newPattern in conversion.Generate())
+            foreach (Pattern newPattern in conversion.Generate())
             {
                 lastPattern = conversion is EndTimeObjectPatternGenerator ? lastPattern : newPattern;
                 lastStair = (conversion as HitObjectPatternGenerator)?.StairType ?? lastStair;
 
-                foreach (var obj in newPattern.HitObjects)
+                foreach (ManiaHitObject obj in newPattern.HitObjects)
                     yield return obj;
             }
         }

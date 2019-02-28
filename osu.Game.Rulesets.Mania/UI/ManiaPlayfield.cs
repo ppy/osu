@@ -68,9 +68,9 @@ namespace osu.Game.Rulesets.Mania.UI
         {
             Column found = null;
 
-            foreach (var stage in stages)
+            foreach (ManiaStage stage in stages)
             {
-                foreach (var column in stage.Columns)
+                foreach (Column column in stage.Columns)
                 {
                     if (column.ReceivePositionalInputAt(screenSpacePosition))
                     {
@@ -94,7 +94,7 @@ namespace osu.Game.Rulesets.Mania.UI
         private ManiaStage getStageByColumn(int column)
         {
             int sum = 0;
-            foreach (var stage in stages)
+            foreach (ManiaStage stage in stages)
             {
                 sum = sum + stage.Columns.Count;
                 if (sum > column)

@@ -80,7 +80,7 @@ namespace osu.Game.Graphics.UserInterface
                 new HoverClickSounds()
             };
 
-            Current.DisabledChanged += disabled => { Alpha = disabled ? 0.3f : 1; };
+            Current.DisabledChanged += disabled => Alpha = disabled ? 0.3f : 1;
         }
 
         [BackgroundDependencyLoader]
@@ -162,10 +162,10 @@ namespace osu.Game.Graphics.UserInterface
                     TooltipText = floatValue.ToString("P0");
                 else
                 {
-                    var decimalPrecision = normalise((decimal)Convert.ChangeType(CurrentNumber.Precision, typeof(decimal)), max_decimal_digits);
+                    decimal decimalPrecision = normalise((decimal)Convert.ChangeType(CurrentNumber.Precision, typeof(decimal)), max_decimal_digits);
 
                     // Find the number of significant digits (we could have less than 5 after normalize())
-                    var significantDigits = findPrecision(decimalPrecision);
+                    int significantDigits = findPrecision(decimalPrecision);
 
                     TooltipText = floatValue.ToString($"N{significantDigits}");
                 }

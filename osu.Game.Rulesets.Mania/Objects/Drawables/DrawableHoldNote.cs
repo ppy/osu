@@ -69,7 +69,7 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
                 }
             };
 
-            foreach (var tick in tickContainer)
+            foreach (DrawableHoldNoteTick tick in tickContainer)
                 AddNested(tick);
 
             AddNested(Head);
@@ -221,7 +221,7 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
                     return;
                 }
 
-                var result = HitObject.HitWindows.ResultFor(timeOffset);
+                HitResult result = HitObject.HitWindows.ResultFor(timeOffset);
                 if (result == HitResult.None)
                     return;
 

@@ -10,6 +10,7 @@ using osu.Game.Rulesets.Catch.UI;
 using osu.Game.Rulesets.Objects.Types;
 using osuTK;
 using osu.Game.Rulesets.Catch.MathUtils;
+using osu.Game.Rulesets.Objects;
 
 namespace osu.Game.Rulesets.Catch.Beatmaps
 {
@@ -31,7 +32,7 @@ namespace osu.Game.Rulesets.Catch.Beatmaps
             initialiseHyperDash((List<CatchHitObject>)Beatmap.HitObjects);
 
             int index = 0;
-            foreach (var obj in Beatmap.HitObjects.OfType<CatchHitObject>())
+            foreach (CatchHitObject obj in Beatmap.HitObjects.OfType<CatchHitObject>())
             {
                 obj.IndexInBeatmap = index++;
                 if (obj.LastInCombo && obj.NestedHitObjects.LastOrDefault() is IHasComboInformation lastNested)
@@ -44,12 +45,12 @@ namespace osu.Game.Rulesets.Catch.Beatmaps
             var rng = new FastRandom(RNG_SEED);
             // todo: HardRock displacement should be applied here
 
-            foreach (var obj in Beatmap.HitObjects)
+            foreach (HitObject obj in Beatmap.HitObjects)
             {
                 switch (obj)
                 {
                     case BananaShower bananaShower:
-                        foreach (var banana in bananaShower.NestedHitObjects.OfType<Banana>())
+                        foreach (Banana banana in bananaShower.NestedHitObjects.OfType<Banana>())
                         {
                             banana.X = (float)rng.NextDouble();
                             rng.Next(); // osu!stable retrieved a random banana type
@@ -59,7 +60,7 @@ namespace osu.Game.Rulesets.Catch.Beatmaps
 
                         break;
                     case JuiceStream juiceStream:
-                        foreach (var nested in juiceStream.NestedHitObjects)
+                        foreach (HitObject nested in juiceStream.NestedHitObjects)
                         {
                             var hitObject = (CatchHitObject)nested;
                             if (hitObject is TinyDroplet)
@@ -76,14 +77,14 @@ namespace osu.Game.Rulesets.Catch.Beatmaps
 
         private void initialiseHyperDash(List<CatchHitObject> objects)
         {
-            List<CatchHitObject> objectWithDroplets = new List<CatchHitObject>();
+            var objectWithDroplets = new List<CatchHitObject>();
 
-            foreach (var currentObject in objects)
+            foreach (CatchHitObject currentObject in objects)
             {
                 if (currentObject is Fruit)
                     objectWithDroplets.Add(currentObject);
                 if (currentObject is JuiceStream)
-                    foreach (var currentJuiceElement in currentObject.NestedHitObjects)
+                    foreach (HitObject currentJuiceElement in currentObject.NestedHitObjects)
                         if (!(currentJuiceElement is TinyDroplet))
                             objectWithDroplets.Add((CatchHitObject)currentJuiceElement);
             }

@@ -24,9 +24,9 @@ namespace osu.Game.Tests.Visual
         [BackgroundDependencyLoader]
         private void load(OsuGameBase osu, APIAccess api, RulesetStore rulesets)
         {
-            Bindable<BeatmapInfo> beatmapBindable = new Bindable<BeatmapInfo>();
+            var beatmapBindable = new Bindable<BeatmapInfo>();
 
-            var imported = ImportBeatmapTest.LoadOszIntoOsu(osu);
+            BeatmapSetInfo imported = ImportBeatmapTest.LoadOszIntoOsu(osu);
 
             Child = backgroundSprite = new UpdateableBeatmapBackgroundSprite { RelativeSizeAxes = Axes.Both };
 

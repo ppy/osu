@@ -43,7 +43,7 @@ namespace osu.Game.Configuration
         {
             base.AddBindable(lookup, bindable);
 
-            var setting = databasedSettings.Find(s => (int)s.Key == (int)(object)lookup);
+            DatabasedSetting setting = databasedSettings.Find(s => (int)s.Key == (int)(object)lookup);
             if (setting != null)
             {
                 bindable.Parse(setting.Value);

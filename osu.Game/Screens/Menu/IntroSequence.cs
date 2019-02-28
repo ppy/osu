@@ -163,7 +163,7 @@ namespace osu.Game.Screens.Menu
                 },
             };
 
-            foreach (var line in lines)
+            foreach (Box line in lines)
             {
                 line.Size = new Vector2(105, 1.5f);
                 line.Alpha = 0;
@@ -196,7 +196,7 @@ namespace osu.Game.Screens.Menu
                 const int line_duration = 700;
                 const int line_resize = 150;
 
-                foreach (var line in lines)
+                foreach (Box line in lines)
                 {
                     line.FadeIn(40).ResizeWidthTo(0, line_duration - line_resize, Easing.OutQuint);
                 }

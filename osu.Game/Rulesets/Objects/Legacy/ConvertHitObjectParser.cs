@@ -46,9 +46,9 @@ namespace osu.Game.Rulesets.Objects.Legacy
             {
                 string[] split = text.Split(',');
 
-                Vector2 pos = new Vector2((int)Convert.ToSingle(split[0], CultureInfo.InvariantCulture), (int)Convert.ToSingle(split[1], CultureInfo.InvariantCulture));
+                var pos = new Vector2((int)Convert.ToSingle(split[0], CultureInfo.InvariantCulture), (int)Convert.ToSingle(split[1], CultureInfo.InvariantCulture));
 
-                ConvertHitObjectType type = (ConvertHitObjectType)int.Parse(split[3]);
+                var type = (ConvertHitObjectType)int.Parse(split[3]);
 
                 int comboOffset = (int)(type & ConvertHitObjectType.ComboOffset) >> 4;
                 type &= ~ConvertHitObjectType.ComboOffset;
@@ -70,13 +70,13 @@ namespace osu.Game.Rulesets.Objects.Legacy
                 }
                 else if (type.HasFlag(ConvertHitObjectType.Slider))
                 {
-                    PathType pathType = PathType.Catmull;
+                    var pathType = PathType.Catmull;
                     double length = 0;
 
                     string[] pointSplit = split[5].Split('|');
 
                     int pointCount = 1;
-                    foreach (var t in pointSplit)
+                    foreach (string t in pointSplit)
                         if (t.Length > 1)
                             pointCount++;
 

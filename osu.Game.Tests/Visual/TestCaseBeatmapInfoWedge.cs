@@ -58,16 +58,16 @@ namespace osu.Game.Tests.Visual
 
             AddWaitStep(3);
 
-            AddStep("hide", () => { infoWedge.State = Visibility.Hidden; });
+            AddStep("hide", () => infoWedge.State = Visibility.Hidden);
 
             AddWaitStep(3);
 
-            AddStep("show", () => { infoWedge.State = Visibility.Visible; });
+            AddStep("show", () => infoWedge.State = Visibility.Visible);
 
-            foreach (var rulesetInfo in rulesets.AvailableRulesets)
+            foreach (RulesetInfo rulesetInfo in rulesets.AvailableRulesets)
             {
-                var instance = rulesetInfo.CreateInstance();
-                var testBeatmap = createTestBeatmap(rulesetInfo);
+                Ruleset instance = rulesetInfo.CreateInstance();
+                IBeatmap testBeatmap = createTestBeatmap(rulesetInfo);
 
                 beatmaps.Add(testBeatmap);
 
@@ -140,7 +140,7 @@ namespace osu.Game.Tests.Visual
 
         private IBeatmap createTestBeatmap(RulesetInfo ruleset)
         {
-            List<HitObject> objects = new List<HitObject>();
+            var objects = new List<HitObject>();
             for (double i = 0; i < 50000; i += 1000)
                 objects.Add(new TestHitObject { StartTime = i });
 

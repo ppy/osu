@@ -57,7 +57,7 @@ namespace osu.Game.Tests.Visual
                 RelativeSizeAxes = Axes.Both,
             });
 
-            List<BeatmapSetInfo> beatmapSets = new List<BeatmapSetInfo>();
+            var beatmapSets = new List<BeatmapSetInfo>();
 
             for (int i = 1; i <= set_count; i++)
                 beatmapSets.Add(createTestBeatmapSet(i));
@@ -147,7 +147,7 @@ namespace osu.Game.Tests.Visual
 
         private bool selectedBeatmapVisible()
         {
-            var currentlySelected = carousel.Items.Find(s => s.Item is CarouselBeatmap && s.Item.State.Value == CarouselItemState.Selected);
+            DrawableCarouselItem currentlySelected = carousel.Items.Find(s => s.Item is CarouselBeatmap && s.Item.State.Value == CarouselItemState.Selected);
             if (currentlySelected == null)
                 return true;
 
@@ -312,7 +312,7 @@ namespace osu.Game.Tests.Visual
             AddStep("Sort by author", () => carousel.Filter(new FilterCriteria { Sort = SortMode.Author }, false));
             AddAssert("Check zzzzz is at bottom", () => carousel.BeatmapSets.Last().Metadata.AuthorString == "zzzzz");
             AddStep("Sort by artist", () => carousel.Filter(new FilterCriteria { Sort = SortMode.Artist }, false));
-            AddAssert($"Check #{set_count} is at bottom", () => carousel.BeatmapSets.Last().Metadata.Title.EndsWith($"#{set_count}!"));
+            AddAssert($"Check #{set_count} is at bottom", () => carousel.BeatmapSets.Last().Metadata.Title.EndsWith($"#{set_count}!", StringComparison.Ordinal));
         }
 
         private void testRemoveAll()
@@ -355,7 +355,7 @@ namespace osu.Game.Tests.Visual
 
         private void testHiding()
         {
-            var hidingSet = createTestBeatmapSet(1);
+            BeatmapSetInfo hidingSet = createTestBeatmapSet(1);
             hidingSet.Beatmaps[1].Hidden = true;
             AddStep("Add set with diff 2 hidden", () => carousel.UpdateBeatmapSet(hidingSet));
             setSelected(1, 1);
@@ -389,7 +389,7 @@ namespace osu.Game.Tests.Visual
 
         private void testSelectingFilteredRuleset()
         {
-            var testMixed = createTestBeatmapSet(set_count + 1);
+            BeatmapSetInfo testMixed = createTestBeatmapSet(set_count + 1);
             AddStep("add mixed ruleset beatmapset", () =>
             {
                 for (int i = 0; i <= 2; i++)
@@ -410,7 +410,7 @@ namespace osu.Game.Tests.Visual
                 carousel.RemoveBeatmapSet(testMixed);
                 testMixed = null;
             });
-            var testSingle = createTestBeatmapSet(set_count + 2);
+            BeatmapSetInfo testSingle = createTestBeatmapSet(set_count + 2);
             testSingle.Beatmaps.ForEach(b =>
             {
                 b.Ruleset = rulesets.AvailableRulesets.ElementAt(1);
@@ -424,7 +424,7 @@ namespace osu.Game.Tests.Visual
 
         private void testCarouselRootIsRandom()
         {
-            List<BeatmapSetInfo> beatmapSets = new List<BeatmapSetInfo>();
+            var beatmapSets = new List<BeatmapSetInfo>();
 
             for (int i = 1; i <= 50; i++)
                 beatmapSets.Add(createTestBeatmapSet(i));

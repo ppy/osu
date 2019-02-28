@@ -18,7 +18,7 @@ namespace osu.Game.Tests.Visual
         {
             int numerator = 0, denominator = 0;
 
-            ScoreCounter score = new ScoreCounter(7)
+            var score = new ScoreCounter(7)
             {
                 Origin = Anchor.TopRight,
                 Anchor = Anchor.TopRight,
@@ -36,7 +36,7 @@ namespace osu.Game.Tests.Visual
             };
             Add(comboCounter);
 
-            PercentageCounter accuracyCounter = new PercentageCounter
+            var accuracyCounter = new PercentageCounter
             {
                 Origin = Anchor.TopRight,
                 Anchor = Anchor.TopRight,
@@ -44,7 +44,7 @@ namespace osu.Game.Tests.Visual
             };
             Add(accuracyCounter);
 
-            StarCounter stars = new StarCounter
+            var stars = new StarCounter
             {
                 Origin = Anchor.BottomLeft,
                 Anchor = Anchor.BottomLeft,
@@ -53,7 +53,7 @@ namespace osu.Game.Tests.Visual
             };
             Add(stars);
 
-            SpriteText starsLabel = new SpriteText
+            var starsLabel = new SpriteText
             {
                 Origin = Anchor.BottomLeft,
                 Anchor = Anchor.BottomLeft,

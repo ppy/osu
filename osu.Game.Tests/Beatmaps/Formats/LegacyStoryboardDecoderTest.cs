@@ -19,10 +19,10 @@ namespace osu.Game.Tests.Beatmaps.Formats
         public void TestDecodeStoryboardEvents()
         {
             var decoder = new LegacyStoryboardDecoder();
-            using (var resStream = TestResources.OpenResource("Himeringo - Yotsuya-san ni Yoroshiku (RLC) [Winber1's Extreme].osu"))
+            using (Stream resStream = TestResources.OpenResource("Himeringo - Yotsuya-san ni Yoroshiku (RLC) [Winber1's Extreme].osu"))
             using (var stream = new StreamReader(resStream))
             {
-                var storyboard = decoder.Decode(stream);
+                Storyboard storyboard = decoder.Decode(stream);
 
                 Assert.IsTrue(storyboard.HasDrawable);
                 Assert.AreEqual(4, storyboard.Layers.Count());
@@ -91,10 +91,10 @@ namespace osu.Game.Tests.Beatmaps.Formats
         public void TestDecodeVariableWithSuffix()
         {
             var decoder = new LegacyStoryboardDecoder();
-            using (var resStream = TestResources.OpenResource("variable-with-suffix.osb"))
+            using (Stream resStream = TestResources.OpenResource("variable-with-suffix.osb"))
             using (var stream = new StreamReader(resStream))
             {
-                var storyboard = decoder.Decode(stream);
+                Storyboard storyboard = decoder.Decode(stream);
 
                 StoryboardLayer background = storyboard.Layers.Single(l => l.Depth == 3);
                 Assert.AreEqual(123456, ((StoryboardSprite)background.Elements.Single()).InitialPosition.X);

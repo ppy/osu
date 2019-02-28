@@ -5,6 +5,7 @@ using osuTK;
 using osuTK.Graphics;
 using osuTK.Input;
 using osu.Framework.Allocation;
+using osu.Framework.Audio.Track;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Input.Events;
@@ -57,11 +58,11 @@ namespace osu.Game.Screens.Menu
                     {
                         buttons = new ButtonSystem
                         {
-                            OnChart = delegate { this.Push(new ChartListing()); },
-                            OnDirect = delegate { this.Push(new OnlineListing()); },
-                            OnEdit = delegate { this.Push(new Editor()); },
+                            OnChart = () => this.Push(new ChartListing()),
+                            OnDirect = () => this.Push(new OnlineListing()),
+                            OnEdit = () => this.Push(new Editor()),
                             OnSolo = onSolo,
-                            OnMulti = delegate { this.Push(new Multiplayer()); },
+                            OnMulti = () => this.Push(new Multiplayer()),
                             OnExit = this.Exit,
                         }
                     }
@@ -104,7 +105,7 @@ namespace osu.Game.Screens.Menu
 
         private Screen consumeSongSelect()
         {
-            var s = songSelect;
+            Screen s = songSelect;
             songSelect = null;
             return s;
         }
@@ -114,16 +115,13 @@ namespace osu.Game.Screens.Menu
             base.OnEntering(last);
             buttons.FadeInFromZero(500);
 
-            var track = Beatmap.Value.Track;
-            var metadata = Beatmap.Value.Metadata;
+            Track track = Beatmap.Value.Track;
+            BeatmapMetadata metadata = Beatmap.Value.Metadata;
 
-            if (last is Intro && track != null)
+            if (last is Intro && track?.IsRunning == false)
             {
-                if (!track.IsRunning)
-                {
-                    track.Seek(metadata.PreviewTime != -1 ? metadata.PreviewTime : 0.4f * track.Length);
-                    track.Start();
-                }
+                track.Seek(metadata.PreviewTime != -1 ? metadata.PreviewTime : 0.4f * track.Length);
+                track.Start();
             }
 
             Beatmap.ValueChanged += beatmap_ValueChanged;

@@ -3,6 +3,7 @@
 
 using System.IO;
 using osu.Game.IO.Serialization;
+using osu.Game.Rulesets.Objects;
 
 namespace osu.Game.Beatmaps.Formats
 {
@@ -20,7 +21,7 @@ namespace osu.Game.Beatmaps.Formats
 
             stream.ReadToEnd().DeserializeInto(output);
 
-            foreach (var hitObject in output.HitObjects)
+            foreach (HitObject hitObject in output.HitObjects)
                 hitObject.ApplyDefaults(output.ControlPointInfo, output.BeatmapInfo.BaseDifficulty);
         }
     }

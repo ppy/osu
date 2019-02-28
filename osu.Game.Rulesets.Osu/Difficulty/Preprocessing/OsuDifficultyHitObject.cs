@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using osu.Game.Rulesets.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Objects;
@@ -105,7 +106,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
                     progress = progress % 1;
 
                 // ReSharper disable once PossibleInvalidOperationException (bugged in current r# version)
-                var diff = slider.StackedPosition + slider.Path.PositionAt(progress) - slider.LazyEndPosition.Value;
+                Vector2 diff = slider.StackedPosition + slider.Path.PositionAt(progress) - slider.LazyEndPosition.Value;
                 float dist = diff.Length;
 
                 if (dist > approxFollowCircleRadius)
@@ -119,8 +120,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
             });
 
             // Skip the head circle
-            var scoringTimes = slider.NestedHitObjects.Skip(1).Select(t => t.StartTime);
-            foreach (var time in scoringTimes)
+            IEnumerable<double> scoringTimes = slider.NestedHitObjects.Skip(1).Select(t => t.StartTime);
+            foreach (double time in scoringTimes)
                 computeVertex(time);
         }
 

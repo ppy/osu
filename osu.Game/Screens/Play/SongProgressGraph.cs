@@ -25,17 +25,17 @@ namespace osu.Game.Screens.Play
                 if (!objects.Any())
                     return;
 
-                var firstHit = objects.First().StartTime;
-                var lastHit = objects.Max(o => (o as IHasEndTime)?.EndTime ?? o.StartTime);
+                double firstHit = objects.First().StartTime;
+                double lastHit = objects.Max(o => (o as IHasEndTime)?.EndTime ?? o.StartTime);
 
                 if (lastHit == 0)
                     lastHit = objects.Last().StartTime;
 
-                var interval = (lastHit - firstHit + 1) / granularity;
+                double interval = (lastHit - firstHit + 1) / granularity;
 
-                foreach (var h in objects)
+                foreach (HitObject h in objects)
                 {
-                    var endTime = (h as IHasEndTime)?.EndTime ?? h.StartTime;
+                    double endTime = (h as IHasEndTime)?.EndTime ?? h.StartTime;
 
                     Debug.Assert(endTime >= h.StartTime);
 

@@ -79,17 +79,14 @@ namespace osu.Game.Screens.Multi.Match
                             header = new Components.Header
                             {
                                 Depth = -1,
-                                RequestBeatmapSelection = () =>
+                                RequestBeatmapSelection = () => this.Push(new MatchSongSelect
                                 {
-                                    this.Push(new MatchSongSelect
+                                    Selected = item =>
                                     {
-                                        Selected = item =>
-                                        {
-                                            Playlist.Clear();
-                                            Playlist.Add(item);
-                                        }
-                                    });
-                                }
+                                        Playlist.Clear();
+                                        Playlist.Add(item);
+                                    }
+                                })
                             }
                         },
                         new Drawable[] { info = new Info { OnStart = onStart } },
@@ -191,7 +188,7 @@ namespace osu.Game.Screens.Multi.Match
         private void currentItemChanged(ValueChangedEvent<PlaylistItem> e)
         {
             // Retrieve the corresponding local beatmap, since we can't directly use the playlist's beatmap info
-            var localBeatmap = e.NewValue?.Beatmap == null ? null : beatmapManager.QueryBeatmap(b => b.OnlineBeatmapID == e.NewValue.Beatmap.OnlineBeatmapID);
+            BeatmapInfo localBeatmap = e.NewValue?.Beatmap == null ? null : beatmapManager.QueryBeatmap(b => b.OnlineBeatmapID == e.NewValue.Beatmap.OnlineBeatmapID);
 
             Beatmap.Value = beatmapManager.GetWorkingBeatmap(localBeatmap);
             CurrentMods.Value = e.NewValue?.RequiredMods ?? Enumerable.Empty<Mod>();
@@ -211,7 +208,7 @@ namespace osu.Game.Screens.Multi.Match
                 return;
 
             // Try to retrieve the corresponding local beatmap
-            var localBeatmap = beatmapManager.QueryBeatmap(b => b.OnlineBeatmapID == CurrentItem.Value.Beatmap.OnlineBeatmapID);
+            BeatmapInfo localBeatmap = beatmapManager.QueryBeatmap(b => b.OnlineBeatmapID == CurrentItem.Value.Beatmap.OnlineBeatmapID);
 
             if (localBeatmap != null)
                 Beatmap.Value = beatmapManager.GetWorkingBeatmap(localBeatmap);

@@ -23,7 +23,7 @@ namespace osu.Game.Beatmaps
         {
             IHasComboInformation lastObj = null;
 
-            foreach (var obj in Beatmap.HitObjects.OfType<IHasComboInformation>())
+            foreach (IHasComboInformation obj in Beatmap.HitObjects.OfType<IHasComboInformation>())
             {
                 if (obj.NewCombo)
                 {
@@ -51,16 +51,16 @@ namespace osu.Game.Beatmaps
                 {
                     objectComboInfo.ComboIndex = comboIndex;
                     objectComboInfo.IndexInCurrentCombo = indexInCurrentCombo;
-                    foreach (var nestedObject in obj.NestedHitObjects)
+                    foreach (HitObject nestedObject in obj.NestedHitObjects)
                         updateNestedCombo(nestedObject, comboIndex, indexInCurrentCombo);
                 }
             }
 
-            foreach (var hitObject in Beatmap.HitObjects)
+            foreach (HitObject hitObject in Beatmap.HitObjects)
             {
                 if (hitObject is IHasComboInformation objectComboInfo)
                 {
-                    foreach (var nested in hitObject.NestedHitObjects)
+                    foreach (HitObject nested in hitObject.NestedHitObjects)
                         updateNestedCombo(nested, objectComboInfo.ComboIndex, objectComboInfo.IndexInCurrentCombo);
                 }
             }

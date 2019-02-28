@@ -195,7 +195,7 @@ namespace osu.Game.Rulesets.Catch.UI
 
                 if (!Trail) return;
 
-                var additive = createCatcherSprite();
+                Sprite additive = createCatcherSprite();
 
                 additive.Anchor = Anchor;
                 additive.OriginPosition = additive.OriginPosition + new Vector2(DrawWidth / 2, 0); // also temporary to align sprite correctly.
@@ -249,16 +249,16 @@ namespace osu.Game.Rulesets.Catch.UI
                 float halfCatchWidth = CatchWidth * 0.5f;
 
                 // this stuff wil disappear once we move fruit to non-relative coordinate space in the future.
-                var catchObjectPosition = fruit.X * CatchPlayfield.BASE_WIDTH;
-                var catcherPosition = Position.X * CatchPlayfield.BASE_WIDTH;
+                float catchObjectPosition = fruit.X * CatchPlayfield.BASE_WIDTH;
+                float catcherPosition = Position.X * CatchPlayfield.BASE_WIDTH;
 
-                var validCatch =
+                bool validCatch =
                     catchObjectPosition >= catcherPosition - halfCatchWidth &&
                     catchObjectPosition <= catcherPosition + halfCatchWidth;
 
                 if (validCatch && fruit.HyperDash)
                 {
-                    var target = fruit.HyperDashTarget;
+                    CatchHitObject target = fruit.HyperDashTarget;
                     double timeDifference = target.StartTime - fruit.StartTime;
                     double positionDifference = target.X * CatchPlayfield.BASE_WIDTH - catcherPosition;
                     double velocity = positionDifference / Math.Max(1.0, timeDifference - 1000.0 / 60.0);
@@ -365,7 +365,7 @@ namespace osu.Game.Rulesets.Catch.UI
 
                 if (currentDirection == 0) return;
 
-                var direction = Math.Sign(currentDirection);
+                int direction = Math.Sign(currentDirection);
 
                 double dashModifier = Dashing ? 1 : 0.5;
                 double speed = BASE_SPEED * dashModifier * hyperDashModifier;
@@ -387,9 +387,9 @@ namespace osu.Game.Rulesets.Catch.UI
             /// </summary>
             public void Drop()
             {
-                var fruit = caughtFruit.ToArray();
+                DrawableHitObject[] fruit = caughtFruit.ToArray();
 
-                foreach (var f in fruit)
+                foreach (DrawableHitObject f in fruit)
                 {
                     if (ExplodingFruitTarget != null)
                     {
@@ -412,13 +412,13 @@ namespace osu.Game.Rulesets.Catch.UI
             /// </summary>
             public void Explode()
             {
-                foreach (var f in caughtFruit.ToArray())
+                foreach (DrawableHitObject f in caughtFruit.ToArray())
                     Explode(f);
             }
 
             public void Explode(DrawableHitObject fruit)
             {
-                var originalX = fruit.X * Scale.X;
+                float originalX = fruit.X * Scale.X;
 
                 if (ExplodingFruitTarget != null)
                 {

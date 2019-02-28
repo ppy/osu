@@ -74,7 +74,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             AddNested(TailCircle);
             components.Add(TailCircle);
 
-            foreach (var tick in s.NestedHitObjects.OfType<SliderTick>())
+            foreach (SliderTick tick in s.NestedHitObjects.OfType<SliderTick>())
             {
                 var drawableTick = new DrawableSliderTick(tick) { Position = tick.Position - s.Position };
 
@@ -83,7 +83,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                 AddNested(drawableTick);
             }
 
-            foreach (var repeatPoint in s.NestedHitObjects.OfType<RepeatPoint>())
+            foreach (RepeatPoint repeatPoint in s.NestedHitObjects.OfType<RepeatPoint>())
             {
                 var drawableRepeatPoint = new DrawableRepeatPoint(repeatPoint, this) { Position = repeatPoint.Position - s.Position };
 
@@ -122,7 +122,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                 Body.AccentColour = AccentColour;
                 Ball.AccentColour = AccentColour;
 
-                foreach (var drawableHitObject in NestedHitObjects)
+                foreach (DrawableHitObject drawableHitObject in NestedHitObjects)
                     drawableHitObject.AccentColour = AccentColour;
             }
         }
@@ -137,17 +137,17 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
             double completionProgress = MathHelper.Clamp((Time.Current - slider.StartTime) / slider.Duration, 0, 1);
 
-            foreach (var c in components.OfType<ISliderProgress>()) c.UpdateProgress(completionProgress);
-            foreach (var c in components.OfType<ITrackSnaking>()) c.UpdateSnakingPosition(slider.Path.PositionAt(Body.SnakedStart ?? 0), slider.Path.PositionAt(Body.SnakedEnd ?? 0));
-            foreach (var t in components.OfType<IRequireTracking>()) t.Tracking = Ball.Tracking;
+            foreach (ISliderProgress c in components.OfType<ISliderProgress>()) c.UpdateProgress(completionProgress);
+            foreach (ITrackSnaking c in components.OfType<ITrackSnaking>()) c.UpdateSnakingPosition(slider.Path.PositionAt(Body.SnakedStart ?? 0), slider.Path.PositionAt(Body.SnakedEnd ?? 0));
+            foreach (IRequireTracking t in components.OfType<IRequireTracking>()) t.Tracking = Ball.Tracking;
 
             Size = Body.Size;
             OriginPosition = Body.PathOffset;
 
             if (DrawSize != Vector2.Zero)
             {
-                var childAnchorPosition = Vector2.Divide(OriginPosition, DrawSize);
-                foreach (var obj in NestedHitObjects)
+                Vector2 childAnchorPosition = Vector2.Divide(OriginPosition, DrawSize);
+                foreach (DrawableHitObject obj in NestedHitObjects)
                     obj.RelativeAnchorPosition = childAnchorPosition;
                 Ball.RelativeAnchorPosition = childAnchorPosition;
             }
@@ -169,10 +169,10 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
             ApplyResult(r =>
             {
-                var judgementsCount = NestedHitObjects.Count();
-                var judgementsHit = NestedHitObjects.Count(h => h.IsHit);
+                int judgementsCount = NestedHitObjects.Count();
+                int judgementsHit = NestedHitObjects.Count(h => h.IsHit);
 
-                var hitFraction = (double)judgementsHit / judgementsCount;
+                double hitFraction = (double)judgementsHit / judgementsCount;
 
                 if (hitFraction == 1 && HeadCircle.Result.Type == HitResult.Great)
                     r.Type = HitResult.Great;

@@ -26,13 +26,13 @@ namespace osu.Game.Screens.Select.Carousel
         {
             get
             {
-                var drawables = base.Drawables;
+                List<DrawableCarouselItem> drawables = base.Drawables;
 
                 // if we are explicitly not present, don't ever present children.
                 // without this check, children drawables can potentially be presented without their group header.
                 if (DrawableRepresentation.Value?.IsPresent == false) return drawables;
 
-                foreach (var c in InternalChildren)
+                foreach (CarouselItem c in InternalChildren)
                     drawables.AddRange(c.Drawables);
                 return drawables;
             }
@@ -93,7 +93,7 @@ namespace osu.Game.Screens.Select.Carousel
             // ensure we are the only item selected
             if (value == CarouselItemState.Selected)
             {
-                foreach (var b in InternalChildren)
+                foreach (CarouselItem b in InternalChildren)
                 {
                     if (item == b) continue;
 

@@ -53,14 +53,14 @@ namespace osu.Game.Online.Chat
             int captureOffset = 0;
             foreach (Match m in regex.Matches(result.Text, startIndex))
             {
-                var index = m.Index - captureOffset;
+                int index = m.Index - captureOffset;
 
-                var displayText = string.Format(display,
+                string displayText = string.Format(display,
                     m.Groups[0],
                     m.Groups.Count > 1 ? m.Groups[1].Value : "",
                     m.Groups.Count > 2 ? m.Groups[2].Value : "").Trim();
 
-                var linkText = string.Format(link,
+                string linkText = string.Format(link,
                     m.Groups[0],
                     m.Groups.Count > 1 ? m.Groups[1].Value : "",
                     m.Groups.Count > 2 ? m.Groups[2].Value : "").Trim();
@@ -75,7 +75,7 @@ namespace osu.Game.Online.Chat
                     //since we just changed the line display text, offset any already processed links.
                     result.Links.ForEach(l => l.Index -= l.Index > index ? m.Length - displayText.Length : 0);
 
-                    var details = getLinkDetails(linkText);
+                    LinkDetails details = getLinkDetails(linkText);
                     result.Links.Add(new Link(linkText, index, displayText.Length, linkActionOverride ?? details.Action, details.Argument));
 
                     //adjust the offset for processing the current matches group.
@@ -88,18 +88,18 @@ namespace osu.Game.Online.Chat
         {
             foreach (Match m in regex.Matches(result.Text, startIndex))
             {
-                var index = m.Index;
-                var link = m.Groups["link"].Value;
-                var indexLength = link.Length;
+                int index = m.Index;
+                string link = m.Groups["link"].Value;
+                int indexLength = link.Length;
 
-                var details = getLinkDetails(link);
+                LinkDetails details = getLinkDetails(link);
                 result.Links.Add(new Link(link, index, indexLength, details.Action, details.Argument));
             }
         }
 
         private static LinkDetails getLinkDetails(string url)
         {
-            var args = url.Split(new[] { '/' }, StringSplitOptions.RemoveEmptyEntries);
+            string[] args = url.Split(new[] { '/' }, StringSplitOptions.RemoveEmptyEntries);
             args[0] = args[0].TrimEnd(':');
 
             switch (args[0])
@@ -189,7 +189,7 @@ namespace osu.Game.Online.Chat
             // handle channels
             handleMatches(channel_regex, "{0}", "osu://chan/{0}", result, startIndex, LinkAction.OpenChannel);
 
-            var empty = "";
+            string empty = "";
             while (space-- > 0)
                 empty += "\0";
 
@@ -200,7 +200,7 @@ namespace osu.Game.Online.Chat
 
         public static Message FormatMessage(Message inputMessage)
         {
-            var result = format(inputMessage.Content);
+            MessageFormatterResult result = format(inputMessage.Content);
 
             inputMessage.DisplayContent = result.Text;
 
@@ -212,7 +212,7 @@ namespace osu.Game.Online.Chat
 
         public static MessageFormatterResult FormatText(string text)
         {
-            var result = format(text);
+            MessageFormatterResult result = format(text);
 
             result.Links.Sort();
 

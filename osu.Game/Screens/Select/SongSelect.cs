@@ -366,8 +366,8 @@ namespace osu.Game.Screens.Select
         /// </summary>
         private void performUpdateSelected()
         {
-            var beatmap = beatmapNoDebounce;
-            var ruleset = rulesetNoDebounce;
+            BeatmapInfo beatmap = beatmapNoDebounce;
+            RulesetInfo ruleset = rulesetNoDebounce;
 
             void run()
             {
@@ -444,7 +444,7 @@ namespace osu.Game.Screens.Select
         {
             base.LogoArriving(logo, resuming);
 
-            Vector2 position = new Vector2(0.95f, 0.96f);
+            var position = new Vector2(0.95f, 0.96f);
 
             if (logo.Alpha > 0.8f)
             {
@@ -480,7 +480,7 @@ namespace osu.Game.Screens.Select
 
             Beatmap.Value.Track.Looping = true;
 
-            if (Beatmap != null && !Beatmap.Value.BeatmapSetInfo.DeletePending)
+            if (Beatmap?.Value.BeatmapSetInfo.DeletePending == false)
             {
                 UpdateBeatmap(Beatmap.Value);
                 ensurePlayingSelected();

@@ -12,6 +12,7 @@ using osu.Game.Graphics;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Graphics.Transforms;
 using osu.Game.Screens.Ranking;
 using osu.Game.Rulesets.Scoring;
 
@@ -214,7 +215,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
         protected override void UpdateCurrentState(ArmedState state)
         {
-            var sequence = this.Delay(Spinner.Duration).FadeOut(160);
+            TransformSequence<DrawableSpinner> sequence = this.Delay(Spinner.Duration).FadeOut(160);
 
             switch (state)
             {

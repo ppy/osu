@@ -148,8 +148,8 @@ namespace osu.Game.Screens.Select
             [BackgroundDependencyLoader]
             private void load(LocalisationManager localisation)
             {
-                var beatmapInfo = beatmap.BeatmapInfo;
-                var metadata = beatmapInfo.Metadata ?? beatmap.BeatmapSetInfo?.Metadata ?? new BeatmapMetadata();
+                BeatmapInfo beatmapInfo = beatmap.BeatmapInfo;
+                BeatmapMetadata metadata = beatmapInfo.Metadata ?? beatmap.BeatmapSetInfo?.Metadata ?? new BeatmapMetadata();
 
                 PixelSnapping = true;
                 CacheDrawnFrameBuffer = true;
@@ -280,9 +280,9 @@ namespace osu.Game.Screens.Select
 
             private InfoLabel[] getInfoLabels()
             {
-                var b = beatmap.Beatmap;
+                IBeatmap b = beatmap.Beatmap;
 
-                List<InfoLabel> labels = new List<InfoLabel>();
+                var labels = new List<InfoLabel>();
 
                 if (b?.HitObjects?.Any() == true)
                 {

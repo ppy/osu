@@ -19,7 +19,7 @@ namespace osu.Game.Beatmaps
 
             public VirtualBeatmapTrack(IBeatmap beatmap)
             {
-                var lastObject = beatmap.HitObjects.LastOrDefault();
+                HitObject lastObject = beatmap.HitObjects.LastOrDefault();
 
                 switch (lastObject)
                 {

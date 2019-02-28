@@ -22,7 +22,7 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawable
 
             InternalChild = bananaContainer = new Container { RelativeSizeAxes = Axes.Both };
 
-            foreach (var b in s.NestedHitObjects.Cast<Banana>())
+            foreach (Banana b in s.NestedHitObjects.Cast<Banana>())
                 AddNested(getVisualRepresentation?.Invoke(b));
         }
 

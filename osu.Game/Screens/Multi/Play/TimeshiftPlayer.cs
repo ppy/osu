@@ -83,7 +83,7 @@ namespace osu.Game.Screens.Multi.Play
 
         private void submitScore()
         {
-            var score = base.CreateScore();
+            ScoreInfo score = base.CreateScore();
 
             score.TotalScore = (int)Math.Round(ScoreProcessor.GetStandardisedScore());
 

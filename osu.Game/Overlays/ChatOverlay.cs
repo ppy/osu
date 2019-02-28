@@ -204,7 +204,7 @@ namespace osu.Game.Overlays
             if (channelTabControl.Current.Value != e.NewValue)
                 Scheduler.Add(() => channelTabControl.Current.Value = e.NewValue);
 
-            var loaded = loadedChannels.Find(d => d.Channel == e.NewValue);
+            DrawableChannel loaded = loadedChannels.Find(d => d.Channel == e.NewValue);
             if (loaded == null)
             {
                 currentChannelContainer.FadeOut(500, Easing.OutQuint);
@@ -266,7 +266,7 @@ namespace osu.Game.Overlays
 
         private void selectTab(int index)
         {
-            var channel = channelTabControl.Items.Skip(index).FirstOrDefault();
+            Channel channel = channelTabControl.Items.Skip(index).FirstOrDefault();
             if (channel != null && channel.Name != "+")
                 channelTabControl.Current.Value = channel;
         }
@@ -387,7 +387,7 @@ namespace osu.Game.Overlays
 
         private void postMessage(TextBox textbox, bool newText)
         {
-            var text = textbox.Text.Trim();
+            string text = textbox.Text.Trim();
 
             if (string.IsNullOrWhiteSpace(text))
                 return;

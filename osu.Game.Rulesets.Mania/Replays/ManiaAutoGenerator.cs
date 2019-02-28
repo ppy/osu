@@ -29,7 +29,7 @@ namespace osu.Game.Rulesets.Mania.Replays
             var normalAction = ManiaAction.Key1;
             var specialAction = ManiaAction.Special1;
             int totalCounter = 0;
-            foreach (var stage in Beatmap.Stages)
+            foreach (StageDefinition stage in Beatmap.Stages)
             {
                 for (int i = 0; i < stage.Columns; i++)
                 {
@@ -49,12 +49,12 @@ namespace osu.Game.Rulesets.Mania.Replays
             // Todo: Realistically this shouldn't be needed, but the first frame is skipped with the way replays are currently handled
             Replay.Frames.Add(new ManiaReplayFrame(-100000, 0));
 
-            var pointGroups = generateActionPoints().GroupBy(a => a.Time).OrderBy(g => g.First().Time);
+            IOrderedEnumerable<IGrouping<double, IActionPoint>> pointGroups = generateActionPoints().GroupBy(a => a.Time).OrderBy(g => g.First().Time);
 
             var actions = new List<ManiaAction>();
-            foreach (var group in pointGroups)
+            foreach (IGrouping<double, IActionPoint> group in pointGroups)
             {
-                foreach (var point in group)
+                foreach (IActionPoint point in group)
                 {
                     switch (point)
                     {
@@ -75,7 +75,7 @@ namespace osu.Game.Rulesets.Mania.Replays
 
         private IEnumerable<IActionPoint> generateActionPoints()
         {
-            foreach (var obj in Beatmap.HitObjects)
+            foreach (ManiaHitObject obj in Beatmap.HitObjects)
             {
                 yield return new HitPoint { Time = obj.StartTime, Column = obj.Column };
                 yield return new ReleasePoint { Time = ((obj as IHasEndTime)?.EndTime ?? obj.StartTime) + RELEASE_DELAY, Column = obj.Column };

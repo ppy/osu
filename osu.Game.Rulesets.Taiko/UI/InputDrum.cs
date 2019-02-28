@@ -146,7 +146,7 @@ namespace osu.Game.Rulesets.Taiko.UI
                 Drawable target = null;
                 Drawable back = null;
 
-                var drumSample = sampleMappings.SampleAt(Time.Current);
+                DrumSampleMapping.DrumSample drumSample = sampleMappings.SampleAt(Time.Current);
 
                 if (action == CentreAction)
                 {

@@ -10,6 +10,7 @@ using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Mania.Edit.Blueprints;
 using osu.Game.Rulesets.Mania.Objects;
 using osu.Game.Rulesets.Mania.Objects.Drawables;
+using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.UI.Scrolling;
 using osu.Game.Tests.Visual;
 
@@ -45,7 +46,7 @@ namespace osu.Game.Rulesets.Mania.Tests
         {
             base.Update();
 
-            foreach (var nested in drawableObject.NestedHitObjects)
+            foreach (DrawableHitObject nested in drawableObject.NestedHitObjects)
             {
                 double finalPosition = (nested.HitObject.StartTime - drawableObject.HitObject.StartTime) / drawableObject.HitObject.Duration;
                 nested.Y = (float)(-finalPosition * content.DrawHeight);

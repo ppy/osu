@@ -18,7 +18,7 @@ namespace osu.Game.Overlays.Toolbar
             {
                 ruleset = value;
 
-                var rInstance = ruleset.CreateInstance();
+                Ruleset rInstance = ruleset.CreateInstance();
 
                 TooltipMain = rInstance.Description;
                 TooltipSub = $"Play some {rInstance.Description}";

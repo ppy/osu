@@ -109,7 +109,7 @@ namespace osu.Game.Screens.Multi.Ranking.Pages
 
             protected override FillFlowContainer<LeaderboardScore> CreateScoreFlow()
             {
-                var flow = base.CreateScoreFlow();
+                FillFlowContainer<LeaderboardScore> flow = base.CreateScoreFlow();
                 flow.Padding = new MarginPadding
                 {
                     Top = LeaderboardScore.HEIGHT * 2,

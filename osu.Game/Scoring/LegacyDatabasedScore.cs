@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.IO;
 using System.Linq;
 using osu.Framework.IO.Stores;
 using osu.Game.Beatmaps;
@@ -16,9 +17,9 @@ namespace osu.Game.Scoring
         {
             ScoreInfo = score;
 
-            var replayFilename = score.Files.First(f => f.Filename.EndsWith(".osr", StringComparison.InvariantCultureIgnoreCase)).FileInfo.StoragePath;
+            string replayFilename = score.Files.First(f => f.Filename.EndsWith(".osr", StringComparison.InvariantCultureIgnoreCase)).FileInfo.StoragePath;
 
-            using (var stream = store.GetStream(replayFilename))
+            using (Stream stream = store.GetStream(replayFilename))
                 Replay = new DatabasedLegacyScoreParser(rulesets, beatmaps).Parse(stream).Replay;
         }
     }

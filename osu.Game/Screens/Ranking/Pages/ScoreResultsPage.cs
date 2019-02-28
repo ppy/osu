@@ -180,7 +180,7 @@ namespace osu.Game.Screens.Ranking.Pages
                 scoreCounter.Increment(Score.TotalScore);
 
                 int delay = 0;
-                foreach (var s in statisticsContainer.Children)
+                foreach (DrawableScoreStatistic s in statisticsContainer.Children)
                 {
                     s.FadeOut()
                      .Then(delay += 200)
@@ -335,7 +335,7 @@ namespace osu.Game.Screens.Ranking.Pages
                 title.Colour = artist.Colour = colours.BlueDarker;
                 versionMapper.Colour = colours.Gray8;
 
-                var creator = beatmap.Metadata.Author?.Username;
+                string creator = beatmap.Metadata.Author?.Username;
                 if (!string.IsNullOrEmpty(creator))
                 {
                     versionMapper.Text = $"mapped by {creator}";

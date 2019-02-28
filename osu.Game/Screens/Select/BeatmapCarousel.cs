@@ -71,7 +71,7 @@ namespace osu.Game.Screens.Select
 
         private void loadBeatmapSets(Func<IEnumerable<BeatmapSetInfo>> beatmapSets)
         {
-            CarouselRoot newRoot = new CarouselRoot(this);
+            var newRoot = new CarouselRoot(this);
 
             Task.Run(() =>
             {
@@ -79,7 +79,7 @@ namespace osu.Game.Screens.Select
                 newRoot.Filter(activeCriteria);
 
                 // preload drawables as the ctor overhead is quite high currently.
-                var _ = newRoot.Drawables;
+                List<DrawableCarouselItem> _ = newRoot.Drawables;
             }).ContinueWith(_ => Schedule(() =>
             {
                 root = newRoot;
@@ -138,7 +138,7 @@ namespace osu.Game.Screens.Select
         {
             Schedule(() =>
             {
-                var existingSet = beatmapSets.FirstOrDefault(b => b.BeatmapSet.ID == beatmapSet.ID);
+                CarouselBeatmapSet existingSet = beatmapSets.FirstOrDefault(b => b.BeatmapSet.ID == beatmapSet.ID);
 
                 if (existingSet == null)
                     return;
@@ -156,7 +156,7 @@ namespace osu.Game.Screens.Select
 
                 bool hadSelection = existingSet?.State?.Value == CarouselItemState.Selected;
 
-                var newSet = createCarouselSet(beatmapSet);
+                CarouselBeatmapSet newSet = createCarouselSet(beatmapSet);
 
                 if (existingSet != null)
                     root.RemoveChild(existingSet);
@@ -199,7 +199,7 @@ namespace osu.Game.Screens.Select
                 if (!bypassFilters && set.Filtered.Value)
                     continue;
 
-                var item = set.Beatmaps.FirstOrDefault(p => p.Beatmap.Equals(beatmap));
+                CarouselBeatmap item = set.Beatmaps.FirstOrDefault(p => p.Beatmap.Equals(beatmap));
 
                 if (item == null)
                     // The beatmap that needs to be selected doesn't exist in this set
@@ -226,7 +226,7 @@ namespace osu.Game.Screens.Select
         /// <param name="skipDifficulties">Whether to skip individual difficulties and only increment over full groups.</param>
         public void SelectNext(int direction = 1, bool skipDifficulties = true)
         {
-            var visibleItems = Items.Where(s => !s.Item.Filtered.Value).ToList();
+            List<DrawableCarouselItem> visibleItems = Items.Where(s => !s.Item.Filtered.Value).ToList();
 
             if (!visibleItems.Any())
                 return;
@@ -246,7 +246,7 @@ namespace osu.Game.Screens.Select
 
             while (incrementIndex() != originalIndex)
             {
-                var item = visibleItems[currentIndex].Item;
+                CarouselItem item = visibleItems[currentIndex].Item;
 
                 if (item.Filtered.Value || item.State.Value == CarouselItemState.Selected) continue;
 
@@ -273,7 +273,7 @@ namespace osu.Game.Screens.Select
         /// <returns>True if a selection could be made, else False.</returns>
         public bool SelectNextRandom()
         {
-            var visibleSets = beatmapSets.Where(s => !s.Filtered.Value).ToList();
+            List<CarouselBeatmapSet> visibleSets = beatmapSets.Where(s => !s.Filtered.Value).ToList();
             if (!visibleSets.Any())
                 return false;
 
@@ -291,7 +291,7 @@ namespace osu.Game.Screens.Select
 
             if (RandomAlgorithm.Value == RandomSelectAlgorithm.RandomPermutation)
             {
-                var notYetVisitedSets = visibleSets.Except(previouslyVisitedRandomSets).ToList();
+                List<CarouselBeatmapSet> notYetVisitedSets = visibleSets.Except(previouslyVisitedRandomSets).ToList();
                 if (!notYetVisitedSets.Any())
                 {
                     previouslyVisitedRandomSets.RemoveAll(s => visibleSets.Contains(s));
@@ -304,7 +304,7 @@ namespace osu.Game.Screens.Select
             else
                 set = visibleSets.ElementAt(RNG.Next(visibleSets.Count));
 
-            var visibleBeatmaps = set.Beatmaps.Where(s => !s.Filtered.Value).ToList();
+            List<CarouselBeatmap> visibleBeatmaps = set.Beatmaps.Where(s => !s.Filtered.Value).ToList();
             select(visibleBeatmaps[RNG.Next(visibleBeatmaps.Count)]);
             return true;
         }
@@ -313,7 +313,7 @@ namespace osu.Game.Screens.Select
         {
             while (randomSelectedBeatmaps.Any())
             {
-                var beatmap = randomSelectedBeatmaps.Pop();
+                CarouselBeatmap beatmap = randomSelectedBeatmaps.Pop();
 
                 if (!beatmap.Filtered.Value)
                 {
@@ -491,7 +491,7 @@ namespace osu.Game.Screens.Select
             base.Dispose(isDisposing);
 
             // aggressively dispose "off-screen" items to reduce GC pressure.
-            foreach (var i in Items)
+            foreach (DrawableCarouselItem i in Items)
                 i.Dispose();
         }
 
@@ -501,7 +501,7 @@ namespace osu.Game.Screens.Select
                 return null;
 
             // todo: remove the need for this.
-            foreach (var b in beatmapSet.Beatmaps)
+            foreach (BeatmapInfo b in beatmapSet.Beatmaps)
             {
                 if (b.Metadata == null)
                     b.Metadata = beatmapSet.Metadata;
@@ -509,7 +509,7 @@ namespace osu.Game.Screens.Select
 
             var set = new CarouselBeatmapSet(beatmapSet);
 
-            foreach (var c in set.Beatmaps)
+            foreach (CarouselBeatmap c in set.Beatmaps)
             {
                 c.State.ValueChanged += state =>
                 {
@@ -634,7 +634,7 @@ namespace osu.Game.Screens.Select
         /// <param name="halfHeight">Half the draw height of the carousel container.</param>
         private void updateItem(DrawableCarouselItem p, float halfHeight)
         {
-            var height = p.IsPresent ? p.DrawHeight : 0;
+            float height = p.IsPresent ? p.DrawHeight : 0;
 
             float itemDrawY = p.Position.Y - Current + height / 2;
             float dist = Math.Abs(1f - itemDrawY / halfHeight);

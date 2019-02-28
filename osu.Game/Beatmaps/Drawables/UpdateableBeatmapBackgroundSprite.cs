@@ -29,7 +29,7 @@ namespace osu.Game.Beatmaps.Drawables
             {
                 Drawable drawable;
 
-                var localBeatmap = beatmaps.GetWorkingBeatmap(model);
+                WorkingBeatmap localBeatmap = beatmaps.GetWorkingBeatmap(model);
 
                 if (localBeatmap.BeatmapInfo.ID == 0 && model?.BeatmapSet?.OnlineInfo != null)
                     drawable = new BeatmapSetCover(model.BeatmapSet);

@@ -8,6 +8,7 @@ using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
 using osu.Game.Beatmaps;
+using osu.Game.Beatmaps.Timing;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu.Objects;
@@ -39,7 +40,7 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         public void ApplyToScoreProcessor(ScoreProcessor scoreProcessor)
         {
-            scoreProcessor.Health.ValueChanged += health => { blinds.AnimateClosedness((float)health.NewValue); };
+            scoreProcessor.Health.ValueChanged += health => blinds.AnimateClosedness((float)health.NewValue);
         }
 
         /// <summary>
@@ -152,13 +153,13 @@ namespace osu.Game.Rulesets.Osu.Mods
 
                 base.LoadComplete();
 
-                var firstObj = beatmap.HitObjects[0];
-                var startDelay = firstObj.StartTime - firstObj.TimePreempt;
+                OsuHitObject firstObj = beatmap.HitObjects[0];
+                double startDelay = firstObj.StartTime - firstObj.TimePreempt;
 
                 using (BeginAbsoluteSequence(startDelay + break_close_late, true))
                     leaveBreak();
 
-                foreach (var breakInfo in beatmap.Breaks)
+                foreach (BreakPeriod breakInfo in beatmap.Breaks)
                 {
                     if (breakInfo.HasEffect)
                     {

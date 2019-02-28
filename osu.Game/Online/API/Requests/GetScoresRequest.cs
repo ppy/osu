@@ -39,7 +39,7 @@ namespace osu.Game.Online.API.Requests
 
         protected override WebRequest CreateWebRequest()
         {
-            var req = base.CreateWebRequest();
+            WebRequest req = base.CreateWebRequest();
 
             req.Timeout = 30000;
             req.AddParameter(@"type", scope.ToString().ToLowerInvariant());

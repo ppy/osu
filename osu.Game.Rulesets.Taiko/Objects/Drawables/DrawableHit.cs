@@ -4,6 +4,7 @@
 using System;
 using System.Linq;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Shapes;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.Taiko.Objects.Drawables.Pieces;
@@ -41,7 +42,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
                 return;
             }
 
-            var result = HitObject.HitWindows.ResultFor(timeOffset);
+            HitResult result = HitObject.HitWindows.ResultFor(timeOffset);
             if (result == HitResult.None)
                 return;
 
@@ -62,7 +63,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             validActionPressed = HitActions.Contains(action);
 
             // Only count this as handled if the new judgement is a hit
-            var result = UpdateResult(true);
+            bool result = UpdateResult(true);
 
             if (IsHit)
                 HitAction = action;
@@ -97,7 +98,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             var circlePiece = MainPiece as CirclePiece;
             circlePiece?.FlashBox.FinishTransforms();
 
-            var offset = !AllJudged ? 0 : Time.Current - HitObject.StartTime;
+            double offset = !AllJudged ? 0 : Time.Current - HitObject.StartTime;
             using (BeginDelayedSequence(HitObject.StartTime - Time.Current + offset, true))
             {
                 switch (State.Value)
@@ -116,12 +117,9 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
                         // If we're far enough away from the left stage, we should bring outselves in front of it
                         ProxyContent();
 
-                        var flash = circlePiece?.FlashBox;
-                        if (flash != null)
-                        {
-                            flash.FadeTo(0.9f);
-                            flash.FadeOut(300);
-                        }
+                        Box flash = circlePiece?.FlashBox;
+                        flash?.FadeTo(0.9f);
+                        flash?.FadeOut(300);
 
                         const float gravity_time = 300;
                         const float gravity_travel_height = 200;

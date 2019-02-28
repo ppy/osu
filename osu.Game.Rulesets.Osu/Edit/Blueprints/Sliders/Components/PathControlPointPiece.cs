@@ -76,7 +76,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
 
         protected override bool OnDrag(DragEvent e)
         {
-            var newControlPoints = slider.Path.ControlPoints.ToArray();
+            Vector2[] newControlPoints = slider.Path.ControlPoints.ToArray();
 
             if (index == 0)
             {

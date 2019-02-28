@@ -9,6 +9,7 @@ using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Mania.Objects;
 using osu.Game.Rulesets.Mania.Objects.Drawables.Pieces;
 using osu.Game.Rulesets.Mania.UI;
+using osu.Game.Rulesets.UI;
 using osu.Game.Rulesets.UI.Scrolling;
 using osuTK;
 
@@ -72,7 +73,7 @@ namespace osu.Game.Rulesets.Mania.Edit.Blueprints
             SnappedWidth = Column.DrawWidth;
 
             // Snap to the column
-            var parentPos = Parent.ToLocalSpace(Column.ToScreenSpace(new Vector2(Column.DrawWidth / 2, 0)));
+            Vector2 parentPos = Parent.ToLocalSpace(Column.ToScreenSpace(new Vector2(Column.DrawWidth / 2, 0)));
             SnappedMousePosition = new Vector2(parentPos.X, e.MousePosition.Y);
             return true;
         }
@@ -82,11 +83,11 @@ namespace osu.Game.Rulesets.Mania.Edit.Blueprints
             if (Column == null)
                 return 0;
 
-            var hitObjectContainer = Column.HitObjectContainer;
+            HitObjectContainer hitObjectContainer = Column.HitObjectContainer;
 
             // If we're scrolling downwards, a position of 0 is actually further away from the hit target
             // so we need to flip the vertical coordinate in the hitobject container's space
-            var hitObjectPos = Column.HitObjectContainer.ToLocalSpace(applyPositionOffset(screenSpacePosition, false)).Y;
+            float hitObjectPos = Column.HitObjectContainer.ToLocalSpace(applyPositionOffset(screenSpacePosition, false)).Y;
             if (scrollingInfo.Direction.Value == ScrollingDirection.Down)
                 hitObjectPos = hitObjectContainer.DrawHeight - hitObjectPos;
 
@@ -98,7 +99,7 @@ namespace osu.Game.Rulesets.Mania.Edit.Blueprints
 
         protected float PositionAt(double time)
         {
-            var pos = scrollingInfo.Algorithm.PositionAt(time,
+            float pos = scrollingInfo.Algorithm.PositionAt(time,
                 EditorClock.CurrentTime,
                 scrollingInfo.TimeRange.Value,
                 Column.HitObjectContainer.DrawHeight);

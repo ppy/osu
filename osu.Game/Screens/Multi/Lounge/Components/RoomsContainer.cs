@@ -87,7 +87,7 @@ namespace osu.Game.Screens.Multi.Lounge.Components
 
         private void addRooms(IEnumerable<Room> rooms)
         {
-            foreach (var r in rooms)
+            foreach (Room r in rooms)
                 roomFlow.Add(new DrawableRoom(r) { Action = () => selectRoom(r) });
 
             Filter(currentFilter);
@@ -95,9 +95,9 @@ namespace osu.Game.Screens.Multi.Lounge.Components
 
         private void removeRooms(IEnumerable<Room> rooms)
         {
-            foreach (var r in rooms)
+            foreach (Room r in rooms)
             {
-                var toRemove = roomFlow.Single(d => d.Room == r);
+                DrawableRoom toRemove = roomFlow.Single(d => d.Room == r);
                 toRemove.Action = null;
 
                 roomFlow.Remove(toRemove);
@@ -108,13 +108,13 @@ namespace osu.Game.Screens.Multi.Lounge.Components
 
         private void updateSorting()
         {
-            foreach (var room in roomFlow)
+            foreach (DrawableRoom room in roomFlow)
                 roomFlow.SetLayoutPosition(room, room.Room.Position.Value);
         }
 
         private void selectRoom(Room room)
         {
-            var drawable = roomFlow.FirstOrDefault(r => r.Room == room);
+            DrawableRoom drawable = roomFlow.FirstOrDefault(r => r.Room == room);
 
             if (drawable != null && drawable.State == SelectionState.Selected)
                 JoinRequested?.Invoke(room);

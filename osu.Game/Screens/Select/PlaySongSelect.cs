@@ -1,10 +1,13 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
+using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Screens;
 using osu.Game.Graphics;
+using osu.Game.Rulesets.Mods;
 using osu.Game.Screens.Play;
 using osuTK.Input;
 
@@ -33,7 +36,7 @@ namespace osu.Game.Screens.Select
 
             if (removeAutoModOnResume)
             {
-                var autoType = Ruleset.Value.CreateInstance().GetAutoplayMod().GetType();
+                Type autoType = Ruleset.Value.CreateInstance().GetAutoplayMod().GetType();
                 ModSelect.DeselectTypes(new[] { autoType }, true);
                 removeAutoModOnResume = false;
             }
@@ -48,10 +51,10 @@ namespace osu.Game.Screens.Select
             // Ctrl+Enter should start map with autoplay enabled.
             if (GetContainingInputManager().CurrentState?.Keyboard.ControlPressed == true)
             {
-                var auto = Ruleset.Value.CreateInstance().GetAutoplayMod();
-                var autoType = auto.GetType();
+                Mod auto = Ruleset.Value.CreateInstance().GetAutoplayMod();
+                Type autoType = auto.GetType();
 
-                var mods = SelectedMods.Value;
+                IEnumerable<Mod> mods = SelectedMods.Value;
                 if (mods.All(m => m.GetType() != autoType))
                 {
                     SelectedMods.Value = mods.Append(auto);

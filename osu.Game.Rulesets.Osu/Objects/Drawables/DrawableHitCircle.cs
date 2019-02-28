@@ -123,7 +123,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                 return;
             }
 
-            var result = HitObject.HitWindows.ResultFor(timeOffset);
+            HitResult result = HitObject.HitWindows.ResultFor(timeOffset);
             if (result == HitResult.None)
             {
                 Shake(Math.Abs(timeOffset) - HitObject.HitWindows.HalfWindowFor(HitResult.Miss));

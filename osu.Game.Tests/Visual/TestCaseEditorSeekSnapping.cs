@@ -7,6 +7,7 @@ using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Lists;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Rulesets.Osu.Objects;
@@ -363,7 +364,7 @@ namespace osu.Game.Tests.Visual
                     }
                 };
 
-                var timingPoints = beatmap.ControlPointInfo.TimingPoints;
+                SortedList<TimingControlPoint> timingPoints = beatmap.ControlPointInfo.TimingPoints;
 
                 for (int i = 0; i < timingPoints.Count; i++)
                 {

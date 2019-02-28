@@ -47,7 +47,7 @@ namespace osu.Game.Rulesets.Mods
 
         public virtual void ApplyToRulesetContainer(RulesetContainer<T> rulesetContainer)
         {
-            var flashlight = CreateFlashlight();
+            Flashlight flashlight = CreateFlashlight();
             flashlight.Combo = Combo;
             flashlight.RelativeSizeAxes = Axes.Both;
             flashlight.Colour = Color4.Black;
@@ -95,7 +95,7 @@ namespace osu.Game.Rulesets.Mods
 
                 this.FadeInFromZero(FLASHLIGHT_FADE_DURATION);
 
-                foreach (var breakPeriod in Breaks)
+                foreach (BreakPeriod breakPeriod in Breaks)
                 {
                     if (breakPeriod.Duration < FLASHLIGHT_FADE_DURATION * 2) continue;
 

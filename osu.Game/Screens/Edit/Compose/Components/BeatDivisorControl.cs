@@ -202,7 +202,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
             [BackgroundDependencyLoader]
             private void load()
             {
-                foreach (var t in availableDivisors)
+                foreach (int t in availableDivisors)
                 {
                     AddInternal(new Tick(t)
                     {
@@ -272,7 +272,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
             private void handleMouseInput(Vector2 screenSpaceMousePosition)
             {
                 // copied from SliderBar so we can do custom spacing logic.
-                var xPosition = (ToLocalSpace(screenSpaceMousePosition).X - RangePadding) / UsableWidth;
+                float xPosition = (ToLocalSpace(screenSpaceMousePosition).X - RangePadding) / UsableWidth;
 
                 CurrentNumber.Value = availableDivisors.OrderBy(d => Math.Abs(getMappedPosition(d) - xPosition)).First();
                 OnUserChange(Current.Value);

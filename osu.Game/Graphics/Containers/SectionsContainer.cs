@@ -115,7 +115,7 @@ namespace osu.Game.Graphics.Containers
         {
             if (!Children.Any()) return;
 
-            var newMargin = originalSectionsMargin;
+            MarginPadding newMargin = originalSectionsMargin;
             newMargin.Top += headerHeight;
             newMargin.Bottom += footerHeight;
 
@@ -178,7 +178,7 @@ namespace osu.Game.Graphics.Containers
                 float minDiff = float.MaxValue;
                 float scrollOffset = FixedHeader?.LayoutSize.Y ?? 0;
 
-                foreach (var section in Children)
+                foreach (T section in Children)
                 {
                     float diff = Math.Abs(scrollContainer.GetChildPosInContent(section) - currentScroll - scrollOffset);
                     if (diff < minDiff)

@@ -18,9 +18,9 @@ namespace osu.Game.Overlays.KeyBinding
         {
             this.ruleset = ruleset;
 
-            var r = ruleset.CreateInstance();
+            Ruleset r = ruleset.CreateInstance();
 
-            foreach (var variant in r.AvailableVariants)
+            foreach (int variant in r.AvailableVariants)
                 Add(new VariantBindingsSubsection(ruleset, variant));
         }
     }

@@ -176,9 +176,9 @@ namespace osu.Game.Rulesets.Scoring
             score.Rank = Rank.Value;
             score.Date = DateTimeOffset.Now;
 
-            var hitWindows = CreateHitWindows();
+            HitWindows hitWindows = CreateHitWindows();
 
-            foreach (var result in Enum.GetValues(typeof(HitResult)).OfType<HitResult>().Where(r => r > HitResult.None && hitWindows.IsHitResultAllowed(r)))
+            foreach (HitResult result in Enum.GetValues(typeof(HitResult)).OfType<HitResult>().Where(r => r > HitResult.None && hitWindows.IsHitResultAllowed(r)))
                 score.Statistics[result] = GetStatistic(result);
         }
 
@@ -245,19 +245,19 @@ namespace osu.Game.Rulesets.Scoring
         /// <param name="beatmap">The <see cref="Beatmap{TObject}"/> to simulate.</param>
         protected virtual void SimulateAutoplay(Beatmap<TObject> beatmap)
         {
-            foreach (var obj in beatmap.HitObjects)
+            foreach (TObject obj in beatmap.HitObjects)
                 simulate(obj);
 
             void simulate(HitObject obj)
             {
-                foreach (var nested in obj.NestedHitObjects)
+                foreach (HitObject nested in obj.NestedHitObjects)
                     simulate(nested);
 
-                var judgement = obj.CreateJudgement();
+                Judgement judgement = obj.CreateJudgement();
                 if (judgement == null)
                     return;
 
-                var result = CreateResult(judgement);
+                JudgementResult result = CreateResult(judgement);
                 if (result == null)
                     throw new InvalidOperationException($"{GetType().ReadableName()} must provide a {nameof(JudgementResult)} through {nameof(CreateResult)}.");
 

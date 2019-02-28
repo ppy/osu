@@ -20,6 +20,7 @@ using osu.Game.Database;
 using osu.Game.IO.Archives;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays.Notifications;
 using osu.Game.Rulesets;
 
@@ -116,7 +117,7 @@ namespace osu.Game.Beatmaps
             // check if a set already exists with the same online id, delete if it does.
             if (beatmapSet.OnlineBeatmapSetID != null)
             {
-                var existingOnlineId = beatmaps.ConsumableItems.FirstOrDefault(b => b.OnlineBeatmapSetID == beatmapSet.OnlineBeatmapSetID);
+                BeatmapSetInfo existingOnlineId = beatmaps.ConsumableItems.FirstOrDefault(b => b.OnlineBeatmapSetID == beatmapSet.OnlineBeatmapSetID);
                 if (existingOnlineId != null)
                 {
                     Delete(existingOnlineId);
@@ -128,7 +129,7 @@ namespace osu.Game.Beatmaps
 
         private void validateOnlineIds(List<BeatmapInfo> beatmaps)
         {
-            var beatmapIds = beatmaps.Where(b => b.OnlineBeatmapID.HasValue).Select(b => b.OnlineBeatmapID).ToList();
+            List<int?> beatmapIds = beatmaps.Where(b => b.OnlineBeatmapID.HasValue).Select(b => b.OnlineBeatmapID).ToList();
 
             // ensure all IDs are unique in this set and none match existing IDs in the local beatmap store.
             if (beatmapIds.GroupBy(b => b).Any(g => g.Count() > 1) || QueryBeatmaps(b => beatmapIds.Contains(b.OnlineBeatmapID)).Any())
@@ -145,7 +146,7 @@ namespace osu.Game.Beatmaps
         /// <returns>Downloading can happen</returns>
         public bool Download(BeatmapSetInfo beatmapSetInfo, bool noVideo = false)
         {
-            var existing = GetExistingDownload(beatmapSetInfo);
+            DownloadBeatmapSetRequest existing = GetExistingDownload(beatmapSetInfo);
 
             if (existing != null || api == null) return false;
 
@@ -170,7 +171,7 @@ namespace osu.Game.Beatmaps
                 Task.Factory.StartNew(() =>
                 {
                     // This gets scheduled back to the update thread, but we want the import to run in the background.
-                    var importedBeatmap = Import(filename);
+                    BeatmapSetInfo importedBeatmap = Import(filename);
 
                     downloadNotification.CompletionClickAction = () =>
                     {
@@ -313,7 +314,7 @@ namespace osu.Game.Beatmaps
         protected override BeatmapSetInfo CreateModel(ArchiveReader reader)
         {
             // let's make sure there are actually .osu files to import.
-            string mapName = reader.Filenames.FirstOrDefault(f => f.EndsWith(".osu"));
+            string mapName = reader.Filenames.FirstOrDefault(f => f.EndsWith(".osu", StringComparison.Ordinal));
             if (string.IsNullOrEmpty(mapName))
             {
                 Logger.Log($"No beatmap files found in the beatmap archive ({reader.Name}).", LoggingTarget.Database);
@@ -339,23 +340,23 @@ namespace osu.Game.Beatmaps
         {
             var beatmapInfos = new List<BeatmapInfo>();
 
-            foreach (var name in reader.Filenames.Where(f => f.EndsWith(".osu")))
+            foreach (string name in reader.Filenames.Where(f => f.EndsWith(".osu", StringComparison.Ordinal)))
             {
-                using (var raw = reader.GetStream(name))
+                using (Stream raw = reader.GetStream(name))
                 using (var ms = new MemoryStream()) //we need a memory stream so we can seek and shit
                 using (var sr = new StreamReader(ms))
                 {
                     raw.CopyTo(ms);
                     ms.Position = 0;
 
-                    var decoder = Decoder.GetDecoder<Beatmap>(sr);
+                    Decoder<Beatmap> decoder = Decoder.GetDecoder<Beatmap>(sr);
                     IBeatmap beatmap = decoder.Decode(sr);
 
                     beatmap.BeatmapInfo.Path = name;
                     beatmap.BeatmapInfo.Hash = ms.ComputeSHA2Hash();
                     beatmap.BeatmapInfo.MD5Hash = ms.ComputeMD5Hash();
 
-                    var ruleset = rulesets.GetRuleset(beatmap.BeatmapInfo.RulesetID);
+                    RulesetInfo ruleset = rulesets.GetRuleset(beatmap.BeatmapInfo.RulesetID);
                     beatmap.BeatmapInfo.Ruleset = ruleset;
                     // TODO: this should be done in a better place once we actually need to dynamically update it.
                     beatmap.BeatmapInfo.StarDifficulty = ruleset?.CreateInstance().CreateDifficultyCalculator(new DummyConversionBeatmap(beatmap)).Calculate().StarRating ?? 0;
@@ -391,7 +392,7 @@ namespace osu.Game.Beatmaps
 
                 req.Perform(api);
 
-                var res = req.Result;
+                APIBeatmap res = req.Result;
 
                 Logger.Log($"Successfully mapped to {res.OnlineBeatmapSetID} / {res.OnlineBeatmapID}.", LoggingTarget.Database);
 

@@ -40,7 +40,7 @@ namespace osu.Game.Rulesets.Mania.Mods
             var maniaBeatmap = (ManiaBeatmap)beatmap;
 
             var newDefinitions = new List<StageDefinition>();
-            foreach (var existing in maniaBeatmap.Stages)
+            foreach (StageDefinition existing in maniaBeatmap.Stages)
             {
                 newDefinitions.Add(new StageDefinition { Columns = existing.Columns / 2 });
                 newDefinitions.Add(new StageDefinition { Columns = existing.Columns / 2 });

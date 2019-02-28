@@ -41,7 +41,7 @@ namespace osu.Game.Tests.Visual
 
             buttons.SetOsuLogo(logo);
 
-            foreach (var s in Enum.GetValues(typeof(ButtonSystemState)).OfType<ButtonSystemState>().Skip(1))
+            foreach (ButtonSystemState s in Enum.GetValues(typeof(ButtonSystemState)).OfType<ButtonSystemState>().Skip(1))
                 AddStep($"State to {s}", () => buttons.State = s);
         }
     }

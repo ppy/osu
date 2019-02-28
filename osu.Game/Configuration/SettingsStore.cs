@@ -30,7 +30,7 @@ namespace osu.Game.Configuration
         {
             using (ContextFactory.GetForWrite())
             {
-                var newValue = setting.Value;
+                object newValue = setting.Value;
                 Refresh(ref setting);
                 setting.Value = newValue;
             }

@@ -12,9 +12,9 @@ namespace osu.Game.Utils
         {
             try
             {
-                using (var arc = ZipArchive.Open(path))
+                using (ZipArchive arc = ZipArchive.Open(path))
                 {
-                    foreach (var entry in arc.Entries)
+                    foreach (ZipArchiveEntry entry in arc.Entries)
                     {
                         using (entry.OpenEntryStream())
                         {

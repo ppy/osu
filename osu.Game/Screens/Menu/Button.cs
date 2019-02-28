@@ -57,7 +57,7 @@ namespace osu.Game.Screens.Menu
             AutoSizeAxes = Axes.Both;
             Alpha = 0;
 
-            Vector2 boxSize = new Vector2(ButtonSystem.BUTTON_WIDTH + Math.Abs(extraWidth), ButtonArea.BUTTON_AREA_HEIGHT);
+            var boxSize = new Vector2(ButtonSystem.BUTTON_WIDTH + Math.Abs(extraWidth), ButtonArea.BUTTON_AREA_HEIGHT);
 
             Children = new Drawable[]
             {

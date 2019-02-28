@@ -44,10 +44,10 @@ namespace osu.Game.Rulesets.Mania.Difficulty
         private double difficultyValue(Skill[] skills)
         {
             // Preprocess the strains to find the maximum overall + individual (aggregate) strain from each section
-            var overall = skills.OfType<Overall>().Single();
+            Overall overall = skills.OfType<Overall>().Single();
             var aggregatePeaks = new List<double>(Enumerable.Repeat(0.0, overall.StrainPeaks.Count));
 
-            foreach (var individual in skills.OfType<Individual>())
+            foreach (Individual individual in skills.OfType<Individual>())
             {
                 for (int i = 0; i < individual.StrainPeaks.Count; i++)
                 {

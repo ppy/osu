@@ -18,7 +18,7 @@ namespace osu.Game.Online.API.Requests
 
         protected override WebRequest CreateWebRequest()
         {
-            var req = base.CreateWebRequest();
+            WebRequest req = base.CreateWebRequest();
 
             req.Method = HttpMethod.Post;
             req.AddParameter(@"is_action", message.IsAction.ToString().ToLowerInvariant());

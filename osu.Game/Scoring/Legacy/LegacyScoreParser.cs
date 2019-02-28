@@ -12,6 +12,7 @@ using osu.Game.Replays.Legacy;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Replays;
+using osu.Game.Rulesets.Replays.Types;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Users;
 using SharpCompress.Compressors.LZMA;
@@ -31,14 +32,14 @@ namespace osu.Game.Scoring.Legacy
                 Replay = new Replay()
             };
 
-            using (SerializationReader sr = new SerializationReader(stream))
+            using (var sr = new SerializationReader(stream))
             {
                 currentRuleset = GetRuleset(sr.ReadByte());
                 score.ScoreInfo = new ScoreInfo { Ruleset = currentRuleset.RulesetInfo };
 
-                var version = sr.ReadInt32();
+                int version = sr.ReadInt32();
 
-                var workingBeatmap = GetBeatmap(sr.ReadString());
+                WorkingBeatmap workingBeatmap = GetBeatmap(sr.ReadString());
                 if (workingBeatmap is DummyWorkingBeatmap)
                     throw new BeatmapNotFoundException();
 
@@ -50,12 +51,12 @@ namespace osu.Game.Scoring.Legacy
                 // MD5Hash
                 sr.ReadString();
 
-                var count300 = (int)sr.ReadUInt16();
-                var count100 = (int)sr.ReadUInt16();
-                var count50 = (int)sr.ReadUInt16();
-                var countGeki = (int)sr.ReadUInt16();
-                var countKatu = (int)sr.ReadUInt16();
-                var countMiss = (int)sr.ReadUInt16();
+                int count300 = sr.ReadUInt16();
+                int count100 = sr.ReadUInt16();
+                int count50 = sr.ReadUInt16();
+                int countGeki = sr.ReadUInt16();
+                int countKatu = sr.ReadUInt16();
+                int countMiss = sr.ReadUInt16();
 
                 switch (currentRuleset.LegacyID)
                 {
@@ -97,7 +98,7 @@ namespace osu.Game.Scoring.Legacy
 
                 score.ScoreInfo.Date = sr.ReadDateTime();
 
-                var compressedReplay = sr.ReadByteArray();
+                byte[] compressedReplay = sr.ReadByteArray();
 
                 if (version >= 20140721)
                     score.ScoreInfo.OnlineScoreID = sr.ReadInt64();
@@ -108,7 +109,7 @@ namespace osu.Game.Scoring.Legacy
                 {
                     using (var replayInStream = new MemoryStream(compressedReplay))
                     {
-                        byte[] properties = new byte[5];
+                        var properties = new byte[5];
                         if (replayInStream.Read(properties, 0, 5) != 5)
                             throw new IOException("input .lzma is too short");
 
@@ -236,9 +237,9 @@ namespace osu.Game.Scoring.Legacy
         {
             float lastTime = 0;
 
-            foreach (var l in reader.ReadToEnd().Split(','))
+            foreach (string l in reader.ReadToEnd().Split(','))
             {
-                var split = l.Split('|');
+                string[] split = l.Split('|');
 
                 if (split.Length < 4)
                     continue;
@@ -249,7 +250,7 @@ namespace osu.Game.Scoring.Legacy
                     continue;
                 }
 
-                var diff = float.Parse(split[0]);
+                float diff = float.Parse(split[0]);
                 lastTime += diff;
 
                 // Todo: At some point we probably want to rewind and play back the negative-time frames
@@ -263,7 +264,7 @@ namespace osu.Game.Scoring.Legacy
 
         private ReplayFrame convertFrame(LegacyReplayFrame legacyFrame)
         {
-            var convertible = currentRuleset.CreateConvertibleReplayFrame();
+            IConvertibleReplayFrame convertible = currentRuleset.CreateConvertibleReplayFrame();
             if (convertible == null)
                 throw new InvalidOperationException($"Legacy replay cannot be converted for the ruleset: {currentRuleset.Description}");
 

@@ -49,7 +49,7 @@ namespace osu.Game.Tests.Visual
             }
             else
             {
-                foreach (var r in rulesets.AvailableRulesets)
+                foreach (RulesetInfo r in rulesets.AvailableRulesets)
                 {
                     Player p = null;
                     AddStep(r.Name, () => p = loadPlayerFor(r));
@@ -98,7 +98,7 @@ namespace osu.Game.Tests.Visual
 
         private Player loadPlayerFor(Ruleset r)
         {
-            var beatmap = CreateBeatmap(r);
+            IBeatmap beatmap = CreateBeatmap(r);
             var working = new TestWorkingBeatmap(beatmap, Clock);
 
             workingWeakReferences.Add(working);
@@ -108,7 +108,7 @@ namespace osu.Game.Tests.Visual
 
             Player?.Exit();
 
-            var player = CreatePlayer(r);
+            Player player = CreatePlayer(r);
 
             playerWeakReferences.Add(player);
 

@@ -32,7 +32,7 @@ namespace osu.Game.Utils
             {
                 if (entry.Level < LogLevel.Verbose) return;
 
-                var exception = entry.Exception;
+                Exception exception = entry.Exception;
 
                 if (exception != null)
                 {
@@ -48,7 +48,7 @@ namespace osu.Game.Utils
 
                     // since we let unhandled exceptions go ignored at times, we want to ensure they don't get submitted on subsequent reports.
                     if (lastException != null &&
-                        lastException.Message == exception.Message && exception.StackTrace.StartsWith(lastException.StackTrace))
+                        lastException.Message == exception.Message && exception.StackTrace.StartsWith(lastException.StackTrace, StringComparison.Ordinal))
                     {
                         return;
                     }

@@ -174,7 +174,7 @@ namespace osu.Game.Rulesets.Mania.UI
             if (action != Action.Value)
                 return false;
 
-            var nextObject =
+            DrawableHitObject nextObject =
                 HitObjectContainer.AliveObjects.FirstOrDefault(h => h.HitObject.StartTime > Time.Current) ??
                 // fallback to non-alive objects to find next off-screen object
                 HitObjectContainer.Objects.FirstOrDefault(h => h.HitObject.StartTime > Time.Current) ??

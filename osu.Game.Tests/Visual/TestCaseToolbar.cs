@@ -27,7 +27,7 @@ namespace osu.Game.Tests.Visual
 
             Add(toolbar);
 
-            var notificationButton = toolbar.Children.OfType<FillFlowContainer>().Last().Children.OfType<ToolbarNotificationButton>().First();
+            ToolbarNotificationButton notificationButton = toolbar.Children.OfType<FillFlowContainer>().Last().Children.OfType<ToolbarNotificationButton>().First();
 
             void setNotifications(int count) => AddStep($"set notification count to {count}", () => notificationButton.NotificationCount.Value = count);
 

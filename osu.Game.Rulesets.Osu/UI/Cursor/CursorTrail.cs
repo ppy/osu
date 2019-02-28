@@ -50,7 +50,7 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
         {
             base.ApplyDrawNode(node);
 
-            TrailDrawNode tNode = (TrailDrawNode)node;
+            var tNode = (TrailDrawNode)node;
             tNode.Shader = shader;
             tNode.Texture = texture;
             tNode.Size = size;

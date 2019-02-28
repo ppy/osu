@@ -18,10 +18,10 @@ namespace osu.Game.Tests.Skins
         public void TestDecodeSkinColours(bool hasColours)
         {
             var decoder = new LegacySkinDecoder();
-            using (var resStream = TestResources.OpenResource(hasColours ? "skin.ini" : "skin-empty.ini"))
+            using (Stream resStream = TestResources.OpenResource(hasColours ? "skin.ini" : "skin-empty.ini"))
             using (var stream = new StreamReader(resStream))
             {
-                var comboColors = decoder.Decode(stream).ComboColours;
+                List<Color4> comboColors = decoder.Decode(stream).ComboColours;
 
                 List<Color4> expectedColors;
                 if (hasColours)

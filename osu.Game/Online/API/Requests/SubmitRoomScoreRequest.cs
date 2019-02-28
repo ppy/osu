@@ -25,7 +25,7 @@ namespace osu.Game.Online.API.Requests
 
         protected override WebRequest CreateWebRequest()
         {
-            var req = base.CreateWebRequest();
+            WebRequest req = base.CreateWebRequest();
 
             req.ContentType = "application/json";
             req.Method = HttpMethod.Put;

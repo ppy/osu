@@ -59,7 +59,7 @@ namespace osu.Game.Online.API.Requests.Responses
 
         public BeatmapInfo ToBeatmap(RulesetStore rulesets)
         {
-            var set = BeatmapSet?.ToBeatmapSet(rulesets);
+            BeatmapSetInfo set = BeatmapSet?.ToBeatmapSet(rulesets);
 
             return new BeatmapInfo
             {

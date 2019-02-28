@@ -8,6 +8,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Logging;
+using osu.Game.Rulesets;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Screens.Edit.Compose.Components;
@@ -99,7 +100,7 @@ namespace osu.Game.Screens.Edit.Compose
                 },
             };
 
-            var ruleset = Beatmap.Value.BeatmapInfo.Ruleset?.CreateInstance();
+            Ruleset ruleset = Beatmap.Value.BeatmapInfo.Ruleset?.CreateInstance();
             if (ruleset == null)
             {
                 Logger.Log("Beatmap doesn't have a ruleset assigned.");

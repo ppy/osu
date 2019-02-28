@@ -32,12 +32,12 @@ namespace osu.Game.Rulesets.Catch.Tests
             switch (hitObject)
             {
                 case JuiceStream stream:
-                    foreach (var nested in stream.NestedHitObjects)
+                    foreach (HitObject nested in stream.NestedHitObjects)
                         yield return new ConvertValue((CatchHitObject)nested);
 
                     break;
                 case BananaShower shower:
-                    foreach (var nested in shower.NestedHitObjects)
+                    foreach (HitObject nested in shower.NestedHitObjects)
                         yield return new ConvertValue((CatchHitObject)nested);
 
                     break;

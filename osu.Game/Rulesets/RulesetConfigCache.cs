@@ -34,7 +34,7 @@ namespace osu.Game.Rulesets
             if (ruleset.RulesetInfo.ID == null)
                 throw new InvalidOperationException("The provided ruleset doesn't have a valid id.");
 
-            if (configCache.TryGetValue(ruleset.RulesetInfo.ID.Value, out var existing))
+            if (configCache.TryGetValue(ruleset.RulesetInfo.ID.Value, out IRulesetConfigManager existing))
                 return existing;
 
             return configCache[ruleset.RulesetInfo.ID.Value] = ruleset.CreateConfig(settingsStore);

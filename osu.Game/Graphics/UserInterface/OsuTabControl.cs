@@ -46,7 +46,7 @@ namespace osu.Game.Graphics.UserInterface
             });
 
             if (isEnumType)
-                foreach (var val in (T[])Enum.GetValues(typeof(T)))
+                foreach (T val in (T[])Enum.GetValues(typeof(T)))
                     AddItem(val);
         }
 
@@ -67,7 +67,7 @@ namespace osu.Game.Graphics.UserInterface
                 accentColour = value;
                 if (Dropdown is IHasAccentColour dropdown)
                     dropdown.AccentColour = value;
-                foreach (var i in TabContainer.Children.OfType<IHasAccentColour>())
+                foreach (IHasAccentColour i in TabContainer.Children.OfType<IHasAccentColour>())
                     i.AccentColour = value;
             }
         }

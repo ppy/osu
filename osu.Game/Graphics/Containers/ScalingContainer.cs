@@ -137,15 +137,15 @@ namespace osu.Game.Graphics.Containers
 
             bool scaling = targetMode == null || scalingMode.Value == targetMode;
 
-            var targetSize = scaling ? new Vector2(sizeX.Value, sizeY.Value) : Vector2.One;
-            var targetPosition = scaling ? new Vector2(posX.Value, posY.Value) * (Vector2.One - targetSize) : Vector2.Zero;
+            Vector2 targetSize = scaling ? new Vector2(sizeX.Value, sizeY.Value) : Vector2.One;
+            Vector2 targetPosition = scaling ? new Vector2(posX.Value, posY.Value) * (Vector2.One - targetSize) : Vector2.Zero;
             bool requiresMasking = scaling && targetSize != Vector2.One;
 
             if (requiresMasking)
                 sizableContainer.Masking = true;
 
             sizableContainer.MoveTo(targetPosition, 500, Easing.OutQuart);
-            sizableContainer.ResizeTo(targetSize, 500, Easing.OutQuart).OnComplete(_ => { sizableContainer.Masking = requiresMasking; });
+            sizableContainer.ResizeTo(targetSize, 500, Easing.OutQuart).OnComplete(_ => sizableContainer.Masking = requiresMasking);
         }
 
         private class AlwaysInputContainer : Container

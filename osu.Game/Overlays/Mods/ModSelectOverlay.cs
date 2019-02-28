@@ -78,7 +78,7 @@ namespace osu.Game.Overlays.Mods
         {
             if (e.NewValue == null) return;
 
-            var instance = e.NewValue.CreateInstance();
+            Ruleset instance = e.NewValue.CreateInstance();
 
             foreach (ModSection section in ModSectionsContainer.Children)
                 section.Mods = instance.GetModsFor(section.ModType);

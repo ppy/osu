@@ -91,7 +91,7 @@ namespace osu.Game.Graphics.UserInterface
 
         public void ReplayAnimation()
         {
-            var t = countStars;
+            float t = countStars;
             ResetCount();
             CountStars = t;
         }
@@ -99,7 +99,7 @@ namespace osu.Game.Graphics.UserInterface
         public void StopAnimation()
         {
             int i = 0;
-            foreach (var star in stars.Children)
+            foreach (Star star in stars.Children)
             {
                 star.ClearTransforms(true);
                 star.FadeTo(i < countStars ? 1.0f : minStarAlpha);
@@ -119,11 +119,11 @@ namespace osu.Game.Graphics.UserInterface
         private void transformCount(float newValue)
         {
             int i = 0;
-            foreach (var star in stars.Children)
+            foreach (Star star in stars.Children)
             {
                 star.ClearTransforms(true);
 
-                var delay = (countStars <= newValue ? Math.Max(i - countStars, 0) : Math.Max(countStars - 1 - i, 0)) * animationDelay;
+                double delay = (countStars <= newValue ? Math.Max(i - countStars, 0) : Math.Max(countStars - 1 - i, 0)) * animationDelay;
                 star.Delay(delay).FadeTo(i < newValue ? 1.0f : minStarAlpha, fadingDuration);
                 star.Icon.Delay(delay).ScaleTo(getStarScale(i, newValue), scalingDuration, scalingEasing);
 

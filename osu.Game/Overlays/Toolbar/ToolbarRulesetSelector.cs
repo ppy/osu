@@ -71,12 +71,12 @@ namespace osu.Game.Overlays.Toolbar
         private void load(RulesetStore rulesets, Bindable<RulesetInfo> parentRuleset)
         {
             this.rulesets = rulesets;
-            foreach (var r in rulesets.AvailableRulesets)
+            foreach (RulesetInfo r in rulesets.AvailableRulesets)
             {
                 modeButtons.Add(new ToolbarRulesetButton
                 {
                     Ruleset = r,
-                    Action = delegate { ruleset.Value = r; }
+                    Action = () => ruleset.Value = r
                 });
             }
 

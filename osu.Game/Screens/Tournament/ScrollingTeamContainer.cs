@@ -121,7 +121,7 @@ namespace osu.Game.Screens.Tournament
 
                         ScrollingTeam closest = null;
 
-                        foreach (var c in Children)
+                        foreach (Drawable c in Children)
                         {
                             var stc = c as ScrollingTeam;
 
@@ -198,9 +198,9 @@ namespace osu.Game.Screens.Tournament
         {
             availableTeams.Remove(team);
 
-            foreach (var c in Children)
+            foreach (Drawable c in Children)
             {
-                ScrollingTeam st = c as ScrollingTeam;
+                var st = c as ScrollingTeam;
 
                 if (st == null)
                     continue;
@@ -256,7 +256,7 @@ namespace osu.Game.Screens.Tournament
 
             float pos = leftPos;
 
-            foreach (var c in Children)
+            foreach (Drawable c in Children)
             {
                 if (!(c is ScrollingTeam))
                     continue;
@@ -290,13 +290,11 @@ namespace osu.Game.Screens.Tournament
 
         private void resetSelected()
         {
-            foreach (var c in Children)
+            foreach (Drawable c in Children)
             {
-                ScrollingTeam st = c as ScrollingTeam;
-                if (st == null)
-                    continue;
+                var st = c as ScrollingTeam;
 
-                if (st.Selected)
+                if (st?.Selected == true)
                 {
                     st.Selected = false;
                     RemoveTeam(st.Team);

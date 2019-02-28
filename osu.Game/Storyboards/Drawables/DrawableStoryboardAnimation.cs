@@ -27,7 +27,7 @@ namespace osu.Game.Storyboards.Drawables
         {
             get
             {
-                var origin = base.Origin;
+                Anchor origin = base.Origin;
 
                 if (FlipH)
                 {
@@ -66,16 +66,16 @@ namespace osu.Game.Storyboards.Drawables
         [BackgroundDependencyLoader]
         private void load(IBindable<WorkingBeatmap> beatmap, TextureStore textureStore)
         {
-            var basePath = Animation.Path.ToLowerInvariant();
-            for (var frame = 0; frame < Animation.FrameCount; frame++)
+            string basePath = Animation.Path.ToLowerInvariant();
+            for (int frame = 0; frame < Animation.FrameCount; frame++)
             {
-                var framePath = basePath.Replace(".", frame + ".");
+                string framePath = basePath.Replace(".", frame + ".");
 
-                var path = beatmap.Value.BeatmapSetInfo.Files.Find(f => f.Filename.ToLowerInvariant() == framePath)?.FileInfo.StoragePath;
+                string path = beatmap.Value.BeatmapSetInfo.Files.Find(f => f.Filename.ToLowerInvariant() == framePath)?.FileInfo.StoragePath;
                 if (path == null)
                     continue;
 
-                var texture = textureStore.Get(path);
+                Texture texture = textureStore.Get(path);
                 AddFrame(texture, Animation.FrameDelay);
             }
 

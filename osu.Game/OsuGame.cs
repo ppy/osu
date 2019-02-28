@@ -133,7 +133,7 @@ namespace osu.Game
         /// <param name="toolbar">Whether the toolbar should also be hidden.</param>
         public void CloseAllOverlays(bool toolbar = true)
         {
-            foreach (var overlay in overlays)
+            foreach (OverlayContainer overlay in overlays)
                 overlay.State = Visibility.Hidden;
             if (toolbar) Toolbar.State = Visibility.Hidden;
         }
@@ -158,7 +158,7 @@ namespace osu.Game
 
             if (args?.Length > 0)
             {
-                var paths = args.Where(a => !a.StartsWith(@"-")).ToArray();
+                string[] paths = args.Where(a => !a.StartsWith(@"-", StringComparison.Ordinal)).ToArray();
                 if (paths.Length > 0)
                     Task.Run(() => Import(paths));
             }
@@ -192,7 +192,7 @@ namespace osu.Game
 
         public void OpenUrlExternally(string url)
         {
-            if (url.StartsWith("/"))
+            if (url.StartsWith("/", StringComparison.Ordinal))
                 url = $"{API.Endpoint}{url}";
 
             externalLinkOpener.OpenUrlExternally(url);
@@ -228,12 +228,12 @@ namespace osu.Game
                     return;
                 }
 
-                var databasedSet = beatmap.OnlineBeatmapSetID != null ? BeatmapManager.QueryBeatmapSet(s => s.OnlineBeatmapSetID == beatmap.OnlineBeatmapSetID) : BeatmapManager.QueryBeatmapSet(s => s.Hash == beatmap.Hash);
+                BeatmapSetInfo databasedSet = beatmap.OnlineBeatmapSetID != null ? BeatmapManager.QueryBeatmapSet(s => s.OnlineBeatmapSetID == beatmap.OnlineBeatmapSetID) : BeatmapManager.QueryBeatmapSet(s => s.Hash == beatmap.Hash);
 
                 if (databasedSet != null)
                 {
                     // Use first beatmap available for current ruleset, else switch ruleset.
-                    var first = databasedSet.Beatmaps.Find(b => b.Ruleset == ruleset.Value) ?? databasedSet.Beatmaps.First();
+                    BeatmapInfo first = databasedSet.Beatmaps.Find(b => b.Ruleset == ruleset.Value) ?? databasedSet.Beatmaps.First();
 
                     ruleset.Value = first.Ruleset;
                     Beatmap.Value = BeatmapManager.GetWorkingBeatmap(first);
@@ -280,15 +280,15 @@ namespace osu.Game
                 return;
             }
 
-            var databasedScore = ScoreManager.GetScore(score);
-            var databasedScoreInfo = databasedScore.ScoreInfo;
+            Score databasedScore = ScoreManager.GetScore(score);
+            ScoreInfo databasedScoreInfo = databasedScore.ScoreInfo;
             if (databasedScore.Replay == null)
             {
                 Logger.Log("The loaded score has no replay data.", LoggingTarget.Information);
                 return;
             }
 
-            var databasedBeatmap = BeatmapManager.QueryBeatmap(b => b.ID == databasedScoreInfo.Beatmap.ID);
+            BeatmapInfo databasedBeatmap = BeatmapManager.QueryBeatmap(b => b.ID == databasedScoreInfo.Beatmap.ID);
             if (databasedBeatmap == null)
             {
                 Logger.Log("Tried to load a score for a beatmap we don't have!", LoggingTarget.Information);
@@ -477,7 +477,7 @@ namespace osu.Game
             var singleDisplaySideOverlays = new OverlayContainer[] { settings, notifications };
             overlays.AddRange(singleDisplaySideOverlays);
 
-            foreach (var overlay in singleDisplaySideOverlays)
+            foreach (OverlayContainer overlay in singleDisplaySideOverlays)
             {
                 overlay.StateChanged += state =>
                 {
@@ -491,7 +491,7 @@ namespace osu.Game
             var informationalOverlays = new OverlayContainer[] { beatmapSetOverlay, userProfile };
             overlays.AddRange(informationalOverlays);
 
-            foreach (var overlay in informationalOverlays)
+            foreach (OverlayContainer overlay in informationalOverlays)
             {
                 overlay.StateChanged += state =>
                 {
@@ -505,7 +505,7 @@ namespace osu.Game
             var singleDisplayOverlays = new OverlayContainer[] { chatOverlay, social, direct };
             overlays.AddRange(singleDisplayOverlays);
 
-            foreach (var overlay in singleDisplayOverlays)
+            foreach (OverlayContainer overlay in singleDisplayOverlays)
             {
                 overlay.StateChanged += state =>
                 {
@@ -616,7 +616,7 @@ namespace osu.Game
             // we could avoid the need for scheduling altogether.
             Schedule(() =>
             {
-                var previousLoadStream = asyncLoadStream;
+                Task previousLoadStream = asyncLoadStream;
 
                 //chain with existing load stream
                 asyncLoadStream = Task.Run(async () =>
@@ -654,7 +654,7 @@ namespace osu.Game
                     social.ToggleVisibility();
                     return true;
                 case GlobalAction.ResetInputSettings:
-                    var sensitivity = frameworkConfig.GetBindable<double>(FrameworkSetting.CursorSensitivity);
+                    Bindable<double> sensitivity = frameworkConfig.GetBindable<double>(FrameworkSetting.CursorSensitivity);
 
                     sensitivity.Disabled = false;
                     sensitivity.Value = 1;

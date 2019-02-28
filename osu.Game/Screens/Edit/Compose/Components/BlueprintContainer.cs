@@ -52,7 +52,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
                 dragBox.CreateProxy()
             };
 
-            foreach (var obj in composer.HitObjects)
+            foreach (DrawableHitObject obj in composer.HitObjects)
                 AddBlueprintFor(obj);
         }
 
@@ -83,7 +83,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
         {
             refreshTool();
 
-            var blueprint = composer.CreateBlueprintFor(hitObject);
+            SelectionBlueprint blueprint = composer.CreateBlueprintFor(hitObject);
             if (blueprint == null)
                 return;
 
@@ -101,7 +101,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
         /// <param name="hitObject">The <see cref="DrawableHitObject"/> for which to remove the blueprint.</param>
         public void RemoveBlueprintFor(DrawableHitObject hitObject)
         {
-            var blueprint = selectionBlueprints.Single(m => m.HitObject == hitObject);
+            SelectionBlueprint blueprint = selectionBlueprints.Single(m => m.HitObject == hitObject);
             if (blueprint == null)
                 return;
 
@@ -142,7 +142,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
             placementBlueprintContainer.Clear();
             currentPlacement = null;
 
-            var blueprint = CurrentTool?.CreatePlacementBlueprint();
+            PlacementBlueprint blueprint = CurrentTool?.CreatePlacementBlueprint();
             if (blueprint != null)
                 placementBlueprintContainer.Child = currentPlacement = blueprint;
         }
@@ -153,7 +153,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
         /// <param name="rect">The rectangle to perform a selection on in screen-space coordinates.</param>
         private void select(RectangleF rect)
         {
-            foreach (var blueprint in selections.ToList())
+            foreach (SelectionBlueprint blueprint in selections.ToList())
             {
                 if (blueprint.IsPresent && rect.Contains(blueprint.SelectionPoint))
                     blueprint.Select();

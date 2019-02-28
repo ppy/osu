@@ -46,7 +46,7 @@ namespace osu.Game.Beatmaps.Drawables
             if (beatmap == null)
                 throw new ArgumentNullException(nameof(beatmap));
 
-            var rating = beatmap.StarDifficulty;
+            double rating = beatmap.StarDifficulty;
 
             if (rating < 1.5) return DifficultyRating.Easy;
             if (rating < 2.25) return DifficultyRating.Normal;

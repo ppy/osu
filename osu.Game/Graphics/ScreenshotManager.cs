@@ -19,6 +19,7 @@ using osu.Game.Input.Bindings;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Notifications;
 using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.PixelFormats;
 
 namespace osu.Game.Graphics
 {
@@ -90,14 +91,14 @@ namespace osu.Game.Graphics
                 waitDelegate.Cancel();
             }
 
-            using (var image = await host.TakeScreenshotAsync())
+            using (Image<Rgba32> image = await host.TakeScreenshotAsync())
             {
                 Interlocked.Decrement(ref screenShotTasks);
 
-                var fileName = getFileName();
+                string fileName = getFileName();
                 if (fileName == null) return;
 
-                var stream = storage.GetStream(fileName, FileAccess.Write);
+                Stream stream = storage.GetStream(fileName, FileAccess.Write);
 
                 switch (screenshotFormat.Value)
                 {
@@ -133,16 +134,16 @@ namespace osu.Game.Graphics
 
         private string getFileName()
         {
-            var dt = DateTime.Now;
-            var fileExt = screenshotFormat.ToString().ToLowerInvariant();
+            DateTime dt = DateTime.Now;
+            string fileExt = screenshotFormat.ToString().ToLowerInvariant();
 
-            var withoutIndex = $"osu_{dt:yyyy-MM-dd_HH-mm-ss}.{fileExt}";
+            string withoutIndex = $"osu_{dt:yyyy-MM-dd_HH-mm-ss}.{fileExt}";
             if (!storage.Exists(withoutIndex))
                 return withoutIndex;
 
             for (ulong i = 1; i < ulong.MaxValue; i++)
             {
-                var indexedName = $"osu_{dt:yyyy-MM-dd_HH-mm-ss}-{i}.{fileExt}";
+                string indexedName = $"osu_{dt:yyyy-MM-dd_HH-mm-ss}-{i}.{fileExt}";
                 if (!storage.Exists(indexedName))
                     return indexedName;
             }

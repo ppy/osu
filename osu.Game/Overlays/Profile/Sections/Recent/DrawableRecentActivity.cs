@@ -48,7 +48,7 @@ namespace osu.Game.Overlays.Profile.Sections.Recent
                 Origin = Anchor.TopRight,
             });
 
-            var formatted = createMessage();
+            MessageFormatter.MessageFormatterResult formatted = createMessage();
 
             content.AddLinks(formatted.Text, formatted.Links);
         }

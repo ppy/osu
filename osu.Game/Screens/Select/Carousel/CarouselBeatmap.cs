@@ -26,7 +26,7 @@ namespace osu.Game.Screens.Select.Carousel
 
             bool match = criteria.Ruleset == null || Beatmap.RulesetID == criteria.Ruleset.ID || (Beatmap.RulesetID == 0 && criteria.Ruleset.ID > 0 && criteria.AllowConvertedBeatmaps);
 
-            foreach (var criteriaTerm in criteria.SearchTerms)
+            foreach (string criteriaTerm in criteria.SearchTerms)
                 match &=
                     Beatmap.Metadata.SearchableTerms.Any(term => term.IndexOf(criteriaTerm, StringComparison.InvariantCultureIgnoreCase) >= 0) ||
                     Beatmap.Version.IndexOf(criteriaTerm, StringComparison.InvariantCultureIgnoreCase) >= 0;
@@ -43,7 +43,7 @@ namespace osu.Game.Screens.Select.Carousel
             {
                 default:
                 case SortMode.Difficulty:
-                    var ruleset = Beatmap.RulesetID.CompareTo(otherBeatmap.Beatmap.RulesetID);
+                    int ruleset = Beatmap.RulesetID.CompareTo(otherBeatmap.Beatmap.RulesetID);
                     if (ruleset != 0) return ruleset;
 
                     return Beatmap.StarDifficulty.CompareTo(otherBeatmap.Beatmap.StarDifficulty);

@@ -108,16 +108,16 @@ namespace osu.Game.Overlays.KeyBinding
                 }
             };
 
-            foreach (var b in bindings)
+            foreach (Framework.Input.Bindings.KeyBinding b in bindings)
                 buttons.Add(new KeyButton(b));
         }
 
         public void RestoreDefaults()
         {
             int i = 0;
-            foreach (var d in Defaults)
+            foreach (KeyCombination d in Defaults)
             {
-                var button = buttons[i++];
+                KeyButton button = buttons[i++];
                 button.UpdateKeyCombination(d);
                 store.Update(button.KeyBinding);
             }
@@ -257,11 +257,7 @@ namespace osu.Game.Overlays.KeyBinding
                 store.Update(bindTarget.KeyBinding);
 
                 bindTarget.IsBinding = false;
-                Schedule(() =>
-                {
-                    // schedule to ensure we don't instantly get focus back on next OnMouseClick (see AcceptFocus impl.)
-                    bindTarget = null;
-                });
+                Schedule(() => bindTarget = null); // schedule to ensure we don't instantly get focus back on next OnMouseClick (see AcceptFocus impl.)
             }
 
             if (HasFocus)

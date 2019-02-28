@@ -55,7 +55,7 @@ namespace osu.Game.Tests.Visual
             linkColour = colours.Blue;
 
             var chatManager = new ChannelManager();
-            BindableList<Channel> availableChannels = (BindableList<Channel>)chatManager.AvailableChannels;
+            var availableChannels = (BindableList<Channel>)chatManager.AvailableChannels;
             availableChannels.Add(new Channel { Name = "#english" });
             availableChannels.Add(new Channel { Name = "#japanese" });
             Dependencies.Cache(chatManager);
@@ -82,14 +82,14 @@ namespace osu.Game.Tests.Visual
 
             bool hasExpectedActions()
             {
-                var expectedActionsList = expectedActions.ToList();
+                List<LinkAction> expectedActionsList = expectedActions.ToList();
 
                 if (expectedActionsList.Count != newLine.Message.Links.Count)
                     return false;
 
                 for (int i = 0; i < newLine.Message.Links.Count; i++)
                 {
-                    var action = newLine.Message.Links[i].Action;
+                    LinkAction action = newLine.Message.Links[i].Action;
                     if (action != expectedActions[i]) return false;
                 }
 
@@ -104,8 +104,8 @@ namespace osu.Game.Tests.Visual
 
                 Color4 textColour = isAction && hasBackground ? OsuColour.FromHex(newLine.Message.Sender.Colour) : Color4.White;
 
-                var linkCompilers = newLine.ContentFlow.Where(d => d is DrawableLinkCompiler).ToList();
-                var linkSprites = linkCompilers.SelectMany(comp => ((DrawableLinkCompiler)comp).Parts);
+                List<Drawable> linkCompilers = newLine.ContentFlow.Where(d => d is DrawableLinkCompiler).ToList();
+                IEnumerable<Drawable> linkSprites = linkCompilers.SelectMany(comp => ((DrawableLinkCompiler)comp).Parts);
 
                 return linkSprites.All(d => d.Colour == linkColour)
                        && newLine.ContentFlow.Except(linkSprites.Concat(linkCompilers)).All(d => d.Colour == textColour);

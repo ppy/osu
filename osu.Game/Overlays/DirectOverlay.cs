@@ -57,7 +57,7 @@ namespace osu.Game.Overlays
                 var artists = new List<string>();
                 var songs = new List<string>();
                 var tags = new List<string>();
-                foreach (var s in beatmapSets)
+                foreach (BeatmapSetInfo s in beatmapSets)
                 {
                     artists.Add(s.Metadata.Artist);
                     songs.Add(s.Metadata.Title);
@@ -281,20 +281,17 @@ namespace osu.Game.Overlays
                 Filter.DisplayStyleControl.Dropdown.Current.Value,
                 Filter.Tabs.Current.Value); //todo: sort direction (?)
 
-            getSetsRequest.Success += response =>
+            getSetsRequest.Success += response => Task.Run(() =>
             {
-                Task.Run(() =>
-                {
-                    var sets = response.BeatmapSets.Select(r => r.ToBeatmapSet(rulesets)).ToList();
+                List<BeatmapSetInfo> sets = response.BeatmapSets.Select(r => r.ToBeatmapSet(rulesets)).ToList();
 
-                    // may not need scheduling; loads async internally.
-                    Schedule(() =>
-                    {
-                        BeatmapSets = sets;
-                        recreatePanels(Filter.DisplayStyleControl.DisplayStyle.Value);
-                    });
+                // may not need scheduling; loads async internally.
+                Schedule(() =>
+                {
+                    BeatmapSets = sets;
+                    recreatePanels(Filter.DisplayStyleControl.DisplayStyle.Value);
                 });
-            };
+            });
 
             api.Queue(getSetsRequest);
         }

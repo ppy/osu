@@ -136,7 +136,7 @@ namespace osu.Game.Overlays
             if (trackedConfigManagers.ContainsKey((source, configManager)))
                 throw new InvalidOperationException($"{nameof(configManager)} is already registered.");
 
-            var trackedSettings = configManager.CreateTrackedSettings();
+            TrackedSettings trackedSettings = configManager.CreateTrackedSettings();
             if (trackedSettings == null)
                 return;
 
@@ -157,7 +157,7 @@ namespace osu.Game.Overlays
         {
             if (configManager == null) throw new ArgumentNullException(nameof(configManager));
 
-            if (!trackedConfigManagers.TryGetValue((source, configManager), out var existing))
+            if (!trackedConfigManagers.TryGetValue((source, configManager), out TrackedSettings existing))
                 return;
 
             existing.Unload();
@@ -189,7 +189,7 @@ namespace osu.Game.Overlays
                         if (val) selectedOption = 0;
                         break;
                     case Enum _:
-                        var values = Enum.GetValues(description.RawValue.GetType());
+                        Array values = Enum.GetValues(description.RawValue.GetType());
                         optionCount = values.Length;
                         selectedOption = Convert.ToInt32(description.RawValue);
                         break;
@@ -227,12 +227,9 @@ namespace osu.Game.Overlays
             }
 
             fadeOut?.Cancel();
-            fadeOut = Scheduler.AddDelayed(() =>
-            {
-                toDisplay.Animate(
-                    b => b.FadeOutFromOne(1500, Easing.InQuint),
-                    b => b.ResizeHeightTo(height_contracted, 1500, Easing.InQuint));
-            }, 500);
+            fadeOut = Scheduler.AddDelayed(() => toDisplay.Animate(
+                b => b.FadeOutFromOne(1500, Easing.InQuint),
+                b => b.ResizeHeightTo(height_contracted, 1500, Easing.InQuint)), 500);
         }
 
         private class OptionLight : Container

@@ -9,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Bindables;
+using osu.Game.Online.API.Requests.Responses;
 
 namespace osu.Game.Overlays.Profile.Sections.Ranks
 {
@@ -36,7 +37,7 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
             request = new GetUserScoresRequest(User.Value.Id, type, VisiblePages++ * ItemsPerPage);
             request.Success += scores => Schedule(() =>
             {
-                foreach (var s in scores)
+                foreach (APIScoreInfo s in scores)
                     s.Ruleset = Rulesets.GetRuleset(s.RulesetID);
 
                 if (!scores.Any() && VisiblePages == 1)

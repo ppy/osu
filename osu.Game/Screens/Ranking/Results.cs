@@ -100,10 +100,7 @@ namespace osu.Game.Screens.Ranking
 
         public override bool OnExiting(IScreen next)
         {
-            allCircles.ForEach(c =>
-            {
-                c.ScaleTo(0, transition_time, Easing.OutSine);
-            });
+            allCircles.ForEach(c => c.ScaleTo(0, transition_time, Easing.OutSine));
 
             Background.ScaleTo(1f, transition_time / 4, Easing.OutQuint);
 
@@ -262,7 +259,7 @@ namespace osu.Game.Screens.Ranking
                 },
             };
 
-            foreach (var t in CreateResultPages())
+            foreach (IResultPageInfo t in CreateResultPages())
                 modeChangeButtons.AddItem(t);
             modeChangeButtons.Current.Value = modeChangeButtons.Items.FirstOrDefault();
 

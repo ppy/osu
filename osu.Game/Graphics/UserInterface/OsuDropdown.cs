@@ -90,7 +90,7 @@ namespace osu.Game.Graphics.UserInterface
                 set
                 {
                     accentColour = value;
-                    foreach (var c in Children.OfType<IHasAccentColour>())
+                    foreach (IHasAccentColour c in Children.OfType<IHasAccentColour>())
                         c.AccentColour = value;
                 }
             }

@@ -13,7 +13,7 @@ namespace osu.Game.Tests.Beatmaps
     {
         public TestBeatmap(RulesetInfo ruleset)
         {
-            var baseBeatmap = createTestBeatmap();
+            Beatmap baseBeatmap = createTestBeatmap();
 
             BeatmapInfo = baseBeatmap.BeatmapInfo;
             ControlPointInfo = baseBeatmap.ControlPointInfo;

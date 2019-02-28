@@ -6,6 +6,7 @@ using osu.Framework.MathUtils;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Osu.Objects;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Graphics;
 using osu.Game.Replays;
@@ -192,7 +193,7 @@ namespace osu.Game.Rulesets.Osu.Replays
 
         private void moveToHitObject(OsuHitObject h, Vector2 targetPos, Easing easing)
         {
-            OsuReplayFrame lastFrame = (OsuReplayFrame)Frames[Frames.Count - 1];
+            var lastFrame = (OsuReplayFrame)Frames[Frames.Count - 1];
 
             // Wait until Auto could "see and react" to the next note.
             double waitTime = h.StartTime - Math.Max(0.0, h.TimePreempt - reactionTime);
@@ -231,7 +232,7 @@ namespace osu.Game.Rulesets.Osu.Replays
         {
             // Time to insert the first frame which clicks the object
             // Here we mainly need to determine which button to use
-            var action = buttonIndex % 2 == 0 ? OsuAction.LeftButton : OsuAction.RightButton;
+            OsuAction action = buttonIndex % 2 == 0 ? OsuAction.LeftButton : OsuAction.RightButton;
 
             var startFrame = new OsuReplayFrame(h.StartTime, new Vector2(startPosition.X, startPosition.Y), action);
 
@@ -249,7 +250,7 @@ namespace osu.Game.Rulesets.Osu.Replays
             if (index >= 0)
             {
                 var previousFrame = (OsuReplayFrame)Frames[index];
-                var previousActions = previousFrame.Actions;
+                List<OsuAction> previousActions = previousFrame.Actions;
 
                 // If a button is already held, then we simply alternate
                 if (previousActions.Any())

@@ -52,7 +52,7 @@ namespace osu.Game.Beatmaps
         /// <returns>The converted Beatmap.</returns>
         protected virtual Beatmap<T> ConvertBeatmap(IBeatmap original)
         {
-            var beatmap = CreateBeatmap();
+            Beatmap<T> beatmap = CreateBeatmap();
 
             beatmap.BeatmapInfo = original.BeatmapInfo;
             beatmap.ControlPointInfo = original.ControlPointInfo;
@@ -66,7 +66,7 @@ namespace osu.Game.Beatmaps
         {
             var result = new List<T>(hitObjects.Count);
 
-            foreach (var obj in hitObjects)
+            foreach (HitObject obj in hitObjects)
             {
                 if (obj is T tObj)
                 {
@@ -74,7 +74,7 @@ namespace osu.Game.Beatmaps
                     continue;
                 }
 
-                var converted = ConvertHitObject(obj, beatmap);
+                IEnumerable<T> converted = ConvertHitObject(obj, beatmap);
 
                 if (ObjectConverted != null)
                 {
@@ -82,7 +82,7 @@ namespace osu.Game.Beatmaps
                     ObjectConverted.Invoke(obj, converted);
                 }
 
-                foreach (var c in converted)
+                foreach (T c in converted)
                 {
                     if (c != null)
                         result.Add(c);

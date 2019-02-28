@@ -38,7 +38,7 @@ namespace osu.Game.Beatmaps.ControlPoints
         /// <returns>The modified <see cref="SampleInfo"/>. This does not share a reference with <paramref name="sampleInfo"/>.</returns>
         public virtual SampleInfo ApplyTo(SampleInfo sampleInfo)
         {
-            var newSampleInfo = sampleInfo.Clone();
+            SampleInfo newSampleInfo = sampleInfo.Clone();
             newSampleInfo.Bank = sampleInfo.Bank ?? SampleBank;
             newSampleInfo.Volume = sampleInfo.Volume > 0 ? sampleInfo.Volume : SampleVolume;
             return newSampleInfo;

@@ -60,7 +60,7 @@ namespace osu.Game.Online.Leaderboards
         [BackgroundDependencyLoader]
         private void load()
         {
-            var user = score.User;
+            User user = score.User;
 
             statisticsLabels = GetStatistics(score).Select(s => new ScoreComponentLabel(s)).ToList();
 
@@ -218,7 +218,7 @@ namespace osu.Game.Online.Leaderboards
 
         public override void Show()
         {
-            foreach (var d in new[] { avatar, nameLabel, scoreLabel, scoreRank, flagBadgeContainer, modsContainer }.Concat(statisticsLabels))
+            foreach (Drawable d in new[] { avatar, nameLabel, scoreLabel, scoreRank, flagBadgeContainer, modsContainer }.Concat(statisticsLabels))
                 d.FadeOut();
 
             Alpha = 0;
@@ -245,7 +245,7 @@ namespace osu.Game.Online.Leaderboards
 
                     using (BeginDelayedSequence(50, true))
                     {
-                        var drawables = new Drawable[] { flagBadgeContainer, modsContainer }.Concat(statisticsLabels).ToArray();
+                        Drawable[] drawables = new Drawable[] { flagBadgeContainer, modsContainer }.Concat(statisticsLabels).ToArray();
                         for (int i = 0; i < drawables.Length; i++)
                             drawables[i].FadeIn(100 + i * 50);
                     }

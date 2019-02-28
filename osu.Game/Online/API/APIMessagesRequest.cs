@@ -18,7 +18,7 @@ namespace osu.Game.Online.API
 
         protected override WebRequest CreateWebRequest()
         {
-            var req = base.CreateWebRequest();
+            WebRequest req = base.CreateWebRequest();
 
             if (sinceId.HasValue) req.AddParameter(@"since", sinceId.Value.ToString());
 

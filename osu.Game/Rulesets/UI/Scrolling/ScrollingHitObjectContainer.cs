@@ -44,7 +44,7 @@ namespace osu.Game.Rulesets.UI.Scrolling
 
         public override bool Remove(DrawableHitObject hitObject)
         {
-            var result = base.Remove(hitObject);
+            bool result = base.Remove(hitObject);
             if (result)
                 initialStateCache.Invalidate();
             return result;
@@ -79,7 +79,7 @@ namespace osu.Game.Rulesets.UI.Scrolling
 
                 scrollingInfo.Algorithm.Reset();
 
-                foreach (var obj in Objects)
+                foreach (DrawableHitObject obj in Objects)
                     computeInitialStateRecursive(obj);
                 initialStateCache.Validate();
             }
@@ -104,7 +104,7 @@ namespace osu.Game.Rulesets.UI.Scrolling
                 }
             }
 
-            foreach (var obj in hitObject.NestedHitObjects)
+            foreach (DrawableHitObject obj in hitObject.NestedHitObjects)
             {
                 computeInitialStateRecursive(obj);
 
@@ -118,7 +118,7 @@ namespace osu.Game.Rulesets.UI.Scrolling
             base.UpdateAfterChildrenLife();
 
             // We need to calculate hitobject positions as soon as possible after lifetimes so that hitobjects get the final say in their positions
-            foreach (var obj in AliveObjects)
+            foreach (DrawableHitObject obj in AliveObjects)
                 updatePosition(obj, Time.Current);
         }
 

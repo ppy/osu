@@ -161,7 +161,7 @@ namespace osu.Game.Tests.Visual
                 },
             };
 
-            foreach (var s in scores)
+            foreach (APIScoreInfo s in scores)
             {
                 s.Statistics.Add(HitResult.Great, RNG.Next(2000));
                 s.Statistics.Add(HitResult.Good, RNG.Next(2000));
@@ -273,7 +273,7 @@ namespace osu.Game.Tests.Visual
                     Accuracy = 0.8765,
                 },
             };
-            foreach (var s in anotherScores)
+            foreach (APIScoreInfo s in anotherScores)
             {
                 s.Statistics.Add(HitResult.Great, RNG.Next(2000));
                 s.Statistics.Add(HitResult.Good, RNG.Next(2000));

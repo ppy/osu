@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.IO;
 using System.Linq;
 using osu.Framework.Audio.Track;
@@ -42,12 +43,12 @@ namespace osu.Game.Tests
 
         protected override Track GetTrack() => new TrackBass(getAudioStream());
 
-        private Stream getAudioStream() => reader.GetStream(reader.Filenames.First(f => f.EndsWith(".mp3")));
-        private Stream getBeatmapStream() => reader.GetStream(reader.Filenames.First(f => f.EndsWith(".osu")));
+        private Stream getAudioStream() => reader.GetStream(reader.Filenames.First(f => f.EndsWith(".mp3", StringComparison.Ordinal)));
+        private Stream getBeatmapStream() => reader.GetStream(reader.Filenames.First(f => f.EndsWith(".osu", StringComparison.Ordinal)));
 
         private Beatmap createTestBeatmap()
         {
-            using (var beatmapStream = getBeatmapStream())
+            using (Stream beatmapStream = getBeatmapStream())
             using (var beatmapReader = new StreamReader(beatmapStream))
                 return Decoder.GetDecoder<Beatmap>(beatmapReader).Decode(beatmapReader);
         }

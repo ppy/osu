@@ -134,7 +134,7 @@ namespace osu.Game.Rulesets.Taiko.Tests
             var cpi = new ControlPointInfo();
             cpi.EffectPoints.Add(new EffectControlPoint { KiaiMode = kiai });
 
-            Hit hit = new Hit();
+            var hit = new Hit();
             hit.ApplyDefaults(cpi, new BeatmapDifficulty());
 
             var h = new DrawableTestHit(hit) { X = RNG.NextSingle(hitResult == HitResult.Good ? -0.1f : -0.05f, hitResult == HitResult.Good ? 0.1f : 0.05f) };
@@ -149,7 +149,7 @@ namespace osu.Game.Rulesets.Taiko.Tests
             var cpi = new ControlPointInfo();
             cpi.EffectPoints.Add(new EffectControlPoint { KiaiMode = kiai });
 
-            Hit hit = new Hit();
+            var hit = new Hit();
             hit.ApplyDefaults(cpi, new BeatmapDifficulty());
 
             var h = new DrawableTestHit(hit) { X = RNG.NextSingle(hitResult == HitResult.Good ? -0.1f : -0.05f, hitResult == HitResult.Good ? 0.1f : 0.05f) };
@@ -165,7 +165,7 @@ namespace osu.Game.Rulesets.Taiko.Tests
 
         private void addBarLine(bool major, double delay = scroll_time)
         {
-            BarLine bl = new BarLine { StartTime = rulesetContainer.Playfield.Time.Current + delay };
+            var bl = new BarLine { StartTime = rulesetContainer.Playfield.Time.Current + delay };
 
             rulesetContainer.Playfield.Add(major ? new DrawableBarLineMajor(bl) : new DrawableBarLine(bl));
         }
@@ -202,7 +202,7 @@ namespace osu.Game.Rulesets.Taiko.Tests
 
         private void addCentreHit(bool strong)
         {
-            Hit h = new Hit
+            var h = new Hit
             {
                 StartTime = rulesetContainer.Playfield.Time.Current + scroll_time,
                 IsStrong = strong
@@ -215,7 +215,7 @@ namespace osu.Game.Rulesets.Taiko.Tests
 
         private void addRimHit(bool strong)
         {
-            Hit h = new Hit
+            var h = new Hit
             {
                 StartTime = rulesetContainer.Playfield.Time.Current + scroll_time,
                 IsStrong = strong

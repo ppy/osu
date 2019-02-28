@@ -24,10 +24,10 @@ namespace osu.Game.Rulesets.Osu.Mods
         {
             void adjustFadeIn(OsuHitObject h) => h.TimeFadeIn = h.TimePreempt * fade_in_duration_multiplier;
 
-            foreach (var d in drawables.OfType<DrawableOsuHitObject>())
+            foreach (DrawableOsuHitObject d in drawables.OfType<DrawableOsuHitObject>())
             {
                 adjustFadeIn(d.HitObject);
-                foreach (var h in d.HitObject.NestedHitObjects.OfType<OsuHitObject>())
+                foreach (OsuHitObject h in d.HitObject.NestedHitObjects.OfType<OsuHitObject>())
                     adjustFadeIn(h);
             }
 
@@ -39,13 +39,13 @@ namespace osu.Game.Rulesets.Osu.Mods
             if (!(drawable is DrawableOsuHitObject d))
                 return;
 
-            var h = d.HitObject;
+            OsuHitObject h = d.HitObject;
 
-            var fadeOutStartTime = h.StartTime - h.TimePreempt + h.TimeFadeIn;
-            var fadeOutDuration = h.TimePreempt * fade_out_duration_multiplier;
+            double fadeOutStartTime = h.StartTime - h.TimePreempt + h.TimeFadeIn;
+            double fadeOutDuration = h.TimePreempt * fade_out_duration_multiplier;
 
             // new duration from completed fade in to end (before fading out)
-            var longFadeDuration = ((h as IHasEndTime)?.EndTime ?? h.StartTime) - fadeOutStartTime;
+            double longFadeDuration = ((h as IHasEndTime)?.EndTime ?? h.StartTime) - fadeOutStartTime;
 
             switch (drawable)
             {
@@ -66,7 +66,7 @@ namespace osu.Game.Rulesets.Osu.Mods
                     break;
                 case DrawableSliderTick sliderTick:
                     // slider ticks fade out over up to one second
-                    var tickFadeOutDuration = Math.Min(sliderTick.HitObject.TimePreempt - DrawableSliderTick.ANIM_DURATION, 1000);
+                    double tickFadeOutDuration = Math.Min(sliderTick.HitObject.TimePreempt - DrawableSliderTick.ANIM_DURATION, 1000);
 
                     using (sliderTick.BeginAbsoluteSequence(sliderTick.HitObject.StartTime - tickFadeOutDuration, true))
                         sliderTick.FadeOut(tickFadeOutDuration);

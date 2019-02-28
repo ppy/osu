@@ -187,7 +187,7 @@ namespace osu.Game.Screens.Select
             source.Text = Beatmap.Metadata.Source;
             tags.Text = Beatmap.Metadata.Tags;
 
-            var requestedBeatmap = Beatmap;
+            BeatmapInfo requestedBeatmap = Beatmap;
             if (requestedBeatmap.Metrics == null)
             {
                 var lookup = new GetBeatmapDetailsRequest(requestedBeatmap);
@@ -211,8 +211,8 @@ namespace osu.Game.Screens.Select
 
         private void displayMetrics(BeatmapMetrics metrics, bool failOnMissing = true)
         {
-            var hasRatings = metrics?.Ratings?.Any() ?? false;
-            var hasRetriesFails = (metrics?.Retries?.Any() ?? false) && (metrics.Fails?.Any() ?? false);
+            bool hasRatings = metrics?.Ratings?.Any() ?? false;
+            bool hasRetriesFails = (metrics?.Retries?.Any() ?? false) && (metrics.Fails?.Any() ?? false);
 
             if (failOnMissing) loading.Hide();
 

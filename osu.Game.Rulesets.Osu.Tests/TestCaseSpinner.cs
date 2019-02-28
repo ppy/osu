@@ -57,7 +57,7 @@ namespace osu.Game.Rulesets.Osu.Tests
                 Depth = depthIndex++
             };
 
-            foreach (var mod in Mods.OfType<IApplicableToDrawableHitObjects>())
+            foreach (IApplicableToDrawableHitObjects mod in Mods.OfType<IApplicableToDrawableHitObjects>())
                 mod.ApplyToDrawableHitObjects(new[] { drawable });
 
             Add(drawable);

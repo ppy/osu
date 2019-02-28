@@ -64,7 +64,7 @@ namespace osu.Game.Rulesets.Mania.Tests
 
             AddStep("flip direction", () =>
             {
-                foreach (var c in fill.Children)
+                foreach (ScrollingTestContainer c in fill.Children)
                     c.Flip();
             });
 
@@ -76,7 +76,7 @@ namespace osu.Game.Rulesets.Mania.Tests
 
         private void createNote()
         {
-            foreach (var stage in stages)
+            foreach (ManiaStage stage in stages)
             {
                 for (int i = 0; i < stage.Columns.Count; i++)
                 {
@@ -90,7 +90,7 @@ namespace osu.Game.Rulesets.Mania.Tests
 
         private void createHoldNote()
         {
-            foreach (var stage in stages)
+            foreach (ManiaStage stage in stages)
             {
                 for (int i = 0; i < stage.Columns.Count; i++)
                 {
@@ -104,7 +104,7 @@ namespace osu.Game.Rulesets.Mania.Tests
 
         private void createBarLine(bool major)
         {
-            foreach (var stage in stages)
+            foreach (ManiaStage stage in stages)
             {
                 var obj = new BarLine
                 {

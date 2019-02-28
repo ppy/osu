@@ -45,7 +45,7 @@ namespace osu.Game.Screens.Edit
         /// <returns>Whether the seek could be performed.</returns>
         public bool SeekSnapped(double position)
         {
-            var timingPoint = ControlPointInfo.TimingPointAt(position);
+            TimingControlPoint timingPoint = ControlPointInfo.TimingPointAt(position);
             double beatSnapLength = timingPoint.BeatLength / beatDivisor.Value;
 
             // We will be snapping to beats within the timing point
@@ -57,7 +57,7 @@ namespace osu.Game.Screens.Edit
 
             // Depending on beatSnapLength, we may snap to a beat that is beyond timingPoint's end time, but we want to instead snap to
             // the next timing point's start time
-            var nextTimingPoint = ControlPointInfo.TimingPoints.Find(t => t.Time > timingPoint.Time);
+            TimingControlPoint nextTimingPoint = ControlPointInfo.TimingPoints.Find(t => t.Time > timingPoint.Time);
             if (position > nextTimingPoint?.Time)
                 position = nextTimingPoint.Time;
 
@@ -82,7 +82,7 @@ namespace osu.Game.Screens.Edit
         {
             if (amount <= 0) throw new ArgumentException("Value should be greater than zero", nameof(amount));
 
-            var timingPoint = ControlPointInfo.TimingPointAt(CurrentTime);
+            TimingControlPoint timingPoint = ControlPointInfo.TimingPointAt(CurrentTime);
             if (direction < 0 && timingPoint.Time == CurrentTime)
             {
                 // When going backwards and we're at the boundary of two timing points, we compute the seek distance with the timing point which we are seeking into
@@ -123,7 +123,7 @@ namespace osu.Game.Screens.Edit
             if (seekTime < timingPoint.Time && timingPoint != ControlPointInfo.TimingPoints.First())
                 seekTime = timingPoint.Time;
 
-            var nextTimingPoint = ControlPointInfo.TimingPoints.Find(t => t.Time > timingPoint.Time);
+            TimingControlPoint nextTimingPoint = ControlPointInfo.TimingPoints.Find(t => t.Time > timingPoint.Time);
             if (seekTime > nextTimingPoint?.Time)
                 seekTime = nextTimingPoint.Time;
 

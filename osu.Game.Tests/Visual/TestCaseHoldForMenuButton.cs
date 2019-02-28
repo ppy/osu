@@ -29,7 +29,7 @@ namespace osu.Game.Tests.Visual
                 Action = () => exitAction = true
             });
 
-            var text = holdForMenuButton.Children.OfType<SpriteText>().First();
+            SpriteText text = holdForMenuButton.Children.OfType<SpriteText>().First();
 
             AddStep("Trigger text fade in", () => InputManager.MoveMouseTo(holdForMenuButton));
             AddUntilStep(() => text.IsPresent && !exitAction, "Text visible");

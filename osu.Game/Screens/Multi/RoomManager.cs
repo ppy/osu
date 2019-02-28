@@ -129,7 +129,7 @@ namespace osu.Game.Screens.Multi
             pollReq.Success += result =>
             {
                 // Remove past matches
-                foreach (var r in rooms.ToList())
+                foreach (Room r in rooms.ToList())
                 {
                     if (result.All(e => e.RoomID.Value != r.RoomID.Value))
                         rooms.Remove(r);
@@ -137,7 +137,7 @@ namespace osu.Game.Screens.Multi
 
                 for (int i = 0; i < result.Count; i++)
                 {
-                    var r = result[i];
+                    Room r = result[i];
                     r.Position.Value = i;
 
                     update(r, r);
@@ -162,7 +162,7 @@ namespace osu.Game.Screens.Multi
         /// <param name="remote">The remote <see cref="Room"/> to update with.</param>
         private void update(Room local, Room remote)
         {
-            foreach (var pi in remote.Playlist)
+            foreach (PlaylistItem pi in remote.Playlist)
                 pi.MapObjects(beatmaps, rulesets);
 
             local.CopyFrom(remote);
@@ -174,7 +174,7 @@ namespace osu.Game.Screens.Multi
         /// <param name="room">The <see cref="Room"/> to add.<</param>
         private void addRoom(Room room)
         {
-            var existing = rooms.FirstOrDefault(e => e.RoomID.Value == room.RoomID.Value);
+            Room existing = rooms.FirstOrDefault(e => e.RoomID.Value == room.RoomID.Value);
             if (existing == null)
                 rooms.Add(room);
             else

@@ -29,8 +29,8 @@ namespace osu.Game.Tests.Beatmaps
 
         protected void Test(string name)
         {
-            var ourResult = convert(name);
-            var expectedResult = read(name);
+            ConvertResult ourResult = convert(name);
+            ConvertResult expectedResult = read(name);
 
             Assert.Multiple(() =>
             {
@@ -46,8 +46,8 @@ namespace osu.Game.Tests.Beatmaps
                         Assert.Fail($"A conversion generated hitobjects, but should not have, for hitobject at time: {ourResult.Mappings[mappingCounter].StartTime}\n");
                     else if (!expectedResult.Mappings[mappingCounter].Equals(ourResult.Mappings[mappingCounter]))
                     {
-                        var expectedMapping = expectedResult.Mappings[mappingCounter];
-                        var ourMapping = ourResult.Mappings[mappingCounter];
+                        TConvertMapping expectedMapping = expectedResult.Mappings[mappingCounter];
+                        TConvertMapping ourMapping = ourResult.Mappings[mappingCounter];
 
                         Assert.Fail($"The conversion mapping differed for object at time {expectedMapping.StartTime}:\n"
                                     + $"Expected {JsonConvert.SerializeObject(expectedMapping)}\n"
@@ -55,8 +55,8 @@ namespace osu.Game.Tests.Beatmaps
                     }
                     else
                     {
-                        var ourMapping = ourResult.Mappings[mappingCounter];
-                        var expectedMapping = expectedResult.Mappings[mappingCounter];
+                        TConvertMapping ourMapping = ourResult.Mappings[mappingCounter];
+                        TConvertMapping expectedMapping = expectedResult.Mappings[mappingCounter];
 
                         Assert.Multiple(() =>
                         {
@@ -91,9 +91,9 @@ namespace osu.Game.Tests.Beatmaps
 
         private ConvertResult convert(string name)
         {
-            var beatmap = getBeatmap(name);
+            IBeatmap beatmap = getBeatmap(name);
 
-            var rulesetInstance = CreateRuleset();
+            Ruleset rulesetInstance = CreateRuleset();
             beatmap.BeatmapInfo.Ruleset = beatmap.BeatmapInfo.RulesetID == rulesetInstance.RulesetInfo.ID ? rulesetInstance.RulesetInfo : new RulesetInfo();
 
             Converter = rulesetInstance.CreateBeatmapConverter(beatmap);
@@ -104,10 +104,10 @@ namespace osu.Game.Tests.Beatmaps
             {
                 converted.ForEach(h => h.ApplyDefaults(beatmap.ControlPointInfo, beatmap.BeatmapInfo.BaseDifficulty));
 
-                var mapping = CreateConvertMapping();
+                TConvertMapping mapping = CreateConvertMapping();
                 mapping.StartTime = orig.StartTime;
 
-                foreach (var obj in converted)
+                foreach (HitObject obj in converted)
                     mapping.Objects.AddRange(CreateConvertValue(obj));
                 result.Mappings.Add(mapping);
             };
@@ -120,20 +120,20 @@ namespace osu.Game.Tests.Beatmaps
 
         private ConvertResult read(string name)
         {
-            using (var resStream = openResource($"{resource_namespace}.{name}{expected_conversion_suffix}.json"))
+            using (Stream resStream = openResource($"{resource_namespace}.{name}{expected_conversion_suffix}.json"))
             using (var reader = new StreamReader(resStream))
             {
-                var contents = reader.ReadToEnd();
+                string contents = reader.ReadToEnd();
                 return JsonConvert.DeserializeObject<ConvertResult>(contents);
             }
         }
 
         private IBeatmap getBeatmap(string name)
         {
-            using (var resStream = openResource($"{resource_namespace}.{name}.osu"))
+            using (Stream resStream = openResource($"{resource_namespace}.{name}.osu"))
             using (var stream = new StreamReader(resStream))
             {
-                var decoder = Decoder.GetDecoder<Beatmap>(stream);
+                Decoder<Beatmap> decoder = Decoder.GetDecoder<Beatmap>(stream);
                 ((LegacyBeatmapDecoder)decoder).ApplyOffsets = false;
                 return decoder.Decode(stream);
             }
@@ -141,7 +141,7 @@ namespace osu.Game.Tests.Beatmaps
 
         private Stream openResource(string name)
         {
-            var localPath = Path.GetDirectoryName(Uri.UnescapeDataString(new UriBuilder(Assembly.GetExecutingAssembly().CodeBase).Path));
+            string localPath = Path.GetDirectoryName(Uri.UnescapeDataString(new UriBuilder(Assembly.GetExecutingAssembly().CodeBase).Path));
             return Assembly.LoadFrom(Path.Combine(localPath, $"{ResourceAssembly}.dll")).GetManifestResourceStream($@"{ResourceAssembly}.Resources.{name}");
         }
 

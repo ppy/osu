@@ -3,6 +3,7 @@
 
 using System;
 using osu.Framework.Allocation;
+using osu.Framework.Audio.Track;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -233,7 +234,7 @@ namespace osu.Game.Screens.Multi
 
         private void cancelLooping()
         {
-            var track = Beatmap?.Value?.Track;
+            Track track = Beatmap?.Value?.Track;
 
             if (track != null)
                 track.Looping = false;
@@ -247,7 +248,7 @@ namespace osu.Game.Screens.Multi
 
             if (screenStack.CurrentScreen is MatchSubScreen)
             {
-                var track = Beatmap.Value.Track;
+                Track track = Beatmap.Value.Track;
                 if (track != null)
                 {
                     track.Looping = true;

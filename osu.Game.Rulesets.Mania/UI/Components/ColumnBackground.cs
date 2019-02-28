@@ -84,8 +84,8 @@ namespace osu.Game.Rulesets.Mania.UI.Components
 
             background.Colour = AccentColour;
 
-            var brightPoint = AccentColour.Opacity(0.6f);
-            var dimPoint = AccentColour.Opacity(0);
+            Color4 brightPoint = AccentColour.Opacity(0.6f);
+            Color4 dimPoint = AccentColour.Opacity(0);
 
             backgroundOverlay.Colour = ColourInfo.GradientVertical(
                 direction.Value == ScrollingDirection.Up ? brightPoint : dimPoint,

@@ -37,7 +37,7 @@ namespace osu.Game.Skinning
         {
             channels = samples.Select(s =>
             {
-                var ch = loadChannel(s, skin.GetSample);
+                SampleChannel ch = loadChannel(s, skin.GetSample);
                 if (ch == null && allowFallback)
                     ch = loadChannel(s, audio.Sample.Get);
                 return ch;
@@ -46,9 +46,9 @@ namespace osu.Game.Skinning
 
         private SampleChannel loadChannel(SampleInfo info, Func<string, SampleChannel> getSampleFunction)
         {
-            foreach (var lookup in info.LookupNames)
+            foreach (string lookup in info.LookupNames)
             {
-                var ch = getSampleFunction($"Gameplay/{lookup}");
+                SampleChannel ch = getSampleFunction($"Gameplay/{lookup}");
                 if (ch == null)
                     continue;
 

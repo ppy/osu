@@ -62,18 +62,18 @@ namespace osu.Game.Rulesets.Edit
             var tObject = (TObject)hitObject;
 
             // Add to beatmap, preserving sorting order
-            var insertionIndex = beatmap.HitObjects.FindLastIndex(h => h.StartTime <= hitObject.StartTime);
+            int insertionIndex = beatmap.HitObjects.FindLastIndex(h => h.StartTime <= hitObject.StartTime);
             beatmap.HitObjects.Insert(insertionIndex + 1, tObject);
 
             // Process object
-            var processor = ruleset.CreateBeatmapProcessor(beatmap);
+            IBeatmapProcessor processor = ruleset.CreateBeatmapProcessor(beatmap);
 
             processor?.PreProcess();
             tObject.ApplyDefaults(beatmap.ControlPointInfo, beatmap.BeatmapInfo.BaseDifficulty);
             processor?.PostProcess();
 
             // Add visual representation
-            var drawableObject = rulesetContainer.GetVisualRepresentation(tObject);
+            DrawableHitObject<TObject> drawableObject = rulesetContainer.GetVisualRepresentation(tObject);
 
             rulesetContainer.Playfield.Add(drawableObject);
             rulesetContainer.Playfield.PostProcess();
@@ -89,13 +89,13 @@ namespace osu.Game.Rulesets.Edit
             beatmap.HitObjects.Remove(tObject);
 
             // Process the beatmap
-            var processor = ruleset.CreateBeatmapProcessor(beatmap);
+            IBeatmapProcessor processor = ruleset.CreateBeatmapProcessor(beatmap);
 
             processor?.PreProcess();
             processor?.PostProcess();
 
             // Remove visual representation
-            var drawableObject = Playfield.AllHitObjects.Single(d => d.HitObject == hitObject);
+            DrawableHitObject drawableObject = Playfield.AllHitObjects.Single(d => d.HitObject == hitObject);
 
             rulesetContainer.Playfield.Remove(drawableObject);
             rulesetContainer.Playfield.PostProcess();

@@ -39,7 +39,7 @@ namespace osu.Game.Rulesets.Osu.Objects
             set
             {
                 base.ComboIndex = value;
-                foreach (var n in NestedHitObjects.OfType<IHasComboInformation>())
+                foreach (IHasComboInformation n in NestedHitObjects.OfType<IHasComboInformation>())
                     n.ComboIndex = value;
             }
         }
@@ -50,7 +50,7 @@ namespace osu.Game.Rulesets.Osu.Objects
             set
             {
                 base.IndexInCurrentCombo = value;
-                foreach (var n in NestedHitObjects.OfType<IHasComboInformation>())
+                foreach (IHasComboInformation n in NestedHitObjects.OfType<IHasComboInformation>())
                     n.IndexInCurrentCombo = value;
             }
         }
@@ -193,30 +193,30 @@ namespace osu.Game.Rulesets.Osu.Objects
             // This exists for edge cases such as /b/1573664 where the beatmap has been edited by the user, and should never be reached in normal usage.
             const double max_length = 100000;
 
-            var length = Math.Min(max_length, Path.Distance);
-            var tickDistance = MathHelper.Clamp(TickDistance, 0, length);
+            double length = Math.Min(max_length, Path.Distance);
+            double tickDistance = MathHelper.Clamp(TickDistance, 0, length);
 
             if (tickDistance == 0) return;
 
-            var minDistanceFromEnd = Velocity * 10;
+            double minDistanceFromEnd = Velocity * 10;
 
-            var spanCount = this.SpanCount();
+            int spanCount = this.SpanCount();
 
-            for (var span = 0; span < spanCount; span++)
+            for (int span = 0; span < spanCount; span++)
             {
-                var spanStartTime = StartTime + span * SpanDuration;
-                var reversed = span % 2 == 1;
+                double spanStartTime = StartTime + span * SpanDuration;
+                bool reversed = span % 2 == 1;
 
-                for (var d = tickDistance; d <= length; d += tickDistance)
+                for (double d = tickDistance; d <= length; d += tickDistance)
                 {
                     if (d > length - minDistanceFromEnd)
                         break;
 
-                    var distanceProgress = d / length;
-                    var timeProgress = reversed ? 1 - distanceProgress : distanceProgress;
+                    double distanceProgress = d / length;
+                    double timeProgress = reversed ? 1 - distanceProgress : distanceProgress;
 
-                    var firstSample = Samples.Find(s => s.Name == SampleInfo.HIT_NORMAL)
-                                      ?? Samples.FirstOrDefault(); // TODO: remove this when guaranteed sort is present for samples (https://github.com/ppy/osu/issues/1933)
+                    SampleInfo firstSample = Samples.Find(s => s.Name == SampleInfo.HIT_NORMAL)
+                                             ?? Samples.FirstOrDefault(); // TODO: remove this when guaranteed sort is present for samples (https://github.com/ppy/osu/issues/1933)
                     var sampleList = new List<SampleInfo>();
 
                     if (firstSample != null)

@@ -126,7 +126,7 @@ namespace osu.Game.Rulesets.Mania.UI
 
             for (int i = 0; i < definition.Columns; i++)
             {
-                var isSpecial = definition.IsSpecialColumn(i);
+                bool isSpecial = definition.IsSpecialColumn(i);
                 var column = new Column(firstColumnIndex + i)
                 {
                     IsSpecial = isSpecial,
@@ -136,13 +136,10 @@ namespace osu.Game.Rulesets.Mania.UI
                 AddColumn(column);
             }
 
-            Direction.BindValueChanged(dir =>
+            Direction.BindValueChanged(dir => barLineContainer.Padding = new MarginPadding
             {
-                barLineContainer.Padding = new MarginPadding
-                {
-                    Top = dir.NewValue == ScrollingDirection.Up ? HIT_TARGET_POSITION : 0,
-                    Bottom = dir.NewValue == ScrollingDirection.Down ? HIT_TARGET_POSITION : 0,
-                };
+                Top = dir.NewValue == ScrollingDirection.Up ? HIT_TARGET_POSITION : 0,
+                Bottom = dir.NewValue == ScrollingDirection.Down ? HIT_TARGET_POSITION : 0,
             }, true);
         }
 
@@ -208,7 +205,7 @@ namespace osu.Game.Rulesets.Mania.UI
             specialColumnColour = new Color4(0, 48, 63, 255);
 
             // Set the special column + colour + key
-            foreach (var column in Columns)
+            foreach (Column column in Columns)
             {
                 if (!column.IsSpecial)
                     continue;
@@ -216,7 +213,7 @@ namespace osu.Game.Rulesets.Mania.UI
                 column.AccentColour = specialColumnColour;
             }
 
-            var nonSpecialColumns = Columns.Where(c => !c.IsSpecial).ToList();
+            List<Column> nonSpecialColumns = Columns.Where(c => !c.IsSpecial).ToList();
 
             // We'll set the colours of the non-special columns in a separate loop, because the non-special
             // column colours are mirrored across their centre and special styles mess with this

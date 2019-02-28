@@ -106,7 +106,7 @@ namespace osu.Game.Screens.Select.Carousel
         {
             get
             {
-                List<MenuItem> items = new List<MenuItem>();
+                var items = new List<MenuItem>();
 
                 if (Item.State.Value == CarouselItemState.NotSelected)
                     items.Add(new OsuMenuItem("Expand", MenuItemType.Highlighted, () => Item.State.Value = CarouselItemState.Selected));

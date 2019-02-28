@@ -67,7 +67,7 @@ namespace osu.Game.Screens.Play.PlayerSettings
             if (AdjustableClock == null)
                 return;
 
-            var clockRate = AdjustableClock.Rate;
+            double clockRate = AdjustableClock.Rate;
 
             // can't trigger this line instantly as the underlying clock may not be ready to accept adjustments yet.
             rateSlider.Bindable.ValueChanged += multiplier => AdjustableClock.Rate = clockRate * multiplier.NewValue;

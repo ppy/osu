@@ -42,7 +42,7 @@ namespace osu.Game.Audio
         /// <returns>The playable <see cref="PreviewTrack"/>.</returns>
         public PreviewTrack Get(BeatmapSetInfo beatmapSetInfo)
         {
-            var track = CreatePreviewTrack(beatmapSetInfo, trackManager);
+            TrackManagerPreviewTrack track = CreatePreviewTrack(beatmapSetInfo, trackManager);
 
             track.Started += () =>
             {

@@ -81,7 +81,7 @@ namespace osu.Game.Online.API
 
         public void Unregister(IOnlineComponent component)
         {
-            Scheduler.Add(delegate { components.Remove(component); });
+            Scheduler.Add(() => components.Remove(component));
         }
 
         public string AccessToken => authentication.RequestAccessToken();
@@ -335,13 +335,13 @@ namespace osu.Game.Online.API
         {
             lock (queue)
             {
-                var oldQueueRequests = queue.ToArray();
+                APIRequest[] oldQueueRequests = queue.ToArray();
 
                 queue.Clear();
 
                 if (failOldRequests)
                 {
-                    foreach (var req in oldQueueRequests)
+                    foreach (APIRequest req in oldQueueRequests)
                         req.Fail(new WebException(@"Disconnected from server"));
                 }
             }

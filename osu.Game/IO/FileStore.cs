@@ -29,13 +29,13 @@ namespace osu.Game.IO
 
         public FileInfo Add(Stream data, bool reference = true)
         {
-            using (var usage = ContextFactory.GetForWrite())
+            using (DatabaseWriteUsage usage = ContextFactory.GetForWrite())
             {
                 string hash = data.ComputeSHA2Hash();
 
-                var existing = usage.Context.FileInfo.FirstOrDefault(f => f.Hash == hash);
+                FileInfo existing = usage.Context.FileInfo.FirstOrDefault(f => f.Hash == hash);
 
-                var info = existing ?? new FileInfo { Hash = hash };
+                FileInfo info = existing ?? new FileInfo { Hash = hash };
 
                 string path = info.StoragePath;
 
@@ -44,7 +44,7 @@ namespace osu.Game.IO
                 {
                     data.Seek(0, SeekOrigin.Begin);
 
-                    using (var output = Storage.GetStream(path, FileAccess.Write))
+                    using (Stream output = Storage.GetStream(path, FileAccess.Write))
                         data.CopyTo(output);
 
                     data.Seek(0, SeekOrigin.Begin);
@@ -61,13 +61,13 @@ namespace osu.Game.IO
         {
             if (files.Length == 0) return;
 
-            using (var usage = ContextFactory.GetForWrite())
+            using (DatabaseWriteUsage usage = ContextFactory.GetForWrite())
             {
-                var context = usage.Context;
+                OsuDbContext context = usage.Context;
 
-                foreach (var f in files.GroupBy(f => f.ID))
+                foreach (IGrouping<int, FileInfo> f in files.GroupBy(f => f.ID))
                 {
-                    var refetch = context.Find<FileInfo>(f.First().ID) ?? f.First();
+                    FileInfo refetch = context.Find<FileInfo>(f.First().ID) ?? f.First();
                     refetch.ReferenceCount += f.Count();
                     context.FileInfo.Update(refetch);
                 }
@@ -78,13 +78,13 @@ namespace osu.Game.IO
         {
             if (files.Length == 0) return;
 
-            using (var usage = ContextFactory.GetForWrite())
+            using (DatabaseWriteUsage usage = ContextFactory.GetForWrite())
             {
-                var context = usage.Context;
+                OsuDbContext context = usage.Context;
 
-                foreach (var f in files.GroupBy(f => f.ID))
+                foreach (IGrouping<int, FileInfo> f in files.GroupBy(f => f.ID))
                 {
-                    var refetch = context.FileInfo.Find(f.Key);
+                    FileInfo refetch = context.FileInfo.Find(f.Key);
                     refetch.ReferenceCount -= f.Count();
                     context.FileInfo.Update(refetch);
                 }
@@ -93,11 +93,11 @@ namespace osu.Game.IO
 
         public override void Cleanup()
         {
-            using (var usage = ContextFactory.GetForWrite())
+            using (DatabaseWriteUsage usage = ContextFactory.GetForWrite())
             {
-                var context = usage.Context;
+                OsuDbContext context = usage.Context;
 
-                foreach (var f in context.FileInfo.Where(f => f.ReferenceCount < 1))
+                foreach (FileInfo f in context.FileInfo.Where(f => f.ReferenceCount < 1))
                 {
                     try
                     {

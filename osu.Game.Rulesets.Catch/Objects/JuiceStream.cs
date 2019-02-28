@@ -49,13 +49,13 @@ namespace osu.Game.Rulesets.Catch.Objects
             if (TickDistance == 0)
                 return;
 
-            var length = Path.Distance;
-            var tickDistance = Math.Min(TickDistance, length);
-            var spanDuration = length / Velocity;
+            double length = Path.Distance;
+            double tickDistance = Math.Min(TickDistance, length);
+            double spanDuration = length / Velocity;
 
-            var minDistanceFromEnd = Velocity * 0.01;
+            double minDistanceFromEnd = Velocity * 0.01;
 
-            var tickSamples = Samples.Select(s => new SampleInfo
+            List<SampleInfo> tickSamples = Samples.Select(s => new SampleInfo
             {
                 Bank = s.Bank,
                 Name = @"slidertick",
@@ -73,8 +73,8 @@ namespace osu.Game.Rulesets.Catch.Objects
 
             for (int span = 0; span < this.SpanCount(); span++)
             {
-                var spanStartTime = StartTime + span * spanDuration;
-                var reversed = span % 2 == 1;
+                double spanStartTime = StartTime + span * spanDuration;
+                bool reversed = span % 2 == 1;
 
                 for (double d = tickDistance;; d += tickDistance)
                 {
@@ -85,8 +85,8 @@ namespace osu.Game.Rulesets.Catch.Objects
                         isLastTick = true;
                     }
 
-                    var timeProgress = d / length;
-                    var distanceProgress = reversed ? 1 - timeProgress : timeProgress;
+                    double timeProgress = d / length;
+                    double distanceProgress = reversed ? 1 - timeProgress : timeProgress;
 
                     double time = spanStartTime + timeProgress * spanDuration;
 
@@ -107,7 +107,7 @@ namespace osu.Game.Rulesets.Catch.Objects
 
                     for (int tinyTickIndex = 0; tinyTickIndex < tinyTickCount - 1; tinyTickIndex++)
                     {
-                        var t = lastTickTime + (tinyTickIndex + 1) * tinyTickInterval;
+                        double t = lastTickTime + (tinyTickIndex + 1) * tinyTickInterval;
                         double progress = reversed ? 1 - (t - spanStartTime) / spanDuration : (t - spanStartTime) / spanDuration;
 
                         AddNested(new TinyDroplet

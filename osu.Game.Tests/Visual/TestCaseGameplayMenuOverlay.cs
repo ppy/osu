@@ -9,6 +9,7 @@ using osuTK.Input;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Logging;
+using osu.Game.Graphics.UserInterface;
 using osu.Game.Screens.Play;
 using osuTK;
 
@@ -38,7 +39,7 @@ namespace osu.Game.Tests.Visual
                 OnQuit = () => Logger.Log(@"Quit"),
             });
 
-            var retryCount = 0;
+            int retryCount = 0;
 
             AddStep("Add retry", () =>
             {
@@ -165,7 +166,7 @@ namespace osu.Game.Tests.Visual
         {
             AddStep("Show overlay", () => pauseOverlay.Show());
 
-            var secondButton = pauseOverlay.Buttons.Skip(1).First();
+            DialogButton secondButton = pauseOverlay.Buttons.Skip(1).First();
 
             AddStep("Down arrow", () => press(Key.Down));
             AddStep("Hover second button", () => InputManager.MoveMouseTo(secondButton));
@@ -186,7 +187,7 @@ namespace osu.Game.Tests.Visual
                 InputManager.MoveMouseTo(Vector2.Zero);
             });
 
-            var secondButton = pauseOverlay.Buttons.Skip(1).First();
+            DialogButton secondButton = pauseOverlay.Buttons.Skip(1).First();
 
             AddStep("Hover second button", () => InputManager.MoveMouseTo(secondButton));
             AddStep("Up arrow", () => press(Key.Up));
@@ -203,7 +204,7 @@ namespace osu.Game.Tests.Visual
         {
             AddStep("Show overlay", () => pauseOverlay.Show());
 
-            var secondButton = pauseOverlay.Buttons.Skip(1).First();
+            DialogButton secondButton = pauseOverlay.Buttons.Skip(1).First();
 
             AddStep("Hover second button", () => InputManager.MoveMouseTo(secondButton));
             AddStep("Unhover second button", () => InputManager.MoveMouseTo(Vector2.Zero));
@@ -220,12 +221,12 @@ namespace osu.Game.Tests.Visual
         {
             AddStep("Show overlay", () => pauseOverlay.Show());
 
-            var retryButton = pauseOverlay.Buttons.Skip(1).First();
+            DialogButton retryButton = pauseOverlay.Buttons.Skip(1).First();
 
             bool triggered = false;
             AddStep("Click retry button", () =>
             {
-                var lastAction = pauseOverlay.OnRetry;
+                Action lastAction = pauseOverlay.OnRetry;
                 pauseOverlay.OnRetry = () => triggered = true;
 
                 retryButton.Click();

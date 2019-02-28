@@ -22,7 +22,7 @@ namespace osu.Game.Tests.Visual
 
         public TestCaseMultiScreen()
         {
-            Multiplayer multi = new Multiplayer();
+            var multi = new Multiplayer();
 
             AddStep(@"show", () => LoadScreen(multi));
         }

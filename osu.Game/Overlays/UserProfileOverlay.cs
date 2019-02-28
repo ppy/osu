@@ -175,7 +175,7 @@ namespace osu.Game.Overlays
             {
                 foreach (string id in user.ProfileOrder)
                 {
-                    var sec = sections.FirstOrDefault(s => s.Identifier == id);
+                    ProfileSection sec = sections.FirstOrDefault(s => s.Identifier == id);
                     if (sec != null)
                     {
                         sec.User.Value = user;

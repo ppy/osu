@@ -204,7 +204,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
             }
             finally
             {
-                foreach (var obj in pattern.HitObjects)
+                foreach (ManiaHitObject obj in pattern.HitObjects)
                 {
                     if (convertType.HasFlag(PatternType.Stair) && obj.Column == TotalColumns - 1)
                         StairType = PatternType.ReverseStair;

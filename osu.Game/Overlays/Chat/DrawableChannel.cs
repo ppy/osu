@@ -77,19 +77,19 @@ namespace osu.Game.Overlays.Chat
         private void newMessagesArrived(IEnumerable<Message> newMessages)
         {
             // Add up to last Channel.MAX_HISTORY messages
-            var displayMessages = newMessages.Skip(Math.Max(0, newMessages.Count() - Channel.MaxHistory));
+            IEnumerable<Message> displayMessages = newMessages.Skip(Math.Max(0, newMessages.Count() - Channel.MaxHistory));
 
             ChatLineFlow.AddRange(displayMessages.Select(CreateChatLine));
 
             if (scroll.IsScrolledToEnd(10) || !ChatLineFlow.Children.Any() || newMessages.Any(m => m is LocalMessage))
                 scrollToEnd();
 
-            var staleMessages = ChatLineFlow.Children.Where(c => c.LifetimeEnd == double.MaxValue).ToArray();
+            ChatLine[] staleMessages = ChatLineFlow.Children.Where(c => c.LifetimeEnd == double.MaxValue).ToArray();
             int count = staleMessages.Length - Channel.MaxHistory;
 
             for (int i = 0; i < count; i++)
             {
-                var d = staleMessages[i];
+                ChatLine d = staleMessages[i];
                 if (!scroll.IsScrolledToEnd(10))
                     scroll.OffsetScrollPosition(-d.DrawHeight);
                 d.Expire();
@@ -98,7 +98,7 @@ namespace osu.Game.Overlays.Chat
 
         private void pendingMessageResolved(Message existing, Message updated)
         {
-            var found = ChatLineFlow.Children.LastOrDefault(c => c.Message == existing);
+            ChatLine found = ChatLineFlow.Children.LastOrDefault(c => c.Message == existing);
             if (found != null)
             {
                 Trace.Assert(updated.Id.HasValue, "An updated message was returned with no ID.");

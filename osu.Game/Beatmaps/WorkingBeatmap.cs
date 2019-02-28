@@ -40,7 +40,7 @@ namespace osu.Game.Beatmaps
 
             beatmap = new RecyclableLazy<IBeatmap>(() =>
             {
-                var b = GetBeatmap() ?? new Beatmap();
+                IBeatmap b = GetBeatmap() ?? new Beatmap();
 
                 // The original beatmap version needs to be preserved as the database doesn't contain it
                 BeatmapInfo.BeatmapVersion = b.BeatmapInfo.BeatmapVersion;
@@ -54,7 +54,7 @@ namespace osu.Game.Beatmaps
             track = new RecyclableLazy<Track>(() =>
             {
                 // we want to ensure that we always have a track, even if it's a fake one.
-                var t = GetTrack() ?? new VirtualBeatmapTrack(Beatmap);
+                Track t = GetTrack() ?? new VirtualBeatmapTrack(Beatmap);
                 applyRateAdjustments(t);
                 return t;
             });
@@ -71,7 +71,7 @@ namespace osu.Game.Beatmaps
         /// <returns>The absolute path of the output file.</returns>
         public string Save()
         {
-            var path = FileSafety.GetTempPath(Guid.NewGuid().ToString().Replace("-", string.Empty) + ".json");
+            string path = FileSafety.GetTempPath(Guid.NewGuid().ToString().Replace("-", string.Empty) + ".json");
             using (var sw = new StreamWriter(path))
                 sw.WriteLine(Beatmap.Serialize());
             return path;
@@ -89,7 +89,7 @@ namespace osu.Game.Beatmaps
         /// <exception cref="BeatmapInvalidForRulesetException">If <see cref="Beatmap"/> could not be converted to <paramref name="ruleset"/>.</exception>
         public IBeatmap GetPlayableBeatmap(RulesetInfo ruleset)
         {
-            var rulesetInstance = ruleset.CreateInstance();
+            Ruleset rulesetInstance = ruleset.CreateInstance();
 
             IBeatmapConverter converter = rulesetInstance.CreateBeatmapConverter(Beatmap);
 
@@ -98,7 +98,7 @@ namespace osu.Game.Beatmaps
                 throw new BeatmapInvalidForRulesetException($"{nameof(Beatmaps.Beatmap)} can not be converted for the ruleset (ruleset: {ruleset.InstantiationInfo}, converter: {converter}).");
 
             // Apply conversion mods
-            foreach (var mod in Mods.Value.OfType<IApplicableToBeatmapConverter>())
+            foreach (IApplicableToBeatmapConverter mod in Mods.Value.OfType<IApplicableToBeatmapConverter>())
                 mod.ApplyToBeatmapConverter(converter);
 
             // Convert
@@ -110,7 +110,7 @@ namespace osu.Game.Beatmaps
                 converted.BeatmapInfo = converted.BeatmapInfo.Clone();
                 converted.BeatmapInfo.BaseDifficulty = converted.BeatmapInfo.BaseDifficulty.Clone();
 
-                foreach (var mod in Mods.Value.OfType<IApplicableToDifficulty>())
+                foreach (IApplicableToDifficulty mod in Mods.Value.OfType<IApplicableToDifficulty>())
                     mod.ApplyToDifficulty(converted.BeatmapInfo.BaseDifficulty);
             }
 
@@ -119,11 +119,11 @@ namespace osu.Game.Beatmaps
             processor?.PreProcess();
 
             // Compute default values for hitobjects, including creating nested hitobjects in-case they're needed
-            foreach (var obj in converted.HitObjects)
+            foreach (HitObject obj in converted.HitObjects)
                 obj.ApplyDefaults(converted.ControlPointInfo, converted.BeatmapInfo.BaseDifficulty);
 
-            foreach (var mod in Mods.Value.OfType<IApplicableToHitObject>())
-            foreach (var obj in converted.HitObjects)
+            foreach (IApplicableToHitObject mod in Mods.Value.OfType<IApplicableToHitObject>())
+            foreach (HitObject obj in converted.HitObjects)
                 mod.ApplyToHitObject(obj);
 
             processor?.PostProcess();
@@ -140,7 +140,7 @@ namespace osu.Game.Beatmaps
 
         public bool BackgroundLoaded => background.IsResultAvailable;
         public Texture Background => background.Value;
-        protected virtual bool BackgroundStillValid(Texture b) => b == null || b.Available;
+        protected virtual bool BackgroundStillValid(Texture b) => b?.Available != false;
         protected abstract Texture GetBackground();
         private readonly RecyclableLazy<Texture> background;
 
@@ -194,7 +194,7 @@ namespace osu.Game.Beatmaps
             if (t == null) return;
 
             t.ResetSpeedAdjustments();
-            foreach (var mod in Mods.Value.OfType<IApplicableToClock>())
+            foreach (IApplicableToClock mod in Mods.Value.OfType<IApplicableToClock>())
                 mod.ApplyToClock(t);
         }
 

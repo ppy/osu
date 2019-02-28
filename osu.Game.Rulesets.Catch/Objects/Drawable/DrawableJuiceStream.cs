@@ -22,7 +22,7 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawable
 
             InternalChild = dropletContainer = new Container { RelativeSizeAxes = Axes.Both, };
 
-            foreach (var o in s.NestedHitObjects.Cast<CatchHitObject>())
+            foreach (CatchHitObject o in s.NestedHitObjects.Cast<CatchHitObject>())
                 AddNested(getVisualRepresentation?.Invoke(o));
         }
 

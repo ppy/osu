@@ -81,8 +81,8 @@ namespace osu.Game.Storyboards
         private void applyCommands<T>(Drawable drawable, IEnumerable<CommandTimeline<T>.TypedCommand> commands, DrawablePropertyInitializer<T> initializeProperty, DrawableTransformer<T> transform, bool alwaysInitialize = true)
             where T : struct
         {
-            var initialized = false;
-            foreach (var command in commands.OrderBy(l => l))
+            bool initialized = false;
+            foreach (CommandTimeline<T>.TypedCommand command in commands.OrderBy(l => l))
             {
                 if (!initialized)
                 {
@@ -101,11 +101,11 @@ namespace osu.Game.Storyboards
 
         private IEnumerable<CommandTimeline<T>.TypedCommand> getCommands<T>(CommandTimelineSelector<T> timelineSelector, IEnumerable<Tuple<CommandTimelineGroup, double>> triggeredGroups)
         {
-            var commands = TimelineGroup.GetCommands(timelineSelector);
-            foreach (var loop in loops)
+            IEnumerable<CommandTimeline<T>.TypedCommand> commands = TimelineGroup.GetCommands(timelineSelector);
+            foreach (CommandLoop loop in loops)
                 commands = commands.Concat(loop.GetCommands(timelineSelector));
             if (triggeredGroups != null)
-                foreach (var pair in triggeredGroups)
+                foreach (Tuple<CommandTimelineGroup, double> pair in triggeredGroups)
                     commands = commands.Concat(pair.Item1.GetCommands(timelineSelector, pair.Item2));
             return commands;
         }

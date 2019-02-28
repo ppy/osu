@@ -43,7 +43,7 @@ namespace osu.Game.Beatmaps
 
         private void registerAudioTrack(WorkingBeatmap beatmap)
         {
-            var trackLoaded = lastBeatmap?.TrackLoaded ?? false;
+            bool trackLoaded = lastBeatmap?.TrackLoaded ?? false;
 
             // compare to last beatmap as sometimes the two may share a track representation (optimisation, see WorkingBeatmap.TransferTo)
             if (!trackLoaded || lastBeatmap?.Track != beatmap.Track)

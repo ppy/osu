@@ -9,6 +9,7 @@ using osu.Game.Rulesets.Difficulty;
 using osu.Game.Rulesets.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Difficulty.Skills;
 using osu.Game.Rulesets.Mods;
+using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Osu.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Osu.Difficulty.Skills;
 using osu.Game.Rulesets.Osu.Mods;
@@ -60,9 +61,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             // If the map has less than two OsuHitObjects, the enumerator will not return anything.
             for (int i = 1; i < beatmap.HitObjects.Count; i++)
             {
-                var lastLast = i > 1 ? beatmap.HitObjects[i - 2] : null;
-                var last = beatmap.HitObjects[i - 1];
-                var current = beatmap.HitObjects[i];
+                HitObject lastLast = i > 1 ? beatmap.HitObjects[i - 2] : null;
+                HitObject last = beatmap.HitObjects[i - 1];
+                HitObject current = beatmap.HitObjects[i];
 
                 yield return new OsuDifficultyHitObject(current, lastLast, last, clockRate);
             }

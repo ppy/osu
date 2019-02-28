@@ -21,10 +21,10 @@ namespace osu.Game.Input
         {
             using (ContextFactory.GetForWrite())
             {
-                foreach (var info in rulesets.AvailableRulesets)
+                foreach (RulesetInfo info in rulesets.AvailableRulesets)
                 {
-                    var ruleset = info.CreateInstance();
-                    foreach (var variant in ruleset.AvailableVariants)
+                    Ruleset ruleset = info.CreateInstance();
+                    foreach (int variant in ruleset.AvailableVariants)
                         insertDefaults(ruleset.GetDefaultKeyBindings(variant), info.ID, variant);
                 }
             }
@@ -34,10 +34,10 @@ namespace osu.Game.Input
 
         private void insertDefaults(IEnumerable<KeyBinding> defaults, int? rulesetId = null, int? variant = null)
         {
-            using (var usage = ContextFactory.GetForWrite())
+            using (DatabaseWriteUsage usage = ContextFactory.GetForWrite())
             {
                 // compare counts in database vs defaults
-                foreach (var group in defaults.GroupBy(k => k.Action))
+                foreach (IGrouping<object, KeyBinding> group in defaults.GroupBy(k => k.Action))
                 {
                     int count = Query(rulesetId, variant).Count(k => (int)k.Action == (int)group.Key);
                     int aimCount = group.Count();
@@ -45,7 +45,7 @@ namespace osu.Game.Input
                     if (aimCount <= count)
                         continue;
 
-                    foreach (var insertable in group.Skip(count).Take(aimCount - count))
+                    foreach (KeyBinding insertable in group.Skip(count).Take(aimCount - count))
                         // insert any defaults which are missing.
                         usage.Context.DatabasedKeyBinding.Add(new DatabasedKeyBinding
                         {

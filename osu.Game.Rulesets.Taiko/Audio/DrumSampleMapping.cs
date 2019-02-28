@@ -26,10 +26,10 @@ namespace osu.Game.Rulesets.Taiko.Audio
             else
                 samplePoints = controlPoints.SamplePoints;
 
-            foreach (var s in samplePoints)
+            foreach (SampleControlPoint s in samplePoints)
             {
-                var centre = s.GetSampleInfo();
-                var rim = s.GetSampleInfo(SampleInfo.HIT_CLAP);
+                SampleInfo centre = s.GetSampleInfo();
+                SampleInfo rim = s.GetSampleInfo(SampleInfo.HIT_CLAP);
 
                 // todo: this is ugly
                 centre.Namespace = "taiko";

@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Data.Common;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.Logging;
@@ -59,12 +60,12 @@ namespace osu.Game.Database
         {
             this.connectionString = connectionString;
 
-            var connection = Database.GetDbConnection();
+            DbConnection connection = Database.GetDbConnection();
             try
             {
                 connection.Open();
 
-                using (var cmd = connection.CreateCommand())
+                using (DbCommand cmd = connection.CreateCommand())
                 {
                     cmd.CommandText = "PRAGMA journal_mode=WAL;";
                     cmd.ExecuteNonQuery();

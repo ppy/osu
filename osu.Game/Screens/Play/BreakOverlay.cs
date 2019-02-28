@@ -115,7 +115,7 @@ namespace osu.Game.Screens.Play
 
             if (breaks == null) return; //we need breaks.
 
-            foreach (var b in breaks)
+            foreach (BreakPeriod b in breaks)
             {
                 if (!b.HasEffect)
                     continue;

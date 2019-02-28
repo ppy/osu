@@ -24,7 +24,7 @@ namespace osu.Game.Tests.Visual
         [BackgroundDependencyLoader]
         private void load(GameHost host)
         {
-            OsuGame game = new OsuGame();
+            var game = new OsuGame();
             game.SetHost(host);
 
             Children = new Drawable[]

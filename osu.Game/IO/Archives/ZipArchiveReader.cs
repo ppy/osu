@@ -27,7 +27,7 @@ namespace osu.Game.IO.Archives
                 throw new FileNotFoundException();
 
             // allow seeking
-            MemoryStream copy = new MemoryStream();
+            var copy = new MemoryStream();
 
             using (Stream s = entry.OpenEntryStream())
                 s.CopyTo(copy);

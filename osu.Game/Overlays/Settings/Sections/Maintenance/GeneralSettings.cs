@@ -39,14 +39,11 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
                 deleteBeatmapsButton = new DangerousSettingsButton
                 {
                     Text = "Delete ALL beatmaps",
-                    Action = () =>
+                    Action = () => dialogOverlay?.Push(new DeleteAllBeatmapsDialog(() =>
                     {
-                        dialogOverlay?.Push(new DeleteAllBeatmapsDialog(() =>
-                        {
-                            deleteBeatmapsButton.Enabled.Value = false;
-                            Task.Run(() => beatmaps.Delete(beatmaps.GetAllUsableBeatmapSets())).ContinueWith(t => Schedule(() => deleteBeatmapsButton.Enabled.Value = true));
-                        }));
-                    }
+                        deleteBeatmapsButton.Enabled.Value = false;
+                        Task.Run(() => beatmaps.Delete(beatmaps.GetAllUsableBeatmapSets())).ContinueWith(t => Schedule(() => deleteBeatmapsButton.Enabled.Value = true));
+                    }))
                 },
                 importSkinsButton = new SettingsButton
                 {
@@ -60,14 +57,11 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
                 deleteSkinsButton = new DangerousSettingsButton
                 {
                     Text = "Delete ALL skins",
-                    Action = () =>
+                    Action = () => dialogOverlay?.Push(new DeleteAllBeatmapsDialog(() =>
                     {
-                        dialogOverlay?.Push(new DeleteAllBeatmapsDialog(() =>
-                        {
-                            deleteSkinsButton.Enabled.Value = false;
-                            Task.Run(() => skins.Delete(skins.GetAllUserSkins())).ContinueWith(t => Schedule(() => deleteSkinsButton.Enabled.Value = true));
-                        }));
-                    }
+                        deleteSkinsButton.Enabled.Value = false;
+                        Task.Run(() => skins.Delete(skins.GetAllUserSkins())).ContinueWith(t => Schedule(() => deleteSkinsButton.Enabled.Value = true));
+                    }))
                 },
                 restoreButton = new SettingsButton
                 {
@@ -77,7 +71,7 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
                         restoreButton.Enabled.Value = false;
                         Task.Run(() =>
                         {
-                            foreach (var b in beatmaps.QueryBeatmaps(b => b.Hidden).ToList())
+                            foreach (BeatmapInfo b in beatmaps.QueryBeatmaps(b => b.Hidden).ToList())
                                 beatmaps.Restore(b);
                         }).ContinueWith(t => Schedule(() => restoreButton.Enabled.Value = true));
                     }

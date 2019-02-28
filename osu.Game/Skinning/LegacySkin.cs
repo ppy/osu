@@ -33,7 +33,7 @@ namespace osu.Game.Skinning
         {
             Stream stream = storage.GetStream(filename);
             if (stream != null)
-                using (StreamReader reader = new StreamReader(stream))
+                using (var reader = new StreamReader(stream))
                     Configuration = new LegacySkinDecoder().Decode(reader);
             else
                 Configuration = new SkinConfiguration();
@@ -69,7 +69,7 @@ namespace osu.Game.Skinning
                         };
             }
 
-            var texture = GetTexture(componentName);
+            Texture texture = GetTexture(componentName);
 
             if (texture == null)
                 return null;
@@ -81,7 +81,7 @@ namespace osu.Game.Skinning
         {
             float ratio = 2;
 
-            var texture = Textures.Get($"{componentName}@2x");
+            Texture texture = Textures.Get($"{componentName}@2x");
             if (texture == null)
             {
                 ratio = 1;
@@ -109,9 +109,9 @@ namespace osu.Game.Skinning
                 bool hasExtension = filename.Contains('.');
 
                 string lastPiece = filename.Split('/').Last();
-                var legacyName = filename.StartsWith("Gameplay/taiko/") ? "taiko-" + lastPiece : lastPiece;
+                string legacyName = filename.StartsWith("Gameplay/taiko/", StringComparison.Ordinal) ? "taiko-" + lastPiece : lastPiece;
 
-                var file = source.Files.Find(f =>
+                T file = source.Files.Find(f =>
                     string.Equals(hasExtension ? f.Filename : Path.ChangeExtension(f.Filename, null), legacyName, StringComparison.InvariantCultureIgnoreCase));
                 return file?.FileInfo.StoragePath;
             }
@@ -183,7 +183,7 @@ namespace osu.Game.Skinning
                 // Approximate value that brings character sizing roughly in-line with stable
                 float ratio = 36;
 
-                var texture = textures.Get($"{textureName}@2x");
+                Texture texture = textures.Get($"{textureName}@2x");
                 if (texture == null)
                 {
                     ratio = 18;

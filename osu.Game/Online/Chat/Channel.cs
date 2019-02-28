@@ -26,7 +26,7 @@ namespace osu.Game.Online.Chat
         {
             set
             {
-                foreach (var id in value)
+                foreach (long id in value)
                     Users.Add(new User { Id = id });
             }
         }
@@ -124,7 +124,7 @@ namespace osu.Game.Online.Chat
 
             Messages.AddRange(messages);
 
-            var maxMessageId = messages.Max(m => m.Id);
+            long? maxMessageId = messages.Max(m => m.Id);
             if (maxMessageId > LastMessageId)
                 LastMessageId = maxMessageId;
 

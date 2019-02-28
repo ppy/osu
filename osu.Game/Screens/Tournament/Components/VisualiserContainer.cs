@@ -36,7 +36,7 @@ namespace osu.Game.Screens.Tournament.Components
 
         private void addLine()
         {
-            VisualiserLine newLine = new VisualiserLine
+            var newLine = new VisualiserLine
             {
                 RelativeSizeAxes = Axes.Both,
 
@@ -89,7 +89,7 @@ namespace osu.Game.Screens.Tournament.Components
 
                 float pos = leftPos;
 
-                foreach (var c in Children)
+                foreach (Drawable c in Children)
                 {
                     if (c.Position.X < -1)
                     {

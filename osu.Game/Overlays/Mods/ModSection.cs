@@ -37,7 +37,7 @@ namespace osu.Game.Overlays.Mods
         {
             set
             {
-                var modContainers = value.Select(m =>
+                ModButtonEmpty[] modContainers = value.Select(m =>
                 {
                     if (m == null)
                         return new ModButtonEmpty();
@@ -59,7 +59,7 @@ namespace osu.Game.Overlays.Mods
         {
             if (ToggleKeys != null)
             {
-                var index = Array.IndexOf(ToggleKeys, e.Key);
+                int index = Array.IndexOf(ToggleKeys, e.Key);
                 if (index > -1 && index < buttons.Length)
                     buttons[index].SelectNext(e.ShiftPressed ? -1 : 1);
             }
@@ -77,12 +77,12 @@ namespace osu.Game.Overlays.Mods
         public void DeselectTypes(IEnumerable<Type> modTypes, bool immediate = false)
         {
             int delay = 0;
-            foreach (var button in buttons)
+            foreach (ModButton button in buttons)
             {
                 Mod selected = button.SelectedMod;
                 if (selected == null) continue;
 
-                foreach (var type in modTypes)
+                foreach (Type type in modTypes)
                     if (type.IsInstanceOfType(selected))
                     {
                         if (immediate)
@@ -99,7 +99,7 @@ namespace osu.Game.Overlays.Mods
         /// <param name="modTypes">The types of <see cref="Mod"/>s which should be selected.</param>
         public void SelectTypes(IEnumerable<Type> modTypes)
         {
-            foreach (var button in buttons)
+            foreach (ModButton button in buttons)
             {
                 int i = Array.FindIndex(button.Mods, m => modTypes.Any(t => t.IsInstanceOfType(m)));
 

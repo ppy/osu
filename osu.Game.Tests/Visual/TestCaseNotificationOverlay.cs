@@ -40,14 +40,14 @@ namespace osu.Game.Tests.Visual
                 Origin = Anchor.TopRight
             });
 
-            SpriteText displayedCount = new SpriteText();
+            var displayedCount = new SpriteText();
 
             Content.Add(displayedCount);
 
             void setState(Visibility state) => AddStep(state.ToString(), () => manager.State = state);
             void checkProgressingCount(int expected) => AddAssert($"progressing count is {expected}", () => progressingNotifications.Count == expected);
 
-            manager.UnreadCount.ValueChanged += count => { displayedCount.Text = $"displayed count: {count.NewValue}"; };
+            manager.UnreadCount.ValueChanged += count => displayedCount.Text = $"displayed count: {count.NewValue}";
 
             setState(Visibility.Visible);
             AddStep(@"simple #1", sendHelloNotification);
@@ -109,12 +109,12 @@ namespace osu.Game.Tests.Visual
 
             if (progressingNotifications.Count(n => n.State == ProgressNotificationState.Active) < 3)
             {
-                var p = progressingNotifications.Find(n => n.State == ProgressNotificationState.Queued);
+                ProgressNotification p = progressingNotifications.Find(n => n.State == ProgressNotificationState.Queued);
                 if (p != null)
                     p.State = ProgressNotificationState.Active;
             }
 
-            foreach (var n in progressingNotifications.FindAll(n => n.State == ProgressNotificationState.Active))
+            foreach (ProgressNotification n in progressingNotifications.FindAll(n => n.State == ProgressNotificationState.Active))
             {
                 if (n.Progress < 1)
                     n.Progress += (float)(Time.Elapsed / 400) * RNG.NextSingle();

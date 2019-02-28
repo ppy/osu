@@ -17,7 +17,7 @@ namespace osu.Game.IO.Serialization.Converters
 
         public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
         {
-            var obj = JObject.Load(reader);
+            JObject obj = JObject.Load(reader);
             return new Vector2((float)obj["x"], (float)obj["y"]);
         }
 

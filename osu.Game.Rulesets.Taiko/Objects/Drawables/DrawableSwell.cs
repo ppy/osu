@@ -105,7 +105,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
 
             MainPiece.Add(symbol = new SwellSymbolPiece());
 
-            foreach (var tick in HitObject.NestedHitObjects.OfType<SwellTick>())
+            foreach (SwellTick tick in HitObject.NestedHitObjects.OfType<SwellTick>())
             {
                 var vis = new DrawableSwellTick(tick);
 
@@ -135,13 +135,13 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
         {
             if (userTriggered)
             {
-                var nextTick = ticks.Find(j => !j.IsHit);
+                DrawableSwellTick nextTick = ticks.Find(j => !j.IsHit);
 
                 nextTick?.TriggerResult(HitResult.Great);
 
-                var numHits = ticks.Count(r => r.IsHit);
+                int numHits = ticks.Count(r => r.IsHit);
 
-                var completion = (float)numHits / HitObject.RequiredHits;
+                float completion = (float)numHits / HitObject.RequiredHits;
 
                 expandingRing
                     .FadeTo(expandingRing.Alpha + MathHelper.Clamp(completion / 16, 0.1f, 0.6f), 50)
@@ -162,7 +162,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
 
                 int numHits = 0;
 
-                foreach (var tick in ticks)
+                foreach (DrawableSwellTick tick in ticks)
                 {
                     if (tick.IsHit)
                     {
@@ -173,7 +173,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
                     tick.TriggerResult(HitResult.Miss);
                 }
 
-                var hitResult = numHits > HitObject.RequiredHits / 2 ? HitResult.Good : HitResult.Miss;
+                HitResult hitResult = numHits > HitObject.RequiredHits / 2 ? HitResult.Good : HitResult.Miss;
 
                 ApplyResult(r => r.Type = hitResult);
             }
@@ -224,7 +224,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             if (Time.Current < HitObject.StartTime)
                 return false;
 
-            var isCentre = action == TaikoAction.LeftCentre || action == TaikoAction.RightCentre;
+            bool isCentre = action == TaikoAction.LeftCentre || action == TaikoAction.RightCentre;
 
             // Ensure alternating centre and rim hits
             if (lastWasCentre == isCentre)

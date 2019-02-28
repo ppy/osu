@@ -88,12 +88,12 @@ namespace osu.Game.Tests.Visual
             factory = new DatabaseContextFactory(LocalStorage);
             factory.ResetDatabase();
 
-            using (var usage = factory.Get())
+            using (OsuDbContext usage = factory.Get())
                 usage.Migrate();
 
             factory.ResetDatabase();
 
-            using (var usage = factory.Get())
+            using (OsuDbContext usage = factory.Get())
                 usage.Migrate();
 
             Dependencies.Cache(rulesets = new RulesetStore(factory));
@@ -104,7 +104,7 @@ namespace osu.Game.Tests.Visual
 
         [SetUp]
         public virtual void SetUp() =>
-            Schedule(() => { manager?.Delete(manager.GetAllUsableBeatmapSets()); });
+            Schedule(() => manager?.Delete(manager.GetAllUsableBeatmapSets()));
 
         [Test]
         public void TestDummy()
@@ -129,10 +129,10 @@ namespace osu.Game.Tests.Visual
 
             AddAssert("random map selected", () => songSelect.CurrentBeatmap != defaultBeatmap);
 
-            AddStep(@"Sort by Artist", delegate { songSelect.FilterControl.Sort = SortMode.Artist; });
-            AddStep(@"Sort by Title", delegate { songSelect.FilterControl.Sort = SortMode.Title; });
-            AddStep(@"Sort by Author", delegate { songSelect.FilterControl.Sort = SortMode.Author; });
-            AddStep(@"Sort by Difficulty", delegate { songSelect.FilterControl.Sort = SortMode.Difficulty; });
+            AddStep(@"Sort by Artist", () => songSelect.FilterControl.Sort = SortMode.Artist);
+            AddStep(@"Sort by Title", () => songSelect.FilterControl.Sort = SortMode.Title);
+            AddStep(@"Sort by Author", () => songSelect.FilterControl.Sort = SortMode.Author);
+            AddStep(@"Sort by Difficulty", () => songSelect.FilterControl.Sort = SortMode.Difficulty);
         }
 
         [Test]
@@ -232,7 +232,7 @@ namespace osu.Game.Tests.Visual
         {
             AddStep("import test maps", () =>
             {
-                var usableRulesets = rulesets.AvailableRulesets.Where(r => r.ID != 2).ToArray();
+                RulesetInfo[] usableRulesets = rulesets.AvailableRulesets.Where(r => r.ID != 2).ToArray();
 
                 for (int i = 0; i < 100; i += 10)
                     manager.Import(createTestBeatmapSet(i, usableRulesets));

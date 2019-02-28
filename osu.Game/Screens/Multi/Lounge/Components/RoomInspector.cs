@@ -15,6 +15,7 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Screens.Multi.Components;
 using osu.Game.Users;
@@ -252,13 +253,13 @@ namespace osu.Game.Screens.Multi.Lounge.Components
 
             private void updateParticipants()
             {
-                var roomId = RoomID.Value ?? 0;
+                int roomId = RoomID.Value ?? 0;
 
                 request?.Cancel();
 
                 // nice little progressive fade
                 int time = 500;
-                foreach (var c in fill.Children)
+                foreach (Drawable c in fill.Children)
                 {
                     c.Delay(500 - time).FadeOut(time, Easing.Out);
                     time = Math.Max(20, time - 20);
@@ -274,7 +275,7 @@ namespace osu.Game.Screens.Multi.Lounge.Components
                         return;
 
                     fill.Clear();
-                    foreach (var s in scores)
+                    foreach (APIRoomScoreInfo s in scores)
                         fill.Add(new UserTile(s.User));
 
                     fill.FadeInFromZero(1000, Easing.OutQuint);

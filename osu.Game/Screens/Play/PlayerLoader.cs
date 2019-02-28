@@ -106,7 +106,7 @@ namespace osu.Game.Screens.Play
 
         private void loadNewPlayer()
         {
-            var restartCount = player?.RestartCount + 1 ?? 0;
+            int restartCount = player?.RestartCount + 1 ?? 0;
 
             player = createPlayer();
             player.RestartCount = restartCount;
@@ -312,7 +312,7 @@ namespace osu.Game.Screens.Play
             [BackgroundDependencyLoader]
             private void load()
             {
-                var metadata = beatmap?.BeatmapInfo?.Metadata ?? new BeatmapMetadata();
+                BeatmapMetadata metadata = beatmap?.BeatmapInfo?.Metadata ?? new BeatmapMetadata();
 
                 AutoSizeAxes = Axes.Both;
                 Children = new Drawable[]

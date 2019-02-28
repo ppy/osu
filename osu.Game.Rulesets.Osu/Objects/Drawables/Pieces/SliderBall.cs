@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -177,17 +178,17 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
 
             // from the point at which the head circle is hit, this will be non-null.
             // it may be null if the head circle was missed.
-            var headCircleHitAction = GetInitialHitAction();
+            OsuAction? headCircleHitAction = GetInitialHitAction();
 
             if (headCircleHitAction == null)
                 timeToAcceptAnyKeyAfter = null;
 
-            var actions = drawableSlider?.OsuActionInputManager?.PressedActions;
+            IEnumerable<OsuAction> actions = drawableSlider?.OsuActionInputManager?.PressedActions;
 
             // if the head circle was hit with a specific key, tracking should only occur while that key is pressed.
             if (headCircleHitAction != null && timeToAcceptAnyKeyAfter == null)
             {
-                var otherKey = headCircleHitAction == OsuAction.RightButton ? OsuAction.LeftButton : OsuAction.RightButton;
+                OsuAction otherKey = headCircleHitAction == OsuAction.RightButton ? OsuAction.LeftButton : OsuAction.RightButton;
 
                 // we can return to accepting all keys if the initial head circle key is the *only* key pressed, or all keys have been released.
                 if (actions?.Contains(otherKey) != true)

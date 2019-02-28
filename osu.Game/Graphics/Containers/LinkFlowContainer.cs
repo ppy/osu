@@ -51,7 +51,7 @@ namespace osu.Game.Graphics.Containers
             }
 
             int previousLinkEnd = 0;
-            foreach (var link in links)
+            foreach (Link link in links)
             {
                 AddText(text.Substring(previousLinkEnd, link.Index - previousLinkEnd));
                 AddLink(text.Substring(link.Index, link.Length), link.Url, link.Action, link.Argument);
@@ -69,7 +69,7 @@ namespace osu.Game.Graphics.Containers
 
         public IEnumerable<Drawable> AddLink(IEnumerable<SpriteText> text, string url, LinkAction linkType = LinkAction.External, string linkArgument = null, string tooltipText = null)
         {
-            foreach (var t in text)
+            foreach (SpriteText t in text)
                 AddArbitraryDrawable(t);
 
             return createLink(text, null, url, linkType, linkArgument, tooltipText);

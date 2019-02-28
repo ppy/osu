@@ -36,7 +36,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             Container<DrawableDrumRollTick> tickContainer;
             MainPiece.Add(tickContainer = new Container<DrawableDrumRollTick> { RelativeSizeAxes = Axes.Both });
 
-            foreach (var tick in drumRoll.NestedHitObjects.OfType<DrumRollTick>())
+            foreach (DrumRollTick tick in drumRoll.NestedHitObjects.OfType<DrumRollTick>())
             {
                 var newTick = new DrawableDrumRollTick(tick);
                 newTick.OnNewResult += onNewTickResult;

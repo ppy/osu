@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -9,6 +10,7 @@ using osu.Framework.IO.File;
 using osu.Game.Beatmaps.Timing;
 using osu.Game.Rulesets.Objects.Legacy;
 using osu.Game.Beatmaps.ControlPoints;
+using osu.Game.Rulesets.Objects;
 
 namespace osu.Game.Beatmaps.Formats
 {
@@ -55,7 +57,7 @@ namespace osu.Game.Beatmaps.Formats
             // The parsing order of hitobjects matters in mania difficulty calculation
             this.beatmap.HitObjects = this.beatmap.HitObjects.OrderBy(h => h.StartTime).ToList();
 
-            foreach (var hitObject in this.beatmap.HitObjects)
+            foreach (HitObject hitObject in this.beatmap.HitObjects)
                 hitObject.ApplyDefaults(this.beatmap.ControlPointInfo, this.beatmap.BeatmapInfo.BaseDifficulty);
         }
 
@@ -63,7 +65,7 @@ namespace osu.Game.Beatmaps.Formats
 
         protected override void ParseLine(Beatmap beatmap, Section section, string line)
         {
-            var strippedLine = StripComments(line);
+            string strippedLine = StripComments(line);
 
             switch (section)
             {
@@ -95,9 +97,9 @@ namespace osu.Game.Beatmaps.Formats
 
         private void handleGeneral(string line)
         {
-            var pair = SplitKeyVal(line);
+            KeyValuePair<string, string> pair = SplitKeyVal(line);
 
-            var metadata = beatmap.BeatmapInfo.Metadata;
+            BeatmapMetadata metadata = beatmap.BeatmapInfo.Metadata;
             switch (pair.Key)
             {
                 case @"AudioFilename":
@@ -155,7 +157,7 @@ namespace osu.Game.Beatmaps.Formats
 
         private void handleEditor(string line)
         {
-            var pair = SplitKeyVal(line);
+            KeyValuePair<string, string> pair = SplitKeyVal(line);
 
             switch (pair.Key)
             {
@@ -179,9 +181,9 @@ namespace osu.Game.Beatmaps.Formats
 
         private void handleMetadata(string line)
         {
-            var pair = SplitKeyVal(line);
+            KeyValuePair<string, string> pair = SplitKeyVal(line);
 
-            var metadata = beatmap.BeatmapInfo.Metadata;
+            BeatmapMetadata metadata = beatmap.BeatmapInfo.Metadata;
             switch (pair.Key)
             {
                 case @"Title":
@@ -219,9 +221,9 @@ namespace osu.Game.Beatmaps.Formats
 
         private void handleDifficulty(string line)
         {
-            var pair = SplitKeyVal(line);
+            KeyValuePair<string, string> pair = SplitKeyVal(line);
 
-            var difficulty = beatmap.BeatmapInfo.BaseDifficulty;
+            BeatmapDifficulty difficulty = beatmap.BeatmapInfo.BaseDifficulty;
             switch (pair.Key)
             {
                 case @"HPDrainRate":
@@ -284,7 +286,7 @@ namespace osu.Game.Beatmaps.Formats
                 double beatLength = double.Parse(split[1].Trim(), NumberFormatInfo.InvariantInfo);
                 double speedMultiplier = beatLength < 0 ? 100.0 / -beatLength : 1;
 
-                TimeSignatures timeSignature = TimeSignatures.SimpleQuadruple;
+                var timeSignature = TimeSignatures.SimpleQuadruple;
                 if (split.Length >= 3)
                     timeSignature = split[2][0] == '0' ? TimeSignatures.SimpleQuadruple : (TimeSignatures)int.Parse(split[2]);
 
@@ -308,7 +310,7 @@ namespace osu.Game.Beatmaps.Formats
                 bool omitFirstBarSignature = false;
                 if (split.Length >= 8)
                 {
-                    EffectFlags effectFlags = (EffectFlags)int.Parse(split[7]);
+                    var effectFlags = (EffectFlags)int.Parse(split[7]);
                     kiaiMode = effectFlags.HasFlag(EffectFlags.Kiai);
                     omitFirstBarSignature = effectFlags.HasFlag(EffectFlags.OmitFirstBarLine);
                 }
@@ -319,7 +321,7 @@ namespace osu.Game.Beatmaps.Formats
 
                 if (timingChange)
                 {
-                    var controlPoint = CreateTimingControlPoint();
+                    TimingControlPoint controlPoint = CreateTimingControlPoint();
                     controlPoint.Time = time;
                     controlPoint.BeatLength = beatLength;
                     controlPoint.TimeSignature = timeSignature;
@@ -355,7 +357,7 @@ namespace osu.Game.Beatmaps.Formats
 
         private void handleTimingControlPoint(TimingControlPoint newPoint)
         {
-            var existing = beatmap.ControlPointInfo.TimingPointAt(newPoint.Time);
+            TimingControlPoint existing = beatmap.ControlPointInfo.TimingPointAt(newPoint.Time);
 
             if (existing.Time == newPoint.Time)
                 beatmap.ControlPointInfo.TimingPoints.Remove(existing);
@@ -365,7 +367,7 @@ namespace osu.Game.Beatmaps.Formats
 
         private void handleDifficultyControlPoint(DifficultyControlPoint newPoint)
         {
-            var existing = beatmap.ControlPointInfo.DifficultyPointAt(newPoint.Time);
+            DifficultyControlPoint existing = beatmap.ControlPointInfo.DifficultyPointAt(newPoint.Time);
 
             if (newPoint.EquivalentTo(existing))
                 return;
@@ -378,7 +380,7 @@ namespace osu.Game.Beatmaps.Formats
 
         private void handleEffectControlPoint(EffectControlPoint newPoint)
         {
-            var existing = beatmap.ControlPointInfo.EffectPointAt(newPoint.Time);
+            EffectControlPoint existing = beatmap.ControlPointInfo.EffectPointAt(newPoint.Time);
 
             if (newPoint.EquivalentTo(existing))
                 return;
@@ -391,7 +393,7 @@ namespace osu.Game.Beatmaps.Formats
 
         private void handleSampleControlPoint(SampleControlPoint newPoint)
         {
-            var existing = beatmap.ControlPointInfo.SamplePointAt(newPoint.Time);
+            SampleControlPoint existing = beatmap.ControlPointInfo.SamplePointAt(newPoint.Time);
 
             if (newPoint.EquivalentTo(existing))
                 return;
@@ -408,7 +410,7 @@ namespace osu.Game.Beatmaps.Formats
             if (parser == null)
                 parser = new Rulesets.Objects.Legacy.Osu.ConvertHitObjectParser(getOffsetTime(), FormatVersion);
 
-            var obj = parser.Parse(line);
+            HitObject obj = parser.Parse(line);
             if (obj != null)
                 beatmap.HitObjects.Add(obj);
         }

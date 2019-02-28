@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -42,10 +43,10 @@ namespace osu.Game.Screens.Select.Details
                 }
                 else
                 {
-                    var ratings = Metrics.Ratings.Skip(1).Take(rating_range); // adjust for API returning weird empty data at 0.
+                    IEnumerable<int> ratings = Metrics.Ratings.Skip(1).Take(rating_range); // adjust for API returning weird empty data at 0.
 
-                    var negativeCount = ratings.Take(rating_range / 2).Sum();
-                    var totalCount = ratings.Sum();
+                    int negativeCount = ratings.Take(rating_range / 2).Sum();
+                    int totalCount = ratings.Sum();
 
                     negativeRatings.Text = negativeCount.ToString();
                     positiveRatings.Text = (totalCount - negativeCount).ToString();

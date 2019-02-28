@@ -75,8 +75,8 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Skills
                 return false;
             }
 
-            var oldColourSwitch = lastColourSwitch;
-            var newColourSwitch = sameColourCount % 2 == 0 ? ColourSwitch.Even : ColourSwitch.Odd;
+            ColourSwitch oldColourSwitch = lastColourSwitch;
+            ColourSwitch newColourSwitch = sameColourCount % 2 == 0 ? ColourSwitch.Even : ColourSwitch.Odd;
 
             lastColourSwitch = newColourSwitch;
             sameColourCount = 1;

@@ -42,7 +42,7 @@ namespace osu.Game.Storyboards
         {
             get
             {
-                var backgroundPath = BeatmapInfo.BeatmapSet?.Metadata?.BackgroundFile?.ToLowerInvariant();
+                string backgroundPath = BeatmapInfo.BeatmapSet?.Metadata?.BackgroundFile?.ToLowerInvariant();
                 if (backgroundPath == null)
                     return false;
 

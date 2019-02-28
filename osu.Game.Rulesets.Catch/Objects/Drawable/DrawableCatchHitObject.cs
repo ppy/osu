@@ -64,8 +64,9 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawable
         {
             base.SkinChanged(skin, allowFallback);
 
-            if (HitObject is IHasComboInformation combo)
-                AccentColour = skin.GetValue<SkinConfiguration, Color4?>(s => s.ComboColours.Count > 0 ? s.ComboColours[combo.ComboIndex % s.ComboColours.Count] : (Color4?)null) ?? Color4.White;
+            var combo = (IHasComboInformation)HitObject;
+
+            AccentColour = skin.GetValue<SkinConfiguration, Color4?>(s => s.ComboColours.Count > 0 ? s.ComboColours[combo.ComboIndex % s.ComboColours.Count] : (Color4?)null) ?? Color4.White;
         }
 
         private const float preempt = 1000;
@@ -75,7 +76,7 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawable
             using (BeginAbsoluteSequence(HitObject.StartTime - preempt))
                 this.FadeIn(200);
 
-            var endTime = (HitObject as IHasEndTime)?.EndTime ?? HitObject.StartTime;
+            double endTime = (HitObject as IHasEndTime)?.EndTime ?? HitObject.StartTime;
 
             using (BeginAbsoluteSequence(endTime, true))
             {

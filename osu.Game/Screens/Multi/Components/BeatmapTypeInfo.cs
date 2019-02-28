@@ -4,6 +4,7 @@
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Online.Chat;
@@ -55,7 +56,7 @@ namespace osu.Game.Screens.Multi.Components
             {
                 beatmapAuthor.Clear();
 
-                var beatmap = item.NewValue?.Beatmap;
+                BeatmapInfo beatmap = item.NewValue?.Beatmap;
 
                 if (beatmap != null)
                 {

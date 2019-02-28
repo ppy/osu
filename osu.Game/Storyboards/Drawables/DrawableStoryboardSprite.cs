@@ -27,7 +27,7 @@ namespace osu.Game.Storyboards.Drawables
         {
             get
             {
-                var origin = base.Origin;
+                Anchor origin = base.Origin;
 
                 if (FlipH)
                 {
@@ -65,8 +65,8 @@ namespace osu.Game.Storyboards.Drawables
         [BackgroundDependencyLoader]
         private void load(IBindable<WorkingBeatmap> beatmap, TextureStore textureStore)
         {
-            var spritePath = Sprite.Path.ToLowerInvariant();
-            var path = beatmap.Value.BeatmapSetInfo.Files.Find(f => f.Filename.ToLowerInvariant() == spritePath)?.FileInfo.StoragePath;
+            string spritePath = Sprite.Path.ToLowerInvariant();
+            string path = beatmap.Value.BeatmapSetInfo.Files.Find(f => f.Filename.ToLowerInvariant() == spritePath)?.FileInfo.StoragePath;
             if (path == null)
                 return;
 

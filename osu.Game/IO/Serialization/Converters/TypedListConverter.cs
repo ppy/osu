@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Reflection;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
@@ -42,14 +43,14 @@ namespace osu.Game.IO.Serialization.Converters
         {
             var list = new List<T>();
 
-            var obj = JObject.Load(reader);
+            JObject obj = JObject.Load(reader);
             var lookupTable = serializer.Deserialize<List<string>>(obj["lookup_table"].CreateReader());
 
-            foreach (var tok in obj["items"])
+            foreach (JToken tok in obj["items"])
             {
-                var itemReader = tok.CreateReader();
+                JsonReader itemReader = tok.CreateReader();
 
-                var typeName = lookupTable[(int)tok["type"]];
+                string typeName = lookupTable[(int)tok["type"]];
                 var instance = (T)Activator.CreateInstance(Type.GetType(typeName));
                 serializer.Populate(itemReader, instance);
 
@@ -65,12 +66,12 @@ namespace osu.Game.IO.Serialization.Converters
 
             var lookupTable = new List<string>();
             var objects = new List<JObject>();
-            foreach (var item in list)
+            foreach (T item in list)
             {
-                var type = item.GetType();
-                var assemblyName = type.Assembly.GetName();
+                Type type = item.GetType();
+                AssemblyName assemblyName = type.Assembly.GetName();
 
-                var typeString = $"{type.FullName}, {assemblyName.Name}";
+                string typeString = $"{type.FullName}, {assemblyName.Name}";
                 if (requiresTypeVersion)
                     typeString += $", {assemblyName.Version}";
 
@@ -81,7 +82,7 @@ namespace osu.Game.IO.Serialization.Converters
                     typeId = lookupTable.Count - 1;
                 }
 
-                var itemObject = JObject.FromObject(item, serializer);
+                JObject itemObject = JObject.FromObject(item, serializer);
                 itemObject.AddFirst(new JProperty("type", typeId));
                 objects.Add(itemObject);
             }

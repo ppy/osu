@@ -8,6 +8,8 @@ using osu.Framework.Timing;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Mania.Edit.Blueprints;
 using osu.Game.Rulesets.Mania.Objects;
+using osu.Game.Rulesets.Mania.UI;
+using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.UI;
 using osu.Game.Rulesets.UI.Scrolling;
 using osu.Game.Screens.Edit.Compose.Components;
@@ -58,15 +60,15 @@ namespace osu.Game.Rulesets.Mania.Edit
 
             float movementDelta = targetPosition - reference.HitObject.Position.Y;
 
-            foreach (var b in SelectedBlueprints.OfType<ManiaSelectionBlueprint>())
+            foreach (ManiaSelectionBlueprint b in SelectedBlueprints.OfType<ManiaSelectionBlueprint>())
                 b.HitObject.Y += movementDelta;
         }
 
         private void performDragMovement(DragEvent dragEvent)
         {
-            foreach (var b in SelectedBlueprints)
+            foreach (SelectionBlueprint b in SelectedBlueprints)
             {
-                var hitObject = b.HitObject;
+                DrawableHitObject hitObject = b.HitObject;
 
                 var objectParent = (HitObjectContainer)hitObject.Parent;
 
@@ -96,8 +98,8 @@ namespace osu.Game.Rulesets.Mania.Edit
 
         private void performColumnMovement(DragEvent dragEvent)
         {
-            var lastColumn = composer.ColumnAt(dragEvent.ScreenSpaceLastMousePosition);
-            var currentColumn = composer.ColumnAt(dragEvent.ScreenSpaceMousePosition);
+            Column lastColumn = composer.ColumnAt(dragEvent.ScreenSpaceLastMousePosition);
+            Column currentColumn = composer.ColumnAt(dragEvent.ScreenSpaceMousePosition);
             if (lastColumn == null || currentColumn == null)
                 return;
 
@@ -108,7 +110,7 @@ namespace osu.Game.Rulesets.Mania.Edit
             int minColumn = int.MaxValue;
             int maxColumn = int.MinValue;
 
-            foreach (var obj in SelectedHitObjects.OfType<ManiaHitObject>())
+            foreach (ManiaHitObject obj in SelectedHitObjects.OfType<ManiaHitObject>())
             {
                 if (obj.Column < minColumn)
                     minColumn = obj.Column;
@@ -118,7 +120,7 @@ namespace osu.Game.Rulesets.Mania.Edit
 
             columnDelta = MathHelper.Clamp(columnDelta, -minColumn, composer.TotalColumns - 1 - maxColumn);
 
-            foreach (var obj in SelectedHitObjects.OfType<ManiaHitObject>())
+            foreach (ManiaHitObject obj in SelectedHitObjects.OfType<ManiaHitObject>())
                 obj.Column += columnDelta;
         }
     }

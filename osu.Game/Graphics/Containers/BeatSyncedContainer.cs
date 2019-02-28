@@ -37,8 +37,8 @@ namespace osu.Game.Graphics.Containers
         {
             if (!Beatmap.Value.TrackLoaded || !Beatmap.Value.BeatmapLoaded) return;
 
-            var track = Beatmap.Value.Track;
-            var beatmap = Beatmap.Value.Beatmap;
+            Track track = Beatmap.Value.Track;
+            IBeatmap beatmap = Beatmap.Value.Beatmap;
 
             if (track == null || beatmap == null)
                 return;

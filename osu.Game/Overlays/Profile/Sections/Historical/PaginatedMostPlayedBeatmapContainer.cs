@@ -6,6 +6,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Online.API.Requests;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Users;
 
 namespace osu.Game.Overlays.Profile.Sections.Historical
@@ -40,7 +41,7 @@ namespace osu.Game.Overlays.Profile.Sections.Historical
 
                 MissingText.Hide();
 
-                foreach (var beatmap in beatmaps)
+                foreach (APIUserMostPlayedBeatmap beatmap in beatmaps)
                 {
                     ItemsContainer.Add(new DrawableMostPlayedRow(beatmap.GetBeatmapInfo(Rulesets), beatmap.PlayCount));
                 }

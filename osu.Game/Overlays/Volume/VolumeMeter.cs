@@ -174,13 +174,10 @@ namespace osu.Game.Overlays.Volume
                     }
                 }
             };
-            Bindable.ValueChanged += volume =>
-            {
-                this.TransformTo("DisplayVolume",
-                    volume.NewValue,
-                    400,
-                    Easing.OutQuint);
-            };
+            Bindable.ValueChanged += volume => this.TransformTo("DisplayVolume",
+                volume.NewValue,
+                400,
+                Easing.OutQuint);
             bgProgress.Current.Value = 0.75f;
         }
 
@@ -233,7 +230,7 @@ namespace osu.Game.Overlays.Volume
         {
             scrollAccumulation += delta * adjust_step * (isPrecise ? 0.1 : 1);
 
-            var precision = Bindable.Precision;
+            double precision = Bindable.Precision;
 
             while (Precision.AlmostBigger(Math.Abs(scrollAccumulation), precision))
             {

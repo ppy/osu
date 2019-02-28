@@ -15,7 +15,7 @@ namespace osu.Game.Overlays.KeyBinding
         {
             Ruleset = ruleset;
 
-            var rulesetInstance = ruleset.CreateInstance();
+            Ruleset rulesetInstance = ruleset.CreateInstance();
 
             variantName = rulesetInstance.GetVariantName(variant);
             Defaults = rulesetInstance.GetDefaultKeyBindings(variant);

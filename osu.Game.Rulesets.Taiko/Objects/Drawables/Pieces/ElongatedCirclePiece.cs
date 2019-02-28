@@ -16,7 +16,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables.Pieces
         {
             base.Update();
 
-            var padding = Content.DrawHeight * Content.Width / 2;
+            float padding = Content.DrawHeight * Content.Width / 2;
 
             Content.Padding = new MarginPadding
             {

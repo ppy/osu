@@ -3,6 +3,7 @@
 
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Transforms;
 
 namespace osu.Game.Graphics.Containers
 {
@@ -38,8 +39,8 @@ namespace osu.Game.Graphics.Containers
             if (maximumLength < ShakeDuration * 2)
                 return;
 
-            var sequence = this.MoveToX(shake_amount, ShakeDuration / 2, Easing.OutSine).Then()
-                               .MoveToX(-shake_amount, ShakeDuration, Easing.InOutSine).Then();
+            TransformSequence<ShakeContainer> sequence = this.MoveToX(shake_amount, ShakeDuration / 2, Easing.OutSine).Then()
+                                                             .MoveToX(-shake_amount, ShakeDuration, Easing.InOutSine).Then();
 
             // if we don't have enough time for the second shake, skip it.
             if (!maximumLength.HasValue || maximumLength >= ShakeDuration * 4)

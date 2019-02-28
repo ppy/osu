@@ -40,7 +40,7 @@ namespace osu.Game.Overlays.SearchableList
 
             RelativeSizeAxes = Axes.X;
 
-            var controls = CreateSupplementaryControls();
+            Drawable controls = CreateSupplementaryControls();
             Container controlsContainer;
             Children = new Drawable[]
             {

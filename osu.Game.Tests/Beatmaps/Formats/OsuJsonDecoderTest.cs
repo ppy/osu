@@ -26,8 +26,8 @@ namespace osu.Game.Tests.Beatmaps.Formats
         [Test]
         public void TestDecodeMetadata()
         {
-            var beatmap = decodeAsJson(normal);
-            var meta = beatmap.BeatmapInfo.Metadata;
+            Beatmap beatmap = decodeAsJson(normal);
+            BeatmapMetadata meta = beatmap.BeatmapInfo.Metadata;
             Assert.AreEqual(241526, beatmap.BeatmapInfo.BeatmapSet.OnlineBeatmapSetID);
             Assert.AreEqual("Soleily", meta.Artist);
             Assert.AreEqual("Soleily", meta.ArtistUnicode);
@@ -44,8 +44,8 @@ namespace osu.Game.Tests.Beatmaps.Formats
         [Test]
         public void TestDecodeGeneral()
         {
-            var beatmap = decodeAsJson(normal);
-            var beatmapInfo = beatmap.BeatmapInfo;
+            Beatmap beatmap = decodeAsJson(normal);
+            BeatmapInfo beatmapInfo = beatmap.BeatmapInfo;
             Assert.AreEqual(0, beatmapInfo.AudioLeadIn);
             Assert.AreEqual(false, beatmapInfo.Countdown);
             Assert.AreEqual(0.7f, beatmapInfo.StackLeniency);
@@ -58,8 +58,8 @@ namespace osu.Game.Tests.Beatmaps.Formats
         [Test]
         public void TestDecodeEditor()
         {
-            var beatmap = decodeAsJson(normal);
-            var beatmapInfo = beatmap.BeatmapInfo;
+            Beatmap beatmap = decodeAsJson(normal);
+            BeatmapInfo beatmapInfo = beatmap.BeatmapInfo;
 
             int[] expectedBookmarks =
             {
@@ -79,8 +79,8 @@ namespace osu.Game.Tests.Beatmaps.Formats
         [Test]
         public void TestDecodeDifficulty()
         {
-            var beatmap = decodeAsJson(normal);
-            var difficulty = beatmap.BeatmapInfo.BaseDifficulty;
+            Beatmap beatmap = decodeAsJson(normal);
+            BeatmapDifficulty difficulty = beatmap.BeatmapInfo.BaseDifficulty;
             Assert.AreEqual(6.5f, difficulty.DrainRate);
             Assert.AreEqual(4, difficulty.CircleSize);
             Assert.AreEqual(8, difficulty.OverallDifficulty);
@@ -92,7 +92,7 @@ namespace osu.Game.Tests.Beatmaps.Formats
         [Test]
         public void TestDecodeHitObjects()
         {
-            var beatmap = decodeAsJson(normal);
+            Beatmap beatmap = decodeAsJson(normal);
 
             var curveData = beatmap.HitObjects[0] as IHasCurve;
             var positionData = beatmap.HitObjects[0] as IHasPosition;
@@ -117,7 +117,7 @@ namespace osu.Game.Tests.Beatmaps.Formats
         // [TestCase(with_sb)]
         public void TestParity(string beatmap)
         {
-            var legacy = decode(beatmap, out Beatmap json);
+            Beatmap legacy = decode(beatmap, out Beatmap json);
             json.WithDeepEqual(legacy)
                 .IgnoreProperty(r => r.DeclaringType == typeof(HitWindows)
                                      // Todo: CustomSampleBank shouldn't exist going forward, we need a conversion mechanism
@@ -146,10 +146,10 @@ namespace osu.Game.Tests.Beatmaps.Formats
         /// <returns>The <see cref="Beatmap"/> after being decoded by an <see cref="LegacyBeatmapDecoder"/>.</returns>
         private Beatmap decode(string filename, out Beatmap jsonDecoded)
         {
-            using (var stream = TestResources.OpenResource(filename))
+            using (Stream stream = TestResources.OpenResource(filename))
             using (var sr = new StreamReader(stream))
             {
-                var legacyDecoded = new LegacyBeatmapDecoder { ApplyOffsets = false }.Decode(sr);
+                Beatmap legacyDecoded = new LegacyBeatmapDecoder { ApplyOffsets = false }.Decode(sr);
                 using (var ms = new MemoryStream())
                 using (var sw = new StreamWriter(ms))
                 using (var sr2 = new StreamReader(ms))

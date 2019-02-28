@@ -31,7 +31,7 @@ namespace osu.Game.Tests.NonVisual
             });
 
             int count = 0;
-            foreach (var unused in stack)
+            foreach (int unused in stack)
                 count++;
 
             Assert.AreEqual(0, count);
@@ -102,7 +102,7 @@ namespace osu.Game.Tests.NonVisual
             int enumeratorCount = 0;
             int expectedValue = count - 1;
 
-            foreach (var item in stack)
+            foreach (int item in stack)
             {
                 Assert.AreEqual(expectedValue, item);
                 enumeratorCount++;

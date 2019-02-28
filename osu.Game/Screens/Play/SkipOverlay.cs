@@ -57,7 +57,7 @@ namespace osu.Game.Screens.Play
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
-            var baseClock = Clock;
+            IFrameBasedClock baseClock = Clock;
 
             if (FramedClock != null)
             {

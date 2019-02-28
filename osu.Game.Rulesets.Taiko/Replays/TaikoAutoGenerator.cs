@@ -36,12 +36,12 @@ namespace osu.Game.Rulesets.Taiko.Replays
             {
                 TaikoHitObject h = Beatmap.HitObjects[i];
 
-                IHasEndTime endTimeData = h as IHasEndTime;
+                var endTimeData = h as IHasEndTime;
                 double endTime = endTimeData?.EndTime ?? h.StartTime;
 
-                Swell swell = h as Swell;
-                DrumRoll drumRoll = h as DrumRoll;
-                Hit hit = h as Hit;
+                var swell = h as Swell;
+                var drumRoll = h as DrumRoll;
+                var hit = h as Hit;
 
                 if (swell != null)
                 {
@@ -78,7 +78,7 @@ namespace osu.Game.Rulesets.Taiko.Replays
                 }
                 else if (drumRoll != null)
                 {
-                    foreach (var tick in drumRoll.NestedHitObjects.OfType<DrumRollTick>())
+                    foreach (DrumRollTick tick in drumRoll.NestedHitObjects.OfType<DrumRollTick>())
                     {
                         Frames.Add(new TaikoReplayFrame(tick.StartTime, hitButton ? TaikoAction.LeftCentre : TaikoAction.RightCentre));
                         hitButton = !hitButton;

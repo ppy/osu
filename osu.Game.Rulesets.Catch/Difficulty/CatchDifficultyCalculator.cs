@@ -55,7 +55,7 @@ namespace osu.Game.Rulesets.Catch.Difficulty
         {
             CatchHitObject lastObject = null;
 
-            foreach (var hitObject in beatmap.HitObjects.OfType<CatchHitObject>())
+            foreach (CatchHitObject hitObject in beatmap.HitObjects.OfType<CatchHitObject>())
             {
                 if (lastObject == null)
                 {
@@ -72,7 +72,7 @@ namespace osu.Game.Rulesets.Catch.Difficulty
                         lastObject = hitObject;
                         break;
                     case JuiceStream _:
-                        foreach (var nested in hitObject.NestedHitObjects.OfType<CatchHitObject>().Where(o => !(o is TinyDroplet)))
+                        foreach (CatchHitObject nested in hitObject.NestedHitObjects.OfType<CatchHitObject>().Where(o => !(o is TinyDroplet)))
                         {
                             yield return new CatchDifficultyHitObject(nested, lastObject, clockRate, halfCatchWidth);
 

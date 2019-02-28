@@ -189,7 +189,7 @@ namespace osu.Game.Online.Chat
             if (target == null)
                 return;
 
-            var parameters = text.Split(new[] { ' ' }, 2);
+            string[] parameters = text.Split(new[] { ' ' }, 2);
             string command = parameters[0];
             string content = parameters.Length == 2 ? parameters[1] : string.Empty;
 
@@ -217,9 +217,9 @@ namespace osu.Game.Online.Chat
 
         private void handleChannelMessages(IEnumerable<Message> messages)
         {
-            var channels = JoinedChannels.ToList();
+            List<Channel> channels = JoinedChannels.ToList();
 
-            foreach (var group in messages.GroupBy(m => m.ChannelId))
+            foreach (IGrouping<long, Message> group in messages.GroupBy(m => m.ChannelId))
                 channels.Find(c => c.Id == group.Key)?.AddNewMessages(group.ToArray());
         }
 
@@ -227,13 +227,13 @@ namespace osu.Game.Online.Chat
         {
             var req = new ListChannelsRequest();
 
-            var joinDefaults = JoinedChannels.Count == 0;
+            bool joinDefaults = JoinedChannels.Count == 0;
 
             req.Success += channels =>
             {
-                foreach (var channel in channels)
+                foreach (Channel channel in channels)
                 {
-                    var ch = getChannel(channel, addToAvailable: true);
+                    Channel ch = getChannel(channel, addToAvailable: true);
 
                     // join any channels classified as "defaults"
                     if (joinDefaults && defaultChannels.Any(c => c.Equals(channel.Name, StringComparison.OrdinalIgnoreCase)))
@@ -284,11 +284,11 @@ namespace osu.Game.Online.Chat
 
             bool lookupCondition(Channel ch) => lookup.Id > 0 ? ch.Id == lookup.Id : lookup.Name == ch.Name;
 
-            var available = AvailableChannels.FirstOrDefault(lookupCondition);
+            Channel available = AvailableChannels.FirstOrDefault(lookupCondition);
             if (available != null)
                 found = available;
 
-            var joined = JoinedChannels.FirstOrDefault(lookupCondition);
+            Channel joined = JoinedChannels.FirstOrDefault(lookupCondition);
             if (found == null && joined != null)
                 found = joined;
 
@@ -298,7 +298,7 @@ namespace osu.Game.Online.Chat
 
                 // if we're using a channel object from the server, we want to remove ourselves from the users list.
                 // this is because we check the first user in the channel to display a name/icon on tabs for now.
-                var foundSelf = found.Users.FirstOrDefault(u => u.Id == api.LocalUser.Value.Id);
+                User foundSelf = found.Users.FirstOrDefault(u => u.Id == api.LocalUser.Value.Id);
                 if (foundSelf != null)
                     found.Users.Remove(foundSelf);
             }
@@ -385,7 +385,7 @@ namespace osu.Game.Online.Chat
             {
                 if (updates?.Presence != null)
                 {
-                    foreach (var channel in updates.Presence)
+                    foreach (Channel channel in updates.Presence)
                     {
                         // we received this from the server so should mark the channel already joined.
                         JoinChannel(channel, true);
@@ -395,7 +395,7 @@ namespace osu.Game.Online.Chat
 
                     handleChannelMessages(updates.Messages);
 
-                    foreach (var group in updates.Messages.GroupBy(m => m.ChannelId))
+                    foreach (IGrouping<long, Message> group in updates.Messages.GroupBy(m => m.ChannelId))
                         JoinedChannels.FirstOrDefault(c => c.Id == group.Key)?.AddNewMessages(group.ToArray());
 
                     lastMessageId = updates.Messages.LastOrDefault()?.Id ?? lastMessageId;

@@ -122,9 +122,9 @@ namespace osu.Game.Overlays
             if (notification is IHasCompletionTarget hasCompletionTarget)
                 hasCompletionTarget.CompletionTarget = Post;
 
-            var ourType = notification.GetType();
+            Type ourType = notification.GetType();
 
-            var section = sections.Children.FirstOrDefault(s => s.AcceptTypes.Any(accept => accept.IsAssignableFrom(ourType)));
+            NotificationSection section = sections.Children.FirstOrDefault(s => s.AcceptTypes.Any(accept => accept.IsAssignableFrom(ourType)));
             section?.Add(notification, notification.DisplayOnTop ? -runningDepth : runningDepth);
 
             if (notification.IsImportant)

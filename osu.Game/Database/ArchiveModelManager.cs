@@ -89,7 +89,7 @@ namespace osu.Game.Database
 
             if (perform)
             {
-                foreach (var a in events)
+                foreach (Action a in events)
                     a.Invoke();
             }
 
@@ -137,7 +137,7 @@ namespace osu.Game.Database
 
             PostNotification?.Invoke(notification);
 
-            List<TModel> imported = new List<TModel>();
+            var imported = new List<TModel>();
 
             int current = 0;
             foreach (string path in paths)
@@ -219,7 +219,7 @@ namespace osu.Game.Database
         {
             try
             {
-                var model = CreateModel(archive);
+                TModel model = CreateModel(archive);
 
                 if (model == null) return null;
 
@@ -247,7 +247,7 @@ namespace osu.Game.Database
         private string computeHash(ArchiveReader reader)
         {
             // for now, concatenate all .osu files in the set to create a unique hash.
-            MemoryStream hashable = new MemoryStream();
+            var hashable = new MemoryStream();
             foreach (string file in reader.Filenames.Where(f => HashableFileTypes.Any(f.EndsWith)))
                 using (Stream s = reader.GetStream(file))
                     s.CopyTo(hashable);
@@ -269,13 +269,13 @@ namespace osu.Game.Database
             {
                 Logger.Log($"Importing {item}...", LoggingTarget.Database);
 
-                using (var write = ContextFactory.GetForWrite()) // used to share a context for full import. keep in mind this will block all writes.
+                using (DatabaseWriteUsage write = ContextFactory.GetForWrite()) // used to share a context for full import. keep in mind this will block all writes.
                 {
                     try
                     {
                         if (!write.IsTransactionLeader) throw new InvalidOperationException($"Ensure there is no parent transaction so errors can correctly be handled by {this}");
 
-                        var existing = CheckForExisting(item);
+                        TModel existing = CheckForExisting(item);
 
                         if (existing != null)
                         {
@@ -334,9 +334,9 @@ namespace osu.Game.Database
             using (ContextFactory.GetForWrite())
             {
                 // re-fetch the model on the import context.
-                var foundModel = queryModel().Include(s => s.Files).ThenInclude(f => f.FileInfo).FirstOrDefault(s => s.ID == item.ID);
+                TModel foundModel = queryModel().Include(s => s.Files).ThenInclude(f => f.FileInfo).FirstOrDefault(s => s.ID == item.ID);
 
-                if (foundModel == null || foundModel.DeletePending) return false;
+                if (foundModel?.DeletePending != false) return false;
 
                 if (ModelStore.Delete(foundModel))
                     Files.Dereference(foundModel.Files.Select(f => f.FileInfo).ToArray());
@@ -365,7 +365,7 @@ namespace osu.Game.Database
 
             using (ContextFactory.GetForWrite())
             {
-                foreach (var b in items)
+                foreach (TModel b in items)
                 {
                     if (notification.State == ProgressNotificationState.Cancelled)
                         // user requested abort
@@ -403,7 +403,7 @@ namespace osu.Game.Database
 
             using (ContextFactory.GetForWrite())
             {
-                foreach (var item in items)
+                foreach (TModel item in items)
                 {
                     if (notification.State == ProgressNotificationState.Cancelled)
                         // user requested abort
@@ -426,7 +426,7 @@ namespace osu.Game.Database
         /// <param name="item">The item to restore</param>
         public void Undelete(TModel item)
         {
-            using (var usage = ContextFactory.GetForWrite())
+            using (DatabaseWriteUsage usage = ContextFactory.GetForWrite())
             {
                 usage.Context.ChangeTracker.AutoDetectChangesEnabled = false;
 
@@ -479,7 +479,7 @@ namespace osu.Game.Database
         /// </summary>
         public Task ImportFromStableAsync()
         {
-            var stable = GetStableStorage?.Invoke();
+            Storage stable = GetStableStorage?.Invoke();
 
             if (stable == null)
             {

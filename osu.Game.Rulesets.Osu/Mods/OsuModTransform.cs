@@ -26,7 +26,7 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         public void ApplyToDrawableHitObjects(IEnumerable<DrawableHitObject> drawables)
         {
-            foreach (var drawable in drawables)
+            foreach (DrawableHitObject drawable in drawables)
             {
                 var hitObject = (OsuHitObject)drawable.HitObject;
 

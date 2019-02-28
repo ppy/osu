@@ -30,7 +30,7 @@ namespace osu.Game.Rulesets.UI
     {
         protected override InputState CreateInitialState()
         {
-            var state = base.CreateInitialState();
+            InputState state = base.CreateInitialState();
             return new RulesetInputManagerInputState<T>(state.Mouse, state.Keyboard, state.Joystick);
         }
 
@@ -49,10 +49,10 @@ namespace osu.Game.Rulesets.UI
         {
             if (inputStateChange is ReplayStateChangeEvent<T> replayStateChanged)
             {
-                foreach (var action in replayStateChanged.ReleasedActions)
+                foreach (T action in replayStateChanged.ReleasedActions)
                     KeyBindingContainer.TriggerReleased(action);
 
-                foreach (var action in replayStateChanged.PressedActions)
+                foreach (T action in replayStateChanged.PressedActions)
                     KeyBindingContainer.TriggerPressed(action);
             }
             else
@@ -152,7 +152,7 @@ namespace osu.Game.Rulesets.UI
             clock.Rate = parentClock.Rate;
             clock.IsRunning = parentClock.IsRunning;
 
-            var newProposedTime = parentClock.CurrentTime;
+            double newProposedTime = parentClock.CurrentTime;
 
             try
             {

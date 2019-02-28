@@ -76,24 +76,24 @@ namespace osu.Game.Tests.Visual
         [Test]
         public void TestOsuMods()
         {
-            var ruleset = rulesets.AvailableRulesets.First(r => r.ID == 0);
-            AddStep("change ruleset", () => { Ruleset.Value = ruleset; });
+            RulesetInfo ruleset = rulesets.AvailableRulesets.First(r => r.ID == 0);
+            AddStep("change ruleset", () => Ruleset.Value = ruleset);
 
-            var instance = ruleset.CreateInstance();
+            Ruleset instance = ruleset.CreateInstance();
 
-            var easierMods = instance.GetModsFor(ModType.DifficultyReduction);
-            var harderMods = instance.GetModsFor(ModType.DifficultyIncrease);
-            var assistMods = instance.GetModsFor(ModType.Automation);
+            IEnumerable<Mod> easierMods = instance.GetModsFor(ModType.DifficultyReduction);
+            IEnumerable<Mod> harderMods = instance.GetModsFor(ModType.DifficultyIncrease);
+            IEnumerable<Mod> assistMods = instance.GetModsFor(ModType.Automation);
 
-            var noFailMod = easierMods.FirstOrDefault(m => m is OsuModNoFail);
-            var hiddenMod = harderMods.FirstOrDefault(m => m is OsuModHidden);
+            Mod noFailMod = easierMods.FirstOrDefault(m => m is OsuModNoFail);
+            Mod hiddenMod = harderMods.FirstOrDefault(m => m is OsuModHidden);
 
-            var doubleTimeMod = harderMods.OfType<MultiMod>().FirstOrDefault(m => m.Mods.Any(a => a is OsuModDoubleTime));
+            MultiMod doubleTimeMod = harderMods.OfType<MultiMod>().FirstOrDefault(m => m.Mods.Any(a => a is OsuModDoubleTime));
 
-            var autoPilotMod = assistMods.FirstOrDefault(m => m is OsuModAutopilot);
+            Mod autoPilotMod = assistMods.FirstOrDefault(m => m is OsuModAutopilot);
 
-            var easy = easierMods.FirstOrDefault(m => m is OsuModEasy);
-            var hardRock = harderMods.FirstOrDefault(m => m is OsuModHardRock);
+            Mod easy = easierMods.FirstOrDefault(m => m is OsuModEasy);
+            Mod hardRock = harderMods.FirstOrDefault(m => m is OsuModHardRock);
 
             testSingleMod(noFailMod);
             testMultiMod(doubleTimeMod);
@@ -108,8 +108,8 @@ namespace osu.Game.Tests.Visual
         [Test]
         public void TestManiaMods()
         {
-            var ruleset = rulesets.AvailableRulesets.First(r => r.ID == 3);
-            AddStep("change ruleset", () => { Ruleset.Value = ruleset; });
+            RulesetInfo ruleset = rulesets.AvailableRulesets.First(r => r.ID == 3);
+            AddStep("change ruleset", () => Ruleset.Value = ruleset);
 
             testRankedText(ruleset.CreateInstance().GetModsFor(ModType.Conversion).First(m => m is ManiaModRandom));
         }
@@ -117,26 +117,26 @@ namespace osu.Game.Tests.Visual
         [Test]
         public void TestRulesetChanges()
         {
-            var rulesetOsu = rulesets.AvailableRulesets.First(r => r.ID == 0);
-            var rulesetMania = rulesets.AvailableRulesets.First(r => r.ID == 3);
+            RulesetInfo rulesetOsu = rulesets.AvailableRulesets.First(r => r.ID == 0);
+            RulesetInfo rulesetMania = rulesets.AvailableRulesets.First(r => r.ID == 3);
 
-            AddStep("change ruleset to null", () => { Ruleset.Value = null; });
+            AddStep("change ruleset to null", () => Ruleset.Value = null);
 
-            var instance = rulesetOsu.CreateInstance();
-            var easierMods = instance.GetModsFor(ModType.DifficultyReduction);
-            var noFailMod = easierMods.FirstOrDefault(m => m is OsuModNoFail);
+            Ruleset instance = rulesetOsu.CreateInstance();
+            IEnumerable<Mod> easierMods = instance.GetModsFor(ModType.DifficultyReduction);
+            Mod noFailMod = easierMods.FirstOrDefault(m => m is OsuModNoFail);
 
-            AddStep("set mods externally", () => { modDisplay.Current.Value = new[] { noFailMod }; });
+            AddStep("set mods externally", () => modDisplay.Current.Value = new[] { noFailMod });
 
-            AddStep("change ruleset to osu", () => { Ruleset.Value = rulesetOsu; });
+            AddStep("change ruleset to osu", () => Ruleset.Value = rulesetOsu);
 
             AddAssert("ensure mods still selected", () => modDisplay.Current.Value.Single(m => m is OsuModNoFail) != null);
 
-            AddStep("change ruleset to mania", () => { Ruleset.Value = rulesetMania; });
+            AddStep("change ruleset to mania", () => Ruleset.Value = rulesetMania);
 
             AddAssert("ensure mods not selected", () => !modDisplay.Current.Value.Any(m => m is OsuModNoFail));
 
-            AddStep("change ruleset to osu", () => { Ruleset.Value = rulesetOsu; });
+            AddStep("change ruleset to osu", () => Ruleset.Value = rulesetOsu);
 
             AddAssert("ensure mods not selected", () => !modDisplay.Current.Value.Any());
         }
@@ -160,7 +160,7 @@ namespace osu.Game.Tests.Visual
 
         private void testMultiMod(MultiMod multiMod)
         {
-            foreach (var mod in multiMod.Mods)
+            foreach (Mod mod in multiMod.Mods)
             {
                 selectNext(mod);
                 checkSelected(mod);
@@ -169,7 +169,7 @@ namespace osu.Game.Tests.Visual
             for (int index = multiMod.Mods.Length - 1; index >= 0; index--)
                 selectPrevious(multiMod.Mods[index]);
 
-            foreach (var mod in multiMod.Mods)
+            foreach (Mod mod in multiMod.Mods)
                 checkNotSelected(mod);
         }
 
@@ -196,7 +196,7 @@ namespace osu.Game.Tests.Visual
 
         private void testDeselectAll(IEnumerable<Mod> mods)
         {
-            foreach (var mod in mods)
+            foreach (Mod mod in mods)
                 selectNext(mod);
 
             AddAssert("check for any selection", () => modSelect.SelectedMods.Value.Any());
@@ -235,7 +235,7 @@ namespace osu.Game.Tests.Visual
         {
             AddAssert($"check {mod.Name} is selected", () =>
             {
-                var button = modSelect.GetModButton(mod);
+                ModButton button = modSelect.GetModButton(mod);
                 return modSelect.SelectedMods.Value.Single(m => m.Name == mod.Name) != null && button.SelectedMod.GetType() == mod.GetType() && button.Selected;
             });
         }
@@ -244,7 +244,7 @@ namespace osu.Game.Tests.Visual
         {
             AddAssert($"check {mod.Name} is not selected", () =>
             {
-                var button = modSelect.GetModButton(mod);
+                ModButton button = modSelect.GetModButton(mod);
                 return modSelect.SelectedMods.Value.All(m => m.GetType() != mod.GetType()) && button.SelectedMod?.GetType() != mod.GetType();
             });
         }
@@ -257,7 +257,7 @@ namespace osu.Game.Tests.Visual
 
             public ModButton GetModButton(Mod mod)
             {
-                var section = ModSectionsContainer.Children.Single(s => s.ModType == mod.Type);
+                ModSection section = ModSectionsContainer.Children.Single(s => s.ModType == mod.Type);
                 return section.ButtonsContainer.OfType<ModButton>().Single(b => b.Mods.Any(m => m.GetType() == mod.GetType()));
             }
 

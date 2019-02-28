@@ -60,7 +60,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
 
         public override IEnumerable<Pattern> Generate()
         {
-            var originalPattern = generate();
+            Pattern originalPattern = generate();
 
             if (originalPattern.HitObjects.Count() == 1)
             {
@@ -75,7 +75,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
             var intermediatePattern = new Pattern();
             var endTimePattern = new Pattern();
 
-            foreach (var obj in originalPattern.HitObjects)
+            foreach (ManiaHitObject obj in originalPattern.HitObjects)
             {
                 if (!Precision.AlmostEquals(EndTime, (obj as IHasEndTime)?.EndTime ?? obj.StartTime))
                     intermediatePattern.Add(obj);

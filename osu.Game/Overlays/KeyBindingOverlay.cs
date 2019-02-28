@@ -26,7 +26,7 @@ namespace osu.Game.Overlays
         {
             AddSection(new GlobalKeyBindingsSection(global));
 
-            foreach (var ruleset in rulesets.AvailableRulesets)
+            foreach (RulesetInfo ruleset in rulesets.AvailableRulesets)
                 AddSection(new RulesetBindingsSection(ruleset));
 
             AddInternal(new BackButton

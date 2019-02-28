@@ -283,7 +283,7 @@ namespace osu.Game.Rulesets.UI
             if (mods == null)
                 return;
 
-            foreach (var mod in mods.OfType<IApplicableToBeatmap<TObject>>())
+            foreach (IApplicableToBeatmap<TObject> mod in mods.OfType<IApplicableToBeatmap<TObject>>())
                 mod.ApplyToBeatmap(Beatmap);
         }
 
@@ -296,10 +296,10 @@ namespace osu.Game.Rulesets.UI
             if (mods == null)
                 return;
 
-            foreach (var mod in mods.OfType<IApplicableToRulesetContainer<TObject>>())
+            foreach (IApplicableToRulesetContainer<TObject> mod in mods.OfType<IApplicableToRulesetContainer<TObject>>())
                 mod.ApplyToRulesetContainer(this);
 
-            foreach (var mod in mods.OfType<IReadFromConfig>())
+            foreach (IReadFromConfig mod in mods.OfType<IReadFromConfig>())
                 mod.ReadFromConfig(config);
         }
 
@@ -321,7 +321,7 @@ namespace osu.Game.Rulesets.UI
 
             Playfield.PostProcess();
 
-            foreach (var mod in Mods.OfType<IApplicableToDrawableHitObjects>())
+            foreach (IApplicableToDrawableHitObjects mod in Mods.OfType<IApplicableToDrawableHitObjects>())
                 mod.ApplyToDrawableHitObjects(Playfield.HitObjectContainer.Objects);
         }
 
@@ -331,7 +331,7 @@ namespace osu.Game.Rulesets.UI
         /// <param name="hitObject">The <see cref="TObject"/> to add the visual representation for.</param>
         internal void AddRepresentation(TObject hitObject)
         {
-            var drawableObject = GetVisualRepresentation(hitObject);
+            DrawableHitObject<TObject> drawableObject = GetVisualRepresentation(hitObject);
 
             if (drawableObject == null)
                 return;

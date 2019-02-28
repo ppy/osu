@@ -4,6 +4,7 @@
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Localisation;
+using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
@@ -54,7 +55,7 @@ namespace osu.Game.Screens.Multi.Components
 
             textFlow.Clear();
 
-            var beatmap = CurrentItem.Value?.Beatmap;
+            BeatmapInfo beatmap = CurrentItem.Value?.Beatmap;
 
             if (beatmap == null)
                 textFlow.AddText("No beatmap selected", s =>

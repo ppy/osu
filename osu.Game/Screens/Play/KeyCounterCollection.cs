@@ -44,7 +44,7 @@ namespace osu.Game.Screens.Play
 
         public void ResetCount()
         {
-            foreach (var counter in Children)
+            foreach (KeyCounter counter in Children)
                 counter.ResetCount();
         }
 
@@ -67,7 +67,7 @@ namespace osu.Game.Screens.Play
                 if (value == isCounting) return;
 
                 isCounting = value;
-                foreach (var child in Children)
+                foreach (KeyCounter child in Children)
                     child.IsCounting = value;
             }
         }
@@ -82,7 +82,7 @@ namespace osu.Game.Screens.Play
                 if (value != fadeTime)
                 {
                     fadeTime = value;
-                    foreach (var child in Children)
+                    foreach (KeyCounter child in Children)
                         child.FadeTime = value;
                 }
             }
@@ -98,7 +98,7 @@ namespace osu.Game.Screens.Play
                 if (value != keyDownTextColor)
                 {
                     keyDownTextColor = value;
-                    foreach (var child in Children)
+                    foreach (KeyCounter child in Children)
                         child.KeyDownTextColor = value;
                 }
             }
@@ -114,7 +114,7 @@ namespace osu.Game.Screens.Play
                 if (value != keyUpTextColor)
                 {
                     keyUpTextColor = value;
-                    foreach (var child in Children)
+                    foreach (KeyCounter child in Children)
                         child.KeyUpTextColor = value;
                 }
             }

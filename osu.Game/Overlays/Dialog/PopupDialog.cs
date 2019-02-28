@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Extensions.Color4Extensions;
@@ -73,7 +74,7 @@ namespace osu.Game.Overlays.Dialog
                 buttonsContainer.ChildrenEnumerable = value;
                 foreach (PopupDialogButton b in value)
                 {
-                    var action = b.Action;
+                    Action action = b.Action;
                     b.Action = () =>
                     {
                         if (actionInvoked) return;
@@ -220,7 +221,7 @@ namespace osu.Game.Overlays.Dialog
             if (e.Repeat) return false;
 
             // press button at number if 1-9 on number row or keypad are pressed
-            var k = e.Key;
+            Key k = e.Key;
             if (k >= Key.Number1 && k <= Key.Number9)
             {
                 pressButtonAtIndex(k - Key.Number1);

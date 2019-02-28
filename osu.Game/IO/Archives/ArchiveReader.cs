@@ -38,7 +38,7 @@ namespace osu.Game.IO.Archives
                 if (input == null)
                     return null;
 
-                byte[] buffer = new byte[input.Length];
+                var buffer = new byte[input.Length];
                 await input.ReadAsync(buffer, 0, buffer.Length);
                 return buffer;
             }

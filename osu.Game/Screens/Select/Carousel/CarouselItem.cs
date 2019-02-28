@@ -24,7 +24,7 @@ namespace osu.Game.Screens.Select.Carousel
             {
                 var items = new List<DrawableCarouselItem>();
 
-                var self = DrawableRepresentation.Value;
+                DrawableCarouselItem self = DrawableRepresentation.Value;
                 if (self?.IsPresent == true) items.Add(self);
 
                 return items;

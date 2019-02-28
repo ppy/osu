@@ -26,7 +26,7 @@ namespace osu.Game.IO.Legacy
         /// <summary> Static method to initialise the writer with a suitable MemoryStream. </summary>
         public static SerializationWriter GetWriter()
         {
-            MemoryStream ms = new MemoryStream(1024);
+            var ms = new MemoryStream(1024);
             return new SerializationWriter(ms);
         }
 
@@ -218,7 +218,7 @@ namespace osu.Game.IO.Legacy
 
                     default:
                         Write((byte)ObjType.otherType);
-                        BinaryFormatter b = new BinaryFormatter
+                        var b = new BinaryFormatter
                         {
                             // AssemblyFormat = FormatterAssemblyStyle.Simple,
                             TypeFormat = FormatterTypeStyle.TypesWhenNeeded

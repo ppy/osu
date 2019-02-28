@@ -28,7 +28,7 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         public void ApplyToDrawableHitObjects(IEnumerable<DrawableHitObject> drawables)
         {
-            foreach (var drawable in drawables)
+            foreach (DrawableHitObject drawable in drawables)
                 drawable.ApplyCustomUpdateState += drawableOnApplyCustomUpdateState;
         }
 
@@ -42,7 +42,7 @@ namespace osu.Game.Rulesets.Osu.Mods
             if (osuObject is RepeatPoint)
                 return;
 
-            Random objRand = new Random((int)osuObject.StartTime);
+            var objRand = new Random((int)osuObject.StartTime);
 
             // Wiggle all objects during TimePreempt
             int amountWiggles = (int)osuObject.TimePreempt / wiggle_duration;

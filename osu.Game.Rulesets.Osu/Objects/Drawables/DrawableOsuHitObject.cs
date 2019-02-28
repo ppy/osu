@@ -46,7 +46,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             {
                 UpdatePreemptState();
 
-                var judgementOffset = Math.Min(HitObject.HitWindows.HalfWindowFor(HitResult.Miss), Result?.TimeOffset ?? 0);
+                double judgementOffset = Math.Min(HitObject.HitWindows.HalfWindowFor(HitResult.Miss), Result?.TimeOffset ?? 0);
 
                 using (BeginDelayedSequence(HitObject.TimePreempt + judgementOffset, true))
                     UpdateCurrentState(state);
@@ -57,8 +57,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         {
             base.SkinChanged(skin, allowFallback);
 
-            if (HitObject is IHasComboInformation combo)
-                AccentColour = skin.GetValue<SkinConfiguration, Color4?>(s => s.ComboColours.Count > 0 ? s.ComboColours[combo.ComboIndex % s.ComboColours.Count] : (Color4?)null) ?? Color4.White;
+            var combo = (IHasComboInformation)HitObject;
+            AccentColour = skin.GetValue<SkinConfiguration, Color4?>(s => s.ComboColours.Count > 0 ? s.ComboColours[combo.ComboIndex % s.ComboColours.Count] : (Color4?)null) ?? Color4.White;
         }
 
         protected virtual void UpdatePreemptState() => this.FadeIn(HitObject.TimeFadeIn);

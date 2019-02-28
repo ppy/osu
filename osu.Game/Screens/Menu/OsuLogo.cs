@@ -266,7 +266,7 @@ namespace osu.Game.Screens.Menu
 
             lastBeatIndex = beatIndex;
 
-            var beatLength = timingPoint.BeatLength;
+            double beatLength = timingPoint.BeatLength;
 
             float amplitudeAdjust = Math.Min(1, 0.4f + amplitudes.Maximum);
 
@@ -323,7 +323,7 @@ namespace osu.Game.Screens.Menu
 
             if (Beatmap.Value.Track.IsRunning)
             {
-                var maxAmplitude = lastBeatIndex >= 0 ? Beatmap.Value.Track.CurrentAmplitudes.Maximum : 0;
+                float maxAmplitude = lastBeatIndex >= 0 ? Beatmap.Value.Track.CurrentAmplitudes.Maximum : 0;
                 logoAmplitudeContainer.ScaleTo(1 - Math.Max(0, maxAmplitude - scale_adjust_cutoff) * 0.04f, 75, Easing.OutQuint);
 
                 if (maxAmplitude > velocity_adjust_cutoff)

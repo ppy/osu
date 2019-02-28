@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Objects.Drawables;
@@ -13,6 +14,7 @@ using osu.Game.Rulesets.UI;
 using osu.Game.Rulesets.Taiko.Replays;
 using System.Linq;
 using osu.Framework.Input;
+using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Configuration;
 using osu.Game.Input.Handlers;
 using osu.Game.Replays;
@@ -44,7 +46,7 @@ namespace osu.Game.Rulesets.Taiko.UI
             TaikoHitObject lastObject = Beatmap.HitObjects[Beatmap.HitObjects.Count - 1];
             double lastHitTime = 1 + ((lastObject as IHasEndTime)?.EndTime ?? lastObject.StartTime);
 
-            var timingPoints = Beatmap.ControlPointInfo.TimingPoints.ToList();
+            List<TimingControlPoint> timingPoints = Beatmap.ControlPointInfo.TimingPoints.ToList();
 
             if (timingPoints.Count == 0)
                 return;
@@ -62,7 +64,7 @@ namespace osu.Game.Rulesets.Taiko.UI
                     currentBeat = 0;
                 }
 
-                var currentPoint = timingPoints[currentIndex];
+                TimingControlPoint currentPoint = timingPoints[currentIndex];
 
                 var barLine = new BarLine
                 {

@@ -1,11 +1,13 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
 using NUnit.Framework;
 using osu.Game.Beatmaps;
+using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Tests.Beatmaps;
 using Decoder = osu.Game.Beatmaps.Formats.Decoder;
@@ -21,10 +23,10 @@ namespace osu.Game.Rulesets.Osu.Tests
             using (var stream = new MemoryStream(Encoding.UTF8.GetBytes(beatmap_data)))
             using (var reader = new StreamReader(stream))
             {
-                var beatmap = Decoder.GetDecoder<Beatmap>(reader).Decode(reader);
-                var converted = new TestWorkingBeatmap(beatmap).GetPlayableBeatmap(new OsuRuleset().RulesetInfo);
+                Beatmap beatmap = Decoder.GetDecoder<Beatmap>(reader).Decode(reader);
+                IBeatmap converted = new TestWorkingBeatmap(beatmap).GetPlayableBeatmap(new OsuRuleset().RulesetInfo);
 
-                var objects = converted.HitObjects.ToList();
+                List<HitObject> objects = converted.HitObjects.ToList();
 
                 // The last hitobject triggers the stacking
                 for (int i = 0; i < objects.Count - 1; i++)

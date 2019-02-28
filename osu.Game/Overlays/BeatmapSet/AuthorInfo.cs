@@ -46,7 +46,7 @@ namespace osu.Game.Overlays.BeatmapSet
             if (BeatmapSet == null)
                 return;
 
-            var online = BeatmapSet.OnlineInfo;
+            BeatmapSetOnlineInfo online = BeatmapSet.OnlineInfo;
 
             fields.Children = new Drawable[]
             {
@@ -58,13 +58,9 @@ namespace osu.Game.Overlays.BeatmapSet
             };
 
             if (online.Ranked.HasValue)
-            {
                 fields.Add(new Field("ranked on", online.Ranked.Value.ToString(@"MMMM d, yyyy"), OsuFont.GetFont(weight: FontWeight.Bold)));
-            }
             else if (online.LastUpdated.HasValue)
-            {
                 fields.Add(new Field("last updated on", online.LastUpdated.Value.ToString(@"MMMM d, yyyy"), OsuFont.GetFont(weight: FontWeight.Bold)));
-            }
         }
 
         public AuthorInfo()

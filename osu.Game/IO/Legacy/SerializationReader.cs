@@ -30,8 +30,8 @@ namespace osu.Game.IO.Legacy
         /// and produce a SerializationReader from which serialized objects can be read </summary>.
         public static SerializationReader GetReader(SerializationInfo info)
         {
-            byte[] byteArray = (byte[])info.GetValue("X", typeof(byte[]));
-            MemoryStream ms = new MemoryStream(byteArray);
+            var byteArray = (byte[])info.GetValue("X", typeof(byte[]));
+            var ms = new MemoryStream(byteArray);
             return new SerializationReader(ms);
         }
 
@@ -80,11 +80,11 @@ namespace osu.Game.IO.Legacy
 
             IList<T> d = new List<T>(count);
 
-            SerializationReader sr = new SerializationReader(BaseStream);
+            var sr = new SerializationReader(BaseStream);
 
             for (int i = 0; i < count; i++)
             {
-                T obj = new T();
+                var obj = new T();
                 try
                 {
                     obj.ReadFromStream(sr);
@@ -128,7 +128,7 @@ namespace osu.Game.IO.Legacy
         /// <summary> Reads an object which was added to the buffer by WriteObject. </summary>
         public object ReadObject()
         {
-            ObjType t = (ObjType)ReadByte();
+            var t = (ObjType)ReadByte();
             switch (t)
             {
                 case ObjType.boolType:
@@ -211,7 +211,7 @@ namespace osu.Game.IO.Legacy
                     if (cache.TryGetValue(assemblyName + typeName, out typeToDeserialize))
                         return typeToDeserialize;
 
-                    List<Type> tmpTypes = new List<Type>();
+                    var tmpTypes = new List<Type>();
                     Type genType = null;
 
                     if (typeName.Contains("System.Collections.Generic") && typeName.Contains("[["))

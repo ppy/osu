@@ -76,7 +76,7 @@ namespace osu.Game.Screens.Select
             overlays.Add(overlay);
             AddButton(text, colour, () =>
             {
-                foreach (var o in overlays)
+                foreach (OverlayContainer o in overlays)
                 {
                     if (o == overlay)
                         o.ToggleVisibility();

@@ -21,7 +21,7 @@ namespace osu.Game.Online.API.Requests
 
         protected override WebRequest CreateWebRequest()
         {
-            var req = base.CreateWebRequest();
+            WebRequest req = base.CreateWebRequest();
             req.Method = HttpMethod.Post;
             req.AddParameter(@"target_id", user.Id.ToString());
             req.AddParameter(@"message", message.Content);

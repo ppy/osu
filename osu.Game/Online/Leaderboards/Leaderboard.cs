@@ -55,7 +55,7 @@ namespace osu.Game.Online.Leaderboards
                 showScoresDelegate?.Cancel();
                 showScoresCancellationSource?.Cancel();
 
-                if (scores == null || !scores.Any())
+                if (scores?.Any() != true)
                     return;
 
                 // ensure placeholder is hidden when displaying scores
@@ -74,7 +74,7 @@ namespace osu.Game.Online.Leaderboards
                     scrollContainer.Add(scrollFlow);
 
                     int i = 0;
-                    foreach (var s in scrollFlow.Children)
+                    foreach (LeaderboardScore s in scrollFlow.Children)
                     {
                         using (s.BeginDelayedSequence(i++ * 50, true))
                             s.Show();
@@ -249,7 +249,7 @@ namespace osu.Game.Online.Leaderboards
 
         private void replacePlaceholder(Placeholder placeholder)
         {
-            if (placeholder != null && placeholder.Equals(currentPlaceholder))
+            if (placeholder?.Equals(currentPlaceholder) == true)
                 return;
 
             currentPlaceholder?.FadeOut(150, Easing.OutQuint).Expire();
@@ -275,8 +275,8 @@ namespace osu.Game.Online.Leaderboards
         {
             base.UpdateAfterChildren();
 
-            var fadeBottom = scrollContainer.Current + scrollContainer.DrawHeight;
-            var fadeTop = scrollContainer.Current + LeaderboardScore.HEIGHT;
+            float fadeBottom = scrollContainer.Current + scrollContainer.DrawHeight;
+            float fadeTop = scrollContainer.Current + LeaderboardScore.HEIGHT;
 
             if (!scrollContainer.IsScrolledToEnd())
                 fadeBottom -= LeaderboardScore.HEIGHT;
@@ -284,10 +284,10 @@ namespace osu.Game.Online.Leaderboards
             if (scrollFlow == null)
                 return;
 
-            foreach (var c in scrollFlow.Children)
+            foreach (LeaderboardScore c in scrollFlow.Children)
             {
-                var topY = c.ToSpaceOfOtherDrawable(Vector2.Zero, scrollFlow).Y;
-                var bottomY = topY + LeaderboardScore.HEIGHT;
+                float topY = c.ToSpaceOfOtherDrawable(Vector2.Zero, scrollFlow).Y;
+                float bottomY = topY + LeaderboardScore.HEIGHT;
 
                 bool requireTopFade = FadeTop && topY <= fadeTop;
                 bool requireBottomFade = FadeBottom && bottomY >= fadeBottom;

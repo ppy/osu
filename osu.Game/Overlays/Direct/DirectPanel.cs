@@ -88,7 +88,7 @@ namespace osu.Game.Overlays.Direct
         {
             base.Update();
 
-            if (PreviewPlaying.Value && Preview != null && Preview.TrackLoaded)
+            if (PreviewPlaying.Value && Preview?.TrackLoaded == true)
             {
                 PreviewBar.Width = (float)(Preview.CurrentTime / Preview.Length);
             }
@@ -138,7 +138,7 @@ namespace osu.Game.Overlays.Direct
         {
             var icons = new List<DifficultyIcon>();
 
-            foreach (var b in SetInfo.Beatmaps.OrderBy(beatmap => beatmap.StarDifficulty))
+            foreach (BeatmapInfo b in SetInfo.Beatmaps.OrderBy(beatmap => beatmap.StarDifficulty))
                 icons.Add(new DifficultyIcon(b));
 
             return icons;

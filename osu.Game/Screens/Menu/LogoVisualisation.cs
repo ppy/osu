@@ -14,7 +14,9 @@ using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using System;
 using osu.Framework.Allocation;
+using osu.Framework.Audio.Track;
 using osu.Framework.Bindables;
+using osu.Game.Beatmaps.ControlPoints;
 
 namespace osu.Game.Screens.Menu
 {
@@ -82,8 +84,8 @@ namespace osu.Game.Screens.Menu
 
         private void updateAmplitudes()
         {
-            var track = beatmap.Value.TrackLoaded ? beatmap.Value.Track : null;
-            var effect = beatmap.Value.BeatmapLoaded ? beatmap.Value.Beatmap.ControlPointInfo.EffectPointAt(track?.CurrentTime ?? Time.Current) : null;
+            Track track = beatmap.Value.TrackLoaded ? beatmap.Value.Track : null;
+            EffectControlPoint effect = beatmap.Value.BeatmapLoaded ? beatmap.Value.Beatmap.ControlPointInfo.EffectPointAt(track?.CurrentTime ?? Time.Current) : null;
 
             float[] temporalAmplitudes = track?.CurrentAmplitudes.FrequencyAmplitudes ?? new float[256];
 
@@ -190,7 +192,7 @@ namespace osu.Game.Screens.Menu
                             float rotationCos = (float)Math.Cos(rotation);
                             float rotationSin = (float)Math.Sin(rotation);
                             //taking the cos and sin to the 0..1 range
-                            var barPosition = new Vector2(rotationCos / 2 + 0.5f, rotationSin / 2 + 0.5f) * Size;
+                            Vector2 barPosition = new Vector2(rotationCos / 2 + 0.5f, rotationSin / 2 + 0.5f) * Size;
 
                             var barSize = new Vector2(Size * (float)Math.Sqrt(2 * (1 - Math.Cos(MathHelper.DegreesToRadians(360f / bars_per_visualiser)))) / 2f, bar_length * AudioData[i]);
                             //The distance between the position and the sides of the bar.

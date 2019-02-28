@@ -68,7 +68,7 @@ namespace osu.Game.Rulesets.Osu.Tests
                 Depth = depthIndex++
             };
 
-            foreach (var mod in Mods.OfType<IApplicableToDrawableHitObjects>())
+            foreach (IApplicableToDrawableHitObjects mod in Mods.OfType<IApplicableToDrawableHitObjects>())
                 mod.ApplyToDrawableHitObjects(new[] { drawable });
 
             Add(drawable);
@@ -76,7 +76,7 @@ namespace osu.Game.Rulesets.Osu.Tests
 
         private void testStream(float circleSize, bool auto = false)
         {
-            Vector2 pos = new Vector2(-250, 0);
+            var pos = new Vector2(-250, 0);
 
             for (int i = 0; i <= 1000; i += 100)
             {

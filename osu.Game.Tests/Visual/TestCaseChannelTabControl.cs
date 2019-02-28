@@ -92,7 +92,7 @@ namespace osu.Game.Tests.Visual
 
             AddUntilStep(() =>
             {
-                var first = channelTabControl.Items.First();
+                Channel first = channelTabControl.Items.First();
                 if (first.Name == "+")
                     return true;
 

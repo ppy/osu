@@ -110,10 +110,10 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             Content.Add(MainPiece = CreateMainPiece());
             MainPiece.KiaiMode = HitObject.Kiai;
 
-            var strongObject = HitObject.NestedHitObjects.OfType<StrongHitObject>().FirstOrDefault();
+            StrongHitObject strongObject = HitObject.NestedHitObjects.OfType<StrongHitObject>().FirstOrDefault();
             if (strongObject != null)
             {
-                var strongHit = CreateStrongHit(strongObject);
+                DrawableStrongNestedHit strongHit = CreateStrongHit(strongObject);
 
                 AddNested(strongHit);
                 AddInternal(strongHit);

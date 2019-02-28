@@ -8,6 +8,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Events;
+using osuTK;
 using osuTK.Graphics;
 
 namespace osu.Game.Screens.Edit.Compose.Components
@@ -63,16 +64,16 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
         protected override bool OnDrag(DragEvent e)
         {
-            var dragPosition = e.ScreenSpaceMousePosition;
-            var dragStartPosition = e.ScreenSpaceMouseDownPosition;
+            Vector2 dragPosition = e.ScreenSpaceMousePosition;
+            Vector2 dragStartPosition = e.ScreenSpaceMouseDownPosition;
 
             var dragQuad = new Quad(dragStartPosition.X, dragStartPosition.Y, dragPosition.X - dragStartPosition.X, dragPosition.Y - dragStartPosition.Y);
 
             // We use AABBFloat instead of RectangleF since it handles negative sizes for us
-            var dragRectangle = dragQuad.AABBFloat;
+            RectangleF dragRectangle = dragQuad.AABBFloat;
 
-            var topLeft = ToLocalSpace(dragRectangle.TopLeft);
-            var bottomRight = ToLocalSpace(dragRectangle.BottomRight);
+            Vector2 topLeft = ToLocalSpace(dragRectangle.TopLeft);
+            Vector2 bottomRight = ToLocalSpace(dragRectangle.BottomRight);
 
             box.Position = topLeft;
             box.Size = bottomRight - topLeft;

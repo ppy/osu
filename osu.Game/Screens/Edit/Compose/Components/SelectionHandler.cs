@@ -81,7 +81,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
             switch (e.Key)
             {
                 case Key.Delete:
-                    foreach (var h in selectedBlueprints.ToList())
+                    foreach (SelectionBlueprint h in selectedBlueprints.ToList())
                         placementHandler.Delete(h.HitObject.HitObject);
                     return true;
             }
@@ -168,7 +168,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
             bool hasSelection = false;
 
-            foreach (var blueprint in selectedBlueprints)
+            foreach (SelectionBlueprint blueprint in selectedBlueprints)
             {
                 topLeft = Vector2.ComponentMin(topLeft, ToLocalSpace(blueprint.SelectionQuad.TopLeft));
                 bottomRight = Vector2.ComponentMax(bottomRight, ToLocalSpace(blueprint.SelectionQuad.BottomRight));

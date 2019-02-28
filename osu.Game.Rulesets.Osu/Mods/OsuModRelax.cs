@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Game.Rulesets.Mods;
+using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Objects.Drawables;
@@ -27,7 +28,7 @@ namespace osu.Game.Rulesets.Osu.Mods
 
             const float relax_leniency = 3;
 
-            foreach (var drawable in playfield.HitObjectContainer.AliveObjects)
+            foreach (DrawableHitObject drawable in playfield.HitObjectContainer.AliveObjects)
             {
                 if (!(drawable is DrawableOsuHitObject osuHit))
                     continue;

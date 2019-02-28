@@ -12,6 +12,7 @@ using osu.Game.Overlays.Settings;
 using osu.Game.Rulesets;
 using osuTK;
 using osu.Game.Graphics;
+using osu.Game.Input.Bindings;
 
 namespace osu.Game.Overlays.KeyBinding
 {
@@ -34,9 +35,9 @@ namespace osu.Game.Overlays.KeyBinding
         [BackgroundDependencyLoader]
         private void load(KeyBindingStore store)
         {
-            var bindings = store.Query(Ruleset?.ID, variant);
+            List<DatabasedKeyBinding> bindings = store.Query(Ruleset?.ID, variant);
 
-            foreach (var defaultGroup in Defaults.GroupBy(d => d.Action))
+            foreach (IGrouping<object, Framework.Input.Bindings.KeyBinding> defaultGroup in Defaults.GroupBy(d => d.Action))
             {
                 int intKey = (int)defaultGroup.Key;
 

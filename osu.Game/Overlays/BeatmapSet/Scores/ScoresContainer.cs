@@ -71,7 +71,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
         {
             loading = false;
 
-            var scoreCount = scores?.Count() ?? 0;
+            int scoreCount = scores?.Count() ?? 0;
 
             if (scoreCount == 0)
             {

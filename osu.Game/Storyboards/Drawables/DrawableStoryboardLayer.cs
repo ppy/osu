@@ -26,7 +26,7 @@ namespace osu.Game.Storyboards.Drawables
         [BackgroundDependencyLoader]
         private void load()
         {
-            foreach (var element in Layer.Elements)
+            foreach (IStoryboardElement element in Layer.Elements)
             {
                 if (element.IsDrawable)
                     AddInternal(element.CreateDrawable());

@@ -96,9 +96,9 @@ namespace osu.Desktop
 
         private void fileDrop(object sender, FileDropEventArgs e)
         {
-            var filePaths = e.FileNames;
+            string[] filePaths = e.FileNames;
 
-            var firstExtension = Path.GetExtension(filePaths.First());
+            string firstExtension = Path.GetExtension(filePaths.First());
 
             if (filePaths.Any(f => Path.GetExtension(f) != firstExtension)) return;
 

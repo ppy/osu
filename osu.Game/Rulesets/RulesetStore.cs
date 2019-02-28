@@ -58,14 +58,14 @@ namespace osu.Game.Rulesets
 
         protected void AddMissingRulesets()
         {
-            using (var usage = ContextFactory.GetForWrite())
+            using (DatabaseWriteUsage usage = ContextFactory.GetForWrite())
             {
-                var context = usage.Context;
+                OsuDbContext context = usage.Context;
 
-                var instances = loaded_assemblies.Values.Select(r => (Ruleset)Activator.CreateInstance(r, (RulesetInfo)null)).ToList();
+                List<Ruleset> instances = loaded_assemblies.Values.Select(r => (Ruleset)Activator.CreateInstance(r, (RulesetInfo)null)).ToList();
 
                 //add all legacy modes in correct order
-                foreach (var r in instances.Where(r => r.LegacyID != null).OrderBy(r => r.LegacyID))
+                foreach (Ruleset r in instances.Where(r => r.LegacyID != null).OrderBy(r => r.LegacyID))
                 {
                     if (context.RulesetInfo.SingleOrDefault(rsi => rsi.ID == r.RulesetInfo.ID) == null)
                         context.RulesetInfo.Add(r.RulesetInfo);
@@ -74,18 +74,18 @@ namespace osu.Game.Rulesets
                 context.SaveChanges();
 
                 //add any other modes
-                foreach (var r in instances.Where(r => r.LegacyID == null))
+                foreach (Ruleset r in instances.Where(r => r.LegacyID == null))
                     if (context.RulesetInfo.FirstOrDefault(ri => ri.InstantiationInfo == r.RulesetInfo.InstantiationInfo) == null)
                         context.RulesetInfo.Add(r.RulesetInfo);
 
                 context.SaveChanges();
 
                 //perform a consistency check
-                foreach (var r in context.RulesetInfo)
+                foreach (RulesetInfo r in context.RulesetInfo)
                 {
                     try
                     {
-                        var instanceInfo = ((Ruleset)Activator.CreateInstance(Type.GetType(r.InstantiationInfo, asm =>
+                        RulesetInfo instanceInfo = ((Ruleset)Activator.CreateInstance(Type.GetType(r.InstantiationInfo, asm =>
                         {
                             // for the time being, let's ignore the version being loaded.
                             // this allows for debug builds to successfully load rulesets (even though debug rulesets have a 0.0.0 version).
@@ -113,14 +113,14 @@ namespace osu.Game.Rulesets
 
         private static void loadRulesetFromFile(string file)
         {
-            var filename = Path.GetFileNameWithoutExtension(file);
+            string filename = Path.GetFileNameWithoutExtension(file);
 
             if (loaded_assemblies.Values.Any(t => t.Namespace == filename))
                 return;
 
             try
             {
-                var assembly = Assembly.LoadFrom(file);
+                Assembly assembly = Assembly.LoadFrom(file);
                 loaded_assemblies[assembly] = assembly.GetTypes().First(t => t.IsPublic && t.IsSubclassOf(typeof(Ruleset)));
             }
             catch (Exception e)

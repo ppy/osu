@@ -53,7 +53,7 @@ namespace osu.Desktop.Updater
             {
                 if (updateManager == null) updateManager = await UpdateManager.GitHubUpdateManager(@"https://github.com/ppy/osu", @"osulazer", null, null, true);
 
-                var info = await updateManager.CheckForUpdate(!useDeltaPatching);
+                UpdateInfo info = await updateManager.CheckForUpdate(!useDeltaPatching);
                 if (info.ReleasesToApply.Count == 0)
                     //no updates available. bail and retry later.
                     return;
@@ -174,7 +174,7 @@ namespace osu.Desktop.Updater
 
             public SquirrelLogger()
             {
-                var file = Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location), "SquirrelSetupUpdater.log");
+                string file = Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location), "SquirrelSetupUpdater.log");
                 if (File.Exists(file)) File.Delete(file);
                 path = file;
             }

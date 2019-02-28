@@ -115,7 +115,7 @@ namespace osu.Game.Screens.Play
                     throw new InvalidOperationException("Beatmap was not loaded");
 
                 ruleset = Ruleset.Value ?? beatmap.BeatmapInfo.Ruleset;
-                var rulesetInstance = ruleset.CreateInstance();
+                Ruleset rulesetInstance = ruleset.CreateInstance();
 
                 try
                 {
@@ -245,7 +245,7 @@ namespace osu.Game.Screens.Play
             ScoreProcessor.AllJudged += onCompletion;
             ScoreProcessor.Failed += onFail;
 
-            foreach (var mod in Beatmap.Value.Mods.Value.OfType<IApplicableToScoreProcessor>())
+            foreach (IApplicableToScoreProcessor mod in Beatmap.Value.Mods.Value.OfType<IApplicableToScoreProcessor>())
                 mod.ApplyToScoreProcessor(ScoreProcessor);
         }
 
@@ -254,7 +254,7 @@ namespace osu.Game.Screens.Play
             if (sourceClock == null) return;
 
             sourceClock.Rate = 1;
-            foreach (var mod in Beatmap.Value.Mods.Value.OfType<IApplicableToClock>())
+            foreach (IApplicableToClock mod in Beatmap.Value.Mods.Value.OfType<IApplicableToClock>())
                 mod.ApplyToClock(sourceClock);
         }
 
@@ -293,7 +293,7 @@ namespace osu.Game.Screens.Play
                 {
                     if (!this.IsCurrentScreen()) return;
 
-                    var score = CreateScore();
+                    ScoreInfo score = CreateScore();
                     if (RulesetContainer.ReplayScore == null)
                         scoreManager.Import(score, true);
 
@@ -306,7 +306,7 @@ namespace osu.Game.Screens.Play
 
         protected virtual ScoreInfo CreateScore()
         {
-            var score = RulesetContainer.ReplayScore?.ScoreInfo ?? new ScoreInfo
+            ScoreInfo score = RulesetContainer.ReplayScore?.ScoreInfo ?? new ScoreInfo
             {
                 Beatmap = Beatmap.Value.BeatmapInfo,
                 Ruleset = ruleset,
@@ -413,7 +413,7 @@ namespace osu.Game.Screens.Play
             if (storyboardContainer == null)
                 return;
 
-            var beatmap = Beatmap.Value;
+            WorkingBeatmap beatmap = Beatmap.Value;
 
             storyboard = beatmap.Storyboard.CreateDrawable();
             storyboard.Masking = true;
@@ -433,8 +433,8 @@ namespace osu.Game.Screens.Play
             if (ShowStoryboard.Value && storyboard == null)
                 initializeStoryboard(true);
 
-            var beatmap = Beatmap.Value;
-            var storyboardVisible = ShowStoryboard.Value && beatmap.Storyboard.HasDrawable;
+            WorkingBeatmap beatmap = Beatmap.Value;
+            bool storyboardVisible = ShowStoryboard.Value && beatmap.Storyboard.HasDrawable;
 
             storyboardContainer?
                 .FadeColour(OsuColour.Gray(BackgroundOpacity), BACKGROUND_FADE_DURATION, Easing.OutQuint)

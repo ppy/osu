@@ -23,7 +23,7 @@ namespace osu.Game.Beatmaps.Formats
 
         protected override void ParseStreamInto(StreamReader stream, T output)
         {
-            Section section = Section.None;
+            var section = Section.None;
 
             string line;
             while ((line = stream.ReadLine()) != null)
@@ -69,7 +69,7 @@ namespace osu.Game.Beatmaps.Formats
 
         protected string StripComments(string line)
         {
-            var index = line.AsSpan().IndexOf("//".AsSpan());
+            int index = line.AsSpan().IndexOf("//".AsSpan());
             if (index > 0)
                 return line.Substring(0, index);
 
@@ -80,9 +80,9 @@ namespace osu.Game.Beatmaps.Formats
 
         private void handleColours(T output, string line)
         {
-            var pair = SplitKeyVal(line);
+            KeyValuePair<string, string> pair = SplitKeyVal(line);
 
-            bool isCombo = pair.Key.StartsWith(@"Combo");
+            bool isCombo = pair.Key.StartsWith(@"Combo", StringComparison.Ordinal);
 
             string[] split = pair.Value.Split(',');
 
@@ -123,7 +123,7 @@ namespace osu.Game.Beatmaps.Formats
 
         protected KeyValuePair<string, string> SplitKeyVal(string line, char separator = ':')
         {
-            var split = line.Trim().Split(new[] { separator }, 2);
+            string[] split = line.Trim().Split(new[] { separator }, 2);
 
             return new KeyValuePair<string, string>
             (
@@ -194,7 +194,7 @@ namespace osu.Game.Beatmaps.Formats
 
             public override SampleInfo ApplyTo(SampleInfo sampleInfo)
             {
-                var baseInfo = base.ApplyTo(sampleInfo);
+                SampleInfo baseInfo = base.ApplyTo(sampleInfo);
 
                 if (string.IsNullOrEmpty(baseInfo.Suffix) && CustomSampleBank > 1)
                     baseInfo.Suffix = CustomSampleBank.ToString();

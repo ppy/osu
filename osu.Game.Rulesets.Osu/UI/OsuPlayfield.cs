@@ -60,7 +60,7 @@ namespace osu.Game.Rulesets.Osu.UI
 
             if (h is IDrawableHitObjectWithProxiedApproach c)
             {
-                var original = c.ProxiedLayer;
+                Drawable original = c.ProxiedLayer;
 
                 // Hitobjects only have lifetimes set on LoadComplete. For nested hitobjects (e.g. SliderHeads), this only happens when the parenting slider becomes visible.
                 // This delegation is required to make sure that the approach circles for those not-yet-loaded objects aren't added prematurely.
@@ -72,7 +72,7 @@ namespace osu.Game.Rulesets.Osu.UI
 
         private void addApproachCircleProxy(Drawable d)
         {
-            var proxy = d.CreateProxy();
+            Drawable proxy = d.CreateProxy();
             proxy.LifetimeStart = d.LifetimeStart;
             proxy.LifetimeEnd = d.LifetimeEnd;
             approachCircles.Add(proxy);
@@ -88,7 +88,7 @@ namespace osu.Game.Rulesets.Osu.UI
             if (!judgedObject.DisplayResult || !DisplayJudgements.Value)
                 return;
 
-            DrawableOsuJudgement explosion = new DrawableOsuJudgement(result, judgedObject)
+            var explosion = new DrawableOsuJudgement(result, judgedObject)
             {
                 Origin = Anchor.Centre,
                 Position = ((OsuHitObject)judgedObject.HitObject).StackedEndPosition,

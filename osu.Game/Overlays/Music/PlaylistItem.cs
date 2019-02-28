@@ -81,7 +81,7 @@ namespace osu.Game.Overlays.Music
             hoverColour = colours.Yellow;
             artistColour = colours.Gray9;
 
-            var metadata = BeatmapSetInfo.Metadata;
+            BeatmapMetadata metadata = BeatmapSetInfo.Metadata;
             FilterTerms = metadata.SearchableTerms;
 
             Children = new Drawable[]

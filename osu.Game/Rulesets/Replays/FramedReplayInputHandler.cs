@@ -119,7 +119,7 @@ namespace osu.Game.Rulesets.Replays
         {
             public ReplayKeyboardState(List<Key> keys)
             {
-                foreach (var key in keys)
+                foreach (Key key in keys)
                     Keys.Add(key);
             }
         }

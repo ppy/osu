@@ -38,9 +38,9 @@ namespace osu.Game.Database
         /// <param name="silent">Whether the user should be notified of the addition.</param>
         public void Add(T item, bool silent)
         {
-            using (var usage = ContextFactory.GetForWrite())
+            using (DatabaseWriteUsage usage = ContextFactory.GetForWrite())
             {
-                var context = usage.Context;
+                OsuDbContext context = usage.Context;
                 context.Attach(item);
             }
 
@@ -53,7 +53,7 @@ namespace osu.Game.Database
         /// <param name="item">The item to update.</param>
         public void Update(T item)
         {
-            using (var usage = ContextFactory.GetForWrite())
+            using (DatabaseWriteUsage usage = ContextFactory.GetForWrite())
                 usage.Context.Update(item);
 
             ItemRemoved?.Invoke(item);
@@ -132,17 +132,17 @@ namespace osu.Game.Database
         /// <param name="query">An optional query limiting the scope of the purge.</param>
         public void PurgeDeletable(Expression<Func<T, bool>> query = null)
         {
-            using (var usage = ContextFactory.GetForWrite())
+            using (DatabaseWriteUsage usage = ContextFactory.GetForWrite())
             {
-                var context = usage.Context;
+                OsuDbContext context = usage.Context;
 
-                var lookup = context.Set<T>().Where(s => s.DeletePending);
+                IQueryable<T> lookup = context.Set<T>().Where(s => s.DeletePending);
 
                 if (query != null) lookup = lookup.Where(query);
 
                 lookup = AddIncludesForDeletion(lookup);
 
-                var purgeable = lookup.ToList();
+                List<T> purgeable = lookup.ToList();
 
                 if (!purgeable.Any()) return;
 

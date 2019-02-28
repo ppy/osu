@@ -69,7 +69,7 @@ namespace osu.Game.Online.API.Requests.Responses
         {
             set
             {
-                foreach (var kvp in value)
+                foreach (KeyValuePair<string, int> kvp in value)
                 {
                     HitResult newKey;
                     switch (kvp.Key)

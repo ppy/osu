@@ -60,13 +60,13 @@ namespace osu.Game.Storyboards.Drawables
         {
             dependencies.Cache(new TextureStore(new TextureLoaderStore(fileStore.Store), false, scaleAdjust: 1));
 
-            foreach (var layer in Storyboard.Layers)
+            foreach (StoryboardLayer layer in Storyboard.Layers)
                 Add(layer.CreateDrawable());
         }
 
         private void updateLayerVisibility()
         {
-            foreach (var layer in Children)
+            foreach (DrawableStoryboardLayer layer in Children)
                 layer.Enabled = passing ? layer.Layer.EnabledWhenPassing : layer.Layer.EnabledWhenFailing;
         }
     }

@@ -33,7 +33,7 @@ namespace osu.Game.Tests.Visual
         [BackgroundDependencyLoader]
         private void load()
         {
-            var beatmapInfo = beatmaps.QueryBeatmap(b => b.RulesetID == 0);
+            BeatmapInfo beatmapInfo = beatmaps.QueryBeatmap(b => b.RulesetID == 0);
             if (beatmapInfo != null)
                 Beatmap.Value = beatmaps.GetWorkingBeatmap(beatmapInfo);
 
@@ -85,7 +85,7 @@ namespace osu.Game.Tests.Visual
         {
             protected override APIRequest FetchScores(Action<IEnumerable<APIRoomScoreInfo>> scoresCallback)
             {
-                var scores = Enumerable.Range(0, 50).Select(createRoomScore).ToArray();
+                APIRoomScoreInfo[] scores = Enumerable.Range(0, 50).Select(createRoomScore).ToArray();
 
                 scoresCallback?.Invoke(scores);
                 ScoresLoaded?.Invoke(scores);

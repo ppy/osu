@@ -92,7 +92,7 @@ namespace osu.Game.Rulesets.Catch.Replays
                 lastPosition = h.X;
             }
 
-            foreach (var obj in Beatmap.HitObjects)
+            foreach (CatchHitObject obj in Beatmap.HitObjects)
             {
                 switch (obj)
                 {
@@ -101,7 +101,7 @@ namespace osu.Game.Rulesets.Catch.Replays
                         break;
                 }
 
-                foreach (var nestedObj in obj.NestedHitObjects.Cast<CatchHitObject>())
+                foreach (CatchHitObject nestedObj in obj.NestedHitObjects.Cast<CatchHitObject>())
                 {
                     switch (nestedObj)
                     {

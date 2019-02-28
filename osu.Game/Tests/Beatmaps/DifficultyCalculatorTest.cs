@@ -25,10 +25,10 @@ namespace osu.Game.Tests.Beatmaps
 
         private WorkingBeatmap getBeatmap(string name)
         {
-            using (var resStream = openResource($"{resource_namespace}.{name}.osu"))
+            using (Stream resStream = openResource($"{resource_namespace}.{name}.osu"))
             using (var stream = new StreamReader(resStream))
             {
-                var decoder = Decoder.GetDecoder<Beatmap>(stream);
+                Decoder<Beatmap> decoder = Decoder.GetDecoder<Beatmap>(stream);
                 ((LegacyBeatmapDecoder)decoder).ApplyOffsets = false;
 
                 var working = new TestWorkingBeatmap(decoder.Decode(stream));
@@ -40,7 +40,7 @@ namespace osu.Game.Tests.Beatmaps
 
         private Stream openResource(string name)
         {
-            var localPath = Path.GetDirectoryName(Uri.UnescapeDataString(new UriBuilder(Assembly.GetExecutingAssembly().CodeBase).Path));
+            string localPath = Path.GetDirectoryName(Uri.UnescapeDataString(new UriBuilder(Assembly.GetExecutingAssembly().CodeBase).Path));
             return Assembly.LoadFrom(Path.Combine(localPath, $"{ResourceAssembly}.dll")).GetManifestResourceStream($@"{ResourceAssembly}.Resources.{name}");
         }
 

@@ -87,7 +87,7 @@ namespace osu.Game.Tests.Visual
 
         private PreviewTrack getOwnedTrack()
         {
-            var track = getTrack();
+            PreviewTrack track = getTrack();
 
             Add(track);
 

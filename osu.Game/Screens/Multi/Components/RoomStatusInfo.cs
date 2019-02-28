@@ -58,7 +58,7 @@ namespace osu.Game.Screens.Multi.Components
 
             protected override string Format()
             {
-                var diffToNow = Date.Subtract(DateTimeOffset.Now);
+                TimeSpan diffToNow = Date.Subtract(DateTimeOffset.Now);
 
                 if (diffToNow.TotalSeconds < -5)
                     return $"Closed {base.Format()}";

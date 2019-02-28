@@ -93,8 +93,8 @@ namespace osu.Desktop.Overlays
         {
             base.LoadComplete();
 
-            var version = game.Version;
-            var lastVersion = config.Get<string>(OsuSetting.Version);
+            string version = game.Version;
+            string lastVersion = config.Get<string>(OsuSetting.Version);
             if (game.IsDeployedBuild && version != lastVersion)
             {
                 config.Set(OsuSetting.Version, version);

@@ -96,7 +96,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
         [BackgroundDependencyLoader]
         private void load()
         {
-            var judgement = HitObject.CreateJudgement();
+            Judgement judgement = HitObject.CreateJudgement();
             if (judgement != null)
             {
                 Result = CreateResult(judgement);
@@ -104,7 +104,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
                     throw new InvalidOperationException($"{GetType().ReadableName()} must provide a {nameof(JudgementResult)} through {nameof(CreateResult)}.");
             }
 
-            var samples = GetSamples().ToArray();
+            SampleInfo[] samples = GetSamples().ToArray();
 
             if (samples.Any())
             {
@@ -113,7 +113,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
                                                                                           + $" This is an indication that {nameof(HitObject.ApplyDefaults)} has not been invoked on {this}.");
 
                 samples = samples.Select(s => HitObject.SampleControlPoint.ApplyTo(s)).ToArray();
-                foreach (var s in samples)
+                foreach (SampleInfo s in samples)
                     s.Namespace = SampleNamespace;
 
                 AddInternal(Samples = new SkinnableSound(samples));
@@ -155,9 +155,9 @@ namespace osu.Game.Rulesets.Objects.Drawables
         {
             base.Update();
 
-            if (Result != null && Result.HasResult)
+            if (Result?.HasResult == true)
             {
-                var endTime = (HitObject as IHasEndTime)?.EndTime ?? HitObject.StartTime;
+                double endTime = (HitObject as IHasEndTime)?.EndTime ?? HitObject.StartTime;
 
                 if (Result.TimeOffset + endTime > Time.Current)
                 {
@@ -202,7 +202,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
             judgementOccurred = true;
 
             // Ensure that the judgement is given a valid time offset, because this may not get set by the caller
-            var endTime = (HitObject as IHasEndTime)?.EndTime ?? HitObject.StartTime;
+            double endTime = (HitObject as IHasEndTime)?.EndTime ?? HitObject.StartTime;
             Result.TimeOffset = Time.Current - endTime;
 
             switch (Result.Type)
@@ -225,7 +225,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
         /// </summary>
         internal void OnLifetimeEnd()
         {
-            foreach (var nested in NestedHitObjects)
+            foreach (DrawableHitObject nested in NestedHitObjects)
                 nested.OnLifetimeEnd();
             UpdateResult(false);
         }
@@ -242,13 +242,13 @@ namespace osu.Game.Rulesets.Objects.Drawables
             if (AllJudged)
                 return false;
 
-            foreach (var d in NestedHitObjects)
+            foreach (DrawableHitObject d in NestedHitObjects)
                 judgementOccurred |= d.UpdateResult(userTriggered);
 
             if (judgementOccurred || Judged)
                 return judgementOccurred;
 
-            var endTime = (HitObject as IHasEndTime)?.EndTime ?? HitObject.StartTime;
+            double endTime = (HitObject as IHasEndTime)?.EndTime ?? HitObject.StartTime;
             CheckForResult(userTriggered, Time.Current - endTime);
 
             return judgementOccurred;

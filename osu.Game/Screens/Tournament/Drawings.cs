@@ -59,7 +59,7 @@ namespace osu.Game.Screens.Tournament
         {
             this.storage = storage;
 
-            TextureStore flagStore = new TextureStore();
+            var flagStore = new TextureStore();
             // Local flag store
             flagStore.AddStore(new TextureLoaderStore(new NamespacedResourceStore<byte[]>(new StorageBackedResourceStore(storage), "Drawings")));
             // Default texture store
@@ -271,7 +271,7 @@ namespace osu.Game.Screens.Tournament
                 {
                     // Write to drawings_results
                     using (Stream stream = storage.GetStream(results_filename, FileAccess.Write, FileMode.Create))
-                    using (StreamWriter sw = new StreamWriter(stream))
+                    using (var sw = new StreamWriter(stream))
                     {
                         sw.Write(text);
                     }
@@ -282,7 +282,7 @@ namespace osu.Game.Screens.Tournament
                 }
             }
 
-            writeOp = writeOp?.ContinueWith(t => { writeAction(); }) ?? Task.Run((Action)writeAction);
+            writeOp = writeOp?.ContinueWith(t => writeAction()) ?? Task.Run((Action)writeAction);
         }
 
         private void reloadTeams()
@@ -315,7 +315,7 @@ namespace osu.Game.Screens.Tournament
                 {
                     // Read from drawings_results
                     using (Stream stream = storage.GetStream(results_filename, FileAccess.Read, FileMode.Open))
-                    using (StreamReader sr = new StreamReader(stream))
+                    using (var sr = new StreamReader(stream))
                     {
                         string line;
                         while ((line = sr.ReadLine()?.Trim()) != null)
@@ -323,7 +323,7 @@ namespace osu.Game.Screens.Tournament
                             if (string.IsNullOrEmpty(line))
                                 continue;
 
-                            if (line.ToUpperInvariant().StartsWith("GROUP"))
+                            if (line.ToUpperInvariant().StartsWith("GROUP", StringComparison.Ordinal))
                                 continue;
 
                             // ReSharper disable once AccessToModifiedClosure

@@ -65,7 +65,7 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
                 return;
             }
 
-            var result = HitObject.HitWindows.ResultFor(timeOffset);
+            HitResult result = HitObject.HitWindows.ResultFor(timeOffset);
             if (result == HitResult.None)
                 return;
 

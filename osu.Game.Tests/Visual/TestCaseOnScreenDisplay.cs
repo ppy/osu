@@ -49,7 +49,7 @@ namespace osu.Game.Tests.Visual
 
             public void IncrementEnumSetting(TestConfigSetting setting)
             {
-                var nextValue = Get<EnumSetting>(setting) + 1;
+                EnumSetting nextValue = Get<EnumSetting>(setting) + 1;
                 if (nextValue > EnumSetting.Setting4)
                     nextValue = EnumSetting.Setting1;
                 Set(setting, nextValue);

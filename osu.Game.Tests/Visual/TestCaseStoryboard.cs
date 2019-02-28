@@ -3,6 +3,7 @@
 
 using NUnit.Framework;
 using osu.Framework.Allocation;
+using osu.Framework.Audio.Track;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -67,7 +68,7 @@ namespace osu.Game.Tests.Visual
 
         private void restart()
         {
-            var track = Beatmap.Value.Track;
+            Track track = Beatmap.Value.Track;
 
             track.Reset();
             loadStoryboard(Beatmap.Value);

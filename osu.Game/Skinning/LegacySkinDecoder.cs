@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Collections.Generic;
 using osu.Game.Beatmaps.Formats;
 
 namespace osu.Game.Skinning
@@ -20,7 +21,7 @@ namespace osu.Game.Skinning
             {
                 case Section.General:
                 {
-                    var pair = SplitKeyVal(line);
+                    KeyValuePair<string, string> pair = SplitKeyVal(line);
 
                     switch (pair.Key)
                     {
@@ -39,7 +40,7 @@ namespace osu.Game.Skinning
                 }
                 case Section.Fonts:
                 {
-                    var pair = SplitKeyVal(line);
+                    KeyValuePair<string, string> pair = SplitKeyVal(line);
 
                     switch (pair.Key)
                     {

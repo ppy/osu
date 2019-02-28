@@ -47,10 +47,10 @@ namespace osu.Game.Rulesets.Mania.Tests
                 Spacing = new Vector2(20),
                 Children = new[]
                 {
-                    createNoteDisplay(ScrollingDirection.Down, 1, out var note1),
-                    createNoteDisplay(ScrollingDirection.Up, 2, out var note2),
-                    createHoldNoteDisplay(ScrollingDirection.Down, 1, out var holdNote1),
-                    createHoldNoteDisplay(ScrollingDirection.Up, 2, out var holdNote2),
+                    createNoteDisplay(ScrollingDirection.Down, 1, out DrawableNote note1),
+                    createNoteDisplay(ScrollingDirection.Up, 2, out DrawableNote note2),
+                    createHoldNoteDisplay(ScrollingDirection.Down, 1, out DrawableHoldNote holdNote1),
+                    createHoldNoteDisplay(ScrollingDirection.Up, 2, out DrawableHoldNote holdNote2),
                 }
             };
 
@@ -160,12 +160,12 @@ namespace osu.Game.Rulesets.Mania.Tests
             {
                 base.Update();
 
-                foreach (var obj in content.OfType<DrawableHitObject>())
+                foreach (DrawableHitObject obj in content.OfType<DrawableHitObject>())
                 {
                     if (!(obj.HitObject is IHasEndTime endTime))
                         continue;
 
-                    foreach (var nested in obj.NestedHitObjects)
+                    foreach (DrawableHitObject nested in obj.NestedHitObjects)
                     {
                         double finalPosition = (nested.HitObject.StartTime - obj.HitObject.StartTime) / endTime.Duration;
                         switch (direction)

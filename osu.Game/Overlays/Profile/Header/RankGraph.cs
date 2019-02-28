@@ -120,7 +120,7 @@ namespace osu.Game.Overlays.Profile.Header
 
         private void updateRankTexts()
         {
-            var user = User.Value;
+            User user = User.Value;
 
             performanceText.Text = user.Statistics.PP != null ? $"{user.Statistics.PP:#,0}pp" : string.Empty;
             rankText.Text = user.Statistics.Ranks.Global > 0 ? $"#{user.Statistics.Ranks.Global:#,0}" : "no rank";

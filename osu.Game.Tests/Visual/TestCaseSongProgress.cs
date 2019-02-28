@@ -61,7 +61,7 @@ namespace osu.Game.Tests.Visual
 
         private void displayNewValues()
         {
-            List<HitObject> objects = new List<HitObject>();
+            var objects = new List<HitObject>();
             for (double i = 0; i < 5000; i += RNG.NextDouble() * 10 + i / 1000)
                 objects.Add(new HitObject { StartTime = i });
 

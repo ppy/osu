@@ -86,7 +86,7 @@ namespace osu.Game
                 if (!IsDeployedBuild)
                     return @"local " + (DebugUtils.IsDebug ? @"debug" : @"release");
 
-                var assembly = AssemblyName;
+                AssemblyName assembly = AssemblyName;
                 return $@"{assembly.Version.Major}.{assembly.Version.Minor}.{assembly.Version.Build}";
             }
         }
@@ -209,7 +209,7 @@ namespace osu.Game
             // TODO: This is temporary until we reimplement the local FPS display.
             // It's just to allow end-users to access the framework FPS display without knowing the shortcut key.
             fpsDisplayVisible = LocalConfig.GetBindable<bool>(OsuSetting.ShowFpsDisplay);
-            fpsDisplayVisible.ValueChanged += visible => { FrameStatisticsMode = visible.NewValue ? FrameStatisticsMode.Minimal : FrameStatisticsMode.None; };
+            fpsDisplayVisible.ValueChanged += visible => FrameStatisticsMode = visible.NewValue ? FrameStatisticsMode.Minimal : FrameStatisticsMode.None;
             fpsDisplayVisible.TriggerChange();
         }
 
@@ -217,7 +217,7 @@ namespace osu.Game
         {
             try
             {
-                using (var db = contextFactory.GetForWrite(false))
+                using (DatabaseWriteUsage db = contextFactory.GetForWrite(false))
                     db.Context.Migrate();
             }
             catch (Exception e)
@@ -231,7 +231,7 @@ namespace osu.Game
                 Logger.Log("Database purged successfully.", LoggingTarget.Database);
 
                 // only run once more, then hard bail.
-                using (var db = contextFactory.GetForWrite(false))
+                using (DatabaseWriteUsage db = contextFactory.GetForWrite(false))
                     db.Context.Migrate();
             }
         }
@@ -247,9 +247,9 @@ namespace osu.Game
 
         public void Import(params string[] paths)
         {
-            var extension = Path.GetExtension(paths.First())?.ToLowerInvariant();
+            string extension = Path.GetExtension(paths.First())?.ToLowerInvariant();
 
-            foreach (var importer in fileImporters)
+            foreach (ICanAcceptFiles importer in fileImporters)
                 if (importer.HandledExtensions.Contains(extension))
                     importer.Import(paths);
         }

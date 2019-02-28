@@ -21,14 +21,14 @@ namespace osu.Game.Database
         /// <typeparam name="T">A valid EF-stored type.</typeparam>
         protected virtual void Refresh<T>(ref T obj, IQueryable<T> lookupSource = null) where T : class, IHasPrimaryKey
         {
-            using (var usage = ContextFactory.GetForWrite())
+            using (DatabaseWriteUsage usage = ContextFactory.GetForWrite())
             {
-                var context = usage.Context;
+                OsuDbContext context = usage.Context;
 
                 if (context.Entry(obj).State != EntityState.Detached) return;
 
-                var id = obj.ID;
-                var foundObject = lookupSource?.SingleOrDefault(t => t.ID == id) ?? context.Find<T>(id);
+                int id = obj.ID;
+                T foundObject = lookupSource?.SingleOrDefault(t => t.ID == id) ?? context.Find<T>(id);
                 if (foundObject != null)
                     obj = foundObject;
                 else

@@ -35,7 +35,7 @@ namespace osu.Game.Tests.Visual
 
         private void newBeatmaps()
         {
-            var ruleset = rulesets.GetRuleset(0);
+            RulesetInfo ruleset = rulesets.GetRuleset(0);
 
             direct.BeatmapSets = new[]
             {

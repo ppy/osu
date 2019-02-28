@@ -107,7 +107,7 @@ namespace osu.Game.Screens.Play
 
         protected override void UpdateValue(float value)
         {
-            var xFill = value * UsableWidth;
+            float xFill = value * UsableWidth;
             fill.Width = xFill;
             handleBase.X = xFill;
         }

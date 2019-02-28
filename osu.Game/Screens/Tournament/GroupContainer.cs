@@ -52,7 +52,7 @@ namespace osu.Game.Screens.Tournament
 
             for (int i = 0; i < numGroups; i++)
             {
-                Group g = new Group(nextGroupName.ToString());
+                var g = new Group(nextGroupName.ToString());
 
                 groups.Add(g);
                 nextGroupName++;
@@ -89,7 +89,7 @@ namespace osu.Game.Screens.Tournament
 
         public string GetStringRepresentation()
         {
-            StringBuilder sb = new StringBuilder();
+            var sb = new StringBuilder();
 
             foreach (Group g in groups)
             {

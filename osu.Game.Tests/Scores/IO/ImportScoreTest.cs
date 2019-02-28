@@ -29,7 +29,7 @@ namespace osu.Game.Tests.Scores.IO
             {
                 try
                 {
-                    var osu = loadOsu(host);
+                    OsuGameBase osu = loadOsu(host);
 
                     var toImport = new ScoreInfo
                     {
@@ -43,7 +43,7 @@ namespace osu.Game.Tests.Scores.IO
                         OnlineScoreID = 12345,
                     };
 
-                    var imported = loadIntoOsu(osu, toImport);
+                    ScoreInfo imported = loadIntoOsu(osu, toImport);
 
                     Assert.AreEqual(toImport.Rank, imported.Rank);
                     Assert.AreEqual(toImport.TotalScore, imported.TotalScore);
@@ -68,14 +68,14 @@ namespace osu.Game.Tests.Scores.IO
             {
                 try
                 {
-                    var osu = loadOsu(host);
+                    OsuGameBase osu = loadOsu(host);
 
                     var toImport = new ScoreInfo
                     {
                         Mods = new Mod[] { new OsuModHardRock(), new OsuModDoubleTime() },
                     };
 
-                    var imported = loadIntoOsu(osu, toImport);
+                    ScoreInfo imported = loadIntoOsu(osu, toImport);
 
                     Assert.IsTrue(imported.Mods.Any(m => m is OsuModHardRock));
                     Assert.IsTrue(imported.Mods.Any(m => m is OsuModDoubleTime));
@@ -94,7 +94,7 @@ namespace osu.Game.Tests.Scores.IO
             {
                 try
                 {
-                    var osu = loadOsu(host);
+                    OsuGameBase osu = loadOsu(host);
 
                     var toImport = new ScoreInfo
                     {
@@ -105,7 +105,7 @@ namespace osu.Game.Tests.Scores.IO
                         }
                     };
 
-                    var imported = loadIntoOsu(osu, toImport);
+                    ScoreInfo imported = loadIntoOsu(osu, toImport);
 
                     Assert.AreEqual(toImport.Statistics[HitResult.Perfect], imported.Statistics[HitResult.Perfect]);
                     Assert.AreEqual(toImport.Statistics[HitResult.Miss], imported.Statistics[HitResult.Miss]);
@@ -136,7 +136,7 @@ namespace osu.Game.Tests.Scores.IO
             Task.Run(() => host.Run(osu));
             waitForOrAssert(() => osu.IsLoaded, @"osu! failed to start in a reasonable amount of time");
 
-            var beatmapFile = TestResources.GetTestBeatmapForImport();
+            string beatmapFile = TestResources.GetTestBeatmapForImport();
             var beatmapManager = osu.Dependencies.Get<BeatmapManager>();
             beatmapManager.Import(beatmapFile);
 
