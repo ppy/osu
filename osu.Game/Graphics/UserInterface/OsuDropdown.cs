@@ -38,11 +38,9 @@ namespace osu.Game.Graphics.UserInterface
 
         private void updateAccentColour()
         {
-            var header = Header as IHasAccentColour;
-            if (header != null) header.AccentColour = accentColour;
+            if (Header is IHasAccentColour header) header.AccentColour = accentColour;
 
-            var menu = Menu as IHasAccentColour;
-            if (menu != null) menu.AccentColour = accentColour;
+            if (Menu is IHasAccentColour menu) menu.AccentColour = accentColour;
         }
 
         protected override DropdownHeader CreateHeader() => new OsuDropdownHeader();
@@ -154,8 +152,7 @@ namespace osu.Game.Graphics.UserInterface
                 {
                     base.UpdateForegroundColour();
 
-                    var content = Foreground.Children.FirstOrDefault() as Content;
-                    if (content != null) content.Chevron.Alpha = IsHovered ? 1 : 0;
+                    if (Foreground.Children.FirstOrDefault() is Content content) content.Chevron.Alpha = IsHovered ? 1 : 0;
                 }
 
                 protected override Drawable CreateContent() => new Content();
