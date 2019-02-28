@@ -43,12 +43,14 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => true;
 
         private bool tracking;
+
         public bool Tracking
         {
             get => tracking;
             set
             {
                 if (value == tracking) return;
+
                 tracking = value;
 
                 background.FadeTo(tracking ? tracking_alpha : idle_alpha, 100);
@@ -56,12 +58,14 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
         }
 
         private bool complete;
+
         public bool Complete
         {
             get => complete;
             set
             {
                 if (value == complete) return;
+
                 complete = value;
 
                 updateCompleteTick();

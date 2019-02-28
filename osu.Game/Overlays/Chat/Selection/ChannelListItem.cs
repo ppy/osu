@@ -36,6 +36,7 @@ namespace osu.Game.Overlays.Chat.Selection
         private Color4 hoverColour;
 
         public IEnumerable<string> FilterTerms => new[] { channel.Name };
+
         public bool MatchingFilter
         {
             set => this.FadeTo(value ? 1f : 0f, 100);

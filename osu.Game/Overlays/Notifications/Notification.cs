@@ -151,6 +151,7 @@ namespace osu.Game.Overlays.Notifications
         public virtual void Close()
         {
             if (WasClosed) return;
+
             WasClosed = true;
 
             Closed?.Invoke();

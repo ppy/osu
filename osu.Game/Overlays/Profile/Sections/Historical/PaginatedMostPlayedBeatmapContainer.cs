@@ -15,7 +15,7 @@ namespace osu.Game.Overlays.Profile.Sections.Historical
         private GetUserMostPlayedBeatmapsRequest request;
 
         public PaginatedMostPlayedBeatmapContainer(Bindable<User> user)
-            :base(user, "Most Played Beatmaps", "No records. :(")
+            : base(user, "Most Played Beatmaps", "No records. :(")
         {
             ItemsPerPage = 5;
 

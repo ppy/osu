@@ -78,6 +78,7 @@ namespace osu.Game.Overlays
         }
 
         private ScheduledDelegate notificationsEnabler;
+
         private void updateProcessingMode()
         {
             bool enabled = OverlayActivationMode.Value == OverlayActivation.All || State == Visibility.Visible;

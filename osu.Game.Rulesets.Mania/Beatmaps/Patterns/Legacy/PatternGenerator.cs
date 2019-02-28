@@ -87,6 +87,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
                 return 4;
             if (val >= 1 - p3)
                 return 3;
+
             return val >= 1 - p2 ? 2 : 1;
         }
 

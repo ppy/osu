@@ -49,7 +49,6 @@ namespace osu.Game.Graphics.UserInterface
         public override Anchor Origin
         {
             get => base.Origin;
-
             set
             {
                 base.Origin = value;
@@ -208,7 +207,10 @@ namespace osu.Game.Graphics.UserInterface
 
             private readonly SpriteIcon icon;
 
-            public FontAwesome Icon { set => icon.Icon = value; }
+            public FontAwesome Icon
+            {
+                set => icon.Icon = value;
+            }
 
             public BouncingIcon()
             {

@@ -53,6 +53,7 @@ namespace osu.Game.Overlays.Dialog
             {
                 if (text == value)
                     return;
+
                 text = value;
 
                 header.Text = value;

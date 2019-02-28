@@ -12,6 +12,7 @@ namespace osu.Game.Screens.Edit.Components.RadioButtons
     public class RadioButtonCollection : CompositeDrawable
     {
         private IReadOnlyList<RadioButton> items;
+
         public IReadOnlyList<RadioButton> Items
         {
             get => items;
@@ -19,6 +20,7 @@ namespace osu.Game.Screens.Edit.Components.RadioButtons
             {
                 if (ReferenceEquals(items, value))
                     return;
+
                 items = value;
 
                 buttonContainer.Clear();
@@ -42,6 +44,7 @@ namespace osu.Game.Screens.Edit.Components.RadioButtons
         }
 
         private RadioButton currentlySelected;
+
         private void addButton(RadioButton button)
         {
             button.Selected.ValueChanged += selected =>

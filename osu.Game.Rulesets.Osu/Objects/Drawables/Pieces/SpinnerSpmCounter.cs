@@ -45,6 +45,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
             private set
             {
                 if (value == spm) return;
+
                 spm = value;
                 spmText.Text = Math.Truncate(value).ToString(@"#0");
             }

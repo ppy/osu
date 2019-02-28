@@ -265,6 +265,7 @@ namespace osu.Game.Tests.Visual
                     pauseOverlay.OnRetry = lastAction;
                     lastAction = null;
                 }
+
                 return triggered;
             });
             AddAssert("Overlay is closed", () => pauseOverlay.State == Visibility.Hidden);
