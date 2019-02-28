@@ -600,8 +600,7 @@ namespace osu.Game
         private void loadComponentSingleFile<T>(T d, Action<T> add)
             where T : Drawable
         {
-            var focused = d as FocusedOverlayContainer;
-            if (focused != null)
+            if (d is FocusedOverlayContainer focused)
             {
                 focused.StateChanged += s =>
                 {

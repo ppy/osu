@@ -74,8 +74,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
 
         protected override IEnumerable<ManiaHitObject> ConvertHitObject(HitObject original, IBeatmap beatmap)
         {
-            var maniaOriginal = original as ManiaHitObject;
-            if (maniaOriginal != null)
+            if (original is ManiaHitObject maniaOriginal)
             {
                 yield return maniaOriginal;
                 yield break;
