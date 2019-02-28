@@ -84,7 +84,7 @@ namespace osu.Game.Tests.Visual
             public TestScreen PushNext()
             {
                 TestScreen screen = CreateNextScreen();
-               this.Push(screen);
+                this.Push(screen);
 
                 return screen;
             }

@@ -58,6 +58,7 @@ namespace osu.Game.Screens.Multi.Match.Components
             {
                 if (!enabled.Value)
                     return true;
+
                 return base.OnClick(e);
             }
         }

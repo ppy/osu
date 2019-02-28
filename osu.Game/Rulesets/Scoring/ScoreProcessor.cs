@@ -113,6 +113,7 @@ namespace osu.Game.Rulesets.Scoring
                 return ScoreRank.B;
             if (acc > 0.7)
                 return ScoreRank.C;
+
             return ScoreRank.D;
         }
 
@@ -168,7 +169,7 @@ namespace osu.Game.Rulesets.Scoring
         /// </summary>
         public virtual void PopulateScore(ScoreInfo score)
         {
-            score.TotalScore = (int)Math.Round(TotalScore.Value);
+            score.TotalScore = (long)Math.Round(TotalScore.Value);
             score.Combo = Combo.Value;
             score.MaxCombo = HighestCombo.Value;
             score.Accuracy = Math.Round(Accuracy.Value, 4);

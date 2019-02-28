@@ -219,13 +219,11 @@ namespace osu.Game.Overlays
                     {
                         if (drawableMedal.State != DisplayState.Full)
                             drawableMedal.State = DisplayState.Icon;
-                    })
-                    .Delay(step_duration).Schedule(() =>
+                    }).Delay(step_duration).Schedule(() =>
                     {
                         if (drawableMedal.State != DisplayState.Full)
                             drawableMedal.State = DisplayState.MedalUnlocked;
-                    })
-                    .Delay(step_duration).Schedule(() =>
+                    }).Delay(step_duration).Schedule(() =>
                     {
                         if (drawableMedal.State != DisplayState.Full)
                             drawableMedal.State = DisplayState.Full;

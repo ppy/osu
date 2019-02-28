@@ -27,7 +27,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
         /// </summary>
         public Color4 AccentColour
         {
-            get { return accentColour; }
+            get => accentColour;
             set
             {
                 accentColour = value;
@@ -136,11 +136,12 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
 
         public bool Tracking
         {
-            get { return tracking; }
+            get => tracking;
             private set
             {
                 if (value == tracking)
                     return;
+
                 tracking = value;
 
                 FollowCircle.ScaleTo(tracking ? 2f : 1, 300, Easing.OutQuint);
