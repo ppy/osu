@@ -5,7 +5,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
-using osu.Framework.Platform;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Skinning;

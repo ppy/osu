@@ -75,6 +75,7 @@ namespace osu.Game.Screens.Edit
                 fileMenuItems.Add(new EditorMenuItem("Export", MenuItemType.Standard, exportBeatmap));
                 fileMenuItems.Add(new EditorMenuItemSpacer());
             }
+
             fileMenuItems.Add(new EditorMenuItem("Exit", MenuItemType.Standard, this.Exit));
 
             InternalChildren = new[]
