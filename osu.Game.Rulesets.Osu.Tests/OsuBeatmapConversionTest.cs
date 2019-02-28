@@ -33,9 +33,11 @@ namespace osu.Game.Rulesets.Osu.Tests
                 case Slider slider:
                     foreach (var nested in slider.NestedHitObjects)
                         yield return createConvertValue(nested);
+
                     break;
                 default:
                     yield return createConvertValue(hitObject);
+
                     break;
             }
 

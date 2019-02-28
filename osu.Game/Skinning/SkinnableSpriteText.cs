@@ -30,6 +30,7 @@ namespace osu.Game.Skinning
             {
                 if (text == value)
                     return;
+
                 text = value;
 
                 if (Drawable is IHasText textDrawable)

@@ -144,6 +144,7 @@ namespace osu.Game.Overlays
                         tabs.Current.Value = lastSection;
                     return;
                 }
+
                 if (lastSection != section.NewValue)
                 {
                     lastSection = section.NewValue;
@@ -212,7 +213,8 @@ namespace osu.Game.Overlays
 
             private class ProfileTabItem : PageTabItem
             {
-                public ProfileTabItem(ProfileSection value) : base(value)
+                public ProfileTabItem(ProfileSection value)
+                    : base(value)
                 {
                     Text.Text = value.Title;
                 }

@@ -20,7 +20,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
         public override bool DisplayResult => false;
 
-        public DrawableSliderTick(SliderTick sliderTick) : base(sliderTick)
+        public DrawableSliderTick(SliderTick sliderTick)
+            : base(sliderTick)
         {
             Size = new Vector2(16) * sliderTick.Scale;
             Origin = Anchor.Centre;

@@ -34,7 +34,7 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawable
 
         public override Color4 AccentColour
         {
-            get { return base.AccentColour; }
+            get => base.AccentColour;
             set
             {
                 base.AccentColour = value;

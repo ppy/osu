@@ -57,10 +57,11 @@ namespace osu.Game.Graphics.UserInterface
 
             public Visibility State
             {
-                get { return state; }
+                get => state;
                 set
                 {
                     if (value == state) return;
+
                     state = value;
 
                     const float transition_duration = 500;
@@ -80,7 +81,8 @@ namespace osu.Game.Graphics.UserInterface
                 }
             }
 
-            public BreadcrumbTabItem(T value) : base(value)
+            public BreadcrumbTabItem(T value)
+                : base(value)
             {
                 Text.Font = Text.Font.With(size: 18);
                 Text.Margin = new MarginPadding { Vertical = 8 };

@@ -241,8 +241,7 @@ namespace osu.Game.Screens.Play
             ComboCounter?.Current.BindTo(processor.Combo);
             HealthDisplay?.Current.BindTo(processor.Health);
 
-            var shd = HealthDisplay as StandardHealthDisplay;
-            if (shd != null)
+            if (HealthDisplay is StandardHealthDisplay shd)
                 processor.NewJudgement += shd.Flash;
         }
     }

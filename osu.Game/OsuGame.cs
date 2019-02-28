@@ -482,6 +482,7 @@ namespace osu.Game
                 overlay.StateChanged += state =>
                 {
                     if (state == Visibility.Hidden) return;
+
                     singleDisplaySideOverlays.Where(o => o != overlay).ForEach(o => o.Hide());
                 };
             }
@@ -495,6 +496,7 @@ namespace osu.Game
                 overlay.StateChanged += state =>
                 {
                     if (state == Visibility.Hidden) return;
+
                     informationalOverlays.Where(o => o != overlay).ForEach(o => o.Hide());
                 };
             }
@@ -600,8 +602,7 @@ namespace osu.Game
         private void loadComponentSingleFile<T>(T d, Action<T> add)
             where T : Drawable
         {
-            var focused = d as FocusedOverlayContainer;
-            if (focused != null)
+            if (d is FocusedOverlayContainer focused)
             {
                 focused.StateChanged += s =>
                 {

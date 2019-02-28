@@ -28,10 +28,11 @@ namespace osu.Game.Screens.Play
 
         public int Progress
         {
-            get { return progress; }
+            get => progress;
             set
             {
                 if (value == progress) return;
+
                 progress = value;
                 redrawProgress();
             }
@@ -43,10 +44,11 @@ namespace osu.Game.Screens.Play
 
         public int[] Values
         {
-            get { return values; }
+            get => values;
             set
             {
                 if (value == values) return;
+
                 values = value;
                 layout.Invalidate();
             }
@@ -56,10 +58,11 @@ namespace osu.Game.Screens.Play
 
         public Color4 FillColour
         {
-            get { return fillColour; }
+            get => fillColour;
             set
             {
                 if (value == fillColour) return;
+
                 fillColour = value;
                 redrawFilled();
             }
@@ -193,12 +196,12 @@ namespace osu.Game.Screens.Play
 
             public float Filled
             {
-                get { return filled; }
+                get => filled;
                 set
                 {
                     if (value == filled) return;
-                    filled = value;
 
+                    filled = value;
                     fillActive();
                 }
             }
@@ -207,12 +210,12 @@ namespace osu.Game.Screens.Play
 
             public ColumnState State
             {
-                get { return state; }
+                get => state;
                 set
                 {
                     if (value == state) return;
-                    state = value;
 
+                    state = value;
                     if (IsLoaded)
                         fillActive();
 
