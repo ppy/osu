@@ -27,6 +27,7 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
 
         private Bindable<ScalingMode> scalingMode;
         private Bindable<Size> sizeFullscreen;
+        private readonly BindableList<WindowMode> windowModes = new BindableList<WindowMode>();
 
         private OsuGameBase game;
         private SettingsDropdown<Size> resolutionDropdown;
@@ -51,6 +52,9 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
             scalingPositionX = osuConfig.GetBindable<float>(OsuSetting.ScalingPositionX);
             scalingPositionY = osuConfig.GetBindable<float>(OsuSetting.ScalingPositionY);
 
+            if (host.Window != null)
+                windowModes.BindTo(host.Window.SupportedWindowModes);
+
             Container resolutionSettingsContainer;
 
             Children = new Drawable[]
@@ -59,7 +63,7 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
                 {
                     LabelText = "Screen mode",
                     Bindable = config.GetBindable<WindowMode>(FrameworkSetting.WindowMode),
-                    ItemSource = host.Window?.SupportedWindowModes,
+                    ItemSource = windowModes,
                 },
                 resolutionSettingsContainer = new Container
                 {
@@ -152,6 +156,19 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
 
                 scalingSettings.ForEach(s => s.TransferValueOnCommit = mode.NewValue == ScalingMode.Everything);
             }, true);
+
+            windowModes.ItemsAdded += _ => windowModesChanged();
+            windowModes.ItemsRemoved += _ => windowModesChanged();
+
+            windowModesChanged();
+        }
+
+        private void windowModesChanged()
+        {
+            if (windowModes.Count() > 1)
+                windowModeDropdown.Show();
+            else
+                windowModeDropdown.Hide();
         }
 
         /// <summary>
