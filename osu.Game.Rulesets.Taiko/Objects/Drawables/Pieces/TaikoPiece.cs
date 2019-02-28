@@ -11,6 +11,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables.Pieces
     public class TaikoPiece : BeatSyncedContainer, IHasAccentColour
     {
         private Color4 accentColour;
+
         /// <summary>
         /// The colour of the inner circle and outer glows.
         /// </summary>
@@ -21,6 +22,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables.Pieces
         }
 
         private bool kiaiMode;
+
         /// <summary>
         /// Whether Kiai mode effects are enabled for this circle piece.
         /// </summary>

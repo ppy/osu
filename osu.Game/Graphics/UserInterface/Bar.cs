@@ -47,6 +47,7 @@ namespace osu.Game.Graphics.UserInterface
         }
 
         private BarDirection direction = BarDirection.LeftToRight;
+
         public BarDirection Direction
         {
             get => direction;

@@ -176,6 +176,7 @@ namespace osu.Game.Online.API
                     lock (queue)
                     {
                         if (queue.Count == 0) break;
+
                         req = queue.Dequeue();
                     }
 

@@ -313,6 +313,7 @@ namespace osu.Game.Overlays.KeyBinding
                 set
                 {
                     if (value == isBinding) return;
+
                     isBinding = value;
 
                     updateHoverState();

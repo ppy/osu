@@ -20,6 +20,7 @@ namespace osu.Game.Screens.Select
         public readonly BeatmapLeaderboard Leaderboard;
 
         private WorkingBeatmap beatmap;
+
         public WorkingBeatmap Beatmap
         {
             get => beatmap;

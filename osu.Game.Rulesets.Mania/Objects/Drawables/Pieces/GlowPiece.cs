@@ -35,6 +35,7 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables.Pieces
         }
 
         private Color4 accentColour;
+
         public Color4 AccentColour
         {
             get => accentColour;
@@ -42,6 +43,7 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables.Pieces
             {
                 if (accentColour == value)
                     return;
+
                 accentColour = value;
 
                 updateGlow();

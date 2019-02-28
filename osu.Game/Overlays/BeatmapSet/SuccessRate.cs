@@ -21,12 +21,14 @@ namespace osu.Game.Overlays.BeatmapSet
         private readonly FailRetryGraph graph;
 
         private BeatmapInfo beatmap;
+
         public BeatmapInfo Beatmap
         {
             get => beatmap;
             set
             {
                 if (value == beatmap) return;
+
                 beatmap = value;
 
                 updateDisplay();

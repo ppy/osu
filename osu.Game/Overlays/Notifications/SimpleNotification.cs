@@ -15,6 +15,7 @@ namespace osu.Game.Overlays.Notifications
     public class SimpleNotification : Notification
     {
         private string text = string.Empty;
+
         public string Text
         {
             get => text;
@@ -26,6 +27,7 @@ namespace osu.Game.Overlays.Notifications
         }
 
         private FontAwesome icon = FontAwesome.fa_info_circle;
+
         public FontAwesome Icon
         {
             get => icon;
@@ -77,7 +79,6 @@ namespace osu.Game.Overlays.Notifications
         public override bool Read
         {
             get => base.Read;
-
             set
             {
                 if (value == base.Read) return;

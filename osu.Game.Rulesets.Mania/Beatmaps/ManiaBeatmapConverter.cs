@@ -78,6 +78,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
             if (maniaOriginal != null)
             {
                 yield return maniaOriginal;
+
                 yield break;
             }
 
@@ -92,6 +93,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
 
         private readonly List<double> prevNoteTimes = new List<double>(max_notes_for_density);
         private double density = int.MaxValue;
+
         private void computeDensity(double newNoteTime)
         {
             if (prevNoteTimes.Count == max_notes_for_density)
@@ -104,6 +106,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
         private double lastTime;
         private Vector2 lastPosition;
         private PatternType lastStair = PatternType.Stair;
+
         private void recordNote(double time, Vector2 position)
         {
             lastTime = time;

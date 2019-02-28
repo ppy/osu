@@ -173,6 +173,7 @@ namespace osu.Game.Overlays.Notifications
             private Color4 colourInactive;
 
             private float progress;
+
             public float Progress
             {
                 get => progress;

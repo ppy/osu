@@ -81,6 +81,7 @@ namespace osu.Game.Overlays.Mods
             {
                 Mod selected = button.SelectedMod;
                 if (selected == null) continue;
+
                 foreach (var type in modTypes)
                     if (type.IsInstanceOfType(selected))
                     {

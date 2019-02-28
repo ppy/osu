@@ -84,6 +84,7 @@ namespace osu.Game.Screens.Tournament
         }
 
         private ScrollState _scrollState;
+
         private ScrollState scrollState
         {
             get => _scrollState;
@@ -326,6 +327,7 @@ namespace osu.Game.Screens.Tournament
             private readonly Box outline;
 
             private bool selected;
+
             public bool Selected
             {
                 get => selected;

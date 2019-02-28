@@ -70,7 +70,8 @@ namespace osu.Game.Screens.Backgrounds
         {
             private readonly Skin skin;
 
-            public SkinnedBackground(Skin skin, string fallbackTextureName) : base(fallbackTextureName)
+            public SkinnedBackground(Skin skin, string fallbackTextureName)
+                : base(fallbackTextureName)
             {
                 this.skin = skin;
             }

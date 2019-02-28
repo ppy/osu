@@ -72,6 +72,7 @@ namespace osu.Game.Graphics.UserInterface
         }
 
         private bool glowing;
+
         public bool Glowing
         {
             get => glowing;
@@ -113,6 +114,7 @@ namespace osu.Game.Graphics.UserInterface
         }
 
         private Color4 accentColour;
+
         public Color4 AccentColour
         {
             get => accentColour;
@@ -125,6 +127,7 @@ namespace osu.Game.Graphics.UserInterface
         }
 
         private Color4 glowingAccentColour;
+
         public Color4 GlowingAccentColour
         {
             get => glowingAccentColour;
@@ -137,6 +140,7 @@ namespace osu.Game.Graphics.UserInterface
         }
 
         private Color4 glowColour;
+
         public Color4 GlowColour
         {
             get => glowColour;

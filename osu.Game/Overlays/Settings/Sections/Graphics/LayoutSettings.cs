@@ -84,7 +84,7 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
                     AutoSizeDuration = transition_duration,
                     AutoSizeEasing = Easing.OutQuint,
                     Masking = true,
-                    Children = new []
+                    Children = new[]
                     {
                         new SettingsSlider<float>
                         {
@@ -171,6 +171,7 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
         }
 
         private Drawable preview;
+
         private void showPreview()
         {
             if (preview?.IsAlive != true)
@@ -225,6 +226,7 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
                 {
                     if (item == new Size(9999, 9999))
                         return "Default";
+
                     return $"{item.Width}x{item.Height}";
                 }
             }

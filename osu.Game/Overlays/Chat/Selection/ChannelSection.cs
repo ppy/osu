@@ -21,6 +21,7 @@ namespace osu.Game.Overlays.Chat.Selection
 
         public IEnumerable<IFilterable> FilterableChildren => ChannelFlow.Children;
         public IEnumerable<string> FilterTerms => Array.Empty<string>();
+
         public bool MatchingFilter
         {
             set => this.FadeTo(value ? 1f : 0f, 100);

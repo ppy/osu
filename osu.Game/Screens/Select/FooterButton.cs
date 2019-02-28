@@ -29,6 +29,7 @@ namespace osu.Game.Screens.Select
         }
 
         private Color4 deselectedColour;
+
         public Color4 DeselectedColour
         {
             get => deselectedColour;
@@ -41,6 +42,7 @@ namespace osu.Game.Screens.Select
         }
 
         private Color4 selectedColour;
+
         public Color4 SelectedColour
         {
             get => selectedColour;

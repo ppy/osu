@@ -92,6 +92,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
         {
             if (slider.LazyEndPosition != null)
                 return;
+
             slider.LazyEndPosition = slider.StackedPosition;
 
             float approxFollowCircleRadius = (float)(slider.Radius * 3);

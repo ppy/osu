@@ -32,6 +32,7 @@ namespace osu.Game.Screens.Play
             set
             {
                 if (value == progress) return;
+
                 progress = value;
                 redrawProgress();
             }
@@ -47,6 +48,7 @@ namespace osu.Game.Screens.Play
             set
             {
                 if (value == values) return;
+
                 values = value;
                 layout.Invalidate();
             }
@@ -60,6 +62,7 @@ namespace osu.Game.Screens.Play
             set
             {
                 if (value == fillColour) return;
+
                 fillColour = value;
                 redrawFilled();
             }
@@ -197,8 +200,8 @@ namespace osu.Game.Screens.Play
                 set
                 {
                     if (value == filled) return;
-                    filled = value;
 
+                    filled = value;
                     fillActive();
                 }
             }
@@ -211,8 +214,8 @@ namespace osu.Game.Screens.Play
                 set
                 {
                     if (value == state) return;
-                    state = value;
 
+                    state = value;
                     if (IsLoaded)
                         fillActive();
 

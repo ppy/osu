@@ -134,6 +134,7 @@ namespace osu.Game.Graphics.UserInterface
         private class Star : Container
         {
             public readonly SpriteIcon Icon;
+
             public Star()
             {
                 Size = new Vector2(star_size);

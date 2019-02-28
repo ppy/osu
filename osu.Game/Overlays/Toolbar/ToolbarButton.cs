@@ -66,7 +66,8 @@ namespace osu.Game.Overlays.Toolbar
         private readonly SpriteText tooltip2;
         protected FillFlowContainer Flow;
 
-        public ToolbarButton() : base(HoverSampleSet.Loud)
+        public ToolbarButton()
+            : base(HoverSampleSet.Loud)
         {
             Width = WIDTH;
             RelativeSizeAxes = Axes.Y;

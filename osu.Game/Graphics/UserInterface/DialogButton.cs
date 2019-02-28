@@ -154,6 +154,7 @@ namespace osu.Game.Graphics.UserInterface
         }
 
         private Color4 buttonColour;
+
         public Color4 ButtonColour
         {
             get => buttonColour;
@@ -166,6 +167,7 @@ namespace osu.Game.Graphics.UserInterface
         }
 
         private Color4 backgroundColour = OsuColour.Gray(34);
+
         public Color4 BackgroundColour
         {
             get => backgroundColour;
@@ -177,6 +179,7 @@ namespace osu.Game.Graphics.UserInterface
         }
 
         private string text;
+
         public string Text
         {
             get => text;

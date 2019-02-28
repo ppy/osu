@@ -82,6 +82,7 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables.Pieces
             {
                 if (accentColour == value)
                     return;
+
                 accentColour = value;
 
                 updateAccentColour();

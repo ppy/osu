@@ -31,6 +31,7 @@ namespace osu.Game.Overlays.BeatmapSet
             set
             {
                 if (value == beatmapSet) return;
+
                 beatmapSet = value;
 
                 updateDisplay();

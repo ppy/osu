@@ -20,7 +20,6 @@ namespace osu.Game.Online.API
         public long ExpiresIn
         {
             get => AccessTokenExpiry - DateTimeOffset.UtcNow.ToUnixTimeSeconds();
-
             set => AccessTokenExpiry = DateTimeOffset.Now.AddSeconds(value).ToUnixTimeSeconds();
         }
 
@@ -51,6 +50,7 @@ namespace osu.Game.Online.API
             catch
             {
             }
+
             return null;
         }
     }

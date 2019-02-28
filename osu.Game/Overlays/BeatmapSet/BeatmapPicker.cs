@@ -33,12 +33,14 @@ namespace osu.Game.Overlays.BeatmapSet
         public readonly Bindable<BeatmapInfo> Beatmap = new Bindable<BeatmapInfo>();
 
         private BeatmapSetInfo beatmapSet;
+
         public BeatmapSetInfo BeatmapSet
         {
             get => beatmapSet;
             set
             {
                 if (value == beatmapSet) return;
+
                 beatmapSet = value;
 
                 updateDisplay();
@@ -194,12 +196,14 @@ namespace osu.Game.Overlays.BeatmapSet
             public event Action<DifficultySelectorState> StateChanged;
 
             private DifficultySelectorState state;
+
             public DifficultySelectorState State
             {
                 get => state;
                 set
                 {
                     if (value == state) return;
+
                     state = value;
 
                     StateChanged?.Invoke(State);
@@ -277,6 +281,7 @@ namespace osu.Game.Overlays.BeatmapSet
             private readonly OsuSpriteText text;
 
             private int value;
+
             public int Value
             {
                 get => value;

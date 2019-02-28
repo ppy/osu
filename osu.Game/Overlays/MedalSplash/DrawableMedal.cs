@@ -29,6 +29,7 @@ namespace osu.Game.Overlays.MedalSplash
         private readonly OsuSpriteText unlocked, name;
         private readonly TextFlowContainer description;
         private DisplayState state;
+
         public DrawableMedal(Medal medal)
         {
             this.medal = medal;
