@@ -18,9 +18,9 @@ namespace osu.Game.Graphics.Containers
     {
         private const float background_fade_duration = 800;
 
-        protected Bindable<double> DimLevel { get; private set; }
+        private Bindable<double> dimLevel { get; set; }
 
-        protected Bindable<bool> ShowStoryboard { get; private set; }
+        private Bindable<bool> showStoryboard { get; set; }
 
         /// <summary>
         /// Whether or not user-configured dim levels should be applied to the container.
@@ -41,10 +41,11 @@ namespace osu.Game.Graphics.Containers
         /// <summary>
         /// Creates a new <see cref="UserDimContainer"/>.
         /// </summary>
-        /// <param name="isStoryboard">
-        /// Whether or not this instance of UserDimContainer contains a storyboard.
-        /// While both backgrounds and storyboards allow user dim levels to be applied, storyboards can be toggled via <see cref="ShowStoryboard"/>
+        /// <param name="isStoryboard"> Whether or not this instance of UserDimContainer contains a storyboard.
+        /// <remarks>
+        /// While both backgrounds and storyboards allow user dim levels to be applied, storyboards can be toggled via <see cref="showStoryboard"/>
         /// and can cause backgrounds to become hidden via <see cref="StoryboardReplacesBackground"/>.
+        /// </remarks>
         /// </param>
         public UserDimContainer(bool isStoryboard = false)
         {
@@ -55,11 +56,11 @@ namespace osu.Game.Graphics.Containers
         [BackgroundDependencyLoader]
         private void load(OsuConfigManager config)
         {
-            DimLevel = config.GetBindable<double>(OsuSetting.DimLevel);
-            ShowStoryboard = config.GetBindable<bool>(OsuSetting.ShowStoryboard);
+            dimLevel = config.GetBindable<double>(OsuSetting.DimLevel);
+            showStoryboard = config.GetBindable<bool>(OsuSetting.ShowStoryboard);
             EnableUserDim.ValueChanged += _ => updateBackgroundDim();
-            DimLevel.ValueChanged += _ => updateBackgroundDim();
-            ShowStoryboard.ValueChanged += _ => updateBackgroundDim();
+            dimLevel.ValueChanged += _ => updateBackgroundDim();
+            showStoryboard.ValueChanged += _ => updateBackgroundDim();
             StoryboardReplacesBackground.ValueChanged += _ => updateBackgroundDim();
         }
 
@@ -73,15 +74,15 @@ namespace osu.Game.Graphics.Containers
         {
             if (isStoryboard)
             {
-                DimContainer.FadeTo(!ShowStoryboard.Value || DimLevel.Value == 1 ? 0 : 1, background_fade_duration, Easing.OutQuint);
+                DimContainer.FadeTo(!showStoryboard.Value || dimLevel.Value == 1 ? 0 : 1, background_fade_duration, Easing.OutQuint);
             }
             else
             {
                 // The background needs to be hidden in the case of it being replaced by the storyboard
-                DimContainer.FadeTo(ShowStoryboard.Value && StoryboardReplacesBackground.Value ? 0 : 1, background_fade_duration, Easing.OutQuint);
+                DimContainer.FadeTo(showStoryboard.Value && StoryboardReplacesBackground.Value ? 0 : 1, background_fade_duration, Easing.OutQuint);
             }
 
-            DimContainer.FadeColour(EnableUserDim.Value ? OsuColour.Gray(1 - (float)DimLevel.Value) : Color4.White, background_fade_duration, Easing.OutQuint);
+            DimContainer.FadeColour(EnableUserDim.Value ? OsuColour.Gray(1 - (float)dimLevel.Value) : Color4.White, background_fade_duration, Easing.OutQuint);
         }
     }
 }
