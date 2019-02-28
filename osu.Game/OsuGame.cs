@@ -626,6 +626,10 @@ namespace osu.Game
                     try
                     {
                         Logger.Log($"Loading {d}...", level: LogLevel.Debug);
+
+                        if (IsDisposed)
+                            return;
+
                         await LoadComponentAsync(d, add);
                         Logger.Log($"Loaded {d}!", level: LogLevel.Debug);
                     }
