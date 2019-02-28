@@ -158,7 +158,7 @@ namespace osu.Game.Overlays.Direct
 
             public int Value
             {
-                get { return value; }
+                get => value;
                 set
                 {
                     this.value = value;

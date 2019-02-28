@@ -19,7 +19,7 @@ namespace osu.Game.Rulesets.Mania.Objects
         private double duration;
         public double Duration
         {
-            get { return duration; }
+            get => duration;
             set
             {
                 duration = value;
@@ -29,7 +29,7 @@ namespace osu.Game.Rulesets.Mania.Objects
 
         public override double StartTime
         {
-            get { return base.StartTime; }
+            get => base.StartTime;
             set
             {
                 base.StartTime = value;
@@ -40,7 +40,7 @@ namespace osu.Game.Rulesets.Mania.Objects
 
         public override int Column
         {
-            get { return base.Column; }
+            get => base.Column;
             set
             {
                 base.Column = value;

@@ -18,8 +18,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
 
         public string Text
         {
-            get { return number.Text; }
-            set { number.Text = value; }
+            get => number.Text;
+            set => number.Text = value;
         }
 
         public NumberPiece()

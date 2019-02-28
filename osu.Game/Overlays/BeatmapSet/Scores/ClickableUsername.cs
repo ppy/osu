@@ -19,7 +19,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
         private User user;
         public User User
         {
-            get { return user; }
+            get => user;
             set
             {
                 if (user == value) return;
