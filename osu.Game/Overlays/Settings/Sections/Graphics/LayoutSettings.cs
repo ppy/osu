@@ -59,7 +59,7 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
                 {
                     LabelText = "Screen mode",
                     Bindable = config.GetBindable<WindowMode>(FrameworkSetting.WindowMode),
-                    ItemSource = host.Window.SupportedWindowModes,
+                    ItemSource = host.Window?.SupportedWindowModes,
                 },
                 resolutionSettingsContainer = new Container
                 {
