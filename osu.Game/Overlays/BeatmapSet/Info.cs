@@ -22,7 +22,6 @@ namespace osu.Game.Overlays.BeatmapSet
         private const float metadata_width = 225;
         private const float spacing = 20;
 
-        private readonly MetadataSection source, tags;
         private readonly Box successRateBackground;
         private readonly SuccessRate successRate;
 
@@ -36,6 +35,7 @@ namespace osu.Game.Overlays.BeatmapSet
 
         public Info()
         {
+            MetadataSection source, tags;
             RelativeSizeAxes = Axes.X;
             Height = 220;
             Masking = true;

@@ -30,7 +30,6 @@ namespace osu.Game.Overlays
         public const float RIGHT_WIDTH = 275;
 
         private readonly Header header;
-        private readonly Info info;
 
         private APIAccess api;
         private RulesetStore rulesets;
@@ -44,6 +43,7 @@ namespace osu.Game.Overlays
 
         public BeatmapSetOverlay()
         {
+            Info info;
             ScoresContainer scores;
             Waves.FirstWaveColour = OsuColour.Gray(0.4f);
             Waves.SecondWaveColour = OsuColour.Gray(0.3f);
