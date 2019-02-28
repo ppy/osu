@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using System.Threading;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -60,7 +61,7 @@ namespace osu.Game.Screens.Multi.Play
             if (ruleset.Value.ID != playlistItem.Ruleset.ID)
                 throw new InvalidOperationException("Current Ruleset does not match PlaylistItem's Ruleset");
 
-            if (!CurrentMods.Value.Equals(playlistItem.RequiredMods))
+            if (!playlistItem.RequiredMods.All(m => CurrentMods.Value.Contains(m)))
                 throw new InvalidOperationException("Current Mods do not match PlaylistItem's RequiredMods");
 
             var req = new CreateRoomScoreRequest(roomId.Value ?? 0, playlistItem.ID);
