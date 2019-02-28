@@ -26,7 +26,7 @@ namespace osu.Game.Screens.Select
         protected Bindable<PlaylistItem> CurrentItem { get; private set; }
 
         [Resolved]
-        protected Bindable<IEnumerable<Mod>> CurrentMods { get; private set; }
+        private Bindable<IEnumerable<Mod>> selectedMods { get; set; }
 
         [Resolved]
         private BeatmapManager beatmaps { get; set; }
@@ -61,7 +61,7 @@ namespace osu.Game.Screens.Select
                 return true;
 
             Beatmap.Value = beatmaps.GetWorkingBeatmap(CurrentItem.Value?.Beatmap);
-            Beatmap.Value.Mods.Value = CurrentMods.Value = CurrentItem.Value?.RequiredMods;
+            Beatmap.Value.Mods.Value = selectedMods.Value = CurrentItem.Value?.RequiredMods;
             Ruleset.Value = CurrentItem.Value?.Ruleset;
 
             Beatmap.Disabled = true;
