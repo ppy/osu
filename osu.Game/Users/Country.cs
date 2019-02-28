@@ -36,7 +36,7 @@ namespace osu.Game.Users
 
         public Country Country
         {
-            get { return country; }
+            get => country;
             set
             {
                 if (value == country)

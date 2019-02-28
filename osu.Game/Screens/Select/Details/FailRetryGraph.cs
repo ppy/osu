@@ -20,7 +20,7 @@ namespace osu.Game.Screens.Select.Details
 
         public BeatmapMetrics Metrics
         {
-            get { return metrics; }
+            get => metrics;
             set
             {
                 if (value == metrics) return;

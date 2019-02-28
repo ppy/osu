@@ -78,8 +78,8 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables.Pieces
 
         public Color4 AccentColour
         {
-            get { return Colour; }
-            set { Colour = value; }
+            get => Colour;
+            set => Colour = value;
         }
     }
 }

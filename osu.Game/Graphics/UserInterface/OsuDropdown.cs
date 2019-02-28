@@ -20,7 +20,7 @@ namespace osu.Game.Graphics.UserInterface
 
         public Color4 AccentColour
         {
-            get { return accentColour; }
+            get => accentColour;
             set
             {
                 accentColour = value;
@@ -88,7 +88,7 @@ namespace osu.Game.Graphics.UserInterface
 
             public Color4 AccentColour
             {
-                get { return accentColour; }
+                get => accentColour;
                 set
                 {
                     accentColour = value;
@@ -110,7 +110,7 @@ namespace osu.Game.Graphics.UserInterface
 
                 public Color4 AccentColour
                 {
-                    get { return accentColour ?? nonAccentSelectedColour; }
+                    get => accentColour ?? nonAccentSelectedColour;
                     set
                     {
                         accentColour = value;
@@ -164,8 +164,8 @@ namespace osu.Game.Graphics.UserInterface
                 {
                     public string Text
                     {
-                        get { return Label.Text; }
-                        set { Label.Text = value; }
+                        get => Label.Text;
+                        set => Label.Text = value;
                     }
 
                     public readonly OsuSpriteText Label;
@@ -211,8 +211,8 @@ namespace osu.Game.Graphics.UserInterface
 
             protected override string Label
             {
-                get { return Text.Text; }
-                set { Text.Text = value; }
+                get => Text.Text;
+                set => Text.Text = value;
             }
 
             protected readonly SpriteIcon Icon;
@@ -221,7 +221,7 @@ namespace osu.Game.Graphics.UserInterface
 
             public virtual Color4 AccentColour
             {
-                get { return accentColour; }
+                get => accentColour;
                 set
                 {
                     accentColour = value;

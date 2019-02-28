@@ -206,7 +206,7 @@ namespace osu.Game.Overlays.Notifications
 
             public bool Pulsate
             {
-                get { return pulsate; }
+                get => pulsate;
                 set
                 {
                     if (pulsate == value) return;

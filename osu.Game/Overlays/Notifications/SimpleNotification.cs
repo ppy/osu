@@ -18,7 +18,7 @@ namespace osu.Game.Overlays.Notifications
 
         public string Text
         {
-            get { return text; }
+            get => text;
             set
             {
                 text = value;
@@ -30,7 +30,7 @@ namespace osu.Game.Overlays.Notifications
 
         public FontAwesome Icon
         {
-            get { return icon; }
+            get => icon;
             set
             {
                 icon = value;
@@ -78,8 +78,7 @@ namespace osu.Game.Overlays.Notifications
 
         public override bool Read
         {
-            get { return base.Read; }
-
+            get => base.Read;
             set
             {
                 if (value == base.Read) return;

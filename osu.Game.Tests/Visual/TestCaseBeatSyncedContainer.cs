@@ -191,7 +191,7 @@ namespace osu.Game.Tests.Visual
 
             public double Value
             {
-                set { valueText.Text = $"{value:G}"; }
+                set => valueText.Text = $"{value:G}";
             }
 
             public InfoString(string header)

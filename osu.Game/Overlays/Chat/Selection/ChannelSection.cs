@@ -24,18 +24,18 @@ namespace osu.Game.Overlays.Chat.Selection
 
         public bool MatchingFilter
         {
-            set { this.FadeTo(value ? 1f : 0f, 100); }
+            set => this.FadeTo(value ? 1f : 0f, 100);
         }
 
         public string Header
         {
-            get { return header.Text; }
-            set { header.Text = value.ToUpperInvariant(); }
+            get => header.Text;
+            set => header.Text = value.ToUpperInvariant();
         }
 
         public IEnumerable<Channel> Channels
         {
-            set { ChannelFlow.ChildrenEnumerable = value.Select(c => new ChannelListItem(c)); }
+            set => ChannelFlow.ChildrenEnumerable = value.Select(c => new ChannelListItem(c));
         }
 
         public ChannelSection()

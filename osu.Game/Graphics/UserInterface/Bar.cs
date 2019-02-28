@@ -26,7 +26,7 @@ namespace osu.Game.Graphics.UserInterface
         /// </summary>
         public float Length
         {
-            get { return length; }
+            get => length;
             set
             {
                 length = MathHelper.Clamp(value, 0, 1);
@@ -50,7 +50,7 @@ namespace osu.Game.Graphics.UserInterface
 
         public BarDirection Direction
         {
-            get { return direction; }
+            get => direction;
             set
             {
                 direction = value;

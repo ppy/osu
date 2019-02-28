@@ -31,12 +31,12 @@ namespace osu.Game.Screens.Play
 
         public double StartTime
         {
-            set { startTime = value; }
+            set => startTime = value;
         }
 
         public double EndTime
         {
-            set { endTime = value; }
+            set => endTime = value;
         }
 
         [BackgroundDependencyLoader]

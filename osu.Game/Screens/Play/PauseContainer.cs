@@ -34,7 +34,7 @@ namespace osu.Game.Screens.Play
 
         public int Retries
         {
-            set { pauseOverlay.Retries = value; }
+            set => pauseOverlay.Retries = value;
         }
 
         public bool CanPause => (CheckCanPause?.Invoke() ?? true) && Time.Current >= lastPauseActionTime + pause_cooldown;

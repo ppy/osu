@@ -57,7 +57,7 @@ namespace osu.Game.Graphics.UserInterface
 
             public Visibility State
             {
-                get { return state; }
+                get => state;
                 set
                 {
                     if (value == state) return;

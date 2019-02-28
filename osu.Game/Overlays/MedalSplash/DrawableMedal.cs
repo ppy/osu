@@ -133,7 +133,7 @@ namespace osu.Game.Overlays.MedalSplash
 
         public DisplayState State
         {
-            get { return state; }
+            get => state;
             set
             {
                 if (state == value) return;

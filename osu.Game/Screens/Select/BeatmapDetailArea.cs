@@ -23,7 +23,7 @@ namespace osu.Game.Screens.Select
 
         public WorkingBeatmap Beatmap
         {
-            get { return beatmap; }
+            get => beatmap;
             set
             {
                 beatmap = value;

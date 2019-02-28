@@ -61,7 +61,7 @@ namespace osu.Game.Screens.Play
 
         public bool IsCounting
         {
-            get { return isCounting; }
+            get => isCounting;
             set
             {
                 if (value == isCounting) return;
@@ -76,7 +76,7 @@ namespace osu.Game.Screens.Play
 
         public int FadeTime
         {
-            get { return fadeTime; }
+            get => fadeTime;
             set
             {
                 if (value != fadeTime)
@@ -92,7 +92,7 @@ namespace osu.Game.Screens.Play
 
         public Color4 KeyDownTextColor
         {
-            get { return keyDownTextColor; }
+            get => keyDownTextColor;
             set
             {
                 if (value != keyDownTextColor)
@@ -108,7 +108,7 @@ namespace osu.Game.Screens.Play
 
         public Color4 KeyUpTextColor
         {
-            get { return keyUpTextColor; }
+            get => keyUpTextColor;
             set
             {
                 if (value != keyUpTextColor)

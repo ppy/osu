@@ -100,7 +100,7 @@ namespace osu.Game.Rulesets.Mania.UI
 
         public bool IsSpecial
         {
-            get { return isSpecial; }
+            get => isSpecial;
             set
             {
                 if (isSpecial == value)
@@ -116,7 +116,7 @@ namespace osu.Game.Rulesets.Mania.UI
 
         public Color4 AccentColour
         {
-            get { return accentColour; }
+            get => accentColour;
             set
             {
                 if (accentColour == value)

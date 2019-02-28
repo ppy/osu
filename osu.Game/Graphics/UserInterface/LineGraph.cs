@@ -44,7 +44,7 @@ namespace osu.Game.Graphics.UserInterface
         /// </summary>
         public IEnumerable<float> Values
         {
-            get { return values; }
+            get => values;
             set
             {
                 values = value.ToArray();

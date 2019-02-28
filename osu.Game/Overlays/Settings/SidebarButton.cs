@@ -29,7 +29,7 @@ namespace osu.Game.Overlays.Settings
 
         public SettingsSection Section
         {
-            get { return section; }
+            get => section;
             set
             {
                 section = value;
@@ -42,7 +42,7 @@ namespace osu.Game.Overlays.Settings
 
         public bool Selected
         {
-            get { return selected; }
+            get => selected;
             set
             {
                 selected = value;

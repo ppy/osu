@@ -16,7 +16,7 @@ namespace osu.Game.Beatmaps.Drawables
 
         public BeatmapSetInfo BeatmapSet
         {
-            get { return beatmapSet; }
+            get => beatmapSet;
             set
             {
                 if (value == beatmapSet) return;
@@ -32,7 +32,7 @@ namespace osu.Game.Beatmaps.Drawables
 
         public BeatmapSetCoverType CoverType
         {
-            get { return coverType; }
+            get => coverType;
             set
             {
                 if (value == coverType) return;
