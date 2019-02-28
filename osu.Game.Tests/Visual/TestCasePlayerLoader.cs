@@ -6,6 +6,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Screens;
 using osu.Game.Beatmaps;
+using osu.Game.Screens;
 using osu.Game.Screens.Play;
 
 namespace osu.Game.Tests.Visual
@@ -13,14 +14,21 @@ namespace osu.Game.Tests.Visual
     public class TestCasePlayerLoader : ManualInputManagerTestCase
     {
         private PlayerLoader loader;
-        private ScreenStack stack;
+        private readonly ScreenStack stack;
+
+        [Cached]
+        private BackgroundScreenStack backgroundStack;
+
+        public TestCasePlayerLoader()
+        {
+            InputManager.Add(backgroundStack = new BackgroundScreenStack { RelativeSizeAxes = Axes.Both });
+            InputManager.Add(stack = new ScreenStack { RelativeSizeAxes = Axes.Both });
+        }
 
         [BackgroundDependencyLoader]
         private void load(OsuGameBase game)
         {
             Beatmap.Value = new DummyWorkingBeatmap(game);
-
-            InputManager.Add(stack = new ScreenStack { RelativeSizeAxes = Axes.Both });
 
             AddStep("load dummy beatmap", () => stack.Push(loader = new PlayerLoader(() => new Player
             {
