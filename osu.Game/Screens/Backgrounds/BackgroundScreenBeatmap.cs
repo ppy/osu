@@ -18,11 +18,11 @@ namespace osu.Game.Screens.Backgrounds
         /// <summary>
         /// Whether or not user dim settings should be applied to this Background.
         /// </summary>
-        public Bindable<bool> EnableUserDim = new Bindable<bool>();
+        public readonly Bindable<bool> EnableUserDim = new Bindable<bool>();
 
-        public Bindable<bool> StoryboardReplacesBackground = new Bindable<bool>();
+        public readonly Bindable<bool> StoryboardReplacesBackground = new Bindable<bool>();
 
-        protected UserDimContainer FadeContainer;
+        protected UserDimContainer FadeContainer { get; private set; }
 
         protected virtual UserDimContainer CreateFadeContainer() => new UserDimContainer { RelativeSizeAxes = Axes.Both };
 
