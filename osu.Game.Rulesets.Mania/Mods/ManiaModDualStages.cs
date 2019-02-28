@@ -27,7 +27,7 @@ namespace osu.Game.Rulesets.Mania.Mods
             if (isForCurrentRuleset)
                 return;
 
-            mbc.IsDuel = true;
+            mbc.Dual = true;
         }
 
         public PlayfieldType PlayfieldType => PlayfieldType.Dual;

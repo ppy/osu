@@ -27,7 +27,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
         protected override IEnumerable<Type> ValidConversionTypes { get; } = new[] { typeof(IHasXPosition) };
 
         public int TargetColumns;
-        public bool IsDuel;
+        public bool Dual;
         public readonly bool IsForCurrentRuleset;
 
         // Internal for testing purposes
@@ -51,7 +51,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
                 if (TargetColumns >= 10)
                 {
                     TargetColumns = TargetColumns / 2;
-                    IsDuel = true;
+                    Dual = true;
                 }
             }
             else
@@ -82,7 +82,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
         {
             beatmap = new ManiaBeatmap(new StageDefinition { Columns = TargetColumns });
 
-            if(IsDuel)
+            if(Dual)
                 beatmap.Stages.Add(new StageDefinition { Columns = TargetColumns });
 
             return beatmap;
