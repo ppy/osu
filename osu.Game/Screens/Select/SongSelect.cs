@@ -512,12 +512,6 @@ namespace osu.Game.Screens.Select
             if (base.OnExiting(next))
                 return true;
 
-            if (ModSelect.State == Visibility.Visible)
-            {
-                ModSelect.Hide();
-                return true;
-            }
-
             beatmapInfoWedge.State = Visibility.Hidden;
 
             this.FadeOut(100);
