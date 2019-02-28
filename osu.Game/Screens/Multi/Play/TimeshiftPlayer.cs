@@ -2,7 +2,9 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using System.Threading;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -11,6 +13,8 @@ using osu.Framework.Screens;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Game.Online.Multiplayer;
+using osu.Game.Rulesets;
+using osu.Game.Rulesets.Mods;
 using osu.Game.Scoring;
 using osu.Game.Screens.Multi.Ranking;
 using osu.Game.Screens.Play;
@@ -30,6 +34,12 @@ namespace osu.Game.Screens.Multi.Play
         [Resolved]
         private APIAccess api { get; set; }
 
+        [Resolved]
+        private IBindable<RulesetInfo> ruleset { get; set; }
+
+        [Resolved]
+        private Bindable<IEnumerable<Mod>> selectedMods { get; set; }
+
         public TimeshiftPlayer(PlaylistItem playlistItem)
         {
             this.playlistItem = playlistItem;
@@ -43,6 +53,16 @@ namespace osu.Game.Screens.Multi.Play
             token = null;
 
             bool failed = false;
+
+            // Sanity checks to ensure that TimeshiftPlayer matches the settings for the current PlaylistItem
+            if (Beatmap.Value.BeatmapInfo.OnlineBeatmapID != playlistItem.Beatmap.OnlineBeatmapID)
+                throw new InvalidOperationException("Current Beatmap does not match PlaylistItem's Beatmap");
+
+            if (ruleset.Value.ID != playlistItem.Ruleset.ID)
+                throw new InvalidOperationException("Current Ruleset does not match PlaylistItem's Ruleset");
+
+            if (!playlistItem.RequiredMods.All(m => selectedMods.Value.Contains(m)))
+                throw new InvalidOperationException("Current Mods do not match PlaylistItem's RequiredMods");
 
             var req = new CreateRoomScoreRequest(roomId.Value ?? 0, playlistItem.ID);
             req.Success += r => token = r.ID;
