@@ -82,7 +82,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
         {
             beatmap = new ManiaBeatmap(new StageDefinition { Columns = TargetColumns });
 
-            if(Dual)
+            if (Dual)
                 beatmap.Stages.Add(new StageDefinition { Columns = TargetColumns });
 
             return beatmap;
