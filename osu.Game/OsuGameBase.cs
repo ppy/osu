@@ -75,7 +75,7 @@ namespace osu.Game
 
         private Bindable<bool> fpsDisplayVisible;
 
-        protected virtual Version AssemblyVersion => Assembly.GetEntryAssembly()?.GetName()?.Version ?? new Version();
+        public virtual Version AssemblyVersion => Assembly.GetEntryAssembly()?.GetName().Version ?? new Version();
 
         public bool IsDeployedBuild => AssemblyVersion.Major > 0;
 
