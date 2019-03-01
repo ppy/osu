@@ -116,8 +116,8 @@ namespace osu.Game.Overlays.Direct
                                             {
                                                 statusContainer = new FillFlowContainer
                                                 {
-                                                    AutoSizeAxes = Axes.Both,
-                                                    Margin = new MarginPadding { Vertical = vertical_padding, Horizontal = 5 },
+                                                    AutoSizeAxes = Axes.X,
+                                                    Margin = new MarginPadding { Vertical = 8, Right = 5 },
                                                     Spacing = new Vector2(5),
                                                 },
                                                 new FillFlowContainer
@@ -223,8 +223,8 @@ namespace osu.Game.Overlays.Direct
 
             statusContainer.Add(new BeatmapSetOnlineStatusPill
             {
-                TextSize = 12,
-                TextPadding = new MarginPadding { Horizontal = 10, Vertical = 5 },
+                TextSize = 11,
+                TextPadding = new MarginPadding { Vertical = 2, Horizontal = 8 },
                 Status = SetInfo.OnlineInfo?.Status ?? BeatmapSetOnlineStatus.None,
             });
         }
