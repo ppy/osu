@@ -37,6 +37,10 @@ platform :ios do
 
   desc 'Compile the project'
   lane :build do
+    nuget_restore(
+      project_path: 'osu.iOS.sln'
+    )
+
     souyuz(
       platform: "ios",
       build_target: "osu_iOS",
