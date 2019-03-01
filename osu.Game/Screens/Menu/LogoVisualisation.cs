@@ -131,8 +131,6 @@ namespace osu.Game.Screens.Menu
 
         protected override DrawNode CreateDrawNode() => new VisualisationDrawNode();
 
-        private readonly VisualiserSharedData sharedData = new VisualiserSharedData();
-
         protected override void ApplyDrawNode(DrawNode node)
         {
             base.ApplyDrawNode(node);
@@ -142,14 +140,8 @@ namespace osu.Game.Screens.Menu
             visNode.Shader = shader;
             visNode.Texture = texture;
             visNode.Size = DrawSize.X;
-            visNode.Shared = sharedData;
             visNode.Colour = AccentColour;
             visNode.AudioData = frequencyAmplitudes;
-        }
-
-        private class VisualiserSharedData
-        {
-            public readonly QuadBatch<TexturedVertex2D> VertexBatch = new QuadBatch<TexturedVertex2D>(100, 10);
         }
 
         private class VisualisationDrawNode : DrawNode
@@ -157,13 +149,13 @@ namespace osu.Game.Screens.Menu
             public Shader Shader;
             public Texture Texture;
 
-            public VisualiserSharedData Shared;
-
             //Asuming the logo is a circle, we don't need a second dimension.
             public float Size;
 
             public Color4 Colour;
             public float[] AudioData;
+
+            private readonly QuadBatch<TexturedVertex2D> vertexBatch = new QuadBatch<TexturedVertex2D>(100, 10);
 
             public override void Draw(Action<TexturedVertex2D> vertexAction)
             {
@@ -209,7 +201,7 @@ namespace osu.Game.Screens.Menu
                                 rectangle,
                                 colourInfo,
                                 null,
-                                Shared.VertexBatch.AddAction,
+                                vertexBatch.AddAction,
                                 //barSize by itself will make it smooth more in the X axis than in the Y axis, this reverts that.
                                 Vector2.Divide(inflation, barSize.Yx));
                         }
@@ -217,6 +209,13 @@ namespace osu.Game.Screens.Menu
                 }
 
                 Shader.Unbind();
+            }
+
+            protected override void Dispose(bool isDisposing)
+            {
+                base.Dispose(isDisposing);
+
+                vertexBatch.Dispose();
             }
         }
     }

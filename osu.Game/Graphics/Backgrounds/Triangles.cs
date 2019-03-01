@@ -180,8 +180,6 @@ namespace osu.Game.Graphics.Backgrounds
 
         protected override DrawNode CreateDrawNode() => new TrianglesDrawNode();
 
-        private readonly TrianglesDrawNodeSharedData sharedData = new TrianglesDrawNodeSharedData();
-
         protected override void ApplyDrawNode(DrawNode node)
         {
             base.ApplyDrawNode(node);
@@ -191,15 +189,9 @@ namespace osu.Game.Graphics.Backgrounds
             trianglesNode.Shader = shader;
             trianglesNode.Texture = texture;
             trianglesNode.Size = DrawSize;
-            trianglesNode.Shared = sharedData;
 
             trianglesNode.Parts.Clear();
             trianglesNode.Parts.AddRange(parts);
-        }
-
-        private class TrianglesDrawNodeSharedData
-        {
-            public readonly LinearBatch<TexturedVertex2D> VertexBatch = new LinearBatch<TexturedVertex2D>(100 * 3, 10, PrimitiveType.Triangles);
         }
 
         private class TrianglesDrawNode : DrawNode
@@ -207,10 +199,10 @@ namespace osu.Game.Graphics.Backgrounds
             public Shader Shader;
             public Texture Texture;
 
-            public TrianglesDrawNodeSharedData Shared;
-
             public readonly List<TriangleParticle> Parts = new List<TriangleParticle>();
             public Vector2 Size;
+
+            private readonly LinearBatch<TexturedVertex2D> vertexBatch = new LinearBatch<TexturedVertex2D>(100 * 3, 10, PrimitiveType.Triangles);
 
             public override void Draw(Action<TexturedVertex2D> vertexAction)
             {
@@ -239,11 +231,18 @@ namespace osu.Game.Graphics.Backgrounds
                         triangle,
                         colourInfo,
                         null,
-                        Shared.VertexBatch.AddAction,
+                        vertexBatch.AddAction,
                         Vector2.Divide(localInflationAmount, size));
                 }
 
                 Shader.Unbind();
+            }
+
+            protected override void Dispose(bool isDisposing)
+            {
+                base.Dispose(isDisposing);
+
+                vertexBatch.Dispose();
             }
         }
 
