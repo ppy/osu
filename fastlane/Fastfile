@@ -28,9 +28,13 @@ platform :ios do
       build_platform: 'iPhone'
     )
 
+    client = HTTPClient.new
+    changelog = client.get_content 'https://gist.githubusercontent.com/peppy/ab89c29dcc0dce95f39eb218e8fad197/raw'
+    changelog.gsub!('$BUILD_ID', options[:build])
+
     pilot(
-      skip_waiting_for_build_processing: true,
-      changelog: "i am woot poot",
+      wait_processing_interval: 600,
+      changelog: changelog,
       ipa: './osu.iOS/bin/iPhone/Release/osu.iOS.ipa'
     )
   end
