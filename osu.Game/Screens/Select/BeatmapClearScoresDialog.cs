@@ -7,7 +7,6 @@ using osu.Game.Graphics;
 using osu.Game.Overlays.Dialog;
 using osu.Game.Scoring;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 
 namespace osu.Game.Screens.Select
@@ -26,7 +25,7 @@ namespace osu.Game.Screens.Select
         {
             BodyText = $@"{beatmap.Metadata?.Artist} - {beatmap.Metadata?.Title}";
             Icon = FontAwesome.fa_eraser;
-            HeaderText = $@"Clearing all local scores. Are you sure?";
+            HeaderText = @"Clearing all local scores. Are you sure?";
             Buttons = new PopupDialogButton[]
             {
                 new PopupDialogOkButton
