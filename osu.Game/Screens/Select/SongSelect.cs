@@ -628,8 +628,6 @@ namespace osu.Game.Screens.Select
 
         private void clearScores(BeatmapInfo beatmap)
         {
-            if (BeatmapDetails.Leaderboard.Scope != BeatmapLeaderboardScope.Local) return;
-
             if (beatmap == null || beatmap.ID <= 0) return;
 
             if (BeatmapDetails.Leaderboard.Scores == null || !BeatmapDetails.Leaderboard.Scores.Any()) return;
