@@ -19,5 +19,9 @@ namespace osu.Game.Database
         protected override IQueryable<T> AddIncludesForConsumption(IQueryable<T> query) =>
             base.AddIncludesForConsumption(query)
                 .Include(s => s.Files).ThenInclude(f => f.FileInfo);
+
+        protected override IQueryable<T> AddIncludesForDeletion(IQueryable<T> query) =>
+            base.AddIncludesForDeletion(query)
+                .Include(s => s.Files); // don't include FileInfo. these are handled by the FileStore itself.
     }
 }
