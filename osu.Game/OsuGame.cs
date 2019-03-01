@@ -142,8 +142,7 @@ namespace osu.Game
 
         public void RemoveBlockingOverlay(OverlayContainer overlay)
         {
-            if (visibleBlockingOverlays.Contains(overlay))
-                visibleBlockingOverlays.Remove(overlay);
+            visibleBlockingOverlays.Remove(overlay);
             updateBlockingOverlayFade();
         }
 
