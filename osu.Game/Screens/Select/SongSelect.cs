@@ -625,8 +625,6 @@ namespace osu.Game.Screens.Select
         {
             if (beatmap == null || beatmap.ID <= 0) return;
 
-            if (BeatmapDetails.Leaderboard.Scores == null || !BeatmapDetails.Leaderboard.Scores.Any()) return;
-
             dialogOverlay?.Push(new BeatmapClearScoresDialog(beatmap, () => BeatmapDetails.Leaderboard.RefreshScores()));
         }
 
