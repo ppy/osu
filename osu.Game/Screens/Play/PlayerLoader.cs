@@ -17,6 +17,7 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Screens.Menu;
+using osu.Game.Screens.Play.HUD;
 using osu.Game.Screens.Play.PlayerSettings;
 using osuTK;
 using osuTK.Graphics;
@@ -296,6 +297,15 @@ namespace osu.Game.Screens.Play
             private readonly WorkingBeatmap beatmap;
             private LoadingAnimation loading;
             private Sprite backgroundSprite;
+            private ModDisplay ModDisplay;
+
+            protected virtual ModDisplay CreateModsContainer() => new ModDisplay
+            {
+                Anchor = Anchor.TopCentre,
+                Origin = Anchor.TopCentre,
+                AutoSizeAxes = Axes.Both,
+                Margin = new MarginPadding { Top = 20 },
+            };
 
             public bool Loading
             {
@@ -323,6 +333,8 @@ namespace osu.Game.Screens.Play
             private void load()
             {
                 var metadata = beatmap?.BeatmapInfo?.Metadata ?? new BeatmapMetadata();
+                ModDisplay = CreateModsContainer();
+                ModDisplay.Current.BindTo(beatmap.Mods);
 
                 AutoSizeAxes = Axes.Both;
                 Children = new Drawable[]
@@ -391,6 +403,7 @@ namespace osu.Game.Screens.Play
                                 Origin = Anchor.TopCentre,
                                 Anchor = Anchor.TopCentre,
                             },
+                            ModDisplay
                         },
                     }
                 };
