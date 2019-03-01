@@ -1,0 +1,57 @@
+update_fastlane
+
+default_platform(:ios)
+
+platform :ios do
+  lane :clean_dryrun do
+    clean_testflight_testers(days_of_inactivity:45, dry_run: true)
+  end
+
+  # Specify a custom number for what's "inactive"
+  lane :clean do
+    clean_testflight_testers(days_of_inactivity: 45) # 120 days, so about 4 months
+  end
+
+  lane :update_version do |options|
+    options[:plist_path] = '../osu.iOS/Info.plist'
+    app_version(options)
+  end
+
+  desc 'Deploy to testflight'
+  lane :beta do |options|
+    provision(
+      type: 'appstore'
+    )
+
+    build(
+      build_configuration: 'Release', 
+      build_platform: 'iPhone'
+    )
+
+    pilot(
+      skip_waiting_for_build_processing: true,
+      changelog: "i am woot poot",
+      ipa: './osu.iOS/bin/iPhone/Release/osu.iOS.ipa'
+    )
+  end
+
+  desc 'Compile the project'
+  lane :build do
+    souyuz(
+      platform: "ios",
+      build_target: "osu_iOS",
+      plist_path: "../osu.iOS/Info.plist"
+    )
+  end
+
+  desc 'Install provisioning profiles using match'
+  lane :provision do |options|
+    if Helper.is_ci?
+      # CI should not do stuff in ADP
+      options[:readonly] = true
+    end
+
+    # update provisioning profiles
+    match(options)
+  end
+end
