@@ -625,7 +625,9 @@ namespace osu.Game.Screens.Select
         {
             if (beatmap == null || beatmap.ID <= 0) return;
 
-            dialogOverlay?.Push(new BeatmapClearScoresDialog(beatmap, () => BeatmapDetails.Leaderboard.RefreshScores()));
+            dialogOverlay?.Push(new BeatmapClearScoresDialog(beatmap, () =>
+                // schedule done here rather than inside the dialog as the dialog may fade out and never callback.
+                Schedule(() => BeatmapDetails.Leaderboard.RefreshScores())));
         }
 
         public override bool OnPressed(GlobalAction action)
