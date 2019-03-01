@@ -29,7 +29,7 @@ namespace osu.Game.Screens.Select
                     Action = () =>
                     {
                         Task.Run(() => scoreManager.Delete(scoreManager.QueryScores(s => !s.DeletePending && s.Beatmap.ID == beatmap.ID).ToList()))
-                            .ContinueWith(t => Schedule(onCompletion));
+                            .ContinueWith(_ => onCompletion);
                     }
                 },
                 new PopupDialogCancelButton
