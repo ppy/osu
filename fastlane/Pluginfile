@@ -4,3 +4,4 @@
 
 gem 'fastlane-plugin-clean_testflight_testers'
 gem 'fastlane-plugin-souyuz'
+gem 'fastlane-plugin-xamarin'
