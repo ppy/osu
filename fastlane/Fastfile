@@ -19,6 +19,8 @@ platform :ios do
 
   desc 'Deploy to testflight'
   lane :beta do |options|
+    update_version(options)
+
     provision(
       type: 'appstore'
     )
