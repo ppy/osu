@@ -106,7 +106,7 @@ namespace osu.Game.Rulesets.Osu
                         new MultiMod(new OsuModSuddenDeath(), new OsuModPerfect()),
                         new MultiMod(new OsuModDoubleTime(), new OsuModNightcore()),
                         new OsuModHidden(),
-                        new MultiMod(new OsuModFlashlight(), new OsuModBlinds()),
+                        new OsuModFlashlight(),
                     };
                 case ModType.Conversion:
                     return new Mod[]
@@ -125,7 +125,8 @@ namespace osu.Game.Rulesets.Osu
                     {
                         new OsuModTransform(),
                         new OsuModWiggle(),
-                        new OsuModGrow()
+                        new OsuModGrow(),
+                        new OsuModBlinds(),
                     };
                 default:
                     return new Mod[] { };

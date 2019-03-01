@@ -25,7 +25,7 @@ namespace osu.Game.Rulesets.Osu.Mods
         public override string Acronym => "BL";
 
         public override FontAwesome Icon => FontAwesome.fa_adjust;
-        public override ModType Type => ModType.DifficultyIncrease;
+        public override ModType Type => ModType.Fun;
 
         public override bool Ranked => false;
 
