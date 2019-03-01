@@ -8,20 +8,15 @@ using osu.Game.Overlays.Dialog;
 using osu.Game.Scoring;
 using System;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace osu.Game.Screens.Select
 {
     public class BeatmapClearScoresDialog : PopupDialog
     {
-        private ScoreManager manager;
+        private ScoreManager scoreManager;
 
-        [BackgroundDependencyLoader]
-        private void load(ScoreManager scoreManager)
-        {
-            manager = scoreManager;
-        }
-
-        public BeatmapClearScoresDialog(BeatmapInfo beatmap, Action refresh)
+        public BeatmapClearScoresDialog(BeatmapInfo beatmap, Action onCompletion)
         {
             BodyText = $@"{beatmap.Metadata?.Artist} - {beatmap.Metadata?.Title}";
             Icon = FontAwesome.fa_eraser;
@@ -33,8 +28,8 @@ namespace osu.Game.Screens.Select
                     Text = @"Yes. Please.",
                     Action = () =>
                     {
-                        manager.Delete(manager.QueryScores(s => !s.DeletePending && s.Beatmap.ID == beatmap.ID).ToList());
-                        refresh();
+                        Task.Run(() => scoreManager.Delete(scoreManager.QueryScores(s => !s.DeletePending && s.Beatmap.ID == beatmap.ID).ToList()))
+                            .ContinueWith(t => Schedule(onCompletion));
                     }
                 },
                 new PopupDialogCancelButton
@@ -42,6 +37,12 @@ namespace osu.Game.Screens.Select
                     Text = @"No, I'm still attached.",
                 },
             };
+        }
+
+        [BackgroundDependencyLoader]
+        private void load(ScoreManager scoreManager)
+        {
+            this.scoreManager = scoreManager;
         }
     }
 }
