@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using osu.Framework.Configuration;
 using osu.Framework.Screens;
 using osu.Game.Configuration;
@@ -19,6 +20,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using osu.Framework.Audio;
+using osu.Framework.Bindables;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Input;
 using osu.Framework.Input.Bindings;
@@ -174,15 +176,17 @@ namespace osu.Game
             // bind config int to database RulesetInfo
             configRuleset = LocalConfig.GetBindable<int>(OsuSetting.Ruleset);
             ruleset.Value = RulesetStore.GetRuleset(configRuleset.Value) ?? RulesetStore.AvailableRulesets.First();
-            ruleset.ValueChanged += r => configRuleset.Value = r.ID ?? 0;
+            ruleset.ValueChanged += r => configRuleset.Value = r.NewValue.ID ?? 0;
 
             // bind config int to database SkinInfo
             configSkin = LocalConfig.GetBindable<int>(OsuSetting.Skin);
-            SkinManager.CurrentSkinInfo.ValueChanged += s => configSkin.Value = s.ID;
-            configSkin.ValueChanged += id => SkinManager.CurrentSkinInfo.Value = SkinManager.Query(s => s.ID == id) ?? SkinInfo.Default;
+            SkinManager.CurrentSkinInfo.ValueChanged += skin => configSkin.Value = skin.NewValue.ID;
+            configSkin.ValueChanged += skinId => SkinManager.CurrentSkinInfo.Value = SkinManager.Query(s => s.ID == skinId.NewValue) ?? SkinInfo.Default;
             configSkin.TriggerChange();
 
             LocalConfig.BindWith(OsuSetting.VolumeInactive, inactiveVolumeAdjust);
+
+            IsActive.BindValueChanged(active => updateActiveState(active.NewValue), true);
         }
 
         private ExternalLinkOpener externalLinkOpener;
@@ -337,6 +341,11 @@ namespace osu.Game
         {
             base.LoadComplete();
 
+            // The next time this is updated is in UpdateAfterChildren, which occurs too late and results
+            // in the cursor being shown for a few frames during the intro.
+            // This prevents the cursor from showing until we have a screen with CursorVisible = true
+            MenuCursorContainer.CanShowCursor = menuScreen?.CursorVisible ?? false;
+
             // todo: all archive managers should be able to be looped here.
             SkinManager.PostNotification = n => notifications?.Post(n);
             SkinManager.GetStableStorage = GetStorageForStableInstall;
@@ -474,6 +483,7 @@ namespace osu.Game
                 overlay.StateChanged += state =>
                 {
                     if (state == Visibility.Hidden) return;
+
                     singleDisplaySideOverlays.Where(o => o != overlay).ForEach(o => o.Hide());
                 };
             }
@@ -487,6 +497,7 @@ namespace osu.Game
                 overlay.StateChanged += state =>
                 {
                     if (state == Visibility.Hidden) return;
+
                     informationalOverlays.Where(o => o != overlay).ForEach(o => o.Hide());
                 };
             }
@@ -508,9 +519,9 @@ namespace osu.Game
                 };
             }
 
-            OverlayActivationMode.ValueChanged += v =>
+            OverlayActivationMode.ValueChanged += mode =>
             {
-                if (v != OverlayActivation.All) CloseAllOverlays();
+                if (mode.NewValue != OverlayActivation.All) CloseAllOverlays();
             };
 
             void updateScreenOffset()
@@ -592,8 +603,7 @@ namespace osu.Game
         private void loadComponentSingleFile<T>(T d, Action<T> add)
             where T : Drawable
         {
-            var focused = d as FocusedOverlayContainer;
-            if (focused != null)
+            if (d is FocusedOverlayContainer focused)
             {
                 focused.StateChanged += s =>
                 {
@@ -618,7 +628,25 @@ namespace osu.Game
                     try
                     {
                         Logger.Log($"Loading {d}...", level: LogLevel.Debug);
-                        await LoadComponentAsync(d, add);
+
+                        // Since this is running in a separate thread, it is possible for OsuGame to be disposed after LoadComponentAsync has been called
+                        // throwing an exception. To avoid this, the call is scheduled on the update thread, which does not run if IsDisposed = true
+                        Task task = null;
+                        var del = new ScheduledDelegate(() => task = LoadComponentAsync(d, add));
+                        Scheduler.Add(del);
+
+                        // The delegate won't complete if OsuGame has been disposed in the meantime
+                        while (!IsDisposed && !del.Completed)
+                            await Task.Delay(10);
+
+                        // Either we're disposed or the load process has started successfully
+                        if (IsDisposed)
+                            return;
+
+                        Debug.Assert(task != null);
+
+                        await task;
+
                         Logger.Log($"Loaded {d}!", level: LogLevel.Debug);
                     }
                     catch (OperationCanceledException)
@@ -669,16 +697,12 @@ namespace osu.Game
 
         private readonly BindableDouble inactiveVolumeAdjust = new BindableDouble();
 
-        protected override void OnDeactivated()
+        private void updateActiveState(bool isActive)
         {
-            base.OnDeactivated();
-            Audio.AddAdjustment(AdjustableProperty.Volume, inactiveVolumeAdjust);
-        }
-
-        protected override void OnActivated()
-        {
-            base.OnActivated();
-            Audio.RemoveAdjustment(AdjustableProperty.Volume, inactiveVolumeAdjust);
+            if (isActive)
+                Audio.RemoveAdjustment(AdjustableProperty.Volume, inactiveVolumeAdjust);
+            else
+                Audio.AddAdjustment(AdjustableProperty.Volume, inactiveVolumeAdjust);
         }
 
         public bool OnReleased(GlobalAction action) => false;

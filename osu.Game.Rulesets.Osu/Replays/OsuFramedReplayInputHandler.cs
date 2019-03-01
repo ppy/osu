@@ -11,9 +11,9 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Replays
 {
-    public class OsuReplayInputHandler : FramedReplayInputHandler<OsuReplayFrame>
+    public class OsuFramedReplayInputHandler : FramedReplayInputHandler<OsuReplayFrame>
     {
-        public OsuReplayInputHandler(Replay replay)
+        public OsuFramedReplayInputHandler(Replay replay)
             : base(replay)
         {
         }

@@ -6,6 +6,7 @@ using osu.Game.Graphics.Sprites;
 using System;
 using osu.Framework.Allocation;
 using osu.Framework.Timing;
+using osu.Game.Graphics;
 
 namespace osu.Game.Screens.Edit.Components
 {
@@ -23,8 +24,7 @@ namespace osu.Game.Screens.Edit.Components
                 {
                     Origin = Anchor.BottomLeft,
                     RelativePositionAxes = Axes.Y,
-                    TextSize = 22,
-                    FixedWidth = true,
+                    Font = OsuFont.GetFont(size: 22, fixedWidth: true),
                     Y = 0.5f,
                 }
             };

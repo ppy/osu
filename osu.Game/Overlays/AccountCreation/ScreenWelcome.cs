@@ -5,6 +5,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Screens;
+using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Overlays.Settings;
 using osu.Game.Screens.Menu;
@@ -40,17 +41,16 @@ namespace osu.Game.Overlays.AccountCreation
                     },
                     new OsuSpriteText
                     {
-                        TextSize = 24,
-                        Font = "Exo2.0-Light",
                         Anchor = Anchor.TopCentre,
                         Origin = Anchor.TopCentre,
+                        Font = OsuFont.GetFont(size: 24, weight: FontWeight.Light),
                         Text = "New Player Registration",
                     },
                     new OsuSpriteText
                     {
-                        TextSize = 12,
                         Anchor = Anchor.TopCentre,
                         Origin = Anchor.TopCentre,
+                        Font = OsuFont.GetFont(size: 12),
                         Text = "let's get you started",
                     },
                     new SettingsButton

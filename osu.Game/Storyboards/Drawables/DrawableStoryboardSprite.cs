@@ -3,7 +3,7 @@
 
 using osuTK;
 using osu.Framework.Allocation;
-using osu.Framework.Configuration;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;

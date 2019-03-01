@@ -40,6 +40,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
             {
                 if (path.AccentColour == value)
                     return;
+
                 path.AccentColour = value;
 
                 container.ForceRedraw();
@@ -56,6 +57,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
             {
                 if (path.BorderColour == value)
                     return;
+
                 path.BorderColour = value;
 
                 container.ForceRedraw();
@@ -105,6 +107,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
                 {
                     if (borderColour == value)
                         return;
+
                     borderColour = value;
 
                     InvalidateTexture();
@@ -120,6 +123,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
                 {
                     if (accentColour == value)
                         return;
+
                     accentColour = value;
 
                     InvalidateTexture();

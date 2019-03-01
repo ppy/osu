@@ -16,7 +16,7 @@ namespace osu.Game.Screens.Multi.Components
 
             InternalChild = sprite = CreateBackgroundSprite();
 
-            CurrentItem.BindValueChanged(i => sprite.Beatmap.Value = i?.Beatmap, true);
+            CurrentItem.BindValueChanged(item => sprite.Beatmap.Value = item.NewValue?.Beatmap, true);
         }
 
         protected virtual UpdateableBeatmapBackgroundSprite CreateBackgroundSprite() => new UpdateableBeatmapBackgroundSprite { RelativeSizeAxes = Axes.Both };

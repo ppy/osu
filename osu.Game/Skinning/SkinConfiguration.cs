@@ -23,6 +23,8 @@ namespace osu.Game.Skinning
 
         public string HitCircleFont { get; set; } = "default";
 
+        public int HitCircleOverlap { get; set; }
+
         public bool? CursorExpand { get; set; } = true;
     }
 }

@@ -5,7 +5,7 @@ using System;
 using System.Collections.Generic;
 using NUnit.Framework;
 using osu.Framework.Allocation;
-using osu.Framework.Configuration;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Beatmaps;
@@ -52,16 +52,16 @@ namespace osu.Game.Tests.Visual
                 Room.Playlist.Clear();
             });
 
-            AddAssert("button disabled", () => !settings.ApplyButton.Enabled);
+            AddAssert("button disabled", () => !settings.ApplyButton.Enabled.Value);
 
             AddStep("set name", () => Room.Name.Value = "Room name");
-            AddAssert("button disabled", () => !settings.ApplyButton.Enabled);
+            AddAssert("button disabled", () => !settings.ApplyButton.Enabled.Value);
 
             AddStep("set beatmap", () => Room.Playlist.Add(new PlaylistItem { Beatmap = new DummyWorkingBeatmap().BeatmapInfo }));
-            AddAssert("button enabled", () => settings.ApplyButton.Enabled);
+            AddAssert("button enabled", () => settings.ApplyButton.Enabled.Value);
 
             AddStep("clear name", () => Room.Name.Value = "");
-            AddAssert("button disabled", () => !settings.ApplyButton.Enabled);
+            AddAssert("button disabled", () => !settings.ApplyButton.Enabled.Value);
         }
 
         [Test]

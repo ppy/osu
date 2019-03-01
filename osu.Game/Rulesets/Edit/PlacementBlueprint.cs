@@ -4,7 +4,7 @@
 using System;
 using osu.Framework;
 using osu.Framework.Allocation;
-using osu.Framework.Configuration;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input.Events;
@@ -75,6 +75,7 @@ namespace osu.Game.Rulesets.Edit
             {
                 if (state == value)
                     return;
+
                 state = value;
 
                 if (state == PlacementState.Shown)

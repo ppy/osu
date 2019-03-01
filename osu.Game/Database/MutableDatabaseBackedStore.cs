@@ -71,6 +71,7 @@ namespace osu.Game.Database
                 Refresh(ref item);
 
                 if (item.DeletePending) return false;
+
                 item.DeletePending = true;
             }
 
@@ -89,6 +90,7 @@ namespace osu.Game.Database
                 Refresh(ref item, ConsumableItems);
 
                 if (!item.DeletePending) return false;
+
                 item.DeletePending = false;
             }
 

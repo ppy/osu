@@ -3,7 +3,6 @@
 
 using osuTK;
 using osuTK.Graphics;
-using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Batches;
 using osu.Framework.Graphics.Colour;
@@ -15,6 +14,7 @@ using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using System;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 
 namespace osu.Game.Screens.Menu
 {
@@ -156,7 +156,9 @@ namespace osu.Game.Screens.Menu
         {
             public Shader Shader;
             public Texture Texture;
+
             public VisualiserSharedData Shared;
+
             //Asuming the logo is a circle, we don't need a second dimension.
             public float Size;
 
@@ -213,6 +215,7 @@ namespace osu.Game.Screens.Menu
                         }
                     }
                 }
+
                 Shader.Unbind();
             }
         }

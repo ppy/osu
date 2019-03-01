@@ -46,9 +46,9 @@ namespace osu.Game.Screens.Multi.Components
                 },
             };
 
-            CurrentItem.BindValueChanged(updateBeatmap, true);
+            CurrentItem.BindValueChanged(item => updateBeatmap(item.NewValue), true);
 
-            Type.BindValueChanged(v => gameTypeContainer.Child = new DrawableGameType(v) { Size = new Vector2(height) }, true);
+            Type.BindValueChanged(type => gameTypeContainer.Child = new DrawableGameType(type.NewValue) { Size = new Vector2(height) }, true);
         }
 
         private void updateBeatmap(PlaylistItem item)

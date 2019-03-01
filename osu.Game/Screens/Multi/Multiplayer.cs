@@ -3,7 +3,7 @@
 
 using System;
 using osu.Framework.Allocation;
-using osu.Framework.Configuration;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -45,7 +45,7 @@ namespace osu.Game.Screens.Multi
         private readonly Bindable<Room> currentRoom = new Bindable<Room>();
 
         [Cached]
-        private readonly Bindable<FilterCriteria> currentFilter = new Bindable<FilterCriteria>();
+        private readonly Bindable<FilterCriteria> currentFilter = new Bindable<FilterCriteria>(new FilterCriteria());
 
         [Cached(Type = typeof(IRoomManager))]
         private RoomManager roomManager;
@@ -135,7 +135,7 @@ namespace osu.Game.Screens.Multi
         protected override void LoadComplete()
         {
             base.LoadComplete();
-            isIdle.BindValueChanged(updatePollingRate, true);
+            isIdle.BindValueChanged(idle => updatePollingRate(idle.NewValue), true);
         }
 
         protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
