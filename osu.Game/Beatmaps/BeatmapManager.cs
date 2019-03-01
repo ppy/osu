@@ -206,7 +206,17 @@ namespace osu.Game.Beatmaps
             PostNotification?.Invoke(downloadNotification);
 
             // don't run in the main api queue as this is a long-running task.
-            Task.Factory.StartNew(() => request.Perform(api), TaskCreationOptions.LongRunning);
+            Task.Factory.StartNew(() =>
+            {
+                try
+                {
+                    request.Perform(api);
+                }
+                catch (Exception e)
+                {
+                    // no need to handle here as exceptions will filter down to request.Failure above.
+                }
+            }, TaskCreationOptions.LongRunning);
             BeatmapDownloadBegan?.Invoke(request);
             return true;
         }

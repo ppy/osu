@@ -57,7 +57,7 @@ namespace osu.Game.Screens.Menu
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
                     AutoSizeAxes = Axes.Both,
-                    Children = new []
+                    Children = new[]
                     {
                         lineTopLeft = new Box
                         {
@@ -102,9 +102,8 @@ namespace osu.Game.Screens.Menu
                     Origin = Anchor.Centre,
                     Text = "welcome",
                     Padding = new MarginPadding { Bottom = 10 },
-                    Font = @"Exo2.0-Light",
+                    Font = OsuFont.GetFont(weight: FontWeight.Light, size: 42),
                     Alpha = 0,
-                    TextSize = 42,
                     Spacing = new Vector2(5),
                 },
                 new CircularContainer

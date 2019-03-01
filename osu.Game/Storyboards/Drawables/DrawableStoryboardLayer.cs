@@ -7,7 +7,7 @@ using osu.Framework.Graphics.Containers;
 
 namespace osu.Game.Storyboards.Drawables
 {
-    public class DrawableStoryboardLayer : Container
+    public class DrawableStoryboardLayer : LifetimeManagementContainer
     {
         public StoryboardLayer Layer { get; private set; }
         public bool Enabled;
@@ -29,7 +29,7 @@ namespace osu.Game.Storyboards.Drawables
             foreach (var element in Layer.Elements)
             {
                 if (element.IsDrawable)
-                    Add(element.CreateDrawable());
+                    AddInternal(element.CreateDrawable());
             }
         }
     }

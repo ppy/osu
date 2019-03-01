@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using osu.Framework.Bindables;
 using osu.Framework.Caching;
 using osu.Framework.Graphics;
 using osu.Game.Rulesets.Mania.Objects;
@@ -51,7 +52,7 @@ namespace osu.Game.Rulesets.Mania.Mods
                 }
             }
 
-            protected override void OnComboChange(int newCombo)
+            protected override void OnComboChange(ValueChangedEvent<int> e)
             {
             }
 
