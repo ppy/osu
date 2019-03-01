@@ -7,13 +7,9 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
-using osu.Framework.Logging;
-using osu.Framework.Screens;
 using osu.Framework.Timing;
 using osu.Game.Beatmaps;
 using osu.Game.Overlays;
-using osu.Game.Screens;
-using osu.Game.Screens.Backgrounds;
 using osu.Game.Storyboards.Drawables;
 using osuTK.Graphics;
 
@@ -22,7 +18,7 @@ namespace osu.Game.Tests.Visual
     [TestFixture]
     public class TestCaseStoryboard : OsuTestCase
     {
-        private Container storyboardContainer;
+        private readonly Container storyboardContainer;
         private DrawableStoryboard storyboard;
 
         public TestCaseStoryboard()
