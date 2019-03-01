@@ -34,10 +34,11 @@ namespace osu.Game.Screens.Play.PlayerSettings
 
         public bool Expanded
         {
-            get { return expanded; }
+            get => expanded;
             set
             {
                 if (expanded == value) return;
+
                 expanded = value;
 
                 content.ClearTransforms();

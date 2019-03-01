@@ -22,8 +22,8 @@ namespace osu.Game.Rulesets.UI
 
         public FontAwesome Icon
         {
-            get { return modIcon.Icon; }
-            set { modIcon.Icon = value; }
+            get => modIcon.Icon;
+            set => modIcon.Icon = value;
         }
 
         private readonly ModType type;
@@ -100,7 +100,7 @@ namespace osu.Game.Rulesets.UI
 
         public bool Highlighted
         {
-            get { return highlighted; }
+            get => highlighted;
 
             set
             {

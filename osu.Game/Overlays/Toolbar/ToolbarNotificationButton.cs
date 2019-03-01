@@ -66,7 +66,7 @@ namespace osu.Game.Overlays.Toolbar
 
             public int Count
             {
-                get { return count; }
+                get => count;
                 set
                 {
                     if (count == value)

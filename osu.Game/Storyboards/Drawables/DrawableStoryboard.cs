@@ -27,10 +27,11 @@ namespace osu.Game.Storyboards.Drawables
         /// </summary>
         public bool Passing
         {
-            get { return passing; }
+            get => passing;
             set
             {
                 if (passing == value) return;
+
                 passing = value;
                 updateLayerVisibility();
             }
@@ -39,6 +40,7 @@ namespace osu.Game.Storyboards.Drawables
         public override bool RemoveCompletedTransforms => false;
 
         private DependencyContainer dependencies;
+
         protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent) =>
             dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
 

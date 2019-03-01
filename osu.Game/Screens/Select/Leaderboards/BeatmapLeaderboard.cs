@@ -23,7 +23,7 @@ namespace osu.Game.Screens.Select.Leaderboards
 
         public BeatmapInfo Beatmap
         {
-            get { return beatmap; }
+            get => beatmap;
             set
             {
                 if (beatmap == value)

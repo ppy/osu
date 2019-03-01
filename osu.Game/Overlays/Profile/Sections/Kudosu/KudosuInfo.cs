@@ -78,7 +78,7 @@ namespace osu.Game.Overlays.Profile.Sections.Kudosu
 
             public new int Count
             {
-                set { valueText.Text = value.ToString(); }
+                set => valueText.Text = value.ToString();
             }
 
             public CountSection(string header, string description)

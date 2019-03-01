@@ -175,6 +175,7 @@ namespace osu.Game.Screens.Edit.Components.Menus
                 {
                     if (Item is EditorMenuItemSpacer)
                         return true;
+
                     return base.OnHover(e);
                 }
 
@@ -182,6 +183,7 @@ namespace osu.Game.Screens.Edit.Components.Menus
                 {
                     if (Item is EditorMenuItemSpacer)
                         return true;
+
                     return base.OnClick(e);
                 }
             }

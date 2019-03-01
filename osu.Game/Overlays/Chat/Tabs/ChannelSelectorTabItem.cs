@@ -13,7 +13,8 @@ namespace osu.Game.Overlays.Chat.Tabs
 
         public override bool IsSwitchable => false;
 
-        public ChannelSelectorTabItem(Channel value) : base(value)
+        public ChannelSelectorTabItem(Channel value)
+            : base(value)
         {
             Depth = float.MaxValue;
             Width = 45;

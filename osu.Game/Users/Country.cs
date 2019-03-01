@@ -33,9 +33,10 @@ namespace osu.Game.Users
         private TextureStore textures;
 
         private Country country;
+
         public Country Country
         {
-            get { return country; }
+            get => country;
             set
             {
                 if (value == country)

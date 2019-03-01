@@ -34,8 +34,8 @@ namespace osu.Game.Users
         [JsonProperty(@"cover_url")]
         public string CoverUrl
         {
-            get { return Cover?.Url; }
-            set { Cover = new UserCover { Url = value }; }
+            get => Cover?.Url;
+            set => Cover = new UserCover { Url = value };
         }
 
         [JsonProperty(@"cover")]
