@@ -29,8 +29,15 @@ namespace osu.Game.Screens.Play
 
         public IClock AudioClock;
 
-        public double StartTime { set { startTime = value; } }
-        public double EndTime { set { endTime = value; } }
+        public double StartTime
+        {
+            set => startTime = value;
+        }
+
+        public double EndTime
+        {
+            set => endTime = value;
+        }
 
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)

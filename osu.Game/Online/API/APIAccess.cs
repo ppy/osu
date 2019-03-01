@@ -176,6 +176,7 @@ namespace osu.Game.Online.API
                     lock (queue)
                     {
                         if (queue.Count == 0) break;
+
                         req = queue.Dequeue();
                     }
 
@@ -260,7 +261,7 @@ namespace osu.Game.Online.API
 
         public APIState State
         {
-            get { return state; }
+            get => state;
             private set
             {
                 APIState oldState = state;

@@ -18,7 +18,7 @@ namespace osu.Game.Rulesets.Osu.Tests
     {
         private GameplayCursor cursor;
 
-        public override IReadOnlyList<Type> RequiredTypes => new [] { typeof(CursorTrail) };
+        public override IReadOnlyList<Type> RequiredTypes => new[] { typeof(CursorTrail) };
 
         public CursorContainer Cursor => cursor;
 

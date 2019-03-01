@@ -21,10 +21,11 @@ namespace osu.Game.Overlays.BeatmapSet
 
         public BeatmapSetInfo BeatmapSet
         {
-            get { return beatmapSet; }
+            get => beatmapSet;
             set
             {
                 if (value == beatmapSet) return;
+
                 beatmapSet = value;
 
                 updateDisplay();
@@ -35,10 +36,11 @@ namespace osu.Game.Overlays.BeatmapSet
 
         public BeatmapInfo Beatmap
         {
-            get { return beatmap; }
+            get => beatmap;
             set
             {
                 if (value == beatmap) return;
+
                 beatmap = value;
 
                 updateDisplay();
@@ -95,8 +97,8 @@ namespace osu.Game.Overlays.BeatmapSet
 
             public string Value
             {
-                get { return value.Text; }
-                set { this.value.Text = value; }
+                get => value.Text;
+                set => this.value.Text = value;
             }
 
             public Statistic(FontAwesome icon, string name)

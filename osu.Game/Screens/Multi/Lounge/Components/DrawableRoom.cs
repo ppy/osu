@@ -43,12 +43,14 @@ namespace osu.Game.Screens.Multi.Lounge.Components
         public readonly Room Room;
 
         private SelectionState state;
+
         public SelectionState State
         {
-            get { return state; }
+            get => state;
             set
             {
                 if (value == state) return;
+
                 state = value;
 
                 if (state == SelectionState.Selected)
@@ -63,9 +65,10 @@ namespace osu.Game.Screens.Multi.Lounge.Components
         public IEnumerable<string> FilterTerms => new[] { Room.Name.Value };
 
         private bool matchingFilter;
+
         public bool MatchingFilter
         {
-            get { return matchingFilter; }
+            get => matchingFilter;
             set
             {
                 matchingFilter = value;
