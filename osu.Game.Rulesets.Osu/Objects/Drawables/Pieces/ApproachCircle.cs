@@ -12,6 +12,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
 {
     public class ApproachCircle : Container
     {
+        public override bool RemoveWhenNotAlive => false;
+
         public ApproachCircle()
         {
             Anchor = Anchor.Centre;

@@ -5,7 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
-using osu.Framework.Configuration;
+using osu.Framework.Bindables;
 using osu.Framework.Extensions.TypeExtensions;
 using osu.Framework.Graphics.Primitives;
 using osu.Game.Audio;
@@ -124,14 +124,14 @@ namespace osu.Game.Rulesets.Objects.Drawables
         {
             base.LoadComplete();
 
-            State.ValueChanged += state =>
+            State.ValueChanged += armed =>
             {
-                UpdateState(state);
+                UpdateState(armed.NewValue);
 
                 // apply any custom state overrides
-                ApplyCustomUpdateState?.Invoke(this, state);
+                ApplyCustomUpdateState?.Invoke(this, armed.NewValue);
 
-                if (State == ArmedState.Hit)
+                if (armed.NewValue == ArmedState.Hit)
                     PlaySamples();
             };
 
@@ -218,6 +218,16 @@ namespace osu.Game.Rulesets.Objects.Drawables
             }
 
             OnNewResult?.Invoke(this, Result);
+        }
+
+        /// <summary>
+        /// Will called at least once after the <see cref="LifetimeEnd"/> of this <see cref="DrawableHitObject"/> has been passed.
+        /// </summary>
+        internal void OnLifetimeEnd()
+        {
+            foreach (var nested in NestedHitObjects)
+                nested.OnLifetimeEnd();
+            UpdateResult(false);
         }
 
         /// <summary>

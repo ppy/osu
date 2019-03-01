@@ -12,7 +12,8 @@ namespace osu.Game.Graphics.Containers
 {
     public class OsuTextFlowContainer : TextFlowContainer
     {
-        public OsuTextFlowContainer(Action<SpriteText> defaultCreationParameters = null) : base(defaultCreationParameters)
+        public OsuTextFlowContainer(Action<SpriteText> defaultCreationParameters = null)
+            : base(defaultCreationParameters)
         {
         }
 
