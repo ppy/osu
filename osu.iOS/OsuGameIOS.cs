@@ -9,6 +9,6 @@ namespace osu.iOS
 {
     public class OsuGameIOS : OsuGame
     {
-        protected override Version AssemblyVersion => new Version(NSBundle.MainBundle.InfoDictionary["CFBundleVersion"].ToString());
+        public override Version AssemblyVersion => new Version(NSBundle.MainBundle.InfoDictionary["CFBundleVersion"].ToString());
     }
 }
