@@ -16,14 +16,14 @@ or alternatively using `brew cask install fastlane`
 
 # Available Actions
 ## iOS
-### ios clean_dryrun
+### ios testflight_prune_dry
 ```
-fastlane ios clean_dryrun
+fastlane ios testflight_prune_dry
 ```
 
-### ios clean
+### ios testflight_prune
 ```
-fastlane ios clean
+fastlane ios testflight_prune
 ```
 
 ### ios update_version
