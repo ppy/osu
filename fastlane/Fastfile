@@ -3,12 +3,12 @@ update_fastlane
 default_platform(:ios)
 
 platform :ios do
-  lane :clean_dryrun do
+  lane :testflight_prune_dry do
     clean_testflight_testers(days_of_inactivity:45, dry_run: true)
   end
 
   # Specify a custom number for what's "inactive"
-  lane :clean do
+  lane :testflight_prune do
     clean_testflight_testers(days_of_inactivity: 45) # 120 days, so about 4 months
   end
 
@@ -57,11 +57,9 @@ platform :ios do
   desc 'Install provisioning profiles using match'
   lane :provision do |options|
     if Helper.is_ci?
-      # CI should not do stuff in ADP
       options[:readonly] = true
     end
 
-    # update provisioning profiles
     match(options)
   end
 end
