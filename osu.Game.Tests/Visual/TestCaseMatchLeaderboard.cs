@@ -1,23 +1,24 @@
-// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
 using Newtonsoft.Json;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Game.Online.API;
-using osu.Game.Online.Multiplayer;
 using osu.Game.Screens.Multi.Match.Components;
 using osu.Game.Users;
 using osuTK;
 
 namespace osu.Game.Tests.Visual
 {
-    public class TestCaseMatchLeaderboard : OsuTestCase
+    public class TestCaseMatchLeaderboard : MultiplayerTestCase
     {
         public TestCaseMatchLeaderboard()
         {
-            Add(new MatchLeaderboard(new Room { RoomID = { Value = 3 } })
+            Room.RoomID.Value = 3;
+
+            Add(new MatchLeaderboard
             {
                 Origin = Anchor.Centre,
                 Anchor = Anchor.Centre,

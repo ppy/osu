@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using NUnit.Framework;
 using osu.Framework.Graphics;
@@ -61,10 +61,10 @@ namespace osu.Game.Tests.Visual
 
             // Move box along a square trajectory
             container.Loop(c => c
-                .MoveTo(new Vector2(0, 100), duration).Then()
-                .MoveTo(new Vector2(100, 100), duration).Then()
-                .MoveTo(new Vector2(100, 0), duration).Then()
-                .MoveTo(Vector2.Zero, duration)
+                                .MoveTo(new Vector2(0, 100), duration).Then()
+                                .MoveTo(new Vector2(100, 100), duration).Then()
+                                .MoveTo(new Vector2(100, 0), duration).Then()
+                                .MoveTo(Vector2.Zero, duration)
             );
         }
 

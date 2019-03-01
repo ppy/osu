@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
@@ -38,7 +38,7 @@ namespace osu.Game.Screens.Play.PlayerSettings
                 },
                 showStoryboardToggle = new PlayerCheckbox { LabelText = "Storyboards" },
                 beatmapSkinsToggle = new PlayerCheckbox { LabelText = "Beatmap skins" },
-                beatmapHitsoundsToggle = new PlayerCheckbox { LabelText = "Beatmap hit sounds" }
+                beatmapHitsoundsToggle = new PlayerCheckbox { LabelText = "Beatmap hitsounds" }
             };
         }
 

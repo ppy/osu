@@ -1,12 +1,12 @@
-// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using Newtonsoft.Json;
-using osu.Framework.Configuration;
+using osu.Framework.Bindables;
 using osu.Framework.Lists;
 using osu.Game.Users;
 
@@ -40,7 +40,6 @@ namespace osu.Game.Online.Chat
         /// Contains all the messages that are still pending for submission to the server.
         /// </summary>
         private readonly List<LocalEchoMessage> pendingMessages = new List<LocalEchoMessage>();
-
 
         /// <summary>
         /// An event that fires when new messages arrived.

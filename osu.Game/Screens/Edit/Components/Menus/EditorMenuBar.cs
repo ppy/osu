@@ -1,8 +1,8 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
-using osu.Framework.Configuration;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -110,7 +110,8 @@ namespace osu.Game.Screens.Edit.Components.Menus
             {
                 public TextContainer()
                 {
-                    NormalText.TextSize = BoldText.TextSize = 14;
+                    NormalText.Font = NormalText.Font.With(size: 14);
+                    BoldText.Font = BoldText.Font.With(size: 14);
                     NormalText.Margin = BoldText.Margin = new MarginPadding { Horizontal = 10, Vertical = MARGIN_VERTICAL };
                 }
             }
@@ -174,6 +175,7 @@ namespace osu.Game.Screens.Edit.Components.Menus
                 {
                     if (Item is EditorMenuItemSpacer)
                         return true;
+
                     return base.OnHover(e);
                 }
 
@@ -181,6 +183,7 @@ namespace osu.Game.Screens.Edit.Components.Menus
                 {
                     if (Item is EditorMenuItemSpacer)
                         return true;
+
                     return base.OnClick(e);
                 }
             }

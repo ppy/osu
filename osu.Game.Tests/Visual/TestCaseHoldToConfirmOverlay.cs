@@ -1,9 +1,10 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using System.Collections.Generic;
 using osu.Framework.Graphics;
+using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Screens.Menu;
 
@@ -22,7 +23,7 @@ namespace osu.Game.Tests.Visual
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
                 Text = "Fired!",
-                TextSize = 50,
+                Font = OsuFont.GetFont(size: 50),
                 Alpha = 0,
             };
 

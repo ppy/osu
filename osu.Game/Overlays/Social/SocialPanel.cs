@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using osuTK;
 using osuTK.Graphics;
@@ -15,7 +15,8 @@ namespace osu.Game.Overlays.Social
     {
         private const double hover_transition_time = 400;
 
-        public SocialPanel(User user) : base(user)
+        public SocialPanel(User user)
+            : base(user)
         {
         }
 

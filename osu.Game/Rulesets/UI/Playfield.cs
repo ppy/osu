@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using System.Collections.Generic;
@@ -7,8 +7,8 @@ using System.Linq;
 using osu.Framework.Graphics;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Extensions.IEnumerableExtensions;
-using osu.Framework.Configuration;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Mods;
@@ -60,7 +60,7 @@ namespace osu.Game.Rulesets.UI
         private WorkingBeatmap beatmap;
 
         [BackgroundDependencyLoader]
-        private void load(IBindableBeatmap beatmap)
+        private void load(IBindable<WorkingBeatmap> beatmap)
         {
             this.beatmap = beatmap.Value;
         }

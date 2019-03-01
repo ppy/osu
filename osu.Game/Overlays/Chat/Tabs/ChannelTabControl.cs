@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.UserInterface;
@@ -7,9 +7,9 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.Chat;
 using osuTK;
-using osu.Framework.Configuration;
 using System;
 using System.Linq;
+using osu.Framework.Bindables;
 
 namespace osu.Game.Overlays.Chat.Tabs
 {
@@ -110,7 +110,7 @@ namespace osu.Game.Overlays.Chat.Tabs
             if (tab == SelectedTab && totalTabs > 1)
                 // Select the tab after tab-to-be-removed's index, or the tab before if current == last
                 SelectTab(TabContainer[currentIndex == totalTabs ? currentIndex - 1 : currentIndex + 1]);
-            else if (totalTabs == 1 && !selectorTab.Active)
+            else if (totalTabs == 1 && !selectorTab.Active.Value)
                 // Open channel selection overlay if all channel tabs will be closed after removing this tab
                 SelectTab(selectorTab);
 

@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System.Linq;
 using osu.Framework.Allocation;
@@ -15,6 +15,8 @@ namespace osu.Game.Screens.Select
         private bool removeAutoModOnResume;
         private OsuScreen player;
 
+        public override bool AllowExternalScreenChange => true;
+
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
@@ -25,7 +27,7 @@ namespace osu.Game.Screens.Select
             }, Key.Number3);
         }
 
-        protected override void OnResuming(Screen last)
+        public override void OnResuming(IScreen last)
         {
             player = null;
 
@@ -58,13 +60,12 @@ namespace osu.Game.Screens.Select
             }
 
             Beatmap.Value.Track.Looping = false;
-            Beatmap.Disabled = true;
 
             SampleConfirm?.Play();
 
             LoadComponentAsync(player = new PlayerLoader(() => new Player()), l =>
             {
-                if (IsCurrentScreen) Push(player);
+                if (this.IsCurrentScreen()) this.Push(player);
             });
 
             return true;

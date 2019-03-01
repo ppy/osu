@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using osuTK;
 using osu.Framework.Allocation;
@@ -20,12 +20,14 @@ namespace osu.Game.Storyboards.Drawables
         protected override Vector2 DrawScale => new Vector2(Parent.DrawHeight / 480);
 
         private bool passing = true;
+
         public bool Passing
         {
-            get { return passing; }
+            get => passing;
             set
             {
                 if (passing == value) return;
+
                 passing = value;
                 updateLayerVisibility();
             }
@@ -34,6 +36,7 @@ namespace osu.Game.Storyboards.Drawables
         public override bool RemoveCompletedTransforms => false;
 
         private DependencyContainer dependencies;
+
         protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent) =>
             dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
 

@@ -1,9 +1,10 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System.IO;
 using osu.Framework.Allocation;
 using osu.Framework.Audio.Sample;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Game.Beatmaps;
 
@@ -28,7 +29,7 @@ namespace osu.Game.Storyboards.Drawables
         }
 
         [BackgroundDependencyLoader]
-        private void load(IBindableBeatmap beatmap)
+        private void load(IBindable<WorkingBeatmap> beatmap)
         {
             // Try first with the full name, then attempt with no path
             channel = beatmap.Value.Skin.GetSample(sample.Path) ?? beatmap.Value.Skin.GetSample(Path.ChangeExtension(sample.Path, null));

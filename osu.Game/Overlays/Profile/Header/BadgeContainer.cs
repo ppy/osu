@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using osu.Framework.Allocation;
@@ -53,11 +53,10 @@ namespace osu.Game.Overlays.Profile.Header
                         {
                             badgeCountText = new OsuSpriteText
                             {
-                                Alpha = 0,
-                                TextSize = 12,
                                 Anchor = Anchor.BottomCentre,
                                 Origin = Anchor.BottomCentre,
-                                Font = "Exo2.0-Regular"
+                                Alpha = 0,
+                                Font = OsuFont.GetFont(size: 12, weight: FontWeight.Regular)
                             },
                             new Container
                             {

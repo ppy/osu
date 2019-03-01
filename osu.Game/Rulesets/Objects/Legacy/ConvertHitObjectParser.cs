@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using osuTK;
 using osu.Game.Rulesets.Objects.Types;
@@ -123,7 +123,6 @@ namespace osu.Game.Rulesets.Objects.Legacy
 
                     // osu-stable treated the first span of the slider as a repeat, but no repeats are happening
                     repeatCount = Math.Max(0, repeatCount - 1);
-
 
                     if (split.Length > 7)
                         length = Convert.ToDouble(split[7], CultureInfo.InvariantCulture);

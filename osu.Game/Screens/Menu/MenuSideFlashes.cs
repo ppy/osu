@@ -1,10 +1,9 @@
-// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using osuTK.Graphics;
 using osu.Framework.Allocation;
 using osu.Framework.Audio.Track;
-using osu.Framework.Configuration;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
@@ -14,6 +13,7 @@ using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using System;
+using osu.Framework.Bindables;
 
 namespace osu.Game.Screens.Menu
 {
@@ -42,7 +42,7 @@ namespace osu.Game.Screens.Menu
         }
 
         [BackgroundDependencyLoader]
-        private void load(IBindableBeatmap beatmap, OsuColour colours)
+        private void load(IBindable<WorkingBeatmap> beatmap, OsuColour colours)
         {
             this.beatmap.BindTo(beatmap);
 

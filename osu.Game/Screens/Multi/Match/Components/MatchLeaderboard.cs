@@ -1,9 +1,10 @@
-// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using System.Collections.Generic;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Game.Online.API.Requests.Responses;
@@ -16,19 +17,15 @@ namespace osu.Game.Screens.Multi.Match.Components
     {
         public Action<IEnumerable<APIRoomScoreInfo>> ScoresLoaded;
 
-        private readonly Room room;
-
-        public MatchLeaderboard(Room room)
-        {
-            this.room = room;
-        }
+        [Resolved(typeof(Room), nameof(Room.RoomID))]
+        private Bindable<int?> roomId { get; set; }
 
         [BackgroundDependencyLoader]
         private void load()
         {
-            room.RoomID.BindValueChanged(id =>
+            roomId.BindValueChanged(id =>
             {
-                if (id == null)
+                if (id.NewValue == null)
                     return;
 
                 Scores = null;
@@ -38,10 +35,10 @@ namespace osu.Game.Screens.Multi.Match.Components
 
         protected override APIRequest FetchScores(Action<IEnumerable<APIRoomScoreInfo>> scoresCallback)
         {
-            if (room.RoomID == null)
+            if (roomId.Value == null)
                 return null;
 
-            var req = new GetRoomScoresRequest(room.RoomID.Value ?? 0);
+            var req = new GetRoomScoresRequest(roomId.Value ?? 0);
 
             req.Success += r =>
             {

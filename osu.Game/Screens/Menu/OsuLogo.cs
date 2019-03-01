@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using osu.Framework.Allocation;
@@ -62,7 +62,7 @@ namespace osu.Game.Screens.Menu
 
         public bool Triangles
         {
-            set { colourAndTriangles.FadeTo(value ? 1 : 0, transition_length, Easing.OutQuint); }
+            set => colourAndTriangles.FadeTo(value ? 1 : 0, transition_length, Easing.OutQuint);
         }
 
         public bool BeatMatching = true;
@@ -71,8 +71,8 @@ namespace osu.Game.Screens.Menu
 
         public bool Ripple
         {
-            get { return rippleContainer.Alpha > 0; }
-            set { rippleContainer.FadeTo(value ? 1 : 0, transition_length, Easing.OutQuint); }
+            get => rippleContainer.Alpha > 0;
+            set => rippleContainer.FadeTo(value ? 1 : 0, transition_length, Easing.OutQuint);
         }
 
         private readonly Box flashLayer;

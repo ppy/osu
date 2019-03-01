@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using System.Collections.Generic;
@@ -16,7 +16,7 @@ using osu.Game.Users;
 namespace osu.Game.Tests.Visual
 {
     [TestFixture]
-    public class TestCaseResults : OsuTestCase
+    public class TestCaseResults : ScreenTestCase
     {
         private BeatmapManager beatmaps;
 
@@ -43,7 +43,7 @@ namespace osu.Game.Tests.Visual
             if (beatmapInfo != null)
                 Beatmap.Value = beatmaps.GetWorkingBeatmap(beatmapInfo);
 
-            Add(new SoloResults(new ScoreInfo
+            LoadScreen(new SoloResults(new ScoreInfo
             {
                 TotalScore = 2845370,
                 Accuracy = 0.98,

@@ -1,9 +1,9 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using osu.Framework.Allocation;
-using osu.Framework.Configuration;
+using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
@@ -69,10 +69,10 @@ namespace osu.Game.Overlays.Volume
                 }
             });
 
-            Current.ValueChanged += newValue =>
+            Current.ValueChanged += muted =>
             {
-                icon.Icon = newValue ? FontAwesome.fa_volume_off : FontAwesome.fa_volume_up;
-                icon.Margin = new MarginPadding { Left = newValue ? width / 2 - 15 : width / 2 - 10 }; //Magic numbers to line up both icons because they're different widths
+                icon.Icon = muted.NewValue ? FontAwesome.fa_volume_off : FontAwesome.fa_volume_up;
+                icon.Margin = new MarginPadding { Left = muted.NewValue ? width / 2 - 15 : width / 2 - 10 }; //Magic numbers to line up both icons because they're different widths
             };
             Current.TriggerChange();
         }

@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using osu.Framework.Allocation;
@@ -21,10 +21,11 @@ namespace osu.Game.Overlays.BeatmapSet
 
         public BeatmapSetInfo BeatmapSet
         {
-            get { return beatmapSet; }
+            get => beatmapSet;
             set
             {
                 if (value == beatmapSet) return;
+
                 beatmapSet = value;
 
                 updateDisplay();
@@ -35,10 +36,11 @@ namespace osu.Game.Overlays.BeatmapSet
 
         public BeatmapInfo Beatmap
         {
-            get { return beatmap; }
+            get => beatmap;
             set
             {
                 if (value == beatmap) return;
+
                 beatmap = value;
 
                 updateDisplay();
@@ -95,8 +97,8 @@ namespace osu.Game.Overlays.BeatmapSet
 
             public string Value
             {
-                get { return value.Text; }
-                set { this.value.Text = value; }
+                get => value.Text;
+                set => this.value.Text = value;
             }
 
             public Statistic(FontAwesome icon, string name)
@@ -136,9 +138,8 @@ namespace osu.Game.Overlays.BeatmapSet
                             {
                                 Anchor = Anchor.CentreLeft,
                                 Origin = Anchor.CentreLeft,
-                                TextSize = 13,
-                                Font = @"Exo2.0-Bold",
                                 Margin = new MarginPadding { Left = 10 },
+                                Font = OsuFont.GetFont(size: 13, weight: FontWeight.Bold),
                             },
                         },
                     },

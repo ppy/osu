@@ -1,5 +1,5 @@
-// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using osu.Framework.Allocation;
@@ -80,10 +80,10 @@ namespace osu.Game.Screens.Edit.Components.RadioButtons
         {
             base.LoadComplete();
 
-            button.Selected.ValueChanged += v =>
+            button.Selected.ValueChanged += selected =>
             {
                 updateSelectionState();
-                if (v)
+                if (selected.NewValue)
                     Selected?.Invoke(button);
             };
 
@@ -95,16 +95,16 @@ namespace osu.Game.Screens.Edit.Components.RadioButtons
             if (!IsLoaded)
                 return;
 
-            BackgroundColour = button.Selected ? selectedBackgroundColour : defaultBackgroundColour;
-            bubble.Colour = button.Selected ? selectedBubbleColour : defaultBubbleColour;
+            BackgroundColour = button.Selected.Value ? selectedBackgroundColour : defaultBackgroundColour;
+            bubble.Colour = button.Selected.Value ? selectedBubbleColour : defaultBubbleColour;
         }
 
         protected override bool OnClick(ClickEvent e)
         {
-            if (button.Selected)
+            if (button.Selected.Value)
                 return true;
 
-            if (!Enabled)
+            if (!Enabled.Value)
                 return true;
 
             button.Selected.Value = true;

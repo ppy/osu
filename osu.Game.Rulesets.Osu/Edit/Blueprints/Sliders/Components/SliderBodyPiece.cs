@@ -1,5 +1,5 @@
-// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
 using osu.Framework.Allocation;
@@ -34,7 +34,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
             body.BorderColour = colours.Yellow;
 
             PositionBindable.BindValueChanged(_ => updatePosition(), true);
-            ScaleBindable.BindValueChanged(v => body.PathWidth = v * 64, true);
+            ScaleBindable.BindValueChanged(scale => body.PathWidth = scale.NewValue * 64, true);
         }
 
         private void updatePosition() => Position = slider.StackedPosition;

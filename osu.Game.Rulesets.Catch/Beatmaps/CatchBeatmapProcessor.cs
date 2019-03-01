@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using System.Collections.Generic;
@@ -56,6 +56,7 @@ namespace osu.Game.Rulesets.Catch.Beatmaps
                             rng.Next(); // osu!stable retrieved a random banana rotation
                             rng.Next(); // osu!stable retrieved a random banana colour
                         }
+
                         break;
                     case JuiceStream juiceStream:
                         foreach (var nested in juiceStream.NestedHitObjects)
@@ -67,6 +68,7 @@ namespace osu.Game.Rulesets.Catch.Beatmaps
                                 rng.Next(); // osu!stable retrieved a random droplet rotation
                             hitObject.X = MathHelper.Clamp(hitObject.X, 0, 1);
                         }
+
                         break;
                 }
             }

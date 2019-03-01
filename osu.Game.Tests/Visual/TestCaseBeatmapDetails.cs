@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System.ComponentModel;
 using System.Linq;
@@ -21,7 +21,7 @@ namespace osu.Game.Tests.Visual
                 Padding = new MarginPadding(150),
             });
 
-            AddStep("beatmap all metrics", () => details.Beatmap = new BeatmapInfo
+            AddStep("all metrics", () => details.Beatmap = new BeatmapInfo
             {
                 Version = "All Metrics",
                 Metadata = new BeatmapMetadata
@@ -45,7 +45,30 @@ namespace osu.Game.Tests.Visual
                 },
             });
 
-            AddStep("beatmap ratings", () => details.Beatmap = new BeatmapInfo
+            AddStep("all except source", () => details.Beatmap = new BeatmapInfo
+            {
+                Version = "All Metrics",
+                Metadata = new BeatmapMetadata
+                {
+                    Tags = "this beatmap has all the metrics",
+                },
+                BaseDifficulty = new BeatmapDifficulty
+                {
+                    CircleSize = 7,
+                    DrainRate = 1,
+                    OverallDifficulty = 5.7f,
+                    ApproachRate = 3.5f,
+                },
+                StarDifficulty = 5.3f,
+                Metrics = new BeatmapMetrics
+                {
+                    Ratings = Enumerable.Range(0, 11),
+                    Fails = Enumerable.Range(1, 100).Select(i => i % 12 - 6),
+                    Retries = Enumerable.Range(-2, 100).Select(i => i % 12 - 6),
+                },
+            });
+
+            AddStep("ratings", () => details.Beatmap = new BeatmapInfo
             {
                 Version = "Only Ratings",
                 Metadata = new BeatmapMetadata
@@ -67,7 +90,7 @@ namespace osu.Game.Tests.Visual
                 },
             });
 
-            AddStep("beatmap fails retries", () => details.Beatmap = new BeatmapInfo
+            AddStep("fails retries", () => details.Beatmap = new BeatmapInfo
             {
                 Version = "Only Retries and Fails",
                 Metadata = new BeatmapMetadata
@@ -90,7 +113,7 @@ namespace osu.Game.Tests.Visual
                 },
             });
 
-            AddStep("beatmap no metrics", () => details.Beatmap = new BeatmapInfo
+            AddStep("no metrics", () => details.Beatmap = new BeatmapInfo
             {
                 Version = "No Metrics",
                 Metadata = new BeatmapMetadata
