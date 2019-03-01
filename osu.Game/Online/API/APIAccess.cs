@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using System.Collections.Generic;
@@ -8,7 +8,7 @@ using System.Net;
 using System.Net.Http;
 using System.Threading;
 using Newtonsoft.Json.Linq;
-using osu.Framework.Configuration;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Logging;
 using osu.Game.Configuration;
@@ -64,7 +64,7 @@ namespace osu.Game.Online.API
             thread.Start();
         }
 
-        private void onTokenChanged(OAuthToken token) => config.Set(OsuSetting.Token, config.Get<bool>(OsuSetting.SavePassword) ? authentication.TokenString : string.Empty);
+        private void onTokenChanged(ValueChangedEvent<OAuthToken> e) => config.Set(OsuSetting.Token, config.Get<bool>(OsuSetting.SavePassword) ? authentication.TokenString : string.Empty);
 
         private readonly List<IOnlineComponent> components = new List<IOnlineComponent>();
 
@@ -101,6 +101,9 @@ namespace osu.Game.Online.API
                         //todo: replace this with a ping request.
                         log.Add(@"In a failing state, waiting a bit before we try again...");
                         Thread.Sleep(5000);
+
+                        if (!IsLoggedIn) goto case APIState.Connecting;
+
                         if (queue.Count == 0)
                         {
                             log.Add(@"Queueing a ping request");
@@ -173,6 +176,7 @@ namespace osu.Game.Online.API
                     lock (queue)
                     {
                         if (queue.Count == 0) break;
+
                         req = queue.Dequeue();
                     }
 
@@ -257,7 +261,7 @@ namespace osu.Game.Online.API
 
         public APIState State
         {
-            get { return state; }
+            get => state;
             private set
             {
                 APIState oldState = state;
@@ -352,11 +356,7 @@ namespace osu.Game.Online.API
             State = APIState.Offline;
         }
 
-        private static User createGuestUser() => new User
-        {
-            Username = @"Guest",
-            Id = 1,
-        };
+        private static User createGuestUser() => new GuestUser();
 
         protected override void Dispose(bool isDisposing)
         {
@@ -364,6 +364,15 @@ namespace osu.Game.Online.API
 
             flushQueue();
             cancellationToken.Cancel();
+        }
+    }
+
+    internal class GuestUser : User
+    {
+        public GuestUser()
+        {
+            Username = @"Guest";
+            Id = 1;
         }
     }
 

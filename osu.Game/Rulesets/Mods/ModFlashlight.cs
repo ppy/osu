@@ -1,10 +1,10 @@
-// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using System.Collections.Generic;
 using osu.Framework.Allocation;
-using osu.Framework.Configuration;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.OpenGL.Vertices;
 using osu.Framework.Graphics.Primitives;
@@ -104,11 +104,12 @@ namespace osu.Game.Rulesets.Mods
                 }
             }
 
-            protected abstract void OnComboChange(int newCombo);
+            protected abstract void OnComboChange(ValueChangedEvent<int> e);
 
             protected abstract string FragmentShader { get; }
 
             private Vector2 flashlightPosition;
+
             protected Vector2 FlashlightPosition
             {
                 get => flashlightPosition;
@@ -122,6 +123,7 @@ namespace osu.Game.Rulesets.Mods
             }
 
             private Vector2 flashlightSize;
+
             protected Vector2 FlashlightSize
             {
                 get => flashlightSize;

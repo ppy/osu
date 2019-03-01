@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using osuTK.Graphics;
 using osu.Framework.Allocation;
@@ -13,10 +13,10 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
+using osu.Framework.Bindables;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Overlays;
-using osu.Framework.Configuration;
 
 namespace osu.Game.Tests.Visual
 {
@@ -56,7 +56,7 @@ namespace osu.Game.Tests.Visual
 
             var chatManager = new ChannelManager();
             BindableList<Channel> availableChannels = (BindableList<Channel>)chatManager.AvailableChannels;
-            availableChannels.Add(new Channel { Name = "#english"});
+            availableChannels.Add(new Channel { Name = "#english" });
             availableChannels.Add(new Channel { Name = "#japanese" });
             Dependencies.Cache(chatManager);
 
@@ -96,7 +96,7 @@ namespace osu.Game.Tests.Visual
                 return true;
             }
 
-            bool isItalic() => newLine.ContentFlow.Where(d => d is OsuSpriteText).Cast<OsuSpriteText>().All(sprite => sprite.Font == "Exo2.0-MediumItalic");
+            bool isItalic() => newLine.ContentFlow.Where(d => d is OsuSpriteText).Cast<OsuSpriteText>().All(sprite => sprite.Font.Italics);
 
             bool isShowingLinks()
             {

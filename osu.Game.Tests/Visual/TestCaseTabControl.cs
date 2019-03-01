@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System.ComponentModel;
 using osu.Framework.Graphics;
@@ -33,9 +33,9 @@ namespace osu.Game.Tests.Visual
             filter.PinItem(GroupMode.All);
             filter.PinItem(GroupMode.RecentlyPlayed);
 
-            filter.Current.ValueChanged += newFilter =>
+            filter.Current.ValueChanged += grouping =>
             {
-                text.Text = "Currently Selected: " + newFilter.ToString();
+                text.Text = "Currently Selected: " + grouping.NewValue.ToString();
             };
         }
     }

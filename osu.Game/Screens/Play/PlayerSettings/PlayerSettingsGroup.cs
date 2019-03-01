@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
@@ -34,10 +34,11 @@ namespace osu.Game.Screens.Play.PlayerSettings
 
         public bool Expanded
         {
-            get { return expanded; }
+            get => expanded;
             set
             {
                 if (expanded == value) return;
+
                 expanded = value;
 
                 content.ClearTransforms();
@@ -94,8 +95,7 @@ namespace osu.Game.Screens.Play.PlayerSettings
                                     Origin = Anchor.CentreLeft,
                                     Anchor = Anchor.CentreLeft,
                                     Text = Title.ToUpperInvariant(),
-                                    TextSize = 17,
-                                    Font = @"Exo2.0-Bold",
+                                    Font = OsuFont.GetFont(weight: FontWeight.Bold, size: 17),
                                     Margin = new MarginPadding { Left = 10 },
                                 },
                                 button = new IconButton

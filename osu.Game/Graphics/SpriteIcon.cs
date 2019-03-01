@@ -1,5 +1,5 @@
-// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using osu.Framework.Allocation;
@@ -65,6 +65,7 @@ namespace osu.Game.Graphics
         }
 
         private FontAwesome loadedIcon;
+
         private void updateTexture()
         {
             var loadableIcon = icon;
@@ -104,9 +105,10 @@ namespace osu.Game.Graphics
         }
 
         private bool shadow;
+
         public bool Shadow
         {
-            get { return shadow; }
+            get => shadow;
             set
             {
                 shadow = value;
@@ -119,11 +121,7 @@ namespace osu.Game.Graphics
 
         public FontAwesome Icon
         {
-            get
-            {
-                return icon;
-            }
-
+            get => icon;
             set
             {
                 if (icon == value) return;

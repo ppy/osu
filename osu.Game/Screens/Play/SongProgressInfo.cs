@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
@@ -29,8 +29,15 @@ namespace osu.Game.Screens.Play
 
         public IClock AudioClock;
 
-        public double StartTime { set { startTime = value; } }
-        public double EndTime { set { endTime = value; } }
+        public double StartTime
+        {
+            set => startTime = value;
+        }
+
+        public double EndTime
+        {
+            set => endTime = value;
+        }
 
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
@@ -42,7 +49,7 @@ namespace osu.Game.Screens.Play
                     Origin = Anchor.BottomLeft,
                     Anchor = Anchor.BottomLeft,
                     Colour = colours.BlueLighter,
-                    Font = @"Venera",
+                    Font = OsuFont.Numeric,
                     Margin = new MarginPadding
                     {
                         Left = margin,
@@ -53,14 +60,14 @@ namespace osu.Game.Screens.Play
                     Origin = Anchor.BottomCentre,
                     Anchor = Anchor.BottomCentre,
                     Colour = colours.BlueLighter,
-                    Font = @"Venera",
+                    Font = OsuFont.Numeric,
                 },
                 timeLeft = new OsuSpriteText
                 {
                     Origin = Anchor.BottomRight,
                     Anchor = Anchor.BottomRight,
                     Colour = colours.BlueLighter,
-                    Font = @"Venera",
+                    Font = OsuFont.Numeric,
                     Margin = new MarginPadding
                     {
                         Right = margin,

@@ -1,6 +1,8 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
+using osu.Framework.Graphics;
+using osu.Framework.Screens;
 using osu.Game.Graphics.Containers;
 using osu.Game.Screens.Backgrounds;
 
@@ -14,7 +16,10 @@ namespace osu.Game.Tests.Visual
 
             Add(parallax = new ParallaxContainer
             {
-                Child = new BackgroundScreenDefault { Alpha = 0.8f }
+                Child = new ScreenStack(new BackgroundScreenDefault { Alpha = 0.8f })
+                {
+                    RelativeSizeAxes = Axes.Both,
+                }
             });
 
             AddStep("default parallax", () => parallax.ParallaxAmount = ParallaxContainer.DEFAULT_PARALLAX_AMOUNT);

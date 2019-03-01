@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using System.Collections.Generic;
@@ -107,12 +107,12 @@ namespace osu.Game.Overlays
                 SectionsContainer.SelectedSection.ValueChanged += section =>
                 {
                     selectedSidebarButton.Selected = false;
-                    selectedSidebarButton = Sidebar.Children.Single(b => b.Section == section);
+                    selectedSidebarButton = Sidebar.Children.Single(b => b.Section == section.NewValue);
                     selectedSidebarButton.Selected = true;
                 };
             }
 
-            searchTextBox.Current.ValueChanged += newValue => SectionsContainer.SearchContainer.SearchTerm = newValue;
+            searchTextBox.Current.ValueChanged += term => SectionsContainer.SearchContainer.SearchTerm = term.NewValue;
 
             CreateSections()?.ForEach(AddSection);
         }
@@ -179,7 +179,7 @@ namespace osu.Game.Overlays
 
         protected override void OnFocus(FocusEvent e)
         {
-            GetContainingInputManager().ChangeFocus(searchTextBox);
+            searchTextBox.TakeFocus();
             base.OnFocus(e);
         }
 

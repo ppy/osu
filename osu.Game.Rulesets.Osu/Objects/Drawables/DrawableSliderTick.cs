@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Graphics;
 using osu.Game.Rulesets.Objects.Drawables;
@@ -20,7 +20,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
         public override bool DisplayResult => false;
 
-        public DrawableSliderTick(SliderTick sliderTick) : base(sliderTick)
+        public DrawableSliderTick(SliderTick sliderTick)
+            : base(sliderTick)
         {
             Size = new Vector2(16) * sliderTick.Scale;
             Origin = Anchor.Centre;

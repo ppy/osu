@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using osuTK.Graphics;
@@ -22,8 +22,8 @@ namespace osu.Game.Rulesets.UI
 
         public FontAwesome Icon
         {
-            get { return modIcon.Icon; }
-            set { modIcon.Icon = value; }
+            get => modIcon.Icon;
+            set => modIcon.Icon = value;
         }
 
         private readonly ModType type;
@@ -100,7 +100,7 @@ namespace osu.Game.Rulesets.UI
 
         public bool Highlighted
         {
-            get { return highlighted; }
+            get => highlighted;
 
             set
             {

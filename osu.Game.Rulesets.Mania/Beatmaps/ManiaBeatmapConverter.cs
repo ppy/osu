@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using osu.Game.Rulesets.Mania.Objects;
 using System;
@@ -74,10 +74,10 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
 
         protected override IEnumerable<ManiaHitObject> ConvertHitObject(HitObject original, IBeatmap beatmap)
         {
-            var maniaOriginal = original as ManiaHitObject;
-            if (maniaOriginal != null)
+            if (original is ManiaHitObject maniaOriginal)
             {
                 yield return maniaOriginal;
+
                 yield break;
             }
 
@@ -92,6 +92,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
 
         private readonly List<double> prevNoteTimes = new List<double>(max_notes_for_density);
         private double density = int.MaxValue;
+
         private void computeDensity(double newNoteTime)
         {
             if (prevNoteTimes.Count == max_notes_for_density)
@@ -104,6 +105,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
         private double lastTime;
         private Vector2 lastPosition;
         private PatternType lastStair = PatternType.Stair;
+
         private void recordNote(double time, Vector2 position)
         {
             lastTime = time;
@@ -180,7 +182,6 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
 
                 foreach (var obj in newPattern.HitObjects)
                     yield return obj;
-
             }
         }
 

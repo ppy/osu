@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using System.Linq;
@@ -25,7 +25,7 @@ namespace osu.Game.Rulesets.Catch.UI
 {
     public class CatcherArea : Container
     {
-        public const float CATCHER_SIZE = 100;
+        public const float CATCHER_SIZE = 106.75f;
 
         protected internal readonly Catcher MovableCatcher;
 
@@ -33,7 +33,7 @@ namespace osu.Game.Rulesets.Catch.UI
 
         public Container ExplodingFruitTarget
         {
-            set { MovableCatcher.ExplodingFruitTarget = value; }
+            set => MovableCatcher.ExplodingFruitTarget = value;
         }
 
         public CatcherArea(BeatmapDifficulty difficulty = null)
@@ -158,7 +158,7 @@ namespace osu.Game.Rulesets.Catch.UI
 
             protected bool Dashing
             {
-                get { return dashing; }
+                get => dashing;
                 set
                 {
                     if (value == dashing) return;
@@ -176,7 +176,7 @@ namespace osu.Game.Rulesets.Catch.UI
             /// </summary>
             protected bool Trail
             {
-                get { return trail; }
+                get => trail;
                 set
                 {
                     if (value == trail) return;

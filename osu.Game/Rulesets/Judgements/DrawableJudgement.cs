@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using osuTK;
 using osu.Framework.Allocation;
@@ -58,10 +58,9 @@ namespace osu.Game.Rulesets.Judgements
                 Child = new SkinnableDrawable($"Play/{Result.Type}", _ => JudgementText = new OsuSpriteText
                 {
                     Text = Result.Type.GetDescription().ToUpperInvariant(),
-                    Font = @"Venera",
+                    Font = OsuFont.Numeric.With(size: 12),
                     Colour = judgementColour(Result.Type),
                     Scale = new Vector2(0.85f, 1),
-                    TextSize = 12
                 }, restrictSize: false)
             };
         }

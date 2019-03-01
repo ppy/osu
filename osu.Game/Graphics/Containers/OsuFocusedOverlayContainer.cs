@@ -1,12 +1,12 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics.Containers;
 using osuTK;
-using osu.Framework.Configuration;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
 using osu.Game.Audio;
@@ -90,12 +90,13 @@ namespace osu.Game.Graphics.Containers
             switch (visibility)
             {
                 case Visibility.Visible:
-                    if (OverlayActivationMode != OverlayActivation.Disabled)
+                    if (OverlayActivationMode.Value != OverlayActivation.Disabled)
                     {
                         if (PlaySamplesOnStateChange) samplePopIn?.Play();
                     }
                     else
                         State = Visibility.Hidden;
+
                     break;
                 case Visibility.Hidden:
                     if (PlaySamplesOnStateChange) samplePopOut?.Play();

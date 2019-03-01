@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using osu.Framework;
@@ -46,10 +46,10 @@ namespace osu.Game.Screens.Play
             State = Visibility.Visible;
 
             RelativePositionAxes = Axes.Both;
-            RelativeSizeAxes = Axes.Both;
+            RelativeSizeAxes = Axes.X;
 
             Position = new Vector2(0.5f, 0.7f);
-            Size = new Vector2(1, 0.14f);
+            Size = new Vector2(1, 100);
 
             Origin = Anchor.Centre;
         }
@@ -158,7 +158,7 @@ namespace osu.Game.Screens.Play
 
             public Visibility State
             {
-                get { return state; }
+                get => state;
                 set
                 {
                     bool stateChanged = value != state;
@@ -273,8 +273,7 @@ namespace osu.Game.Screens.Play
                                 Anchor = Anchor.TopCentre,
                                 RelativePositionAxes = Axes.Y,
                                 Y = 0.7f,
-                                TextSize = 12,
-                                Font = @"Exo2.0-Bold",
+                                Font = OsuFont.GetFont(weight: FontWeight.Bold, size: 12),
                                 Origin = Anchor.Centre,
                                 Text = @"SKIP",
                             },
@@ -313,7 +312,7 @@ namespace osu.Game.Screens.Play
 
             protected override bool OnClick(ClickEvent e)
             {
-                if (!Enabled)
+                if (!Enabled.Value)
                     return false;
 
                 sampleConfirm.Play();

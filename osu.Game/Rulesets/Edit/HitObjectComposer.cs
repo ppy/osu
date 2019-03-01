@@ -1,11 +1,11 @@
-// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
-using osu.Framework.Configuration;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input;
@@ -48,7 +48,7 @@ namespace osu.Game.Rulesets.Edit
         }
 
         [BackgroundDependencyLoader]
-        private void load(IBindableBeatmap beatmap, IFrameBasedClock framedClock)
+        private void load(IBindable<WorkingBeatmap> beatmap, IFrameBasedClock framedClock)
         {
             Beatmap.BindTo(beatmap);
 
@@ -111,8 +111,8 @@ namespace osu.Game.Rulesets.Edit
 
             toolboxCollection.Items =
                 CompositionTools.Select(t => new RadioButton(t.Name, () => blueprintContainer.CurrentTool = t))
-                .Prepend(new RadioButton("Select", () => blueprintContainer.CurrentTool = null))
-                .ToList();
+                                .Prepend(new RadioButton("Select", () => blueprintContainer.CurrentTool = null))
+                                .ToList();
 
             toolboxCollection.Items[0].Select();
         }

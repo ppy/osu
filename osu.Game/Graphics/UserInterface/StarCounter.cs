@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using osuTK;
 using osu.Framework.Graphics;
@@ -41,10 +41,7 @@ namespace osu.Game.Graphics.UserInterface
         /// </summary>
         public float CountStars
         {
-            get
-            {
-                return countStars;
-            }
+            get => countStars;
 
             set
             {
@@ -137,6 +134,7 @@ namespace osu.Game.Graphics.UserInterface
         private class Star : Container
         {
             public readonly SpriteIcon Icon;
+
             public Star()
             {
                 Size = new Vector2(star_size);

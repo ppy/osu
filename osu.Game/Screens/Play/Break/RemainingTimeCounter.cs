@@ -1,9 +1,10 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.UserInterface;
+using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 
 namespace osu.Game.Screens.Play.Break
@@ -19,8 +20,7 @@ namespace osu.Game.Screens.Play.Break
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
-                TextSize = 33,
-                Font = "Venera",
+                Font = OsuFont.Numeric.With(size: 33),
             };
         }
 

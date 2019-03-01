@@ -1,11 +1,11 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using osu.Framework.Configuration;
+using osu.Framework.Bindables;
 using osu.Framework.Extensions;
 using osu.Framework.Extensions.TypeExtensions;
 using osu.Game.Beatmaps;
@@ -63,7 +63,7 @@ namespace osu.Game.Rulesets.Scoring
         /// <summary>
         /// Create a <see cref="HitWindows"/> for this processor.
         /// </summary>
-        protected virtual HitWindows CreateHitWindows() => new HitWindows();
+        public virtual HitWindows CreateHitWindows() => new HitWindows();
 
         /// <summary>
         /// The current rank.
@@ -113,6 +113,7 @@ namespace osu.Game.Rulesets.Scoring
                 return ScoreRank.B;
             if (acc > 0.7)
                 return ScoreRank.C;
+
             return ScoreRank.D;
         }
 
@@ -168,11 +169,11 @@ namespace osu.Game.Rulesets.Scoring
         /// </summary>
         public virtual void PopulateScore(ScoreInfo score)
         {
-            score.TotalScore = (int)Math.Round(TotalScore);
-            score.Combo = Combo;
-            score.MaxCombo = HighestCombo;
-            score.Accuracy = Math.Round(Accuracy, 4);
-            score.Rank = Rank;
+            score.TotalScore = (long)Math.Round(TotalScore.Value);
+            score.Combo = Combo.Value;
+            score.MaxCombo = HighestCombo.Value;
+            score.Accuracy = Math.Round(Accuracy.Value, 4);
+            score.Rank = Rank.Value;
             score.Date = DateTimeOffset.Now;
 
             var hitWindows = CreateHitWindows();
@@ -298,8 +299,8 @@ namespace osu.Game.Rulesets.Scoring
         /// <param name="result">The <see cref="JudgementResult"/> to apply.</param>
         protected virtual void ApplyResult(JudgementResult result)
         {
-            result.ComboAtJudgement = Combo;
-            result.HighestComboAtJudgement = HighestCombo;
+            result.ComboAtJudgement = Combo.Value;
+            result.HighestComboAtJudgement = HighestCombo.Value;
 
             JudgedHits++;
 
@@ -371,10 +372,10 @@ namespace osu.Game.Rulesets.Scoring
             {
                 default:
                 case ScoringMode.Standardised:
-                    return max_score * (base_portion * baseScore / maxBaseScore + combo_portion * HighestCombo / maxHighestCombo) + bonusScore;
+                    return max_score * (base_portion * baseScore / maxBaseScore + combo_portion * HighestCombo.Value / maxHighestCombo) + bonusScore;
                 case ScoringMode.Classic:
                     // should emulate osu-stable's scoring as closely as we can (https://osu.ppy.sh/help/wiki/Score/ScoreV1)
-                    return bonusScore + baseScore * (1 + Math.Max(0, HighestCombo - 1) / 25);
+                    return bonusScore + baseScore * (1 + Math.Max(0, HighestCombo.Value - 1) / 25);
             }
         }
 
@@ -389,7 +390,7 @@ namespace osu.Game.Rulesets.Scoring
             if (storeResults)
             {
                 MaxHits = JudgedHits;
-                maxHighestCombo = HighestCombo;
+                maxHighestCombo = HighestCombo.Value;
                 maxBaseScore = baseScore;
             }
 

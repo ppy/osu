@@ -1,10 +1,11 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Game.Graphics;
 using osu.Game.Online.API;
 using osu.Game.Users;
 using osuTK;
@@ -20,7 +21,7 @@ namespace osu.Game.Overlays.Toolbar
         {
             AutoSizeAxes = Axes.X;
 
-            DrawableText.Font = @"Exo2.0-MediumItalic";
+            DrawableText.Font = OsuFont.GetFont(italics: true);
 
             Add(new OpaqueBackground { Depth = 1 });
 
@@ -57,7 +58,7 @@ namespace osu.Game.Overlays.Toolbar
                     break;
                 case APIState.Online:
                     Text = api.LocalUser.Value.Username;
-                    avatar.User = api.LocalUser;
+                    avatar.User = api.LocalUser.Value;
                     break;
             }
         }

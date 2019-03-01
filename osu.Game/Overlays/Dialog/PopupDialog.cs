@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
 using System.Linq;
@@ -53,6 +53,7 @@ namespace osu.Game.Overlays.Dialog
             {
                 if (text == value)
                     return;
+
                 text = value;
 
                 header.Text = value;
@@ -171,7 +172,7 @@ namespace osu.Game.Overlays.Dialog
                                         },
                                     },
                                 },
-                                header = new OsuTextFlowContainer(t => t.TextSize = 25)
+                                header = new OsuTextFlowContainer(t => t.Font = t.Font.With(size: 25))
                                 {
                                     Origin = Anchor.TopCentre,
                                     Anchor = Anchor.TopCentre,
@@ -180,7 +181,7 @@ namespace osu.Game.Overlays.Dialog
                                     Padding = new MarginPadding(15),
                                     TextAnchor = Anchor.TopCentre,
                                 },
-                                body = new OsuTextFlowContainer(t => t.TextSize = 18)
+                                body = new OsuTextFlowContainer(t => t.Font = t.Font.With(size: 18))
                                 {
                                     RelativeSizeAxes = Axes.X,
                                     AutoSizeAxes = Axes.Y,
