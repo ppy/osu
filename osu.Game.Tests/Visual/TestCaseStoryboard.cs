@@ -81,18 +81,16 @@ namespace osu.Game.Tests.Visual
         private void loadStoryboard(WorkingBeatmap working)
         {
             if (storyboard != null)
-                storyboardContainer = new Container();
+                storyboardContainer.Clear();
 
             var decoupledClock = new DecoupleableInterpolatingFramedClock { IsCoupled = true };
             storyboardContainer.Clock = decoupledClock;
 
-            LoadComponentAsync(working.Storyboard.CreateDrawable(Beatmap.Value), p =>
-            {
-                storyboard = p;
-                storyboard.Passing = false;
-                storyboardContainer.Add(storyboard);
-                decoupledClock.ChangeSource(working.Track);
-            });
+            storyboard = working.Storyboard.CreateDrawable(Beatmap.Value);
+            storyboard.Passing = false;
+
+            storyboardContainer.Add(storyboard);
+            decoupledClock.ChangeSource(working.Track);
         }
     }
 }
