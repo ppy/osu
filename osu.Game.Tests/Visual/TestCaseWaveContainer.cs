@@ -41,7 +41,7 @@ namespace osu.Game.Tests.Visual
                     {
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
-                        TextSize = 20,
+                        Font = OsuFont.GetFont(size: 20),
                         Text = @"Wave Container",
                     },
                 },

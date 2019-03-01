@@ -23,9 +23,10 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawable.Pieces
         }
 
         private Color4 accentColour;
+
         public Color4 AccentColour
         {
-            get { return accentColour; }
+            get => accentColour;
             set
             {
                 accentColour = value;

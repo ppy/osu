@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
+using osu.Framework.Bindables;
 using osu.Framework.Configuration;
 using osu.Game.Rulesets;
 
@@ -60,9 +61,9 @@ namespace osu.Game.Configuration
                 databasedSettings.Add(setting);
             }
 
-            bindable.ValueChanged += v =>
+            bindable.ValueChanged += b =>
             {
-                setting.Value = v;
+                setting.Value = b.NewValue;
                 settings.Update(setting);
             };
         }

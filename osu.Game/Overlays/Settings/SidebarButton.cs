@@ -26,12 +26,10 @@ namespace osu.Game.Overlays.Settings
         public new Action<SettingsSection> Action;
 
         private SettingsSection section;
+
         public SettingsSection Section
         {
-            get
-            {
-                return section;
-            }
+            get => section;
             set
             {
                 section = value;
@@ -41,9 +39,10 @@ namespace osu.Game.Overlays.Settings
         }
 
         private bool selected;
+
         public bool Selected
         {
-            get { return selected; }
+            get => selected;
             set
             {
                 selected = value;

@@ -14,6 +14,7 @@ using System;
 using System.Linq;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Input.Events;
+using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
 
 namespace osu.Game.Overlays.Mods
@@ -106,10 +107,11 @@ namespace osu.Game.Overlays.Mods
 
         public Color4 SelectedColour
         {
-            get { return selectedColour; }
+            get => selectedColour;
             set
             {
                 if (value == selectedColour) return;
+
                 selectedColour = value;
                 if (Selected) foregroundIcon.Colour = value;
             }
@@ -120,7 +122,7 @@ namespace osu.Game.Overlays.Mods
 
         public Mod Mod
         {
-            get { return mod; }
+            get => mod;
             set
             {
                 mod = value;
@@ -275,7 +277,7 @@ namespace osu.Game.Overlays.Mods
                     Y = 75,
                     Origin = Anchor.TopCentre,
                     Anchor = Anchor.TopCentre,
-                    TextSize = 18,
+                    Font = OsuFont.GetFont(size: 18)
                 },
                 new HoverClickSounds()
             };

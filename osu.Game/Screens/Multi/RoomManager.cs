@@ -5,7 +5,7 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 using osu.Framework.Allocation;
-using osu.Framework.Configuration;
+using osu.Framework.Bindables;
 using osu.Framework.Logging;
 using osu.Game.Beatmaps;
 using osu.Game.Online;
@@ -56,7 +56,7 @@ namespace osu.Game.Screens.Multi
 
         public void CreateRoom(Room room, Action<Room> onSuccess = null, Action<string> onError = null)
         {
-            room.Host.Value = api.LocalUser;
+            room.Host.Value = api.LocalUser.Value;
 
             var req = new CreateRoomRequest(room);
 

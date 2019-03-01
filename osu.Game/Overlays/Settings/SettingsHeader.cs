@@ -38,7 +38,7 @@ namespace osu.Game.Overlays.Settings
                         new OsuSpriteText
                         {
                             Text = heading,
-                            TextSize = 40,
+                            Font = OsuFont.GetFont(size: 40),
                             Margin = new MarginPadding
                             {
                                 Left = SettingsOverlay.CONTENT_MARGINS,
@@ -49,7 +49,7 @@ namespace osu.Game.Overlays.Settings
                         {
                             Colour = colours.Pink,
                             Text = subheading,
-                            TextSize = 18,
+                            Font = OsuFont.GetFont(size: 18),
                             Margin = new MarginPadding
                             {
                                 Left = SettingsOverlay.CONTENT_MARGINS,
