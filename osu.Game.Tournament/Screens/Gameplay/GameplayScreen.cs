@@ -120,7 +120,12 @@ namespace osu.Game.Tournament.Screens.Gameplay
             State.BindTo(ipc.State);
             State.BindValueChanged(stateChanged, true);
 
-            currentMatch.BindValueChanged(m => warmup.Value = m.NewValue.Team1Score.Value + m.NewValue.Team2Score.Value == 0);
+            currentMatch.BindValueChanged(m =>
+            {
+                warmup.Value = m.NewValue.Team1Score.Value + m.NewValue.Team2Score.Value == 0;
+                scheduledOperation?.Cancel();
+            });
+
             currentMatch.BindTo(ladder.CurrentMatch);
 
             warmup.BindValueChanged(w => warmupButton.Alpha = !w.NewValue ? 0.5f : 1, true);
@@ -172,12 +177,16 @@ namespace osu.Game.Tournament.Screens.Gameplay
                     case TourneyState.Idle:
                         contract();
 
+                        const float delay_before_progression = 4000;
+
+                        // if we've returned to idle and the last screen was ranking
+                        // we should automatically proceed after a short delay
                         if (lastState == TourneyState.Ranking && !warmup.Value)
                         {
                             if (currentMatch.Value?.Completed.Value == true)
-                                scheduledOperation = Scheduler.AddDelayed(() => { sceneManager?.SetScreen(typeof(TeamWinScreen)); }, 4000);
+                                scheduledOperation = Scheduler.AddDelayed(() => { sceneManager?.SetScreen(typeof(TeamWinScreen)); }, delay_before_progression);
                             else if (currentMatch.Value?.Completed.Value == false)
-                                scheduledOperation = Scheduler.AddDelayed(() => { sceneManager?.SetScreen(typeof(MapPoolScreen)); }, 4000);
+                                scheduledOperation = Scheduler.AddDelayed(() => { sceneManager?.SetScreen(typeof(MapPoolScreen)); }, delay_before_progression);
                         }
 
                         break;
