@@ -38,6 +38,8 @@ namespace osu.Game.Overlays.Mods
 
         protected override bool BlockNonPositionalInput => false;
 
+        protected override bool DimMainContent => false;
+
         protected readonly FillFlowContainer<ModSection> ModSectionsContainer;
 
         protected readonly Bindable<IEnumerable<Mod>> SelectedMods = new Bindable<IEnumerable<Mod>>(new Mod[] { });
