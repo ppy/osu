@@ -3,7 +3,7 @@
 
 using System.Linq;
 using osu.Framework.Allocation;
-using osu.Framework.Configuration;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Game.Tournament.Screens.Ladder.Components;
 using osu.Game.Tournament.Screens.TeamIntro;
@@ -21,7 +21,7 @@ namespace osu.Game.Tournament.Tests
             var pairing = new MatchPairing();
             pairing.Team1.Value = Ladder.Teams.FirstOrDefault(t => t.Acronym == "USA");
             pairing.Team2.Value = Ladder.Teams.FirstOrDefault(t => t.Acronym == "JPN");
-            pairing.Grouping.Value = Ladder.Groupings.FirstOrDefault(g => g.Name == "Finals");
+            pairing.Grouping.Value = Ladder.Groupings.FirstOrDefault(g => g.Name.Value == "Finals");
             currentMatch.Value = pairing;
 
             Add(new TeamIntroScreen
