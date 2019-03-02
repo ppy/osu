@@ -23,8 +23,8 @@ namespace osu.Game.Tournament.Components
         /// </summary>
         public string FlagName
         {
-            get { return flagName ?? Acronym?.Substring(0, 2); }
-            set { flagName = value; }
+            get => flagName ?? Acronym?.Substring(0, 2);
+            set => flagName = value;
         }
 
         private string acronym;
@@ -34,8 +34,8 @@ namespace osu.Game.Tournament.Components
         /// </summary>
         public string Acronym
         {
-            get { return acronym ?? FullName?.Substring(0, 3); }
-            set { acronym = value; }
+            get => acronym ?? FullName?.Substring(0, 3);
+            set => acronym = value;
         }
 
         [JsonProperty]

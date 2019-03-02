@@ -121,7 +121,8 @@ namespace osu.Game.Tournament.Screens.Drawings.Components
         {
             private readonly FillFlowContainer innerContainer;
 
-            public GroupTeam(TournamentTeam team) : base(team)
+            public GroupTeam(TournamentTeam team)
+                : base(team)
             {
                 Width = 36;
                 AutoSizeAxes = Axes.Y;

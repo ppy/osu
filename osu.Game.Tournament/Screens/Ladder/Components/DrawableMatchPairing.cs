@@ -111,6 +111,7 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
             set
             {
                 if (value == selected) return;
+
                 selected = value;
 
                 if (selected)
