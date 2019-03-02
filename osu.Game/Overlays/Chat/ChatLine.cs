@@ -88,7 +88,7 @@ namespace osu.Game.Overlays.Chat
             Drawable effectedUsername = username = new OsuSpriteText
             {
                 Colour = hasBackground ? customUsernameColour : username_colours[message.Sender.Id % username_colours.Length],
-                Font = OsuFont.GetFont(size: TextSize, weight: FontWeight.SemiBold, italics: true)
+                Font = OsuFont.GetFont(size: TextSize, weight: FontWeight.Bold, italics: true)
             };
 
             if (hasBackground)
@@ -137,7 +137,7 @@ namespace osu.Game.Overlays.Chat
                         {
                             Anchor = Anchor.CentreLeft,
                             Origin = Anchor.CentreLeft,
-                            Font = OsuFont.GetFont(size: TextSize * 0.75f, weight: FontWeight.Bold, fixedWidth: true)
+                            Font = OsuFont.GetFont(size: TextSize * 0.75f, weight: FontWeight.SemiBold, fixedWidth: true)
                         },
                         new MessageSender(message.Sender)
                         {
