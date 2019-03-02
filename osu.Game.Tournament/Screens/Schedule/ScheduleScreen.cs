@@ -57,8 +57,9 @@ namespace osu.Game.Tournament.Screens.Schedule
             }
 
             var upcoming = ladder.Pairings.Where(p => !p.Completed.Value && p.Team1.Value != null && p.Team2.Value != null && Math.Abs(p.Date.Value.DayOfYear - DateTimeOffset.UtcNow.DayOfYear) < 4);
-            var conditionals = ladder.Pairings.Where(p => !p.Completed.Value && (p.Team1.Value == null || p.Team2.Value == null) && Math.Abs(p.Date.Value.DayOfYear - DateTimeOffset.UtcNow.DayOfYear) < 4)
-                                     .SelectMany(m => m.ConditionalPairings.Where(cp => m.Acronyms.TrueForAll(a => cp.Acronyms.Contains(a))));
+            var conditionals = ladder
+                               .Pairings.Where(p => !p.Completed.Value && (p.Team1.Value == null || p.Team2.Value == null) && Math.Abs(p.Date.Value.DayOfYear - DateTimeOffset.UtcNow.DayOfYear) < 4)
+                               .SelectMany(m => m.ConditionalPairings.Where(cp => m.Acronyms.TrueForAll(a => cp.Acronyms.Contains(a))));
 
             upcoming = upcoming.Concat(conditionals);
             upcoming = upcoming.OrderBy(p => p.Date.Value).Take(12);
@@ -145,7 +146,7 @@ namespace osu.Game.Tournament.Screens.Schedule
                         Anchor = Anchor.TopRight,
                         Origin = Anchor.TopLeft,
                         Colour = Color4.Black,
-                        Alpha =  conditional ? 0.6f : 1,
+                        Alpha = conditional ? 0.6f : 1,
                         Margin = new MarginPadding { Horizontal = 10, Vertical = 5 },
                     });
                     AddInternal(new OsuSpriteText
@@ -153,7 +154,7 @@ namespace osu.Game.Tournament.Screens.Schedule
                         Anchor = Anchor.BottomRight,
                         Origin = Anchor.BottomLeft,
                         Colour = Color4.Black,
-                        Alpha =  conditional ? 0.6f : 1,
+                        Alpha = conditional ? 0.6f : 1,
                         Margin = new MarginPadding { Horizontal = 10, Vertical = 5 },
                         Text = pairing.Date.Value.ToUniversalTime().ToString("HH:mm UTC") + (conditional ? " (conditional)" : "")
                     });
