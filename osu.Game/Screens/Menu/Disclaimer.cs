@@ -36,8 +36,7 @@ namespace osu.Game.Screens.Menu
 
         private const float icon_y = -85;
 
-        [Resolved]
-        private APIAccess api { get; set; }
+        private readonly Bindable<User> currentUser = new Bindable<User>();
 
         public Disclaimer()
         {
@@ -45,7 +44,7 @@ namespace osu.Game.Screens.Menu
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
+        private void load(OsuColour colours, APIAccess api)
         {
             InternalChildren = new Drawable[]
             {
@@ -102,14 +101,19 @@ namespace osu.Game.Screens.Menu
             }).First());
 
             iconColour = colours.Yellow;
+
+            currentUser.BindTo(api.LocalUser);
+            currentUser.BindValueChanged(e =>
+            {
+                if (e.NewValue.IsSupporter)
+                    supporterDrawables.ForEach(d => d.FadeOut(200, Easing.OutQuint).Expire());
+            }, true);
         }
 
         protected override void LoadComplete()
         {
             base.LoadComplete();
             LoadComponentAsync(intro = new Intro());
-
-            api.LocalUser.BindValueChanged(userChanged, true);
         }
 
         public override void OnEntering(IScreen last)
@@ -140,12 +144,7 @@ namespace osu.Game.Screens.Menu
         {
             base.OnSuspending(next);
 
-            api.LocalUser.ValueChanged -= userChanged;
-        }
-
-        private void userChanged(ValueChangedEvent<User> user)
-        {
-            if (user.NewValue.IsSupporter) supporterDrawables.ForEach(d => d.FadeOut(200, Easing.OutQuint).Expire());
+            currentUser.UnbindAll();
         }
     }
 }
