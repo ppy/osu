@@ -47,6 +47,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             {
                 if (value < 1)
                     throw new ArgumentException($"{nameof(MinZoom)} must be >= 1.", nameof(value));
+
                 minZoom = value;
 
                 if (Zoom < value)
@@ -66,6 +67,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             {
                 if (value < 1)
                     throw new ArgumentException($"{nameof(MaxZoom)} must be >= 1.", nameof(value));
+
                 maxZoom = value;
 
                 if (Zoom > value)
@@ -108,6 +110,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
         }
 
         private float zoomTarget = 1;
+
         private void setZoomTarget(float newZoom, float focusPoint)
         {
             zoomTarget = MathHelper.Clamp(newZoom, MinZoom, MaxZoom);

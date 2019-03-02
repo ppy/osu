@@ -17,7 +17,7 @@ namespace osu.Game.Overlays.Toolbar
 
         public OverlayContainer StateContainer
         {
-            get { return stateContainer; }
+            get => stateContainer;
             set
             {
                 stateContainer = value;

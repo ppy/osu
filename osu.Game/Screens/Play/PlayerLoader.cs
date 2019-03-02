@@ -78,7 +78,7 @@ namespace osu.Game.Screens.Play
                         Margin = new MarginPadding(25),
                         Children = new PlayerSettingsGroup[]
                         {
-                            visualSettings = new VisualSettings(),
+                            VisualSettings = new VisualSettings(),
                             new InputSettings()
                         }
                     }
@@ -151,23 +151,31 @@ namespace osu.Game.Screens.Play
         }
 
         private ScheduledDelegate pushDebounce;
-        private VisualSettings visualSettings;
+        protected VisualSettings VisualSettings;
 
         private bool readyForPush => player.LoadState == LoadState.Ready && IsHovered && GetContainingInputManager()?.DraggedDrawable == null;
 
         protected override bool OnHover(HoverEvent e)
         {
             // restore our screen defaults
-            InitializeBackgroundElements();
+            if (this.IsCurrentScreen())
+            {
+                InitializeBackgroundElements();
+                Background.EnableUserDim.Value = false;
+            }
+
             return base.OnHover(e);
         }
 
         protected override void OnHoverLost(HoverLostEvent e)
         {
-            if (GetContainingInputManager()?.HoveredDrawables.Contains(visualSettings) == true)
+            if (GetContainingInputManager()?.HoveredDrawables.Contains(VisualSettings) == true)
             {
-                // show user setting preview
+                // Update background elements is only being called here because blur logic still exists in Player.
+                // Will need to be removed when resolving https://github.com/ppy/osu/issues/4322
                 UpdateBackgroundElements();
+                if (this.IsCurrentScreen())
+                    Background.EnableUserDim.Value = true;
             }
 
             base.OnHoverLost(e);
@@ -240,6 +248,8 @@ namespace osu.Game.Screens.Play
             content.ScaleTo(0.7f, 150, Easing.InQuint);
             this.FadeOut(150);
             cancelLoad();
+
+            Background.EnableUserDim.Value = false;
 
             return base.OnExiting(next);
         }

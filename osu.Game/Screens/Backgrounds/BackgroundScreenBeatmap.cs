@@ -2,10 +2,12 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Textures;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics.Backgrounds;
+using osu.Game.Graphics.Containers;
 
 namespace osu.Game.Screens.Backgrounds
 {
@@ -13,9 +15,20 @@ namespace osu.Game.Screens.Backgrounds
     {
         private WorkingBeatmap beatmap;
 
-        public WorkingBeatmap Beatmap
+        /// <summary>
+        /// Whether or not user dim settings should be applied to this Background.
+        /// </summary>
+        public readonly Bindable<bool> EnableUserDim = new Bindable<bool>();
+
+        public readonly Bindable<bool> StoryboardReplacesBackground = new Bindable<bool>();
+
+        private readonly UserDimContainer fadeContainer;
+
+        protected virtual UserDimContainer CreateFadeContainer() => new UserDimContainer { RelativeSizeAxes = Axes.Both };
+
+        public virtual WorkingBeatmap Beatmap
         {
-            get { return beatmap; }
+            get => beatmap;
             set
             {
                 if (beatmap == value && beatmap != null)
@@ -37,8 +50,9 @@ namespace osu.Game.Screens.Backgrounds
                         }
 
                         b.Depth = newDepth;
-                        AddInternal(Background = b);
+                        fadeContainer.Add(Background = b);
                         Background.BlurSigma = BlurTarget;
+                        StoryboardReplacesBackground.BindTo(fadeContainer.StoryboardReplacesBackground);
                     }));
                 });
             }
@@ -47,6 +61,8 @@ namespace osu.Game.Screens.Backgrounds
         public BackgroundScreenBeatmap(WorkingBeatmap beatmap = null)
         {
             Beatmap = beatmap;
+            InternalChild = fadeContainer = CreateFadeContainer();
+            fadeContainer.EnableUserDim.BindTo(EnableUserDim);
         }
 
         public override bool Equals(BackgroundScreen other)
@@ -57,7 +73,7 @@ namespace osu.Game.Screens.Backgrounds
             return base.Equals(other) && beatmap == otherBeatmapBackground.Beatmap;
         }
 
-        private class BeatmapBackground : Background
+        protected class BeatmapBackground : Background
         {
             private readonly WorkingBeatmap beatmap;
 

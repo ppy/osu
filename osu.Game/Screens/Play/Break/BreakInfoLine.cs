@@ -72,7 +72,8 @@ namespace osu.Game.Screens.Play.Break
 
     public class PercentageBreakInfoLine : BreakInfoLine<double>
     {
-        public PercentageBreakInfoLine(string name, string prefix = "") : base(name, prefix)
+        public PercentageBreakInfoLine(string name, string prefix = "")
+            : base(name, prefix)
         {
         }
 

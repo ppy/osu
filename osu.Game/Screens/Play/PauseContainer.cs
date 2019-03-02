@@ -32,7 +32,10 @@ namespace osu.Game.Screens.Play
 
         protected override Container<Drawable> Content => content;
 
-        public int Retries { set { pauseOverlay.Retries = value; } }
+        public int Retries
+        {
+            set => pauseOverlay.Retries = value;
+        }
 
         public bool CanPause => (CheckCanPause?.Invoke() ?? true) && Time.Current >= lastPauseActionTime + pause_cooldown;
         public bool IsResuming { get; private set; }

@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using osu.Framework.Configuration;
 using osu.Framework.Screens;
 using osu.Game.Configuration;
@@ -109,6 +110,8 @@ namespace osu.Game
 
         private readonly List<OverlayContainer> overlays = new List<OverlayContainer>();
 
+        private readonly List<OverlayContainer> visibleBlockingOverlays = new List<OverlayContainer>();
+
         // todo: move this to SongSelect once Screen has the ability to unsuspend.
         [Cached]
         [Cached(Type = typeof(IBindable<IEnumerable<Mod>>))]
@@ -126,6 +129,22 @@ namespace osu.Game
         public void ToggleSettings() => settings.ToggleVisibility();
 
         public void ToggleDirect() => direct.ToggleVisibility();
+
+        private void updateBlockingOverlayFade() =>
+            screenContainer.FadeColour(visibleBlockingOverlays.Any() ? OsuColour.Gray(0.5f) : Color4.White, 500, Easing.OutQuint);
+
+        public void AddBlockingOverlay(OverlayContainer overlay)
+        {
+            if (!visibleBlockingOverlays.Contains(overlay))
+                visibleBlockingOverlays.Add(overlay);
+            updateBlockingOverlayFade();
+        }
+
+        public void RemoveBlockingOverlay(OverlayContainer overlay)
+        {
+            visibleBlockingOverlays.Remove(overlay);
+            updateBlockingOverlayFade();
+        }
 
         /// <summary>
         /// Close all game-wide overlays.
@@ -482,6 +501,7 @@ namespace osu.Game
                 overlay.StateChanged += state =>
                 {
                     if (state == Visibility.Hidden) return;
+
                     singleDisplaySideOverlays.Where(o => o != overlay).ForEach(o => o.Hide());
                 };
             }
@@ -495,6 +515,7 @@ namespace osu.Game
                 overlay.StateChanged += state =>
                 {
                     if (state == Visibility.Hidden) return;
+
                     informationalOverlays.Where(o => o != overlay).ForEach(o => o.Hide());
                 };
             }
@@ -595,21 +616,10 @@ namespace osu.Game
         }
 
         private Task asyncLoadStream;
-        private int visibleOverlayCount;
 
         private void loadComponentSingleFile<T>(T d, Action<T> add)
             where T : Drawable
         {
-            var focused = d as FocusedOverlayContainer;
-            if (focused != null)
-            {
-                focused.StateChanged += s =>
-                {
-                    visibleOverlayCount += s == Visibility.Visible ? 1 : -1;
-                    screenContainer.FadeColour(visibleOverlayCount > 0 ? OsuColour.Gray(0.5f) : Color4.White, 500, Easing.OutQuint);
-                };
-            }
-
             // schedule is here to ensure that all component loads are done after LoadComplete is run (and thus all dependencies are cached).
             // with some better organisation of LoadComplete to do construction and dependency caching in one step, followed by calls to loadComponentSingleFile,
             // we could avoid the need for scheduling altogether.
@@ -626,7 +636,25 @@ namespace osu.Game
                     try
                     {
                         Logger.Log($"Loading {d}...", level: LogLevel.Debug);
-                        await LoadComponentAsync(d, add);
+
+                        // Since this is running in a separate thread, it is possible for OsuGame to be disposed after LoadComponentAsync has been called
+                        // throwing an exception. To avoid this, the call is scheduled on the update thread, which does not run if IsDisposed = true
+                        Task task = null;
+                        var del = new ScheduledDelegate(() => task = LoadComponentAsync(d, add));
+                        Scheduler.Add(del);
+
+                        // The delegate won't complete if OsuGame has been disposed in the meantime
+                        while (!IsDisposed && !del.Completed)
+                            await Task.Delay(10);
+
+                        // Either we're disposed or the load process has started successfully
+                        if (IsDisposed)
+                            return;
+
+                        Debug.Assert(task != null);
+
+                        await task;
+
                         Logger.Log($"Loaded {d}!", level: LogLevel.Debug);
                     }
                     catch (OperationCanceledException)

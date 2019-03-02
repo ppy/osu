@@ -33,7 +33,8 @@ namespace osu.Game.Overlays.KeyBinding
         {
             protected override string Header => "In Game";
 
-            public InGameKeyBindingsSubsection(GlobalActionContainer manager) : base(null)
+            public InGameKeyBindingsSubsection(GlobalActionContainer manager)
+                : base(null)
             {
                 Defaults = manager.InGameKeyBindings;
             }

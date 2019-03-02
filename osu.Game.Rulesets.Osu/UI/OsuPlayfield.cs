@@ -16,7 +16,7 @@ namespace osu.Game.Rulesets.Osu.UI
 {
     public class OsuPlayfield : Playfield
     {
-        private readonly Container approachCircles;
+        private readonly ApproachCircleProxyContainer approachCircles;
         private readonly JudgementContainer<DrawableOsuJudgement> judgementLayer;
         private readonly ConnectionRenderer<OsuHitObject> connectionLayer;
 
@@ -45,7 +45,7 @@ namespace osu.Game.Rulesets.Osu.UI
                         Depth = 1,
                     },
                     HitObjectContainer,
-                    approachCircles = new Container
+                    approachCircles = new ApproachCircleProxyContainer
                     {
                         RelativeSizeAxes = Axes.Both,
                         Depth = -1,
@@ -58,11 +58,24 @@ namespace osu.Game.Rulesets.Osu.UI
         {
             h.OnNewResult += onNewResult;
 
-            var c = h as IDrawableHitObjectWithProxiedApproach;
-            if (c != null)
-                approachCircles.Add(c.ProxiedLayer.CreateProxy());
+            if (h is IDrawableHitObjectWithProxiedApproach c)
+            {
+                var original = c.ProxiedLayer;
+
+                // Hitobjects only have lifetimes set on LoadComplete. For nested hitobjects (e.g. SliderHeads), this only happens when the parenting slider becomes visible.
+                // This delegation is required to make sure that the approach circles for those not-yet-loaded objects aren't added prematurely.
+                original.OnLoadComplete += addApproachCircleProxy;
+            }
 
             base.Add(h);
+        }
+
+        private void addApproachCircleProxy(Drawable d)
+        {
+            var proxy = d.CreateProxy();
+            proxy.LifetimeStart = d.LifetimeStart;
+            proxy.LifetimeEnd = d.LifetimeEnd;
+            approachCircles.Add(proxy);
         }
 
         public override void PostProcess()
@@ -86,5 +99,10 @@ namespace osu.Game.Rulesets.Osu.UI
         }
 
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => HitObjectContainer.ReceivePositionalInputAt(screenSpacePos);
+
+        private class ApproachCircleProxyContainer : LifetimeManagementContainer
+        {
+            public void Add(Drawable approachCircleProxy) => AddInternal(approachCircleProxy);
+        }
     }
 }

@@ -15,10 +15,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
 
         public Color4 AccentColour
         {
-            get
-            {
-                return Disc.Colour;
-            }
+            get => Disc.Colour;
             set
             {
                 Disc.Colour = value;

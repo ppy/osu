@@ -213,6 +213,7 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
             public void Expand()
             {
                 if (!cursorExpand) return;
+
                 expandTarget.ScaleTo(released_scale).ScaleTo(pressed_scale, 100, Easing.OutQuad);
             }
 

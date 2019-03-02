@@ -24,7 +24,17 @@ namespace osu.Game.Graphics.Containers
 
         protected override bool BlockNonPositionalInput => true;
 
-        private PreviewTrackManager previewTrackManager;
+        /// <summary>
+        /// Temporary to allow for overlays in the main screen content to not dim theirselves.
+        /// Should be eventually replaced by dimming which is aware of the target dim container (traverse parent for certain interface type?).
+        /// </summary>
+        protected virtual bool DimMainContent => true;
+
+        [Resolved(CanBeNull = true)]
+        private OsuGame osuGame { get; set; }
+
+        [Resolved]
+        private PreviewTrackManager previewTrackManager { get; set; }
 
         protected readonly Bindable<OverlayActivation> OverlayActivationMode = new Bindable<OverlayActivation>(OverlayActivation.All);
 
@@ -36,10 +46,8 @@ namespace osu.Game.Graphics.Containers
         }
 
         [BackgroundDependencyLoader(true)]
-        private void load(OsuGame osuGame, AudioManager audio, PreviewTrackManager previewTrackManager)
+        private void load(AudioManager audio)
         {
-            this.previewTrackManager = previewTrackManager;
-
             if (osuGame != null)
                 OverlayActivationMode.BindTo(osuGame.OverlayActivationMode);
 
@@ -93,12 +101,15 @@ namespace osu.Game.Graphics.Containers
                     if (OverlayActivationMode.Value != OverlayActivation.Disabled)
                     {
                         if (PlaySamplesOnStateChange) samplePopIn?.Play();
+                        if (BlockScreenWideMouse && DimMainContent) osuGame?.AddBlockingOverlay(this);
                     }
                     else
                         State = Visibility.Hidden;
+
                     break;
                 case Visibility.Hidden:
                     if (PlaySamplesOnStateChange) samplePopOut?.Play();
+                    if (BlockScreenWideMouse) osuGame?.RemoveBlockingOverlay(this);
                     break;
             }
         }
@@ -107,6 +118,12 @@ namespace osu.Game.Graphics.Containers
         {
             base.PopOut();
             previewTrackManager.StopAnyPlaying(this);
+        }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+            osuGame?.RemoveBlockingOverlay(this);
         }
     }
 }
