@@ -1,7 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using osu.Framework.Configuration;
+using osu.Framework.Bindables;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Objects;
 using osuTK;
@@ -21,7 +21,7 @@ namespace osu.Game.Rulesets.Osu.Objects
 
         public virtual Vector2 Position
         {
-            get => PositionBindable;
+            get => PositionBindable.Value;
             set => PositionBindable.Value = value;
         }
 
@@ -38,7 +38,7 @@ namespace osu.Game.Rulesets.Osu.Objects
 
         public int StackHeight
         {
-            get => StackHeightBindable;
+            get => StackHeightBindable.Value;
             set => StackHeightBindable.Value = value;
         }
 
@@ -50,7 +50,7 @@ namespace osu.Game.Rulesets.Osu.Objects
 
         public float Scale
         {
-            get => ScaleBindable;
+            get => ScaleBindable.Value;
             set => ScaleBindable.Value = value;
         }
 

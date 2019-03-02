@@ -3,8 +3,8 @@
 
 using System.Collections.Generic;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osuTK.Graphics;
-using osu.Framework.Configuration;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -39,7 +39,7 @@ namespace osu.Game.Overlays.Settings
 
         public virtual string LabelText
         {
-            get { return text?.Text ?? string.Empty; }
+            get => text?.Text ?? string.Empty;
             set
             {
                 if (text == null)
@@ -58,7 +58,7 @@ namespace osu.Game.Overlays.Settings
 
         public virtual Bindable<T> Bindable
         {
-            get { return bindable; }
+            get => bindable;
 
             set
             {
@@ -78,11 +78,7 @@ namespace osu.Game.Overlays.Settings
 
         public bool MatchingFilter
         {
-            set
-            {
-                // probably needs a better transition.
-                this.FadeTo(value ? 1 : 0);
-            }
+            set => this.FadeTo(value ? 1 : 0);
         }
 
         protected SettingsItem()
@@ -117,12 +113,12 @@ namespace osu.Game.Overlays.Settings
 
             public Bindable<T> Bindable
             {
-                get { return bindable; }
+                get => bindable;
                 set
                 {
                     bindable = value;
-                    bindable.ValueChanged += newValue => UpdateState();
-                    bindable.DisabledChanged += disabled => UpdateState();
+                    bindable.ValueChanged += _ => UpdateState();
+                    bindable.DisabledChanged += _ => UpdateState();
                 }
             }
 

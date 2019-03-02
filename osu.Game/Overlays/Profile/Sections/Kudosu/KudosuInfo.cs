@@ -1,9 +1,9 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using osu.Framework.Bindables;
 using osuTK;
 using osuTK.Graphics;
-using osu.Framework.Configuration;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -63,10 +63,10 @@ namespace osu.Game.Overlays.Profile.Sections.Kudosu
                 }
             };
 
-            this.user.ValueChanged += newUser =>
+            this.user.ValueChanged += u =>
             {
-                total.Count = newUser?.Kudosu.Total ?? 0;
-                avaliable.Count = newUser?.Kudosu.Available ?? 0;
+                total.Count = u.NewValue?.Kudosu.Total ?? 0;
+                avaliable.Count = u.NewValue?.Kudosu.Available ?? 0;
             };
         }
 
@@ -78,7 +78,7 @@ namespace osu.Game.Overlays.Profile.Sections.Kudosu
 
             public new int Count
             {
-                set { valueText.Text = value.ToString(); }
+                set => valueText.Text = value.ToString();
             }
 
             public CountSection(string header, string description)
@@ -107,21 +107,19 @@ namespace osu.Game.Overlays.Profile.Sections.Kudosu
                                     Anchor = Anchor.BottomLeft,
                                     Origin = Anchor.BottomLeft,
                                     Text = header + ":",
-                                    TextSize = 20,
-                                    Font = @"Exo2.0-RegularItalic",
+                                    Font = OsuFont.GetFont(size: 20, weight: FontWeight.Regular, italics: true)
                                 },
                                 valueText = new OsuSpriteText
                                 {
                                     Anchor = Anchor.BottomLeft,
                                     Origin = Anchor.BottomLeft,
                                     Text = "0",
-                                    TextSize = 40,
+                                    Font = OsuFont.GetFont(size: 40, weight: FontWeight.Regular, italics: true),
                                     UseFullGlyphHeight = false,
-                                    Font = @"Exo2.0-RegularItalic"
                                 }
                             }
                         },
-                        new OsuTextFlowContainer(t => { t.TextSize = 19; })
+                        new OsuTextFlowContainer(t => t.Font = t.Font.With(size: 19))
                         {
                             RelativeSizeAxes = Axes.X,
                             AutoSizeAxes = Axes.Y,

@@ -19,10 +19,13 @@ namespace osu.Game.Rulesets.Taiko
     {
         [Description("Left (rim)")]
         LeftRim,
+
         [Description("Left (centre)")]
         LeftCentre,
+
         [Description("Right (centre)")]
         RightCentre,
+
         [Description("Right (rim)")]
         RightRim
     }

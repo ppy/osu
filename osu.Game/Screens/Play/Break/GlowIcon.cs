@@ -16,7 +16,7 @@ namespace osu.Game.Screens.Play.Break
 
         public override Vector2 Size
         {
-            get { return base.Size; }
+            get => base.Size;
             set
             {
                 blurredIcon.Size = spriteIcon.Size = value;
@@ -26,14 +26,14 @@ namespace osu.Game.Screens.Play.Break
 
         public Vector2 BlurSigma
         {
-            get { return blurredIcon.BlurSigma; }
-            set { blurredIcon.BlurSigma = value; }
+            get => blurredIcon.BlurSigma;
+            set => blurredIcon.BlurSigma = value;
         }
 
         public FontAwesome Icon
         {
-            get { return spriteIcon.Icon; }
-            set { spriteIcon.Icon = blurredIcon.Icon = value; }
+            get => spriteIcon.Icon;
+            set => spriteIcon.Icon = blurredIcon.Icon = value;
         }
 
         public GlowIcon()
