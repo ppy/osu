@@ -32,7 +32,7 @@ namespace osu.Game.Screens.Select
 
         public SortMode Sort
         {
-            get { return sort; }
+            get => sort;
             set
             {
                 if (sort != value)
@@ -47,7 +47,7 @@ namespace osu.Game.Screens.Select
 
         public GroupMode Group
         {
-            get { return group; }
+            get => group;
             set
             {
                 if (group != value)

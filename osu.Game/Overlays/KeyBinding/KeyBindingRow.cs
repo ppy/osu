@@ -35,7 +35,7 @@ namespace osu.Game.Overlays.KeyBinding
 
         public bool MatchingFilter
         {
-            get { return matchingFilter; }
+            get => matchingFilter;
             set
             {
                 matchingFilter = value;
@@ -309,10 +309,11 @@ namespace osu.Game.Overlays.KeyBinding
 
             public bool IsBinding
             {
-                get { return isBinding; }
+                get => isBinding;
                 set
                 {
                     if (value == isBinding) return;
+
                     isBinding = value;
 
                     updateHoverState();

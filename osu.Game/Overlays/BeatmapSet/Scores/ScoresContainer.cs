@@ -34,7 +34,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
 
         public IEnumerable<APIScoreInfo> Scores
         {
-            get { return scores; }
+            get => scores;
             set
             {
                 getScoresRequest?.Cancel();

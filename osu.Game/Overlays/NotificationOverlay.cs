@@ -78,6 +78,7 @@ namespace osu.Game.Overlays
         }
 
         private ScheduledDelegate notificationsEnabler;
+
         private void updateProcessingMode()
         {
             bool enabled = OverlayActivationMode.Value == OverlayActivation.All || State == Visibility.Visible;
@@ -118,8 +119,7 @@ namespace osu.Game.Overlays
 
             notification.Closed += notificationClosed;
 
-            var hasCompletionTarget = notification as IHasCompletionTarget;
-            if (hasCompletionTarget != null)
+            if (notification is IHasCompletionTarget hasCompletionTarget)
                 hasCompletionTarget.CompletionTarget = Post;
 
             var ourType = notification.GetType();

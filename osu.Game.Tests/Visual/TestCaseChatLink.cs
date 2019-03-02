@@ -56,7 +56,7 @@ namespace osu.Game.Tests.Visual
 
             var chatManager = new ChannelManager();
             BindableList<Channel> availableChannels = (BindableList<Channel>)chatManager.AvailableChannels;
-            availableChannels.Add(new Channel { Name = "#english"});
+            availableChannels.Add(new Channel { Name = "#english" });
             availableChannels.Add(new Channel { Name = "#japanese" });
             Dependencies.Cache(chatManager);
 

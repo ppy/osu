@@ -27,6 +27,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
         protected override IEnumerable<Type> ValidConversionTypes { get; } = new[] { typeof(IHasXPosition) };
 
         public int TargetColumns;
+        public bool Dual;
         public readonly bool IsForCurrentRuleset;
 
         // Internal for testing purposes
@@ -45,7 +46,14 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
             var roundedOverallDifficulty = Math.Round(beatmap.BeatmapInfo.BaseDifficulty.OverallDifficulty);
 
             if (IsForCurrentRuleset)
+            {
                 TargetColumns = (int)Math.Max(1, roundedCircleSize);
+                if (TargetColumns >= 10)
+                {
+                    TargetColumns = TargetColumns / 2;
+                    Dual = true;
+                }
+            }
             else
             {
                 float percentSliderOrSpinner = (float)beatmap.HitObjects.Count(h => h is IHasEndTime) / beatmap.HitObjects.Count;
@@ -70,14 +78,22 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
             return base.ConvertBeatmap(original);
         }
 
-        protected override Beatmap<ManiaHitObject> CreateBeatmap() => beatmap = new ManiaBeatmap(new StageDefinition { Columns = TargetColumns });
+        protected override Beatmap<ManiaHitObject> CreateBeatmap()
+        {
+            beatmap = new ManiaBeatmap(new StageDefinition { Columns = TargetColumns });
+
+            if (Dual)
+                beatmap.Stages.Add(new StageDefinition { Columns = TargetColumns });
+
+            return beatmap;
+        }
 
         protected override IEnumerable<ManiaHitObject> ConvertHitObject(HitObject original, IBeatmap beatmap)
         {
-            var maniaOriginal = original as ManiaHitObject;
-            if (maniaOriginal != null)
+            if (original is ManiaHitObject maniaOriginal)
             {
                 yield return maniaOriginal;
+
                 yield break;
             }
 
@@ -92,6 +108,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
 
         private readonly List<double> prevNoteTimes = new List<double>(max_notes_for_density);
         private double density = int.MaxValue;
+
         private void computeDensity(double newNoteTime)
         {
             if (prevNoteTimes.Count == max_notes_for_density)
@@ -104,6 +121,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
         private double lastTime;
         private Vector2 lastPosition;
         private PatternType lastStair = PatternType.Stair;
+
         private void recordNote(double time, Vector2 position)
         {
             lastTime = time;

@@ -35,9 +35,10 @@ namespace osu.Game.Graphics.UserInterface
         public virtual string TooltipText { get; private set; }
 
         private Color4 accentColour;
+
         public Color4 AccentColour
         {
-            get { return accentColour; }
+            get => accentColour;
             set
             {
                 accentColour = value;
@@ -79,10 +80,7 @@ namespace osu.Game.Graphics.UserInterface
                 new HoverClickSounds()
             };
 
-            Current.DisabledChanged += disabled =>
-            {
-                Alpha = disabled ? 0.3f : 1;
-            };
+            Current.DisabledChanged += disabled => { Alpha = disabled ? 0.3f : 1; };
         }
 
         [BackgroundDependencyLoader]

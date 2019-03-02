@@ -38,6 +38,8 @@ namespace osu.Game.Overlays.Mods
 
         protected override bool BlockNonPositionalInput => false;
 
+        protected override bool DimMainContent => false;
+
         protected readonly FillFlowContainer<ModSection> ModSectionsContainer;
 
         protected readonly Bindable<IEnumerable<Mod>> SelectedMods = new Bindable<IEnumerable<Mod>>(new Mod[] { });
@@ -168,6 +170,7 @@ namespace osu.Game.Overlays.Mods
         public void DeselectTypes(Type[] modTypes, bool immediate = false)
         {
             if (modTypes.Length == 0) return;
+
             foreach (ModSection section in ModSectionsContainer.Children)
                 section.DeselectTypes(modTypes, immediate);
         }

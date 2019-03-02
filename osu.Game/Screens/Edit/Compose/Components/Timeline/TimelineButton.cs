@@ -19,8 +19,8 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
         public FontAwesome Icon
         {
-            get { return button.Icon; }
-            set { button.Icon = value; }
+            get => button.Icon;
+            set => button.Icon = value;
         }
 
         private readonly IconButton button;

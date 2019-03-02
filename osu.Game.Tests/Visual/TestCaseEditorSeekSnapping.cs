@@ -33,7 +33,7 @@ namespace osu.Game.Tests.Visual
                 {
                     TimingPoints =
                     {
-                        new TimingControlPoint { Time = 0, BeatLength = 200},
+                        new TimingControlPoint { Time = 0, BeatLength = 200 },
                         new TimingControlPoint { Time = 100, BeatLength = 400 },
                         new TimingControlPoint { Time = 175, BeatLength = 800 },
                         new TimingControlPoint { Time = 350, BeatLength = 200 },

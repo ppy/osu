@@ -20,9 +20,15 @@ namespace osu.Game.Tests.Visual
     {
         public SortedList<MultiplierControlPoint> ControlPoints => scrollingInfo.Algorithm.ControlPoints;
 
-        public ScrollVisualisationMethod ScrollAlgorithm { set => scrollingInfo.Algorithm.Algorithm = value; }
+        public ScrollVisualisationMethod ScrollAlgorithm
+        {
+            set => scrollingInfo.Algorithm.Algorithm = value;
+        }
 
-        public double TimeRange { set => scrollingInfo.TimeRange.Value = value; }
+        public double TimeRange
+        {
+            set => scrollingInfo.TimeRange.Value = value;
+        }
 
         public IScrollingInfo ScrollingInfo => scrollingInfo;
 

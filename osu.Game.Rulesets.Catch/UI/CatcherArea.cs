@@ -33,7 +33,7 @@ namespace osu.Game.Rulesets.Catch.UI
 
         public Container ExplodingFruitTarget
         {
-            set { MovableCatcher.ExplodingFruitTarget = value; }
+            set => MovableCatcher.ExplodingFruitTarget = value;
         }
 
         public CatcherArea(BeatmapDifficulty difficulty = null)
@@ -158,7 +158,7 @@ namespace osu.Game.Rulesets.Catch.UI
 
             protected bool Dashing
             {
-                get { return dashing; }
+                get => dashing;
                 set
                 {
                     if (value == dashing) return;
@@ -176,7 +176,7 @@ namespace osu.Game.Rulesets.Catch.UI
             /// </summary>
             protected bool Trail
             {
-                get { return trail; }
+                get => trail;
                 set
                 {
                     if (value == trail) return;
