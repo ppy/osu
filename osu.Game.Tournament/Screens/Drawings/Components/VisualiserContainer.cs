@@ -19,7 +19,7 @@ namespace osu.Game.Tournament.Screens.Drawings.Components
         /// </summary>
         public int Lines
         {
-            get { return allLines.Count; }
+            get => allLines.Count;
             set
             {
                 while (value > allLines.Count)

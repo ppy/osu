@@ -86,7 +86,7 @@ namespace osu.Game.Tournament.Screens.Drawings.Components
 
         private ScrollState scrollState
         {
-            get { return _scrollState; }
+            get => _scrollState;
 
             set
             {
@@ -326,7 +326,7 @@ namespace osu.Game.Tournament.Screens.Drawings.Components
 
             public bool Selected
             {
-                get { return selected; }
+                get => selected;
 
                 set
                 {

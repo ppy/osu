@@ -151,6 +151,7 @@ namespace osu.Game.Overlays.Notifications
         public virtual void Close()
         {
             if (WasClosed) return;
+
             WasClosed = true;
 
             Closed?.Invoke();
@@ -205,7 +206,7 @@ namespace osu.Game.Overlays.Notifications
 
             public bool Pulsate
             {
-                get { return pulsate; }
+                get => pulsate;
                 set
                 {
                     if (pulsate == value) return;

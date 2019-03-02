@@ -1,24 +1,20 @@
-﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
 using System.Linq;
+using osu.Game.Rulesets.Difficulty.Preprocessing;
+using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Osu.Objects;
 using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
 {
-    /// <summary>
-    /// A wrapper around <see cref="OsuHitObject"/> extending it with additional data required for difficulty calculation.
-    /// </summary>
-    public class OsuDifficultyHitObject
+    public class OsuDifficultyHitObject : DifficultyHitObject
     {
         private const int normalized_radius = 52;
 
-        /// <summary>
-        /// The <see cref="OsuHitObject"/> this <see cref="OsuDifficultyHitObject"/> refers to.
-        /// </summary>
-        public OsuHitObject BaseObject { get; }
+        protected new OsuHitObject BaseObject => (OsuHitObject)base.BaseObject;
 
         /// <summary>
         /// Normalized distance from the end position of the previous <see cref="OsuDifficultyHitObject"/> to the start position of this <see cref="OsuDifficultyHitObject"/>.
@@ -31,39 +27,29 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
         public double TravelDistance { get; private set; }
 
         /// <summary>
-        /// Milliseconds elapsed since the StartTime of the previous <see cref="OsuDifficultyHitObject"/>.
-        /// </summary>
-        public double DeltaTime { get; private set; }
-
-        /// <summary>
-        /// Milliseconds elapsed since the start time of the previous <see cref="OsuDifficultyHitObject"/>, with a minimum of 50ms.
-        /// </summary>
-        public double StrainTime { get; private set; }
-
-        /// <summary>
         /// Angle the player has to take to hit this <see cref="OsuDifficultyHitObject"/>.
         /// Calculated as the angle between the circles (current-2, current-1, current).
         /// </summary>
         public double? Angle { get; private set; }
 
+        /// <summary>
+        /// Milliseconds elapsed since the start time of the previous <see cref="OsuDifficultyHitObject"/>, with a minimum of 50ms.
+        /// </summary>
+        public readonly double StrainTime;
+
         private readonly OsuHitObject lastLastObject;
         private readonly OsuHitObject lastObject;
-        private readonly double timeRate;
 
-        /// <summary>
-        /// Initializes the object calculating extra data required for difficulty calculation.
-        /// </summary>
-        public OsuDifficultyHitObject(OsuHitObject lastLastObject, OsuHitObject lastObject, OsuHitObject currentObject, double timeRate)
+        public OsuDifficultyHitObject(HitObject hitObject, HitObject lastLastObject, HitObject lastObject, double clockRate)
+            : base(hitObject, lastObject, clockRate)
         {
-            this.lastLastObject = lastLastObject;
-            this.lastObject = lastObject;
-            this.timeRate = timeRate;
-
-            BaseObject = currentObject;
+            this.lastLastObject = (OsuHitObject)lastLastObject;
+            this.lastObject = (OsuHitObject)lastObject;
 
             setDistances();
-            setTimingValues();
-            // Calculate angle here
+
+            // Every strain interval is hard capped at the equivalent of 375 BPM streaming speed as a safety measure
+            StrainTime = Math.Max(50, DeltaTime);
         }
 
         private void setDistances()
@@ -102,18 +88,11 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
             }
         }
 
-        private void setTimingValues()
-        {
-            DeltaTime = (BaseObject.StartTime - lastObject.StartTime) / timeRate;
-
-            // Every strain interval is hard capped at the equivalent of 375 BPM streaming speed as a safety measure
-            StrainTime = Math.Max(50, DeltaTime);
-        }
-
         private void computeSliderCursorPosition(Slider slider)
         {
             if (slider.LazyEndPosition != null)
                 return;
+
             slider.LazyEndPosition = slider.StackedPosition;
 
             float approxFollowCircleRadius = (float)(slider.Radius * 3);
@@ -149,8 +128,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
         {
             Vector2 pos = hitObject.StackedPosition;
 
-            var slider = hitObject as Slider;
-            if (slider != null)
+            if (hitObject is Slider slider)
             {
                 computeSliderCursorPosition(slider);
                 pos = slider.LazyEndPosition ?? pos;

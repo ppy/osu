@@ -25,19 +25,19 @@ namespace osu.Game.Online.Chat
         // This is in the format (<required>, [optional]):
         //      http[s]://<domain>.<tld>[:port][/path][?query][#fragment]
         private static readonly Regex advanced_link_regex = new Regex(
-                // protocol
-                @"(?<link>[a-z]*?:\/\/" +
-                // domain + tld
-                @"(?<domain>(?:[a-z0-9]\.|[a-z0-9][a-z0-9-]*[a-z0-9]\.)*[a-z0-9-]*[a-z0-9]" +
-                // port (optional)
-                @"(?::\d+)?)" +
-                // path (optional)
-                @"(?<path>(?:(?:\/+(?:[a-z0-9$_\.\+!\*\',;:\(\)@&~=-]|%[0-9a-f]{2})*)*" +
-                // query (optional)
-                @"(?:\?(?:[a-z0-9$_\+!\*\',;:\(\)@&=\/~-]|%[0-9a-f]{2})*)?)?" +
-                // fragment (optional)
-                @"(?:#(?:[a-z0-9$_\+!\*\',;:\(\)@&=\/~-]|%[0-9a-f]{2})*)?)?)",
-                RegexOptions.IgnoreCase);
+            // protocol
+            @"(?<link>[a-z]*?:\/\/" +
+            // domain + tld
+            @"(?<domain>(?:[a-z0-9]\.|[a-z0-9][a-z0-9-]*[a-z0-9]\.)*[a-z0-9-]*[a-z0-9]" +
+            // port (optional)
+            @"(?::\d+)?)" +
+            // path (optional)
+            @"(?<path>(?:(?:\/+(?:[a-z0-9$_\.\+!\*\',;:\(\)@&~=-]|%[0-9a-f]{2})*)*" +
+            // query (optional)
+            @"(?:\?(?:[a-z0-9$_\+!\*\',;:\(\)@&=\/~-]|%[0-9a-f]{2})*)?)?" +
+            // fragment (optional)
+            @"(?:#(?:[a-z0-9$_\+!\*\',;:\(\)@&=\/~-]|%[0-9a-f]{2})*)?)?)",
+            RegexOptions.IgnoreCase);
 
         // 00:00:000 (1,2,3) - test
         private static readonly Regex time_regex = new Regex(@"\d\d:\d\d:\d\d\d? [^-]*");
@@ -56,14 +56,14 @@ namespace osu.Game.Online.Chat
                 var index = m.Index - captureOffset;
 
                 var displayText = string.Format(display,
-                                                m.Groups[0],
-                                                m.Groups.Count > 1 ? m.Groups[1].Value : "",
-                                                m.Groups.Count > 2 ? m.Groups[2].Value : "").Trim();
+                    m.Groups[0],
+                    m.Groups.Count > 1 ? m.Groups[1].Value : "",
+                    m.Groups.Count > 2 ? m.Groups[2].Value : "").Trim();
 
                 var linkText = string.Format(link,
-                                                m.Groups[0],
-                                                m.Groups.Count > 1 ? m.Groups[1].Value : "",
-                                                m.Groups.Count > 2 ? m.Groups[2].Value : "").Trim();
+                    m.Groups[0],
+                    m.Groups.Count > 1 ? m.Groups[1].Value : "",
+                    m.Groups.Count > 2 ? m.Groups[2].Value : "").Trim();
 
                 if (displayText.Length == 0 || linkText.Length == 0) continue;
 

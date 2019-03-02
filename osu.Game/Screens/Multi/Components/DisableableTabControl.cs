@@ -1,7 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using osu.Framework.Configuration;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Events;
 
@@ -29,8 +29,9 @@ namespace osu.Game.Screens.Multi.Components
 
             protected override bool OnClick(ClickEvent e)
             {
-                if (!Enabled)
+                if (!Enabled.Value)
                     return true;
+
                 return base.OnClick(e);
             }
         }

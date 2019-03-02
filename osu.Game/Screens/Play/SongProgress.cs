@@ -9,7 +9,7 @@ using System.Collections.Generic;
 using osu.Game.Graphics;
 using osu.Framework.Allocation;
 using System.Linq;
-using osu.Framework.Configuration;
+using osu.Framework.Bindables;
 using osu.Framework.Timing;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
@@ -35,7 +35,11 @@ namespace osu.Game.Screens.Play
         public override bool HandlePositionalInput => AllowSeeking;
 
         private IClock audioClock;
-        public IClock AudioClock { set { audioClock = info.AudioClock = value; } }
+
+        public IClock AudioClock
+        {
+            set => audioClock = info.AudioClock = value;
+        }
 
         private double lastHitTime => ((objects.Last() as IHasEndTime)?.EndTime ?? objects.Last().StartTime) + 1;
 
@@ -94,7 +98,7 @@ namespace osu.Game.Screens.Play
                 {
                     Alpha = 0,
                     Anchor = Anchor.BottomLeft,
-                    Origin =  Anchor.BottomLeft,
+                    Origin = Anchor.BottomLeft,
                     OnSeek = position => OnSeek?.Invoke(position),
                 },
             };
@@ -104,7 +108,7 @@ namespace osu.Game.Screens.Play
         {
             State = Visibility.Visible;
 
-            replayLoaded.ValueChanged += v => AllowSeeking = v;
+            replayLoaded.ValueChanged += loaded => AllowSeeking = loaded.NewValue;
             replayLoaded.TriggerChange();
         }
 
@@ -117,11 +121,7 @@ namespace osu.Game.Screens.Play
 
         public bool AllowSeeking
         {
-            get
-            {
-                return allowSeeking;
-            }
-
+            get => allowSeeking;
             set
             {
                 if (allowSeeking == value) return;

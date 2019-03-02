@@ -31,7 +31,7 @@ namespace osu.Game.Overlays.Settings
 
         public bool MatchingFilter
         {
-            set { this.FadeTo(value ? 1 : 0); }
+            set => this.FadeTo(value ? 1 : 0);
         }
 
         protected SettingsSection()
@@ -77,7 +77,7 @@ namespace osu.Game.Overlays.Settings
                     {
                         new OsuSpriteText
                         {
-                            TextSize = header_size,
+                            Font = OsuFont.GetFont(size: header_size),
                             Text = Header,
                             Colour = colours.Yellow,
                             Margin = new MarginPadding { Left = SettingsOverlay.CONTENT_MARGINS, Right = SettingsOverlay.CONTENT_MARGINS }

@@ -67,7 +67,7 @@ namespace osu.Game.Overlays.Direct
         {
             base.LoadComplete();
 
-            State.BindValueChanged(updateState, true);
+            State.BindValueChanged(state => updateState(state.NewValue), true);
             FinishTransforms(true);
         }
 
@@ -85,10 +85,10 @@ namespace osu.Game.Overlays.Direct
                         shakeContainer.Shake();
                         break;
                     case DownloadState.LocallyAvailable:
-                        game.PresentBeatmap(BeatmapSet);
+                        game.PresentBeatmap(BeatmapSet.Value);
                         break;
                     default:
-                        beatmaps.Download(BeatmapSet, noVideo);
+                        beatmaps.Download(BeatmapSet.Value, noVideo);
                         break;
                 }
             };
