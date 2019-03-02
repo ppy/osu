@@ -2,7 +2,7 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using osu.Framework.Allocation;
-using osu.Framework.Configuration;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Video;
@@ -62,10 +62,10 @@ namespace osu.Game.Tournament.Screens.TeamWin
             currentCompleted.BindValueChanged(_ => update());
         }
 
-        private void matchChanged(MatchPairing pairing)
+        private void matchChanged(ValueChangedEvent<MatchPairing> pairing)
         {
             currentCompleted.UnbindBindings();
-            currentCompleted.BindTo(pairing.Completed);
+            currentCompleted.BindTo(pairing.NewValue.Completed);
 
             update();
         }

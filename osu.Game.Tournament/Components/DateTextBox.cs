@@ -2,7 +2,7 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
-using osu.Framework.Configuration;
+using osu.Framework.Bindables;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays.Settings;
 
@@ -12,13 +12,12 @@ namespace osu.Game.Tournament.Components
     {
         public new Bindable<DateTimeOffset> Bindable
         {
-            get { return bindable; }
-
+            get => bindable;
             set
             {
                 bindable = value;
                 bindable.BindValueChanged(dto =>
-                    base.Bindable.Value = dto.ToUniversalTime().ToString("yyyy-MM-ddTHH:mm:ssZ"), true);
+                    base.Bindable.Value = dto.NewValue.ToUniversalTime().ToString("yyyy-MM-ddTHH:mm:ssZ"), true);
             }
         }
 

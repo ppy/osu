@@ -2,6 +2,7 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Legacy;
@@ -30,15 +31,15 @@ namespace osu.Game.Tournament.Screens
             ipc.Mods.BindValueChanged(modsChanged, true);
         }
 
-        private void modsChanged(LegacyMods mods)
+        private void modsChanged(ValueChangedEvent<LegacyMods> mods)
         {
-            SongBar.Mods = mods;
+            SongBar.Mods = mods.NewValue;
         }
 
-        private void beatmapChanged(BeatmapInfo beatmap)
+        private void beatmapChanged(ValueChangedEvent<BeatmapInfo> beatmap)
         {
             SongBar.FadeInFromZero(300, Easing.OutQuint);
-            SongBar.Beatmap = beatmap;
+            SongBar.Beatmap = beatmap.NewValue;
         }
     }
 }

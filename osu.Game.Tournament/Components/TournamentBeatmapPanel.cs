@@ -6,7 +6,7 @@ using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.Linq;
 using osu.Framework.Allocation;
-using osu.Framework.Configuration;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -148,9 +148,9 @@ namespace osu.Game.Tournament.Components
                 });
         }
 
-        private void matchChanged(MatchPairing match)
+        private void matchChanged(ValueChangedEvent<MatchPairing> pairing)
         {
-            match.PicksBans.CollectionChanged += picksBansOnCollectionChanged;
+            pairing.NewValue.PicksBans.CollectionChanged += picksBansOnCollectionChanged;
             updateState();
         }
 

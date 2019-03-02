@@ -3,7 +3,7 @@
 
 using System.Linq;
 using osu.Framework.Allocation;
-using osu.Framework.Configuration;
+using osu.Framework.Bindables;
 using osu.Game.Online.Chat;
 using osu.Game.Overlays.Chat;
 using osu.Game.Tournament.IPC;
@@ -25,12 +25,12 @@ namespace osu.Game.Tournament.Components
             if (ipc != null)
             {
                 chatChannel.BindTo(ipc.ChatChannel);
-                chatChannel.BindValueChanged(channelString =>
+                chatChannel.BindValueChanged(c =>
                 {
-                    if (string.IsNullOrWhiteSpace(channelString))
+                    if (string.IsNullOrWhiteSpace(c.NewValue))
                         return;
 
-                    int id = int.Parse(channelString);
+                    int id = int.Parse(c.NewValue);
 
                     if (id <= 0) return;
 

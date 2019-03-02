@@ -2,7 +2,7 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using osu.Framework.Allocation;
-using osu.Framework.Configuration;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Video;
@@ -46,9 +46,9 @@ namespace osu.Game.Tournament.Screens.TeamIntro
             currentMatch.BindTo(ladder.CurrentMatch);
         }
 
-        private void matchChanged(MatchPairing pairing)
+        private void matchChanged(ValueChangedEvent<MatchPairing> pairing)
         {
-            if (pairing == null)
+            if (pairing.NewValue == null)
             {
                 mainContainer.Clear();
                 return;
@@ -56,7 +56,7 @@ namespace osu.Game.Tournament.Screens.TeamIntro
 
             mainContainer.Children = new Drawable[]
             {
-                new TeamWithPlayers(pairing.Team1, true)
+                new TeamWithPlayers(pairing.NewValue.Team1.Value, true)
                 {
                     RelativeSizeAxes = Axes.Both,
                     Width = 0.5f,
@@ -64,7 +64,7 @@ namespace osu.Game.Tournament.Screens.TeamIntro
                     Anchor = Anchor.Centre,
                     Origin = Anchor.CentreRight
                 },
-                new TeamWithPlayers(pairing.Team2)
+                new TeamWithPlayers(pairing.NewValue.Team2.Value)
                 {
                     RelativeSizeAxes = Axes.Both,
                     Width = 0.5f,
@@ -72,7 +72,7 @@ namespace osu.Game.Tournament.Screens.TeamIntro
                     Anchor = Anchor.Centre,
                     Origin = Anchor.CentreLeft
                 },
-                new RoundDisplay(pairing)
+                new RoundDisplay(pairing.NewValue)
                 {
                     RelativeSizeAxes = Axes.Both,
                     Height = 0.25f,

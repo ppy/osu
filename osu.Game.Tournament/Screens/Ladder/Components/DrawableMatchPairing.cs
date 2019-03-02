@@ -2,7 +2,7 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using osu.Framework.Allocation;
-using osu.Framework.Configuration;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -87,7 +87,8 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
             pairing.Position.BindValueChanged(pos =>
             {
                 if (IsDragged) return;
-                Position = new Vector2(pos.X, pos.Y);
+
+                Position = new Vector2(pos.NewValue.X, pos.NewValue.Y);
             }, true);
 
             updateTeams();
@@ -127,7 +128,7 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
 
         private void updateProgression()
         {
-            if (!Pairing.Completed)
+            if (!Pairing.Completed.Value)
             {
                 // ensure we clear any of our teams from our progression.
                 // this is not pretty logic but should suffice for now.
@@ -177,10 +178,10 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
         {
             if (Pairing.Grouping.Value == null) return;
 
-            var instaWinAmount = Pairing.Grouping.Value.BestOf / 2;
+            var instaWinAmount = Pairing.Grouping.Value.BestOf.Value / 2;
 
-            Pairing.Completed.Value = Pairing.Grouping.Value.BestOf > 0
-                                      && (Pairing.Team1Score + Pairing.Team2Score >= Pairing.Grouping.Value.BestOf || Pairing.Team1Score > instaWinAmount || Pairing.Team2Score > instaWinAmount);
+            Pairing.Completed.Value = Pairing.Grouping.Value.BestOf.Value > 0
+                                      && (Pairing.Team1Score.Value + Pairing.Team2Score.Value >= Pairing.Grouping.Value.BestOf.Value || Pairing.Team1Score.Value > instaWinAmount || Pairing.Team2Score.Value > instaWinAmount);
         }
 
         protected override void LoadComplete()
@@ -193,7 +194,7 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
                 globalSelection = editorInfo.Selected.GetBoundCopy();
                 globalSelection.BindValueChanged(s =>
                 {
-                    if (s != Pairing) Selected = false;
+                    if (s.NewValue != Pairing) Selected = false;
                 });
             }
         }
@@ -216,14 +217,14 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
                     var team2Match = conditional.Acronyms.Contains(Pairing.Team2Acronym);
 
                     if (team1Match && team2Match)
-                        Pairing.Date.Value = conditional.Date;
+                        Pairing.Date.Value = conditional.Date.Value;
                 }
             }
 
             Flow.Children = new[]
             {
-                new DrawableMatchTeam(Pairing.Team1, Pairing, Pairing.Losers),
-                new DrawableMatchTeam(Pairing.Team2, Pairing, Pairing.Losers)
+                new DrawableMatchTeam(Pairing.Team1.Value, Pairing, Pairing.Losers.Value),
+                new DrawableMatchTeam(Pairing.Team2.Value, Pairing, Pairing.Losers.Value)
             };
 
             SchedulerAfterChildren.Add(() => Scheduler.Add(updateProgression));
