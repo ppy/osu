@@ -98,13 +98,13 @@ namespace osu.Game.Tournament.Screens.Ladder
                         // clean up outdated progressions.
                         pairing.Pairing.Progression.Value = null;
                     else
-                        paths.Add(new ProgressionPath(pairing, dest) { Colour = pairing.Pairing.Losers ? losersPathColour : normalPathColour });
+                        paths.Add(new ProgressionPath(pairing, dest) { Colour = pairing.Pairing.Losers.Value ? losersPathColour : normalPathColour });
                 }
             }
 
             foreach (var group in LadderInfo.Groupings)
             {
-                var topPairing = PairingsContainer.Where(p => !p.Pairing.Losers && p.Pairing.Grouping.Value == group).OrderBy(p => p.Y).FirstOrDefault();
+                var topPairing = PairingsContainer.Where(p => !p.Pairing.Losers.Value && p.Pairing.Grouping.Value == group).OrderBy(p => p.Y).FirstOrDefault();
 
                 if (topPairing == null) continue;
 
@@ -118,7 +118,7 @@ namespace osu.Game.Tournament.Screens.Ladder
 
             foreach (var group in LadderInfo.Groupings)
             {
-                var topPairing = PairingsContainer.Where(p => p.Pairing.Losers && p.Pairing.Grouping.Value == group).OrderBy(p => p.Y).FirstOrDefault();
+                var topPairing = PairingsContainer.Where(p => p.Pairing.Losers.Value && p.Pairing.Grouping.Value == group).OrderBy(p => p.Y).FirstOrDefault();
 
                 if (topPairing == null) continue;
 

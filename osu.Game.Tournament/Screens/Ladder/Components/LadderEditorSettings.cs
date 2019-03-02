@@ -4,7 +4,7 @@
 using System;
 using System.Linq;
 using osu.Framework.Allocation;
-using osu.Framework.Configuration;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input.Events;
@@ -93,11 +93,11 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
 
             editorInfo.Selected.ValueChanged += selection =>
             {
-                textboxTeam1.Text = selection?.Team1.Value?.Acronym;
-                textboxTeam2.Text = selection?.Team2.Value?.Acronym;
-                groupingDropdown.Bindable.Value = selection?.Grouping.Value ?? groupingOptions.First();
-                losersCheckbox.Current.Value = selection?.Losers.Value ?? false;
-                dateTimeBox.Bindable.Value = selection?.Date.Value ?? DateTimeOffset.UtcNow;
+                textboxTeam1.Text = selection.NewValue?.Team1.Value?.Acronym;
+                textboxTeam2.Text = selection.NewValue?.Team2.Value?.Acronym;
+                groupingDropdown.Bindable.Value = selection.NewValue?.Grouping.Value ?? groupingOptions.First();
+                losersCheckbox.Current.Value = selection.NewValue?.Losers.Value ?? false;
+                dateTimeBox.Bindable.Value = selection.NewValue?.Date.Value ?? DateTimeOffset.UtcNow;
             };
 
             textboxTeam1.OnCommit = (val, newText) =>
@@ -116,10 +116,10 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
             {
                 if (editorInfo.Selected.Value != null)
                 {
-                    editorInfo.Selected.Value.Grouping.Value = grouping;
-                    if (editorInfo.Selected.Value.Date.Value < grouping.StartDate.Value)
+                    editorInfo.Selected.Value.Grouping.Value = grouping.NewValue;
+                    if (editorInfo.Selected.Value.Date.Value < grouping.NewValue.StartDate.Value)
                     {
-                        editorInfo.Selected.Value.Date.Value = grouping.StartDate.Value;
+                        editorInfo.Selected.Value.Date.Value = grouping.NewValue.StartDate.Value;
                         editorInfo.Selected.TriggerChange();
                     }
                 }
@@ -128,13 +128,13 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
             losersCheckbox.Current.ValueChanged += losers =>
             {
                 if (editorInfo.Selected.Value != null)
-                    editorInfo.Selected.Value.Losers.Value = losers;
+                    editorInfo.Selected.Value.Losers.Value = losers.NewValue;
             };
 
             dateTimeBox.Bindable.ValueChanged += date =>
             {
                 if (editorInfo.Selected.Value != null)
-                    editorInfo.Selected.Value.Date.Value = date;
+                    editorInfo.Selected.Value.Date.Value = date.NewValue;
             };
         }
 

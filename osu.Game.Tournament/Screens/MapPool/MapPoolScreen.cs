@@ -3,7 +3,7 @@
 
 using System.Linq;
 using osu.Framework.Allocation;
-using osu.Framework.Configuration;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input.Events;
@@ -102,13 +102,13 @@ namespace osu.Game.Tournament.Screens.MapPool
             ipc.Beatmap.BindValueChanged(beatmapChanged);
         }
 
-        private void beatmapChanged(BeatmapInfo beatmap)
+        private void beatmapChanged(ValueChangedEvent<BeatmapInfo> beatmap)
         {
             if (currentMatch.Value.PicksBans.Count(p => p.Type == ChoiceType.Ban) < 2)
                 return;
 
-            if (beatmap.OnlineBeatmapID != null)
-                addForBeatmap(beatmap.OnlineBeatmapID.Value);
+            if (beatmap.NewValue.OnlineBeatmapID != null)
+                addForBeatmap(beatmap.NewValue.OnlineBeatmapID.Value);
         }
 
         private void setMode(TeamColour colour, ChoiceType choiceType)
@@ -201,16 +201,16 @@ namespace osu.Game.Tournament.Screens.MapPool
             }
         }
 
-        private void matchChanged(MatchPairing match)
+        private void matchChanged(ValueChangedEvent<MatchPairing> match)
         {
             mapFlows.Clear();
 
-            if (match.Grouping.Value != null)
+            if (match.NewValue.Grouping.Value != null)
             {
                 FillFlowContainer<TournamentBeatmapPanel> currentFlow = null;
                 string currentMod = null;
 
-                foreach (var b in match.Grouping.Value.Beatmaps)
+                foreach (var b in match.NewValue.Grouping.Value.Beatmaps)
                 {
                     if (currentFlow == null || currentMod != b.Mods)
                     {

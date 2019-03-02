@@ -2,7 +2,7 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using osu.Framework.Allocation;
-using osu.Framework.Configuration;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -73,13 +73,13 @@ namespace osu.Game.Tournament.Screens.Gameplay.Components
                 currentMatch.BindTo(ladder.CurrentMatch);
             }
 
-            private void matchChanged(MatchPairing match)
+            private void matchChanged(ValueChangedEvent<MatchPairing> match)
             {
                 currentTeamScore.UnbindBindings();
-                currentTeamScore.BindTo(teamColour == TeamColour.Red ? match.Team1Score : match.Team2Score);
+                currentTeamScore.BindTo(teamColour == TeamColour.Red ? match.NewValue.Team1Score : match.NewValue.Team2Score);
 
                 currentTeam.UnbindBindings();
-                currentTeam.BindTo(teamColour == TeamColour.Red ? match.Team1 : match.Team2);
+                currentTeam.BindTo(teamColour == TeamColour.Red ? match.NewValue.Team1 : match.NewValue.Team2);
 
                 // team may change to same team, which means score is not in a good state.
                 // thus we handle this manually.
@@ -144,7 +144,7 @@ namespace osu.Game.Tournament.Screens.Gameplay.Components
                 currentTeamScore.BindTo(score);
             }
 
-            private void scoreChanged(int? score) => counter.CountStars = score ?? 0;
+            private void scoreChanged(ValueChangedEvent<int?> score) => counter.CountStars = score.NewValue ?? 0;
         }
 
         private class TeamDisplay : DrawableTournamentTeam
@@ -204,7 +204,7 @@ namespace osu.Game.Tournament.Screens.Gameplay.Components
                 currentMatch.BindTo(ladder.CurrentMatch);
             }
 
-            private void matchChanged(MatchPairing match)
+            private void matchChanged(ValueChangedEvent<MatchPairing> match)
             {
                 InternalChildren = new Drawable[]
                 {
@@ -218,7 +218,7 @@ namespace osu.Game.Tournament.Screens.Gameplay.Components
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
                         Colour = Color4.White,
-                        Text = match.Grouping.Value?.Name.Value ?? "Unknown Grouping",
+                        Text = match.NewValue.Grouping.Value?.Name.Value ?? "Unknown Grouping",
                         Font = "Aquatico-Regular",
                         TextSize = 18,
                     },

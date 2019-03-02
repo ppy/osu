@@ -4,7 +4,7 @@
 using System;
 using System.Linq;
 using osu.Framework.Allocation;
-using osu.Framework.Configuration;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -48,9 +48,9 @@ namespace osu.Game.Tournament.Screens.Schedule
             currentMatch.BindTo(ladder.CurrentMatch);
         }
 
-        private void matchChanged(MatchPairing pairing)
+        private void matchChanged(ValueChangedEvent<MatchPairing> pairing)
         {
-            if (pairing == null)
+            if (pairing.NewValue == null)
             {
                 mainContainer.Clear();
                 return;
@@ -113,10 +113,10 @@ namespace osu.Game.Tournament.Screens.Schedule
                                 Colour = Color4.Black,
                                 TextSize = 20
                             },
-                            new SchedulePairing(currentMatch, false),
+                            new SchedulePairing(currentMatch.Value, false),
                             new OsuSpriteText
                             {
-                                Text = "Start Time " + pairing.Date.Value.ToUniversalTime().ToString("HH:mm UTC"),
+                                Text = "Start Time " + pairing.NewValue.Date.Value.ToUniversalTime().ToString("HH:mm UTC"),
                                 Colour = Color4.Black,
                                 TextSize = 20
                             },

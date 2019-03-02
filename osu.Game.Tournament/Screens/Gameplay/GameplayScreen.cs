@@ -2,7 +2,7 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using osu.Framework.Allocation;
-using osu.Framework.Configuration;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -120,10 +120,10 @@ namespace osu.Game.Tournament.Screens.Gameplay
             State.BindTo(ipc.State);
             State.BindValueChanged(stateChanged, true);
 
-            currentMatch.BindValueChanged(m => warmup.Value = m.Team1Score + m.Team2Score == 0);
+            currentMatch.BindValueChanged(m => warmup.Value = m.NewValue.Team1Score.Value + m.NewValue.Team2Score.Value == 0);
             currentMatch.BindTo(ladder.CurrentMatch);
 
-            warmup.BindValueChanged(w => warmupButton.Alpha = !w ? 0.5f : 1, true);
+            warmup.BindValueChanged(w => warmupButton.Alpha = !w.NewValue ? 0.5f : 1, true);
         }
 
         private ScheduledDelegate scheduledOperation;
@@ -132,15 +132,15 @@ namespace osu.Game.Tournament.Screens.Gameplay
 
         private TourneyState lastState;
 
-        private void stateChanged(TourneyState state)
+        private void stateChanged(ValueChangedEvent<TourneyState> state)
         {
             try
             {
-                if (state == TourneyState.Ranking)
+                if (state.NewValue == TourneyState.Ranking)
                 {
                     if (warmup.Value) return;
 
-                    if (ipc.Score1 > ipc.Score2)
+                    if (ipc.Score1.Value > ipc.Score2.Value)
                         currentMatch.Value.Team1Score.Value++;
                     else
                         currentMatch.Value.Team2Score.Value++;
@@ -167,16 +167,16 @@ namespace osu.Game.Tournament.Screens.Gameplay
                         chat.Contract();
                 }
 
-                switch (state)
+                switch (state.NewValue)
                 {
                     case TourneyState.Idle:
                         contract();
 
                         if (lastState == TourneyState.Ranking && !warmup.Value)
                         {
-                            if (currentMatch.Value?.Completed == true)
+                            if (currentMatch.Value?.Completed.Value == true)
                                 scheduledOperation = Scheduler.AddDelayed(() => { sceneManager?.SetScreen(typeof(TeamWinScreen)); }, 4000);
-                            else if (currentMatch.Value?.Completed == false)
+                            else if (currentMatch.Value?.Completed.Value == false)
                                 scheduledOperation = Scheduler.AddDelayed(() => { sceneManager?.SetScreen(typeof(MapPoolScreen)); }, 4000);
                         }
 
@@ -192,7 +192,7 @@ namespace osu.Game.Tournament.Screens.Gameplay
             }
             finally
             {
-                lastState = state;
+                lastState = state.NewValue;
             }
         }
     }

@@ -5,7 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using Newtonsoft.Json;
-using osu.Framework.Configuration;
+using osu.Framework.Bindables;
 using osu.Game.Tournament.Components;
 using SixLabors.Primitives;
 
@@ -71,8 +71,8 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
 
         public MatchPairing()
         {
-            Team1.BindValueChanged(t => Team1Acronym = t?.Acronym, true);
-            Team2.BindValueChanged(t => Team2Acronym = t?.Acronym, true);
+            Team1.BindValueChanged(t => Team1Acronym = t.NewValue?.Acronym, true);
+            Team2.BindValueChanged(t => Team2Acronym = t.NewValue?.Acronym, true);
         }
 
         public MatchPairing(TournamentTeam team1 = null, TournamentTeam team2 = null)
@@ -88,7 +88,7 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
         [JsonIgnore]
         public TournamentTeam Loser => !Completed.Value ? null : Team1Score.Value > Team2Score.Value ? Team2.Value : Team1.Value;
 
-        public int PointsToWin => Grouping.Value == null ? 0 : Grouping.Value.BestOf / 2 + 1;
+        public int PointsToWin => Grouping.Value?.BestOf.Value / 2 + 1 ?? 0;
 
         /// <summary>
         /// Remove scores from the match, in case of a false click or false start.

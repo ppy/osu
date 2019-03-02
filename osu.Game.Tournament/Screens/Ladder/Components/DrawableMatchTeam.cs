@@ -3,7 +3,7 @@
 
 using System;
 using osu.Framework.Allocation;
-using osu.Framework.Configuration;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
@@ -52,7 +52,7 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
         [Resolved(CanBeNull = true)]
         private LadderEditorInfo editorInfo { get; set; }
 
-        public DrawableMatchTeam(Bindable<TournamentTeam> team, MatchPairing pairing, bool losers)
+        public DrawableMatchTeam(TournamentTeam team, MatchPairing pairing, bool losers)
             : base(team)
         {
             this.pairing = pairing;
@@ -74,8 +74,8 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
                 isWinner = () => pairing.Winner == Team;
 
                 completed.BindTo(pairing.Completed);
-                if (team.Value != null)
-                    score.BindTo(team.Value == pairing.Team1.Value ? pairing.Team1Score : pairing.Team2Score);
+                if (team != null)
+                    score.BindTo(team == pairing.Team1.Value ? pairing.Team1Score : pairing.Team2Score);
             }
         }
 
@@ -133,7 +133,7 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
 
             score.BindValueChanged(val =>
             {
-                scoreText.Text = val?.ToString() ?? string.Empty;
+                scoreText.Text = val.NewValue?.ToString() ?? string.Empty;
                 updateWinStyle();
             }, true);
         }
@@ -155,7 +155,7 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
                 {
                     pairing.StartMatch();
                 }
-                else if (!pairing.Completed)
+                else if (!pairing.Completed.Value)
                     score.Value++;
             }
             else
@@ -164,7 +164,7 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
                     // don't allow changing scores if the match has a progression. can cause large data loss
                     return false;
 
-                if (pairing.Completed && pairing.Winner != Team)
+                if (pairing.Completed.Value && pairing.Winner != Team)
                     // don't allow changing scores from the non-winner
                     return false;
 
@@ -179,7 +179,7 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
 
         private void updateWinStyle()
         {
-            bool winner = completed && isWinner?.Invoke() == true;
+            bool winner = completed.Value && isWinner?.Invoke() == true;
 
             background.FadeColour(winner ? colourWinner : colourNormal, winner ? 500 : 0, Easing.OutQuint);
 

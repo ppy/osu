@@ -4,7 +4,7 @@
 using System;
 using System.Collections.Generic;
 using Newtonsoft.Json;
-using osu.Framework.Configuration;
+using osu.Framework.Bindables;
 
 namespace osu.Game.Tournament.Screens.Ladder.Components
 {
