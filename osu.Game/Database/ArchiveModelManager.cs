@@ -8,6 +8,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using JetBrains.Annotations;
 using Microsoft.EntityFrameworkCore;
+using osu.Framework;
 using osu.Framework.Extensions;
 using osu.Framework.IO.File;
 using osu.Framework.Logging;
@@ -52,6 +53,8 @@ namespace osu.Game.Database
         public event Action<TModel> ItemRemoved;
 
         public virtual string[] HandledExtensions => new[] { ".zip" };
+
+        public virtual bool SupportsImportFromStable => RuntimeInfo.IsDesktop;
 
         protected readonly FileStore Files;
 
@@ -150,25 +153,9 @@ namespace osu.Game.Database
                 {
                     notification.Text = $"Importing ({++current} of {paths.Length})\n{Path.GetFileName(path)}";
 
-                    TModel import;
-                    using (ArchiveReader reader = getReaderFrom(path))
-                        imported.Add(import = Import(reader));
+                    imported.Add(Import(path));
 
                     notification.Progress = (float)current / paths.Length;
-
-                    // We may or may not want to delete the file depending on where it is stored.
-                    //  e.g. reconstructing/repairing database with items from default storage.
-                    // Also, not always a single file, i.e. for LegacyFilesystemReader
-                    // TODO: Add a check to prevent files from storage to be deleted.
-                    try
-                    {
-                        if (import != null && File.Exists(path))
-                            File.Delete(path);
-                    }
-                    catch (Exception e)
-                    {
-                        Logger.Error(e, $@"Could not delete original file after import ({Path.GetFileName(path)})");
-                    }
                 }
                 catch (Exception e)
                 {
@@ -193,6 +180,34 @@ namespace osu.Game.Database
                 };
                 notification.State = ProgressNotificationState.Completed;
             }
+        }
+
+        /// <summary>
+        /// Import one <see cref="TModel"/> from the filesystem and delete the file on success.
+        /// </summary>
+        /// <param name="path">The archive location on disk.</param>
+        /// <returns>The imported model, if successful.</returns>
+        public TModel Import(string path)
+        {
+            TModel import;
+            using (ArchiveReader reader = getReaderFrom(path))
+                import = Import(reader);
+
+            // We may or may not want to delete the file depending on where it is stored.
+            //  e.g. reconstructing/repairing database with items from default storage.
+            // Also, not always a single file, i.e. for LegacyFilesystemReader
+            // TODO: Add a check to prevent files from storage to be deleted.
+            try
+            {
+                if (import != null && File.Exists(path))
+                    File.Delete(path);
+            }
+            catch (Exception e)
+            {
+                Logger.Error(e, $@"Could not delete original file after import ({Path.GetFileName(path)})");
+            }
+
+            return import;
         }
 
         protected virtual void PresentCompletedImport(IEnumerable<TModel> imported)
@@ -527,6 +542,7 @@ namespace osu.Game.Database
                 return new LegacyDirectoryArchiveReader(path);
             if (File.Exists(path))
                 return new LegacyFileArchiveReader(path);
+
             throw new InvalidFormatException($"{path} is not a valid archive");
         }
     }

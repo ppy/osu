@@ -4,6 +4,7 @@
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osuTK.Graphics;
 
@@ -22,6 +23,7 @@ namespace osu.Game.Beatmaps.Drawables
             {
                 if (status == value)
                     return;
+
                 status = value;
 
                 Alpha = value == BeatmapSetOnlineStatus.None ? 0 : 1;
@@ -31,8 +33,8 @@ namespace osu.Game.Beatmaps.Drawables
 
         public float TextSize
         {
-            get => statusText.TextSize;
-            set => statusText.TextSize = value;
+            get => statusText.Font.Size;
+            set => statusText.Font = statusText.Font.With(size: value);
         }
 
         public MarginPadding TextPadding
@@ -58,7 +60,7 @@ namespace osu.Game.Beatmaps.Drawables
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
-                    Font = @"Exo2.0-Bold",
+                    Font = OsuFont.GetFont(weight: FontWeight.Bold)
                 },
             };
 

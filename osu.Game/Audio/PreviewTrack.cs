@@ -28,6 +28,7 @@ namespace osu.Game.Audio
         private void load()
         {
             track = GetTrack();
+            track.Completed += () => Schedule(Stop);
         }
 
         /// <summary>
@@ -50,15 +51,6 @@ namespace osu.Game.Audio
         /// </summary>
         public bool IsRunning => track?.IsRunning ?? false;
 
-        protected override void Update()
-        {
-            base.Update();
-
-            // Todo: Track currently doesn't signal its completion, so we have to handle it manually
-            if (hasStarted && track.HasCompleted)
-                Stop();
-        }
-
         private ScheduledDelegate startDelegate;
 
         /// <summary>
@@ -71,6 +63,7 @@ namespace osu.Game.Audio
 
             if (hasStarted)
                 return;
+
             hasStarted = true;
 
             track.Restart();
@@ -89,6 +82,7 @@ namespace osu.Game.Audio
 
             if (!hasStarted)
                 return;
+
             hasStarted = false;
 
             track.Stop();

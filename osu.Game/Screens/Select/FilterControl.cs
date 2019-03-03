@@ -5,7 +5,7 @@ using System;
 using osuTK;
 using osuTK.Graphics;
 using osu.Framework.Allocation;
-using osu.Framework.Configuration;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.UserInterface;
@@ -32,7 +32,7 @@ namespace osu.Game.Screens.Select
 
         public SortMode Sort
         {
-            get { return sort; }
+            get => sort;
             set
             {
                 if (sort != value)
@@ -47,7 +47,7 @@ namespace osu.Game.Screens.Select
 
         public GroupMode Group
         {
-            get { return group; }
+            get => group;
             set
             {
                 if (group != value)
@@ -63,7 +63,7 @@ namespace osu.Game.Screens.Select
             Group = group,
             Sort = sort,
             SearchText = searchTextBox.Text,
-            AllowConvertedBeatmaps = showConverted,
+            AllowConvertedBeatmaps = showConverted.Value,
             Ruleset = ruleset.Value
         };
 
@@ -146,12 +146,12 @@ namespace osu.Game.Screens.Select
                 }
             };
 
-            searchTextBox.Current.ValueChanged += t => FilterChanged?.Invoke(CreateCriteria());
+            searchTextBox.Current.ValueChanged += _ => FilterChanged?.Invoke(CreateCriteria());
 
             groupTabs.PinItem(GroupMode.All);
             groupTabs.PinItem(GroupMode.RecentlyPlayed);
-            groupTabs.Current.ValueChanged += val => Group = val;
-            sortTabs.Current.ValueChanged += val => Sort = val;
+            groupTabs.Current.ValueChanged += group => Group = group.NewValue;
+            sortTabs.Current.ValueChanged += sort => Sort = sort.NewValue;
         }
 
         public void Deactivate()
@@ -178,7 +178,7 @@ namespace osu.Game.Screens.Select
             sortTabs.AccentColour = colours.GreenLight;
 
             showConverted = config.GetBindable<bool>(OsuSetting.ShowConvertedBeatmaps);
-            showConverted.ValueChanged += val => updateCriteria();
+            showConverted.ValueChanged += _ => updateCriteria();
 
             ruleset.BindTo(parentRuleset);
             ruleset.BindValueChanged(_ => updateCriteria(), true);

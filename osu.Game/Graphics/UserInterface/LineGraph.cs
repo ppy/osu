@@ -44,7 +44,7 @@ namespace osu.Game.Graphics.UserInterface
         /// </summary>
         public IEnumerable<float> Values
         {
-            get { return values; }
+            get => values;
             set
             {
                 values = value.ToArray();
@@ -112,6 +112,7 @@ namespace osu.Game.Graphics.UserInterface
         protected float GetYPosition(float value)
         {
             if (ActualMaxValue == ActualMinValue) return 0;
+
             return (ActualMaxValue - value) / (ActualMaxValue - ActualMinValue);
         }
     }

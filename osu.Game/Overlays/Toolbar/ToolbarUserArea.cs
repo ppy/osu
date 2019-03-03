@@ -22,7 +22,8 @@ namespace osu.Game.Overlays.Toolbar
             RelativeSizeAxes = Axes.Y;
             AutoSizeAxes = Axes.X;
 
-            Children = new Drawable[] {
+            Children = new Drawable[]
+            {
                 button = new ToolbarUserButton
                 {
                     Action = () => LoginOverlay.ToggleVisibility(),

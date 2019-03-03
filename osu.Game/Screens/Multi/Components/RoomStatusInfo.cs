@@ -3,7 +3,7 @@
 
 using System;
 using osu.Framework.Allocation;
-using osu.Framework.Configuration;
+using osu.Framework.Bindables;
 using osu.Framework.Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -13,16 +13,16 @@ using osu.Game.Online.Multiplayer.RoomStatuses;
 
 namespace osu.Game.Screens.Multi.Components
 {
-    public class RoomStatusInfo : CompositeDrawable
+    public class RoomStatusInfo : MultiplayerComposite
     {
-        private readonly RoomBindings bindings = new RoomBindings();
-
-        public RoomStatusInfo(Room room)
+        public RoomStatusInfo()
         {
-            bindings.Room = room;
-
             AutoSizeAxes = Axes.Both;
+        }
 
+        [BackgroundDependencyLoader]
+        private void load()
+        {
             StatusPart statusPart;
             EndDatePart endDatePart;
 
@@ -34,17 +34,16 @@ namespace osu.Game.Screens.Multi.Components
                 {
                     statusPart = new StatusPart
                     {
-                        TextSize = 14,
-                        Font = "Exo2.0-Bold"
+                        Font = OsuFont.GetFont(weight: FontWeight.Bold, size: 14)
                     },
-                    endDatePart = new EndDatePart { TextSize = 14 }
+                    endDatePart = new EndDatePart { Font = OsuFont.GetFont(size: 14) }
                 }
             };
 
-            statusPart.EndDate.BindTo(bindings.EndDate);
-            statusPart.Status.BindTo(bindings.Status);
-            statusPart.Availability.BindTo(bindings.Availability);
-            endDatePart.EndDate.BindTo(bindings.EndDate);
+            statusPart.EndDate.BindTo(EndDate);
+            statusPart.Status.BindTo(Status);
+            statusPart.Availability.BindTo(Availability);
+            endDatePart.EndDate.BindTo(EndDate);
         }
 
         private class EndDatePart : DrawableDate
@@ -54,7 +53,7 @@ namespace osu.Game.Screens.Multi.Components
             public EndDatePart()
                 : base(DateTimeOffset.UtcNow)
             {
-                EndDate.BindValueChanged(d => Date = d);
+                EndDate.BindValueChanged(date => Date = date.NewValue);
             }
 
             protected override string Format()

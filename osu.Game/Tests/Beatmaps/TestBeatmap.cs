@@ -30,8 +30,7 @@ namespace osu.Game.Tests.Beatmaps
                 return Decoder.GetDecoder<Beatmap>(reader).Decode(reader);
         }
 
-        private const string test_beatmap_data =
-@"osu file format v14
+        private const string test_beatmap_data = @"osu file format v14
 
 [General]
 AudioLeadIn: 500

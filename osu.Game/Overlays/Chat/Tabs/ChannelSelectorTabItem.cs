@@ -13,15 +13,16 @@ namespace osu.Game.Overlays.Chat.Tabs
 
         public override bool IsSwitchable => false;
 
-        public ChannelSelectorTabItem(Channel value) : base(value)
+        public ChannelSelectorTabItem(Channel value)
+            : base(value)
         {
             Depth = float.MaxValue;
             Width = 45;
 
             Icon.Alpha = 0;
 
-            Text.TextSize = 45;
-            TextBold.TextSize = 45;
+            Text.Font = Text.Font.With(size: 45);
+            TextBold.Font = Text.Font.With(size: 45);
         }
 
         [BackgroundDependencyLoader]

@@ -8,7 +8,7 @@ using osu.Game.Rulesets.Osu.Objects.Drawables.Pieces;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
-using osu.Framework.Configuration;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Configuration;
 using osu.Game.Rulesets.Objects;
@@ -53,6 +53,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                 repeatPoints = new Container<DrawableRepeatPoint> { RelativeSizeAxes = Axes.Both },
                 Ball = new SliderBall(s, this)
                 {
+                    GetInitialHitAction = () => HeadCircle.HitAction,
                     BypassAutoSizeAxes = Axes.Both,
                     Scale = new Vector2(s.Scale),
                     AlwaysPresent = true,
@@ -99,10 +100,10 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             config.BindWith(OsuSetting.SnakingOutSliders, Body.SnakingOut);
 
             positionBindable.BindValueChanged(_ => Position = HitObject.StackedPosition);
-            scaleBindable.BindValueChanged(v =>
+            scaleBindable.BindValueChanged(scale =>
             {
-                Body.PathWidth = HitObject.Scale * 64;
-                Ball.Scale = new Vector2(HitObject.Scale);
+                Body.PathWidth = scale.NewValue * 64;
+                Ball.Scale = new Vector2(scale.NewValue);
             });
 
             positionBindable.BindTo(HitObject.PositionBindable);
@@ -114,7 +115,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
         public override Color4 AccentColour
         {
-            get { return base.AccentColour; }
+            get => base.AccentColour;
             set
             {
                 base.AccentColour = value;
@@ -156,9 +157,9 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         {
             base.SkinChanged(skin, allowFallback);
 
-            Body.AccentColour = skin.GetValue<SkinConfiguration, Color4>(s => s.CustomColours.ContainsKey("SliderTrackOverride") ? s.CustomColours["SliderTrackOverride"] : Body.AccentColour);
-            Body.BorderColour = skin.GetValue<SkinConfiguration, Color4>(s => s.CustomColours.ContainsKey("SliderBorder") ? s.CustomColours["SliderBorder"] : Body.BorderColour);
-            Ball.AccentColour = skin.GetValue<SkinConfiguration, Color4>(s => s.CustomColours.ContainsKey("SliderBall") ? s.CustomColours["SliderBall"] : Ball.AccentColour);
+            Body.AccentColour = skin.GetValue<SkinConfiguration, Color4?>(s => s.CustomColours.ContainsKey("SliderTrackOverride") ? s.CustomColours["SliderTrackOverride"] : (Color4?)null) ?? Body.AccentColour;
+            Body.BorderColour = skin.GetValue<SkinConfiguration, Color4?>(s => s.CustomColours.ContainsKey("SliderBorder") ? s.CustomColours["SliderBorder"] : (Color4?)null) ?? Body.BorderColour;
+            Ball.AccentColour = skin.GetValue<SkinConfiguration, Color4?>(s => s.CustomColours.ContainsKey("SliderBall") ? s.CustomColours["SliderBall"] : (Color4?)null) ?? Ball.AccentColour;
         }
 
         protected override void CheckForResult(bool userTriggered, double timeOffset)

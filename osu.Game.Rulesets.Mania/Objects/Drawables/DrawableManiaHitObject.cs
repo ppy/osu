@@ -3,7 +3,7 @@
 
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
-using osu.Framework.Configuration;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.UI.Scrolling;
@@ -41,9 +41,9 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
 
         protected override bool ShouldBeAlive => AlwaysAlive || base.ShouldBeAlive;
 
-        protected virtual void OnDirectionChanged(ScrollingDirection direction)
+        protected virtual void OnDirectionChanged(ValueChangedEvent<ScrollingDirection> e)
         {
-            Anchor = Origin = direction == ScrollingDirection.Up ? Anchor.TopCentre : Anchor.BottomCentre;
+            Anchor = Origin = e.NewValue == ScrollingDirection.Up ? Anchor.TopCentre : Anchor.BottomCentre;
         }
     }
 
