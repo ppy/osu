@@ -15,6 +15,9 @@ namespace osu.Game.Screens
         protected Vector2 BlurTarget;
 
         public TransformSequence<Background> BlurTo(Vector2 sigma, double duration, Easing easing = Easing.None)
-            => Background?.BlurTo(BlurTarget = sigma, duration, easing);
+        {
+            BlurTarget = sigma;
+            return Background?.BlurTo(BlurTarget, duration, easing);
+        }
     }
 }

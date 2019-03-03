@@ -229,6 +229,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             // Ensure alternating centre and rim hits
             if (lastWasCentre == isCentre)
                 return false;
+
             lastWasCentre = isCentre;
 
             UpdateResult(true);

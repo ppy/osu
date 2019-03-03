@@ -163,18 +163,14 @@ namespace osu.Game.Beatmaps
                 downloadNotification.Progress = progress;
             };
 
-            request.Success += data =>
+            request.Success += filename =>
             {
                 downloadNotification.Text = $"Importing {beatmapSetInfo.Metadata.Artist} - {beatmapSetInfo.Metadata.Title}";
 
                 Task.Factory.StartNew(() =>
                 {
-                    BeatmapSetInfo importedBeatmap;
-
                     // This gets scheduled back to the update thread, but we want the import to run in the background.
-                    using (var stream = new MemoryStream(data))
-                    using (var archive = new ZipArchiveReader(stream, beatmapSetInfo.ToString()))
-                        importedBeatmap = Import(archive);
+                    var importedBeatmap = Import(filename);
 
                     downloadNotification.CompletionClickAction = () =>
                     {
@@ -210,7 +206,17 @@ namespace osu.Game.Beatmaps
             PostNotification?.Invoke(downloadNotification);
 
             // don't run in the main api queue as this is a long-running task.
-            Task.Factory.StartNew(() => request.Perform(api), TaskCreationOptions.LongRunning);
+            Task.Factory.StartNew(() =>
+            {
+                try
+                {
+                    request.Perform(api);
+                }
+                catch (Exception e)
+                {
+                    // no need to handle here as exceptions will filter down to request.Failure above.
+                }
+            }, TaskCreationOptions.LongRunning);
             BeatmapDownloadBegan?.Invoke(request);
             return true;
         }

@@ -44,12 +44,14 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
         private readonly ScoreModsContainer modsContainer;
 
         private APIScoreInfo score;
+
         public APIScoreInfo Score
         {
-            get { return score; }
+            get => score;
             set
             {
                 if (score == value) return;
+
                 score = value;
 
                 avatar.User = username.User = score.User;
@@ -117,8 +119,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                     Anchor = Anchor.TopRight,
                     Origin = Anchor.BottomRight,
                     Text = "#1",
-                    TextSize = 40,
-                    Font = @"Exo2.0-BoldItalic",
+                    Font = OsuFont.GetFont(size: 40, weight: FontWeight.Bold, italics: true),
                     Y = height / 4,
                     Margin = new MarginPadding { Right = margin }
                 },
@@ -208,9 +209,10 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                 {
                     if (valueText.Text == value)
                         return;
+
                     valueText.Text = value;
                 }
-                get { return valueText.Text; }
+                get => valueText.Text;
             }
 
             public InfoColumn(string header)
@@ -222,15 +224,10 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                 {
                     headerText = new OsuSpriteText
                     {
-                        TextSize = 14,
                         Text = header,
-                        Font = @"Exo2.0-Bold",
+                        Font = OsuFont.GetFont(size: 14, weight: FontWeight.Bold)
                     },
-                    valueText = new OsuSpriteText
-                    {
-                        TextSize = 25,
-                        Font = @"Exo2.0-RegularItalic",
-                    }
+                    valueText = new OsuSpriteText { Font = OsuFont.GetFont(size: 25, weight: FontWeight.Regular, italics: true) }
                 };
             }
 

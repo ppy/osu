@@ -34,10 +34,11 @@ namespace osu.Game.Screens.Play.PlayerSettings
 
         public bool Expanded
         {
-            get { return expanded; }
+            get => expanded;
             set
             {
                 if (expanded == value) return;
+
                 expanded = value;
 
                 content.ClearTransforms();
@@ -94,8 +95,7 @@ namespace osu.Game.Screens.Play.PlayerSettings
                                     Origin = Anchor.CentreLeft,
                                     Anchor = Anchor.CentreLeft,
                                     Text = Title.ToUpperInvariant(),
-                                    TextSize = 17,
-                                    Font = @"Exo2.0-Bold",
+                                    Font = OsuFont.GetFont(weight: FontWeight.Bold, size: 17),
                                     Margin = new MarginPadding { Left = 10 },
                                 },
                                 button = new IconButton

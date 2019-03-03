@@ -38,7 +38,13 @@ namespace osu.Game.Rulesets.Mods
 
         public virtual void Update(Playfield playfield)
         {
-            double newRate = 1 + (AppendRate * (clock.CurrentTime / lastObjectEndTime));
+            double newRate;
+            
+            if (1 + AppendRate < 1)
+                newRate = Math.Max(1 + AppendRate, 1 + (AppendRate * (clock.CurrentTime / (lastObjectEndTime * 0.75))));
+            else
+                newRate = Math.Min(1 + AppendRate, 1 + (AppendRate * (clock.CurrentTime / (lastObjectEndTime * 0.75))));
+
             clock.Rate = newRate;
             pitchAdjust.PitchAdjust = newRate;
         }

@@ -8,7 +8,7 @@ using System.Net;
 using System.Net.Http;
 using System.Threading;
 using Newtonsoft.Json.Linq;
-using osu.Framework.Configuration;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Logging;
 using osu.Game.Configuration;
@@ -64,7 +64,7 @@ namespace osu.Game.Online.API
             thread.Start();
         }
 
-        private void onTokenChanged(OAuthToken token) => config.Set(OsuSetting.Token, config.Get<bool>(OsuSetting.SavePassword) ? authentication.TokenString : string.Empty);
+        private void onTokenChanged(ValueChangedEvent<OAuthToken> e) => config.Set(OsuSetting.Token, config.Get<bool>(OsuSetting.SavePassword) ? authentication.TokenString : string.Empty);
 
         private readonly List<IOnlineComponent> components = new List<IOnlineComponent>();
 
@@ -176,6 +176,7 @@ namespace osu.Game.Online.API
                     lock (queue)
                     {
                         if (queue.Count == 0) break;
+
                         req = queue.Dequeue();
                     }
 
@@ -260,7 +261,7 @@ namespace osu.Game.Online.API
 
         public APIState State
         {
-            get { return state; }
+            get => state;
             private set
             {
                 APIState oldState = state;
@@ -355,11 +356,7 @@ namespace osu.Game.Online.API
             State = APIState.Offline;
         }
 
-        private static User createGuestUser() => new User
-        {
-            Username = @"Guest",
-            Id = 1,
-        };
+        private static User createGuestUser() => new GuestUser();
 
         protected override void Dispose(bool isDisposing)
         {
@@ -367,6 +364,15 @@ namespace osu.Game.Online.API
 
             flushQueue();
             cancellationToken.Cancel();
+        }
+    }
+
+    internal class GuestUser : User
+    {
+        public GuestUser()
+        {
+            Username = @"Guest";
+            Id = 1;
         }
     }
 
