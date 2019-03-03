@@ -39,7 +39,6 @@ namespace osu.Game.Rulesets.Mods
         public virtual void Update(Playfield playfield)
         {
             double newRate;
-            
             if (1 + AppendRate < 1)
                 newRate = Math.Max(1 + AppendRate, 1 + (AppendRate * (clock.CurrentTime / (lastObjectEndTime * 0.75))));
             else
