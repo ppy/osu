@@ -27,6 +27,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
         protected override IEnumerable<Type> ValidConversionTypes { get; } = new[] { typeof(IHasXPosition) };
 
         public int TargetColumns;
+        public bool Dual;
         public readonly bool IsForCurrentRuleset;
 
         // Internal for testing purposes
@@ -45,7 +46,14 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
             var roundedOverallDifficulty = Math.Round(beatmap.BeatmapInfo.BaseDifficulty.OverallDifficulty);
 
             if (IsForCurrentRuleset)
+            {
                 TargetColumns = (int)Math.Max(1, roundedCircleSize);
+                if (TargetColumns >= 10)
+                {
+                    TargetColumns = TargetColumns / 2;
+                    Dual = true;
+                }
+            }
             else
             {
                 float percentSliderOrSpinner = (float)beatmap.HitObjects.Count(h => h is IHasEndTime) / beatmap.HitObjects.Count;
@@ -70,7 +78,15 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
             return base.ConvertBeatmap(original);
         }
 
-        protected override Beatmap<ManiaHitObject> CreateBeatmap() => beatmap = new ManiaBeatmap(new StageDefinition { Columns = TargetColumns });
+        protected override Beatmap<ManiaHitObject> CreateBeatmap()
+        {
+            beatmap = new ManiaBeatmap(new StageDefinition { Columns = TargetColumns });
+
+            if (Dual)
+                beatmap.Stages.Add(new StageDefinition { Columns = TargetColumns });
+
+            return beatmap;
+        }
 
         protected override IEnumerable<ManiaHitObject> ConvertHitObject(HitObject original, IBeatmap beatmap)
         {
