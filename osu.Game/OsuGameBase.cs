@@ -75,9 +75,9 @@ namespace osu.Game
 
         private Bindable<bool> fpsDisplayVisible;
 
-        protected AssemblyName AssemblyName => Assembly.GetEntryAssembly()?.GetName() ?? new AssemblyName { Version = new Version() };
+        public virtual Version AssemblyVersion => Assembly.GetEntryAssembly()?.GetName().Version ?? new Version();
 
-        public bool IsDeployedBuild => AssemblyName.Version.Major > 0;
+        public bool IsDeployedBuild => AssemblyVersion.Major > 0;
 
         public string Version
         {
@@ -86,8 +86,8 @@ namespace osu.Game
                 if (!IsDeployedBuild)
                     return @"local " + (DebugUtils.IsDebug ? @"debug" : @"release");
 
-                var assembly = AssemblyName;
-                return $@"{assembly.Version.Major}.{assembly.Version.Minor}.{assembly.Version.Build}";
+                var version = AssemblyVersion;
+                return $@"{version.Major}.{version.Minor}.{version.Build}";
             }
         }
 
