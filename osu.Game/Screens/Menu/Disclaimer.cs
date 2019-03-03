@@ -139,12 +139,5 @@ namespace osu.Game.Screens.Menu
 
             heart.FlashColour(Color4.White, 750, Easing.OutQuint).Loop();
         }
-
-        public override void OnSuspending(IScreen next)
-        {
-            base.OnSuspending(next);
-
-            currentUser.UnbindAll();
-        }
     }
 }
