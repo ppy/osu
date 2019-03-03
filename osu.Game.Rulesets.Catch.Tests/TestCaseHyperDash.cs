@@ -13,7 +13,9 @@ namespace osu.Game.Rulesets.Catch.Tests
     public class TestCaseHyperDash : Game.Tests.Visual.TestCasePlayer
     {
         public TestCaseHyperDash()
-            : base(new CatchRuleset()) { }
+            : base(new CatchRuleset())
+        {
+        }
 
         protected override IBeatmap CreateBeatmap(Ruleset ruleset)
         {
