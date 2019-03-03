@@ -138,7 +138,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 // Apply object-based bonus for flashlight.
                 if (mods.Any(h => h is OsuModTouchDevice))
                 {
-                    aimValue *= 1.0f + 0.3f * Math.Min(1.0f, totalHits / 95.0f) +
+                    aimValue *= 1.0f + 0.4f * Math.Min(1.0f, totalHits / 95.0f) +
                                        (totalHits > 95 ? 0.45f * Math.Min(1.0f, (totalHits - 95) / 205.0f) +
                                        (totalHits > 300 ? (totalHits - 300) / 550.0f : 0.0f) : 0.0f);
                 }
