@@ -106,7 +106,7 @@ namespace osu.Game.Screens.Menu
             currentUser.BindValueChanged(e =>
             {
                 if (e.NewValue.IsSupporter)
-                    supporterDrawables.ForEach(d => d.FadeOut(200, Easing.OutQuint).Expire());
+                    supporterDrawables.ForEach(d => d.FadeOut(500, Easing.OutQuint).Expire());
             }, true);
         }
 
