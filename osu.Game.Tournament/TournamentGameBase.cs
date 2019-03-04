@@ -27,7 +27,8 @@ namespace osu.Game.Tournament
     {
         private const string bracket_filename = "bracket.json";
 
-        protected LadderInfo Ladder;
+        private LadderInfo ladder;
+
         private Storage storage;
 
         private DependencyContainer dependencies;
@@ -57,42 +58,61 @@ namespace osu.Game.Tournament
 
             windowSize = frameworkConfig.GetBindable<Size>(FrameworkSetting.WindowedSize);
 
-            string content = null;
-            if (storage.Exists(bracket_filename))
-                using (Stream stream = storage.GetStream(bracket_filename, FileAccess.Read, FileMode.Open))
-                using (var sr = new StreamReader(stream))
-                {
-                    content = sr.ReadToEnd();
-                }
+            readBracket();
 
-            Ladder = content != null ? JsonConvert.DeserializeObject<LadderInfo>(content) : new LadderInfo();
-
-            dependencies.Cache(Ladder);
+            ladder.CurrentMatch.Value = ladder.Pairings.FirstOrDefault(p => p.Current.Value);
 
             dependencies.CacheAs<MatchIPCInfo>(ipc = new FileBasedIPC());
             Add(ipc);
 
+            Add(new OsuButton
+            {
+                Text = "Save Changes",
+                Width = 140,
+                Height = 50,
+                Anchor = Anchor.BottomRight,
+                Origin = Anchor.BottomRight,
+                Padding = new MarginPadding(10),
+                Action = SaveChanges,
+            });
+        }
+
+        private void readBracket()
+        {
+            if (storage.Exists(bracket_filename))
+            {
+                using (Stream stream = storage.GetStream(bracket_filename, FileAccess.Read, FileMode.Open))
+                using (var sr = new StreamReader(stream))
+                    ladder = JsonConvert.DeserializeObject<LadderInfo>(sr.ReadToEnd());
+            }
+            else
+            {
+                ladder = new LadderInfo();
+            }
+
+            dependencies.Cache(ladder);
+
             bool addedInfo = false;
 
             // assign teams
-            foreach (var pairing in Ladder.Pairings)
+            foreach (var pairing in ladder.Pairings)
             {
-                pairing.Team1.Value = Ladder.Teams.FirstOrDefault(t => t.Acronym == pairing.Team1Acronym);
-                pairing.Team2.Value = Ladder.Teams.FirstOrDefault(t => t.Acronym == pairing.Team2Acronym);
+                pairing.Team1.Value = ladder.Teams.FirstOrDefault(t => t.Acronym == pairing.Team1Acronym);
+                pairing.Team2.Value = ladder.Teams.FirstOrDefault(t => t.Acronym == pairing.Team2Acronym);
 
                 foreach (var conditional in pairing.ConditionalPairings)
                 {
-                    conditional.Team1.Value = Ladder.Teams.FirstOrDefault(t => t.Acronym == conditional.Team1Acronym);
-                    conditional.Team2.Value = Ladder.Teams.FirstOrDefault(t => t.Acronym == conditional.Team2Acronym);
+                    conditional.Team1.Value = ladder.Teams.FirstOrDefault(t => t.Acronym == conditional.Team1Acronym);
+                    conditional.Team2.Value = ladder.Teams.FirstOrDefault(t => t.Acronym == conditional.Team2Acronym);
                     conditional.Grouping.Value = pairing.Grouping.Value;
                 }
             }
 
             // assign progressions
-            foreach (var pair in Ladder.Progressions)
+            foreach (var pair in ladder.Progressions)
             {
-                var src = Ladder.Pairings.FirstOrDefault(p => p.ID == pair.Item1);
-                var dest = Ladder.Pairings.FirstOrDefault(p => p.ID == pair.Item2);
+                var src = ladder.Pairings.FirstOrDefault(p => p.ID == pair.Item1);
+                var dest = ladder.Pairings.FirstOrDefault(p => p.ID == pair.Item2);
 
                 if (src == null) throw new InvalidOperationException();
 
@@ -106,10 +126,10 @@ namespace osu.Game.Tournament
             }
 
             // link pairings to groupings
-            foreach (var group in Ladder.Groupings)
+            foreach (var group in ladder.Groupings)
             foreach (var id in group.Pairings)
             {
-                var found = Ladder.Pairings.FirstOrDefault(p => p.ID == id);
+                var found = ladder.Pairings.FirstOrDefault(p => p.ID == id);
                 if (found != null)
                 {
                     found.Grouping.Value = group;
@@ -118,10 +138,23 @@ namespace osu.Game.Tournament
                 }
             }
 
-            Ladder.CurrentMatch.Value = Ladder.Pairings.FirstOrDefault(p => p.Current.Value);
+            addedInfo |= addPlayers();
+            addedInfo |= addBeatmaps();
+            addedInfo |= addCountries();
 
-            // add full player info based on user IDs
-            foreach (var t in Ladder.Teams)
+            if (addedInfo)
+                SaveChanges();
+        }
+
+        /// <summary>
+        /// Add missing player info based on user IDs.
+        /// </summary>
+        /// <returns></returns>
+        private bool addPlayers()
+        {
+            bool addedInfo = false;
+
+            foreach (var t in ladder.Teams)
             foreach (var p in t.Players)
                 if (string.IsNullOrEmpty(p.Username))
                 {
@@ -132,8 +165,16 @@ namespace osu.Game.Tournament
                     addedInfo = true;
                 }
 
-            // add full beatmap info based on beatmap IDs
-            foreach (var g in Ladder.Groupings)
+            return addedInfo;
+        }
+
+        /// <summary>
+        /// Add missing beatmap info based on beatmap IDs
+        /// </summary>
+        private bool addBeatmaps()
+        {
+            bool addedInfo = false;
+            foreach (var g in ladder.Groupings)
             foreach (var b in g.Beatmaps)
                 if (b.BeatmapInfo == null)
                 {
@@ -144,36 +185,37 @@ namespace osu.Game.Tournament
                     addedInfo = true;
                 }
 
+            return addedInfo;
+        }
+
+        /// <summary>
+        /// Add missing country info based on acronyms.
+        /// </summary>
+        private bool addCountries()
+        {
+            bool addedInfo = false;
+
             List<TournamentTeam> countries;
             using (Stream stream = Resources.GetStream("Resources/countries.json"))
             using (var sr = new StreamReader(stream))
                 countries = JsonConvert.DeserializeObject<List<TournamentTeam>>(sr.ReadToEnd());
 
-            foreach (var t in Ladder.Teams)
-                if (string.IsNullOrEmpty(t.FullName))
-                {
-                    var result = countries.FirstOrDefault(c => c.Acronym == t.Acronym);
-                    if (result != null)
-                    {
-                        t.Acronym = result.Acronym;
-                        t.FlagName = result.FlagName;
-                        t.FullName = result.FullName;
-                    }
-                }
-
-            if (addedInfo)
-                SaveChanges();
-
-            Add(new OsuButton
+            foreach (var t in ladder.Teams)
             {
-                Text = "Save Changes",
-                Width = 140,
-                Height = 50,
-                Anchor = Anchor.BottomRight,
-                Origin = Anchor.BottomRight,
-                Padding = new MarginPadding(10),
-                Action = SaveChanges,
-            });
+                if (!string.IsNullOrEmpty(t.FullName))
+                    continue;
+
+                var result = countries.FirstOrDefault(c => c.Acronym == t.Acronym);
+
+                if (result == null) continue;
+
+                t.Acronym = result.Acronym;
+                t.FlagName = result.FlagName;
+                t.FullName = result.FullName;
+                addedInfo = true;
+            }
+
+            return addedInfo;
         }
 
         protected override void LoadComplete()
@@ -198,7 +240,7 @@ namespace osu.Game.Tournament
             using (var stream = storage.GetStream(bracket_filename, FileAccess.Write, FileMode.Create))
             using (var sw = new StreamWriter(stream))
             {
-                sw.Write(JsonConvert.SerializeObject(Ladder,
+                sw.Write(JsonConvert.SerializeObject(ladder,
                     new JsonSerializerSettings
                     {
                         NullValueHandling = NullValueHandling.Ignore,
