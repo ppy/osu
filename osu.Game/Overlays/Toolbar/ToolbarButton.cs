@@ -139,6 +139,7 @@ namespace osu.Game.Overlays.Toolbar
         protected override bool OnClick(ClickEvent e)
         {
             HoverBackground.FlashColour(Color4.White.Opacity(100), 500, Easing.OutQuint);
+            tooltipContainer.FadeOut(100);
             return base.OnClick(e);
         }
 
