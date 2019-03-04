@@ -30,7 +30,6 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
         [Resolved(CanBeNull = true)]
         private LadderInfo ladderInfo { get; set; }
 
-
         public DrawableMatchPairing(MatchPairing pairing, bool editor = false)
         {
             Pairing = pairing;

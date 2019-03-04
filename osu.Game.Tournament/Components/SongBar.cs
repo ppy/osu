@@ -80,7 +80,6 @@ namespace osu.Game.Tournament.Components
             }
         }
 
-
         [BackgroundDependencyLoader]
         private void load()
         {
@@ -247,4 +246,3 @@ namespace osu.Game.Tournament.Components
         }
     }
 }
-
