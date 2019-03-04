@@ -112,14 +112,14 @@ namespace osu.Game.Tournament.Screens.Schedule
                                 Spacing = new Vector2(10, 0),
                                 Text = currentMatch.Value.Grouping.Value.Name.Value,
                                 Colour = Color4.Black,
-                                TextSize = 20
+                                Font = OsuFont.GetFont(size: 20)
                             },
                             new SchedulePairing(currentMatch.Value, false),
                             new OsuSpriteText
                             {
                                 Text = "Start Time " + pairing.NewValue.Date.Value.ToUniversalTime().ToString("HH:mm UTC"),
                                 Colour = Color4.Black,
-                                TextSize = 20
+                                Font = OsuFont.GetFont(size: 20)
                             },
                         }
                     }
@@ -179,7 +179,7 @@ namespace osu.Game.Tournament.Screens.Schedule
                         Text = title,
                         Colour = Color4.Black,
                         Spacing = new Vector2(10, 0),
-                        TextSize = 30
+                        Font = OsuFont.GetFont(size: 30)
                     },
                     content = new FillFlowContainer
                     {

@@ -7,6 +7,7 @@ using System.Text;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Tournament.Components;
 using osuTK;
@@ -49,8 +50,7 @@ namespace osu.Game.Tournament.Screens.Drawings.Components
                     Position = new Vector2(0, 7f),
 
                     Text = $"GROUP {name.ToUpperInvariant()}",
-                    TextSize = 8f,
-                    Font = @"Exo2.0-Bold",
+                    Font = OsuFont.GetFont(weight: FontWeight.Bold, size: 8),
                     Colour = new Color4(255, 204, 34, 255),
                 },
                 teams = new FillFlowContainer<GroupTeam>
@@ -134,8 +134,7 @@ namespace osu.Game.Tournament.Screens.Drawings.Components
                 AcronymText.Anchor = Anchor.TopCentre;
                 AcronymText.Origin = Anchor.TopCentre;
                 AcronymText.Text = team.Acronym.ToUpperInvariant();
-                AcronymText.TextSize = 10f;
-                AcronymText.Font = @"Exo2.0-Bold";
+                AcronymText.Font = OsuFont.GetFont(weight: FontWeight.Bold, size: 10);
 
                 InternalChildren = new Drawable[]
                 {
