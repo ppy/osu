@@ -11,7 +11,8 @@ namespace osu.Game.Screens.Play
     {
         public MouseButton Button { get; }
 
-        public KeyCounterMouse(MouseButton button) : base(getStringRepresentation(button))
+        public KeyCounterMouse(MouseButton button)
+            : base(getStringRepresentation(button))
         {
             Button = button;
         }

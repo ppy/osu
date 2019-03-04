@@ -16,6 +16,7 @@ namespace osu.Game.Beatmaps
         where T : HitObject
     {
         private event Action<HitObject, IEnumerable<HitObject>> ObjectConverted;
+
         event Action<HitObject, IEnumerable<HitObject>> IBeatmapConverter.ObjectConverted
         {
             add => ObjectConverted += value;

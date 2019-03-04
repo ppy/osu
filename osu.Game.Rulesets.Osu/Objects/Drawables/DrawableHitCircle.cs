@@ -3,8 +3,9 @@
 
 using System;
 using osu.Framework.Allocation;
-using osu.Framework.Configuration;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Osu.Objects.Drawables.Pieces;
 using osuTK;
@@ -27,40 +28,60 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         private readonly IBindable<int> stackHeightBindable = new Bindable<int>();
         private readonly IBindable<float> scaleBindable = new Bindable<float>();
 
+        public OsuAction? HitAction => circle.HitAction;
+
+        private readonly Container explodeContainer;
+
+        private readonly Container scaleContainer;
+
         public DrawableHitCircle(HitCircle h)
             : base(h)
         {
             Origin = Anchor.Centre;
 
             Position = HitObject.StackedPosition;
-            Scale = new Vector2(h.Scale);
 
             InternalChildren = new Drawable[]
             {
-                glow = new GlowPiece(),
-                circle = new CirclePiece
+                scaleContainer = new Container
                 {
-                    Hit = () =>
+                    RelativeSizeAxes = Axes.Both,
+                    Origin = Anchor.Centre,
+                    Anchor = Anchor.Centre,
+                    Child = explodeContainer = new Container
                     {
-                        if (AllJudged)
-                            return false;
+                        RelativeSizeAxes = Axes.Both,
+                        Origin = Anchor.Centre,
+                        Anchor = Anchor.Centre,
+                        Children = new Drawable[]
+                        {
+                            glow = new GlowPiece(),
+                            circle = new CirclePiece
+                            {
+                                Hit = () =>
+                                {
+                                    if (AllJudged)
+                                        return false;
 
-                        UpdateResult(true);
-                        return true;
-                    },
+                                    UpdateResult(true);
+                                    return true;
+                                },
+                            },
+                            number = new NumberPiece
+                            {
+                                Text = (HitObject.IndexInCurrentCombo + 1).ToString(),
+                            },
+                            ring = new RingPiece(),
+                            flash = new FlashPiece(),
+                            explode = new ExplodePiece(),
+                            ApproachCircle = new ApproachCircle
+                            {
+                                Alpha = 0,
+                                Scale = new Vector2(4),
+                            }
+                        }
+                    }
                 },
-                number = new NumberPiece
-                {
-                    Text = (HitObject.IndexInCurrentCombo + 1).ToString(),
-                },
-                ring = new RingPiece(),
-                flash = new FlashPiece(),
-                explode = new ExplodePiece(),
-                ApproachCircle = new ApproachCircle
-                {
-                    Alpha = 0,
-                    Scale = new Vector2(4),
-                }
             };
 
             //may not be so correct
@@ -72,7 +93,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         {
             positionBindable.BindValueChanged(_ => Position = HitObject.StackedPosition);
             stackHeightBindable.BindValueChanged(_ => Position = HitObject.StackedPosition);
-            scaleBindable.BindValueChanged(v => Scale = new Vector2(v));
+            scaleBindable.BindValueChanged(scale => scaleContainer.Scale = new Vector2(scale.NewValue), true);
 
             positionBindable.BindTo(HitObject.PositionBindable);
             stackHeightBindable.BindTo(HitObject.StackHeightBindable);
@@ -81,7 +102,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
         public override Color4 AccentColour
         {
-            get { return base.AccentColour; }
+            get => base.AccentColour;
             set
             {
                 base.AccentColour = value;
@@ -118,6 +139,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
             ApproachCircle.FadeIn(Math.Min(HitObject.TimeFadeIn * 2, HitObject.TimePreempt));
             ApproachCircle.ScaleTo(1.1f, HitObject.TimePreempt);
+            ApproachCircle.Expire(true);
         }
 
         protected override void UpdateCurrentState(ArmedState state)
@@ -130,6 +152,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                     this.Delay(HitObject.TimePreempt).FadeOut(500);
 
                     Expire(true);
+
+                    circle.HitAction = null;
 
                     // override lifetime end as FadeIn may have been changed externally, causing out expiration to be too early.
                     LifetimeEnd = HitObject.StartTime + HitObject.HitWindows.HalfWindowFor(HitResult.Miss);
@@ -156,8 +180,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                         circle.FadeOut();
                         number.FadeOut();
 
-                        this.FadeOut(800)
-                            .ScaleTo(Scale * 1.5f, 400, Easing.OutQuad);
+                        this.FadeOut(800);
+                        explodeContainer.ScaleTo(1.5f, 400, Easing.OutQuad);
                     }
 
                     Expire();

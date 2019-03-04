@@ -2,7 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
-using osu.Framework.Configuration;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Configuration;
@@ -74,10 +74,10 @@ namespace osu.Game.Graphics.Containers
                 }
             }
 
-            private void scaleChanged(float value)
+            private void scaleChanged(ValueChangedEvent<float> args)
             {
-                this.ScaleTo(new Vector2(value), 500, Easing.Out);
-                this.ResizeTo(new Vector2(1 / value), 500, Easing.Out);
+                this.ScaleTo(new Vector2(args.NewValue), 500, Easing.Out);
+                this.ResizeTo(new Vector2(1 / args.NewValue), 500, Easing.Out);
             }
         }
 
@@ -108,7 +108,7 @@ namespace osu.Game.Graphics.Containers
             sizableContainer.FinishTransforms();
         }
 
-        private bool requiresBackgroundVisible => (scalingMode == ScalingMode.Everything || scalingMode == ScalingMode.ExcludeOverlays) && (sizeX.Value != 1 || sizeY.Value != 1);
+        private bool requiresBackgroundVisible => (scalingMode.Value == ScalingMode.Everything || scalingMode.Value == ScalingMode.ExcludeOverlays) && (sizeX.Value != 1 || sizeY.Value != 1);
 
         private void updateSize()
         {
@@ -137,8 +137,8 @@ namespace osu.Game.Graphics.Containers
 
             bool scaling = targetMode == null || scalingMode.Value == targetMode;
 
-            var targetSize = scaling ? new Vector2(sizeX, sizeY) : Vector2.One;
-            var targetPosition = scaling ? new Vector2(posX, posY) * (Vector2.One - targetSize) : Vector2.Zero;
+            var targetSize = scaling ? new Vector2(sizeX.Value, sizeY.Value) : Vector2.One;
+            var targetPosition = scaling ? new Vector2(posX.Value, posY.Value) * (Vector2.One - targetSize) : Vector2.Zero;
             bool requiresMasking = scaling && targetSize != Vector2.One;
 
             if (requiresMasking)

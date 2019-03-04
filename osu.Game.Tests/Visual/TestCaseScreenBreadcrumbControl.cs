@@ -48,7 +48,7 @@ namespace osu.Game.Tests.Visual
                 },
             };
 
-            breadcrumbs.Current.ValueChanged += s => titleText.Text = $"Changed to {s.ToString()}";
+            breadcrumbs.Current.ValueChanged += screen => titleText.Text = $"Changed to {screen.NewValue.ToString()}";
             breadcrumbs.Current.TriggerChange();
 
             waitForCurrent();
@@ -84,7 +84,7 @@ namespace osu.Game.Tests.Visual
             public TestScreen PushNext()
             {
                 TestScreen screen = CreateNextScreen();
-               this.Push(screen);
+                this.Push(screen);
 
                 return screen;
             }
