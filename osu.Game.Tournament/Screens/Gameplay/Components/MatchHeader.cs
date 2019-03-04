@@ -87,7 +87,6 @@ namespace osu.Game.Tournament.Screens.Gameplay.Components
                 teamChanged(currentTeam.Value);
             }
 
-
             protected override bool OnMouseDown(MouseDownEvent e)
             {
                 switch (e.Button)

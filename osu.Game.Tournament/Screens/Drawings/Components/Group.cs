@@ -127,7 +127,6 @@ namespace osu.Game.Tournament.Screens.Drawings.Components
                 Width = 36;
                 AutoSizeAxes = Axes.Y;
 
-
                 Flag.Anchor = Anchor.TopCentre;
                 Flag.Origin = Anchor.TopCentre;
 
