@@ -15,7 +15,6 @@ using osu.Game.Input.Handlers;
 using osu.Game.Replays;
 using osu.Game.Rulesets.Mania.Beatmaps;
 using osu.Game.Rulesets.Mania.Configuration;
-using osu.Game.Rulesets.Mania.Mods;
 using osu.Game.Rulesets.Mania.Objects;
 using osu.Game.Rulesets.Mania.Objects.Drawables;
 using osu.Game.Rulesets.Mania.Replays;
@@ -96,7 +95,7 @@ namespace osu.Game.Rulesets.Mania.UI
 
         public override ScoreProcessor CreateScoreProcessor() => new ManiaScoreProcessor(this);
 
-        public override int Variant => (int)(Mods.OfType<IPlayfieldTypeMod>().FirstOrDefault()?.PlayfieldType ?? PlayfieldType.Single) + Beatmap.TotalColumns;
+        public override int Variant => (int)(Beatmap.Stages.Count == 1 ? PlayfieldType.Single : PlayfieldType.Dual) + Beatmap.TotalColumns;
 
         public override PassThroughInputManager CreateInputManager() => new ManiaInputManager(Ruleset.RulesetInfo, Variant);
 
