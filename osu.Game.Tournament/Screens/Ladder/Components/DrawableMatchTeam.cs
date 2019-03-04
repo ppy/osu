@@ -67,7 +67,7 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
 
             AcronymText.Anchor = AcronymText.Origin = Anchor.CentreLeft;
             AcronymText.Padding = new MarginPadding { Left = 50 };
-            AcronymText.TextSize = 24;
+            AcronymText.Font = OsuFont.GetFont(size: 24);
 
             if (pairing != null)
             {
@@ -121,7 +121,7 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
                                 {
                                     Anchor = Anchor.Centre,
                                     Origin = Anchor.Centre,
-                                    TextSize = 20,
+                                    Font = OsuFont.GetFont(size: 20),
                                 }
                             }
                         }

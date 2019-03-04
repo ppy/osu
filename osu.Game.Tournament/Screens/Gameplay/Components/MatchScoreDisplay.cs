@@ -7,6 +7,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Tournament.IPC;
 using osu.Game.Tournament.Screens.Ladder.Components;
@@ -119,26 +120,15 @@ namespace osu.Game.Tournament.Screens.Gameplay.Components
             public MatchScoreCounter()
             {
                 Margin = new MarginPadding { Top = bar_height + 5, Horizontal = 10 };
-                Winning = false;
 
-                DisplayedCountSpriteText.FixedWidth = false;
+                Winning = false;
             }
 
             public bool Winning
             {
-                set
-                {
-                    if (value)
-                    {
-                        DisplayedCountSpriteText.Font = "Aquatico-Regular";
-                        DisplayedCountSpriteText.TextSize = 60;
-                    }
-                    else
-                    {
-                        DisplayedCountSpriteText.Font = "Aquatico-Light";
-                        DisplayedCountSpriteText.TextSize = 40;
-                    }
-                }
+                set => DisplayedCountSpriteText.Font = value
+                    ? OsuFont.GetFont(typeface: Typeface.Aquatico, weight: FontWeight.Regular, size: 60)
+                    : OsuFont.GetFont(typeface: Typeface.Aquatico, weight: FontWeight.Light, size: 40);
             }
         }
     }

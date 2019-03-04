@@ -120,8 +120,7 @@ namespace osu.Game.Tournament.Screens.Drawings
 
                             Alpha = 0,
 
-                            Font = "Exo2.0-Light",
-                            TextSize = 42f
+                            Font = OsuFont.GetFont(weight: FontWeight.Light, size: 42),
                         }
                     }
                 },

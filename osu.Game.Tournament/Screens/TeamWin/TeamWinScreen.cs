@@ -127,8 +127,7 @@ namespace osu.Game.Tournament.Screens.TeamWin
                                 Origin = Anchor.TopCentre,
                                 Colour = col,
                                 Text = "WINNER",
-                                Font = "Aquatico-Regular",
-                                TextSize = 15,
+                                Font = OsuFont.GetFont(Typeface.Aquatico, 15, FontWeight.Regular),
                             },
                             new OsuSpriteText
                             {
@@ -136,18 +135,16 @@ namespace osu.Game.Tournament.Screens.TeamWin
                                 Origin = Anchor.TopCentre,
                                 Colour = col,
                                 Text = pairing.Grouping.Value?.Name.Value ?? "Unknown Grouping",
-                                Font = "Aquatico-Light",
+                                Font = OsuFont.GetFont(Typeface.Aquatico, 50, FontWeight.Light),
                                 Spacing = new Vector2(10, 0),
-                                TextSize = 50,
                             },
                             new OsuSpriteText
                             {
                                 Anchor = Anchor.TopCentre,
                                 Origin = Anchor.TopCentre,
-                                Font = "Aquatico-Light",
                                 Colour = col,
                                 Text = pairing.Date.Value.ToUniversalTime().ToString("dd MMMM HH:mm UTC"),
-                                TextSize = 20,
+                                Font = OsuFont.GetFont(Typeface.Aquatico, 20, FontWeight.Light),
                             },
                         }
                     }
@@ -207,16 +204,15 @@ namespace osu.Game.Tournament.Screens.TeamWin
                             new OsuSpriteText
                             {
                                 Text = team?.FullName.ToUpper() ?? "???",
-                                TextSize = 40,
+                                Font = OsuFont.GetFont(Typeface.Aquatico, 40, FontWeight.Light),
                                 Colour = Color4.Black,
-                                Font = "Aquatico-Light",
                                 Origin = Anchor.TopCentre,
                                 Anchor = Anchor.TopCentre,
                             },
                             new OsuSpriteText
                             {
                                 Text = teamName.ToUpper(),
-                                TextSize = 20,
+                                Font = OsuFont.GetFont(size: 20),
                                 Colour = colour,
                                 Origin = Anchor.TopCentre,
                                 Anchor = Anchor.TopCentre,

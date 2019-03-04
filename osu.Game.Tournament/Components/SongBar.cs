@@ -163,7 +163,7 @@ namespace osu.Game.Tournament.Components
             string hardRockExtra = "";
             string srExtra = "";
 
-            var ar = beatmap.BaseDifficulty.ApproachRate;
+            //var ar = beatmap.BaseDifficulty.ApproachRate;
             if ((mods & LegacyMods.HardRock) > 0)
             {
                 hardRockExtra = "*";
@@ -225,8 +225,7 @@ namespace osu.Game.Tournament.Components
                 void cp(SpriteText s, Color4 colour)
                 {
                     s.Colour = colour;
-                    s.TextSize = 15;
-                    s.Font = @"Exo2.0-Bold";
+                    s.Font = OsuFont.GetFont(weight: FontWeight.Bold, size: 15);
                 }
 
                 bool first = true;

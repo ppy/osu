@@ -7,6 +7,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Events;
+using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Tournament.Components;
@@ -174,9 +175,8 @@ namespace osu.Game.Tournament.Screens.Gameplay.Components
                             Text = team?.FullName.ToUpper() ?? "???",
                             X = (flip ? -1 : 1) * 90,
                             Y = -10,
-                            TextSize = 20,
                             Colour = colour,
-                            Font = "Aquatico-Regular",
+                            Font = OsuFont.GetFont(typeface: Typeface.Aquatico, weight: FontWeight.Regular, size: 20),
                             Origin = anchor,
                             Anchor = anchor,
                         },
@@ -219,8 +219,7 @@ namespace osu.Game.Tournament.Screens.Gameplay.Components
                         Origin = Anchor.Centre,
                         Colour = Color4.White,
                         Text = match.NewValue.Grouping.Value?.Name.Value ?? "Unknown Grouping",
-                        Font = "Aquatico-Regular",
-                        TextSize = 18,
+                        Font = OsuFont.GetFont(typeface: Typeface.Aquatico, weight: FontWeight.Regular, size: 18),
                     },
                 };
             }

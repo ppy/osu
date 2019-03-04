@@ -4,6 +4,7 @@
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osuTK;
 using osuTK.Graphics;
@@ -40,8 +41,7 @@ namespace osu.Game.Tournament.Components
                     Origin = Anchor.TopCentre,
 
                     Text = "Control Panel",
-                    TextSize = 22f,
-                    Font = "Exo2.0-Bold"
+                    Font = OsuFont.GetFont(weight: FontWeight.Bold, size: 22)
                 },
                 buttons = new FillFlowContainer
                 {

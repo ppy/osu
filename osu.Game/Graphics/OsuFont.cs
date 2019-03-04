@@ -46,6 +46,8 @@ namespace osu.Game.Graphics
                     return "FontAwesome";
                 case Typeface.Venera:
                     return "Venera";
+                case Typeface.Aquatico:
+                    return "Aquatico";
             }
 
             return null;
@@ -103,6 +105,7 @@ namespace osu.Game.Graphics
         Exo,
         FontAwesome,
         Venera,
+        Aquatico // tournament use only
     }
 
     public enum FontWeight

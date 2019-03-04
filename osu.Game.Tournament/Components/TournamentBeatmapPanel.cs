@@ -100,29 +100,25 @@ namespace osu.Game.Tournament.Components
                                 new OsuSpriteText
                                 {
                                     Text = "mapper",
-                                    Font = @"Exo2.0-RegularItalic",
                                     Padding = new MarginPadding { Right = 5 },
-                                    TextSize = 14
+                                    Font = OsuFont.GetFont(italics: true, weight: FontWeight.Regular, size: 14)
                                 },
                                 new OsuSpriteText
                                 {
                                     Text = Beatmap.Metadata.AuthorString,
-                                    Font = @"Exo2.0-BoldItalic",
                                     Padding = new MarginPadding { Right = 20 },
-                                    TextSize = 14
+                                    Font = OsuFont.GetFont(italics: true, weight: FontWeight.Bold, size: 14)
                                 },
                                 new OsuSpriteText
                                 {
                                     Text = "difficulty",
-                                    Font = @"Exo2.0-RegularItalic",
                                     Padding = new MarginPadding { Right = 5 },
-                                    TextSize = 14
+                                    Font = OsuFont.GetFont(italics: true, weight: FontWeight.Regular, size: 14)
                                 },
                                 new OsuSpriteText
                                 {
                                     Text = Beatmap.Version,
-                                    Font = @"Exo2.0-BoldItalic",
-                                    TextSize = 14
+                                    Font = OsuFont.GetFont(italics: true, weight: FontWeight.Bold, size: 14)
                                 },
                             }
                         }
