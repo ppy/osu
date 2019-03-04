@@ -10,6 +10,7 @@ using osu.Game.Rulesets.UI;
 using System.Collections.Generic;
 using osu.Framework.Graphics;
 using osu.Framework.Input.Bindings;
+using osu.Game.Rulesets.Catch.Objects;
 using osu.Game.Rulesets.Catch.Replays;
 using osu.Game.Rulesets.Replays.Types;
 using osu.Game.Beatmaps.Legacy;
@@ -102,7 +103,7 @@ namespace osu.Game.Rulesets.Catch
                 case ModType.Fun:
                     return new Mod[]
                     {
-                        new MultiMod(new CatchModWindUp(), new CatchModWindDown())
+                        new MultiMod(new ModWindUp<CatchHitObject>(), new ModWindDown<CatchHitObject>())
                     };
                 default:
                     return new Mod[] { };

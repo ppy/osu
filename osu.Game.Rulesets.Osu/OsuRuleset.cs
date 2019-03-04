@@ -13,6 +13,7 @@ using osu.Game.Overlays.Settings;
 using osu.Framework.Input.Bindings;
 using osu.Game.Rulesets.Osu.Edit;
 using osu.Game.Rulesets.Edit;
+using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Replays;
 using osu.Game.Rulesets.Replays.Types;
 using osu.Game.Beatmaps.Legacy;
@@ -126,7 +127,7 @@ namespace osu.Game.Rulesets.Osu
                         new OsuModTransform(),
                         new OsuModWiggle(),
                         new OsuModGrow(),
-                        new MultiMod(new OsuModWindUp(), new OsuModWindDown()),
+                        new MultiMod(new ModWindUp<OsuHitObject>(), new ModWindDown<OsuHitObject>()),
                     };
                 default:
                     return new Mod[] { };
