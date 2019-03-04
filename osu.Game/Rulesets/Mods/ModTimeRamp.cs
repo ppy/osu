@@ -28,6 +28,7 @@ namespace osu.Game.Rulesets.Mods
         {
             clock = clk;
             pitchAdjust = clk as IHasPitchAdjust;
+            pitchAdjust.PitchAdjust = 1.0 + AppendRate;
         }
 
         public virtual void ApplyToBeatmap(Beatmap<T> beatmap)
@@ -40,7 +41,6 @@ namespace osu.Game.Rulesets.Mods
         {
             double newRate = 1 + AppendRate < 1 ? Math.Max(1 + AppendRate, 1 + (AppendRate * (clock.CurrentTime / (lastObjectEndTime * 0.75)))) :
                 Math.Min(1 + AppendRate, 1 + (AppendRate * (clock.CurrentTime / (lastObjectEndTime * 0.75))));
-            clock.Rate = newRate;
             pitchAdjust.PitchAdjust = newRate;
         }
     }
