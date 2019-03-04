@@ -14,6 +14,7 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
     /// <summary>
     /// A collection of two teams competing in a head-to-head match.
     /// </summary>
+    [Serializable]
     public class MatchPairing
     {
         public int ID;
@@ -65,6 +66,7 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
 
         public readonly Bindable<DateTimeOffset> Date = new Bindable<DateTimeOffset>();
 
+        [JsonProperty]
         public readonly BindableList<ConditionalMatchPairing> ConditionalPairings = new BindableList<ConditionalMatchPairing>();
 
         public readonly Bindable<Point> Position = new Bindable<Point>();
