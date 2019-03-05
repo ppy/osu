@@ -1,5 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="..\osu.Android.props" />
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
@@ -8,49 +9,20 @@
     <ProjectGuid>{D1D5F9A8-B40B-40E6-B02F-482D03346D3D}</ProjectGuid>
     <ProjectTypeGuids>{EFBA0AD7-5A72-4C68-AF49-83D382785DCF};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <TemplateGuid>{122416d6-6b49-4ee2-a1e8-b825f31c79fe}</TemplateGuid>
-    <OutputType>Library</OutputType>
-    <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>osu.Android</RootNamespace>
     <AssemblyName>osu.Android</AssemblyName>
-    <FileAlignment>512</FileAlignment>
-    <AndroidApplication>True</AndroidApplication>
-    <AndroidResgenFile>Resources\Resource.designer.cs</AndroidResgenFile>
-    <AndroidResgenClass>Resource</AndroidResgenClass>
-    <GenerateSerializationAssemblies>Off</GenerateSerializationAssemblies>
-    <AndroidUseLatestPlatformSdk>false</AndroidUseLatestPlatformSdk>
-    <TargetFrameworkVersion>v8.1</TargetFrameworkVersion>
     <AndroidManifest>Properties\AndroidManifest.xml</AndroidManifest>
-    <MonoAndroidResourcePrefix>Resources</MonoAndroidResourcePrefix>
-    <MonoAndroidAssetsPrefix>Assets</MonoAndroidAssetsPrefix>
-    <AndroidHttpClientHandlerType>Xamarin.Android.Net.AndroidClientHandler</AndroidHttpClientHandlerType>
   </PropertyGroup>
-  <Import Project="..\osu.Android.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|AnyCPU'">
+    <Optimize>true</Optimize>
+  </PropertyGroup>
   <ItemGroup>
     <Compile Include="OsuGameActivity.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\osu.licenseheader">
-      <Link>osu.licenseheader</Link>
-    </None>
-    <AndroidNativeLibrary Include="lib\arm64-v8a\libbass.so">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </AndroidNativeLibrary>
-    <AndroidNativeLibrary Include="lib\arm64-v8a\libbass_fx.so">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </AndroidNativeLibrary>
-    <AndroidNativeLibrary Include="lib\armeabi-v7a\libbass.so">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </AndroidNativeLibrary>
-    <AndroidNativeLibrary Include="lib\armeabi-v7a\libbass_fx.so">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </AndroidNativeLibrary>
     <None Include="Properties\AndroidManifest.xml" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\osu-resources\osu.Game.Resources\osu.Game.Resources.csproj">
-      <Project>{d9a367c9-4c1a-489f-9b05-a0cea2b53b58}</Project>
-      <Name>osu.Game.Resources</Name>
-    </ProjectReference>
     <ProjectReference Include="..\osu.Game.Rulesets.Catch\osu.Game.Rulesets.Catch.csproj">
       <Project>{58f6c80c-1253-4a0e-a465-b8c85ebeadf3}</Project>
       <Name>osu.Game.Rulesets.Catch</Name>
@@ -73,8 +45,10 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="bass.dll" />
     <AndroidResource Include="Resources\drawable\lazer.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <AndroidEnvironment Include="monogc.txt" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\Android\Xamarin.Android.CSharp.targets" />
 </Project>

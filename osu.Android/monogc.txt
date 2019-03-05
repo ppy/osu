@@ -1,0 +1,1 @@
+﻿MONO_GC_PARAMS=nursery-size=8m
