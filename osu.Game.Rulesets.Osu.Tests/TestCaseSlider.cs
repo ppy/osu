@@ -17,6 +17,7 @@ using osu.Game.Rulesets.Mods;
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
+using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Objects;
@@ -312,6 +313,7 @@ namespace osu.Game.Rulesets.Osu.Tests
         }
 
         private float judgementOffsetDirection = 1;
+
         private void onNewResult(DrawableHitObject judgedObject, JudgementResult result)
         {
             var osuObject = judgedObject as DrawableOsuHitObject;
@@ -325,7 +327,7 @@ namespace osu.Game.Rulesets.Osu.Tests
                 Origin = Anchor.Centre,
                 Text = result.IsHit ? "Hit!" : "Miss!",
                 Colour = result.IsHit ? Color4.Green : Color4.Red,
-                TextSize = 30,
+                Font = OsuFont.GetFont(size: 30),
                 Position = osuObject.HitObject.StackedEndPosition + judgementOffsetDirection * new Vector2(0, 45)
             });
 

@@ -5,14 +5,17 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Screens;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
+using osu.Game.Online.API;
 using osuTK;
 using osuTK.Graphics;
 using osu.Game.Overlays;
+using osu.Game.Users;
 
 namespace osu.Game.Screens.Menu
 {
@@ -23,8 +26,8 @@ namespace osu.Game.Screens.Menu
         private Color4 iconColour;
         private LinkFlowContainer textFlow;
 
-        protected override bool HideOverlaysOnEnter => true;
-        protected override OverlayActivation InitialOverlayActivationMode => OverlayActivation.Disabled;
+        public override bool HideOverlaysOnEnter => true;
+        public override OverlayActivation InitialOverlayActivationMode => OverlayActivation.Disabled;
 
         public override bool CursorVisible => false;
 
@@ -33,15 +36,17 @@ namespace osu.Game.Screens.Menu
 
         private const float icon_y = -85;
 
+        private readonly Bindable<User> currentUser = new Bindable<User>();
+
         public Disclaimer()
         {
             ValidForResume = false;
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
+        private void load(OsuColour colours, APIAccess api)
         {
-            Children = new Drawable[]
+            InternalChildren = new Drawable[]
             {
                 icon = new SpriteIcon
                 {
@@ -64,31 +69,19 @@ namespace osu.Game.Screens.Menu
                 }
             };
 
-            textFlow.AddText("This is an ", t =>
-            {
-                t.TextSize = 30;
-                t.Font = @"Exo2.0-Light";
-            });
-            textFlow.AddText("early development build", t =>
-            {
-                t.TextSize = 30;
-                t.Font = @"Exo2.0-SemiBold";
-            });
+            textFlow.AddText("This is an ", t => t.Font = t.Font.With(Typeface.Exo, 30, FontWeight.Light));
+            textFlow.AddText("early development build", t => t.Font = t.Font.With(Typeface.Exo, 30, FontWeight.SemiBold));
 
-            textFlow.AddParagraph("Things may not work as expected", t => t.TextSize = 20);
+            textFlow.AddParagraph("Things may not work as expected", t => t.Font = t.Font.With(size: 20));
             textFlow.NewParagraph();
 
-            Action<SpriteText> format = t =>
-            {
-                t.TextSize = 15;
-                t.Font = @"Exo2.0-SemiBold";
-            };
+            Action<SpriteText> format = t => t.Font = OsuFont.GetFont(size: 15, weight: FontWeight.SemiBold);
 
             textFlow.AddParagraph("Detailed bug reports are welcomed via github issues.", format);
             textFlow.NewParagraph();
 
             textFlow.AddText("Visit ", format);
-            textFlow.AddLink("discord.gg/ppy", "https://discord.gg/ppy", creationParameters:format);
+            textFlow.AddLink("discord.gg/ppy", "https://discord.gg/ppy", creationParameters: format);
             textFlow.AddText(" to help out or follow progress!", format);
 
             textFlow.NewParagraph();
@@ -102,12 +95,19 @@ namespace osu.Game.Screens.Menu
             supporterDrawables.Add(heart = textFlow.AddIcon(FontAwesome.fa_heart, t =>
             {
                 t.Padding = new MarginPadding { Left = 5 };
-                t.TextSize = 12;
+                t.Font = t.Font.With(size: 12);
                 t.Colour = colours.Pink;
                 t.Origin = Anchor.Centre;
             }).First());
 
             iconColour = colours.Yellow;
+
+            currentUser.BindTo(api.LocalUser);
+            currentUser.BindValueChanged(e =>
+            {
+                if (e.NewValue.IsSupporter)
+                    supporterDrawables.ForEach(d => d.FadeOut(500, Easing.OutQuint).Expire());
+            }, true);
         }
 
         protected override void LoadComplete()
@@ -116,7 +116,7 @@ namespace osu.Game.Screens.Menu
             LoadComponentAsync(intro = new Intro());
         }
 
-        protected override void OnEntering(Screen last)
+        public override void OnEntering(IScreen last)
         {
             base.OnEntering(last);
 
@@ -130,12 +130,12 @@ namespace osu.Game.Screens.Menu
 
             supporterDrawables.ForEach(d => d.FadeOut().Delay(2000).FadeIn(500));
 
-            Content
+            this
                 .FadeInFromZero(500)
                 .Then(5500)
                 .FadeOut(250)
                 .ScaleTo(0.9f, 250, Easing.InQuint)
-                .Finally(d => Push(intro));
+                .Finally(d => this.Push(intro));
 
             heart.FlashColour(Color4.White, 750, Easing.OutQuint).Loop();
         }

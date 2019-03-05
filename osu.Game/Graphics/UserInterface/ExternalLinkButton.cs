@@ -51,7 +51,7 @@ namespace osu.Game.Graphics.UserInterface
 
         protected override bool OnClick(ClickEvent e)
         {
-            if(Link != null)
+            if (Link != null)
                 host.OpenUrlExternally(Link);
             return true;
         }

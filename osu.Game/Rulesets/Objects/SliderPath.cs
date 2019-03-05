@@ -125,6 +125,7 @@ namespace osu.Game.Rulesets.Objects
         {
             if (isInitialised)
                 return;
+
             isInitialised = true;
 
             controlPoints = controlPoints ?? Array.Empty<Vector2>();
@@ -280,6 +281,7 @@ namespace osu.Game.Rulesets.Objects
         public override bool Equals(object obj)
         {
             if (ReferenceEquals(null, obj)) return false;
+
             return obj is SliderPath other && Equals(other);
         }
     }

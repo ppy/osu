@@ -85,6 +85,9 @@ namespace osu.Game.Rulesets.Osu
 
             if (mods.HasFlag(LegacyMods.Target))
                 yield return new OsuModTarget();
+
+            if (mods.HasFlag(LegacyMods.TouchDevice))
+                yield return new OsuModTouchDevice();
         }
 
         public override IEnumerable<Mod> GetModsFor(ModType type)
@@ -121,9 +124,11 @@ namespace osu.Game.Rulesets.Osu
                         new OsuModAutopilot(),
                     };
                 case ModType.Fun:
-                    return new Mod[] {
+                    return new Mod[]
+                    {
                         new OsuModTransform(),
                         new OsuModWiggle(),
+                        new OsuModGrow()
                     };
                 default:
                     return new Mod[] { };
