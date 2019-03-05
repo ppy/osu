@@ -42,7 +42,7 @@ namespace osu.Game.Beatmaps.Drawables
                 else if (fallback && localBeatmap.BeatmapInfo.ID != 0)
                 {
                     // Fall back to local background if one exists
-                    drawable = new BeatmapBackgroundSprite(beatmaps.GetWorkingBeatmap(model));
+                    drawable = new BeatmapBackgroundSprite(localBeatmap);
                 }
                 else
                 {
