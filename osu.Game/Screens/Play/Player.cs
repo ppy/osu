@@ -196,26 +196,20 @@ namespace osu.Game.Screens.Play
                         {
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
-                            ProcessCustomClock = false,
                             Breaks = beatmap.Breaks
                         },
                         new ScalingContainer(ScalingMode.Gameplay)
                         {
                             Child = RulesetContainer.Cursor?.CreateProxy() ?? new Container(),
                         },
-                        HUDOverlay = new HUDOverlay(ScoreProcessor, RulesetContainer, working, offsetClock, adjustableClock)
+                        HUDOverlay = new HUDOverlay(ScoreProcessor, RulesetContainer, working, adjustableClock)
                         {
-                            Clock = Clock, // hud overlay doesn't want to use the audio clock directly
-                            ProcessCustomClock = false,
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre
                         },
                         new SkipOverlay(RulesetContainer.GameplayStartTime)
                         {
-                            Clock = Clock, // skip button doesn't want to use the audio clock directly
-                            ProcessCustomClock = false,
-                            AdjustableClock = adjustableClock,
-                            FramedClock = offsetClock,
+                            RequestSeek = time => adjustableClock.Seek(time)
                         },
                     }
                 },
