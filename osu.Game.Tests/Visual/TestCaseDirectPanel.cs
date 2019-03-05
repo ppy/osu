@@ -6,7 +6,6 @@ using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Game.Beatmaps;
 using osu.Game.Overlays.Direct;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Tests.Beatmaps;
