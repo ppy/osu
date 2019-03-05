@@ -260,6 +260,8 @@ namespace osu.Game.Beatmaps
             if (beatmapInfo?.BeatmapSet == null || beatmapInfo == DefaultBeatmap?.BeatmapInfo)
                 return DefaultBeatmap;
 
+            beatmapInfo = QueryBeatmap(p => beatmapInfo.OnlineBeatmapID == p.OnlineBeatmapID) ?? beatmapInfo;
+
             if (beatmapInfo.Metadata == null)
                 beatmapInfo.Metadata = beatmapInfo.BeatmapSet.Metadata;
 
