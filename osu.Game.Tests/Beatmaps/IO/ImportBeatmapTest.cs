@@ -101,7 +101,7 @@ namespace osu.Game.Tests.Beatmaps.IO
                     int fireCount = 0;
 
                     // ReSharper disable once AccessToModifiedClosure
-                    manager.ItemAdded += (_, __, ___) => fireCount++;
+                    manager.ItemAdded += (_, __) => fireCount++;
                     manager.ItemRemoved += _ => fireCount++;
 
                     var imported = LoadOszIntoOsu(osu);
