@@ -11,6 +11,7 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Online.API;
 using osu.Game.Overlays.AccountCreation;
+using osu.Game.Screens;
 using osuTK;
 using osuTK.Graphics;
 
@@ -70,7 +71,7 @@ namespace osu.Game.Overlays
                                     Colour = Color4.Black,
                                     Alpha = 0.9f,
                                 },
-                                new ScreenStack(welcomeScreen = new ScreenWelcome())
+                                new OsuScreenStack(welcomeScreen = new ScreenWelcome())
                                 {
                                     RelativeSizeAxes = Axes.Both,
                                 },

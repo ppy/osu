@@ -91,7 +91,7 @@ namespace osu.Game
 
         private ParallaxContainer backgroundParallax;
 
-        private ScreenStack screenStack;
+        private OsuScreenStack screenStack;
         private VolumeOverlay volume;
         private OnScreenDisplay onscreenDisplay;
         private OsuLogo osuLogo;
@@ -393,7 +393,7 @@ namespace osu.Game
                             RelativeSizeAxes = Axes.Both,
                             Child = backgroundStack = new BackgroundScreenStack { RelativeSizeAxes = Axes.Both },
                         },
-                        screenStack = new ScreenStack { RelativeSizeAxes = Axes.Both },
+                        screenStack = new OsuScreenStack { RelativeSizeAxes = Axes.Both },
                         logoContainer = new Container { RelativeSizeAxes = Axes.Both },
                     }
                 },

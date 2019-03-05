@@ -144,12 +144,6 @@ namespace osu.Game.Screens
             if (localBackground != null && backgroundStack?.CurrentScreen == localBackground)
                 backgroundStack?.Exit();
 
-            Schedule(() =>
-            {
-                (Beatmap as LeasedBindable<WorkingBeatmap>)?.UnbindAll();
-                (Ruleset as LeasedBindable<RulesetInfo>)?.UnbindAll();
-            });
-
             return false;
         }
 

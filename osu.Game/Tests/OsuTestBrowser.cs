@@ -3,9 +3,9 @@
 
 using osu.Framework.Graphics;
 using osu.Framework.Platform;
-using osu.Framework.Screens;
 using osu.Framework.Testing;
 using osu.Game.Graphics;
+using osu.Game.Screens;
 using osu.Game.Screens.Backgrounds;
 
 namespace osu.Game.Tests
@@ -16,7 +16,7 @@ namespace osu.Game.Tests
         {
             base.LoadComplete();
 
-            LoadComponentAsync(new ScreenStack(new BackgroundScreenDefault { Colour = OsuColour.Gray(0.5f) })
+            LoadComponentAsync(new OsuScreenStack(new BackgroundScreenDefault { Colour = OsuColour.Gray(0.5f) })
             {
                 Depth = 10,
                 RelativeSizeAxes = Axes.Both,

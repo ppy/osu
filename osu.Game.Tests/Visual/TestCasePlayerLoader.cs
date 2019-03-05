@@ -14,7 +14,7 @@ namespace osu.Game.Tests.Visual
     public class TestCasePlayerLoader : ManualInputManagerTestCase
     {
         private PlayerLoader loader;
-        private readonly ScreenStack stack;
+        private readonly OsuScreenStack stack;
 
         [Cached]
         private BackgroundScreenStack backgroundStack;
@@ -22,7 +22,7 @@ namespace osu.Game.Tests.Visual
         public TestCasePlayerLoader()
         {
             InputManager.Add(backgroundStack = new BackgroundScreenStack { RelativeSizeAxes = Axes.Both });
-            InputManager.Add(stack = new ScreenStack { RelativeSizeAxes = Axes.Both });
+            InputManager.Add(stack = new OsuScreenStack { RelativeSizeAxes = Axes.Both });
         }
 
         [BackgroundDependencyLoader]

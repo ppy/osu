@@ -2,8 +2,8 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Graphics;
-using osu.Framework.Screens;
 using osu.Game.Graphics.Containers;
+using osu.Game.Screens;
 using osu.Game.Screens.Backgrounds;
 
 namespace osu.Game.Tests.Visual
@@ -16,7 +16,7 @@ namespace osu.Game.Tests.Visual
 
             Add(parallax = new ParallaxContainer
             {
-                Child = new ScreenStack(new BackgroundScreenDefault { Alpha = 0.8f })
+                Child = new OsuScreenStack(new BackgroundScreenDefault { Alpha = 0.8f })
                 {
                     RelativeSizeAxes = Axes.Both,
                 }

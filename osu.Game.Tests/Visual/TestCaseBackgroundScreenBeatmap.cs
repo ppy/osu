@@ -359,12 +359,12 @@ namespace osu.Game.Tests.Visual
             [Cached]
             private BackgroundScreenStack backgroundScreenStack;
 
-            public readonly ScreenStack ScreenStack;
+            public readonly OsuScreenStack ScreenStack;
 
             public ScreenStackCacheContainer()
             {
                 Add(backgroundScreenStack = new BackgroundScreenStack { RelativeSizeAxes = Axes.Both });
-                Add(ScreenStack = new ScreenStack { RelativeSizeAxes = Axes.Both });
+                Add(ScreenStack = new OsuScreenStack { RelativeSizeAxes = Axes.Both });
             }
         }
 

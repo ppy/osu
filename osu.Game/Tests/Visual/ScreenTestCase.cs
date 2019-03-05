@@ -13,7 +13,7 @@ namespace osu.Game.Tests.Visual
     /// </summary>
     public abstract class ScreenTestCase : OsuTestCase
     {
-        private readonly ScreenStack stack;
+        private readonly OsuScreenStack stack;
 
         [Cached]
         private BackgroundScreenStack backgroundStack;
@@ -23,7 +23,7 @@ namespace osu.Game.Tests.Visual
             Children = new Drawable[]
             {
                 backgroundStack = new BackgroundScreenStack { RelativeSizeAxes = Axes.Both },
-                stack = new ScreenStack { RelativeSizeAxes = Axes.Both }
+                stack = new OsuScreenStack { RelativeSizeAxes = Axes.Both }
             };
         }
 
