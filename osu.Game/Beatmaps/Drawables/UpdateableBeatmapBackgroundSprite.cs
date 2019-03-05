@@ -9,7 +9,7 @@ using osu.Framework.Graphics.Containers;
 namespace osu.Game.Beatmaps.Drawables
 {
     /// <summary>
-    /// Display a beatmap background from an online source
+    /// Display a baetmap background from a local source, but fallback to online source if not available.
     /// </summary>
     public class UpdateableBeatmapBackgroundSprite : ModelBackedDrawable<BeatmapInfo>
     {
@@ -20,13 +20,10 @@ namespace osu.Game.Beatmaps.Drawables
 
         private readonly BeatmapSetCoverType beatmapSetCoverType;
 
-        private readonly bool fallback;
-
-        public UpdateableBeatmapBackgroundSprite(bool fallback = false, BeatmapSetCoverType beatmapSetCoverType = BeatmapSetCoverType.Cover)
+        public UpdateableBeatmapBackgroundSprite(BeatmapSetCoverType beatmapSetCoverType = BeatmapSetCoverType.Cover)
         {
             Beatmap.BindValueChanged(b => Model = b.NewValue);
             this.beatmapSetCoverType = beatmapSetCoverType;
-            this.fallback = fallback;
         }
 
         protected override Drawable CreateDrawable(BeatmapInfo model)
@@ -39,7 +36,7 @@ namespace osu.Game.Beatmaps.Drawables
 
                 if (model?.BeatmapSet?.OnlineInfo != null)
                     drawable = new BeatmapSetCover(model.BeatmapSet, beatmapSetCoverType);
-                else if (fallback && localBeatmap.BeatmapInfo.ID != 0)
+                else if (localBeatmap.BeatmapInfo.ID != 0)
                 {
                     // Fall back to local background if one exists
                     drawable = new BeatmapBackgroundSprite(localBeatmap);

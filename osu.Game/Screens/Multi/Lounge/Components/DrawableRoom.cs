@@ -138,7 +138,7 @@ namespace osu.Game.Screens.Multi.Lounge.Components
                                 Width = cover_width,
                                 Masking = true,
                                 Margin = new MarginPadding { Left = side_strip_width },
-                                Child = new MultiplayerListSprite { RelativeSizeAxes = Axes.Both }
+                                Child = new MultiplayerBackgroundSprite(BeatmapSetCoverType.List) { RelativeSizeAxes = Axes.Both }
                             },
                             new Container
                             {
@@ -201,11 +201,6 @@ namespace osu.Game.Screens.Multi.Lounge.Components
         {
             base.LoadComplete();
             this.FadeInFromZero(transition_duration);
-        }
-
-        private class MultiplayerListSprite : MultiplayerBackgroundSprite
-        {
-            protected override UpdateableBeatmapBackgroundSprite CreateBackgroundSprite() => new UpdateableBeatmapBackgroundSprite(beatmapSetCoverType: BeatmapSetCoverType.List) { RelativeSizeAxes = Axes.Both };
         }
 
         private class RoomName : OsuSpriteText
