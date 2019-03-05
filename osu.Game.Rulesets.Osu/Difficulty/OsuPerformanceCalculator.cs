@@ -102,7 +102,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             double rawAim = Attributes.AimStrain;
 
             if (mods.Any(m => m is OsuModTouchDevice))
-                rawAim = Math.Pow(Attributes.TouchAimStrain, 0.86);
+                rawAim = Math.Pow(Attributes.TouchAimStrain, 0.87);
 
             double aimValue = Math.Pow(5.0f * Math.Max(1.0f, rawAim / 0.0675f) - 4.0f, 3.0f) / 100000.0f;
 

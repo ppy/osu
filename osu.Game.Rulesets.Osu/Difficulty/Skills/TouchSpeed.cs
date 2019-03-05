@@ -47,25 +47,26 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             if (deltaTime < min_speed_bonus)
                 speedBonus = 1 + Math.Pow((min_speed_bonus - deltaTime) / speed_balancing_factor, 2);
 
+            // Angle bonus for fast jumps - wide angles generally require you to tapping multiple times with one hand
+            if (osuCurrent.Angle != null)
+            {
+                angle = osuCurrent.Angle.Value;
+                angle *= (Math.Max(0, Math.Min(1, (-1 * osuPrevious.StrainTime / 75 + 4)))); // Bonus is reduced if previous two objects are too slow
+                angleBonus *= ((1 / (1 + Math.Pow(6, -3 * (angle - 1.5)))));
+            }
+
             double speedValue;
             if (distance > 125)
-                speedValue = 1.9;
+                speedValue = 1.5 + 1 * angleBonus;
             else if (distance > 110)
-                speedValue = 1.5 + 0.4 * (distance - 110) / 15;
+                speedValue = 1.5 + 1 * angleBonus * (distance - 110) / 15;
             else if (distance > 90)
                 speedValue = 1.2 + 0.3 * (distance - 90) / 20;
             else if (distance > 45)
                 speedValue = 0.95 + 0.25 * (distance - 45) / 45;
             else
                 speedValue = 0.95;
-            // Angle bonus for fast jumps - wide angles generally require you to tapping multiple times with one hand
-            if (osuCurrent.Angle != null)
-            {
-                angle = osuCurrent.Angle.Value;
-                angle *= (Math.Max(0, Math.Min(1, (-1 * osuPrevious.StrainTime / 75 + 4)))); // Bonus is reduced if previous two objects are too slow
-                angleBonus *= ((0.5 / (1 + Math.Pow(3, -2 * (angle - 2.4)))) + 1);
-                angleBonus = Math.Max(1, angleBonus);
-            }
+            
             // Bonus for streams specifically
             if (Previous.Count > 1)
             {
@@ -75,7 +76,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
                 streamBonus *= Math.Max(0, Math.Min(1, (-1 * osuPrevious.StrainTime / 75 + 4))); // Bonus is reduced if previous two objects are too slow
                 streamBonus = Math.Min(1, Math.Max(0, streamBonus)) + 1;
             }
-            return (speedBonus * streamBonus * angleBonus * speedValue) / osuCurrent.StrainTime;
+            return (speedBonus * streamBonus * speedValue) / osuCurrent.StrainTime;
         }
     }
 }
