@@ -202,7 +202,7 @@ namespace osu.Game.Screens.Multi.Match
         /// <summary>
         /// Handle the case where a beatmap is imported (and can be used by this match).
         /// </summary>
-        private void beatmapAdded(BeatmapSetInfo model, bool existing, bool silent) => Schedule(() =>
+        private void beatmapAdded(BeatmapSetInfo model, bool existing) => Schedule(() =>
         {
             if (Beatmap.Value != beatmapManager.DefaultBeatmap)
                 return;
