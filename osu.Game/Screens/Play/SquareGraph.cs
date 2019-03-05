@@ -242,7 +242,11 @@ namespace osu.Game.Screens.Play
 
                 // Reverse drawableRows so when iterating through them they start at the bottom
                 drawableRows.Reverse();
+            }
 
+            protected override void LoadComplete()
+            {
+                base.LoadComplete();
                 fillActive();
             }
 
