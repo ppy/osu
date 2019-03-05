@@ -72,7 +72,7 @@ namespace osu.Game.Screens.Play
         [Resolved]
         private ScoreManager scoreManager { get; set; }
 
-        protected PauseContainer PauseContainer { get; private set; }
+        protected PausableGameplayContainer PausableGameplayContainer { get; private set; }
 
         private RulesetInfo ruleset;
 
@@ -175,7 +175,7 @@ namespace osu.Game.Screens.Play
 
             InternalChildren = new Drawable[]
             {
-                PauseContainer = new PauseContainer(offsetClock, adjustableClock)
+                PausableGameplayContainer = new PausableGameplayContainer(offsetClock, adjustableClock)
                 {
                     Retries = RestartCount,
                     OnRetry = restart,
@@ -233,7 +233,7 @@ namespace osu.Game.Screens.Play
             HUDOverlay.HoldToQuit.Action = performUserRequestedExit;
             HUDOverlay.KeyCounter.Visible.BindTo(RulesetContainer.HasReplayLoaded);
 
-            RulesetContainer.IsPaused.BindTo(PauseContainer.IsPaused);
+            RulesetContainer.IsPaused.BindTo(PausableGameplayContainer.IsPaused);
 
             if (ShowStoryboard.Value)
                 initializeStoryboard(false);
@@ -366,7 +366,7 @@ namespace osu.Game.Screens.Play
 
                     this.Delay(750).Schedule(() =>
                     {
-                        if (!PauseContainer.IsPaused.Value)
+                        if (!PausableGameplayContainer.IsPaused.Value)
                         {
                             adjustableClock.Start();
                         }
@@ -374,8 +374,8 @@ namespace osu.Game.Screens.Play
                 });
             });
 
-            PauseContainer.Alpha = 0;
-            PauseContainer.FadeIn(750, Easing.OutQuint);
+            PausableGameplayContainer.Alpha = 0;
+            PausableGameplayContainer.FadeIn(750, Easing.OutQuint);
         }
 
         public override void OnSuspending(IScreen next)
@@ -393,7 +393,7 @@ namespace osu.Game.Screens.Play
                 return true;
             }
 
-            if ((!AllowPause || HasFailed || !ValidForResume || PauseContainer?.IsPaused.Value != false || RulesetContainer?.HasReplayLoaded.Value != false) && (!PauseContainer?.IsResuming ?? true))
+            if ((!AllowPause || HasFailed || !ValidForResume || PausableGameplayContainer?.IsPaused.Value != false || RulesetContainer?.HasReplayLoaded.Value != false) && (!PausableGameplayContainer?.IsResuming ?? true))
             {
                 // In the case of replays, we may have changed the playback rate.
                 applyRateFromMods();
@@ -402,7 +402,7 @@ namespace osu.Game.Screens.Play
             }
 
             if (LoadedBeatmapSuccessfully)
-                PauseContainer?.Pause();
+                PausableGameplayContainer?.Pause();
 
             return true;
         }
@@ -416,7 +416,7 @@ namespace osu.Game.Screens.Play
             storyboardReplacesBackground.Value = false;
         }
 
-        protected override bool OnScroll(ScrollEvent e) => mouseWheelDisabled.Value && !PauseContainer.IsPaused.Value;
+        protected override bool OnScroll(ScrollEvent e) => mouseWheelDisabled.Value && !PausableGameplayContainer.IsPaused.Value;
 
         private void initializeStoryboard(bool asyncLoad)
         {

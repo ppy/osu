@@ -14,10 +14,11 @@ using osuTK.Graphics;
 namespace osu.Game.Screens.Play
 {
     /// <summary>
-    /// A container which handles pausing children, displaying a pause overlay with choices etc.
+    /// A container which handles pausing children, displaying a pause overlay with choices and processing the clock.
+    /// Exposes a <see cref="GameplayClock"/> to children via DI.
     /// This alleviates a lot of the intricate pause logic from being in <see cref="Player"/>
     /// </summary>
-    public class PauseContainer : Container
+    public class PausableGameplayContainer : Container
     {
         public readonly BindableBool IsPaused = new BindableBool();
 
@@ -53,11 +54,11 @@ namespace osu.Game.Screens.Play
         private readonly GameplayClock gameplayClock;
 
         /// <summary>
-        /// Creates a new <see cref="PauseContainer"/>.
+        /// Creates a new <see cref="PausableGameplayContainer"/>.
         /// </summary>
         /// <param name="offsetClock">The gameplay clock. This is the clock that will process frames. Includes user/system offsets.</param>
         /// <param name="adjustableClock">The seekable clock. This is the clock that will be paused and resumed. Should not be processed (it is processed automatically by <see cref="offsetClock"/>).</param>
-        public PauseContainer(FramedClock offsetClock, DecoupleableInterpolatingFramedClock adjustableClock)
+        public PausableGameplayContainer(FramedClock offsetClock, DecoupleableInterpolatingFramedClock adjustableClock)
         {
             this.offsetClock = offsetClock;
             this.adjustableClock = adjustableClock;
