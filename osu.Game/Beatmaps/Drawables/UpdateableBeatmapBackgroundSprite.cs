@@ -30,10 +30,15 @@ namespace osu.Game.Beatmaps.Drawables
         {
             return new DelayedLoadUnloadWrapper(() =>
             {
-                if (model?.BeatmapSet?.OnlineInfo == null)
-                    return null;
+                Drawable drawable;
 
-                Drawable drawable = new BeatmapSetCover(model.BeatmapSet, beatmapSetCoverType);
+                if (model?.BeatmapSet?.OnlineInfo != null)
+                    drawable = new BeatmapSetCover(model.BeatmapSet, beatmapSetCoverType);
+                else
+                {
+                    // Use the default background if somehow an online set does not exist.
+                    drawable = new BeatmapBackgroundSprite(beatmaps.GetWorkingBeatmap(null));
+                }
 
                 drawable.RelativeSizeAxes = Axes.Both;
                 drawable.Anchor = Anchor.Centre;
