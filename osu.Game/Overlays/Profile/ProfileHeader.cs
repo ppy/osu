@@ -19,6 +19,7 @@ using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays.Profile.Components;
 using osu.Game.Overlays.Profile.Header;
 using osu.Game.Users;
+using Humanizer;
 
 namespace osu.Game.Overlays.Profile
 {
@@ -118,8 +119,7 @@ namespace osu.Game.Overlays.Profile
                                                 usernameText = new OsuSpriteText
                                                 {
                                                     Text = user.Username,
-                                                    Font = @"Exo2.0-RegularItalic",
-                                                    TextSize = 30,
+                                                    Font = OsuFont.GetFont(size: 30, weight: FontWeight.Regular, italics: true)
                                                 },
                                                 new ExternalLinkButton($@"https://osu.ppy.sh/users/{user.Id}")
                                                 {
@@ -166,7 +166,7 @@ namespace osu.Game.Overlays.Profile
                     Y = cover_height,
                     Colour = OsuColour.Gray(34),
                 },
-                infoTextLeft = new LinkFlowContainer(t => t.TextSize = 14)
+                infoTextLeft = new LinkFlowContainer(t => t.Font = t.Font.With(size: 14))
                 {
                     X = UserProfileOverlay.CONTENT_X_MARGIN,
                     Y = cover_height + 20,
@@ -175,11 +175,7 @@ namespace osu.Game.Overlays.Profile
                     ParagraphSpacing = 0.8f,
                     LineSpacing = 0.2f
                 },
-                infoTextRight = new LinkFlowContainer(t =>
-                {
-                    t.TextSize = 14;
-                    t.Font = @"Exo2.0-RegularItalic";
-                })
+                infoTextRight = new LinkFlowContainer(t => t.Font = OsuFont.GetFont(size: 14, weight: FontWeight.Regular, italics: true))
                 {
                     X = UserProfileOverlay.CONTENT_X_MARGIN + info_width + 20,
                     Y = cover_height + 20,
@@ -222,7 +218,7 @@ namespace osu.Game.Overlays.Profile
                                     Anchor = Anchor.TopCentre,
                                     Origin = Anchor.TopCentre,
                                     Y = 11,
-                                    TextSize = 20
+                                    Font = OsuFont.GetFont(size: 20)
                                 }
                             }
                         },
@@ -323,7 +319,7 @@ namespace osu.Game.Overlays.Profile
 
         public User User
         {
-            get { return user; }
+            get => user;
             set
             {
                 user = value;
@@ -354,19 +350,18 @@ namespace osu.Game.Overlays.Profile
                 colourBar.Show();
             }
 
-            void boldItalic(SpriteText t) => t.Font = @"Exo2.0-BoldItalic";
+            void boldItalic(SpriteText t) => t.Font = t.Font.With(Typeface.Exo, weight: FontWeight.Bold, italics: true);
             void lightText(SpriteText t) => t.Alpha = 0.8f;
 
             OsuSpriteText createScoreText(string text) => new OsuSpriteText
             {
-                TextSize = 14,
+                Font = OsuFont.GetFont(size: 14),
                 Text = text
             };
 
             OsuSpriteText createScoreNumberText(string text) => new OsuSpriteText
             {
-                TextSize = 14,
-                Font = @"Exo2.0-Bold",
+                Font = OsuFont.GetFont(size: 14, weight: FontWeight.Bold),
                 Anchor = Anchor.TopRight,
                 Origin = Anchor.TopRight,
                 Text = text
@@ -407,7 +402,7 @@ namespace osu.Game.Overlays.Profile
 
             infoTextLeft.NewLine();
             infoTextLeft.AddText("Contributed ", lightText);
-            infoTextLeft.AddLink($@"{user.PostCount} forum posts", url: $"https://osu.ppy.sh/users/{user.Id}/posts", creationParameters: boldItalic);
+            infoTextLeft.AddLink("forum post".ToQuantity(user.PostCount), url: $"https://osu.ppy.sh/users/{user.Id}/posts", creationParameters: boldItalic);
 
             string websiteWithoutProtcol = user.Website;
             if (!string.IsNullOrEmpty(websiteWithoutProtcol))

@@ -5,7 +5,7 @@ using System;
 using System.Collections.Generic;
 using osu.Framework;
 using osu.Framework.Allocation;
-using osu.Framework.Configuration;
+using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -43,12 +43,14 @@ namespace osu.Game.Screens.Multi.Lounge.Components
         public readonly Room Room;
 
         private SelectionState state;
+
         public SelectionState State
         {
-            get { return state; }
+            get => state;
             set
             {
                 if (value == state) return;
+
                 state = value;
 
                 if (state == SelectionState.Selected)
@@ -63,9 +65,10 @@ namespace osu.Game.Screens.Multi.Lounge.Components
         public IEnumerable<string> FilterTerms => new[] { Room.Name.Value };
 
         private bool matchingFilter;
+
         public bool MatchingFilter
         {
-            get { return matchingFilter; }
+            get => matchingFilter;
             set
             {
                 matchingFilter = value;
@@ -155,7 +158,7 @@ namespace osu.Game.Screens.Multi.Lounge.Components
                                         Spacing = new Vector2(5f),
                                         Children = new Drawable[]
                                         {
-                                            new RoomName { TextSize = 18 },
+                                            new RoomName { Font = OsuFont.GetFont(size: 18) },
                                             new ParticipantInfo(),
                                         },
                                     },

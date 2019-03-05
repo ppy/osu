@@ -2,10 +2,15 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
 using Humanizer;
+using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Screens;
+using osu.Game.Beatmaps;
 using osu.Game.Online.Multiplayer;
+using osu.Game.Rulesets.Mods;
 using osu.Game.Screens.Multi;
 
 namespace osu.Game.Screens.Select
@@ -16,6 +21,15 @@ namespace osu.Game.Screens.Select
 
         public string ShortTitle => "song selection";
         public override string Title => ShortTitle.Humanize();
+
+        [Resolved(typeof(Room))]
+        protected Bindable<PlaylistItem> CurrentItem { get; private set; }
+
+        [Resolved]
+        private Bindable<IEnumerable<Mod>> selectedMods { get; set; }
+
+        [Resolved]
+        private BeatmapManager beatmaps { get; set; }
 
         public MatchSongSelect()
         {
@@ -43,10 +57,17 @@ namespace osu.Game.Screens.Select
 
         public override bool OnExiting(IScreen next)
         {
+            if (base.OnExiting(next))
+                return true;
+
+            Beatmap.Value = beatmaps.GetWorkingBeatmap(CurrentItem.Value?.Beatmap);
+            Beatmap.Value.Mods.Value = selectedMods.Value = CurrentItem.Value?.RequiredMods;
+            Ruleset.Value = CurrentItem.Value?.Ruleset;
+
             Beatmap.Disabled = true;
             Ruleset.Disabled = true;
 
-            return base.OnExiting(next);
+            return false;
         }
 
         public override void OnEntering(IScreen last)

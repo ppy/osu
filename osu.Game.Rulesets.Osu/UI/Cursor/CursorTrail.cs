@@ -255,10 +255,13 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
         {
             [VertexMember(2, VertexAttribPointerType.Float)]
             public Vector2 Position;
+
             [VertexMember(4, VertexAttribPointerType.Float)]
             public Color4 Colour;
+
             [VertexMember(2, VertexAttribPointerType.Float)]
             public Vector2 TexturePosition;
+
             [VertexMember(1, VertexAttribPointerType.Float)]
             public float Time;
 

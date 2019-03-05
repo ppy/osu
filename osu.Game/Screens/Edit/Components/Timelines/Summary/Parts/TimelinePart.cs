@@ -3,8 +3,8 @@
 
 using System;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osuTK;
-using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Beatmaps;
@@ -27,7 +27,7 @@ namespace osu.Game.Screens.Edit.Components.Timelines.Summary.Parts
             Beatmap.ValueChanged += b =>
             {
                 updateRelativeChildSize();
-                LoadBeatmap(b);
+                LoadBeatmap(b.NewValue);
             };
         }
 

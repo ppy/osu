@@ -60,7 +60,7 @@ namespace osu.Desktop.Overlays
                             {
                                 new OsuSpriteText
                                 {
-                                    Font = @"Exo2.0-Bold",
+                                    Font = OsuFont.GetFont(weight: FontWeight.Bold),
                                     Text = game.Name
                                 },
                                 new OsuSpriteText
@@ -74,9 +74,8 @@ namespace osu.Desktop.Overlays
                         {
                             Anchor = Anchor.TopCentre,
                             Origin = Anchor.TopCentre,
-                            TextSize = 12,
+                            Font = OsuFont.Numeric.With(size: 12),
                             Colour = colours.Yellow,
-                            Font = @"Venera",
                             Text = @"Development Build"
                         },
                         new Sprite

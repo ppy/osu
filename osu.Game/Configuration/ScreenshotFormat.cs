@@ -9,6 +9,7 @@ namespace osu.Game.Configuration
     {
         [Description("JPG (web-friendly)")]
         Jpg = 1,
+
         [Description("PNG (lossless)")]
         Png = 2
     }

@@ -3,7 +3,7 @@
 
 using System.Diagnostics;
 using System.Net.Http;
-using osu.Framework.Configuration;
+using osu.Framework.Bindables;
 using osu.Framework.IO.Network;
 
 namespace osu.Game.Online.API

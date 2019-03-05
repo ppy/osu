@@ -21,7 +21,7 @@ namespace osu.Game.Rulesets.Osu.Tests
     public class TestCaseSpinner : OsuTestCase
     {
         public override IReadOnlyList<Type> RequiredTypes => new[]
-{
+        {
             typeof(SpinnerDisc),
             typeof(DrawableSpinner),
             typeof(DrawableOsuHitObject)
@@ -67,7 +67,8 @@ namespace osu.Game.Rulesets.Osu.Tests
         {
             private bool auto;
 
-            public TestDrawableSpinner(Spinner s, bool auto) : base(s)
+            public TestDrawableSpinner(Spinner s, bool auto)
+                : base(s)
             {
                 this.auto = auto;
             }

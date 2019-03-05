@@ -8,6 +8,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using JetBrains.Annotations;
 using Microsoft.EntityFrameworkCore;
+using osu.Framework;
 using osu.Framework.Extensions;
 using osu.Framework.IO.File;
 using osu.Framework.Logging;
@@ -52,6 +53,8 @@ namespace osu.Game.Database
         public event Action<TModel> ItemRemoved;
 
         public virtual string[] HandledExtensions => new[] { ".zip" };
+
+        public virtual bool SupportsImportFromStable => RuntimeInfo.IsDesktop;
 
         protected readonly FileStore Files;
 
@@ -105,7 +108,7 @@ namespace osu.Game.Database
                 a.Invoke();
         }
 
-        protected ArchiveModelManager(Storage storage, IDatabaseContextFactory contextFactory, MutableDatabaseBackedStore<TModel> modelStore, IIpcHost importHost = null)
+        protected ArchiveModelManager(Storage storage, IDatabaseContextFactory contextFactory, MutableDatabaseBackedStoreWithFileIncludes<TModel, TFileModel> modelStore, IIpcHost importHost = null)
         {
             ContextFactory = contextFactory;
 
@@ -539,6 +542,7 @@ namespace osu.Game.Database
                 return new LegacyDirectoryArchiveReader(path);
             if (File.Exists(path))
                 return new LegacyFileArchiveReader(path);
+
             throw new InvalidFormatException($"{path} is not a valid archive");
         }
     }

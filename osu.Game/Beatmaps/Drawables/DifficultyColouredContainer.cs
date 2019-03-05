@@ -53,6 +53,7 @@ namespace osu.Game.Beatmaps.Drawables
             if (rating < 4.0) return DifficultyRating.Hard;
             if (rating < 5.3) return DifficultyRating.Insane;
             if (rating < 6.5) return DifficultyRating.Expert;
+
             return DifficultyRating.ExpertPlus;
         }
 
