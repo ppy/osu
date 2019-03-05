@@ -7,8 +7,8 @@ using System.Linq;
 using osu.Framework.Graphics;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Extensions.IEnumerableExtensions;
-using osu.Framework.Configuration;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Mods;
@@ -60,7 +60,7 @@ namespace osu.Game.Rulesets.UI
         private WorkingBeatmap beatmap;
 
         [BackgroundDependencyLoader]
-        private void load(IBindableBeatmap beatmap)
+        private void load(IBindable<WorkingBeatmap> beatmap)
         {
             this.beatmap = beatmap.Value;
         }

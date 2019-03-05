@@ -5,7 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
-using osu.Framework.Configuration;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -44,30 +44,26 @@ namespace osu.Game.Overlays.Profile.Header
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
                     Text = "No recent plays",
-                    TextSize = 14,
-                    Font = @"Exo2.0-RegularItalic",
+                    Font = OsuFont.GetFont(size: 14, weight: FontWeight.Regular, italics: true)
                 },
                 rankText = new OsuSpriteText
                 {
                     Anchor = Anchor.TopCentre,
                     Origin = Anchor.TopCentre,
-                    Font = @"Exo2.0-RegularItalic",
-                    TextSize = primary_textsize
+                    Font = OsuFont.GetFont(size: primary_textsize, weight: FontWeight.Regular, italics: true),
                 },
                 relativeText = new OsuSpriteText
                 {
                     Anchor = Anchor.TopCentre,
                     Origin = Anchor.TopCentre,
-                    Font = @"Exo2.0-RegularItalic",
+                    Font = OsuFont.GetFont(size: secondary_textsize, weight: FontWeight.Regular, italics: true),
                     Y = 25,
-                    TextSize = secondary_textsize
                 },
                 performanceText = new OsuSpriteText
                 {
                     Anchor = Anchor.BottomCentre,
                     Origin = Anchor.BottomCentre,
-                    Font = @"Exo2.0-RegularItalic",
-                    TextSize = secondary_textsize
+                    Font = OsuFont.GetFont(size: secondary_textsize, weight: FontWeight.Regular, italics: true)
                 },
                 graph = new RankChartLineGraph
                 {
@@ -91,11 +87,11 @@ namespace osu.Game.Overlays.Profile.Header
             graph.Colour = colours.Yellow;
         }
 
-        private void userChanged(User user)
+        private void userChanged(ValueChangedEvent<User> e)
         {
             placeholder.FadeIn(fade_duration, Easing.Out);
 
-            if (user?.Statistics?.Ranks.Global == null)
+            if (e.NewValue?.Statistics?.Ranks.Global == null)
             {
                 rankText.Text = string.Empty;
                 performanceText.Text = string.Empty;
@@ -105,7 +101,7 @@ namespace osu.Game.Overlays.Profile.Header
                 return;
             }
 
-            int[] userRanks = user.RankHistory?.Data ?? new[] { user.Statistics.Ranks.Global.Value };
+            int[] userRanks = e.NewValue.RankHistory?.Data ?? new[] { e.NewValue.Statistics.Ranks.Global.Value };
             ranks = userRanks.Select((x, index) => new KeyValuePair<int, int>(index, x)).Where(x => x.Value != 0).ToArray();
 
             if (ranks.Length > 1)
@@ -144,6 +140,7 @@ namespace osu.Game.Overlays.Profile.Header
                 graph.UpdateBallPosition(e.MousePosition.X);
                 graph.ShowBall();
             }
+
             return base.OnHover(e);
         }
 

@@ -16,8 +16,11 @@ using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Osu.Replays;
 using osu.Game.Rulesets.Replays.Types;
 using osu.Game.Beatmaps.Legacy;
+using osu.Game.Configuration;
+using osu.Game.Rulesets.Configuration;
 using osu.Game.Rulesets.Difficulty;
 using osu.Game.Rulesets.Osu.Beatmaps;
+using osu.Game.Rulesets.Osu.Configuration;
 using osu.Game.Rulesets.Osu.Difficulty;
 using osu.Game.Scoring;
 
@@ -121,9 +124,11 @@ namespace osu.Game.Rulesets.Osu
                         new OsuModAutopilot(),
                     };
                 case ModType.Fun:
-                    return new Mod[] {
+                    return new Mod[]
+                    {
                         new OsuModTransform(),
                         new OsuModWiggle(),
+                        new OsuModGrow()
                     };
                 default:
                     return new Mod[] { };
@@ -142,11 +147,13 @@ namespace osu.Game.Rulesets.Osu
 
         public override string ShortName => "osu";
 
-        public override RulesetSettingsSubsection CreateSettings() => new OsuSettings(this);
+        public override RulesetSettingsSubsection CreateSettings() => new OsuSettingsSubsection(this);
 
         public override int? LegacyID => 0;
 
         public override IConvertibleReplayFrame CreateConvertibleReplayFrame() => new OsuReplayFrame();
+
+        public override IRulesetConfigManager CreateConfig(SettingsStore settings) => new OsuRulesetConfigManager(settings, RulesetInfo);
 
         public OsuRuleset(RulesetInfo rulesetInfo = null)
             : base(rulesetInfo)

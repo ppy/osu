@@ -26,10 +26,10 @@ namespace osu.Game.Tests.Visual
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
-                Size = new Vector2(200,100)
+                Size = new Vector2(200, 100)
             };
 
-            Beatmap.Value = new TestWorkingBeatmap(new Beatmap());
+            Beatmap.Value = new TestWorkingBeatmap(new Beatmap(), Clock);
 
             Child = playback;
         }

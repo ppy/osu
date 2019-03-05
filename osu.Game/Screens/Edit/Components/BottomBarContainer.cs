@@ -3,7 +3,7 @@
 
 using osu.Framework.Allocation;
 using osu.Framework.Audio.Track;
-using osu.Framework.Configuration;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -42,7 +42,7 @@ namespace osu.Game.Screens.Edit.Components
         }
 
         [BackgroundDependencyLoader]
-        private void load(IBindableBeatmap beatmap, OsuColour colours)
+        private void load(IBindable<WorkingBeatmap> beatmap, OsuColour colours)
         {
             Beatmap.BindTo(beatmap);
             background.Colour = colours.Gray1;

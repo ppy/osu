@@ -118,7 +118,6 @@ namespace osu.Game.Screens.Menu
                             AllowMultiline = false,
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
-                            TextSize = 16,
                             Position = new Vector2(0, 35),
                             Text = text
                         }
@@ -243,7 +242,7 @@ namespace osu.Game.Screens.Menu
 
         public ButtonState State
         {
-            get { return state; }
+            get => state;
 
             set
             {

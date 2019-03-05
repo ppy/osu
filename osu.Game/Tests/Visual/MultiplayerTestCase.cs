@@ -2,19 +2,19 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
-using osu.Framework.Configuration;
+using osu.Framework.Bindables;
 using osu.Game.Online.Multiplayer;
 
 namespace osu.Game.Tests.Visual
 {
-    public class MultiplayerTestCase : OsuTestCase
+    public abstract class MultiplayerTestCase : ScreenTestCase
     {
         [Cached]
         private readonly Bindable<Room> currentRoom = new Bindable<Room>(new Room());
 
         protected Room Room
         {
-            get => currentRoom;
+            get => currentRoom.Value;
             set => currentRoom.Value = value;
         }
 

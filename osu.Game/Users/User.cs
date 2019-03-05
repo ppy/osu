@@ -3,7 +3,7 @@
 
 using System;
 using Newtonsoft.Json;
-using osu.Framework.Configuration;
+using osu.Framework.Bindables;
 
 namespace osu.Game.Users
 {
@@ -34,8 +34,8 @@ namespace osu.Game.Users
         [JsonProperty(@"cover_url")]
         public string CoverUrl
         {
-            get { return Cover?.Url; }
-            set { Cover = new UserCover { Url = value }; }
+            get => Cover?.Url;
+            set => Cover = new UserCover { Url = value };
         }
 
         [JsonProperty(@"cover")]

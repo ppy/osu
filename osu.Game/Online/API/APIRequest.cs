@@ -121,7 +121,10 @@ namespace osu.Game.Online.API
     }
 
     public delegate void APIFailureHandler(Exception e);
+
     public delegate void APISuccessHandler();
+
     public delegate void APIProgressHandler(long current, long total);
+
     public delegate void APISuccessHandler<in T>(T content);
 }

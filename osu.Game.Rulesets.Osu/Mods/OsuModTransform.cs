@@ -28,7 +28,7 @@ namespace osu.Game.Rulesets.Osu.Mods
         {
             foreach (var drawable in drawables)
             {
-                var hitObject = (OsuHitObject) drawable.HitObject;
+                var hitObject = (OsuHitObject)drawable.HitObject;
 
                 float appearDistance = (float)(hitObject.TimePreempt - hitObject.TimeFadeIn) / 2;
 
@@ -46,7 +46,7 @@ namespace osu.Game.Rulesets.Osu.Mods
                         .MoveTo(originalPosition, moveDuration, Easing.InOutSine);
                 }
 
-                theta += (float) hitObject.TimeFadeIn / 1000;
+                theta += (float)hitObject.TimeFadeIn / 1000;
             }
         }
     }

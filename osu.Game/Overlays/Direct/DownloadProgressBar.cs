@@ -37,7 +37,7 @@ namespace osu.Game.Overlays.Direct
 
             State.BindValueChanged(state =>
             {
-                switch (state)
+                switch (state.NewValue)
                 {
                     case DownloadState.NotDownloaded:
                         progressBar.Current.Value = 0;

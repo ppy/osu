@@ -19,8 +19,10 @@ namespace osu.Game.Rulesets.Catch
     {
         [Description("Move left")]
         MoveLeft,
+
         [Description("Move right")]
         MoveRight,
+
         [Description("Engage dash")]
         Dash,
     }
