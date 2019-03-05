@@ -213,12 +213,6 @@ namespace osu.Game.Online.Leaderboards
             pendingUpdateScores?.Cancel();
             pendingUpdateScores = Schedule(() =>
             {
-                if (api?.IsLoggedIn != true)
-                {
-                    PlaceholderState = PlaceholderState.NotLoggedIn;
-                    return;
-                }
-
                 PlaceholderState = PlaceholderState.Retrieving;
                 loading.Show();
 
@@ -230,6 +224,12 @@ namespace osu.Game.Online.Leaderboards
 
                 if (getScoresRequest == null)
                     return;
+
+                if (api?.IsLoggedIn != true)
+                {
+                    PlaceholderState = PlaceholderState.NotLoggedIn;
+                    return;
+                }
 
                 getScoresRequest.Failure += e => Schedule(() =>
                 {
