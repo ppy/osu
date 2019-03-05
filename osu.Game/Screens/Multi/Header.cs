@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
@@ -22,7 +22,7 @@ namespace osu.Game.Screens.Multi
         private readonly OsuSpriteText screenType;
         private readonly HeaderBreadcrumbControl breadcrumbs;
 
-        public Header(Screen initialScreen)
+        public Header(ScreenStack stack)
         {
             RelativeSizeAxes = Axes.X;
             Height = HEIGHT;
@@ -37,7 +37,7 @@ namespace osu.Game.Screens.Multi
                 new Container
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Padding = new MarginPadding { Horizontal = SearchableListOverlay.WIDTH_PADDING },
+                    Padding = new MarginPadding { Horizontal = SearchableListOverlay.WIDTH_PADDING + OsuScreen.HORIZONTAL_OVERFLOW_PADDING },
                     Children = new Drawable[]
                     {
                         new FillFlowContainer
@@ -64,18 +64,17 @@ namespace osu.Game.Screens.Multi
                                         new OsuSpriteText
                                         {
                                             Text = "multiplayer ",
-                                            TextSize = 25,
+                                            Font = OsuFont.GetFont(size: 25)
                                         },
                                         screenType = new OsuSpriteText
                                         {
-                                            TextSize = 25,
-                                            Font = @"Exo2.0-Light",
+                                            Font = OsuFont.GetFont(weight: FontWeight.Light, size: 25)
                                         },
                                     },
                                 },
                             },
                         },
-                        breadcrumbs = new HeaderBreadcrumbControl(initialScreen)
+                        breadcrumbs = new HeaderBreadcrumbControl(stack)
                         {
                             Anchor = Anchor.BottomLeft,
                             Origin = Anchor.BottomLeft,
@@ -85,10 +84,10 @@ namespace osu.Game.Screens.Multi
                 },
             };
 
-            breadcrumbs.Current.ValueChanged += s =>
+            breadcrumbs.Current.ValueChanged += scren =>
             {
-                if (s is IMultiplayerSubScreen mpScreen)
-                    screenType.Text = mpScreen.ShortTitle.ToLowerInvariant();
+                if (scren.NewValue is IMultiplayerSubScreen multiScreen)
+                    screenType.Text = multiScreen.ShortTitle.ToLowerInvariant();
             };
 
             breadcrumbs.Current.TriggerChange();
@@ -103,8 +102,8 @@ namespace osu.Game.Screens.Multi
 
         private class HeaderBreadcrumbControl : ScreenBreadcrumbControl
         {
-            public HeaderBreadcrumbControl(Screen initialScreen)
-                : base(initialScreen)
+            public HeaderBreadcrumbControl(ScreenStack stack)
+                : base(stack)
             {
             }
 

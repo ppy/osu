@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using System.Collections.Generic;
@@ -11,7 +11,7 @@ using osu.Game.Screens.Multi.Lounge.Components;
 namespace osu.Game.Tests.Visual
 {
     [TestFixture]
-    public class TestCaseMultiScreen : OsuTestCase
+    public class TestCaseMultiScreen : ScreenTestCase
     {
         public override IReadOnlyList<Type> RequiredTypes => new[]
         {
@@ -24,9 +24,7 @@ namespace osu.Game.Tests.Visual
         {
             Multiplayer multi = new Multiplayer();
 
-            AddStep(@"show", () => Add(multi));
-            AddWaitStep(5);
-            AddStep(@"exit", multi.Exit);
+            AddStep(@"show", () => LoadScreen(multi));
         }
     }
 }

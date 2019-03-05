@@ -1,9 +1,8 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using osuTK;
 using osuTK.Graphics;
-using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Batches;
 using osu.Framework.Graphics.Colour;
@@ -15,6 +14,7 @@ using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using System;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 
 namespace osu.Game.Screens.Menu
 {
@@ -74,7 +74,7 @@ namespace osu.Game.Screens.Menu
         }
 
         [BackgroundDependencyLoader]
-        private void load(ShaderManager shaders, IBindableBeatmap beatmap)
+        private void load(ShaderManager shaders, IBindable<WorkingBeatmap> beatmap)
         {
             this.beatmap.BindTo(beatmap);
             shader = shaders.Load(VertexShaderDescriptor.TEXTURE_2, FragmentShaderDescriptor.TEXTURE_ROUNDED);
@@ -156,7 +156,9 @@ namespace osu.Game.Screens.Menu
         {
             public Shader Shader;
             public Texture Texture;
+
             public VisualiserSharedData Shared;
+
             //Asuming the logo is a circle, we don't need a second dimension.
             public float Size;
 
@@ -213,6 +215,7 @@ namespace osu.Game.Screens.Menu
                         }
                     }
                 }
+
                 Shader.Unbind();
             }
         }

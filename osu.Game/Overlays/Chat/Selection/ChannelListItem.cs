@@ -1,12 +1,12 @@
-// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using System.Collections.Generic;
 using osuTK;
 using osuTK.Graphics;
 using osu.Framework.Allocation;
-using osu.Framework.Configuration;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input.Events;
@@ -36,12 +36,10 @@ namespace osu.Game.Overlays.Chat.Selection
         private Color4 hoverColour;
 
         public IEnumerable<string> FilterTerms => new[] { channel.Name };
+
         public bool MatchingFilter
         {
-            set
-            {
-                this.FadeTo(value ? 1f : 0f, 100);
-            }
+            set => this.FadeTo(value ? 1f : 0f, 100);
         }
 
         public Action<Channel> OnRequestJoin;
@@ -54,7 +52,7 @@ namespace osu.Game.Overlays.Chat.Selection
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
 
-            Action = () => { (channel.Joined ? OnRequestLeave : OnRequestJoin)?.Invoke(channel); };
+            Action = () => { (channel.Joined.Value ? OnRequestLeave : OnRequestJoin)?.Invoke(channel); };
 
             Children = new Drawable[]
             {
@@ -89,8 +87,7 @@ namespace osu.Game.Overlays.Chat.Selection
                                 name = new OsuSpriteText
                                 {
                                     Text = channel.ToString(),
-                                    TextSize = text_size,
-                                    Font = @"Exo2.0-Bold",
+                                    Font = OsuFont.GetFont(size: text_size, weight: FontWeight.Bold),
                                     Shadow = false,
                                 },
                             },
@@ -106,8 +103,7 @@ namespace osu.Game.Overlays.Chat.Selection
                                 topic = new OsuSpriteText
                                 {
                                     Text = channel.Topic,
-                                    TextSize = text_size,
-                                    Font = @"Exo2.0-SemiBold",
+                                    Font = OsuFont.GetFont(size: text_size, weight: FontWeight.SemiBold),
                                     Shadow = false,
                                 },
                             },
@@ -130,8 +126,7 @@ namespace osu.Game.Overlays.Chat.Selection
                                 new OsuSpriteText
                                 {
                                     Text = @"0",
-                                    TextSize = text_size,
-                                    Font = @"Exo2.0-SemiBold",
+                                    Font = OsuFont.GetFont(size: text_size, weight: FontWeight.SemiBold),
                                     Shadow = false,
                                 },
                             },
@@ -148,7 +143,7 @@ namespace osu.Game.Overlays.Chat.Selection
             joinedColour = colours.Blue;
             hoverColour = colours.Yellow;
 
-            joinedBind.ValueChanged += updateColour;
+            joinedBind.ValueChanged += joined => updateColour(joined.NewValue);
             joinedBind.BindTo(channel.Joined);
 
             joinedBind.TriggerChange();

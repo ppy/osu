@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using System.Collections.Generic;
@@ -84,9 +84,10 @@ namespace osu.Game.Screens.Tournament
         }
 
         private ScrollState _scrollState;
+
         private ScrollState scrollState
         {
-            get { return _scrollState; }
+            get => _scrollState;
 
             set
             {
@@ -326,9 +327,10 @@ namespace osu.Game.Screens.Tournament
             private readonly Box outline;
 
             private bool selected;
+
             public bool Selected
             {
-                get { return selected; }
+                get => selected;
 
                 set
                 {

@@ -1,5 +1,5 @@
-// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using System.Collections.Generic;
@@ -8,7 +8,7 @@ using System.Linq;
 using System.Reflection;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
-using osu.Framework.Configuration;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.IO.Stores;
@@ -69,14 +69,15 @@ namespace osu.Game
 
         protected override Container<Drawable> Content => content;
 
-        private OsuBindableBeatmap beatmap;
-        protected BindableBeatmap Beatmap => beatmap;
+        private Bindable<WorkingBeatmap> beatmap;
+
+        protected Bindable<WorkingBeatmap> Beatmap => beatmap;
 
         private Bindable<bool> fpsDisplayVisible;
 
-        protected AssemblyName AssemblyName => Assembly.GetEntryAssembly()?.GetName() ?? new AssemblyName { Version = new Version() };
+        public virtual Version AssemblyVersion => Assembly.GetEntryAssembly()?.GetName().Version ?? new Version();
 
-        public bool IsDeployedBuild => AssemblyName.Version.Major > 0;
+        public bool IsDeployedBuild => AssemblyVersion.Major > 0;
 
         public string Version
         {
@@ -85,8 +86,8 @@ namespace osu.Game
                 if (!IsDeployedBuild)
                     return @"local " + (DebugUtils.IsDebug ? @"debug" : @"release");
 
-                var assembly = AssemblyName;
-                return $@"{assembly.Version.Major}.{assembly.Version.Minor}.{assembly.Version.Build}";
+                var version = AssemblyVersion;
+                return $@"{version.Major}.{version.Minor}.{version.Build}";
             }
         }
 
@@ -111,8 +112,8 @@ namespace osu.Game
 
             dependencies.Cache(contextFactory = new DatabaseContextFactory(Host.Storage));
 
-            var largeStore = new LargeTextureStore(new TextureLoaderStore(new NamespacedResourceStore<byte[]>(Resources, @"Textures")));
-            largeStore.AddStore(new TextureLoaderStore(new OnlineStore()));
+            var largeStore = new LargeTextureStore(Host.CreateTextureLoaderStore(new NamespacedResourceStore<byte[]>(Resources, @"Textures")));
+            largeStore.AddStore(Host.CreateTextureLoaderStore(new OnlineStore()));
             dependencies.Cache(largeStore);
 
             dependencies.CacheAs(this);
@@ -155,7 +156,6 @@ namespace osu.Game
             dependencies.CacheAs<IAPIProvider>(API);
 
             var defaultBeatmap = new DummyWorkingBeatmap(this);
-            beatmap = new OsuBindableBeatmap(defaultBeatmap, Audio);
 
             dependencies.Cache(RulesetStore = new RulesetStore(contextFactory));
             dependencies.Cache(FileStore = new FileStore(contextFactory, Host.Storage));
@@ -174,8 +174,10 @@ namespace osu.Game
             // this adds a global reduction of track volume for the time being.
             Audio.Track.AddAdjustment(AdjustableProperty.Volume, new BindableDouble(0.8));
 
-            dependencies.CacheAs<BindableBeatmap>(beatmap);
-            dependencies.CacheAs<IBindableBeatmap>(beatmap);
+            beatmap = new OsuBindableBeatmap(defaultBeatmap, Audio);
+
+            dependencies.CacheAs<IBindable<WorkingBeatmap>>(beatmap);
+            dependencies.CacheAs(beatmap);
 
             FileStore.Cleanup();
 
@@ -207,7 +209,7 @@ namespace osu.Game
             // TODO: This is temporary until we reimplement the local FPS display.
             // It's just to allow end-users to access the framework FPS display without knowing the shortcut key.
             fpsDisplayVisible = LocalConfig.GetBindable<bool>(OsuSetting.ShowFpsDisplay);
-            fpsDisplayVisible.ValueChanged += val => { FrameStatisticsMode = val ? FrameStatisticsMode.Minimal : FrameStatisticsMode.None; };
+            fpsDisplayVisible.ValueChanged += visible => { FrameStatisticsMode = visible.NewValue ? FrameStatisticsMode.Minimal : FrameStatisticsMode.None; };
             fpsDisplayVisible.TriggerChange();
         }
 

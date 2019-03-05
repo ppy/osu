@@ -1,9 +1,9 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using System.Linq;
-using osu.Framework.Configuration;
+using osu.Framework.Bindables;
 
 namespace osu.Game.Screens.Edit
 {
@@ -22,7 +22,7 @@ namespace osu.Game.Screens.Edit
 
         public override int Value
         {
-            get { return base.Value; }
+            get => base.Value;
             set
             {
                 if (!VALID_DIVISORS.Contains(value))

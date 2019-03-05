@@ -1,5 +1,5 @@
-// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using System.Collections.Generic;
@@ -147,9 +147,10 @@ namespace osu.Game.Tests.Visual
 
         private bool selectedBeatmapVisible()
         {
-            var currentlySelected = carousel.Items.Find(s => s.Item is CarouselBeatmap && s.Item.State == CarouselItemState.Selected);
+            var currentlySelected = carousel.Items.Find(s => s.Item is CarouselBeatmap && s.Item.State.Value == CarouselItemState.Selected);
             if (currentlySelected == null)
                 return true;
+
             return currentlySelected.Item.Visible;
         }
 
@@ -166,8 +167,7 @@ namespace osu.Game.Tests.Visual
                 carousel.Filter(new FilterCriteria { SearchText = "Dingo" }, false);
                 carousel.Filter(new FilterCriteria(), false);
                 eagerSelectedIDs.Add(carousel.SelectedBeatmapSet.ID);
-            }
-            );
+            });
         }
 
         /// <summary>
@@ -522,6 +522,7 @@ namespace osu.Game.Tests.Visual
                     }
                 });
             }
+
             return toReturn;
         }
 

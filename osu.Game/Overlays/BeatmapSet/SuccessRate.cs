@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
@@ -21,12 +21,14 @@ namespace osu.Game.Overlays.BeatmapSet
         private readonly FailRetryGraph graph;
 
         private BeatmapInfo beatmap;
+
         public BeatmapInfo Beatmap
         {
-            get { return beatmap; }
+            get => beatmap;
             set
             {
                 if (value == beatmap) return;
+
                 beatmap = value;
 
                 updateDisplay();
@@ -62,7 +64,7 @@ namespace osu.Game.Overlays.BeatmapSet
                             Anchor = Anchor.TopCentre,
                             Origin = Anchor.TopCentre,
                             Text = "Success Rate",
-                            TextSize = 13,
+                            Font = OsuFont.GetFont(size: 13)
                         },
                         successRate = new Bar
                         {
@@ -79,7 +81,7 @@ namespace osu.Game.Overlays.BeatmapSet
                             {
                                 Anchor = Anchor.TopRight,
                                 Origin = Anchor.TopCentre,
-                                TextSize = 13,
+                                Font = OsuFont.GetFont(size: 13),
                             },
                         },
                         graphLabel = new OsuSpriteText
@@ -87,7 +89,7 @@ namespace osu.Game.Overlays.BeatmapSet
                             Anchor = Anchor.TopCentre,
                             Origin = Anchor.TopCentre,
                             Text = "Points of Failure",
-                            TextSize = 13,
+                            Font = OsuFont.GetFont(size: 13),
                             Margin = new MarginPadding { Vertical = 20 },
                         },
                     },

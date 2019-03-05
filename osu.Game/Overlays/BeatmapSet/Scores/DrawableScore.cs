@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using osuTK;
 using osu.Framework.Allocation;
@@ -46,7 +46,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                     Anchor = Anchor.CentreLeft,
                     Origin = Anchor.CentreLeft,
                     Text = $"#{index + 1}",
-                    Font = @"Exo2.0-RegularItalic",
+                    Font = OsuFont.GetFont(weight: FontWeight.Regular, italics: true),
                     Margin = new MarginPadding { Left = side_margin }
                 },
                 new DrawableFlag(score.User.Country)
@@ -87,17 +87,16 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                     Anchor = Anchor.CentreLeft,
                     Origin = Anchor.CentreRight,
                     Text = $@"{score.TotalScore:N0}",
-                    Font = @"Venera",
+                    Font = OsuFont.Numeric.With(fixedWidth: true),
                     RelativePositionAxes = Axes.X,
                     X = 0.75f,
-                    FixedWidth = true,
                 },
                 new OsuSpriteText
                 {
                     Anchor = Anchor.CentreLeft,
                     Origin = Anchor.CentreRight,
                     Text = $@"{score.Accuracy:P2}",
-                    Font = @"Exo2.0-RegularItalic",
+                    Font = OsuFont.GetFont(weight: FontWeight.Regular, italics: true),
                     RelativePositionAxes = Axes.X,
                     X = 0.85f
                 },
@@ -106,7 +105,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                     Anchor = Anchor.CentreRight,
                     Origin = Anchor.CentreRight,
                     Text = $"{score.Statistics[HitResult.Great]}/{score.Statistics[HitResult.Good]}/{score.Statistics[HitResult.Meh]}",
-                    Font = @"Exo2.0-RegularItalic",
+                    Font = OsuFont.GetFont(weight: FontWeight.Regular, italics: true),
                     Margin = new MarginPadding { Right = side_margin }
                 },
             };

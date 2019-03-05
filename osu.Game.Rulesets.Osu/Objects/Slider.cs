@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using osuTK;
@@ -7,8 +7,8 @@ using osu.Game.Rulesets.Objects.Types;
 using System.Collections.Generic;
 using osu.Game.Rulesets.Objects;
 using System.Linq;
+using osu.Framework.Bindables;
 using osu.Framework.Caching;
-using osu.Framework.Configuration;
 using osu.Game.Audio;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
@@ -198,7 +198,7 @@ namespace osu.Game.Rulesets.Osu.Objects
 
             if (tickDistance == 0) return;
 
-            var minDistanceFromEnd = Velocity * 0.01;
+            var minDistanceFromEnd = Velocity * 10;
 
             var spanCount = this.SpanCount();
 
@@ -262,6 +262,7 @@ namespace osu.Game.Rulesets.Osu.Objects
         {
             if (nodeIndex < NodeSamples.Count)
                 return NodeSamples[nodeIndex];
+
             return Samples;
         }
 

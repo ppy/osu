@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using NUnit.Framework;
 using osu.Framework.Allocation;
@@ -33,7 +33,7 @@ namespace osu.Game.Tests.Visual
                 {
                     TimingPoints =
                     {
-                        new TimingControlPoint { Time = 0, BeatLength = 200},
+                        new TimingControlPoint { Time = 0, BeatLength = 200 },
                         new TimingControlPoint { Time = 100, BeatLength = 400 },
                         new TimingControlPoint { Time = 175, BeatLength = 800 },
                         new TimingControlPoint { Time = 350, BeatLength = 200 },
@@ -48,7 +48,7 @@ namespace osu.Game.Tests.Visual
                 }
             };
 
-            Beatmap.Value = new TestWorkingBeatmap(testBeatmap);
+            Beatmap.Value = new TestWorkingBeatmap(testBeatmap, Clock);
 
             Child = new TimingPointVisualiser(testBeatmap, 5000) { Clock = Clock };
         }

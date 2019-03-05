@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
@@ -28,26 +28,26 @@ namespace osu.Game.Screens.Select.Options
 
         public Color4 ButtonColour
         {
-            get { return background.Colour; }
-            set { background.Colour = value; }
+            get => background.Colour;
+            set => background.Colour = value;
         }
 
         public FontAwesome Icon
         {
-            get { return iconText.Icon; }
-            set { iconText.Icon = value; }
+            get => iconText.Icon;
+            set => iconText.Icon = value;
         }
 
         public string FirstLineText
         {
-            get { return firstLine.Text; }
-            set { firstLine.Text = value; }
+            get => firstLine.Text;
+            set => firstLine.Text = value;
         }
 
         public string SecondLineText
         {
-            get { return secondLine.Text; }
-            set { secondLine.Text = value; }
+            get => secondLine.Text;
+            set => secondLine.Text = value;
         }
 
         public Key? HotKey;
@@ -150,14 +150,14 @@ namespace osu.Game.Screens.Select.Options
                         {
                             Origin = Anchor.TopCentre,
                             Anchor = Anchor.TopCentre,
-                            Font = @"Exo2.0-Bold",
+                            Font = OsuFont.GetFont(weight: FontWeight.Bold),
                             Text = @"",
                         },
                         secondLine = new OsuSpriteText
                         {
                             Origin = Anchor.TopCentre,
                             Anchor = Anchor.TopCentre,
-                            Font = @"Exo2.0-Bold",
+                            Font = OsuFont.GetFont(weight: FontWeight.Bold),
                             Text = @"",
                         },
                     },

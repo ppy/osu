@@ -1,10 +1,10 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using System.Collections.Generic;
 using osu.Framework.Allocation;
-using osu.Framework.Configuration;
+using osu.Framework.Bindables;
 using osu.Game.Rulesets.Objects.Types;
 using osuTK;
 
@@ -54,18 +54,18 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
             var spanProgress = slider.ProgressAt(completionProgress);
 
             double start = 0;
-            double end = SnakingIn ? MathHelper.Clamp((Time.Current - (slider.StartTime - slider.TimePreempt)) / slider.TimeFadeIn, 0, 1) : 1;
+            double end = SnakingIn.Value ? MathHelper.Clamp((Time.Current - (slider.StartTime - slider.TimePreempt)) / slider.TimeFadeIn, 0, 1) : 1;
 
             if (span >= slider.SpanCount() - 1)
             {
                 if (Math.Min(span, slider.SpanCount() - 1) % 2 == 1)
                 {
                     start = 0;
-                    end = SnakingOut ? spanProgress : 1;
+                    end = SnakingOut.Value ? spanProgress : 1;
                 }
                 else
                 {
-                    start = SnakingOut ? spanProgress : 0;
+                    start = SnakingOut.Value ? spanProgress : 0;
                 }
             }
 

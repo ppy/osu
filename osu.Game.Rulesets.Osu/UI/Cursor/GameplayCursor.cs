@@ -1,8 +1,8 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
-using osu.Framework.Configuration;
+using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -112,7 +112,7 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
             }
 
             [BackgroundDependencyLoader]
-            private void load(OsuConfigManager config, IBindableBeatmap beatmap)
+            private void load(OsuConfigManager config, IBindable<WorkingBeatmap> beatmap)
             {
                 InternalChild = expandTarget = new Container
                 {
@@ -183,13 +183,13 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
                 };
 
                 this.beatmap.BindTo(beatmap);
-                this.beatmap.ValueChanged += v => calculateScale();
+                this.beatmap.ValueChanged += _ => calculateScale();
 
                 cursorScale = config.GetBindable<double>(OsuSetting.GameplayCursorSize);
-                cursorScale.ValueChanged += v => calculateScale();
+                cursorScale.ValueChanged += _ => calculateScale();
 
                 autoCursorScale = config.GetBindable<bool>(OsuSetting.AutoCursorSize);
-                autoCursorScale.ValueChanged += v => calculateScale();
+                autoCursorScale.ValueChanged += _ => calculateScale();
 
                 calculateScale();
             }
@@ -198,7 +198,7 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
             {
                 float scale = (float)cursorScale.Value;
 
-                if (autoCursorScale && beatmap.Value != null)
+                if (autoCursorScale.Value && beatmap.Value != null)
                 {
                     // if we have a beatmap available, let's get its circle size to figure out an automatic cursor scale modifier.
                     scale *= (float)(1 - 0.7 * (1 + beatmap.Value.BeatmapInfo.BaseDifficulty.CircleSize - BeatmapDifficulty.DEFAULT_DIFFICULTY) / BeatmapDifficulty.DEFAULT_DIFFICULTY);
@@ -213,6 +213,7 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
             public void Expand()
             {
                 if (!cursorExpand) return;
+
                 expandTarget.ScaleTo(released_scale).ScaleTo(pressed_scale, 100, Easing.OutQuad);
             }
 

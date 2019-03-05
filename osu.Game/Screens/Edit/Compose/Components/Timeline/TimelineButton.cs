@@ -1,8 +1,8 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
-using osu.Framework.Configuration;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics;
@@ -19,8 +19,8 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
         public FontAwesome Icon
         {
-            get { return button.Icon; }
-            set { button.Icon = value; }
+            get => button.Icon;
+            set => button.Icon = value;
         }
 
         private readonly IconButton button;

@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using System.Collections.Generic;
@@ -39,7 +39,7 @@ namespace osu.Game.Online.Leaderboards
 
         public IEnumerable<ScoreInfo> Scores
         {
-            get { return scores; }
+            get => scores;
             set
             {
                 scores = value;
@@ -98,7 +98,7 @@ namespace osu.Game.Online.Leaderboards
 
         public TScope Scope
         {
-            get { return scope; }
+            get => scope;
             set
             {
                 if (value.Equals(scope))
@@ -117,7 +117,7 @@ namespace osu.Game.Online.Leaderboards
         /// </summary>
         protected PlaceholderState PlaceholderState
         {
-            get { return placeholderState; }
+            get => placeholderState;
             set
             {
                 if (value != PlaceholderState.Successful)

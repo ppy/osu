@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Transforms;
@@ -15,6 +15,9 @@ namespace osu.Game.Screens
         protected Vector2 BlurTarget;
 
         public TransformSequence<Background> BlurTo(Vector2 sigma, double duration, Easing easing = Easing.None)
-            => Background?.BlurTo(BlurTarget = sigma, duration, easing);
+        {
+            BlurTarget = sigma;
+            return Background?.BlurTo(BlurTarget, duration, easing);
+        }
     }
 }

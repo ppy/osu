@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
 using NUnit.Framework;
@@ -15,7 +15,7 @@ namespace osu.Game.Tests.Visual
     public class TestCaseSongProgress : OsuTestCase
     {
         private readonly SongProgress progress;
-        private readonly SongProgressGraph graph;
+        private readonly TestSongProgressGraph graph;
 
         private readonly StopwatchClock clock;
 
@@ -31,7 +31,7 @@ namespace osu.Game.Tests.Visual
                 Origin = Anchor.BottomLeft,
             });
 
-            Add(graph = new SongProgressGraph
+            Add(graph = new TestSongProgressGraph
             {
                 RelativeSizeAxes = Axes.X,
                 Height = 200,
@@ -39,13 +39,24 @@ namespace osu.Game.Tests.Visual
                 Origin = Anchor.TopLeft,
             });
 
+            AddWaitStep(5);
+            AddAssert("ensure not created", () => graph.CreationCount == 0);
+
+            AddStep("display values", displayNewValues);
+            AddWaitStep(5);
+            AddUntilStep(() => graph.CreationCount == 1, "wait for creation count");
+
             AddStep("Toggle Bar", () => progress.AllowSeeking = !progress.AllowSeeking);
             AddWaitStep(5);
+            AddUntilStep(() => graph.CreationCount == 1, "wait for creation count");
+
             AddStep("Toggle Bar", () => progress.AllowSeeking = !progress.AllowSeeking);
-            AddWaitStep(2);
+            AddWaitStep(5);
+            AddUntilStep(() => graph.CreationCount == 1, "wait for creation count");
             AddRepeatStep("New Values", displayNewValues, 5);
 
-            displayNewValues();
+            AddWaitStep(5);
+            AddAssert("ensure debounced", () => graph.CreationCount == 2);
         }
 
         private void displayNewValues()
@@ -59,6 +70,17 @@ namespace osu.Game.Tests.Visual
 
             progress.AudioClock = clock;
             progress.OnSeek = pos => clock.Seek(pos);
+        }
+
+        private class TestSongProgressGraph : SongProgressGraph
+        {
+            public int CreationCount { get; private set; }
+
+            protected override void RecreateGraph()
+            {
+                base.RecreateGraph();
+                CreationCount++;
+            }
         }
     }
 }

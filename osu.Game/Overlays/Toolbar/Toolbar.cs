@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using osu.Framework.Extensions.Color4Extensions;
@@ -10,7 +10,7 @@ using osu.Game.Graphics;
 using osuTK;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Allocation;
-using osu.Framework.Configuration;
+using osu.Framework.Bindables;
 using osu.Framework.Input.Events;
 
 namespace osu.Game.Overlays.Toolbar
@@ -85,7 +85,7 @@ namespace osu.Game.Overlays.Toolbar
         {
             StateChanged += visibility =>
             {
-                if (overlayActivationMode == OverlayActivation.Disabled)
+                if (overlayActivationMode.Value == OverlayActivation.Disabled)
                     State = Visibility.Hidden;
             };
 

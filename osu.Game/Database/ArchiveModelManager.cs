@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using System.Collections.Generic;
@@ -8,6 +8,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using JetBrains.Annotations;
 using Microsoft.EntityFrameworkCore;
+using osu.Framework;
 using osu.Framework.Extensions;
 using osu.Framework.IO.File;
 using osu.Framework.Logging;
@@ -32,7 +33,7 @@ namespace osu.Game.Database
         where TModel : class, IHasFiles<TFileModel>, IHasPrimaryKey, ISoftDelete
         where TFileModel : INamedFileInfo, new()
     {
-        public delegate void ItemAddedDelegate(TModel model, bool existing, bool silent);
+        public delegate void ItemAddedDelegate(TModel model, bool existing);
 
         /// <summary>
         /// Set an endpoint for notifications to be posted to.
@@ -52,6 +53,8 @@ namespace osu.Game.Database
         public event Action<TModel> ItemRemoved;
 
         public virtual string[] HandledExtensions => new[] { ".zip" };
+
+        public virtual bool SupportsImportFromStable => RuntimeInfo.IsDesktop;
 
         protected readonly FileStore Files;
 
@@ -105,12 +108,12 @@ namespace osu.Game.Database
                 a.Invoke();
         }
 
-        protected ArchiveModelManager(Storage storage, IDatabaseContextFactory contextFactory, MutableDatabaseBackedStore<TModel> modelStore, IIpcHost importHost = null)
+        protected ArchiveModelManager(Storage storage, IDatabaseContextFactory contextFactory, MutableDatabaseBackedStoreWithFileIncludes<TModel, TFileModel> modelStore, IIpcHost importHost = null)
         {
             ContextFactory = contextFactory;
 
             ModelStore = modelStore;
-            ModelStore.ItemAdded += (item, silent) => handleEvent(() => ItemAdded?.Invoke(item, false, silent));
+            ModelStore.ItemAdded += item => handleEvent(() => ItemAdded?.Invoke(item, false));
             ModelStore.ItemRemoved += s => handleEvent(() => ItemRemoved?.Invoke(s));
 
             Files = new FileStore(contextFactory, storage);
@@ -128,14 +131,18 @@ namespace osu.Game.Database
         /// <param name="paths">One or more archive locations on disk.</param>
         public void Import(params string[] paths)
         {
-            var notification = new ProgressNotification
-            {
-                Text = "Import is initialising...",
-                Progress = 0,
-                State = ProgressNotificationState.Active,
-            };
+            var notification = new ProgressNotification { State = ProgressNotificationState.Active };
 
             PostNotification?.Invoke(notification);
+            Import(notification, paths);
+        }
+
+        protected void Import(ProgressNotification notification, params string[] paths)
+        {
+            notification.Progress = 0;
+            notification.Text = "Import is initialising...";
+
+            var term = $"{typeof(TModel).Name.Replace("Info", "").ToLower()}";
 
             List<TModel> imported = new List<TModel>();
 
@@ -148,27 +155,22 @@ namespace osu.Game.Database
 
                 try
                 {
-                    notification.Text = $"Importing ({++current} of {paths.Length})\n{Path.GetFileName(path)}";
+                    var text = "Importing ";
 
-                    TModel import;
-                    using (ArchiveReader reader = getReaderFrom(path))
-                        imported.Add(import = Import(reader));
+                    if (path.Length > 1)
+                        text += $"{++current} of {paths.Length} {term}s..";
+                    else
+                        text += $"{term}..";
+
+                    // only show the filename if it isn't a temporary one (as those look ugly).
+                    if (!path.Contains(Path.GetTempPath()))
+                        text += $"\n{Path.GetFileName(path)}";
+
+                    notification.Text = text;
+
+                    imported.Add(Import(path));
 
                     notification.Progress = (float)current / paths.Length;
-
-                    // We may or may not want to delete the file depending on where it is stored.
-                    //  e.g. reconstructing/repairing database with items from default storage.
-                    // Also, not always a single file, i.e. for LegacyFilesystemReader
-                    // TODO: Add a check to prevent files from storage to be deleted.
-                    try
-                    {
-                        if (import != null && File.Exists(path))
-                            File.Delete(path);
-                    }
-                    catch (Exception e)
-                    {
-                        Logger.Error(e, $@"Could not delete original file after import ({Path.GetFileName(path)})");
-                    }
                 }
                 catch (Exception e)
                 {
@@ -184,20 +186,56 @@ namespace osu.Game.Database
             }
             else
             {
-                notification.CompletionText = $"Imported {current} {typeof(TModel).Name.Replace("Info", "").ToLower()}s!";
-                notification.CompletionClickAction += () =>
+                notification.CompletionText = imported.Count == 1
+                    ? $"Imported {imported.First()}!"
+                    : $"Imported {current} {term}s!";
+
+                if (imported.Count > 0 && PresentImport != null)
                 {
-                    if (imported.Count > 0)
-                        PresentCompletedImport(imported);
-                    return true;
-                };
+                    notification.CompletionText += " Click to view.";
+                    notification.CompletionClickAction = () =>
+                    {
+                        PresentImport?.Invoke(imported);
+                        return true;
+                    };
+                }
+
                 notification.State = ProgressNotificationState.Completed;
             }
         }
 
-        protected virtual void PresentCompletedImport(IEnumerable<TModel> imported)
+        /// <summary>
+        /// Import one <see cref="TModel"/> from the filesystem and delete the file on success.
+        /// </summary>
+        /// <param name="path">The archive location on disk.</param>
+        /// <returns>The imported model, if successful.</returns>
+        public TModel Import(string path)
         {
+            TModel import;
+            using (ArchiveReader reader = getReaderFrom(path))
+                import = Import(reader);
+
+            // We may or may not want to delete the file depending on where it is stored.
+            //  e.g. reconstructing/repairing database with items from default storage.
+            // Also, not always a single file, i.e. for LegacyFilesystemReader
+            // TODO: Add a check to prevent files from storage to be deleted.
+            try
+            {
+                if (import != null && File.Exists(path))
+                    File.Delete(path);
+            }
+            catch (Exception e)
+            {
+                Logger.Error(e, $@"Could not delete original file after import ({Path.GetFileName(path)})");
+            }
+
+            return import;
         }
+
+        /// <summary>
+        /// Fired when the user requests to view the resulting import.
+        /// </summary>
+        public Action<IEnumerable<TModel>> PresentImport;
 
         /// <summary>
         /// Import an item from an <see cref="ArchiveReader"/>.
@@ -213,7 +251,7 @@ namespace osu.Game.Database
 
                 model.Hash = computeHash(archive);
 
-                return Import(model, false, archive);
+                return Import(model, archive);
             }
             catch (Exception e)
             {
@@ -247,9 +285,8 @@ namespace osu.Game.Database
         /// Import an item from a <see cref="TModel"/>.
         /// </summary>
         /// <param name="item">The model to be imported.</param>
-        /// <param name="silent">Whether the user should be notified fo the import.</param>
         /// <param name="archive">An optional archive to use for model population.</param>
-        public TModel Import(TModel item, bool silent = false, ArchiveReader archive = null)
+        public TModel Import(TModel item, ArchiveReader archive = null)
         {
             delayEvents();
 
@@ -269,7 +306,7 @@ namespace osu.Game.Database
                         {
                             Undelete(existing);
                             Logger.Log($"Found existing {typeof(TModel)} for {item} (ID {existing.ID}). Skipping import.", LoggingTarget.Database);
-                            handleEvent(() => ItemAdded?.Invoke(existing, true, silent));
+                            handleEvent(() => ItemAdded?.Invoke(existing, true));
                             return existing;
                         }
 
@@ -279,7 +316,7 @@ namespace osu.Game.Database
                         Populate(item, archive);
 
                         // import to store
-                        ModelStore.Add(item, silent);
+                        ModelStore.Add(item);
                     }
                     catch (Exception e)
                     {
@@ -527,6 +564,7 @@ namespace osu.Game.Database
                 return new LegacyDirectoryArchiveReader(path);
             if (File.Exists(path))
                 return new LegacyFileArchiveReader(path);
+
             throw new InvalidFormatException($"{path} is not a valid archive");
         }
     }
