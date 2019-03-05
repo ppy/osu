@@ -243,6 +243,11 @@ namespace osu.Game.Online.Leaderboards
             });
         }
 
+        /// <summary>
+        /// Performs a fetch/refresh of scores to be displayed.
+        /// </summary>
+        /// <param name="scoresCallback">A callback which should be called when fetching is completed. Scheduling is not required.</param>
+        /// <returns>An <see cref="APIRequest"/> responsible for the fetch operation. This will be queued and performed automatically.</returns>
         protected abstract APIRequest FetchScores(Action<IEnumerable<ScoreInfo>> scoresCallback);
 
         private Placeholder currentPlaceholder;
