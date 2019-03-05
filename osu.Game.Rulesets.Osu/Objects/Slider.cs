@@ -262,6 +262,7 @@ namespace osu.Game.Rulesets.Osu.Objects
         {
             if (nodeIndex < NodeSamples.Count)
                 return NodeSamples[nodeIndex];
+
             return Samples;
         }
 

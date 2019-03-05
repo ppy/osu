@@ -47,8 +47,9 @@ namespace osu.Game.Overlays.Profile.Sections
                 {
                     new OsuSpriteText
                     {
-                        Text = new LocalisedString(($"{beatmap.Metadata.TitleUnicode ?? beatmap.Metadata.Title} [{beatmap.Version}] ",
-                                                    $"{beatmap.Metadata.Title ?? beatmap.Metadata.TitleUnicode} [{beatmap.Version}] ")),
+                        Text = new LocalisedString((
+                            $"{beatmap.Metadata.TitleUnicode ?? beatmap.Metadata.Title} [{beatmap.Version}] ",
+                            $"{beatmap.Metadata.Title ?? beatmap.Metadata.TitleUnicode} [{beatmap.Version}] ")),
                         Font = OsuFont.GetFont(size: 15, weight: FontWeight.SemiBold, italics: true)
                     },
                     new OsuSpriteText

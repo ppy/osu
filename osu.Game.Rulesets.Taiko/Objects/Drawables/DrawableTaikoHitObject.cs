@@ -49,6 +49,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
         protected void ProxyContent()
         {
             if (isProxied) return;
+
             isProxied = true;
 
             nonProxiedContent.Remove(Content);
@@ -62,6 +63,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
         protected void UnproxyContent()
         {
             if (!isProxied) return;
+
             isProxied = false;
 
             proxiedContent.Remove(Content);

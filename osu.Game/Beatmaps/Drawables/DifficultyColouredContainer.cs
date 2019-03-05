@@ -48,11 +48,12 @@ namespace osu.Game.Beatmaps.Drawables
 
             var rating = beatmap.StarDifficulty;
 
-            if (rating < 1.5) return DifficultyRating.Easy;
-            if (rating < 2.25) return DifficultyRating.Normal;
-            if (rating < 3.75) return DifficultyRating.Hard;
-            if (rating < 5.25) return DifficultyRating.Insane;
-            if (rating < 6.75) return DifficultyRating.Expert;
+            if (rating < 2.0) return DifficultyRating.Easy;
+            if (rating < 2.7) return DifficultyRating.Normal;
+            if (rating < 4.0) return DifficultyRating.Hard;
+            if (rating < 5.3) return DifficultyRating.Insane;
+            if (rating < 6.5) return DifficultyRating.Expert;
+
             return DifficultyRating.ExpertPlus;
         }
 

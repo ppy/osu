@@ -4,6 +4,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Humanizer;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -45,7 +46,7 @@ namespace osu.Game.Overlays
 
         public IEnumerable<BeatmapSetInfo> BeatmapSets
         {
-            get { return beatmapSets; }
+            get => beatmapSets;
             set
             {
                 if (beatmapSets?.Equals(value) ?? false) return;
@@ -72,10 +73,11 @@ namespace osu.Game.Overlays
 
         public ResultCounts ResultAmounts
         {
-            get { return resultAmounts; }
+            get => resultAmounts;
             set
             {
                 if (value == ResultAmounts) return;
+
                 resultAmounts = value;
 
                 updateResultCounts();
@@ -189,14 +191,9 @@ namespace osu.Game.Overlays
             resultCountsContainer.FadeTo(ResultAmounts == null ? 0f : 1f, 200, Easing.OutQuint);
             if (ResultAmounts == null) return;
 
-            resultCountsText.Text = pluralize("Artist", ResultAmounts.Artists) + ", " +
-                                    pluralize("Song", ResultAmounts.Songs) + ", " +
-                                    pluralize("Tag", ResultAmounts.Tags);
-        }
-
-        private string pluralize(string prefix, int value)
-        {
-            return $@"{value} {prefix}" + (value == 1 ? string.Empty : @"s");
+            resultCountsText.Text = "Artist".ToQuantity(ResultAmounts.Artists) + ", " +
+                                    "Song".ToQuantity(ResultAmounts.Songs) + ", " +
+                                    "Tag".ToQuantity(ResultAmounts.Tags);
         }
 
         private void recreatePanels(PanelDisplayStyle displayStyle)

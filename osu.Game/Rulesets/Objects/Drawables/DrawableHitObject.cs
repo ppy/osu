@@ -221,6 +221,16 @@ namespace osu.Game.Rulesets.Objects.Drawables
         }
 
         /// <summary>
+        /// Will called at least once after the <see cref="LifetimeEnd"/> of this <see cref="DrawableHitObject"/> has been passed.
+        /// </summary>
+        internal void OnLifetimeEnd()
+        {
+            foreach (var nested in NestedHitObjects)
+                nested.OnLifetimeEnd();
+            UpdateResult(false);
+        }
+
+        /// <summary>
         /// Processes this <see cref="DrawableHitObject"/>, checking if a scoring result has occurred.
         /// </summary>
         /// <param name="userTriggered">Whether the user triggered this process.</param>

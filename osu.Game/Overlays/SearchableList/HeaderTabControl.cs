@@ -19,7 +19,8 @@ namespace osu.Game.Overlays.SearchableList
 
         private class HeaderTabItem : OsuTabItem
         {
-            public HeaderTabItem(T value) : base(value)
+            public HeaderTabItem(T value)
+                : base(value)
             {
                 Text.Font = Text.Font.With(size: 16);
             }

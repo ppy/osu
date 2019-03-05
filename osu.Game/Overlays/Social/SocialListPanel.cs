@@ -8,7 +8,8 @@ namespace osu.Game.Overlays.Social
 {
     public class SocialListPanel : SocialPanel
     {
-        public SocialListPanel(User user) : base(user)
+        public SocialListPanel(User user)
+            : base(user)
         {
             RelativeSizeAxes = Axes.X;
         }

@@ -338,6 +338,9 @@ namespace osu.Game.Migrations
 
                     b.Property<long>("TotalScore");
 
+                    b.Property<long?>("UserID")
+                        .HasColumnName("UserID");
+
                     b.Property<string>("UserString")
                         .HasColumnName("User");
 

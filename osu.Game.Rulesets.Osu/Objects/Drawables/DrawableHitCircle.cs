@@ -102,7 +102,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
         public override Color4 AccentColour
         {
-            get { return base.AccentColour; }
+            get => base.AccentColour;
             set
             {
                 base.AccentColour = value;
@@ -139,6 +139,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
             ApproachCircle.FadeIn(Math.Min(HitObject.TimeFadeIn * 2, HitObject.TimePreempt));
             ApproachCircle.ScaleTo(1.1f, HitObject.TimePreempt);
+            ApproachCircle.Expire(true);
         }
 
         protected override void UpdateCurrentState(ArmedState state)

@@ -20,7 +20,8 @@ namespace osu.Game.Tests.Visual
     [Description("PlaySongSelect leaderboard")]
     public class TestCaseLeaderboard : OsuTestCase
     {
-        public override IReadOnlyList<Type> RequiredTypes => new[] {
+        public override IReadOnlyList<Type> RequiredTypes => new[]
+        {
             typeof(Placeholder),
             typeof(MessagePlaceholder),
             typeof(RetrievalFailurePlaceholder),

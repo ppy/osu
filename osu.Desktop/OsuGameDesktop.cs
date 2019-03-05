@@ -83,8 +83,7 @@ namespace osu.Desktop
         public override void SetHost(GameHost host)
         {
             base.SetHost(host);
-            var desktopWindow = host.Window as DesktopGameWindow;
-            if (desktopWindow != null)
+            if (host.Window is DesktopGameWindow desktopWindow)
             {
                 desktopWindow.CursorState |= CursorState.Hidden;
 

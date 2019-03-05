@@ -24,10 +24,11 @@ namespace osu.Game.Overlays.Direct
 
         public BeatmapSetInfo BeatmapSet
         {
-            get { return beatmapSet; }
+            get => beatmapSet;
             set
             {
                 if (value == beatmapSet) return;
+
                 beatmapSet = value;
 
                 Preview?.Stop();
