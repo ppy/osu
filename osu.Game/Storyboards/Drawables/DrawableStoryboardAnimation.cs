@@ -3,7 +3,7 @@
 
 using osuTK;
 using osu.Framework.Allocation;
-using osu.Framework.Configuration;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Animations;
 using osu.Framework.Graphics.Textures;
@@ -78,6 +78,7 @@ namespace osu.Game.Storyboards.Drawables
                 var texture = textureStore.Get(path);
                 AddFrame(texture, Animation.FrameDelay);
             }
+
             Animation.ApplyTransforms(this);
         }
     }

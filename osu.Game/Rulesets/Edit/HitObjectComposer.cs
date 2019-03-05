@@ -5,7 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
-using osu.Framework.Configuration;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input;
@@ -111,8 +111,8 @@ namespace osu.Game.Rulesets.Edit
 
             toolboxCollection.Items =
                 CompositionTools.Select(t => new RadioButton(t.Name, () => blueprintContainer.CurrentTool = t))
-                .Prepend(new RadioButton("Select", () => blueprintContainer.CurrentTool = null))
-                .ToList();
+                                .Prepend(new RadioButton("Select", () => blueprintContainer.CurrentTool = null))
+                                .ToList();
 
             toolboxCollection.Items[0].Select();
         }

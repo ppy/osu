@@ -70,7 +70,10 @@ namespace osu.Game.Overlays
                                     Colour = Color4.Black,
                                     Alpha = 0.9f,
                                 },
-                                welcomeScreen = new ScreenWelcome(),
+                                new ScreenStack(welcomeScreen = new ScreenWelcome())
+                                {
+                                    RelativeSizeAxes = Axes.Both,
+                                },
                             }
                         }
                     }

@@ -40,7 +40,7 @@ namespace osu.Game.Screens.Multi.Components
                         Children = new Drawable[]
                         {
                             new BeatmapTitle(),
-                            beatmapAuthor = new LinkFlowContainer(s => s.TextSize = 14)
+                            beatmapAuthor = new LinkFlowContainer(s => s.Font = s.Font.With(size: 14))
                             {
                                 Anchor = Anchor.BottomLeft,
                                 Origin = Anchor.BottomLeft,
@@ -55,7 +55,7 @@ namespace osu.Game.Screens.Multi.Components
             {
                 beatmapAuthor.Clear();
 
-                var beatmap = item?.Beatmap;
+                var beatmap = item.NewValue?.Beatmap;
 
                 if (beatmap != null)
                 {

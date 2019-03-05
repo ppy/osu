@@ -30,7 +30,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables.Pieces
         /// </summary>
         public override Color4 AccentColour
         {
-            get { return base.AccentColour; }
+            get => base.AccentColour;
             set
             {
                 base.AccentColour = value;
@@ -46,7 +46,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables.Pieces
         /// </summary>
         public override bool KiaiMode
         {
-            get { return base.KiaiMode; }
+            get => base.KiaiMode;
             set
             {
                 base.KiaiMode = value;
