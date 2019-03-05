@@ -178,7 +178,7 @@ namespace osu.Game.Screens.Play
                 PauseContainer = new PauseContainer(offsetClock, adjustableClock)
                 {
                     Retries = RestartCount,
-                    OnRetry = Restart,
+                    OnRetry = restart,
                     OnQuit = performUserRequestedExit,
                     CheckCanPause = () => AllowPause && ValidForResume && !HasFailed && !RulesetContainer.HasReplayLoaded.Value,
                     Children = new Container[]
@@ -215,7 +215,7 @@ namespace osu.Game.Screens.Play
                 },
                 failOverlay = new FailOverlay
                 {
-                    OnRetry = Restart,
+                    OnRetry = restart,
                     OnQuit = performUserRequestedExit,
                 },
                 new HotkeyRetryOverlay
@@ -225,7 +225,7 @@ namespace osu.Game.Screens.Play
                         if (!this.IsCurrentScreen()) return;
 
                         fadeOut(true);
-                        Restart();
+                        restart();
                     },
                 }
             };
@@ -262,7 +262,7 @@ namespace osu.Game.Screens.Play
             this.Exit();
         }
 
-        public void Restart()
+        private void restart()
         {
             if (!this.IsCurrentScreen()) return;
 
