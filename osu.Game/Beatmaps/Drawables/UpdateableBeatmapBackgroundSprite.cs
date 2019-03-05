@@ -9,7 +9,7 @@ using osu.Framework.Graphics.Containers;
 namespace osu.Game.Beatmaps.Drawables
 {
     /// <summary>
-    /// Display a baetmap background from a local source, but fallback to online source if not available.
+    /// Display a beatmap background from an online source
     /// </summary>
     public class UpdateableBeatmapBackgroundSprite : ModelBackedDrawable<BeatmapInfo>
     {
@@ -30,14 +30,10 @@ namespace osu.Game.Beatmaps.Drawables
         {
             return new DelayedLoadUnloadWrapper(() =>
             {
-                Drawable drawable;
+                if (model?.BeatmapSet?.OnlineInfo == null)
+                    return null;
 
-                var localBeatmap = beatmaps.GetWorkingBeatmap(model);
-
-                if (localBeatmap.BeatmapInfo.ID == 0 && model?.BeatmapSet?.OnlineInfo != null)
-                    drawable = new BeatmapSetCover(model.BeatmapSet, beatmapSetCoverType);
-                else
-                    drawable = new BeatmapBackgroundSprite(localBeatmap);
+                Drawable drawable = new BeatmapSetCover(model.BeatmapSet, beatmapSetCoverType);
 
                 drawable.RelativeSizeAxes = Axes.Both;
                 drawable.Anchor = Anchor.Centre;
