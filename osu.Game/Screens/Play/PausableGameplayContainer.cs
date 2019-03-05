@@ -14,10 +14,11 @@ using osuTK.Graphics;
 namespace osu.Game.Screens.Play
 {
     /// <summary>
-    /// A container which handles pausing children, displaying a pause overlay with choices etc.
+    /// A container which handles pausing children, displaying a pause overlay with choices and processing the clock.
+    /// Exposes a <see cref="GameplayClock"/> to children via DI.
     /// This alleviates a lot of the intricate pause logic from being in <see cref="Player"/>
     /// </summary>
-    public class PauseContainer : Container
+    public class PausableGameplayContainer : Container
     {
         public readonly BindableBool IsPaused = new BindableBool();
 
@@ -43,24 +44,32 @@ namespace osu.Game.Screens.Play
         public Action OnRetry;
         public Action OnQuit;
 
-        private readonly FramedClock framedClock;
-        private readonly DecoupleableInterpolatingFramedClock decoupledClock;
+        private readonly FramedClock offsetClock;
+        private readonly DecoupleableInterpolatingFramedClock adjustableClock;
 
         /// <summary>
-        /// Creates a new <see cref="PauseContainer"/>.
+        /// The final clock which is exposed to underlying components.
         /// </summary>
-        /// <param name="framedClock">The gameplay clock. This is the clock that will process frames.</param>
-        /// <param name="decoupledClock">The seekable clock. This is the clock that will be paused and resumed.</param>
-        public PauseContainer(FramedClock framedClock, DecoupleableInterpolatingFramedClock decoupledClock)
+        [Cached]
+        private readonly GameplayClock gameplayClock;
+
+        /// <summary>
+        /// Creates a new <see cref="PausableGameplayContainer"/>.
+        /// </summary>
+        /// <param name="offsetClock">The gameplay clock. This is the clock that will process frames. Includes user/system offsets.</param>
+        /// <param name="adjustableClock">The seekable clock. This is the clock that will be paused and resumed. Should not be processed (it is processed automatically by <see cref="offsetClock"/>).</param>
+        public PausableGameplayContainer(FramedClock offsetClock, DecoupleableInterpolatingFramedClock adjustableClock)
         {
-            this.framedClock = framedClock;
-            this.decoupledClock = decoupledClock;
+            this.offsetClock = offsetClock;
+            this.adjustableClock = adjustableClock;
+
+            gameplayClock = new GameplayClock(offsetClock);
 
             RelativeSizeAxes = Axes.Both;
 
             AddInternal(content = new Container
             {
-                Clock = this.framedClock,
+                Clock = this.offsetClock,
                 ProcessCustomClock = false,
                 RelativeSizeAxes = Axes.Both
             });
@@ -84,7 +93,7 @@ namespace osu.Game.Screens.Play
             if (IsPaused.Value) return;
 
             // stop the seekable clock (stops the audio eventually)
-            decoupledClock.Stop();
+            adjustableClock.Stop();
             IsPaused.Value = true;
 
             pauseOverlay.Show();
@@ -102,8 +111,8 @@ namespace osu.Game.Screens.Play
 
             // Seeking the decoupled clock to its current time ensures that its source clock will be seeked to the same time
             // This accounts for the audio clock source potentially taking time to enter a completely stopped state
-            decoupledClock.Seek(decoupledClock.CurrentTime);
-            decoupledClock.Start();
+            adjustableClock.Seek(adjustableClock.CurrentTime);
+            adjustableClock.Start();
 
             pauseOverlay.Hide();
         }
@@ -123,7 +132,7 @@ namespace osu.Game.Screens.Play
                 Pause();
 
             if (!IsPaused.Value)
-                framedClock.ProcessFrame();
+                offsetClock.ProcessFrame();
 
             base.Update();
         }
