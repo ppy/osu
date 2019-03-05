@@ -1,5 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="..\osu.Android.props" />
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
@@ -8,30 +9,14 @@
     <ProjectGuid>{3701A0A1-8476-42C6-B5C4-D24129B4A484}</ProjectGuid>
     <ProjectTypeGuids>{EFBA0AD7-5A72-4C68-AF49-83D382785DCF};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <TemplateGuid>{122416d6-6b49-4ee2-a1e8-b825f31c79fe}</TemplateGuid>
-    <OutputType>Library</OutputType>
-    <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>osu.Game.Rulesets.Taiko.Tests</RootNamespace>
     <AssemblyName>osu.Game.Rulesets.Taiko.Tests.Android</AssemblyName>
-    <FileAlignment>512</FileAlignment>
-    <AndroidApplication>True</AndroidApplication>
-    <AndroidResgenFile>Resources\Resource.designer.cs</AndroidResgenFile>
-    <AndroidResgenClass>Resource</AndroidResgenClass>
-    <GenerateSerializationAssemblies>Off</GenerateSerializationAssemblies>
-    <AndroidUseLatestPlatformSdk>false</AndroidUseLatestPlatformSdk>
-    <TargetFrameworkVersion>v8.1</TargetFrameworkVersion>
     <AndroidManifest>Properties\AndroidManifest.xml</AndroidManifest>
-    <MonoAndroidResourcePrefix>Resources</MonoAndroidResourcePrefix>
-    <MonoAndroidAssetsPrefix>Assets</MonoAndroidAssetsPrefix>
-    <AndroidHttpClientHandlerType>Xamarin.Android.Net.AndroidClientHandler</AndroidHttpClientHandlerType>
   </PropertyGroup>
-  <Import Project="..\osu.Android.props" />
   <ItemGroup>
     <Compile Include="MainActivity.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\osu.licenseheader">
-      <Link>osu.licenseheader</Link>
-    </None>
     <None Include="Properties\AndroidManifest.xml" />
   </ItemGroup>
   <ItemGroup>
@@ -40,13 +25,6 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Xamarin.Android.Support.Design" Version="27.0.2.1" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\osu-resources\osu.Game.Resources\osu.Game.Resources.csproj">
-      <Project>{d9a367c9-4c1a-489f-9b05-a0cea2b53b58}</Project>
-      <Name>osu.Game.Resources</Name>
-    </ProjectReference>
     <ProjectReference Include="..\osu.Game.Rulesets.Taiko\osu.Game.Rulesets.Taiko.csproj">
       <Project>{f167e17a-7de6-4af5-b920-a5112296c695}</Project>
       <Name>osu.Game.Rulesets.Taiko</Name>

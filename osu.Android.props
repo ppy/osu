@@ -1,60 +1,69 @@
 <Project>
+  <PropertyGroup>
+    <OutputPath>bin\$(Configuration)</OutputPath>
+    <WarningLevel>4</WarningLevel>
+    <SchemaVersion>2.0</SchemaVersion>
+    <BundleAssemblies>false</BundleAssemblies>
+    <AotAssemblies>false</AotAssemblies>
+    <LangVersion>default</LangVersion>
+    <OutputType>Library</OutputType>
+    <FileAlignment>512</FileAlignment>
+    <GenerateSerializationAssemblies>Off</GenerateSerializationAssemblies>
+    <AndroidApplication>True</AndroidApplication>
+    <AndroidHttpClientHandlerType>Xamarin.Android.Net.AndroidClientHandler</AndroidHttpClientHandlerType>
+    <TargetFrameworkVersion>v8.1</TargetFrameworkVersion>
+    <AndroidUseLatestPlatformSdk>false</AndroidUseLatestPlatformSdk>
+  </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>True</DebugSymbols>
     <DebugType>portable</DebugType>
     <Optimize>False</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <AndroidUseSharedRuntime>True</AndroidUseSharedRuntime>
-    <AndroidLinkMode>None</AndroidLinkMode>
-    <EmbedAssembliesIntoApk>False</EmbedAssembliesIntoApk>
-    <AotAssemblies>false</AotAssemblies>
     <EnableLLVM>false</EnableLLVM>
-    <BundleAssemblies>false</BundleAssemblies>
-    <MandroidI18n>CJK;Mideast;Rare;West;Other</MandroidI18n>
-    <AndroidSupportedAbis />
-    <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
+    <AndroidManagedSymbols>false</AndroidManagedSymbols>
+    <AndroidLinkMode>SdkOnly</AndroidLinkMode>
+    <AndroidUseSharedRuntime>true</AndroidUseSharedRuntime>
+    <EmbedAssembliesIntoApk>false</EmbedAssembliesIntoApk>
+    <MandroidI18n>cjk,mideast,other,rare,west</MandroidI18n>
+    <AndroidEnableSGenConcurrent>true</AndroidEnableSGenConcurrent>
+    <AndroidSupportedAbis>armeabi-v7a;x86;arm64-v8a</AndroidSupportedAbis>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugSymbols>True</DebugSymbols>
-    <DebugType>pdbonly</DebugType>
+    <DebugSymbols>false</DebugSymbols>
+    <DebugType>None</DebugType>
     <Optimize>True</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <AndroidManagedSymbols>true</AndroidManagedSymbols>
-    <AndroidUseSharedRuntime>False</AndroidUseSharedRuntime>
+	<EnableLLVM>true</EnableLLVM>
+    <AndroidManagedSymbols>false</AndroidManagedSymbols>
     <AndroidLinkMode>SdkOnly</AndroidLinkMode>
-    <EmbedAssembliesIntoApk>True</EmbedAssembliesIntoApk>
-	<MandroidI18n>CJK;Mideast;Rare;West;Other</MandroidI18n>
+    <AndroidUseSharedRuntime>False</AndroidUseSharedRuntime>
+    <EmbedAssembliesIntoApk>true</EmbedAssembliesIntoApk>
+    <MandroidI18n>cjk,mideast,other,rare,west</MandroidI18n>
+    <AndroidEnableSGenConcurrent>true</AndroidEnableSGenConcurrent>
+    <AndroidSupportedAbis>armeabi-v7a;x86;arm64-v8a</AndroidSupportedAbis>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <ItemGroup>
+    <None Include="$(MSBuildThisFileDirectory)\osu.licenseheader">
+      <Link>osu.licenseheader</Link>
+    </None>
+    <AndroidNativeLibrary Include="$(MSBuildThisFileDirectory)\osu.Android\lib\**\*.so">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </AndroidNativeLibrary>
+    <Content Include="$(MSBuildThisFileDirectory)\osu.Android\bass.dll" />
+  </ItemGroup>
+  <ItemGroup>
     <Reference Include="System" />
+    <Reference Include="System.Net.Http" />
     <Reference Include="System.Xml" />
     <Reference Include="System.Core" />
     <Reference Include="Mono.Android" />
+    <Reference Include="Java.Interop" />
   </ItemGroup>
-    <ItemGroup>
-    <PackageReference Include="ppy.osu.Framework">
-      <Version>0.0.7939</Version>
-    </PackageReference>
-    <PackageReference Include="ppy.osu.Framework.Android">
-      <Version>0.0.7939</Version>
-    </PackageReference>
-    <PackageReference Include="SharpCompress">
-      <Version>0.22.0</Version>
-    </PackageReference>
-    <PackageReference Include="SharpFNT">
-      <Version>1.1.0</Version>
-    </PackageReference>
-    <PackageReference Include="SixLabors.Core">
-      <Version>1.0.0-dev000096</Version>
-    </PackageReference>
-    <PackageReference Include="SixLabors.ImageSharp">
-      <Version>1.0.0-dev002315</Version>
-    </PackageReference>
+  <ItemGroup>
+    <PackageReference Include="ppy.osu.Game.Resources" Version="2019.128.0" />
+    <PackageReference Include="ppy.osu.Framework.Android" Version="0.0.8473" />
   </ItemGroup>
 </Project>
