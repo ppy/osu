@@ -33,6 +33,9 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         private readonly IBindable<float> scaleBindable = new Bindable<float>();
         private readonly IBindable<SliderPath> pathBindable = new Bindable<SliderPath>();
 
+        [Resolved(CanBeNull = true)]
+        private OsuRulesetConfigManager config { get; set; }
+
         public DrawableSlider(Slider s)
             : base(s)
         {
@@ -94,10 +97,10 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuRulesetConfigManager config)
+        private void load()
         {
-            config.BindWith(OsuRulesetSetting.SnakingInSliders, Body.SnakingIn);
-            config.BindWith(OsuRulesetSetting.SnakingOutSliders, Body.SnakingOut);
+            config?.BindWith(OsuRulesetSetting.SnakingInSliders, Body.SnakingIn);
+            config?.BindWith(OsuRulesetSetting.SnakingOutSliders, Body.SnakingOut);
 
             positionBindable.BindValueChanged(_ => Position = HitObject.StackedPosition);
             scaleBindable.BindValueChanged(scale =>
