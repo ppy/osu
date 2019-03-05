@@ -1,31 +1,26 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
-using osu.Framework.Configuration;
+using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Online.Chat;
-using osu.Game.Online.Multiplayer;
-using osu.Game.Rulesets;
 using osuTK;
 
 namespace osu.Game.Screens.Multi.Components
 {
-    public class BeatmapTypeInfo : CompositeDrawable
+    public class BeatmapTypeInfo : MultiplayerComposite
     {
-        public readonly IBindable<BeatmapInfo> Beatmap = new Bindable<BeatmapInfo>();
-        public readonly IBindable<RulesetInfo> Ruleset = new Bindable<RulesetInfo>();
-        public readonly IBindable<GameType> Type = new Bindable<GameType>();
-
         public BeatmapTypeInfo()
         {
             AutoSizeAxes = Axes.Both;
+        }
 
-            BeatmapTitle beatmapTitle;
-            ModeTypeInfo modeTypeInfo;
+        [BackgroundDependencyLoader]
+        private void load()
+        {
             LinkFlowContainer beatmapAuthor;
 
             InternalChild = new FillFlowContainer
@@ -36,7 +31,7 @@ namespace osu.Game.Screens.Multi.Components
                 Spacing = new Vector2(5, 0),
                 Children = new Drawable[]
                 {
-                    modeTypeInfo = new ModeTypeInfo(),
+                    new ModeTypeInfo(),
                     new Container
                     {
                         AutoSizeAxes = Axes.X,
@@ -44,8 +39,8 @@ namespace osu.Game.Screens.Multi.Components
                         Margin = new MarginPadding { Left = 5 },
                         Children = new Drawable[]
                         {
-                            beatmapTitle = new BeatmapTitle(),
-                            beatmapAuthor = new LinkFlowContainer(s => s.TextSize = 14)
+                            new BeatmapTitle(),
+                            beatmapAuthor = new LinkFlowContainer(s => s.Font = s.Font.With(size: 14))
                             {
                                 Anchor = Anchor.BottomLeft,
                                 Origin = Anchor.BottomLeft,
@@ -56,22 +51,18 @@ namespace osu.Game.Screens.Multi.Components
                 }
             };
 
-            modeTypeInfo.Beatmap.BindTo(Beatmap);
-            modeTypeInfo.Ruleset.BindTo(Ruleset);
-            modeTypeInfo.Type.BindTo(Type);
-
-            beatmapTitle.Beatmap.BindTo(Beatmap);
-
-            Beatmap.BindValueChanged(v =>
+            CurrentItem.BindValueChanged(item =>
             {
                 beatmapAuthor.Clear();
 
-                if (v != null)
+                var beatmap = item.NewValue?.Beatmap;
+
+                if (beatmap != null)
                 {
                     beatmapAuthor.AddText("mapped by ", s => s.Colour = OsuColour.Gray(0.8f));
-                    beatmapAuthor.AddLink(v.Metadata.Author.Username, null, LinkAction.OpenUserProfile, v.Metadata.Author.Id.ToString(), "View Profile");
+                    beatmapAuthor.AddLink(beatmap.Metadata.Author.Username, null, LinkAction.OpenUserProfile, beatmap.Metadata.Author.Id.ToString(), "View Profile");
                 }
-            });
+            }, true);
         }
     }
 }

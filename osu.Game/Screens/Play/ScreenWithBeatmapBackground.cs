@@ -1,8 +1,8 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
-using osu.Framework.Configuration;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Screens;
 using osu.Game.Configuration;
@@ -17,15 +17,10 @@ namespace osu.Game.Screens.Play
 
         protected new BackgroundScreenBeatmap Background => (BackgroundScreenBeatmap)base.Background;
 
-        public override bool AllowBeatmapRulesetChange => false;
-
         protected const float BACKGROUND_FADE_DURATION = 800;
-
-        protected float BackgroundOpacity => 1 - (float)DimLevel;
 
         #region User Settings
 
-        protected Bindable<double> DimLevel;
         protected Bindable<double> BlurLevel;
         protected Bindable<bool> ShowStoryboard;
 
@@ -34,21 +29,18 @@ namespace osu.Game.Screens.Play
         [BackgroundDependencyLoader]
         private void load(OsuConfigManager config)
         {
-            DimLevel = config.GetBindable<double>(OsuSetting.DimLevel);
             BlurLevel = config.GetBindable<double>(OsuSetting.BlurLevel);
             ShowStoryboard = config.GetBindable<bool>(OsuSetting.ShowStoryboard);
         }
 
-        protected override void OnEntering(Screen last)
+        public override void OnEntering(IScreen last)
         {
             base.OnEntering(last);
-            DimLevel.ValueChanged += _ => UpdateBackgroundElements();
             BlurLevel.ValueChanged += _ => UpdateBackgroundElements();
-            ShowStoryboard.ValueChanged += _ => UpdateBackgroundElements();
             InitializeBackgroundElements();
         }
 
-        protected override void OnResuming(Screen last)
+        public override void OnResuming(IScreen last)
         {
             base.OnResuming(last);
             InitializeBackgroundElements();
@@ -60,14 +52,13 @@ namespace osu.Game.Screens.Play
         protected virtual void InitializeBackgroundElements() => UpdateBackgroundElements();
 
         /// <summary>
-        /// Called wen background elements require updates, usually due to a user changing a setting.
+        /// Called when background elements require updates, usually due to a user changing a setting.
         /// </summary>
         /// <param name="userChange"></param>
         protected virtual void UpdateBackgroundElements()
         {
-            if (!IsCurrentScreen) return;
+            if (!this.IsCurrentScreen()) return;
 
-            Background?.FadeTo(BackgroundOpacity, BACKGROUND_FADE_DURATION, Easing.OutQuint);
             Background?.BlurTo(new Vector2((float)BlurLevel.Value * 25), BACKGROUND_FADE_DURATION, Easing.OutQuint);
         }
     }

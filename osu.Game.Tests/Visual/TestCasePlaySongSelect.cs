@@ -1,5 +1,5 @@
-// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using System.Collections.Generic;
@@ -8,9 +8,11 @@ using System.Linq;
 using System.Text;
 using NUnit.Framework;
 using osu.Framework.Allocation;
-using osu.Framework.Configuration;
+using osu.Framework.Bindables;
 using osu.Framework.Extensions;
 using osu.Framework.MathUtils;
+using osu.Framework.Platform;
+using osu.Framework.Screens;
 using osu.Game.Beatmaps;
 using osu.Game.Database;
 using osu.Game.Rulesets;
@@ -24,7 +26,7 @@ using osu.Game.Screens.Select.Filter;
 namespace osu.Game.Tests.Visual
 {
     [TestFixture]
-    public class TestCasePlaySongSelect : OsuTestCase
+    public class TestCasePlaySongSelect : ScreenTestCase
     {
         private BeatmapManager manager;
 
@@ -81,7 +83,7 @@ namespace osu.Game.Tests.Visual
         }
 
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(GameHost host)
         {
             factory = new DatabaseContextFactory(LocalStorage);
             factory.ResetDatabase();
@@ -95,27 +97,22 @@ namespace osu.Game.Tests.Visual
                 usage.Migrate();
 
             Dependencies.Cache(rulesets = new RulesetStore(factory));
-            Dependencies.Cache(manager = new BeatmapManager(LocalStorage, factory, rulesets, null, null, null, defaultBeatmap = Beatmap.Default));
+            Dependencies.Cache(manager = new BeatmapManager(LocalStorage, factory, rulesets, null, null, host, defaultBeatmap = Beatmap.Default));
 
             Beatmap.SetDefault();
         }
 
         [SetUp]
-        public virtual void SetUp()
-        {
-            Schedule(() =>
-            {
-                manager?.Delete(manager.GetAllUsableBeatmapSets());
-                Child = songSelect = new TestSongSelect();
-            });
-        }
+        public virtual void SetUp() =>
+            Schedule(() => { manager?.Delete(manager.GetAllUsableBeatmapSets()); });
 
         [Test]
         public void TestDummy()
         {
+            createSongSelect();
             AddAssert("dummy selected", () => songSelect.CurrentBeatmap == defaultBeatmap);
 
-            AddAssert("dummy shown on wedge", () => songSelect.CurrentBeatmapDetailsBeatmap == defaultBeatmap);
+            AddUntilStep(() => songSelect.CurrentBeatmapDetailsBeatmap == defaultBeatmap, "dummy shown on wedge");
 
             addManyTestMaps();
             AddWaitStep(3);
@@ -126,6 +123,7 @@ namespace osu.Game.Tests.Visual
         [Test]
         public void TestSorting()
         {
+            createSongSelect();
             addManyTestMaps();
             AddWaitStep(3);
 
@@ -141,6 +139,7 @@ namespace osu.Game.Tests.Visual
         [Ignore("needs fixing")]
         public void TestImportUnderDifferentRuleset()
         {
+            createSongSelect();
             changeRuleset(2);
             importForRuleset(0);
             AddUntilStep(() => songSelect.Carousel.SelectedBeatmap == null, "no selection");
@@ -149,6 +148,7 @@ namespace osu.Game.Tests.Visual
         [Test]
         public void TestImportUnderCurrentRuleset()
         {
+            createSongSelect();
             changeRuleset(2);
             importForRuleset(2);
             importForRuleset(1);
@@ -164,6 +164,7 @@ namespace osu.Game.Tests.Visual
         [Test]
         public void TestRulesetChangeResetsMods()
         {
+            createSongSelect();
             changeRuleset(0);
 
             changeMods(new OsuModHardRock());
@@ -186,13 +187,14 @@ namespace osu.Game.Tests.Visual
             AddAssert("mods changed before ruleset", () => modChangeIndex < rulesetChangeIndex);
             AddAssert("empty mods", () => !selectedMods.Value.Any());
 
-            void onModChange(IEnumerable<Mod> mods) => modChangeIndex = actionIndex++;
-            void onRulesetChange(RulesetInfo ruleset) => rulesetChangeIndex = actionIndex--;
+            void onModChange(ValueChangedEvent<IEnumerable<Mod>> e) => modChangeIndex = actionIndex++;
+            void onRulesetChange(ValueChangedEvent<RulesetInfo> e) => rulesetChangeIndex = actionIndex--;
         }
 
         [Test]
         public void TestStartAfterUnMatchingFilterDoesNotStart()
         {
+            createSongSelect();
             addManyTestMaps();
             AddUntilStep(() => songSelect.Carousel.SelectedBeatmap != null, "has selection");
 
@@ -219,6 +221,12 @@ namespace osu.Game.Tests.Visual
         private void changeMods(params Mod[] mods) => AddStep($"change mods to {string.Join(", ", mods.Select(m => m.Acronym))}", () => selectedMods.Value = mods);
 
         private void changeRuleset(int id) => AddStep($"change ruleset to {id}", () => Ruleset.Value = rulesets.AvailableRulesets.First(r => r.ID == id));
+
+        private void createSongSelect()
+        {
+            AddStep("create song select", () => LoadScreen(songSelect = new TestSongSelect()));
+            AddUntilStep(() => songSelect.IsCurrentScreen(), "wait for present");
+        }
 
         private void addManyTestMaps()
         {

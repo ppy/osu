@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
@@ -13,7 +13,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using osu.Framework.Configuration;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Input;
 using osu.Game.Configuration;
@@ -96,10 +96,10 @@ namespace osu.Game.Rulesets.UI
 
             IsPaused.ValueChanged += paused =>
             {
-                if (HasReplayLoaded)
+                if (HasReplayLoaded.Value)
                     return;
 
-                KeyBindingInputManager.UseParentInput = !paused;
+                KeyBindingInputManager.UseParentInput = !paused.NewValue;
             };
 
             Cursor = CreateCursor();
@@ -250,14 +250,14 @@ namespace osu.Game.Rulesets.UI
         [BackgroundDependencyLoader]
         private void load(OsuConfigManager config)
         {
-            KeyBindingInputManager.Children = new Drawable[]
+            KeyBindingInputManager.AddRange(new Drawable[]
             {
                 content = new Container
                 {
                     RelativeSizeAxes = Axes.Both,
                 },
                 Playfield
-            };
+            });
 
             if (Cursor != null)
                 KeyBindingInputManager.Add(Cursor);

@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Graphics;
 using osu.Framework.MathUtils;
@@ -86,7 +86,7 @@ namespace osu.Game.Graphics.Backgrounds
 
         public float TriangleScale
         {
-            get { return triangleScale; }
+            get => triangleScale;
             set
             {
                 float change = value / triangleScale;
@@ -110,10 +110,10 @@ namespace osu.Game.Graphics.Backgrounds
             if (CreateNewTriangles)
                 addTriangles(false);
 
-            float adjustedAlpha = HideAlphaDiscrepancies ?
+            float adjustedAlpha = HideAlphaDiscrepancies
                 // Cubically scale alpha to make it drop off more sharply.
-                (float)Math.Pow(DrawColourInfo.Colour.AverageColour.Linear.A, 3) :
-                1;
+                ? (float)Math.Pow(DrawColourInfo.Colour.AverageColour.Linear.A, 3)
+                : 1;
 
             float elapsedSeconds = (float)Time.Elapsed / 1000;
             // Since position is relative, the velocity needs to scale inversely with DrawHeight.
@@ -181,6 +181,7 @@ namespace osu.Game.Graphics.Backgrounds
         protected override DrawNode CreateDrawNode() => new TrianglesDrawNode();
 
         private readonly TrianglesDrawNodeSharedData sharedData = new TrianglesDrawNodeSharedData();
+
         protected override void ApplyDrawNode(DrawNode node)
         {
             base.ApplyDrawNode(node);

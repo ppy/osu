@@ -1,11 +1,11 @@
-// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
-using osu.Framework.Configuration;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Game.Graphics;
 using osu.Game.Online.Multiplayer;
@@ -16,7 +16,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Tests.Visual
 {
-    public class TestCaseLoungeRoomsContainer : OsuTestCase
+    public class TestCaseLoungeRoomsContainer : MultiplayerTestCase
     {
         public override IReadOnlyList<Type> RequiredTypes => new[]
         {
@@ -61,7 +61,7 @@ namespace osu.Game.Tests.Visual
             AddAssert("first room removed", () => container.Rooms.All(r => r.Room.RoomID.Value != 0));
 
             AddStep("select first room", () => container.Rooms.First().Action?.Invoke());
-            AddAssert("first room selected", () => container.SelectedRoom.Value == roomManager.Rooms.First());
+            AddAssert("first room selected", () => Room == roomManager.Rooms.First());
 
             AddStep("join first room", () => container.Rooms.First().Action?.Invoke());
             AddAssert("first room joined", () => roomManager.Rooms.First().Status.Value is JoinedRoomStatus);
@@ -71,7 +71,11 @@ namespace osu.Game.Tests.Visual
 
         private class TestRoomManager : IRoomManager
         {
-            public event Action RoomsUpdated;
+            public event Action RoomsUpdated
+            {
+                add { }
+                remove { }
+            }
 
             public readonly BindableList<Room> Rooms = new BindableList<Room>();
             IBindableList<Room> IRoomManager.Rooms => Rooms;
@@ -83,10 +87,6 @@ namespace osu.Game.Tests.Visual
             }
 
             public void PartRoom()
-            {
-            }
-
-            public void Filter(FilterCriteria criteria)
             {
             }
         }

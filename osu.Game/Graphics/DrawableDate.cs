@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using Humanizer;
@@ -21,6 +21,7 @@ namespace osu.Game.Graphics
             {
                 if (date == value)
                     return;
+
                 date = value.ToLocalTime();
 
                 if (LoadState >= LoadState.Ready)
@@ -30,8 +31,7 @@ namespace osu.Game.Graphics
 
         public DrawableDate(DateTimeOffset date)
         {
-            Font = "Exo2.0-RegularItalic";
-
+            Font = OsuFont.GetFont(weight: FontWeight.Regular, italics: true);
             Date = date;
         }
 

@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using NUnit.Framework;
 using osu.Framework.Allocation;
@@ -26,10 +26,10 @@ namespace osu.Game.Tests.Visual
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
-                Size = new Vector2(200,100)
+                Size = new Vector2(200, 100)
             };
 
-            Beatmap.Value = new TestWorkingBeatmap(new Beatmap());
+            Beatmap.Value = new TestWorkingBeatmap(new Beatmap(), Clock);
 
             Child = playback;
         }

@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using System.Collections.Generic;
@@ -21,7 +21,7 @@ namespace osu.Game.Rulesets.Osu.Tests
     public class TestCaseSpinner : OsuTestCase
     {
         public override IReadOnlyList<Type> RequiredTypes => new[]
-{
+        {
             typeof(SpinnerDisc),
             typeof(DrawableSpinner),
             typeof(DrawableOsuHitObject)
@@ -67,7 +67,8 @@ namespace osu.Game.Rulesets.Osu.Tests
         {
             private bool auto;
 
-            public TestDrawableSpinner(Spinner s, bool auto) : base(s)
+            public TestDrawableSpinner(Spinner s, bool auto)
+                : base(s)
             {
                 this.auto = auto;
             }

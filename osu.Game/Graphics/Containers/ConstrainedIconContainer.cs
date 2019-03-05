@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using osu.Framework.Graphics;
@@ -15,15 +15,9 @@ namespace osu.Game.Graphics.Containers
     {
         public Drawable Icon
         {
-            get
-            {
-                return InternalChild;
-            }
+            get => InternalChild;
 
-            set
-            {
-                InternalChild = value;
-            }
+            set => InternalChild = value;
         }
 
         /// <summary>
@@ -33,8 +27,8 @@ namespace osu.Game.Graphics.Containers
         /// </summary>
         public new EdgeEffectParameters EdgeEffect
         {
-            get { return base.EdgeEffect; }
-            set { base.EdgeEffect = value; }
+            get => base.EdgeEffect;
+            set => base.EdgeEffect = value;
         }
 
         protected override void Update()

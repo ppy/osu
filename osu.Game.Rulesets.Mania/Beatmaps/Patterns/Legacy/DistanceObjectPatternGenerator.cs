@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using System.Collections.Generic;
@@ -65,6 +65,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
             if (originalPattern.HitObjects.Count() == 1)
             {
                 yield return originalPattern;
+
                 yield break;
             }
 
@@ -135,6 +136,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
             {
                 if (convertType.HasFlag(PatternType.LowProbability))
                     return generateNRandomNotes(HitObject.StartTime, 0.78, 0.3, 0);
+
                 return generateNRandomNotes(HitObject.StartTime, 0.85, 0.36, 0.03);
             }
 
@@ -142,6 +144,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
             {
                 if (convertType.HasFlag(PatternType.LowProbability))
                     return generateNRandomNotes(HitObject.StartTime, 0.43, 0.08, 0);
+
                 return generateNRandomNotes(HitObject.StartTime, 0.56, 0.18, 0);
             }
 
@@ -149,11 +152,13 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
             {
                 if (convertType.HasFlag(PatternType.LowProbability))
                     return generateNRandomNotes(HitObject.StartTime, 0.3, 0, 0);
+
                 return generateNRandomNotes(HitObject.StartTime, 0.37, 0.08, 0);
             }
 
             if (convertType.HasFlag(PatternType.LowProbability))
                 return generateNRandomNotes(HitObject.StartTime, 0.17, 0, 0);
+
             return generateNRandomNotes(HitObject.StartTime, 0.27, 0, 0);
         }
 

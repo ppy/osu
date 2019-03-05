@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using NUnit.Framework;
 using osu.Framework.Graphics;
@@ -74,7 +74,7 @@ namespace osu.Game.Tests.Visual
 
             AddStep(@"Hit! :D", delegate
             {
-                score.Current.Value += 300 + (ulong)(300.0 * (comboCounter.Current > 0 ? comboCounter.Current - 1 : 0) / 25.0);
+                score.Current.Value += 300 + (ulong)(300.0 * (comboCounter.Current.Value > 0 ? comboCounter.Current.Value - 1 : 0) / 25.0);
                 comboCounter.Increment();
                 numerator++;
                 denominator++;

@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using osuTK;
@@ -20,7 +20,7 @@ namespace osu.Game.Screens.Select
 
         public string Text
         {
-            get { return spriteText?.Text; }
+            get => spriteText?.Text;
             set
             {
                 if (spriteText != null)
@@ -29,9 +29,10 @@ namespace osu.Game.Screens.Select
         }
 
         private Color4 deselectedColour;
+
         public Color4 DeselectedColour
         {
-            get { return deselectedColour; }
+            get => deselectedColour;
             set
             {
                 deselectedColour = value;
@@ -41,9 +42,10 @@ namespace osu.Game.Screens.Select
         }
 
         private Color4 selectedColour;
+
         public Color4 SelectedColour
         {
-            get { return selectedColour; }
+            get => selectedColour;
             set
             {
                 selectedColour = value;

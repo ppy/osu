@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using osu.Framework;
@@ -118,7 +118,6 @@ namespace osu.Game.Screens.Menu
                             AllowMultiline = false,
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
-                            TextSize = 16,
                             Position = new Vector2(0, 35),
                             Text = text
                         }
@@ -243,7 +242,7 @@ namespace osu.Game.Screens.Menu
 
         public ButtonState State
         {
-            get { return state; }
+            get => state;
 
             set
             {

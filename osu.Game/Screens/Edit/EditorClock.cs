@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using System.Linq;
@@ -46,7 +46,7 @@ namespace osu.Game.Screens.Edit
         public bool SeekSnapped(double position)
         {
             var timingPoint = ControlPointInfo.TimingPointAt(position);
-            double beatSnapLength = timingPoint.BeatLength / beatDivisor;
+            double beatSnapLength = timingPoint.BeatLength / beatDivisor.Value;
 
             // We will be snapping to beats within the timing point
             position -= timingPoint.Time;
@@ -91,7 +91,7 @@ namespace osu.Game.Screens.Edit
                     timingPoint = ControlPointInfo.TimingPoints[--activeIndex];
             }
 
-            double seekAmount = timingPoint.BeatLength / beatDivisor * amount;
+            double seekAmount = timingPoint.BeatLength / beatDivisor.Value * amount;
             double seekTime = CurrentTime + seekAmount * direction;
 
             if (!snapped || ControlPointInfo.TimingPoints.Count == 0)
