@@ -205,7 +205,7 @@ namespace osu.Game.Screens.Multi.Lounge.Components
 
         private class MultiplayerListSprite : MultiplayerBackgroundSprite
         {
-            protected override UpdateableBeatmapBackgroundSprite CreateBackgroundSprite() => new UpdateableBeatmapBackgroundSprite(BeatmapSetCoverType.List) { RelativeSizeAxes = Axes.Both };
+            protected override UpdateableBeatmapBackgroundSprite CreateBackgroundSprite() => new UpdateableBeatmapBackgroundSprite(beatmapSetCoverType: BeatmapSetCoverType.List) { RelativeSizeAxes = Axes.Both };
         }
 
         private class RoomName : OsuSpriteText
