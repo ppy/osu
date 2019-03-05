@@ -24,6 +24,12 @@ namespace osu.Game.Graphics.Containers
 
         protected override bool BlockNonPositionalInput => true;
 
+        /// <summary>
+        /// Temporary to allow for overlays in the main screen content to not dim theirselves.
+        /// Should be eventually replaced by dimming which is aware of the target dim container (traverse parent for certain interface type?).
+        /// </summary>
+        protected virtual bool DimMainContent => true;
+
         [Resolved(CanBeNull = true)]
         private OsuGame osuGame { get; set; }
 
@@ -95,7 +101,7 @@ namespace osu.Game.Graphics.Containers
                     if (OverlayActivationMode.Value != OverlayActivation.Disabled)
                     {
                         if (PlaySamplesOnStateChange) samplePopIn?.Play();
-                        if (BlockScreenWideMouse) osuGame?.AddBlockingOverlay(this);
+                        if (BlockScreenWideMouse && DimMainContent) osuGame?.AddBlockingOverlay(this);
                     }
                     else
                         State = Visibility.Hidden;
