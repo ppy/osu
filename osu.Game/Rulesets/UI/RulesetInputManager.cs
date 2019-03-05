@@ -105,7 +105,6 @@ namespace osu.Game.Rulesets.UI
                 parentGameplayClock = clock;
         }
 
-
         protected override void LoadComplete()
         {
             base.LoadComplete();
