@@ -263,6 +263,9 @@ namespace osu.Game.Beatmaps
             if (beatmapInfo.Metadata == null)
                 beatmapInfo.Metadata = beatmapInfo.BeatmapSet.Metadata;
 
+            var info = beatmapInfo;
+            beatmapInfo = QueryBeatmap(p => info.OnlineBeatmapID == p.OnlineBeatmapID) ?? beatmapInfo;
+
             WorkingBeatmap working = new BeatmapManagerWorkingBeatmap(Files.Store, new LargeTextureStore(host?.CreateTextureLoaderStore(Files.Store)), beatmapInfo, audioManager);
 
             previous?.TransferTo(working);
