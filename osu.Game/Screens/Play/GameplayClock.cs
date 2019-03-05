@@ -9,7 +9,7 @@ namespace osu.Game.Screens.Play
     /// A clock which is used for gameplay elements that need to follow audio time 1:1.
     /// Exposed via DI by <see cref="PauseContainer"/>.
     /// <remarks>
-    /// THe main purpose of this clock is to stop components using it from accidentally processing the main
+    /// The main purpose of this clock is to stop components using it from accidentally processing the main
     /// <see cref="IFrameBasedClock"/>, as this should only be done once to ensure accuracy.
     /// </remarks>
     /// </summary>
