@@ -132,15 +132,10 @@ namespace osu.Game.Screens.Multi.Match.Components
 
         private class HeaderBackgroundSprite : MultiplayerBackgroundSprite
         {
-            protected override UpdateableBeatmapBackgroundSprite CreateBackgroundSprite() => new BackgroundSprite(true) { RelativeSizeAxes = Axes.Both };
+            protected override UpdateableBeatmapBackgroundSprite CreateBackgroundSprite() => new BackgroundSprite { RelativeSizeAxes = Axes.Both };
 
             private class BackgroundSprite : UpdateableBeatmapBackgroundSprite
             {
-                public BackgroundSprite(bool fallback = false, BeatmapSetCoverType beatmapSetCoverType = BeatmapSetCoverType.Cover)
-                    : base(fallback, beatmapSetCoverType)
-                {
-                }
-
                 protected override double FadeDuration => 200;
             }
         }
