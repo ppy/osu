@@ -213,18 +213,18 @@ namespace osu.Game.Overlays.Direct
 
             if (SetInfo.OnlineInfo?.HasVideo ?? false)
             {
-                statusContainer.Add(new IconPill(FontAwesome.fa_film));
+                statusContainer.Add(new IconPill(FontAwesome.fa_film) { IconSize = new Vector2(20) });
             }
 
             if (SetInfo.OnlineInfo?.HasStoryboard ?? false)
             {
-                statusContainer.Add(new IconPill(FontAwesome.fa_image));
+                statusContainer.Add(new IconPill(FontAwesome.fa_image) { IconSize = new Vector2(20) });
             }
 
             statusContainer.Add(new BeatmapSetOnlineStatusPill
             {
                 TextSize = 12,
-                TextPadding = new MarginPadding { Horizontal = 10, Vertical = 5 },
+                TextPadding = new MarginPadding { Horizontal = 10, Vertical = 4 },
                 Status = SetInfo.OnlineInfo?.Status ?? BeatmapSetOnlineStatus.None,
             });
         }
