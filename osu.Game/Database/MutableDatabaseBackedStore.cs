@@ -16,9 +16,7 @@ namespace osu.Game.Database
     public abstract class MutableDatabaseBackedStore<T> : DatabaseBackedStore
         where T : class, IHasPrimaryKey, ISoftDelete
     {
-        public delegate void ItemAddedDelegate(T model, bool silent);
-
-        public event ItemAddedDelegate ItemAdded;
+        public event Action<T> ItemAdded;
         public event Action<T> ItemRemoved;
 
         protected MutableDatabaseBackedStore(IDatabaseContextFactory contextFactory, Storage storage = null)
@@ -35,8 +33,7 @@ namespace osu.Game.Database
         /// Add a <see cref="T"/> to the database.
         /// </summary>
         /// <param name="item">The item to add.</param>
-        /// <param name="silent">Whether the user should be notified of the addition.</param>
-        public void Add(T item, bool silent)
+        public void Add(T item)
         {
             using (var usage = ContextFactory.GetForWrite())
             {
@@ -44,7 +41,7 @@ namespace osu.Game.Database
                 context.Attach(item);
             }
 
-            ItemAdded?.Invoke(item, silent);
+            ItemAdded?.Invoke(item);
         }
 
         /// <summary>
@@ -57,7 +54,7 @@ namespace osu.Game.Database
                 usage.Context.Update(item);
 
             ItemRemoved?.Invoke(item);
-            ItemAdded?.Invoke(item, true);
+            ItemAdded?.Invoke(item);
         }
 
         /// <summary>
@@ -94,7 +91,7 @@ namespace osu.Game.Database
                 item.DeletePending = false;
             }
 
-            ItemAdded?.Invoke(item, true);
+            ItemAdded?.Invoke(item);
             return true;
         }
 
