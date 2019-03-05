@@ -18,9 +18,12 @@ namespace osu.Game.Beatmaps.Drawables
         [Resolved]
         private BeatmapManager beatmaps { get; set; }
 
-        public UpdateableBeatmapBackgroundSprite()
+        private readonly BeatmapSetCoverType beatmapSetCoverType;
+
+        public UpdateableBeatmapBackgroundSprite(BeatmapSetCoverType beatmapSetCoverType = BeatmapSetCoverType.Cover)
         {
             Beatmap.BindValueChanged(b => Model = b.NewValue);
+            this.beatmapSetCoverType = beatmapSetCoverType;
         }
 
         protected override Drawable CreateDrawable(BeatmapInfo model)
@@ -32,7 +35,7 @@ namespace osu.Game.Beatmaps.Drawables
                 var localBeatmap = beatmaps.GetWorkingBeatmap(model);
 
                 if (localBeatmap.BeatmapInfo.ID == 0 && model?.BeatmapSet?.OnlineInfo != null)
-                    drawable = new BeatmapSetCover(model.BeatmapSet);
+                    drawable = new BeatmapSetCover(model.BeatmapSet, beatmapSetCoverType);
                 else
                     drawable = new BeatmapBackgroundSprite(localBeatmap);
 
