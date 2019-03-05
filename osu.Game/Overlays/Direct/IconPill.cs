@@ -12,6 +12,14 @@ namespace osu.Game.Overlays.Direct
 {
     public class IconPill : CircularContainer
     {
+        public Vector2 IconSize
+        {
+            get => iconContainer.Size;
+            set => iconContainer.Size = value;
+        }
+
+        private readonly Container iconContainer;
+
         public IconPill(FontAwesome icon)
         {
             AutoSizeAxes = Axes.Both;
@@ -25,16 +33,16 @@ namespace osu.Game.Overlays.Direct
                     Colour = Color4.Black,
                     Alpha = 0.5f,
                 },
-                new Container
+                iconContainer = new Container
                 {
-                    AutoSizeAxes = Axes.Both,
-                    Margin = new MarginPadding(5),
+                    Size = new Vector2(22),
+                    Padding = new MarginPadding(5),
                     Child = new SpriteIcon
                     {
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
+                        RelativeSizeAxes = Axes.Both,
                         Icon = icon,
-                        Size = new Vector2(12),
                     },
                 },
             };
