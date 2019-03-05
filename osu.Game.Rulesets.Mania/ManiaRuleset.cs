@@ -330,11 +330,11 @@ namespace osu.Game.Rulesets.Mania
                 for (int i = LeftKeys.Length - columns / 2; i < LeftKeys.Length; i++)
                     bindings.Add(new KeyBinding(LeftKeys[i], currentNormalAction++));
 
-                for (int i = 0; i < columns / 2; i++)
-                    bindings.Add(new KeyBinding(RightKeys[i], currentNormalAction++));
-
                 if (columns % 2 == 1)
                     bindings.Add(new KeyBinding(SpecialKey, SpecialAction));
+
+                for (int i = 0; i < columns / 2; i++)
+                    bindings.Add(new KeyBinding(RightKeys[i], currentNormalAction++));
 
                 nextNormalAction = currentNormalAction;
                 return bindings;
@@ -349,6 +349,7 @@ namespace osu.Game.Rulesets.Mania
         /// Number of columns in this stage lies at (item - Single).
         /// </summary>
         Single = 0,
+
         /// <summary>
         /// Columns are grouped into two stages.
         /// Overall number of columns lies at (item - Dual), further computation is required for

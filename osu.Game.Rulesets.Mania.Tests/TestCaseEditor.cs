@@ -3,7 +3,7 @@
 
 using NUnit.Framework;
 using osu.Framework.Allocation;
-using osu.Framework.Configuration;
+using osu.Framework.Bindables;
 using osu.Game.Rulesets.Mania.Configuration;
 using osu.Game.Rulesets.Mania.UI;
 using osu.Game.Tests.Visual;

@@ -39,7 +39,7 @@ namespace osu.Game.Users
         public override string Message => @"in Multiplayer Lobby";
     }
 
-    public class UserStatusSoloGame :  UserStatusBusy
+    public class UserStatusSoloGame : UserStatusBusy
     {
         public override string Message => @"Solo Game";
     }
