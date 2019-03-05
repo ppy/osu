@@ -161,10 +161,7 @@ namespace osu.Game.Rulesets.UI
         private void updateClock()
         {
             if (parentGameplayClock == null)
-            {
-                validState = false;
                 return;
-            }
 
             validState = true;
 
