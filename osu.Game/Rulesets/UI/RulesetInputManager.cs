@@ -108,13 +108,7 @@ namespace osu.Game.Rulesets.UI
         protected override void LoadComplete()
         {
             base.LoadComplete();
-
-            // in case a parent gameplay clock isn't available, just use the parent clock.
-            if (parentGameplayClock == null)
-                parentGameplayClock = Clock;
-
-            Clock = gameplayClock;
-            ProcessCustomClock = false;
+            setClock();
         }
 
         /// <summary>
@@ -161,7 +155,7 @@ namespace osu.Game.Rulesets.UI
         private void updateClock()
         {
             if (parentGameplayClock == null)
-                return;
+                setClock(); // LoadComplete may not be run yet, but we still want the clock.
 
             validState = true;
 
@@ -208,6 +202,16 @@ namespace osu.Game.Rulesets.UI
                 // to ensure that the its time is valid for our children before input is processed
                 framedClock.ProcessFrame();
             }
+        }
+
+        private void setClock()
+        {
+            // in case a parent gameplay clock isn't available, just use the parent clock.
+            if (parentGameplayClock == null)
+                parentGameplayClock = Clock;
+
+            Clock = gameplayClock;
+            ProcessCustomClock = false;
         }
 
         #endregion
