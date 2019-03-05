@@ -59,7 +59,6 @@ namespace osu.Game.Graphics.UserInterface
 
         public abstract void Increment(T amount);
 
-
         public float TextSize
         {
             get => DisplayedCountSpriteText.Font.Size;
