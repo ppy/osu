@@ -12,7 +12,6 @@ using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Mods;
-using osu.Game.Screens.Play;
 using osuTK;
 
 namespace osu.Game.Rulesets.UI
@@ -60,12 +59,10 @@ namespace osu.Game.Rulesets.UI
 
         private WorkingBeatmap beatmap;
 
-        [BackgroundDependencyLoader(true)]
-        private void load(IBindable<WorkingBeatmap> beatmap, GameplayClock clock)
+        [BackgroundDependencyLoader]
+        private void load(IBindable<WorkingBeatmap> beatmap)
         {
             this.beatmap = beatmap.Value;
-
-            if (clock != null) Clock = clock;
         }
 
         /// <summary>

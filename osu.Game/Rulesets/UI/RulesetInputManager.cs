@@ -41,6 +41,7 @@ namespace osu.Game.Rulesets.UI
         protected RulesetInputManager(RulesetInfo ruleset, int variant, SimultaneousBindingMode unique)
         {
             InternalChild = KeyBindingContainer = CreateKeyBindingContainer(ruleset, variant, unique);
+            gameplayClock = new GameplayClock(framedClock = new FramedClock(manualClock = new ManualClock()));
         }
 
         #region Action mapping (for replays)
@@ -86,22 +87,35 @@ namespace osu.Game.Rulesets.UI
 
         #region Clock control
 
-        private ManualClock clock;
-        private IFrameBasedClock parentClock;
+        private readonly ManualClock manualClock;
+
+        private readonly FramedClock framedClock;
+
+        [Cached]
+        private GameplayClock gameplayClock;
+
+        private IFrameBasedClock parentGameplayClock;
+
+        [BackgroundDependencyLoader(true)]
+        private void load(OsuConfigManager config, GameplayClock clock)
+        {
+            mouseDisabled = config.GetBindable<bool>(OsuSetting.MouseDisableButtons);
+
+            if (clock != null)
+                parentGameplayClock = clock;
+        }
+
 
         protected override void LoadComplete()
         {
             base.LoadComplete();
 
-            //our clock will now be our parent's clock, but we want to replace this to allow manual control.
-            parentClock = Clock;
+            // in case a parent gameplay clock isn't available, just use the parent clock.
+            if (parentGameplayClock == null)
+                parentGameplayClock = Clock;
 
+            Clock = gameplayClock;
             ProcessCustomClock = false;
-            Clock = new FramedClock(clock = new ManualClock
-            {
-                CurrentTime = parentClock.CurrentTime,
-                Rate = parentClock.Rate,
-            });
         }
 
         /// <summary>
@@ -147,25 +161,31 @@ namespace osu.Game.Rulesets.UI
 
         private void updateClock()
         {
-            if (parentClock == null) return;
+            if (parentGameplayClock == null)
+            {
+                validState = false;
+                return;
+            }
 
-            clock.Rate = parentClock.Rate;
-            clock.IsRunning = parentClock.IsRunning;
+            validState = true;
 
-            var newProposedTime = parentClock.CurrentTime;
+            manualClock.Rate = parentGameplayClock.Rate;
+            manualClock.IsRunning = parentGameplayClock.IsRunning;
+
+            var newProposedTime = parentGameplayClock.CurrentTime;
 
             try
             {
-                if (Math.Abs(clock.CurrentTime - newProposedTime) > sixty_frame_time * 1.2f)
+                if (Math.Abs(manualClock.CurrentTime - newProposedTime) > sixty_frame_time * 1.2f)
                 {
-                    newProposedTime = clock.Rate > 0
-                        ? Math.Min(newProposedTime, clock.CurrentTime + sixty_frame_time)
-                        : Math.Max(newProposedTime, clock.CurrentTime - sixty_frame_time);
+                    newProposedTime = manualClock.Rate > 0
+                        ? Math.Min(newProposedTime, manualClock.CurrentTime + sixty_frame_time)
+                        : Math.Max(newProposedTime, manualClock.CurrentTime - sixty_frame_time);
                 }
 
                 if (!isAttached)
                 {
-                    clock.CurrentTime = newProposedTime;
+                    manualClock.CurrentTime = newProposedTime;
                 }
                 else
                 {
@@ -177,20 +197,20 @@ namespace osu.Game.Rulesets.UI
                         validState = false;
 
                         requireMoreUpdateLoops = true;
-                        clock.CurrentTime = newProposedTime;
+                        manualClock.CurrentTime = newProposedTime;
                         return;
                     }
 
-                    clock.CurrentTime = newTime.Value;
+                    manualClock.CurrentTime = newTime.Value;
                 }
 
-                requireMoreUpdateLoops = clock.CurrentTime != parentClock.CurrentTime;
+                requireMoreUpdateLoops = manualClock.CurrentTime != parentGameplayClock.CurrentTime;
             }
             finally
             {
                 // The manual clock time has changed in the above code. The framed clock now needs to be updated
                 // to ensure that the its time is valid for our children before input is processed
-                Clock.ProcessFrame();
+                framedClock.ProcessFrame();
             }
         }
 
@@ -199,12 +219,6 @@ namespace osu.Game.Rulesets.UI
         #region Setting application (disables etc.)
 
         private Bindable<bool> mouseDisabled;
-
-        [BackgroundDependencyLoader]
-        private void load(OsuConfigManager config)
-        {
-            mouseDisabled = config.GetBindable<bool>(OsuSetting.MouseDisableButtons);
-        }
 
         protected override bool Handle(UIEvent e)
         {
