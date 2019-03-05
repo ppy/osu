@@ -137,7 +137,7 @@ namespace osu.Game.Screens.Multi.Lounge.Components
                                 Width = cover_width,
                                 Masking = true,
                                 Margin = new MarginPadding { Left = side_strip_width },
-                                Child = new MultiplayerBackgroundSprite { RelativeSizeAxes = Axes.Both }
+                                Child = new MultiplayerListSprite { RelativeSizeAxes = Axes.Both }
                             },
                             new Container
                             {
