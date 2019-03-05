@@ -2,7 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using Microsoft.EntityFrameworkCore.Internal;
+using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics.Containers;
@@ -41,7 +41,7 @@ namespace osu.Game.Overlays.Direct
             {
                 if (setInfo.NewValue == null)
                     attachDownload(null);
-                else if (beatmaps.QueryBeatmapSets(s => s.OnlineBeatmapSetID == setInfo.NewValue.OnlineBeatmapSetID).Any())
+                else if (beatmaps.GetAllUsableBeatmapSetsEnumerable().Any(s => s.OnlineBeatmapSetID == setInfo.NewValue.OnlineBeatmapSetID))
                     State.Value = DownloadState.LocallyAvailable;
                 else
                     attachDownload(beatmaps.GetExistingDownload(setInfo.NewValue));
@@ -63,8 +63,11 @@ namespace osu.Game.Overlays.Direct
         {
             base.Dispose(isDisposing);
 
-            beatmaps.BeatmapDownloadBegan -= attachDownload;
-            beatmaps.ItemAdded -= setAdded;
+            if (beatmaps != null)
+            {
+                beatmaps.BeatmapDownloadBegan -= attachDownload;
+                beatmaps.ItemAdded -= setAdded;
+            }
 
             State.UnbindAll();
 

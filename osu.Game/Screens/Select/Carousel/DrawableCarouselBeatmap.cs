@@ -38,7 +38,8 @@ namespace osu.Game.Screens.Select.Carousel
 
         private BeatmapSetOverlay beatmapOverlay;
 
-        public DrawableCarouselBeatmap(CarouselBeatmap panel) : base(panel)
+        public DrawableCarouselBeatmap(CarouselBeatmap panel)
+            : base(panel)
         {
             beatmap = panel.Beatmap;
             Height *= 0.60f;

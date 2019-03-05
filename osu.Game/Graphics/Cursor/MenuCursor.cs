@@ -85,6 +85,7 @@ namespace osu.Game.Graphics.Cursor
                 dragRotationState = DragRotationState.DragStarted;
                 positionMouseDown = e.MousePosition;
             }
+
             return base.OnMouseDown(e);
         }
 
@@ -102,6 +103,7 @@ namespace osu.Game.Graphics.Cursor
                     activeCursor.RotateTo(0, 600 * (1 + Math.Abs(activeCursor.Rotation / 720)), Easing.OutElasticHalf);
                 dragRotationState = DragRotationState.NotDragging;
             }
+
             return base.OnMouseUp(e);
         }
 

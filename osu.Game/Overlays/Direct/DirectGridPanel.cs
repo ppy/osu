@@ -29,7 +29,8 @@ namespace osu.Game.Overlays.Direct
         protected override PlayButton PlayButton => playButton;
         protected override Box PreviewBar => progressBar;
 
-        public DirectGridPanel(BeatmapSetInfo beatmap) : base(beatmap)
+        public DirectGridPanel(BeatmapSetInfo beatmap)
+            : base(beatmap)
         {
             Width = 380;
             Height = 140 + vertical_padding; //full height of all the elements plus vertical padding (autosize uses the image)

@@ -23,7 +23,7 @@ namespace osu.Game.Screens.Select.Leaderboards
 
         public BeatmapInfo Beatmap
         {
-            get { return beatmap; }
+            get => beatmap;
             set
             {
                 if (beatmap == value)
@@ -55,7 +55,7 @@ namespace osu.Game.Screens.Select.Leaderboards
         {
             if (Scope == BeatmapLeaderboardScope.Local)
             {
-                Scores = scoreManager.QueryScores(s => s.Beatmap.ID == Beatmap.ID).ToArray();
+                Scores = scoreManager.QueryScores(s => !s.DeletePending && s.Beatmap.ID == Beatmap.ID).ToArray();
                 PlaceholderState = Scores.Any() ? PlaceholderState.Successful : PlaceholderState.NoScores;
                 return null;
             }

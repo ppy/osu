@@ -43,7 +43,7 @@ namespace osu.Game.Screens.Multi.Match
         protected Bindable<PlaylistItem> CurrentItem { get; private set; }
 
         [Resolved]
-        protected Bindable<IEnumerable<Mod>> CurrentMods { get; private set; }
+        protected Bindable<IEnumerable<Mod>> SelectedMods { get; private set; }
 
         [Resolved]
         private BeatmapManager beatmapManager { get; set; }
@@ -194,7 +194,7 @@ namespace osu.Game.Screens.Multi.Match
             var localBeatmap = e.NewValue?.Beatmap == null ? null : beatmapManager.QueryBeatmap(b => b.OnlineBeatmapID == e.NewValue.Beatmap.OnlineBeatmapID);
 
             Beatmap.Value = beatmapManager.GetWorkingBeatmap(localBeatmap);
-            CurrentMods.Value = e.NewValue?.RequiredMods ?? Enumerable.Empty<Mod>();
+            SelectedMods.Value = e.NewValue?.RequiredMods ?? Enumerable.Empty<Mod>();
             if (e.NewValue?.Ruleset != null)
                 Ruleset.Value = e.NewValue.Ruleset;
         }
@@ -222,7 +222,7 @@ namespace osu.Game.Screens.Multi.Match
 
         private void onStart()
         {
-            Beatmap.Value.Mods.Value = CurrentMods.Value.ToArray();
+            Beatmap.Value.Mods.Value = SelectedMods.Value.ToArray();
 
             switch (type.Value)
             {

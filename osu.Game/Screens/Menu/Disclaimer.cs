@@ -5,14 +5,17 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Screens;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
+using osu.Game.Online.API;
 using osuTK;
 using osuTK.Graphics;
 using osu.Game.Overlays;
+using osu.Game.Users;
 
 namespace osu.Game.Screens.Menu
 {
@@ -33,13 +36,15 @@ namespace osu.Game.Screens.Menu
 
         private const float icon_y = -85;
 
+        private readonly Bindable<User> currentUser = new Bindable<User>();
+
         public Disclaimer()
         {
             ValidForResume = false;
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
+        private void load(OsuColour colours, APIAccess api)
         {
             InternalChildren = new Drawable[]
             {
@@ -70,13 +75,13 @@ namespace osu.Game.Screens.Menu
             textFlow.AddParagraph("Things may not work as expected", t => t.Font = t.Font.With(size: 20));
             textFlow.NewParagraph();
 
-            Action<SpriteText> format = t => t.Font = OsuFont.GetFont(size: 15, weight: FontWeight.Bold);
+            Action<SpriteText> format = t => t.Font = OsuFont.GetFont(size: 15, weight: FontWeight.SemiBold);
 
             textFlow.AddParagraph("Detailed bug reports are welcomed via github issues.", format);
             textFlow.NewParagraph();
 
             textFlow.AddText("Visit ", format);
-            textFlow.AddLink("discord.gg/ppy", "https://discord.gg/ppy", creationParameters:format);
+            textFlow.AddLink("discord.gg/ppy", "https://discord.gg/ppy", creationParameters: format);
             textFlow.AddText(" to help out or follow progress!", format);
 
             textFlow.NewParagraph();
@@ -96,6 +101,13 @@ namespace osu.Game.Screens.Menu
             }).First());
 
             iconColour = colours.Yellow;
+
+            currentUser.BindTo(api.LocalUser);
+            currentUser.BindValueChanged(e =>
+            {
+                if (e.NewValue.IsSupporter)
+                    supporterDrawables.ForEach(d => d.FadeOut(500, Easing.OutQuint).Expire());
+            }, true);
         }
 
         protected override void LoadComplete()

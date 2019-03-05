@@ -6,7 +6,6 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Screens;
 using osu.Game.Configuration;
-using osu.Game.Graphics;
 using osu.Game.Screens.Backgrounds;
 using osuTK;
 
@@ -16,15 +15,12 @@ namespace osu.Game.Screens.Play
     {
         protected override BackgroundScreen CreateBackground() => new BackgroundScreenBeatmap(Beatmap.Value);
 
-        protected new BackgroundScreenBeatmap Background => base.Background as BackgroundScreenBeatmap;
+        protected new BackgroundScreenBeatmap Background => (BackgroundScreenBeatmap)base.Background;
 
         protected const float BACKGROUND_FADE_DURATION = 800;
 
-        protected float BackgroundOpacity => 1 - (float)DimLevel.Value;
-
         #region User Settings
 
-        protected Bindable<double> DimLevel;
         protected Bindable<double> BlurLevel;
         protected Bindable<bool> ShowStoryboard;
 
@@ -33,7 +29,6 @@ namespace osu.Game.Screens.Play
         [BackgroundDependencyLoader]
         private void load(OsuConfigManager config)
         {
-            DimLevel = config.GetBindable<double>(OsuSetting.DimLevel);
             BlurLevel = config.GetBindable<double>(OsuSetting.BlurLevel);
             ShowStoryboard = config.GetBindable<bool>(OsuSetting.ShowStoryboard);
         }
@@ -41,9 +36,7 @@ namespace osu.Game.Screens.Play
         public override void OnEntering(IScreen last)
         {
             base.OnEntering(last);
-            DimLevel.ValueChanged += _ => UpdateBackgroundElements();
             BlurLevel.ValueChanged += _ => UpdateBackgroundElements();
-            ShowStoryboard.ValueChanged += _ => UpdateBackgroundElements();
             InitializeBackgroundElements();
         }
 
@@ -66,7 +59,6 @@ namespace osu.Game.Screens.Play
         {
             if (!this.IsCurrentScreen()) return;
 
-            Background?.FadeColour(OsuColour.Gray(BackgroundOpacity), BACKGROUND_FADE_DURATION, Easing.OutQuint);
             Background?.BlurTo(new Vector2((float)BlurLevel.Value * 25), BACKGROUND_FADE_DURATION, Easing.OutQuint);
         }
     }
