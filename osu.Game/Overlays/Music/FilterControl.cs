@@ -8,6 +8,7 @@ using osu.Game.Graphics.UserInterface;
 using osuTK;
 using osuTK.Graphics;
 using System;
+using osu.Framework.Bindables;
 
 namespace osu.Game.Overlays.Music
 {
@@ -44,7 +45,7 @@ namespace osu.Game.Overlays.Music
             Search.Current.ValueChanged += current_ValueChanged;
         }
 
-        private void current_ValueChanged(string newValue) => FilterChanged?.Invoke(newValue);
+        private void current_ValueChanged(ValueChangedEvent<string> e) => FilterChanged?.Invoke(e.NewValue);
 
         public Action ExitRequested;
 

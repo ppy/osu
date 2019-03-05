@@ -50,7 +50,7 @@ namespace osu.Game.Screens.Select.Carousel
         public override void Filter(FilterCriteria criteria)
         {
             base.Filter(criteria);
-            Filtered.Value = InternalChildren.All(i => i.Filtered);
+            Filtered.Value = InternalChildren.All(i => i.Filtered.Value);
         }
 
         public override string ToString() => BeatmapSet.ToString();

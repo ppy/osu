@@ -78,7 +78,7 @@ namespace osu.Game.Rulesets.Taiko.Tests
                     Ruleset = new TaikoRuleset().RulesetInfo
                 },
                 ControlPointInfo = controlPointInfo
-            });
+            }, Clock);
 
             Add(playfieldContainer = new Container
             {

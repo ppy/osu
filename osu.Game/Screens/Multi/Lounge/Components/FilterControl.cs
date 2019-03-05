@@ -3,7 +3,7 @@
 
 using System.ComponentModel;
 using osu.Framework.Allocation;
-using osu.Framework.Configuration;
+using osu.Framework.Bindables;
 using osu.Game.Graphics;
 using osu.Game.Overlays.SearchableList;
 using osuTK.Graphics;
@@ -45,8 +45,8 @@ namespace osu.Game.Screens.Multi.Lounge.Components
             filter.Value = new FilterCriteria
             {
                 SearchString = Search.Current.Value ?? string.Empty,
-                PrimaryFilter = Tabs.Current,
-                SecondaryFilter = DisplayStyleControl.Dropdown.Current
+                PrimaryFilter = Tabs.Current.Value,
+                SecondaryFilter = DisplayStyleControl.Dropdown.Current.Value
             };
         }
     }
@@ -54,6 +54,7 @@ namespace osu.Game.Screens.Multi.Lounge.Components
     public enum PrimaryFilter
     {
         Open,
+
         [Description("Recently Ended")]
         RecentlyEnded,
         Participated,

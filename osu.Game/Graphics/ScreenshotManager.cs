@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
-using osu.Framework.Configuration;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input;
 using osu.Framework.Input.Bindings;
@@ -127,7 +127,7 @@ namespace osu.Game.Graphics
         {
             base.Update();
 
-            if (cursorVisibility == false && Interlocked.CompareExchange(ref screenShotTasks, 0, 0) == 0)
+            if (cursorVisibility.Value == false && Interlocked.CompareExchange(ref screenShotTasks, 0, 0) == 0)
                 cursorVisibility.Value = true;
         }
 

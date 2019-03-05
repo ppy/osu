@@ -111,12 +111,14 @@ namespace osu.Game.Scoring.Legacy
                         byte[] properties = new byte[5];
                         if (replayInStream.Read(properties, 0, 5) != 5)
                             throw new IOException("input .lzma is too short");
+
                         long outSize = 0;
                         for (int i = 0; i < 8; i++)
                         {
                             int v = replayInStream.ReadByte();
                             if (v < 0)
                                 throw new IOException("Can't Read 1");
+
                             outSize |= (long)(byte)v << (8 * i);
                         }
 
@@ -264,6 +266,7 @@ namespace osu.Game.Scoring.Legacy
             var convertible = currentRuleset.CreateConvertibleReplayFrame();
             if (convertible == null)
                 throw new InvalidOperationException($"Legacy replay cannot be converted for the ruleset: {currentRuleset.Description}");
+
             convertible.ConvertFrom(legacyFrame, currentBeatmap);
 
             var frame = (ReplayFrame)convertible;
