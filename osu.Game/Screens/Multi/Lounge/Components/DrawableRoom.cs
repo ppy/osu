@@ -11,6 +11,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Beatmaps;
+using osu.Game.Beatmaps.Drawables;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
@@ -200,6 +201,11 @@ namespace osu.Game.Screens.Multi.Lounge.Components
         {
             base.LoadComplete();
             this.FadeInFromZero(transition_duration);
+        }
+
+        private class MultiplayerListSprite : MultiplayerBackgroundSprite
+        {
+            protected override UpdateableBeatmapBackgroundSprite CreateBackgroundSprite() => new UpdateableBeatmapBackgroundSprite(BeatmapSetCoverType.List) { RelativeSizeAxes = Axes.Both };
         }
 
         private class RoomName : OsuSpriteText
