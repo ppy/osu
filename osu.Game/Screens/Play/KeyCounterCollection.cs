@@ -8,7 +8,6 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input.Events;
-using osu.Framework.Timing;
 using osu.Game.Configuration;
 using osuTK;
 using osuTK.Graphics;
@@ -37,9 +36,6 @@ namespace osu.Game.Screens.Play
             key.FadeTime = FadeTime;
             key.KeyDownTextColor = KeyDownTextColor;
             key.KeyUpTextColor = KeyUpTextColor;
-            // Use the same clock object as SongProgress for saving KeyCounter state
-            if (AudioClock != null)
-                key.Clock = AudioClock;
         }
 
         public void ResetCount()
@@ -124,8 +120,6 @@ namespace osu.Game.Screens.Play
 
         public override bool HandleNonPositionalInput => receptor == null;
         public override bool HandlePositionalInput => receptor == null;
-
-        public IFrameBasedClock AudioClock { get; set; }
 
         private Receptor receptor;
 

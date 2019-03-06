@@ -3,34 +3,36 @@
 
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
-using osu.Game.Configuration;
 using osu.Game.Overlays.Settings;
+using osu.Game.Rulesets.Osu.Configuration;
 
 namespace osu.Game.Rulesets.Osu.UI
 {
-    public class OsuSettings : RulesetSettingsSubsection
+    public class OsuSettingsSubsection : RulesetSettingsSubsection
     {
         protected override string Header => "osu!";
 
-        public OsuSettings(Ruleset ruleset)
+        public OsuSettingsSubsection(Ruleset ruleset)
             : base(ruleset)
         {
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuConfigManager config)
+        private void load()
         {
+            var config = (OsuRulesetConfigManager)Config;
+
             Children = new Drawable[]
             {
                 new SettingsCheckbox
                 {
                     LabelText = "Snaking in sliders",
-                    Bindable = config.GetBindable<bool>(OsuSetting.SnakingInSliders)
+                    Bindable = config.GetBindable<bool>(OsuRulesetSetting.SnakingInSliders)
                 },
                 new SettingsCheckbox
                 {
                     LabelText = "Snaking out sliders",
-                    Bindable = config.GetBindable<bool>(OsuSetting.SnakingOutSliders)
+                    Bindable = config.GetBindable<bool>(OsuRulesetSetting.SnakingOutSliders)
                 },
             };
         }
