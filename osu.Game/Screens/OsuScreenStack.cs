@@ -24,7 +24,7 @@ namespace osu.Game.Screens
         /// <summary> Return all child dependency bindables created by the exiting screen </summary>
         /// <remarks>
         /// While all bindables will eventually be returned by disposal logic,
-        /// Bindables that are created by every OsuScreen, namely ones created in <see cref="OsuScreenDependencies"/>, will not be returned in time.
+        /// This is too late as leases can be in leased states while screens are still being transitioned.
         /// We need to return them manually after OnExiting runs to ensure a new instance of the same screen can use these bindables immediately.
         /// </remarks>
         private void unbindAllDependencies(IScreen prev, IScreen next)
