@@ -58,8 +58,6 @@ namespace osu.Game.Rulesets.UI
             RelativeSizeAxes = Axes.Both;
 
             hitObjectContainerLazy = new Lazy<HitObjectContainer>(CreateHitObjectContainer);
-
-            Cursor = CreateCursor();
         }
 
         private WorkingBeatmap beatmap;
@@ -88,14 +86,9 @@ namespace osu.Game.Rulesets.UI
         public virtual bool Remove(DrawableHitObject h) => HitObjectContainer.Remove(h);
 
         /// <summary>
-        /// Creates the cursor. May be null if no cursor is required.
+        /// The cursor currently being used by this <see cref="Playfield"/>. May be null if no cursor is provided.
         /// </summary>
-        protected virtual CursorContainer CreateCursor() => null;
-
-        /// <summary>
-        /// The cursor provided by this <see cref="RulesetContainer"/>. May be null if no cursor is provided.
-        /// </summary>
-        public CursorContainer Cursor { get; }
+        public CursorContainer Cursor { get; protected set; }
 
         /// <summary>
         /// Registers a <see cref="Playfield"/> as a nested <see cref="Playfield"/>.
