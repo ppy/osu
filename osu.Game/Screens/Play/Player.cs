@@ -193,10 +193,6 @@ namespace osu.Game.Screens.Play
                             Origin = Anchor.Centre,
                             Breaks = beatmap.Breaks
                         },
-                        new ScalingContainer(ScalingMode.Gameplay)
-                        {
-                            Child = RulesetContainer.Cursor?.CreateProxy() ?? new Container(),
-                        },
                         HUDOverlay = new HUDOverlay(ScoreProcessor, RulesetContainer, working, adjustableClock)
                         {
                             Anchor = Anchor.Centre,

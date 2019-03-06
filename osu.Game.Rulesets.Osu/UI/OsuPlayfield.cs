@@ -10,7 +10,9 @@ using osu.Game.Rulesets.Osu.Objects.Drawables;
 using osu.Game.Rulesets.Osu.Objects.Drawables.Connections;
 using osu.Game.Rulesets.UI;
 using System.Linq;
+using osu.Framework.Graphics.Cursor;
 using osu.Game.Rulesets.Judgements;
+using osu.Game.Rulesets.Osu.UI.Cursor;
 
 namespace osu.Game.Rulesets.Osu.UI
 {
@@ -34,6 +36,7 @@ namespace osu.Game.Rulesets.Osu.UI
                 RelativeSizeAxes = Axes.Both,
                 Children = new Drawable[]
                 {
+                    Cursor,
                     connectionLayer = new FollowPointRenderer
                     {
                         RelativeSizeAxes = Axes.Both,
@@ -53,6 +56,8 @@ namespace osu.Game.Rulesets.Osu.UI
                 }
             };
         }
+
+        protected override CursorContainer CreateCursor() => new GameplayCursorContainer();
 
         public override void Add(DrawableHitObject h)
         {
