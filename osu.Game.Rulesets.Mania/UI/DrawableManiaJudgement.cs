@@ -19,7 +19,7 @@ namespace osu.Game.Rulesets.Mania.UI
         private void load()
         {
             if (JudgementText != null)
-                JudgementText.TextSize = 25;
+                JudgementText.Font = JudgementText.Font.With(size: 25);
         }
 
         protected override void LoadComplete()

@@ -9,11 +9,11 @@ using osu.Game.Screens.Tournament.Teams;
 namespace osu.Game.Tests.Visual
 {
     [Description("for tournament use")]
-    public class TestCaseDrawings : OsuTestCase
+    public class TestCaseDrawings : ScreenTestCase
     {
         public TestCaseDrawings()
         {
-            Add(new Drawings
+            LoadScreen(new Drawings
             {
                 TeamList = new TestTeamList(),
             });

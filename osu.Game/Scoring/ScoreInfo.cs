@@ -25,10 +25,10 @@ namespace osu.Game.Scoring
         public ScoreRank Rank { get; set; }
 
         [JsonProperty("total_score")]
-        public int TotalScore { get; set; }
+        public long TotalScore { get; set; }
 
         [JsonProperty("accuracy")]
-        [Column(TypeName="DECIMAL(1,4)")]
+        [Column(TypeName = "DECIMAL(1,4)")]
         public double Accuracy { get; set; }
 
         [JsonProperty(@"pp")]
@@ -109,7 +109,27 @@ namespace osu.Game.Scoring
         public string UserString
         {
             get => User?.Username;
-            set => User = new User { Username = value };
+            set
+            {
+                if (User == null)
+                    User = new User();
+
+                User.Username = value;
+            }
+        }
+
+        [JsonIgnore]
+        [Column("UserID")]
+        public long? UserID
+        {
+            get => User?.Id ?? 1;
+            set
+            {
+                if (User == null)
+                    User = new User();
+
+                User.Id = value ?? 1;
+            }
         }
 
         [JsonIgnore]
@@ -158,5 +178,7 @@ namespace osu.Game.Scoring
         {
             public string Acronym { get; set; }
         }
+
+        public override string ToString() => $"{User} playing {Beatmap}";
     }
 }

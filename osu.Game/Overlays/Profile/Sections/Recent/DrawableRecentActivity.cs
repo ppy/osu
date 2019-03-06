@@ -42,7 +42,7 @@ namespace osu.Game.Overlays.Profile.Sections.Recent
 
             RightFlowContainer.Add(new DrawableDate(activity.CreatedAt)
             {
-                TextSize =  13,
+                Font = OsuFont.GetFont(size: 13),
                 Colour = OsuColour.Gray(0xAA),
                 Anchor = Anchor.TopRight,
                 Origin = Anchor.TopRight,

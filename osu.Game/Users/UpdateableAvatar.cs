@@ -1,7 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using osu.Framework.Configuration;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 
@@ -23,7 +23,7 @@ namespace osu.Game.Users
 
         public User User
         {
-            get { return user; }
+            get => user;
             set
             {
                 if (user?.Id == value?.Id)

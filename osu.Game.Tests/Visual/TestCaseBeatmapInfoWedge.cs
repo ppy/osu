@@ -50,7 +50,7 @@ namespace osu.Game.Tests.Visual
             AddStep("show", () =>
             {
                 infoWedge.State = Visibility.Visible;
-                infoWedge.Beatmap = Beatmap;
+                infoWedge.Beatmap = Beatmap.Value;
             });
 
             // select part is redundant, but wait for load isn't

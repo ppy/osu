@@ -2,7 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
-using osu.Framework.Configuration;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.MathUtils;
 using osu.Framework.Threading;
@@ -42,7 +42,7 @@ namespace osu.Game.Screens.Backgrounds
             Background?.FadeOut(800, Easing.InOutSine);
             Background?.Expire();
 
-            Add(Background = newBackground);
+            AddInternal(Background = newBackground);
             currentDisplay++;
         }
 
@@ -70,7 +70,8 @@ namespace osu.Game.Screens.Backgrounds
         {
             private readonly Skin skin;
 
-            public SkinnedBackground(Skin skin, string fallbackTextureName) : base(fallbackTextureName)
+            public SkinnedBackground(Skin skin, string fallbackTextureName)
+                : base(fallbackTextureName)
             {
                 this.skin = skin;
             }

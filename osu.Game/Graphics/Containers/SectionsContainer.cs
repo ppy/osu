@@ -3,7 +3,7 @@
 
 using System;
 using System.Linq;
-using osu.Framework.Configuration;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 
@@ -24,7 +24,7 @@ namespace osu.Game.Graphics.Containers
 
         public Drawable ExpandableHeader
         {
-            get { return expandableHeader; }
+            get => expandableHeader;
             set
             {
                 if (value == expandableHeader) return;
@@ -40,7 +40,7 @@ namespace osu.Game.Graphics.Containers
 
         public Drawable FixedHeader
         {
-            get { return fixedHeader; }
+            get => fixedHeader;
             set
             {
                 if (value == fixedHeader) return;
@@ -56,7 +56,7 @@ namespace osu.Game.Graphics.Containers
 
         public Drawable Footer
         {
-            get { return footer; }
+            get => footer;
             set
             {
                 if (value == footer) return;
@@ -75,7 +75,7 @@ namespace osu.Game.Graphics.Containers
 
         public Drawable HeaderBackground
         {
-            get { return headerBackground; }
+            get => headerBackground;
             set
             {
                 if (value == headerBackground) return;
@@ -110,6 +110,7 @@ namespace osu.Game.Graphics.Containers
 
         private float headerHeight, footerHeight;
         private readonly MarginPadding originalSectionsMargin;
+
         private void updateSectionsMargin()
         {
             if (!Children.Any()) return;
@@ -153,6 +154,7 @@ namespace osu.Game.Graphics.Containers
         }
 
         private float lastKnownScroll;
+
         protected override void UpdateAfterChildren()
         {
             base.UpdateAfterChildren();

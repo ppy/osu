@@ -9,7 +9,6 @@ using osu.Framework.Audio.Sample;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Threading;
-using osu.Framework.Timing;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Screens.Ranking;
@@ -27,8 +26,7 @@ namespace osu.Game.Screens.Play
     {
         private readonly double startTime;
 
-        public IAdjustableClock AdjustableClock;
-        public IFrameBasedClock FramedClock;
+        public Action<double> RequestSeek;
 
         private Button button;
         private Box remainingTimeBox;
@@ -54,16 +52,13 @@ namespace osu.Game.Screens.Play
             Origin = Anchor.Centre;
         }
 
-        [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
+        [BackgroundDependencyLoader(true)]
+        private void load(OsuColour colours, GameplayClock clock)
         {
             var baseClock = Clock;
 
-            if (FramedClock != null)
-            {
-                Clock = FramedClock;
-                ProcessCustomClock = false;
-            }
+            if (clock != null)
+                Clock = clock;
 
             Children = new Drawable[]
             {
@@ -111,7 +106,7 @@ namespace osu.Game.Screens.Play
             using (BeginAbsoluteSequence(beginFadeTime))
                 this.FadeOut(fade_time);
 
-            button.Action = () => AdjustableClock?.Seek(startTime - skip_required_cutoff - fade_time);
+            button.Action = () => RequestSeek?.Invoke(startTime - skip_required_cutoff - fade_time);
 
             displayTime = Time.Current;
 
@@ -158,7 +153,7 @@ namespace osu.Game.Screens.Play
 
             public Visibility State
             {
-                get { return state; }
+                get => state;
                 set
                 {
                     bool stateChanged = value != state;
@@ -273,8 +268,7 @@ namespace osu.Game.Screens.Play
                                 Anchor = Anchor.TopCentre,
                                 RelativePositionAxes = Axes.Y,
                                 Y = 0.7f,
-                                TextSize = 12,
-                                Font = @"Exo2.0-Bold",
+                                Font = OsuFont.GetFont(weight: FontWeight.Bold, size: 12),
                                 Origin = Anchor.Centre,
                                 Text = @"SKIP",
                             },
@@ -313,7 +307,7 @@ namespace osu.Game.Screens.Play
 
             protected override bool OnClick(ClickEvent e)
             {
-                if (!Enabled)
+                if (!Enabled.Value)
                     return false;
 
                 sampleConfirm.Play();
