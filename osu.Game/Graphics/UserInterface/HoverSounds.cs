@@ -45,8 +45,10 @@ namespace osu.Game.Graphics.UserInterface
     {
         [Description("")]
         Loud,
+
         [Description("-soft")]
         Normal,
+
         [Description("-softer")]
         Soft
     }

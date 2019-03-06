@@ -58,5 +58,7 @@ namespace osu.Game.Rulesets.Judgements
         /// <param name="result">The <see cref="JudgementResult"/> to find the numeric health increase for.</param>
         /// <returns>The numeric health increase of <paramref name="result"/>.</returns>
         public double HealthIncreaseFor(JudgementResult result) => HealthIncreaseFor(result.Type);
+
+        public override string ToString() => $"AffectsCombo:{AffectsCombo} MaxResult:{MaxResult} MaxScore:{MaxNumericResult}";
     }
 }

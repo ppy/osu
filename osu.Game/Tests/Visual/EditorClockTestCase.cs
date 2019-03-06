@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Input.Events;
 using osu.Framework.Timing;
 using osu.Game.Beatmaps;
@@ -41,10 +42,10 @@ namespace osu.Game.Tests.Visual
             Beatmap.BindValueChanged(beatmapChanged, true);
         }
 
-        private void beatmapChanged(WorkingBeatmap working)
+        private void beatmapChanged(ValueChangedEvent<WorkingBeatmap> e)
         {
-            Clock.ControlPointInfo = working.Beatmap.ControlPointInfo;
-            Clock.ChangeSource((IAdjustableClock)working.Track ?? new StopwatchClock());
+            Clock.ControlPointInfo = e.NewValue.Beatmap.ControlPointInfo;
+            Clock.ChangeSource((IAdjustableClock)e.NewValue.Track ?? new StopwatchClock());
             Clock.ProcessFrame();
         }
 

@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -21,37 +22,20 @@ namespace osu.Game.Overlays.BeatmapSet
         private const float metadata_width = 225;
         private const float spacing = 20;
 
-        private readonly MetadataSection source, tags;
         private readonly Box successRateBackground;
         private readonly SuccessRate successRate;
 
-        private BeatmapSetInfo beatmapSet;
-        public BeatmapSetInfo BeatmapSet
-        {
-            get { return beatmapSet; }
-            set
-            {
-                if (value == beatmapSet) return;
-                beatmapSet = value;
-
-                updateDisplay();
-            }
-        }
-
-        private void updateDisplay()
-        {
-            source.Text = BeatmapSet?.Metadata.Source ?? string.Empty;
-            tags.Text = BeatmapSet?.Metadata.Tags ?? string.Empty;
-        }
+        public readonly Bindable<BeatmapSetInfo> BeatmapSet = new Bindable<BeatmapSetInfo>();
 
         public BeatmapInfo Beatmap
         {
-            get { return successRate.Beatmap; }
-            set { successRate.Beatmap = value; }
+            get => successRate.Beatmap;
+            set => successRate.Beatmap = value;
         }
 
         public Info()
         {
+            MetadataSection source, tags;
             RelativeSizeAxes = Axes.X;
             Height = 220;
             Masking = true;
@@ -129,14 +113,18 @@ namespace osu.Game.Overlays.BeatmapSet
                     },
                 },
             };
+
+            BeatmapSet.ValueChanged += b =>
+            {
+                source.Text = b.NewValue?.Metadata.Source ?? string.Empty;
+                tags.Text = b.NewValue?.Metadata.Tags ?? string.Empty;
+            };
         }
 
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
             successRateBackground.Colour = colours.GrayE;
-
-            updateDisplay();
         }
 
         private class MetadataSection : FillFlowContainer
@@ -156,14 +144,14 @@ namespace osu.Game.Overlays.BeatmapSet
 
                     this.FadeIn(transition_duration);
                     textFlow.Clear();
-                    textFlow.AddText(value, s => s.TextSize = 14);
+                    textFlow.AddText(value, s => s.Font = s.Font.With(size: 14));
                 }
             }
 
             public Color4 TextColour
             {
-                get { return textFlow.Colour; }
-                set { textFlow.Colour = value; }
+                get => textFlow.Colour;
+                set => textFlow.Colour = value;
             }
 
             public MetadataSection(string title)
@@ -177,8 +165,7 @@ namespace osu.Game.Overlays.BeatmapSet
                     header = new OsuSpriteText
                     {
                         Text = title,
-                        Font = @"Exo2.0-Bold",
-                        TextSize = 14,
+                        Font = OsuFont.GetFont(size: 14, weight: FontWeight.Bold),
                         Shadow = false,
                         Margin = new MarginPadding { Top = 20 },
                     },

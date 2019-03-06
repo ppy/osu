@@ -3,6 +3,7 @@
 
 using osuTK;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Animations;
 using osu.Framework.Graphics.Textures;
@@ -63,7 +64,7 @@ namespace osu.Game.Storyboards.Drawables
         }
 
         [BackgroundDependencyLoader]
-        private void load(IBindableBeatmap beatmap, TextureStore textureStore)
+        private void load(IBindable<WorkingBeatmap> beatmap, TextureStore textureStore)
         {
             var basePath = Animation.Path.ToLowerInvariant();
             for (var frame = 0; frame < Animation.FrameCount; frame++)
@@ -77,6 +78,7 @@ namespace osu.Game.Storyboards.Drawables
                 var texture = textureStore.Get(path);
                 AddFrame(texture, Animation.FrameDelay);
             }
+
             Animation.ApplyTransforms(this);
         }
     }

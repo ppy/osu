@@ -55,5 +55,7 @@ namespace osu.Game.Rulesets.Judgements
         {
             Judgement = judgement;
         }
+
+        public override string ToString() => $"{Type} (Score:{Judgement.NumericResultFor(this)} HP:{Judgement.HealthIncreaseFor(this)} {Judgement})";
     }
 }
