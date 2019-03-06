@@ -74,7 +74,7 @@ namespace osu.Game.Screens
         }
 
         /// <summary>
-        /// Unbind and return leases for all <see cref="Bindable{T}"/>s managed by the exiting screen.
+        /// Unbind and return leases for all <see cref="Bindable{T}"/>s managed by this screen.
         /// </summary>
         /// <remarks>
         /// While all bindables will eventually be cleaned up by disposal logic, this is too late as
