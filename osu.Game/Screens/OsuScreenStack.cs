@@ -21,7 +21,6 @@ namespace osu.Game.Screens
             ScreenExited += unbindAllDependencies;
         }
 
-
         /// <summary> Return all child dependency bindables created by the exiting screen </summary>
         /// <remarks>
         /// While all bindables will eventually be returned by disposal logic,
