@@ -10,6 +10,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Cursor;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Mods;
 using osuTK;
@@ -47,6 +48,8 @@ namespace osu.Game.Rulesets.UI
         /// </summary>
         public readonly BindableBool DisplayJudgements = new BindableBool(true);
 
+        public readonly BindableBool HasReplayLoaded = new BindableBool();
+
         /// <summary>
         /// Creates a new <see cref="Playfield"/>.
         /// </summary>
@@ -55,6 +58,8 @@ namespace osu.Game.Rulesets.UI
             RelativeSizeAxes = Axes.Both;
 
             hitObjectContainerLazy = new Lazy<HitObjectContainer>(CreateHitObjectContainer);
+
+            Cursor = CreateCursor();
         }
 
         private WorkingBeatmap beatmap;
@@ -81,6 +86,16 @@ namespace osu.Game.Rulesets.UI
         /// </summary>
         /// <param name="h">The DrawableHitObject to remove.</param>
         public virtual bool Remove(DrawableHitObject h) => HitObjectContainer.Remove(h);
+
+        /// <summary>
+        /// Creates the cursor. May be null if no cursor is required.
+        /// </summary>
+        protected virtual CursorContainer CreateCursor() => null;
+
+        /// <summary>
+        /// The cursor provided by this <see cref="RulesetContainer"/>. May be null if no cursor is provided.
+        /// </summary>
+        public CursorContainer Cursor { get; }
 
         /// <summary>
         /// Registers a <see cref="Playfield"/> as a nested <see cref="Playfield"/>.

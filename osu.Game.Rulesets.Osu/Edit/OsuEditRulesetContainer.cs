@@ -16,8 +16,11 @@ namespace osu.Game.Rulesets.Osu.Edit
         {
         }
 
-        protected override CursorContainer CreateCursor() => null;
+        protected override Playfield CreatePlayfield() => new OsuPlayfieldNoCursor { Size = Vector2.One　};
 
-        protected override Playfield CreatePlayfield() => new OsuPlayfield { Size = Vector2.One　};
+        private class OsuPlayfieldNoCursor : OsuPlayfield
+        {
+            protected override CursorContainer CreateCursor() => null;
+        }
     }
 }

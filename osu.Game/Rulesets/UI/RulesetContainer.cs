@@ -76,12 +76,9 @@ namespace osu.Game.Rulesets.UI
         /// </summary>
         public Container Overlays { get; protected set; }
 
-        /// <summary>
-        /// The cursor provided by this <see cref="RulesetContainer"/>. May be null if no cursor is provided.
-        /// </summary>
-        public CursorContainer Cursor { get; }
+        public CursorContainer Cursor => Playfield.Cursor;
 
-        public bool ProvidingUserCursor => Cursor != null && !HasReplayLoaded.Value;
+        public bool ProvidingUserCursor => Playfield.Cursor != null && !HasReplayLoaded.Value;
 
         protected override bool OnHover(HoverEvent e) => true; // required for IProvideCursor
 
@@ -107,8 +104,6 @@ namespace osu.Game.Rulesets.UI
 
                 KeyBindingInputManager.UseParentInput = !paused.NewValue;
             };
-
-            Cursor = CreateCursor();
         }
 
         protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
@@ -264,9 +259,6 @@ namespace osu.Game.Rulesets.UI
                 },
                 Playfield
             });
-
-            if (Cursor != null)
-                KeyBindingInputManager.Add(Cursor);
 
             InternalChildren = new Drawable[]
             {
