@@ -5,6 +5,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Events;
+using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osuTK;
@@ -36,7 +37,7 @@ namespace osu.Game.Overlays.Profile.Header
             }
         }
 
-        public MarginPadding Padding
+        public new MarginPadding Padding
         {
             get => TabContainer.Padding;
             set => TabContainer.Padding = value;
@@ -78,7 +79,7 @@ namespace osu.Game.Overlays.Profile.Header
                     accentColour = value;
 
                     bar.Colour = value;
-                    if (!Active) text.Colour = value;
+                    if (!Active.Value) text.Colour = value;
                 }
             }
 
@@ -96,8 +97,7 @@ namespace osu.Game.Overlays.Profile.Header
                         Origin = Anchor.BottomLeft,
                         Anchor = Anchor.BottomLeft,
                         Text = value,
-                        TextSize = 14,
-                        Font = "Exo2.0-Bold",
+                        Font = OsuFont.GetFont(size: 14, weight: FontWeight.Bold)
                     },
                     bar = new Circle
                     {
@@ -112,7 +112,7 @@ namespace osu.Game.Overlays.Profile.Header
 
             protected override bool OnHover(HoverEvent e)
             {
-                if (!Active)
+                if (!Active.Value)
                     onActivated(true);
                 return base.OnHover(e);
             }
@@ -121,7 +121,7 @@ namespace osu.Game.Overlays.Profile.Header
             {
                 base.OnHoverLost(e);
 
-                if (!Active)
+                if (!Active.Value)
                     OnDeactivated();
             }
 
@@ -134,7 +134,7 @@ namespace osu.Game.Overlays.Profile.Header
             {
                 text.FadeColour(AccentColour, 120, Easing.InQuad);
                 bar.ResizeHeightTo(0, 120, Easing.InQuad);
-                text.Font = "Exo2.0-Medium";
+                text.Font = text.Font.With(Typeface.Exo, weight: FontWeight.Medium);
             }
 
             private void onActivated(bool fake = false)
@@ -142,7 +142,7 @@ namespace osu.Game.Overlays.Profile.Header
                 text.FadeColour(Color4.White, 120, Easing.InQuad);
                 bar.ResizeHeightTo(7.5f, 120, Easing.InQuad);
                 if (!fake)
-                    text.Font = "Exo2.0-Bold";
+                    text.Font = text.Font.With(Typeface.Exo, weight: FontWeight.Bold);
             }
         }
     }
