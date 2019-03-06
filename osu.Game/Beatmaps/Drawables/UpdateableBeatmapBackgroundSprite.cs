@@ -44,7 +44,7 @@ namespace osu.Game.Beatmaps.Drawables
                 else
                 {
                     // Use the default background if somehow an online set does not exist and we don't have a local copy.
-                    drawable = new BeatmapBackgroundSprite(beatmaps.GetWorkingBeatmap(null));
+                    drawable = new BeatmapBackgroundSprite(beatmaps.DefaultBeatmap);
                 }
 
                 drawable.RelativeSizeAxes = Axes.Both;
