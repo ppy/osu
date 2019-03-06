@@ -53,6 +53,9 @@ namespace osu.Game.Screens.Multi.Match
 
         private MatchLeaderboard leaderboard;
 
+        [Resolved]
+        private Bindable<Room> currentRoom { get; set; }
+
         public MatchSubScreen(Room room)
         {
             Title = room.RoomID.Value == null ? "New room" : room.Name.Value;
@@ -182,6 +185,10 @@ namespace osu.Game.Screens.Multi.Match
         public override bool OnExiting(IScreen next)
         {
             RoomManager?.PartRoom();
+
+            if (roomId.Value == null)
+                currentRoom.Value = new Room();
+
             return base.OnExiting(next);
         }
 
