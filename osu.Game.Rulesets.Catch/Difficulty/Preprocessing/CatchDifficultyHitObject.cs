@@ -21,7 +21,7 @@ namespace osu.Game.Rulesets.Catch.Difficulty.Preprocessing
         public readonly float LastNormalizedPosition;
 
         /// <summary>
-        /// Milliseconds elapsed since the start time of the previous <see cref="CatchDifficultyHitObject"/>, with a minimum of 25ms.
+        /// Milliseconds elapsed since the start time of the previous <see cref="CatchDifficultyHitObject"/>, with a minimum of 40ms.
         /// </summary>
         public readonly double StrainTime;
 
@@ -34,8 +34,8 @@ namespace osu.Game.Rulesets.Catch.Difficulty.Preprocessing
             NormalizedPosition = BaseObject.X * CatchPlayfield.BASE_WIDTH * scalingFactor;
             LastNormalizedPosition = LastObject.X * CatchPlayfield.BASE_WIDTH * scalingFactor;
 
-            // Every strain interval is hard capped at the equivalent of 600 BPM streaming speed as a safety measure
-            StrainTime = Math.Max(25, DeltaTime);
+            // Every strain interval is hard capped at the equivalent of 375 BPM streaming speed as a safety measure
+            StrainTime = Math.Max(40, DeltaTime);
         }
     }
 }
