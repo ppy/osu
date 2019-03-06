@@ -186,10 +186,13 @@ namespace osu.Game.Users
         {
             [Description("Keyboard")]
             Keyboard,
+
             [Description("Mouse")]
             Mouse,
+
             [Description("Tablet")]
             Tablet,
+
             [Description("Touch Screen")]
             Touch,
         }

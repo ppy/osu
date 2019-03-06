@@ -48,13 +48,17 @@ namespace osu.Game.Overlays.Profile.Header
         private APIAccess apiAccess { get; set; }
 
         private User user;
+
         public User User
         {
             get => user;
             set
             {
-                if (user == value) return;
+                if (user == value)
+                    return;
+
                 user = value;
+
                 updateDisplay();
             }
         }
@@ -183,7 +187,7 @@ namespace osu.Game.Overlays.Profile.Header
                                 {
                                     Anchor = Anchor.Centre,
                                     Origin = Anchor.Centre,
-                                    Font = OsuFont.GetFont(size: 20, weight: FontWeight.Medium)
+                                    Font = OsuFont.GetFont(size: 20)
                                 }
                             }
                         },

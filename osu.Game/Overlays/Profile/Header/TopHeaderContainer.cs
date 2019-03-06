@@ -28,13 +28,17 @@ namespace osu.Game.Overlays.Profile.Header
         private const float avatar_size = 110;
 
         private User user;
+
         public User User
         {
             get => user;
             set
             {
-                if (user == value) return;
+                if (user == value)
+                    return;
+
                 user = value;
+
                 updateDisplay();
             }
         }
