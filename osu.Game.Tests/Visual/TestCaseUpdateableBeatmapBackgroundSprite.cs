@@ -36,11 +36,9 @@ namespace osu.Game.Tests.Visual
             api.Queue(req);
 
             AddStep("load null beatmap", () => beatmapBindable.Value = null);
-            AddWaitStep(20, "wait for transition...");
-            AddAssert("ensure only 1 child is present", () => backgroundSprite.ChildCount == 1);
+            AddUntilStep(() => backgroundSprite.ChildCount == 1, "wait for cleanup...");
             AddStep("load imported beatmap", () => beatmapBindable.Value = imported.Beatmaps.First());
-            AddWaitStep(20, "wait for transition...");
-            AddAssert("ensure only 1 child is present", () => backgroundSprite.ChildCount == 1);
+            AddUntilStep(() => backgroundSprite.ChildCount == 1, "wait for cleanup...");
 
             if (api.IsLoggedIn)
             {
@@ -49,8 +47,7 @@ namespace osu.Game.Tests.Visual
                 {
                     BeatmapSet = req.Result?.ToBeatmapSet(rulesets)
                 });
-                AddWaitStep(20, "wait for transition...");
-                AddAssert("ensure only 1 child is present", () => backgroundSprite.ChildCount == 1);
+                AddUntilStep(() => backgroundSprite.ChildCount == 1, "wait for cleanup...");
             }
             else
             {
