@@ -24,13 +24,17 @@ namespace osu.Game.Overlays.Profile.Header
         private Color4 linkBlue, communityUserGrayGreenLighter;
 
         private User user;
+
         public User User
         {
             get => user;
             set
             {
-                if (user == value) return;
+                if (user == value)
+                    return;
+
                 user = value;
+
                 updateDisplay();
             }
         }
@@ -131,9 +135,8 @@ namespace osu.Game.Overlays.Profile.Header
                     });
                 }
                 else
-                {
                     bottomLinkContainer.AddText(" " + content, bold);
-                }
+
                 addSpacer(bottomLinkContainer);
             }
 
