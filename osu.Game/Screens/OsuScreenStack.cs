@@ -18,6 +18,6 @@ namespace osu.Game.Screens
             ScreenExited += onExited;
         }
 
-        private void onExited(IScreen prev, IScreen next) => (prev as OsuScreen)?.UnbindAll();
+        private void onExited(IScreen prev, IScreen next) => (prev as OsuScreen)?.UnbindAllBindables();
     }
 }
