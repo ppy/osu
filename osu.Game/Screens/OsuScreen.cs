@@ -73,6 +73,20 @@ namespace osu.Game.Screens
             return deps;
         }
 
+        /// <summary>
+        /// Unbind and return leases for all <see cref="Bindable{T}"/>s managed by the exiting screen.
+        /// </summary>
+        /// <remarks>
+        /// While all bindables will eventually be returned by disposal logic, this is too late as
+        /// leases would be in a leased state during exiting transitions.
+        /// This localised handling ensures a correct leased state before <see cref="IScreen.OnResuming"/>.
+        /// </remarks>
+        public void UnbindAll()
+        {
+            (Beatmap as LeasedBindable<WorkingBeatmap>)?.UnbindAll();
+            (Ruleset as LeasedBindable<RulesetInfo>)?.UnbindAll();
+        }
+
         protected BackgroundScreen Background => backgroundStack?.CurrentScreen as BackgroundScreen;
 
         private BackgroundScreen localBackground;
