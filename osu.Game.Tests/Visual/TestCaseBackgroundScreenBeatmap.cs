@@ -188,10 +188,10 @@ namespace osu.Game.Tests.Visual
         public void PauseTest()
         {
             performFullSetup(true);
-            AddStep("Pause", () => player.CurrentPauseContainer.Pause());
+            AddStep("Pause", () => player.CurrentPausableGameplayContainer.Pause());
             waitForDim();
             AddAssert("Screen is dimmed", () => songSelect.IsBackgroundDimmed());
-            AddStep("Unpause", () => player.CurrentPauseContainer.Resume());
+            AddStep("Unpause", () => player.CurrentPausableGameplayContainer.Resume());
             waitForDim();
             AddAssert("Screen is dimmed", () => songSelect.IsBackgroundDimmed());
         }
@@ -328,7 +328,7 @@ namespace osu.Game.Tests.Visual
                 };
             }
 
-            public PauseContainer CurrentPauseContainer => PauseContainer;
+            public PausableGameplayContainer CurrentPausableGameplayContainer => PausableGameplayContainer;
 
             public UserDimContainer CurrentStoryboardContainer => StoryboardContainer;
 
