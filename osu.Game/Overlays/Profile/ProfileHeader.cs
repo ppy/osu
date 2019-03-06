@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
-using osu.Framework.Configuration;
 using osuTK.Graphics;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
@@ -15,6 +14,7 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Overlays.Profile.Header;
 using osu.Game.Users;
+using osu.Framework.Bindables;
 
 namespace osu.Game.Overlays.Profile
 {
@@ -145,7 +145,7 @@ namespace osu.Game.Overlays.Profile
             infoTabControl.AddItem("Modding");
 
             centerHeaderContainer.DetailsVisible.BindTo(DetailsVisible);
-            DetailsVisible.ValueChanged += newValue => detailHeaderContainer.Alpha = newValue ? 0 : 1;
+            DetailsVisible.ValueChanged += visible => detailHeaderContainer.Alpha = visible.NewValue ? 0 : 1;
         }
 
         [BackgroundDependencyLoader]
@@ -224,13 +224,11 @@ namespace osu.Game.Overlays.Profile
                         },
                         title = new OsuSpriteText
                         {
-                            Font = "Exo2.0-Bold",
-                            TextSize = big ? 14 : 12,
+                            Font = OsuFont.GetFont(size: big ? 14 : 12, weight: FontWeight.Bold)
                         },
                         content = new OsuSpriteText
                         {
-                            Font = "Exo2.0-Light",
-                            TextSize = big ? 40 : 18,
+                            Font = OsuFont.GetFont(size: big ? 40 : 18, weight: FontWeight.Light)
                         },
                         new Container //Add a minimum size to the FillFlowContainer
                         {

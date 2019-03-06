@@ -3,7 +3,7 @@
 
 using System.Collections.Generic;
 using osu.Framework.Allocation;
-using osu.Framework.Configuration;
+using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -108,8 +108,7 @@ namespace osu.Game.Overlays.Profile.Header
                                         {
                                             Anchor = Anchor.CentreLeft,
                                             Origin = Anchor.CentreLeft,
-                                            TextSize = 16,
-                                            Font = "Exo2.0-Bold"
+                                            Font = OsuFont.GetFont(weight: FontWeight.Bold)
                                         }
                                     }
                                 }
@@ -182,10 +181,9 @@ namespace osu.Game.Overlays.Profile.Header
                                 },
                                 levelBadgeText = new OsuSpriteText
                                 {
-                                    TextSize = 20,
-                                    Font = "Exo2.0-Medium",
                                     Anchor = Anchor.Centre,
                                     Origin = Anchor.Centre,
+                                    Font = OsuFont.GetFont(size: 20, weight: FontWeight.Medium)
                                 }
                             }
                         },
@@ -215,8 +213,7 @@ namespace osu.Game.Overlays.Profile.Header
                                 {
                                     Anchor = Anchor.BottomRight,
                                     Origin = Anchor.TopRight,
-                                    Font = "Exo2.0-Bold",
-                                    TextSize = 12,
+                                    Font = OsuFont.GetFont(size: 12, weight: FontWeight.Bold)
                                 }
                             }
                         },
@@ -248,9 +245,12 @@ namespace osu.Game.Overlays.Profile.Header
                 }
             };
 
-            DetailsVisible.ValueChanged += newValue => expandButtonIcon.Icon = newValue ? FontAwesome.fa_chevron_down : FontAwesome.fa_chevron_up;
-            DetailsVisible.ValueChanged += newValue => hiddenDetailContainer.Alpha = newValue ? 1 : 0;
-            DetailsVisible.ValueChanged += newValue => expandedDetailContainer.Alpha = newValue ? 0 : 1;
+            DetailsVisible.ValueChanged += visible =>
+            {
+                expandButtonIcon.Icon = visible.NewValue ? FontAwesome.fa_chevron_down : FontAwesome.fa_chevron_up;
+                hiddenDetailContainer.Alpha = visible.NewValue ? 1 : 0;
+                expandedDetailContainer.Alpha = visible.NewValue ? 0 : 1;
+            };
         }
 
         private void updateDisplay()
