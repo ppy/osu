@@ -48,8 +48,6 @@ namespace osu.Game.Rulesets.UI
         /// </summary>
         public readonly BindableBool DisplayJudgements = new BindableBool(true);
 
-        public readonly BindableBool HasReplayLoaded = new BindableBool();
-
         /// <summary>
         /// Creates a new <see cref="Playfield"/>.
         /// </summary>
