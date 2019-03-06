@@ -18,9 +18,12 @@ namespace osu.Game.Beatmaps.Drawables
         [Resolved]
         private BeatmapManager beatmaps { get; set; }
 
-        public UpdateableBeatmapBackgroundSprite()
+        private readonly BeatmapSetCoverType beatmapSetCoverType;
+
+        public UpdateableBeatmapBackgroundSprite(BeatmapSetCoverType beatmapSetCoverType = BeatmapSetCoverType.Cover)
         {
             Beatmap.BindValueChanged(b => Model = b.NewValue);
+            this.beatmapSetCoverType = beatmapSetCoverType;
         }
 
         protected override Drawable CreateDrawable(BeatmapInfo model)
@@ -31,10 +34,18 @@ namespace osu.Game.Beatmaps.Drawables
 
                 var localBeatmap = beatmaps.GetWorkingBeatmap(model);
 
-                if (localBeatmap.BeatmapInfo.ID == 0 && model?.BeatmapSet?.OnlineInfo != null)
-                    drawable = new BeatmapSetCover(model.BeatmapSet);
-                else
+                if (model?.BeatmapSet?.OnlineInfo != null)
+                    drawable = new BeatmapSetCover(model.BeatmapSet, beatmapSetCoverType);
+                else if (localBeatmap.BeatmapInfo.ID != 0)
+                {
+                    // Fall back to local background if one exists
                     drawable = new BeatmapBackgroundSprite(localBeatmap);
+                }
+                else
+                {
+                    // Use the default background if somehow an online set does not exist and we don't have a local copy.
+                    drawable = new BeatmapBackgroundSprite(beatmaps.DefaultBeatmap);
+                }
 
                 drawable.RelativeSizeAxes = Axes.Both;
                 drawable.Anchor = Anchor.Centre;
