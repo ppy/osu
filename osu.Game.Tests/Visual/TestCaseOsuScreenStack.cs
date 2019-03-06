@@ -16,8 +16,8 @@ namespace osu.Game.Tests.Visual
         [SetUp]
         private void setup()
         {
-            baseScreen.MakeCurrent();
-            baseScreen.Exit();
+            baseScreen?.MakeCurrent();
+            baseScreen?.Exit();
         }
 
         /// <summary>
