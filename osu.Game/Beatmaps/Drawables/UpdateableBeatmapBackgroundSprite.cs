@@ -40,7 +40,7 @@ namespace osu.Game.Beatmaps.Drawables
                 // If the model has changed since the previous unload (or if there was no load), then we can safely use the given content
                 lastModel = Beatmap.Value;
                 return content;
-            }, 500, 10000);
+            }, timeBeforeLoad, 10000);
         }
 
         protected override Drawable CreateDrawable(BeatmapInfo model)
