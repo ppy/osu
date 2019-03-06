@@ -13,6 +13,13 @@ namespace osu.Game.Tests.Visual
         private TestOsuScreen baseScreen;
         private TestScreenWithBeatmapBackground newScreen;
 
+        [SetUp]
+        private void setup()
+        {
+            baseScreen.MakeCurrent();
+            baseScreen.Exit();
+        }
+
         /// <summary>
         /// Make sure that OsuScreen dependencies are returned immediately after Exit is called.
         /// </summary>
