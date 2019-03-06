@@ -118,7 +118,7 @@ namespace osu.Game.Overlays.Direct
 
         private void onRequestFailure(Exception e) => Schedule(() => attachDownload(null));
 
-        private void setAdded(BeatmapSetInfo s, bool existing, bool silent) => setDownloadStateFromManager(s, DownloadState.LocallyAvailable);
+        private void setAdded(BeatmapSetInfo s, bool existing) => setDownloadStateFromManager(s, DownloadState.LocallyAvailable);
 
         private void setRemoved(BeatmapSetInfo s) => setDownloadStateFromManager(s, DownloadState.NotDownloaded);
 
