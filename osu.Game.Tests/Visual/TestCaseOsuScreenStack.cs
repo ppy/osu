@@ -14,7 +14,7 @@ namespace osu.Game.Tests.Visual
         private TestScreenWithBeatmapBackground newScreen;
 
         [SetUp]
-        private void setup()
+        public void SetUp()
         {
             baseScreen?.MakeCurrent();
             baseScreen?.Exit();
