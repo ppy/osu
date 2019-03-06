@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Humanizer;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -61,7 +62,7 @@ namespace osu.Game.Screens.Select
                 return true;
 
             Beatmap.Value = beatmaps.GetWorkingBeatmap(CurrentItem.Value?.Beatmap);
-            Beatmap.Value.Mods.Value = selectedMods.Value = CurrentItem.Value?.RequiredMods;
+            Beatmap.Value.Mods.Value = selectedMods.Value = CurrentItem.Value?.RequiredMods ?? Enumerable.Empty<Mod>();
             Ruleset.Value = CurrentItem.Value?.Ruleset;
 
             Beatmap.Disabled = true;
