@@ -14,6 +14,7 @@ using osuTK;
 using osuTK.Graphics;
 using osu.Game.Screens.Tournament.Teams;
 using osu.Framework.Graphics.Shapes;
+using osu.Game.Graphics;
 
 namespace osu.Game.Screens.Tournament
 {
@@ -52,8 +53,7 @@ namespace osu.Game.Screens.Tournament
                     Position = new Vector2(0, 7f),
 
                     Text = $"GROUP {name.ToUpperInvariant()}",
-                    TextSize = 8f,
-                    Font = @"Exo2.0-Bold",
+                    Font = OsuFont.GetFont(weight: FontWeight.Bold, size: 8),
                     Colour = new Color4(255, 204, 34, 255),
                 },
                 teams = new FillFlowContainer<GroupTeam>
@@ -162,8 +162,7 @@ namespace osu.Game.Screens.Tournament
                                 Origin = Anchor.TopCentre,
 
                                 Text = team.Acronym.ToUpperInvariant(),
-                                TextSize = 10f,
-                                Font = @"Exo2.0-Bold"
+                                Font = OsuFont.GetFont(weight: FontWeight.Bold, size: 10),
                             }
                         }
                     }

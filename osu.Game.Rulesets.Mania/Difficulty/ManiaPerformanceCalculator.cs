@@ -114,8 +114,8 @@ namespace osu.Game.Rulesets.Mania.Difficulty
             // Lots of arbitrary values from testing.
             // Considering to use derivation from perfect accuracy in a probabilistic manner - assume normal distribution
             double accuracyValue = Math.Max(0.0, 0.2 - (Attributes.GreatHitWindow - 34) * 0.006667)
-                                       * strainValue
-                                       * Math.Pow(Math.Max(0.0, scaledScore - 960000) / 40000, 1.1);
+                                   * strainValue
+                                   * Math.Pow(Math.Max(0.0, scaledScore - 960000) / 40000, 1.1);
 
             // Bonus for many hitcircles - it's harder to keep good accuracy up for longer
             // accuracyValue *= Math.Min(1.15, Math.Pow(totalHits / 1500.0, 0.3));

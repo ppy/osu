@@ -40,29 +40,29 @@ namespace osu.Game.Rulesets.Mania.Tests
         protected override Ruleset CreateRuleset() => new ManiaRuleset();
     }
 
-     public class ManiaConvertMapping : ConvertMapping<ConvertValue>, IEquatable<ManiaConvertMapping>
-     {
-         public uint RandomW;
-         public uint RandomX;
-         public uint RandomY;
-         public uint RandomZ;
+    public class ManiaConvertMapping : ConvertMapping<ConvertValue>, IEquatable<ManiaConvertMapping>
+    {
+        public uint RandomW;
+        public uint RandomX;
+        public uint RandomY;
+        public uint RandomZ;
 
-         public ManiaConvertMapping()
-         {
-         }
+        public ManiaConvertMapping()
+        {
+        }
 
-         public ManiaConvertMapping(IBeatmapConverter converter)
-         {
-             var maniaConverter = (ManiaBeatmapConverter)converter;
-             RandomW = maniaConverter.Random.W;
-             RandomX = maniaConverter.Random.X;
-             RandomY = maniaConverter.Random.Y;
-             RandomZ = maniaConverter.Random.Z;
-         }
+        public ManiaConvertMapping(IBeatmapConverter converter)
+        {
+            var maniaConverter = (ManiaBeatmapConverter)converter;
+            RandomW = maniaConverter.Random.W;
+            RandomX = maniaConverter.Random.X;
+            RandomY = maniaConverter.Random.Y;
+            RandomZ = maniaConverter.Random.Z;
+        }
 
-         public bool Equals(ManiaConvertMapping other) => other != null && RandomW == other.RandomW && RandomX == other.RandomX && RandomY == other.RandomY && RandomZ == other.RandomZ;
-         public override bool Equals(ConvertMapping<ConvertValue> other) => base.Equals(other) && Equals(other as ManiaConvertMapping);
-     }
+        public bool Equals(ManiaConvertMapping other) => other != null && RandomW == other.RandomW && RandomX == other.RandomX && RandomY == other.RandomY && RandomZ == other.RandomZ;
+        public override bool Equals(ConvertMapping<ConvertValue> other) => base.Equals(other) && Equals(other as ManiaConvertMapping);
+    }
 
     public struct ConvertValue : IEquatable<ConvertValue>
     {

@@ -8,8 +8,9 @@ namespace osu.Game.Screens.Charts
 {
     public class ChartListing : ScreenWhiteBox
     {
-        protected override IEnumerable<Type> PossibleChildren => new[] {
-                typeof(ChartInfo)
+        protected override IEnumerable<Type> PossibleChildren => new[]
+        {
+            typeof(ChartInfo)
         };
     }
 }

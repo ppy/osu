@@ -24,9 +24,6 @@ namespace osu.Game.Tests.Visual
     [Description("in BeatmapOverlay")]
     public class TestCaseBeatmapScoresContainer : OsuTestCase
     {
-        private readonly IEnumerable<APIScoreInfo> scores;
-        private readonly IEnumerable<APIScoreInfo> anotherScores;
-        private readonly APIScoreInfo topScoreInfo;
         private readonly Box background;
 
         public TestCaseBeatmapScoresContainer()
@@ -48,15 +45,7 @@ namespace osu.Game.Tests.Visual
                 }
             };
 
-            AddStep("scores pack 1", () => scoresContainer.Scores = scores);
-            AddStep("scores pack 2", () => scoresContainer.Scores = anotherScores);
-            AddStep("only top score", () => scoresContainer.Scores = new[] { topScoreInfo });
-            AddStep("remove scores", () => scoresContainer.Scores = null);
-            AddStep("resize to big", () => container.ResizeWidthTo(1, 300));
-            AddStep("resize to normal", () => container.ResizeWidthTo(0.8f, 300));
-            AddStep("online scores", () => scoresContainer.Beatmap = new BeatmapInfo { OnlineBeatmapID = 75, Ruleset = new OsuRuleset().RulesetInfo });
-
-            scores = new[]
+            IEnumerable<APIScoreInfo> scores = new[]
             {
                 new APIScoreInfo
                 {
@@ -161,6 +150,7 @@ namespace osu.Game.Tests.Visual
                     Accuracy = 0.6543,
                 },
             };
+
             foreach (var s in scores)
             {
                 s.Statistics.Add(HitResult.Great, RNG.Next(2000));
@@ -169,7 +159,7 @@ namespace osu.Game.Tests.Visual
                 s.Statistics.Add(HitResult.Miss, RNG.Next(2000));
             }
 
-            anotherScores = new[]
+            IEnumerable<APIScoreInfo> anotherScores = new[]
             {
                 new APIScoreInfo
                 {
@@ -282,7 +272,7 @@ namespace osu.Game.Tests.Visual
                 s.Statistics.Add(HitResult.Miss, RNG.Next(2000));
             }
 
-            topScoreInfo = new APIScoreInfo
+            var topScoreInfo = new APIScoreInfo
             {
                 User = new User
                 {

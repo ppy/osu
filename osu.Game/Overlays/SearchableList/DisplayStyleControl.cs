@@ -1,8 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using osu.Framework.Bindables;
 using osuTK;
-using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics;
@@ -78,13 +78,13 @@ namespace osu.Game.Overlays.SearchableList
                 };
 
                 bindable.ValueChanged += Bindable_ValueChanged;
-                Bindable_ValueChanged(bindable.Value);
+                Bindable_ValueChanged(new ValueChangedEvent<PanelDisplayStyle>(bindable.Value, bindable.Value));
                 Action = () => bindable.Value = this.style;
             }
 
-            private void Bindable_ValueChanged(PanelDisplayStyle style)
+            private void Bindable_ValueChanged(ValueChangedEvent<PanelDisplayStyle> e)
             {
-                icon.FadeTo(style == this.style ? 1.0f : 0.5f, 100);
+                icon.FadeTo(e.NewValue == style ? 1.0f : 0.5f, 100);
             }
 
             protected override void Dispose(bool isDisposing)

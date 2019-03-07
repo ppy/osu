@@ -111,8 +111,7 @@ namespace osu.Game.Screens.Ranking.Pages
                             Origin = Anchor.TopCentre,
                             Colour = colours.PinkDarker,
                             Shadow = false,
-                            Font = @"Exo2.0-Bold",
-                            TextSize = 16,
+                            Font = OsuFont.GetFont(weight: FontWeight.Bold),
                             Text = "total score",
                             Margin = new MarginPadding { Bottom = 15 },
                         },
@@ -214,17 +213,19 @@ namespace osu.Game.Screens.Ranking.Pages
             {
                 Children = new Drawable[]
                 {
-                    new OsuSpriteText {
+                    new OsuSpriteText
+                    {
                         Text = statistic.Value.ToString().PadLeft(4, '0'),
                         Colour = colours.Gray7,
-                        TextSize = 30,
+                        Font = OsuFont.GetFont(size: 30),
                         Anchor = Anchor.TopCentre,
                         Origin = Anchor.TopCentre,
                     },
-                    new OsuSpriteText {
+                    new OsuSpriteText
+                    {
                         Text = statistic.Key.GetDescription(),
                         Colour = colours.Gray7,
-                        Font = @"Exo2.0-Bold",
+                        Font = OsuFont.GetFont(weight: FontWeight.Bold),
                         Y = 26,
                         Anchor = Anchor.TopCentre,
                         Origin = Anchor.TopCentre,
@@ -307,24 +308,21 @@ namespace osu.Game.Screens.Ranking.Pages
                                 Anchor = Anchor.TopCentre,
                                 Origin = Anchor.TopCentre,
                                 Shadow = false,
-                                TextSize = 24,
-                                Font = @"Exo2.0-BoldItalic",
+                                Font = OsuFont.GetFont(weight: FontWeight.Bold, size: 24, italics: true),
                             },
                             artist = new OsuSpriteText
                             {
                                 Anchor = Anchor.TopCentre,
                                 Origin = Anchor.TopCentre,
                                 Shadow = false,
-                                TextSize = 20,
-                                Font = @"Exo2.0-BoldItalic",
+                                Font = OsuFont.GetFont(weight: FontWeight.Bold, size: 20, italics: true),
                             },
                             versionMapper = new OsuSpriteText
                             {
                                 Anchor = Anchor.TopCentre,
                                 Origin = Anchor.TopCentre,
                                 Shadow = false,
-                                TextSize = 16,
-                                Font = @"Exo2.0-Bold",
+                                Font = OsuFont.GetFont(weight: FontWeight.Bold),
                             },
                         }
                     }
@@ -338,7 +336,8 @@ namespace osu.Game.Screens.Ranking.Pages
                 versionMapper.Colour = colours.Gray8;
 
                 var creator = beatmap.Metadata.Author?.Username;
-                if (!string.IsNullOrEmpty(creator)) {
+                if (!string.IsNullOrEmpty(creator))
+                {
                     versionMapper.Text = $"mapped by {creator}";
 
                     if (!string.IsNullOrEmpty(beatmap.Version))
@@ -369,11 +368,10 @@ namespace osu.Game.Screens.Ranking.Pages
                     },
                     new OsuSpriteText
                     {
-                        Font = @"Exo2.0-RegularItalic",
-                        Text = user.Username,
                         Anchor = Anchor.BottomCentre,
                         Origin = Anchor.BottomCentre,
-                        TextSize = 30,
+                        Text = user.Username,
+                        Font = OsuFont.GetFont(size: 30, weight: FontWeight.Regular, italics: true),
                         Padding = new MarginPadding { Bottom = 10 },
                     }
                 };
@@ -393,10 +391,11 @@ namespace osu.Game.Screens.Ranking.Pages
 
             protected override Easing RollingEasing => Easing.OutPow10;
 
-            public SlowScoreCounter(uint leading = 0) : base(leading)
+            public SlowScoreCounter(uint leading = 0)
+                : base(leading)
             {
                 DisplayedCountSpriteText.Shadow = false;
-                DisplayedCountSpriteText.Font = @"Venera-Light";
+                DisplayedCountSpriteText.Font = DisplayedCountSpriteText.Font.With(Typeface.Venera, weight: FontWeight.Light);
                 UseCommaSeparator = true;
             }
         }

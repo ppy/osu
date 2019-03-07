@@ -33,14 +33,14 @@ namespace osu.Game.Configuration
             Set(OsuSetting.Username, string.Empty);
             Set(OsuSetting.Token, string.Empty);
 
-            Set(OsuSetting.SavePassword, false).ValueChanged += val =>
+            Set(OsuSetting.SavePassword, false).ValueChanged += enabled =>
             {
-                if (val) Set(OsuSetting.SaveUsername, true);
+                if (enabled.NewValue) Set(OsuSetting.SaveUsername, true);
             };
 
-            Set(OsuSetting.SaveUsername, true).ValueChanged += val =>
+            Set(OsuSetting.SaveUsername, true).ValueChanged += enabled =>
             {
-                if (!val) Set(OsuSetting.SavePassword, false);
+                if (!enabled.NewValue) Set(OsuSetting.SavePassword, false);
             };
 
             Set(OsuSetting.ExternalLinkWarning, true);
@@ -71,9 +71,6 @@ namespace osu.Game.Configuration
             Set(OsuSetting.CursorRotation, true);
 
             Set(OsuSetting.MenuParallax, true);
-
-            Set(OsuSetting.SnakingInSliders, true);
-            Set(OsuSetting.SnakingOutSliders, true);
 
             // Gameplay
             Set(OsuSetting.DimLevel, 0.3, 0, 1, 0.01);
@@ -150,8 +147,6 @@ namespace osu.Game.Configuration
         DisplayStarsMinimum,
         DisplayStarsMaximum,
         RandomSelectAlgorithm,
-        SnakingInSliders,
-        SnakingOutSliders,
         ShowFpsDisplay,
         ChatDisplayHeight,
         Version,

@@ -56,6 +56,7 @@ namespace osu.Game.Tests.Visual
         });
 
         [Test]
+        [Ignore("polling is threaded, and it's very hard to hook into it correctly")]
         public void TestInstantPolling()
         {
             createPoller(true);
@@ -106,8 +107,11 @@ namespace osu.Game.Tests.Visual
 
         private void checkCount(int checkValue)
         {
-            Logger.Log($"value is {count}");
-            AddAssert($"count is {checkValue}", () => count == checkValue);
+            AddAssert($"count is {checkValue}", () =>
+            {
+                Logger.Log($"value is {count}");
+                return count == checkValue;
+            });
         }
 
         private void createPoller(bool instant) => AddStep("create poller", () =>

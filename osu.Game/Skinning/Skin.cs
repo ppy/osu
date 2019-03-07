@@ -49,6 +49,7 @@ namespace osu.Game.Skinning
         {
             if (isDisposed)
                 return;
+
             isDisposed = true;
         }
 

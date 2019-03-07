@@ -15,6 +15,7 @@ using osu.Game.Graphics.Sprites;
 using osu.Game.Overlays;
 using osuTK.Graphics;
 using osu.Framework.Lists;
+using osu.Game.Graphics;
 
 namespace osu.Game.Tests.Visual
 {
@@ -140,6 +141,7 @@ namespace osu.Game.Tests.Visual
             }
 
             private SortedList<TimingControlPoint> timingPoints => Beatmap.Value.Beatmap.ControlPointInfo.TimingPoints;
+
             private TimingControlPoint getNextTimingPoint(TimingControlPoint current)
             {
                 if (timingPoints[timingPoints.Count - 1] == current)
@@ -189,15 +191,15 @@ namespace osu.Game.Tests.Visual
 
             public double Value
             {
-                set { valueText.Text = $"{value:G}"; }
+                set => valueText.Text = $"{value:G}";
             }
 
             public InfoString(string header)
             {
                 AutoSizeAxes = Axes.Both;
                 Direction = FillDirection.Horizontal;
-                Add(new OsuSpriteText { Text = header + @": ", TextSize = text_size });
-                Add(valueText = new OsuSpriteText { TextSize = text_size });
+                Add(new OsuSpriteText { Text = header + @": ", Font = OsuFont.GetFont(size: text_size) });
+                Add(valueText = new OsuSpriteText { Font = OsuFont.GetFont(size: text_size) });
                 Margin = new MarginPadding(margin);
             }
         }

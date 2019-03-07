@@ -5,7 +5,8 @@ namespace osu.Game.Online.Chat
 {
     public class ErrorMessage : InfoMessage
     {
-        public ErrorMessage(string message) : base(message)
+        public ErrorMessage(string message)
+            : base(message)
         {
             Sender.Colour = @"ff0000";
         }

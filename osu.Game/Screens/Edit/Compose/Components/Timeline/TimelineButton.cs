@@ -2,7 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using osu.Framework.Configuration;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics;
@@ -19,8 +19,8 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
         public FontAwesome Icon
         {
-            get { return button.Icon; }
-            set { button.Icon = value; }
+            get => button.Icon;
+            set => button.Icon = value;
         }
 
         private readonly IconButton button;
