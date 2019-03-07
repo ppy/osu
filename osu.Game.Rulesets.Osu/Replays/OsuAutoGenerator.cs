@@ -10,12 +10,15 @@ using System.Linq;
 using osu.Framework.Graphics;
 using osu.Game.Replays;
 using osu.Game.Rulesets.Objects.Types;
+using osu.Game.Rulesets.Osu.Beatmaps;
 using osu.Game.Rulesets.Scoring;
 
 namespace osu.Game.Rulesets.Osu.Replays
 {
     public class OsuAutoGenerator : OsuAutoGeneratorBase
     {
+        public new OsuBeatmap Beatmap => (OsuBeatmap)base.Beatmap;
+
         #region Parameters
 
         /// <summary>
@@ -42,7 +45,7 @@ namespace osu.Game.Rulesets.Osu.Replays
 
         #region Construction / Initialisation
 
-        public OsuAutoGenerator(Beatmap<OsuHitObject> beatmap)
+        public OsuAutoGenerator(IBeatmap beatmap)
             : base(beatmap)
         {
             // Already superhuman, but still somewhat realistic
