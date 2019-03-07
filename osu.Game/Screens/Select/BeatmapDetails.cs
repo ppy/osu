@@ -175,7 +175,7 @@ namespace osu.Game.Screens.Select
 
         private void updateStatistics()
         {
-            if (Beatmap == null)
+            if (Beatmap?.OnlineBeatmapID == null)
             {
                 clearStats();
                 return;
