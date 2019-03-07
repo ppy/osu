@@ -63,7 +63,7 @@ namespace osu.Game.Screens.Menu
 
         private readonly float[] frequencyAmplitudes = new float[256];
 
-        private Shader shader;
+        private IShader shader;
         private readonly Texture texture;
 
         public LogoVisualisation()
@@ -146,7 +146,7 @@ namespace osu.Game.Screens.Menu
 
         private class VisualisationDrawNode : DrawNode
         {
-            public Shader Shader;
+            public IShader Shader;
             public Texture Texture;
 
             //Asuming the logo is a circle, we don't need a second dimension.
