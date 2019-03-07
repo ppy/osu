@@ -24,7 +24,7 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
     {
         private int currentIndex;
 
-        private Shader shader;
+        private IShader shader;
         private Texture texture;
 
         private Vector2 size => texture.Size * Scale;
@@ -79,7 +79,7 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
         [BackgroundDependencyLoader]
         private void load(ShaderManager shaders, TextureStore textures)
         {
-            shader = shaders?.Load(@"CursorTrail", FragmentShaderDescriptor.TEXTURE);
+            shader = shaders.Load(@"CursorTrail", FragmentShaderDescriptor.TEXTURE);
             texture = textures.Get(@"Cursor/cursortrail");
             Scale = new Vector2(1 / texture.ScaleAdjust);
         }
@@ -167,7 +167,7 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
 
         private class TrailDrawNode : DrawNode
         {
-            public Shader Shader;
+            public IShader Shader;
             public Texture Texture;
 
             public float Time;

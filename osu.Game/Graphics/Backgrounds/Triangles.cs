@@ -64,7 +64,7 @@ namespace osu.Game.Graphics.Backgrounds
 
         private readonly SortedList<TriangleParticle> parts = new SortedList<TriangleParticle>(Comparer<TriangleParticle>.Default);
 
-        private Shader shader;
+        private IShader shader;
         private readonly Texture texture;
 
         public Triangles()
@@ -75,7 +75,7 @@ namespace osu.Game.Graphics.Backgrounds
         [BackgroundDependencyLoader]
         private void load(ShaderManager shaders)
         {
-            shader = shaders?.Load(VertexShaderDescriptor.TEXTURE_2, FragmentShaderDescriptor.TEXTURE_ROUNDED);
+            shader = shaders.Load(VertexShaderDescriptor.TEXTURE_2, FragmentShaderDescriptor.TEXTURE_ROUNDED);
         }
 
         protected override void LoadComplete()
@@ -196,7 +196,7 @@ namespace osu.Game.Graphics.Backgrounds
 
         private class TrianglesDrawNode : DrawNode
         {
-            public Shader Shader;
+            public IShader Shader;
             public Texture Texture;
 
             public readonly List<TriangleParticle> Parts = new List<TriangleParticle>();
