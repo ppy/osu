@@ -118,9 +118,10 @@ namespace osu.Game.Screens.Play
                     OnQuit = performUserRequestedExit,
                     Start = gameplayClockContainer.Start,
                     Stop = gameplayClockContainer.Stop,
+                    IsPaused = { BindTarget = gameplayClockContainer.IsPaused },
 
                     CheckCanPause = () => AllowPause && ValidForResume && !HasFailed && !RulesetContainer.HasReplayLoaded.Value,
-                    Children = new Container[]
+                    Children = new[]
                     {
                         StoryboardContainer = CreateStoryboardContainer(),
                         new ScalingContainer(ScalingMode.Gameplay)
@@ -137,12 +138,12 @@ namespace osu.Game.Screens.Play
                             Origin = Anchor.Centre,
                             Breaks = working.Beatmap.Breaks
                         },
-                        new ScalingContainer(ScalingMode.Gameplay)
-                        {
-                            Child = RulesetContainer.Cursor?.CreateProxy() ?? new Container(),
-                        },
+                        RulesetContainer.Cursor?.CreateProxy() ?? new Container(),
                         HUDOverlay = new HUDOverlay(ScoreProcessor, RulesetContainer, working)
                         {
+                            HoldToQuit = { Action = performUserRequestedExit },
+                            PlayerSettingsOverlay = { PlaybackSettings = { UserPlaybackRate = { BindTarget = gameplayClockContainer.UserPlaybackRate } } },
+                            KeyCounter = { Visible = { BindTarget = RulesetContainer.HasReplayLoaded } },
                             RequestSeek = gameplayClockContainer.Seek,
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre
@@ -171,12 +172,7 @@ namespace osu.Game.Screens.Play
             };
 
             // bind clock into components that require it
-            PausableGameplayContainer.IsPaused.BindTo(gameplayClockContainer.IsPaused);
             RulesetContainer.IsPaused.BindTo(gameplayClockContainer.IsPaused);
-            HUDOverlay.PlayerSettingsOverlay.PlaybackSettings.UserPlaybackRate.BindTo(gameplayClockContainer.UserPlaybackRate);
-
-            HUDOverlay.HoldToQuit.Action = performUserRequestedExit;
-            HUDOverlay.KeyCounter.Visible.BindTo(RulesetContainer.HasReplayLoaded);
 
             if (ShowStoryboard.Value)
                 initializeStoryboard(false);
