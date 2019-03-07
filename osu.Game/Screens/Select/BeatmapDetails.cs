@@ -175,7 +175,7 @@ namespace osu.Game.Screens.Select
 
         private void updateStatistics()
         {
-            if (Beatmap?.OnlineBeatmapID == null)
+            if (Beatmap == null)
             {
                 clearStats();
                 return;
@@ -188,7 +188,7 @@ namespace osu.Game.Screens.Select
             tags.Text = Beatmap.Metadata.Tags;
 
             var requestedBeatmap = Beatmap;
-            if (requestedBeatmap.Metrics == null)
+            if (requestedBeatmap.Metrics == null && requestedBeatmap.OnlineBeatmapID != null)
             {
                 var lookup = new GetBeatmapDetailsRequest(requestedBeatmap);
                 lookup.Success += res =>
