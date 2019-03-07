@@ -19,7 +19,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
 
         private readonly BufferedContainer container;
 
-        public float PathWidth
+        public float PathRadius
         {
             get => path.PathRadius;
             set => path.PathRadius = value;
