@@ -56,14 +56,13 @@ namespace osu.Game.Overlays.Settings
                     Anchor = Anchor.TopCentre,
                     Origin = Anchor.TopCentre,
                     Text = game.Name,
-                    TextSize = 18,
-                    Font = @"Exo2.0-Bold",
+                    Font = OsuFont.GetFont(size: 18, weight: FontWeight.Bold),
                 },
                 new OsuSpriteText
                 {
                     Anchor = Anchor.TopCentre,
                     Origin = Anchor.TopCentre,
-                    TextSize = 14,
+                    Font = OsuFont.GetFont(size: 14),
                     Text = game.Version,
                     Colour = DebugUtils.IsDebug ? colours.Red : Color4.White,
                 },

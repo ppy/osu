@@ -1,20 +1,15 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using osuTK;
-using osuTK.Input;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Audio.Track;
-using osu.Framework.Configuration;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Logging;
 using osu.Framework.Input.Events;
+using osu.Framework.Logging;
 using osu.Framework.Screens;
 using osu.Framework.Threading;
 using osu.Game.Beatmaps;
@@ -31,7 +26,12 @@ using osu.Game.Screens.Menu;
 using osu.Game.Screens.Play;
 using osu.Game.Screens.Select.Options;
 using osu.Game.Skinning;
+using osuTK;
 using osuTK.Graphics;
+using osuTK.Input;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace osu.Game.Screens.Select
 {
@@ -44,8 +44,6 @@ namespace osu.Game.Screens.Select
         public readonly FilterControl FilterControl;
 
         protected virtual bool ShowFooter => true;
-
-        public override bool AllowExternalScreenChange => true;
 
         /// <summary>
         /// Can be null if <see cref="ShowFooter"/> is false.
@@ -78,7 +76,7 @@ namespace osu.Game.Screens.Select
 
         protected readonly BeatmapDetailArea BeatmapDetails;
 
-        protected new readonly Bindable<RulesetInfo> Ruleset = new Bindable<RulesetInfo>();
+        private readonly Bindable<RulesetInfo> decoupledRuleset = new Bindable<RulesetInfo>();
 
         [Cached]
         [Cached(Type = typeof(IBindable<IEnumerable<Mod>>))]
@@ -211,7 +209,7 @@ namespace osu.Game.Screens.Select
                 });
             }
 
-            BeatmapDetails.Leaderboard.ScoreSelected += s =>this.Push(new SoloResults(s));
+            BeatmapDetails.Leaderboard.ScoreSelected += s => this.Push(new SoloResults(s));
         }
 
         [BackgroundDependencyLoader(true)]
@@ -228,7 +226,7 @@ namespace osu.Game.Screens.Select
 
                 BeatmapOptions.AddButton(@"Delete", @"all difficulties", FontAwesome.fa_trash, colours.Pink, () => delete(Beatmap.Value.BeatmapSetInfo), Key.Number4, float.MaxValue);
                 BeatmapOptions.AddButton(@"Remove", @"from unplayed", FontAwesome.fa_times_circle_o, colours.Purple, null, Key.Number1);
-                BeatmapOptions.AddButton(@"Clear", @"local scores", FontAwesome.fa_eraser, colours.Purple, null, Key.Number2);
+                BeatmapOptions.AddButton(@"Clear", @"local scores", FontAwesome.fa_eraser, colours.Purple, () => clearScores(Beatmap.Value.BeatmapInfo), Key.Number2);
             }
 
             if (this.beatmaps == null)
@@ -268,8 +266,8 @@ namespace osu.Game.Screens.Select
         {
             dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
             dependencies.CacheAs(this);
-            dependencies.CacheAs(Ruleset);
-            dependencies.CacheAs<IBindable<RulesetInfo>>(Ruleset);
+            dependencies.CacheAs(decoupledRuleset);
+            dependencies.CacheAs<IBindable<RulesetInfo>>(decoupledRuleset);
 
             return dependencies;
         }
@@ -288,7 +286,7 @@ namespace osu.Game.Screens.Select
         public void Edit(BeatmapInfo beatmap = null)
         {
             Beatmap.Value = beatmaps.GetWorkingBeatmap(beatmap ?? beatmapNoDebounce);
-           this.Push(new Editor());
+            this.Push(new Editor());
         }
 
         /// <summary>
@@ -328,16 +326,16 @@ namespace osu.Game.Screens.Select
 
         private ScheduledDelegate selectionChangedDebounce;
 
-        private void workingBeatmapChanged(WorkingBeatmap beatmap)
+        private void workingBeatmapChanged(ValueChangedEvent<WorkingBeatmap> e)
         {
-            if (beatmap is DummyWorkingBeatmap) return;
+            if (e.NewValue is DummyWorkingBeatmap) return;
 
-            if (this.IsCurrentScreen() && !Carousel.SelectBeatmap(beatmap?.BeatmapInfo, false))
+            if (this.IsCurrentScreen() && !Carousel.SelectBeatmap(e.NewValue?.BeatmapInfo, false))
                 // If selecting new beatmap without bypassing filters failed, there's possibly a ruleset mismatch
-                if (beatmap?.BeatmapInfo?.Ruleset != null && beatmap.BeatmapInfo.Ruleset != Ruleset.Value)
+                if (e.NewValue?.BeatmapInfo?.Ruleset != null && e.NewValue.BeatmapInfo.Ruleset != decoupledRuleset.Value)
                 {
-                    base.Ruleset.Value = beatmap.BeatmapInfo.Ruleset;
-                    Carousel.SelectBeatmap(beatmap.BeatmapInfo);
+                    Ruleset.Value = e.NewValue.BeatmapInfo.Ruleset;
+                    Carousel.SelectBeatmap(e.NewValue.BeatmapInfo);
                 }
         }
 
@@ -377,12 +375,12 @@ namespace osu.Game.Screens.Select
 
                 bool preview = false;
 
-                if (ruleset?.Equals(Ruleset.Value) == false)
+                if (ruleset?.Equals(decoupledRuleset.Value) == false)
                 {
-                    Logger.Log($"ruleset changed from \"{Ruleset.Value}\" to \"{ruleset}\"");
+                    Logger.Log($"ruleset changed from \"{decoupledRuleset.Value}\" to \"{ruleset}\"");
 
                     Beatmap.Value.Mods.Value = Enumerable.Empty<Mod>();
-                    Ruleset.Value = ruleset;
+                    decoupledRuleset.Value = ruleset;
 
                     // force a filter before attempting to change the beatmap.
                     // we may still be in the wrong ruleset as there is a debounce delay on ruleset changes.
@@ -446,7 +444,6 @@ namespace osu.Game.Screens.Select
         {
             base.LogoArriving(logo, resuming);
 
-            logo.RelativePositionAxes = Axes.Both;
             Vector2 position = new Vector2(0.95f, 0.96f);
 
             if (logo.Alpha > 0.8f)
@@ -512,13 +509,8 @@ namespace osu.Game.Screens.Select
 
         public override bool OnExiting(IScreen next)
         {
-            if (ModSelect.State == Visibility.Visible)
-            {
-                ModSelect.Hide();
+            if (base.OnExiting(next))
                 return true;
-            }
-
-            FinaliseSelection(performStartAction: false);
 
             beatmapInfoWedge.State = Visibility.Hidden;
 
@@ -532,14 +524,14 @@ namespace osu.Game.Screens.Select
             SelectedMods.UnbindAll();
             Beatmap.Value.Mods.Value = new Mod[] { };
 
-            return base.OnExiting(next);
+            return false;
         }
 
         protected override void Dispose(bool isDisposing)
         {
             base.Dispose(isDisposing);
 
-            Ruleset.UnbindAll();
+            decoupledRuleset.UnbindAll();
 
             if (beatmaps != null)
             {
@@ -590,7 +582,7 @@ namespace osu.Game.Screens.Select
             }
         }
 
-        private void onBeatmapSetAdded(BeatmapSetInfo s, bool existing, bool silent) => Carousel.UpdateBeatmapSet(s);
+        private void onBeatmapSetAdded(BeatmapSetInfo s, bool existing) => Carousel.UpdateBeatmapSet(s);
         private void onBeatmapSetRemoved(BeatmapSetInfo s) => Carousel.RemoveBeatmapSet(s);
         private void onBeatmapRestored(BeatmapInfo b) => Carousel.UpdateBeatmapSet(beatmaps.QueryBeatmapSet(s => s.ID == b.BeatmapSetInfoID));
         private void onBeatmapHidden(BeatmapInfo b) => Carousel.UpdateBeatmapSet(beatmaps.QueryBeatmapSet(s => s.ID == b.BeatmapSetInfoID));
@@ -600,9 +592,11 @@ namespace osu.Game.Screens.Select
             if (rulesetNoDebounce == null)
             {
                 // manual binding to parent ruleset to allow for delayed load in the incoming direction.
-                rulesetNoDebounce = Ruleset.Value = base.Ruleset.Value;
-                base.Ruleset.ValueChanged += updateSelectedRuleset;
-                Ruleset.ValueChanged += r => base.Ruleset.Value = r;
+                rulesetNoDebounce = decoupledRuleset.Value = Ruleset.Value;
+                Ruleset.ValueChanged += r => updateSelectedRuleset(r.NewValue);
+
+                decoupledRuleset.ValueChanged += r => Ruleset.Value = r.NewValue;
+                decoupledRuleset.DisabledChanged += r => Ruleset.Disabled = r;
 
                 Beatmap.BindDisabledChanged(disabled => Carousel.AllowSelection = !disabled, true);
                 Beatmap.BindValueChanged(workingBeatmapChanged);
@@ -623,7 +617,17 @@ namespace osu.Game.Screens.Select
         private void delete(BeatmapSetInfo beatmap)
         {
             if (beatmap == null || beatmap.ID <= 0) return;
+
             dialogOverlay?.Push(new BeatmapDeleteDialog(beatmap));
+        }
+
+        private void clearScores(BeatmapInfo beatmap)
+        {
+            if (beatmap == null || beatmap.ID <= 0) return;
+
+            dialogOverlay?.Push(new BeatmapClearScoresDialog(beatmap, () =>
+                // schedule done here rather than inside the dialog as the dialog may fade out and never callback.
+                Schedule(() => BeatmapDetails.Leaderboard.RefreshScores())));
         }
 
         public override bool OnPressed(GlobalAction action)

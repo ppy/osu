@@ -4,7 +4,7 @@
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
-using osu.Framework.Configuration;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
@@ -33,7 +33,7 @@ namespace osu.Game.Graphics.UserInterface
 
         public string LabelText
         {
-            get { return labelSpriteText?.Text; }
+            get => labelSpriteText?.Text;
             set
             {
                 if (labelSpriteText != null)
@@ -43,7 +43,7 @@ namespace osu.Game.Graphics.UserInterface
 
         public MarginPadding LabelPadding
         {
-            get { return labelSpriteText?.Padding ?? new MarginPadding(); }
+            get => labelSpriteText?.Padding ?? new MarginPadding();
             set
             {
                 if (labelSpriteText != null)
@@ -86,9 +86,9 @@ namespace osu.Game.Graphics.UserInterface
         {
             base.LoadComplete();
 
-            Current.ValueChanged += newValue =>
+            Current.ValueChanged += enabled =>
             {
-                if (newValue)
+                if (enabled.NewValue)
                     sampleChecked?.Play();
                 else
                     sampleUnchecked?.Play();

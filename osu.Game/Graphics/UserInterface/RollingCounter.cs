@@ -1,13 +1,13 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Graphics.Sprites;
 using System;
 using System.Collections.Generic;
+using osu.Framework.Bindables;
 using osuTK.Graphics;
 
 namespace osu.Game.Graphics.UserInterface
@@ -45,15 +45,13 @@ namespace osu.Game.Graphics.UserInterface
         /// </summary>
         public virtual T DisplayedCount
         {
-            get
-            {
-                return displayedCount;
-            }
+            get => displayedCount;
 
             set
             {
                 if (EqualityComparer<T>.Default.Equals(displayedCount, value))
                     return;
+
                 displayedCount = value;
                 DisplayedCountSpriteText.Text = FormatCount(value);
             }
@@ -61,22 +59,16 @@ namespace osu.Game.Graphics.UserInterface
 
         public abstract void Increment(T amount);
 
-        private float textSize;
-
         public float TextSize
         {
-            get { return textSize; }
-            set
-            {
-                textSize = value;
-                DisplayedCountSpriteText.TextSize = value;
-            }
+            get => DisplayedCountSpriteText.Font.Size;
+            set => DisplayedCountSpriteText.Font = DisplayedCountSpriteText.Font.With(size: value);
         }
 
         public Color4 AccentColour
         {
-            get { return DisplayedCountSpriteText.Colour; }
-            set { DisplayedCountSpriteText.Colour = value; }
+            get => DisplayedCountSpriteText.Colour;
+            set => DisplayedCountSpriteText.Colour = value;
         }
 
         /// <summary>
@@ -86,20 +78,17 @@ namespace osu.Game.Graphics.UserInterface
         {
             Children = new Drawable[]
             {
-                DisplayedCountSpriteText = new OsuSpriteText
-                {
-                    Font = @"Venera"
-                },
+                DisplayedCountSpriteText = new OsuSpriteText { Font = OsuFont.Numeric }
             };
 
             TextSize = 40;
             AutoSizeAxes = Axes.Both;
 
-            DisplayedCount = Current;
+            DisplayedCount = Current.Value;
 
-            Current.ValueChanged += newValue =>
+            Current.ValueChanged += val =>
             {
-                if (IsLoaded) TransformCount(displayedCount, newValue);
+                if (IsLoaded) TransformCount(displayedCount, val.NewValue);
             };
         }
 
@@ -107,7 +96,7 @@ namespace osu.Game.Graphics.UserInterface
         {
             base.LoadComplete();
 
-            DisplayedCountSpriteText.Text = FormatCount(Current);
+            DisplayedCountSpriteText.Text = FormatCount(Current.Value);
         }
 
         /// <summary>
@@ -126,7 +115,7 @@ namespace osu.Game.Graphics.UserInterface
         public virtual void StopRolling()
         {
             FinishTransforms(false, nameof(DisplayedCount));
-            DisplayedCount = Current;
+            DisplayedCount = Current.Value;
         }
 
         /// <summary>

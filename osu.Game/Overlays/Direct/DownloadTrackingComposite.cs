@@ -2,15 +2,18 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using Microsoft.EntityFrameworkCore.Internal;
+using System.Linq;
 using osu.Framework.Allocation;
-using osu.Framework.Configuration;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Beatmaps;
 using osu.Game.Online.API.Requests;
 
 namespace osu.Game.Overlays.Direct
 {
+    /// <summary>
+    /// A component which tracks a beatmap through potential download/import/deletion.
+    /// </summary>
     public abstract class DownloadTrackingComposite : CompositeDrawable
     {
         public readonly Bindable<BeatmapSetInfo> BeatmapSet = new Bindable<BeatmapSetInfo>();
@@ -34,14 +37,14 @@ namespace osu.Game.Overlays.Direct
         {
             this.beatmaps = beatmaps;
 
-            BeatmapSet.BindValueChanged(set =>
+            BeatmapSet.BindValueChanged(setInfo =>
             {
-                if (set == null)
+                if (setInfo.NewValue == null)
                     attachDownload(null);
-                else if (beatmaps.QueryBeatmapSets(s => s.OnlineBeatmapSetID == set.OnlineBeatmapSetID).Any())
+                else if (beatmaps.GetAllUsableBeatmapSetsEnumerable().Any(s => s.OnlineBeatmapSetID == setInfo.NewValue.OnlineBeatmapSetID))
                     State.Value = DownloadState.LocallyAvailable;
                 else
-                    attachDownload(beatmaps.GetExistingDownload(set));
+                    attachDownload(beatmaps.GetExistingDownload(setInfo.NewValue));
             }, true);
 
             beatmaps.BeatmapDownloadBegan += download =>
@@ -51,6 +54,7 @@ namespace osu.Game.Overlays.Direct
             };
 
             beatmaps.ItemAdded += setAdded;
+            beatmaps.ItemRemoved += setRemoved;
         }
 
         #region Disposal
@@ -59,8 +63,11 @@ namespace osu.Game.Overlays.Direct
         {
             base.Dispose(isDisposing);
 
-            beatmaps.BeatmapDownloadBegan -= attachDownload;
-            beatmaps.ItemAdded -= setAdded;
+            if (beatmaps != null)
+            {
+                beatmaps.BeatmapDownloadBegan -= attachDownload;
+                beatmaps.ItemAdded -= setAdded;
+            }
 
             State.UnbindAll();
 
@@ -105,27 +112,22 @@ namespace osu.Game.Overlays.Direct
             }
         }
 
-        private void onRequestSuccess(string data)
-        {
-            Schedule(() => State.Value = DownloadState.Downloaded);
-        }
+        private void onRequestSuccess(string _) => Schedule(() => State.Value = DownloadState.Downloaded);
 
-        private void onRequestProgress(float progress)
-        {
-            Schedule(() => Progress.Value = progress);
-        }
+        private void onRequestProgress(float progress) => Schedule(() => Progress.Value = progress);
 
-        private void onRequestFailure(Exception e)
-        {
-            Schedule(() => attachDownload(null));
-        }
+        private void onRequestFailure(Exception e) => Schedule(() => attachDownload(null));
 
-        private void setAdded(BeatmapSetInfo s, bool existing, bool silent)
+        private void setAdded(BeatmapSetInfo s, bool existing) => setDownloadStateFromManager(s, DownloadState.LocallyAvailable);
+
+        private void setRemoved(BeatmapSetInfo s) => setDownloadStateFromManager(s, DownloadState.NotDownloaded);
+
+        private void setDownloadStateFromManager(BeatmapSetInfo s, DownloadState state) => Schedule(() =>
         {
             if (s.OnlineBeatmapSetID != BeatmapSet.Value?.OnlineBeatmapSetID)
                 return;
 
-            Schedule(() => State.Value = DownloadState.LocallyAvailable);
-        }
+            State.Value = state;
+        });
     }
 }

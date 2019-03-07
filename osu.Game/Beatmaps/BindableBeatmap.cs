@@ -6,15 +6,15 @@ using System.Diagnostics;
 using JetBrains.Annotations;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Track;
-using osu.Framework.Configuration;
+using osu.Framework.Bindables;
 
 namespace osu.Game.Beatmaps
 {
     /// <summary>
-    /// A <see cref="Bindable{WorkingBeatmap}"/> for the <see cref="OsuGame"/> beatmap.
-    /// This should be used sparingly in-favour of <see cref="IBindableBeatmap"/>.
+    /// A <see cref="Bindable{T}"/> for the <see cref="OsuGame"/> beatmap.
+    /// This should be used sparingly in-favour of <see cref="IBindable<WorkingBeatmap>"/>.
     /// </summary>
-    public abstract class BindableBeatmap : NonNullableBindable<WorkingBeatmap>, IBindableBeatmap
+    public abstract class BindableBeatmap : NonNullableBindable<WorkingBeatmap>
     {
         private AudioManager audioManager;
         private WorkingBeatmap lastBeatmap;
@@ -34,7 +34,7 @@ namespace osu.Game.Beatmaps
 
             this.audioManager = audioManager;
 
-            ValueChanged += registerAudioTrack;
+            ValueChanged += b => registerAudioTrack(b.NewValue);
 
             // If the track has changed prior to this being called, let's register it
             if (Value != Default)
@@ -61,9 +61,6 @@ namespace osu.Game.Beatmaps
 
             lastBeatmap = beatmap;
         }
-
-        [NotNull]
-        IBindableBeatmap IBindableBeatmap.GetBoundCopy() => GetBoundCopy();
 
         /// <summary>
         /// Retrieve a new <see cref="BindableBeatmap"/> instance weakly bound to this <see cref="BindableBeatmap"/>.

@@ -41,8 +41,7 @@ namespace osu.Game.Screens.Multi.Match.Components
             Depth = -1,
             Origin = Anchor.Centre,
             Anchor = Anchor.Centre,
-            Font = @"Exo2.0-Light",
-            TextSize = 30,
+            Font = OsuFont.GetFont(weight: FontWeight.Light, size: 30),
         };
     }
 }
