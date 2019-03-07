@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using osu.Framework.Configuration;
 using osu.Framework.Screens;
 using osu.Game.Configuration;
@@ -109,6 +110,8 @@ namespace osu.Game
 
         private readonly List<OverlayContainer> overlays = new List<OverlayContainer>();
 
+        private readonly List<OverlayContainer> visibleBlockingOverlays = new List<OverlayContainer>();
+
         // todo: move this to SongSelect once Screen has the ability to unsuspend.
         [Cached]
         [Cached(Type = typeof(IBindable<IEnumerable<Mod>>))]
@@ -126,6 +129,22 @@ namespace osu.Game
         public void ToggleSettings() => settings.ToggleVisibility();
 
         public void ToggleDirect() => direct.ToggleVisibility();
+
+        private void updateBlockingOverlayFade() =>
+            screenContainer.FadeColour(visibleBlockingOverlays.Any() ? OsuColour.Gray(0.5f) : Color4.White, 500, Easing.OutQuint);
+
+        public void AddBlockingOverlay(OverlayContainer overlay)
+        {
+            if (!visibleBlockingOverlays.Contains(overlay))
+                visibleBlockingOverlays.Add(overlay);
+            updateBlockingOverlayFade();
+        }
+
+        public void RemoveBlockingOverlay(OverlayContainer overlay)
+        {
+            visibleBlockingOverlays.Remove(overlay);
+            updateBlockingOverlayFade();
+        }
 
         /// <summary>
         /// Close all game-wide overlays.
@@ -147,8 +166,6 @@ namespace osu.Game
         private void load(FrameworkConfigManager frameworkConfig)
         {
             this.frameworkConfig = frameworkConfig;
-
-            ScoreManager.ItemAdded += (score, _, silent) => Schedule(() => LoadScore(score, silent));
 
             if (!Host.IsPrimaryInstance)
             {
@@ -198,62 +215,11 @@ namespace osu.Game
             externalLinkOpener.OpenUrlExternally(url);
         }
 
-        private ScheduledDelegate scoreLoad;
-
         /// <summary>
         /// Show a beatmap set as an overlay.
         /// </summary>
         /// <param name="setId">The set to display.</param>
         public void ShowBeatmapSet(int setId) => beatmapSetOverlay.FetchAndShowBeatmapSet(setId);
-
-        /// <summary>
-        /// Present a beatmap at song select.
-        /// </summary>
-        /// <param name="beatmap">The beatmap to select.</param>
-        public void PresentBeatmap(BeatmapSetInfo beatmap)
-        {
-            if (menuScreen == null)
-            {
-                Schedule(() => PresentBeatmap(beatmap));
-                return;
-            }
-
-            CloseAllOverlays(false);
-
-            void setBeatmap()
-            {
-                if (Beatmap.Disabled)
-                {
-                    Schedule(setBeatmap);
-                    return;
-                }
-
-                var databasedSet = beatmap.OnlineBeatmapSetID != null ? BeatmapManager.QueryBeatmapSet(s => s.OnlineBeatmapSetID == beatmap.OnlineBeatmapSetID) : BeatmapManager.QueryBeatmapSet(s => s.Hash == beatmap.Hash);
-
-                if (databasedSet != null)
-                {
-                    // Use first beatmap available for current ruleset, else switch ruleset.
-                    var first = databasedSet.Beatmaps.Find(b => b.Ruleset == ruleset.Value) ?? databasedSet.Beatmaps.First();
-
-                    ruleset.Value = first.Ruleset;
-                    Beatmap.Value = BeatmapManager.GetWorkingBeatmap(first);
-                }
-            }
-
-            switch (screenStack.CurrentScreen)
-            {
-                case SongSelect _:
-                    break;
-                default:
-                    // navigate to song select if we are not already there.
-
-                    menuScreen.MakeCurrent();
-                    menuScreen.LoadToSolo();
-                    break;
-            }
-
-            setBeatmap();
-        }
 
         /// <summary>
         /// Show a user's profile as an overlay.
@@ -267,19 +233,44 @@ namespace osu.Game
         /// <param name="beatmapId">The beatmap to show.</param>
         public void ShowBeatmap(int beatmapId) => beatmapSetOverlay.FetchAndShowBeatmap(beatmapId);
 
-        protected void LoadScore(ScoreInfo score, bool silent)
+        /// <summary>
+        /// Present a beatmap at song select immediately.
+        /// The user should have already requested this interactively.
+        /// </summary>
+        /// <param name="beatmap">The beatmap to select.</param>
+        public void PresentBeatmap(BeatmapSetInfo beatmap)
         {
-            if (silent)
-                return;
+            var databasedSet = beatmap.OnlineBeatmapSetID != null
+                ? BeatmapManager.QueryBeatmapSet(s => s.OnlineBeatmapSetID == beatmap.OnlineBeatmapSetID)
+                : BeatmapManager.QueryBeatmapSet(s => s.Hash == beatmap.Hash);
 
-            scoreLoad?.Cancel();
-
-            if (menuScreen == null)
+            if (databasedSet == null)
             {
-                scoreLoad = Schedule(() => LoadScore(score, false));
+                Logger.Log("The requested beatmap could not be loaded.", LoggingTarget.Information);
                 return;
             }
 
+            performFromMainMenu(() =>
+            {
+                // we might already be at song select, so a check is required before performing the load to solo.
+                if (menuScreen.IsCurrentScreen())
+                    menuScreen.LoadToSolo();
+
+                // Use first beatmap available for current ruleset, else switch ruleset.
+                var first = databasedSet.Beatmaps.Find(b => b.Ruleset == ruleset.Value) ?? databasedSet.Beatmaps.First();
+
+                ruleset.Value = first.Ruleset;
+                Beatmap.Value = BeatmapManager.GetWorkingBeatmap(first);
+            }, $"load {beatmap}", bypassScreenAllowChecks: true, targetScreen: typeof(PlaySongSelect));
+        }
+
+        /// <summary>
+        /// Present a score's replay immediately.
+        /// The user should have already requested this interactively.
+        /// </summary>
+        /// <param name="beatmap">The beatmap to select.</param>
+        public void PresentScore(ScoreInfo score)
+        {
             var databasedScore = ScoreManager.GetScore(score);
             var databasedScoreInfo = databasedScore.ScoreInfo;
             if (databasedScore.Replay == null)
@@ -295,14 +286,40 @@ namespace osu.Game
                 return;
             }
 
-            if ((screenStack.CurrentScreen as IOsuScreen)?.AllowExternalScreenChange == false)
+            performFromMainMenu(() =>
+            {
+                ruleset.Value = databasedScoreInfo.Ruleset;
+
+                Beatmap.Value = BeatmapManager.GetWorkingBeatmap(databasedBeatmap);
+                Beatmap.Value.Mods.Value = databasedScoreInfo.Mods;
+
+                menuScreen.Push(new PlayerLoader(() => new ReplayPlayer(databasedScore)));
+            }, $"watch {databasedScoreInfo}", bypassScreenAllowChecks: true);
+        }
+
+        private ScheduledDelegate performFromMainMenuTask;
+
+        /// <summary>
+        /// Perform an action only after returning to the main menu.
+        /// Eagerly tries to exit the current screen until it succeeds.
+        /// </summary>
+        /// <param name="action">The action to perform once we are in the correct state.</param>
+        /// <param name="taskName">The task name to display in a notification (if we can't immediately reach the main menu state).</param>
+        /// <param name="targetScreen">An optional target screen type. If this screen is already current we can immediately perform the action without returning to the menu.</param>
+        /// <param name="bypassScreenAllowChecks">Whether checking <see cref="IOsuScreen.AllowExternalScreenChange"/> should be bypassed.</param>
+        private void performFromMainMenu(Action action, string taskName, Type targetScreen = null, bool bypassScreenAllowChecks = false)
+        {
+            performFromMainMenuTask?.Cancel();
+
+            // if the current screen does not allow screen changing, give the user an option to try again later.
+            if (!bypassScreenAllowChecks && (screenStack.CurrentScreen as IOsuScreen)?.AllowExternalScreenChange == false)
             {
                 notifications.Post(new SimpleNotification
                 {
-                    Text = $"Click here to watch {databasedScoreInfo.User.Username} on {databasedScoreInfo.Beatmap}",
+                    Text = $"Click here to {taskName}",
                     Activated = () =>
                     {
-                        loadScore();
+                        performFromMainMenu(action, taskName, targetScreen, true);
                         return true;
                     }
                 });
@@ -310,24 +327,26 @@ namespace osu.Game
                 return;
             }
 
-            loadScore();
+            CloseAllOverlays(false);
 
-            void loadScore()
+            // we may already be at the target screen type.
+            if (targetScreen != null && screenStack.CurrentScreen?.GetType() == targetScreen)
             {
-                if (!menuScreen.IsCurrentScreen() || Beatmap.Disabled)
-                {
-                    menuScreen.MakeCurrent();
-                    this.Delay(500).Schedule(loadScore, out scoreLoad);
-                    return;
-                }
-
-                ruleset.Value = databasedScoreInfo.Ruleset;
-
-                Beatmap.Value = BeatmapManager.GetWorkingBeatmap(databasedBeatmap);
-                Beatmap.Value.Mods.Value = databasedScoreInfo.Mods;
-
-                menuScreen.Push(new PlayerLoader(() => new ReplayPlayer(databasedScore)));
+                action();
+                return;
             }
+
+            // all conditions have been met to continue with the action.
+            if (menuScreen?.IsCurrentScreen() == true && !Beatmap.Disabled)
+            {
+                action();
+                return;
+            }
+
+            // menuScreen may not be initialised yet (null check required).
+            menuScreen?.MakeCurrent();
+
+            performFromMainMenuTask = Schedule(() => performFromMainMenu(action, taskName));
         }
 
         protected override void Dispose(bool isDisposing)
@@ -351,8 +370,10 @@ namespace osu.Game
 
             BeatmapManager.PostNotification = n => notifications?.Post(n);
             BeatmapManager.GetStableStorage = GetStorageForStableInstall;
+            BeatmapManager.PresentImport = items => PresentBeatmap(items.First());
 
-            BeatmapManager.PresentBeatmap = PresentBeatmap;
+            ScoreManager.PostNotification = n => notifications?.Post(n);
+            ScoreManager.PresentImport = items => PresentScore(items.First());
 
             Container logoContainer;
 
@@ -597,20 +618,10 @@ namespace osu.Game
         }
 
         private Task asyncLoadStream;
-        private int visibleOverlayCount;
 
         private void loadComponentSingleFile<T>(T d, Action<T> add)
             where T : Drawable
         {
-            if (d is FocusedOverlayContainer focused)
-            {
-                focused.StateChanged += s =>
-                {
-                    visibleOverlayCount += s == Visibility.Visible ? 1 : -1;
-                    screenContainer.FadeColour(visibleOverlayCount > 0 ? OsuColour.Gray(0.5f) : Color4.White, 500, Easing.OutQuint);
-                };
-            }
-
             // schedule is here to ensure that all component loads are done after LoadComplete is run (and thus all dependencies are cached).
             // with some better organisation of LoadComplete to do construction and dependency caching in one step, followed by calls to loadComponentSingleFile,
             // we could avoid the need for scheduling altogether.
@@ -628,10 +639,24 @@ namespace osu.Game
                     {
                         Logger.Log($"Loading {d}...", level: LogLevel.Debug);
 
+                        // Since this is running in a separate thread, it is possible for OsuGame to be disposed after LoadComponentAsync has been called
+                        // throwing an exception. To avoid this, the call is scheduled on the update thread, which does not run if IsDisposed = true
+                        Task task = null;
+                        var del = new ScheduledDelegate(() => task = LoadComponentAsync(d, add));
+                        Scheduler.Add(del);
+
+                        // The delegate won't complete if OsuGame has been disposed in the meantime
+                        while (!IsDisposed && !del.Completed)
+                            await Task.Delay(10);
+
+                        // Either we're disposed or the load process has started successfully
                         if (IsDisposed)
                             return;
 
-                        await LoadComponentAsync(d, add);
+                        Debug.Assert(task != null);
+
+                        await task;
+
                         Logger.Log($"Loaded {d}!", level: LogLevel.Debug);
                     }
                     catch (OperationCanceledException)

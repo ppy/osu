@@ -13,6 +13,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Localisation;
 using osu.Game.Beatmaps;
+using osu.Game.Beatmaps.Drawables;
 
 namespace osu.Game.Overlays.Direct
 {
@@ -23,6 +24,7 @@ namespace osu.Game.Overlays.Direct
         private const float vertical_padding = 5;
         private const float height = 70;
 
+        private FillFlowContainer statusContainer;
         private PlayButton playButton;
         private Box progressBar;
 
@@ -108,10 +110,24 @@ namespace osu.Game.Overlays.Direct
                                         },
                                         new FillFlowContainer
                                         {
-                                            AutoSizeAxes = Axes.X,
-                                            Height = 20,
-                                            Margin = new MarginPadding { Top = vertical_padding, Bottom = vertical_padding },
-                                            Children = GetDifficultyIcons(),
+                                            AutoSizeAxes = Axes.Both,
+                                            Direction = FillDirection.Horizontal,
+                                            Children = new Drawable[]
+                                            {
+                                                statusContainer = new FillFlowContainer
+                                                {
+                                                    AutoSizeAxes = Axes.Both,
+                                                    Margin = new MarginPadding { Vertical = vertical_padding, Horizontal = 5 },
+                                                    Spacing = new Vector2(5),
+                                                },
+                                                new FillFlowContainer
+                                                {
+                                                    AutoSizeAxes = Axes.X,
+                                                    Height = 20,
+                                                    Margin = new MarginPadding { Top = vertical_padding, Bottom = vertical_padding },
+                                                    Children = GetDifficultyIcons(),
+                                                },
+                                            },
                                         },
                                     },
                                 },
@@ -193,6 +209,23 @@ namespace osu.Game.Overlays.Direct
                     Alpha = 0,
                     Colour = colours.Yellow,
                 },
+            });
+
+            if (SetInfo.OnlineInfo?.HasVideo ?? false)
+            {
+                statusContainer.Add(new IconPill(FontAwesome.fa_film) { IconSize = new Vector2(20) });
+            }
+
+            if (SetInfo.OnlineInfo?.HasStoryboard ?? false)
+            {
+                statusContainer.Add(new IconPill(FontAwesome.fa_image) { IconSize = new Vector2(20) });
+            }
+
+            statusContainer.Add(new BeatmapSetOnlineStatusPill
+            {
+                TextSize = 12,
+                TextPadding = new MarginPadding { Horizontal = 10, Vertical = 4 },
+                Status = SetInfo.OnlineInfo?.Status ?? BeatmapSetOnlineStatus.None,
             });
         }
     }

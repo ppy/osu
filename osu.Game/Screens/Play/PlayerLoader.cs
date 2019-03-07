@@ -17,6 +17,7 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Screens.Menu;
+using osu.Game.Screens.Play.HUD;
 using osu.Game.Screens.Play.PlayerSettings;
 using osuTK;
 using osuTK.Graphics;
@@ -78,7 +79,7 @@ namespace osu.Game.Screens.Play
                         Margin = new MarginPadding(25),
                         Children = new PlayerSettingsGroup[]
                         {
-                            visualSettings = new VisualSettings(),
+                            VisualSettings = new VisualSettings(),
                             new InputSettings()
                         }
                     }
@@ -151,23 +152,31 @@ namespace osu.Game.Screens.Play
         }
 
         private ScheduledDelegate pushDebounce;
-        private VisualSettings visualSettings;
+        protected VisualSettings VisualSettings;
 
         private bool readyForPush => player.LoadState == LoadState.Ready && IsHovered && GetContainingInputManager()?.DraggedDrawable == null;
 
         protected override bool OnHover(HoverEvent e)
         {
             // restore our screen defaults
-            InitializeBackgroundElements();
+            if (this.IsCurrentScreen())
+            {
+                InitializeBackgroundElements();
+                Background.EnableUserDim.Value = false;
+            }
+
             return base.OnHover(e);
         }
 
         protected override void OnHoverLost(HoverLostEvent e)
         {
-            if (GetContainingInputManager()?.HoveredDrawables.Contains(visualSettings) == true)
+            if (GetContainingInputManager()?.HoveredDrawables.Contains(VisualSettings) == true)
             {
-                // show user setting preview
+                // Update background elements is only being called here because blur logic still exists in Player.
+                // Will need to be removed when resolving https://github.com/ppy/osu/issues/4322
                 UpdateBackgroundElements();
+                if (this.IsCurrentScreen())
+                    Background.EnableUserDim.Value = true;
             }
 
             base.OnHoverLost(e);
@@ -241,6 +250,8 @@ namespace osu.Game.Screens.Play
             this.FadeOut(150);
             cancelLoad();
 
+            Background.EnableUserDim.Value = false;
+
             return base.OnExiting(next);
         }
 
@@ -286,6 +297,7 @@ namespace osu.Game.Screens.Play
             private readonly WorkingBeatmap beatmap;
             private LoadingAnimation loading;
             private Sprite backgroundSprite;
+            private ModDisplay modDisplay;
 
             public bool Loading
             {
@@ -312,7 +324,7 @@ namespace osu.Game.Screens.Play
             [BackgroundDependencyLoader]
             private void load()
             {
-                var metadata = beatmap?.BeatmapInfo?.Metadata ?? new BeatmapMetadata();
+                var metadata = beatmap.BeatmapInfo?.Metadata ?? new BeatmapMetadata();
 
                 AutoSizeAxes = Axes.Both;
                 Children = new Drawable[]
@@ -381,6 +393,14 @@ namespace osu.Game.Screens.Play
                                 Origin = Anchor.TopCentre,
                                 Anchor = Anchor.TopCentre,
                             },
+                            new ModDisplay
+                            {
+                                Anchor = Anchor.TopCentre,
+                                Origin = Anchor.TopCentre,
+                                AutoSizeAxes = Axes.Both,
+                                Margin = new MarginPadding { Top = 20 },
+                                Current = beatmap.Mods
+                            }
                         },
                     }
                 };
