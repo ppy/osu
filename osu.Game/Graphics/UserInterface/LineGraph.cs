@@ -102,9 +102,9 @@ namespace osu.Game.Graphics.UserInterface
 
             for (int i = 0; i < values.Length; i++)
             {
-                float x = (i + count - values.Length) / (float)(count - 1) * DrawWidth - 1;
-                float y = GetYPosition(values[i]) * DrawHeight - 1;
-                // the -1 is for inner offset in path (actually -PathWidth)
+                // Make sure that we are accounting for path width when calculating vertex positions
+                float x = (i + count - values.Length) / (float)(count - 1) * (DrawWidth - path.PathWidth);
+                float y = GetYPosition(values[i]) * (DrawHeight - path.PathWidth);
                 path.AddVertex(new Vector2(x, y));
             }
         }
