@@ -21,8 +21,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
 
         public float PathWidth
         {
-            get => path.PathWidth;
-            set => path.PathWidth = value;
+            get => path.PathRadius;
+            set => path.PathRadius = value;
         }
 
         /// <summary>
