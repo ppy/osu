@@ -103,8 +103,9 @@ namespace osu.Game.Graphics.UserInterface
             for (int i = 0; i < values.Length; i++)
             {
                 // Make sure that we are accounting for path width when calculating vertex positions
-                float x = (i + count - values.Length) / (float)(count - 1) * (DrawWidth - path.PathWidth);
-                float y = GetYPosition(values[i]) * (DrawHeight - path.PathWidth);
+                // We need to apply 2x the path radius to account for it because the full diameter of the line accounts into height
+                float x = (i + count - values.Length) / (float)(count - 1) * (DrawWidth - 2 * path.PathWidth);
+                float y = GetYPosition(values[i]) * (DrawHeight - 2 * path.PathWidth);
                 path.AddVertex(new Vector2(x, y));
             }
         }
