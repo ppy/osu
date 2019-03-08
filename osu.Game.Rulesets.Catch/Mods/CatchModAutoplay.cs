@@ -12,7 +12,7 @@ namespace osu.Game.Rulesets.Catch.Mods
 {
     public class CatchModAutoplay : ModAutoplay<CatchHitObject>
     {
-        protected override Score CreateReplayScore(Beatmap<CatchHitObject> beatmap) => new Score
+        public override Score CreateReplayScore(IBeatmap beatmap) => new Score
         {
             ScoreInfo = new ScoreInfo { User = new User { Username = "osu!salad!" } },
             Replay = new CatchAutoGenerator(beatmap).Generate(),
