@@ -50,6 +50,8 @@ namespace osu.Game.Beatmaps.Drawables
 
             if (model != null && model.ID == 0)
                 localInfo = beatmaps.QueryBeatmap(p => p.OnlineBeatmapID == model.OnlineBeatmapID);
+            else
+                localInfo = model;
 
             if (model?.BeatmapSet?.OnlineInfo != null)
             {
