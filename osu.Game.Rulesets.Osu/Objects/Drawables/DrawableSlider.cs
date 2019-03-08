@@ -50,7 +50,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             {
                 Body = new SnakingSliderBody(s)
                 {
-                    PathWidth = s.Scale * 64,
+                    PathRadius = s.Scale * 64,
                 },
                 ticks = new Container<DrawableSliderTick> { RelativeSizeAxes = Axes.Both },
                 repeatPoints = new Container<DrawableRepeatPoint> { RelativeSizeAxes = Axes.Both },
@@ -105,7 +105,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             positionBindable.BindValueChanged(_ => Position = HitObject.StackedPosition);
             scaleBindable.BindValueChanged(scale =>
             {
-                Body.PathWidth = scale.NewValue * 64;
+                Body.PathRadius = scale.NewValue * 64;
                 Ball.Scale = new Vector2(scale.NewValue);
             });
 
