@@ -72,7 +72,7 @@ namespace osu.Game.Online.API
 
         /// <summary>
         /// Register a component to receive API events.
-        /// Fires <see cref="IOnlineComponent.APIStateChanged"/> once immediately to ensure correct .
+        /// Fires <see cref="IOnlineComponent.APIStateChanged"/> once immediately to ensure a correct state.
         /// </summary>
         /// <param name="component"></param>
         public void Register(IOnlineComponent component)
