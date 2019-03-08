@@ -114,7 +114,6 @@ namespace osu.Game.Screens.Play
                     Start = gameplayClockContainer.Start,
                     Stop = gameplayClockContainer.Stop,
                     IsPaused = { BindTarget = gameplayClockContainer.IsPaused },
-
                     CheckCanPause = () => AllowPause && ValidForResume && !HasFailed && !RulesetContainer.HasReplayLoaded.Value,
                     Children = new[]
                     {
