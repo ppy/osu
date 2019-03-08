@@ -31,15 +31,17 @@ namespace osu.Game.Beatmaps.Drawables
             return new DelayedLoadUnloadWrapper(() =>
             {
                 Drawable drawable;
+                BeatmapInfo localInfo = new BeatmapInfo();
 
-                var localBeatmap = beatmaps.GetWorkingBeatmap(model);
+                if (model != null)
+                    localInfo = beatmaps.QueryBeatmap(p => p.OnlineBeatmapID == model.OnlineBeatmapID);
 
                 if (model?.BeatmapSet?.OnlineInfo != null)
                     drawable = new BeatmapSetCover(model.BeatmapSet, beatmapSetCoverType);
-                else if (localBeatmap.BeatmapInfo.ID != 0)
+                else if (localInfo.ID != 0)
                 {
                     // Fall back to local background if one exists
-                    drawable = new BeatmapBackgroundSprite(localBeatmap);
+                    drawable = new BeatmapBackgroundSprite(beatmaps.GetWorkingBeatmap(localInfo));
                 }
                 else
                 {
