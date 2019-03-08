@@ -33,6 +33,12 @@ namespace osu.Game.Overlays.Toolbar
 
         private readonly Bindable<OverlayActivation> overlayActivationMode = new Bindable<OverlayActivation>(OverlayActivation.All);
 
+        public Toolbar()
+        {
+            RelativeSizeAxes = Axes.X;
+            Size = new Vector2(1, HEIGHT);
+        }
+
         [BackgroundDependencyLoader(true)]
         private void load(OsuGame osuGame)
         {
@@ -76,9 +82,6 @@ namespace osu.Game.Overlays.Toolbar
                     }
                 }
             };
-
-            RelativeSizeAxes = Axes.X;
-            Size = new Vector2(1, HEIGHT);
 
             StateChanged += visibility =>
             {
