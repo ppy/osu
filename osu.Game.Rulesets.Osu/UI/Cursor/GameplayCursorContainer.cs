@@ -103,7 +103,7 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
             public OsuCursor()
             {
                 Origin = Anchor.Centre;
-                Size = new Vector2(42);
+                Size = new Vector2(28);
             }
 
             protected override void SkinChanged(ISkinSource skin, bool allowFallback)

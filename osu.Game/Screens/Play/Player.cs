@@ -133,6 +133,7 @@ namespace osu.Game.Screens.Play
                             Origin = Anchor.Centre,
                             Breaks = working.Beatmap.Breaks
                         },
+                        // display the cursor above some HUD elements.
                         RulesetContainer.Cursor?.CreateProxy() ?? new Container(),
                         HUDOverlay = new HUDOverlay(ScoreProcessor, RulesetContainer, working)
                         {
