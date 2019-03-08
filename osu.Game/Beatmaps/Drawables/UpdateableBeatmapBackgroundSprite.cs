@@ -46,9 +46,9 @@ namespace osu.Game.Beatmaps.Drawables
         protected override Drawable CreateDrawable(BeatmapInfo model)
         {
             Drawable drawable;
-            BeatmapInfo localInfo = new BeatmapInfo();
+            BeatmapInfo localInfo = null;
 
-            if (model != null)
+            if (model != null && model.ID == 0)
                 localInfo = beatmaps.QueryBeatmap(p => p.OnlineBeatmapID == model.OnlineBeatmapID);
 
             if (model?.BeatmapSet?.OnlineInfo != null)
