@@ -17,7 +17,7 @@ using osu.Game.Rulesets.Mods;
 namespace osu.Game.Screens.Play
 {
     /// <summary>
-    /// Manages the various intricacies of the gameplay clock.
+    /// Encapsulates gameplay timing logic and provides a <see cref="GameplayClock"/> for children.
     /// </summary>
     public class GameplayClockContainer : Container
     {
@@ -35,12 +35,6 @@ namespace osu.Game.Screens.Play
         /// </summary>
         private readonly DecoupleableInterpolatingFramedClock adjustableClock;
 
-        /// <summary>
-        /// The final clock which is exposed to underlying components.
-        /// </summary>
-        [Cached]
-        private readonly GameplayClock gameplayClock;
-
         public readonly Bindable<double> UserPlaybackRate = new BindableDouble(1)
         {
             Default = 1,
@@ -49,15 +43,21 @@ namespace osu.Game.Screens.Play
             Precision = 0.1,
         };
 
+        /// <summary>
+        /// The final clock which is exposed to underlying components.
+        /// </summary>
+        [Cached]
+        private readonly GameplayClock gameplayClock;
+
         private Bindable<double> userAudioOffset;
 
         private readonly FramedOffsetClock offsetClock;
 
         public GameplayClockContainer(WorkingBeatmap beatmap, bool allowLeadIn, double gameplayStartTime)
         {
-            RelativeSizeAxes = Axes.Both;
-
             this.beatmap = beatmap;
+
+            RelativeSizeAxes = Axes.Both;
 
             sourceClock = (IAdjustableClock)beatmap.Track ?? new StopwatchClock();
 
