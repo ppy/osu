@@ -7,7 +7,8 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
 {
     public class ScoreTextLine : ScoreTableLine
     {
-        public ScoreTextLine(int maxModsAmount) : base(maxModsAmount)
+        public ScoreTextLine(int maxModsAmount)
+            : base(maxModsAmount)
         {
             RankContainer.Add(new ScoreText
             {

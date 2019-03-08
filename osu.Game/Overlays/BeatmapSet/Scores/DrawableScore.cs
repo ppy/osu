@@ -118,7 +118,8 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
 
         private class DrawableScoreData : ScoreTableLine
         {
-            public DrawableScoreData(int index, APIScoreInfo score, int maxModsAmount) : base(maxModsAmount)
+            public DrawableScoreData(int index, APIScoreInfo score, int maxModsAmount)
+                : base(maxModsAmount)
             {
                 SpriteText scoreText;
                 SpriteText accuracy;

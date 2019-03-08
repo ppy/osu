@@ -56,13 +56,15 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
         private readonly ModsInfoColumn modsInfo;
 
         private APIScoreInfo score;
+
         public APIScoreInfo Score
         {
-            get { return score; }
+            get => score;
             set
             {
                 if (score == value)
                     return;
+
                 score = value;
 
                 avatar.User = username.User = score.User;
@@ -274,9 +276,10 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                 {
                     if (text.TextSize == value)
                         return;
+
                     text.TextSize = value;
                 }
-                get { return text.TextSize; }
+                get => text.TextSize;
             }
 
             public ClickableTopScoreUsername()
@@ -386,7 +389,8 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                 }
             }
 
-            public ModsInfoColumn(string header) : base(header)
+            public ModsInfoColumn(string header)
+                : base(header)
             {
                 AutoSizeAxes = Axes.Both;
                 Add(modsContainer = new FillFlowContainer
@@ -409,12 +413,14 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                 {
                     if (valueText.Text == value)
                         return;
+
                     valueText.Text = value;
                 }
-                get { return valueText.Text; }
+                get => valueText.Text;
             }
 
-            protected TextInfoColumn(string header, float valueTextSize = 25) : base(header)
+            protected TextInfoColumn(string header, float valueTextSize = 25)
+                : base(header)
             {
                 Add(valueText = new SpriteText
                 {
@@ -425,7 +431,8 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
 
         private class AutoSizedInfoColumn : TextInfoColumn
         {
-            public AutoSizedInfoColumn(string header, float valueTextSize = 25) : base(header, valueTextSize)
+            public AutoSizedInfoColumn(string header, float valueTextSize = 25)
+                : base(header, valueTextSize)
             {
                 AutoSizeAxes = Axes.Both;
             }
@@ -435,7 +442,8 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
         {
             private const float width = 70;
 
-            public MediumInfoColumn(string header, float valueTextSize = 25) : base(header, valueTextSize)
+            public MediumInfoColumn(string header, float valueTextSize = 25)
+                : base(header, valueTextSize)
             {
                 Width = width;
             }
@@ -445,7 +453,8 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
         {
             private const float width = 40;
 
-            public SmallInfoColumn(string header, float valueTextSize = 25) : base(header, valueTextSize)
+            public SmallInfoColumn(string header, float valueTextSize = 25)
+                : base(header, valueTextSize)
             {
                 Width = width;
             }

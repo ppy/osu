@@ -11,6 +11,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
     public class ScoreTable : FillFlowContainer
     {
         private IEnumerable<APIScoreInfo> scores;
+
         public IEnumerable<APIScoreInfo> Scores
         {
             set
@@ -31,10 +32,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                 foreach (var s in scores)
                     Add(new DrawableScore(index++, s, maxModsAmount));
             }
-            get
-            {
-                return scores;
-            }
+            get => scores;
         }
 
         public ScoreTable()

@@ -26,10 +26,9 @@ namespace osu.Game.Tests.Visual
 
         public TestCaseBeatmapScoresContainer()
         {
-            Container container;
             ScoresContainer scoresContainer;
 
-            Child = container = new Container
+            Child = new Container
             {
                 Anchor = Anchor.TopCentre,
                 Origin = Anchor.TopCentre,
@@ -65,6 +64,7 @@ namespace osu.Game.Tests.Visual
                         new OsuModHardRock(),
                     },
                     Rank = ScoreRank.XH,
+                    PP = 200,
                     MaxCombo = 1234,
                     TotalScore = 1234567890,
                     Accuracy = 1,
@@ -88,6 +88,7 @@ namespace osu.Game.Tests.Visual
                         new OsuModFlashlight(),
                     },
                     Rank = ScoreRank.S,
+                    PP = 190,
                     MaxCombo = 1234,
                     TotalScore = 1234789,
                     Accuracy = 0.9997,
@@ -110,6 +111,7 @@ namespace osu.Game.Tests.Visual
                         new OsuModHidden(),
                     },
                     Rank = ScoreRank.B,
+                    PP = 180,
                     MaxCombo = 1234,
                     TotalScore = 12345678,
                     Accuracy = 0.9854,
@@ -131,6 +133,7 @@ namespace osu.Game.Tests.Visual
                         new OsuModDoubleTime(),
                     },
                     Rank = ScoreRank.C,
+                    PP = 170,
                     MaxCombo = 1234,
                     TotalScore = 1234567,
                     Accuracy = 0.8765,
@@ -148,6 +151,7 @@ namespace osu.Game.Tests.Visual
                         },
                     },
                     Rank = ScoreRank.F,
+                    PP = 160,
                     MaxCombo = 1234,
                     TotalScore = 123456,
                     Accuracy = 0.6543,
