@@ -86,7 +86,7 @@ namespace osu.Game.Rulesets.Objects
 
             yield return new SliderEventDescriptor
             {
-                Type = SliderEventType.LegacyFinalTick,
+                Type = SliderEventType.LegacyLastTick,
                 SpanIndex = finalSpanIndex,
                 SpanStartTime = finalSpanStartTime,
                 StartTime = finalSpanTime,
@@ -120,7 +120,7 @@ namespace osu.Game.Rulesets.Objects
     public enum SliderEventType
     {
         Tick,
-        LegacyFinalTick,
+        LegacyLastTick,
         Head,
         Tail,
         Repeat
