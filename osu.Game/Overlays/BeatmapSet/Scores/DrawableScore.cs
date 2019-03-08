@@ -31,8 +31,10 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
         {
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
+
             CornerRadius = 3;
             Masking = true;
+
             Children = new Drawable[]
             {
                 background = new Box

@@ -5,47 +5,50 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Online.API.Requests.Responses;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace osu.Game.Overlays.BeatmapSet.Scores
 {
-    public class ScoreTable : FillFlowContainer
+    public class ScoreTable : CompositeDrawable
     {
-        private IEnumerable<APIScoreInfo> scores;
+        private readonly FillFlowContainer scoresFlow;
+
+        public ScoreTable()
+        {
+            RelativeSizeAxes = Axes.X;
+            AutoSizeAxes = Axes.Y;
+
+            InternalChild = scoresFlow = new FillFlowContainer
+            {
+                RelativeSizeAxes = Axes.X,
+                AutoSizeAxes = Axes.Y,
+                Direction = FillDirection.Vertical
+            };
+        }
 
         public IEnumerable<APIScoreInfo> Scores
         {
             set
             {
-                scores = value;
+                scoresFlow.Clear();
+
+                if (value == null || !value.Any())
+                    return;
 
                 int maxModsAmount = 0;
-                foreach (var s in scores)
+                foreach (var s in value)
                 {
                     var scoreModsAmount = s.Mods.Length;
                     if (scoreModsAmount > maxModsAmount)
                         maxModsAmount = scoreModsAmount;
                 }
 
-                Add(new ScoreTextLine(maxModsAmount));
+                scoresFlow.Add(new ScoreTextLine(maxModsAmount));
 
                 int index = 0;
-                foreach (var s in scores)
-                    Add(new DrawableScore(index++, s, maxModsAmount));
+                foreach (var s in value)
+                    scoresFlow.Add(new DrawableScore(index++, s, maxModsAmount));
             }
-            get => scores;
-        }
-
-        public ScoreTable()
-        {
-            RelativeSizeAxes = Axes.X;
-            AutoSizeAxes = Axes.Y;
-            Direction = FillDirection.Vertical;
-        }
-
-        public void ClearScores()
-        {
-            scores = null;
-            Clear();
         }
     }
 }
