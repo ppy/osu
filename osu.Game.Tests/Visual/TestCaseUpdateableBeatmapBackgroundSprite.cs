@@ -16,7 +16,7 @@ namespace osu.Game.Tests.Visual
 {
     public class TestCaseUpdateableBeatmapBackgroundSprite : OsuTestCase
     {
-        private UpdateableBeatmapBackgroundSprite backgroundSprite;
+        private TestUpdateableBeatmapBackgroundSprite backgroundSprite;
 
         [Resolved]
         private BeatmapManager beatmaps { get; set; }
@@ -28,30 +28,36 @@ namespace osu.Game.Tests.Visual
 
             var imported = ImportBeatmapTest.LoadOszIntoOsu(osu);
 
-            Child = backgroundSprite = new UpdateableBeatmapBackgroundSprite { RelativeSizeAxes = Axes.Both };
+            Child = backgroundSprite = new TestUpdateableBeatmapBackgroundSprite { RelativeSizeAxes = Axes.Both };
 
             backgroundSprite.Beatmap.BindTo(beatmapBindable);
 
             var req = new GetBeatmapSetRequest(1);
             api.Queue(req);
 
-            AddStep("null", () => beatmapBindable.Value = null);
-
-            AddStep("imported", () => beatmapBindable.Value = imported.Beatmaps.First());
+            AddStep("load null beatmap", () => beatmapBindable.Value = null);
+            AddUntilStep(() => backgroundSprite.ChildCount == 1, "wait for cleanup...");
+            AddStep("load imported beatmap", () => beatmapBindable.Value = imported.Beatmaps.First());
+            AddUntilStep(() => backgroundSprite.ChildCount == 1, "wait for cleanup...");
 
             if (api.IsLoggedIn)
             {
                 AddUntilStep(() => req.Result != null, "wait for api response");
-
-                AddStep("online", () => beatmapBindable.Value = new BeatmapInfo
+                AddStep("load online beatmap", () => beatmapBindable.Value = new BeatmapInfo
                 {
                     BeatmapSet = req.Result?.ToBeatmapSet(rulesets)
                 });
+                AddUntilStep(() => backgroundSprite.ChildCount == 1, "wait for cleanup...");
             }
             else
             {
                 AddStep("online (login first)", () => { });
             }
+        }
+
+        private class TestUpdateableBeatmapBackgroundSprite : UpdateableBeatmapBackgroundSprite
+        {
+            public int ChildCount => InternalChildren.Count;
         }
     }
 }
