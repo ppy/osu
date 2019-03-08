@@ -7,8 +7,8 @@ using osu.Game.Rulesets.Objects.Types;
 using System.Collections.Generic;
 using osu.Game.Rulesets.Objects;
 using System.Linq;
+using osu.Framework.Bindables;
 using osu.Framework.Caching;
-using osu.Framework.Configuration;
 using osu.Game.Audio;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
@@ -262,6 +262,7 @@ namespace osu.Game.Rulesets.Osu.Objects
         {
             if (nodeIndex < NodeSamples.Count)
                 return NodeSamples[nodeIndex];
+
             return Samples;
         }
 

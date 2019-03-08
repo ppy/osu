@@ -2,7 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
-using osu.Framework.Configuration;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 
@@ -13,27 +13,39 @@ namespace osu.Game.Beatmaps.Drawables
     /// </summary>
     public class UpdateableBeatmapBackgroundSprite : ModelBackedDrawable<BeatmapInfo>
     {
-        public readonly IBindable<BeatmapInfo> Beatmap = new Bindable<BeatmapInfo>();
+        public readonly Bindable<BeatmapInfo> Beatmap = new Bindable<BeatmapInfo>();
 
         [Resolved]
         private BeatmapManager beatmaps { get; set; }
 
-        public UpdateableBeatmapBackgroundSprite()
+        private readonly BeatmapSetCoverType beatmapSetCoverType;
+
+        public UpdateableBeatmapBackgroundSprite(BeatmapSetCoverType beatmapSetCoverType = BeatmapSetCoverType.Cover)
         {
-            Beatmap.BindValueChanged(b => Model = b);
+            Beatmap.BindValueChanged(b => Model = b.NewValue);
+            this.beatmapSetCoverType = beatmapSetCoverType;
         }
 
         protected override Drawable CreateDrawable(BeatmapInfo model)
         {
-            return new DelayedLoadUnloadWrapper(() => {
+            return new DelayedLoadUnloadWrapper(() =>
+            {
                 Drawable drawable;
 
                 var localBeatmap = beatmaps.GetWorkingBeatmap(model);
 
-                if (localBeatmap.BeatmapInfo.ID == 0 && model?.BeatmapSet?.OnlineInfo != null)
-                    drawable = new BeatmapSetCover(model.BeatmapSet);
-                else
+                if (model?.BeatmapSet?.OnlineInfo != null)
+                    drawable = new BeatmapSetCover(model.BeatmapSet, beatmapSetCoverType);
+                else if (localBeatmap.BeatmapInfo.ID != 0)
+                {
+                    // Fall back to local background if one exists
                     drawable = new BeatmapBackgroundSprite(localBeatmap);
+                }
+                else
+                {
+                    // Use the default background if somehow an online set does not exist and we don't have a local copy.
+                    drawable = new BeatmapBackgroundSprite(beatmaps.DefaultBeatmap);
+                }
 
                 drawable.RelativeSizeAxes = Axes.Both;
                 drawable.Anchor = Anchor.Centre;
