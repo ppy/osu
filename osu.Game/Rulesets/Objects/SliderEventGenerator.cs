@@ -61,7 +61,7 @@ namespace osu.Game.Rulesets.Objects
                             Type = SliderEventType.Repeat,
                             SpanIndex = span,
                             SpanStartTime = startTime + span * spanDuration,
-                            StartTime = spanStartTime + (span + 1) * spanDuration,
+                            StartTime = spanStartTime + spanDuration,
                             PathProgress = (span + 1) % 2,
                         };
                     }
@@ -70,19 +70,37 @@ namespace osu.Game.Rulesets.Objects
 
             double totalDuration = spanCount * spanDuration;
 
-            var tail = new SliderEventDescriptor
+            // Okay, I'll level with you. I made a mistake. It was 2007.
+            // Times were simpler. osu! was but in its infancy and sliders were a new concept.
+            // A hack was made, which has unfortunately lived through until this day.
+            //
+            // This legacy tick is used for some calculations and judgements where audio output is not required.
+            // Generally we are keeping this around just for difficulty compatibility.
+            // Optimistically we do not want to ever use this for anything user-facing going forwards.
+
+            int finalSpanIndex = spanCount - 1;
+            double finalSpanStartTime = startTime + finalSpanIndex * spanDuration;
+            double finalSpanTime = Math.Max(startTime + totalDuration / 2, (finalSpanStartTime + spanDuration) - (legacyLastTickOffset ?? 0));
+            double finalProgress = (finalSpanTime - finalSpanStartTime) / spanDuration;
+            if (spanCount % 2 == 0) finalProgress = 1 - finalProgress;
+
+            yield return new SliderEventDescriptor
+            {
+                Type = SliderEventType.LegacyFinalTick,
+                SpanIndex = finalSpanIndex,
+                SpanStartTime = finalSpanStartTime,
+                StartTime = finalSpanTime,
+                PathProgress = finalProgress,
+            };
+
+            yield return new SliderEventDescriptor
             {
                 Type = SliderEventType.Tail,
                 SpanIndex = spanCount - 1,
                 SpanStartTime = startTime + (spanCount - 1) * spanDuration,
                 StartTime = startTime + totalDuration,
-                PathProgress = 1,
+                PathProgress = spanCount % 2,
             };
-
-            if (legacyLastTickOffset != null)
-                tail.StartTime = Math.Max(startTime + totalDuration / 2, tail.StartTime - legacyLastTickOffset.Value);
-
-            yield return tail;
         }
     }
 
@@ -102,6 +120,7 @@ namespace osu.Game.Rulesets.Objects
     public enum SliderEventType
     {
         Tick,
+        LegacyFinalTick,
         Head,
         Tail,
         Repeat

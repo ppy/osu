@@ -194,7 +194,7 @@ namespace osu.Game.Rulesets.Osu.Objects
                             ComboIndex = ComboIndex,
                         });
                         break;
-                    case SliderEventType.Tail:
+                    case SliderEventType.LegacyFinalTick:
                         AddNested(TailCircle = new SliderTailCircle(this)
                         {
                             StartTime = e.StartTime,
