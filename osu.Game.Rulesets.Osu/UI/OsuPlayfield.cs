@@ -10,6 +10,7 @@ using osu.Game.Rulesets.Osu.Objects.Drawables;
 using osu.Game.Rulesets.Osu.Objects.Drawables.Connections;
 using osu.Game.Rulesets.UI;
 using System.Linq;
+using osu.Framework.Graphics.Cursor;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Osu.UI.Cursor;
 
@@ -23,6 +24,12 @@ namespace osu.Game.Rulesets.Osu.UI
 
         public static readonly Vector2 BASE_SIZE = new Vector2(512, 384);
 
+        private readonly PlayfieldAdjustmentContainer adjustmentContainer;
+
+        protected override Container CursorTargetContainer => adjustmentContainer;
+
+        protected override CursorContainer CreateCursor() => new GameplayCursorContainer();
+
         public OsuPlayfield()
         {
             Anchor = Anchor.Centre;
@@ -30,7 +37,7 @@ namespace osu.Game.Rulesets.Osu.UI
 
             Size = new Vector2(0.75f);
 
-            InternalChild = new PlayfieldAdjustmentContainer
+            InternalChild = adjustmentContainer = new PlayfieldAdjustmentContainer
             {
                 RelativeSizeAxes = Axes.Both,
                 Children = new Drawable[]
@@ -51,7 +58,6 @@ namespace osu.Game.Rulesets.Osu.UI
                         RelativeSizeAxes = Axes.Both,
                         Depth = -1,
                     },
-                    Cursor = new GameplayCursorContainer(),
                 }
             };
         }
