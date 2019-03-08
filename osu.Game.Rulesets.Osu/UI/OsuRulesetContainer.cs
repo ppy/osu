@@ -60,6 +60,6 @@ namespace osu.Game.Rulesets.Osu.UI
             }
         }
 
-        protected override CursorContainer CreateCursor() => new GameplayCursor();
+        protected override CursorContainer CreateCursor() => new GameplayCursorContainer();
     }
 }
