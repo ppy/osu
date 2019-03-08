@@ -176,7 +176,7 @@ namespace osu.Game.Screens.Play
                     OnRetry = restart,
                     OnQuit = performUserRequestedExit,
                     CheckCanPause = () => AllowPause && ValidForResume && !HasFailed && !RulesetContainer.HasReplayLoaded.Value,
-                    Children = new Container[]
+                    Children = new[]
                     {
                         StoryboardContainer = CreateStoryboardContainer(),
                         new ScalingContainer(ScalingMode.Gameplay)
@@ -193,10 +193,8 @@ namespace osu.Game.Screens.Play
                             Origin = Anchor.Centre,
                             Breaks = beatmap.Breaks
                         },
-                        new ScalingContainer(ScalingMode.Gameplay)
-                        {
-                            Child = RulesetContainer.Cursor?.CreateProxy() ?? new Container(),
-                        },
+                        // display the cursor above some HUD elements.
+                        RulesetContainer.Cursor?.CreateProxy() ?? new Container(),
                         HUDOverlay = new HUDOverlay(ScoreProcessor, RulesetContainer, working, adjustableClock)
                         {
                             Anchor = Anchor.Centre,
