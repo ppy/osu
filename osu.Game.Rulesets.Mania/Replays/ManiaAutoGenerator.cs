@@ -5,13 +5,12 @@ using System.Collections.Generic;
 using System.Linq;
 using osu.Game.Replays;
 using osu.Game.Rulesets.Mania.Beatmaps;
-using osu.Game.Rulesets.Mania.Objects;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Replays;
 
 namespace osu.Game.Rulesets.Mania.Replays
 {
-    internal class ManiaAutoGenerator : AutoGenerator<ManiaHitObject>
+    internal class ManiaAutoGenerator : AutoGenerator
     {
         public const double RELEASE_DELAY = 20;
 

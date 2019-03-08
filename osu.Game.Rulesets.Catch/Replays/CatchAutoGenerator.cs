@@ -6,17 +6,20 @@ using System.Linq;
 using osu.Framework.MathUtils;
 using osu.Game.Beatmaps;
 using osu.Game.Replays;
+using osu.Game.Rulesets.Catch.Beatmaps;
 using osu.Game.Rulesets.Catch.Objects;
 using osu.Game.Rulesets.Catch.UI;
 using osu.Game.Rulesets.Replays;
 
 namespace osu.Game.Rulesets.Catch.Replays
 {
-    internal class CatchAutoGenerator : AutoGenerator<CatchHitObject>
+    internal class CatchAutoGenerator : AutoGenerator
     {
         public const double RELEASE_DELAY = 20;
 
-        public CatchAutoGenerator(Beatmap<CatchHitObject> beatmap)
+        public new CatchBeatmap Beatmap => (CatchBeatmap)base.Beatmap;
+
+        public CatchAutoGenerator(IBeatmap beatmap)
             : base(beatmap)
         {
             Replay = new Replay();
