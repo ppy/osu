@@ -55,7 +55,7 @@ namespace osu.Game.Beatmaps.Drawables
             {
                 drawable = new BeatmapSetCover(model.BeatmapSet, beatmapSetCoverType);
             }
-            else if (localInfo.ID != 0)
+            else if (localInfo?.ID != null)
             {
                 // Fall back to local background if one exists
                 drawable = new BeatmapBackgroundSprite(beatmaps.GetWorkingBeatmap(localInfo));
