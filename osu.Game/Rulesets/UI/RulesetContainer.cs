@@ -16,7 +16,9 @@ using System.Linq;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Input;
+using osu.Framework.Input.Events;
 using osu.Game.Configuration;
+using osu.Game.Graphics.Cursor;
 using osu.Game.Input.Handlers;
 using osu.Game.Overlays;
 using osu.Game.Replays;
@@ -32,7 +34,7 @@ namespace osu.Game.Rulesets.UI
     /// Should not be derived - derive <see cref="RulesetContainer{TObject}"/> instead.
     /// </para>
     /// </summary>
-    public abstract class RulesetContainer : Container
+    public abstract class RulesetContainer : Container, IProvideCursor
     {
         /// <summary>
         /// The selected variant.
@@ -77,7 +79,11 @@ namespace osu.Game.Rulesets.UI
         /// <summary>
         /// The cursor provided by this <see cref="RulesetContainer"/>. May be null if no cursor is provided.
         /// </summary>
-        public readonly CursorContainer Cursor;
+        public CursorContainer Cursor { get; }
+
+        public bool ProvidingUserCursor => Cursor != null && !HasReplayLoaded.Value;
+
+        protected override bool OnHover(HoverEvent e) => true; // required for IProvideCursor
 
         public readonly Ruleset Ruleset;
 

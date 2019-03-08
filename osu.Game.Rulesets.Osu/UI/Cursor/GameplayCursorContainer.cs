@@ -17,7 +17,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Osu.UI.Cursor
 {
-    public class GameplayCursor : CursorContainer, IKeyBindingHandler<OsuAction>
+    public class GameplayCursorContainer : CursorContainer, IKeyBindingHandler<OsuAction>
     {
         protected override Drawable CreateCursor() => new OsuCursor();
 
@@ -25,7 +25,7 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
 
         private readonly Container<Drawable> fadeContainer;
 
-        public GameplayCursor()
+        public GameplayCursorContainer()
         {
             InternalChild = fadeContainer = new Container
             {
