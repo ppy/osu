@@ -11,7 +11,6 @@ using osu.Framework.Caching;
 using osu.Game.Audio;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
-using osu.Game.Beatmaps.Formats;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Osu.Judgements;
 
@@ -210,7 +209,7 @@ namespace osu.Game.Rulesets.Osu.Objects
                             RepeatIndex = e.SpanIndex,
                             SpanDuration = SpanDuration,
                             StartTime = StartTime + (e.SpanIndex + 1) * SpanDuration,
-                            Position = Position + Path.PositionAt((e.SpanIndex + 1) % 2),
+                            Position = Position + Path.PositionAt(e.PathProgress),
                             StackHeight = StackHeight,
                             Scale = Scale,
                             Samples = getNodeSamples(1 + e.SpanIndex)
