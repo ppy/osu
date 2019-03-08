@@ -56,10 +56,6 @@ namespace osu.Game.Rulesets.UI
             RelativeSizeAxes = Axes.Both;
 
             hitObjectContainerLazy = new Lazy<HitObjectContainer>(CreateHitObjectContainer);
-
-            Cursor = CreateCursor();
-            if (Cursor != null)
-                CursorTargetContainer.Add(Cursor);
         }
 
         private WorkingBeatmap beatmap;
@@ -68,6 +64,10 @@ namespace osu.Game.Rulesets.UI
         private void load(IBindable<WorkingBeatmap> beatmap)
         {
             this.beatmap = beatmap.Value;
+
+            Cursor = CreateCursor();
+            if (Cursor != null)
+                CursorTargetContainer.Add(Cursor);
         }
 
         /// <summary>
