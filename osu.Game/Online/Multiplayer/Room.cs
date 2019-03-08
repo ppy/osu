@@ -124,6 +124,7 @@ namespace osu.Game.Online.Multiplayer
             if (other.Host.Value != null && Host.Value?.Id != other.Host.Value.Id)
                 Host.Value = other.Host.Value;
 
+            ChannelId.Value = other.ChannelId.Value;
             Status.Value = other.Status.Value;
             Availability.Value = other.Availability.Value;
             Type.Value = other.Type.Value;
