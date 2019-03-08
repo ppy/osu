@@ -17,7 +17,7 @@ using System.Linq;
 
 namespace osu.Game.Overlays.BeatmapSet.Scores
 {
-    public class ScoresContainer : Container
+    public class ScoresContainer : CompositeDrawable
     {
         private const int spacing = 15;
         private const int fade_duration = 200;
@@ -28,77 +28,15 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
         private readonly DrawableTopScore topScore;
         private readonly LoadingAnimation loadingAnimation;
 
-        private bool loading
-        {
-            set => loadingAnimation.FadeTo(value ? 1 : 0, fade_duration);
-        }
-
-        private IEnumerable<APIScoreInfo> scores;
-        private BeatmapInfo beatmap;
-
-        public IEnumerable<APIScoreInfo> Scores
-        {
-            get => scores;
-            set
-            {
-                getScoresRequest?.Cancel();
-                scores = value;
-
-                updateDisplay();
-            }
-        }
-
-        private GetScoresRequest getScoresRequest;
-        private APIAccess api;
-
-        public BeatmapInfo Beatmap
-        {
-            get => beatmap;
-            set
-            {
-                beatmap = value;
-
-                Scores = null;
-
-                if (beatmap?.OnlineBeatmapID.HasValue != true)
-                    return;
-
-                loading = true;
-
-                getScoresRequest = new GetScoresRequest(beatmap, beatmap.Ruleset);
-                getScoresRequest.Success += r => Schedule(() => Scores = r.Scores);
-                api.Queue(getScoresRequest);
-            }
-        }
-
-        private void updateDisplay()
-        {
-            scoreTable.ClearScores();
-
-            loading = false;
-
-            var scoreCount = scores?.Count() ?? 0;
-
-            if (scoreCount == 0)
-            {
-                topScore.Hide();
-                return;
-            }
-
-            topScore.Score = scores.FirstOrDefault();
-            topScore.Show();
-
-            if (scoreCount < 2)
-                return;
-
-            scoreTable.Scores = scores;
-        }
+        [Resolved]
+        private APIAccess api { get; set; }
 
         public ScoresContainer()
         {
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
-            Children = new Drawable[]
+
+            InternalChildren = new Drawable[]
             {
                 background = new Box
                 {
@@ -135,10 +73,74 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
         [BackgroundDependencyLoader]
         private void load(APIAccess api, OsuColour colours)
         {
-            this.api = api;
-
             background.Colour = colours.Gray2;
             updateDisplay();
+        }
+
+        private bool loading
+        {
+            set => loadingAnimation.FadeTo(value ? 1 : 0, fade_duration);
+        }
+
+        private GetScoresRequest getScoresRequest;
+
+        private IEnumerable<APIScoreInfo> scores;
+
+        public IEnumerable<APIScoreInfo> Scores
+        {
+            get => scores;
+            set
+            {
+                getScoresRequest?.Cancel();
+                scores = value;
+
+                updateDisplay();
+            }
+        }
+
+        private BeatmapInfo beatmap;
+
+        public BeatmapInfo Beatmap
+        {
+            get => beatmap;
+            set
+            {
+                beatmap = value;
+
+                Scores = null;
+
+                if (beatmap?.OnlineBeatmapID.HasValue != true)
+                    return;
+
+                loading = true;
+
+                getScoresRequest = new GetScoresRequest(beatmap, beatmap.Ruleset);
+                getScoresRequest.Success += r => Schedule(() => Scores = r.Scores);
+                api.Queue(getScoresRequest);
+            }
+        }
+
+        private void updateDisplay()
+        {
+            scoreTable.Scores = Enumerable.Empty<APIScoreInfo>();
+
+            loading = false;
+
+            var scoreCount = scores?.Count() ?? 0;
+
+            if (scoreCount == 0)
+            {
+                topScore.Hide();
+                return;
+            }
+
+            topScore.Score = scores.FirstOrDefault();
+            topScore.Show();
+
+            if (scoreCount < 2)
+                return;
+
+            scoreTable.Scores = scores;
         }
 
         protected override void Dispose(bool isDisposing)
