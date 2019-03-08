@@ -15,8 +15,8 @@ namespace osu.Game.Screens.Play.Break
 
         public FontAwesome Icon
         {
-            set { icon.Icon = value; }
-            get { return icon.Icon; }
+            set => icon.Icon = value;
+            get => icon.Icon;
         }
 
         public override Vector2 Size
@@ -27,7 +27,7 @@ namespace osu.Game.Screens.Play.Break
                 base.Size = value + BlurSigma * 2.5f;
                 ForceRedraw();
             }
-            get { return base.Size; }
+            get => base.Size;
         }
 
         public BlurredIcon()

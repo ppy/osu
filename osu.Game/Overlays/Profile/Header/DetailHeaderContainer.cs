@@ -26,13 +26,17 @@ namespace osu.Game.Overlays.Profile.Header
         private RankGraph rankGraph;
 
         private User user;
+
         public User User
         {
             get => user;
             set
             {
-                if (user == value) return;
+                if (user == value)
+                    return;
+
                 user = value;
+
                 updateDisplay();
             }
         }
@@ -181,7 +185,7 @@ namespace osu.Game.Overlays.Profile.Header
             totalPlayTimeTooltip.TooltipText = (user?.Statistics?.PlayTime ?? 0) / 3600 + " hours";
 
             foreach (var scoreRankInfo in scoreRankInfos)
-                scoreRankInfo.Value.RankCount = user?.Statistics?.GradesCount.GetForScoreRank(scoreRankInfo.Key) ?? 0;
+                scoreRankInfo.Value.RankCount = user?.Statistics?.GradesCount[scoreRankInfo.Key] ?? 0;
 
             detailGlobalRank.Content = user?.Statistics?.Ranks.Global?.ToString("#,##0") ?? "-";
             detailCountryRank.Content = user?.Statistics?.Ranks.Country?.ToString("#,##0") ?? "-";

@@ -5,7 +5,7 @@ using System;
 using System.ComponentModel;
 using System.Linq;
 using Newtonsoft.Json;
-using osu.Framework.Configuration;
+using osu.Framework.Bindables;
 
 namespace osu.Game.Users
 {
@@ -36,8 +36,8 @@ namespace osu.Game.Users
         [JsonProperty(@"cover_url")]
         public string CoverUrl
         {
-            get { return Cover?.Url; }
-            set { Cover = new UserCover { Url = value }; }
+            get => Cover?.Url;
+            set => Cover = new UserCover { Url = value };
         }
 
         [JsonProperty(@"cover")]
@@ -186,10 +186,13 @@ namespace osu.Game.Users
         {
             [Description("Keyboard")]
             Keyboard,
+
             [Description("Mouse")]
             Mouse,
+
             [Description("Tablet")]
             Tablet,
+
             [Description("Touch Screen")]
             Touch,
         }

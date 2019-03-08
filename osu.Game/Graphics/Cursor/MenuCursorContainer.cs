@@ -43,6 +43,7 @@ namespace osu.Game.Graphics.Cursor
         }
 
         private IProvideCursor currentTarget;
+
         protected override void Update()
         {
             base.Update();
@@ -50,6 +51,7 @@ namespace osu.Game.Graphics.Cursor
             if (!CanShowCursor)
             {
                 currentTarget?.Cursor?.Hide();
+                currentTarget = null;
                 return;
             }
 

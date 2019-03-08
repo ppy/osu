@@ -8,7 +8,8 @@ namespace osu.Game.Rulesets.Catch.Tests
     [TestFixture]
     public class TestCaseCatchPlayer : Game.Tests.Visual.TestCasePlayer
     {
-        public TestCaseCatchPlayer() : base(new CatchRuleset())
+        public TestCaseCatchPlayer()
+            : base(new CatchRuleset())
         {
         }
     }

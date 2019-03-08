@@ -20,7 +20,7 @@ namespace osu.Game.Tests.Visual
             typeof(ProfileHeader),
             typeof(RankGraph),
             typeof(LineGraph),
-            typeof(SupporterIcon)
+            typeof(ProfileHeaderTabControl),
         };
 
         [Resolved]
