@@ -3,7 +3,6 @@
 
 using osuTK;
 using osu.Game.Beatmaps;
-using osu.Game.Rulesets.Osu.Objects;
 using System;
 using System.Collections.Generic;
 using osu.Game.Replays;
@@ -12,7 +11,7 @@ using osu.Game.Rulesets.Replays;
 
 namespace osu.Game.Rulesets.Osu.Replays
 {
-    public abstract class OsuAutoGeneratorBase : AutoGenerator<OsuHitObject>
+    public abstract class OsuAutoGeneratorBase : AutoGenerator
     {
         #region Constants
 
@@ -35,7 +34,7 @@ namespace osu.Game.Rulesets.Osu.Replays
         protected Replay Replay;
         protected List<ReplayFrame> Frames => Replay.Frames;
 
-        protected OsuAutoGeneratorBase(Beatmap<OsuHitObject> beatmap)
+        protected OsuAutoGeneratorBase(IBeatmap beatmap)
             : base(beatmap)
         {
             Replay = new Replay();
