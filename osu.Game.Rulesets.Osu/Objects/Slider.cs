@@ -1,4 +1,4 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 using osuTK;
@@ -194,6 +194,7 @@ namespace osu.Game.Rulesets.Osu.Objects
                             ComboIndex = ComboIndex,
                         });
                         break;
+                    case SliderEventType.LegacyLastTick:
                         // we need to use the LegacyLastTick here for compatibility reasons (difficulty).
                         // it is *okay* to use this because the TailCircle is not used for any meaningful purpose in gameplay.
                         // if this is to change, we should revisit this.
