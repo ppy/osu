@@ -33,9 +33,9 @@ namespace osu.Game.Tests.Visual
             header = new ProfileHeader();
             Add(header);
 
-            AddStep("Show offline dummy", () => header.User = TestCaseUserProfile.TEST_USER);
+            AddStep("Show offline dummy", () => header.User.Value = TestCaseUserProfile.TEST_USER);
 
-            AddStep("Show null dummy", () => header.User = new User
+            AddStep("Show null dummy", () => header.User.Value = new User
             {
                 Username = "Null"
             });
@@ -65,11 +65,11 @@ namespace osu.Game.Tests.Visual
                 if (api.IsLoggedIn)
                 {
                     var request = new GetUserRequest(fallback.Id);
-                    request.Success += user => header.User = user;
+                    request.Success += user => header.User.Value = user;
                     api.Queue(request);
                 }
                 else
-                    header.User = fallback;
+                    header.User.Value = fallback;
             });
         }
     }

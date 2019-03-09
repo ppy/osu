@@ -81,7 +81,7 @@ namespace osu.Game.Overlays
 
             Show();
 
-            if (user.Id == Header?.User?.Id)
+            if (user.Id == Header?.User.Value?.Id)
                 return;
 
             userReq?.Cancel();
@@ -167,7 +167,7 @@ namespace osu.Game.Overlays
 
         private void userLoadComplete(User user)
         {
-            Header.User = user;
+            Header.User.Value = user;
 
             if (user.ProfileOrder != null)
             {

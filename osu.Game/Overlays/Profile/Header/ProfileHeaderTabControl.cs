@@ -93,11 +93,11 @@ namespace osu.Game.Overlays.Profile.Header
                 {
                     text = new OsuSpriteText
                     {
-                        Margin = new MarginPadding { Bottom = 15 },
+                        Margin = new MarginPadding { Bottom = 10 },
                         Origin = Anchor.BottomLeft,
                         Anchor = Anchor.BottomLeft,
                         Text = value,
-                        Font = OsuFont.GetFont(size: 14, weight: FontWeight.Bold)
+                        Font = OsuFont.GetFont()
                     },
                     bar = new Circle
                     {
@@ -134,7 +134,7 @@ namespace osu.Game.Overlays.Profile.Header
             {
                 text.FadeColour(AccentColour, 120, Easing.InQuad);
                 bar.ResizeHeightTo(0, 120, Easing.InQuad);
-                text.Font = text.Font.With(Typeface.Exo, weight: FontWeight.Medium);
+                text.Font = text.Font.With(weight: FontWeight.Medium);
             }
 
             private void onActivated(bool fake = false)
@@ -142,7 +142,7 @@ namespace osu.Game.Overlays.Profile.Header
                 text.FadeColour(Color4.White, 120, Easing.InQuad);
                 bar.ResizeHeightTo(7.5f, 120, Easing.InQuad);
                 if (!fake)
-                    text.Font = text.Font.With(Typeface.Exo, weight: FontWeight.Bold);
+                    text.Font = text.Font.With(weight: FontWeight.Bold);
             }
         }
     }

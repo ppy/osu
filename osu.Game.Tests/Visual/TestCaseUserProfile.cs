@@ -87,8 +87,6 @@ namespace osu.Game.Tests.Visual
 
             AddStep("Show offline dummy", () => profile.ShowUser(TEST_USER, false));
 
-            checkSupporterTag(false);
-
             AddStep("Show null dummy", () => profile.ShowUser(new User
             {
                 Username = @"Null",
@@ -104,8 +102,6 @@ namespace osu.Game.Tests.Visual
                 CoverUrl = @"https://osu.ppy.sh/images/headers/profile-covers/c3.jpg"
             }, api.IsLoggedIn));
 
-            checkSupporterTag(true);
-
             AddStep("Show flyte", () => profile.ShowUser(new User
             {
                 Username = @"flyte",
@@ -116,15 +112,6 @@ namespace osu.Game.Tests.Visual
 
             AddStep("Hide", profile.Hide);
             AddStep("Show without reload", profile.Show);
-        }
-
-        private void checkSupporterTag(bool isSupporter)
-        {
-            AddUntilStep(() => profile.Header.User != null, "wait for load");
-            if (isSupporter)
-                AddAssert("is supporter", () => profile.Header.SupporterTag.Alpha == 1);
-            else
-                AddAssert("no supporter", () => profile.Header.SupporterTag.Alpha == 0);
         }
 
         private class TestUserProfileOverlay : UserProfileOverlay

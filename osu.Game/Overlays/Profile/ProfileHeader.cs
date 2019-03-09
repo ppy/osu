@@ -2,43 +2,31 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
-using osuTK.Graphics;
-using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
-using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Textures;
 using osu.Game.Graphics;
-using osu.Game.Graphics.Sprites;
 using osu.Game.Overlays.Profile.Header;
 using osu.Game.Users;
 using osu.Framework.Bindables;
+using osu.Game.Graphics.UserInterface;
 
 namespace osu.Game.Overlays.Profile
 {
     public class ProfileHeader : Container
     {
-        private readonly Container coverContainer;
-        private readonly OsuSpriteText coverInfoText;
+        private readonly UserCoverBackground coverContainer;
+        private readonly ScreenTitle coverTitle;
         private readonly ProfileHeaderTabControl infoTabControl;
-
-        private readonly TopHeaderContainer topHeaderContainer;
-        public SupporterIcon SupporterTag => topHeaderContainer.SupporterTag;
-
-        private readonly CenterHeaderContainer centerHeaderContainer;
-        public readonly BindableBool DetailsVisible = new BindableBool();
-
-        private readonly DetailHeaderContainer detailHeaderContainer;
-        private readonly MedalHeaderContainer medalHeaderContainer;
-        private readonly BottomHeaderContainer bottomHeaderContainer;
 
         private const float cover_height = 150;
         private const float cover_info_height = 75;
 
         public ProfileHeader()
         {
+            CenterHeaderContainer centerHeaderContainer;
+            DetailHeaderContainer detailHeaderContainer;
             Container expandedDetailContainer;
             FillFlowContainer hiddenDetailContainer, headerDetailContainer;
             SpriteIcon expandButtonIcon;
@@ -48,19 +36,10 @@ namespace osu.Game.Overlays.Profile
 
             Children = new Drawable[]
             {
-                coverContainer = new Container
+                coverContainer = new UserCoverBackground
                 {
                     RelativeSizeAxes = Axes.X,
                     Height = cover_height,
-                    Masking = true,
-                    Children = new Drawable[]
-                    {
-                        new Box
-                        {
-                            RelativeSizeAxes = Axes.Both,
-                            Colour = ColourInfo.GradientVertical(Color4.Black.Opacity(0.1f), Color4.Black.Opacity(0.75f))
-                        },
-                    }
                 },
                 new Container
                 {
@@ -73,25 +52,10 @@ namespace osu.Game.Overlays.Profile
                     Depth = -float.MaxValue,
                     Children = new Drawable[]
                     {
-                        new FillFlowContainer
+                        coverTitle = new ScreenTitle
                         {
-                            AutoSizeAxes = Axes.Both,
-                            Direction = FillDirection.Horizontal,
-                            Children = new[]
-                            {
-                                new OsuSpriteText
-                                {
-                                    Text = "Player ",
-                                    Font = "Exo2.0-Regular",
-                                    TextSize = 30
-                                },
-                                coverInfoText = new OsuSpriteText
-                                {
-                                    Text = "Info",
-                                    Font = "Exo2.0-Regular",
-                                    TextSize = 30
-                                }
-                            }
+                            Title = "Player ",
+                            Page = "Info"
                         },
                         infoTabControl = new ProfileHeaderTabControl
                         {
@@ -112,30 +76,30 @@ namespace osu.Game.Overlays.Profile
                     Direction = FillDirection.Vertical,
                     Children = new Drawable[]
                     {
-                        topHeaderContainer = new TopHeaderContainer
+                        new TopHeaderContainer
                         {
                             RelativeSizeAxes = Axes.X,
-                            Height = 150,
+                            User = { BindTarget = User },
                         },
                         centerHeaderContainer = new CenterHeaderContainer
                         {
                             RelativeSizeAxes = Axes.X,
-                            Height = 60,
+                            User = { BindTarget = User },
                         },
                         detailHeaderContainer = new DetailHeaderContainer
                         {
                             RelativeSizeAxes = Axes.X,
-                            AutoSizeAxes = Axes.Y,
+                            User = { BindTarget = User },
                         },
-                        medalHeaderContainer = new MedalHeaderContainer
+                        new MedalHeaderContainer
                         {
                             RelativeSizeAxes = Axes.X,
-                            AutoSizeAxes = Axes.Y,
+                            User = { BindTarget = User },
                         },
-                        bottomHeaderContainer = new BottomHeaderContainer
+                        new BottomHeaderContainer
                         {
                             RelativeSizeAxes = Axes.X,
-                            AutoSizeAxes = Axes.Y,
+                            User = { BindTarget = User },
                         },
                     }
                 }
@@ -144,99 +108,28 @@ namespace osu.Game.Overlays.Profile
             infoTabControl.AddItem("Info");
             infoTabControl.AddItem("Modding");
 
-            centerHeaderContainer.DetailsVisible.BindTo(DetailsVisible);
-            DetailsVisible.ValueChanged += visible => detailHeaderContainer.Alpha = visible.NewValue ? 0 : 1;
+            centerHeaderContainer.DetailsVisibilityAction = visible => detailHeaderContainer.Alpha = visible ? 0 : 1;
+            User.ValueChanged += e => updateDisplay(e.NewValue);
         }
 
         [BackgroundDependencyLoader]
         private void load(OsuColour colours, TextureStore textures)
         {
-            coverInfoText.Colour = colours.CommunityUserGreen;
+            coverTitle.AccentColour = colours.CommunityUserGreen;
 
             infoTabControl.AccentColour = colours.CommunityUserGreen;
         }
 
-        private User user;
+        public Bindable<User> User = new Bindable<User>();
 
-        public User User
+        private void updateDisplay(User user)
         {
-            get => user;
-            set
-            {
-                medalHeaderContainer.User = detailHeaderContainer.User = bottomHeaderContainer.User =
-                    centerHeaderContainer.User = topHeaderContainer.User = user = value;
-                updateDisplay();
-            }
-        }
-
-        private void updateDisplay()
-        {
-            coverContainer.RemoveAll(d => d is UserCoverBackground);
-            LoadComponentAsync(new UserCoverBackground(user)
-            {
-                RelativeSizeAxes = Axes.Both,
-                Anchor = Anchor.Centre,
-                Origin = Anchor.Centre,
-                FillMode = FillMode.Fill,
-                OnLoadComplete = d => d.FadeInFromZero(200),
-                Depth = float.MaxValue,
-            }, coverContainer.Add);
+            coverContainer.User = user;
         }
 
         public class HasTooltipContainer : Container, IHasTooltip
         {
             public string TooltipText { get; set; }
-        }
-
-        public class OverlinedInfoContainer : CompositeDrawable
-        {
-            private readonly Circle line;
-            private readonly OsuSpriteText title, content;
-
-            public string Title
-            {
-                set => title.Text = value;
-            }
-
-            public string Content
-            {
-                set => content.Text = value;
-            }
-
-            public Color4 LineColour
-            {
-                set => line.Colour = value;
-            }
-
-            public OverlinedInfoContainer(bool big = false, int minimumWidth = 60)
-            {
-                AutoSizeAxes = Axes.Both;
-                InternalChild = new FillFlowContainer
-                {
-                    Direction = FillDirection.Vertical,
-                    AutoSizeAxes = Axes.Both,
-                    Children = new Drawable[]
-                    {
-                        line = new Circle
-                        {
-                            RelativeSizeAxes = Axes.X,
-                            Height = 4,
-                        },
-                        title = new OsuSpriteText
-                        {
-                            Font = OsuFont.GetFont(size: big ? 14 : 12, weight: FontWeight.Bold)
-                        },
-                        content = new OsuSpriteText
-                        {
-                            Font = OsuFont.GetFont(size: big ? 40 : 18, weight: FontWeight.Light)
-                        },
-                        new Container //Add a minimum size to the FillFlowContainer
-                        {
-                            Width = minimumWidth,
-                        }
-                    }
-                };
-            }
         }
     }
 }

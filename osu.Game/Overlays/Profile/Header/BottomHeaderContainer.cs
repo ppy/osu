@@ -4,6 +4,7 @@
 using System;
 using System.Linq;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -17,32 +18,21 @@ using osuTK.Graphics;
 
 namespace osu.Game.Overlays.Profile.Header
 {
-    public class BottomHeaderContainer : Container
+    public class BottomHeaderContainer : CompositeDrawable
     {
         private LinkFlowContainer bottomTopLinkContainer;
         private LinkFlowContainer bottomLinkContainer;
         private Color4 linkBlue, communityUserGrayGreenLighter;
 
-        private User user;
-
-        public User User
-        {
-            get => user;
-            set
-            {
-                if (user == value)
-                    return;
-
-                user = value;
-
-                updateDisplay();
-            }
-        }
+        public readonly Bindable<User> User = new Bindable<User>();
 
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
-            Children = new Drawable[]
+            AutoSizeAxes = Axes.Y;
+            User.ValueChanged += e => updateDisplay(e.NewValue);
+
+            InternalChildren = new Drawable[]
             {
                 new Box
                 {
@@ -76,7 +66,7 @@ namespace osu.Game.Overlays.Profile.Header
             communityUserGrayGreenLighter = colours.CommunityUserGrayGreenLighter;
         }
 
-        private void updateDisplay()
+        private void updateDisplay(User user)
         {
             void bold(SpriteText t) => t.Font = @"Exo2.0-Bold";
             void addSpacer(OsuTextFlowContainer textFlow) => textFlow.AddArbitraryDrawable(new Container { Width = 15 });
