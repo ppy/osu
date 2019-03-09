@@ -20,13 +20,13 @@ namespace osu.Game.Utils
 
         private readonly List<Task> tasks = new List<Task>();
 
-        private Exception lastException;
-
         public RavenLogger(OsuGame game)
         {
             raven.Release = game.Version;
 
             if (!game.IsDeployedBuild) return;
+
+            Exception lastException = null;
 
             Logger.NewEntry += entry =>
             {
