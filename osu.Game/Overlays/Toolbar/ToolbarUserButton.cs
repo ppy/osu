@@ -42,7 +42,7 @@ namespace osu.Game.Overlays.Toolbar
             });
         }
 
-        [BackgroundDependencyLoader]
+        [BackgroundDependencyLoader(true)]
         private void load(APIAccess api, LoginOverlay login)
         {
             api.Register(this);
