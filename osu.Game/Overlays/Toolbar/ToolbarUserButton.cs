@@ -13,7 +13,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Overlays.Toolbar
 {
-    public class ToolbarUserButton : ToolbarButton, IOnlineComponent
+    public class ToolbarUserButton : ToolbarOverlayToggleButton, IOnlineComponent
     {
         private readonly UpdateableAvatar avatar;
 
@@ -43,9 +43,11 @@ namespace osu.Game.Overlays.Toolbar
         }
 
         [BackgroundDependencyLoader]
-        private void load(APIAccess api)
+        private void load(APIAccess api, LoginOverlay login)
         {
             api.Register(this);
+
+            StateContainer = login;
         }
 
         public void APIStateChanged(APIAccess api, APIState state)

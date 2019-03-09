@@ -74,6 +74,8 @@ namespace osu.Game
 
         private BeatmapSetOverlay beatmapSetOverlay;
 
+        private LoginOverlay loginOverlay;
+
         [Cached]
         private readonly ScreenshotManager screenshotManager = new ScreenshotManager();
 
@@ -421,7 +423,7 @@ namespace osu.Game
 
             loadComponentSingleFile(Toolbar = new Toolbar
             {
-                Depth = -5,
+                Depth = -7,
                 OnHome = delegate
                 {
                     CloseAllOverlays(false);
@@ -446,14 +448,6 @@ namespace osu.Game
             }, floatingOverlayContent.Add);
             loadComponentSingleFile(userProfile = new UserProfileOverlay { Depth = -2 }, overlayContent.Add);
             loadComponentSingleFile(beatmapSetOverlay = new BeatmapSetOverlay { Depth = -3 }, overlayContent.Add);
-            loadComponentSingleFile(musicController = new MusicController
-            {
-                Depth = -5,
-                Position = new Vector2(0, Toolbar.HEIGHT),
-                Anchor = Anchor.TopRight,
-                Origin = Anchor.TopRight,
-            }, floatingOverlayContent.Add);
-
             loadComponentSingleFile(notifications = new NotificationOverlay
             {
                 GetToolbarHeight = () => ToolbarOffset,
@@ -462,19 +456,35 @@ namespace osu.Game
                 Origin = Anchor.TopRight,
             }, floatingOverlayContent.Add);
 
-            loadComponentSingleFile(accountCreation = new AccountCreationOverlay
+            loadComponentSingleFile(musicController = new MusicController
+            {
+                Depth = -5,
+                Position = new Vector2(0, Toolbar.HEIGHT),
+                Anchor = Anchor.TopRight,
+                Origin = Anchor.TopRight,
+            }, floatingOverlayContent.Add);
+
+            loadComponentSingleFile(loginOverlay = new LoginOverlay
             {
                 Depth = -6,
+                Position = new Vector2(-ToolbarButton.WIDTH, Toolbar.HEIGHT),
+                Anchor = Anchor.TopRight,
+                Origin = Anchor.TopRight,
+            }, floatingOverlayContent.Add);
+
+            loadComponentSingleFile(accountCreation = new AccountCreationOverlay
+            {
+                Depth = -8,
             }, floatingOverlayContent.Add);
 
             loadComponentSingleFile(dialogOverlay = new DialogOverlay
             {
-                Depth = -7,
+                Depth = -9,
             }, floatingOverlayContent.Add);
 
             loadComponentSingleFile(externalLinkOpener = new ExternalLinkOpener
             {
-                Depth = -8,
+                Depth = -10,
             }, floatingOverlayContent.Add);
 
             dependencies.CacheAs(idleTracker);
@@ -490,6 +500,7 @@ namespace osu.Game
             dependencies.Cache(notifications);
             dependencies.Cache(dialogOverlay);
             dependencies.Cache(accountCreation);
+            dependencies.Cache(loginOverlay);
 
             chatOverlay.StateChanged += state => channelManager.HighPollRate.Value = state == Visibility.Visible;
 
