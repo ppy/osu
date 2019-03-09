@@ -1,75 +1,48 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System.Collections.Generic;
+using System;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
-using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
 using osu.Game.Graphics;
-using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
-using osu.Game.Online.API;
-using osu.Game.Online.Chat;
 using osu.Game.Users;
 using osuTK;
 using osuTK.Graphics;
 
 namespace osu.Game.Overlays.Profile.Header
 {
-    public class CenterHeaderContainer : Container
+    public class CenterHeaderContainer : CompositeDrawable
     {
-        public readonly BindableBool DetailsVisible = new BindableBool();
+        public Action<bool> DetailsVisibilityAction;
+        private bool detailsVisible;
 
         private OsuSpriteText followerText;
-        private ProfileHeaderButton messageButton;
         private OsuSpriteText levelBadgeText;
 
         private Bar levelProgressBar;
         private OsuSpriteText levelProgressText;
 
-        private ProfileHeader.OverlinedInfoContainer hiddenDetailGlobal, hiddenDetailCountry;
+        private OverlinedInfoContainer hiddenDetailGlobal, hiddenDetailCountry;
 
-        [Resolved(CanBeNull = true)]
-        private ChannelManager channelManager { get; set; }
-
-        [Resolved(CanBeNull = true)]
-        private UserProfileOverlay userOverlay { get; set; }
-
-        [Resolved(CanBeNull = true)]
-        private ChatOverlay chatOverlay { get; set; }
-
-        [Resolved]
-        private APIAccess apiAccess { get; set; }
-
-        private User user;
-
-        public User User
-        {
-            get => user;
-            set
-            {
-                if (user == value)
-                    return;
-
-                user = value;
-
-                updateDisplay();
-            }
-        }
+        public readonly Bindable<User> User = new Bindable<User>();
 
         [BackgroundDependencyLoader]
         private void load(OsuColour colours, TextureStore textures)
         {
             Container<Drawable> hiddenDetailContainer, expandedDetailContainer;
             SpriteIcon expandButtonIcon;
+            ProfileHeaderButton detailsToggleButton;
+            Height = 60;
+            User.ValueChanged += e => updateDisplay(e.NewValue);
 
-            Children = new Drawable[]
+            InternalChildren = new Drawable[]
             {
                 new Box
                 {
@@ -118,21 +91,9 @@ namespace osu.Game.Overlays.Profile.Header
                                 }
                             }
                         },
-                        messageButton = new ProfileHeaderButton
+                        new ProfileMessageButton
                         {
-                            Alpha = 0,
-                            RelativeSizeAxes = Axes.Y,
-                            Children = new Drawable[]
-                            {
-                                new SpriteIcon
-                                {
-                                    Anchor = Anchor.CentreLeft,
-                                    Origin = Anchor.CentreLeft,
-                                    Icon = FontAwesome.fa_envelope,
-                                    FillMode = FillMode.Fit,
-                                    Size = new Vector2(50, 14)
-                                },
-                            }
+                            User = { BindTarget = User }
                         },
                     }
                 },
@@ -143,12 +104,11 @@ namespace osu.Game.Overlays.Profile.Header
                     RelativeSizeAxes = Axes.Y,
                     Padding = new MarginPadding { Vertical = 10 },
                     Width = UserProfileOverlay.CONTENT_X_MARGIN,
-                    Child = new ProfileHeaderButton
+                    Child = detailsToggleButton = new ProfileHeaderButton
                     {
                         RelativeSizeAxes = Axes.Y,
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
-                        Action = DetailsVisible.Toggle,
                         Children = new Drawable[]
                         {
                             expandButtonIcon = new SpriteIcon
@@ -233,12 +193,12 @@ namespace osu.Game.Overlays.Profile.Header
                             Margin = new MarginPadding { Right = 50 },
                             Children = new[]
                             {
-                                hiddenDetailGlobal = new ProfileHeader.OverlinedInfoContainer
+                                hiddenDetailGlobal = new OverlinedInfoContainer
                                 {
                                     Title = "Global Ranking",
                                     LineColour = colours.Yellow
                                 },
-                                hiddenDetailCountry = new ProfileHeader.OverlinedInfoContainer
+                                hiddenDetailCountry = new OverlinedInfoContainer
                                 {
                                     Title = "Country Ranking",
                                     LineColour = colours.Yellow
@@ -249,76 +209,26 @@ namespace osu.Game.Overlays.Profile.Header
                 }
             };
 
-            DetailsVisible.ValueChanged += visible =>
+            detailsToggleButton.Action = () =>
             {
-                expandButtonIcon.Icon = visible.NewValue ? FontAwesome.fa_chevron_down : FontAwesome.fa_chevron_up;
-                hiddenDetailContainer.Alpha = visible.NewValue ? 1 : 0;
-                expandedDetailContainer.Alpha = visible.NewValue ? 0 : 1;
+                detailsVisible = !detailsVisible;
+                expandButtonIcon.Icon = detailsVisible ? FontAwesome.fa_chevron_down : FontAwesome.fa_chevron_up;
+                hiddenDetailContainer.Alpha = detailsVisible ? 1 : 0;
+                expandedDetailContainer.Alpha = detailsVisible ? 0 : 1;
+                DetailsVisibilityAction(detailsVisible);
             };
         }
 
-        private void updateDisplay()
+        private void updateDisplay(User user)
         {
             followerText.Text = user.FollowerCount?.Length > 0 ? user.FollowerCount[0].ToString("#,##0") : "0";
-
-            if (!user.PMFriendsOnly && apiAccess.LocalUser.Value.Id != user.Id)
-            {
-                messageButton.Show();
-                messageButton.Action = () =>
-                {
-                    channelManager?.OpenPrivateChannel(user);
-                    userOverlay?.Hide();
-                    chatOverlay?.Show();
-                };
-            }
-            else
-            {
-                messageButton.Hide();
-            }
 
             levelBadgeText.Text = user.Statistics?.Level.Current.ToString() ?? "0";
             levelProgressBar.Length = user.Statistics?.Level.Progress / 100f ?? 0;
             levelProgressText.Text = user.Statistics?.Level.Progress.ToString("0'%'");
 
-            hiddenDetailGlobal.Content = user?.Statistics?.Ranks.Global?.ToString("#,##0") ?? "-";
-            hiddenDetailCountry.Content = user?.Statistics?.Ranks.Country?.ToString("#,##0") ?? "-";
-        }
-
-        private class ProfileHeaderButton : OsuHoverContainer
-        {
-            private readonly Box background;
-            private readonly Container content;
-
-            protected override Container<Drawable> Content => content;
-
-            protected override IEnumerable<Drawable> EffectTargets => new[] { background };
-
-            public ProfileHeaderButton()
-            {
-                HoverColour = Color4.Black.Opacity(0.75f);
-                IdleColour = Color4.Black.Opacity(0.7f);
-                AutoSizeAxes = Axes.X;
-
-                base.Content.Add(new CircularContainer
-                {
-                    Masking = true,
-                    AutoSizeAxes = Axes.X,
-                    RelativeSizeAxes = Axes.Y,
-                    Children = new Drawable[]
-                    {
-                        background = new Box
-                        {
-                            RelativeSizeAxes = Axes.Both,
-                        },
-                        content = new Container
-                        {
-                            AutoSizeAxes = Axes.X,
-                            RelativeSizeAxes = Axes.Y,
-                            Padding = new MarginPadding { Horizontal = 10 },
-                        }
-                    }
-                });
-            }
+            hiddenDetailGlobal.Content = user.Statistics?.Ranks.Global?.ToString("#,##0") ?? "-";
+            hiddenDetailCountry.Content = user.Statistics?.Ranks.Country?.ToString("#,##0") ?? "-";
         }
     }
 }

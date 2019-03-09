@@ -3,6 +3,7 @@
 
 using System.Collections.Generic;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -17,34 +18,23 @@ using osuTK;
 
 namespace osu.Game.Overlays.Profile.Header
 {
-    public class DetailHeaderContainer : Container
+    public class DetailHeaderContainer : CompositeDrawable
     {
         private ProfileHeader.HasTooltipContainer totalPlayTimeTooltip;
-        private ProfileHeader.OverlinedInfoContainer totalPlayTimeInfo, medalInfo, ppInfo;
+        private OverlinedInfoContainer totalPlayTimeInfo, medalInfo, ppInfo;
         private readonly Dictionary<ScoreRank, ScoreRankInfo> scoreRankInfos = new Dictionary<ScoreRank, ScoreRankInfo>();
-        private ProfileHeader.OverlinedInfoContainer detailGlobalRank, detailCountryRank;
+        private OverlinedInfoContainer detailGlobalRank, detailCountryRank;
         private RankGraph rankGraph;
 
-        private User user;
-
-        public User User
-        {
-            get => user;
-            set
-            {
-                if (user == value)
-                    return;
-
-                user = value;
-
-                updateDisplay();
-            }
-        }
+        public readonly Bindable<User> User = new Bindable<User>();
 
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
-            Children = new Drawable[]
+            AutoSizeAxes = Axes.Y;
+            User.ValueChanged += e => updateDisplay(e.NewValue);
+
+            InternalChildren = new Drawable[]
             {
                 new Box
                 {
@@ -79,18 +69,18 @@ namespace osu.Game.Overlays.Profile.Header
                                         {
                                             AutoSizeAxes = Axes.Both,
                                             TooltipText = "0 hours",
-                                            Child = totalPlayTimeInfo = new ProfileHeader.OverlinedInfoContainer
+                                            Child = totalPlayTimeInfo = new OverlinedInfoContainer
                                             {
                                                 Title = "Total Play Time",
                                                 LineColour = colours.Yellow,
                                             },
                                         },
-                                        medalInfo = new ProfileHeader.OverlinedInfoContainer
+                                        medalInfo = new OverlinedInfoContainer
                                         {
                                             Title = "Medals",
                                             LineColour = colours.GreenLight,
                                         },
-                                        ppInfo = new ProfileHeader.OverlinedInfoContainer
+                                        ppInfo = new OverlinedInfoContainer
                                         {
                                             Title = "pp",
                                             LineColour = colours.Red,
@@ -135,12 +125,12 @@ namespace osu.Game.Overlays.Profile.Header
                                     Spacing = new Vector2(0, 20),
                                     Children = new Drawable[]
                                     {
-                                        detailGlobalRank = new ProfileHeader.OverlinedInfoContainer(true, 110)
+                                        detailGlobalRank = new OverlinedInfoContainer(true, 110)
                                         {
                                             Title = "Global Ranking",
                                             LineColour = colours.Yellow,
                                         },
-                                        detailCountryRank = new ProfileHeader.OverlinedInfoContainer(false, 110)
+                                        detailCountryRank = new OverlinedInfoContainer(false, 110)
                                         {
                                             Title = "Country Ranking",
                                             LineColour = colours.Yellow,
@@ -154,7 +144,7 @@ namespace osu.Game.Overlays.Profile.Header
             };
         }
 
-        private void updateDisplay()
+        private void updateDisplay(User user)
         {
             medalInfo.Content = user?.Achievements?.Length.ToString() ?? "0";
             ppInfo.Content = user?.Statistics?.PP?.ToString("#,##0") ?? "0";

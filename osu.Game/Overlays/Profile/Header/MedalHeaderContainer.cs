@@ -2,14 +2,12 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Shapes;
-using osu.Framework.Graphics.Sprites;
-using osu.Framework.Graphics.Textures;
 using osu.Game.Graphics;
 using osu.Game.Users;
 using osuTK;
@@ -17,31 +15,20 @@ using osuTK.Graphics;
 
 namespace osu.Game.Overlays.Profile.Header
 {
-    public class MedalHeaderContainer : Container
+    public class MedalHeaderContainer : CompositeDrawable
     {
         private FillFlowContainer badgeFlowContainer;
 
-        private User user;
-
-        public User User
-        {
-            get => user;
-            set
-            {
-                if (user == value)
-                    return;
-
-                user = value;
-
-                updateDisplay();
-            }
-        }
+        public readonly Bindable<User> User = new Bindable<User>();
 
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
             Alpha = 0;
-            Children = new Drawable[]
+            AutoSizeAxes = Axes.Y;
+            User.ValueChanged += e => updateDisplay(e.NewValue);
+
+            InternalChildren = new Drawable[]
             {
                 new Box
                 {
@@ -76,9 +63,9 @@ namespace osu.Game.Overlays.Profile.Header
             };
         }
 
-        private void updateDisplay()
+        private void updateDisplay(User user)
         {
-            var badges = User.Badges;
+            var badges = user.Badges;
             badgeFlowContainer.Clear();
             if (badges?.Length > 0)
             {
@@ -99,38 +86,6 @@ namespace osu.Game.Overlays.Profile.Header
             {
                 Hide();
             }
-        }
-
-        private class DrawableBadge : CompositeDrawable, IHasTooltip
-        {
-            public static readonly Vector2 DRAWABLE_BADGE_SIZE = new Vector2(86, 40);
-
-            private readonly Badge badge;
-
-            public DrawableBadge(Badge badge)
-            {
-                this.badge = badge;
-                Size = DRAWABLE_BADGE_SIZE;
-            }
-
-            [BackgroundDependencyLoader]
-            private void load(LargeTextureStore textures)
-            {
-                InternalChild = new Sprite
-                {
-                    FillMode = FillMode.Fit,
-                    RelativeSizeAxes = Axes.Both,
-                    Texture = textures.Get(badge.ImageUrl),
-                };
-            }
-
-            protected override void LoadComplete()
-            {
-                base.LoadComplete();
-                InternalChild.FadeInFromZero(200);
-            }
-
-            public string TooltipText => badge.Description;
         }
     }
 }

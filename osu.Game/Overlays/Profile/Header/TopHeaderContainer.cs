@@ -3,6 +3,7 @@
 
 using System;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -14,9 +15,9 @@ using osuTK;
 
 namespace osu.Game.Overlays.Profile.Header
 {
-    public class TopHeaderContainer : Container
+    public class TopHeaderContainer : CompositeDrawable
     {
-        public SupporterIcon SupporterTag;
+        private SupporterIcon supporterTag;
         private UpdateableAvatar avatar;
         private OsuSpriteText usernameText;
         private ExternalLinkButton openUserExternally;
@@ -27,26 +28,15 @@ namespace osu.Game.Overlays.Profile.Header
 
         private const float avatar_size = 110;
 
-        private User user;
-
-        public User User
-        {
-            get => user;
-            set
-            {
-                if (user == value)
-                    return;
-
-                user = value;
-
-                updateDisplay();
-            }
-        }
+        public readonly Bindable<User> User = new Bindable<User>();
 
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
-            Children = new Drawable[]
+            Height = 150;
+            User.ValueChanged += e => updateDisplay(e.NewValue);
+
+            InternalChildren = new Drawable[]
             {
                 new Box
                 {
@@ -109,7 +99,7 @@ namespace osu.Game.Overlays.Profile.Header
                                             TextSize = 18,
                                             Font = "Exo2.0-Regular"
                                         },
-                                        SupporterTag = new SupporterIcon
+                                        supporterTag = new SupporterIcon
                                         {
                                             Height = 20,
                                             Margin = new MarginPadding { Top = 5 }
@@ -161,14 +151,14 @@ namespace osu.Game.Overlays.Profile.Header
             };
         }
 
-        private void updateDisplay()
+        private void updateDisplay(User user)
         {
-            avatar.User = User;
+            avatar.User = user;
             usernameText.Text = user.Username;
             openUserExternally.Link = $@"https://osu.ppy.sh/users/{user.Id}";
             userFlag.Country = user.Country;
             userCountryText.Text = user.Country?.FullName ?? "Alien";
-            SupporterTag.SupporterLevel = user.SupportLevel;
+            supporterTag.SupporterLevel = user.SupportLevel;
             titleText.Text = user.Title;
             titleText.Colour = OsuColour.FromHex(user.Colour ?? "fff");
 

@@ -10,10 +10,11 @@ using osu.Game.Graphics;
 
 namespace osu.Game.Overlays.Profile.Header
 {
-    public class SupporterIcon : CircularContainer, IHasTooltip
+    public class SupporterIcon : CompositeDrawable, IHasTooltip
     {
         private readonly Box background;
         private readonly FillFlowContainer iconContainer;
+        private readonly CircularContainer content;
 
         public string TooltipText => "osu!supporter";
 
@@ -23,11 +24,11 @@ namespace osu.Game.Overlays.Profile.Header
             {
                 if (value == 0)
                 {
-                    Hide();
+                    content.Hide();
                 }
                 else
                 {
-                    Show();
+                    content.Show();
                     iconContainer.Clear();
                     for (int i = 0; i < value; i++)
                     {
@@ -38,41 +39,36 @@ namespace osu.Game.Overlays.Profile.Header
                             Icon = FontAwesome.fa_heart,
                         });
                     }
+
+                    iconContainer.Padding = new MarginPadding { Horizontal = DrawHeight / 2 };
                 }
             }
         }
 
         public SupporterIcon()
         {
-            Masking = true;
             AutoSizeAxes = Axes.X;
-            Hide();
 
-            Children = new Drawable[]
+            InternalChild = content = new CircularContainer
             {
-                background = new Box { RelativeSizeAxes = Axes.Both },
-                iconContainer = new FillFlowContainer
+                RelativeSizeAxes = Axes.Y,
+                AutoSizeAxes = Axes.X,
+                Masking = true,
+                Alpha = 0,
+                Children = new Drawable[]
                 {
-                    Direction = FillDirection.Horizontal,
-                    RelativeSizeAxes = Axes.Y,
-                    AutoSizeAxes = Axes.X,
-                    Height = 0.6f,
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
+                    background = new Box { RelativeSizeAxes = Axes.Both },
+                    iconContainer = new FillFlowContainer
+                    {
+                        Direction = FillDirection.Horizontal,
+                        RelativeSizeAxes = Axes.Y,
+                        AutoSizeAxes = Axes.X,
+                        Height = 0.6f,
+                        Anchor = Anchor.Centre,
+                        Origin = Anchor.Centre,
+                    }
                 }
             };
-        }
-
-        public override bool Invalidate(Invalidation invalidation = Invalidation.All, Drawable source = null, bool shallPropagate = true)
-        {
-            bool invalid = base.Invalidate(invalidation, source, shallPropagate);
-
-            if ((invalidation & Invalidation.DrawSize) != 0)
-            {
-                iconContainer.Padding = new MarginPadding { Horizontal = DrawHeight / 2 };
-            }
-
-            return invalid;
         }
 
         [BackgroundDependencyLoader]
