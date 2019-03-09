@@ -61,7 +61,7 @@ namespace osu.Game.Rulesets.Mods
         public abstract class Flashlight : Drawable
         {
             internal BindableInt Combo;
-            private Shader shader;
+            private IShader shader;
 
             protected override DrawNode CreateDrawNode() => new FlashlightDrawNode();
 
@@ -139,7 +139,7 @@ namespace osu.Game.Rulesets.Mods
 
         private class FlashlightDrawNode : DrawNode
         {
-            public Shader Shader;
+            public IShader Shader;
             public Quad ScreenSpaceDrawQuad;
             public Vector2 FlashlightPosition;
             public Vector2 FlashlightSize;

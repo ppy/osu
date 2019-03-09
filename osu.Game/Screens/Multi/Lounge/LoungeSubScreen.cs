@@ -107,6 +107,14 @@ namespace osu.Game.Screens.Multi.Lounge
             Filter.Search.HoldFocus = false;
         }
 
+        public override void OnResuming(IScreen last)
+        {
+            base.OnResuming(last);
+
+            if (currentRoom.Value?.RoomID.Value == null)
+                currentRoom.Value = new Room();
+        }
+
         private void joinRequested(Room room)
         {
             processingOverlay.Show();
