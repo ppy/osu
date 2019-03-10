@@ -249,7 +249,7 @@ namespace osu.Game.Overlays
         {
             base.UpdateAfterChildren();
             Height = dragContainer.Height;
-            
+
             dragContainer.Padding = new MarginPadding { Top = GetToolbarHeight?.Invoke() ?? 0 };
         }
 

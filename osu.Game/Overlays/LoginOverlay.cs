@@ -98,7 +98,7 @@ namespace osu.Game.Overlays
         protected override void UpdateAfterChildren()
         {
             base.UpdateAfterChildren();
-            
+
             Padding = new MarginPadding { Top = GetToolbarHeight?.Invoke() ?? 0 };
         }
     }
