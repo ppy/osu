@@ -10,6 +10,7 @@ using osuTK.Graphics;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Cursor;
+using System;
 
 namespace osu.Game.Overlays
 {
@@ -23,6 +24,11 @@ namespace osu.Game.Overlays
         {
             AutoSizeAxes = Axes.Both;
         }
+
+        /// <summary>
+        /// Provide a source for the toolbar height.
+        /// </summary>
+        public Func<float> GetToolbarHeight;
 
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
@@ -87,6 +93,13 @@ namespace osu.Game.Overlays
 
             settingsSection.Bounding = false;
             this.FadeOut(transition_time);
+        }
+
+        protected override void UpdateAfterChildren()
+        {
+            base.UpdateAfterChildren();
+            
+            Padding = new MarginPadding { Top = GetToolbarHeight?.Invoke() ?? 0 };
         }
     }
 }
