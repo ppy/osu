@@ -122,7 +122,7 @@ namespace osu.Game.Rulesets.Objects
         public double Time;
 
         /// <summary>
-        /// The zero-based index of the span. In the case of repeat sliders, this will increase each repeat.
+        /// The zero-based index of the span. In the case of repeat sliders, this will increase after each <see cref="SliderEventType.Repeat"/>.
         /// </summary>
         public int SpanIndex;
 
