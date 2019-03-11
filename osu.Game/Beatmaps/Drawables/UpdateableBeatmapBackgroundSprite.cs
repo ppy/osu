@@ -45,7 +45,7 @@ namespace osu.Game.Beatmaps.Drawables
 
         protected override Drawable CreateDrawable(BeatmapInfo model)
         {
-            Drawable drawable = null;
+            Drawable drawable;
 
             if (model?.BeatmapSet?.OnlineInfo != null)
             {
@@ -54,14 +54,10 @@ namespace osu.Game.Beatmaps.Drawables
             }
             else if (model?.OnlineBeatmapID != null)
             {
-                // Fall back to local background if one exists, query for local beatmap info if we don't have it yet.
-                if (model.ID == 0)
-                    drawable = new BeatmapBackgroundSprite(beatmaps.GetWorkingBeatmap(beatmaps.QueryBeatmap(p => p.OnlineBeatmapID == model.OnlineBeatmapID)));
-                else
-                    drawable = new BeatmapBackgroundSprite(beatmaps.GetWorkingBeatmap(model));
+                // Fall back to local background if one exists.
+                drawable = new BeatmapBackgroundSprite(beatmaps.GetWorkingBeatmap(beatmaps.QueryBeatmap(p => p.OnlineBeatmapID == model.OnlineBeatmapID) ?? model));
             }
-
-            if (drawable == null)
+            else
             {
                 // Use the default background if somehow an online set does not exist and we don't have a local copy.
                 drawable = new BeatmapBackgroundSprite(beatmaps.DefaultBeatmap);
