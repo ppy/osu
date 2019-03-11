@@ -141,11 +141,10 @@ namespace osu.Game.Screens.Play
         {
             if (sourceClock == null) return;
 
-            sourceClock.Rate = 1;
+            sourceClock.Rate = UserPlaybackRate.Value;
+
             foreach (var mod in beatmap.Mods.Value.OfType<IApplicableToClock>())
                 mod.ApplyToClock(sourceClock);
-
-            sourceClock.Rate *= UserPlaybackRate.Value;
         }
     }
 }
