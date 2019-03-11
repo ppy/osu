@@ -6,7 +6,7 @@ using osu.Framework.Graphics.Containers;
 
 namespace osu.Game.Overlays.BeatmapSet.Scores
 {
-    public class ScoreTableLine : GridContainer
+    public class ScoreTableRow : GridContainer
     {
         private const float rank_position = 30;
         private const float drawable_rank_position = 45;
@@ -36,7 +36,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
         protected readonly Container PPContainer;
         protected readonly Container ModsContainer;
 
-        public ScoreTableLine(int maxModsAmount)
+        public ScoreTableRow(int maxModsAmount)
         {
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;

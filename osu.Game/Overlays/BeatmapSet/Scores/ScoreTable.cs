@@ -43,7 +43,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                         maxModsAmount = scoreModsAmount;
                 }
 
-                scoresFlow.Add(new ScoreTextLine(maxModsAmount));
+                scoresFlow.Add(new ScoreTableHeader(maxModsAmount));
 
                 int index = 0;
                 foreach (var s in value)
