@@ -95,10 +95,7 @@ namespace osu.Game.Screens.Multi
                     {
                         RelativeSizeAxes = Axes.Both,
                         Padding = new MarginPadding { Top = Header.HEIGHT },
-                        Children = new CompositeDrawable[]
-                        {
-                            screenStack = new OsuScreenStack(loungeSubScreen = new LoungeSubScreen()) { RelativeSizeAxes = Axes.Both },
-                        }
+                        Child = screenStack = new OsuScreenStack(loungeSubScreen = new LoungeSubScreen()) { RelativeSizeAxes = Axes.Both }
                     },
                     new Header(screenStack),
                     createButton = new HeaderButton
