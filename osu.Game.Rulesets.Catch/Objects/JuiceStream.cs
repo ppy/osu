@@ -60,7 +60,7 @@ namespace osu.Game.Rulesets.Catch.Objects
                 // generate tiny droplets since the last point
                 if (lastEvent != null)
                 {
-                    double sinceLastTick = e.StartTime - lastEvent.Value.StartTime;
+                    double sinceLastTick = e.Time - lastEvent.Value.Time;
 
                     if (sinceLastTick > 80)
                     {
@@ -73,7 +73,7 @@ namespace osu.Game.Rulesets.Catch.Objects
                             AddNested(new TinyDroplet
                             {
                                 Samples = tickSamples,
-                                StartTime = t + lastEvent.Value.StartTime,
+                                StartTime = t + lastEvent.Value.Time,
                                 X = X + Path.PositionAt(
                                         lastEvent.Value.PathProgress + (t / sinceLastTick) * (e.PathProgress - lastEvent.Value.PathProgress)).X / CatchPlayfield.BASE_WIDTH,
                             });
@@ -91,7 +91,7 @@ namespace osu.Game.Rulesets.Catch.Objects
                         AddNested(new Droplet
                         {
                             Samples = tickSamples,
-                            StartTime = e.StartTime,
+                            StartTime = e.Time,
                             X = X + Path.PositionAt(e.PathProgress).X / CatchPlayfield.BASE_WIDTH,
                         });
                         break;
@@ -101,7 +101,7 @@ namespace osu.Game.Rulesets.Catch.Objects
                         AddNested(new Fruit
                         {
                             Samples = Samples,
-                            StartTime = e.StartTime,
+                            StartTime = e.Time,
                             X = X + Path.PositionAt(e.PathProgress).X / CatchPlayfield.BASE_WIDTH,
                         });
                         break;

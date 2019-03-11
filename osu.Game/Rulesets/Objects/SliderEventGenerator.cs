@@ -25,7 +25,7 @@ namespace osu.Game.Rulesets.Objects
                 Type = SliderEventType.Head,
                 SpanIndex = 0,
                 SpanStartTime = startTime,
-                StartTime = startTime,
+                Time = startTime,
                 PathProgress = 0,
             };
 
@@ -49,7 +49,7 @@ namespace osu.Game.Rulesets.Objects
                             Type = SliderEventType.Tick,
                             SpanIndex = span,
                             SpanStartTime = spanStartTime,
-                            StartTime = spanStartTime + timeProgress * spanDuration,
+                            Time = spanStartTime + timeProgress * spanDuration,
                             PathProgress = pathProgress,
                         };
                     }
@@ -61,7 +61,7 @@ namespace osu.Game.Rulesets.Objects
                             Type = SliderEventType.Repeat,
                             SpanIndex = span,
                             SpanStartTime = startTime + span * spanDuration,
-                            StartTime = spanStartTime + spanDuration,
+                            Time = spanStartTime + spanDuration,
                             PathProgress = (span + 1) % 2,
                         };
                     }
@@ -90,7 +90,7 @@ namespace osu.Game.Rulesets.Objects
                 Type = SliderEventType.LegacyLastTick,
                 SpanIndex = finalSpanIndex,
                 SpanStartTime = finalSpanStartTime,
-                StartTime = finalSpanEndTime,
+                Time = finalSpanEndTime,
                 PathProgress = finalProgress,
             };
 
@@ -99,22 +99,41 @@ namespace osu.Game.Rulesets.Objects
                 Type = SliderEventType.Tail,
                 SpanIndex = finalSpanIndex,
                 SpanStartTime = startTime + (spanCount - 1) * spanDuration,
-                StartTime = startTime + totalDuration,
+                Time = startTime + totalDuration,
                 PathProgress = spanCount % 2,
             };
         }
     }
 
+    /// <summary>
+    /// Describes a point in time on a slider given special meaning.
+    /// Should be used by rulesets to visualise the slider.
+    /// </summary>
     public struct SliderEventDescriptor
     {
+        /// <summary>
+        /// The type of event.
+        /// </summary>
         public SliderEventType Type;
 
+        /// <summary>
+        /// The time of this event.
+        /// </summary>
+        public double Time;
+
+        /// <summary>
+        /// The zero-based index of the span. In the case of repeat sliders, this will increase each repeat.
+        /// </summary>
         public int SpanIndex;
 
+        /// <summary>
+        /// The time at which the contained <see cref="SpanIndex"/> begins.
+        /// </summary>
         public double SpanStartTime;
 
-        public double StartTime;
-
+        /// <summary>
+        /// The progress along the slider's <see cref="SliderPath"/> at which this event occurs.
+        /// </summary>
         public double PathProgress;
     }
 
