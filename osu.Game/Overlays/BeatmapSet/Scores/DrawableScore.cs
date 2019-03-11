@@ -46,7 +46,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                     RelativeSizeAxes = Axes.Both,
                     Alpha = 0,
                 },
-                new DrawableScoreData(index, score, maxModsAmount),
+                new ScoreRow(index, score, maxModsAmount),
             };
 
             if (index % 2 != 0)
@@ -118,9 +118,9 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
             }
         }
 
-        private class DrawableScoreData : ScoreTableLine
+        private class ScoreRow : ScoreTableRow
         {
-            public DrawableScoreData(int index, APIScoreInfo score, int maxModsAmount)
+            public ScoreRow(int index, APIScoreInfo score, int maxModsAmount)
                 : base(maxModsAmount)
             {
                 SpriteText scoreText;

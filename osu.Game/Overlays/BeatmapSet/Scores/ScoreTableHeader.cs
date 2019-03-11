@@ -5,9 +5,9 @@ using osu.Framework.Graphics.Sprites;
 
 namespace osu.Game.Overlays.BeatmapSet.Scores
 {
-    public class ScoreTextLine : ScoreTableLine
+    public class ScoreTableHeader : ScoreTableRow
     {
-        public ScoreTextLine(int maxModsAmount)
+        public ScoreTableHeader(int maxModsAmount)
             : base(maxModsAmount)
         {
             RankContainer.Add(new ScoreText
