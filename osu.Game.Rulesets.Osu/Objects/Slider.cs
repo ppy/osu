@@ -215,7 +215,7 @@ namespace osu.Game.Rulesets.Osu.Objects
                             Position = Position + Path.PositionAt(e.PathProgress),
                             StackHeight = StackHeight,
                             Scale = Scale,
-                            Samples = getNodeSamples(1 + e.SpanIndex)
+                            Samples = getNodeSamples(e.SpanIndex + 1)
                         });
                         break;
                 }
