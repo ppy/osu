@@ -80,8 +80,9 @@ namespace osu.Game.Rulesets.Objects
 
             int finalSpanIndex = spanCount - 1;
             double finalSpanStartTime = startTime + finalSpanIndex * spanDuration;
-            double finalSpanTime = Math.Max(startTime + totalDuration / 2, (finalSpanStartTime + spanDuration) - (legacyLastTickOffset ?? 0));
-            double finalProgress = (finalSpanTime - finalSpanStartTime) / spanDuration;
+            double finalSpanEndTime = Math.Max(startTime + totalDuration / 2, (finalSpanStartTime + spanDuration) - (legacyLastTickOffset ?? 0));
+            double finalProgress = (finalSpanEndTime - finalSpanStartTime) / spanDuration;
+
             if (spanCount % 2 == 0) finalProgress = 1 - finalProgress;
 
             yield return new SliderEventDescriptor
@@ -89,14 +90,14 @@ namespace osu.Game.Rulesets.Objects
                 Type = SliderEventType.LegacyLastTick,
                 SpanIndex = finalSpanIndex,
                 SpanStartTime = finalSpanStartTime,
-                StartTime = finalSpanTime,
+                StartTime = finalSpanEndTime,
                 PathProgress = finalProgress,
             };
 
             yield return new SliderEventDescriptor
             {
                 Type = SliderEventType.Tail,
-                SpanIndex = spanCount - 1,
+                SpanIndex = finalSpanIndex,
                 SpanStartTime = startTime + (spanCount - 1) * spanDuration,
                 StartTime = startTime + totalDuration,
                 PathProgress = spanCount % 2,
