@@ -36,26 +36,32 @@ namespace osu.Game.Screens.Backgrounds
 
                 beatmap = value;
 
-                Schedule(() =>
-                {
-                    LoadComponentAsync(new BeatmapBackground(beatmap), b => Schedule(() =>
-                    {
-                        float newDepth = 0;
-                        if (Background != null)
-                        {
-                            newDepth = Background.Depth + 1;
-                            Background.FinishTransforms();
-                            Background.FadeOut(250);
-                            Background.Expire();
-                        }
-
-                        b.Depth = newDepth;
-                        fadeContainer.Add(Background = b);
-                        Background.BlurSigma = BlurTarget;
-                        StoryboardReplacesBackground.BindTo(fadeContainer.StoryboardReplacesBackground);
-                    }));
-                });
+                Schedule(() => { LoadComponentAsync(new BeatmapBackground(beatmap), b => Schedule(() => backgroundLoaded(b))); });
             }
+        }
+
+        private void backgroundLoaded(BeatmapBackground b)
+        {
+            float newDepth = 0;
+            if (Background != null)
+            {
+                newDepth = Background.Depth + 1;
+                Background.FinishTransforms();
+                Background.FadeOut(250);
+                Background.Expire();
+            }
+
+            b.Depth = newDepth;
+            fadeContainer.Add(Background = b);
+            Background.BlurSigma = BlurTarget;
+            StoryboardReplacesBackground.BindTo(fadeContainer.StoryboardReplacesBackground);
+        }
+
+        [BackgroundDependencyLoader]
+        private void load()
+        {
+            if (beatmap != null)
+                backgroundLoaded(new BeatmapBackground(beatmap));
         }
 
         public BackgroundScreenBeatmap(WorkingBeatmap beatmap = null)
