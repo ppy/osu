@@ -38,6 +38,7 @@ namespace osu.Game.Screens.Multi
         private readonly OsuButton createButton;
         private readonly LoungeSubScreen loungeSubScreen;
         private readonly ScreenStack screenStack;
+        private ParallaxContainer backgroundParallax;
 
         private readonly IBindable<bool> isIdle = new BindableBool();
 
@@ -98,9 +99,13 @@ namespace osu.Game.Screens.Multi
                     {
                         RelativeSizeAxes = Axes.Both,
                         Padding = new MarginPadding { Top = Header.HEIGHT },
-                        Children = new[]
+                        Children = new CompositeDrawable[]
                         {
-                            backgroundScreenStack = new BackgroundScreenStack { RelativeSizeAxes = Axes.Both },
+                            backgroundParallax = new ParallaxContainer
+                            {
+                                RelativeSizeAxes = Axes.Both,
+                                Child = backgroundScreenStack = new BackgroundScreenStack { RelativeSizeAxes = Axes.Both },
+                            },
                             screenStack = new ScreenStack(loungeSubScreen = new LoungeSubScreen()) { RelativeSizeAxes = Axes.Both },
                         }
                     },
