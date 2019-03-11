@@ -4,7 +4,6 @@
 using osuTK.Graphics;
 using osu.Framework.Allocation;
 using osu.Framework.Audio.Track;
-using osu.Framework.Configuration;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
@@ -14,6 +13,7 @@ using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using System;
+using osu.Framework.Bindables;
 
 namespace osu.Game.Screens.Menu
 {
@@ -42,7 +42,7 @@ namespace osu.Game.Screens.Menu
         }
 
         [BackgroundDependencyLoader]
-        private void load(IBindableBeatmap beatmap, OsuColour colours)
+        private void load(IBindable<WorkingBeatmap> beatmap, OsuColour colours)
         {
             this.beatmap.BindTo(beatmap);
 

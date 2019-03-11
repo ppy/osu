@@ -88,7 +88,7 @@ namespace osu.Game.Overlays.Settings
 
         public ExpandedState State
         {
-            get { return state; }
+            get => state;
             set
             {
                 expandEvent?.Cancel();

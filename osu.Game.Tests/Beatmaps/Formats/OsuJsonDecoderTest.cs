@@ -113,6 +113,7 @@ namespace osu.Game.Tests.Beatmaps.Formats
 
         [TestCase(normal)]
         [TestCase(marathon)]
+        [Ignore("temporarily disabled pending DeepEqual fix (https://github.com/jamesfoster/DeepEqual/pull/35)")]
         // Currently fails:
         // [TestCase(with_sb)]
         public void TestParity(string beatmap)
@@ -146,7 +147,7 @@ namespace osu.Game.Tests.Beatmaps.Formats
         /// <returns>The <see cref="Beatmap"/> after being decoded by an <see cref="LegacyBeatmapDecoder"/>.</returns>
         private Beatmap decode(string filename, out Beatmap jsonDecoded)
         {
-            using (var stream = Resource.OpenResource(filename))
+            using (var stream = TestResources.OpenResource(filename))
             using (var sr = new StreamReader(stream))
             {
                 var legacyDecoded = new LegacyBeatmapDecoder { ApplyOffsets = false }.Decode(sr);

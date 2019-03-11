@@ -10,9 +10,10 @@ namespace osu.Game.Overlays.Toolbar
     public class ToolbarRulesetButton : ToolbarButton
     {
         private RulesetInfo ruleset;
+
         public RulesetInfo Ruleset
         {
-            get { return ruleset; }
+            get => ruleset;
             set
             {
                 ruleset = value;

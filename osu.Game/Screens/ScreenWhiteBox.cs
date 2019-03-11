@@ -30,7 +30,7 @@ namespace osu.Game.Screens
 
         protected override BackgroundScreen CreateBackground() => new BackgroundScreenCustom(@"Backgrounds/bg2");
 
-        protected override void OnEntering(Screen last)
+        public override void OnEntering(IScreen last)
         {
             base.OnEntering(last);
 
@@ -38,51 +38,51 @@ namespace osu.Game.Screens
             if (last != null)
                 popButton.Alpha = 1;
 
-            Content.Alpha = 0;
+            Alpha = 0;
             textContainer.Position = new Vector2(DrawSize.X / 16, 0);
 
             boxContainer.ScaleTo(0.2f);
             boxContainer.RotateTo(-20);
 
-            using (Content.BeginDelayedSequence(300, true))
+            using (BeginDelayedSequence(300, true))
             {
                 boxContainer.ScaleTo(1, transition_time, Easing.OutElastic);
                 boxContainer.RotateTo(0, transition_time / 2, Easing.OutQuint);
 
                 textContainer.MoveTo(Vector2.Zero, transition_time, Easing.OutExpo);
-                Content.FadeIn(transition_time, Easing.OutExpo);
+                this.FadeIn(transition_time, Easing.OutExpo);
             }
         }
 
-        protected override bool OnExiting(Screen next)
+        public override bool OnExiting(IScreen next)
         {
             textContainer.MoveTo(new Vector2(DrawSize.X / 16, 0), transition_time, Easing.OutExpo);
-            Content.FadeOut(transition_time, Easing.OutExpo);
+            this.FadeOut(transition_time, Easing.OutExpo);
 
             return base.OnExiting(next);
         }
 
-        protected override void OnSuspending(Screen next)
+        public override void OnSuspending(IScreen next)
         {
             base.OnSuspending(next);
 
             textContainer.MoveTo(new Vector2(-(DrawSize.X / 16), 0), transition_time, Easing.OutExpo);
-            Content.FadeOut(transition_time, Easing.OutExpo);
+            this.FadeOut(transition_time, Easing.OutExpo);
         }
 
-        protected override void OnResuming(Screen last)
+        public override void OnResuming(IScreen last)
         {
             base.OnResuming(last);
 
             textContainer.MoveTo(Vector2.Zero, transition_time, Easing.OutExpo);
-            Content.FadeIn(transition_time, Easing.OutExpo);
+            this.FadeIn(transition_time, Easing.OutExpo);
         }
 
         public ScreenWhiteBox()
         {
             FillFlowContainer childModeButtons;
 
-            Children = new Drawable[]
+            InternalChildren = new Drawable[]
             {
                 boxContainer = new Container
                 {
@@ -119,25 +119,25 @@ namespace osu.Game.Screens
                                 },
                                 new OsuSpriteText
                                 {
+                                    Anchor = Anchor.TopCentre,
+                                    Origin = Anchor.TopCentre,
                                     Text = GetType().Name,
                                     Colour = getColourFor(GetType()).Lighten(0.8f),
-                                    Anchor = Anchor.TopCentre,
-                                    Origin = Anchor.TopCentre,
-                                    TextSize = 50,
+                                    Font = OsuFont.GetFont(size: 50),
                                 },
                                 new OsuSpriteText
                                 {
+                                    Anchor = Anchor.TopCentre,
+                                    Origin = Anchor.TopCentre,
                                     Text = "is not yet ready for use!",
-                                    TextSize = 20,
-                                    Anchor = Anchor.TopCentre,
-                                    Origin = Anchor.TopCentre,
+                                    Font = OsuFont.GetFont(size: 20),
                                 },
                                 new OsuSpriteText
                                 {
-                                    Text = "please check back a bit later.",
-                                    TextSize = 14,
                                     Anchor = Anchor.TopCentre,
                                     Origin = Anchor.TopCentre,
+                                    Text = "please check back a bit later.",
+                                    Font = OsuFont.GetFont(size: 14),
                                 },
                             }
                         },
@@ -148,7 +148,7 @@ namespace osu.Game.Screens
                     Anchor = Anchor.BottomLeft,
                     Origin = Anchor.BottomLeft,
                     Alpha = 0,
-                    Action = Exit
+                    Action = this.Exit
                 },
                 childModeButtons = new FillFlowContainer
                 {
@@ -169,10 +169,7 @@ namespace osu.Game.Screens
                         Text = $@"{t.Name}",
                         BackgroundColour = getColourFor(t),
                         HoverColour = getColourFor(t).Lighten(0.2f),
-                        Action = delegate
-                        {
-                            Push(Activator.CreateInstance(t) as Screen);
-                        }
+                        Action = delegate { this.Push(Activator.CreateInstance(t) as Screen); }
                     });
                 }
             }

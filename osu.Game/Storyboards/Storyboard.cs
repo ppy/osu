@@ -76,6 +76,7 @@ namespace osu.Game.Storyboards
         {
             if (isDisposed)
                 return;
+
             isDisposed = true;
         }
 

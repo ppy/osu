@@ -4,7 +4,7 @@
 using System;
 using System.Collections.Generic;
 using osu.Framework.Allocation;
-using osu.Framework.Configuration;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.OpenGL.Vertices;
 using osu.Framework.Graphics.Primitives;
@@ -61,7 +61,7 @@ namespace osu.Game.Rulesets.Mods
         public abstract class Flashlight : Drawable
         {
             internal BindableInt Combo;
-            private Shader shader;
+            private IShader shader;
 
             protected override DrawNode CreateDrawNode() => new FlashlightDrawNode();
 
@@ -104,11 +104,12 @@ namespace osu.Game.Rulesets.Mods
                 }
             }
 
-            protected abstract void OnComboChange(int newCombo);
+            protected abstract void OnComboChange(ValueChangedEvent<int> e);
 
             protected abstract string FragmentShader { get; }
 
             private Vector2 flashlightPosition;
+
             protected Vector2 FlashlightPosition
             {
                 get => flashlightPosition;
@@ -122,6 +123,7 @@ namespace osu.Game.Rulesets.Mods
             }
 
             private Vector2 flashlightSize;
+
             protected Vector2 FlashlightSize
             {
                 get => flashlightSize;
@@ -137,7 +139,7 @@ namespace osu.Game.Rulesets.Mods
 
         private class FlashlightDrawNode : DrawNode
         {
-            public Shader Shader;
+            public IShader Shader;
             public Quad ScreenSpaceDrawQuad;
             public Vector2 FlashlightPosition;
             public Vector2 FlashlightSize;

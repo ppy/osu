@@ -17,9 +17,11 @@ namespace osu.Game.Screens
     {
         private bool showDisclaimer;
 
-        protected override bool HideOverlaysOnEnter => true;
+        public override bool HideOverlaysOnEnter => true;
 
-        protected override OverlayActivation InitialOverlayActivationMode => OverlayActivation.Disabled;
+        public override OverlayActivation InitialOverlayActivationMode => OverlayActivation.Disabled;
+
+        public override bool CursorVisible => false;
 
         protected override bool AllowBackButton => false;
 
@@ -55,11 +57,11 @@ namespace osu.Game.Screens
 
         protected virtual ShaderPrecompiler CreateShaderPrecompiler() => new ShaderPrecompiler();
 
-        protected override void OnEntering(Screen last)
+        public override void OnEntering(IScreen last)
         {
             base.OnEntering(last);
 
-            LoadComponentAsync(precompiler = CreateShaderPrecompiler(), Add);
+            LoadComponentAsync(precompiler = CreateShaderPrecompiler(), AddInternal);
             LoadComponentAsync(loadableScreen = CreateLoadableScreen());
 
             checkIfLoaded();
@@ -73,7 +75,7 @@ namespace osu.Game.Screens
                 return;
             }
 
-            Push(loadableScreen);
+            this.Push(loadableScreen);
         }
 
         [BackgroundDependencyLoader]
@@ -87,7 +89,7 @@ namespace osu.Game.Screens
         /// </summary>
         public class ShaderPrecompiler : Drawable
         {
-            private readonly List<Shader> loadTargets = new List<Shader>();
+            private readonly List<IShader> loadTargets = new List<IShader>();
 
             public bool FinishedCompiling { get; private set; }
 
@@ -104,7 +106,7 @@ namespace osu.Game.Screens
                 loadTargets.Add(manager.Load(VertexShaderDescriptor.TEXTURE_3, FragmentShaderDescriptor.TEXTURE));
             }
 
-            protected virtual bool AllLoaded => loadTargets.All(s => s.Loaded);
+            protected virtual bool AllLoaded => loadTargets.All(s => s.IsLoaded);
 
             protected override void Update()
             {

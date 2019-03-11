@@ -159,6 +159,6 @@ namespace osu.Game.Rulesets.Mania.Scoring
             }
         }
 
-        protected override HitWindows CreateHitWindows() => new ManiaHitWindows();
+        public override HitWindows CreateHitWindows() => new ManiaHitWindows();
     }
 }

@@ -26,12 +26,12 @@ namespace osu.Game.Overlays.AccountCreation
 
         private const string help_centre_url = "/help/wiki/Help_Centre#login";
 
-        protected override void OnEntering(Screen last)
+        public override void OnEntering(IScreen last)
         {
             if (string.IsNullOrEmpty(api.ProvidedUsername))
             {
-                Content.FadeOut();
-                Push(new ScreenEntry());
+                this.FadeOut();
+                this.Push(new ScreenEntry());
                 return;
             }
 
@@ -46,7 +46,7 @@ namespace osu.Game.Overlays.AccountCreation
             if (string.IsNullOrEmpty(api.ProvidedUsername))
                 return;
 
-            Children = new Drawable[]
+            InternalChildren = new Drawable[]
             {
                 new Sprite
                 {
@@ -83,14 +83,13 @@ namespace osu.Game.Overlays.AccountCreation
                         },
                         new OsuSpriteText
                         {
-                            TextSize = 28,
-                            Font = "Exo2.0-Light",
                             Anchor = Anchor.TopCentre,
                             Origin = Anchor.TopCentre,
                             Colour = Color4.Red,
+                            Font = OsuFont.GetFont(size: 28, weight: FontWeight.Light),
                             Text = "Warning! 注意！",
                         },
-                        multiAccountExplanationText = new OsuTextFlowContainer(cp => { cp.TextSize = 12; })
+                        multiAccountExplanationText = new OsuTextFlowContainer(cp => cp.Font = cp.Font.With(size: 12))
                         {
                             RelativeSizeAxes = Axes.X,
                             AutoSizeAxes = Axes.Y
@@ -104,9 +103,9 @@ namespace osu.Game.Overlays.AccountCreation
                         new DangerousSettingsButton
                         {
                             Text = "I understand. This account isn't for me.",
-                            Action = () => Push(new ScreenEntry())
+                            Action = () => this.Push(new ScreenEntry())
                         },
-                        furtherAssistance = new LinkFlowContainer(cp => { cp.TextSize = 12; })
+                        furtherAssistance = new LinkFlowContainer(cp => cp.Font = cp.Font.With(size: 12))
                         {
                             Margin = new MarginPadding { Top = 20 },
                             Anchor = Anchor.TopCentre,

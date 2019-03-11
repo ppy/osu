@@ -56,6 +56,7 @@ namespace osu.Game.Rulesets.Catch.Beatmaps
                             rng.Next(); // osu!stable retrieved a random banana rotation
                             rng.Next(); // osu!stable retrieved a random banana colour
                         }
+
                         break;
                     case JuiceStream juiceStream:
                         foreach (var nested in juiceStream.NestedHitObjects)
@@ -67,6 +68,7 @@ namespace osu.Game.Rulesets.Catch.Beatmaps
                                 rng.Next(); // osu!stable retrieved a random droplet rotation
                             hitObject.X = MathHelper.Clamp(hitObject.X, 0, 1);
                         }
+
                         break;
                 }
             }
@@ -98,7 +100,7 @@ namespace osu.Game.Rulesets.Catch.Beatmaps
                 CatchHitObject nextObject = objectWithDroplets[i + 1];
 
                 int thisDirection = nextObject.X > currentObject.X ? 1 : -1;
-                double timeToNext = nextObject.StartTime - currentObject.StartTime;
+                double timeToNext = nextObject.StartTime - currentObject.StartTime - 1000f / 60f / 4; // 1/4th of a frame of grace time, taken from osu-stable
                 double distanceToNext = Math.Abs(nextObject.X - currentObject.X) - (lastDirection == thisDirection ? lastExcess : halfCatcherWidth);
                 float distanceToHyper = (float)(timeToNext * CatcherArea.Catcher.BASE_SPEED - distanceToNext);
                 if (distanceToHyper < 0)

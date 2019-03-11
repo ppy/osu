@@ -2,7 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
-using osu.Framework.Configuration;
+using osu.Framework.Bindables;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Events;
@@ -14,12 +14,11 @@ namespace osu.Game.Screens.Multi.Match.Components
 {
     public class MatchTabControl : PageTabControl<MatchPage>
     {
-        private readonly IBindable<int?> roomIdBind = new Bindable<int?>();
+        [Resolved(typeof(Room), nameof(Room.RoomID))]
+        private Bindable<int?> roomId { get; set; }
 
-        public MatchTabControl(Room room)
+        public MatchTabControl()
         {
-            roomIdBind.BindTo(room.RoomID);
-
             AddItem(new RoomMatchPage());
             AddItem(new SettingsMatchPage());
         }
@@ -27,9 +26,9 @@ namespace osu.Game.Screens.Multi.Match.Components
         [BackgroundDependencyLoader]
         private void load()
         {
-            roomIdBind.BindValueChanged(v =>
+            roomId.BindValueChanged(id =>
             {
-                if (v.HasValue)
+                if (id.NewValue.HasValue)
                 {
                     Items.ForEach(t => t.Enabled.Value = !(t is SettingsMatchPage));
                     Current.Value = new RoomMatchPage();
@@ -52,13 +51,14 @@ namespace osu.Game.Screens.Multi.Match.Components
                 : base(value)
             {
                 enabled.BindTo(value.Enabled);
-                enabled.BindValueChanged(v => Colour = v ? Color4.White : Color4.Gray);
+                enabled.BindValueChanged(enabled => Colour = enabled.NewValue ? Color4.White : Color4.Gray, true);
             }
 
             protected override bool OnClick(ClickEvent e)
             {
                 if (!enabled.Value)
                     return true;
+
                 return base.OnClick(e);
             }
         }

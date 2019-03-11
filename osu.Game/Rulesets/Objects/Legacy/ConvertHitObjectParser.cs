@@ -301,7 +301,16 @@ namespace osu.Game.Rulesets.Objects.Legacy
         {
             // Todo: This should return the normal SampleInfos if the specified sample file isn't found, but that's a pretty edge-case scenario
             if (!string.IsNullOrEmpty(bankInfo.Filename))
-                return new List<SampleInfo> { new FileSampleInfo { Filename = bankInfo.Filename } };
+            {
+                return new List<SampleInfo>
+                {
+                    new FileSampleInfo
+                    {
+                        Filename = bankInfo.Filename,
+                        Volume = bankInfo.Volume
+                    }
+                };
+            }
 
             var soundTypes = new List<SampleInfo>
             {
