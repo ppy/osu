@@ -208,7 +208,6 @@ namespace osu.Game.Screens.Play.HUD
                 return false;
             }
 
-
             protected override bool OnMouseDown(MouseDownEvent e)
             {
                 if (!pendingAnimation && e.CurrentState.Mouse.Buttons.Count() == 1)
