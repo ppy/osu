@@ -5,7 +5,6 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Screens;
 using osu.Game.Graphics.Containers;
-using osu.Game.Screens.Multi.Lounge;
 
 namespace osu.Game.Screens
 {
