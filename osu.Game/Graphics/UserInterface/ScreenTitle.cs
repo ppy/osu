@@ -26,7 +26,7 @@ namespace osu.Game.Graphics.UserInterface
             set => titleText.Text = value;
         }
 
-        public string Page
+        public string Section
         {
             get => pageText.Text;
             set => pageText.Text = value;
@@ -55,6 +55,7 @@ namespace osu.Game.Graphics.UserInterface
                 {
                     AutoSizeAxes = Axes.Both,
                     Direction = FillDirection.Horizontal,
+                    Spacing = new Vector2(6, 0),
                     Children = new[]
                     {
                         titleText = new OsuSpriteText
