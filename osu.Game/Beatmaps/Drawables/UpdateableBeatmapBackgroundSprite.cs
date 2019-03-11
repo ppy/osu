@@ -46,21 +46,18 @@ namespace osu.Game.Beatmaps.Drawables
         protected override Drawable CreateDrawable(BeatmapInfo model)
         {
             Drawable drawable;
-            BeatmapInfo localInfo;
 
-            if (model != null && model.ID == 0)
-                localInfo = beatmaps.QueryBeatmap(p => p.OnlineBeatmapID == model.OnlineBeatmapID);
-            else
-                localInfo = model;
+            if (model?.OnlineBeatmapID != null)
+                model = beatmaps.QueryBeatmap(p => p.OnlineBeatmapID == model.OnlineBeatmapID) ?? model;
 
             if (model?.BeatmapSet?.OnlineInfo != null)
             {
                 drawable = new BeatmapSetCover(model.BeatmapSet, beatmapSetCoverType);
             }
-            else if (localInfo?.ID != null)
+            else if (model?.ID > 0)
             {
                 // Fall back to local background if one exists
-                drawable = new BeatmapBackgroundSprite(beatmaps.GetWorkingBeatmap(localInfo));
+                drawable = new BeatmapBackgroundSprite(beatmaps.GetWorkingBeatmap(model));
             }
             else
             {
