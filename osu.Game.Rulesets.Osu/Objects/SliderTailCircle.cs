@@ -8,6 +8,10 @@ using osu.Game.Rulesets.Osu.Judgements;
 
 namespace osu.Game.Rulesets.Osu.Objects
 {
+    /// <summary>
+    /// Note that this should not be used for timing correctness.
+    /// See <see cref="SliderEventType.LegacyLastTick"/> usage in <see cref="Slider"/> for more information.
+    /// </summary>
     public class SliderTailCircle : SliderCircle
     {
         private readonly IBindable<SliderPath> pathBindable = new Bindable<SliderPath>();
