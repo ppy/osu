@@ -106,7 +106,10 @@ namespace osu.Game.Beatmaps
 
             foreach (BeatmapInfo b in beatmapSet.Beatmaps)
                 fetchAndPopulateOnlineValues(b, beatmapSet.Beatmaps);
+        }
 
+        protected override void PreImport(BeatmapSetInfo beatmapSet)
+        {
             // check if a set already exists with the same online id, delete if it does.
             if (beatmapSet.OnlineBeatmapSetID != null)
             {
@@ -253,6 +256,15 @@ namespace osu.Game.Beatmaps
         /// <param name="query">The query.</param>
         /// <returns>The first result for the provided query, or null if no results were found.</returns>
         public BeatmapSetInfo QueryBeatmapSet(Expression<Func<BeatmapSetInfo, bool>> query) => beatmaps.ConsumableItems.AsNoTracking().FirstOrDefault(query);
+
+        protected override bool CanUndelete(BeatmapSetInfo existing, BeatmapSetInfo import)
+        {
+            if (!base.CanUndelete(existing, import))
+                return false;
+
+            // force re-import if we are not in a sane state.
+            return existing.OnlineBeatmapSetID == import.OnlineBeatmapSetID;
+        }
 
         /// <summary>
         /// Returns a list of all usable <see cref="BeatmapSetInfo"/>s.
