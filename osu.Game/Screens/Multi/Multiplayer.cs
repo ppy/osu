@@ -50,6 +50,9 @@ namespace osu.Game.Screens.Multi
         [Cached(Type = typeof(IRoomManager))]
         private RoomManager roomManager;
 
+        [Cached]
+        private BackgroundScreenStack backgroundScreenStack;
+
         [Resolved]
         private OsuGameBase game { get; set; }
 
@@ -95,7 +98,11 @@ namespace osu.Game.Screens.Multi
                     {
                         RelativeSizeAxes = Axes.Both,
                         Padding = new MarginPadding { Top = Header.HEIGHT },
-                        Child = screenStack = new ScreenStack(loungeSubScreen = new LoungeSubScreen()) { RelativeSizeAxes = Axes.Both }
+                        Children = new[]
+                        {
+                            backgroundScreenStack = new BackgroundScreenStack { RelativeSizeAxes = Axes.Both },
+                            screenStack = new ScreenStack(loungeSubScreen = new LoungeSubScreen()) { RelativeSizeAxes = Axes.Both },
+                        }
                     },
                     new Header(screenStack),
                     createButton = new HeaderButton
