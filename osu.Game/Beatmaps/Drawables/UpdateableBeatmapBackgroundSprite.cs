@@ -52,15 +52,23 @@ namespace osu.Game.Beatmaps.Drawables
                 // Always try to use the online copy of the beatmap cover first.
                 drawable = new BeatmapSetCover(model.BeatmapSet, beatmapSetCoverType);
             }
-            else if (model?.OnlineBeatmapID != null)
-            {
-                // Fall back to local background if one exists.
-                drawable = new BeatmapBackgroundSprite(beatmaps.GetWorkingBeatmap(beatmaps.QueryBeatmap(p => p.OnlineBeatmapID == model.OnlineBeatmapID) ?? model));
-            }
             else
             {
-                // Use the default background if somehow an online set does not exist and we don't have a local copy.
-                drawable = new BeatmapBackgroundSprite(beatmaps.DefaultBeatmap);
+                if (model?.ID > 0)
+                {
+                    // If we already have a local ID, use the associated beatmap background.
+                    drawable = new BeatmapBackgroundSprite(beatmaps.GetWorkingBeatmap(model));
+                }
+                else if (model?.OnlineBeatmapID != null)
+                {
+                    // Try to query for a local ID if we don't have one yet. If this fails, GetWorkingBeatmap will automatically return the default beatmap/background.
+                    drawable = new BeatmapBackgroundSprite(beatmaps.GetWorkingBeatmap(beatmaps.QueryBeatmap(p => p.OnlineBeatmapID == model.OnlineBeatmapID)));
+                }
+                else
+                {
+                    // Use the default background if somehow an online set does not exist and our model doesn't have an OnlineID
+                    drawable = new BeatmapBackgroundSprite(beatmaps.DefaultBeatmap);
+                }
             }
 
             drawable.RelativeSizeAxes = Axes.Both;
