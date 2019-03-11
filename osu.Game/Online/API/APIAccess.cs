@@ -70,13 +70,15 @@ namespace osu.Game.Online.API
 
         internal new void Schedule(Action action) => base.Schedule(action);
 
+        /// <summary>
+        /// Register a component to receive API events.
+        /// Fires <see cref="IOnlineComponent.APIStateChanged"/> once immediately to ensure a correct state.
+        /// </summary>
+        /// <param name="component"></param>
         public void Register(IOnlineComponent component)
         {
-            Scheduler.Add(delegate
-            {
-                components.Add(component);
-                component.APIStateChanged(this, state);
-            });
+            Scheduler.Add(delegate { components.Add(component); });
+            component.APIStateChanged(this, state);
         }
 
         public void Unregister(IOnlineComponent component)
