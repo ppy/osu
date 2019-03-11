@@ -405,7 +405,7 @@ namespace osu.Game
                 {
                     RelativeSizeAxes = Axes.Both,
                 },
-                floatingOverlayContent = new Container { RelativeSizeAxes = Axes.Both, Depth = float.MinValue },
+                floatingOverlayContent = new Container { RelativeSizeAxes = Axes.Both },
                 idleTracker = new GameIdleTracker(6000)
             });
 
