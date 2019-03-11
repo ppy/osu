@@ -176,7 +176,7 @@ namespace osu.Game.Rulesets.Osu.Objects
                         {
                             SpanIndex = e.SpanIndex,
                             SpanStartTime = e.SpanStartTime,
-                            StartTime = e.StartTime,
+                            StartTime = e.Time,
                             Position = Position + Path.PositionAt(e.PathProgress),
                             StackHeight = StackHeight,
                             Scale = Scale,
@@ -186,7 +186,7 @@ namespace osu.Game.Rulesets.Osu.Objects
                     case SliderEventType.Head:
                         AddNested(HeadCircle = new SliderCircle
                         {
-                            StartTime = e.StartTime,
+                            StartTime = e.Time,
                             Position = Position,
                             Samples = getNodeSamples(0),
                             SampleControlPoint = SampleControlPoint,
@@ -200,7 +200,7 @@ namespace osu.Game.Rulesets.Osu.Objects
                         // if this is to change, we should revisit this.
                         AddNested(TailCircle = new SliderTailCircle(this)
                         {
-                            StartTime = e.StartTime,
+                            StartTime = e.Time,
                             Position = EndPosition,
                             IndexInCurrentCombo = IndexInCurrentCombo,
                             ComboIndex = ComboIndex,
