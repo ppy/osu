@@ -9,24 +9,24 @@ using osuTK.Graphics;
 
 namespace osu.Game.Graphics.UserInterface
 {
-    public class ScreenTitle : CompositeDrawable, IHasAccentColour
+    public abstract class ScreenTitle : CompositeDrawable, IHasAccentColour
     {
         private readonly SpriteIcon iconSprite;
         private readonly OsuSpriteText titleText, pageText;
 
-        public FontAwesome Icon
+        protected FontAwesome Icon
         {
             get => iconSprite.Icon;
             set => iconSprite.Icon = value;
         }
 
-        public string Title
+        protected string Title
         {
             get => titleText.Text;
             set => titleText.Text = value;
         }
 
-        public string Section
+        protected string Section
         {
             get => pageText.Text;
             set => pageText.Text = value;
@@ -38,7 +38,7 @@ namespace osu.Game.Graphics.UserInterface
             set => pageText.Colour = value;
         }
 
-        public ScreenTitle()
+        protected ScreenTitle()
         {
             AutoSizeAxes = Axes.Both;
 
