@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Screens;
 using osu.Game.Graphics.Containers;
@@ -13,15 +14,33 @@ namespace osu.Game.Screens
         [Cached]
         private BackgroundScreenStack backgroundScreenStack;
 
+        private ParallaxContainer parallaxContainer;
+
+        public OsuScreenStack()
+        {
+            initializeStack();
+        }
+
         public OsuScreenStack(IScreen baseScreen)
             : base(baseScreen)
         {
-            backgroundScreenStack = new BackgroundScreenStack { RelativeSizeAxes = Axes.Both };
-            InternalChild = new ParallaxContainer
+            initializeStack();
+        }
+
+        private void initializeStack()
+        {
+            InternalChild = parallaxContainer = new ParallaxContainer
             {
                 RelativeSizeAxes = Axes.Both,
-                Child = backgroundScreenStack,
+                Child = backgroundScreenStack = new BackgroundScreenStack { RelativeSizeAxes = Axes.Both },
             };
+
+            ScreenPushed += setParallax;
+        }
+
+        private void setParallax(IScreen prev, IScreen next)
+        {
+            parallaxContainer.ParallaxAmount = ParallaxContainer.DEFAULT_PARALLAX_AMOUNT * ((IOsuScreen)next).BackgroundParallaxAmount;
         }
     }
 }

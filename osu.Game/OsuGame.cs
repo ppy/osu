@@ -87,11 +87,7 @@ namespace osu.Game
 
         public readonly Bindable<OverlayActivation> OverlayActivationMode = new Bindable<OverlayActivation>();
 
-        private BackgroundScreenStack backgroundStack;
-
-        private ParallaxContainer backgroundParallax;
-
-        private ScreenStack screenStack;
+        private readonly OsuScreenStack screenStack = new OsuScreenStack { RelativeSizeAxes = Axes.Both };
         private VolumeOverlay volume;
         private OnScreenDisplay onscreenDisplay;
         private OsuLogo osuLogo;
@@ -390,12 +386,7 @@ namespace osu.Game
                     RelativeSizeAxes = Axes.Both,
                     Children = new Drawable[]
                     {
-                        backgroundParallax = new ParallaxContainer
-                        {
-                            RelativeSizeAxes = Axes.Both,
-                            Child = backgroundStack = new BackgroundScreenStack { RelativeSizeAxes = Axes.Both },
-                        },
-                        screenStack = new ScreenStack { RelativeSizeAxes = Axes.Both },
+                        screenStack,
                         logoContainer = new Container { RelativeSizeAxes = Axes.Both },
                     }
                 },
@@ -407,17 +398,17 @@ namespace osu.Game
                 idleTracker = new GameIdleTracker(6000)
             });
 
-            dependencies.Cache(backgroundStack);
-
             screenStack.ScreenPushed += screenPushed;
             screenStack.ScreenExited += screenExited;
 
-            loadComponentSingleFile(osuLogo, logoContainer.Add);
-
-            loadComponentSingleFile(new Loader
+            loadComponentSingleFile(osuLogo, logo =>
             {
-                RelativeSizeAxes = Axes.Both
-            }, screenStack.Push);
+                logoContainer.Add(logo);
+                screenStack.Push(new Loader
+                {
+                    RelativeSizeAxes = Axes.Both
+                });
+            });
 
             loadComponentSingleFile(Toolbar = new Toolbar
             {
@@ -777,8 +768,6 @@ namespace osu.Game
 
             if (newScreen is IOsuScreen newOsuScreen)
             {
-                backgroundParallax.ParallaxAmount = ParallaxContainer.DEFAULT_PARALLAX_AMOUNT * newOsuScreen.BackgroundParallaxAmount;
-
                 OverlayActivationMode.Value = newOsuScreen.InitialOverlayActivationMode;
 
                 if (newOsuScreen.HideOverlaysOnEnter)
