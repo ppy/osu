@@ -36,8 +36,7 @@ namespace osu.Game.Screens.Backgrounds
         [BackgroundDependencyLoader]
         private void load()
         {
-            if (beatmap != null)
-                backgroundLoaded(new BeatmapBackground(beatmap));
+            backgroundLoaded(new BeatmapBackground(beatmap));
         }
 
         public WorkingBeatmap Beatmap
