@@ -1,12 +1,12 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input.Events;
-using osu.Framework.Timing;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Graphics.UserInterface;
@@ -40,7 +40,9 @@ namespace osu.Game.Screens.Play
 
         private static bool hasShownNotificationOnce;
 
-        public HUDOverlay(ScoreProcessor scoreProcessor, RulesetContainer rulesetContainer, WorkingBeatmap working, IAdjustableClock adjustableClock)
+        public Action<double> RequestSeek;
+
+        public HUDOverlay(ScoreProcessor scoreProcessor, RulesetContainer rulesetContainer, WorkingBeatmap working)
         {
             RelativeSizeAxes = Axes.Both;
 
@@ -92,11 +94,9 @@ namespace osu.Game.Screens.Play
 
             Progress.Objects = rulesetContainer.Objects;
             Progress.AllowSeeking = rulesetContainer.HasReplayLoaded.Value;
-            Progress.RequestSeek = pos => adjustableClock.Seek(pos);
+            Progress.RequestSeek = time => RequestSeek(time);
 
             ModDisplay.Current.BindTo(working.Mods);
-
-            PlayerSettingsOverlay.PlaybackSettings.AdjustableClock = adjustableClock;
         }
 
         [BackgroundDependencyLoader(true)]

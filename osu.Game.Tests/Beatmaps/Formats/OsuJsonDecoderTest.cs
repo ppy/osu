@@ -113,6 +113,7 @@ namespace osu.Game.Tests.Beatmaps.Formats
 
         [TestCase(normal)]
         [TestCase(marathon)]
+        [Ignore("temporarily disabled pending DeepEqual fix (https://github.com/jamesfoster/DeepEqual/pull/35)")]
         // Currently fails:
         // [TestCase(with_sb)]
         public void TestParity(string beatmap)
