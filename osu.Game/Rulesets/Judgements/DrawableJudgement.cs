@@ -92,7 +92,7 @@ namespace osu.Game.Rulesets.Judgements
                     JudgementBody.MoveToOffset(new Vector2(0, 100), MISS_ANIMATION_DURATION, Easing.InQuint);
                     JudgementBody.RotateTo(40, MISS_ANIMATION_DURATION, Easing.InQuint);
 
-                    this.Delay(500).FadeOut(200);
+                    this.Delay(600).FadeOut(200);
                     break;
                 default:
                     JudgementBody.ScaleTo(InitialHitScale);
