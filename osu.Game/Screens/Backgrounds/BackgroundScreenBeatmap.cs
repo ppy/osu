@@ -1,4 +1,4 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
@@ -25,6 +25,20 @@ namespace osu.Game.Screens.Backgrounds
         private readonly UserDimContainer fadeContainer;
 
         protected virtual UserDimContainer CreateFadeContainer() => new UserDimContainer { RelativeSizeAxes = Axes.Both };
+
+        public BackgroundScreenBeatmap(WorkingBeatmap beatmap = null)
+        {
+            Beatmap = beatmap;
+            InternalChild = fadeContainer = CreateFadeContainer();
+            fadeContainer.EnableUserDim.BindTo(EnableUserDim);
+        }
+
+        [BackgroundDependencyLoader]
+        private void load()
+        {
+            if (beatmap != null)
+                backgroundLoaded(new BeatmapBackground(beatmap));
+        }
 
         public virtual WorkingBeatmap Beatmap
         {
@@ -58,20 +72,6 @@ namespace osu.Game.Screens.Backgrounds
             fadeContainer.Add(Background = b);
             Background.BlurSigma = BlurTarget;
             StoryboardReplacesBackground.BindTo(fadeContainer.StoryboardReplacesBackground);
-        }
-
-        [BackgroundDependencyLoader]
-        private void load()
-        {
-            if (beatmap != null)
-                backgroundLoaded(new BeatmapBackground(beatmap));
-        }
-
-        public BackgroundScreenBeatmap(WorkingBeatmap beatmap = null)
-        {
-            Beatmap = beatmap;
-            InternalChild = fadeContainer = CreateFadeContainer();
-            fadeContainer.EnableUserDim.BindTo(EnableUserDim);
         }
 
         public override bool Equals(BackgroundScreen other)
