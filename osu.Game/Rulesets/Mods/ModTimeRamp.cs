@@ -15,7 +15,7 @@ namespace osu.Game.Rulesets.Mods
 {
     public abstract class ModTimeRamp : Mod
     {
-        public override Type[] IncompatibleMods => new[] { typeof(ModDoubleTime), typeof(ModHalfTime) };
+        public override Type[] IncompatibleMods => new[] { typeof(ModTimeAdjust) };
 
         protected abstract double FinalRateAdjustment { get; }
     }
@@ -29,20 +29,26 @@ namespace osu.Game.Rulesets.Mods
 
         private IAdjustableClock clock;
 
-        private IHasPitchAdjust pitchAdjust;
-
         /// <summary>
         /// The point in the beatmap at which the final ramping rate should be reached.
         /// </summary>
         private const double final_rate_progress = 0.75f;
 
+        /// <summary>
+        /// The adjustment applied on entering this mod's application method.
+        /// </summary>
+        private double baseAdjust;
+
         public virtual void ApplyToClock(IAdjustableClock clock)
         {
             this.clock = clock;
-            pitchAdjust = (IHasPitchAdjust)clock;
 
-            // for preview purposes
-            pitchAdjust.PitchAdjust = 1.0 + FinalRateAdjustment;
+            // we capture the adjustment applied before entering our application method.
+            // this will cover external changes, which should re-fire this method.
+            baseAdjust = (clock as IHasPitchAdjust)?.PitchAdjust ?? clock.Rate;
+
+            // for preview purposes. during gameplay, Update will overwrite this setting.
+            applyAdjustment(1);
         }
 
         public virtual void ApplyToBeatmap(Beatmap<T> beatmap)
@@ -56,9 +62,17 @@ namespace osu.Game.Rulesets.Mods
         public virtual void Update(Playfield playfield)
         {
             var absRate = Math.Abs(FinalRateAdjustment);
-            var adjustment = MathHelper.Clamp(absRate * ((clock.CurrentTime - beginRampTime) / finalRateTime), 0, absRate);
+            applyAdjustment(MathHelper.Clamp(absRate * ((clock.CurrentTime - beginRampTime) / finalRateTime), 0, absRate));
+        }
 
-            pitchAdjust.PitchAdjust = 1 + Math.Sign(FinalRateAdjustment) * adjustment;
+        private void applyAdjustment(double adjustment)
+        {
+            var localAdjust = 1 + Math.Sign(FinalRateAdjustment) * adjustment;
+
+            if (clock is IHasPitchAdjust tempo)
+                tempo.PitchAdjust = baseAdjust * localAdjust;
+            else
+                clock.Rate *= baseAdjust * localAdjust;
         }
     }
 }
