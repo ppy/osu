@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Threading;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -36,8 +37,12 @@ namespace osu.Game.Screens.Backgrounds
         [BackgroundDependencyLoader]
         private void load()
         {
-            backgroundLoaded(new BeatmapBackground(beatmap));
+            var background = new BeatmapBackground(beatmap);
+            LoadComponent(background);
+            switchBackground(background);
         }
+
+        private CancellationTokenSource cancellationSource;
 
         public WorkingBeatmap Beatmap
         {
@@ -49,14 +54,18 @@ namespace osu.Game.Screens.Backgrounds
 
                 beatmap = value;
 
-                // load will be completed in async load.
-                if (LoadState < LoadState.Ready) return;
+                Schedule(() =>
+                {
+                    if ((Background as BeatmapBackground)?.Beatmap == beatmap)
+                        return;
 
-                Schedule(() => { LoadComponentAsync(new BeatmapBackground(beatmap), b => Schedule(() => backgroundLoaded(b))); });
+                    cancellationSource?.Cancel();
+                    LoadComponentAsync(new BeatmapBackground(beatmap), switchBackground, (cancellationSource = new CancellationTokenSource()).Token);
+                });
             }
         }
 
-        private void backgroundLoaded(BeatmapBackground b)
+        private void switchBackground(BeatmapBackground b)
         {
             float newDepth = 0;
             if (Background != null)
@@ -75,25 +84,24 @@ namespace osu.Game.Screens.Backgrounds
 
         public override bool Equals(BackgroundScreen other)
         {
-            var otherBeatmapBackground = other as BackgroundScreenBeatmap;
-            if (otherBeatmapBackground == null) return false;
+            if (!(other is BackgroundScreenBeatmap otherBeatmapBackground)) return false;
 
             return base.Equals(other) && beatmap == otherBeatmapBackground.Beatmap;
         }
 
         protected class BeatmapBackground : Background
         {
-            private readonly WorkingBeatmap beatmap;
+            public readonly WorkingBeatmap Beatmap;
 
             public BeatmapBackground(WorkingBeatmap beatmap)
             {
-                this.beatmap = beatmap;
+                Beatmap = beatmap;
             }
 
             [BackgroundDependencyLoader]
             private void load(TextureStore textures)
             {
-                Sprite.Texture = beatmap?.Background ?? textures.Get(@"Backgrounds/bg1");
+                Sprite.Texture = Beatmap?.Background ?? textures.Get(@"Backgrounds/bg1");
             }
         }
     }
