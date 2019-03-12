@@ -86,21 +86,62 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             return totalValue;
         }
 
+        private double interp(IList<double> values, double scoreCombo, double mapCombo)
+        {
+
+
+            if (mapCombo == 0)
+            {
+                return values.Last();
+            }
+
+            double comboRatio = scoreCombo / mapCombo;
+            double pos = Math.Min(comboRatio * (values.Count), (double)values.Count);
+            int i = (int)pos;
+
+            if (i == values.Count) {
+                return values.Last();
+            }
+
+            if (pos <= 0)
+            {
+                return 0;
+            }
+
+            double ub = values[i];
+            double lb = i == 0 ? 0 : values[i - 1];
+
+            double t = pos - i;
+            double ret = lb * (1-t) + ub * t;
+
+            return ret;
+        }
+
+        IList<double> getTransformedStrains(IList<double> strains)
+        {
+            var transformed = new List<double>();
+
+            foreach(double strain in strains)
+            {
+                transformed.Add(Math.Pow(5.0f * Math.Max(1.0f, strain / 0.0675f) - 4.0f, 3.0f) / 100000.0f);
+            }
+
+            return transformed;
+        }
+
         private double computeAimValue()
         {
-            double rawAim = Attributes.AimStrain;
+            double rawAim = interp(Attributes.AimStrains, scoreMaxCombo, beatmapMaxCombo);
 
             if (mods.Any(m => m is OsuModTouchDevice))
                 rawAim = Math.Pow(rawAim, 0.8);
 
             double aimValue = Math.Pow(5.0f * Math.Max(1.0f, rawAim / 0.0675f) - 4.0f, 3.0f) / 100000.0f;
 
+            //System.Console.WriteLine($"aim: [ {String.Join(", ", getTransformedStrains(Attributes.AimStrains))}]");
+
             // Penalize misses exponentially. This mainly fixes tag4 maps and the likes until a per-hitobject solution is available
             aimValue *= Math.Pow(0.97f, countMiss);
-
-            // Combo scaling
-            if (beatmapMaxCombo > 0)
-                aimValue *= Math.Min(Math.Pow(scoreMaxCombo, 0.8f) / Math.Pow(beatmapMaxCombo, 0.8f), 1.0f);
 
             double approachRateFactor = 1.0f;
             if (Attributes.ApproachRate > 10.33f)
@@ -136,14 +177,13 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
         private double computeSpeedValue()
         {
-            double speedValue = Math.Pow(5.0f * Math.Max(1.0f, Attributes.SpeedStrain / 0.0675f) - 4.0f, 3.0f) / 100000.0f;
+            double rawSpeed = interp(Attributes.SpeedStrains, scoreMaxCombo, beatmapMaxCombo);
+            double speedValue = Math.Pow(5.0f * Math.Max(1.0f, rawSpeed / 0.0675f) - 4.0f, 3.0f) / 100000.0f;
+
+
 
             // Penalize misses exponentially. This mainly fixes tag4 maps and the likes until a per-hitobject solution is available
             speedValue *= Math.Pow(0.97f, countMiss);
-
-            // Combo scaling
-            if (beatmapMaxCombo > 0)
-                speedValue *= Math.Min(Math.Pow(scoreMaxCombo, 0.8f) / Math.Pow(beatmapMaxCombo, 0.8f), 1.0f);
 
             double approachRateFactor = 1.0f;
             if (Attributes.ApproachRate > 10.33f)

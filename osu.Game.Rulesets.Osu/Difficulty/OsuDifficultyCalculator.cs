@@ -29,8 +29,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             if (beatmap.HitObjects.Count == 0)
                 return new OsuDifficultyAttributes { Mods = mods };
 
-            double aimRating = skills[0].DifficultyValue();
-            double speedRating = skills[1].DifficultyValue();
+            IList<double> aimRatings = skills[0].DifficultyValues();
+            IList<double> speedRatings = skills[1].DifficultyValues();
+            double aimRating = aimRatings.Last();
+            double speedRating = speedRatings.Last();
             double starRating = aimRating + speedRating + Math.Abs(aimRating - speedRating) / 2;
 
             // Todo: These int casts are temporary to achieve 1:1 results with osu!stable, and should be removed in the future
@@ -46,7 +48,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 StarRating = starRating,
                 Mods = mods,
                 AimStrain = aimRating,
+                AimStrains = aimRatings,
                 SpeedStrain = speedRating,
+                SpeedStrains = speedRatings,
                 ApproachRate = preempt > 1200 ? (1800 - preempt) / 120 : (1200 - preempt) / 150 + 5,
                 OverallDifficulty = (80 - hitWindowGreat) / 6,
                 MaxCombo = maxCombo

@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using osu.Game.Rulesets.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Difficulty.Utils;
 
@@ -18,6 +19,8 @@ namespace osu.Game.Rulesets.Difficulty.Skills
         /// The peak strain for each <see cref="DifficultyCalculator.SectionLength"/> section of the beatmap.
         /// </summary>
         public IList<double> StrainPeaks => strainPeaks;
+
+        private const int difficulty_count = 20;
 
         private const double section_length = 400;
         private const double difficulty_multiplier = 0.0675;
@@ -105,6 +108,43 @@ namespace osu.Game.Rulesets.Difficulty.Skills
         }
 
         /// <summary>
+        /// Returns a list of difficulty values for passing the easiest fraction i/difficulty_sections of the map for i=1 to difficulty_sections.
+        /// </summary>
+        public IList<double> DifficultyValues()
+        {
+            double difficulty = 0;
+
+            // previously returned sum of 0.9^n * strain, which converges to 10*strain for constant strain.
+            double legacyScalingFactor = 10;
+
+            // difficulty to FC the remainder of the map from every position, used later to calculate expected map length. 
+            var difficultyPartialSums = new List<double>();
+
+            // Difficulty calculated according to probability of FC
+            // iterate backwards to calculate difficultyPartialSums
+            for (int i = strainPeaks.Count - 1; i >= 0; --i)
+            {
+                double strain = strainPeaks[i];
+                double stars = Math.Sqrt(strain * legacyScalingFactor) * difficulty_multiplier;
+                difficulty += Math.Exp(star_bonus_k * starsToDifficulty(stars)) * time_multiplier;
+                difficultyPartialSums.Add(difficulty);
+            }
+
+            var skillToFcSubset = getSkillToFcSubsets(difficultyPartialSums);
+
+            //double skill = getSkillToFcInTargetTime(difficultyPartialSums);
+
+            for (int i=0; i<skillToFcSubset.Count; i++)
+            {
+                skillToFcSubset[i] = difficultyToStars(skillToFcSubset[i]);
+            }
+
+            return skillToFcSubset;
+
+
+        }
+
+        /// <summary>
         /// Returns the calculated difficulty value representing all processed <see cref="DifficultyHitObject"/>s.
         /// </summary>
         public double DifficultyValue()
@@ -127,9 +167,9 @@ namespace osu.Game.Rulesets.Difficulty.Skills
                 difficultyPartialSums.Add(difficulty);
             }
 
-            difficulty = Math.Log(difficulty) / star_bonus_k;
+  
 
-            double skill = getSkillToFcInTargetTime(difficulty, difficultyPartialSums);
+            double skill = getSkillToFcInTargetTime(difficultyPartialSums);
 
             return difficultyToStars(skill);
 
@@ -142,8 +182,32 @@ namespace osu.Game.Rulesets.Difficulty.Skills
 
         private double strainDecay(double ms) => Math.Pow(StrainDecayBase, ms / 1000);
 
-        private double getSkillToFcInTargetTime(double difficulty, List<double> difficultyPartialSums)
+
+        private IList<double> getSkillToFcSubsets(List<double> difficultyPartialSums)
         {
+            var ret = new double[difficulty_count];
+
+            for (int i=1; i<=difficulty_count; ++i)
+            {
+                ret[i-1] = double.PositiveInfinity;
+
+                for (int j=0;j<=difficulty_count-i; ++j)
+                {
+                    int count = difficultyPartialSums.Count * i / difficulty_count;
+                    int start = difficultyPartialSums.Count * j / difficulty_count;
+                    double remainder = (start>0) ? difficultyPartialSums[start -1] : 0;
+
+                    ret[i-1] = Math.Min(ret[i-1], getSkillToFcInTargetTime(difficultyPartialSums.GetRange(start, count), remainder));
+                }
+            }
+
+            return ret;
+        }
+
+        private double getSkillToFcInTargetTime(IList<double> difficultyPartialSums, double remainder=0)
+        {
+            double difficulty = Math.Log(difficultyPartialSums.Last()-remainder) / star_bonus_k;
+
             // if map is really long, return skill level to pass with 0.5 probability
             if (difficultyPartialSums.Count >= target_fc_sections / 2)
                 return skillLevel(0.5, difficulty);
@@ -160,7 +224,7 @@ namespace osu.Game.Rulesets.Difficulty.Skills
             for (int i = 0; i < max_iterations; ++i)
             {
                 // use estimate for improved average length calculation
-                double expectedSectionsBeforeFC = getExpectedSectionsPlayedBeforeFC(skill, difficultyPartialSums);
+                double expectedSectionsBeforeFC = getExpectedSectionsPlayedBeforeFC(skill, difficultyPartialSums, remainder);
 
                 // play x sections per fc, fc with probability p per attempt, so on average play x*p sections per attempt
                 averageLength = expectedSectionsBeforeFC * passProbability(skill, difficulty);
@@ -181,7 +245,7 @@ namespace osu.Game.Rulesets.Difficulty.Skills
             return skill + target_fc_star_adjustment;
         }
 
-        private double getExpectedSectionsPlayedBeforeFC(double skill, List<double> difficultyPartialSums)
+        private double getExpectedSectionsPlayedBeforeFC(double skill, IList<double> difficultyPartialSums, double remainder=0)
         {
             // note: calculating this separately for each skill isn't really correct, maybe fix in future
 
@@ -191,7 +255,7 @@ namespace osu.Game.Rulesets.Difficulty.Skills
             {
                 // if we fail before reaching this section, section playcount doesnt increase
                 // it only increases if we fail afterwards
-                double probabilityOfPassingRemainderOfMap = passProbFromExp(skill, expDifficulty);
+                double probabilityOfPassingRemainderOfMap = passProbFromExp(skill, expDifficulty-remainder);
                 double expectedSectionPlaysBeforeFC = 1 / probabilityOfPassingRemainderOfMap;
                 length += expectedSectionPlaysBeforeFC; 
             }
