@@ -32,6 +32,14 @@ namespace osu.Game.Rulesets.Judgements
         protected Container JudgementBody;
         protected SpriteText JudgementText;
 
+        protected virtual double FadeInDuration => 100;
+
+        protected virtual float InitialHitScale => 0.9f;
+
+        protected virtual float HitScaleDuration => 500;
+
+        protected virtual double HitFadeOutDuration => 400;
+
         /// <summary>
         /// Creates a drawable which visualises a <see cref="Judgements.Judgement"/>.
         /// </summary>
@@ -65,11 +73,13 @@ namespace osu.Game.Rulesets.Judgements
             };
         }
 
+        private const double MISS_ANIMATION_DURATION = 800;
+
         protected override void LoadComplete()
         {
             base.LoadComplete();
 
-            this.FadeInFromZero(100, Easing.OutQuint);
+            this.FadeInFromZero(FadeInDuration, Easing.OutQuint);
 
             switch (Result.Type)
             {
@@ -77,18 +87,18 @@ namespace osu.Game.Rulesets.Judgements
                     break;
                 case HitResult.Miss:
                     JudgementBody.ScaleTo(1.6f);
-                    JudgementBody.ScaleTo(1, 100, Easing.In);
+                    JudgementBody.ScaleTo(1, FadeInDuration, Easing.In);
 
-                    JudgementBody.MoveToOffset(new Vector2(0, 100), 800, Easing.InQuint);
-                    JudgementBody.RotateTo(40, 800, Easing.InQuint);
+                    JudgementBody.MoveToOffset(new Vector2(0, 100), MISS_ANIMATION_DURATION, Easing.InQuint);
+                    JudgementBody.RotateTo(40, MISS_ANIMATION_DURATION, Easing.InQuint);
 
-                    this.Delay(600).FadeOut(200);
+                    this.Delay(500).FadeOut(200);
                     break;
                 default:
-                    JudgementBody.ScaleTo(0.9f);
-                    JudgementBody.ScaleTo(1, 500, Easing.OutElastic);
+                    JudgementBody.ScaleTo(InitialHitScale);
+                    JudgementBody.ScaleTo(1, HitScaleDuration, Easing.OutElastic);
 
-                    this.Delay(100).FadeOut(400);
+                    this.Delay(FadeInDuration).FadeOut(HitFadeOutDuration);
                     break;
             }
 

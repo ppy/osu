@@ -22,22 +22,20 @@ namespace osu.Game.Rulesets.Mania.UI
                 JudgementText.Font = JudgementText.Font.With(size: 25);
         }
 
+        protected override double FadeInDuration => 50;
+
+        protected override float InitialHitScale => 0.8f;
+
+        protected override double HitFadeOutDuration => 200;
+
+        protected override float HitScaleDuration => 250;
+
         protected override void LoadComplete()
         {
-            base.LoadComplete();
-
-            this.FadeInFromZero(50, Easing.OutQuint);
-
             if (Result.IsHit)
-            {
-                JudgementBody.ScaleTo(0.8f);
-                JudgementBody.ScaleTo(1, 250, Easing.OutElastic);
+                JudgementBody.Delay(FadeInDuration).ScaleTo(0.75f, HitScaleDuration);
 
-                JudgementBody.Delay(50).ScaleTo(0.75f, 250);
-                this.Delay(50).FadeOut(200);
-            }
-
-            Expire();
+            base.LoadComplete();
         }
     }
 }
