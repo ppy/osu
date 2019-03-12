@@ -87,7 +87,7 @@ namespace osu.Game
 
         public readonly Bindable<OverlayActivation> OverlayActivationMode = new Bindable<OverlayActivation>();
 
-        private readonly OsuScreenStack screenStack = new OsuScreenStack { RelativeSizeAxes = Axes.Both };
+        private OsuScreenStack screenStack;
         private VolumeOverlay volume;
         private OnScreenDisplay onscreenDisplay;
         private OsuLogo osuLogo;
@@ -199,6 +199,8 @@ namespace osu.Game
             LocalConfig.BindWith(OsuSetting.VolumeInactive, inactiveVolumeAdjust);
 
             IsActive.BindValueChanged(active => updateActiveState(active.NewValue), true);
+
+            screenStack = new OsuScreenStack { RelativeSizeAxes = Axes.Both };
         }
 
         private ExternalLinkOpener externalLinkOpener;
