@@ -246,7 +246,7 @@ namespace osu.Game.Tests.Beatmaps.IO
         public void TestImportWithDuplicateBeatmapIDs()
         {
             //unfortunately for the time being we need to reference osu.Framework.Desktop for a game host here.
-            using (HeadlessGameHost host = new CleanRunHeadlessGameHost($"TestImportWithDuplicateBeatmapID"))
+            using (HeadlessGameHost host = new CleanRunHeadlessGameHost("TestImportWithDuplicateBeatmapID"))
             {
                 try
                 {
@@ -258,7 +258,7 @@ namespace osu.Game.Tests.Beatmaps.IO
                         AuthorString = "SomeAuthor"
                     };
 
-                    BeatmapDifficulty difficulty = null;
+                    var difficulty = new BeatmapDifficulty();
 
                     var toImport = new BeatmapSetInfo
                     {
