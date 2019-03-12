@@ -91,7 +91,7 @@ namespace osu.Game.Rulesets.Judgements
                     break;
                 case HitResult.Miss:
                     JudgementBody.ScaleTo(1.6f);
-                    JudgementBody.ScaleTo(1, FadeInDuration, Easing.In);
+                    JudgementBody.ScaleTo(1, 100, Easing.In);
 
                     JudgementBody.MoveToOffset(new Vector2(0, 100), 800, Easing.InQuint);
                     JudgementBody.RotateTo(40, 800, Easing.InQuint);
