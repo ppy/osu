@@ -108,13 +108,13 @@ namespace osu.Game.Tests.Visual
 
             Player?.Exit();
 
-            var p = Player = CreatePlayer(r);
+            Player = CreatePlayer(r);
 
-            playerWeakReferences.Add(p);
+            playerWeakReferences.Add(Player);
 
             LoadScreen(Player);
 
-            return p;
+            return Player;
         }
 
         protected virtual Player CreatePlayer(Ruleset ruleset) => new Player
