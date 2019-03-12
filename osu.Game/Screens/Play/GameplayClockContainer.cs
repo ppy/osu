@@ -141,6 +141,7 @@ namespace osu.Game.Screens.Play
         {
             if (sourceClock == null) return;
 
+            sourceClock.ResetSpeedAdjustments();
             sourceClock.Rate = UserPlaybackRate.Value;
 
             foreach (var mod in beatmap.Mods.Value.OfType<IApplicableToClock>())
