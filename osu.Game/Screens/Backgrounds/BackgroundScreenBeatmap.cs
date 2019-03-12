@@ -40,7 +40,7 @@ namespace osu.Game.Screens.Backgrounds
                 backgroundLoaded(new BeatmapBackground(beatmap));
         }
 
-        public virtual WorkingBeatmap Beatmap
+        public WorkingBeatmap Beatmap
         {
             get => beatmap;
             set
