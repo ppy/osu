@@ -45,24 +45,7 @@ namespace osu.Game.Beatmaps.Drawables
 
         protected override Drawable CreateDrawable(BeatmapInfo model)
         {
-            Drawable drawable;
-
-            var localBeatmap = beatmaps.GetWorkingBeatmap(model);
-
-            if (model?.BeatmapSet?.OnlineInfo != null)
-            {
-                drawable = new BeatmapSetCover(model.BeatmapSet, beatmapSetCoverType);
-            }
-            else if (localBeatmap.BeatmapInfo.ID != 0)
-            {
-                // Fall back to local background if one exists
-                drawable = new BeatmapBackgroundSprite(localBeatmap);
-            }
-            else
-            {
-                // Use the default background if somehow an online set does not exist and we don't have a local copy.
-                drawable = new BeatmapBackgroundSprite(beatmaps.DefaultBeatmap);
-            }
+            Drawable drawable = getDrawableForModel(model);
 
             drawable.RelativeSizeAxes = Axes.Both;
             drawable.Anchor = Anchor.Centre;
@@ -71,6 +54,17 @@ namespace osu.Game.Beatmaps.Drawables
             drawable.OnLoadComplete = d => d.FadeInFromZero(400);
 
             return drawable;
+        }
+
+        private Drawable getDrawableForModel(BeatmapInfo model)
+        {
+            // prefer online cover where available.
+            if (model?.BeatmapSet?.OnlineInfo != null)
+                return new BeatmapSetCover(model.BeatmapSet, beatmapSetCoverType);
+
+            return model?.ID > 0
+                ? new BeatmapBackgroundSprite(beatmaps.GetWorkingBeatmap(model))
+                : new BeatmapBackgroundSprite(beatmaps.DefaultBeatmap);
         }
     }
 }
