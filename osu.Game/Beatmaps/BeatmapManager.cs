@@ -102,11 +102,14 @@ namespace osu.Game.Beatmaps
                 b.BeatmapSet = beatmapSet;
             }
 
-            validateOnlineIds(beatmapSet.Beatmaps);
+            validateOnlineIds(beatmapSet);
 
             foreach (BeatmapInfo b in beatmapSet.Beatmaps)
                 fetchAndPopulateOnlineValues(b, beatmapSet.Beatmaps);
+        }
 
+        protected override void PreImport(BeatmapSetInfo beatmapSet)
+        {
             // check if a set already exists with the same online id, delete if it does.
             if (beatmapSet.OnlineBeatmapSetID != null)
             {
@@ -120,14 +123,30 @@ namespace osu.Game.Beatmaps
             }
         }
 
-        private void validateOnlineIds(List<BeatmapInfo> beatmaps)
+        private void validateOnlineIds(BeatmapSetInfo beatmapSet)
         {
-            var beatmapIds = beatmaps.Where(b => b.OnlineBeatmapID.HasValue).Select(b => b.OnlineBeatmapID).ToList();
+            var beatmapIds = beatmapSet.Beatmaps.Where(b => b.OnlineBeatmapID.HasValue).Select(b => b.OnlineBeatmapID).ToList();
 
-            // ensure all IDs are unique in this set and none match existing IDs in the local beatmap store.
-            if (beatmapIds.GroupBy(b => b).Any(g => g.Count() > 1) || QueryBeatmaps(b => beatmapIds.Contains(b.OnlineBeatmapID)).Any())
-                // remove all online IDs if any problems were found.
-                beatmaps.ForEach(b => b.OnlineBeatmapID = null);
+            // ensure all IDs are unique
+            if (beatmapIds.GroupBy(b => b).Any(g => g.Count() > 1))
+            {
+                resetIds();
+                return;
+            }
+
+            // find any existing beatmaps in the database that have matching online ids
+            var existingBeatmaps = QueryBeatmaps(b => beatmapIds.Contains(b.OnlineBeatmapID)).ToList();
+
+            if (existingBeatmaps.Count > 0)
+            {
+                // reset the import ids (to force a re-fetch) *unless* they match the candidate CheckForExisting set.
+                // we can ignore the case where the new ids are contained by the CheckForExisting set as it will either be used (import skipped) or deleted.
+                var existing = CheckForExisting(beatmapSet);
+                if (existing == null || existingBeatmaps.Any(b => !existing.Beatmaps.Contains(b)))
+                    resetIds();
+            }
+
+            void resetIds() => beatmapSet.Beatmaps.ForEach(b => b.OnlineBeatmapID = null);
         }
 
         /// <summary>
@@ -253,6 +272,18 @@ namespace osu.Game.Beatmaps
         /// <param name="query">The query.</param>
         /// <returns>The first result for the provided query, or null if no results were found.</returns>
         public BeatmapSetInfo QueryBeatmapSet(Expression<Func<BeatmapSetInfo, bool>> query) => beatmaps.ConsumableItems.AsNoTracking().FirstOrDefault(query);
+
+        protected override bool CanUndelete(BeatmapSetInfo existing, BeatmapSetInfo import)
+        {
+            if (!base.CanUndelete(existing, import))
+                return false;
+
+            var existingIds = existing.Beatmaps.Select(b => b.OnlineBeatmapID).OrderBy(i => i);
+            var importIds = import.Beatmaps.Select(b => b.OnlineBeatmapID).OrderBy(i => i);
+
+            // force re-import if we are not in a sane state.
+            return existing.OnlineBeatmapSetID == import.OnlineBeatmapSetID && existingIds.SequenceEqual(importIds);
+        }
 
         /// <summary>
         /// Returns a list of all usable <see cref="BeatmapSetInfo"/>s.
