@@ -32,13 +32,11 @@ namespace osu.Game.Rulesets.Judgements
         protected Container JudgementBody;
         protected SpriteText JudgementText;
 
+        /// <summary>
+        /// The amount of time for this judgement to initially fade in.
+        /// </summary>
+        /// <remarks> Override this to change fade in times of mode-specific judgements </remarks>
         protected virtual double FadeInDuration => 100;
-
-        protected virtual float InitialHitScale => 0.9f;
-
-        protected virtual float HitScaleDuration => 500;
-
-        protected virtual double HitFadeOutDuration => 400;
 
         /// <summary>
         /// Creates a drawable which visualises a <see cref="Judgements.Judgement"/>.
@@ -73,7 +71,13 @@ namespace osu.Game.Rulesets.Judgements
             };
         }
 
-        private const double MISS_ANIMATION_DURATION = 800;
+        protected virtual void ApplyHitAnimations()
+        {
+            JudgementBody.ScaleTo(0.9f);
+            JudgementBody.ScaleTo(1, 500, Easing.OutElastic);
+
+            this.Delay(FadeInDuration).FadeOut(400);
+        }
 
         protected override void LoadComplete()
         {
@@ -89,16 +93,13 @@ namespace osu.Game.Rulesets.Judgements
                     JudgementBody.ScaleTo(1.6f);
                     JudgementBody.ScaleTo(1, FadeInDuration, Easing.In);
 
-                    JudgementBody.MoveToOffset(new Vector2(0, 100), MISS_ANIMATION_DURATION, Easing.InQuint);
-                    JudgementBody.RotateTo(40, MISS_ANIMATION_DURATION, Easing.InQuint);
+                    JudgementBody.MoveToOffset(new Vector2(0, 100), 800, Easing.InQuint);
+                    JudgementBody.RotateTo(40, 800, Easing.InQuint);
 
                     this.Delay(600).FadeOut(200);
                     break;
                 default:
-                    JudgementBody.ScaleTo(InitialHitScale);
-                    JudgementBody.ScaleTo(1, HitScaleDuration, Easing.OutElastic);
-
-                    this.Delay(FadeInDuration).FadeOut(HitFadeOutDuration);
+                    ApplyHitAnimations();
                     break;
             }
 
