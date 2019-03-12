@@ -24,18 +24,13 @@ namespace osu.Game.Rulesets.Mania.UI
 
         protected override double FadeInDuration => 50;
 
-        protected override float InitialHitScale => 0.8f;
-
-        protected override double HitFadeOutDuration => 200;
-
-        protected override float HitScaleDuration => 250;
-
-        protected override void LoadComplete()
+        protected override void ApplyHitAnimations()
         {
-            if (Result.IsHit)
-                JudgementBody.Delay(FadeInDuration).ScaleTo(0.75f, HitScaleDuration);
+            JudgementBody.ScaleTo(0.8f);
+            JudgementBody.ScaleTo(1, 250, Easing.OutElastic);
 
-            base.LoadComplete();
+            JudgementBody.Delay(FadeInDuration).ScaleTo(0.75f, 250);
+            this.Delay(FadeInDuration).FadeOut(200);
         }
     }
 }
