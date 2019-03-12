@@ -16,7 +16,7 @@ namespace osu.Game.Tests.Visual
         {
             int index = 0;
 
-            ScreenStack screenStack = new ScreenStack(new TestMultiplayerSubScreen(index)) { RelativeSizeAxes = Axes.Both };
+            OsuScreenStack screenStack = new OsuScreenStack(new TestMultiplayerSubScreen(index)) { RelativeSizeAxes = Axes.Both };
 
             Children = new Drawable[]
             {
