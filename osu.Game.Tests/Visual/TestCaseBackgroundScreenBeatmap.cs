@@ -9,7 +9,6 @@ using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Events;
 using osu.Framework.Input.States;
@@ -54,7 +53,7 @@ namespace osu.Game.Tests.Visual
         private BeatmapManager manager;
         private RulesetStore rulesets;
 
-        private ScreenStackCacheContainer screenStackContainer;
+        private OsuScreenStack screenStack;
 
         [BackgroundDependencyLoader]
         private void load(GameHost host)
@@ -85,8 +84,8 @@ namespace osu.Game.Tests.Visual
                 manager.Delete(manager.GetAllUsableBeatmapSets());
                 var temp = TestResources.GetTestBeatmapForImport();
                 manager.Import(temp);
-                Child = screenStackContainer = new ScreenStackCacheContainer { RelativeSizeAxes = Axes.Both };
-                screenStackContainer.ScreenStack.Push(songSelect = new DummySongSelect());
+                Child = screenStack = new OsuScreenStack() { RelativeSizeAxes = Axes.Both };
+                screenStack.Push(songSelect = new DummySongSelect());
             });
         }
 
@@ -351,20 +350,6 @@ namespace osu.Game.Tests.Visual
                 StoryboardEnabled = config.GetBindable<bool>(OsuSetting.ShowStoryboard);
                 ReplacesBackground.BindTo(Background.StoryboardReplacesBackground);
                 RulesetContainer.IsPaused.BindTo(IsPaused);
-            }
-        }
-
-        private class ScreenStackCacheContainer : Container
-        {
-            [Cached]
-            private BackgroundScreenStack backgroundScreenStack;
-
-            public readonly ScreenStack ScreenStack;
-
-            public ScreenStackCacheContainer()
-            {
-                Add(backgroundScreenStack = new BackgroundScreenStack { RelativeSizeAxes = Axes.Both });
-                Add(ScreenStack = new ScreenStack { RelativeSizeAxes = Axes.Both });
             }
         }
 
