@@ -84,7 +84,7 @@ namespace osu.Game.Tests.Visual
                 manager.Delete(manager.GetAllUsableBeatmapSets());
                 var temp = TestResources.GetTestBeatmapForImport();
                 manager.Import(temp);
-                Child = screenStack = new OsuScreenStack() { RelativeSizeAxes = Axes.Both };
+                Child = screenStack = new OsuScreenStack { RelativeSizeAxes = Axes.Both };
                 screenStack.Push(songSelect = new DummySongSelect());
             });
         }

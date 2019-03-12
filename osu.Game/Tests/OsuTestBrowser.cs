@@ -6,7 +6,6 @@ using osu.Framework.Platform;
 using osu.Framework.Screens;
 using osu.Framework.Testing;
 using osu.Game.Graphics;
-using osu.Game.Screens;
 using osu.Game.Screens.Backgrounds;
 
 namespace osu.Game.Tests
