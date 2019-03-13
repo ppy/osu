@@ -26,8 +26,9 @@ namespace osu.Game.Screens.Play
 {
     public class PlayerLoader : ScreenWithBeatmapBackground
     {
+        protected static readonly Vector2 BACKGROUND_BLUR = new Vector2(15);
+
         private readonly Func<Player> createPlayer;
-        private static readonly Vector2 background_blur = new Vector2(15);
 
         private Player player;
 
@@ -118,12 +119,16 @@ namespace osu.Game.Screens.Play
 
         private void contentIn()
         {
+            Background?.BlurTo(BACKGROUND_BLUR, 800, Easing.OutQuint);
+
             content.ScaleTo(1, 650, Easing.OutQuint);
             content.FadeInFromZero(400);
         }
 
         private void contentOut()
         {
+            Background?.BlurTo(new Vector2(0), 800, Easing.OutQuint);
+
             content.ScaleTo(0.7f, 300, Easing.InQuint);
             content.FadeOut(250);
         }
@@ -133,6 +138,7 @@ namespace osu.Game.Screens.Play
             base.OnEntering(last);
 
             content.ScaleTo(0.7f);
+            Background?.FadeColour(Color4.White, 800, Easing.OutQuint);
 
             contentIn();
 
@@ -158,11 +164,10 @@ namespace osu.Game.Screens.Play
 
         protected override bool OnHover(HoverEvent e)
         {
-            // restore our screen defaults
             if (this.IsCurrentScreen())
             {
-                InitializeBackgroundElements();
-                Background.EnableUserDim.Value = false;
+                Background.BlurTo(BACKGROUND_BLUR, 800, Easing.OutQuint);
+                Background.EnableVisualSettings.Value = false;
             }
 
             return base.OnHover(e);
@@ -172,20 +177,14 @@ namespace osu.Game.Screens.Play
         {
             if (GetContainingInputManager()?.HoveredDrawables.Contains(VisualSettings) == true)
             {
-                // Update background elements is only being called here because blur logic still exists in Player.
-                // Will need to be removed when resolving https://github.com/ppy/osu/issues/4322
-                UpdateBackgroundElements();
-                if (this.IsCurrentScreen())
-                    Background.EnableUserDim.Value = true;
+                if (this.IsCurrentScreen() && Background != null)
+                {
+                    Background.BlurTo(new Vector2(0), 800, Easing.OutQuint);
+                    Background.EnableVisualSettings.Value = true;
+                }
             }
 
             base.OnHoverLost(e);
-        }
-
-        protected override void InitializeBackgroundElements()
-        {
-            Background?.FadeColour(Color4.White, BACKGROUND_FADE_DURATION, Easing.OutQuint);
-            Background?.BlurTo(background_blur, BACKGROUND_FADE_DURATION, Easing.OutQuint);
         }
 
         private void pushWhenLoaded()
@@ -250,7 +249,7 @@ namespace osu.Game.Screens.Play
             this.FadeOut(150);
             cancelLoad();
 
-            Background.EnableUserDim.Value = false;
+            Background.EnableVisualSettings.Value = false;
 
             return base.OnExiting(next);
         }

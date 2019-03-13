@@ -37,8 +37,8 @@ namespace osu.Game.Screens.Select
 {
     public abstract class SongSelect : OsuScreen
     {
+        protected static readonly Vector2 BACKGROUND_BLUR = new Vector2(20);
         private static readonly Vector2 wedged_container_size = new Vector2(0.5f, 245);
-        private static readonly Vector2 background_blur = new Vector2(20);
         private const float left_area_padding = 20;
 
         public readonly FilterControl FilterControl;
@@ -556,7 +556,7 @@ namespace osu.Game.Screens.Select
             if (Background is BackgroundScreenBeatmap backgroundModeBeatmap)
             {
                 backgroundModeBeatmap.Beatmap = beatmap;
-                backgroundModeBeatmap.BlurTo(background_blur, 750, Easing.OutQuint);
+                backgroundModeBeatmap.BlurTo(BACKGROUND_BLUR, 750, Easing.OutQuint);
                 backgroundModeBeatmap.FadeColour(Color4.White, 250);
             }
 
