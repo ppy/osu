@@ -36,7 +36,7 @@ namespace osu.Game.Screens.Select
         private readonly FailRetryGraph failRetryGraph;
         private readonly DimmedLoadingAnimation loading;
 
-        private APIAccess api;
+        private IAPIProvider api;
 
         private ScheduledDelegate pendingBeatmapSwitch;
 
@@ -160,7 +160,7 @@ namespace osu.Game.Screens.Select
         }
 
         [BackgroundDependencyLoader]
-        private void load(APIAccess api)
+        private void load(IAPIProvider api)
         {
             this.api = api;
         }
