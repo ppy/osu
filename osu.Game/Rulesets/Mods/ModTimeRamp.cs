@@ -72,7 +72,7 @@ namespace osu.Game.Rulesets.Mods
             if (clock is IHasPitchAdjust tempo)
                 tempo.PitchAdjust = baseAdjust * localAdjust;
             else
-                clock.Rate *= baseAdjust * localAdjust;
+                clock.Rate = baseAdjust * localAdjust;
         }
     }
 }
