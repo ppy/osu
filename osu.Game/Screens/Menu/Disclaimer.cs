@@ -1,12 +1,13 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Screens;
 using osu.Game.Graphics;
@@ -25,16 +26,17 @@ namespace osu.Game.Screens.Menu
         private SpriteIcon icon;
         private Color4 iconColour;
         private LinkFlowContainer textFlow;
+        private LinkFlowContainer supportFlow;
 
         public override bool HideOverlaysOnEnter => true;
         public override OverlayActivation InitialOverlayActivationMode => OverlayActivation.Disabled;
 
         public override bool CursorVisible => false;
 
-        private readonly List<Drawable> supporterDrawables = new List<Drawable>();
         private Drawable heart;
 
         private const float icon_y = -85;
+        private const float icon_size = 30;
 
         private readonly Bindable<User> currentUser = new Bindable<User>();
 
@@ -53,19 +55,38 @@ namespace osu.Game.Screens.Menu
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
                     Icon = FontAwesome.fa_warning,
-                    Size = new Vector2(30),
+                    Size = new Vector2(icon_size),
                     Y = icon_y,
                 },
-                textFlow = new LinkFlowContainer
+                new FillFlowContainer
                 {
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
-                    Padding = new MarginPadding(50),
-                    TextAnchor = Anchor.TopCentre,
-                    Y = -110,
+                    Direction = FillDirection.Vertical,
+                    Y = icon_y + icon_size,
                     Anchor = Anchor.Centre,
                     Origin = Anchor.TopCentre,
-                    Spacing = new Vector2(0, 2),
+                    Children = new Drawable[]
+                    {
+                        textFlow = new LinkFlowContainer
+                        {
+                            RelativeSizeAxes = Axes.X,
+                            AutoSizeAxes = Axes.Y,
+                            TextAnchor = Anchor.TopCentre,
+                            Anchor = Anchor.TopCentre,
+                            Origin = Anchor.TopCentre,
+                            Spacing = new Vector2(0, 2),
+                        },
+                        supportFlow = new LinkFlowContainer
+                        {
+                            RelativeSizeAxes = Axes.X,
+                            AutoSizeAxes = Axes.Y,
+                            TextAnchor = Anchor.TopCentre,
+                            Anchor = Anchor.TopCentre,
+                            Origin = Anchor.TopCentre,
+                            Spacing = new Vector2(0, 2),
+                        },
+                    }
                 }
             };
 
@@ -88,26 +109,40 @@ namespace osu.Game.Screens.Menu
             textFlow.NewParagraph();
             textFlow.NewParagraph();
 
-            supporterDrawables.AddRange(textFlow.AddText("Consider becoming an ", format));
-            supporterDrawables.AddRange(textFlow.AddLink("osu!supporter", "https://osu.ppy.sh/home/support", creationParameters: format));
-            supporterDrawables.AddRange(textFlow.AddText(" to help support the game", format));
-
-            supporterDrawables.Add(heart = textFlow.AddIcon(FontAwesome.fa_heart, t =>
-            {
-                t.Padding = new MarginPadding { Left = 5 };
-                t.Font = t.Font.With(size: 12);
-                t.Colour = colours.Pink;
-                t.Origin = Anchor.Centre;
-            }).First());
-
             iconColour = colours.Yellow;
 
             currentUser.BindTo(api.LocalUser);
             currentUser.BindValueChanged(e =>
             {
+                supportFlow.Children.ForEach(d => d.FadeOut(500, Easing.OutQuint).Expire());
+
                 if (e.NewValue.IsSupporter)
-                    supporterDrawables.ForEach(d => d.FadeOut(500, Easing.OutQuint).Expire());
+                {
+                    supportFlow.AddText("Thank you for supporting osu!", format);
+                }
+                else
+                {
+                    supportFlow.AddText("Consider becoming an ", format);
+                    supportFlow.AddLink("osu!supporter", "https://osu.ppy.sh/home/support", creationParameters: format);
+                    supportFlow.AddText(" to help support the game", format);
+                }
+
+                heart = supportFlow.AddIcon(FontAwesome.fa_heart, t =>
+                {
+                    t.Padding = new MarginPadding { Left = 5 };
+                    t.Font = t.Font.With(size: 12);
+                    t.Origin = Anchor.Centre;
+                    t.Colour = colours.Pink;
+                }).First();
+
+                if (IsLoaded)
+                    animateHeart();
             }, true);
+        }
+
+        private void animateHeart()
+        {
+            heart.FlashColour(Color4.White, 750, Easing.OutQuint).Loop();
         }
 
         protected override void LoadComplete()
@@ -128,7 +163,9 @@ namespace osu.Game.Screens.Menu
                 .MoveToY(icon_y, 160, Easing.InCirc)
                 .RotateTo(0, 160, Easing.InCirc);
 
-            supporterDrawables.ForEach(d => d.FadeOut().Delay(2000).FadeIn(500));
+            supportFlow.FadeOut().Delay(2000).FadeIn(500);
+
+            animateHeart();
 
             this
                 .FadeInFromZero(500)
@@ -136,8 +173,6 @@ namespace osu.Game.Screens.Menu
                 .FadeOut(250)
                 .ScaleTo(0.9f, 250, Easing.InQuint)
                 .Finally(d => this.Push(intro));
-
-            heart.FlashColour(Color4.White, 750, Easing.OutQuint).Loop();
         }
     }
 }
