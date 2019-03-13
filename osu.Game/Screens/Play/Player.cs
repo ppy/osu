@@ -71,13 +71,13 @@ namespace osu.Game.Screens.Play
         private FailOverlay failOverlay;
 
         private DrawableStoryboard storyboard;
-        protected UserDimContainer StoryboardContainer { get; private set; }
+        protected VisualSettingsContainer StoryboardContainer { get; private set; }
 
-        protected virtual UserDimContainer CreateStoryboardContainer() => new UserDimContainer(true)
+        protected virtual VisualSettingsContainer CreateStoryboardContainer() => new VisualSettingsContainer(true)
         {
             RelativeSizeAxes = Axes.Both,
             Alpha = 1,
-            EnableUserDim = { Value = true }
+            EnableVisualSettings = { Value = true }
         };
 
         public bool LoadedBeatmapSuccessfully => RulesetContainer?.Objects.Any() == true;
@@ -318,7 +318,7 @@ namespace osu.Game.Screens.Play
                 if (enabled.NewValue) initializeStoryboard(true);
             };
 
-            Background.EnableUserDim.Value = true;
+            Background.EnableVisualSettings.Value = true;
 
             Background.StoryboardReplacesBackground.BindTo(storyboardReplacesBackground);
             StoryboardContainer.StoryboardReplacesBackground.BindTo(storyboardReplacesBackground);
@@ -365,7 +365,7 @@ namespace osu.Game.Screens.Play
             float fadeOutDuration = instant ? 0 : 250;
             this.FadeOut(fadeOutDuration);
 
-            Background.EnableUserDim.Value = false;
+            Background.EnableVisualSettings.Value = false;
             storyboardReplacesBackground.Value = false;
         }
 

@@ -8,6 +8,7 @@ using osu.Framework.Graphics.Textures;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics.Backgrounds;
 using osu.Game.Graphics.Containers;
+using osuTK;
 
 namespace osu.Game.Screens.Backgrounds
 {
@@ -18,13 +19,13 @@ namespace osu.Game.Screens.Backgrounds
         /// <summary>
         /// Whether or not user dim settings should be applied to this Background.
         /// </summary>
-        public readonly Bindable<bool> EnableUserDim = new Bindable<bool>();
+        public readonly Bindable<bool> EnableVisualSettings = new Bindable<bool>();
 
         public readonly Bindable<bool> StoryboardReplacesBackground = new Bindable<bool>();
 
-        private readonly UserDimContainer fadeContainer;
+        private readonly VisualSettingsContainer fadeContainer;
 
-        protected virtual UserDimContainer CreateFadeContainer() => new UserDimContainer { RelativeSizeAxes = Axes.Both };
+        protected virtual VisualSettingsContainer CreateFadeContainer() => new VisualSettingsContainer { RelativeSizeAxes = Axes.Both };
 
         public virtual WorkingBeatmap Beatmap
         {
@@ -62,7 +63,7 @@ namespace osu.Game.Screens.Backgrounds
         {
             Beatmap = beatmap;
             InternalChild = fadeContainer = CreateFadeContainer();
-            fadeContainer.EnableUserDim.BindTo(EnableUserDim);
+            fadeContainer.EnableVisualSettings.BindTo(EnableVisualSettings);
         }
 
         public override bool Equals(BackgroundScreen other)

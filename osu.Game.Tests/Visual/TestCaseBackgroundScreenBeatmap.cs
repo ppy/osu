@@ -43,13 +43,13 @@ namespace osu.Game.Tests.Visual
             typeof(ScreenWithBeatmapBackground),
             typeof(PlayerLoader),
             typeof(Player),
-            typeof(UserDimContainer),
+            typeof(VisualSettingsContainer),
             typeof(OsuScreen)
         };
 
         private DummySongSelect songSelect;
-        private DimAccessiblePlayerLoader playerLoader;
-        private DimAccessiblePlayer player;
+        private TestPlayerLoader playerLoader;
+        private TestPlayer player;
         private DatabaseContextFactory factory;
         private BeatmapManager manager;
         private RulesetStore rulesets;
@@ -91,13 +91,13 @@ namespace osu.Game.Tests.Visual
         }
 
         /// <summary>
-        /// Check if <see cref="PlayerLoader"/> properly triggers background dim previews when a user hovers over the visual settings panel.
+        /// Check if <see cref="PlayerLoader"/> properly triggers the visual settings preview when a user hovers over the visual settings panel.
         /// </summary>
         [Test]
         public void PlayerLoaderSettingsHoverTest()
         {
             setupUserSettings();
-            AddStep("Start player loader", () => songSelect.Push(playerLoader = new DimAccessiblePlayerLoader(player = new DimAccessiblePlayer())));
+            AddStep("Start player loader", () => songSelect.Push(playerLoader = new TestPlayerLoader(player = new TestPlayer())));
             AddUntilStep(() => playerLoader?.IsLoaded ?? false, "Wait for Player Loader to load");
             AddAssert("Background retained from song select", () => songSelect.IsBackgroundCurrent());
             AddStep("Trigger background preview", () =>
@@ -106,16 +106,16 @@ namespace osu.Game.Tests.Visual
                 InputManager.MoveMouseTo(playerLoader.VisualSettingsPos);
             });
             waitForDim();
-            AddAssert("Screen is dimmed", () => songSelect.IsBackgroundDimmed());
+            AddAssert("Screen is dimmed and blur applied", () => songSelect.IsBackgroundDimmed() && songSelect.IsUserBlurApplied());
             AddStep("Stop background preview", () => InputManager.MoveMouseTo(playerLoader.ScreenPos));
             waitForDim();
-            AddAssert("Screen is undimmed", () => songSelect.IsBackgroundUndimmed());
+            AddAssert("Screen is undimmed and user blur removed", () => songSelect.IsBackgroundUndimmed() && songSelect.IsUserBlurDisabled());
         }
 
         /// <summary>
         /// In the case of a user triggering the dim preview the instant player gets loaded, then moving the cursor off of the visual settings:
-        /// The OnHover of PlayerLoader will trigger, which could potentially trigger an undim unless checked for in PlayerLoader.
-        /// We need to check that in this scenario, the dim is still properly applied after entering player.
+        /// The OnHover of PlayerLoader will trigger, which could potentially cause visual settings to be unapplied unless checked for in PlayerLoader.
+        /// We need to check that in this scenario, the dim and blur is still properly applied after entering player.
         /// </summary>
         [Test]
         public void PlayerLoaderTransitionTest()
@@ -124,7 +124,7 @@ namespace osu.Game.Tests.Visual
             AddStep("Trigger hover event", () => playerLoader.TriggerOnHover());
             AddAssert("Background retained from song select", () => songSelect.IsBackgroundCurrent());
             waitForDim();
-            AddAssert("Screen is dimmed and unblurred", () => songSelect.IsBackgroundDimmed() && songSelect.IsBackgroundUnblurred());
+            AddAssert("Screen is dimmed and blur applied", () => songSelect.IsBackgroundDimmed() && songSelect.IsUserBlurApplied());
         }
 
         /// <summary>
@@ -165,24 +165,24 @@ namespace osu.Game.Tests.Visual
         }
 
         /// <summary>
-        /// Check if the <see cref="UserDimContainer"/> is properly accepting user dim changes at all.
+        /// Check if the <see cref="VisualSettingsContainer"/> is properly accepting user-defined visual changes at all.
         /// </summary>
         [Test]
         public void DisableUserDimTest()
         {
             performFullSetup();
             waitForDim();
-            AddAssert("Screen is dimmed", () => songSelect.IsBackgroundDimmed());
+            AddAssert("Screen is dimmed and blur applied", () => songSelect.IsBackgroundDimmed() && songSelect.IsUserBlurApplied());
             AddStep("EnableUserDim disabled", () => songSelect.DimEnabled.Value = false);
             waitForDim();
-            AddAssert("Screen is undimmed", () => songSelect.IsBackgroundUndimmed());
+            AddAssert("Screen is undimmed and user blur removed", () => songSelect.IsBackgroundUndimmed() && songSelect.IsUserBlurDisabled());
             AddStep("EnableUserDim enabled", () => songSelect.DimEnabled.Value = true);
             waitForDim();
-            AddAssert("Screen is dimmed", () => songSelect.IsBackgroundDimmed());
+            AddAssert("Screen is dimmed and blur applied", () => songSelect.IsBackgroundDimmed() && songSelect.IsUserBlurApplied());
         }
 
         /// <summary>
-        /// Check if the fade container retains dim when pausing
+        /// Check if the visual settings container retains dim and blur when pausing
         /// </summary>
         [Test]
         public void PauseTest()
@@ -190,14 +190,14 @@ namespace osu.Game.Tests.Visual
             performFullSetup(true);
             AddStep("Pause", () => player.CurrentPausableGameplayContainer.Pause());
             waitForDim();
-            AddAssert("Screen is dimmed", () => songSelect.IsBackgroundDimmed());
+            AddAssert("Screen is dimmed and blur applied", () => songSelect.IsBackgroundDimmed() && songSelect.IsUserBlurApplied());
             AddStep("Unpause", () => player.CurrentPausableGameplayContainer.Resume());
             waitForDim();
-            AddAssert("Screen is dimmed", () => songSelect.IsBackgroundDimmed());
+            AddAssert("Screen is dimmed and blur applied", () => songSelect.IsBackgroundDimmed() && songSelect.IsUserBlurApplied());
         }
 
         /// <summary>
-        /// Check if the fade container removes user dim when suspending <see cref="Player"/> for <see cref="SoloResults"/>
+        /// Check if the visual settings container removes user dim when suspending <see cref="Player"/> for <see cref="SoloResults"/>
         /// </summary>
         [Test]
         public void TransitionTest()
@@ -205,11 +205,12 @@ namespace osu.Game.Tests.Visual
             performFullSetup();
             AddStep("Transition to Results", () => player.Push(new FadeAccessibleResults(new ScoreInfo { User = new User { Username = "osu!" } })));
             waitForDim();
-            AddAssert("Screen is undimmed and is original background", () => songSelect.IsBackgroundUndimmed() && songSelect.IsBackgroundCurrent());
+            AddAssert("Screen is undimmed, original background retained", () => 
+                songSelect.IsBackgroundUndimmed() && songSelect.IsBackgroundCurrent() && songSelect.IsUserBlurDisabled());
         }
 
         /// <summary>
-        /// Check if background gets undimmed when leaving <see cref="Player"/>  for <see cref="PlaySongSelect"/>
+        /// Check if background gets undimmed and unblurred when leaving <see cref="Player"/>  for <see cref="PlaySongSelect"/>
         /// </summary>
         [Test]
         public void TransitionOutTest()
@@ -217,7 +218,7 @@ namespace osu.Game.Tests.Visual
             performFullSetup();
             AddStep("Exit to song select", () => player.Exit());
             waitForDim();
-            AddAssert("Screen is undimmed", () => songSelect.IsBackgroundUndimmed());
+            AddAssert("Screen is undimmed and user blur removed", () => songSelect.IsBackgroundUndimmed() && songSelect.IsUserBlurDisabled());
         }
 
         private void waitForDim() => AddWaitStep(5, "Wait for dim");
@@ -243,7 +244,7 @@ namespace osu.Game.Tests.Visual
 
             AddStep("Start player loader", () =>
             {
-                songSelect.Push(playerLoader = new DimAccessiblePlayerLoader(player = new DimAccessiblePlayer
+                songSelect.Push(playerLoader = new TestPlayerLoader(player = new TestPlayer
                 {
                     AllowPause = allowPause,
                     Ready = true,
@@ -261,7 +262,7 @@ namespace osu.Game.Tests.Visual
             {
                 Beatmap.Value.Mods.Value = Beatmap.Value.Mods.Value.Concat(new[] { new OsuModNoFail() });
                 songSelect.DimLevel.Value = 0.7f;
-                songSelect.BlurLevel.Value = 0.0f;
+                songSelect.BlurLevel.Value = 0.4f;
             });
         }
 
@@ -270,7 +271,7 @@ namespace osu.Game.Tests.Visual
             protected override BackgroundScreen CreateBackground()
             {
                 FadeAccessibleBackground background = new FadeAccessibleBackground(Beatmap.Value);
-                DimEnabled.BindTo(background.EnableUserDim);
+                DimEnabled.BindTo(background.EnableVisualSettings);
                 return background;
             }
 
@@ -289,9 +290,11 @@ namespace osu.Game.Tests.Visual
 
             public bool IsBackgroundDimmed() => ((FadeAccessibleBackground)Background).CurrentColour == OsuColour.Gray(1 - (float)DimLevel.Value);
 
-            public bool IsBackgroundUnblurred() => ((FadeAccessibleBackground)Background).CurrentBlur == new Vector2(0);
-
             public bool IsBackgroundUndimmed() => ((FadeAccessibleBackground)Background).CurrentColour == Color4.White;
+
+            public bool IsUserBlurApplied() => ((FadeAccessibleBackground)Background).CurrentBlur == new Vector2((float)BlurLevel.Value * 25);
+
+            public bool IsUserBlurDisabled() => ((FadeAccessibleBackground)Background).CurrentBlur == new Vector2(0);
 
             public bool IsBackgroundInvisible() => ((FadeAccessibleBackground)Background).CurrentAlpha == 0;
 
@@ -314,23 +317,23 @@ namespace osu.Game.Tests.Visual
             protected override BackgroundScreen CreateBackground() => new FadeAccessibleBackground(Beatmap.Value);
         }
 
-        private class DimAccessiblePlayer : Player
+        private class TestPlayer : Player
         {
             protected override BackgroundScreen CreateBackground() => new FadeAccessibleBackground(Beatmap.Value);
 
-            protected override UserDimContainer CreateStoryboardContainer()
+            protected override VisualSettingsContainer CreateStoryboardContainer()
             {
-                return new TestUserDimContainer(true)
+                return new TestVisualSettingsContainer(true)
                 {
                     RelativeSizeAxes = Axes.Both,
                     Alpha = 1,
-                    EnableUserDim = { Value = true }
+                    EnableVisualSettings = { Value = true }
                 };
             }
 
             public PausableGameplayContainer CurrentPausableGameplayContainer => PausableGameplayContainer;
 
-            public UserDimContainer CurrentStoryboardContainer => StoryboardContainer;
+            public VisualSettingsContainer CurrentStoryboardContainer => StoryboardContainer;
 
             // Whether or not the player should be allowed to load.
             public bool Ready;
@@ -339,9 +342,9 @@ namespace osu.Game.Tests.Visual
             public readonly Bindable<bool> ReplacesBackground = new Bindable<bool>();
             public readonly Bindable<bool> IsPaused = new Bindable<bool>();
 
-            public bool IsStoryboardVisible() => ((TestUserDimContainer)CurrentStoryboardContainer).CurrentAlpha == 1;
+            public bool IsStoryboardVisible() => ((TestVisualSettingsContainer)CurrentStoryboardContainer).CurrentAlpha == 1;
 
-            public bool IsStoryboardInvisible() => ((TestUserDimContainer)CurrentStoryboardContainer).CurrentAlpha <= 1;
+            public bool IsStoryboardInvisible() => ((TestVisualSettingsContainer)CurrentStoryboardContainer).CurrentAlpha <= 1;
 
             [BackgroundDependencyLoader]
             private void load(OsuConfigManager config)
@@ -368,12 +371,12 @@ namespace osu.Game.Tests.Visual
             }
         }
 
-        private class DimAccessiblePlayerLoader : PlayerLoader
+        private class TestPlayerLoader : PlayerLoader
         {
             public VisualSettings VisualSettingsPos => VisualSettings;
             public BackgroundScreen ScreenPos => Background;
 
-            public DimAccessiblePlayerLoader(Player player)
+            public TestPlayerLoader(Player player)
                 : base(() => player)
             {
             }
@@ -385,14 +388,15 @@ namespace osu.Game.Tests.Visual
 
         private class FadeAccessibleBackground : BackgroundScreenBeatmap
         {
-            protected override UserDimContainer CreateFadeContainer() => fadeContainer = new TestUserDimContainer { RelativeSizeAxes = Axes.Both };
+            protected override VisualSettingsContainer CreateFadeContainer() => fadeContainer = new TestVisualSettingsContainer { RelativeSizeAxes = Axes.Both };
 
             public Color4 CurrentColour => fadeContainer.CurrentColour;
+
             public float CurrentAlpha => fadeContainer.CurrentAlpha;
 
-            public Vector2 CurrentBlur => Background.BlurSigma;
+            public Vector2 CurrentBlur => fadeContainer.CurrentBlur;
 
-            private TestUserDimContainer fadeContainer;
+            private TestVisualSettingsContainer fadeContainer;
 
             public FadeAccessibleBackground(WorkingBeatmap beatmap)
                 : base(beatmap)
@@ -400,12 +404,14 @@ namespace osu.Game.Tests.Visual
             }
         }
 
-        private class TestUserDimContainer : UserDimContainer
+        private class TestVisualSettingsContainer : VisualSettingsContainer
         {
-            public Color4 CurrentColour => DimContainer.Colour;
-            public float CurrentAlpha => DimContainer.Alpha;
+            public Color4 CurrentColour => LocalContainer.Colour;
+            public float CurrentAlpha => LocalContainer.Alpha;
 
-            public TestUserDimContainer(bool isStoryboard = false)
+            public Vector2 CurrentBlur => LocalContainer.BlurSigma;
+
+            public TestVisualSettingsContainer(bool isStoryboard = false)
                 : base(isStoryboard)
             {
             }
