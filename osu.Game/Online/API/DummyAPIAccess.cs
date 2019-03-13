@@ -41,7 +41,7 @@ namespace osu.Game.Online.API
             LocalUser.Value = new User
             {
                 Username = @"Dummy",
-                Id = 1,
+                Id = 1001,
             };
         }
 
