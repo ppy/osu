@@ -15,11 +15,14 @@ namespace osu.Game.Beatmaps.Formats
 
         public const double MAX_PARSE_VALUE = int.MaxValue;
 
-        public static double ParseFloat(string input, float parseLimit = (float)MAX_PARSE_VALUE)
+        public static float ParseFloat(string input, float parseLimit = (float)MAX_PARSE_VALUE)
         {
             var output = float.Parse(input, CultureInfo.InvariantCulture);
-            if (output < -parseLimit) throw new FormatException("Value is too low");
-            if (output > parseLimit) throw new FormatException("Value is too high");
+
+            if (output < -parseLimit) throw new OverflowException("Value is too low");
+            if (output > parseLimit) throw new OverflowException("Value is too high");
+
+            if (float.IsNaN(output)) throw new FormatException("Not a number");
 
             return output;
         }
@@ -27,8 +30,11 @@ namespace osu.Game.Beatmaps.Formats
         public static double ParseDouble(string input, double parseLimit = MAX_PARSE_VALUE)
         {
             var output = double.Parse(input, CultureInfo.InvariantCulture);
-            if (output < -parseLimit) throw new FormatException("Value is too low");
-            if (output > parseLimit) throw new FormatException("Value is too high");
+
+            if (output < -parseLimit) throw new OverflowException("Value is too low");
+            if (output > parseLimit) throw new OverflowException("Value is too high");
+
+            if (double.IsNaN(output)) throw new FormatException("Not a number");
 
             return output;
         }
@@ -36,8 +42,9 @@ namespace osu.Game.Beatmaps.Formats
         public static int ParseInt(string input, int parseLimit = (int)MAX_PARSE_VALUE)
         {
             var output = int.Parse(input, CultureInfo.InvariantCulture);
-            if (output < -parseLimit) throw new FormatException("Value is too low");
-            if (output > parseLimit) throw new FormatException("Value is too high");
+
+            if (output < -parseLimit) throw new OverflowException("Value is too low");
+            if (output > parseLimit) throw new OverflowException("Value is too high");
 
             return output;
         }
