@@ -18,7 +18,7 @@ namespace osu.Game.Online.API
 
         public string ProvidedUsername => LocalUser.Value.Username;
 
-        public string Endpoint => "https://test.com";
+        public string Endpoint => "http://localhost";
 
         public APIState State => LocalUser.Value.Id == 1 ? APIState.Offline : APIState.Online;
 
