@@ -5,6 +5,7 @@ using System;
 using System.IO;
 using System.Linq;
 using osu.Framework.IO.File;
+using osu.Framework.Logging;
 using osu.Game.Beatmaps.Timing;
 using osu.Game.Rulesets.Objects.Legacy;
 using osu.Game.Beatmaps.ControlPoints;
@@ -351,9 +352,11 @@ namespace osu.Game.Beatmaps.Formats
             }
             catch (FormatException)
             {
+                Logger.Log("A timing point could not be parsed correctly and will be ignored", LoggingTarget.Runtime, LogLevel.Important);
             }
             catch (OverflowException)
             {
+                Logger.Log("A timing point could not be parsed correctly and will be ignored", LoggingTarget.Runtime, LogLevel.Important);
             }
         }
 

@@ -225,9 +225,11 @@ namespace osu.Game.Rulesets.Objects.Legacy
             }
             catch (FormatException)
             {
+                Logger.Log("A hitobject could not be parsed correctly and will be ignored", LoggingTarget.Runtime, LogLevel.Important);
             }
             catch (OverflowException)
             {
+                Logger.Log("A hitobject could not be parsed correctly and will be ignored", LoggingTarget.Runtime, LogLevel.Important);
             }
 
             return null;
