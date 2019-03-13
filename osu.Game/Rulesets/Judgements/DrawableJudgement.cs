@@ -33,9 +33,9 @@ namespace osu.Game.Rulesets.Judgements
         protected SpriteText JudgementText;
 
         /// <summary>
-        /// The amount of time for this judgement to initially fade in.
+        /// Duration of initial fade in.
+        /// Default fade out will start immediately after this duration.
         /// </summary>
-        /// <remarks> Override this to change fade in times of mode-specific judgements </remarks>
         protected virtual double FadeInDuration => 100;
 
         /// <summary>
