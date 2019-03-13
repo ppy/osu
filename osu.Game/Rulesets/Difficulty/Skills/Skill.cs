@@ -206,6 +206,12 @@ namespace osu.Game.Rulesets.Difficulty.Skills
 
         private double getSkillToFcInTargetTime(IList<double> difficultyPartialSums, double remainder=0)
         {
+            if (difficultyPartialSums.Last() - remainder <= 1e-10)
+            {
+                // calculating SR for empty section
+                return -1e100;
+            }
+
             double difficulty = Math.Log(difficultyPartialSums.Last()-remainder) / star_bonus_k;
 
             // if map is really long, return skill level to pass with 0.5 probability
@@ -277,7 +283,7 @@ namespace osu.Game.Rulesets.Difficulty.Skills
             if (val > 0)
                 return (Math.Log(val));
 
-            return -1e10;
+            return -1e100;
         }
 
         private double difficultyToStars(double val)
