@@ -264,7 +264,7 @@ namespace osu.Game.Beatmaps.Formats
                     var breakEvent = new BreakPeriod
                     {
                         StartTime = start,
-                        EndTime = Math.Max(start, getOffsetTime(Parsing.ParseDouble(split[1])))
+                        EndTime = Math.Max(start, getOffsetTime(Parsing.ParseDouble(split[2])))
                     };
 
                     if (!breakEvent.HasEffect)
