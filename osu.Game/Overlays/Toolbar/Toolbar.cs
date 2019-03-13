@@ -22,7 +22,7 @@ namespace osu.Game.Overlays.Toolbar
 
         public Action OnHome;
 
-        private readonly ToolbarUserArea userArea;
+        private ToolbarUserArea userArea;
 
         protected override bool BlockPositionalInput => false;
 
@@ -34,6 +34,13 @@ namespace osu.Game.Overlays.Toolbar
         private readonly Bindable<OverlayActivation> overlayActivationMode = new Bindable<OverlayActivation>(OverlayActivation.All);
 
         public Toolbar()
+        {
+            RelativeSizeAxes = Axes.X;
+            Size = new Vector2(1, HEIGHT);
+        }
+
+        [BackgroundDependencyLoader(true)]
+        private void load(OsuGame osuGame)
         {
             Children = new Drawable[]
             {
@@ -76,13 +83,6 @@ namespace osu.Game.Overlays.Toolbar
                 }
             };
 
-            RelativeSizeAxes = Axes.X;
-            Size = new Vector2(1, HEIGHT);
-        }
-
-        [BackgroundDependencyLoader(true)]
-        private void load(OsuGame osuGame)
-        {
             StateChanged += visibility =>
             {
                 if (overlayActivationMode.Value == OverlayActivation.Disabled)

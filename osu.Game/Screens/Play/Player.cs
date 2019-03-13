@@ -3,24 +3,19 @@
 
 using System;
 using System.Linq;
-using System.Threading.Tasks;
-using osu.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Cursor;
 using osu.Framework.Input.Events;
 using osu.Framework.Logging;
 using osu.Framework.Screens;
 using osu.Framework.Threading;
-using osu.Framework.Timing;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Graphics.Containers;
-using osu.Game.Graphics.Cursor;
 using osu.Game.Online.API;
 using osu.Game.Overlays;
 using osu.Game.Rulesets;
@@ -34,7 +29,7 @@ using osu.Game.Storyboards.Drawables;
 
 namespace osu.Game.Screens.Play
 {
-    public class Player : ScreenWithBeatmapBackground, IProvideCursor
+    public class Player : ScreenWithBeatmapBackground
     {
         protected override bool AllowBackButton => false; // handled by HoldForMenuButton
 
@@ -53,21 +48,10 @@ namespace osu.Game.Screens.Play
         public bool AllowResults { get; set; } = true;
 
         private Bindable<bool> mouseWheelDisabled;
-        private Bindable<double> userAudioOffset;
 
         private readonly Bindable<bool> storyboardReplacesBackground = new Bindable<bool>();
 
         public int RestartCount;
-
-        public CursorContainer Cursor => RulesetContainer.Cursor;
-        public bool ProvidingUserCursor => RulesetContainer?.Cursor != null && !RulesetContainer.HasReplayLoaded.Value;
-
-        private IAdjustableClock sourceClock;
-
-        /// <summary>
-        /// The decoupled clock used for gameplay. Should be used for seeks and clock control.
-        /// </summary>
-        private DecoupleableInterpolatingFramedClock adjustableClock;
 
         [Resolved]
         private ScoreManager scoreManager { get; set; }
@@ -98,25 +82,113 @@ namespace osu.Game.Screens.Play
 
         public bool LoadedBeatmapSuccessfully => RulesetContainer?.Objects.Any() == true;
 
+        private GameplayClockContainer gameplayClockContainer;
+
         [BackgroundDependencyLoader]
         private void load(AudioManager audio, APIAccess api, OsuConfigManager config)
         {
             this.api = api;
 
-            WorkingBeatmap working = Beatmap.Value;
-            if (working is DummyWorkingBeatmap)
+            WorkingBeatmap working = loadBeatmap();
+
+            if (working == null)
                 return;
 
             sampleRestart = audio.Sample.Get(@"Gameplay/restart");
 
             mouseWheelDisabled = config.GetBindable<bool>(OsuSetting.MouseDisableWheel);
-            userAudioOffset = config.GetBindable<double>(OsuSetting.AudioOffset);
 
-            IBeatmap beatmap;
+            ScoreProcessor = RulesetContainer.CreateScoreProcessor();
+            if (!ScoreProcessor.Mode.Disabled)
+                config.BindWith(OsuSetting.ScoreDisplayMode, ScoreProcessor.Mode);
+
+            InternalChild = gameplayClockContainer = new GameplayClockContainer(working, AllowLeadIn, RulesetContainer.GameplayStartTime);
+
+            gameplayClockContainer.Children = new Drawable[]
+            {
+                PausableGameplayContainer = new PausableGameplayContainer
+                {
+                    Retries = RestartCount,
+                    OnRetry = restart,
+                    OnQuit = performUserRequestedExit,
+                    Start = gameplayClockContainer.Start,
+                    Stop = gameplayClockContainer.Stop,
+                    IsPaused = { BindTarget = gameplayClockContainer.IsPaused },
+                    CheckCanPause = () => AllowPause && ValidForResume && !HasFailed && !RulesetContainer.HasReplayLoaded.Value,
+                    Children = new[]
+                    {
+                        StoryboardContainer = CreateStoryboardContainer(),
+                        new ScalingContainer(ScalingMode.Gameplay)
+                        {
+                            Child = new LocalSkinOverrideContainer(working.Skin)
+                            {
+                                RelativeSizeAxes = Axes.Both,
+                                Child = RulesetContainer
+                            }
+                        },
+                        new BreakOverlay(working.Beatmap.BeatmapInfo.LetterboxInBreaks, ScoreProcessor)
+                        {
+                            Anchor = Anchor.Centre,
+                            Origin = Anchor.Centre,
+                            Breaks = working.Beatmap.Breaks
+                        },
+                        // display the cursor above some HUD elements.
+                        RulesetContainer.Cursor?.CreateProxy() ?? new Container(),
+                        HUDOverlay = new HUDOverlay(ScoreProcessor, RulesetContainer, working)
+                        {
+                            HoldToQuit = { Action = performUserRequestedExit },
+                            PlayerSettingsOverlay = { PlaybackSettings = { UserPlaybackRate = { BindTarget = gameplayClockContainer.UserPlaybackRate } } },
+                            KeyCounter = { Visible = { BindTarget = RulesetContainer.HasReplayLoaded } },
+                            RequestSeek = gameplayClockContainer.Seek,
+                            Anchor = Anchor.Centre,
+                            Origin = Anchor.Centre
+                        },
+                        new SkipOverlay(RulesetContainer.GameplayStartTime)
+                        {
+                            RequestSeek = gameplayClockContainer.Seek
+                        },
+                    }
+                },
+                failOverlay = new FailOverlay
+                {
+                    OnRetry = restart,
+                    OnQuit = performUserRequestedExit,
+                },
+                new HotkeyRetryOverlay
+                {
+                    Action = () =>
+                    {
+                        if (!this.IsCurrentScreen()) return;
+
+                        fadeOut(true);
+                        restart();
+                    },
+                }
+            };
+
+            // bind clock into components that require it
+            RulesetContainer.IsPaused.BindTo(gameplayClockContainer.IsPaused);
+
+            if (ShowStoryboard.Value)
+                initializeStoryboard(false);
+
+            // Bind ScoreProcessor to ourselves
+            ScoreProcessor.AllJudged += onCompletion;
+            ScoreProcessor.Failed += onFail;
+
+            foreach (var mod in Beatmap.Value.Mods.Value.OfType<IApplicableToScoreProcessor>())
+                mod.ApplyToScoreProcessor(ScoreProcessor);
+        }
+
+        private WorkingBeatmap loadBeatmap()
+        {
+            WorkingBeatmap working = Beatmap.Value;
+            if (working is DummyWorkingBeatmap)
+                return null;
 
             try
             {
-                beatmap = working.Beatmap;
+                var beatmap = working.Beatmap;
 
                 if (beatmap == null)
                     throw new InvalidOperationException("Beatmap was not loaded");
@@ -140,119 +212,17 @@ namespace osu.Game.Screens.Play
                 if (!RulesetContainer.Objects.Any())
                 {
                     Logger.Log("Beatmap contains no hit objects!", level: LogLevel.Error);
-                    return;
+                    return null;
                 }
             }
             catch (Exception e)
             {
                 Logger.Error(e, "Could not load beatmap sucessfully!");
                 //couldn't load, hard abort!
-                return;
+                return null;
             }
 
-            sourceClock = (IAdjustableClock)working.Track ?? new StopwatchClock();
-            adjustableClock = new DecoupleableInterpolatingFramedClock { IsCoupled = false };
-
-            adjustableClock.Seek(AllowLeadIn
-                ? Math.Min(0, RulesetContainer.GameplayStartTime - beatmap.BeatmapInfo.AudioLeadIn)
-                : RulesetContainer.GameplayStartTime);
-
-            adjustableClock.ProcessFrame();
-
-            // Lazer's audio timings in general doesn't match stable. This is the result of user testing, albeit limited.
-            // This only seems to be required on windows. We need to eventually figure out why, with a bit of luck.
-            var platformOffsetClock = new FramedOffsetClock(adjustableClock) { Offset = RuntimeInfo.OS == RuntimeInfo.Platform.Windows ? 22 : 0 };
-
-            // the final usable gameplay clock with user-set offsets applied.
-            var offsetClock = new FramedOffsetClock(platformOffsetClock);
-
-            userAudioOffset.ValueChanged += offset => offsetClock.Offset = offset.NewValue;
-            userAudioOffset.TriggerChange();
-
-            ScoreProcessor = RulesetContainer.CreateScoreProcessor();
-            if (!ScoreProcessor.Mode.Disabled)
-                config.BindWith(OsuSetting.ScoreDisplayMode, ScoreProcessor.Mode);
-
-            InternalChildren = new Drawable[]
-            {
-                PausableGameplayContainer = new PausableGameplayContainer(offsetClock, adjustableClock)
-                {
-                    Retries = RestartCount,
-                    OnRetry = restart,
-                    OnQuit = performUserRequestedExit,
-                    CheckCanPause = () => AllowPause && ValidForResume && !HasFailed && !RulesetContainer.HasReplayLoaded.Value,
-                    Children = new Container[]
-                    {
-                        StoryboardContainer = CreateStoryboardContainer(),
-                        new ScalingContainer(ScalingMode.Gameplay)
-                        {
-                            Child = new LocalSkinOverrideContainer(working.Skin)
-                            {
-                                RelativeSizeAxes = Axes.Both,
-                                Child = RulesetContainer
-                            }
-                        },
-                        new BreakOverlay(beatmap.BeatmapInfo.LetterboxInBreaks, ScoreProcessor)
-                        {
-                            Anchor = Anchor.Centre,
-                            Origin = Anchor.Centre,
-                            Breaks = beatmap.Breaks
-                        },
-                        new ScalingContainer(ScalingMode.Gameplay)
-                        {
-                            Child = RulesetContainer.Cursor?.CreateProxy() ?? new Container(),
-                        },
-                        HUDOverlay = new HUDOverlay(ScoreProcessor, RulesetContainer, working, adjustableClock)
-                        {
-                            Anchor = Anchor.Centre,
-                            Origin = Anchor.Centre
-                        },
-                        new SkipOverlay(RulesetContainer.GameplayStartTime)
-                        {
-                            RequestSeek = time => adjustableClock.Seek(time)
-                        },
-                    }
-                },
-                failOverlay = new FailOverlay
-                {
-                    OnRetry = restart,
-                    OnQuit = performUserRequestedExit,
-                },
-                new HotkeyRetryOverlay
-                {
-                    Action = () =>
-                    {
-                        if (!this.IsCurrentScreen()) return;
-
-                        fadeOut(true);
-                        restart();
-                    },
-                }
-            };
-
-            HUDOverlay.HoldToQuit.Action = performUserRequestedExit;
-            HUDOverlay.KeyCounter.Visible.BindTo(RulesetContainer.HasReplayLoaded);
-
-            RulesetContainer.IsPaused.BindTo(PausableGameplayContainer.IsPaused);
-
-            if (ShowStoryboard.Value)
-                initializeStoryboard(false);
-
-            // Bind ScoreProcessor to ourselves
-            ScoreProcessor.AllJudged += onCompletion;
-            ScoreProcessor.Failed += onFail;
-
-            foreach (var mod in Beatmap.Value.Mods.Value.OfType<IApplicableToScoreProcessor>())
-                mod.ApplyToScoreProcessor(ScoreProcessor);
-        }
-
-        private void applyRateFromMods()
-        {
-            if (sourceClock == null) return;
-
-            sourceClock.Rate = 1;
-            foreach (var mod in Beatmap.Value.Mods.Value.OfType<IApplicableToClock>())
-                mod.ApplyToClock(sourceClock);
+            return working;
         }
 
         private void performUserRequestedExit()
@@ -321,7 +291,7 @@ namespace osu.Game.Screens.Play
             if (Beatmap.Value.Mods.Value.OfType<IApplicableFailOverride>().Any(m => !m.AllowFail))
                 return false;
 
-            adjustableClock.Stop();
+            gameplayClockContainer.Stop();
 
             HasFailed = true;
             failOverlay.Retries = RestartCount;
@@ -355,24 +325,7 @@ namespace osu.Game.Screens.Play
 
             storyboardReplacesBackground.Value = Beatmap.Value.Storyboard.ReplacesBackground && Beatmap.Value.Storyboard.HasDrawable;
 
-            Task.Run(() =>
-            {
-                sourceClock.Reset();
-
-                Schedule(() =>
-                {
-                    adjustableClock.ChangeSource(sourceClock);
-                    applyRateFromMods();
-
-                    this.Delay(750).Schedule(() =>
-                    {
-                        if (!PausableGameplayContainer.IsPaused.Value)
-                        {
-                            adjustableClock.Start();
-                        }
-                    });
-                });
-            });
+            gameplayClockContainer.Restart();
 
             PausableGameplayContainer.Alpha = 0;
             PausableGameplayContainer.FadeIn(750, Easing.OutQuint);
@@ -395,8 +348,8 @@ namespace osu.Game.Screens.Play
 
             if ((!AllowPause || HasFailed || !ValidForResume || PausableGameplayContainer?.IsPaused.Value != false || RulesetContainer?.HasReplayLoaded.Value != false) && (!PausableGameplayContainer?.IsResuming ?? true))
             {
-                // In the case of replays, we may have changed the playback rate.
-                applyRateFromMods();
+                gameplayClockContainer.ResetLocalAdjustments();
+
                 fadeOut();
                 return base.OnExiting(next);
             }
