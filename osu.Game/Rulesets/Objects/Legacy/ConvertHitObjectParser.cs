@@ -257,7 +257,7 @@ namespace osu.Game.Rulesets.Objects.Legacy
                 bankInfo.CustomSampleBank = Parsing.ParseInt(split[2]);
 
             if (split.Length > 3)
-                bankInfo.Volume = Parsing.ParseInt(split[3]);
+                bankInfo.Volume = Math.Max(0, Parsing.ParseInt(split[3]));
 
             bankInfo.Filename = split.Length > 4 ? split[4] : null;
         }
