@@ -182,6 +182,7 @@ namespace osu.Game.Screens.Select
 
             if (Beatmap == null)
             {
+                updateMetrics(null);
                 ratingsContainer.FadeOut(transition_duration);
                 failRetryContainer.FadeOut(transition_duration);
                 return;
