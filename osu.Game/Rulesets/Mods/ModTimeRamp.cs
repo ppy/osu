@@ -62,12 +62,14 @@ namespace osu.Game.Rulesets.Mods
         public virtual void Update(Playfield playfield)
         {
             var absRate = Math.Abs(FinalRateAdjustment);
-            applyAdjustment(MathHelper.Clamp(absRate * ((clock.CurrentTime - beginRampTime) / finalRateTime), 0, absRate));
+            applyAdjustment((clock.CurrentTime - beginRampTime) / finalRateTime);
         }
 
-        private void applyAdjustment(double adjustment)
+        private void applyAdjustment(double adjustAmount)
         {
-            var localAdjust = 1 + Math.Sign(FinalRateAdjustment) * adjustment;
+            adjustAmount = MathHelper.Clamp(adjustAmount, 0, 1);
+
+            var localAdjust = 1 + Math.Sign(FinalRateAdjustment) * adjustAmount * Math.Abs(FinalRateAdjustment);
 
             if (clock is IHasPitchAdjust tempo)
                 tempo.PitchAdjust = baseAdjust * localAdjust;
