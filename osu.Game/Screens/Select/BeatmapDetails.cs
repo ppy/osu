@@ -9,6 +9,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using System.Linq;
+using JetBrains.Annotations;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Framework.Threading;
@@ -180,15 +181,15 @@ namespace osu.Game.Screens.Select
             source.Text = Beatmap?.Metadata?.Source;
             tags.Text = Beatmap?.Metadata?.Tags;
 
-            if (Beatmap == null)
+            // metrics may have been previously fetched
+            if (Beatmap?.Metrics != null)
             {
-                updateMetrics(null);
-                ratingsContainer.FadeOut(transition_duration);
-                failRetryContainer.FadeOut(transition_duration);
+                updateMetrics(Beatmap.Metrics);
                 return;
             }
 
-            if (Beatmap.Metrics == null && Beatmap.OnlineBeatmapID != null)
+            // metrics may not be fetched but can be
+            if (Beatmap?.OnlineBeatmapID != null)
             {
                 var requestedBeatmap = Beatmap;
                 var lookup = new GetBeatmapDetailsRequest(requestedBeatmap);
@@ -204,14 +205,13 @@ namespace osu.Game.Screens.Select
                 lookup.Failure += e => Schedule(() => updateMetrics(null));
                 api.Queue(lookup);
                 loading.Show();
+                return;
             }
-            else
-            {
-                updateMetrics(Beatmap.Metrics);
-            }
+
+            updateMetrics(null);
         }
 
-        private void updateMetrics(BeatmapMetrics metrics)
+        private void updateMetrics([CanBeNull] BeatmapMetrics metrics)
         {
             var hasRatings = metrics?.Ratings?.Any() ?? false;
             var hasRetriesFails = (metrics?.Retries?.Any() ?? false) && (metrics.Fails?.Any() ?? false);
