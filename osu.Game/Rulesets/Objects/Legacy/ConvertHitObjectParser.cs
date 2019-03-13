@@ -225,8 +225,12 @@ namespace osu.Game.Rulesets.Objects.Legacy
             }
             catch (FormatException)
             {
-                return null;
             }
+            catch (OverflowException)
+            {
+            }
+
+            return null;
         }
 
         private void readCustomSampleBanks(string str, SampleBankInfo bankInfo)

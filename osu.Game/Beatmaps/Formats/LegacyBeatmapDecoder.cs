@@ -348,7 +348,10 @@ namespace osu.Game.Beatmaps.Formats
                     CustomSampleBank = customSampleBank
                 });
             }
-            catch (FormatException e)
+            catch (FormatException)
+            {
+            }
+            catch (OverflowException)
             {
             }
         }
