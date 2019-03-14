@@ -94,7 +94,7 @@ namespace osu.Game.Rulesets.Difficulty.Skills
 
 
             expDifficulties.Add(expDifficulty);
-            timestamps.Add(current.BaseObject.StartTime);
+            timestamps.Add(current.StartTime);
 
 
             Previous.Push(current);
