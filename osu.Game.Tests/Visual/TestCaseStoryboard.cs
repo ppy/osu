@@ -81,6 +81,7 @@ namespace osu.Game.Tests.Visual
             storyboard.Passing = false;
 
             storyboardContainer.Add(storyboard);
+            decoupledClock.ChangeSource(working.Track);
         }
     }
 }
