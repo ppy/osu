@@ -25,6 +25,8 @@ namespace osu.Game.Skinning
 
         public int HitCircleOverlap { get; set; }
 
+        public int? SliderBorderSize { get; set; }
+
         public bool? CursorExpand { get; set; } = true;
     }
 }

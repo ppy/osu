@@ -33,6 +33,10 @@ namespace osu.Game.Skinning
                         case @"CursorExpand":
                             skin.CursorExpand = pair.Value != "0";
                             break;
+                        case @"SliderBorderSize":
+                            if (int.TryParse(pair.Value, out int size))
+                                skin.SliderBorderSize = size;
+                            break;
                     }
 
                     break;
