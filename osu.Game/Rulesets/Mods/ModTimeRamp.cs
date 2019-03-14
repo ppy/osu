@@ -34,18 +34,11 @@ namespace osu.Game.Rulesets.Mods
         /// </summary>
         private const double final_rate_progress = 0.75f;
 
-        /// <summary>
-        /// The adjustment applied on entering this mod's application method.
-        /// </summary>
-        private double baseAdjust;
-
         public virtual void ApplyToClock(IAdjustableClock clock)
         {
             this.clock = clock;
 
-            // we capture the adjustment applied before entering our application method.
-            // this will cover external changes, which should re-fire this method.
-            baseAdjust = (clock as IHasPitchAdjust)?.PitchAdjust ?? clock.Rate;
+            lastAdjust = 1;
 
             // for preview purposes. during gameplay, Update will overwrite this setting.
             applyAdjustment(1);
@@ -61,20 +54,38 @@ namespace osu.Game.Rulesets.Mods
 
         public virtual void Update(Playfield playfield)
         {
-            var absRate = Math.Abs(FinalRateAdjustment);
             applyAdjustment((clock.CurrentTime - beginRampTime) / finalRateTime);
         }
 
-        private void applyAdjustment(double adjustAmount)
+        private double lastAdjust = 1;
+
+        private bool reported;
+
+        /// <summary>
+        /// Adjust the rate along the specified ramp
+        /// </summary>
+        /// <param name="amount">The amount of adjustment to apply (from 0..1).</param>
+        private void applyAdjustment(double amount)
         {
-            adjustAmount = MathHelper.Clamp(adjustAmount, 0, 1);
+            double adjust = 1 + (Math.Sign(FinalRateAdjustment) * MathHelper.Clamp(amount, 0, 1) * Math.Abs(FinalRateAdjustment));
 
-            var localAdjust = 1 + Math.Sign(FinalRateAdjustment) * adjustAmount * Math.Abs(FinalRateAdjustment);
+            switch (clock)
+            {
+                case IHasPitchAdjust pitch:
+                    pitch.PitchAdjust /= lastAdjust;
+                    pitch.PitchAdjust *= adjust;
+                    break;
+                case IHasTempoAdjust tempo:
+                    tempo.TempoAdjust /= lastAdjust;
+                    tempo.TempoAdjust *= adjust;
+                    break;
+                default:
+                    clock.Rate /= lastAdjust;
+                    clock.Rate *= adjust;
+                    break;
+            }
 
-            if (clock is IHasPitchAdjust tempo)
-                tempo.PitchAdjust = baseAdjust * localAdjust;
-            else
-                clock.Rate = baseAdjust * localAdjust;
+            lastAdjust = adjust;
         }
     }
 }
