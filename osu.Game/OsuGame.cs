@@ -415,6 +415,15 @@ namespace osu.Game
 
             loadComponentSingleFile(new Loader { RelativeSizeAxes = Axes.Both }, screenStack.Push);
 
+            loadComponentSingleFile(Toolbar = new Toolbar
+            {
+                OnHome = delegate
+                {
+                    CloseAllOverlays(false);
+                    menuScreen?.MakeCurrent();
+                },
+            }, urgentOverlayContent.Add);
+
             loadComponentSingleFile(onscreenDisplay = new OnScreenDisplay(), Add);
 
             loadComponentSingleFile(screenshotManager, Add);
@@ -451,15 +460,6 @@ namespace osu.Game
             loadComponentSingleFile(settings = new MainSettings(), overlayContent.Add);
 
             //urgent overlay elements
-            loadComponentSingleFile(Toolbar = new Toolbar
-            {
-                OnHome = delegate
-                {
-                    CloseAllOverlays(false);
-                    menuScreen?.MakeCurrent();
-                },
-            }, urgentOverlayContent.Add);
-
             loadComponentSingleFile(accountCreation = new AccountCreationOverlay(), urgentOverlayContent.Add);
             loadComponentSingleFile(dialogOverlay = new DialogOverlay(), urgentOverlayContent.Add);
             loadComponentSingleFile(externalLinkOpener = new ExternalLinkOpener(), urgentOverlayContent.Add);
