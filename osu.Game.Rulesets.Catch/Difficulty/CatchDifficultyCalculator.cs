@@ -7,6 +7,7 @@ using System.Linq;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Catch.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Catch.Difficulty.Skills;
+using osu.Game.Rulesets.Catch.Mods;
 using osu.Game.Rulesets.Catch.Objects;
 using osu.Game.Rulesets.Catch.UI;
 using osu.Game.Rulesets.Difficulty;
@@ -87,6 +88,14 @@ namespace osu.Game.Rulesets.Catch.Difficulty
         protected override Skill[] CreateSkills(IBeatmap beatmap) => new Skill[]
         {
             new Movement(),
+        };
+
+        protected override Mod[] DifficultyAdjustmentMods => new Mod[]
+        {
+            new CatchModDoubleTime(),
+            new CatchModHalfTime(),
+            new CatchModHardRock(),
+            new CatchModEasy(),
         };
     }
 }
