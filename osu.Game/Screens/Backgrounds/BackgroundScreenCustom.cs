@@ -12,7 +12,7 @@ namespace osu.Game.Screens.Backgrounds
         public BackgroundScreenCustom(string textureName)
         {
             this.textureName = textureName;
-            AddInternal(new Background(textureName));
+            AddInternal(Background = new Background(textureName));
         }
 
         public override bool Equals(BackgroundScreen other)

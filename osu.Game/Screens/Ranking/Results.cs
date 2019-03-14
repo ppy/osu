@@ -24,7 +24,7 @@ namespace osu.Game.Screens.Ranking
 {
     public abstract class Results : OsuScreen
     {
-        private const float background_blur = 20;
+        protected const float BACKGROUND_BLUR = 20;
 
         private Container circleOuterBackground;
         private Container circleOuter;
@@ -58,7 +58,7 @@ namespace osu.Game.Screens.Ranking
         public override void OnEntering(IScreen last)
         {
             base.OnEntering(last);
-            ((BackgroundScreenBeatmap)Background).AddedBlur.Value = background_blur;
+            ((BackgroundScreenBeatmap)Background).AddedBlur.Value = BACKGROUND_BLUR;
             Background.ScaleTo(1.1f, transition_time, Easing.OutQuint);
 
             allCircles.ForEach(c =>

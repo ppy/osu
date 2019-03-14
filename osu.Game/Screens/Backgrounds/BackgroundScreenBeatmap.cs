@@ -11,7 +11,7 @@ using osu.Game.Graphics.Containers;
 
 namespace osu.Game.Screens.Backgrounds
 {
-    public class BackgroundScreenBeatmap : BlurrableBackgroundScreen
+    public class BackgroundScreenBeatmap : BackgroundScreen
     {
         private WorkingBeatmap beatmap;
 
@@ -54,7 +54,7 @@ namespace osu.Game.Screens.Backgrounds
                         b.Depth = newDepth;
                         fadeContainer.Add(Background = b);
                         fadeContainer.UpdateVisuals();
-                        Background.BlurSigma = BlurTarget;
+                        Background.BlurSigma = fadeContainer.BlurTarget;
                         StoryboardReplacesBackground.BindTo(fadeContainer.StoryboardReplacesBackground);
                     }));
                 });

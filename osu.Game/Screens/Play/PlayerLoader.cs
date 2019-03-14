@@ -26,7 +26,7 @@ namespace osu.Game.Screens.Play
 {
     public class PlayerLoader : ScreenWithBeatmapBackground
     {
-        private const float background_blur = 15;
+        protected const float BACKGROUND_BLUR = 15;
 
         private readonly Func<Player> createPlayer;
 
@@ -119,7 +119,8 @@ namespace osu.Game.Screens.Play
 
         private void contentIn()
         {
-            Background.AddedBlur.Value = background_blur;
+            Background.AddedBlur.Value = BACKGROUND_BLUR;
+            Background.EnableVisualSettings.Value = false;
 
             content.ScaleTo(1, 650, Easing.OutQuint);
             content.FadeInFromZero(400);
@@ -128,6 +129,7 @@ namespace osu.Game.Screens.Play
         private void contentOut()
         {
             Background.AddedBlur.Value = 0;
+            Background.EnableVisualSettings.Value = true;
 
             content.ScaleTo(0.7f, 300, Easing.InQuint);
             content.FadeOut(250);
@@ -166,7 +168,7 @@ namespace osu.Game.Screens.Play
         {
             if (this.IsCurrentScreen())
             {
-                Background.AddedBlur.Value = background_blur;
+                Background.AddedBlur.Value = BACKGROUND_BLUR;
                 Background.EnableVisualSettings.Value = false;
             }
 
@@ -251,7 +253,7 @@ namespace osu.Game.Screens.Play
             this.FadeOut(150);
             cancelLoad();
 
-            Background.EnableVisualSettings.Value = true;
+            Background.EnableVisualSettings.Value = false;
 
             return base.OnExiting(next);
         }

@@ -24,8 +24,6 @@ namespace osu.Game.Graphics.Containers
     {
         private const float background_fade_duration = 800;
 
-        public Action ContentLoadComplete = () => { };
-
         private Bindable<double> dimLevel { get; set; }
 
         private Bindable<double> blurLevel { get; set; }
@@ -50,6 +48,10 @@ namespace osu.Game.Graphics.Containers
 
         public Bindable<float> AddedBlur = new Bindable<float>();
 
+        public Vector2 BlurTarget => EnableVisualSettings.Value
+            ? new Vector2(AddedBlur.Value + (float)blurLevel.Value * 25)
+            : new Vector2(AddedBlur.Value);
+
         /// <summary>
         /// Creates a new <see cref="VisualSettingsContainer"/>.
         /// </summary>
@@ -71,7 +73,11 @@ namespace osu.Game.Graphics.Containers
             dimLevel = config.GetBindable<double>(OsuSetting.DimLevel);
             blurLevel = config.GetBindable<double>(OsuSetting.BlurLevel);
             showStoryboard = config.GetBindable<bool>(OsuSetting.ShowStoryboard);
-            EnableVisualSettings.ValueChanged += _ => UpdateVisuals();
+            EnableVisualSettings.ValueChanged += _ =>
+            {
+                Logger.Log("Oh fuck");
+                UpdateVisuals();
+            };
             dimLevel.ValueChanged += _ => UpdateVisuals();
             blurLevel.ValueChanged += _ => UpdateVisuals();
             showStoryboard.ValueChanged += _ => UpdateVisuals();
@@ -101,9 +107,7 @@ namespace osu.Game.Graphics.Containers
                     // Only blur if this container contains a background
                     // We can't blur the container like we did with the dim because buffered containers add considerable draw overhead.
                     // As a result, this blurs the background directly.
-                    ((Background)c)?.BlurTo(EnableVisualSettings.Value
-                        ? new Vector2(AddedBlur.Value + (float)blurLevel.Value * 25)
-                        : new Vector2(AddedBlur.Value), background_fade_duration, Easing.OutQuint);
+                    ((Background)c)?.BlurTo(BlurTarget, background_fade_duration, Easing.OutQuint);
 
                     Logger.Log("Enable visual settings: " + EnableVisualSettings.Value + " Added blur is: " + AddedBlur.Value);
                 }
