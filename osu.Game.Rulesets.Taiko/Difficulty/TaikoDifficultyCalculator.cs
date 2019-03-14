@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Game.Beatmaps;
@@ -47,12 +48,12 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
 
         protected override Skill[] CreateSkills(IBeatmap beatmap) => new Skill[] { new Strain() };
 
-        protected override Mod[] DifficultyAdjustmentMods => new Mod[]
+        protected override Type[] DifficultyAdjustmentMods => new[]
         {
-            new TaikoModDoubleTime(),
-            new TaikoModHalfTime(),
-            new TaikoModEasy(),
-            new TaikoModHardRock(),
+            typeof(TaikoModDoubleTime),
+            typeof(TaikoModHalfTime),
+            typeof(TaikoModEasy),
+            typeof(TaikoModHardRock),
         };
     }
 }

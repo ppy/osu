@@ -90,12 +90,12 @@ namespace osu.Game.Rulesets.Catch.Difficulty
             new Movement(),
         };
 
-        protected override Mod[] DifficultyAdjustmentMods => new Mod[]
+        protected override Type[] DifficultyAdjustmentMods => new[]
         {
-            new CatchModDoubleTime(),
-            new CatchModHalfTime(),
-            new CatchModHardRock(),
-            new CatchModEasy(),
+            typeof(CatchModDoubleTime),
+            typeof(CatchModHalfTime),
+            typeof(CatchModHardRock),
+            typeof(CatchModEasy),
         };
     }
 }
