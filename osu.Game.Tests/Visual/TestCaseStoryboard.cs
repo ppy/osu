@@ -17,7 +17,7 @@ namespace osu.Game.Tests.Visual
     [TestFixture]
     public class TestCaseStoryboard : OsuTestCase
     {
-        private readonly Container storyboardContainer;
+        private readonly Container<DrawableStoryboard> storyboardContainer;
         private DrawableStoryboard storyboard;
 
         public TestCaseStoryboard()
@@ -34,7 +34,7 @@ namespace osu.Game.Tests.Visual
                         RelativeSizeAxes = Axes.Both,
                         Colour = Color4.Black,
                     },
-                    storyboardContainer = new Container
+                    storyboardContainer = new Container<DrawableStoryboard>
                     {
                         RelativeSizeAxes = Axes.Both,
                     },
