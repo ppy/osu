@@ -59,8 +59,6 @@ namespace osu.Game.Rulesets.Mods
 
         private double lastAdjust = 1;
 
-        private bool reported;
-
         /// <summary>
         /// Adjust the rate along the specified ramp
         /// </summary>
