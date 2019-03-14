@@ -26,7 +26,7 @@ namespace osu.Game.Screens.Play
 {
     public class PlayerLoader : ScreenWithBeatmapBackground
     {
-        protected static readonly Vector2 BACKGROUND_BLUR = new Vector2(15);
+        private const float background_blur = 15;
 
         private readonly Func<Player> createPlayer;
 
@@ -119,7 +119,7 @@ namespace osu.Game.Screens.Play
 
         private void contentIn()
         {
-            Background?.BlurTo(BACKGROUND_BLUR, 800, Easing.OutQuint);
+            Background.AddedBlur.Value = background_blur;
 
             content.ScaleTo(1, 650, Easing.OutQuint);
             content.FadeInFromZero(400);
@@ -127,7 +127,7 @@ namespace osu.Game.Screens.Play
 
         private void contentOut()
         {
-            Background?.BlurTo(new Vector2(0), 800, Easing.OutQuint);
+            Background.AddedBlur.Value = 0;
 
             content.ScaleTo(0.7f, 300, Easing.InQuint);
             content.FadeOut(250);
@@ -166,7 +166,7 @@ namespace osu.Game.Screens.Play
         {
             if (this.IsCurrentScreen())
             {
-                Background.BlurTo(BACKGROUND_BLUR, 800, Easing.OutQuint);
+                Background.AddedBlur.Value = background_blur;
                 Background.EnableVisualSettings.Value = false;
             }
 
@@ -179,7 +179,7 @@ namespace osu.Game.Screens.Play
             {
                 if (this.IsCurrentScreen() && Background != null)
                 {
-                    Background.BlurTo(new Vector2(0), 800, Easing.OutQuint);
+                    Background.AddedBlur.Value = 0;
                     Background.EnableVisualSettings.Value = true;
                 }
             }
@@ -239,6 +239,8 @@ namespace osu.Game.Screens.Play
 
         public override void OnSuspending(IScreen next)
         {
+            Background.EnableVisualSettings.Value = true;
+
             base.OnSuspending(next);
             cancelLoad();
         }
@@ -249,7 +251,7 @@ namespace osu.Game.Screens.Play
             this.FadeOut(150);
             cancelLoad();
 
-            Background.EnableVisualSettings.Value = false;
+            Background.EnableVisualSettings.Value = true;
 
             return base.OnExiting(next);
         }
