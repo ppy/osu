@@ -72,29 +72,13 @@ namespace osu.Game.Rulesets.Difficulty
 
             double sectionLength = SectionLength * clockRate;
 
-            // The first object doesn't generate a strain, so we begin with an incremented section end
-            double currentSectionEnd = Math.Ceiling(beatmap.HitObjects.First().StartTime / sectionLength) * sectionLength;
 
             foreach (DifficultyHitObject h in difficultyHitObjects)
             {
-                while (h.BaseObject.StartTime > currentSectionEnd)
-                {
-                    foreach (Skill s in skills)
-                    {
-                        s.SaveCurrentPeak();
-                        s.StartNewSectionFrom(currentSectionEnd);
-                    }
-
-                    currentSectionEnd += sectionLength;
-                }
-
                 foreach (Skill s in skills)
                     s.Process(h);
             }
-
-            // The peak strain will not be saved for the last section in the above loop
-            foreach (Skill s in skills)
-                s.SaveCurrentPeak();
+            
 
             return CreateDifficultyAttributes(beatmap, mods, skills, clockRate);
         }

@@ -22,7 +22,7 @@ namespace osu.Game.Rulesets.Difficulty.Skills
 
         private const int difficulty_count = 20;
 
-        private const double section_length = 400;
+        private const double max_strain_time = 200;
         private const double difficulty_multiplier = 0.0675;
 
         // repeating a section adds this much difficulty
@@ -30,12 +30,10 @@ namespace osu.Game.Rulesets.Difficulty.Skills
         private readonly double star_bonus_k = Math.Log(2) / star_bonus_per_length_double;
 
         // Constant difficulty sections of this length match previous star rating
-        private const double star_bonus_base_time = (12.0 * 1000.0);
-        private const double time_multiplier = section_length / star_bonus_base_time;
+        private const double star_bonus_base_time = (8.0 * 1000.0);
 
         // Final star rating is player skill level who can FC the map once per target_fc_time
         private const double target_fc_time = 4 * 60 * 60 * 1000;
-        private const double target_fc_sections = target_fc_time / section_length;
 
         // minimum precision for fc time, though typically will be around 5x more precise
         // current setting of 0.05 usually takes 2 iterations, gives around 4dp for star ratings
@@ -56,12 +54,11 @@ namespace osu.Game.Rulesets.Difficulty.Skills
         /// </summary>
         protected abstract double StrainDecayBase { get; }
 
-        
 
         /// <summary>
         /// The weight by which each strain value decays.
         /// </summary>
-        protected virtual double DecayWeight => 0.9;
+        protected virtual double DecayWeight => 0.9; //TODO fix other game modes and remove
 
         /// <summary>
         /// <see cref="DifficultyHitObject"/>s that were processed previously. They can affect the strain values of the following objects.
@@ -71,17 +68,34 @@ namespace osu.Game.Rulesets.Difficulty.Skills
         private double currentStrain = 1; // We keep track of the strain level at all times throughout the beatmap.
         private double currentSectionPeak = 1; // We also keep track of the peak strain level in the current section.
 
-        private readonly List<double> strainPeaks = new List<double>();
+        private readonly List<double> strainPeaks = new List<double>(); // TODO remove and fix other modes
+
+        private readonly List<double> expDifficulties = new List<double>(); // list of exp(k*difficulty) for each note
+        private readonly List<double> timestamps = new List<double>();  // list of timestamps for each note
+
 
         /// <summary>
-        /// Process a <see cref="DifficultyHitObject"/> and update current strain values accordingly.
+        /// Process a <see cref="DifficultyHitObject"/> and update current strain values.
+        /// Also calculates hit probability function for this note and adds to list
         /// </summary>
         public void Process(DifficultyHitObject current)
         {
             currentStrain *= strainDecay(current.DeltaTime);
             currentStrain += StrainValueOf(current) * SkillMultiplier;
 
-            currentSectionPeak = Math.Max(currentStrain, currentSectionPeak);
+
+            double legacyScalingFactor = 10;
+            double stars = Math.Sqrt(currentStrain * legacyScalingFactor) * difficulty_multiplier;
+
+            double t = Math.Min(current.DeltaTime, max_strain_time) / star_bonus_base_time;
+
+            double expDifficulty = Math.Exp(star_bonus_k * starsToDifficulty(stars)) * t;
+
+
+
+            expDifficulties.Add(expDifficulty);
+            timestamps.Add(current.BaseObject.StartTime);
+
 
             Previous.Push(current);
         }
@@ -89,7 +103,7 @@ namespace osu.Game.Rulesets.Difficulty.Skills
         /// <summary>
         /// Saves the current peak strain level to the list of strain peaks, which will be used to calculate an overall difficulty.
         /// </summary>
-        public void SaveCurrentPeak()
+        public void SaveCurrentPeak() // TODO remove and fix other modes
         {
             if (Previous.Count > 0)
                 strainPeaks.Add(currentSectionPeak);
@@ -99,7 +113,7 @@ namespace osu.Game.Rulesets.Difficulty.Skills
         /// Sets the initial strain level for a new section.
         /// </summary>
         /// <param name="offset">The beginning of the new section in milliseconds.</param>
-        public void StartNewSectionFrom(double offset)
+        public void StartNewSectionFrom(double offset)  // TODO remove and fix other modes
         {
             // The maximum strain of the new section is not zero by default, strain decays as usual regardless of section boundaries.
             // This means we need to capture the strain level at the beginning of the new section, and use that as the initial peak level.
@@ -112,27 +126,21 @@ namespace osu.Game.Rulesets.Difficulty.Skills
         /// </summary>
         public IList<double> DifficultyValues()
         {
-            double difficulty = 0;
-
-            // previously returned sum of 0.9^n * strain, which converges to 10*strain for constant strain.
-            double legacyScalingFactor = 10;
 
             // difficulty to FC the remainder of the map from every position, used later to calculate expected map length. 
-            var difficultyPartialSums = new List<double>();
+            var difficultyPartialSums = new double[expDifficulties.Count];
+
+            double total=0;
 
             // Difficulty calculated according to probability of FC
-            // iterate backwards to calculate difficultyPartialSums
-            for (int i = strainPeaks.Count - 1; i >= 0; --i)
+            // iterate backwards to calculate probs of FCing the remainder of map from a given point
+            for (int i = expDifficulties.Count - 1; i >= 0; --i)
             {
-                double strain = strainPeaks[i];
-                double stars = Math.Sqrt(strain * legacyScalingFactor) * difficulty_multiplier;
-                difficulty += Math.Exp(star_bonus_k * starsToDifficulty(stars)) * time_multiplier;
-                difficultyPartialSums.Add(difficulty);
+                total += expDifficulties[i];
+                difficultyPartialSums[i] = total;
             }
 
             var skillToFcSubset = getSkillToFcSubsets(difficultyPartialSums);
-
-            //double skill = getSkillToFcInTargetTime(difficultyPartialSums);
 
             for (int i=0; i<skillToFcSubset.Count; i++)
             {
@@ -141,38 +149,14 @@ namespace osu.Game.Rulesets.Difficulty.Skills
 
             return skillToFcSubset;
 
-
         }
 
         /// <summary>
         /// Returns the calculated difficulty value representing all processed <see cref="DifficultyHitObject"/>s.
         /// </summary>
-        public double DifficultyValue()
+        public double DifficultyValue() // TODO remove and fix other modes
         {
-            double difficulty = 0;
-
-            // previously returned sum of 0.9^n * strain, which converges to 10*strain for constant strain.
-            double legacyScalingFactor = 10;
-
-            // difficulty to FC the remainder of the map from every position, used later to calculate expected map length. 
-            var difficultyPartialSums = new List<double>();
-
-            // Difficulty calculated according to probability of FC
-            // iterate backwards to calculate difficultyPartialSums
-            for (int i=strainPeaks.Count-1; i>=0; --i)
-            {
-                double strain = strainPeaks[i];
-                double stars = Math.Sqrt(strain * legacyScalingFactor) * difficulty_multiplier;
-                difficulty += Math.Exp(star_bonus_k * starsToDifficulty(stars)) * time_multiplier;
-                difficultyPartialSums.Add(difficulty);
-            }
-
-  
-
-            double skill = getSkillToFcInTargetTime(difficultyPartialSums);
-
-            return difficultyToStars(skill);
-
+            return DifficultyValues().Last();
         }
 
         /// <summary>
@@ -182,88 +166,127 @@ namespace osu.Game.Rulesets.Difficulty.Skills
 
         private double strainDecay(double ms) => Math.Pow(StrainDecayBase, ms / 1000);
 
-
-        private IList<double> getSkillToFcSubsets(List<double> difficultyPartialSums)
+        // get skill to fc easiest section with e.g. 5% combo, 10%, 15%, ... 100% combo
+        private IList<double> getSkillToFcSubsets(double[] difficultyPartialSums)
         {
             var ret = new double[difficulty_count];
 
             for (int i=1; i<=difficulty_count; ++i)
             {
+                // getting lowest difficulty for a combo with this many hit objects
+                int count = difficultyPartialSums.Length * i / difficulty_count; 
+
                 ret[i-1] = double.PositiveInfinity;
 
                 for (int j=0;j<=difficulty_count-i; ++j)
                 {
-                    int count = difficultyPartialSums.Count * i / difficulty_count;
-                    int start = difficultyPartialSums.Count * j / difficulty_count;
-                    double remainder = (start>0) ? difficultyPartialSums[start -1] : 0;
+                    // checking this start point to see if it's easiest
+                    int start = difficultyPartialSums.Length * j / difficulty_count;
 
-                    ret[i-1] = Math.Min(ret[i-1], getSkillToFcInTargetTime(difficultyPartialSums.GetRange(start, count), remainder));
+                    // difficulty for the rest of the map after the combo we're considering
+                    double remainder = (start+count<difficultyPartialSums.Length) ? difficultyPartialSums[start+count] : 0;
+
+                    ret[i-1] = Math.Min(ret[i-1], getSkillToFcInTargetTime(difficultyPartialSums,start,count, remainder));
                 }
             }
 
             return ret;
         }
 
-        private double getSkillToFcInTargetTime(IList<double> difficultyPartialSums, double remainder=0)
+        private double getSkillToFcInTargetTime(double[] difficultyPartialSums, int first, int count, double remainder=0)
         {
-            if (difficultyPartialSums.Last() - remainder <= 1e-10)
+            int last = first + count - 1;
+
+            // preserve star rating for averageLength = target_fc_base_time
+            double target_fc_star_adjustment = -skillLevel(target_fc_base_time / target_fc_time, 0);
+
+            if (difficultyPartialSums[first] - remainder <= 1e-10)
             {
-                // calculating SR for empty section
+                // remainder is the expDifficulty of the rest of the map after last
+                // if first and remainder are equal, the section has no notes, so return zero stars
                 return -1e100;
             }
 
-            double difficulty = Math.Log(difficultyPartialSums.Last()-remainder) / star_bonus_k;
+            double difficulty = Math.Log(difficultyPartialSums[first]-remainder) / star_bonus_k;
 
-            // if map is really long, return skill level to pass with 0.5 probability
-            if (difficultyPartialSums.Count >= target_fc_sections / 2)
-                return skillLevel(0.5, difficulty);
-
-            // otherwise return skill level to FC on average once per target_fc_time
-            // hard to calculate exactly so approximate and iteratively improve. Normally gets to within 1% in 2 iterations
+            // hard to calculate skill directly so approximate and iteratively improve. Normally gets to within 1% in 2 iterations
 
             // initial guess of average play length 
-            double averageLength = difficultyPartialSums.Count * 0.3;
-            double fcProb = averageLength / target_fc_sections;
+            double averageLength = (timestamps[last]-timestamps[first]) * 0.3;
+            double fcProb = averageLength / target_fc_time;
+
+            // map is super long, these calculations might not even make sense, return skill level to pass with 50% probability
+            if (fcProb > 0.9)
+                return skillLevel(0.5, difficulty) + target_fc_star_adjustment;
+
+
             double skill = skillLevel(fcProb, difficulty);
+            double firstLength;
+
+
             int max_iterations = 5;
 
             for (int i = 0; i < max_iterations; ++i)
             {
                 // use estimate for improved average length calculation
-                double expectedSectionsBeforeFC = getExpectedSectionsPlayedBeforeFC(skill, difficultyPartialSums, remainder);
+                double expectedTimeBeforeFC = getExpectedTimePlayedBeforeFC(skill, difficultyPartialSums, first, count, remainder);
 
-                // play x sections per fc, fc with probability p per attempt, so on average play x*p sections per attempt
-                averageLength = expectedSectionsBeforeFC * passProbability(skill, difficulty);
+                // x ms per fc, fc with probability p per attempt, so on average x*p ms per attempt
+                averageLength = expectedTimeBeforeFC * passProbability(skill, difficulty);
+                fcProb = averageLength / target_fc_time;
 
-                fcProb = averageLength / target_fc_sections;
+                // map too long
+                if (fcProb > 0.9)
+                    return skillLevel(0.5, difficulty) + target_fc_star_adjustment;
+
                 skill = skillLevel(fcProb, difficulty);
 
-                if (Math.Abs(expectedSectionsBeforeFC - target_fc_sections) / target_fc_sections < target_fc_precision)
+                if (Math.Abs(expectedTimeBeforeFC - target_fc_time) / target_fc_time < target_fc_precision)
                 {
                     // enough precision already
                     break;
                 }
             }
 
-            // preserve star rating for averageLength = target_fc_base_time
-            double target_fc_star_adjustment = -skillLevel(target_fc_base_time / target_fc_time, 0);
+            if (fcProb > 0.5)
+            {
+                // map is very long, return skill level to pass with 50% probability
+                return skillLevel(0.5, difficulty) + target_fc_star_adjustment;
+            }
+
 
             return skill + target_fc_star_adjustment;
         }
 
-        private double getExpectedSectionsPlayedBeforeFC(double skill, IList<double> difficultyPartialSums, double remainder=0)
+        private double getExpectedTimePlayedBeforeFC(double skill, double[] difficultyPartialSums, int first, int count, double remainder = 0)
         {
+            int last = first + count - 1;
+
             // note: calculating this separately for each skill isn't really correct, maybe fix in future
 
             double length = 0;
-            // difficultyPartialSums is a list of exp(k*d) for each strain where d is the difficulty to pass the remainder of the map
-            foreach (double expDifficulty in difficultyPartialSums)
+            double lastTime = timestamps[first] - max_strain_time;
+            double expSkill = Math.Exp(-star_bonus_k * skill);
+
+            for (int i=first; i<=last; ++i)
             {
-                // if we fail before reaching this section, section playcount doesnt increase
-                // it only increases if we fail afterwards
-                double probabilityOfPassingRemainderOfMap = passProbFromExp(skill, expDifficulty-remainder);
-                double expectedSectionPlaysBeforeFC = 1 / probabilityOfPassingRemainderOfMap;
-                length += expectedSectionPlaysBeforeFC; 
+                if (i < last)
+                {
+                    // no need for millisecond precision, 1s fine
+                    if ((timestamps[i + 1] - lastTime) < 1000)
+                        continue;
+                }
+
+                double deltaT = timestamps[i] - lastTime;
+
+                // We need to play this note again every time we fail after it until we pass the remainder of the map
+                // If we fail before, we don't play it
+
+                // difficultyPartialSums is a list of exp(k*d) for each note where d is the difficulty to pass the remainder of the map
+                double probabilityOfPassingRemainderOfMap = passProbFromExp(expSkill, difficultyPartialSums[i]-remainder);
+                double expectedNotePlaysBeforeFC = 1 / probabilityOfPassingRemainderOfMap;
+                length += expectedNotePlaysBeforeFC*(deltaT);
+                lastTime = timestamps[i];
             }
 
             return length;
@@ -272,8 +295,8 @@ namespace osu.Game.Rulesets.Difficulty.Skills
         // probability a player of the given skill passes a map of the given difficulty
         private double passProbability(double skill, double difficulty) => Math.Exp(-Math.Exp(-star_bonus_k * (skill - difficulty)));
 
-        // same as above but pass in exp(k*difficulty) instead of difficulty
-        private double passProbFromExp(double skill, double expDifficulty) => Math.Exp(-Math.Exp(-star_bonus_k * skill) * expDifficulty);
+        // same as above but pass in exp(-k*skill) and exp(k*difficulty)
+        private double passProbFromExp(double expSkill, double expDifficulty) => Math.Exp(-expSkill * expDifficulty);
 
         // inverse of passProbability
         private double skillLevel(double probability, double difficulty) => difficulty - Math.Log(-Math.Log(probability)) / star_bonus_k;
