@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Game.Beatmaps;
@@ -91,33 +92,33 @@ namespace osu.Game.Rulesets.Mania.Difficulty
             return skills.ToArray();
         }
 
-        protected override Mod[] DifficultyAdjustmentMods
+        protected override Type[] DifficultyAdjustmentMods
         {
             get
             {
-                var mods = new Mod[]
+                var mods = new[]
                 {
-                    new ManiaModDoubleTime(),
-                    new ManiaModHalfTime(),
-                    new ManiaModEasy(),
-                    new ManiaModHardRock(),
+                    typeof(ManiaModDoubleTime),
+                    typeof(ManiaModHalfTime),
+                    typeof(ManiaModEasy),
+                    typeof(ManiaModHardRock)
                 };
 
                 if (isForCurrentRuleset)
                     return mods;
 
                 // if we are a convert, we can be played in any key mod.
-                return mods.Concat(new Mod[]
+                return mods.Concat(new[]
                 {
-                    new ManiaModKey1(),
-                    new ManiaModKey2(),
-                    new ManiaModKey3(),
-                    new ManiaModKey4(),
-                    new ManiaModKey5(),
-                    new ManiaModKey6(),
-                    new ManiaModKey7(),
-                    new ManiaModKey8(),
-                    new ManiaModKey9(),
+                    typeof(ManiaModKey1),
+                    typeof(ManiaModKey2),
+                    typeof(ManiaModKey3),
+                    typeof(ManiaModKey4),
+                    typeof(ManiaModKey5),
+                    typeof(ManiaModKey6),
+                    typeof(ManiaModKey7),
+                    typeof(ManiaModKey8),
+                    typeof(ManiaModKey9),
                 }).ToArray();
             }
         }

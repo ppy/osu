@@ -106,7 +106,7 @@ namespace osu.Game.Rulesets.Difficulty
         {
             return createDifficultyAdjustmentModCombinations(Enumerable.Empty<Mod>(), DifficultyAdjustmentMods).ToArray();
 
-            IEnumerable<Mod> createDifficultyAdjustmentModCombinations(IEnumerable<Mod> currentSet, Mod[] adjustmentSet, int currentSetCount = 0, int adjustmentSetStart = 0)
+            IEnumerable<Mod> createDifficultyAdjustmentModCombinations(IEnumerable<Mod> currentSet, Type[] adjustmentSet, int currentSetCount = 0, int adjustmentSetStart = 0)
             {
                 switch (currentSetCount)
                 {
@@ -129,12 +129,14 @@ namespace osu.Game.Rulesets.Difficulty
                 // combinations in further recursions, so a moving subset is used to eliminate this effect
                 for (int i = adjustmentSetStart; i < adjustmentSet.Length; i++)
                 {
-                    var adjustmentMod = adjustmentSet[i];
+                    var adjustmentMod = createMod();
                     if (currentSet.Any(c => c.IncompatibleMods.Any(m => m.IsInstanceOfType(adjustmentMod))))
                         continue;
 
-                    foreach (var combo in createDifficultyAdjustmentModCombinations(currentSet.Append(adjustmentMod), adjustmentSet, currentSetCount + 1, i + 1))
+                    foreach (var combo in createDifficultyAdjustmentModCombinations(currentSet.Append(createMod()), adjustmentSet, currentSetCount + 1, i + 1))
                         yield return combo;
+
+                    Mod createMod() => (Mod)Activator.CreateInstance(adjustmentSet[i]);
                 }
             }
         }
@@ -142,7 +144,7 @@ namespace osu.Game.Rulesets.Difficulty
         /// <summary>
         /// Retrieves all <see cref="Mod"/>s which adjust the <see cref="Beatmap"/> difficulty.
         /// </summary>
-        protected virtual Mod[] DifficultyAdjustmentMods => Array.Empty<Mod>();
+        protected virtual Type[] DifficultyAdjustmentMods => Array.Empty<Type>();
 
         /// <summary>
         /// Creates <see cref="DifficultyAttributes"/> to describe beatmap's calculated difficulty.
