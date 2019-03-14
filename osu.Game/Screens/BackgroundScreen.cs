@@ -5,12 +5,15 @@ using System;
 using osu.Framework.Screens;
 using osu.Framework.Graphics;
 using osu.Framework.Input.Events;
+using osu.Game.Graphics.Backgrounds;
 using osuTK;
 
 namespace osu.Game.Screens
 {
     public abstract class BackgroundScreen : Screen, IEquatable<BackgroundScreen>
     {
+        protected Background Background;
+
         protected BackgroundScreen()
         {
             Anchor = Anchor.Centre;

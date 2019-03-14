@@ -109,7 +109,7 @@ namespace osu.Game.Tests.Visual
             AddAssert("Screen is dimmed and blur applied", () => songSelect.IsBackgroundDimmed() && songSelect.IsUserBlurApplied());
             AddStep("Stop background preview", () => InputManager.MoveMouseTo(playerLoader.ScreenPos));
             waitForDim();
-            AddAssert("Screen is undimmed and user blur removed", () => songSelect.IsBackgroundUndimmed() && songSelect.IsUserBlurDisabled());
+            AddAssert("Screen is undimmed and user blur removed", () => songSelect.IsBackgroundUndimmed() && playerLoader.IsBlurCorrect());
         }
 
         /// <summary>
@@ -203,10 +203,11 @@ namespace osu.Game.Tests.Visual
         public void TransitionTest()
         {
             performFullSetup();
-            AddStep("Transition to Results", () => player.Push(new FadeAccessibleResults(new ScoreInfo { User = new User { Username = "osu!" } })));
+            var results = new FadeAccessibleResults(new ScoreInfo { User = new User { Username = "osu!" } });
+            AddStep("Transition to Results", () => player.Push(results));
             waitForDim();
-            AddAssert("Screen is undimmed, original background retained", () => 
-                songSelect.IsBackgroundUndimmed() && songSelect.IsBackgroundCurrent() && songSelect.IsUserBlurDisabled());
+            AddAssert("Screen is undimmed, original background retained", () =>
+                songSelect.IsBackgroundUndimmed() && songSelect.IsBackgroundCurrent() && results.IsBlurCorrect());
         }
 
         /// <summary>
@@ -218,7 +219,7 @@ namespace osu.Game.Tests.Visual
             performFullSetup();
             AddStep("Exit to song select", () => player.Exit());
             waitForDim();
-            AddAssert("Screen is undimmed and user blur removed", () => songSelect.IsBackgroundUndimmed() && songSelect.IsUserBlurDisabled());
+            AddAssert("Screen is undimmed and user blur removed", () => songSelect.IsBackgroundUndimmed() && songSelect.IsBlurCorrect());
         }
 
         private void waitForDim() => AddWaitStep(5, "Wait for dim");
@@ -300,6 +301,8 @@ namespace osu.Game.Tests.Visual
 
             public bool IsBackgroundVisible() => ((FadeAccessibleBackground)Background).CurrentAlpha == 1;
 
+            public bool IsBlurCorrect() => ((FadeAccessibleBackground)Background).CurrentBlur == new Vector2(BACKGROUND_BLUR);
+
             /// <summary>
             /// Make sure every time a screen gets pushed, the background doesn't get replaced
             /// </summary>
@@ -315,6 +318,8 @@ namespace osu.Game.Tests.Visual
             }
 
             protected override BackgroundScreen CreateBackground() => new FadeAccessibleBackground(Beatmap.Value);
+
+            public bool IsBlurCorrect() => ((FadeAccessibleBackground)Background).CurrentBlur == new Vector2(BACKGROUND_BLUR);
         }
 
         private class TestPlayer : Player
@@ -383,6 +388,8 @@ namespace osu.Game.Tests.Visual
 
             public void TriggerOnHover() => OnHover(new HoverEvent(new InputState()));
 
+            public bool IsBlurCorrect() => ((FadeAccessibleBackground)Background).CurrentBlur == new Vector2(BACKGROUND_BLUR);
+
             protected override BackgroundScreen CreateBackground() => new FadeAccessibleBackground(Beatmap.Value);
         }
 
@@ -394,7 +401,7 @@ namespace osu.Game.Tests.Visual
 
             public float CurrentAlpha => fadeContainer.CurrentAlpha;
 
-            public Vector2 CurrentBlur => fadeContainer.CurrentBlur;
+            public Vector2 CurrentBlur => Background.BlurSigma;
 
             private TestVisualSettingsContainer fadeContainer;
 
@@ -408,8 +415,6 @@ namespace osu.Game.Tests.Visual
         {
             public Color4 CurrentColour => LocalContainer.Colour;
             public float CurrentAlpha => LocalContainer.Alpha;
-
-            public Vector2 CurrentBlur => LocalContainer.BlurSigma;
 
             public TestVisualSettingsContainer(bool isStoryboard = false)
                 : base(isStoryboard)

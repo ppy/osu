@@ -13,7 +13,7 @@ using osu.Game.Users;
 
 namespace osu.Game.Screens.Backgrounds
 {
-    public class BackgroundScreenDefault : BlurrableBackgroundScreen
+    public class BackgroundScreenDefault : BackgroundScreen
     {
         private int currentDisplay;
         private const int background_count = 5;
