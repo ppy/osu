@@ -483,7 +483,7 @@ namespace osu.Game
 
             Add(externalLinkOpener = new ExternalLinkOpener());
 
-            var singleDisplaySideOverlays = new OverlayContainer[] { settings, notifications, musicController, loginOverlay };
+            var singleDisplaySideOverlays = new OverlayContainer[] { settings, notifications, loginOverlay };
             overlays.AddRange(singleDisplaySideOverlays);
 
             foreach (var overlay in singleDisplaySideOverlays)
