@@ -205,6 +205,7 @@ namespace osu.Game.Tests.Visual
             performFullSetup();
             var results = new FadeAccessibleResults(new ScoreInfo { User = new User { Username = "osu!" } });
             AddStep("Transition to Results", () => player.Push(results));
+            AddUntilStep(results.IsCurrentScreen, "Wait for results is current");
             waitForDim();
             AddAssert("Screen is undimmed, original background retained", () =>
                 songSelect.IsBackgroundUndimmed() && songSelect.IsBackgroundCurrent() && results.IsBlurCorrect());
