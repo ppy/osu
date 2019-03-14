@@ -15,7 +15,7 @@ namespace osu.Game.Rulesets.Mods
 {
     public abstract class ModTimeRamp : Mod
     {
-        public override Type[] IncompatibleMods => new[] { typeof(ModDoubleTime), typeof(ModHalfTime) };
+        public override Type[] IncompatibleMods => new[] { typeof(ModTimeAdjust) };
 
         protected abstract double FinalRateAdjustment { get; }
     }
@@ -29,8 +29,6 @@ namespace osu.Game.Rulesets.Mods
 
         private IAdjustableClock clock;
 
-        private IHasPitchAdjust pitchAdjust;
-
         /// <summary>
         /// The point in the beatmap at which the final ramping rate should be reached.
         /// </summary>
@@ -39,10 +37,11 @@ namespace osu.Game.Rulesets.Mods
         public virtual void ApplyToClock(IAdjustableClock clock)
         {
             this.clock = clock;
-            pitchAdjust = (IHasPitchAdjust)clock;
 
-            // for preview purposes
-            pitchAdjust.PitchAdjust = 1.0 + FinalRateAdjustment;
+            lastAdjust = 1;
+
+            // for preview purposes. during gameplay, Update will overwrite this setting.
+            applyAdjustment(1);
         }
 
         public virtual void ApplyToBeatmap(Beatmap<T> beatmap)
@@ -55,10 +54,36 @@ namespace osu.Game.Rulesets.Mods
 
         public virtual void Update(Playfield playfield)
         {
-            var absRate = Math.Abs(FinalRateAdjustment);
-            var adjustment = MathHelper.Clamp(absRate * ((clock.CurrentTime - beginRampTime) / finalRateTime), 0, absRate);
+            applyAdjustment((clock.CurrentTime - beginRampTime) / finalRateTime);
+        }
 
-            pitchAdjust.PitchAdjust = 1 + Math.Sign(FinalRateAdjustment) * adjustment;
+        private double lastAdjust = 1;
+
+        /// <summary>
+        /// Adjust the rate along the specified ramp
+        /// </summary>
+        /// <param name="amount">The amount of adjustment to apply (from 0..1).</param>
+        private void applyAdjustment(double amount)
+        {
+            double adjust = 1 + (Math.Sign(FinalRateAdjustment) * MathHelper.Clamp(amount, 0, 1) * Math.Abs(FinalRateAdjustment));
+
+            switch (clock)
+            {
+                case IHasPitchAdjust pitch:
+                    pitch.PitchAdjust /= lastAdjust;
+                    pitch.PitchAdjust *= adjust;
+                    break;
+                case IHasTempoAdjust tempo:
+                    tempo.TempoAdjust /= lastAdjust;
+                    tempo.TempoAdjust *= adjust;
+                    break;
+                default:
+                    clock.Rate /= lastAdjust;
+                    clock.Rate *= adjust;
+                    break;
+            }
+
+            lastAdjust = adjust;
         }
     }
 }
