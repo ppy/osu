@@ -9,7 +9,6 @@ using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using System.Linq;
-using JetBrains.Annotations;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Framework.Threading;
@@ -202,16 +201,16 @@ namespace osu.Game.Screens.Select
                     requestedBeatmap.Metrics = res;
                     Schedule(() => updateMetrics(res));
                 };
-                lookup.Failure += e => Schedule(() => updateMetrics(null));
+                lookup.Failure += e => Schedule(() => updateMetrics());
                 api.Queue(lookup);
                 loading.Show();
                 return;
             }
 
-            updateMetrics(null);
+            updateMetrics();
         }
 
-        private void updateMetrics([CanBeNull] BeatmapMetrics metrics)
+        private void updateMetrics(BeatmapMetrics metrics = null)
         {
             var hasRatings = metrics?.Ratings?.Any() ?? false;
             var hasRetriesFails = (metrics?.Retries?.Any() ?? false) && (metrics.Fails?.Any() ?? false);
