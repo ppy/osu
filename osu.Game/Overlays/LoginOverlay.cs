@@ -25,11 +25,6 @@ namespace osu.Game.Overlays
             AutoSizeAxes = Axes.Both;
         }
 
-        /// <summary>
-        /// Provide a source for the toolbar height.
-        /// </summary>
-        public Func<float> GetToolbarHeight;
-
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
@@ -93,13 +88,6 @@ namespace osu.Game.Overlays
 
             settingsSection.Bounding = false;
             this.FadeOut(transition_time);
-        }
-
-        protected override void UpdateAfterChildren()
-        {
-            base.UpdateAfterChildren();
-
-            Padding = new MarginPadding { Top = GetToolbarHeight?.Invoke() ?? 0 };
         }
     }
 }

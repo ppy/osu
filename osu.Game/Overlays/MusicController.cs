@@ -65,11 +65,6 @@ namespace osu.Game.Overlays
             AlwaysPresent = true;
         }
 
-        /// <summary>
-        /// Provide a source for the toolbar height.
-        /// </summary>
-        public Func<float> GetToolbarHeight;
-
         [BackgroundDependencyLoader]
         private void load(Bindable<WorkingBeatmap> beatmap, BeatmapManager beatmaps, OsuColour colours)
         {
@@ -249,8 +244,6 @@ namespace osu.Game.Overlays
         {
             base.UpdateAfterChildren();
             Height = dragContainer.Height;
-
-            dragContainer.Padding = new MarginPadding { Top = GetToolbarHeight?.Invoke() ?? 0 };
         }
 
         protected override void Update()

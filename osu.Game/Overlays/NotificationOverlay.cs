@@ -24,11 +24,6 @@ namespace osu.Game.Overlays
 
         private FlowContainer<NotificationSection> sections;
 
-        /// <summary>
-        /// Provide a source for the toolbar height.
-        /// </summary>
-        public Func<float> GetToolbarHeight;
-
         [BackgroundDependencyLoader]
         private void load()
         {
@@ -168,13 +163,6 @@ namespace osu.Game.Overlays
             sections.Children.ForEach(s => s.MarkAllRead());
 
             updateCounts();
-        }
-
-        protected override void UpdateAfterChildren()
-        {
-            base.UpdateAfterChildren();
-
-            Padding = new MarginPadding { Top = GetToolbarHeight?.Invoke() ?? 0 };
         }
     }
 }
