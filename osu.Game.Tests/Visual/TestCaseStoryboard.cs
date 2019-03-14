@@ -54,11 +54,7 @@ namespace osu.Game.Tests.Visual
             {
                 if (storyboard != null) storyboard.Passing = passing;
             });
-        }
 
-        [BackgroundDependencyLoader]
-        private void load()
-        {
             Beatmap.ValueChanged += beatmapChanged;
         }
 
@@ -76,20 +72,16 @@ namespace osu.Game.Tests.Visual
 
         private void loadStoryboard(WorkingBeatmap working)
         {
-            Schedule(() =>
-            {
-                if (storyboard != null)
-                    storyboardContainer.Remove(storyboard);
+            if (storyboard != null)
+                storyboardContainer.Remove(storyboard);
 
-                var decoupledClock = new DecoupleableInterpolatingFramedClock { IsCoupled = true };
-                storyboardContainer.Clock = decoupledClock;
+            var decoupledClock = new DecoupleableInterpolatingFramedClock { IsCoupled = true };
+            storyboardContainer.Clock = decoupledClock;
 
-                storyboard = working.Storyboard.CreateDrawable(Beatmap.Value);
-                storyboard.Passing = false;
+            storyboard = working.Storyboard.CreateDrawable(Beatmap.Value);
+            storyboard.Passing = false;
 
-                storyboardContainer.Add(storyboard);
-                decoupledClock.ChangeSource(working.Track);
-            });
+            storyboardContainer.Add(storyboard);
         }
     }
 }
