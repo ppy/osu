@@ -64,6 +64,21 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
             }
         }
 
+        /// <summary>
+        /// Used to size the path border.
+        /// </summary>
+        public int BorderSize {
+            get => path.BorderSize;
+            set {
+                if (path.BorderSize == value)
+                    return;
+
+                path.BorderSize = value;
+
+                container.ForceRedraw();
+            }
+        }
+
         public Quad PathDrawQuad => container.ScreenSpaceDrawQuad;
 
         protected SliderBody()
@@ -130,12 +145,28 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
                 }
             }
 
+            private int borderSize = 100;
+
+            public int BorderSize {
+                get => borderSize;
+                set {
+                    if (borderSize == value)
+                        return;
+
+                    borderSize = value;
+
+                    InvalidateTexture();
+                }
+            }
+
+            private float calucatedBorderPortion => BorderSize / 100f * border_portion;
+
             protected override Color4 ColourAt(float position)
             {
-                if (position <= border_portion)
+                if (position <= calucatedBorderPortion)
                     return BorderColour;
 
-                position -= border_portion;
+                position -= calucatedBorderPortion;
                 return new Color4(AccentColour.R, AccentColour.G, AccentColour.B, (opacity_at_edge - (opacity_at_edge - opacity_at_centre) * position / gradient_portion) * AccentColour.A);
             }
         }
