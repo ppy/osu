@@ -74,12 +74,12 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             new Speed()
         };
 
-        protected override Mod[] DifficultyAdjustmentMods => new Mod[]
+        protected override Type[] DifficultyAdjustmentMods => new[]
         {
-            new OsuModDoubleTime(),
-            new OsuModHalfTime(),
-            new OsuModEasy(),
-            new OsuModHardRock(),
+            typeof(OsuModDoubleTime),
+            typeof(OsuModHalfTime),
+            typeof(OsuModEasy),
+            typeof(OsuModHardRock),
         };
     }
 }
