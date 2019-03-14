@@ -10,7 +10,6 @@ using osuTK.Graphics;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Cursor;
-using System;
 
 namespace osu.Game.Overlays
 {
