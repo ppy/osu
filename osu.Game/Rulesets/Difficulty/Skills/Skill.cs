@@ -27,11 +27,11 @@ namespace osu.Game.Rulesets.Difficulty.Skills
         private const double difficulty_multiplier = 0.0675;
 
         // repeating a section adds this much difficulty
-        private const double star_bonus_per_length_double = 0.065;
+        private const double star_bonus_per_length_double = 0.0655;
         private readonly double star_bonus_k = Math.Log(2) / star_bonus_per_length_double;
 
         // Constant difficulty sections of this length match previous star rating
-        private const double star_bonus_base_time = (8.0 * 1000.0);
+        private const double star_bonus_base_time = (7.5 * 1000.0);
 
         // Final star rating is player skill level who can FC the map once per target_fc_time
         private const double target_fc_time = 4 * 60 * 60 * 1000;
