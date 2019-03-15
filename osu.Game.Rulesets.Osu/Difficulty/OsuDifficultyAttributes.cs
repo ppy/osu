@@ -8,10 +8,16 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 {
     public class OsuDifficultyAttributes : DifficultyAttributes
     {
+        public double MissSRIncrement;
+
         public double AimStrain;
-        public IList<double> AimStrains;
+        public IList<double> AimComboSR;
+        public IList<double> AimMissCounts;
+
         public double SpeedStrain;
-        public IList<double> SpeedStrains;
+        public IList<double> SpeedComboSR;
+        public IList<double> SpeedMissCounts;
+
         public double ApproachRate;
         public double OverallDifficulty;
         public int MaxCombo;

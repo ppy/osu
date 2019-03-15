@@ -63,9 +63,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             if (mods.Any(m => m is OsuModSpunOut))
                 multiplier *= 0.95f;
 
-            double aimValue = computeAimValue();
-            double speedValue = computeSpeedValue();
-            double accuracyValue = computeAccuracyValue();
+            double aimValue = computeAimValue(categoryRatings);
+            double speedValue = computeSpeedValue(categoryRatings);
+            double accuracyValue = computeAccuracyValue(categoryRatings);
             double totalValue =
                 Math.Pow(
                     Math.Pow(aimValue, 1.1f) +
@@ -75,9 +75,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             if (categoryRatings != null)
             {
-                categoryRatings.Add("Aim", aimValue);
-                categoryRatings.Add("Speed", speedValue);
-                categoryRatings.Add("Accuracy", accuracyValue);
                 categoryRatings.Add("OD", Attributes.OverallDifficulty);
                 categoryRatings.Add("AR", Attributes.ApproachRate);
                 categoryRatings.Add("Max Combo", beatmapMaxCombo);
@@ -86,7 +83,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             return totalValue;
         }
 
-        private double interp(IList<double> values, double scoreCombo, double mapCombo)
+        private double interpComboSR(IList<double> values, double scoreCombo, double mapCombo)
         {
 
 
@@ -117,6 +114,47 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             return ret;
         }
 
+        private double interpMissCountSR(double SR, IList<double> values, int missCount)
+        {
+            double increment = Attributes.MissSRIncrement;
+            double t;
+
+            if (missCount == 0)
+            {
+                // zero misses, return SR
+                return SR;
+            }
+
+            if (missCount<values[0])
+            {
+                return SR - increment * missCount / values[0];
+            }
+            for (int i = 0; i < values.Count; ++i)
+            {
+                if (missCount == values[i])
+                {
+                    if (i < values.Count - 1 && missCount == values[i + 1])
+                    {
+                        // if there are duplicates, take the lowest SR that can achieve miss count
+                        continue;
+                    }
+                    return SR - (i + 1) * increment;
+                }
+                if (i<values.Count-1 && missCount < values[i+1])
+                {
+                    t = (double)(missCount - values[i]) / (double)(values[i + 1] / values[i]);
+
+                    return SR - (i + 1 + t) * increment;
+                }
+            }
+
+            // more misses than max evaluated, interpolate to zero
+            t = (double)(missCount - values.Last()) / (double)(beatmapMaxCombo - values.Last());
+            return (SR - values.Count * increment) * (1 - t);
+
+        }
+
+
         IList<double> getTransformedStrains(IList<double> strains)
         {
             var transformed = new List<double>();
@@ -129,19 +167,19 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             return transformed;
         }
 
-        private double computeAimValue()
+        private double computeAimValue(Dictionary<string, double> categoryRatings = null)
         {
-            double rawAim = interp(Attributes.AimStrains, scoreMaxCombo, beatmapMaxCombo);
+            double aimComboSR = interpComboSR(Attributes.AimComboSR, scoreMaxCombo, beatmapMaxCombo);
+            double aimMissCountSR = interpMissCountSR(Attributes.AimStrain, Attributes.AimMissCounts, countMiss);
+            double rawAim = 0.5*aimComboSR + 0.5*aimMissCountSR;
 
             if (mods.Any(m => m is OsuModTouchDevice))
                 rawAim = Math.Pow(rawAim, 0.8);
 
             double aimValue = Math.Pow(5.0f * Math.Max(1.0f, rawAim / 0.0675f) - 4.0f, 3.0f) / 100000.0f;
 
-            //System.Console.WriteLine($"aim: [ {String.Join(", ", getTransformedStrains(Attributes.AimStrains))}]");
-
-            // Penalize misses exponentially. This mainly fixes tag4 maps and the likes until a per-hitobject solution is available
-            aimValue *= Math.Pow(0.97f, countMiss);
+            //System.Console.WriteLine($"aim: [ {String.Join(", ", getTransformedStrains(Attributes.AimComboSR))}]");
+            //System.Console.WriteLine($"aim Misses: [ {String.Join(", ", Attributes.AimMissCounts)}]");
 
             double approachRateFactor = 1.0f;
             if (Attributes.ApproachRate > 10.33f)
@@ -172,18 +210,25 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             // It is important to also consider accuracy difficulty when doing that
             aimValue *= 0.98f + Math.Pow(Attributes.OverallDifficulty, 2) / 2500;
 
+            if (categoryRatings != null)
+            {
+                categoryRatings.Add("Aim", aimValue);
+                categoryRatings.Add("Aim Combo Stars", aimComboSR);
+                categoryRatings.Add("Aim Miss Count Stars", aimMissCountSR );
+
+            }
+
+
             return aimValue;
         }
 
-        private double computeSpeedValue()
+        private double computeSpeedValue(Dictionary<string, double> categoryRatings = null)
         {
-            double rawSpeed = interp(Attributes.SpeedStrains, scoreMaxCombo, beatmapMaxCombo);
+            double speedComboSR = interpComboSR(Attributes.SpeedComboSR, scoreMaxCombo, beatmapMaxCombo);
+            double speedMissCountSR = interpMissCountSR(Attributes.SpeedStrain, Attributes.SpeedMissCounts, countMiss);
+            double rawSpeed = 0.5*speedComboSR + 0.5*speedMissCountSR;
+
             double speedValue = Math.Pow(5.0f * Math.Max(1.0f, rawSpeed / 0.0675f) - 4.0f, 3.0f) / 100000.0f;
-
-
-
-            // Penalize misses exponentially. This mainly fixes tag4 maps and the likes until a per-hitobject solution is available
-            speedValue *= Math.Pow(0.97f, countMiss);
 
             double approachRateFactor = 1.0f;
             if (Attributes.ApproachRate > 10.33f)
@@ -199,10 +244,18 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             // It is important to also consider accuracy difficulty when doing that
             speedValue *= 0.96f + Math.Pow(Attributes.OverallDifficulty, 2) / 1600;
 
+            if (categoryRatings != null)
+            {
+                categoryRatings.Add("Speed", speedValue);
+                categoryRatings.Add("Speed Combo Stars", speedComboSR);
+                categoryRatings.Add("Speed Miss Count Stars", speedMissCountSR);
+            }
+
+
             return speedValue;
         }
 
-        private double computeAccuracyValue()
+        private double computeAccuracyValue(Dictionary<string, double> categoryRatings = null)
         {
             // This percentage only considers HitCircles of any value - in this part of the calculation we focus on hitting the timing hit window
             double betterAccuracyPercentage;
@@ -228,6 +281,12 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 accuracyValue *= 1.08f;
             if (mods.Any(m => m is OsuModFlashlight))
                 accuracyValue *= 1.02f;
+
+
+            if (categoryRatings != null)
+            {
+                categoryRatings.Add("Accuracy", accuracyValue);
+            }
 
             return accuracyValue;
         }

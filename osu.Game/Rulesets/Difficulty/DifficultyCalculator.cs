@@ -78,6 +78,11 @@ namespace osu.Game.Rulesets.Difficulty
                 foreach (Skill s in skills)
                     s.Process(h);
             }
+
+            foreach (Skill s in skills)
+            {
+                s.Calculate();
+            }
             
 
             return CreateDifficultyAttributes(beatmap, mods, skills, clockRate);

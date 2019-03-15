@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using MathNet.Numerics.Distributions;
 using osu.Game.Rulesets.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Difficulty.Utils;
 
@@ -26,11 +27,11 @@ namespace osu.Game.Rulesets.Difficulty.Skills
         private const double difficulty_multiplier = 0.0675;
 
         // repeating a section adds this much difficulty
-        private const double star_bonus_per_length_double = 0.066;
+        private const double star_bonus_per_length_double = 0.063;
         private readonly double star_bonus_k = Math.Log(2) / star_bonus_per_length_double;
 
         // Constant difficulty sections of this length match previous star rating
-        private const double star_bonus_base_time = (8.0 * 1000.0);
+        private const double star_bonus_base_time = (7.0 * 1000.0);
 
         // Final star rating is player skill level who can FC the map once per target_fc_time
         private const double target_fc_time = 4 * 60 * 60 * 1000;
@@ -41,6 +42,9 @@ namespace osu.Game.Rulesets.Difficulty.Skills
 
         // maps with this expected length will match previous star rating
         private const double target_fc_base_time = 30 * 1000;
+
+        private double target_fc_difficulty_adjustment => -skillLevel(target_fc_base_time / target_fc_time, 0);
+
 
 
         /// <summary>
@@ -73,6 +77,12 @@ namespace osu.Game.Rulesets.Difficulty.Skills
         private readonly List<double> expDifficulties = new List<double>(); // list of exp(k*difficulty) for each note
         private readonly List<double> timestamps = new List<double>();  // list of timestamps for each note
 
+        private IList<double> missCountBySR, comboSR;
+        private double fcProb=0;
+
+        public const double MissSRIncrement = 0.1;
+        public IList<double> MissCounts { get => missCountBySR; }
+        public IList<double> ComboSR { get => comboSR; }
 
         /// <summary>
         /// Process a <see cref="DifficultyHitObject"/> and update current strain values.
@@ -122,9 +132,9 @@ namespace osu.Game.Rulesets.Difficulty.Skills
         }
 
         /// <summary>
-        /// Returns a list of difficulty values for passing the easiest fraction i/difficulty_sections of the map for i=1 to difficulty_sections.
+        /// Perform difficulty calculations
         /// </summary>
-        public IList<double> DifficultyValues()
+        public void Calculate()
         {
 
             // difficulty to FC the remainder of the map from every position, used later to calculate expected map length. 
@@ -140,24 +150,25 @@ namespace osu.Game.Rulesets.Difficulty.Skills
                 difficultyPartialSums[i] = total;
             }
 
-            var skillToFcSubset = getSkillToFcSubsets(difficultyPartialSums);
+            calculateSkillToFcSubsets(difficultyPartialSums);
 
-            for (int i=0; i<skillToFcSubset.Count; i++)
+            for (int i=0; i< comboSR.Count; i++)
             {
-                skillToFcSubset[i] = difficultyToStars(skillToFcSubset[i]);
+                comboSR[i] = difficultyToStars(comboSR[i]);
             }
 
-            return skillToFcSubset;
+            calculateMissSR();
 
         }
 
         /// <summary>
-        /// Returns the calculated difficulty value representing all processed <see cref="DifficultyHitObject"/>s.
+        /// Returns the calculated difficulty to FC, representing all processed <see cref="DifficultyHitObject"/>s.
         /// </summary>
-        public double DifficultyValue() // TODO remove and fix other modes
+        public double DifficultyValue()
         {
-            return DifficultyValues().Last();
+            return comboSR.Last();
         }
+
 
         /// <summary>
         /// Calculates the strain value of a <see cref="DifficultyHitObject"/>. This value is affected by previously processed objects.
@@ -167,16 +178,16 @@ namespace osu.Game.Rulesets.Difficulty.Skills
         private double strainDecay(double ms) => Math.Pow(StrainDecayBase, ms / 1000);
 
         // get skill to fc easiest section with e.g. 5% combo, 10%, 15%, ... 100% combo
-        private IList<double> getSkillToFcSubsets(double[] difficultyPartialSums)
+        private void calculateSkillToFcSubsets(double[] difficultyPartialSums)
         {
-            var ret = new double[difficulty_count];
+            comboSR = new double[difficulty_count];
 
             for (int i=1; i<=difficulty_count; ++i)
             {
                 // getting lowest difficulty for a combo with this many hit objects
-                int count = difficultyPartialSums.Length * i / difficulty_count; 
+                int count = difficultyPartialSums.Length * i / difficulty_count;
 
-                ret[i-1] = double.PositiveInfinity;
+                comboSR[i-1] = double.PositiveInfinity;
 
                 for (int j=0;j<=difficulty_count-i; ++j)
                 {
@@ -186,19 +197,14 @@ namespace osu.Game.Rulesets.Difficulty.Skills
                     // difficulty for the rest of the map after the combo we're considering
                     double remainder = (start+count<difficultyPartialSums.Length) ? difficultyPartialSums[start+count] : 0;
 
-                    ret[i-1] = Math.Min(ret[i-1], getSkillToFcInTargetTime(difficultyPartialSums,start,count, remainder));
+                    comboSR[i-1] = Math.Min(comboSR[i-1], getSkillToFcInTargetTime(difficultyPartialSums,start,count, remainder));
                 }
             }
-
-            return ret;
         }
 
-        private double getSkillToFcInTargetTime(double[] difficultyPartialSums, int first, int count, double remainder=0)
+        private double getSkillToFcInTargetTime(double[] difficultyPartialSums, int first, int count, double remainder)
         {
             int last = first + count - 1;
-
-            // preserve star rating for averageLength = target_fc_base_time
-            double target_fc_star_adjustment = -skillLevel(target_fc_base_time / target_fc_time, 0);
 
             if (difficultyPartialSums[first] - remainder <= 1e-10)
             {
@@ -213,16 +219,21 @@ namespace osu.Game.Rulesets.Difficulty.Skills
 
             // initial guess of average play length 
             double averageLength = (timestamps[last]-timestamps[first]) * 0.3;
-            double fcProb = averageLength / target_fc_time;
+
+            // fcProb being a member variable is horrible. Want to use fcProb for whole map in miss SR calc
+            // the last time this function is called happens to be for the whole map
+            fcProb = averageLength / target_fc_time;
 
             // map is super long, these calculations might not even make sense, return skill level to pass with 50% probability
             if (fcProb > 0.9)
-                return skillLevel(0.5, difficulty) + target_fc_star_adjustment;
+            {
+                fcProb = 0.5;
+                return skillLevel(0.5, difficulty) + target_fc_difficulty_adjustment;
+            }
 
 
             double skill = skillLevel(fcProb, difficulty);
             double firstLength;
-
 
             int max_iterations = 5;
 
@@ -237,7 +248,10 @@ namespace osu.Game.Rulesets.Difficulty.Skills
 
                 // map too long
                 if (fcProb > 0.9)
-                    return skillLevel(0.5, difficulty) + target_fc_star_adjustment;
+                {
+                    fcProb = 0.5;
+                    return skillLevel(0.5, difficulty) + target_fc_difficulty_adjustment;
+                }
 
                 skill = skillLevel(fcProb, difficulty);
 
@@ -251,11 +265,11 @@ namespace osu.Game.Rulesets.Difficulty.Skills
             if (fcProb > 0.5)
             {
                 // map is very long, return skill level to pass with 50% probability
-                return skillLevel(0.5, difficulty) + target_fc_star_adjustment;
+                fcProb = 0.5;
+                return skillLevel(0.5, difficulty) + target_fc_difficulty_adjustment;
             }
 
-
-            return skill + target_fc_star_adjustment;
+            return skill + target_fc_difficulty_adjustment;
         }
 
         private double getExpectedTimePlayedBeforeFC(double skill, double[] difficultyPartialSums, int first, int count, double remainder = 0)
@@ -312,6 +326,99 @@ namespace osu.Game.Rulesets.Difficulty.Skills
         private double difficultyToStars(double val)
         {
             return Math.Exp(val);
+        }
+
+
+        private void calculateMissSR()
+        {
+            missCountBySR = new double[difficulty_count];
+
+            double stars = comboSR.Last();
+
+            for (int i = 0; i < difficulty_count; ++i)
+            {
+                double missStars = stars - (i+1) * MissSRIncrement;
+                double skill = starsToDifficulty(missStars)-target_fc_difficulty_adjustment;
+
+                double[] missProbs = getMissProbabilities(skill);
+
+                missCountBySR[i] = getMissCount(fcProb, missProbs);
+            }
+        }
+
+        private double[] getMissProbabilities(double skill)
+        {
+            // slider breaks should be a miss :(
+
+            var result = new double[expDifficulties.Count];
+
+            double expSkill = Math.Exp(-star_bonus_k * skill);
+
+            for (int i = 0; i < expDifficulties.Count; ++i)
+            {
+                result[i] = 1-passProbFromExp(expSkill, expDifficulties[i]);
+            }
+
+            return result;
+        }
+
+        // find first miss count achievable with at least probability p
+        private int getMissCount(double p, double[] missProbabilities)
+        {
+            var distribution = new PoissionBinomial(missProbabilities);
+
+            int missCount = 0;
+            while (missCount < 10000)
+            {
+                if (distribution.CDF(missCount) > p)
+                {
+                    return missCount;
+                }
+
+                ++missCount;
+            }
+            return 10000;
+        }
+
+        // note: NOT poisson OR binomial, it's its own thing
+        private class PoissionBinomial
+        {
+
+            // approximate poisson binomial CDF defined by miss probabilities
+            // see "Refined Normal Approximation (RNA)" from
+            // https://www.researchgate.net/publication/257017356_On_computing_the_distribution_function_for_the_Poisson_binomial_distribution
+            // In future maybe use an exact method for small map length
+
+
+            double mu, sigma, gamma, v;
+
+            public PoissionBinomial(IList<double> probabilities)
+            {
+                mu = probabilities.Sum();
+
+                sigma = 0;
+                gamma = 0;
+
+                foreach (double p in probabilities)
+                {
+                    sigma += p * (1 - p);
+                    gamma += p * (1 - p) * (1 - 2 * p);
+                }
+
+                sigma = Math.Sqrt(sigma);
+
+                v = gamma / (6 * Math.Pow(sigma, 3));
+            }
+
+            public double CDF(double count)
+            {
+                double k = (count + 0.5 - mu) / sigma;
+
+                double result = Normal.CDF(0, 1, k) + v * (1 - k * k) * Normal.PDF(0, 1, k);
+                if (result < 0) return 0;
+                if (result > 1) return 1;
+                return result;
+            }
         }
     }
 }
