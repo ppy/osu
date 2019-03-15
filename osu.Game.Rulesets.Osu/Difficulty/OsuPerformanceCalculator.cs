@@ -171,7 +171,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         {
             double aimComboSR = interpComboSR(Attributes.AimComboSR, scoreMaxCombo, beatmapMaxCombo);
             double aimMissCountSR = interpMissCountSR(Attributes.AimStrain, Attributes.AimMissCounts, countMiss);
-            double rawAim = 0.5*aimComboSR + 0.5*aimMissCountSR;
+            double rawAim = Math.Pow(aimComboSR,0.7) * Math.Pow(aimMissCountSR, 0.3);
 
             if (mods.Any(m => m is OsuModTouchDevice))
                 rawAim = Math.Pow(rawAim, 0.8);
@@ -180,6 +180,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             //System.Console.WriteLine($"aim: [ {String.Join(", ", getTransformedStrains(Attributes.AimComboSR))}]");
             //System.Console.WriteLine($"aim Misses: [ {String.Join(", ", Attributes.AimMissCounts)}]");
+
+            // discourage misses
+            aimValue *= Math.Pow(0.97, countMiss);
+
 
             double approachRateFactor = 1.0f;
             if (Attributes.ApproachRate > 10.33f)
@@ -226,9 +230,13 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         {
             double speedComboSR = interpComboSR(Attributes.SpeedComboSR, scoreMaxCombo, beatmapMaxCombo);
             double speedMissCountSR = interpMissCountSR(Attributes.SpeedStrain, Attributes.SpeedMissCounts, countMiss);
-            double rawSpeed = 0.5*speedComboSR + 0.5*speedMissCountSR;
+            double rawSpeed = Math.Pow(speedComboSR, 0.7) * Math.Pow(speedMissCountSR, 0.3);
+            //System.Console.WriteLine($"speed Misses: [ {String.Join(", ", Attributes.SpeedMissCounts)}]");
 
             double speedValue = Math.Pow(5.0f * Math.Max(1.0f, rawSpeed / 0.0675f) - 4.0f, 3.0f) / 100000.0f;
+
+            // discourage misses
+            speedValue *= Math.Pow(0.97, countMiss);
 
             double approachRateFactor = 1.0f;
             if (Attributes.ApproachRate > 10.33f)
