@@ -14,6 +14,7 @@ using osu.Game.Rulesets.Difficulty;
 using osu.Game.Rulesets.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Difficulty.Skills;
 using osu.Game.Rulesets.Mods;
+using osu.Game.Rulesets.Objects;
 
 namespace osu.Game.Rulesets.Catch.Difficulty
 {
@@ -35,9 +36,16 @@ namespace osu.Game.Rulesets.Catch.Difficulty
             halfCatchWidth *= 0.8f;
         }
 
-        protected override DifficultyAttributes CreateDifficultyAttributes(IBeatmap beatmap, Mod[] mods, Skill[] skills, double clockRate)
+        protected override DifficultyAttributes CreateDifficultyAttributes(IBeatmap beatmap, Mod[] mods, Skill[] skills, double clockRate, double upTo = double.PositiveInfinity)
         {
-            if (beatmap.HitObjects.Count == 0)
+            
+            IReadOnlyList<HitObject> hitObjects;
+            if (double.IsPositiveInfinity(upTo))
+                hitObjects = beatmap.HitObjects;
+            else
+                hitObjects = beatmap.HitObjects.Where(h => h.StartTime <= upTo).ToList();
+
+            if (hitObjects.Count == 0)
                 return new CatchDifficultyAttributes { Mods = mods };
 
             // this is the same as osu!, so there's potential to share the implementation... maybe
@@ -48,7 +56,7 @@ namespace osu.Game.Rulesets.Catch.Difficulty
                 StarRating = Math.Sqrt(skills[0].DifficultyValue()) * star_scaling_factor,
                 Mods = mods,
                 ApproachRate = preempt > 1200.0 ? -(preempt - 1800.0) / 120.0 : -(preempt - 1200.0) / 150.0 + 5.0,
-                MaxCombo = beatmap.HitObjects.Count(h => h is Fruit) + beatmap.HitObjects.OfType<JuiceStream>().SelectMany(j => j.NestedHitObjects).Count(h => !(h is TinyDroplet))
+                MaxCombo = hitObjects.Count(h => h is Fruit) + hitObjects.OfType<JuiceStream>().SelectMany(j => j.NestedHitObjects).Count(h => !(h is TinyDroplet))
             };
         }
 

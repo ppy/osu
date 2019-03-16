@@ -44,7 +44,7 @@ namespace osu.Game.Rulesets.Difficulty
 
             var clock = new StopwatchClock();
             mods.OfType<IApplicableToClock>().ForEach(m => m.ApplyToClock(clock));
-            
+
             return calculate(playableBeatmap, mods, clock.Rate);
         }
 
@@ -91,13 +91,15 @@ namespace osu.Game.Rulesets.Difficulty
                         s.StartNewSectionFrom(currentSectionEnd);
                     }
 
+                    yield return new TimedDifficultyAttributes(currentSectionEnd, CreateDifficultyAttributes(beatmap, mods, skills, clockRate, currentSectionEnd));
+
                     currentSectionEnd += sectionLength;
                 }
 
                 foreach (Skill s in skills)
                     s.Process(h);
 
-                yield return new TimedDifficultyAttributes(currentSectionEnd, CreateDifficultyAttributes(beatmap, mods, skills, clockRate));
+
             }
 
             // The peak strain will not be saved for the last section in the above loop
@@ -159,7 +161,8 @@ namespace osu.Game.Rulesets.Difficulty
         /// <param name="mods">The <see cref="Mod"/>s that difficulty was calculated with.</param>
         /// <param name="skills">The skills which processed the beatmap.</param>
         /// <param name="clockRate">The rate at which the gameplay clock is run at.</param>
-        protected abstract DifficultyAttributes CreateDifficultyAttributes(IBeatmap beatmap, Mod[] mods, Skill[] skills, double clockRate);
+        /// <param name="upTo">Time in ms to with beatmap should be processed</param>
+        protected abstract DifficultyAttributes CreateDifficultyAttributes(IBeatmap beatmap, Mod[] mods, Skill[] skills, double clockRate, double upTo = double.PositiveInfinity);
 
         /// <summary>
         /// Enumerates <see cref="DifficultyHitObject"/>s to be processed from <see cref="HitObject"/>s in the <see cref="IBeatmap"/>.
