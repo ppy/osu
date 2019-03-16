@@ -111,10 +111,14 @@ namespace osu.Game.Screens.Play
                     Retries = RestartCount,
                     OnRetry = restart,
                     OnQuit = performUserRequestedExit,
-                    Start = gameplayClockContainer.Start,
-                    Stop = gameplayClockContainer.Stop,
+                    RequestResume = completion =>
+                    {
+                        gameplayClockContainer.Start();
+                        completion();
+                    },
+                    RequestPause = gameplayClockContainer.Stop,
                     IsPaused = { BindTarget = gameplayClockContainer.IsPaused },
-                    CheckCanPause = () => AllowPause && ValidForResume && !HasFailed && !RulesetContainer.HasReplayLoaded.Value,
+                    CheckCanPause = () => CanPause,
                     Children = new[]
                     {
                         StoryboardContainer = CreateStoryboardContainer(),
@@ -337,6 +341,9 @@ namespace osu.Game.Screens.Play
             base.OnSuspending(next);
         }
 
+        public bool CanPause => AllowPause && ValidForResume && !HasFailed && !RulesetContainer.HasReplayLoaded.Value
+                                && (PausableGameplayContainer?.IsPaused.Value == false || PausableGameplayContainer?.IsResuming == true);
+
         public override bool OnExiting(IScreen next)
         {
             if (onCompletionEvent != null)
@@ -346,18 +353,16 @@ namespace osu.Game.Screens.Play
                 return true;
             }
 
-            if ((!AllowPause || HasFailed || !ValidForResume || PausableGameplayContainer?.IsPaused.Value != false || RulesetContainer?.HasReplayLoaded.Value != false) && (!PausableGameplayContainer?.IsResuming ?? true))
+            if (LoadedBeatmapSuccessfully && CanPause)
             {
-                gameplayClockContainer.ResetLocalAdjustments();
-
-                fadeOut();
-                return base.OnExiting(next);
+                PausableGameplayContainer?.Pause();
+                return true;
             }
 
-            if (LoadedBeatmapSuccessfully)
-                PausableGameplayContainer?.Pause();
+            gameplayClockContainer.ResetLocalAdjustments();
 
-            return true;
+            fadeOut();
+            return base.OnExiting(next);
         }
 
         private void fadeOut(bool instant = false)

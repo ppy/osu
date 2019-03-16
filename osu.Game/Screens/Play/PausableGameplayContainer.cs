@@ -41,8 +41,8 @@ namespace osu.Game.Screens.Play
         public Action OnRetry;
         public Action OnQuit;
 
-        public Action Stop;
-        public Action Start;
+        public Action RequestPause;
+        public Action<Action> RequestResume;
 
         /// <summary>
         /// Creates a new <see cref="PausableGameplayContainer"/>.
@@ -70,15 +70,12 @@ namespace osu.Game.Screens.Play
             };
         }
 
-        public void Pause(bool force = false) => Schedule(() => // Scheduled to ensure a stable position in execution order, no matter how it was called.
+        public void Pause() => Schedule(() => // Scheduled to ensure a stable position in execution order, no matter how it was called.
         {
-            if (!CanPause && !force) return;
-
-            if (IsPaused.Value) return;
+            if (!CanPause) return;
 
             // stop the seekable clock (stops the audio eventually)
-            Stop?.Invoke();
-            IsPaused.Value = true;
+            RequestPause?.Invoke();
 
             pauseOverlay.Show();
 
@@ -89,14 +86,13 @@ namespace osu.Game.Screens.Play
         {
             if (!IsPaused.Value) return;
 
-            IsResuming = false;
-            lastPauseActionTime = Time.Current;
-
-            IsPaused.Value = false;
-
-            Start?.Invoke();
-
             pauseOverlay.Hide();
+
+            RequestResume?.Invoke(() =>
+            {
+                IsResuming = false;
+                lastPauseActionTime = Time.Current;
+            });
         }
 
         private OsuGameBase game;
