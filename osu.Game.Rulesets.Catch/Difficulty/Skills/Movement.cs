@@ -59,9 +59,9 @@ namespace osu.Game.Rulesets.Catch.Difficulty.Skills
                     distanceAddition += direction_change_bonus / sqrtStrain * bonusFactor;
 
                     // Direction changes after jumps (antiflow) are harder
-                    double antiflowBonusFactor = Math.Min(Math.Sqrt(Math.Abs(distanceMoved)) / 10, 1);
+                    double antiflowBonusFactor = Math.Min(Math.Abs(distanceMoved) / 70, 1);
 
-                    distanceAddition += (antiflow_bonus / sqrtStrain) * (Math.Sqrt(Math.Abs(lastDistanceMoved)) / (lastStrainTime / 40 + 10.0)) * antiflowBonusFactor;
+                    distanceAddition += (antiflow_bonus / (catchCurrent.StrainTime / 40 + 10)) * (Math.Sqrt(Math.Abs(lastDistanceMoved)) / Math.Sqrt(lastStrainTime + 20)) * antiflowBonusFactor;
                 }
 
                 // Base bonus for every movement, giving some weight to streams.
