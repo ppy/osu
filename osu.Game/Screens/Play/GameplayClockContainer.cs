@@ -118,11 +118,16 @@ namespace osu.Game.Screens.Play
             // This accounts for the audio clock source potentially taking time to enter a completely stopped state
             adjustableClock.Seek(adjustableClock.CurrentTime);
             adjustableClock.Start();
+            IsPaused.Value = false;
         }
 
         public void Seek(double time) => adjustableClock.Seek(time);
 
-        public void Stop() => adjustableClock.Stop();
+        public void Stop()
+        {
+            adjustableClock.Stop();
+            IsPaused.Value = true;
+        }
 
         public void ResetLocalAdjustments()
         {
