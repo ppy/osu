@@ -2,6 +2,8 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Game.Beatmaps.Formats;
+using System;
+using System.Globalization;
 
 namespace osu.Game.Skinning
 {
@@ -34,7 +36,7 @@ namespace osu.Game.Skinning
                             skin.CursorExpand = pair.Value != "0";
                             break;
                         case @"SliderBorderSize":
-                            if (int.TryParse(pair.Value, out int size))
+                            if (Single.TryParse(pair.Value, NumberStyles.Number, CultureInfo.CreateSpecificCulture("en-US"), out float size))
                                 skin.SliderBorderSize = size;
                             break;
                     }

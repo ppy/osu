@@ -67,7 +67,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
         /// <summary>
         /// Used to size the path border.
         /// </summary>
-        public int BorderSize {
+        public float BorderSize
+        {
             get => path.BorderSize;
             set {
                 if (path.BorderSize == value)
@@ -107,6 +108,9 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
 
         private class SliderPath : SmoothPath
         {
+            private const float border_max_size = 10f;
+            private const float border_min_size = 0f; // = no border
+
             private const float border_portion = 0.128f;
             private const float gradient_portion = 1 - border_portion;
 
@@ -145,12 +149,16 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
                 }
             }
 
-            private int borderSize = 100;
+            private float borderSize = 1f;
 
-            public int BorderSize {
+            public float BorderSize
+            {
                 get => borderSize;
                 set {
                     if (borderSize == value)
+                        return;
+
+                    if (value < border_min_size || value > border_max_size)
                         return;
 
                     borderSize = value;
@@ -159,14 +167,14 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
                 }
             }
 
-            private float calucatedBorderPortion => BorderSize / 100f * border_portion;
+            private float calculatedBorderPortion => BorderSize * border_portion;
 
             protected override Color4 ColourAt(float position)
             {
-                if (position <= calucatedBorderPortion)
+                if (calculatedBorderPortion != 0f && position <= calculatedBorderPortion)
                     return BorderColour;
 
-                position -= calucatedBorderPortion;
+                position -= calculatedBorderPortion;
                 return new Color4(AccentColour.R, AccentColour.G, AccentColour.B, (opacity_at_edge - (opacity_at_edge - opacity_at_centre) * position / gradient_portion) * AccentColour.A);
             }
         }
