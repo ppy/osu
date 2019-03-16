@@ -81,6 +81,10 @@ namespace osu.Game.Rulesets.Difficulty
             // The first object doesn't generate a strain, so we begin with an incremented section end
             double currentSectionEnd = Math.Ceiling(beatmap.HitObjects.First().StartTime / sectionLength) * sectionLength;
 
+            //Generate strain for start section of beatmap
+            double startSectionEnd = currentSectionEnd - sectionLength;
+            yield return new TimedDifficultyAttributes(startSectionEnd, CreateDifficultyAttributes(beatmap, mods, skills, clockRate, startSectionEnd));
+
             foreach (DifficultyHitObject h in difficultyHitObjects)
             {
                 while (h.BaseObject.StartTime > currentSectionEnd)
