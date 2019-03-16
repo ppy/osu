@@ -35,14 +35,16 @@ namespace osu.Game.Rulesets.Difficulty
         /// </summary>
         /// <param name="mods">The mods that should be applied to the beatmap.</param>
         /// <returns>A structure describing the difficulty of the beatmap.</returns>
-        public DifficultyAttributes Calculate(params Mod[] mods)
+        public DifficultyAttributes Calculate(params Mod[] mods) => CalculateTimed(mods).Last().Attributes;
+
+        public IEnumerable<TimedDifficultyAttributes> CalculateTimed(params Mod[] mods)
         {
             beatmap.Mods.Value = mods;
             IBeatmap playableBeatmap = beatmap.GetPlayableBeatmap(ruleset.RulesetInfo);
 
             var clock = new StopwatchClock();
             mods.OfType<IApplicableToClock>().ForEach(m => m.ApplyToClock(clock));
-
+            
             return calculate(playableBeatmap, mods, clock.Rate);
         }
 
@@ -61,12 +63,16 @@ namespace osu.Game.Rulesets.Difficulty
             }
         }
 
-        private DifficultyAttributes calculate(IBeatmap beatmap, Mod[] mods, double clockRate)
+        private IEnumerable<TimedDifficultyAttributes> calculate(IBeatmap beatmap, Mod[] mods, double clockRate)
         {
             var skills = CreateSkills(beatmap);
 
             if (!beatmap.HitObjects.Any())
-                return CreateDifficultyAttributes(beatmap, mods, skills, clockRate);
+            {
+                yield return new TimedDifficultyAttributes(0, CreateDifficultyAttributes(beatmap, mods, skills, clockRate));
+
+                yield break;
+            }
 
             var difficultyHitObjects = CreateDifficultyHitObjects(beatmap, clockRate).OrderBy(h => h.BaseObject.StartTime).ToList();
 
@@ -90,13 +96,15 @@ namespace osu.Game.Rulesets.Difficulty
 
                 foreach (Skill s in skills)
                     s.Process(h);
+
+                yield return new TimedDifficultyAttributes(currentSectionEnd, CreateDifficultyAttributes(beatmap, mods, skills, clockRate));
             }
 
             // The peak strain will not be saved for the last section in the above loop
             foreach (Skill s in skills)
                 s.SaveCurrentPeak();
 
-            return CreateDifficultyAttributes(beatmap, mods, skills, clockRate);
+            yield return new TimedDifficultyAttributes(currentSectionEnd, CreateDifficultyAttributes(beatmap, mods, skills, clockRate));
         }
 
         /// <summary>
