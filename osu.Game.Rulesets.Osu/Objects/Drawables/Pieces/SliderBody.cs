@@ -108,8 +108,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
 
         private class SliderPath : SmoothPath
         {
-            private const float border_max_size = 10f;
-            private const float border_min_size = 0f; // = no border
+            private const float border_max_size = 8f;
+            private const float border_min_size = 0f;
 
             private const float border_portion = 0.128f;
             private const float gradient_portion = 1 - border_portion;
