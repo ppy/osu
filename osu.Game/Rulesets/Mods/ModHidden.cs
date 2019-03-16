@@ -10,7 +10,7 @@ using osu.Framework.Bindables;
 
 namespace osu.Game.Rulesets.Mods
 {
-    public abstract class ModHidden : Mod, IReadFromConfig, IApplicableToDrawableHitObjects
+    public abstract class ModHidden : Mod, IReadFromOsuConfig, IApplicableToDrawableHitObjects
     {
         public override string Name => "Hidden";
         public override string Acronym => "HD";
@@ -20,7 +20,7 @@ namespace osu.Game.Rulesets.Mods
 
         protected Bindable<bool> IncreaseFirstObjectVisibility = new Bindable<bool>();
 
-        public void ReadFromConfig(OsuConfigManager config)
+        public void ReadFromOsuConfig(OsuConfigManager config)
         {
             IncreaseFirstObjectVisibility = config.GetBindable<bool>(OsuSetting.IncreaseFirstObjectVisibility);
         }

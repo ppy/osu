@@ -25,6 +25,7 @@ using osu.Game.Replays;
 using osu.Game.Rulesets.Configuration;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring;
+using osu.Framework.Configuration;
 
 namespace osu.Game.Rulesets.UI
 {
@@ -249,7 +250,7 @@ namespace osu.Game.Rulesets.UI
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuConfigManager config)
+        private void load(OsuConfigManager osuConfig, FrameworkConfigManager config)
         {
             KeyBindingInputManager.AddRange(new Drawable[]
             {
@@ -267,7 +268,7 @@ namespace osu.Game.Rulesets.UI
             };
 
             // Apply mods
-            applyRulesetMods(Mods, config);
+            applyRulesetMods(Mods, config, osuConfig);
 
             loadObjects();
         }
@@ -289,7 +290,7 @@ namespace osu.Game.Rulesets.UI
         /// Applies the active mods to this RulesetContainer.
         /// </summary>
         /// <param name="mods"></param>
-        private void applyRulesetMods(IEnumerable<Mod> mods, OsuConfigManager config)
+        private void applyRulesetMods(IEnumerable<Mod> mods, FrameworkConfigManager config, OsuConfigManager osuConfig)
         {
             if (mods == null)
                 return;
@@ -299,6 +300,9 @@ namespace osu.Game.Rulesets.UI
 
             foreach (var mod in mods.OfType<IReadFromConfig>())
                 mod.ReadFromConfig(config);
+
+            foreach (var mod in mods.OfType<IReadFromOsuConfig>())
+                mod.ReadFromOsuConfig(osuConfig);
         }
 
         public override void SetReplayScore(Score replayScore)

@@ -102,6 +102,7 @@ namespace osu.Game.Rulesets.Osu
                         new OsuModNoFail(),
                         new MultiMod(new OsuModHalfTime(), new OsuModDaycore()),
                         new OsuModSpunOut(),
+                        new OsuModTablet(),
                     };
                 case ModType.DifficultyIncrease:
                     return new Mod[]

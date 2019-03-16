@@ -9,8 +9,8 @@ namespace osu.Game.Rulesets.Mods
     /// <summary>
     /// An interface for mods that require reading access to the osu! configuration.
     /// </summary>
-    public interface IReadFromConfig
+    public interface IReadFromOsuConfig
     {
-        void ReadFromConfig(FrameworkConfigManager config);
+        void ReadFromOsuConfig(OsuConfigManager config);
     }
 }
