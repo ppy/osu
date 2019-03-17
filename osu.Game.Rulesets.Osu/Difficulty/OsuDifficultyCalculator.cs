@@ -36,7 +36,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             if (hitObjects.Count == 0)
                 return new OsuDifficultyAttributes { Mods = mods };
-            
+
             double aimRating = Math.Sqrt(skills[0].DifficultyValue()) * difficulty_multiplier;
             double speedRating = Math.Sqrt(skills[1].DifficultyValue()) * difficulty_multiplier;
             double starRating = aimRating + speedRating + Math.Abs(aimRating - speedRating) / 2;
