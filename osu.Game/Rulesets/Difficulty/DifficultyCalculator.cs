@@ -102,8 +102,6 @@ namespace osu.Game.Rulesets.Difficulty
 
                 foreach (Skill s in skills)
                     s.Process(h);
-
-
             }
 
             // The peak strain will not be saved for the last section in the above loop
