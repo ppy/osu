@@ -82,7 +82,7 @@ namespace osu.Game.Screens.Play
 
         public bool LoadedBeatmapSuccessfully => RulesetContainer?.Objects.Any() == true;
 
-        private GameplayClockContainer gameplayClockContainer;
+        protected GameplayClockContainer GameplayClockContainer { get; private set; }
 
         [BackgroundDependencyLoader]
         private void load(AudioManager audio, IAPIProvider api, OsuConfigManager config)
@@ -102,9 +102,9 @@ namespace osu.Game.Screens.Play
             if (!ScoreProcessor.Mode.Disabled)
                 config.BindWith(OsuSetting.ScoreDisplayMode, ScoreProcessor.Mode);
 
-            InternalChild = gameplayClockContainer = new GameplayClockContainer(working, AllowLeadIn, RulesetContainer.GameplayStartTime);
+            InternalChild = GameplayClockContainer = new GameplayClockContainer(working, AllowLeadIn, RulesetContainer.GameplayStartTime);
 
-            gameplayClockContainer.Children = new Drawable[]
+            GameplayClockContainer.Children = new Drawable[]
             {
                 PausableGameplayContainer = new PausableGameplayContainer
                 {
@@ -113,11 +113,11 @@ namespace osu.Game.Screens.Play
                     OnQuit = performUserRequestedExit,
                     RequestResume = completion =>
                     {
-                        gameplayClockContainer.Start();
+                        GameplayClockContainer.Start();
                         completion();
                     },
-                    RequestPause = gameplayClockContainer.Stop,
-                    IsPaused = { BindTarget = gameplayClockContainer.IsPaused },
+                    RequestPause = GameplayClockContainer.Stop,
+                    IsPaused = { BindTarget = GameplayClockContainer.IsPaused },
                     CheckCanPause = () => CanPause,
                     Children = new[]
                     {
@@ -141,15 +141,15 @@ namespace osu.Game.Screens.Play
                         HUDOverlay = new HUDOverlay(ScoreProcessor, RulesetContainer, working)
                         {
                             HoldToQuit = { Action = performUserRequestedExit },
-                            PlayerSettingsOverlay = { PlaybackSettings = { UserPlaybackRate = { BindTarget = gameplayClockContainer.UserPlaybackRate } } },
+                            PlayerSettingsOverlay = { PlaybackSettings = { UserPlaybackRate = { BindTarget = GameplayClockContainer.UserPlaybackRate } } },
                             KeyCounter = { Visible = { BindTarget = RulesetContainer.HasReplayLoaded } },
-                            RequestSeek = gameplayClockContainer.Seek,
+                            RequestSeek = GameplayClockContainer.Seek,
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre
                         },
                         new SkipOverlay(RulesetContainer.GameplayStartTime)
                         {
-                            RequestSeek = gameplayClockContainer.Seek
+                            RequestSeek = GameplayClockContainer.Seek
                         },
                     }
                 },
@@ -171,7 +171,7 @@ namespace osu.Game.Screens.Play
             };
 
             // bind clock into components that require it
-            RulesetContainer.IsPaused.BindTo(gameplayClockContainer.IsPaused);
+            RulesetContainer.IsPaused.BindTo(GameplayClockContainer.IsPaused);
 
             if (ShowStoryboard.Value)
                 initializeStoryboard(false);
@@ -295,7 +295,7 @@ namespace osu.Game.Screens.Play
             if (Beatmap.Value.Mods.Value.OfType<IApplicableFailOverride>().Any(m => !m.AllowFail))
                 return false;
 
-            gameplayClockContainer.Stop();
+            GameplayClockContainer.Stop();
 
             HasFailed = true;
             failOverlay.Retries = RestartCount;
@@ -329,7 +329,7 @@ namespace osu.Game.Screens.Play
 
             storyboardReplacesBackground.Value = Beatmap.Value.Storyboard.ReplacesBackground && Beatmap.Value.Storyboard.HasDrawable;
 
-            gameplayClockContainer.Restart();
+            GameplayClockContainer.Restart();
 
             PausableGameplayContainer.Alpha = 0;
             PausableGameplayContainer.FadeIn(750, Easing.OutQuint);
@@ -359,7 +359,7 @@ namespace osu.Game.Screens.Play
                 return true;
             }
 
-            gameplayClockContainer.ResetLocalAdjustments();
+            GameplayClockContainer.ResetLocalAdjustments();
 
             fadeOut();
             return base.OnExiting(next);
