@@ -13,11 +13,9 @@
     <AssemblyName>osu.Android</AssemblyName>
     <AndroidManifest>Properties\AndroidManifest.xml</AndroidManifest>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|AnyCPU'">
-    <Optimize>true</Optimize>
-  </PropertyGroup>
   <ItemGroup>
     <Compile Include="OsuGameActivity.cs" />
+    <Compile Include="OsuGameAndroid.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Properties\AndroidManifest.xml" />
