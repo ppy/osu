@@ -149,7 +149,7 @@ namespace osu.Game.Tests.NonVisual
 
             protected override Mod[] DifficultyAdjustmentMods { get; }
 
-            protected override DifficultyAttributes CreateDifficultyAttributes(IBeatmap beatmap, Mod[] mods, Skill[] skills, double clockRate)
+            protected override DifficultyAttributes CreateDifficultyAttributes(IBeatmap beatmap, Mod[] mods, Skill[] skills, double clockRate, double upTo = double.PositiveInfinity)
             {
                 throw new NotImplementedException();
             }
