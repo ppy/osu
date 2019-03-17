@@ -6,15 +6,13 @@ using Android.Content.PM;
 using Android.OS;
 using Android.Views;
 using osu.Framework.Android;
-using osu.Game;
 
 namespace osu.Android
 {
     [Activity(Theme = "@android:style/Theme.NoTitleBar", MainLauncher = true, ScreenOrientation = ScreenOrientation.SensorLandscape, SupportsPictureInPicture = false, ConfigurationChanges = ConfigChanges.Orientation | ConfigChanges.ScreenSize, HardwareAccelerated = true)]
     public class OsuGameActivity : AndroidGameActivity
     {
-        protected override Framework.Game CreateGame()
-            => new OsuGame();
+        protected override Framework.Game CreateGame() => new OsuGameAndroid();
 
         protected override void OnCreate(Bundle savedInstanceState)
         {
