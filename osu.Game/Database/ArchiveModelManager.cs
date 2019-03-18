@@ -300,20 +300,30 @@ namespace osu.Game.Database
                     {
                         if (!write.IsTransactionLeader) throw new InvalidOperationException($"Ensure there is no parent transaction so errors can correctly be handled by {this}");
 
-                        var existing = CheckForExisting(item);
-
-                        if (existing != null)
-                        {
-                            Undelete(existing);
-                            Logger.Log($"Found existing {typeof(TModel)} for {item} (ID {existing.ID}). Skipping import.", LoggingTarget.Database);
-                            handleEvent(() => ItemAdded?.Invoke(existing, true));
-                            return existing;
-                        }
-
                         if (archive != null)
                             item.Files = createFileInfos(archive, Files);
 
                         Populate(item, archive);
+
+                        var existing = CheckForExisting(item);
+
+                        if (existing != null)
+                        {
+                            if (CanUndelete(existing, item))
+                            {
+                                Undelete(existing);
+                                Logger.Log($"Found existing {typeof(TModel)} for {item} (ID {existing.ID}). Skipping import.", LoggingTarget.Database);
+                                handleEvent(() => ItemAdded?.Invoke(existing, true));
+                                return existing;
+                            }
+                            else
+                            {
+                                Delete(existing);
+                                ModelStore.PurgeDeletable(s => s.ID == existing.ID);
+                            }
+                        }
+
+                        PreImport(item);
 
                         // import to store
                         ModelStore.Add(item);
@@ -543,11 +553,28 @@ namespace osu.Game.Database
         }
 
         /// <summary>
+        /// Perform any final actions before the import to database executes.
+        /// </summary>
+        /// <param name="model">The model prepared for import.</param>
+        protected virtual void PreImport(TModel model)
+        {
+        }
+
+        /// <summary>
         /// Check whether an existing model already exists for a new import item.
         /// </summary>
-        /// <param name="model">The new model proposed for import. Note that <see cref="Populate"/> has not yet been run on this model.</param>
+        /// <param name="model">The new model proposed for import.
         /// <returns>An existing model which matches the criteria to skip importing, else null.</returns>
-        protected virtual TModel CheckForExisting(TModel model) => model.Hash == null ? null : ModelStore.ConsumableItems.FirstOrDefault(b => b.Hash == model.Hash);
+        protected TModel CheckForExisting(TModel model) => model.Hash == null ? null : ModelStore.ConsumableItems.FirstOrDefault(b => b.Hash == model.Hash);
+
+        /// <summary>
+        /// After an existing <see cref="TModel"/> is found during an import process, the default behaviour is to restore the existing
+        /// item and skip the import. This method allows changing that behaviour.
+        /// </summary>
+        /// <param name="existing">The existing model.</param>
+        /// <param name="import">The newly imported model.</param>
+        /// <returns>Whether the existing model should be restored and used. Returning false will delete the existing a force a re-import.</returns>
+        protected virtual bool CanUndelete(TModel existing, TModel import) => true;
 
         private DbSet<TModel> queryModel() => ContextFactory.Get().Set<TModel>();
 

@@ -54,7 +54,7 @@ namespace osu.Game.Screens.Multi
         private OsuGameBase game { get; set; }
 
         [Resolved]
-        private APIAccess api { get; set; }
+        private IAPIProvider api { get; set; }
 
         [Resolved(CanBeNull = true)]
         private OsuLogo logo { get; set; }
@@ -163,7 +163,7 @@ namespace osu.Game.Screens.Multi
             this.Push(new PlayerLoader(player));
         }
 
-        public void APIStateChanged(APIAccess api, APIState state)
+        public void APIStateChanged(IAPIProvider api, APIState state)
         {
             if (state != APIState.Online)
                 forcefullyExit();
