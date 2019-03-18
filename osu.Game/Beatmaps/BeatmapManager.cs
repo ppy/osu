@@ -64,7 +64,7 @@ namespace osu.Game.Beatmaps
 
         private readonly BeatmapStore beatmaps;
 
-        private readonly APIAccess api;
+        private readonly IAPIProvider api;
 
         private readonly AudioManager audioManager;
 
@@ -72,7 +72,7 @@ namespace osu.Game.Beatmaps
 
         private readonly List<DownloadBeatmapSetRequest> currentDownloads = new List<DownloadBeatmapSetRequest>();
 
-        public BeatmapManager(Storage storage, IDatabaseContextFactory contextFactory, RulesetStore rulesets, APIAccess api, AudioManager audioManager, GameHost host = null,
+        public BeatmapManager(Storage storage, IDatabaseContextFactory contextFactory, RulesetStore rulesets, IAPIProvider api, AudioManager audioManager, GameHost host = null,
                               WorkingBeatmap defaultBeatmap = null)
             : base(storage, contextFactory, new BeatmapStore(contextFactory), host)
         {
