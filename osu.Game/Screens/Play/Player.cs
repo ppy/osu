@@ -60,7 +60,7 @@ namespace osu.Game.Screens.Play
 
         private RulesetInfo ruleset;
 
-        private APIAccess api;
+        private IAPIProvider api;
 
         private SampleChannel sampleRestart;
 
@@ -85,7 +85,7 @@ namespace osu.Game.Screens.Play
         private GameplayClockContainer gameplayClockContainer;
 
         [BackgroundDependencyLoader]
-        private void load(AudioManager audio, APIAccess api, OsuConfigManager config)
+        private void load(AudioManager audio, IAPIProvider api, OsuConfigManager config)
         {
             this.api = api;
 
