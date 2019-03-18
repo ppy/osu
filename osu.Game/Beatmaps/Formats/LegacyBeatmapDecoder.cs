@@ -2,10 +2,10 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Globalization;
 using System.IO;
 using System.Linq;
 using osu.Framework.IO.File;
+using osu.Framework.Logging;
 using osu.Game.Beatmaps.Timing;
 using osu.Game.Rulesets.Objects.Legacy;
 using osu.Game.Beatmaps.ControlPoints;
@@ -25,7 +25,7 @@ namespace osu.Game.Beatmaps.Formats
 
         public static void Register()
         {
-            AddDecoder<Beatmap>(@"osu file format v", m => new LegacyBeatmapDecoder(int.Parse(m.Split('v').Last())));
+            AddDecoder<Beatmap>(@"osu file format v", m => new LegacyBeatmapDecoder(Parsing.ParseInt(m.Split('v').Last())));
         }
 
         /// <summary>
@@ -104,25 +104,25 @@ namespace osu.Game.Beatmaps.Formats
                     metadata.AudioFile = FileSafety.PathStandardise(pair.Value);
                     break;
                 case @"AudioLeadIn":
-                    beatmap.BeatmapInfo.AudioLeadIn = int.Parse(pair.Value);
+                    beatmap.BeatmapInfo.AudioLeadIn = Parsing.ParseInt(pair.Value);
                     break;
                 case @"PreviewTime":
-                    metadata.PreviewTime = getOffsetTime(int.Parse(pair.Value));
+                    metadata.PreviewTime = getOffsetTime(Parsing.ParseInt(pair.Value));
                     break;
                 case @"Countdown":
-                    beatmap.BeatmapInfo.Countdown = int.Parse(pair.Value) == 1;
+                    beatmap.BeatmapInfo.Countdown = Parsing.ParseInt(pair.Value) == 1;
                     break;
                 case @"SampleSet":
                     defaultSampleBank = (LegacySampleBank)Enum.Parse(typeof(LegacySampleBank), pair.Value);
                     break;
                 case @"SampleVolume":
-                    defaultSampleVolume = int.Parse(pair.Value);
+                    defaultSampleVolume = Parsing.ParseInt(pair.Value);
                     break;
                 case @"StackLeniency":
-                    beatmap.BeatmapInfo.StackLeniency = float.Parse(pair.Value, NumberFormatInfo.InvariantInfo);
+                    beatmap.BeatmapInfo.StackLeniency = Parsing.ParseFloat(pair.Value);
                     break;
                 case @"Mode":
-                    beatmap.BeatmapInfo.RulesetID = int.Parse(pair.Value);
+                    beatmap.BeatmapInfo.RulesetID = Parsing.ParseInt(pair.Value);
 
                     switch (beatmap.BeatmapInfo.RulesetID)
                     {
@@ -142,13 +142,13 @@ namespace osu.Game.Beatmaps.Formats
 
                     break;
                 case @"LetterboxInBreaks":
-                    beatmap.BeatmapInfo.LetterboxInBreaks = int.Parse(pair.Value) == 1;
+                    beatmap.BeatmapInfo.LetterboxInBreaks = Parsing.ParseInt(pair.Value) == 1;
                     break;
                 case @"SpecialStyle":
-                    beatmap.BeatmapInfo.SpecialStyle = int.Parse(pair.Value) == 1;
+                    beatmap.BeatmapInfo.SpecialStyle = Parsing.ParseInt(pair.Value) == 1;
                     break;
                 case @"WidescreenStoryboard":
-                    beatmap.BeatmapInfo.WidescreenStoryboard = int.Parse(pair.Value) == 1;
+                    beatmap.BeatmapInfo.WidescreenStoryboard = Parsing.ParseInt(pair.Value) == 1;
                     break;
             }
         }
@@ -163,16 +163,16 @@ namespace osu.Game.Beatmaps.Formats
                     beatmap.BeatmapInfo.StoredBookmarks = pair.Value;
                     break;
                 case @"DistanceSpacing":
-                    beatmap.BeatmapInfo.DistanceSpacing = double.Parse(pair.Value, NumberFormatInfo.InvariantInfo);
+                    beatmap.BeatmapInfo.DistanceSpacing = Math.Max(0, Parsing.ParseDouble(pair.Value));
                     break;
                 case @"BeatDivisor":
-                    beatmap.BeatmapInfo.BeatDivisor = int.Parse(pair.Value);
+                    beatmap.BeatmapInfo.BeatDivisor = Parsing.ParseInt(pair.Value);
                     break;
                 case @"GridSize":
-                    beatmap.BeatmapInfo.GridSize = int.Parse(pair.Value);
+                    beatmap.BeatmapInfo.GridSize = Parsing.ParseInt(pair.Value);
                     break;
                 case @"TimelineZoom":
-                    beatmap.BeatmapInfo.TimelineZoom = double.Parse(pair.Value, NumberFormatInfo.InvariantInfo);
+                    beatmap.BeatmapInfo.TimelineZoom = Math.Max(0, Parsing.ParseDouble(pair.Value));
                     break;
             }
         }
@@ -209,10 +209,10 @@ namespace osu.Game.Beatmaps.Formats
                     beatmap.BeatmapInfo.Metadata.Tags = pair.Value;
                     break;
                 case @"BeatmapID":
-                    beatmap.BeatmapInfo.OnlineBeatmapID = int.Parse(pair.Value);
+                    beatmap.BeatmapInfo.OnlineBeatmapID = Parsing.ParseInt(pair.Value);
                     break;
                 case @"BeatmapSetID":
-                    beatmap.BeatmapInfo.BeatmapSet = new BeatmapSetInfo { OnlineBeatmapSetID = int.Parse(pair.Value) };
+                    beatmap.BeatmapInfo.BeatmapSet = new BeatmapSetInfo { OnlineBeatmapSetID = Parsing.ParseInt(pair.Value) };
                     break;
             }
         }
@@ -225,22 +225,22 @@ namespace osu.Game.Beatmaps.Formats
             switch (pair.Key)
             {
                 case @"HPDrainRate":
-                    difficulty.DrainRate = float.Parse(pair.Value, NumberFormatInfo.InvariantInfo);
+                    difficulty.DrainRate = Parsing.ParseFloat(pair.Value);
                     break;
                 case @"CircleSize":
-                    difficulty.CircleSize = float.Parse(pair.Value, NumberFormatInfo.InvariantInfo);
+                    difficulty.CircleSize = Parsing.ParseFloat(pair.Value);
                     break;
                 case @"OverallDifficulty":
-                    difficulty.OverallDifficulty = float.Parse(pair.Value, NumberFormatInfo.InvariantInfo);
+                    difficulty.OverallDifficulty = Parsing.ParseFloat(pair.Value);
                     break;
                 case @"ApproachRate":
-                    difficulty.ApproachRate = float.Parse(pair.Value, NumberFormatInfo.InvariantInfo);
+                    difficulty.ApproachRate = Parsing.ParseFloat(pair.Value);
                     break;
                 case @"SliderMultiplier":
-                    difficulty.SliderMultiplier = double.Parse(pair.Value, NumberFormatInfo.InvariantInfo);
+                    difficulty.SliderMultiplier = Parsing.ParseDouble(pair.Value);
                     break;
                 case @"SliderTickRate":
-                    difficulty.SliderTickRate = double.Parse(pair.Value, NumberFormatInfo.InvariantInfo);
+                    difficulty.SliderTickRate = Parsing.ParseDouble(pair.Value);
                     break;
             }
         }
@@ -260,10 +260,12 @@ namespace osu.Game.Beatmaps.Formats
                     beatmap.BeatmapInfo.Metadata.BackgroundFile = FileSafety.PathStandardise(filename);
                     break;
                 case EventType.Break:
+                    double start = getOffsetTime(Parsing.ParseDouble(split[1]));
+
                     var breakEvent = new BreakPeriod
                     {
-                        StartTime = getOffsetTime(double.Parse(split[1], NumberFormatInfo.InvariantInfo)),
-                        EndTime = getOffsetTime(double.Parse(split[2], NumberFormatInfo.InvariantInfo))
+                        StartTime = start,
+                        EndTime = Math.Max(start, getOffsetTime(Parsing.ParseDouble(split[2])))
                     };
 
                     if (!breakEvent.HasEffect)
@@ -280,25 +282,25 @@ namespace osu.Game.Beatmaps.Formats
             {
                 string[] split = line.Split(',');
 
-                double time = getOffsetTime(double.Parse(split[0].Trim(), NumberFormatInfo.InvariantInfo));
-                double beatLength = double.Parse(split[1].Trim(), NumberFormatInfo.InvariantInfo);
+                double time = getOffsetTime(Parsing.ParseDouble(split[0].Trim()));
+                double beatLength = Parsing.ParseDouble(split[1].Trim());
                 double speedMultiplier = beatLength < 0 ? 100.0 / -beatLength : 1;
 
                 TimeSignatures timeSignature = TimeSignatures.SimpleQuadruple;
                 if (split.Length >= 3)
-                    timeSignature = split[2][0] == '0' ? TimeSignatures.SimpleQuadruple : (TimeSignatures)int.Parse(split[2]);
+                    timeSignature = split[2][0] == '0' ? TimeSignatures.SimpleQuadruple : (TimeSignatures)Parsing.ParseInt(split[2]);
 
                 LegacySampleBank sampleSet = defaultSampleBank;
                 if (split.Length >= 4)
-                    sampleSet = (LegacySampleBank)int.Parse(split[3]);
+                    sampleSet = (LegacySampleBank)Parsing.ParseInt(split[3]);
 
                 int customSampleBank = 0;
                 if (split.Length >= 5)
-                    customSampleBank = int.Parse(split[4]);
+                    customSampleBank = Parsing.ParseInt(split[4]);
 
                 int sampleVolume = defaultSampleVolume;
                 if (split.Length >= 6)
-                    sampleVolume = int.Parse(split[5]);
+                    sampleVolume = Parsing.ParseInt(split[5]);
 
                 bool timingChange = true;
                 if (split.Length >= 7)
@@ -308,7 +310,7 @@ namespace osu.Game.Beatmaps.Formats
                 bool omitFirstBarSignature = false;
                 if (split.Length >= 8)
                 {
-                    EffectFlags effectFlags = (EffectFlags)int.Parse(split[7]);
+                    EffectFlags effectFlags = (EffectFlags)Parsing.ParseInt(split[7]);
                     kiaiMode = effectFlags.HasFlag(EffectFlags.Kiai);
                     omitFirstBarSignature = effectFlags.HasFlag(EffectFlags.OmitFirstBarLine);
                 }
@@ -348,8 +350,13 @@ namespace osu.Game.Beatmaps.Formats
                     CustomSampleBank = customSampleBank
                 });
             }
-            catch (FormatException e)
+            catch (FormatException)
             {
+                Logger.Log("A timing point could not be parsed correctly and will be ignored", LoggingTarget.Runtime, LogLevel.Important);
+            }
+            catch (OverflowException)
+            {
+                Logger.Log("A timing point could not be parsed correctly and will be ignored", LoggingTarget.Runtime, LogLevel.Important);
             }
         }
 
