@@ -1,4 +1,4 @@
-﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Linq;
@@ -36,12 +36,16 @@ namespace osu.Game.Tests.Visual
 
         protected virtual IBeatmap CreateBeatmap(Ruleset ruleset) => new TestBeatmap(ruleset.RulesetInfo);
 
+        protected virtual bool AllowFail => false;
+
         private void loadPlayer()
         {
             var beatmap = CreateBeatmap(ruleset);
 
             Beatmap.Value = new TestWorkingBeatmap(beatmap, Clock);
-            Beatmap.Value.Mods.Value = new[] { ruleset.GetAllMods().First(m => m is ModNoFail) };
+
+            if (!AllowFail)
+                Beatmap.Value.Mods.Value = new[] { ruleset.GetAllMods().First(m => m is ModNoFail) };
 
             LoadComponentAsync(Player = CreatePlayer(ruleset), p =>
             {
