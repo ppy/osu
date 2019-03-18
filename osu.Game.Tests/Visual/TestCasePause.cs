@@ -3,6 +3,7 @@
 
 using System;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Screens;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Scoring;
@@ -26,7 +27,6 @@ namespace osu.Game.Tests.Visual
             PausePlayer pausable() => (PausePlayer)player();
 
             base.AddCheckSteps(player);
-            //AddUntilStep(() => pausable().ScoreProcessor.TotalScore.Value > 0, "score above zero");
 
             AddStep("pause", () => pausable().Pause());
             AddAssert("clock stopped", () => !pausable().GameplayClockContainer.GameplayClock.IsRunning);
@@ -47,6 +47,17 @@ namespace osu.Game.Tests.Visual
 
             AddAssert("pause overlay hidden", () => !pausable().PauseOverlayVisible);
             AddAssert("fail overlay still shown", () => pausable().FailOverlayVisible);
+
+            AddStep("restart", () => pausable().Restart());
+
+            AddUntilStep(() =>
+            {
+                pausable().Pause();
+                return pausable().PauseOverlayVisible;
+            }, "keep trying to pause");
+
+            AddStep("exit", () => pausable().Exit());
+            AddUntilStep(() => !pausable().IsCurrentScreen(), "player exited");
         }
 
         private class PausePlayer : Player
