@@ -1,4 +1,4 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
@@ -56,8 +56,6 @@ namespace osu.Game.Screens.Play
         [Resolved]
         private ScoreManager scoreManager { get; set; }
 
-        protected PausableGameplayContainer PausableGameplayContainer { get; private set; }
-
         private RulesetInfo ruleset;
 
         private IAPIProvider api;
@@ -68,7 +66,6 @@ namespace osu.Game.Screens.Play
         protected RulesetContainer RulesetContainer { get; private set; }
 
         protected HUDOverlay HUDOverlay { get; private set; }
-        private FailOverlay failOverlay;
 
         #region Storyboard
 
@@ -127,57 +124,47 @@ namespace osu.Game.Screens.Play
 
             InternalChild = GameplayClockContainer = new GameplayClockContainer(working, AllowLeadIn, RulesetContainer.GameplayStartTime);
 
-            GameplayClockContainer.Children = new Drawable[]
+            GameplayClockContainer.Children = new[]
             {
-                PausableGameplayContainer = new PausableGameplayContainer
+                StoryboardContainer = CreateStoryboardContainer(),
+                new ScalingContainer(ScalingMode.Gameplay)
                 {
-                    Retries = RestartCount,
-                    OnRetry = restart,
-                    OnQuit = performUserRequestedExit,
-                    RequestResume = completion =>
+                    Child = new LocalSkinOverrideContainer(working.Skin)
                     {
-                        GameplayClockContainer.Start();
-                        completion();
-                    },
-                    RequestPause = GameplayClockContainer.Stop,
-                    IsPaused = { BindTarget = GameplayClockContainer.IsPaused },
-                    CheckCanPause = () => CanPause,
-                    Children = new[]
-                    {
-                        StoryboardContainer = CreateStoryboardContainer(),
-                        new ScalingContainer(ScalingMode.Gameplay)
-                        {
-                            Child = new LocalSkinOverrideContainer(working.Skin)
-                            {
-                                RelativeSizeAxes = Axes.Both,
-                                Child = RulesetContainer
-                            }
-                        },
-                        new BreakOverlay(working.Beatmap.BeatmapInfo.LetterboxInBreaks, ScoreProcessor)
-                        {
-                            Anchor = Anchor.Centre,
-                            Origin = Anchor.Centre,
-                            Breaks = working.Beatmap.Breaks
-                        },
-                        // display the cursor above some HUD elements.
-                        RulesetContainer.Cursor?.CreateProxy() ?? new Container(),
-                        HUDOverlay = new HUDOverlay(ScoreProcessor, RulesetContainer, working)
-                        {
-                            HoldToQuit = { Action = performUserRequestedExit },
-                            PlayerSettingsOverlay = { PlaybackSettings = { UserPlaybackRate = { BindTarget = GameplayClockContainer.UserPlaybackRate } } },
-                            KeyCounter = { Visible = { BindTarget = RulesetContainer.HasReplayLoaded } },
-                            RequestSeek = GameplayClockContainer.Seek,
-                            Anchor = Anchor.Centre,
-                            Origin = Anchor.Centre
-                        },
-                        new SkipOverlay(RulesetContainer.GameplayStartTime)
-                        {
-                            RequestSeek = GameplayClockContainer.Seek
-                        },
+                        RelativeSizeAxes = Axes.Both,
+                        Child = RulesetContainer
                     }
                 },
-                failOverlay = new FailOverlay
+                new BreakOverlay(working.Beatmap.BeatmapInfo.LetterboxInBreaks, ScoreProcessor)
                 {
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    Breaks = working.Beatmap.Breaks
+                },
+                // display the cursor above some HUD elements.
+                RulesetContainer.Cursor?.CreateProxy() ?? new Container(),
+                HUDOverlay = new HUDOverlay(ScoreProcessor, RulesetContainer, working)
+                {
+                    HoldToQuit = { Action = performUserRequestedExit },
+                    PlayerSettingsOverlay = { PlaybackSettings = { UserPlaybackRate = { BindTarget = GameplayClockContainer.UserPlaybackRate } } },
+                    KeyCounter = { Visible = { BindTarget = RulesetContainer.HasReplayLoaded } },
+                    RequestSeek = GameplayClockContainer.Seek,
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre
+                },
+                new SkipOverlay(RulesetContainer.GameplayStartTime)
+                {
+                    RequestSeek = GameplayClockContainer.Seek
+                },
+                FailOverlay = new FailOverlay
+                {
+                    OnRetry = restart,
+                    OnQuit = performUserRequestedExit,
+                },
+                PauseOverlay = new PauseOverlay
+                {
+                    OnResume = Resume,
+                    Retries = RestartCount,
                     OnRetry = restart,
                     OnQuit = performUserRequestedExit,
                 },
@@ -197,7 +184,7 @@ namespace osu.Game.Screens.Play
             RulesetContainer.IsPaused.BindTo(GameplayClockContainer.IsPaused);
 
             // load storyboard as part of player's load if we can
-                initializeStoryboard(false);
+            initializeStoryboard(false);
 
             // Bind ScoreProcessor to ourselves
             ScoreProcessor.AllJudged += onCompletion;
@@ -313,6 +300,14 @@ namespace osu.Game.Screens.Play
             return score;
         }
 
+        protected override bool OnScroll(ScrollEvent e) => mouseWheelDisabled.Value && !GameplayClockContainer.IsPaused.Value;
+
+        protected virtual Results CreateResults(ScoreInfo score) => new SoloResults(score);
+
+        #region Fail Logic
+
+        protected FailOverlay FailOverlay { get; private set; }
+
         private bool onFail()
         {
             if (Beatmap.Value.Mods.Value.OfType<IApplicableFailOverride>().Any(m => !m.AllowFail))
@@ -321,10 +316,86 @@ namespace osu.Game.Screens.Play
             GameplayClockContainer.Stop();
 
             HasFailed = true;
-            failOverlay.Retries = RestartCount;
-            failOverlay.Show();
+
+            // There is a chance that we could be in a paused state as the ruleset's internal clock (see FrameStabilityContainer)
+            // could process an extra frame after the GameplayClock is stopped.
+            // In such cases we want the fail state to precede a user triggered pause.
+            if (PauseOverlay.State == Visibility.Visible)
+                PauseOverlay.Hide();
+
+            FailOverlay.Retries = RestartCount;
+            FailOverlay.Show();
             return true;
         }
+
+        #endregion
+
+        #region Pause Logic
+
+        public bool IsResuming { get; private set; }
+
+        /// <summary>
+        /// The amount of gameplay time after which a second pause is allowed.
+        /// </summary>
+        private const double pause_cooldown = 1000;
+
+        protected PauseOverlay PauseOverlay { get; private set; }
+
+        private double? lastPauseActionTime;
+
+        private bool canPause =>
+            // must pass basic screen conditions (beatmap loaded, instance allows pause)
+            LoadedBeatmapSuccessfully && AllowPause && ValidForResume
+            // replays cannot be paused and exit immediately
+            && !RulesetContainer.HasReplayLoaded.Value
+            // cannot pause if we are already in a fail state
+            && !HasFailed
+            // cannot pause if already paused (and not in the process of resuming)
+            && (GameplayClockContainer.IsPaused.Value == false || IsResuming)
+            // cannot pause too soon after previous pause
+            && (!lastPauseActionTime.HasValue || GameplayClockContainer.GameplayClock.CurrentTime >= lastPauseActionTime + pause_cooldown);
+
+        private bool canResume =>
+            // cannot resume from a non-paused state
+            GameplayClockContainer.IsPaused.Value
+            // cannot resume if we are already in a fail state
+            && !HasFailed
+            // already resuming
+            && !IsResuming;
+
+        protected override void Update()
+        {
+            base.Update();
+
+            // eagerly pause when we lose window focus (if we are locally playing).
+            if (!Game.IsActive.Value)
+                Pause();
+        }
+
+        public void Pause()
+        {
+            if (!canPause) return;
+
+            GameplayClockContainer.Stop();
+            PauseOverlay.Show();
+            lastPauseActionTime = GameplayClockContainer.GameplayClock.CurrentTime;
+        }
+
+        public void Resume()
+        {
+            if (!canResume) return;
+
+            //todo: add resume request support to ruleset
+            IsResuming = true;
+
+            GameplayClockContainer.Start();
+            PauseOverlay.Hide();
+            IsResuming = false;
+        }
+
+        #endregion
+
+        #region Screen Logic
 
         public override void OnEntering(IScreen last)
         {
@@ -350,9 +421,7 @@ namespace osu.Game.Screens.Play
             storyboardReplacesBackground.Value = Beatmap.Value.Storyboard.ReplacesBackground && Beatmap.Value.Storyboard.HasDrawable;
 
             GameplayClockContainer.Restart();
-
-            PausableGameplayContainer.Alpha = 0;
-            PausableGameplayContainer.FadeIn(750, Easing.OutQuint);
+            GameplayClockContainer.FadeInFromZero(750, Easing.OutQuint);
         }
 
         public override void OnSuspending(IScreen next)
@@ -360,9 +429,6 @@ namespace osu.Game.Screens.Play
             fadeOut();
             base.OnSuspending(next);
         }
-
-        public bool CanPause => AllowPause && ValidForResume && !HasFailed && !RulesetContainer.HasReplayLoaded.Value
-                                && (PausableGameplayContainer?.IsPaused.Value == false || PausableGameplayContainer?.IsResuming == true);
 
         public override bool OnExiting(IScreen next)
         {
@@ -373,9 +439,9 @@ namespace osu.Game.Screens.Play
                 return true;
             }
 
-            if (LoadedBeatmapSuccessfully && CanPause)
+            if (LoadedBeatmapSuccessfully && canPause)
             {
-                PausableGameplayContainer?.Pause();
+                Pause();
                 return true;
             }
 
@@ -394,8 +460,6 @@ namespace osu.Game.Screens.Play
             storyboardReplacesBackground.Value = false;
         }
 
-        protected override bool OnScroll(ScrollEvent e) => mouseWheelDisabled.Value && !PausableGameplayContainer.IsPaused.Value;
-
-        protected virtual Results CreateResults(ScoreInfo score) => new SoloResults(score);
+        #endregion
     }
 }

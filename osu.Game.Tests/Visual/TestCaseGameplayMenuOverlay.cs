@@ -17,15 +17,15 @@ namespace osu.Game.Tests.Visual
     [Description("player pause/fail screens")]
     public class TestCaseGameplayMenuOverlay : ManualInputManagerTestCase
     {
-        public override IReadOnlyList<Type> RequiredTypes => new[] { typeof(FailOverlay), typeof(PausableGameplayContainer) };
+        public override IReadOnlyList<Type> RequiredTypes => new[] { typeof(FailOverlay), typeof(PauseOverlay) };
 
         private FailOverlay failOverlay;
-        private PausableGameplayContainer.PauseOverlay pauseOverlay;
+        private PauseOverlay pauseOverlay;
 
         [BackgroundDependencyLoader]
         private void load()
         {
-            Add(pauseOverlay = new PausableGameplayContainer.PauseOverlay
+            Add(pauseOverlay = new PauseOverlay
             {
                 OnResume = () => Logger.Log(@"Resume"),
                 OnRetry = () => Logger.Log(@"Retry"),
