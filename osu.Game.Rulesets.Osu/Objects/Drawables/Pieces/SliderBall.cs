@@ -132,6 +132,12 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
             base.ClearTransformsAfter(time, false, targetMember);
         }
 
+        public override void ApplyTransformsAt(double time, bool propagateChildren = false)
+        {
+            // For the same reasons as above w.r.t rewinding, we shouldn't propagate to children here either.
+            base.ApplyTransformsAt(time, false);
+        }
+
         private bool tracking;
 
         public bool Tracking
