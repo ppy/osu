@@ -246,7 +246,7 @@ namespace osu.Game.Screens.Multi.Lounge.Components
             }
 
             [Resolved]
-            private APIAccess api { get; set; }
+            private IAPIProvider api { get; set; }
 
             private GetRoomScoresRequest request;
 

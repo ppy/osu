@@ -109,7 +109,7 @@ namespace osu.Game.Overlays.MedalSplash
                 s.Font = s.Font.With(size: 16);
             });
 
-            medalContainer.OnLoadComplete = d =>
+            medalContainer.OnLoadComplete += d =>
             {
                 unlocked.Position = new Vector2(0f, medalContainer.DrawSize.Y / 2 + 10);
                 infoFlow.Position = new Vector2(0f, unlocked.Position.Y + 90);

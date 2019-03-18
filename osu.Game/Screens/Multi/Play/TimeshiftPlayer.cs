@@ -32,7 +32,7 @@ namespace osu.Game.Screens.Multi.Play
         private readonly PlaylistItem playlistItem;
 
         [Resolved]
-        private APIAccess api { get; set; }
+        private IAPIProvider api { get; set; }
 
         [Resolved]
         private IBindable<RulesetInfo> ruleset { get; set; }

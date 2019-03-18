@@ -335,9 +335,12 @@ namespace osu.Game.Overlays.Profile
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
                 FillMode = FillMode.Fill,
-                OnLoadComplete = d => d.FadeInFromZero(200),
                 Depth = float.MaxValue,
-            }, coverContainer.Add);
+            }, background =>
+            {
+                coverContainer.Add(background);
+                background.FadeInFromZero(200);
+            });
 
             if (user.IsSupporter)
                 SupporterTag.Show();

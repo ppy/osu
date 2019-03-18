@@ -45,7 +45,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
         }
 
         private GetScoresRequest getScoresRequest;
-        private APIAccess api;
+        private IAPIProvider api;
 
         public BeatmapInfo Beatmap
         {
@@ -129,7 +129,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
         }
 
         [BackgroundDependencyLoader]
-        private void load(APIAccess api)
+        private void load(IAPIProvider api)
         {
             this.api = api;
             updateDisplay();

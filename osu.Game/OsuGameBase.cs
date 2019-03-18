@@ -152,7 +152,6 @@ namespace osu.Game
 
             API = new APIAccess(LocalConfig);
 
-            dependencies.Cache(API);
             dependencies.CacheAs<IAPIProvider>(API);
 
             var defaultBeatmap = new DummyWorkingBeatmap(this);
