@@ -70,11 +70,7 @@ namespace osu.Game.Graphics.Containers
             dimLevel = config.GetBindable<double>(OsuSetting.DimLevel);
             blurLevel = config.GetBindable<double>(OsuSetting.BlurLevel);
             showStoryboard = config.GetBindable<bool>(OsuSetting.ShowStoryboard);
-            EnableVisualSettings.ValueChanged += _ =>
-            {
-                Logger.Log("Oh fuck");
-                UpdateVisuals();
-            };
+            EnableVisualSettings.ValueChanged += _ => UpdateVisuals();
             dimLevel.ValueChanged += _ => UpdateVisuals();
             blurLevel.ValueChanged += _ => UpdateVisuals();
             showStoryboard.ValueChanged += _ => UpdateVisuals();
@@ -105,8 +101,6 @@ namespace osu.Game.Graphics.Containers
                     // We can't blur the container like we did with the dim because buffered containers add considerable draw overhead.
                     // As a result, this blurs the background directly.
                     ((Background)c)?.BlurTo(BlurTarget, background_fade_duration, Easing.OutQuint);
-
-                    Logger.Log("Enable visual settings: " + EnableVisualSettings.Value + " Added blur is: " + AddedBlur.Value);
                 }
             }
 
