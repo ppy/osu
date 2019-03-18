@@ -1,4 +1,4 @@
-﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
@@ -70,8 +70,31 @@ namespace osu.Game.Screens.Play
         protected HUDOverlay HUDOverlay { get; private set; }
         private FailOverlay failOverlay;
 
+        #region Storyboard
+
         private DrawableStoryboard storyboard;
         protected UserDimContainer StoryboardContainer { get; private set; }
+
+        private void initializeStoryboard(bool asyncLoad)
+        {
+            if (StoryboardContainer == null || storyboard != null)
+                return;
+
+            if (!ShowStoryboard.Value)
+                return;
+
+            var beatmap = Beatmap.Value;
+
+            storyboard = beatmap.Storyboard.CreateDrawable();
+            storyboard.Masking = true;
+
+            if (asyncLoad)
+                LoadComponentAsync(storyboard, StoryboardContainer.Add);
+            else
+                StoryboardContainer.Add(storyboard);
+        }
+
+        #endregion
 
         protected virtual UserDimContainer CreateStoryboardContainer() => new UserDimContainer(true)
         {
@@ -173,7 +196,7 @@ namespace osu.Game.Screens.Play
             // bind clock into components that require it
             RulesetContainer.IsPaused.BindTo(GameplayClockContainer.IsPaused);
 
-            if (ShowStoryboard.Value)
+            // load storyboard as part of player's load if we can
                 initializeStoryboard(false);
 
             // Bind ScoreProcessor to ourselves
@@ -317,10 +340,7 @@ namespace osu.Game.Screens.Play
                 .Delay(250)
                 .FadeIn(250);
 
-            ShowStoryboard.ValueChanged += enabled =>
-            {
-                if (enabled.NewValue) initializeStoryboard(true);
-            };
+            ShowStoryboard.ValueChanged += _ => initializeStoryboard(true);
 
             Background.EnableUserDim.Value = true;
 
@@ -375,22 +395,6 @@ namespace osu.Game.Screens.Play
         }
 
         protected override bool OnScroll(ScrollEvent e) => mouseWheelDisabled.Value && !PausableGameplayContainer.IsPaused.Value;
-
-        private void initializeStoryboard(bool asyncLoad)
-        {
-            if (StoryboardContainer == null || storyboard != null)
-                return;
-
-            var beatmap = Beatmap.Value;
-
-            storyboard = beatmap.Storyboard.CreateDrawable();
-            storyboard.Masking = true;
-
-            if (asyncLoad)
-                LoadComponentAsync(storyboard, StoryboardContainer.Add);
-            else
-                StoryboardContainer.Add(storyboard);
-        }
 
         protected virtual Results CreateResults(ScoreInfo score) => new SoloResults(score);
     }
