@@ -56,7 +56,7 @@ namespace osu.Game.Storyboards.Drawables
             });
         }
 
-        [BackgroundDependencyLoader]
+        [BackgroundDependencyLoader(true)]
         private void load(FileStore fileStore, GameplayClock clock)
         {
             if (Clock != null)
