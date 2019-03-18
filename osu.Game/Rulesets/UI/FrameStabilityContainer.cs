@@ -23,8 +23,6 @@ namespace osu.Game.Rulesets.UI
             gameplayClock = new GameplayClock(framedClock = new FramedClock(manualClock = new ManualClock()));
         }
 
-        #region Clock control
-
         private readonly ManualClock manualClock;
 
         private readonly FramedClock framedClock;
@@ -150,12 +148,6 @@ namespace osu.Game.Rulesets.UI
             ProcessCustomClock = false;
         }
 
-        #endregion
-
-        #region IHasReplayHandler
-
         public ReplayInputHandler ReplayInputHandler { get; set; }
-
-        #endregion
     }
 }
