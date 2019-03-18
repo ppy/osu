@@ -59,7 +59,7 @@ namespace osu.Game.Storyboards.Drawables
         [BackgroundDependencyLoader(true)]
         private void load(FileStore fileStore, GameplayClock clock)
         {
-            if (Clock != null)
+            if (clock != null)
                 Clock = clock;
 
             dependencies.Cache(new TextureStore(new TextureLoaderStore(fileStore.Store), false, scaleAdjust: 1));
