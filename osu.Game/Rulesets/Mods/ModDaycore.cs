@@ -17,7 +17,7 @@ namespace osu.Game.Rulesets.Mods
         public override void ApplyToClock(IAdjustableClock clock)
         {
             if (clock is IHasPitchAdjust pitchAdjust)
-                pitchAdjust.PitchAdjust = 0.75;
+                pitchAdjust.PitchAdjust *= RateAdjust;
             else
                 base.ApplyToClock(clock);
         }
