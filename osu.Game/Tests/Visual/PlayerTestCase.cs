@@ -1,9 +1,10 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Linq;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Testing;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
@@ -29,7 +30,11 @@ namespace osu.Game.Tests.Visual
                 Colour = Color4.Black,
                 Depth = int.MaxValue
             });
+        }
 
+        [SetUpSteps]
+        public void SetUpSteps()
+        {
             AddStep(ruleset.RulesetInfo.Name, loadPlayer);
             AddUntilStep(() => Player.IsLoaded, "player loaded");
         }
