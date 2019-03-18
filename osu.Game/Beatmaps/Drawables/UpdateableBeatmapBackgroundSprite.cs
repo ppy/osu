@@ -51,7 +51,7 @@ namespace osu.Game.Beatmaps.Drawables
             drawable.Anchor = Anchor.Centre;
             drawable.Origin = Anchor.Centre;
             drawable.FillMode = FillMode.Fill;
-            drawable.OnLoadComplete = d => d.FadeInFromZero(400);
+            drawable.OnLoadComplete += d => d.FadeInFromZero(400);
 
             return drawable;
         }
