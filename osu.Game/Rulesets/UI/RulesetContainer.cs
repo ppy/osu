@@ -130,6 +130,13 @@ namespace osu.Game.Rulesets.UI
         /// <returns>The input manager.</returns>
         public abstract PassThroughInputManager CreateInputManager();
 
+        /// <summary>
+        /// Invoked when the interactive user requests resuming from a paused state.
+        /// Allows potentially delaying the resume process until an interaction is performed.
+        /// </summary>
+        /// <param name="continueResume">The action to run when resuming is to be completed.</param>
+        public void RequestResume(Action continueResume) => continueResume();
+
         protected virtual ReplayInputHandler CreateReplayInputHandler(Replay replay) => null;
 
         protected FrameStabilityContainer FrameStabilityContainer;

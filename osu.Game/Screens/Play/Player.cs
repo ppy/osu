@@ -352,8 +352,10 @@ namespace osu.Game.Screens.Play
             && !HasFailed
             // cannot pause if already paused (and not in the process of resuming)
             && (GameplayClockContainer.IsPaused.Value == false || IsResuming)
-            // cannot pause too soon after previous pause
-            && (!lastPauseActionTime.HasValue || GameplayClockContainer.GameplayClock.CurrentTime >= lastPauseActionTime + pause_cooldown);
+            && (!pauseCooldownActive || IsResuming);
+
+        private bool pauseCooldownActive =>
+            lastPauseActionTime.HasValue && GameplayClockContainer.GameplayClock.CurrentTime < lastPauseActionTime + pause_cooldown;
 
         private bool canResume =>
             // cannot resume from a non-paused state
@@ -376,6 +378,7 @@ namespace osu.Game.Screens.Play
         {
             if (!canPause) return;
 
+            IsResuming = false;
             GameplayClockContainer.Stop();
             PauseOverlay.Show();
             lastPauseActionTime = GameplayClockContainer.GameplayClock.CurrentTime;
@@ -385,12 +388,20 @@ namespace osu.Game.Screens.Play
         {
             if (!canResume) return;
 
-            //todo: add resume request support to ruleset
             IsResuming = true;
-
-            GameplayClockContainer.Start();
             PauseOverlay.Hide();
-            IsResuming = false;
+
+            // time-based conditions may allow instant resume.
+            if (GameplayClockContainer.GameplayClock.CurrentTime < Beatmap.Value.Beatmap.HitObjects.First().StartTime)
+                completeResume();
+            else
+                RulesetContainer.RequestResume(completeResume);
+
+            void completeResume()
+            {
+                GameplayClockContainer.Start();
+                IsResuming = false;
+            }
         }
 
         #endregion
@@ -444,6 +455,10 @@ namespace osu.Game.Screens.Play
                 Pause();
                 return true;
             }
+
+            if (pauseCooldownActive && !GameplayClockContainer.IsPaused.Value)
+                // still want to block if we are within the cooldown period and not already paused.
+                return true;
 
             GameplayClockContainer.ResetLocalAdjustments();
 
