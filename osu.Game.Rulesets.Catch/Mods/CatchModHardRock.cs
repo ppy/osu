@@ -71,7 +71,7 @@ namespace osu.Game.Rulesets.Catch.Mods
                 return;
             }
 
-            if (Math.Abs(diff) < timeDiff / 3d)
+            if (Math.Abs(diff * CatchPlayfield.BASE_WIDTH) < timeDiff / 3d)
             {
                 if (diff > 0)
                 {
