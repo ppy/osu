@@ -558,7 +558,6 @@ namespace osu.Game.Screens.Select
                 backgroundModeBeatmap.Beatmap = beatmap;
                 backgroundModeBeatmap.AddedBlur.Value = BACKGROUND_BLUR;
                 backgroundModeBeatmap.FadeColour(Color4.White, 250);
-                Logger.Log("blur updated!");
             }
 
             beatmapInfoWedge.Beatmap = beatmap;
