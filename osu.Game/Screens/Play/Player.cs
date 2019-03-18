@@ -158,14 +158,14 @@ namespace osu.Game.Screens.Play
                 },
                 FailOverlay = new FailOverlay
                 {
-                    OnRetry = restart,
+                    OnRetry = Restart,
                     OnQuit = performUserRequestedExit,
                 },
                 PauseOverlay = new PauseOverlay
                 {
                     OnResume = Resume,
                     Retries = RestartCount,
-                    OnRetry = restart,
+                    OnRetry = Restart,
                     OnQuit = performUserRequestedExit,
                 },
                 new HotkeyRetryOverlay
@@ -175,7 +175,7 @@ namespace osu.Game.Screens.Play
                         if (!this.IsCurrentScreen()) return;
 
                         fadeOut(true);
-                        restart();
+                        Restart();
                     },
                 }
             };
@@ -246,7 +246,7 @@ namespace osu.Game.Screens.Play
             this.Exit();
         }
 
-        private void restart()
+        public void Restart()
         {
             if (!this.IsCurrentScreen()) return;
 
