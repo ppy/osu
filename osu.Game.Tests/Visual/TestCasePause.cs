@@ -1,7 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
+using NUnit.Framework;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Screens;
 using osu.Game.Rulesets;
@@ -11,56 +11,69 @@ using osu.Game.Screens.Play;
 
 namespace osu.Game.Tests.Visual
 {
-    public class TestCasePause : TestCasePlayer
+    public class TestCasePause : PlayerTestCase
     {
+        protected new PausePlayer Player => (PausePlayer)base.Player;
+
         public TestCasePause()
             : base(new OsuRuleset())
         {
+        }
+
+        [Test]
+        public void TestPauseResume()
+        {
+            AddStep("pause", () => Player.Pause());
+            AddAssert("clock stopped", () => !Player.GameplayClockContainer.GameplayClock.IsRunning);
+            AddAssert("pause overlay shown", () => Player.PauseOverlayVisible);
+
+            AddStep("resume", () => Player.Resume());
+            AddAssert("pause overlay hidden", () => !Player.PauseOverlayVisible);
+        }
+
+        [Test]
+        public void TestPauseTooSoon()
+        {
+            AddStep("pause", () => Player.Pause());
+            AddAssert("clock stopped", () => !Player.GameplayClockContainer.GameplayClock.IsRunning);
+            AddStep("resume", () => Player.Resume());
+            AddAssert("clock started", () => Player.GameplayClockContainer.GameplayClock.IsRunning);
+            AddStep("pause too soon", () => Player.Pause());
+            AddAssert("clock not stopped", () => Player.GameplayClockContainer.GameplayClock.IsRunning);
+            AddAssert("pause overlay hidden", () => !Player.PauseOverlayVisible);
+        }
+
+        [Test]
+        public void TestPauseAfterFail()
+        {
+            AddUntilStep(() => Player.HasFailed, "wait for fail");
+
+            AddAssert("fail overlay shown", () => Player.FailOverlayVisible);
+
+            AddStep("try to pause", () => Player.Pause());
+
+            AddAssert("pause overlay hidden", () => !Player.PauseOverlayVisible);
+            AddAssert("fail overlay still shown", () => Player.FailOverlayVisible);
+        }
+
+        [Test]
+        public void TestExitFromPause()
+        {
+            AddUntilStep(() =>
+            {
+                Player.Pause();
+                return Player.PauseOverlayVisible;
+            }, "keep trying to pause");
+
+            AddStep("exit", () => Player.Exit());
+            AddUntilStep(() => !Player.IsCurrentScreen(), "player exited");
         }
 
         protected override bool AllowFail => true;
 
         protected override Player CreatePlayer(Ruleset ruleset) => new PausePlayer();
 
-        protected override void AddCheckSteps(Func<Player> player)
-        {
-            PausePlayer pausable() => (PausePlayer)player();
-
-            base.AddCheckSteps(player);
-
-            AddStep("pause", () => pausable().Pause());
-            AddAssert("clock stopped", () => !pausable().GameplayClockContainer.GameplayClock.IsRunning);
-            AddAssert("pause overlay shown", () => pausable().PauseOverlayVisible);
-
-            AddStep("resume", () => pausable().Resume());
-            AddAssert("pause overlay hidden", () => !pausable().PauseOverlayVisible);
-
-            AddStep("pause too soon", () => pausable().Pause());
-            AddAssert("clock not stopped", () => pausable().GameplayClockContainer.GameplayClock.IsRunning);
-            AddAssert("pause overlay hidden", () => !pausable().PauseOverlayVisible);
-
-            AddUntilStep(() => pausable().HasFailed, "wait for fail");
-
-            AddAssert("fail overlay shown", () => pausable().FailOverlayVisible);
-
-            AddStep("try to pause", () => pausable().Pause());
-
-            AddAssert("pause overlay hidden", () => !pausable().PauseOverlayVisible);
-            AddAssert("fail overlay still shown", () => pausable().FailOverlayVisible);
-
-            AddStep("restart", () => pausable().Restart());
-
-            AddUntilStep(() =>
-            {
-                pausable().Pause();
-                return pausable().PauseOverlayVisible;
-            }, "keep trying to pause");
-
-            AddStep("exit", () => pausable().Exit());
-            AddUntilStep(() => !pausable().IsCurrentScreen(), "player exited");
-        }
-
-        private class PausePlayer : Player
+        protected class PausePlayer : Player
         {
             public new GameplayClockContainer GameplayClockContainer => base.GameplayClockContainer;
 
