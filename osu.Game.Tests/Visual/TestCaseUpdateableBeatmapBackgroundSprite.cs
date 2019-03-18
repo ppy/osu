@@ -22,7 +22,7 @@ namespace osu.Game.Tests.Visual
         private BeatmapManager beatmaps { get; set; }
 
         [BackgroundDependencyLoader]
-        private void load(OsuGameBase osu, APIAccess api, RulesetStore rulesets)
+        private void load(OsuGameBase osu, IAPIProvider api, RulesetStore rulesets)
         {
             Bindable<BeatmapInfo> beatmapBindable = new Bindable<BeatmapInfo>();
 

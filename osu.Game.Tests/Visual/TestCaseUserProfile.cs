@@ -19,7 +19,7 @@ namespace osu.Game.Tests.Visual
     public class TestCaseUserProfile : OsuTestCase
     {
         private readonly TestUserProfileOverlay profile;
-        private APIAccess api;
+        private IAPIProvider api;
 
         public override IReadOnlyList<Type> RequiredTypes => new[]
         {
@@ -36,7 +36,7 @@ namespace osu.Game.Tests.Visual
         }
 
         [BackgroundDependencyLoader]
-        private void load(APIAccess api)
+        private void load(IAPIProvider api)
         {
             this.api = api;
         }
