@@ -28,7 +28,7 @@ namespace osu.Game.Tests.Visual
         }
 
         [Resolved]
-        private APIAccess api { get; set; }
+        private IAPIProvider api { get; set; }
 
         [BackgroundDependencyLoader]
         private void load()
