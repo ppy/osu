@@ -30,6 +30,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         private int countMeh;
         private int countMiss;
 
+        private const double miss_decay = 0.97;
+        private const double combo_weight = 0.6;
+
         public OsuPerformanceCalculator(Ruleset ruleset, WorkingBeatmap beatmap, ScoreInfo score)
             : base(ruleset, beatmap, score)
         {
@@ -171,7 +174,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         {
             double aimComboSR = interpComboSR(Attributes.AimComboSR, scoreMaxCombo, beatmapMaxCombo);
             double aimMissCountSR = interpMissCountSR(Attributes.AimStrain, Attributes.AimMissCounts, countMiss);
-            double rawAim = Math.Pow(aimComboSR,0.7) * Math.Pow(aimMissCountSR, 0.3);
+            double rawAim = Math.Pow(aimComboSR,combo_weight) * Math.Pow(aimMissCountSR, 1-combo_weight);
 
             if (mods.Any(m => m is OsuModTouchDevice))
                 rawAim = Math.Pow(rawAim, 0.8);
@@ -182,7 +185,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             //System.Console.WriteLine($"aim Misses: [ {String.Join(", ", Attributes.AimMissCounts)}]");
 
             // discourage misses
-            aimValue *= Math.Pow(0.97, countMiss);
+            aimValue *= Math.Pow(miss_decay, countMiss);
 
 
             double approachRateFactor = 1.0f;
@@ -230,13 +233,13 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         {
             double speedComboSR = interpComboSR(Attributes.SpeedComboSR, scoreMaxCombo, beatmapMaxCombo);
             double speedMissCountSR = interpMissCountSR(Attributes.SpeedStrain, Attributes.SpeedMissCounts, countMiss);
-            double rawSpeed = Math.Pow(speedComboSR, 0.7) * Math.Pow(speedMissCountSR, 0.3);
+            double rawSpeed = Math.Pow(speedComboSR, combo_weight) * Math.Pow(speedMissCountSR, 1-combo_weight);
             //System.Console.WriteLine($"speed Misses: [ {String.Join(", ", Attributes.SpeedMissCounts)}]");
 
             double speedValue = Math.Pow(5.0f * Math.Max(1.0f, rawSpeed / 0.0675f) - 4.0f, 3.0f) / 100000.0f;
 
             // discourage misses
-            speedValue *= Math.Pow(0.97, countMiss);
+            speedValue *= Math.Pow(miss_decay, countMiss);
 
             double approachRateFactor = 1.0f;
             if (Attributes.ApproachRate > 10.33f)

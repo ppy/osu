@@ -22,6 +22,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
         protected override double SkillMultiplier => 1400;
         protected override double StrainDecayBase => 0.3;
+        protected override double MaxStrainTime => 200;
 
         private const double min_speed_bonus = 75; // ~200BPM
         private const double max_speed_bonus = 45; // ~330BPM

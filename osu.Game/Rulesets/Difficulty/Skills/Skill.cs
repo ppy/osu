@@ -21,17 +21,18 @@ namespace osu.Game.Rulesets.Difficulty.Skills
         /// </summary>
         public IList<double> StrainPeaks => strainPeaks;
 
-        private const int difficulty_count = 20;
 
-        private const double max_strain_time = 200;
+
+        private const bool strain_after_note = true; // true => use time between current and next, false => use time between prev and current
+        protected virtual double MaxStrainTime  => 200; 
         private const double difficulty_multiplier = 0.0675;
 
         // repeating a section adds this much difficulty
-        private const double star_bonus_per_length_double = 0.0655;
-        private readonly double star_bonus_k = Math.Log(2) / star_bonus_per_length_double;
+        protected virtual double StarBonusPerLengthDouble => 0.0655; 
+        private double star_bonus_k  => Math.Log(2) / StarBonusPerLengthDouble; 
 
         // Constant difficulty sections of this length match previous star rating
-        private const double star_bonus_base_time = (7.5 * 1000.0);
+        protected virtual double StarBonusBaseTime => (8.0 * 1000.0); 
 
         // Final star rating is player skill level who can FC the map once per target_fc_time
         private const double target_fc_time = 4 * 60 * 60 * 1000;
@@ -45,6 +46,8 @@ namespace osu.Game.Rulesets.Difficulty.Skills
 
         private double target_fc_difficulty_adjustment => -skillLevel(target_fc_base_time / target_fc_time, 0);
 
+        // size of lists used to interpolate combo SR and miss count SR for performance calc
+        private const int difficulty_count = 20;
 
 
         /// <summary>
@@ -80,6 +83,7 @@ namespace osu.Game.Rulesets.Difficulty.Skills
         private IList<double> missCountBySR, comboSR;
         private double fcProb=0;
         private double difficulty=0;
+        private bool last_scaled = false;
 
         public const double MissSRIncrement = 0.1;
         public IList<double> MissCounts { get => missCountBySR; }
@@ -98,17 +102,36 @@ namespace osu.Game.Rulesets.Difficulty.Skills
             double legacyScalingFactor = 10;
             double stars = Math.Sqrt(currentStrain * legacyScalingFactor) * difficulty_multiplier;
 
-            double t = Math.Min(current.DeltaTime, max_strain_time) / star_bonus_base_time;
+            if (strain_after_note) scaleLastHitObject(current.DeltaTime);
 
-            double expDifficulty = Math.Exp(star_bonus_k * starsToDifficulty(stars)) * t;
+            double expDifficulty = Math.Exp(star_bonus_k * starsToDifficulty(stars)) ;
 
-
+            // add zero difficulty notes corresponding to slider ticks/slider ends so combo is reflected properly
+            // (slider difficulty is currently handled in the following note)
+            int extraNestedCount = current.BaseObject.NestedHitObjects.Count - 1;
+            for (int i = 0; i < extraNestedCount; ++i)
+            {
+                expDifficulties.Add(0);
+                timestamps.Add(current.StartTime);
+            }
 
             expDifficulties.Add(expDifficulty);
             timestamps.Add(current.StartTime);
+            if (!strain_after_note) scaleLastHitObject(current.DeltaTime);
 
 
             Previous.Push(current);
+        }
+
+        private void scaleLastHitObject(double t)
+        {
+            if (expDifficulties.Count!=0)
+                expDifficulties[expDifficulties.Count - 1] *= Math.Min(t, MaxStrainTime) / StarBonusBaseTime;
+        }
+        private void scaleLastHitObject()
+        {
+            if (expDifficulties.Count != 0)
+                expDifficulties[expDifficulties.Count - 1] *= MaxStrainTime / StarBonusBaseTime;
         }
 
         /// <summary>
@@ -137,6 +160,14 @@ namespace osu.Game.Rulesets.Difficulty.Skills
         /// </summary>
         public void Calculate()
         {
+            if (strain_after_note && !last_scaled)
+            {
+                scaleLastHitObject();
+                last_scaled = true;
+            }
+
+            //System.Console.WriteLine($"t = [ {String.Join(", ", timestamps.Select(d => $"{d/1000:0.000}"))} 
+            //System.Console.WriteLine($"d = [ {String.Join(", ", expDifficulties.Select(d=>$"{d:0.00}"))} ]");
 
             // difficulty to FC the remainder of the map from every position, used later to calculate expected map length. 
             var difficultyPartialSums = new double[expDifficulties.Count];
@@ -282,7 +313,7 @@ namespace osu.Game.Rulesets.Difficulty.Skills
             // note: calculating this separately for each skill isn't really correct, maybe fix in future
 
             double length = 0;
-            double lastTime = timestamps[first] - max_strain_time;
+            double lastTime = timestamps[first] - MaxStrainTime;
             double expSkill = Math.Exp(-star_bonus_k * skill);
 
             for (int i=first; i<=last; ++i)
@@ -365,6 +396,28 @@ namespace osu.Game.Rulesets.Difficulty.Skills
 
             return result;
         }
+
+        // find first miss count achievable with at least probability p
+        private List<double> printMissDistribution(double[] missProbabilities)
+        {
+            var distribution = new PoissionBinomial(missProbabilities);
+            var result = new List<double>();
+            int missCount = 0;
+            while (missCount < 10000)
+            {
+                double p = distribution.CDF(missCount);
+                result.Add(p);
+                if (p > 0.99)
+                {
+                    break;
+                }
+
+
+                ++missCount;
+            }
+            return result;
+        }
+
 
         // find first miss count achievable with at least probability p
         private int getMissCount(double p, double[] missProbabilities)
