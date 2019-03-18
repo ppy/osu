@@ -92,30 +92,6 @@ namespace osu.Game.Screens.Play.HUD
             public Action HoverGained;
             public Action HoverLost;
 
-            public bool OnPressed(GlobalAction action)
-            {
-                switch (action)
-                {
-                    case GlobalAction.Back:
-                        BeginConfirm();
-                        return true;
-                }
-
-                return false;
-            }
-
-            public bool OnReleased(GlobalAction action)
-            {
-                switch (action)
-                {
-                    case GlobalAction.Back:
-                        AbortConfirm();
-                        return true;
-                }
-
-                return false;
-            }
-
             [BackgroundDependencyLoader]
             private void load(OsuColour colours)
             {
@@ -178,7 +154,7 @@ namespace osu.Game.Screens.Play.HUD
                 // avoid starting a new confirm call until we finish animating.
                 pendingAnimation = true;
 
-                Progress.Value = 0;
+                AbortConfirm();
 
                 overlayCircle.ScaleTo(0, 100)
                              .Then().FadeOut().ScaleTo(1).FadeIn(500)
@@ -205,6 +181,31 @@ namespace osu.Game.Screens.Play.HUD
             {
                 HoverLost?.Invoke();
                 base.OnHoverLost(e);
+            }
+
+            public bool OnPressed(GlobalAction action)
+            {
+                switch (action)
+                {
+                    case GlobalAction.Back:
+                        if (!pendingAnimation)
+                            BeginConfirm();
+                        return true;
+                }
+
+                return false;
+            }
+
+            public bool OnReleased(GlobalAction action)
+            {
+                switch (action)
+                {
+                    case GlobalAction.Back:
+                        AbortConfirm();
+                        return true;
+                }
+
+                return false;
             }
 
             protected override bool OnMouseDown(MouseDownEvent e)
