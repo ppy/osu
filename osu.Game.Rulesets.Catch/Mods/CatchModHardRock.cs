@@ -20,6 +20,9 @@ namespace osu.Game.Rulesets.Catch.Mods
 
         public void ApplyToHitObject(HitObject hitObject)
         {
+            if (!(hitObject is Fruit))
+                return;
+
             var catchObject = (CatchHitObject)hitObject;
 
             float position = catchObject.X;
