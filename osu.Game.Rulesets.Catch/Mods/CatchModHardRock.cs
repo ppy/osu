@@ -36,7 +36,7 @@ namespace osu.Game.Rulesets.Catch.Mods
                 return;
             }
 
-            float positionDiff = lastPosition.Value - position;
+            float positionDiff = position - lastPosition.Value;
             double timeDiff = startTime - lastStartTime;
 
             if (timeDiff > 1000)
@@ -99,13 +99,15 @@ namespace osu.Game.Rulesets.Catch.Mods
         {
             if (amount > 0)
             {
-                if (position - amount > 0)
-                    position -= amount;
+                // Clamp to the right bound
+                if (position + amount < 1)
+                    position += amount;
             }
             else
             {
-                if (position - amount < 1)
-                    position -= amount;
+                // Clamp to the left bound
+                if (position + amount > 0)
+                    position += amount;
             }
         }
     }
