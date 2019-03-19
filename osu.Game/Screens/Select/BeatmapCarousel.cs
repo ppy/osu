@@ -577,7 +577,7 @@ namespace osu.Game.Screens.Select
                             else
                             {
                                 float y = currentY;
-                                d.OnLoadComplete = _ => performMove(y, setY);
+                                d.OnLoadComplete += _ => performMove(y, setY);
                             }
 
                             break;

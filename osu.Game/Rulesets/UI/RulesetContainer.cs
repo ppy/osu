@@ -132,6 +132,8 @@ namespace osu.Game.Rulesets.UI
 
         protected virtual ReplayInputHandler CreateReplayInputHandler(Replay replay) => null;
 
+        protected FrameStabilityContainer FrameStabilityContainer;
+
         public Score ReplayScore { get; private set; }
 
         /// <summary>
@@ -149,7 +151,11 @@ namespace osu.Game.Rulesets.UI
                 throw new InvalidOperationException($"A {nameof(KeyBindingInputManager)} which supports replay loading is not available");
 
             ReplayScore = replayScore;
-            ReplayInputManager.ReplayInputHandler = replayScore != null ? CreateReplayInputHandler(replayScore.Replay) : null;
+
+            var handler = replayScore != null ? CreateReplayInputHandler(replayScore.Replay) : null;
+
+            ReplayInputManager.ReplayInputHandler = handler;
+            FrameStabilityContainer.ReplayInputHandler = handler;
 
             HasReplayLoaded.Value = ReplayInputManager.ReplayInputHandler != null;
         }
@@ -243,7 +249,6 @@ namespace osu.Game.Rulesets.UI
             Beatmap = (Beatmap<TObject>)workingBeatmap.GetPlayableBeatmap(ruleset.RulesetInfo);
 
             KeyBindingInputManager = CreateInputManager();
-            KeyBindingInputManager.RelativeSizeAxes = Axes.Both;
 
             applyBeatmapMods(Mods);
         }
@@ -262,7 +267,10 @@ namespace osu.Game.Rulesets.UI
 
             InternalChildren = new Drawable[]
             {
-                KeyBindingInputManager,
+                FrameStabilityContainer = new FrameStabilityContainer
+                {
+                    Child = KeyBindingInputManager,
+                },
                 Overlays = new Container { RelativeSizeAxes = Axes.Both }
             };
 
