@@ -63,8 +63,6 @@ namespace osu.Game.Rulesets.Difficulty
 
         private DifficultyAttributes calculate(IBeatmap beatmap, Mod[] mods, double clockRate)
         {
-            PreProcess(beatmap, mods, clockRate);
-
             var skills = CreateSkills(beatmap);
 
             if (!beatmap.HitObjects.Any())
@@ -99,13 +97,6 @@ namespace osu.Game.Rulesets.Difficulty
                 s.SaveCurrentPeak();
 
             return CreateDifficultyAttributes(beatmap, mods, skills, clockRate);
-        }
-
-        /// <summary>
-        /// Computes any values to be used for difficulty calculation, prior to difficulty calculation taking place.
-        /// </summary>
-        protected virtual void PreProcess(IBeatmap beatmap, Mod[] mods, double clockRate)
-        {
         }
 
         /// <summary>
