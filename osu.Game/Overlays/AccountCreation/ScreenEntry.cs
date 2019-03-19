@@ -33,7 +33,7 @@ namespace osu.Game.Overlays.AccountCreation
         private OsuTextBox emailTextBox;
         private OsuPasswordTextBox passwordTextBox;
 
-        private APIAccess api;
+        private IAPIProvider api;
         private ShakeContainer registerShake;
         private IEnumerable<Drawable> characterCheckText;
 
@@ -42,7 +42,7 @@ namespace osu.Game.Overlays.AccountCreation
         private GameHost host;
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours, APIAccess api, GameHost host)
+        private void load(OsuColour colours, IAPIProvider api, GameHost host)
         {
             this.api = api;
             this.host = host;
