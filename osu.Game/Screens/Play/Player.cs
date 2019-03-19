@@ -73,6 +73,8 @@ namespace osu.Game.Screens.Play
         private DrawableStoryboard storyboard;
         protected UserDimContainer StoryboardContainer { get; private set; }
 
+        private Bindable<bool> showStoryboard;
+
         protected virtual UserDimContainer CreateStoryboardContainer() => new UserDimContainer(true)
         {
             RelativeSizeAxes = Axes.Both,
@@ -97,6 +99,7 @@ namespace osu.Game.Screens.Play
             sampleRestart = audio.Sample.Get(@"Gameplay/restart");
 
             mouseWheelDisabled = config.GetBindable<bool>(OsuSetting.MouseDisableWheel);
+            showStoryboard = config.GetBindable<bool>(OsuSetting.ShowStoryboard);
 
             ScoreProcessor = RulesetContainer.CreateScoreProcessor();
             if (!ScoreProcessor.Mode.Disabled)
@@ -169,7 +172,7 @@ namespace osu.Game.Screens.Play
             // bind clock into components that require it
             RulesetContainer.IsPaused.BindTo(gameplayClockContainer.IsPaused);
 
-            if (ShowStoryboard.Value)
+            if (showStoryboard.Value)
                 initializeStoryboard(false);
 
             // Bind ScoreProcessor to ourselves
@@ -313,7 +316,7 @@ namespace osu.Game.Screens.Play
                 .Delay(250)
                 .FadeIn(250);
 
-            ShowStoryboard.ValueChanged += enabled =>
+            showStoryboard.ValueChanged += enabled =>
             {
                 if (enabled.NewValue) initializeStoryboard(true);
             };
