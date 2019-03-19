@@ -112,10 +112,10 @@ namespace osu.Game.Tests.Visual
             createSongSelect();
             AddAssert("dummy selected", () => songSelect.CurrentBeatmap == defaultBeatmap);
 
-            AddUntilStep(() => songSelect.CurrentBeatmapDetailsBeatmap == defaultBeatmap, "dummy shown on wedge");
+            AddUntilStep("dummy shown on wedge", () => songSelect.CurrentBeatmapDetailsBeatmap == defaultBeatmap);
 
             addManyTestMaps();
-            AddWaitStep(3);
+            AddWaitStep("wait for select", 3);
 
             AddAssert("random map selected", () => songSelect.CurrentBeatmap != defaultBeatmap);
         }
@@ -125,7 +125,7 @@ namespace osu.Game.Tests.Visual
         {
             createSongSelect();
             addManyTestMaps();
-            AddWaitStep(3);
+            AddWaitStep("wait for add", 3);
 
             AddAssert("random map selected", () => songSelect.CurrentBeatmap != defaultBeatmap);
 
@@ -142,7 +142,7 @@ namespace osu.Game.Tests.Visual
             createSongSelect();
             changeRuleset(2);
             importForRuleset(0);
-            AddUntilStep(() => songSelect.Carousel.SelectedBeatmap == null, "no selection");
+            AddUntilStep("no selection", () => songSelect.Carousel.SelectedBeatmap == null);
         }
 
         [Test]
@@ -152,13 +152,13 @@ namespace osu.Game.Tests.Visual
             changeRuleset(2);
             importForRuleset(2);
             importForRuleset(1);
-            AddUntilStep(() => songSelect.Carousel.SelectedBeatmap.RulesetID == 2, "has selection");
+            AddUntilStep("has selection", () => songSelect.Carousel.SelectedBeatmap.RulesetID == 2);
 
             changeRuleset(1);
-            AddUntilStep(() => songSelect.Carousel.SelectedBeatmap.RulesetID == 1, "has selection");
+            AddUntilStep("has selection", () => songSelect.Carousel.SelectedBeatmap.RulesetID == 1);
 
             changeRuleset(0);
-            AddUntilStep(() => songSelect.Carousel.SelectedBeatmap == null, "no selection");
+            AddUntilStep("no selection", () => songSelect.Carousel.SelectedBeatmap == null);
         }
 
         [Test]
@@ -196,7 +196,7 @@ namespace osu.Game.Tests.Visual
         {
             createSongSelect();
             addManyTestMaps();
-            AddUntilStep(() => songSelect.Carousel.SelectedBeatmap != null, "has selection");
+            AddUntilStep("has selection", () => songSelect.Carousel.SelectedBeatmap != null);
 
             bool startRequested = false;
 
@@ -225,7 +225,7 @@ namespace osu.Game.Tests.Visual
         private void createSongSelect()
         {
             AddStep("create song select", () => LoadScreen(songSelect = new TestSongSelect()));
-            AddUntilStep(() => songSelect.IsCurrentScreen(), "wait for present");
+            AddUntilStep("wait for present", () => songSelect.IsCurrentScreen());
         }
 
         private void addManyTestMaps()
