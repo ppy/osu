@@ -43,7 +43,7 @@ namespace osu.Game.Tests.Visual
             typeof(ScreenWithBeatmapBackground),
             typeof(PlayerLoader),
             typeof(Player),
-            typeof(VisualSettingsContainer),
+            typeof(UserDimContainer),
             typeof(OsuScreen)
         };
 
@@ -165,7 +165,7 @@ namespace osu.Game.Tests.Visual
         }
 
         /// <summary>
-        /// Check if the <see cref="VisualSettingsContainer"/> is properly accepting user-defined visual changes at all.
+        /// Check if the <see cref="UserDimContainer"/> is properly accepting user-defined visual changes at all.
         /// </summary>
         [Test]
         public void DisableUserDimTest()
@@ -327,9 +327,9 @@ namespace osu.Game.Tests.Visual
         {
             protected override BackgroundScreen CreateBackground() => new FadeAccessibleBackground(Beatmap.Value);
 
-            protected override VisualSettingsContainer CreateStoryboardContainer()
+            protected override UserDimContainer CreateStoryboardContainer()
             {
-                return new TestVisualSettingsContainer(true)
+                return new TestUserDimContainer(true)
                 {
                     RelativeSizeAxes = Axes.Both,
                     Alpha = 1,
@@ -339,7 +339,7 @@ namespace osu.Game.Tests.Visual
 
             public PausableGameplayContainer CurrentPausableGameplayContainer => PausableGameplayContainer;
 
-            public VisualSettingsContainer CurrentStoryboardContainer => StoryboardContainer;
+            public UserDimContainer CurrentStoryboardContainer => StoryboardContainer;
 
             // Whether or not the player should be allowed to load.
             public bool Ready;
@@ -348,9 +348,9 @@ namespace osu.Game.Tests.Visual
             public readonly Bindable<bool> ReplacesBackground = new Bindable<bool>();
             public readonly Bindable<bool> IsPaused = new Bindable<bool>();
 
-            public bool IsStoryboardVisible() => ((TestVisualSettingsContainer)CurrentStoryboardContainer).CurrentAlpha == 1;
+            public bool IsStoryboardVisible() => ((TestUserDimContainer)CurrentStoryboardContainer).CurrentAlpha == 1;
 
-            public bool IsStoryboardInvisible() => ((TestVisualSettingsContainer)CurrentStoryboardContainer).CurrentAlpha <= 1;
+            public bool IsStoryboardInvisible() => ((TestUserDimContainer)CurrentStoryboardContainer).CurrentAlpha <= 1;
 
             [BackgroundDependencyLoader]
             private void load(OsuConfigManager config)
@@ -396,7 +396,7 @@ namespace osu.Game.Tests.Visual
 
         private class FadeAccessibleBackground : BackgroundScreenBeatmap
         {
-            protected override VisualSettingsContainer CreateFadeContainer() => fadeContainer = new TestVisualSettingsContainer { RelativeSizeAxes = Axes.Both };
+            protected override UserDimContainer CreateFadeContainer() => fadeContainer = new TestUserDimContainer { RelativeSizeAxes = Axes.Both };
 
             public Color4 CurrentColour => fadeContainer.CurrentColour;
 
@@ -404,7 +404,7 @@ namespace osu.Game.Tests.Visual
 
             public Vector2 CurrentBlur => Background.BlurSigma;
 
-            private TestVisualSettingsContainer fadeContainer;
+            private TestUserDimContainer fadeContainer;
 
             public FadeAccessibleBackground(WorkingBeatmap beatmap)
                 : base(beatmap)
@@ -412,12 +412,12 @@ namespace osu.Game.Tests.Visual
             }
         }
 
-        private class TestVisualSettingsContainer : VisualSettingsContainer
+        private class TestUserDimContainer : UserDimContainer
         {
-            public Color4 CurrentColour => LocalContainer.Colour;
-            public float CurrentAlpha => LocalContainer.Alpha;
+            public Color4 CurrentColour => DimContainer.Colour;
+            public float CurrentAlpha => DimContainer.Alpha;
 
-            public TestVisualSettingsContainer(bool isStoryboard = false)
+            public TestUserDimContainer(bool isStoryboard = false)
                 : base(isStoryboard)
             {
             }
