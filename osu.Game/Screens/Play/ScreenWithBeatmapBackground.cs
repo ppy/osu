@@ -13,13 +13,5 @@ namespace osu.Game.Screens.Play
         protected override BackgroundScreen CreateBackground() => new BackgroundScreenBeatmap(Beatmap.Value);
 
         protected new BackgroundScreenBeatmap Background => (BackgroundScreenBeatmap)base.Background;
-
-        protected Bindable<bool> ShowStoryboard;
-
-        [BackgroundDependencyLoader]
-        private void load(OsuConfigManager config)
-        {
-            ShowStoryboard = config.GetBindable<bool>(OsuSetting.ShowStoryboard);
-        }
     }
 }
