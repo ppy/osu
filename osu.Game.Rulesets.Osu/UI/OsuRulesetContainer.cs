@@ -30,7 +30,7 @@ namespace osu.Game.Rulesets.Osu.UI
 
         protected override Playfield CreatePlayfield() => new OsuPlayfield();
 
-        public override PassThroughInputManager CreateInputManager() => new OsuInputManager(Ruleset.RulesetInfo);
+        protected override PassThroughInputManager CreateInputManager() => new OsuInputManager(Ruleset.RulesetInfo);
 
         public override DrawableHitObject<OsuHitObject> GetVisualRepresentation(OsuHitObject h)
         {

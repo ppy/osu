@@ -97,7 +97,7 @@ namespace osu.Game.Rulesets.Mania.UI
 
         public override int Variant => (int)(Beatmap.Stages.Count == 1 ? PlayfieldType.Single : PlayfieldType.Dual) + Beatmap.TotalColumns;
 
-        public override PassThroughInputManager CreateInputManager() => new ManiaInputManager(Ruleset.RulesetInfo, Variant);
+        protected override PassThroughInputManager CreateInputManager() => new ManiaInputManager(Ruleset.RulesetInfo, Variant);
 
         public override DrawableHitObject<ManiaHitObject> GetVisualRepresentation(ManiaHitObject h)
         {
