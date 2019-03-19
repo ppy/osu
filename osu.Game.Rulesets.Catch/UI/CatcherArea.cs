@@ -60,7 +60,7 @@ namespace osu.Game.Rulesets.Catch.UI
                 if (lastPlateableFruit.IsLoaded)
                     action();
                 else
-                    lastPlateableFruit.OnLoadComplete = _ => action();
+                    lastPlateableFruit.OnLoadComplete += _ => action();
             }
 
             if (result.IsHit && fruit.CanBePlated)
