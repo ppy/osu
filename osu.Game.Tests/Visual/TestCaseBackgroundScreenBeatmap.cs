@@ -333,7 +333,7 @@ namespace osu.Game.Tests.Visual
                 {
                     RelativeSizeAxes = Axes.Both,
                     Alpha = 1,
-                    EnableVisualSettings = { Value = true }
+                    EnableUserDim = { Value = true }
                 };
             }
 

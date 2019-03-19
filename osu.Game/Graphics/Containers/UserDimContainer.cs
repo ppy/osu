@@ -20,21 +20,29 @@ namespace osu.Game.Graphics.Containers
     {
         private const float background_fade_duration = 800;
 
-        private Bindable<double> dimLevel { get; set; }
-
-        private Bindable<double> blurLevel { get; set; }
-
-        private Bindable<bool> showStoryboard { get; set; }
-
         /// <summary>
         /// Whether or not user-configured dim levels should be applied to the container.
         /// </summary>
-        public readonly Bindable<bool> EnableVisualSettings = new Bindable<bool>();
+        public readonly Bindable<bool> EnableUserDim = new Bindable<bool>();
 
         /// <summary>
         /// Whether or not the storyboard loaded should completely hide the background behind it.
         /// </summary>
         public readonly Bindable<bool> StoryboardReplacesBackground = new Bindable<bool>();
+
+        /// <summary>
+        /// The amount of blur to be applied to the background in addition to user-specified blur.
+        /// </summary>
+        /// <remarks>
+        /// Used in contexts where there can potentially be both user and screen-specified blurring occuring at the same time, such as in <see cref="PlayerLoader"/>
+        /// </remarks>
+        public Bindable<float> AddedBlur = new Bindable<float>();
+
+        private Bindable<double> dimLevel { get; set; }
+
+        private Bindable<double> blurLevel { get; set; }
+
+        private Bindable<bool> showStoryboard { get; set; }
 
         protected Container DimContainer { get; }
 
@@ -42,9 +50,7 @@ namespace osu.Game.Graphics.Containers
 
         private readonly bool isStoryboard;
 
-        public Bindable<float> AddedBlur = new Bindable<float>();
-
-        public Vector2 BlurTarget => EnableVisualSettings.Value
+        private Vector2 blurTarget => EnableUserDim.Value
             ? new Vector2(AddedBlur.Value + (float)blurLevel.Value * 25)
             : new Vector2(AddedBlur.Value);
 
@@ -69,7 +75,7 @@ namespace osu.Game.Graphics.Containers
             dimLevel = config.GetBindable<double>(OsuSetting.DimLevel);
             blurLevel = config.GetBindable<double>(OsuSetting.BlurLevel);
             showStoryboard = config.GetBindable<bool>(OsuSetting.ShowStoryboard);
-            EnableVisualSettings.ValueChanged += _ => UpdateVisuals();
+            EnableUserDim.ValueChanged += _ => UpdateVisuals();
             dimLevel.ValueChanged += _ => UpdateVisuals();
             blurLevel.ValueChanged += _ => UpdateVisuals();
             showStoryboard.ValueChanged += _ => UpdateVisuals();
@@ -83,7 +89,7 @@ namespace osu.Game.Graphics.Containers
             UpdateVisuals();
         }
 
-        public void UpdateVisuals()
+        public void UpdateVisuals(bool instant = false)
         {
             if (isStoryboard)
             {
@@ -97,13 +103,13 @@ namespace osu.Game.Graphics.Containers
                 foreach (Drawable c in DimContainer)
                 {
                     // Only blur if this container contains a background
-                    // We can't blur the container like we did with the dim because buffered containers add considerable draw overhead.
-                    // As a result, this blurs the background directly.
-                    ((Background)c)?.BlurTo(BlurTarget, background_fade_duration, Easing.OutQuint);
+                    // We can't blur the container like we did with the dim because buffered containers add considerable draw overhead. As a result, this blurs the background directly.
+                    // We need to support instant blurring here in the case of SongSelect, where blurring shouldn't be from 0 every time the beatmap is changed.
+                    ((Background)c)?.BlurTo(blurTarget, instant ? 0 : background_fade_duration, Easing.OutQuint);
                 }
             }
 
-            DimContainer.FadeColour(EnableVisualSettings.Value ? OsuColour.Gray(1 - (float)dimLevel.Value) : Color4.White, background_fade_duration, Easing.OutQuint);
+            DimContainer.FadeColour(EnableUserDim.Value ? OsuColour.Gray(1 - (float)dimLevel.Value) : Color4.White, background_fade_duration, Easing.OutQuint);
         }
     }
 }
