@@ -79,7 +79,7 @@ namespace osu.Game.Screens.Play
         {
             RelativeSizeAxes = Axes.Both,
             Alpha = 1,
-            EnableVisualSettings = { Value = true }
+            EnableUserDim = { Value = true }
         };
 
         public bool LoadedBeatmapSuccessfully => RulesetContainer?.Objects.Any() == true;
