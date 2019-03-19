@@ -24,9 +24,9 @@ namespace osu.Game.Screens.Backgrounds
 
         public readonly Bindable<float> AddedBlur = new Bindable<float>();
 
-        private readonly VisualSettingsContainer fadeContainer;
+        private readonly UserDimContainer fadeContainer;
 
-        protected virtual VisualSettingsContainer CreateFadeContainer() => new VisualSettingsContainer { RelativeSizeAxes = Axes.Both };
+        protected virtual UserDimContainer CreateFadeContainer() => new UserDimContainer { RelativeSizeAxes = Axes.Both };
 
         public virtual WorkingBeatmap Beatmap
         {

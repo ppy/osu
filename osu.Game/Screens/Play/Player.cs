@@ -71,9 +71,9 @@ namespace osu.Game.Screens.Play
         private FailOverlay failOverlay;
 
         private DrawableStoryboard storyboard;
-        protected VisualSettingsContainer StoryboardContainer { get; private set; }
+        protected UserDimContainer StoryboardContainer { get; private set; }
 
-        protected virtual VisualSettingsContainer CreateStoryboardContainer() => new VisualSettingsContainer(true)
+        protected virtual UserDimContainer CreateStoryboardContainer() => new UserDimContainer(true)
         {
             RelativeSizeAxes = Axes.Both,
             Alpha = 1,

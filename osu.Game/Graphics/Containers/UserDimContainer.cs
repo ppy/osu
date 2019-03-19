@@ -16,7 +16,7 @@ namespace osu.Game.Graphics.Containers
     /// A container that applies user-configured visual settings to its contents.
     /// This container specifies behavior that applies to both Storyboards and Backgrounds.
     /// </summary>
-    public class VisualSettingsContainer : Container
+    public class UserDimContainer : Container
     {
         private const float background_fade_duration = 800;
 
@@ -36,9 +36,9 @@ namespace osu.Game.Graphics.Containers
         /// </summary>
         public readonly Bindable<bool> StoryboardReplacesBackground = new Bindable<bool>();
 
-        protected Container LocalContainer { get; }
+        protected Container DimContainer { get; }
 
-        protected override Container<Drawable> Content => LocalContainer;
+        protected override Container<Drawable> Content => DimContainer;
 
         private readonly bool isStoryboard;
 
@@ -49,7 +49,7 @@ namespace osu.Game.Graphics.Containers
             : new Vector2(AddedBlur.Value);
 
         /// <summary>
-        /// Creates a new <see cref="VisualSettingsContainer"/>.
+        /// Creates a new <see cref="UserDimContainer"/>.
         /// </summary>
         /// <param name="isStoryboard"> Whether or not this instance contains a storyboard.
         /// <remarks>
@@ -57,10 +57,10 @@ namespace osu.Game.Graphics.Containers
         /// and can cause backgrounds to become hidden via <see cref="StoryboardReplacesBackground"/>. Storyboards are also currently unable to be blurred.
         /// </remarks>
         /// </param>
-        public VisualSettingsContainer(bool isStoryboard = false)
+        public UserDimContainer(bool isStoryboard = false)
         {
             this.isStoryboard = isStoryboard;
-            AddInternal(LocalContainer = new Container { RelativeSizeAxes = Axes.Both });
+            AddInternal(DimContainer = new Container { RelativeSizeAxes = Axes.Both });
         }
 
         [BackgroundDependencyLoader]
@@ -87,14 +87,14 @@ namespace osu.Game.Graphics.Containers
         {
             if (isStoryboard)
             {
-                LocalContainer.FadeTo(!showStoryboard.Value || dimLevel.Value == 1 ? 0 : 1, background_fade_duration, Easing.OutQuint);
+                DimContainer.FadeTo(!showStoryboard.Value || dimLevel.Value == 1 ? 0 : 1, background_fade_duration, Easing.OutQuint);
             }
             else
             {
                 // The background needs to be hidden in the case of it being replaced by the storyboard
-                LocalContainer.FadeTo(showStoryboard.Value && StoryboardReplacesBackground.Value ? 0 : 1, background_fade_duration, Easing.OutQuint);
+                DimContainer.FadeTo(showStoryboard.Value && StoryboardReplacesBackground.Value ? 0 : 1, background_fade_duration, Easing.OutQuint);
 
-                foreach (Drawable c in LocalContainer)
+                foreach (Drawable c in DimContainer)
                 {
                     // Only blur if this container contains a background
                     // We can't blur the container like we did with the dim because buffered containers add considerable draw overhead.
@@ -103,7 +103,7 @@ namespace osu.Game.Graphics.Containers
                 }
             }
 
-            LocalContainer.FadeColour(EnableVisualSettings.Value ? OsuColour.Gray(1 - (float)dimLevel.Value) : Color4.White, background_fade_duration, Easing.OutQuint);
+            DimContainer.FadeColour(EnableVisualSettings.Value ? OsuColour.Gray(1 - (float)dimLevel.Value) : Color4.White, background_fade_duration, Easing.OutQuint);
         }
     }
 }
