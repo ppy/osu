@@ -7,15 +7,15 @@ using osu.Game.Rulesets.UI;
 namespace osu.Game.Rulesets.Mods
 {
     /// <summary>
-    /// An interface for <see cref="Mod"/>s that can be applied to <see cref="RulesetContainer"/>s.
+    /// An interface for <see cref="Mod"/>s that can be applied to <see cref="DrawableRuleset"/>s.
     /// </summary>
-    public interface IApplicableToRulesetContainer<TObject> : IApplicableMod
+    public interface IApplicableToDrawableRuleset<TObject> : IApplicableMod
         where TObject : HitObject
     {
         /// <summary>
-        /// Applies this <see cref="IApplicableToRulesetContainer{TObject}"/> to a <see cref="RulesetContainer{TObject}"/>.
+        /// Applies this <see cref="IApplicableToDrawableRuleset{TObject}"/> to a <see cref="DrawableRuleset{TObject}"/>.
         /// </summary>
-        /// <param name="rulesetContainer">The <see cref="RulesetContainer{TObject}"/> to apply to.</param>
-        void ApplyToRulesetContainer(RulesetContainer<TObject> rulesetContainer);
+        /// <param name="rrawableRuleset">The <see cref="DrawableRuleset{TObject}"/> to apply to.</param>
+        void ApplyToDrawableRuleset(DrawableRuleset<TObject> rrawableRuleset);
     }
 }

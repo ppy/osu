@@ -20,13 +20,13 @@ using osu.Game.Rulesets.UI.Scrolling;
 
 namespace osu.Game.Rulesets.Taiko.UI
 {
-    public class TaikoRulesetContainer : ScrollingRulesetContainer<TaikoPlayfield, TaikoHitObject>
+    public class DrawableTaikoRuleset : DrawableScrollingRuleset<TaikoPlayfield, TaikoHitObject>
     {
         protected override ScrollVisualisationMethod VisualisationMethod => ScrollVisualisationMethod.Overlapping;
 
         protected override bool UserScrollSpeedAdjustment => false;
 
-        public TaikoRulesetContainer(Ruleset ruleset, WorkingBeatmap beatmap)
+        public DrawableTaikoRuleset(Ruleset ruleset, WorkingBeatmap beatmap)
             : base(ruleset, beatmap)
         {
             Direction.Value = ScrollingDirection.Left;
