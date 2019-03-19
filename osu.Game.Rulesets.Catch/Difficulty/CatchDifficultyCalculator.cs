@@ -23,11 +23,17 @@ namespace osu.Game.Rulesets.Catch.Difficulty
 
         protected override int SectionLength => 750;
 
-        private readonly float halfCatchWidth;
+        private float halfCatchWidth;
 
         public CatchDifficultyCalculator(Ruleset ruleset, WorkingBeatmap beatmap)
             : base(ruleset, beatmap)
         {
+        }
+
+        protected override void PreProcess(IBeatmap beatmap, Mod[] mods, double clockRate)
+        {
+            base.PreProcess(beatmap, mods, clockRate);
+
             var catcher = new CatcherArea.Catcher(beatmap.BeatmapInfo.BaseDifficulty);
             halfCatchWidth = catcher.CatchWidth * 0.5f;
 
