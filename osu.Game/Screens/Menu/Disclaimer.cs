@@ -84,6 +84,7 @@ namespace osu.Game.Screens.Menu
                             TextAnchor = Anchor.TopCentre,
                             Anchor = Anchor.TopCentre,
                             Origin = Anchor.TopCentre,
+                            Alpha = 0,
                             Spacing = new Vector2(0, 2),
                         },
                     }
