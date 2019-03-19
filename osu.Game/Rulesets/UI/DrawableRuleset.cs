@@ -30,14 +30,14 @@ using osu.Game.Screens.Play;
 namespace osu.Game.Rulesets.UI
 {
     /// <summary>
-    /// RulesetContainer that applies conversion to Beatmaps. Does not contain a Playfield
+    /// DrawableRuleset that applies conversion to Beatmaps. Does not contain a Playfield
     /// and does not load drawable hit objects.
     /// <para>
-    /// Should not be derived - derive <see cref="RulesetContainer{TPlayfield, TObject}"/> instead.
+    /// Should not be derived - derive <see cref="DrawableRuleset{TPlayfield,TObject}"/> instead.
     /// </para>
     /// </summary>
-    /// <typeparam name="TObject">The type of HitObject contained by this RulesetContainer.</typeparam>
-    public abstract class RulesetContainer<TObject> : RulesetContainer, IProvideCursor, ICanAttachKeyCounter
+    /// <typeparam name="TObject">The type of HitObject contained by this DrawableRuleset.</typeparam>
+    public abstract class DrawableRuleset<TObject> : DrawableRuleset, IProvideCursor, ICanAttachKeyCounter
         where TObject : HitObject
     {
         /// <summary>
@@ -46,7 +46,7 @@ namespace osu.Game.Rulesets.UI
         public virtual int Variant => 0;
 
         /// <summary>
-        /// The key conversion input manager for this RulesetContainer.
+        /// The key conversion input manager for this DrawableRuleset.
         /// </summary>
         public PassThroughInputManager KeyBindingInputManager;
 
@@ -79,10 +79,10 @@ namespace osu.Game.Rulesets.UI
         /// </summary>
         /// <param name="ruleset">The ruleset being repesented.</param>
         /// <param name="workingBeatmap">The beatmap to create the hit renderer for.</param>
-        protected RulesetContainer(Ruleset ruleset, WorkingBeatmap workingBeatmap)
+        protected DrawableRuleset(Ruleset ruleset, WorkingBeatmap workingBeatmap)
             : base(ruleset)
         {
-            Debug.Assert(workingBeatmap != null, "RulesetContainer initialized with a null beatmap.");
+            Debug.Assert(workingBeatmap != null, "DrawableRuleset initialized with a null beatmap.");
 
             RelativeSizeAxes = Axes.Both;
 
@@ -134,7 +134,7 @@ namespace osu.Game.Rulesets.UI
         }
 
         /// <summary>
-        /// Creates and adds the visual representation of a <see cref="TObject"/> to this <see cref="RulesetContainer{TObject}"/>.
+        /// Creates and adds the visual representation of a <see cref="TObject"/> to this <see cref="DrawableRuleset{TObject}"/>.
         /// </summary>
         /// <param name="hitObject">The <see cref="TObject"/> to add the visual representation for.</param>
         private void addRepresentation(TObject hitObject)
@@ -253,7 +253,7 @@ namespace osu.Game.Rulesets.UI
         }
 
         /// <summary>
-        /// Applies the active mods to this RulesetContainer.
+        /// Applies the active mods to this DrawableRuleset.
         /// </summary>
         /// <param name="mods"></param>
         private void applyRulesetMods(IEnumerable<Mod> mods, OsuConfigManager config)
@@ -261,8 +261,8 @@ namespace osu.Game.Rulesets.UI
             if (mods == null)
                 return;
 
-            foreach (var mod in mods.OfType<IApplicableToRulesetContainer<TObject>>())
-                mod.ApplyToRulesetContainer(this);
+            foreach (var mod in mods.OfType<IApplicableToDrawableRuleset<TObject>>())
+                mod.ApplyToDrawableRuleset(this);
 
             foreach (var mod in mods.OfType<IReadFromConfig>())
                 mod.ReadFromConfig(config);
@@ -281,12 +281,12 @@ namespace osu.Game.Rulesets.UI
     }
 
     /// <summary>
-    /// Base RulesetContainer. Doesn't hold objects.
+    /// Base DrawableRuleset. Doesn't hold objects.
     /// <para>
-    /// Should not be derived - derive <see cref="RulesetContainer{TObject}"/> instead.
+    /// Should not be derived - derive <see cref="DrawableRuleset{TObject}"/> instead.
     /// </para>
     /// </summary>
-    public abstract class RulesetContainer : CompositeDrawable
+    public abstract class DrawableRuleset : CompositeDrawable
     {
         /// <summary>
         /// Whether a replay is currently loaded.
@@ -307,7 +307,7 @@ namespace osu.Game.Rulesets.UI
         /// Creates a ruleset visualisation for the provided ruleset.
         /// </summary>
         /// <param name="ruleset">The ruleset.</param>
-        protected RulesetContainer(Ruleset ruleset)
+        protected DrawableRuleset(Ruleset ruleset)
         {
             Ruleset = ruleset;
         }
@@ -341,18 +341,18 @@ namespace osu.Game.Rulesets.UI
 
         /// <summary>
         /// Create a <see cref="ScoreProcessor"/> for the associated ruleset  and link with this
-        /// <see cref="RulesetContainer"/>.
+        /// <see cref="DrawableRuleset"/>.
         /// </summary>
         /// <returns>A score processor.</returns>
         public abstract ScoreProcessor CreateScoreProcessor();
     }
 
     /// <summary>
-    /// A derivable RulesetContainer that manages the Playfield and HitObjects.
+    /// A derivable DrawableRuleset that manages the Playfield and HitObjects.
     /// </summary>
-    /// <typeparam name="TPlayfield">The type of Playfield contained by this RulesetContainer.</typeparam>
-    /// <typeparam name="TObject">The type of HitObject contained by this RulesetContainer.</typeparam>
-    public abstract class RulesetContainer<TPlayfield, TObject> : RulesetContainer<TObject>
+    /// <typeparam name="TPlayfield">The type of Playfield contained by this DrawableRuleset.</typeparam>
+    /// <typeparam name="TObject">The type of HitObject contained by this DrawableRuleset.</typeparam>
+    public abstract class DrawableRuleset<TPlayfield, TObject> : DrawableRuleset<TObject>
         where TObject : HitObject
         where TPlayfield : Playfield
     {
@@ -366,7 +366,7 @@ namespace osu.Game.Rulesets.UI
         /// </summary>
         /// <param name="ruleset">The ruleset being repesented.</param>
         /// <param name="beatmap">The beatmap to create the hit renderer for.</param>
-        protected RulesetContainer(Ruleset ruleset, WorkingBeatmap beatmap)
+        protected DrawableRuleset(Ruleset ruleset, WorkingBeatmap beatmap)
             : base(ruleset, beatmap)
         {
         }

@@ -28,7 +28,7 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Mania.UI
 {
-    public class ManiaRulesetContainer : ScrollingRulesetContainer<ManiaPlayfield, ManiaHitObject>
+    public class DrawableManiaRuleset : DrawableScrollingRuleset<ManiaPlayfield, ManiaHitObject>
     {
         public new ManiaBeatmap Beatmap => (ManiaBeatmap)base.Beatmap;
 
@@ -38,7 +38,7 @@ namespace osu.Game.Rulesets.Mania.UI
 
         private readonly Bindable<ManiaScrollingDirection> configDirection = new Bindable<ManiaScrollingDirection>();
 
-        public ManiaRulesetContainer(Ruleset ruleset, WorkingBeatmap beatmap)
+        public DrawableManiaRuleset(Ruleset ruleset, WorkingBeatmap beatmap)
             : base(ruleset, beatmap)
         {
             // Generate the bar lines

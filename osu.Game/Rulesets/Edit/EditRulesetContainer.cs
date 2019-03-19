@@ -11,14 +11,14 @@ using osu.Game.Rulesets.UI;
 
 namespace osu.Game.Rulesets.Edit
 {
-    public abstract class EditRulesetContainer : CompositeDrawable
+    public abstract class EditDrawableRuleset : CompositeDrawable
     {
         /// <summary>
-        /// The <see cref="Playfield"/> contained by this <see cref="EditRulesetContainer"/>.
+        /// The <see cref="Playfield"/> contained by this <see cref="EditDrawableRuleset"/>.
         /// </summary>
         public abstract Playfield Playfield { get; }
 
-        internal EditRulesetContainer()
+        internal EditDrawableRuleset()
         {
             RelativeSizeAxes = Axes.Both;
         }
@@ -38,21 +38,21 @@ namespace osu.Game.Rulesets.Edit
         internal abstract DrawableHitObject Remove(HitObject hitObject);
     }
 
-    public class EditRulesetContainer<TObject> : EditRulesetContainer
+    public class EditDrawableRuleset<TObject> : EditDrawableRuleset
         where TObject : HitObject
     {
-        public override Playfield Playfield => rulesetContainer.Playfield;
+        public override Playfield Playfield => rrawableRuleset.Playfield;
 
-        private Ruleset ruleset => rulesetContainer.Ruleset;
-        private Beatmap<TObject> beatmap => rulesetContainer.Beatmap;
+        private Ruleset ruleset => rrawableRuleset.Ruleset;
+        private Beatmap<TObject> beatmap => rrawableRuleset.Beatmap;
 
-        private readonly RulesetContainer<TObject> rulesetContainer;
+        private readonly DrawableRuleset<TObject> rrawableRuleset;
 
-        public EditRulesetContainer(RulesetContainer<TObject> rulesetContainer)
+        public EditDrawableRuleset(DrawableRuleset<TObject> rrawableRuleset)
         {
-            this.rulesetContainer = rulesetContainer;
+            this.rrawableRuleset = rrawableRuleset;
 
-            InternalChild = rulesetContainer;
+            InternalChild = rrawableRuleset;
 
             Playfield.DisplayJudgements.Value = false;
         }
@@ -73,10 +73,10 @@ namespace osu.Game.Rulesets.Edit
             processor?.PostProcess();
 
             // Add visual representation
-            var drawableObject = rulesetContainer.GetVisualRepresentation(tObject);
+            var drawableObject = rrawableRuleset.GetVisualRepresentation(tObject);
 
-            rulesetContainer.Playfield.Add(drawableObject);
-            rulesetContainer.Playfield.PostProcess();
+            rrawableRuleset.Playfield.Add(drawableObject);
+            rrawableRuleset.Playfield.PostProcess();
 
             return drawableObject;
         }
@@ -97,8 +97,8 @@ namespace osu.Game.Rulesets.Edit
             // Remove visual representation
             var drawableObject = Playfield.AllHitObjects.Single(d => d.HitObject == hitObject);
 
-            rulesetContainer.Playfield.Remove(drawableObject);
-            rulesetContainer.Playfield.PostProcess();
+            rrawableRuleset.Playfield.Remove(drawableObject);
+            rrawableRuleset.Playfield.PostProcess();
 
             return drawableObject;
         }

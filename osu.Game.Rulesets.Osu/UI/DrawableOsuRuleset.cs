@@ -17,11 +17,11 @@ using osu.Game.Rulesets.UI;
 
 namespace osu.Game.Rulesets.Osu.UI
 {
-    public class OsuRulesetContainer : RulesetContainer<OsuPlayfield, OsuHitObject>
+    public class DrawableOsuRuleset : DrawableRuleset<OsuPlayfield, OsuHitObject>
     {
         protected new OsuRulesetConfigManager Config => (OsuRulesetConfigManager)base.Config;
 
-        public OsuRulesetContainer(Ruleset ruleset, WorkingBeatmap beatmap)
+        public DrawableOsuRuleset(Ruleset ruleset, WorkingBeatmap beatmap)
             : base(ruleset, beatmap)
         {
         }

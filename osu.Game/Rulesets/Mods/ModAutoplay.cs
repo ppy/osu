@@ -11,10 +11,10 @@ using osu.Game.Scoring;
 
 namespace osu.Game.Rulesets.Mods
 {
-    public abstract class ModAutoplay<T> : ModAutoplay, IApplicableToRulesetContainer<T>
+    public abstract class ModAutoplay<T> : ModAutoplay, IApplicableToDrawableRuleset<T>
         where T : HitObject
     {
-        public virtual void ApplyToRulesetContainer(RulesetContainer<T> rulesetContainer) => rulesetContainer.SetReplayScore(CreateReplayScore(rulesetContainer.Beatmap));
+        public virtual void ApplyToDrawableRuleset(DrawableRuleset<T> rrawableRuleset) => rrawableRuleset.SetReplayScore(CreateReplayScore(rrawableRuleset.Beatmap));
     }
 
     public abstract class ModAutoplay : Mod, IApplicableFailOverride
