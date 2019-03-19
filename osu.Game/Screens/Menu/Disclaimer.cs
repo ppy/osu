@@ -114,7 +114,7 @@ namespace osu.Game.Screens.Menu
             currentUser.BindTo(api.LocalUser);
             currentUser.BindValueChanged(e =>
             {
-                supportFlow.Children.ForEach(d => d.FadeOut(500, Easing.OutQuint).Expire());
+                supportFlow.Children.ForEach(d => d.FadeOut().Expire());
 
                 if (e.NewValue.IsSupporter)
                 {
@@ -137,6 +137,9 @@ namespace osu.Game.Screens.Menu
 
                 if (IsLoaded)
                     animateHeart();
+
+                if (supportFlow.IsPresent)
+                    supportFlow.FadeInFromZero(500);
             }, true);
         }
 
