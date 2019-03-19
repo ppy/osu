@@ -23,8 +23,6 @@ namespace osu.Game.Rulesets.Catch.Difficulty
 
         protected override int SectionLength => 750;
 
-        private float? halfCatchWidth;
-
         public CatchDifficultyCalculator(Ruleset ruleset, WorkingBeatmap beatmap)
             : base(ruleset, beatmap)
         {
@@ -49,14 +47,14 @@ namespace osu.Game.Rulesets.Catch.Difficulty
 
         protected override IEnumerable<DifficultyHitObject> CreateDifficultyHitObjects(IBeatmap beatmap, double clockRate)
         {
-            if (halfCatchWidth == null)
-            {
-                var catcher = new CatcherArea.Catcher(beatmap.BeatmapInfo.BaseDifficulty);
-                halfCatchWidth = catcher.CatchWidth * 0.5f;
+            float halfCatchWidth;
 
-                // We're only using 80% of the catcher's width to simulate imperfect gameplay.
-                halfCatchWidth *= 0.8f;
+            using (var catcher = new CatcherArea.Catcher(beatmap.BeatmapInfo.BaseDifficulty))
+            {
+                halfCatchWidth = catcher.CatchWidth * 0.5f;
+                halfCatchWidth *= 0.8f; // We're only using 80% of the catcher's width to simulate imperfect gameplay.
             }
+
 
             CatchHitObject lastObject = null;
 
@@ -72,14 +70,14 @@ namespace osu.Game.Rulesets.Catch.Difficulty
                 {
                     // We want to only consider fruits that contribute to the combo. Droplets are addressed as accuracy and spinners are not relevant for "skill" calculations.
                     case Fruit fruit:
-                        yield return new CatchDifficultyHitObject(fruit, lastObject, clockRate, halfCatchWidth.Value);
+                        yield return new CatchDifficultyHitObject(fruit, lastObject, clockRate, halfCatchWidth);
 
                         lastObject = hitObject;
                         break;
                     case JuiceStream _:
                         foreach (var nested in hitObject.NestedHitObjects.OfType<CatchHitObject>().Where(o => !(o is TinyDroplet)))
                         {
-                            yield return new CatchDifficultyHitObject(nested, lastObject, clockRate, halfCatchWidth.Value);
+                            yield return new CatchDifficultyHitObject(nested, lastObject, clockRate, halfCatchWidth);
 
                             lastObject = nested;
                         }
