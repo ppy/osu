@@ -64,6 +64,8 @@ namespace osu.Game.Online.Leaderboards
 
             statisticsLabels = GetStatistics(score).Select(s => new ScoreComponentLabel(s)).ToList();
 
+            Avatar innerAvatar;
+
             Children = new Drawable[]
             {
                 new Container
@@ -109,12 +111,11 @@ namespace osu.Game.Online.Leaderboards
                             Children = new[]
                             {
                                 avatar = new DelayedLoadWrapper(
-                                    new Avatar(user)
+                                    innerAvatar = new Avatar(user)
                                     {
                                         RelativeSizeAxes = Axes.Both,
                                         CornerRadius = corner_radius,
                                         Masking = true,
-                                        OnLoadComplete = d => d.FadeInFromZero(200),
                                         EdgeEffect = new EdgeEffectParameters
                                         {
                                             Type = EdgeEffectType.Shadow,
@@ -214,6 +215,8 @@ namespace osu.Game.Online.Leaderboards
                     },
                 },
             };
+
+            innerAvatar.OnLoadComplete += d => d.FadeInFromZero(200);
         }
 
         public override void Show()
