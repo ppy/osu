@@ -97,7 +97,7 @@ namespace osu.Game.Tests.Visual
         public void PlayerLoaderSettingsHoverTest()
         {
             setupUserSettings();
-            AddStep("Start player loader", () => songSelect.Push(playerLoader = new DimAccessiblePlayerLoader(player = new DimAccessiblePlayer())));
+            AddStep("Start player loader", () => songSelect.Push(playerLoader = new TestPlayerLoader(player = new TestPlayer())));
             AddUntilStep("Wait for Player Loader to load", () => playerLoader?.IsLoaded ?? false);
             AddAssert("Background retained from song select", () => songSelect.IsBackgroundCurrent());
             AddStep("Trigger background preview", () =>
@@ -205,7 +205,7 @@ namespace osu.Game.Tests.Visual
             performFullSetup();
             var results = new FadeAccessibleResults(new ScoreInfo { User = new User { Username = "osu!" } });
             AddStep("Transition to Results", () => player.Push(results));
-            AddUntilStep(results.IsCurrentScreen, "Wait for results is current");
+            AddUntilStep("Wait for results is current", results.IsCurrentScreen);
             waitForDim();
             AddAssert("Screen is undimmed, original background retained", () =>
                 songSelect.IsBackgroundUndimmed() && songSelect.IsBackgroundCurrent() && results.IsBlurCorrect());
