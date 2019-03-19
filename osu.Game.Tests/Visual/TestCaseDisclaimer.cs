@@ -2,16 +2,31 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
+using osu.Game.Online.API;
 using osu.Game.Screens.Menu;
+using osu.Game.Users;
 
 namespace osu.Game.Tests.Visual
 {
     public class TestCaseDisclaimer : ScreenTestCase
     {
+        [Cached(typeof(IAPIProvider))]
+        private readonly DummyAPIAccess api = new DummyAPIAccess();
+
         [BackgroundDependencyLoader]
         private void load()
         {
-            LoadScreen(new Disclaimer());
+            AddStep("load disclaimer", () => LoadScreen(new Disclaimer()));
+
+            AddStep("toggle support", () =>
+            {
+                api.LocalUser.Value = new User
+                {
+                    Username = api.LocalUser.Value.Username,
+                    Id = api.LocalUser.Value.Id,
+                    IsSupporter = !api.LocalUser.Value.IsSupporter,
+                };
+            });
         }
     }
 }
