@@ -25,30 +25,30 @@ namespace osu.Game.Tests.Visual
 
             bool logoVisible = false;
             AddStep("almost instant display", () => Child = loader = new TestLoader(250));
-            AddUntilStep(() =>
+            AddUntilStep("loaded", () =>
             {
                 logoVisible = loader.Logo?.Alpha > 0;
                 return loader.Logo != null && loader.ScreenLoaded;
-            }, "loaded");
+            });
             AddAssert("logo not visible", () => !logoVisible);
 
             AddStep("short load", () => Child = loader = new TestLoader(800));
-            AddUntilStep(() =>
+            AddUntilStep("loaded", () =>
             {
                 logoVisible = loader.Logo?.Alpha > 0;
                 return loader.Logo != null && loader.ScreenLoaded;
-            }, "loaded");
+            });
             AddAssert("logo visible", () => logoVisible);
-            AddUntilStep(() => loader.Logo?.Alpha == 0, "logo gone");
+            AddUntilStep("logo gone", () => loader.Logo?.Alpha == 0);
 
             AddStep("longer load", () => Child = loader = new TestLoader(1400));
-            AddUntilStep(() =>
+            AddUntilStep("loaded", () =>
             {
                 logoVisible = loader.Logo?.Alpha > 0;
                 return loader.Logo != null && loader.ScreenLoaded;
-            }, "loaded");
+            });
             AddAssert("logo visible", () => logoVisible);
-            AddUntilStep(() => loader.Logo?.Alpha == 0, "logo gone");
+            AddUntilStep("logo gone", () => loader.Logo?.Alpha == 0);
         }
 
         private class TestLoader : Loader

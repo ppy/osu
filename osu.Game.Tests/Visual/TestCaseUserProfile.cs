@@ -108,7 +108,7 @@ namespace osu.Game.Tests.Visual
 
         private void checkSupporterTag(bool isSupporter)
         {
-            AddUntilStep(() => profile.Header.User != null, "wait for load");
+            AddUntilStep("wait for load", () => profile.Header.User != null);
             if (isSupporter)
                 AddAssert("is supporter", () => profile.Header.SupporterTag.Alpha == 1);
             else
