@@ -112,7 +112,7 @@ namespace osu.Game.Screens.Play
                 PausableGameplayContainer = new PausableGameplayContainer
                 {
                     Retries = RestartCount,
-                    OnRetry = restart,
+                    OnRetry = Restart,
                     OnQuit = performUserRequestedExit,
                     Start = gameplayClockContainer.Start,
                     Stop = gameplayClockContainer.Stop,
@@ -154,7 +154,7 @@ namespace osu.Game.Screens.Play
                 },
                 failOverlay = new FailOverlay
                 {
-                    OnRetry = restart,
+                    OnRetry = Restart,
                     OnQuit = performUserRequestedExit,
                 },
                 new HotkeyRetryOverlay
@@ -164,7 +164,7 @@ namespace osu.Game.Screens.Play
                         if (!this.IsCurrentScreen()) return;
 
                         fadeOut(true);
-                        restart();
+                        Restart();
                     },
                 }
             };
@@ -235,7 +235,7 @@ namespace osu.Game.Screens.Play
             this.Exit();
         }
 
-        private void restart()
+        public void Restart()
         {
             if (!this.IsCurrentScreen()) return;
 
