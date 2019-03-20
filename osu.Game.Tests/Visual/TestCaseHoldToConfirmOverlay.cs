@@ -49,7 +49,7 @@ namespace osu.Game.Tests.Visual
 
             AddStep("start confirming", () => overlay.Begin());
 
-            AddUntilStep(() => fired, "wait until confirmed");
+            AddUntilStep("wait until confirmed", () => fired);
         }
 
         private class TestHoldToConfirmOverlay : ExitConfirmOverlay
