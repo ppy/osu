@@ -97,7 +97,7 @@ namespace osu.Game.Tests.Visual
         {
             setupUserSettings();
             AddStep("Start player loader", () => songSelect.Push(playerLoader = new DimAccessiblePlayerLoader(player = new DimAccessiblePlayer())));
-            AddUntilStep(() => playerLoader?.IsLoaded ?? false, "Wait for Player Loader to load");
+            AddUntilStep("Wait for Player Loader to load", () => playerLoader?.IsLoaded ?? false);
             AddAssert("Background retained from song select", () => songSelect.IsBackgroundCurrent());
             AddStep("Trigger background preview", () =>
             {
@@ -219,7 +219,7 @@ namespace osu.Game.Tests.Visual
             AddAssert("Screen is undimmed", () => songSelect.IsBackgroundUndimmed());
         }
 
-        private void waitForDim() => AddWaitStep(5, "Wait for dim");
+        private void waitForDim() => AddWaitStep("Wait for dim", 5);
 
         private void createFakeStoryboard() => AddStep("Create storyboard", () =>
         {
@@ -248,14 +248,14 @@ namespace osu.Game.Tests.Visual
                     Ready = true,
                 }));
             });
-            AddUntilStep(() => playerLoader.IsLoaded, "Wait for Player Loader to load");
+            AddUntilStep("Wait for Player Loader to load", () => playerLoader.IsLoaded);
             AddStep("Move mouse to center of screen", () => InputManager.MoveMouseTo(playerLoader.ScreenPos));
-            AddUntilStep(() => player.IsLoaded, "Wait for player to load");
+            AddUntilStep("Wait for player to load", () => player.IsLoaded);
         }
 
         private void setupUserSettings()
         {
-            AddUntilStep(() => songSelect.Carousel.SelectedBeatmap != null, "Song select has selection");
+            AddUntilStep("Song select has selection", () => songSelect.Carousel.SelectedBeatmap != null);
             AddStep("Set default user settings", () =>
             {
                 Beatmap.Value.Mods.Value = Beatmap.Value.Mods.Value.Concat(new[] { new OsuModNoFail() });
@@ -349,7 +349,7 @@ namespace osu.Game.Tests.Visual
                     Thread.Sleep(1);
                 StoryboardEnabled = config.GetBindable<bool>(OsuSetting.ShowStoryboard);
                 ReplacesBackground.BindTo(Background.StoryboardReplacesBackground);
-                RulesetContainer.IsPaused.BindTo(IsPaused);
+                DrawableRuleset.IsPaused.BindTo(IsPaused);
             }
         }
 
