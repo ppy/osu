@@ -41,8 +41,6 @@ namespace osu.Game.Screens.Play
 
         public override bool DisallowExternalBeatmapRulesetChanges => true;
 
-        public override bool HandlePositionalInput => true;
-
         private Task loadTask;
 
         private InputManager inputManager;
