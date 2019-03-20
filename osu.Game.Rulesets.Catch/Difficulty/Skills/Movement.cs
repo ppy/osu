@@ -15,9 +15,9 @@ namespace osu.Game.Rulesets.Catch.Difficulty.Skills
         private const float absolute_player_positioning_error = 16f;
         private const float normalized_hitobject_radius = 41.0f;
         private const double direction_change_bonus = 9.5;
-        private const double antiflow_bonus = 25.0;
+        private const double antiflow_bonus = 26.0;
 
-        protected override double SkillMultiplier => 850;
+        protected override double SkillMultiplier => 860;
         protected override double StrainDecayBase => 0.2;
 
         protected override double DecayWeight => 0.94;
@@ -25,6 +25,7 @@ namespace osu.Game.Rulesets.Catch.Difficulty.Skills
         private float? lastPlayerPosition;
         private float lastDistanceMoved;
         private double lastStrainTime;
+        private bool lastHyperdash;
 
         protected override double StrainValueOf(DifficultyHitObject current)
         {
@@ -44,7 +45,7 @@ namespace osu.Game.Rulesets.Catch.Difficulty.Skills
             // Reduce speed scaling
             double weightedStrainTime = catchCurrent.StrainTime + 20;
 
-            double distanceAddition = Math.Pow(Math.Abs(distanceMoved), 1.3) / 600;
+            double distanceAddition = Math.Pow(Math.Abs(distanceMoved), 1.2) / 340;
             double sqrtStrain = Math.Sqrt(weightedStrainTime);
 
             double bonus = 0;
@@ -61,7 +62,14 @@ namespace osu.Game.Rulesets.Catch.Difficulty.Skills
                     // Direction changes after jumps (antiflow) are harder
                     double antiflowBonusFactor = Math.Min(Math.Abs(distanceMoved) / 70, 1);
 
-                    distanceAddition += (antiflow_bonus / (catchCurrent.StrainTime / 40 + 10)) * (Math.Sqrt(Math.Abs(lastDistanceMoved)) / Math.Sqrt(lastStrainTime + 20)) * antiflowBonusFactor;
+                    distanceAddition += (antiflow_bonus / (catchCurrent.StrainTime / 17.5 + 10)) * (Math.Sqrt(Math.Abs(lastDistanceMoved)) / Math.Sqrt(lastStrainTime + 25)) * antiflowBonusFactor;
+
+                    // Reduce strain slightly for Hyperdash chains
+                    if (catchCurrent.LastObject.HyperDash && lastHyperdash)
+                        distanceAddition *= 0.95;
+
+                    if (catchCurrent.LastObject.DistanceToHyperDash <= 14.0f / CatchPlayfield.BASE_WIDTH && !catchCurrent.LastObject.HyperDash)
+                        bonus += 3.0;
                 }
 
                 // Base bonus for every movement, giving some weight to streams.
@@ -100,6 +108,7 @@ namespace osu.Game.Rulesets.Catch.Difficulty.Skills
             lastPlayerPosition = playerPosition;
             lastDistanceMoved = distanceMoved;
             lastStrainTime = catchCurrent.StrainTime;
+            lastHyperdash = catchCurrent.LastObject.HyperDash;
 
             return distanceAddition / weightedStrainTime;
         }
