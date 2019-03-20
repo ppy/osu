@@ -240,6 +240,7 @@ namespace osu.Game.Tests.Visual
             waitForDim();
             AddAssert("Screen is dimmed and blur applied", () => songSelect.IsBackgroundDimmed() && songSelect.IsUserBlurApplied());
             AddStep("Move mouse to center of screen", () => InputManager.MoveMouseTo(playerLoader.ScreenPos));
+            waitForDim();
             AddAssert("Screen is undimmed and user blur removed", () => songSelect.IsBackgroundUndimmed() && playerLoader.IsBlurCorrect());
         }
 
