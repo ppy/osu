@@ -399,10 +399,7 @@ namespace osu.Game
                         logoContainer = new Container { RelativeSizeAxes = Axes.Both },
                     }
                 },
-                overlayContent = new Container
-                {
-                    RelativeSizeAxes = Axes.Both,
-                },
+                overlayContent = new Container { RelativeSizeAxes = Axes.Both },
                 floatingOverlayContent = new Container { RelativeSizeAxes = Axes.Both },
                 idleTracker = new GameIdleTracker(6000)
             });
@@ -414,10 +411,7 @@ namespace osu.Game
 
             loadComponentSingleFile(osuLogo, logoContainer.Add);
 
-            loadComponentSingleFile(new Loader
-            {
-                RelativeSizeAxes = Axes.Both
-            }, screenStack.Push);
+            loadComponentSingleFile(new Loader { RelativeSizeAxes = Axes.Both }, screenStack.Push);
 
             loadComponentSingleFile(Toolbar = new Toolbar
             {
