@@ -223,6 +223,26 @@ namespace osu.Game.Tests.Visual
             AddAssert("Screen is undimmed and user blur removed", () => songSelect.IsBackgroundUndimmed() && songSelect.IsBlurCorrect());
         }
 
+        /// <summary>
+        /// Check if hovering on the visual settings dialogue after resuming from player still previews the background dim.
+        /// </summary>
+        [Test]
+        public void ResumeFromPlayerTest()
+        {
+            performFullSetup();
+            AddStep("Move mouse to Visual Settings", () => InputManager.MoveMouseTo(playerLoader.VisualSettingsPos));
+            AddStep("Resume PlayerLoader", () =>
+            {
+                player.ValidForResume = false;
+                player.RestartRequested?.Invoke();
+                player.Exit();
+            });
+            waitForDim();
+            AddAssert("Screen is dimmed and blur applied", () => songSelect.IsBackgroundDimmed() && songSelect.IsUserBlurApplied());
+            AddStep("Move mouse to center of screen", () => InputManager.MoveMouseTo(playerLoader.ScreenPos));
+            AddAssert("Screen is undimmed and user blur removed", () => songSelect.IsBackgroundUndimmed() && playerLoader.IsBlurCorrect());
+        }
+
         private void waitForDim() => AddWaitStep("Wait for dim", 5);
 
         private void createFakeStoryboard() => AddStep("Create storyboard", () =>

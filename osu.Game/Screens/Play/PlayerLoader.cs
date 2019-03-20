@@ -211,8 +211,6 @@ namespace osu.Game.Screens.Play
 
         public override void OnSuspending(IScreen next)
         {
-            Background.EnableUserDim.Value = true;
-
             base.OnSuspending(next);
             cancelLoad();
         }
