@@ -45,15 +45,15 @@ namespace osu.Game.Rulesets.Mods
             Combo.BindTo(scoreProcessor.Combo);
         }
 
-        public virtual void ApplyToDrawableRuleset(DrawableRuleset<T> rrawableRuleset)
+        public virtual void ApplyToDrawableRuleset(DrawableRuleset<T> drawableRuleset)
         {
             var flashlight = CreateFlashlight();
             flashlight.Combo = Combo;
             flashlight.RelativeSizeAxes = Axes.Both;
             flashlight.Colour = Color4.Black;
-            rrawableRuleset.KeyBindingInputManager.Add(flashlight);
+            drawableRuleset.KeyBindingInputManager.Add(flashlight);
 
-            flashlight.Breaks = rrawableRuleset.Beatmap.Breaks;
+            flashlight.Breaks = drawableRuleset.Beatmap.Breaks;
         }
 
         public abstract Flashlight CreateFlashlight();

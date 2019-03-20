@@ -15,7 +15,7 @@ namespace osu.Game.Rulesets.Mods
         /// <summary>
         /// Applies this <see cref="IApplicableToDrawableRuleset{TObject}"/> to a <see cref="DrawableRuleset{TObject}"/>.
         /// </summary>
-        /// <param name="rrawableRuleset">The <see cref="DrawableRuleset{TObject}"/> to apply to.</param>
-        void ApplyToDrawableRuleset(DrawableRuleset<TObject> rrawableRuleset);
+        /// <param name="drawableRuleset">The <see cref="DrawableRuleset{TObject}"/> to apply to.</param>
+        void ApplyToDrawableRuleset(DrawableRuleset<TObject> drawableRuleset);
     }
 }

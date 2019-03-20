@@ -92,8 +92,8 @@ namespace osu.Game.Rulesets.Mania.Scoring
         {
         }
 
-        public ManiaScoreProcessor(DrawableRuleset<ManiaHitObject> rrawableRuleset)
-            : base(rrawableRuleset)
+        public ManiaScoreProcessor(DrawableRuleset<ManiaHitObject> drawableRuleset)
+            : base(drawableRuleset)
         {
         }
 

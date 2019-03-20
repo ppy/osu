@@ -13,8 +13,8 @@ namespace osu.Game.Rulesets.Catch.Scoring
 {
     public class CatchScoreProcessor : ScoreProcessor<CatchHitObject>
     {
-        public CatchScoreProcessor(DrawableRuleset<CatchHitObject> rrawableRuleset)
-            : base(rrawableRuleset)
+        public CatchScoreProcessor(DrawableRuleset<CatchHitObject> drawableRuleset)
+            : base(drawableRuleset)
         {
         }
 

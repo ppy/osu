@@ -210,15 +210,15 @@ namespace osu.Game.Rulesets.Scoring
         {
         }
 
-        public ScoreProcessor(DrawableRuleset<TObject> rrawableRuleset)
+        public ScoreProcessor(DrawableRuleset<TObject> drawableRuleset)
         {
             Debug.Assert(base_portion + combo_portion == 1.0);
 
-            rrawableRuleset.OnNewResult += applyResult;
-            rrawableRuleset.OnRevertResult += revertResult;
+            drawableRuleset.OnNewResult += applyResult;
+            drawableRuleset.OnRevertResult += revertResult;
 
-            ApplyBeatmap(rrawableRuleset.Beatmap);
-            SimulateAutoplay(rrawableRuleset.Beatmap);
+            ApplyBeatmap(drawableRuleset.Beatmap);
+            SimulateAutoplay(drawableRuleset.Beatmap);
             Reset(true);
 
             if (maxBaseScore == 0 || maxHighestCombo == 0)
