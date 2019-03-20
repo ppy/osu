@@ -73,7 +73,7 @@ namespace osu.Game.Graphics.Containers
 
         public override void Add(Drawable drawable)
         {
-            // We need to blur instantly here in the case of changing beatmap backgrounds, where blurring shouldn't be from 0 every time the beatmap is changed.
+            // Make sure we're already at the correct blur target when a background is added to the container.
             if (drawable is Background b)
             {
                 background = b;
