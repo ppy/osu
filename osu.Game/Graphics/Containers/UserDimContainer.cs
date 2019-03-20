@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -50,11 +51,12 @@ namespace osu.Game.Graphics.Containers
 
         private readonly bool isStoryboard;
 
+        /// <summary>
+        /// As an optimisation, we add the two blur portions to be applied rather than actually applying two separate blurs.
+        /// </summary>
         private Vector2 blurTarget => EnableUserDim.Value
             ? new Vector2(BlurAmount.Value + (float)userBlurLevel.Value * 25)
             : new Vector2(BlurAmount.Value);
-
-        private Background background;
 
         /// <summary>
         /// Creates a new <see cref="UserDimContainer"/>.
@@ -71,14 +73,22 @@ namespace osu.Game.Graphics.Containers
             AddInternal(DimContainer = new Container { RelativeSizeAxes = Axes.Both });
         }
 
-        public override void Add(Drawable drawable)
+        private Background background;
+
+        public Background Background
         {
-            // Make sure we're already at the correct blur target when a background is added to the container.
-            if (drawable is Background b)
+            get => background;
+            set
             {
-                background = b;
+                background = value;
                 background.BlurTo(blurTarget, 0, Easing.OutQuint);
             }
+        }
+
+        public override void Add(Drawable drawable)
+        {
+            if (drawable is Background)
+                throw new InvalidOperationException($"Use {nameof(Background)} to set a background.");
 
             base.Add(drawable);
         }
@@ -115,10 +125,7 @@ namespace osu.Game.Graphics.Containers
                 // The background needs to be hidden in the case of it being replaced by the storyboard
                 DimContainer.FadeTo(showStoryboard.Value && StoryboardReplacesBackground.Value ? 0 : 1, background_fade_duration, Easing.OutQuint);
 
-                // This only works if the background is a direct child of DimContainer.
-                // We can't blur the container like we did with the dim because buffered containers add considerable draw overhead.
-                // As a result, this blurs the background directly via the direct children of DimContainer.
-                background?.BlurTo(blurTarget, background_fade_duration, Easing.OutQuint);
+                Background?.BlurTo(blurTarget, background_fade_duration, Easing.OutQuint);
             }
 
             DimContainer.FadeColour(EnableUserDim.Value ? OsuColour.Gray(1 - (float)userDimLevel.Value) : Color4.White, background_fade_duration, Easing.OutQuint);
