@@ -55,7 +55,7 @@ namespace osu.Game.Screens.Play
         /// Called when background elements require updates, usually due to a user changing a setting.
         /// </summary>
         /// <param name="userChange"></param>
-        protected virtual void UpdateBackgroundElements()
+        protected void UpdateBackgroundElements()
         {
             if (!this.IsCurrentScreen()) return;
 

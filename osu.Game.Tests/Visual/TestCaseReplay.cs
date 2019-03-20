@@ -1,7 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
 using System.ComponentModel;
 using System.Linq;
 using osu.Game.Rulesets;
@@ -12,7 +11,7 @@ using osu.Game.Screens.Play;
 namespace osu.Game.Tests.Visual
 {
     [Description("Player instantiated with a replay.")]
-    public class TestCaseReplay : TestCasePlayer
+    public class TestCaseReplay : AllPlayersTestCase
     {
         protected override Player CreatePlayer(Ruleset ruleset)
         {
@@ -21,11 +20,10 @@ namespace osu.Game.Tests.Visual
             return new ScoreAccessibleReplayPlayer(ruleset.GetAutoplayMod().CreateReplayScore(beatmap));
         }
 
-        protected override void AddCheckSteps(Func<Player> player)
+        protected override void AddCheckSteps()
         {
-            base.AddCheckSteps(player);
-            AddUntilStep(() => ((ScoreAccessibleReplayPlayer)player()).ScoreProcessor.TotalScore.Value > 0, "score above zero");
-            AddUntilStep(() => ((ScoreAccessibleReplayPlayer)player()).HUDOverlay.KeyCounter.Children.Any(kc => kc.CountPresses > 0), "key counter counted keys");
+            AddUntilStep("score above zero", () => ((ScoreAccessibleReplayPlayer)Player).ScoreProcessor.TotalScore.Value > 0);
+            AddUntilStep("key counter counted keys", () => ((ScoreAccessibleReplayPlayer)Player).HUDOverlay.KeyCounter.Children.Any(kc => kc.CountPresses > 0));
         }
 
         private class ScoreAccessibleReplayPlayer : ReplayPlayer

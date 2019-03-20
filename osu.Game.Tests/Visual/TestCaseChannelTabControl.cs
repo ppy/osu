@@ -90,7 +90,7 @@ namespace osu.Game.Tests.Visual
             AddStep("set second channel", () => channelTabControl.Current.Value = channelTabControl.Items.Skip(1).First());
             AddAssert("selector tab is inactive", () => !channelTabControl.ChannelSelectorActive.Value);
 
-            AddUntilStep(() =>
+            AddUntilStep("remove all channels", () =>
             {
                 var first = channelTabControl.Items.First();
                 if (first.Name == "+")
@@ -98,7 +98,7 @@ namespace osu.Game.Tests.Visual
 
                 channelTabControl.RemoveChannel(first);
                 return false;
-            }, "remove all channels");
+            });
 
             AddAssert("selector tab is active", () => channelTabControl.ChannelSelectorActive.Value);
         }

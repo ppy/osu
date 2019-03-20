@@ -22,7 +22,7 @@ namespace osu.Game.Tests.Visual
         private BeatmapManager beatmaps { get; set; }
 
         [BackgroundDependencyLoader]
-        private void load(OsuGameBase osu, APIAccess api, RulesetStore rulesets)
+        private void load(OsuGameBase osu, IAPIProvider api, RulesetStore rulesets)
         {
             Bindable<BeatmapInfo> beatmapBindable = new Bindable<BeatmapInfo>();
 
@@ -36,18 +36,18 @@ namespace osu.Game.Tests.Visual
             api.Queue(req);
 
             AddStep("load null beatmap", () => beatmapBindable.Value = null);
-            AddUntilStep(() => backgroundSprite.ChildCount == 1, "wait for cleanup...");
+            AddUntilStep("wait for cleanup...", () => backgroundSprite.ChildCount == 1);
             AddStep("load imported beatmap", () => beatmapBindable.Value = imported.Beatmaps.First());
-            AddUntilStep(() => backgroundSprite.ChildCount == 1, "wait for cleanup...");
+            AddUntilStep("wait for cleanup...", () => backgroundSprite.ChildCount == 1);
 
             if (api.IsLoggedIn)
             {
-                AddUntilStep(() => req.Result != null, "wait for api response");
+                AddUntilStep("wait for api response", () => req.Result != null);
                 AddStep("load online beatmap", () => beatmapBindable.Value = new BeatmapInfo
                 {
                     BeatmapSet = req.Result?.ToBeatmapSet(rulesets)
                 });
-                AddUntilStep(() => backgroundSprite.ChildCount == 1, "wait for cleanup...");
+                AddUntilStep("wait for cleanup...", () => backgroundSprite.ChildCount == 1);
             }
             else
             {

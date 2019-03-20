@@ -5,6 +5,6 @@ namespace osu.Game.Online.API
 {
     public interface IOnlineComponent
     {
-        void APIStateChanged(APIAccess api, APIState state);
+        void APIStateChanged(IAPIProvider api, APIState state);
     }
 }
