@@ -34,7 +34,7 @@ namespace osu.Game.Rulesets.Edit
 
         private readonly List<Container> layerContainers = new List<Container>();
 
-        protected EditDrawableRuleset DrawableRuleset { get; private set; }
+        protected DrawableEditRuleset DrawableRuleset { get; private set; }
 
         private BlueprintContainer blueprintContainer;
 
@@ -160,7 +160,7 @@ namespace osu.Game.Rulesets.Edit
 
         public void Remove(HitObject hitObject) => blueprintContainer.RemoveBlueprintFor(DrawableRuleset.Remove(hitObject));
 
-        internal abstract EditDrawableRuleset CreateDrawableRuleset();
+        internal abstract DrawableEditRuleset CreateDrawableRuleset();
 
         protected abstract IReadOnlyList<HitObjectCompositionTool> CompositionTools { get; }
 
@@ -189,8 +189,8 @@ namespace osu.Game.Rulesets.Edit
         {
         }
 
-        internal override EditDrawableRuleset CreateDrawableRuleset()
-            => new EditDrawableRuleset<TObject>(CreateDrawableRuleset(Ruleset, Beatmap.Value));
+        internal override DrawableEditRuleset CreateDrawableRuleset()
+            => new DrawableEditRuleset<TObject>(CreateDrawableRuleset(Ruleset, Beatmap.Value));
 
         protected abstract DrawableRuleset<TObject> CreateDrawableRuleset(Ruleset ruleset, WorkingBeatmap beatmap);
     }

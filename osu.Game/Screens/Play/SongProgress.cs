@@ -109,7 +109,7 @@ namespace osu.Game.Screens.Play
             replayLoaded.TriggerChange();
         }
 
-        public void BindRulestContainer(DrawableRuleset drawableRuleset)
+        public void BindDrawableRuleset(DrawableRuleset drawableRuleset)
         {
             replayLoaded.BindTo(drawableRuleset.HasReplayLoaded);
         }
