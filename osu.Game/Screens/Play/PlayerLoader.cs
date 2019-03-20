@@ -157,6 +157,12 @@ namespace osu.Game.Screens.Play
             logo.Delay(resuming ? 0 : 500).MoveToOffset(new Vector2(0, -0.24f), 500, Easing.InOutExpo);
         }
 
+        protected override void LoadComplete()
+        {
+            inputManager = GetContainingInputManager();
+            base.LoadComplete();
+        }
+
         private ScheduledDelegate pushDebounce;
         protected VisualSettings VisualSettings;
 
@@ -204,12 +210,6 @@ namespace osu.Game.Screens.Play
             {
                 Schedule(pushWhenLoaded);
             }
-        }
-
-        protected override void LoadComplete()
-        {
-            inputManager = GetContainingInputManager();
-            base.LoadComplete();
         }
 
         private void cancelLoad()
