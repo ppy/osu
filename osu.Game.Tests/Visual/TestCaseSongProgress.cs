@@ -46,23 +46,23 @@ namespace osu.Game.Tests.Visual
                 Origin = Anchor.TopLeft,
             });
 
-            AddWaitStep(5);
+            AddWaitStep("wait some", 5);
             AddAssert("ensure not created", () => graph.CreationCount == 0);
 
             AddStep("display values", displayNewValues);
-            AddWaitStep(5);
-            AddUntilStep(() => graph.CreationCount == 1, "wait for creation count");
+            AddWaitStep("wait some", 5);
+            AddUntilStep("wait for creation count", () => graph.CreationCount == 1);
 
             AddStep("Toggle Bar", () => progress.AllowSeeking = !progress.AllowSeeking);
-            AddWaitStep(5);
-            AddUntilStep(() => graph.CreationCount == 1, "wait for creation count");
+            AddWaitStep("wait some", 5);
+            AddUntilStep("wait for creation count", () => graph.CreationCount == 1);
 
             AddStep("Toggle Bar", () => progress.AllowSeeking = !progress.AllowSeeking);
-            AddWaitStep(5);
-            AddUntilStep(() => graph.CreationCount == 1, "wait for creation count");
+            AddWaitStep("wait some", 5);
+            AddUntilStep("wait for creation count", () => graph.CreationCount == 1);
             AddRepeatStep("New Values", displayNewValues, 5);
 
-            AddWaitStep(5);
+            AddWaitStep("wait some", 5);
             AddAssert("ensure debounced", () => graph.CreationCount == 2);
         }
 
