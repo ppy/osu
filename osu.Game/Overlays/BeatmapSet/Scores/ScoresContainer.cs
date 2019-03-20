@@ -29,7 +29,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
         private readonly LoadingAnimation loadingAnimation;
 
         [Resolved]
-        private APIAccess api { get; set; }
+        private IAPIProvider api { get; set; }
 
         public ScoresContainer()
         {
@@ -71,7 +71,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
         }
 
         [BackgroundDependencyLoader]
-        private void load(APIAccess api, OsuColour colours)
+        private void load(OsuColour colours)
         {
             background.Colour = colours.Gray2;
             updateDisplay();
