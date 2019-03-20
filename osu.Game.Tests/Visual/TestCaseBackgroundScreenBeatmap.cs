@@ -74,21 +74,17 @@ namespace osu.Game.Tests.Visual
             Dependencies.Cache(manager = new BeatmapManager(LocalStorage, factory, rulesets, null, null, host, Beatmap.Default));
             Dependencies.Cache(new OsuConfigManager(LocalStorage));
 
+            manager.Import(TestResources.GetTestBeatmapForImport());
+
             Beatmap.SetDefault();
         }
 
         [SetUp]
-        public virtual void SetUp()
+        public virtual void SetUp() => Schedule(() =>
         {
-            Schedule(() =>
-            {
-                manager.Delete(manager.GetAllUsableBeatmapSets());
-                var temp = TestResources.GetTestBeatmapForImport();
-                manager.Import(temp);
-                Child = screenStackContainer = new ScreenStackCacheContainer { RelativeSizeAxes = Axes.Both };
-                screenStackContainer.ScreenStack.Push(songSelect = new DummySongSelect());
-            });
-        }
+            Child = screenStackContainer = new ScreenStackCacheContainer { RelativeSizeAxes = Axes.Both };
+            screenStackContainer.ScreenStack.Push(songSelect = new DummySongSelect());
+        });
 
         /// <summary>
         /// Check if <see cref="PlayerLoader"/> properly triggers the visual settings preview when a user hovers over the visual settings panel.
