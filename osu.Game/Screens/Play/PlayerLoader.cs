@@ -8,6 +8,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Input;
 using osu.Framework.Localisation;
 using osu.Framework.Screens;
 using osu.Framework.Threading;
@@ -43,6 +44,8 @@ namespace osu.Game.Screens.Play
         public override bool HandlePositionalInput => true;
 
         private Task loadTask;
+
+        private InputManager inputManager;
 
         public PlayerLoader(Func<Player> createPlayer)
         {
@@ -203,6 +206,12 @@ namespace osu.Game.Screens.Play
             }
         }
 
+        protected override void LoadComplete()
+        {
+            inputManager = GetContainingInputManager();
+            base.LoadComplete();
+        }
+
         private void cancelLoad()
         {
             pushDebounce?.Cancel();
@@ -244,7 +253,7 @@ namespace osu.Game.Screens.Play
             if (!this.IsCurrentScreen())
                 return;
 
-            if (GetContainingInputManager()?.HoveredDrawables.Contains(VisualSettings) == true)
+            if (inputManager.HoveredDrawables.Contains(VisualSettings))
             {
                 // Acts as an "on hover" trigger for the visual settings panel.
                 // Preview user-defined background dim and blur when hovered on the visual settings panel.
