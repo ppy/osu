@@ -164,6 +164,9 @@ namespace osu.Game.Screens.Play
         private ScheduledDelegate pushDebounce;
         protected VisualSettings VisualSettings;
 
+        // HandlePositionalInput is being set to true here because IsHovered will not update unless we do so.
+        public override bool HandlePositionalInput => true;
+
         private bool readyForPush => player.LoadState == LoadState.Ready && IsHovered && GetContainingInputManager()?.DraggedDrawable == null;
 
         private void pushWhenLoaded()
