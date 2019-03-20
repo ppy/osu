@@ -22,10 +22,10 @@ namespace osu.Game.Rulesets.Taiko.Mods
 
         private TaikoPlayfield playfield;
 
-        public override void ApplyToRulesetContainer(RulesetContainer<TaikoHitObject> rulesetContainer)
+        public override void ApplyToDrawableRuleset(DrawableRuleset<TaikoHitObject> drawableRuleset)
         {
-            playfield = (TaikoPlayfield)rulesetContainer.Playfield;
-            base.ApplyToRulesetContainer(rulesetContainer);
+            playfield = (TaikoPlayfield)drawableRuleset.Playfield;
+            base.ApplyToDrawableRuleset(drawableRuleset);
         }
 
         private class TaikoFlashlight : Flashlight

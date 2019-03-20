@@ -320,6 +320,8 @@ namespace osu.Game.Overlays
             this.MoveToY(Height, transition_length, Easing.InSine);
             this.FadeOut(transition_length, Easing.InSine);
 
+            channelSelectionOverlay.State = Visibility.Hidden;
+
             textbox.HoldFocus = false;
             base.PopOut();
         }
