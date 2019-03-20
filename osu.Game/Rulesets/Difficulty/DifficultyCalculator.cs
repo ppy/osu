@@ -57,9 +57,9 @@ namespace osu.Game.Rulesets.Difficulty
             foreach (var combination in CreateDifficultyAdjustmentModCombinations())
             {
                 if (combination is MultiMod multi)
-                    yield return Calculate(multi.Mods.Select(m => m.CreateCopy()).ToArray());
+                    yield return Calculate(multi.Mods);
                 else
-                    yield return Calculate(combination.CreateCopy());
+                    yield return Calculate(combination);
             }
         }
 
