@@ -28,8 +28,10 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Mania.UI
 {
-    public class ManiaRulesetContainer : ScrollingRulesetContainer<ManiaPlayfield, ManiaHitObject>
+    public class DrawableManiaRuleset : DrawableScrollingRuleset<ManiaHitObject>
     {
+        protected new ManiaPlayfield Playfield => (ManiaPlayfield)base.Playfield;
+
         public new ManiaBeatmap Beatmap => (ManiaBeatmap)base.Beatmap;
 
         public IEnumerable<BarLine> BarLines;
@@ -38,7 +40,7 @@ namespace osu.Game.Rulesets.Mania.UI
 
         private readonly Bindable<ManiaScrollingDirection> configDirection = new Bindable<ManiaScrollingDirection>();
 
-        public ManiaRulesetContainer(Ruleset ruleset, WorkingBeatmap beatmap)
+        public DrawableManiaRuleset(Ruleset ruleset, WorkingBeatmap beatmap)
             : base(ruleset, beatmap)
         {
             // Generate the bar lines
@@ -97,7 +99,7 @@ namespace osu.Game.Rulesets.Mania.UI
 
         public override int Variant => (int)(Beatmap.Stages.Count == 1 ? PlayfieldType.Single : PlayfieldType.Dual) + Beatmap.TotalColumns;
 
-        public override PassThroughInputManager CreateInputManager() => new ManiaInputManager(Ruleset.RulesetInfo, Variant);
+        protected override PassThroughInputManager CreateInputManager() => new ManiaInputManager(Ruleset.RulesetInfo, Variant);
 
         public override DrawableHitObject<ManiaHitObject> GetVisualRepresentation(ManiaHitObject h)
         {
