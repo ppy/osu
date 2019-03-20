@@ -1,7 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -55,6 +54,8 @@ namespace osu.Game.Graphics.Containers
             ? new Vector2(BlurAmount.Value + (float)blurLevel.Value * 25)
             : new Vector2(BlurAmount.Value);
 
+        private Background background;
+
         /// <summary>
         /// Creates a new <see cref="UserDimContainer"/>.
         /// </summary>
@@ -74,7 +75,10 @@ namespace osu.Game.Graphics.Containers
         {
             // We need to blur instantly here in the case of changing beatmap backgrounds, where blurring shouldn't be from 0 every time the beatmap is changed.
             if (drawable is Background b)
+            {
+                background = b;
                 b.BlurTo(blurTarget, 0, Easing.OutQuint);
+            }
 
             base.Add(drawable);
         }
@@ -113,7 +117,7 @@ namespace osu.Game.Graphics.Containers
                 // This only works if the background is a direct child of DimContainer.
                 // We can't blur the container like we did with the dim because buffered containers add considerable draw overhead.
                 // As a result, this blurs the background directly via the direct children of DimContainer.
-                DimContainer.Children.OfType<Background>().FirstOrDefault()?.BlurTo(blurTarget, background_fade_duration, Easing.OutQuint);
+                background?.BlurTo(blurTarget, background_fade_duration, Easing.OutQuint);
             }
 
             DimContainer.FadeColour(EnableUserDim.Value ? OsuColour.Gray(1 - (float)dimLevel.Value) : Color4.White, background_fade_duration, Easing.OutQuint);
