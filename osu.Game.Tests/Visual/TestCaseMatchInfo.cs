@@ -14,7 +14,7 @@ using osu.Game.Screens.Multi.Match.Components;
 namespace osu.Game.Tests.Visual
 {
     [TestFixture]
-    public class TestCaseMatchInfo : OsuTestCase
+    public class TestCaseMatchInfo : MultiplayerTestCase
     {
         public override IReadOnlyList<Type> RequiredTypes => new[]
         {
@@ -27,18 +27,15 @@ namespace osu.Game.Tests.Visual
         [BackgroundDependencyLoader]
         private void load(RulesetStore rulesets)
         {
-            var room = new Room();
+            Add(new Info());
 
-            Info info = new Info(room);
-            Add(info);
-
-            AddStep(@"set name", () => room.Name.Value = @"Room Name?");
-            AddStep(@"set availability", () => room.Availability.Value = RoomAvailability.FriendsOnly);
-            AddStep(@"set status", () => room.Status.Value = new RoomStatusPlaying());
+            AddStep(@"set name", () => Room.Name.Value = @"Room Name?");
+            AddStep(@"set availability", () => Room.Availability.Value = RoomAvailability.FriendsOnly);
+            AddStep(@"set status", () => Room.Status.Value = new RoomStatusPlaying());
             AddStep(@"set beatmap", () =>
             {
-                room.Playlist.Clear();
-                room.Playlist.Add(new PlaylistItem
+                Room.Playlist.Clear();
+                Room.Playlist.Add(new PlaylistItem
                 {
                     Beatmap = new BeatmapInfo
                     {
@@ -54,14 +51,14 @@ namespace osu.Game.Tests.Visual
                 });
             });
 
-            AddStep(@"change name", () => room.Name.Value = @"Room Name!");
-            AddStep(@"change availability", () => room.Availability.Value = RoomAvailability.InviteOnly);
-            AddStep(@"change status", () => room.Status.Value = new RoomStatusOpen());
-            AddStep(@"null beatmap", () => room.Playlist.Clear());
+            AddStep(@"change name", () => Room.Name.Value = @"Room Name!");
+            AddStep(@"change availability", () => Room.Availability.Value = RoomAvailability.InviteOnly);
+            AddStep(@"change status", () => Room.Status.Value = new RoomStatusOpen());
+            AddStep(@"null beatmap", () => Room.Playlist.Clear());
             AddStep(@"change beatmap", () =>
             {
-                room.Playlist.Clear();
-                room.Playlist.Add(new PlaylistItem
+                Room.Playlist.Clear();
+                Room.Playlist.Add(new PlaylistItem
                 {
                     Beatmap = new BeatmapInfo
                     {

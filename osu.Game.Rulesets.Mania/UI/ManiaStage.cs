@@ -136,12 +136,12 @@ namespace osu.Game.Rulesets.Mania.UI
                 AddColumn(column);
             }
 
-            Direction.BindValueChanged(d =>
+            Direction.BindValueChanged(dir =>
             {
                 barLineContainer.Padding = new MarginPadding
                 {
-                    Top = d == ScrollingDirection.Up ? HIT_TARGET_POSITION : 0,
-                    Bottom = d == ScrollingDirection.Down ? HIT_TARGET_POSITION : 0,
+                    Top = dir.NewValue == ScrollingDirection.Up ? HIT_TARGET_POSITION : 0,
+                    Bottom = dir.NewValue == ScrollingDirection.Down ? HIT_TARGET_POSITION : 0,
                 };
             }, true);
         }
@@ -185,7 +185,7 @@ namespace osu.Game.Rulesets.Mania.UI
 
         internal void OnNewResult(DrawableHitObject judgedObject, JudgementResult result)
         {
-            if (!judgedObject.DisplayResult || !DisplayJudgements)
+            if (!judgedObject.DisplayResult || !DisplayJudgements.Value)
                 return;
 
             judgements.Clear();

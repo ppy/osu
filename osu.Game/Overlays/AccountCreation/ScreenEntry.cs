@@ -33,7 +33,7 @@ namespace osu.Game.Overlays.AccountCreation
         private OsuTextBox emailTextBox;
         private OsuPasswordTextBox passwordTextBox;
 
-        private APIAccess api;
+        private IAPIProvider api;
         private ShakeContainer registerShake;
         private IEnumerable<Drawable> characterCheckText;
 
@@ -42,7 +42,7 @@ namespace osu.Game.Overlays.AccountCreation
         private GameHost host;
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours, APIAccess api, GameHost host)
+        private void load(OsuColour colours, IAPIProvider api, GameHost host)
         {
             this.api = api;
             this.host = host;
@@ -61,10 +61,10 @@ namespace osu.Game.Overlays.AccountCreation
                     {
                         new OsuSpriteText
                         {
-                            TextSize = 20,
                             Margin = new MarginPadding { Vertical = 10 },
                             Anchor = Anchor.TopCentre,
                             Origin = Anchor.TopCentre,
+                            Font = OsuFont.GetFont(size: 20),
                             Text = "Let's create an account!",
                         },
                         usernameTextBox = new OsuTextBox
@@ -129,13 +129,13 @@ namespace osu.Game.Overlays.AccountCreation
             usernameDescription.AddText("This will be your public presence. No profanity, no impersonation. Avoid exposing your own personal details, too!");
 
             emailAddressDescription.AddText("Will be used for notifications, account verification and in the case you forget your password. No spam, ever.");
-            emailAddressDescription.AddText(" Make sure to get it right!", cp => cp.Font = "Exo2.0-Bold");
+            emailAddressDescription.AddText(" Make sure to get it right!", cp => cp.Font = cp.Font.With(Typeface.Exo, weight: FontWeight.Bold));
 
             passwordDescription.AddText("At least ");
             characterCheckText = passwordDescription.AddText("8 characters long");
             passwordDescription.AddText(". Choose something long but also something you will remember, like a line from your favourite song.");
 
-            passwordTextBox.Current.ValueChanged += text => { characterCheckText.ForEach(s => s.Colour = text.Length == 0 ? Color4.White : Interpolation.ValueAt(text.Length, Color4.OrangeRed, Color4.YellowGreen, 0, 8, Easing.In)); };
+            passwordTextBox.Current.ValueChanged += password => { characterCheckText.ForEach(s => s.Colour = password.NewValue.Length == 0 ? Color4.White : Interpolation.ValueAt(password.NewValue.Length, Color4.OrangeRed, Color4.YellowGreen, 0, 8, Easing.In)); };
         }
 
         protected override void Update()

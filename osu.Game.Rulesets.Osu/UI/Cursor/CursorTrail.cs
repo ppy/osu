@@ -24,7 +24,7 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
     {
         private int currentIndex;
 
-        private Shader shader;
+        private IShader shader;
         private Texture texture;
 
         private Vector2 size => texture.Size * Scale;
@@ -35,7 +35,6 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
 
         public override bool IsPresent => true;
 
-        private readonly TrailDrawNodeSharedData trailDrawNodeSharedData = new TrailDrawNodeSharedData();
         private const int max_sprites = 2048;
 
         private readonly TrailPart[] parts = new TrailPart[max_sprites];
@@ -55,7 +54,6 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
             tNode.Texture = texture;
             tNode.Size = size;
             tNode.Time = time;
-            tNode.Shared = trailDrawNodeSharedData;
 
             for (int i = 0; i < parts.Length; ++i)
                 if (parts[i].InvalidationID > tNode.Parts[i].InvalidationID)
@@ -81,7 +79,7 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
         [BackgroundDependencyLoader]
         private void load(ShaderManager shaders, TextureStore textures)
         {
-            shader = shaders?.Load(@"CursorTrail", FragmentShaderDescriptor.TEXTURE);
+            shader = shaders.Load(@"CursorTrail", FragmentShaderDescriptor.TEXTURE);
             texture = textures.Get(@"Cursor/cursortrail");
             Scale = new Vector2(1 / texture.ScaleAdjust);
         }
@@ -167,21 +165,17 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
             public bool WasUpdated;
         }
 
-        private class TrailDrawNodeSharedData
-        {
-            public VertexBuffer<TexturedTrailVertex> VertexBuffer;
-        }
-
         private class TrailDrawNode : DrawNode
         {
-            public Shader Shader;
+            public IShader Shader;
             public Texture Texture;
 
             public float Time;
-            public TrailDrawNodeSharedData Shared;
 
             public readonly TrailPart[] Parts = new TrailPart[max_sprites];
             public Vector2 Size;
+
+            private readonly VertexBuffer<TexturedTrailVertex> vertexBuffer = new QuadVertexBuffer<TexturedTrailVertex>(max_sprites, BufferUsageHint.DynamicDraw);
 
             public TrailDrawNode()
             {
@@ -194,9 +188,6 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
 
             public override void Draw(Action<TexturedVertex2D> vertexAction)
             {
-                if (Shared.VertexBuffer == null)
-                    Shared.VertexBuffer = new QuadVertexBuffer<TexturedTrailVertex>(max_sprites, BufferUsageHint.DynamicDraw);
-
                 Shader.GetUniform<float>("g_FadeClock").UpdateValue(ref Time);
 
                 int updateStart = -1, updateEnd = 0;
@@ -218,7 +209,7 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
                             new Quad(pos.X - Size.X / 2, pos.Y - Size.Y / 2, Size.X, Size.Y),
                             DrawColourInfo.Colour,
                             null,
-                            v => Shared.VertexBuffer.Vertices[end++] = new TexturedTrailVertex
+                            v => vertexBuffer.Vertices[end++] = new TexturedTrailVertex
                             {
                                 Position = v.Position,
                                 TexturePosition = v.TexturePosition,
@@ -230,23 +221,30 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
                     }
                     else if (updateStart != -1)
                     {
-                        Shared.VertexBuffer.UpdateRange(updateStart * 4, updateEnd * 4);
+                        vertexBuffer.UpdateRange(updateStart * 4, updateEnd * 4);
                         updateStart = -1;
                     }
                 }
 
                 // Update all remaining vertices that have been changed.
                 if (updateStart != -1)
-                    Shared.VertexBuffer.UpdateRange(updateStart * 4, updateEnd * 4);
+                    vertexBuffer.UpdateRange(updateStart * 4, updateEnd * 4);
 
                 base.Draw(vertexAction);
 
                 Shader.Bind();
 
                 Texture.TextureGL.Bind();
-                Shared.VertexBuffer.Draw();
+                vertexBuffer.Draw();
 
                 Shader.Unbind();
+            }
+
+            protected override void Dispose(bool isDisposing)
+            {
+                base.Dispose(isDisposing);
+
+                vertexBuffer.Dispose();
             }
         }
 
@@ -255,10 +253,13 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
         {
             [VertexMember(2, VertexAttribPointerType.Float)]
             public Vector2 Position;
+
             [VertexMember(4, VertexAttribPointerType.Float)]
             public Color4 Colour;
+
             [VertexMember(2, VertexAttribPointerType.Float)]
             public Vector2 TexturePosition;
+
             [VertexMember(1, VertexAttribPointerType.Float)]
             public float Time;
 

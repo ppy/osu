@@ -39,12 +39,10 @@ namespace osu.Game.Rulesets.Taiko.UI
             }
         }
 
-        protected override void LoadComplete()
+        protected override void ApplyHitAnimations()
         {
-            if (Result.IsHit)
-                this.MoveToY(-100, 500);
-
-            base.LoadComplete();
+            this.MoveToY(-100, 500);
+            base.ApplyHitAnimations();
         }
     }
 }

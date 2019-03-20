@@ -42,7 +42,7 @@ namespace osu.Game.Rulesets
         /// <returns>An enumerable of constructed <see cref="Mod"/>s</returns>
         public virtual IEnumerable<Mod> ConvertLegacyMods(LegacyMods mods) => new Mod[] { };
 
-        public Mod GetAutoplayMod() => GetAllMods().First(mod => mod is ModAutoplay);
+        public ModAutoplay GetAutoplayMod() => GetAllMods().OfType<ModAutoplay>().First();
 
         protected Ruleset(RulesetInfo rulesetInfo = null)
         {

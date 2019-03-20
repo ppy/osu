@@ -91,7 +91,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                                                 RelativeSizeAxes = Axes.Y,
                                                 Height = 0.5f,
                                                 Icon = FontAwesome.fa_search_plus,
-                                                Action = () => timeline.Zoom++
+                                                Action = () => changeZoom(1)
                                             },
                                             new TimelineButton
                                             {
@@ -100,7 +100,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                                                 RelativeSizeAxes = Axes.Y,
                                                 Height = 0.5f,
                                                 Icon = FontAwesome.fa_search_minus,
-                                                Action = () => timeline.Zoom--
+                                                Action = () => changeZoom(-1)
                                             },
                                         }
                                     }
@@ -124,5 +124,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
             timeline.WaveformVisible.BindTo(waveformCheckbox.Current);
         }
+
+        private void changeZoom(float change) => timeline.Zoom += change;
     }
 }

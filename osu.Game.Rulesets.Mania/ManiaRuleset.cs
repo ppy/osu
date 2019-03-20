@@ -12,6 +12,7 @@ using System.Linq;
 using osu.Framework.Graphics;
 using osu.Framework.Input.Bindings;
 using osu.Game.Graphics;
+using osu.Game.Rulesets.Mania.Objects;
 using osu.Game.Rulesets.Mania.Replays;
 using osu.Game.Rulesets.Replays.Types;
 using osu.Game.Beatmaps.Legacy;
@@ -145,6 +146,11 @@ namespace osu.Game.Rulesets.Mania
                     {
                         new MultiMod(new ManiaModAutoplay(), new ModCinema()),
                     };
+                case ModType.Fun:
+                    return new Mod[]
+                    {
+                        new MultiMod(new ModWindUp<ManiaHitObject>(), new ModWindDown<ManiaHitObject>())
+                    };
                 default:
                     return new Mod[] { };
             }
@@ -162,7 +168,7 @@ namespace osu.Game.Rulesets.Mania
 
         public override IConvertibleReplayFrame CreateConvertibleReplayFrame() => new ManiaReplayFrame();
 
-        public override IRulesetConfigManager CreateConfig(SettingsStore settings) => new ManiaConfigManager(settings, RulesetInfo);
+        public override IRulesetConfigManager CreateConfig(SettingsStore settings) => new ManiaRulesetConfigManager(settings, RulesetInfo);
 
         public override RulesetSettingsSubsection CreateSettings() => new ManiaSettingsSubsection(this);
 
@@ -330,11 +336,11 @@ namespace osu.Game.Rulesets.Mania
                 for (int i = LeftKeys.Length - columns / 2; i < LeftKeys.Length; i++)
                     bindings.Add(new KeyBinding(LeftKeys[i], currentNormalAction++));
 
-                for (int i = 0; i < columns / 2; i++)
-                    bindings.Add(new KeyBinding(RightKeys[i], currentNormalAction++));
-
                 if (columns % 2 == 1)
                     bindings.Add(new KeyBinding(SpecialKey, SpecialAction));
+
+                for (int i = 0; i < columns / 2; i++)
+                    bindings.Add(new KeyBinding(RightKeys[i], currentNormalAction++));
 
                 nextNormalAction = currentNormalAction;
                 return bindings;
@@ -349,6 +355,7 @@ namespace osu.Game.Rulesets.Mania
         /// Number of columns in this stage lies at (item - Single).
         /// </summary>
         Single = 0,
+
         /// <summary>
         /// Columns are grouped into two stages.
         /// Overall number of columns lies at (item - Dual), further computation is required for

@@ -5,7 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
-using osu.Framework.Configuration;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
@@ -15,6 +15,7 @@ using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Localisation;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Drawables;
+using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays;
@@ -48,10 +49,15 @@ namespace osu.Game.Screens.Select.Carousel
             Children = new Drawable[]
             {
                 new DelayedLoadUnloadWrapper(() =>
-                    new PanelBackground(manager.GetWorkingBeatmap(beatmapSet.Beatmaps.FirstOrDefault()))
                     {
-                        RelativeSizeAxes = Axes.Both,
-                        OnLoadComplete = d => d.FadeInFromZero(1000, Easing.OutQuint),
+                        var background = new PanelBackground(manager.GetWorkingBeatmap(beatmapSet.Beatmaps.FirstOrDefault()))
+                        {
+                            RelativeSizeAxes = Axes.Both,
+                        };
+
+                        background.OnLoadComplete += d => d.FadeInFromZero(1000, Easing.OutQuint);
+
+                        return background;
                     }, 300, 5000
                 ),
                 new FillFlowContainer
@@ -63,16 +69,14 @@ namespace osu.Game.Screens.Select.Carousel
                     {
                         new OsuSpriteText
                         {
-                            Font = @"Exo2.0-BoldItalic",
                             Text = new LocalisedString((beatmapSet.Metadata.TitleUnicode, beatmapSet.Metadata.Title)),
-                            TextSize = 22,
+                            Font = OsuFont.GetFont(weight: FontWeight.Bold, size: 22, italics: true),
                             Shadow = true,
                         },
                         new OsuSpriteText
                         {
-                            Font = @"Exo2.0-SemiBoldItalic",
                             Text = new LocalisedString((beatmapSet.Metadata.ArtistUnicode, beatmapSet.Metadata.Artist)),
-                            TextSize = 17,
+                            Font = OsuFont.GetFont(weight: FontWeight.SemiBold, size: 17, italics: true),
                             Shadow = true,
                         },
                         new FillFlowContainer
@@ -109,7 +113,7 @@ namespace osu.Game.Screens.Select.Carousel
             {
                 List<MenuItem> items = new List<MenuItem>();
 
-                if (Item.State == CarouselItemState.NotSelected)
+                if (Item.State.Value == CarouselItemState.NotSelected)
                     items.Add(new OsuMenuItem("Expand", MenuItemType.Highlighted, () => Item.State.Value = CarouselItemState.Selected));
 
                 if (beatmapSet.OnlineBeatmapSetID != null)
@@ -189,7 +193,7 @@ namespace osu.Game.Screens.Select.Carousel
                 : base(item.Beatmap)
             {
                 filtered.BindTo(item.Filtered);
-                filtered.ValueChanged += v => Schedule(() => this.FadeTo(v ? 0.1f : 1, 100));
+                filtered.ValueChanged += isFiltered => Schedule(() => this.FadeTo(isFiltered.NewValue ? 0.1f : 1, 100));
                 filtered.TriggerChange();
             }
         }

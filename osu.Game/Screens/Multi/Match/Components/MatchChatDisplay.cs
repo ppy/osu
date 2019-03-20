@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Game.Online.Chat;
 using osu.Game.Online.Multiplayer;
 
@@ -9,28 +10,33 @@ namespace osu.Game.Screens.Multi.Match.Components
 {
     public class MatchChatDisplay : StandAloneChatDisplay
     {
-        private readonly Room room;
+        [Resolved(typeof(Room), nameof(Room.RoomID))]
+        private Bindable<int?> roomId { get; set; }
+
+        [Resolved(typeof(Room), nameof(Room.ChannelId))]
+        private Bindable<int> channelId { get; set; }
 
         [Resolved(CanBeNull = true)]
         private ChannelManager channelManager { get; set; }
 
-        public MatchChatDisplay(Room room)
+        public MatchChatDisplay()
             : base(true)
         {
-            this.room = room;
         }
 
         protected override void LoadComplete()
         {
             base.LoadComplete();
 
-            room.RoomID.BindValueChanged(v => updateChannel(), true);
+            channelId.BindValueChanged(_ => updateChannel(), true);
         }
 
         private void updateChannel()
         {
-            if (room.RoomID.Value != null)
-                Channel.Value = channelManager?.JoinChannel(new Channel { Id = room.ChannelId, Type = ChannelType.Multiplayer, Name = $"#mp_{room.RoomID}" });
+            if (roomId.Value == null || channelId.Value == 0)
+                return;
+
+            Channel.Value = channelManager?.JoinChannel(new Channel { Id = channelId.Value, Type = ChannelType.Multiplayer, Name = $"#lazermp_{roomId.Value}" });
         }
     }
 }

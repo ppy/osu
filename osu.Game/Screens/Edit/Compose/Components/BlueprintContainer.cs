@@ -68,6 +68,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
             {
                 if (currentTool == value)
                     return;
+
                 currentTool = value;
 
                 refreshTool();
@@ -188,6 +189,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
             {
                 if (!(x is SelectionBlueprint xBlueprint) || !(y is SelectionBlueprint yBlueprint))
                     return base.Compare(x, y);
+
                 return Compare(xBlueprint, yBlueprint);
             }
 

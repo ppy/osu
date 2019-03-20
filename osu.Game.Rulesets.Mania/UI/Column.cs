@@ -8,7 +8,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Framework.Allocation;
-using osu.Framework.Configuration;
+using osu.Framework.Bindables;
 using osu.Framework.Input.Bindings;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Mania.UI.Components;
@@ -82,28 +82,30 @@ namespace osu.Game.Rulesets.Mania.UI
 
             TopLevelContainer.Add(explosionContainer.CreateProxy());
 
-            Direction.BindValueChanged(d =>
+            Direction.BindValueChanged(dir =>
             {
                 hitTargetContainer.Padding = new MarginPadding
                 {
-                    Top = d == ScrollingDirection.Up ? ManiaStage.HIT_TARGET_POSITION : 0,
-                    Bottom = d == ScrollingDirection.Down ? ManiaStage.HIT_TARGET_POSITION : 0,
+                    Top = dir.NewValue == ScrollingDirection.Up ? ManiaStage.HIT_TARGET_POSITION : 0,
+                    Bottom = dir.NewValue == ScrollingDirection.Down ? ManiaStage.HIT_TARGET_POSITION : 0,
                 };
 
-                keyArea.Anchor = keyArea.Origin= d == ScrollingDirection.Up ? Anchor.TopLeft : Anchor.BottomLeft;
+                keyArea.Anchor = keyArea.Origin = dir.NewValue == ScrollingDirection.Up ? Anchor.TopLeft : Anchor.BottomLeft;
             }, true);
         }
 
         public override Axes RelativeSizeAxes => Axes.Y;
 
         private bool isSpecial;
+
         public bool IsSpecial
         {
-            get { return isSpecial; }
+            get => isSpecial;
             set
             {
                 if (isSpecial == value)
                     return;
+
                 isSpecial = value;
 
                 Width = isSpecial ? special_column_width : column_width;
@@ -111,13 +113,15 @@ namespace osu.Game.Rulesets.Mania.UI
         }
 
         private Color4 accentColour;
+
         public Color4 AccentColour
         {
-            get { return accentColour; }
+            get => accentColour;
             set
             {
                 if (accentColour == value)
                     return;
+
                 accentColour = value;
 
                 background.AccentColour = value;
@@ -156,7 +160,7 @@ namespace osu.Game.Rulesets.Mania.UI
 
         internal void OnNewResult(DrawableHitObject judgedObject, JudgementResult result)
         {
-            if (!result.IsHit || !judgedObject.DisplayResult || !DisplayJudgements)
+            if (!result.IsHit || !judgedObject.DisplayResult || !DisplayJudgements.Value)
                 return;
 
             explosionContainer.Add(new HitExplosion(judgedObject)
@@ -167,7 +171,7 @@ namespace osu.Game.Rulesets.Mania.UI
 
         public bool OnPressed(ManiaAction action)
         {
-            if (action != Action)
+            if (action != Action.Value)
                 return false;
 
             var nextObject =

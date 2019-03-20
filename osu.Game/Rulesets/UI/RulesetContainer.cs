@@ -13,10 +13,12 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using osu.Framework.Configuration;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Input;
+using osu.Framework.Input.Events;
 using osu.Game.Configuration;
+using osu.Game.Graphics.Cursor;
 using osu.Game.Input.Handlers;
 using osu.Game.Overlays;
 using osu.Game.Replays;
@@ -32,7 +34,7 @@ namespace osu.Game.Rulesets.UI
     /// Should not be derived - derive <see cref="RulesetContainer{TObject}"/> instead.
     /// </para>
     /// </summary>
-    public abstract class RulesetContainer : Container
+    public abstract class RulesetContainer : Container, IProvideCursor
     {
         /// <summary>
         /// The selected variant.
@@ -74,10 +76,11 @@ namespace osu.Game.Rulesets.UI
         /// </summary>
         public Container Overlays { get; protected set; }
 
-        /// <summary>
-        /// The cursor provided by this <see cref="RulesetContainer"/>. May be null if no cursor is provided.
-        /// </summary>
-        public readonly CursorContainer Cursor;
+        public CursorContainer Cursor => Playfield.Cursor;
+
+        public bool ProvidingUserCursor => Playfield.Cursor != null && !HasReplayLoaded.Value;
+
+        protected override bool OnHover(HoverEvent e) => true; // required for IProvideCursor
 
         public readonly Ruleset Ruleset;
 
@@ -96,13 +99,11 @@ namespace osu.Game.Rulesets.UI
 
             IsPaused.ValueChanged += paused =>
             {
-                if (HasReplayLoaded)
+                if (HasReplayLoaded.Value)
                     return;
 
-                KeyBindingInputManager.UseParentInput = !paused;
+                KeyBindingInputManager.UseParentInput = !paused.NewValue;
             };
-
-            Cursor = CreateCursor();
         }
 
         protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
@@ -131,6 +132,8 @@ namespace osu.Game.Rulesets.UI
 
         protected virtual ReplayInputHandler CreateReplayInputHandler(Replay replay) => null;
 
+        protected FrameStabilityContainer FrameStabilityContainer;
+
         public Score ReplayScore { get; private set; }
 
         /// <summary>
@@ -148,7 +151,11 @@ namespace osu.Game.Rulesets.UI
                 throw new InvalidOperationException($"A {nameof(KeyBindingInputManager)} which supports replay loading is not available");
 
             ReplayScore = replayScore;
-            ReplayInputManager.ReplayInputHandler = replayScore != null ? CreateReplayInputHandler(replayScore.Replay) : null;
+
+            var handler = replayScore != null ? CreateReplayInputHandler(replayScore.Replay) : null;
+
+            ReplayInputManager.ReplayInputHandler = handler;
+            FrameStabilityContainer.ReplayInputHandler = handler;
 
             HasReplayLoaded.Value = ReplayInputManager.ReplayInputHandler != null;
         }
@@ -242,7 +249,6 @@ namespace osu.Game.Rulesets.UI
             Beatmap = (Beatmap<TObject>)workingBeatmap.GetPlayableBeatmap(ruleset.RulesetInfo);
 
             KeyBindingInputManager = CreateInputManager();
-            KeyBindingInputManager.RelativeSizeAxes = Axes.Both;
 
             applyBeatmapMods(Mods);
         }
@@ -259,12 +265,12 @@ namespace osu.Game.Rulesets.UI
                 Playfield
             });
 
-            if (Cursor != null)
-                KeyBindingInputManager.Add(Cursor);
-
             InternalChildren = new Drawable[]
             {
-                KeyBindingInputManager,
+                FrameStabilityContainer = new FrameStabilityContainer
+                {
+                    Child = KeyBindingInputManager,
+                },
                 Overlays = new Container { RelativeSizeAxes = Axes.Both }
             };
 

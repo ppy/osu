@@ -38,8 +38,8 @@ namespace osu.Game.Screens.Edit.Setup.Components.LabelledComponents
 
         public float LabelTextSize
         {
-            get => label.TextSize;
-            set => label.TextSize = value;
+            get => label.Font.Size;
+            set => label.Font = label.Font.With(size: value);
         }
 
         public string PlaceholderText
@@ -103,8 +103,7 @@ namespace osu.Game.Screens.Edit.Setup.Components.LabelledComponents
                                     Origin = Anchor.TopLeft,
                                     Padding = new MarginPadding { Left = default_label_left_padding, Top = default_label_top_padding },
                                     Colour = Color4.White,
-                                    TextSize = default_label_text_size,
-                                    Font = @"Exo2.0-Bold",
+                                    Font = OsuFont.GetFont(size: default_label_text_size, weight: FontWeight.Bold),
                                 },
                                 textBox = new OsuTextBox
                                 {

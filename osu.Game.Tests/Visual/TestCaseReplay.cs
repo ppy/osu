@@ -1,10 +1,12 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.ComponentModel;
 using System.Linq;
 using osu.Game.Rulesets;
-using osu.Game.Rulesets.Mods;
+using osu.Game.Rulesets.Scoring;
+using osu.Game.Scoring;
 using osu.Game.Screens.Play;
 
 namespace osu.Game.Tests.Visual
@@ -14,15 +16,27 @@ namespace osu.Game.Tests.Visual
     {
         protected override Player CreatePlayer(Ruleset ruleset)
         {
-            // We create a dummy RulesetContainer just to get the replay - we don't want to use mods here
-            // to simulate setting a replay rather than having the replay already set for us
-            Beatmap.Value.Mods.Value = Beatmap.Value.Mods.Value.Concat(new[] { ruleset.GetAutoplayMod() });
-            var dummyRulesetContainer = ruleset.CreateRulesetContainerWith(Beatmap.Value);
+            var beatmap = Beatmap.Value.GetPlayableBeatmap(ruleset.RulesetInfo);
 
-            // Reset the mods
-            Beatmap.Value.Mods.Value = Beatmap.Value.Mods.Value.Where(m => !(m is ModAutoplay));
+            return new ScoreAccessibleReplayPlayer(ruleset.GetAutoplayMod().CreateReplayScore(beatmap));
+        }
 
-            return new ReplayPlayer(dummyRulesetContainer.ReplayScore);
+        protected override void AddCheckSteps(Func<Player> player)
+        {
+            base.AddCheckSteps(player);
+            AddUntilStep("score above zero", () => ((ScoreAccessibleReplayPlayer)player()).ScoreProcessor.TotalScore.Value > 0);
+            AddUntilStep("key counter counted keys", () => ((ScoreAccessibleReplayPlayer)player()).HUDOverlay.KeyCounter.Children.Any(kc => kc.CountPresses > 0));
+        }
+
+        private class ScoreAccessibleReplayPlayer : ReplayPlayer
+        {
+            public new ScoreProcessor ScoreProcessor => base.ScoreProcessor;
+            public new HUDOverlay HUDOverlay => base.HUDOverlay;
+
+            public ScoreAccessibleReplayPlayer(Score score)
+                : base(score)
+            {
+            }
         }
     }
 }

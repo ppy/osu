@@ -6,7 +6,7 @@ using System.Linq;
 using osuTK;
 using osuTK.Graphics;
 using osu.Framework.Allocation;
-using osu.Framework.Configuration;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -162,8 +162,8 @@ namespace osu.Game.Overlays
                 },
             };
 
-            channelTabControl.Current.ValueChanged += chat => channelManager.CurrentChannel.Value = chat;
-            channelTabControl.ChannelSelectorActive.ValueChanged += value => channelSelectionOverlay.State = value ? Visibility.Visible : Visibility.Hidden;
+            channelTabControl.Current.ValueChanged += current => channelManager.CurrentChannel.Value = current.NewValue;
+            channelTabControl.ChannelSelectorActive.ValueChanged += active => channelSelectionOverlay.State = active.NewValue ? Visibility.Visible : Visibility.Hidden;
             channelSelectionOverlay.StateChanged += state =>
             {
                 if (state == Visibility.Hidden && channelManager.CurrentChannel.Value == null)
@@ -189,9 +189,9 @@ namespace osu.Game.Overlays
             channelSelectionOverlay.OnRequestLeave = channel => channelManager.LeaveChannel(channel);
         }
 
-        private void currentChannelChanged(Channel channel)
+        private void currentChannelChanged(ValueChangedEvent<Channel> e)
         {
-            if (channel == null)
+            if (e.NewValue == null)
             {
                 textbox.Current.Disabled = true;
                 currentChannelContainer.Clear(false);
@@ -199,18 +199,18 @@ namespace osu.Game.Overlays
                 return;
             }
 
-            textbox.Current.Disabled = channel.ReadOnly;
+            textbox.Current.Disabled = e.NewValue.ReadOnly;
 
-            if (channelTabControl.Current.Value != channel)
-                Scheduler.Add(() => channelTabControl.Current.Value = channel);
+            if (channelTabControl.Current.Value != e.NewValue)
+                Scheduler.Add(() => channelTabControl.Current.Value = e.NewValue);
 
-            var loaded = loadedChannels.Find(d => d.Channel == channel);
+            var loaded = loadedChannels.Find(d => d.Channel == e.NewValue);
             if (loaded == null)
             {
                 currentChannelContainer.FadeOut(500, Easing.OutQuint);
                 loading.Show();
 
-                loaded = new DrawableChannel(channel);
+                loaded = new DrawableChannel(e.NewValue);
                 loadedChannels.Add(loaded);
                 LoadComponentAsync(loaded, l =>
                 {
@@ -320,6 +320,8 @@ namespace osu.Game.Overlays
             this.MoveToY(Height, transition_length, Easing.InSine);
             this.FadeOut(transition_length, Easing.InSine);
 
+            channelSelectionOverlay.State = Visibility.Hidden;
+
             textbox.HoldFocus = false;
             base.PopOut();
         }
@@ -328,11 +330,11 @@ namespace osu.Game.Overlays
         private void load(OsuConfigManager config, OsuColour colours, ChannelManager channelManager)
         {
             ChatHeight = config.GetBindable<double>(OsuSetting.ChatDisplayHeight);
-            ChatHeight.ValueChanged += h =>
+            ChatHeight.ValueChanged += height =>
             {
-                chatContainer.Height = (float)h;
-                channelSelectionContainer.Height = 1f - (float)h;
-                tabBackground.FadeTo(h == 1 ? 1 : 0.8f, 200);
+                chatContainer.Height = (float)height.NewValue;
+                channelSelectionContainer.Height = 1f - (float)height.NewValue;
+                tabBackground.FadeTo(height.NewValue == 1 ? 1 : 0.8f, 200);
             };
             ChatHeight.TriggerChange();
 

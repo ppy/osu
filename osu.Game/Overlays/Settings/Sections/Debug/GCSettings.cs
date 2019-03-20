@@ -4,6 +4,7 @@
 using System;
 using System.Runtime;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 
@@ -34,8 +35,8 @@ namespace osu.Game.Overlays.Settings.Sections.Debug
             };
 
             configLatencyMode = config.GetBindable<GCLatencyMode>(DebugSetting.ActiveGCMode);
-            configLatencyMode.BindValueChanged(v => latencyMode.Value = (LatencyMode)v, true);
-            latencyMode.BindValueChanged(v => configLatencyMode.Value = (GCLatencyMode)v);
+            configLatencyMode.BindValueChanged(mode => latencyMode.Value = (LatencyMode)mode.NewValue, true);
+            latencyMode.BindValueChanged(mode => configLatencyMode.Value = (GCLatencyMode)mode.NewValue);
         }
 
         private enum LatencyMode

@@ -2,7 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Linq;
-using osu.Framework.Configuration;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Online.API.Requests;
@@ -15,7 +15,7 @@ namespace osu.Game.Overlays.Profile.Sections.Historical
         private GetUserMostPlayedBeatmapsRequest request;
 
         public PaginatedMostPlayedBeatmapContainer(Bindable<User> user)
-            :base(user, "Most Played Beatmaps", "No records. :(")
+            : base(user, "Most Played Beatmaps", "No records. :(")
         {
             ItemsPerPage = 5;
 
