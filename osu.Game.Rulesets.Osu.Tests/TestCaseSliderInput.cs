@@ -354,9 +354,9 @@ namespace osu.Game.Rulesets.Osu.Tests
                 judgementResults = new List<JudgementResult>();
             });
 
-            AddUntilStep(() => Beatmap.Value.Track.CurrentTime == 0, "Beatmap at 0");
-            AddUntilStep(() => currentPlayer.IsCurrentScreen(), "Wait until player is loaded");
-            AddUntilStep(() => allJudgedFired, "Wait for all judged");
+            AddUntilStep("Beatmap at 0", () => Beatmap.Value.Track.CurrentTime == 0);
+            AddUntilStep("Wait until player is loaded", () => currentPlayer.IsCurrentScreen());
+            AddUntilStep("Wait for all judged", () => allJudgedFired);
         }
 
         private class ScoreAccessibleReplayPlayer : ReplayPlayer
