@@ -36,7 +36,7 @@ namespace osu.Game.Screens.Backgrounds
 
             currentDisplay = RNG.Next(0, background_count);
 
-            Next();
+            display(createBackground());
         }
 
         private void display(Background newBackground)
@@ -53,19 +53,21 @@ namespace osu.Game.Screens.Backgrounds
         public void Next()
         {
             nextTask?.Cancel();
-            nextTask = Scheduler.AddDelayed(() =>
-            {
-                Background background;
+            nextTask = Scheduler.AddDelayed(() => { LoadComponentAsync(createBackground(), display); }, 100);
+        }
 
-                if (user.Value?.IsSupporter ?? false)
-                    background = new SkinnedBackground(skin.Value, backgroundName);
-                else
-                    background = new Background(backgroundName);
+        private Background createBackground()
+        {
+            Background background;
 
-                background.Depth = currentDisplay;
+            if (user.Value?.IsSupporter ?? false)
+                background = new SkinnedBackground(skin.Value, backgroundName);
+            else
+                background = new Background(backgroundName);
 
-                LoadComponentAsync(background, display);
-            }, 100);
+            background.Depth = currentDisplay;
+
+            return background;
         }
 
         private class SkinnedBackground : Background
