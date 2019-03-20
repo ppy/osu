@@ -18,7 +18,7 @@ namespace osu.Game.Tests.Visual
 
         protected override void AddCheckSteps()
         {
-            AddUntilStep(() =>
+            AddUntilStep("no leaked beatmaps", () =>
             {
                 GC.Collect();
                 GC.WaitForPendingFinalizers();
@@ -26,9 +26,9 @@ namespace osu.Game.Tests.Visual
 
                 workingWeakReferences.ForEachAlive(_ => count++);
                 return count == 1;
-            }, "no leaked beatmaps");
+            });
 
-            AddUntilStep(() =>
+            AddUntilStep("no leaked players", () =>
             {
                 GC.Collect();
                 GC.WaitForPendingFinalizers();
@@ -36,7 +36,7 @@ namespace osu.Game.Tests.Visual
 
                 playerWeakReferences.ForEachAlive(_ => count++);
                 return count == 1;
-            }, "no leaked players");
+            });
         }
 
         protected override WorkingBeatmap CreateWorkingBeatmap(IBeatmap beatmap, IFrameBasedClock clock)

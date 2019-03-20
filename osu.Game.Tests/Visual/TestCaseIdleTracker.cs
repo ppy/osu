@@ -59,7 +59,7 @@ namespace osu.Game.Tests.Visual
         {
             AddStep("move mouse to top left", () => InputManager.MoveMouseTo(box1.ScreenSpaceDrawQuad.Centre));
 
-            AddUntilStep(() => box1.IsIdle && box2.IsIdle && box3.IsIdle && box4.IsIdle, "Wait for all idle");
+            AddUntilStep("Wait for all idle", () => box1.IsIdle && box2.IsIdle && box3.IsIdle && box4.IsIdle);
 
             AddStep("nudge mouse", () => InputManager.MoveMouseTo(box1.ScreenSpaceDrawQuad.Centre + new Vector2(1)));
 
@@ -87,7 +87,7 @@ namespace osu.Game.Tests.Visual
             AddAssert("check idle", () => !box3.IsIdle);
             AddAssert("check idle", () => !box4.IsIdle);
 
-            AddUntilStep(() => box1.IsIdle && box2.IsIdle && box3.IsIdle && box4.IsIdle, "Wait for all idle");
+            AddUntilStep("Wait for all idle", () => box1.IsIdle && box2.IsIdle && box3.IsIdle && box4.IsIdle);
         }
 
         [Test]
@@ -96,13 +96,13 @@ namespace osu.Game.Tests.Visual
             AddStep("move mouse", () => InputManager.MoveMouseTo(ScreenSpaceDrawQuad.Centre));
 
             AddAssert("check not idle", () => !box1.IsIdle && !box2.IsIdle && !box3.IsIdle && !box4.IsIdle);
-            AddUntilStep(() => box1.IsIdle, "Wait for idle");
+            AddUntilStep("Wait for idle", () => box1.IsIdle);
             AddAssert("check not idle", () => !box2.IsIdle && !box3.IsIdle && !box4.IsIdle);
-            AddUntilStep(() => box2.IsIdle, "Wait for idle");
+            AddUntilStep("Wait for idle", () => box2.IsIdle);
             AddAssert("check not idle", () => !box3.IsIdle && !box4.IsIdle);
-            AddUntilStep(() => box3.IsIdle, "Wait for idle");
+            AddUntilStep("Wait for idle", () => box3.IsIdle);
 
-            AddUntilStep(() => box1.IsIdle && box2.IsIdle && box3.IsIdle && box4.IsIdle, "Wait for all idle");
+            AddUntilStep("Wait for all idle", () => box1.IsIdle && box2.IsIdle && box3.IsIdle && box4.IsIdle);
         }
 
         private class IdleTrackingBox : CompositeDrawable

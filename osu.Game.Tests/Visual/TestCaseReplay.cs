@@ -22,8 +22,8 @@ namespace osu.Game.Tests.Visual
 
         protected override void AddCheckSteps()
         {
-            AddUntilStep(() => ((ScoreAccessibleReplayPlayer)Player).ScoreProcessor.TotalScore.Value > 0, "score above zero");
-            AddUntilStep(() => ((ScoreAccessibleReplayPlayer)Player).HUDOverlay.KeyCounter.Children.Any(kc => kc.CountPresses > 0), "key counter counted keys");
+            AddUntilStep("score above zero", () => ((ScoreAccessibleReplayPlayer)Player).ScoreProcessor.TotalScore.Value > 0);
+            AddUntilStep("key counter counted keys", () => ((ScoreAccessibleReplayPlayer)Player).HUDOverlay.KeyCounter.Children.Any(kc => kc.CountPresses > 0));
         }
 
         private class ScoreAccessibleReplayPlayer : ReplayPlayer
