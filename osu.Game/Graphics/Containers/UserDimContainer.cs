@@ -38,9 +38,9 @@ namespace osu.Game.Graphics.Containers
         /// </remarks>
         public readonly Bindable<float> BlurAmount = new Bindable<float>();
 
-        private Bindable<double> dimLevel { get; set; }
+        private Bindable<double> userDimLevel { get; set; }
 
-        private Bindable<double> blurLevel { get; set; }
+        private Bindable<double> userBlurLevel { get; set; }
 
         private Bindable<bool> showStoryboard { get; set; }
 
@@ -51,7 +51,7 @@ namespace osu.Game.Graphics.Containers
         private readonly bool isStoryboard;
 
         private Vector2 blurTarget => EnableUserDim.Value
-            ? new Vector2(BlurAmount.Value + (float)blurLevel.Value * 25)
+            ? new Vector2(BlurAmount.Value + (float)userBlurLevel.Value * 25)
             : new Vector2(BlurAmount.Value);
 
         private Background background;
@@ -77,7 +77,7 @@ namespace osu.Game.Graphics.Containers
             if (drawable is Background b)
             {
                 background = b;
-                b.BlurTo(blurTarget, 0, Easing.OutQuint);
+                background.BlurTo(blurTarget, 0, Easing.OutQuint);
             }
 
             base.Add(drawable);
@@ -86,12 +86,13 @@ namespace osu.Game.Graphics.Containers
         [BackgroundDependencyLoader]
         private void load(OsuConfigManager config)
         {
-            dimLevel = config.GetBindable<double>(OsuSetting.DimLevel);
-            blurLevel = config.GetBindable<double>(OsuSetting.BlurLevel);
+            userDimLevel = config.GetBindable<double>(OsuSetting.DimLevel);
+            userBlurLevel = config.GetBindable<double>(OsuSetting.BlurLevel);
             showStoryboard = config.GetBindable<bool>(OsuSetting.ShowStoryboard);
+
             EnableUserDim.ValueChanged += _ => updateVisuals();
-            dimLevel.ValueChanged += _ => updateVisuals();
-            blurLevel.ValueChanged += _ => updateVisuals();
+            userDimLevel.ValueChanged += _ => updateVisuals();
+            userBlurLevel.ValueChanged += _ => updateVisuals();
             showStoryboard.ValueChanged += _ => updateVisuals();
             StoryboardReplacesBackground.ValueChanged += _ => updateVisuals();
             BlurAmount.ValueChanged += _ => updateVisuals();
@@ -107,7 +108,7 @@ namespace osu.Game.Graphics.Containers
         {
             if (isStoryboard)
             {
-                DimContainer.FadeTo(!showStoryboard.Value || dimLevel.Value == 1 ? 0 : 1, background_fade_duration, Easing.OutQuint);
+                DimContainer.FadeTo(!showStoryboard.Value || userDimLevel.Value == 1 ? 0 : 1, background_fade_duration, Easing.OutQuint);
             }
             else
             {
@@ -120,7 +121,7 @@ namespace osu.Game.Graphics.Containers
                 background?.BlurTo(blurTarget, background_fade_duration, Easing.OutQuint);
             }
 
-            DimContainer.FadeColour(EnableUserDim.Value ? OsuColour.Gray(1 - (float)dimLevel.Value) : Color4.White, background_fade_duration, Easing.OutQuint);
+            DimContainer.FadeColour(EnableUserDim.Value ? OsuColour.Gray(1 - (float)userDimLevel.Value) : Color4.White, background_fade_duration, Easing.OutQuint);
         }
     }
 }
