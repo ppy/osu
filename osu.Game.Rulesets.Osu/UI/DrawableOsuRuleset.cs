@@ -17,11 +17,11 @@ using osu.Game.Rulesets.UI;
 
 namespace osu.Game.Rulesets.Osu.UI
 {
-    public class OsuRulesetContainer : RulesetContainer<OsuPlayfield, OsuHitObject>
+    public class DrawableOsuRuleset : DrawableRuleset<OsuHitObject>
     {
         protected new OsuRulesetConfigManager Config => (OsuRulesetConfigManager)base.Config;
 
-        public OsuRulesetContainer(Ruleset ruleset, WorkingBeatmap beatmap)
+        public DrawableOsuRuleset(Ruleset ruleset, WorkingBeatmap beatmap)
             : base(ruleset, beatmap)
         {
         }
@@ -30,7 +30,7 @@ namespace osu.Game.Rulesets.Osu.UI
 
         protected override Playfield CreatePlayfield() => new OsuPlayfield();
 
-        public override PassThroughInputManager CreateInputManager() => new OsuInputManager(Ruleset.RulesetInfo);
+        protected override PassThroughInputManager CreateInputManager() => new OsuInputManager(Ruleset.RulesetInfo);
 
         public override DrawableHitObject<OsuHitObject> GetVisualRepresentation(OsuHitObject h)
         {
