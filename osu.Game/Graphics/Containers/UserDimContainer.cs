@@ -80,7 +80,7 @@ namespace osu.Game.Graphics.Containers
             get => background;
             set
             {
-                background = value;
+                base.Add(background = value);
                 background.BlurTo(blurTarget, 0, Easing.OutQuint);
             }
         }
