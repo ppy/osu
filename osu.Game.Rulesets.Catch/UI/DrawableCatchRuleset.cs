@@ -17,13 +17,13 @@ using osu.Game.Rulesets.UI.Scrolling;
 
 namespace osu.Game.Rulesets.Catch.UI
 {
-    public class CatchRulesetContainer : ScrollingRulesetContainer<CatchPlayfield, CatchHitObject>
+    public class DrawableCatchRuleset : DrawableScrollingRuleset<CatchHitObject>
     {
         protected override ScrollVisualisationMethod VisualisationMethod => ScrollVisualisationMethod.Constant;
 
         protected override bool UserScrollSpeedAdjustment => false;
 
-        public CatchRulesetContainer(Ruleset ruleset, WorkingBeatmap beatmap)
+        public DrawableCatchRuleset(Ruleset ruleset, WorkingBeatmap beatmap)
             : base(ruleset, beatmap)
         {
             Direction.Value = ScrollingDirection.Down;
@@ -36,7 +36,7 @@ namespace osu.Game.Rulesets.Catch.UI
 
         protected override Playfield CreatePlayfield() => new CatchPlayfield(Beatmap.BeatmapInfo.BaseDifficulty, GetVisualRepresentation);
 
-        public override PassThroughInputManager CreateInputManager() => new CatchInputManager(Ruleset.RulesetInfo);
+        protected override PassThroughInputManager CreateInputManager() => new CatchInputManager(Ruleset.RulesetInfo);
 
         public override DrawableHitObject<CatchHitObject> GetVisualRepresentation(CatchHitObject h)
         {

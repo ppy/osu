@@ -371,7 +371,7 @@ namespace osu.Game.Tests.Visual
                     Thread.Sleep(1);
                 StoryboardEnabled = config.GetBindable<bool>(OsuSetting.ShowStoryboard);
                 ReplacesBackground.BindTo(Background.StoryboardReplacesBackground);
-                RulesetContainer.IsPaused.BindTo(IsPaused);
+                DrawableRuleset.IsPaused.BindTo(IsPaused);
             }
         }
 

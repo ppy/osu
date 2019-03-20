@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
@@ -20,12 +21,11 @@ using osu.Game.Rulesets.UI.Scrolling.Algorithms;
 namespace osu.Game.Rulesets.UI.Scrolling
 {
     /// <summary>
-    /// A type of <see cref="RulesetContainer{TPlayfield,TObject}"/> that supports a <see cref="ScrollingPlayfield"/>.
-    /// <see cref="HitObject"/>s inside this <see cref="RulesetContainer{TPlayfield,TObject}"/> will scroll within the playfield.
+    /// A type of <see cref="DrawableRuleset{TObject}"/> that supports a <see cref="ScrollingPlayfield"/>.
+    /// <see cref="HitObject"/>s inside this <see cref="DrawableRuleset{TObject}"/> will scroll within the playfield.
     /// </summary>
-    public abstract class ScrollingRulesetContainer<TPlayfield, TObject> : RulesetContainer<TPlayfield, TObject>, IKeyBindingHandler<GlobalAction>
+    public abstract class DrawableScrollingRuleset<TObject> : DrawableRuleset<TObject>, IKeyBindingHandler<GlobalAction>
         where TObject : HitObject
-        where TPlayfield : ScrollingPlayfield
     {
         /// <summary>
         /// The default span of time visible by the length of the scrolling axes.
@@ -70,7 +70,7 @@ namespace osu.Game.Rulesets.UI.Scrolling
 
         /// <summary>
         /// Provides the default <see cref="MultiplierControlPoint"/>s that adjust the scrolling rate of <see cref="HitObject"/>s
-        /// inside this <see cref="RulesetContainer{TPlayfield,TObject}"/>.
+        /// inside this <see cref="DrawableRuleset{TObject}"/>.
         /// </summary>
         /// <returns></returns>
         private readonly SortedList<MultiplierControlPoint> controlPoints = new SortedList<MultiplierControlPoint>(Comparer<MultiplierControlPoint>.Default);
@@ -80,7 +80,7 @@ namespace osu.Game.Rulesets.UI.Scrolling
         [Cached(Type = typeof(IScrollingInfo))]
         private readonly LocalScrollingInfo scrollingInfo;
 
-        protected ScrollingRulesetContainer(Ruleset ruleset, WorkingBeatmap beatmap)
+        protected DrawableScrollingRuleset(Ruleset ruleset, WorkingBeatmap beatmap)
             : base(ruleset, beatmap)
         {
             scrollingInfo = new LocalScrollingInfo();
@@ -165,6 +165,14 @@ namespace osu.Game.Rulesets.UI.Scrolling
             }
 
             return false;
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            if (!(Playfield is ScrollingPlayfield))
+                throw new ArgumentException($"{nameof(Playfield)} must be a {nameof(ScrollingPlayfield)} when using {nameof(DrawableScrollingRuleset<TObject>)}.");
         }
 
         public bool OnReleased(GlobalAction action) => false;
