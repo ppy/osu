@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
@@ -69,7 +70,7 @@ namespace osu.Game.Rulesets.UI.Scrolling
 
         /// <summary>
         /// Provides the default <see cref="MultiplierControlPoint"/>s that adjust the scrolling rate of <see cref="HitObject"/>s
-        /// inside this <see cref="DrawableRuleset{TPlayfield,TObject}"/>.
+        /// inside this <see cref="DrawableRuleset{TObject}"/>.
         /// </summary>
         /// <returns></returns>
         private readonly SortedList<MultiplierControlPoint> controlPoints = new SortedList<MultiplierControlPoint>(Comparer<MultiplierControlPoint>.Default);
@@ -164,6 +165,14 @@ namespace osu.Game.Rulesets.UI.Scrolling
             }
 
             return false;
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            if (!(Playfield is ScrollingPlayfield))
+                throw new ArgumentException($"{nameof(Playfield)} must be a {nameof(ScrollingPlayfield)} when using {nameof(DrawableScrollingRuleset<TObject>)}.");
         }
 
         public bool OnReleased(GlobalAction action) => false;
