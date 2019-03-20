@@ -2,13 +2,11 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Linq;
 using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
-using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
 using osu.Framework.Screens;
 using osu.Framework.Threading;
@@ -40,6 +38,8 @@ namespace osu.Game.Screens.Play
         public override bool HideOverlaysOnEnter => hideOverlays;
 
         public override bool DisallowExternalBeatmapRulesetChanges => true;
+
+        public override bool HandlePositionalInput => true;
 
         private Task loadTask;
 
@@ -158,35 +158,6 @@ namespace osu.Game.Screens.Play
 
         private bool readyForPush => player.LoadState == LoadState.Ready && IsHovered && GetContainingInputManager()?.DraggedDrawable == null;
 
-        protected override bool OnHover(HoverEvent e)
-        {
-            // Acts as an "on hover lost" trigger for the visual settings panel.
-            // Returns background dim and blur to the values specified by PlayerLoader.
-            if (this.IsCurrentScreen())
-            {
-                Background.BlurAmount.Value = BACKGROUND_BLUR;
-                Background.EnableUserDim.Value = false;
-            }
-
-            return base.OnHover(e);
-        }
-
-        protected override void OnHoverLost(HoverLostEvent e)
-        {
-            // Acts as an "on hover" trigger for the visual settings panel.
-            // Preview user-defined background dim and blur when hovered on the visual settings panel.
-            if (GetContainingInputManager()?.HoveredDrawables.Contains(VisualSettings) == true)
-            {
-                if (this.IsCurrentScreen() && Background != null)
-                {
-                    Background.BlurAmount.Value = 0;
-                    Background.EnableUserDim.Value = true;
-                }
-            }
-
-            base.OnHoverLost(e);
-        }
-
         private void pushWhenLoaded()
         {
             if (!this.IsCurrentScreen()) return;
@@ -264,6 +235,29 @@ namespace osu.Game.Screens.Play
             {
                 // if the player never got pushed, we should explicitly dispose it.
                 loadTask?.ContinueWith(_ => player.Dispose());
+            }
+        }
+
+        protected override void Update()
+        {
+            base.Update();
+
+            if (!this.IsCurrentScreen())
+                return;
+
+            if (Background.BlurAmount.Value != 0 && VisualSettings.IsHovered)
+            {
+                // Acts as an "on hover" trigger for the visual settings panel.
+                // Preview user-defined background dim and blur when hovered on the visual settings panel.
+                Background.EnableUserDim.Value = true;
+                Background.BlurAmount.Value = 0;
+            }
+            else if (Background.BlurAmount.Value != BACKGROUND_BLUR && !VisualSettings.IsHovered)
+            {
+                // Acts as an "on hover lost" trigger for the visual settings panel.
+                // Returns background dim and blur to the values specified by PlayerLoader.
+                Background.EnableUserDim.Value = false;
+                Background.BlurAmount.Value = BACKGROUND_BLUR;
             }
         }
 
