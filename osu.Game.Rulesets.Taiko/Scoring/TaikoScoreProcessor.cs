@@ -32,8 +32,8 @@ namespace osu.Game.Rulesets.Taiko.Scoring
         /// </summary>
         private double hpMissMultiplier;
 
-        public TaikoScoreProcessor(DrawableRuleset<TaikoHitObject> rrawableRuleset)
-            : base(rrawableRuleset)
+        public TaikoScoreProcessor(DrawableRuleset<TaikoHitObject> drawableRuleset)
+            : base(drawableRuleset)
         {
         }
 

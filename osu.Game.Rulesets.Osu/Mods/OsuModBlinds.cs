@@ -32,9 +32,9 @@ namespace osu.Game.Rulesets.Osu.Mods
         public override double ScoreMultiplier => 1.12;
         private DrawableOsuBlinds blinds;
 
-        public void ApplyToDrawableRuleset(DrawableRuleset<OsuHitObject> rrawableRuleset)
+        public void ApplyToDrawableRuleset(DrawableRuleset<OsuHitObject> drawableRuleset)
         {
-            rrawableRuleset.Overlays.Add(blinds = new DrawableOsuBlinds(rrawableRuleset.Playfield.HitObjectContainer, rrawableRuleset.Beatmap));
+            drawableRuleset.Overlays.Add(blinds = new DrawableOsuBlinds(drawableRuleset.Playfield.HitObjectContainer, drawableRuleset.Beatmap));
         }
 
         public void ApplyToScoreProcessor(ScoreProcessor scoreProcessor)

@@ -41,18 +41,18 @@ namespace osu.Game.Rulesets.Edit
     public class EditDrawableRuleset<TObject> : EditDrawableRuleset
         where TObject : HitObject
     {
-        public override Playfield Playfield => rrawableRuleset.Playfield;
+        public override Playfield Playfield => drawableRuleset.Playfield;
 
-        private Ruleset ruleset => rrawableRuleset.Ruleset;
-        private Beatmap<TObject> beatmap => rrawableRuleset.Beatmap;
+        private Ruleset ruleset => drawableRuleset.Ruleset;
+        private Beatmap<TObject> beatmap => drawableRuleset.Beatmap;
 
-        private readonly DrawableRuleset<TObject> rrawableRuleset;
+        private readonly DrawableRuleset<TObject> drawableRuleset;
 
-        public EditDrawableRuleset(DrawableRuleset<TObject> rrawableRuleset)
+        public EditDrawableRuleset(DrawableRuleset<TObject> drawableRuleset)
         {
-            this.rrawableRuleset = rrawableRuleset;
+            this.drawableRuleset = drawableRuleset;
 
-            InternalChild = rrawableRuleset;
+            InternalChild = drawableRuleset;
 
             Playfield.DisplayJudgements.Value = false;
         }
@@ -73,10 +73,10 @@ namespace osu.Game.Rulesets.Edit
             processor?.PostProcess();
 
             // Add visual representation
-            var drawableObject = rrawableRuleset.GetVisualRepresentation(tObject);
+            var drawableObject = drawableRuleset.GetVisualRepresentation(tObject);
 
-            rrawableRuleset.Playfield.Add(drawableObject);
-            rrawableRuleset.Playfield.PostProcess();
+            drawableRuleset.Playfield.Add(drawableObject);
+            drawableRuleset.Playfield.PostProcess();
 
             return drawableObject;
         }
@@ -97,8 +97,8 @@ namespace osu.Game.Rulesets.Edit
             // Remove visual representation
             var drawableObject = Playfield.AllHitObjects.Single(d => d.HitObject == hitObject);
 
-            rrawableRuleset.Playfield.Remove(drawableObject);
-            rrawableRuleset.Playfield.PostProcess();
+            drawableRuleset.Playfield.Remove(drawableObject);
+            drawableRuleset.Playfield.PostProcess();
 
             return drawableObject;
         }

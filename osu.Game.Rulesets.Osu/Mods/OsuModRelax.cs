@@ -79,10 +79,10 @@ namespace osu.Game.Rulesets.Osu.Mods
             state.Apply(osuInputManager.CurrentState, osuInputManager);
         }
 
-        public void ApplyToDrawableRuleset(DrawableRuleset<OsuHitObject> rrawableRuleset)
+        public void ApplyToDrawableRuleset(DrawableRuleset<OsuHitObject> drawableRuleset)
         {
             // grab the input manager for future use.
-            osuInputManager = (OsuInputManager)rrawableRuleset.KeyBindingInputManager;
+            osuInputManager = (OsuInputManager)drawableRuleset.KeyBindingInputManager;
             osuInputManager.AllowUserPresses = false;
         }
     }

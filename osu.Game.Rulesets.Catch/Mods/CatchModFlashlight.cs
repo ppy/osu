@@ -21,10 +21,10 @@ namespace osu.Game.Rulesets.Catch.Mods
 
         private CatchPlayfield playfield;
 
-        public override void ApplyToDrawableRuleset(DrawableRuleset<CatchHitObject> rrawableRuleset)
+        public override void ApplyToDrawableRuleset(DrawableRuleset<CatchHitObject> drawableRuleset)
         {
-            playfield = (CatchPlayfield)rrawableRuleset.Playfield;
-            base.ApplyToDrawableRuleset(rrawableRuleset);
+            playfield = (CatchPlayfield)drawableRuleset.Playfield;
+            base.ApplyToDrawableRuleset(drawableRuleset);
         }
 
         private class CatchFlashlight : Flashlight
