@@ -58,16 +58,16 @@ namespace osu.Game.Screens.Backgrounds
 
         private Background createBackground()
         {
-            Background background;
+            Background newBackground;
 
             if (user.Value?.IsSupporter ?? false)
-                background = new SkinnedBackground(skin.Value, backgroundName);
+                newBackground = new SkinnedBackground(skin.Value, backgroundName);
             else
-                background = new Background(backgroundName);
+                newBackground = new Background(backgroundName);
 
-            background.Depth = currentDisplay;
+            newBackground.Depth = currentDisplay;
 
-            return background;
+            return newBackground;
         }
 
         private class SkinnedBackground : Background
