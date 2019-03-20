@@ -2,11 +2,12 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using NUnit.Framework;
+using osu.Game.Tests.Visual;
 
 namespace osu.Game.Rulesets.Osu.Tests
 {
     [TestFixture]
-    public class TestCaseOsuPlayer : Game.Tests.Visual.TestCasePlayer
+    public class TestCaseOsuPlayer : PlayerTestCase
     {
         public TestCaseOsuPlayer()
             : base(new OsuRuleset())
