@@ -26,8 +26,8 @@ namespace osu.Game.Rulesets.Osu.Edit
         {
         }
 
-        protected override RulesetContainer<OsuHitObject> CreateRulesetContainer(Ruleset ruleset, WorkingBeatmap beatmap)
-            => new OsuEditRulesetContainer(ruleset, beatmap);
+        protected override DrawableRuleset<OsuHitObject> CreateDrawableRuleset(Ruleset ruleset, WorkingBeatmap beatmap)
+            => new DrawableOsuEditRuleset(ruleset, beatmap);
 
         protected override IReadOnlyList<HitObjectCompositionTool> CompositionTools => new HitObjectCompositionTool[]
         {
