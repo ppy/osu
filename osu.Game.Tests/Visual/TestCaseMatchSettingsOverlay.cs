@@ -111,7 +111,7 @@ namespace osu.Game.Tests.Visual
                 settings.ApplyButton.Action.Invoke();
             });
 
-            AddUntilStep(() => !settings.ErrorText.IsPresent, "error not displayed");
+            AddUntilStep("error not displayed", () => !settings.ErrorText.IsPresent);
         }
 
         private class TestRoomSettings : MatchSettingsOverlay

@@ -52,12 +52,18 @@ namespace osu.Game.Screens.Multi.Match.Components
 
             Participants.BindValueChanged(participants =>
             {
-                usersFlow.Children = participants.NewValue.Select(u => new UserPanel(u)
+                usersFlow.Children = participants.NewValue.Select(u =>
                 {
-                    Anchor = Anchor.TopCentre,
-                    Origin = Anchor.TopCentre,
-                    Width = 300,
-                    OnLoadComplete = d => d.FadeInFromZero(60),
+                    var panel = new UserPanel(u)
+                    {
+                        Anchor = Anchor.TopCentre,
+                        Origin = Anchor.TopCentre,
+                        Width = 300,
+                    };
+
+                    panel.OnLoadComplete += d => d.FadeInFromZero(60);
+
+                    return panel;
                 }).ToList();
             }, true);
         }

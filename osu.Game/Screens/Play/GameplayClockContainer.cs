@@ -6,6 +6,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using osu.Framework;
 using osu.Framework.Allocation;
+using osu.Framework.Audio;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -141,11 +142,15 @@ namespace osu.Game.Screens.Play
         {
             if (sourceClock == null) return;
 
-            sourceClock.Rate = 1;
+            sourceClock.ResetSpeedAdjustments();
+
+            if (sourceClock is IHasTempoAdjust tempo)
+                tempo.TempoAdjust = UserPlaybackRate.Value;
+            else
+                sourceClock.Rate = UserPlaybackRate.Value;
+
             foreach (var mod in beatmap.Mods.Value.OfType<IApplicableToClock>())
                 mod.ApplyToClock(sourceClock);
-
-            sourceClock.Rate *= UserPlaybackRate.Value;
         }
     }
 }

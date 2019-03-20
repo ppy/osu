@@ -87,7 +87,7 @@ namespace osu.Game.Tests.Visual
                 carousel.BeatmapSetsChanged = () => changed = true;
                 carousel.BeatmapSets = beatmapSets;
             });
-            AddUntilStep(() => changed, "Wait for load");
+            AddUntilStep("Wait for load", () => changed);
         }
 
         private void ensureRandomFetchSuccess() =>
@@ -214,7 +214,7 @@ namespace osu.Game.Tests.Visual
             checkSelected(3, 2);
 
             AddStep("Un-filter (debounce)", () => carousel.Filter(new FilterCriteria()));
-            AddUntilStep(() => !carousel.PendingFilterTask, "Wait for debounce");
+            AddUntilStep("Wait for debounce", () => !carousel.PendingFilterTask);
             checkVisibleItemCount(diff: false, count: set_count);
             checkVisibleItemCount(diff: true, count: 3);
 
@@ -327,13 +327,13 @@ namespace osu.Game.Tests.Visual
             AddStep("Remove first", () => carousel.RemoveBeatmapSet(carousel.BeatmapSets.First()));
             checkSelected(1);
 
-            AddUntilStep(() =>
+            AddUntilStep("Remove all", () =>
             {
                 if (!carousel.BeatmapSets.Any()) return true;
 
                 carousel.RemoveBeatmapSet(carousel.BeatmapSets.Last());
                 return false;
-            }, "Remove all");
+            });
 
             checkNoSelection();
         }
