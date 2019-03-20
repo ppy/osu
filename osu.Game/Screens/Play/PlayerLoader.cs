@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
@@ -245,14 +246,14 @@ namespace osu.Game.Screens.Play
             if (!this.IsCurrentScreen())
                 return;
 
-            if (Background.BlurAmount.Value != 0 && VisualSettings.IsHovered)
+            if (GetContainingInputManager()?.HoveredDrawables.Contains(VisualSettings) == true)
             {
                 // Acts as an "on hover" trigger for the visual settings panel.
                 // Preview user-defined background dim and blur when hovered on the visual settings panel.
                 Background.EnableUserDim.Value = true;
                 Background.BlurAmount.Value = 0;
             }
-            else if (Background.BlurAmount.Value != BACKGROUND_BLUR && !VisualSettings.IsHovered)
+            else
             {
                 // Acts as an "on hover lost" trigger for the visual settings panel.
                 // Returns background dim and blur to the values specified by PlayerLoader.
