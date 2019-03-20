@@ -20,6 +20,13 @@ namespace osu.Game.Rulesets.Catch.Mods
 
         public void ApplyToHitObject(HitObject hitObject)
         {
+            if (hitObject is JuiceStream stream)
+            {
+                lastPosition = stream.EndX;
+                lastStartTime = stream.EndTime;
+                return;
+            }
+
             if (!(hitObject is Fruit))
                 return;
 
