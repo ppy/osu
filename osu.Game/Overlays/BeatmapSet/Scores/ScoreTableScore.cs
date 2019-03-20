@@ -19,7 +19,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Overlays.BeatmapSet.Scores
 {
-    public class DrawableScore : Container
+    public class ScoreTableScore : Container
     {
         private const int fade_duration = 100;
         private const int text_size = 14;
@@ -27,7 +27,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
         private readonly Box hoveredBackground;
         private readonly Box background;
 
-        public DrawableScore(int index, APIScoreInfo score, int maxModsAmount)
+        public ScoreTableScore(int index, APIScoreInfo score, int maxModsAmount)
         {
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
