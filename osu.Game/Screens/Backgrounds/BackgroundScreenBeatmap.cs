@@ -13,16 +13,21 @@ namespace osu.Game.Screens.Backgrounds
 {
     public class BackgroundScreenBeatmap : BackgroundScreen
     {
+        protected Background Background;
+
         private WorkingBeatmap beatmap;
 
         /// <summary>
         /// Whether or not user dim settings should be applied to this Background.
         /// </summary>
-        public readonly Bindable<bool> EnableVisualSettings = new Bindable<bool>();
+        public readonly Bindable<bool> EnableUserDim = new Bindable<bool>();
 
         public readonly Bindable<bool> StoryboardReplacesBackground = new Bindable<bool>();
 
-        public readonly Bindable<float> AddedBlur = new Bindable<float>();
+        /// <summary>
+        /// The amount of blur to be applied in addition to user-specified blur.
+        /// </summary>
+        public readonly Bindable<float> BlurAmount = new Bindable<float>();
 
         private readonly UserDimContainer fadeContainer;
 
@@ -53,7 +58,7 @@ namespace osu.Game.Screens.Backgrounds
 
                         b.Depth = newDepth;
                         fadeContainer.Add(Background = b);
-                        fadeContainer.UpdateVisuals(true);
+                        fadeContainer.ApplyInstantBlur();
                         StoryboardReplacesBackground.BindTo(fadeContainer.StoryboardReplacesBackground);
                     }));
                 });
@@ -64,8 +69,8 @@ namespace osu.Game.Screens.Backgrounds
         {
             Beatmap = beatmap;
             InternalChild = fadeContainer = CreateFadeContainer();
-            fadeContainer.EnableUserDim.BindTo(EnableVisualSettings);
-            fadeContainer.AddedBlur.BindTo(AddedBlur);
+            fadeContainer.EnableUserDim.BindTo(EnableUserDim);
+            fadeContainer.BlurAmount.BindTo(BlurAmount);
         }
 
         public override bool Equals(BackgroundScreen other)

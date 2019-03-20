@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -36,7 +37,7 @@ namespace osu.Game.Graphics.Containers
         /// <remarks>
         /// Used in contexts where there can potentially be both user and screen-specified blurring occuring at the same time, such as in <see cref="PlayerLoader"/>
         /// </remarks>
-        public Bindable<float> AddedBlur = new Bindable<float>();
+        public readonly Bindable<float> BlurAmount = new Bindable<float>();
 
         private Bindable<double> dimLevel { get; set; }
 
@@ -51,8 +52,10 @@ namespace osu.Game.Graphics.Containers
         private readonly bool isStoryboard;
 
         private Vector2 blurTarget => EnableUserDim.Value
-            ? new Vector2(AddedBlur.Value + (float)blurLevel.Value * 25)
-            : new Vector2(AddedBlur.Value);
+            ? new Vector2(BlurAmount.Value + (float)blurLevel.Value * 25)
+            : new Vector2(BlurAmount.Value);
+
+        private Background background => DimContainer.Children.OfType<Background>().FirstOrDefault();
 
         /// <summary>
         /// Creates a new <see cref="UserDimContainer"/>.
@@ -69,27 +72,38 @@ namespace osu.Game.Graphics.Containers
             AddInternal(DimContainer = new Container { RelativeSizeAxes = Axes.Both });
         }
 
+        /// <summary>
+        /// Set the blur of the background in this UserDimContainer to our blur target instantly.
+        /// </summary>
+        /// <remarks>
+        /// We need to support instant blurring here in the case of changing beatmap backgrounds, where blurring shouldn't be from 0 every time the beatmap is changed.
+        /// </remarks>
+        public void ApplyInstantBlur()
+        {
+            background?.BlurTo(blurTarget, 0, Easing.OutQuint);
+        }
+
         [BackgroundDependencyLoader]
         private void load(OsuConfigManager config)
         {
             dimLevel = config.GetBindable<double>(OsuSetting.DimLevel);
             blurLevel = config.GetBindable<double>(OsuSetting.BlurLevel);
             showStoryboard = config.GetBindable<bool>(OsuSetting.ShowStoryboard);
-            EnableUserDim.ValueChanged += _ => UpdateVisuals();
-            dimLevel.ValueChanged += _ => UpdateVisuals();
-            blurLevel.ValueChanged += _ => UpdateVisuals();
-            showStoryboard.ValueChanged += _ => UpdateVisuals();
-            StoryboardReplacesBackground.ValueChanged += _ => UpdateVisuals();
-            AddedBlur.ValueChanged += _ => UpdateVisuals();
+            EnableUserDim.ValueChanged += _ => updateVisuals();
+            dimLevel.ValueChanged += _ => updateVisuals();
+            blurLevel.ValueChanged += _ => updateVisuals();
+            showStoryboard.ValueChanged += _ => updateVisuals();
+            StoryboardReplacesBackground.ValueChanged += _ => updateVisuals();
+            BlurAmount.ValueChanged += _ => updateVisuals();
         }
 
         protected override void LoadComplete()
         {
             base.LoadComplete();
-            UpdateVisuals();
+            updateVisuals();
         }
 
-        public void UpdateVisuals(bool instant = false)
+        private void updateVisuals()
         {
             if (isStoryboard)
             {
@@ -100,13 +114,10 @@ namespace osu.Game.Graphics.Containers
                 // The background needs to be hidden in the case of it being replaced by the storyboard
                 DimContainer.FadeTo(showStoryboard.Value && StoryboardReplacesBackground.Value ? 0 : 1, background_fade_duration, Easing.OutQuint);
 
-                foreach (Drawable c in DimContainer)
-                {
-                    // Only blur if this container contains a background
-                    // We can't blur the container like we did with the dim because buffered containers add considerable draw overhead. As a result, this blurs the background directly.
-                    // We need to support instant blurring here in the case of SongSelect, where blurring shouldn't be from 0 every time the beatmap is changed.
-                    ((Background)c)?.BlurTo(blurTarget, instant ? 0 : background_fade_duration, Easing.OutQuint);
-                }
+                // Only blur if this container contains a background
+                // We can't blur the container like we did with the dim because buffered containers add considerable draw overhead.
+                // As a result, this blurs the background directly.
+                background?.BlurTo(blurTarget, background_fade_duration, Easing.OutQuint);
             }
 
             DimContainer.FadeColour(EnableUserDim.Value ? OsuColour.Gray(1 - (float)dimLevel.Value) : Color4.White, background_fade_duration, Easing.OutQuint);

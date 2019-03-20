@@ -58,7 +58,7 @@ namespace osu.Game.Screens.Ranking
         public override void OnEntering(IScreen last)
         {
             base.OnEntering(last);
-            ((BackgroundScreenBeatmap)Background).AddedBlur.Value = BACKGROUND_BLUR;
+            ((BackgroundScreenBeatmap)Background).BlurAmount.Value = BACKGROUND_BLUR;
             Background.ScaleTo(1.1f, transition_time, Easing.OutQuint);
 
             allCircles.ForEach(c =>

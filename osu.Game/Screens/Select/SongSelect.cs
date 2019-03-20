@@ -556,7 +556,7 @@ namespace osu.Game.Screens.Select
             if (Background is BackgroundScreenBeatmap backgroundModeBeatmap)
             {
                 backgroundModeBeatmap.Beatmap = beatmap;
-                backgroundModeBeatmap.AddedBlur.Value = BACKGROUND_BLUR;
+                backgroundModeBeatmap.BlurAmount.Value = BACKGROUND_BLUR;
                 backgroundModeBeatmap.FadeColour(Color4.White, 250);
             }
 
