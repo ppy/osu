@@ -269,7 +269,7 @@ namespace osu.Game.Screens.Select
 
             protected override bool OnHover(HoverEvent e)
             {
-                if (Mouse.GetState().IsButtonDown(MouseButton.Left))
+                if (e.IsPressed(MouseButton.Left))
                 {
                     if (isDragging)
                         isHovered = true;
@@ -302,7 +302,7 @@ namespace osu.Game.Screens.Select
             protected override bool OnMouseMove(MouseMoveEvent e)
             {
                 // This is to show the current item's buttons after having dragged a different item and landing here (i.e. the OnHover was prevented from being fired)
-                if (!isHovered && !Mouse.GetState().IsButtonDown(MouseButton.Left))
+                if (!isHovered && !e.IsPressed(MouseButton.Left))
                 {
                     removeButton.ShowButton();
                 }
