@@ -30,7 +30,7 @@ namespace osu.Game.Overlays
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours, APIAccess api)
+        private void load(OsuColour colours, IAPIProvider api)
         {
             api.Register(this);
 
@@ -96,7 +96,7 @@ namespace osu.Game.Overlays
             this.FadeOut(100);
         }
 
-        public void APIStateChanged(APIAccess api, APIState state)
+        public void APIStateChanged(IAPIProvider api, APIState state)
         {
             switch (state)
             {

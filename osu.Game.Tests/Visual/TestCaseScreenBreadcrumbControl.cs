@@ -74,7 +74,7 @@ namespace osu.Game.Tests.Visual
         }
 
         private void pushNext() => AddStep(@"push next screen", () => ((TestScreen)screenStack.CurrentScreen).PushNext());
-        private void waitForCurrent() => AddUntilStep(() => screenStack.CurrentScreen.IsCurrentScreen(), "current screen");
+        private void waitForCurrent() => AddUntilStep("current screen", () => screenStack.CurrentScreen.IsCurrentScreen());
 
         private abstract class TestScreen : OsuScreen
         {

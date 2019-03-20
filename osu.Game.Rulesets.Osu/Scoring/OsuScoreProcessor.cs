@@ -15,8 +15,8 @@ namespace osu.Game.Rulesets.Osu.Scoring
 {
     internal class OsuScoreProcessor : ScoreProcessor<OsuHitObject>
     {
-        public OsuScoreProcessor(RulesetContainer<OsuHitObject> rulesetContainer)
-            : base(rulesetContainer)
+        public OsuScoreProcessor(DrawableRuleset<OsuHitObject> drawableRuleset)
+            : base(drawableRuleset)
         {
         }
 

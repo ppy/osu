@@ -32,9 +32,9 @@ namespace osu.Game.Tests.Visual
             var text = holdForMenuButton.Children.OfType<SpriteText>().First();
 
             AddStep("Trigger text fade in", () => InputManager.MoveMouseTo(holdForMenuButton));
-            AddUntilStep(() => text.IsPresent && !exitAction, "Text visible");
+            AddUntilStep("Text visible", () => text.IsPresent && !exitAction);
             AddStep("Trigger text fade out", () => InputManager.MoveMouseTo(Vector2.One));
-            AddUntilStep(() => !text.IsPresent && !exitAction, "Text is not visible");
+            AddUntilStep("Text is not visible", () => !text.IsPresent && !exitAction);
 
             AddStep("Trigger exit action", () =>
             {
@@ -47,7 +47,7 @@ namespace osu.Game.Tests.Visual
             AddAssert("action not triggered", () => !exitAction);
 
             AddStep("Trigger exit action", () => InputManager.PressButton(MouseButton.Left));
-            AddUntilStep(() => exitAction, $"{nameof(holdForMenuButton.Action)} was triggered");
+            AddUntilStep($"{nameof(holdForMenuButton.Action)} was triggered", () => exitAction);
         }
     }
 }

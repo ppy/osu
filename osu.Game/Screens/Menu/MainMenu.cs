@@ -40,7 +40,9 @@ namespace osu.Game.Screens.Menu
         [Resolved]
         private GameHost host { get; set; }
 
-        protected override BackgroundScreen CreateBackground() => new BackgroundScreenDefault();
+        private BackgroundScreenDefault background;
+
+        protected override BackgroundScreen CreateBackground() => background;
 
         [BackgroundDependencyLoader(true)]
         private void load(OsuGame game = null)
@@ -89,6 +91,7 @@ namespace osu.Game.Screens.Menu
                 buttons.OnDirect = game.ToggleDirect;
             }
 
+            LoadComponentAsync(background = new BackgroundScreenDefault());
             preloadSongSelect();
         }
 
