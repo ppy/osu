@@ -4,12 +4,13 @@
 using NUnit.Framework;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Osu.Objects;
+using osu.Game.Tests.Visual;
 using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Tests
 {
     [TestFixture]
-    public class TestCaseHitCircleLongCombo : Game.Tests.Visual.TestCasePlayer
+    public class TestCaseHitCircleLongCombo : PlayerTestCase
     {
         public TestCaseHitCircleLongCombo()
             : base(new OsuRuleset())
