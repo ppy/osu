@@ -52,7 +52,7 @@ namespace osu.Game.Beatmaps
             {
                 public override IEnumerable<Mod> GetModsFor(ModType type) => new Mod[] { };
 
-                public override RulesetContainer CreateRulesetContainerWith(WorkingBeatmap beatmap)
+                public override DrawableRuleset CreateDrawableRulesetWith(WorkingBeatmap beatmap)
                 {
                     throw new NotImplementedException();
                 }
