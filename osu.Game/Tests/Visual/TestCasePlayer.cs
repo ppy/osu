@@ -55,7 +55,7 @@ namespace osu.Game.Tests.Visual
                     AddStep(r.Name, () => p = loadPlayerFor(r));
                     AddCheckSteps(() => p);
 
-                    AddUntilStep(() =>
+                    AddUntilStep("no leaked beatmaps", () =>
                     {
                         p = null;
 
@@ -65,9 +65,9 @@ namespace osu.Game.Tests.Visual
 
                         workingWeakReferences.ForEachAlive(_ => count++);
                         return count == 1;
-                    }, "no leaked beatmaps");
+                    });
 
-                    AddUntilStep(() =>
+                    AddUntilStep("no leaked players", () =>
                     {
                         GC.Collect();
                         GC.WaitForPendingFinalizers();
@@ -75,14 +75,14 @@ namespace osu.Game.Tests.Visual
 
                         playerWeakReferences.ForEachAlive(_ => count++);
                         return count == 1;
-                    }, "no leaked players");
+                    });
                 }
             }
         }
 
         protected virtual void AddCheckSteps(Func<Player> player)
         {
-            AddUntilStep(() => player().IsLoaded, "player loaded");
+            AddUntilStep("player loaded", () => player().IsLoaded);
         }
 
         protected virtual IBeatmap CreateBeatmap(Ruleset ruleset) => new TestBeatmap(ruleset.RulesetInfo);
