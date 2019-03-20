@@ -39,6 +39,7 @@ namespace osu.Game.Screens.Backgrounds
             Beatmap = beatmap;
             InternalChild = fadeContainer = CreateFadeContainer();
             fadeContainer.EnableUserDim.BindTo(EnableUserDim);
+            fadeContainer.BlurAmount.BindTo(BlurAmount);
         }
 
         [BackgroundDependencyLoader]
