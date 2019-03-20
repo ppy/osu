@@ -17,7 +17,7 @@ using osu.Game.Rulesets.UI.Scrolling;
 
 namespace osu.Game.Rulesets.Catch.UI
 {
-    public class DrawableCatchRuleset : DrawableScrollingRuleset<CatchPlayfield, CatchHitObject>
+    public class DrawableCatchRuleset : DrawableScrollingRuleset<CatchHitObject>
     {
         protected override ScrollVisualisationMethod VisualisationMethod => ScrollVisualisationMethod.Constant;
 

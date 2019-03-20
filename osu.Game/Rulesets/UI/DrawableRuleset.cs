@@ -32,9 +32,6 @@ namespace osu.Game.Rulesets.UI
     /// <summary>
     /// DrawableRuleset that applies conversion to Beatmaps. Does not contain a Playfield
     /// and does not load drawable hit objects.
-    /// <para>
-    /// Should not be derived - derive <see cref="DrawableRuleset{TPlayfield,TObject}"/> instead.
-    /// </para>
     /// </summary>
     /// <typeparam name="TObject">The type of HitObject contained by this DrawableRuleset.</typeparam>
     public abstract class DrawableRuleset<TObject> : DrawableRuleset, IProvideCursor, ICanAttachKeyCounter
@@ -345,31 +342,6 @@ namespace osu.Game.Rulesets.UI
         /// </summary>
         /// <returns>A score processor.</returns>
         public abstract ScoreProcessor CreateScoreProcessor();
-    }
-
-    /// <summary>
-    /// A derivable DrawableRuleset that manages the Playfield and HitObjects.
-    /// </summary>
-    /// <typeparam name="TPlayfield">The type of Playfield contained by this DrawableRuleset.</typeparam>
-    /// <typeparam name="TObject">The type of HitObject contained by this DrawableRuleset.</typeparam>
-    public abstract class DrawableRuleset<TPlayfield, TObject> : DrawableRuleset<TObject>
-        where TObject : HitObject
-        where TPlayfield : Playfield
-    {
-        /// <summary>
-        /// The playfield.
-        /// </summary>
-        protected new TPlayfield Playfield => (TPlayfield)base.Playfield;
-
-        /// <summary>
-        /// Creates a ruleset visualisation for the provided ruleset and beatmap.
-        /// </summary>
-        /// <param name="ruleset">The ruleset being repesented.</param>
-        /// <param name="beatmap">The beatmap to create the hit renderer for.</param>
-        protected DrawableRuleset(Ruleset ruleset, WorkingBeatmap beatmap)
-            : base(ruleset, beatmap)
-        {
-        }
     }
 
     public class BeatmapInvalidForRulesetException : ArgumentException

@@ -20,7 +20,7 @@ using osu.Game.Rulesets.UI.Scrolling;
 
 namespace osu.Game.Rulesets.Taiko.UI
 {
-    public class DrawableTaikoRuleset : DrawableScrollingRuleset<TaikoPlayfield, TaikoHitObject>
+    public class DrawableTaikoRuleset : DrawableScrollingRuleset<TaikoHitObject>
     {
         protected override ScrollVisualisationMethod VisualisationMethod => ScrollVisualisationMethod.Overlapping;
 

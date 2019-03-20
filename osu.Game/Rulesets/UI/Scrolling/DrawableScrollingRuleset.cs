@@ -20,12 +20,11 @@ using osu.Game.Rulesets.UI.Scrolling.Algorithms;
 namespace osu.Game.Rulesets.UI.Scrolling
 {
     /// <summary>
-    /// A type of <see cref="DrawableRuleset{TPlayfield,TObject}"/> that supports a <see cref="ScrollingPlayfield"/>.
-    /// <see cref="HitObject"/>s inside this <see cref="DrawableRuleset{TPlayfield,TObject}"/> will scroll within the playfield.
+    /// A type of <see cref="DrawableRuleset{TObject}"/> that supports a <see cref="ScrollingPlayfield"/>.
+    /// <see cref="HitObject"/>s inside this <see cref="DrawableRuleset{TObject}"/> will scroll within the playfield.
     /// </summary>
-    public abstract class DrawableScrollingRuleset<TPlayfield, TObject> : DrawableRuleset<TPlayfield, TObject>, IKeyBindingHandler<GlobalAction>
+    public abstract class DrawableScrollingRuleset<TObject> : DrawableRuleset<TObject>, IKeyBindingHandler<GlobalAction>
         where TObject : HitObject
-        where TPlayfield : ScrollingPlayfield
     {
         /// <summary>
         /// The default span of time visible by the length of the scrolling axes.
