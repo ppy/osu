@@ -21,7 +21,7 @@ namespace osu.Game.Rulesets.Catch.Tests
             typeof(DrawableBananaShower),
 
             typeof(CatchRuleset),
-            typeof(CatchRulesetContainer),
+            typeof(DrawableCatchRuleset),
         };
 
         public TestCaseBananaShower()
