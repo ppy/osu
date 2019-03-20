@@ -77,7 +77,7 @@ namespace osu.Game.Rulesets.Catch.Mods
         private void applyRandomOffset(ref float position, double maxOffset)
         {
             bool right = RNG.NextBool();
-            float rand = Math.Min(20, (float)RNG.NextDouble(0, maxOffset)) / CatchPlayfield.BASE_WIDTH;
+            float rand = Math.Min(20, (float)RNG.NextDouble(0, Math.Max(0, maxOffset))) / CatchPlayfield.BASE_WIDTH;
 
             if (right)
             {
