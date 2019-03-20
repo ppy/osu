@@ -28,8 +28,10 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Mania.UI
 {
-    public class DrawableManiaRuleset : DrawableScrollingRuleset<ManiaPlayfield, ManiaHitObject>
+    public class DrawableManiaRuleset : DrawableScrollingRuleset<ManiaHitObject>
     {
+        protected new ManiaPlayfield Playfield => (ManiaPlayfield)base.Playfield;
+
         public new ManiaBeatmap Beatmap => (ManiaBeatmap)base.Beatmap;
 
         public IEnumerable<BarLine> BarLines;
