@@ -59,6 +59,8 @@ namespace osu.Game.Users
 
             FillFlowContainer infoContainer;
 
+            UserCoverBackground coverBackground;
+
             AddInternal(content = new Container
             {
                 RelativeSizeAxes = Axes.Both,
@@ -73,13 +75,12 @@ namespace osu.Game.Users
 
                 Children = new Drawable[]
                 {
-                    new DelayedLoadWrapper(new UserCoverBackground(user)
+                    new DelayedLoadWrapper(coverBackground = new UserCoverBackground(user)
                     {
                         RelativeSizeAxes = Axes.Both,
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
                         FillMode = FillMode.Fill,
-                        OnLoadComplete = d => d.FadeInFromZero(400, Easing.Out)
                     }, 300) { RelativeSizeAxes = Axes.Both },
                     new Box
                     {
@@ -180,6 +181,8 @@ namespace osu.Game.Users
                     },
                 }
             });
+
+            coverBackground.OnLoadComplete += d => d.FadeInFromZero(400, Easing.Out);
 
             if (user.IsSupporter)
             {

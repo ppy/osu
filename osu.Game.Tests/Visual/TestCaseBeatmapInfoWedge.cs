@@ -56,11 +56,11 @@ namespace osu.Game.Tests.Visual
             // select part is redundant, but wait for load isn't
             selectBeatmap(Beatmap.Value.Beatmap);
 
-            AddWaitStep(3);
+            AddWaitStep("wait for select", 3);
 
             AddStep("hide", () => { infoWedge.State = Visibility.Hidden; });
 
-            AddWaitStep(3);
+            AddWaitStep("wait for hide", 3);
 
             AddStep("show", () => { infoWedge.State = Visibility.Visible; });
 
@@ -135,7 +135,7 @@ namespace osu.Game.Tests.Visual
                 infoWedge.Beatmap = Beatmap.Value = b == null ? Beatmap.Default : new TestWorkingBeatmap(b);
             });
 
-            AddUntilStep(() => infoWedge.Info != infoBefore, "wait for async load");
+            AddUntilStep("wait for async load", () => infoWedge.Info != infoBefore);
         }
 
         private IBeatmap createTestBeatmap(RulesetInfo ruleset)

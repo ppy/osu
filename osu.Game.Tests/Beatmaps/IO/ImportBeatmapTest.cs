@@ -243,6 +243,61 @@ namespace osu.Game.Tests.Beatmaps.IO
         }
 
         [Test]
+        public void TestImportWithDuplicateBeatmapIDs()
+        {
+            //unfortunately for the time being we need to reference osu.Framework.Desktop for a game host here.
+            using (HeadlessGameHost host = new CleanRunHeadlessGameHost("TestImportWithDuplicateBeatmapID"))
+            {
+                try
+                {
+                    var osu = loadOsu(host);
+
+                    var metadata = new BeatmapMetadata
+                    {
+                        Artist = "SomeArtist",
+                        AuthorString = "SomeAuthor"
+                    };
+
+                    var difficulty = new BeatmapDifficulty();
+
+                    var toImport = new BeatmapSetInfo
+                    {
+                        OnlineBeatmapSetID = 1,
+                        Metadata = metadata,
+                        Beatmaps = new List<BeatmapInfo>
+                        {
+                            new BeatmapInfo
+                            {
+                                OnlineBeatmapID = 2,
+                                Metadata = metadata,
+                                BaseDifficulty = difficulty
+                            },
+                            new BeatmapInfo
+                            {
+                                OnlineBeatmapID = 2,
+                                Metadata = metadata,
+                                Status = BeatmapSetOnlineStatus.Loved,
+                                BaseDifficulty = difficulty
+                            }
+                        }
+                    };
+
+                    var manager = osu.Dependencies.Get<BeatmapManager>();
+
+                    var imported = manager.Import(toImport);
+
+                    Assert.NotNull(imported);
+                    Assert.AreEqual(null, imported.Beatmaps[0].OnlineBeatmapID);
+                    Assert.AreEqual(null, imported.Beatmaps[1].OnlineBeatmapID);
+                }
+                finally
+                {
+                    host.Exit();
+                }
+            }
+        }
+
+        [Test]
         [NonParallelizable]
         [Ignore("Binding IPC on Appveyor isn't working (port in use). Need to figure out why")]
         public void TestImportOverIPC()
