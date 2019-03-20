@@ -30,8 +30,7 @@ using osu.Game.Screens.Play;
 namespace osu.Game.Rulesets.UI
 {
     /// <summary>
-    /// DrawableRuleset that applies conversion to Beatmaps. Does not contain a Playfield
-    /// and does not load drawable hit objects.
+    /// Displays an interactive ruleset gameplay instance.
     /// </summary>
     /// <typeparam name="TObject">The type of HitObject contained by this DrawableRuleset.</typeparam>
     public abstract class DrawableRuleset<TObject> : DrawableRuleset, IProvideCursor, ICanAttachKeyCounter
@@ -278,10 +277,11 @@ namespace osu.Game.Rulesets.UI
     }
 
     /// <summary>
-    /// Base DrawableRuleset. Doesn't hold objects.
-    /// <para>
-    /// Should not be derived - derive <see cref="DrawableRuleset{TObject}"/> instead.
-    /// </para>
+    /// Displays an interactive ruleset gameplay instance.
+    /// <remarks>
+    /// This type is required only for adding non-generic type to the draw hierarchy.
+    /// Once IDrawable is a thing, this can also become an interface.
+    /// </remarks>
     /// </summary>
     public abstract class DrawableRuleset : CompositeDrawable
     {
@@ -295,7 +295,7 @@ namespace osu.Game.Rulesets.UI
         /// </summary>
         public readonly BindableBool IsPaused = new BindableBool();
 
-        /// <summary>
+        /// <summary>~
         /// The associated ruleset.
         /// </summary>
         public readonly Ruleset Ruleset;
@@ -304,7 +304,7 @@ namespace osu.Game.Rulesets.UI
         /// Creates a ruleset visualisation for the provided ruleset.
         /// </summary>
         /// <param name="ruleset">The ruleset.</param>
-        protected DrawableRuleset(Ruleset ruleset)
+        internal DrawableRuleset(Ruleset ruleset)
         {
             Ruleset = ruleset;
         }
