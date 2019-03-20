@@ -46,7 +46,7 @@ namespace osu.Game.Tests.Visual
         [Test]
         public void TestPauseAfterFail()
         {
-            AddUntilStep(() => Player.HasFailed, "wait for fail");
+            AddUntilStep("wait for fail", () => Player.HasFailed);
 
             AddAssert("fail overlay shown", () => Player.FailOverlayVisible);
 
@@ -59,14 +59,14 @@ namespace osu.Game.Tests.Visual
         [Test]
         public void TestExitFromPause()
         {
-            AddUntilStep(() =>
+            AddUntilStep("keep trying to pause", () =>
             {
                 Player.Pause();
                 return Player.PauseOverlayVisible;
-            }, "keep trying to pause");
+            });
 
             AddStep("exit", () => Player.Exit());
-            AddUntilStep(() => !Player.IsCurrentScreen(), "player exited");
+            AddUntilStep("player exited", () => !Player.IsCurrentScreen());
         }
 
         protected override bool AllowFail => true;
