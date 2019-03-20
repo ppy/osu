@@ -47,7 +47,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
 
                 int index = 0;
                 foreach (var s in value)
-                    scoresFlow.Add(new DrawableScore(index++, s, maxModsAmount));
+                    scoresFlow.Add(new ScoreTableScore(index++, s, maxModsAmount));
             }
         }
     }

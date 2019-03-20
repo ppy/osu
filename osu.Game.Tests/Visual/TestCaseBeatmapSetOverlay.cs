@@ -25,7 +25,7 @@ namespace osu.Game.Tests.Visual
         {
             typeof(Header),
             typeof(ClickableUserContainer),
-            typeof(DrawableScore),
+            typeof(ScoreTableScore),
             typeof(DrawableTopScore),
             typeof(ScoresContainer),
             typeof(AuthorInfo),
