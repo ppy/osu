@@ -149,7 +149,7 @@ namespace osu.Game.Screens.Play
 
             replayLoaded.BindTo(drawableRuleset.HasReplayLoaded);
 
-            Progress.BindRulestContainer(drawableRuleset);
+            Progress.BindDrawableRuleset(drawableRuleset);
         }
 
         protected override bool OnKeyDown(KeyDownEvent e)

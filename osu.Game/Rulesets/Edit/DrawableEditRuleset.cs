@@ -11,14 +11,14 @@ using osu.Game.Rulesets.UI;
 
 namespace osu.Game.Rulesets.Edit
 {
-    public abstract class EditDrawableRuleset : CompositeDrawable
+    public abstract class DrawableEditRuleset : CompositeDrawable
     {
         /// <summary>
-        /// The <see cref="Playfield"/> contained by this <see cref="EditDrawableRuleset"/>.
+        /// The <see cref="Playfield"/> contained by this <see cref="DrawableEditRuleset"/>.
         /// </summary>
         public abstract Playfield Playfield { get; }
 
-        internal EditDrawableRuleset()
+        internal DrawableEditRuleset()
         {
             RelativeSizeAxes = Axes.Both;
         }
@@ -38,7 +38,7 @@ namespace osu.Game.Rulesets.Edit
         internal abstract DrawableHitObject Remove(HitObject hitObject);
     }
 
-    public class EditDrawableRuleset<TObject> : EditDrawableRuleset
+    public class DrawableEditRuleset<TObject> : DrawableEditRuleset
         where TObject : HitObject
     {
         public override Playfield Playfield => drawableRuleset.Playfield;
@@ -48,7 +48,7 @@ namespace osu.Game.Rulesets.Edit
 
         private readonly DrawableRuleset<TObject> drawableRuleset;
 
-        public EditDrawableRuleset(DrawableRuleset<TObject> drawableRuleset)
+        public DrawableEditRuleset(DrawableRuleset<TObject> drawableRuleset)
         {
             this.drawableRuleset = drawableRuleset;
 
