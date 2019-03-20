@@ -4,6 +4,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osuTK;
 using osuTK.Graphics;
 using osu.Framework.Graphics;
@@ -15,14 +16,13 @@ using osu.Game.Online.API.Requests;
 using osu.Game.Overlays.SearchableList;
 using osu.Game.Overlays.Social;
 using osu.Game.Users;
-using osu.Framework.Configuration;
 using osu.Framework.Threading;
 
 namespace osu.Game.Overlays
 {
     public class SocialOverlay : SearchableListOverlay<SocialTab, SocialSortCriteria, SortDirection>, IOnlineComponent
     {
-        private APIAccess api;
+        private IAPIProvider api;
         private readonly LoadingAnimation loading;
         private FillFlowContainer<SocialPanel> panels;
 
@@ -34,9 +34,10 @@ namespace osu.Game.Overlays
         protected override SearchableListFilterControl<SocialSortCriteria, SortDirection> CreateFilterControl() => new FilterControl();
 
         private IEnumerable<User> users;
+
         public IEnumerable<User> Users
         {
-            get { return users; }
+            get => users;
             set
             {
                 if (users?.Equals(value) ?? false)
@@ -57,7 +58,7 @@ namespace osu.Game.Overlays
 
             Filter.Search.Current.ValueChanged += text =>
             {
-                if (!string.IsNullOrEmpty(text))
+                if (!string.IsNullOrEmpty(text.NewValue))
                 {
                     // force searching in players until searching for friends is supported
                     Header.Tabs.Current.Value = SocialTab.AllPlayers;
@@ -67,18 +68,18 @@ namespace osu.Game.Overlays
                 }
             };
 
-            Header.Tabs.Current.ValueChanged += tab => Scheduler.AddOnce(updateSearch);
+            Header.Tabs.Current.ValueChanged += _ => Scheduler.AddOnce(updateSearch);
 
-            Filter.Tabs.Current.ValueChanged += sortCriteria => Scheduler.AddOnce(updateSearch);
+            Filter.Tabs.Current.ValueChanged += _ => Scheduler.AddOnce(updateSearch);
 
-            Filter.DisplayStyleControl.DisplayStyle.ValueChanged += recreatePanels;
-            Filter.DisplayStyleControl.Dropdown.Current.ValueChanged += sortOrder => Scheduler.AddOnce(updateSearch);
+            Filter.DisplayStyleControl.DisplayStyle.ValueChanged += style => recreatePanels(style.NewValue);
+            Filter.DisplayStyleControl.Dropdown.Current.ValueChanged += _ => Scheduler.AddOnce(updateSearch);
 
             currentQuery.ValueChanged += query =>
             {
                 queryChangedDebounce?.Cancel();
 
-                if (string.IsNullOrEmpty(query))
+                if (string.IsNullOrEmpty(query.NewValue))
                     Scheduler.AddOnce(updateSearch);
                 else
                     queryChangedDebounce = Scheduler.AddDelayed(updateSearch, 500);
@@ -88,7 +89,7 @@ namespace osu.Game.Overlays
         }
 
         [BackgroundDependencyLoader]
-        private void load(APIAccess api)
+        private void load(IAPIProvider api)
         {
             this.api = api;
             api.Register(this);
@@ -123,6 +124,7 @@ namespace osu.Game.Overlays
                             panel = new SocialListPanel(u);
                             break;
                     }
+
                     panel.Status.BindTo(u.Status);
                     return panel;
                 })
@@ -130,7 +132,7 @@ namespace osu.Game.Overlays
 
             LoadComponentAsync(newPanels, f =>
             {
-                if(panels != null)
+                if (panels != null)
                     ScrollFlow.Remove(panels);
 
                 ScrollFlow.Add(panels = newPanels);
@@ -171,6 +173,7 @@ namespace osu.Game.Overlays
                     api.Queue(getUsersRequest = userRequest);
                     break;
             }
+
             loading.Show();
         }
 
@@ -190,7 +193,7 @@ namespace osu.Game.Overlays
             }
         }
 
-        public void APIStateChanged(APIAccess api, APIState state)
+        public void APIStateChanged(IAPIProvider api, APIState state)
         {
             switch (state)
             {

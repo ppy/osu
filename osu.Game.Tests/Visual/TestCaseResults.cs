@@ -16,7 +16,7 @@ using osu.Game.Users;
 namespace osu.Game.Tests.Visual
 {
     [TestFixture]
-    public class TestCaseResults : OsuTestCase
+    public class TestCaseResults : ScreenTestCase
     {
         private BeatmapManager beatmaps;
 
@@ -43,7 +43,7 @@ namespace osu.Game.Tests.Visual
             if (beatmapInfo != null)
                 Beatmap.Value = beatmaps.GetWorkingBeatmap(beatmapInfo);
 
-            Add(new SoloResults(new ScoreInfo
+            LoadScreen(new SoloResults(new ScoreInfo
             {
                 TotalScore = 2845370,
                 Accuracy = 0.98,

@@ -13,7 +13,7 @@ using osu.Game.Rulesets.Osu.Mods;
 using System.Linq;
 using System.Collections.Generic;
 using NUnit.Framework;
-using osu.Framework.Configuration;
+using osu.Framework.Bindables;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Overlays.Mods.Sections;
@@ -208,22 +208,22 @@ namespace osu.Game.Tests.Visual
         {
             checkLabelColor(Color4.White);
             selectNext(mod);
-            AddWaitStep(1, "wait for changing colour");
+            AddWaitStep("wait for changing colour", 1);
             checkLabelColor(colour);
             selectPrevious(mod);
-            AddWaitStep(1, "wait for changing colour");
+            AddWaitStep("wait for changing colour", 1);
             checkLabelColor(Color4.White);
         }
 
         private void testRankedText(Mod mod)
         {
-            AddWaitStep(1, "wait for fade");
+            AddWaitStep("wait for fade", 1);
             AddAssert("check for ranked", () => modSelect.UnrankedLabel.Alpha == 0);
             selectNext(mod);
-            AddWaitStep(1, "wait for fade");
+            AddWaitStep("wait for fade", 1);
             AddAssert("check for unranked", () => modSelect.UnrankedLabel.Alpha != 0);
             selectPrevious(mod);
-            AddWaitStep(1, "wait for fade");
+            AddWaitStep("wait for fade", 1);
             AddAssert("check for ranked", () => modSelect.UnrankedLabel.Alpha == 0);
         }
 

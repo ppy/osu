@@ -1,10 +1,13 @@
-﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Difficulty;
+using osu.Game.Rulesets.Difficulty.Preprocessing;
+using osu.Game.Rulesets.Difficulty.Skills;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Osu.Difficulty.Skills;
@@ -15,7 +18,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 {
     public class OsuDifficultyCalculator : DifficultyCalculator
     {
-        private const int section_length = 400;
         private const double difficulty_multiplier = 0.0675;
 
         public OsuDifficultyCalculator(Ruleset ruleset, WorkingBeatmap beatmap)
@@ -23,58 +25,27 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         {
         }
 
-        protected override DifficultyAttributes Calculate(IBeatmap beatmap, Mod[] mods, double timeRate)
+        protected override DifficultyAttributes CreateDifficultyAttributes(IBeatmap beatmap, Mod[] mods, Skill[] skills, double clockRate)
         {
-            if (!beatmap.HitObjects.Any())
-                return new OsuDifficultyAttributes(mods, 0);
-
-            OsuDifficultyBeatmap difficultyBeatmap = new OsuDifficultyBeatmap(beatmap.HitObjects.Cast<OsuHitObject>().ToList(), timeRate);
-            Skill[] skills =
-            {
-                new Aim(),
-                new Speed()
-            };
-
-            double sectionLength = section_length * timeRate;
-
-            // The first object doesn't generate a strain, so we begin with an incremented section end
-            double currentSectionEnd = Math.Ceiling(beatmap.HitObjects.First().StartTime / sectionLength) * sectionLength;
-
-            foreach (OsuDifficultyHitObject h in difficultyBeatmap)
-            {
-                while (h.BaseObject.StartTime > currentSectionEnd)
-                {
-                    foreach (Skill s in skills)
-                    {
-                        s.SaveCurrentPeak();
-                        s.StartNewSectionFrom(currentSectionEnd);
-                    }
-
-                    currentSectionEnd += sectionLength;
-                }
-
-                foreach (Skill s in skills)
-                    s.Process(h);
-            }
-
-            // The peak strain will not be saved for the last section in the above loop
-            foreach (Skill s in skills)
-                s.SaveCurrentPeak();
+            if (beatmap.HitObjects.Count == 0)
+                return new OsuDifficultyAttributes { Mods = mods };
 
             double aimRating = Math.Sqrt(skills[0].DifficultyValue()) * difficulty_multiplier;
             double speedRating = Math.Sqrt(skills[1].DifficultyValue()) * difficulty_multiplier;
             double starRating = aimRating + speedRating + Math.Abs(aimRating - speedRating) / 2;
 
             // Todo: These int casts are temporary to achieve 1:1 results with osu!stable, and should be removed in the future
-            double hitWindowGreat = (int)(beatmap.HitObjects.First().HitWindows.Great / 2) / timeRate;
-            double preempt = (int)BeatmapDifficulty.DifficultyRange(beatmap.BeatmapInfo.BaseDifficulty.ApproachRate, 1800, 1200, 450) / timeRate;
+            double hitWindowGreat = (int)(beatmap.HitObjects.First().HitWindows.Great / 2) / clockRate;
+            double preempt = (int)BeatmapDifficulty.DifficultyRange(beatmap.BeatmapInfo.BaseDifficulty.ApproachRate, 1800, 1200, 450) / clockRate;
 
             int maxCombo = beatmap.HitObjects.Count;
             // Add the ticks + tail of the slider. 1 is subtracted because the head circle would be counted twice (once for the slider itself in the line above)
             maxCombo += beatmap.HitObjects.OfType<Slider>().Sum(s => s.NestedHitObjects.Count - 1);
 
-            return new OsuDifficultyAttributes(mods, starRating)
+            return new OsuDifficultyAttributes
             {
+                StarRating = starRating,
+                Mods = mods,
                 AimStrain = aimRating,
                 SpeedStrain = speedRating,
                 ApproachRate = preempt > 1200 ? (1800 - preempt) / 120 : (1200 - preempt) / 150 + 5,
@@ -82,6 +53,26 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 MaxCombo = maxCombo
             };
         }
+
+        protected override IEnumerable<DifficultyHitObject> CreateDifficultyHitObjects(IBeatmap beatmap, double clockRate)
+        {
+            // The first jump is formed by the first two hitobjects of the map.
+            // If the map has less than two OsuHitObjects, the enumerator will not return anything.
+            for (int i = 1; i < beatmap.HitObjects.Count; i++)
+            {
+                var lastLast = i > 1 ? beatmap.HitObjects[i - 2] : null;
+                var last = beatmap.HitObjects[i - 1];
+                var current = beatmap.HitObjects[i];
+
+                yield return new OsuDifficultyHitObject(current, lastLast, last, clockRate);
+            }
+        }
+
+        protected override Skill[] CreateSkills(IBeatmap beatmap) => new Skill[]
+        {
+            new Aim(),
+            new Speed()
+        };
 
         protected override Mod[] DifficultyAdjustmentMods => new Mod[]
         {

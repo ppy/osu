@@ -8,6 +8,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using JetBrains.Annotations;
 using Microsoft.EntityFrameworkCore;
+using osu.Framework;
 using osu.Framework.Extensions;
 using osu.Framework.IO.File;
 using osu.Framework.Logging;
@@ -32,7 +33,7 @@ namespace osu.Game.Database
         where TModel : class, IHasFiles<TFileModel>, IHasPrimaryKey, ISoftDelete
         where TFileModel : INamedFileInfo, new()
     {
-        public delegate void ItemAddedDelegate(TModel model, bool existing, bool silent);
+        public delegate void ItemAddedDelegate(TModel model, bool existing);
 
         /// <summary>
         /// Set an endpoint for notifications to be posted to.
@@ -52,6 +53,8 @@ namespace osu.Game.Database
         public event Action<TModel> ItemRemoved;
 
         public virtual string[] HandledExtensions => new[] { ".zip" };
+
+        public virtual bool SupportsImportFromStable => RuntimeInfo.IsDesktop;
 
         protected readonly FileStore Files;
 
@@ -105,12 +108,12 @@ namespace osu.Game.Database
                 a.Invoke();
         }
 
-        protected ArchiveModelManager(Storage storage, IDatabaseContextFactory contextFactory, MutableDatabaseBackedStore<TModel> modelStore, IIpcHost importHost = null)
+        protected ArchiveModelManager(Storage storage, IDatabaseContextFactory contextFactory, MutableDatabaseBackedStoreWithFileIncludes<TModel, TFileModel> modelStore, IIpcHost importHost = null)
         {
             ContextFactory = contextFactory;
 
             ModelStore = modelStore;
-            ModelStore.ItemAdded += (item, silent) => handleEvent(() => ItemAdded?.Invoke(item, false, silent));
+            ModelStore.ItemAdded += item => handleEvent(() => ItemAdded?.Invoke(item, false));
             ModelStore.ItemRemoved += s => handleEvent(() => ItemRemoved?.Invoke(s));
 
             Files = new FileStore(contextFactory, storage);
@@ -128,14 +131,18 @@ namespace osu.Game.Database
         /// <param name="paths">One or more archive locations on disk.</param>
         public void Import(params string[] paths)
         {
-            var notification = new ProgressNotification
-            {
-                Text = "Import is initialising...",
-                Progress = 0,
-                State = ProgressNotificationState.Active,
-            };
+            var notification = new ProgressNotification { State = ProgressNotificationState.Active };
 
             PostNotification?.Invoke(notification);
+            Import(notification, paths);
+        }
+
+        protected void Import(ProgressNotification notification, params string[] paths)
+        {
+            notification.Progress = 0;
+            notification.Text = "Import is initialising...";
+
+            var term = $"{typeof(TModel).Name.Replace("Info", "").ToLower()}";
 
             List<TModel> imported = new List<TModel>();
 
@@ -148,7 +155,18 @@ namespace osu.Game.Database
 
                 try
                 {
-                    notification.Text = $"Importing ({++current} of {paths.Length})\n{Path.GetFileName(path)}";
+                    var text = "Importing ";
+
+                    if (path.Length > 1)
+                        text += $"{++current} of {paths.Length} {term}s..";
+                    else
+                        text += $"{term}..";
+
+                    // only show the filename if it isn't a temporary one (as those look ugly).
+                    if (!path.Contains(Path.GetTempPath()))
+                        text += $"\n{Path.GetFileName(path)}";
+
+                    notification.Text = text;
 
                     imported.Add(Import(path));
 
@@ -168,13 +186,20 @@ namespace osu.Game.Database
             }
             else
             {
-                notification.CompletionText = $"Imported {current} {typeof(TModel).Name.Replace("Info", "").ToLower()}s!";
-                notification.CompletionClickAction += () =>
+                notification.CompletionText = imported.Count == 1
+                    ? $"Imported {imported.First()}!"
+                    : $"Imported {current} {term}s!";
+
+                if (imported.Count > 0 && PresentImport != null)
                 {
-                    if (imported.Count > 0)
-                        PresentCompletedImport(imported);
-                    return true;
-                };
+                    notification.CompletionText += " Click to view.";
+                    notification.CompletionClickAction = () =>
+                    {
+                        PresentImport?.Invoke(imported);
+                        return true;
+                    };
+                }
+
                 notification.State = ProgressNotificationState.Completed;
             }
         }
@@ -207,9 +232,10 @@ namespace osu.Game.Database
             return import;
         }
 
-        protected virtual void PresentCompletedImport(IEnumerable<TModel> imported)
-        {
-        }
+        /// <summary>
+        /// Fired when the user requests to view the resulting import.
+        /// </summary>
+        public Action<IEnumerable<TModel>> PresentImport;
 
         /// <summary>
         /// Import an item from an <see cref="ArchiveReader"/>.
@@ -225,7 +251,7 @@ namespace osu.Game.Database
 
                 model.Hash = computeHash(archive);
 
-                return Import(model, false, archive);
+                return Import(model, archive);
             }
             catch (Exception e)
             {
@@ -259,9 +285,8 @@ namespace osu.Game.Database
         /// Import an item from a <see cref="TModel"/>.
         /// </summary>
         /// <param name="item">The model to be imported.</param>
-        /// <param name="silent">Whether the user should be notified fo the import.</param>
         /// <param name="archive">An optional archive to use for model population.</param>
-        public TModel Import(TModel item, bool silent = false, ArchiveReader archive = null)
+        public TModel Import(TModel item, ArchiveReader archive = null)
         {
             delayEvents();
 
@@ -275,23 +300,33 @@ namespace osu.Game.Database
                     {
                         if (!write.IsTransactionLeader) throw new InvalidOperationException($"Ensure there is no parent transaction so errors can correctly be handled by {this}");
 
-                        var existing = CheckForExisting(item);
-
-                        if (existing != null)
-                        {
-                            Undelete(existing);
-                            Logger.Log($"Found existing {typeof(TModel)} for {item} (ID {existing.ID}). Skipping import.", LoggingTarget.Database);
-                            handleEvent(() => ItemAdded?.Invoke(existing, true, silent));
-                            return existing;
-                        }
-
                         if (archive != null)
                             item.Files = createFileInfos(archive, Files);
 
                         Populate(item, archive);
 
+                        var existing = CheckForExisting(item);
+
+                        if (existing != null)
+                        {
+                            if (CanUndelete(existing, item))
+                            {
+                                Undelete(existing);
+                                Logger.Log($"Found existing {typeof(TModel)} for {item} (ID {existing.ID}). Skipping import.", LoggingTarget.Database);
+                                handleEvent(() => ItemAdded?.Invoke(existing, true));
+                                return existing;
+                            }
+                            else
+                            {
+                                Delete(existing);
+                                ModelStore.PurgeDeletable(s => s.ID == existing.ID);
+                            }
+                        }
+
+                        PreImport(item);
+
                         // import to store
-                        ModelStore.Add(item, silent);
+                        ModelStore.Add(item);
                     }
                     catch (Exception e)
                     {
@@ -518,11 +553,28 @@ namespace osu.Game.Database
         }
 
         /// <summary>
+        /// Perform any final actions before the import to database executes.
+        /// </summary>
+        /// <param name="model">The model prepared for import.</param>
+        protected virtual void PreImport(TModel model)
+        {
+        }
+
+        /// <summary>
         /// Check whether an existing model already exists for a new import item.
         /// </summary>
-        /// <param name="model">The new model proposed for import. Note that <see cref="Populate"/> has not yet been run on this model.</param>
+        /// <param name="model">The new model proposed for import.
         /// <returns>An existing model which matches the criteria to skip importing, else null.</returns>
-        protected virtual TModel CheckForExisting(TModel model) => model.Hash == null ? null : ModelStore.ConsumableItems.FirstOrDefault(b => b.Hash == model.Hash);
+        protected TModel CheckForExisting(TModel model) => model.Hash == null ? null : ModelStore.ConsumableItems.FirstOrDefault(b => b.Hash == model.Hash);
+
+        /// <summary>
+        /// After an existing <see cref="TModel"/> is found during an import process, the default behaviour is to restore the existing
+        /// item and skip the import. This method allows changing that behaviour.
+        /// </summary>
+        /// <param name="existing">The existing model.</param>
+        /// <param name="import">The newly imported model.</param>
+        /// <returns>Whether the existing model should be restored and used. Returning false will delete the existing a force a re-import.</returns>
+        protected virtual bool CanUndelete(TModel existing, TModel import) => true;
 
         private DbSet<TModel> queryModel() => ContextFactory.Get().Set<TModel>();
 
@@ -539,6 +591,7 @@ namespace osu.Game.Database
                 return new LegacyDirectoryArchiveReader(path);
             if (File.Exists(path))
                 return new LegacyFileArchiveReader(path);
+
             throw new InvalidFormatException($"{path} is not a valid archive");
         }
     }

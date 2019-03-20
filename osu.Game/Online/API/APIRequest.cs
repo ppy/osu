@@ -61,9 +61,12 @@ namespace osu.Game.Online.API
 
         private Action pendingFailure;
 
-        public void Perform(APIAccess api)
+        public void Perform(IAPIProvider api)
         {
-            API = api;
+            if (!(api is APIAccess apiAccess))
+                throw new NotSupportedException($"A {nameof(APIAccess)} is required to perform requests.");
+
+            API = apiAccess;
 
             if (checkAndScheduleFailure())
                 return;
@@ -71,7 +74,7 @@ namespace osu.Game.Online.API
             WebRequest = CreateWebRequest();
             WebRequest.Failed += Fail;
             WebRequest.AllowRetryOnTimeout = false;
-            WebRequest.AddHeader("Authorization", $"Bearer {api.AccessToken}");
+            WebRequest.AddHeader("Authorization", $"Bearer {API.AccessToken}");
 
             if (checkAndScheduleFailure())
                 return;
@@ -85,7 +88,7 @@ namespace osu.Game.Online.API
             if (checkAndScheduleFailure())
                 return;
 
-            api.Schedule(delegate { Success?.Invoke(); });
+            API.Schedule(delegate { Success?.Invoke(); });
         }
 
         public void Cancel() => Fail(new OperationCanceledException(@"Request cancelled"));
@@ -121,7 +124,10 @@ namespace osu.Game.Online.API
     }
 
     public delegate void APIFailureHandler(Exception e);
+
     public delegate void APISuccessHandler();
+
     public delegate void APIProgressHandler(long current, long total);
+
     public delegate void APISuccessHandler<in T>(T content);
 }

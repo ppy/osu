@@ -1,14 +1,13 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
 using osuTK;
 using osu.Game.Rulesets.Objects.Types;
 using System.Collections.Generic;
 using osu.Game.Rulesets.Objects;
 using System.Linq;
+using osu.Framework.Bindables;
 using osu.Framework.Caching;
-using osu.Framework.Configuration;
 using osu.Game.Audio;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
@@ -155,115 +154,76 @@ namespace osu.Game.Rulesets.Osu.Objects
         {
             base.CreateNestedHitObjects();
 
-            createSliderEnds();
-            createTicks();
-            createRepeatPoints();
-
-            if (LegacyLastTickOffset != null)
-                TailCircle.StartTime = Math.Max(StartTime + Duration / 2, TailCircle.StartTime - LegacyLastTickOffset.Value);
-        }
-
-        private void createSliderEnds()
-        {
-            HeadCircle = new SliderCircle
+            foreach (var e in
+                SliderEventGenerator.Generate(StartTime, SpanDuration, Velocity, TickDistance, Path.Distance, this.SpanCount(), LegacyLastTickOffset))
             {
-                StartTime = StartTime,
-                Position = Position,
-                Samples = getNodeSamples(0),
-                SampleControlPoint = SampleControlPoint,
-                IndexInCurrentCombo = IndexInCurrentCombo,
-                ComboIndex = ComboIndex,
-            };
+                var firstSample = Samples.Find(s => s.Name == SampleInfo.HIT_NORMAL)
+                                  ?? Samples.FirstOrDefault(); // TODO: remove this when guaranteed sort is present for samples (https://github.com/ppy/osu/issues/1933)
+                var sampleList = new List<SampleInfo>();
 
-            TailCircle = new SliderTailCircle(this)
-            {
-                StartTime = EndTime,
-                Position = EndPosition,
-                IndexInCurrentCombo = IndexInCurrentCombo,
-                ComboIndex = ComboIndex,
-            };
-
-            AddNested(HeadCircle);
-            AddNested(TailCircle);
-        }
-
-        private void createTicks()
-        {
-            // A very lenient maximum length of a slider for ticks to be generated.
-            // This exists for edge cases such as /b/1573664 where the beatmap has been edited by the user, and should never be reached in normal usage.
-            const double max_length = 100000;
-
-            var length = Math.Min(max_length, Path.Distance);
-            var tickDistance = MathHelper.Clamp(TickDistance, 0, length);
-
-            if (tickDistance == 0) return;
-
-            var minDistanceFromEnd = Velocity * 10;
-
-            var spanCount = this.SpanCount();
-
-            for (var span = 0; span < spanCount; span++)
-            {
-                var spanStartTime = StartTime + span * SpanDuration;
-                var reversed = span % 2 == 1;
-
-                for (var d = tickDistance; d <= length; d += tickDistance)
-                {
-                    if (d > length - minDistanceFromEnd)
-                        break;
-
-                    var distanceProgress = d / length;
-                    var timeProgress = reversed ? 1 - distanceProgress : distanceProgress;
-
-                    var firstSample = Samples.Find(s => s.Name == SampleInfo.HIT_NORMAL)
-                                      ?? Samples.FirstOrDefault(); // TODO: remove this when guaranteed sort is present for samples (https://github.com/ppy/osu/issues/1933)
-                    var sampleList = new List<SampleInfo>();
-
-                    if (firstSample != null)
-                        sampleList.Add(new SampleInfo
-                        {
-                            Bank = firstSample.Bank,
-                            Volume = firstSample.Volume,
-                            Name = @"slidertick",
-                        });
-
-                    AddNested(new SliderTick
+                if (firstSample != null)
+                    sampleList.Add(new SampleInfo
                     {
-                        SpanIndex = span,
-                        SpanStartTime = spanStartTime,
-                        StartTime = spanStartTime + timeProgress * SpanDuration,
-                        Position = Position + Path.PositionAt(distanceProgress),
-                        StackHeight = StackHeight,
-                        Scale = Scale,
-                        Samples = sampleList
+                        Bank = firstSample.Bank,
+                        Volume = firstSample.Volume,
+                        Name = @"slidertick",
                     });
+
+                switch (e.Type)
+                {
+                    case SliderEventType.Tick:
+                        AddNested(new SliderTick
+                        {
+                            SpanIndex = e.SpanIndex,
+                            SpanStartTime = e.SpanStartTime,
+                            StartTime = e.Time,
+                            Position = Position + Path.PositionAt(e.PathProgress),
+                            StackHeight = StackHeight,
+                            Scale = Scale,
+                            Samples = sampleList
+                        });
+                        break;
+                    case SliderEventType.Head:
+                        AddNested(HeadCircle = new SliderCircle
+                        {
+                            StartTime = e.Time,
+                            Position = Position,
+                            Samples = getNodeSamples(0),
+                            SampleControlPoint = SampleControlPoint,
+                            IndexInCurrentCombo = IndexInCurrentCombo,
+                            ComboIndex = ComboIndex,
+                        });
+                        break;
+                    case SliderEventType.LegacyLastTick:
+                        // we need to use the LegacyLastTick here for compatibility reasons (difficulty).
+                        // it is *okay* to use this because the TailCircle is not used for any meaningful purpose in gameplay.
+                        // if this is to change, we should revisit this.
+                        AddNested(TailCircle = new SliderTailCircle(this)
+                        {
+                            StartTime = e.Time,
+                            Position = EndPosition,
+                            IndexInCurrentCombo = IndexInCurrentCombo,
+                            ComboIndex = ComboIndex,
+                        });
+                        break;
+                    case SliderEventType.Repeat:
+                        AddNested(new RepeatPoint
+                        {
+                            RepeatIndex = e.SpanIndex,
+                            SpanDuration = SpanDuration,
+                            StartTime = StartTime + (e.SpanIndex + 1) * SpanDuration,
+                            Position = Position + Path.PositionAt(e.PathProgress),
+                            StackHeight = StackHeight,
+                            Scale = Scale,
+                            Samples = getNodeSamples(e.SpanIndex + 1)
+                        });
+                        break;
                 }
             }
         }
 
-        private void createRepeatPoints()
-        {
-            for (int repeatIndex = 0, repeat = 1; repeatIndex < RepeatCount; repeatIndex++, repeat++)
-            {
-                AddNested(new RepeatPoint
-                {
-                    RepeatIndex = repeatIndex,
-                    SpanDuration = SpanDuration,
-                    StartTime = StartTime + repeat * SpanDuration,
-                    Position = Position + Path.PositionAt(repeat % 2),
-                    StackHeight = StackHeight,
-                    Scale = Scale,
-                    Samples = getNodeSamples(1 + repeatIndex)
-                });
-            }
-        }
-
-        private List<SampleInfo> getNodeSamples(int nodeIndex)
-        {
-            if (nodeIndex < NodeSamples.Count)
-                return NodeSamples[nodeIndex];
-            return Samples;
-        }
+        private List<SampleInfo> getNodeSamples(int nodeIndex) =>
+            nodeIndex < NodeSamples.Count ? NodeSamples[nodeIndex] : Samples;
 
         public override Judgement CreateJudgement() => new OsuJudgement();
     }

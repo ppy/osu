@@ -46,7 +46,7 @@ namespace osu.Game.Screens.Edit
         public bool SeekSnapped(double position)
         {
             var timingPoint = ControlPointInfo.TimingPointAt(position);
-            double beatSnapLength = timingPoint.BeatLength / beatDivisor;
+            double beatSnapLength = timingPoint.BeatLength / beatDivisor.Value;
 
             // We will be snapping to beats within the timing point
             position -= timingPoint.Time;
@@ -91,7 +91,7 @@ namespace osu.Game.Screens.Edit
                     timingPoint = ControlPointInfo.TimingPoints[--activeIndex];
             }
 
-            double seekAmount = timingPoint.BeatLength / beatDivisor * amount;
+            double seekAmount = timingPoint.BeatLength / beatDivisor.Value * amount;
             double seekTime = CurrentTime + seekAmount * direction;
 
             if (!snapped || ControlPointInfo.TimingPoints.Count == 0)

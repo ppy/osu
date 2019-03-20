@@ -16,7 +16,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Tests.Visual
 {
-    public abstract class TestCasePlayer : ScreenTestCase
+    public abstract class TestCasePlayer : RateAdjustedBeatmapTestCase
     {
         private readonly Ruleset ruleset;
 
@@ -55,7 +55,7 @@ namespace osu.Game.Tests.Visual
                     AddStep(r.Name, () => p = loadPlayerFor(r));
                     AddCheckSteps(() => p);
 
-                    AddUntilStep(() =>
+                    AddUntilStep("no leaked beatmaps", () =>
                     {
                         p = null;
 
@@ -65,9 +65,9 @@ namespace osu.Game.Tests.Visual
 
                         workingWeakReferences.ForEachAlive(_ => count++);
                         return count == 1;
-                    }, "no leaked beatmaps");
+                    });
 
-                    AddUntilStep(() =>
+                    AddUntilStep("no leaked players", () =>
                     {
                         GC.Collect();
                         GC.WaitForPendingFinalizers();
@@ -75,14 +75,14 @@ namespace osu.Game.Tests.Visual
 
                         playerWeakReferences.ForEachAlive(_ => count++);
                         return count == 1;
-                    }, "no leaked players");
+                    });
                 }
             }
         }
 
         protected virtual void AddCheckSteps(Func<Player> player)
         {
-            AddUntilStep(() => player().IsLoaded, "player loaded");
+            AddUntilStep("player loaded", () => player().IsLoaded);
         }
 
         protected virtual IBeatmap CreateBeatmap(Ruleset ruleset) => new TestBeatmap(ruleset.RulesetInfo);
@@ -99,7 +99,7 @@ namespace osu.Game.Tests.Visual
         private Player loadPlayerFor(Ruleset r)
         {
             var beatmap = CreateBeatmap(r);
-            var working = new TestWorkingBeatmap(beatmap);
+            var working = new TestWorkingBeatmap(beatmap, Clock);
 
             workingWeakReferences.Add(working);
 
@@ -119,14 +119,6 @@ namespace osu.Game.Tests.Visual
             });
 
             return player;
-        }
-
-        protected override void Update()
-        {
-            base.Update();
-
-            // note that this will override any mod rate application
-            Beatmap.Value.Track.Rate = Clock.Rate;
         }
 
         protected virtual Player CreatePlayer(Ruleset ruleset) => new Player

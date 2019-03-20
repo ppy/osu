@@ -2,17 +2,16 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Linq;
-using osu.Framework.Graphics.Cursor;
 using osu.Framework.Input;
 using osu.Game.Beatmaps;
 using osu.Game.Input.Handlers;
 using osu.Game.Replays;
 using osu.Game.Rulesets.Objects.Drawables;
+using osu.Game.Rulesets.Osu.Configuration;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Objects.Drawables;
 using osu.Game.Rulesets.Osu.Replays;
 using osu.Game.Rulesets.Osu.Scoring;
-using osu.Game.Rulesets.Osu.UI.Cursor;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.UI;
 
@@ -20,6 +19,8 @@ namespace osu.Game.Rulesets.Osu.UI
 {
     public class OsuRulesetContainer : RulesetContainer<OsuPlayfield, OsuHitObject>
     {
+        protected new OsuRulesetConfigManager Config => (OsuRulesetConfigManager)base.Config;
+
         public OsuRulesetContainer(Ruleset ruleset, WorkingBeatmap beatmap)
             : base(ruleset, beatmap)
         {
@@ -46,7 +47,7 @@ namespace osu.Game.Rulesets.Osu.UI
             return null;
         }
 
-        protected override ReplayInputHandler CreateReplayInputHandler(Replay replay) => new OsuReplayInputHandler(replay);
+        protected override ReplayInputHandler CreateReplayInputHandler(Replay replay) => new OsuFramedReplayInputHandler(replay);
 
         public override double GameplayStartTime
         {
@@ -56,7 +57,5 @@ namespace osu.Game.Rulesets.Osu.UI
                 return first.StartTime - first.TimePreempt;
             }
         }
-
-        protected override CursorContainer CreateCursor() => new GameplayCursor();
     }
 }

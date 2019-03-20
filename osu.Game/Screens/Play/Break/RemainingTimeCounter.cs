@@ -4,6 +4,7 @@
 using System;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.UserInterface;
+using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 
 namespace osu.Game.Screens.Play.Break
@@ -19,8 +20,7 @@ namespace osu.Game.Screens.Play.Break
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
-                TextSize = 33,
-                Font = "Venera",
+                Font = OsuFont.Numeric.With(size: 33),
             };
         }
 

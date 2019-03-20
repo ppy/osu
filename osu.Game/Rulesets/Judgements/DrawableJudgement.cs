@@ -33,6 +33,12 @@ namespace osu.Game.Rulesets.Judgements
         protected SpriteText JudgementText;
 
         /// <summary>
+        /// Duration of initial fade in.
+        /// Default fade out will start immediately after this duration.
+        /// </summary>
+        protected virtual double FadeInDuration => 100;
+
+        /// <summary>
         /// Creates a drawable which visualises a <see cref="Judgements.Judgement"/>.
         /// </summary>
         /// <param name="result">The judgement to visualise.</param>
@@ -58,19 +64,26 @@ namespace osu.Game.Rulesets.Judgements
                 Child = new SkinnableDrawable($"Play/{Result.Type}", _ => JudgementText = new OsuSpriteText
                 {
                     Text = Result.Type.GetDescription().ToUpperInvariant(),
-                    Font = @"Venera",
+                    Font = OsuFont.Numeric.With(size: 12),
                     Colour = judgementColour(Result.Type),
                     Scale = new Vector2(0.85f, 1),
-                    TextSize = 12
                 }, restrictSize: false)
             };
+        }
+
+        protected virtual void ApplyHitAnimations()
+        {
+            JudgementBody.ScaleTo(0.9f);
+            JudgementBody.ScaleTo(1, 500, Easing.OutElastic);
+
+            this.Delay(FadeInDuration).FadeOut(400);
         }
 
         protected override void LoadComplete()
         {
             base.LoadComplete();
 
-            this.FadeInFromZero(100, Easing.OutQuint);
+            this.FadeInFromZero(FadeInDuration, Easing.OutQuint);
 
             switch (Result.Type)
             {
@@ -86,10 +99,7 @@ namespace osu.Game.Rulesets.Judgements
                     this.Delay(600).FadeOut(200);
                     break;
                 default:
-                    JudgementBody.ScaleTo(0.9f);
-                    JudgementBody.ScaleTo(1, 500, Easing.OutElastic);
-
-                    this.Delay(100).FadeOut(400);
+                    ApplyHitAnimations();
                     break;
             }
 

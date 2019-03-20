@@ -17,7 +17,7 @@ namespace osu.Game.Online.API
             return request;
         }
 
-        private void request_Progress(long current, long total) => API.Schedule(() => Progress?.Invoke(current, total));
+        private void request_Progress(long current, long total) => API.Schedule(() => Progressed?.Invoke(current, total));
 
         protected APIDownloadRequest()
         {
@@ -29,7 +29,7 @@ namespace osu.Game.Online.API
             Success?.Invoke(filename);
         }
 
-        public event APIProgressHandler Progress;
+        public event APIProgressHandler Progressed;
 
         public new event APISuccessHandler<string> Success;
     }
