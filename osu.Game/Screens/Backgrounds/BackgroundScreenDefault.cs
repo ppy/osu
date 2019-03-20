@@ -15,6 +15,8 @@ namespace osu.Game.Screens.Backgrounds
 {
     public class BackgroundScreenDefault : BackgroundScreen
     {
+        private Background background;
+
         private int currentDisplay;
         private const int background_count = 5;
 
@@ -39,10 +41,10 @@ namespace osu.Game.Screens.Backgrounds
 
         private void display(Background newBackground)
         {
-            Background?.FadeOut(800, Easing.InOutSine);
-            Background?.Expire();
+            background?.FadeOut(800, Easing.InOutSine);
+            background?.Expire();
 
-            AddInternal(Background = newBackground);
+            AddInternal(background = newBackground);
             currentDisplay++;
         }
 

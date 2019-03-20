@@ -119,18 +119,12 @@ namespace osu.Game.Screens.Play
 
         private void contentIn()
         {
-            Background.AddedBlur.Value = BACKGROUND_BLUR;
-            Background.EnableVisualSettings.Value = false;
-
             content.ScaleTo(1, 650, Easing.OutQuint);
             content.FadeInFromZero(400);
         }
 
         private void contentOut()
         {
-            Background.AddedBlur.Value = 0;
-            Background.EnableVisualSettings.Value = true;
-
             content.ScaleTo(0.7f, 300, Easing.InQuint);
             content.FadeOut(250);
         }
@@ -166,10 +160,12 @@ namespace osu.Game.Screens.Play
 
         protected override bool OnHover(HoverEvent e)
         {
+            // Acts as an "on hover lost" trigger for the visual settings panel.
+            // Returns background dim and blur to the values specified by PlayerLoader.
             if (this.IsCurrentScreen())
             {
-                Background.AddedBlur.Value = BACKGROUND_BLUR;
-                Background.EnableVisualSettings.Value = false;
+                Background.BlurAmount.Value = BACKGROUND_BLUR;
+                Background.EnableUserDim.Value = false;
             }
 
             return base.OnHover(e);
@@ -177,12 +173,14 @@ namespace osu.Game.Screens.Play
 
         protected override void OnHoverLost(HoverLostEvent e)
         {
+            // Acts as an "on hover" trigger for the visual settings panel.
+            // Preview user-defined background dim and blur when hovered on the visual settings panel.
             if (GetContainingInputManager()?.HoveredDrawables.Contains(VisualSettings) == true)
             {
                 if (this.IsCurrentScreen() && Background != null)
                 {
-                    Background.AddedBlur.Value = 0;
-                    Background.EnableVisualSettings.Value = true;
+                    Background.BlurAmount.Value = 0;
+                    Background.EnableUserDim.Value = true;
                 }
             }
 
@@ -241,7 +239,7 @@ namespace osu.Game.Screens.Play
 
         public override void OnSuspending(IScreen next)
         {
-            Background.EnableVisualSettings.Value = true;
+            Background.EnableUserDim.Value = true;
 
             base.OnSuspending(next);
             cancelLoad();
@@ -253,7 +251,7 @@ namespace osu.Game.Screens.Play
             this.FadeOut(150);
             cancelLoad();
 
-            Background.EnableVisualSettings.Value = false;
+            Background.EnableUserDim.Value = false;
 
             return base.OnExiting(next);
         }

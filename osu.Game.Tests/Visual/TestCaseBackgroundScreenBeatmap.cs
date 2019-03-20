@@ -273,7 +273,7 @@ namespace osu.Game.Tests.Visual
             protected override BackgroundScreen CreateBackground()
             {
                 FadeAccessibleBackground background = new FadeAccessibleBackground(Beatmap.Value);
-                DimEnabled.BindTo(background.EnableVisualSettings);
+                DimEnabled.BindTo(background.EnableUserDim);
                 return background;
             }
 

@@ -321,7 +321,8 @@ namespace osu.Game.Screens.Play
                 if (enabled.NewValue) initializeStoryboard(true);
             };
 
-            Background.EnableVisualSettings.Value = true;
+            Background.EnableUserDim.Value = true;
+            Background.BlurAmount.Value = 0;
 
             Background.StoryboardReplacesBackground.BindTo(storyboardReplacesBackground);
             StoryboardContainer.StoryboardReplacesBackground.BindTo(storyboardReplacesBackground);
@@ -368,7 +369,7 @@ namespace osu.Game.Screens.Play
             float fadeOutDuration = instant ? 0 : 250;
             this.FadeOut(fadeOutDuration);
 
-            Background.EnableVisualSettings.Value = false;
+            Background.EnableUserDim.Value = false;
             storyboardReplacesBackground.Value = false;
         }
 
