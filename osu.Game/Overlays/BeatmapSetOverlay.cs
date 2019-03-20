@@ -31,7 +31,7 @@ namespace osu.Game.Overlays
 
         private readonly Header header;
 
-        private APIAccess api;
+        private IAPIProvider api;
         private RulesetStore rulesets;
 
         private readonly ScrollContainer scroll;
@@ -101,7 +101,7 @@ namespace osu.Game.Overlays
         }
 
         [BackgroundDependencyLoader]
-        private void load(APIAccess api, RulesetStore rulesets)
+        private void load(IAPIProvider api, RulesetStore rulesets)
         {
             this.api = api;
             this.rulesets = rulesets;

@@ -2,12 +2,12 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using osu.Framework.Timing;
+using System.Linq;
 using osu.Game.Graphics;
 
 namespace osu.Game.Rulesets.Mods
 {
-    public abstract class ModHalfTime : Mod, IApplicableToClock
+    public abstract class ModHalfTime : ModTimeAdjust, IApplicableToClock
     {
         public override string Name => "Half Time";
         public override string Acronym => "HT";
@@ -15,11 +15,9 @@ namespace osu.Game.Rulesets.Mods
         public override ModType Type => ModType.DifficultyReduction;
         public override string Description => "Less zoom...";
         public override bool Ranked => true;
-        public override Type[] IncompatibleMods => new[] { typeof(ModDoubleTime) };
 
-        public virtual void ApplyToClock(IAdjustableClock clock)
-        {
-            clock.Rate = 0.75;
-        }
+        public override Type[] IncompatibleMods => base.IncompatibleMods.Append(typeof(ModDoubleTime)).ToArray();
+
+        protected override double RateAdjust => 0.75;
     }
 }
