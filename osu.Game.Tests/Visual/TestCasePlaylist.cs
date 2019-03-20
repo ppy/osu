@@ -36,6 +36,11 @@ namespace osu.Game.Tests.Visual
                 RulesetID = Ruleset.Value.ID ?? 0
             };
 
+            for (int i = 0; i < 3; i++)
+            {
+                playlist.AddItem(playlistItem);
+            }
+
             AddStep("AddItem", () =>
             {
                 playlist.AddItem(playlistItem);

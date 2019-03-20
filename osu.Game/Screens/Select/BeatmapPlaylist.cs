@@ -1,8 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Collections.Generic;
-using System.Text.RegularExpressions;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
 using osuTK;
@@ -10,10 +10,11 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
-using osu.Framework.Graphics.Sprites;
+using osu.Framework.Input.Events;
 using osu.Game.Beatmaps.Drawables;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.Multiplayer;
 using osuTK.Graphics;
 
@@ -23,8 +24,8 @@ namespace osu.Game.Screens.Select
     {
         private const float spacing = 10;
 
-        private BindableList<PlaylistItem> playlist = new BindableList<PlaylistItem>();
-        private FillFlowContainer<BeatmapPlaylistItem> derpFlowContainer;
+        private readonly BindableList<PlaylistItem> playlist = new BindableList<PlaylistItem>();
+        private readonly FillFlowContainer<BeatmapPlaylistItem> playlistFlowContainer;
 
         public BeatmapPlaylist()
         {
@@ -33,12 +34,12 @@ namespace osu.Game.Screens.Select
             {
                 RelativeSizeAxes = Axes.Both,
                 ScrollbarOverlapsContent = false,
-                Padding = new MarginPadding(5),
+                Padding = new MarginPadding(spacing / 2),
                 Child = new Container
                 {
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
-                    Child = derpFlowContainer = new FillFlowContainer<BeatmapPlaylistItem>
+                    Child = playlistFlowContainer = new FillFlowContainer<BeatmapPlaylistItem>
                     {
                         RelativeSizeAxes = Axes.X,
                         AutoSizeAxes = Axes.Y,
@@ -49,18 +50,16 @@ namespace osu.Game.Screens.Select
             };
 
             playlist.ItemsAdded += itemsAdded;
-            playlist.ItemsRemoved += itemsRemoved;
-        }
-
-        private void itemsRemoved(IEnumerable<PlaylistItem> items)
-        {
-            // throw new System.NotImplementedException();
         }
 
         private void itemsAdded(IEnumerable<PlaylistItem> items)
         {
             foreach (var item in items)
-                derpFlowContainer.Add(new BeatmapPlaylistItem(item));
+            {
+                var drawable = new BeatmapPlaylistItem(item);
+                drawable.RemovalTriggered += handleRemoval;
+                playlistFlowContainer.Add(drawable);
+            }
         }
 
         public void AddItem(PlaylistItem item)
@@ -68,10 +67,19 @@ namespace osu.Game.Screens.Select
             playlist.Add(item);
         }
 
+        private void handleRemoval(BeatmapPlaylistItem item)
+        {
+            playlist.Remove(item.PlaylistItem.Value);
+            playlistFlowContainer.Remove(item);
+        }
+
         public class BeatmapPlaylistItem : Container
         {
-            private readonly Bindable<PlaylistItem> playlistItem = new Bindable<PlaylistItem>();
+            public readonly Bindable<PlaylistItem> PlaylistItem = new Bindable<PlaylistItem>();
             private readonly UpdateableBeatmapBackgroundSprite cover;
+            private readonly Container removeButton;
+
+            public event Action<BeatmapPlaylistItem> RemovalTriggered;
 
             public BeatmapPlaylistItem(PlaylistItem item)
             {
@@ -138,7 +146,7 @@ namespace osu.Game.Screens.Select
                                 {
                                     Padding = new MarginPadding
                                     {
-                                        Left = 10
+                                        Left = spacing
                                     },
                                     Children = new Drawable[]
                                     {
@@ -156,19 +164,19 @@ namespace osu.Game.Screens.Select
                                                 new OsuSpriteText
                                                 {
                                                     Text = "-",
-                                                    Font = OsuFont.GetFont(size: 16)
+                                                    Font = OsuFont.GetFont()
                                                 },
                                                 new OsuSpriteText
                                                 {
                                                     Text = item.Beatmap?.BeatmapSet?.Metadata?.Title ?? "????????",
-                                                    Font = OsuFont.GetFont(size: 16)
+                                                    Font = OsuFont.GetFont()
                                                 },
                                             }
                                         },
                                         new FillFlowContainer
                                         {
                                             AutoSizeAxes = Axes.Both,
-                                            Spacing = new Vector2(10),
+                                            Spacing = new Vector2(spacing),
                                             Children = new Drawable[]
                                             {
                                                 new OsuSpriteText
@@ -187,11 +195,41 @@ namespace osu.Game.Screens.Select
                                     }
                                 },
                             }
-                        }
+                        },
+                        removeButton = new Container
+                        {
+                            AutoSizeAxes = Axes.Both,
+                            Anchor = Anchor.CentreRight,
+                            Origin = Anchor.CentreRight,
+                            Alpha = 0,
+                            Margin = new MarginPadding
+                            {
+                                Right = 10,
+                            },
+                            Child = new IconButton
+                            {
+                                Colour = Color4.White,
+                                Icon = FontAwesome.fa_minus_square,
+                                ButtonSize = new Vector2(14),
+                                IconScale = new Vector2(0.75f),
+                                Action = () => RemovalTriggered?.Invoke(this)
+                            }
+                        },
                     },
                 };
 
-                playlistItem.ValueChanged += itemChanged;
+                PlaylistItem.ValueChanged += itemChanged;
+            }
+
+            protected override bool OnHover(HoverEvent e)
+            {
+                removeButton.FadeTo(1f, 60);
+                return true;
+            }
+
+            protected override void OnHoverLost(HoverLostEvent e)
+            {
+                removeButton.FadeTo(0f, 60);
             }
 
             private void itemChanged(ValueChangedEvent<PlaylistItem> item)
