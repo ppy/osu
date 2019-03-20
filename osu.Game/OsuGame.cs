@@ -403,7 +403,7 @@ namespace osu.Game
                 {
                     RelativeSizeAxes = Axes.Both,
                 },
-                floatingOverlayContent = new Container { RelativeSizeAxes = Axes.Both, Depth = float.MinValue },
+                floatingOverlayContent = new Container { RelativeSizeAxes = Axes.Both },
                 idleTracker = new GameIdleTracker(6000)
             });
 
@@ -421,7 +421,6 @@ namespace osu.Game
 
             loadComponentSingleFile(Toolbar = new Toolbar
             {
-                Depth = -5,
                 OnHome = delegate
                 {
                     CloseAllOverlays(false);
@@ -435,20 +434,15 @@ namespace osu.Game
             loadComponentSingleFile(screenshotManager, Add);
 
             //overlay elements
-            loadComponentSingleFile(direct = new DirectOverlay { Depth = -1 }, overlayContent.Add);
-            loadComponentSingleFile(social = new SocialOverlay { Depth = -1 }, overlayContent.Add);
+            loadComponentSingleFile(direct = new DirectOverlay(), overlayContent.Add);
+            loadComponentSingleFile(social = new SocialOverlay(), overlayContent.Add);
             loadComponentSingleFile(channelManager = new ChannelManager(), AddInternal);
-            loadComponentSingleFile(chatOverlay = new ChatOverlay { Depth = -1 }, overlayContent.Add);
-            loadComponentSingleFile(settings = new MainSettings
-            {
-                GetToolbarHeight = () => ToolbarOffset,
-                Depth = -1
-            }, floatingOverlayContent.Add);
-            loadComponentSingleFile(userProfile = new UserProfileOverlay { Depth = -2 }, overlayContent.Add);
-            loadComponentSingleFile(beatmapSetOverlay = new BeatmapSetOverlay { Depth = -3 }, overlayContent.Add);
+            loadComponentSingleFile(chatOverlay = new ChatOverlay(), overlayContent.Add);
+            loadComponentSingleFile(settings = new MainSettings { GetToolbarHeight = () => ToolbarOffset }, floatingOverlayContent.Add);
+            loadComponentSingleFile(userProfile = new UserProfileOverlay(), overlayContent.Add);
+            loadComponentSingleFile(beatmapSetOverlay = new BeatmapSetOverlay(), overlayContent.Add);
             loadComponentSingleFile(musicController = new MusicController
             {
-                Depth = -5,
                 Position = new Vector2(0, Toolbar.HEIGHT),
                 Anchor = Anchor.TopRight,
                 Origin = Anchor.TopRight,
@@ -457,25 +451,15 @@ namespace osu.Game
             loadComponentSingleFile(notifications = new NotificationOverlay
             {
                 GetToolbarHeight = () => ToolbarOffset,
-                Depth = -4,
                 Anchor = Anchor.TopRight,
                 Origin = Anchor.TopRight,
             }, floatingOverlayContent.Add);
 
-            loadComponentSingleFile(accountCreation = new AccountCreationOverlay
-            {
-                Depth = -6,
-            }, floatingOverlayContent.Add);
+            loadComponentSingleFile(accountCreation = new AccountCreationOverlay(), floatingOverlayContent.Add);
 
-            loadComponentSingleFile(dialogOverlay = new DialogOverlay
-            {
-                Depth = -7,
-            }, floatingOverlayContent.Add);
+            loadComponentSingleFile(dialogOverlay = new DialogOverlay(), floatingOverlayContent.Add);
 
-            loadComponentSingleFile(externalLinkOpener = new ExternalLinkOpener
-            {
-                Depth = -8,
-            }, floatingOverlayContent.Add);
+            loadComponentSingleFile(externalLinkOpener = new ExternalLinkOpener(), floatingOverlayContent.Add);
 
             dependencies.CacheAs(idleTracker);
             dependencies.Cache(settings);
