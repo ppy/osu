@@ -86,7 +86,6 @@ namespace osu.Game.Screens.Backgrounds
 
             b.Depth = newDepth;
             fadeContainer.Add(Background = b);
-            fadeContainer.ApplyInstantBlur();
             StoryboardReplacesBackground.BindTo(fadeContainer.StoryboardReplacesBackground);
         }
 

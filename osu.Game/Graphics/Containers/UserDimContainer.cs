@@ -55,8 +55,6 @@ namespace osu.Game.Graphics.Containers
             ? new Vector2(BlurAmount.Value + (float)blurLevel.Value * 25)
             : new Vector2(BlurAmount.Value);
 
-        private Background background => DimContainer.Children.OfType<Background>().FirstOrDefault();
-
         /// <summary>
         /// Creates a new <see cref="UserDimContainer"/>.
         /// </summary>
@@ -72,15 +70,13 @@ namespace osu.Game.Graphics.Containers
             AddInternal(DimContainer = new Container { RelativeSizeAxes = Axes.Both });
         }
 
-        /// <summary>
-        /// Set the blur of the background in this UserDimContainer to our blur target instantly.
-        /// </summary>
-        /// <remarks>
-        /// We need to support instant blurring here in the case of changing beatmap backgrounds, where blurring shouldn't be from 0 every time the beatmap is changed.
-        /// </remarks>
-        public void ApplyInstantBlur()
+        public override void Add(Drawable drawable)
         {
-            background?.BlurTo(blurTarget, 0, Easing.OutQuint);
+            // We need to blur instantly here in the case of changing beatmap backgrounds, where blurring shouldn't be from 0 every time the beatmap is changed.
+            if (drawable is Background b)
+                b.BlurTo(blurTarget, 0, Easing.OutQuint);
+
+            base.Add(drawable);
         }
 
         [BackgroundDependencyLoader]
@@ -114,10 +110,10 @@ namespace osu.Game.Graphics.Containers
                 // The background needs to be hidden in the case of it being replaced by the storyboard
                 DimContainer.FadeTo(showStoryboard.Value && StoryboardReplacesBackground.Value ? 0 : 1, background_fade_duration, Easing.OutQuint);
 
-                // Only blur if this container contains a background
+                // This only works if the background is a direct child of DimContainer.
                 // We can't blur the container like we did with the dim because buffered containers add considerable draw overhead.
-                // As a result, this blurs the background directly.
-                background?.BlurTo(blurTarget, background_fade_duration, Easing.OutQuint);
+                // As a result, this blurs the background directly via the direct children of DimContainer.
+                DimContainer.Children.OfType<Background>().FirstOrDefault()?.BlurTo(blurTarget, background_fade_duration, Easing.OutQuint);
             }
 
             DimContainer.FadeColour(EnableUserDim.Value ? OsuColour.Gray(1 - (float)dimLevel.Value) : Color4.White, background_fade_duration, Easing.OutQuint);
