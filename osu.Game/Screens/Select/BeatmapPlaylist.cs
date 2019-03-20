@@ -13,10 +13,12 @@ using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Events;
 using osu.Game.Beatmaps.Drawables;
 using osu.Game.Graphics;
+using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.Multiplayer;
 using osuTK.Graphics;
+using osuTK.Input;
 
 namespace osu.Game.Screens.Select
 {
@@ -75,11 +77,55 @@ namespace osu.Game.Screens.Select
 
         public class BeatmapPlaylistItem : Container
         {
+            private const int fade_duration = 60;
             public readonly Bindable<PlaylistItem> PlaylistItem = new Bindable<PlaylistItem>();
             private readonly UpdateableBeatmapBackgroundSprite cover;
-            private readonly Container removeButton;
+            private readonly RemoveButton removeButton;
+            private bool isHovered;
+            private bool isDragging;
 
             public event Action<BeatmapPlaylistItem> RemovalTriggered;
+
+            private class RemoveButton : OsuClickableContainer
+            {
+                private bool depressed;
+
+                public RemoveButton()
+                {
+                    Alpha = 0;
+                    Child = new SpriteIcon
+                    {
+                        Colour = Color4.White,
+                        Icon = FontAwesome.fa_minus_square,
+                        Size = new Vector2(14),
+                    };
+                }
+
+                public void ShowButton()
+                {
+                    this.FadeTo(1f, fade_duration);
+                }
+
+                public void HideButton()
+                {
+                    if (!depressed)
+                        this.FadeTo(0f, fade_duration);
+                }
+
+                protected override bool OnMouseDown(MouseDownEvent e)
+                {
+                    depressed = true;
+                    Content.ScaleTo(0.75f, 2000, Easing.OutQuint);
+                    return base.OnMouseDown(e);
+                }
+
+                protected override bool OnMouseUp(MouseUpEvent e)
+                {
+                    depressed = false;
+                    Content.ScaleTo(1, 1000, Easing.OutElastic);
+                    return base.OnMouseUp(e);
+                }
+            }
 
             public BeatmapPlaylistItem(PlaylistItem item)
             {
@@ -153,7 +199,7 @@ namespace osu.Game.Screens.Select
                                         new FillFlowContainer
                                         {
                                             AutoSizeAxes = Axes.Both,
-                                            Spacing = new Vector2(5),
+                                            Spacing = new Vector2(spacing / 2),
                                             Children = new Drawable[]
                                             {
                                                 new OsuSpriteText
@@ -196,7 +242,7 @@ namespace osu.Game.Screens.Select
                                 },
                             }
                         },
-                        removeButton = new Container
+                        removeButton = new RemoveButton
                         {
                             AutoSizeAxes = Axes.Both,
                             Anchor = Anchor.CentreRight,
@@ -223,13 +269,57 @@ namespace osu.Game.Screens.Select
 
             protected override bool OnHover(HoverEvent e)
             {
-                removeButton.FadeTo(1f, 60);
+                if (Mouse.GetState().IsButtonDown(MouseButton.Left))
+                {
+                    if (isDragging)
+                        isHovered = true;
+
+                    return true;
+                }
+
+                isHovered = true;
+
+                removeButton.ShowButton();
                 return true;
             }
 
             protected override void OnHoverLost(HoverLostEvent e)
             {
-                removeButton.FadeTo(0f, 60);
+                isHovered = false;
+
+                if (isDragging)
+                    return;
+
+                removeButton.HideButton();
+            }
+
+            protected override bool OnMouseDown(MouseDownEvent e)
+            {
+                isDragging = true;
+                return false;
+            }
+
+            protected override bool OnMouseMove(MouseMoveEvent e)
+            {
+                // This is to show the current item's buttons after having dragged a different item and landing here (i.e. the OnHover was prevented from being fired)
+                if (!isHovered && !Mouse.GetState().IsButtonDown(MouseButton.Left))
+                {
+                    removeButton.ShowButton();
+                }
+
+                return base.OnMouseMove(e);
+            }
+
+            protected override bool OnMouseUp(MouseUpEvent e)
+            {
+                isDragging = false;
+
+                if (!isHovered)
+                {
+                    removeButton.HideButton();
+                }
+
+                return base.OnMouseUp(e);
             }
 
             private void itemChanged(ValueChangedEvent<PlaylistItem> item)
