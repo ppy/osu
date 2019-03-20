@@ -253,16 +253,16 @@ namespace osu.Game.Screens.Play
             if (!this.IsCurrentScreen())
                 return;
 
+            // We need to perform this check here rather than in OnHover as any number of children of VisualSettings
+            // may also be handling the hover events.
             if (inputManager.HoveredDrawables.Contains(VisualSettings))
             {
-                // Acts as an "on hover" trigger for the visual settings panel.
                 // Preview user-defined background dim and blur when hovered on the visual settings panel.
                 Background.EnableUserDim.Value = true;
                 Background.BlurAmount.Value = 0;
             }
             else
             {
-                // Acts as an "on hover lost" trigger for the visual settings panel.
                 // Returns background dim and blur to the values specified by PlayerLoader.
                 Background.EnableUserDim.Value = false;
                 Background.BlurAmount.Value = BACKGROUND_BLUR;
