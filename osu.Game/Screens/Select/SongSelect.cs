@@ -300,6 +300,10 @@ namespace osu.Game.Screens.Select
         /// <param name="performStartAction">Whether to trigger <see cref="OnStart"/>.</param>
         public void FinaliseSelection(BeatmapInfo beatmap = null, bool performStartAction = true)
         {
+            // This is very important as we have not yet bound to screen-level bindables before the carousel load is completed.
+            if (!Carousel.BeatmapSetsLoaded)
+                return;
+
             // if we have a pending filter operation, we want to run it now.
             // it could change selection (ie. if the ruleset has been changed).
             Carousel.FlushPendingFilterOperations();
@@ -610,19 +614,19 @@ namespace osu.Game.Screens.Select
         private bool boundLocalBindables;
 
         private void bindBindables()
-            {
+        {
             if (boundLocalBindables)
                 return;
 
-                // manual binding to parent ruleset to allow for delayed load in the incoming direction.
-                rulesetNoDebounce = decoupledRuleset.Value = Ruleset.Value;
-                Ruleset.ValueChanged += r => updateSelectedRuleset(r.NewValue);
+            // manual binding to parent ruleset to allow for delayed load in the incoming direction.
+            rulesetNoDebounce = decoupledRuleset.Value = Ruleset.Value;
+            Ruleset.ValueChanged += r => updateSelectedRuleset(r.NewValue);
 
-                decoupledRuleset.ValueChanged += r => Ruleset.Value = r.NewValue;
-                decoupledRuleset.DisabledChanged += r => Ruleset.Disabled = r;
+            decoupledRuleset.ValueChanged += r => Ruleset.Value = r.NewValue;
+            decoupledRuleset.DisabledChanged += r => Ruleset.Disabled = r;
 
-                Beatmap.BindDisabledChanged(disabled => Carousel.AllowSelection = !disabled, true);
-                Beatmap.BindValueChanged(workingBeatmapChanged);
+            Beatmap.BindDisabledChanged(disabled => Carousel.AllowSelection = !disabled, true);
+            Beatmap.BindValueChanged(workingBeatmapChanged);
 
             boundLocalBindables = true;
         }
