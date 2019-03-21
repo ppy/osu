@@ -1,30 +1,17 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
 using System.Collections.Generic;
 using osu.Framework.Bindables;
-using osu.Framework.Extensions.Color4Extensions;
 using osuTK;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Shapes;
-using osu.Framework.Input.Events;
-using osu.Game.Beatmaps.Drawables;
-using osu.Game.Graphics;
-using osu.Game.Graphics.Containers;
-using osu.Game.Graphics.Sprites;
 using osu.Game.Online.Multiplayer;
-using osuTK.Graphics;
-using osuTK.Input;
 
 namespace osu.Game.Screens.Select
 {
     public class BeatmapPlaylist : CompositeDrawable
     {
-        private const float spacing = 10;
-
         private readonly BindableList<PlaylistItem> playlist = new BindableList<PlaylistItem>();
         private readonly FillFlowContainer<BeatmapPlaylistItem> playlistFlowContainer;
 
@@ -35,18 +22,13 @@ namespace osu.Game.Screens.Select
             {
                 RelativeSizeAxes = Axes.Both,
                 ScrollbarOverlapsContent = false,
-                Padding = new MarginPadding(spacing / 2),
-                Child = new Container
+                Padding = new MarginPadding(5),
+                Child = playlistFlowContainer = new FillFlowContainer<BeatmapPlaylistItem>
                 {
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
-                    Child = playlistFlowContainer = new FillFlowContainer<BeatmapPlaylistItem>
-                    {
-                        RelativeSizeAxes = Axes.X,
-                        AutoSizeAxes = Axes.Y,
-                        Direction = FillDirection.Vertical,
-                        Spacing = new Vector2(1),
-                    },
+                    Direction = FillDirection.Vertical,
+                    Spacing = new Vector2(1),
                 }
             };
 
@@ -63,299 +45,15 @@ namespace osu.Game.Screens.Select
             }
         }
 
-        public void AddItem(PlaylistItem item)
-        {
-            playlist.Add(item);
-        }
-
         private void handleRemoval(BeatmapPlaylistItem item)
         {
             playlist.Remove(item.PlaylistItem.Value);
             playlistFlowContainer.Remove(item);
         }
 
-        public class BeatmapPlaylistItem : Container
+        public void AddItem(PlaylistItem item)
         {
-            private const int fade_duration = 60;
-            public readonly Bindable<PlaylistItem> PlaylistItem = new Bindable<PlaylistItem>();
-            private readonly UpdateableBeatmapBackgroundSprite cover;
-            private readonly RemoveButton removeButton;
-            private readonly DragHandle dragHandle;
-            private bool isHovered;
-            private bool isDragging;
-
-            public event Action<BeatmapPlaylistItem> RemovalTriggered;
-
-            private class DragHandle : SpriteIcon
-            {
-                public DragHandle()
-                {
-                    Anchor = Anchor.CentreLeft;
-                    Origin = Anchor.CentreLeft;
-                    Size = new Vector2(12);
-                    Icon = FontAwesome.fa_bars;
-                    Alpha = 0f;
-                    Margin = new MarginPadding { Left = 5, Top = 2 };
-                }
-
-                public override bool HandlePositionalInput => IsPresent;
-            }
-
-            private class RemoveButton : OsuClickableContainer
-            {
-                private bool depressed;
-
-                public RemoveButton()
-                {
-                    Alpha = 0;
-                    Child = new SpriteIcon
-                    {
-                        Colour = Color4.White,
-                        Icon = FontAwesome.fa_minus_square,
-                        Size = new Vector2(14),
-                    };
-                }
-
-                public void ShowButton()
-                {
-                    this.FadeTo(1f, fade_duration);
-                }
-
-                public void HideButton()
-                {
-                    if (!depressed)
-                        this.FadeTo(0f, fade_duration);
-                }
-
-                protected override bool OnMouseDown(MouseDownEvent e)
-                {
-                    depressed = true;
-                    Content.ScaleTo(0.75f, 2000, Easing.OutQuint);
-                    return base.OnMouseDown(e);
-                }
-
-                protected override bool OnMouseUp(MouseUpEvent e)
-                {
-                    depressed = false;
-                    Content.ScaleTo(1, 1000, Easing.OutElastic);
-                    return base.OnMouseUp(e);
-                }
-            }
-
-            public BeatmapPlaylistItem(PlaylistItem item)
-            {
-                Height = 50;
-                RelativeSizeAxes = Axes.X;
-                Children = new Drawable[]
-                {
-                    new Container
-                    {
-                        RelativeSizeAxes = Axes.Both,
-                        Padding = new MarginPadding
-                        {
-                            Left = 25,
-                        },
-                        Child = new Container
-                        {
-                            RelativeSizeAxes = Axes.Both,
-                            Masking = true,
-                            CornerRadius = 5,
-                            EdgeEffect = new EdgeEffectParameters
-                            {
-                                Type = EdgeEffectType.Shadow,
-                                Colour = Color4.Black.Opacity(40),
-                                Radius = 5,
-                            },
-                            Children = new Drawable[]
-                            {
-                                new FillFlowContainer
-                                {
-                                    RelativeSizeAxes = Axes.Both,
-                                    Children = new Drawable[]
-                                    {
-                                        new Box
-                                        {
-                                            Colour = Color4.Black,
-                                            RelativeSizeAxes = Axes.Both,
-                                            Width = 0.25f,
-                                        },
-                                        new Container
-                                        {
-                                            RelativeSizeAxes = Axes.Both,
-                                            Width = 0.75f,
-                                            Children = new Drawable[]
-                                            {
-                                                cover = new UpdateableBeatmapBackgroundSprite(BeatmapSetCoverType.List)
-                                                {
-                                                    RelativeSizeAxes = Axes.Both,
-                                                    FillMode = FillMode.Stretch
-                                                },
-                                                new Box
-                                                {
-                                                    Colour = ColourInfo.GradientHorizontal(Color4.Black, Color4.Black.Opacity(0.25f)),
-                                                    RelativeSizeAxes = Axes.Both,
-                                                },
-                                            },
-                                        },
-                                    }
-                                },
-                                new FillFlowContainer
-                                {
-                                    AutoSizeAxes = Axes.Both,
-                                    Direction = FillDirection.Horizontal,
-                                    Anchor = Anchor.CentreLeft,
-                                    Origin = Anchor.CentreLeft,
-                                    Padding = new MarginPadding(7),
-                                    Children = new Drawable[]
-                                    {
-                                        new DifficultyIcon(item.Beatmap)
-                                        {
-                                            Scale = new Vector2(1.5f)
-                                        },
-                                        new FillFlowContainer
-                                        {
-                                            AutoSizeAxes = Axes.Both,
-                                            Direction = FillDirection.Vertical,
-                                            Padding = new MarginPadding
-                                            {
-                                                Left = spacing,
-                                            },
-                                            Children = new Drawable[]
-                                            {
-                                                new FillFlowContainer
-                                                {
-                                                    AutoSizeAxes = Axes.Both,
-                                                    Spacing = new Vector2(5),
-                                                    Children = new Drawable[]
-                                                    {
-                                                        new OsuSpriteText
-                                                        {
-                                                            Text = item.Beatmap?.BeatmapSet?.Metadata?.Artist ?? "????????",
-                                                            Font = OsuFont.GetFont(size: 16, weight: FontWeight.Bold)
-                                                        },
-                                                        new OsuSpriteText
-                                                        {
-                                                            Text = "-",
-                                                            Font = OsuFont.GetFont()
-                                                        },
-                                                        new OsuSpriteText
-                                                        {
-                                                            Text = item.Beatmap?.BeatmapSet?.Metadata?.Title ?? "????????",
-                                                            Font = OsuFont.GetFont()
-                                                        },
-                                                    }
-                                                },
-                                                new FillFlowContainer
-                                                {
-                                                    AutoSizeAxes = Axes.Both,
-                                                    Spacing = new Vector2(spacing),
-                                                    Children = new Drawable[]
-                                                    {
-                                                        new OsuSpriteText
-                                                        {
-                                                            Text = item.Beatmap?.Version ?? "??",
-                                                            Font = OsuFont.GetFont(size: 12)
-                                                        },
-                                                        new OsuSpriteText
-                                                        {
-                                                            Text = $"mapped by {item.Beatmap?.BeatmapSet?.Metadata?.Author.Username}",
-                                                            Font = OsuFont.GetFont(size: 12, italics: true),
-                                                            Colour = Color4.Violet,
-                                                        }
-                                                    }
-                                                },
-                                            }
-                                        },
-                                    }
-                                },
-                            },
-                        }
-                    },
-                    new Container
-                    {
-                        AutoSizeAxes = Axes.Both,
-                        Anchor = Anchor.CentreRight,
-                        Origin = Anchor.CentreRight,
-                        Margin = new MarginPadding
-                        {
-                            Right = 10,
-                        },
-                        Child = removeButton = new RemoveButton
-                        {
-                            AutoSizeAxes = Axes.Both,
-                            Action = () => RemovalTriggered?.Invoke(this)
-                        }
-                    },
-                    dragHandle = new DragHandle()
-                };
-
-                PlaylistItem.ValueChanged += itemChanged;
-            }
-
-            protected override bool OnHover(HoverEvent e)
-            {
-                if (e.IsPressed(MouseButton.Left))
-                {
-                    if (isDragging)
-                        isHovered = true;
-
-                    return true;
-                }
-
-                isHovered = true;
-
-                removeButton.ShowButton();
-                dragHandle.FadeTo(1f, fade_duration);
-                return true;
-            }
-
-            protected override void OnHoverLost(HoverLostEvent e)
-            {
-                isHovered = false;
-
-                if (isDragging)
-                    return;
-
-                removeButton.HideButton();
-
-                dragHandle.FadeTo(0f, fade_duration);
-            }
-
-            protected override bool OnMouseDown(MouseDownEvent e)
-            {
-                isDragging = true;
-                return false;
-            }
-
-            protected override bool OnMouseMove(MouseMoveEvent e)
-            {
-                // This is to show the current item's buttons after having dragged a different item and landing here (i.e. the OnHover was prevented from being fired)
-                if (!isHovered && !e.IsPressed(MouseButton.Left))
-                {
-                    removeButton.ShowButton();
-                    dragHandle.FadeTo(1f, fade_duration);
-                }
-
-                return base.OnMouseMove(e);
-            }
-
-            protected override bool OnMouseUp(MouseUpEvent e)
-            {
-                isDragging = false;
-
-                if (!isHovered)
-                {
-                    removeButton.HideButton();
-                    dragHandle.FadeTo(0f, fade_duration);
-                }
-
-                return base.OnMouseUp(e);
-            }
-
-            private void itemChanged(ValueChangedEvent<PlaylistItem> item)
-            {
-                cover.Beatmap.Value = item.NewValue.Beatmap;
-            }
+            playlist.Add(item);
         }
     }
 }
