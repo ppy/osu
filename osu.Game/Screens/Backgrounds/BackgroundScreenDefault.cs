@@ -13,8 +13,10 @@ using osu.Game.Users;
 
 namespace osu.Game.Screens.Backgrounds
 {
-    public class BackgroundScreenDefault : BlurrableBackgroundScreen
+    public class BackgroundScreenDefault : BackgroundScreen
     {
+        private Background background;
+
         private int currentDisplay;
         private const int background_count = 5;
 
@@ -39,10 +41,10 @@ namespace osu.Game.Screens.Backgrounds
 
         private void display(Background newBackground)
         {
-            Background?.FadeOut(800, Easing.InOutSine);
-            Background?.Expire();
+            background?.FadeOut(800, Easing.InOutSine);
+            background?.Expire();
 
-            AddInternal(Background = newBackground);
+            AddInternal(background = newBackground);
             currentDisplay++;
         }
 
@@ -56,16 +58,16 @@ namespace osu.Game.Screens.Backgrounds
 
         private Background createBackground()
         {
-            Background background;
+            Background newBackground;
 
             if (user.Value?.IsSupporter ?? false)
-                background = new SkinnedBackground(skin.Value, backgroundName);
+                newBackground = new SkinnedBackground(skin.Value, backgroundName);
             else
-                background = new Background(backgroundName);
+                newBackground = new Background(backgroundName);
 
-            background.Depth = currentDisplay;
+            newBackground.Depth = currentDisplay;
 
-            return background;
+            return newBackground;
         }
 
         private class SkinnedBackground : Background

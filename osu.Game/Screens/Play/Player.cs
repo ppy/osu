@@ -73,6 +73,8 @@ namespace osu.Game.Screens.Play
         private DrawableStoryboard storyboard;
         protected UserDimContainer StoryboardContainer { get; private set; }
 
+        private Bindable<bool> showStoryboard;
+
         protected virtual UserDimContainer CreateStoryboardContainer() => new UserDimContainer(true)
         {
             RelativeSizeAxes = Axes.Both,
@@ -97,6 +99,7 @@ namespace osu.Game.Screens.Play
             sampleRestart = audio.Sample.Get(@"Gameplay/restart");
 
             mouseWheelDisabled = config.GetBindable<bool>(OsuSetting.MouseDisableWheel);
+            showStoryboard = config.GetBindable<bool>(OsuSetting.ShowStoryboard);
 
             ScoreProcessor = DrawableRuleset.CreateScoreProcessor();
             if (!ScoreProcessor.Mode.Disabled)
@@ -109,7 +112,7 @@ namespace osu.Game.Screens.Play
                 PausableGameplayContainer = new PausableGameplayContainer
                 {
                     Retries = RestartCount,
-                    OnRetry = restart,
+                    OnRetry = Restart,
                     OnQuit = performUserRequestedExit,
                     Start = gameplayClockContainer.Start,
                     Stop = gameplayClockContainer.Stop,
@@ -151,7 +154,7 @@ namespace osu.Game.Screens.Play
                 },
                 failOverlay = new FailOverlay
                 {
-                    OnRetry = restart,
+                    OnRetry = Restart,
                     OnQuit = performUserRequestedExit,
                 },
                 new HotkeyRetryOverlay
@@ -161,7 +164,7 @@ namespace osu.Game.Screens.Play
                         if (!this.IsCurrentScreen()) return;
 
                         fadeOut(true);
-                        restart();
+                        Restart();
                     },
                 }
             };
@@ -169,7 +172,7 @@ namespace osu.Game.Screens.Play
             // bind clock into components that require it
             DrawableRuleset.IsPaused.BindTo(gameplayClockContainer.IsPaused);
 
-            if (ShowStoryboard.Value)
+            if (showStoryboard.Value)
                 initializeStoryboard(false);
 
             // Bind ScoreProcessor to ourselves
@@ -232,7 +235,7 @@ namespace osu.Game.Screens.Play
             this.Exit();
         }
 
-        private void restart()
+        public void Restart()
         {
             if (!this.IsCurrentScreen()) return;
 
@@ -313,12 +316,13 @@ namespace osu.Game.Screens.Play
                 .Delay(250)
                 .FadeIn(250);
 
-            ShowStoryboard.ValueChanged += enabled =>
+            showStoryboard.ValueChanged += enabled =>
             {
                 if (enabled.NewValue) initializeStoryboard(true);
             };
 
             Background.EnableUserDim.Value = true;
+            Background.BlurAmount.Value = 0;
 
             Background.StoryboardReplacesBackground.BindTo(storyboardReplacesBackground);
             StoryboardContainer.StoryboardReplacesBackground.BindTo(storyboardReplacesBackground);
