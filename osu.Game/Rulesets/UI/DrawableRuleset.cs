@@ -169,7 +169,20 @@ namespace osu.Game.Rulesets.UI
                 mod.ApplyToDrawableHitObjects(Playfield.HitObjectContainer.Objects);
         }
 
-        public override void RequestResume(Action continueResume) => continueResume();
+        public override void RequestResume(Action continueResume)
+        {
+            if (ResumeOverlay != null && (Cursor == null || Contains(Cursor.ActiveCursor.ScreenSpaceDrawQuad.Centre)))
+            {
+                ResumeOverlay.ResumeAction = continueResume;
+                ResumeOverlay.Show();
+            }
+            else
+                continueResume();
+        }
+
+        public ResumeOverlay ResumeOverlay { get; private set; }
+
+        protected virtual ResumeOverlay CreateResumeOverlay() => null;
 
         /// <summary>
         /// Creates and adds the visual representation of a <see cref="TObject"/> to this <see cref="DrawableRuleset{TObject}"/>.
