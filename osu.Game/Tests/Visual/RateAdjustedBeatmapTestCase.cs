@@ -13,7 +13,7 @@ namespace osu.Game.Tests.Visual
             base.Update();
 
             // note that this will override any mod rate application
-            Beatmap.Value.Track.Rate = Clock.Rate;
+            Beatmap.Value.Track.TempoAdjust = Clock.Rate;
         }
     }
 }

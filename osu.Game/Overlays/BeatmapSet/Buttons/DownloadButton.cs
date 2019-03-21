@@ -39,7 +39,7 @@ namespace osu.Game.Overlays.BeatmapSet.Buttons
         }
 
         [BackgroundDependencyLoader]
-        private void load(APIAccess api, BeatmapManager beatmaps)
+        private void load(IAPIProvider api, BeatmapManager beatmaps)
         {
             FillFlowContainer textSprites;
 

@@ -10,11 +10,11 @@ using osu.Game.Rulesets.UI.Scrolling;
 
 namespace osu.Game.Rulesets.Mania.Edit
 {
-    public class ManiaEditRulesetContainer : ManiaRulesetContainer
+    public class DrawableManiaEditRuleset : DrawableManiaRuleset
     {
         public new IScrollingInfo ScrollingInfo => base.ScrollingInfo;
 
-        public ManiaEditRulesetContainer(Ruleset ruleset, WorkingBeatmap beatmap)
+        public DrawableManiaEditRuleset(Ruleset ruleset, WorkingBeatmap beatmap)
             : base(ruleset, beatmap)
         {
         }

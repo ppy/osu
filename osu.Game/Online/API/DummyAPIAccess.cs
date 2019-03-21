@@ -11,14 +11,16 @@ namespace osu.Game.Online.API
         public Bindable<User> LocalUser { get; } = new Bindable<User>(new User
         {
             Username = @"Dummy",
-            Id = 1,
+            Id = 1001,
         });
 
         public bool IsLoggedIn => true;
 
-        public void Update()
-        {
-        }
+        public string ProvidedUsername => LocalUser.Value.Username;
+
+        public string Endpoint => "http://localhost";
+
+        public APIState State => LocalUser.Value.Id == 1 ? APIState.Offline : APIState.Online;
 
         public virtual void Queue(APIRequest request)
         {
@@ -26,6 +28,28 @@ namespace osu.Game.Online.API
 
         public void Register(IOnlineComponent component)
         {
+            // todo: add support
         }
+
+        public void Unregister(IOnlineComponent component)
+        {
+            // todo: add support
+        }
+
+        public void Login(string username, string password)
+        {
+            LocalUser.Value = new User
+            {
+                Username = @"Dummy",
+                Id = 1001,
+            };
+        }
+
+        public void Logout()
+        {
+            LocalUser.Value = new GuestUser();
+        }
+
+        public RegistrationRequest.RegistrationRequestErrors CreateAccount(string email, string username, string password) => null;
     }
 }

@@ -26,7 +26,12 @@ namespace osu.Game.Beatmaps
                     Title = "no beatmaps available!"
                 },
                 BeatmapSet = new BeatmapSetInfo(),
-                BaseDifficulty = new BeatmapDifficulty(),
+                BaseDifficulty = new BeatmapDifficulty
+                {
+                    DrainRate = 0,
+                    CircleSize = 0,
+                    OverallDifficulty = 0,
+                },
                 Ruleset = new DummyRulesetInfo()
             })
         {
@@ -47,7 +52,7 @@ namespace osu.Game.Beatmaps
             {
                 public override IEnumerable<Mod> GetModsFor(ModType type) => new Mod[] { };
 
-                public override RulesetContainer CreateRulesetContainerWith(WorkingBeatmap beatmap)
+                public override DrawableRuleset CreateDrawableRulesetWith(WorkingBeatmap beatmap)
                 {
                     throw new NotImplementedException();
                 }
