@@ -23,36 +23,34 @@ namespace osu.Game.Tests.Visual
         [Test]
         public void TestPauseResume()
         {
-            AddStep("pause", () => Player.Pause());
-            AddAssert("clock stopped", () => !Player.GameplayClockContainer.GameplayClock.IsRunning);
-            AddAssert("pause overlay shown", () => Player.PauseOverlayVisible);
-
-            AddStep("resume", () => Player.Resume());
-            AddAssert("pause overlay hidden", () => !Player.PauseOverlayVisible);
+            pauseAndConfirm();
+            resumeAndConfirm();
         }
 
         [Test]
         public void TestPauseTooSoon()
         {
-            AddStep("pause", () => Player.Pause());
-            AddAssert("clock stopped", () => !Player.GameplayClockContainer.GameplayClock.IsRunning);
-            AddStep("resume", () => Player.Resume());
-            AddAssert("clock started", () => Player.GameplayClockContainer.GameplayClock.IsRunning);
-            AddStep("pause too soon", () => Player.Pause());
-            AddAssert("clock not stopped", () => Player.GameplayClockContainer.GameplayClock.IsRunning);
-            AddAssert("pause overlay hidden", () => !Player.PauseOverlayVisible);
+            pauseAndConfirm();
+            resumeAndConfirm();
+
+            pause();
+
+            confirmClockRunning(true);
+            confirmPauseOverlayShown(false);
         }
 
         [Test]
         public void TestExitTooSoon()
         {
-            AddStep("pause", () => Player.Pause());
-            AddAssert("clock stopped", () => !Player.GameplayClockContainer.GameplayClock.IsRunning);
-            AddStep("resume", () => Player.Resume());
-            AddAssert("clock started", () => Player.GameplayClockContainer.GameplayClock.IsRunning);
-            AddStep("pause too soon", () => Player.Exit());
-            AddAssert("clock not stopped", () => Player.GameplayClockContainer.GameplayClock.IsRunning);
-            AddAssert("pause overlay hidden", () => !Player.PauseOverlayVisible);
+            pauseAndConfirm();
+
+            resume();
+
+            AddStep("exit too soon", () => Player.Exit());
+
+            confirmClockRunning(true);
+            confirmPauseOverlayShown(false);
+
             AddAssert("not exited", () => Player.IsCurrentScreen());
         }
 
@@ -62,41 +60,79 @@ namespace osu.Game.Tests.Visual
             AddUntilStep("wait for fail", () => Player.HasFailed);
             AddAssert("fail overlay shown", () => Player.FailOverlayVisible);
 
-            AddStep("try to pause", () => Player.Pause());
+            confirmClockRunning(false);
 
-            AddAssert("pause overlay hidden", () => !Player.PauseOverlayVisible);
+            pause();
+
+            confirmClockRunning(false);
+            confirmPauseOverlayShown(false);
+
             AddAssert("fail overlay still shown", () => Player.FailOverlayVisible);
 
-            confirmExit();
+            exitAndConfirm();
         }
 
         [Test]
         public void TestExitFromGameplay()
         {
             AddStep("exit", () => Player.Exit());
-            AddUntilStep("wait for pause", () => Player.PauseOverlayVisible);
 
-            confirmExit();
+            confirmPaused();
+
+            exitAndConfirm();
         }
 
         [Test]
         public void TestExitFromPause()
         {
-            AddUntilStep("keep trying to pause", () =>
-            {
-                Player.Pause();
-                return Player.PauseOverlayVisible;
-            });
-
-            confirmExit();
+            pauseAndConfirm();
+            exitAndConfirm();
         }
 
-        private void confirmExit()
+        private void pauseAndConfirm()
+        {
+            pause();
+            confirmPaused();
+        }
+
+        private void resumeAndConfirm()
+        {
+            resume();
+            confirmResumed();
+        }
+
+        private void exitAndConfirm()
         {
             AddUntilStep("player not exited", () => Player.IsCurrentScreen());
             AddStep("exit", () => Player.Exit());
+            confirmExited();
+        }
+
+        private void confirmPaused()
+        {
+            confirmClockRunning(false);
+            AddAssert("pause overlay shown", () => Player.PauseOverlayVisible);
+        }
+
+        private void confirmResumed()
+        {
+            confirmClockRunning(true);
+            confirmPauseOverlayShown(false);
+        }
+
+        private void confirmExited()
+        {
             AddUntilStep("player exited", () => !Player.IsCurrentScreen());
         }
+
+        private void pause() => AddStep("pause", () => Player.Pause());
+        private void resume() => AddStep("resume", () => Player.Resume());
+
+        private void confirmPauseOverlayShown(bool isShown) =>
+            AddAssert("pause overlay " + (isShown ? "shown" : "hidden"), () => Player.PauseOverlayVisible == isShown);
+
+        private void confirmClockRunning(bool isRunning) =>
+            AddAssert("clock " + (isRunning ? "running" : "stopped"), () => Player.GameplayClockContainer.GameplayClock.IsRunning == isRunning);
 
         protected override bool AllowFail => true;
 
