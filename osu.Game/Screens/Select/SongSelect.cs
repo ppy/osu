@@ -593,18 +593,7 @@ namespace osu.Game.Screens.Select
 
         private void carouselBeatmapsLoaded()
         {
-            if (rulesetNoDebounce == null)
-            {
-                // manual binding to parent ruleset to allow for delayed load in the incoming direction.
-                rulesetNoDebounce = decoupledRuleset.Value = Ruleset.Value;
-                Ruleset.ValueChanged += r => updateSelectedRuleset(r.NewValue);
-
-                decoupledRuleset.ValueChanged += r => Ruleset.Value = r.NewValue;
-                decoupledRuleset.DisabledChanged += r => Ruleset.Disabled = r;
-
-                Beatmap.BindDisabledChanged(disabled => Carousel.AllowSelection = !disabled, true);
-                Beatmap.BindValueChanged(workingBeatmapChanged);
-            }
+            bindBindables();
 
             if (!Beatmap.IsDefault && Beatmap.Value.BeatmapSetInfo?.DeletePending == false && Beatmap.Value.BeatmapSetInfo?.Protected == false
                 && Carousel.SelectBeatmap(Beatmap.Value.BeatmapInfo, false))
@@ -616,6 +605,26 @@ namespace osu.Game.Screens.Select
                 // to show the dummy beatmap (we have nothing else to display).
                 performUpdateSelected();
             }
+        }
+
+        private bool boundLocalBindables;
+
+        private void bindBindables()
+            {
+            if (boundLocalBindables)
+                return;
+
+                // manual binding to parent ruleset to allow for delayed load in the incoming direction.
+                rulesetNoDebounce = decoupledRuleset.Value = Ruleset.Value;
+                Ruleset.ValueChanged += r => updateSelectedRuleset(r.NewValue);
+
+                decoupledRuleset.ValueChanged += r => Ruleset.Value = r.NewValue;
+                decoupledRuleset.DisabledChanged += r => Ruleset.Disabled = r;
+
+                Beatmap.BindDisabledChanged(disabled => Carousel.AllowSelection = !disabled, true);
+                Beatmap.BindValueChanged(workingBeatmapChanged);
+
+            boundLocalBindables = true;
         }
 
         private void delete(BeatmapSetInfo beatmap)
