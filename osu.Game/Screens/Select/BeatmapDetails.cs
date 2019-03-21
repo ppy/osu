@@ -36,7 +36,7 @@ namespace osu.Game.Screens.Select
         private readonly FailRetryGraph failRetryGraph;
         private readonly DimmedLoadingAnimation loading;
 
-        private APIAccess api;
+        private IAPIProvider api;
 
         private ScheduledDelegate pendingBeatmapSwitch;
 
@@ -160,7 +160,7 @@ namespace osu.Game.Screens.Select
         }
 
         [BackgroundDependencyLoader]
-        private void load(APIAccess api)
+        private void load(IAPIProvider api)
         {
             this.api = api;
         }
@@ -175,21 +175,22 @@ namespace osu.Game.Screens.Select
 
         private void updateStatistics()
         {
-            if (Beatmap == null)
+            advanced.Beatmap = Beatmap;
+            description.Text = Beatmap?.Version;
+            source.Text = Beatmap?.Metadata?.Source;
+            tags.Text = Beatmap?.Metadata?.Tags;
+
+            // metrics may have been previously fetched
+            if (Beatmap?.Metrics != null)
             {
-                clearStats();
+                updateMetrics(Beatmap.Metrics);
                 return;
             }
 
-            ratingsContainer.FadeIn(transition_duration);
-            advanced.Beatmap = Beatmap;
-            description.Text = Beatmap.Version;
-            source.Text = Beatmap.Metadata.Source;
-            tags.Text = Beatmap.Metadata.Tags;
-
-            var requestedBeatmap = Beatmap;
-            if (requestedBeatmap.Metrics == null)
+            // metrics may not be fetched but can be
+            if (Beatmap?.OnlineBeatmapID != null)
             {
+                var requestedBeatmap = Beatmap;
                 var lookup = new GetBeatmapDetailsRequest(requestedBeatmap);
                 lookup.Success += res =>
                 {
@@ -198,39 +199,34 @@ namespace osu.Game.Screens.Select
                         return;
 
                     requestedBeatmap.Metrics = res;
-                    Schedule(() => displayMetrics(res));
+                    Schedule(() => updateMetrics(res));
                 };
-                lookup.Failure += e => Schedule(() => displayMetrics(null));
-
+                lookup.Failure += e => Schedule(() => updateMetrics());
                 api.Queue(lookup);
                 loading.Show();
+                return;
             }
 
-            displayMetrics(requestedBeatmap.Metrics, false);
+            updateMetrics();
         }
 
-        private void displayMetrics(BeatmapMetrics metrics, bool failOnMissing = true)
+        private void updateMetrics(BeatmapMetrics metrics = null)
         {
             var hasRatings = metrics?.Ratings?.Any() ?? false;
             var hasRetriesFails = (metrics?.Retries?.Any() ?? false) && (metrics.Fails?.Any() ?? false);
 
-            if (failOnMissing) loading.Hide();
-
             if (hasRatings)
             {
                 ratings.Metrics = metrics;
-                ratings.FadeIn(transition_duration);
+                ratingsContainer.FadeIn(transition_duration);
             }
-            else if (failOnMissing)
+            else
             {
                 ratings.Metrics = new BeatmapMetrics
                 {
                     Ratings = new int[10],
                 };
-            }
-            else
-            {
-                ratings.FadeTo(0.25f, transition_duration);
+                ratingsContainer.FadeTo(0.25f, transition_duration);
             }
 
             if (hasRetriesFails)
@@ -238,41 +234,17 @@ namespace osu.Game.Screens.Select
                 failRetryGraph.Metrics = metrics;
                 failRetryContainer.FadeIn(transition_duration);
             }
-            else if (failOnMissing)
+            else
             {
                 failRetryGraph.Metrics = new BeatmapMetrics
                 {
                     Fails = new int[100],
                     Retries = new int[100],
                 };
+                failRetryContainer.FadeOut(transition_duration);
             }
-            else
-            {
-                failRetryContainer.FadeTo(0.25f, transition_duration);
-            }
-        }
-
-        private void clearStats()
-        {
-            description.Text = null;
-            source.Text = null;
-            tags.Text = null;
-
-            advanced.Beatmap = new BeatmapInfo
-            {
-                StarDifficulty = 0,
-                BaseDifficulty = new BeatmapDifficulty
-                {
-                    CircleSize = 0,
-                    DrainRate = 0,
-                    OverallDifficulty = 0,
-                    ApproachRate = 0,
-                },
-            };
 
             loading.Hide();
-            ratingsContainer.FadeOut(transition_duration);
-            failRetryContainer.FadeOut(transition_duration);
         }
 
         private class DetailBox : Container
