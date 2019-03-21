@@ -327,6 +327,9 @@ namespace osu.Game.Screens.Select
 
         private void select(CarouselItem item)
         {
+            if (!AllowSelection)
+                return;
+
             if (item == null) return;
 
             item.State.Value = CarouselItemState.Selected;
