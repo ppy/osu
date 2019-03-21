@@ -42,6 +42,7 @@ namespace osu.Game.Screens.Multi
                         {
                             Anchor = Anchor.CentreLeft,
                             Origin = Anchor.BottomLeft,
+                            X = -35,
                         },
                         breadcrumbs = new HeaderBreadcrumbControl(stack)
                         {
