@@ -401,7 +401,7 @@ namespace osu.Game
                 },
                 overlayContent = new Container { RelativeSizeAxes = Axes.Both },
                 floatingOverlayContent = new Container { RelativeSizeAxes = Axes.Both },
-                urgentOverlayContent = new Container { RelativeSizeAxes = Axes.Both },
+                topMostOverlayContent = new Container { RelativeSizeAxes = Axes.Both },
                 idleTracker = new GameIdleTracker(6000)
             });
 
@@ -421,7 +421,7 @@ namespace osu.Game
                     CloseAllOverlays(false);
                     menuScreen?.MakeCurrent();
                 },
-            }, urgentOverlayContent.Add);
+            }, topMostOverlayContent.Add);
 
             loadComponentSingleFile(volume = new VolumeOverlay(), floatingOverlayContent.Add);
             loadComponentSingleFile(onscreenDisplay = new OnScreenDisplay(), Add);
@@ -450,11 +450,11 @@ namespace osu.Game
                 Origin = Anchor.TopRight,
             }, floatingOverlayContent.Add);
 
-            loadComponentSingleFile(accountCreation = new AccountCreationOverlay(), urgentOverlayContent.Add);
+            loadComponentSingleFile(accountCreation = new AccountCreationOverlay(), topMostOverlayContent.Add);
 
-            loadComponentSingleFile(dialogOverlay = new DialogOverlay(), urgentOverlayContent.Add);
+            loadComponentSingleFile(dialogOverlay = new DialogOverlay(), topMostOverlayContent.Add);
 
-            loadComponentSingleFile(externalLinkOpener = new ExternalLinkOpener(), urgentOverlayContent.Add);
+            loadComponentSingleFile(externalLinkOpener = new ExternalLinkOpener(), topMostOverlayContent.Add);
 
             dependencies.CacheAs(idleTracker);
             dependencies.Cache(settings);
@@ -700,7 +700,7 @@ namespace osu.Game
 
         private Container floatingOverlayContent;
 
-        private Container urgentOverlayContent;
+        private Container topMostOverlayContent;
 
         private FrameworkConfigManager frameworkConfig;
         private ScalingContainer screenContainer;
