@@ -44,30 +44,35 @@ namespace osu.Game.Graphics.UserInterface
 
             InternalChildren = new Drawable[]
             {
-                iconSprite = new SpriteIcon
-                {
-                    Size = new Vector2(25),
-                    Anchor = Anchor.TopLeft,
-                    Origin = Anchor.TopRight,
-                    Margin = new MarginPadding { Right = 10 },
-                },
                 new FillFlowContainer
                 {
                     AutoSizeAxes = Axes.Both,
-                    Direction = FillDirection.Horizontal,
-                    Spacing = new Vector2(6, 0),
-                    Children = new[]
+                    Spacing = new Vector2(10, 0),
+                    Children = new Drawable[]
                     {
-                        titleText = new OsuSpriteText
+                        iconSprite = new SpriteIcon
                         {
-                            Font = OsuFont.GetFont(size: 25),
+                            Size = new Vector2(25),
                         },
-                        pageText = new OsuSpriteText
+                        new FillFlowContainer
                         {
-                            Font = OsuFont.GetFont(size: 25),
+                            AutoSizeAxes = Axes.Both,
+                            Direction = FillDirection.Horizontal,
+                            Spacing = new Vector2(6, 0),
+                            Children = new[]
+                            {
+                                titleText = new OsuSpriteText
+                                {
+                                    Font = OsuFont.GetFont(size: 25),
+                                },
+                                pageText = new OsuSpriteText
+                                {
+                                    Font = OsuFont.GetFont(size: 25),
+                                }
+                            }
                         }
                     }
-                }
+                },
             };
         }
     }
