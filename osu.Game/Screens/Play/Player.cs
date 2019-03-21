@@ -77,7 +77,7 @@ namespace osu.Game.Screens.Play
             if (StoryboardContainer == null || storyboard != null)
                 return;
 
-            if (!ShowStoryboard.Value)
+            if (!showStoryboard.Value)
                 return;
 
             var beatmap = Beatmap.Value;
@@ -92,6 +92,8 @@ namespace osu.Game.Screens.Play
         }
 
         #endregion
+
+        private Bindable<bool> showStoryboard;
 
         protected virtual UserDimContainer CreateStoryboardContainer() => new UserDimContainer(true)
         {
@@ -117,6 +119,7 @@ namespace osu.Game.Screens.Play
             sampleRestart = audio.Sample.Get(@"Gameplay/restart");
 
             mouseWheelDisabled = config.GetBindable<bool>(OsuSetting.MouseDisableWheel);
+            showStoryboard = config.GetBindable<bool>(OsuSetting.ShowStoryboard);
 
             ScoreProcessor = DrawableRuleset.CreateScoreProcessor();
             if (!ScoreProcessor.Mode.Disabled)
@@ -422,9 +425,10 @@ namespace osu.Game.Screens.Play
                 .Delay(250)
                 .FadeIn(250);
 
-            ShowStoryboard.ValueChanged += _ => initializeStoryboard(true);
+            showStoryboard.ValueChanged += _ => initializeStoryboard(true);
 
             Background.EnableUserDim.Value = true;
+            Background.BlurAmount.Value = 0;
 
             Background.StoryboardReplacesBackground.BindTo(storyboardReplacesBackground);
             StoryboardContainer.StoryboardReplacesBackground.BindTo(storyboardReplacesBackground);

@@ -65,5 +65,10 @@ namespace osu.Game.Rulesets.Mods
         /// </summary>
         [JsonIgnore]
         public virtual Type[] IncompatibleMods => new Type[] { };
+
+        /// <summary>
+        /// Creates a copy of this <see cref="Mod"/> initialised to a default state.
+        /// </summary>
+        public virtual Mod CreateCopy() => (Mod)Activator.CreateInstance(GetType());
     }
 }
