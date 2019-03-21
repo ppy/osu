@@ -23,29 +23,34 @@ namespace osu.Game.Tests.Visual
 
         private BeatmapPlaylist playlist;
 
+        private int lastInsert;
+
         [BackgroundDependencyLoader]
         private void load(RulesetStore rulesets)
         {
             Add(playlist = new BeatmapPlaylist());
 
-            var beatmap = new TestBeatmap(rulesets.GetRuleset(0));
-
-            var playlistItem = new PlaylistItem
+            for (int i = 0; i < 4; i++)
             {
-                Beatmap = beatmap.BeatmapInfo,
-                Ruleset = beatmap.BeatmapInfo.Ruleset,
-                RulesetID = Ruleset.Value.ID ?? 0
-            };
-
-            for (int i = 0; i < 3; i++)
-            {
-                playlist.AddItem(playlistItem);
+                playlist.AddItem(generatePlaylistItem(rulesets.GetRuleset(i)));
             }
 
             AddStep("AddItem", () =>
             {
-                playlist.AddItem(playlistItem);
+                playlist.AddItem(generatePlaylistItem(rulesets.GetRuleset(lastInsert++ % 4)));
             });
+        }
+
+        private PlaylistItem generatePlaylistItem(RulesetInfo ruleset)
+        {
+            var beatmap = new TestBeatmap(ruleset);
+
+            return new PlaylistItem
+            {
+                Beatmap = beatmap.BeatmapInfo,
+                Ruleset = beatmap.BeatmapInfo.Ruleset,
+                RulesetID = beatmap.BeatmapInfo.Ruleset?.ID ?? 0
+            };
         }
     }
 }
