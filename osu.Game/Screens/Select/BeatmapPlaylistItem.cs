@@ -132,7 +132,7 @@ namespace osu.Game.Screens.Select
                                         Width = 0.75f,
                                         Children = new Drawable[]
                                         {
-                                            cover = new UpdateableBeatmapBackgroundSprite(BeatmapSetCoverType.List)
+                                            cover = new UpdateableBeatmapBackgroundSprite
                                             {
                                                 RelativeSizeAxes = Axes.Both,
                                                 FillMode = FillMode.Stretch
@@ -237,6 +237,7 @@ namespace osu.Game.Screens.Select
             };
 
             PlaylistItem.ValueChanged += itemChanged;
+            PlaylistItem.Value = item;
         }
 
         protected override bool OnHover(HoverEvent e)
