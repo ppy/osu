@@ -373,6 +373,13 @@ namespace osu.Game.Screens.Select
             var beatmap = beatmapNoDebounce;
             var ruleset = rulesetNoDebounce;
 
+            selectionChangedDebounce?.Cancel();
+
+            if (beatmap == null)
+                run();
+            else
+                selectionChangedDebounce = Scheduler.AddDelayed(run, 200);
+
             void run()
             {
                 Logger.Log($"updating selection with beatmap:{beatmap?.ID.ToString() ?? "null"} ruleset:{ruleset?.ID.ToString() ?? "null"}");
@@ -417,13 +424,6 @@ namespace osu.Game.Screens.Select
                 if (this.IsCurrentScreen()) ensurePlayingSelected(preview);
                 UpdateBeatmap(Beatmap.Value);
             }
-
-            selectionChangedDebounce?.Cancel();
-
-            if (beatmap == null)
-                run();
-            else
-                selectionChangedDebounce = Scheduler.AddDelayed(run, 200);
         }
 
         private void triggerRandom()
