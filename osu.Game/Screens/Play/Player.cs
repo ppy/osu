@@ -67,41 +67,6 @@ namespace osu.Game.Screens.Play
 
         protected HUDOverlay HUDOverlay { get; private set; }
 
-        #region Storyboard
-
-        private DrawableStoryboard storyboard;
-        protected UserDimContainer StoryboardContainer { get; private set; }
-
-        private void initializeStoryboard(bool asyncLoad)
-        {
-            if (StoryboardContainer == null || storyboard != null)
-                return;
-
-            if (!showStoryboard.Value)
-                return;
-
-            var beatmap = Beatmap.Value;
-
-            storyboard = beatmap.Storyboard.CreateDrawable();
-            storyboard.Masking = true;
-
-            if (asyncLoad)
-                LoadComponentAsync(storyboard, StoryboardContainer.Add);
-            else
-                StoryboardContainer.Add(storyboard);
-        }
-
-        #endregion
-
-        private Bindable<bool> showStoryboard;
-
-        protected virtual UserDimContainer CreateStoryboardContainer() => new UserDimContainer(true)
-        {
-            RelativeSizeAxes = Axes.Both,
-            Alpha = 1,
-            EnableUserDim = { Value = true }
-        };
-
         public bool LoadedBeatmapSuccessfully => DrawableRuleset?.Objects.Any() == true;
 
         protected GameplayClockContainer GameplayClockContainer { get; private set; }
@@ -306,6 +271,41 @@ namespace osu.Game.Screens.Play
         protected override bool OnScroll(ScrollEvent e) => mouseWheelDisabled.Value && !GameplayClockContainer.IsPaused.Value;
 
         protected virtual Results CreateResults(ScoreInfo score) => new SoloResults(score);
+
+        #region Storyboard
+
+        private DrawableStoryboard storyboard;
+        protected UserDimContainer StoryboardContainer { get; private set; }
+
+        protected virtual UserDimContainer CreateStoryboardContainer() => new UserDimContainer(true)
+        {
+            RelativeSizeAxes = Axes.Both,
+            Alpha = 1,
+            EnableUserDim = { Value = true }
+        };
+
+        private Bindable<bool> showStoryboard;
+
+        private void initializeStoryboard(bool asyncLoad)
+        {
+            if (StoryboardContainer == null || storyboard != null)
+                return;
+
+            if (!showStoryboard.Value)
+                return;
+
+            var beatmap = Beatmap.Value;
+
+            storyboard = beatmap.Storyboard.CreateDrawable();
+            storyboard.Masking = true;
+
+            if (asyncLoad)
+                LoadComponentAsync(storyboard, StoryboardContainer.Add);
+            else
+                StoryboardContainer.Add(storyboard);
+        }
+
+        #endregion
 
         #region Fail Logic
 
