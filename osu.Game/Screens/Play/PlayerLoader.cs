@@ -149,13 +149,13 @@ namespace osu.Game.Screens.Play
         {
             base.LogoArriving(logo, resuming);
 
-            logo.ScaleTo(new Vector2(0.15f), 300, Easing.In);
-            logo.MoveTo(new Vector2(0.5f), 300, Easing.In);
+            const double duration = 300;
+
+            logo.ScaleTo(new Vector2(0.15f), duration, Easing.In);
+            logo.MoveTo(new Vector2(0.5f), duration, Easing.In);
             logo.FadeIn(350);
 
-            logo.Delay(resuming ? 0 : 500).MoveToOffset(new Vector2(0, -0.24f), 500, Easing.InOutExpo);
-
-            content.SetLogo(logo);
+            content.SetLogo(logo, resuming, duration);
         }
 
         protected override void LoadComplete()
@@ -334,6 +334,9 @@ namespace osu.Game.Screens.Play
             private void load(Facade facade)
             {
                 var metadata = beatmap.BeatmapInfo?.Metadata ?? new BeatmapMetadata();
+
+                facade.Anchor = Anchor.TopCentre;
+                facade.Origin = Anchor.TopCentre;
 
                 AutoSizeAxes = Axes.Both;
                 Children = new Drawable[]
