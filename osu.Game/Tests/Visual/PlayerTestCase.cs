@@ -52,11 +52,8 @@ namespace osu.Game.Tests.Visual
             if (!AllowFail)
                 Beatmap.Value.Mods.Value = new[] { ruleset.GetAllMods().First(m => m is ModNoFail) };
 
-            LoadComponentAsync(Player = CreatePlayer(ruleset), p =>
-            {
-                Player = p;
-                LoadScreen(p);
-            });
+            Player = CreatePlayer(ruleset);
+            LoadScreen(Player);
         }
 
         protected virtual Player CreatePlayer(Ruleset ruleset) => new Player

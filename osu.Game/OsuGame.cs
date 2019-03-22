@@ -406,6 +406,8 @@ namespace osu.Game
             loadComponentSingleFile(osuLogo, logo =>
             {
                 logoContainer.Add(logo);
+
+                // Loader has to be created synchronously in order for DI to be successful for its background screen stack.
                 screenStack.Push(new Loader
                 {
                     RelativeSizeAxes = Axes.Both

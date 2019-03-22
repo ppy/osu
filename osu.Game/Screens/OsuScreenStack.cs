@@ -15,6 +15,8 @@ namespace osu.Game.Screens
 
         private ParallaxContainer parallaxContainer;
 
+        protected float ParallaxAmount => parallaxContainer.ParallaxAmount;
+
         public OsuScreenStack()
         {
             initializeStack();
@@ -35,11 +37,15 @@ namespace osu.Game.Screens
             };
 
             ScreenPushed += setParallax;
+            ScreenExited += setParallax;
         }
 
         private void setParallax(IScreen prev, IScreen next)
         {
-            parallaxContainer.ParallaxAmount = ParallaxContainer.DEFAULT_PARALLAX_AMOUNT * ((IOsuScreen)next).BackgroundParallaxAmount;
+            if (next != null)
+            {
+                parallaxContainer.ParallaxAmount = ParallaxContainer.DEFAULT_PARALLAX_AMOUNT * ((IOsuScreen)next).BackgroundParallaxAmount;
+            }
         }
     }
 }
