@@ -46,13 +46,19 @@ namespace osu.Game.Screens.Select
                 Margin = new MarginPadding { Left = 5, Top = 2 };
             }
 
-            public override bool HandlePositionalInput => IsPresent;
+            public override void Show()
+            {
+                this.FadeIn(fade_duration);
+            }
+
+            public override void Hide()
+            {
+                this.FadeOut(fade_duration);
+            }
         }
 
         private class RemoveButton : OsuClickableContainer
         {
-            private bool depressed;
-
             public RemoveButton()
             {
                 Alpha = 0;
@@ -64,27 +70,24 @@ namespace osu.Game.Screens.Select
                 };
             }
 
-            public void ShowButton()
+            public override void Show()
             {
-                this.FadeTo(1, fade_duration);
+                this.FadeIn(fade_duration);
             }
 
-            public void HideButton()
+            public override void Hide()
             {
-                if (!depressed)
-                    this.FadeTo(0, fade_duration);
+                this.FadeOut(fade_duration);
             }
 
             protected override bool OnMouseDown(MouseDownEvent e)
             {
-                depressed = true;
                 Content.ScaleTo(0.75f, 2000, Easing.OutQuint);
                 return base.OnMouseDown(e);
             }
 
             protected override bool OnMouseUp(MouseUpEvent e)
             {
-                depressed = false;
                 Content.ScaleTo(1, 1000, Easing.OutElastic);
                 return base.OnMouseUp(e);
             }
@@ -241,6 +244,20 @@ namespace osu.Game.Screens.Select
             PlaylistItem.Value = item;
         }
 
+        private void showHoverElements(bool show)
+        {
+            if (show)
+            {
+                removeButton.Show();
+                dragHandle.Show();
+            }
+            else
+            {
+                removeButton.Hide();
+                dragHandle.Hide();
+            }
+        }
+
         protected override bool OnHover(HoverEvent e)
         {
             if (Mouse.GetState().IsButtonDown(MouseButton.Left))
@@ -253,8 +270,7 @@ namespace osu.Game.Screens.Select
 
             isHovered = true;
 
-            removeButton.ShowButton();
-            dragHandle.FadeTo(1, fade_duration);
+            showHoverElements(true);
             return true;
         }
 
@@ -265,9 +281,7 @@ namespace osu.Game.Screens.Select
             if (isDragged)
                 return;
 
-            removeButton.HideButton();
-
-            dragHandle.FadeTo(0, fade_duration);
+            showHoverElements(false);
         }
 
         protected override bool OnMouseDown(MouseDownEvent e)
@@ -281,10 +295,7 @@ namespace osu.Game.Screens.Select
         {
             // This is to show the current item's buttons after having dragged a different item and landing here (i.e. the OnHover was prevented from being fired)
             if (!isHovered && !Mouse.GetState().IsButtonDown(MouseButton.Left))
-            {
-                removeButton.ShowButton();
-                dragHandle.FadeTo(1, fade_duration);
-            }
+                showHoverElements(true);
 
             return base.OnMouseMove(e);
         }
@@ -294,10 +305,7 @@ namespace osu.Game.Screens.Select
             isDragged = false;
 
             if (!isHovered)
-            {
-                removeButton.HideButton();
-                dragHandle.FadeTo(0, fade_duration);
-            }
+                showHoverElements(false);
 
             return base.OnMouseUp(e);
         }
