@@ -28,7 +28,6 @@ namespace osu.Game.Screens.Select
         public event Action<BeatmapPlaylistItem> RequestRemoval;
 
         private const int fade_duration = 60;
-        private readonly UpdateableBeatmapBackgroundSprite cover;
         private readonly DragHandle dragHandle;
         private readonly RemoveButton removeButton;
         private bool isHovered;
@@ -36,6 +35,7 @@ namespace osu.Game.Screens.Select
 
         public BeatmapPlaylistItem(PlaylistItem item)
         {
+            UpdateableBeatmapBackgroundSprite cover;
             Height = 50;
             RelativeSizeAxes = Axes.X;
             Children = new Drawable[]
@@ -165,16 +165,14 @@ namespace osu.Game.Screens.Select
                 },
                 new Container
                 {
-                    AutoSizeAxes = Axes.Both,
                     Anchor = Anchor.CentreRight,
                     Origin = Anchor.CentreRight,
-                    Margin = new MarginPadding
-                    {
-                        Right = 10,
-                    },
+                    Position = new Vector2(-20, 0),
                     Child = removeButton = new RemoveButton
                     {
                         AutoSizeAxes = Axes.Both,
+                        Anchor = Anchor.Centre,
+                        Origin = Anchor.Centre,
                         Action = () => RequestRemoval?.Invoke(this)
                     }
                 },
