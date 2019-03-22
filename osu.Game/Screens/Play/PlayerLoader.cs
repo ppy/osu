@@ -14,6 +14,7 @@ using osu.Framework.Screens;
 using osu.Framework.Threading;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
+using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Screens.Menu;
@@ -32,7 +33,7 @@ namespace osu.Game.Screens.Play
 
         private Player player;
 
-        private Container content;
+        private FacadeContainer content;
 
         private BeatmapMetadataDisplay info;
 
@@ -59,7 +60,7 @@ namespace osu.Game.Screens.Play
         [BackgroundDependencyLoader]
         private void load()
         {
-            InternalChild = content = new Container
+            InternalChild = content = new FacadeContainer
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
@@ -153,6 +154,8 @@ namespace osu.Game.Screens.Play
             logo.FadeIn(350);
 
             logo.Delay(resuming ? 0 : 500).MoveToOffset(new Vector2(0, -0.24f), 500, Easing.InOutExpo);
+
+            content.SetLogo(logo);
         }
 
         protected override void LoadComplete()
@@ -302,6 +305,8 @@ namespace osu.Game.Screens.Play
             private LoadingAnimation loading;
             private Sprite backgroundSprite;
             private ModDisplay modDisplay;
+            private FillFlowContainer fillFlowContainer;
+            private FacadeContainer facadeContainer;
 
             public bool Loading
             {
@@ -326,14 +331,14 @@ namespace osu.Game.Screens.Play
             }
 
             [BackgroundDependencyLoader]
-            private void load()
+            private void load(Facade facade)
             {
                 var metadata = beatmap.BeatmapInfo?.Metadata ?? new BeatmapMetadata();
 
                 AutoSizeAxes = Axes.Both;
                 Children = new Drawable[]
                 {
-                    new FillFlowContainer
+                    fillFlowContainer = new FillFlowContainer
                     {
                         AutoSizeAxes = Axes.Both,
                         Origin = Anchor.TopCentre,
@@ -341,6 +346,7 @@ namespace osu.Game.Screens.Play
                         Direction = FillDirection.Vertical,
                         Children = new Drawable[]
                         {
+                            facade,
                             new OsuSpriteText
                             {
                                 Text = new LocalisedString((metadata.TitleUnicode, metadata.Title)),
