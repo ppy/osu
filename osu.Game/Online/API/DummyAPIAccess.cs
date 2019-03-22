@@ -32,18 +32,12 @@ namespace osu.Game.Online.API
             get => state;
             private set
             {
-                APIState oldState = state;
-                APIState newState = value;
+                if (state == value)
+                    return;
 
                 state = value;
 
-                if (oldState != newState)
-                {
-                    Scheduler.Add(delegate
-                    {
-                        components.ForEach(c => c.APIStateChanged(this, newState));
-                    });
-                }
+                Scheduler.Add(() => components.ForEach(c => c.APIStateChanged(this, value)));
             }
         }
 
