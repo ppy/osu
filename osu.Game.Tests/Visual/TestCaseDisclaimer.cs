@@ -16,6 +16,8 @@ namespace osu.Game.Tests.Visual
         [BackgroundDependencyLoader]
         private void load()
         {
+            Add(api);
+
             AddStep("load disclaimer", () => LoadScreen(new Disclaimer()));
 
             AddStep("toggle support", () =>
