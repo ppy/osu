@@ -35,6 +35,11 @@ namespace osu.Game.Screens.Select
             playlist.ItemsAdded += itemsAdded;
         }
 
+        public void AddItem(PlaylistItem item)
+        {
+            playlist.Add(item);
+        }
+
         private void itemsAdded(IEnumerable<PlaylistItem> items)
         {
             foreach (var item in items)
@@ -49,11 +54,6 @@ namespace osu.Game.Screens.Select
         {
             playlist.Remove(item.PlaylistItem.Value);
             playlistFlowContainer.Remove(item);
-        }
-
-        public void AddItem(PlaylistItem item)
-        {
-            playlist.Add(item);
         }
     }
 }

@@ -185,20 +185,6 @@ namespace osu.Game.Screens.Select
             PlaylistItem.Value = item;
         }
 
-        private void showHoverElements(bool show)
-        {
-            if (show)
-            {
-                removeButton.Show();
-                dragHandle.Show();
-            }
-            else
-            {
-                removeButton.Hide();
-                dragHandle.Hide();
-            }
-        }
-
         protected override bool OnHover(HoverEvent e)
         {
             if (e.IsPressed(MouseButton.Left))
@@ -232,6 +218,16 @@ namespace osu.Game.Screens.Select
             return false;
         }
 
+        protected override bool OnMouseUp(MouseUpEvent e)
+        {
+            isDragged = false;
+
+            if (!isHovered)
+                showHoverElements(false);
+
+            return base.OnMouseUp(e);
+        }
+
         protected override bool OnMouseMove(MouseMoveEvent e)
         {
             // This is to show the current item's buttons after having dragged a different item and landing here (i.e. the OnHover was prevented from being fired)
@@ -241,14 +237,18 @@ namespace osu.Game.Screens.Select
             return base.OnMouseMove(e);
         }
 
-        protected override bool OnMouseUp(MouseUpEvent e)
+        private void showHoverElements(bool show)
         {
-            isDragged = false;
-
-            if (!isHovered)
-                showHoverElements(false);
-
-            return base.OnMouseUp(e);
+            if (show)
+            {
+                removeButton.Show();
+                dragHandle.Show();
+            }
+            else
+            {
+                removeButton.Hide();
+                dragHandle.Hide();
+            }
         }
 
         private class DragHandle : SpriteIcon
