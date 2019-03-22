@@ -7,7 +7,6 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Screens;
 using osu.Framework.Testing;
-using osu.Game.Graphics.Containers;
 using osu.Game.Screens;
 using osu.Game.Screens.Play;
 using osuTK.Graphics;
@@ -17,26 +16,30 @@ namespace osu.Game.Tests.Visual
     [TestFixture]
     public class TestCaseOsuScreenStack : OsuTestCase
     {
-        private NoParallaxTestScreen baseScreen;
-        private TestScreen newScreen;
         private TestOsuScreenStack stack;
 
         [SetUpSteps]
-        public void Setup()
+        public void SetUpSteps()
         {
             AddStep("Create new screen stack", () => { Child = stack = new TestOsuScreenStack { RelativeSizeAxes = Axes.Both }; });
-            AddStep("Push new base screen", () => stack.Push(baseScreen = new NoParallaxTestScreen("THIS IS SCREEN 1. THIS SCREEN SHOULD HAVE NO PARALLAX.")));
-            AddUntilStep("Wait for Screen 1 to be current", () => baseScreen.IsLoaded);
         }
 
         [Test]
         public void ParallaxAssignmentTest()
         {
-            AddStep("Push new screen to base screen", () => baseScreen.Push(newScreen = new TestScreen("THIS IS SCREEN 2. THIS SCREEN SHOULD HAVE PARALLAX.")));
-            AddUntilStep("Wait for Screen 2 to be current", () => newScreen.IsLoaded);
-            AddAssert("Parallax is correct", () => stack.IsParallaxSet);
-            AddStep("Exit from new screen", () => { baseScreen.MakeCurrent(); });
-            AddAssert("Parallax is correct", () => stack.IsParallaxSet);
+            NoParallaxTestScreen noParallaxScreen = null;
+            TestScreen parallaxScreen = null;
+
+            AddStep("Push no parallax", () => stack.Push(noParallaxScreen = new NoParallaxTestScreen("NO PARALLAX")));
+            AddUntilStep("Wait for current", () => noParallaxScreen.IsLoaded);
+            AddAssert("Parallax is off", () => stack.ParallaxAmount == 0);
+
+            AddStep("Push parallax", () => noParallaxScreen.Push(parallaxScreen = new TestScreen("PARALLAX")));
+            AddUntilStep("Wait for current", () => parallaxScreen.IsLoaded);
+            AddAssert("Parallax is on", () => stack.ParallaxAmount > 0);
+
+            AddStep("Exit from new screen", () => { noParallaxScreen.MakeCurrent(); });
+            AddAssert("Parallax is off", () => stack.ParallaxAmount == 0);
         }
 
         private class TestScreen : ScreenWithBeatmapBackground
@@ -54,7 +57,9 @@ namespace osu.Game.Tests.Visual
                 AddInternal(new SpriteText
                 {
                     Text = screenText,
-                    Colour = Color4.White
+                    Colour = Color4.White,
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
                 });
             }
         }
@@ -71,7 +76,7 @@ namespace osu.Game.Tests.Visual
 
         private class TestOsuScreenStack : OsuScreenStack
         {
-            public bool IsParallaxSet => ParallaxAmount == ((TestScreen)CurrentScreen).BackgroundParallaxAmount * ParallaxContainer.DEFAULT_PARALLAX_AMOUNT;
+            public new float ParallaxAmount => base.ParallaxAmount;
         }
     }
 }
