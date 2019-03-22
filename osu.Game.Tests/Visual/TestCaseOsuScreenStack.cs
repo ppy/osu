@@ -26,17 +26,16 @@ namespace osu.Game.Tests.Visual
         {
             AddStep("Create new screen stack", () => { Child = stack = new TestOsuScreenStack { RelativeSizeAxes = Axes.Both }; });
             AddStep("Push new base screen", () => stack.Push(baseScreen = new NoParallaxTestScreen("THIS IS SCREEN 1. THIS SCREEN SHOULD HAVE NO PARALLAX.")));
-            AddUntilStep("Wait for Screen 1 to be current", baseScreen.IsCurrentScreen);
+            AddUntilStep("Wait for Screen 1 to be current", () => baseScreen.IsLoaded);
         }
 
         [Test]
         public void ParallaxAssignmentTest()
         {
             AddStep("Push new screen to base screen", () => baseScreen.Push(newScreen = new TestScreen("THIS IS SCREEN 2. THIS SCREEN SHOULD HAVE PARALLAX.")));
-            AddUntilStep("Wait for Screen 2 to be current", newScreen.IsCurrentScreen);
+            AddUntilStep("Wait for Screen 2 to be current", () => newScreen.IsLoaded);
             AddAssert("Parallax is correct", () => stack.IsParallaxSet);
             AddStep("Exit from new screen", () => { baseScreen.MakeCurrent(); });
-            AddUntilStep("Wait for Screen 1 to be current", baseScreen.IsCurrentScreen);
             AddAssert("Parallax is correct", () => stack.IsParallaxSet);
         }
 
