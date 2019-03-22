@@ -34,65 +34,6 @@ namespace osu.Game.Screens.Select
         private bool isHovered;
         private bool isDragged;
 
-        private class DragHandle : SpriteIcon
-        {
-            public DragHandle()
-            {
-                Anchor = Anchor.CentreLeft;
-                Origin = Anchor.CentreLeft;
-                Size = new Vector2(12);
-                Icon = FontAwesome.fa_bars;
-                Alpha = 0;
-                Margin = new MarginPadding { Left = 5, Top = 2 };
-            }
-
-            public override void Show()
-            {
-                this.FadeIn(fade_duration);
-            }
-
-            public override void Hide()
-            {
-                this.FadeOut(fade_duration);
-            }
-        }
-
-        private class RemoveButton : OsuClickableContainer
-        {
-            public RemoveButton()
-            {
-                Alpha = 0;
-                Child = new SpriteIcon
-                {
-                    Colour = Color4.White,
-                    Icon = FontAwesome.fa_minus_square,
-                    Size = new Vector2(14),
-                };
-            }
-
-            public override void Show()
-            {
-                this.FadeIn(fade_duration);
-            }
-
-            public override void Hide()
-            {
-                this.FadeOut(fade_duration);
-            }
-
-            protected override bool OnMouseDown(MouseDownEvent e)
-            {
-                Content.ScaleTo(0.75f, 2000, Easing.OutQuint);
-                return base.OnMouseDown(e);
-            }
-
-            protected override bool OnMouseUp(MouseUpEvent e)
-            {
-                Content.ScaleTo(1, 1000, Easing.OutElastic);
-                return base.OnMouseUp(e);
-            }
-        }
-
         public BeatmapPlaylistItem(PlaylistItem item)
         {
             Height = 50;
@@ -308,6 +249,65 @@ namespace osu.Game.Screens.Select
                 showHoverElements(false);
 
             return base.OnMouseUp(e);
+        }
+
+        private class DragHandle : SpriteIcon
+        {
+            public DragHandle()
+            {
+                Anchor = Anchor.CentreLeft;
+                Origin = Anchor.CentreLeft;
+                Size = new Vector2(12);
+                Icon = FontAwesome.fa_bars;
+                Alpha = 0;
+                Margin = new MarginPadding { Left = 5, Top = 2 };
+            }
+
+            public override void Show()
+            {
+                this.FadeIn(fade_duration);
+            }
+
+            public override void Hide()
+            {
+                this.FadeOut(fade_duration);
+            }
+        }
+
+        private class RemoveButton : OsuClickableContainer
+        {
+            public RemoveButton()
+            {
+                Alpha = 0;
+                Child = new SpriteIcon
+                {
+                    Colour = Color4.White,
+                    Icon = FontAwesome.fa_minus_square,
+                    Size = new Vector2(14),
+                };
+            }
+
+            public override void Show()
+            {
+                this.FadeIn(fade_duration);
+            }
+
+            public override void Hide()
+            {
+                this.FadeOut(fade_duration);
+            }
+
+            protected override bool OnMouseDown(MouseDownEvent e)
+            {
+                Content.ScaleTo(0.75f, 2000, Easing.OutQuint);
+                return base.OnMouseDown(e);
+            }
+
+            protected override bool OnMouseUp(MouseUpEvent e)
+            {
+                Content.ScaleTo(1, 1000, Easing.OutElastic);
+                return base.OnMouseUp(e);
+            }
         }
     }
 }
