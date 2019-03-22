@@ -138,7 +138,8 @@ namespace osu.Game.Rulesets.UI
         {
             KeyBindingInputManager.AddRange(new Drawable[]
             {
-                Playfield
+                Playfield,
+                (ResumeOverlay = CreateResumeOverlay()) ?? new Container()
             });
 
             InternalChildren = new Drawable[]
