@@ -353,9 +353,8 @@ namespace osu.Game.Screens.Play
             && !DrawableRuleset.HasReplayLoaded.Value
             // cannot pause if we are already in a fail state
             && !HasFailed
-            // cannot pause if already paused (and not in the process of resuming)
-            && (GameplayClockContainer.IsPaused.Value == false || IsResuming)
-            && (!pauseCooldownActive || IsResuming);
+            // cannot pause if already paused (or in a cooldown state) unless we are in a resuming state.
+            && (IsResuming || (GameplayClockContainer.IsPaused.Value == false && !pauseCooldownActive));
 
         private bool pauseCooldownActive =>
             lastPauseActionTime.HasValue && GameplayClockContainer.GameplayClock.CurrentTime < lastPauseActionTime + pause_cooldown;
@@ -454,7 +453,7 @@ namespace osu.Game.Screens.Play
                 return true;
             }
 
-            if (LoadedBeatmapSuccessfully && canPause)
+            if (canPause)
             {
                 Pause();
                 return true;
