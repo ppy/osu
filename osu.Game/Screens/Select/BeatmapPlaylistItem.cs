@@ -237,7 +237,7 @@ namespace osu.Game.Screens.Select
                 dragHandle = new DragHandle()
             };
 
-            PlaylistItem.ValueChanged += itemChanged;
+            PlaylistItem.ValueChanged += change => cover.Beatmap.Value = change.NewValue.Beatmap;
             PlaylistItem.Value = item;
         }
 
@@ -300,11 +300,6 @@ namespace osu.Game.Screens.Select
             }
 
             return base.OnMouseUp(e);
-        }
-
-        private void itemChanged(ValueChangedEvent<PlaylistItem> item)
-        {
-            cover.Beatmap.Value = item.NewValue.Beatmap;
         }
     }
 }
