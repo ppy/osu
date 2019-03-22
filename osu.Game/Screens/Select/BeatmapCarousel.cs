@@ -55,9 +55,9 @@ namespace osu.Game.Screens.Select
         public override bool HandlePositionalInput => AllowSelection;
 
         /// <summary>
-        /// Used to avoid firing null selections before the initial beatmaps have been loaded via <see cref="BeatmapSets"/>.
+        /// Whether carousel items have completed asynchronously loaded.
         /// </summary>
-        private bool initialLoadComplete;
+        public bool BeatmapSetsLoaded { get; private set; }
 
         private IEnumerable<CarouselBeatmapSet> beatmapSets => root.Children.OfType<CarouselBeatmapSet>();
 
@@ -90,7 +90,7 @@ namespace osu.Game.Screens.Select
                 Schedule(() =>
                 {
                     BeatmapSetsChanged?.Invoke();
-                    initialLoadComplete = true;
+                    BeatmapSetsLoaded = true;
                 });
             }));
         }
@@ -327,6 +327,9 @@ namespace osu.Game.Screens.Select
 
         private void select(CarouselItem item)
         {
+            if (!AllowSelection)
+                return;
+
             if (item == null) return;
 
             item.State.Value = CarouselItemState.Selected;
@@ -593,7 +596,7 @@ namespace osu.Game.Screens.Select
             currentY += DrawHeight / 2;
             scrollableContent.Height = currentY;
 
-            if (initialLoadComplete && (selectedBeatmapSet == null || selectedBeatmap == null || selectedBeatmapSet.State.Value != CarouselItemState.Selected))
+            if (BeatmapSetsLoaded && (selectedBeatmapSet == null || selectedBeatmap == null || selectedBeatmapSet.State.Value != CarouselItemState.Selected))
             {
                 selectedBeatmapSet = null;
                 SelectionChanged?.Invoke(null);
