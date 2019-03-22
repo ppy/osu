@@ -40,7 +40,7 @@ namespace osu.Game.Screens.Select
             foreach (var item in items)
             {
                 var drawable = new BeatmapPlaylistItem(item);
-                drawable.RemovalTriggered += handleRemoval;
+                drawable.RequestRemoval += handleRemoval;
                 playlistFlowContainer.Add(drawable);
             }
         }

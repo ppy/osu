@@ -23,15 +23,16 @@ namespace osu.Game.Screens.Select
 {
     public class BeatmapPlaylistItem : Container
     {
-        private const int fade_duration = 60;
         public readonly Bindable<PlaylistItem> PlaylistItem = new Bindable<PlaylistItem>();
+
+        public event Action<BeatmapPlaylistItem> RequestRemoval;
+
+        private const int fade_duration = 60;
         private readonly UpdateableBeatmapBackgroundSprite cover;
         private readonly DragHandle dragHandle;
         private readonly RemoveButton removeButton;
         private bool isHovered;
         private bool isDragged;
-
-        public event Action<BeatmapPlaylistItem> RemovalTriggered;
 
         private class DragHandle : SpriteIcon
         {
@@ -230,7 +231,7 @@ namespace osu.Game.Screens.Select
                     Child = removeButton = new RemoveButton
                     {
                         AutoSizeAxes = Axes.Both,
-                        Action = () => RemovalTriggered?.Invoke(this)
+                        Action = () => RequestRemoval?.Invoke(this)
                     }
                 },
                 dragHandle = new DragHandle()
