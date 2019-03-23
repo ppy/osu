@@ -27,7 +27,7 @@ namespace osu.Game.Tests.NonVisual
         [Test]
         public void TestSingleMod()
         {
-            var combinations = new TestLegacyDifficultyCalculator(typeof(ModA)).CreateDifficultyAdjustmentModCombinations();
+            var combinations = new TestLegacyDifficultyCalculator(new ModA()).CreateDifficultyAdjustmentModCombinations();
 
             Assert.AreEqual(2, combinations.Length);
             Assert.IsTrue(combinations[0] is ModNoMod);
@@ -37,7 +37,7 @@ namespace osu.Game.Tests.NonVisual
         [Test]
         public void TestDoubleMod()
         {
-            var combinations = new TestLegacyDifficultyCalculator(typeof(ModA), typeof(ModB)).CreateDifficultyAdjustmentModCombinations();
+            var combinations = new TestLegacyDifficultyCalculator(new ModA(), new ModB()).CreateDifficultyAdjustmentModCombinations();
 
             Assert.AreEqual(4, combinations.Length);
             Assert.IsTrue(combinations[0] is ModNoMod);
@@ -52,7 +52,7 @@ namespace osu.Game.Tests.NonVisual
         [Test]
         public void TestIncompatibleMods()
         {
-            var combinations = new TestLegacyDifficultyCalculator(typeof(ModA), typeof(ModIncompatibleWithA)).CreateDifficultyAdjustmentModCombinations();
+            var combinations = new TestLegacyDifficultyCalculator(new ModA(), new ModIncompatibleWithA()).CreateDifficultyAdjustmentModCombinations();
 
             Assert.AreEqual(3, combinations.Length);
             Assert.IsTrue(combinations[0] is ModNoMod);
@@ -63,7 +63,7 @@ namespace osu.Game.Tests.NonVisual
         [Test]
         public void TestDoubleIncompatibleMods()
         {
-            var combinations = new TestLegacyDifficultyCalculator(typeof(ModA), typeof(ModB), typeof(ModIncompatibleWithA), typeof(ModIncompatibleWithAAndB)).CreateDifficultyAdjustmentModCombinations();
+            var combinations = new TestLegacyDifficultyCalculator(new ModA(), new ModB(), new ModIncompatibleWithA(), new ModIncompatibleWithAAndB()).CreateDifficultyAdjustmentModCombinations();
 
             Assert.AreEqual(8, combinations.Length);
             Assert.IsTrue(combinations[0] is ModNoMod);
@@ -86,7 +86,7 @@ namespace osu.Game.Tests.NonVisual
         [Test]
         public void TestIncompatibleThroughBaseType()
         {
-            var combinations = new TestLegacyDifficultyCalculator(typeof(ModAofA), typeof(ModIncompatibleWithAofA)).CreateDifficultyAdjustmentModCombinations();
+            var combinations = new TestLegacyDifficultyCalculator(new ModAofA(), new ModIncompatibleWithAofA()).CreateDifficultyAdjustmentModCombinations();
 
             Assert.AreEqual(3, combinations.Length);
             Assert.IsTrue(combinations[0] is ModNoMod);
@@ -141,13 +141,13 @@ namespace osu.Game.Tests.NonVisual
 
         private class TestLegacyDifficultyCalculator : DifficultyCalculator
         {
-            public TestLegacyDifficultyCalculator(params Type[] mods)
+            public TestLegacyDifficultyCalculator(params Mod[] mods)
                 : base(null, null)
             {
                 DifficultyAdjustmentMods = mods;
             }
 
-            protected override Type[] DifficultyAdjustmentMods { get; }
+            protected override Mod[] DifficultyAdjustmentMods { get; }
 
             protected override DifficultyAttributes CreateDifficultyAttributes(IBeatmap beatmap, Mod[] mods, Skill[] skills, double clockRate)
             {
