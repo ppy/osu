@@ -18,7 +18,7 @@ using osu.Game.Rulesets.Mods;
 namespace osu.Game.Screens.Play
 {
     /// <summary>
-    /// Encapsulates gameplay timing logic and provides a <see cref="GameplayClock"/> for children.
+    /// Encapsulates gameplay timing logic and provides a <see cref="Play.GameplayClock"/> for children.
     /// </summary>
     public class GameplayClockContainer : Container
     {
@@ -48,7 +48,7 @@ namespace osu.Game.Screens.Play
         /// The final clock which is exposed to underlying components.
         /// </summary>
         [Cached]
-        private readonly GameplayClock gameplayClock;
+        public readonly GameplayClock GameplayClock;
 
         private Bindable<double> userAudioOffset;
 
@@ -78,7 +78,7 @@ namespace osu.Game.Screens.Play
             offsetClock = new FramedOffsetClock(platformOffsetClock);
 
             // the clock to be exposed via DI to children.
-            gameplayClock = new GameplayClock(offsetClock);
+            GameplayClock = new GameplayClock(offsetClock);
         }
 
         [BackgroundDependencyLoader]
@@ -118,11 +118,16 @@ namespace osu.Game.Screens.Play
             // This accounts for the audio clock source potentially taking time to enter a completely stopped state
             adjustableClock.Seek(adjustableClock.CurrentTime);
             adjustableClock.Start();
+            IsPaused.Value = false;
         }
 
         public void Seek(double time) => adjustableClock.Seek(time);
 
-        public void Stop() => adjustableClock.Stop();
+        public void Stop()
+        {
+            adjustableClock.Stop();
+            IsPaused.Value = true;
+        }
 
         public void ResetLocalAdjustments()
         {
