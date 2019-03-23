@@ -19,7 +19,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         public new OsuDifficultyAttributes Attributes => (OsuDifficultyAttributes)base.Attributes;
 
         private readonly int countHitCircles;
-        private readonly int beatmapMaxCombo;
 
         private Mod[] mods;
 
@@ -34,10 +33,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             : base(ruleset, beatmap, score)
         {
             countHitCircles = Beatmap.HitObjects.Count(h => h is HitCircle);
-
-            beatmapMaxCombo = Beatmap.HitObjects.Count;
-            // Add the ticks + tail of the slider. 1 is subtracted because the "headcircle" would be counted twice (once for the slider itself in the line above)
-            beatmapMaxCombo += Beatmap.HitObjects.OfType<Slider>().Sum(s => s.NestedHitObjects.Count - 1);
         }
 
         public override double Calculate(Dictionary<string, double> categoryRatings = null)
@@ -80,7 +75,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 categoryRatings.Add("Accuracy", accuracyValue);
                 categoryRatings.Add("OD", Attributes.OverallDifficulty);
                 categoryRatings.Add("AR", Attributes.ApproachRate);
-                categoryRatings.Add("Max Combo", beatmapMaxCombo);
+                categoryRatings.Add("Max Combo", Attributes.MaxCombo);
             }
 
             return totalValue;
@@ -105,8 +100,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             aimValue *= Math.Pow(0.97f, countMiss);
 
             // Combo scaling
-            if (beatmapMaxCombo > 0)
-                aimValue *= Math.Min(Math.Pow(scoreMaxCombo, 0.8f) / Math.Pow(beatmapMaxCombo, 0.8f), 1.0f);
+            if (Attributes.MaxCombo > 0)
+                aimValue *= Math.Min(Math.Pow(scoreMaxCombo, 0.8f) / Math.Pow(Attributes.MaxCombo, 0.8f), 1.0f);
 
             double approachRateFactor = 1.0f;
             if (Attributes.ApproachRate > 10.33f)
@@ -152,8 +147,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             speedValue *= Math.Pow(0.97f, countMiss);
 
             // Combo scaling
-            if (beatmapMaxCombo > 0)
-                speedValue *= Math.Min(Math.Pow(scoreMaxCombo, 0.8f) / Math.Pow(beatmapMaxCombo, 0.8f), 1.0f);
+            if (Attributes.MaxCombo > 0)
+                speedValue *= Math.Min(Math.Pow(scoreMaxCombo, 0.8f) / Math.Pow(Attributes.MaxCombo, 0.8f), 1.0f);
 
             double approachRateFactor = 1.0f;
             if (Attributes.ApproachRate > 10.33f)
