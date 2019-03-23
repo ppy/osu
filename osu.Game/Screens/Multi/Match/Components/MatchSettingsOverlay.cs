@@ -316,8 +316,12 @@ namespace osu.Game.Screens.Multi.Match.Components
 
         private class SettingsTextBox : OsuTextBox
         {
-            protected override Color4 BackgroundUnfocused => Color4.Black;
-            protected override Color4 BackgroundFocused => Color4.Black;
+            [BackgroundDependencyLoader]
+            private void load()
+            {
+                BackgroundUnfocused = Color4.Black;
+                BackgroundFocused = Color4.Black;
+            }
         }
 
         private class SettingsNumberTextBox : SettingsTextBox
@@ -327,8 +331,12 @@ namespace osu.Game.Screens.Multi.Match.Components
 
         private class SettingsPasswordTextBox : OsuPasswordTextBox
         {
-            protected override Color4 BackgroundUnfocused => Color4.Black;
-            protected override Color4 BackgroundFocused => Color4.Black;
+            [BackgroundDependencyLoader]
+            private void load()
+            {
+                BackgroundUnfocused = Color4.Black;
+                BackgroundFocused = Color4.Black;
+            }
         }
 
         private class SectionContainer : FillFlowContainer<Section>

@@ -37,6 +37,8 @@ namespace osu.Game.Rulesets.Difficulty
         /// <returns>A structure describing the difficulty of the beatmap.</returns>
         public DifficultyAttributes Calculate(params Mod[] mods)
         {
+            mods = mods.Select(m => m.CreateCopy()).ToArray();
+
             beatmap.Mods.Value = mods;
             IBeatmap playableBeatmap = beatmap.GetPlayableBeatmap(ruleset.RulesetInfo);
 
