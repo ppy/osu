@@ -119,7 +119,7 @@ namespace osu.Game.Graphics.Containers
                 if (requiresBackgroundVisible)
                 {
                     if (backgroundLayer == null)
-                        LoadComponentAsync(backgroundLayer = new BackgroundScreenStack()
+                        LoadComponentAsync(backgroundLayer = new BackgroundScreenStack
                         {
                             Colour = OsuColour.Gray(0.1f),
                             Alpha = 0,
