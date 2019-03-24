@@ -20,6 +20,8 @@ using osu.Game.Online.API;
 using osu.Game.Overlays;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
+using osu.Game.Rulesets.Objects;
+using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.UI;
 using osu.Game.Scoring;
@@ -28,8 +30,6 @@ using osu.Game.Skinning;
 using osu.Game.Storyboards.Drawables;
 using osu.Game.Utils;
 using DiscordRPC;
-using osu.Game.Rulesets.Objects;
-using osu.Game.Rulesets.Objects.Types;
 
 namespace osu.Game.Screens.Play
 {

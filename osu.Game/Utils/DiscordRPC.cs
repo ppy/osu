@@ -1,11 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Threading.Tasks;
-using osu.Framework.Logging;
 using DiscordRPC;
 using DiscordRPC.Logging;
 using LogLevel = DiscordRPC.Logging.LogLevel;
