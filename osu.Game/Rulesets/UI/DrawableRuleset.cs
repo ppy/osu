@@ -161,7 +161,7 @@ namespace osu.Game.Rulesets.UI
         private void loadObjects()
         {
             foreach (TObject h in Beatmap.HitObjects)
-                addRepresentation(h);
+                addHitObject(h);
 
             Playfield.PostProcess();
 
@@ -175,9 +175,9 @@ namespace osu.Game.Rulesets.UI
         /// Creates and adds the visual representation of a <see cref="TObject"/> to this <see cref="DrawableRuleset{TObject}"/>.
         /// </summary>
         /// <param name="hitObject">The <see cref="TObject"/> to add the visual representation for.</param>
-        private void addRepresentation(TObject hitObject)
+        private void addHitObject(TObject hitObject)
         {
-            var drawableObject = GetVisualRepresentation(hitObject);
+            var drawableObject = CreateDrawableRepresentation(hitObject);
 
             if (drawableObject == null)
                 return;
@@ -209,7 +209,7 @@ namespace osu.Game.Rulesets.UI
         /// </summary>
         /// <param name="h">The HitObject to make drawable.</param>
         /// <returns>The DrawableHitObject.</returns>
-        public abstract DrawableHitObject<TObject> GetVisualRepresentation(TObject h);
+        public abstract DrawableHitObject<TObject> CreateDrawableRepresentation(TObject h);
 
         public void Attach(KeyCounterCollection keyCounter) =>
             (KeyBindingInputManager as ICanAttachKeyCounter)?.Attach(keyCounter);

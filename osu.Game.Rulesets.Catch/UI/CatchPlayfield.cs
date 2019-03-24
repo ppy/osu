@@ -20,7 +20,7 @@ namespace osu.Game.Rulesets.Catch.UI
 
         internal readonly CatcherArea CatcherArea;
 
-        public CatchPlayfield(BeatmapDifficulty difficulty, Func<CatchHitObject, DrawableHitObject<CatchHitObject>> getVisualRepresentation)
+        public CatchPlayfield(BeatmapDifficulty difficulty, Func<CatchHitObject, DrawableHitObject<CatchHitObject>> createDrawableRepresentation)
         {
             Container explodingFruitContainer;
 
@@ -40,7 +40,7 @@ namespace osu.Game.Rulesets.Catch.UI
                     },
                     CatcherArea = new CatcherArea(difficulty)
                     {
-                        GetVisualRepresentation = getVisualRepresentation,
+                        CreateDrawableRepresentation = createDrawableRepresentation,
                         ExplodingFruitTarget = explodingFruitContainer,
                         Anchor = Anchor.BottomLeft,
                         Origin = Anchor.TopLeft,
