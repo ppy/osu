@@ -7,6 +7,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osuTK.Graphics;
 using osu.Framework.Graphics.Shapes;
+using osu.Game.Graphics;
 using osu.Game.Skinning;
 
 namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
@@ -17,8 +18,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
 
         public string Text
         {
-            get { return number.Text; }
-            set { number.Text = value; }
+            get => number.Text;
+            set => number.Text = value;
         }
 
         public NumberPiece()
@@ -42,9 +43,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
                 }, s => s.GetTexture("Play/osu/hitcircle") == null),
                 number = new SkinnableSpriteText("Play/osu/number-text", _ => new OsuSpriteText
                 {
-                    Font = @"Venera",
+                    Font = OsuFont.Numeric.With(size: 40),
                     UseFullGlyphHeight = false,
-                    TextSize = 40,
                 }, restrictSize: false)
                 {
                     Text = @"1"

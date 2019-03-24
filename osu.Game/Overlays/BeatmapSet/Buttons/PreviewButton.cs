@@ -2,7 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
-using osu.Framework.Configuration;
+using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -30,8 +30,8 @@ namespace osu.Game.Overlays.BeatmapSet.Buttons
 
         public BeatmapSetInfo BeatmapSet
         {
-            get { return playButton.BeatmapSet; }
-            set { playButton.BeatmapSet = value; }
+            get => playButton.BeatmapSet;
+            set => playButton.BeatmapSet = value;
         }
 
         public PreviewButton()
@@ -67,7 +67,7 @@ namespace osu.Game.Overlays.BeatmapSet.Buttons
             };
 
             Action = () => playButton.Click();
-            Playing.ValueChanged += newValue => progress.FadeTo(newValue ? 1 : 0, 100);
+            Playing.ValueChanged += playing => progress.FadeTo(playing.NewValue ? 1 : 0, 100);
         }
 
         [BackgroundDependencyLoader]

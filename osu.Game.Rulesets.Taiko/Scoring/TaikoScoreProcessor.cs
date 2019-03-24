@@ -32,8 +32,8 @@ namespace osu.Game.Rulesets.Taiko.Scoring
         /// </summary>
         private double hpMissMultiplier;
 
-        public TaikoScoreProcessor(RulesetContainer<TaikoHitObject> rulesetContainer)
-            : base(rulesetContainer)
+        public TaikoScoreProcessor(DrawableRuleset<TaikoHitObject> drawableRuleset)
+            : base(drawableRuleset)
         {
         }
 
@@ -67,6 +67,6 @@ namespace osu.Game.Rulesets.Taiko.Scoring
             Health.Value = 0;
         }
 
-        protected override HitWindows CreateHitWindows() => new TaikoHitWindows();
+        public override HitWindows CreateHitWindows() => new TaikoHitWindows();
     }
 }

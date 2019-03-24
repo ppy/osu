@@ -127,16 +127,13 @@ namespace osu.Game.Overlays.SearchableList
 
         private class FilterSearchTextBox : SearchTextBox
         {
-            protected override Color4 BackgroundUnfocused => backgroundColour;
-            protected override Color4 BackgroundFocused => backgroundColour;
             protected override bool AllowCommit => true;
 
-            private Color4 backgroundColour;
-
             [BackgroundDependencyLoader]
-            private void load(OsuColour colours)
+            private void load()
             {
-                backgroundColour = colours.Gray2.Opacity(0.9f);
+                BackgroundUnfocused = OsuColour.Gray(0.06f);
+                BackgroundFocused = OsuColour.Gray(0.12f);
             }
         }
     }

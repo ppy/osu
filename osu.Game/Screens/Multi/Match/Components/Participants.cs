@@ -1,9 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System.Collections.Generic;
 using System.Linq;
-using osu.Framework.Configuration;
+using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Overlays.SearchableList;
@@ -13,16 +12,12 @@ using osuTK;
 
 namespace osu.Game.Screens.Multi.Match.Components
 {
-    public class Participants : CompositeDrawable
+    public class Participants : MultiplayerComposite
     {
-        public readonly IBindable<IEnumerable<User>> Users = new Bindable<IEnumerable<User>>();
-        public readonly IBindable<int> ParticipantCount = new Bindable<int>();
-        public readonly IBindable<int?> MaxParticipants = new Bindable<int?>();
-
-        public Participants()
+        [BackgroundDependencyLoader]
+        private void load()
         {
             FillFlowContainer<UserPanel> usersFlow;
-            ParticipantCountDisplay count;
 
             InternalChild = new Container
             {
@@ -36,7 +31,7 @@ namespace osu.Game.Screens.Multi.Match.Components
                         Padding = new MarginPadding { Top = 10 },
                         Children = new Drawable[]
                         {
-                            count = new ParticipantCountDisplay
+                            new ParticipantCountDisplay
                             {
                                 Anchor = Anchor.TopRight,
                                 Origin = Anchor.TopRight,
@@ -55,20 +50,22 @@ namespace osu.Game.Screens.Multi.Match.Components
                 },
             };
 
-            count.Participants.BindTo(Users);
-            count.ParticipantCount.BindTo(ParticipantCount);
-            count.MaxParticipants.BindTo(MaxParticipants);
-
-            Users.BindValueChanged(v =>
+            Participants.BindValueChanged(participants =>
             {
-                usersFlow.Children = v.Select(u => new UserPanel(u)
+                usersFlow.Children = participants.NewValue.Select(u =>
                 {
-                    Anchor = Anchor.TopCentre,
-                    Origin = Anchor.TopCentre,
-                    Width = 300,
-                    OnLoadComplete = d => d.FadeInFromZero(60),
+                    var panel = new UserPanel(u)
+                    {
+                        Anchor = Anchor.TopCentre,
+                        Origin = Anchor.TopCentre,
+                        Width = 300,
+                    };
+
+                    panel.OnLoadComplete += d => d.FadeInFromZero(60);
+
+                    return panel;
                 }).ToList();
-            });
+            }, true);
         }
     }
 }

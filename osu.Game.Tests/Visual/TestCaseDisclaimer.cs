@@ -2,27 +2,33 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
-using osu.Framework.Graphics;
-using osu.Framework.Graphics.Shapes;
+using osu.Game.Online.API;
 using osu.Game.Screens.Menu;
-using osuTK.Graphics;
+using osu.Game.Users;
 
 namespace osu.Game.Tests.Visual
 {
-    public class TestCaseDisclaimer : OsuTestCase
+    public class TestCaseDisclaimer : ScreenTestCase
     {
+        [Cached(typeof(IAPIProvider))]
+        private readonly DummyAPIAccess api = new DummyAPIAccess();
+
         [BackgroundDependencyLoader]
         private void load()
         {
-            Children = new Drawable[]
+            Add(api);
+
+            AddStep("load disclaimer", () => LoadScreen(new Disclaimer()));
+
+            AddStep("toggle support", () =>
             {
-                new Box
+                api.LocalUser.Value = new User
                 {
-                    RelativeSizeAxes = Axes.Both,
-                    Colour = Color4.Black,
-                },
-                new Disclaimer()
-            };
+                    Username = api.LocalUser.Value.Username,
+                    Id = api.LocalUser.Value.Id,
+                    IsSupporter = !api.LocalUser.Value.IsSupporter,
+                };
+            });
         }
     }
 }

@@ -4,25 +4,37 @@
 using System.ComponentModel;
 using System.Linq;
 using osu.Game.Rulesets;
-using osu.Game.Rulesets.Mods;
+using osu.Game.Rulesets.Scoring;
+using osu.Game.Scoring;
 using osu.Game.Screens.Play;
 
 namespace osu.Game.Tests.Visual
 {
     [Description("Player instantiated with a replay.")]
-    public class TestCaseReplay : TestCasePlayer
+    public class TestCaseReplay : AllPlayersTestCase
     {
         protected override Player CreatePlayer(Ruleset ruleset)
         {
-            // We create a dummy RulesetContainer just to get the replay - we don't want to use mods here
-            // to simulate setting a replay rather than having the replay already set for us
-            Beatmap.Value.Mods.Value = Beatmap.Value.Mods.Value.Concat(new[] { ruleset.GetAutoplayMod() });
-            var dummyRulesetContainer = ruleset.CreateRulesetContainerWith(Beatmap.Value);
+            var beatmap = Beatmap.Value.GetPlayableBeatmap(ruleset.RulesetInfo);
 
-            // Reset the mods
-            Beatmap.Value.Mods.Value = Beatmap.Value.Mods.Value.Where(m => !(m is ModAutoplay));
+            return new ScoreAccessibleReplayPlayer(ruleset.GetAutoplayMod().CreateReplayScore(beatmap));
+        }
 
-            return new ReplayPlayer(dummyRulesetContainer.ReplayScore);
+        protected override void AddCheckSteps()
+        {
+            AddUntilStep("score above zero", () => ((ScoreAccessibleReplayPlayer)Player).ScoreProcessor.TotalScore.Value > 0);
+            AddUntilStep("key counter counted keys", () => ((ScoreAccessibleReplayPlayer)Player).HUDOverlay.KeyCounter.Children.Any(kc => kc.CountPresses > 0));
+        }
+
+        private class ScoreAccessibleReplayPlayer : ReplayPlayer
+        {
+            public new ScoreProcessor ScoreProcessor => base.ScoreProcessor;
+            public new HUDOverlay HUDOverlay => base.HUDOverlay;
+
+            public ScoreAccessibleReplayPlayer(Score score)
+                : base(score)
+            {
+            }
         }
     }
 }

@@ -2,13 +2,15 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using NUnit.Framework;
+using osu.Game.Tests.Visual;
 
 namespace osu.Game.Rulesets.Catch.Tests
 {
     [TestFixture]
-    public class TestCaseCatchPlayer : Game.Tests.Visual.TestCasePlayer
+    public class TestCaseCatchPlayer : PlayerTestCase
     {
-        public TestCaseCatchPlayer() : base(new CatchRuleset())
+        public TestCaseCatchPlayer()
+            : base(new CatchRuleset())
         {
         }
     }

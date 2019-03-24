@@ -18,6 +18,7 @@ using System.Linq;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
 using osu.Game.Input.Bindings;
+using Humanizer;
 
 namespace osu.Game.Screens.Play
 {
@@ -92,11 +93,10 @@ namespace osu.Game.Screens.Play
                                 new OsuSpriteText
                                 {
                                     Text = Header,
-                                    Font = @"Exo2.0-Medium",
+                                    Font = OsuFont.GetFont(size: 30),
                                     Spacing = new Vector2(5, 0),
                                     Origin = Anchor.TopCentre,
                                     Anchor = Anchor.TopCentre,
-                                    TextSize = 30,
                                     Colour = colours.Yellow,
                                     Shadow = true,
                                     ShadowColour = new Color4(0, 0, 0, 0.25f)
@@ -180,7 +180,7 @@ namespace osu.Game.Screens.Play
                 }
             };
 
-            button.Selected.ValueChanged += s => buttonSelectionChanged(button, s);
+            button.Selected.ValueChanged += selected => buttonSelectionChanged(button, selected.NewValue);
 
             InternalButtons.Add(button);
         }
@@ -189,7 +189,7 @@ namespace osu.Game.Screens.Play
 
         private int selectionIndex
         {
-            get { return _selectionIndex; }
+            get => _selectionIndex;
             set
             {
                 if (_selectionIndex == value)
@@ -270,22 +270,21 @@ namespace osu.Game.Screens.Play
                     Text = "You've retried ",
                     Shadow = true,
                     ShadowColour = new Color4(0, 0, 0, 0.25f),
-                    TextSize = 18
+                    Font = OsuFont.GetFont(size: 18),
                 },
                 new OsuSpriteText
                 {
-                    Text = $"{retries:n0}",
-                    Font = @"Exo2.0-Bold",
+                    Text = "time".ToQuantity(retries),
+                    Font = OsuFont.GetFont(weight: FontWeight.Bold, size: 18),
                     Shadow = true,
                     ShadowColour = new Color4(0, 0, 0, 0.25f),
-                    TextSize = 18
                 },
                 new OsuSpriteText
                 {
-                    Text = $" time{(retries == 1 ? "" : "s")} in this session",
+                    Text = " in this session",
                     Shadow = true,
                     ShadowColour = new Color4(0, 0, 0, 0.25f),
-                    TextSize = 18
+                    Font = OsuFont.GetFont(size: 18),
                 }
             };
         }

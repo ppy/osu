@@ -9,8 +9,10 @@ namespace osu.Game.Configuration
     {
         [Description("Sequential")]
         Sequential,
+
         [Description("Overlapping")]
         Overlapping,
+
         [Description("Constant")]
         Constant
     }

@@ -92,8 +92,8 @@ namespace osu.Game.Rulesets.Mania.Scoring
         {
         }
 
-        public ManiaScoreProcessor(RulesetContainer<ManiaHitObject> rulesetContainer)
-            : base(rulesetContainer)
+        public ManiaScoreProcessor(DrawableRuleset<ManiaHitObject> drawableRuleset)
+            : base(drawableRuleset)
         {
         }
 
@@ -159,6 +159,6 @@ namespace osu.Game.Rulesets.Mania.Scoring
             }
         }
 
-        protected override HitWindows CreateHitWindows() => new ManiaHitWindows();
+        public override HitWindows CreateHitWindows() => new ManiaHitWindows();
     }
 }

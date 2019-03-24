@@ -3,6 +3,7 @@
 
 using System.Collections.Generic;
 using NUnit.Framework;
+using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.MathUtils;
 using osu.Framework.Timing;
@@ -15,23 +16,29 @@ namespace osu.Game.Tests.Visual
     public class TestCaseSongProgress : OsuTestCase
     {
         private readonly SongProgress progress;
-        private readonly SongProgressGraph graph;
+        private readonly TestSongProgressGraph graph;
 
         private readonly StopwatchClock clock;
+
+        [Cached]
+        private readonly GameplayClock gameplayClock;
+
+        private readonly FramedClock framedClock;
 
         public TestCaseSongProgress()
         {
             clock = new StopwatchClock(true);
 
+            gameplayClock = new GameplayClock(framedClock = new FramedClock(clock));
+
             Add(progress = new SongProgress
             {
                 RelativeSizeAxes = Axes.X,
-                AudioClock = new StopwatchClock(true),
                 Anchor = Anchor.BottomLeft,
                 Origin = Anchor.BottomLeft,
             });
 
-            Add(graph = new SongProgressGraph
+            Add(graph = new TestSongProgressGraph
             {
                 RelativeSizeAxes = Axes.X,
                 Height = 200,
@@ -39,13 +46,24 @@ namespace osu.Game.Tests.Visual
                 Origin = Anchor.TopLeft,
             });
 
+            AddWaitStep("wait some", 5);
+            AddAssert("ensure not created", () => graph.CreationCount == 0);
+
+            AddStep("display values", displayNewValues);
+            AddWaitStep("wait some", 5);
+            AddUntilStep("wait for creation count", () => graph.CreationCount == 1);
+
             AddStep("Toggle Bar", () => progress.AllowSeeking = !progress.AllowSeeking);
-            AddWaitStep(5);
+            AddWaitStep("wait some", 5);
+            AddUntilStep("wait for creation count", () => graph.CreationCount == 1);
+
             AddStep("Toggle Bar", () => progress.AllowSeeking = !progress.AllowSeeking);
-            AddWaitStep(2);
+            AddWaitStep("wait some", 5);
+            AddUntilStep("wait for creation count", () => graph.CreationCount == 1);
             AddRepeatStep("New Values", displayNewValues, 5);
 
-            displayNewValues();
+            AddWaitStep("wait some", 5);
+            AddAssert("ensure debounced", () => graph.CreationCount == 2);
         }
 
         private void displayNewValues()
@@ -57,8 +75,24 @@ namespace osu.Game.Tests.Visual
             progress.Objects = objects;
             graph.Objects = objects;
 
-            progress.AudioClock = clock;
-            progress.OnSeek = pos => clock.Seek(pos);
+            progress.RequestSeek = pos => clock.Seek(pos);
+        }
+
+        protected override void Update()
+        {
+            base.Update();
+            framedClock.ProcessFrame();
+        }
+
+        private class TestSongProgressGraph : SongProgressGraph
+        {
+            public int CreationCount { get; private set; }
+
+            protected override void RecreateGraph()
+            {
+                base.RecreateGraph();
+                CreationCount++;
+            }
         }
     }
 }

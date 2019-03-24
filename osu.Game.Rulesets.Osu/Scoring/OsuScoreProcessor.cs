@@ -15,8 +15,8 @@ namespace osu.Game.Rulesets.Osu.Scoring
 {
     internal class OsuScoreProcessor : ScoreProcessor<OsuHitObject>
     {
-        public OsuScoreProcessor(RulesetContainer<OsuHitObject> rulesetContainer)
-            : base(rulesetContainer)
+        public OsuScoreProcessor(DrawableRuleset<OsuHitObject> drawableRuleset)
+            : base(drawableRuleset)
         {
         }
 
@@ -74,6 +74,6 @@ namespace osu.Game.Rulesets.Osu.Scoring
 
         protected override JudgementResult CreateResult(Judgement judgement) => new OsuJudgementResult(judgement);
 
-        protected override HitWindows CreateHitWindows() => new OsuHitWindows();
+        public override HitWindows CreateHitWindows() => new OsuHitWindows();
     }
 }

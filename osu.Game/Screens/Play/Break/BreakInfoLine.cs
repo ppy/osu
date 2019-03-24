@@ -2,7 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
-using osu.Framework.Configuration;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics;
@@ -34,7 +34,7 @@ namespace osu.Game.Screens.Play.Break
                     Anchor = Anchor.Centre,
                     Origin = Anchor.CentreRight,
                     Text = name,
-                    TextSize = 17,
+                    Font = OsuFont.GetFont(size: 17),
                     Margin = new MarginPadding { Right = margin }
                 },
                 valueText = new OsuSpriteText
@@ -42,8 +42,7 @@ namespace osu.Game.Screens.Play.Break
                     Anchor = Anchor.Centre,
                     Origin = Anchor.CentreLeft,
                     Text = prefix + @"-",
-                    TextSize = 17,
-                    Font = "Exo2.0-Bold",
+                    Font = OsuFont.GetFont(weight: FontWeight.Bold, size: 17),
                     Margin = new MarginPadding { Left = margin }
                 }
             };
@@ -51,9 +50,9 @@ namespace osu.Game.Screens.Play.Break
             Current.ValueChanged += currentValueChanged;
         }
 
-        private void currentValueChanged(T newValue)
+        private void currentValueChanged(ValueChangedEvent<T> e)
         {
-            var newText = prefix + Format(newValue);
+            var newText = prefix + Format(e.NewValue);
 
             if (valueText.Text == newText)
                 return;
@@ -73,7 +72,8 @@ namespace osu.Game.Screens.Play.Break
 
     public class PercentageBreakInfoLine : BreakInfoLine<double>
     {
-        public PercentageBreakInfoLine(string name, string prefix = "") : base(name, prefix)
+        public PercentageBreakInfoLine(string name, string prefix = "")
+            : base(name, prefix)
         {
         }
 

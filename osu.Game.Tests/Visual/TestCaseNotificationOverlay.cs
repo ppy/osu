@@ -47,7 +47,7 @@ namespace osu.Game.Tests.Visual
             void setState(Visibility state) => AddStep(state.ToString(), () => manager.State = state);
             void checkProgressingCount(int expected) => AddAssert($"progressing count is {expected}", () => progressingNotifications.Count == expected);
 
-            manager.UnreadCount.ValueChanged += count => { displayedCount.Text = $"displayed count: {count}"; };
+            manager.UnreadCount.ValueChanged += count => { displayedCount.Text = $"displayed count: {count.NewValue}"; };
 
             setState(Visibility.Visible);
             AddStep(@"simple #1", sendHelloNotification);
@@ -60,7 +60,7 @@ namespace osu.Game.Tests.Visual
             setState(Visibility.Hidden);
 
             AddRepeatStep(@"add many simple", sendManyNotifications, 3);
-            AddWaitStep(5);
+            AddWaitStep("wait some", 5);
 
             checkProgressingCount(0);
 
@@ -70,7 +70,7 @@ namespace osu.Game.Tests.Visual
 
             AddAssert("Displayed count is 33", () => manager.UnreadCount.Value == 33);
 
-            AddWaitStep(10);
+            AddWaitStep("wait some", 10);
 
             checkProgressingCount(0);
 

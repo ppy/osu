@@ -4,6 +4,7 @@
 using NUnit.Framework;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Screens;
 using osu.Game.Screens;
 using osu.Game.Screens.Menu;
 using osuTK.Graphics;
@@ -24,30 +25,30 @@ namespace osu.Game.Tests.Visual
 
             bool logoVisible = false;
             AddStep("almost instant display", () => Child = loader = new TestLoader(250));
-            AddUntilStep(() =>
+            AddUntilStep("loaded", () =>
             {
                 logoVisible = loader.Logo?.Alpha > 0;
                 return loader.Logo != null && loader.ScreenLoaded;
-            }, "loaded");
+            });
             AddAssert("logo not visible", () => !logoVisible);
 
             AddStep("short load", () => Child = loader = new TestLoader(800));
-            AddUntilStep(() =>
+            AddUntilStep("loaded", () =>
             {
                 logoVisible = loader.Logo?.Alpha > 0;
                 return loader.Logo != null && loader.ScreenLoaded;
-            }, "loaded");
+            });
             AddAssert("logo visible", () => logoVisible);
-            AddUntilStep(() => loader.Logo?.Alpha == 0, "logo gone");
+            AddUntilStep("logo gone", () => loader.Logo?.Alpha == 0);
 
             AddStep("longer load", () => Child = loader = new TestLoader(1400));
-            AddUntilStep(() =>
+            AddUntilStep("loaded", () =>
             {
                 logoVisible = loader.Logo?.Alpha > 0;
                 return loader.Logo != null && loader.ScreenLoaded;
-            }, "loaded");
+            });
             AddAssert("logo visible", () => logoVisible);
-            AddUntilStep(() => loader.Logo?.Alpha == 0, "logo gone");
+            AddUntilStep("logo gone", () => loader.Logo?.Alpha == 0);
         }
 
         private class TestLoader : Loader
@@ -57,7 +58,7 @@ namespace osu.Game.Tests.Visual
             public OsuLogo Logo;
             private TestScreen screen;
 
-            public bool ScreenLoaded => screen.IsCurrentScreen;
+            public bool ScreenLoaded => screen.IsCurrentScreen();
 
             public TestLoader(double delay)
             {
@@ -96,7 +97,7 @@ namespace osu.Game.Tests.Visual
             {
                 public TestScreen()
                 {
-                    Child = new Box
+                    InternalChild = new Box
                     {
                         RelativeSizeAxes = Axes.Both,
                         Colour = Color4.DarkSlateGray,
@@ -107,7 +108,7 @@ namespace osu.Game.Tests.Visual
                 protected override void LogoArriving(OsuLogo logo, bool resuming)
                 {
                     base.LogoArriving(logo, resuming);
-                    Child.FadeInFromZero(200);
+                    InternalChild.FadeInFromZero(200);
                 }
             }
         }

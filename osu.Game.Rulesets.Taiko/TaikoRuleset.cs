@@ -11,6 +11,7 @@ using System.Collections.Generic;
 using osu.Framework.Graphics;
 using osu.Framework.Input.Bindings;
 using osu.Game.Rulesets.Replays.Types;
+using osu.Game.Rulesets.Taiko.Objects;
 using osu.Game.Rulesets.Taiko.Replays;
 using osu.Game.Beatmaps.Legacy;
 using osu.Game.Rulesets.Difficulty;
@@ -22,7 +23,7 @@ namespace osu.Game.Rulesets.Taiko
 {
     public class TaikoRuleset : Ruleset
     {
-        public override RulesetContainer CreateRulesetContainerWith(WorkingBeatmap beatmap) => new TaikoRulesetContainer(this, beatmap);
+        public override DrawableRuleset CreateDrawableRulesetWith(WorkingBeatmap beatmap) => new DrawableTaikoRuleset(this, beatmap);
         public override IBeatmapConverter CreateBeatmapConverter(IBeatmap beatmap) => new TaikoBeatmapConverter(beatmap);
 
         public override IEnumerable<KeyBinding> GetDefaultKeyBindings(int variant = 0) => new[]
@@ -98,6 +99,11 @@ namespace osu.Game.Rulesets.Taiko
                     {
                         new MultiMod(new TaikoModAutoplay(), new ModCinema()),
                         new TaikoModRelax(),
+                    };
+                case ModType.Fun:
+                    return new Mod[]
+                    {
+                        new MultiMod(new ModWindUp<TaikoHitObject>(), new ModWindDown<TaikoHitObject>())
                     };
                 default:
                     return new Mod[] { };

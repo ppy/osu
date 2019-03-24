@@ -13,7 +13,7 @@ namespace osu.Game.Overlays.AccountCreation
         private readonly List<Drawable> errorDrawables = new List<Drawable>();
 
         public ErrorTextFlowContainer()
-            : base(cp => { cp.TextSize = 12; })
+            : base(cp => cp.Font = cp.Font.With(size: 12))
         {
         }
 
