@@ -42,10 +42,7 @@ namespace osu.Game.Screens
 
         private void setParallax(IScreen prev, IScreen next)
         {
-            if (next != null)
-            {
-                parallaxContainer.ParallaxAmount = ParallaxContainer.DEFAULT_PARALLAX_AMOUNT * ((IOsuScreen)next).BackgroundParallaxAmount;
-            }
+            parallaxContainer.ParallaxAmount = ParallaxContainer.DEFAULT_PARALLAX_AMOUNT * ((IOsuScreen)next)?.BackgroundParallaxAmount ?? 1.0f;
         }
     }
 }
