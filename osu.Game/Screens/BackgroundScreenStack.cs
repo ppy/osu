@@ -11,6 +11,7 @@ namespace osu.Game.Screens
     public class BackgroundScreenStack : ScreenStack
     {
         public BackgroundScreenStack()
+            : base(false)
         {
             Scale = new Vector2(1.06f);
             RelativeSizeAxes = Axes.Both;

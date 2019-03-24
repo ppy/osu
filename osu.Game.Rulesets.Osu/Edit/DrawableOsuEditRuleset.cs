@@ -9,15 +9,18 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Edit
 {
-    public class OsuEditRulesetContainer : OsuRulesetContainer
+    public class DrawableOsuEditRuleset : DrawableOsuRuleset
     {
-        public OsuEditRulesetContainer(Ruleset ruleset, WorkingBeatmap beatmap)
+        public DrawableOsuEditRuleset(Ruleset ruleset, WorkingBeatmap beatmap)
             : base(ruleset, beatmap)
         {
         }
 
-        protected override CursorContainer CreateCursor() => null;
+        protected override Playfield CreatePlayfield() => new OsuPlayfieldNoCursor { Size = Vector2.One　};
 
-        protected override Playfield CreatePlayfield() => new OsuPlayfield { Size = Vector2.One　};
+        private class OsuPlayfieldNoCursor : OsuPlayfield
+        {
+            protected override CursorContainer CreateCursor() => null;
+        }
     }
 }

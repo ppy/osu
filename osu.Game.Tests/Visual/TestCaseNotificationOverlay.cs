@@ -60,7 +60,7 @@ namespace osu.Game.Tests.Visual
             setState(Visibility.Hidden);
 
             AddRepeatStep(@"add many simple", sendManyNotifications, 3);
-            AddWaitStep(5);
+            AddWaitStep("wait some", 5);
 
             checkProgressingCount(0);
 
@@ -70,7 +70,7 @@ namespace osu.Game.Tests.Visual
 
             AddAssert("Displayed count is 33", () => manager.UnreadCount.Value == 33);
 
-            AddWaitStep(10);
+            AddWaitStep("wait some", 10);
 
             checkProgressingCount(0);
 

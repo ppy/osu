@@ -20,13 +20,13 @@ using osu.Game.Rulesets.UI.Scrolling;
 
 namespace osu.Game.Rulesets.Taiko.UI
 {
-    public class TaikoRulesetContainer : ScrollingRulesetContainer<TaikoPlayfield, TaikoHitObject>
+    public class DrawableTaikoRuleset : DrawableScrollingRuleset<TaikoHitObject>
     {
         protected override ScrollVisualisationMethod VisualisationMethod => ScrollVisualisationMethod.Overlapping;
 
         protected override bool UserScrollSpeedAdjustment => false;
 
-        public TaikoRulesetContainer(Ruleset ruleset, WorkingBeatmap beatmap)
+        public DrawableTaikoRuleset(Ruleset ruleset, WorkingBeatmap beatmap)
             : base(ruleset, beatmap)
         {
             Direction.Value = ScrollingDirection.Left;
@@ -81,7 +81,7 @@ namespace osu.Game.Rulesets.Taiko.UI
 
         public override ScoreProcessor CreateScoreProcessor() => new TaikoScoreProcessor(this);
 
-        public override PassThroughInputManager CreateInputManager() => new TaikoInputManager(Ruleset.RulesetInfo);
+        protected override PassThroughInputManager CreateInputManager() => new TaikoInputManager(Ruleset.RulesetInfo);
 
         protected override Playfield CreatePlayfield() => new TaikoPlayfield(Beatmap.ControlPointInfo);
 

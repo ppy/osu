@@ -1,7 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -12,7 +11,6 @@ using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
 using osu.Framework.Input.StateChanges.Events;
 using osu.Framework.Input.States;
-using osu.Framework.Timing;
 using osu.Game.Configuration;
 using osu.Game.Input.Bindings;
 using osu.Game.Input.Handlers;
@@ -41,6 +39,12 @@ namespace osu.Game.Rulesets.UI
         protected RulesetInputManager(RulesetInfo ruleset, int variant, SimultaneousBindingMode unique)
         {
             InternalChild = KeyBindingContainer = CreateKeyBindingContainer(ruleset, variant, unique);
+        }
+
+        [BackgroundDependencyLoader(true)]
+        private void load(OsuConfigManager config)
+        {
+            mouseDisabled = config.GetBindable<bool>(OsuSetting.MouseDisableButtons);
         }
 
         #region Action mapping (for replays)
@@ -84,127 +88,9 @@ namespace osu.Game.Rulesets.UI
 
         #endregion
 
-        #region Clock control
-
-        private ManualClock clock;
-        private IFrameBasedClock parentClock;
-
-        protected override void LoadComplete()
-        {
-            base.LoadComplete();
-
-            //our clock will now be our parent's clock, but we want to replace this to allow manual control.
-            parentClock = Clock;
-
-            ProcessCustomClock = false;
-            Clock = new FramedClock(clock = new ManualClock
-            {
-                CurrentTime = parentClock.CurrentTime,
-                Rate = parentClock.Rate,
-            });
-        }
-
-        /// <summary>
-        /// Whether we are running up-to-date with our parent clock.
-        /// If not, we will need to keep processing children until we catch up.
-        /// </summary>
-        private bool requireMoreUpdateLoops;
-
-        /// <summary>
-        /// Whether we are in a valid state (ie. should we keep processing children frames).
-        /// This should be set to false when the replay is, for instance, waiting for future frames to arrive.
-        /// </summary>
-        private bool validState;
-
-        protected override bool RequiresChildrenUpdate => base.RequiresChildrenUpdate && validState;
-
-        private bool isAttached => replayInputHandler != null && !UseParentInput;
-
-        private const int max_catch_up_updates_per_frame = 50;
-
-        private const double sixty_frame_time = 1000.0 / 60;
-
-        public override bool UpdateSubTree()
-        {
-            requireMoreUpdateLoops = true;
-            validState = true;
-
-            int loops = 0;
-
-            while (validState && requireMoreUpdateLoops && loops++ < max_catch_up_updates_per_frame)
-            {
-                updateClock();
-
-                if (validState)
-                {
-                    base.UpdateSubTree();
-                    UpdateSubTreeMasking(this, ScreenSpaceDrawQuad.AABBFloat);
-                }
-            }
-
-            return true;
-        }
-
-        private void updateClock()
-        {
-            if (parentClock == null) return;
-
-            clock.Rate = parentClock.Rate;
-            clock.IsRunning = parentClock.IsRunning;
-
-            var newProposedTime = parentClock.CurrentTime;
-
-            try
-            {
-                if (Math.Abs(clock.CurrentTime - newProposedTime) > sixty_frame_time * 1.2f)
-                {
-                    newProposedTime = clock.Rate > 0
-                        ? Math.Min(newProposedTime, clock.CurrentTime + sixty_frame_time)
-                        : Math.Max(newProposedTime, clock.CurrentTime - sixty_frame_time);
-                }
-
-                if (!isAttached)
-                {
-                    clock.CurrentTime = newProposedTime;
-                }
-                else
-                {
-                    double? newTime = replayInputHandler.SetFrameFromTime(newProposedTime);
-
-                    if (newTime == null)
-                    {
-                        // we shouldn't execute for this time value. probably waiting on more replay data.
-                        validState = false;
-
-                        requireMoreUpdateLoops = true;
-                        clock.CurrentTime = newProposedTime;
-                        return;
-                    }
-
-                    clock.CurrentTime = newTime.Value;
-                }
-
-                requireMoreUpdateLoops = clock.CurrentTime != parentClock.CurrentTime;
-            }
-            finally
-            {
-                // The manual clock time has changed in the above code. The framed clock now needs to be updated
-                // to ensure that the its time is valid for our children before input is processed
-                Clock.ProcessFrame();
-            }
-        }
-
-        #endregion
-
         #region Setting application (disables etc.)
 
         private Bindable<bool> mouseDisabled;
-
-        [BackgroundDependencyLoader]
-        private void load(OsuConfigManager config)
-        {
-            mouseDisabled = config.GetBindable<bool>(OsuSetting.MouseDisableButtons);
-        }
 
         protected override bool Handle(UIEvent e)
         {
