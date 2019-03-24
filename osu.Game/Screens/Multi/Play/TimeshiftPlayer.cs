@@ -2,13 +2,19 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using System.Threading;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Logging;
+using osu.Framework.Screens;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Game.Online.Multiplayer;
+using osu.Game.Rulesets;
+using osu.Game.Rulesets.Mods;
 using osu.Game.Scoring;
 using osu.Game.Screens.Multi.Ranking;
 using osu.Game.Screens.Play;
@@ -18,16 +24,25 @@ namespace osu.Game.Screens.Multi.Play
 {
     public class TimeshiftPlayer : Player
     {
-        private readonly Room room;
-        private readonly int playlistItemId;
+        public Action Exited;
+
+        [Resolved(typeof(Room), nameof(Room.RoomID))]
+        private Bindable<int?> roomId { get; set; }
+
+        private readonly PlaylistItem playlistItem;
 
         [Resolved]
-        private APIAccess api { get; set; }
+        private IAPIProvider api { get; set; }
 
-        public TimeshiftPlayer(Room room, int playlistItemId)
+        [Resolved]
+        private IBindable<RulesetInfo> ruleset { get; set; }
+
+        [Resolved]
+        private Bindable<IEnumerable<Mod>> selectedMods { get; set; }
+
+        public TimeshiftPlayer(PlaylistItem playlistItem)
         {
-            this.room = room;
-            this.playlistItemId = playlistItemId;
+            this.playlistItem = playlistItem;
         }
 
         private int? token;
@@ -39,7 +54,17 @@ namespace osu.Game.Screens.Multi.Play
 
             bool failed = false;
 
-            var req = new CreateRoomScoreRequest(room.RoomID.Value ?? 0, playlistItemId);
+            // Sanity checks to ensure that TimeshiftPlayer matches the settings for the current PlaylistItem
+            if (Beatmap.Value.BeatmapInfo.OnlineBeatmapID != playlistItem.Beatmap.OnlineBeatmapID)
+                throw new InvalidOperationException("Current Beatmap does not match PlaylistItem's Beatmap");
+
+            if (ruleset.Value.ID != playlistItem.Ruleset.ID)
+                throw new InvalidOperationException("Current Ruleset does not match PlaylistItem's Ruleset");
+
+            if (!playlistItem.RequiredMods.All(m => selectedMods.Value.Contains(m)))
+                throw new InvalidOperationException("Current Mods do not match PlaylistItem's RequiredMods");
+
+            var req = new CreateRoomScoreRequest(roomId.Value ?? 0, playlistItem.ID);
             req.Success += r => token = r.ID;
             req.Failure += e =>
             {
@@ -50,7 +75,7 @@ namespace osu.Game.Screens.Multi.Play
                 Schedule(() =>
                 {
                     ValidForResume = false;
-                    Exit();
+                    this.Exit();
                 });
             };
 
@@ -58,6 +83,16 @@ namespace osu.Game.Screens.Multi.Play
 
             while (!failed && !token.HasValue)
                 Thread.Sleep(1000);
+        }
+
+        public override bool OnExiting(IScreen next)
+        {
+            if (base.OnExiting(next))
+                return true;
+
+            Exited?.Invoke();
+
+            return false;
         }
 
         protected override ScoreInfo CreateScore()
@@ -74,11 +109,18 @@ namespace osu.Game.Screens.Multi.Play
 
             Debug.Assert(token != null);
 
-            var request = new SubmitRoomScoreRequest(token.Value, room.RoomID.Value ?? 0, playlistItemId, score);
+            var request = new SubmitRoomScoreRequest(token.Value, roomId.Value ?? 0, playlistItem.ID, score);
             request.Failure += e => Logger.Error(e, "Failed to submit score");
             api.Queue(request);
         }
 
-        protected override Results CreateResults(ScoreInfo score) => new MatchResults(score, room);
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+
+            Exited = null;
+        }
+
+        protected override Results CreateResults(ScoreInfo score) => new MatchResults(score);
     }
 }

@@ -42,7 +42,7 @@ namespace osu.Game.Screens.Play.HUD
                 text = new OsuSpriteText
                 {
                     Text = "hold for menu",
-                    Font = @"Exo2.0-Bold",
+                    Font = OsuFont.GetFont(weight: FontWeight.Bold),
                     Anchor = Anchor.CentreLeft,
                     Origin = Anchor.CentreLeft
                 },
@@ -92,30 +92,6 @@ namespace osu.Game.Screens.Play.HUD
             public Action HoverGained;
             public Action HoverLost;
 
-            public bool OnPressed(GlobalAction action)
-            {
-                switch (action)
-                {
-                    case GlobalAction.Back:
-                        BeginConfirm();
-                        return true;
-                }
-
-                return false;
-            }
-
-            public bool OnReleased(GlobalAction action)
-            {
-                switch (action)
-                {
-                    case GlobalAction.Back:
-                        AbortConfirm();
-                        return true;
-                }
-
-                return false;
-            }
-
             [BackgroundDependencyLoader]
             private void load(OsuColour colours)
             {
@@ -163,7 +139,7 @@ namespace osu.Game.Screens.Play.HUD
             private void bind()
             {
                 circularProgress.Current.BindTo(Progress);
-                Progress.ValueChanged += v => icon.Scale = new Vector2(1 + (float)v * 0.2f);
+                Progress.ValueChanged += progress => icon.Scale = new Vector2(1 + (float)progress.NewValue * 0.2f);
             }
 
             private bool pendingAnimation;
@@ -178,7 +154,7 @@ namespace osu.Game.Screens.Play.HUD
                 // avoid starting a new confirm call until we finish animating.
                 pendingAnimation = true;
 
-                Progress.Value = 0;
+                AbortConfirm();
 
                 overlayCircle.ScaleTo(0, 100)
                              .Then().FadeOut().ScaleTo(1).FadeIn(500)
@@ -205,6 +181,31 @@ namespace osu.Game.Screens.Play.HUD
             {
                 HoverLost?.Invoke();
                 base.OnHoverLost(e);
+            }
+
+            public bool OnPressed(GlobalAction action)
+            {
+                switch (action)
+                {
+                    case GlobalAction.Back:
+                        if (!pendingAnimation)
+                            BeginConfirm();
+                        return true;
+                }
+
+                return false;
+            }
+
+            public bool OnReleased(GlobalAction action)
+            {
+                switch (action)
+                {
+                    case GlobalAction.Back:
+                        AbortConfirm();
+                        return true;
+                }
+
+                return false;
             }
 
             protected override bool OnMouseDown(MouseDownEvent e)

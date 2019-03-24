@@ -24,7 +24,7 @@ namespace osu.Game.Rulesets.Taiko.UI
     public class TaikoPlayfield : ScrollingPlayfield
     {
         /// <summary>
-        /// Default height of a <see cref="TaikoPlayfield"/> when inside a <see cref="TaikoRulesetContainer"/>.
+        /// Default height of a <see cref="TaikoPlayfield"/> when inside a <see cref="DrawableTaikoRuleset"/>.
         /// </summary>
         public const float DEFAULT_HEIGHT = 178;
 
@@ -225,7 +225,7 @@ namespace osu.Game.Rulesets.Taiko.UI
 
         internal void OnNewResult(DrawableHitObject judgedObject, JudgementResult result)
         {
-            if (!DisplayJudgements)
+            if (!DisplayJudgements.Value)
                 return;
 
             if (!judgedObject.DisplayResult)

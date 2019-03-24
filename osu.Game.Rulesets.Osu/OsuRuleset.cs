@@ -13,11 +13,15 @@ using osu.Game.Overlays.Settings;
 using osu.Framework.Input.Bindings;
 using osu.Game.Rulesets.Osu.Edit;
 using osu.Game.Rulesets.Edit;
+using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Replays;
 using osu.Game.Rulesets.Replays.Types;
 using osu.Game.Beatmaps.Legacy;
+using osu.Game.Configuration;
+using osu.Game.Rulesets.Configuration;
 using osu.Game.Rulesets.Difficulty;
 using osu.Game.Rulesets.Osu.Beatmaps;
+using osu.Game.Rulesets.Osu.Configuration;
 using osu.Game.Rulesets.Osu.Difficulty;
 using osu.Game.Scoring;
 
@@ -25,7 +29,7 @@ namespace osu.Game.Rulesets.Osu
 {
     public class OsuRuleset : Ruleset
     {
-        public override RulesetContainer CreateRulesetContainerWith(WorkingBeatmap beatmap) => new OsuRulesetContainer(this, beatmap);
+        public override DrawableRuleset CreateDrawableRulesetWith(WorkingBeatmap beatmap) => new DrawableOsuRuleset(this, beatmap);
         public override IBeatmapConverter CreateBeatmapConverter(IBeatmap beatmap) => new OsuBeatmapConverter(beatmap);
         public override IBeatmapProcessor CreateBeatmapProcessor(IBeatmap beatmap) => new OsuBeatmapProcessor(beatmap);
 
@@ -82,6 +86,9 @@ namespace osu.Game.Rulesets.Osu
 
             if (mods.HasFlag(LegacyMods.Target))
                 yield return new OsuModTarget();
+
+            if (mods.HasFlag(LegacyMods.TouchDevice))
+                yield return new OsuModTouchDevice();
         }
 
         public override IEnumerable<Mod> GetModsFor(ModType type)
@@ -118,9 +125,12 @@ namespace osu.Game.Rulesets.Osu
                         new OsuModAutopilot(),
                     };
                 case ModType.Fun:
-                    return new Mod[] {
+                    return new Mod[]
+                    {
                         new OsuModTransform(),
                         new OsuModWiggle(),
+                        new OsuModGrow(),
+                        new MultiMod(new ModWindUp<OsuHitObject>(), new ModWindDown<OsuHitObject>()),
                     };
                 default:
                     return new Mod[] { };
@@ -139,11 +149,13 @@ namespace osu.Game.Rulesets.Osu
 
         public override string ShortName => "osu";
 
-        public override RulesetSettingsSubsection CreateSettings() => new OsuSettings(this);
+        public override RulesetSettingsSubsection CreateSettings() => new OsuSettingsSubsection(this);
 
         public override int? LegacyID => 0;
 
         public override IConvertibleReplayFrame CreateConvertibleReplayFrame() => new OsuReplayFrame();
+
+        public override IRulesetConfigManager CreateConfig(SettingsStore settings) => new OsuRulesetConfigManager(settings, RulesetInfo);
 
         public OsuRuleset(RulesetInfo rulesetInfo = null)
             : base(rulesetInfo)

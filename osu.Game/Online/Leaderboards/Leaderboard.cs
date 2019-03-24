@@ -39,7 +39,7 @@ namespace osu.Game.Online.Leaderboards
 
         public IEnumerable<ScoreInfo> Scores
         {
-            get { return scores; }
+            get => scores;
             set
             {
                 scores = value;
@@ -98,7 +98,7 @@ namespace osu.Game.Online.Leaderboards
 
         public TScope Scope
         {
-            get { return scope; }
+            get => scope;
             set
             {
                 if (value.Equals(scope))
@@ -117,7 +117,7 @@ namespace osu.Game.Online.Leaderboards
         /// </summary>
         protected PlaceholderState PlaceholderState
         {
-            get { return placeholderState; }
+            get => placeholderState;
             set
             {
                 if (value != PlaceholderState.Successful)
@@ -174,12 +174,12 @@ namespace osu.Game.Online.Leaderboards
             };
         }
 
-        private APIAccess api;
+        private IAPIProvider api;
 
         private ScheduledDelegate pendingUpdateScores;
 
         [BackgroundDependencyLoader(true)]
-        private void load(APIAccess api)
+        private void load(IAPIProvider api)
         {
             this.api = api;
             api?.Register(this);
@@ -195,7 +195,7 @@ namespace osu.Game.Online.Leaderboards
 
         private APIRequest getScoresRequest;
 
-        public void APIStateChanged(APIAccess api, APIState state)
+        public void APIStateChanged(IAPIProvider api, APIState state)
         {
             if (state == APIState.Online)
                 UpdateScores();
@@ -213,12 +213,6 @@ namespace osu.Game.Online.Leaderboards
             pendingUpdateScores?.Cancel();
             pendingUpdateScores = Schedule(() =>
             {
-                if (api?.IsLoggedIn != true)
-                {
-                    PlaceholderState = PlaceholderState.NotLoggedIn;
-                    return;
-                }
-
                 PlaceholderState = PlaceholderState.Retrieving;
                 loading.Show();
 
@@ -230,6 +224,12 @@ namespace osu.Game.Online.Leaderboards
 
                 if (getScoresRequest == null)
                     return;
+
+                if (api?.IsLoggedIn != true)
+                {
+                    PlaceholderState = PlaceholderState.NotLoggedIn;
+                    return;
+                }
 
                 getScoresRequest.Failure += e => Schedule(() =>
                 {
@@ -243,6 +243,11 @@ namespace osu.Game.Online.Leaderboards
             });
         }
 
+        /// <summary>
+        /// Performs a fetch/refresh of scores to be displayed.
+        /// </summary>
+        /// <param name="scoresCallback">A callback which should be called when fetching is completed. Scheduling is not required.</param>
+        /// <returns>An <see cref="APIRequest"/> responsible for the fetch operation. This will be queued and performed automatically.</returns>
         protected abstract APIRequest FetchScores(Action<IEnumerable<ScoreInfo>> scoresCallback);
 
         private Placeholder currentPlaceholder;

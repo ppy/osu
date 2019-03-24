@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using osu.Framework.Bindables;
 using osuTK;
 using osuTK.Graphics;
 using osu.Framework.Graphics;
@@ -12,7 +13,6 @@ using osu.Game.Graphics.Backgrounds;
 using osu.Game.Graphics.Sprites;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Game.Graphics.Containers;
-using osu.Framework.Configuration;
 using osu.Framework.Input.Events;
 
 namespace osu.Game.Graphics.UserInterface
@@ -141,8 +141,7 @@ namespace osu.Game.Graphics.UserInterface
                     Text = Text,
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
-                    TextSize = 28,
-                    Font = "Exo2.0-Bold",
+                    Font = OsuFont.GetFont(size: 28, weight: FontWeight.Bold),
                     Shadow = true,
                     ShadowColour = new Color4(0, 0, 0, 0.1f),
                     Colour = Color4.White,
@@ -155,12 +154,10 @@ namespace osu.Game.Graphics.UserInterface
         }
 
         private Color4 buttonColour;
+
         public Color4 ButtonColour
         {
-            get
-            {
-                return buttonColour;
-            }
+            get => buttonColour;
             set
             {
                 buttonColour = value;
@@ -170,12 +167,10 @@ namespace osu.Game.Graphics.UserInterface
         }
 
         private Color4 backgroundColour = OsuColour.Gray(34);
+
         public Color4 BackgroundColour
         {
-            get
-            {
-                return backgroundColour;
-            }
+            get => backgroundColour;
             set
             {
                 backgroundColour = value;
@@ -184,12 +179,10 @@ namespace osu.Game.Graphics.UserInterface
         }
 
         private string text;
+
         public string Text
         {
-            get
-            {
-                return text;
-            }
+            get => text;
             set
             {
                 text = value;
@@ -197,18 +190,10 @@ namespace osu.Game.Graphics.UserInterface
             }
         }
 
-        private float textSize = 28;
         public float TextSize
         {
-            get
-            {
-                return textSize;
-            }
-            set
-            {
-                textSize = value;
-                spriteText.TextSize = value;
-            }
+            get => spriteText.Font.Size;
+            set => spriteText.Font = spriteText.Font.With(size: value);
         }
 
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => backgroundContainer.ReceivePositionalInputAt(screenSpacePos);
@@ -242,9 +227,9 @@ namespace osu.Game.Graphics.UserInterface
             Selected.Value = false;
         }
 
-        private void selectionChanged(bool isSelected)
+        private void selectionChanged(ValueChangedEvent<bool> args)
         {
-            if (isSelected)
+            if (args.NewValue)
             {
                 spriteText.TransformSpacingTo(hoverSpacing, hover_duration, Easing.OutElastic);
                 colourContainer.ResizeTo(new Vector2(hover_width, 1f), hover_duration, Easing.OutElastic);

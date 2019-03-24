@@ -24,7 +24,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
             InternalChild = body = new ManualSliderBody
             {
                 AccentColour = Color4.Transparent,
-                PathWidth = slider.Scale * 64
+                PathRadius = slider.Scale * 64
             };
         }
 
@@ -34,7 +34,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
             body.BorderColour = colours.Yellow;
 
             PositionBindable.BindValueChanged(_ => updatePosition(), true);
-            ScaleBindable.BindValueChanged(v => body.PathWidth = v * 64, true);
+            ScaleBindable.BindValueChanged(scale => body.PathRadius = scale.NewValue * 64, true);
         }
 
         private void updatePosition() => Position = slider.StackedPosition;

@@ -12,7 +12,7 @@ namespace osu.Game.Beatmaps
     /// <summary>
     /// Handles the storage and retrieval of Beatmaps/BeatmapSets to the database backing
     /// </summary>
-    public class BeatmapStore : MutableDatabaseBackedStore<BeatmapSetInfo>
+    public class BeatmapStore : MutableDatabaseBackedStoreWithFileIncludes<BeatmapSetInfo, BeatmapSetFileInfo>
     {
         public event Action<BeatmapInfo> BeatmapHidden;
         public event Action<BeatmapInfo> BeatmapRestored;
@@ -34,6 +34,7 @@ namespace osu.Game.Beatmaps
                 Refresh(ref beatmap, Beatmaps);
 
                 if (beatmap.Hidden) return false;
+
                 beatmap.Hidden = true;
             }
 
@@ -53,6 +54,7 @@ namespace osu.Game.Beatmaps
                 Refresh(ref beatmap, Beatmaps);
 
                 if (!beatmap.Hidden) return false;
+
                 beatmap.Hidden = false;
             }
 
@@ -62,18 +64,17 @@ namespace osu.Game.Beatmaps
 
         protected override IQueryable<BeatmapSetInfo> AddIncludesForDeletion(IQueryable<BeatmapSetInfo> query) =>
             base.AddIncludesForDeletion(query)
-                .Include(s => s.Beatmaps).ThenInclude(b => b.Metadata)
-                .Include(s => s.Beatmaps).ThenInclude(b => b.BaseDifficulty)
                 .Include(s => s.Metadata)
-                .Include(s => s.Beatmaps).ThenInclude(b => b.Scores);
+                .Include(s => s.Beatmaps).ThenInclude(b => b.Scores)
+                .Include(s => s.Beatmaps).ThenInclude(b => b.BaseDifficulty)
+                .Include(s => s.Beatmaps).ThenInclude(b => b.Metadata);
 
         protected override IQueryable<BeatmapSetInfo> AddIncludesForConsumption(IQueryable<BeatmapSetInfo> query) =>
             base.AddIncludesForConsumption(query)
                 .Include(s => s.Metadata)
                 .Include(s => s.Beatmaps).ThenInclude(s => s.Ruleset)
                 .Include(s => s.Beatmaps).ThenInclude(b => b.BaseDifficulty)
-                .Include(s => s.Beatmaps).ThenInclude(b => b.Metadata)
-                .Include(s => s.Files).ThenInclude(f => f.FileInfo);
+                .Include(s => s.Beatmaps).ThenInclude(b => b.Metadata);
 
         protected override void Purge(List<BeatmapSetInfo> items, OsuDbContext context)
         {

@@ -16,15 +16,11 @@ namespace osu.Game.Graphics.UserInterface
 {
     public class OsuTextBox : TextBox, IKeyBindingHandler<GlobalAction>
     {
-        protected override Color4 BackgroundUnfocused => Color4.Black.Opacity(0.5f);
-        protected override Color4 BackgroundFocused => OsuColour.Gray(0.3f).Opacity(0.8f);
-        protected override Color4 BackgroundCommit => BorderColour;
-
         protected override float LeftRightPadding => 10;
 
         protected override SpriteText CreatePlaceholder() => new OsuSpriteText
         {
-            Font = @"Exo2.0-MediumItalic",
+            Font = OsuFont.GetFont(italics: true),
             Colour = new Color4(180, 180, 180, 255),
             Margin = new MarginPadding { Left = 2 },
         };
@@ -41,7 +37,9 @@ namespace osu.Game.Graphics.UserInterface
         [BackgroundDependencyLoader]
         private void load(OsuColour colour)
         {
-            BorderColour = colour.Yellow;
+            BackgroundUnfocused = Color4.Black.Opacity(0.5f);
+            BackgroundFocused = OsuColour.Gray(0.3f).Opacity(0.8f);
+            BackgroundCommit = BorderColour = colour.Yellow;
         }
 
         protected override void OnFocus(FocusEvent e)
@@ -57,7 +55,7 @@ namespace osu.Game.Graphics.UserInterface
             base.OnFocusLost(e);
         }
 
-        protected override Drawable GetDrawableCharacter(char c) => new OsuSpriteText { Text = c.ToString(), TextSize = CalculatedTextSize };
+        protected override Drawable GetDrawableCharacter(char c) => new OsuSpriteText { Text = c.ToString(), Font = OsuFont.GetFont(size: CalculatedTextSize) };
 
         public virtual bool OnPressed(GlobalAction action)
         {

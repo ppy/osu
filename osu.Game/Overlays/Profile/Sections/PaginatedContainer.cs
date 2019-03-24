@@ -3,9 +3,10 @@
 
 using osuTK;
 using osu.Framework.Allocation;
-using osu.Framework.Configuration;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
@@ -27,7 +28,7 @@ namespace osu.Game.Overlays.Profile.Sections
 
         protected readonly Bindable<User> User = new Bindable<User>();
 
-        protected APIAccess Api;
+        protected IAPIProvider Api;
         protected APIRequest RetrievalRequest;
         protected RulesetStore Rulesets;
 
@@ -43,9 +44,8 @@ namespace osu.Game.Overlays.Profile.Sections
             {
                 new OsuSpriteText
                 {
-                    TextSize = 15,
                     Text = header,
-                    Font = "Exo2.0-RegularItalic",
+                    Font = OsuFont.GetFont(size: 15, weight: FontWeight.Regular, italics: true),
                     Margin = new MarginPadding { Top = 10, Bottom = 10 },
                 },
                 ItemsContainer = new FillFlowContainer
@@ -63,9 +63,9 @@ namespace osu.Game.Overlays.Profile.Sections
                     Origin = Anchor.TopCentre,
                     Child = new OsuSpriteText
                     {
-                        TextSize = 14,
+                        Font = OsuFont.GetFont(size: 14),
                         Text = "show more",
-                        Padding = new MarginPadding {Vertical = 10, Horizontal = 15 },
+                        Padding = new MarginPadding { Vertical = 10, Horizontal = 15 },
                     }
                 },
                 ShowMoreLoading = new LoadingAnimation
@@ -76,7 +76,7 @@ namespace osu.Game.Overlays.Profile.Sections
                 },
                 MissingText = new OsuSpriteText
                 {
-                    TextSize = 14,
+                    Font = OsuFont.GetFont(size: 14),
                     Text = missing,
                     Alpha = 0,
                 },
@@ -84,7 +84,7 @@ namespace osu.Game.Overlays.Profile.Sections
         }
 
         [BackgroundDependencyLoader]
-        private void load(APIAccess api, RulesetStore rulesets)
+        private void load(IAPIProvider api, RulesetStore rulesets)
         {
             Api = api;
             Rulesets = rulesets;
@@ -93,13 +93,13 @@ namespace osu.Game.Overlays.Profile.Sections
             User.TriggerChange();
         }
 
-        private void onUserChanged(User newUser)
+        private void onUserChanged(ValueChangedEvent<User> e)
         {
             VisiblePages = 0;
             ItemsContainer.Clear();
             ShowMoreButton.Hide();
 
-            if (newUser != null)
+            if (e.NewValue != null)
                 ShowMore();
         }
 

@@ -9,7 +9,7 @@ using osu.Game.Rulesets.Objects.Drawables;
 
 namespace osu.Game.Rulesets.UI
 {
-    public class HitObjectContainer : CompositeDrawable
+    public class HitObjectContainer : LifetimeManagementContainer
     {
         public IEnumerable<DrawableHitObject> Objects => InternalChildren.Cast<DrawableHitObject>().OrderBy(h => h.HitObject.StartTime);
         public IEnumerable<DrawableHitObject> AliveObjects => AliveInternalChildren.Cast<DrawableHitObject>().OrderBy(h => h.HitObject.StartTime);
@@ -30,6 +30,12 @@ namespace osu.Game.Rulesets.UI
             // Put earlier hitobjects towards the end of the list, so they handle input first
             int i = yObj.HitObject.StartTime.CompareTo(xObj.HitObject.StartTime);
             return i == 0 ? CompareReverseChildID(x, y) : i;
+        }
+
+        protected override void OnChildLifetimeBoundaryCrossed(LifetimeBoundaryCrossedEvent e)
+        {
+            if (e.Kind == LifetimeBoundaryKind.End && e.Direction == LifetimeBoundaryCrossingDirection.Forward && e.Child is DrawableHitObject hitObject)
+                hitObject.OnLifetimeEnd();
         }
     }
 }

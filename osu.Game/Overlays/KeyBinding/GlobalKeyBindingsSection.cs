@@ -9,7 +9,7 @@ namespace osu.Game.Overlays.KeyBinding
 {
     public class GlobalKeyBindingsSection : SettingsSection
     {
-        public override FontAwesome Icon => FontAwesome.fa_osu_hot;
+        public override FontAwesome Icon => FontAwesome.fa_globe;
         public override string Header => "Global";
 
         public GlobalKeyBindingsSection(GlobalActionContainer manager)
@@ -33,7 +33,8 @@ namespace osu.Game.Overlays.KeyBinding
         {
             protected override string Header => "In Game";
 
-            public InGameKeyBindingsSubsection(GlobalActionContainer manager) : base(null)
+            public InGameKeyBindingsSubsection(GlobalActionContainer manager)
+                : base(null)
             {
                 Defaults = manager.InGameKeyBindings;
             }
