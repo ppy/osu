@@ -22,7 +22,7 @@ namespace osu.Game.Overlays.AccountCreation
     {
         private OsuTextFlowContainer multiAccountExplanationText;
         private LinkFlowContainer furtherAssistance;
-        private APIAccess api;
+        private IAPIProvider api;
 
         private const string help_centre_url = "/help/wiki/Help_Centre#login";
 
@@ -39,7 +39,7 @@ namespace osu.Game.Overlays.AccountCreation
         }
 
         [BackgroundDependencyLoader(true)]
-        private void load(OsuColour colours, APIAccess api, OsuGame game, TextureStore textures)
+        private void load(OsuColour colours, IAPIProvider api, OsuGame game, TextureStore textures)
         {
             this.api = api;
 

@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using osu.Game.Beatmaps;
@@ -21,6 +22,18 @@ namespace osu.Game.Tests.Beatmaps
             HitObjects = baseBeatmap.HitObjects;
 
             BeatmapInfo.Ruleset = ruleset;
+            BeatmapInfo.BeatmapSet.Metadata = BeatmapInfo.Metadata;
+            BeatmapInfo.BeatmapSet.Beatmaps = new List<BeatmapInfo> { BeatmapInfo };
+            BeatmapInfo.BeatmapSet.OnlineInfo = new BeatmapSetOnlineInfo
+            {
+                Status = BeatmapSetOnlineStatus.Ranked,
+                Covers = new BeatmapSetOnlineCovers
+                {
+                    Cover = "https://assets.ppy.sh/beatmaps/163112/covers/cover.jpg",
+                    Card = "https://assets.ppy.sh/beatmaps/163112/covers/card.jpg",
+                    List = "https://assets.ppy.sh/beatmaps/163112/covers/list.jpg"
+                }
+            };
         }
 
         private static Beatmap createTestBeatmap()

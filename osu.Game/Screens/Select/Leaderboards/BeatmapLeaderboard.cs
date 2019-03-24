@@ -43,7 +43,7 @@ namespace osu.Game.Screens.Select.Leaderboards
         private IBindable<RulesetInfo> ruleset { get; set; }
 
         [Resolved]
-        private APIAccess api { get; set; }
+        private IAPIProvider api { get; set; }
 
         [BackgroundDependencyLoader]
         private void load()

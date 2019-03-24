@@ -24,10 +24,13 @@ namespace osu.Game.Tests.Visual
         public TestCaseToolbar()
         {
             var toolbar = new Toolbar { State = Visibility.Visible };
+            ToolbarNotificationButton notificationButton = null;
 
-            Add(toolbar);
-
-            var notificationButton = toolbar.Children.OfType<FillFlowContainer>().Last().Children.OfType<ToolbarNotificationButton>().First();
+            AddStep("create toolbar", () =>
+            {
+                Add(toolbar);
+                notificationButton = toolbar.Children.OfType<FillFlowContainer>().Last().Children.OfType<ToolbarNotificationButton>().First();
+            });
 
             void setNotifications(int count) => AddStep($"set notification count to {count}", () => notificationButton.NotificationCount.Value = count);
 
