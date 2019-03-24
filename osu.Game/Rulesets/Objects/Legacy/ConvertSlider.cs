@@ -23,7 +23,8 @@ namespace osu.Game.Rulesets.Objects.Legacy
 
         public double Distance => Path.Distance;
 
-        public List<List<SampleInfo>> NodeSamples { get; set; }
+        public List<List<SampleInfo>> NodeSamples { get; set; } = new List<List<SampleInfo>>();
+
         public int RepeatCount { get; set; }
 
         public double EndTime => StartTime + this.SpanCount() * Distance / Velocity;

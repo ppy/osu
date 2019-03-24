@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Linq;
 using osu.Framework;
 using osu.Framework.Platform;
 
@@ -14,7 +15,10 @@ namespace osu.Game.Tests
         {
             using (DesktopGameHost host = Host.GetSuitableHost(@"osu", true))
             {
-                host.Run(new OsuTestBrowser());
+                if (args.FirstOrDefault() == "--benchmark")
+                    host.Run(new Benchmark());
+                else
+                    host.Run(new OsuTestBrowser());
                 return 0;
             }
         }
