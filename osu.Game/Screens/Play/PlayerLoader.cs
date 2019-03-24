@@ -35,6 +35,8 @@ namespace osu.Game.Screens.Play
 
         private FacadeContainer content;
 
+        protected virtual FacadeContainer CreateFacadeContainer() => new FacadeContainer();
+
         private BeatmapMetadataDisplay info;
 
         private bool hideOverlays;
@@ -60,32 +62,30 @@ namespace osu.Game.Screens.Play
         [BackgroundDependencyLoader]
         private void load()
         {
-            InternalChild = content = new FacadeContainer
+            InternalChild = content = CreateFacadeContainer();
+            content.Anchor = Anchor.Centre;
+            content.Origin = Anchor.Centre;
+            content.RelativeSizeAxes = Axes.Both;
+            content.Children = new Drawable[]
             {
-                Anchor = Anchor.Centre,
-                Origin = Anchor.Centre,
-                RelativeSizeAxes = Axes.Both,
-                Children = new Drawable[]
+                info = new BeatmapMetadataDisplay(Beatmap.Value)
                 {
-                    info = new BeatmapMetadataDisplay(Beatmap.Value)
+                    Alpha = 0,
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                },
+                new FillFlowContainer<PlayerSettingsGroup>
+                {
+                    Anchor = Anchor.TopRight,
+                    Origin = Anchor.TopRight,
+                    AutoSizeAxes = Axes.Both,
+                    Direction = FillDirection.Vertical,
+                    Spacing = new Vector2(0, 20),
+                    Margin = new MarginPadding(25),
+                    Children = new PlayerSettingsGroup[]
                     {
-                        Alpha = 0,
-                        Anchor = Anchor.Centre,
-                        Origin = Anchor.Centre,
-                    },
-                    new FillFlowContainer<PlayerSettingsGroup>
-                    {
-                        Anchor = Anchor.TopRight,
-                        Origin = Anchor.TopRight,
-                        AutoSizeAxes = Axes.Both,
-                        Direction = FillDirection.Vertical,
-                        Spacing = new Vector2(0, 20),
-                        Margin = new MarginPadding(25),
-                        Children = new PlayerSettingsGroup[]
-                        {
-                            VisualSettings = new VisualSettings(),
-                            new InputSettings()
-                        }
+                        VisualSettings = new VisualSettings(),
+                        new InputSettings()
                     }
                 }
             };

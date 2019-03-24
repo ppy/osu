@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -19,9 +20,11 @@ namespace osu.Game.Graphics.Containers
         private bool tracking;
         private bool smoothTransform;
 
+        protected virtual Facade CreateFacade() => new Facade();
+
         public FacadeContainer()
         {
-            facade = new Facade();
+            facade = CreateFacade();
         }
 
         private Vector2 logoTrackingPosition => logo.Parent.ToLocalSpace(facade.ScreenSpaceDrawQuad.Centre);
@@ -44,30 +47,26 @@ namespace osu.Game.Graphics.Containers
         {
             base.UpdateAfterChildren();
 
-            facade.Size = new Vector2(logo.SizeForFlow * 0.3f);
-
-            if (!tracking)
+            if (logo == null)
                 return;
 
-            logo.RelativePositionAxes = Axes.None;
+            facade.Size = new Vector2(logo.SizeForFlow * 0.3f);
 
-            bool childrenLoaded = true;
-
-            foreach (var d in Children)
-            {
-                if (!d.IsAlive)
-                    childrenLoaded = false;
-            }
-
-            if (smoothTransform && childrenLoaded)
+            if (smoothTransform && facade.IsLoaded && logo.Transforms.Count == 0)
             {
                 // Our initial movement to the tracking location should be smooth.
-                Schedule(() => logo.MoveTo(logoTrackingPosition, 500, Easing.InOutExpo));
-                smoothTransform = false;
+                Schedule(() =>
+                {
+                    facade.Size = new Vector2(logo.SizeForFlow * 0.3f);
+                    logo.RelativePositionAxes = Axes.None;
+                    logo.MoveTo(logoTrackingPosition, 500, Easing.InOutExpo);
+                    smoothTransform = false;
+                });
             }
-            else if (logo.Transforms.Count == 0)
+            else if (facade.IsLoaded && logo.Transforms.Count == 0)
             {
                 // If all transforms have finished playing, the logo constantly track the position of the facade.
+                logo.RelativePositionAxes = Axes.None;
                 logo.Position = logoTrackingPosition;
             }
         }
