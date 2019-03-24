@@ -7,8 +7,10 @@ using System.ComponentModel;
 using System.Linq;
 using osuTK.Input;
 using osu.Framework.Allocation;
+using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Logging;
+using osu.Game.Input.Bindings;
 using osu.Game.Screens.Play;
 using osuTK;
 
@@ -22,21 +24,29 @@ namespace osu.Game.Tests.Visual
         private FailOverlay failOverlay;
         private PauseOverlay pauseOverlay;
 
-        [BackgroundDependencyLoader]
-        private void load()
-        {
-            Add(pauseOverlay = new PauseOverlay
-            {
-                OnResume = () => Logger.Log(@"Resume"),
-                OnRetry = () => Logger.Log(@"Retry"),
-                OnQuit = () => Logger.Log(@"Quit"),
-            });
+        private GlobalActionContainer globalActionContainer;
 
-            Add(failOverlay = new FailOverlay
+        [BackgroundDependencyLoader]
+        private void load(OsuGameBase game)
+        {
+            Child = globalActionContainer = new GlobalActionContainer(game)
             {
-                OnRetry = () => Logger.Log(@"Retry"),
-                OnQuit = () => Logger.Log(@"Quit"),
-            });
+                Children = new Drawable[]
+                {
+                    pauseOverlay = new PauseOverlay
+                    {
+                        OnResume = () => Logger.Log(@"Resume"),
+                        OnRetry = () => Logger.Log(@"Retry"),
+                        OnQuit = () => Logger.Log(@"Quit"),
+                    },
+                    failOverlay = new FailOverlay
+
+                    {
+                        OnRetry = () => Logger.Log(@"Retry"),
+                        OnQuit = () => Logger.Log(@"Quit"),
+                    }
+                }
+            };
 
             var retryCount = 0;
 
@@ -79,12 +89,6 @@ namespace osu.Game.Tests.Visual
             AddAssert("Overlay state is reset", () => !failOverlay.Buttons.Any(b => b.Selected.Value));
         }
 
-        private void press(Key key)
-        {
-            InputManager.PressKey(key);
-            InputManager.ReleaseKey(key);
-        }
-
         /// <summary>
         /// Tests that pressing enter after an overlay shows doesn't trigger an event because a selection hasn't occurred.
         /// </summary>
@@ -92,7 +96,7 @@ namespace osu.Game.Tests.Visual
         {
             AddStep("Show overlay", () => pauseOverlay.Show());
 
-            AddStep("Press enter", () => press(Key.Enter));
+            AddStep("Press select", () => press(GlobalAction.Select));
             AddAssert("Overlay still open", () => pauseOverlay.State == Visibility.Visible);
 
             AddStep("Hide overlay", () => pauseOverlay.Hide());
@@ -269,6 +273,18 @@ namespace osu.Game.Tests.Visual
                 return triggered;
             });
             AddAssert("Overlay is closed", () => pauseOverlay.State == Visibility.Hidden);
+        }
+
+        private void press(Key key)
+        {
+            InputManager.PressKey(key);
+            InputManager.ReleaseKey(key);
+        }
+
+        private void press(GlobalAction action)
+        {
+            globalActionContainer.TriggerPressed(action);
+            globalActionContainer.TriggerReleased(action);
         }
     }
 }
