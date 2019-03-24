@@ -15,10 +15,7 @@ namespace osu.Game.Tests.Visual
 
         protected ScreenTestCase()
         {
-            Children = new Drawable[]
-            {
-                stack = new OsuScreenStack { RelativeSizeAxes = Axes.Both }
-            };
+            Child = stack = new OsuScreenStack { RelativeSizeAxes = Axes.Both };
         }
 
         protected void LoadScreen(OsuScreen screen)

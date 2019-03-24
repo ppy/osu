@@ -199,8 +199,6 @@ namespace osu.Game
             LocalConfig.BindWith(OsuSetting.VolumeInactive, inactiveVolumeAdjust);
 
             IsActive.BindValueChanged(active => updateActiveState(active.NewValue), true);
-
-            screenStack = new OsuScreenStack { RelativeSizeAxes = Axes.Both };
         }
 
         private ExternalLinkOpener externalLinkOpener;
@@ -388,7 +386,7 @@ namespace osu.Game
                     RelativeSizeAxes = Axes.Both,
                     Children = new Drawable[]
                     {
-                        screenStack,
+                        screenStack = new OsuScreenStack { RelativeSizeAxes = Axes.Both },
                         logoContainer = new Container { RelativeSizeAxes = Axes.Both },
                     }
                 },
@@ -407,7 +405,7 @@ namespace osu.Game
             {
                 logoContainer.Add(logo);
 
-                // Loader has to be created synchronously in order for DI to be successful for its background screen stack.
+                // Loader has to be created after the logo has finished loading as Loader performs logo transformations on entering.
                 screenStack.Push(new Loader
                 {
                     RelativeSizeAxes = Axes.Both
