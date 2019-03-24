@@ -13,7 +13,7 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawable
     {
         private readonly Container bananaContainer;
 
-        public DrawableBananaShower(BananaShower s, Func<CatchHitObject, DrawableHitObject<CatchHitObject>> getVisualRepresentation = null)
+        public DrawableBananaShower(BananaShower s, Func<CatchHitObject, DrawableHitObject<CatchHitObject>> createDrawableRepresentation = null)
             : base(s)
         {
             RelativeSizeAxes = Axes.X;
@@ -23,7 +23,7 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawable
             InternalChild = bananaContainer = new Container { RelativeSizeAxes = Axes.Both };
 
             foreach (var b in s.NestedHitObjects.Cast<Banana>())
-                AddNested(getVisualRepresentation?.Invoke(b));
+                AddNested(createDrawableRepresentation?.Invoke(b));
         }
 
         protected override void AddNested(DrawableHitObject h)
