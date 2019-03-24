@@ -19,7 +19,9 @@ using osu.Game.Screens.Edit;
 using osu.Game.Screens.Multi;
 using osu.Game.Screens.Select;
 using osu.Game.Screens.Tournament;
+using osu.Game.Utils;
 using osu.Framework.Platform;
+using DiscordRPC;
 
 namespace osu.Game.Screens.Menu
 {
@@ -43,6 +45,16 @@ namespace osu.Game.Screens.Menu
         private BackgroundScreenDefault background;
 
         protected override BackgroundScreen CreateBackground() => background;
+
+        protected override RichPresence Presence => new RichPresence
+        {
+            Details = "Idling",
+            Assets = new Assets()
+            {
+                LargeImageKey = "lazer",
+                LargeImageText = "osu!lazer"
+            }
+        };
 
         [BackgroundDependencyLoader(true)]
         private void load(OsuGame game = null)
@@ -188,6 +200,7 @@ namespace osu.Game.Screens.Menu
             base.OnResuming(last);
 
             (Background as BackgroundScreenDefault)?.Next();
+            DiscordRpc.updatePresence(Presence);
 
             //we may have consumed our preloaded instance, so let's make another.
             preloadSongSelect();

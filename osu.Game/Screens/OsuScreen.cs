@@ -14,6 +14,8 @@ using osu.Game.Input.Bindings;
 using osu.Game.Rulesets;
 using osu.Game.Screens.Menu;
 using osu.Game.Overlays;
+using osu.Game.Utils;
+using DiscordRPC;
 
 namespace osu.Game.Screens
 {
@@ -33,6 +35,8 @@ namespace osu.Game.Screens
         public string Description => Title;
 
         protected virtual bool AllowBackButton => true;
+
+        protected virtual RichPresence Presence => null;
 
         public virtual bool AllowExternalScreenChange => false;
 

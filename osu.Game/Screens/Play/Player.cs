@@ -26,6 +26,10 @@ using osu.Game.Scoring;
 using osu.Game.Screens.Ranking;
 using osu.Game.Skinning;
 using osu.Game.Storyboards.Drawables;
+using osu.Game.Utils;
+using DiscordRPC;
+using osu.Game.Rulesets.Objects;
+using osu.Game.Rulesets.Objects.Types;
 
 namespace osu.Game.Screens.Play
 {
@@ -70,6 +74,19 @@ namespace osu.Game.Screens.Play
         public bool LoadedBeatmapSuccessfully => DrawableRuleset?.Objects.Any() == true;
 
         protected GameplayClockContainer GameplayClockContainer { get; private set; }
+
+        protected override RichPresence Presence => new RichPresence
+        {
+            Details = $"{Beatmap.Value.Metadata.Artist} - {Beatmap.Value.Metadata.Title} [{Beatmap.Value.BeatmapInfo.Version}]",
+            State = "Playing a beatmap",
+            Assets = new Assets()
+            {
+                LargeImageKey = "lazer",
+                LargeImageText = "osu!lazer",
+                SmallImageKey = ruleset.ShortName,
+                SmallImageText = ruleset.Name
+            }
+        };
 
         [BackgroundDependencyLoader]
         private void load(AudioManager audio, IAPIProvider api, OsuConfigManager config)
@@ -160,6 +177,8 @@ namespace osu.Game.Screens.Play
 
             foreach (var mod in Beatmap.Value.Mods.Value.OfType<IApplicableToScoreProcessor>())
                 mod.ApplyToScoreProcessor(ScoreProcessor);
+
+            DiscordRpc.updatePresence(Presence);
         }
 
         private WorkingBeatmap loadBeatmap()

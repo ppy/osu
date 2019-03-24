@@ -26,12 +26,14 @@ using osu.Game.Screens.Menu;
 using osu.Game.Screens.Play;
 using osu.Game.Screens.Select.Options;
 using osu.Game.Skinning;
+using osu.Game.Utils;
 using osuTK;
 using osuTK.Graphics;
 using osuTK.Input;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using DiscordRPC;
 
 namespace osu.Game.Screens.Select
 {
@@ -66,6 +68,16 @@ namespace osu.Game.Screens.Select
             var background = new BackgroundScreenBeatmap();
             return background;
         }
+
+        protected override RichPresence Presence => new RichPresence
+        {
+            Details = "Idling",
+            Assets = new Assets()
+            {
+                LargeImageKey = "lazer",
+                LargeImageText = "osu!lazer"
+            }
+        };
 
         protected readonly BeatmapCarousel Carousel;
         private readonly BeatmapInfoWedge beatmapInfoWedge;
@@ -262,6 +274,8 @@ namespace osu.Game.Screens.Select
                         }));
                 });
             }
+
+            DiscordRpc.updatePresence(Presence);
         }
 
         private DependencyContainer dependencies;
@@ -501,6 +515,8 @@ namespace osu.Game.Screens.Select
             this.ScaleTo(1, 250, Easing.OutSine);
 
             FilterControl.Activate();
+
+            DiscordRpc.updatePresence(Presence);
         }
 
         public override void OnSuspending(IScreen next)

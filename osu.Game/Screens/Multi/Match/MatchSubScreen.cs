@@ -3,6 +3,7 @@
 
 using System.Collections.Generic;
 using System.Linq;
+using DiscordRPC;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -15,7 +16,9 @@ using osu.Game.Rulesets.Mods;
 using osu.Game.Screens.Multi.Match.Components;
 using osu.Game.Screens.Multi.Play;
 using osu.Game.Screens.Select;
+using osu.Game.Utils;
 using PlaylistItem = osu.Game.Online.Multiplayer.PlaylistItem;
+using DiscordRPC;
 
 namespace osu.Game.Screens.Multi.Match
 {
@@ -52,6 +55,16 @@ namespace osu.Game.Screens.Multi.Match
         private OsuGame game { get; set; }
 
         private MatchLeaderboard leaderboard;
+
+        protected override RichPresence Presence => new RichPresence
+        {
+            Details = $"In {name} | {type.Value.Name}",
+            Assets = new Assets()
+            {
+                LargeImageKey = "lazer",
+                LargeImageText = "osu!lazer"
+            }
+        };
 
         public MatchSubScreen(Room room)
         {
@@ -170,6 +183,8 @@ namespace osu.Game.Screens.Multi.Match
             };
 
             beatmapManager.ItemAdded += beatmapAdded;
+
+            DiscordRpc.updatePresence(Presence);
         }
 
         protected override void LoadComplete()

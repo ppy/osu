@@ -21,9 +21,11 @@ using osu.Game.Screens.Edit.Components;
 using osu.Game.Screens.Edit.Components.Menus;
 using osu.Game.Screens.Edit.Compose;
 using osu.Game.Screens.Edit.Design;
+using osu.Game.Utils;
 using osuTK.Input;
 using System.Collections.Generic;
 using osu.Framework;
+using DiscordRPC;
 
 namespace osu.Game.Screens.Edit
 {
@@ -49,6 +51,17 @@ namespace osu.Game.Screens.Edit
 
         protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
             => dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
+
+        protected override RichPresence Presence => new RichPresence
+        {
+            Details = $"{Beatmap.Value.Metadata.Artist} - {Beatmap.Value.Metadata.Title}",
+            State = "Editing beatmap",
+            Assets = new Assets()
+            {
+                LargeImageKey = "lazer",
+                LargeImageText = "osu!lazer"
+            }
+        };
 
         [BackgroundDependencyLoader]
         private void load(OsuColour colours, GameHost host)
@@ -164,6 +177,8 @@ namespace osu.Game.Screens.Edit
             menuBar.Mode.ValueChanged += onModeChanged;
 
             bottomBackground.Colour = colours.Gray2;
+
+            DiscordRpc.updatePresence(Presence);
         }
 
         protected override bool OnKeyDown(KeyDownEvent e)

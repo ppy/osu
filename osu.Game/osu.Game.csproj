@@ -11,6 +11,7 @@
     <Service Include="{82a7f48d-3b50-4b1e-b82e-3ada8210c358}" />
   </ItemGroup>
   <ItemGroup Label="Package References">
+    <PackageReference Include="DiscordRichPresence" Version="1.0.77" />
     <PackageReference Include="Humanizer" Version="2.6.2" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="2.2.3" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite.Core" Version="2.2.3" />
