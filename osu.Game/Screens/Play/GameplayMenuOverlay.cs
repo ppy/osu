@@ -38,13 +38,15 @@ namespace osu.Game.Screens.Play
         /// <summary>
         /// Action that is invoked when <see cref="GlobalAction.Back"/> is triggered.
         /// </summary>
-        protected virtual Action BackAction => () => InternalButtons.Children.Last().Click();
+        protected virtual Action BackAction => () => InternalButtons.Children.LastOrDefault()?.Click();
 
         /// <summary>
         /// Action that is invoked when <see cref="GlobalAction.Select"/> is triggered.
         /// </summary>
-        protected Action SelectAction => () => InternalButtons.Children.FirstOrDefault(f => f.Selected)?.Click();
+        protected virtual Action SelectAction => () => InternalButtons.Children.FirstOrDefault(f => f.Selected.Value)?.Click();
+
         public abstract string Header { get; }
+
         public abstract string Description { get; }
 
         protected internal FillFlowContainer<DialogButton> InternalButtons;
@@ -233,22 +235,20 @@ namespace osu.Game.Screens.Play
 
         public bool OnPressed(GlobalAction action)
         {
-            if (action == GlobalAction.Back)
+            switch (action)
             {
-                BackAction.Invoke();
-                return true;
+                case GlobalAction.Back:
+                    BackAction.Invoke();
+                    return true;
+                case GlobalAction.Select:
+                    SelectAction.Invoke();
+                    return true;
+                default:
+                    return false;
             }
-
-            if (action == GlobalAction.Select)
-            {
-                SelectAction.Invoke();
-                return true;
-            }
-
-            return false;
         }
 
-        public bool OnReleased(GlobalAction action) => action == GlobalAction.Back;
+        public bool OnReleased(GlobalAction action) => false;
 
         private void buttonSelectionChanged(DialogButton button, bool isSelected)
         {
