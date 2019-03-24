@@ -6,7 +6,8 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Configuration;
-using osu.Game.Graphics.Backgrounds;
+using osu.Game.Screens;
+using osu.Game.Screens.Backgrounds;
 using osuTK;
 
 namespace osu.Game.Graphics.Containers
@@ -32,7 +33,7 @@ namespace osu.Game.Graphics.Containers
 
         private readonly Container sizableContainer;
 
-        private Drawable backgroundLayer;
+        private BackgroundScreenStack backgroundLayer;
 
         /// <summary>
         /// Create a new instance.
@@ -118,7 +119,7 @@ namespace osu.Game.Graphics.Containers
                 if (requiresBackgroundVisible)
                 {
                     if (backgroundLayer == null)
-                        LoadComponentAsync(backgroundLayer = new Background("Menu/menu-background-1")
+                        LoadComponentAsync(backgroundLayer = new BackgroundScreenStack()
                         {
                             Colour = OsuColour.Gray(0.1f),
                             Alpha = 0,
@@ -126,6 +127,7 @@ namespace osu.Game.Graphics.Containers
                         }, d =>
                         {
                             AddInternal(d);
+                            d.Push(new BackgroundScreenDefault());
                             d.FadeTo(requiresBackgroundVisible ? 1 : 0, 4000, Easing.OutQuint);
                         });
                     else
