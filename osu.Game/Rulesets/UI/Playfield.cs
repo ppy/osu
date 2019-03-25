@@ -67,7 +67,7 @@ namespace osu.Game.Rulesets.UI
 
             Cursor = CreateCursor();
             if (Cursor != null)
-                CursorTargetContainer.Add(Cursor);
+                AddInternal(Cursor);
         }
 
         /// <summary>
@@ -98,11 +98,6 @@ namespace osu.Game.Rulesets.UI
         /// </summary>
         /// <returns>The cursor, or null if a cursor is not rqeuired.</returns>
         protected virtual CursorContainer CreateCursor() => null;
-
-        /// <summary>
-        /// The target container to add the cursor after it is created.
-        /// </summary>
-        protected virtual Container CursorTargetContainer => null;
 
         /// <summary>
         /// Registers a <see cref="Playfield"/> as a nested <see cref="Playfield"/>.
