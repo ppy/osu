@@ -8,7 +8,6 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
-using osu.Game.Graphics;
 using osu.Game.Rulesets.Osu.UI.Cursor;
 using osu.Game.Screens.Play;
 using osuTK;
@@ -27,7 +26,7 @@ namespace osu.Game.Rulesets.Osu.UI
         protected override string Message => "Click the orange cursor to resume";
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
+        private void load()
         {
             Add(clickToResumeCursor = new OsuClickToResumeCursor { ResumeRequested = Resume });
         }
