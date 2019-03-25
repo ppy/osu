@@ -130,7 +130,7 @@ namespace osu.Game.Graphics.Containers
                             Depth = float.MaxValue
                         });
 
-                        backgroundStack.Push(new ScalignBackgroundScreen());
+                        backgroundStack.Push(new ScalingBackgroundScreen());
                     }
 
                     backgroundStack.FadeIn(fade_time);
@@ -152,7 +152,7 @@ namespace osu.Game.Graphics.Containers
             sizableContainer.ResizeTo(targetSize, 500, Easing.OutQuart).OnComplete(_ => { sizableContainer.Masking = requiresMasking; });
         }
 
-        private class ScalignBackgroundScreen : BackgroundScreenDefault
+        private class ScalingBackgroundScreen : BackgroundScreenDefault
         {
             public override void OnEntering(IScreen last)
             {
