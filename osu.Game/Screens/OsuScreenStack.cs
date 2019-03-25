@@ -36,11 +36,11 @@ namespace osu.Game.Screens
                 Child = backgroundScreenStack = new BackgroundScreenStack { RelativeSizeAxes = Axes.Both },
             };
 
-            ScreenPushed += setParallax;
-            ScreenExited += setParallax;
+            ScreenPushed += onScreenChange;
+            ScreenExited += onScreenChange;
         }
 
-        private void setParallax(IScreen prev, IScreen next)
+        private void onScreenChange(IScreen prev, IScreen next)
         {
             parallaxContainer.ParallaxAmount = ParallaxContainer.DEFAULT_PARALLAX_AMOUNT * ((IOsuScreen)next)?.BackgroundParallaxAmount ?? 1.0f;
         }
