@@ -20,8 +20,6 @@ using osu.Game.Online.API;
 using osu.Game.Overlays;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
-using osu.Game.Rulesets.Objects;
-using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.UI;
 using osu.Game.Scoring;
@@ -79,7 +77,7 @@ namespace osu.Game.Screens.Play
         {
             Details = $"{Beatmap.Value.Metadata.Artist} - {Beatmap.Value.Metadata.Title} [{Beatmap.Value.BeatmapInfo.Version}]",
             State = "Playing a beatmap",
-            Assets = new Assets()
+            Assets = new Assets
             {
                 LargeImageKey = "lazer",
                 LargeImageText = "osu!lazer",

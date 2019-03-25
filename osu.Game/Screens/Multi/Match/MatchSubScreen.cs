@@ -58,7 +58,7 @@ namespace osu.Game.Screens.Multi.Match
         protected override RichPresence Presence => new RichPresence
         {
             Details = $"In {name} | {type.Value.Name}",
-            Assets = new Assets()
+            Assets = new Assets
             {
                 LargeImageKey = "lazer",
                 LargeImageText = "osu!lazer"

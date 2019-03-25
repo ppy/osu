@@ -56,7 +56,7 @@ namespace osu.Game.Screens.Edit
         {
             Details = $"{Beatmap.Value.Metadata.Artist} - {Beatmap.Value.Metadata.Title}",
             State = "Editing beatmap",
-            Assets = new Assets()
+            Assets = new Assets
             {
                 LargeImageKey = "lazer",
                 LargeImageText = "osu!lazer"

@@ -2,20 +2,19 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using DiscordRPC;
-using DiscordRPC.Logging;
 
 namespace osu.Game.Utils
 {
     public static class DiscordRpc
     {
-        private static DiscordRpcClient client = new DiscordRpcClient("559391129716391967");
+        private static readonly DiscordRpcClient client = new DiscordRpcClient("559391129716391967");
 
         /// <summary>Initializes and changes the Rich Presence in Discord.</summary>
         /// <param name="Presence">Value to set the presence</param>
-        public static void UpdatePresence(RichPresence Presence)
+        public static void UpdatePresence(RichPresence presence)
         {
             client.Initialize();
-            client.SetPresence(Presence);
+            client.SetPresence(presence);
             client.Invoke();
         }
     }

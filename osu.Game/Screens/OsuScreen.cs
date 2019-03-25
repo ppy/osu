@@ -39,7 +39,7 @@ namespace osu.Game.Screens
         protected virtual RichPresence Presence => new RichPresence
         {
             Details = "Idling",
-            Assets = new Assets()
+            Assets = new Assets
             {
                 LargeImageKey = "lazer",
                 LargeImageText = "osu!lazer"
