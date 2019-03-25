@@ -53,8 +53,6 @@ namespace osu.Game.Tests.Visual
         private BeatmapManager manager;
         private RulesetStore rulesets;
 
-        private OsuScreenStack screenStack;
-
         [BackgroundDependencyLoader]
         private void load(GameHost host)
         {
@@ -81,8 +79,10 @@ namespace osu.Game.Tests.Visual
         [SetUp]
         public virtual void SetUp() => Schedule(() =>
         {
-            Child = screenStack = new OsuScreenStack { RelativeSizeAxes = Axes.Both };
-            screenStack.Push(songSelect = new DummySongSelect());
+            Child = new OsuScreenStack(songSelect = new DummySongSelect())
+            {
+                RelativeSizeAxes = Axes.Both
+            };
         });
 
         /// <summary>
