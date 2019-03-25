@@ -3,12 +3,12 @@
 
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Cursor;
 using osu.Framework.Input.Bindings;
+using osu.Game.Rulesets.UI;
 
 namespace osu.Game.Rulesets.Osu.UI.Cursor
 {
-    public class GameplayCursorContainer : CursorContainer, IKeyBindingHandler<OsuAction>
+    public class OsuCursorContainer : GameplayCursorContainer, IKeyBindingHandler<OsuAction>
     {
         protected override Drawable CreateCursor() => new OsuCursor();
 
@@ -16,7 +16,7 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
 
         private readonly Container<Drawable> fadeContainer;
 
-        public GameplayCursorContainer()
+        public OsuCursorContainer()
         {
             InternalChild = fadeContainer = new Container
             {

@@ -9,6 +9,7 @@ using osu.Framework.Graphics.Cursor;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
 using osu.Game.Rulesets.Osu.UI.Cursor;
+using osu.Game.Rulesets.UI;
 using osu.Game.Screens.Play;
 using osuTK;
 using osuTK.Graphics;
@@ -37,7 +38,7 @@ namespace osu.Game.Rulesets.Osu.UI
             clickToResumeCursor.ShowAt(GameplayCursor.ActiveCursor.Position);
 
             if (localCursorContainer == null)
-                Add(localCursorContainer = new GameplayCursorContainer());
+                Add(localCursorContainer = new OsuCursorContainer());
         }
 
         public override void Hide()
