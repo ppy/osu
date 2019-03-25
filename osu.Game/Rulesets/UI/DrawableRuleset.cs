@@ -1,4 +1,4 @@
-﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
@@ -133,20 +133,19 @@ namespace osu.Game.Rulesets.UI
             return dependencies;
         }
 
+        protected virtual PlayfieldAdjustmentContainer CreatePlayfieldAdjustmentContainer() => new PlayfieldAdjustmentContainer();
+
         [BackgroundDependencyLoader]
         private void load(OsuConfigManager config)
         {
-            KeyBindingInputManager.AddRange(new Drawable[]
-            {
-                Playfield,
-                (ResumeOverlay = CreateResumeOverlay()) ?? new Container()
-            });
-
             InternalChildren = new Drawable[]
             {
                 frameStabilityContainer = new FrameStabilityContainer
                 {
-                    Child = KeyBindingInputManager,
+                    Child = KeyBindingInputManager
+                        .WithChild(CreatePlayfieldAdjustmentContainer()
+                            .WithChild(Playfield)
+                        )
                 },
                 Overlays = new Container { RelativeSizeAxes = Axes.Both }
             };
