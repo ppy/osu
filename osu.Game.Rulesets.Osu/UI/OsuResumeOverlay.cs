@@ -35,12 +35,16 @@ namespace osu.Game.Rulesets.Osu.UI
         {
             base.Show();
             clickToResumeCursor.ShowAt(GameplayCursor.ActiveCursor.Position);
-            Add(localCursorContainer = new GameplayCursorContainer());
+
+            if (localCursorContainer == null)
+                Add(localCursorContainer = new GameplayCursorContainer());
         }
 
         public override void Hide()
         {
-            localCursorContainer.Expire();
+            localCursorContainer?.Expire();
+            localCursorContainer = null;
+
             base.Hide();
         }
 
