@@ -183,7 +183,7 @@ namespace osu.Game.Screens.Multi.Match
 
             beatmapManager.ItemAdded += beatmapAdded;
 
-            DiscordRpc.updatePresence(Presence);
+            DiscordRpc.UpdatePresence(Presence);
         }
 
         protected override void LoadComplete()

@@ -127,7 +127,7 @@ namespace osu.Game.Screens
             sampleExit?.Play();
             applyArrivingDefaults(true);
 
-            DiscordRpc.updatePresence(Presence);
+            DiscordRpc.UpdatePresence(Presence);
 
             base.OnResuming(last);
         }

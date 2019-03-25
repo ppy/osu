@@ -178,7 +178,7 @@ namespace osu.Game.Screens.Play
             foreach (var mod in Beatmap.Value.Mods.Value.OfType<IApplicableToScoreProcessor>())
                 mod.ApplyToScoreProcessor(ScoreProcessor);
 
-            DiscordRpc.updatePresence(Presence);
+            DiscordRpc.UpdatePresence(Presence);
         }
 
         private WorkingBeatmap loadBeatmap()

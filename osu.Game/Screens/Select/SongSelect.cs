@@ -265,7 +265,7 @@ namespace osu.Game.Screens.Select
                 });
             }
 
-            DiscordRpc.updatePresence(Presence);
+            DiscordRpc.UpdatePresence(Presence);
         }
 
         private DependencyContainer dependencies;

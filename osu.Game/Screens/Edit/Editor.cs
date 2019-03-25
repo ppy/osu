@@ -178,7 +178,7 @@ namespace osu.Game.Screens.Edit
 
             bottomBackground.Colour = colours.Gray2;
 
-            DiscordRpc.updatePresence(Presence);
+            DiscordRpc.UpdatePresence(Presence);
         }
 
         protected override bool OnKeyDown(KeyDownEvent e)
