@@ -69,16 +69,6 @@ namespace osu.Game.Screens.Select
             return background;
         }
 
-        protected override RichPresence Presence => new RichPresence
-        {
-            Details = "Idling",
-            Assets = new Assets()
-            {
-                LargeImageKey = "lazer",
-                LargeImageText = "osu!lazer"
-            }
-        };
-
         protected readonly BeatmapCarousel Carousel;
         private readonly BeatmapInfoWedge beatmapInfoWedge;
         private DialogOverlay dialogOverlay;
@@ -515,8 +505,6 @@ namespace osu.Game.Screens.Select
             this.ScaleTo(1, 250, Easing.OutSine);
 
             FilterControl.Activate();
-
-            DiscordRpc.updatePresence(Presence);
         }
 
         public override void OnSuspending(IScreen next)

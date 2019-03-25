@@ -36,7 +36,15 @@ namespace osu.Game.Screens
 
         protected virtual bool AllowBackButton => true;
 
-        protected virtual RichPresence Presence => null;
+        protected virtual RichPresence Presence => new RichPresence
+        {
+            Details = "Idling",
+            Assets = new Assets()
+            {
+                LargeImageKey = "lazer",
+                LargeImageText = "osu!lazer"
+            }
+        };
 
         public virtual bool AllowExternalScreenChange => false;
 
@@ -118,6 +126,8 @@ namespace osu.Game.Screens
         {
             sampleExit?.Play();
             applyArrivingDefaults(true);
+
+            DiscordRpc.updatePresence(Presence);
 
             base.OnResuming(last);
         }

@@ -46,16 +46,6 @@ namespace osu.Game.Screens.Menu
 
         protected override BackgroundScreen CreateBackground() => background;
 
-        protected override RichPresence Presence => new RichPresence
-        {
-            Details = "Idling",
-            Assets = new Assets()
-            {
-                LargeImageKey = "lazer",
-                LargeImageText = "osu!lazer"
-            }
-        };
-
         [BackgroundDependencyLoader(true)]
         private void load(OsuGame game = null)
         {
@@ -200,7 +190,6 @@ namespace osu.Game.Screens.Menu
             base.OnResuming(last);
 
             (Background as BackgroundScreenDefault)?.Next();
-            DiscordRpc.updatePresence(Presence);
 
             //we may have consumed our preloaded instance, so let's make another.
             preloadSongSelect();

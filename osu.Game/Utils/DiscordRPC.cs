@@ -3,17 +3,16 @@
 
 using DiscordRPC;
 using DiscordRPC.Logging;
-using LogLevel = DiscordRPC.Logging.LogLevel;
 
 namespace osu.Game.Utils
 {
     public static class DiscordRpc
     {
-        public static DiscordRpcClient client = new DiscordRpcClient("559391129716391967");
+        private static DiscordRpcClient client = new DiscordRpcClient("559391129716391967");
 
         /// <summary>Initializes and changes the Rich Presence in Discord.</summary>
         /// <param name="Presence">Value to set the presence</param>
-        public static void updatePresence(RichPresence Presence)
+        public static void UpdatePresence(RichPresence Presence)
         {
             client.Initialize();
             client.SetPresence(Presence);
