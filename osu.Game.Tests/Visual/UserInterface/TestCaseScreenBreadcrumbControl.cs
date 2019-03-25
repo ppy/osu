@@ -19,14 +19,14 @@ namespace osu.Game.Tests.Visual.UserInterface
     public class TestCaseScreenBreadcrumbControl : OsuTestCase
     {
         private readonly ScreenBreadcrumbControl breadcrumbs;
-        private readonly ScreenStack screenStack;
+        private readonly OsuScreenStack screenStack;
 
         public TestCaseScreenBreadcrumbControl()
         {
             OsuSpriteText titleText;
 
             IScreen startScreen = new TestScreenOne();
-            screenStack = new ScreenStack(startScreen) { RelativeSizeAxes = Axes.Both };
+            screenStack = new OsuScreenStack(startScreen) { RelativeSizeAxes = Axes.Both };
 
             Children = new Drawable[]
             {
