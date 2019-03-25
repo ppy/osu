@@ -73,15 +73,11 @@ namespace osu.Game.Tests.Visual
             Player?.Exit();
             Player = null;
 
-            var player = CreatePlayer(r);
+            Player = CreatePlayer(r);
 
-            LoadComponentAsync(player, p =>
-            {
-                Player = p;
-                LoadScreen(p);
-            });
+            LoadScreen(Player);
 
-            return player;
+            return Player;
         }
 
         protected virtual Player CreatePlayer(Ruleset ruleset) => new Player

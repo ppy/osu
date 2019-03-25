@@ -9,7 +9,6 @@ using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Events;
 using osu.Framework.Input.States;
@@ -54,8 +53,6 @@ namespace osu.Game.Tests.Visual.Background
         private BeatmapManager manager;
         private RulesetStore rulesets;
 
-        private ScreenStackCacheContainer screenStackContainer;
-
         [BackgroundDependencyLoader]
         private void load(GameHost host)
         {
@@ -82,8 +79,10 @@ namespace osu.Game.Tests.Visual.Background
         [SetUp]
         public virtual void SetUp() => Schedule(() =>
         {
-            Child = screenStackContainer = new ScreenStackCacheContainer { RelativeSizeAxes = Axes.Both };
-            screenStackContainer.ScreenStack.Push(songSelect = new DummySongSelect());
+            Child = new OsuScreenStack(songSelect = new DummySongSelect())
+            {
+                RelativeSizeAxes = Axes.Both
+            };
         });
 
         /// <summary>
@@ -370,20 +369,6 @@ namespace osu.Game.Tests.Visual.Background
                 StoryboardEnabled = config.GetBindable<bool>(OsuSetting.ShowStoryboard);
                 ReplacesBackground.BindTo(Background.StoryboardReplacesBackground);
                 DrawableRuleset.IsPaused.BindTo(IsPaused);
-            }
-        }
-
-        private class ScreenStackCacheContainer : Container
-        {
-            [Cached]
-            private BackgroundScreenStack backgroundScreenStack;
-
-            public readonly ScreenStack ScreenStack;
-
-            public ScreenStackCacheContainer()
-            {
-                Add(backgroundScreenStack = new BackgroundScreenStack { RelativeSizeAxes = Axes.Both });
-                Add(ScreenStack = new ScreenStack { RelativeSizeAxes = Axes.Both });
             }
         }
 
