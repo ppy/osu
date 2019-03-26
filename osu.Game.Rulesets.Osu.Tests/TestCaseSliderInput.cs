@@ -333,7 +333,6 @@ namespace osu.Game.Rulesets.Osu.Tests
                 var p = new ScoreAccessibleReplayPlayer(new Score { Replay = new Replay { Frames = frames } })
                 {
                     AllowPause = false,
-                    AllowLeadIn = false,
                     AllowResults = false
                 };
 

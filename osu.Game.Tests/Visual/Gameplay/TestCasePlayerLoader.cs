@@ -29,7 +29,6 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddStep("load dummy beatmap", () => stack.Push(loader = new PlayerLoader(() => new Player
             {
                 AllowPause = false,
-                AllowLeadIn = false,
                 AllowResults = false,
             })));
 
@@ -50,7 +49,6 @@ namespace osu.Game.Tests.Visual.Gameplay
                 stack.Push(loader = new PlayerLoader(() => slow = new SlowLoadPlayer
                 {
                     AllowPause = false,
-                    AllowLeadIn = false,
                     AllowResults = false,
                 }));
 

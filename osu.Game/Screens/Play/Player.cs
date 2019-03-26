@@ -44,7 +44,6 @@ namespace osu.Game.Screens.Play
         public bool HasFailed { get; private set; }
 
         public bool AllowPause { get; set; } = true;
-        public bool AllowLeadIn { get; set; } = true;
         public bool AllowResults { get; set; } = true;
 
         private Bindable<bool> mouseWheelDisabled;
@@ -90,7 +89,7 @@ namespace osu.Game.Screens.Play
             if (!ScoreProcessor.Mode.Disabled)
                 config.BindWith(OsuSetting.ScoreDisplayMode, ScoreProcessor.Mode);
 
-            InternalChild = GameplayClockContainer = new GameplayClockContainer(working, AllowLeadIn, DrawableRuleset.GameplayStartTime);
+            InternalChild = GameplayClockContainer = new GameplayClockContainer(working, DrawableRuleset.GameplayStartTime);
 
             GameplayClockContainer.Children = new[]
             {
