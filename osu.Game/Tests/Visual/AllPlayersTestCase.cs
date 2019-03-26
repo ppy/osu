@@ -80,10 +80,6 @@ namespace osu.Game.Tests.Visual
             return Player;
         }
 
-        protected virtual Player CreatePlayer(Ruleset ruleset) => new Player
-        {
-            AllowPause = false,
-            AllowResults = false,
-        };
+        protected virtual Player CreatePlayer(Ruleset ruleset) => new Player(false, false);
     }
 }
