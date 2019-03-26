@@ -99,7 +99,13 @@ namespace osu.Game.Screens.Play
             userAudioOffset = config.GetBindable<double>(OsuSetting.AudioOffset);
             userAudioOffset.BindValueChanged(offset => userOffsetClock.Offset = offset.NewValue, true);
 
-            adjustableClock.Seek(Math.Min(0, gameplayStartTime - totalOffset - (allowLeadIn ? beatmap.BeatmapInfo.AudioLeadIn : 0)));
+            double startTime = -beatmap.BeatmapInfo.AudioLeadIn;
+
+            startTime = Math.Min(startTime, beatmap.Storyboard.FirstEventTime);
+            startTime = Math.Min(startTime, gameplayStartTime);
+            startTime = Math.Min(startTime, 0);
+
+            Seek(startTime);
             adjustableClock.ProcessFrame();
 
             UserPlaybackRate.ValueChanged += _ => updateRate();
