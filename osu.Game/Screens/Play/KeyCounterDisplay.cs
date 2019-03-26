@@ -14,14 +14,14 @@ using osuTK.Graphics;
 
 namespace osu.Game.Screens.Play
 {
-    public class KeyCounterCollection : FillFlowContainer<KeyCounter>
+    public class KeyCounterDisplay : FillFlowContainer<KeyCounter>
     {
         private const int duration = 100;
 
         public readonly Bindable<bool> Visible = new Bindable<bool>(true);
         private readonly Bindable<bool> configVisibility = new Bindable<bool>();
 
-        public KeyCounterCollection()
+        public KeyCounterDisplay()
         {
             Direction = FillDirection.Horizontal;
             AutoSizeAxes = Axes.Both;
@@ -138,9 +138,9 @@ namespace osu.Game.Screens.Play
 
         public class Receptor : Drawable
         {
-            protected readonly KeyCounterCollection Target;
+            protected readonly KeyCounterDisplay Target;
 
-            public Receptor(KeyCounterCollection target)
+            public Receptor(KeyCounterDisplay target)
             {
                 RelativeSizeAxes = Axes.Both;
                 Depth = float.MinValue;
