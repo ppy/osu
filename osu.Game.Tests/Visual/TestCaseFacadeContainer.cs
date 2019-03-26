@@ -11,7 +11,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
-using osu.Framework.Testing;
+using osu.Framework.Graphics.UserInterface;
 using osu.Game.Configuration;
 using osu.Game.Graphics.Containers;
 using osu.Game.Rulesets.Mods;
@@ -31,7 +31,11 @@ namespace osu.Game.Tests.Visual
             typeof(PlayerLoader),
             typeof(Player),
             typeof(Facade),
-            typeof(FacadeContainer)
+            typeof(FacadeContainer),
+            typeof(ButtonSystem),
+            typeof(ButtonSystemState),
+            typeof(Menu),
+            typeof(MainMenu)
         };
 
         [Cached]
@@ -68,13 +72,8 @@ namespace osu.Game.Tests.Visual
                 AllowPause = false,
                 AllowLeadIn = false,
                 AllowResults = false,
+                Ready = false
             })));
-        }
-
-        [Test]
-        public void MainMenuTest()
-        {
-            AddStep("Add new Main Menu", () => LoadScreen(new MainMenu()));
         }
 
         private class TestFacadeContainer : FacadeContainer
@@ -119,8 +118,15 @@ namespace osu.Game.Tests.Visual
                 base.LogoArriving(logo, resuming);
                 logo.FadeIn(350);
                 logo.ScaleTo(new Vector2(0.15f), 350, Easing.In);
-                facadeContainer.SetLogo(logo);
+                facadeContainer.SetLogo(logo, 0.3f, 1000, Easing.InOutQuint);
+                facadeContainer.Tracking = true;
                 moveLogoFacade();
+            }
+
+            protected override void LogoExiting(OsuLogo logo)
+            {
+                base.LogoExiting(logo);
+                facadeContainer.Tracking = false;
             }
 
             private void moveLogoFacade()
@@ -128,7 +134,7 @@ namespace osu.Game.Tests.Visual
                 Random random = new Random();
                 if (facadeFlowComponent.Transforms.Count == 0)
                 {
-                    facadeFlowComponent.Delay(500).MoveTo(new Vector2(random.Next(0, 800), random.Next(0, 600)), 300);
+                    facadeFlowComponent.Delay(500).MoveTo(new Vector2(random.Next(0, (int)DrawWidth), random.Next(0, (int)DrawHeight)), 300);
                 }
 
                 if (randomPositions)
@@ -159,11 +165,13 @@ namespace osu.Game.Tests.Visual
 
         private class TestPlayer : Player
         {
+            public bool Ready;
+
             [BackgroundDependencyLoader]
             private void load()
             {
                 // Never finish loading
-                while (true)
+                while (!Ready)
                     Thread.Sleep(1);
             }
         }

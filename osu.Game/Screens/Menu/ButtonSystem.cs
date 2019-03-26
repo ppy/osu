@@ -9,6 +9,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input.Bindings;
@@ -16,6 +17,7 @@ using osu.Framework.Logging;
 using osu.Framework.Platform;
 using osu.Framework.Threading;
 using osu.Game.Graphics;
+using osu.Game.Graphics.Containers;
 using osu.Game.Input;
 using osu.Game.Input.Bindings;
 using osu.Game.Online.API;
@@ -53,15 +55,19 @@ namespace osu.Game.Screens.Menu
             if (this.logo != null)
             {
                 this.logo.Action = onOsuLogo;
+                facadeContainer.SetLogo(logo, 0.5f);
 
                 // osuLogo.SizeForFlow relies on loading to be complete.
                 buttonArea.Flow.Position = new Vector2(WEDGE_WIDTH * 2 - (BUTTON_WIDTH + this.logo.SizeForFlow / 4), 0);
 
                 updateLogoState();
             }
+            else
+            {
+                facadeContainer.Tracking = false;
+            }
         }
 
-        private readonly Drawable iconFacade;
         private readonly ButtonArea buttonArea;
 
         private readonly Button backButton;
@@ -71,26 +77,29 @@ namespace osu.Game.Screens.Menu
 
         private SampleChannel sampleBack;
 
+        private readonly FacadeContainer facadeContainer;
+
         public ButtonSystem()
         {
             RelativeSizeAxes = Axes.Both;
 
-            Child = buttonArea = new ButtonArea();
+            Child = facadeContainer = new FacadeContainer
+            {
+                RelativeSizeAxes = Axes.Both,
+                Child = buttonArea = new ButtonArea()
+            };
 
-            buttonArea.AddRange(new[]
+            buttonArea.AddRange(new Container[]
             {
                 new Button(@"settings", string.Empty, FontAwesome.fa_gear, new Color4(85, 85, 85, 255), () => OnSettings?.Invoke(), -WEDGE_WIDTH, Key.O),
                 backButton = new Button(@"back", @"button-back-select", FontAwesome.fa_osu_left_o, new Color4(51, 58, 94, 255), () => State = ButtonSystemState.TopLevel, -WEDGE_WIDTH)
                 {
                     VisibleState = ButtonSystemState.Play,
                 },
-                iconFacade = new Container //need a container to make the osu! icon flow properly.
-                {
-                    Size = new Vector2(0, ButtonArea.BUTTON_AREA_HEIGHT)
-                }
+                facadeContainer.Facade
             });
 
-            buttonArea.Flow.CentreTarget = iconFacade;
+            buttonArea.Flow.CentreTarget = facadeContainer.Facade;
         }
 
         [Resolved(CanBeNull = true)]
@@ -119,6 +128,15 @@ namespace osu.Game.Screens.Menu
 
             buttonArea.AddRange(buttonsPlay);
             buttonArea.AddRange(buttonsTopLevel);
+
+            buttonArea.ForEach(b =>
+            {
+                if (b is Button)
+                {
+                    b.Origin = Anchor.CentreLeft;
+                    b.Anchor = Anchor.CentreLeft;
+                }
+            });
 
             isIdle.ValueChanged += idle => updateIdleState(idle.NewValue);
 
@@ -247,7 +265,7 @@ namespace osu.Game.Screens.Menu
                     logoDelayedAction?.Cancel();
                     logoDelayedAction = Scheduler.AddDelayed(() =>
                         {
-                            logoTracking = false;
+                            facadeContainer.Tracking = false;
 
                             game?.Toolbar.Hide();
 
@@ -266,19 +284,16 @@ namespace osu.Game.Screens.Menu
                             break;
                         case ButtonSystemState.Initial:
                             logo.ClearTransforms(targetMember: nameof(Position));
-                            logo.RelativePositionAxes = Axes.None;
 
                             bool impact = logo.Scale.X > 0.6f;
 
                             if (lastState == ButtonSystemState.Initial)
                                 logo.ScaleTo(0.5f, 200, Easing.In);
 
-                            logo.MoveTo(logoTrackingPosition, lastState == ButtonSystemState.EnteringMode ? 0 : 200, Easing.In);
-
                             logoDelayedAction?.Cancel();
                             logoDelayedAction = Scheduler.AddDelayed(() =>
                             {
-                                logoTracking = true;
+                                facadeContainer.Tracking = true;
 
                                 if (impact)
                                     logo.Impact();
@@ -288,33 +303,15 @@ namespace osu.Game.Screens.Menu
                             break;
                         default:
                             logo.ClearTransforms(targetMember: nameof(Position));
-                            logo.RelativePositionAxes = Axes.None;
-                            logoTracking = true;
+                            facadeContainer.Tracking = true;
                             logo.ScaleTo(0.5f, 200, Easing.OutQuint);
                             break;
                     }
 
                     break;
                 case ButtonSystemState.EnteringMode:
-                    logoTracking = true;
+                    facadeContainer.Tracking = true;
                     break;
-            }
-        }
-
-        private Vector2 logoTrackingPosition => logo.Parent.ToLocalSpace(iconFacade.ScreenSpaceDrawQuad.Centre);
-
-        private bool logoTracking;
-
-        protected override void Update()
-        {
-            base.Update();
-
-            if (logo != null)
-            {
-                if (logoTracking && logo.RelativePositionAxes == Axes.None && iconFacade.IsLoaded)
-                    logo.Position = logoTrackingPosition;
-
-                iconFacade.Width = logo.SizeForFlow * 0.5f;
             }
         }
     }
