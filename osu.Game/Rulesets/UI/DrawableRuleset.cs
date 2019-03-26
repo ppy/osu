@@ -211,7 +211,7 @@ namespace osu.Game.Rulesets.UI
         /// <returns>The DrawableHitObject.</returns>
         public abstract DrawableHitObject<TObject> GetVisualRepresentation(TObject h);
 
-        public void Attach(KeyCounterCollection keyCounter) =>
+        public void Attach(KeyCounterDisplay keyCounter) =>
             (KeyBindingInputManager as ICanAttachKeyCounter)?.Attach(keyCounter);
 
         /// <summary>
