@@ -155,7 +155,7 @@ namespace osu.Game.Screens.Play
             logo.MoveTo(new Vector2(0.5f), duration, Easing.In);
             logo.FadeIn(350);
 
-            content.SetLogo(logo, resuming, duration);
+            content.SetLogo(logo, duration);
         }
 
         protected override void LoadComplete()
@@ -167,7 +167,7 @@ namespace osu.Game.Screens.Play
         private ScheduledDelegate pushDebounce;
         protected VisualSettings VisualSettings;
 
-        // Hhere because IsHovered will not update unless we do so.
+        // Here because IsHovered will not update unless we do so.
         public override bool HandlePositionalInput => true;
 
         private bool readyForPush => player.LoadState == LoadState.Ready && IsHovered && GetContainingInputManager()?.DraggedDrawable == null;
@@ -306,7 +306,6 @@ namespace osu.Game.Screens.Play
             private Sprite backgroundSprite;
             private ModDisplay modDisplay;
             private FillFlowContainer fillFlowContainer;
-            private FacadeContainer facadeContainer;
 
             public bool Loading
             {
