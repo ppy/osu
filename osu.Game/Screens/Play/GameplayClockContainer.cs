@@ -26,6 +26,10 @@ namespace osu.Game.Screens.Play
         private readonly WorkingBeatmap beatmap;
         private readonly IReadOnlyList<Mod> mods;
 
+        private readonly bool allowLeadIn;
+
+        private readonly double gameplayStartTime;
+
         /// <summary>
         /// The original source (usually a <see cref="WorkingBeatmap"/>'s track).
         /// </summary>
@@ -60,6 +64,8 @@ namespace osu.Game.Screens.Play
 
         private readonly FramedOffsetClock platformOffsetClock;
 
+        private double totalOffset => userOffsetClock.Offset + platformOffsetClock.Offset;
+
         public GameplayClockContainer(WorkingBeatmap beatmap, IReadOnlyList<Mod> mods, double gameplayStartTime)
         {
             this.beatmap = beatmap;
@@ -92,6 +98,9 @@ namespace osu.Game.Screens.Play
         {
             userAudioOffset = config.GetBindable<double>(OsuSetting.AudioOffset);
             userAudioOffset.BindValueChanged(offset => userOffsetClock.Offset = offset.NewValue, true);
+
+            adjustableClock.Seek(Math.Min(0, gameplayStartTime - totalOffset - (allowLeadIn ? beatmap.BeatmapInfo.AudioLeadIn : 0)));
+            adjustableClock.ProcessFrame();
 
             UserPlaybackRate.ValueChanged += _ => updateRate();
 
