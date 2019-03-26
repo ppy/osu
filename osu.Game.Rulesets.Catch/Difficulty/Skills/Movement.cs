@@ -62,28 +62,26 @@ namespace osu.Game.Rulesets.Catch.Difficulty.Skills
                     double antiflowBonusFactor = Math.Min(Math.Abs(distanceMoved) / 70, 1);
 
                     distanceAddition += (antiflow_bonus / (catchCurrent.StrainTime / 17.5 + 10)) * (Math.Sqrt(Math.Abs(lastDistanceMoved)) / Math.Sqrt(lastStrainTime + 20)) * antiflowBonusFactor;
-
-                    // Bonus for edge dashes on direction change
-                    if (catchCurrent.LastObject.DistanceToHyperDash <= 14.0f / CatchPlayfield.BASE_WIDTH && !catchCurrent.LastObject.HyperDash)
-                        bonus += 1.0;
                 }
 
                 // Base bonus for every movement, giving some weight to streams.
                 distanceAddition += 10.0 * Math.Min(Math.Abs(distanceMoved), normalized_hitobject_radius * 2) / (normalized_hitobject_radius * 6) / sqrtStrain;
             }
 
-            // Bonus for edge dashes regardless of direction change
-            if (catchCurrent.LastObject.DistanceToHyperDash <= 14.0f / CatchPlayfield.BASE_WIDTH)
+            // Bonus for edge dashes
+            double edgeDashThreshold = 15.5f * ((Math.Min(catchCurrent.StrainTime * catchCurrent.ClockRate, 250) * 0.9 + 25) / 250);
+
+            if (catchCurrent.LastObject.DistanceToHyperDash <= edgeDashThreshold / CatchPlayfield.BASE_WIDTH)
             {
                 if (!catchCurrent.LastObject.HyperDash)
-                    bonus += 0.9;
+                    bonus += 2.3;
                 else
                 {
                     // After a hyperdash we ARE in the correct position. Always!
                     playerPosition = catchCurrent.NormalizedPosition;
                 }
 
-                distanceAddition *= 1.0 + bonus * Math.Pow(14.0f - catchCurrent.LastObject.DistanceToHyperDash * CatchPlayfield.BASE_WIDTH, 1.6f) / 14.0f * (Math.Min(catchCurrent.StrainTime * catchCurrent.ClockRate, 250) / 250); // Edge dashes are easier at lower ms values
+                distanceAddition *= 1.0 + bonus * Math.Pow(edgeDashThreshold - catchCurrent.LastObject.DistanceToHyperDash * CatchPlayfield.BASE_WIDTH, 1.6f) / edgeDashThreshold * (Math.Min(catchCurrent.StrainTime * catchCurrent.ClockRate, 265) / 265); // Edge dashes are easier at lower ms values
             }
 
             // Prevent wide dense stacks of notes which fit on the catcher from greatly increasing SR
