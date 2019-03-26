@@ -9,7 +9,9 @@ using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Graphics.Sprites;
 using osu.Framework.Testing;
 using osu.Game.Configuration;
 using osu.Game.Graphics.Containers;
@@ -18,6 +20,7 @@ using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Screens;
 using osu.Game.Screens.Menu;
 using osu.Game.Screens.Play;
+using osuTK;
 using osuTK.Graphics;
 
 namespace osu.Game.Tests.Visual
@@ -36,6 +39,7 @@ namespace osu.Game.Tests.Visual
 
         private readonly Bindable<float> uiScale = new Bindable<float>();
 
+        private TestScreen screen1;
         private OsuScreen baseScreen;
 
         public TestCaseFacadeContainer()
@@ -49,7 +53,6 @@ namespace osu.Game.Tests.Visual
             baseScreen = null;
             config.BindWith(OsuSetting.UIScale, uiScale);
             AddSliderStep("Adjust scale", 1f, 1.5f, 1f, v => uiScale.Value = v);
-            AddToggleStep("Toggle mods", b => { Beatmap.Value.Mods.Value = b ? Beatmap.Value.Mods.Value.Concat(new[] { new OsuModNoFail() }) : Enumerable.Empty<Mod>(); });
         }
 
         [SetUpSteps]
@@ -59,8 +62,17 @@ namespace osu.Game.Tests.Visual
         }
 
         [Test]
+        public void IsolatedTest()
+        {
+            bool randomPositions = false;
+            AddToggleStep("Toggle move continuously", b => randomPositions = b);
+            AddStep("Move facade to random position", () => LoadScreen(screen1 = new TestScreen(randomPositions)));
+        }
+
+        [Test]
         public void PlayerLoaderTest()
         {
+            AddToggleStep("Toggle mods", b => { Beatmap.Value.Mods.Value = b ? Beatmap.Value.Mods.Value.Concat(new[] { new OsuModNoFail() }) : Enumerable.Empty<Mod>(); });
             AddStep("Add new playerloader", () => LoadScreen(baseScreen = new TestPlayerLoader(() => new TestPlayer
             {
                 AllowPause = false,
@@ -87,6 +99,67 @@ namespace osu.Game.Tests.Visual
                     RelativeSizeAxes = Axes.Both,
                 },
             };
+        }
+
+        private class TestScreen : OsuScreen
+        {
+            private TestFacadeContainer facadeContainer;
+            private FacadeFlowComponent facadeFlowComponent;
+            private OsuLogo logo;
+
+            private readonly bool randomPositions;
+
+            public TestScreen(bool randomPositions = false)
+            {
+                this.randomPositions = randomPositions;
+            }
+
+            private SpriteText positionText;
+            private SpriteText sizeAxesText;
+
+            [BackgroundDependencyLoader]
+            private void load()
+            {
+                InternalChild = facadeContainer = new TestFacadeContainer
+                {
+                    Child = facadeFlowComponent = new FacadeFlowComponent
+                    {
+                        AutoSizeAxes = Axes.Both
+                    }
+                };
+            }
+
+            protected override void LogoArriving(OsuLogo logo, bool resuming)
+            {
+                base.LogoArriving(logo, resuming);
+                logo.FadeIn(350);
+                logo.ScaleTo(new Vector2(0.15f), 350, Easing.In);
+                facadeContainer.SetLogo(logo);
+                moveLogoFacade();
+            }
+
+            private void moveLogoFacade()
+            {
+                Random random = new Random();
+                if (facadeFlowComponent.Transforms.Count == 0)
+                {
+                    facadeFlowComponent.Delay(500).MoveTo(new Vector2(random.Next(0, 800), random.Next(0, 600)), 300);
+                }
+
+                if (randomPositions)
+                    Schedule(moveLogoFacade);
+            }
+        }
+
+        private class FacadeFlowComponent : FillFlowContainer
+        {
+            [BackgroundDependencyLoader]
+            private void load(Facade facade)
+            {
+                facade.Anchor = Anchor.TopCentre;
+                facade.Origin = Anchor.TopCentre;
+                Child = facade;
+            }
         }
 
         private class TestPlayerLoader : PlayerLoader

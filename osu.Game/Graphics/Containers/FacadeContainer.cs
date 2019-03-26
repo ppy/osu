@@ -1,10 +1,10 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.MathUtils;
 using osu.Game.Screens.Menu;
 using osuTK;
 
@@ -18,7 +18,6 @@ namespace osu.Game.Graphics.Containers
         private OsuLogo logo;
 
         private bool tracking;
-        private bool smoothTransform;
 
         protected virtual Facade CreateFacade() => new Facade();
 
@@ -29,7 +28,7 @@ namespace osu.Game.Graphics.Containers
 
         private Vector2 logoTrackingPosition => logo.Parent.ToLocalSpace(facade.ScreenSpaceDrawQuad.Centre);
 
-        public void SetLogo(OsuLogo logo, bool resuming, double transformDelay)
+        public void SetLogo(OsuLogo logo, double transformDelay = 0)
         {
             if (logo != null)
             {
@@ -38,41 +37,53 @@ namespace osu.Game.Graphics.Containers
                 Scheduler.AddDelayed(() =>
                 {
                     tracking = true;
-                    smoothTransform = !resuming;
                 }, transformDelay);
             }
         }
+
+        private double startTime;
+        private double duration = 1000;
+
+        private Vector2 startPosition;
+        private Easing easing = Easing.InOutExpo;
 
         protected override void UpdateAfterChildren()
         {
             base.UpdateAfterChildren();
 
-            if (logo == null)
+            if (logo == null || !tracking)
                 return;
 
             facade.Size = new Vector2(logo.SizeForFlow * 0.3f);
 
-            if (smoothTransform && facade.IsLoaded && logo.Transforms.Count == 0)
+            if (facade.IsLoaded && logo.Position != logoTrackingPosition)
             {
-                // Our initial movement to the tracking location should be smooth.
-                Schedule(() =>
+                if (logo.RelativePositionAxes != Axes.None)
                 {
-                    facade.Size = new Vector2(logo.SizeForFlow * 0.3f);
+                    logo.Position = logo.Parent.ToLocalSpace(logo.Position);
                     logo.RelativePositionAxes = Axes.None;
-                    logo.MoveTo(logoTrackingPosition, 500, Easing.InOutExpo);
-                    smoothTransform = false;
-                });
-            }
-            else if (facade.IsLoaded && logo.Transforms.Count == 0)
-            {
-                // If all transforms have finished playing, the logo constantly track the position of the facade.
-                logo.RelativePositionAxes = Axes.None;
-                logo.Position = logoTrackingPosition;
+                }
+
+                if (startTime == 0)
+                {
+                    startTime = Time.Current;
+                }
+
+                var endTime = startTime + duration;
+                var remainingDuration = endTime - Time.Current;
+
+                if (remainingDuration <= 0)
+                {
+                    remainingDuration = 0;
+                }
+
+                float currentTime = (float)Interpolation.ApplyEasing(easing, remainingDuration / duration);
+                logo.Position = Vector2.Lerp(logoTrackingPosition, startPosition, currentTime);
             }
         }
     }
+}
 
-    public class Facade : Container
-    {
-    }
+public class Facade : Container
+{
 }
