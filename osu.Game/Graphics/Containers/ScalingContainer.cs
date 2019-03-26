@@ -5,8 +5,10 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Screens;
 using osu.Game.Configuration;
-using osu.Game.Graphics.Backgrounds;
+using osu.Game.Screens;
+using osu.Game.Screens.Backgrounds;
 using osuTK;
 
 namespace osu.Game.Graphics.Containers
@@ -32,7 +34,7 @@ namespace osu.Game.Graphics.Containers
 
         private readonly Container sizableContainer;
 
-        private Drawable backgroundLayer;
+        private BackgroundScreenStack backgroundStack;
 
         /// <summary>
         /// Create a new instance.
@@ -112,27 +114,29 @@ namespace osu.Game.Graphics.Containers
 
         private void updateSize()
         {
+            const float fade_time = 500;
+
             if (targetMode == ScalingMode.Everything)
             {
                 // the top level scaling container manages the background to be displayed while scaling.
                 if (requiresBackgroundVisible)
                 {
-                    if (backgroundLayer == null)
-                        LoadComponentAsync(backgroundLayer = new Background("Menu/menu-background-1")
+                    if (backgroundStack == null)
+                    {
+                        AddInternal(backgroundStack = new BackgroundScreenStack
                         {
                             Colour = OsuColour.Gray(0.1f),
                             Alpha = 0,
                             Depth = float.MaxValue
-                        }, d =>
-                        {
-                            AddInternal(d);
-                            d.FadeTo(requiresBackgroundVisible ? 1 : 0, 4000, Easing.OutQuint);
                         });
-                    else
-                        backgroundLayer.FadeIn(500);
+
+                        backgroundStack.Push(new ScalingBackgroundScreen());
+                    }
+
+                    backgroundStack.FadeIn(fade_time);
                 }
                 else
-                    backgroundLayer?.FadeOut(500);
+                    backgroundStack?.FadeOut(fade_time);
             }
 
             bool scaling = targetMode == null || scalingMode.Value == targetMode;
@@ -146,6 +150,14 @@ namespace osu.Game.Graphics.Containers
 
             sizableContainer.MoveTo(targetPosition, 500, Easing.OutQuart);
             sizableContainer.ResizeTo(targetSize, 500, Easing.OutQuart).OnComplete(_ => { sizableContainer.Masking = requiresMasking; });
+        }
+
+        private class ScalingBackgroundScreen : BackgroundScreenDefault
+        {
+            public override void OnEntering(IScreen last)
+            {
+                this.FadeInFromZero(4000, Easing.OutQuint);
+            }
         }
 
         private class AlwaysInputContainer : Container

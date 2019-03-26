@@ -169,6 +169,8 @@ namespace osu.Game.Rulesets.UI
                 mod.ApplyToDrawableHitObjects(Playfield.HitObjectContainer.Objects);
         }
 
+        public override void RequestResume(Action continueResume) => continueResume();
+
         /// <summary>
         /// Creates and adds the visual representation of a <see cref="TObject"/> to this <see cref="DrawableRuleset{TObject}"/>.
         /// </summary>
@@ -338,6 +340,13 @@ namespace osu.Game.Rulesets.UI
         /// </summary>
         /// <param name="replayScore">The replay, null for local input.</param>
         public abstract void SetReplayScore(Score replayScore);
+
+        /// <summary>
+        /// Invoked when the interactive user requests resuming from a paused state.
+        /// Allows potentially delaying the resume process until an interaction is performed.
+        /// </summary>
+        /// <param name="continueResume">The action to run when resuming is to be completed.</param>
+        public abstract void RequestResume(Action continueResume);
 
         /// <summary>
         /// Create a <see cref="ScoreProcessor"/> for the associated ruleset  and link with this
