@@ -28,8 +28,9 @@ namespace osu.Game.Tests.Visual.SongSelect
             typeof(ScoresContainer),
             typeof(ScoreTable),
             typeof(ScoreTableRow),
-            typeof(ScoreTableHeader),
-            typeof(ScoreTableScore)
+            typeof(ScoreTableHeaderRow),
+            typeof(ScoreTableScoreRow),
+            typeof(ScoreTableRowBackground),
         };
 
         private readonly Box background;

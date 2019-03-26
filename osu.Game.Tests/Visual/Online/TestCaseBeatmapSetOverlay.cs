@@ -25,7 +25,11 @@ namespace osu.Game.Tests.Visual.Online
         {
             typeof(Header),
             typeof(ClickableUserContainer),
-            typeof(ScoreTableScore),
+            typeof(ScoreTable),
+            typeof(ScoreTableRow),
+            typeof(ScoreTableHeaderRow),
+            typeof(ScoreTableScoreRow),
+            typeof(ScoreTableRowBackground),
             typeof(DrawableTopScore),
             typeof(ScoresContainer),
             typeof(AuthorInfo),
