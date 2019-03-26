@@ -7,16 +7,13 @@ using osu.Framework.Graphics;
 using osu.Framework.Screens;
 using osu.Game.Beatmaps;
 using osu.Game.Screens;
-using osu.Game.Screens.Menu;
 using osu.Game.Screens.Play;
-using osuTK;
 
 namespace osu.Game.Tests.Visual.Gameplay
 {
     public class TestCasePlayerLoader : ManualInputManagerTestCase
     {
         private PlayerLoader loader;
-
         private readonly OsuScreenStack stack;
 
         public TestCasePlayerLoader()
@@ -28,8 +25,6 @@ namespace osu.Game.Tests.Visual.Gameplay
         private void load(OsuGameBase game)
         {
             Beatmap.Value = new DummyWorkingBeatmap(game);
-
-            AddStep("Reset logo position", () => logo = new OsuLogo { Position = new Vector2(0, 0) });
 
             AddStep("load dummy beatmap", () => stack.Push(loader = new PlayerLoader(() => new Player
             {
@@ -58,6 +53,8 @@ namespace osu.Game.Tests.Visual.Gameplay
                     AllowLeadIn = false,
                     AllowResults = false,
                 }));
+
+                Scheduler.AddDelayed(() => slow.Ready = true, 5000);
             });
 
             AddUntilStep("wait for no longer current", () => !loader.IsCurrentScreen());

@@ -33,7 +33,7 @@ namespace osu.Game.Screens.Play
 
         private Player player;
 
-        private FacadeContainer content;
+        private FacadeContainer facadeContainer;
 
         protected virtual FacadeContainer CreateFacadeContainer() => new FacadeContainer();
 
@@ -62,11 +62,11 @@ namespace osu.Game.Screens.Play
         [BackgroundDependencyLoader]
         private void load()
         {
-            InternalChild = content = CreateFacadeContainer();
-            content.Anchor = Anchor.Centre;
-            content.Origin = Anchor.Centre;
-            content.RelativeSizeAxes = Axes.Both;
-            content.Children = new Drawable[]
+            InternalChild = facadeContainer = CreateFacadeContainer();
+            facadeContainer.Anchor = Anchor.Centre;
+            facadeContainer.Origin = Anchor.Centre;
+            facadeContainer.RelativeSizeAxes = Axes.Both;
+            facadeContainer.Children = new Drawable[]
             {
                 info = new BeatmapMetadataDisplay(Beatmap.Value)
                 {
@@ -122,21 +122,21 @@ namespace osu.Game.Screens.Play
 
         private void contentIn()
         {
-            content.ScaleTo(1, 650, Easing.OutQuint);
-            content.FadeInFromZero(400);
+            facadeContainer.ScaleTo(1, 650, Easing.OutQuint);
+            facadeContainer.FadeInFromZero(400);
         }
 
         private void contentOut()
         {
-            content.ScaleTo(0.7f, 300, Easing.InQuint);
-            content.FadeOut(250);
+            facadeContainer.ScaleTo(0.7f, 300, Easing.InQuint);
+            facadeContainer.FadeOut(250);
         }
 
         public override void OnEntering(IScreen last)
         {
             base.OnEntering(last);
 
-            content.ScaleTo(0.7f);
+            facadeContainer.ScaleTo(0.7f);
             Background?.FadeColour(Color4.White, 800, Easing.OutQuint);
 
             contentIn();
@@ -155,7 +155,15 @@ namespace osu.Game.Screens.Play
             logo.MoveTo(new Vector2(0.5f), duration, Easing.In);
             logo.FadeIn(350);
 
-            content.SetLogo(logo, duration);
+            facadeContainer.SetLogo(logo, 0.3f, 500, Easing.InOutQuint);
+
+            Scheduler.AddDelayed(() => facadeContainer.Tracking = true, duration);
+        }
+
+        protected override void LogoExiting(OsuLogo logo)
+        {
+            base.LogoExiting(logo);
+            facadeContainer.Tracking = false;
         }
 
         protected override void LoadComplete()
@@ -230,7 +238,7 @@ namespace osu.Game.Screens.Play
 
         public override bool OnExiting(IScreen next)
         {
-            content.ScaleTo(0.7f, 150, Easing.InQuint);
+            facadeContainer.ScaleTo(0.7f, 150, Easing.InQuint);
             this.FadeOut(150);
             cancelLoad();
 
@@ -305,7 +313,6 @@ namespace osu.Game.Screens.Play
             private LoadingAnimation loading;
             private Sprite backgroundSprite;
             private ModDisplay modDisplay;
-            private FillFlowContainer fillFlowContainer;
 
             public bool Loading
             {
@@ -340,7 +347,7 @@ namespace osu.Game.Screens.Play
                 AutoSizeAxes = Axes.Both;
                 Children = new Drawable[]
                 {
-                    fillFlowContainer = new FillFlowContainer
+                    new FillFlowContainer
                     {
                         AutoSizeAxes = Axes.Both,
                         Origin = Anchor.TopCentre,

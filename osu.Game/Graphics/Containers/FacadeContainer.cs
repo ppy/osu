@@ -10,80 +10,98 @@ using osuTK;
 
 namespace osu.Game.Graphics.Containers
 {
+    /// <summary>
+    /// A container that creates a <see cref="Facade"/> to be used by its children.
+    /// This container also updates the position and size of the Facade, and contains logic for tracking an <see cref="OsuLogo"/> on the Facade's position.
+    /// </summary>
     public class FacadeContainer : Container
     {
+        protected virtual Facade CreateFacade() => new Facade();
+
+        public Facade Facade => facade;
+
+        /// <summary>
+        /// Whether or not the logo assigned to this FacadeContainer should be tracking the position its facade.
+        /// </summary>
+        public bool Tracking;
+
         [Cached]
         private Facade facade;
 
         private OsuLogo logo;
+        private float facadeScale;
 
-        private bool tracking;
-
-        protected virtual Facade CreateFacade() => new Facade();
+        private Vector2 startPosition;
+        private Easing easing;
+        private double startTime;
+        private double duration;
 
         public FacadeContainer()
         {
             facade = CreateFacade();
         }
 
-        private Vector2 logoTrackingPosition => logo.Parent.ToLocalSpace(facade.ScreenSpaceDrawQuad.Centre);
-
-        public void SetLogo(OsuLogo logo, double transformDelay = 0)
+        /// <summary>
+        /// Set the logo that should track the Facade's position, as well as how it should transform to its initial position.
+        /// </summary>
+        /// <param name="logo"> The instance of the logo to be used for tracking. </param>
+        /// <param name="facadeScale"> The scale of the facade. </param>
+        /// <param name="duration"> The duration of the initial transform. Default is instant.</param>
+        /// <param name="easing"> The easing type of the initial transform. </param>
+        public void SetLogo(OsuLogo logo, float facadeScale, double duration = 0, Easing easing = Easing.None)
         {
             if (logo != null)
             {
-                facade.Size = new Vector2(logo.SizeForFlow * 0.3f);
                 this.logo = logo;
-                Scheduler.AddDelayed(() =>
-                {
-                    tracking = true;
-                }, transformDelay);
             }
+
+            this.facadeScale = facadeScale;
+            this.duration = duration;
+            this.easing = easing;
         }
 
-        private double startTime;
-        private double duration = 1000;
-
-        private Vector2 startPosition;
-        private Easing easing = Easing.InOutExpo;
+        private Vector2 logoTrackingPosition => logo.Parent.ToLocalSpace(facade.ScreenSpaceDrawQuad.Centre);
 
         protected override void UpdateAfterChildren()
         {
             base.UpdateAfterChildren();
 
-            if (logo == null || !tracking)
+            if (logo == null || !Tracking)
                 return;
 
-            facade.Size = new Vector2(logo.SizeForFlow * 0.3f);
+            facade.Size = new Vector2(logo.SizeForFlow * facadeScale);
 
             if (facade.IsLoaded && logo.Position != logoTrackingPosition)
             {
-                if (logo.RelativePositionAxes != Axes.None)
-                {
-                    logo.RelativePositionAxes = Axes.None;
-                    logo.Position = logo.Parent.ToLocalSpace(logo.Position);
-                }
+                // Required for the correct position of the logo to be set with respect to logoTrackingPosition
+                logo.RelativePositionAxes = Axes.None;
 
+                // If this is our first update since tracking has started, initialize our starting values for interpolation
                 if (startTime == 0)
                 {
                     startTime = Time.Current;
+                    startPosition = logo.Position;
                 }
 
                 var endTime = startTime + duration;
                 var remainingDuration = endTime - Time.Current;
 
-                if (remainingDuration <= 0)
-                {
-                    remainingDuration = 0;
-                }
+                // If our transform should be instant, our position should already be at logoTrackingPosition, thus set the blend to 0.
+                // If we are already past when the transform should be finished playing, set the blend to 0 so that the logo is always at the position of the facade.
+                var blend = duration > 0 && remainingDuration > 0
+                    ? (float)Interpolation.ApplyEasing(easing, remainingDuration / duration)
+                    : 0;
 
-                float currentTime = (float)Interpolation.ApplyEasing(easing, remainingDuration / duration);
-                logo.Position = Vector2.Lerp(logoTrackingPosition, startPosition, currentTime);
+                // Interpolate the position of the logo, where blend 0 is the position of the Facade, and blend 1 is where the logo was when it first began interpolating.
+                logo.Position = Vector2.Lerp(logoTrackingPosition, startPosition, blend);
             }
         }
     }
 }
 
+/// <summary>
+/// A placeholder container that serves as a dummy object to denote another object's location and size.
+/// </summary>
 public class Facade : Container
 {
 }
