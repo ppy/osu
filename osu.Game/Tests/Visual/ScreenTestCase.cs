@@ -1,9 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using osu.Framework.Allocation;
 using osu.Framework.Graphics;
-using osu.Framework.Screens;
 using osu.Game.Screens;
 
 namespace osu.Game.Tests.Visual
@@ -13,18 +11,11 @@ namespace osu.Game.Tests.Visual
     /// </summary>
     public abstract class ScreenTestCase : OsuTestCase
     {
-        private readonly ScreenStack stack;
-
-        [Cached]
-        private BackgroundScreenStack backgroundStack;
+        private readonly OsuScreenStack stack;
 
         protected ScreenTestCase()
         {
-            Children = new Drawable[]
-            {
-                backgroundStack = new BackgroundScreenStack { RelativeSizeAxes = Axes.Both },
-                stack = new ScreenStack { RelativeSizeAxes = Axes.Both }
-            };
+            Child = stack = new OsuScreenStack { RelativeSizeAxes = Axes.Both };
         }
 
         protected void LoadScreen(OsuScreen screen)
