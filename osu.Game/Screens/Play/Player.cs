@@ -47,6 +47,8 @@ namespace osu.Game.Screens.Play
         public bool AllowLeadIn { get; set; } = true;
         public bool AllowResults { get; set; } = true;
 
+        public bool PauseOnFocusLost { get; set; } = true;
+
         private Bindable<bool> mouseWheelDisabled;
 
         private readonly Bindable<bool> storyboardReplacesBackground = new Bindable<bool>();
@@ -372,7 +374,7 @@ namespace osu.Game.Screens.Play
             base.Update();
 
             // eagerly pause when we lose window focus (if we are locally playing).
-            if (!Game.IsActive.Value)
+            if (PauseOnFocusLost && !Game.IsActive.Value)
                 Pause();
         }
 
