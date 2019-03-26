@@ -23,6 +23,10 @@ namespace osu.Game.Rulesets.Osu.UI
 
         public static readonly Vector2 BASE_SIZE = new Vector2(512, 384);
 
+        private readonly PlayfieldAdjustmentContainer adjustmentContainer;
+
+        protected override Container CursorTargetContainer => adjustmentContainer;
+
         protected override GameplayCursorContainer CreateCursor() => new OsuCursorContainer();
 
         public OsuPlayfield()
@@ -32,7 +36,7 @@ namespace osu.Game.Rulesets.Osu.UI
 
             Size = new Vector2(0.75f);
 
-            InternalChild = new PlayfieldAdjustmentContainer
+            InternalChild = adjustmentContainer = new PlayfieldAdjustmentContainer
             {
                 RelativeSizeAxes = Axes.Both,
                 Children = new Drawable[]
