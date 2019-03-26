@@ -39,10 +39,6 @@ namespace osu.Game.Rulesets.UI
 
         private readonly Container content;
 
-        private class Poop : Container<Box>
-        {
-        }
-
         protected RulesetInputManager(RulesetInfo ruleset, int variant, SimultaneousBindingMode unique)
         {
             InternalChild = KeyBindingContainer =
