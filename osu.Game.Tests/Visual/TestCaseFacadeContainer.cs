@@ -11,7 +11,6 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
-using osu.Framework.Graphics.Sprites;
 using osu.Framework.Testing;
 using osu.Game.Configuration;
 using osu.Game.Graphics.Containers;
@@ -32,15 +31,13 @@ namespace osu.Game.Tests.Visual
             typeof(PlayerLoader),
             typeof(Player),
             typeof(Facade),
+            typeof(FacadeContainer)
         };
 
         [Cached]
         private OsuLogo logo;
 
         private readonly Bindable<float> uiScale = new Bindable<float>();
-
-        private TestScreen screen1;
-        private OsuScreen baseScreen;
 
         public TestCaseFacadeContainer()
         {
@@ -50,15 +47,8 @@ namespace osu.Game.Tests.Visual
         [BackgroundDependencyLoader]
         private void load(OsuConfigManager config)
         {
-            baseScreen = null;
             config.BindWith(OsuSetting.UIScale, uiScale);
             AddSliderStep("Adjust scale", 1f, 1.5f, 1f, v => uiScale.Value = v);
-        }
-
-        [SetUpSteps]
-        public void SetUpSteps()
-        {
-            AddStep("Null screens", () => baseScreen = null);
         }
 
         [Test]
@@ -66,14 +56,14 @@ namespace osu.Game.Tests.Visual
         {
             bool randomPositions = false;
             AddToggleStep("Toggle move continuously", b => randomPositions = b);
-            AddStep("Move facade to random position", () => LoadScreen(screen1 = new TestScreen(randomPositions)));
+            AddStep("Move facade to random position", () => LoadScreen(new TestScreen(randomPositions)));
         }
 
         [Test]
         public void PlayerLoaderTest()
         {
             AddToggleStep("Toggle mods", b => { Beatmap.Value.Mods.Value = b ? Beatmap.Value.Mods.Value.Concat(new[] { new OsuModNoFail() }) : Enumerable.Empty<Mod>(); });
-            AddStep("Add new playerloader", () => LoadScreen(baseScreen = new TestPlayerLoader(() => new TestPlayer
+            AddStep("Add new playerloader", () => LoadScreen(new TestPlayerLoader(() => new TestPlayer
             {
                 AllowPause = false,
                 AllowLeadIn = false,
@@ -84,7 +74,7 @@ namespace osu.Game.Tests.Visual
         [Test]
         public void MainMenuTest()
         {
-            AddStep("Add new Main Menu", () => LoadScreen(baseScreen = new MainMenu()));
+            AddStep("Add new Main Menu", () => LoadScreen(new MainMenu()));
         }
 
         private class TestFacadeContainer : FacadeContainer
@@ -105,17 +95,12 @@ namespace osu.Game.Tests.Visual
         {
             private TestFacadeContainer facadeContainer;
             private FacadeFlowComponent facadeFlowComponent;
-            private OsuLogo logo;
-
             private readonly bool randomPositions;
 
             public TestScreen(bool randomPositions = false)
             {
                 this.randomPositions = randomPositions;
             }
-
-            private SpriteText positionText;
-            private SpriteText sizeAxesText;
 
             [BackgroundDependencyLoader]
             private void load()

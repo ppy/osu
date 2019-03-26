@@ -60,8 +60,8 @@ namespace osu.Game.Graphics.Containers
             {
                 if (logo.RelativePositionAxes != Axes.None)
                 {
-                    logo.Position = logo.Parent.ToLocalSpace(logo.Position);
                     logo.RelativePositionAxes = Axes.None;
+                    logo.Position = logo.Parent.ToLocalSpace(logo.Position);
                 }
 
                 if (startTime == 0)
