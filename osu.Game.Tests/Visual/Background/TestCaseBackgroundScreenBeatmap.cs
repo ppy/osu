@@ -257,9 +257,8 @@ namespace osu.Game.Tests.Visual.Background
 
             AddStep("Start player loader", () =>
             {
-                songSelect.Push(playerLoader = new TestPlayerLoader(player = new TestPlayer
+                songSelect.Push(playerLoader = new TestPlayerLoader(player = new TestPlayer(allowPause)
                 {
-                    AllowPause = allowPause,
                     Ready = true,
                 }));
             });
@@ -356,6 +355,11 @@ namespace osu.Game.Tests.Visual.Background
             public Bindable<bool> StoryboardEnabled;
             public readonly Bindable<bool> ReplacesBackground = new Bindable<bool>();
             public readonly Bindable<bool> IsPaused = new Bindable<bool>();
+
+            public TestPlayer(bool allowPause = true)
+                : base(allowPause)
+            {
+            }
 
             public bool IsStoryboardVisible() => ((TestUserDimContainer)CurrentStoryboardContainer).CurrentAlpha == 1;
 

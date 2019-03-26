@@ -330,11 +330,7 @@ namespace osu.Game.Rulesets.Osu.Tests
                     },
                 }, Clock);
 
-                var p = new ScoreAccessibleReplayPlayer(new Score { Replay = new Replay { Frames = frames } })
-                {
-                    AllowPause = false,
-                    AllowResults = false
-                };
+                var p = new ScoreAccessibleReplayPlayer(new Score { Replay = new Replay { Frames = frames } });
 
                 p.OnLoadComplete += _ =>
                 {
@@ -363,7 +359,7 @@ namespace osu.Game.Rulesets.Osu.Tests
             public new ScoreProcessor ScoreProcessor => base.ScoreProcessor;
 
             public ScoreAccessibleReplayPlayer(Score score)
-                : base(score)
+                : base(score, false, false)
             {
             }
         }
