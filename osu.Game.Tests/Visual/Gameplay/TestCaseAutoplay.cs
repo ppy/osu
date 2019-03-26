@@ -18,7 +18,6 @@ namespace osu.Game.Tests.Visual.Gameplay
             return new ScoreAccessiblePlayer
             {
                 AllowPause = false,
-                AllowLeadIn = false,
                 AllowResults = false,
             };
         }
