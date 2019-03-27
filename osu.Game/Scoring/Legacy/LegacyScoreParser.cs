@@ -71,7 +71,10 @@ namespace osu.Game.Scoring.Legacy
                         score.ScoreInfo.Statistics[HitResult.Miss] = countMiss;
                         break;
                     case 2:
-                        score.ScoreInfo.Statistics[HitResult.Perfect] = count300;
+                        score.ScoreInfo.Statistics[HitResult.Great] = count300;
+                        score.ScoreInfo.Statistics[HitResult.Good] = count100;
+                        score.ScoreInfo.Statistics[HitResult.Ok] = countKatu;
+                        score.ScoreInfo.Statistics[HitResult.Meh] = count50;
                         score.ScoreInfo.Statistics[HitResult.Miss] = countMiss;
                         break;
                     case 3:
