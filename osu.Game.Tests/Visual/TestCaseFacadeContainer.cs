@@ -93,7 +93,7 @@ namespace osu.Game.Tests.Visual
         private class TestScreen : OsuScreen
         {
             private TestFacadeContainer facadeContainer;
-            private FacadeFlowComponent facadeFlowComponent;
+            private Facade facadeFlowComponent;
             private readonly bool randomPositions;
 
             public TestScreen(bool randomPositions = false)
@@ -104,13 +104,8 @@ namespace osu.Game.Tests.Visual
             [BackgroundDependencyLoader]
             private void load()
             {
-                InternalChild = facadeContainer = new TestFacadeContainer
-                {
-                    Child = facadeFlowComponent = new FacadeFlowComponent
-                    {
-                        AutoSizeAxes = Axes.Both
-                    }
-                };
+                InternalChild = facadeContainer = new TestFacadeContainer();
+                facadeContainer.Child = facadeFlowComponent = facadeContainer.Facade;
             }
 
             protected override void LogoArriving(OsuLogo logo, bool resuming)
