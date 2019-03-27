@@ -80,6 +80,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                 Anchor = Anchor.CentreLeft,
                 Origin = Anchor.CentreLeft,
                 AutoSizeAxes = Axes.Both,
+                Margin = new MarginPadding { Right = 20 },
                 Child = CreateModsCell()
             };
         }
