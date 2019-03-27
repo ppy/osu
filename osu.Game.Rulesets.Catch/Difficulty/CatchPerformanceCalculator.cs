@@ -20,17 +20,21 @@ namespace osu.Game.Rulesets.Catch.Difficulty
         private Mod[] mods;
         private int countGreat;
         private int countGood;
+        private int countKatu;
         private int countMeh;
         private int countMiss;
 
         public CatchPerformanceCalculator(Ruleset ruleset, WorkingBeatmap beatmap, ScoreInfo score)
-            : base(ruleset, beatmap, score) { }
+            : base(ruleset, beatmap, score)
+        {
+        }
 
         public override double Calculate(Dictionary<string, double> categoryDifficulty = null)
         {
             mods = Score.Mods;
             countGreat = Convert.ToInt32(Score.Statistics[HitResult.Great]);
             countGood = Convert.ToInt32(Score.Statistics[HitResult.Good]);
+            countKatu = Convert.ToInt32(Score.Statistics[HitResult.Ok]);
             countMeh = Convert.ToInt32(Score.Statistics[HitResult.Meh]);
             countMiss = Convert.ToInt32(Score.Statistics[HitResult.Miss]);
 
@@ -88,8 +92,8 @@ namespace osu.Game.Rulesets.Catch.Difficulty
         }
 
         private float accuracy() => totalHits() == 0 ? 0 : MathHelper.Clamp((float)totalSuccessfulHits() / totalHits(), 0f, 1f);
-        private int totalHits() => countMeh + countGood + countGreat + countMiss;
+        private int totalHits() => countMeh + countGood + countGreat + countMiss + countKatu;
         private int totalSuccessfulHits() => countMeh + countGood + countGreat;
-        private int totalComboHits() => countMeh + countGood + countGreat;
+        private int totalComboHits() => countMiss + countGood + countGreat;
     }
 }
