@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System.Linq;
 using osu.Framework.Graphics;
@@ -11,7 +11,7 @@ using osuTK.Graphics;
 using osu.Game.Graphics;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Allocation;
-using osu.Framework.Configuration;
+using osu.Framework.Bindables;
 using osu.Game.Screens.Ranking;
 using osu.Game.Rulesets.Scoring;
 
@@ -42,7 +42,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         private Color4 normalColour;
         private Color4 completeColour;
 
-        public DrawableSpinner(Spinner s) : base(s)
+        public DrawableSpinner(Spinner s)
+            : base(s)
         {
             Origin = Anchor.Centre;
             Position = s.Position;
@@ -130,7 +131,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             circle.Colour = colours.BlueDark;
             glow.Colour = colours.BlueDark;
 
-            positionBindable.BindValueChanged(v => Position = v);
+            positionBindable.BindValueChanged(pos => Position = pos.NewValue);
             positionBindable.BindTo(HitObject.PositionBindable);
         }
 

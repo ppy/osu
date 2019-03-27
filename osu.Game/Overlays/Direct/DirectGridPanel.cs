@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using osuTK;
 using osuTK.Graphics;
@@ -29,7 +29,8 @@ namespace osu.Game.Overlays.Direct
         protected override PlayButton PlayButton => playButton;
         protected override Box PreviewBar => progressBar;
 
-        public DirectGridPanel(BeatmapSetInfo beatmap) : base(beatmap)
+        public DirectGridPanel(BeatmapSetInfo beatmap)
+            : base(beatmap)
         {
             Width = 380;
             Height = 140 + vertical_padding; //full height of all the elements plus vertical padding (autosize uses the image)
@@ -75,13 +76,12 @@ namespace osu.Game.Overlays.Direct
                                 new OsuSpriteText
                                 {
                                     Text = new LocalisedString((SetInfo.Metadata.TitleUnicode, SetInfo.Metadata.Title)),
-                                    TextSize = 18,
-                                    Font = @"Exo2.0-BoldItalic",
+                                    Font = OsuFont.GetFont(size: 18, weight: FontWeight.Bold, italics: true)
                                 },
                                 new OsuSpriteText
                                 {
                                     Text = new LocalisedString((SetInfo.Metadata.ArtistUnicode, SetInfo.Metadata.Artist)),
-                                    Font = @"Exo2.0-BoldItalic",
+                                    Font = OsuFont.GetFont(weight: FontWeight.Bold, italics: true)
                                 },
                             },
                         },
@@ -127,15 +127,14 @@ namespace osu.Game.Overlays.Direct
                                                 new OsuSpriteText
                                                 {
                                                     Text = "mapped by ",
-                                                    TextSize = 14,
+                                                    Font = OsuFont.GetFont(size: 14),
                                                     Shadow = false,
                                                     Colour = colours.Gray5,
                                                 },
                                                 new OsuSpriteText
                                                 {
                                                     Text = SetInfo.Metadata.Author.Username,
-                                                    TextSize = 14,
-                                                    Font = @"Exo2.0-SemiBoldItalic",
+                                                    Font = OsuFont.GetFont(size: 14, weight: FontWeight.SemiBold, italics: true),
                                                     Shadow = false,
                                                     Colour = colours.BlueDark,
                                                 },
@@ -150,7 +149,7 @@ namespace osu.Game.Overlays.Direct
                                                 new OsuSpriteText
                                                 {
                                                     Text = SetInfo.Metadata.Source,
-                                                    TextSize = 14,
+                                                    Font = OsuFont.GetFont(size: 14),
                                                     Shadow = false,
                                                     Colour = colours.Gray5,
                                                     Alpha = string.IsNullOrEmpty(SetInfo.Metadata.Source) ? 0f : 1f,
@@ -186,10 +185,7 @@ namespace osu.Game.Overlays.Direct
                     Margin = new MarginPadding { Top = vertical_padding, Right = vertical_padding },
                     Children = new[]
                     {
-                        new Statistic(FontAwesome.fa_play_circle, SetInfo.OnlineInfo?.PlayCount ?? 0)
-                        {
-                            Margin = new MarginPadding { Right = 1 },
-                        },
+                        new Statistic(FontAwesome.fa_play_circle, SetInfo.OnlineInfo?.PlayCount ?? 0),
                         new Statistic(FontAwesome.fa_heart, SetInfo.OnlineInfo?.FavouriteCount ?? 0),
                     },
                 },
@@ -239,6 +235,6 @@ namespace osu.Game.Overlays.Direct
             updateStatusContainer();
         }
 
-        private void updateStatusContainer() => statusContainer.FadeTo(IsHovered || PreviewPlaying ? 0 : 1, 120, Easing.InOutQuint);
+        private void updateStatusContainer() => statusContainer.FadeTo(IsHovered || PreviewPlaying.Value ? 0 : 1, 120, Easing.InOutQuint);
     }
 }

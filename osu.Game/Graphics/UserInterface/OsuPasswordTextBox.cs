@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using osuTK;
 using osuTK.Graphics;
@@ -9,12 +9,13 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Input;
 using osu.Framework.Input.Events;
 using osu.Framework.Platform;
 
 namespace osu.Game.Graphics.UserInterface
 {
-    public class OsuPasswordTextBox : OsuTextBox
+    public class OsuPasswordTextBox : OsuTextBox, ISuppressKeyEventLogging
     {
         protected override Drawable GetDrawableCharacter(char c) => new PasswordMaskChar(CalculatedTextSize);
 

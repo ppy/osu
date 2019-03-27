@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using System.Collections.Generic;
@@ -28,7 +28,7 @@ namespace osu.Game.Rulesets.Osu.Mods
         {
             foreach (var drawable in drawables)
             {
-                var hitObject = (OsuHitObject) drawable.HitObject;
+                var hitObject = (OsuHitObject)drawable.HitObject;
 
                 float appearDistance = (float)(hitObject.TimePreempt - hitObject.TimeFadeIn) / 2;
 
@@ -46,7 +46,7 @@ namespace osu.Game.Rulesets.Osu.Mods
                         .MoveTo(originalPosition, moveDuration, Easing.InOutSine);
                 }
 
-                theta += (float) hitObject.TimeFadeIn / 1000;
+                theta += (float)hitObject.TimeFadeIn / 1000;
             }
         }
     }

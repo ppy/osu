@@ -1,11 +1,11 @@
-// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
-using osu.Framework.Configuration;
+using osu.Framework.Bindables;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -19,13 +19,13 @@ namespace osu.Game.Screens.Multi.Lounge.Components
     {
         public Action<Room> JoinRequested;
 
-        private readonly Bindable<Room> selectedRoom = new Bindable<Room>();
-        public IBindable<Room> SelectedRoom => selectedRoom;
-
         private readonly IBindableList<Room> rooms = new BindableList<Room>();
 
         private readonly FillFlowContainer<DrawableRoom> roomFlow;
         public IReadOnlyList<DrawableRoom> Rooms => roomFlow;
+
+        [Resolved]
+        private Bindable<Room> currentRoom { get; set; }
 
         [Resolved]
         private IRoomManager roomManager { get; set; }
@@ -109,7 +109,7 @@ namespace osu.Game.Screens.Multi.Lounge.Components
         private void updateSorting()
         {
             foreach (var room in roomFlow)
-                roomFlow.SetLayoutPosition(room, room.Room.Position);
+                roomFlow.SetLayoutPosition(room, room.Room.Position.Value);
         }
 
         private void selectRoom(Room room)
@@ -121,7 +121,7 @@ namespace osu.Game.Screens.Multi.Lounge.Components
             else
                 roomFlow.Children.ForEach(r => r.State = r.Room == room ? SelectionState.Selected : SelectionState.NotSelected);
 
-            selectedRoom.Value = room;
+            currentRoom.Value = room;
         }
 
         protected override void Dispose(bool isDisposing)

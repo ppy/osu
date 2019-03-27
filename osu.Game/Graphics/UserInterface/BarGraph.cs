@@ -1,5 +1,5 @@
-// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using osuTK;
 using osu.Framework.Graphics;
@@ -17,12 +17,10 @@ namespace osu.Game.Graphics.UserInterface
         public float? MaxValue { get; set; }
 
         private BarDirection direction = BarDirection.BottomToTop;
+
         public new BarDirection Direction
         {
-            get
-            {
-                return direction;
-            }
+            get => direction;
             set
             {
                 direction = value;
@@ -69,6 +67,7 @@ namespace osu.Game.Graphics.UserInterface
                         });
                     }
                 }
+
                 //I'm using ToList() here because Where() returns an Enumerable which can change it's elements afterwards
                 RemoveRange(Children.Where((bar, index) => index >= value.Count()).ToList());
             }

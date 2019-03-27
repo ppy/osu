@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using osu.Game.Graphics;
 using System;
@@ -65,5 +65,10 @@ namespace osu.Game.Rulesets.Mods
         /// </summary>
         [JsonIgnore]
         public virtual Type[] IncompatibleMods => new Type[] { };
+
+        /// <summary>
+        /// Creates a copy of this <see cref="Mod"/> initialised to a default state.
+        /// </summary>
+        public virtual Mod CreateCopy() => (Mod)Activator.CreateInstance(GetType());
     }
 }

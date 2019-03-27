@@ -1,10 +1,8 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
-using System.Collections.Generic;
 using Humanizer;
 using osu.Framework.Allocation;
-using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics;
@@ -16,26 +14,24 @@ using osuTK;
 
 namespace osu.Game.Screens.Multi.Lounge.Components
 {
-    public class ParticipantInfo : Container
+    public class ParticipantInfo : MultiplayerComposite
     {
-        private readonly FillFlowContainer summaryContainer;
-
-        public readonly IBindable<User> Host = new Bindable<User>();
-        public readonly IBindable<IEnumerable<User>> Participants = new Bindable<IEnumerable<User>>();
-        public readonly IBindable<int> ParticipantCount = new Bindable<int>();
-
         public ParticipantInfo()
         {
-            OsuSpriteText summary;
             RelativeSizeAxes = Axes.X;
             Height = 15f;
+        }
 
+        [BackgroundDependencyLoader]
+        private void load(OsuColour colours)
+        {
+            OsuSpriteText summary;
             OsuSpriteText levelRangeHigher;
             OsuSpriteText levelRangeLower;
             Container flagContainer;
             LinkFlowContainer hostText;
 
-            Children = new Drawable[]
+            InternalChildren = new Drawable[]
             {
                 new FillFlowContainer
                 {
@@ -73,46 +69,46 @@ namespace osu.Game.Screens.Multi.Lounge.Components
                         }
                     },
                 },
-                summaryContainer = new FillFlowContainer
+                new FillFlowContainer
                 {
                     Anchor = Anchor.CentreRight,
                     Origin = Anchor.CentreRight,
                     AutoSizeAxes = Axes.Both,
                     Direction = FillDirection.Horizontal,
+                    Colour = colours.Gray9,
                     Children = new[]
                     {
                         summary = new OsuSpriteText
                         {
                             Text = "0 participants",
-                            TextSize = 14,
+                            Font = OsuFont.GetFont(size: 14)
                         }
                     },
                 },
             };
 
-            Host.BindValueChanged(v =>
+            Host.BindValueChanged(host =>
             {
                 hostText.Clear();
-                hostText.AddText("hosted by ");
-                hostText.AddLink(v.Username, null, LinkAction.OpenUserProfile, v.Id.ToString(), "Open profile", s => s.Font = "Exo2.0-BoldItalic");
+                flagContainer.Clear();
 
-                flagContainer.Child = new DrawableFlag(v.Country) { RelativeSizeAxes = Axes.Both };
-            });
+                if (host.NewValue != null)
+                {
+                    hostText.AddText("hosted by ");
+                    hostText.AddLink(host.NewValue.Username, null, LinkAction.OpenUserProfile, host.NewValue.Id.ToString(), "Open profile",
+                        s => s.Font = s.Font.With(Typeface.Exo, weight: FontWeight.Bold, italics: true));
+                    flagContainer.Child = new DrawableFlag(host.NewValue.Country) { RelativeSizeAxes = Axes.Both };
+                }
+            }, true);
 
-            ParticipantCount.BindValueChanged(v => summary.Text = $"{v:#,0}{" participant".Pluralize(v == 1)}");
+            ParticipantCount.BindValueChanged(count => summary.Text = "participant".ToQuantity(count.NewValue), true);
 
-            /*Participants.BindValueChanged(v =>
+            /*Participants.BindValueChanged(e =>
             {
                 var ranks = v.Select(u => u.Statistics.Ranks.Global);
                 levelRangeLower.Text = ranks.Min().ToString();
                 levelRangeHigher.Text = ranks.Max().ToString();
             });*/
-        }
-
-        [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
-        {
-            summaryContainer.Colour = colours.Gray9;
         }
     }
 }

@@ -1,5 +1,5 @@
-// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using osu.Game.Beatmaps;
@@ -11,14 +11,10 @@ using osu.Game.Scoring;
 
 namespace osu.Game.Rulesets.Mods
 {
-    public abstract class ModAutoplay<T> : ModAutoplay, IApplicableToRulesetContainer<T>
+    public abstract class ModAutoplay<T> : ModAutoplay, IApplicableToDrawableRuleset<T>
         where T : HitObject
     {
-        protected virtual Score CreateReplayScore(Beatmap<T> beatmap) => new Score { Replay = new Replay() };
-
-        public override bool HasImplementation => GetType().GenericTypeArguments.Length == 0;
-
-        public virtual void ApplyToRulesetContainer(RulesetContainer<T> rulesetContainer) => rulesetContainer.SetReplayScore(CreateReplayScore(rulesetContainer.Beatmap));
+        public virtual void ApplyToDrawableRuleset(DrawableRuleset<T> drawableRuleset) => drawableRuleset.SetReplayScore(CreateReplayScore(drawableRuleset.Beatmap));
     }
 
     public abstract class ModAutoplay : Mod, IApplicableFailOverride
@@ -31,5 +27,9 @@ namespace osu.Game.Rulesets.Mods
         public override double ScoreMultiplier => 1;
         public bool AllowFail => false;
         public override Type[] IncompatibleMods => new[] { typeof(ModRelax), typeof(ModSuddenDeath), typeof(ModNoFail) };
+
+        public override bool HasImplementation => GetType().GenericTypeArguments.Length == 0;
+
+        public virtual Score CreateReplayScore(IBeatmap beatmap) => new Score { Replay = new Replay() };
     }
 }

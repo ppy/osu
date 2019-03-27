@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
@@ -15,8 +15,8 @@ namespace osu.Game.Screens.Play.Break
 
         public FontAwesome Icon
         {
-            set { icon.Icon = value; }
-            get { return icon.Icon; }
+            set => icon.Icon = value;
+            get => icon.Icon;
         }
 
         public override Vector2 Size
@@ -27,7 +27,7 @@ namespace osu.Game.Screens.Play.Break
                 base.Size = value + BlurSigma * 2.5f;
                 ForceRedraw();
             }
-            get { return base.Size; }
+            get => base.Size;
         }
 
         public BlurredIcon()

@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
@@ -28,8 +28,7 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
                 Text = $"{pp:0}pp",
                 Anchor = Anchor.TopRight,
                 Origin = Anchor.TopRight,
-                TextSize = 18,
-                Font = "Exo2.0-BoldItalic",
+                Font = OsuFont.GetFont(size: 18, weight: FontWeight.Bold, italics: true)
             });
 
             if (weight.HasValue)
@@ -40,8 +39,7 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
                     Anchor = Anchor.TopRight,
                     Origin = Anchor.TopRight,
                     Colour = colour.GrayA,
-                    TextSize = 11,
-                    Font = "Exo2.0-RegularItalic",
+                    Font = OsuFont.GetFont(size: 11, weight: FontWeight.Regular, italics: true)
                 });
             }
         }

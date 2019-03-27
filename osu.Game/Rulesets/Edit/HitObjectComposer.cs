@@ -1,11 +1,11 @@
-// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
-using osu.Framework.Configuration;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input;
@@ -24,7 +24,7 @@ namespace osu.Game.Rulesets.Edit
 {
     public abstract class HitObjectComposer : CompositeDrawable
     {
-        public IEnumerable<DrawableHitObject> HitObjects => RulesetContainer.Playfield.AllHitObjects;
+        public IEnumerable<DrawableHitObject> HitObjects => DrawableRuleset.Playfield.AllHitObjects;
 
         protected readonly Ruleset Ruleset;
 
@@ -34,7 +34,7 @@ namespace osu.Game.Rulesets.Edit
 
         private readonly List<Container> layerContainers = new List<Container>();
 
-        protected EditRulesetContainer RulesetContainer { get; private set; }
+        protected DrawableEditRuleset DrawableRuleset { get; private set; }
 
         private BlueprintContainer blueprintContainer;
 
@@ -48,14 +48,14 @@ namespace osu.Game.Rulesets.Edit
         }
 
         [BackgroundDependencyLoader]
-        private void load(IBindableBeatmap beatmap, IFrameBasedClock framedClock)
+        private void load(IBindable<WorkingBeatmap> beatmap, IFrameBasedClock framedClock)
         {
             Beatmap.BindTo(beatmap);
 
             try
             {
-                RulesetContainer = CreateRulesetContainer();
-                RulesetContainer.Clock = framedClock;
+                DrawableRuleset = CreateDrawableRuleset();
+                DrawableRuleset.Clock = framedClock;
             }
             catch (Exception e)
             {
@@ -97,7 +97,7 @@ namespace osu.Game.Rulesets.Edit
                             Children = new Drawable[]
                             {
                                 layerBelowRuleset,
-                                RulesetContainer,
+                                DrawableRuleset,
                                 layerAboveRuleset
                             }
                         }
@@ -111,8 +111,8 @@ namespace osu.Game.Rulesets.Edit
 
             toolboxCollection.Items =
                 CompositionTools.Select(t => new RadioButton(t.Name, () => blueprintContainer.CurrentTool = t))
-                .Prepend(new RadioButton("Select", () => blueprintContainer.CurrentTool = null))
-                .ToList();
+                                .Prepend(new RadioButton("Select", () => blueprintContainer.CurrentTool = null))
+                                .ToList();
 
             toolboxCollection.Items[0].Select();
         }
@@ -140,27 +140,27 @@ namespace osu.Game.Rulesets.Edit
 
             layerContainers.ForEach(l =>
             {
-                l.Anchor = RulesetContainer.Playfield.Anchor;
-                l.Origin = RulesetContainer.Playfield.Origin;
-                l.Position = RulesetContainer.Playfield.Position;
-                l.Size = RulesetContainer.Playfield.Size;
+                l.Anchor = DrawableRuleset.Playfield.Anchor;
+                l.Origin = DrawableRuleset.Playfield.Origin;
+                l.Position = DrawableRuleset.Playfield.Position;
+                l.Size = DrawableRuleset.Playfield.Size;
             });
         }
 
         /// <summary>
         /// Whether the user's cursor is currently in an area of the <see cref="HitObjectComposer"/> that is valid for placement.
         /// </summary>
-        public virtual bool CursorInPlacementArea => RulesetContainer.Playfield.ReceivePositionalInputAt(inputManager.CurrentState.Mouse.Position);
+        public virtual bool CursorInPlacementArea => DrawableRuleset.Playfield.ReceivePositionalInputAt(inputManager.CurrentState.Mouse.Position);
 
         /// <summary>
         /// Adds a <see cref="HitObject"/> to the <see cref="Beatmaps.Beatmap"/> and visualises it.
         /// </summary>
         /// <param name="hitObject">The <see cref="HitObject"/> to add.</param>
-        public void Add(HitObject hitObject) => blueprintContainer.AddBlueprintFor(RulesetContainer.Add(hitObject));
+        public void Add(HitObject hitObject) => blueprintContainer.AddBlueprintFor(DrawableRuleset.Add(hitObject));
 
-        public void Remove(HitObject hitObject) => blueprintContainer.RemoveBlueprintFor(RulesetContainer.Remove(hitObject));
+        public void Remove(HitObject hitObject) => blueprintContainer.RemoveBlueprintFor(DrawableRuleset.Remove(hitObject));
 
-        internal abstract EditRulesetContainer CreateRulesetContainer();
+        internal abstract DrawableEditRuleset CreateDrawableRuleset();
 
         protected abstract IReadOnlyList<HitObjectCompositionTool> CompositionTools { get; }
 
@@ -189,9 +189,9 @@ namespace osu.Game.Rulesets.Edit
         {
         }
 
-        internal override EditRulesetContainer CreateRulesetContainer()
-            => new EditRulesetContainer<TObject>(CreateRulesetContainer(Ruleset, Beatmap.Value));
+        internal override DrawableEditRuleset CreateDrawableRuleset()
+            => new DrawableEditRuleset<TObject>(CreateDrawableRuleset(Ruleset, Beatmap.Value));
 
-        protected abstract RulesetContainer<TObject> CreateRulesetContainer(Ruleset ruleset, WorkingBeatmap beatmap);
+        protected abstract DrawableRuleset<TObject> CreateDrawableRuleset(Ruleset ruleset, WorkingBeatmap beatmap);
     }
 }

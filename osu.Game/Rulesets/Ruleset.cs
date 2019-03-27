@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using System.Collections.Generic;
@@ -42,7 +42,7 @@ namespace osu.Game.Rulesets
         /// <returns>An enumerable of constructed <see cref="Mod"/>s</returns>
         public virtual IEnumerable<Mod> ConvertLegacyMods(LegacyMods mods) => new Mod[] { };
 
-        public Mod GetAutoplayMod() => GetAllMods().First(mod => mod is ModAutoplay);
+        public ModAutoplay GetAutoplayMod() => GetAllMods().OfType<ModAutoplay>().First();
 
         protected Ruleset(RulesetInfo rulesetInfo = null)
         {
@@ -55,7 +55,7 @@ namespace osu.Game.Rulesets
         /// <param name="beatmap">The beatmap to create the hit renderer for.</param>
         /// <exception cref="BeatmapInvalidForRulesetException">Unable to successfully load the beatmap to be usable with this ruleset.</exception>
         /// <returns></returns>
-        public abstract RulesetContainer CreateRulesetContainerWith(WorkingBeatmap beatmap);
+        public abstract DrawableRuleset CreateDrawableRulesetWith(WorkingBeatmap beatmap);
 
         /// <summary>
         /// Creates a <see cref="IBeatmapConverter"/> to convert a <see cref="IBeatmap"/> to one that is applicable for this <see cref="Ruleset"/>.

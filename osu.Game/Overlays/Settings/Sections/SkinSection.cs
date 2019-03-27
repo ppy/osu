@@ -1,9 +1,9 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System.Linq;
 using osu.Framework.Allocation;
-using osu.Framework.Configuration;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Game.Configuration;
 using osu.Game.Graphics;
@@ -52,6 +52,16 @@ namespace osu.Game.Overlays.Settings.Sections
                     LabelText = "Adjust gameplay cursor size based on current beatmap",
                     Bindable = config.GetBindable<bool>(OsuSetting.AutoCursorSize)
                 },
+                new SettingsCheckbox
+                {
+                    LabelText = "Beatmap skins",
+                    Bindable = config.GetBindable<bool>(OsuSetting.BeatmapSkins)
+                },
+                new SettingsCheckbox
+                {
+                    LabelText = "Beatmap hitsounds",
+                    Bindable = config.GetBindable<bool>(OsuSetting.BeatmapHitsounds)
+                },
             };
 
             skins.ItemAdded += itemAdded;
@@ -66,13 +76,13 @@ namespace osu.Game.Overlays.Settings.Sections
             if (skinDropdown.Items.All(s => s.ID != configBindable.Value))
                 configBindable.Value = 0;
 
-            configBindable.BindValueChanged(v => dropdownBindable.Value = skinDropdown.Items.Single(s => s.ID == v), true);
-            dropdownBindable.BindValueChanged(v => configBindable.Value = v.ID);
+            configBindable.BindValueChanged(id => dropdownBindable.Value = skinDropdown.Items.Single(s => s.ID == id.NewValue), true);
+            dropdownBindable.BindValueChanged(skin => configBindable.Value = skin.NewValue.ID);
         }
 
         private void itemRemoved(SkinInfo s) => Schedule(() => skinDropdown.Items = skinDropdown.Items.Where(i => i.ID != s.ID).ToArray());
 
-        private void itemAdded(SkinInfo s, bool existing, bool silent)
+        private void itemAdded(SkinInfo s, bool existing)
         {
             if (existing)
                 return;
