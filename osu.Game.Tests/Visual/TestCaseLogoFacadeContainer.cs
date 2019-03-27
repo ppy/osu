@@ -9,7 +9,6 @@ using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.UserInterface;
 using osu.Game.Configuration;
@@ -24,14 +23,14 @@ using osuTK.Graphics;
 
 namespace osu.Game.Tests.Visual
 {
-    public class TestCaseFacadeContainer : ScreenTestCase
+    public class TestCaseLogoFacadeContainer : ScreenTestCase
     {
         public override IReadOnlyList<Type> RequiredTypes => new[]
         {
             typeof(PlayerLoader),
             typeof(Player),
-            typeof(Facade),
-            typeof(FacadeContainer),
+            typeof(LogoFacadeContainer.Facade),
+            typeof(LogoFacadeContainer),
             typeof(ButtonSystem),
             typeof(ButtonSystemState),
             typeof(Menu),
@@ -43,7 +42,7 @@ namespace osu.Game.Tests.Visual
 
         private readonly Bindable<float> uiScale = new Bindable<float>();
 
-        public TestCaseFacadeContainer()
+        public TestCaseLogoFacadeContainer()
         {
             Add(logo = new OsuLogo());
         }
@@ -63,20 +62,7 @@ namespace osu.Game.Tests.Visual
             AddStep("Move facade to random position", () => LoadScreen(new TestScreen(randomPositions)));
         }
 
-        [Test]
-        public void PlayerLoaderTest()
-        {
-            AddToggleStep("Toggle mods", b => { Beatmap.Value.Mods.Value = b ? Beatmap.Value.Mods.Value.Concat(new[] { new OsuModNoFail() }) : Enumerable.Empty<Mod>(); });
-            AddStep("Add new playerloader", () => LoadScreen(new TestPlayerLoader(() => new TestPlayer
-            {
-                AllowPause = false,
-                AllowLeadIn = false,
-                AllowResults = false,
-                Ready = false
-            })));
-        }
-
-        private class TestFacadeContainer : FacadeContainer
+        private class TestLogoFacadeContainer : LogoFacadeContainer
         {
             protected override Facade CreateFacade() => new Facade
             {
@@ -92,8 +78,8 @@ namespace osu.Game.Tests.Visual
 
         private class TestScreen : OsuScreen
         {
-            private TestFacadeContainer facadeContainer;
-            private Facade facadeFlowComponent;
+            private TestLogoFacadeContainer logoFacadeContainer;
+            private LogoFacadeContainer.Facade facadeFlowComponent;
             private readonly bool randomPositions;
 
             public TestScreen(bool randomPositions = false)
@@ -104,8 +90,8 @@ namespace osu.Game.Tests.Visual
             [BackgroundDependencyLoader]
             private void load()
             {
-                InternalChild = facadeContainer = new TestFacadeContainer();
-                facadeContainer.Child = facadeFlowComponent = facadeContainer.Facade;
+                InternalChild = logoFacadeContainer = new TestLogoFacadeContainer();
+                logoFacadeContainer.Child = facadeFlowComponent = logoFacadeContainer.LogoFacade;
             }
 
             protected override void LogoArriving(OsuLogo logo, bool resuming)
@@ -113,15 +99,15 @@ namespace osu.Game.Tests.Visual
                 base.LogoArriving(logo, resuming);
                 logo.FadeIn(350);
                 logo.ScaleTo(new Vector2(0.15f), 350, Easing.In);
-                facadeContainer.SetLogo(logo, 0.3f, 1000, Easing.InOutQuint);
-                facadeContainer.Tracking = true;
+                logoFacadeContainer.SetLogo(logo, 0.3f, 1000, Easing.InOutQuint);
+                logoFacadeContainer.Tracking = true;
                 moveLogoFacade();
             }
 
             protected override void LogoExiting(OsuLogo logo)
             {
                 base.LogoExiting(logo);
-                facadeContainer.Tracking = false;
+                logoFacadeContainer.Tracking = false;
             }
 
             private void moveLogoFacade()
@@ -134,40 +120,6 @@ namespace osu.Game.Tests.Visual
 
                 if (randomPositions)
                     Schedule(moveLogoFacade);
-            }
-        }
-
-        private class FacadeFlowComponent : FillFlowContainer
-        {
-            [BackgroundDependencyLoader]
-            private void load(Facade facade)
-            {
-                facade.Anchor = Anchor.TopCentre;
-                facade.Origin = Anchor.TopCentre;
-                Child = facade;
-            }
-        }
-
-        private class TestPlayerLoader : PlayerLoader
-        {
-            public TestPlayerLoader(Func<Player> player)
-                : base(player)
-            {
-            }
-
-            protected override FacadeContainer CreateFacadeContainer() => new TestFacadeContainer();
-        }
-
-        private class TestPlayer : Player
-        {
-            public bool Ready;
-
-            [BackgroundDependencyLoader]
-            private void load(CancellationToken token)
-            {
-                // Never finish loading
-                while (!Ready && !token.IsCancellationRequested)
-                    Thread.Sleep(1);
             }
         }
     }
