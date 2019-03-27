@@ -6,7 +6,7 @@ using osu.Game.Online.API.Requests.Responses;
 
 namespace osu.Game.Online.API.Requests
 {
-    public class GetUserScoresRequest : APIRequest<List<APIScoreInfo>>
+    public class GetUserScoresRequest : APIRequest<List<APILegacyScoreInfo>>
     {
         private readonly long userId;
         private readonly ScoreType type;

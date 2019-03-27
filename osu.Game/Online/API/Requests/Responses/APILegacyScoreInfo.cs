@@ -13,7 +13,7 @@ using osu.Game.Users;
 
 namespace osu.Game.Online.API.Requests.Responses
 {
-    public class APIScoreInfo : LegacyScoreInfo
+    public class APILegacyScoreInfo : LegacyScoreInfo
     {
         [JsonProperty(@"score")]
         private int totalScore
