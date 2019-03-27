@@ -33,9 +33,7 @@ namespace osu.Game.Screens.Play
 
         private Player player;
 
-        private FacadeContainer facadeContainer;
-
-        protected virtual FacadeContainer CreateFacadeContainer() => new FacadeContainer();
+        private LogoFacadeContainer content;
 
         private BeatmapMetadataDisplay info;
 
@@ -62,30 +60,32 @@ namespace osu.Game.Screens.Play
         [BackgroundDependencyLoader]
         private void load()
         {
-            InternalChild = facadeContainer = CreateFacadeContainer();
-            facadeContainer.Anchor = Anchor.Centre;
-            facadeContainer.Origin = Anchor.Centre;
-            facadeContainer.RelativeSizeAxes = Axes.Both;
-            facadeContainer.Children = new Drawable[]
+            InternalChild = content = new LogoFacadeContainer
             {
-                info = new BeatmapMetadataDisplay(Beatmap.Value, facadeContainer.Facade)
+                Anchor = Anchor.Centre,
+                Origin = Anchor.Centre,
+                RelativeSizeAxes = Axes.Both,
+                Children = new Drawable[]
                 {
-                    Alpha = 0,
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
-                },
-                new FillFlowContainer<PlayerSettingsGroup>
-                {
-                    Anchor = Anchor.TopRight,
-                    Origin = Anchor.TopRight,
-                    AutoSizeAxes = Axes.Both,
-                    Direction = FillDirection.Vertical,
-                    Spacing = new Vector2(0, 20),
-                    Margin = new MarginPadding(25),
-                    Children = new PlayerSettingsGroup[]
+                    info = new BeatmapMetadataDisplay(Beatmap.Value, content.LogoFacade)
                     {
-                        VisualSettings = new VisualSettings(),
-                        new InputSettings()
+                        Alpha = 0,
+                        Anchor = Anchor.Centre,
+                        Origin = Anchor.Centre,
+                    },
+                    new FillFlowContainer<PlayerSettingsGroup>
+                    {
+                        Anchor = Anchor.TopRight,
+                        Origin = Anchor.TopRight,
+                        AutoSizeAxes = Axes.Both,
+                        Direction = FillDirection.Vertical,
+                        Spacing = new Vector2(0, 20),
+                        Margin = new MarginPadding(25),
+                        Children = new PlayerSettingsGroup[]
+                        {
+                            VisualSettings = new VisualSettings(),
+                            new InputSettings()
+                        }
                     }
                 }
             };
@@ -122,21 +122,21 @@ namespace osu.Game.Screens.Play
 
         private void contentIn()
         {
-            facadeContainer.ScaleTo(1, 650, Easing.OutQuint);
-            facadeContainer.FadeInFromZero(400);
+            content.ScaleTo(1, 650, Easing.OutQuint);
+            content.FadeInFromZero(400);
         }
 
         private void contentOut()
         {
-            facadeContainer.ScaleTo(0.7f, 300, Easing.InQuint);
-            facadeContainer.FadeOut(250);
+            content.ScaleTo(0.7f, 300, Easing.InQuint);
+            content.FadeOut(250);
         }
 
         public override void OnEntering(IScreen last)
         {
             base.OnEntering(last);
 
-            facadeContainer.ScaleTo(0.7f);
+            content.ScaleTo(0.7f);
             Background?.FadeColour(Color4.White, 800, Easing.OutQuint);
 
             contentIn();
@@ -155,15 +155,15 @@ namespace osu.Game.Screens.Play
             logo.MoveTo(new Vector2(0.5f), duration, Easing.In);
             logo.FadeIn(350);
 
-            facadeContainer.SetLogo(logo, 0.3f, 500, Easing.InOutQuint);
+            content.SetLogo(logo, 0.3f, 500, Easing.InOutExpo);
 
-            Scheduler.AddDelayed(() => facadeContainer.Tracking = true, duration);
+            Scheduler.AddDelayed(() => content.Tracking = true, resuming ? 0 : 500);
         }
 
         protected override void LogoExiting(OsuLogo logo)
         {
             base.LogoExiting(logo);
-            facadeContainer.Tracking = false;
+            content.Tracking = false;
         }
 
         protected override void LoadComplete()
@@ -238,7 +238,7 @@ namespace osu.Game.Screens.Play
 
         public override bool OnExiting(IScreen next)
         {
-            facadeContainer.ScaleTo(0.7f, 150, Easing.InQuint);
+            content.ScaleTo(0.7f, 150, Easing.InQuint);
             this.FadeOut(150);
             cancelLoad();
 
@@ -310,7 +310,7 @@ namespace osu.Game.Screens.Play
             }
 
             private readonly WorkingBeatmap beatmap;
-            private readonly Facade facade;
+            private readonly LogoFacadeContainer.Facade facade;
             private LoadingAnimation loading;
             private Sprite backgroundSprite;
             private ModDisplay modDisplay;
@@ -332,7 +332,7 @@ namespace osu.Game.Screens.Play
                 }
             }
 
-            public BeatmapMetadataDisplay(WorkingBeatmap beatmap, Facade facade)
+            public BeatmapMetadataDisplay(WorkingBeatmap beatmap, LogoFacadeContainer.Facade facade)
             {
                 this.beatmap = beatmap;
                 this.facade = facade;

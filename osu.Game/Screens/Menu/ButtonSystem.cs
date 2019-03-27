@@ -48,6 +48,10 @@ namespace osu.Game.Screens.Menu
 
         private OsuLogo logo;
 
+        /// <summary>
+        /// Assign the <see cref="OsuLogo"/> that this ButtonSystem should manage the position of.
+        /// </summary>
+        /// <param name="logo">The instance of the logo to be assigned. If null, we are suspending from the screen that uses this ButtonSystem.</param>
         public void SetOsuLogo(OsuLogo logo)
         {
             this.logo = logo;
@@ -55,7 +59,7 @@ namespace osu.Game.Screens.Menu
             if (this.logo != null)
             {
                 this.logo.Action = onOsuLogo;
-                facadeContainer.SetLogo(logo, 0.5f);
+                logoFacadeContainer.SetLogo(logo, 0.5f);
 
                 // osuLogo.SizeForFlow relies on loading to be complete.
                 buttonArea.Flow.Position = new Vector2(WEDGE_WIDTH * 2 - (BUTTON_WIDTH + this.logo.SizeForFlow / 4), 0);
@@ -64,9 +68,8 @@ namespace osu.Game.Screens.Menu
             }
             else
             {
-                // If logo is null, we are suspending from the screen that uses this ButtonSystem.
                 // We should stop tracking as the facade is now out of scope.
-                facadeContainer.Tracking = false;
+                logoFacadeContainer.Tracking = false;
             }
         }
 
@@ -79,13 +82,13 @@ namespace osu.Game.Screens.Menu
 
         private SampleChannel sampleBack;
 
-        private readonly FacadeContainer facadeContainer;
+        private readonly LogoFacadeContainer logoFacadeContainer;
 
         public ButtonSystem()
         {
             RelativeSizeAxes = Axes.Both;
 
-            Child = facadeContainer = new FacadeContainer
+            Child = logoFacadeContainer = new LogoFacadeContainer
             {
                 RelativeSizeAxes = Axes.Both,
                 Child = buttonArea = new ButtonArea()
@@ -98,10 +101,10 @@ namespace osu.Game.Screens.Menu
                 {
                     VisibleState = ButtonSystemState.Play,
                 },
-                facadeContainer.Facade
+                logoFacadeContainer.LogoFacade
             });
 
-            buttonArea.Flow.CentreTarget = facadeContainer.Facade;
+            buttonArea.Flow.CentreTarget = logoFacadeContainer.LogoFacade;
         }
 
         [Resolved(CanBeNull = true)]
@@ -267,7 +270,7 @@ namespace osu.Game.Screens.Menu
                     logoDelayedAction?.Cancel();
                     logoDelayedAction = Scheduler.AddDelayed(() =>
                         {
-                            facadeContainer.Tracking = false;
+                            logoFacadeContainer.Tracking = false;
 
                             game?.Toolbar.Hide();
 
@@ -295,7 +298,7 @@ namespace osu.Game.Screens.Menu
                             logoDelayedAction?.Cancel();
                             logoDelayedAction = Scheduler.AddDelayed(() =>
                             {
-                                facadeContainer.Tracking = true;
+                                logoFacadeContainer.Tracking = true;
 
                                 if (impact)
                                     logo.Impact();
@@ -305,14 +308,14 @@ namespace osu.Game.Screens.Menu
                             break;
                         default:
                             logo.ClearTransforms(targetMember: nameof(Position));
-                            facadeContainer.Tracking = true;
+                            logoFacadeContainer.Tracking = true;
                             logo.ScaleTo(0.5f, 200, Easing.OutQuint);
                             break;
                     }
 
                     break;
                 case ButtonSystemState.EnteringMode:
-                    facadeContainer.Tracking = true;
+                    logoFacadeContainer.Tracking = true;
                     break;
             }
         }
