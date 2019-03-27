@@ -17,7 +17,7 @@ namespace osu.Game.Graphics.Containers
     {
         protected virtual Facade CreateFacade() => new Facade();
 
-        public readonly Facade Facade;
+        public Facade Facade { get; }
 
         /// <summary>
         /// Whether or not the logo assigned to this FacadeContainer should be tracking the position its facade.
