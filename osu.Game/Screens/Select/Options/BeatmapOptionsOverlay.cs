@@ -6,7 +6,7 @@ using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
-using osu.Game.Graphics;
+using osu.Framework.Graphics.Sprites;
 using osuTK;
 using osuTK.Graphics;
 using osuTK.Input;
@@ -93,7 +93,7 @@ namespace osu.Game.Screens.Select.Options
         /// <para>Lower depth to be put on the left, and higher to be put on the right.</para>
         /// <para>Notice this is different to <see cref="Footer"/>!</para>
         /// </param>
-        public void AddButton(string firstLine, string secondLine, FontAwesome icon, Color4 colour, Action action, Key? hotkey = null, float depth = 0)
+        public void AddButton(string firstLine, string secondLine, IconUsage icon, Color4 colour, Action action, Key? hotkey = null, float depth = 0)
         {
             var button = new BeatmapOptionsButton
             {

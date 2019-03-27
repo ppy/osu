@@ -9,6 +9,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Events;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
@@ -71,7 +72,7 @@ namespace osu.Game.Overlays.Chat.Selection
                                 {
                                     Anchor = Anchor.TopRight,
                                     Origin = Anchor.TopRight,
-                                    Icon = FontAwesome.fa_check_circle,
+                                    Icon = FontAwesome.CheckCircle,
                                     Size = new Vector2(text_size),
                                     Shadow = false,
                                     Margin = new MarginPadding { Right = 10f },
@@ -118,7 +119,7 @@ namespace osu.Game.Overlays.Chat.Selection
                             {
                                 new SpriteIcon
                                 {
-                                    Icon = FontAwesome.fa_user,
+                                    Icon = FontAwesome.User,
                                     Size = new Vector2(text_size - 2),
                                     Shadow = false,
                                     Margin = new MarginPadding { Top = 1 },

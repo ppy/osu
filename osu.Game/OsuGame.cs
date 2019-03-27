@@ -22,6 +22,7 @@ using System.Threading.Tasks;
 using osu.Framework.Audio;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.IEnumerableExtensions;
+using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Platform;
@@ -587,7 +588,7 @@ namespace osu.Game
                 {
                     Schedule(() => notifications.Post(new SimpleNotification
                     {
-                        Icon = entry.Level == LogLevel.Important ? FontAwesome.fa_exclamation_circle : FontAwesome.fa_bomb,
+                        Icon = entry.Level == LogLevel.Important ? FontAwesome.ExclamationCircle : FontAwesome.Bomb,
                         Text = entry.Message + (entry.Exception != null && IsDeployedBuild ? "\n\nThis error has been automatically reported to the devs." : string.Empty),
                     }));
                 }
@@ -595,7 +596,7 @@ namespace osu.Game
                 {
                     Schedule(() => notifications.Post(new SimpleNotification
                     {
-                        Icon = FontAwesome.fa_ellipsis_h,
+                        Icon = FontAwesome.EllipsisH,
                         Text = "Subsequent messages have been logged. Click to view log files.",
                         Activated = () =>
                         {

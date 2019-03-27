@@ -3,7 +3,7 @@
 
 using NUnit.Framework;
 using osu.Framework.Graphics;
-using osu.Game.Graphics;
+using osu.Framework.Graphics.Sprites;
 using osu.Game.Overlays.Dialog;
 
 namespace osu.Game.Tests.Visual.UserInterface
@@ -17,7 +17,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             {
                 RelativeSizeAxes = Axes.Both,
                 State = Framework.Graphics.Containers.Visibility.Visible,
-                Icon = FontAwesome.fa_assistive_listening_systems,
+                Icon = FontAwesome.AssistiveListeningSystems,
                 HeaderText = @"This is a test popup",
                 BodyText = "I can say lots of stuff and even wrap my words!",
                 Buttons = new PopupDialogButton[]

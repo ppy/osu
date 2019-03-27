@@ -143,7 +143,7 @@ namespace osu.Game.Overlays
                                                     Anchor = Anchor.Centre,
                                                     Origin = Anchor.Centre,
                                                     Action = prev,
-                                                    Icon = FontAwesome.fa_step_backward,
+                                                    Icon = FontAwesome.StepBackward,
                                                 },
                                                 playButton = new MusicIconButton
                                                 {
@@ -152,14 +152,14 @@ namespace osu.Game.Overlays
                                                     Scale = new Vector2(1.4f),
                                                     IconScale = new Vector2(1.4f),
                                                     Action = play,
-                                                    Icon = FontAwesome.fa_play_circle_o,
+                                                    Icon = FontAwesome.PlayCircleOutline,
                                                 },
                                                 nextButton = new MusicIconButton
                                                 {
                                                     Anchor = Anchor.Centre,
                                                     Origin = Anchor.Centre,
                                                     Action = () => next(),
-                                                    Icon = FontAwesome.fa_step_forward,
+                                                    Icon = FontAwesome.StepForward,
                                                 },
                                             }
                                         },
@@ -168,7 +168,7 @@ namespace osu.Game.Overlays
                                             Origin = Anchor.Centre,
                                             Anchor = Anchor.CentreRight,
                                             Position = new Vector2(-bottom_black_area_height / 2, 0),
-                                            Icon = FontAwesome.fa_bars,
+                                            Icon = FontAwesome.Bars,
                                             Action = () => playlist.ToggleVisibility(),
                                         },
                                     }
@@ -257,13 +257,13 @@ namespace osu.Game.Overlays
                 progressBar.EndTime = track.Length;
                 progressBar.CurrentTime = track.CurrentTime;
 
-                playButton.Icon = track.IsRunning ? FontAwesome.fa_pause_circle_o : FontAwesome.fa_play_circle_o;
+                playButton.Icon = track.IsRunning ? FontAwesome.PauseCircleOutline : FontAwesome.PlayCircleOutline;
             }
             else
             {
                 progressBar.CurrentTime = 0;
                 progressBar.EndTime = 1;
-                playButton.Icon = FontAwesome.fa_play_circle_o;
+                playButton.Icon = FontAwesome.PlayCircleOutline;
             }
         }
 
