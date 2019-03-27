@@ -8,12 +8,12 @@ using Newtonsoft.Json;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Scoring;
-using osu.Game.Scoring;
+using osu.Game.Scoring.Legacy;
 using osu.Game.Users;
 
 namespace osu.Game.Online.API.Requests.Responses
 {
-    public class APIScoreInfo : ScoreInfo
+    public class APIScoreInfo : LegacyScoreInfo
     {
         [JsonProperty(@"score")]
         private int totalScore
@@ -96,7 +96,11 @@ namespace osu.Game.Online.API.Requests.Responses
         }
 
         [JsonProperty(@"mode_int")]
-        public int OnlineRulesetID { get; set; }
+        public int OnlineRulesetID
+        {
+            get => RulesetID;
+            set => RulesetID = value;
+        }
 
         [JsonProperty(@"mods")]
         private string[] modStrings { get; set; }
