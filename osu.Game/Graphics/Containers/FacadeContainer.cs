@@ -1,7 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.MathUtils;
@@ -18,19 +17,15 @@ namespace osu.Game.Graphics.Containers
     {
         protected virtual Facade CreateFacade() => new Facade();
 
-        public Facade Facade => facade;
+        public readonly Facade Facade;
 
         /// <summary>
         /// Whether or not the logo assigned to this FacadeContainer should be tracking the position its facade.
         /// </summary>
         public bool Tracking;
 
-        [Cached]
-        private Facade facade;
-
         private OsuLogo logo;
         private float facadeScale;
-
         private Vector2 startPosition;
         private Easing easing;
         private double startTime;
@@ -38,11 +33,11 @@ namespace osu.Game.Graphics.Containers
 
         public FacadeContainer()
         {
-            facade = CreateFacade();
+            Facade = CreateFacade();
         }
 
         /// <summary>
-        /// Set the logo that should track the Facade's position, as well as how it should transform to its initial position.
+        /// Assign the logo that should track the Facade's position, as well as how it should transform to its initial position.
         /// </summary>
         /// <param name="logo"> The instance of the logo to be used for tracking. </param>
         /// <param name="facadeScale"> The scale of the facade. </param>
@@ -60,7 +55,7 @@ namespace osu.Game.Graphics.Containers
             this.easing = easing;
         }
 
-        private Vector2 logoTrackingPosition => logo.Parent.ToLocalSpace(facade.ScreenSpaceDrawQuad.Centre);
+        private Vector2 logoTrackingPosition => logo.Parent.ToLocalSpace(Facade.ScreenSpaceDrawQuad.Centre);
 
         protected override void UpdateAfterChildren()
         {
@@ -69,9 +64,9 @@ namespace osu.Game.Graphics.Containers
             if (logo == null || !Tracking)
                 return;
 
-            facade.Size = new Vector2(logo.SizeForFlow * facadeScale);
+            Facade.Size = new Vector2(logo.SizeForFlow * facadeScale);
 
-            if (facade.IsLoaded && logo.Position != logoTrackingPosition)
+            if (Facade.IsLoaded && logo.Position != logoTrackingPosition)
             {
                 // Required for the correct position of the logo to be set with respect to logoTrackingPosition
                 logo.RelativePositionAxes = Axes.None;

@@ -68,7 +68,7 @@ namespace osu.Game.Screens.Play
             facadeContainer.RelativeSizeAxes = Axes.Both;
             facadeContainer.Children = new Drawable[]
             {
-                info = new BeatmapMetadataDisplay(Beatmap.Value)
+                info = new BeatmapMetadataDisplay(Beatmap.Value, facadeContainer.Facade)
                 {
                     Alpha = 0,
                     Anchor = Anchor.Centre,
@@ -310,6 +310,7 @@ namespace osu.Game.Screens.Play
             }
 
             private readonly WorkingBeatmap beatmap;
+            private readonly Facade facade;
             private LoadingAnimation loading;
             private Sprite backgroundSprite;
             private ModDisplay modDisplay;
@@ -331,13 +332,14 @@ namespace osu.Game.Screens.Play
                 }
             }
 
-            public BeatmapMetadataDisplay(WorkingBeatmap beatmap)
+            public BeatmapMetadataDisplay(WorkingBeatmap beatmap, Facade facade)
             {
                 this.beatmap = beatmap;
+                this.facade = facade;
             }
 
             [BackgroundDependencyLoader]
-            private void load(Facade facade)
+            private void load()
             {
                 var metadata = beatmap.BeatmapInfo?.Metadata ?? new BeatmapMetadata();
 
