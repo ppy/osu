@@ -55,8 +55,8 @@ namespace osu.Game.Rulesets.Catch.Difficulty
 
             // Longer maps are worth more
             float lengthBonus =
-                0.95f + 0.4f * Math.Min(1.0f, numTotalHits / 3000.0f) +
-                (numTotalHits > 3000 ? (float)Math.Log10(numTotalHits / 3000.0f) * 0.5f : 0.0f);
+                0.95f + 0.3f * Math.Min(1.0f, numTotalHits / 2500.0f) +
+                (numTotalHits > 2500 ? (float)Math.Log10(numTotalHits / 2500.0f) * 0.475f : 0.0f);
 
             // Longer maps are worth more
             value *= lengthBonus;
@@ -73,14 +73,22 @@ namespace osu.Game.Rulesets.Catch.Difficulty
             float approachRateFactor = 1.0f;
             if (approachRate > 9.0f)
                 approachRateFactor += 0.1f * (approachRate - 9.0f); // 10% for each AR above 9
+            if (approachRate > 10.0f)
+                approachRateFactor += 0.2f * (float)Math.Pow(approachRate - 10.0f, 1.5f); // Additional 20% at AR 11, 40% total
             else if (approachRate < 8.0f)
                 approachRateFactor += 0.025f * (8.0f - approachRate); // 2.5% for each AR below 8
 
             value *= approachRateFactor;
 
             if (mods.Any(m => m is ModHidden))
-                // Hiddens gives nothing on max approach rate, and more the lower it is
+            {
                 value *= 1.05f + 0.075f * (10.0f - Math.Min(10.0f, approachRate)); // 7.5% for each AR below 10
+                // Hiddens gives almost nothing on max approach rate, and more the lower it is
+                if (approachRate <= 10.0f)
+                    value *= 1.05f + 0.075f * (10.0f - approachRate); // 7.5% for each AR below 10
+                else if (approachRate > 10.0f)
+                    value *= 1.01f + 0.04f * (11.0f - Math.Min(11.0f, approachRate)); // 5% at AR 10, 1% at AR 11
+            }
 
             if (mods.Any(m => m is ModFlashlight))
                 // Apply length bonus again if flashlight is on simply because it becomes a lot harder on longer maps.
