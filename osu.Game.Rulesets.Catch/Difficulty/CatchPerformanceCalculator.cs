@@ -9,6 +9,7 @@ using osu.Game.Rulesets.Difficulty;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring;
+using osu.Game.Scoring.Legacy;
 using osuTK;
 
 namespace osu.Game.Rulesets.Catch.Difficulty
@@ -18,11 +19,12 @@ namespace osu.Game.Rulesets.Catch.Difficulty
         protected new CatchDifficultyAttributes Attributes => (CatchDifficultyAttributes)base.Attributes;
 
         private Mod[] mods;
-        private int countGreat;
-        private int countGood;
-        private int countKatu;
-        private int countMeh;
-        private int countMiss;
+
+        private int fruitsHit;
+        private int ticksHit;
+        private int tinyTicksHit;
+        private int tinyTicksMissed;
+        private int misses;
 
         public CatchPerformanceCalculator(Ruleset ruleset, WorkingBeatmap beatmap, ScoreInfo score)
             : base(ruleset, beatmap, score)
@@ -32,11 +34,14 @@ namespace osu.Game.Rulesets.Catch.Difficulty
         public override double Calculate(Dictionary<string, double> categoryDifficulty = null)
         {
             mods = Score.Mods;
-            countGreat = Convert.ToInt32(Score.Statistics[HitResult.Great]);
-            countGood = Convert.ToInt32(Score.Statistics[HitResult.Good]);
-            countKatu = Convert.ToInt32(Score.Statistics[HitResult.Ok]);
-            countMeh = Convert.ToInt32(Score.Statistics[HitResult.Meh]);
-            countMiss = Convert.ToInt32(Score.Statistics[HitResult.Miss]);
+
+            var legacyScore = Score as LegacyScoreInfo;
+
+            fruitsHit = legacyScore?.Count300 ?? Score.Statistics[HitResult.Perfect];
+            ticksHit = legacyScore?.Count100 ?? 0;
+            tinyTicksHit = legacyScore?.Count50 ?? 0;
+            tinyTicksMissed = legacyScore?.CountKatu ?? 0;
+            misses = Score.Statistics[HitResult.Miss];
 
             // Don't count scores made with supposedly unranked mods
             if (mods.Any(m => !m.Ranked))
@@ -57,7 +62,7 @@ namespace osu.Game.Rulesets.Catch.Difficulty
             value *= lengthBonus;
 
             // Penalize misses exponentially. This mainly fixes tag4 maps and the likes until a per-hitobject solution is available
-            value *= Math.Pow(0.97f, countMiss);
+            value *= Math.Pow(0.97f, misses);
 
             // Combo scaling
             float beatmapMaxCombo = Attributes.MaxCombo;
@@ -92,8 +97,8 @@ namespace osu.Game.Rulesets.Catch.Difficulty
         }
 
         private float accuracy() => totalHits() == 0 ? 0 : MathHelper.Clamp((float)totalSuccessfulHits() / totalHits(), 0f, 1f);
-        private int totalHits() => countMeh + countGood + countGreat + countMiss + countKatu;
-        private int totalSuccessfulHits() => countMeh + countGood + countGreat;
-        private int totalComboHits() => countMiss + countGood + countGreat;
+        private int totalHits() => tinyTicksHit + ticksHit + fruitsHit + misses + tinyTicksMissed;
+        private int totalSuccessfulHits() => tinyTicksHit + ticksHit + fruitsHit;
+        private int totalComboHits() => misses + ticksHit + fruitsHit;
     }
 }
