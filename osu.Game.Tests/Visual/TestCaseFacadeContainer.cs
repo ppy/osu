@@ -163,10 +163,10 @@ namespace osu.Game.Tests.Visual
             public bool Ready;
 
             [BackgroundDependencyLoader]
-            private void load()
+            private void load(CancellationToken token)
             {
                 // Never finish loading
-                while (!Ready)
+                while (!Ready && !token.IsCancellationRequested)
                     Thread.Sleep(1);
             }
         }
