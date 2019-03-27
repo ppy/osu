@@ -64,6 +64,8 @@ namespace osu.Game.Screens.Menu
             }
             else
             {
+                // If logo is null, we are suspending from the screen that uses this ButtonSystem.
+                // We should stop tracking as the facade is now out of scope.
                 facadeContainer.Tracking = false;
             }
         }
