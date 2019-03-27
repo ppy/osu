@@ -42,7 +42,7 @@ namespace osu.Game.Screens.Play
 
         public Action<double> RequestSeek;
 
-        public HUDOverlay(ScoreProcessor scoreProcessor, RulesetContainer rulesetContainer, WorkingBeatmap working)
+        public HUDOverlay(ScoreProcessor scoreProcessor, DrawableRuleset drawableRuleset, WorkingBeatmap working)
         {
             RelativeSizeAxes = Axes.Both;
 
@@ -90,10 +90,10 @@ namespace osu.Game.Screens.Play
             };
 
             BindProcessor(scoreProcessor);
-            BindRulesetContainer(rulesetContainer);
+            BindDrawableRuleset(drawableRuleset);
 
-            Progress.Objects = rulesetContainer.Objects;
-            Progress.AllowSeeking = rulesetContainer.HasReplayLoaded.Value;
+            Progress.Objects = drawableRuleset.Objects;
+            Progress.AllowSeeking = drawableRuleset.HasReplayLoaded.Value;
             Progress.RequestSeek = time => RequestSeek(time);
 
             ModDisplay.Current.BindTo(working.Mods);
@@ -143,13 +143,13 @@ namespace osu.Game.Screens.Play
             }
         }
 
-        protected virtual void BindRulesetContainer(RulesetContainer rulesetContainer)
+        protected virtual void BindDrawableRuleset(DrawableRuleset drawableRuleset)
         {
-            (rulesetContainer.KeyBindingInputManager as ICanAttachKeyCounter)?.Attach(KeyCounter);
+            (drawableRuleset as ICanAttachKeyCounter)?.Attach(KeyCounter);
 
-            replayLoaded.BindTo(rulesetContainer.HasReplayLoaded);
+            replayLoaded.BindTo(drawableRuleset.HasReplayLoaded);
 
-            Progress.BindRulestContainer(rulesetContainer);
+            Progress.BindDrawableRuleset(drawableRuleset);
         }
 
         protected override bool OnKeyDown(KeyDownEvent e)

@@ -16,10 +16,6 @@ namespace osu.Game.Graphics.UserInterface
 {
     public class OsuTextBox : TextBox, IKeyBindingHandler<GlobalAction>
     {
-        protected override Color4 BackgroundUnfocused => Color4.Black.Opacity(0.5f);
-        protected override Color4 BackgroundFocused => OsuColour.Gray(0.3f).Opacity(0.8f);
-        protected override Color4 BackgroundCommit => BorderColour;
-
         protected override float LeftRightPadding => 10;
 
         protected override SpriteText CreatePlaceholder() => new OsuSpriteText
@@ -41,7 +37,9 @@ namespace osu.Game.Graphics.UserInterface
         [BackgroundDependencyLoader]
         private void load(OsuColour colour)
         {
-            BorderColour = colour.Yellow;
+            BackgroundUnfocused = Color4.Black.Opacity(0.5f);
+            BackgroundFocused = OsuColour.Gray(0.3f).Opacity(0.8f);
+            BackgroundCommit = BorderColour = colour.Yellow;
         }
 
         protected override void OnFocus(FocusEvent e)
