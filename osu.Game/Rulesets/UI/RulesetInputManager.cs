@@ -34,11 +34,14 @@ namespace osu.Game.Rulesets.UI
 
         protected readonly KeyBindingContainer<T> KeyBindingContainer;
 
-        protected override Container<Drawable> Content => KeyBindingContainer;
+        protected override Container<Drawable> Content => content;
+
+        private readonly Container content;
 
         protected RulesetInputManager(RulesetInfo ruleset, int variant, SimultaneousBindingMode unique)
         {
-            InternalChild = KeyBindingContainer = CreateKeyBindingContainer(ruleset, variant, unique);
+            InternalChild = KeyBindingContainer = CreateKeyBindingContainer(ruleset, variant, unique)
+                .WithChild(content = new Container { RelativeSizeAxes = Axes.Both });
         }
 
         [BackgroundDependencyLoader(true)]
