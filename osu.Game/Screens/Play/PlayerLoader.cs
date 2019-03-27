@@ -65,27 +65,28 @@ namespace osu.Game.Screens.Play
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
                 RelativeSizeAxes = Axes.Both,
-                Children = new Drawable[]
+            };
+
+            content.Children = new Drawable[]
+            {
+                info = new BeatmapMetadataDisplay(Beatmap.Value, content.LogoFacade)
                 {
-                    info = new BeatmapMetadataDisplay(Beatmap.Value, content.LogoFacade)
+                    Alpha = 0,
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                },
+                new FillFlowContainer<PlayerSettingsGroup>
+                {
+                    Anchor = Anchor.TopRight,
+                    Origin = Anchor.TopRight,
+                    AutoSizeAxes = Axes.Both,
+                    Direction = FillDirection.Vertical,
+                    Spacing = new Vector2(0, 20),
+                    Margin = new MarginPadding(25),
+                    Children = new PlayerSettingsGroup[]
                     {
-                        Alpha = 0,
-                        Anchor = Anchor.Centre,
-                        Origin = Anchor.Centre,
-                    },
-                    new FillFlowContainer<PlayerSettingsGroup>
-                    {
-                        Anchor = Anchor.TopRight,
-                        Origin = Anchor.TopRight,
-                        AutoSizeAxes = Axes.Both,
-                        Direction = FillDirection.Vertical,
-                        Spacing = new Vector2(0, 20),
-                        Margin = new MarginPadding(25),
-                        Children = new PlayerSettingsGroup[]
-                        {
-                            VisualSettings = new VisualSettings(),
-                            new InputSettings()
-                        }
+                        VisualSettings = new VisualSettings(),
+                        new InputSettings()
                     }
                 }
             };
