@@ -6,7 +6,7 @@ using NUnit.Framework;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
-using osu.Game.Graphics;
+using osu.Framework.Graphics.Sprites;
 using osuTK;
 
 namespace osu.Game.Tests.Visual.UserInterface
@@ -31,7 +31,7 @@ namespace osu.Game.Tests.Visual.UserInterface
                 },
             });
 
-            foreach (FontAwesome fa in Enum.GetValues(typeof(FontAwesome)))
+            foreach (IconUsage fa in Enum.GetValues(typeof(FontAwesome)))
                 flow.Add(new Icon(fa));
         }
 
@@ -39,7 +39,7 @@ namespace osu.Game.Tests.Visual.UserInterface
         {
             public string TooltipText { get; }
 
-            public Icon(FontAwesome fa)
+            public Icon(IconUsage fa)
             {
                 TooltipText = fa.ToString();
 
