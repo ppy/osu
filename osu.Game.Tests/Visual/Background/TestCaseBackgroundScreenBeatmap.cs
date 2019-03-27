@@ -92,7 +92,7 @@ namespace osu.Game.Tests.Visual.Background
         public void PlayerLoaderSettingsHoverTest()
         {
             setupUserSettings();
-            AddStep("Start player loader", () => songSelect.Push(playerLoader = new TestPlayerLoader(player = new TestPlayer { Ready = false })));
+            AddStep("Start player loader", () => songSelect.Push(playerLoader = new TestPlayerLoader(player = new TestPlayer { BlockLoad = true })));
             AddUntilStep("Wait for Player Loader to load", () => playerLoader?.IsLoaded ?? false);
             AddAssert("Background retained from song select", () => songSelect.IsBackgroundCurrent());
             AddStep("Trigger background preview", () =>
@@ -344,7 +344,7 @@ namespace osu.Game.Tests.Visual.Background
             public UserDimContainer CurrentStoryboardContainer => StoryboardContainer;
 
             // Whether or not the player should be allowed to load.
-            public bool Ready = true;
+            public bool BlockLoad;
 
             public Bindable<bool> StoryboardEnabled;
             public readonly Bindable<bool> ReplacesBackground = new Bindable<bool>();
@@ -357,7 +357,7 @@ namespace osu.Game.Tests.Visual.Background
             [BackgroundDependencyLoader]
             private void load(OsuConfigManager config, CancellationToken token)
             {
-                while (!Ready && !token.IsCancellationRequested)
+                while (BlockLoad && !token.IsCancellationRequested)
                     Thread.Sleep(1);
 
                 StoryboardEnabled = config.GetBindable<bool>(OsuSetting.ShowStoryboard);
