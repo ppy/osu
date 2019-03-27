@@ -36,7 +36,7 @@ namespace osu.Game.Scoring.Legacy
                 currentRuleset = GetRuleset(sr.ReadByte());
                 var scoreInfo = new LegacyScoreInfo { Ruleset = currentRuleset.RulesetInfo };
 
-                scoreInfo = scoreInfo;
+                score.ScoreInfo = scoreInfo;
 
                 var version = sr.ReadInt32();
 
