@@ -1,14 +1,13 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using System.Linq;
 using osu.Framework.Allocation;
-using osu.Framework.Configuration;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input.Events;
-using osu.Framework.Timing;
 using osu.Game.Configuration;
 using osuTK;
 using osuTK.Graphics;
@@ -37,9 +36,6 @@ namespace osu.Game.Screens.Play
             key.FadeTime = FadeTime;
             key.KeyDownTextColor = KeyDownTextColor;
             key.KeyUpTextColor = KeyUpTextColor;
-            // Use the same clock object as SongProgress for saving KeyCounter state
-            if (AudioClock != null)
-                key.Clock = AudioClock;
         }
 
         public void ResetCount()
@@ -58,9 +54,10 @@ namespace osu.Game.Screens.Play
         }
 
         private bool isCounting = true;
+
         public bool IsCounting
         {
-            get { return isCounting; }
+            get => isCounting;
             set
             {
                 if (value == isCounting) return;
@@ -72,9 +69,10 @@ namespace osu.Game.Screens.Play
         }
 
         private int fadeTime;
+
         public int FadeTime
         {
-            get { return fadeTime; }
+            get => fadeTime;
             set
             {
                 if (value != fadeTime)
@@ -87,9 +85,10 @@ namespace osu.Game.Screens.Play
         }
 
         private Color4 keyDownTextColor = Color4.DarkGray;
+
         public Color4 KeyDownTextColor
         {
-            get { return keyDownTextColor; }
+            get => keyDownTextColor;
             set
             {
                 if (value != keyDownTextColor)
@@ -102,9 +101,10 @@ namespace osu.Game.Screens.Play
         }
 
         private Color4 keyUpTextColor = Color4.White;
+
         public Color4 KeyUpTextColor
         {
-            get { return keyUpTextColor; }
+            get => keyUpTextColor;
             set
             {
                 if (value != keyUpTextColor)
@@ -120,8 +120,6 @@ namespace osu.Game.Screens.Play
 
         public override bool HandleNonPositionalInput => receptor == null;
         public override bool HandlePositionalInput => receptor == null;
-
-        public IFrameBasedClock AudioClock { get; set; }
 
         private Receptor receptor;
 
@@ -161,6 +159,7 @@ namespace osu.Game.Screens.Play
                     case MouseUpEvent _:
                         return Target.Children.Any(c => c.TriggerEvent(e));
                 }
+
                 return base.Handle(e);
             }
         }

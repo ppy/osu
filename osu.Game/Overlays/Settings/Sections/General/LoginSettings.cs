@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using osu.Framework.Allocation;
@@ -41,7 +41,7 @@ namespace osu.Game.Overlays.Settings.Sections.General
 
         public bool Bounding
         {
-            get { return bounding; }
+            get => bounding;
             set
             {
                 bounding = value;
@@ -58,14 +58,14 @@ namespace osu.Game.Overlays.Settings.Sections.General
         }
 
         [BackgroundDependencyLoader(permitNulls: true)]
-        private void load(OsuColour colours, APIAccess api)
+        private void load(OsuColour colours, IAPIProvider api)
         {
             this.colours = colours;
 
             api?.Register(this);
         }
 
-        public void APIStateChanged(APIAccess api, APIState state)
+        public void APIStateChanged(IAPIProvider api, APIState state)
         {
             form = null;
 
@@ -78,7 +78,7 @@ namespace osu.Game.Overlays.Settings.Sections.General
                         {
                             Text = "ACCOUNT",
                             Margin = new MarginPadding { Bottom = 5 },
-                            Font = @"Exo2.0-Black",
+                            Font = OsuFont.GetFont(weight: FontWeight.Black),
                         },
                         form = new LoginForm
                         {
@@ -134,8 +134,7 @@ namespace osu.Game.Overlays.Settings.Sections.General
                                             Anchor = Anchor.Centre,
                                             Origin = Anchor.Centre,
                                             Text = "Signed in",
-                                            TextSize = 18,
-                                            Font = @"Exo2.0-Bold",
+                                            Font = OsuFont.GetFont(size: 18, weight: FontWeight.Bold),
                                             Margin = new MarginPadding { Top = 5, Bottom = 5 },
                                         },
                                     },
@@ -152,9 +151,9 @@ namespace osu.Game.Overlays.Settings.Sections.General
 
                     panel.Status.BindTo(api.LocalUser.Value.Status);
 
-                    dropdown.Current.ValueChanged += newValue =>
+                    dropdown.Current.ValueChanged += action =>
                     {
-                        switch (newValue)
+                        switch (action.NewValue)
                         {
                             case UserAction.Online:
                                 api.LocalUser.Value.Status.Value = new UserStatusOnline();
@@ -195,7 +194,7 @@ namespace osu.Game.Overlays.Settings.Sections.General
         {
             private TextBox username;
             private TextBox password;
-            private APIAccess api;
+            private IAPIProvider api;
 
             public Action RequestHide;
 
@@ -206,7 +205,7 @@ namespace osu.Game.Overlays.Settings.Sections.General
             }
 
             [BackgroundDependencyLoader(permitNulls: true)]
-            private void load(APIAccess api, OsuConfigManager config, AccountCreationOverlay accountCreation)
+            private void load(IAPIProvider api, OsuConfigManager config, AccountCreationOverlay accountCreation)
             {
                 this.api = api;
                 Direction = FillDirection.Vertical;
@@ -278,6 +277,7 @@ namespace osu.Game.Overlays.Settings.Sections.General
                 {
                     var h = Header as UserDropdownHeader;
                     if (h == null) return;
+
                     h.StatusColour = value;
                 }
             }
@@ -339,7 +339,7 @@ namespace osu.Game.Overlays.Settings.Sections.General
 
                 public Color4 StatusColour
                 {
-                    set { statusIcon.FadeColour(value, 500, Easing.OutQuint); }
+                    set => statusIcon.FadeColour(value, 500, Easing.OutQuint);
                 }
 
                 public UserDropdownHeader()

@@ -41,27 +41,28 @@ Param(
     [switch]$ShowDescription,
     [Alias("WhatIf", "Noop")]
     [switch]$DryRun,
-    [Parameter(Position=0,Mandatory=$false,ValueFromRemainingArguments=$true)]
+    [Parameter(Position = 0, Mandatory = $false, ValueFromRemainingArguments = $true)]
     [string[]]$ScriptArgs
 )
 
 Write-Host "Preparing to run build script..."
 
 # Determine the script root for resolving other paths.
-if(!$PSScriptRoot){
+if(!$PSScriptRoot) {
     $PSScriptRoot = Split-Path $MyInvocation.MyCommand.Path -Parent
 }
 
 # Resolve the paths for resources used for debugging.
-$TOOLS_DIR = Join-Path $PSScriptRoot "tools"
-$CAKE_CSPROJ = Join-Path $TOOLS_DIR "cakebuild.csproj"
+$BUILD_DIR = Join-Path $PSScriptRoot "build"
+$TOOLS_DIR = Join-Path $BUILD_DIR "tools"
+$CAKE_CSPROJ = Join-Path $BUILD_DIR "cakebuild.csproj"
 
 # Install the required tools locally.
 Write-Host "Restoring cake tools..."
 Invoke-Expression "dotnet restore `"$CAKE_CSPROJ`" --packages `"$TOOLS_DIR`"" | Out-Null
 
 # Find the Cake executable
-$CAKE_EXECUTABLE = (Get-ChildItem -Path ./tools/cake.coreclr/ -Filter Cake.dll -Recurse).FullName
+$CAKE_EXECUTABLE = (Get-ChildItem -Path "$TOOLS_DIR/cake.coreclr/" -Filter Cake.dll -Recurse).FullName
 
 # Build Cake arguments
 $cakeArguments = @("$Script");
@@ -75,5 +76,7 @@ $cakeArguments += $ScriptArgs
 
 # Start Cake
 Write-Host "Running build script..."
+Push-Location -Path $BUILD_DIR
 Invoke-Expression "dotnet `"$CAKE_EXECUTABLE`" $cakeArguments"
+Pop-Location
 exit $LASTEXITCODE

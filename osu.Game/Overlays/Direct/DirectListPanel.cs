@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using osuTK;
 using osuTK.Graphics;
@@ -13,6 +13,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Localisation;
 using osu.Game.Beatmaps;
+using osu.Game.Beatmaps.Drawables;
 
 namespace osu.Game.Overlays.Direct
 {
@@ -23,6 +24,7 @@ namespace osu.Game.Overlays.Direct
         private const float vertical_padding = 5;
         private const float height = 70;
 
+        private FillFlowContainer statusContainer;
         private PlayButton playButton;
         private Box progressBar;
 
@@ -95,13 +97,12 @@ namespace osu.Game.Overlays.Direct
                                                         new OsuSpriteText
                                                         {
                                                             Text = new LocalisedString((SetInfo.Metadata.TitleUnicode, SetInfo.Metadata.Title)),
-                                                            TextSize = 18,
-                                                            Font = @"Exo2.0-BoldItalic",
+                                                            Font = OsuFont.GetFont(size: 18, weight: FontWeight.Bold, italics: true)
                                                         },
                                                         new OsuSpriteText
                                                         {
                                                             Text = new LocalisedString((SetInfo.Metadata.ArtistUnicode, SetInfo.Metadata.Artist)),
-                                                            Font = @"Exo2.0-BoldItalic",
+                                                            Font = OsuFont.GetFont(weight: FontWeight.Bold, italics: true)
                                                         },
                                                     }
                                                 },
@@ -109,10 +110,24 @@ namespace osu.Game.Overlays.Direct
                                         },
                                         new FillFlowContainer
                                         {
-                                            AutoSizeAxes = Axes.X,
-                                            Height = 20,
-                                            Margin = new MarginPadding { Top = vertical_padding, Bottom = vertical_padding },
-                                            Children = GetDifficultyIcons(),
+                                            AutoSizeAxes = Axes.Both,
+                                            Direction = FillDirection.Horizontal,
+                                            Children = new Drawable[]
+                                            {
+                                                statusContainer = new FillFlowContainer
+                                                {
+                                                    AutoSizeAxes = Axes.Both,
+                                                    Margin = new MarginPadding { Vertical = vertical_padding, Horizontal = 5 },
+                                                    Spacing = new Vector2(5),
+                                                },
+                                                new FillFlowContainer
+                                                {
+                                                    AutoSizeAxes = Axes.X,
+                                                    Height = 20,
+                                                    Margin = new MarginPadding { Top = vertical_padding, Bottom = vertical_padding },
+                                                    Children = GetDifficultyIcons(),
+                                                },
+                                            },
                                         },
                                     },
                                 },
@@ -145,10 +160,7 @@ namespace osu.Game.Overlays.Direct
                                     Direction = FillDirection.Vertical,
                                     Children = new Drawable[]
                                     {
-                                        new Statistic(FontAwesome.fa_play_circle, SetInfo.OnlineInfo?.PlayCount ?? 0)
-                                        {
-                                            Margin = new MarginPadding { Right = 1 },
-                                        },
+                                        new Statistic(FontAwesome.fa_play_circle, SetInfo.OnlineInfo?.PlayCount ?? 0),
                                         new Statistic(FontAwesome.fa_heart, SetInfo.OnlineInfo?.FavouriteCount ?? 0),
                                         new FillFlowContainer
                                         {
@@ -161,13 +173,12 @@ namespace osu.Game.Overlays.Direct
                                                 new OsuSpriteText
                                                 {
                                                     Text = "mapped by ",
-                                                    TextSize = 14,
+                                                    Font = OsuFont.GetFont(size: 14)
                                                 },
                                                 new OsuSpriteText
                                                 {
                                                     Text = SetInfo.Metadata.Author.Username,
-                                                    TextSize = 14,
-                                                    Font = @"Exo2.0-SemiBoldItalic",
+                                                    Font = OsuFont.GetFont(size: 14, weight: FontWeight.SemiBold, italics: true)
                                                 },
                                             },
                                         },
@@ -176,7 +187,7 @@ namespace osu.Game.Overlays.Direct
                                             Text = SetInfo.Metadata.Source,
                                             Anchor = Anchor.TopRight,
                                             Origin = Anchor.TopRight,
-                                            TextSize = 14,
+                                            Font = OsuFont.GetFont(size: 14),
                                             Alpha = string.IsNullOrEmpty(SetInfo.Metadata.Source) ? 0f : 1f,
                                         },
                                     },
@@ -195,6 +206,23 @@ namespace osu.Game.Overlays.Direct
                     Alpha = 0,
                     Colour = colours.Yellow,
                 },
+            });
+
+            if (SetInfo.OnlineInfo?.HasVideo ?? false)
+            {
+                statusContainer.Add(new IconPill(FontAwesome.fa_film) { IconSize = new Vector2(20) });
+            }
+
+            if (SetInfo.OnlineInfo?.HasStoryboard ?? false)
+            {
+                statusContainer.Add(new IconPill(FontAwesome.fa_image) { IconSize = new Vector2(20) });
+            }
+
+            statusContainer.Add(new BeatmapSetOnlineStatusPill
+            {
+                TextSize = 12,
+                TextPadding = new MarginPadding { Horizontal = 10, Vertical = 4 },
+                Status = SetInfo.OnlineInfo?.Status ?? BeatmapSetOnlineStatus.None,
             });
         }
     }

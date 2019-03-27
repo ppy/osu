@@ -1,5 +1,5 @@
-// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using System.Collections.Generic;
@@ -20,13 +20,13 @@ namespace osu.Game.Utils
 
         private readonly List<Task> tasks = new List<Task>();
 
-        private Exception lastException;
-
         public RavenLogger(OsuGame game)
         {
             raven.Release = game.Version;
 
             if (!game.IsDeployedBuild) return;
+
+            Exception lastException = null;
 
             Logger.NewEntry += entry =>
             {

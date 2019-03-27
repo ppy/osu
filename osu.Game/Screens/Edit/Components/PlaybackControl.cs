@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using osuTK;
 using osuTK.Graphics;
@@ -61,7 +61,7 @@ namespace osu.Game.Screens.Edit.Components
                 }
             };
 
-            tabs.Current.ValueChanged += newValue => Beatmap.Value.Track.Tempo.Value = newValue;
+            tabs.Current.ValueChanged += tempo => Beatmap.Value.Track.Tempo.Value = tempo.NewValue;
         }
 
         protected override bool OnKeyDown(KeyDownEvent e)
@@ -114,7 +114,8 @@ namespace osu.Game.Screens.Edit.Components
                 private readonly OsuSpriteText text;
                 private readonly OsuSpriteText textBold;
 
-                public PlaybackTabItem(double value) : base(value)
+                public PlaybackTabItem(double value)
+                    : base(value)
                 {
                     RelativeSizeAxes = Axes.Both;
 
@@ -127,15 +128,14 @@ namespace osu.Game.Screens.Edit.Components
                             Origin = Anchor.TopCentre,
                             Anchor = Anchor.TopCentre,
                             Text = $"{value:0%}",
-                            TextSize = 14,
+                            Font = OsuFont.GetFont(size: 14)
                         },
                         textBold = new OsuSpriteText
                         {
                             Origin = Anchor.TopCentre,
                             Anchor = Anchor.TopCentre,
                             Text = $"{value:0%}",
-                            TextSize = 14,
-                            Font = @"Exo2.0-Bold",
+                            Font = OsuFont.GetFont(size: 14, weight: FontWeight.Bold),
                             Alpha = 0,
                         },
                     };
@@ -163,9 +163,9 @@ namespace osu.Game.Screens.Edit.Components
 
                 private void updateState()
                 {
-                    text.FadeColour(Active || IsHovered ? hoveredColour : normalColour, fade_duration, Easing.OutQuint);
-                    text.FadeTo(Active ? 0 : 1, fade_duration, Easing.OutQuint);
-                    textBold.FadeTo(Active ? 1 : 0, fade_duration, Easing.OutQuint);
+                    text.FadeColour(Active.Value || IsHovered ? hoveredColour : normalColour, fade_duration, Easing.OutQuint);
+                    text.FadeTo(Active.Value ? 0 : 1, fade_duration, Easing.OutQuint);
+                    textBold.FadeTo(Active.Value ? 1 : 0, fade_duration, Easing.OutQuint);
                 }
             }
         }

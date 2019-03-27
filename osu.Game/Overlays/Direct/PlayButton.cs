@@ -1,8 +1,8 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
-using osu.Framework.Configuration;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input.Events;
@@ -24,10 +24,11 @@ namespace osu.Game.Overlays.Direct
 
         public BeatmapSetInfo BeatmapSet
         {
-            get { return beatmapSet; }
+            get => beatmapSet;
             set
             {
                 if (value == beatmapSet) return;
+
                 beatmapSet = value;
 
                 Preview?.Stop();
@@ -112,12 +113,12 @@ namespace osu.Game.Overlays.Direct
             base.OnHoverLost(e);
         }
 
-        private void playingStateChanged(bool playing)
+        private void playingStateChanged(ValueChangedEvent<bool> e)
         {
-            icon.Icon = playing ? FontAwesome.fa_stop : FontAwesome.fa_play;
-            icon.FadeColour(playing || IsHovered ? hoverColour : Color4.White, 120, Easing.InOutQuint);
+            icon.Icon = e.NewValue ? FontAwesome.fa_stop : FontAwesome.fa_play;
+            icon.FadeColour(e.NewValue || IsHovered ? hoverColour : Color4.White, 120, Easing.InOutQuint);
 
-            if (playing)
+            if (e.NewValue)
             {
                 if (BeatmapSet == null)
                 {
@@ -144,7 +145,7 @@ namespace osu.Game.Overlays.Direct
                     preview.Stopped += () => Playing.Value = false;
 
                     // user may have changed their mind.
-                    if (Playing)
+                    if (Playing.Value)
                         preview.Start();
                 });
             }

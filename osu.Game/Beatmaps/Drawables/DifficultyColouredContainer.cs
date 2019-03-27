@@ -1,5 +1,5 @@
-// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using osu.Framework.Allocation;
@@ -48,11 +48,12 @@ namespace osu.Game.Beatmaps.Drawables
 
             var rating = beatmap.StarDifficulty;
 
-            if (rating < 1.5) return DifficultyRating.Easy;
-            if (rating < 2.25) return DifficultyRating.Normal;
-            if (rating < 3.75) return DifficultyRating.Hard;
-            if (rating < 5.25) return DifficultyRating.Insane;
-            if (rating < 6.75) return DifficultyRating.Expert;
+            if (rating < 2.0) return DifficultyRating.Easy;
+            if (rating < 2.7) return DifficultyRating.Normal;
+            if (rating < 4.0) return DifficultyRating.Hard;
+            if (rating < 5.3) return DifficultyRating.Insane;
+            if (rating < 6.5) return DifficultyRating.Expert;
+
             return DifficultyRating.ExpertPlus;
         }
 

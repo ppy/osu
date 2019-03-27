@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System.ComponentModel;
 using osu.Game.Overlays;
@@ -36,11 +36,12 @@ namespace osu.Game.Online.API.Requests
 
         [Description("Ranked & Approved")]
         RankedApproved = 0,
-        Approved = 1,
+        Qualified = 3,
         Loved = 8,
         Favourites = 2,
-        Qualified = 3,
-        Pending = 4,
+
+        [Description("Pending & WIP")]
+        PendingWIP = 4,
         Graveyard = 5,
 
         [Description("My Maps")]

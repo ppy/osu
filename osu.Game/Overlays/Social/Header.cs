@@ -1,5 +1,5 @@
-// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using osu.Game.Overlays.SearchableList;
 using osuTK.Graphics;
@@ -32,13 +32,12 @@ namespace osu.Game.Overlays.Social
                     new OsuSpriteText
                     {
                         Text = "social ",
-                        TextSize = 25,
+                        Font = OsuFont.GetFont(size: 25),
                     },
                     browser = new OsuSpriteText
                     {
                         Text = "browser",
-                        TextSize = 25,
-                        Font = @"Exo2.0-Light",
+                        Font = OsuFont.GetFont(size: 25, weight: FontWeight.Light),
                     },
                 },
             };
@@ -55,6 +54,7 @@ namespace osu.Game.Overlays.Social
     {
         [Description("All Players")]
         AllPlayers,
+
         [Description("Friends")]
         Friends,
         //[Description("Team Members")]

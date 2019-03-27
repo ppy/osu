@@ -1,8 +1,8 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
-using osu.Framework.Configuration;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -53,9 +53,9 @@ namespace osu.Game.Overlays.BeatmapSet.Buttons
                 },
             });
 
-            Favourited.ValueChanged += value =>
+            Favourited.ValueChanged += favourited =>
             {
-                if (value)
+                if (favourited.NewValue)
                 {
                     pink.FadeIn(200);
                     icon.Icon = FontAwesome.fa_heart;

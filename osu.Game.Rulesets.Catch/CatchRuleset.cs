@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
@@ -10,6 +10,7 @@ using osu.Game.Rulesets.UI;
 using System.Collections.Generic;
 using osu.Framework.Graphics;
 using osu.Framework.Input.Bindings;
+using osu.Game.Rulesets.Catch.Objects;
 using osu.Game.Rulesets.Catch.Replays;
 using osu.Game.Rulesets.Replays.Types;
 using osu.Game.Beatmaps.Legacy;
@@ -22,7 +23,7 @@ namespace osu.Game.Rulesets.Catch
 {
     public class CatchRuleset : Ruleset
     {
-        public override RulesetContainer CreateRulesetContainerWith(WorkingBeatmap beatmap) => new CatchRulesetContainer(this, beatmap);
+        public override DrawableRuleset CreateDrawableRulesetWith(WorkingBeatmap beatmap) => new DrawableCatchRuleset(this, beatmap);
         public override IBeatmapConverter CreateBeatmapConverter(IBeatmap beatmap) => new CatchBeatmapConverter(beatmap);
         public override IBeatmapProcessor CreateBeatmapProcessor(IBeatmap beatmap) => new CatchBeatmapProcessor(beatmap);
 
@@ -99,6 +100,11 @@ namespace osu.Game.Rulesets.Catch
                     {
                         new MultiMod(new CatchModAutoplay(), new ModCinema()),
                         new CatchModRelax(),
+                    };
+                case ModType.Fun:
+                    return new Mod[]
+                    {
+                        new MultiMod(new ModWindUp<CatchHitObject>(), new ModWindDown<CatchHitObject>())
                     };
                 default:
                     return new Mod[] { };

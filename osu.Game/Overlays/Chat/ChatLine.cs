@@ -1,5 +1,5 @@
-// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using System.Linq;
@@ -87,9 +87,8 @@ namespace osu.Game.Overlays.Chat
 
             Drawable effectedUsername = username = new OsuSpriteText
             {
-                Font = @"Exo2.0-BoldItalic",
                 Colour = hasBackground ? customUsernameColour : username_colours[message.Sender.Id % username_colours.Length],
-                TextSize = TextSize,
+                Font = OsuFont.GetFont(size: TextSize, weight: FontWeight.Bold, italics: true)
             };
 
             if (hasBackground)
@@ -138,9 +137,7 @@ namespace osu.Game.Overlays.Chat
                         {
                             Anchor = Anchor.CentreLeft,
                             Origin = Anchor.CentreLeft,
-                            Font = @"Exo2.0-SemiBold",
-                            FixedWidth = true,
-                            TextSize = TextSize * 0.75f,
+                            Font = OsuFont.GetFont(size: TextSize * 0.75f, weight: FontWeight.SemiBold, fixedWidth: true)
                         },
                         new MessageSender(message.Sender)
                         {
@@ -162,13 +159,13 @@ namespace osu.Game.Overlays.Chat
                         {
                             if (Message.IsAction)
                             {
-                                t.Font = @"Exo2.0-MediumItalic";
+                                t.Font = OsuFont.GetFont(italics: true);
 
                                 if (senderHasBackground)
                                     t.Colour = OsuColour.FromHex(message.Sender.Colour);
                             }
 
-                            t.TextSize = TextSize;
+                            t.Font = t.Font.With(size: TextSize);
                         })
                         {
                             AutoSizeAxes = Axes.Y,

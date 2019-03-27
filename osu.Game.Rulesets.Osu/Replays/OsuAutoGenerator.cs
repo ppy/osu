@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using osuTK;
 using osu.Framework.MathUtils;
@@ -10,12 +10,15 @@ using System.Linq;
 using osu.Framework.Graphics;
 using osu.Game.Replays;
 using osu.Game.Rulesets.Objects.Types;
+using osu.Game.Rulesets.Osu.Beatmaps;
 using osu.Game.Rulesets.Scoring;
 
 namespace osu.Game.Rulesets.Osu.Replays
 {
     public class OsuAutoGenerator : OsuAutoGeneratorBase
     {
+        public new OsuBeatmap Beatmap => (OsuBeatmap)base.Beatmap;
+
         #region Parameters
 
         /// <summary>
@@ -42,7 +45,7 @@ namespace osu.Game.Rulesets.Osu.Replays
 
         #region Construction / Initialisation
 
-        public OsuAutoGenerator(Beatmap<OsuHitObject> beatmap)
+        public OsuAutoGenerator(IBeatmap beatmap)
             : base(beatmap)
         {
             // Already superhuman, but still somewhat realistic
@@ -209,7 +212,7 @@ namespace osu.Game.Rulesets.Osu.Replays
             // Only "snap" to hitcircles if they are far enough apart. As the time between hitcircles gets shorter the snapping threshold goes up.
             if (timeDifference > 0 && // Sanity checks
                 ((lastPosition - targetPos).Length > h.Radius * (1.5 + 100.0 / timeDifference) || // Either the distance is big enough
-                timeDifference >= 266)) // ... or the beats are slow enough to tap anyway.
+                 timeDifference >= 266)) // ... or the beats are slow enough to tap anyway.
             {
                 // Perform eased movement
                 for (double time = lastFrame.Time + FrameDelay; time < h.StartTime; time += FrameDelay)

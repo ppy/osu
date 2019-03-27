@@ -1,5 +1,5 @@
-// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using System.Collections.Generic;
@@ -9,14 +9,17 @@ using osu.Game.Replays;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Taiko.Objects;
 using osu.Game.Rulesets.Replays;
+using osu.Game.Rulesets.Taiko.Beatmaps;
 
 namespace osu.Game.Rulesets.Taiko.Replays
 {
-    public class TaikoAutoGenerator : AutoGenerator<TaikoHitObject>
+    public class TaikoAutoGenerator : AutoGenerator
     {
+        public new TaikoBeatmap Beatmap => (TaikoBeatmap)base.Beatmap;
+
         private const double swell_hit_speed = 50;
 
-        public TaikoAutoGenerator(Beatmap<TaikoHitObject> beatmap)
+        public TaikoAutoGenerator(IBeatmap beatmap)
             : base(beatmap)
         {
             Replay = new Replay();

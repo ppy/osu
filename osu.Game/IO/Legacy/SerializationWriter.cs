@@ -1,5 +1,5 @@
-// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using System.Collections.Generic;
@@ -8,6 +8,7 @@ using System.Runtime.Serialization;
 using System.Runtime.Serialization.Formatters;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
+
 // ReSharper disable ConditionIsAlwaysTrueOrFalse (we're allowing nulls to be passed to the writer where the underlying class doesn't).
 // ReSharper disable HeuristicUnreachableCode
 
@@ -219,7 +220,7 @@ namespace osu.Game.IO.Legacy
                         Write((byte)ObjType.otherType);
                         BinaryFormatter b = new BinaryFormatter
                         {
-//                            AssemblyFormat = FormatterAssemblyStyle.Simple,
+                            // AssemblyFormat = FormatterAssemblyStyle.Simple,
                             TypeFormat = FormatterTypeStyle.TypesWhenNeeded
                         };
                         b.Serialize(BaseStream, obj);

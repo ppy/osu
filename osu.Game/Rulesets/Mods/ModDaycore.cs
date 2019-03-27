@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Audio;
 using osu.Framework.Timing;
@@ -16,9 +16,8 @@ namespace osu.Game.Rulesets.Mods
 
         public override void ApplyToClock(IAdjustableClock clock)
         {
-            var pitchAdjust = clock as IHasPitchAdjust;
-            if (pitchAdjust != null)
-                pitchAdjust.PitchAdjust = 0.75;
+            if (clock is IHasPitchAdjust pitchAdjust)
+                pitchAdjust.PitchAdjust *= RateAdjust;
             else
                 base.ApplyToClock(clock);
         }

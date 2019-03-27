@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Configuration;
 using osu.Framework.Configuration.Tracking;
@@ -33,14 +33,14 @@ namespace osu.Game.Configuration
             Set(OsuSetting.Username, string.Empty);
             Set(OsuSetting.Token, string.Empty);
 
-            Set(OsuSetting.SavePassword, false).ValueChanged += val =>
+            Set(OsuSetting.SavePassword, false).ValueChanged += enabled =>
             {
-                if (val) Set(OsuSetting.SaveUsername, true);
+                if (enabled.NewValue) Set(OsuSetting.SaveUsername, true);
             };
 
-            Set(OsuSetting.SaveUsername, true).ValueChanged += val =>
+            Set(OsuSetting.SaveUsername, true).ValueChanged += enabled =>
             {
-                if (!val) Set(OsuSetting.SavePassword, false);
+                if (!enabled.NewValue) Set(OsuSetting.SavePassword, false);
             };
 
             Set(OsuSetting.ExternalLinkWarning, true);
@@ -72,9 +72,6 @@ namespace osu.Game.Configuration
 
             Set(OsuSetting.MenuParallax, true);
 
-            Set(OsuSetting.SnakingInSliders, true);
-            Set(OsuSetting.SnakingOutSliders, true);
-
             // Gameplay
             Set(OsuSetting.DimLevel, 0.3, 0, 1, 0.01);
             Set(OsuSetting.BlurLevel, 0, 0, 1, 0.01);
@@ -105,6 +102,8 @@ namespace osu.Game.Configuration
 
             Set(OsuSetting.ScalingPositionX, 0.5f, 0f, 1f);
             Set(OsuSetting.ScalingPositionY, 0.5f, 0f, 1f);
+
+            Set(OsuSetting.UIScale, 1f, 0.8f, 1.6f, 0.01f);
         }
 
         public OsuConfigManager(Storage storage)
@@ -148,8 +147,6 @@ namespace osu.Game.Configuration
         DisplayStarsMinimum,
         DisplayStarsMaximum,
         RandomSelectAlgorithm,
-        SnakingInSliders,
-        SnakingOutSliders,
         ShowFpsDisplay,
         ChatDisplayHeight,
         Version,
@@ -167,6 +164,7 @@ namespace osu.Game.Configuration
         ScalingPositionX,
         ScalingPositionY,
         ScalingSizeX,
-        ScalingSizeY
+        ScalingSizeY,
+        UIScale
     }
 }

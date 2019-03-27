@@ -1,10 +1,8 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using osuTK;
 using osuTK.Graphics;
-using osuTK.Graphics.ES30;
-using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Batches;
 using osu.Framework.Graphics.Colour;
@@ -16,6 +14,7 @@ using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using System;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 
 namespace osu.Game.Screens.Menu
 {
@@ -64,7 +63,7 @@ namespace osu.Game.Screens.Menu
 
         private readonly float[] frequencyAmplitudes = new float[256];
 
-        private Shader shader;
+        private IShader shader;
         private readonly Texture texture;
 
         public LogoVisualisation()
@@ -75,7 +74,7 @@ namespace osu.Game.Screens.Menu
         }
 
         [BackgroundDependencyLoader]
-        private void load(ShaderManager shaders, IBindableBeatmap beatmap)
+        private void load(ShaderManager shaders, IBindable<WorkingBeatmap> beatmap)
         {
             this.beatmap.BindTo(beatmap);
             shader = shaders.Load(VertexShaderDescriptor.TEXTURE_2, FragmentShaderDescriptor.TEXTURE_ROUNDED);
@@ -132,8 +131,6 @@ namespace osu.Game.Screens.Menu
 
         protected override DrawNode CreateDrawNode() => new VisualisationDrawNode();
 
-        private readonly VisualiserSharedData sharedData = new VisualiserSharedData();
-
         protected override void ApplyDrawNode(DrawNode node)
         {
             base.ApplyDrawNode(node);
@@ -143,26 +140,22 @@ namespace osu.Game.Screens.Menu
             visNode.Shader = shader;
             visNode.Texture = texture;
             visNode.Size = DrawSize.X;
-            visNode.Shared = sharedData;
             visNode.Colour = AccentColour;
             visNode.AudioData = frequencyAmplitudes;
         }
 
-        private class VisualiserSharedData
-        {
-            public readonly LinearBatch<TexturedVertex2D> VertexBatch = new LinearBatch<TexturedVertex2D>(100 * 4, 10, PrimitiveType.Quads);
-        }
-
         private class VisualisationDrawNode : DrawNode
         {
-            public Shader Shader;
+            public IShader Shader;
             public Texture Texture;
-            public VisualiserSharedData Shared;
+
             //Asuming the logo is a circle, we don't need a second dimension.
             public float Size;
 
             public Color4 Colour;
             public float[] AudioData;
+
+            private readonly QuadBatch<TexturedVertex2D> vertexBatch = new QuadBatch<TexturedVertex2D>(100, 10);
 
             public override void Draw(Action<TexturedVertex2D> vertexAction)
             {
@@ -208,13 +201,21 @@ namespace osu.Game.Screens.Menu
                                 rectangle,
                                 colourInfo,
                                 null,
-                                Shared.VertexBatch.AddAction,
+                                vertexBatch.AddAction,
                                 //barSize by itself will make it smooth more in the X axis than in the Y axis, this reverts that.
                                 Vector2.Divide(inflation, barSize.Yx));
                         }
                     }
                 }
+
                 Shader.Unbind();
+            }
+
+            protected override void Dispose(bool isDisposing)
+            {
+                base.Dispose(isDisposing);
+
+                vertexBatch.Dispose();
             }
         }
     }

@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using System.Collections.Generic;
@@ -7,9 +7,10 @@ using System.Linq;
 using osu.Framework.Graphics;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Extensions.IEnumerableExtensions;
-using osu.Framework.Configuration;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Cursor;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Mods;
 using osuTK;
@@ -60,9 +61,13 @@ namespace osu.Game.Rulesets.UI
         private WorkingBeatmap beatmap;
 
         [BackgroundDependencyLoader]
-        private void load(IBindableBeatmap beatmap)
+        private void load(IBindable<WorkingBeatmap> beatmap)
         {
             this.beatmap = beatmap.Value;
+
+            Cursor = CreateCursor();
+            if (Cursor != null)
+                CursorTargetContainer.Add(Cursor);
         }
 
         /// <summary>
@@ -81,6 +86,23 @@ namespace osu.Game.Rulesets.UI
         /// </summary>
         /// <param name="h">The DrawableHitObject to remove.</param>
         public virtual bool Remove(DrawableHitObject h) => HitObjectContainer.Remove(h);
+
+        /// <summary>
+        /// The cursor currently being used by this <see cref="Playfield"/>. May be null if no cursor is provided.
+        /// </summary>
+        public CursorContainer Cursor { get; private set; }
+
+        /// <summary>
+        /// Provide an optional cursor which is to be used for gameplay.
+        /// If providing a cursor, <see cref="CursorTargetContainer"/> must also point to a valid target container.
+        /// </summary>
+        /// <returns>The cursor, or null if a cursor is not rqeuired.</returns>
+        protected virtual CursorContainer CreateCursor() => null;
+
+        /// <summary>
+        /// The target container to add the cursor after it is created.
+        /// </summary>
+        protected virtual Container CursorTargetContainer => null;
 
         /// <summary>
         /// Registers a <see cref="Playfield"/> as a nested <see cref="Playfield"/>.
