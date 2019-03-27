@@ -26,8 +26,8 @@ namespace osu.Game.Graphics.Containers
 
         private OsuLogo logo;
         private float facadeScale;
-        private Vector2 startPosition;
         private Easing easing;
+        private Vector2? startPosition;
         private double? startTime;
         private double duration;
 
@@ -49,6 +49,9 @@ namespace osu.Game.Graphics.Containers
             this.facadeScale = facadeScale;
             this.duration = duration;
             this.easing = easing;
+
+            startTime = null;
+            startPosition = null;
         }
 
         private Vector2 logoTrackingPosition => logo.Parent.ToLocalSpace(LogoFacade.ScreenSpaceDrawQuad.Centre);
@@ -68,7 +71,7 @@ namespace osu.Game.Graphics.Containers
                 logo.RelativePositionAxes = Axes.None;
 
                 // If this is our first update since tracking has started, initialize our starting values for interpolation
-                if (startTime == null)
+                if (startTime == null || startPosition == null)
                 {
                     startTime = Time.Current;
                     startPosition = logo.Position;
@@ -76,12 +79,12 @@ namespace osu.Game.Graphics.Containers
 
                 if (duration != 0)
                 {
-                    double elapsedDuration = Time.Current - startTime ?? 0;
+                    double elapsedDuration = Time.Current - startTime ?? throw new ArgumentNullException(nameof(startTime));
 
                     var mount = (float)Interpolation.ApplyEasing(easing, Math.Min(elapsedDuration / duration, 1));
 
                     // Interpolate the position of the logo, where mount 0 is where the logo was when it first began interpolating, and mount 1 is the target location.
-                    logo.Position = Vector2.Lerp(startPosition, logoTrackingPosition, mount);
+                    logo.Position = Vector2.Lerp(startPosition ?? throw new ArgumentNullException(nameof(startPosition)), logoTrackingPosition, mount);
                 }
                 else
                 {

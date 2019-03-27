@@ -311,7 +311,7 @@ namespace osu.Game.Screens.Play
             }
 
             private readonly WorkingBeatmap beatmap;
-            private readonly LogoFacadeContainer.Facade facade;
+            private readonly Container facade;
             private LoadingAnimation loading;
             private Sprite backgroundSprite;
             private ModDisplay modDisplay;
@@ -333,7 +333,7 @@ namespace osu.Game.Screens.Play
                 }
             }
 
-            public BeatmapMetadataDisplay(WorkingBeatmap beatmap, LogoFacadeContainer.Facade facade)
+            public BeatmapMetadataDisplay(WorkingBeatmap beatmap, Container facade)
             {
                 this.beatmap = beatmap;
                 this.facade = facade;
