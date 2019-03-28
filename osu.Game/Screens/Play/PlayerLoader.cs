@@ -129,6 +129,9 @@ namespace osu.Game.Screens.Play
 
         private void contentOut()
         {
+            // Ensure the logo is no longer tracking before we scale the content.
+            content.Tracking = false;
+
             content.ScaleTo(0.7f, 300, Easing.InQuint);
             content.FadeOut(250);
         }
