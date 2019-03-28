@@ -155,6 +155,8 @@ namespace osu.Game.Overlays.Music
             }
         }
 
+        public bool FilteringActive { get; set; }
+
         private class PlaylistItemHandle : SpriteIcon
         {
             public PlaylistItemHandle()
