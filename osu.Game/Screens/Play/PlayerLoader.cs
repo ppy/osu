@@ -152,8 +152,12 @@ namespace osu.Game.Screens.Play
 
             const double duration = 300;
 
+            if (!resuming)
+            {
+                logo.MoveTo(new Vector2(0.5f), duration, Easing.In);
+            }
+
             logo.ScaleTo(new Vector2(0.15f), duration, Easing.In);
-            logo.MoveTo(new Vector2(0.5f), duration, Easing.In);
             logo.FadeIn(350);
 
             content.SetLogo(logo, 1.0f, 500, Easing.InOutExpo);
