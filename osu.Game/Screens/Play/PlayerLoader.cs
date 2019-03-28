@@ -156,7 +156,7 @@ namespace osu.Game.Screens.Play
             logo.MoveTo(new Vector2(0.5f), duration, Easing.In);
             logo.FadeIn(350);
 
-            content.SetLogo(logo, 0.3f, 500, Easing.InOutExpo);
+            content.SetLogo(logo, 1.0f, 500, Easing.InOutExpo);
 
             Scheduler.AddDelayed(() => content.Tracking = true, resuming ? 0 : 500);
         }
@@ -365,6 +365,7 @@ namespace osu.Game.Screens.Play
                                 Font = OsuFont.GetFont(size: 36, italics: true),
                                 Origin = Anchor.TopCentre,
                                 Anchor = Anchor.TopCentre,
+                                Margin = new MarginPadding { Top = 15 },
                             },
                             new OsuSpriteText
                             {

@@ -63,7 +63,8 @@ namespace osu.Game.Graphics.Containers
             if (logo == null || !Tracking)
                 return;
 
-            LogoFacade.Size = new Vector2(logo.SizeForFlow * facadeScale);
+            // Account for the scale of the actual logo container, as SizeForFlow only accounts for the sprite scale.
+            LogoFacade.Size = new Vector2(logo.SizeForFlow * logo.Scale.X * facadeScale);
 
             if (LogoFacade.Parent != null && logo.Position != logoTrackingPosition)
             {
