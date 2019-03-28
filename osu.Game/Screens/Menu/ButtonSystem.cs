@@ -59,7 +59,7 @@ namespace osu.Game.Screens.Menu
             if (this.logo != null)
             {
                 this.logo.Action = onOsuLogo;
-                logoFacadeContainer.SetLogo(logo, 0.5f);
+                logoFacadeContainer.SetLogo(logo, 0.74f);
 
                 // osuLogo.SizeForFlow relies on loading to be complete.
                 buttonArea.Flow.Position = new Vector2(WEDGE_WIDTH * 2 - (BUTTON_WIDTH + this.logo.SizeForFlow / 4), 0);
@@ -295,7 +295,7 @@ namespace osu.Game.Screens.Menu
                             if (lastState == ButtonSystemState.Initial)
                                 logo.ScaleTo(0.5f, 200, Easing.In);
 
-                            logoFacadeContainer.SetLogo(logo, 0.5f, lastState == ButtonSystemState.EnteringMode ? 0 : 200, Easing.In);
+                            logoFacadeContainer.SetLogo(logo, 0.74f, lastState == ButtonSystemState.EnteringMode ? 0 : 200, Easing.In);
                             logoFacadeContainer.Tracking = true;
 
                             logoDelayedAction?.Cancel();
