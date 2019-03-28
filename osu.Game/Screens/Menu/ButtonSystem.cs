@@ -295,11 +295,12 @@ namespace osu.Game.Screens.Menu
                             if (lastState == ButtonSystemState.Initial)
                                 logo.ScaleTo(0.5f, 200, Easing.In);
 
+                            logoFacadeContainer.SetLogo(logo, 0.5f, lastState == ButtonSystemState.EnteringMode ? 0 : 200, Easing.In);
+                            logoFacadeContainer.Tracking = true;
+
                             logoDelayedAction?.Cancel();
                             logoDelayedAction = Scheduler.AddDelayed(() =>
                             {
-                                logoFacadeContainer.Tracking = true;
-
                                 if (impact)
                                     logo.Impact();
 
