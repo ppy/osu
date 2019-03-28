@@ -145,7 +145,12 @@ namespace osu.Game.Tests.Visual
                 logoFacadeContainer.Add(logoFacade = logoFacadeContainer.LogoFacade);
             }
 
-            public bool IsLogoTracking => logo.Position == logo.Parent.ToLocalSpace(logoFacadeContainer.LogoFacade.ScreenSpaceDrawQuad.Centre);
+            private Vector2 logoTrackingPosition => logo.Parent.ToLocalSpace(logoFacade.ScreenSpaceDrawQuad.Centre);
+
+            /// <summary>
+            /// Check that the logo is tracking the position of the facade, with an acceptable precision lenience.
+            /// </summary>
+            public bool IsLogoTracking => Math.Abs(logo.Position.X - logoTrackingPosition.X) < 0.001f && Math.Abs(logo.Position.Y - logoTrackingPosition.Y) < 0.001f;
 
             public void RemoveFacade()
             {

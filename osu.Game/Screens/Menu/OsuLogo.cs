@@ -54,7 +54,7 @@ namespace osu.Game.Screens.Menu
         /// </summary>
         public Func<bool> Action;
 
-        public float SizeForFlow => logo == null ? 0 : logo.DrawSize.X * logo.Scale.X * logoBounceContainer.Scale.X * logoHoverContainer.Scale.X * 0.74f;
+        public float SizeForFlow => logo == null ? 0 : logo.DrawSize.X * logo.Scale.X * logoBounceContainer.Scale.X * logoHoverContainer.Scale.X;
 
         private readonly Sprite ripple;
 
