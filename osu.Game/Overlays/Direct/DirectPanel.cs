@@ -166,7 +166,7 @@ namespace osu.Game.Overlays.Direct
                 }
             }
 
-            public Statistic(FontAwesome icon, int value = 0)
+            public Statistic(IconUsage icon, int value = 0)
             {
                 Anchor = Anchor.TopRight;
                 Origin = Anchor.TopRight;

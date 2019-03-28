@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using osu.Framework.Graphics.Sprites;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.Mods;
 
@@ -11,7 +12,7 @@ namespace osu.Game.Rulesets.Osu.Mods
     {
         public override string Name => "Autopilot";
         public override string Acronym => "AP";
-        public override FontAwesome Icon => FontAwesome.fa_osu_mod_autopilot;
+        public override IconUsage Icon => OsuIcon.ModAutopilot;
         public override ModType Type => ModType.Automation;
         public override string Description => @"Automatic cursor movement - just follow the rhythm.";
         public override double ScoreMultiplier => 1;
