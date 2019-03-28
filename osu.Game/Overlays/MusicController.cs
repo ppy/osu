@@ -56,6 +56,11 @@ namespace osu.Game.Overlays
 
         private readonly Bindable<WorkingBeatmap> beatmap = new Bindable<WorkingBeatmap>();
 
+        /// <summary>
+        /// Provide a source for the toolbar height.
+        /// </summary>
+        public Func<float> GetToolbarHeight;
+
         public MusicController()
         {
             Width = 400;
@@ -244,6 +249,8 @@ namespace osu.Game.Overlays
         {
             base.UpdateAfterChildren();
             Height = dragContainer.Height;
+
+            dragContainer.Padding = new MarginPadding { Top = GetToolbarHeight?.Invoke() ?? 0 };
         }
 
         protected override void Update()
