@@ -79,7 +79,6 @@ namespace osu.Game.Scoring.Legacy
                 {
                     case 0:
                     case 1:
-                    case 2:
                         Statistics[HitResult.Good] = value;
                         break;
                     case 3:
@@ -101,7 +100,6 @@ namespace osu.Game.Scoring.Legacy
                 switch (Ruleset?.ID ?? RulesetID)
                 {
                     case 0:
-                    case 2:
                     case 3:
                         Statistics[HitResult.Meh] = value;
                         break;
