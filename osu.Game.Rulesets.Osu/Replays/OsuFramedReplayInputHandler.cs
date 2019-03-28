@@ -18,16 +18,18 @@ namespace osu.Game.Rulesets.Osu.Replays
         {
         }
 
-        protected override bool IsImportant(OsuReplayFrame frame) => frame.Actions.Any();
+        protected override bool IsImportant(OsuReplayFrame frame) => frame?.Actions.Any() ?? false;
 
         protected Vector2? Position
         {
             get
             {
-                if (!HasFrames)
+                var frame = CurrentFrame;
+
+                if (frame == null)
                     return null;
 
-                return Interpolation.ValueAt(CurrentTime, CurrentFrame.Position, NextFrame.Position, CurrentFrame.Time, NextFrame.Time);
+                return Interpolation.ValueAt(CurrentTime, frame.Position, NextFrame.Position, frame.Time, NextFrame.Time);
             }
         }
 
@@ -41,7 +43,7 @@ namespace osu.Game.Rulesets.Osu.Replays
                 },
                 new ReplayState<OsuAction>
                 {
-                    PressedActions = CurrentFrame.Actions
+                    PressedActions = CurrentFrame?.Actions ?? new List<OsuAction>()
                 }
             };
         }
