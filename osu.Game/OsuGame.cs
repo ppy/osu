@@ -441,7 +441,7 @@ namespace osu.Game
 
             loadComponentSingleFile(musicController = new MusicController
             {
-                Position = new Vector2(0, Toolbar.HEIGHT),
+                GetToolbarHeight = () => ToolbarOffset,
                 Anchor = Anchor.TopRight,
                 Origin = Anchor.TopRight,
             }, floatingOverlayContent.Add);
