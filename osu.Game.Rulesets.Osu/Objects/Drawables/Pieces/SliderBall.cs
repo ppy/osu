@@ -6,6 +6,7 @@ using System.Linq;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Input;
 using osu.Framework.Input.Events;
 using osu.Game.Rulesets.Objects.Types;
 using osuTK.Graphics;
@@ -14,7 +15,7 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
 {
-    public class SliderBall : CircularContainer, ISliderProgress
+    public class SliderBall : CircularContainer, ISliderProgress, IRequireHighFrequencyMousePosition
     {
         private const float width = 128;
 
@@ -106,18 +107,6 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
         }
 
         private Vector2? lastScreenSpaceMousePosition;
-
-        protected override bool OnMouseDown(MouseDownEvent e)
-        {
-            lastScreenSpaceMousePosition = e.ScreenSpaceMousePosition;
-            return base.OnMouseDown(e);
-        }
-
-        protected override bool OnMouseUp(MouseUpEvent e)
-        {
-            lastScreenSpaceMousePosition = e.ScreenSpaceMousePosition;
-            return base.OnMouseUp(e);
-        }
 
         protected override bool OnMouseMove(MouseMoveEvent e)
         {
