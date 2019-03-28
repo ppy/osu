@@ -62,7 +62,7 @@ namespace osu.Game
 
         private NotificationOverlay notifications;
 
-        public LoginOverlay loginOverlay;
+        private LoginOverlay loginOverlay;
 
         private DialogOverlay dialogOverlay;
 
