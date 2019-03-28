@@ -101,6 +101,5 @@ namespace osu.Game.Overlays
 
             Padding = new MarginPadding { Top = GetToolbarHeight?.Invoke() ?? 0 };
         }
-
     }
 }
