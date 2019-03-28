@@ -7,7 +7,6 @@ using osu.Framework.Input.StateChanges;
 using osu.Game.Input.Handlers;
 using osu.Game.Replays;
 using osuTK;
-using osuTK.Input;
 
 namespace osu.Game.Rulesets.Replays
 {
@@ -22,12 +21,12 @@ namespace osu.Game.Rulesets.Replays
 
         protected List<ReplayFrame> Frames => replay.Frames;
 
-        public TFrame CurrentFrame => !HasFrames ? null : (TFrame)Frames[currentFrameIndex];
+        public TFrame CurrentFrame => !HasFrames || !currentFrameIndex.HasValue ? null : (TFrame)Frames[currentFrameIndex.Value];
         public TFrame NextFrame => !HasFrames ? null : (TFrame)Frames[nextFrameIndex];
 
-        private int currentFrameIndex;
+        private int? currentFrameIndex;
 
-        private int nextFrameIndex => MathHelper.Clamp(currentFrameIndex + (currentDirection > 0 ? 1 : -1), 0, Frames.Count - 1);
+        private int nextFrameIndex => currentFrameIndex.HasValue ? MathHelper.Clamp(currentFrameIndex.Value + (currentDirection > 0 ? 1 : -1), 0, Frames.Count - 1) : 0;
 
         protected FramedReplayInputHandler(Replay replay)
         {
@@ -46,9 +45,6 @@ namespace osu.Game.Rulesets.Replays
         }
 
         public override List<IInput> GetPendingInputs() => new List<IInput>();
-
-        public bool AtLastFrame => currentFrameIndex == Frames.Count - 1;
-        public bool AtFirstFrame => currentFrameIndex == 0;
 
         private const double sixty_frame_time = 1000.0 / 60;
 
@@ -105,23 +101,6 @@ namespace osu.Game.Rulesets.Replays
             }
 
             return CurrentTime = time;
-        }
-
-        protected class ReplayMouseState : osu.Framework.Input.States.MouseState
-        {
-            public ReplayMouseState(Vector2 position)
-            {
-                Position = position;
-            }
-        }
-
-        protected class ReplayKeyboardState : osu.Framework.Input.States.KeyboardState
-        {
-            public ReplayKeyboardState(List<Key> keys)
-            {
-                foreach (var key in keys)
-                    Keys.Add(key);
-            }
         }
     }
 }
