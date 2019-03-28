@@ -43,6 +43,8 @@ namespace osu.Game.Overlays.Chat.Selection
             set => this.FadeTo(value ? 1f : 0f, 100);
         }
 
+        public bool FilteringActive { get; set; }
+
         public Action<Channel> OnRequestJoin;
         public Action<Channel> OnRequestLeave;
 
