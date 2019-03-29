@@ -42,7 +42,7 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawable
             // todo: this should come from the skin.
             AccentColour = colourForRepresentation(HitObject.VisualRepresentation);
 
-            InternalChildren = new[]
+            AddRangeInternal(new[]
             {
                 createPulp(HitObject.VisualRepresentation),
                 border = new Circle
@@ -70,7 +70,7 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawable
                         }
                     }
                 },
-            };
+            });
 
             if (HitObject.HyperDash)
             {

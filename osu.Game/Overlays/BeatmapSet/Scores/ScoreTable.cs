@@ -3,9 +3,9 @@
 
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Game.Online.API.Requests.Responses;
 using System.Collections.Generic;
 using System.Linq;
+using osu.Game.Scoring;
 
 namespace osu.Game.Overlays.BeatmapSet.Scores
 {
@@ -48,7 +48,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
             };
         }
 
-        public IEnumerable<APIScoreInfo> Scores
+        public IEnumerable<ScoreInfo> Scores
         {
             set
             {

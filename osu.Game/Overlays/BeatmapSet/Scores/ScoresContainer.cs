@@ -10,10 +10,10 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
-using osu.Game.Online.API.Requests.Responses;
 using osuTK;
 using System.Collections.Generic;
 using System.Linq;
+using osu.Game.Scoring;
 
 namespace osu.Game.Overlays.BeatmapSet.Scores
 {
@@ -83,10 +83,9 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
         }
 
         private GetScoresRequest getScoresRequest;
+        private IEnumerable<ScoreInfo> scores;
 
-        private IEnumerable<APIScoreInfo> scores;
-
-        public IEnumerable<APIScoreInfo> Scores
+        public IEnumerable<ScoreInfo> Scores
         {
             get => scores;
             set
@@ -122,7 +121,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
 
         private void updateDisplay()
         {
-            scoreTable.Scores = Enumerable.Empty<APIScoreInfo>();
+            scoreTable.Scores = Enumerable.Empty<ScoreInfo>();
 
             loading = false;
 

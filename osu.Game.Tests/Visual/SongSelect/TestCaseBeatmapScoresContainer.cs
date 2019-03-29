@@ -9,7 +9,6 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.MathUtils;
 using osu.Game.Graphics;
-using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays.BeatmapSet.Scores;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu.Mods;
@@ -53,9 +52,9 @@ namespace osu.Game.Tests.Visual.SongSelect
                 }
             };
 
-            IEnumerable<APIScoreInfo> scores = new[]
+            IEnumerable<ScoreInfo> scores = new[]
             {
-                new APIScoreInfo
+                new ScoreInfo
                 {
                     User = new User
                     {
@@ -80,7 +79,7 @@ namespace osu.Game.Tests.Visual.SongSelect
                     TotalScore = 1234567890,
                     Accuracy = 1,
                 },
-                new APIScoreInfo
+                new ScoreInfo
                 {
                     User = new User
                     {
@@ -104,7 +103,7 @@ namespace osu.Game.Tests.Visual.SongSelect
                     TotalScore = 1234789,
                     Accuracy = 0.9997,
                 },
-                new APIScoreInfo
+                new ScoreInfo
                 {
                     User = new User
                     {
@@ -127,7 +126,7 @@ namespace osu.Game.Tests.Visual.SongSelect
                     TotalScore = 12345678,
                     Accuracy = 0.9854,
                 },
-                new APIScoreInfo
+                new ScoreInfo
                 {
                     User = new User
                     {
@@ -149,7 +148,7 @@ namespace osu.Game.Tests.Visual.SongSelect
                     TotalScore = 1234567,
                     Accuracy = 0.8765,
                 },
-                new APIScoreInfo
+                new ScoreInfo
                 {
                     User = new User
                     {

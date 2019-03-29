@@ -10,7 +10,6 @@ using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Events;
 using osu.Game.Graphics;
-using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Leaderboards;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Scoring;
@@ -55,9 +54,9 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
 
         private readonly ModsInfoColumn modsInfo;
 
-        private APIScoreInfo score;
+        private ScoreInfo score;
 
-        public APIScoreInfo Score
+        public ScoreInfo Score
         {
             get => score;
             set
