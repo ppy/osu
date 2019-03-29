@@ -16,6 +16,7 @@ using osu.Game.Overlays;
 using osu.Framework.Graphics.UserInterface;
 using osu.Game.Graphics.UserInterface;
 using osu.Framework.Graphics.Cursor;
+using osu.Framework.Graphics.Sprites;
 using osu.Game.Graphics.Containers;
 using osu.Game.Overlays.Profile.Header;
 
@@ -165,7 +166,7 @@ namespace osu.Game.Users
                                     {
                                         Anchor = Anchor.CentreLeft,
                                         Origin = Anchor.CentreLeft,
-                                        Icon = FontAwesome.fa_circle_o,
+                                        Icon = FontAwesome.CircleOutline,
                                         Shadow = true,
                                         Size = new Vector2(14),
                                     },

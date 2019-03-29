@@ -34,6 +34,19 @@ namespace osu.Game.Screens.Play
     public class Player : ScreenWithBeatmapBackground
     {
         protected override bool AllowBackButton => false; // handled by HoldForMenuButton
+        
+        protected override RichPresence Presence => new RichPresence
+        {
+            Details = $"{Beatmap.Value.Metadata.Artist} - {Beatmap.Value.Metadata.Title} [{Beatmap.Value.BeatmapInfo.Version}]",
+            State = "Playing a beatmap",
+            Assets = new Assets
+            {
+                LargeImageKey = "lazer",
+                LargeImageText = "osu!lazer",
+                SmallImageKey = ruleset.ShortName,
+                SmallImageText = ruleset.Name
+            }
+        };
 
         public override float BackgroundParallaxAmount => 0.1f;
 
@@ -44,10 +57,6 @@ namespace osu.Game.Screens.Play
         public Action RestartRequested;
 
         public bool HasFailed { get; private set; }
-
-        public bool AllowPause { get; set; } = true;
-        public bool AllowLeadIn { get; set; } = true;
-        public bool AllowResults { get; set; } = true;
 
         private Bindable<bool> mouseWheelDisabled;
 
@@ -73,18 +82,19 @@ namespace osu.Game.Screens.Play
 
         protected GameplayClockContainer GameplayClockContainer { get; private set; }
 
-        protected override RichPresence Presence => new RichPresence
+        private readonly bool allowPause;
+        private readonly bool showResults;
+
+        /// <summary>
+        /// Create a new player instance.
+        /// </summary>
+        /// <param name="allowPause">Whether pausing should be allowed. If not allowed, attempting to pause will quit.</param>
+        /// <param name="showResults">Whether results screen should be pushed on completion.</param>
+        public Player(bool allowPause = true, bool showResults = true)
         {
-            Details = $"{Beatmap.Value.Metadata.Artist} - {Beatmap.Value.Metadata.Title} [{Beatmap.Value.BeatmapInfo.Version}]",
-            State = "Playing a beatmap",
-            Assets = new Assets
-            {
-                LargeImageKey = "lazer",
-                LargeImageText = "osu!lazer",
-                SmallImageKey = ruleset.ShortName,
-                SmallImageText = ruleset.Name
-            }
-        };
+            this.allowPause = allowPause;
+            this.showResults = showResults;
+        }
 
         [BackgroundDependencyLoader]
         private void load(AudioManager audio, IAPIProvider api, OsuConfigManager config)
@@ -105,7 +115,7 @@ namespace osu.Game.Screens.Play
             if (!ScoreProcessor.Mode.Disabled)
                 config.BindWith(OsuSetting.ScoreDisplayMode, ScoreProcessor.Mode);
 
-            InternalChild = GameplayClockContainer = new GameplayClockContainer(working, AllowLeadIn, DrawableRuleset.GameplayStartTime);
+            InternalChild = GameplayClockContainer = new GameplayClockContainer(working, DrawableRuleset.GameplayStartTime);
 
             GameplayClockContainer.Children = new[]
             {
@@ -251,7 +261,7 @@ namespace osu.Game.Screens.Play
 
             ValidForResume = false;
 
-            if (!AllowResults) return;
+            if (!showResults) return;
 
             using (BeginDelayedSequence(1000))
             {
@@ -365,7 +375,7 @@ namespace osu.Game.Screens.Play
 
         private bool canPause =>
             // must pass basic screen conditions (beatmap loaded, instance allows pause)
-            LoadedBeatmapSuccessfully && AllowPause && ValidForResume
+            LoadedBeatmapSuccessfully && allowPause && ValidForResume
             // replays cannot be paused and exit immediately
             && !DrawableRuleset.HasReplayLoaded.Value
             // cannot pause if we are already in a fail state
