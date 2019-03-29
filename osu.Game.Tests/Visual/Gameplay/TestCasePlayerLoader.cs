@@ -26,12 +26,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         {
             Beatmap.Value = new DummyWorkingBeatmap(game);
 
-            AddStep("load dummy beatmap", () => stack.Push(loader = new PlayerLoader(() => new Player
-            {
-                AllowPause = false,
-                AllowLeadIn = false,
-                AllowResults = false,
-            })));
+            AddStep("load dummy beatmap", () => stack.Push(loader = new PlayerLoader(() => new Player(false, false))));
 
             AddUntilStep("wait for current", () => loader.IsCurrentScreen());
 
@@ -47,12 +42,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             {
                 SlowLoadPlayer slow = null;
 
-                stack.Push(loader = new PlayerLoader(() => slow = new SlowLoadPlayer
-                {
-                    AllowPause = false,
-                    AllowLeadIn = false,
-                    AllowResults = false,
-                }));
+                stack.Push(loader = new PlayerLoader(() => slow = new SlowLoadPlayer(false, false)));
 
                 Scheduler.AddDelayed(() => slow.Ready = true, 5000);
             });
@@ -63,6 +53,11 @@ namespace osu.Game.Tests.Visual.Gameplay
         protected class SlowLoadPlayer : Player
         {
             public bool Ready;
+
+            public SlowLoadPlayer(bool allowPause = true, bool showResults = true)
+                : base(allowPause, showResults)
+            {
+            }
 
             [BackgroundDependencyLoader]
             private void load()

@@ -43,10 +43,6 @@ namespace osu.Game.Screens.Play
 
         public bool HasFailed { get; private set; }
 
-        public bool AllowPause { get; set; } = true;
-        public bool AllowLeadIn { get; set; } = true;
-        public bool AllowResults { get; set; } = true;
-
         private Bindable<bool> mouseWheelDisabled;
 
         private readonly Bindable<bool> storyboardReplacesBackground = new Bindable<bool>();
@@ -71,6 +67,20 @@ namespace osu.Game.Screens.Play
 
         protected GameplayClockContainer GameplayClockContainer { get; private set; }
 
+        private readonly bool allowPause;
+        private readonly bool showResults;
+
+        /// <summary>
+        /// Create a new player instance.
+        /// </summary>
+        /// <param name="allowPause">Whether pausing should be allowed. If not allowed, attempting to pause will quit.</param>
+        /// <param name="showResults">Whether results screen should be pushed on completion.</param>
+        public Player(bool allowPause = true, bool showResults = true)
+        {
+            this.allowPause = allowPause;
+            this.showResults = showResults;
+        }
+
         [BackgroundDependencyLoader]
         private void load(AudioManager audio, IAPIProvider api, OsuConfigManager config)
         {
@@ -90,7 +100,7 @@ namespace osu.Game.Screens.Play
             if (!ScoreProcessor.Mode.Disabled)
                 config.BindWith(OsuSetting.ScoreDisplayMode, ScoreProcessor.Mode);
 
-            InternalChild = GameplayClockContainer = new GameplayClockContainer(working, AllowLeadIn, DrawableRuleset.GameplayStartTime);
+            InternalChild = GameplayClockContainer = new GameplayClockContainer(working, DrawableRuleset.GameplayStartTime);
 
             GameplayClockContainer.Children = new[]
             {
@@ -234,7 +244,7 @@ namespace osu.Game.Screens.Play
 
             ValidForResume = false;
 
-            if (!AllowResults) return;
+            if (!showResults) return;
 
             using (BeginDelayedSequence(1000))
             {
@@ -348,7 +358,7 @@ namespace osu.Game.Screens.Play
 
         private bool canPause =>
             // must pass basic screen conditions (beatmap loaded, instance allows pause)
-            LoadedBeatmapSuccessfully && AllowPause && ValidForResume
+            LoadedBeatmapSuccessfully && allowPause && ValidForResume
             // replays cannot be paused and exit immediately
             && !DrawableRuleset.HasReplayLoaded.Value
             // cannot pause if we are already in a fail state
