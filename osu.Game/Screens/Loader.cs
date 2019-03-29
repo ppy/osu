@@ -36,6 +36,7 @@ namespace osu.Game.Screens
 
             logo.BeatMatching = false;
             logo.Triangles = false;
+            logo.RelativePositionAxes = Axes.None;
             logo.Origin = Anchor.BottomRight;
             logo.Anchor = Anchor.BottomRight;
             logo.Position = new Vector2(-40);

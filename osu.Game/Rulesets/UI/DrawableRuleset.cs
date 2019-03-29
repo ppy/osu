@@ -1,4 +1,4 @@
-﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
@@ -133,19 +133,19 @@ namespace osu.Game.Rulesets.UI
             return dependencies;
         }
 
+        protected virtual PlayfieldAdjustmentContainer CreatePlayfieldAdjustmentContainer() => new PlayfieldAdjustmentContainer();
+
         [BackgroundDependencyLoader]
         private void load(OsuConfigManager config)
         {
-            KeyBindingInputManager.AddRange(new Drawable[]
-            {
-                Playfield
-            });
-
             InternalChildren = new Drawable[]
             {
                 frameStabilityContainer = new FrameStabilityContainer
                 {
-                    Child = KeyBindingInputManager,
+                    Child = KeyBindingInputManager
+                        .WithChild(CreatePlayfieldAdjustmentContainer()
+                            .WithChild(Playfield)
+                        )
                 },
                 Overlays = new Container { RelativeSizeAxes = Axes.Both }
             };
@@ -211,7 +211,7 @@ namespace osu.Game.Rulesets.UI
         /// <returns>The DrawableHitObject.</returns>
         public abstract DrawableHitObject<TObject> GetVisualRepresentation(TObject h);
 
-        public void Attach(KeyCounterCollection keyCounter) =>
+        public void Attach(KeyCounterDisplay keyCounter) =>
             (KeyBindingInputManager as ICanAttachKeyCounter)?.Attach(keyCounter);
 
         /// <summary>
@@ -263,7 +263,9 @@ namespace osu.Game.Rulesets.UI
 
         protected override bool OnHover(HoverEvent e) => true; // required for IProvideCursor
 
-        public override CursorContainer Cursor => Playfield.Cursor;
+        CursorContainer IProvideCursor.Cursor => Playfield.Cursor;
+
+        public override GameplayCursorContainer Cursor => Playfield.Cursor;
 
         public bool ProvidingUserCursor => Playfield.Cursor != null && !HasReplayLoaded.Value;
 
@@ -333,7 +335,7 @@ namespace osu.Game.Rulesets.UI
         /// <summary>
         /// The cursor being displayed by the <see cref="Playfield"/>. May be null if no cursor is provided.
         /// </summary>
-        public abstract CursorContainer Cursor { get; }
+        public abstract GameplayCursorContainer Cursor { get; }
 
         /// <summary>
         /// Sets a replay to be used, overriding local input.
