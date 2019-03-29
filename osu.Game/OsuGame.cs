@@ -458,9 +458,7 @@ namespace osu.Game
             loadComponentSingleFile(settings = new MainSettings { GetToolbarHeight = () => ToolbarOffset }, floatingOverlayContent.Add);
 
             loadComponentSingleFile(accountCreation = new AccountCreationOverlay(), topMostOverlayContent.Add);
-
             loadComponentSingleFile(dialogOverlay = new DialogOverlay(), topMostOverlayContent.Add);
-
             loadComponentSingleFile(externalLinkOpener = new ExternalLinkOpener(), topMostOverlayContent.Add);
 
             dependencies.CacheAs(idleTracker);
