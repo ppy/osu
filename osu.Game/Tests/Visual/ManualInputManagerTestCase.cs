@@ -14,8 +14,7 @@ namespace osu.Game.Tests.Visual
 
         protected ManualInputManagerTestCase()
         {
-            base.Content.Add(InputManager = new ManualInputManager());
-            ReturnUserInput();
+            base.Content.Add(InputManager = new ManualInputManager { UseParentInput = true });
         }
 
         /// <summary>
