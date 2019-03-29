@@ -55,7 +55,7 @@ namespace osu.Game.Screens.Edit
         {
             this.host = host;
 
-            // TODO: should probably be done at a RulesetContainer level to share logic with Player.
+            // TODO: should probably be done at a DrawableRuleset level to share logic with Player.
             var sourceClock = (IAdjustableClock)Beatmap.Value.Track ?? new StopwatchClock();
             clock = new EditorClock(Beatmap.Value, beatDivisor) { IsCoupled = false };
             clock.ChangeSource(sourceClock);
