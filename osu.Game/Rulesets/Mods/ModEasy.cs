@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using osu.Framework.Graphics.Sprites;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 
@@ -11,7 +12,7 @@ namespace osu.Game.Rulesets.Mods
     {
         public override string Name => "Easy";
         public override string Acronym => "EZ";
-        public override FontAwesome Icon => FontAwesome.fa_osu_mod_easy;
+        public override IconUsage Icon => OsuIcon.ModEasy;
         public override ModType Type => ModType.DifficultyReduction;
         public override double ScoreMultiplier => 0.5;
         public override bool Ranked => true;
