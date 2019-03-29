@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using osu.Framework.Bindables;
 using osu.Framework.Timing;
 
 namespace osu.Game.Screens.Play
@@ -16,6 +17,8 @@ namespace osu.Game.Screens.Play
     public class GameplayClock : IFrameBasedClock
     {
         private readonly IFrameBasedClock underlyingClock;
+
+        public readonly BindableBool IsPaused = new BindableBool();
 
         public GameplayClock(IFrameBasedClock underlyingClock)
         {

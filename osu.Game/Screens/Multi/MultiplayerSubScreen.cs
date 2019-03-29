@@ -14,8 +14,6 @@ namespace osu.Game.Screens.Multi
     {
         public override bool DisallowExternalBeatmapRulesetChanges => false;
 
-        public override bool RemoveWhenNotAlive => false;
-
         public virtual string ShortTitle => Title;
 
         [Resolved(CanBeNull = true)]
