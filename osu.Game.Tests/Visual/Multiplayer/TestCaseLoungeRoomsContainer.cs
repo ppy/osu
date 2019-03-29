@@ -27,7 +27,8 @@ namespace osu.Game.Tests.Visual.Multiplayer
         [Cached(Type = typeof(IRoomManager))]
         private TestRoomManager roomManager = new TestRoomManager();
 
-        public TestCaseLoungeRoomsContainer()
+        [BackgroundDependencyLoader]
+        private void load()
         {
             RoomsContainer container;
 

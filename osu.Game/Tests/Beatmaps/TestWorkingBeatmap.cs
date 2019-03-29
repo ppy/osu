@@ -7,7 +7,6 @@ using osu.Framework.Graphics.Textures;
 using osu.Framework.Timing;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets;
-using osuTK;
 
 namespace osu.Game.Tests.Beatmaps
 {
@@ -68,7 +67,7 @@ namespace osu.Game.Tests.Beatmaps
 
             public override bool Seek(double seek)
             {
-                offset = MathHelper.Clamp(seek, 0, Length);
+                offset = Math.Min(seek, Length);
                 lastReferenceTime = null;
                 return true;
             }
