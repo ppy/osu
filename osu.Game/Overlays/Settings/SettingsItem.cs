@@ -79,6 +79,8 @@ namespace osu.Game.Overlays.Settings
             set => this.FadeTo(value ? 1 : 0);
         }
 
+        public bool FilteringActive { get; set; }
+
         protected SettingsItem()
         {
             RelativeSizeAxes = Axes.X;

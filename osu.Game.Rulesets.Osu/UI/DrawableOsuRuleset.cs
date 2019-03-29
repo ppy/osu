@@ -32,6 +32,8 @@ namespace osu.Game.Rulesets.Osu.UI
 
         protected override PassThroughInputManager CreateInputManager() => new OsuInputManager(Ruleset.RulesetInfo);
 
+        protected override PlayfieldAdjustmentContainer CreatePlayfieldAdjustmentContainer() => new OsuPlayfieldAdjustmentContainer();
+
         public override DrawableHitObject<OsuHitObject> CreateDrawableRepresentation(OsuHitObject h)
         {
             switch (h)
