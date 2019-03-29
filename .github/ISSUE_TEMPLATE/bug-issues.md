@@ -1,6 +1,6 @@
 ---
 name: Bug Report
-about: For issues regarding encountered game bugs
+about: Issues regarding encountered bugs.
 ---
 **Describe the bug:** 
 

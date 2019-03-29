@@ -1,7 +1,7 @@
 ---
 name: Missing for Live
-about: Let us know the features you need which are available in osu-stable but not lazer
+about: Features which are available in osu!stable but not yet in osu!lazer.
 ---
 **Describe the missing feature:** 
 
-**Designs:** 
+**Proposal designs of the feature:** 
