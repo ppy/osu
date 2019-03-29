@@ -36,7 +36,10 @@ namespace osu.Game.Rulesets.UI
         private void load(GameplayClock clock)
         {
             if (clock != null)
+            {
                 parentGameplayClock = clock;
+                gameplayClock.IsPaused.BindTo(clock.IsPaused);
+            }
         }
 
         protected override void LoadComplete()
@@ -68,7 +71,7 @@ namespace osu.Game.Rulesets.UI
         public override bool UpdateSubTree()
         {
             requireMoreUpdateLoops = true;
-            validState = true;
+            validState = !gameplayClock.IsPaused.Value;
 
             int loops = 0;
 
