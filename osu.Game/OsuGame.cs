@@ -451,7 +451,6 @@ namespace osu.Game
             loadComponentSingleFile(loginOverlay = new LoginOverlay
             {
                 GetToolbarHeight = () => ToolbarOffset,
-                Position = new Vector2(-ToolbarButton.WIDTH, 0),
                 Anchor = Anchor.TopRight,
                 Origin = Anchor.TopRight,
             }, floatingOverlayContent.Add);
