@@ -37,6 +37,8 @@ namespace osu.Game.Screens.Play
 
         private BeatmapMetadataDisplay info;
 
+        private OsuLogo logo;
+
         private bool hideOverlays;
         public override bool HideOverlaysOnEnter => hideOverlays;
 
@@ -129,8 +131,11 @@ namespace osu.Game.Screens.Play
 
         private void contentOut()
         {
-            // Ensure the logo is no longer tracking before we scale the content.
+            // Ensure the logo is no longer tracking before we scale the content, and that its RelativePositionAxes have been returned.
             content.Tracking = false;
+
+            if (logo != null)
+                logo.RelativePositionAxes = Axes.Both;
 
             content.ScaleTo(0.7f, 300, Easing.InQuint);
             content.FadeOut(250);
@@ -152,6 +157,8 @@ namespace osu.Game.Screens.Play
         protected override void LogoArriving(OsuLogo logo, bool resuming)
         {
             base.LogoArriving(logo, resuming);
+
+            this.logo = logo;
 
             const double duration = 300;
 
