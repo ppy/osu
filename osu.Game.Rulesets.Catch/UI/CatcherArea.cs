@@ -29,7 +29,7 @@ namespace osu.Game.Rulesets.Catch.UI
 
         protected internal readonly Catcher MovableCatcher;
 
-        public Func<CatchHitObject, DrawableHitObject<CatchHitObject>> GetVisualRepresentation;
+        public Func<CatchHitObject, DrawableHitObject<CatchHitObject>> CreateDrawableRepresentation;
 
         public Container ExplodingFruitTarget
         {
@@ -65,7 +65,7 @@ namespace osu.Game.Rulesets.Catch.UI
 
             if (result.IsHit && fruit.CanBePlated)
             {
-                var caughtFruit = (DrawableCatchHitObject)GetVisualRepresentation?.Invoke(fruit.HitObject);
+                var caughtFruit = (DrawableCatchHitObject)CreateDrawableRepresentation?.Invoke(fruit.HitObject);
 
                 if (caughtFruit == null) return;
 

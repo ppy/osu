@@ -61,11 +61,6 @@ namespace osu.Game.Tests.Visual
             LoadScreen(Player);
         }
 
-        protected virtual Player CreatePlayer(Ruleset ruleset) => new Player
-        {
-            AllowPause = false,
-            AllowLeadIn = false,
-            AllowResults = false,
-        };
+        protected virtual Player CreatePlayer(Ruleset ruleset) => new Player(false, false);
     }
 }

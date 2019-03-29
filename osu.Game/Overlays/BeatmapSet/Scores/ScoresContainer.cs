@@ -11,7 +11,7 @@ using System.Linq;
 using osu.Framework.Allocation;
 using osu.Game.Beatmaps;
 using osu.Game.Online.API;
-using osu.Game.Online.API.Requests.Responses;
+using osu.Game.Scoring;
 
 namespace osu.Game.Overlays.BeatmapSet.Scores
 {
@@ -29,10 +29,10 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
             set => loadingAnimation.FadeTo(value ? 1 : 0, fade_duration);
         }
 
-        private IEnumerable<APIScoreInfo> scores;
+        private IEnumerable<ScoreInfo> scores;
         private BeatmapInfo beatmap;
 
-        public IEnumerable<APIScoreInfo> Scores
+        public IEnumerable<ScoreInfo> Scores
         {
             get => scores;
             set

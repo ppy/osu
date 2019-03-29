@@ -6,9 +6,9 @@ using Newtonsoft.Json;
 
 namespace osu.Game.Online.API.Requests.Responses
 {
-    public class APIScores
+    public class APILegacyScores
     {
         [JsonProperty(@"scores")]
-        public IEnumerable<APIScoreInfo> Scores;
+        public IEnumerable<APILegacyScoreInfo> Scores;
     }
 }

@@ -8,12 +8,12 @@ using Newtonsoft.Json;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Scoring;
-using osu.Game.Scoring;
+using osu.Game.Scoring.Legacy;
 using osu.Game.Users;
 
 namespace osu.Game.Online.API.Requests.Responses
 {
-    public class APIScoreInfo : ScoreInfo
+    public class APILegacyScoreInfo : LegacyScoreInfo
     {
         [JsonProperty(@"score")]
         private int totalScore
@@ -74,29 +74,37 @@ namespace osu.Game.Online.API.Requests.Responses
                     HitResult newKey;
                     switch (kvp.Key)
                     {
+                        case @"count_geki":
+                            CountGeki = kvp.Value;
+                            break;
                         case @"count_300":
-                            newKey = HitResult.Great;
+                            Count300 = kvp.Value;
+                            break;
+                        case @"count_katu":
+                            CountKatu = kvp.Value;
                             break;
                         case @"count_100":
-                            newKey = HitResult.Good;
+                            Count100 = kvp.Value;
                             break;
                         case @"count_50":
-                            newKey = HitResult.Meh;
+                            Count50 = kvp.Value;
                             break;
                         case @"count_miss":
-                            newKey = HitResult.Miss;
+                            CountMiss = kvp.Value;
                             break;
                         default:
                             continue;
                     }
-
-                    Statistics.Add(newKey, kvp.Value);
                 }
             }
         }
 
         [JsonProperty(@"mode_int")]
-        public int OnlineRulesetID { get; set; }
+        public int OnlineRulesetID
+        {
+            get => RulesetID;
+            set => RulesetID = value;
+        }
 
         [JsonProperty(@"mods")]
         private string[] modStrings { get; set; }
