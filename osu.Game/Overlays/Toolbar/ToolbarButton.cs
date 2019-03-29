@@ -27,13 +27,13 @@ namespace osu.Game.Overlays.Toolbar
             IconContainer.Show();
         }
 
-        public void SetIcon(FontAwesome icon) => SetIcon(new SpriteIcon
+        public void SetIcon(IconUsage icon) => SetIcon(new SpriteIcon
         {
             Size = new Vector2(20),
             Icon = icon
         });
 
-        public FontAwesome Icon
+        public IconUsage Icon
         {
             set => SetIcon(value);
         }

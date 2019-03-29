@@ -120,6 +120,8 @@ namespace osu.Game.Rulesets.Objects.Drawables
             }
         }
 
+        protected override void ClearInternal(bool disposeChildren = true) => throw new InvalidOperationException($"Should never clear a {nameof(DrawableHitObject)}");
+
         protected override void LoadComplete()
         {
             base.LoadComplete();
