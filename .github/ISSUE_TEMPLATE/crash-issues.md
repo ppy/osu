@@ -1,6 +1,6 @@
 ---
 name: Crash Report
-about: For issues regarding game crashes or permanent freezes
+about: Issues regarding crashes or permanent freezes.
 ---
 **Describe the crash:** 
 
