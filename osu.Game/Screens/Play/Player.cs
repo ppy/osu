@@ -34,7 +34,6 @@ namespace osu.Game.Screens.Play
     public class Player : ScreenWithBeatmapBackground
     {
         protected override bool AllowBackButton => false; // handled by HoldForMenuButton
-        
         protected override RichPresence Presence => new RichPresence
         {
             Details = $"{Beatmap.Value.Metadata.Artist} - {Beatmap.Value.Metadata.Title} [{Beatmap.Value.BeatmapInfo.Version}]",
