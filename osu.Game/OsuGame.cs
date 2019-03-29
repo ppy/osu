@@ -15,7 +15,6 @@ using osu.Framework.Allocation;
 using osu.Game.Overlays.Toolbar;
 using osu.Game.Screens;
 using osu.Game.Screens.Menu;
-using osuTK;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
