@@ -7,6 +7,7 @@ using osu.Game.Rulesets.Objects.Drawables;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Bindables;
+using osu.Framework.Graphics.Sprites;
 
 namespace osu.Game.Rulesets.Mods
 {
@@ -14,7 +15,7 @@ namespace osu.Game.Rulesets.Mods
     {
         public override string Name => "Hidden";
         public override string Acronym => "HD";
-        public override FontAwesome Icon => FontAwesome.fa_osu_mod_hidden;
+        public override IconUsage Icon => OsuIcon.ModHidden;
         public override ModType Type => ModType.DifficultyIncrease;
         public override bool Ranked => true;
 
