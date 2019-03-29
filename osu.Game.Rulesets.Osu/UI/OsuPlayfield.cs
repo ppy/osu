@@ -10,7 +10,6 @@ using osu.Game.Rulesets.Osu.Objects.Drawables;
 using osu.Game.Rulesets.Osu.Objects.Drawables.Connections;
 using osu.Game.Rulesets.UI;
 using System.Linq;
-using osu.Framework.Graphics.Cursor;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Osu.UI.Cursor;
 
@@ -24,7 +23,7 @@ namespace osu.Game.Rulesets.Osu.UI
 
         public static readonly Vector2 BASE_SIZE = new Vector2(512, 384);
 
-        protected override CursorContainer CreateCursor() => new GameplayCursorContainer();
+        protected override CursorContainer CreateCursor() => new OsuCursorContainer();
 
         public OsuPlayfield()
         {
