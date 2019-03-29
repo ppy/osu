@@ -18,6 +18,7 @@ using osu.Game.Beatmaps.Legacy;
 using osu.Game.Rulesets.Catch.Beatmaps;
 using osu.Game.Rulesets.Catch.Difficulty;
 using osu.Game.Rulesets.Difficulty;
+using osu.Game.Scoring;
 
 namespace osu.Game.Rulesets.Catch
 {
@@ -118,6 +119,8 @@ namespace osu.Game.Rulesets.Catch
         public override Drawable CreateIcon() => new SpriteIcon { Icon = OsuIcon.RulesetCatch };
 
         public override DifficultyCalculator CreateDifficultyCalculator(WorkingBeatmap beatmap) => new CatchDifficultyCalculator(this, beatmap);
+
+        public override PerformanceCalculator CreatePerformanceCalculator(WorkingBeatmap beatmap, ScoreInfo score) => new CatchPerformanceCalculator(this, beatmap, score);
 
         public override int? LegacyID => 2;
 
