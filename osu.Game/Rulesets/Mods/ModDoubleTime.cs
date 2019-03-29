@@ -3,6 +3,7 @@
 
 using System;
 using System.Linq;
+using osu.Framework.Graphics.Sprites;
 using osu.Game.Graphics;
 
 namespace osu.Game.Rulesets.Mods
@@ -11,7 +12,7 @@ namespace osu.Game.Rulesets.Mods
     {
         public override string Name => "Double Time";
         public override string Acronym => "DT";
-        public override FontAwesome Icon => FontAwesome.fa_osu_mod_doubletime;
+        public override IconUsage Icon => OsuIcon.ModDoubletime;
         public override ModType Type => ModType.DifficultyIncrease;
         public override string Description => "Zoooooooooom...";
         public override bool Ranked => true;

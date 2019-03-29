@@ -24,7 +24,7 @@ namespace osu.Game.Screens.Play
     {
         private const int duration = 100;
 
-        public readonly KeyCounterCollection KeyCounter;
+        public readonly KeyCounterDisplay KeyCounter;
         public readonly RollingCounter<int> ComboCounter;
         public readonly ScoreCounter ScoreCounter;
         public readonly RollingCounter<double> AccuracyCounter;
@@ -201,7 +201,7 @@ namespace osu.Game.Screens.Play
             Margin = new MarginPadding { Top = 20 }
         };
 
-        protected virtual KeyCounterCollection CreateKeyCounter() => new KeyCounterCollection
+        protected virtual KeyCounterDisplay CreateKeyCounter() => new KeyCounterDisplay
         {
             FadeTime = 50,
             Anchor = Anchor.BottomRight,

@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using osu.Framework.Graphics.Sprites;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 
@@ -11,7 +12,7 @@ namespace osu.Game.Rulesets.Mods
     {
         public override string Name => "Hard Rock";
         public override string Acronym => "HR";
-        public override FontAwesome Icon => FontAwesome.fa_osu_mod_hardrock;
+        public override IconUsage Icon => OsuIcon.ModHardrock;
         public override ModType Type => ModType.DifficultyIncrease;
         public override string Description => "Everything just got a bit harder...";
         public override Type[] IncompatibleMods => new[] { typeof(ModEasy) };
