@@ -1,7 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using osu.Framework.Graphics.Cursor;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Osu.UI;
 using osu.Game.Rulesets.UI;
@@ -20,7 +19,7 @@ namespace osu.Game.Rulesets.Osu.Edit
 
         private class OsuPlayfieldNoCursor : OsuPlayfield
         {
-            protected override CursorContainer CreateCursor() => null;
+            protected override GameplayCursorContainer CreateCursor() => null;
         }
     }
 }
