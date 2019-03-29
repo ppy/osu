@@ -421,7 +421,6 @@ namespace osu.Game
                 },
             }, topMostOverlayContent.Add);
 
-            loadComponentSingleFile(volume = new VolumeOverlay(), floatingOverlayContent.Add);
             loadComponentSingleFile(onscreenDisplay = new OnScreenDisplay(), Add);
 
             loadComponentSingleFile(loginOverlay = new LoginOverlay
@@ -438,7 +437,6 @@ namespace osu.Game
             loadComponentSingleFile(social = new SocialOverlay(), overlayContent.Add);
             loadComponentSingleFile(channelManager = new ChannelManager(), AddInternal);
             loadComponentSingleFile(chatOverlay = new ChatOverlay(), overlayContent.Add);
-            loadComponentSingleFile(settings = new MainSettings { GetToolbarHeight = () => ToolbarOffset }, floatingOverlayContent.Add);
             loadComponentSingleFile(userProfile = new UserProfileOverlay(), overlayContent.Add);
             loadComponentSingleFile(beatmapSetOverlay = new BeatmapSetOverlay(), overlayContent.Add);
 
@@ -455,6 +453,9 @@ namespace osu.Game
                 Anchor = Anchor.TopRight,
                 Origin = Anchor.TopRight,
             }, floatingOverlayContent.Add);
+
+            loadComponentSingleFile(volume = new VolumeOverlay(), floatingOverlayContent.Add);
+            loadComponentSingleFile(settings = new MainSettings { GetToolbarHeight = () => ToolbarOffset }, floatingOverlayContent.Add);
 
             loadComponentSingleFile(accountCreation = new AccountCreationOverlay(), topMostOverlayContent.Add);
 
