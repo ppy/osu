@@ -231,6 +231,11 @@ namespace osu.Game.Overlays.Music
                     }
                 }
 
+                public bool FilteringActive
+                {
+                    set { }
+                }
+
                 public IEnumerable<IFilterable> FilterableChildren => Children;
 
                 public ItemSearchContainer()

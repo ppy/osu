@@ -21,8 +21,33 @@ namespace osu.Game.Rulesets.Replays
 
         protected List<ReplayFrame> Frames => replay.Frames;
 
-        public TFrame CurrentFrame => !HasFrames || !currentFrameIndex.HasValue ? null : (TFrame)Frames[currentFrameIndex.Value];
-        public TFrame NextFrame => !HasFrames ? null : (TFrame)Frames[nextFrameIndex];
+        public TFrame CurrentFrame
+        {
+            get
+            {
+                if (!HasFrames || !currentFrameIndex.HasValue)
+                    return null;
+
+                return (TFrame)Frames[currentFrameIndex.Value];
+            }
+        }
+
+        public TFrame NextFrame
+        {
+            get
+            {
+                if (!HasFrames)
+                    return null;
+
+                if (!currentFrameIndex.HasValue)
+                    return (TFrame)Frames[0];
+
+                if (currentDirection > 0)
+                    return currentFrameIndex == Frames.Count - 1 ? null : (TFrame)Frames[currentFrameIndex.Value + 1];
+                else
+                    return currentFrameIndex == 0 ? null : (TFrame)Frames[nextFrameIndex];
+            }
+        }
 
         private int? currentFrameIndex;
 
@@ -48,7 +73,10 @@ namespace osu.Game.Rulesets.Replays
 
         private const double sixty_frame_time = 1000.0 / 60;
 
-        protected double CurrentTime { get; private set; }
+        protected virtual double AllowedImportantTimeSpan => sixty_frame_time * 1.2;
+
+        protected double? CurrentTime { get; private set; }
+
         private int currentDirection;
 
         /// <summary>
@@ -64,7 +92,7 @@ namespace osu.Game.Rulesets.Replays
             //a button is in a pressed state
             IsImportant(currentDirection > 0 ? CurrentFrame : NextFrame) &&
             //the next frame is within an allowable time span
-            Math.Abs(CurrentTime - NextFrame?.Time ?? 0) <= sixty_frame_time * 1.2;
+            Math.Abs(CurrentTime - NextFrame?.Time ?? 0) <= AllowedImportantTimeSpan;
 
         protected virtual bool IsImportant(TFrame frame) => false;
 
@@ -77,26 +105,32 @@ namespace osu.Game.Rulesets.Replays
         /// <returns>The usable time value. If null, we should not advance time as we do not have enough data.</returns>
         public override double? SetFrameFromTime(double time)
         {
-            currentDirection = time.CompareTo(CurrentTime);
-            if (currentDirection == 0) currentDirection = 1;
+            if (!CurrentTime.HasValue)
+            {
+                currentDirection = 1;
+            }
+            else
+            {
+                currentDirection = time.CompareTo(CurrentTime);
+                if (currentDirection == 0) currentDirection = 1;
+            }
 
             if (HasFrames)
             {
-                // check if the next frame is in the "future" for the current playback direction
-                if (currentDirection != time.CompareTo(NextFrame.Time))
+                // check if the next frame is valid for the current playback direction.
+                // validity is if the next frame is equal or "earlier"
+                var compare = time.CompareTo(NextFrame?.Time);
+
+                if (compare == 0 || compare == currentDirection)
+                {
+                    if (advanceFrame())
+                        return CurrentTime = CurrentFrame.Time;
+                }
+                else
                 {
                     // if we didn't change frames, we need to ensure we are allowed to run frames in between, else return null.
                     if (inImportantSection)
                         return null;
-                }
-                else if (advanceFrame())
-                {
-                    // If going backwards, we need to execute once _before_ the frame time to reverse any judgements
-                    // that would occur as a result of this frame in forward playback
-                    if (currentDirection == -1)
-                        return CurrentTime = CurrentFrame.Time - 1;
-
-                    return CurrentTime = CurrentFrame.Time;
                 }
             }
 
