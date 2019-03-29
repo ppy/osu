@@ -1,8 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using osu.Framework.Allocation;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Game.Screens;
 
 namespace osu.Game.Tests.Visual
@@ -12,12 +12,19 @@ namespace osu.Game.Tests.Visual
     /// </summary>
     public abstract class ScreenTestCase : ManualInputManagerTestCase
     {
-        private OsuScreenStack stack;
+        private readonly OsuScreenStack stack;
 
-        [BackgroundDependencyLoader]
-        private void load()
+        private readonly Container content;
+
+        protected override Container<Drawable> Content => content;
+
+        protected ScreenTestCase()
         {
-            Add(stack = new OsuScreenStack { RelativeSizeAxes = Axes.Both });
+            base.Content.AddRange(new Drawable[]
+            {
+                stack = new OsuScreenStack { RelativeSizeAxes = Axes.Both },
+                content = new Container { RelativeSizeAxes = Axes.Both }
+            });
         }
 
         protected void LoadScreen(OsuScreen screen)
