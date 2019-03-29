@@ -19,10 +19,7 @@ namespace osu.Game.Rulesets.Osu.Edit
 
         private class OsuPlayfieldNoCursor : OsuPlayfield
         {
-            public OsuPlayfieldNoCursor()
-            {
-                Cursor?.Expire();
-            }
+            protected override GameplayCursorContainer CreateCursor() => null;
         }
     }
 }

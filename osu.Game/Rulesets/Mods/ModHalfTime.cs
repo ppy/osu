@@ -3,6 +3,7 @@
 
 using System;
 using System.Linq;
+using osu.Framework.Graphics.Sprites;
 using osu.Game.Graphics;
 
 namespace osu.Game.Rulesets.Mods
@@ -11,7 +12,7 @@ namespace osu.Game.Rulesets.Mods
     {
         public override string Name => "Half Time";
         public override string Acronym => "HT";
-        public override FontAwesome Icon => FontAwesome.fa_osu_mod_halftime;
+        public override IconUsage Icon => OsuIcon.ModHalftime;
         public override ModType Type => ModType.DifficultyReduction;
         public override string Description => "Less zoom...";
         public override bool Ranked => true;
