@@ -73,7 +73,7 @@ namespace osu.Game.Rulesets.Edit
             processor?.PostProcess();
 
             // Add visual representation
-            var drawableObject = drawableRuleset.GetVisualRepresentation(tObject);
+            var drawableObject = drawableRuleset.CreateDrawableRepresentation(tObject);
 
             drawableRuleset.Playfield.Add(drawableObject);
             drawableRuleset.Playfield.PostProcess();

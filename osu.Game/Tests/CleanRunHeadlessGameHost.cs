@@ -13,6 +13,11 @@ namespace osu.Game.Tests
         public CleanRunHeadlessGameHost(string gameName = @"", bool bindIPC = false, bool realtime = true)
             : base(gameName, bindIPC, realtime)
         {
+        }
+
+        protected override void SetupForRun()
+        {
+            base.SetupForRun();
             Storage.DeleteDirectory(string.Empty);
         }
     }

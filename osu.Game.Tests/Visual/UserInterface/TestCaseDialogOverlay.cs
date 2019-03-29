@@ -2,7 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using NUnit.Framework;
-using osu.Game.Graphics;
+using osu.Framework.Graphics.Sprites;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Dialog;
 
@@ -19,7 +19,7 @@ namespace osu.Game.Tests.Visual.UserInterface
 
             AddStep("dialog #1", () => overlay.Push(new PopupDialog
             {
-                Icon = FontAwesome.fa_trash_o,
+                Icon = FontAwesome.TrashOutline,
                 HeaderText = @"Confirm deletion of",
                 BodyText = @"Ayase Rie - Yuima-ru*World TVver.",
                 Buttons = new PopupDialogButton[]
@@ -39,7 +39,7 @@ namespace osu.Game.Tests.Visual.UserInterface
 
             AddStep("dialog #2", () => overlay.Push(new PopupDialog
             {
-                Icon = FontAwesome.fa_gear,
+                Icon = FontAwesome.Gear,
                 HeaderText = @"What do you want to do with",
                 BodyText = "Camellia as \"Bang Riot\" - Blastix Riotz",
                 Buttons = new PopupDialogButton[]

@@ -28,8 +28,6 @@ namespace osu.Game.Rulesets.Mania.UI
             if (stageDefinitions.Count <= 0)
                 throw new ArgumentException("Can't have zero or fewer stages.");
 
-            Size = new Vector2(1, 0.8f);
-
             GridContainer playfieldGrid;
             AddInternal(playfieldGrid = new GridContainer
             {
