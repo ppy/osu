@@ -35,7 +35,7 @@ namespace osu.Game.Graphics.Containers
             showNotImplementedError = () => notifications?.Post(new SimpleNotification
             {
                 Text = @"This link type is not yet supported!",
-                Icon = FontAwesome.fa_life_saver,
+                Icon = FontAwesome.LifeSaver,
             });
         }
 

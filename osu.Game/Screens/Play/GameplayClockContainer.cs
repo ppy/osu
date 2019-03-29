@@ -77,6 +77,8 @@ namespace osu.Game.Screens.Play
 
             // the clock to be exposed via DI to children.
             GameplayClock = new GameplayClock(offsetClock);
+
+            GameplayClock.IsPaused.BindTo(IsPaused);
         }
 
         [BackgroundDependencyLoader]

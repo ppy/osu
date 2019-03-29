@@ -5,6 +5,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Graphics.Sprites;
 using osu.Framework.Screens;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
@@ -53,7 +54,7 @@ namespace osu.Game.Screens.Multi
                                 new SpriteIcon
                                 {
                                     Size = new Vector2(25),
-                                    Icon = FontAwesome.fa_osu_multi,
+                                    Icon = OsuIcon.Multi,
                                 },
                                 new FillFlowContainer
                                 {
