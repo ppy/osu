@@ -1,4 +1,4 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Linq;
@@ -34,7 +34,7 @@ namespace osu.Game.Rulesets.Osu.UI
 
         protected override PlayfieldAdjustmentContainer CreatePlayfieldAdjustmentContainer() => new OsuPlayfieldAdjustmentContainer();
 
-        public override DrawableHitObject<OsuHitObject> GetVisualRepresentation(OsuHitObject h)
+        public override DrawableHitObject<OsuHitObject> CreateDrawableRepresentation(OsuHitObject h)
         {
             switch (h)
             {
