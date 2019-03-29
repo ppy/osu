@@ -9,6 +9,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Cursor;
 using osu.Game.Graphics.Cursor;
 using osu.Game.Rulesets.Osu.UI.Cursor;
+using osu.Game.Rulesets.UI;
 using osu.Game.Tests.Visual;
 
 namespace osu.Game.Rulesets.Osu.Tests
@@ -27,7 +28,7 @@ namespace osu.Game.Rulesets.Osu.Tests
         [BackgroundDependencyLoader]
         private void load()
         {
-            Add(cursorContainer = new GameplayCursorContainer { RelativeSizeAxes = Axes.Both });
+            Add(cursorContainer = new OsuCursorContainer { RelativeSizeAxes = Axes.Both });
         }
     }
 }

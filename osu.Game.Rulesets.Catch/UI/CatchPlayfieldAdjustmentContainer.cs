@@ -3,17 +3,23 @@
 
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Game.Rulesets.UI;
 using osuTK;
 
 namespace osu.Game.Rulesets.Catch.UI
 {
-    public class PlayfieldAdjustmentContainer : Container
+    public class CatchPlayfieldAdjustmentContainer : PlayfieldAdjustmentContainer
     {
         protected override Container<Drawable> Content => content;
         private readonly Container content;
 
-        public PlayfieldAdjustmentContainer()
+        public CatchPlayfieldAdjustmentContainer()
         {
+            Anchor = Anchor.TopCentre;
+            Origin = Anchor.TopCentre;
+
+            Size = new Vector2(0.86f); // matches stable's vertical offset for catcher plate
+
             InternalChild = new Container
             {
                 Anchor = Anchor.Centre,

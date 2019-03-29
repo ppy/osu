@@ -9,6 +9,7 @@ using osu.Game.Rulesets.Taiko.UI;
 using osu.Game.Rulesets.UI;
 using System.Collections.Generic;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Bindings;
 using osu.Game.Rulesets.Replays.Types;
 using osu.Game.Rulesets.Taiko.Objects;
@@ -114,7 +115,7 @@ namespace osu.Game.Rulesets.Taiko
 
         public override string ShortName => "taiko";
 
-        public override Drawable CreateIcon() => new SpriteIcon { Icon = FontAwesome.fa_osu_taiko_o };
+        public override Drawable CreateIcon() => new SpriteIcon { Icon = OsuIcon.RulesetTaiko };
 
         public override DifficultyCalculator CreateDifficultyCalculator(WorkingBeatmap beatmap) => new TaikoDifficultyCalculator(this, beatmap);
 

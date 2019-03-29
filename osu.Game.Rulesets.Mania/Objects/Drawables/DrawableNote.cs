@@ -29,7 +29,7 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
             CornerRadius = 5;
             Masking = true;
 
-            InternalChild = headPiece = new NotePiece();
+            AddInternal(headPiece = new NotePiece());
         }
 
         protected override void OnDirectionChanged(ValueChangedEvent<ScrollingDirection> e)

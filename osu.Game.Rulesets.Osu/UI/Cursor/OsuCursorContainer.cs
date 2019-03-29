@@ -6,7 +6,6 @@ using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Bindings;
 using osu.Game.Beatmaps;
@@ -14,10 +13,11 @@ using osu.Game.Configuration;
 using osu.Game.Skinning;
 using osuTK;
 using osuTK.Graphics;
+using osu.Game.Rulesets.UI;
 
 namespace osu.Game.Rulesets.Osu.UI.Cursor
 {
-    public class GameplayCursorContainer : CursorContainer, IKeyBindingHandler<OsuAction>
+    public class OsuCursorContainer : GameplayCursorContainer, IKeyBindingHandler<OsuAction>
     {
         protected override Drawable CreateCursor() => new OsuCursor();
 
@@ -25,7 +25,7 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
 
         private readonly Container<Drawable> fadeContainer;
 
-        public GameplayCursorContainer()
+        public OsuCursorContainer()
         {
             InternalChild = fadeContainer = new Container
             {

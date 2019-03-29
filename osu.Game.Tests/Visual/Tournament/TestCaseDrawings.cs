@@ -3,6 +3,7 @@
 
 using System.Collections.Generic;
 using System.ComponentModel;
+using osu.Framework.Allocation;
 using osu.Game.Screens.Tournament;
 using osu.Game.Screens.Tournament.Teams;
 
@@ -11,7 +12,8 @@ namespace osu.Game.Tests.Visual.Tournament
     [Description("for tournament use")]
     public class TestCaseDrawings : ScreenTestCase
     {
-        public TestCaseDrawings()
+        [BackgroundDependencyLoader]
+        private void load()
         {
             LoadScreen(new Drawings
             {
