@@ -263,7 +263,9 @@ namespace osu.Game.Rulesets.UI
 
         protected override bool OnHover(HoverEvent e) => true; // required for IProvideCursor
 
-        public override CursorContainer Cursor => Playfield.Cursor;
+        CursorContainer IProvideCursor.Cursor => Playfield.Cursor;
+
+        public override GameplayCursorContainer Cursor => Playfield.Cursor;
 
         public bool ProvidingUserCursor => Playfield.Cursor != null && !HasReplayLoaded.Value;
 
@@ -333,7 +335,7 @@ namespace osu.Game.Rulesets.UI
         /// <summary>
         /// The cursor being displayed by the <see cref="Playfield"/>. May be null if no cursor is provided.
         /// </summary>
-        public abstract CursorContainer Cursor { get; }
+        public abstract GameplayCursorContainer Cursor { get; }
 
         /// <summary>
         /// Sets a replay to be used, overriding local input.

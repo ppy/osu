@@ -10,7 +10,6 @@ using osu.Game.Rulesets.Osu.Objects.Drawables;
 using osu.Game.Rulesets.Osu.Objects.Drawables.Connections;
 using osu.Game.Rulesets.UI;
 using System.Linq;
-using osu.Framework.Graphics.Cursor;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Osu.UI.Cursor;
 
@@ -28,7 +27,7 @@ namespace osu.Game.Rulesets.Osu.UI
 
         protected override Container CursorTargetContainer => adjustmentContainer;
 
-        protected override CursorContainer CreateCursor() => new GameplayCursorContainer();
+        protected override GameplayCursorContainer CreateCursor() => new OsuCursorContainer();
 
         public OsuPlayfield()
         {
