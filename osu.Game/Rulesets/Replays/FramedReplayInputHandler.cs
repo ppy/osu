@@ -1,4 +1,4 @@
-﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
@@ -21,8 +21,33 @@ namespace osu.Game.Rulesets.Replays
 
         protected List<ReplayFrame> Frames => replay.Frames;
 
-        public TFrame CurrentFrame => !HasFrames || !currentFrameIndex.HasValue ? null : (TFrame)Frames[currentFrameIndex.Value];
-        public TFrame NextFrame => !HasFrames || ((currentDirection > 0 && currentFrameIndex == Frames.Count - 1) || (currentDirection < 0 && currentFrameIndex == 0)) ? null : (TFrame)Frames[nextFrameIndex];
+        public TFrame CurrentFrame
+        {
+            get
+            {
+                if (!HasFrames || !currentFrameIndex.HasValue)
+                    return null;
+
+                return (TFrame)Frames[currentFrameIndex.Value];
+            }
+        }
+
+        public TFrame NextFrame
+        {
+            get
+            {
+                if (!HasFrames)
+                    return null;
+
+                if (!currentFrameIndex.HasValue)
+                    return (TFrame)Frames[0];
+
+                if (currentDirection > 0)
+                    return currentFrameIndex == Frames.Count - 1 ? null : (TFrame)Frames[currentFrameIndex.Value + 1];
+                else
+                    return currentFrameIndex == 0 ? null : (TFrame)Frames[nextFrameIndex];
+            }
+        }
 
         private int? currentFrameIndex;
 
