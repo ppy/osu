@@ -66,7 +66,7 @@ namespace osu.Game.Rulesets.UI
 
             Cursor = CreateCursor();
             if (Cursor != null)
-                CursorTargetContainer.Add(Cursor);
+                AddInternal(Cursor);
         }
 
         /// <summary>
