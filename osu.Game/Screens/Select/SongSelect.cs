@@ -90,13 +90,12 @@ namespace osu.Game.Screens.Select
         protected SongSelect()
         {
             const float carousel_width = 640;
-            const float filter_height = 100;
 
             AddRangeInternal(new Drawable[]
             {
                 new ParallaxContainer
                 {
-                    Padding = new MarginPadding { Top = filter_height },
+                    Masking = true,
                     ParallaxAmount = 0.005f,
                     RelativeSizeAxes = Axes.Both,
                     Children = new[]
@@ -155,7 +154,7 @@ namespace osu.Game.Screens.Select
                             FilterControl = new FilterControl
                             {
                                 RelativeSizeAxes = Axes.X,
-                                Height = filter_height,
+                                Height = 100,
                                 FilterChanged = c => Carousel.Filter(c),
                                 Background = { Width = 2 },
                                 Exit = () =>
@@ -414,7 +413,6 @@ namespace osu.Game.Screens.Select
                 {
                     Logger.Log($"beatmap changed from \"{Beatmap.Value.BeatmapInfo}\" to \"{beatmap}\"");
 
-                    preview = beatmap?.BeatmapSetInfoID != Beatmap.Value?.BeatmapInfo.BeatmapSetInfoID;
                     Beatmap.Value = beatmaps.GetWorkingBeatmap(beatmap, Beatmap.Value);
 
                     if (beatmap != null)
@@ -426,7 +424,8 @@ namespace osu.Game.Screens.Select
                     }
                 }
 
-                if (this.IsCurrentScreen()) ensurePlayingSelected(preview);
+                if (this.IsCurrentScreen())
+                    ensurePlayingSelected();
                 UpdateBeatmap(Beatmap.Value);
             }
         }
@@ -577,17 +576,17 @@ namespace osu.Game.Screens.Select
                 beatmap.Track.Looping = true;
         }
 
-        private void ensurePlayingSelected(bool preview = false)
+        private void ensurePlayingSelected(bool restart = false)
         {
             Track track = Beatmap.Value.Track;
 
-            if (!track.IsRunning)
+            if (!track.IsRunning || restart)
             {
                 // Ensure the track is added to the TrackManager, since it is removed after the player finishes the map.
                 // Using AddItemToList rather than AddItem so that it doesn't attempt to register adjustment dependencies more than once.
                 Game.Audio.Track.AddItemToList(track);
-                if (preview) track.Seek(Beatmap.Value.Metadata.PreviewTime);
-                track.Start();
+                track.RestartPoint = Beatmap.Value.Metadata.PreviewTime;
+                track.Restart();
             }
         }
 

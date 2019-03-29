@@ -15,7 +15,6 @@ using osu.Framework.Allocation;
 using osu.Game.Overlays.Toolbar;
 using osu.Game.Screens;
 using osu.Game.Screens.Menu;
-using osuTK;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -442,7 +441,7 @@ namespace osu.Game
 
             loadComponentSingleFile(musicController = new MusicController
             {
-                Position = new Vector2(0, Toolbar.HEIGHT),
+                GetToolbarHeight = () => ToolbarOffset,
                 Anchor = Anchor.TopRight,
                 Origin = Anchor.TopRight,
             }, floatingOverlayContent.Add);
