@@ -36,6 +36,8 @@ namespace osu.Game.Rulesets.Catch.UI
 
         protected override Playfield CreatePlayfield() => new CatchPlayfield(Beatmap.BeatmapInfo.BaseDifficulty, GetVisualRepresentation);
 
+        protected override PlayfieldAdjustmentContainer CreatePlayfieldAdjustmentContainer() => new CatchPlayfieldAdjustmentContainer();
+
         protected override PassThroughInputManager CreateInputManager() => new CatchInputManager(Ruleset.RulesetInfo);
 
         public override DrawableHitObject<CatchHitObject> GetVisualRepresentation(CatchHitObject h)

@@ -9,6 +9,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.OpenGL.Vertices;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.Shaders;
+using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
 using osu.Game.Beatmaps.Timing;
 using osu.Game.Graphics;
@@ -24,7 +25,7 @@ namespace osu.Game.Rulesets.Mods
     {
         public override string Name => "Flashlight";
         public override string Acronym => "FL";
-        public override FontAwesome Icon => FontAwesome.fa_osu_mod_flashlight;
+        public override IconUsage Icon => OsuIcon.ModFlashlight;
         public override ModType Type => ModType.DifficultyIncrease;
         public override string Description => "Restricted view area.";
         public override bool Ranked => true;
