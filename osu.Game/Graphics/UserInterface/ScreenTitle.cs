@@ -3,6 +3,7 @@
 
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Sprites;
 using osu.Game.Graphics.Sprites;
 using osuTK;
 using osuTK.Graphics;
@@ -14,7 +15,7 @@ namespace osu.Game.Graphics.UserInterface
         private readonly SpriteIcon iconSprite;
         private readonly OsuSpriteText titleText, pageText;
 
-        protected FontAwesome Icon
+        protected IconUsage Icon
         {
             get => iconSprite.Icon;
             set => iconSprite.Icon = value;
