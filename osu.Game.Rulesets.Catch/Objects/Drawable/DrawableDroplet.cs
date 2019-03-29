@@ -26,10 +26,7 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawable
         [BackgroundDependencyLoader]
         private void load()
         {
-            InternalChild = pulp = new Pulp
-            {
-                Size = Size
-            };
+            AddInternal(pulp = new Pulp { Size = Size });
         }
 
         public override Color4 AccentColour
