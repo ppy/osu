@@ -122,17 +122,19 @@ namespace osu.Game.Tests.NonVisual
         [Test]
         public void TestBasicRewind()
         {
-            setTime(3000, 0);
-            setTime(3000, 1000);
-            setTime(3000, 2000);
-            setTime(3000, 3000);
-            confirmCurrentFrame(3);
-            confirmNextFrame(4);
+            setTime(2800, 0);
+            setTime(2800, 1000);
+            setTime(2800, 2000);
+            setTime(2800, 2800);
+            confirmCurrentFrame(2);
+            confirmNextFrame(3);
 
-            setTime(1980, 2000);
+            // pivot without crossing a frame boundary
+            setTime(2700, 2700);
             confirmCurrentFrame(2);
             confirmNextFrame(1);
 
+            // cross current frame boundary; should not yet update frame
             setTime(1980, 1980);
             confirmCurrentFrame(2);
             confirmNextFrame(1);
@@ -141,6 +143,7 @@ namespace osu.Game.Tests.NonVisual
             confirmCurrentFrame(2);
             confirmNextFrame(1);
 
+            //ensure each frame plays out until start
             setTime(-500, 1000);
             confirmCurrentFrame(1);
             confirmNextFrame(0);
@@ -152,6 +155,76 @@ namespace osu.Game.Tests.NonVisual
             setTime(-500, -500);
             confirmCurrentFrame(0);
             confirmNextFrame(null);
+        }
+
+        [Test]
+        public void TestRewindInsideImportantSection()
+        {
+            // fast forward to important section
+            while (handler.SetFrameFromTime(3000) != null)
+            {
+            }
+
+            setTime(4000, 4000);
+            confirmCurrentFrame(4);
+            confirmNextFrame(5);
+
+            setTime(3500, null);
+            confirmCurrentFrame(4);
+            confirmNextFrame(3);
+
+            setTime(3000, 3000);
+            confirmCurrentFrame(3);
+            confirmNextFrame(2);
+
+            setTime(3500, null);
+            confirmCurrentFrame(3);
+            confirmNextFrame(4);
+
+            setTime(4000, 4000);
+            confirmCurrentFrame(4);
+            confirmNextFrame(5);
+
+            setTime(4500, null);
+            confirmCurrentFrame(4);
+            confirmNextFrame(5);
+
+            setTime(4000, null);
+            confirmCurrentFrame(4);
+            confirmNextFrame(5);
+
+            setTime(3500, null);
+            confirmCurrentFrame(4);
+            confirmNextFrame(3);
+
+            setTime(3000, 3000);
+            confirmCurrentFrame(3);
+            confirmNextFrame(2);
+        }
+
+        [Test]
+        public void TestRewindOutOfImportantSection()
+        {
+            // fast forward to important section
+            while (handler.SetFrameFromTime(3500) != null)
+            {
+            }
+
+            confirmCurrentFrame(3);
+            confirmNextFrame(4);
+
+            setTime(3200, null);
+            // next frame doesn't change even though direction reversed, because of important section.
+            confirmCurrentFrame(3);
+            confirmNextFrame(4);
+
+            setTime(3000, null);
+            confirmCurrentFrame(3);
+            confirmNextFrame(4);
+
+            setTime(2800, 2800);
+            confirmCurrentFrame(3);
+            confirmNextFrame(2);
         }
 
         private void setTime(double set, double? expect)
