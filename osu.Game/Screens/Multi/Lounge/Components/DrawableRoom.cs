@@ -77,6 +77,8 @@ namespace osu.Game.Screens.Multi.Lounge.Components
             }
         }
 
+        public bool FilteringActive { get; set; }
+
         public DrawableRoom(Room room)
         {
             Room = room;

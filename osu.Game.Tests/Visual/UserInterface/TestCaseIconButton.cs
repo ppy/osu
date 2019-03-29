@@ -111,7 +111,7 @@ namespace osu.Game.Tests.Visual.UserInterface
 
                 button.Anchor = Anchor.Centre;
                 button.Origin = Anchor.Centre;
-                button.Icon = FontAwesome.fa_osu_osu_o;
+                button.Icon = OsuIcon.RulesetOsu;
             }
         }
     }

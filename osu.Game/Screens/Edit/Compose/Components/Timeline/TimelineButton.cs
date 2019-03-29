@@ -5,6 +5,7 @@ using System;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Sprites;
 using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
 using osuTK;
@@ -17,7 +18,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
         public Action Action;
         public readonly BindableBool Enabled = new BindableBool(true);
 
-        public FontAwesome Icon
+        public IconUsage Icon
         {
             get => button.Icon;
             set => button.Icon = value;

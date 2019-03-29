@@ -3,17 +3,23 @@
 
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Game.Rulesets.UI;
 using osuTK;
 
 namespace osu.Game.Rulesets.Osu.UI
 {
-    public class PlayfieldAdjustmentContainer : Container
+    public class OsuPlayfieldAdjustmentContainer : PlayfieldAdjustmentContainer
     {
         protected override Container<Drawable> Content => content;
         private readonly Container content;
 
-        public PlayfieldAdjustmentContainer()
+        public OsuPlayfieldAdjustmentContainer()
         {
+            Anchor = Anchor.Centre;
+            Origin = Anchor.Centre;
+
+            Size = new Vector2(0.75f);
+
             InternalChild = new Container
             {
                 Anchor = Anchor.Centre,
