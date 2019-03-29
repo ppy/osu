@@ -20,13 +20,13 @@ namespace osu.Game.Tests.Visual.Gameplay
         {
             typeof(KeyCounterKeyboard),
             typeof(KeyCounterMouse),
-            typeof(KeyCounterCollection)
+            typeof(KeyCounterDisplay)
         };
 
         public TestCaseKeyCounter()
         {
             KeyCounterKeyboard rewindTestKeyCounterKeyboard;
-            KeyCounterCollection kc = new KeyCounterCollection
+            KeyCounterDisplay kc = new KeyCounterDisplay
             {
                 Origin = Anchor.Centre,
                 Anchor = Anchor.Centre,

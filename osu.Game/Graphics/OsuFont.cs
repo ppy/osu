@@ -5,7 +5,7 @@ using osu.Framework.Graphics.Sprites;
 
 namespace osu.Game.Graphics
 {
-    public struct OsuFont
+    public static class OsuFont
     {
         /// <summary>
         /// The default font size.
