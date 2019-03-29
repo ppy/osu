@@ -424,6 +424,13 @@ namespace osu.Game
             loadComponentSingleFile(volume = new VolumeOverlay(), floatingOverlayContent.Add);
             loadComponentSingleFile(onscreenDisplay = new OnScreenDisplay(), Add);
 
+            loadComponentSingleFile(loginOverlay = new LoginOverlay
+            {
+                GetToolbarHeight = () => ToolbarOffset,
+                Anchor = Anchor.TopRight,
+                Origin = Anchor.TopRight,
+            }, floatingOverlayContent.Add);
+
             loadComponentSingleFile(screenshotManager, Add);
 
             //overlay elements
@@ -434,6 +441,7 @@ namespace osu.Game
             loadComponentSingleFile(settings = new MainSettings { GetToolbarHeight = () => ToolbarOffset }, floatingOverlayContent.Add);
             loadComponentSingleFile(userProfile = new UserProfileOverlay(), overlayContent.Add);
             loadComponentSingleFile(beatmapSetOverlay = new BeatmapSetOverlay(), overlayContent.Add);
+
             loadComponentSingleFile(notifications = new NotificationOverlay
             {
                 GetToolbarHeight = () => ToolbarOffset,
@@ -442,13 +450,6 @@ namespace osu.Game
             }, floatingOverlayContent.Add);
 
             loadComponentSingleFile(musicController = new MusicController
-            {
-                GetToolbarHeight = () => ToolbarOffset,
-                Anchor = Anchor.TopRight,
-                Origin = Anchor.TopRight,
-            }, floatingOverlayContent.Add);
-
-            loadComponentSingleFile(loginOverlay = new LoginOverlay
             {
                 GetToolbarHeight = () => ToolbarOffset,
                 Anchor = Anchor.TopRight,
