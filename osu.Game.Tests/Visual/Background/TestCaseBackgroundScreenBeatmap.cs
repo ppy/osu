@@ -92,7 +92,7 @@ namespace osu.Game.Tests.Visual.Background
         public void PlayerLoaderSettingsHoverTest()
         {
             setupUserSettings();
-            AddStep("Start player loader", () => songSelect.Push(playerLoader = new TestPlayerLoader(player = new TestPlayer())));
+            AddStep("Start player loader", () => songSelect.Push(playerLoader = new TestPlayerLoader(player = new TestPlayer { BlockLoad = true })));
             AddUntilStep("Wait for Player Loader to load", () => playerLoader?.IsLoaded ?? false);
             AddAssert("Background retained from song select", () => songSelect.IsBackgroundCurrent());
             AddStep("Trigger background preview", () =>
@@ -255,14 +255,8 @@ namespace osu.Game.Tests.Visual.Background
         {
             setupUserSettings();
 
-            AddStep("Start player loader", () =>
-            {
-                songSelect.Push(playerLoader = new TestPlayerLoader(player = new TestPlayer
-                {
-                    AllowPause = allowPause,
-                    Ready = true,
-                }));
-            });
+            AddStep("Start player loader", () => songSelect.Push(playerLoader = new TestPlayerLoader(player = new TestPlayer(allowPause))));
+
             AddUntilStep("Wait for Player Loader to load", () => playerLoader.IsLoaded);
             AddStep("Move mouse to center of screen", () => InputManager.MoveMouseTo(playerLoader.ScreenPos));
             AddUntilStep("Wait for player to load", () => player.IsLoaded);
@@ -351,21 +345,27 @@ namespace osu.Game.Tests.Visual.Background
             public UserDimContainer CurrentStoryboardContainer => StoryboardContainer;
 
             // Whether or not the player should be allowed to load.
-            public bool Ready;
+            public bool BlockLoad;
 
             public Bindable<bool> StoryboardEnabled;
             public readonly Bindable<bool> ReplacesBackground = new Bindable<bool>();
             public readonly Bindable<bool> IsPaused = new Bindable<bool>();
+
+            public TestPlayer(bool allowPause = true)
+                : base(allowPause)
+            {
+            }
 
             public bool IsStoryboardVisible() => ((TestUserDimContainer)CurrentStoryboardContainer).CurrentAlpha == 1;
 
             public bool IsStoryboardInvisible() => ((TestUserDimContainer)CurrentStoryboardContainer).CurrentAlpha <= 1;
 
             [BackgroundDependencyLoader]
-            private void load(OsuConfigManager config)
+            private void load(OsuConfigManager config, CancellationToken token)
             {
-                while (!Ready)
+                while (BlockLoad && !token.IsCancellationRequested)
                     Thread.Sleep(1);
+
                 StoryboardEnabled = config.GetBindable<bool>(OsuSetting.ShowStoryboard);
                 ReplacesBackground.BindTo(Background.StoryboardReplacesBackground);
                 DrawableRuleset.IsPaused.BindTo(IsPaused);

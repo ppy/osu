@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using osu.Framework.Graphics.Sprites;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Replays;
@@ -21,7 +22,7 @@ namespace osu.Game.Rulesets.Mods
     {
         public override string Name => "Autoplay";
         public override string Acronym => "AT";
-        public override FontAwesome Icon => FontAwesome.fa_osu_mod_auto;
+        public override IconUsage Icon => OsuIcon.ModAuto;
         public override ModType Type => ModType.Automation;
         public override string Description => "Watch a perfect automated play through the song.";
         public override double ScoreMultiplier => 1;
