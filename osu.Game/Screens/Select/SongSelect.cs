@@ -491,7 +491,7 @@ namespace osu.Game.Screens.Select
             if (Beatmap != null && !Beatmap.Value.BeatmapSetInfo.DeletePending)
             {
                 UpdateBeatmap(Beatmap.Value);
-                ensurePlayingSelected(true);
+                ensurePlayingSelected();
             }
 
             base.OnResuming(last);
