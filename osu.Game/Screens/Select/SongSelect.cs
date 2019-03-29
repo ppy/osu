@@ -90,13 +90,12 @@ namespace osu.Game.Screens.Select
         protected SongSelect()
         {
             const float carousel_width = 640;
-            const float filter_height = 100;
 
             AddRangeInternal(new Drawable[]
             {
                 new ParallaxContainer
                 {
-                    Padding = new MarginPadding { Top = filter_height },
+                    Masking = true,
                     ParallaxAmount = 0.005f,
                     RelativeSizeAxes = Axes.Both,
                     Children = new[]
@@ -155,7 +154,7 @@ namespace osu.Game.Screens.Select
                             FilterControl = new FilterControl
                             {
                                 RelativeSizeAxes = Axes.X,
-                                Height = filter_height,
+                                Height = 100,
                                 FilterChanged = c => Carousel.Filter(c),
                                 Background = { Width = 2 },
                                 Exit = () =>
