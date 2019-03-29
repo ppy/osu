@@ -22,7 +22,7 @@ namespace osu.Game.Overlays.Toolbar
 
         public Action OnHome;
 
-        private ToolbarUserArea userArea;
+        private ToolbarUserButton userButton;
 
         protected override bool BlockPositionalInput => false;
 
@@ -77,7 +77,7 @@ namespace osu.Game.Overlays.Toolbar
                         //{
                         //    Icon = FontAwesome.search
                         //},
-                        userArea = new ToolbarUserArea(),
+                        userButton = new ToolbarUserButton(),
                         new ToolbarNotificationButton(),
                     }
                 }
@@ -143,7 +143,7 @@ namespace osu.Game.Overlays.Toolbar
 
         protected override void PopOut()
         {
-            userArea?.LoginOverlay.Hide();
+            userButton?.StateContainer.Hide();
 
             this.MoveToY(-DrawSize.Y, transition_time, Easing.OutQuint);
             this.FadeOut(transition_time);
