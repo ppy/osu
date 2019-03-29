@@ -41,7 +41,7 @@ namespace osu.Game.Rulesets.UI
         protected RulesetInputManager(RulesetInfo ruleset, int variant, SimultaneousBindingMode unique)
         {
             InternalChild = KeyBindingContainer =
-                (KeyBindingContainer<T>)CreateKeyBindingContainer(ruleset, variant, unique)
+                CreateKeyBindingContainer(ruleset, variant, unique)
                     .WithChild(content = new Container { RelativeSizeAxes = Axes.Both });
         }
 
