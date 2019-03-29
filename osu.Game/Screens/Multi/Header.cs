@@ -80,7 +80,7 @@ namespace osu.Game.Screens.Multi
             private void load(OsuColour colours)
             {
                 Title = "multiplayer";
-                Icon = FontAwesome.fa_osu_multi;
+                Icon = OsuIcon.Multi;
                 AccentColour = colours.Yellow;
             }
         }

@@ -149,7 +149,7 @@ namespace osu.Game.Graphics.UserInterface
             };
         }
 
-        public FontAwesome Icon
+        public IconUsage Icon
         {
             set => bouncingIcon.Icon = value;
         }
@@ -207,7 +207,7 @@ namespace osu.Game.Graphics.UserInterface
 
             private readonly SpriteIcon icon;
 
-            public FontAwesome Icon
+            public IconUsage Icon
             {
                 set => icon.Icon = value;
             }
