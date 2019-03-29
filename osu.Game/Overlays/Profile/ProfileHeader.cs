@@ -415,16 +415,16 @@ namespace osu.Game.Overlays.Profile
                     websiteWithoutProtcol = websiteWithoutProtcol.Substring(protocolIndex + 2);
             }
 
-            tryAddInfoRightLine(FontAwesome.fa_map_marker, user.Location);
-            tryAddInfoRightLine(FontAwesome.fa_heart_o, user.Interests);
-            tryAddInfoRightLine(FontAwesome.fa_suitcase, user.Occupation);
+            tryAddInfoRightLine(FontAwesome.MapMarker, user.Location);
+            tryAddInfoRightLine(FontAwesome.HeartOutline, user.Interests);
+            tryAddInfoRightLine(FontAwesome.Suitcase, user.Occupation);
             infoTextRight.NewParagraph();
             if (!string.IsNullOrEmpty(user.Twitter))
-                tryAddInfoRightLine(FontAwesome.fa_twitter, "@" + user.Twitter, $@"https://twitter.com/{user.Twitter}");
-            tryAddInfoRightLine(FontAwesome.fa_gamepad, user.Discord);
-            tryAddInfoRightLine(FontAwesome.fa_skype, user.Skype, @"skype:" + user.Skype + @"?chat");
-            tryAddInfoRightLine(FontAwesome.fa_lastfm, user.Lastfm, $@"https://last.fm/users/{user.Lastfm}");
-            tryAddInfoRightLine(FontAwesome.fa_globe, websiteWithoutProtcol, user.Website);
+                tryAddInfoRightLine(FontAwesome.Twitter, "@" + user.Twitter, $@"https://twitter.com/{user.Twitter}");
+            tryAddInfoRightLine(FontAwesome.Gamepad, user.Discord);
+            tryAddInfoRightLine(FontAwesome.Skype, user.Skype, @"skype:" + user.Skype + @"?chat");
+            tryAddInfoRightLine(FontAwesome.Lastfm, user.Lastfm, $@"https://last.fm/users/{user.Lastfm}");
+            tryAddInfoRightLine(FontAwesome.Globe, websiteWithoutProtcol, user.Website);
 
             if (user.Statistics != null)
             {
@@ -463,7 +463,7 @@ namespace osu.Game.Overlays.Profile
             badgeContainer.ShowBadges(user.Badges);
         }
 
-        private void tryAddInfoRightLine(FontAwesome icon, string str, string url = null)
+        private void tryAddInfoRightLine(IconUsage icon, string str, string url = null)
         {
             if (string.IsNullOrEmpty(str)) return;
 

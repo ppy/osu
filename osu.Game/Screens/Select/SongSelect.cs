@@ -32,6 +32,7 @@ using osuTK.Input;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using osu.Framework.Graphics.Sprites;
 
 namespace osu.Game.Screens.Select
 {
@@ -228,9 +229,9 @@ namespace osu.Game.Screens.Select
                 Footer.AddButton(@"random", colours.Green, triggerRandom, Key.F2);
                 Footer.AddButton(@"options", colours.Blue, BeatmapOptions, Key.F3);
 
-                BeatmapOptions.AddButton(@"Delete", @"all difficulties", FontAwesome.fa_trash, colours.Pink, () => delete(Beatmap.Value.BeatmapSetInfo), Key.Number4, float.MaxValue);
-                BeatmapOptions.AddButton(@"Remove", @"from unplayed", FontAwesome.fa_times_circle_o, colours.Purple, null, Key.Number1);
-                BeatmapOptions.AddButton(@"Clear", @"local scores", FontAwesome.fa_eraser, colours.Purple, () => clearScores(Beatmap.Value.BeatmapInfo), Key.Number2);
+                BeatmapOptions.AddButton(@"Delete", @"all difficulties", FontAwesome.Trash, colours.Pink, () => delete(Beatmap.Value.BeatmapSetInfo), Key.Number4, float.MaxValue);
+                BeatmapOptions.AddButton(@"Remove", @"from unplayed", FontAwesome.TimesCircleOutline, colours.Purple, null, Key.Number1);
+                BeatmapOptions.AddButton(@"Clear", @"local scores", FontAwesome.Eraser, colours.Purple, () => clearScores(Beatmap.Value.BeatmapInfo), Key.Number2);
             }
 
             if (this.beatmaps == null)

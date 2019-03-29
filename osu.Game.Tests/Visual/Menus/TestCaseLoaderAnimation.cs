@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using NUnit.Framework;
+using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Screens;
@@ -12,19 +13,24 @@ using osuTK.Graphics;
 namespace osu.Game.Tests.Visual.Menus
 {
     [TestFixture]
-    public class TestCaseLoaderAnimation : OsuTestCase
+    public class TestCaseLoaderAnimation : ScreenTestCase
     {
         private TestLoader loader;
+
+        [Cached]
+        private OsuLogo logo;
+
+        public TestCaseLoaderAnimation()
+        {
+            Add(logo = new OsuLogo { Depth = float.MinValue });
+        }
 
         protected override void LoadComplete()
         {
             base.LoadComplete();
 
-            // required to preload the logo in a headless run (so it doesn't delay the loading itself).
-            Add(new OsuLogo());
-
             bool logoVisible = false;
-            AddStep("almost instant display", () => Child = loader = new TestLoader(250));
+            AddStep("almost instant display", () => LoadScreen(loader = new TestLoader(250)));
             AddUntilStep("loaded", () =>
             {
                 logoVisible = loader.Logo?.Alpha > 0;
@@ -32,7 +38,7 @@ namespace osu.Game.Tests.Visual.Menus
             });
             AddAssert("logo not visible", () => !logoVisible);
 
-            AddStep("short load", () => Child = loader = new TestLoader(800));
+            AddStep("short load", () => LoadScreen(loader = new TestLoader(800)));
             AddUntilStep("loaded", () =>
             {
                 logoVisible = loader.Logo?.Alpha > 0;
@@ -41,7 +47,7 @@ namespace osu.Game.Tests.Visual.Menus
             AddAssert("logo visible", () => logoVisible);
             AddUntilStep("logo gone", () => loader.Logo?.Alpha == 0);
 
-            AddStep("longer load", () => Child = loader = new TestLoader(1400));
+            AddStep("longer load", () => LoadScreen(loader = new TestLoader(1400)));
             AddUntilStep("loaded", () =>
             {
                 logoVisible = loader.Logo?.Alpha > 0;

@@ -17,7 +17,7 @@ namespace osu.Game.Tests.Visual
         [BackgroundDependencyLoader]
         private void load()
         {
-            Child = stack = new OsuScreenStack { RelativeSizeAxes = Axes.Both };
+            Add(stack = new OsuScreenStack { RelativeSizeAxes = Axes.Both });
         }
 
         protected void LoadScreen(OsuScreen screen)
