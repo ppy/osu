@@ -2,7 +2,7 @@
 name: Crash Report
 about: For issues regarding game crashes or permanent freezes
 ---
-**Describe your problem:** 
+**Describe the crash:** 
 
 **Screenshots or videos showing encountered issue:** 
 
