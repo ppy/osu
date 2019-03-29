@@ -122,7 +122,7 @@ namespace osu.Game.Tests.Visual
                     {
                         Alpha = 0.35f,
                         RelativeSizeAxes = Axes.None,
-                        Size = new Vector2(107),
+                        Size = new Vector2(72),
                         Child = visualBox = new Box
                         {
                             Colour = Color4.Tomato,
@@ -133,7 +133,7 @@ namespace osu.Game.Tests.Visual
                     {
                         Alpha = 0.35f,
                         RelativeSizeAxes = Axes.None,
-                        Size = new Vector2(107),
+                        Size = new Vector2(72),
                         Child = transferContainerBox = new Box
                         {
                             Colour = Color4.White,
@@ -172,7 +172,7 @@ namespace osu.Game.Tests.Visual
                 this.logo = logo;
                 logo.FadeIn(350);
                 logo.ScaleTo(new Vector2(0.15f), 350, Easing.In);
-                logoFacadeContainer.SetLogo(logo, 0.3f, 1000, Easing.InOutQuint);
+                logoFacadeContainer.SetLogo(logo, 1.0f, 1000, Easing.InOutQuint);
                 logoFacadeContainer.Tracking = true;
                 moveLogoFacade();
             }
