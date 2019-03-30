@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using JetBrains.Annotations;
 using osu.Framework.Input.StateChanges;
 using osu.Game.Input.Handlers;
 using osu.Game.Replays;
@@ -87,14 +88,24 @@ namespace osu.Game.Rulesets.Replays
 
         protected bool HasFrames => Frames.Count > 0;
 
-        private bool inImportantSection =>
-            HasFrames && FrameAccuratePlayback &&
-            //a button is in a pressed state
-            IsImportant(currentDirection > 0 ? CurrentFrame : NextFrame) &&
-            //the next frame is within an allowable time span
-            Math.Abs(CurrentTime - NextFrame?.Time ?? 0) <= AllowedImportantTimeSpan;
+        private bool inImportantSection
+        {
+            get
+            {
+                if (!HasFrames || !FrameAccuratePlayback)
+                    return false;
 
-        protected virtual bool IsImportant(TFrame frame) => false;
+                var checkFrame = currentDirection > 0 ? CurrentFrame : NextFrame;
+
+                if (checkFrame == null)
+                    return false;
+
+                return IsImportant(currentDirection > 0 ? CurrentFrame : NextFrame) && //a button is in a pressed state
+                       Math.Abs(CurrentTime - NextFrame?.Time ?? 0) <= AllowedImportantTimeSpan; //the next frame is within an allowable time span
+            }
+        }
+
+        protected virtual bool IsImportant([NotNull] TFrame frame) => false;
 
         /// <summary>
         /// Update the current frame based on an incoming time value.
