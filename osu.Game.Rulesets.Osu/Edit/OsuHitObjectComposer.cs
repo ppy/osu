@@ -38,8 +38,6 @@ namespace osu.Game.Rulesets.Osu.Edit
 
         public override SelectionHandler CreateSelectionHandler() => new OsuSelectionHandler();
 
-        protected override Container CreateLayerContainer() => new OsuPlayfieldAdjustmentContainer { RelativeSizeAxes = Axes.Both };
-
         public override SelectionBlueprint CreateBlueprintFor(DrawableHitObject hitObject)
         {
             switch (hitObject)
