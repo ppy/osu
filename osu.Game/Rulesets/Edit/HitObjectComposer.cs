@@ -178,7 +178,7 @@ namespace osu.Game.Rulesets.Edit
         /// <summary>
         /// Creates a <see cref="ScalableContainer"/> which provides a layer above or below the <see cref="Playfield"/>.
         /// </summary>
-        protected virtual Container CreateLayerContainer() => new Container { RelativeSizeAxes = Axes.Both };
+        protected virtual Container CreateLayerContainer() => DrawableRuleset.CreatePlayfieldAdjustmentContainer();
     }
 
     public abstract class HitObjectComposer<TObject> : HitObjectComposer
