@@ -11,13 +11,14 @@ namespace osu.Game.Storyboards
         public string Path { get; set; }
         public bool IsDrawable => true;
 
-        public double Time;
+        public double StartTime { get; }
+
         public float Volume;
 
         public StoryboardSample(string path, double time, float volume)
         {
             Path = path;
-            Time = time;
+            StartTime = time;
             Volume = volume;
         }
 

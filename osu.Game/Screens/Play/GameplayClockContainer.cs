@@ -54,7 +54,7 @@ namespace osu.Game.Screens.Play
 
         private readonly FramedOffsetClock offsetClock;
 
-        public GameplayClockContainer(WorkingBeatmap beatmap, bool allowLeadIn, double gameplayStartTime)
+        public GameplayClockContainer(WorkingBeatmap beatmap, double gameplayStartTime)
         {
             this.beatmap = beatmap;
 
@@ -64,9 +64,7 @@ namespace osu.Game.Screens.Play
 
             adjustableClock = new DecoupleableInterpolatingFramedClock { IsCoupled = false };
 
-            adjustableClock.Seek(allowLeadIn
-                ? Math.Min(0, gameplayStartTime - beatmap.BeatmapInfo.AudioLeadIn)
-                : gameplayStartTime);
+            adjustableClock.Seek(Math.Min(0, gameplayStartTime - beatmap.BeatmapInfo.AudioLeadIn));
 
             adjustableClock.ProcessFrame();
 
@@ -79,6 +77,8 @@ namespace osu.Game.Screens.Play
 
             // the clock to be exposed via DI to children.
             GameplayClock = new GameplayClock(offsetClock);
+
+            GameplayClock.IsPaused.BindTo(IsPaused);
         }
 
         [BackgroundDependencyLoader]

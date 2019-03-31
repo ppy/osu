@@ -11,12 +11,13 @@ using osu.Game.Graphics;
 using osuTK;
 using osuTK.Graphics;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Graphics.Sprites;
 
 namespace osu.Game.Screens.Ranking
 {
     public class ResultModeButton : TabItem<IResultPageInfo>, IHasTooltip
     {
-        private readonly FontAwesome icon;
+        private readonly IconUsage icon;
         private Color4 activeColour;
         private Color4 inactiveColour;
         private CircularContainer colouredPart;

@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Linq;
+using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Testing;
@@ -23,7 +24,11 @@ namespace osu.Game.Tests.Visual
         protected PlayerTestCase(Ruleset ruleset)
         {
             this.ruleset = ruleset;
+        }
 
+        [BackgroundDependencyLoader]
+        private void load()
+        {
             Add(new Box
             {
                 RelativeSizeAxes = Axes.Both,
@@ -52,18 +57,10 @@ namespace osu.Game.Tests.Visual
             if (!AllowFail)
                 Beatmap.Value.Mods.Value = new[] { ruleset.GetAllMods().First(m => m is ModNoFail) };
 
-            LoadComponentAsync(Player = CreatePlayer(ruleset), p =>
-            {
-                Player = p;
-                LoadScreen(p);
-            });
+            Player = CreatePlayer(ruleset);
+            LoadScreen(Player);
         }
 
-        protected virtual Player CreatePlayer(Ruleset ruleset) => new Player
-        {
-            AllowPause = false,
-            AllowLeadIn = false,
-            AllowResults = false,
-        };
+        protected virtual Player CreatePlayer(Ruleset ruleset) => new Player(false, false);
     }
 }
