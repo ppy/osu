@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using osu.Framework.Input.StateChanges;
 using osu.Framework.MathUtils;
@@ -18,16 +19,20 @@ namespace osu.Game.Rulesets.Osu.Replays
         {
         }
 
-        protected override bool IsImportant(OsuReplayFrame frame) => frame.Actions.Any();
+        protected override bool IsImportant(OsuReplayFrame frame) => frame?.Actions.Any() ?? false;
 
         protected Vector2? Position
         {
             get
             {
-                if (!HasFrames)
+                var frame = CurrentFrame;
+
+                if (frame == null)
                     return null;
 
-                return Interpolation.ValueAt(CurrentTime, CurrentFrame.Position, NextFrame.Position, CurrentFrame.Time, NextFrame.Time);
+                Debug.Assert(CurrentTime != null);
+
+                return NextFrame != null ? Interpolation.ValueAt(CurrentTime.Value, frame.Position, NextFrame.Position, frame.Time, NextFrame.Time) : frame.Position;
             }
         }
 
@@ -41,7 +46,7 @@ namespace osu.Game.Rulesets.Osu.Replays
                 },
                 new ReplayState<OsuAction>
                 {
-                    PressedActions = CurrentFrame.Actions
+                    PressedActions = CurrentFrame?.Actions ?? new List<OsuAction>()
                 }
             };
         }
