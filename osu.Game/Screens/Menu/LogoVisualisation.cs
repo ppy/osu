@@ -12,6 +12,9 @@ using osu.Framework.Graphics.Shaders;
 using osu.Framework.Graphics.Textures;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
+using osu.Game.Skinning;
+using osu.Game.Online.API;
+using osu.Game.Users;
 using System;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -66,18 +69,27 @@ namespace osu.Game.Screens.Menu
         private IShader shader;
         private readonly Texture texture;
 
+        private Bindable<User> user;
+        private Bindable<Skin> skin;
+
         public LogoVisualisation()
         {
             texture = Texture.WhitePixel;
-            AccentColour = new Color4(1, 1, 1, 0.2f);
             Blending = BlendingMode.Additive;
         }
 
         [BackgroundDependencyLoader]
-        private void load(ShaderManager shaders, IBindable<WorkingBeatmap> beatmap)
+        private void load(ShaderManager shaders, IBindable<WorkingBeatmap> beatmap, IAPIProvider api, SkinManager skinManager)
         {
             this.beatmap.BindTo(beatmap);
             shader = shaders.Load(VertexShaderDescriptor.TEXTURE_2, FragmentShaderDescriptor.TEXTURE_ROUNDED);
+            user = api.LocalUser.GetBoundCopy();
+            skin = skinManager.CurrentSkin.GetBoundCopy();
+
+            user.ValueChanged += _ => changeColour();
+            skin.ValueChanged += _ => changeColour();
+
+            changeColour();
         }
 
         private void updateAmplitudes()
@@ -105,6 +117,14 @@ namespace osu.Game.Screens.Menu
 
             indexOffset = (indexOffset + index_change) % bars_per_visualiser;
             Scheduler.AddDelayed(updateAmplitudes, time_between_updates);
+        }
+
+        private void changeColour()
+        {
+            if (user.Value?.IsSupporter ?? false)
+                AccentColour = skin.Value.GetValue<SkinConfiguration, Color4?>(s => s.CustomColours.ContainsKey("MenuGlow") ? s.CustomColours["MenuGlow"] : (Color4?)null) ?? new Color4(1, 1, 1, 0.2f);
+            else
+                AccentColour = new Color4(1, 1, 1, 0.2f);
         }
 
         protected override void LoadComplete()
