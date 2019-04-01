@@ -64,6 +64,7 @@ namespace osu.Game.Overlays.Settings
             {
                 bindable = value;
                 controlWithCurrent?.Current.BindTo(bindable);
+
                 if (ShowsDefaultIndicator)
                 {
                     restoreDefaultButton.Bindable = bindable.GetBoundCopy();

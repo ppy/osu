@@ -51,6 +51,7 @@ namespace osu.Game.Graphics.Containers
             }
 
             int previousLinkEnd = 0;
+
             foreach (var link in links)
             {
                 AddText(text.Substring(previousLinkEnd, link.Index - previousLinkEnd));
@@ -90,10 +91,12 @@ namespace osu.Game.Graphics.Containers
                             if (linkArgument != null && int.TryParse(linkArgument.Contains('?') ? linkArgument.Split('?')[0] : linkArgument, out int beatmapId))
                                 game?.ShowBeatmap(beatmapId);
                             break;
+
                         case LinkAction.OpenBeatmapSet:
                             if (int.TryParse(linkArgument, out int setId))
                                 game?.ShowBeatmapSet(setId);
                             break;
+
                         case LinkAction.OpenChannel:
                             try
                             {
@@ -105,18 +108,22 @@ namespace osu.Game.Graphics.Containers
                             }
 
                             break;
+
                         case LinkAction.OpenEditorTimestamp:
                         case LinkAction.JoinMultiplayerMatch:
                         case LinkAction.Spectate:
                             showNotImplementedError?.Invoke();
                             break;
+
                         case LinkAction.External:
                             game?.OpenUrlExternally(url);
                             break;
+
                         case LinkAction.OpenUserProfile:
                             if (long.TryParse(linkArgument, out long userId))
                                 game?.ShowUser(userId);
                             break;
+
                         default:
                             throw new NotImplementedException($"This {nameof(LinkAction)} ({linkType.ToString()}) is missing an associated action.");
                     }

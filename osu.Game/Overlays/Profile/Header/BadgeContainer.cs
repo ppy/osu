@@ -106,6 +106,7 @@ namespace osu.Game.Overlays.Profile.Header
             visibleBadge = 0;
 
             badgeFlowContainer.Clear();
+
             for (var index = 0; index < badges.Length; index++)
             {
                 int displayIndex = index;

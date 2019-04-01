@@ -113,6 +113,7 @@ namespace osu.Game.Online.API
                         }
 
                         break;
+
                     case APIState.Offline:
                     case APIState.Connecting:
                         //work to restore a connection...
@@ -300,6 +301,7 @@ namespace osu.Game.Online.API
                 case HttpStatusCode.Unauthorized:
                     Logout();
                     return true;
+
                 case HttpStatusCode.RequestTimeout:
                     failureCount++;
                     log.Add($@"API failure count is now {failureCount}");

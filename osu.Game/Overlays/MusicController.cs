@@ -296,6 +296,7 @@ namespace osu.Game.Overlays
             queuedDirection = TransformDirection.Prev;
 
             var playable = beatmapSets.TakeWhile(i => i.ID != current.BeatmapSetInfo.ID).LastOrDefault() ?? beatmapSets.LastOrDefault();
+
             if (playable != null)
             {
                 beatmap.Value = beatmaps.GetWorkingBeatmap(playable.Beatmaps.First(), beatmap.Value);
@@ -309,6 +310,7 @@ namespace osu.Game.Overlays
                 queuedDirection = TransformDirection.Next;
 
             var playable = beatmapSets.SkipWhile(i => i.ID != current.BeatmapSetInfo.ID).Skip(1).FirstOrDefault() ?? beatmapSets.FirstOrDefault();
+
             if (playable != null)
             {
                 beatmap.Value = beatmaps.GetWorkingBeatmap(playable.Beatmaps.First(), beatmap.Value);
@@ -399,6 +401,7 @@ namespace osu.Game.Overlays
                             newBackground.MoveToX(0, 500, Easing.OutCubic);
                             background.MoveToX(-400, 500, Easing.OutCubic);
                             break;
+
                         case TransformDirection.Prev:
                             newBackground.Position = new Vector2(-400, 0);
                             newBackground.MoveToX(0, 500, Easing.OutCubic);

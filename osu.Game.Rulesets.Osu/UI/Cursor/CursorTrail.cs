@@ -191,6 +191,7 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
                 Shader.GetUniform<float>("g_FadeClock").UpdateValue(ref Time);
 
                 int updateStart = -1, updateEnd = 0;
+
                 for (int i = 0; i < Parts.Length; ++i)
                 {
                     if (Parts[i].WasUpdated)

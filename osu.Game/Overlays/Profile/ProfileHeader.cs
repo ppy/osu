@@ -408,6 +408,7 @@ namespace osu.Game.Overlays.Profile
             infoTextLeft.AddLink("forum post".ToQuantity(user.PostCount), url: $"https://osu.ppy.sh/users/{user.Id}/posts", creationParameters: boldItalic);
 
             string websiteWithoutProtcol = user.Website;
+
             if (!string.IsNullOrEmpty(websiteWithoutProtcol))
             {
                 int protocolIndex = websiteWithoutProtcol.IndexOf("//", StringComparison.Ordinal);
@@ -468,14 +469,11 @@ namespace osu.Game.Overlays.Profile
             if (string.IsNullOrEmpty(str)) return;
 
             infoTextRight.AddIcon(icon);
+
             if (url != null)
-            {
                 infoTextRight.AddLink(" " + str, url);
-            }
             else
-            {
                 infoTextRight.AddText(" " + str);
-            }
 
             infoTextRight.NewLine();
         }
