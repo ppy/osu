@@ -18,6 +18,7 @@ using osu.Game.Users;
 using System;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions.Color4Extensions;
 
 namespace osu.Game.Screens.Menu
 {
@@ -86,10 +87,8 @@ namespace osu.Game.Screens.Menu
             user = api.LocalUser.GetBoundCopy();
             skin = skinManager.CurrentSkin.GetBoundCopy();
 
-            user.ValueChanged += _ => changeColour();
-            skin.ValueChanged += _ => changeColour();
-
-            changeColour();
+            user.ValueChanged += _ => updateColour();
+            skin.BindValueChanged(_ => updateColour(), true);
         }
 
         private void updateAmplitudes()
@@ -119,12 +118,14 @@ namespace osu.Game.Screens.Menu
             Scheduler.AddDelayed(updateAmplitudes, time_between_updates);
         }
 
-        private void changeColour()
+        private void updateColour()
         {
+            Color4 defaultColour = Color4.White.Opacity(0.2f);
+
             if (user.Value?.IsSupporter ?? false)
-                AccentColour = skin.Value.GetValue<SkinConfiguration, Color4?>(s => s.CustomColours.ContainsKey("MenuGlow") ? s.CustomColours["MenuGlow"] : (Color4?)null) ?? new Color4(1, 1, 1, 0.2f);
+                AccentColour = skin.Value.GetValue<SkinConfiguration, Color4?>(s => s.CustomColours.ContainsKey("MenuGlow") ? s.CustomColours["MenuGlow"] : (Color4?)null) ?? defaultColour;
             else
-                AccentColour = new Color4(1, 1, 1, 0.2f);
+                AccentColour = defaultColour;
         }
 
         protected override void LoadComplete()

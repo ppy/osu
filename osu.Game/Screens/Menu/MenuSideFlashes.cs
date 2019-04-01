@@ -58,9 +58,6 @@ namespace osu.Game.Screens.Menu
             user = api.LocalUser.GetBoundCopy();
             skin = skinManager.CurrentSkin.GetBoundCopy();
 
-            user.ValueChanged += _ => changeColour();
-            skin.ValueChanged += _ => changeColour();
-
             Children = new Drawable[]
             {
                 leftBox = new Box
@@ -88,7 +85,8 @@ namespace osu.Game.Screens.Menu
                 }
             };
 
-            changeColour();
+            user.ValueChanged += _ => updateColour();
+            skin.BindValueChanged(_ => updateColour(), true);
         }
 
         protected override void OnNewBeat(int beatIndex, TimingControlPoint timingPoint, EffectControlPoint effectPoint, TrackAmplitudes amplitudes)
@@ -109,14 +107,12 @@ namespace osu.Game.Screens.Menu
              .FadeOut(beatLength, Easing.In);
         }
 
-        private void changeColour()
+        private void updateColour()
         {
-            Color4 baseColour;
+            Color4 baseColour = colours.Blue;
 
             if (user.Value?.IsSupporter ?? false)
-                baseColour = skin.Value.GetValue<SkinConfiguration, Color4?>(s => s.CustomColours.ContainsKey("MenuGlow") ? s.CustomColours["MenuGlow"] : (Color4?)null) ?? colours.Blue;
-            else
-                baseColour = colours.Blue;
+                baseColour = skin.Value.GetValue<SkinConfiguration, Color4?>(s => s.CustomColours.ContainsKey("MenuGlow") ? s.CustomColours["MenuGlow"] : (Color4?)null) ?? baseColour;
 
             // linear colour looks better in this case, so let's use it for now.
             Color4 gradientDark = baseColour.Opacity(0).ToLinear();
