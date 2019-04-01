@@ -95,6 +95,7 @@ namespace osu.Desktop.Overlays
 
             var version = game.Version;
             var lastVersion = config.Get<string>(OsuSetting.Version);
+
             if (game.IsDeployedBuild && version != lastVersion)
             {
                 config.Set(OsuSetting.Version, version);

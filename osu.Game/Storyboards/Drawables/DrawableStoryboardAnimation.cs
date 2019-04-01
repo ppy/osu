@@ -67,6 +67,7 @@ namespace osu.Game.Storyboards.Drawables
         private void load(IBindable<WorkingBeatmap> beatmap, TextureStore textureStore)
         {
             var basePath = Animation.Path.ToLowerInvariant();
+
             for (var frame = 0; frame < Animation.FrameCount; frame++)
             {
                 var framePath = basePath.Replace(".", frame + ".");

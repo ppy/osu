@@ -77,6 +77,7 @@ namespace osu.Game.Overlays.Mods
         public void DeselectTypes(IEnumerable<Type> modTypes, bool immediate = false)
         {
             int delay = 0;
+
             foreach (var button in buttons)
             {
                 Mod selected = button.SelectedMod;

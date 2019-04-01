@@ -101,6 +101,7 @@ namespace osu.Game.Beatmaps
             protected override Storyboard GetStoryboard()
             {
                 Storyboard storyboard;
+
                 try
                 {
                     using (var stream = new StreamReader(store.GetStream(getPathForFile(BeatmapInfo.Path))))
@@ -131,6 +132,7 @@ namespace osu.Game.Beatmaps
             protected override Skin GetSkin()
             {
                 Skin skin;
+
                 try
                 {
                     skin = new LegacyBeatmapSkin(BeatmapInfo, store, audioManager);

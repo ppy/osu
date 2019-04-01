@@ -71,12 +71,14 @@ namespace osu.Game.Rulesets.Edit
                 if (state == value) return;
 
                 state = value;
+
                 switch (state)
                 {
                     case SelectionState.Selected:
                         Show();
                         Selected?.Invoke(this);
                         break;
+
                     case SelectionState.NotSelected:
                         Hide();
                         Deselected?.Invoke(this);

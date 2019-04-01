@@ -261,6 +261,7 @@ namespace osu.Game.Tests.Visual.SongSelect
                     Accuracy = 0.8765,
                 },
             };
+
             foreach (var s in anotherScores)
             {
                 s.Statistics.Add(HitResult.Great, RNG.Next(2000));

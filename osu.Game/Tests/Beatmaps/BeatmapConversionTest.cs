@@ -35,6 +35,7 @@ namespace osu.Game.Tests.Beatmaps
             Assert.Multiple(() =>
             {
                 int mappingCounter = 0;
+
                 while (true)
                 {
                     if (mappingCounter >= ourResult.Mappings.Count && mappingCounter >= expectedResult.Mappings.Count)
@@ -61,6 +62,7 @@ namespace osu.Game.Tests.Beatmaps
                         Assert.Multiple(() =>
                         {
                             int objectCounter = 0;
+
                             while (true)
                             {
                                 if (objectCounter >= ourMapping.Objects.Count && objectCounter >= expectedMapping.Objects.Count)

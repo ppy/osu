@@ -31,6 +31,7 @@ namespace osu.Desktop
                     var importer = new ArchiveImportIPCChannel(host);
                     // Restore the cwd so relative paths given at the command line work correctly
                     Directory.SetCurrentDirectory(cwd);
+
                     foreach (var file in args)
                     {
                         Console.WriteLine(@"Importing {0}", file);

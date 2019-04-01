@@ -67,6 +67,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Connections
                 return;
 
             OsuHitObject prevHitObject = null;
+
             foreach (var currHitObject in hitObjects)
             {
                 if (prevHitObject != null && !currHitObject.NewCombo && !(prevHitObject is Spinner) && !(currHitObject is Spinner))

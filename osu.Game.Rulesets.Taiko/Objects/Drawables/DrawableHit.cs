@@ -98,6 +98,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             circlePiece?.FlashBox.FinishTransforms();
 
             var offset = !AllJudged ? 0 : Time.Current - HitObject.StartTime;
+
             using (BeginDelayedSequence(HitObject.StartTime - Time.Current + offset, true))
             {
                 switch (State.Value)
@@ -108,15 +109,18 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
                         UnproxyContent();
                         this.Delay(HitObject.HitWindows.HalfWindowFor(HitResult.Miss)).Expire();
                         break;
+
                     case ArmedState.Miss:
                         this.FadeOut(100)
                             .Expire();
                         break;
+
                     case ArmedState.Hit:
                         // If we're far enough away from the left stage, we should bring outselves in front of it
                         ProxyContent();
 
                         var flash = circlePiece?.FlashBox;
+
                         if (flash != null)
                         {
                             flash.FadeTo(0.9f);

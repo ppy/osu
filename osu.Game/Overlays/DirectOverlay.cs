@@ -58,6 +58,7 @@ namespace osu.Game.Overlays
                 var artists = new List<string>();
                 var songs = new List<string>();
                 var tags = new List<string>();
+
                 foreach (var s in beatmapSets)
                 {
                     artists.Add(s.Metadata.Artist);
@@ -210,6 +211,7 @@ namespace osu.Game.Overlays
                                 Anchor = Anchor.TopCentre,
                                 Origin = Anchor.TopCentre,
                             };
+
                         default:
                             return new DirectListPanel(b);
                     }

@@ -42,9 +42,11 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
                 speedBonus = 1 + Math.Pow((min_speed_bonus - deltaTime) / speed_balancing_factor, 2);
 
             double angleBonus = 1.0;
+
             if (osuCurrent.Angle != null && osuCurrent.Angle.Value < angle_bonus_begin)
             {
                 angleBonus = 1 + Math.Pow(Math.Sin(1.5 * (angle_bonus_begin - osuCurrent.Angle.Value)), 2) / 3.57;
+
                 if (osuCurrent.Angle.Value < pi_over_2)
                 {
                     angleBonus = 1.28;

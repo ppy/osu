@@ -84,6 +84,7 @@ namespace osu.Game.Database
         private void flushEvents(bool perform)
         {
             Action[] events;
+
             lock (queuedEvents)
             {
                 events = queuedEvents.ToArray();
@@ -147,6 +148,7 @@ namespace osu.Game.Database
             List<TModel> imported = new List<TModel>();
 
             int current = 0;
+
             foreach (string path in paths)
             {
                 if (notification.State == ProgressNotificationState.Cancelled)

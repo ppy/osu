@@ -74,6 +74,7 @@ namespace osu.Game.Online.Leaderboards
                     scrollContainer.Add(scrollFlow);
 
                     int i = 0;
+
                     foreach (var s in scrollFlow.Children)
                     {
                         using (s.BeginDelayedSequence(i++ * 50, true))
@@ -138,18 +139,23 @@ namespace osu.Game.Online.Leaderboards
                             OnRetry = UpdateScores,
                         });
                         break;
+
                     case PlaceholderState.Unavailable:
                         replacePlaceholder(new MessagePlaceholder(@"Leaderboards are not available for this beatmap!"));
                         break;
+
                     case PlaceholderState.NoScores:
                         replacePlaceholder(new MessagePlaceholder(@"No records yet!"));
                         break;
+
                     case PlaceholderState.NotLoggedIn:
                         replacePlaceholder(new MessagePlaceholder(@"Please sign in to view online leaderboards!"));
                         break;
+
                     case PlaceholderState.NotSupporter:
                         replacePlaceholder(new MessagePlaceholder(@"Please invest in an osu!supporter tag to view this leaderboard!"));
                         break;
+
                     default:
                         replacePlaceholder(null);
                         break;

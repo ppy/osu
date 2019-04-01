@@ -52,6 +52,7 @@ namespace osu.Game.Screens.Play
                 {
                     isLit = value;
                     updateGlowSprite(value);
+
                     if (value && IsCounting)
                     {
                         CountPresses++;

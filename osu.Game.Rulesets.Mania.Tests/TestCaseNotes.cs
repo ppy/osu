@@ -168,11 +168,13 @@ namespace osu.Game.Rulesets.Mania.Tests
                     foreach (var nested in obj.NestedHitObjects)
                     {
                         double finalPosition = (nested.HitObject.StartTime - obj.HitObject.StartTime) / endTime.Duration;
+
                         switch (direction)
                         {
                             case ScrollingDirection.Up:
                                 nested.Y = (float)(finalPosition * content.DrawHeight);
                                 break;
+
                             case ScrollingDirection.Down:
                                 nested.Y = (float)(-finalPosition * content.DrawHeight);
                                 break;

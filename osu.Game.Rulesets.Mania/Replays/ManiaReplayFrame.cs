@@ -39,6 +39,7 @@ namespace osu.Game.Rulesets.Mania.Replays
 
             int activeColumns = (int)(legacyFrame.MouseX ?? 0);
             int counter = 0;
+
             while (activeColumns > 0)
             {
                 var isSpecial = stage.IsSpecialColumn(counter);

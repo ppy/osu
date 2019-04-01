@@ -73,6 +73,7 @@ namespace osu.Game.Rulesets.Catch.Difficulty
 
                         lastObject = hitObject;
                         break;
+
                     case JuiceStream _:
                         foreach (var nested in hitObject.NestedHitObjects.OfType<CatchHitObject>().Where(o => !(o is TinyDroplet)))
                         {

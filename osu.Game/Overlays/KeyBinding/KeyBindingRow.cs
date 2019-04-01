@@ -117,6 +117,7 @@ namespace osu.Game.Overlays.KeyBinding
         public void RestoreDefaults()
         {
             int i = 0;
+
             foreach (var d in Defaults)
             {
                 var button = buttons[i++];

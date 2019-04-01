@@ -111,6 +111,7 @@ namespace osu.Game.Overlays
                 ChildrenEnumerable = Users.Select(u =>
                 {
                     SocialPanel panel;
+
                     switch (displayStyle)
                     {
                         case PanelDisplayStyle.Grid:
@@ -120,6 +121,7 @@ namespace osu.Game.Overlays
                                 Origin = Anchor.TopCentre
                             };
                             break;
+
                         default:
                             panel = new SocialListPanel(u);
                             break;
@@ -167,6 +169,7 @@ namespace osu.Game.Overlays
                     friendRequest.Success += updateUsers;
                     api.Queue(getUsersRequest = friendRequest);
                     break;
+
                 default:
                     var userRequest = new GetUsersRequest(); // TODO filter arguments!
                     userRequest.Success += response => updateUsers(response.Select(r => r.User));
@@ -200,6 +203,7 @@ namespace osu.Game.Overlays
                 case APIState.Online:
                     Scheduler.AddOnce(updateSearch);
                     break;
+
                 default:
                     Users = null;
                     clearPanels();

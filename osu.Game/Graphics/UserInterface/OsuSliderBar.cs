@@ -203,6 +203,7 @@ namespace osu.Game.Graphics.UserInterface
         private int findPrecision(decimal d)
         {
             int precision = 0;
+
             while (d != Math.Round(d))
             {
                 d *= 10;

@@ -179,6 +179,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
 
             int usableColumns = TotalColumns - RandomStart - PreviousPattern.ColumnWithObjects;
             int nextColumn = GetRandomColumn();
+
             for (int i = 0; i < Math.Min(usableColumns, noteCount); i++)
             {
                 // Find available column
@@ -217,6 +218,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
                 nextColumn = FindAvailableColumn(nextColumn, PreviousPattern);
 
             int lastColumn = nextColumn;
+
             for (int i = 0; i < noteCount; i++)
             {
                 addToPattern(pattern, nextColumn, startTime, startTime);
@@ -299,6 +301,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
             int interval = Random.Next(1, TotalColumns - (legacy ? 1 : 0));
 
             int nextColumn = GetColumn((HitObject as IHasXPosition)?.X ?? 0, true);
+
             for (int i = 0; i <= spanCount; i++)
             {
                 addToPattern(pattern, nextColumn, startTime, startTime);
@@ -341,16 +344,19 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
                     p3 = 0;
                     p4 = 0;
                     break;
+
                 case 3:
                     p2 = Math.Min(p2, 0.1);
                     p3 = 0;
                     p4 = 0;
                     break;
+
                 case 4:
                     p2 = Math.Min(p2, 0.3);
                     p3 = Math.Min(p3, 0.04);
                     p4 = 0;
                     break;
+
                 case 5:
                     p2 = Math.Min(p2, 0.34);
                     p3 = Math.Min(p3, 0.1);
@@ -440,6 +446,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
             bool ignoreHead = !sampleInfoListAt(startTime).Any(s => s.Name == SampleInfo.HIT_WHISTLE || s.Name == SampleInfo.HIT_FINISH || s.Name == SampleInfo.HIT_CLAP);
 
             var rowPattern = new Pattern();
+
             for (int i = 0; i <= spanCount; i++)
             {
                 if (!(ignoreHead && startTime == HitObject.StartTime))

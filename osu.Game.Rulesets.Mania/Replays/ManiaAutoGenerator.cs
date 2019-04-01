@@ -28,6 +28,7 @@ namespace osu.Game.Rulesets.Mania.Replays
             var normalAction = ManiaAction.Key1;
             var specialAction = ManiaAction.Special1;
             int totalCounter = 0;
+
             foreach (var stage in Beatmap.Stages)
             {
                 for (int i = 0; i < stage.Columns; i++)
@@ -51,6 +52,7 @@ namespace osu.Game.Rulesets.Mania.Replays
             var pointGroups = generateActionPoints().GroupBy(a => a.Time).OrderBy(g => g.First().Time);
 
             var actions = new List<ManiaAction>();
+
             foreach (var group in pointGroups)
             {
                 foreach (var point in group)
@@ -60,6 +62,7 @@ namespace osu.Game.Rulesets.Mania.Replays
                         case HitPoint _:
                             actions.Add(columnActions[point.Column]);
                             break;
+
                         case ReleasePoint _:
                             actions.Remove(columnActions[point.Column]);
                             break;

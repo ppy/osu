@@ -209,6 +209,7 @@ namespace osu.Game.Overlays.AccountCreation
         private bool focusNextTextbox()
         {
             var nextTextbox = nextUnfilledTextbox();
+
             if (nextTextbox != null)
             {
                 Schedule(() => GetContainingInputManager().ChangeFocus(nextTextbox));

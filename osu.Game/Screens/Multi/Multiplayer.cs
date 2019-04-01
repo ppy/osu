@@ -248,6 +248,7 @@ namespace osu.Game.Screens.Multi
             if (screenStack.CurrentScreen is MatchSubScreen)
             {
                 var track = Beatmap.Value.Track;
+
                 if (track != null)
                 {
                     track.Looping = true;
