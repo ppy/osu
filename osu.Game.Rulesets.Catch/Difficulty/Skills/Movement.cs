@@ -14,10 +14,9 @@ namespace osu.Game.Rulesets.Catch.Difficulty.Skills
     {
         private const float absolute_player_positioning_error = 16f;
         private const float normalized_hitobject_radius = 41.0f;
-        private const double direction_change_bonus = 9.8;
-        private const double antiflow_bonus = 26.0;
+        private const double direction_change_bonus = 21.0;
 
-        protected override double SkillMultiplier => 850;
+        protected override double SkillMultiplier => 900;
         protected override double StrainDecayBase => 0.2;
 
         protected override double DecayWeight => 0.94;
@@ -29,6 +28,7 @@ namespace osu.Game.Rulesets.Catch.Difficulty.Skills
         protected override double StrainValueOf(DifficultyHitObject current)
         {
             var catchCurrent = (CatchDifficultyHitObject)current;
+            double halfCatcherWidth = catchCurrent.HalfCatcherWidth;
 
             if (lastPlayerPosition == null)
                 lastPlayerPosition = catchCurrent.LastNormalizedPosition;
@@ -41,10 +41,9 @@ namespace osu.Game.Rulesets.Catch.Difficulty.Skills
 
             float distanceMoved = playerPosition - lastPlayerPosition.Value;
 
-            // Reduce speed scaling
-            double weightedStrainTime = catchCurrent.StrainTime + 20;
+            double weightedStrainTime = catchCurrent.StrainTime + 18;
 
-            double distanceAddition = Math.Pow(Math.Abs(distanceMoved), 1.2) / 340;
+            double distanceAddition = (Math.Pow(Math.Abs(distanceMoved), 1.3) / 510);
             double sqrtStrain = Math.Sqrt(weightedStrainTime);
 
             double bonus = 0;
@@ -54,18 +53,14 @@ namespace osu.Game.Rulesets.Catch.Difficulty.Skills
             {
                 if (Math.Abs(lastDistanceMoved) > 0.1 && Math.Sign(distanceMoved) != Math.Sign(lastDistanceMoved))
                 {
-                    double bonusFactor = Math.Min(absolute_player_positioning_error, Math.Abs(distanceMoved)) / absolute_player_positioning_error;
+                    double bonusFactor = Math.Min(halfCatcherWidth, Math.Abs(distanceMoved)) / halfCatcherWidth;
+                    double antiflowFactor = Math.Max(Math.Min(halfCatcherWidth, Math.Abs(lastDistanceMoved)) / halfCatcherWidth, 0.3);
 
-                    distanceAddition += direction_change_bonus / sqrtStrain * bonusFactor;
-
-                    // Direction changes after jumps (antiflow) are harder
-                    double antiflowBonusFactor = Math.Min(Math.Abs(distanceMoved) / 70, 1);
-
-                    distanceAddition += (antiflow_bonus / (catchCurrent.StrainTime / 17.5 + 10)) * (Math.Sqrt(Math.Abs(lastDistanceMoved)) / Math.Sqrt(lastStrainTime + 20)) * antiflowBonusFactor;
+                    distanceAddition += direction_change_bonus / Math.Sqrt(lastStrainTime + 18) * bonusFactor * antiflowFactor * Math.Max(1 - Math.Pow(weightedStrainTime / 1000, 2), 0);
                 }
 
                 // Base bonus for every movement, giving some weight to streams.
-                distanceAddition += 10.0 * Math.Min(Math.Abs(distanceMoved), normalized_hitobject_radius * 2) / (normalized_hitobject_radius * 6) / sqrtStrain;
+                distanceAddition += 12.5 * Math.Min(Math.Abs(distanceMoved), normalized_hitobject_radius * 2) / (normalized_hitobject_radius * 6) / sqrtStrain;
             }
 
             // Bonus for "almost" hyperdashes at corner points
