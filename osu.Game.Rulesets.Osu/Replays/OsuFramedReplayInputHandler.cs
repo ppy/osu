@@ -19,7 +19,7 @@ namespace osu.Game.Rulesets.Osu.Replays
         {
         }
 
-        protected override bool IsImportant(OsuReplayFrame frame) => frame?.Actions.Any() ?? false;
+        protected override bool IsImportant(OsuReplayFrame frame) => frame.Actions.Any();
 
         protected Vector2? Position
         {

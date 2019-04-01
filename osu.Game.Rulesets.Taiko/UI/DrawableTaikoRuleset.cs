@@ -81,7 +81,7 @@ namespace osu.Game.Rulesets.Taiko.UI
 
         public override ScoreProcessor CreateScoreProcessor() => new TaikoScoreProcessor(this);
 
-        protected override PlayfieldAdjustmentContainer CreatePlayfieldAdjustmentContainer() => new TaikoPlayfieldAdjustmentContainer();
+        public override PlayfieldAdjustmentContainer CreatePlayfieldAdjustmentContainer() => new TaikoPlayfieldAdjustmentContainer();
 
         protected override PassThroughInputManager CreateInputManager() => new TaikoInputManager(Ruleset.RulesetInfo);
 
