@@ -68,20 +68,18 @@ namespace osu.Game.Rulesets.Catch.Difficulty.Skills
                 distanceAddition += 10.0 * Math.Min(Math.Abs(distanceMoved), normalized_hitobject_radius * 2) / (normalized_hitobject_radius * 6) / sqrtStrain;
             }
 
-            // Bonus for edge dashes
-            double edgeDashThreshold = 15.5f * ((Math.Min(catchCurrent.StrainTime * catchCurrent.ClockRate, 250) * 0.9 + 25) / 250);
-
-            if (catchCurrent.LastObject.DistanceToHyperDash <= edgeDashThreshold / CatchPlayfield.BASE_WIDTH)
+            // Bonus for "almost" hyperdashes at corner points
+            if (catchCurrent.LastObject.DistanceToHyperDash <= 20.0f / CatchPlayfield.BASE_WIDTH)
             {
                 if (!catchCurrent.LastObject.HyperDash)
-                    bonus += 2.3;
+                    bonus += 5.7;
                 else
                 {
                     // After a hyperdash we ARE in the correct position. Always!
                     playerPosition = catchCurrent.NormalizedPosition;
                 }
 
-                distanceAddition *= 1.0 + bonus * Math.Pow(edgeDashThreshold - catchCurrent.LastObject.DistanceToHyperDash * CatchPlayfield.BASE_WIDTH, 1.6f) / edgeDashThreshold * (Math.Min(catchCurrent.StrainTime * catchCurrent.ClockRate, 265) / 265); // Edge dashes are easier at lower ms values
+                distanceAddition *= 1.0 + bonus * ((20 - catchCurrent.LastObject.DistanceToHyperDash * CatchPlayfield.BASE_WIDTH) / 20) * Math.Pow((Math.Min(catchCurrent.StrainTime, 265) / 265), 1.5);
             }
 
             // Prevent wide dense stacks of notes which fit on the catcher from greatly increasing SR
