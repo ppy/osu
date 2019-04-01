@@ -133,7 +133,7 @@ namespace osu.Game.Rulesets.UI
             return dependencies;
         }
 
-        protected virtual PlayfieldAdjustmentContainer CreatePlayfieldAdjustmentContainer() => new PlayfieldAdjustmentContainer();
+        public virtual PlayfieldAdjustmentContainer CreatePlayfieldAdjustmentContainer() => new PlayfieldAdjustmentContainer();
 
         [BackgroundDependencyLoader]
         private void load(OsuConfigManager config)
