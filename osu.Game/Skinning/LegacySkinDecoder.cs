@@ -16,12 +16,11 @@ namespace osu.Game.Skinning
         {
             line = StripComments(line);
 
+            var pair = SplitKeyVal(line);
+
             switch (section)
             {
                 case Section.General:
-                {
-                    var pair = SplitKeyVal(line);
-
                     switch (pair.Key)
                     {
                         case @"Name":
@@ -36,11 +35,8 @@ namespace osu.Game.Skinning
                     }
 
                     break;
-                }
-                case Section.Fonts:
-                {
-                    var pair = SplitKeyVal(line);
 
+                case Section.Fonts:
                     switch (pair.Key)
                     {
                         case "HitCirclePrefix":
@@ -52,7 +48,6 @@ namespace osu.Game.Skinning
                     }
 
                     break;
-                }
             }
 
             base.ParseLine(skin, section, line);

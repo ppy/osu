@@ -88,6 +88,7 @@ namespace osu.Game.Scoring.Legacy
                             throw new IOException("input .lzma is too short");
 
                         long outSize = 0;
+
                         for (int i = 0; i < 8; i++)
                         {
                             int v = replayInStream.ReadByte();
@@ -144,6 +145,7 @@ namespace osu.Game.Scoring.Legacy
                         score.Rank = ScoreRank.D;
                     break;
                 }
+
                 case 1:
                 {
                     int totalHits = count50 + count100 + count300 + countMiss;
@@ -166,6 +168,7 @@ namespace osu.Game.Scoring.Legacy
                         score.Rank = ScoreRank.D;
                     break;
                 }
+
                 case 2:
                 {
                     int totalHits = count50 + count100 + count300 + countMiss + countKatu;
@@ -185,6 +188,7 @@ namespace osu.Game.Scoring.Legacy
                         score.Rank = ScoreRank.D;
                     break;
                 }
+
                 case 3:
                 {
                     int totalHits = count50 + count100 + count300 + countMiss + countGeki + countKatu;
