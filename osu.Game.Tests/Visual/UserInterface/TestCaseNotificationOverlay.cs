@@ -86,12 +86,15 @@ namespace osu.Game.Tests.Visual.UserInterface
                 case 0:
                     sendHelloNotification();
                     break;
+
                 case 1:
                     sendAmazingNotification();
                     break;
+
                 case 2:
                     sendUploadProgress();
                     break;
+
                 case 3:
                     sendDownloadProgress();
                     break;

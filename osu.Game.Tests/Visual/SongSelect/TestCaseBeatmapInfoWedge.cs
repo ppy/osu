@@ -83,15 +83,19 @@ namespace osu.Game.Tests.Visual.SongSelect
                     case OsuRuleset _:
                         testInfoLabels(5);
                         break;
+
                     case TaikoRuleset _:
                         testInfoLabels(5);
                         break;
+
                     case CatchRuleset _:
                         testInfoLabels(5);
                         break;
+
                     case ManiaRuleset _:
                         testInfoLabels(4);
                         break;
+
                     default:
                         testInfoLabels(2);
                         break;

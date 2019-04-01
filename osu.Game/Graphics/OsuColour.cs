@@ -20,12 +20,14 @@ namespace osu.Game.Graphics
             {
                 default:
                     throw new ArgumentException(@"Invalid hex string length!");
+
                 case 3:
                     return new Color4(
                         (byte)(Convert.ToByte(hex.Substring(0, 1), 16) * 17),
                         (byte)(Convert.ToByte(hex.Substring(1, 1), 16) * 17),
                         (byte)(Convert.ToByte(hex.Substring(2, 1), 16) * 17),
                         255);
+
                 case 6:
                     return new Color4(
                         Convert.ToByte(hex.Substring(0, 2), 16),

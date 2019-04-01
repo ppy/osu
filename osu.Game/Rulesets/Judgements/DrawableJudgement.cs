@@ -89,6 +89,7 @@ namespace osu.Game.Rulesets.Judgements
             {
                 case HitResult.None:
                     break;
+
                 case HitResult.Miss:
                     JudgementBody.ScaleTo(1.6f);
                     JudgementBody.ScaleTo(1, 100, Easing.In);
@@ -98,6 +99,7 @@ namespace osu.Game.Rulesets.Judgements
 
                     this.Delay(600).FadeOut(200);
                     break;
+
                 default:
                     ApplyHitAnimations();
                     break;
@@ -113,13 +115,17 @@ namespace osu.Game.Rulesets.Judgements
                 case HitResult.Perfect:
                 case HitResult.Great:
                     return colours.Blue;
+
                 case HitResult.Ok:
                 case HitResult.Good:
                     return colours.Green;
+
                 case HitResult.Meh:
                     return colours.Yellow;
+
                 case HitResult.Miss:
                     return colours.Red;
+
                 default:
                     return Color4.White;
             }

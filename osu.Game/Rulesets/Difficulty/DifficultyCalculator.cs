@@ -117,10 +117,12 @@ namespace osu.Game.Rulesets.Difficulty
                         yield return new ModNoMod();
 
                         break;
+
                     case 1:
                         yield return currentSet.Single();
 
                         break;
+
                     default:
                         yield return new MultiMod(currentSet.ToArray());
 

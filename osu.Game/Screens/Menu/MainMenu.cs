@@ -79,6 +79,7 @@ namespace osu.Game.Screens.Menu
                     case ButtonSystemState.Exit:
                         Background.FadeColour(Color4.White, 500, Easing.OutSine);
                         break;
+
                     default:
                         Background.FadeColour(OsuColour.Gray(0.8f), 500, Easing.OutSine);
                         break;

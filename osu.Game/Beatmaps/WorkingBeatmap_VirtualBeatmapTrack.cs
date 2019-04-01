@@ -26,9 +26,11 @@ namespace osu.Game.Beatmaps
                     case null:
                         Length = excess_length;
                         break;
+
                     case IHasEndTime endTime:
                         Length = endTime.EndTime + excess_length;
                         break;
+
                     default:
                         Length = lastObject.StartTime + excess_length;
                         break;

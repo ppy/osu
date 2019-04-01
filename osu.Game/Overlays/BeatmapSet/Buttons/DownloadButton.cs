@@ -123,6 +123,7 @@ namespace osu.Game.Overlays.BeatmapSet.Buttons
                             },
                         };
                         break;
+
                     case DownloadState.Downloaded:
                         textSprites.Children = new Drawable[]
                         {
@@ -133,9 +134,11 @@ namespace osu.Game.Overlays.BeatmapSet.Buttons
                             },
                         };
                         break;
+
                     case DownloadState.LocallyAvailable:
                         this.FadeOut(200);
                         break;
+
                     case DownloadState.NotDownloaded:
                         textSprites.Children = new Drawable[]
                         {

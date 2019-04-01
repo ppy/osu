@@ -59,11 +59,13 @@ namespace osu.Game.Rulesets.Osu.Mods
                         circle.FadeOut(fadeOutDuration);
 
                     break;
+
                 case DrawableSlider slider:
                     using (slider.BeginAbsoluteSequence(fadeOutStartTime, true))
                         slider.Body.FadeOut(longFadeDuration, Easing.Out);
 
                     break;
+
                 case DrawableSliderTick sliderTick:
                     // slider ticks fade out over up to one second
                     var tickFadeOutDuration = Math.Min(sliderTick.HitObject.TimePreempt - DrawableSliderTick.ANIM_DURATION, 1000);
@@ -72,6 +74,7 @@ namespace osu.Game.Rulesets.Osu.Mods
                         sliderTick.FadeOut(tickFadeOutDuration);
 
                     break;
+
                 case DrawableSpinner spinner:
                     // hide elements we don't care about.
                     spinner.Disc.Hide();

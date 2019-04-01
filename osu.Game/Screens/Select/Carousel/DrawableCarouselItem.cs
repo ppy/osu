@@ -106,6 +106,7 @@ namespace osu.Game.Screens.Select.Carousel
                 case CarouselItemState.NotSelected:
                     Deselected();
                     break;
+
                 case CarouselItemState.Selected:
                     Selected();
                     break;

@@ -58,6 +58,7 @@ namespace osu.Game.Overlays.Toolbar
                     Text = @"Guest";
                     avatar.User = new User();
                     break;
+
                 case APIState.Online:
                     Text = api.LocalUser.Value.Username;
                     avatar.User = api.LocalUser.Value;

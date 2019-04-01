@@ -58,6 +58,7 @@ namespace osu.Game.Overlays.Chat.Tabs
             {
                 default:
                     return new ChannelTabItem(value) { OnRequestClose = tabCloseRequested };
+
                 case ChannelType.PM:
                     return new PrivateChannelTabItem(value) { OnRequestClose = tabCloseRequested };
             }

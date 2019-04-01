@@ -108,12 +108,14 @@ namespace osu.Game.Screens.Tournament
                         speedTo(1000f, 200);
                         tracker.FadeOut(100);
                         break;
+
                     case ScrollState.Stopping:
                         speedTo(0f, 2000);
                         tracker.FadeIn(200);
 
                         delayedStateChangeDelegate = Scheduler.AddDelayed(() => scrollState = ScrollState.Stopped, 2300);
                         break;
+
                     case ScrollState.Stopped:
                         // Find closest to center
                         if (!Children.Any())
@@ -155,6 +157,7 @@ namespace osu.Game.Screens.Tournament
 
                         delayedStateChangeDelegate = Scheduler.AddDelayed(() => scrollState = ScrollState.Idle, 10000);
                         break;
+
                     case ScrollState.Idle:
                         resetSelected();
 

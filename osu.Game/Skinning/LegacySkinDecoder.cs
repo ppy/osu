@@ -26,9 +26,11 @@ namespace osu.Game.Skinning
                         case @"Name":
                             skin.SkinInfo.Name = pair.Value;
                             break;
+
                         case @"Author":
                             skin.SkinInfo.Creator = pair.Value;
                             break;
+
                         case @"CursorExpand":
                             skin.CursorExpand = pair.Value != "0";
                             break;
@@ -42,6 +44,7 @@ namespace osu.Game.Skinning
                         case "HitCirclePrefix":
                             skin.HitCircleFont = pair.Value;
                             break;
+
                         case "HitCircleOverlap":
                             skin.HitCircleOverlap = int.Parse(pair.Value);
                             break;

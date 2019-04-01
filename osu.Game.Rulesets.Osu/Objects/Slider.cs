@@ -183,6 +183,7 @@ namespace osu.Game.Rulesets.Osu.Objects
                             Samples = sampleList
                         });
                         break;
+
                     case SliderEventType.Head:
                         AddNested(HeadCircle = new SliderCircle
                         {
@@ -194,6 +195,7 @@ namespace osu.Game.Rulesets.Osu.Objects
                             ComboIndex = ComboIndex,
                         });
                         break;
+
                     case SliderEventType.LegacyLastTick:
                         // we need to use the LegacyLastTick here for compatibility reasons (difficulty).
                         // it is *okay* to use this because the TailCircle is not used for any meaningful purpose in gameplay.
@@ -206,6 +208,7 @@ namespace osu.Game.Rulesets.Osu.Objects
                             ComboIndex = ComboIndex,
                         });
                         break;
+
                     case SliderEventType.Repeat:
                         AddNested(new RepeatPoint
                         {
