@@ -140,18 +140,23 @@ namespace osu.Game.Rulesets.Mania.Scoring
                     case HitResult.Miss:
                         Health.Value += hpMissMultiplier * hp_increase_miss;
                         break;
+
                     case HitResult.Meh:
                         Health.Value += hpMultiplier * hp_increase_bad;
                         break;
+
                     case HitResult.Ok:
                         Health.Value += hpMultiplier * hp_increase_ok;
                         break;
+
                     case HitResult.Good:
                         Health.Value += hpMultiplier * hp_increase_good;
                         break;
+
                     case HitResult.Great:
                         Health.Value += hpMultiplier * hp_increase_great;
                         break;
+
                     case HitResult.Perfect:
                         Health.Value += hpMultiplier * hp_increase_perfect;
                         break;

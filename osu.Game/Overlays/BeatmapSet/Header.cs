@@ -225,11 +225,13 @@ namespace osu.Game.Overlays.BeatmapSet
                         RelativeSizeAxes = Axes.Y
                     };
                     break;
+
                 case DownloadState.Downloading:
                 case DownloadState.Downloaded:
                     // temporary to avoid showing two buttons for maps with novideo. will be fixed in new beatmap overlay design.
                     downloadButtonsContainer.Child = new DownloadButton(BeatmapSet.Value);
                     break;
+
                 default:
                     downloadButtonsContainer.Child = new DownloadButton(BeatmapSet.Value);
                     if (BeatmapSet.Value.OnlineInfo.HasVideo)

@@ -87,6 +87,7 @@ namespace osu.Game.Overlays.Settings.Sections.General
                         }
                     };
                     break;
+
                 case APIState.Failing:
                 case APIState.Connecting:
                     LinkFlowContainer linkFlow;
@@ -112,6 +113,7 @@ namespace osu.Game.Overlays.Settings.Sections.General
 
                     linkFlow.AddLink("cancel", api.Logout, string.Empty);
                     break;
+
                 case APIState.Online:
                     Children = new Drawable[]
                     {
@@ -160,14 +162,17 @@ namespace osu.Game.Overlays.Settings.Sections.General
                                 api.LocalUser.Value.Status.Value = new UserStatusOnline();
                                 dropdown.StatusColour = colours.Green;
                                 break;
+
                             case UserAction.DoNotDisturb:
                                 api.LocalUser.Value.Status.Value = new UserStatusDoNotDisturb();
                                 dropdown.StatusColour = colours.Red;
                                 break;
+
                             case UserAction.AppearOffline:
                                 api.LocalUser.Value.Status.Value = new UserStatusOffline();
                                 dropdown.StatusColour = colours.Gray7;
                                 break;
+
                             case UserAction.SignOut:
                                 api.Logout();
                                 break;

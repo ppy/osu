@@ -124,12 +124,15 @@ namespace osu.Game.Tests.Visual.Gameplay
                 case ScrollingDirection.Up:
                     obj.Anchor = Anchor.TopCentre;
                     break;
+
                 case ScrollingDirection.Down:
                     obj.Anchor = Anchor.BottomCentre;
                     break;
+
                 case ScrollingDirection.Left:
                     obj.Anchor = Anchor.CentreLeft;
                     break;
+
                 case ScrollingDirection.Right:
                     obj.Anchor = Anchor.CentreRight;
                     break;
@@ -184,6 +187,7 @@ namespace osu.Game.Tests.Visual.Gameplay
                         RelativeSizeAxes = Axes.X;
                         Height = 2;
                         break;
+
                     case ScrollingDirection.Left:
                     case ScrollingDirection.Right:
                         RelativeSizeAxes = Axes.Y;

@@ -73,10 +73,12 @@ namespace osu.Game.Rulesets.Mods
                     pitch.PitchAdjust /= lastAdjust;
                     pitch.PitchAdjust *= adjust;
                     break;
+
                 case IHasTempoAdjust tempo:
                     tempo.TempoAdjust /= lastAdjust;
                     tempo.TempoAdjust *= adjust;
                     break;
+
                 default:
                     clock.Rate /= lastAdjust;
                     clock.Rate *= adjust;
