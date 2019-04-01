@@ -297,11 +297,6 @@ namespace osu.Game.Rulesets.Osu.Tests
 
         private void performTest(List<ReplayFrame> frames)
         {
-            // Empty frame to be added as a workaround for first frame behavior.
-            // If an input exists on the first frame, the input would apply to the entire intro lead-in
-            // Likely requires some discussion regarding how first frame inputs should be handled.
-            frames.Insert(0, new OsuReplayFrame());
-
             AddStep("load player", () =>
             {
                 Beatmap.Value = new TestWorkingBeatmap(new Beatmap<OsuHitObject>
@@ -330,12 +325,7 @@ namespace osu.Game.Rulesets.Osu.Tests
                     },
                 }, Clock);
 
-                var p = new ScoreAccessibleReplayPlayer(new Score { Replay = new Replay { Frames = frames } })
-                {
-                    AllowPause = false,
-                    AllowLeadIn = false,
-                    AllowResults = false
-                };
+                var p = new ScoreAccessibleReplayPlayer(new Score { Replay = new Replay { Frames = frames } });
 
                 p.OnLoadComplete += _ =>
                 {
@@ -364,7 +354,7 @@ namespace osu.Game.Rulesets.Osu.Tests
             public new ScoreProcessor ScoreProcessor => base.ScoreProcessor;
 
             public ScoreAccessibleReplayPlayer(Score score)
-                : base(score)
+                : base(score, false, false)
             {
             }
         }

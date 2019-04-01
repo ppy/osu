@@ -15,12 +15,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         protected override Player CreatePlayer(Ruleset ruleset)
         {
             Beatmap.Value.Mods.Value = Beatmap.Value.Mods.Value.Concat(new[] { ruleset.GetAutoplayMod() });
-            return new ScoreAccessiblePlayer
-            {
-                AllowPause = false,
-                AllowLeadIn = false,
-                AllowResults = false,
-            };
+            return new ScoreAccessiblePlayer();
         }
 
         protected override void AddCheckSteps()
@@ -33,6 +28,11 @@ namespace osu.Game.Tests.Visual.Gameplay
         {
             public new ScoreProcessor ScoreProcessor => base.ScoreProcessor;
             public new HUDOverlay HUDOverlay => base.HUDOverlay;
+
+            public ScoreAccessiblePlayer()
+                : base(false, false)
+            {
+            }
         }
     }
 }
