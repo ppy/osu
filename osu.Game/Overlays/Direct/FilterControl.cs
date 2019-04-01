@@ -116,5 +116,6 @@ namespace osu.Game.Overlays.Direct
         Ranked,
         Rating,
         Plays,
+        Favourites,
     }
 }
