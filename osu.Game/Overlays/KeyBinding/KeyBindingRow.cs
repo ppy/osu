@@ -43,6 +43,8 @@ namespace osu.Game.Overlays.KeyBinding
             }
         }
 
+        public bool FilteringActive { get; set; }
+
         private OsuSpriteText text;
         private OsuTextFlowContainer pressAKey;
 

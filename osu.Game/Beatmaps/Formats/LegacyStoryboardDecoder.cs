@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
+using System.Linq;
 using osuTK;
 using osuTK.Graphics;
 using osu.Framework.Graphics;
@@ -38,6 +39,10 @@ namespace osu.Game.Beatmaps.Formats
         {
             this.storyboard = storyboard;
             base.ParseStreamInto(stream, storyboard);
+
+            // OrderBy is used to guarantee that the parsing order of elements with equal start times is maintained (stably-sorted)
+            foreach (StoryboardLayer layer in storyboard.Layers)
+                layer.Elements = layer.Elements.OrderBy(h => h.StartTime).ToList();
         }
 
         protected override void ParseLine(Storyboard storyboard, Section section, string line)

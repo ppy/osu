@@ -9,7 +9,6 @@ using osu.Framework.Graphics.Shapes;
 using osu.Framework.MathUtils;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
-using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays.BeatmapSet.Scores;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu;
@@ -44,9 +43,9 @@ namespace osu.Game.Tests.Visual.SongSelect
                 }
             };
 
-            IEnumerable<APIScoreInfo> scores = new[]
+            IEnumerable<ScoreInfo> scores = new[]
             {
-                new APIScoreInfo
+                new ScoreInfo
                 {
                     User = new User
                     {
@@ -69,7 +68,7 @@ namespace osu.Game.Tests.Visual.SongSelect
                     TotalScore = 1234567890,
                     Accuracy = 1,
                 },
-                new APIScoreInfo
+                new ScoreInfo
                 {
                     User = new User
                     {
@@ -91,7 +90,7 @@ namespace osu.Game.Tests.Visual.SongSelect
                     TotalScore = 1234789,
                     Accuracy = 0.9997,
                 },
-                new APIScoreInfo
+                new ScoreInfo
                 {
                     User = new User
                     {
@@ -112,7 +111,7 @@ namespace osu.Game.Tests.Visual.SongSelect
                     TotalScore = 12345678,
                     Accuracy = 0.9854,
                 },
-                new APIScoreInfo
+                new ScoreInfo
                 {
                     User = new User
                     {
@@ -132,7 +131,7 @@ namespace osu.Game.Tests.Visual.SongSelect
                     TotalScore = 1234567,
                     Accuracy = 0.8765,
                 },
-                new APIScoreInfo
+                new ScoreInfo
                 {
                     User = new User
                     {
@@ -157,9 +156,9 @@ namespace osu.Game.Tests.Visual.SongSelect
                 s.Statistics.Add(HitResult.Meh, RNG.Next(2000));
             }
 
-            IEnumerable<APIScoreInfo> anotherScores = new[]
+            IEnumerable<ScoreInfo> anotherScores = new[]
             {
-                new APIScoreInfo
+                new ScoreInfo
                 {
                     User = new User
                     {
@@ -181,7 +180,7 @@ namespace osu.Game.Tests.Visual.SongSelect
                     TotalScore = 1234789,
                     Accuracy = 0.9997,
                 },
-                new APIScoreInfo
+                new ScoreInfo
                 {
                     User = new User
                     {
@@ -204,7 +203,7 @@ namespace osu.Game.Tests.Visual.SongSelect
                     TotalScore = 1234567890,
                     Accuracy = 1,
                 },
-                new APIScoreInfo
+                new ScoreInfo
                 {
                     User = new User
                     {
@@ -220,7 +219,7 @@ namespace osu.Game.Tests.Visual.SongSelect
                     TotalScore = 123456,
                     Accuracy = 0.6543,
                 },
-                new APIScoreInfo
+                new ScoreInfo
                 {
                     User = new User
                     {
@@ -241,7 +240,7 @@ namespace osu.Game.Tests.Visual.SongSelect
                     TotalScore = 12345678,
                     Accuracy = 0.9854,
                 },
-                new APIScoreInfo
+                new ScoreInfo
                 {
                     User = new User
                     {
@@ -269,7 +268,7 @@ namespace osu.Game.Tests.Visual.SongSelect
                 s.Statistics.Add(HitResult.Meh, RNG.Next(2000));
             }
 
-            var topScoreInfo = new APIScoreInfo
+            var topScoreInfo = new ScoreInfo
             {
                 User = new User
                 {
