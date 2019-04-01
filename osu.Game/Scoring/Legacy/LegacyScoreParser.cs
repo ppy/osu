@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using osu.Game.Beatmaps;
@@ -232,7 +233,10 @@ namespace osu.Game.Scoring.Legacy
                 if (diff < 0)
                     continue;
 
-                replay.Frames.Add(convertFrame(new LegacyReplayFrame(lastTime, float.Parse(split[1]), float.Parse(split[2]), (ReplayButtonState)int.Parse(split[3]))));
+                replay.Frames.Add(convertFrame(new LegacyReplayFrame(lastTime,
+                    float.Parse(split[1], CultureInfo.InvariantCulture),
+                    float.Parse(split[2], CultureInfo.InvariantCulture),
+                    (ReplayButtonState)int.Parse(split[3]))));
             }
         }
 
