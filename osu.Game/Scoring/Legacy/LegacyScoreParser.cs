@@ -5,6 +5,7 @@ using System;
 using System.IO;
 using System.Linq;
 using osu.Game.Beatmaps;
+using osu.Game.Beatmaps.Formats;
 using osu.Game.Beatmaps.Legacy;
 using osu.Game.IO.Legacy;
 using osu.Game.Replays;
@@ -224,7 +225,7 @@ namespace osu.Game.Scoring.Legacy
                     continue;
                 }
 
-                var diff = float.Parse(split[0]);
+                var diff = Parsing.ParseFloat(split[0]);
                 lastTime += diff;
 
                 // Todo: At some point we probably want to rewind and play back the negative-time frames
@@ -232,7 +233,10 @@ namespace osu.Game.Scoring.Legacy
                 if (diff < 0)
                     continue;
 
-                replay.Frames.Add(convertFrame(new LegacyReplayFrame(lastTime, float.Parse(split[1]), float.Parse(split[2]), (ReplayButtonState)int.Parse(split[3]))));
+                replay.Frames.Add(convertFrame(new LegacyReplayFrame(lastTime,
+                    Parsing.ParseFloat(split[1], Parsing.MAX_COORDINATE_VALUE),
+                    Parsing.ParseFloat(split[2], Parsing.MAX_COORDINATE_VALUE),
+                    (ReplayButtonState)Parsing.ParseInt(split[3]))));
             }
         }
 
