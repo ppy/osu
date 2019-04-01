@@ -95,12 +95,12 @@ namespace osu.Game.Rulesets.Replays
                 if (!HasFrames || !FrameAccuratePlayback)
                     return false;
 
-                var checkFrame = currentDirection > 0 ? CurrentFrame : NextFrame;
+                var frame = currentDirection > 0 ? CurrentFrame : NextFrame;
 
-                if (checkFrame == null)
+                if (frame == null)
                     return false;
 
-                return IsImportant(currentDirection > 0 ? CurrentFrame : NextFrame) && //a button is in a pressed state
+                return IsImportant(frame) && //a button is in a pressed state
                        Math.Abs(CurrentTime - NextFrame?.Time ?? 0) <= AllowedImportantTimeSpan; //the next frame is within an allowable time span
             }
         }
