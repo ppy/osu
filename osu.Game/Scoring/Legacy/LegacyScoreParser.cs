@@ -145,6 +145,7 @@ namespace osu.Game.Scoring.Legacy
                         score.Rank = ScoreRank.D;
                     break;
                 }
+
                 case 1:
                 {
                     int totalHits = count50 + count100 + count300 + countMiss;
@@ -167,6 +168,7 @@ namespace osu.Game.Scoring.Legacy
                         score.Rank = ScoreRank.D;
                     break;
                 }
+
                 case 2:
                 {
                     int totalHits = count50 + count100 + count300 + countMiss + countKatu;
@@ -186,6 +188,7 @@ namespace osu.Game.Scoring.Legacy
                         score.Rank = ScoreRank.D;
                     break;
                 }
+
                 case 3:
                 {
                     int totalHits = count50 + count100 + count300 + countMiss + countGeki + countKatu;
