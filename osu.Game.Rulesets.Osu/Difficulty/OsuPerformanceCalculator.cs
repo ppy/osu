@@ -30,8 +30,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         private int countMeh;
         private int countMiss;
 
-        private const double miss_decay = 0.97;
-        private const double combo_weight = 0.6;
+        private const double miss_decay = 0.985;
+        private const double combo_weight = 0.5;
 
         public OsuPerformanceCalculator(Ruleset ruleset, WorkingBeatmap beatmap, ScoreInfo score)
             : base(ruleset, beatmap, score)
@@ -162,12 +162,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         {
             var transformed = new List<double>();
 
-            foreach(double strain in strains)
-            {
-                transformed.Add(Math.Pow(5.0f * Math.Max(1.0f, strain / 0.0675f) - 4.0f, 3.0f) / 100000.0f);
-            }
-
-            return transformed;
+            return strains.Select(s => Math.Pow(5.0f * Math.Max(1.0f, s / 0.0675f) - 4.0f, 3.0f) / 100000.0f).ToList();
         }
 
         private double computeAimValue(Dictionary<string, double> categoryRatings = null)
