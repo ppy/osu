@@ -12,7 +12,7 @@ namespace osu.Game.Online.Leaderboards
 
         public MessagePlaceholder(string message)
         {
-            AddIcon(FontAwesome.ExclamationCircle, cp =>
+            AddIcon(FontAwesome.Solid.ExclamationCircle, cp =>
             {
                 cp.Font = cp.Font.With(size: TEXT_SIZE);
                 cp.Padding = new MarginPadding { Right = 10 };

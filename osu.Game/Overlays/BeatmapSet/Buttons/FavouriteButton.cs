@@ -48,7 +48,7 @@ namespace osu.Game.Overlays.BeatmapSet.Buttons
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
-                    Icon = FontAwesome.HeartOutline,
+                    Icon = FontAwesome.Regular.Heart,
                     Size = new Vector2(18),
                     Shadow = false,
                 },
@@ -59,12 +59,12 @@ namespace osu.Game.Overlays.BeatmapSet.Buttons
                 if (favourited.NewValue)
                 {
                     pink.FadeIn(200);
-                    icon.Icon = FontAwesome.Heart;
+                    icon.Icon = FontAwesome.Solid.Heart;
                 }
                 else
                 {
                     pink.FadeOut(200);
-                    icon.Icon = FontAwesome.HeartOutline;
+                    icon.Icon = FontAwesome.Regular.Heart;
                 }
             };
 

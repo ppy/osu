@@ -113,7 +113,7 @@ namespace osu.Game.Screens
                             {
                                 new SpriteIcon
                                 {
-                                    Icon = FontAwesome.UniversalAccess,
+                                    Icon = FontAwesome.Solid.UniversalAccess,
                                     Anchor = Anchor.TopCentre,
                                     Origin = Anchor.TopCentre,
                                     Size = new Vector2(50),
