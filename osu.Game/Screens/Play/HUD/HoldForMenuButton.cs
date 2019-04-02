@@ -129,7 +129,7 @@ namespace osu.Game.Screens.Play.HUD
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
                             Size = new Vector2(15),
-                            Icon = FontAwesome.Close
+                            Icon = FontAwesome.Solid.TimesCircle
                         },
                     }
                 };

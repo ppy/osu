@@ -42,8 +42,6 @@ namespace osu.Game.Graphics
             {
                 case Typeface.Exo:
                     return "Exo2.0";
-                case Typeface.FontAwesome:
-                    return "FontAwesome";
                 case Typeface.Venera:
                     return "Venera";
             }
@@ -101,7 +99,6 @@ namespace osu.Game.Graphics
     public enum Typeface
     {
         Exo,
-        FontAwesome,
         Venera,
     }
 
