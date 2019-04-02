@@ -50,7 +50,7 @@ namespace osu.Game.Overlays.Profile.Header
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
                     RelativeSizeAxes = Axes.Both,
-                    Icon = FontAwesome.Heart,
+                    Icon = FontAwesome.Solid.Heart,
                     Scale = new Vector2(0.45f),
                 }
             };

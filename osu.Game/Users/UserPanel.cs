@@ -166,7 +166,7 @@ namespace osu.Game.Users
                                     {
                                         Anchor = Anchor.CentreLeft,
                                         Origin = Anchor.CentreLeft,
-                                        Icon = FontAwesome.CircleOutline,
+                                        Icon = FontAwesome.Regular.Circle,
                                         Shadow = true,
                                         Size = new Vector2(14),
                                     },

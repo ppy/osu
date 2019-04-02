@@ -580,7 +580,7 @@ namespace osu.Game
                 {
                     Schedule(() => notifications.Post(new SimpleNotification
                     {
-                        Icon = entry.Level == LogLevel.Important ? FontAwesome.ExclamationCircle : FontAwesome.Bomb,
+                        Icon = entry.Level == LogLevel.Important ? FontAwesome.Solid.ExclamationCircle : FontAwesome.Solid.Bomb,
                         Text = entry.Message + (entry.Exception != null && IsDeployedBuild ? "\n\nThis error has been automatically reported to the devs." : string.Empty),
                     }));
                 }
@@ -588,7 +588,7 @@ namespace osu.Game
                 {
                     Schedule(() => notifications.Post(new SimpleNotification
                     {
-                        Icon = FontAwesome.EllipsisH,
+                        Icon = FontAwesome.Solid.EllipsisH,
                         Text = "Subsequent messages have been logged. Click to view log files.",
                         Activated = () =>
                         {

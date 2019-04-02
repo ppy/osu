@@ -141,7 +141,7 @@ namespace osu.Game.Screens.Select.Options
                             Anchor = Anchor.TopCentre,
                             Size = new Vector2(30),
                             Shadow = true,
-                            Icon = FontAwesome.Close,
+                            Icon = FontAwesome.Solid.TimesCircle,
                             Margin = new MarginPadding
                             {
                                 Bottom = 5,

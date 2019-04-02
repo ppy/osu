@@ -14,7 +14,7 @@ namespace osu.Game.Rulesets.Mods
         public override string Name => "Wind Up";
         public override string Acronym => "WU";
         public override string Description => "Can you keep up?";
-        public override IconUsage Icon => FontAwesome.ChevronCircleUp;
+        public override IconUsage Icon => FontAwesome.Solid.ChevronCircleUp;
         public override double ScoreMultiplier => 1.0;
 
         protected override double FinalRateAdjustment => 0.5;

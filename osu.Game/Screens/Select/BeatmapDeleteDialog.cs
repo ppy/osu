@@ -22,7 +22,7 @@ namespace osu.Game.Screens.Select
         {
             BodyText = $@"{beatmap.Metadata?.Artist} - {beatmap.Metadata?.Title}";
 
-            Icon = FontAwesome.TrashOutline;
+            Icon = FontAwesome.Regular.TrashAlt;
             HeaderText = @"Confirm deletion of";
             Buttons = new PopupDialogButton[]
             {

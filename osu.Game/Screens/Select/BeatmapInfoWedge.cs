@@ -293,14 +293,14 @@ namespace osu.Game.Screens.Select
                     labels.Add(new InfoLabel(new BeatmapStatistic
                     {
                         Name = "Length",
-                        Icon = FontAwesome.ClockOutline,
+                        Icon = FontAwesome.Regular.Clock,
                         Content = TimeSpan.FromMilliseconds(endTime - b.HitObjects.First().StartTime).ToString(@"m\:ss"),
                     }));
 
                     labels.Add(new InfoLabel(new BeatmapStatistic
                     {
                         Name = "BPM",
-                        Icon = FontAwesome.Circle,
+                        Icon = FontAwesome.Regular.Circle,
                         Content = getBPMRange(b),
                     }));
 
@@ -378,7 +378,7 @@ namespace osu.Game.Screens.Select
                                     Origin = Anchor.Centre,
                                     RelativeSizeAxes = Axes.Both,
                                     Colour = OsuColour.FromHex(@"441288"),
-                                    Icon = FontAwesome.Square,
+                                    Icon = FontAwesome.Solid.Square,
                                     Rotation = 45,
                                 },
                                 new SpriteIcon

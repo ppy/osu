@@ -10,7 +10,7 @@ namespace osu.Game.Screens.Ranking.Types
 {
     public class ScoreOverviewPageInfo : IResultPageInfo
     {
-        public IconUsage Icon => FontAwesome.Asterisk;
+        public IconUsage Icon => FontAwesome.Solid.Asterisk;
 
         public string Name => "Overview";
         private readonly ScoreInfo score;

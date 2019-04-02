@@ -27,7 +27,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables.Pieces
                 new SpriteIcon
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Icon = FontAwesome.Asterisk,
+                    Icon = FontAwesome.Solid.Asterisk,
                     Shadow = false
                 }
             };

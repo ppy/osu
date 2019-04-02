@@ -77,7 +77,7 @@ namespace osu.Game.Rulesets
 
         public virtual HitObjectComposer CreateHitObjectComposer() => null;
 
-        public virtual Drawable CreateIcon() => new SpriteIcon { Icon = FontAwesome.QuestionCircle };
+        public virtual Drawable CreateIcon() => new SpriteIcon { Icon = FontAwesome.Solid.QuestionCircle };
 
         public abstract string Description { get; }
 
