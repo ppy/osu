@@ -15,13 +15,13 @@ using osu.Framework.Allocation;
 using osu.Game.Overlays.Toolbar;
 using osu.Game.Screens;
 using osu.Game.Screens.Menu;
-using osuTK;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using osu.Framework.Audio;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.IEnumerableExtensions;
+using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Platform;
@@ -61,6 +61,8 @@ namespace osu.Game
         private MusicController musicController;
 
         private NotificationOverlay notifications;
+
+        private LoginOverlay loginOverlay;
 
         private DialogOverlay dialogOverlay;
 
@@ -390,11 +392,9 @@ namespace osu.Game
                         logoContainer = new Container { RelativeSizeAxes = Axes.Both },
                     }
                 },
-                overlayContent = new Container
-                {
-                    RelativeSizeAxes = Axes.Both,
-                },
-                floatingOverlayContent = new Container { RelativeSizeAxes = Axes.Both, Depth = float.MinValue },
+                overlayContent = new Container { RelativeSizeAxes = Axes.Both },
+                floatingOverlayContent = new Container { RelativeSizeAxes = Axes.Both },
+                topMostOverlayContent = new Container { RelativeSizeAxes = Axes.Both },
                 idleTracker = new GameIdleTracker(6000)
             });
 
@@ -414,61 +414,53 @@ namespace osu.Game
 
             loadComponentSingleFile(Toolbar = new Toolbar
             {
-                Depth = -5,
                 OnHome = delegate
                 {
                     CloseAllOverlays(false);
                     menuScreen?.MakeCurrent();
                 },
-            }, floatingOverlayContent.Add);
+            }, topMostOverlayContent.Add);
 
             loadComponentSingleFile(volume = new VolumeOverlay(), floatingOverlayContent.Add);
             loadComponentSingleFile(onscreenDisplay = new OnScreenDisplay(), Add);
 
-            loadComponentSingleFile(screenshotManager, Add);
-
-            //overlay elements
-            loadComponentSingleFile(direct = new DirectOverlay { Depth = -1 }, overlayContent.Add);
-            loadComponentSingleFile(social = new SocialOverlay { Depth = -1 }, overlayContent.Add);
-            loadComponentSingleFile(channelManager = new ChannelManager(), AddInternal);
-            loadComponentSingleFile(chatOverlay = new ChatOverlay { Depth = -1 }, overlayContent.Add);
-            loadComponentSingleFile(settings = new MainSettings
+            loadComponentSingleFile(loginOverlay = new LoginOverlay
             {
                 GetToolbarHeight = () => ToolbarOffset,
-                Depth = -1
-            }, floatingOverlayContent.Add);
-            loadComponentSingleFile(userProfile = new UserProfileOverlay { Depth = -2 }, overlayContent.Add);
-            loadComponentSingleFile(beatmapSetOverlay = new BeatmapSetOverlay { Depth = -3 }, overlayContent.Add);
-            loadComponentSingleFile(musicController = new MusicController
-            {
-                Depth = -5,
-                Position = new Vector2(0, Toolbar.HEIGHT),
                 Anchor = Anchor.TopRight,
                 Origin = Anchor.TopRight,
             }, floatingOverlayContent.Add);
+
+            loadComponentSingleFile(screenshotManager, Add);
+
+            //overlay elements
+            loadComponentSingleFile(direct = new DirectOverlay(), overlayContent.Add);
+            loadComponentSingleFile(social = new SocialOverlay(), overlayContent.Add);
+            loadComponentSingleFile(channelManager = new ChannelManager(), AddInternal);
+            loadComponentSingleFile(chatOverlay = new ChatOverlay(), overlayContent.Add);
+            loadComponentSingleFile(settings = new MainSettings { GetToolbarHeight = () => ToolbarOffset }, floatingOverlayContent.Add);
+            loadComponentSingleFile(userProfile = new UserProfileOverlay(), overlayContent.Add);
+            loadComponentSingleFile(beatmapSetOverlay = new BeatmapSetOverlay(), overlayContent.Add);
 
             loadComponentSingleFile(notifications = new NotificationOverlay
             {
                 GetToolbarHeight = () => ToolbarOffset,
-                Depth = -4,
                 Anchor = Anchor.TopRight,
                 Origin = Anchor.TopRight,
             }, floatingOverlayContent.Add);
 
-            loadComponentSingleFile(accountCreation = new AccountCreationOverlay
+            loadComponentSingleFile(musicController = new MusicController
             {
-                Depth = -6,
+                GetToolbarHeight = () => ToolbarOffset,
+                Anchor = Anchor.TopRight,
+                Origin = Anchor.TopRight,
             }, floatingOverlayContent.Add);
 
-            loadComponentSingleFile(dialogOverlay = new DialogOverlay
-            {
-                Depth = -7,
-            }, floatingOverlayContent.Add);
+            loadComponentSingleFile(accountCreation = new AccountCreationOverlay(), topMostOverlayContent.Add);
 
-            loadComponentSingleFile(externalLinkOpener = new ExternalLinkOpener
-            {
-                Depth = -8,
-            }, floatingOverlayContent.Add);
+            loadComponentSingleFile(dialogOverlay = new DialogOverlay(), topMostOverlayContent.Add);
+
+            loadComponentSingleFile(externalLinkOpener = new ExternalLinkOpener(), topMostOverlayContent.Add);
 
             dependencies.CacheAs(idleTracker);
             dependencies.Cache(settings);
@@ -481,6 +473,7 @@ namespace osu.Game
             dependencies.Cache(musicController);
             dependencies.Cache(beatmapSetOverlay);
             dependencies.Cache(notifications);
+            dependencies.Cache(loginOverlay);
             dependencies.Cache(dialogOverlay);
             dependencies.Cache(accountCreation);
 
@@ -587,7 +580,7 @@ namespace osu.Game
                 {
                     Schedule(() => notifications.Post(new SimpleNotification
                     {
-                        Icon = entry.Level == LogLevel.Important ? FontAwesome.fa_exclamation_circle : FontAwesome.fa_bomb,
+                        Icon = entry.Level == LogLevel.Important ? FontAwesome.ExclamationCircle : FontAwesome.Bomb,
                         Text = entry.Message + (entry.Exception != null && IsDeployedBuild ? "\n\nThis error has been automatically reported to the devs." : string.Empty),
                     }));
                 }
@@ -595,7 +588,7 @@ namespace osu.Game
                 {
                     Schedule(() => notifications.Post(new SimpleNotification
                     {
-                        Icon = FontAwesome.fa_ellipsis_h,
+                        Icon = FontAwesome.EllipsisH,
                         Text = "Subsequent messages have been logged. Click to view log files.",
                         Activated = () =>
                         {
@@ -713,6 +706,8 @@ namespace osu.Game
         private Container overlayContent;
 
         private Container floatingOverlayContent;
+
+        private Container topMostOverlayContent;
 
         private FrameworkConfigManager frameworkConfig;
         private ScalingContainer screenContainer;

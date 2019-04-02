@@ -55,7 +55,7 @@ namespace osu.Game.Configuration
 
             // Input
             Set(OsuSetting.MenuCursorSize, 1.0, 0.5f, 2, 0.01);
-            Set(OsuSetting.GameplayCursorSize, 1.0, 0.5f, 2, 0.01);
+            Set(OsuSetting.GameplayCursorSize, 1.0, 0.1f, 2, 0.01);
             Set(OsuSetting.AutoCursorSize, false);
 
             Set(OsuSetting.MouseDisableButtons, false);

@@ -54,7 +54,7 @@ namespace osu.Game.Screens.Menu
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
-                    Icon = FontAwesome.fa_warning,
+                    Icon = FontAwesome.Warning,
                     Size = new Vector2(icon_size),
                     Y = icon_y,
                 },
@@ -128,7 +128,7 @@ namespace osu.Game.Screens.Menu
                     supportFlow.AddText(" to help support the game", format);
                 }
 
-                heart = supportFlow.AddIcon(FontAwesome.fa_heart, t =>
+                heart = supportFlow.AddIcon(FontAwesome.Heart, t =>
                 {
                     t.Padding = new MarginPadding { Left = 5 };
                     t.Font = t.Font.With(size: 12);
