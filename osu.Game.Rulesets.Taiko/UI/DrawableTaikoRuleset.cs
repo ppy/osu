@@ -81,11 +81,13 @@ namespace osu.Game.Rulesets.Taiko.UI
 
         public override ScoreProcessor CreateScoreProcessor() => new TaikoScoreProcessor(this);
 
+        public override PlayfieldAdjustmentContainer CreatePlayfieldAdjustmentContainer() => new TaikoPlayfieldAdjustmentContainer();
+
         protected override PassThroughInputManager CreateInputManager() => new TaikoInputManager(Ruleset.RulesetInfo);
 
         protected override Playfield CreatePlayfield() => new TaikoPlayfield(Beatmap.ControlPointInfo);
 
-        public override DrawableHitObject<TaikoHitObject> GetVisualRepresentation(TaikoHitObject h)
+        public override DrawableHitObject<TaikoHitObject> CreateDrawableRepresentation(TaikoHitObject h)
         {
             switch (h)
             {

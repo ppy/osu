@@ -6,7 +6,6 @@ using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.IEnumerableExtensions;
-using osu.Framework.Graphics;
 using osu.Framework.Input;
 using osu.Framework.MathUtils;
 using osu.Game.Beatmaps;
@@ -89,11 +88,9 @@ namespace osu.Game.Rulesets.Mania.UI
         /// <returns>The column which intersects with <paramref name="screenSpacePosition"/>.</returns>
         public Column GetColumnByPosition(Vector2 screenSpacePosition) => Playfield.GetColumnByPosition(screenSpacePosition);
 
-        protected override Playfield CreatePlayfield() => new ManiaPlayfield(Beatmap.Stages)
-        {
-            Anchor = Anchor.Centre,
-            Origin = Anchor.Centre,
-        };
+        public override PlayfieldAdjustmentContainer CreatePlayfieldAdjustmentContainer() => new ManiaPlayfieldAdjustmentContainer();
+
+        protected override Playfield CreatePlayfield() => new ManiaPlayfield(Beatmap.Stages);
 
         public override ScoreProcessor CreateScoreProcessor() => new ManiaScoreProcessor(this);
 
@@ -101,7 +98,7 @@ namespace osu.Game.Rulesets.Mania.UI
 
         protected override PassThroughInputManager CreateInputManager() => new ManiaInputManager(Ruleset.RulesetInfo, Variant);
 
-        public override DrawableHitObject<ManiaHitObject> GetVisualRepresentation(ManiaHitObject h)
+        public override DrawableHitObject<ManiaHitObject> CreateDrawableRepresentation(ManiaHitObject h)
         {
             switch (h)
             {

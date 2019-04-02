@@ -34,11 +34,15 @@ namespace osu.Game.Rulesets.UI
 
         protected readonly KeyBindingContainer<T> KeyBindingContainer;
 
-        protected override Container<Drawable> Content => KeyBindingContainer;
+        protected override Container<Drawable> Content => content;
+
+        private readonly Container content;
 
         protected RulesetInputManager(RulesetInfo ruleset, int variant, SimultaneousBindingMode unique)
         {
-            InternalChild = KeyBindingContainer = CreateKeyBindingContainer(ruleset, variant, unique);
+            InternalChild = KeyBindingContainer =
+                CreateKeyBindingContainer(ruleset, variant, unique)
+                    .WithChild(content = new Container { RelativeSizeAxes = Axes.Both });
         }
 
         [BackgroundDependencyLoader(true)]
@@ -115,18 +119,19 @@ namespace osu.Game.Rulesets.UI
 
         #region Key Counter Attachment
 
-        public void Attach(KeyCounterCollection keyCounter)
+        public void Attach(KeyCounterDisplay keyCounter)
         {
             var receptor = new ActionReceptor(keyCounter);
-            Add(receptor);
-            keyCounter.SetReceptor(receptor);
 
+            KeyBindingContainer.Add(receptor);
+
+            keyCounter.SetReceptor(receptor);
             keyCounter.AddRange(KeyBindingContainer.DefaultKeyBindings.Select(b => b.GetAction<T>()).Distinct().Select(b => new KeyCounterAction<T>(b)));
         }
 
-        public class ActionReceptor : KeyCounterCollection.Receptor, IKeyBindingHandler<T>
+        public class ActionReceptor : KeyCounterDisplay.Receptor, IKeyBindingHandler<T>
         {
-            public ActionReceptor(KeyCounterCollection target)
+            public ActionReceptor(KeyCounterDisplay target)
                 : base(target)
             {
             }
@@ -159,12 +164,12 @@ namespace osu.Game.Rulesets.UI
     }
 
     /// <summary>
-    /// Supports attaching a <see cref="KeyCounterCollection"/>.
+    /// Supports attaching a <see cref="KeyCounterDisplay"/>.
     /// Keys will be populated automatically and a receptor will be injected inside.
     /// </summary>
     public interface ICanAttachKeyCounter
     {
-        void Attach(KeyCounterCollection keyCounter);
+        void Attach(KeyCounterDisplay keyCounter);
     }
 
     public class RulesetInputManagerInputState<T> : InputState

@@ -18,6 +18,8 @@ namespace osu.Game.Rulesets.Edit
         /// </summary>
         public abstract Playfield Playfield { get; }
 
+        public abstract PlayfieldAdjustmentContainer CreatePlayfieldAdjustmentContainer();
+
         internal DrawableEditRuleset()
         {
             RelativeSizeAxes = Axes.Both;
@@ -42,6 +44,8 @@ namespace osu.Game.Rulesets.Edit
         where TObject : HitObject
     {
         public override Playfield Playfield => drawableRuleset.Playfield;
+
+        public override PlayfieldAdjustmentContainer CreatePlayfieldAdjustmentContainer() => drawableRuleset.CreatePlayfieldAdjustmentContainer();
 
         private Ruleset ruleset => drawableRuleset.Ruleset;
         private Beatmap<TObject> beatmap => drawableRuleset.Beatmap;
@@ -73,7 +77,7 @@ namespace osu.Game.Rulesets.Edit
             processor?.PostProcess();
 
             // Add visual representation
-            var drawableObject = drawableRuleset.GetVisualRepresentation(tObject);
+            var drawableObject = drawableRuleset.CreateDrawableRepresentation(tObject);
 
             drawableRuleset.Playfield.Add(drawableObject);
             drawableRuleset.Playfield.PostProcess();

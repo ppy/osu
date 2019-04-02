@@ -29,28 +29,28 @@ namespace osu.Game.Tests.Beatmaps.Formats
 
                 StoryboardLayer background = storyboard.Layers.FirstOrDefault(l => l.Depth == 3);
                 Assert.IsNotNull(background);
-                Assert.AreEqual(16, background.Elements.Count());
+                Assert.AreEqual(16, background.Elements.Count);
                 Assert.IsTrue(background.EnabledWhenFailing);
                 Assert.IsTrue(background.EnabledWhenPassing);
                 Assert.AreEqual("Background", background.Name);
 
                 StoryboardLayer fail = storyboard.Layers.FirstOrDefault(l => l.Depth == 2);
                 Assert.IsNotNull(fail);
-                Assert.AreEqual(0, fail.Elements.Count());
+                Assert.AreEqual(0, fail.Elements.Count);
                 Assert.IsTrue(fail.EnabledWhenFailing);
                 Assert.IsFalse(fail.EnabledWhenPassing);
                 Assert.AreEqual("Fail", fail.Name);
 
                 StoryboardLayer pass = storyboard.Layers.FirstOrDefault(l => l.Depth == 1);
                 Assert.IsNotNull(pass);
-                Assert.AreEqual(0, pass.Elements.Count());
+                Assert.AreEqual(0, pass.Elements.Count);
                 Assert.IsFalse(pass.EnabledWhenFailing);
                 Assert.IsTrue(pass.EnabledWhenPassing);
                 Assert.AreEqual("Pass", pass.Name);
 
                 StoryboardLayer foreground = storyboard.Layers.FirstOrDefault(l => l.Depth == 0);
                 Assert.IsNotNull(foreground);
-                Assert.AreEqual(151, foreground.Elements.Count());
+                Assert.AreEqual(151, foreground.Elements.Count);
                 Assert.IsTrue(foreground.EnabledWhenFailing);
                 Assert.IsTrue(foreground.EnabledWhenPassing);
                 Assert.AreEqual("Foreground", foreground.Name);
@@ -62,7 +62,7 @@ namespace osu.Game.Tests.Beatmaps.Formats
                 Assert.AreEqual(15, spriteCount);
                 Assert.AreEqual(1, animationCount);
                 Assert.AreEqual(0, sampleCount);
-                Assert.AreEqual(background.Elements.Count(), spriteCount + animationCount + sampleCount);
+                Assert.AreEqual(background.Elements.Count, spriteCount + animationCount + sampleCount);
 
                 var sprite = background.Elements.ElementAt(0) as StoryboardSprite;
                 Assert.NotNull(sprite);
@@ -70,9 +70,9 @@ namespace osu.Game.Tests.Beatmaps.Formats
                 Assert.AreEqual(new Vector2(320, 240), sprite.InitialPosition);
                 Assert.IsTrue(sprite.IsDrawable);
                 Assert.AreEqual(Anchor.Centre, sprite.Origin);
-                Assert.AreEqual("SB/lyric/ja-21.png", sprite.Path);
+                Assert.AreEqual("SB/black.jpg", sprite.Path);
 
-                var animation = background.Elements.ElementAt(12) as StoryboardAnimation;
+                var animation = background.Elements.OfType<StoryboardAnimation>().First();
                 Assert.NotNull(animation);
                 Assert.AreEqual(141175, animation.EndTime);
                 Assert.AreEqual(10, animation.FrameCount);

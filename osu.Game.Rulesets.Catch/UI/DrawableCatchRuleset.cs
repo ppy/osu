@@ -34,11 +34,13 @@ namespace osu.Game.Rulesets.Catch.UI
 
         protected override ReplayInputHandler CreateReplayInputHandler(Replay replay) => new CatchFramedReplayInputHandler(replay);
 
-        protected override Playfield CreatePlayfield() => new CatchPlayfield(Beatmap.BeatmapInfo.BaseDifficulty, GetVisualRepresentation);
+        protected override Playfield CreatePlayfield() => new CatchPlayfield(Beatmap.BeatmapInfo.BaseDifficulty, CreateDrawableRepresentation);
+
+        public override PlayfieldAdjustmentContainer CreatePlayfieldAdjustmentContainer() => new CatchPlayfieldAdjustmentContainer();
 
         protected override PassThroughInputManager CreateInputManager() => new CatchInputManager(Ruleset.RulesetInfo);
 
-        public override DrawableHitObject<CatchHitObject> GetVisualRepresentation(CatchHitObject h)
+        public override DrawableHitObject<CatchHitObject> CreateDrawableRepresentation(CatchHitObject h)
         {
             switch (h)
             {
@@ -47,9 +49,9 @@ namespace osu.Game.Rulesets.Catch.UI
                 case Fruit fruit:
                     return new DrawableFruit(fruit);
                 case JuiceStream stream:
-                    return new DrawableJuiceStream(stream, GetVisualRepresentation);
+                    return new DrawableJuiceStream(stream, CreateDrawableRepresentation);
                 case BananaShower shower:
-                    return new DrawableBananaShower(shower, GetVisualRepresentation);
+                    return new DrawableBananaShower(shower, CreateDrawableRepresentation);
                 case TinyDroplet tiny:
                     return new DrawableTinyDroplet(tiny);
                 case Droplet droplet:

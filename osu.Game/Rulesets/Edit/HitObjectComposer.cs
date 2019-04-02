@@ -63,10 +63,10 @@ namespace osu.Game.Rulesets.Edit
                 return;
             }
 
-            var layerBelowRuleset = CreateLayerContainer();
+            var layerBelowRuleset = DrawableRuleset.CreatePlayfieldAdjustmentContainer();
             layerBelowRuleset.Child = new EditorPlayfieldBorder { RelativeSizeAxes = Axes.Both };
 
-            var layerAboveRuleset = CreateLayerContainer();
+            var layerAboveRuleset = DrawableRuleset.CreatePlayfieldAdjustmentContainer();
             layerAboveRuleset.Child = blueprintContainer = new BlueprintContainer();
 
             layerContainers.Add(layerBelowRuleset);
@@ -174,11 +174,6 @@ namespace osu.Game.Rulesets.Edit
         /// Creates a <see cref="SelectionHandler"/> which outlines <see cref="DrawableHitObject"/>s and handles movement of selections.
         /// </summary>
         public virtual SelectionHandler CreateSelectionHandler() => new SelectionHandler();
-
-        /// <summary>
-        /// Creates a <see cref="ScalableContainer"/> which provides a layer above or below the <see cref="Playfield"/>.
-        /// </summary>
-        protected virtual Container CreateLayerContainer() => new Container { RelativeSizeAxes = Axes.Both };
     }
 
     public abstract class HitObjectComposer<TObject> : HitObjectComposer
