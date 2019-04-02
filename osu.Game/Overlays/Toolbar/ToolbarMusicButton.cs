@@ -10,7 +10,7 @@ namespace osu.Game.Overlays.Toolbar
     {
         public ToolbarMusicButton()
         {
-            Icon = FontAwesome.Music;
+            Icon = FontAwesome.Solid.Music;
         }
 
         [BackgroundDependencyLoader(true)]
