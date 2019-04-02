@@ -12,6 +12,7 @@ using osu.Game.Graphics.Containers;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Framework.Audio.Track;
 using System;
+using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Events;
 
