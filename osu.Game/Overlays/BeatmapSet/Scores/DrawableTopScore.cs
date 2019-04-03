@@ -12,13 +12,15 @@ using osu.Framework.Input.Events;
 using osu.Game.Graphics;
 using osu.Game.Online.Leaderboards;
 using osu.Game.Rulesets.Mods;
-using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.UI;
 using osu.Game.Scoring;
 using osu.Game.Users;
 using osuTK;
 using osuTK.Graphics;
 using System.Collections.Generic;
+using System.Linq;
+using osu.Framework.Extensions;
+using osu.Framework.Localisation;
 using osu.Game.Graphics.Sprites;
 
 namespace osu.Game.Overlays.BeatmapSet.Scores
@@ -26,7 +28,6 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
     public class DrawableTopScore : Container
     {
         private const float fade_duration = 100;
-        private const float height = 100;
         private const float avatar_size = 80;
         private const float margin = 10;
 
@@ -34,6 +35,9 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
 
         private Color4 backgroundIdleColour => colours.Gray3;
         private Color4 backgroundHoveredColour => colours.Gray4;
+
+        private readonly FontUsage smallStatisticsFont = OsuFont.GetFont(size: 20);
+        private readonly FontUsage largeStatisticsFont = OsuFont.GetFont(size: 25);
 
         private readonly Box background;
         private readonly UpdateableAvatar avatar;
@@ -43,14 +47,12 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
         private readonly SpriteText date;
         private readonly DrawableRank rank;
 
-        private readonly SpriteText totalScoreText;
-        private readonly SpriteText accuracyText;
-        private readonly SpriteText maxComboText;
-        private readonly SpriteText hitGreatText;
-        private readonly SpriteText hitGoodText;
-        private readonly SpriteText hitMehText;
-        private readonly SpriteText hitMissText;
-        private readonly SpriteText ppText;
+        private readonly FillFlowContainer<InfoColumn> statisticsContainer;
+
+        private readonly TextColumn totalScoreColumn;
+        private readonly TextColumn accuracyColumn;
+        private readonly TextColumn maxComboColumn;
+        private readonly TextColumn ppColumn;
 
         private readonly ModsInfoColumn modsInfo;
 
@@ -71,15 +73,12 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                 date.Text = $@"achieved {score.Date.Humanize()}";
                 rank.UpdateRank(score.Rank);
 
-                totalScoreText.Text = $@"{score.TotalScore:N0}";
-                accuracyText.Text = $@"{score.Accuracy:P2}";
-                maxComboText.Text = $@"{score.MaxCombo:N0}x";
+                totalScoreColumn.Text = $@"{score.TotalScore:N0}";
+                accuracyColumn.Text = $@"{score.Accuracy:P2}";
+                maxComboColumn.Text = $@"{score.MaxCombo:N0}x";
+                ppColumn.Text = $@"{score.PP:N0}";
 
-                hitGreatText.Text = $"{score.Statistics[HitResult.Great]}";
-                hitGoodText.Text = $"{score.Statistics[HitResult.Good]}";
-                hitMehText.Text = $"{score.Statistics[HitResult.Meh]}";
-                hitMissText.Text = $"{score.Statistics[HitResult.Miss]}";
-                ppText.Text = $@"{score.PP:N0}";
+                statisticsContainer.ChildrenEnumerable = score.Statistics.Select(kvp => new TextColumn(kvp.Key.GetDescription(), smallStatisticsFont) { Text = kvp.Value.ToString() });
 
                 modsInfo.Mods = score.Mods;
             }
@@ -99,9 +98,6 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                 Radius = 1,
                 Offset = new Vector2(0, 1),
             };
-
-            var smallFont = OsuFont.GetFont(size: 20);
-            var largeFont = OsuFont.GetFont(size: 25);
 
             Children = new Drawable[]
             {
@@ -209,11 +205,13 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                                         Spacing = new Vector2(margin, 0),
                                         Children = new Drawable[]
                                         {
-                                            new InfoColumn("300", hitGreatText = new OsuSpriteText { Font = smallFont }),
-                                            new InfoColumn("100", hitGoodText = new OsuSpriteText { Font = smallFont }),
-                                            new InfoColumn("50", hitMehText = new OsuSpriteText { Font = smallFont }),
-                                            new InfoColumn("misses", hitMissText = new OsuSpriteText { Font = smallFont }),
-                                            new InfoColumn("pp", ppText = new OsuSpriteText { Font = smallFont }),
+                                            statisticsContainer = new FillFlowContainer<InfoColumn>
+                                            {
+                                                AutoSizeAxes = Axes.Both,
+                                                Direction = FillDirection.Horizontal,
+                                                Spacing = new Vector2(margin, 0),
+                                            },
+                                            ppColumn = new TextColumn("pp", smallStatisticsFont),
                                             modsInfo = new ModsInfoColumn(),
                                         }
                                     },
@@ -226,9 +224,9 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                                         Spacing = new Vector2(margin, 0),
                                         Children = new Drawable[]
                                         {
-                                            new InfoColumn("total score", totalScoreText = new OsuSpriteText { Font = largeFont }),
-                                            new InfoColumn("accuracy", accuracyText = new OsuSpriteText { Font = largeFont }),
-                                            new InfoColumn("max combo", maxComboText = new OsuSpriteText { Font = largeFont })
+                                            totalScoreColumn = new TextColumn("total score", largeStatisticsFont),
+                                            accuracyColumn = new TextColumn("accuracy", largeStatisticsFont),
+                                            maxComboColumn = new TextColumn("max combo", largeStatisticsFont)
                                         }
                                     },
                                 }
@@ -352,6 +350,28 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
             private void load(OsuColour colours)
             {
                 separator.Colour = colours.Gray5;
+            }
+        }
+
+        private class TextColumn : InfoColumn
+        {
+            private readonly SpriteText text;
+
+            public TextColumn(string title, FontUsage font)
+                : this(title, new OsuSpriteText { Font = font })
+            {
+            }
+
+            private TextColumn(string title, SpriteText text)
+                : base(title, text)
+            {
+                this.text = text;
+            }
+
+            public LocalisedString Text
+            {
+                get => text.Text;
+                set => text.Text = value;
             }
         }
 
