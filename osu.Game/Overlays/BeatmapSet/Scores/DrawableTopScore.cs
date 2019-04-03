@@ -65,6 +65,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                                         Anchor = Anchor.CentreLeft,
                                         Origin = Anchor.CentreLeft,
                                     },
+                                    null,
                                     statisticsSection = new TopScoreStatisticsSection
                                     {
                                         Anchor = Anchor.CentreRight,
@@ -72,7 +73,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                                     }
                                 },
                             },
-                            ColumnDimensions = new[] { new Dimension(GridSizeMode.AutoSize) },
+                            ColumnDimensions = new[] { new Dimension(GridSizeMode.AutoSize), new Dimension(GridSizeMode.Absolute, 20) },
                             RowDimensions = new[] { new Dimension(GridSizeMode.AutoSize) },
                         }
                     }
