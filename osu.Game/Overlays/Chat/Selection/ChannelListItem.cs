@@ -74,7 +74,7 @@ namespace osu.Game.Overlays.Chat.Selection
                                 {
                                     Anchor = Anchor.TopRight,
                                     Origin = Anchor.TopRight,
-                                    Icon = FontAwesome.CheckCircle,
+                                    Icon = FontAwesome.Solid.CheckCircle,
                                     Size = new Vector2(text_size),
                                     Shadow = false,
                                     Margin = new MarginPadding { Right = 10f },
@@ -121,7 +121,7 @@ namespace osu.Game.Overlays.Chat.Selection
                             {
                                 new SpriteIcon
                                 {
-                                    Icon = FontAwesome.User,
+                                    Icon = FontAwesome.Solid.User,
                                     Size = new Vector2(text_size - 2),
                                     Shadow = false,
                                     Margin = new MarginPadding { Top = 1 },

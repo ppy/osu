@@ -258,8 +258,8 @@ namespace osu.Game.Online.Leaderboards
 
         protected virtual IEnumerable<LeaderboardScoreStatistic> GetStatistics(ScoreInfo model) => new[]
         {
-            new LeaderboardScoreStatistic(FontAwesome.Link, "Max Combo", model.MaxCombo.ToString()),
-            new LeaderboardScoreStatistic(FontAwesome.Crosshairs, "Accuracy", string.Format(model.Accuracy % 1 == 0 ? @"{0:P0}" : @"{0:P2}", model.Accuracy))
+            new LeaderboardScoreStatistic(FontAwesome.Solid.Link, "Max Combo", model.MaxCombo.ToString()),
+            new LeaderboardScoreStatistic(FontAwesome.Solid.Crosshairs, "Accuracy", string.Format(model.Accuracy % 1 == 0 ? @"{0:P0}" : @"{0:P2}", model.Accuracy))
         };
 
         protected override bool OnHover(HoverEvent e)
@@ -353,7 +353,7 @@ namespace osu.Game.Online.Leaderboards
                                     Size = new Vector2(icon_size),
                                     Rotation = 45,
                                     Colour = OsuColour.FromHex(@"3087ac"),
-                                    Icon = FontAwesome.Square,
+                                    Icon = FontAwesome.Solid.Square,
                                     Shadow = true,
                                 },
                                 new SpriteIcon

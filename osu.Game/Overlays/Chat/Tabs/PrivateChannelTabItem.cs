@@ -21,7 +21,7 @@ namespace osu.Game.Overlays.Chat.Tabs
         private readonly OsuSpriteText username;
         private readonly Avatar avatarContainer;
 
-        protected override IconUsage DisplayIcon => FontAwesome.At;
+        protected override IconUsage DisplayIcon => FontAwesome.Solid.At;
 
         public PrivateChannelTabItem(Channel value)
             : base(value)
