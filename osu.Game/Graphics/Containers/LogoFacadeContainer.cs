@@ -43,7 +43,7 @@ namespace osu.Game.Graphics.Containers
         /// <param name="facadeScale">The scale of the facade. Does not actually affect the logo itself.</param>
         /// <param name="duration">The duration of the initial transform. Default is instant.</param>
         /// <param name="easing">The easing type of the initial transform.</param>
-        public void SetLogo(OsuLogo logo, float facadeScale, double duration = 0, Easing easing = Easing.None)
+        public void SetLogo(OsuLogo logo, float facadeScale = 1.0f, double duration = 0, Easing easing = Easing.None)
         {
             this.logo = logo ?? throw new ArgumentNullException(nameof(logo));
             this.facadeScale = facadeScale;
@@ -54,11 +54,19 @@ namespace osu.Game.Graphics.Containers
             startPosition = null;
         }
 
-        private Vector2 logoTrackingPosition => logo.Parent.ToLocalSpace(LogoFacade.ScreenSpaceDrawQuad.Centre);
-
-        protected override void UpdateAfterChildren()
+        private Vector2 localSpaceConversion()
         {
-            base.UpdateAfterChildren();
+            Vector2 local;
+            local.X = logo.Parent.ToLocalSpace(LogoFacade.ScreenSpaceDrawQuad.Centre).X / logo.Parent.RelativeToAbsoluteFactor.X;
+            local.Y = logo.Parent.ToLocalSpace(LogoFacade.ScreenSpaceDrawQuad.Centre).Y / logo.Parent.RelativeToAbsoluteFactor.Y;
+            return local;
+        }
+
+        private Vector2 logoTrackingPosition => logo.RelativePositionAxes == Axes.None ? logo.Parent.ToLocalSpace(LogoFacade.ScreenSpaceDrawQuad.Centre) : localSpaceConversion();
+
+        protected override void Update()
+        {
+            base.Update();
 
             if (logo == null || !Tracking)
                 return;
@@ -68,9 +76,6 @@ namespace osu.Game.Graphics.Containers
 
             if (LogoFacade.Parent != null && logo.Position != logoTrackingPosition)
             {
-                // Required for the correct position of the logo to be set with respect to logoTrackingPosition
-                logo.RelativePositionAxes = Axes.None;
-
                 // If this is our first update since tracking has started, initialize our starting values for interpolation
                 if (startTime == null || startPosition == null)
                 {

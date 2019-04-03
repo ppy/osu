@@ -290,6 +290,7 @@ namespace osu.Game.Screens.Menu
                             break;
                         case ButtonSystemState.Initial:
                             logo.ClearTransforms(targetMember: nameof(Position));
+                            logo.RelativePositionAxes = Axes.None;
 
                             bool impact = logo.Scale.X > 0.6f;
 
@@ -310,6 +311,7 @@ namespace osu.Game.Screens.Menu
                             break;
                         default:
                             logo.ClearTransforms(targetMember: nameof(Position));
+                            logo.RelativePositionAxes = Axes.None;
                             logoFacadeContainer.Tracking = true;
                             logo.ScaleTo(0.5f, 200, Easing.OutQuint);
                             break;
