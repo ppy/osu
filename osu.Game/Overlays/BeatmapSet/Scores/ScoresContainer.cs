@@ -83,9 +83,9 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
         }
 
         private GetScoresRequest getScoresRequest;
-        private IEnumerable<ScoreInfo> scores;
+        private IReadOnlyList<ScoreInfo> scores;
 
-        public IEnumerable<ScoreInfo> Scores
+        public IReadOnlyList<ScoreInfo> Scores
         {
             get => scores;
             set
@@ -121,11 +121,11 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
 
         private void updateDisplay()
         {
-            scoreTable.Scores = Enumerable.Empty<ScoreInfo>();
+            scoreTable.Scores = new List<ScoreInfo>();
 
             loading = false;
 
-            var scoreCount = scores?.Count() ?? 0;
+            var scoreCount = scores?.Count ?? 0;
 
             if (scoreCount == 0)
             {

@@ -48,24 +48,27 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
             };
         }
 
-        public IEnumerable<ScoreInfo> Scores
+        public IReadOnlyList<ScoreInfo> Scores
         {
             set
             {
                 if (value == null || !value.Any())
                     return;
 
-                var content = new List<Drawable[]> { new ScoreTableHeaderRow().CreateDrawables().ToArray() };
-
-                int index = 0;
-                foreach (var s in value)
-                    content.Add(new ScoreTableScoreRow(index++, s).CreateDrawables().ToArray());
-
-                scoresGrid.Content = content.ToArray();
+                var content = new List<Drawable[]>
+                {
+                    new ScoreTableHeaderRow(value.First()).CreateDrawables().ToArray()
+                };
 
                 backgroundFlow.Clear();
-                for (int i = 0; i < index; i++)
+
+                for (int i = 0; i < value.Count; i++)
+                {
+                    content.Add(new ScoreTableScoreRow(i, value[i]).CreateDrawables().ToArray());
                     backgroundFlow.Add(new ScoreTableRowBackground(i));
+                }
+
+                scoresGrid.Content = content.ToArray();
             }
         }
 

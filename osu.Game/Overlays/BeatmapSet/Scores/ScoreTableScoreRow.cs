@@ -10,7 +10,6 @@ using osu.Framework.Input.Events;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Online.Leaderboards;
-using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.UI;
 using osu.Game.Scoring;
 using osu.Game.Users;
@@ -74,33 +73,15 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                 Font = OsuFont.GetFont(size: TEXT_SIZE)
             };
 
-            yield return new OsuSpriteText
+            foreach (var kvp in score.Statistics)
             {
-                Text = $"{score.Statistics[HitResult.Great]}",
-                Font = OsuFont.GetFont(size: TEXT_SIZE),
-                Colour = score.Statistics[HitResult.Great] == 0 ? Color4.Gray : Color4.White
-            };
-
-            yield return new OsuSpriteText
-            {
-                Text = $"{score.Statistics[HitResult.Good]}",
-                Font = OsuFont.GetFont(size: TEXT_SIZE),
-                Colour = score.Statistics[HitResult.Good] == 0 ? Color4.Gray : Color4.White
-            };
-
-            yield return new OsuSpriteText
-            {
-                Text = $"{score.Statistics[HitResult.Meh]}",
-                Font = OsuFont.GetFont(size: TEXT_SIZE),
-                Colour = score.Statistics[HitResult.Meh] == 0 ? Color4.Gray : Color4.White
-            };
-
-            yield return new OsuSpriteText
-            {
-                Text = $"{score.Statistics[HitResult.Miss]}",
-                Font = OsuFont.GetFont(size: TEXT_SIZE),
-                Colour = score.Statistics[HitResult.Miss] == 0 ? Color4.Gray : Color4.White
-            };
+                yield return new OsuSpriteText
+                {
+                    Text = $"{kvp.Value}",
+                    Font = OsuFont.GetFont(size: TEXT_SIZE),
+                    Colour = kvp.Value == 0 ? Color4.Gray : Color4.White
+                };
+            }
         }
 
         protected override Drawable CreatePpCell() => new OsuSpriteText
