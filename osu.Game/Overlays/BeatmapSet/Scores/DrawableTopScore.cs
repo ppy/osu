@@ -31,10 +31,8 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
         private const float avatar_size = 80;
         private const float margin = 10;
 
-        private OsuColour colours;
-
-        private Color4 backgroundIdleColour => colours.Gray3;
-        private Color4 backgroundHoveredColour => colours.Gray4;
+        private Color4 backgroundIdleColour;
+        private Color4 backgroundHoveredColour;
 
         private readonly FontUsage smallStatisticsFont = OsuFont.GetFont(size: 20);
         private readonly FontUsage largeStatisticsFont = OsuFont.GetFont(size: 25);
@@ -55,34 +53,6 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
         private readonly TextColumn ppColumn;
 
         private readonly ModsInfoColumn modsInfo;
-
-        private ScoreInfo score;
-
-        public ScoreInfo Score
-        {
-            get => score;
-            set
-            {
-                if (score == value)
-                    return;
-
-                score = value;
-
-                avatar.User = username.User = score.User;
-                flag.Country = score.User.Country;
-                date.Text = $@"achieved {score.Date.Humanize()}";
-                rank.UpdateRank(score.Rank);
-
-                totalScoreColumn.Text = $@"{score.TotalScore:N0}";
-                accuracyColumn.Text = $@"{score.Accuracy:P2}";
-                maxComboColumn.Text = $@"{score.MaxCombo:N0}x";
-                ppColumn.Text = $@"{score.PP:N0}";
-
-                statisticsContainer.ChildrenEnumerable = score.Statistics.Select(kvp => new TextColumn(kvp.Key.GetDescription(), smallStatisticsFont) { Text = kvp.Value.ToString() });
-
-                modsInfo.Mods = score.Mods;
-            }
-        }
 
         public DrawableTopScore()
         {
@@ -240,10 +210,34 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
-            this.colours = colours;
-
+            backgroundIdleColour = colours.Gray3;
+            backgroundHoveredColour = colours.Gray4;
             rankText.Colour = colours.Yellow;
+
             background.Colour = backgroundIdleColour;
+        }
+
+        /// <summary>
+        /// Sets the score to be displayed.
+        /// </summary>
+        public ScoreInfo Score
+        {
+            set
+            {
+                avatar.User = username.User = value.User;
+                flag.Country = value.User.Country;
+                date.Text = $@"achieved {value.Date.Humanize()}";
+                rank.UpdateRank(value.Rank);
+
+                totalScoreColumn.Text = $@"{value.TotalScore:N0}";
+                accuracyColumn.Text = $@"{value.Accuracy:P2}";
+                maxComboColumn.Text = $@"{value.MaxCombo:N0}x";
+                ppColumn.Text = $@"{value.PP:N0}";
+
+                statisticsContainer.ChildrenEnumerable = value.Statistics.Select(kvp => new TextColumn(kvp.Key.GetDescription(), smallStatisticsFont) { Text = kvp.Value.ToString() });
+
+                modsInfo.Mods = value.Mods;
+            }
         }
 
         protected override bool OnHover(HoverEvent e)
