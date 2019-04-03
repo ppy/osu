@@ -168,16 +168,18 @@ namespace osu.Game.Screens.Select.Carousel
 
             base.ApplyState();
         }
+
         public MenuItem[] ContextMenuItems
         {
             get
             {
-                List<MenuItem> items = new List<MenuItem>();
-
-                items.Add(new OsuMenuItem("Play", MenuItemType.Highlighted, () => startRequested?.Invoke(beatmap)));
-                items.Add(new OsuMenuItem("Edit", MenuItemType.Standard, () => editRequested?.Invoke(beatmap)));
-                items.Add(new OsuMenuItem("Hide", MenuItemType.Destructive, () => hideRequested?.Invoke(beatmap)));
-
+                List<MenuItem> items = new List<MenuItem>()
+                {
+                    new OsuMenuItem("Play", MenuItemType.Highlighted, () => startRequested?.Invoke(beatmap)),
+                    new OsuMenuItem("Edit", MenuItemType.Standard, () => editRequested?.Invoke(beatmap)),
+                    new OsuMenuItem("Hide", MenuItemType.Destructive, () => hideRequested?.Invoke(beatmap)),
+                };
+                
                 if (beatmap.OnlineBeatmapID.HasValue)
                     items.Add(new OsuMenuItem("Details", MenuItemType.Standard, () => beatmapOverlay?.FetchAndShowBeatmap(beatmap.OnlineBeatmapID.Value)));
 
