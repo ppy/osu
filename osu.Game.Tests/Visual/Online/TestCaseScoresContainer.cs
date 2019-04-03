@@ -15,19 +15,16 @@ using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring;
 using osu.Game.Users;
-using NUnit.Framework;
 
-namespace osu.Game.Tests.Visual.SongSelect
+namespace osu.Game.Tests.Visual.Online
 {
-    [Description("in BeatmapOverlay")]
-    public class TestCaseBeatmapScoresContainer : OsuTestCase
+    public class TestCaseScoresContainer : OsuTestCase
     {
         public override IReadOnlyList<Type> RequiredTypes => new[]
         {
             typeof(DrawableTopScore),
             typeof(TopScoreUserSection),
             typeof(TopScoreStatisticsSection),
-            typeof(ScoresContainer),
             typeof(ScoreTable),
             typeof(ScoreTableRow),
             typeof(ScoreTableHeaderRow),
@@ -37,7 +34,7 @@ namespace osu.Game.Tests.Visual.SongSelect
 
         private readonly Box background;
 
-        public TestCaseBeatmapScoresContainer()
+        public TestCaseScoresContainer()
         {
             ScoresContainer scoresContainer;
 
