@@ -121,25 +121,17 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
 
         private void updateDisplay()
         {
-            scoreTable.Scores = new List<ScoreInfo>();
-
             loading = false;
 
-            var scoreCount = scores?.Count ?? 0;
+            scoreTable.Scores = scores?.Count > 1 ? scores : new List<ScoreInfo>();
 
-            if (scoreCount == 0)
+            if (scores.Any())
             {
-                topScore.Hide();
-                return;
+                topScore.Score = scores.FirstOrDefault();
+                topScore.Show();
             }
-
-            topScore.Score = scores.FirstOrDefault();
-            topScore.Show();
-
-            if (scoreCount < 2)
-                return;
-
-            scoreTable.Scores = scores;
+            else
+                topScore.Hide();
         }
 
         protected override void Dispose(bool isDisposing)
