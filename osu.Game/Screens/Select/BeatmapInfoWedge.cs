@@ -22,6 +22,7 @@ using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Cursor;
+using osu.Framework.Graphics.Sprites;
 using osu.Framework.Localisation;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.UI;
@@ -292,14 +293,14 @@ namespace osu.Game.Screens.Select
                     labels.Add(new InfoLabel(new BeatmapStatistic
                     {
                         Name = "Length",
-                        Icon = FontAwesome.fa_clock_o,
+                        Icon = FontAwesome.Regular.Clock,
                         Content = TimeSpan.FromMilliseconds(endTime - b.HitObjects.First().StartTime).ToString(@"m\:ss"),
                     }));
 
                     labels.Add(new InfoLabel(new BeatmapStatistic
                     {
                         Name = "BPM",
-                        Icon = FontAwesome.fa_circle,
+                        Icon = FontAwesome.Regular.Circle,
                         Content = getBPMRange(b),
                     }));
 
@@ -377,7 +378,7 @@ namespace osu.Game.Screens.Select
                                     Origin = Anchor.Centre,
                                     RelativeSizeAxes = Axes.Both,
                                     Colour = OsuColour.FromHex(@"441288"),
-                                    Icon = FontAwesome.fa_square,
+                                    Icon = FontAwesome.Solid.Square,
                                     Rotation = 45,
                                 },
                                 new SpriteIcon

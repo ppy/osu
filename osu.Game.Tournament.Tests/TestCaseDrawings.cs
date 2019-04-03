@@ -6,12 +6,14 @@ using osu.Game.Tests.Visual;
 using osu.Game.Tournament.Components;
 using osu.Game.Tournament.Screens.Drawings;
 using osu.Game.Tournament.Screens.Drawings.Components;
+using osu.Framework.Allocation;
 
 namespace osu.Game.Tournament.Tests
 {
     public class TestCaseDrawings : ScreenTestCase
     {
-        public TestCaseDrawings()
+        [BackgroundDependencyLoader]
+        private void load()
         {
             Add(new DrawingsScreen
             {

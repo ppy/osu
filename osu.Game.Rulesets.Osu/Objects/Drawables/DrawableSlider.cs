@@ -10,8 +10,8 @@ using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics.Containers;
-using osu.Game.Configuration;
 using osu.Game.Rulesets.Objects;
+using osu.Game.Rulesets.Osu.Configuration;
 using osu.Game.Rulesets.Scoring;
 using osuTK.Graphics;
 using osu.Game.Skinning;
@@ -33,6 +33,9 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         private readonly IBindable<float> scaleBindable = new Bindable<float>();
         private readonly IBindable<SliderPath> pathBindable = new Bindable<SliderPath>();
 
+        [Resolved(CanBeNull = true)]
+        private OsuRulesetConfigManager config { get; set; }
+
         public DrawableSlider(Slider s)
             : base(s)
         {
@@ -47,7 +50,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             {
                 Body = new SnakingSliderBody(s)
                 {
-                    PathWidth = s.Scale * 64,
+                    PathRadius = s.Scale * 64,
                 },
                 ticks = new Container<DrawableSliderTick> { RelativeSizeAxes = Axes.Both },
                 repeatPoints = new Container<DrawableRepeatPoint> { RelativeSizeAxes = Axes.Both },
@@ -94,15 +97,15 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuConfigManager config)
+        private void load()
         {
-            config.BindWith(OsuSetting.SnakingInSliders, Body.SnakingIn);
-            config.BindWith(OsuSetting.SnakingOutSliders, Body.SnakingOut);
+            config?.BindWith(OsuRulesetSetting.SnakingInSliders, Body.SnakingIn);
+            config?.BindWith(OsuRulesetSetting.SnakingOutSliders, Body.SnakingOut);
 
             positionBindable.BindValueChanged(_ => Position = HitObject.StackedPosition);
             scaleBindable.BindValueChanged(scale =>
             {
-                Body.PathWidth = scale.NewValue * 64;
+                Body.PathRadius = scale.NewValue * 64;
                 Ball.Scale = new Vector2(scale.NewValue);
             });
 

@@ -6,6 +6,7 @@ using System.Linq;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Input;
 using osu.Framework.Input.Events;
 using osu.Game.Rulesets.Objects.Types;
 using osuTK.Graphics;
@@ -14,7 +15,7 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
 {
-    public class SliderBall : CircularContainer, ISliderProgress
+    public class SliderBall : CircularContainer, ISliderProgress, IRequireHighFrequencyMousePosition
     {
         private const float width = 128;
 
@@ -107,18 +108,6 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
 
         private Vector2? lastScreenSpaceMousePosition;
 
-        protected override bool OnMouseDown(MouseDownEvent e)
-        {
-            lastScreenSpaceMousePosition = e.ScreenSpaceMousePosition;
-            return base.OnMouseDown(e);
-        }
-
-        protected override bool OnMouseUp(MouseUpEvent e)
-        {
-            lastScreenSpaceMousePosition = e.ScreenSpaceMousePosition;
-            return base.OnMouseUp(e);
-        }
-
         protected override bool OnMouseMove(MouseMoveEvent e)
         {
             lastScreenSpaceMousePosition = e.ScreenSpaceMousePosition;
@@ -130,6 +119,12 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
             // Consider the case of rewinding - children's transforms are handled internally, so propagating down
             // any further will cause weirdness with the Tracking bool below. Let's not propagate further at this point.
             base.ClearTransformsAfter(time, false, targetMember);
+        }
+
+        public override void ApplyTransformsAt(double time, bool propagateChildren = false)
+        {
+            // For the same reasons as above w.r.t rewinding, we shouldn't propagate to children here either.
+            base.ApplyTransformsAt(time, false);
         }
 
         private bool tracking;

@@ -9,6 +9,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.OpenGL.Vertices;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.Shaders;
+using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
 using osu.Game.Beatmaps.Timing;
 using osu.Game.Graphics;
@@ -24,7 +25,7 @@ namespace osu.Game.Rulesets.Mods
     {
         public override string Name => "Flashlight";
         public override string Acronym => "FL";
-        public override FontAwesome Icon => FontAwesome.fa_osu_mod_flashlight;
+        public override IconUsage Icon => OsuIcon.ModFlashlight;
         public override ModType Type => ModType.DifficultyIncrease;
         public override string Description => "Restricted view area.";
         public override bool Ranked => true;
@@ -34,7 +35,7 @@ namespace osu.Game.Rulesets.Mods
         }
     }
 
-    public abstract class ModFlashlight<T> : ModFlashlight, IApplicableToRulesetContainer<T>, IApplicableToScoreProcessor
+    public abstract class ModFlashlight<T> : ModFlashlight, IApplicableToDrawableRuleset<T>, IApplicableToScoreProcessor
         where T : HitObject
     {
         public const double FLASHLIGHT_FADE_DURATION = 800;
@@ -45,15 +46,15 @@ namespace osu.Game.Rulesets.Mods
             Combo.BindTo(scoreProcessor.Combo);
         }
 
-        public virtual void ApplyToRulesetContainer(RulesetContainer<T> rulesetContainer)
+        public virtual void ApplyToDrawableRuleset(DrawableRuleset<T> drawableRuleset)
         {
             var flashlight = CreateFlashlight();
             flashlight.Combo = Combo;
             flashlight.RelativeSizeAxes = Axes.Both;
             flashlight.Colour = Color4.Black;
-            rulesetContainer.KeyBindingInputManager.Add(flashlight);
+            drawableRuleset.KeyBindingInputManager.Add(flashlight);
 
-            flashlight.Breaks = rulesetContainer.Beatmap.Breaks;
+            flashlight.Breaks = drawableRuleset.Beatmap.Breaks;
         }
 
         public abstract Flashlight CreateFlashlight();
@@ -61,7 +62,7 @@ namespace osu.Game.Rulesets.Mods
         public abstract class Flashlight : Drawable
         {
             internal BindableInt Combo;
-            private Shader shader;
+            private IShader shader;
 
             protected override DrawNode CreateDrawNode() => new FlashlightDrawNode();
 
@@ -139,7 +140,7 @@ namespace osu.Game.Rulesets.Mods
 
         private class FlashlightDrawNode : DrawNode
         {
-            public Shader Shader;
+            public IShader Shader;
             public Quad ScreenSpaceDrawQuad;
             public Vector2 FlashlightPosition;
             public Vector2 FlashlightSize;

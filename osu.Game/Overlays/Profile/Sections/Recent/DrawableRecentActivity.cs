@@ -16,7 +16,7 @@ namespace osu.Game.Overlays.Profile.Sections.Recent
 {
     public class DrawableRecentActivity : DrawableProfileRow
     {
-        private APIAccess api;
+        private IAPIProvider api;
 
         private readonly APIRecentActivity activity;
 
@@ -28,7 +28,7 @@ namespace osu.Game.Overlays.Profile.Sections.Recent
         }
 
         [BackgroundDependencyLoader]
-        private void load(APIAccess api)
+        private void load(IAPIProvider api)
         {
             this.api = api;
 

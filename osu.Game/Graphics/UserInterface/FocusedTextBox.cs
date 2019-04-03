@@ -16,9 +16,6 @@ namespace osu.Game.Graphics.UserInterface
     /// </summary>
     public class FocusedTextBox : OsuTextBox
     {
-        protected override Color4 BackgroundUnfocused => new Color4(10, 10, 10, 255);
-        protected override Color4 BackgroundFocused => new Color4(10, 10, 10, 255);
-
         public Action Exit;
 
         private bool focus;
@@ -47,6 +44,9 @@ namespace osu.Game.Graphics.UserInterface
         private void load(GameHost host)
         {
             this.host = host;
+
+            BackgroundUnfocused = new Color4(10, 10, 10, 255);
+            BackgroundFocused = new Color4(10, 10, 10, 255);
         }
 
         // We may not be focused yet, but we need to handle keyboard input to be able to request focus

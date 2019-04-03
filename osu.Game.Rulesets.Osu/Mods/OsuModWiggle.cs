@@ -4,7 +4,7 @@
 using System;
 using System.Collections.Generic;
 using osu.Framework.Graphics;
-using osu.Game.Graphics;
+using osu.Framework.Graphics.Sprites;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Objects.Types;
@@ -17,7 +17,7 @@ namespace osu.Game.Rulesets.Osu.Mods
     {
         public override string Name => "Wiggle";
         public override string Acronym => "WG";
-        public override FontAwesome Icon => FontAwesome.fa_certificate;
+        public override IconUsage Icon => FontAwesome.Solid.Certificate;
         public override ModType Type => ModType.Fun;
         public override string Description => "They just won't stay still...";
         public override double ScoreMultiplier => 1;

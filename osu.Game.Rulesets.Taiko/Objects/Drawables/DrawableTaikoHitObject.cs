@@ -24,7 +24,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
         protected DrawableTaikoHitObject(TaikoHitObject hitObject)
             : base(hitObject)
         {
-            InternalChildren = new[]
+            AddRangeInternal(new[]
             {
                 nonProxiedContent = new Container
                 {
@@ -32,7 +32,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
                     Child = Content = new Container { RelativeSizeAxes = Axes.Both }
                 },
                 proxiedContent = new ProxiedContentContainer { RelativeSizeAxes = Axes.Both }
-            };
+            });
         }
 
         /// <summary>

@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Events;
 using osuTK;
 using osuTK.Input;
@@ -21,7 +22,7 @@ namespace osu.Game.Graphics.UserInterface
             {
                 new SpriteIcon
                 {
-                    Icon = FontAwesome.fa_search,
+                    Icon = FontAwesome.Solid.Search,
                     Origin = Anchor.CentreRight,
                     Anchor = Anchor.CentreRight,
                     Margin = new MarginPadding { Right = 10 },

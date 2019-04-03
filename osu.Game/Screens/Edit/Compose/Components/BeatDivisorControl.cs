@@ -94,13 +94,13 @@ namespace osu.Game.Screens.Edit.Compose.Components
                                                 {
                                                     new DivisorButton
                                                     {
-                                                        Icon = FontAwesome.fa_chevron_left,
+                                                        Icon = FontAwesome.Solid.ChevronLeft,
                                                         Action = beatDivisor.Previous
                                                     },
                                                     new DivisorText(beatDivisor),
                                                     new DivisorButton
                                                     {
-                                                        Icon = FontAwesome.fa_chevron_right,
+                                                        Icon = FontAwesome.Solid.ChevronRight,
                                                         Action = beatDivisor.Next
                                                     }
                                                 },

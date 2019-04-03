@@ -5,7 +5,7 @@ using osu.Framework.Bindables;
 using osuTK;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Game.Graphics;
+using osu.Framework.Graphics.Sprites;
 using osu.Game.Graphics.Containers;
 
 namespace osu.Game.Overlays.SearchableList
@@ -37,8 +37,8 @@ namespace osu.Game.Overlays.SearchableList
                             Direction = FillDirection.Horizontal,
                             Children = new[]
                             {
-                                new DisplayStyleToggleButton(FontAwesome.fa_th_large, PanelDisplayStyle.Grid, DisplayStyle),
-                                new DisplayStyleToggleButton(FontAwesome.fa_list_ul, PanelDisplayStyle.List, DisplayStyle),
+                                new DisplayStyleToggleButton(FontAwesome.Solid.ThLarge, PanelDisplayStyle.Grid, DisplayStyle),
+                                new DisplayStyleToggleButton(FontAwesome.Solid.ListUl, PanelDisplayStyle.List, DisplayStyle),
                             },
                         },
                         Dropdown = new SlimEnumDropdown<T>
@@ -59,7 +59,7 @@ namespace osu.Game.Overlays.SearchableList
             private readonly PanelDisplayStyle style;
             private readonly Bindable<PanelDisplayStyle> bindable;
 
-            public DisplayStyleToggleButton(FontAwesome icon, PanelDisplayStyle style, Bindable<PanelDisplayStyle> bindable)
+            public DisplayStyleToggleButton(IconUsage icon, PanelDisplayStyle style, Bindable<PanelDisplayStyle> bindable)
             {
                 this.bindable = bindable;
                 this.style = style;

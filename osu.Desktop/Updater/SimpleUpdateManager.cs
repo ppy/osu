@@ -7,10 +7,10 @@ using Newtonsoft.Json;
 using osu.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Sprites;
 using osu.Framework.IO.Network;
 using osu.Framework.Platform;
 using osu.Game;
-using osu.Game.Graphics;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Notifications;
 
@@ -54,7 +54,7 @@ namespace osu.Desktop.Updater
                     {
                         Text = $"A newer release of osu! has been found ({version} → {latest.TagName}).\n\n"
                                + "Click here to download the new version, which can be installed over the top of your existing installation",
-                        Icon = FontAwesome.fa_upload,
+                        Icon = FontAwesome.Solid.Upload,
                         Activated = () =>
                         {
                             host.OpenUrlExternally(getBestUrl(latest));

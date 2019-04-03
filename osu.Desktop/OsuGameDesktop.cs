@@ -14,6 +14,7 @@ using osuTK.Input;
 using Microsoft.Win32;
 using osu.Desktop.Updater;
 using osu.Framework;
+using osu.Framework.Logging;
 using osu.Framework.Platform.Windows;
 using osu.Framework.Screens;
 using osu.Game.Screens.Menu;
@@ -35,12 +36,15 @@ namespace osu.Desktop
         {
             try
             {
-                return new StableStorage();
+                if (Host is DesktopGameHost desktopHost)
+                    return new StableStorage(desktopHost);
             }
-            catch
+            catch (Exception e)
             {
-                return null;
+                Logger.Error(e, "Error while searching for stable install");
             }
+
+            return null;
         }
 
         protected override void LoadComplete()
@@ -139,8 +143,8 @@ namespace osu.Desktop
                 return null;
             }
 
-            public StableStorage()
-                : base(string.Empty, null)
+            public StableStorage(DesktopGameHost host)
+                : base(string.Empty, host)
             {
             }
         }

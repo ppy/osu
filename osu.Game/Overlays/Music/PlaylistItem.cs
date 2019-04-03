@@ -155,6 +155,8 @@ namespace osu.Game.Overlays.Music
             }
         }
 
+        public bool FilteringActive { get; set; }
+
         private class PlaylistItemHandle : SpriteIcon
         {
             public PlaylistItemHandle()
@@ -162,7 +164,7 @@ namespace osu.Game.Overlays.Music
                 Anchor = Anchor.TopLeft;
                 Origin = Anchor.TopLeft;
                 Size = new Vector2(12);
-                Icon = FontAwesome.fa_bars;
+                Icon = FontAwesome.Solid.Bars;
                 Alpha = 0f;
                 Margin = new MarginPadding { Left = 5, Top = 2 };
             }
