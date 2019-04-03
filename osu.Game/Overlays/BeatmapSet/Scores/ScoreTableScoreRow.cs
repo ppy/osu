@@ -5,10 +5,10 @@ using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Sprites;
-using osu.Framework.Input.Events;
 using osu.Game.Graphics;
+using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Online.Chat;
 using osu.Game.Online.Leaderboards;
 using osu.Game.Rulesets.UI;
 using osu.Game.Scoring;
@@ -53,17 +53,27 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
             Colour = score.Accuracy == 1 ? Color4.GreenYellow : Color4.White
         };
 
-        protected override Drawable CreatePlayerCell() => new FillFlowContainer
+        protected override Drawable CreatePlayerCell()
         {
-            AutoSizeAxes = Axes.Both,
-            Direction = FillDirection.Horizontal,
-            Spacing = new Vector2(5, 0),
-            Children = new Drawable[]
+            var username = new LinkFlowContainer(t => t.Font = OsuFont.GetFont(size: TEXT_SIZE))
             {
-                new DrawableFlag(score.User.Country) { Size = new Vector2(20, 13) },
-                new ClickableScoreUsername { User = score.User }
-            }
-        };
+                AutoSizeAxes = Axes.Both,
+            };
+
+            username.AddLink(score.User.Username, null, LinkAction.OpenUserProfile, score.User.Id.ToString(), "Open profile");
+
+            return new FillFlowContainer
+            {
+                AutoSizeAxes = Axes.Both,
+                Direction = FillDirection.Horizontal,
+                Spacing = new Vector2(5, 0),
+                Children = new Drawable[]
+                {
+                    new DrawableFlag(score.User.Country) { Size = new Vector2(20, 13) },
+                    username
+                }
+            };
+        }
 
         protected override IEnumerable<Drawable> CreateStatisticsCells()
         {
@@ -100,47 +110,5 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                 Scale = new Vector2(0.3f)
             })
         };
-
-        private class ClickableScoreUsername : ClickableUserContainer
-        {
-            private const int fade_duration = 100;
-
-            private readonly SpriteText text;
-            private readonly SpriteText textBold;
-
-            public ClickableScoreUsername()
-            {
-                Add(text = new OsuSpriteText
-                {
-                    Anchor = Anchor.CentreLeft,
-                    Origin = Anchor.CentreLeft,
-                    Font = OsuFont.GetFont(size: TEXT_SIZE)
-                });
-
-                Add(textBold = new OsuSpriteText
-                {
-                    Anchor = Anchor.CentreLeft,
-                    Origin = Anchor.CentreLeft,
-                    Font = OsuFont.GetFont(size: TEXT_SIZE, weight: FontWeight.Bold),
-                    Alpha = 0,
-                });
-            }
-
-            protected override void OnUserChanged(User user) => text.Text = textBold.Text = user.Username;
-
-            protected override bool OnHover(HoverEvent e)
-            {
-                textBold.Show();
-                text.Hide();
-                return base.OnHover(e);
-            }
-
-            protected override void OnHoverLost(HoverLostEvent e)
-            {
-                textBold.Hide();
-                text.Show();
-                base.OnHoverLost(e);
-            }
-        }
     }
 }
