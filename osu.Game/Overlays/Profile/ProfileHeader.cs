@@ -9,6 +9,9 @@ using osu.Game.Graphics;
 using osu.Game.Overlays.Profile.Header;
 using osu.Game.Users;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions.Color4Extensions;
+using osu.Framework.Graphics.Colour;
+using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 
@@ -35,10 +38,23 @@ namespace osu.Game.Overlays.Profile
 
             Children = new Drawable[]
             {
-                coverContainer = new UserCoverBackground
+                new Container
                 {
                     RelativeSizeAxes = Axes.X,
                     Height = cover_height,
+                    Masking = true,
+                    Children = new Drawable[]
+                    {
+                        coverContainer = new UserCoverBackground
+                        {
+                            RelativeSizeAxes = Axes.Both,
+                        },
+                        new Box
+                        {
+                            RelativeSizeAxes = Axes.Both,
+                            Colour = ColourInfo.GradientVertical(OsuColour.FromHex("222").Opacity(0.8f), OsuColour.FromHex("222").Opacity(0.2f))
+                        },
+                    }
                 },
                 new Container
                 {
