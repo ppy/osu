@@ -125,6 +125,13 @@ namespace osu.Game.Screens.Play
             IsPaused.Value = false;
         }
 
+        /// <summary>
+        /// Seek to a specific time in gameplay.
+        /// <remarks>
+        /// Adjusts for any offsets which have been applied (so the seek may not be the expected point in time on the underlying audio track).
+        /// </remarks>
+        /// </summary>
+        /// <param name="time">The destination time to seek to.</param>
         public void Seek(double time)
         {
             // remove the offset component here because most of the time we want the seek to be aligned to gameplay, not the audio track.
