@@ -14,7 +14,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Overlays.BeatmapSet.Scores
 {
-    public class DrawableTopScore : Container
+    public class DrawableTopScore : CompositeDrawable
     {
         private const float fade_duration = 100;
 
@@ -40,7 +40,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                 Offset = new Vector2(0, 1),
             };
 
-            Children = new Drawable[]
+            InternalChildren = new Drawable[]
             {
                 background = new Box
                 {
