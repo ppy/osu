@@ -254,6 +254,12 @@ namespace osu.Game
                 if (menuScreen.IsCurrentScreen())
                     menuScreen.LoadToSolo();
 
+                // we might even already be at the song
+                if (Beatmap.Value.BeatmapSetInfo.Hash == databasedSet.Hash)
+                {
+                    return;
+                }
+
                 // Use first beatmap available for current ruleset, else switch ruleset.
                 var first = databasedSet.Beatmaps.Find(b => b.Ruleset == ruleset.Value) ?? databasedSet.Beatmaps.First();
 
