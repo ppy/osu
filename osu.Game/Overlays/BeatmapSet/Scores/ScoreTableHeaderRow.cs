@@ -28,7 +28,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
 
         protected override Drawable CreateAccuracyCell() => new CellText("accuracy");
 
-        protected override Drawable CreatePlayerCell() => new CellText("player");
+        protected override Drawable CreateUserCell() => new CellText("player");
 
         protected override IEnumerable<Drawable> CreateStatisticsCells()
         {

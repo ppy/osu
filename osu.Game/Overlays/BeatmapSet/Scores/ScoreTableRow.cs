@@ -53,7 +53,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                 Origin = Anchor.CentreLeft,
                 AutoSizeAxes = Axes.Both,
                 Margin = new MarginPadding { Right = 20 },
-                Child = CreatePlayerCell()
+                Child = CreateUserCell()
             };
 
             foreach (var cell in CreateStatisticsCells())
@@ -93,7 +93,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
 
         protected abstract Drawable CreateAccuracyCell();
 
-        protected abstract Drawable CreatePlayerCell();
+        protected abstract Drawable CreateUserCell();
 
         protected abstract IEnumerable<Drawable> CreateStatisticsCells();
 
