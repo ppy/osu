@@ -40,7 +40,7 @@ namespace osu.Game.Rulesets.Catch.Difficulty.Skills
 
             float distanceMoved = playerPosition - lastPlayerPosition.Value;
 
-            double weightedStrainTime = catchCurrent.StrainTime + 18;
+            double weightedStrainTime = catchCurrent.StrainTime + 10 + (8 / catchCurrent.ClockRate);
 
             double distanceAddition = (Math.Pow(Math.Abs(distanceMoved), 1.3) / 510);
             double sqrtStrain = Math.Sqrt(weightedStrainTime);
