@@ -19,6 +19,7 @@ using osu.Game.Users;
 using osuTK;
 using osuTK.Graphics;
 using System.Collections.Generic;
+using osu.Game.Graphics.Sprites;
 
 namespace osu.Game.Overlays.BeatmapSet.Scores
 {
@@ -164,7 +165,6 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                                         {
                                             Anchor = Anchor.CentreLeft,
                                             Origin = Anchor.CentreLeft,
-                                            TextSize = 20,
                                         },
                                         date = new SpriteText
                                         {
@@ -263,67 +263,59 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
         {
             private const float username_fade_duration = 500;
 
-            private readonly Box underscore;
-            private readonly Container underscoreContainer;
-            private readonly SpriteText text;
+            private readonly FillFlowContainer hoverContainer;
 
-            private Color4 hoverColour;
-
-            public float TextSize
-            {
-                set
-                {
-                    if (text.TextSize == value)
-                        return;
-
-                    text.TextSize = value;
-                }
-                get => text.TextSize;
-            }
+            private readonly SpriteText normalText;
+            private readonly SpriteText hoveredText;
 
             public ClickableTopScoreUsername()
             {
-                Add(underscoreContainer = new Container
+                var font = OsuFont.GetFont(size: 20, weight: FontWeight.Bold, italics: true);
+
+                Children = new Drawable[]
                 {
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
-                    RelativeSizeAxes = Axes.X,
-                    Height = 1,
-                    Child = underscore = new Box
+                    normalText = new OsuSpriteText { Font = font },
+                    hoverContainer = new FillFlowContainer
                     {
-                        RelativeSizeAxes = Axes.Both,
+                        RelativeSizeAxes = Axes.X,
+                        AutoSizeAxes = Axes.Y,
                         Alpha = 0,
+                        Direction = FillDirection.Vertical,
+                        Spacing = new Vector2(0, 1),
+                        Children = new Drawable[]
+                        {
+                            hoveredText = new OsuSpriteText { Font = font },
+                            new Box
+                            {
+                                BypassAutoSizeAxes = Axes.Both,
+                                RelativeSizeAxes = Axes.X,
+                                Height = 1
+                            }
+                        }
                     }
-                });
-                Add(text = new SpriteText
-                {
-                    Font = @"Exo2.0-BoldItalic",
-                });
+                };
             }
 
             [BackgroundDependencyLoader]
             private void load(OsuColour colours)
             {
-                hoverColour = underscore.Colour = colours.Blue;
-                underscoreContainer.Position = new Vector2(0, TextSize / 2 - 1);
+                hoverContainer.Colour = colours.Blue;
             }
 
-            protected override void OnUserChange(User user)
+            protected override void OnUserChanged(User user)
             {
-                text.Text = user.Username;
+                normalText.Text = hoveredText.Text = user.Username;
             }
 
             protected override bool OnHover(HoverEvent e)
             {
-                text.FadeColour(hoverColour, username_fade_duration, Easing.OutQuint);
-                underscore.FadeIn(username_fade_duration, Easing.OutQuint);
+                hoverContainer.FadeIn(username_fade_duration, Easing.OutQuint);
                 return base.OnHover(e);
             }
 
             protected override void OnHoverLost(HoverLostEvent e)
             {
-                text.FadeColour(Color4.White, username_fade_duration, Easing.OutQuint);
-                underscore.FadeOut(username_fade_duration, Easing.OutQuint);
+                hoverContainer.FadeOut(username_fade_duration, Easing.OutQuint);
                 base.OnHoverLost(e);
             }
         }

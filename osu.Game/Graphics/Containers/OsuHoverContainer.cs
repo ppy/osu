@@ -12,11 +12,11 @@ namespace osu.Game.Graphics.Containers
 {
     public class OsuHoverContainer : OsuClickableContainer
     {
+        protected const float FADE_DURATION = 500;
+
         protected Color4 HoverColour;
 
         protected Color4 IdleColour = Color4.White;
-
-        protected const float FADE_DURATION = 500;
 
         protected virtual IEnumerable<Drawable> EffectTargets => new[] { Content };
 
