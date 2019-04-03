@@ -13,7 +13,7 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Catch.Tests
 {
-    public class TestCaseAutoJuiceStream : TestCasePlayer
+    public class TestCaseAutoJuiceStream : PlayerTestCase
     {
         public TestCaseAutoJuiceStream()
             : base(new CatchRuleset())

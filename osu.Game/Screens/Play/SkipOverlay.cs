@@ -15,6 +15,7 @@ using osu.Game.Screens.Ranking;
 using osuTK;
 using osuTK.Graphics;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Graphics.Sprites;
 using osu.Game.Graphics.Containers;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
@@ -258,9 +259,9 @@ namespace osu.Game.Screens.Play
                                 Direction = FillDirection.Horizontal,
                                 Children = new[]
                                 {
-                                    new SpriteIcon { Size = new Vector2(15), Shadow = true, Icon = FontAwesome.fa_chevron_right },
-                                    new SpriteIcon { Size = new Vector2(15), Shadow = true, Icon = FontAwesome.fa_chevron_right },
-                                    new SpriteIcon { Size = new Vector2(15), Shadow = true, Icon = FontAwesome.fa_chevron_right },
+                                    new SpriteIcon { Size = new Vector2(15), Shadow = true, Icon = FontAwesome.Solid.ChevronRight },
+                                    new SpriteIcon { Size = new Vector2(15), Shadow = true, Icon = FontAwesome.Solid.ChevronRight },
+                                    new SpriteIcon { Size = new Vector2(15), Shadow = true, Icon = FontAwesome.Solid.ChevronRight },
                                 }
                             },
                             new OsuSpriteText

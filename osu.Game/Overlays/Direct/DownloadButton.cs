@@ -4,6 +4,7 @@
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Graphics.Sprites;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
@@ -48,7 +49,7 @@ namespace osu.Game.Overlays.Direct
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
                             Size = new Vector2(13),
-                            Icon = FontAwesome.fa_download,
+                            Icon = FontAwesome.Solid.Download,
                         },
                         checkmark = new SpriteIcon
                         {
@@ -56,7 +57,7 @@ namespace osu.Game.Overlays.Direct
                             Origin = Anchor.Centre,
                             X = 8,
                             Size = Vector2.Zero,
-                            Icon = FontAwesome.fa_check,
+                            Icon = FontAwesome.Solid.Check,
                         }
                     }
                 }

@@ -10,6 +10,7 @@ using osu.Game.Rulesets.UI;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Bindings;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.Mania.Objects;
@@ -31,7 +32,7 @@ namespace osu.Game.Rulesets.Mania
 {
     public class ManiaRuleset : Ruleset
     {
-        public override RulesetContainer CreateRulesetContainerWith(WorkingBeatmap beatmap) => new ManiaRulesetContainer(this, beatmap);
+        public override DrawableRuleset CreateDrawableRulesetWith(WorkingBeatmap beatmap) => new DrawableManiaRuleset(this, beatmap);
         public override IBeatmapConverter CreateBeatmapConverter(IBeatmap beatmap) => new ManiaBeatmapConverter(beatmap);
         public override PerformanceCalculator CreatePerformanceCalculator(WorkingBeatmap beatmap, ScoreInfo score) => new ManiaPerformanceCalculator(this, beatmap, score);
 
@@ -160,7 +161,7 @@ namespace osu.Game.Rulesets.Mania
 
         public override string ShortName => "mania";
 
-        public override Drawable CreateIcon() => new SpriteIcon { Icon = FontAwesome.fa_osu_mania_o };
+        public override Drawable CreateIcon() => new SpriteIcon { Icon = OsuIcon.RulesetMania };
 
         public override DifficultyCalculator CreateDifficultyCalculator(WorkingBeatmap beatmap) => new ManiaDifficultyCalculator(this, beatmap);
 

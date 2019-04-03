@@ -3,13 +3,13 @@
 
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.UserInterface;
-using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.Chat;
 using osuTK;
 using System;
 using System.Linq;
 using osu.Framework.Bindables;
+using osu.Framework.Graphics.Sprites;
 
 namespace osu.Game.Overlays.Chat.Tabs
 {
@@ -31,7 +31,7 @@ namespace osu.Game.Overlays.Chat.Tabs
 
             AddInternal(new SpriteIcon
             {
-                Icon = FontAwesome.fa_comments,
+                Icon = FontAwesome.Solid.Comments,
                 Anchor = Anchor.CentreLeft,
                 Origin = Anchor.CentreLeft,
                 Size = new Vector2(20),

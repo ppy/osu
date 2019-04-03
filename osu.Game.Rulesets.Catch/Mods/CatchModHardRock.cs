@@ -15,77 +15,107 @@ namespace osu.Game.Rulesets.Catch.Mods
         public override double ScoreMultiplier => 1.12;
         public override bool Ranked => true;
 
-        private float lastStartX;
-        private int lastStartTime;
+        private float? lastPosition;
+        private double lastStartTime;
 
         public void ApplyToHitObject(HitObject hitObject)
         {
+            if (hitObject is JuiceStream stream)
+            {
+                lastPosition = stream.EndX;
+                lastStartTime = stream.EndTime;
+                return;
+            }
+
+            if (!(hitObject is Fruit))
+                return;
+
             var catchObject = (CatchHitObject)hitObject;
 
             float position = catchObject.X;
-            int startTime = (int)hitObject.StartTime;
+            double startTime = hitObject.StartTime;
 
-            if (lastStartX == 0)
+            if (lastPosition == null)
             {
-                lastStartX = position;
+                lastPosition = position;
                 lastStartTime = startTime;
+
                 return;
             }
 
-            float diff = lastStartX - position;
-            int timeDiff = startTime - lastStartTime;
+            float positionDiff = position - lastPosition.Value;
+            double timeDiff = startTime - lastStartTime;
 
             if (timeDiff > 1000)
             {
-                lastStartX = position;
+                lastPosition = position;
                 lastStartTime = startTime;
                 return;
             }
 
-            if (diff == 0)
+            if (positionDiff == 0)
             {
-                bool right = RNG.NextBool();
-
-                float rand = Math.Min(20, (float)RNG.NextDouble(0, timeDiff / 4d)) / CatchPlayfield.BASE_WIDTH;
-
-                if (right)
-                {
-                    if (position + rand <= 1)
-                        position += rand;
-                    else
-                        position -= rand;
-                }
-                else
-                {
-                    if (position - rand >= 0)
-                        position -= rand;
-                    else
-                        position += rand;
-                }
-
+                applyRandomOffset(ref position, timeDiff / 4d);
                 catchObject.X = position;
-
                 return;
             }
 
-            if (Math.Abs(diff) < timeDiff / 3d)
-            {
-                if (diff > 0)
-                {
-                    if (position - diff > 0)
-                        position -= diff;
-                }
-                else
-                {
-                    if (position - diff < 1)
-                        position -= diff;
-                }
-            }
+            if (Math.Abs(positionDiff * CatchPlayfield.BASE_WIDTH) < timeDiff / 3d)
+                applyOffset(ref position, positionDiff);
 
             catchObject.X = position;
 
-            lastStartX = position;
+            lastPosition = position;
             lastStartTime = startTime;
+        }
+
+        /// <summary>
+        /// Applies a random offset in a random direction to a position, ensuring that the final position remains within the boundary of the playfield.
+        /// </summary>
+        /// <param name="position">The position which the offset should be applied to.</param>
+        /// <param name="maxOffset">The maximum offset, cannot exceed 20px.</param>
+        private void applyRandomOffset(ref float position, double maxOffset)
+        {
+            bool right = RNG.NextBool();
+            float rand = Math.Min(20, (float)RNG.NextDouble(0, Math.Max(0, maxOffset))) / CatchPlayfield.BASE_WIDTH;
+
+            if (right)
+            {
+                // Clamp to the right bound
+                if (position + rand <= 1)
+                    position += rand;
+                else
+                    position -= rand;
+            }
+            else
+            {
+                // Clamp to the left bound
+                if (position - rand >= 0)
+                    position -= rand;
+                else
+                    position += rand;
+            }
+        }
+
+        /// <summary>
+        /// Applies an offset to a position, ensuring that the final position remains within the boundary of the playfield.
+        /// </summary>
+        /// <param name="position">The position which the offset should be applied to.</param>
+        /// <param name="amount">The amount to offset by.</param>
+        private void applyOffset(ref float position, float amount)
+        {
+            if (amount > 0)
+            {
+                // Clamp to the right bound
+                if (position + amount < 1)
+                    position += amount;
+            }
+            else
+            {
+                // Clamp to the left bound
+                if (position + amount > 0)
+                    position += amount;
+            }
         }
     }
 }

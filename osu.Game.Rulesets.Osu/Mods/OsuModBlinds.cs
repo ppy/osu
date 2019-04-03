@@ -8,7 +8,6 @@ using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
 using osu.Game.Beatmaps;
-using osu.Game.Graphics;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Scoring;
@@ -18,13 +17,13 @@ using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Osu.Mods
 {
-    public class OsuModBlinds : Mod, IApplicableToRulesetContainer<OsuHitObject>, IApplicableToScoreProcessor
+    public class OsuModBlinds : Mod, IApplicableToDrawableRuleset<OsuHitObject>, IApplicableToScoreProcessor
     {
         public override string Name => "Blinds";
         public override string Description => "Play with blinds on your screen.";
         public override string Acronym => "BL";
 
-        public override FontAwesome Icon => FontAwesome.fa_adjust;
+        public override IconUsage Icon => FontAwesome.Solid.Adjust;
         public override ModType Type => ModType.DifficultyIncrease;
 
         public override bool Ranked => false;
@@ -32,9 +31,9 @@ namespace osu.Game.Rulesets.Osu.Mods
         public override double ScoreMultiplier => 1.12;
         private DrawableOsuBlinds blinds;
 
-        public void ApplyToRulesetContainer(RulesetContainer<OsuHitObject> rulesetContainer)
+        public void ApplyToDrawableRuleset(DrawableRuleset<OsuHitObject> drawableRuleset)
         {
-            rulesetContainer.Overlays.Add(blinds = new DrawableOsuBlinds(rulesetContainer.Playfield.HitObjectContainer, rulesetContainer.Beatmap));
+            drawableRuleset.Overlays.Add(blinds = new DrawableOsuBlinds(drawableRuleset.Playfield.HitObjectContainer, drawableRuleset.Beatmap));
         }
 
         public void ApplyToScoreProcessor(ScoreProcessor scoreProcessor)

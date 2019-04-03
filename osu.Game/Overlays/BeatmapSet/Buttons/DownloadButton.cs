@@ -6,6 +6,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
+using osu.Framework.Graphics.Sprites;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
@@ -39,7 +40,7 @@ namespace osu.Game.Overlays.BeatmapSet.Buttons
         }
 
         [BackgroundDependencyLoader]
-        private void load(APIAccess api, BeatmapManager beatmaps)
+        private void load(IAPIProvider api, BeatmapManager beatmaps)
         {
             FillFlowContainer textSprites;
 
@@ -77,7 +78,7 @@ namespace osu.Game.Overlays.BeatmapSet.Buttons
                                     Depth = -1,
                                     Anchor = Anchor.CentreRight,
                                     Origin = Anchor.CentreRight,
-                                    Icon = FontAwesome.fa_download,
+                                    Icon = FontAwesome.Solid.Download,
                                     Size = new Vector2(16),
                                     Margin = new MarginPadding { Right = 5 },
                                 },

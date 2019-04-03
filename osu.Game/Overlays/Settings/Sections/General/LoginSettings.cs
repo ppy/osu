@@ -16,6 +16,7 @@ using System.ComponentModel;
 using osu.Game.Graphics;
 using osuTK.Graphics;
 using osu.Framework.Extensions.Color4Extensions;
+using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Events;
 using osu.Game.Graphics.Containers;
 using RectangleF = osu.Framework.Graphics.Primitives.RectangleF;
@@ -58,14 +59,14 @@ namespace osu.Game.Overlays.Settings.Sections.General
         }
 
         [BackgroundDependencyLoader(permitNulls: true)]
-        private void load(OsuColour colours, APIAccess api)
+        private void load(OsuColour colours, IAPIProvider api)
         {
             this.colours = colours;
 
             api?.Register(this);
         }
 
-        public void APIStateChanged(APIAccess api, APIState state)
+        public void APIStateChanged(IAPIProvider api, APIState state)
         {
             form = null;
 
@@ -194,7 +195,7 @@ namespace osu.Game.Overlays.Settings.Sections.General
         {
             private TextBox username;
             private TextBox password;
-            private APIAccess api;
+            private IAPIProvider api;
 
             public Action RequestHide;
 
@@ -205,7 +206,7 @@ namespace osu.Game.Overlays.Settings.Sections.General
             }
 
             [BackgroundDependencyLoader(permitNulls: true)]
-            private void load(APIAccess api, OsuConfigManager config, AccountCreationOverlay accountCreation)
+            private void load(IAPIProvider api, OsuConfigManager config, AccountCreationOverlay accountCreation)
             {
                 this.api = api;
                 Direction = FillDirection.Vertical;
@@ -362,7 +363,7 @@ namespace osu.Game.Overlays.Settings.Sections.General
                     {
                         Anchor = Anchor.CentreLeft,
                         Origin = Anchor.CentreLeft,
-                        Icon = FontAwesome.fa_circle_o,
+                        Icon = FontAwesome.Regular.Circle,
                         Size = new Vector2(14),
                     });
 

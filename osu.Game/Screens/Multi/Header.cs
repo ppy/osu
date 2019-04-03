@@ -17,11 +17,11 @@ namespace osu.Game.Screens.Multi
     {
         public const float HEIGHT = 121;
 
-        private readonly ScreenTitle title;
         private readonly HeaderBreadcrumbControl breadcrumbs;
 
         public Header(ScreenStack stack)
         {
+            MultiHeaderTitle title;
             RelativeSizeAxes = Axes.X;
             Height = HEIGHT;
 
@@ -38,12 +38,11 @@ namespace osu.Game.Screens.Multi
                     Padding = new MarginPadding { Horizontal = SearchableListOverlay.WIDTH_PADDING + OsuScreen.HORIZONTAL_OVERFLOW_PADDING },
                     Children = new Drawable[]
                     {
-                        title = new ScreenTitle
+                        title = new MultiHeaderTitle
                         {
                             Anchor = Anchor.CentreLeft,
                             Origin = Anchor.BottomLeft,
-                            Icon = FontAwesome.fa_osu_multi,
-                            Title = "multiplayer ",
+                            X = -35,
                         },
                         breadcrumbs = new HeaderBreadcrumbControl(stack)
                         {
@@ -55,10 +54,10 @@ namespace osu.Game.Screens.Multi
                 },
             };
 
-            breadcrumbs.Current.ValueChanged += scren =>
+            breadcrumbs.Current.ValueChanged += screen =>
             {
-                if (scren.NewValue is IMultiplayerSubScreen multiScreen)
-                    title.Page = multiScreen.ShortTitle.ToLowerInvariant();
+                if (screen.NewValue is IMultiplayerSubScreen multiScreen)
+                    title.Screen = multiScreen;
             };
 
             breadcrumbs.Current.TriggerChange();
@@ -67,8 +66,23 @@ namespace osu.Game.Screens.Multi
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
-            title.AccentColour = colours.Yellow;
             breadcrumbs.StripColour = colours.Green;
+        }
+
+        private class MultiHeaderTitle : ScreenTitle
+        {
+            public IMultiplayerSubScreen Screen
+            {
+                set => Section = value.ShortTitle.ToLowerInvariant();
+            }
+
+            [BackgroundDependencyLoader]
+            private void load(OsuColour colours)
+            {
+                Title = "multiplayer";
+                Icon = OsuIcon.Multi;
+                AccentColour = colours.Yellow;
+            }
         }
 
         private class HeaderBreadcrumbControl : ScreenBreadcrumbControl

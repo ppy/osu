@@ -6,6 +6,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Graphics.Sprites;
 using osu.Game.Graphics;
 
 namespace osu.Game.Overlays.Profile.Header
@@ -66,6 +67,7 @@ namespace osu.Game.Overlays.Profile.Header
                         Height = 0.6f,
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
+                        Icon = FontAwesome.Solid.Heart,
                     }
                 }
             };

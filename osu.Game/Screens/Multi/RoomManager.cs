@@ -30,7 +30,7 @@ namespace osu.Game.Screens.Multi
         private Bindable<FilterCriteria> currentFilter { get; set; }
 
         [Resolved]
-        private APIAccess api { get; set; }
+        private IAPIProvider api { get; set; }
 
         [Resolved]
         private RulesetStore rulesets { get; set; }

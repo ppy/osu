@@ -56,6 +56,11 @@ namespace osu.Game.Overlays
 
         private readonly Bindable<WorkingBeatmap> beatmap = new Bindable<WorkingBeatmap>();
 
+        /// <summary>
+        /// Provide a source for the toolbar height.
+        /// </summary>
+        public Func<float> GetToolbarHeight;
+
         public MusicController()
         {
             Width = 400;
@@ -143,7 +148,7 @@ namespace osu.Game.Overlays
                                                     Anchor = Anchor.Centre,
                                                     Origin = Anchor.Centre,
                                                     Action = prev,
-                                                    Icon = FontAwesome.fa_step_backward,
+                                                    Icon = FontAwesome.Solid.StepBackward,
                                                 },
                                                 playButton = new MusicIconButton
                                                 {
@@ -152,14 +157,14 @@ namespace osu.Game.Overlays
                                                     Scale = new Vector2(1.4f),
                                                     IconScale = new Vector2(1.4f),
                                                     Action = play,
-                                                    Icon = FontAwesome.fa_play_circle_o,
+                                                    Icon = FontAwesome.Regular.PlayCircle,
                                                 },
                                                 nextButton = new MusicIconButton
                                                 {
                                                     Anchor = Anchor.Centre,
                                                     Origin = Anchor.Centre,
                                                     Action = () => next(),
-                                                    Icon = FontAwesome.fa_step_forward,
+                                                    Icon = FontAwesome.Solid.StepForward,
                                                 },
                                             }
                                         },
@@ -168,7 +173,7 @@ namespace osu.Game.Overlays
                                             Origin = Anchor.Centre,
                                             Anchor = Anchor.CentreRight,
                                             Position = new Vector2(-bottom_black_area_height / 2, 0),
-                                            Icon = FontAwesome.fa_bars,
+                                            Icon = FontAwesome.Solid.Bars,
                                             Action = () => playlist.ToggleVisibility(),
                                         },
                                     }
@@ -244,6 +249,8 @@ namespace osu.Game.Overlays
         {
             base.UpdateAfterChildren();
             Height = dragContainer.Height;
+
+            dragContainer.Padding = new MarginPadding { Top = GetToolbarHeight?.Invoke() ?? 0 };
         }
 
         protected override void Update()
@@ -257,13 +264,13 @@ namespace osu.Game.Overlays
                 progressBar.EndTime = track.Length;
                 progressBar.CurrentTime = track.CurrentTime;
 
-                playButton.Icon = track.IsRunning ? FontAwesome.fa_pause_circle_o : FontAwesome.fa_play_circle_o;
+                playButton.Icon = track.IsRunning ? FontAwesome.Regular.PauseCircle : FontAwesome.Regular.PlayCircle;
             }
             else
             {
                 progressBar.CurrentTime = 0;
                 progressBar.EndTime = 1;
-                playButton.Icon = FontAwesome.fa_play_circle_o;
+                playButton.Icon = FontAwesome.Regular.PlayCircle;
             }
         }
 
