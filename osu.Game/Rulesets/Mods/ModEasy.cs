@@ -5,11 +5,13 @@ using System;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
+using osu.Game.Rulesets.Scoring;
 
 namespace osu.Game.Rulesets.Mods
 {
-    public abstract class ModEasy : Mod, IApplicableToDifficulty
+    public abstract class ModEasy : Mod, IApplicableToDifficulty, IApplicableToScoreProcessor
     {
+        public static int Lives = 2;
         public override string Name => "Easy";
         public override string Acronym => "EZ";
         public override IconUsage Icon => OsuIcon.ModEasy;
@@ -25,6 +27,22 @@ namespace osu.Game.Rulesets.Mods
             difficulty.ApproachRate *= ratio;
             difficulty.DrainRate *= ratio;
             difficulty.OverallDifficulty *= ratio;
+        }
+
+        public void ApplyToScoreProcessor(ScoreProcessor scoreProcessor)
+        {
+            scoreProcessor.Health.ValueChanged += ValueChanged =>{
+                if (scoreProcessor.Health.Value == 0)
+                {
+                    if (Lives != 0)
+                    {
+                        Lives--;
+                        scoreProcessor.Health.Value = 100;
+                    }
+                }
+
+            } ;
+            
         }
     }
 }
