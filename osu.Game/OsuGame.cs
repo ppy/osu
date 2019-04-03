@@ -255,7 +255,7 @@ namespace osu.Game
                     menuScreen.LoadToSolo();
 
                 // we might even already be at the song
-                if (Beatmap.Value.BeatmapSetInfo.OnlineBeatmapSetID == beatmap.OnlineBeatmapSetID)
+                if (Beatmap.Value.BeatmapSetInfo.Hash == databasedSet.Hash)
                 {
                     return;
                 }
