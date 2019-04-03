@@ -19,7 +19,7 @@ namespace osu.Game.Screens.Select
         public BeatmapClearScoresDialog(BeatmapInfo beatmap, Action onCompletion)
         {
             BodyText = $@"{beatmap.Metadata?.Artist} - {beatmap.Metadata?.Title}";
-            Icon = FontAwesome.Eraser;
+            Icon = FontAwesome.Solid.Eraser;
             HeaderText = @"Clearing all local scores. Are you sure?";
             Buttons = new PopupDialogButton[]
             {

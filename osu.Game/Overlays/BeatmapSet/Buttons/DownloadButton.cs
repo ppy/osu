@@ -78,7 +78,7 @@ namespace osu.Game.Overlays.BeatmapSet.Buttons
                                     Depth = -1,
                                     Anchor = Anchor.CentreRight,
                                     Origin = Anchor.CentreRight,
-                                    Icon = FontAwesome.Download,
+                                    Icon = FontAwesome.Solid.Download,
                                     Size = new Vector2(16),
                                     Margin = new MarginPadding { Right = 5 },
                                 },

@@ -292,7 +292,6 @@ namespace osu.Game.Rulesets.Osu.Replays
             {
                 // We add intermediate frames for spinning / following a slider here.
                 case Spinner spinner:
-                {
                     Vector2 difference = startPosition - SPINNER_CENTRE;
 
                     float radius = difference.Length;
@@ -315,9 +314,7 @@ namespace osu.Game.Rulesets.Osu.Replays
 
                     endFrame.Position = endPosition;
                     break;
-                }
                 case Slider slider:
-                {
                     for (double j = FrameDelay; j < slider.Duration; j += FrameDelay)
                     {
                         Vector2 pos = slider.StackedPositionAt(j / slider.Duration);
@@ -326,7 +323,6 @@ namespace osu.Game.Rulesets.Osu.Replays
 
                     AddFrameToReplay(new OsuReplayFrame(slider.EndTime, new Vector2(slider.StackedEndPosition.X, slider.StackedEndPosition.Y), action));
                     break;
-                }
             }
 
             // We only want to let go of our button if we are at the end of the current replay. Otherwise something is still going on after us so we need to keep the button pressed!

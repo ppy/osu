@@ -28,7 +28,7 @@ namespace osu.Game.Rulesets.Mods
         /// The icon of this mod.
         /// </summary>
         [JsonIgnore]
-        public virtual IconUsage Icon => FontAwesome.Question;
+        public virtual IconUsage Icon => FontAwesome.Solid.Question;
 
         /// <summary>
         /// The type of this mod.

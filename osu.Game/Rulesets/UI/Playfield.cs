@@ -99,11 +99,6 @@ namespace osu.Game.Rulesets.UI
         protected virtual GameplayCursorContainer CreateCursor() => null;
 
         /// <summary>
-        /// The target container to add the cursor after it is created.
-        /// </summary>
-        protected virtual Container CursorTargetContainer => null;
-
-        /// <summary>
         /// Registers a <see cref="Playfield"/> as a nested <see cref="Playfield"/>.
         /// This does not add the <see cref="Playfield"/> to the draw hierarchy.
         /// </summary>
