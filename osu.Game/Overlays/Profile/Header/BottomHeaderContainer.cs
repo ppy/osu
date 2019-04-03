@@ -107,7 +107,7 @@ namespace osu.Game.Overlays.Profile.Header
             bottomTopLinkContainer.AddText("Contributed ");
             bottomTopLinkContainer.AddLink($@"{user.PostCount:#,##0} forum posts", $"https://osu.ppy.sh/users/{user.Id}/posts", creationParameters: bold);
 
-            void tryAddInfo(FontAwesome icon, string content, string link = null)
+            void tryAddInfo(IconUsage icon, string content, string link = null)
             {
                 if (string.IsNullOrEmpty(content)) return;
 
@@ -138,16 +138,16 @@ namespace osu.Game.Overlays.Profile.Header
                     websiteWithoutProtcol = websiteWithoutProtcol.Substring(protocolIndex + 2);
             }
 
-            tryAddInfo(FontAwesome.fa_map_marker, user.Location);
-            tryAddInfo(FontAwesome.fa_heart_o, user.Interests);
-            tryAddInfo(FontAwesome.fa_suitcase, user.Occupation);
+            tryAddInfo(FontAwesome.Solid.MapMarker, user.Location);
+            tryAddInfo(OsuIcon.Heart, user.Interests);
+            tryAddInfo(FontAwesome.Solid.Suitcase, user.Occupation);
             bottomLinkContainer.NewLine();
             if (!string.IsNullOrEmpty(user.Twitter))
-                tryAddInfo(FontAwesome.fa_twitter, "@" + user.Twitter, $@"https://twitter.com/{user.Twitter}");
-            tryAddInfo(FontAwesome.fa_gamepad, user.Discord); //todo: update fontawesome to include discord logo
-            tryAddInfo(FontAwesome.fa_skype, user.Skype, @"skype:" + user.Skype + @"?chat");
-            tryAddInfo(FontAwesome.fa_lastfm, user.Lastfm, $@"https://last.fm/users/{user.Lastfm}");
-            tryAddInfo(FontAwesome.fa_link, websiteWithoutProtcol, user.Website);
+                tryAddInfo(FontAwesome.Brands.Twitter, "@" + user.Twitter, $@"https://twitter.com/{user.Twitter}");
+            tryAddInfo(FontAwesome.Brands.Discord, user.Discord);
+            tryAddInfo(FontAwesome.Brands.Skype, user.Skype, @"skype:" + user.Skype + @"?chat");
+            tryAddInfo(FontAwesome.Brands.Lastfm, user.Lastfm, $@"https://last.fm/users/{user.Lastfm}");
+            tryAddInfo(FontAwesome.Solid.Link, websiteWithoutProtcol, user.Website);
         }
     }
 }

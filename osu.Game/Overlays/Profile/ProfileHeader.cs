@@ -5,11 +5,11 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
-using osu.Framework.Graphics.Textures;
 using osu.Game.Graphics;
 using osu.Game.Overlays.Profile.Header;
 using osu.Game.Users;
 using osu.Framework.Bindables;
+using osu.Framework.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 
 namespace osu.Game.Overlays.Profile
@@ -17,7 +17,6 @@ namespace osu.Game.Overlays.Profile
     public class ProfileHeader : Container
     {
         private readonly UserCoverBackground coverContainer;
-        private readonly ScreenTitle coverTitle;
         private readonly ProfileHeaderTabControl infoTabControl;
 
         private const float cover_height = 150;
@@ -52,10 +51,9 @@ namespace osu.Game.Overlays.Profile
                     Depth = -float.MaxValue,
                     Children = new Drawable[]
                     {
-                        coverTitle = new ScreenTitle
+                        new ProfileHeaderTitle
                         {
-                            Title = "Player ",
-                            Page = "Info"
+                            X = -ScreenTitle.ICON_WIDTH,
                         },
                         infoTabControl = new ProfileHeaderTabControl
                         {
@@ -113,10 +111,8 @@ namespace osu.Game.Overlays.Profile
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours, TextureStore textures)
+        private void load(OsuColour colours)
         {
-            coverTitle.AccentColour = colours.CommunityUserGreen;
-
             infoTabControl.AccentColour = colours.CommunityUserGreen;
         }
 
@@ -130,6 +126,21 @@ namespace osu.Game.Overlays.Profile
         public class HasTooltipContainer : Container, IHasTooltip
         {
             public string TooltipText { get; set; }
+        }
+
+        private class ProfileHeaderTitle : ScreenTitle
+        {
+            public ProfileHeaderTitle()
+            {
+                Title = "Player ";
+                Section = "Info";
+            }
+
+            [BackgroundDependencyLoader]
+            private void load(OsuColour colours)
+            {
+                AccentColour = colours.CommunityUserGreen;
+            }
         }
     }
 }

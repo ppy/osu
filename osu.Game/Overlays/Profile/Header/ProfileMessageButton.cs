@@ -4,7 +4,7 @@
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
-using osu.Game.Graphics;
+using osu.Framework.Graphics.Sprites;
 using osu.Game.Online.API;
 using osu.Game.Online.Chat;
 using osu.Game.Users;
@@ -26,7 +26,7 @@ namespace osu.Game.Overlays.Profile.Header
         private ChatOverlay chatOverlay { get; set; }
 
         [Resolved]
-        private APIAccess apiAccess { get; set; }
+        private IAPIProvider apiProvider { get; set; }
 
         public ProfileMessageButton()
         {
@@ -37,7 +37,7 @@ namespace osu.Game.Overlays.Profile.Header
             {
                 Anchor = Anchor.CentreLeft,
                 Origin = Anchor.CentreLeft,
-                Icon = FontAwesome.fa_envelope,
+                Icon = FontAwesome.Solid.Envelope,
                 FillMode = FillMode.Fit,
                 Size = new Vector2(50, 14)
             };
@@ -51,7 +51,7 @@ namespace osu.Game.Overlays.Profile.Header
                 chatOverlay?.Show();
             };
 
-            User.ValueChanged += e => Content.Alpha = !e.NewValue.PMFriendsOnly && apiAccess.LocalUser.Value.Id != e.NewValue.Id ? 1 : 0;
+            User.ValueChanged += e => Content.Alpha = !e.NewValue.PMFriendsOnly && apiProvider.LocalUser.Value.Id != e.NewValue.Id ? 1 : 0;
         }
     }
 }
