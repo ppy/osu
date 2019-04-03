@@ -172,7 +172,11 @@ namespace osu.Game.Screens.Play
 
             content.SetLogo(logo, 1.0f, 500, Easing.InOutExpo);
 
-            Scheduler.AddDelayed(() => content.Tracking = true, resuming ? 0 : 500);
+            Scheduler.AddDelayed(() =>
+            {
+                content.Tracking = true;
+                //logo.RelativePositionAxes = Axes.None;
+            }, resuming ? 0 : 500);
         }
 
         protected override void LogoExiting(OsuLogo logo)
