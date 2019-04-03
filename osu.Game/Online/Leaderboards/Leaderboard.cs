@@ -174,12 +174,12 @@ namespace osu.Game.Online.Leaderboards
             };
         }
 
-        private APIAccess api;
+        private IAPIProvider api;
 
         private ScheduledDelegate pendingUpdateScores;
 
         [BackgroundDependencyLoader(true)]
-        private void load(APIAccess api)
+        private void load(IAPIProvider api)
         {
             this.api = api;
             api?.Register(this);
@@ -195,7 +195,7 @@ namespace osu.Game.Online.Leaderboards
 
         private APIRequest getScoresRequest;
 
-        public void APIStateChanged(APIAccess api, APIState state)
+        public void APIStateChanged(IAPIProvider api, APIState state)
         {
             if (state == APIState.Online)
                 UpdateScores();

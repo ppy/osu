@@ -3,6 +3,7 @@
 
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Sprites;
 using osuTK;
 using osuTK.Graphics;
 
@@ -36,14 +37,14 @@ namespace osu.Game.Graphics.UserInterface
                     Position = new Vector2(1, 1),
                     Colour = Color4.Black,
                     Alpha = 0.4f,
-                    Icon = FontAwesome.fa_circle_o_notch
+                    Icon = FontAwesome.Solid.CircleNotch
                 },
                 spinner = new SpriteIcon
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
                     RelativeSizeAxes = Axes.Both,
-                    Icon = FontAwesome.fa_circle_o_notch
+                    Icon = FontAwesome.Solid.CircleNotch
                 }
             };
         }

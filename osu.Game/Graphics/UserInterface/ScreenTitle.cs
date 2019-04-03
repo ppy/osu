@@ -3,30 +3,31 @@
 
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Sprites;
 using osu.Game.Graphics.Sprites;
 using osuTK;
 using osuTK.Graphics;
 
 namespace osu.Game.Graphics.UserInterface
 {
-    public class ScreenTitle : CompositeDrawable, IHasAccentColour
+    public abstract class ScreenTitle : CompositeDrawable, IHasAccentColour
     {
         private readonly SpriteIcon iconSprite;
         private readonly OsuSpriteText titleText, pageText;
 
-        public FontAwesome Icon
+        protected IconUsage Icon
         {
             get => iconSprite.Icon;
             set => iconSprite.Icon = value;
         }
 
-        public string Title
+        protected string Title
         {
             get => titleText.Text;
             set => titleText.Text = value;
         }
 
-        public string Page
+        protected string Section
         {
             get => pageText.Text;
             set => pageText.Text = value;
@@ -38,35 +39,41 @@ namespace osu.Game.Graphics.UserInterface
             set => pageText.Colour = value;
         }
 
-        public ScreenTitle()
+        protected ScreenTitle()
         {
             AutoSizeAxes = Axes.Both;
 
             InternalChildren = new Drawable[]
             {
-                iconSprite = new SpriteIcon
-                {
-                    Size = new Vector2(25),
-                    Anchor = Anchor.TopLeft,
-                    Origin = Anchor.TopRight,
-                    Margin = new MarginPadding { Right = 10 },
-                },
                 new FillFlowContainer
                 {
                     AutoSizeAxes = Axes.Both,
-                    Direction = FillDirection.Horizontal,
-                    Children = new[]
+                    Spacing = new Vector2(10, 0),
+                    Children = new Drawable[]
                     {
-                        titleText = new OsuSpriteText
+                        iconSprite = new SpriteIcon
                         {
-                            Font = OsuFont.GetFont(size: 25),
+                            Size = new Vector2(25),
                         },
-                        pageText = new OsuSpriteText
+                        new FillFlowContainer
                         {
-                            Font = OsuFont.GetFont(size: 25),
+                            AutoSizeAxes = Axes.Both,
+                            Direction = FillDirection.Horizontal,
+                            Spacing = new Vector2(6, 0),
+                            Children = new[]
+                            {
+                                titleText = new OsuSpriteText
+                                {
+                                    Font = OsuFont.GetFont(size: 25),
+                                },
+                                pageText = new OsuSpriteText
+                                {
+                                    Font = OsuFont.GetFont(size: 25),
+                                }
+                            }
                         }
                     }
-                }
+                },
             };
         }
     }

@@ -5,6 +5,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
+using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Events;
 using osu.Framework.Platform;
 using osuTK;
@@ -25,7 +26,7 @@ namespace osu.Game.Graphics.UserInterface
             Size = new Vector2(12);
             InternalChild = new SpriteIcon
             {
-                Icon = FontAwesome.fa_external_link,
+                Icon = FontAwesome.Solid.ExternalLinkAlt,
                 RelativeSizeAxes = Axes.Both
             };
         }

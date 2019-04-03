@@ -2,8 +2,8 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Events;
-using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osuTK;
 using osuTK.Graphics;
@@ -23,7 +23,7 @@ namespace osu.Game.Overlays.Chat.Tabs
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
                 Scale = new Vector2(0.75f),
-                Icon = FontAwesome.fa_close,
+                Icon = FontAwesome.Solid.TimesCircle,
                 RelativeSizeAxes = Axes.Both,
             };
         }

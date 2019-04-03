@@ -4,7 +4,7 @@
 using osuTK;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Game.Graphics;
+using osu.Framework.Graphics.Sprites;
 
 namespace osu.Game.Rulesets.Taiko.Objects.Drawables.Pieces
 {
@@ -27,7 +27,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables.Pieces
                 new SpriteIcon
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Icon = FontAwesome.fa_asterisk,
+                    Icon = FontAwesome.Solid.Asterisk,
                     Shadow = false
                 }
             };

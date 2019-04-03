@@ -179,7 +179,7 @@ namespace osu.Game.Graphics.UserInterface
                             Chevron = new SpriteIcon
                             {
                                 AlwaysPresent = true,
-                                Icon = FontAwesome.fa_chevron_right,
+                                Icon = FontAwesome.Solid.ChevronRight,
                                 Colour = Color4.Black,
                                 Alpha = 0.5f,
                                 Size = new Vector2(8),
@@ -244,7 +244,7 @@ namespace osu.Game.Graphics.UserInterface
                     },
                     Icon = new SpriteIcon
                     {
-                        Icon = FontAwesome.fa_chevron_down,
+                        Icon = FontAwesome.Solid.ChevronDown,
                         Anchor = Anchor.CentreRight,
                         Origin = Anchor.CentreRight,
                         Margin = new MarginPadding { Right = 4 },

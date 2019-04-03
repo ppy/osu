@@ -110,7 +110,7 @@ namespace osu.Desktop.Overlays
             public UpdateCompleteNotification(string version, Action<string> openUrl = null)
             {
                 Text = $"You are now running osu!lazer {version}.\nClick to see what's new!";
-                Icon = FontAwesome.fa_check_square;
+                Icon = FontAwesome.Solid.CheckSquare;
                 Activated = delegate
                 {
                     openUrl?.Invoke($"https://osu.ppy.sh/home/changelog/lazer/{version}");

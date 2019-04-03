@@ -2,7 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Graphics;
-using osu.Game.Graphics;
+using osu.Framework.Graphics.Sprites;
 
 namespace osu.Game.Online.Leaderboards
 {
@@ -12,7 +12,7 @@ namespace osu.Game.Online.Leaderboards
 
         public MessagePlaceholder(string message)
         {
-            AddIcon(FontAwesome.fa_exclamation_circle, cp =>
+            AddIcon(FontAwesome.Solid.ExclamationCircle, cp =>
             {
                 cp.Font = cp.Font.With(size: TEXT_SIZE);
                 cp.Padding = new MarginPadding { Right = 10 };

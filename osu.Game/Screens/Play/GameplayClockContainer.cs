@@ -6,6 +6,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using osu.Framework;
 using osu.Framework.Allocation;
+using osu.Framework.Audio;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -17,7 +18,7 @@ using osu.Game.Rulesets.Mods;
 namespace osu.Game.Screens.Play
 {
     /// <summary>
-    /// Encapsulates gameplay timing logic and provides a <see cref="GameplayClock"/> for children.
+    /// Encapsulates gameplay timing logic and provides a <see cref="Play.GameplayClock"/> for children.
     /// </summary>
     public class GameplayClockContainer : Container
     {
@@ -47,13 +48,13 @@ namespace osu.Game.Screens.Play
         /// The final clock which is exposed to underlying components.
         /// </summary>
         [Cached]
-        private readonly GameplayClock gameplayClock;
+        public readonly GameplayClock GameplayClock;
 
         private Bindable<double> userAudioOffset;
 
         private readonly FramedOffsetClock offsetClock;
 
-        public GameplayClockContainer(WorkingBeatmap beatmap, bool allowLeadIn, double gameplayStartTime)
+        public GameplayClockContainer(WorkingBeatmap beatmap, double gameplayStartTime)
         {
             this.beatmap = beatmap;
 
@@ -63,9 +64,7 @@ namespace osu.Game.Screens.Play
 
             adjustableClock = new DecoupleableInterpolatingFramedClock { IsCoupled = false };
 
-            adjustableClock.Seek(allowLeadIn
-                ? Math.Min(0, gameplayStartTime - beatmap.BeatmapInfo.AudioLeadIn)
-                : gameplayStartTime);
+            adjustableClock.Seek(Math.Min(0, gameplayStartTime - beatmap.BeatmapInfo.AudioLeadIn));
 
             adjustableClock.ProcessFrame();
 
@@ -77,7 +76,9 @@ namespace osu.Game.Screens.Play
             offsetClock = new FramedOffsetClock(platformOffsetClock);
 
             // the clock to be exposed via DI to children.
-            gameplayClock = new GameplayClock(offsetClock);
+            GameplayClock = new GameplayClock(offsetClock);
+
+            GameplayClock.IsPaused.BindTo(IsPaused);
         }
 
         [BackgroundDependencyLoader]
@@ -117,11 +118,16 @@ namespace osu.Game.Screens.Play
             // This accounts for the audio clock source potentially taking time to enter a completely stopped state
             adjustableClock.Seek(adjustableClock.CurrentTime);
             adjustableClock.Start();
+            IsPaused.Value = false;
         }
 
         public void Seek(double time) => adjustableClock.Seek(time);
 
-        public void Stop() => adjustableClock.Stop();
+        public void Stop()
+        {
+            adjustableClock.Stop();
+            IsPaused.Value = true;
+        }
 
         public void ResetLocalAdjustments()
         {
@@ -141,11 +147,15 @@ namespace osu.Game.Screens.Play
         {
             if (sourceClock == null) return;
 
-            sourceClock.Rate = 1;
+            sourceClock.ResetSpeedAdjustments();
+
+            if (sourceClock is IHasTempoAdjust tempo)
+                tempo.TempoAdjust = UserPlaybackRate.Value;
+            else
+                sourceClock.Rate = UserPlaybackRate.Value;
+
             foreach (var mod in beatmap.Mods.Value.OfType<IApplicableToClock>())
                 mod.ApplyToClock(sourceClock);
-
-            sourceClock.Rate *= UserPlaybackRate.Value;
         }
     }
 }

@@ -10,6 +10,7 @@ using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Events;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Drawables;
@@ -130,8 +131,8 @@ namespace osu.Game.Overlays.BeatmapSet
                             Margin = new MarginPadding { Top = 5 },
                             Children = new[]
                             {
-                                plays = new Statistic(FontAwesome.fa_play_circle),
-                                favourites = new Statistic(FontAwesome.fa_heart),
+                                plays = new Statistic(FontAwesome.Solid.PlayCircle),
+                                favourites = new Statistic(FontAwesome.Solid.Heart),
                             },
                         },
                     },
@@ -292,7 +293,7 @@ namespace osu.Game.Overlays.BeatmapSet
                 }
             }
 
-            public Statistic(FontAwesome icon)
+            public Statistic(IconUsage icon)
             {
                 AutoSizeAxes = Axes.Both;
                 Direction = FillDirection.Horizontal;
