@@ -46,7 +46,7 @@ Task("InspectCode")
             OutputFile = "inspectcodereport.xml",
         });
 
-        int returnCode = StartProcess(nVikaToolPath, $@"parsereport ""{inspectcodereport}"" --treatwarningsaserrors");
+        int returnCode = StartProcess(nVikaToolPath, $@"parsereport ""inspectcodereport.xml"" --treatwarningsaserrors");
         if (returnCode != 0)
             throw new Exception($"inspectcode failed with return code {returnCode}");
     });
