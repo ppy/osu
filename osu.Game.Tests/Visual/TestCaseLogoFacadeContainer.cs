@@ -177,7 +177,6 @@ namespace osu.Game.Tests.Visual
                 Scheduler.AddDelayed(() =>
                 {
                     logoFacadeContainer.Tracking = true;
-                    //logo.RelativePositionAxes = Axes.None;
                     visualBox.Colour = Color4.Tomato;
                 }, 700);
             });

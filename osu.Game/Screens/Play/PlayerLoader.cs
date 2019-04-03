@@ -175,7 +175,6 @@ namespace osu.Game.Screens.Play
             Scheduler.AddDelayed(() =>
             {
                 content.Tracking = true;
-                //logo.RelativePositionAxes = Axes.None;
             }, resuming ? 0 : 500);
         }
 
