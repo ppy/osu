@@ -325,7 +325,7 @@ namespace osu.Game.Screens.Play
 
         protected FailOverlay FailOverlay { get; private set; }
 
-        private void Fail()
+        private void fail()
         {
             GameplayClockContainer.Stop();
             HasFailed = true;
@@ -345,7 +345,7 @@ namespace osu.Game.Screens.Play
                 }
                 else
                 {
-                    Fail();
+                    fail();
                     return true;
                 }
             }
@@ -356,7 +356,7 @@ namespace osu.Game.Screens.Play
             // In such cases we want the fail state to precede a user triggered pause.
             if (PauseOverlay.State == Visibility.Visible)
                 PauseOverlay.Hide();
-            Fail();
+            fail();
             return true;
         }
 
