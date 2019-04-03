@@ -325,10 +325,8 @@ namespace osu.Game.Screens.Play
 
         protected FailOverlay FailOverlay { get; private set; }
 
-
         private bool onFail()
         {
-            
             if (Beatmap.Value.Mods.Value.OfType<IApplicableFailOverride>().Any(m => !m.AllowFail))
                 return false;
             GameplayClockContainer.Stop();
