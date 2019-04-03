@@ -325,14 +325,18 @@ namespace osu.Game.Screens.Play
 
         protected FailOverlay FailOverlay { get; private set; }
 
-
+        private void Fail()
+        {
+            GameplayClockContainer.Stop();
+            HasFailed = true;
+            FailOverlay.Retries = RestartCount;
+            FailOverlay.Show();
+        }
         private bool onFail()
         {
-            
             //issue #3372
             if (Beatmap.Value.Mods.Value.Any(x => x is ModEasy))
             {
-                
                 if (Lives != 0)
                 {
                     Lives--;
@@ -341,33 +345,18 @@ namespace osu.Game.Screens.Play
                 }
                 else
                 {
-                    GameplayClockContainer.Stop();
-                    HasFailed = true;
-                    FailOverlay.Retries = RestartCount;
-                    FailOverlay.Show();
+                    Fail();
                     return true;
-                        
                 }
-
             }
-
             if (Beatmap.Value.Mods.Value.OfType<IApplicableFailOverride>().Any(m => !m.AllowFail))
                 return false;
-
-            GameplayClockContainer.Stop();
-
-            HasFailed = true;
-
-
-
             // There is a chance that we could be in a paused state as the ruleset's internal clock (see FrameStabilityContainer)
             // could process an extra frame after the GameplayClock is stopped.
             // In such cases we want the fail state to precede a user triggered pause.
             if (PauseOverlay.State == Visibility.Visible)
                 PauseOverlay.Hide();
-
-            FailOverlay.Retries = RestartCount;
-            FailOverlay.Show();
+            Fail();
             return true;
         }
 
