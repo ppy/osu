@@ -145,7 +145,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                 });
             }
 
-            protected override void OnUserChange(User user)
+            protected override void OnUserChanged(User user)
             {
                 text.Text = textBold.Text = user.Username;
             }

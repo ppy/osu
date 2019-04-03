@@ -24,6 +24,7 @@ namespace osu.Game.Tests.Visual.SongSelect
     {
         public override IReadOnlyList<Type> RequiredTypes => new[]
         {
+            typeof(DrawableTopScore),
             typeof(ScoresContainer),
             typeof(ScoreTable),
             typeof(ScoreTableRow),

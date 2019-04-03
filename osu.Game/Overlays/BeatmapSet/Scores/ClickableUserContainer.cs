@@ -13,6 +13,17 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
     {
         private UserProfileOverlay profile;
 
+        protected ClickableUserContainer()
+        {
+            AutoSizeAxes = Axes.Both;
+        }
+
+        [BackgroundDependencyLoader(true)]
+        private void load(UserProfileOverlay profile)
+        {
+            this.profile = profile;
+        }
+
         private User user;
 
         public User User
@@ -20,26 +31,16 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
             get => user;
             set
             {
-                if (user == value) return;
+                if (user == value)
+                    return;
 
                 user = value;
 
-                OnUserChange(user);
+                OnUserChanged(user);
             }
         }
 
-        protected ClickableUserContainer()
-        {
-            AutoSizeAxes = Axes.Both;
-        }
-
-        protected abstract void OnUserChange(User user);
-
-        [BackgroundDependencyLoader(true)]
-        private void load(UserProfileOverlay profile)
-        {
-            this.profile = profile;
-        }
+        protected abstract void OnUserChanged(User user);
 
         protected override bool OnClick(ClickEvent e)
         {
