@@ -52,8 +52,8 @@ namespace osu.Game.Rulesets.Catch.Difficulty
             using (var catcher = new CatcherArea.Catcher(beatmap.BeatmapInfo.BaseDifficulty))
             {
                 halfCatchWidth = catcher.CatchWidth * 0.5f;
-                // We're only using 80% of the catcher's width to simulate imperfect gameplay.
-                halfCatchWidth *= Math.Min(1.05f - (0.05f * beatmap.BeatmapInfo.BaseDifficulty.CircleSize), 0.8f); // Reduce the catcher's width further at circle sizes above 5.
+                // We're only using 80% of the catcher's width to simulate imperfect gameplay, reduced further at circle sizes above 5.5
+                halfCatchWidth *= Math.Min(1.075f - (0.05f * beatmap.BeatmapInfo.BaseDifficulty.CircleSize), 0.8f);
             }
 
             CatchHitObject lastObject = null;
