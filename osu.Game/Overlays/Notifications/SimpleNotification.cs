@@ -6,6 +6,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Graphics.Sprites;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osuTK;
@@ -26,9 +27,9 @@ namespace osu.Game.Overlays.Notifications
             }
         }
 
-        private FontAwesome icon = FontAwesome.fa_info_circle;
+        private IconUsage icon = FontAwesome.Solid.InfoCircle;
 
-        public FontAwesome Icon
+        public IconUsage Icon
         {
             get => icon;
             set

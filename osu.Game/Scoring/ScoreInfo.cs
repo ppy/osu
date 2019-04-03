@@ -178,5 +178,7 @@ namespace osu.Game.Scoring
         {
             public string Acronym { get; set; }
         }
+
+        public override string ToString() => $"{User} playing {Beatmap}";
     }
 }

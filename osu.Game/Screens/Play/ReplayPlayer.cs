@@ -9,7 +9,8 @@ namespace osu.Game.Screens.Play
     {
         private readonly Score score;
 
-        public ReplayPlayer(Score score)
+        public ReplayPlayer(Score score, bool allowPause = true, bool showResults = true)
+            : base(allowPause, showResults)
         {
             this.score = score;
         }
@@ -17,7 +18,7 @@ namespace osu.Game.Screens.Play
         protected override void LoadComplete()
         {
             base.LoadComplete();
-            RulesetContainer?.SetReplayScore(score);
+            DrawableRuleset?.SetReplayScore(score);
         }
 
         protected override ScoreInfo CreateScore() => score.ScoreInfo;

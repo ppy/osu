@@ -18,7 +18,7 @@ namespace osu.Game.Tournament.Tests
     public class TestCaseBeatmapPanel : OsuTestCase
     {
         [Resolved]
-        private APIAccess api { get; set; }
+        private IAPIProvider api { get; set; }
 
         [Resolved]
         private RulesetStore rulesets { get; set; }

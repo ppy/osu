@@ -1,9 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using osu.Framework.Allocation;
 using osu.Framework.Graphics;
-using osu.Framework.Screens;
+using osu.Framework.Graphics.Containers;
 using osu.Game.Screens;
 
 namespace osu.Game.Tests.Visual
@@ -11,20 +10,21 @@ namespace osu.Game.Tests.Visual
     /// <summary>
     /// A test case which can be used to test a screen (that relies on OnEntering being called to execute startup instructions).
     /// </summary>
-    public abstract class ScreenTestCase : OsuTestCase
+    public abstract class ScreenTestCase : ManualInputManagerTestCase
     {
-        private readonly ScreenStack stack;
+        private readonly OsuScreenStack stack;
 
-        [Cached]
-        private BackgroundScreenStack backgroundStack;
+        private readonly Container content;
+
+        protected override Container<Drawable> Content => content;
 
         protected ScreenTestCase()
         {
-            Children = new Drawable[]
+            base.Content.AddRange(new Drawable[]
             {
-                backgroundStack = new BackgroundScreenStack { RelativeSizeAxes = Axes.Both },
-                stack = new ScreenStack { RelativeSizeAxes = Axes.Both }
-            };
+                stack = new OsuScreenStack { RelativeSizeAxes = Axes.Both },
+                content = new Container { RelativeSizeAxes = Axes.Both }
+            });
         }
 
         protected void LoadScreen(OsuScreen screen)

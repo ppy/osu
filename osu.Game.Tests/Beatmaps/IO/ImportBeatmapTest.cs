@@ -101,7 +101,7 @@ namespace osu.Game.Tests.Beatmaps.IO
                     int fireCount = 0;
 
                     // ReSharper disable once AccessToModifiedClosure
-                    manager.ItemAdded += (_, __, ___) => fireCount++;
+                    manager.ItemAdded += (_, __) => fireCount++;
                     manager.ItemRemoved += _ => fireCount++;
 
                     var imported = LoadOszIntoOsu(osu);
@@ -199,6 +199,96 @@ namespace osu.Game.Tests.Beatmaps.IO
                     // check the newly "imported" beatmap is actually just the restored previous import. since it matches hash.
                     Assert.IsTrue(imported.ID == importedSecondTime.ID);
                     Assert.IsTrue(imported.Beatmaps.First().ID == importedSecondTime.Beatmaps.First().ID);
+                }
+                finally
+                {
+                    host.Exit();
+                }
+            }
+        }
+
+        [TestCase(true)]
+        [TestCase(false)]
+        public void TestImportThenDeleteThenImportWithOnlineIDMismatch(bool set)
+        {
+            //unfortunately for the time being we need to reference osu.Framework.Desktop for a game host here.
+            using (HeadlessGameHost host = new CleanRunHeadlessGameHost($"TestImportThenDeleteThenImport-{set}"))
+            {
+                try
+                {
+                    var osu = loadOsu(host);
+
+                    var imported = LoadOszIntoOsu(osu);
+
+                    if (set)
+                        imported.OnlineBeatmapSetID = 1234;
+                    else
+                        imported.Beatmaps.First().OnlineBeatmapID = 1234;
+
+                    osu.Dependencies.Get<BeatmapManager>().Update(imported);
+
+                    deleteBeatmapSet(imported, osu);
+
+                    var importedSecondTime = LoadOszIntoOsu(osu);
+
+                    // check the newly "imported" beatmap has been reimported due to mismatch (even though hashes matched)
+                    Assert.IsTrue(imported.ID != importedSecondTime.ID);
+                    Assert.IsTrue(imported.Beatmaps.First().ID != importedSecondTime.Beatmaps.First().ID);
+                }
+                finally
+                {
+                    host.Exit();
+                }
+            }
+        }
+
+        [Test]
+        public void TestImportWithDuplicateBeatmapIDs()
+        {
+            //unfortunately for the time being we need to reference osu.Framework.Desktop for a game host here.
+            using (HeadlessGameHost host = new CleanRunHeadlessGameHost("TestImportWithDuplicateBeatmapID"))
+            {
+                try
+                {
+                    var osu = loadOsu(host);
+
+                    var metadata = new BeatmapMetadata
+                    {
+                        Artist = "SomeArtist",
+                        AuthorString = "SomeAuthor"
+                    };
+
+                    var difficulty = new BeatmapDifficulty();
+
+                    var toImport = new BeatmapSetInfo
+                    {
+                        OnlineBeatmapSetID = 1,
+                        Metadata = metadata,
+                        Beatmaps = new List<BeatmapInfo>
+                        {
+                            new BeatmapInfo
+                            {
+                                OnlineBeatmapID = 2,
+                                Metadata = metadata,
+                                BaseDifficulty = difficulty
+                            },
+                            new BeatmapInfo
+                            {
+                                OnlineBeatmapID = 2,
+                                Metadata = metadata,
+                                Status = BeatmapSetOnlineStatus.Loved,
+                                BaseDifficulty = difficulty
+                            }
+                        }
+                    };
+
+                    var manager = osu.Dependencies.Get<BeatmapManager>();
+
+                    var imported = manager.Import(toImport);
+
+                    Assert.NotNull(imported);
+                    Assert.AreEqual(null, imported.Beatmaps[0].OnlineBeatmapID);
+                    Assert.AreEqual(null, imported.Beatmaps[1].OnlineBeatmapID);
                 }
                 finally
                 {

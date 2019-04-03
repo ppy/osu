@@ -10,7 +10,6 @@ using osu.Game.Graphics;
 using osu.Framework.Allocation;
 using System.Linq;
 using osu.Framework.Bindables;
-using osu.Framework.Timing;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.UI;
@@ -29,17 +28,10 @@ namespace osu.Game.Screens.Play
         private readonly SongProgressGraph graph;
         private readonly SongProgressInfo info;
 
-        public Action<double> OnSeek;
+        public Action<double> RequestSeek;
 
         public override bool HandleNonPositionalInput => AllowSeeking;
         public override bool HandlePositionalInput => AllowSeeking;
-
-        private IClock audioClock;
-
-        public IClock AudioClock
-        {
-            set => audioClock = info.AudioClock = value;
-        }
 
         private double lastHitTime => ((objects.Last() as IHasEndTime)?.EndTime ?? objects.Last().StartTime) + 1;
 
@@ -63,9 +55,14 @@ namespace osu.Game.Screens.Play
 
         private readonly BindableBool replayLoaded = new BindableBool();
 
-        [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
+        private GameplayClock gameplayClock;
+
+        [BackgroundDependencyLoader(true)]
+        private void load(OsuColour colours, GameplayClock clock)
         {
+            if (clock != null)
+                gameplayClock = clock;
+
             graph.FillColour = bar.FillColour = colours.BlueLighter;
         }
 
@@ -99,7 +96,7 @@ namespace osu.Game.Screens.Play
                     Alpha = 0,
                     Anchor = Anchor.BottomLeft,
                     Origin = Anchor.BottomLeft,
-                    OnSeek = position => OnSeek?.Invoke(position),
+                    OnSeek = time => RequestSeek?.Invoke(time),
                 },
             };
         }
@@ -112,9 +109,9 @@ namespace osu.Game.Screens.Play
             replayLoaded.TriggerChange();
         }
 
-        public void BindRulestContainer(RulesetContainer rulesetContainer)
+        public void BindDrawableRuleset(DrawableRuleset drawableRuleset)
         {
-            replayLoaded.BindTo(rulesetContainer.HasReplayLoaded);
+            replayLoaded.BindTo(drawableRuleset.HasReplayLoaded);
         }
 
         private bool allowSeeking;
@@ -157,14 +154,11 @@ namespace osu.Game.Screens.Play
             if (objects == null)
                 return;
 
-            double position = audioClock?.CurrentTime ?? Time.Current;
-            double progress = (position - firstHitTime) / (lastHitTime - firstHitTime);
+            double position = gameplayClock?.CurrentTime ?? Time.Current;
+            double progress = Math.Min(1, (position - firstHitTime) / (lastHitTime - firstHitTime));
 
-            if (progress < 1)
-            {
-                bar.CurrentTime = position;
-                graph.Progress = (int)(graph.ColumnCount * progress);
-            }
+            bar.CurrentTime = position;
+            graph.Progress = (int)(graph.ColumnCount * progress);
         }
     }
 }

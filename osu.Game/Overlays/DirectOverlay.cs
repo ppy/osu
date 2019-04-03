@@ -28,7 +28,7 @@ namespace osu.Game.Overlays
     {
         private const float panel_padding = 10f;
 
-        private APIAccess api;
+        private IAPIProvider api;
         private RulesetStore rulesets;
 
         private readonly FillFlowContainer resultCountsContainer;
@@ -134,9 +134,9 @@ namespace osu.Game.Overlays
                         Filter.Tabs.Current.Value = DirectSortCriteria.Ranked;
                 }
             };
-            ((FilterControl)Filter).Ruleset.ValueChanged += _ => Scheduler.AddOnce(updateSearch);
+            ((FilterControl)Filter).Ruleset.ValueChanged += _ => queueUpdateSearch();
             Filter.DisplayStyleControl.DisplayStyle.ValueChanged += style => recreatePanels(style.NewValue);
-            Filter.DisplayStyleControl.Dropdown.Current.ValueChanged += _ => Scheduler.AddOnce(updateSearch);
+            Filter.DisplayStyleControl.Dropdown.Current.ValueChanged += _ => queueUpdateSearch();
 
             Header.Tabs.Current.ValueChanged += tab =>
             {
@@ -144,24 +144,11 @@ namespace osu.Game.Overlays
                 {
                     currentQuery.Value = string.Empty;
                     Filter.Tabs.Current.Value = (DirectSortCriteria)Header.Tabs.Current.Value;
-                    Scheduler.AddOnce(updateSearch);
+                    queueUpdateSearch();
                 }
             };
 
-            currentQuery.ValueChanged += text =>
-            {
-                queryChangedDebounce?.Cancel();
-
-                if (string.IsNullOrEmpty(text.NewValue))
-                    Scheduler.AddOnce(updateSearch);
-                else
-                {
-                    BeatmapSets = null;
-                    ResultAmounts = null;
-
-                    queryChangedDebounce = Scheduler.AddDelayed(updateSearch, 500);
-                }
-            };
+            currentQuery.ValueChanged += text => queueUpdateSearch(!string.IsNullOrEmpty(text.NewValue));
 
             currentQuery.BindTo(Filter.Search.Current);
 
@@ -170,14 +157,14 @@ namespace osu.Game.Overlays
                 if (Header.Tabs.Current.Value != DirectTab.Search && tab.NewValue != (DirectSortCriteria)Header.Tabs.Current.Value)
                     Header.Tabs.Current.Value = DirectTab.Search;
 
-                Scheduler.AddOnce(updateSearch);
+                queueUpdateSearch();
             };
 
             updateResultCounts();
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours, APIAccess api, RulesetStore rulesets, PreviewTrackManager previewTrackManager)
+        private void load(OsuColour colours, IAPIProvider api, RulesetStore rulesets, PreviewTrackManager previewTrackManager)
         {
             this.api = api;
             this.rulesets = rulesets;
@@ -242,37 +229,42 @@ namespace osu.Game.Overlays
 
             // Queries are allowed to be run only on the first pop-in
             if (getSetsRequest == null)
-                Scheduler.AddOnce(updateSearch);
+                queueUpdateSearch();
         }
 
         private SearchBeatmapSetsRequest getSetsRequest;
 
-        private readonly Bindable<string> currentQuery = new Bindable<string>();
+        private readonly Bindable<string> currentQuery = new Bindable<string>(string.Empty);
 
         private ScheduledDelegate queryChangedDebounce;
         private PreviewTrackManager previewTrackManager;
 
+        private void queueUpdateSearch(bool queryTextChanged = false)
+        {
+            BeatmapSets = null;
+            ResultAmounts = null;
+
+            getSetsRequest?.Cancel();
+
+            queryChangedDebounce?.Cancel();
+            queryChangedDebounce = Scheduler.AddDelayed(updateSearch, queryTextChanged ? 500 : 100);
+        }
+
         private void updateSearch()
         {
-            queryChangedDebounce?.Cancel();
-
             if (!IsLoaded)
                 return;
 
             if (State == Visibility.Hidden)
                 return;
 
-            BeatmapSets = null;
-            ResultAmounts = null;
-
-            getSetsRequest?.Cancel();
-
             if (api == null)
                 return;
 
             previewTrackManager.StopAnyPlaying(this);
 
-            getSetsRequest = new SearchBeatmapSetsRequest(currentQuery.Value ?? string.Empty,
+            getSetsRequest = new SearchBeatmapSetsRequest(
+                currentQuery.Value,
                 ((FilterControl)Filter).Ruleset.Value,
                 Filter.DisplayStyleControl.Dropdown.Current.Value,
                 Filter.Tabs.Current.Value); //todo: sort direction (?)

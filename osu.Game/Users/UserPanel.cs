@@ -16,6 +16,7 @@ using osu.Game.Overlays;
 using osu.Framework.Graphics.UserInterface;
 using osu.Game.Graphics.UserInterface;
 using osu.Framework.Graphics.Cursor;
+using osu.Framework.Graphics.Sprites;
 using osu.Game.Graphics.Containers;
 using osu.Game.Overlays.Profile.Header;
 
@@ -59,6 +60,8 @@ namespace osu.Game.Users
 
             FillFlowContainer infoContainer;
 
+            UserCoverBackground coverBackground;
+
             AddInternal(content = new Container
             {
                 RelativeSizeAxes = Axes.Both,
@@ -73,13 +76,12 @@ namespace osu.Game.Users
 
                 Children = new Drawable[]
                 {
-                    new DelayedLoadWrapper(new UserCoverBackground(user)
+                    new DelayedLoadWrapper(coverBackground = new UserCoverBackground(user)
                     {
                         RelativeSizeAxes = Axes.Both,
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
                         FillMode = FillMode.Fill,
-                        OnLoadComplete = d => d.FadeInFromZero(400, Easing.Out)
                     }, 300) { RelativeSizeAxes = Axes.Both },
                     new Box
                     {
@@ -164,7 +166,7 @@ namespace osu.Game.Users
                                     {
                                         Anchor = Anchor.CentreLeft,
                                         Origin = Anchor.CentreLeft,
-                                        Icon = FontAwesome.fa_circle_o,
+                                        Icon = FontAwesome.Regular.Circle,
                                         Shadow = true,
                                         Size = new Vector2(14),
                                     },
@@ -180,6 +182,8 @@ namespace osu.Game.Users
                     },
                 }
             });
+
+            coverBackground.OnLoadComplete += d => d.FadeInFromZero(400, Easing.Out);
 
             if (user.IsSupporter)
             {

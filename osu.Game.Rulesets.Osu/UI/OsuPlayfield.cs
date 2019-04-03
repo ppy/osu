@@ -11,6 +11,7 @@ using osu.Game.Rulesets.Osu.Objects.Drawables.Connections;
 using osu.Game.Rulesets.UI;
 using System.Linq;
 using osu.Game.Rulesets.Judgements;
+using osu.Game.Rulesets.Osu.UI.Cursor;
 
 namespace osu.Game.Rulesets.Osu.UI
 {
@@ -22,35 +23,28 @@ namespace osu.Game.Rulesets.Osu.UI
 
         public static readonly Vector2 BASE_SIZE = new Vector2(512, 384);
 
+        protected override GameplayCursorContainer CreateCursor() => new OsuCursorContainer();
+
         public OsuPlayfield()
         {
-            Anchor = Anchor.Centre;
-            Origin = Anchor.Centre;
-
-            Size = new Vector2(0.75f);
-
-            InternalChild = new PlayfieldAdjustmentContainer
+            InternalChildren = new Drawable[]
             {
-                RelativeSizeAxes = Axes.Both,
-                Children = new Drawable[]
+                connectionLayer = new FollowPointRenderer
                 {
-                    connectionLayer = new FollowPointRenderer
-                    {
-                        RelativeSizeAxes = Axes.Both,
-                        Depth = 2,
-                    },
-                    judgementLayer = new JudgementContainer<DrawableOsuJudgement>
-                    {
-                        RelativeSizeAxes = Axes.Both,
-                        Depth = 1,
-                    },
-                    HitObjectContainer,
-                    approachCircles = new ApproachCircleProxyContainer
-                    {
-                        RelativeSizeAxes = Axes.Both,
-                        Depth = -1,
-                    },
-                }
+                    RelativeSizeAxes = Axes.Both,
+                    Depth = 2,
+                },
+                judgementLayer = new JudgementContainer<DrawableOsuJudgement>
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Depth = 1,
+                },
+                HitObjectContainer,
+                approachCircles = new ApproachCircleProxyContainer
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Depth = -1,
+                },
             };
         }
 

@@ -36,6 +36,7 @@ namespace osu.Game.Screens
 
             logo.BeatMatching = false;
             logo.Triangles = false;
+            logo.RelativePositionAxes = Axes.None;
             logo.Origin = Anchor.BottomRight;
             logo.Anchor = Anchor.BottomRight;
             logo.Position = new Vector2(-40);
@@ -89,7 +90,7 @@ namespace osu.Game.Screens
         /// </summary>
         public class ShaderPrecompiler : Drawable
         {
-            private readonly List<Shader> loadTargets = new List<Shader>();
+            private readonly List<IShader> loadTargets = new List<IShader>();
 
             public bool FinishedCompiling { get; private set; }
 
@@ -106,7 +107,7 @@ namespace osu.Game.Screens
                 loadTargets.Add(manager.Load(VertexShaderDescriptor.TEXTURE_3, FragmentShaderDescriptor.TEXTURE));
             }
 
-            protected virtual bool AllLoaded => loadTargets.All(s => s.Loaded);
+            protected virtual bool AllLoaded => loadTargets.All(s => s.IsLoaded);
 
             protected override void Update()
             {

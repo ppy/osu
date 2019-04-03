@@ -18,7 +18,7 @@ namespace osu.Game.Tournament.IPC
     public class FileBasedIPC : MatchIPCInfo
     {
         [Resolved]
-        protected APIAccess API { get; private set; }
+        protected IAPIProvider API { get; private set; }
 
         [Resolved]
         protected RulesetStore Rulesets { get; private set; }
