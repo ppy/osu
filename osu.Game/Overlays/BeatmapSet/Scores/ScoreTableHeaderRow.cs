@@ -2,15 +2,24 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
+using osu.Framework.Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Scoring;
 
 namespace osu.Game.Overlays.BeatmapSet.Scores
 {
     public class ScoreTableHeaderRow : ScoreTableRow
     {
+        private readonly ScoreInfo score;
+
+        public ScoreTableHeaderRow(ScoreInfo score)
+        {
+            this.score = score;
+        }
+
         protected override Drawable CreateIndexCell() => new CellText("rank");
 
         protected override Drawable CreateRankCell() => new Container();
@@ -21,14 +30,13 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
 
         protected override Drawable CreatePlayerCell() => new CellText("player");
 
-        protected override IEnumerable<Drawable> CreateStatisticsCells() => new[]
+        protected override IEnumerable<Drawable> CreateStatisticsCells()
         {
-            new CellText("max combo"),
-            new CellText("300"),
-            new CellText("100"),
-            new CellText("50"),
-            new CellText("miss"),
-        };
+            yield return new CellText("max combo");
+
+            foreach (var kvp in score.Statistics)
+                yield return new CellText(kvp.Key.GetDescription());
+        }
 
         protected override Drawable CreatePpCell() => new CellText("pp");
 

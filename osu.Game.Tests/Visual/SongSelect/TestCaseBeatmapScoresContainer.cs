@@ -53,7 +53,7 @@ namespace osu.Game.Tests.Visual.SongSelect
                 }
             };
 
-            IEnumerable<ScoreInfo> scores = new[]
+            var scores = new List<ScoreInfo>
             {
                 new ScoreInfo
                 {
