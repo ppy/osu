@@ -11,7 +11,7 @@ using osu.Game.Overlays.Profile;
 using osu.Game.Overlays.Profile.Header;
 using osu.Game.Users;
 
-namespace osu.Game.Tests.Visual
+namespace osu.Game.Tests.Visual.Online
 {
     public class TestCaseUserProfileHeader : OsuTestCase
     {
@@ -24,7 +24,7 @@ namespace osu.Game.Tests.Visual
         };
 
         [Resolved]
-        private APIAccess api { get; set; }
+        private IAPIProvider api { get; set; }
 
         private readonly ProfileHeader header;
 

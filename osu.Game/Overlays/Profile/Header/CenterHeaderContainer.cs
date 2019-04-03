@@ -77,7 +77,7 @@ namespace osu.Game.Overlays.Profile.Header
                                         {
                                             Anchor = Anchor.CentreLeft,
                                             Origin = Anchor.CentreLeft,
-                                            Icon = FontAwesome.fa_user,
+                                            Icon = FontAwesome.Solid.User,
                                             FillMode = FillMode.Fit,
                                             Size = new Vector2(50, 14)
                                         },
@@ -116,7 +116,7 @@ namespace osu.Game.Overlays.Profile.Header
                                 Anchor = Anchor.Centre,
                                 Origin = Anchor.Centre,
                                 Size = new Vector2(20),
-                                Icon = FontAwesome.fa_chevron_up,
+                                Icon = FontAwesome.Solid.ChevronUp,
                             },
                         }
                     },
@@ -212,7 +212,7 @@ namespace osu.Game.Overlays.Profile.Header
             detailsToggleButton.Action = () =>
             {
                 detailsVisible = !detailsVisible;
-                expandButtonIcon.Icon = detailsVisible ? FontAwesome.fa_chevron_down : FontAwesome.fa_chevron_up;
+                expandButtonIcon.Icon = detailsVisible ? FontAwesome.Solid.ChevronDown : FontAwesome.Solid.ChevronUp;
                 hiddenDetailContainer.Alpha = detailsVisible ? 1 : 0;
                 expandedDetailContainer.Alpha = detailsVisible ? 0 : 1;
                 DetailsVisibilityAction(detailsVisible);

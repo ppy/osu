@@ -37,7 +37,7 @@ namespace osu.Game.Overlays.Profile.Header
                         {
                             Width = 12,
                             RelativeSizeAxes = Axes.Y,
-                            Icon = FontAwesome.fa_heart,
+                            Icon = FontAwesome.Solid.Heart,
                         });
                     }
 
@@ -66,8 +66,7 @@ namespace osu.Game.Overlays.Profile.Header
                         AutoSizeAxes = Axes.X,
                         Height = 0.6f,
                         Anchor = Anchor.Centre,
-                        Origin = Anchor.Centre,
-                        Icon = FontAwesome.Solid.Heart,
+                        Origin = Anchor.Centre
                     }
                 }
             };

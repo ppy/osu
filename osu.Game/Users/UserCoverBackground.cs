@@ -36,15 +36,16 @@ namespace osu.Game.Users
             }
             else
             {
-                return new Sprite
+                var sprite = new Sprite
                 {
                     RelativeSizeAxes = Axes.Both,
                     Texture = textures.Get(user.CoverUrl),
                     FillMode = FillMode.Fill,
                     Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
-                    OnLoadComplete = d => d.FadeInFromZero(400),
+                    Origin = Anchor.Centre
                 };
+                sprite.OnLoadComplete += d => d.FadeInFromZero(400);
+                return sprite;
             }
         }
     }
