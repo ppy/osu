@@ -52,6 +52,9 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
         {
             set
             {
+                scoresGrid.Content = new Drawable[0][];
+                backgroundFlow.Clear();
+
                 if (value == null || !value.Any())
                     return;
 
@@ -59,8 +62,6 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                 {
                     new ScoreTableHeaderRow(value.First()).CreateDrawables().ToArray()
                 };
-
-                backgroundFlow.Clear();
 
                 for (int i = 0; i < value.Count; i++)
                 {
