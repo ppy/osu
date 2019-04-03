@@ -40,9 +40,7 @@ namespace osu.Game.Rulesets.Mods
                         scoreProcessor.Health.Value = 100;
                     }
                 }
-
-            } ;
-            
+            };
         }
     }
 }
