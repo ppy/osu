@@ -51,8 +51,6 @@ namespace osu.Game.Screens.Play
 
         public int RestartCount;
 
-        public int Lives = 2;
-
         [Resolved]
         private ScoreManager scoreManager { get; set; }
 
@@ -329,13 +327,17 @@ namespace osu.Game.Screens.Play
         {
             if (Beatmap.Value.Mods.Value.OfType<IApplicableFailOverride>().Any(m => !m.AllowFail))
                 return false;
+
             GameplayClockContainer.Stop();
+
             HasFailed = true;
+
             // There is a chance that we could be in a paused state as the ruleset's internal clock (see FrameStabilityContainer)
             // could process an extra frame after the GameplayClock is stopped.
             // In such cases we want the fail state to precede a user triggered pause.
             if (PauseOverlay.State == Visibility.Visible)
                 PauseOverlay.Hide();
+
             FailOverlay.Retries = RestartCount;
             FailOverlay.Show();
             return true;

@@ -11,7 +11,7 @@ namespace osu.Game.Rulesets.Mods
 {
     public abstract class ModEasy : Mod, IApplicableToDifficulty, IApplicableToScoreProcessor
     {
-        public static int Lives = 2;
+        public int Lives = 2;
         public override string Name => "Easy";
         public override string Acronym => "EZ";
         public override IconUsage Icon => OsuIcon.ModEasy;
@@ -31,7 +31,8 @@ namespace osu.Game.Rulesets.Mods
 
         public void ApplyToScoreProcessor(ScoreProcessor scoreProcessor)
         {
-            scoreProcessor.Health.ValueChanged += valueChanged =>{
+            scoreProcessor.Health.ValueChanged += valueChanged =>
+            {
                 if (scoreProcessor.Health.Value == 0)
                 {
                     if (Lives != 0)
