@@ -24,7 +24,7 @@ namespace osu.Game.Overlays.Toolbar
 
         public ToolbarNotificationButton()
         {
-            Icon = FontAwesome.Bars;
+            Icon = FontAwesome.Solid.Bars;
             TooltipMain = "Notifications";
             TooltipSub = "Waiting for 'ya";
 
