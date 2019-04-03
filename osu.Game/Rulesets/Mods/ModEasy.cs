@@ -31,7 +31,7 @@ namespace osu.Game.Rulesets.Mods
 
         public void ApplyToScoreProcessor(ScoreProcessor scoreProcessor)
         {
-            scoreProcessor.Health.ValueChanged += ValueChanged =>{
+            scoreProcessor.Health.ValueChanged += valueChanged =>{
                 if (scoreProcessor.Health.Value == 0)
                 {
                     if (Lives != 0)
