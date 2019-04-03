@@ -125,13 +125,12 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                             Spacing = new Vector2(margin, 0),
                             Children = new Drawable[]
                             {
-                                rankText = new SpriteText
+                                rankText = new OsuSpriteText
                                 {
                                     Anchor = Anchor.Centre,
                                     Origin = Anchor.Centre,
                                     Text = "#1",
-                                    TextSize = 30,
-                                    Font = @"Exo2.0-BoldItalic",
+                                    Font = OsuFont.GetFont(size: 30, weight: FontWeight.Bold, italics: true)
                                 },
                                 rank = new DrawableRank(ScoreRank.F)
                                 {
@@ -173,8 +172,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                                         {
                                             Anchor = Anchor.CentreLeft,
                                             Origin = Anchor.CentreLeft,
-                                            TextSize = 15,
-                                            Font = @"Exo2.0-Bold",
+                                            Font = OsuFont.GetFont(size: 15, weight: FontWeight.Bold)
                                         },
                                         flag = new DrawableFlag
                                         {
