@@ -51,6 +51,8 @@ namespace osu.Game.Screens.Play
 
         public int RestartCount;
 
+        public int Lives = 2;
+
         [Resolved]
         private ScoreManager scoreManager { get; set; }
 
@@ -323,14 +325,40 @@ namespace osu.Game.Screens.Play
 
         protected FailOverlay FailOverlay { get; private set; }
 
+
         private bool onFail()
         {
+            
+            //issue #3372
+            if (Beatmap.Value.Mods.Value.Any(x => x is ModEasy))
+            {
+                
+                if (Lives != 0)
+                {
+                    Lives--;
+                    ScoreProcessor.Health.Value = 100;
+                    return false;
+                }
+                else
+                {
+                    GameplayClockContainer.Stop();
+                    HasFailed = true;
+                    FailOverlay.Retries = RestartCount;
+                    FailOverlay.Show();
+                    return true;
+                        
+                }
+
+            }
+
             if (Beatmap.Value.Mods.Value.OfType<IApplicableFailOverride>().Any(m => !m.AllowFail))
                 return false;
 
             GameplayClockContainer.Stop();
 
             HasFailed = true;
+
+
 
             // There is a chance that we could be in a paused state as the ruleset's internal clock (see FrameStabilityContainer)
             // could process an extra frame after the GameplayClock is stopped.
