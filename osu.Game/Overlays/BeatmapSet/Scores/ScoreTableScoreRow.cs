@@ -53,7 +53,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
             Colour = score.Accuracy == 1 ? Color4.GreenYellow : Color4.White
         };
 
-        protected override Drawable CreatePlayerCell()
+        protected override Drawable CreateUserCell()
         {
             var username = new LinkFlowContainer(t => t.Font = OsuFont.GetFont(size: TEXT_SIZE))
             {
