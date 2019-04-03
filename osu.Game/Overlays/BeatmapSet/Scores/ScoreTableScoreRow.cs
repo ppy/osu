@@ -145,22 +145,19 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                 });
             }
 
-            protected override void OnUserChanged(User user)
-            {
-                text.Text = textBold.Text = user.Username;
-            }
+            protected override void OnUserChanged(User user) => text.Text = textBold.Text = user.Username;
 
             protected override bool OnHover(HoverEvent e)
             {
-                textBold.FadeIn(fade_duration, Easing.OutQuint);
-                text.FadeOut(fade_duration, Easing.OutQuint);
+                textBold.Show();
+                text.Hide();
                 return base.OnHover(e);
             }
 
             protected override void OnHoverLost(HoverLostEvent e)
             {
-                textBold.FadeOut(fade_duration, Easing.OutQuint);
-                text.FadeIn(fade_duration, Easing.OutQuint);
+                textBold.Hide();
+                text.Show();
                 base.OnHoverLost(e);
             }
         }

@@ -261,7 +261,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
 
         private class ClickableTopScoreUsername : ClickableUserContainer
         {
-            private const float username_fade_duration = 500;
+            private const float username_fade_duration = 150;
 
             private readonly FillFlowContainer hoverContainer;
 
