@@ -179,7 +179,7 @@ namespace osu.Game.Screens.Select.Carousel
                     new OsuMenuItem("Edit", MenuItemType.Standard, () => editRequested?.Invoke(beatmap)),
                     new OsuMenuItem("Hide", MenuItemType.Destructive, () => hideRequested?.Invoke(beatmap)),
                 };
-                
+
                 if (beatmap.OnlineBeatmapID.HasValue)
                     items.Add(new OsuMenuItem("Details", MenuItemType.Standard, () => beatmapOverlay?.FetchAndShowBeatmap(beatmap.OnlineBeatmapID.Value)));
 
