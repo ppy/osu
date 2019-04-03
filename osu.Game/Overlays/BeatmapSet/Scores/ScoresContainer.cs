@@ -125,7 +125,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
 
             scoreTable.Scores = scores?.Count > 1 ? scores : new List<ScoreInfo>();
 
-            if (scores.Any())
+            if (scores?.Any() == true)
             {
                 topScore.Score = scores.FirstOrDefault();
                 topScore.Show();
