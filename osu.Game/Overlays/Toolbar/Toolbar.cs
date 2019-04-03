@@ -75,7 +75,7 @@ namespace osu.Game.Overlays.Toolbar
                         new ToolbarMusicButton(),
                         //new ToolbarButton
                         //{
-                        //    Icon = FontAwesome.search
+                        //    Icon = FontAwesome.Solid.search
                         //},
                         userButton = new ToolbarUserButton(),
                         new ToolbarNotificationButton(),

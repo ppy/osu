@@ -278,7 +278,7 @@ namespace osu.Game.Tests.NonVisual
 
             protected override double AllowedImportantTimeSpan => 1000;
 
-            protected override bool IsImportant(TestReplayFrame frame) => frame?.IsImportant ?? false;
+            protected override bool IsImportant(TestReplayFrame frame) => frame.IsImportant;
         }
     }
 }

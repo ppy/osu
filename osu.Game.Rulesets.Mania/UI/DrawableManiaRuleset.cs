@@ -88,7 +88,7 @@ namespace osu.Game.Rulesets.Mania.UI
         /// <returns>The column which intersects with <paramref name="screenSpacePosition"/>.</returns>
         public Column GetColumnByPosition(Vector2 screenSpacePosition) => Playfield.GetColumnByPosition(screenSpacePosition);
 
-        protected override PlayfieldAdjustmentContainer CreatePlayfieldAdjustmentContainer() => new ManiaPlayfieldAdjustmentContainer();
+        public override PlayfieldAdjustmentContainer CreatePlayfieldAdjustmentContainer() => new ManiaPlayfieldAdjustmentContainer();
 
         protected override Playfield CreatePlayfield() => new ManiaPlayfield(Beatmap.Stages);
 
