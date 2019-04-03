@@ -54,15 +54,13 @@ namespace osu.Game.Graphics.Containers
             startPosition = null;
         }
 
-        private Vector2 localSpaceConversion()
+        private Vector2 logoTrackingPosition()
         {
             Vector2 local;
             local.X = logo.Parent.ToLocalSpace(LogoFacade.ScreenSpaceDrawQuad.Centre).X / logo.Parent.RelativeToAbsoluteFactor.X;
             local.Y = logo.Parent.ToLocalSpace(LogoFacade.ScreenSpaceDrawQuad.Centre).Y / logo.Parent.RelativeToAbsoluteFactor.Y;
             return local;
         }
-
-        private Vector2 logoTrackingPosition => logo.RelativePositionAxes == Axes.None ? logo.Parent.ToLocalSpace(LogoFacade.ScreenSpaceDrawQuad.Centre) : localSpaceConversion();
 
         protected override void Update()
         {
@@ -74,7 +72,7 @@ namespace osu.Game.Graphics.Containers
             // Account for the scale of the actual logo container, as SizeForFlow only accounts for the sprite scale.
             LogoFacade.Size = new Vector2(logo.SizeForFlow * logo.Scale.X * facadeScale);
 
-            if (LogoFacade.Parent != null && logo.Position != logoTrackingPosition)
+            if (LogoFacade.Parent != null && logo.Position != logoTrackingPosition())
             {
                 // If this is our first update since tracking has started, initialize our starting values for interpolation
                 if (startTime == null || startPosition == null)
@@ -90,11 +88,11 @@ namespace osu.Game.Graphics.Containers
                     var mount = (float)Interpolation.ApplyEasing(easing, Math.Min(elapsedDuration / duration, 1));
 
                     // Interpolate the position of the logo, where mount 0 is where the logo was when it first began interpolating, and mount 1 is the target location.
-                    logo.Position = Vector2.Lerp(startPosition ?? throw new ArgumentNullException(nameof(startPosition)), logoTrackingPosition, mount);
+                    logo.Position = Vector2.Lerp(startPosition ?? throw new ArgumentNullException(nameof(startPosition)), logoTrackingPosition(), mount);
                 }
                 else
                 {
-                    logo.Position = logoTrackingPosition;
+                    logo.Position = logoTrackingPosition();
                 }
             }
         }
