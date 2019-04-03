@@ -6,11 +6,11 @@ using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
-using osu.Framework.Input.Events;
 using osu.Game.Graphics;
+using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Online.Chat;
 using osu.Game.Online.Leaderboards;
 using osu.Game.Scoring;
 using osu.Game.Users;
@@ -24,7 +24,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
         private readonly SpriteText rankText;
         private readonly DrawableRank rank;
         private readonly UpdateableAvatar avatar;
-        private readonly UsernameText usernameText;
+        private readonly LinkFlowContainer usernameText;
         private readonly SpriteText date;
         private readonly DrawableFlag flag;
 
@@ -77,10 +77,11 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                         Spacing = new Vector2(0, 3),
                         Children = new Drawable[]
                         {
-                            usernameText = new UsernameText
+                            usernameText = new LinkFlowContainer(s => s.Font = OsuFont.GetFont(size: 20, weight: FontWeight.Bold, italics: true))
                             {
                                 Anchor = Anchor.CentreLeft,
                                 Origin = Anchor.CentreLeft,
+                                AutoSizeAxes = Axes.Both,
                             },
                             date = new SpriteText
                             {
@@ -113,68 +114,14 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
         {
             set
             {
-                avatar.User = usernameText.User = value.User;
+                avatar.User = value.User;
                 flag.Country = value.User.Country;
                 date.Text = $@"achieved {value.Date.Humanize()}";
+
+                usernameText.Clear();
+                usernameText.AddLink(value.User.Username, null, LinkAction.OpenUserProfile, value.User.Id.ToString(), "Open profile");
+
                 rank.UpdateRank(value.Rank);
-            }
-        }
-
-        private class UsernameText : ClickableUserContainer
-        {
-            private const float username_fade_duration = 150;
-
-            private readonly FillFlowContainer hoverContainer;
-
-            private readonly SpriteText normalText;
-            private readonly SpriteText hoveredText;
-
-            public UsernameText()
-            {
-                var font = OsuFont.GetFont(size: 20, weight: FontWeight.Bold, italics: true);
-
-                Children = new Drawable[]
-                {
-                    normalText = new OsuSpriteText { Font = font },
-                    hoverContainer = new FillFlowContainer
-                    {
-                        RelativeSizeAxes = Axes.X,
-                        AutoSizeAxes = Axes.Y,
-                        Alpha = 0,
-                        Direction = FillDirection.Vertical,
-                        Spacing = new Vector2(0, 1),
-                        Children = new Drawable[]
-                        {
-                            hoveredText = new OsuSpriteText { Font = font },
-                            new Box
-                            {
-                                BypassAutoSizeAxes = Axes.Both,
-                                RelativeSizeAxes = Axes.X,
-                                Height = 1
-                            }
-                        }
-                    }
-                };
-            }
-
-            [BackgroundDependencyLoader]
-            private void load(OsuColour colours)
-            {
-                hoverContainer.Colour = colours.Blue;
-            }
-
-            protected override void OnUserChanged(User user) => normalText.Text = hoveredText.Text = user.Username;
-
-            protected override bool OnHover(HoverEvent e)
-            {
-                hoverContainer.FadeIn(username_fade_duration, Easing.OutQuint);
-                return base.OnHover(e);
-            }
-
-            protected override void OnHoverLost(HoverLostEvent e)
-            {
-                hoverContainer.FadeOut(username_fade_duration, Easing.OutQuint);
-                base.OnHoverLost(e);
             }
         }
     }
