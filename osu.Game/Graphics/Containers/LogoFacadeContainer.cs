@@ -24,7 +24,8 @@ namespace osu.Game.Graphics.Containers
         /// </summary>
         public bool Tracking = false;
 
-        private OsuLogo logo;
+        protected OsuLogo Logo;
+
         private float facadeScale;
         private Easing easing;
         private Vector2? startPosition;
@@ -45,7 +46,7 @@ namespace osu.Game.Graphics.Containers
         /// <param name="easing">The easing type of the initial transform.</param>
         public void SetLogo(OsuLogo logo, float facadeScale = 1.0f, double duration = 0, Easing easing = Easing.None)
         {
-            this.logo = logo ?? throw new ArgumentNullException(nameof(logo));
+            Logo = logo ?? throw new ArgumentNullException(nameof(logo));
             this.facadeScale = facadeScale;
             this.duration = duration;
             this.easing = easing;
@@ -54,11 +55,11 @@ namespace osu.Game.Graphics.Containers
             startPosition = null;
         }
 
-        private Vector2 logoTrackingPosition()
+        protected Vector2 LogoTrackingPosition()
         {
             Vector2 local;
-            local.X = logo.Parent.ToLocalSpace(LogoFacade.ScreenSpaceDrawQuad.Centre).X / logo.Parent.RelativeToAbsoluteFactor.X;
-            local.Y = logo.Parent.ToLocalSpace(LogoFacade.ScreenSpaceDrawQuad.Centre).Y / logo.Parent.RelativeToAbsoluteFactor.Y;
+            local.X = Logo.Parent.ToLocalSpace(LogoFacade.ScreenSpaceDrawQuad.Centre).X / Logo.Parent.RelativeToAbsoluteFactor.X;
+            local.Y = Logo.Parent.ToLocalSpace(LogoFacade.ScreenSpaceDrawQuad.Centre).Y / Logo.Parent.RelativeToAbsoluteFactor.Y;
             return local;
         }
 
@@ -66,19 +67,19 @@ namespace osu.Game.Graphics.Containers
         {
             base.Update();
 
-            if (logo == null || !Tracking)
+            if (Logo == null || !Tracking)
                 return;
 
             // Account for the scale of the actual logo container, as SizeForFlow only accounts for the sprite scale.
-            LogoFacade.Size = new Vector2(logo.SizeForFlow * logo.Scale.X * facadeScale);
+            LogoFacade.Size = new Vector2(Logo.SizeForFlow * Logo.Scale.X * facadeScale);
 
-            if (LogoFacade.Parent != null && logo.Position != logoTrackingPosition())
+            if (LogoFacade.Parent != null && Logo.Position != LogoTrackingPosition())
             {
                 // If this is our first update since tracking has started, initialize our starting values for interpolation
                 if (startTime == null || startPosition == null)
                 {
                     startTime = Time.Current;
-                    startPosition = logo.Position;
+                    startPosition = Logo.Position;
                 }
 
                 if (duration != 0)
@@ -88,11 +89,11 @@ namespace osu.Game.Graphics.Containers
                     var mount = (float)Interpolation.ApplyEasing(easing, Math.Min(elapsedDuration / duration, 1));
 
                     // Interpolate the position of the logo, where mount 0 is where the logo was when it first began interpolating, and mount 1 is the target location.
-                    logo.Position = Vector2.Lerp(startPosition ?? throw new ArgumentNullException(nameof(startPosition)), logoTrackingPosition(), mount);
+                    Logo.Position = Vector2.Lerp(startPosition ?? throw new ArgumentNullException(nameof(startPosition)), LogoTrackingPosition(), mount);
                 }
                 else
                 {
-                    logo.Position = logoTrackingPosition();
+                    Logo.Position = LogoTrackingPosition();
                 }
             }
         }
