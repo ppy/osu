@@ -10,6 +10,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.UserInterface;
+using osu.Framework.MathUtils;
 using osu.Framework.Testing;
 using osu.Game.Configuration;
 using osu.Game.Graphics.Containers;
@@ -18,7 +19,7 @@ using osu.Game.Screens.Play;
 using osuTK;
 using osuTK.Graphics;
 
-namespace osu.Game.Tests.Visual
+namespace osu.Game.Tests.Visual.UserInterface
 {
     public class TestCaseLogoFacadeContainer : OsuTestCase
     {
@@ -250,7 +251,7 @@ namespace osu.Game.Tests.Visual
             /// <summary>
             /// Check that the logo is tracking the position of the facade, with an acceptable precision lenience.
             /// </summary>
-            public bool IsLogoTracking => Math.Abs(Logo.Position.X - LogoTrackingPosition().X) < 0.001f && Math.Abs(Logo.Position.Y - LogoTrackingPosition().Y) < 0.001f;
+            public bool IsLogoTracking => Precision.AlmostEquals(Logo.Position, LogoTrackingPosition());
         }
     }
 }
