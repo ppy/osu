@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using System.Collections.Generic;
@@ -16,13 +16,12 @@ using osuTK.Graphics;
 using osu.Game.Rulesets.Mods;
 using System.Linq;
 using NUnit.Framework;
-using osu.Framework.Allocation;
+using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Objects.Types;
-using osu.Game.Rulesets.Osu.Configuration;
 using osu.Game.Rulesets.Osu.Objects.Drawables.Pieces;
 
 namespace osu.Game.Rulesets.Osu.Tests
@@ -40,16 +39,6 @@ namespace osu.Game.Rulesets.Osu.Tests
             typeof(DrawableRepeatPoint),
             typeof(DrawableOsuHitObject)
         };
-
-        protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
-        {
-            var dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
-
-            var configCache = dependencies.Get<RulesetConfigCache>();
-            dependencies.CacheAs((OsuConfigManager)configCache.GetConfigFor(new OsuRuleset()));
-
-            return dependencies;
-        }
 
         private readonly Container content;
         protected override Container<Drawable> Content => content;
@@ -312,6 +301,7 @@ namespace osu.Game.Rulesets.Osu.Tests
         }
 
         private float judgementOffsetDirection = 1;
+
         private void onNewResult(DrawableHitObject judgedObject, JudgementResult result)
         {
             var osuObject = judgedObject as DrawableOsuHitObject;
@@ -325,7 +315,7 @@ namespace osu.Game.Rulesets.Osu.Tests
                 Origin = Anchor.Centre,
                 Text = result.IsHit ? "Hit!" : "Miss!",
                 Colour = result.IsHit ? Color4.Green : Color4.Red,
-                TextSize = 30,
+                Font = OsuFont.GetFont(size: 30),
                 Position = osuObject.HitObject.StackedEndPosition + judgementOffsetDirection * new Vector2(0, 45)
             });
 

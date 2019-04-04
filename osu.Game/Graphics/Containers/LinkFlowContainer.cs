@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using osu.Game.Online.Chat;
 using System;
@@ -35,7 +35,7 @@ namespace osu.Game.Graphics.Containers
             showNotImplementedError = () => notifications?.Post(new SimpleNotification
             {
                 Text = @"This link type is not yet supported!",
-                Icon = FontAwesome.fa_life_saver,
+                Icon = FontAwesome.Solid.LifeRing,
             });
         }
 

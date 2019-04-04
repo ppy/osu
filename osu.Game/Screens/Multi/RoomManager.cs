@@ -1,11 +1,11 @@
-// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using System.Linq;
 using System.Threading.Tasks;
 using osu.Framework.Allocation;
-using osu.Framework.Configuration;
+using osu.Framework.Bindables;
 using osu.Framework.Logging;
 using osu.Game.Beatmaps;
 using osu.Game.Online;
@@ -24,18 +24,29 @@ namespace osu.Game.Screens.Multi
         private readonly BindableList<Room> rooms = new BindableList<Room>();
         public IBindableList<Room> Rooms => rooms;
 
-        private Room currentRoom;
-
-        private FilterCriteria currentFilter = new FilterCriteria();
+        private Room joinedRoom;
 
         [Resolved]
-        private APIAccess api { get; set; }
+        private Bindable<FilterCriteria> currentFilter { get; set; }
+
+        [Resolved]
+        private IAPIProvider api { get; set; }
 
         [Resolved]
         private RulesetStore rulesets { get; set; }
 
         [Resolved]
         private BeatmapManager beatmaps { get; set; }
+
+        [BackgroundDependencyLoader]
+        private void load()
+        {
+            currentFilter.BindValueChanged(_ =>
+            {
+                if (IsLoaded)
+                    PollImmediately();
+            });
+        }
 
         protected override void Dispose(bool isDisposing)
         {
@@ -45,17 +56,18 @@ namespace osu.Game.Screens.Multi
 
         public void CreateRoom(Room room, Action<Room> onSuccess = null, Action<string> onError = null)
         {
-            room.Host.Value = api.LocalUser;
+            room.Host.Value = api.LocalUser.Value;
 
             var req = new CreateRoomRequest(room);
 
             req.Success += result =>
             {
+                joinedRoom = room;
+
                 update(room, result);
                 addRoom(room);
 
                 RoomsUpdated?.Invoke();
-
                 onSuccess?.Invoke(room);
             };
 
@@ -80,7 +92,7 @@ namespace osu.Game.Screens.Multi
             currentJoinRoomRequest = new JoinRoomRequest(room, api.LocalUser.Value);
             currentJoinRoomRequest.Success += () =>
             {
-                currentRoom = room;
+                joinedRoom = room;
                 onSuccess?.Invoke(room);
             };
 
@@ -95,17 +107,11 @@ namespace osu.Game.Screens.Multi
 
         public void PartRoom()
         {
-            if (currentRoom == null)
+            if (joinedRoom == null)
                 return;
 
-            api.Queue(new PartRoomRequest(currentRoom, api.LocalUser.Value));
-            currentRoom = null;
-        }
-
-        public void Filter(FilterCriteria criteria)
-        {
-            currentFilter = criteria;
-            PollImmediately();
+            api.Queue(new PartRoomRequest(joinedRoom, api.LocalUser.Value));
+            joinedRoom = null;
         }
 
         private GetRoomsRequest pollReq;
@@ -118,7 +124,7 @@ namespace osu.Game.Screens.Multi
             var tcs = new TaskCompletionSource<bool>();
 
             pollReq?.Cancel();
-            pollReq = new GetRoomsRequest(currentFilter.PrimaryFilter);
+            pollReq = new GetRoomsRequest(currentFilter.Value.PrimaryFilter);
 
             pollReq.Success += result =>
             {
@@ -132,14 +138,13 @@ namespace osu.Game.Screens.Multi
                 for (int i = 0; i < result.Count; i++)
                 {
                     var r = result[i];
-                    r.Position = i;
+                    r.Position.Value = i;
 
                     update(r, r);
                     addRoom(r);
                 }
 
                 RoomsUpdated?.Invoke();
-
                 tcs.SetResult(true);
             };
 

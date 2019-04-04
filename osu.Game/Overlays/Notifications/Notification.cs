@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using osu.Framework.Allocation;
@@ -11,6 +11,7 @@ using osu.Game.Graphics;
 using osuTK;
 using osuTK.Graphics;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Events;
 using osu.Game.Graphics.Containers;
 
@@ -151,6 +152,7 @@ namespace osu.Game.Overlays.Notifications
         public virtual void Close()
         {
             if (WasClosed) return;
+
             WasClosed = true;
 
             Closed?.Invoke();
@@ -173,7 +175,7 @@ namespace osu.Game.Overlays.Notifications
                     {
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
-                        Icon = FontAwesome.fa_times_circle,
+                        Icon = FontAwesome.Solid.TimesCircle,
                         Size = new Vector2(20),
                     }
                 };
@@ -205,7 +207,7 @@ namespace osu.Game.Overlays.Notifications
 
             public bool Pulsate
             {
-                get { return pulsate; }
+                get => pulsate;
                 set
                 {
                     if (pulsate == value) return;

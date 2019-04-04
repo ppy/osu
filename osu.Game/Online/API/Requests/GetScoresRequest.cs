@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using osu.Game.Beatmaps;
@@ -10,7 +10,7 @@ using osu.Game.Online.API.Requests.Responses;
 
 namespace osu.Game.Online.API.Requests
 {
-    public class GetScoresRequest : APIRequest<APIScores>
+    public class GetScoresRequest : APIRequest<APILegacyScores>
     {
         private readonly BeatmapInfo beatmap;
         private readonly BeatmapLeaderboardScope scope;
@@ -31,9 +31,9 @@ namespace osu.Game.Online.API.Requests
             Success += onSuccess;
         }
 
-        private void onSuccess(APIScores r)
+        private void onSuccess(APILegacyScores r)
         {
-            foreach (APIScoreInfo score in r.Scores)
+            foreach (APILegacyScoreInfo score in r.Scores)
                 score.Beatmap = beatmap;
         }
 

@@ -1,8 +1,8 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
-using osu.Framework.Configuration;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Platform;
 using osu.Game.Configuration;
@@ -18,16 +18,16 @@ namespace osu.Game.Online.Chat
         private Bindable<bool> externalLinkWarning;
 
         [BackgroundDependencyLoader(true)]
-        private void load(GameHost host, DialogOverlay dialogOverlay, GameConfigManager config)
+        private void load(GameHost host, DialogOverlay dialogOverlay, OsuConfigManager config)
         {
             this.host = host;
             this.dialogOverlay = dialogOverlay;
-            externalLinkWarning = config.GetBindable<bool>(GameSetting.ExternalLinkWarning);
+            externalLinkWarning = config.GetBindable<bool>(OsuSetting.ExternalLinkWarning);
         }
 
         public void OpenUrlExternally(string url)
         {
-            if (externalLinkWarning)
+            if (externalLinkWarning.Value)
                 dialogOverlay.Push(new ExternalLinkDialog(url, () => host.OpenUrlExternally(url)));
             else
                 host.OpenUrlExternally(url);

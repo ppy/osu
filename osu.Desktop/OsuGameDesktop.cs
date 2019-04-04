@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using System.IO;
@@ -14,9 +14,9 @@ using osuTK.Input;
 using Microsoft.Win32;
 using osu.Desktop.Updater;
 using osu.Framework;
+using osu.Framework.Logging;
 using osu.Framework.Platform.Windows;
 using osu.Framework.Screens;
-using osu.Game.Screens;
 using osu.Game.Screens.Menu;
 
 namespace osu.Desktop
@@ -36,12 +36,15 @@ namespace osu.Desktop
         {
             try
             {
-                return new StableStorage();
+                if (Host is DesktopGameHost desktopHost)
+                    return new StableStorage(desktopHost);
             }
-            catch
+            catch (Exception e)
             {
-                return null;
+                Logger.Error(e, "Error while searching for stable install");
             }
+
+            return null;
         }
 
         protected override void LoadComplete()
@@ -63,9 +66,10 @@ namespace osu.Desktop
             }
         }
 
-        protected override void ScreenChanged(OsuScreen current, Screen newScreen)
+        protected override void ScreenChanged(IScreen lastScreen, IScreen newScreen)
         {
-            base.ScreenChanged(current, newScreen);
+            base.ScreenChanged(lastScreen, newScreen);
+
             switch (newScreen)
             {
                 case Intro _:
@@ -83,8 +87,7 @@ namespace osu.Desktop
         public override void SetHost(GameHost host)
         {
             base.SetHost(host);
-            var desktopWindow = host.Window as DesktopGameWindow;
-            if (desktopWindow != null)
+            if (host.Window is DesktopGameWindow desktopWindow)
             {
                 desktopWindow.CursorState |= CursorState.Hidden;
 
@@ -140,8 +143,8 @@ namespace osu.Desktop
                 return null;
             }
 
-            public StableStorage()
-                : base(string.Empty, null)
+            public StableStorage(DesktopGameHost host)
+                : base(string.Empty, host)
             {
             }
         }

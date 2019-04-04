@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 
@@ -33,11 +33,11 @@ namespace osu.Game.Rulesets.Catch.MathUtils
         /// <returns>The random value.</returns>
         public uint NextUInt()
         {
-            uint t = _x ^ _x << 11;
+            uint t = _x ^ (_x << 11);
             _x = _y;
             _y = _z;
             _z = _w;
-            return _w = _w ^ _w >> 19 ^ t ^ t >> 8;
+            return _w = _w ^ (_w >> 19) ^ t ^ (t >> 8);
         }
 
         /// <summary>

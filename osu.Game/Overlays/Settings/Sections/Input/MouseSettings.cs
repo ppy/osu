@@ -1,7 +1,8 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Input;
@@ -19,7 +20,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
         private SensitivitySetting sensitivity;
 
         [BackgroundDependencyLoader]
-        private void load(GameConfigManager gameConfig, FrameworkConfigManager config)
+        private void load(OsuConfigManager osuConfig, FrameworkConfigManager config)
         {
             Children = new Drawable[]
             {
@@ -46,12 +47,12 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                 new SettingsCheckbox
                 {
                     LabelText = "Disable mouse wheel during gameplay",
-                    Bindable = gameConfig.GetBindable<bool>(GameSetting.MouseDisableWheel)
+                    Bindable = osuConfig.GetBindable<bool>(OsuSetting.MouseDisableWheel)
                 },
                 new SettingsCheckbox
                 {
                     LabelText = "Disable mouse buttons during gameplay",
-                    Bindable = gameConfig.GetBindable<bool>(GameSetting.MouseDisableButtons)
+                    Bindable = osuConfig.GetBindable<bool>(OsuSetting.MouseDisableButtons)
                 },
             };
 
@@ -61,13 +62,13 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                 const string raw_mouse_handler = @"OsuTKRawMouseHandler";
                 const string standard_mouse_handler = @"OsuTKMouseHandler";
 
-                ignoredInputHandler.Value = enabled ? standard_mouse_handler : raw_mouse_handler;
+                ignoredInputHandler.Value = enabled.NewValue ? standard_mouse_handler : raw_mouse_handler;
             };
 
             ignoredInputHandler = config.GetBindable<string>(FrameworkSetting.IgnoredInputHandlers);
             ignoredInputHandler.ValueChanged += handler =>
             {
-                bool raw = !handler.Contains("Raw");
+                bool raw = !handler.NewValue.Contains("Raw");
                 rawInputToggle.Value = raw;
                 sensitivity.Bindable.Disabled = !raw;
             };
@@ -86,7 +87,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
 
         private class SensitivitySlider : OsuSliderBar<double>
         {
-            public override string TooltipText => Current.Disabled ? "Enable raw input to adjust sensitivity" : Current.Value.ToString(@"0.##x");
+            public override string TooltipText => Current.Disabled ? "Enable raw input to adjust sensitivity" : $"{base.TooltipText}x";
         }
     }
 }

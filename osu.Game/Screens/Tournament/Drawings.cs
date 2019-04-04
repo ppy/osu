@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using System.Collections.Generic;
@@ -22,6 +22,8 @@ using osuTK;
 using osuTK.Graphics;
 using osu.Framework.IO.Stores;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Screens;
+using osu.Game.Graphics;
 
 namespace osu.Game.Screens.Tournament
 {
@@ -29,7 +31,7 @@ namespace osu.Game.Screens.Tournament
     {
         private const string results_filename = "drawings_results.txt";
 
-        protected override bool HideOverlaysOnEnter => true;
+        public override bool HideOverlaysOnEnter => true;
 
         protected override BackgroundScreen CreateBackground() => new BackgroundScreenDefault();
 
@@ -70,13 +72,13 @@ namespace osu.Game.Screens.Tournament
 
             if (!TeamList.Teams.Any())
             {
-                Exit();
+                this.Exit();
                 return;
             }
 
             drawingsConfig = new DrawingsConfigManager(storage);
 
-            Children = new Drawable[]
+            InternalChildren = new Drawable[]
             {
                 new Box
                 {
@@ -150,8 +152,7 @@ namespace osu.Game.Screens.Tournament
 
                                     Alpha = 0,
 
-                                    Font = "Exo2.0-Light",
-                                    TextSize = 42f
+                                    Font = OsuFont.GetFont(weight: FontWeight.Light, size: 42),
                                 }
                             }
                         },
@@ -174,8 +175,7 @@ namespace osu.Game.Screens.Tournament
                                     Origin = Anchor.TopCentre,
 
                                     Text = "Control Panel",
-                                    TextSize = 22f,
-                                    Font = "Exo2.0-Bold"
+                                    Font = OsuFont.GetFont(weight: FontWeight.Bold, size: 22),
                                 },
                                 new FillFlowContainer
                                 {

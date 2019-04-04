@@ -1,9 +1,10 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Input.Events;
+using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Users;
@@ -16,12 +17,14 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
         private UserProfileOverlay profile;
 
         private User user;
+
         public User User
         {
-            get { return user; }
+            get => user;
             set
             {
                 if (user == value) return;
+
                 user = value;
 
                 text.Text = user.Username;
@@ -30,21 +33,14 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
 
         public float TextSize
         {
-            set
-            {
-                if (text.TextSize == value) return;
-                text.TextSize = value;
-            }
-            get { return text.TextSize; }
+            get => text.Font.Size;
+            set => text.Font = text.Font.With(size: value);
         }
 
         public ClickableUsername()
         {
             AutoSizeAxes = Axes.Both;
-            Child = text = new OsuSpriteText
-            {
-                Font = @"Exo2.0-BoldItalic",
-            };
+            Child = text = new OsuSpriteText { Font = OsuFont.GetFont(weight: FontWeight.Bold, italics: true) };
         }
 
         [BackgroundDependencyLoader(true)]

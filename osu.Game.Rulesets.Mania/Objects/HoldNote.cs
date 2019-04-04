@@ -1,5 +1,5 @@
-// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
@@ -17,9 +17,10 @@ namespace osu.Game.Rulesets.Mania.Objects
         public double EndTime => StartTime + Duration;
 
         private double duration;
+
         public double Duration
         {
-            get { return duration; }
+            get => duration;
             set
             {
                 duration = value;
@@ -29,7 +30,7 @@ namespace osu.Game.Rulesets.Mania.Objects
 
         public override double StartTime
         {
-            get { return base.StartTime; }
+            get => base.StartTime;
             set
             {
                 base.StartTime = value;
@@ -40,7 +41,7 @@ namespace osu.Game.Rulesets.Mania.Objects
 
         public override int Column
         {
-            get { return base.Column; }
+            get => base.Column;
             set
             {
                 base.Column = value;

@@ -1,8 +1,8 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Graphics;
-using osu.Game.Graphics;
+using osu.Framework.Graphics.Sprites;
 
 namespace osu.Game.Online.Leaderboards
 {
@@ -12,9 +12,9 @@ namespace osu.Game.Online.Leaderboards
 
         public MessagePlaceholder(string message)
         {
-            AddIcon(FontAwesome.fa_exclamation_circle, cp =>
+            AddIcon(FontAwesome.Solid.ExclamationCircle, cp =>
             {
-                cp.TextSize = TEXT_SIZE;
+                cp.Font = cp.Font.With(size: TEXT_SIZE);
                 cp.Padding = new MarginPadding { Right = 10 };
             });
 

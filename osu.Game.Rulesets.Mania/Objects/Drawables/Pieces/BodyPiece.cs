@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using osu.Framework.Caching;
@@ -77,11 +77,12 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables.Pieces
 
         public Color4 AccentColour
         {
-            get { return accentColour; }
+            get => accentColour;
             set
             {
                 if (accentColour == value)
                     return;
+
                 accentColour = value;
 
                 updateAccentColour();
@@ -90,7 +91,7 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables.Pieces
 
         public bool Hitting
         {
-            get { return hitting; }
+            get => hitting;
             set
             {
                 hitting = value;

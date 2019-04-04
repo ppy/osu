@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using System.Collections.Generic;
@@ -8,7 +8,7 @@ using JetBrains.Annotations;
 using osuTK;
 using osuTK.Graphics;
 using osu.Framework.Allocation;
-using osu.Framework.Configuration;
+using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
@@ -22,6 +22,7 @@ using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Cursor;
+using osu.Framework.Graphics.Sprites;
 using osu.Framework.Localisation;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.UI;
@@ -203,9 +204,8 @@ namespace osu.Game.Screens.Select
                         {
                             VersionLabel = new OsuSpriteText
                             {
-                                Font = @"Exo2.0-MediumItalic",
                                 Text = beatmapInfo.Version,
-                                TextSize = 24,
+                                Font = OsuFont.GetFont(size: 24, italics: true),
                             },
                         }
                     },
@@ -240,13 +240,11 @@ namespace osu.Game.Screens.Select
                         {
                             TitleLabel = new OsuSpriteText
                             {
-                                Font = @"Exo2.0-MediumItalic",
-                                TextSize = 28,
+                                Font = OsuFont.GetFont(size: 28, italics: true),
                             },
                             ArtistLabel = new OsuSpriteText
                             {
-                                Font = @"Exo2.0-MediumItalic",
-                                TextSize = 17,
+                                Font = OsuFont.GetFont(size: 17, italics: true),
                             },
                             MapperContainer = new FillFlowContainer
                             {
@@ -266,8 +264,8 @@ namespace osu.Game.Screens.Select
                     }
                 };
 
-                titleBinding.BindValueChanged(value => setMetadata(metadata.Source));
-                artistBinding.BindValueChanged(value => setMetadata(metadata.Source), true);
+                titleBinding.BindValueChanged(_ => setMetadata(metadata.Source));
+                artistBinding.BindValueChanged(_ => setMetadata(metadata.Source), true);
 
                 // no difficulty means it can't have a status to show
                 if (beatmapInfo.Version == null)
@@ -295,14 +293,14 @@ namespace osu.Game.Screens.Select
                     labels.Add(new InfoLabel(new BeatmapStatistic
                     {
                         Name = "Length",
-                        Icon = FontAwesome.fa_clock_o,
+                        Icon = FontAwesome.Regular.Clock,
                         Content = TimeSpan.FromMilliseconds(endTime - b.HitObjects.First().StartTime).ToString(@"m\:ss"),
                     }));
 
                     labels.Add(new InfoLabel(new BeatmapStatistic
                     {
                         Name = "BPM",
-                        Icon = FontAwesome.fa_circle,
+                        Icon = FontAwesome.Regular.Circle,
                         Content = getBPMRange(b),
                     }));
 
@@ -345,16 +343,13 @@ namespace osu.Game.Screens.Select
                 {
                     new OsuSpriteText
                     {
-                        Font = @"Exo2.0-Medium",
                         Text = "mapped by ",
-                        TextSize = 15,
+                        Font = OsuFont.GetFont(size: 15),
                     },
                     new OsuSpriteText
                     {
-                        Font = @"Exo2.0-Bold",
-                        // ReSharper disable once PossibleNullReferenceException (resharper broken?)
                         Text = metadata.Author.Username,
-                        TextSize = 15,
+                        Font = OsuFont.GetFont(weight: FontWeight.Bold, size: 15),
                     }
                 };
             }
@@ -383,7 +378,7 @@ namespace osu.Game.Screens.Select
                                     Origin = Anchor.Centre,
                                     RelativeSizeAxes = Axes.Both,
                                     Colour = OsuColour.FromHex(@"441288"),
-                                    Icon = FontAwesome.fa_square,
+                                    Icon = FontAwesome.Solid.Square,
                                     Rotation = 45,
                                 },
                                 new SpriteIcon
@@ -402,10 +397,9 @@ namespace osu.Game.Screens.Select
                             Anchor = Anchor.CentreLeft,
                             Origin = Anchor.CentreLeft,
                             Colour = new Color4(255, 221, 85, 255),
-                            Font = @"Exo2.0-Bold",
+                            Font = OsuFont.GetFont(weight: FontWeight.Bold, size: 17),
                             Margin = new MarginPadding { Left = 30 },
                             Text = statistic.Content,
-                            TextSize = 17,
                         }
                     };
                 }

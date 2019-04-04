@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System.Linq;
 using Microsoft.EntityFrameworkCore;
@@ -8,7 +8,7 @@ using osu.Game.Database;
 
 namespace osu.Game.Scoring
 {
-    public class ScoreStore : MutableDatabaseBackedStore<ScoreInfo>
+    public class ScoreStore : MutableDatabaseBackedStoreWithFileIncludes<ScoreInfo, ScoreFileInfo>
     {
         public ScoreStore(IDatabaseContextFactory factory, Storage storage)
             : base(factory, storage)
@@ -17,7 +17,6 @@ namespace osu.Game.Scoring
 
         protected override IQueryable<ScoreInfo> AddIncludesForConsumption(IQueryable<ScoreInfo> query)
             => base.AddIncludesForConsumption(query)
-                   .Include(s => s.Files).ThenInclude(f => f.FileInfo)
                    .Include(s => s.Beatmap)
                    .Include(s => s.Ruleset);
     }

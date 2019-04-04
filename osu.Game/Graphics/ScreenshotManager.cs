@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using System.IO;
@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
-using osu.Framework.Configuration;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input;
 using osu.Framework.Input.Bindings;
@@ -42,14 +42,14 @@ namespace osu.Game.Graphics
         private SampleChannel shutter;
 
         [BackgroundDependencyLoader]
-        private void load(GameHost host, GameConfigManager config, Storage storage, NotificationOverlay notificationOverlay, AudioManager audio)
+        private void load(GameHost host, OsuConfigManager config, Storage storage, NotificationOverlay notificationOverlay, AudioManager audio)
         {
             this.host = host;
             this.storage = storage.GetStorageForDirectory(@"screenshots");
             this.notificationOverlay = notificationOverlay;
 
-            screenshotFormat = config.GetBindable<ScreenshotFormat>(GameSetting.ScreenshotFormat);
-            captureMenuCursor = config.GetBindable<bool>(GameSetting.ScreenshotCaptureMenuCursor);
+            screenshotFormat = config.GetBindable<ScreenshotFormat>(OsuSetting.ScreenshotFormat);
+            captureMenuCursor = config.GetBindable<bool>(OsuSetting.ScreenshotCaptureMenuCursor);
 
             shutter = audio.Sample.Get("UI/shutter");
         }
@@ -127,7 +127,7 @@ namespace osu.Game.Graphics
         {
             base.Update();
 
-            if (cursorVisibility == false && Interlocked.CompareExchange(ref screenShotTasks, 0, 0) == 0)
+            if (cursorVisibility.Value == false && Interlocked.CompareExchange(ref screenShotTasks, 0, 0) == 0)
                 cursorVisibility.Value = true;
         }
 
