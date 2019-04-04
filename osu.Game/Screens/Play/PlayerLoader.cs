@@ -37,8 +37,6 @@ namespace osu.Game.Screens.Play
 
         private BeatmapMetadataDisplay info;
 
-        private OsuLogo logo;
-
         private bool hideOverlays;
         public override bool HideOverlaysOnEnter => hideOverlays;
 
@@ -154,8 +152,6 @@ namespace osu.Game.Screens.Play
         protected override void LogoArriving(OsuLogo logo, bool resuming)
         {
             base.LogoArriving(logo, resuming);
-
-            this.logo = logo;
 
             const double duration = 300;
 
