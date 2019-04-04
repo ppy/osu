@@ -41,8 +41,9 @@ namespace osu.Game.Tests.Visual.UserInterface
         private Box visualBox;
         private Box transferContainerBox;
         private Container logoFacade;
-
         private bool randomPositions;
+
+        private const float visual_box_size = 72;
 
         [BackgroundDependencyLoader]
         private void load(OsuConfigManager config)
@@ -110,7 +111,7 @@ namespace osu.Game.Tests.Visual.UserInterface
         }
 
         /// <summary>
-        /// Add a facade to a flow container then move logo to facade.
+        /// Add a facade to a flow container, move the logo to the center of the screen, then start tracking on the facade.
         /// </summary>
         [Test]
         public void FlowContainerTest()
@@ -139,13 +140,13 @@ namespace osu.Game.Tests.Visual.UserInterface
                         Origin = Anchor.TopCentre,
                         Anchor = Anchor.TopCentre,
                         Colour = Color4.Azure,
-                        Size = new Vector2(70)
+                        Size = new Vector2(visual_box_size)
                     },
                     new Container
                     {
                         Alpha = 0.35f,
                         RelativeSizeAxes = Axes.None,
-                        Size = new Vector2(72),
+                        Size = new Vector2(visual_box_size),
                         Origin = Anchor.TopCentre,
                         Anchor = Anchor.TopCentre,
                         Children = new Drawable[]
@@ -163,7 +164,7 @@ namespace osu.Game.Tests.Visual.UserInterface
                         Origin = Anchor.TopCentre,
                         Anchor = Anchor.TopCentre,
                         Colour = Color4.Azure,
-                        Size = new Vector2(70)
+                        Size = new Vector2(visual_box_size)
                     },
                 };
             });
@@ -194,7 +195,7 @@ namespace osu.Game.Tests.Visual.UserInterface
                 {
                     Alpha = 0.35f,
                     RelativeSizeAxes = Axes.None,
-                    Size = new Vector2(72),
+                    Size = new Vector2(visual_box_size),
                     Child = visualBox = new Box
                     {
                         Colour = Color4.Tomato,
@@ -205,7 +206,7 @@ namespace osu.Game.Tests.Visual.UserInterface
                 {
                     Alpha = 0.35f,
                     RelativeSizeAxes = Axes.None,
-                    Size = new Vector2(72),
+                    Size = new Vector2(visual_box_size),
                     Child = transferContainerBox = new Box
                     {
                         Colour = Color4.White,
