@@ -23,19 +23,19 @@ namespace osu.Game.Rulesets.Catch.Beatmaps
                 {
                     Name = @"Fruit Count",
                     Content = fruits.ToString(),
-                    Icon = FontAwesome.CircleOutline
+                    Icon = FontAwesome.Regular.Circle
                 },
                 new BeatmapStatistic
                 {
                     Name = @"Juice Stream Count",
                     Content = juiceStreams.ToString(),
-                    Icon = FontAwesome.Circle
+                    Icon = FontAwesome.Regular.Circle
                 },
                 new BeatmapStatistic
                 {
                     Name = @"Banana Shower Count",
                     Content = bananaShowers.ToString(),
-                    Icon = FontAwesome.Circle
+                    Icon = FontAwesome.Regular.Circle
                 }
             };
         }

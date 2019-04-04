@@ -17,7 +17,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             {
                 RelativeSizeAxes = Axes.Both,
                 State = Framework.Graphics.Containers.Visibility.Visible,
-                Icon = FontAwesome.AssistiveListeningSystems,
+                Icon = FontAwesome.Solid.AssistiveListeningSystems,
                 HeaderText = @"This is a test popup",
                 BodyText = "I can say lots of stuff and even wrap my words!",
                 Buttons = new PopupDialogButton[]
