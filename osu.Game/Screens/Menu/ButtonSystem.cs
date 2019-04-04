@@ -276,8 +276,6 @@ namespace osu.Game.Screens.Menu
                             game?.Toolbar.Hide();
 
                             logo.ClearTransforms(targetMember: nameof(Position));
-                            logo.RelativePositionAxes = Axes.Both;
-
                             logo.MoveTo(new Vector2(0.5f), 800, Easing.OutExpo);
                             logo.ScaleTo(1, 800, Easing.OutExpo);
                         }, buttonArea.Alpha * 150);

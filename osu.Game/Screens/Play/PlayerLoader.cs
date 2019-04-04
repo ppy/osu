@@ -131,11 +131,8 @@ namespace osu.Game.Screens.Play
 
         private void contentOut()
         {
-            // Ensure the logo is no longer tracking before we scale the content, and that its RelativePositionAxes have been returned.
+            // Ensure the logo is no longer tracking before we scale the content
             content.Tracking = false;
-
-            if (logo != null)
-                logo.RelativePositionAxes = Axes.Both;
 
             content.ScaleTo(0.7f, 300, Easing.InQuint);
             content.FadeOut(250);

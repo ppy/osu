@@ -170,7 +170,6 @@ namespace osu.Game.Tests.Visual
             AddStep("Perform logo movements", () =>
             {
                 facadeContainer.Tracking = false;
-                logo.RelativePositionAxes = Axes.Both;
                 logo.MoveTo(new Vector2(0.5f), 500, Easing.InOutExpo);
                 facadeContainer.SetLogo(logo, 1.0f, 1000, Easing.InOutExpo);
                 visualBox.Colour = Color4.White;
