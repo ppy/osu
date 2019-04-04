@@ -57,7 +57,7 @@ namespace osu.Game.Graphics.Containers
 
         /// <summary>
         /// Gets the position that the logo should move to with respect to the <see cref="LogoFacade"/>.
-        /// Manually performs a conversion of the Facade's position to the relative position of the Logo's Parent.
+        /// Manually performs a conversion of the Facade's position to the Logo's parent's relative space.
         /// </summary>
         /// <remarks>Will only be correct if the logo's <see cref="Drawable.RelativePositionAxes"/> are set to Axes.Both</remarks>
         /// <returns>The position that the logo should move to in its parent's relative space.</returns>
