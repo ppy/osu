@@ -5,13 +5,26 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using System.Collections.Generic;
 using System.Linq;
+using osu.Framework.Extensions;
+using osu.Game.Graphics;
+using osu.Game.Graphics.Containers;
+using osu.Game.Graphics.Sprites;
+using osu.Game.Online.Chat;
+using osu.Game.Online.Leaderboards;
+using osu.Game.Rulesets.UI;
 using osu.Game.Scoring;
+using osu.Game.Users;
+using osuTK;
+using osuTK.Graphics;
 
 namespace osu.Game.Overlays.BeatmapSet.Scores
 {
-    public class ScoreTable : CompositeDrawable
+    public class ScoreTable : TableContainer
     {
-        private readonly ScoresGrid scoresGrid;
+        private const float horizontal_inset = 20;
+        private const float row_height = 25;
+        private const int text_size = 14;
+
         private readonly FillFlowContainer backgroundFlow;
 
         public ScoreTable()
@@ -19,77 +32,152 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
 
-            InternalChildren = new Drawable[]
+            Padding = new MarginPadding { Horizontal = horizontal_inset };
+            RowSize = new Dimension(GridSizeMode.Absolute, row_height);
+
+            AddInternal(backgroundFlow = new FillFlowContainer
             {
-                backgroundFlow = new FillFlowContainer
-                {
-                    RelativeSizeAxes = Axes.X,
-                    AutoSizeAxes = Axes.Y,
-                    Margin = new MarginPadding { Top = 25 }
-                },
-                scoresGrid = new ScoresGrid
-                {
-                    ColumnDimensions = new[]
-                    {
-                        new Dimension(GridSizeMode.Absolute, 40),
-                        new Dimension(GridSizeMode.Absolute, 70),
-                        new Dimension(GridSizeMode.AutoSize),
-                        new Dimension(GridSizeMode.AutoSize),
-                        new Dimension(GridSizeMode.Distributed, minSize: 150),
-                        new Dimension(GridSizeMode.Distributed, minSize: 70, maxSize: 90),
-                        new Dimension(GridSizeMode.Distributed, minSize: 50, maxSize: 70),
-                        new Dimension(GridSizeMode.Distributed, minSize: 50, maxSize: 70),
-                        new Dimension(GridSizeMode.Distributed, minSize: 50, maxSize: 70),
-                        new Dimension(GridSizeMode.Distributed, minSize: 50, maxSize: 70),
-                        new Dimension(GridSizeMode.Distributed, minSize: 40, maxSize: 70),
-                        new Dimension(GridSizeMode.AutoSize),
-                    }
-                }
-            };
+                RelativeSizeAxes = Axes.Both,
+                Depth = 1f,
+                Padding = new MarginPadding { Horizontal = -horizontal_inset },
+                Margin = new MarginPadding { Top = row_height }
+            });
         }
 
         public IReadOnlyList<ScoreInfo> Scores
         {
             set
             {
-                scoresGrid.Content = new Drawable[0][];
+                Content = null;
                 backgroundFlow.Clear();
 
                 if (value == null || !value.Any())
                     return;
 
-                var content = new List<Drawable[]>
-                {
-                    new ScoreTableHeaderRow(value.First()).CreateDrawables().ToArray()
-                };
-
                 for (int i = 0; i < value.Count; i++)
-                {
-                    content.Add(new ScoreTableScoreRow(i, value[i]).CreateDrawables().ToArray());
                     backgroundFlow.Add(new ScoreTableRowBackground(i));
-                }
 
-                scoresGrid.Content = content.ToArray();
+                Columns = createHeaders(value[0]);
+                Content = value.Select((s, i) => createContent(i, s)).ToArray().ToRectangular();
             }
         }
 
-        private class ScoresGrid : GridContainer
+        private TableColumn[] createHeaders(ScoreInfo score)
         {
-            public ScoresGrid()
+            var columns = new List<TableColumn>
             {
-                RelativeSizeAxes = Axes.X;
-                AutoSizeAxes = Axes.Y;
+                new TableColumn("rank", Anchor.CentreRight, new Dimension(GridSizeMode.AutoSize)),
+                new TableColumn("", Anchor.Centre, new Dimension(GridSizeMode.Absolute, 70)), // grade
+                new TableColumn("score", Anchor.CentreLeft, new Dimension(GridSizeMode.AutoSize)),
+                new TableColumn("accuracy", Anchor.CentreLeft, new Dimension(GridSizeMode.AutoSize)),
+                new TableColumn("player", Anchor.CentreLeft, new Dimension(GridSizeMode.Distributed, minSize: 150)),
+                new TableColumn("max combo", Anchor.CentreLeft, new Dimension(GridSizeMode.Distributed, minSize: 70, maxSize: 90))
+            };
+
+            foreach (var statistic in score.Statistics)
+                columns.Add(new TableColumn(statistic.Key.GetDescription(), Anchor.CentreLeft, new Dimension(GridSizeMode.Distributed, minSize: 50, maxSize: 70)));
+
+            columns.AddRange(new[]
+            {
+                new TableColumn("pp", Anchor.CentreLeft, new Dimension(GridSizeMode.Distributed, minSize: 40, maxSize: 70)),
+                new TableColumn("mods", Anchor.CentreLeft, new Dimension(GridSizeMode.AutoSize)),
+            });
+
+            return columns.ToArray();
+        }
+
+        private Drawable[] createContent(int index, ScoreInfo score)
+        {
+            var content = new List<Drawable>
+            {
+                new OsuSpriteText
+                {
+                    Text = $"#{index + 1}",
+                    Font = OsuFont.GetFont(size: text_size, weight: FontWeight.Bold)
+                },
+                new DrawableRank(score.Rank)
+                {
+                    Size = new Vector2(30, 20)
+                },
+                new OsuSpriteText
+                {
+                    Margin = new MarginPadding { Right = horizontal_inset },
+                    Text = $@"{score.TotalScore:N0}",
+                    Font = OsuFont.GetFont(size: text_size, weight: index == 0 ? FontWeight.Bold : FontWeight.Medium)
+                },
+                new OsuSpriteText
+                {
+                    Margin = new MarginPadding { Right = horizontal_inset },
+                    Text = $@"{score.Accuracy:P2}",
+                    Font = OsuFont.GetFont(size: text_size),
+                    Colour = score.Accuracy == 1 ? Color4.GreenYellow : Color4.White
+                },
+            };
+
+            var username = new LinkFlowContainer(t => t.Font = OsuFont.GetFont(size: text_size)) { AutoSizeAxes = Axes.Both };
+            username.AddLink(score.User.Username, null, LinkAction.OpenUserProfile, score.User.Id.ToString(), "Open profile");
+
+            content.AddRange(new Drawable[]
+            {
+                new FillFlowContainer
+                {
+                    AutoSizeAxes = Axes.Both,
+                    Direction = FillDirection.Horizontal,
+                    Margin = new MarginPadding { Right = horizontal_inset },
+                    Spacing = new Vector2(5, 0),
+                    Children = new Drawable[]
+                    {
+                        new DrawableFlag(score.User.Country) { Size = new Vector2(20, 13) },
+                        username
+                    }
+                },
+                new OsuSpriteText
+                {
+                    Text = $@"{score.MaxCombo:N0}x",
+                    Font = OsuFont.GetFont(size: text_size)
+                }
+            });
+
+            foreach (var kvp in score.Statistics)
+            {
+                content.Add(new OsuSpriteText
+                {
+                    Text = $"{kvp.Value}",
+                    Font = OsuFont.GetFont(size: text_size),
+                    Colour = kvp.Value == 0 ? Color4.Gray : Color4.White
+                });
             }
 
-            public Drawable[][] Content
+            content.AddRange(new Drawable[]
             {
-                get => base.Content;
-                set
+                new OsuSpriteText
                 {
-                    base.Content = value;
+                    Text = $@"{score.PP:N0}",
+                    Font = OsuFont.GetFont(size: text_size)
+                },
+                new FillFlowContainer
+                {
+                    Direction = FillDirection.Horizontal,
+                    AutoSizeAxes = Axes.Both,
+                    ChildrenEnumerable = score.Mods.Select(m => new ModIcon(m)
+                    {
+                        AutoSizeAxes = Axes.Both,
+                        Scale = new Vector2(0.3f)
+                    })
+                },
+            });
 
-                    RowDimensions = Enumerable.Repeat(new Dimension(GridSizeMode.Absolute, 25), value.Length).ToArray();
-                }
+            return content.ToArray();
+        }
+
+        protected override Drawable CreateHeader(int index, TableColumn column) => new HeaderText(column?.Header ?? string.Empty);
+
+        private class HeaderText : OsuSpriteText
+        {
+            public HeaderText(string text)
+            {
+                Text = text.ToUpper();
+                Font = OsuFont.GetFont(size: 12, weight: FontWeight.Black);
             }
         }
     }
