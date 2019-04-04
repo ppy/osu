@@ -23,7 +23,6 @@ namespace osu.Game.Rulesets.Mods
         public override double ScoreMultiplier => 0.5;
         public override bool Ranked => true;
         public override Type[] IncompatibleMods => new[] { typeof(ModHardRock) };
-              
         public void ApplyToDifficulty(BeatmapDifficulty difficulty)
         {
             const float ratio = 0.5f;
