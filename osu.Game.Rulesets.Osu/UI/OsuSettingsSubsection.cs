@@ -36,7 +36,7 @@ namespace osu.Game.Rulesets.Osu.UI
                 },
                 new SettingsCheckbox
                 {
-                    LabelText = "Show cursor trail",
+                    LabelText = "Cursor trail",
                     Bindable = config.GetBindable<bool>(OsuRulesetSetting.ShowCursorTrail)
                 },
             };
