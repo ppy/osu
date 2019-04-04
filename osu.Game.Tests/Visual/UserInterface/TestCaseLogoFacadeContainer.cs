@@ -183,7 +183,7 @@ namespace osu.Game.Tests.Visual.UserInterface
                 }, 700);
             });
 
-            waitForMove();
+            waitForMove(8);
             AddAssert("Logo is tracking", () => facadeContainer.IsLogoTracking);
         }
 
@@ -219,7 +219,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             facadeContainer.SetLogo(logo, 1.0f, 1000);
         }
 
-        private void waitForMove() => AddWaitStep("Wait for transforms to finish", 5);
+        private void waitForMove(int count = 5) => AddWaitStep("Wait for transforms to finish", count);
 
         private void removeFacade()
         {
