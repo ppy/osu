@@ -5,6 +5,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using System.Collections.Generic;
 using System.Linq;
+using osu.Framework.Allocation;
 using osu.Framework.Extensions;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
@@ -27,6 +28,8 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
 
         private readonly FillFlowContainer backgroundFlow;
 
+        private Color4 highAccuracyColour;
+
         public ScoreTable()
         {
             RelativeSizeAxes = Axes.X;
@@ -42,6 +45,12 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                 Padding = new MarginPadding { Horizontal = -horizontal_inset },
                 Margin = new MarginPadding { Top = row_height }
             });
+        }
+
+        [BackgroundDependencyLoader]
+        private void load(OsuColour colours)
+        {
+            highAccuracyColour = colours.GreenLight;
         }
 
         public IReadOnlyList<ScoreInfo> Scores
@@ -110,7 +119,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                     Margin = new MarginPadding { Right = horizontal_inset },
                     Text = $@"{score.Accuracy:P2}",
                     Font = OsuFont.GetFont(size: text_size),
-                    Colour = score.Accuracy == 1 ? Color4.GreenYellow : Color4.White
+                    Colour = score.Accuracy == 1 ? highAccuracyColour : Color4.White
                 },
             };
 
