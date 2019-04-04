@@ -72,7 +72,7 @@ namespace osu.Game.Overlays.Volume
 
             Current.ValueChanged += muted =>
             {
-                icon.Icon = muted.NewValue ? FontAwesome.VolumeOff : FontAwesome.VolumeUp;
+                icon.Icon = muted.NewValue ? FontAwesome.Solid.VolumeOff : FontAwesome.Solid.VolumeUp;
                 icon.Margin = new MarginPadding { Left = muted.NewValue ? width / 2 - 15 : width / 2 - 10 }; //Magic numbers to line up both icons because they're different widths
             };
             Current.TriggerChange();

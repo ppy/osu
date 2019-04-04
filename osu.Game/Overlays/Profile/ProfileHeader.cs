@@ -415,16 +415,16 @@ namespace osu.Game.Overlays.Profile
                     websiteWithoutProtcol = websiteWithoutProtcol.Substring(protocolIndex + 2);
             }
 
-            tryAddInfoRightLine(FontAwesome.MapMarker, user.Location);
-            tryAddInfoRightLine(FontAwesome.HeartOutline, user.Interests);
-            tryAddInfoRightLine(FontAwesome.Suitcase, user.Occupation);
+            tryAddInfoRightLine(FontAwesome.Solid.MapMarker, user.Location);
+            tryAddInfoRightLine(FontAwesome.Regular.Heart, user.Interests);
+            tryAddInfoRightLine(FontAwesome.Solid.Suitcase, user.Occupation);
             infoTextRight.NewParagraph();
             if (!string.IsNullOrEmpty(user.Twitter))
-                tryAddInfoRightLine(FontAwesome.Twitter, "@" + user.Twitter, $@"https://twitter.com/{user.Twitter}");
-            tryAddInfoRightLine(FontAwesome.Gamepad, user.Discord);
-            tryAddInfoRightLine(FontAwesome.Skype, user.Skype, @"skype:" + user.Skype + @"?chat");
-            tryAddInfoRightLine(FontAwesome.Lastfm, user.Lastfm, $@"https://last.fm/users/{user.Lastfm}");
-            tryAddInfoRightLine(FontAwesome.Globe, websiteWithoutProtcol, user.Website);
+                tryAddInfoRightLine(FontAwesome.Brands.Twitter, "@" + user.Twitter, $@"https://twitter.com/{user.Twitter}");
+            tryAddInfoRightLine(FontAwesome.Solid.Gamepad, user.Discord);
+            tryAddInfoRightLine(FontAwesome.Brands.Skype, user.Skype, @"skype:" + user.Skype + @"?chat");
+            tryAddInfoRightLine(FontAwesome.Brands.Lastfm, user.Lastfm, $@"https://last.fm/users/{user.Lastfm}");
+            tryAddInfoRightLine(FontAwesome.Solid.Globe, websiteWithoutProtcol, user.Website);
 
             if (user.Statistics != null)
             {
