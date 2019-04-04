@@ -41,10 +41,6 @@ namespace osu.Game.Rulesets.Mods
                         Lives--;
                         scoreProcessor.Health.Value = 100;
                     }
-                    else
-                    {
-                        Lives = 2;
-                    }
                 }
             };
         }
