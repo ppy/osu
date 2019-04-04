@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using osuTK;
 using osu.Framework.Graphics;
@@ -11,7 +11,7 @@ using System.Linq;
 using osu.Framework.Allocation;
 using osu.Game.Beatmaps;
 using osu.Game.Online.API;
-using osu.Game.Online.API.Requests.Responses;
+using osu.Game.Scoring;
 
 namespace osu.Game.Overlays.BeatmapSet.Scores
 {
@@ -29,12 +29,12 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
             set => loadingAnimation.FadeTo(value ? 1 : 0, fade_duration);
         }
 
-        private IEnumerable<APIScoreInfo> scores;
+        private IEnumerable<ScoreInfo> scores;
         private BeatmapInfo beatmap;
 
-        public IEnumerable<APIScoreInfo> Scores
+        public IEnumerable<ScoreInfo> Scores
         {
-            get { return scores; }
+            get => scores;
             set
             {
                 getScoresRequest?.Cancel();
@@ -45,7 +45,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
         }
 
         private GetScoresRequest getScoresRequest;
-        private APIAccess api;
+        private IAPIProvider api;
 
         public BeatmapInfo Beatmap
         {
@@ -129,7 +129,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
         }
 
         [BackgroundDependencyLoader]
-        private void load(APIAccess api)
+        private void load(IAPIProvider api)
         {
             this.api = api;
             updateDisplay();

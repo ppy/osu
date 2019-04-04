@@ -1,11 +1,12 @@
-// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Screens;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Online.API;
@@ -29,7 +30,7 @@ namespace osu.Game.Overlays
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours, APIAccess api)
+        private void load(OsuColour colours, IAPIProvider api)
         {
             api.Register(this);
 
@@ -69,7 +70,10 @@ namespace osu.Game.Overlays
                                     Colour = Color4.Black,
                                     Alpha = 0.9f,
                                 },
-                                welcomeScreen = new ScreenWelcome(),
+                                new ScreenStack(welcomeScreen = new ScreenWelcome())
+                                {
+                                    RelativeSizeAxes = Axes.Both,
+                                },
                             }
                         }
                     }
@@ -82,7 +86,7 @@ namespace osu.Game.Overlays
             base.PopIn();
             this.FadeIn(transition_time, Easing.OutQuint);
 
-            if (welcomeScreen.ChildScreen != null)
+            if (welcomeScreen.GetChildScreen() != null)
                 welcomeScreen.MakeCurrent();
         }
 
@@ -92,7 +96,7 @@ namespace osu.Game.Overlays
             this.FadeOut(100);
         }
 
-        public void APIStateChanged(APIAccess api, APIState state)
+        public void APIStateChanged(IAPIProvider api, APIState state)
         {
             switch (state)
             {

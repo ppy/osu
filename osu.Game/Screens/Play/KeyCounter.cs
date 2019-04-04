@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
 using System.Linq;
@@ -8,6 +8,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
+using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osuTK;
 using osuTK.Graphics;
@@ -26,9 +27,10 @@ namespace osu.Game.Screens.Play
 
         public bool IsCounting { get; set; } = true;
         private int countPresses;
+
         public int CountPresses
         {
-            get { return countPresses; }
+            get => countPresses;
             private set
             {
                 if (countPresses != value)
@@ -40,9 +42,10 @@ namespace osu.Game.Screens.Play
         }
 
         private bool isLit;
+
         public bool IsLit
         {
-            get { return isLit; }
+            get => isLit;
             protected set
             {
                 if (isLit != value)
@@ -68,9 +71,12 @@ namespace osu.Game.Screens.Play
             Name = name;
         }
 
-        [BackgroundDependencyLoader]
-        private void load(TextureStore textures)
+        [BackgroundDependencyLoader(true)]
+        private void load(TextureStore textures, GameplayClock clock)
         {
+            if (clock != null)
+                Clock = clock;
+
             Children = new Drawable[]
             {
                 buttonSprite = new Sprite
@@ -96,8 +102,7 @@ namespace osu.Game.Screens.Play
                         new OsuSpriteText
                         {
                             Text = Name,
-                            Font = @"Venera",
-                            TextSize = 12,
+                            Font = OsuFont.Numeric.With(size: 12),
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
                             RelativePositionAxes = Axes.Both,

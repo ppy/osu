@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using osuTK;
 using osu.Framework.Graphics;
@@ -8,7 +8,7 @@ using osu.Game.Rulesets.Osu.Objects.Drawables.Pieces;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
-using osu.Framework.Configuration;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Osu.Configuration;
@@ -33,6 +33,9 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         private readonly IBindable<float> scaleBindable = new Bindable<float>();
         private readonly IBindable<SliderPath> pathBindable = new Bindable<SliderPath>();
 
+        [Resolved(CanBeNull = true)]
+        private OsuRulesetConfigManager config { get; set; }
+
         public DrawableSlider(Slider s)
             : base(s)
         {
@@ -47,12 +50,13 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             {
                 Body = new SnakingSliderBody(s)
                 {
-                    PathWidth = s.Scale * 64,
+                    PathRadius = s.Scale * 64,
                 },
                 ticks = new Container<DrawableSliderTick> { RelativeSizeAxes = Axes.Both },
                 repeatPoints = new Container<DrawableRepeatPoint> { RelativeSizeAxes = Axes.Both },
                 Ball = new SliderBall(s, this)
                 {
+                    GetInitialHitAction = () => HeadCircle.HitAction,
                     BypassAutoSizeAxes = Axes.Both,
                     Scale = new Vector2(s.Scale),
                     AlwaysPresent = true,
@@ -93,16 +97,16 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuConfigManager config)
+        private void load()
         {
-            config.BindWith(OsuSetting.SnakingInSliders, Body.SnakingIn);
-            config.BindWith(OsuSetting.SnakingOutSliders, Body.SnakingOut);
+            config?.BindWith(OsuRulesetSetting.SnakingInSliders, Body.SnakingIn);
+            config?.BindWith(OsuRulesetSetting.SnakingOutSliders, Body.SnakingOut);
 
             positionBindable.BindValueChanged(_ => Position = HitObject.StackedPosition);
-            scaleBindable.BindValueChanged(v =>
+            scaleBindable.BindValueChanged(scale =>
             {
-                Body.PathWidth = HitObject.Scale * 64;
-                Ball.Scale = new Vector2(HitObject.Scale);
+                Body.PathRadius = scale.NewValue * 64;
+                Ball.Scale = new Vector2(scale.NewValue);
             });
 
             positionBindable.BindTo(HitObject.PositionBindable);
@@ -114,7 +118,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
         public override Color4 AccentColour
         {
-            get { return base.AccentColour; }
+            get => base.AccentColour;
             set
             {
                 base.AccentColour = value;
@@ -156,9 +160,9 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         {
             base.SkinChanged(skin, allowFallback);
 
-            Body.AccentColour = skin.GetValue<SkinConfiguration, Color4>(s => s.CustomColours.ContainsKey("SliderTrackOverride") ? s.CustomColours["SliderTrackOverride"] : Body.AccentColour);
-            Body.BorderColour = skin.GetValue<SkinConfiguration, Color4>(s => s.CustomColours.ContainsKey("SliderBorder") ? s.CustomColours["SliderBorder"] : Body.BorderColour);
-            Ball.AccentColour = skin.GetValue<SkinConfiguration, Color4>(s => s.CustomColours.ContainsKey("SliderBall") ? s.CustomColours["SliderBall"] : Ball.AccentColour);
+            Body.AccentColour = skin.GetValue<SkinConfiguration, Color4?>(s => s.CustomColours.ContainsKey("SliderTrackOverride") ? s.CustomColours["SliderTrackOverride"] : (Color4?)null) ?? Body.AccentColour;
+            Body.BorderColour = skin.GetValue<SkinConfiguration, Color4?>(s => s.CustomColours.ContainsKey("SliderBorder") ? s.CustomColours["SliderBorder"] : (Color4?)null) ?? Body.BorderColour;
+            Ball.AccentColour = skin.GetValue<SkinConfiguration, Color4?>(s => s.CustomColours.ContainsKey("SliderBall") ? s.CustomColours["SliderBall"] : (Color4?)null) ?? Ball.AccentColour;
         }
 
         protected override void CheckForResult(bool userTriggered, double timeOffset)

@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
@@ -13,14 +13,14 @@ namespace osu.Game.Overlays.Settings.Sections.Audio
         protected override string Header => "Offset Adjustment";
 
         [BackgroundDependencyLoader]
-        private void load(GameConfigManager config)
+        private void load(OsuConfigManager config)
         {
             Children = new Drawable[]
             {
                 new SettingsSlider<double, OffsetSlider>
                 {
                     LabelText = "Audio offset",
-                    Bindable = config.GetBindable<double>(GameSetting.AudioOffset),
+                    Bindable = config.GetBindable<double>(OsuSetting.AudioOffset),
                     KeyboardStep = 1f
                 },
                 new SettingsButton

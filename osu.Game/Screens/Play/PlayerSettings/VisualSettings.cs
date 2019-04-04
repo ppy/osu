@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
@@ -43,13 +43,13 @@ namespace osu.Game.Screens.Play.PlayerSettings
         }
 
         [BackgroundDependencyLoader]
-        private void load(GameConfigManager config)
+        private void load(OsuConfigManager config)
         {
-            dimSliderBar.Bindable = config.GetBindable<double>(GameSetting.DimLevel);
-            blurSliderBar.Bindable = config.GetBindable<double>(GameSetting.BlurLevel);
-            showStoryboardToggle.Bindable = config.GetBindable<bool>(GameSetting.ShowStoryboard);
-            beatmapSkinsToggle.Bindable = config.GetBindable<bool>(GameSetting.BeatmapSkins);
-            beatmapHitsoundsToggle.Bindable = config.GetBindable<bool>(GameSetting.BeatmapHitsounds);
+            dimSliderBar.Bindable = config.GetBindable<double>(OsuSetting.DimLevel);
+            blurSliderBar.Bindable = config.GetBindable<double>(OsuSetting.BlurLevel);
+            showStoryboardToggle.Bindable = config.GetBindable<bool>(OsuSetting.ShowStoryboard);
+            beatmapSkinsToggle.Bindable = config.GetBindable<bool>(OsuSetting.BeatmapSkins);
+            beatmapHitsoundsToggle.Bindable = config.GetBindable<bool>(OsuSetting.BeatmapHitsounds);
         }
     }
 }

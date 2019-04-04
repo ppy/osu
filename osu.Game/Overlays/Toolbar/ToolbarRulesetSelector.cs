@@ -1,15 +1,15 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System.Linq;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Caching;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osuTK;
 using osuTK.Input;
 using osuTK.Graphics;
-using osu.Framework.Configuration;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Events;
 using osu.Game.Rulesets;
@@ -115,11 +115,11 @@ namespace osu.Game.Overlays.Toolbar
             Size = new Vector2(modeButtons.DrawSize.X, 1);
         }
 
-        private void rulesetChanged(RulesetInfo ruleset)
+        private void rulesetChanged(ValueChangedEvent<RulesetInfo> e)
         {
             foreach (ToolbarRulesetButton m in modeButtons.Children.Cast<ToolbarRulesetButton>())
             {
-                bool isActive = m.Ruleset.ID == ruleset.ID;
+                bool isActive = m.Ruleset.ID == e.NewValue.ID;
                 m.Active = isActive;
                 if (isActive)
                     activeButton = m;

@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using System.Globalization;
@@ -35,9 +35,10 @@ namespace osu.Game.Graphics.UserInterface
         public virtual string TooltipText { get; private set; }
 
         private Color4 accentColour;
+
         public Color4 AccentColour
         {
-            get { return accentColour; }
+            get => accentColour;
             set
             {
                 accentColour = value;
@@ -79,10 +80,7 @@ namespace osu.Game.Graphics.UserInterface
                 new HoverClickSounds()
             };
 
-            Current.DisabledChanged += disabled =>
-            {
-                Alpha = disabled ? 0.3f : 1;
-            };
+            Current.DisabledChanged += disabled => { Alpha = disabled ? 0.3f : 1; };
         }
 
         [BackgroundDependencyLoader]
@@ -95,7 +93,7 @@ namespace osu.Game.Graphics.UserInterface
         protected override void LoadComplete()
         {
             base.LoadComplete();
-            CurrentNumber.BindValueChanged(updateTooltipText, true);
+            CurrentNumber.BindValueChanged(current => updateTooltipText(current.NewValue), true);
         }
 
         protected override bool OnHover(HoverEvent e)

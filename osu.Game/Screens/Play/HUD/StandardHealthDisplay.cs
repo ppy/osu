@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using osu.Framework.Allocation;
@@ -44,18 +44,20 @@ namespace osu.Game.Screens.Play.HUD
 
         public Color4 AccentColour
         {
-            get { return fill.Colour; }
-            set { fill.Colour = value; }
+            get => fill.Colour;
+            set => fill.Colour = value;
         }
 
         private Color4 glowColour;
+
         public Color4 GlowColour
         {
-            get { return glowColour; }
+            get => glowColour;
             set
             {
                 if (glowColour == value)
                     return;
+
                 glowColour = value;
 
                 fill.EdgeEffect = new EdgeEffectParameters

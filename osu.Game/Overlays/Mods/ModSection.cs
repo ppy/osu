@@ -1,5 +1,5 @@
-// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using osuTK;
 using osuTK.Input;
@@ -11,6 +11,7 @@ using System;
 using System.Linq;
 using System.Collections.Generic;
 using osu.Framework.Input.Events;
+using osu.Game.Graphics;
 
 namespace osu.Game.Overlays.Mods
 {
@@ -80,6 +81,7 @@ namespace osu.Game.Overlays.Mods
             {
                 Mod selected = button.SelectedMod;
                 if (selected == null) continue;
+
                 foreach (var type in modTypes)
                     if (type.IsInstanceOfType(selected))
                     {
@@ -123,7 +125,7 @@ namespace osu.Game.Overlays.Mods
                     Origin = Anchor.TopLeft,
                     Anchor = Anchor.TopLeft,
                     Position = new Vector2(0f, 0f),
-                    Font = @"Exo2.0-Bold"
+                    Font = OsuFont.GetFont(weight: FontWeight.Bold)
                 },
                 ButtonsContainer = new FillFlowContainer<ModButtonEmpty>
                 {

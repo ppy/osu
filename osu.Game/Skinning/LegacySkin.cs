@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using System.IO;
@@ -28,7 +28,8 @@ namespace osu.Game.Skinning
         {
         }
 
-        protected LegacySkin(SkinInfo skin, IResourceStore<byte[]> storage, AudioManager audioManager, string filename) : base(skin)
+        protected LegacySkin(SkinInfo skin, IResourceStore<byte[]> storage, AudioManager audioManager, string filename)
+            : base(skin)
         {
             Stream stream = storage.GetStream(filename);
             if (stream != null)
@@ -58,7 +59,14 @@ namespace osu.Game.Skinning
                     componentName = "hit300";
                     break;
                 case "Play/osu/number-text":
-                    return !hasFont(Configuration.HitCircleFont) ? null : new LegacySpriteText(Textures, Configuration.HitCircleFont) { Scale = new Vector2(0.96f) };
+                    return !hasFont(Configuration.HitCircleFont)
+                        ? null
+                        : new LegacySpriteText(Textures, Configuration.HitCircleFont)
+                        {
+                            Scale = new Vector2(0.96f),
+                            // Spacing value was reverse-engineered from the ratio of the rendered sprite size in the visual inspector vs the actual texture size
+                            Spacing = new Vector2(-Configuration.HitCircleOverlap * 0.89f, 0)
+                        };
             }
 
             var texture = GetTexture(componentName);

@@ -1,15 +1,17 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Configuration;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Platform;
 using osu.Game.Configuration;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
@@ -25,10 +27,11 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
 
         private Bindable<ScalingMode> scalingMode;
         private Bindable<Size> sizeFullscreen;
+        private readonly BindableList<WindowMode> windowModes = new BindableList<WindowMode>();
 
         private OsuGameBase game;
         private SettingsDropdown<Size> resolutionDropdown;
-        private SettingsEnumDropdown<WindowMode> windowModeDropdown;
+        private SettingsDropdown<WindowMode> windowModeDropdown;
 
         private Bindable<float> scalingPositionX;
         private Bindable<float> scalingPositionY;
@@ -38,25 +41,29 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
         private const int transition_duration = 400;
 
         [BackgroundDependencyLoader]
-        private void load(FrameworkConfigManager config, GameConfigManager gameConfig, OsuGameBase game)
+        private void load(FrameworkConfigManager config, OsuConfigManager osuConfig, OsuGameBase game, GameHost host)
         {
             this.game = game;
 
-            scalingMode = gameConfig.GetBindable<ScalingMode>(GameSetting.Scaling);
+            scalingMode = osuConfig.GetBindable<ScalingMode>(OsuSetting.Scaling);
             sizeFullscreen = config.GetBindable<Size>(FrameworkSetting.SizeFullscreen);
-            scalingSizeX = gameConfig.GetBindable<float>(GameSetting.ScalingSizeX);
-            scalingSizeY = gameConfig.GetBindable<float>(GameSetting.ScalingSizeY);
-            scalingPositionX = gameConfig.GetBindable<float>(GameSetting.ScalingPositionX);
-            scalingPositionY = gameConfig.GetBindable<float>(GameSetting.ScalingPositionY);
+            scalingSizeX = osuConfig.GetBindable<float>(OsuSetting.ScalingSizeX);
+            scalingSizeY = osuConfig.GetBindable<float>(OsuSetting.ScalingSizeY);
+            scalingPositionX = osuConfig.GetBindable<float>(OsuSetting.ScalingPositionX);
+            scalingPositionY = osuConfig.GetBindable<float>(OsuSetting.ScalingPositionY);
+
+            if (host.Window != null)
+                windowModes.BindTo(host.Window.SupportedWindowModes);
 
             Container resolutionSettingsContainer;
 
             Children = new Drawable[]
             {
-                windowModeDropdown = new SettingsEnumDropdown<WindowMode>
+                windowModeDropdown = new SettingsDropdown<WindowMode>
                 {
                     LabelText = "Screen mode",
                     Bindable = config.GetBindable<WindowMode>(FrameworkSetting.WindowMode),
+                    ItemSource = windowModes,
                 },
                 resolutionSettingsContainer = new Container
                 {
@@ -67,13 +74,13 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
                 {
                     LabelText = "UI Scaling",
                     TransferValueOnCommit = true,
-                    Bindable = gameConfig.GetBindable<float>(GameSetting.UIScale),
+                    Bindable = osuConfig.GetBindable<float>(OsuSetting.UIScale),
                     KeyboardStep = 0.01f
                 },
                 new SettingsEnumDropdown<ScalingMode>
                 {
                     LabelText = "Screen Scaling",
-                    Bindable = gameConfig.GetBindable<ScalingMode>(GameSetting.Scaling),
+                    Bindable = osuConfig.GetBindable<ScalingMode>(OsuSetting.Scaling),
                 },
                 scalingSettings = new FillFlowContainer<SettingsSlider<float>>
                 {
@@ -83,7 +90,7 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
                     AutoSizeDuration = transition_duration,
                     AutoSizeEasing = Easing.OutQuint,
                     Masking = true,
-                    Children = new []
+                    Children = new[]
                     {
                         new SettingsSlider<float>
                         {
@@ -127,9 +134,9 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
                     Bindable = sizeFullscreen
                 };
 
-                windowModeDropdown.Bindable.BindValueChanged(windowMode =>
+                windowModeDropdown.Bindable.BindValueChanged(mode =>
                 {
-                    if (windowMode == WindowMode.Fullscreen)
+                    if (mode.NewValue == WindowMode.Fullscreen)
                     {
                         resolutionDropdown.Show();
                         sizeFullscreen.TriggerChange();
@@ -142,13 +149,26 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
             scalingMode.BindValueChanged(mode =>
             {
                 scalingSettings.ClearTransforms();
-                scalingSettings.AutoSizeAxes = mode != ScalingMode.Off ? Axes.Y : Axes.None;
+                scalingSettings.AutoSizeAxes = mode.NewValue != ScalingMode.Off ? Axes.Y : Axes.None;
 
-                if (mode == ScalingMode.Off)
+                if (mode.NewValue == ScalingMode.Off)
                     scalingSettings.ResizeHeightTo(0, transition_duration, Easing.OutQuint);
 
-                scalingSettings.ForEach(s => s.TransferValueOnCommit = mode == ScalingMode.Everything);
+                scalingSettings.ForEach(s => s.TransferValueOnCommit = mode.NewValue == ScalingMode.Everything);
             }, true);
+
+            windowModes.ItemsAdded += _ => windowModesChanged();
+            windowModes.ItemsRemoved += _ => windowModesChanged();
+
+            windowModesChanged();
+        }
+
+        private void windowModesChanged()
+        {
+            if (windowModes.Count > 1)
+                windowModeDropdown.Show();
+            else
+                windowModeDropdown.Hide();
         }
 
         /// <summary>
@@ -158,7 +178,7 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
         /// <returns>A bindable which will propagate updates with a delay.</returns>
         private void bindPreviewEvent(Bindable<float> bindable)
         {
-            bindable.ValueChanged += v =>
+            bindable.ValueChanged += _ =>
             {
                 switch (scalingMode.Value)
                 {
@@ -170,6 +190,7 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
         }
 
         private Drawable preview;
+
         private void showPreview()
         {
             if (preview?.IsAlive != true)
@@ -224,6 +245,7 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
                 {
                     if (item == new Size(9999, 9999))
                         return "Default";
+
                     return $"{item.Width}x{item.Height}";
                 }
             }

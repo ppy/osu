@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using System.Linq;
@@ -7,6 +7,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
@@ -42,7 +43,7 @@ namespace osu.Game.Screens.Play.HUD
                 text = new OsuSpriteText
                 {
                     Text = "hold for menu",
-                    Font = @"Exo2.0-Bold",
+                    Font = OsuFont.GetFont(weight: FontWeight.Bold),
                     Anchor = Anchor.CentreLeft,
                     Origin = Anchor.CentreLeft
                 },
@@ -92,30 +93,6 @@ namespace osu.Game.Screens.Play.HUD
             public Action HoverGained;
             public Action HoverLost;
 
-            public bool OnPressed(GlobalAction action)
-            {
-                switch (action)
-                {
-                    case GlobalAction.Back:
-                        BeginConfirm();
-                        return true;
-                }
-
-                return false;
-            }
-
-            public bool OnReleased(GlobalAction action)
-            {
-                switch (action)
-                {
-                    case GlobalAction.Back:
-                        AbortConfirm();
-                        return true;
-                }
-
-                return false;
-            }
-
             [BackgroundDependencyLoader]
             private void load(OsuColour colours)
             {
@@ -152,7 +129,7 @@ namespace osu.Game.Screens.Play.HUD
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
                             Size = new Vector2(15),
-                            Icon = FontAwesome.fa_close
+                            Icon = FontAwesome.Solid.TimesCircle
                         },
                     }
                 };
@@ -163,7 +140,7 @@ namespace osu.Game.Screens.Play.HUD
             private void bind()
             {
                 circularProgress.Current.BindTo(Progress);
-                Progress.ValueChanged += v => icon.Scale = new Vector2(1 + (float)v * 0.2f);
+                Progress.ValueChanged += progress => icon.Scale = new Vector2(1 + (float)progress.NewValue * 0.2f);
             }
 
             private bool pendingAnimation;
@@ -178,7 +155,7 @@ namespace osu.Game.Screens.Play.HUD
                 // avoid starting a new confirm call until we finish animating.
                 pendingAnimation = true;
 
-                Progress.Value = 0;
+                AbortConfirm();
 
                 overlayCircle.ScaleTo(0, 100)
                              .Then().FadeOut().ScaleTo(1).FadeIn(500)
@@ -205,6 +182,31 @@ namespace osu.Game.Screens.Play.HUD
             {
                 HoverLost?.Invoke();
                 base.OnHoverLost(e);
+            }
+
+            public bool OnPressed(GlobalAction action)
+            {
+                switch (action)
+                {
+                    case GlobalAction.Back:
+                        if (!pendingAnimation)
+                            BeginConfirm();
+                        return true;
+                }
+
+                return false;
+            }
+
+            public bool OnReleased(GlobalAction action)
+            {
+                switch (action)
+                {
+                    case GlobalAction.Back:
+                        AbortConfirm();
+                        return true;
+                }
+
+                return false;
             }
 
             protected override bool OnMouseDown(MouseDownEvent e)

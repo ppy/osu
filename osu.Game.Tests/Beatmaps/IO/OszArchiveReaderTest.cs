@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System.IO;
 using System.Linq;
@@ -17,7 +17,7 @@ namespace osu.Game.Tests.Beatmaps.IO
         [Test]
         public void TestReadBeatmaps()
         {
-            using (var osz = Resource.OpenResource("Beatmaps.241526 Soleily - Renatus.osz"))
+            using (var osz = TestResources.GetTestBeatmapStream())
             {
                 var reader = new ZipArchiveReader(osz);
                 string[] expected =
@@ -44,7 +44,7 @@ namespace osu.Game.Tests.Beatmaps.IO
         [Test]
         public void TestReadMetadata()
         {
-            using (var osz = Resource.OpenResource("Beatmaps.241526 Soleily - Renatus.osz"))
+            using (var osz = TestResources.GetTestBeatmapStream())
             {
                 var reader = new ZipArchiveReader(osz);
 
@@ -72,7 +72,7 @@ namespace osu.Game.Tests.Beatmaps.IO
         [Test]
         public void TestReadFile()
         {
-            using (var osz = Resource.OpenResource("Beatmaps.241526 Soleily - Renatus.osz"))
+            using (var osz = TestResources.GetTestBeatmapStream())
             {
                 var reader = new ZipArchiveReader(osz);
                 using (var stream = new StreamReader(

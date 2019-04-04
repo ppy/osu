@@ -1,11 +1,11 @@
-// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using osuTK;
 using osuTK.Graphics;
 using osu.Framework.Allocation;
-using osu.Framework.Configuration;
+using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -16,6 +16,7 @@ using osu.Game.Overlays;
 using osu.Framework.Graphics.UserInterface;
 using osu.Game.Graphics.UserInterface;
 using osu.Framework.Graphics.Cursor;
+using osu.Framework.Graphics.Sprites;
 using osu.Game.Graphics.Containers;
 using osu.Game.Overlays.Profile.Header;
 
@@ -59,6 +60,8 @@ namespace osu.Game.Users
 
             FillFlowContainer infoContainer;
 
+            UserCoverBackground coverBackground;
+
             AddInternal(content = new Container
             {
                 RelativeSizeAxes = Axes.Both,
@@ -73,13 +76,12 @@ namespace osu.Game.Users
 
                 Children = new Drawable[]
                 {
-                    new DelayedLoadWrapper(new UserCoverBackground(user)
+                    new DelayedLoadWrapper(coverBackground = new UserCoverBackground(user)
                     {
                         RelativeSizeAxes = Axes.Both,
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
                         FillMode = FillMode.Fill,
-                        OnLoadComplete = d => d.FadeInFromZero(400, Easing.Out)
                     }, 300) { RelativeSizeAxes = Axes.Both },
                     new Box
                     {
@@ -116,8 +118,7 @@ namespace osu.Game.Users
                                     new OsuSpriteText
                                     {
                                         Text = user.Username,
-                                        TextSize = 18,
-                                        Font = @"Exo2.0-SemiBoldItalic",
+                                        Font = OsuFont.GetFont(weight: FontWeight.SemiBold, size: 18, italics: true),
                                     },
                                     infoContainer = new FillFlowContainer
                                     {
@@ -165,7 +166,7 @@ namespace osu.Game.Users
                                     {
                                         Anchor = Anchor.CentreLeft,
                                         Origin = Anchor.CentreLeft,
-                                        Icon = FontAwesome.fa_circle_o,
+                                        Icon = FontAwesome.Regular.Circle,
                                         Shadow = true,
                                         Size = new Vector2(14),
                                     },
@@ -173,7 +174,7 @@ namespace osu.Game.Users
                                     {
                                         Anchor = Anchor.CentreLeft,
                                         Origin = Anchor.CentreLeft,
-                                        Font = @"Exo2.0-Semibold",
+                                        Font = OsuFont.GetFont(weight: FontWeight.SemiBold),
                                     },
                                 },
                             },
@@ -181,6 +182,8 @@ namespace osu.Game.Users
                     },
                 }
             });
+
+            coverBackground.OnLoadComplete += d => d.FadeInFromZero(400, Easing.Out);
 
             if (user.IsSupporter)
             {
@@ -191,8 +194,8 @@ namespace osu.Game.Users
                 });
             }
 
-            Status.ValueChanged += displayStatus;
-            Status.ValueChanged += status => statusBg.FadeColour(status?.GetAppropriateColour(colours) ?? colours.Gray5, 500, Easing.OutQuint);
+            Status.ValueChanged += status => displayStatus(status.NewValue);
+            Status.ValueChanged += status => statusBg.FadeColour(status.NewValue?.GetAppropriateColour(colours) ?? colours.Gray5, 500, Easing.OutQuint);
 
             base.Action = ViewProfile = () =>
             {

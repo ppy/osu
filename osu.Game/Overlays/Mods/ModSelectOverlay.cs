@@ -1,10 +1,9 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using osuTK;
 using osuTK.Graphics;
 using osu.Framework.Allocation;
-using osu.Framework.Configuration;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -17,21 +16,18 @@ using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics.Containers;
 using osu.Game.Rulesets;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays.Mods.Sections;
+using osu.Game.Screens;
 
 namespace osu.Game.Overlays.Mods
 {
     public class ModSelectOverlay : WaveOverlayContainer
     {
-        /// <summary>
-        /// How much this container should overflow the sides of the screen to account for parallax shifting.
-        /// </summary>
-        private const float overflow_padding = 50;
-
         private const float content_width = 0.8f;
 
         protected Color4 LowMultiplierColour, HighMultiplierColour;
@@ -41,6 +37,8 @@ namespace osu.Game.Overlays.Mods
         private readonly FillFlowContainer footerContainer;
 
         protected override bool BlockNonPositionalInput => false;
+
+        protected override bool DimMainContent => false;
 
         protected readonly FillFlowContainer<ModSection> ModSectionsContainer;
 
@@ -78,28 +76,28 @@ namespace osu.Game.Overlays.Mods
             SelectedMods.UnbindAll();
         }
 
-        private void rulesetChanged(RulesetInfo newRuleset)
+        private void rulesetChanged(ValueChangedEvent<RulesetInfo> e)
         {
-            if (newRuleset == null) return;
+            if (e.NewValue == null) return;
 
-            var instance = newRuleset.CreateInstance();
+            var instance = e.NewValue.CreateInstance();
 
             foreach (ModSection section in ModSectionsContainer.Children)
                 section.Mods = instance.GetModsFor(section.ModType);
 
             // attempt to re-select any already selected mods.
             // this may be the first time we are receiving the ruleset, in which case they will still match.
-            selectedModsChanged(SelectedMods.Value);
+            selectedModsChanged(new ValueChangedEvent<IEnumerable<Mod>>(SelectedMods.Value, SelectedMods.Value));
 
             // write the mods back to the SelectedMods bindable in the case a change was not applicable.
             // this generally isn't required as the previous line will perform deselection; just here for safety.
             refreshSelectedMods();
         }
 
-        private void selectedModsChanged(IEnumerable<Mod> obj)
+        private void selectedModsChanged(ValueChangedEvent<IEnumerable<Mod>> e)
         {
             foreach (ModSection section in ModSectionsContainer.Children)
-                section.SelectTypes(obj.Select(m => m.GetType()).ToList());
+                section.SelectTypes(e.NewValue.Select(m => m.GetType()).ToList());
 
             updateMods();
         }
@@ -172,6 +170,7 @@ namespace osu.Game.Overlays.Mods
         public void DeselectTypes(Type[] modTypes, bool immediate = false)
         {
             if (modTypes.Length == 0) return;
+
             foreach (ModSection section in ModSectionsContainer.Children)
                 section.DeselectTypes(modTypes, immediate);
         }
@@ -203,11 +202,7 @@ namespace osu.Game.Overlays.Mods
             Waves.FourthWaveColour = OsuColour.FromHex(@"003a4e");
 
             Height = 510;
-            Padding = new MarginPadding
-            {
-                Left = -overflow_padding,
-                Right = -overflow_padding
-            };
+            Padding = new MarginPadding { Horizontal = -OsuScreen.HORIZONTAL_OVERFLOW_PADDING };
 
             Children = new Drawable[]
             {
@@ -267,18 +262,13 @@ namespace osu.Game.Overlays.Mods
                                         AutoSizeAxes = Axes.Y,
                                         Direction = FillDirection.Vertical,
                                         Width = content_width,
-                                        Padding = new MarginPadding
-                                        {
-                                            Left = overflow_padding,
-                                            Right = overflow_padding
-                                        },
+                                        Padding = new MarginPadding { Horizontal = OsuScreen.HORIZONTAL_OVERFLOW_PADDING },
                                         Children = new Drawable[]
                                         {
                                             new OsuSpriteText
                                             {
-                                                Font = @"Exo2.0-Bold",
                                                 Text = @"Gameplay Mods",
-                                                TextSize = 22,
+                                                Font = OsuFont.GetFont(size: 22, weight: FontWeight.Bold),
                                                 Shadow = true,
                                                 Margin = new MarginPadding
                                                 {
@@ -287,7 +277,7 @@ namespace osu.Game.Overlays.Mods
                                             },
                                             new OsuTextFlowContainer(text =>
                                             {
-                                                text.TextSize = 18;
+                                                text.Font = text.Font.With(size: 18);
                                                 text.Shadow = true;
                                             })
                                             {
@@ -312,8 +302,7 @@ namespace osu.Game.Overlays.Mods
                                 Padding = new MarginPadding
                                 {
                                     Vertical = 10,
-                                    Left = overflow_padding,
-                                    Right = overflow_padding
+                                    Horizontal = OsuScreen.HORIZONTAL_OVERFLOW_PADDING
                                 },
                                 Child = ModSectionsContainer = new FillFlowContainer<ModSection>
                                 {
@@ -361,8 +350,7 @@ namespace osu.Game.Overlays.Mods
                                         Padding = new MarginPadding
                                         {
                                             Vertical = 15,
-                                            Left = overflow_padding,
-                                            Right = overflow_padding
+                                            Horizontal = OsuScreen.HORIZONTAL_OVERFLOW_PADDING
                                         },
                                         Children = new Drawable[]
                                         {
@@ -379,7 +367,7 @@ namespace osu.Game.Overlays.Mods
                                             new OsuSpriteText
                                             {
                                                 Text = @"Score Multiplier:",
-                                                TextSize = 30,
+                                                Font = OsuFont.GetFont(size: 30),
                                                 Margin = new MarginPadding
                                                 {
                                                     Top = 5,
@@ -388,8 +376,7 @@ namespace osu.Game.Overlays.Mods
                                             },
                                             MultiplierLabel = new OsuSpriteText
                                             {
-                                                Font = @"Exo2.0-Bold",
-                                                TextSize = 30,
+                                                Font = OsuFont.GetFont(size: 30, weight: FontWeight.Bold),
                                                 Margin = new MarginPadding
                                                 {
                                                     Top = 5
@@ -397,9 +384,8 @@ namespace osu.Game.Overlays.Mods
                                             },
                                             UnrankedLabel = new OsuSpriteText
                                             {
-                                                Font = @"Exo2.0-Bold",
                                                 Text = @"(Unranked)",
-                                                TextSize = 30,
+                                                Font = OsuFont.GetFont(size: 30, weight: FontWeight.Bold),
                                                 Margin = new MarginPadding
                                                 {
                                                     Top = 5,

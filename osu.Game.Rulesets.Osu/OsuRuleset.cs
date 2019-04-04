@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
@@ -9,10 +9,12 @@ using osu.Game.Rulesets.Osu.UI;
 using osu.Game.Rulesets.UI;
 using System.Collections.Generic;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Sprites;
 using osu.Game.Overlays.Settings;
 using osu.Framework.Input.Bindings;
 using osu.Game.Rulesets.Osu.Edit;
 using osu.Game.Rulesets.Edit;
+using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Replays;
 using osu.Game.Rulesets.Replays.Types;
 using osu.Game.Beatmaps.Legacy;
@@ -28,7 +30,7 @@ namespace osu.Game.Rulesets.Osu
 {
     public class OsuRuleset : Ruleset
     {
-        public override RulesetContainer CreateRulesetContainerWith(WorkingBeatmap beatmap) => new OsuRulesetContainer(this, beatmap);
+        public override DrawableRuleset CreateDrawableRulesetWith(WorkingBeatmap beatmap) => new DrawableOsuRuleset(this, beatmap);
         public override IBeatmapConverter CreateBeatmapConverter(IBeatmap beatmap) => new OsuBeatmapConverter(beatmap);
         public override IBeatmapProcessor CreateBeatmapProcessor(IBeatmap beatmap) => new OsuBeatmapProcessor(beatmap);
 
@@ -85,6 +87,9 @@ namespace osu.Game.Rulesets.Osu
 
             if (mods.HasFlag(LegacyMods.Target))
                 yield return new OsuModTarget();
+
+            if (mods.HasFlag(LegacyMods.TouchDevice))
+                yield return new OsuModTouchDevice();
         }
 
         public override IEnumerable<Mod> GetModsFor(ModType type)
@@ -121,16 +126,19 @@ namespace osu.Game.Rulesets.Osu
                         new OsuModAutopilot(),
                     };
                 case ModType.Fun:
-                    return new Mod[] {
+                    return new Mod[]
+                    {
                         new OsuModTransform(),
                         new OsuModWiggle(),
+                        new OsuModGrow(),
+                        new MultiMod(new ModWindUp<OsuHitObject>(), new ModWindDown<OsuHitObject>()),
                     };
                 default:
                     return new Mod[] { };
             }
         }
 
-        public override Drawable CreateIcon() => new SpriteIcon { Icon = FontAwesome.fa_osu_osu_o };
+        public override Drawable CreateIcon() => new SpriteIcon { Icon = OsuIcon.RulesetOsu };
 
         public override DifficultyCalculator CreateDifficultyCalculator(WorkingBeatmap beatmap) => new OsuDifficultyCalculator(this, beatmap);
 
@@ -148,7 +156,7 @@ namespace osu.Game.Rulesets.Osu
 
         public override IConvertibleReplayFrame CreateConvertibleReplayFrame() => new OsuReplayFrame();
 
-        public override IRulesetConfigManager CreateConfig(SettingsStore settings) => new OsuConfigManager(settings, RulesetInfo);
+        public override IRulesetConfigManager CreateConfig(SettingsStore settings) => new OsuRulesetConfigManager(settings, RulesetInfo);
 
         public OsuRuleset(RulesetInfo rulesetInfo = null)
             : base(rulesetInfo)

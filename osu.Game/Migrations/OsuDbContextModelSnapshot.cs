@@ -14,7 +14,7 @@ namespace osu.Game.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "2.2.0-rtm-35687");
+                .HasAnnotation("ProductVersion", "2.2.1-servicing-10028");
 
             modelBuilder.Entity("osu.Game.Beatmaps.BeatmapDifficulty", b =>
                 {
@@ -336,7 +336,10 @@ namespace osu.Game.Migrations
                     b.Property<string>("StatisticsJson")
                         .HasColumnName("Statistics");
 
-                    b.Property<int>("TotalScore");
+                    b.Property<long>("TotalScore");
+
+                    b.Property<long?>("UserID")
+                        .HasColumnName("UserID");
 
                     b.Property<string>("UserString")
                         .HasColumnName("User");

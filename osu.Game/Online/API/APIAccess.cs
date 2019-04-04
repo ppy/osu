@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using System.Collections.Generic;
@@ -8,7 +8,7 @@ using System.Net;
 using System.Net.Http;
 using System.Threading;
 using Newtonsoft.Json.Linq;
-using osu.Framework.Configuration;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Logging;
 using osu.Game.Configuration;
@@ -19,10 +19,10 @@ namespace osu.Game.Online.API
 {
     public class APIAccess : Component, IAPIProvider
     {
-        private readonly GameConfigManager config;
+        private readonly OsuConfigManager config;
         private readonly OAuth authentication;
 
-        public string Endpoint = @"https://osu.ppy.sh";
+        public string Endpoint => @"https://osu.ppy.sh";
         private const string client_id = @"5";
         private const string client_secret = @"FGc9GAtyHzeQDshWP5Ah7dega8hJACAJpQtw6OXk";
 
@@ -43,16 +43,16 @@ namespace osu.Game.Online.API
 
         private readonly Logger log;
 
-        public APIAccess(GameConfigManager config)
+        public APIAccess(OsuConfigManager config)
         {
             this.config = config;
 
             authentication = new OAuth(client_id, client_secret, Endpoint);
             log = Logger.GetLogger(LoggingTarget.Network);
 
-            ProvidedUsername = config.Get<string>(GameSetting.Username);
+            ProvidedUsername = config.Get<string>(OsuSetting.Username);
 
-            authentication.TokenString = config.Get<string>(GameSetting.Token);
+            authentication.TokenString = config.Get<string>(OsuSetting.Token);
             authentication.Token.ValueChanged += onTokenChanged;
 
             var thread = new Thread(run)
@@ -64,19 +64,21 @@ namespace osu.Game.Online.API
             thread.Start();
         }
 
-        private void onTokenChanged(OAuthToken token) => config.Set(GameSetting.Token, config.Get<bool>(GameSetting.SavePassword) ? authentication.TokenString : string.Empty);
+        private void onTokenChanged(ValueChangedEvent<OAuthToken> e) => config.Set(OsuSetting.Token, config.Get<bool>(OsuSetting.SavePassword) ? authentication.TokenString : string.Empty);
 
         private readonly List<IOnlineComponent> components = new List<IOnlineComponent>();
 
         internal new void Schedule(Action action) => base.Schedule(action);
 
+        /// <summary>
+        /// Register a component to receive API events.
+        /// Fires <see cref="IOnlineComponent.APIStateChanged"/> once immediately to ensure a correct state.
+        /// </summary>
+        /// <param name="component"></param>
         public void Register(IOnlineComponent component)
         {
-            Scheduler.Add(delegate
-            {
-                components.Add(component);
-                component.APIStateChanged(this, state);
-            });
+            Scheduler.Add(delegate { components.Add(component); });
+            component.APIStateChanged(this, state);
         }
 
         public void Unregister(IOnlineComponent component)
@@ -124,7 +126,7 @@ namespace osu.Game.Online.API
                         State = APIState.Connecting;
 
                         // save the username at this point, if the user requested for it to be.
-                        config.Set(GameSetting.Username, config.Get<bool>(GameSetting.SaveUsername) ? ProvidedUsername : string.Empty);
+                        config.Set(OsuSetting.Username, config.Get<bool>(OsuSetting.SaveUsername) ? ProvidedUsername : string.Empty);
 
                         if (!authentication.HasValidAccessToken && !authentication.AuthenticateWithLogin(ProvidedUsername, password))
                         {
@@ -176,6 +178,7 @@ namespace osu.Game.Online.API
                     lock (queue)
                     {
                         if (queue.Count == 0) break;
+
                         req = queue.Dequeue();
                     }
 
@@ -260,23 +263,21 @@ namespace osu.Game.Online.API
 
         public APIState State
         {
-            get { return state; }
+            get => state;
             private set
             {
-                APIState oldState = state;
-                APIState newState = value;
+                if (state == value)
+                    return;
 
+                APIState oldState = state;
                 state = value;
 
-                if (oldState != newState)
+                log.Add($@"We just went {state}!");
+                Scheduler.Add(delegate
                 {
-                    log.Add($@"We just went {newState}!");
-                    Scheduler.Add(delegate
-                    {
-                        components.ForEach(c => c.APIStateChanged(this, newState));
-                        OnStateChange?.Invoke(oldState, newState);
-                    });
-                }
+                    components.ForEach(c => c.APIStateChanged(this, state));
+                    OnStateChange?.Invoke(oldState, state);
+                });
             }
         }
 
@@ -355,11 +356,7 @@ namespace osu.Game.Online.API
             State = APIState.Offline;
         }
 
-        private static User createGuestUser() => new User
-        {
-            Username = @"Guest",
-            Id = 1,
-        };
+        private static User createGuestUser() => new GuestUser();
 
         protected override void Dispose(bool isDisposing)
         {
@@ -367,6 +364,15 @@ namespace osu.Game.Online.API
 
             flushQueue();
             cancellationToken.Cancel();
+        }
+    }
+
+    internal class GuestUser : User
+    {
+        public GuestUser()
+        {
+            Username = @"Guest";
+            Id = 1;
         }
     }
 
