@@ -182,6 +182,49 @@ namespace osu.Game.Tests.Visual.UserInterface
             AddAssert("Logo is tracking", () => trackingContainer.IsLogoTracking);
         }
 
+        [Test]
+        public void SetFacadeSizeTest()
+        {
+            bool failed = false;
+            AddStep("Add tracking containers", addFacadeContainers);
+            AddStep("Try setting facade size", () =>
+            {
+                try
+                {
+                    logoFacade.Size = new Vector2(0, 0);
+                }
+                catch (Exception e)
+                {
+                    if (e is InvalidOperationException)
+                        failed = true;
+                }
+            });
+            AddAssert("Exception thrown", () => failed);
+        }
+
+        [Test]
+        public void SetMultipleContainers()
+        {
+            bool failed = false;
+            LogoTrackingContainer newContainer = new LogoTrackingContainer();
+            AddStep("Add tracking containers", addFacadeContainers);
+            AddStep("Move facade to random position", startTrackingRandom);
+            AddStep("Add logo to new container", () => newContainer.SetLogo(logo));
+            AddStep("Try tracking new container", () =>
+            {
+                try
+                {
+                    newContainer.Tracking = true;
+                }
+                catch (Exception e)
+                {
+                    if (e is InvalidOperationException)
+                        failed = true;
+                }
+            });
+            AddAssert("Exception thrown", () => failed);
+        }
+
         private void addFacadeContainers()
         {
             AddRange(new Drawable[]
