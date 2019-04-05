@@ -10,7 +10,6 @@ using osu.Framework.Extensions;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
-using osu.Game.Online.Chat;
 using osu.Game.Online.Leaderboards;
 using osu.Game.Rulesets.UI;
 using osu.Game.Scoring;
@@ -124,7 +123,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
             };
 
             var username = new LinkFlowContainer(t => t.Font = OsuFont.GetFont(size: text_size)) { AutoSizeAxes = Axes.Both };
-            username.AddLink(score.User.Username, null, LinkAction.OpenUserProfile, score.User.Id.ToString(), "Open profile");
+            username.AddUserLink(score.User);
 
             content.AddRange(new Drawable[]
             {

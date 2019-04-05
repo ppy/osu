@@ -8,7 +8,6 @@ using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
-using osu.Game.Online.Chat;
 using osu.Game.Users;
 using osuTK;
 
@@ -95,8 +94,8 @@ namespace osu.Game.Screens.Multi.Lounge.Components
                 if (host.NewValue != null)
                 {
                     hostText.AddText("hosted by ");
-                    hostText.AddLink(host.NewValue.Username, null, LinkAction.OpenUserProfile, host.NewValue.Id.ToString(), "Open profile",
-                        s => s.Font = s.Font.With(Typeface.Exo, weight: FontWeight.Bold, italics: true));
+                    hostText.AddUserLink(host.NewValue, s => s.Font = s.Font.With(Typeface.Exo, weight: FontWeight.Bold, italics: true));
+
                     flagContainer.Child = new DrawableFlag(host.NewValue.Country) { RelativeSizeAxes = Axes.Both };
                 }
             }, true);

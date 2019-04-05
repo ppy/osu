@@ -10,7 +10,6 @@ using osu.Framework.Graphics.Sprites;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
-using osu.Game.Online.Chat;
 using osu.Game.Online.Leaderboards;
 using osu.Game.Scoring;
 using osu.Game.Users;
@@ -119,7 +118,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                 date.Text = $@"achieved {value.Date.Humanize()}";
 
                 usernameText.Clear();
-                usernameText.AddLink(value.User.Username, null, LinkAction.OpenUserProfile, value.User.Id.ToString(), "Open profile");
+                usernameText.AddUserLink(value.User);
 
                 rank.UpdateRank(value.Rank);
             }
