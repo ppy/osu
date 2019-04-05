@@ -159,7 +159,7 @@ namespace osu.Desktop.Updater
                     {
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
-                        Icon = FontAwesome.Upload,
+                        Icon = FontAwesome.Solid.Upload,
                         Colour = Color4.White,
                         Size = new Vector2(20),
                     }

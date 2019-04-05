@@ -91,7 +91,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                                             {
                                                 RelativeSizeAxes = Axes.Y,
                                                 Height = 0.5f,
-                                                Icon = FontAwesome.SearchPlus,
+                                                Icon = FontAwesome.Solid.SearchPlus,
                                                 Action = () => changeZoom(1)
                                             },
                                             new TimelineButton
@@ -100,7 +100,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                                                 Origin = Anchor.BottomLeft,
                                                 RelativeSizeAxes = Axes.Y,
                                                 Height = 0.5f,
-                                                Icon = FontAwesome.SearchMinus,
+                                                Icon = FontAwesome.Solid.SearchMinus,
                                                 Action = () => changeZoom(-1)
                                             },
                                         }

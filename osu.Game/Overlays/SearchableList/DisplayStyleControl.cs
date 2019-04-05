@@ -37,8 +37,8 @@ namespace osu.Game.Overlays.SearchableList
                             Direction = FillDirection.Horizontal,
                             Children = new[]
                             {
-                                new DisplayStyleToggleButton(FontAwesome.ThLarge, PanelDisplayStyle.Grid, DisplayStyle),
-                                new DisplayStyleToggleButton(FontAwesome.ListUl, PanelDisplayStyle.List, DisplayStyle),
+                                new DisplayStyleToggleButton(FontAwesome.Solid.ThLarge, PanelDisplayStyle.Grid, DisplayStyle),
+                                new DisplayStyleToggleButton(FontAwesome.Solid.ListUl, PanelDisplayStyle.List, DisplayStyle),
                             },
                         },
                         Dropdown = new SlimEnumDropdown<T>

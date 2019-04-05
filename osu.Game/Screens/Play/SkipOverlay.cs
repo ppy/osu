@@ -259,9 +259,9 @@ namespace osu.Game.Screens.Play
                                 Direction = FillDirection.Horizontal,
                                 Children = new[]
                                 {
-                                    new SpriteIcon { Size = new Vector2(15), Shadow = true, Icon = FontAwesome.ChevronRight },
-                                    new SpriteIcon { Size = new Vector2(15), Shadow = true, Icon = FontAwesome.ChevronRight },
-                                    new SpriteIcon { Size = new Vector2(15), Shadow = true, Icon = FontAwesome.ChevronRight },
+                                    new SpriteIcon { Size = new Vector2(15), Shadow = true, Icon = FontAwesome.Solid.ChevronRight },
+                                    new SpriteIcon { Size = new Vector2(15), Shadow = true, Icon = FontAwesome.Solid.ChevronRight },
+                                    new SpriteIcon { Size = new Vector2(15), Shadow = true, Icon = FontAwesome.Solid.ChevronRight },
                                 }
                             },
                             new OsuSpriteText

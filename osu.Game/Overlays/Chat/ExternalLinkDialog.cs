@@ -14,7 +14,7 @@ namespace osu.Game.Overlays.Chat
             HeaderText = "Just checking...";
             BodyText = $"You are about to leave osu! and open the following link in a web browser:\n\n{url}";
 
-            Icon = FontAwesome.Warning;
+            Icon = FontAwesome.Solid.ExclamationTriangle;
 
             Buttons = new PopupDialogButton[]
             {

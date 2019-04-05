@@ -10,7 +10,7 @@ namespace osu.Game.Overlays.Toolbar
     {
         public ToolbarSocialButton()
         {
-            Icon = FontAwesome.Users;
+            Icon = FontAwesome.Solid.Users;
         }
 
         [BackgroundDependencyLoader(true)]

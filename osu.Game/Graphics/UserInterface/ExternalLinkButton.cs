@@ -26,7 +26,7 @@ namespace osu.Game.Graphics.UserInterface
             Size = new Vector2(12);
             InternalChild = new SpriteIcon
             {
-                Icon = FontAwesome.ExternalLink,
+                Icon = FontAwesome.Solid.ExternalLinkAlt,
                 RelativeSizeAxes = Axes.Both
             };
         }

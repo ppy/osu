@@ -11,6 +11,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Logging;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Notifications;
+using osu.Game.Users;
 
 namespace osu.Game.Graphics.Containers
 {
@@ -35,7 +36,7 @@ namespace osu.Game.Graphics.Containers
             showNotImplementedError = () => notifications?.Post(new SimpleNotification
             {
                 Text = @"This link type is not yet supported!",
-                Icon = FontAwesome.LifeSaver,
+                Icon = FontAwesome.Solid.LifeRing,
             });
         }
 
@@ -74,6 +75,9 @@ namespace osu.Game.Graphics.Containers
 
             return createLink(text, null, url, linkType, linkArgument, tooltipText);
         }
+
+        public IEnumerable<Drawable> AddUserLink(User user, Action<SpriteText> creationParameters = null)
+            => createLink(AddText(user.Username, creationParameters), user.Username, null, LinkAction.OpenUserProfile, user.Id.ToString(), "View profile");
 
         private IEnumerable<Drawable> createLink(IEnumerable<Drawable> drawables, string text, string url = null, LinkAction linkType = LinkAction.External, string linkArgument = null, string tooltipText = null, Action action = null)
         {
