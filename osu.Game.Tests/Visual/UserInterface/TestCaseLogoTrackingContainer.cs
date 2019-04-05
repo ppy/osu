@@ -21,13 +21,13 @@ using osuTK.Graphics;
 
 namespace osu.Game.Tests.Visual.UserInterface
 {
-    public class TestCaseLogoFacadeContainer : OsuTestCase
+    public class TestCaseLogoTrackingContainer : OsuTestCase
     {
         public override IReadOnlyList<Type> RequiredTypes => new[]
         {
             typeof(PlayerLoader),
             typeof(Player),
-            typeof(LogoFacadeContainer),
+            typeof(LogoTrackingContainer),
             typeof(ButtonSystem),
             typeof(ButtonSystemState),
             typeof(Menu),
@@ -36,11 +36,11 @@ namespace osu.Game.Tests.Visual.UserInterface
 
         private OsuLogo logo;
         private readonly Bindable<float> uiScale = new Bindable<float>();
-        private TestLogoFacadeContainer facadeContainer;
+        private TestLogoTrackingContainer trackingContainer;
         private Container transferContainer;
         private Box visualBox;
         private Box transferContainerBox;
-        private Container logoFacade;
+        private Drawable logoFacade;
         private bool randomPositions;
 
         private const float visual_box_size = 72;
@@ -59,7 +59,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             {
                 Clear();
                 Add(logo = new OsuLogo { Scale = new Vector2(0.15f), RelativePositionAxes = Axes.Both });
-                facadeContainer = null;
+                trackingContainer = null;
                 transferContainer = null;
             });
         }
@@ -72,10 +72,10 @@ namespace osu.Game.Tests.Visual.UserInterface
         public void MoveFacadeTest()
         {
             AddToggleStep("Toggle move continuously", b => randomPositions = b);
-            AddStep("Add facade containers", addFacadeContainers);
+            AddStep("Add tracking containers", addFacadeContainers);
             AddStep("Move facade to random position", startTrackingRandom);
             waitForMove();
-            AddAssert("Logo is tracking", () => facadeContainer.IsLogoTracking);
+            AddAssert("Logo is tracking", () => trackingContainer.IsLogoTracking);
         }
 
         /// <summary>
@@ -84,11 +84,11 @@ namespace osu.Game.Tests.Visual.UserInterface
         [Test]
         public void RemoveFacadeTest()
         {
-            AddStep("Add facade containers", addFacadeContainers);
+            AddStep("Add tracking containers", addFacadeContainers);
             AddStep("Move facade to random position", startTrackingRandom);
             AddStep("Remove facade from FacadeContainer", removeFacade);
             waitForMove();
-            AddAssert("Logo is not tracking", () => !facadeContainer.IsLogoTracking);
+            AddAssert("Logo is not tracking", () => !trackingContainer.IsLogoTracking);
         }
 
         /// <summary>
@@ -97,17 +97,12 @@ namespace osu.Game.Tests.Visual.UserInterface
         [Test]
         public void TransferFacadeTest()
         {
-            AddStep("Add facade containers", addFacadeContainers);
+            AddStep("Add tracking containers", addFacadeContainers);
             AddStep("Move facade to random position", startTrackingRandom);
             AddStep("Remove facade from FacadeContainer", removeFacade);
-            AddStep("Transfer facade to a new container", () =>
-            {
-                transferContainer.Add(logoFacade);
-                transferContainerBox.Colour = Color4.Tomato;
-                moveLogoFacade();
-            });
+            AddStep("Transfer facade to a new container", addFacadeToNewContainer);
             waitForMove();
-            AddAssert("Logo is tracking", () => facadeContainer.IsLogoTracking);
+            AddAssert("Logo is tracking", () => trackingContainer.IsLogoTracking);
         }
 
         /// <summary>
@@ -120,7 +115,7 @@ namespace osu.Game.Tests.Visual.UserInterface
 
             AddStep("Create new flow container with facade", () =>
             {
-                Add(facadeContainer = new TestLogoFacadeContainer
+                Add(trackingContainer = new TestLogoTrackingContainer
                 {
                     AutoSizeAxes = Axes.Both,
                     Origin = Anchor.TopCentre,
@@ -156,7 +151,7 @@ namespace osu.Game.Tests.Visual.UserInterface
                                 Colour = Color4.White,
                                 RelativeSizeAxes = Axes.Both,
                             },
-                            facadeContainer.LogoFacade,
+                            trackingContainer.LogoFacade,
                         }
                     },
                     new Box
@@ -171,27 +166,34 @@ namespace osu.Game.Tests.Visual.UserInterface
 
             AddStep("Perform logo movements", () =>
             {
-                facadeContainer.Tracking = false;
+                trackingContainer.Tracking = false;
                 logo.MoveTo(new Vector2(0.5f), 500, Easing.InOutExpo);
-                facadeContainer.SetLogo(logo, 1.0f, 1000, Easing.InOutExpo);
+                trackingContainer.SetLogo(logo, 1.0f, 1000, Easing.InOutExpo);
                 visualBox.Colour = Color4.White;
 
                 Scheduler.AddDelayed(() =>
                 {
-                    facadeContainer.Tracking = true;
+                    trackingContainer.Tracking = true;
                     visualBox.Colour = Color4.Tomato;
                 }, 700);
             });
 
             waitForMove(8);
-            AddAssert("Logo is tracking", () => facadeContainer.IsLogoTracking);
+            AddAssert("Logo is tracking", () => trackingContainer.IsLogoTracking);
+        }
+
+        [Test]
+        public void SetFacadeSizeTest()
+        {
+            AddStep("Add tracking containers", addFacadeContainers);
+            AddStep("Break shit", () => { logoFacade.Size = new Vector2(0, 0); });
         }
 
         private void addFacadeContainers()
         {
             AddRange(new Drawable[]
             {
-                facadeContainer = new TestLogoFacadeContainer
+                trackingContainer = new TestLogoTrackingContainer
                 {
                     Alpha = 0.35f,
                     RelativeSizeAxes = Axes.None,
@@ -215,22 +217,29 @@ namespace osu.Game.Tests.Visual.UserInterface
                 },
             });
 
-            facadeContainer.Add(logoFacade = facadeContainer.LogoFacade);
-            facadeContainer.SetLogo(logo, 1.0f, 1000);
+            trackingContainer.Add(logoFacade = trackingContainer.LogoFacade);
+            trackingContainer.SetLogo(logo, 1.0f, 1000);
         }
 
         private void waitForMove(int count = 5) => AddWaitStep("Wait for transforms to finish", count);
 
         private void removeFacade()
         {
-            facadeContainer.Remove(logoFacade);
+            trackingContainer.Remove(logoFacade);
             visualBox.Colour = Color4.White;
             moveLogoFacade();
         }
 
         private void startTrackingRandom()
         {
-            facadeContainer.Tracking = true;
+            trackingContainer.Tracking = true;
+            moveLogoFacade();
+        }
+
+        private void addFacadeToNewContainer()
+        {
+            transferContainer.Add(logoFacade);
+            transferContainerBox.Colour = Color4.Tomato;
             moveLogoFacade();
         }
 
@@ -239,7 +248,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             if (logoFacade?.Transforms.Count == 0 && transferContainer?.Transforms.Count == 0)
             {
                 Random random = new Random();
-                facadeContainer.Delay(500).MoveTo(new Vector2(random.Next(0, (int)logo.Parent.DrawWidth), random.Next(0, (int)logo.Parent.DrawHeight)), 300);
+                trackingContainer.Delay(500).MoveTo(new Vector2(random.Next(0, (int)logo.Parent.DrawWidth), random.Next(0, (int)logo.Parent.DrawHeight)), 300);
                 transferContainer.Delay(500).MoveTo(new Vector2(random.Next(0, (int)logo.Parent.DrawWidth), random.Next(0, (int)logo.Parent.DrawHeight)), 300);
             }
 
@@ -247,12 +256,12 @@ namespace osu.Game.Tests.Visual.UserInterface
                 Schedule(moveLogoFacade);
         }
 
-        private class TestLogoFacadeContainer : LogoFacadeContainer
+        private class TestLogoTrackingContainer : LogoTrackingContainer
         {
             /// <summary>
             /// Check that the logo is tracking the position of the facade, with an acceptable precision lenience.
             /// </summary>
-            public bool IsLogoTracking => Precision.AlmostEquals(Logo.Position, LogoTrackingPosition());
+            public bool IsLogoTracking => Precision.AlmostEquals(Logo.Position, LogoTrackingPosition);
         }
     }
 }
