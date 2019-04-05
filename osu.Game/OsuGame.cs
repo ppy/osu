@@ -399,7 +399,8 @@ namespace osu.Game
                     }
                 },
                 overlayContent = new Container { RelativeSizeAxes = Axes.Both },
-                floatingOverlayContent = new Container { RelativeSizeAxes = Axes.Both },
+                rightFloatingOverlayContent = new Container { RelativeSizeAxes = Axes.Both },
+                leftFloatingOverlayContent = new Container { RelativeSizeAxes = Axes.Both },
                 topMostOverlayContent = new Container { RelativeSizeAxes = Axes.Both },
                 idleTracker = new GameIdleTracker(6000)
             });
@@ -427,7 +428,7 @@ namespace osu.Game
                 },
             }, topMostOverlayContent.Add);
 
-            loadComponentSingleFile(volume = new VolumeOverlay(), floatingOverlayContent.Add);
+            loadComponentSingleFile(volume = new VolumeOverlay(), leftFloatingOverlayContent.Add);
             loadComponentSingleFile(onscreenDisplay = new OnScreenDisplay(), Add);
 
             loadComponentSingleFile(loginOverlay = new LoginOverlay
@@ -435,7 +436,7 @@ namespace osu.Game
                 GetToolbarHeight = () => ToolbarOffset,
                 Anchor = Anchor.TopRight,
                 Origin = Anchor.TopRight,
-            }, floatingOverlayContent.Add);
+            }, rightFloatingOverlayContent.Add);
 
             loadComponentSingleFile(screenshotManager, Add);
 
@@ -444,7 +445,7 @@ namespace osu.Game
             loadComponentSingleFile(social = new SocialOverlay(), overlayContent.Add);
             loadComponentSingleFile(channelManager = new ChannelManager(), AddInternal);
             loadComponentSingleFile(chatOverlay = new ChatOverlay(), overlayContent.Add);
-            loadComponentSingleFile(settings = new MainSettings { GetToolbarHeight = () => ToolbarOffset }, floatingOverlayContent.Add);
+            loadComponentSingleFile(settings = new MainSettings { GetToolbarHeight = () => ToolbarOffset }, leftFloatingOverlayContent.Add);
             loadComponentSingleFile(userProfile = new UserProfileOverlay(), overlayContent.Add);
             loadComponentSingleFile(beatmapSetOverlay = new BeatmapSetOverlay(), overlayContent.Add);
 
@@ -453,19 +454,17 @@ namespace osu.Game
                 GetToolbarHeight = () => ToolbarOffset,
                 Anchor = Anchor.TopRight,
                 Origin = Anchor.TopRight,
-            }, floatingOverlayContent.Add);
+            }, rightFloatingOverlayContent.Add);
 
             loadComponentSingleFile(musicController = new MusicController
             {
                 GetToolbarHeight = () => ToolbarOffset,
                 Anchor = Anchor.TopRight,
                 Origin = Anchor.TopRight,
-            }, floatingOverlayContent.Add);
+            }, rightFloatingOverlayContent.Add);
 
             loadComponentSingleFile(accountCreation = new AccountCreationOverlay(), topMostOverlayContent.Add);
-
             loadComponentSingleFile(dialogOverlay = new DialogOverlay(), topMostOverlayContent.Add);
-
             loadComponentSingleFile(externalLinkOpener = new ExternalLinkOpener(), topMostOverlayContent.Add);
 
             dependencies.CacheAs(idleTracker);
@@ -711,7 +710,9 @@ namespace osu.Game
 
         private Container overlayContent;
 
-        private Container floatingOverlayContent;
+        private Container rightFloatingOverlayContent;
+
+        private Container leftFloatingOverlayContent;
 
         private Container topMostOverlayContent;
 
