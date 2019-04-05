@@ -186,7 +186,17 @@ namespace osu.Game.Tests.Visual.UserInterface
         public void SetFacadeSizeTest()
         {
             AddStep("Add tracking containers", addFacadeContainers);
-            AddStep("Break shit", () => { logoFacade.Size = new Vector2(0, 0); });
+            AddStep("Break stuff", () => { logoFacade.Size = new Vector2(0, 0); });
+        }
+
+        [Test]
+        public void SetMultipleContainers()
+        {
+            LogoTrackingContainer newContainer = new LogoTrackingContainer();
+            AddStep("Add tracking containers", addFacadeContainers);
+            AddStep("Move facade to random position", startTrackingRandom);
+            AddStep("Add logo to new container", () => newContainer.SetLogo(logo));
+            AddStep("Break stuff", () => newContainer.Tracking = true);
         }
 
         private void addFacadeContainers()

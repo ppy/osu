@@ -12,7 +12,7 @@ using osuTK;
 namespace osu.Game.Graphics.Containers
 {
     /// <summary>
-    /// A container that handles tracking of an <see cref="OsuLogo"/> through different layout scenarios
+    /// A container that handles tracking of an <see cref="OsuLogo"/> through different layout scenarios.
     /// </summary>
     public class LogoTrackingContainer : Container
     {
@@ -38,8 +38,6 @@ namespace osu.Game.Graphics.Containers
             }
         }
 
-        private bool tracking;
-
         protected OsuLogo Logo;
 
         private float facadeScale;
@@ -47,6 +45,7 @@ namespace osu.Game.Graphics.Containers
         private Vector2? startPosition;
         private double? startTime;
         private double duration;
+        private bool tracking;
 
         public LogoTrackingContainer()
         {
@@ -69,7 +68,11 @@ namespace osu.Game.Graphics.Containers
             }
 
             Logo = logo ?? throw new ArgumentNullException(nameof(logo));
-            Logo.IsTracking = Tracking;
+
+            if (Tracking)
+            {
+                Logo.IsTracking = true;
+            }
 
             this.facadeScale = facadeScale;
             this.duration = duration;
