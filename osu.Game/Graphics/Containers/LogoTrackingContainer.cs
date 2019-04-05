@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Reflection.Metadata.Ecma335;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.MathUtils;
@@ -132,8 +131,6 @@ namespace osu.Game.Graphics.Containers
 
             base.Dispose(isDisposing);
         }
-
-        private Vector2 size;
 
         private class ExposedFacade : Facade
         {

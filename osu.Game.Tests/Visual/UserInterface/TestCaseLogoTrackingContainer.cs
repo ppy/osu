@@ -182,23 +182,6 @@ namespace osu.Game.Tests.Visual.UserInterface
             AddAssert("Logo is tracking", () => trackingContainer.IsLogoTracking);
         }
 
-        [Test]
-        public void SetFacadeSizeTest()
-        {
-            AddStep("Add tracking containers", addFacadeContainers);
-            AddStep("Break stuff", () => { logoFacade.Size = new Vector2(0, 0); });
-        }
-
-        [Test]
-        public void SetMultipleContainers()
-        {
-            LogoTrackingContainer newContainer = new LogoTrackingContainer();
-            AddStep("Add tracking containers", addFacadeContainers);
-            AddStep("Move facade to random position", startTrackingRandom);
-            AddStep("Add logo to new container", () => newContainer.SetLogo(logo));
-            AddStep("Break stuff", () => newContainer.Tracking = true);
-        }
-
         private void addFacadeContainers()
         {
             AddRange(new Drawable[]
