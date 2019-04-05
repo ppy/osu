@@ -33,7 +33,7 @@ namespace osu.Game.Screens.Play
 
         private Player player;
 
-        private LogoFacadeContainer content;
+        private LogoTrackingContainer content;
 
         private BeatmapMetadataDisplay info;
 
@@ -60,14 +60,12 @@ namespace osu.Game.Screens.Play
         [BackgroundDependencyLoader]
         private void load()
         {
-            InternalChild = content = new LogoFacadeContainer
+            InternalChild = (content = new LogoTrackingContainer
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
                 RelativeSizeAxes = Axes.Both,
-            };
-
-            content.Children = new Drawable[]
+            }).WithChildren(new Drawable[]
             {
                 info = new BeatmapMetadataDisplay(Beatmap.Value, content.LogoFacade)
                 {
@@ -89,7 +87,7 @@ namespace osu.Game.Screens.Play
                         new InputSettings()
                     }
                 }
-            };
+            });
 
             loadNewPlayer();
         }
@@ -163,12 +161,9 @@ namespace osu.Game.Screens.Play
             logo.ScaleTo(new Vector2(0.15f), duration, Easing.In);
             logo.FadeIn(350);
 
-            content.SetLogo(logo, 1.0f, 500, Easing.InOutExpo);
+            content.SetLogo(logo, 1.0f, resuming ? 0 : 500, Easing.InOutExpo);
 
-            Scheduler.AddDelayed(() =>
-            {
-                content.Tracking = true;
-            }, resuming ? 0 : 500);
+            Scheduler.AddDelayed(() => { content.Tracking = true; }, resuming ? 0 : 500);
         }
 
         protected override void LogoExiting(OsuLogo logo)
@@ -321,7 +316,7 @@ namespace osu.Game.Screens.Play
             }
 
             private readonly WorkingBeatmap beatmap;
-            private readonly Container facade;
+            private readonly Drawable facade;
             private LoadingAnimation loading;
             private Sprite backgroundSprite;
             private ModDisplay modDisplay;
@@ -343,7 +338,7 @@ namespace osu.Game.Screens.Play
                 }
             }
 
-            public BeatmapMetadataDisplay(WorkingBeatmap beatmap, Container facade)
+            public BeatmapMetadataDisplay(WorkingBeatmap beatmap, Drawable facade)
             {
                 this.beatmap = beatmap;
                 this.facade = facade;
@@ -366,7 +361,7 @@ namespace osu.Game.Screens.Play
                         Origin = Anchor.TopCentre,
                         Anchor = Anchor.TopCentre,
                         Direction = FillDirection.Vertical,
-                        Children = new Drawable[]
+                        Children = new[]
                         {
                             facade,
                             new OsuSpriteText
