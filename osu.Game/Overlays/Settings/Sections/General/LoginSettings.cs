@@ -363,7 +363,7 @@ namespace osu.Game.Overlays.Settings.Sections.General
                     {
                         Anchor = Anchor.CentreLeft,
                         Origin = Anchor.CentreLeft,
-                        Icon = FontAwesome.CircleOutline,
+                        Icon = FontAwesome.Regular.Circle,
                         Size = new Vector2(14),
                     });
 

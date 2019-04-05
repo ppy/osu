@@ -20,7 +20,7 @@ namespace osu.Game.Screens.Multi.Ranking.Types
             this.beatmap = beatmap;
         }
 
-        public IconUsage Icon => FontAwesome.Users;
+        public IconUsage Icon => FontAwesome.Solid.Users;
 
         public string Name => "Room Leaderboard";
 
