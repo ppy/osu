@@ -60,7 +60,7 @@ namespace osu.Game.Screens.Menu
         /// <remarks>Does not account for the scale of this <see cref="OsuLogo"/></remarks>
         public float SizeForFlow => logo == null ? 0 : logo.DrawSize.X * logo.Scale.X * logoBounceContainer.Scale.X * logoHoverContainer.Scale.X;
 
-        public bool HasTrackingContainer { get; set; }
+        public bool IsTracking { get; set; }
 
         private readonly Sprite ripple;
 

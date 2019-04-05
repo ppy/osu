@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Reflection.Metadata.Ecma335;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.MathUtils;
@@ -20,7 +21,24 @@ namespace osu.Game.Graphics.Containers
         /// <summary>
         /// Whether or not the logo assigned to this FacadeContainer should be tracking the position of its facade.
         /// </summary>
-        public bool Tracking { get; set; }
+        public bool Tracking
+        {
+            get => tracking;
+            set
+            {
+                if (Logo != null)
+                {
+                    if (value && !tracking && Logo.IsTracking)
+                        throw new InvalidOperationException($"Cannot track an instance of {typeof(OsuLogo)} to multiple {typeof(LogoTrackingContainer)}s");
+
+                    Logo.IsTracking = value;
+                }
+
+                tracking = value;
+            }
+        }
+
+        private bool tracking;
 
         protected OsuLogo Logo;
 
@@ -44,23 +62,15 @@ namespace osu.Game.Graphics.Containers
         /// <param name="easing">The easing type of the initial transform.</param>
         public void SetLogo(OsuLogo logo, float facadeScale = 1.0f, double duration = 0, Easing easing = Easing.None)
         {
-            if (Logo != logo)
+            if (Logo != logo && Logo != null)
             {
-                if (logo?.HasTrackingContainer ?? throw new ArgumentNullException(nameof(logo)))
-                {
-                    // Prevent the same logo from being added to multiple LogoTrackingContainers.
-                    throw new InvalidOperationException($"Cannot add an instance of {typeof(OsuLogo)} to multiple {typeof(LogoTrackingContainer)}s");
-                }
-
-                if (Logo != null)
-                {
-                    // If we're replacing the logo to be tracked, the old one no longer has a tracking container
-                    Logo.HasTrackingContainer = false;
-                }
+                // If we're replacing the logo to be tracked, the old one no longer has a tracking container
+                Logo.IsTracking = false;
             }
 
-            Logo = logo;
-            Logo.HasTrackingContainer = true;
+            Logo = logo ?? throw new ArgumentNullException(nameof(logo));
+            Logo.IsTracking = Tracking;
+
             this.facadeScale = facadeScale;
             this.duration = duration;
             this.easing = easing;
@@ -115,7 +125,7 @@ namespace osu.Game.Graphics.Containers
         protected override void Dispose(bool isDisposing)
         {
             if (Logo != null)
-                Logo.HasTrackingContainer = false;
+                Tracking = false;
 
             base.Dispose(isDisposing);
         }
@@ -124,12 +134,6 @@ namespace osu.Game.Graphics.Containers
 
         private class ExposedFacade : Facade
         {
-            public override Vector2 Size
-            {
-                get => base.Size;
-                set => throw new InvalidOperationException($"Cannot set the Size of a {typeof(Facade)} outside of a {typeof(LogoTrackingContainer)}");
-            }
-
             public void SetSize(Vector2 size)
             {
                 base.SetSize(size);
