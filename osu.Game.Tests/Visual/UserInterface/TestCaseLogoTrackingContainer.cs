@@ -100,7 +100,12 @@ namespace osu.Game.Tests.Visual.UserInterface
             AddStep("Add tracking containers", addFacadeContainers);
             AddStep("Move facade to random position", startTrackingRandom);
             AddStep("Remove facade from FacadeContainer", removeFacade);
-            AddStep("Transfer facade to a new container", addFacadeToNewContainer);
+            AddStep("Transfer facade to a new container", () =>
+            {
+                transferContainer.Add(logoFacade);
+                transferContainerBox.Colour = Color4.Tomato;
+                moveLogoFacade();
+            });
             waitForMove();
             AddAssert("Logo is tracking", () => trackingContainer.IsLogoTracking);
         }
@@ -186,7 +191,11 @@ namespace osu.Game.Tests.Visual.UserInterface
         public void SetFacadeSizeTest()
         {
             bool failed = false;
-            AddStep("Add tracking containers", addFacadeContainers);
+            AddStep("Set up scenario", () =>
+            {
+                failed = false;
+                addFacadeContainers();
+            });
             AddStep("Try setting facade size", () =>
             {
                 try
@@ -203,13 +212,18 @@ namespace osu.Game.Tests.Visual.UserInterface
         }
 
         [Test]
-        public void SetMultipleContainers()
+        public void SetMultipleContainersTest()
         {
             bool failed = false;
             LogoTrackingContainer newContainer = new LogoTrackingContainer();
-            AddStep("Add tracking containers", addFacadeContainers);
-            AddStep("Move facade to random position", startTrackingRandom);
-            AddStep("Add logo to new container", () => newContainer.SetLogo(logo));
+            AddStep("Set up scenario", () =>
+            {
+                failed = false;
+                newContainer = new LogoTrackingContainer();
+                addFacadeContainers();
+                startTrackingRandom();
+                newContainer.SetLogo(logo);
+            });
             AddStep("Try tracking new container", () =>
             {
                 try
@@ -269,13 +283,6 @@ namespace osu.Game.Tests.Visual.UserInterface
         private void startTrackingRandom()
         {
             trackingContainer.Tracking = true;
-            moveLogoFacade();
-        }
-
-        private void addFacadeToNewContainer()
-        {
-            transferContainer.Add(logoFacade);
-            transferContainerBox.Colour = Color4.Tomato;
             moveLogoFacade();
         }
 
