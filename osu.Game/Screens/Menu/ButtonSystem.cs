@@ -137,7 +137,7 @@ namespace osu.Game.Screens.Menu
             {
                 notifications?.Post(new SimpleNotification
                 {
-                    Text = "You gotta be logged in to multi 'yo!",                   
+                    Text = "You gotta be logged in to multi 'yo!",
                     Icon = FontAwesome.Solid.Globe,
                     Activated = () =>
                     {
