@@ -103,7 +103,7 @@ namespace osu.Game.Screens.Menu
         [Resolved(CanBeNull = true)]
         private NotificationOverlay notifications { get; set; }
 
-        [Resolved]
+        [Resolved(CanBeNull = true)]
         private LoginOverlay loginOverlay { get; set; }
 
         [BackgroundDependencyLoader(true)]
@@ -141,7 +141,7 @@ namespace osu.Game.Screens.Menu
                     Icon = FontAwesome.Solid.Globe,
                     Activated = () =>
                     {
-                        loginOverlay.Show();
+                        loginOverlay?.Show();
                         return true;
                     }
                 });
