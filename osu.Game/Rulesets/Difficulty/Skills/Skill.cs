@@ -89,6 +89,22 @@ namespace osu.Game.Rulesets.Difficulty.Skills
         public IList<double> MissCounts { get => missCountBySR; }
         public IList<double> ComboSR { get => comboSR; }
 
+        public IList<double> Timestamps { get => timestamps; }
+        public IEnumerable<double> HitObjectStars() => expDifficulties.Select(d => difficultyToStars(Math.Log(d)/star_bonus_k));
+        public IEnumerable<double> CumulativeHitObjectStars ()
+        {
+            double total = 0;
+
+            // Difficulty calculated according to probability of FC
+            // iterate backwards to calculate probs of FCing the remainder of map from a given point
+            foreach(double d in expDifficulties)
+            {
+                total += d;
+                yield return difficultyToStars(Math.Log(total) / star_bonus_k);
+            }
+        }
+
+
         /// <summary>
         /// Process a <see cref="DifficultyHitObject"/> and update current strain values.
         /// Also calculates hit probability function for this note and adds to list
