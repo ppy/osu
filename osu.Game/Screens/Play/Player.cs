@@ -60,6 +60,8 @@ namespace osu.Game.Screens.Play
 
         private SampleChannel sampleRestart;
 
+        private BreakOverlay breakOverlay;
+
         protected ScoreProcessor ScoreProcessor { get; private set; }
         protected DrawableRuleset DrawableRuleset { get; private set; }
 
@@ -115,7 +117,7 @@ namespace osu.Game.Screens.Play
                         Child = DrawableRuleset
                     }
                 },
-                new BreakOverlay(working.Beatmap.BeatmapInfo.LetterboxInBreaks, ScoreProcessor)
+                breakOverlay = new BreakOverlay(working.Beatmap.BeatmapInfo.LetterboxInBreaks, ScoreProcessor)
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
@@ -405,8 +407,8 @@ namespace osu.Game.Screens.Play
             IsResuming = true;
             PauseOverlay.Hide();
 
-            // time-based conditions may allow instant resume.
-            if (GameplayClockContainer.GameplayClock.CurrentTime < Beatmap.Value.Beatmap.HitObjects.First().StartTime)
+            // breaks and time-based conditions may allow instant resume.
+            if (breakOverlay.IsActive || GameplayClockContainer.GameplayClock.CurrentTime < Beatmap.Value.Beatmap.HitObjects.First().StartTime)
                 completeResume();
             else
                 DrawableRuleset.RequestResume(completeResume);
