@@ -61,11 +61,11 @@ namespace osu.Game.Screens
 
         public virtual float BackgroundParallaxAmount => 1;
 
-        public Bindable<WorkingBeatmap> Beatmap { get; set; }
+        public Bindable<WorkingBeatmap> Beatmap { get; private set; }
 
-        public Bindable<RulesetInfo> Ruleset { get; set; }
+        public Bindable<RulesetInfo> Ruleset { get; private set; }
 
-        public Bindable<IEnumerable<Mod>> SelectedMods { get; set; }
+        public Bindable<IEnumerable<Mod>> SelectedMods { get; private set; }
 
         protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
         {
