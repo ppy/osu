@@ -73,7 +73,7 @@ namespace osu.Game.Tests.Visual.UserInterface
         {
             AddToggleStep("Toggle move continuously", b => randomPositions = b);
             AddStep("Add tracking containers", addFacadeContainers);
-            AddStep("Move facade to random position", startTrackingRandom);
+            AddStep("Move facade to random position", moveLogoFacade);
             waitForMove();
             AddAssert("Logo is tracking", () => trackingContainer.IsLogoTracking);
         }
@@ -85,7 +85,7 @@ namespace osu.Game.Tests.Visual.UserInterface
         public void RemoveFacadeTest()
         {
             AddStep("Add tracking containers", addFacadeContainers);
-            AddStep("Move facade to random position", startTrackingRandom);
+            AddStep("Move facade to random position", moveLogoFacade);
             AddStep("Remove facade from FacadeContainer", removeFacade);
             waitForMove();
             AddAssert("Logo is not tracking", () => !trackingContainer.IsLogoTracking);
@@ -98,7 +98,7 @@ namespace osu.Game.Tests.Visual.UserInterface
         public void TransferFacadeTest()
         {
             AddStep("Add tracking containers", addFacadeContainers);
-            AddStep("Move facade to random position", startTrackingRandom);
+            AddStep("Move facade to random position", moveLogoFacade);
             AddStep("Remove facade from FacadeContainer", removeFacade);
             AddStep("Transfer facade to a new container", () =>
             {
@@ -171,14 +171,14 @@ namespace osu.Game.Tests.Visual.UserInterface
 
             AddStep("Perform logo movements", () =>
             {
-                trackingContainer.Tracking = false;
+                trackingContainer.StopTracking();
                 logo.MoveTo(new Vector2(0.5f), 500, Easing.InOutExpo);
-                trackingContainer.SetLogo(logo, 1.0f, 1000, Easing.InOutExpo);
+
                 visualBox.Colour = Color4.White;
 
                 Scheduler.AddDelayed(() =>
                 {
-                    trackingContainer.Tracking = true;
+                    trackingContainer.StartTracking(logo, 1000, Easing.InOutExpo);
                     visualBox.Colour = Color4.Tomato;
                 }, 700);
             });
@@ -221,14 +221,13 @@ namespace osu.Game.Tests.Visual.UserInterface
                 failed = false;
                 newContainer = new LogoTrackingContainer();
                 addFacadeContainers();
-                startTrackingRandom();
-                newContainer.SetLogo(logo);
+                moveLogoFacade();
             });
             AddStep("Try tracking new container", () =>
             {
                 try
                 {
-                    newContainer.Tracking = true;
+                    newContainer.StartTracking(logo);
                 }
                 catch (Exception e)
                 {
@@ -268,7 +267,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             });
 
             trackingContainer.Add(logoFacade = trackingContainer.LogoFacade);
-            trackingContainer.SetLogo(logo, 1.0f, 1000);
+            trackingContainer.StartTracking(logo, 1000);
         }
 
         private void waitForMove(int count = 5) => AddWaitStep("Wait for transforms to finish", count);
@@ -277,12 +276,6 @@ namespace osu.Game.Tests.Visual.UserInterface
         {
             trackingContainer.Remove(logoFacade);
             visualBox.Colour = Color4.White;
-            moveLogoFacade();
-        }
-
-        private void startTrackingRandom()
-        {
-            trackingContainer.Tracking = true;
             moveLogoFacade();
         }
 
@@ -304,7 +297,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             /// <summary>
             /// Check that the logo is tracking the position of the facade, with an acceptable precision lenience.
             /// </summary>
-            public bool IsLogoTracking => Precision.AlmostEquals(Logo.Position, LogoTrackingPosition);
+            public bool IsLogoTracking => Precision.AlmostEquals(Logo.Position, ComputeLogoTrackingPosition());
         }
     }
 }

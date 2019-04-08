@@ -128,7 +128,7 @@ namespace osu.Game.Screens.Play
         private void contentOut()
         {
             // Ensure the logo is no longer tracking before we scale the content
-            content.Tracking = false;
+            content.StopTracking();
 
             content.ScaleTo(0.7f, 300, Easing.InQuint);
             content.FadeOut(250);
@@ -161,15 +161,13 @@ namespace osu.Game.Screens.Play
             logo.ScaleTo(new Vector2(0.15f), duration, Easing.In);
             logo.FadeIn(350);
 
-            content.SetLogo(logo, 1.0f, resuming ? 0 : 500, Easing.InOutExpo);
-
-            Scheduler.AddDelayed(() => { content.Tracking = true; }, resuming ? 0 : 500);
+            Scheduler.AddDelayed(() => { content.StartTracking(logo, resuming ? 0 : 500, Easing.InOutExpo); }, resuming ? 0 : 500);
         }
 
         protected override void LogoExiting(OsuLogo logo)
         {
             base.LogoExiting(logo);
-            content.Tracking = false;
+            content.StopTracking();
         }
 
         protected override void LoadComplete()

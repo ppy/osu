@@ -60,17 +60,17 @@ namespace osu.Game.Screens.Menu
             if (this.logo != null)
             {
                 this.logo.Action = onOsuLogo;
-                logoTrackingContainer.SetLogo(logo, 0.74f);
 
                 // osuLogo.SizeForFlow relies on loading to be complete.
                 buttonArea.Flow.Position = new Vector2(WEDGE_WIDTH * 2 - (BUTTON_WIDTH + this.logo.SizeForFlow / 4), 0);
+                logoTrackingContainer.LogoFacade.Scale = new Vector2(0.74f);
 
                 updateLogoState();
             }
             else
             {
                 // We should stop tracking as the facade is now out of scope.
-                logoTrackingContainer.Tracking = false;
+                logoTrackingContainer.StopTracking();
             }
         }
 
@@ -271,7 +271,7 @@ namespace osu.Game.Screens.Menu
                     logoDelayedAction?.Cancel();
                     logoDelayedAction = Scheduler.AddDelayed(() =>
                         {
-                            logoTrackingContainer.Tracking = false;
+                            logoTrackingContainer.StopTracking();
 
                             game?.Toolbar.Hide();
 
@@ -294,8 +294,7 @@ namespace osu.Game.Screens.Menu
                             if (lastState == ButtonSystemState.Initial)
                                 logo.ScaleTo(0.5f, 200, Easing.In);
 
-                            logoTrackingContainer.SetLogo(logo, 0.74f, lastState == ButtonSystemState.EnteringMode ? 0 : 200, Easing.In);
-                            logoTrackingContainer.Tracking = true;
+                            logoTrackingContainer.StartTracking(logo, lastState == ButtonSystemState.EnteringMode ? 0 : 200, Easing.In);
 
                             logoDelayedAction?.Cancel();
                             logoDelayedAction = Scheduler.AddDelayed(() =>
@@ -308,14 +307,14 @@ namespace osu.Game.Screens.Menu
                             break;
                         default:
                             logo.ClearTransforms(targetMember: nameof(Position));
-                            logoTrackingContainer.Tracking = true;
+                            logoTrackingContainer.StartTracking(logo, 0, Easing.In);
                             logo.ScaleTo(0.5f, 200, Easing.OutQuint);
                             break;
                     }
 
                     break;
                 case ButtonSystemState.EnteringMode:
-                    logoTrackingContainer.Tracking = true;
+                    logoTrackingContainer.StartTracking(logo, 0, Easing.In);
                     break;
             }
         }
