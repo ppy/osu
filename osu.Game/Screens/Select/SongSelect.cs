@@ -83,9 +83,7 @@ namespace osu.Game.Screens.Select
 
         private readonly Bindable<RulesetInfo> decoupledRuleset = new Bindable<RulesetInfo>();
 
-        [Cached]
-        [Cached(Type = typeof(IBindable<IEnumerable<Mod>>))]
-        protected readonly Bindable<IEnumerable<Mod>> SelectedMods = new Bindable<IEnumerable<Mod>>(new Mod[] { });
+        protected readonly Bindable<IEnumerable<Mod>> SelectedMods = new Bindable<IEnumerable<Mod>>(Enumerable.Empty<Mod>());
 
         protected SongSelect()
         {
@@ -217,11 +215,8 @@ namespace osu.Game.Screens.Select
         }
 
         [BackgroundDependencyLoader(true)]
-        private void load(BeatmapManager beatmaps, AudioManager audio, DialogOverlay dialog, OsuColour colours, SkinManager skins, Bindable<IEnumerable<Mod>> selectedMods)
+        private void load(BeatmapManager beatmaps, AudioManager audio, DialogOverlay dialog, OsuColour colours, SkinManager skins)
         {
-            if (selectedMods != null)
-                SelectedMods.BindTo(selectedMods);
-
             if (Footer != null)
             {
                 Footer.AddButton(@"mods", colours.Yellow, ModSelect, Key.F1);
@@ -269,6 +264,12 @@ namespace osu.Game.Screens.Select
         protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
         {
             dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
+
+            SelectedMods.BindTo(base.SelectedMods);
+
+            dependencies.CacheAs(SelectedMods);
+            dependencies.CacheAs<IBindable<IEnumerable<Mod>>>(SelectedMods);
+
             dependencies.CacheAs(this);
             dependencies.CacheAs(decoupledRuleset);
             dependencies.CacheAs<IBindable<RulesetInfo>>(decoupledRuleset);

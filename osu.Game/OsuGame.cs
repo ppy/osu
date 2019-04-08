@@ -113,7 +113,7 @@ namespace osu.Game
         // todo: move this to SongSelect once Screen has the ability to unsuspend.
         [Cached]
         [Cached(Type = typeof(IBindable<IEnumerable<Mod>>))]
-        private readonly Bindable<IEnumerable<Mod>> selectedMods = new Bindable<IEnumerable<Mod>>(new Mod[] { });
+        private readonly Bindable<IEnumerable<Mod>> selectedMods = new Bindable<IEnumerable<Mod>>(Enumerable.Empty<Mod>());
 
         public OsuGame(string[] args = null)
         {

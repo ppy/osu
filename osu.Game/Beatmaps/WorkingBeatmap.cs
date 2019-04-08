@@ -46,14 +46,7 @@ namespace osu.Game.Beatmaps
                 return b;
             });
 
-            track = new RecyclableLazy<Track>(() =>
-            {
-                // we want to ensure that we always have a track, even if it's a fake one.
-                var t = GetTrack() ?? new VirtualBeatmapTrack(Beatmap);
-                // applyRateAdjustments(t);
-                return t;
-            });
-
+            track = new RecyclableLazy<Track>(() => GetTrack() ?? new VirtualBeatmapTrack(Beatmap));
             background = new RecyclableLazy<Texture>(GetBackground, BackgroundStillValid);
             waveform = new RecyclableLazy<Waveform>(GetWaveform);
             storyboard = new RecyclableLazy<Storyboard>(GetStoryboard);
@@ -182,16 +175,6 @@ namespace osu.Game.Beatmaps
         /// Accessing track again will load a fresh instance.
         /// </summary>
         public void RecycleTrack() => track.Recycle();
-
-        // private void applyRateAdjustments(Track t = null)
-        // {
-        //     if (t == null && track.IsResultAvailable) t = Track;
-        //     if (t == null) return;
-        //
-        //     t.ResetSpeedAdjustments();
-        //     foreach (var mod in Mods.Value.OfType<IApplicableToClock>())
-        //         mod.ApplyToClock(t);
-        // }
 
         public class RecyclableLazy<T>
         {
