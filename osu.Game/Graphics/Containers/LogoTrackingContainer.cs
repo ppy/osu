@@ -17,14 +17,12 @@ namespace osu.Game.Graphics.Containers
     {
         public Facade LogoFacade { get; }
 
-        protected OsuLogo Logo => logo;
+        protected OsuLogo Logo { get; private set; }
 
-        private OsuLogo logo;
         private Easing easing;
         private Vector2? startPosition;
         private double? startTime;
         private double duration;
-        private bool tracking;
 
         public LogoTrackingContainer()
         {
@@ -43,33 +41,32 @@ namespace osu.Game.Graphics.Containers
             if (logo == null)
                 throw new ArgumentNullException(nameof(logo));
 
-            if (logo.IsTracking && tracking == false)
+            if (logo.IsTracking && Logo == null)
                 throw new InvalidOperationException($"Cannot track an instance of {typeof(OsuLogo)} to multiple {typeof(LogoTrackingContainer)}s");
 
-            if (this.logo != logo && this.logo != null)
+            if (Logo != logo && Logo != null)
             {
                 // If we're replacing the logo to be tracked, the old one no longer has a tracking container
-                this.logo.IsTracking = false;
+                Logo.IsTracking = false;
             }
 
-            this.logo = logo;
-            this.logo.IsTracking = true;
+            Logo = logo;
+            Logo.IsTracking = true;
 
             this.duration = duration;
             this.easing = easing;
 
             startTime = null;
             startPosition = null;
-
-            tracking = true;
         }
 
         public void StopTracking()
         {
-            if (logo != null)
-                logo.IsTracking = false;
-
-            tracking = false;
+            if (Logo != null)
+            {
+                Logo.IsTracking = false;
+                Logo = null;
+            }
         }
 
         /// <summary>
@@ -89,7 +86,7 @@ namespace osu.Game.Graphics.Containers
         {
             base.Update();
 
-            if (Logo == null || !tracking)
+            if (Logo == null)
                 return;
 
             // Account for the scale of the actual OsuLogo, as SizeForFlow only accounts for the sprite scale.

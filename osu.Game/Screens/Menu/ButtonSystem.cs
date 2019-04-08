@@ -63,7 +63,6 @@ namespace osu.Game.Screens.Menu
 
                 // osuLogo.SizeForFlow relies on loading to be complete.
                 buttonArea.Flow.Position = new Vector2(WEDGE_WIDTH * 2 - (BUTTON_WIDTH + this.logo.SizeForFlow / 4), 0);
-                logoTrackingContainer.LogoFacade.Scale = new Vector2(0.74f);
 
                 updateLogoState();
             }
@@ -106,6 +105,7 @@ namespace osu.Game.Screens.Menu
             });
 
             buttonArea.Flow.CentreTarget = logoTrackingContainer.LogoFacade;
+            logoTrackingContainer.LogoFacade.Scale = new Vector2(0.74f);
         }
 
         [Resolved(CanBeNull = true)]
