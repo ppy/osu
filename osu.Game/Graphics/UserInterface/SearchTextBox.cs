@@ -22,7 +22,7 @@ namespace osu.Game.Graphics.UserInterface
             {
                 new SpriteIcon
                 {
-                    Icon = FontAwesome.Search,
+                    Icon = FontAwesome.Solid.Search,
                     Origin = Anchor.CentreRight,
                     Anchor = Anchor.CentreRight,
                     Margin = new MarginPadding { Right = 10 },

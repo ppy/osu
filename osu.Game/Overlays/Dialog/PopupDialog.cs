@@ -167,7 +167,7 @@ namespace osu.Game.Overlays.Dialog
                                                 {
                                                     Origin = Anchor.Centre,
                                                     Anchor = Anchor.Centre,
-                                                    Icon = FontAwesome.Close,
+                                                    Icon = FontAwesome.Solid.TimesCircle,
                                                     Size = new Vector2(50),
                                                 },
                                             },

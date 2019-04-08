@@ -118,7 +118,7 @@ namespace osu.Game.Overlays.Chat.Tabs
             };
         }
 
-        protected virtual IconUsage DisplayIcon => FontAwesome.Hashtag;
+        protected virtual IconUsage DisplayIcon => FontAwesome.Solid.Hashtag;
 
         protected virtual bool ShowCloseOnHover => true;
 

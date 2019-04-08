@@ -7,7 +7,7 @@ namespace osu.Game.Graphics
 {
     public static class OsuIcon
     {
-        public static IconUsage Get(int icon) => new IconUsage((char)icon, "OsuFont");
+        public static IconUsage Get(int icon) => new IconUsage((char)icon, "osuFont");
 
         // ruleset icons in circles
         public static IconUsage RulesetOsu => Get(0xe000);
