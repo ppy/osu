@@ -17,29 +17,9 @@ namespace osu.Game.Graphics.Containers
     {
         public Facade LogoFacade { get; }
 
-        /// <summary>
-        /// Whether or not the logo assigned to this FacadeContainer should be tracking the position of its facade.
-        /// </summary>
-        public bool Tracking
-        {
-            get => tracking;
-            set
-            {
-                if (Logo != null)
-                {
-                    if (value && !tracking && Logo.IsTracking)
-                        throw new InvalidOperationException($"Cannot track an instance of {typeof(OsuLogo)} to multiple {typeof(LogoTrackingContainer)}s");
+        protected OsuLogo Logo => logo;
 
-                    Logo.IsTracking = value;
-                }
-
-                tracking = value;
-            }
-        }
-
-        protected OsuLogo Logo;
-
-        private float facadeScale;
+        private OsuLogo logo;
         private Easing easing;
         private Vector2? startPosition;
         private double? startTime;
@@ -58,27 +38,38 @@ namespace osu.Game.Graphics.Containers
         /// <param name="facadeScale">The scale of the facade. Does not actually affect the logo itself.</param>
         /// <param name="duration">The duration of the initial transform. Default is instant.</param>
         /// <param name="easing">The easing type of the initial transform.</param>
-        public void SetLogo(OsuLogo logo, float facadeScale = 1.0f, double duration = 0, Easing easing = Easing.None)
+        public void StartTracking(OsuLogo logo, double duration = 0, Easing easing = Easing.None)
         {
-            if (Logo != logo && Logo != null)
+            if (logo == null)
+                throw new ArgumentNullException(nameof(logo));
+
+            if (logo.IsTracking && tracking == false)
+                throw new InvalidOperationException($"Cannot track an instance of {typeof(OsuLogo)} to multiple {typeof(LogoTrackingContainer)}s");
+
+            if (this.logo != logo && this.logo != null)
             {
                 // If we're replacing the logo to be tracked, the old one no longer has a tracking container
-                Logo.IsTracking = false;
+                this.logo.IsTracking = false;
             }
 
-            Logo = logo ?? throw new ArgumentNullException(nameof(logo));
+            this.logo = logo;
+            this.logo.IsTracking = true;
 
-            if (Tracking)
-            {
-                Logo.IsTracking = true;
-            }
-
-            this.facadeScale = facadeScale;
             this.duration = duration;
             this.easing = easing;
 
             startTime = null;
             startPosition = null;
+
+            tracking = true;
+        }
+
+        public void StopTracking()
+        {
+            if (logo != null)
+                logo.IsTracking = false;
+
+            tracking = false;
         }
 
         /// <summary>
@@ -86,20 +77,27 @@ namespace osu.Game.Graphics.Containers
         /// Manually performs a conversion of the Facade's position to the Logo's parent's relative space.
         /// </summary>
         /// <remarks>Will only be correct if the logo's <see cref="Drawable.RelativePositionAxes"/> are set to Axes.Both</remarks>
-        protected Vector2 LogoTrackingPosition => new Vector2(Logo.Parent.ToLocalSpace(LogoFacade.ScreenSpaceDrawQuad.Centre).X / Logo.Parent.RelativeToAbsoluteFactor.X,
-            Logo.Parent.ToLocalSpace(LogoFacade.ScreenSpaceDrawQuad.Centre).Y / Logo.Parent.RelativeToAbsoluteFactor.Y);
+        protected Vector2 ComputeLogoTrackingPosition()
+        {
+            var absolutePos = Logo.Parent.ToLocalSpace(LogoFacade.ScreenSpaceDrawQuad.Centre);
+
+            return new Vector2(absolutePos.X / Logo.Parent.RelativeToAbsoluteFactor.X,
+                absolutePos.Y / Logo.Parent.RelativeToAbsoluteFactor.Y);
+        }
 
         protected override void Update()
         {
             base.Update();
 
-            if (Logo == null || !Tracking)
+            if (Logo == null || !tracking)
                 return;
 
             // Account for the scale of the actual OsuLogo, as SizeForFlow only accounts for the sprite scale.
-            ((ExposedFacade)LogoFacade).SetSize(new Vector2(Logo.SizeForFlow * Logo.Scale.X * facadeScale));
+            ((ExposedFacade)LogoFacade).SetSize(new Vector2(Logo.SizeForFlow * Logo.Scale.X));
 
-            if (LogoFacade.Parent != null && Logo.Position != LogoTrackingPosition && Logo.RelativePositionAxes == Axes.Both)
+            var localPos = ComputeLogoTrackingPosition();
+
+            if (LogoFacade.Parent != null && Logo.Position != localPos && Logo.RelativePositionAxes == Axes.Both)
             {
                 // If this is our first update since tracking has started, initialize our starting values for interpolation
                 if (startTime == null || startPosition == null)
@@ -115,11 +113,11 @@ namespace osu.Game.Graphics.Containers
                     var amount = (float)Interpolation.ApplyEasing(easing, Math.Min(elapsedDuration / duration, 1));
 
                     // Interpolate the position of the logo, where amount 0 is where the logo was when it first began interpolating, and amount 1 is the target location.
-                    Logo.Position = Vector2.Lerp((Vector2)startPosition, LogoTrackingPosition, amount);
+                    Logo.Position = Vector2.Lerp((Vector2)startPosition, localPos, amount);
                 }
                 else
                 {
-                    Logo.Position = LogoTrackingPosition;
+                    Logo.Position = localPos;
                 }
             }
         }
@@ -127,7 +125,7 @@ namespace osu.Game.Graphics.Containers
         protected override void Dispose(bool isDisposing)
         {
             if (Logo != null)
-                Tracking = false;
+                Logo.IsTracking = false;
 
             base.Dispose(isDisposing);
         }
