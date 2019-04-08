@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using osu.Framework;
@@ -22,7 +23,7 @@ namespace osu.Game.Screens.Play
     /// </summary>
     public class GameplayClockContainer : Container
     {
-        private readonly WorkingBeatmap beatmap;
+        private readonly IEnumerable<Mod> mods;
 
         /// <summary>
         /// The original source (usually a <see cref="WorkingBeatmap"/>'s track).
@@ -54,9 +55,9 @@ namespace osu.Game.Screens.Play
 
         private readonly FramedOffsetClock offsetClock;
 
-        public GameplayClockContainer(WorkingBeatmap beatmap, double gameplayStartTime)
+        public GameplayClockContainer(WorkingBeatmap beatmap, IEnumerable<Mod> mods, double gameplayStartTime)
         {
-            this.beatmap = beatmap;
+            this.mods = mods;
 
             RelativeSizeAxes = Axes.Both;
 
@@ -154,7 +155,7 @@ namespace osu.Game.Screens.Play
             else
                 sourceClock.Rate = UserPlaybackRate.Value;
 
-            foreach (var mod in beatmap.Mods.Value.OfType<IApplicableToClock>())
+            foreach (var mod in mods.OfType<IApplicableToClock>())
                 mod.ApplyToClock(sourceClock);
         }
     }

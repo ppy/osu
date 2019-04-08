@@ -222,8 +222,6 @@ namespace osu.Game.Screens.Multi.Match
 
         private void onStart()
         {
-            Beatmap.Value.Mods.Value = SelectedMods.Value.ToArray();
-
             switch (type.Value)
             {
                 default:

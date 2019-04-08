@@ -175,12 +175,12 @@ namespace osu.Game.Tests.Visual.SongSelect
 
             AddStep("change ruleset", () =>
             {
-                songSelect.CurrentBeatmap.Mods.ValueChanged += onModChange;
+                SelectedMods.ValueChanged += onModChange;
                 songSelect.Ruleset.ValueChanged += onRulesetChange;
 
                 Ruleset.Value = new TaikoRuleset().RulesetInfo;
 
-                songSelect.CurrentBeatmap.Mods.ValueChanged -= onModChange;
+                SelectedMods.ValueChanged -= onModChange;
                 songSelect.Ruleset.ValueChanged -= onRulesetChange;
             });
 

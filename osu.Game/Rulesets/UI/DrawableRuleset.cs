@@ -11,7 +11,6 @@ using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics.Cursor;
@@ -82,7 +81,9 @@ namespace osu.Game.Rulesets.UI
         /// <summary>
         /// The mods which are to be applied.
         /// </summary>
-        private readonly IEnumerable<Mod> mods;
+        [Cached]
+        [Cached(typeof(IBindable<IEnumerable<Mod>>))]
+        private readonly Bindable<IEnumerable<Mod>> mods = new Bindable<IEnumerable<Mod>>();
 
         private FrameStabilityContainer frameStabilityContainer;
 
@@ -93,16 +94,18 @@ namespace osu.Game.Rulesets.UI
         /// </summary>
         /// <param name="ruleset">The ruleset being represented.</param>
         /// <param name="workingBeatmap">The beatmap to create the hit renderer for.</param>
-        protected DrawableRuleset(Ruleset ruleset, WorkingBeatmap workingBeatmap)
+        protected DrawableRuleset(Ruleset ruleset, WorkingBeatmap workingBeatmap, IEnumerable<Mod> mods)
             : base(ruleset)
         {
-            Debug.Assert(workingBeatmap != null, "DrawableRuleset initialized with a null beatmap.");
+            if (workingBeatmap == null)
+                throw new ArgumentException("Beatmap cannot be null.", nameof(workingBeatmap));
+
+            this.mods.Value = mods;
 
             RelativeSizeAxes = Axes.Both;
 
-            Beatmap = (Beatmap<TObject>)workingBeatmap.GetPlayableBeatmap(ruleset.RulesetInfo);
+            Beatmap = (Beatmap<TObject>)workingBeatmap.GetPlayableBeatmap(ruleset.RulesetInfo, mods);
 
-            mods = workingBeatmap.Mods.Value;
             applyBeatmapMods(mods);
 
             KeyBindingInputManager = CreateInputManager();
@@ -157,7 +160,7 @@ namespace osu.Game.Rulesets.UI
                         .WithChild(ResumeOverlay)));
             }
 
-            applyRulesetMods(mods, config);
+            applyRulesetMods(mods.Value, config);
 
             loadObjects();
         }
@@ -172,7 +175,7 @@ namespace osu.Game.Rulesets.UI
 
             Playfield.PostProcess();
 
-            foreach (var mod in mods.OfType<IApplicableToDrawableHitObjects>())
+            foreach (var mod in mods.Value.OfType<IApplicableToDrawableHitObjects>())
                 mod.ApplyToDrawableHitObjects(Playfield.HitObjectContainer.Objects);
         }
 
