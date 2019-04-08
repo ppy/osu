@@ -394,7 +394,7 @@ namespace osu.Game.Screens.Select
                 {
                     Logger.Log($"ruleset changed from \"{decoupledRuleset.Value}\" to \"{ruleset}\"");
 
-                    Beatmap.Value.Mods.Value = Enumerable.Empty<Mod>();
+                    SelectedMods.Value = Enumerable.Empty<Mod>();
                     decoupledRuleset.Value = ruleset;
 
                     // force a filter before attempting to change the beatmap.
@@ -530,7 +530,7 @@ namespace osu.Game.Screens.Select
                 Beatmap.Value.Track.Looping = false;
 
             SelectedMods.UnbindAll();
-            Beatmap.Value.Mods.Value = new Mod[] { };
+            base.SelectedMods.Value = Enumerable.Empty<Mod>();
 
             return false;
         }
@@ -557,8 +557,6 @@ namespace osu.Game.Screens.Select
         /// <param name="beatmap">The working beatmap.</param>
         protected virtual void UpdateBeatmap(WorkingBeatmap beatmap)
         {
-            beatmap.Mods.BindTo(SelectedMods);
-
             Logger.Log($"working beatmap updated to {beatmap}");
 
             if (Background is BackgroundScreenBeatmap backgroundModeBeatmap)

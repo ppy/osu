@@ -14,7 +14,7 @@ namespace osu.Game.Tests.Visual.Gameplay
     {
         protected override Player CreatePlayer(Ruleset ruleset)
         {
-            Beatmap.Value.Mods.Value = Beatmap.Value.Mods.Value.Concat(new[] { ruleset.GetAutoplayMod() });
+            SelectedMods.Value = SelectedMods.Value.Concat(new[] { ruleset.GetAutoplayMod() });
             return new ScoreAccessiblePlayer();
         }
 

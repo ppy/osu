@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore.Internal;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
@@ -14,6 +15,7 @@ using osu.Game.Input.Bindings;
 using osu.Game.Rulesets;
 using osu.Game.Screens.Menu;
 using osu.Game.Overlays;
+using osu.Game.Rulesets.Mods;
 
 namespace osu.Game.Screens
 {
@@ -63,12 +65,15 @@ namespace osu.Game.Screens
 
         public Bindable<RulesetInfo> Ruleset { get; set; }
 
+        public Bindable<IEnumerable<Mod>> SelectedMods { get; set; }
+
         protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
         {
             var screenDependencies = new OsuScreenDependencies(DisallowExternalBeatmapRulesetChanges, parent);
 
             Beatmap = screenDependencies.Beatmap;
             Ruleset = screenDependencies.Ruleset;
+            SelectedMods = screenDependencies.SelectedMods;
 
             return base.CreateChildDependencies(screenDependencies);
         }

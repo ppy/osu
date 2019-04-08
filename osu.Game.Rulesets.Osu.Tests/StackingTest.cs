@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using NUnit.Framework;
 using osu.Game.Beatmaps;
+using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Tests.Beatmaps;
 using Decoder = osu.Game.Beatmaps.Formats.Decoder;
@@ -22,7 +23,7 @@ namespace osu.Game.Rulesets.Osu.Tests
             using (var reader = new StreamReader(stream))
             {
                 var beatmap = Decoder.GetDecoder<Beatmap>(reader).Decode(reader);
-                var converted = new TestWorkingBeatmap(beatmap).GetPlayableBeatmap(new OsuRuleset().RulesetInfo);
+                var converted = new TestWorkingBeatmap(beatmap).GetPlayableBeatmap(new OsuRuleset().RulesetInfo, Enumerable.Empty<Mod>());
 
                 var objects = converted.HitObjects.ToList();
 
