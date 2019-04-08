@@ -9,7 +9,7 @@ namespace osu.Game.Overlays.KeyBinding
 {
     public class GlobalKeyBindingsSection : SettingsSection
     {
-        public override IconUsage Icon => FontAwesome.Globe;
+        public override IconUsage Icon => FontAwesome.Solid.Globe;
         public override string Header => "Global";
 
         public GlobalKeyBindingsSection(GlobalActionContainer manager)

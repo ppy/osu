@@ -80,7 +80,7 @@ namespace osu.Game.Screens.Menu
 
             buttonArea.AddRange(new[]
             {
-                new Button(@"settings", string.Empty, FontAwesome.Gear, new Color4(85, 85, 85, 255), () => OnSettings?.Invoke(), -WEDGE_WIDTH, Key.O),
+                new Button(@"settings", string.Empty, FontAwesome.Solid.Cog, new Color4(85, 85, 85, 255), () => OnSettings?.Invoke(), -WEDGE_WIDTH, Key.O),
                 backButton = new Button(@"back", @"button-back-select", OsuIcon.LeftCircle, new Color4(51, 58, 94, 255), () => State = ButtonSystemState.TopLevel, -WEDGE_WIDTH)
                 {
                     VisibleState = ButtonSystemState.Play,
@@ -103,11 +103,14 @@ namespace osu.Game.Screens.Menu
         [Resolved(CanBeNull = true)]
         private NotificationOverlay notifications { get; set; }
 
+        [Resolved(CanBeNull = true)]
+        private LoginOverlay loginOverlay { get; set; }
+
         [BackgroundDependencyLoader(true)]
         private void load(AudioManager audio, IdleTracker idleTracker, GameHost host)
         {
-            buttonsPlay.Add(new Button(@"solo", @"button-solo-select", FontAwesome.User, new Color4(102, 68, 204, 255), () => OnSolo?.Invoke(), WEDGE_WIDTH, Key.P));
-            buttonsPlay.Add(new Button(@"multi", @"button-generic-select", FontAwesome.Users, new Color4(94, 63, 186, 255), onMulti, 0, Key.M));
+            buttonsPlay.Add(new Button(@"solo", @"button-solo-select", FontAwesome.Solid.User, new Color4(102, 68, 204, 255), () => OnSolo?.Invoke(), WEDGE_WIDTH, Key.P));
+            buttonsPlay.Add(new Button(@"multi", @"button-generic-select", FontAwesome.Solid.Users, new Color4(94, 63, 186, 255), onMulti, 0, Key.M));
             buttonsPlay.Add(new Button(@"chart", @"button-generic-select", OsuIcon.Charts, new Color4(80, 53, 160, 255), () => OnChart?.Invoke()));
             buttonsPlay.ForEach(b => b.VisibleState = ButtonSystemState.Play);
 
@@ -135,7 +138,12 @@ namespace osu.Game.Screens.Menu
                 notifications?.Post(new SimpleNotification
                 {
                     Text = "You gotta be logged in to multi 'yo!",
-                    Icon = FontAwesome.Globe
+                    Icon = FontAwesome.Solid.Globe,
+                    Activated = () =>
+                    {
+                        loginOverlay?.Show();
+                        return true;
+                    }
                 });
 
                 return;

@@ -1,13 +1,19 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Linq;
 using NUnit.Framework;
+using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Screens;
+using osu.Game.Graphics.Containers;
+using osu.Game.Graphics.Cursor;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Screens.Play;
+using osuTK;
+using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.Gameplay
 {
@@ -15,14 +21,52 @@ namespace osu.Game.Tests.Visual.Gameplay
     {
         protected new PausePlayer Player => (PausePlayer)base.Player;
 
+        private readonly Container content;
+
+        protected override Container<Drawable> Content => content;
+
         public TestCasePause()
             : base(new OsuRuleset())
         {
+            base.Content.Add(content = new MenuCursorContainer { RelativeSizeAxes = Axes.Both });
         }
 
         [Test]
         public void TestPauseResume()
         {
+            AddStep("move cursor outside", () => InputManager.MoveMouseTo(Player.ScreenSpaceDrawQuad.TopLeft - new Vector2(10)));
+            pauseAndConfirm();
+            resumeAndConfirm();
+        }
+
+        [Test]
+        public void TestResumeWithResumeOverlay()
+        {
+            AddStep("move cursor to center", () => InputManager.MoveMouseTo(Player.ScreenSpaceDrawQuad.Centre));
+            AddUntilStep("wait for hitobjects", () => Player.ScoreProcessor.Health.Value < 1);
+
+            pauseAndConfirm();
+            resume();
+
+            confirmClockRunning(false);
+            confirmPauseOverlayShown(false);
+
+            AddStep("click to resume", () =>
+            {
+                InputManager.PressButton(MouseButton.Left);
+                InputManager.ReleaseButton(MouseButton.Left);
+            });
+
+            confirmClockRunning(true);
+        }
+
+        [Test]
+        public void TestResumeWithResumeOverlaySkipped()
+        {
+            AddStep("move cursor to button", () =>
+                InputManager.MoveMouseTo(Player.HUDOverlay.HoldToQuit.Children.OfType<HoldToConfirmContainer>().First().ScreenSpaceDrawQuad.Centre));
+            AddUntilStep("wait for hitobjects", () => Player.ScoreProcessor.Health.Value < 1);
+
             pauseAndConfirm();
             resumeAndConfirm();
         }
@@ -30,6 +74,8 @@ namespace osu.Game.Tests.Visual.Gameplay
         [Test]
         public void TestPauseTooSoon()
         {
+            AddStep("move cursor outside", () => InputManager.MoveMouseTo(Player.ScreenSpaceDrawQuad.TopLeft - new Vector2(10)));
+
             pauseAndConfirm();
             resumeAndConfirm();
 
@@ -144,9 +190,16 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             public new ScoreProcessor ScoreProcessor => base.ScoreProcessor;
 
+            public new HUDOverlay HUDOverlay => base.HUDOverlay;
+
             public bool FailOverlayVisible => FailOverlay.State == Visibility.Visible;
 
             public bool PauseOverlayVisible => PauseOverlay.State == Visibility.Visible;
+
+            public PausePlayer()
+            {
+                PauseOnFocusLost = false;
+            }
         }
     }
 }

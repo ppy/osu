@@ -64,6 +64,8 @@ namespace osu.Game.Screens.Menu
             {
                 box = new Container
                 {
+                    // box needs to be always present to ensure the button is always sized correctly for flow
+                    AlwaysPresent = true,
                     Masking = true,
                     MaskingSmoothness = 2,
                     EdgeEffect = new EdgeEffectParameters

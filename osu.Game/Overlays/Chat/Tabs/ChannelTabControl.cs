@@ -31,7 +31,7 @@ namespace osu.Game.Overlays.Chat.Tabs
 
             AddInternal(new SpriteIcon
             {
-                Icon = FontAwesome.Comments,
+                Icon = FontAwesome.Solid.Comments,
                 Anchor = Anchor.CentreLeft,
                 Origin = Anchor.CentreLeft,
                 Size = new Vector2(20),
