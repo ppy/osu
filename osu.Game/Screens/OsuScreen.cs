@@ -65,7 +65,7 @@ namespace osu.Game.Screens
 
         protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
         {
-            OsuScreenDependencies screenDependencies = new OsuScreenDependencies(DisallowExternalBeatmapRulesetChanges, parent);
+            var screenDependencies = new OsuScreenDependencies(DisallowExternalBeatmapRulesetChanges, parent);
 
             Beatmap = screenDependencies.Beatmap;
             Ruleset = screenDependencies.Ruleset;
