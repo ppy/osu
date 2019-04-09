@@ -83,7 +83,9 @@ namespace osu.Game.Screens.Select
 
         private readonly Bindable<RulesetInfo> decoupledRuleset = new Bindable<RulesetInfo>();
 
-        protected readonly Bindable<IEnumerable<Mod>> SelectedMods = new Bindable<IEnumerable<Mod>>(Enumerable.Empty<Mod>());
+        [Cached]
+        [Cached(Type = typeof(IBindable<IEnumerable<Mod>>))]
+        private readonly Bindable<IEnumerable<Mod>> selectedMods = new Bindable<IEnumerable<Mod>>(Enumerable.Empty<Mod>()); // Bound to the game's mods, but is not reset on exiting
 
         protected SongSelect()
         {
@@ -217,6 +219,8 @@ namespace osu.Game.Screens.Select
         [BackgroundDependencyLoader(true)]
         private void load(BeatmapManager beatmaps, AudioManager audio, DialogOverlay dialog, OsuColour colours, SkinManager skins)
         {
+            selectedMods.BindTo(SelectedMods);
+
             if (Footer != null)
             {
                 Footer.AddButton(@"mods", colours.Yellow, ModSelect, Key.F1);
@@ -264,11 +268,6 @@ namespace osu.Game.Screens.Select
         protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
         {
             dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
-
-            SelectedMods.BindTo(base.SelectedMods);
-
-            dependencies.CacheAs(SelectedMods);
-            dependencies.CacheAs<IBindable<IEnumerable<Mod>>>(SelectedMods);
 
             dependencies.CacheAs(this);
             dependencies.CacheAs(decoupledRuleset);
@@ -395,7 +394,7 @@ namespace osu.Game.Screens.Select
                 {
                     Logger.Log($"ruleset changed from \"{decoupledRuleset.Value}\" to \"{ruleset}\"");
 
-                    SelectedMods.Value = Enumerable.Empty<Mod>();
+                    selectedMods.Value = Enumerable.Empty<Mod>();
                     decoupledRuleset.Value = ruleset;
 
                     // force a filter before attempting to change the beatmap.
@@ -530,8 +529,8 @@ namespace osu.Game.Screens.Select
             if (Beatmap.Value.Track != null)
                 Beatmap.Value.Track.Looping = false;
 
-            SelectedMods.UnbindAll();
-            base.SelectedMods.Value = Enumerable.Empty<Mod>();
+            selectedMods.UnbindAll();
+            SelectedMods.Value = Enumerable.Empty<Mod>();
 
             return false;
         }

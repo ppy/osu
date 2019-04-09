@@ -66,6 +66,7 @@ namespace osu.Game.Screens.Select
 
             Beatmap.Disabled = true;
             Ruleset.Disabled = true;
+            SelectedMods.Disabled = true;
 
             return false;
         }
@@ -76,6 +77,7 @@ namespace osu.Game.Screens.Select
 
             Beatmap.Disabled = false;
             Ruleset.Disabled = false;
+            SelectedMods.Disabled = false;
         }
     }
 }

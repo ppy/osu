@@ -1,7 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -41,9 +40,6 @@ namespace osu.Game.Screens.Multi.Match
 
         [Resolved(typeof(Room))]
         protected Bindable<PlaylistItem> CurrentItem { get; private set; }
-
-        [Resolved]
-        protected Bindable<IEnumerable<Mod>> SelectedMods { get; private set; }
 
         [Resolved]
         private BeatmapManager beatmapManager { get; set; }
