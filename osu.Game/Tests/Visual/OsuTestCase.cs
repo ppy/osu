@@ -29,7 +29,7 @@ namespace osu.Game.Tests.Visual
 
         [Cached]
         [Cached(Type = typeof(IBindable<IEnumerable<Mod>>))]
-        protected readonly Bindable<IEnumerable<Mod>> SelectedMods = new Bindable<IEnumerable<Mod>>();
+        protected readonly Bindable<IEnumerable<Mod>> SelectedMods = new Bindable<IEnumerable<Mod>>(Enumerable.Empty<Mod>());
 
         protected DependencyContainer Dependencies { get; private set; }
 
@@ -38,12 +38,10 @@ namespace osu.Game.Tests.Visual
 
         protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
         {
-            Dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
-
             // This is the earliest we can get OsuGameBase, which is used by the dummy working beatmap to find textures
-            beatmap.Default = new DummyWorkingBeatmap(Dependencies.Get<OsuGameBase>());
+            beatmap.Default = new DummyWorkingBeatmap(parent.Get<OsuGameBase>());
 
-            return Dependencies;
+            return Dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
         }
 
         protected OsuTestCase()
