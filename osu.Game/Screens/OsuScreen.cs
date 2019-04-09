@@ -65,12 +65,12 @@ namespace osu.Game.Screens
 
         protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
         {
-            var deps = new OsuScreenDependencies(DisallowExternalBeatmapRulesetChanges, base.CreateChildDependencies(parent));
+            var screenDependencies = new OsuScreenDependencies(DisallowExternalBeatmapRulesetChanges, parent);
 
-            Beatmap = deps.Beatmap;
-            Ruleset = deps.Ruleset;
+            Beatmap = screenDependencies.Beatmap;
+            Ruleset = screenDependencies.Ruleset;
 
-            return deps;
+            return base.CreateChildDependencies(screenDependencies);
         }
 
         protected BackgroundScreen Background => backgroundStack?.CurrentScreen as BackgroundScreen;
