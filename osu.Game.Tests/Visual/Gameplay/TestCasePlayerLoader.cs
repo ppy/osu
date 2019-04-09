@@ -2,10 +2,10 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Threading;
+using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Screens;
-using osu.Game.Beatmaps;
 using osu.Game.Screens;
 using osu.Game.Screens.Play;
 
@@ -21,23 +21,15 @@ namespace osu.Game.Tests.Visual.Gameplay
             InputManager.Add(stack = new OsuScreenStack { RelativeSizeAxes = Axes.Both });
         }
 
-        [BackgroundDependencyLoader]
-        private void load(OsuGameBase game)
+        [Test]
+        public void TestLoadContinuation()
         {
-            Beatmap.Value = new DummyWorkingBeatmap(game);
-
             AddStep("load dummy beatmap", () => stack.Push(loader = new PlayerLoader(() => new Player(false, false))));
-
             AddUntilStep("wait for current", () => loader.IsCurrentScreen());
-
             AddStep("mouse in centre", () => InputManager.MoveMouseTo(loader.ScreenSpaceDrawQuad.Centre));
-
             AddUntilStep("wait for no longer current", () => !loader.IsCurrentScreen());
-
             AddStep("exit loader", () => loader.Exit());
-
             AddUntilStep("wait for no longer alive", () => !loader.IsAlive);
-
             AddStep("load slow dummy beatmap", () =>
             {
                 SlowLoadPlayer slow = null;
