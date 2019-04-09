@@ -178,6 +178,9 @@ namespace osu.Game.Screens.Multi.Match
         public override bool OnExiting(IScreen next)
         {
             RoomManager?.PartRoom();
+
+            SelectedMods.Value = Enumerable.Empty<Mod>();
+
             return base.OnExiting(next);
         }
 
