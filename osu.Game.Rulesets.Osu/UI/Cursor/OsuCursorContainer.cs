@@ -1,9 +1,12 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input.Bindings;
+using osu.Game.Rulesets.Osu.Configuration;
 using osu.Game.Rulesets.UI;
 
 namespace osu.Game.Rulesets.Osu.UI.Cursor
@@ -16,6 +19,10 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
 
         private readonly Container<Drawable> fadeContainer;
 
+        private readonly Bindable<bool> showTrail = new Bindable<bool>(true);
+
+        private readonly CursorTrail cursorTrail;
+
         public OsuCursorContainer()
         {
             InternalChild = fadeContainer = new Container
@@ -23,9 +30,17 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
                 RelativeSizeAxes = Axes.Both,
                 Children = new Drawable[]
                 {
-                    new CursorTrail { Depth = 1 }
+                    cursorTrail = new CursorTrail { Depth = 1 }
                 }
             };
+        }
+
+        [BackgroundDependencyLoader(true)]
+        private void load(OsuRulesetConfigManager config)
+        {
+            config?.BindWith(OsuRulesetSetting.ShowCursorTrail, showTrail);
+
+            showTrail.BindValueChanged(v => cursorTrail.FadeTo(v.NewValue ? 1 : 0, 200), true);
         }
 
         private int downCount;

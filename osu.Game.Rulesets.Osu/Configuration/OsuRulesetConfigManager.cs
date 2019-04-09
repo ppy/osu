@@ -16,15 +16,16 @@ namespace osu.Game.Rulesets.Osu.Configuration
         protected override void InitialiseDefaults()
         {
             base.InitialiseDefaults();
-
             Set(OsuRulesetSetting.SnakingInSliders, true);
             Set(OsuRulesetSetting.SnakingOutSliders, true);
+            Set(OsuRulesetSetting.ShowCursorTrail, true);
         }
     }
 
     public enum OsuRulesetSetting
     {
         SnakingInSliders,
-        SnakingOutSliders
+        SnakingOutSliders,
+        ShowCursorTrail
     }
 }
