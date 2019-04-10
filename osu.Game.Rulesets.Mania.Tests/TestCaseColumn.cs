@@ -13,6 +13,7 @@ using osu.Game.Rulesets.Mania.Objects;
 using osu.Game.Rulesets.Mania.Objects.Drawables;
 using osu.Game.Rulesets.Mania.UI;
 using osu.Game.Rulesets.Mania.UI.Components;
+using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.UI.Scrolling;
 using osu.Game.Tests.Visual;
 using osuTK;
@@ -30,6 +31,9 @@ namespace osu.Game.Rulesets.Mania.Tests
             typeof(ColumnKeyArea),
             typeof(ColumnHitObjectArea)
         };
+
+        [Cached(typeof(IReadOnlyList<Mod>))]
+        private IReadOnlyList<Mod> mods { get; set; } = Array.Empty<Mod>();
 
         private readonly List<Column> columns = new List<Column>();
 
