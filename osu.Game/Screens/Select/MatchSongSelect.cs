@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Linq;
 using Humanizer;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -61,7 +60,7 @@ namespace osu.Game.Screens.Select
             {
                 Ruleset.Value = CurrentItem.Value.Ruleset;
                 Beatmap.Value = beatmaps.GetWorkingBeatmap(CurrentItem.Value.Beatmap);
-                Mods.Value = CurrentItem.Value.RequiredMods ?? Enumerable.Empty<Mod>();
+                Mods.Value = CurrentItem.Value.RequiredMods?.ToArray() ?? Array.Empty<Mod>();
             }
 
             Beatmap.Disabled = true;

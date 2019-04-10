@@ -310,12 +310,12 @@ namespace osu.Game.Screens.Select
                     try
                     {
                         // Try to get the beatmap with the user's ruleset
-                        playableBeatmap = beatmap.GetPlayableBeatmap(ruleset, Enumerable.Empty<Mod>());
+                        playableBeatmap = beatmap.GetPlayableBeatmap(ruleset, Array.Empty<Mod>());
                     }
                     catch (BeatmapInvalidForRulesetException)
                     {
                         // Can't be converted to the user's ruleset, so use the beatmap's own ruleset
-                        playableBeatmap = beatmap.GetPlayableBeatmap(beatmap.BeatmapInfo.Ruleset, Enumerable.Empty<Mod>());
+                        playableBeatmap = beatmap.GetPlayableBeatmap(beatmap.BeatmapInfo.Ruleset, Array.Empty<Mod>());
                     }
 
                     labels.AddRange(playableBeatmap.GetStatistics().Select(s => new InfoLabel(s)));

@@ -59,7 +59,7 @@ namespace osu.Game.Overlays
         private Bindable<WorkingBeatmap> beatmap { get; set; }
 
         [Resolved]
-        private IBindable<IEnumerable<Mod>> mods { get; set; }
+        private IBindable<IReadOnlyList<Mod>> mods { get; set; }
 
         /// <summary>
         /// Provide a source for the toolbar height.

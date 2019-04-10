@@ -42,12 +42,12 @@ namespace osu.Game.Overlays.Mods
 
         protected readonly FillFlowContainer<ModSection> ModSectionsContainer;
 
-        protected readonly Bindable<IEnumerable<Mod>> SelectedMods = new Bindable<IEnumerable<Mod>>(Enumerable.Empty<Mod>());
+        protected readonly Bindable<IReadOnlyList<Mod>> SelectedMods = new Bindable<IReadOnlyList<Mod>>(Array.Empty<Mod>());
 
         protected readonly IBindable<RulesetInfo> Ruleset = new Bindable<RulesetInfo>();
 
         [BackgroundDependencyLoader(true)]
-        private void load(OsuColour colours, IBindable<RulesetInfo> ruleset, AudioManager audio, Bindable<IEnumerable<Mod>> mods)
+        private void load(OsuColour colours, IBindable<RulesetInfo> ruleset, AudioManager audio, Bindable<IReadOnlyList<Mod>> mods)
         {
             LowMultiplierColour = colours.Red;
             HighMultiplierColour = colours.Green;
@@ -87,14 +87,14 @@ namespace osu.Game.Overlays.Mods
 
             // attempt to re-select any already selected mods.
             // this may be the first time we are receiving the ruleset, in which case they will still match.
-            selectedModsChanged(new ValueChangedEvent<IEnumerable<Mod>>(SelectedMods.Value, SelectedMods.Value));
+            selectedModsChanged(new ValueChangedEvent<IReadOnlyList<Mod>>(SelectedMods.Value, SelectedMods.Value));
 
             // write the mods back to the SelectedMods bindable in the case a change was not applicable.
             // this generally isn't required as the previous line will perform deselection; just here for safety.
             refreshSelectedMods();
         }
 
-        private void selectedModsChanged(ValueChangedEvent<IEnumerable<Mod>> e)
+        private void selectedModsChanged(ValueChangedEvent<IReadOnlyList<Mod>> e)
         {
             foreach (ModSection section in ModSectionsContainer.Children)
                 section.SelectTypes(e.NewValue.Select(m => m.GetType()).ToList());

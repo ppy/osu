@@ -24,7 +24,7 @@ namespace osu.Game.Screens.Play
     public class GameplayClockContainer : Container
     {
         private readonly WorkingBeatmap beatmap;
-        private readonly IEnumerable<Mod> mods;
+        private readonly IReadOnlyList<Mod> mods;
 
         /// <summary>
         /// The original source (usually a <see cref="WorkingBeatmap"/>'s track).
@@ -60,7 +60,7 @@ namespace osu.Game.Screens.Play
 
         private readonly FramedOffsetClock platformOffsetClock;
 
-        public GameplayClockContainer(WorkingBeatmap beatmap, IEnumerable<Mod> mods, double gameplayStartTime)
+        public GameplayClockContainer(WorkingBeatmap beatmap, IReadOnlyList<Mod> mods, double gameplayStartTime)
         {
             this.beatmap = beatmap;
             this.mods = mods;

@@ -183,7 +183,7 @@ namespace osu.Game.Tests.Visual.SongSelect
             AddAssert("mods changed before ruleset", () => modChangeIndex < rulesetChangeIndex);
             AddAssert("empty mods", () => !Mods.Value.Any());
 
-            void onModChange(ValueChangedEvent<IEnumerable<Mod>> e) => modChangeIndex = actionIndex++;
+            void onModChange(ValueChangedEvent<IReadOnlyList<Mod>> e) => modChangeIndex = actionIndex++;
             void onRulesetChange(ValueChangedEvent<RulesetInfo> e) => rulesetChangeIndex = actionIndex--;
         }
 

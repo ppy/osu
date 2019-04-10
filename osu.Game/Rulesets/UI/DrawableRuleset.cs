@@ -93,7 +93,7 @@ namespace osu.Game.Rulesets.UI
         /// </summary>
         /// <param name="ruleset">The ruleset being represented.</param>
         /// <param name="workingBeatmap">The beatmap to create the hit renderer for.</param>
-        protected DrawableRuleset(Ruleset ruleset, WorkingBeatmap workingBeatmap, IEnumerable<Mod> mods)
+        protected DrawableRuleset(Ruleset ruleset, WorkingBeatmap workingBeatmap, IReadOnlyList<Mod> mods)
             : base(ruleset)
         {
             if (workingBeatmap == null)
@@ -257,7 +257,7 @@ namespace osu.Game.Rulesets.UI
         /// Applies the active mods to the Beatmap.
         /// </summary>
         /// <param name="mods"></param>
-        private void applyBeatmapMods(IEnumerable<Mod> mods)
+        private void applyBeatmapMods(IReadOnlyList<Mod> mods)
         {
             if (mods == null)
                 return;
@@ -270,7 +270,7 @@ namespace osu.Game.Rulesets.UI
         /// Applies the active mods to this DrawableRuleset.
         /// </summary>
         /// <param name="mods"></param>
-        private void applyRulesetMods(IEnumerable<Mod> mods, OsuConfigManager config)
+        private void applyRulesetMods(IReadOnlyList<Mod> mods, OsuConfigManager config)
         {
             if (mods == null)
                 return;

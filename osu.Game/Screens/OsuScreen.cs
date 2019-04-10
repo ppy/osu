@@ -65,7 +65,7 @@ namespace osu.Game.Screens
 
         public Bindable<RulesetInfo> Ruleset { get; private set; }
 
-        public Bindable<IEnumerable<Mod>> Mods { get; private set; }
+        public Bindable<IReadOnlyList<Mod>> Mods { get; private set; }
 
         protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
         {
