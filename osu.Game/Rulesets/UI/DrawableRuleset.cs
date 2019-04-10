@@ -81,9 +81,8 @@ namespace osu.Game.Rulesets.UI
         /// <summary>
         /// The mods which are to be applied.
         /// </summary>
-        [Cached]
-        [Cached(typeof(IBindable<IEnumerable<Mod>>))]
-        private readonly Bindable<IEnumerable<Mod>> mods = new Bindable<IEnumerable<Mod>>();
+        [Cached(typeof(IReadOnlyList<Mod>))]
+        private readonly IReadOnlyList<Mod> mods;
 
         private FrameStabilityContainer frameStabilityContainer;
 
@@ -100,7 +99,7 @@ namespace osu.Game.Rulesets.UI
             if (workingBeatmap == null)
                 throw new ArgumentException("Beatmap cannot be null.", nameof(workingBeatmap));
 
-            this.mods.Value = mods;
+            this.mods = mods.ToArray();
 
             RelativeSizeAxes = Axes.Both;
 
@@ -160,7 +159,7 @@ namespace osu.Game.Rulesets.UI
                         .WithChild(ResumeOverlay)));
             }
 
-            applyRulesetMods(mods.Value, config);
+            applyRulesetMods(mods, config);
 
             loadObjects();
         }
@@ -175,7 +174,7 @@ namespace osu.Game.Rulesets.UI
 
             Playfield.PostProcess();
 
-            foreach (var mod in mods.Value.OfType<IApplicableToDrawableHitObjects>())
+            foreach (var mod in mods.OfType<IApplicableToDrawableHitObjects>())
                 mod.ApplyToDrawableHitObjects(Playfield.HitObjectContainer.Objects);
         }
 
