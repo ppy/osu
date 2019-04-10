@@ -54,7 +54,8 @@ namespace osu.Game.Screens.Select
             }
         }
 
-        private readonly SpriteText spriteText;
+        protected readonly Container textContainer;
+        protected readonly SpriteText spriteText;
         private readonly Box box;
         private readonly Box light;
 
@@ -65,7 +66,7 @@ namespace osu.Game.Screens.Select
             AutoSizeAxes = Axes.Both;
             Children = new Drawable[]
             {
-                new Container
+                textContainer = new Container
                 {
                     Size = new Vector2(100, 50),
                     Child = spriteText = new OsuSpriteText
