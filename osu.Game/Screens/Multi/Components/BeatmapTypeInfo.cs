@@ -6,7 +6,6 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
-using osu.Game.Online.Chat;
 using osuTK;
 
 namespace osu.Game.Screens.Multi.Components
@@ -60,7 +59,7 @@ namespace osu.Game.Screens.Multi.Components
                 if (beatmap != null)
                 {
                     beatmapAuthor.AddText("mapped by ", s => s.Colour = OsuColour.Gray(0.8f));
-                    beatmapAuthor.AddLink(beatmap.Metadata.Author.Username, null, LinkAction.OpenUserProfile, beatmap.Metadata.Author.Id.ToString(), "View Profile");
+                    beatmapAuthor.AddUserLink(beatmap.Metadata.Author);
                 }
             }, true);
         }
