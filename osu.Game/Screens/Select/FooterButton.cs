@@ -6,6 +6,7 @@ using osuTK;
 using osuTK.Graphics;
 using osuTK.Input;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Events;
@@ -61,8 +62,18 @@ namespace osu.Game.Screens.Select
 
         public FooterButton()
         {
+            AutoSizeAxes = Axes.Both;
             Children = new Drawable[]
             {
+                new Container
+                {
+                    Size = new Vector2(100, 50),
+                    Child = spriteText = new OsuSpriteText
+                    {
+                        Anchor = Anchor.Centre,
+                        Origin = Anchor.Centre,
+                    }
+                },
                 box = new Box
                 {
                     RelativeSizeAxes = Axes.Both,
@@ -78,11 +89,6 @@ namespace osu.Game.Screens.Select
                     EdgeSmoothness = new Vector2(2, 0),
                     RelativeSizeAxes = Axes.X,
                 },
-                spriteText = new OsuSpriteText
-                {
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
-                }
             };
         }
 
