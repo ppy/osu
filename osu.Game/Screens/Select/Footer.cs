@@ -20,9 +20,6 @@ namespace osu.Game.Screens.Select
     {
         private readonly Box modeLight;
 
-        private const float play_song_select_button_width = 100;
-        private const float play_song_select_button_height = 50;
-
         public const float HEIGHT = 50;
 
         public const int TRANSITION_LENGTH = 300;
@@ -33,6 +30,7 @@ namespace osu.Game.Screens.Select
 
         private readonly FillFlowContainer<FooterButton> buttons;
 
+        /// <param name="button">Button to be added.</param>
         /// <param name="text">Text on the button.</param>
         /// <param name="colour">Colour of the button.</param>
         /// <param name="hotkey">Hotkey of the button.</param>
@@ -41,21 +39,16 @@ namespace osu.Game.Screens.Select
         /// <para>Higher depth to be put on the left, and lower to be put on the right.</para>
         /// <para>Notice this is different to <see cref="Options.BeatmapOptionsOverlay"/>!</para>
         /// </param>
-        public void AddButton(string text, Color4 colour, Action action, Key? hotkey = null, float depth = 0)
+        public void AddButton(FooterButton button, string text, Color4 colour, Action action, Key? hotkey = null, float depth = 0)
         {
-            var button = new FooterButton
-            {
-                Text = text,
-                Height = play_song_select_button_height,
-                Width = play_song_select_button_width,
-                Depth = depth,
-                SelectedColour = colour,
-                DeselectedColour = colour.Opacity(0.5f),
-                Hotkey = hotkey,
-                Hovered = updateModeLight,
-                HoverLost = updateModeLight,
-                Action = action,
-            };
+            button.Text = text;
+            button.Depth = depth;
+            button.SelectedColour = colour;
+            button.DeselectedColour = colour.Opacity(0.5f);
+            button.Hotkey = hotkey;
+            button.Hovered = updateModeLight;
+            button.HoverLost = updateModeLight;
+            button.Action = action;
 
             buttons.Add(button);
             buttons.SetLayoutPosition(button, -depth);
@@ -71,10 +64,10 @@ namespace osu.Game.Screens.Select
         /// <para>Higher depth to be put on the left, and lower to be put on the right.</para>
         /// <para>Notice this is different to <see cref="Options.BeatmapOptionsOverlay"/>!</para>
         /// </param>
-        public void AddButton(string text, Color4 colour, OverlayContainer overlay, Key? hotkey = null, float depth = 0)
+        public void AddButton(FooterButton button, string text, Color4 colour, OverlayContainer overlay, Key? hotkey = null, float depth = 0)
         {
             overlays.Add(overlay);
-            AddButton(text, colour, () =>
+            AddButton(button, text, colour, () =>
             {
                 foreach (var o in overlays)
                 {
