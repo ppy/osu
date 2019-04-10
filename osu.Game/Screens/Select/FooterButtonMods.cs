@@ -6,7 +6,6 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.UI;
-using System;
 using System.Collections.Generic;
 using osuTK;
 
@@ -18,7 +17,7 @@ namespace osu.Game.Screens.Select
 
         private readonly FillFlowContainer<ModIcon> modIcons;
 
-        public FooterButtonMods(Bindable<IEnumerable<Mod>> mods) : base()
+        public FooterButtonMods(Bindable<IEnumerable<Mod>> mods)
         {
             Add(modIcons = new FillFlowContainer<ModIcon>
             {
@@ -26,7 +25,7 @@ namespace osu.Game.Screens.Select
                 Origin = Anchor.CentreLeft,
                 Direction = FillDirection.Horizontal,
                 AutoSizeAxes = Axes.Both,
-                Margin = new MarginPadding {Left = 80, Right = 20}
+                Margin = new MarginPadding { Left = 80, Right = 20 }
             });
 
             if (mods != null)
