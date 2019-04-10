@@ -68,7 +68,7 @@ namespace osu.Game.Screens.Play
                 RelativeSizeAxes = Axes.Both,
                 Children = new Drawable[]
                 {
-                    info = new BeatmapMetadataDisplay(Beatmap.Value, SelectedMods.Value)
+                    info = new BeatmapMetadataDisplay(Beatmap.Value, Mods.Value)
                     {
                         Alpha = 0,
                         Anchor = Anchor.Centre,

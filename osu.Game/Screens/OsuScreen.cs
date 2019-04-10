@@ -65,7 +65,7 @@ namespace osu.Game.Screens
 
         public Bindable<RulesetInfo> Ruleset { get; private set; }
 
-        public Bindable<IEnumerable<Mod>> SelectedMods { get; private set; }
+        public Bindable<IEnumerable<Mod>> Mods { get; private set; }
 
         protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
         {
@@ -73,7 +73,7 @@ namespace osu.Game.Screens
 
             Beatmap = screenDependencies.Beatmap;
             Ruleset = screenDependencies.Ruleset;
-            SelectedMods = screenDependencies.SelectedMods;
+            Mods = screenDependencies.Mods;
 
             return base.CreateChildDependencies(screenDependencies);
         }

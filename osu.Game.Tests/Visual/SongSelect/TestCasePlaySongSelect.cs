@@ -171,17 +171,17 @@ namespace osu.Game.Tests.Visual.SongSelect
 
             AddStep("change ruleset", () =>
             {
-                SelectedMods.ValueChanged += onModChange;
+                Mods.ValueChanged += onModChange;
                 songSelect.Ruleset.ValueChanged += onRulesetChange;
 
                 Ruleset.Value = new TaikoRuleset().RulesetInfo;
 
-                SelectedMods.ValueChanged -= onModChange;
+                Mods.ValueChanged -= onModChange;
                 songSelect.Ruleset.ValueChanged -= onRulesetChange;
             });
 
             AddAssert("mods changed before ruleset", () => modChangeIndex < rulesetChangeIndex);
-            AddAssert("empty mods", () => !SelectedMods.Value.Any());
+            AddAssert("empty mods", () => !Mods.Value.Any());
 
             void onModChange(ValueChangedEvent<IEnumerable<Mod>> e) => modChangeIndex = actionIndex++;
             void onRulesetChange(ValueChangedEvent<RulesetInfo> e) => rulesetChangeIndex = actionIndex--;
@@ -214,7 +214,7 @@ namespace osu.Game.Tests.Visual.SongSelect
         private static int importId;
         private int getImportId() => ++importId;
 
-        private void changeMods(params Mod[] mods) => AddStep($"change mods to {string.Join(", ", mods.Select(m => m.Acronym))}", () => SelectedMods.Value = mods);
+        private void changeMods(params Mod[] mods) => AddStep($"change mods to {string.Join(", ", mods.Select(m => m.Acronym))}", () => Mods.Value = mods);
 
         private void changeRuleset(int id) => AddStep($"change ruleset to {id}", () => Ruleset.Value = rulesets.AvailableRulesets.First(r => r.ID == id));
 

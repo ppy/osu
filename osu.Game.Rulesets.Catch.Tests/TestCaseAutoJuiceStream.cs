@@ -53,7 +53,7 @@ namespace osu.Game.Rulesets.Catch.Tests
 
         protected override Player CreatePlayer(Ruleset ruleset)
         {
-            SelectedMods.Value = SelectedMods.Value.Concat(new[] { ruleset.GetAutoplayMod() });
+            Mods.Value = Mods.Value.Concat(new[] { ruleset.GetAutoplayMod() });
             return base.CreatePlayer(ruleset);
         }
     }
