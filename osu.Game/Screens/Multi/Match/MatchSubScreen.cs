@@ -179,7 +179,7 @@ namespace osu.Game.Screens.Multi.Match
         {
             RoomManager?.PartRoom();
 
-            SelectedMods.Value = Enumerable.Empty<Mod>();
+            Mods.Value = Enumerable.Empty<Mod>();
 
             return base.OnExiting(next);
         }
@@ -193,7 +193,7 @@ namespace osu.Game.Screens.Multi.Match
             var localBeatmap = e.NewValue?.Beatmap == null ? null : beatmapManager.QueryBeatmap(b => b.OnlineBeatmapID == e.NewValue.Beatmap.OnlineBeatmapID);
 
             Beatmap.Value = beatmapManager.GetWorkingBeatmap(localBeatmap);
-            SelectedMods.Value = e.NewValue?.RequiredMods ?? Enumerable.Empty<Mod>();
+            Mods.Value = e.NewValue?.RequiredMods ?? Enumerable.Empty<Mod>();
             if (e.NewValue?.Ruleset != null)
                 Ruleset.Value = e.NewValue.Ruleset;
         }

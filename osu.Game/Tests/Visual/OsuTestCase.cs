@@ -29,7 +29,7 @@ namespace osu.Game.Tests.Visual
 
         [Cached]
         [Cached(Type = typeof(IBindable<IEnumerable<Mod>>))]
-        protected readonly Bindable<IEnumerable<Mod>> SelectedMods = new Bindable<IEnumerable<Mod>>(Enumerable.Empty<Mod>());
+        protected readonly Bindable<IEnumerable<Mod>> Mods = new Bindable<IEnumerable<Mod>>(Enumerable.Empty<Mod>());
 
         protected DependencyContainer Dependencies { get; private set; }
 

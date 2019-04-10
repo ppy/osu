@@ -59,7 +59,7 @@ namespace osu.Game.Overlays
         private Bindable<WorkingBeatmap> beatmap { get; set; }
 
         [Resolved]
-        private IBindable<IEnumerable<Mod>> selectedMods { get; set; }
+        private IBindable<IEnumerable<Mod>> mods { get; set; }
 
         /// <summary>
         /// Provide a source for the toolbar height.
@@ -235,7 +235,7 @@ namespace osu.Game.Overlays
         {
             beatmap.BindValueChanged(beatmapChanged, true);
             beatmap.BindDisabledChanged(beatmapDisabledChanged, true);
-            selectedMods.BindValueChanged(_ => updateAudioAdjustments(), true);
+            mods.BindValueChanged(_ => updateAudioAdjustments(), true);
             base.LoadComplete();
         }
 
@@ -372,7 +372,7 @@ namespace osu.Game.Overlays
 
             track.ResetSpeedAdjustments();
 
-            foreach (var mod in selectedMods.Value.OfType<IApplicableToClock>())
+            foreach (var mod in mods.Value.OfType<IApplicableToClock>())
                 mod.ApplyToClock(track);
         }
 

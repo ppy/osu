@@ -61,7 +61,7 @@ namespace osu.Game.Rulesets.UI
         private IBindable<WorkingBeatmap> beatmap { get; set; }
 
         [Resolved]
-        private IBindable<IEnumerable<Mod>> selectedMods { get; set; }
+        private IBindable<IEnumerable<Mod>> mods { get; set; }
 
         [BackgroundDependencyLoader]
         private void load()
@@ -125,7 +125,7 @@ namespace osu.Game.Rulesets.UI
             base.Update();
 
             if (beatmap != null)
-                foreach (var mod in selectedMods.Value)
+                foreach (var mod in mods.Value)
                     if (mod is IUpdatableByPlayfield updatable)
                         updatable.Update(this);
         }

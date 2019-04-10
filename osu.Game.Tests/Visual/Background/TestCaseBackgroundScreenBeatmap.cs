@@ -267,7 +267,7 @@ namespace osu.Game.Tests.Visual.Background
             AddUntilStep("Song select has selection", () => songSelect.Carousel.SelectedBeatmap != null);
             AddStep("Set default user settings", () =>
             {
-                SelectedMods.Value = SelectedMods.Value.Concat(new[] { new OsuModNoFail() });
+                Mods.Value = Mods.Value.Concat(new[] { new OsuModNoFail() });
                 songSelect.DimLevel.Value = 0.7f;
                 songSelect.BlurLevel.Value = 0.4f;
             });

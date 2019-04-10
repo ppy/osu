@@ -44,7 +44,6 @@ namespace osu.Game.Rulesets.Osu.Tests
         protected override Container<Drawable> Content => content;
 
         private int depthIndex;
-        protected readonly List<Mod> Mods = new List<Mod>();
 
         public TestCaseSlider()
         {
@@ -292,7 +291,7 @@ namespace osu.Game.Rulesets.Osu.Tests
                 Depth = depthIndex++
             };
 
-            foreach (var mod in Mods.OfType<IApplicableToDrawableHitObjects>())
+            foreach (var mod in Mods.Value.OfType<IApplicableToDrawableHitObjects>())
                 mod.ApplyToDrawableHitObjects(new[] { drawable });
 
             drawable.OnNewResult += onNewResult;

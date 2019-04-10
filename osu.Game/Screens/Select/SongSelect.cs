@@ -85,7 +85,7 @@ namespace osu.Game.Screens.Select
 
         [Cached]
         [Cached(Type = typeof(IBindable<IEnumerable<Mod>>))]
-        private readonly Bindable<IEnumerable<Mod>> selectedMods = new Bindable<IEnumerable<Mod>>(Enumerable.Empty<Mod>()); // Bound to the game's mods, but is not reset on exiting
+        private readonly Bindable<IEnumerable<Mod>> mods = new Bindable<IEnumerable<Mod>>(Enumerable.Empty<Mod>()); // Bound to the game's mods, but is not reset on exiting
 
         protected SongSelect()
         {
@@ -219,7 +219,7 @@ namespace osu.Game.Screens.Select
         [BackgroundDependencyLoader(true)]
         private void load(BeatmapManager beatmaps, AudioManager audio, DialogOverlay dialog, OsuColour colours, SkinManager skins)
         {
-            selectedMods.BindTo(SelectedMods);
+            mods.BindTo(Mods);
 
             if (Footer != null)
             {
@@ -394,7 +394,7 @@ namespace osu.Game.Screens.Select
                 {
                     Logger.Log($"ruleset changed from \"{decoupledRuleset.Value}\" to \"{ruleset}\"");
 
-                    selectedMods.Value = Enumerable.Empty<Mod>();
+                    mods.Value = Enumerable.Empty<Mod>();
                     decoupledRuleset.Value = ruleset;
 
                     // force a filter before attempting to change the beatmap.
@@ -529,8 +529,8 @@ namespace osu.Game.Screens.Select
             if (Beatmap.Value.Track != null)
                 Beatmap.Value.Track.Looping = false;
 
-            selectedMods.UnbindAll();
-            SelectedMods.Value = Enumerable.Empty<Mod>();
+            mods.UnbindAll();
+            Mods.Value = Enumerable.Empty<Mod>();
 
             return false;
         }
