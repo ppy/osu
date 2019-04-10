@@ -103,6 +103,9 @@ namespace osu.Game.Screens.Menu
         [Resolved(CanBeNull = true)]
         private NotificationOverlay notifications { get; set; }
 
+        [Resolved(CanBeNull = true)]
+        private LoginOverlay loginOverlay { get; set; }
+
         [BackgroundDependencyLoader(true)]
         private void load(AudioManager audio, IdleTracker idleTracker, GameHost host)
         {
@@ -135,7 +138,12 @@ namespace osu.Game.Screens.Menu
                 notifications?.Post(new SimpleNotification
                 {
                     Text = "You gotta be logged in to multi 'yo!",
-                    Icon = FontAwesome.Solid.Globe
+                    Icon = FontAwesome.Solid.Globe,
+                    Activated = () =>
+                    {
+                        loginOverlay?.Show();
+                        return true;
+                    }
                 });
 
                 return;
