@@ -43,7 +43,7 @@ namespace osu.Game.Screens.Play
 
         public Action<double> RequestSeek;
 
-        public HUDOverlay(ScoreProcessor scoreProcessor, DrawableRuleset drawableRuleset, IEnumerable<Mod> mods)
+        public HUDOverlay(ScoreProcessor scoreProcessor, DrawableRuleset drawableRuleset, IReadOnlyList<Mod> mods)
         {
             RelativeSizeAxes = Axes.Both;
 

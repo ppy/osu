@@ -16,7 +16,7 @@ namespace osu.Game.Screens
 
         public Bindable<RulesetInfo> Ruleset { get; }
 
-        public Bindable<IEnumerable<Mod>> Mods { get; }
+        public Bindable<IReadOnlyList<Mod>> Mods { get; }
 
         public OsuScreenDependencies(bool requireLease, IReadOnlyDependencyContainer parent)
             : base(parent)
@@ -31,15 +31,15 @@ namespace osu.Game.Screens
                 if (Ruleset == null)
                     Cache(Ruleset = parent.Get<Bindable<RulesetInfo>>().BeginLease(true));
 
-                Mods = parent.Get<LeasedBindable<IEnumerable<Mod>>>()?.GetBoundCopy();
+                Mods = parent.Get<LeasedBindable<IReadOnlyList<Mod>>>()?.GetBoundCopy();
                 if (Mods == null)
-                    Cache(Mods = parent.Get<Bindable<IEnumerable<Mod>>>().BeginLease(true));
+                    Cache(Mods = parent.Get<Bindable<IReadOnlyList<Mod>>>().BeginLease(true));
             }
             else
             {
                 Beatmap = (parent.Get<LeasedBindable<WorkingBeatmap>>() ?? parent.Get<Bindable<WorkingBeatmap>>()).GetBoundCopy();
                 Ruleset = (parent.Get<LeasedBindable<RulesetInfo>>() ?? parent.Get<Bindable<RulesetInfo>>()).GetBoundCopy();
-                Mods = (parent.Get<LeasedBindable<IEnumerable<Mod>>>() ?? parent.Get<Bindable<IEnumerable<Mod>>>()).GetBoundCopy();
+                Mods = (parent.Get<LeasedBindable<IReadOnlyList<Mod>>>() ?? parent.Get<Bindable<IReadOnlyList<Mod>>>()).GetBoundCopy();
             }
         }
     }

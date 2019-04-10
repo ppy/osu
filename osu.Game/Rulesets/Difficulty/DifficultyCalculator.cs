@@ -105,7 +105,7 @@ namespace osu.Game.Rulesets.Difficulty
         /// </summary>
         public Mod[] CreateDifficultyAdjustmentModCombinations()
         {
-            return createDifficultyAdjustmentModCombinations(Enumerable.Empty<Mod>(), DifficultyAdjustmentMods).ToArray();
+            return createDifficultyAdjustmentModCombinations(Array.Empty<Mod>(), DifficultyAdjustmentMods).ToArray();
 
             IEnumerable<Mod> createDifficultyAdjustmentModCombinations(IEnumerable<Mod> currentSet, Mod[] adjustmentSet, int currentSetCount = 0, int adjustmentSetStart = 0)
             {

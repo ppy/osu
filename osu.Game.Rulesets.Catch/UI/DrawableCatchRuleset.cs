@@ -25,7 +25,7 @@ namespace osu.Game.Rulesets.Catch.UI
 
         protected override bool UserScrollSpeedAdjustment => false;
 
-        public DrawableCatchRuleset(Ruleset ruleset, WorkingBeatmap beatmap, IEnumerable<Mod> mods)
+        public DrawableCatchRuleset(Ruleset ruleset, WorkingBeatmap beatmap, IReadOnlyList<Mod> mods)
             : base(ruleset, beatmap, mods)
         {
             Direction.Value = ScrollingDirection.Down;

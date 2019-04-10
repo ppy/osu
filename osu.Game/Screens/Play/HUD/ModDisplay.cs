@@ -18,15 +18,15 @@ using osu.Game.Graphics;
 
 namespace osu.Game.Screens.Play.HUD
 {
-    public class ModDisplay : Container, IHasCurrentValue<IEnumerable<Mod>>
+    public class ModDisplay : Container, IHasCurrentValue<IReadOnlyList<Mod>>
     {
         private const int fade_duration = 1000;
 
         public bool DisplayUnrankedText = true;
 
-        private readonly Bindable<IEnumerable<Mod>> current = new Bindable<IEnumerable<Mod>>();
+        private readonly Bindable<IReadOnlyList<Mod>> current = new Bindable<IReadOnlyList<Mod>>();
 
-        public Bindable<IEnumerable<Mod>> Current
+        public Bindable<IReadOnlyList<Mod>> Current
         {
             get => current;
             set

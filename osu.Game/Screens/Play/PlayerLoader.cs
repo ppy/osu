@@ -301,7 +301,7 @@ namespace osu.Game.Screens.Play
             }
 
             private readonly WorkingBeatmap beatmap;
-            private readonly IEnumerable<Mod> mods;
+            private readonly IReadOnlyList<Mod> mods;
             private LoadingAnimation loading;
             private Sprite backgroundSprite;
             private ModDisplay modDisplay;
@@ -323,7 +323,7 @@ namespace osu.Game.Screens.Play
                 }
             }
 
-            public BeatmapMetadataDisplay(WorkingBeatmap beatmap, IEnumerable<Mod> mods)
+            public BeatmapMetadataDisplay(WorkingBeatmap beatmap, IReadOnlyList<Mod> mods)
             {
                 this.beatmap = beatmap;
                 this.mods = mods;

@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
@@ -110,7 +109,7 @@ namespace osu.Game.Screens.Multi.Match.Components
                 },
             };
 
-            CurrentItem.BindValueChanged(item => modDisplay.Current.Value = item.NewValue?.RequiredMods ?? Enumerable.Empty<Mod>(), true);
+            CurrentItem.BindValueChanged(item => modDisplay.Current.Value = item.NewValue?.RequiredMods?.ToArray() ?? Array.Empty<Mod>(), true);
 
             beatmapButton.Action = () => RequestBeatmapSelection?.Invoke();
         }

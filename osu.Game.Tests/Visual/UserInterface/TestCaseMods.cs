@@ -253,7 +253,7 @@ namespace osu.Game.Tests.Visual.UserInterface
 
         private class TestModSelectOverlay : ModSelectOverlay
         {
-            public new Bindable<IEnumerable<Mod>> SelectedMods => base.SelectedMods;
+            public new Bindable<IReadOnlyList<Mod>> SelectedMods => base.SelectedMods;
 
             public ModButton GetModButton(Mod mod)
             {
