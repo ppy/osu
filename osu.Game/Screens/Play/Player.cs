@@ -26,12 +26,15 @@ using osu.Game.Scoring;
 using osu.Game.Screens.Ranking;
 using osu.Game.Skinning;
 using osu.Game.Storyboards.Drawables;
+using osu.Game.Users;
 
 namespace osu.Game.Screens.Play
 {
     public class Player : ScreenWithBeatmapBackground
     {
         protected override bool AllowBackButton => false; // handled by HoldForMenuButton
+
+        protected override UserStatus ScreenStatus => new UserStatusSoloGame(Beatmap.Value.BeatmapInfo);
 
         public override float BackgroundParallaxAmount => 0.1f;
 

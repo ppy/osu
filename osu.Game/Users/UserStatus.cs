@@ -3,6 +3,7 @@
 
 using osuTK.Graphics;
 using osu.Game.Graphics;
+using osu.Game.Beatmaps;
 
 namespace osu.Game.Users
 {
@@ -41,7 +42,33 @@ namespace osu.Game.Users
 
     public class UserStatusSoloGame : UserStatusBusy
     {
+        public UserStatusSoloGame(BeatmapInfo info)
+        {
+            Beatmap = info;
+        }
+
         public override string Message => @"Solo Game";
+
+        public BeatmapInfo Beatmap { get; }
+    }
+
+    public class UserStatusEditing : UserStatusBusy
+    {
+        public UserStatusEditing(BeatmapInfo info)
+        {
+            Beatmap = info;
+        }
+
+        public override string Message => @"Editing a beatmap";
+
+        public override Color4 GetAppropriateColour(OsuColour colours) => colours.GreenDarker;
+
+        public BeatmapInfo Beatmap { get; }
+    }
+
+    public class UserStatusChoosingBeatmap : UserStatusOnline
+    {
+        public override string Message => @"Choosing a beatmap";
     }
 
     public class UserStatusMultiplayerGame : UserStatusBusy
