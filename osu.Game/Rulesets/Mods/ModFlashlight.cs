@@ -95,14 +95,17 @@ namespace osu.Game.Rulesets.Mods
 
                 Combo.ValueChanged += OnComboChange;
 
-                this.FadeInFromZero(FLASHLIGHT_FADE_DURATION);
-
-                foreach (var breakPeriod in Breaks)
+                using (BeginAbsoluteSequence(0))
                 {
-                    if (breakPeriod.Duration < FLASHLIGHT_FADE_DURATION * 2) continue;
+                    this.FadeInFromZero(FLASHLIGHT_FADE_DURATION);
 
-                    this.Delay(breakPeriod.StartTime + FLASHLIGHT_FADE_DURATION).FadeOutFromOne(FLASHLIGHT_FADE_DURATION);
-                    this.Delay(breakPeriod.EndTime - FLASHLIGHT_FADE_DURATION).FadeInFromZero(FLASHLIGHT_FADE_DURATION);
+                    foreach (var breakPeriod in Breaks)
+                    {
+                        if (breakPeriod.Duration < FLASHLIGHT_FADE_DURATION * 2) continue;
+
+                        this.Delay(breakPeriod.StartTime + FLASHLIGHT_FADE_DURATION).FadeOutFromOne(FLASHLIGHT_FADE_DURATION);
+                        this.Delay(breakPeriod.EndTime - FLASHLIGHT_FADE_DURATION).FadeInFromZero(FLASHLIGHT_FADE_DURATION);
+                    }
                 }
             }
 
