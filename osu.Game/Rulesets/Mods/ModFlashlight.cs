@@ -80,7 +80,7 @@ namespace osu.Game.Rulesets.Mods
                 flashNode.ScreenSpaceDrawQuad = ScreenSpaceDrawQuad;
                 flashNode.FlashlightPosition = Vector2Extensions.Transform(FlashlightPosition, DrawInfo.Matrix);
                 flashNode.FlashlightSize = Vector2Extensions.Transform(FlashlightSize, DrawInfo.Matrix);
-                flashNode.FlashlightLightness = FlashlightLightness;
+                flashNode.FlashlightDim = FlashlightDim;
             }
 
             [BackgroundDependencyLoader]
@@ -138,16 +138,16 @@ namespace osu.Game.Rulesets.Mods
                 }
             }
 
-            private float flashlightLightness = 1.0f;
+            private float flashlightDim;
 
-            public float FlashlightLightness
+            public float FlashlightDim
             {
-                get => flashlightLightness;
+                get => flashlightDim;
                 set
                 {
-                    if (flashlightLightness == value) return;
+                    if (flashlightDim == value) return;
 
-                    flashlightLightness = value;
+                    flashlightDim = value;
                     Invalidate(Invalidation.DrawNode);
                 }
             }
@@ -159,7 +159,7 @@ namespace osu.Game.Rulesets.Mods
             public Quad ScreenSpaceDrawQuad;
             public Vector2 FlashlightPosition;
             public Vector2 FlashlightSize;
-            public float FlashlightLightness;
+            public float FlashlightDim;
 
             public override void Draw(Action<TexturedVertex2D> vertexAction)
             {
@@ -169,7 +169,7 @@ namespace osu.Game.Rulesets.Mods
 
                 Shader.GetUniform<Vector2>("flashlightPos").UpdateValue(ref FlashlightPosition);
                 Shader.GetUniform<Vector2>("flashlightSize").UpdateValue(ref FlashlightSize);
-                Shader.GetUniform<float>("flashlightLightness").UpdateValue(ref FlashlightLightness);
+                Shader.GetUniform<float>("flashlightDim").UpdateValue(ref FlashlightDim);
 
                 Texture.WhitePixel.DrawQuad(ScreenSpaceDrawQuad, DrawColourInfo.Colour, vertexAction: vertexAction);
 
