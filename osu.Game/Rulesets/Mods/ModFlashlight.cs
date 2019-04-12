@@ -80,6 +80,7 @@ namespace osu.Game.Rulesets.Mods
                 flashNode.ScreenSpaceDrawQuad = ScreenSpaceDrawQuad;
                 flashNode.FlashlightPosition = Vector2Extensions.Transform(FlashlightPosition, DrawInfo.Matrix);
                 flashNode.FlashlightSize = Vector2Extensions.Transform(FlashlightSize, DrawInfo.Matrix);
+                flashNode.FlashlightLightness = FlashlightLightness;
             }
 
             [BackgroundDependencyLoader]
@@ -136,6 +137,20 @@ namespace osu.Game.Rulesets.Mods
                     Invalidate(Invalidation.DrawNode);
                 }
             }
+
+            private float flashlightLightness = 1.0f;
+
+            public float FlashlightLightness
+            {
+                get => flashlightLightness;
+                set
+                {
+                    if (flashlightLightness == value) return;
+
+                    flashlightLightness = value;
+                    Invalidate(Invalidation.DrawNode);
+                }
+            }
         }
 
         private class FlashlightDrawNode : DrawNode
@@ -144,6 +159,7 @@ namespace osu.Game.Rulesets.Mods
             public Quad ScreenSpaceDrawQuad;
             public Vector2 FlashlightPosition;
             public Vector2 FlashlightSize;
+            public float FlashlightLightness;
 
             public override void Draw(Action<TexturedVertex2D> vertexAction)
             {
@@ -153,6 +169,7 @@ namespace osu.Game.Rulesets.Mods
 
                 Shader.GetUniform<Vector2>("flashlightPos").UpdateValue(ref FlashlightPosition);
                 Shader.GetUniform<Vector2>("flashlightSize").UpdateValue(ref FlashlightSize);
+                Shader.GetUniform<float>("flashlightLightness").UpdateValue(ref FlashlightLightness);
 
                 Texture.WhitePixel.DrawQuad(ScreenSpaceDrawQuad, DrawColourInfo.Colour, vertexAction: vertexAction);
 
