@@ -42,7 +42,7 @@ namespace osu.Game.Rulesets.Osu.Mods
             else
                 trackingSliders--;
 
-            flashlight.FlashlightLightness = trackingSliders > 0 ? 0.2f : 1.0f;
+            flashlight.FlashlightDim = trackingSliders > 0 ? 0.8f : 0.0f;
         }
 
         private class OsuFlashlight : Flashlight, IRequireHighFrequencyMousePosition
