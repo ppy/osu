@@ -7,7 +7,7 @@ using osu.Game.Screens.Play;
 
 namespace osu.Game.Rulesets.Osu.Tests
 {
-    public class TestCaseFlashlight : TestCaseOsuPlayer
+    public class TestCaseOsuFlashlight : TestCaseOsuPlayer
     {
         protected override Player CreatePlayer(Ruleset ruleset)
         {
