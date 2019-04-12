@@ -1,23 +1,49 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Collections.Generic;
+using System.Linq;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Input;
 using osu.Framework.Input.Events;
 using osu.Game.Rulesets.Mods;
+using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Osu.Objects;
+using osu.Game.Rulesets.Osu.Objects.Drawables;
 using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Mods
 {
-    public class OsuModFlashlight : ModFlashlight<OsuHitObject>
+    public class OsuModFlashlight : ModFlashlight<OsuHitObject>, IApplicableToDrawableHitObjects
     {
         public override double ScoreMultiplier => 1.12;
 
         private const float default_flashlight_size = 180;
 
-        public override Flashlight CreateFlashlight() => new OsuFlashlight();
+        private int trackingSliders;
+
+        private OsuFlashlight flashlight;
+
+        public override Flashlight CreateFlashlight() => flashlight = new OsuFlashlight();
+
+        public void ApplyToDrawableHitObjects(IEnumerable<DrawableHitObject> drawables)
+        {
+            foreach (DrawableSlider drawable in drawables.OfType<DrawableSlider>())
+            {
+                drawable.Tracking.ValueChanged += updateTrackingSliders;
+            }
+        }
+
+        private void updateTrackingSliders(ValueChangedEvent<bool> value)
+        {
+            if (value.NewValue)
+                trackingSliders++;
+            else
+                trackingSliders--;
+
+            flashlight.FlashlightLightness = trackingSliders > 0 ? 0.2f : 1.0f;
+        }
 
         private class OsuFlashlight : Flashlight, IRequireHighFrequencyMousePosition
         {
