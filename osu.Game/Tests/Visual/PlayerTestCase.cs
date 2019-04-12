@@ -3,15 +3,13 @@
 
 using System.Linq;
 using osu.Framework.Allocation;
-using osu.Framework.Graphics;
-using osu.Framework.Graphics.Shapes;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps;
+using osu.Game.Configuration;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Screens.Play;
 using osu.Game.Tests.Beatmaps;
-using osuTK.Graphics;
 
 namespace osu.Game.Tests.Visual
 {
@@ -29,12 +27,9 @@ namespace osu.Game.Tests.Visual
         [BackgroundDependencyLoader]
         private void load()
         {
-            Add(new Box
-            {
-                RelativeSizeAxes = Axes.Both,
-                Colour = Color4.Black,
-                Depth = int.MaxValue
-            });
+            OsuConfigManager manager;
+            Dependencies.Cache(manager = new OsuConfigManager(LocalStorage));
+            manager.GetBindable<double>(OsuSetting.DimLevel).Value = 1.0;
         }
 
         [SetUpSteps]
