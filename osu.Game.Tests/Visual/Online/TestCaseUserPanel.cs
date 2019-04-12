@@ -43,11 +43,13 @@ namespace osu.Game.Tests.Visual.Online
             });
 
             flyte.Status.Value = new UserStatusOnline();
-            peppy.Status.Value = new UserStatusSoloGame();
+            peppy.Status.Value = new UserStatusSoloGame(new Game.Beatmaps.BeatmapInfo());
 
             AddStep(@"spectating", () => { flyte.Status.Value = new UserStatusSpectating(); });
             AddStep(@"multiplaying", () => { flyte.Status.Value = new UserStatusMultiplayerGame(); });
             AddStep(@"modding", () => { flyte.Status.Value = new UserStatusModding(); });
+            AddStep(@"editing", () => { flyte.Status.Value = new UserStatusEditing(null); });
+            AddStep(@"choosing", () => { flyte.Status.Value = new UserStatusChoosingBeatmap(); });
             AddStep(@"offline", () => { flyte.Status.Value = new UserStatusOffline(); });
             AddStep(@"null status", () => { flyte.Status.Value = null; });
         }
