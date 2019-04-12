@@ -21,8 +21,6 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         private const float default_flashlight_size = 180;
 
-        private int trackingSliders;
-
         private OsuFlashlight flashlight;
 
         public override Flashlight CreateFlashlight() => flashlight = new OsuFlashlight();
@@ -31,25 +29,28 @@ namespace osu.Game.Rulesets.Osu.Mods
         {
             foreach (DrawableSlider drawable in drawables.OfType<DrawableSlider>())
             {
-                drawable.Tracking.ValueChanged += updateTrackingSliders;
+                drawable.Tracking.ValueChanged += flashlight.OnSliderTrackingChange;
             }
-        }
-
-        private void updateTrackingSliders(ValueChangedEvent<bool> value)
-        {
-            if (value.NewValue)
-                trackingSliders++;
-            else
-                trackingSliders--;
-
-            flashlight.FlashlightDim = trackingSliders > 0 ? 0.8f : 0.0f;
         }
 
         private class OsuFlashlight : Flashlight, IRequireHighFrequencyMousePosition
         {
+            private int trackingSliders;
+
             public OsuFlashlight()
             {
                 FlashlightSize = new Vector2(0, getSizeFor(0));
+            }
+
+            public void OnSliderTrackingChange(ValueChangedEvent<bool> e)
+            {
+                if (e.NewValue)
+                    trackingSliders++;
+                else
+                    trackingSliders--;
+
+                // If there are any sliders in a tracking state, apply a dim to the entire playfield over a brief duration.
+                this.TransformTo(nameof(FlashlightDim), trackingSliders > 0 ? 0.8f : 0.0f, 50);
             }
 
             protected override bool OnMouseMove(MouseMoveEvent e)
