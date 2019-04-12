@@ -14,6 +14,8 @@ using osu.Game.Input.Bindings;
 using osu.Game.Rulesets;
 using osu.Game.Screens.Menu;
 using osu.Game.Overlays;
+using osu.Game.Users;
+using osu.Game.Online.API;
 
 namespace osu.Game.Screens
 {
@@ -51,6 +53,14 @@ namespace osu.Game.Screens
         protected new OsuGameBase Game => base.Game as OsuGameBase;
 
         /// <summary>
+        /// The <see cref="UserStatus"/> to set the user's status automatically to when this screen is entered / resumed.
+        /// Note that the user status won't be automatically set if :
+        /// <para>- <see cref="ScreenStatus"/> is overriden and returns null</para>
+        /// <para>- The current <see cref="UserStatus"/> is <see cref="UserStatusDoNotDisturb"/> or <see cref="UserStatusOffline"/></para>
+        /// </summary>
+        protected virtual UserStatus ScreenStatus => new UserStatusOnline();
+
+        /// <summary>
         /// Whether to disallow changes to game-wise Beatmap/Ruleset bindables for this screen (and all children).
         /// </summary>
         public virtual bool DisallowExternalBeatmapRulesetChanges => false;
@@ -82,6 +92,9 @@ namespace osu.Game.Screens
 
         [Resolved(canBeNull: true)]
         private OsuLogo logo { get; set; }
+
+        [Resolved(canBeNull: true)]
+        private IAPIProvider api { get; set; }
 
         protected OsuScreen()
         {
@@ -115,6 +128,8 @@ namespace osu.Game.Screens
             sampleExit?.Play();
             applyArrivingDefaults(true);
 
+            setUserStatus(ScreenStatus);
+
             base.OnResuming(last);
         }
 
@@ -129,6 +144,8 @@ namespace osu.Game.Screens
             applyArrivingDefaults(false);
 
             backgroundStack?.Push(localBackground = CreateBackground());
+
+            setUserStatus(ScreenStatus);
 
             base.OnEntering(last);
         }
@@ -145,6 +162,12 @@ namespace osu.Game.Screens
                 backgroundStack?.Exit();
 
             return false;
+        }
+
+        private void setUserStatus(UserStatus status)
+        {
+            if (api != null && status != null && !(api.LocalUser.Value.Status.Value is UserStatusDoNotDisturb) && !(api.LocalUser.Value.Status.Value is UserStatusOffline)) //only sets the user's status to the given one if
+                api.LocalUser.Value.Status.Value = status; //status is not null and the current status isn't either UserStatusDoNotDisturb or UserStatusOffline
         }
 
         /// <summary>
