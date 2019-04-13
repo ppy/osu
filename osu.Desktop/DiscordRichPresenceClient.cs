@@ -50,7 +50,7 @@ namespace osu.Desktop
             {
                 case UserStatusSoloGame game:
                     presence.State = $"{game.Beatmap.Metadata.Artist} - {game.Beatmap.Metadata.Title} [{game.Beatmap.Version}]";
-                    setPresenceGamemode(game.Beatmap.Ruleset, presence);
+                    setPresenceGamemode(game.Ruleset, presence);
                     break;
 
                 case UserStatusEditing editing:
