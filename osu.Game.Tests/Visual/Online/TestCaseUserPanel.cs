@@ -43,7 +43,7 @@ namespace osu.Game.Tests.Visual.Online
             });
 
             flyte.Status.Value = new UserStatusOnline();
-            peppy.Status.Value = new UserStatusSoloGame(new Game.Beatmaps.BeatmapInfo());
+            peppy.Status.Value = new UserStatusSoloGame(null, null);
 
             AddStep(@"spectating", () => { flyte.Status.Value = new UserStatusSpectating(); });
             AddStep(@"multiplaying", () => { flyte.Status.Value = new UserStatusMultiplayerGame(); });
