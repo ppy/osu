@@ -19,6 +19,7 @@ using osu.Game.Graphics.UserInterface;
 using osu.Game.Screens.Menu;
 using osu.Game.Screens.Play.HUD;
 using osu.Game.Screens.Play.PlayerSettings;
+using osu.Game.Users;
 using osuTK;
 using osuTK.Graphics;
 
@@ -38,6 +39,8 @@ namespace osu.Game.Screens.Play
 
         private bool hideOverlays;
         public override bool HideOverlaysOnEnter => hideOverlays;
+
+        protected override UserStatus ScreenStatus => null; //shows the previous screen status
 
         public override bool DisallowExternalBeatmapRulesetChanges => true;
 

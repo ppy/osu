@@ -42,14 +42,17 @@ namespace osu.Game.Users
 
     public class UserStatusSoloGame : UserStatusBusy
     {
-        public UserStatusSoloGame(BeatmapInfo info)
+        public UserStatusSoloGame(BeatmapInfo info, Rulesets.RulesetInfo ruleset)
         {
             Beatmap = info;
+            Ruleset = ruleset;
         }
 
         public override string Message => @"Solo Game";
 
         public BeatmapInfo Beatmap { get; }
+
+        public Rulesets.RulesetInfo Ruleset { get; }
     }
 
     public class UserStatusEditing : UserStatusBusy
