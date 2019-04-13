@@ -23,8 +23,6 @@ namespace osu.Game.Screens.Play
 
         private readonly Container fadeContainer;
 
-        public bool IsActive { get; private set; }
-
         public List<BreakPeriod> Breaks
         {
             get => breaks;
@@ -127,7 +125,6 @@ namespace osu.Game.Screens.Play
 
                 using (BeginAbsoluteSequence(b.StartTime, true))
                 {
-                    Schedule(() => IsActive = true);
                     fadeContainer.FadeIn(fade_duration);
                     breakArrows.Show(fade_duration);
 
@@ -145,7 +142,6 @@ namespace osu.Game.Screens.Play
 
                     using (BeginDelayedSequence(b.Duration - fade_duration, true))
                     {
-                        Schedule(() => IsActive = false);
                         fadeContainer.FadeOut(fade_duration);
                         breakArrows.Hide(fade_duration);
                     }
