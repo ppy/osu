@@ -4,44 +4,40 @@
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Game.Screens.Play.HUD;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.UI;
 using System.Collections.Generic;
 using osuTK;
+using osu.Framework.Input.Events;
 
 namespace osu.Game.Screens.Select
 {
     public class FooterButtonMods : FooterButton
     {
-        private readonly Bindable<IEnumerable<Mod>> selectedMods = new Bindable<IEnumerable<Mod>>();
-
-        private readonly FillFlowContainer<ModIcon> modIcons;
+        private readonly FooterModDisplay modDisplay;
 
         public FooterButtonMods(Bindable<IEnumerable<Mod>> mods)
         {
-            Add(modIcons = new FillFlowContainer<ModIcon>
+            Add(new Container
             {
                 Anchor = Anchor.CentreLeft,
                 Origin = Anchor.CentreLeft,
-                Direction = FillDirection.Horizontal,
+                Child = modDisplay = new FooterModDisplay {
+                    DisplayUnrankedText = false,
+                    Scale = new Vector2(0.8f)
+                },
                 AutoSizeAxes = Axes.Both,
-                Margin = new MarginPadding { Left = 80, Right = 20 }
+                Margin = new MarginPadding { Left = 70 }
             });
 
             if (mods != null)
-            {
-                selectedMods.BindTo(mods);
-                selectedMods.ValueChanged += updateModIcons;
-            }
+                modDisplay.Current = mods;
         }
 
-        private void updateModIcons(ValueChangedEvent<IEnumerable<Mod>> mods)
+        private class FooterModDisplay : ModDisplay
         {
-            modIcons.Clear();
-            foreach (Mod mod in mods.NewValue)
-            {
-                modIcons.Add(new ModIcon(mod) { Scale = new Vector2(0.4f) });
-            }
+            public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => Parent?.Parent?.ReceivePositionalInputAt(screenSpacePos) ?? false;
         }
     }
 }
