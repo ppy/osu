@@ -6,19 +6,17 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Screens.Play.HUD;
 using osu.Game.Rulesets.Mods;
-using osu.Game.Rulesets.UI;
 using System.Collections.Generic;
 using osuTK;
-using osu.Framework.Input.Events;
 
 namespace osu.Game.Screens.Select
 {
     public class FooterButtonMods : FooterButton
     {
-        private readonly FooterModDisplay modDisplay;
-
         public FooterButtonMods(Bindable<IEnumerable<Mod>> mods)
         {
+            FooterModDisplay modDisplay;
+
             Add(new Container
             {
                 Anchor = Anchor.CentreLeft,
