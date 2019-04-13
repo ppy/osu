@@ -21,11 +21,11 @@ namespace osu.Game.Screens.Select
 
         public string Text
         {
-            get => spriteText?.Text;
+            get => SpriteText?.Text;
             set
             {
-                if (spriteText != null)
-                    spriteText.Text = value;
+                if (SpriteText != null)
+                    SpriteText.Text = value;
             }
         }
 
@@ -54,8 +54,8 @@ namespace osu.Game.Screens.Select
             }
         }
 
-        protected readonly Container textContainer;
-        protected readonly SpriteText spriteText;
+        protected readonly Container TextContainer;
+        protected readonly SpriteText SpriteText;
         private readonly Box box;
         private readonly Box light;
 
@@ -66,10 +66,10 @@ namespace osu.Game.Screens.Select
             AutoSizeAxes = Axes.Both;
             Children = new Drawable[]
             {
-                textContainer = new Container
+                TextContainer = new Container
                 {
                     Size = new Vector2(100, 50),
-                    Child = spriteText = new OsuSpriteText
+                    Child = SpriteText = new OsuSpriteText
                     {
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
