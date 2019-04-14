@@ -91,7 +91,7 @@ namespace osu.Desktop
             Assets = new Assets
             {
                 LargeImageKey = "lazer",
-                LargeImageText = "osu!lazer"
+                LargeImageText = user.Value.Username
             }
         };
 
