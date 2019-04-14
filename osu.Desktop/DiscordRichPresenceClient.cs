@@ -15,7 +15,7 @@ namespace osu.Desktop
 {
     internal class DiscordRichPresenceClient : Component
     {
-        private const string client_id = "559391129716391967";
+        private const string client_id = "563024054391537674";
 
         private Bindable<User> user;
 
@@ -54,7 +54,9 @@ namespace osu.Desktop
                     break;
 
                 case UserStatusEditing editing:
-                    presence.State = $"{editing.Beatmap.Metadata.Artist} - {editing.Beatmap.Metadata.Title}" + (editing.Beatmap.Version != null ? $"[{editing.Beatmap.Version}]" : "");
+                    presence.State = $"{editing.Beatmap.Metadata.Artist} - {editing.Beatmap.Metadata.Title} " + (!string.IsNullOrEmpty(editing.Beatmap.Version) ? $"[{editing.Beatmap.Version}]" : "");
+                    presence.Assets.SmallImageKey = "edit";
+                    presence.Assets.SmallImageText = "editing";
                     break;
             }
 
@@ -79,6 +81,10 @@ namespace osu.Desktop
 
                 case 3:
                     presence.Assets.SmallImageKey = "mania";
+                    break;
+
+                default:
+                    presence.Assets.SmallImageKey = "unknown";
                     break;
             }
 
