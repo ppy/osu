@@ -55,7 +55,7 @@ namespace osu.Game.Tests.Visual
             Beatmap.Value = new TestWorkingBeatmap(beatmap, Clock);
 
             if (!AllowFail)
-                Beatmap.Value.Mods.Value = new[] { ruleset.GetAllMods().First(m => m is ModNoFail) };
+                Mods.Value = new[] { ruleset.GetAllMods().First(m => m is ModNoFail) };
 
             Player = CreatePlayer(ruleset);
             LoadScreen(Player);

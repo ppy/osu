@@ -4,11 +4,13 @@
 using System;
 using System.Collections.Generic;
 using NUnit.Framework;
+using osu.Framework.Allocation;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Configuration;
+using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Timing;
@@ -22,6 +24,9 @@ namespace osu.Game.Tests.Visual.Gameplay
     public class TestCaseScrollingHitObjects : OsuTestCase
     {
         public override IReadOnlyList<Type> RequiredTypes => new[] { typeof(Playfield) };
+
+        [Cached(typeof(IReadOnlyList<Mod>))]
+        private IReadOnlyList<Mod> mods { get; set; } = Array.Empty<Mod>();
 
         private readonly ScrollingTestContainer[] scrollContainers = new ScrollingTestContainer[4];
         private readonly TestPlayfield[] playfields = new TestPlayfield[4];
