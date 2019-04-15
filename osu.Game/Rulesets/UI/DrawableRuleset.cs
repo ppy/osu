@@ -11,7 +11,6 @@ using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics.Cursor;
@@ -82,7 +81,8 @@ namespace osu.Game.Rulesets.UI
         /// <summary>
         /// The mods which are to be applied.
         /// </summary>
-        private readonly IEnumerable<Mod> mods;
+        [Cached(typeof(IReadOnlyList<Mod>))]
+        private readonly IReadOnlyList<Mod> mods;
 
         private FrameStabilityContainer frameStabilityContainer;
 
@@ -93,16 +93,18 @@ namespace osu.Game.Rulesets.UI
         /// </summary>
         /// <param name="ruleset">The ruleset being represented.</param>
         /// <param name="workingBeatmap">The beatmap to create the hit renderer for.</param>
-        protected DrawableRuleset(Ruleset ruleset, WorkingBeatmap workingBeatmap)
+        protected DrawableRuleset(Ruleset ruleset, WorkingBeatmap workingBeatmap, IReadOnlyList<Mod> mods)
             : base(ruleset)
         {
-            Debug.Assert(workingBeatmap != null, "DrawableRuleset initialized with a null beatmap.");
+            if (workingBeatmap == null)
+                throw new ArgumentException("Beatmap cannot be null.", nameof(workingBeatmap));
+
+            this.mods = mods.ToArray();
 
             RelativeSizeAxes = Axes.Both;
 
-            Beatmap = (Beatmap<TObject>)workingBeatmap.GetPlayableBeatmap(ruleset.RulesetInfo);
+            Beatmap = (Beatmap<TObject>)workingBeatmap.GetPlayableBeatmap(ruleset.RulesetInfo, mods);
 
-            mods = workingBeatmap.Mods.Value;
             applyBeatmapMods(mods);
 
             KeyBindingInputManager = CreateInputManager();
@@ -255,7 +257,7 @@ namespace osu.Game.Rulesets.UI
         /// Applies the active mods to the Beatmap.
         /// </summary>
         /// <param name="mods"></param>
-        private void applyBeatmapMods(IEnumerable<Mod> mods)
+        private void applyBeatmapMods(IReadOnlyList<Mod> mods)
         {
             if (mods == null)
                 return;
@@ -268,7 +270,7 @@ namespace osu.Game.Rulesets.UI
         /// Applies the active mods to this DrawableRuleset.
         /// </summary>
         /// <param name="mods"></param>
-        private void applyRulesetMods(IEnumerable<Mod> mods, OsuConfigManager config)
+        private void applyRulesetMods(IReadOnlyList<Mod> mods, OsuConfigManager config)
         {
             if (mods == null)
                 return;
