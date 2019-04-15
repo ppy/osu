@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
@@ -10,15 +11,25 @@ using osu.Framework.Platform;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets;
+using osu.Game.Rulesets.Mods;
 
 namespace osu.Game.Tests.Visual
 {
     public abstract class OsuTestCase : TestCase
     {
+        [Cached(typeof(Bindable<WorkingBeatmap>))]
+        [Cached(typeof(IBindable<WorkingBeatmap>))]
         private readonly OsuTestBeatmap beatmap = new OsuTestBeatmap(new DummyWorkingBeatmap());
+
         protected BindableBeatmap Beatmap => beatmap;
 
+        [Cached]
+        [Cached(typeof(IBindable<RulesetInfo>))]
         protected readonly Bindable<RulesetInfo> Ruleset = new Bindable<RulesetInfo>();
+
+        [Cached]
+        [Cached(Type = typeof(IBindable<IReadOnlyList<Mod>>))]
+        protected readonly Bindable<IReadOnlyList<Mod>> Mods = new Bindable<IReadOnlyList<Mod>>(Array.Empty<Mod>());
 
         protected DependencyContainer Dependencies { get; private set; }
 
@@ -27,18 +38,10 @@ namespace osu.Game.Tests.Visual
 
         protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
         {
-            Dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
-
             // This is the earliest we can get OsuGameBase, which is used by the dummy working beatmap to find textures
-            beatmap.Default = new DummyWorkingBeatmap(Dependencies.Get<OsuGameBase>());
+            beatmap.Default = new DummyWorkingBeatmap(parent.Get<OsuGameBase>());
 
-            Dependencies.CacheAs<Bindable<WorkingBeatmap>>(beatmap);
-            Dependencies.CacheAs<IBindable<WorkingBeatmap>>(beatmap);
-
-            Dependencies.CacheAs(Ruleset);
-            Dependencies.CacheAs<IBindable<RulesetInfo>>(Ruleset);
-
-            return Dependencies;
+            return Dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
         }
 
         protected OsuTestCase()
