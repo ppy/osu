@@ -52,10 +52,10 @@ namespace osu.Game.Screens.Select
                 var auto = Ruleset.Value.CreateInstance().GetAutoplayMod();
                 var autoType = auto.GetType();
 
-                var mods = SelectedMods.Value;
+                var mods = Mods.Value;
                 if (mods.All(m => m.GetType() != autoType))
                 {
-                    SelectedMods.Value = mods.Append(auto);
+                    Mods.Value = mods.Append(auto).ToArray();
                     removeAutoModOnResume = true;
                 }
             }

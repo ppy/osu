@@ -1,7 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System.Linq;
+using System;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -179,7 +179,7 @@ namespace osu.Game.Screens.Multi.Match
         {
             RoomManager?.PartRoom();
 
-            SelectedMods.Value = Enumerable.Empty<Mod>();
+            Mods.Value = Array.Empty<Mod>();
 
             return base.OnExiting(next);
         }
@@ -193,7 +193,7 @@ namespace osu.Game.Screens.Multi.Match
             var localBeatmap = e.NewValue?.Beatmap == null ? null : beatmapManager.QueryBeatmap(b => b.OnlineBeatmapID == e.NewValue.Beatmap.OnlineBeatmapID);
 
             Beatmap.Value = beatmapManager.GetWorkingBeatmap(localBeatmap);
-            SelectedMods.Value = e.NewValue?.RequiredMods ?? Enumerable.Empty<Mod>();
+            Mods.Value = e.NewValue?.RequiredMods?.ToArray() ?? Array.Empty<Mod>();
             if (e.NewValue?.Ruleset != null)
                 Ruleset.Value = e.NewValue.Ruleset;
         }

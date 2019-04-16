@@ -23,7 +23,8 @@ namespace osu.Game.Screens.Play
     /// </summary>
     public class GameplayClockContainer : Container
     {
-        private readonly IEnumerable<Mod> mods;
+        private readonly WorkingBeatmap beatmap;
+        private readonly IReadOnlyList<Mod> mods;
 
         /// <summary>
         /// The original source (usually a <see cref="WorkingBeatmap"/>'s track).
@@ -36,6 +37,8 @@ namespace osu.Game.Screens.Play
         /// The decoupled clock used for gameplay. Should be used for seeks and clock control.
         /// </summary>
         private readonly DecoupleableInterpolatingFramedClock adjustableClock;
+
+        private readonly double gameplayStartTime;
 
         public readonly Bindable<double> UserPlaybackRate = new BindableDouble(1)
         {
@@ -53,11 +56,15 @@ namespace osu.Game.Screens.Play
 
         private Bindable<double> userAudioOffset;
 
-        private readonly FramedOffsetClock offsetClock;
+        private readonly FramedOffsetClock userOffsetClock;
 
-        public GameplayClockContainer(WorkingBeatmap beatmap, IEnumerable<Mod> mods, double gameplayStartTime)
+        private readonly FramedOffsetClock platformOffsetClock;
+
+        public GameplayClockContainer(WorkingBeatmap beatmap, IReadOnlyList<Mod> mods, double gameplayStartTime)
         {
+            this.beatmap = beatmap;
             this.mods = mods;
+            this.gameplayStartTime = gameplayStartTime;
 
             RelativeSizeAxes = Axes.Both;
 
@@ -65,30 +72,31 @@ namespace osu.Game.Screens.Play
 
             adjustableClock = new DecoupleableInterpolatingFramedClock { IsCoupled = false };
 
-            adjustableClock.Seek(Math.Min(0, gameplayStartTime - beatmap.BeatmapInfo.AudioLeadIn));
-
-            adjustableClock.ProcessFrame();
-
             // Lazer's audio timings in general doesn't match stable. This is the result of user testing, albeit limited.
             // This only seems to be required on windows. We need to eventually figure out why, with a bit of luck.
-            var platformOffsetClock = new FramedOffsetClock(adjustableClock) { Offset = RuntimeInfo.OS == RuntimeInfo.Platform.Windows ? 22 : 0 };
+            platformOffsetClock = new FramedOffsetClock(adjustableClock) { Offset = RuntimeInfo.OS == RuntimeInfo.Platform.Windows ? 22 : 0 };
 
             // the final usable gameplay clock with user-set offsets applied.
-            offsetClock = new FramedOffsetClock(platformOffsetClock);
+            userOffsetClock = new FramedOffsetClock(platformOffsetClock);
 
             // the clock to be exposed via DI to children.
-            GameplayClock = new GameplayClock(offsetClock);
+            GameplayClock = new GameplayClock(userOffsetClock);
 
             GameplayClock.IsPaused.BindTo(IsPaused);
         }
+
+        private double totalOffset => userOffsetClock.Offset + platformOffsetClock.Offset;
 
         [BackgroundDependencyLoader]
         private void load(OsuConfigManager config)
         {
             userAudioOffset = config.GetBindable<double>(OsuSetting.AudioOffset);
-            userAudioOffset.BindValueChanged(offset => offsetClock.Offset = offset.NewValue, true);
+            userAudioOffset.BindValueChanged(offset => userOffsetClock.Offset = offset.NewValue, true);
 
             UserPlaybackRate.ValueChanged += _ => updateRate();
+
+            Seek(Math.Min(0, gameplayStartTime - beatmap.BeatmapInfo.AudioLeadIn));
+            adjustableClock.ProcessFrame();
         }
 
         public void Restart()
@@ -105,9 +113,7 @@ namespace osu.Game.Screens.Play
                     this.Delay(750).Schedule(() =>
                     {
                         if (!IsPaused.Value)
-                        {
-                            adjustableClock.Start();
-                        }
+                            Start();
                     });
                 });
             });
@@ -122,7 +128,19 @@ namespace osu.Game.Screens.Play
             IsPaused.Value = false;
         }
 
-        public void Seek(double time) => adjustableClock.Seek(time);
+        /// <summary>
+        /// Seek to a specific time in gameplay.
+        /// <remarks>
+        /// Adjusts for any offsets which have been applied (so the seek may not be the expected point in time on the underlying audio track).
+        /// </remarks>
+        /// </summary>
+        /// <param name="time">The destination time to seek to.</param>
+        public void Seek(double time)
+        {
+            // remove the offset component here because most of the time we want the seek to be aligned to gameplay, not the audio track.
+            // we may want to consider reversing the application of offsets in the future as it may feel more correct.
+            adjustableClock.Seek(time - totalOffset);
+        }
 
         public void Stop()
         {
@@ -139,7 +157,7 @@ namespace osu.Game.Screens.Play
         protected override void Update()
         {
             if (!IsPaused.Value)
-                offsetClock.ProcessFrame();
+                userOffsetClock.ProcessFrame();
 
             base.Update();
         }

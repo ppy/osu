@@ -3,7 +3,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
@@ -88,7 +87,7 @@ namespace osu.Game.Rulesets.Taiko.Tests
                 Origin = Anchor.Centre,
                 RelativeSizeAxes = Axes.X,
                 Height = 768,
-                Children = new[] { drawableRuleset = new DrawableTaikoRuleset(new TaikoRuleset(), beatmap, Enumerable.Empty<Mod>()) }
+                Children = new[] { drawableRuleset = new DrawableTaikoRuleset(new TaikoRuleset(), beatmap, Array.Empty<Mod>()) }
             });
         }
 

@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Linq;
 using Humanizer;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -42,7 +41,7 @@ namespace osu.Game.Screens.Select
                 RulesetID = Ruleset.Value.ID ?? 0
             };
 
-            item.RequiredMods.AddRange(SelectedMods.Value);
+            item.RequiredMods.AddRange(Mods.Value);
 
             Selected?.Invoke(item);
 
@@ -61,12 +60,12 @@ namespace osu.Game.Screens.Select
             {
                 Ruleset.Value = CurrentItem.Value.Ruleset;
                 Beatmap.Value = beatmaps.GetWorkingBeatmap(CurrentItem.Value.Beatmap);
-                SelectedMods.Value = CurrentItem.Value.RequiredMods ?? Enumerable.Empty<Mod>();
+                Mods.Value = CurrentItem.Value.RequiredMods?.ToArray() ?? Array.Empty<Mod>();
             }
 
             Beatmap.Disabled = true;
             Ruleset.Disabled = true;
-            SelectedMods.Disabled = true;
+            Mods.Disabled = true;
 
             return false;
         }
@@ -77,7 +76,7 @@ namespace osu.Game.Screens.Select
 
             Beatmap.Disabled = false;
             Ruleset.Disabled = false;
-            SelectedMods.Disabled = false;
+            Mods.Disabled = false;
         }
     }
 }

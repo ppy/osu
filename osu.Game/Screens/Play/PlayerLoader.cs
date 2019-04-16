@@ -68,7 +68,7 @@ namespace osu.Game.Screens.Play
                 RelativeSizeAxes = Axes.Both,
                 Children = new Drawable[]
                 {
-                    info = new BeatmapMetadataDisplay(Beatmap.Value, SelectedMods.Value)
+                    info = new BeatmapMetadataDisplay(Beatmap.Value, Mods.Value)
                     {
                         Alpha = 0,
                         Anchor = Anchor.Centre,
@@ -301,7 +301,7 @@ namespace osu.Game.Screens.Play
             }
 
             private readonly WorkingBeatmap beatmap;
-            private readonly IEnumerable<Mod> mods;
+            private readonly IReadOnlyList<Mod> mods;
             private LoadingAnimation loading;
             private Sprite backgroundSprite;
             private ModDisplay modDisplay;
@@ -323,7 +323,7 @@ namespace osu.Game.Screens.Play
                 }
             }
 
-            public BeatmapMetadataDisplay(WorkingBeatmap beatmap, IEnumerable<Mod> mods)
+            public BeatmapMetadataDisplay(WorkingBeatmap beatmap, IReadOnlyList<Mod> mods)
             {
                 this.beatmap = beatmap;
                 this.mods = mods;

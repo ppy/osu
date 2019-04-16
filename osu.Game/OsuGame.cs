@@ -112,8 +112,8 @@ namespace osu.Game
 
         // todo: move this to SongSelect once Screen has the ability to unsuspend.
         [Cached]
-        [Cached(Type = typeof(IBindable<IEnumerable<Mod>>))]
-        private readonly Bindable<IEnumerable<Mod>> selectedMods = new Bindable<IEnumerable<Mod>>(Enumerable.Empty<Mod>());
+        [Cached(typeof(IBindable<IReadOnlyList<Mod>>))]
+        private readonly Bindable<IReadOnlyList<Mod>> mods = new Bindable<IReadOnlyList<Mod>>(Array.Empty<Mod>());
 
         public OsuGame(string[] args = null)
         {
@@ -294,7 +294,7 @@ namespace osu.Game
             {
                 ruleset.Value = databasedScoreInfo.Ruleset;
                 Beatmap.Value = BeatmapManager.GetWorkingBeatmap(databasedBeatmap);
-                selectedMods.Value = databasedScoreInfo.Mods;
+                mods.Value = databasedScoreInfo.Mods;
 
                 menuScreen.Push(new PlayerLoader(() => new ReplayPlayer(databasedScore)));
             }, $"watch {databasedScoreInfo}", bypassScreenAllowChecks: true);

@@ -105,7 +105,7 @@ namespace osu.Game.Rulesets.UI
             {
                 if (Math.Abs(manualClock.CurrentTime - newProposedTime) > sixty_frame_time * 1.2f)
                 {
-                    newProposedTime = manualClock.Rate > 0
+                    newProposedTime = newProposedTime > manualClock.CurrentTime
                         ? Math.Min(newProposedTime, manualClock.CurrentTime + sixty_frame_time)
                         : Math.Max(newProposedTime, manualClock.CurrentTime - sixty_frame_time);
                 }
