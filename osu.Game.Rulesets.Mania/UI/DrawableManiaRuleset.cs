@@ -40,7 +40,7 @@ namespace osu.Game.Rulesets.Mania.UI
 
         private readonly Bindable<ManiaScrollingDirection> configDirection = new Bindable<ManiaScrollingDirection>();
 
-        public DrawableManiaRuleset(Ruleset ruleset, WorkingBeatmap beatmap, IEnumerable<Mod> mods)
+        public DrawableManiaRuleset(Ruleset ruleset, WorkingBeatmap beatmap, IReadOnlyList<Mod> mods)
             : base(ruleset, beatmap, mods)
         {
             // Generate the bar lines

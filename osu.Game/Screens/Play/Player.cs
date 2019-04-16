@@ -109,7 +109,7 @@ namespace osu.Game.Screens.Play
             if (!ScoreProcessor.Mode.Disabled)
                 config.BindWith(OsuSetting.ScoreDisplayMode, ScoreProcessor.Mode);
 
-            InternalChild = GameplayClockContainer = new GameplayClockContainer(working, SelectedMods.Value, DrawableRuleset.GameplayStartTime);
+            InternalChild = GameplayClockContainer = new GameplayClockContainer(working, Mods.Value, DrawableRuleset.GameplayStartTime);
 
             GameplayClockContainer.Children = new[]
             {
@@ -130,7 +130,7 @@ namespace osu.Game.Screens.Play
                 },
                 // display the cursor above some HUD elements.
                 DrawableRuleset.Cursor?.CreateProxy() ?? new Container(),
-                HUDOverlay = new HUDOverlay(ScoreProcessor, DrawableRuleset, SelectedMods.Value)
+                HUDOverlay = new HUDOverlay(ScoreProcessor, DrawableRuleset, Mods.Value)
                 {
                     HoldToQuit = { Action = performUserRequestedExit },
                     PlayerSettingsOverlay = { PlaybackSettings = { UserPlaybackRate = { BindTarget = GameplayClockContainer.UserPlaybackRate } } },
@@ -177,7 +177,7 @@ namespace osu.Game.Screens.Play
             ScoreProcessor.AllJudged += onCompletion;
             ScoreProcessor.Failed += onFail;
 
-            foreach (var mod in SelectedMods.Value.OfType<IApplicableToScoreProcessor>())
+            foreach (var mod in Mods.Value.OfType<IApplicableToScoreProcessor>())
                 mod.ApplyToScoreProcessor(ScoreProcessor);
         }
 
@@ -199,7 +199,7 @@ namespace osu.Game.Screens.Play
 
                 try
                 {
-                    DrawableRuleset = rulesetInstance.CreateDrawableRulesetWith(working, SelectedMods.Value);
+                    DrawableRuleset = rulesetInstance.CreateDrawableRulesetWith(working, Mods.Value);
                 }
                 catch (BeatmapInvalidForRulesetException)
                 {
@@ -207,7 +207,7 @@ namespace osu.Game.Screens.Play
                     // let's try again forcing the beatmap's ruleset.
                     ruleset = beatmap.BeatmapInfo.Ruleset;
                     rulesetInstance = ruleset.CreateInstance();
-                    DrawableRuleset = rulesetInstance.CreateDrawableRulesetWith(Beatmap.Value, SelectedMods.Value);
+                    DrawableRuleset = rulesetInstance.CreateDrawableRulesetWith(Beatmap.Value, Mods.Value);
                 }
 
                 if (!DrawableRuleset.Objects.Any())
@@ -278,7 +278,7 @@ namespace osu.Game.Screens.Play
             {
                 Beatmap = Beatmap.Value.BeatmapInfo,
                 Ruleset = ruleset,
-                Mods = SelectedMods.Value.ToArray(),
+                Mods = Mods.Value.ToArray(),
                 User = api.LocalUser.Value,
             };
 
@@ -332,7 +332,7 @@ namespace osu.Game.Screens.Play
 
         private bool onFail()
         {
-            if (SelectedMods.Value.OfType<IApplicableFailOverride>().Any(m => !m.AllowFail))
+            if (Mods.Value.OfType<IApplicableFailOverride>().Any(m => !m.AllowFail))
                 return false;
 
             GameplayClockContainer.Stop();

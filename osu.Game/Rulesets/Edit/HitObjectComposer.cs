@@ -186,8 +186,8 @@ namespace osu.Game.Rulesets.Edit
         }
 
         internal override DrawableEditRuleset CreateDrawableRuleset()
-            => new DrawableEditRuleset<TObject>(CreateDrawableRuleset(Ruleset, Beatmap.Value, Enumerable.Empty<Mod>()));
+            => new DrawableEditRuleset<TObject>(CreateDrawableRuleset(Ruleset, Beatmap.Value, Array.Empty<Mod>()));
 
-        protected abstract DrawableRuleset<TObject> CreateDrawableRuleset(Ruleset ruleset, WorkingBeatmap beatmap, IEnumerable<Mod> mods);
+        protected abstract DrawableRuleset<TObject> CreateDrawableRuleset(Ruleset ruleset, WorkingBeatmap beatmap, IReadOnlyList<Mod> mods);
     }
 }

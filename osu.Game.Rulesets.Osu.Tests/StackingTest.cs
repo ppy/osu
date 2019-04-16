@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -23,7 +24,7 @@ namespace osu.Game.Rulesets.Osu.Tests
             using (var reader = new StreamReader(stream))
             {
                 var beatmap = Decoder.GetDecoder<Beatmap>(reader).Decode(reader);
-                var converted = new TestWorkingBeatmap(beatmap).GetPlayableBeatmap(new OsuRuleset().RulesetInfo, Enumerable.Empty<Mod>());
+                var converted = new TestWorkingBeatmap(beatmap).GetPlayableBeatmap(new OsuRuleset().RulesetInfo, Array.Empty<Mod>());
 
                 var objects = converted.HitObjects.ToList();
 

@@ -42,7 +42,7 @@ namespace osu.Game.Rulesets.Mania.Edit
 
         public int TotalColumns => ((ManiaPlayfield)DrawableRuleset.Playfield).TotalColumns;
 
-        protected override DrawableRuleset<ManiaHitObject> CreateDrawableRuleset(Ruleset ruleset, WorkingBeatmap beatmap, IEnumerable<Mod> mods)
+        protected override DrawableRuleset<ManiaHitObject> CreateDrawableRuleset(Ruleset ruleset, WorkingBeatmap beatmap, IReadOnlyList<Mod> mods)
         {
             DrawableRuleset = new DrawableManiaEditRuleset(ruleset, beatmap, mods);
 
