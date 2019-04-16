@@ -113,8 +113,7 @@ namespace osu.Game.Overlays.AccountCreation
                                     Child = new SettingsButton
                                     {
                                         Text = "Register",
-                                        Margin = new MarginPadding { Vertical = 20 },
-                                        Action = performRegistration
+                                        Margin = new MarginPadding { Vertical = 20 }
                                     }
                                 }
                             }
@@ -123,6 +122,8 @@ namespace osu.Game.Overlays.AccountCreation
                 },
                 processingOverlay = new ProcessingOverlay { Alpha = 0 }
             };
+
+            ((SettingsButton)registerShake.Child).Clicked += performRegistration;
 
             textboxes = new[] { usernameTextBox, emailTextBox, passwordTextBox };
 
