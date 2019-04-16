@@ -78,6 +78,12 @@ namespace osu.Game.Screens.Tournament
 
             drawingsConfig = new DrawingsConfigManager(storage);
 
+            TriangleButton startScrollingButton;
+            TriangleButton stopScrollingButton;
+            TriangleButton reloadTeamsButton;
+
+            TriangleButton resetButton;
+
             InternalChildren = new Drawable[]
             {
                 new Box
@@ -193,26 +199,23 @@ namespace osu.Game.Screens.Tournament
 
                                     Children = new Drawable[]
                                     {
-                                        new TriangleButton
+                                        startScrollingButton=new TriangleButton
                                         {
                                             RelativeSizeAxes = Axes.X,
 
-                                            Text = "Begin random",
-                                            Action = teamsContainer.StartScrolling,
+                                            Text = "Begin random"
                                         },
-                                        new TriangleButton
+                                        stopScrollingButton= new TriangleButton
                                         {
                                             RelativeSizeAxes = Axes.X,
 
-                                            Text = "Stop random",
-                                            Action = teamsContainer.StopScrolling,
+                                            Text = "Stop random"
                                         },
-                                        new TriangleButton
+                                        reloadTeamsButton= new TriangleButton
                                         {
                                             RelativeSizeAxes = Axes.X,
 
-                                            Text = "Reload",
-                                            Action = reloadTeams
+                                            Text = "Reload"
                                         }
                                     }
                                 },
@@ -232,12 +235,11 @@ namespace osu.Game.Screens.Tournament
 
                                     Children = new Drawable[]
                                     {
-                                        new TriangleButton
+                                        resetButton=new TriangleButton
                                         {
                                             RelativeSizeAxes = Axes.X,
 
-                                            Text = "Reset",
-                                            Action = () => reset()
+                                            Text = "Reset"
                                         }
                                     }
                                 }
@@ -246,6 +248,12 @@ namespace osu.Game.Screens.Tournament
                     }
                 }
             };
+
+            startScrollingButton.Clicked += teamsContainer.StartScrolling;
+            stopScrollingButton.Clicked += teamsContainer.StopScrolling;
+            reloadTeamsButton.Clicked += reloadTeams;
+
+            resetButton.Clicked += () => reset();
 
             teamsContainer.OnSelected += onTeamSelected;
             teamsContainer.OnScrollStarted += () => fullTeamNameText.FadeOut(200);

@@ -196,10 +196,9 @@ namespace osu.Game.Screens.Select
                         Bottom = Footer.HEIGHT,
                     },
                 });
-                AddInternal(Footer = new Footer
-                {
-                    OnBack = ExitFromBack,
-                });
+                AddInternal(Footer = new Footer());
+
+                Footer.BackButtonClicked += ExitFromBack;
 
                 FooterPanels.AddRange(new Drawable[]
                 {

@@ -16,18 +16,20 @@ namespace osu.Game.Screens.Select
 
             Icon = FontAwesome.Solid.Plane;
 
+            PopupDialogOkButton popupDialogOkButton;
             Buttons = new PopupDialogButton[]
             {
-                new PopupDialogOkButton
+                popupDialogOkButton=new PopupDialogOkButton
                 {
-                    Text = @"Yes please!",
-                    Action = importFromStable
+                    Text = @"Yes please!"
                 },
                 new PopupDialogCancelButton
                 {
                     Text = @"No, I'd like to start from scratch",
                 },
             };
+
+            popupDialogOkButton.Clicked += importFromStable;
         }
     }
 }

@@ -74,13 +74,11 @@ namespace osu.Game.Overlays.Dialog
                 buttonsContainer.ChildrenEnumerable = value;
                 foreach (PopupDialogButton b in value)
                 {
-                    var action = b.Action;
-                    b.Action = () =>
+                    b.Clicked += () =>
                     {
                         if (actionInvoked) return;
 
                         actionInvoked = true;
-                        action?.Invoke();
 
                         Hide();
                     };

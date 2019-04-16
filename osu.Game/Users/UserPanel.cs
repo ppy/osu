@@ -197,7 +197,7 @@ namespace osu.Game.Users
             Status.ValueChanged += status => displayStatus(status.NewValue);
             Status.ValueChanged += status => statusBg.FadeColour(status.NewValue?.GetAppropriateColour(colours) ?? colours.Gray5, 500, Easing.OutQuint);
 
-            base.Action = ViewProfile = () =>
+            Clicked += ViewProfile = () =>
             {
                 Action?.Invoke();
                 profile?.ShowUser(user);

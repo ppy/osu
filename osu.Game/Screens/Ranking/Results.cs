@@ -115,6 +115,7 @@ namespace osu.Game.Screens.Ranking
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
+            BackButton backButton;
             InternalChildren = new Drawable[]
             {
                 new AspectContainer
@@ -254,13 +255,14 @@ namespace osu.Game.Screens.Ranking
                         }
                     }
                 },
-                new BackButton
+                backButton=new BackButton
                 {
                     Anchor = Anchor.BottomLeft,
-                    Origin = Anchor.BottomLeft,
-                    Action = this.Exit
+                    Origin = Anchor.BottomLeft
                 },
             };
+
+            backButton.Clicked += this.Exit;
 
             foreach (var t in CreateResultPages())
                 modeChangeButtons.AddItem(t);

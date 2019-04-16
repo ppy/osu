@@ -148,8 +148,7 @@ namespace osu.Game.Screens
                 {
                     Anchor = Anchor.BottomLeft,
                     Origin = Anchor.BottomLeft,
-                    Alpha = 0,
-                    Action = this.Exit
+                    Alpha = 0
                 },
                 childModeButtons = new FillFlowContainer
                 {
@@ -161,17 +160,21 @@ namespace osu.Game.Screens
                 }
             };
 
+            popButton.Clicked += this.Exit;
+
             if (PossibleChildren != null)
             {
                 foreach (Type t in PossibleChildren)
                 {
-                    childModeButtons.Add(new ChildModeButton
+                    ChildModeButton childModeButton;
+                    childModeButtons.Add(childModeButton = new ChildModeButton
                     {
                         Text = $@"{t.Name}",
                         BackgroundColour = getColourFor(t),
-                        HoverColour = getColourFor(t).Lighten(0.2f),
-                        Action = delegate { this.Push(Activator.CreateInstance(t) as Screen); }
+                        HoverColour = getColourFor(t).Lighten(0.2f)
                     });
+
+                    childModeButton.Clicked += delegate { this.Push(Activator.CreateInstance(t) as Screen); };
                 }
             }
         }

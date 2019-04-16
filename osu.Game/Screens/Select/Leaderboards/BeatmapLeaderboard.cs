@@ -17,7 +17,7 @@ namespace osu.Game.Screens.Select.Leaderboards
 {
     public class BeatmapLeaderboard : Leaderboard<BeatmapLeaderboardScope, ScoreInfo>
     {
-        public Action<ScoreInfo> ScoreSelected;
+        public event Action<ScoreInfo> ScoreSelected;
 
         private BeatmapInfo beatmap;
 
@@ -79,9 +79,11 @@ namespace osu.Game.Screens.Select.Leaderboards
             return req;
         }
 
-        protected override LeaderboardScore CreateDrawableScore(ScoreInfo model, int index) => new LeaderboardScore(model, index)
+        protected override LeaderboardScore CreateDrawableScore(ScoreInfo model, int index)
         {
-            Action = () => ScoreSelected?.Invoke(model)
-        };
+            var leaderboardScore = new LeaderboardScore(model, index);
+            leaderboardScore.Clicked += () => ScoreSelected?.Invoke(model);
+            return leaderboardScore;
+        }
     }
 }

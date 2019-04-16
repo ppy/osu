@@ -24,18 +24,21 @@ namespace osu.Game.Screens.Select
 
             Icon = FontAwesome.Regular.TrashAlt;
             HeaderText = @"Confirm deletion of";
+
+            PopupDialogOkButton popupDialogOkButton;
             Buttons = new PopupDialogButton[]
             {
-                new PopupDialogOkButton
+                popupDialogOkButton=new PopupDialogOkButton
                 {
-                    Text = @"Yes. Totally. Delete it.",
-                    Action = () => manager.Delete(beatmap),
+                    Text = @"Yes. Totally. Delete it."
                 },
                 new PopupDialogCancelButton
                 {
                     Text = @"Firetruck, I didn't mean to!",
                 },
             };
+
+            popupDialogOkButton.Clicked += () => manager.Delete(beatmap);
         }
     }
 }

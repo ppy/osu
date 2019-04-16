@@ -57,9 +57,9 @@ namespace osu.Game.Users
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre
                 },
-                Action = openProfile
             });
 
+            clickableArea.Clicked += openProfile;
             clickableArea.Enabled.BindTo(OpenOnClick);
         }
 

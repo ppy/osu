@@ -21,21 +21,24 @@ namespace osu.Game.Screens.Select
             BodyText = $@"{beatmap.Metadata?.Artist} - {beatmap.Metadata?.Title}";
             Icon = FontAwesome.Solid.Eraser;
             HeaderText = @"Clearing all local scores. Are you sure?";
+
+            PopupDialogOkButton popupDialogOkButton;
             Buttons = new PopupDialogButton[]
             {
-                new PopupDialogOkButton
+                popupDialogOkButton=new PopupDialogOkButton
                 {
-                    Text = @"Yes. Please.",
-                    Action = () =>
-                    {
-                        Task.Run(() => scoreManager.Delete(scoreManager.QueryScores(s => !s.DeletePending && s.Beatmap.ID == beatmap.ID).ToList()))
-                            .ContinueWith(_ => onCompletion);
-                    }
+                    Text = @"Yes. Please."
                 },
                 new PopupDialogCancelButton
                 {
-                    Text = @"No, I'm still attached.",
+                    Text = @"No, I'm still attached."
                 },
+            };
+
+            popupDialogOkButton.Clicked += () =>
+            {
+                Task.Run(() => scoreManager.Delete(scoreManager.QueryScores(s => !s.DeletePending && s.Beatmap.ID == beatmap.ID).ToList()))
+                    .ContinueWith(_ => onCompletion);
             };
         }
 

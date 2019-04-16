@@ -102,12 +102,13 @@ namespace osu.Game.Screens.Select.Options
                 Icon = icon,
                 ButtonColour = colour,
                 Depth = depth,
-                Action = () =>
-                {
-                    Hide();
-                    action?.Invoke();
-                },
                 HotKey = hotkey
+            };
+
+            button.Clicked += () =>
+            {
+                Hide();
+                action?.Invoke();
             };
 
             buttonsContainer.Add(button);

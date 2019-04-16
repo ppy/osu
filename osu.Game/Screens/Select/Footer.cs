@@ -29,7 +29,7 @@ namespace osu.Game.Screens.Select
 
         private const float padding = 80;
 
-        public Action OnBack;
+        public event Action BackButtonClicked;
 
         private readonly FillFlowContainer<FooterButton> buttons;
 
@@ -53,9 +53,10 @@ namespace osu.Game.Screens.Select
                 DeselectedColour = colour.Opacity(0.5f),
                 Hotkey = hotkey,
                 Hovered = updateModeLight,
-                HoverLost = updateModeLight,
-                Action = action,
+                HoverLost = updateModeLight
             };
+
+            button.Clicked += action;
 
             buttons.Add(button);
             buttons.SetLayoutPosition(button, -depth);
@@ -94,6 +95,8 @@ namespace osu.Game.Screens.Select
             Height = HEIGHT;
             Anchor = Anchor.BottomCentre;
             Origin = Anchor.BottomCentre;
+
+            BackButton backButton;
             Children = new Drawable[]
             {
                 new Box
@@ -108,11 +111,10 @@ namespace osu.Game.Screens.Select
                     Height = 3,
                     Position = new Vector2(0, -3),
                 },
-                new BackButton
+                backButton=new BackButton
                 {
                     Anchor = Anchor.BottomLeft,
-                    Origin = Anchor.BottomLeft,
-                    Action = () => OnBack?.Invoke()
+                    Origin = Anchor.BottomLeft
                 },
                 new FillFlowContainer
                 {
@@ -134,6 +136,8 @@ namespace osu.Game.Screens.Select
                     }
                 }
             };
+
+            backButton.Clicked += () => BackButtonClicked?.Invoke();
 
             updateModeLight();
         }
