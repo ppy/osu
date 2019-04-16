@@ -12,15 +12,16 @@ namespace osu.Game.Online.Leaderboards
 {
     public class RetrievalFailurePlaceholder : Placeholder
     {
-        public Action OnRetry;
+        public event Action Retried;
 
         public RetrievalFailurePlaceholder()
         {
-            AddArbitraryDrawable(new RetryButton
+            RetryButton retryButton;
+            AddArbitraryDrawable(retryButton = new RetryButton
             {
-                Action = () => OnRetry?.Invoke(),
                 Padding = new MarginPadding { Right = 10 }
             });
+            retryButton.Clicked += () => Retried?.Invoke();
 
             AddText(@"Couldn't retrieve scores!");
         }
@@ -29,8 +30,6 @@ namespace osu.Game.Online.Leaderboards
         {
             private readonly SpriteIcon icon;
 
-            public new Action Action;
-
             public RetryButton()
             {
                 AutoSizeAxes = Axes.Both;
@@ -38,7 +37,6 @@ namespace osu.Game.Online.Leaderboards
                 Child = new OsuClickableContainer
                 {
                     AutoSizeAxes = Axes.Both,
-                    Action = () => Action?.Invoke(),
                     Child = icon = new SpriteIcon
                     {
                         Icon = FontAwesome.Solid.Sync,

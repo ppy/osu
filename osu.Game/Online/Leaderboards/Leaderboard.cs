@@ -133,10 +133,9 @@ namespace osu.Game.Online.Leaderboards
                 switch (placeholderState = value)
                 {
                     case PlaceholderState.NetworkFailure:
-                        replacePlaceholder(new RetrievalFailurePlaceholder
-                        {
-                            OnRetry = UpdateScores,
-                        });
+                        RetrievalFailurePlaceholder retrievalFailurePlaceholder;
+                        replacePlaceholder(retrievalFailurePlaceholder = new RetrievalFailurePlaceholder());
+                        retrievalFailurePlaceholder.Retried += UpdateScores;
                         break;
                     case PlaceholderState.Unavailable:
                         replacePlaceholder(new MessagePlaceholder(@"Leaderboards are not available for this beatmap!"));
