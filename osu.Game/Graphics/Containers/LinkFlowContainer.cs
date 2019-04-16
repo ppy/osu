@@ -81,50 +81,52 @@ namespace osu.Game.Graphics.Containers
 
         private IEnumerable<Drawable> createLink(IEnumerable<Drawable> drawables, string text, string url = null, LinkAction linkType = LinkAction.External, string linkArgument = null, string tooltipText = null, Action action = null)
         {
-            AddInternal(new DrawableLinkCompiler(drawables.OfType<SpriteText>().ToList())
+            DrawableLinkCompiler drawableLinkCompiler;
+            AddInternal(drawableLinkCompiler = new DrawableLinkCompiler(drawables.OfType<SpriteText>().ToList())
             {
                 RelativeSizeAxes = Axes.Both,
-                TooltipText = tooltipText ?? (url != text ? url : string.Empty),
-                Action = action ?? (() =>
-                {
-                    switch (linkType)
-                    {
-                        case LinkAction.OpenBeatmap:
-                            // TODO: proper query params handling
-                            if (linkArgument != null && int.TryParse(linkArgument.Contains('?') ? linkArgument.Split('?')[0] : linkArgument, out int beatmapId))
-                                game?.ShowBeatmap(beatmapId);
-                            break;
-                        case LinkAction.OpenBeatmapSet:
-                            if (int.TryParse(linkArgument, out int setId))
-                                game?.ShowBeatmapSet(setId);
-                            break;
-                        case LinkAction.OpenChannel:
-                            try
-                            {
-                                channelManager?.OpenChannel(linkArgument);
-                            }
-                            catch (ChannelNotFoundException e)
-                            {
-                                Logger.Log($"The requested channel \"{linkArgument}\" does not exist");
-                            }
+                TooltipText = tooltipText ?? (url != text ? url : string.Empty)
+            });
 
-                            break;
-                        case LinkAction.OpenEditorTimestamp:
-                        case LinkAction.JoinMultiplayerMatch:
-                        case LinkAction.Spectate:
-                            showNotImplementedError?.Invoke();
-                            break;
-                        case LinkAction.External:
-                            game?.OpenUrlExternally(url);
-                            break;
-                        case LinkAction.OpenUserProfile:
-                            if (long.TryParse(linkArgument, out long userId))
-                                game?.ShowUser(userId);
-                            break;
-                        default:
-                            throw new NotImplementedException($"This {nameof(LinkAction)} ({linkType.ToString()}) is missing an associated action.");
-                    }
-                }),
+            drawableLinkCompiler.Clicked += action ?? (() =>
+            {
+                switch (linkType)
+                {
+                    case LinkAction.OpenBeatmap:
+                        // TODO: proper query params handling
+                        if (linkArgument != null && int.TryParse(linkArgument.Contains('?') ? linkArgument.Split('?')[0] : linkArgument, out int beatmapId))
+                            game?.ShowBeatmap(beatmapId);
+                        break;
+                    case LinkAction.OpenBeatmapSet:
+                        if (int.TryParse(linkArgument, out int setId))
+                            game?.ShowBeatmapSet(setId);
+                        break;
+                    case LinkAction.OpenChannel:
+                        try
+                        {
+                            channelManager?.OpenChannel(linkArgument);
+                        }
+                        catch (ChannelNotFoundException e)
+                        {
+                            Logger.Log($"The requested channel \"{linkArgument}\" does not exist");
+                        }
+
+                        break;
+                    case LinkAction.OpenEditorTimestamp:
+                    case LinkAction.JoinMultiplayerMatch:
+                    case LinkAction.Spectate:
+                        showNotImplementedError?.Invoke();
+                        break;
+                    case LinkAction.External:
+                        game?.OpenUrlExternally(url);
+                        break;
+                    case LinkAction.OpenUserProfile:
+                        if (long.TryParse(linkArgument, out long userId))
+                            game?.ShowUser(userId);
+                        break;
+                    default:
+                        throw new NotImplementedException($"This {nameof(LinkAction)} ({linkType.ToString()}) is missing an associated action.");
+                }
             });
 
             return drawables;
