@@ -20,10 +20,13 @@ namespace osu.Game.Overlays.Toolbar
             get => stateContainer;
             set
             {
+                if (stateContainer != null)
+                    Clicked -= stateContainer.ToggleVisibility;
+
                 stateContainer = value;
                 if (stateContainer != null)
                 {
-                    Action = stateContainer.ToggleVisibility;
+                    Clicked += stateContainer.ToggleVisibility;
                     stateContainer.StateChanged += stateChanged;
                 }
             }
