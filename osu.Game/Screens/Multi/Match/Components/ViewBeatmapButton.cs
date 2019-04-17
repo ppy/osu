@@ -28,19 +28,9 @@ namespace osu.Game.Screens.Multi.Match.Components
         private void load()
         {
             if (osuGame != null)
-                Beatmap.BindValueChanged(beatmap => updateAction(beatmap.NewValue), true);
-        }
+                Beatmap.BindValueChanged(beatmap => Enabled.Value = beatmap == null, true);
 
-        private void updateAction(BeatmapInfo beatmap)
-        {
-            if (beatmap == null)
-            {
-                Enabled.Value = false;
-                return;
-            }
-
-            Action = () => osuGame.ShowBeatmap(beatmap.OnlineBeatmapID ?? 0);
-            Enabled.Value = true;
+            Clicked += () => osuGame.ShowBeatmap(Beatmap.Value.OnlineBeatmapID ?? 0);
         }
     }
 }
