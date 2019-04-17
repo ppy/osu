@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using osu.Framework.Allocation;
@@ -17,6 +18,7 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Rulesets.Mods;
 using osu.Game.Screens.Menu;
 using osu.Game.Screens.Play.HUD;
 using osu.Game.Screens.Play.PlayerSettings;
@@ -67,7 +69,7 @@ namespace osu.Game.Screens.Play
                 RelativeSizeAxes = Axes.Both,
             }).WithChildren(new Drawable[]
             {
-                info = new BeatmapMetadataDisplay(Beatmap.Value, content.LogoFacade)
+                info = new BeatmapMetadataDisplay(Beatmap.Value, Mods.Value, content.LogoFacade)
                 {
                     Alpha = 0,
                     Anchor = Anchor.Centre,
@@ -314,6 +316,7 @@ namespace osu.Game.Screens.Play
             }
 
             private readonly WorkingBeatmap beatmap;
+            private readonly IReadOnlyList<Mod> mods;
             private readonly Drawable facade;
             private LoadingAnimation loading;
             private Sprite backgroundSprite;
@@ -336,9 +339,10 @@ namespace osu.Game.Screens.Play
                 }
             }
 
-            public BeatmapMetadataDisplay(WorkingBeatmap beatmap, Drawable facade)
+            public BeatmapMetadataDisplay(WorkingBeatmap beatmap, IReadOnlyList<Mod> mods, Drawable facade)
             {
                 this.beatmap = beatmap;
+                this.mods = mods;
                 this.facade = facade;
             }
 
@@ -425,7 +429,7 @@ namespace osu.Game.Screens.Play
                                 Origin = Anchor.TopCentre,
                                 AutoSizeAxes = Axes.Both,
                                 Margin = new MarginPadding { Top = 20 },
-                                Current = beatmap.Mods
+                                Current = { Value = mods }
                             }
                         },
                     }

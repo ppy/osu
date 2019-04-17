@@ -57,13 +57,15 @@ namespace osu.Game.Rulesets.UI
             hitObjectContainerLazy = new Lazy<HitObjectContainer>(CreateHitObjectContainer);
         }
 
-        private WorkingBeatmap beatmap;
+        [Resolved]
+        private IBindable<WorkingBeatmap> beatmap { get; set; }
+
+        [Resolved]
+        private IReadOnlyList<Mod> mods { get; set; }
 
         [BackgroundDependencyLoader]
-        private void load(IBindable<WorkingBeatmap> beatmap)
+        private void load()
         {
-            this.beatmap = beatmap.Value;
-
             Cursor = CreateCursor();
             if (Cursor != null)
                 AddInternal(Cursor);
@@ -123,7 +125,7 @@ namespace osu.Game.Rulesets.UI
             base.Update();
 
             if (beatmap != null)
-                foreach (var mod in beatmap.Mods.Value)
+                foreach (var mod in mods)
                     if (mod is IUpdatableByPlayfield updatable)
                         updatable.Update(this);
         }

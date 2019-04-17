@@ -11,6 +11,7 @@ using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Game.Rulesets.Mania.Edit.Blueprints;
 using osu.Game.Rulesets.Mania.UI;
+using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.UI;
 using osu.Game.Screens.Edit.Compose.Components;
 using osuTK;
@@ -41,9 +42,9 @@ namespace osu.Game.Rulesets.Mania.Edit
 
         public int TotalColumns => ((ManiaPlayfield)DrawableRuleset.Playfield).TotalColumns;
 
-        protected override DrawableRuleset<ManiaHitObject> CreateDrawableRuleset(Ruleset ruleset, WorkingBeatmap beatmap)
+        protected override DrawableRuleset<ManiaHitObject> CreateDrawableRuleset(Ruleset ruleset, WorkingBeatmap beatmap, IReadOnlyList<Mod> mods)
         {
-            DrawableRuleset = new DrawableManiaEditRuleset(ruleset, beatmap);
+            DrawableRuleset = new DrawableManiaEditRuleset(ruleset, beatmap, mods);
 
             // This is the earliest we can cache the scrolling info to ourselves, before masks are added to the hierarchy and inject it
             dependencies.CacheAs(DrawableRuleset.ScrollingInfo);
