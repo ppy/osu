@@ -193,7 +193,7 @@ namespace osu.Game.Screens.Play
         {
             base.Update();
 
-            if (failing)
+            if (IsFailing)
                 updateFail();
 
             // eagerly pause when we lose window focus (if we are locally playing).
@@ -350,14 +350,14 @@ namespace osu.Game.Screens.Play
 
         protected FailOverlay FailOverlay { get; private set; }
 
-        private bool failing = false;
+        public bool IsFailing { get; private set; }
 
         private bool onFail()
         {
             if (Mods.Value.OfType<IApplicableFailOverride>().Any(m => !m.AllowFail))
                 return false;
 
-            failing = true;
+            IsFailing = true;
             HasFailed = true;
 
             // There is a chance that we could be in a paused state as the ruleset's internal clock (see FrameStabilityContainer)
@@ -392,7 +392,7 @@ namespace osu.Game.Screens.Play
             if (audio.Track.Frequency.Value > 0)
                 return;
 
-            failing = false; // Stop slowing down the audio
+            IsFailing = false; // Stop slowing down the audio
 
             GameplayClockContainer.Stop();
 
@@ -528,7 +528,7 @@ namespace osu.Game.Screens.Play
             GameplayClockContainer.ResetLocalAdjustments();
 
             // Return the audio playback speed back to normal if exited on failing
-            failing = false;
+            IsFailing = false;
             sampleFail?.Stop();
 
             audio.Track.Frequency.Value = 1;
