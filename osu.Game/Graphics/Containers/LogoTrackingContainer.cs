@@ -15,22 +15,19 @@ namespace osu.Game.Graphics.Containers
     /// </summary>
     public class LogoTrackingContainer : Container
     {
-        public Facade LogoFacade { get; }
+        public Facade LogoFacade => facade;
 
         protected OsuLogo Logo { get; private set; }
+
+        private readonly InternalFacade facade = new InternalFacade();
 
         private Easing easing;
         private Vector2? startPosition;
         private double? startTime;
         private double duration;
 
-        public LogoTrackingContainer()
-        {
-            LogoFacade = new ExposedFacade();
-        }
-
         /// <summary>
-        /// Assign the logo that should track the Facade's position, as well as how it should transform to its initial position.
+        /// Assign the logo that should track the facade's position, as well as how it should transform to its initial position.
         /// </summary>
         /// <param name="logo">The instance of the logo to be used for tracking.</param>
         /// <param name="facadeScale">The scale of the facade. Does not actually affect the logo itself.</param>
@@ -96,7 +93,7 @@ namespace osu.Game.Graphics.Containers
                 throw new InvalidOperationException($"Tracking logo must have {nameof(RelativePositionAxes)} = Axes.Both");
 
             // Account for the scale of the actual OsuLogo, as SizeForFlow only accounts for the sprite scale.
-            ((ExposedFacade)LogoFacade).SetSize(new Vector2(Logo.SizeForFlow * Logo.Scale.X));
+            facade.SetSize(new Vector2(Logo.SizeForFlow * Logo.Scale.X));
 
             var localPos = ComputeLogoTrackingPosition();
 
@@ -133,7 +130,7 @@ namespace osu.Game.Graphics.Containers
             base.Dispose(isDisposing);
         }
 
-        private class ExposedFacade : Facade
+        private class InternalFacade : Facade
         {
             public void SetSize(Vector2 size)
             {
