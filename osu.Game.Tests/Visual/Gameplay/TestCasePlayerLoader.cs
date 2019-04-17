@@ -57,7 +57,7 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             AddStep("load player", () =>
             {
-                SelectedMods.Value = new[] { gameMod = new TestMod() };
+                Mods.Value = new[] { gameMod = new TestMod() };
                 InputManager.MoveMouseTo(loader.ScreenSpaceDrawQuad.Centre);
                 stack.Push(new PlayerLoader(() => player = new TestPlayer()));
             });
@@ -66,7 +66,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             {
                 if (player.IsCurrentScreen())
                 {
-                    playerMod1 = (TestMod)player.SelectedMods.Value.Single();
+                    playerMod1 = (TestMod)player.Mods.Value.Single();
                     return true;
                 }
 
@@ -86,7 +86,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             {
                 if (player.IsCurrentScreen())
                 {
-                    playerMod2 = (TestMod)player.SelectedMods.Value.Single();
+                    playerMod2 = (TestMod)player.Mods.Value.Single();
                     return true;
                 }
 
@@ -114,7 +114,7 @@ namespace osu.Game.Tests.Visual.Gameplay
 
         private class TestPlayer : Player
         {
-            public new Bindable<IEnumerable<Mod>> SelectedMods => base.SelectedMods;
+            public new Bindable<IReadOnlyList<Mod>> Mods => base.Mods;
 
             public TestPlayer()
                 : base(false, false)

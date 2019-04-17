@@ -71,8 +71,8 @@ namespace osu.Game.Screens.Play
         protected GameplayClockContainer GameplayClockContainer { get; private set; }
 
         [Cached]
-        [Cached(Type = typeof(IBindable<IEnumerable<Mod>>))]
-        protected readonly Bindable<IEnumerable<Mod>> SelectedMods = new Bindable<IEnumerable<Mod>>(Enumerable.Empty<Mod>());
+        [Cached(Type = typeof(IBindable<IReadOnlyList<Mod>>))]
+        protected readonly Bindable<IReadOnlyList<Mod>> Mods = new Bindable<IReadOnlyList<Mod>>(Array.Empty<Mod>());
 
         private readonly bool allowPause;
         private readonly bool showResults;
@@ -93,7 +93,7 @@ namespace osu.Game.Screens.Play
         {
             this.api = api;
 
-            SelectedMods.Value = base.SelectedMods.Value.Select(m => m.CreateCopy()).ToArray();
+            Mods.Value = base.Mods.Value.Select(m => m.CreateCopy()).ToArray();
 
             WorkingBeatmap working = loadBeatmap();
 
