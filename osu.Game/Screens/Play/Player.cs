@@ -528,7 +528,7 @@ namespace osu.Game.Screens.Play
             GameplayClockContainer.ResetLocalAdjustments();
 
             // Return the audio playback speed back to normal if exited on failing
-            Failing = false;
+            failing = false;
             sampleFail?.Stop();
 
             audio.Track.Frequency.Value = 1;
