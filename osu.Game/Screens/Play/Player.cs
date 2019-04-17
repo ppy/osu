@@ -193,8 +193,8 @@ namespace osu.Game.Screens.Play
         {
             base.Update();
 
-            if (Failing)
-                UpdateFail();
+            if (failing)
+                updateFail();
 
             // eagerly pause when we lose window focus (if we are locally playing).
             if (PauseOnFocusLost && !Game.IsActive.Value)
@@ -350,14 +350,14 @@ namespace osu.Game.Screens.Play
 
         protected FailOverlay FailOverlay { get; private set; }
 
-        private bool Failing = false;
+        private bool failing = false;
 
         private bool onFail()
         {
             if (Mods.Value.OfType<IApplicableFailOverride>().Any(m => !m.AllowFail))
                 return false;
 
-            Failing = true;
+            failing = true;
             HasFailed = true;
 
             // There is a chance that we could be in a paused state as the ruleset's internal clock (see FrameStabilityContainer)
@@ -373,7 +373,7 @@ namespace osu.Game.Screens.Play
             return true;
         }
 
-        private void UpdateFail()
+        private void updateFail()
         {
             audio.Track.Frequency.Value -= Game.IsActive.Value ? 0.0015 : 0.00075;
 
@@ -381,18 +381,18 @@ namespace osu.Game.Screens.Play
 
             DrawableRuleset.Playfield.Alpha -= Game.IsActive.Value ? 0.0015f : 0.00075f;
 
-            Random Rand = new Random();
+            Random objRand = new Random();
             foreach (DrawableHitObject Object in DrawableRuleset.Playfield.AllHitObjects.ToList())
             {
-                Object.Rotation += (Rand.Next(0, 1) != 0 ? -(float)Rand.NextDouble() : (float)Rand.NextDouble()) / 10;
-                Object.X += (Rand.Next(0, 1) != 0 ? (float)Rand.NextDouble() : -(float)Rand.NextDouble()) / 10;
-                Object.Y += (Rand.Next(0, 1) != 0 ? -(float)Rand.NextDouble() : (float)Rand.NextDouble());
+                Object.Rotation += (objRand.Next(0, 1) != 0 ? -(float)objRand.NextDouble() : (float)objRand.NextDouble()) / 10;
+                Object.X += (objRand.Next(0, 1) != 0 ? (float)objRand.NextDouble() : -(float)objRand.NextDouble()) / 10;
+                Object.Y += (objRand.Next(0, 1) != 0 ? -(float)objRand.NextDouble() : (float)objRand.NextDouble());
             }
 
             if (audio.Track.Frequency.Value > 0)
                 return;
 
-            Failing = false; // Stop slowing down the audio
+            failing = false; // Stop slowing down the audio
 
             GameplayClockContainer.Stop();
 
