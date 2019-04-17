@@ -40,7 +40,6 @@ namespace osu.Game.Screens.Edit.Components
                     Scale = new Vector2(1.4f),
                     IconScale = new Vector2(1.4f),
                     Icon = FontAwesome.Regular.PlayCircle,
-                    Action = togglePause,
                     Padding = new MarginPadding { Left = 20 }
                 },
                 new OsuSpriteText
@@ -61,6 +60,8 @@ namespace osu.Game.Screens.Edit.Components
                     Child = tabs = new PlaybackTabControl(),
                 }
             };
+
+            playButton.Clicked += togglePause;
 
             tabs.Current.ValueChanged += tempo => Beatmap.Value.Track.Tempo.Value = tempo.NewValue;
         }

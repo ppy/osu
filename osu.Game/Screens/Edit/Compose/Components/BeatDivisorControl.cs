@@ -36,6 +36,8 @@ namespace osu.Game.Screens.Edit.Compose.Components
             Masking = true;
             CornerRadius = 5;
 
+            DivisorButton previousDivisorButton;
+            DivisorButton nextDivisorButton;
             InternalChildren = new Drawable[]
             {
                 new Box
@@ -92,16 +94,14 @@ namespace osu.Game.Screens.Edit.Compose.Components
                                             {
                                                 new Drawable[]
                                                 {
-                                                    new DivisorButton
+                                                    previousDivisorButton=new DivisorButton
                                                     {
-                                                        Icon = FontAwesome.Solid.ChevronLeft,
-                                                        Action = beatDivisor.Previous
+                                                        Icon = FontAwesome.Solid.ChevronLeft
                                                     },
                                                     new DivisorText(beatDivisor),
-                                                    new DivisorButton
+                                                    nextDivisorButton=new DivisorButton
                                                     {
-                                                        Icon = FontAwesome.Solid.ChevronRight,
-                                                        Action = beatDivisor.Next
+                                                        Icon = FontAwesome.Solid.ChevronRight
                                                     }
                                                 },
                                             },
@@ -134,6 +134,9 @@ namespace osu.Game.Screens.Edit.Compose.Components
                     }
                 }
             };
+
+            previousDivisorButton.Clicked += beatDivisor.Previous;
+            nextDivisorButton.Clicked += beatDivisor.Next;
         }
 
         private class DivisorText : SpriteText

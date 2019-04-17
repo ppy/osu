@@ -37,7 +37,7 @@ namespace osu.Game.Screens.Edit.Components.RadioButtons
             this.button = button;
 
             Text = button.Text;
-            Action = button.Action;
+            Clicked += button.Action;
 
             RelativeSizeAxes = Axes.X;
 

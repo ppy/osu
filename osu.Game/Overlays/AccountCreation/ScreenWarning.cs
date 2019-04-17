@@ -46,6 +46,8 @@ namespace osu.Game.Overlays.AccountCreation
             if (string.IsNullOrEmpty(api.ProvidedUsername))
                 return;
 
+            SettingsButton settingsButton;
+            DangerousSettingsButton dangerousSettingsButton;
             InternalChildren = new Drawable[]
             {
                 new Sprite
@@ -94,16 +96,14 @@ namespace osu.Game.Overlays.AccountCreation
                             RelativeSizeAxes = Axes.X,
                             AutoSizeAxes = Axes.Y
                         },
-                        new SettingsButton
+                        settingsButton=new SettingsButton
                         {
                             Text = "Help, I can't access my account!",
-                            Margin = new MarginPadding { Top = 50 },
-                            Action = () => game?.OpenUrlExternally(help_centre_url)
+                            Margin = new MarginPadding { Top = 50 }
                         },
-                        new DangerousSettingsButton
+                        dangerousSettingsButton=new DangerousSettingsButton
                         {
-                            Text = "I understand. This account isn't for me.",
-                            Action = () => this.Push(new ScreenEntry())
+                            Text = "I understand. This account isn't for me."
                         },
                         furtherAssistance = new LinkFlowContainer(cp => cp.Font = cp.Font.With(size: 12))
                         {
@@ -115,6 +115,9 @@ namespace osu.Game.Overlays.AccountCreation
                     }
                 }
             };
+
+            settingsButton.Clicked += () => game?.OpenUrlExternally(help_centre_url);
+            dangerousSettingsButton.Clicked += () => this.Push(new ScreenEntry());
 
             multiAccountExplanationText.AddText("Are you ");
             multiAccountExplanationText.AddText(api.ProvidedUsername, cp => cp.Colour = colours.BlueLight);

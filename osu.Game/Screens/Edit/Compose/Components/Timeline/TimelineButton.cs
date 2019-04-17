@@ -28,7 +28,9 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
         public TimelineButton()
         {
-            InternalChild = button = new TimelineIconButton { Action = () => Action?.Invoke() };
+            InternalChild = button = new TimelineIconButton();
+
+            button.Clicked += () => Action?.Invoke();
 
             button.Enabled.BindTo(Enabled);
             Width = button.ButtonSize.X;

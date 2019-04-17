@@ -105,8 +105,7 @@ namespace osu.Game.Screens.Play.PlayerSettings
                                     Anchor = Anchor.CentreRight,
                                     Position = new Vector2(-15, 0),
                                     Icon = FontAwesome.Solid.Bars,
-                                    Scale = new Vector2(0.75f),
-                                    Action = () => Expanded = !Expanded,
+                                    Scale = new Vector2(0.75f)
                                 },
                             }
                         },
@@ -126,6 +125,8 @@ namespace osu.Game.Screens.Play.PlayerSettings
                     }
                 },
             };
+
+            button.Clicked += () => Expanded = !Expanded;
         }
 
         private const float fade_duration = 800;

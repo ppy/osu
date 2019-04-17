@@ -42,6 +42,7 @@ namespace osu.Game.Overlays.Toolbar
         [BackgroundDependencyLoader(true)]
         private void load(OsuGame osuGame)
         {
+            ToolbarHomeButton toolbarHomeButton;
             Children = new Drawable[]
             {
                 new ToolbarBackground(),
@@ -53,10 +54,7 @@ namespace osu.Game.Overlays.Toolbar
                     Children = new Drawable[]
                     {
                         new ToolbarSettingsButton(),
-                        new ToolbarHomeButton
-                        {
-                            Action = () => OnHome?.Invoke()
-                        },
+                        toolbarHomeButton=new ToolbarHomeButton(),
                         new ToolbarRulesetSelector()
                     }
                 },
@@ -82,6 +80,8 @@ namespace osu.Game.Overlays.Toolbar
                     }
                 }
             };
+
+            toolbarHomeButton.Clicked += () => OnHome?.Invoke();
 
             StateChanged += visibility =>
             {

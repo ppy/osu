@@ -111,7 +111,7 @@ namespace osu.Game.Screens.Multi.Match.Components
 
             CurrentItem.BindValueChanged(item => modDisplay.Current.Value = item.NewValue?.RequiredMods?.ToArray() ?? Array.Empty<Mod>(), true);
 
-            beatmapButton.Action = () => RequestBeatmapSelection?.Invoke();
+            beatmapButton.Clicked += () => RequestBeatmapSelection?.Invoke();
         }
 
         private class BeatmapSelectButton : HeaderButton

@@ -243,8 +243,7 @@ namespace osu.Game.Screens.Multi.Match.Components
                                                     Anchor = Anchor.BottomCentre,
                                                     Origin = Anchor.BottomCentre,
                                                     Size = new Vector2(230, 55),
-                                                    Enabled = { Value = false },
-                                                    Action = apply,
+                                                    Enabled = { Value = false }
                                                 },
                                                 ErrorText = new OsuSpriteText
                                                 {
@@ -263,6 +262,8 @@ namespace osu.Game.Screens.Multi.Match.Components
                     },
                     processingOverlay = new ProcessingOverlay { Alpha = 0 }
                 };
+
+                ApplyButton.Clicked += apply;
 
                 TypePicker.Current.BindValueChanged(type => typeLabel.Text = type.NewValue?.Name ?? string.Empty, true);
                 Name.BindValueChanged(name => NameField.Text = name.NewValue, true);

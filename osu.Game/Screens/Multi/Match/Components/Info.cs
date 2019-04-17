@@ -82,15 +82,14 @@ namespace osu.Game.Screens.Multi.Match.Components
                             Children = new Drawable[]
                             {
                                 viewBeatmapButton = new ViewBeatmapButton(),
-                                readyButton = new ReadyButton
-                                {
-                                    Action = () => OnStart?.Invoke()
-                                }
+                                readyButton = new ReadyButton()
                             }
                         }
                     },
                 },
             };
+
+            readyButton.Clicked += () => OnStart?.Invoke();
 
             CurrentItem.BindValueChanged(item =>
             {

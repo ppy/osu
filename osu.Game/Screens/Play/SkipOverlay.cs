@@ -107,7 +107,7 @@ namespace osu.Game.Screens.Play
             using (BeginAbsoluteSequence(beginFadeTime))
                 this.FadeOut(fade_time);
 
-            button.Action = () => RequestSeek?.Invoke(startTime - skip_required_cutoff - fade_time);
+            button.Clicked += () => RequestSeek?.Invoke(startTime - skip_required_cutoff - fade_time);
 
             displayTime = Time.Current;
 

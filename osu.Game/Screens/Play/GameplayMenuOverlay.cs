@@ -174,14 +174,14 @@ namespace osu.Game.Screens.Play
                 ButtonColour = colour,
                 Origin = Anchor.TopCentre,
                 Anchor = Anchor.TopCentre,
-                Height = button_height,
-                Action = delegate
-                {
-                    action?.Invoke();
-                    Hide();
-                }
+                Height = button_height
             };
 
+            button.Clicked += delegate
+            {
+                action?.Invoke();
+                Hide();
+            };
             button.Selected.ValueChanged += selected => buttonSelectionChanged(button, selected.NewValue);
 
             InternalButtons.Add(button);

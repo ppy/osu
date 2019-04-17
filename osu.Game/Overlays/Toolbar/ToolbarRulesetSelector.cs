@@ -73,11 +73,13 @@ namespace osu.Game.Overlays.Toolbar
             this.rulesets = rulesets;
             foreach (var r in rulesets.AvailableRulesets)
             {
-                modeButtons.Add(new ToolbarRulesetButton
+                ToolbarRulesetButton toolbarRulesetButton;
+                modeButtons.Add(toolbarRulesetButton = new ToolbarRulesetButton
                 {
-                    Ruleset = r,
-                    Action = delegate { ruleset.Value = r; }
+                    Ruleset = r
                 });
+
+                toolbarRulesetButton.Clicked += delegate { ruleset.Value = r; };
             }
 
             ruleset.ValueChanged += rulesetChanged;

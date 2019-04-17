@@ -109,15 +109,16 @@ namespace osu.Game.Screens.Multi
                             Top = 10,
                             Right = 10 + HORIZONTAL_OVERFLOW_PADDING,
                         },
-                        Text = "Create room",
-                        Action = () => loungeSubScreen.Open(new Room
-                        {
-                            Name = { Value = $"{api.LocalUser}'s awesome room" }
-                        }),
+                        Text = "Create room"
                     },
                     roomManager = new RoomManager()
                 }
             };
+
+            createButton.Clicked += () => loungeSubScreen.Open(new Room
+            {
+                Name = { Value = $"{api.LocalUser}'s awesome room" }
+            });
 
             screenStack.ScreenPushed += screenPushed;
             screenStack.ScreenExited += screenExited;
