@@ -101,11 +101,10 @@ namespace osu.Game.Screens.Menu
                 {
                     VisibleState = ButtonSystemState.Play,
                 },
-                logoTrackingContainer.LogoFacade
+                logoTrackingContainer.LogoFacade.With(d => d.Scale = new Vector2(0.74f))
             });
 
             buttonArea.Flow.CentreTarget = logoTrackingContainer.LogoFacade;
-            logoTrackingContainer.LogoFacade.Scale = new Vector2(0.74f);
         }
 
         [Resolved(CanBeNull = true)]

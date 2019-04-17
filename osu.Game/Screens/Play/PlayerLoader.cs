@@ -351,9 +351,6 @@ namespace osu.Game.Screens.Play
             {
                 var metadata = beatmap.BeatmapInfo?.Metadata ?? new BeatmapMetadata();
 
-                facade.Anchor = Anchor.TopCentre;
-                facade.Origin = Anchor.TopCentre;
-
                 AutoSizeAxes = Axes.Both;
                 Children = new Drawable[]
                 {
@@ -365,7 +362,11 @@ namespace osu.Game.Screens.Play
                         Direction = FillDirection.Vertical,
                         Children = new[]
                         {
-                            facade,
+                            facade.With(d =>
+                            {
+                                d.Anchor = Anchor.TopCentre;
+                                d.Origin = Anchor.TopCentre;
+                            }),
                             new OsuSpriteText
                             {
                                 Text = new LocalisedString((metadata.TitleUnicode, metadata.Title)),
