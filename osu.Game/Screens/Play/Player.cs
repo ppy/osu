@@ -371,7 +371,7 @@ namespace osu.Game.Screens.Play
 
         private void UpdateFail()
         {
-            audio.Frequency.Value -= Game.IsActive.Value ? 0.0015 : 0.00075;
+            audio.Track.Frequency.Value -= Game.IsActive.Value ? 0.0015 : 0.00075;
 
             GameplayClockContainer.UserPlaybackRate.Value -= Game.IsActive.Value ? 0.0015 : 0.00075;
 
@@ -385,14 +385,14 @@ namespace osu.Game.Screens.Play
                 Object.Y += (Rand.Next(0, 1) != 0 ? -(float)Rand.NextDouble() :  (float)Rand.NextDouble());
             }
 
-            if (audio.Frequency.Value > 0)
+            if (audio.Track.Frequency.Value > 0)
                 return;
 
             Failing = false; // Stop slowing down the audio
 
             GameplayClockContainer.Stop();
 
-            audio.Frequency.Value = 1;
+            audio.Track.Frequency.Value = 1;
 
             FailOverlay.Retries = RestartCount;
             FailOverlay.Show();
@@ -522,6 +522,11 @@ namespace osu.Game.Screens.Play
                 return true;
 
             GameplayClockContainer.ResetLocalAdjustments();
+
+            // Return the audio playback speed back to normal if exited on failing
+            Failing = false;
+        
+            audio.Track.Frequency.Value = 1;
 
             fadeOut();
             return base.OnExiting(next);
