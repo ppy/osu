@@ -35,7 +35,6 @@ namespace osu.Game.Tests.Visual.UserInterface
         };
 
         private OsuLogo logo;
-        private readonly Bindable<float> uiScale = new Bindable<float>();
         private TestLogoTrackingContainer trackingContainer;
         private Container transferContainer;
         private Box visualBox;
@@ -44,13 +43,6 @@ namespace osu.Game.Tests.Visual.UserInterface
         private bool randomPositions;
 
         private const float visual_box_size = 72;
-
-        [BackgroundDependencyLoader]
-        private void load(OsuConfigManager config)
-        {
-            config.BindWith(OsuSetting.UIScale, uiScale);
-            AddSliderStep("Adjust scale", 0.8f, 1.5f, 1f, v => uiScale.Value = v);
-        }
 
         [SetUpSteps]
         public void SetUpSteps()
@@ -69,7 +61,7 @@ namespace osu.Game.Tests.Visual.UserInterface
         /// Check if the logo is still tracking the facade.
         /// </summary>
         [Test]
-        public void MoveFacadeTest()
+        public void TestMoveFacade()
         {
             AddToggleStep("Toggle move continuously", b => randomPositions = b);
             AddStep("Add tracking containers", addFacadeContainers);
@@ -82,7 +74,7 @@ namespace osu.Game.Tests.Visual.UserInterface
         /// Check if the facade is removed from the container, the logo stops tracking.
         /// </summary>
         [Test]
-        public void RemoveFacadeTest()
+        public void TestRemoveFacade()
         {
             AddStep("Add tracking containers", addFacadeContainers);
             AddStep("Move facade to random position", moveLogoFacade);
@@ -95,7 +87,7 @@ namespace osu.Game.Tests.Visual.UserInterface
         /// Check if the facade gets added to a new container, tracking starts on the new facade.
         /// </summary>
         [Test]
-        public void TransferFacadeTest()
+        public void TestTransferFacade()
         {
             AddStep("Add tracking containers", addFacadeContainers);
             AddStep("Move facade to random position", moveLogoFacade);
@@ -106,6 +98,7 @@ namespace osu.Game.Tests.Visual.UserInterface
                 transferContainerBox.Colour = Color4.Tomato;
                 moveLogoFacade();
             });
+
             waitForMove();
             AddAssert("Logo is tracking", () => trackingContainer.IsLogoTracking);
         }
@@ -114,7 +107,7 @@ namespace osu.Game.Tests.Visual.UserInterface
         /// Add a facade to a flow container, move the logo to the center of the screen, then start tracking on the facade.
         /// </summary>
         [Test]
-        public void FlowContainerTest()
+        public void TestFlowContainer()
         {
             FillFlowContainer flowContainer;
 
@@ -188,14 +181,16 @@ namespace osu.Game.Tests.Visual.UserInterface
         }
 
         [Test]
-        public void SetFacadeSizeTest()
+        public void TestSetFacadeSize()
         {
             bool failed = false;
+
             AddStep("Set up scenario", () =>
             {
                 failed = false;
                 addFacadeContainers();
             });
+
             AddStep("Try setting facade size", () =>
             {
                 try
@@ -208,14 +203,16 @@ namespace osu.Game.Tests.Visual.UserInterface
                         failed = true;
                 }
             });
+
             AddAssert("Exception thrown", () => failed);
         }
 
         [Test]
-        public void SetMultipleContainersTest()
+        public void TestSetMultipleContainers()
         {
             bool failed = false;
             LogoTrackingContainer newContainer = new LogoTrackingContainer();
+
             AddStep("Set up scenario", () =>
             {
                 failed = false;
@@ -223,6 +220,7 @@ namespace osu.Game.Tests.Visual.UserInterface
                 addFacadeContainers();
                 moveLogoFacade();
             });
+
             AddStep("Try tracking new container", () =>
             {
                 try
@@ -235,6 +233,7 @@ namespace osu.Game.Tests.Visual.UserInterface
                         failed = true;
                 }
             });
+
             AddAssert("Exception thrown", () => failed);
         }
 
