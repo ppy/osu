@@ -92,12 +92,15 @@ namespace osu.Game.Graphics.Containers
             if (Logo == null)
                 return;
 
+            if (Logo.RelativePositionAxes != Axes.Both)
+                throw new InvalidOperationException($"Tracking logo must have {nameof(RelativePositionAxes)} = Axes.Both");
+
             // Account for the scale of the actual OsuLogo, as SizeForFlow only accounts for the sprite scale.
             ((ExposedFacade)LogoFacade).SetSize(new Vector2(Logo.SizeForFlow * Logo.Scale.X));
 
             var localPos = ComputeLogoTrackingPosition();
 
-            if (LogoFacade.Parent != null && Logo.Position != localPos && Logo.RelativePositionAxes == Axes.Both)
+            if (LogoFacade.Parent != null && Logo.Position != localPos)
             {
                 // If this is our first update since tracking has started, initialize our starting values for interpolation
                 if (startTime == null || startPosition == null)
