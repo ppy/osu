@@ -60,6 +60,9 @@ namespace osu.Game.Graphics.Containers
             startPosition = null;
         }
 
+        /// <summary>
+        /// Stops the logo assigned in <see cref="StartTracking"/> from tracking the facade's position.
+        /// </summary>
         public void StopTracking()
         {
             if (Logo != null)
