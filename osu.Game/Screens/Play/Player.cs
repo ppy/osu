@@ -1,4 +1,4 @@
-﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
@@ -7,6 +7,7 @@ using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
+using osu.Framework.Audio.Track;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -64,6 +65,7 @@ namespace osu.Game.Screens.Play
         private IAPIProvider api;
 
         private SampleChannel sampleRestart, sampleFail;
+		private Track trackSong;
 
         protected ScoreProcessor ScoreProcessor { get; private set; }
         protected DrawableRuleset DrawableRuleset { get; private set; }
@@ -106,6 +108,7 @@ namespace osu.Game.Screens.Play
 
             sampleRestart = audio.Sample.Get(@"Gameplay/restart");
             sampleFail = audio.Sample.Get(@"Gameplay/failsound");
+			trackSong = working.Track;
 
             mouseWheelDisabled = config.GetBindable<bool>(OsuSetting.MouseDisableWheel);
             showStoryboard = config.GetBindable<bool>(OsuSetting.ShowStoryboard);
@@ -526,8 +529,10 @@ namespace osu.Game.Screens.Play
 
             // Return the audio playback speed back to normal if exited on failing
             Failing = false;
+			sampleFail?.Stop();
         
             audio.Track.Frequency.Value = 1;
+			trackSong.Restart();
 
             fadeOut();
             return base.OnExiting(next);
