@@ -56,7 +56,7 @@ namespace osu.Game.Screens.Play
 
         [Resolved]
         private ScoreManager scoreManager { get; set; }
-        
+
         [Resolved]
         private AudioManager audio { get; set; }
 
@@ -65,7 +65,7 @@ namespace osu.Game.Screens.Play
         private IAPIProvider api;
 
         private SampleChannel sampleRestart, sampleFail;
-		private Track trackSong;
+        private Track trackSong;
 
         protected ScoreProcessor ScoreProcessor { get; private set; }
         protected DrawableRuleset DrawableRuleset { get; private set; }
@@ -108,7 +108,7 @@ namespace osu.Game.Screens.Play
 
             sampleRestart = audio.Sample.Get(@"Gameplay/restart");
             sampleFail = audio.Sample.Get(@"Gameplay/failsound");
-			trackSong = working.Track;
+            trackSong = working.Track;
 
             mouseWheelDisabled = config.GetBindable<bool>(OsuSetting.MouseDisableWheel);
             showStoryboard = config.GetBindable<bool>(OsuSetting.ShowStoryboard);
@@ -187,6 +187,18 @@ namespace osu.Game.Screens.Play
 
             foreach (var mod in Mods.Value.OfType<IApplicableToScoreProcessor>())
                 mod.ApplyToScoreProcessor(ScoreProcessor);
+        }
+
+        protected override void Update()
+        {
+            base.Update();
+
+            if (Failing)
+                UpdateFail();
+
+            // eagerly pause when we lose window focus (if we are locally playing).
+            if (PauseOnFocusLost && !Game.IsActive.Value)
+                Pause();
         }
 
         private WorkingBeatmap loadBeatmap()
@@ -332,18 +344,6 @@ namespace osu.Game.Screens.Play
                 StoryboardContainer.Add(storyboard);
         }
 
-        protected override void Update()
-        {
-            base.Update();
-
-            if (Failing)
-                UpdateFail();
-
-            // eagerly pause when we lose window focus (if we are locally playing).
-            if (PauseOnFocusLost && !Game.IsActive.Value)
-                Pause();
-        }
-
         #endregion
 
         #region Fail Logic
@@ -356,7 +356,7 @@ namespace osu.Game.Screens.Play
         {
             if (Mods.Value.OfType<IApplicableFailOverride>().Any(m => !m.AllowFail))
                 return false;
-            
+
             Failing = true;
             HasFailed = true;
 
@@ -369,7 +369,7 @@ namespace osu.Game.Screens.Play
             // Disable input to avoid hitting objects while falling
             // TODO: Disabling input will also disable the cursor movement, we don't want that
             DrawableRuleset.KeyBindingInputManager.UseParentInput = false;
-            
+
             return true;
         }
 
@@ -385,8 +385,8 @@ namespace osu.Game.Screens.Play
             foreach (DrawableHitObject Object in DrawableRuleset.Playfield.AllHitObjects.ToList())
             {
                 Object.Rotation += (Rand.Next(0, 1) != 0 ? -(float)Rand.NextDouble() : (float)Rand.NextDouble()) / 10;
-                Object.X += (Rand.Next(0, 1) != 0 ?  (float)Rand.NextDouble() : -(float)Rand.NextDouble()) / 10;
-                Object.Y += (Rand.Next(0, 1) != 0 ? -(float)Rand.NextDouble() :  (float)Rand.NextDouble());
+                Object.X += (Rand.Next(0, 1) != 0 ? (float)Rand.NextDouble() : -(float)Rand.NextDouble()) / 10;
+                Object.Y += (Rand.Next(0, 1) != 0 ? -(float)Rand.NextDouble() : (float)Rand.NextDouble());
             }
 
             if (audio.Track.Frequency.Value > 0)
@@ -529,10 +529,10 @@ namespace osu.Game.Screens.Play
 
             // Return the audio playback speed back to normal if exited on failing
             Failing = false;
-			sampleFail?.Stop();
-        
+            sampleFail?.Stop();
+
             audio.Track.Frequency.Value = 1;
-			trackSong.Restart();
+            trackSong.Restart();
 
             fadeOut();
             return base.OnExiting(next);
