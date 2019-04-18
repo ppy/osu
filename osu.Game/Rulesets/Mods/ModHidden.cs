@@ -11,7 +11,7 @@ using osu.Framework.Graphics.Sprites;
 
 namespace osu.Game.Rulesets.Mods
 {
-    public abstract class ModHidden : Mod, IReadFromConfig, IApplicableToDrawableHitObjects
+    public abstract class ModHidden : Mod, IReadFromConfig, IApplicableToDrawableHitObjects, IApplicableToScoreProcessor
     {
         public override string Name => "Hidden";
         public override string Acronym => "HD";
@@ -20,6 +20,23 @@ namespace osu.Game.Rulesets.Mods
         public override bool Ranked => true;
 
         protected Bindable<bool> IncreaseFirstObjectVisibility = new Bindable<bool>();
+
+        public void ApplyToScoreProcessor(ScoreProcessor scoreProcessor)
+        {
+        }
+
+        public ScoreRank AdjustRank(ScoreRank rank)
+        {
+            switch (rank)
+            {
+                case ScoreRank.X:
+                    return ScoreRank.XH;
+                case ScoreRank.S:
+                    return ScoreRank.SH;
+                default:
+                    return rank;
+            }
+        }
 
         public void ReadFromConfig(OsuConfigManager config)
         {
