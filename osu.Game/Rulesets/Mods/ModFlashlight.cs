@@ -16,6 +16,7 @@ using osu.Game.Graphics;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.UI;
+using osu.Game.Scoring;
 using osuTK;
 using osuTK.Graphics;
 
@@ -45,6 +46,8 @@ namespace osu.Game.Rulesets.Mods
         {
             Combo.BindTo(scoreProcessor.Combo);
         }
+
+        public ScoreRank
 
         public virtual void ApplyToDrawableRuleset(DrawableRuleset<T> drawableRuleset)
         {
