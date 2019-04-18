@@ -396,8 +396,8 @@ namespace osu.Game.Screens.Play
             GameplayClockContainer.Stop();
 
             audio.Track.Frequency.Value = 1;
-            
-            // Return gameplay input 
+
+            // Return gameplay input
             GameplayClockContainer.BlockGameplayInput = false;
 
             FailOverlay.Retries = RestartCount;
@@ -535,8 +535,8 @@ namespace osu.Game.Screens.Play
 
             audio.Track.Frequency.Value = 1;
             trackSong.Restart();
-            
-            // Return gameplay input 
+
+            // Return gameplay input
             GameplayClockContainer.BlockGameplayInput = false;
 
             fadeOut();
