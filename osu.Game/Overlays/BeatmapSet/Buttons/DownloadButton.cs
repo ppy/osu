@@ -94,7 +94,7 @@ namespace osu.Game.Overlays.BeatmapSet.Buttons
                 },
             });
 
-            button.Action = () =>
+            button.Clicked += () =>
             {
                 if (State.Value != DownloadState.NotDownloaded)
                 {

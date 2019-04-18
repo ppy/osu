@@ -106,7 +106,6 @@ namespace osu.Game.Overlays.Notifications
                         closeButton = new CloseButton
                         {
                             Alpha = 0,
-                            Action = Close,
                             Anchor = Anchor.CentreRight,
                             Origin = Anchor.CentreRight,
                             Margin = new MarginPadding
@@ -117,6 +116,8 @@ namespace osu.Game.Overlays.Notifications
                     }
                 }
             });
+
+            closeButton.Clicked += Close;
         }
 
         protected override bool OnHover(HoverEvent e)

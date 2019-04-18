@@ -55,7 +55,7 @@ namespace osu.Game.Overlays.Chat.Selection
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
 
-            Action = () => { (channel.Joined.Value ? OnRequestLeave : OnRequestJoin)?.Invoke(channel); };
+            Clicked += () => { (channel.Joined.Value ? OnRequestLeave : OnRequestJoin)?.Invoke(channel); };
 
             Children = new Drawable[]
             {

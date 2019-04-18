@@ -23,11 +23,13 @@ namespace osu.Game.Overlays.Settings.Sections.General
 
             if (RuntimeInfo.IsDesktop)
             {
-                Add(new SettingsButton
+                SettingsButton openOsuFolderButton;
+                Add(openOsuFolderButton = new SettingsButton
                 {
-                    Text = "Open osu! folder",
-                    Action = storage.OpenInNativeExplorer,
+                    Text = "Open osu! folder"
                 });
+
+                openOsuFolderButton.Clicked += storage.OpenInNativeExplorer;
             }
         }
     }

@@ -151,7 +151,6 @@ namespace osu.Game.Overlays
                                                 {
                                                     Anchor = Anchor.Centre,
                                                     Origin = Anchor.Centre,
-                                                    Action = prev,
                                                     Icon = FontAwesome.Solid.StepBackward,
                                                 },
                                                 playButton = new MusicIconButton
@@ -160,14 +159,12 @@ namespace osu.Game.Overlays
                                                     Origin = Anchor.Centre,
                                                     Scale = new Vector2(1.4f),
                                                     IconScale = new Vector2(1.4f),
-                                                    Action = play,
                                                     Icon = FontAwesome.Regular.PlayCircle,
                                                 },
                                                 nextButton = new MusicIconButton
                                                 {
                                                     Anchor = Anchor.Centre,
                                                     Origin = Anchor.Centre,
-                                                    Action = () => next(),
                                                     Icon = FontAwesome.Solid.StepForward,
                                                 },
                                             }
@@ -178,7 +175,6 @@ namespace osu.Game.Overlays
                                             Anchor = Anchor.CentreRight,
                                             Position = new Vector2(-bottom_black_area_height / 2, 0),
                                             Icon = FontAwesome.Solid.Bars,
-                                            Action = () => playlist.ToggleVisibility(),
                                         },
                                     }
                                 },
@@ -195,6 +191,11 @@ namespace osu.Game.Overlays
                     }
                 }
             };
+
+            prevButton.Clicked += prev;
+            playButton.Clicked += play;
+            nextButton.Clicked += () => next();
+            playlistButton.Clicked += () => playlist.ToggleVisibility();
 
             beatmapSets = beatmaps.GetAllUsableBeatmapSets();
             beatmaps.ItemAdded += handleBeatmapAdded;

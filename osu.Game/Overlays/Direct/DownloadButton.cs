@@ -77,7 +77,7 @@ namespace osu.Game.Overlays.Direct
         {
             this.colours = colours;
 
-            button.Action = () =>
+            button.Clicked += () =>
             {
                 switch (State.Value)
                 {

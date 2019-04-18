@@ -29,78 +29,82 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
             {
                 Add(importBeatmapsButton = new SettingsButton
                 {
-                    Text = "Import beatmaps from stable",
-                    Action = () =>
-                    {
-                        importBeatmapsButton.Enabled.Value = false;
-                        beatmaps.ImportFromStableAsync().ContinueWith(t => Schedule(() => importBeatmapsButton.Enabled.Value = true));
-                    }
+                    Text = "Import beatmaps from stable"
                 });
+
+                importBeatmapsButton.Clicked += () =>
+                {
+                    importBeatmapsButton.Enabled.Value = false;
+                    beatmaps.ImportFromStableAsync().ContinueWith(t => Schedule(() => importBeatmapsButton.Enabled.Value = true));
+                };
             }
 
             Add(deleteBeatmapsButton = new DangerousSettingsButton
             {
-                Text = "Delete ALL beatmaps",
-                Action = () =>
-                {
-                    dialogOverlay?.Push(new DeleteAllBeatmapsDialog(() =>
-                    {
-                        deleteBeatmapsButton.Enabled.Value = false;
-                        Task.Run(() => beatmaps.Delete(beatmaps.GetAllUsableBeatmapSets())).ContinueWith(t => Schedule(() => deleteBeatmapsButton.Enabled.Value = true));
-                    }));
-                }
+                Text = "Delete ALL beatmaps"
             });
+
+            deleteBeatmapsButton.Clicked += () =>
+            {
+                dialogOverlay?.Push(new DeleteAllBeatmapsDialog(() =>
+                {
+                    deleteBeatmapsButton.Enabled.Value = false;
+                    Task.Run(() => beatmaps.Delete(beatmaps.GetAllUsableBeatmapSets())).ContinueWith(t => Schedule(() => deleteBeatmapsButton.Enabled.Value = true));
+                }));
+            };
 
             if (skins.SupportsImportFromStable)
             {
                 Add(importSkinsButton = new SettingsButton
                 {
-                    Text = "Import skins from stable",
-                    Action = () =>
-                    {
-                        importSkinsButton.Enabled.Value = false;
-                        skins.ImportFromStableAsync().ContinueWith(t => Schedule(() => importSkinsButton.Enabled.Value = true));
-                    }
+                    Text = "Import skins from stable"
                 });
+
+                importSkinsButton.Clicked += () =>
+                {
+                    importSkinsButton.Enabled.Value = false;
+                    skins.ImportFromStableAsync().ContinueWith(t => Schedule(() => importSkinsButton.Enabled.Value = true));
+                };
             }
 
             AddRange(new Drawable[]
             {
                 deleteSkinsButton = new DangerousSettingsButton
                 {
-                    Text = "Delete ALL skins",
-                    Action = () =>
-                    {
-                        dialogOverlay?.Push(new DeleteAllBeatmapsDialog(() =>
-                        {
-                            deleteSkinsButton.Enabled.Value = false;
-                            Task.Run(() => skins.Delete(skins.GetAllUserSkins())).ContinueWith(t => Schedule(() => deleteSkinsButton.Enabled.Value = true));
-                        }));
-                    }
+                    Text = "Delete ALL skins"
                 },
                 restoreButton = new SettingsButton
                 {
-                    Text = "Restore all hidden difficulties",
-                    Action = () =>
-                    {
-                        restoreButton.Enabled.Value = false;
-                        Task.Run(() =>
-                        {
-                            foreach (var b in beatmaps.QueryBeatmaps(b => b.Hidden).ToList())
-                                beatmaps.Restore(b);
-                        }).ContinueWith(t => Schedule(() => restoreButton.Enabled.Value = true));
-                    }
+                    Text = "Restore all hidden difficulties"
                 },
                 undeleteButton = new SettingsButton
                 {
-                    Text = "Restore all recently deleted beatmaps",
-                    Action = () =>
-                    {
-                        undeleteButton.Enabled.Value = false;
-                        Task.Run(() => beatmaps.Undelete(beatmaps.QueryBeatmapSets(b => b.DeletePending).ToList())).ContinueWith(t => Schedule(() => undeleteButton.Enabled.Value = true));
-                    }
+                    Text = "Restore all recently deleted beatmaps"
                 },
             });
+
+            deleteSkinsButton.Clicked += () =>
+            {
+                dialogOverlay?.Push(new DeleteAllBeatmapsDialog(() =>
+                {
+                    deleteSkinsButton.Enabled.Value = false;
+                    Task.Run(() => skins.Delete(skins.GetAllUserSkins())).ContinueWith(t => Schedule(() => deleteSkinsButton.Enabled.Value = true));
+                }));
+            };
+            restoreButton.Clicked += () =>
+            {
+                restoreButton.Enabled.Value = false;
+                Task.Run(() =>
+                {
+                    foreach (var b in beatmaps.QueryBeatmaps(b => b.Hidden).ToList())
+                        beatmaps.Restore(b);
+                }).ContinueWith(t => Schedule(() => restoreButton.Enabled.Value = true));
+            };
+            undeleteButton.Clicked += () =>
+            {
+                undeleteButton.Enabled.Value = false;
+                Task.Run(() => beatmaps.Undelete(beatmaps.QueryBeatmapSets(b => b.DeletePending).ToList())).ContinueWith(t => Schedule(() => undeleteButton.Enabled.Value = true));
+            };
         }
     }
 }

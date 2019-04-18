@@ -198,6 +198,7 @@ namespace osu.Game.Overlays.Chat
         {
             private readonly User sender;
 
+            private Action viewProfileAction;
             private Action startChatAction;
 
             public MessageSender(User sender)
@@ -208,13 +209,15 @@ namespace osu.Game.Overlays.Chat
             [BackgroundDependencyLoader(true)]
             private void load(UserProfileOverlay profile, ChannelManager chatManager)
             {
-                Action = () => profile?.ShowUser(sender);
+                viewProfileAction = () => profile?.ShowUser(sender);
                 startChatAction = () => chatManager?.OpenPrivateChannel(sender);
+
+                Clicked += viewProfileAction;
             }
 
             public MenuItem[] ContextMenuItems => new MenuItem[]
             {
-                new OsuMenuItem("View Profile", MenuItemType.Highlighted, Action),
+                new OsuMenuItem("View Profile", MenuItemType.Highlighted, viewProfileAction),
                 new OsuMenuItem("Start Chat", MenuItemType.Standard, startChatAction),
             };
         }

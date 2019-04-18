@@ -358,7 +358,6 @@ namespace osu.Game.Overlays.Mods
                                             {
                                                 Width = 180,
                                                 Text = "Deselect All",
-                                                Action = DeselectAll,
                                                 Margin = new MarginPadding
                                                 {
                                                     Right = 20
@@ -400,6 +399,8 @@ namespace osu.Game.Overlays.Mods
                     },
                 },
             };
+
+            DeselectAllButton.Clicked += DeselectAll;
         }
     }
 }

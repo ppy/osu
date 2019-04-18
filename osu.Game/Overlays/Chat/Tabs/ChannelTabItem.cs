@@ -106,14 +106,15 @@ namespace osu.Game.Overlays.Chat.Tabs
                             Alpha = 0,
                             Margin = new MarginPadding { Right = 20 },
                             Origin = Anchor.CentreRight,
-                            Anchor = Anchor.CentreRight,
-                            Action = delegate
-                            {
-                                if (IsRemovable) OnRequestClose?.Invoke(this);
-                            },
+                            Anchor = Anchor.CentreRight
                         },
                     },
                 },
+            };
+
+            CloseButton.Clicked += delegate
+            {
+                if (IsRemovable) OnRequestClose?.Invoke(this);
             };
         }
 

@@ -18,6 +18,7 @@ namespace osu.Game.Overlays.AccountCreation
         [BackgroundDependencyLoader]
         private void load()
         {
+            SettingsButton createAccountButton;
             InternalChild = new FillFlowContainer
             {
                 RelativeSizeAxes = Axes.Both,
@@ -53,14 +54,15 @@ namespace osu.Game.Overlays.AccountCreation
                         Font = OsuFont.GetFont(size: 12),
                         Text = "let's get you started",
                     },
-                    new SettingsButton
+                    createAccountButton=new SettingsButton
                     {
                         Text = "Let's create an account!",
-                        Margin = new MarginPadding { Vertical = 120 },
-                        Action = () => this.Push(new ScreenWarning())
+                        Margin = new MarginPadding { Vertical = 120 }
                     }
                 }
             };
+
+            createAccountButton.Clicked += () => this.Push(new ScreenWarning());
         }
     }
 }

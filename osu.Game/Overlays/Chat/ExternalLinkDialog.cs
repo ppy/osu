@@ -16,18 +16,20 @@ namespace osu.Game.Overlays.Chat
 
             Icon = FontAwesome.Solid.ExclamationTriangle;
 
+            PopupDialogOkButton popupDialogOkButton;
             Buttons = new PopupDialogButton[]
             {
-                new PopupDialogOkButton
+                popupDialogOkButton=new PopupDialogOkButton
                 {
-                    Text = @"Yes. Go for it.",
-                    Action = openExternalLinkAction
+                    Text = @"Yes. Go for it."
                 },
                 new PopupDialogCancelButton
                 {
                     Text = @"No! Abort mission!"
                 },
             };
+
+            popupDialogOkButton.Clicked += openExternalLinkAction;
         }
     }
 }

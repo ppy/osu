@@ -79,7 +79,7 @@ namespace osu.Game.Overlays.SearchableList
 
                 bindable.ValueChanged += Bindable_ValueChanged;
                 Bindable_ValueChanged(new ValueChangedEvent<PanelDisplayStyle>(bindable.Value, bindable.Value));
-                Action = () => bindable.Value = this.style;
+                Clicked += () => bindable.Value = this.style;
             }
 
             private void Bindable_ValueChanged(ValueChangedEvent<PanelDisplayStyle> e)

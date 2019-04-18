@@ -15,18 +15,21 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
 
             Icon = FontAwesome.Regular.TrashAlt;
             HeaderText = @"Confirm deletion of";
+
+            PopupDialogOkButton popupDialogOkButton;
             Buttons = new PopupDialogButton[]
             {
-                new PopupDialogOkButton
+                popupDialogOkButton=new PopupDialogOkButton
                 {
-                    Text = @"Yes. Go for it.",
-                    Action = deleteAction
+                    Text = @"Yes. Go for it."
                 },
                 new PopupDialogCancelButton
                 {
                     Text = @"No! Abort mission!",
                 },
             };
+
+            popupDialogOkButton.Clicked += deleteAction;
         }
     }
 }

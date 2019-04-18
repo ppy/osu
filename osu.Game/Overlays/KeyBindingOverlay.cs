@@ -30,12 +30,14 @@ namespace osu.Game.Overlays
             foreach (var ruleset in rulesets.AvailableRulesets)
                 AddSection(new RulesetBindingsSection(ruleset));
 
-            AddInternal(new BackButton
+            BackButton backButton;
+            AddInternal(backButton = new BackButton
             {
                 Anchor = Anchor.BottomLeft,
-                Origin = Anchor.BottomLeft,
-                Action = Hide
+                Origin = Anchor.BottomLeft
             });
+
+            backButton.Clicked += Hide;
         }
 
         public KeyBindingOverlay()

@@ -11,15 +11,17 @@ namespace osu.Game.Overlays.Settings.Sections.Input
 
         public KeyboardSettings(KeyBindingOverlay keyConfig)
         {
+            SettingsButton keyConfigurationButton;
             Children = new Drawable[]
             {
-                new SettingsButton
+                keyConfigurationButton=new SettingsButton
                 {
                     Text = "Key configuration",
-                    TooltipText = "Change global shortcut keys and gameplay bindings",
-                    Action = keyConfig.ToggleVisibility
+                    TooltipText = "Change global shortcut keys and gameplay bindings"
                 },
             };
+
+            keyConfigurationButton.Clicked += keyConfig.ToggleVisibility;
         }
     }
 }

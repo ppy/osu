@@ -213,6 +213,8 @@ namespace osu.Game.Overlays.Settings.Sections.General
                 Spacing = new Vector2(0, 5);
                 AutoSizeAxes = Axes.Y;
                 RelativeSizeAxes = Axes.X;
+                SettingsButton performLoginButton;
+                SettingsButton accountCreationButton;
                 Children = new Drawable[]
                 {
                     username = new OsuTextBox
@@ -239,20 +241,21 @@ namespace osu.Game.Overlays.Settings.Sections.General
                         LabelText = "Stay signed in",
                         Bindable = config.GetBindable<bool>(OsuSetting.SavePassword),
                     },
-                    new SettingsButton
+                    performLoginButton=new SettingsButton
                     {
-                        Text = "Sign in",
-                        Action = performLogin
+                        Text = "Sign in"
                     },
-                    new SettingsButton
+                    accountCreationButton=new SettingsButton
                     {
-                        Text = "Register",
-                        Action = () =>
-                        {
-                            RequestHide();
-                            accountCreation.Show();
-                        }
+                        Text = "Register"
                     }
+                };
+
+                performLoginButton.Clicked += performLogin;
+                accountCreationButton.Clicked += () =>
+                {
+                    RequestHide();
+                    accountCreation.Show();
                 };
             }
 

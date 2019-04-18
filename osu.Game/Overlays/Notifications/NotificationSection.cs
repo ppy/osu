@@ -86,8 +86,7 @@ namespace osu.Game.Overlays.Notifications
                         {
                             Text = clearText,
                             Anchor = Anchor.TopRight,
-                            Origin = Anchor.TopRight,
-                            Action = clearAll
+                            Origin = Anchor.TopRight
                         },
                         new FillFlowContainer
                         {
@@ -123,6 +122,8 @@ namespace osu.Game.Overlays.Notifications
                     Spacing = new Vector2(3),
                 }
             });
+
+            clearButton.Clicked += clearAll;
         }
 
         private void clearAll()

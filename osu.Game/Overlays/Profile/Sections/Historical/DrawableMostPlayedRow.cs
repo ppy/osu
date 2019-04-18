@@ -91,7 +91,7 @@ namespace osu.Game.Overlays.Profile.Sections.Historical
             });
 
             if (profileOverlay != null)
-                mapperContainer.Action = () => profileOverlay.ShowUser(beatmap.BeatmapSet.Metadata.Author);
+                mapperContainer.Clicked += () => profileOverlay.ShowUser(beatmap.BeatmapSet.Metadata.Author);
         }
     }
 }

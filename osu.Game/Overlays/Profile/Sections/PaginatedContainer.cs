@@ -57,7 +57,6 @@ namespace osu.Game.Overlays.Profile.Sections
                 ShowMoreButton = new OsuHoverContainer
                 {
                     Alpha = 0,
-                    Action = ShowMore,
                     AutoSizeAxes = Axes.Both,
                     Anchor = Anchor.TopCentre,
                     Origin = Anchor.TopCentre,
@@ -81,6 +80,8 @@ namespace osu.Game.Overlays.Profile.Sections
                     Alpha = 0,
                 },
             };
+
+            ShowMoreButton.Clicked += ShowMore;
         }
 
         [BackgroundDependencyLoader]

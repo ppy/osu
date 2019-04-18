@@ -68,7 +68,7 @@ namespace osu.Game.Overlays.BeatmapSet.Buttons
                 }
             };
 
-            Action = () => Favourited.Value = !Favourited.Value;
+            Clicked += () => Favourited.Value = !Favourited.Value;
         }
 
         protected override void UpdateAfterChildren()

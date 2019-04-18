@@ -94,7 +94,7 @@ namespace osu.Game.Overlays.Direct
                 Ruleset = ruleset;
                 bindable.ValueChanged += Bindable_ValueChanged;
                 Bindable_ValueChanged(new ValueChangedEvent<RulesetInfo>(bindable.Value, bindable.Value));
-                Action = () => bindable.Value = Ruleset;
+                Clicked += () => bindable.Value = Ruleset;
             }
 
             protected override void Dispose(bool isDisposing)

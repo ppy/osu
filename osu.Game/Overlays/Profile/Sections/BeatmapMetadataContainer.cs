@@ -32,7 +32,7 @@ namespace osu.Game.Overlays.Profile.Sections
         [BackgroundDependencyLoader(true)]
         private void load(BeatmapSetOverlay beatmapSetOverlay)
         {
-            Action = () =>
+            Clicked += () =>
             {
                 if (beatmap.OnlineBeatmapID != null)
                     beatmapSetOverlay?.FetchAndShowBeatmap(beatmap.OnlineBeatmapID.Value);

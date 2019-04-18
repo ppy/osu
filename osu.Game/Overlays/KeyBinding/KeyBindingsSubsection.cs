@@ -48,10 +48,9 @@ namespace osu.Game.Overlays.KeyBinding
                 });
             }
 
-            Add(new ResetButton
-            {
-                Action = () => Children.OfType<KeyBindingRow>().ForEach(k => k.RestoreDefaults())
-            });
+            ResetButton resetButton;
+            Add(resetButton = new ResetButton());
+            resetButton.Clicked += () => Children.OfType<KeyBindingRow>().ForEach(k => k.RestoreDefaults());
         }
     }
 
