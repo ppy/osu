@@ -88,7 +88,11 @@ namespace osu.Game.Screens.Multi.Lounge.Components
         private void addRooms(IEnumerable<Room> rooms)
         {
             foreach (var r in rooms)
-                roomFlow.Add(new DrawableRoom(r) { Action = () => selectRoom(r) });
+            {
+                DrawableRoom drawableRoom;
+                roomFlow.Add(drawableRoom = new DrawableRoom(r));
+                drawableRoom.Clicked += onDrawableRoomClicked(r);
+            }
 
             Filter(currentFilter);
         }
@@ -98,13 +102,15 @@ namespace osu.Game.Screens.Multi.Lounge.Components
             foreach (var r in rooms)
             {
                 var toRemove = roomFlow.Single(d => d.Room == r);
-                toRemove.Action = null;
+                toRemove.Clicked -= onDrawableRoomClicked(r);
 
                 roomFlow.Remove(toRemove);
 
                 selectRoom(null);
             }
         }
+
+        private Action onDrawableRoomClicked(Room r) => () => selectRoom(r);
 
         private void updateSorting()
         {
