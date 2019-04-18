@@ -251,6 +251,9 @@ namespace osu.Game.Screens.Play
             if (ScoreProcessor.HasFailed || onCompletionEvent != null)
                 return;
 
+            foreach (var mod in Mods.Value.OfType<IApplicableToScoreProcessor>())
+                ScoreProcessor.Rank.Value = mod.AdjustRank(ScoreProcessor.Rank.Value);
+
             ValidForResume = false;
 
             if (!showResults) return;
