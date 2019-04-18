@@ -1,4 +1,4 @@
-﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
@@ -7,6 +7,7 @@ using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
+using osu.Framework.Audio.Track;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -21,6 +22,7 @@ using osu.Game.Online.API;
 using osu.Game.Overlays;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
+using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.UI;
 using osu.Game.Scoring;
@@ -55,11 +57,15 @@ namespace osu.Game.Screens.Play
         [Resolved]
         private ScoreManager scoreManager { get; set; }
 
+        [Resolved]
+        private AudioManager audio { get; set; }
+
         private RulesetInfo ruleset;
 
         private IAPIProvider api;
 
-        private SampleChannel sampleRestart;
+        private SampleChannel sampleRestart, sampleFail;
+        private Track trackSong;
 
         protected ScoreProcessor ScoreProcessor { get; private set; }
         protected DrawableRuleset DrawableRuleset { get; private set; }
@@ -101,6 +107,8 @@ namespace osu.Game.Screens.Play
                 return;
 
             sampleRestart = audio.Sample.Get(@"Gameplay/restart");
+            sampleFail = audio.Sample.Get(@"Gameplay/failsound");
+            trackSong = working.Track;
 
             mouseWheelDisabled = config.GetBindable<bool>(OsuSetting.MouseDisableWheel);
             showStoryboard = config.GetBindable<bool>(OsuSetting.ShowStoryboard);
@@ -179,6 +187,18 @@ namespace osu.Game.Screens.Play
 
             foreach (var mod in Mods.Value.OfType<IApplicableToScoreProcessor>())
                 mod.ApplyToScoreProcessor(ScoreProcessor);
+        }
+
+        protected override void Update()
+        {
+            base.Update();
+
+            if (IsFailing)
+                updateFail();
+
+            // eagerly pause when we lose window focus (if we are locally playing).
+            if (PauseOnFocusLost && !Game.IsActive.Value)
+                Pause();
         }
 
         private WorkingBeatmap loadBeatmap()
@@ -330,13 +350,14 @@ namespace osu.Game.Screens.Play
 
         protected FailOverlay FailOverlay { get; private set; }
 
+        public bool IsFailing { get; private set; }
+
         private bool onFail()
         {
             if (Mods.Value.OfType<IApplicableFailOverride>().Any(m => !m.AllowFail))
                 return false;
 
-            GameplayClockContainer.Stop();
-
+            IsFailing = true;
             HasFailed = true;
 
             // There is a chance that we could be in a paused state as the ruleset's internal clock (see FrameStabilityContainer)
@@ -345,9 +366,42 @@ namespace osu.Game.Screens.Play
             if (PauseOverlay.State == Visibility.Visible)
                 PauseOverlay.Hide();
 
+            // Disable input to avoid hitting objects while falling
+            GameplayClockContainer.BlockGameplayInput = true;
+
+            return true;
+        }
+
+        private void updateFail()
+        {
+            audio.Track.Frequency.Value -= Game.IsActive.Value ? 0.0015 : 0.00075;
+
+            GameplayClockContainer.UserPlaybackRate.Value -= Game.IsActive.Value ? 0.0015 : 0.00075;
+
+            DrawableRuleset.Playfield.Alpha -= Game.IsActive.Value ? 0.0015f : 0.00075f;
+
+            Random objRand = new Random();
+            foreach (DrawableHitObject Object in DrawableRuleset.Playfield.AllHitObjects.ToList())
+            {
+                Object.Rotation += (objRand.Next(0, 1) != 0 ? -(float)objRand.NextDouble() : (float)objRand.NextDouble()) / 10;
+                Object.X += (objRand.Next(0, 1) != 0 ? (float)objRand.NextDouble() : -(float)objRand.NextDouble()) / 10;
+                Object.Y += (objRand.Next(0, 1) != 0 ? -(float)objRand.NextDouble() : (float)objRand.NextDouble());
+            }
+
+            if (audio.Track.Frequency.Value > 0)
+                return;
+
+            IsFailing = false; // Stop slowing down the audio
+
+            GameplayClockContainer.Stop();
+
+            audio.Track.Frequency.Value = 1;
+
+            // Return gameplay input
+            GameplayClockContainer.BlockGameplayInput = false;
+
             FailOverlay.Retries = RestartCount;
             FailOverlay.Show();
-            return true;
         }
 
         #endregion
@@ -385,15 +439,6 @@ namespace osu.Game.Screens.Play
             && !HasFailed
             // already resuming
             && !IsResuming;
-
-        protected override void Update()
-        {
-            base.Update();
-
-            // eagerly pause when we lose window focus (if we are locally playing).
-            if (PauseOnFocusLost && !Game.IsActive.Value)
-                Pause();
-        }
 
         public void Pause()
         {
@@ -483,6 +528,16 @@ namespace osu.Game.Screens.Play
                 return true;
 
             GameplayClockContainer.ResetLocalAdjustments();
+
+            // Return the audio playback speed back to normal if exited on failing
+            IsFailing = false;
+            sampleFail?.Stop();
+
+            audio.Track.Frequency.Value = 1;
+            trackSong.Restart();
+
+            // Return gameplay input
+            GameplayClockContainer.BlockGameplayInput = false;
 
             fadeOut();
             return base.OnExiting(next);
