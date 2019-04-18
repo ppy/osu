@@ -200,7 +200,7 @@ namespace osu.Game.Tests.Visual.UserInterface
                 selectNext(mod);
 
             AddAssert("check for any selection", () => modSelect.SelectedMods.Value.Any());
-            AddStep("deselect all", modSelect.DeselectAllButton.Action.Invoke);
+            AddStep("deselect all", () => modSelect.DeselectAllButton.Click());
             AddAssert("check for no selection", () => !modSelect.SelectedMods.Value.Any());
         }
 

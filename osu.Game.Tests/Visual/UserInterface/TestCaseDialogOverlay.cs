@@ -17,25 +17,31 @@ namespace osu.Game.Tests.Visual.UserInterface
 
             Add(overlay = new DialogOverlay());
 
-            AddStep("dialog #1", () => overlay.Push(new PopupDialog
+            PopupDialogOkButton popupDialogOkButton;
+            PopupDialogCancelButton popupDialogCancelButton;
+            AddStep("dialog #1", () =>
             {
-                Icon = FontAwesome.Regular.TrashAlt,
-                HeaderText = @"Confirm deletion of",
-                BodyText = @"Ayase Rie - Yuima-ru*World TVver.",
-                Buttons = new PopupDialogButton[]
+                overlay.Push(new PopupDialog
                 {
-                    new PopupDialogOkButton
+                    Icon = FontAwesome.Regular.TrashAlt,
+                    HeaderText = @"Confirm deletion of",
+                    BodyText = @"Ayase Rie - Yuima-ru*World TVver.",
+                    Buttons = new PopupDialogButton[]
                     {
-                        Text = @"I never want to see this again.",
-                        Action = () => System.Console.WriteLine(@"OK"),
+                        popupDialogOkButton = new PopupDialogOkButton
+                        {
+                            Text = @"I never want to see this again."
+                        },
+                        popupDialogCancelButton = new PopupDialogCancelButton
+                        {
+                            Text = @"Firetruck, I still want quick ranks!"
+                        },
                     },
-                    new PopupDialogCancelButton
-                    {
-                        Text = @"Firetruck, I still want quick ranks!",
-                        Action = () => System.Console.WriteLine(@"Cancel"),
-                    },
-                },
-            }));
+                });
+
+                popupDialogOkButton.Clicked += () => System.Console.WriteLine(@"OK");
+                popupDialogCancelButton.Clicked += () => System.Console.WriteLine(@"Cancel");
+            });
 
             AddStep("dialog #2", () => overlay.Push(new PopupDialog
             {

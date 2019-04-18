@@ -111,7 +111,7 @@ namespace osu.Game.Tests.Visual.Editor
                 Size = new Vector2(100, 50);
                 Text = "Start";
 
-                Action = onClick;
+                Clicked += onClick;
             }
 
             [BackgroundDependencyLoader]

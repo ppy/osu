@@ -91,6 +91,7 @@ namespace osu.Game.Tests.Visual.UserInterface
 
             protected TestScreen()
             {
+                TriangleButton triangleButton;
                 InternalChild = new FillFlowContainer
                 {
                     Anchor = Anchor.Centre,
@@ -106,16 +107,17 @@ namespace osu.Game.Tests.Visual.UserInterface
                             Origin = Anchor.TopCentre,
                             Text = Title,
                         },
-                        new TriangleButton
+                        triangleButton=new TriangleButton
                         {
                             Anchor = Anchor.TopCentre,
                             Origin = Anchor.TopCentre,
                             Width = 100,
-                            Text = $"Push {NextTitle}",
-                            Action = () => PushNext(),
+                            Text = $"Push {NextTitle}"
                         },
                     },
                 };
+
+                triangleButton.Clicked += () => PushNext();
             }
         }
 
