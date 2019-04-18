@@ -11,7 +11,8 @@ namespace osu.Game.Rulesets.Osu.Tests
     {
         protected override Player CreatePlayer(Ruleset ruleset)
         {
-            Beatmap.Value.Mods.Value = new Mod[] { new OsuModAutoplay(), new OsuModFlashlight(), };
+            Mods.Value = new Mod[] { new OsuModAutoplay(), new OsuModFlashlight(), };
+
             return base.CreatePlayer(ruleset);
         }
     }
