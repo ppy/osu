@@ -4,6 +4,8 @@
 using osuTK;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Objects.Drawables;
@@ -12,6 +14,8 @@ using osu.Game.Rulesets.UI;
 using System.Linq;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Osu.UI.Cursor;
+using osu.Game.Rulesets.Osu.Configuration;
+using osu.Game.Rulesets.Scoring;
 
 namespace osu.Game.Rulesets.Osu.UI
 {
@@ -48,6 +52,14 @@ namespace osu.Game.Rulesets.Osu.UI
             };
         }
 
+        private Bindable<bool> showGreatJudgement;
+
+        [BackgroundDependencyLoader]
+        private void load(OsuRulesetConfigManager config)
+        {
+            showGreatJudgement = config.GetBindable<bool>(OsuRulesetSetting.ShowGreatJudgement);
+        }
+
         public override void Add(DrawableHitObject h)
         {
             h.OnNewResult += onNewResult;
@@ -80,6 +92,9 @@ namespace osu.Game.Rulesets.Osu.UI
         private void onNewResult(DrawableHitObject judgedObject, JudgementResult result)
         {
             if (!judgedObject.DisplayResult || !DisplayJudgements.Value)
+                return;
+
+            if (!showGreatJudgement.Value && result.Type == HitResult.Great)
                 return;
 
             DrawableOsuJudgement explosion = new DrawableOsuJudgement(result, judgedObject)
