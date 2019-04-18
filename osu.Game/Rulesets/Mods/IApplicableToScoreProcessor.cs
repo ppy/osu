@@ -11,6 +11,5 @@ namespace osu.Game.Rulesets.Mods
     public interface IApplicableToScoreProcessor : IApplicableMod
     {
         void ApplyToScoreProcessor(ScoreProcessor scoreProcessor);
-        ScoreRank AdjustRank(ScoreRank rank);
     }
 }
