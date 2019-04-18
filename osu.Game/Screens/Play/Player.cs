@@ -367,8 +367,7 @@ namespace osu.Game.Screens.Play
                 PauseOverlay.Hide();
 
             // Disable input to avoid hitting objects while falling
-            // TODO: Disabling input will also disable the cursor movement, we don't want that
-            DrawableRuleset.KeyBindingInputManager.UseParentInput = false;
+            GameplayClockContainer.BlockGameplayInput = true;
 
             return true;
         }
@@ -397,6 +396,9 @@ namespace osu.Game.Screens.Play
             GameplayClockContainer.Stop();
 
             audio.Track.Frequency.Value = 1;
+            
+            // Return gameplay input 
+            GameplayClockContainer.BlockGameplayInput = false;
 
             FailOverlay.Retries = RestartCount;
             FailOverlay.Show();
@@ -533,6 +535,9 @@ namespace osu.Game.Screens.Play
 
             audio.Track.Frequency.Value = 1;
             trackSong.Restart();
+            
+            // Return gameplay input 
+            GameplayClockContainer.BlockGameplayInput = false;
 
             fadeOut();
             return base.OnExiting(next);
