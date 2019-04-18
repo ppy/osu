@@ -43,7 +43,7 @@ namespace osu.Game.Rulesets.UI
         /// <summary>
         /// The key conversion input manager for this DrawableRuleset.
         /// </summary>
-        public override PassThroughInputManager KeyBindingInputManager { get; }
+        public PassThroughInputManager KeyBindingInputManager { get; }
 
         public override double GameplayStartTime => Objects.First().StartTime - 2000;
 
@@ -324,11 +324,6 @@ namespace osu.Game.Rulesets.UI
         /// Whether the game is paused. Used to block user input.
         /// </summary>
         public readonly BindableBool IsPaused = new BindableBool();
-
-        /// <summary>
-        /// The key conversion input manager for this DrawableRuleset.
-        /// </summary>
-        public abstract PassThroughInputManager KeyBindingInputManager { get; }
 
         /// <summary>
         /// The playfield.
