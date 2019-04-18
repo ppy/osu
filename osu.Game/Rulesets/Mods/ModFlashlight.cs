@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions.MatrixExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.OpenGL.Vertices;
 using osu.Framework.Graphics.Primitives;
@@ -79,7 +80,7 @@ namespace osu.Game.Rulesets.Mods
                 flashNode.Shader = shader;
                 flashNode.ScreenSpaceDrawQuad = ScreenSpaceDrawQuad;
                 flashNode.FlashlightPosition = Vector2Extensions.Transform(FlashlightPosition, DrawInfo.Matrix);
-                flashNode.FlashlightSize = Vector2Extensions.Transform(FlashlightSize, DrawInfo.Matrix);
+                flashNode.FlashlightSize = FlashlightSize * DrawInfo.Matrix.ExtractScale().Xy;
                 flashNode.FlashlightDim = FlashlightDim;
             }
 
