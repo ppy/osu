@@ -32,6 +32,7 @@ namespace osu.Game.Overlays.Settings.Sections.General
 
         private UserPanel panel;
         private UserDropdown dropdown;
+        private OsuButton signoutButton;
 
         /// <summary>
         /// Called to request a hide of a parent displaying this container.
@@ -146,6 +147,12 @@ namespace osu.Game.Overlays.Settings.Sections.General
                                     Action = RequestHide
                                 },
                                 dropdown = new UserDropdown { RelativeSizeAxes = Axes.X },
+                                signoutButton = new OsuButton()
+                                {
+                                    RelativeSizeAxes = Axes.X,
+                                    Text = "Sign Out",
+                                    Action = api.Logout
+                                }
                             },
                         },
                     };
@@ -167,9 +174,6 @@ namespace osu.Game.Overlays.Settings.Sections.General
                             case UserAction.AppearOffline:
                                 api.LocalUser.Value.Status.Value = new UserStatusOffline();
                                 dropdown.StatusColour = colours.Gray7;
-                                break;
-                            case UserAction.SignOut:
-                                api.Logout();
                                 break;
                         }
                     };
@@ -387,9 +391,6 @@ namespace osu.Game.Overlays.Settings.Sections.General
 
             [Description(@"Appear offline")]
             AppearOffline,
-
-            [Description(@"Sign out")]
-            SignOut,
         }
     }
 }
