@@ -100,13 +100,5 @@ namespace osu.Desktop
                 LargeImageText = user.Value.Username
             }
         };
-
-        protected override void Update()
-        {
-            if (client.IsInitialized)
-                client?.Invoke();
-
-            base.Update();
-        }
     }
 }
