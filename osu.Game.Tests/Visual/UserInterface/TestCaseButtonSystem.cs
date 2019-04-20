@@ -36,7 +36,7 @@ namespace osu.Game.Tests.Visual.UserInterface
                     RelativeSizeAxes = Axes.Both,
                 },
                 buttons = new ButtonSystem(),
-                logo = new OsuLogo()
+                logo = new OsuLogo { RelativePositionAxes = Axes.Both }
             };
 
             buttons.SetOsuLogo(logo);

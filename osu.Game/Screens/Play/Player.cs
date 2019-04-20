@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
@@ -72,6 +73,10 @@ namespace osu.Game.Screens.Play
 
         protected GameplayClockContainer GameplayClockContainer { get; private set; }
 
+        [Cached]
+        [Cached(Type = typeof(IBindable<IReadOnlyList<Mod>>))]
+        protected readonly Bindable<IReadOnlyList<Mod>> Mods = new Bindable<IReadOnlyList<Mod>>(Array.Empty<Mod>());
+
         private readonly bool allowPause;
         private readonly bool showResults;
 
@@ -90,6 +95,8 @@ namespace osu.Game.Screens.Play
         private void load(AudioManager audio, IAPIProvider api, OsuConfigManager config)
         {
             this.api = api;
+
+            Mods.Value = base.Mods.Value.Select(m => m.CreateCopy()).ToArray();
 
             WorkingBeatmap working = loadBeatmap();
 
