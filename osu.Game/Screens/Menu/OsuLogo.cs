@@ -54,7 +54,13 @@ namespace osu.Game.Screens.Menu
         /// </summary>
         public Func<bool> Action;
 
-        public float SizeForFlow => logo == null ? 0 : logo.DrawSize.X * logo.Scale.X * logoBounceContainer.Scale.X * logoHoverContainer.Scale.X * 0.74f;
+        /// <summary>
+        /// The size of the logo Sprite with respect to the scale of its hover and bounce containers.
+        /// </summary>
+        /// <remarks>Does not account for the scale of this <see cref="OsuLogo"/></remarks>
+        public float SizeForFlow => logo == null ? 0 : logo.DrawSize.X * logo.Scale.X * logoBounceContainer.Scale.X * logoHoverContainer.Scale.X;
+
+        public bool IsTracking { get; set; }
 
         private readonly Sprite ripple;
 
