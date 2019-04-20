@@ -12,7 +12,6 @@ using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.UI;
-using osu.Game.Scoring;
 using osuTK;
 using osuTK.Graphics;
 
@@ -40,10 +39,6 @@ namespace osu.Game.Rulesets.Osu.Mods
         public void ApplyToScoreProcessor(ScoreProcessor scoreProcessor)
         {
             scoreProcessor.Health.ValueChanged += health => { blinds.AnimateClosedness((float)health.NewValue); };
-        }
-        
-        public ScoreRank AdjustRank(ScoreRank rank)
-        {
         }
 
         /// <summary>
