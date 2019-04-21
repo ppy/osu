@@ -47,10 +47,7 @@ namespace osu.Game.Rulesets.Mods
             Combo.BindTo(scoreProcessor.Combo);
         }
 
-        public ScoreRank AdjustRank(ScoreRank rank)
-        {
-            return rank;
-        }
+        public ScoreRank AdjustRank(ScoreRank rank) => rank;
 
         public virtual void ApplyToDrawableRuleset(DrawableRuleset<T> drawableRuleset)
         {
