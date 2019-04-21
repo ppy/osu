@@ -112,10 +112,7 @@ namespace osu.Game.Tests.Visual.Gameplay
                 Applied = true;
             }
 
-            public ScoreRank AdjustRank(ScoreRank rank)
-            {
-                return rank;
-            }
+            public ScoreRank AdjustRank(ScoreRank rank) => rank;
         }
 
         private class TestPlayer : Player
