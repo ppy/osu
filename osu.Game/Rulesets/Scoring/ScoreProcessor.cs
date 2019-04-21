@@ -95,6 +95,11 @@ namespace osu.Game.Rulesets.Scoring
         /// </summary>
         protected virtual bool DefaultFailCondition => Health.Value == Health.MinValue;
 
+        /// <summary>
+        /// Used by specific mods to adjust <see cref="Rank"/>. 
+        /// </summary>
+        public bool AdjustRank { get; set; }
+
         protected ScoreProcessor()
         {
             Combo.ValueChanged += delegate { HighestCombo.Value = Math.Max(HighestCombo.Value, Combo.Value); };
@@ -104,9 +109,9 @@ namespace osu.Game.Rulesets.Scoring
         private ScoreRank rankFrom(double acc)
         {
             if (acc == 1)
-                return ScoreRank.X;
+                return (AdjustRank ? ScoreRank.XH : ScoreRank.X);
             if (acc > 0.95)
-                return ScoreRank.S;
+                return (AdjustRank ? ScoreRank.SH : ScoreRank.S);
             if (acc > 0.9)
                 return ScoreRank.A;
             if (acc > 0.8)
