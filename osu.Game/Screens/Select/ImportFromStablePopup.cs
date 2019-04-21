@@ -19,7 +19,7 @@ namespace osu.Game.Screens.Select
             PopupDialogOkButton popupDialogOkButton;
             Buttons = new PopupDialogButton[]
             {
-                popupDialogOkButton=new PopupDialogOkButton
+                popupDialogOkButton = new PopupDialogOkButton
                 {
                     Text = @"Yes please!"
                 },

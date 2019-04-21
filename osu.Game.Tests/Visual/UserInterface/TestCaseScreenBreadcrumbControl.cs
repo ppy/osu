@@ -107,7 +107,7 @@ namespace osu.Game.Tests.Visual.UserInterface
                             Origin = Anchor.TopCentre,
                             Text = Title,
                         },
-                        triangleButton=new TriangleButton
+                        triangleButton = new TriangleButton
                         {
                             Anchor = Anchor.TopCentre,
                             Origin = Anchor.TopCentre,
