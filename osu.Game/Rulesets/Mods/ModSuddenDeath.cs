@@ -25,10 +25,7 @@ namespace osu.Game.Rulesets.Mods
             scoreProcessor.FailConditions += FailCondition;
         }
 
-        public ScoreRank AdjustRank(ScoreRank rank)
-        {
-            return rank;
-        }
+        public ScoreRank AdjustRank(ScoreRank rank) => rank;
 
         protected virtual bool FailCondition(ScoreProcessor scoreProcessor) => scoreProcessor.Combo.Value == 0;
     }
