@@ -12,7 +12,7 @@ namespace osu.Game.Rulesets.Mods
     public interface IApplicableToScoreProcessor : IApplicableMod
     {
         void ApplyToScoreProcessor(ScoreProcessor scoreProcessor);
-        
+
         /// <summary>
         /// Adjusts rank on specific mods, mostly used for S and SS to be S+ and SS+ 
         /// </summary>
