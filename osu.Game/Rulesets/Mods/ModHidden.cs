@@ -32,7 +32,7 @@ namespace osu.Game.Rulesets.Mods
             foreach (var d in drawables.Skip(IncreaseFirstObjectVisibility.Value ? 1 : 0))
                 d.ApplyCustomUpdateState += ApplyHiddenState;
         }
-        
+
         public void ApplyToScoreProcessor(ScoreProcessor scoreProcessor)
         {
             scoreProcessor.AdjustRank.Value = true;
