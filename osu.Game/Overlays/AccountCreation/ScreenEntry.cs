@@ -47,6 +47,7 @@ namespace osu.Game.Overlays.AccountCreation
             this.api = api;
             this.host = host;
 
+            SettingsButton registerButton;
             InternalChildren = new Drawable[]
             {
                 new FillFlowContainer
@@ -110,7 +111,7 @@ namespace osu.Game.Overlays.AccountCreation
                                 {
                                     RelativeSizeAxes = Axes.X,
                                     AutoSizeAxes = Axes.Y,
-                                    Child = new SettingsButton
+                                    Child = registerButton = new SettingsButton
                                     {
                                         Text = "Register",
                                         Margin = new MarginPadding { Vertical = 20 }
@@ -123,7 +124,7 @@ namespace osu.Game.Overlays.AccountCreation
                 processingOverlay = new ProcessingOverlay { Alpha = 0 }
             };
 
-            ((SettingsButton)registerShake.Child).Clicked += performRegistration;
+            registerButton.Clicked += performRegistration;
 
             textboxes = new[] { usernameTextBox, emailTextBox, passwordTextBox };
 
