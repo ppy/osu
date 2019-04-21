@@ -35,7 +35,7 @@ namespace osu.Game.Rulesets.Mods
         
         public void ApplyToScoreProcessor(ScoreProcessor scoreProcessor)
         {
-            scoreProcessor.AdjustRank = true;
+            scoreProcessor.AdjustRank.Value = true;
         }
 
         protected virtual void ApplyHiddenState(DrawableHitObject hitObject, ArmedState state)
