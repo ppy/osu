@@ -42,10 +42,7 @@ namespace osu.Game.Rulesets.Osu.Mods
             scoreProcessor.Health.ValueChanged += health => { blinds.AnimateClosedness((float)health.NewValue); };
         }
 
-        public ScoreRank AdjustRank(ScoreRank rank)
-        {
-            return rank;
-        }
+        public ScoreRank AdjustRank(ScoreRank rank) => rank;
 
         /// <summary>
         /// Element for the Blinds mod drawing 2 black boxes covering the whole screen which resize inside a restricted area with some leniency.
