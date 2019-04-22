@@ -6,9 +6,6 @@ using osu.Framework.Graphics.Transforms;
 using osu.Framework.MathUtils;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.UI;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace osu.Game.Screens.Play
 {
@@ -16,13 +13,13 @@ namespace osu.Game.Screens.Play
     {
         public override string TargetMember => "Alpha";
 
-        private GameplayClockContainer clock;
-        private AudioManager audio;
+        private readonly GameplayClockContainer clock;
+        private readonly AudioManager audio;
 
         public FailTransform(GameplayClockContainer clockContainer, AudioManager audioManager)
         {
-            this.audio = audioManager;
-            this.clock = clockContainer;
+            audio = audioManager;
+            clock = clockContainer;
         }
 
         private float valueAt(double time)
