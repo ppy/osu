@@ -110,11 +110,8 @@ namespace osu.Game.Screens.Play
                     adjustableClock.ChangeSource(sourceClock);
                     updateRate();
 
-                    this.Delay(750).Schedule(() =>
-                    {
-                        if (!IsPaused.Value)
-                            Start();
-                    });
+                    if (!IsPaused.Value)
+                        Start();
                 });
             });
         }
