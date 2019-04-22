@@ -37,8 +37,6 @@ namespace osu.Game.Rulesets.Osu.Scoring
             comboResultCounts.Clear();
         }
 
-        private const double harshness = 0.01;
-
         protected override void ApplyResult(JudgementResult result)
         {
             base.ApplyResult(result);
@@ -49,9 +47,9 @@ namespace osu.Game.Rulesets.Osu.Scoring
                 comboResultCounts[osuResult.ComboType] = comboResultCounts.GetOrDefault(osuResult.ComboType) + 1;
         }
 
-        protected override double HpFactorFor(Judgement judgement, HitResult result)
+        protected override double HpFactorFor(JudgementResult result)
         {
-            switch (result)
+            switch (result.Type)
             {
                 case HitResult.Great:
                     return 10.2 - hpDrainRate;

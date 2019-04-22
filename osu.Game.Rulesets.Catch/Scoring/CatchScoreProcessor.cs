@@ -26,12 +26,10 @@ namespace osu.Game.Rulesets.Catch.Scoring
             hpDrainRate = beatmap.BeatmapInfo.BaseDifficulty.DrainRate;
         }
 
-        protected override double HpFactorFor(Judgement judgement, HitResult result)
+        protected override double HpFactorFor(JudgementResult result)
         {
-            switch (result)
+            switch (result.Type)
             {
-                case HitResult.Miss when judgement.IsBonus:
-                    return 0;
                 case HitResult.Miss:
                     return hpDrainRate;
                 default:
