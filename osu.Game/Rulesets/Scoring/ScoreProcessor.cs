@@ -206,6 +206,9 @@ namespace osu.Game.Rulesets.Scoring
         private double baseScore;
         private double bonusScore;
 
+        private double rollingHp;
+        private double rollingMaxHp;
+
         protected ScoreProcessor()
         {
         }
@@ -332,6 +335,9 @@ namespace osu.Game.Rulesets.Scoring
                 baseScore += result.Judgement.NumericResultFor(result);
                 rollingMaxBaseScore += result.Judgement.MaxNumericResult;
             }
+
+            rollingHp += HpFactorFor(result.Judgement, result.Type) * result.Judgement.HealthIncreaseFor(result);
+            rollingMaxHp += HpFactorFor(result.Judgement, result.Judgement.MaxResult) * result.Judgement.MaxHealthIncrease;
         }
 
         /// <summary>
@@ -356,7 +362,12 @@ namespace osu.Game.Rulesets.Scoring
                 baseScore -= result.Judgement.NumericResultFor(result);
                 rollingMaxBaseScore -= result.Judgement.MaxNumericResult;
             }
+
+            rollingHp -= HpFactorFor(result.Judgement, result.Type) * result.Judgement.HealthIncreaseFor(result);
+            rollingMaxHp -= HpFactorFor(result.Judgement, result.Judgement.MaxResult) * result.Judgement.MaxHealthIncrease;
         }
+
+        protected virtual double HpFactorFor(Judgement judgement, HitResult result) => 1;
 
         private void updateScore()
         {
