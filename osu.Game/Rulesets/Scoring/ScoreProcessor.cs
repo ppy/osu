@@ -102,7 +102,7 @@ namespace osu.Game.Rulesets.Scoring
         /// </summary>
         public bool AdjustRank
         {
-            get => return adjustRank;
+            get => adjustRank;
 
             set
             {
