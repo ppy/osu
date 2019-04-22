@@ -104,8 +104,8 @@ namespace osu.Game.Rulesets.Scoring
         {
             get => return adjustRank;
 
-            set 
-            { 
+            set
+            {
                 adjustRank = value;
                 Rank.Value = rankFrom(Accuracy.Value); // Update rank immediately if AdjustRank was changed
             }
