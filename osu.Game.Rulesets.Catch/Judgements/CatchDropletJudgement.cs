@@ -25,7 +25,7 @@ namespace osu.Game.Rulesets.Catch.Judgements
                 default:
                     return base.HealthIncreaseFor(result);
                 case HitResult.Perfect:
-                    return 0.07;
+                    return 0.007;
             }
         }
     }
