@@ -47,28 +47,29 @@ namespace osu.Game.Rulesets.Osu.Scoring
 
             if (result.Type != HitResult.None)
                 comboResultCounts[osuResult.ComboType] = comboResultCounts.GetOrDefault(osuResult.ComboType) + 1;
+        }
 
-            switch (result.Type)
+        protected override double HpFactorFor(Judgement judgement, HitResult result)
+        {
+            switch (result)
             {
                 case HitResult.Great:
-                    Health.Value += (10.2 - hpDrainRate) * harshness;
-                    break;
+                    return 10.2 - hpDrainRate;
 
                 case HitResult.Good:
-                    Health.Value += (8 - hpDrainRate) * harshness;
-                    break;
+                    return 8 - hpDrainRate;
 
                 case HitResult.Meh:
-                    Health.Value += (4 - hpDrainRate) * harshness;
-                    break;
+                    return 4 - hpDrainRate;
 
-                /*case HitResult.SliderTick:
-                    Health.Value += Math.Max(7 - hpDrainRate, 0) * 0.01;
-                    break;*/
+                // case HitResult.SliderTick:
+                //     return Math.Max(7 - hpDrainRate, 0) * 0.01;
 
                 case HitResult.Miss:
-                    Health.Value -= hpDrainRate * (harshness * 2);
-                    break;
+                    return hpDrainRate;
+
+                default:
+                    return 0;
             }
         }
 
