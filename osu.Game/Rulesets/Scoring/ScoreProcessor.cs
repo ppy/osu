@@ -334,7 +334,7 @@ namespace osu.Game.Rulesets.Scoring
                 rollingMaxBaseScore += result.Judgement.MaxNumericResult;
             }
 
-            Health.Value += HpFactorFor(result) * result.Judgement.HealthIncreaseFor(result);
+            Health.Value += HealthAdjustmentFactorFor(result) * result.Judgement.HealthIncreaseFor(result);
         }
 
         /// <summary>
@@ -362,7 +362,12 @@ namespace osu.Game.Rulesets.Scoring
             }
         }
 
-        protected virtual double HpFactorFor(JudgementResult result) => 1;
+        /// <summary>
+        /// An adjustment factor which is multiplied into the health increase provided by a <see cref="JudgementResult"/>.
+        /// </summary>
+        /// <param name="result">The <see cref="JudgementResult"/> for which the adjustment should apply.</param>
+        /// <returns>The adjustment factor.</returns>
+        protected virtual double HealthAdjustmentFactorFor(JudgementResult result) => 1;
 
         private void updateScore()
         {

@@ -47,7 +47,7 @@ namespace osu.Game.Rulesets.Osu.Scoring
                 comboResultCounts[osuResult.ComboType] = comboResultCounts.GetOrDefault(osuResult.ComboType) + 1;
         }
 
-        protected override double HpFactorFor(JudgementResult result)
+        protected override double HealthAdjustmentFactorFor(JudgementResult result)
         {
             switch (result.Type)
             {
