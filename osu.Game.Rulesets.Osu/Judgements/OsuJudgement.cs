@@ -24,5 +24,20 @@ namespace osu.Game.Rulesets.Osu.Judgements
                     return 300;
             }
         }
+
+        protected override double HealthIncreaseFor(HitResult result)
+        {
+            switch (result)
+            {
+                case HitResult.Miss:
+                    return -0.02;
+                case HitResult.Meh:
+                case HitResult.Good:
+                case HitResult.Great:
+                    return 0.01;
+                default:
+                    return 0;
+            }
+        }
     }
 }
