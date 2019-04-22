@@ -122,42 +122,8 @@ namespace osu.Game.Rulesets.Mania.Scoring
             }
         }
 
-        protected override void ApplyResult(JudgementResult result)
-        {
-            base.ApplyResult(result);
-
-            bool isTick = result.Judgement is HoldNoteTickJudgement;
-
-            if (isTick)
-            {
-                if (result.IsHit)
-                    Health.Value += hpMultiplier * hp_increase_tick;
-            }
-            else
-            {
-                switch (result.Type)
-                {
-                    case HitResult.Miss:
-                        Health.Value += hpMissMultiplier * hp_increase_miss;
-                        break;
-                    case HitResult.Meh:
-                        Health.Value += hpMultiplier * hp_increase_bad;
-                        break;
-                    case HitResult.Ok:
-                        Health.Value += hpMultiplier * hp_increase_ok;
-                        break;
-                    case HitResult.Good:
-                        Health.Value += hpMultiplier * hp_increase_good;
-                        break;
-                    case HitResult.Great:
-                        Health.Value += hpMultiplier * hp_increase_great;
-                        break;
-                    case HitResult.Perfect:
-                        Health.Value += hpMultiplier * hp_increase_perfect;
-                        break;
-                }
-            }
-        }
+        protected override double HpFactorFor(Judgement judgement, HitResult result)
+            => result == HitResult.Miss ? hpMissMultiplier : hpMultiplier;
 
         public override HitWindows CreateHitWindows() => new ManiaHitWindows();
     }
