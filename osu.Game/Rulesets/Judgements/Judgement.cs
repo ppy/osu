@@ -32,6 +32,11 @@ namespace osu.Game.Rulesets.Judgements
         public int MaxNumericResult => NumericResultFor(MaxResult);
 
         /// <summary>
+        /// The health increase for the maximum achievable result.
+        /// </summary>
+        public double MaxHealthIncrease => HealthIncreaseFor(MaxResult);
+
+        /// <summary>
         /// Retrieves the numeric score representation of a <see cref="HitResult"/>.
         /// </summary>
         /// <param name="result">The <see cref="HitResult"/> to find the numeric score representation for.</param>
