@@ -95,24 +95,29 @@ namespace osu.Game.Rulesets.Scoring
         /// </summary>
         protected virtual bool DefaultFailCondition => Health.Value == Health.MinValue;
 
+        private bool adjustRank = false;
+        
         /// <summary>
         /// Used by specific mods to adjust <see cref="Rank"/>.
         /// </summary>
-        public BindableBool AdjustRank = new BindableBool();
+        public bool AdjustRank
+        {
+            get { return adjustRank; }
+            set { adjustRank = value; Rank.Value = rankFrom(Accuracy.Value); } // Update rank immediately if AdjustRank was changed
+        }
 
         protected ScoreProcessor()
         {
             Combo.ValueChanged += delegate { HighestCombo.Value = Math.Max(HighestCombo.Value, Combo.Value); };
             Accuracy.ValueChanged += delegate { Rank.Value = rankFrom(Accuracy.Value); };
-            AdjustRank.ValueChanged += delegate { Rank.Value = rankFrom(Accuracy.Value); }; // Update rank immediately if AdjustRank was changed
         }
 
         private ScoreRank rankFrom(double acc)
         {
             if (acc == 1)
-                return (AdjustRank.Value ? ScoreRank.XH : ScoreRank.X);
+                return (adjustRank ? ScoreRank.XH : ScoreRank.X);
             if (acc > 0.95)
-                return (AdjustRank.Value ? ScoreRank.SH : ScoreRank.S);
+                return (adjustRank ? ScoreRank.SH : ScoreRank.S);
             if (acc > 0.9)
                 return ScoreRank.A;
             if (acc > 0.8)
@@ -129,7 +134,6 @@ namespace osu.Game.Rulesets.Scoring
         /// <param name="storeResults">Whether to store the current state of the <see cref="ScoreProcessor"/> for future use.</param>
         protected virtual void Reset(bool storeResults)
         {
-            AdjustRank.Value = false;
             TotalScore.Value = 0;
             Accuracy.Value = 1;
             Health.Value = 1;
@@ -137,6 +141,7 @@ namespace osu.Game.Rulesets.Scoring
             Rank.Value = ScoreRank.X;
             HighestCombo.Value = 0;
 
+            AdjustRank = false;
             HasFailed = false;
         }
 
