@@ -10,6 +10,7 @@ using osu.Framework.Audio.Sample;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Transforms;
 using osu.Framework.Input.Events;
 using osu.Framework.Logging;
 using osu.Framework.Screens;
@@ -55,11 +56,14 @@ namespace osu.Game.Screens.Play
         [Resolved]
         private ScoreManager scoreManager { get; set; }
 
+        [Resolved]
+        private AudioManager audioManager { get; set; }
+
         private RulesetInfo ruleset;
 
         private IAPIProvider api;
 
-        private SampleChannel sampleRestart;
+        private SampleChannel sampleRestart, sampleFail;
 
         protected ScoreProcessor ScoreProcessor { get; private set; }
         protected DrawableRuleset DrawableRuleset { get; private set; }
@@ -101,6 +105,7 @@ namespace osu.Game.Screens.Play
                 return;
 
             sampleRestart = audio.Sample.Get(@"Gameplay/restart");
+            sampleFail = audio.Sample.Get(@"Gameplay/failsound");
 
             mouseWheelDisabled = config.GetBindable<bool>(OsuSetting.MouseDisableWheel);
             showStoryboard = config.GetBindable<bool>(OsuSetting.ShowStoryboard);
@@ -335,8 +340,6 @@ namespace osu.Game.Screens.Play
             if (Mods.Value.OfType<IApplicableFailOverride>().Any(m => !m.AllowFail))
                 return false;
 
-            GameplayClockContainer.Stop();
-
             HasFailed = true;
 
             // There is a chance that we could be in a paused state as the ruleset's internal clock (see FrameStabilityContainer)
@@ -345,9 +348,27 @@ namespace osu.Game.Screens.Play
             if (PauseOverlay.State == Visibility.Visible)
                 PauseOverlay.Hide();
 
+            sampleFail?.Play();
+
+            var failTransform = new FailTransform(GameplayClockContainer, audioManager);
+            var populated = DrawableRuleset.Playfield.HitObjectContainer.PopulateTransform(failTransform, 0, 500, Easing.None);
+
+            DrawableRuleset.Playfield.HitObjectContainer.TransformTo(populated);
+            populated.OnComplete = onFailComplete;
+            return true;
+        }
+
+        // Called back when the transform finishes
+        private void onFailComplete()
+        {
+            GameplayClockContainer.Stop();
+
+            // Restore back the playback speed
+            GameplayClockContainer.UserPlaybackRate.Value = 1;
+            audioManager.Track.Frequency.Value = 1;
+
             FailOverlay.Retries = RestartCount;
             FailOverlay.Show();
-            return true;
         }
 
         #endregion
@@ -483,6 +504,10 @@ namespace osu.Game.Screens.Play
                 return true;
 
             GameplayClockContainer.ResetLocalAdjustments();
+
+            // Reset track frequency just in case the player left while we are in failing scene
+            Beatmap.Value.Track.Restart();
+            audioManager.Track.Frequency.Value = 1;
 
             fadeOut();
             return base.OnExiting(next);
