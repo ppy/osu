@@ -26,7 +26,7 @@ namespace osu.Game.Rulesets.Catch.Scoring
             hpDrainRate = beatmap.BeatmapInfo.BaseDifficulty.DrainRate;
         }
 
-        protected override double HpFactorFor(JudgementResult result)
+        protected override double HealthAdjustmentFactorFor(JudgementResult result)
         {
             switch (result.Type)
             {
