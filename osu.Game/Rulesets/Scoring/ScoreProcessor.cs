@@ -96,7 +96,7 @@ namespace osu.Game.Rulesets.Scoring
         protected virtual bool DefaultFailCondition => Health.Value == Health.MinValue;
 
         private bool adjustRank = false;
-        
+
         /// <summary>
         /// Used by specific mods to adjust <see cref="Rank"/>.
         /// </summary>
