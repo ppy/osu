@@ -95,10 +95,10 @@ namespace osu.Game.Rulesets.Mods
 
                 Combo.ValueChanged += OnComboChange;
 
+                this.FadeInFromZero(FLASHLIGHT_FADE_DURATION);
+
                 using (BeginAbsoluteSequence(0))
                 {
-                    this.FadeInFromZero(FLASHLIGHT_FADE_DURATION);
-
                     foreach (var breakPeriod in Breaks)
                     {
                         if (breakPeriod.Duration < FLASHLIGHT_FADE_DURATION * 2) continue;
