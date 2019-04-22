@@ -1,7 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Catch.Objects;
 using osu.Game.Rulesets.Judgements;
@@ -27,20 +26,15 @@ namespace osu.Game.Rulesets.Catch.Scoring
             hpDrainRate = beatmap.BeatmapInfo.BaseDifficulty.DrainRate;
         }
 
-        private const double harshness = 0.01;
-
-        protected override void ApplyResult(JudgementResult result)
+        protected override double HealthAdjustmentFactorFor(JudgementResult result)
         {
-            base.ApplyResult(result);
-
-            if (result.Type == HitResult.Miss)
+            switch (result.Type)
             {
-                if (!result.Judgement.IsBonus)
-                    Health.Value -= hpDrainRate * (harshness * 2);
-                return;
+                case HitResult.Miss:
+                    return hpDrainRate;
+                default:
+                    return 10.2 - hpDrainRate; // Award less HP as drain rate is increased
             }
-
-            Health.Value += Math.Max(result.Judgement.HealthIncreaseFor(result) - hpDrainRate, 0) * harshness;
         }
 
         public override HitWindows CreateHitWindows() => new CatchHitWindows();
