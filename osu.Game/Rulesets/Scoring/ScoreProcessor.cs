@@ -95,15 +95,20 @@ namespace osu.Game.Rulesets.Scoring
         /// </summary>
         protected virtual bool DefaultFailCondition => Health.Value == Health.MinValue;
 
-        private bool adjustRank = false;
+        private bool adjustRank;
 
         /// <summary>
         /// Used by specific mods to adjust <see cref="Rank"/>.
         /// </summary>
         public bool AdjustRank
         {
-            get { return adjustRank; }
-            set { adjustRank = value; Rank.Value = rankFrom(Accuracy.Value); } // Update rank immediately if AdjustRank was changed
+            get => return adjustRank;
+            
+            set 
+            { 
+                adjustRank = value;
+                Rank.Value = rankFrom(Accuracy.Value); // Update rank immediately if AdjustRank was changed
+            }
         }
 
         protected ScoreProcessor()
