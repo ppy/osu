@@ -68,7 +68,12 @@ namespace osu.Game.Rulesets.UI
         {
             Cursor = CreateCursor();
             if (Cursor != null)
+            {
+                // initial showing of the cursor will be handed by MenuCursorContainer (via DrawableRuleset's IProvideCursor implementation).
+                Cursor.Hide();
+
                 AddInternal(Cursor);
+            }
         }
 
         /// <summary>
