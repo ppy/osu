@@ -46,8 +46,8 @@ namespace osu.Game.Rulesets.Taiko.Scoring
             hpMissMultiplier = BeatmapDifficulty.DifficultyRange(beatmap.BeatmapInfo.BaseDifficulty.DrainRate, 0.0018, 0.0075, 0.0120);
         }
 
-        protected override double HpFactorFor(Judgement judgement, HitResult result)
-            => result == HitResult.Miss ? hpMissMultiplier : hpMultiplier;
+        protected override double HpFactorFor(JudgementResult result)
+            => result.Type == HitResult.Miss ? hpMissMultiplier : hpMultiplier;
 
         protected override void Reset(bool storeResults)
         {
