@@ -110,11 +110,8 @@ namespace osu.Game.Screens.Play
                     adjustableClock.ChangeSource(sourceClock);
                     updateRate();
 
-                    this.Delay(750).Schedule(() =>
-                    {
-                        if (!IsPaused.Value)
-                            Start();
-                    });
+                    if (!IsPaused.Value)
+                        Start();
                 });
             });
         }
@@ -123,7 +120,7 @@ namespace osu.Game.Screens.Play
         {
             // Seeking the decoupled clock to its current time ensures that its source clock will be seeked to the same time
             // This accounts for the audio clock source potentially taking time to enter a completely stopped state
-            adjustableClock.Seek(adjustableClock.CurrentTime);
+            Seek(GameplayClock.CurrentTime);
             adjustableClock.Start();
             IsPaused.Value = false;
         }
