@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Bindables;
@@ -27,9 +28,9 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         public void ApplyToDrawableHitObjects(IEnumerable<DrawableHitObject> drawables)
         {
-            foreach (DrawableSlider drawable in drawables.OfType<DrawableSlider>())
+            foreach (var s in drawables.OfType<DrawableSlider>())
             {
-                drawable.Tracking.ValueChanged += flashlight.OnSliderTrackingChange;
+                s.Tracking.ValueChanged += flashlight.OnSliderTrackingChange;
             }
         }
 
@@ -44,13 +45,28 @@ namespace osu.Game.Rulesets.Osu.Mods
 
             public void OnSliderTrackingChange(ValueChangedEvent<bool> e)
             {
+                // If any sliders are in a tracking state, apply a dim to the entire playfield over a brief duration.
                 if (e.NewValue)
+                {
                     trackingSliders++;
+                    // This check being here ensures we're only applying a dim if and only if a slider begins tracking.
+                    if (trackingSliders == 1)
+                    {
+                        this.TransformTo(nameof(FlashlightDim), 0.8f, 50);
+                    }
+                }
                 else
+                {
                     trackingSliders--;
 
-                // If there are any sliders in a tracking state, apply a dim to the entire playfield over a brief duration.
-                this.TransformTo(nameof(FlashlightDim), trackingSliders > 0 ? 0.8f : 0.0f, 50);
+                    if (trackingSliders == 0)
+                    {
+                        this.TransformTo(nameof(FlashlightDim), 0.0f, 50);
+                    }
+                }
+
+                if (trackingSliders < 0)
+                    throw new InvalidOperationException($"The number of {nameof(trackingSliders)} cannot be below 0.");
             }
 
             protected override bool OnMouseMove(MouseMoveEvent e)
