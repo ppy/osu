@@ -33,11 +33,6 @@ namespace osu.Game.Screens.Play
 
         public readonly BindableBool IsPaused = new BindableBool();
 
-        public override bool PropagateNonPositionalInputSubTree => !BlockGameplayInput;
-        public override bool PropagatePositionalInputSubTree => !BlockGameplayInput;
-
-        public bool BlockGameplayInput { get; set; }
-
         /// <summary>
         /// The decoupled clock used for gameplay. Should be used for seeks and clock control.
         /// </summary>
