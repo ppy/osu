@@ -227,7 +227,10 @@ namespace osu.Game.Rulesets.UI
                 replayInputManager.ReplayInputHandler.GamefieldToScreenSpace = Playfield.GamefieldToScreenSpace;
 
             if (!ProvidingUserCursor)
+            {
+                // The cursor is hidden by default (see Playfield.load()), but should be shown when there's a replay
                 Playfield.Cursor?.Show();
+            }
         }
 
         /// <summary>
