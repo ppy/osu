@@ -225,6 +225,9 @@ namespace osu.Game.Rulesets.UI
 
             if (replayInputManager.ReplayInputHandler != null)
                 replayInputManager.ReplayInputHandler.GamefieldToScreenSpace = Playfield.GamefieldToScreenSpace;
+
+            if (!ProvidingUserCursor)
+                Playfield.Cursor?.Show();
         }
 
         /// <summary>
