@@ -49,7 +49,8 @@ namespace osu.Game.Rulesets.Osu.Mods
                 if (e.NewValue)
                 {
                     trackingSliders++;
-                    // This check being here ensures we're only applying a dim if and only if a slider begins tracking.
+                    // The fade should only be applied if tracking sliders is increasing from 0 to 1, and cannot be a result of a slider losing tracking.
+                    // As a result, this logic must be exclusive to when e.NewValue is true.
                     if (trackingSliders == 1)
                     {
                         this.TransformTo(nameof(FlashlightDim), 0.8f, 50);
