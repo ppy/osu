@@ -36,8 +36,6 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         private class OsuFlashlight : Flashlight, IRequireHighFrequencyMousePosition
         {
-            private int slidersCurrentlyTracking;
-
             public OsuFlashlight()
             {
                 FlashlightSize = new Vector2(0, getSizeFor(0));
@@ -45,22 +43,8 @@ namespace osu.Game.Rulesets.Osu.Mods
 
             public void OnSliderTrackingChange(ValueChangedEvent<bool> e)
             {
-                // If any sliders are in a tracking state, a further dim should be applied to the (remaining) visible portion of the playfield over a brief duration.
-                if (e.NewValue)
-                {
-                    // The transform should only be applied when the first slider begins tracking.
-                    if (++slidersCurrentlyTracking == 1)
-                        this.TransformTo(nameof(FlashlightDim), 0.8f, 50);
-                }
-                else
-                {
-                    if (slidersCurrentlyTracking == 0)
-                        throw new InvalidOperationException($"The number of {nameof(slidersCurrentlyTracking)} cannot be below 0.");
-
-                    // The fade is restored after the last slider exits a tracked state.
-                    if (--slidersCurrentlyTracking == 0)
-                        this.TransformTo(nameof(FlashlightDim), 0.0f, 50);
-                }
+                // If a slider is in a tracking state, a further dim should be applied to the (remaining) visible portion of the playfield over a brief duration.
+                this.TransformTo(nameof(FlashlightDim), e.NewValue ? 0.8f : 0.0f, 50);
             }
 
             protected override bool OnMouseMove(MouseMoveEvent e)
