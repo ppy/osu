@@ -4,6 +4,7 @@
 using NUnit.Framework;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Testing;
 using osu.Framework.Timing;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Rulesets.UI;
@@ -12,14 +13,13 @@ namespace osu.Game.Tests.Visual.Gameplay
 {
     public class TestCaseFrameStabilityContainer : OsuTestCase
     {
-        private ManualClock manualClock;
+        private readonly ManualClock manualClock;
 
-        private Container mainContainer;
+        private readonly Container mainContainer;
 
         private ClockConsumingChild consumer;
 
-        [SetUp]
-        public void SetUp()
+        public TestCaseFrameStabilityContainer()
         {
             Child = mainContainer = new Container
             {
@@ -31,6 +31,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         [Test]
         public void TestLargeJumps()
         {
+            seekManualTo(0);
             createStabilityContainer();
             seekManualTo(100000);
 
@@ -46,6 +47,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         [Test]
         public void TestSmallJumps()
         {
+            seekManualTo(0);
             createStabilityContainer();
             seekManualTo(40);
 
@@ -61,6 +63,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         [Test]
         public void TestSingleFrameJump()
         {
+            seekManualTo(0);
             createStabilityContainer();
             seekManualTo(8);
             confirmSeek(8);
@@ -75,7 +78,6 @@ namespace osu.Game.Tests.Visual.Gameplay
         public void TestInitialSeek()
         {
             seekManualTo(100000);
-
             createStabilityContainer();
 
             confirmSeek(100000);
