@@ -36,7 +36,7 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         private class OsuFlashlight : Flashlight, IRequireHighFrequencyMousePosition
         {
-            private int trackingSliders;
+            private int slidersCurrentlyTracking;
 
             public OsuFlashlight()
             {
@@ -45,29 +45,22 @@ namespace osu.Game.Rulesets.Osu.Mods
 
             public void OnSliderTrackingChange(ValueChangedEvent<bool> e)
             {
-                // If any sliders are in a tracking state, apply a dim to the entire playfield over a brief duration.
+                // If any sliders are in a tracking state, a further dim should be applied to the (remaining) visible portion of the playfield over a brief duration.
                 if (e.NewValue)
                 {
-                    trackingSliders++;
-                    // The fade should only be applied if tracking sliders is increasing from 0 to 1, and cannot be a result of a slider losing tracking.
-                    // As a result, this logic must be exclusive to when e.NewValue is true.
-                    if (trackingSliders == 1)
-                    {
+                    // The transform should only be applied when the first slider begins tracking.
+                    if (++slidersCurrentlyTracking == 1)
                         this.TransformTo(nameof(FlashlightDim), 0.8f, 50);
-                    }
                 }
                 else
                 {
-                    trackingSliders--;
+                    if (slidersCurrentlyTracking == 0)
+                        throw new InvalidOperationException($"The number of {nameof(slidersCurrentlyTracking)} cannot be below 0.");
 
-                    if (trackingSliders == 0)
-                    {
+                    // The fade is restored after the last slider exits a tracked state.
+                    if (--slidersCurrentlyTracking == 0)
                         this.TransformTo(nameof(FlashlightDim), 0.0f, 50);
-                    }
                 }
-
-                if (trackingSliders < 0)
-                    throw new InvalidOperationException($"The number of {nameof(trackingSliders)} cannot be below 0.");
             }
 
             protected override bool OnMouseMove(MouseMoveEvent e)
