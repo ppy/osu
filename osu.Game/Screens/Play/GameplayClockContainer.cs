@@ -95,8 +95,7 @@ namespace osu.Game.Screens.Play
 
             UserPlaybackRate.ValueChanged += _ => updateRate();
 
-            Seek(Math.Min(0, gameplayStartTime - beatmap.BeatmapInfo.AudioLeadIn));
-            adjustableClock.ProcessFrame();
+            Seek(Math.Min(-beatmap.BeatmapInfo.AudioLeadIn, gameplayStartTime));
         }
 
         public void Restart()
