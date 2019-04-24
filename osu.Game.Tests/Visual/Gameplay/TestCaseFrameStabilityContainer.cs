@@ -4,7 +4,6 @@
 using NUnit.Framework;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Testing;
 using osu.Framework.Timing;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Rulesets.UI;
