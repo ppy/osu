@@ -43,7 +43,7 @@ namespace osu.Game.Rulesets.UI
         /// <summary>
         /// The key conversion input manager for this DrawableRuleset.
         /// </summary>
-        public PassThroughInputManager KeyBindingInputManager { get; }
+        public PassThroughInputManager KeyBindingInputManager;
 
         public override double GameplayStartTime => Objects.First().StartTime - 2000;
 
