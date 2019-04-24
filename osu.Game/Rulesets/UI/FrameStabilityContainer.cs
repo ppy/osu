@@ -110,6 +110,10 @@ namespace osu.Game.Rulesets.UI
                     // On the first update, frame-stability seeking would result in unexpected/unwanted behaviour.
                     // Instead we perform an initial seek to the proposed time.
                     manualClock.CurrentTime = newProposedTime;
+
+                    // do a second process to clear out ElapsedTime
+                    framedClock.ProcessFrame();
+
                     firstConsumption = false;
                 }
                 else if (Math.Abs(manualClock.CurrentTime - newProposedTime) > sixty_frame_time * 1.2f)
