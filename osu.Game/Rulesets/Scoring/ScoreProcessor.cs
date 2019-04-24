@@ -101,12 +101,15 @@ namespace osu.Game.Rulesets.Scoring
             Accuracy.ValueChanged += delegate { Rank.Value = rankFrom(Accuracy.Value); };
         }
 
+        public ScoreRank ScoreRankX = ScoreRank.X;
+        public ScoreRank ScoreRankS = ScoreRank.S;
+
         private ScoreRank rankFrom(double acc)
         {
             if (acc == 1)
-                return ScoreRank.X;
+                return ScoreRankX;
             if (acc > 0.95)
-                return ScoreRank.S;
+                return ScoreRankS;
             if (acc > 0.9)
                 return ScoreRank.A;
             if (acc > 0.8)

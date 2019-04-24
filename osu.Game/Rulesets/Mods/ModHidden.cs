@@ -8,10 +8,12 @@ using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics.Sprites;
+using osu.Game.Rulesets.Scoring;
+using osu.Game.Scoring;
 
 namespace osu.Game.Rulesets.Mods
 {
-    public abstract class ModHidden : Mod, IReadFromConfig, IApplicableToDrawableHitObjects
+    public abstract class ModHidden : Mod, IReadFromConfig, IApplicableToDrawableHitObjects, IApplicableToScoreProcessor
     {
         public override string Name => "Hidden";
         public override string Acronym => "HD";
@@ -34,6 +36,12 @@ namespace osu.Game.Rulesets.Mods
 
         protected virtual void ApplyHiddenState(DrawableHitObject hitObject, ArmedState state)
         {
+        }
+
+        public void ApplyToScoreProcessor(ScoreProcessor scoreProcessor)
+        {
+            scoreProcessor.ScoreRankX = ScoreRank.XH;
+            scoreProcessor.ScoreRankS = ScoreRank.SH;
         }
     }
 }
