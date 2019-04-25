@@ -2,10 +2,10 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
-using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osuTK.Graphics;
 
@@ -22,8 +22,9 @@ namespace osu.Game.Overlays.Profile.Header
 
         public ProfileHeaderButton()
         {
-            HoverColour = Color4.Black.Opacity(0.75f);
-            IdleColour = Color4.Black.Opacity(0.7f);
+            IdleColour = Color4.Black;
+            HoverColour = OsuColour.Gray(0.1f);
+
             AutoSizeAxes = Axes.X;
 
             base.Content.Add(new CircularContainer

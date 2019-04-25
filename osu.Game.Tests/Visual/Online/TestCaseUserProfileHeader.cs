@@ -22,7 +22,8 @@ namespace osu.Game.Tests.Visual.Online
             typeof(LineGraph),
             typeof(ProfileHeaderTabControl),
             typeof(CentreHeaderContainer),
-            typeof(BottomHeaderContainer)
+            typeof(BottomHeaderContainer),
+            typeof(ProfileHeaderButton)
         };
 
         [Resolved]
