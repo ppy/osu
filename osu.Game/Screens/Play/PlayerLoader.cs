@@ -320,7 +320,6 @@ namespace osu.Game.Screens.Play
             private readonly Drawable facade;
             private LoadingAnimation loading;
             private Sprite backgroundSprite;
-            private ModDisplay modDisplay;
 
             public bool Loading
             {

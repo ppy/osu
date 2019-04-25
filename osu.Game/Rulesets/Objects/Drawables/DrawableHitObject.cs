@@ -7,6 +7,7 @@ using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.TypeExtensions;
+using osu.Framework.Graphics;
 using osu.Framework.Graphics.Primitives;
 using osu.Game.Audio;
 using osu.Game.Graphics;
@@ -58,7 +59,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
         public bool AllJudged => Judged && NestedHitObjects.All(h => h.AllJudged);
 
         /// <summary>
-        /// Whether this <see cref="DrawableHitObject"/> has been hit. This occurs if <see cref="Result.IsHit"/> is <see cref="true"/>.
+        /// Whether this <see cref="DrawableHitObject"/> has been hit. This occurs if <see cref="Result"/> is hit.
         /// Note: This does NOT include nested hitobjects.
         /// </summary>
         public bool IsHit => Result?.IsHit ?? false;
@@ -223,7 +224,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
         }
 
         /// <summary>
-        /// Will called at least once after the <see cref="LifetimeEnd"/> of this <see cref="DrawableHitObject"/> has been passed.
+        /// Will called at least once after the <see cref="Drawable.LifetimeEnd"/> of this <see cref="DrawableHitObject"/> has been passed.
         /// </summary>
         internal void OnLifetimeEnd()
         {

@@ -26,7 +26,7 @@ namespace osu.Game.Tests.Visual
         public void SetUpSteps()
         {
             AddStep(ruleset.RulesetInfo.Name, loadPlayer);
-            AddUntilStep(() => Player.IsLoaded && Player.Alpha == 1, "player loaded");
+            AddUntilStep("player loaded", () => Player.IsLoaded && Player.Alpha == 1);
         }
 
         protected virtual IBeatmap CreateBeatmap(Ruleset ruleset) => new TestBeatmap(ruleset.RulesetInfo);

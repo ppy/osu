@@ -25,8 +25,6 @@ namespace osu.Game.Screens.Multi.Lounge.Components
         private void load(OsuColour colours)
         {
             OsuSpriteText summary;
-            OsuSpriteText levelRangeHigher;
-            OsuSpriteText levelRangeLower;
             Container flagContainer;
             LinkFlowContainer hostText;
 
@@ -45,21 +43,6 @@ namespace osu.Game.Screens.Multi.Lounge.Components
                             Width = 22f,
                             RelativeSizeAxes = Axes.Y,
                         },
-                        /*new Container //todo: team banners
-                        {
-                            Width = 38f,
-                            RelativeSizeAxes = Axes.Y,
-                            CornerRadius = 2f,
-                            Masking = true,
-                            Children = new[]
-                            {
-                                new Box
-                                {
-                                    RelativeSizeAxes = Axes.Both,
-                                    Colour = OsuColour.FromHex(@"ad387e"),
-                                },
-                            },
-                        },*/
                         hostText = new LinkFlowContainer
                         {
                             Anchor = Anchor.CentreLeft,
@@ -101,13 +84,6 @@ namespace osu.Game.Screens.Multi.Lounge.Components
             }, true);
 
             ParticipantCount.BindValueChanged(count => summary.Text = "participant".ToQuantity(count.NewValue), true);
-
-            /*Participants.BindValueChanged(e =>
-            {
-                var ranks = v.Select(u => u.Statistics.Ranks.Global);
-                levelRangeLower.Text = ranks.Min().ToString();
-                levelRangeHigher.Text = ranks.Max().ToString();
-            });*/
         }
     }
 }
