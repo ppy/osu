@@ -312,6 +312,7 @@ namespace osu.Game.Rulesets.Scoring
         {
             result.ComboAtJudgement = Combo.Value;
             result.HighestComboAtJudgement = HighestCombo.Value;
+            result.HealthAtJudgement = Health.Value;
 
             JudgedHits++;
 
@@ -343,6 +344,8 @@ namespace osu.Game.Rulesets.Scoring
                 baseScore += result.Judgement.NumericResultFor(result);
                 rollingMaxBaseScore += result.Judgement.MaxNumericResult;
             }
+
+            Health.Value += HealthAdjustmentFactorFor(result) * result.Judgement.HealthIncreaseFor(result);
         }
 
         /// <summary>
@@ -354,6 +357,7 @@ namespace osu.Game.Rulesets.Scoring
         {
             Combo.Value = result.ComboAtJudgement;
             HighestCombo.Value = result.HighestComboAtJudgement;
+            Health.Value = result.HealthAtJudgement;
 
             JudgedHits--;
 
@@ -368,6 +372,13 @@ namespace osu.Game.Rulesets.Scoring
                 rollingMaxBaseScore -= result.Judgement.MaxNumericResult;
             }
         }
+
+        /// <summary>
+        /// An adjustment factor which is multiplied into the health increase provided by a <see cref="JudgementResult"/>.
+        /// </summary>
+        /// <param name="result">The <see cref="JudgementResult"/> for which the adjustment should apply.</param>
+        /// <returns>The adjustment factor.</returns>
+        protected virtual double HealthAdjustmentFactorFor(JudgementResult result) => 1;
 
         private void updateScore()
         {
