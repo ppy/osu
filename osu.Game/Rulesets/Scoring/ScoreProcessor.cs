@@ -7,9 +7,11 @@ using System.Diagnostics;
 using System.Linq;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions;
+using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Extensions.TypeExtensions;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Judgements;
+using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.UI;
 using osu.Game.Scoring;
@@ -61,6 +63,11 @@ namespace osu.Game.Rulesets.Scoring
         public readonly BindableInt Combo = new BindableInt();
 
         /// <summary>
+        /// The current selected mods
+        /// </summary>
+        public readonly Bindable<IReadOnlyList<Mod>> Mods = new Bindable<IReadOnlyList<Mod>>(Array.Empty<Mod>());
+
+        /// <summary>
         /// Create a <see cref="HitWindows"/> for this processor.
         /// </summary>
         public virtual HitWindows CreateHitWindows() => new HitWindows();
@@ -95,34 +102,22 @@ namespace osu.Game.Rulesets.Scoring
         /// </summary>
         protected virtual bool DefaultFailCondition => Health.Value == Health.MinValue;
 
-        private bool adjustRank;
-
-        /// <summary>
-        /// Used by specific mods to adjust <see cref="Rank"/>.
-        /// </summary>
-        public bool AdjustRank
-        {
-            get => adjustRank;
-
-            set
-            {
-                adjustRank = value;
-                Rank.Value = rankFrom(Accuracy.Value); // Update rank immediately if AdjustRank was changed
-            }
-        }
-
         protected ScoreProcessor()
         {
             Combo.ValueChanged += delegate { HighestCombo.Value = Math.Max(HighestCombo.Value, Combo.Value); };
-            Accuracy.ValueChanged += delegate { Rank.Value = rankFrom(Accuracy.Value); };
+            Accuracy.ValueChanged += delegate
+            {
+                foreach (var mod in Mods.Value.OfType<IApplicableToScoreProcessor>())
+                    Rank.Value = mod.AdjustRank(rankFrom(Accuracy.Value), Accuracy.Value);
+            };
         }
 
         private ScoreRank rankFrom(double acc)
         {
             if (acc == 1)
-                return (adjustRank ? ScoreRank.XH : ScoreRank.X);
+                return ScoreRank.X;
             if (acc > 0.95)
-                return (adjustRank ? ScoreRank.SH : ScoreRank.S);
+                return ScoreRank.S;
             if (acc > 0.9)
                 return ScoreRank.A;
             if (acc > 0.8)
@@ -146,7 +141,6 @@ namespace osu.Game.Rulesets.Scoring
             Rank.Value = ScoreRank.X;
             HighestCombo.Value = 0;
 
-            AdjustRank = false;
             HasFailed = false;
         }
 
