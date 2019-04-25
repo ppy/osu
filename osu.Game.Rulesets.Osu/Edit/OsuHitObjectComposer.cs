@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Edit.Tools;
+using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Osu.Edit.Blueprints.HitCircles;
 using osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders;
@@ -23,8 +24,8 @@ namespace osu.Game.Rulesets.Osu.Edit
         {
         }
 
-        protected override DrawableRuleset<OsuHitObject> CreateDrawableRuleset(Ruleset ruleset, WorkingBeatmap beatmap)
-            => new DrawableOsuEditRuleset(ruleset, beatmap);
+        protected override DrawableRuleset<OsuHitObject> CreateDrawableRuleset(Ruleset ruleset, WorkingBeatmap beatmap, IReadOnlyList<Mod> mods)
+            => new DrawableOsuEditRuleset(ruleset, beatmap, mods);
 
         protected override IReadOnlyList<HitObjectCompositionTool> CompositionTools => new HitObjectCompositionTool[]
         {

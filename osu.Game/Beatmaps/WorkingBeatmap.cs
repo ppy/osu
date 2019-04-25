@@ -11,7 +11,6 @@ using osu.Framework.IO.File;
 using System.IO;
 using System.Linq;
 using System.Threading;
-using osu.Framework.Bindables;
 using osu.Game.IO.Serialization;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Objects;
@@ -28,15 +27,11 @@ namespace osu.Game.Beatmaps
 
         public readonly BeatmapMetadata Metadata;
 
-        public readonly Bindable<IEnumerable<Mod>> Mods = new Bindable<IEnumerable<Mod>>(new Mod[] { });
-
         protected WorkingBeatmap(BeatmapInfo beatmapInfo)
         {
             BeatmapInfo = beatmapInfo;
             BeatmapSetInfo = beatmapInfo.BeatmapSet;
             Metadata = beatmapInfo.Metadata ?? BeatmapSetInfo?.Metadata ?? new BeatmapMetadata();
-
-            Mods.ValueChanged += _ => applyRateAdjustments();
 
             beatmap = new RecyclableLazy<IBeatmap>(() =>
             {
@@ -51,14 +46,7 @@ namespace osu.Game.Beatmaps
                 return b;
             });
 
-            track = new RecyclableLazy<Track>(() =>
-            {
-                // we want to ensure that we always have a track, even if it's a fake one.
-                var t = GetTrack() ?? new VirtualBeatmapTrack(Beatmap);
-                applyRateAdjustments(t);
-                return t;
-            });
-
+            track = new RecyclableLazy<Track>(() => GetTrack() ?? new VirtualBeatmapTrack(Beatmap));
             background = new RecyclableLazy<Texture>(GetBackground, BackgroundStillValid);
             waveform = new RecyclableLazy<Waveform>(GetWaveform);
             storyboard = new RecyclableLazy<Storyboard>(GetStoryboard);
@@ -85,9 +73,10 @@ namespace osu.Game.Beatmaps
         /// </para>
         /// </summary>
         /// <param name="ruleset">The <see cref="RulesetInfo"/> to create a playable <see cref="IBeatmap"/> for.</param>
+        /// <param name="mods">The <see cref="Mod"/>s to apply to the <see cref="IBeatmap"/>.</param>
         /// <returns>The converted <see cref="IBeatmap"/>.</returns>
         /// <exception cref="BeatmapInvalidForRulesetException">If <see cref="Beatmap"/> could not be converted to <paramref name="ruleset"/>.</exception>
-        public IBeatmap GetPlayableBeatmap(RulesetInfo ruleset)
+        public IBeatmap GetPlayableBeatmap(RulesetInfo ruleset, IReadOnlyList<Mod> mods)
         {
             var rulesetInstance = ruleset.CreateInstance();
 
@@ -98,19 +87,19 @@ namespace osu.Game.Beatmaps
                 throw new BeatmapInvalidForRulesetException($"{nameof(Beatmaps.Beatmap)} can not be converted for the ruleset (ruleset: {ruleset.InstantiationInfo}, converter: {converter}).");
 
             // Apply conversion mods
-            foreach (var mod in Mods.Value.OfType<IApplicableToBeatmapConverter>())
+            foreach (var mod in mods.OfType<IApplicableToBeatmapConverter>())
                 mod.ApplyToBeatmapConverter(converter);
 
             // Convert
             IBeatmap converted = converter.Convert();
 
             // Apply difficulty mods
-            if (Mods.Value.Any(m => m is IApplicableToDifficulty))
+            if (mods.Any(m => m is IApplicableToDifficulty))
             {
                 converted.BeatmapInfo = converted.BeatmapInfo.Clone();
                 converted.BeatmapInfo.BaseDifficulty = converted.BeatmapInfo.BaseDifficulty.Clone();
 
-                foreach (var mod in Mods.Value.OfType<IApplicableToDifficulty>())
+                foreach (var mod in mods.OfType<IApplicableToDifficulty>())
                     mod.ApplyToDifficulty(converted.BeatmapInfo.BaseDifficulty);
             }
 
@@ -122,7 +111,7 @@ namespace osu.Game.Beatmaps
             foreach (var obj in converted.HitObjects)
                 obj.ApplyDefaults(converted.ControlPointInfo, converted.BeatmapInfo.BaseDifficulty);
 
-            foreach (var mod in Mods.Value.OfType<IApplicableToHitObject>())
+            foreach (var mod in mods.OfType<IApplicableToHitObject>())
             foreach (var obj in converted.HitObjects)
                 mod.ApplyToHitObject(obj);
 
@@ -187,16 +176,6 @@ namespace osu.Game.Beatmaps
         /// Accessing track again will load a fresh instance.
         /// </summary>
         public void RecycleTrack() => track.Recycle();
-
-        private void applyRateAdjustments(Track t = null)
-        {
-            if (t == null && track.IsResultAvailable) t = Track;
-            if (t == null) return;
-
-            t.ResetSpeedAdjustments();
-            foreach (var mod in Mods.Value.OfType<IApplicableToClock>())
-                mod.ApplyToClock(t);
-        }
 
         public class RecyclableLazy<T>
         {

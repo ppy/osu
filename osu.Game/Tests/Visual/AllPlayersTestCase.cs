@@ -3,7 +3,6 @@
 
 using System.Linq;
 using osu.Framework.Allocation;
-using osu.Framework.Graphics.Shapes;
 using osu.Framework.Screens;
 using osu.Framework.Timing;
 using osu.Game.Beatmaps;
@@ -11,7 +10,6 @@ using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Screens.Play;
 using osu.Game.Tests.Beatmaps;
-using osuTK.Graphics;
 
 namespace osu.Game.Tests.Visual
 {
@@ -26,18 +24,11 @@ namespace osu.Game.Tests.Visual
         [BackgroundDependencyLoader]
         private void load(RulesetStore rulesets)
         {
-            Add(new Box
-            {
-                RelativeSizeAxes = Framework.Graphics.Axes.Both,
-                Colour = Color4.Black,
-                Depth = int.MaxValue
-            });
-
             foreach (var r in rulesets.AvailableRulesets)
             {
                 Player p = null;
                 AddStep(r.Name, () => p = loadPlayerFor(r));
-                AddUntilStep(() =>
+                AddUntilStep("player loaded", () =>
                 {
                     if (p?.IsLoaded == true)
                     {
@@ -46,7 +37,7 @@ namespace osu.Game.Tests.Visual
                     }
 
                     return false;
-                }, "player loaded");
+                });
 
                 AddCheckSteps();
             }
@@ -68,7 +59,7 @@ namespace osu.Game.Tests.Visual
             var working = CreateWorkingBeatmap(beatmap, Clock);
 
             Beatmap.Value = working;
-            Beatmap.Value.Mods.Value = new[] { r.GetAllMods().First(m => m is ModNoFail) };
+            Mods.Value = new[] { r.GetAllMods().First(m => m is ModNoFail) };
 
             Player?.Exit();
             Player = null;
