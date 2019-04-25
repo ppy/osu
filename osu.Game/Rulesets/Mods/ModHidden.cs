@@ -9,6 +9,7 @@ using System.Linq;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Rulesets.Scoring;
+using osu.Game.Scoring;
 
 namespace osu.Game.Rulesets.Mods
 {
@@ -35,7 +36,22 @@ namespace osu.Game.Rulesets.Mods
 
         public void ApplyToScoreProcessor(ScoreProcessor scoreProcessor)
         {
-            scoreProcessor.AdjustRank = true;
+            // Default value of ScoreProcessor's Rank in Hidden Mod should bes SS+
+            scoreProcessor.Rank.Value = ScoreRank.XH;
+        }
+
+        // TODO: Other mods that uses AdjustRank might have some issues due to rank changes
+        public ScoreRank AdjustRank(ScoreRank rank, double accuracy)
+        {
+            switch (rank)
+            {
+                case ScoreRank.X:
+                    return ScoreRank.XH;
+                case ScoreRank.S:
+                    return ScoreRank.SH;
+                default:
+                    return rank;
+            }
         }
 
         protected virtual void ApplyHiddenState(DrawableHitObject hitObject, ArmedState state)
