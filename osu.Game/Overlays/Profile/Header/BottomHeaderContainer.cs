@@ -35,6 +35,8 @@ namespace osu.Game.Overlays.Profile.Header
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
+            iconColour = colours.CommunityUserGrayGreenLighter;
+
             InternalChildren = new Drawable[]
             {
                 new Box
@@ -64,8 +66,6 @@ namespace osu.Game.Overlays.Profile.Header
                     }
                 }
             };
-
-            iconColour = colours.CommunityUserGrayGreenLighter;
 
             User.BindValueChanged(user => updateDisplay(user.NewValue));
         }

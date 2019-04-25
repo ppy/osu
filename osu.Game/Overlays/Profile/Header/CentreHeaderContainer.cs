@@ -1,7 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
@@ -21,8 +20,8 @@ namespace osu.Game.Overlays.Profile.Header
 {
     public class CentreHeaderContainer : CompositeDrawable
     {
-        public Action<bool> DetailsVisibilityAction;
-        private bool detailsVisible;
+        public readonly BindableBool DetailsVisible = new BindableBool(true);
+        public readonly Bindable<User> User = new Bindable<User>();
 
         private OsuSpriteText followerText;
         private OsuSpriteText levelBadgeText;
@@ -30,18 +29,20 @@ namespace osu.Game.Overlays.Profile.Header
         private Bar levelProgressBar;
         private OsuSpriteText levelProgressText;
 
-        private OverlinedInfoContainer hiddenDetailGlobal, hiddenDetailCountry;
+        private OverlinedInfoContainer hiddenDetailGlobal;
+        private OverlinedInfoContainer hiddenDetailCountry;
 
-        public readonly Bindable<User> User = new Bindable<User>();
+        public CentreHeaderContainer()
+        {
+            Height = 60;
+        }
 
         [BackgroundDependencyLoader]
         private void load(OsuColour colours, TextureStore textures)
         {
-            Container<Drawable> hiddenDetailContainer, expandedDetailContainer;
+            Container<Drawable> hiddenDetailContainer;
+            Container<Drawable> expandedDetailContainer;
             SpriteIcon expandButtonIcon;
-            ProfileHeaderButton detailsToggleButton;
-            Height = 60;
-            User.ValueChanged += e => updateDisplay(e.NewValue);
 
             InternalChildren = new Drawable[]
             {
@@ -105,11 +106,12 @@ namespace osu.Game.Overlays.Profile.Header
                     RelativeSizeAxes = Axes.Y,
                     Padding = new MarginPadding { Vertical = 10 },
                     Width = UserProfileOverlay.CONTENT_X_MARGIN,
-                    Child = detailsToggleButton = new ExpandButton
+                    Child = new ExpandButton
                     {
                         RelativeSizeAxes = Axes.Y,
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
+                        Action = () => DetailsVisible.Toggle(),
                         Children = new Drawable[]
                         {
                             expandButtonIcon = new SpriteIcon
@@ -210,14 +212,14 @@ namespace osu.Game.Overlays.Profile.Header
                 }
             };
 
-            detailsToggleButton.Action = () =>
+            DetailsVisible.BindValueChanged(visible =>
             {
-                detailsVisible = !detailsVisible;
-                expandButtonIcon.Icon = detailsVisible ? FontAwesome.Solid.ChevronDown : FontAwesome.Solid.ChevronUp;
-                hiddenDetailContainer.Alpha = detailsVisible ? 1 : 0;
-                expandedDetailContainer.Alpha = detailsVisible ? 0 : 1;
-                DetailsVisibilityAction(detailsVisible);
-            };
+                expandButtonIcon.Icon = visible.NewValue ? FontAwesome.Solid.ChevronUp : FontAwesome.Solid.ChevronDown;
+                hiddenDetailContainer.Alpha = visible.NewValue ? 1 : 0;
+                expandedDetailContainer.Alpha = visible.NewValue ? 0 : 1;
+            }, true);
+
+            User.BindValueChanged(user => updateDisplay(user.NewValue));
         }
 
         private void updateDisplay(User user)

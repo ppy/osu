@@ -13,7 +13,8 @@ namespace osu.Game.Overlays.Profile.Header
     public class OverlinedInfoContainer : CompositeDrawable
     {
         private readonly Circle line;
-        private readonly OsuSpriteText title, content;
+        private readonly OsuSpriteText title;
+        private readonly OsuSpriteText content;
 
         public string Title
         {

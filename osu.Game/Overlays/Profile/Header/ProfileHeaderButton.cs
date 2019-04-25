@@ -22,10 +22,10 @@ namespace osu.Game.Overlays.Profile.Header
 
         public ProfileHeaderButton()
         {
+            AutoSizeAxes = Axes.X;
+
             IdleColour = Color4.Black;
             HoverColour = OsuColour.Gray(0.1f);
-
-            AutoSizeAxes = Axes.X;
 
             base.Content.Add(new CircularContainer
             {
