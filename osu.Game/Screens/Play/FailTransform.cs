@@ -9,8 +9,6 @@ using osu.Framework.MathUtils;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.UI;
 using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace osu.Game.Screens.Play
 {
@@ -18,12 +16,12 @@ namespace osu.Game.Screens.Play
     {
         public override string TargetMember => "Alpha, GameplayClockContainer.UserPlaybackRate, AudioManager.Track.Frequency";
 
-        private BindableDouble clockRate = new BindableDouble();
-        private BindableDouble trackFreq = new BindableDouble();
+        private readonly BindableDouble clockRate = new BindableDouble();
+        private readonly BindableDouble trackFreq = new BindableDouble();
 
-        private SampleChannel sampleFail;
+        private readonly SampleChannel sampleFail;
 
-        private int seed;
+        private readonly int seed;
 
         public FailTransform(GameplayClockContainer clockContainer, AudioManager audioManager)
         {
@@ -37,8 +35,8 @@ namespace osu.Game.Screens.Play
             sampleFail = audioManager.Sample.Get(@"Gameplay/failsound");
             sampleFail?.Play();
 
-            base.OnComplete = onCompletion;
-            base.OnAbort = onAbort;
+            OnComplete = onCompletion;
+            OnAbort = onAbort;
             seed = RNG.Next();
         }
 
