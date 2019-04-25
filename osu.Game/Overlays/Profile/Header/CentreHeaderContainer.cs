@@ -4,6 +4,7 @@
 using System;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -104,7 +105,7 @@ namespace osu.Game.Overlays.Profile.Header
                     RelativeSizeAxes = Axes.Y,
                     Padding = new MarginPadding { Vertical = 10 },
                     Width = UserProfileOverlay.CONTENT_X_MARGIN,
-                    Child = detailsToggleButton = new ProfileHeaderButton
+                    Child = detailsToggleButton = new ExpandButton
                     {
                         RelativeSizeAxes = Axes.Y,
                         Anchor = Anchor.Centre,
@@ -115,7 +116,7 @@ namespace osu.Game.Overlays.Profile.Header
                             {
                                 Anchor = Anchor.Centre,
                                 Origin = Anchor.Centre,
-                                Size = new Vector2(20),
+                                Size = new Vector2(20, 12),
                                 Icon = FontAwesome.Solid.ChevronUp,
                             },
                         }
@@ -229,6 +230,16 @@ namespace osu.Game.Overlays.Profile.Header
 
             hiddenDetailGlobal.Content = user.Statistics?.Ranks.Global?.ToString("#,##0") ?? "-";
             hiddenDetailCountry.Content = user.Statistics?.Ranks.Country?.ToString("#,##0") ?? "-";
+        }
+
+        private class ExpandButton : ProfileHeaderButton
+        {
+            [BackgroundDependencyLoader]
+            private void load(OsuColour colours)
+            {
+                IdleColour = colours.CommunityUserGrayGreen;
+                HoverColour = colours.CommunityUserGrayGreen.Darken(0.2f);
+            }
         }
     }
 }
