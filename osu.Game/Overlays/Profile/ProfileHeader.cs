@@ -26,7 +26,7 @@ namespace osu.Game.Overlays.Profile
 
         public ProfileHeader()
         {
-            CenterHeaderContainer centerHeaderContainer;
+            CentreHeaderContainer centreHeaderContainer;
             DetailHeaderContainer detailHeaderContainer;
 
             RelativeSizeAxes = Axes.X;
@@ -91,7 +91,7 @@ namespace osu.Game.Overlays.Profile
                             RelativeSizeAxes = Axes.X,
                             User = { BindTarget = User },
                         },
-                        centerHeaderContainer = new CenterHeaderContainer
+                        centreHeaderContainer = new CentreHeaderContainer
                         {
                             RelativeSizeAxes = Axes.X,
                             User = { BindTarget = User },
@@ -118,7 +118,7 @@ namespace osu.Game.Overlays.Profile
             infoTabControl.AddItem("Info");
             infoTabControl.AddItem("Modding");
 
-            centerHeaderContainer.DetailsVisibilityAction = visible => detailHeaderContainer.Alpha = visible ? 0 : 1;
+            centreHeaderContainer.DetailsVisibilityAction = visible => detailHeaderContainer.Alpha = visible ? 0 : 1;
             User.ValueChanged += e => updateDisplay(e.NewValue);
         }
 

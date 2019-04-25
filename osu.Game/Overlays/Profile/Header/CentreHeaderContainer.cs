@@ -18,7 +18,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Overlays.Profile.Header
 {
-    public class CenterHeaderContainer : CompositeDrawable
+    public class CentreHeaderContainer : CompositeDrawable
     {
         public Action<bool> DetailsVisibilityAction;
         private bool detailsVisible;
