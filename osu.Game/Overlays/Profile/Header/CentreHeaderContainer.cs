@@ -11,10 +11,8 @@ using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
-using osu.Game.Graphics.UserInterface;
 using osu.Game.Users;
 using osuTK;
-using osuTK.Graphics;
 
 namespace osu.Game.Overlays.Profile.Header
 {
@@ -24,11 +22,6 @@ namespace osu.Game.Overlays.Profile.Header
         public readonly Bindable<User> User = new Bindable<User>();
 
         private OsuSpriteText followerText;
-        private OsuSpriteText levelBadgeText;
-
-        private Bar levelProgressBar;
-        private OsuSpriteText levelProgressText;
-
         private OverlinedInfoContainer hiddenDetailGlobal;
         private OverlinedInfoContainer hiddenDetailCountry;
 
@@ -132,56 +125,24 @@ namespace osu.Game.Overlays.Profile.Header
                     Margin = new MarginPadding { Right = UserProfileOverlay.CONTENT_X_MARGIN },
                     Children = new Drawable[]
                     {
-                        new ProfileHeader.HasTooltipContainer
+                        new LevelBadge
                         {
                             Anchor = Anchor.CentreRight,
                             Origin = Anchor.CentreRight,
                             Size = new Vector2(40),
-                            TooltipText = "Level",
-                            Children = new Drawable[]
-                            {
-                                new Sprite
-                                {
-                                    RelativeSizeAxes = Axes.Both,
-                                    Texture = textures.Get("Profile/levelbadge"),
-                                    Colour = colours.Yellow,
-                                },
-                                levelBadgeText = new OsuSpriteText
-                                {
-                                    Anchor = Anchor.Centre,
-                                    Origin = Anchor.Centre,
-                                    Font = OsuFont.GetFont(size: 20)
-                                }
-                            }
+                            User = { BindTarget = User }
                         },
-                        expandedDetailContainer = new ProfileHeader.HasTooltipContainer
+                        expandedDetailContainer = new Container
                         {
-                            TooltipText = "Progress to next level",
                             Anchor = Anchor.CentreRight,
                             Origin = Anchor.CentreRight,
                             Width = 200,
                             Height = 6,
                             Margin = new MarginPadding { Right = 50 },
-                            Children = new Drawable[]
+                            Child = new LevelProgressBar
                             {
-                                new CircularContainer
-                                {
-                                    RelativeSizeAxes = Axes.Both,
-                                    Masking = true,
-                                    Child = levelProgressBar = new Bar
-                                    {
-                                        RelativeSizeAxes = Axes.Both,
-                                        BackgroundColour = Color4.Black,
-                                        Direction = BarDirection.LeftToRight,
-                                        AccentColour = colours.Yellow
-                                    }
-                                },
-                                levelProgressText = new OsuSpriteText
-                                {
-                                    Anchor = Anchor.BottomRight,
-                                    Origin = Anchor.TopRight,
-                                    Font = OsuFont.GetFont(size: 12, weight: FontWeight.Bold)
-                                }
+                                RelativeSizeAxes = Axes.Both,
+                                User = { BindTarget = User }
                             }
                         },
                         hiddenDetailContainer = new FillFlowContainer
@@ -225,10 +186,6 @@ namespace osu.Game.Overlays.Profile.Header
         private void updateDisplay(User user)
         {
             followerText.Text = user.FollowerCount?.Length > 0 ? user.FollowerCount[0].ToString("#,##0") : "0";
-
-            levelBadgeText.Text = user.Statistics?.Level.Current.ToString() ?? "0";
-            levelProgressBar.Length = user.Statistics?.Level.Progress / 100f ?? 0;
-            levelProgressText.Text = user.Statistics?.Level.Progress.ToString("0'%'");
 
             hiddenDetailGlobal.Content = user.Statistics?.Ranks.Global?.ToString("#,##0") ?? "-";
             hiddenDetailCountry.Content = user.Statistics?.Ranks.Country?.ToString("#,##0") ?? "-";

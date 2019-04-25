@@ -4,7 +4,6 @@
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Cursor;
 using osu.Game.Graphics;
 using osu.Game.Overlays.Profile.Header;
 using osu.Game.Users;
@@ -133,11 +132,6 @@ namespace osu.Game.Overlays.Profile
         private void updateDisplay(User user)
         {
             coverContainer.User = user;
-        }
-
-        public class HasTooltipContainer : Container, IHasTooltip
-        {
-            public string TooltipText { get; set; }
         }
 
         private class ProfileHeaderTitle : ScreenTitle
