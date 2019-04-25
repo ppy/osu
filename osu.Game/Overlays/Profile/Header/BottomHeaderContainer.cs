@@ -48,12 +48,12 @@ namespace osu.Game.Overlays.Profile.Header
                     Spacing = new Vector2(0, 10),
                     Children = new Drawable[]
                     {
-                        bottomTopLinkContainer = new LinkFlowContainer(text => text.TextSize = 12)
+                        bottomTopLinkContainer = new LinkFlowContainer(text => text.Font = text.Font.With(size: 12))
                         {
                             RelativeSizeAxes = Axes.X,
                             AutoSizeAxes = Axes.Y,
                         },
-                        bottomLinkContainer = new LinkFlowContainer(text => text.TextSize = 12)
+                        bottomLinkContainer = new LinkFlowContainer(text => text.Font = text.Font.With(size: 12))
                         {
                             RelativeSizeAxes = Axes.X,
                             AutoSizeAxes = Axes.Y,
@@ -68,7 +68,7 @@ namespace osu.Game.Overlays.Profile.Header
 
         private void updateDisplay(User user)
         {
-            void bold(SpriteText t) => t.Font = @"Exo2.0-Bold";
+            void bold(SpriteText t) => t.Font = t.Font.With(weight: FontWeight.Bold);
             void addSpacer(OsuTextFlowContainer textFlow) => textFlow.AddArbitraryDrawable(new Container { Width = 15 });
 
             bottomTopLinkContainer.Clear();
@@ -113,7 +113,7 @@ namespace osu.Game.Overlays.Profile.Header
 
                 bottomLinkContainer.AddIcon(icon, text =>
                 {
-                    text.TextSize = 10;
+                    text.Font = text.Font.With(size: 10);
                     text.Colour = communityUserGrayGreenLighter;
                 });
                 if (link != null)

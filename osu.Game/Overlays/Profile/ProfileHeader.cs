@@ -12,7 +12,6 @@ using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Shapes;
-using osu.Framework.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 
 namespace osu.Game.Overlays.Profile
@@ -29,9 +28,6 @@ namespace osu.Game.Overlays.Profile
         {
             CenterHeaderContainer centerHeaderContainer;
             DetailHeaderContainer detailHeaderContainer;
-            Container expandedDetailContainer;
-            FillFlowContainer hiddenDetailContainer, headerDetailContainer;
-            SpriteIcon expandButtonIcon;
 
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;

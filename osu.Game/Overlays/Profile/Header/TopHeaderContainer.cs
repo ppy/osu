@@ -75,8 +75,7 @@ namespace osu.Game.Overlays.Profile.Header
                                     {
                                         usernameText = new OsuSpriteText
                                         {
-                                            Font = "Exo2.0-Regular",
-                                            TextSize = 24
+                                            Font = OsuFont.GetFont(size: 24, weight: FontWeight.Regular)
                                         },
                                         openUserExternally = new ExternalLinkButton
                                         {
@@ -96,8 +95,7 @@ namespace osu.Game.Overlays.Profile.Header
                                     {
                                         titleText = new OsuSpriteText
                                         {
-                                            TextSize = 18,
-                                            Font = "Exo2.0-Regular"
+                                            Font = OsuFont.GetFont(size: 18, weight: FontWeight.Regular)
                                         },
                                         supporterTag = new SupporterIcon
                                         {
@@ -123,8 +121,7 @@ namespace osu.Game.Overlays.Profile.Header
                                                 },
                                                 userCountryText = new OsuSpriteText
                                                 {
-                                                    Font = "Exo2.0-Regular",
-                                                    TextSize = 17.5f,
+                                                    Font = OsuFont.GetFont(size: 17.5f, weight: FontWeight.Regular),
                                                     Margin = new MarginPadding { Left = 40 },
                                                     Origin = Anchor.CentreLeft,
                                                     Anchor = Anchor.CentreLeft,
@@ -185,17 +182,15 @@ namespace osu.Game.Overlays.Profile.Header
                 {
                     new OsuSpriteText
                     {
-                        TextSize = 15,
+                        Font = OsuFont.GetFont(size: 15),
                         Text = left,
-                        Font = "Exo2.0-Medium"
                     },
                     new OsuSpriteText
                     {
                         Anchor = Anchor.TopRight,
                         Origin = Anchor.TopRight,
-                        TextSize = 15,
+                        Font = OsuFont.GetFont(size: 15, weight: FontWeight.Bold),
                         Text = right,
-                        Font = "Exo2.0-Bold"
                     },
                 };
             }
