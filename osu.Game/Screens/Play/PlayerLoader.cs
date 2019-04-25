@@ -44,6 +44,8 @@ namespace osu.Game.Screens.Play
 
         public override bool DisallowExternalBeatmapRulesetChanges => true;
 
+        protected override bool PlayResumeSound => false;
+
         private Task loadTask;
 
         private InputManager inputManager;
