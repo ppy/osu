@@ -253,7 +253,7 @@ namespace osu.Game.Online.API
                 handleWebException(we);
                 return false;
             }
-            catch (Exception e)
+            catch
             {
                 return false;
             }

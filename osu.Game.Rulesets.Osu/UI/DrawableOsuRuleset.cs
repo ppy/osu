@@ -1,11 +1,13 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Input;
 using osu.Game.Beatmaps;
 using osu.Game.Input.Handlers;
 using osu.Game.Replays;
+using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Osu.Configuration;
 using osu.Game.Rulesets.Osu.Objects;
@@ -22,8 +24,8 @@ namespace osu.Game.Rulesets.Osu.UI
     {
         protected new OsuRulesetConfigManager Config => (OsuRulesetConfigManager)base.Config;
 
-        public DrawableOsuRuleset(Ruleset ruleset, WorkingBeatmap beatmap)
-            : base(ruleset, beatmap)
+        public DrawableOsuRuleset(Ruleset ruleset, WorkingBeatmap beatmap, IReadOnlyList<Mod> mods)
+            : base(ruleset, beatmap, mods)
         {
         }
 

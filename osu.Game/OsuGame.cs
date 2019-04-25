@@ -112,8 +112,8 @@ namespace osu.Game
 
         // todo: move this to SongSelect once Screen has the ability to unsuspend.
         [Cached]
-        [Cached(Type = typeof(IBindable<IEnumerable<Mod>>))]
-        private readonly Bindable<IEnumerable<Mod>> selectedMods = new Bindable<IEnumerable<Mod>>(new Mod[] { });
+        [Cached(typeof(IBindable<IReadOnlyList<Mod>>))]
+        private readonly Bindable<IReadOnlyList<Mod>> mods = new Bindable<IReadOnlyList<Mod>>(Array.Empty<Mod>());
 
         public OsuGame(string[] args = null)
         {
@@ -272,7 +272,6 @@ namespace osu.Game
         /// Present a score's replay immediately.
         /// The user should have already requested this interactively.
         /// </summary>
-        /// <param name="beatmap">The beatmap to select.</param>
         public void PresentScore(ScoreInfo score)
         {
             var databasedScore = ScoreManager.GetScore(score);
@@ -293,9 +292,8 @@ namespace osu.Game
             performFromMainMenu(() =>
             {
                 ruleset.Value = databasedScoreInfo.Ruleset;
-
                 Beatmap.Value = BeatmapManager.GetWorkingBeatmap(databasedBeatmap);
-                Beatmap.Value.Mods.Value = databasedScoreInfo.Mods;
+                mods.Value = databasedScoreInfo.Mods;
 
                 menuScreen.Push(new PlayerLoader(() => new ReplayPlayer(databasedScore)));
             }, $"watch {databasedScoreInfo}", bypassScreenAllowChecks: true);
