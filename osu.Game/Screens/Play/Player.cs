@@ -10,6 +10,7 @@ using osu.Framework.Audio.Sample;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Transforms;
 using osu.Framework.Input.Events;
 using osu.Framework.Logging;
 using osu.Framework.Screens;
@@ -62,7 +63,7 @@ namespace osu.Game.Screens.Play
 
         private IAPIProvider api;
 
-        private SampleChannel sampleRestart, sampleFail;
+        private SampleChannel sampleRestart;
 
         protected ScoreProcessor ScoreProcessor { get; private set; }
         protected DrawableRuleset DrawableRuleset { get; private set; }
@@ -104,7 +105,6 @@ namespace osu.Game.Screens.Play
                 return;
 
             sampleRestart = audio.Sample.Get(@"Gameplay/restart");
-            sampleFail = audio.Sample.Get(@"Gameplay/failsound");
 
             mouseWheelDisabled = config.GetBindable<bool>(OsuSetting.MouseDisableWheel);
             showStoryboard = config.GetBindable<bool>(OsuSetting.ShowStoryboard);
@@ -334,6 +334,8 @@ namespace osu.Game.Screens.Play
 
         protected FailOverlay FailOverlay { get; private set; }
 
+        protected Transform<float, HitObjectContainer> FailTransform { get; private set; }
+
         private bool onFail()
         {
             if (Mods.Value.OfType<IApplicableFailOverride>().Any(m => !m.AllowFail))
@@ -347,13 +349,11 @@ namespace osu.Game.Screens.Play
             if (PauseOverlay.State == Visibility.Visible)
                 PauseOverlay.Hide();
 
-            sampleFail?.Play();
+            var transform = new FailTransform(GameplayClockContainer, audioManager);
+            FailTransform = DrawableRuleset.Playfield.HitObjectContainer.PopulateTransform(transform, 0, 500, Easing.None);
 
-            var failTransform = new FailTransform(GameplayClockContainer, audioManager);
-            var populated = DrawableRuleset.Playfield.HitObjectContainer.PopulateTransform(failTransform, 0, 500, Easing.None);
-
-            DrawableRuleset.Playfield.HitObjectContainer.TransformTo(populated);
-            populated.OnComplete = onFailComplete;
+            DrawableRuleset.Playfield.HitObjectContainer.TransformTo(FailTransform);
+            FailTransform.OnComplete = onFailComplete;
             return true;
         }
 
@@ -502,11 +502,15 @@ namespace osu.Game.Screens.Play
                 // still want to block if we are within the cooldown period and not already paused.
                 return true;
 
+            DrawableRuleset.Playfield.HitObjectContainer.RemoveTransform(FailTransform);
+
             GameplayClockContainer.ResetLocalAdjustments();
 
             // Reset track frequency just in case the player left while we are in failing scene
-            Beatmap.Value.Track.Restart();
+            // TODO: Resetting Frequency values should be done inside FailTransform when removed since it's the one who modified it, but for some reason the base is not invoking onAbort
             audioManager.Track.Frequency.Value = 1;
+
+            Beatmap.Value.Track.Restart();
 
             fadeOut();
             return base.OnExiting(next);
