@@ -46,7 +46,7 @@ namespace osu.Game.Overlays.Profile.Header
         public ProfileHeaderTabControl()
         {
             TabContainer.Masking = false;
-            TabContainer.Spacing = new Vector2(20, 0);
+            TabContainer.Spacing = new Vector2(15, 0);
 
             AddInternal(bar = new Box
             {
