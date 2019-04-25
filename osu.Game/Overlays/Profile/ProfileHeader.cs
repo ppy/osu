@@ -144,7 +144,7 @@ namespace osu.Game.Overlays.Profile
         {
             public ProfileHeaderTitle()
             {
-                Title = "Player ";
+                Title = "Player";
                 Section = "Info";
             }
 
