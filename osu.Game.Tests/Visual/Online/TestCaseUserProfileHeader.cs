@@ -23,6 +23,7 @@ namespace osu.Game.Tests.Visual.Online
             typeof(ProfileHeaderTabControl),
             typeof(CentreHeaderContainer),
             typeof(BottomHeaderContainer),
+            typeof(DetailHeaderContainer),
             typeof(ProfileHeaderButton)
         };
 

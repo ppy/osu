@@ -20,8 +20,7 @@ namespace osu.Game.Overlays.Profile.Header
 {
     public class DetailHeaderContainer : CompositeDrawable
     {
-        private ProfileHeader.HasTooltipContainer totalPlayTimeTooltip;
-        private OverlinedInfoContainer totalPlayTimeInfo, medalInfo, ppInfo;
+        private OverlinedInfoContainer medalInfo, ppInfo;
         private readonly Dictionary<ScoreRank, ScoreRankInfo> scoreRankInfos = new Dictionary<ScoreRank, ScoreRankInfo>();
         private OverlinedInfoContainer detailGlobalRank, detailCountryRank;
         private RankGraph rankGraph;
@@ -65,15 +64,9 @@ namespace osu.Game.Overlays.Profile.Header
                                     Spacing = new Vector2(10, 0),
                                     Children = new Drawable[]
                                     {
-                                        totalPlayTimeTooltip = new ProfileHeader.HasTooltipContainer
+                                        new OverlinedTotalPlayTime
                                         {
-                                            AutoSizeAxes = Axes.Both,
-                                            TooltipText = "0 hours",
-                                            Child = totalPlayTimeInfo = new OverlinedInfoContainer
-                                            {
-                                                Title = "Total Play Time",
-                                                LineColour = colours.Yellow,
-                                            },
+                                            User = { BindTarget = User }
                                         },
                                         medalInfo = new OverlinedInfoContainer
                                         {
@@ -148,31 +141,6 @@ namespace osu.Game.Overlays.Profile.Header
         {
             medalInfo.Content = user?.Achievements?.Length.ToString() ?? "0";
             ppInfo.Content = user?.Statistics?.PP?.ToString("#,##0") ?? "0";
-
-            string formatTime(int? secondsNull)
-            {
-                if (secondsNull == null) return "0h 0m";
-
-                int seconds = secondsNull.Value;
-                string time = "";
-
-                int days = seconds / 86400;
-                seconds -= days * 86400;
-                if (days > 0)
-                    time += days + "d ";
-
-                int hours = seconds / 3600;
-                seconds -= hours * 3600;
-                time += hours + "h ";
-
-                int minutes = seconds / 60;
-                time += minutes + "m";
-
-                return time;
-            }
-
-            totalPlayTimeInfo.Content = formatTime(user?.Statistics?.PlayTime);
-            totalPlayTimeTooltip.TooltipText = (user?.Statistics?.PlayTime ?? 0) / 3600 + " hours";
 
             foreach (var scoreRankInfo in scoreRankInfos)
                 scoreRankInfo.Value.RankCount = user?.Statistics?.GradesCount[scoreRankInfo.Key] ?? 0;
