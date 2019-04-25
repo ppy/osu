@@ -20,18 +20,21 @@ namespace osu.Game.Overlays.Profile.Header
 {
     public class BottomHeaderContainer : CompositeDrawable
     {
-        private LinkFlowContainer bottomTopLinkContainer;
-        private LinkFlowContainer bottomLinkContainer;
-        private Color4 linkBlue, communityUserGrayGreenLighter;
-
         public readonly Bindable<User> User = new Bindable<User>();
+
+        private LinkFlowContainer topLinkContainer;
+        private LinkFlowContainer bottomLinkContainer;
+
+        private Color4 iconColour;
+
+        public BottomHeaderContainer()
+        {
+            AutoSizeAxes = Axes.Y;
+        }
 
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
-            AutoSizeAxes = Axes.Y;
-            User.ValueChanged += e => updateDisplay(e.NewValue);
-
             InternalChildren = new Drawable[]
             {
                 new Box
@@ -48,7 +51,7 @@ namespace osu.Game.Overlays.Profile.Header
                     Spacing = new Vector2(0, 10),
                     Children = new Drawable[]
                     {
-                        bottomTopLinkContainer = new LinkFlowContainer(text => text.Font = text.Font.With(size: 12))
+                        topLinkContainer = new LinkFlowContainer(text => text.Font = text.Font.With(size: 12))
                         {
                             RelativeSizeAxes = Axes.X,
                             AutoSizeAxes = Axes.Y,
@@ -62,80 +65,55 @@ namespace osu.Game.Overlays.Profile.Header
                 }
             };
 
-            linkBlue = colours.BlueLight;
-            communityUserGrayGreenLighter = colours.CommunityUserGrayGreenLighter;
+            iconColour = colours.CommunityUserGrayGreenLighter;
+
+            User.BindValueChanged(user => updateDisplay(user.NewValue));
         }
 
         private void updateDisplay(User user)
         {
-            void bold(SpriteText t) => t.Font = t.Font.With(weight: FontWeight.Bold);
-            void addSpacer(OsuTextFlowContainer textFlow) => textFlow.AddArbitraryDrawable(new Container { Width = 15 });
-
-            bottomTopLinkContainer.Clear();
+            topLinkContainer.Clear();
             bottomLinkContainer.Clear();
 
             if (user == null) return;
 
             if (user.JoinDate.ToUniversalTime().Year < 2008)
-            {
-                bottomTopLinkContainer.AddText("Here since the beginning");
-            }
+                topLinkContainer.AddText("Here since the beginning");
             else
             {
-                bottomTopLinkContainer.AddText("Joined ");
-                bottomTopLinkContainer.AddText(new DrawableDate(user.JoinDate), bold);
+                topLinkContainer.AddText("Joined ");
+                topLinkContainer.AddText(new DrawableDate(user.JoinDate), embolden);
             }
 
-            addSpacer(bottomTopLinkContainer);
+            addSpacer(topLinkContainer);
 
             if (user.PlayStyles?.Length > 0)
             {
-                bottomTopLinkContainer.AddText("Plays with ");
-                bottomTopLinkContainer.AddText(string.Join(", ", user.PlayStyles.Select(style => style.GetDescription())), bold);
+                topLinkContainer.AddText("Plays with ");
+                topLinkContainer.AddText(string.Join(", ", user.PlayStyles.Select(style => style.GetDescription())), embolden);
 
-                addSpacer(bottomTopLinkContainer);
+                addSpacer(topLinkContainer);
             }
 
             if (user.LastVisit.HasValue)
             {
-                bottomTopLinkContainer.AddText("Last seen ");
-                bottomTopLinkContainer.AddText(new DrawableDate(user.LastVisit.Value), bold);
+                topLinkContainer.AddText("Last seen ");
+                topLinkContainer.AddText(new DrawableDate(user.LastVisit.Value), embolden);
 
-                addSpacer(bottomTopLinkContainer);
+                addSpacer(topLinkContainer);
             }
 
-            bottomTopLinkContainer.AddText("Contributed ");
-            bottomTopLinkContainer.AddLink($@"{user.PostCount:#,##0} forum posts", $"https://osu.ppy.sh/users/{user.Id}/posts", creationParameters: bold);
-
-            void tryAddInfo(IconUsage icon, string content, string link = null)
-            {
-                if (string.IsNullOrEmpty(content)) return;
-
-                bottomLinkContainer.AddIcon(icon, text =>
-                {
-                    text.Font = text.Font.With(size: 10);
-                    text.Colour = communityUserGrayGreenLighter;
-                });
-                if (link != null)
-                {
-                    bottomLinkContainer.AddLink(" " + content, link, creationParameters: text =>
-                    {
-                        bold(text);
-                        text.Colour = linkBlue;
-                    });
-                }
-                else
-                    bottomLinkContainer.AddText(" " + content, bold);
-
-                addSpacer(bottomLinkContainer);
-            }
+            topLinkContainer.AddText("Contributed ");
+            topLinkContainer.AddLink($@"{user.PostCount:#,##0} forum posts", $"https://osu.ppy.sh/users/{user.Id}/posts", creationParameters: embolden);
 
             string websiteWithoutProtcol = user.Website;
             if (!string.IsNullOrEmpty(websiteWithoutProtcol))
             {
-                int protocolIndex = websiteWithoutProtcol.IndexOf("//", StringComparison.Ordinal);
-                if (protocolIndex >= 0)
-                    websiteWithoutProtcol = websiteWithoutProtcol.Substring(protocolIndex + 2);
+                if (Uri.TryCreate(websiteWithoutProtcol, UriKind.Absolute, out var uri))
+                {
+                    websiteWithoutProtcol = uri.Host + uri.PathAndQuery + uri.Fragment;
+                    websiteWithoutProtcol = websiteWithoutProtcol.TrimEnd('/');
+                }
             }
 
             tryAddInfo(FontAwesome.Solid.MapMarker, user.Location);
@@ -149,5 +127,27 @@ namespace osu.Game.Overlays.Profile.Header
             tryAddInfo(FontAwesome.Brands.Lastfm, user.Lastfm, $@"https://last.fm/users/{user.Lastfm}");
             tryAddInfo(FontAwesome.Solid.Link, websiteWithoutProtcol, user.Website);
         }
+
+        private void addSpacer(OsuTextFlowContainer textFlow) => textFlow.AddArbitraryDrawable(new Container { Width = 15 });
+
+        private void tryAddInfo(IconUsage icon, string content, string link = null)
+        {
+            if (string.IsNullOrEmpty(content)) return;
+
+            bottomLinkContainer.AddIcon(icon, text =>
+            {
+                text.Font = text.Font.With(size: 10);
+                text.Colour = iconColour;
+            });
+
+            if (link != null)
+                bottomLinkContainer.AddLink(" " + content, link, creationParameters: embolden);
+            else
+                bottomLinkContainer.AddText(" " + content, embolden);
+
+            addSpacer(bottomLinkContainer);
+        }
+
+        private void embolden(SpriteText text) => text.Font = text.Font.With(weight: FontWeight.Bold);
     }
 }
