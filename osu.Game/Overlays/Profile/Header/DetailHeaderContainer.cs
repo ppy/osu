@@ -213,8 +213,7 @@ namespace osu.Game.Overlays.Profile.Header
                         },
                         rankCount = new OsuSpriteText
                         {
-                            Font = "Exo2.0-Bold",
-                            TextSize = 12,
+                            Font = OsuFont.GetFont(size: 12, weight: FontWeight.Bold),
                             Anchor = Anchor.TopCentre,
                             Origin = Anchor.TopCentre
                         }

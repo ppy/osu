@@ -43,8 +43,7 @@ namespace osu.Game.Overlays.Profile.Header
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
                     Text = "No recent plays",
-                    TextSize = 12,
-                    Font = @"Exo2.0-Regular",
+                    Font = OsuFont.GetFont(size: 12, weight: FontWeight.Regular)
                 },
                 graph = new RankChartLineGraph
                 {
@@ -227,14 +226,12 @@ namespace osu.Game.Overlays.Profile.Header
                                 {
                                     new OsuSpriteText
                                     {
-                                        Font = "Exo2.0-Bold",
-                                        TextSize = 12,
+                                        Font = OsuFont.GetFont(size: 12, weight: FontWeight.Bold),
                                         Text = "Global Ranking "
                                     },
                                     globalRankingText = new OsuSpriteText
                                     {
-                                        Font = "Exo2.0-Regular",
-                                        TextSize = 12,
+                                        Font = OsuFont.GetFont(size: 12, weight: FontWeight.Regular),
                                         Anchor = Anchor.BottomLeft,
                                         Origin = Anchor.BottomLeft,
                                     }
@@ -242,8 +239,7 @@ namespace osu.Game.Overlays.Profile.Header
                             },
                             timeText = new OsuSpriteText
                             {
-                                TextSize = 12,
-                                Font = "Exo2.0-Regular"
+                                Font = OsuFont.GetFont(size: 12, weight: FontWeight.Regular),
                             }
                         }
                     }
