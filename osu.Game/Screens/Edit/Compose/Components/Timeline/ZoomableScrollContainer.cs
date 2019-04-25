@@ -92,13 +92,6 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             }
         }
 
-        protected override void Update()
-        {
-            base.Update();
-
-            zoomedContent.Width = DrawWidth * currentZoom;
-        }
-
         protected override bool OnScroll(ScrollEvent e)
         {
             if (e.IsPrecise)
@@ -169,6 +162,11 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                 float targetOffset = expectedWidth * (focusPoint / contentSize) - focusOffset;
 
                 d.currentZoom = newZoom;
+
+                d.zoomedContent.Width = d.DrawWidth * d.currentZoom;
+                // Temporarily here to make sure ScrollTo gets the correct DrawSize for scrollable area.
+                // TODO: Make sure draw size gets invalidated properly on the framework side, and remove this once it is.
+                d.Invalidate(Invalidation.DrawSize);
                 d.ScrollTo(targetOffset, false);
             }
 
