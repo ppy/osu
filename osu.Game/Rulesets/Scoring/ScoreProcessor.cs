@@ -7,7 +7,6 @@ using System.Diagnostics;
 using System.Linq;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions;
-using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Extensions.TypeExtensions;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Judgements;
