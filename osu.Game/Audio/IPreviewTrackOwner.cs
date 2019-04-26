@@ -4,7 +4,7 @@
 namespace osu.Game.Audio
 {
     /// <summary>
-    /// Interface for objects that can own <see cref="IPreviewTrack"/>s.
+    /// Interface for objects that can own <see cref="PreviewTrack"/>s.
     /// </summary>
     /// <remarks>
     /// <see cref="IPreviewTrackOwner"/>s can cancel the currently playing <see cref="PreviewTrack"/> through the

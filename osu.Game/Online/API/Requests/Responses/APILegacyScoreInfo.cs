@@ -7,7 +7,6 @@ using System.Linq;
 using Newtonsoft.Json;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets;
-using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring.Legacy;
 using osu.Game.Users;
 
@@ -71,7 +70,6 @@ namespace osu.Game.Online.API.Requests.Responses
             {
                 foreach (var kvp in value)
                 {
-                    HitResult newKey;
                     switch (kvp.Key)
                     {
                         case @"count_geki":
