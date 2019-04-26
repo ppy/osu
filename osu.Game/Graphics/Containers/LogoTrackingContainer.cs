@@ -30,7 +30,6 @@ namespace osu.Game.Graphics.Containers
         /// Assign the logo that should track the facade's position, as well as how it should transform to its initial position.
         /// </summary>
         /// <param name="logo">The instance of the logo to be used for tracking.</param>
-        /// <param name="facadeScale">The scale of the facade. Does not actually affect the logo itself.</param>
         /// <param name="duration">The duration of the initial transform. Default is instant.</param>
         /// <param name="easing">The easing type of the initial transform.</param>
         public void StartTracking(OsuLogo logo, double duration = 0, Easing easing = Easing.None)
@@ -132,7 +131,7 @@ namespace osu.Game.Graphics.Containers
 
         private class InternalFacade : Facade
         {
-            public void SetSize(Vector2 size)
+            public new void SetSize(Vector2 size)
             {
                 base.SetSize(size);
             }

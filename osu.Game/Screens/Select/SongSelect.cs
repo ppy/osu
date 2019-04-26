@@ -388,8 +388,6 @@ namespace osu.Game.Screens.Select
             {
                 Logger.Log($"updating selection with beatmap:{beatmap?.ID.ToString() ?? "null"} ruleset:{ruleset?.ID.ToString() ?? "null"}");
 
-                bool preview = false;
-
                 if (ruleset?.Equals(decoupledRuleset.Value) == false)
                 {
                     Logger.Log($"ruleset changed from \"{decoupledRuleset.Value}\" to \"{ruleset}\"");

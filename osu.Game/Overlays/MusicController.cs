@@ -50,7 +50,6 @@ namespace osu.Game.Overlays
         private BeatmapManager beatmaps;
 
         private List<BeatmapSetInfo> beatmapSets;
-        private BeatmapSetInfo currentSet;
 
         private Container dragContainer;
         private Container playerContainer;
