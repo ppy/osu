@@ -21,9 +21,11 @@ namespace osu.Game.Overlays.Profile.Header
 {
     public class DetailHeaderContainer : CompositeDrawable
     {
-        private OverlinedInfoContainer medalInfo, ppInfo;
         private readonly Dictionary<ScoreRank, ScoreRankInfo> scoreRankInfos = new Dictionary<ScoreRank, ScoreRankInfo>();
-        private OverlinedInfoContainer detailGlobalRank, detailCountryRank;
+        private OverlinedInfoContainer medalInfo;
+        private OverlinedInfoContainer ppInfo;
+        private OverlinedInfoContainer detailGlobalRank;
+        private OverlinedInfoContainer detailCountryRank;
         private RankGraph rankGraph;
 
         public readonly Bindable<User> User = new Bindable<User>();
