@@ -17,7 +17,7 @@ using osu.Game.Graphics.UserInterface;
 using osu.Game.Users;
 using osuTK;
 
-namespace osu.Game.Overlays.Profile.Header
+namespace osu.Game.Overlays.Profile.Header.Components
 {
     public class RankGraph : Container, IHasCustomTooltip
     {

@@ -9,7 +9,7 @@ using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Graphics;
 
-namespace osu.Game.Overlays.Profile.Header
+namespace osu.Game.Overlays.Profile.Header.Components
 {
     public class SupporterIcon : CompositeDrawable, IHasTooltip
     {

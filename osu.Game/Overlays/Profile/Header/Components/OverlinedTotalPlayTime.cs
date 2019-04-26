@@ -9,7 +9,7 @@ using osu.Framework.Graphics.Cursor;
 using osu.Game.Graphics;
 using osu.Game.Users;
 
-namespace osu.Game.Overlays.Profile.Header
+namespace osu.Game.Overlays.Profile.Header.Components
 {
     public class OverlinedTotalPlayTime : CompositeDrawable, IHasTooltip
     {

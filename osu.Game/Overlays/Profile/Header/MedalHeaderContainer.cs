@@ -9,6 +9,7 @@ using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics;
+using osu.Game.Overlays.Profile.Header.Components;
 using osu.Game.Users;
 using osuTK;
 using osuTK.Graphics;
