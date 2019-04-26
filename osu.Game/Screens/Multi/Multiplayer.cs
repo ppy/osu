@@ -160,7 +160,7 @@ namespace osu.Game.Screens.Multi
             if (!this.IsCurrentScreen())
                 return;
 
-            this.Push(new PlayerLoader(player));
+            this.Push(new MultiplayerPlayerLoader(player));
         }
 
         public void APIStateChanged(IAPIProvider api, APIState state)
@@ -209,7 +209,8 @@ namespace osu.Game.Screens.Multi
             base.LogoExiting(logo);
 
             // the wave overlay transition takes longer than expected to run.
-            logo.Delay(WaveContainer.DISAPPEAR_DURATION / 2).FadeOut();
+            logo.Delay(WaveContainer.DISAPPEAR_DURATION / 2).FadeOut(WaveContainer.DISAPPEAR_DURATION / 2, Easing.Out);
+            logo.Delay(WaveContainer.DISAPPEAR_DURATION / 2).ScaleTo(0.2f, WaveContainer.DISAPPEAR_DURATION / 2, Easing.Out);
         }
 
         public override void OnResuming(IScreen last)

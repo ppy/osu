@@ -138,9 +138,14 @@ namespace osu.Game.Screens
             base.OnEntering(last);
         }
 
+        /// <summary>
+        /// Whether or not this screen should apply its logo exiting animations regardless of whether or not it is valid for resume.
+        /// </summary>
+        protected virtual bool ForceLogoExitAnimation => false;
+
         public override bool OnExiting(IScreen next)
         {
-            if (ValidForResume && logo != null)
+            if ((ValidForResume || ForceLogoExitAnimation) && logo != null)
                 onExitingLogo();
 
             if (base.OnExiting(next))

@@ -475,10 +475,16 @@ namespace osu.Game.Screens.Select
             };
         }
 
+        protected override bool ForceLogoExitAnimation => true;
+
         protected override void LogoExiting(OsuLogo logo)
         {
             base.LogoExiting(logo);
-            logo.ScaleTo(0.2f, logo_transition / 2, Easing.Out);
+
+            // Only apply a scale down when exiting from a screen (potentially not this one) that has a larger OsuLogo
+            if (logo.Scale.X > 0.2f)
+                logo.ScaleTo(0.2f, logo_transition / 2, Easing.Out);
+
             logo.FadeOut(logo_transition / 2, Easing.Out);
         }
 
