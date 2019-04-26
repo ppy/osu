@@ -4,6 +4,7 @@
 using System.Collections.Generic;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
@@ -11,8 +12,10 @@ using osuTK.Graphics;
 
 namespace osu.Game.Overlays.Profile.Header
 {
-    public class ProfileHeaderButton : OsuHoverContainer
+    public abstract class ProfileHeaderButton : OsuHoverContainer, IHasTooltip
     {
+        public abstract string TooltipText { get; }
+
         private readonly Box background;
         private readonly Container content;
 
@@ -20,7 +23,7 @@ namespace osu.Game.Overlays.Profile.Header
 
         protected override IEnumerable<Drawable> EffectTargets => new[] { background };
 
-        public ProfileHeaderButton()
+        protected ProfileHeaderButton()
         {
             AutoSizeAxes = Axes.X;
 
