@@ -185,10 +185,10 @@ namespace osu.Game.Overlays.Profile.Header
 
         private void updateDisplay(User user)
         {
-            followerText.Text = user.FollowerCount?.Length > 0 ? user.FollowerCount[0].ToString("#,##0") : "0";
+            followerText.Text = user?.FollowerCount?.Length > 0 ? user.FollowerCount[0].ToString("#,##0") : "0";
 
-            hiddenDetailGlobal.Content = user.Statistics?.Ranks.Global?.ToString("#,##0") ?? "-";
-            hiddenDetailCountry.Content = user.Statistics?.Ranks.Country?.ToString("#,##0") ?? "-";
+            hiddenDetailGlobal.Content = user?.Statistics?.Ranks.Global?.ToString("#,##0") ?? "-";
+            hiddenDetailCountry.Content = user?.Statistics?.Ranks.Country?.ToString("#,##0") ?? "-";
         }
 
         private class ExpandButton : ProfileHeaderButton

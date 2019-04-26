@@ -17,6 +17,10 @@ namespace osu.Game.Overlays.Profile.Header
 {
     public class TopHeaderContainer : CompositeDrawable
     {
+        private const float avatar_size = 110;
+
+        public readonly Bindable<User> User = new Bindable<User>();
+
         private SupporterIcon supporterTag;
         private UpdateableAvatar avatar;
         private OsuSpriteText usernameText;
@@ -26,15 +30,10 @@ namespace osu.Game.Overlays.Profile.Header
         private OsuSpriteText userCountryText;
         private FillFlowContainer userStats;
 
-        private const float avatar_size = 110;
-
-        public readonly Bindable<User> User = new Bindable<User>();
-
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
             Height = 150;
-            User.ValueChanged += e => updateDisplay(e.NewValue);
 
             InternalChildren = new Drawable[]
             {
@@ -146,21 +145,23 @@ namespace osu.Game.Overlays.Profile.Header
                     Spacing = new Vector2(0, 2)
                 }
             };
+
+            User.BindValueChanged(user => updateUser(user.NewValue));
         }
 
-        private void updateDisplay(User user)
+        private void updateUser(User user)
         {
             avatar.User = user;
-            usernameText.Text = user.Username;
-            openUserExternally.Link = $@"https://osu.ppy.sh/users/{user.Id}";
-            userFlag.Country = user.Country;
-            userCountryText.Text = user.Country?.FullName ?? "Alien";
-            supporterTag.SupporterLevel = user.SupportLevel;
-            titleText.Text = user.Title;
-            titleText.Colour = OsuColour.FromHex(user.Colour ?? "fff");
+            usernameText.Text = user?.Username ?? string.Empty;
+            openUserExternally.Link = $@"https://osu.ppy.sh/users/{user?.Id ?? 0}";
+            userFlag.Country = user?.Country;
+            userCountryText.Text = user?.Country?.FullName ?? "Alien";
+            supporterTag.SupporterLevel = user?.SupportLevel ?? 0;
+            titleText.Text = user?.Title ?? string.Empty;
+            titleText.Colour = OsuColour.FromHex(user?.Colour ?? "fff");
 
             userStats.Clear();
-            if (user.Statistics != null)
+            if (user?.Statistics != null)
             {
                 userStats.Add(new UserStatsLine("Ranked Score", user.Statistics.RankedScore.ToString("#,##0")));
                 userStats.Add(new UserStatsLine("Hit Accuracy", Math.Round(user.Statistics.Accuracy, 2).ToString("#0.00'%'")));
