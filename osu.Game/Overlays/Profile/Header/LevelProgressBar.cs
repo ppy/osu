@@ -53,13 +53,13 @@ namespace osu.Game.Overlays.Profile.Header
                 }
             };
 
-            User.BindValueChanged(updateProgress);
+            User.BindValueChanged(user => updateProgress(user.NewValue));
         }
 
-        private void updateProgress(ValueChangedEvent<User> user)
+        private void updateProgress(User user)
         {
-            levelProgressBar.Length = user.NewValue?.Statistics?.Level.Progress / 100f ?? 0;
-            levelProgressText.Text = user.NewValue?.Statistics?.Level.Progress.ToString("0'%'");
+            levelProgressBar.Length = user?.Statistics?.Level.Progress / 100f ?? 0;
+            levelProgressText.Text = user?.Statistics?.Level.Progress.ToString("0'%'");
         }
     }
 }
