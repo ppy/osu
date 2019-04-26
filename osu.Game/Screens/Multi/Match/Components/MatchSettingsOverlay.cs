@@ -265,7 +265,7 @@ namespace osu.Game.Screens.Multi.Match.Components
                 };
 
                 TypePicker.Current.BindValueChanged(type => typeLabel.Text = type.NewValue?.Name ?? string.Empty, true);
-                Name.BindValueChanged(name => NameField.Text = name.NewValue, true);
+                RoomName.BindValueChanged(name => NameField.Text = name.NewValue, true);
                 Availability.BindValueChanged(availability => AvailabilityPicker.Current.Value = availability.NewValue, true);
                 Type.BindValueChanged(type => TypePicker.Current.Value = type.NewValue, true);
                 MaxParticipants.BindValueChanged(count => MaxParticipantsField.Text = count.NewValue?.ToString(), true);
@@ -285,7 +285,7 @@ namespace osu.Game.Screens.Multi.Match.Components
             {
                 hideError();
 
-                Name.Value = NameField.Text;
+                RoomName.Value = NameField.Text;
                 Availability.Value = AvailabilityPicker.Current.Value;
                 Type.Value = TypePicker.Current.Value;
 

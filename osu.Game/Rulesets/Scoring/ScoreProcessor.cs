@@ -164,7 +164,6 @@ namespace osu.Game.Rulesets.Scoring
         /// <summary>
         /// Notifies subscribers of <see cref="NewJudgement"/> that a new judgement has occurred.
         /// </summary>
-        /// <param name="judgement">The judgement to notify subscribers of.</param>
         /// <param name="result">The judgement scoring result to notify subscribers of.</param>
         protected void NotifyNewJudgement(JudgementResult result)
         {
@@ -293,7 +292,6 @@ namespace osu.Game.Rulesets.Scoring
         /// <summary>
         /// Reverts the score change of a <see cref="JudgementResult"/> that was applied to this <see cref="ScoreProcessor"/>.
         /// </summary>
-        /// <param name="judgement">The judgement to remove.</param>
         /// <param name="result">The judgement scoring result.</param>
         private void revertResult(JudgementResult result)
         {
@@ -350,7 +348,6 @@ namespace osu.Game.Rulesets.Scoring
         /// <summary>
         /// Reverts the score change of a <see cref="JudgementResult"/> that was applied to this <see cref="ScoreProcessor"/>.
         /// </summary>
-        /// <param name="judgement">The judgement to remove.</param>
         /// <param name="result">The judgement scoring result.</param>
         protected virtual void RevertResult(JudgementResult result)
         {
