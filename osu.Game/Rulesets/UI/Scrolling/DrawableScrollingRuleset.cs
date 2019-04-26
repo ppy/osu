@@ -65,7 +65,7 @@ namespace osu.Game.Rulesets.UI.Scrolling
         protected virtual ScrollVisualisationMethod VisualisationMethod => ScrollVisualisationMethod.Sequential;
 
         /// <summary>
-        /// Whether the player can change <see cref="VisibleTimeRange"/>.
+        /// Whether the player can change <see cref="TimeRange"/>.
         /// </summary>
         protected virtual bool UserScrollSpeedAdjustment => true;
 
