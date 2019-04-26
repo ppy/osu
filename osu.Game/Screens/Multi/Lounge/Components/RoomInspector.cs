@@ -97,7 +97,7 @@ namespace osu.Game.Screens.Multi.Lounge.Components
                                                         Anchor = Anchor.BottomLeft,
                                                         Origin = Anchor.BottomLeft,
                                                         Font = OsuFont.GetFont(size: 30),
-                                                        Current = Name
+                                                        Current = RoomName
                                                     },
                                                 },
                                             },
