@@ -24,10 +24,10 @@ namespace osu.Game.Overlays.Profile.Header
             get => accentColour;
             set
             {
-                if (accentColour == value) return;
+                if (accentColour == value)
+                    return;
 
                 accentColour = value;
-
                 bar.Colour = value;
 
                 foreach (TabItem<string> tabItem in TabContainer)
@@ -76,10 +76,13 @@ namespace osu.Game.Overlays.Profile.Header
                 get => accentColour;
                 set
                 {
-                    accentColour = value;
+                    if (accentColour == value)
+                        return;
 
+                    accentColour = value;
                     bar.Colour = value;
-                    if (!Active.Value) text.Colour = value;
+
+                    updateState();
                 }
             }
 
@@ -112,37 +115,40 @@ namespace osu.Game.Overlays.Profile.Header
 
             protected override bool OnHover(HoverEvent e)
             {
-                if (!Active.Value)
-                    onActivated(true);
-                return base.OnHover(e);
+                base.OnHover(e);
+
+                updateState();
+
+                return true;
             }
 
             protected override void OnHoverLost(HoverLostEvent e)
             {
                 base.OnHoverLost(e);
 
-                if (!Active.Value)
-                    OnDeactivated();
+                updateState();
             }
 
-            protected override void OnActivated()
-            {
-                onActivated();
-            }
+            protected override void OnActivated() => updateState();
 
-            protected override void OnDeactivated()
-            {
-                text.FadeColour(AccentColour, 120, Easing.InQuad);
-                bar.ResizeHeightTo(0, 120, Easing.InQuad);
-                text.Font = text.Font.With(weight: FontWeight.Medium);
-            }
+            protected override void OnDeactivated() => updateState();
 
-            private void onActivated(bool fake = false)
+            private void updateState()
             {
-                text.FadeColour(Color4.White, 120, Easing.InQuad);
-                bar.ResizeHeightTo(7.5f, 120, Easing.InQuad);
-                if (!fake)
-                    text.Font = text.Font.With(weight: FontWeight.Bold);
+                if (Active.Value || IsHovered)
+                {
+                    text.FadeColour(Color4.White, 120, Easing.InQuad);
+                    bar.ResizeHeightTo(7.5f, 120, Easing.InQuad);
+
+                    if (Active.Value)
+                        text.Font = text.Font.With(weight: FontWeight.Bold);
+                }
+                else
+                {
+                    text.FadeColour(AccentColour, 120, Easing.InQuad);
+                    bar.ResizeHeightTo(0, 120, Easing.InQuad);
+                    text.Font = text.Font.With(weight: FontWeight.Medium);
+                }
             }
         }
     }
