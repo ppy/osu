@@ -10,7 +10,7 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osuTK.Graphics;
 
-namespace osu.Game.Overlays.Profile.Header
+namespace osu.Game.Overlays.Profile.Header.Components
 {
     public abstract class ProfileHeaderButton : OsuHoverContainer, IHasTooltip
     {

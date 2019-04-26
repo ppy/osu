@@ -12,7 +12,7 @@ using osu.Game.Graphics.UserInterface;
 using osu.Game.Users;
 using osuTK.Graphics;
 
-namespace osu.Game.Overlays.Profile.Header
+namespace osu.Game.Overlays.Profile.Header.Components
 {
     public class LevelProgressBar : CompositeDrawable, IHasTooltip
     {

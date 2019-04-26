@@ -10,9 +10,9 @@ using osu.Game.Online.Chat;
 using osu.Game.Users;
 using osuTK;
 
-namespace osu.Game.Overlays.Profile.Header
+namespace osu.Game.Overlays.Profile.Header.Components
 {
-    public class ProfileMessageButton : ProfileHeaderButton
+    public class MessageUserButton : ProfileHeaderButton
     {
         public readonly Bindable<User> User = new Bindable<User>();
 
@@ -30,7 +30,7 @@ namespace osu.Game.Overlays.Profile.Header
         [Resolved]
         private IAPIProvider apiProvider { get; set; }
 
-        public ProfileMessageButton()
+        public MessageUserButton()
         {
             Content.Alpha = 0;
             RelativeSizeAxes = Axes.Y;

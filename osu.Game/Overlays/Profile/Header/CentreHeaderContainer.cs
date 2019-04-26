@@ -8,6 +8,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Textures;
 using osu.Game.Graphics;
+using osu.Game.Overlays.Profile.Header.Components;
 using osu.Game.Users;
 using osuTK;
 
@@ -49,12 +50,12 @@ namespace osu.Game.Overlays.Profile.Header
                     Spacing = new Vector2(10, 0),
                     Children = new Drawable[]
                     {
-                        new FriendButton
+                        new AddFriendButton
                         {
                             RelativeSizeAxes = Axes.Y,
                             User = { BindTarget = User }
                         },
-                        new ProfileMessageButton
+                        new MessageUserButton
                         {
                             User = { BindTarget = User }
                         },

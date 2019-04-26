@@ -11,9 +11,9 @@ using osu.Game.Graphics.Sprites;
 using osu.Game.Users;
 using osuTK;
 
-namespace osu.Game.Overlays.Profile.Header
+namespace osu.Game.Overlays.Profile.Header.Components
 {
-    public class FriendButton : ProfileHeaderButton
+    public class AddFriendButton : ProfileHeaderButton
     {
         public readonly Bindable<User> User = new Bindable<User>();
 

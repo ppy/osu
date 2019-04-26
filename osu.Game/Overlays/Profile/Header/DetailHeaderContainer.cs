@@ -12,6 +12,7 @@ using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Overlays.Profile.Header.Components;
 using osu.Game.Scoring;
 using osu.Game.Users;
 using osuTK;

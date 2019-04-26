@@ -10,7 +10,7 @@ using osu.Framework.Graphics.Textures;
 using osu.Game.Users;
 using osuTK;
 
-namespace osu.Game.Overlays.Profile.Header
+namespace osu.Game.Overlays.Profile.Header.Components
 {
     public class DrawableBadge : CompositeDrawable, IHasTooltip
     {
