@@ -24,6 +24,8 @@ namespace osu.Game.Screens.Play.HUD
 
         public bool DisplayUnrankedText = true;
 
+        public bool HoverEffect = true;
+
         private readonly Bindable<IReadOnlyList<Mod>> current = new Bindable<IReadOnlyList<Mod>>();
 
         public Bindable<IReadOnlyList<Mod>> Current
@@ -99,9 +101,17 @@ namespace osu.Game.Screens.Play.HUD
 
             iconsContainer.FinishTransforms();
             iconsContainer.FadeInFromZero(fade_duration, Easing.OutQuint);
-            expand();
-            using (iconsContainer.BeginDelayedSequence(1200))
+
+            if (HoverEffect)
+            {
+                expand();
+                using (iconsContainer.BeginDelayedSequence(1200))
+                    contract();
+            }
+            else
+            {
                 contract();
+            }
         }
 
         private void expand() => iconsContainer.TransformSpacingTo(new Vector2(5, 0), 500, Easing.OutQuint);
@@ -110,13 +120,17 @@ namespace osu.Game.Screens.Play.HUD
 
         protected override bool OnHover(HoverEvent e)
         {
-            expand();
+            if (HoverEffect)
+                expand();
+
             return base.OnHover(e);
         }
 
         protected override void OnHoverLost(HoverLostEvent e)
         {
-            contract();
+            if (HoverEffect)
+                contract();
+
             base.OnHoverLost(e);
         }
     }

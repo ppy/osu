@@ -112,6 +112,7 @@ namespace osu.Game.Screens.Select
                                     Position = new Vector2(-30, 0),
                                     DisplayUnrankedText = false,
                                     Scale = new Vector2(0.6f),
+                                    HoverEffect = false,
                                     Current = { Value = Model.PlaylistItem.RequiredMods }
                                 }
                             },
