@@ -272,7 +272,6 @@ namespace osu.Game
         /// Present a score's replay immediately.
         /// The user should have already requested this interactively.
         /// </summary>
-        /// <param name="beatmap">The beatmap to select.</param>
         public void PresentScore(ScoreInfo score)
         {
             var databasedScore = ScoreManager.GetScore(score);
