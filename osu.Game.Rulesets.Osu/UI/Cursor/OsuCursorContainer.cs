@@ -5,7 +5,6 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Effects;
 using osu.Framework.Input.Bindings;
 using osu.Game.Rulesets.Osu.Configuration;
 using osu.Game.Rulesets.UI;
