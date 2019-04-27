@@ -22,18 +22,18 @@ namespace osu.Game.Skinning
         private readonly Bindable<bool> beatmapSkins = new Bindable<bool>();
         private readonly Bindable<bool> beatmapHitsounds = new Bindable<bool>();
 
-        private readonly ISkinSource source;
+        private readonly ISkin skin;
         private ISkinSource fallbackSource;
 
-        public LocalSkinOverrideContainer(ISkinSource source)
+        public LocalSkinOverrideContainer(ISkin skin)
         {
-            this.source = source;
+            this.skin = skin;
         }
 
         public Drawable GetDrawableComponent(string componentName)
         {
             Drawable sourceDrawable;
-            if (beatmapSkins.Value && (sourceDrawable = source.GetDrawableComponent(componentName)) != null)
+            if (beatmapSkins.Value && (sourceDrawable = skin.GetDrawableComponent(componentName)) != null)
                 return sourceDrawable;
 
             return fallbackSource?.GetDrawableComponent(componentName);
@@ -42,7 +42,7 @@ namespace osu.Game.Skinning
         public Texture GetTexture(string componentName)
         {
             Texture sourceTexture;
-            if (beatmapSkins.Value && (sourceTexture = source.GetTexture(componentName)) != null)
+            if (beatmapSkins.Value && (sourceTexture = skin.GetTexture(componentName)) != null)
                 return sourceTexture;
 
             return fallbackSource.GetTexture(componentName);
@@ -51,7 +51,7 @@ namespace osu.Game.Skinning
         public SampleChannel GetSample(string sampleName)
         {
             SampleChannel sourceChannel;
-            if (beatmapHitsounds.Value && (sourceChannel = source.GetSample(sampleName)) != null)
+            if (beatmapHitsounds.Value && (sourceChannel = skin.GetSample(sampleName)) != null)
                 return sourceChannel;
 
             return fallbackSource?.GetSample(sampleName);
@@ -60,7 +60,7 @@ namespace osu.Game.Skinning
         public TValue GetValue<TConfiguration, TValue>(Func<TConfiguration, TValue> query) where TConfiguration : SkinConfiguration
         {
             TValue val;
-            if ((source as Skin)?.Configuration is TConfiguration conf)
+            if ((skin as Skin)?.Configuration is TConfiguration conf)
                 if (beatmapSkins.Value && (val = query.Invoke(conf)) != null)
                     return val;
 

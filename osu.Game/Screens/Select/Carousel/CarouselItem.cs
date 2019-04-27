@@ -31,8 +31,6 @@ namespace osu.Game.Screens.Select.Carousel
             }
         }
 
-        private int creationOrder;
-
         protected CarouselItem()
         {
             DrawableRepresentation = new Lazy<DrawableCarouselItem>(CreateDrawableRepresentation);
