@@ -12,8 +12,6 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays.Profile.Header;
 using osu.Game.Users;
-using Humanizer;
-using osu.Framework.Graphics.Effects;
 
 namespace osu.Game.Overlays.Profile
 {
