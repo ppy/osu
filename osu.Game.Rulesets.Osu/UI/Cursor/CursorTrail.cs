@@ -43,22 +43,7 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
 
         private readonly InputResampler resampler = new InputResampler();
 
-        protected override DrawNode CreateDrawNode() => new TrailDrawNode();
-
-        protected override void ApplyDrawNode(DrawNode node)
-        {
-            base.ApplyDrawNode(node);
-
-            TrailDrawNode tNode = (TrailDrawNode)node;
-            tNode.Shader = shader;
-            tNode.Texture = texture;
-            tNode.Size = size;
-            tNode.Time = time;
-
-            for (int i = 0; i < parts.Length; ++i)
-                if (parts[i].InvalidationID > tNode.Parts[i].InvalidationID)
-                    tNode.Parts[i] = parts[i];
-        }
+        protected override DrawNode CreateDrawNode() => new TrailDrawNode(this);
 
         public CursorTrail()
         {
@@ -167,33 +152,52 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
 
         private class TrailDrawNode : DrawNode
         {
-            public IShader Shader;
-            public Texture Texture;
+            protected new CursorTrail Source => (CursorTrail)base.Source;
 
-            public float Time;
+            private IShader shader;
+            private Texture texture;
 
-            public readonly TrailPart[] Parts = new TrailPart[max_sprites];
-            public Vector2 Size;
+            private float time;
+
+            private readonly TrailPart[] parts = new TrailPart[max_sprites];
+            private Vector2 size;
 
             private readonly VertexBuffer<TexturedTrailVertex> vertexBuffer = new QuadVertexBuffer<TexturedTrailVertex>(max_sprites, BufferUsageHint.DynamicDraw);
 
-            public TrailDrawNode()
+            public TrailDrawNode(CursorTrail source)
+                : base(source)
             {
                 for (int i = 0; i < max_sprites; i++)
                 {
-                    Parts[i].InvalidationID = 0;
-                    Parts[i].WasUpdated = false;
+                    parts[i].InvalidationID = 0;
+                    parts[i].WasUpdated = false;
+                }
+            }
+
+            public override void ApplyState()
+            {
+                base.ApplyState();
+
+                shader = Source.shader;
+                texture = Source.texture;
+                size = Source.size;
+                time = Source.time;
+
+                for (int i = 0; i < Source.parts.Length; ++i)
+                {
+                    if (Source.parts[i].InvalidationID > parts[i].InvalidationID)
+                        parts[i] = Source.parts[i];
                 }
             }
 
             public override void Draw(Action<TexturedVertex2D> vertexAction)
             {
-                Shader.GetUniform<float>("g_FadeClock").UpdateValue(ref Time);
+                shader.GetUniform<float>("g_FadeClock").UpdateValue(ref time);
 
                 int updateStart = -1, updateEnd = 0;
-                for (int i = 0; i < Parts.Length; ++i)
+                for (int i = 0; i < parts.Length; ++i)
                 {
-                    if (Parts[i].WasUpdated)
+                    if (parts[i].WasUpdated)
                     {
                         if (updateStart == -1)
                             updateStart = i;
@@ -202,22 +206,22 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
                         int start = i * 4;
                         int end = start;
 
-                        Vector2 pos = Parts[i].Position;
-                        float time = Parts[i].Time;
+                        Vector2 pos = parts[i].Position;
+                        float localTime = parts[i].Time;
 
-                        Texture.DrawQuad(
-                            new Quad(pos.X - Size.X / 2, pos.Y - Size.Y / 2, Size.X, Size.Y),
+                        texture.DrawQuad(
+                            new Quad(pos.X - size.X / 2, pos.Y - size.Y / 2, size.X, size.Y),
                             DrawColourInfo.Colour,
                             null,
                             v => vertexBuffer.Vertices[end++] = new TexturedTrailVertex
                             {
                                 Position = v.Position,
                                 TexturePosition = v.TexturePosition,
-                                Time = time + 1,
+                                Time = localTime + 1,
                                 Colour = v.Colour,
                             });
 
-                        Parts[i].WasUpdated = false;
+                        parts[i].WasUpdated = false;
                     }
                     else if (updateStart != -1)
                     {
@@ -232,12 +236,12 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
 
                 base.Draw(vertexAction);
 
-                Shader.Bind();
+                shader.Bind();
 
-                Texture.TextureGL.Bind();
+                texture.TextureGL.Bind();
                 vertexBuffer.Draw();
 
-                Shader.Unbind();
+                shader.Unbind();
             }
 
             protected override void Dispose(bool isDisposing)
