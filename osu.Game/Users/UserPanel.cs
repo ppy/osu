@@ -16,6 +16,7 @@ using osu.Game.Overlays;
 using osu.Framework.Graphics.UserInterface;
 using osu.Game.Graphics.UserInterface;
 using osu.Framework.Graphics.Cursor;
+using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Graphics.Containers;
 using osu.Game.Overlays.Profile.Header.Components;
