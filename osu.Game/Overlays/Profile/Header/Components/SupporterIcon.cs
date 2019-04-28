@@ -19,7 +19,7 @@ namespace osu.Game.Overlays.Profile.Header.Components
 
         public string TooltipText => "osu!supporter";
 
-        public int SupporterLevel
+        public int SupportLevel
         {
             set
             {
