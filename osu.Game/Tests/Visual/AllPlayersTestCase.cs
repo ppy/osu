@@ -28,7 +28,7 @@ namespace osu.Game.Tests.Visual
             {
                 Player p = null;
                 AddStep(r.Name, () => p = loadPlayerFor(r));
-                AddUntilStep(() =>
+                AddUntilStep("player loaded", () =>
                 {
                     if (p?.IsLoaded == true)
                     {
@@ -37,7 +37,7 @@ namespace osu.Game.Tests.Visual
                     }
 
                     return false;
-                }, "player loaded");
+                });
 
                 AddCheckSteps();
             }

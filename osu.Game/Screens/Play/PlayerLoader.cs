@@ -163,7 +163,11 @@ namespace osu.Game.Screens.Play
             logo.ScaleTo(new Vector2(0.15f), duration, Easing.In);
             logo.FadeIn(350);
 
-            Scheduler.AddDelayed(() => { content.StartTracking(logo, resuming ? 0 : 500, Easing.InOutExpo); }, resuming ? 0 : 500);
+            Scheduler.AddDelayed(() =>
+            {
+                if (this.IsCurrentScreen())
+                    content.StartTracking(logo, resuming ? 0 : 500, Easing.InOutExpo);
+            }, resuming ? 0 : 500);
         }
 
         protected override void LogoExiting(OsuLogo logo)
@@ -320,7 +324,6 @@ namespace osu.Game.Screens.Play
             private readonly Drawable facade;
             private LoadingAnimation loading;
             private Sprite backgroundSprite;
-            private ModDisplay modDisplay;
 
             public bool Loading
             {
