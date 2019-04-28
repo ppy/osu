@@ -120,12 +120,8 @@ namespace osu.Game.Tests.Visual.Gameplay
             }
         }
 
-        private class SecondarySource : ISkinSource
+        private class SecondarySource : ISkin
         {
-            public event Action SourceChanged;
-
-            public void TriggerSourceChanged() => SourceChanged?.Invoke();
-
             public Drawable GetDrawableComponent(string componentName) => new SecondarySourceBox();
 
             public Texture GetTexture(string componentName) => throw new NotImplementedException();
@@ -135,12 +131,8 @@ namespace osu.Game.Tests.Visual.Gameplay
             public TValue GetValue<TConfiguration, TValue>(Func<TConfiguration, TValue> query) where TConfiguration : SkinConfiguration => throw new NotImplementedException();
         }
 
-        private class SkinSourceContainer : Container, ISkinSource
+        private class SkinSourceContainer : Container, ISkin
         {
-            public event Action SourceChanged;
-
-            public void TriggerSourceChanged() => SourceChanged?.Invoke();
-
             public Drawable GetDrawableComponent(string componentName) => new BaseSourceBox();
 
             public Texture GetTexture(string componentName) => throw new NotImplementedException();
