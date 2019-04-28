@@ -27,8 +27,6 @@ namespace osu.Game.Online.Chat
 
         protected ChannelManager ChannelManager;
 
-        private ScrollContainer scroll;
-
         private DrawableChannel drawableChannel;
 
         private readonly bool postingTextbox;
