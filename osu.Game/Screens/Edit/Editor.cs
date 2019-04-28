@@ -68,9 +68,6 @@ namespace osu.Game.Screens.Edit
             dependencies.Cache(beatDivisor);
 
             EditorMenuBar menuBar;
-            TimeInfoContainer timeInfo;
-            SummaryTimeline timeline;
-            PlaybackControl playback;
 
             var fileMenuItems = new List<MenuItem>();
             if (RuntimeInfo.IsDesktop)

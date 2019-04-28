@@ -68,7 +68,12 @@ namespace osu.Game.Rulesets.UI
         {
             Cursor = CreateCursor();
             if (Cursor != null)
+            {
+                // initial showing of the cursor will be handed by MenuCursorContainer (via DrawableRuleset's IProvideCursor implementation).
+                Cursor.Hide();
+
                 AddInternal(Cursor);
+            }
         }
 
         /// <summary>
@@ -95,7 +100,6 @@ namespace osu.Game.Rulesets.UI
 
         /// <summary>
         /// Provide an optional cursor which is to be used for gameplay.
-        /// If providing a cursor, <see cref="CursorTargetContainer"/> must also point to a valid target container.
         /// </summary>
         /// <returns>The cursor, or null if a cursor is not rqeuired.</returns>
         protected virtual GameplayCursorContainer CreateCursor() => null;

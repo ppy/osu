@@ -8,7 +8,7 @@ using osu.Framework.Screens;
 namespace osu.Game.Graphics.UserInterface
 {
     /// <summary>
-    /// A <see cref="BreadcrumbControl"/> which follows the active screen (and allows navigation) in a <see cref="Screen"/> stack.
+    /// A <see cref="BreadcrumbControl{IScreen}"/> which follows the active screen (and allows navigation) in a <see cref="Screen"/> stack.
     /// </summary>
     public class ScreenBreadcrumbControl : BreadcrumbControl<IScreen>
     {
