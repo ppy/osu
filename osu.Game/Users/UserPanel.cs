@@ -19,7 +19,7 @@ using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Graphics.Containers;
-using osu.Game.Overlays.Profile.Header;
+using osu.Game.Overlays.Profile.Header.Components;
 
 namespace osu.Game.Users
 {
@@ -77,12 +77,12 @@ namespace osu.Game.Users
 
                 Children = new Drawable[]
                 {
-                    new DelayedLoadWrapper(coverBackground = new UserCoverBackground(user)
+                    new DelayedLoadWrapper(coverBackground = new UserCoverBackground
                     {
                         RelativeSizeAxes = Axes.Both,
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
-                        FillMode = FillMode.Fill,
+                        User = user,
                     }, 300) { RelativeSizeAxes = Axes.Both },
                     new Box
                     {
@@ -190,8 +190,8 @@ namespace osu.Game.Users
             {
                 infoContainer.Add(new SupporterIcon
                 {
-                    RelativeSizeAxes = Axes.Y,
-                    Width = 20f,
+                    Height = 20f,
+                    SupportLevel = user.SupportLevel
                 });
             }
 
