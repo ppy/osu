@@ -191,7 +191,7 @@ namespace osu.Game.Users
                 infoContainer.Add(new SupporterIcon
                 {
                     Height = 20f,
-                    SupporterLevel = user.SupportLevel
+                    SupportLevel = user.SupportLevel
                 });
             }
 

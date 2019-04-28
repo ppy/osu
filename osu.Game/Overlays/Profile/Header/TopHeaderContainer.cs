@@ -157,7 +157,7 @@ namespace osu.Game.Overlays.Profile.Header
             openUserExternally.Link = $@"https://osu.ppy.sh/users/{user?.Id ?? 0}";
             userFlag.Country = user?.Country;
             userCountryText.Text = user?.Country?.FullName ?? "Alien";
-            supporterTag.SupporterLevel = user?.SupportLevel ?? 0;
+            supporterTag.SupportLevel = user?.SupportLevel ?? 0;
             titleText.Text = user?.Title ?? string.Empty;
             titleText.Colour = OsuColour.FromHex(user?.Colour ?? "fff");
 
