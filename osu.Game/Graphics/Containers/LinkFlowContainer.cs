@@ -103,7 +103,7 @@ namespace osu.Game.Graphics.Containers
                             {
                                 channelManager?.OpenChannel(linkArgument);
                             }
-                            catch (ChannelNotFoundException e)
+                            catch (ChannelNotFoundException)
                             {
                                 Logger.Log($"The requested channel \"{linkArgument}\" does not exist");
                             }
