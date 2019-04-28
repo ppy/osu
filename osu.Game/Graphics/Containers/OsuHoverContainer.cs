@@ -35,7 +35,8 @@ namespace osu.Game.Graphics.Containers
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
-            HoverColour = colours.Yellow;
+            if (HoverColour == default)
+                HoverColour = colours.Yellow;
         }
 
         protected override void LoadComplete()

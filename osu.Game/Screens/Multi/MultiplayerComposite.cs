@@ -16,8 +16,8 @@ namespace osu.Game.Screens.Multi
         [Resolved(typeof(Room))]
         protected Bindable<int?> RoomID { get; private set; }
 
-        [Resolved(typeof(Room))]
-        protected Bindable<string> Name { get; private set; }
+        [Resolved(typeof(Room), nameof(Room.Name))]
+        protected Bindable<string> RoomName { get; private set; }
 
         [Resolved(typeof(Room))]
         protected Bindable<User> Host { get; private set; }

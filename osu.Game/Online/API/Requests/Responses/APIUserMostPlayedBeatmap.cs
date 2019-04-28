@@ -10,16 +10,16 @@ namespace osu.Game.Online.API.Requests.Responses
     public class APIUserMostPlayedBeatmap
     {
         [JsonProperty("beatmap_id")]
-        public int BeatmapID;
+        public int BeatmapID { get; set; }
 
         [JsonProperty("count")]
-        public int PlayCount;
+        public int PlayCount { get; set; }
 
         [JsonProperty]
-        private BeatmapInfo beatmap;
+        private BeatmapInfo beatmap { get; set; }
 
         [JsonProperty]
-        private APIBeatmapSet beatmapSet;
+        private APIBeatmapSet beatmapSet { get; set; }
 
         public BeatmapInfo GetBeatmapInfo(RulesetStore rulesets)
         {

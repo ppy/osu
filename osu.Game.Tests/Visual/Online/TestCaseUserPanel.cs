@@ -38,6 +38,7 @@ namespace osu.Game.Tests.Visual.Online
                         Country = new Country { FlagName = @"AU" },
                         CoverUrl = @"https://osu.ppy.sh/images/headers/profile-covers/c3.jpg",
                         IsSupporter = true,
+                        SupportLevel = 3,
                     }) { Width = 300 },
                 },
             });

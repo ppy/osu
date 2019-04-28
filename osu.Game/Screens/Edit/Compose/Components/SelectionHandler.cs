@@ -121,6 +121,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
         /// Handle a blueprint requesting selection.
         /// </summary>
         /// <param name="blueprint">The blueprint.</param>
+        /// <param name="state">The input state at the point of selection.</param>
         internal void HandleSelectionRequested(SelectionBlueprint blueprint, InputState state)
         {
             if (state.Keyboard.ControlPressed)
@@ -165,8 +166,6 @@ namespace osu.Game.Screens.Edit.Compose.Components
             // Move the rectangle to cover the hitobjects
             var topLeft = new Vector2(float.MaxValue, float.MaxValue);
             var bottomRight = new Vector2(float.MinValue, float.MinValue);
-
-            bool hasSelection = false;
 
             foreach (var blueprint in selectedBlueprints)
             {

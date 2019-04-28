@@ -68,9 +68,11 @@ namespace osu.Game.Rulesets.Edit
             get => state;
             set
             {
-                if (state == value) return;
+                if (state == value)
+                    return;
 
                 state = value;
+
                 switch (state)
                 {
                     case SelectionState.Selected:
@@ -82,6 +84,8 @@ namespace osu.Game.Rulesets.Edit
                         Deselected?.Invoke(this);
                         break;
                 }
+
+                StateChanged?.Invoke(state);
             }
         }
 
