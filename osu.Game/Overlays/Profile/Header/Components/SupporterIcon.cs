@@ -8,6 +8,7 @@ using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Graphics;
+using osuTK;
 
 namespace osu.Game.Overlays.Profile.Header.Components
 {
@@ -23,7 +24,9 @@ namespace osu.Game.Overlays.Profile.Header.Components
         {
             set
             {
-                if (value == 0)
+                int count = MathHelper.Clamp(value, 0, 3);
+
+                if (count == 0)
                 {
                     content.Hide();
                 }
@@ -31,7 +34,7 @@ namespace osu.Game.Overlays.Profile.Header.Components
                 {
                     content.Show();
                     iconContainer.Clear();
-                    for (int i = 0; i < value; i++)
+                    for (int i = 0; i < count; i++)
                     {
                         iconContainer.Add(new SpriteIcon
                         {
