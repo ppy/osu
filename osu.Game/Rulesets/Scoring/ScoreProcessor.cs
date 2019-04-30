@@ -106,8 +106,9 @@ namespace osu.Game.Rulesets.Scoring
             Combo.ValueChanged += delegate { HighestCombo.Value = Math.Max(HighestCombo.Value, Combo.Value); };
             Accuracy.ValueChanged += delegate
             {
+                Rank.Value = rankFrom(Accuracy.Value);
                 foreach (var mod in Mods.Value.OfType<IApplicableToScoreProcessor>())
-                    Rank.Value = mod.AdjustRank(rankFrom(Accuracy.Value), Accuracy.Value);
+                    Rank.Value = mod.AdjustRank(Rank.Value, Accuracy.Value);
             };
         }
 
