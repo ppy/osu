@@ -16,6 +16,7 @@ using System.ComponentModel;
 using osu.Game.Graphics;
 using osuTK.Graphics;
 using osu.Framework.Extensions.Color4Extensions;
+using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Events;
 using osu.Game.Graphics.Containers;
