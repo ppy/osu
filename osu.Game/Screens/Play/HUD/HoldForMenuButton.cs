@@ -70,6 +70,11 @@ namespace osu.Game.Screens.Play.HUD
             return base.OnMouseMove(e);
         }
 
+        public bool GameInactive
+        {
+            set => button.GameInactive = value;
+        }
+
         protected override void Update()
         {
             base.Update();
@@ -182,6 +187,25 @@ namespace osu.Game.Screens.Play.HUD
             {
                 HoverLost?.Invoke();
                 base.OnHoverLost(e);
+            }
+
+            private bool gameInactive;
+
+            public bool GameInactive
+            {
+                get => gameInactive;
+                set
+                {
+                    if (gameInactive == value)
+                        return;
+
+                    gameInactive = value;
+
+                    if (gameInactive)
+                        BeginConfirm();
+                    else
+                        AbortConfirm();
+                }
             }
 
             public bool OnPressed(GlobalAction action)
