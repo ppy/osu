@@ -36,7 +36,7 @@ namespace osu.Game.Rulesets.Mods
 
         public void ApplyToScoreProcessor(ScoreProcessor scoreProcessor)
         {
-            // Default value of <see ScoreProcessor's Rank in Hidden Mod should be SS+
+            // Default value of ScoreProcessor's Rank in Hidden Mod should be SS+
             scoreProcessor.Rank.Value = ScoreRank.XH;
         }
 
