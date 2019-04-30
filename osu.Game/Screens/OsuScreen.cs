@@ -98,8 +98,7 @@ namespace osu.Game.Screens
         [Resolved(canBeNull: true)]
         private OsuLogo logo { get; set; }
 
-        [Resolved(canBeNull: true)]
-        private IAPIProvider api { get; set; }
+        private IAPIProvider api;
 
         protected OsuScreen()
         {
@@ -108,9 +107,10 @@ namespace osu.Game.Screens
         }
 
         [BackgroundDependencyLoader(true)]
-        private void load(OsuGame osu, AudioManager audio)
+        private void load(OsuGame osu, AudioManager audio, IAPIProvider provider)
         {
             sampleExit = audio.Sample.Get(@"UI/screen-back");
+            api = provider;
         }
 
         public virtual bool OnPressed(GlobalAction action)
@@ -133,14 +133,27 @@ namespace osu.Game.Screens
             sampleExit?.Play();
             applyArrivingDefaults(true);
 
+            if (api != null)
+                api.LocalUser.Value.Status.ValueChanged += userStatusChanged;
+
             setUserStatus(ScreenStatus);
 
             base.OnResuming(last);
         }
 
+        private void userStatusChanged(ValueChangedEvent<UserStatus> obj)
+        {
+            if (obj.NewValue?.GetType() != ScreenStatus?.GetType()) //restore the status back to this screen's status when the user status is changed back to online after having being set to DND / offline
+                setUserStatus(ScreenStatus);
+        }
+
         public override void OnSuspending(IScreen next)
         {
             base.OnSuspending(next);
+
+            if (api != null)
+                api.LocalUser.Value.Status.ValueChanged -= userStatusChanged;
+
             onSuspendingLogo();
         }
 
@@ -149,6 +162,9 @@ namespace osu.Game.Screens
             applyArrivingDefaults(false);
 
             backgroundStack?.Push(localBackground = CreateBackground());
+
+            if (api != null)
+                api.LocalUser.Value.Status.ValueChanged += userStatusChanged;
 
             setUserStatus(ScreenStatus);
 
@@ -159,6 +175,9 @@ namespace osu.Game.Screens
         {
             if (ValidForResume && logo != null)
                 onExitingLogo();
+
+            if (api != null)
+                api.LocalUser.Value.Status.ValueChanged -= userStatusChanged;
 
             if (base.OnExiting(next))
                 return true;
