@@ -36,11 +36,10 @@ namespace osu.Game.Rulesets.Mods
 
         public void ApplyToScoreProcessor(ScoreProcessor scoreProcessor)
         {
-            // Default value of ScoreProcessor's Rank in Hidden Mod should bes SS+
+            // Default value of <see ScoreProcessor's Rank in Hidden Mod should be SS+
             scoreProcessor.Rank.Value = ScoreRank.XH;
         }
 
-        // TODO: Other mods that uses AdjustRank might have some issues due to rank changes
         public ScoreRank AdjustRank(ScoreRank rank, double accuracy)
         {
             switch (rank)
