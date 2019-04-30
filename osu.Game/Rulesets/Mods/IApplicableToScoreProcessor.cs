@@ -13,6 +13,9 @@ namespace osu.Game.Rulesets.Mods
     {
         void ApplyToScoreProcessor(ScoreProcessor scoreProcessor);
 
+        /// <summary>
+        /// Adjusts a rank value passed by <see cref="ScoreProcessor"> and returns it.
+        /// </summary>
         ScoreRank AdjustRank(ScoreRank rank, double accuracy);
     }
 }
