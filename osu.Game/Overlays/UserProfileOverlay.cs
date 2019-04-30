@@ -5,7 +5,7 @@ using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.UserInterface;
 using osu.Game.Graphics;
@@ -31,7 +31,7 @@ namespace osu.Game.Overlays
         private SectionsContainer<ProfileSection> sectionsContainer;
         private ProfileTabControl tabs;
 
-        public const float CONTENT_X_MARGIN = 50;
+        public const float CONTENT_X_MARGIN = 70;
 
         public UserProfileOverlay()
         {
@@ -81,7 +81,7 @@ namespace osu.Game.Overlays
 
             Show();
 
-            if (user.Id == Header?.User?.Id)
+            if (user.Id == Header?.User.Value?.Id)
                 return;
 
             userReq?.Cancel();
@@ -113,12 +113,10 @@ namespace osu.Game.Overlays
                 Colour = OsuColour.Gray(0.2f)
             });
 
-            Header = new ProfileHeader(user);
-
             Add(sectionsContainer = new SectionsContainer<ProfileSection>
             {
                 RelativeSizeAxes = Axes.Both,
-                ExpandableHeader = Header,
+                ExpandableHeader = Header = new ProfileHeader(),
                 FixedHeader = tabs,
                 HeaderBackground = new Box
                 {
@@ -169,7 +167,7 @@ namespace osu.Game.Overlays
 
         private void userLoadComplete(User user)
         {
-            Header.User = user;
+            Header.User.Value = user;
 
             if (user.ProfileOrder != null)
             {
