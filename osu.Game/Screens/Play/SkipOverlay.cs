@@ -87,30 +87,26 @@ namespace osu.Game.Screens.Play
             };
         }
 
-        private const double skip_required_cutoff = 3000;
         private const double fade_time = 300;
 
-        private double beginFadeTime => startTime - skip_required_cutoff - fade_time;
+        private double beginFadeTime => startTime - fade_time;
 
         protected override void LoadComplete()
         {
             base.LoadComplete();
-
-            if (startTime < skip_required_cutoff)
+            if (startTime + 2000 > 1000)
             {
-                Alpha = 0;
+                this.FadeInFromZero(fade_time);
+                using (BeginAbsoluteSequence(beginFadeTime))
+                {
+                    this.FadeOut(fade_time);
+                }
+                button.Action = () => RequestSeek?.Invoke(startTime - fade_time);
+                displayTime = Time.Current;
                 Expire();
                 return;
             }
-
-            this.FadeInFromZero(fade_time);
-            using (BeginAbsoluteSequence(beginFadeTime))
-                this.FadeOut(fade_time);
-
-            button.Action = () => RequestSeek?.Invoke(startTime - skip_required_cutoff - fade_time);
-
-            displayTime = Time.Current;
-
+            Alpha = 0;
             Expire();
         }
 
