@@ -188,7 +188,7 @@ namespace osu.Game.Overlays.Profile.Header.Components
             }
         }
 
-        public string TooltipText => User.Value?.Statistics?.Ranks.Global == null ? "" : $"{ranks[dayIndex].Value:#,##0}|{ranked_days - ranks[dayIndex].Key + 1}";
+        public string TooltipText => User.Value?.Statistics?.Ranks.Global == null ? "" : $"#{ranks[dayIndex].Value:#,##0}|{ranked_days - ranks[dayIndex].Key + 1}";
 
         public ITooltip GetCustomTooltip() => new RankGraphTooltip();
 
