@@ -149,7 +149,7 @@ namespace osu.Game.Overlays.Profile.Header
                 scoreRankInfo.Value.RankCount = user?.Statistics?.GradesCount[scoreRankInfo.Key] ?? 0;
 
             detailGlobalRank.Content = user?.Statistics?.Ranks.Global != null ? $"#{user?.Statistics?.Ranks.Global?.ToString("#,##0")}" : "-";
-            detailCountryRank.Content = user?.Statistics?.Ranks.Global != null ? $"#{user?.Statistics?.Ranks.Country?.ToString("#,##0")}" : "-";
+            detailCountryRank.Content = user?.Statistics?.Ranks.Country != null ? $"#{user?.Statistics?.Ranks.Country?.ToString("#,##0")}" : "-";
 
             rankGraph.User.Value = user;
         }
