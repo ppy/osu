@@ -101,11 +101,13 @@ namespace osu.Game.Screens.Play
                 {
                     this.FadeOut(fade_time);
                 }
+
                 button.Action = () => RequestSeek?.Invoke(startTime - fade_time);
                 displayTime = Time.Current;
                 Expire();
                 return;
             }
+
             Alpha = 0;
             Expire();
         }
