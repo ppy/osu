@@ -318,6 +318,8 @@ namespace osu.Game.Tests.Visual.Background
 
         private class FadeAccessibleResults : SoloResults
         {
+            protected override UserStatus ScreenStatus => null;
+
             public FadeAccessibleResults(ScoreInfo score)
                 : base(score)
             {
@@ -330,6 +332,8 @@ namespace osu.Game.Tests.Visual.Background
 
         private class TestPlayer : Player
         {
+            protected override UserStatus ScreenStatus => null;
+
             protected override BackgroundScreen CreateBackground() => new FadeAccessibleBackground(Beatmap.Value);
 
             protected override UserDimContainer CreateStoryboardContainer()
@@ -376,6 +380,8 @@ namespace osu.Game.Tests.Visual.Background
         {
             public VisualSettings VisualSettingsPos => VisualSettings;
             public BackgroundScreen ScreenPos => Background;
+
+            protected override UserStatus ScreenStatus => null;
 
             public TestPlayerLoader(Player player)
                 : base(() => player)
