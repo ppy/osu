@@ -104,6 +104,8 @@ namespace osu.Game.Tests.Visual.Gameplay
         public void TestPauseAfterFail()
         {
             AddUntilStep("wait for fail", () => Player.HasFailed);
+            AddAssert("fail transform began", () => Player.FailTransformBegan);
+            AddUntilStep("wait for fail transform to finish", () => Player.FailTransformFinished);
             AddAssert("fail overlay shown", () => Player.FailOverlayVisible);
 
             confirmClockRunning(false);
@@ -193,6 +195,10 @@ namespace osu.Game.Tests.Visual.Gameplay
             public new HUDOverlay HUDOverlay => base.HUDOverlay;
 
             public bool FailOverlayVisible => FailOverlay.State == Visibility.Visible;
+
+            public bool FailTransformBegan => FailTransform.Target.Clock.CurrentTime >= FailTransform.StartTime;
+
+            public bool FailTransformFinished => FailTransform.Target.Clock.CurrentTime >= FailTransform.EndTime;
 
             public bool PauseOverlayVisible => PauseOverlay.State == Visibility.Visible;
 
