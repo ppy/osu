@@ -55,12 +55,29 @@ namespace osu.Game.Screens
         protected new OsuGameBase Game => base.Game as OsuGameBase;
 
         /// <summary>
-        /// The <see cref="UserStatus"/> to set the user's status automatically to when this screen is entered / resumed.
-        /// Note that the user status won't be automatically set if :
-        /// <para>- <see cref="ScreenStatus"/> is overriden and returns null</para>
-        /// <para>- The current <see cref="UserStatus"/> is <see cref="UserStatusDoNotDisturb"/> or <see cref="UserStatusOffline"/></para>
+        /// The <see cref="UserStatusOnline"/> to set the user's status automatically to when this screen is entered
         /// </summary>
-        protected virtual UserStatus ScreenStatus => new UserStatusOnline();
+        protected virtual UserStatusOnline InitialScreenStatus => new UserStatusOnline();
+
+        /// <summary>
+        /// The <see cref="UserStatusOnline"/> for this screen.
+        /// Note that the status won't be updated for the user if :
+        /// <para>- The <see cref="ScreenStatus"/> is set to null</para>
+        /// <para>- The current <see cref="UserStatus"/> of the user is <see cref="UserStatusDoNotDisturb"/> or <see cref="UserStatusOffline"/></para>
+        /// </summary>
+        protected UserStatusOnline ScreenStatus
+        {
+            set
+            {
+                if (value == null) return;
+
+                status = value;
+                setUserStatus(value);
+            }
+            get => status;
+        }
+
+        private UserStatusOnline status;
 
         /// <summary>
         /// Whether to disallow changes to game-wise Beatmap/Ruleset bindables for this screen (and all children).
@@ -104,6 +121,8 @@ namespace osu.Game.Screens
         {
             Anchor = Anchor.Centre;
             Origin = Anchor.Centre;
+
+            status = null;
         }
 
         [BackgroundDependencyLoader(true)]
@@ -136,7 +155,7 @@ namespace osu.Game.Screens
             if (api != null)
                 api.LocalUser.Value.Status.ValueChanged += userStatusChanged;
 
-            setUserStatus(ScreenStatus);
+            ScreenStatus = ScreenStatus;
 
             base.OnResuming(last);
         }
@@ -167,7 +186,7 @@ namespace osu.Game.Screens
             if (api != null)
                 api.LocalUser.Value.Status.ValueChanged += userStatusChanged;
 
-            setUserStatus(ScreenStatus);
+            ScreenStatus = InitialScreenStatus;
 
             base.OnEntering(last);
         }

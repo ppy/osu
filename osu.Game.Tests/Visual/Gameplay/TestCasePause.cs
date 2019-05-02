@@ -193,7 +193,7 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             public new HUDOverlay HUDOverlay => base.HUDOverlay;
 
-            protected override UserStatus ScreenStatus => null;
+            protected override UserStatusOnline InitialScreenStatus => null;
 
             public bool FailOverlayVisible => FailOverlay.State == Visibility.Visible;
 

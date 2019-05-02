@@ -19,7 +19,7 @@ namespace osu.Game.Screens.Select
 
         public override bool AllowExternalScreenChange => true;
 
-        protected override UserStatus ScreenStatus => new UserStatusChoosingBeatmap();
+        protected override UserStatusOnline InitialScreenStatus => new UserStatusChoosingBeatmap();
 
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
