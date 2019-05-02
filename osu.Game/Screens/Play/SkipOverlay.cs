@@ -88,27 +88,28 @@ namespace osu.Game.Screens.Play
         }
 
         private const double fade_time = 300;
+        private const int skip_required_time = -1000;
 
         private double beginFadeTime => startTime - fade_time;
 
         protected override void LoadComplete()
         {
             base.LoadComplete();
-            if (startTime + 2000 > 1000)
+            if (startTime < skip_required_time)
             {
-                this.FadeInFromZero(fade_time);
-                using (BeginAbsoluteSequence(beginFadeTime))
-                {
-                    this.FadeOut(fade_time);
-                }
-
-                button.Action = () => RequestSeek?.Invoke(startTime - fade_time);
-                displayTime = Time.Current;
+                Alpha = 0;
                 Expire();
                 return;
             }
 
-            Alpha = 0;
+            this.FadeInFromZero(fade_time);
+            using (BeginAbsoluteSequence(beginFadeTime))
+            {
+                this.FadeOut(fade_time);
+            }
+
+            button.Action = () => RequestSeek?.Invoke(startTime - fade_time);
+            displayTime = Time.Current;
             Expire();
         }
 
