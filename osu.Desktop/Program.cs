@@ -65,7 +65,7 @@ namespace osu.Desktop
 
             Logger.Log($"Unhandled exception has been {(continueExecution ? $"allowed with {allowableExceptions} more allowable exceptions" : "denied")} .");
 
-            // restore the stock of allowable exceptions after a short delay.
+            // Restore the stock of allowable exceptions after a short delay.
             Task.Delay(1000).ContinueWith(_ => Interlocked.Increment(ref allowableExceptions));
 
             return continueExecution;
