@@ -12,6 +12,7 @@ using osu.Game.Rulesets;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Screens.Play;
+using osu.Game.Users;
 using osuTK;
 using osuTK.Input;
 
@@ -191,6 +192,8 @@ namespace osu.Game.Tests.Visual.Gameplay
             public new ScoreProcessor ScoreProcessor => base.ScoreProcessor;
 
             public new HUDOverlay HUDOverlay => base.HUDOverlay;
+
+            protected override UserStatus ScreenStatus => null;
 
             public bool FailOverlayVisible => FailOverlay.State == Visibility.Visible;
 

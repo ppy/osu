@@ -143,8 +143,9 @@ namespace osu.Game.Screens
 
         private void userStatusChanged(ValueChangedEvent<UserStatus> obj)
         {
-            if (obj.NewValue?.GetType() != ScreenStatus?.GetType()) //restore the status back to this screen's status when the user status is changed back to online after having being set to DND / offline
-                setUserStatus(ScreenStatus);
+            if (obj.NewValue?.GetType() == ScreenStatus?.GetType()) return; //don't update the user's status if the current status is of the same type as the given one
+
+            setUserStatus(ScreenStatus);
         }
 
         public override void OnSuspending(IScreen next)
@@ -190,8 +191,12 @@ namespace osu.Game.Screens
 
         private void setUserStatus(UserStatus status)
         {
-            if (api != null && status != null && !(api.LocalUser.Value.Status.Value is UserStatusDoNotDisturb) && !(api.LocalUser.Value.Status.Value is UserStatusOffline)) //only sets the user's status to the given one if
-                api.LocalUser.Value.Status.Value = status; //status is not null and the current status isn't either UserStatusDoNotDisturb or UserStatusOffline
+            if (api == null) return;
+            if (status == null) return;
+
+            if (!(api.LocalUser.Value.Status.Value is UserStatusOnline)) return; //don't update the user's status if the current status doesn't allow to be modified by screens (eg: DND / Offline)
+
+            api.LocalUser.Value.Status.Value = status;
         }
 
         /// <summary>
