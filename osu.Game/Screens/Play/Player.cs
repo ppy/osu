@@ -109,6 +109,8 @@ namespace osu.Game.Screens.Play
             showStoryboard = config.GetBindable<bool>(OsuSetting.ShowStoryboard);
 
             ScoreProcessor = DrawableRuleset.CreateScoreProcessor();
+            ScoreProcessor.Mods.BindTo(Mods);
+
             if (!ScoreProcessor.Mode.Disabled)
                 config.BindWith(OsuSetting.ScoreDisplayMode, ScoreProcessor.Mode);
 
