@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using osu.Framework.Audio.Sample;
@@ -8,13 +8,11 @@ using osu.Framework.Graphics.Textures;
 
 namespace osu.Game.Skinning
 {
-    public abstract class Skin : IDisposable, ISkinSource
+    public abstract class Skin : IDisposable, ISkin
     {
         public readonly SkinInfo SkinInfo;
 
         public virtual SkinConfiguration Configuration { get; protected set; }
-
-        public event Action SourceChanged;
 
         public abstract Drawable GetDrawableComponent(string componentName);
 
@@ -49,6 +47,7 @@ namespace osu.Game.Skinning
         {
             if (isDisposed)
                 return;
+
             isDisposed = true;
         }
 

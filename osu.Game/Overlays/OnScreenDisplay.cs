@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using System.Collections.Generic;
@@ -14,6 +14,7 @@ using osu.Game.Graphics;
 using osuTK;
 using osuTK.Graphics;
 using osu.Framework.Extensions.Color4Extensions;
+using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Transforms;
 using osu.Framework.Threading;
 using osu.Game.Configuration;
@@ -69,16 +70,14 @@ namespace osu.Game.Overlays
                         textLine1 = new OsuSpriteText
                         {
                             Padding = new MarginPadding(10),
-                            Font = @"Exo2.0-Black",
+                            Font = OsuFont.GetFont(size: 14, weight: FontWeight.Black),
                             Spacing = new Vector2(1, 0),
-                            TextSize = 14,
                             Anchor = Anchor.TopCentre,
                             Origin = Anchor.TopCentre,
                         },
                         textLine2 = new OsuSpriteText
                         {
-                            TextSize = 24,
-                            Font = @"Exo2.0-Light",
+                            Font = OsuFont.GetFont(size: 24, weight: FontWeight.Light),
                             Padding = new MarginPadding { Left = 10, Right = 10 },
                             Anchor = Anchor.Centre,
                             Origin = Anchor.BottomCentre,
@@ -105,8 +104,7 @@ namespace osu.Game.Overlays
                                     Anchor = Anchor.TopCentre,
                                     Origin = Anchor.TopCentre,
                                     Margin = new MarginPadding { Bottom = 15 },
-                                    Font = @"Exo2.0-Bold",
-                                    TextSize = 12,
+                                    Font = OsuFont.GetFont(size: 12, weight: FontWeight.Bold),
                                     Alpha = 0.3f,
                                 },
                             }
@@ -161,7 +159,7 @@ namespace osu.Game.Overlays
             if (configManager == null) throw new ArgumentNullException(nameof(configManager));
 
             if (!trackedConfigManagers.TryGetValue((source, configManager), out var existing))
-                throw new InvalidOperationException($"{nameof(configManager)} is not registered.");
+                return;
 
             existing.Unload();
             existing.SettingChanged -= display;

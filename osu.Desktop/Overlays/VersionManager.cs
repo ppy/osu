@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using osu.Framework.Allocation;
@@ -60,7 +60,7 @@ namespace osu.Desktop.Overlays
                             {
                                 new OsuSpriteText
                                 {
-                                    Font = @"Exo2.0-Bold",
+                                    Font = OsuFont.GetFont(weight: FontWeight.Bold),
                                     Text = game.Name
                                 },
                                 new OsuSpriteText
@@ -74,9 +74,8 @@ namespace osu.Desktop.Overlays
                         {
                             Anchor = Anchor.TopCentre,
                             Origin = Anchor.TopCentre,
-                            TextSize = 12,
+                            Font = OsuFont.Numeric.With(size: 12),
                             Colour = colours.Yellow,
-                            Font = @"Venera",
                             Text = @"Development Build"
                         },
                         new Sprite
@@ -111,7 +110,7 @@ namespace osu.Desktop.Overlays
             public UpdateCompleteNotification(string version, Action<string> openUrl = null)
             {
                 Text = $"You are now running osu!lazer {version}.\nClick to see what's new!";
-                Icon = FontAwesome.fa_check_square;
+                Icon = FontAwesome.Solid.CheckSquare;
                 Activated = delegate
                 {
                     openUrl?.Invoke($"https://osu.ppy.sh/home/changelog/lazer/{version}");

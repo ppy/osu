@@ -1,9 +1,9 @@
-// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using osu.Framework.Allocation;
-using osu.Framework.Configuration;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -26,8 +26,6 @@ namespace osu.Game.Online.Chat
         private readonly FocusedTextBox textbox;
 
         protected ChannelManager ChannelManager;
-
-        private ScrollContainer scroll;
 
         private DrawableChannel drawableChannel;
 
@@ -90,9 +88,9 @@ namespace osu.Game.Online.Chat
                 return;
 
             if (text[0] == '/')
-                ChannelManager?.PostCommand(text.Substring(1), Channel);
+                ChannelManager?.PostCommand(text.Substring(1), Channel.Value);
             else
-                ChannelManager?.PostMessage(text, target: Channel);
+                ChannelManager?.PostMessage(text, target: Channel.Value);
 
             textbox.Text = string.Empty;
         }
@@ -111,13 +109,13 @@ namespace osu.Game.Online.Chat
 
         protected virtual ChatLine CreateMessage(Message message) => new StandAloneMessage(message);
 
-        private void channelChanged(Channel channel)
+        private void channelChanged(ValueChangedEvent<Channel> e)
         {
             drawableChannel?.Expire();
 
-            if (channel == null) return;
+            if (e.NewValue == null) return;
 
-            AddInternal(drawableChannel = new StandAloneDrawableChannel(channel)
+            AddInternal(drawableChannel = new StandAloneDrawableChannel(e.NewValue)
             {
                 CreateChatLineAction = CreateMessage,
                 Padding = new MarginPadding { Bottom = postingTextbox ? textbox_height : 0 }
@@ -126,7 +124,7 @@ namespace osu.Game.Online.Chat
 
         protected class StandAloneDrawableChannel : DrawableChannel
         {
-            public Func<Message,ChatLine> CreateChatLineAction;
+            public Func<Message, ChatLine> CreateChatLineAction;
 
             protected override ChatLine CreateChatLine(Message m) => CreateChatLineAction(m);
 
@@ -144,7 +142,8 @@ namespace osu.Game.Online.Chat
             protected override float HorizontalPadding => 10;
             protected override float MessagePadding => 120;
 
-            public StandAloneMessage(Message message) : base(message)
+            public StandAloneMessage(Message message)
+                : base(message)
             {
             }
         }

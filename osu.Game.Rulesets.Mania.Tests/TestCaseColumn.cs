@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using System.Collections.Generic;
@@ -13,6 +13,7 @@ using osu.Game.Rulesets.Mania.Objects;
 using osu.Game.Rulesets.Mania.Objects.Drawables;
 using osu.Game.Rulesets.Mania.UI;
 using osu.Game.Rulesets.Mania.UI.Components;
+using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.UI.Scrolling;
 using osu.Game.Tests.Visual;
 using osuTK;
@@ -30,6 +31,9 @@ namespace osu.Game.Rulesets.Mania.Tests
             typeof(ColumnKeyArea),
             typeof(ColumnHitObjectArea)
         };
+
+        [Cached(typeof(IReadOnlyList<Mod>))]
+        private IReadOnlyList<Mod> mods { get; set; } = Array.Empty<Mod>();
 
         private readonly List<Column> columns = new List<Column>();
 

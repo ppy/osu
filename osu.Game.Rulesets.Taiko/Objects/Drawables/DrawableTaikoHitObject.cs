@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Graphics;
 using osu.Framework.Input.Bindings;
@@ -24,7 +24,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
         protected DrawableTaikoHitObject(TaikoHitObject hitObject)
             : base(hitObject)
         {
-            InternalChildren = new[]
+            AddRangeInternal(new[]
             {
                 nonProxiedContent = new Container
                 {
@@ -32,7 +32,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
                     Child = Content = new Container { RelativeSizeAxes = Axes.Both }
                 },
                 proxiedContent = new ProxiedContentContainer { RelativeSizeAxes = Axes.Both }
-            };
+            });
         }
 
         /// <summary>
@@ -49,6 +49,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
         protected void ProxyContent()
         {
             if (isProxied) return;
+
             isProxied = true;
 
             nonProxiedContent.Remove(Content);
@@ -62,6 +63,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
         protected void UnproxyContent()
         {
             if (!isProxied) return;
+
             isProxied = false;
 
             proxiedContent.Remove(Content);

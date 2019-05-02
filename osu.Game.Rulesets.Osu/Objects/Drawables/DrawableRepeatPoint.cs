@@ -1,13 +1,13 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using System.Collections.Generic;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Sprites;
 using osu.Framework.MathUtils;
 using osu.Game.Rulesets.Objects.Drawables;
 using osuTK;
-using osu.Game.Graphics;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Skinning;
 
@@ -36,7 +36,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                 new SkinnableDrawable("Play/osu/reversearrow", _ => new SpriteIcon
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Icon = FontAwesome.fa_chevron_right
+                    Icon = FontAwesome.Solid.ChevronRight
                 }, restrictSize: false)
             };
         }

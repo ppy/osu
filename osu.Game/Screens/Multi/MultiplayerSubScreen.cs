@@ -1,6 +1,7 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
+using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Screens;
 using osu.Game.Graphics.Containers;
@@ -9,41 +10,47 @@ namespace osu.Game.Screens.Multi
 {
     public abstract class MultiplayerSubScreen : OsuScreen, IMultiplayerSubScreen
     {
-        protected virtual Drawable TransitionContent => Content;
+        public override bool DisallowExternalBeatmapRulesetChanges => false;
 
         public virtual string ShortTitle => Title;
 
-        protected override void OnEntering(Screen last)
-        {
-            base.OnEntering(last);
+        [Resolved(CanBeNull = true)]
+        protected IRoomManager RoomManager { get; private set; }
 
-            Content.FadeInFromZero(WaveContainer.APPEAR_DURATION, Easing.OutQuint);
-            TransitionContent.FadeInFromZero(WaveContainer.APPEAR_DURATION, Easing.OutQuint);
-            TransitionContent.MoveToX(200).MoveToX(0, WaveContainer.APPEAR_DURATION, Easing.OutQuint);
+        protected MultiplayerSubScreen()
+        {
+            Anchor = Anchor.Centre;
+            Origin = Anchor.Centre;
+            RelativeSizeAxes = Axes.Both;
         }
 
-        protected override bool OnExiting(Screen next)
+        public override void OnEntering(IScreen last)
         {
-            Content.FadeOut(WaveContainer.DISAPPEAR_DURATION, Easing.OutQuint);
-            TransitionContent.MoveToX(200, WaveContainer.DISAPPEAR_DURATION, Easing.OutQuint);
-
-            return base.OnExiting(next);
+            this.FadeInFromZero(WaveContainer.APPEAR_DURATION, Easing.OutQuint);
+            this.FadeInFromZero(WaveContainer.APPEAR_DURATION, Easing.OutQuint);
+            this.MoveToX(200).MoveToX(0, WaveContainer.APPEAR_DURATION, Easing.OutQuint);
         }
 
-        protected override void OnResuming(Screen last)
+        public override bool OnExiting(IScreen next)
         {
-            base.OnResuming(last);
+            this.FadeOut(WaveContainer.DISAPPEAR_DURATION, Easing.OutQuint);
+            this.MoveToX(200, WaveContainer.DISAPPEAR_DURATION, Easing.OutQuint);
 
-            Content.FadeIn(WaveContainer.APPEAR_DURATION, Easing.OutQuint);
-            TransitionContent.MoveToX(0, WaveContainer.APPEAR_DURATION, Easing.OutQuint);
+            return false;
         }
 
-        protected override void OnSuspending(Screen next)
+        public override void OnResuming(IScreen last)
         {
-            base.OnSuspending(next);
-
-            Content.FadeOut(WaveContainer.DISAPPEAR_DURATION, Easing.OutQuint);
-            TransitionContent.MoveToX(-200, WaveContainer.DISAPPEAR_DURATION, Easing.OutQuint);
+            this.FadeIn(WaveContainer.APPEAR_DURATION, Easing.OutQuint);
+            this.MoveToX(0, WaveContainer.APPEAR_DURATION, Easing.OutQuint);
         }
+
+        public override void OnSuspending(IScreen next)
+        {
+            this.FadeOut(WaveContainer.DISAPPEAR_DURATION, Easing.OutQuint);
+            this.MoveToX(-200, WaveContainer.DISAPPEAR_DURATION, Easing.OutQuint);
+        }
+
+        public override string ToString() => Title;
     }
 }

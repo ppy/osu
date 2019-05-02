@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
@@ -11,7 +11,7 @@ namespace osu.Game.Overlays
 {
     /// <summary>
     /// An overlay which will display a black screen that dims over a period before confirming an exit action.
-    /// Action is BYO (derived class will need to call <see cref="BeginConfirm"/> and <see cref="AbortConfirm"/> from a user event).
+    /// Action is BYO (derived class will need to call <see cref="HoldToConfirmContainer.BeginConfirm"/> and <see cref="HoldToConfirmContainer.AbortConfirm"/> from a user event).
     /// </summary>
     public abstract class HoldToConfirmOverlay : HoldToConfirmContainer
     {
@@ -33,7 +33,7 @@ namespace osu.Game.Overlays
                 }
             };
 
-            Progress.ValueChanged += v => overlay.Alpha = (float)v;
+            Progress.ValueChanged += p => overlay.Alpha = (float)p.NewValue;
         }
     }
 }

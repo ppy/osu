@@ -1,11 +1,11 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.UserInterface;
 using osu.Game.Graphics;
@@ -26,12 +26,12 @@ namespace osu.Game.Overlays
         private ProfileSection lastSection;
         private ProfileSection[] sections;
         private GetUserRequest userReq;
-        private APIAccess api;
+        private IAPIProvider api;
         protected ProfileHeader Header;
         private SectionsContainer<ProfileSection> sectionsContainer;
         private ProfileTabControl tabs;
 
-        public const float CONTENT_X_MARGIN = 50;
+        public const float CONTENT_X_MARGIN = 70;
 
         public UserProfileOverlay()
         {
@@ -56,7 +56,7 @@ namespace osu.Game.Overlays
         }
 
         [BackgroundDependencyLoader]
-        private void load(APIAccess api)
+        private void load(IAPIProvider api)
         {
             this.api = api;
         }
@@ -81,7 +81,7 @@ namespace osu.Game.Overlays
 
             Show();
 
-            if (user.Id == Header?.User?.Id)
+            if (user.Id == Header?.User.Value?.Id)
                 return;
 
             userReq?.Cancel();
@@ -113,12 +113,10 @@ namespace osu.Game.Overlays
                 Colour = OsuColour.Gray(0.2f)
             });
 
-            Header = new ProfileHeader(user);
-
             Add(sectionsContainer = new SectionsContainer<ProfileSection>
             {
                 RelativeSizeAxes = Axes.Both,
-                ExpandableHeader = Header,
+                ExpandableHeader = Header = new ProfileHeader(),
                 FixedHeader = tabs,
                 HeaderBackground = new Box
                 {
@@ -126,16 +124,16 @@ namespace osu.Game.Overlays
                     RelativeSizeAxes = Axes.Both
                 }
             });
-            sectionsContainer.SelectedSection.ValueChanged += s =>
+            sectionsContainer.SelectedSection.ValueChanged += section =>
             {
-                if (lastSection != s)
+                if (lastSection != section.NewValue)
                 {
-                    lastSection = s;
+                    lastSection = section.NewValue;
                     tabs.Current.Value = lastSection;
                 }
             };
 
-            tabs.Current.ValueChanged += s =>
+            tabs.Current.ValueChanged += section =>
             {
                 if (lastSection == null)
                 {
@@ -144,9 +142,10 @@ namespace osu.Game.Overlays
                         tabs.Current.Value = lastSection;
                     return;
                 }
-                if (lastSection != s)
+
+                if (lastSection != section.NewValue)
                 {
-                    lastSection = s;
+                    lastSection = section.NewValue;
                     sectionsContainer.ScrollTo(lastSection);
                 }
             };
@@ -168,7 +167,7 @@ namespace osu.Game.Overlays
 
         private void userLoadComplete(User user)
         {
-            Header.User = user;
+            Header.User.Value = user;
 
             if (user.ProfileOrder != null)
             {
@@ -212,7 +211,8 @@ namespace osu.Game.Overlays
 
             private class ProfileTabItem : PageTabItem
             {
-                public ProfileTabItem(ProfileSection value) : base(value)
+                public ProfileTabItem(ProfileSection value)
+                    : base(value)
                 {
                     Text.Text = value.Title;
                 }

@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
@@ -125,7 +125,7 @@ namespace osu.Game.Graphics.UserInterface
             {
                 public string Text
                 {
-                    get { return NormalText.Text; }
+                    get => NormalText.Text;
                     set
                     {
                         NormalText.Text = value;
@@ -149,7 +149,7 @@ namespace osu.Game.Graphics.UserInterface
                         {
                             Anchor = Anchor.CentreLeft,
                             Origin = Anchor.CentreLeft,
-                            TextSize = text_size,
+                            Font = OsuFont.GetFont(size: text_size),
                             Margin = new MarginPadding { Horizontal = margin_horizontal, Vertical = MARGIN_VERTICAL },
                         },
                         BoldText = new OsuSpriteText
@@ -158,8 +158,7 @@ namespace osu.Game.Graphics.UserInterface
                             Alpha = 0,
                             Anchor = Anchor.CentreLeft,
                             Origin = Anchor.CentreLeft,
-                            TextSize = text_size,
-                            Font = @"Exo2.0-Bold",
+                            Font = OsuFont.GetFont(size: text_size, weight: FontWeight.Bold),
                             Margin = new MarginPadding { Horizontal = margin_horizontal, Vertical = MARGIN_VERTICAL },
                         }
                     };

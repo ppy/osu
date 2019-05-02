@@ -1,10 +1,10 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using osu.Framework.Configuration;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.UserInterface;
@@ -14,18 +14,19 @@ using osu.Game.Rulesets.UI;
 using osuTK;
 using osu.Game.Graphics.Containers;
 using osu.Framework.Input.Events;
+using osu.Game.Graphics;
 
 namespace osu.Game.Screens.Play.HUD
 {
-    public class ModDisplay : Container, IHasCurrentValue<IEnumerable<Mod>>
+    public class ModDisplay : Container, IHasCurrentValue<IReadOnlyList<Mod>>
     {
         private const int fade_duration = 1000;
 
         public bool DisplayUnrankedText = true;
 
-        private readonly Bindable<IEnumerable<Mod>> current = new Bindable<IEnumerable<Mod>>();
+        private readonly Bindable<IReadOnlyList<Mod>> current = new Bindable<IReadOnlyList<Mod>>();
 
-        public Bindable<IEnumerable<Mod>> Current
+        public Bindable<IReadOnlyList<Mod>> Current
         {
             get => current;
             set
@@ -60,15 +61,14 @@ namespace osu.Game.Screens.Play.HUD
                     Anchor = Anchor.BottomCentre,
                     Origin = Anchor.TopCentre,
                     Text = @"/ UNRANKED /",
-                    Font = @"Venera",
-                    TextSize = 12,
+                    Font = OsuFont.Numeric.With(size: 12)
                 }
             };
 
             Current.ValueChanged += mods =>
             {
                 iconsContainer.Clear();
-                foreach (Mod mod in mods)
+                foreach (Mod mod in mods.NewValue)
                 {
                     iconsContainer.Add(new ModIcon(mod) { Scale = new Vector2(0.6f) });
                 }

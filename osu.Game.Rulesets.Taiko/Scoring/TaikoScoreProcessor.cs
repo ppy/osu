@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Judgements;
@@ -32,8 +32,8 @@ namespace osu.Game.Rulesets.Taiko.Scoring
         /// </summary>
         private double hpMissMultiplier;
 
-        public TaikoScoreProcessor(RulesetContainer<TaikoHitObject> rulesetContainer)
-            : base(rulesetContainer)
+        public TaikoScoreProcessor(DrawableRuleset<TaikoHitObject> drawableRuleset)
+            : base(drawableRuleset)
         {
         }
 
@@ -46,19 +46,8 @@ namespace osu.Game.Rulesets.Taiko.Scoring
             hpMissMultiplier = BeatmapDifficulty.DifficultyRange(beatmap.BeatmapInfo.BaseDifficulty.DrainRate, 0.0018, 0.0075, 0.0120);
         }
 
-        protected override void ApplyResult(JudgementResult result)
-        {
-            base.ApplyResult(result);
-
-            double hpIncrease = result.Judgement.HealthIncreaseFor(result);
-
-            if (result.Type == HitResult.Miss)
-                hpIncrease *= hpMissMultiplier;
-            else
-                hpIncrease *= hpMultiplier;
-
-            Health.Value += hpIncrease;
-        }
+        protected override double HealthAdjustmentFactorFor(JudgementResult result)
+            => result.Type == HitResult.Miss ? hpMissMultiplier : hpMultiplier;
 
         protected override void Reset(bool storeResults)
         {
@@ -67,6 +56,6 @@ namespace osu.Game.Rulesets.Taiko.Scoring
             Health.Value = 0;
         }
 
-        protected override HitWindows CreateHitWindows() => new TaikoHitWindows();
+        public override HitWindows CreateHitWindows() => new TaikoHitWindows();
     }
 }

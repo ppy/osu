@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using osu.Framework.Graphics;
@@ -47,6 +47,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             {
                 if (value < 1)
                     throw new ArgumentException($"{nameof(MinZoom)} must be >= 1.", nameof(value));
+
                 minZoom = value;
 
                 if (Zoom < value)
@@ -66,6 +67,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             {
                 if (value < 1)
                     throw new ArgumentException($"{nameof(MaxZoom)} must be >= 1.", nameof(value));
+
                 maxZoom = value;
 
                 if (Zoom > value)
@@ -90,13 +92,6 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             }
         }
 
-        protected override void Update()
-        {
-            base.Update();
-
-            zoomedContent.Width = DrawWidth * currentZoom;
-        }
-
         protected override bool OnScroll(ScrollEvent e)
         {
             if (e.IsPrecise)
@@ -108,6 +103,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
         }
 
         private float zoomTarget = 1;
+
         private void setZoomTarget(float newZoom, float focusPoint)
         {
             zoomTarget = MathHelper.Clamp(newZoom, MinZoom, MaxZoom);
@@ -135,7 +131,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             private readonly float scrollOffset;
 
             /// <summary>
-            /// Transforms <see cref="TimeTimelinem"/> to a new value.
+            /// Transforms <see cref="ZoomableScrollContainer.currentZoom"/> to a new value.
             /// </summary>
             /// <param name="focusPoint">The focus point in absolute coordinates local to the content.</param>
             /// <param name="contentSize">The size of the content.</param>
@@ -166,6 +162,11 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                 float targetOffset = expectedWidth * (focusPoint / contentSize) - focusOffset;
 
                 d.currentZoom = newZoom;
+
+                d.zoomedContent.Width = d.DrawWidth * d.currentZoom;
+                // Temporarily here to make sure ScrollTo gets the correct DrawSize for scrollable area.
+                // TODO: Make sure draw size gets invalidated properly on the framework side, and remove this once it is.
+                d.Invalidate(Invalidation.DrawSize);
                 d.ScrollTo(targetOffset, false);
             }
 

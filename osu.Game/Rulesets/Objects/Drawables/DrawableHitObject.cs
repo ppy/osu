@@ -1,12 +1,13 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
-using osu.Framework.Configuration;
+using osu.Framework.Bindables;
 using osu.Framework.Extensions.TypeExtensions;
+using osu.Framework.Graphics;
 using osu.Framework.Graphics.Primitives;
 using osu.Game.Audio;
 using osu.Game.Graphics;
@@ -58,7 +59,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
         public bool AllJudged => Judged && NestedHitObjects.All(h => h.AllJudged);
 
         /// <summary>
-        /// Whether this <see cref="DrawableHitObject"/> has been hit. This occurs if <see cref="Result.IsHit"/> is <see cref="true"/>.
+        /// Whether this <see cref="DrawableHitObject"/> has been hit. This occurs if <see cref="Result"/> is hit.
         /// Note: This does NOT include nested hitobjects.
         /// </summary>
         public bool IsHit => Result?.IsHit ?? false;
@@ -120,18 +121,20 @@ namespace osu.Game.Rulesets.Objects.Drawables
             }
         }
 
+        protected override void ClearInternal(bool disposeChildren = true) => throw new InvalidOperationException($"Should never clear a {nameof(DrawableHitObject)}");
+
         protected override void LoadComplete()
         {
             base.LoadComplete();
 
-            State.ValueChanged += state =>
+            State.ValueChanged += armed =>
             {
-                UpdateState(state);
+                UpdateState(armed.NewValue);
 
                 // apply any custom state overrides
-                ApplyCustomUpdateState?.Invoke(this, state);
+                ApplyCustomUpdateState?.Invoke(this, armed.NewValue);
 
-                if (State == ArmedState.Hit)
+                if (armed.NewValue == ArmedState.Hit)
                     PlaySamples();
             };
 
@@ -218,6 +221,16 @@ namespace osu.Game.Rulesets.Objects.Drawables
             }
 
             OnNewResult?.Invoke(this, Result);
+        }
+
+        /// <summary>
+        /// Will called at least once after the <see cref="Drawable.LifetimeEnd"/> of this <see cref="DrawableHitObject"/> has been passed.
+        /// </summary>
+        internal void OnLifetimeEnd()
+        {
+            foreach (var nested in NestedHitObjects)
+                nested.OnLifetimeEnd();
+            UpdateResult(false);
         }
 
         /// <summary>

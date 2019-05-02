@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using osu.Game.Online.Chat;
 using System;
@@ -11,6 +11,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Logging;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Notifications;
+using osu.Game.Users;
 
 namespace osu.Game.Graphics.Containers
 {
@@ -35,7 +36,7 @@ namespace osu.Game.Graphics.Containers
             showNotImplementedError = () => notifications?.Post(new SimpleNotification
             {
                 Text = @"This link type is not yet supported!",
-                Icon = FontAwesome.fa_life_saver,
+                Icon = FontAwesome.Solid.LifeRing,
             });
         }
 
@@ -61,21 +62,24 @@ namespace osu.Game.Graphics.Containers
             AddText(text.Substring(previousLinkEnd));
         }
 
-        public void AddLink(string text, string url, LinkAction linkType = LinkAction.External, string linkArgument = null, string tooltipText = null, Action<SpriteText> creationParameters = null)
+        public IEnumerable<Drawable> AddLink(string text, string url, LinkAction linkType = LinkAction.External, string linkArgument = null, string tooltipText = null, Action<SpriteText> creationParameters = null)
             => createLink(AddText(text, creationParameters), text, url, linkType, linkArgument, tooltipText);
 
-        public void AddLink(string text, Action action, string tooltipText = null, Action<SpriteText> creationParameters = null)
+        public IEnumerable<Drawable> AddLink(string text, Action action, string tooltipText = null, Action<SpriteText> creationParameters = null)
             => createLink(AddText(text, creationParameters), text, tooltipText: tooltipText, action: action);
 
-        public void AddLink(IEnumerable<SpriteText> text, string url, LinkAction linkType = LinkAction.External, string linkArgument = null, string tooltipText = null)
+        public IEnumerable<Drawable> AddLink(IEnumerable<SpriteText> text, string url, LinkAction linkType = LinkAction.External, string linkArgument = null, string tooltipText = null)
         {
             foreach (var t in text)
                 AddArbitraryDrawable(t);
 
-            createLink(text, null, url, linkType, linkArgument, tooltipText);
+            return createLink(text, null, url, linkType, linkArgument, tooltipText);
         }
 
-        private void createLink(IEnumerable<Drawable> drawables, string text, string url = null, LinkAction linkType = LinkAction.External, string linkArgument = null, string tooltipText = null, Action action = null)
+        public IEnumerable<Drawable> AddUserLink(User user, Action<SpriteText> creationParameters = null)
+            => createLink(AddText(user.Username, creationParameters), user.Username, null, LinkAction.OpenUserProfile, user.Id.ToString(), "View profile");
+
+        private IEnumerable<Drawable> createLink(IEnumerable<Drawable> drawables, string text, string url = null, LinkAction linkType = LinkAction.External, string linkArgument = null, string tooltipText = null, Action action = null)
         {
             AddInternal(new DrawableLinkCompiler(drawables.OfType<SpriteText>().ToList())
             {
@@ -99,7 +103,7 @@ namespace osu.Game.Graphics.Containers
                             {
                                 channelManager?.OpenChannel(linkArgument);
                             }
-                            catch (ChannelNotFoundException e)
+                            catch (ChannelNotFoundException)
                             {
                                 Logger.Log($"The requested channel \"{linkArgument}\" does not exist");
                             }
@@ -122,6 +126,8 @@ namespace osu.Game.Graphics.Containers
                     }
                 }),
             });
+
+            return drawables;
         }
 
         // We want the compilers to always be visible no matter where they are, so RelativeSizeAxes is used.

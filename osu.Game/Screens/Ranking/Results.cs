@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
 using System.Linq;
@@ -8,6 +8,7 @@ using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Screens;
 using osu.Game.Graphics.Containers;
@@ -24,6 +25,8 @@ namespace osu.Game.Screens.Ranking
 {
     public abstract class Results : OsuScreen
     {
+        protected const float BACKGROUND_BLUR = 20;
+
         private Container circleOuterBackground;
         private Container circleOuter;
         private Container circleInner;
@@ -32,13 +35,11 @@ namespace osu.Game.Screens.Ranking
 
         private ResultModeTabControl modeChangeButtons;
 
-        public override bool AllowBeatmapRulesetChange => false;
+        public override bool DisallowExternalBeatmapRulesetChanges => true;
 
         protected readonly ScoreInfo Score;
 
         private Container currentPage;
-
-        private static readonly Vector2 background_blur = new Vector2(20);
 
         protected override BackgroundScreen CreateBackground() => new BackgroundScreenBeatmap(Beatmap.Value);
 
@@ -55,10 +56,10 @@ namespace osu.Game.Screens.Ranking
 
         private IEnumerable<Drawable> allCircles => new Drawable[] { circleOuterBackground, circleInner, circleOuter };
 
-        protected override void OnEntering(Screen last)
+        public override void OnEntering(IScreen last)
         {
             base.OnEntering(last);
-            (Background as BackgroundScreenBeatmap)?.BlurTo(background_blur, 2500, Easing.OutQuint);
+            ((BackgroundScreenBeatmap)Background).BlurAmount.Value = BACKGROUND_BLUR;
             Background.ScaleTo(1.1f, transition_time, Easing.OutQuint);
 
             allCircles.ForEach(c =>
@@ -98,7 +99,7 @@ namespace osu.Game.Screens.Ranking
             }
         }
 
-        protected override bool OnExiting(Screen next)
+        public override bool OnExiting(IScreen next)
         {
             allCircles.ForEach(c =>
             {
@@ -107,7 +108,7 @@ namespace osu.Game.Screens.Ranking
 
             Background.ScaleTo(1f, transition_time / 4, Easing.OutQuint);
 
-            Content.FadeOut(transition_time / 4);
+            this.FadeOut(transition_time / 4);
 
             return base.OnExiting(next);
         }
@@ -115,7 +116,7 @@ namespace osu.Game.Screens.Ranking
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
-            Children = new Drawable[]
+            InternalChildren = new Drawable[]
             {
                 new AspectContainer
                 {
@@ -190,45 +191,43 @@ namespace osu.Game.Screens.Ranking
                                 },
                                 new OsuSpriteText
                                 {
+                                    Anchor = Anchor.CentreLeft,
+                                    Origin = Anchor.BottomCentre,
                                     Text = $"{Score.MaxCombo}x",
-                                    TextSize = 40,
                                     RelativePositionAxes = Axes.X,
-                                    Font = @"Exo2.0-Bold",
+                                    Font = OsuFont.GetFont(weight: FontWeight.Bold, size: 40),
                                     X = 0.1f,
                                     Colour = colours.BlueDarker,
-                                    Anchor = Anchor.CentreLeft,
-                                    Origin = Anchor.BottomCentre,
                                 },
                                 new OsuSpriteText
                                 {
+                                    Anchor = Anchor.CentreLeft,
+                                    Origin = Anchor.TopCentre,
                                     Text = "max combo",
-                                    TextSize = 20,
+                                    Font = OsuFont.GetFont(size: 20),
                                     RelativePositionAxes = Axes.X,
                                     X = 0.1f,
                                     Colour = colours.Gray6,
-                                    Anchor = Anchor.CentreLeft,
-                                    Origin = Anchor.TopCentre,
                                 },
                                 new OsuSpriteText
                                 {
-                                    Text = $"{Score.Accuracy:P2}",
-                                    TextSize = 40,
-                                    RelativePositionAxes = Axes.X,
-                                    Font = @"Exo2.0-Bold",
-                                    X = 0.9f,
-                                    Colour = colours.BlueDarker,
                                     Anchor = Anchor.CentreLeft,
                                     Origin = Anchor.BottomCentre,
+                                    Text = $"{Score.Accuracy:P2}",
+                                    Font = OsuFont.GetFont(weight: FontWeight.Bold, size: 40),
+                                    RelativePositionAxes = Axes.X,
+                                    X = 0.9f,
+                                    Colour = colours.BlueDarker,
                                 },
                                 new OsuSpriteText
                                 {
+                                    Anchor = Anchor.CentreLeft,
+                                    Origin = Anchor.TopCentre,
                                     Text = "accuracy",
-                                    TextSize = 20,
+                                    Font = OsuFont.GetFont(size: 20),
                                     RelativePositionAxes = Axes.X,
                                     X = 0.9f,
                                     Colour = colours.Gray6,
-                                    Anchor = Anchor.CentreLeft,
-                                    Origin = Anchor.TopCentre,
                                 },
                             }
                         },
@@ -260,7 +259,7 @@ namespace osu.Game.Screens.Ranking
                 {
                     Anchor = Anchor.BottomLeft,
                     Origin = Anchor.BottomLeft,
-                    Action = Exit
+                    Action = this.Exit
                 },
             };
 
@@ -268,12 +267,12 @@ namespace osu.Game.Screens.Ranking
                 modeChangeButtons.AddItem(t);
             modeChangeButtons.Current.Value = modeChangeButtons.Items.FirstOrDefault();
 
-            modeChangeButtons.Current.BindValueChanged(m =>
+            modeChangeButtons.Current.BindValueChanged(page =>
             {
                 currentPage?.FadeOut();
                 currentPage?.Expire();
 
-                currentPage = m?.CreatePage();
+                currentPage = page.NewValue?.CreatePage();
 
                 if (currentPage != null)
                     circleInner.Add(currentPage);

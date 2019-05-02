@@ -1,10 +1,9 @@
-// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
-using osu.Framework.Configuration;
+using osu.Framework.Bindables;
 using osu.Game.Online.Multiplayer;
-using osu.Game.Screens.Multi.Lounge.Components;
 
 namespace osu.Game.Screens.Multi
 {
@@ -40,11 +39,5 @@ namespace osu.Game.Screens.Multi
         /// Parts the currently-joined <see cref="Room"/>.
         /// </summary>
         void PartRoom();
-
-        /// <summary>
-        /// Queries for <see cref="Room"/>s matching a new <see cref="FilterCriteria"/>.
-        /// </summary>
-        /// <param name="criteria">The <see cref="FilterCriteria"/> to match.</param>
-        void Filter(FilterCriteria criteria);
     }
 }

@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
 using osu.Framework.Extensions;
@@ -33,13 +33,14 @@ namespace osu.Game.Screens.Multi.Match.Components
             AddItem(RoomAvailability.InviteOnly);
         }
 
-        private class RoomAvailabilityPickerItem : DisableableTabItem<RoomAvailability>
+        private class RoomAvailabilityPickerItem : DisableableTabItem
         {
             private const float transition_duration = 200;
 
             private readonly Box hover, selection;
 
-            public RoomAvailabilityPickerItem(RoomAvailability value) : base(value)
+            public RoomAvailabilityPickerItem(RoomAvailability value)
+                : base(value)
             {
                 RelativeSizeAxes = Axes.Y;
                 Width = 102;
@@ -68,7 +69,7 @@ namespace osu.Game.Screens.Multi.Match.Components
                     {
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
-                        Font = @"Exo2.0-Bold",
+                        Font = OsuFont.GetFont(weight: FontWeight.Bold),
                         Text = value.GetDescription(),
                     },
                 };

@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using osu.Framework;
@@ -32,6 +32,7 @@ namespace osu.Game.Screens.Menu
                 RelativeSizeAxes = Axes.X,
                 Size = new Vector2(1, BUTTON_AREA_HEIGHT),
                 Alpha = 0,
+                AlwaysPresent = true, // Always needs to be present for correct tracking on initial -> toplevel state change
                 Children = new Drawable[]
                 {
                     buttonAreaBackground = new ButtonAreaBackground(),

@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using System.Collections.Generic;
@@ -16,6 +16,7 @@ using osuTK.Graphics;
 using osu.Game.Rulesets.Mods;
 using System.Linq;
 using NUnit.Framework;
+using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Objects;
@@ -43,7 +44,6 @@ namespace osu.Game.Rulesets.Osu.Tests
         protected override Container<Drawable> Content => content;
 
         private int depthIndex;
-        protected readonly List<Mod> Mods = new List<Mod>();
 
         public TestCaseSlider()
         {
@@ -291,7 +291,7 @@ namespace osu.Game.Rulesets.Osu.Tests
                 Depth = depthIndex++
             };
 
-            foreach (var mod in Mods.OfType<IApplicableToDrawableHitObjects>())
+            foreach (var mod in Mods.Value.OfType<IApplicableToDrawableHitObjects>())
                 mod.ApplyToDrawableHitObjects(new[] { drawable });
 
             drawable.OnNewResult += onNewResult;
@@ -300,6 +300,7 @@ namespace osu.Game.Rulesets.Osu.Tests
         }
 
         private float judgementOffsetDirection = 1;
+
         private void onNewResult(DrawableHitObject judgedObject, JudgementResult result)
         {
             var osuObject = judgedObject as DrawableOsuHitObject;
@@ -313,7 +314,7 @@ namespace osu.Game.Rulesets.Osu.Tests
                 Origin = Anchor.Centre,
                 Text = result.IsHit ? "Hit!" : "Miss!",
                 Colour = result.IsHit ? Color4.Green : Color4.Red,
-                TextSize = 30,
+                Font = OsuFont.GetFont(size: 30),
                 Position = osuObject.HitObject.StackedEndPosition + judgementOffsetDirection * new Vector2(0, 45)
             });
 

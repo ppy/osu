@@ -1,9 +1,10 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using Humanizer;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -22,43 +23,56 @@ namespace osu.Game.Screens.Multi.Match.Components
     {
         private const float transition_duration = 350;
         private const float field_padding = 45;
-        private const float disabled_alpha = 0.2f;
 
-        private readonly RoomBindings bindings = new RoomBindings();
+        protected MatchSettings Settings { get; private set; }
 
-        private readonly Container content;
-
-        private readonly OsuSpriteText typeLabel;
-
-        protected readonly OsuTextBox NameField, MaxParticipantsField;
-        protected readonly OsuDropdown<TimeSpan> DurationField;
-        protected readonly RoomAvailabilityPicker AvailabilityPicker;
-        protected readonly GameTypePicker TypePicker;
-        protected readonly TriangleButton ApplyButton;
-        protected readonly OsuPasswordTextBox PasswordField;
-
-        protected readonly OsuSpriteText ErrorText;
-
-        private readonly ProcessingOverlay processingOverlay;
-
-        private readonly Room room;
-
-        [Resolved(CanBeNull = true)]
-        private IRoomManager manager { get; set; }
-
-        public MatchSettingsOverlay(Room room)
+        [BackgroundDependencyLoader]
+        private void load()
         {
-            this.room = room;
-
-            bindings.Room = room;
-
             Masking = true;
 
-            Child = content = new Container
+            Child = Settings = new MatchSettings
             {
                 RelativeSizeAxes = Axes.Both,
-                RelativePositionAxes = Axes.Y,
-                Children = new Drawable[]
+                RelativePositionAxes = Axes.Y
+            };
+        }
+
+        protected override void PopIn()
+        {
+            Settings.MoveToY(0, transition_duration, Easing.OutQuint);
+        }
+
+        protected override void PopOut()
+        {
+            Settings.MoveToY(-1, transition_duration, Easing.InSine);
+        }
+
+        protected class MatchSettings : MultiplayerComposite
+        {
+            private const float disabled_alpha = 0.2f;
+
+            public OsuTextBox NameField, MaxParticipantsField;
+            public OsuDropdown<TimeSpan> DurationField;
+            public RoomAvailabilityPicker AvailabilityPicker;
+            public GameTypePicker TypePicker;
+            public TriangleButton ApplyButton;
+
+            public OsuSpriteText ErrorText;
+
+            private OsuSpriteText typeLabel;
+            private ProcessingOverlay processingOverlay;
+
+            [Resolved(CanBeNull = true)]
+            private IRoomManager manager { get; set; }
+
+            [Resolved]
+            private Bindable<Room> currentRoom { get; set; }
+
+            [BackgroundDependencyLoader]
+            private void load(OsuColour colours)
+            {
+                InternalChildren = new Drawable[]
                 {
                     new Box
                     {
@@ -79,7 +93,11 @@ namespace osu.Game.Screens.Multi.Match.Components
                             {
                                 new ScrollContainer
                                 {
-                                    Padding = new MarginPadding { Vertical = 10 },
+                                    Padding = new MarginPadding
+                                    {
+                                        Horizontal = OsuScreen.HORIZONTAL_OVERFLOW_PADDING,
+                                        Vertical = 10
+                                    },
                                     RelativeSizeAxes = Axes.Both,
                                     Children = new[]
                                     {
@@ -107,7 +125,10 @@ namespace osu.Game.Screens.Multi.Match.Components
                                                         new Section("Room visibility")
                                                         {
                                                             Alpha = disabled_alpha,
-                                                            Child = AvailabilityPicker = new RoomAvailabilityPicker(),
+                                                            Child = AvailabilityPicker = new RoomAvailabilityPicker
+                                                            {
+                                                                Enabled = { Value = false }
+                                                            },
                                                         },
                                                         new Section("Game type")
                                                         {
@@ -123,10 +144,12 @@ namespace osu.Game.Screens.Multi.Match.Components
                                                                     TypePicker = new GameTypePicker
                                                                     {
                                                                         RelativeSizeAxes = Axes.X,
+                                                                        Enabled = { Value = false }
                                                                     },
                                                                     typeLabel = new OsuSpriteText
                                                                     {
-                                                                        TextSize = 14,
+                                                                        Font = OsuFont.GetFont(size: 14),
+                                                                        Colour = colours.Yellow
                                                                     },
                                                                 },
                                                             },
@@ -147,7 +170,8 @@ namespace osu.Game.Screens.Multi.Match.Components
                                                             {
                                                                 RelativeSizeAxes = Axes.X,
                                                                 TabbableContentContainer = this,
-                                                                OnCommit = (sender, text) => apply(),
+                                                                ReadOnly = true,
+                                                                OnCommit = (sender, text) => apply()
                                                             },
                                                         },
                                                         new Section("Duration")
@@ -173,10 +197,11 @@ namespace osu.Game.Screens.Multi.Match.Components
                                                         new Section("Password (optional)")
                                                         {
                                                             Alpha = disabled_alpha,
-                                                            Child = PasswordField = new SettingsPasswordTextBox
+                                                            Child = new SettingsPasswordTextBox
                                                             {
                                                                 RelativeSizeAxes = Axes.X,
                                                                 TabbableContentContainer = this,
+                                                                ReadOnly = true,
                                                                 OnCommit = (sender, text) => apply()
                                                             },
                                                         },
@@ -210,6 +235,7 @@ namespace osu.Game.Screens.Multi.Match.Components
                                             Direction = FillDirection.Vertical,
                                             Spacing = new Vector2(0, 20),
                                             Margin = new MarginPadding { Vertical = 20 },
+                                            Padding = new MarginPadding { Horizontal = OsuScreen.HORIZONTAL_OVERFLOW_PADDING },
                                             Children = new Drawable[]
                                             {
                                                 ApplyButton = new CreateRoomButton
@@ -217,6 +243,7 @@ namespace osu.Game.Screens.Multi.Match.Components
                                                     Anchor = Anchor.BottomCentre,
                                                     Origin = Anchor.BottomCentre,
                                                     Size = new Vector2(230, 55),
+                                                    Enabled = { Value = false },
                                                     Action = apply,
                                                 },
                                                 ErrorText = new OsuSpriteText
@@ -224,7 +251,8 @@ namespace osu.Game.Screens.Multi.Match.Components
                                                     Anchor = Anchor.BottomCentre,
                                                     Origin = Anchor.BottomCentre,
                                                     Alpha = 0,
-                                                    Depth = 1
+                                                    Depth = 1,
+                                                    Colour = colours.RedDark
                                                 }
                                             }
                                         }
@@ -234,86 +262,66 @@ namespace osu.Game.Screens.Multi.Match.Components
                         }
                     },
                     processingOverlay = new ProcessingOverlay { Alpha = 0 }
-                },
-            };
+                };
 
-            TypePicker.Current.ValueChanged += t => typeLabel.Text = t.Name;
+                TypePicker.Current.BindValueChanged(type => typeLabel.Text = type.NewValue?.Name ?? string.Empty, true);
+                RoomName.BindValueChanged(name => NameField.Text = name.NewValue, true);
+                Availability.BindValueChanged(availability => AvailabilityPicker.Current.Value = availability.NewValue, true);
+                Type.BindValueChanged(type => TypePicker.Current.Value = type.NewValue, true);
+                MaxParticipants.BindValueChanged(count => MaxParticipantsField.Text = count.NewValue?.ToString(), true);
+                Duration.BindValueChanged(duration => DurationField.Current.Value = duration.NewValue, true);
+            }
 
-            bindings.Name.BindValueChanged(n => NameField.Text = n, true);
-            bindings.Availability.BindValueChanged(a => AvailabilityPicker.Current.Value = a, true);
-            bindings.Type.BindValueChanged(t => TypePicker.Current.Value = t, true);
-            bindings.MaxParticipants.BindValueChanged(m => MaxParticipantsField.Text = m?.ToString(), true);
-            bindings.Duration.BindValueChanged(d => DurationField.Current.Value = d, true);
-        }
+            protected override void Update()
+            {
+                base.Update();
 
-        [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
-        {
-            typeLabel.Colour = colours.Yellow;
-            ErrorText.Colour = colours.RedDark;
+                ApplyButton.Enabled.Value = hasValidSettings;
+            }
 
-            MaxParticipantsField.ReadOnly = true;
-            PasswordField.ReadOnly = true;
-            AvailabilityPicker.Enabled.Value = false;
-            TypePicker.Enabled.Value = false;
-            ApplyButton.Enabled.Value = false;
-        }
+            private bool hasValidSettings => RoomID.Value == null && NameField.Text.Length > 0 && Playlist.Count > 0;
 
-        protected override void Update()
-        {
-            base.Update();
+            private void apply()
+            {
+                hideError();
 
-            ApplyButton.Enabled.Value = hasValidSettings;
-        }
+                RoomName.Value = NameField.Text;
+                Availability.Value = AvailabilityPicker.Current.Value;
+                Type.Value = TypePicker.Current.Value;
 
-        private bool hasValidSettings => bindings.Room.RoomID.Value == null && NameField.Text.Length > 0 && bindings.Playlist.Count > 0;
+                if (int.TryParse(MaxParticipantsField.Text, out int max))
+                    MaxParticipants.Value = max;
+                else
+                    MaxParticipants.Value = null;
 
-        protected override void PopIn()
-        {
-            content.MoveToY(0, transition_duration, Easing.OutQuint);
-        }
+                Duration.Value = DurationField.Current.Value;
 
-        protected override void PopOut()
-        {
-            content.MoveToY(-1, transition_duration, Easing.InSine);
-        }
+                manager?.CreateRoom(currentRoom.Value, onSuccess, onError);
 
-        private void apply()
-        {
-            hideError();
+                processingOverlay.Show();
+            }
 
-            bindings.Name.Value = NameField.Text;
-            bindings.Availability.Value = AvailabilityPicker.Current.Value;
-            bindings.Type.Value = TypePicker.Current.Value;
+            private void hideError() => ErrorText.FadeOut(50);
 
-            if (int.TryParse(MaxParticipantsField.Text, out int max))
-                bindings.MaxParticipants.Value = max;
-            else
-                bindings.MaxParticipants.Value = null;
+            private void onSuccess(Room room) => processingOverlay.Hide();
 
-            bindings.Duration.Value = DurationField.Current.Value;
+            private void onError(string text)
+            {
+                ErrorText.Text = text;
+                ErrorText.FadeIn(50);
 
-            manager?.CreateRoom(room, onSuccess, onError);
-
-            processingOverlay.Show();
-        }
-
-        private void hideError() => ErrorText.FadeOut(50);
-
-        private void onSuccess(Room room) => processingOverlay.Hide();
-
-        private void onError(string text)
-        {
-            ErrorText.Text = text;
-            ErrorText.FadeIn(50);
-
-            processingOverlay.Hide();
+                processingOverlay.Hide();
+            }
         }
 
         private class SettingsTextBox : OsuTextBox
         {
-            protected override Color4 BackgroundUnfocused => Color4.Black;
-            protected override Color4 BackgroundFocused => Color4.Black;
+            [BackgroundDependencyLoader]
+            private void load()
+            {
+                BackgroundUnfocused = Color4.Black;
+                BackgroundFocused = Color4.Black;
+            }
         }
 
         private class SettingsNumberTextBox : SettingsTextBox
@@ -323,8 +331,12 @@ namespace osu.Game.Screens.Multi.Match.Components
 
         private class SettingsPasswordTextBox : OsuPasswordTextBox
         {
-            protected override Color4 BackgroundUnfocused => Color4.Black;
-            protected override Color4 BackgroundFocused => Color4.Black;
+            [BackgroundDependencyLoader]
+            private void load()
+            {
+                BackgroundUnfocused = Color4.Black;
+                BackgroundFocused = Color4.Black;
+            }
         }
 
         private class SectionContainer : FillFlowContainer<Section>
@@ -360,8 +372,7 @@ namespace osu.Game.Screens.Multi.Match.Components
                     {
                         new OsuSpriteText
                         {
-                            TextSize = 12,
-                            Font = @"Exo2.0-Bold",
+                            Font = OsuFont.GetFont(weight: FontWeight.Bold, size: 12),
                             Text = title.ToUpper(),
                         },
                         content = new Container

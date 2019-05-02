@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using System.Collections.Generic;
@@ -13,7 +13,7 @@ namespace osu.Game.Rulesets.Objects
         private static readonly IReadOnlyDictionary<HitResult, (double od0, double od5, double od10)> base_ranges = new Dictionary<HitResult, (double, double, double)>
         {
             { HitResult.Perfect, (44.8, 38.8, 27.8) },
-            { HitResult.Great, (128, 98, 68 ) },
+            { HitResult.Great, (128, 98, 68) },
             { HitResult.Good, (194, 164, 134) },
             { HitResult.Ok, (254, 224, 194) },
             { HitResult.Meh, (302, 272, 242) },
@@ -143,7 +143,7 @@ namespace osu.Game.Rulesets.Objects
 
         /// <summary>
         /// Given a time offset, whether the <see cref="HitObject"/> can ever be hit in the future with a non-<see cref="HitResult.Miss"/> result.
-        /// This happens if <paramref name="timeOffset"/> is less than what is required for a <see cref="SuccessfulHitWindow"/> result.
+        /// This happens if <paramref name="timeOffset"/> is less than what is required for <see cref="LowestSuccessfulHitResult"/>.
         /// </summary>
         /// <param name="timeOffset">The time offset.</param>
         /// <returns>Whether the <see cref="HitObject"/> can be hit at any point in the future from this time offset.</returns>

@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System.Linq;
 using osu.Game.Beatmaps;
@@ -13,7 +13,7 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Catch.Tests
 {
-    public class TestCaseAutoJuiceStream : TestCasePlayer
+    public class TestCaseAutoJuiceStream : PlayerTestCase
     {
         public TestCaseAutoJuiceStream()
             : base(new CatchRuleset())
@@ -53,7 +53,7 @@ namespace osu.Game.Rulesets.Catch.Tests
 
         protected override Player CreatePlayer(Ruleset ruleset)
         {
-            Beatmap.Value.Mods.Value = Beatmap.Value.Mods.Value.Concat(new[] { ruleset.GetAutoplayMod() });
+            Mods.Value = Mods.Value.Concat(new[] { ruleset.GetAutoplayMod() }).ToArray();
             return base.CreatePlayer(ruleset);
         }
     }
