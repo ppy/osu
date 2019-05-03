@@ -2,16 +2,12 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Linq;
-using osu.Framework.Allocation;
-using osu.Framework.Graphics;
-using osu.Framework.Graphics.Shapes;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Screens.Play;
 using osu.Game.Tests.Beatmaps;
-using osuTK.Graphics;
 
 namespace osu.Game.Tests.Visual
 {
@@ -26,22 +22,11 @@ namespace osu.Game.Tests.Visual
             this.ruleset = ruleset;
         }
 
-        [BackgroundDependencyLoader]
-        private void load()
-        {
-            Add(new Box
-            {
-                RelativeSizeAxes = Axes.Both,
-                Colour = Color4.Black,
-                Depth = int.MaxValue
-            });
-        }
-
         [SetUpSteps]
         public void SetUpSteps()
         {
             AddStep(ruleset.RulesetInfo.Name, loadPlayer);
-            AddUntilStep(() => Player.IsLoaded, "player loaded");
+            AddUntilStep("player loaded", () => Player.IsLoaded && Player.Alpha == 1);
         }
 
         protected virtual IBeatmap CreateBeatmap(Ruleset ruleset) => new TestBeatmap(ruleset.RulesetInfo);
@@ -55,7 +40,7 @@ namespace osu.Game.Tests.Visual
             Beatmap.Value = new TestWorkingBeatmap(beatmap, Clock);
 
             if (!AllowFail)
-                Beatmap.Value.Mods.Value = new[] { ruleset.GetAllMods().First(m => m is ModNoFail) };
+                Mods.Value = new[] { ruleset.GetAllMods().First(m => m is ModNoFail) };
 
             Player = CreatePlayer(ruleset);
             LoadScreen(Player);

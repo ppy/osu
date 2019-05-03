@@ -26,8 +26,7 @@ namespace osu.Game.Rulesets.Difficulty
             Ruleset = ruleset;
             Score = score;
 
-            beatmap.Mods.Value = score.Mods;
-            Beatmap = beatmap.GetPlayableBeatmap(ruleset.RulesetInfo);
+            Beatmap = beatmap.GetPlayableBeatmap(ruleset.RulesetInfo, score.Mods);
 
             Attributes = ruleset.CreateDifficultyCalculator(beatmap).Calculate(score.Mods);
 

@@ -217,7 +217,7 @@ namespace osu.Game.Beatmaps
                 {
                     request.Perform(api);
                 }
-                catch (Exception e)
+                catch
                 {
                     // no need to handle here as exceptions will filter down to request.Failure above.
                 }
@@ -382,7 +382,6 @@ namespace osu.Game.Beatmaps
         /// Query the API to populate missing values like OnlineBeatmapID / OnlineBeatmapSetID or (Rank-)Status.
         /// </summary>
         /// <param name="beatmap">The beatmap to populate.</param>
-        /// <param name="otherBeatmaps">The other beatmaps contained within this set.</param>
         /// <param name="force">Whether to re-query if the provided beatmap already has populated values.</param>
         /// <returns>True if population was successful.</returns>
         private bool fetchAndPopulateOnlineValues(BeatmapInfo beatmap, bool force = false)

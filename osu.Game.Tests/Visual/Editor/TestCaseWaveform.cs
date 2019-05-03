@@ -3,12 +3,13 @@
 
 using NUnit.Framework;
 using osu.Framework.Allocation;
+using osu.Framework.Audio.Track;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Audio;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Game.Beatmaps;
 using osu.Game.Graphics.Sprites;
-using osuTK;
 using osuTK.Graphics;
 
 namespace osu.Game.Tests.Visual.Editor
@@ -16,35 +17,38 @@ namespace osu.Game.Tests.Visual.Editor
     [TestFixture]
     public class TestCaseWaveform : OsuTestCase
     {
+        private WorkingBeatmap waveformBeatmap;
+
         [BackgroundDependencyLoader]
         private void load()
         {
-            Beatmap.Value = new WaveformTestBeatmap();
+            waveformBeatmap = new WaveformTestBeatmap();
+        }
 
-            FillFlowContainer flow;
-            Child = flow = new FillFlowContainer
+        [TestCase(1f)]
+        [TestCase(1f / 2)]
+        [TestCase(1f / 4)]
+        [TestCase(1f / 8)]
+        [TestCase(1f / 16)]
+        [TestCase(0f)]
+        public void TestResolution(float resolution)
+        {
+            TestWaveformGraph graph = null;
+
+            AddStep("add graph", () =>
             {
-                RelativeSizeAxes = Axes.Both,
-                Direction = FillDirection.Vertical,
-                Spacing = new Vector2(0, 10),
-            };
-
-            for (int i = 1; i <= 16; i *= 2)
-            {
-                var newDisplay = new WaveformGraph
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    Resolution = 1f / i,
-                    Waveform = Beatmap.Value.Waveform,
-                };
-
-                flow.Add(new Container
+                Child = new Container
                 {
                     RelativeSizeAxes = Axes.X,
                     Height = 100,
                     Children = new Drawable[]
                     {
-                        newDisplay,
+                        graph = new TestWaveformGraph
+                        {
+                            RelativeSizeAxes = Axes.Both,
+                            Resolution = resolution,
+                            Waveform = waveformBeatmap.Waveform,
+                        },
                         new Container
                         {
                             Anchor = Anchor.Centre,
@@ -62,13 +66,42 @@ namespace osu.Game.Tests.Visual.Editor
                                 {
                                     Anchor = Anchor.Centre,
                                     Origin = Anchor.Centre,
-                                    Text = $"Resolution: {1f / i:0.00}"
+                                    Text = $"Resolution: {resolution:0.00}"
                                 }
                             }
                         }
                     }
-                });
-            }
+                };
+            });
+
+            AddUntilStep("wait for load", () => graph.ResampledWaveform != null);
+        }
+
+        [Test]
+        public void TestDefaultBeatmap()
+        {
+            TestWaveformGraph graph = null;
+
+            AddStep("add graph", () =>
+            {
+                Child = new Container
+                {
+                    RelativeSizeAxes = Axes.X,
+                    Height = 100,
+                    Child = graph = new TestWaveformGraph
+                    {
+                        RelativeSizeAxes = Axes.Both,
+                        Waveform = new DummyWorkingBeatmap().Waveform,
+                    },
+                };
+            });
+
+            AddUntilStep("wait for load", () => graph.ResampledWaveform != null);
+        }
+
+        public class TestWaveformGraph : WaveformGraph
+        {
+            public new Waveform ResampledWaveform => base.ResampledWaveform;
         }
     }
 }
