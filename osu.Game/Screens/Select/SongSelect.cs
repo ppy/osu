@@ -224,7 +224,7 @@ namespace osu.Game.Screens.Select
 
             if (Footer != null)
             {
-                Footer.AddButton(new FooterButtonMods(selectedMods), @"mods", colours.Yellow, ModSelect, Key.F1);
+                Footer.AddButton(new FooterButtonMods(SelectedMods), @"mods", colours.Yellow, ModSelect, Key.F1);
                 Footer.AddButton(new FooterButtonRandom(), @"random", colours.Green, triggerRandom, Key.F2);
                 Footer.AddButton(new FooterButton(), @"options", colours.Blue, BeatmapOptions, Key.F3);
 
