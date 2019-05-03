@@ -16,7 +16,7 @@ namespace osu.Game.Screens.Select
 
         public FooterButtonRandom()
         {
-            textContainer.Add(secondaryText = new OsuSpriteText
+            TextContainer.Add(secondaryText = new OsuSpriteText
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
@@ -43,12 +43,12 @@ namespace osu.Game.Screens.Select
         {
             if (secondaryActive)
             {
-                spriteText.FadeOut(120, Easing.InQuad);
+                SpriteText.FadeOut(120, Easing.InQuad);
                 secondaryText.FadeIn(120, Easing.InQuad);
             }
             else
             {
-                spriteText.FadeIn(120, Easing.InQuad);
+                SpriteText.FadeIn(120, Easing.InQuad);
                 secondaryText.FadeOut(120, Easing.InQuad);
             }
         }
