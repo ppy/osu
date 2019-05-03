@@ -56,7 +56,7 @@ namespace osu.Game.Screens.Multi.Play
             if (ruleset.Value.ID != playlistItem.Ruleset.ID)
                 throw new InvalidOperationException("Current Ruleset does not match PlaylistItem's Ruleset");
 
-            if (!playlistItem.RequiredMods.All(m => Mods.Value.Contains(m)))
+            if (!playlistItem.RequiredMods.All(m => Mods.Value.Any(m.Equals)))
                 throw new InvalidOperationException("Current Mods do not match PlaylistItem's RequiredMods");
 
             var req = new CreateRoomScoreRequest(roomId.Value ?? 0, playlistItem.ID);
