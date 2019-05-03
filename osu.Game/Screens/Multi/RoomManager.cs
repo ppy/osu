@@ -171,7 +171,7 @@ namespace osu.Game.Screens.Multi
         /// <summary>
         /// Adds a <see cref="Room"/> to the list of available rooms.
         /// </summary>
-        /// <param name="room">The <see cref="Room"/> to add.<</param>
+        /// <param name="room">The <see cref="Room"/> to add.</param>
         private void addRoom(Room room)
         {
             var existing = rooms.FirstOrDefault(e => e.RoomID.Value == room.RoomID.Value);

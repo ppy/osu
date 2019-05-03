@@ -10,6 +10,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
@@ -22,6 +23,7 @@ using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays.Music;
+using osu.Game.Rulesets.Mods;
 using osuTK;
 using osuTK.Graphics;
 
@@ -49,12 +51,15 @@ namespace osu.Game.Overlays
         private BeatmapManager beatmaps;
 
         private List<BeatmapSetInfo> beatmapSets;
-        private BeatmapSetInfo currentSet;
 
         private Container dragContainer;
         private Container playerContainer;
 
-        private readonly Bindable<WorkingBeatmap> beatmap = new Bindable<WorkingBeatmap>();
+        [Resolved]
+        private Bindable<WorkingBeatmap> beatmap { get; set; }
+
+        [Resolved]
+        private IBindable<IReadOnlyList<Mod>> mods { get; set; }
 
         /// <summary>
         /// Provide a source for the toolbar height.
@@ -73,7 +78,6 @@ namespace osu.Game.Overlays
         [BackgroundDependencyLoader]
         private void load(Bindable<WorkingBeatmap> beatmap, BeatmapManager beatmaps, OsuColour colours)
         {
-            this.beatmap.BindTo(beatmap);
             this.beatmaps = beatmaps;
 
             Children = new Drawable[]
@@ -231,6 +235,7 @@ namespace osu.Game.Overlays
         {
             beatmap.BindValueChanged(beatmapChanged, true);
             beatmap.BindDisabledChanged(beatmapDisabledChanged, true);
+            mods.BindValueChanged(_ => updateAudioAdjustments(), true);
             base.LoadComplete();
         }
 
@@ -354,8 +359,21 @@ namespace osu.Game.Overlays
             progressBar.CurrentTime = 0;
 
             updateDisplay(current, direction);
+            updateAudioAdjustments();
 
             queuedDirection = null;
+        }
+
+        private void updateAudioAdjustments()
+        {
+            var track = current?.Track;
+            if (track == null)
+                return;
+
+            track.ResetSpeedAdjustments();
+
+            foreach (var mod in mods.Value.OfType<IApplicableToClock>())
+                mod.ApplyToClock(track);
         }
 
         private void currentTrackCompleted() => Schedule(() =>

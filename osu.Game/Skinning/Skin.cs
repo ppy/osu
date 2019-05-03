@@ -8,13 +8,11 @@ using osu.Framework.Graphics.Textures;
 
 namespace osu.Game.Skinning
 {
-    public abstract class Skin : IDisposable, ISkinSource
+    public abstract class Skin : IDisposable, ISkin
     {
         public readonly SkinInfo SkinInfo;
 
         public virtual SkinConfiguration Configuration { get; protected set; }
-
-        public event Action SourceChanged;
 
         public abstract Drawable GetDrawableComponent(string componentName);
 

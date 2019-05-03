@@ -19,6 +19,7 @@ using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
 using osu.Game.Input.Bindings;
 using Humanizer;
+using osu.Framework.Graphics.Effects;
 
 namespace osu.Game.Screens.Play
 {

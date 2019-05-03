@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using osu.Framework;
@@ -23,6 +24,7 @@ namespace osu.Game.Screens.Play
     public class GameplayClockContainer : Container
     {
         private readonly WorkingBeatmap beatmap;
+        private readonly IReadOnlyList<Mod> mods;
 
         /// <summary>
         /// The original source (usually a <see cref="WorkingBeatmap"/>'s track).
@@ -58,9 +60,10 @@ namespace osu.Game.Screens.Play
 
         private readonly FramedOffsetClock platformOffsetClock;
 
-        public GameplayClockContainer(WorkingBeatmap beatmap, double gameplayStartTime)
+        public GameplayClockContainer(WorkingBeatmap beatmap, IReadOnlyList<Mod> mods, double gameplayStartTime)
         {
             this.beatmap = beatmap;
+            this.mods = mods;
             this.gameplayStartTime = gameplayStartTime;
 
             RelativeSizeAxes = Axes.Both;
@@ -92,8 +95,7 @@ namespace osu.Game.Screens.Play
 
             UserPlaybackRate.ValueChanged += _ => updateRate();
 
-            Seek(Math.Min(0, gameplayStartTime - beatmap.BeatmapInfo.AudioLeadIn));
-            adjustableClock.ProcessFrame();
+            Seek(Math.Min(-beatmap.BeatmapInfo.AudioLeadIn, gameplayStartTime));
         }
 
         public void Restart()
@@ -107,11 +109,8 @@ namespace osu.Game.Screens.Play
                     adjustableClock.ChangeSource(sourceClock);
                     updateRate();
 
-                    this.Delay(750).Schedule(() =>
-                    {
-                        if (!IsPaused.Value)
-                            Start();
-                    });
+                    if (!IsPaused.Value)
+                        Start();
                 });
             });
         }
@@ -120,7 +119,7 @@ namespace osu.Game.Screens.Play
         {
             // Seeking the decoupled clock to its current time ensures that its source clock will be seeked to the same time
             // This accounts for the audio clock source potentially taking time to enter a completely stopped state
-            adjustableClock.Seek(adjustableClock.CurrentTime);
+            Seek(GameplayClock.CurrentTime);
             adjustableClock.Start();
             IsPaused.Value = false;
         }
@@ -137,6 +136,9 @@ namespace osu.Game.Screens.Play
             // remove the offset component here because most of the time we want the seek to be aligned to gameplay, not the audio track.
             // we may want to consider reversing the application of offsets in the future as it may feel more correct.
             adjustableClock.Seek(time - totalOffset);
+
+            // manually process frame to ensure GameplayClock is correctly updated after a seek.
+            userOffsetClock.ProcessFrame();
         }
 
         public void Stop()
@@ -170,7 +172,7 @@ namespace osu.Game.Screens.Play
             else
                 sourceClock.Rate = UserPlaybackRate.Value;
 
-            foreach (var mod in beatmap.Mods.Value.OfType<IApplicableToClock>())
+            foreach (var mod in mods.OfType<IApplicableToClock>())
                 mod.ApplyToClock(sourceClock);
         }
     }
