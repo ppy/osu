@@ -88,6 +88,13 @@ namespace osu.Game.Screens.Play
         }
 
         private const double fade_time = 300;
+
+        /// <summary>
+        /// Represents minimum of secs required for gameplay start time in order to run skip overlay.
+        /// Since gameplay start time is 2 secs before beatmap's first object start time, in order to
+        /// use skip overlay if intro delay is >= 1 sec, we must substract 2 secs from 1, which is -1.
+        /// See "<see cref="osu.Game.Rulesets.UI.DrawableRuleset.GameplayStartTime"/>".
+        /// </summary>
         private const int skip_required_time = -1000;
 
         private double beginFadeTime => startTime - fade_time;
@@ -95,7 +102,8 @@ namespace osu.Game.Screens.Play
         protected override void LoadComplete()
         {
             base.LoadComplete();
-            if (startTime < skip_required_time)
+
+            if(startTime < skip_required_time)
             {
                 Alpha = 0;
                 Expire();
@@ -103,10 +111,9 @@ namespace osu.Game.Screens.Play
             }
 
             this.FadeInFromZero(fade_time);
-            using (BeginAbsoluteSequence(beginFadeTime))
-            {
+
+            using(BeginAbsoluteSequence(beginFadeTime))
                 this.FadeOut(fade_time);
-            }
 
             button.Action = () => RequestSeek?.Invoke(startTime - fade_time);
             displayTime = Time.Current;
