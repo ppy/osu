@@ -44,8 +44,6 @@ namespace osu.Game.Screens.Play
 
         public bool HasFailed { get; private set; }
 
-        public bool PauseOnFocusLost { get; set; } = true;
-
         private Bindable<bool> mouseWheelDisabled;
 
         private readonly Bindable<bool> storyboardReplacesBackground = new Bindable<bool>();
@@ -387,15 +385,6 @@ namespace osu.Game.Screens.Play
             && !HasFailed
             // already resuming
             && !IsResuming;
-
-        protected override void Update()
-        {
-            base.Update();
-
-            // eagerly pause when we lose window focus (if we are locally playing).
-            if (PauseOnFocusLost)
-                HUDOverlay.HoldToQuit.GameInactive = !Game.IsActive.Value;
-        }
 
         public void Pause()
         {
