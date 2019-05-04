@@ -134,9 +134,9 @@ namespace osu.Game.Overlays.Profile.Header
 
             DetailsVisible.BindValueChanged(visible =>
             {
-                hiddenDetailContainer.Alpha = visible.NewValue ? 0 : 1;
-                expandedDetailContainer.Alpha = visible.NewValue ? 1 : 0;
-            }, true);
+                hiddenDetailContainer.FadeTo(visible.NewValue ? 0 : 1, 200, Easing.OutQuint);
+                expandedDetailContainer.FadeTo(visible.NewValue ? 1 : 0, 200, Easing.OutQuint);
+            });
 
             User.BindValueChanged(user => updateDisplay(user.NewValue));
         }
