@@ -126,6 +126,7 @@ namespace osu.Game.Overlays
                     }
 
                     panel.Status.BindTo(u.Status);
+                    panel.Activity.BindTo(u.Activity);
                     return panel;
                 })
             };
