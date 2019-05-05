@@ -25,6 +25,8 @@ namespace osu.Game.Users
 
         public Bindable<UserStatus> Status = new Bindable<UserStatus>();
 
+        public Bindable<UserActivity> Activity = new Bindable<UserActivity>();
+
         //public Team Team;
 
         [JsonProperty(@"profile_colour")]
