@@ -150,7 +150,7 @@ namespace osu.Game.Screens
             sampleExit?.Play();
             applyArrivingDefaults(true);
 
-            ScreenStatus = ScreenStatus;
+            ScreenActivity = ScreenActivity;
 
             base.OnResuming(last);
         }
@@ -168,7 +168,7 @@ namespace osu.Game.Screens
 
             backgroundStack?.Push(localBackground = CreateBackground());
 
-            ScreenStatus = InitialScreenActivity;
+            ScreenActivity = InitialScreenActivity;
 
             base.OnEntering(last);
         }
