@@ -235,7 +235,7 @@ namespace osu.Game.Users
                 if (status is UserStatusOnline && activity != null)
                 {
                     statusMessage.Text = activity.Status;
-                    statusBg.FadeColour(status.GetAppropriateColour(colours), 500, Easing.OutQuint);
+                    statusBg.FadeColour(activity.GetAppropriateColour(colours), 500, Easing.OutQuint);
                     return;
                 }
 

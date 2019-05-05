@@ -12,10 +12,11 @@ namespace osu.Game.Tests.Visual.Online
     [TestFixture]
     public class TestCaseUserPanel : OsuTestCase
     {
+        UserPanel flyte;
+        UserPanel peppy;
+
         public TestCaseUserPanel()
         {
-            UserPanel flyte;
-            UserPanel peppy;
             Add(new FillFlowContainer
             {
                 Anchor = Anchor.Centre,
@@ -44,15 +45,27 @@ namespace osu.Game.Tests.Visual.Online
             });
 
             flyte.Status.Value = new UserStatusOnline();
-            peppy.Status.Value = new UserStatusSoloGame(null, null);
+            peppy.Status.Value = null;
+        }
 
-            AddStep(@"spectating", () => { flyte.Status.Value = new UserStatusSpectating(); });
-            AddStep(@"multiplaying", () => { flyte.Status.Value = new UserStatusMultiplayerGame(); });
-            AddStep(@"modding", () => { flyte.Status.Value = new UserStatusModding(); });
-            AddStep(@"editing", () => { flyte.Status.Value = new UserStatusEditing(null); });
-            AddStep(@"choosing", () => { flyte.Status.Value = new UserStatusChoosingBeatmap(); });
-            AddStep(@"offline", () => { flyte.Status.Value = new UserStatusOffline(); });
-            AddStep(@"null status", () => { flyte.Status.Value = null; });
+        [Test]
+        public void UserStatusesTests()
+        {
+            AddStep("online", () => { peppy.Status.Value = new UserStatusOnline(); });
+            AddStep(@"do not disturb", () => { peppy.Status.Value = new UserStatusDoNotDisturb(); });
+            AddStep(@"offline", () => { peppy.Status.Value = new UserStatusOffline(); });
+            AddStep(@"null status", () => { peppy.Status.Value = null; });
+        }
+
+        [Test]
+        public void UserActivitiesTests()
+        {
+            AddStep("idle", () => { flyte.Activity.Value = null; });
+            AddStep("spectating", () => { flyte.Activity.Value = new UserActivitySpectating(); });
+            AddStep("solo", () => { flyte.Activity.Value = new UserActivitySoloGame(null, null); });
+            AddStep("choosing", () => { flyte.Activity.Value = new UserActivityChoosingBeatmap(); });
+            AddStep("editing", () => { flyte.Activity.Value = new UserActivityEditing(null); });
+            AddStep("modding", () => { flyte.Activity.Value = new UserActivityModding(); });
         }
     }
 }
