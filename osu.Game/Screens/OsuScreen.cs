@@ -55,29 +55,27 @@ namespace osu.Game.Screens
         protected new OsuGameBase Game => base.Game as OsuGameBase;
 
         /// <summary>
-        /// The <see cref="UserStatusOnline"/> to set the user's status automatically to when this screen is entered
+        /// The <see cref="UserActivity"/> to set the user's activity automatically to when this screen is entered
         /// </summary>
-        protected virtual UserStatusOnline InitialScreenStatus => new UserStatusOnline();
+        protected virtual UserActivity InitialScreenActivity => null;
 
         /// <summary>
-        /// The <see cref="UserStatusOnline"/> for this screen.
-        /// Note that the status won't be updated for the user if :
-        /// <para>- The <see cref="ScreenStatus"/> is set to null</para>
-        /// <para>- The current <see cref="UserStatus"/> of the user is <see cref="UserStatusDoNotDisturb"/> or <see cref="UserStatusOffline"/></para>
+        /// The <see cref="UserActivity"/> for this screen.
         /// </summary>
-        protected UserStatusOnline ScreenStatus
+        protected UserActivity ScreenActivity
         {
             set
             {
                 if (value == null) return;
+                if (api == null) return;
 
-                status = value;
-                setUserStatus(value);
+                activity = value;
+                api.LocalUser.Value.Activity.Value = activity;
             }
-            get => status;
+            get => activity;
         }
 
-        private UserStatusOnline status;
+        private UserActivity activity;
 
         /// <summary>
         /// Whether to disallow changes to game-wise Beatmap/Ruleset bindables for this screen (and all children).
@@ -122,7 +120,7 @@ namespace osu.Game.Screens
             Anchor = Anchor.Centre;
             Origin = Anchor.Centre;
 
-            status = null;
+            activity = null;
         }
 
         [BackgroundDependencyLoader(true)]
@@ -152,27 +150,14 @@ namespace osu.Game.Screens
             sampleExit?.Play();
             applyArrivingDefaults(true);
 
-            if (api != null)
-                api.LocalUser.Value.Status.ValueChanged += userStatusChanged;
-
             ScreenStatus = ScreenStatus;
 
             base.OnResuming(last);
         }
 
-        private void userStatusChanged(ValueChangedEvent<UserStatus> obj)
-        {
-            if (obj.NewValue?.GetType() == ScreenStatus?.GetType()) return; //don't update the user's status if the current status is of the same type as the given one
-
-            setUserStatus(ScreenStatus);
-        }
-
         public override void OnSuspending(IScreen next)
         {
             base.OnSuspending(next);
-
-            if (api != null)
-                api.LocalUser.Value.Status.ValueChanged -= userStatusChanged;
 
             onSuspendingLogo();
         }
@@ -183,10 +168,7 @@ namespace osu.Game.Screens
 
             backgroundStack?.Push(localBackground = CreateBackground());
 
-            if (api != null)
-                api.LocalUser.Value.Status.ValueChanged += userStatusChanged;
-
-            ScreenStatus = InitialScreenStatus;
+            ScreenStatus = InitialScreenActivity;
 
             base.OnEntering(last);
         }
@@ -196,9 +178,6 @@ namespace osu.Game.Screens
             if (ValidForResume && logo != null)
                 onExitingLogo();
 
-            if (api != null)
-                api.LocalUser.Value.Status.ValueChanged -= userStatusChanged;
-
             if (base.OnExiting(next))
                 return true;
 
@@ -206,16 +185,6 @@ namespace osu.Game.Screens
                 backgroundStack?.Exit();
 
             return false;
-        }
-
-        private void setUserStatus(UserStatus status)
-        {
-            if (api == null) return;
-            if (status == null) return;
-
-            if (!(api.LocalUser.Value.Status.Value is UserStatusOnline)) return; //don't update the user's status if the current status doesn't allow to be modified by screens (eg: DND / Offline)
-
-            api.LocalUser.Value.Status.Value = status;
         }
 
         /// <summary>
