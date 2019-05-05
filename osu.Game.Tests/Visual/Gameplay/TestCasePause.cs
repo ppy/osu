@@ -12,7 +12,6 @@ using osu.Game.Rulesets;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Screens.Play;
-using osu.Game.Users;
 using osuTK;
 using osuTK.Input;
 

@@ -275,7 +275,6 @@ namespace osu.Game.Tests.Visual.Background
 
         private class DummySongSelect : PlaySongSelect
         {
-
             protected override BackgroundScreen CreateBackground()
             {
                 FadeAccessibleBackground background = new FadeAccessibleBackground(Beatmap.Value);
@@ -319,7 +318,6 @@ namespace osu.Game.Tests.Visual.Background
 
         private class FadeAccessibleResults : SoloResults
         {
-
             public FadeAccessibleResults(ScoreInfo score)
                 : base(score)
             {
@@ -332,7 +330,6 @@ namespace osu.Game.Tests.Visual.Background
 
         private class TestPlayer : Player
         {
-
             protected override BackgroundScreen CreateBackground() => new FadeAccessibleBackground(Beatmap.Value);
 
             protected override UserDimContainer CreateStoryboardContainer()

@@ -238,10 +238,10 @@ namespace osu.Game.Users
                     statusBg.FadeColour(activity.GetAppropriateColour(colours), 500, Easing.OutQuint);
                     return;
                 }
-
-                statusMessage.Text = status.Message;
-                statusBg.FadeColour(status?.GetAppropriateColour(colours) ?? colours.Gray5, 500, Easing.OutQuint);
             }
+
+            statusMessage.Text = status?.Message;
+            statusBg.FadeColour(status?.GetAppropriateColour(colours) ?? colours.Gray5, 500, Easing.OutQuint);
         }
 
         public MenuItem[] ContextMenuItems => new MenuItem[]
