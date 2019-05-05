@@ -275,7 +275,6 @@ namespace osu.Game.Tests.Visual.Background
 
         private class DummySongSelect : PlaySongSelect
         {
-            protected override UserStatusOnline InitialScreenStatus => null;
 
             protected override BackgroundScreen CreateBackground()
             {
@@ -320,7 +319,6 @@ namespace osu.Game.Tests.Visual.Background
 
         private class FadeAccessibleResults : SoloResults
         {
-            protected override UserStatusOnline InitialScreenStatus => null;
 
             public FadeAccessibleResults(ScoreInfo score)
                 : base(score)
@@ -334,7 +332,6 @@ namespace osu.Game.Tests.Visual.Background
 
         private class TestPlayer : Player
         {
-            protected override UserStatusOnline InitialScreenStatus => null;
 
             protected override BackgroundScreen CreateBackground() => new FadeAccessibleBackground(Beatmap.Value);
 
@@ -382,8 +379,6 @@ namespace osu.Game.Tests.Visual.Background
         {
             public VisualSettings VisualSettingsPos => VisualSettings;
             public BackgroundScreen ScreenPos => Background;
-
-            protected override UserStatusOnline InitialScreenStatus => null;
 
             public TestPlayerLoader(Player player)
                 : base(() => player)
