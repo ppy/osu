@@ -64,15 +64,15 @@ namespace osu.Game.Screens
         /// </summary>
         protected UserActivity ScreenActivity
         {
+            get => activity;
             set
             {
-                if (value == null) return;
+                if (value == activity) return;
                 if (api == null) return;
 
                 activity = value;
                 api.LocalUser.Value.Activity.Value = activity;
             }
-            get => activity;
         }
 
         private UserActivity activity;

@@ -65,6 +65,4 @@ namespace osu.Game.Users
     {
         public override string Status => @"in Multiplayer Lobby";
     }
-
-
 }

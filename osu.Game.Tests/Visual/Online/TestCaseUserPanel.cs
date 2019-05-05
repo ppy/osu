@@ -12,8 +12,8 @@ namespace osu.Game.Tests.Visual.Online
     [TestFixture]
     public class TestCaseUserPanel : OsuTestCase
     {
-        UserPanel flyte;
-        UserPanel peppy;
+        private readonly UserPanel flyte;
+        private readonly UserPanel peppy;
 
         public TestCaseUserPanel()
         {
