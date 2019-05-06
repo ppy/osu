@@ -177,6 +177,8 @@ namespace osu.Game.Scoring
         protected class DeserializedMod : IMod
         {
             public string Acronym { get; set; }
+
+            public bool Equals(IMod other) => Acronym == other?.Acronym;
         }
 
         public override string ToString() => $"{User} playing {Beatmap}";
