@@ -68,10 +68,9 @@ namespace osu.Game.Screens
             set
             {
                 if (value == activity) return;
-                if (api == null) return;
 
                 activity = value;
-                api.LocalUser.Value.Activity.Value = activity;
+                setUserActivity(activity);
             }
         }
 
@@ -150,7 +149,7 @@ namespace osu.Game.Screens
             sampleExit?.Play();
             applyArrivingDefaults(true);
 
-            ScreenActivity = ScreenActivity;
+            setUserActivity(activity);
 
             base.OnResuming(last);
         }
@@ -158,6 +157,8 @@ namespace osu.Game.Screens
         public override void OnSuspending(IScreen next)
         {
             base.OnSuspending(next);
+
+            setUserActivity(null);
 
             onSuspendingLogo();
         }
@@ -175,6 +176,8 @@ namespace osu.Game.Screens
 
         public override bool OnExiting(IScreen next)
         {
+            setUserActivity(null);
+
             if (ValidForResume && logo != null)
                 onExitingLogo();
 
@@ -185,6 +188,13 @@ namespace osu.Game.Screens
                 backgroundStack?.Exit();
 
             return false;
+        }
+
+        private void setUserActivity(UserActivity activity)
+        {
+            if (api == null) return;
+
+            api.LocalUser.Value.Activity.Value = activity;
         }
 
         /// <summary>
