@@ -183,6 +183,7 @@ namespace osu.Game.Screens.Play
                                 using (BeginDelayedSequence(1000))
                                     scheduledHide = Schedule(() => State = Visibility.Hidden);
                             break;
+
                         case Visibility.Hidden:
                             this.FadeOut(1000, Easing.OutExpo);
                             break;
