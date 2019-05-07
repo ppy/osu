@@ -10,5 +10,17 @@ namespace osu.Game.Rulesets.Mania.Judgements
         public override bool AffectsCombo => false;
 
         protected override int NumericResultFor(HitResult result) => 20;
+
+        protected override double HealthIncreaseFor(HitResult result)
+        {
+            switch (result)
+            {
+                case HitResult.Miss:
+                    return 0;
+
+                default:
+                    return 0.040;
+            }
+        }
     }
 }

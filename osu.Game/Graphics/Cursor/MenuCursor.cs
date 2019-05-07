@@ -45,10 +45,12 @@ namespace osu.Game.Graphics.Cursor
             {
                 var position = e.MousePosition;
                 var distance = Vector2Extensions.Distance(position, positionMouseDown);
+
                 // don't start rotating until we're moved a minimum distance away from the mouse down location,
                 // else it can have an annoying effect.
                 if (dragRotationState == DragRotationState.DragStarted && distance > 30)
                     dragRotationState = DragRotationState.Rotating;
+
                 // don't rotate when distance is zero to avoid NaN
                 if (dragRotationState == DragRotationState.Rotating && distance > 0)
                 {

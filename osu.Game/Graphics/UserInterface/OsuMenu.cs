@@ -88,9 +88,11 @@ namespace osu.Game.Graphics.UserInterface
                     case MenuItemType.Standard:
                         text.Colour = Color4.White;
                         break;
+
                     case MenuItemType.Destructive:
                         text.Colour = Color4.Red;
                         break;
+
                     case MenuItemType.Highlighted:
                         text.Colour = OsuColour.FromHex(@"ffcc22");
                         break;
