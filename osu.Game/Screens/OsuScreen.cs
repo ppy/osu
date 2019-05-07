@@ -158,8 +158,6 @@ namespace osu.Game.Screens
         {
             base.OnSuspending(next);
 
-            setUserActivity(null);
-
             onSuspendingLogo();
         }
 
@@ -176,8 +174,6 @@ namespace osu.Game.Screens
 
         public override bool OnExiting(IScreen next)
         {
-            setUserActivity(null);
-
             if (ValidForResume && logo != null)
                 onExitingLogo();
 
