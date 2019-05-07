@@ -65,6 +65,7 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
                 case ArmedState.Miss:
                     this.FadeOut(150, Easing.In).Expire();
                     break;
+
                 case ArmedState.Hit:
                     this.FadeOut(150, Easing.OutQuint).Expire();
                     break;

@@ -32,6 +32,7 @@ namespace osu.Game.Rulesets.Catch.Scoring
             {
                 case HitResult.Miss:
                     return hpDrainRate;
+
                 default:
                     return 10.2 - hpDrainRate; // Award less HP as drain rate is increased
             }
