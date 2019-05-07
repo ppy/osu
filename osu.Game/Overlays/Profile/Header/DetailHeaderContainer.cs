@@ -26,14 +26,40 @@ namespace osu.Game.Overlays.Profile.Header
         private OverlinedInfoContainer ppInfo;
         private OverlinedInfoContainer detailGlobalRank;
         private OverlinedInfoContainer detailCountryRank;
+        private FillFlowContainer fillFlow;
         private RankGraph rankGraph;
 
         public readonly Bindable<User> User = new Bindable<User>();
+
+        private bool expanded = true;
+
+        public bool Expanded
+        {
+            set
+            {
+                if (expanded == value) return;
+
+                expanded = value;
+
+                if (fillFlow == null) return;
+
+                fillFlow.ClearTransforms();
+
+                if (expanded)
+                    fillFlow.AutoSizeAxes = Axes.Y;
+                else
+                {
+                    fillFlow.AutoSizeAxes = Axes.None;
+                    fillFlow.ResizeHeightTo(0, 200, Easing.OutQuint);
+                }
+            }
+        }
 
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
             AutoSizeAxes = Axes.Y;
+
             User.ValueChanged += e => updateDisplay(e.NewValue);
 
             InternalChildren = new Drawable[]
@@ -43,10 +69,13 @@ namespace osu.Game.Overlays.Profile.Header
                     RelativeSizeAxes = Axes.Both,
                     Colour = colours.CommunityUserGrayGreenDarkest,
                 },
-                new FillFlowContainer
+                fillFlow = new FillFlowContainer
                 {
                     RelativeSizeAxes = Axes.X,
-                    AutoSizeAxes = Axes.Y,
+                    AutoSizeAxes = expanded ? Axes.Y : Axes.None,
+                    AutoSizeDuration = 200,
+                    AutoSizeEasing = Easing.OutQuint,
+                    Masking = true,
                     Padding = new MarginPadding { Horizontal = UserProfileOverlay.CONTENT_X_MARGIN, Vertical = 10 },
                     Direction = FillDirection.Vertical,
                     Spacing = new Vector2(0, 20),
@@ -148,8 +177,8 @@ namespace osu.Game.Overlays.Profile.Header
             foreach (var scoreRankInfo in scoreRankInfos)
                 scoreRankInfo.Value.RankCount = user?.Statistics?.GradesCount[scoreRankInfo.Key] ?? 0;
 
-            detailGlobalRank.Content = user?.Statistics?.Ranks.Global?.ToString("#,##0") ?? "-";
-            detailCountryRank.Content = user?.Statistics?.Ranks.Country?.ToString("#,##0") ?? "-";
+            detailGlobalRank.Content = user?.Statistics?.Ranks.Global?.ToString("\\##,##0") ?? "-";
+            detailCountryRank.Content = user?.Statistics?.Ranks.Country?.ToString("\\##,##0") ?? "-";
 
             rankGraph.User.Value = user;
         }
