@@ -44,14 +44,17 @@ namespace osu.Game.Online.Leaderboards
         private void updateTexture()
         {
             string textureName;
+
             switch (Rank)
             {
                 default:
                     textureName = Rank.GetDescription();
                     break;
+
                 case ScoreRank.SH:
                     textureName = "SPlus";
                     break;
+
                 case ScoreRank.XH:
                     textureName = "SSPlus";
                     break;
