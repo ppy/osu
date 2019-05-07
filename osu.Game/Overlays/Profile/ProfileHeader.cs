@@ -135,7 +135,6 @@ namespace osu.Game.Overlays.Profile
         }
 
         private class ProfileHeaderTitle : ScreenTitle
-
         {
             public ProfileHeaderTitle()
             {
@@ -145,8 +144,9 @@ namespace osu.Game.Overlays.Profile
 
             [BackgroundDependencyLoader]
             private void load(OsuColour colours)
-
+            {
                 AccentColour = colours.CommunityUserGreen;
+            }
         }
     }
 }

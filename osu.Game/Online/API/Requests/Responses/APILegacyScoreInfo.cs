@@ -70,7 +70,6 @@ namespace osu.Game.Online.API.Requests.Responses
             {
                 foreach (var kvp in value)
                 {
-
                     switch (kvp.Key)
                     {
                         case @"count_geki":
