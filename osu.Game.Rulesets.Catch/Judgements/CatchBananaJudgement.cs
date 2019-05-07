@@ -30,7 +30,7 @@ namespace osu.Game.Rulesets.Catch.Judgements
                     return 0;
 
                 case HitResult.Perfect:
-                    return 8;
+                    return 0.008;
             }
         }
 

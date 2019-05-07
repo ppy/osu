@@ -142,6 +142,17 @@ namespace osu.Game.Graphics.Containers
 
         public void ScrollToTop() => scrollContainer.ScrollTo(0);
 
+        public override void InvalidateFromChild(Invalidation invalidation, Drawable source = null)
+        {
+            base.InvalidateFromChild(invalidation, source);
+
+            if ((invalidation & Invalidation.DrawSize) != 0)
+            {
+                if (source == ExpandableHeader) //We need to recalculate the positions if the ExpandableHeader changed its size
+                    lastKnownScroll = -1;
+            }
+        }
+
         private float lastKnownScroll;
 
         protected override void UpdateAfterChildren()

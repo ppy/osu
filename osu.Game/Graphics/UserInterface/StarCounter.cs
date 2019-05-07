@@ -145,7 +145,7 @@ namespace osu.Game.Graphics.UserInterface
                 Child = Icon = new SpriteIcon
                 {
                     Size = new Vector2(star_size),
-                    Icon = FontAwesome.Star,
+                    Icon = FontAwesome.Solid.Star,
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
                 };

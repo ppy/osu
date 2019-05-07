@@ -49,7 +49,7 @@ namespace osu.Game.Overlays.Direct
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
                             Size = new Vector2(13),
-                            Icon = FontAwesome.Download,
+                            Icon = FontAwesome.Solid.Download,
                         },
                         checkmark = new SpriteIcon
                         {
@@ -57,7 +57,7 @@ namespace osu.Game.Overlays.Direct
                             Origin = Anchor.Centre,
                             X = 8,
                             Size = Vector2.Zero,
-                            Icon = FontAwesome.Check,
+                            Icon = FontAwesome.Solid.Check,
                         }
                     }
                 }

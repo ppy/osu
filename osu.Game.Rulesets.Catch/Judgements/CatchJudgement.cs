@@ -28,10 +28,10 @@ namespace osu.Game.Rulesets.Catch.Judgements
             switch (result)
             {
                 default:
-                    return 0;
+                    return -0.02;
 
                 case HitResult.Perfect:
-                    return 10.2;
+                    return 0.01;
             }
         }
 

@@ -4,6 +4,7 @@
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Events;
@@ -141,7 +142,7 @@ namespace osu.Game.Screens.Select.Options
                             Anchor = Anchor.TopCentre,
                             Size = new Vector2(30),
                             Shadow = true,
-                            Icon = FontAwesome.Close,
+                            Icon = FontAwesome.Solid.TimesCircle,
                             Margin = new MarginPadding
                             {
                                 Bottom = 5,

@@ -6,6 +6,7 @@ using System.Linq;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Events;
@@ -167,7 +168,7 @@ namespace osu.Game.Overlays.Dialog
                                                 {
                                                     Origin = Anchor.Centre,
                                                     Anchor = Anchor.Centre,
-                                                    Icon = FontAwesome.Close,
+                                                    Icon = FontAwesome.Solid.TimesCircle,
                                                     Size = new Vector2(50),
                                                 },
                                             },

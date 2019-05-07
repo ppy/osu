@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.IO;
 using NUnit.Framework;
 using osuTK;
@@ -13,6 +14,7 @@ using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Beatmaps.Formats;
 using osu.Game.Beatmaps.Timing;
 using osu.Game.Rulesets.Catch.Beatmaps;
+using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Legacy;
 using osu.Game.Rulesets.Osu;
@@ -39,7 +41,7 @@ namespace osu.Game.Tests.Beatmaps.Formats
 
                 Assert.AreEqual(6, working.BeatmapInfo.BeatmapVersion);
                 Assert.AreEqual(6, working.Beatmap.BeatmapInfo.BeatmapVersion);
-                Assert.AreEqual(6, working.GetPlayableBeatmap(new OsuRuleset().RulesetInfo).BeatmapInfo.BeatmapVersion);
+                Assert.AreEqual(6, working.GetPlayableBeatmap(new OsuRuleset().RulesetInfo, Array.Empty<Mod>()).BeatmapInfo.BeatmapVersion);
             }
         }
 

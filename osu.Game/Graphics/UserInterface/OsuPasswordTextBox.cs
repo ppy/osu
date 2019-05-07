@@ -108,7 +108,7 @@ namespace osu.Game.Graphics.UserInterface
 
             public CapsWarning()
             {
-                Icon = FontAwesome.Warning;
+                Icon = FontAwesome.Solid.ExclamationTriangle;
             }
 
             [BackgroundDependencyLoader]

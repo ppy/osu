@@ -9,6 +9,7 @@ using osuTK;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Lines;
+using osuTK.Graphics;
 
 namespace osu.Game.Graphics.UserInterface
 {
@@ -61,6 +62,12 @@ namespace osu.Game.Graphics.UserInterface
                 maskingContainer.Width = 0;
                 maskingContainer.ResizeWidthTo(1, transform_duration, Easing.OutQuint);
             }
+        }
+
+        public Color4 LineColour
+        {
+            get => maskingContainer.Colour;
+            set => maskingContainer.Colour = value;
         }
 
         public LineGraph()

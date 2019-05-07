@@ -16,6 +16,7 @@ using osuTK.Input;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Game.Graphics.Containers;
 using osu.Framework.Audio.Track;
+using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Events;
 using osu.Game.Beatmaps.ControlPoints;
@@ -63,6 +64,8 @@ namespace osu.Game.Screens.Menu
             {
                 box = new Container
                 {
+                    // box needs to be always present to ensure the button is always sized correctly for flow
+                    AlwaysPresent = true,
                     Masking = true,
                     MaskingSmoothness = 2,
                     EdgeEffect = new EdgeEffectParameters

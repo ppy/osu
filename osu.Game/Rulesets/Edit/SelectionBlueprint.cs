@@ -68,7 +68,8 @@ namespace osu.Game.Rulesets.Edit
             get => state;
             set
             {
-                if (state == value) return;
+                if (state == value)
+                    return;
 
                 state = value;
 
@@ -84,6 +85,8 @@ namespace osu.Game.Rulesets.Edit
                         Deselected?.Invoke(this);
                         break;
                 }
+
+                StateChanged?.Invoke(state);
             }
         }
 

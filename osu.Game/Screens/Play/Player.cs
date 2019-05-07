@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
@@ -43,6 +44,8 @@ namespace osu.Game.Screens.Play
 
         public bool HasFailed { get; private set; }
 
+        public bool PauseOnFocusLost { get; set; } = true;
+
         private Bindable<bool> mouseWheelDisabled;
 
         private readonly Bindable<bool> storyboardReplacesBackground = new Bindable<bool>();
@@ -67,6 +70,10 @@ namespace osu.Game.Screens.Play
 
         protected GameplayClockContainer GameplayClockContainer { get; private set; }
 
+        [Cached]
+        [Cached(Type = typeof(IBindable<IReadOnlyList<Mod>>))]
+        protected new readonly Bindable<IReadOnlyList<Mod>> Mods = new Bindable<IReadOnlyList<Mod>>(Array.Empty<Mod>());
+
         private readonly bool allowPause;
         private readonly bool showResults;
 
@@ -86,6 +93,8 @@ namespace osu.Game.Screens.Play
         {
             this.api = api;
 
+            Mods.Value = base.Mods.Value.Select(m => m.CreateCopy()).ToArray();
+
             WorkingBeatmap working = loadBeatmap();
 
             if (working == null)
@@ -97,10 +106,12 @@ namespace osu.Game.Screens.Play
             showStoryboard = config.GetBindable<bool>(OsuSetting.ShowStoryboard);
 
             ScoreProcessor = DrawableRuleset.CreateScoreProcessor();
+            ScoreProcessor.Mods.BindTo(Mods);
+
             if (!ScoreProcessor.Mode.Disabled)
                 config.BindWith(OsuSetting.ScoreDisplayMode, ScoreProcessor.Mode);
 
-            InternalChild = GameplayClockContainer = new GameplayClockContainer(working, DrawableRuleset.GameplayStartTime);
+            InternalChild = GameplayClockContainer = new GameplayClockContainer(working, Mods.Value, DrawableRuleset.GameplayStartTime);
 
             GameplayClockContainer.Children = new[]
             {
@@ -121,7 +132,7 @@ namespace osu.Game.Screens.Play
                 },
                 // display the cursor above some HUD elements.
                 DrawableRuleset.Cursor?.CreateProxy() ?? new Container(),
-                HUDOverlay = new HUDOverlay(ScoreProcessor, DrawableRuleset, working)
+                HUDOverlay = new HUDOverlay(ScoreProcessor, DrawableRuleset, Mods.Value)
                 {
                     HoldToQuit = { Action = performUserRequestedExit },
                     PlayerSettingsOverlay = { PlaybackSettings = { UserPlaybackRate = { BindTarget = GameplayClockContainer.UserPlaybackRate } } },
@@ -168,7 +179,7 @@ namespace osu.Game.Screens.Play
             ScoreProcessor.AllJudged += onCompletion;
             ScoreProcessor.Failed += onFail;
 
-            foreach (var mod in Beatmap.Value.Mods.Value.OfType<IApplicableToScoreProcessor>())
+            foreach (var mod in Mods.Value.OfType<IApplicableToScoreProcessor>())
                 mod.ApplyToScoreProcessor(ScoreProcessor);
         }
 
@@ -190,7 +201,7 @@ namespace osu.Game.Screens.Play
 
                 try
                 {
-                    DrawableRuleset = rulesetInstance.CreateDrawableRulesetWith(working);
+                    DrawableRuleset = rulesetInstance.CreateDrawableRulesetWith(working, Mods.Value);
                 }
                 catch (BeatmapInvalidForRulesetException)
                 {
@@ -198,7 +209,7 @@ namespace osu.Game.Screens.Play
                     // let's try again forcing the beatmap's ruleset.
                     ruleset = beatmap.BeatmapInfo.Ruleset;
                     rulesetInstance = ruleset.CreateInstance();
-                    DrawableRuleset = rulesetInstance.CreateDrawableRulesetWith(Beatmap.Value);
+                    DrawableRuleset = rulesetInstance.CreateDrawableRulesetWith(Beatmap.Value, Mods.Value);
                 }
 
                 if (!DrawableRuleset.Objects.Any())
@@ -269,7 +280,7 @@ namespace osu.Game.Screens.Play
             {
                 Beatmap = Beatmap.Value.BeatmapInfo,
                 Ruleset = ruleset,
-                Mods = Beatmap.Value.Mods.Value.ToArray(),
+                Mods = Mods.Value.ToArray(),
                 User = api.LocalUser.Value,
             };
 
@@ -323,7 +334,7 @@ namespace osu.Game.Screens.Play
 
         private bool onFail()
         {
-            if (Beatmap.Value.Mods.Value.OfType<IApplicableFailOverride>().Any(m => !m.AllowFail))
+            if (Mods.Value.OfType<IApplicableFailOverride>().Any(m => !m.AllowFail))
                 return false;
 
             GameplayClockContainer.Stop();
@@ -382,7 +393,7 @@ namespace osu.Game.Screens.Play
             base.Update();
 
             // eagerly pause when we lose window focus (if we are locally playing).
-            if (!Game.IsActive.Value)
+            if (PauseOnFocusLost && !Game.IsActive.Value)
                 Pause();
         }
 

@@ -57,16 +57,23 @@ namespace osu.Game.Rulesets.UI
             hitObjectContainerLazy = new Lazy<HitObjectContainer>(CreateHitObjectContainer);
         }
 
-        private WorkingBeatmap beatmap;
+        [Resolved]
+        private IBindable<WorkingBeatmap> beatmap { get; set; }
+
+        [Resolved]
+        private IReadOnlyList<Mod> mods { get; set; }
 
         [BackgroundDependencyLoader]
-        private void load(IBindable<WorkingBeatmap> beatmap)
+        private void load()
         {
-            this.beatmap = beatmap.Value;
-
             Cursor = CreateCursor();
             if (Cursor != null)
+            {
+                // initial showing of the cursor will be handed by MenuCursorContainer (via DrawableRuleset's IProvideCursor implementation).
+                Cursor.Hide();
+
                 AddInternal(Cursor);
+            }
         }
 
         /// <summary>
@@ -93,15 +100,9 @@ namespace osu.Game.Rulesets.UI
 
         /// <summary>
         /// Provide an optional cursor which is to be used for gameplay.
-        /// If providing a cursor, <see cref="CursorTargetContainer"/> must also point to a valid target container.
         /// </summary>
         /// <returns>The cursor, or null if a cursor is not rqeuired.</returns>
         protected virtual GameplayCursorContainer CreateCursor() => null;
-
-        /// <summary>
-        /// The target container to add the cursor after it is created.
-        /// </summary>
-        protected virtual Container CursorTargetContainer => null;
 
         /// <summary>
         /// Registers a <see cref="Playfield"/> as a nested <see cref="Playfield"/>.
@@ -128,7 +129,7 @@ namespace osu.Game.Rulesets.UI
             base.Update();
 
             if (beatmap != null)
-                foreach (var mod in beatmap.Mods.Value)
+                foreach (var mod in mods)
                     if (mod is IUpdatableByPlayfield updatable)
                         updatable.Update(this);
         }
