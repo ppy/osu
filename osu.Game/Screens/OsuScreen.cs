@@ -83,6 +83,8 @@ namespace osu.Game.Screens
 
         private SampleChannel sampleExit;
 
+        protected virtual bool PlayResumeSound => true;
+
         public virtual float BackgroundParallaxAmount => 1;
 
         public Bindable<WorkingBeatmap> Beatmap { get; private set; }
@@ -146,7 +148,8 @@ namespace osu.Game.Screens
 
         public override void OnResuming(IScreen last)
         {
-            sampleExit?.Play();
+            if (PlayResumeSound)
+                sampleExit?.Play();
             applyArrivingDefaults(true);
 
             setUserActivity(activity);

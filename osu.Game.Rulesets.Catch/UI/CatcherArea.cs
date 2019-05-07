@@ -292,6 +292,7 @@ namespace osu.Game.Rulesets.Catch.UI
                 const float hyper_dash_transition_length = 180;
 
                 bool previouslyHyperDashing = HyperDashing;
+
                 if (modifier <= 1 || X == targetPosition)
                 {
                     hyperDashModifier = 1;
@@ -325,9 +326,11 @@ namespace osu.Game.Rulesets.Catch.UI
                     case CatchAction.MoveLeft:
                         currentDirection--;
                         return true;
+
                     case CatchAction.MoveRight:
                         currentDirection++;
                         return true;
+
                     case CatchAction.Dash:
                         Dashing = true;
                         return true;
@@ -343,9 +346,11 @@ namespace osu.Game.Rulesets.Catch.UI
                     case CatchAction.MoveLeft:
                         currentDirection++;
                         return true;
+
                     case CatchAction.MoveRight:
                         currentDirection--;
                         return true;
+
                     case CatchAction.Dash:
                         Dashing = false;
                         return true;

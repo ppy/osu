@@ -19,6 +19,7 @@ namespace osu.Game.Tests.Beatmaps.Formats
         public void TestDecodeStoryboardEvents()
         {
             var decoder = new LegacyStoryboardDecoder();
+
             using (var resStream = TestResources.OpenResource("Himeringo - Yotsuya-san ni Yoroshiku (RLC) [Winber1's Extreme].osu"))
             using (var stream = new StreamReader(resStream))
             {
@@ -91,6 +92,7 @@ namespace osu.Game.Tests.Beatmaps.Formats
         public void TestDecodeVariableWithSuffix()
         {
             var decoder = new LegacyStoryboardDecoder();
+
             using (var resStream = TestResources.OpenResource("variable-with-suffix.osb"))
             using (var stream = new StreamReader(resStream))
             {
