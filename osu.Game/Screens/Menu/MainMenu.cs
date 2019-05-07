@@ -20,6 +20,7 @@ using osu.Game.Screens.Multi;
 using osu.Game.Screens.Select;
 using osu.Game.Screens.Tournament;
 using osu.Framework.Platform;
+using osu.Framework.Threading;
 
 namespace osu.Game.Screens.Menu
 {
@@ -42,7 +43,16 @@ namespace osu.Game.Screens.Menu
 
         private BackgroundScreenDefault background;
 
+        /// <summary>
+        /// A scheduled task that ends tracking for the <see cref="LogoTrackingContainer"/> and its <see cref="OsuLogo"/>
+        /// </summary>
+        private ScheduledDelegate logoTrackingDelegate;
+
         protected override BackgroundScreen CreateBackground() => background;
+
+        protected override bool ShouldBeAlive => base.ShouldBeAlive || logoTrackingDelegate?.Completed == false;
+
+        public override bool IsPresent => base.IsPresent || logoTrackingDelegate?.Completed == false;
 
         [BackgroundDependencyLoader(true)]
         private void load(OsuGame game = null)
@@ -156,12 +166,13 @@ namespace osu.Game.Screens.Menu
 
         protected override void LogoSuspending(OsuLogo logo)
         {
-            var logoTrackingDelegate = Scheduler.AddDelayed(() => buttons.SetOsuLogo(null), logo_transform_duration);
+            logoTrackingDelegate = Scheduler.AddDelayed(() => buttons.SetOsuLogo(null), logo_transform_duration);
 
             logo.FadeOut(logo_transform_duration, Easing.InSine)
                 .ScaleTo(0.2f, logo_transform_duration, Easing.InSine)
                 .OnAbort(_ =>
                 {
+                    // Stop tracking immediately since any aborting animation implies the tracking container is out of scope.
                     logoTrackingDelegate.Cancel();
                     buttons.SetOsuLogo(null);
                 });
