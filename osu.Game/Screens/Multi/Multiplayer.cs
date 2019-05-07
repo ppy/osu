@@ -277,7 +277,7 @@ namespace osu.Game.Screens.Multi
 
             updatePollingRate(isIdle.Value);
 
-            if (screenStack.CurrentScreen == null)
+            if (screenStack.CurrentScreen == null && this.IsCurrentScreen())
                 this.Exit();
         }
 

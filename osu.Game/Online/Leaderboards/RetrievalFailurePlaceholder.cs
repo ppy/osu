@@ -41,7 +41,7 @@ namespace osu.Game.Online.Leaderboards
                     Action = () => Action?.Invoke(),
                     Child = icon = new SpriteIcon
                     {
-                        Icon = FontAwesome.Refresh,
+                        Icon = FontAwesome.Solid.Sync,
                         Size = new Vector2(TEXT_SIZE),
                         Shadow = true,
                     },

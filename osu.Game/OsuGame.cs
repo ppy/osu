@@ -112,8 +112,8 @@ namespace osu.Game
 
         // todo: move this to SongSelect once Screen has the ability to unsuspend.
         [Cached]
-        [Cached(Type = typeof(IBindable<IEnumerable<Mod>>))]
-        private readonly Bindable<IEnumerable<Mod>> selectedMods = new Bindable<IEnumerable<Mod>>(new Mod[] { });
+        [Cached(typeof(IBindable<IReadOnlyList<Mod>>))]
+        private readonly Bindable<IReadOnlyList<Mod>> mods = new Bindable<IReadOnlyList<Mod>>(Array.Empty<Mod>());
 
         public OsuGame(string[] args = null)
         {
@@ -254,6 +254,12 @@ namespace osu.Game
                 if (menuScreen.IsCurrentScreen())
                     menuScreen.LoadToSolo();
 
+                // we might even already be at the song
+                if (Beatmap.Value.BeatmapSetInfo.Hash == databasedSet.Hash)
+                {
+                    return;
+                }
+
                 // Use first beatmap available for current ruleset, else switch ruleset.
                 var first = databasedSet.Beatmaps.Find(b => b.Ruleset == ruleset.Value) ?? databasedSet.Beatmaps.First();
 
@@ -266,7 +272,6 @@ namespace osu.Game
         /// Present a score's replay immediately.
         /// The user should have already requested this interactively.
         /// </summary>
-        /// <param name="beatmap">The beatmap to select.</param>
         public void PresentScore(ScoreInfo score)
         {
             var databasedScore = ScoreManager.GetScore(score);
@@ -289,9 +294,8 @@ namespace osu.Game
             performFromMainMenu(() =>
             {
                 ruleset.Value = databasedScoreInfo.Ruleset;
-
                 Beatmap.Value = BeatmapManager.GetWorkingBeatmap(databasedBeatmap);
-                Beatmap.Value.Mods.Value = databasedScoreInfo.Mods;
+                mods.Value = databasedScoreInfo.Mods;
 
                 menuScreen.Push(new PlayerLoader(() => new ReplayPlayer(databasedScore)));
             }, $"watch {databasedScoreInfo}", bypassScreenAllowChecks: true);
@@ -395,7 +399,8 @@ namespace osu.Game
                     }
                 },
                 overlayContent = new Container { RelativeSizeAxes = Axes.Both },
-                floatingOverlayContent = new Container { RelativeSizeAxes = Axes.Both },
+                rightFloatingOverlayContent = new Container { RelativeSizeAxes = Axes.Both },
+                leftFloatingOverlayContent = new Container { RelativeSizeAxes = Axes.Both },
                 topMostOverlayContent = new Container { RelativeSizeAxes = Axes.Both },
                 idleTracker = new GameIdleTracker(6000)
             });
@@ -423,15 +428,15 @@ namespace osu.Game
                 },
             }, topMostOverlayContent.Add);
 
-            loadComponentSingleFile(volume = new VolumeOverlay(), floatingOverlayContent.Add);
+            loadComponentSingleFile(volume = new VolumeOverlay(), leftFloatingOverlayContent.Add);
             loadComponentSingleFile(onscreenDisplay = new OnScreenDisplay(), Add);
 
-            loadComponentSingleFile(loginOverlay = new LoginOverlay
+            loadComponentSingleFile(notifications = new NotificationOverlay
             {
                 GetToolbarHeight = () => ToolbarOffset,
                 Anchor = Anchor.TopRight,
                 Origin = Anchor.TopRight,
-            }, floatingOverlayContent.Add);
+            }, rightFloatingOverlayContent.Add);
 
             loadComponentSingleFile(screenshotManager, Add);
 
@@ -440,28 +445,26 @@ namespace osu.Game
             loadComponentSingleFile(social = new SocialOverlay(), overlayContent.Add);
             loadComponentSingleFile(channelManager = new ChannelManager(), AddInternal);
             loadComponentSingleFile(chatOverlay = new ChatOverlay(), overlayContent.Add);
-            loadComponentSingleFile(settings = new MainSettings { GetToolbarHeight = () => ToolbarOffset }, floatingOverlayContent.Add);
+            loadComponentSingleFile(settings = new MainSettings { GetToolbarHeight = () => ToolbarOffset }, leftFloatingOverlayContent.Add);
             loadComponentSingleFile(userProfile = new UserProfileOverlay(), overlayContent.Add);
             loadComponentSingleFile(beatmapSetOverlay = new BeatmapSetOverlay(), overlayContent.Add);
 
-            loadComponentSingleFile(notifications = new NotificationOverlay
+            loadComponentSingleFile(loginOverlay = new LoginOverlay
             {
                 GetToolbarHeight = () => ToolbarOffset,
                 Anchor = Anchor.TopRight,
                 Origin = Anchor.TopRight,
-            }, floatingOverlayContent.Add);
+            }, rightFloatingOverlayContent.Add);
 
             loadComponentSingleFile(musicController = new MusicController
             {
                 GetToolbarHeight = () => ToolbarOffset,
                 Anchor = Anchor.TopRight,
                 Origin = Anchor.TopRight,
-            }, floatingOverlayContent.Add);
+            }, rightFloatingOverlayContent.Add);
 
             loadComponentSingleFile(accountCreation = new AccountCreationOverlay(), topMostOverlayContent.Add);
-
             loadComponentSingleFile(dialogOverlay = new DialogOverlay(), topMostOverlayContent.Add);
-
             loadComponentSingleFile(externalLinkOpener = new ExternalLinkOpener(), topMostOverlayContent.Add);
 
             dependencies.CacheAs(idleTracker);
@@ -582,7 +585,7 @@ namespace osu.Game
                 {
                     Schedule(() => notifications.Post(new SimpleNotification
                     {
-                        Icon = entry.Level == LogLevel.Important ? FontAwesome.ExclamationCircle : FontAwesome.Bomb,
+                        Icon = entry.Level == LogLevel.Important ? FontAwesome.Solid.ExclamationCircle : FontAwesome.Solid.Bomb,
                         Text = entry.Message + (entry.Exception != null && IsDeployedBuild ? "\n\nThis error has been automatically reported to the devs." : string.Empty),
                     }));
                 }
@@ -590,7 +593,7 @@ namespace osu.Game
                 {
                     Schedule(() => notifications.Post(new SimpleNotification
                     {
-                        Icon = FontAwesome.EllipsisH,
+                        Icon = FontAwesome.Solid.EllipsisH,
                         Text = "Subsequent messages have been logged. Click to view log files.",
                         Activated = () =>
                         {
@@ -713,7 +716,9 @@ namespace osu.Game
 
         private Container overlayContent;
 
-        private Container floatingOverlayContent;
+        private Container rightFloatingOverlayContent;
+
+        private Container leftFloatingOverlayContent;
 
         private Container topMostOverlayContent;
 

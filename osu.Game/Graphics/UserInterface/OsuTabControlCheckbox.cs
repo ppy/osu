@@ -99,7 +99,7 @@ namespace osu.Game.Graphics.UserInterface
                         icon = new SpriteIcon
                         {
                             Size = new Vector2(14),
-                            Icon = FontAwesome.CircleOutline,
+                            Icon = FontAwesome.Regular.Circle,
                             Shadow = true,
                         },
                     },
@@ -120,12 +120,12 @@ namespace osu.Game.Graphics.UserInterface
                 if (selected.NewValue)
                 {
                     fadeIn();
-                    icon.Icon = FontAwesome.CheckCircleOutline;
+                    icon.Icon = FontAwesome.Regular.CheckCircle;
                 }
                 else
                 {
                     fadeOut();
-                    icon.Icon = FontAwesome.CircleOutline;
+                    icon.Icon = FontAwesome.Regular.Circle;
                 }
             };
         }

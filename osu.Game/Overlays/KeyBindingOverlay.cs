@@ -67,7 +67,7 @@ namespace osu.Game.Overlays
                                 Y = -15,
                                 Size = new Vector2(15),
                                 Shadow = true,
-                                Icon = FontAwesome.ChevronLeft
+                                Icon = FontAwesome.Solid.ChevronLeft
                             },
                             new OsuSpriteText
                             {

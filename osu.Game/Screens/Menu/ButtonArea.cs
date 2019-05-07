@@ -32,6 +32,7 @@ namespace osu.Game.Screens.Menu
                 RelativeSizeAxes = Axes.X,
                 Size = new Vector2(1, BUTTON_AREA_HEIGHT),
                 Alpha = 0,
+                AlwaysPresent = true, // Always needs to be present for correct tracking on initial -> toplevel state change
                 Children = new Drawable[]
                 {
                     buttonAreaBackground = new ButtonAreaBackground(),

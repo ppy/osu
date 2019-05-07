@@ -11,6 +11,7 @@ using osu.Framework.MathUtils;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Rulesets.Judgements;
+using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Taiko.Judgements;
@@ -86,7 +87,7 @@ namespace osu.Game.Rulesets.Taiko.Tests
                 Origin = Anchor.Centre,
                 RelativeSizeAxes = Axes.X,
                 Height = 768,
-                Children = new[] { drawableRuleset = new DrawableTaikoRuleset(new TaikoRuleset(), beatmap) }
+                Children = new[] { drawableRuleset = new DrawableTaikoRuleset(new TaikoRuleset(), beatmap, Array.Empty<Mod>()) }
             });
         }
 

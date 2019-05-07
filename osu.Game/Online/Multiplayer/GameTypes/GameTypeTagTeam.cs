@@ -26,14 +26,14 @@ namespace osu.Game.Online.Multiplayer.GameTypes
                 {
                     new SpriteIcon
                     {
-                        Icon = FontAwesome.Refresh,
+                        Icon = FontAwesome.Solid.Sync,
                         Size = new Vector2(size * 0.75f),
                         Colour = colours.Blue,
                         Shadow = false,
                     },
                     new SpriteIcon
                     {
-                        Icon = FontAwesome.Refresh,
+                        Icon = FontAwesome.Solid.Sync,
                         Size = new Vector2(size * 0.75f),
                         Colour = colours.Pink,
                         Shadow = false,

@@ -36,7 +36,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                 new SkinnableDrawable("Play/osu/reversearrow", _ => new SpriteIcon
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Icon = FontAwesome.ChevronRight
+                    Icon = FontAwesome.Solid.ChevronRight
                 }, restrictSize: false)
             };
         }

@@ -10,7 +10,7 @@ namespace osu.Game.Overlays.Toolbar
     {
         public ToolbarSettingsButton()
         {
-            Icon = FontAwesome.Gear;
+            Icon = FontAwesome.Solid.Cog;
             TooltipMain = "Settings";
             TooltipSub = "Change your settings";
         }

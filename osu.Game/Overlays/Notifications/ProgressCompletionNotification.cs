@@ -12,7 +12,7 @@ namespace osu.Game.Overlays.Notifications
     {
         public ProgressCompletionNotification()
         {
-            Icon = FontAwesome.Check;
+            Icon = FontAwesome.Solid.Check;
         }
 
         [BackgroundDependencyLoader]

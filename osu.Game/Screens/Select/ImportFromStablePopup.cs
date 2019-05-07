@@ -14,7 +14,7 @@ namespace osu.Game.Screens.Select
             HeaderText = @"You have no beatmaps!";
             BodyText = "An existing copy of osu! was found, though.\nWould you like to import your beatmaps (and skins)?";
 
-            Icon = FontAwesome.Plane;
+            Icon = FontAwesome.Solid.Plane;
 
             Buttons = new PopupDialogButton[]
             {

@@ -14,6 +14,7 @@ using osu.Game.Graphics;
 using osuTK;
 using osuTK.Graphics;
 using osu.Framework.Extensions.Color4Extensions;
+using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Transforms;
 using osu.Framework.Threading;
 using osu.Game.Configuration;

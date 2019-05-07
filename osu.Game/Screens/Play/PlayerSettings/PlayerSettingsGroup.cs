@@ -104,7 +104,7 @@ namespace osu.Game.Screens.Play.PlayerSettings
                                     Origin = Anchor.Centre,
                                     Anchor = Anchor.CentreRight,
                                     Position = new Vector2(-15, 0),
-                                    Icon = FontAwesome.Bars,
+                                    Icon = FontAwesome.Solid.Bars,
                                     Scale = new Vector2(0.75f),
                                     Action = () => Expanded = !Expanded,
                                 },

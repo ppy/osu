@@ -14,7 +14,7 @@ namespace osu.Game.Rulesets.Mods
         public override string Name => "Wind Down";
         public override string Acronym => "WD";
         public override string Description => "Sloooow doooown...";
-        public override IconUsage Icon => FontAwesome.ChevronCircleDown;
+        public override IconUsage Icon => FontAwesome.Solid.ChevronCircleDown;
         public override double ScoreMultiplier => 1.0;
 
         protected override double FinalRateAdjustment => -0.25;

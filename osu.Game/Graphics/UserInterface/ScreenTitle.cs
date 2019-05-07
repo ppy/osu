@@ -14,6 +14,8 @@ namespace osu.Game.Graphics.UserInterface
     {
         private readonly SpriteIcon iconSprite;
         private readonly OsuSpriteText titleText, pageText;
+        public const float ICON_WIDTH = icon_size + icon_spacing;
+        private const float icon_size = 25, icon_spacing = 10;
 
         protected IconUsage Icon
         {
@@ -48,12 +50,12 @@ namespace osu.Game.Graphics.UserInterface
                 new FillFlowContainer
                 {
                     AutoSizeAxes = Axes.Both,
-                    Spacing = new Vector2(10, 0),
+                    Spacing = new Vector2(icon_spacing, 0),
                     Children = new Drawable[]
                     {
                         iconSprite = new SpriteIcon
                         {
-                            Size = new Vector2(25),
+                            Size = new Vector2(icon_size),
                         },
                         new FillFlowContainer
                         {

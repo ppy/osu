@@ -11,7 +11,7 @@ namespace osu.Game.Rulesets.Mods
     {
         public override string Name => "Daycore";
         public override string Acronym => "DC";
-        public override IconUsage Icon => FontAwesome.Question;
+        public override IconUsage Icon => FontAwesome.Solid.Question;
         public override string Description => "Whoaaaaa...";
 
         public override void ApplyToClock(IAdjustableClock clock)

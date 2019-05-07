@@ -161,8 +161,8 @@ namespace osu.Game.Overlays.Direct
                                     Direction = FillDirection.Vertical,
                                     Children = new Drawable[]
                                     {
-                                        new Statistic(FontAwesome.PlayCircle, SetInfo.OnlineInfo?.PlayCount ?? 0),
-                                        new Statistic(FontAwesome.Heart, SetInfo.OnlineInfo?.FavouriteCount ?? 0),
+                                        new Statistic(FontAwesome.Solid.PlayCircle, SetInfo.OnlineInfo?.PlayCount ?? 0),
+                                        new Statistic(FontAwesome.Solid.Heart, SetInfo.OnlineInfo?.FavouriteCount ?? 0),
                                         new FillFlowContainer
                                         {
                                             Anchor = Anchor.TopRight,
@@ -211,12 +211,12 @@ namespace osu.Game.Overlays.Direct
 
             if (SetInfo.OnlineInfo?.HasVideo ?? false)
             {
-                statusContainer.Add(new IconPill(FontAwesome.Film) { IconSize = new Vector2(20) });
+                statusContainer.Add(new IconPill(FontAwesome.Solid.Film) { IconSize = new Vector2(20) });
             }
 
             if (SetInfo.OnlineInfo?.HasStoryboard ?? false)
             {
-                statusContainer.Add(new IconPill(FontAwesome.Image) { IconSize = new Vector2(20) });
+                statusContainer.Add(new IconPill(FontAwesome.Solid.Image) { IconSize = new Vector2(20) });
             }
 
             statusContainer.Add(new BeatmapSetOnlineStatusPill

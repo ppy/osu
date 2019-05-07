@@ -6,6 +6,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Graphics.Containers;
@@ -60,7 +61,7 @@ namespace osu.Game.Beatmaps.Drawables
                     Origin = Anchor.Centre,
                     RelativeSizeAxes = Axes.Both,
                     // the null coalesce here is only present to make unit tests work (ruleset dlls aren't copied correctly for testing at the moment)
-                    Icon = ruleset?.CreateInstance().CreateIcon() ?? new SpriteIcon { Icon = FontAwesome.QuestionCircleOutline }
+                    Icon = ruleset?.CreateInstance().CreateIcon() ?? new SpriteIcon { Icon = FontAwesome.Regular.QuestionCircle }
                 }
             };
         }

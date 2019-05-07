@@ -20,7 +20,7 @@ namespace osu.Game.Overlays.Social
         protected override Color4 BackgroundColour => OsuColour.FromHex(@"38202e");
 
         protected override SocialTab DefaultTab => SocialTab.AllPlayers;
-        protected override IconUsage Icon => FontAwesome.Users;
+        protected override IconUsage Icon => FontAwesome.Solid.Users;
 
         protected override Drawable CreateHeaderText()
         {

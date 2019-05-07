@@ -131,8 +131,8 @@ namespace osu.Game.Overlays.BeatmapSet
                             Margin = new MarginPadding { Top = 5 },
                             Children = new[]
                             {
-                                plays = new Statistic(FontAwesome.PlayCircle),
-                                favourites = new Statistic(FontAwesome.Heart),
+                                plays = new Statistic(FontAwesome.Solid.PlayCircle),
+                                favourites = new Statistic(FontAwesome.Solid.Heart),
                             },
                         },
                     },

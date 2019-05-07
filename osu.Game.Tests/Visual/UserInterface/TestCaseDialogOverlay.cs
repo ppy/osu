@@ -19,7 +19,7 @@ namespace osu.Game.Tests.Visual.UserInterface
 
             AddStep("dialog #1", () => overlay.Push(new PopupDialog
             {
-                Icon = FontAwesome.TrashOutline,
+                Icon = FontAwesome.Regular.TrashAlt,
                 HeaderText = @"Confirm deletion of",
                 BodyText = @"Ayase Rie - Yuima-ru*World TVver.",
                 Buttons = new PopupDialogButton[]
@@ -39,7 +39,7 @@ namespace osu.Game.Tests.Visual.UserInterface
 
             AddStep("dialog #2", () => overlay.Push(new PopupDialog
             {
-                Icon = FontAwesome.Gear,
+                Icon = FontAwesome.Solid.Cog,
                 HeaderText = @"What do you want to do with",
                 BodyText = "Camellia as \"Bang Riot\" - Blastix Riotz",
                 Buttons = new PopupDialogButton[]

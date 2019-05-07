@@ -93,7 +93,7 @@ namespace osu.Game.Graphics.UserInterface
                     Anchor = Anchor.CentreRight,
                     Origin = Anchor.CentreLeft,
                     Size = new Vector2(item_chevron_size),
-                    Icon = FontAwesome.ChevronRight,
+                    Icon = FontAwesome.Solid.ChevronRight,
                     Margin = new MarginPadding { Left = padding },
                     Alpha = 0f,
                 });

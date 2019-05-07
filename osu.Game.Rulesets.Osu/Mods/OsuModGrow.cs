@@ -17,7 +17,7 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         public override string Acronym => "GR";
 
-        public override IconUsage Icon => FontAwesome.ArrowsV;
+        public override IconUsage Icon => FontAwesome.Solid.ArrowsAltV;
 
         public override ModType Type => ModType.Fun;
 

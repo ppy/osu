@@ -27,7 +27,7 @@ namespace osu.Game.Overlays.Notifications
             }
         }
 
-        private IconUsage icon = FontAwesome.InfoCircle;
+        private IconUsage icon = FontAwesome.Solid.InfoCircle;
 
         public IconUsage Icon
         {

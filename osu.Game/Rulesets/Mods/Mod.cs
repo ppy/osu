@@ -28,7 +28,7 @@ namespace osu.Game.Rulesets.Mods
         /// The icon of this mod.
         /// </summary>
         [JsonIgnore]
-        public virtual IconUsage Icon => FontAwesome.Question;
+        public virtual IconUsage Icon => FontAwesome.Solid.Question;
 
         /// <summary>
         /// The type of this mod.
@@ -70,5 +70,7 @@ namespace osu.Game.Rulesets.Mods
         /// Creates a copy of this <see cref="Mod"/> initialised to a default state.
         /// </summary>
         public virtual Mod CreateCopy() => (Mod)Activator.CreateInstance(GetType());
+
+        public bool Equals(IMod other) => GetType() == other?.GetType();
     }
 }

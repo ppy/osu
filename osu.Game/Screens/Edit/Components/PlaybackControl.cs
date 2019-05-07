@@ -39,7 +39,7 @@ namespace osu.Game.Screens.Edit.Components
                     Origin = Anchor.Centre,
                     Scale = new Vector2(1.4f),
                     IconScale = new Vector2(1.4f),
-                    Icon = FontAwesome.PlayCircleOutline,
+                    Icon = FontAwesome.Regular.PlayCircle,
                     Action = togglePause,
                     Padding = new MarginPadding { Left = 20 }
                 },
@@ -89,7 +89,7 @@ namespace osu.Game.Screens.Edit.Components
         {
             base.Update();
 
-            playButton.Icon = adjustableClock.IsRunning ? FontAwesome.PauseCircleOutline : FontAwesome.PlayCircleOutline;
+            playButton.Icon = adjustableClock.IsRunning ? FontAwesome.Regular.PauseCircle : FontAwesome.Regular.PlayCircle;
         }
 
         private class PlaybackTabControl : OsuTabControl<double>

@@ -186,8 +186,8 @@ namespace osu.Game.Overlays.Direct
                     Margin = new MarginPadding { Top = vertical_padding, Right = vertical_padding },
                     Children = new[]
                     {
-                        new Statistic(FontAwesome.PlayCircle, SetInfo.OnlineInfo?.PlayCount ?? 0),
-                        new Statistic(FontAwesome.Heart, SetInfo.OnlineInfo?.FavouriteCount ?? 0),
+                        new Statistic(FontAwesome.Solid.PlayCircle, SetInfo.OnlineInfo?.PlayCount ?? 0),
+                        new Statistic(FontAwesome.Solid.Heart, SetInfo.OnlineInfo?.FavouriteCount ?? 0),
                     },
                 },
                 statusContainer = new FillFlowContainer
@@ -206,12 +206,12 @@ namespace osu.Game.Overlays.Direct
 
             if (SetInfo.OnlineInfo?.HasVideo ?? false)
             {
-                statusContainer.Add(new IconPill(FontAwesome.Film));
+                statusContainer.Add(new IconPill(FontAwesome.Solid.Film));
             }
 
             if (SetInfo.OnlineInfo?.HasStoryboard ?? false)
             {
-                statusContainer.Add(new IconPill(FontAwesome.Image));
+                statusContainer.Add(new IconPill(FontAwesome.Solid.Image));
             }
 
             statusContainer.Add(new BeatmapSetOnlineStatusPill
