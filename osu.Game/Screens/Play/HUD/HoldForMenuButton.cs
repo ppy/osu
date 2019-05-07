@@ -144,8 +144,13 @@ namespace osu.Game.Screens.Play.HUD
 
                 bind();
 
-                gameActive.BindValueChanged(_ => updateActive());
                 gameActive.BindTo(game.IsActive);
+            }
+
+            protected override void LoadComplete()
+            {
+                base.LoadComplete();
+                gameActive.BindValueChanged(_ => updateActive(), true);
             }
 
             private void bind()
@@ -195,7 +200,7 @@ namespace osu.Game.Screens.Play.HUD
                 base.OnHoverLost(e);
             }
 
-            private bool pauseOnFocusLost;
+            private bool pauseOnFocusLost = true;
 
             public bool PauseOnFocusLost
             {
@@ -205,7 +210,8 @@ namespace osu.Game.Screens.Play.HUD
                         return;
 
                     pauseOnFocusLost = value;
-                    updateActive();
+                    if (IsLoaded)
+                        updateActive();
                 }
             }
 
