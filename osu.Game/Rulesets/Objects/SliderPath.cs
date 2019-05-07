@@ -277,12 +277,5 @@ namespace osu.Game.Rulesets.Objects
 
             return ControlPoints.SequenceEqual(other.ControlPoints) && ExpectedDistance.Equals(other.ExpectedDistance) && Type == other.Type;
         }
-
-        public override bool Equals(object obj)
-        {
-            if (ReferenceEquals(null, obj)) return false;
-
-            return obj is SliderPath other && Equals(other);
-        }
     }
 }

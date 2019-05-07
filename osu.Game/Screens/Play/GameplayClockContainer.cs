@@ -95,8 +95,7 @@ namespace osu.Game.Screens.Play
 
             UserPlaybackRate.ValueChanged += _ => updateRate();
 
-            Seek(Math.Min(0, gameplayStartTime - beatmap.BeatmapInfo.AudioLeadIn));
-            adjustableClock.ProcessFrame();
+            Seek(Math.Min(-beatmap.BeatmapInfo.AudioLeadIn, gameplayStartTime));
         }
 
         public void Restart()
@@ -137,6 +136,9 @@ namespace osu.Game.Screens.Play
             // remove the offset component here because most of the time we want the seek to be aligned to gameplay, not the audio track.
             // we may want to consider reversing the application of offsets in the future as it may feel more correct.
             adjustableClock.Seek(time - totalOffset);
+
+            // manually process frame to ensure GameplayClock is correctly updated after a seek.
+            userOffsetClock.ProcessFrame();
         }
 
         public void Stop()

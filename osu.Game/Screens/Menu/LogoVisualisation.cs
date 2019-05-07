@@ -150,62 +150,67 @@ namespace osu.Game.Screens.Menu
             Invalidate(Invalidation.DrawNode, shallPropagate: false);
         }
 
-        protected override DrawNode CreateDrawNode() => new VisualisationDrawNode();
-
-        protected override void ApplyDrawNode(DrawNode node)
-        {
-            base.ApplyDrawNode(node);
-
-            var visNode = (VisualisationDrawNode)node;
-
-            visNode.Shader = shader;
-            visNode.Texture = texture;
-            visNode.Size = DrawSize.X;
-            visNode.Colour = AccentColour;
-            visNode.AudioData = frequencyAmplitudes;
-        }
+        protected override DrawNode CreateDrawNode() => new VisualisationDrawNode(this);
 
         private class VisualisationDrawNode : DrawNode
         {
-            public IShader Shader;
-            public Texture Texture;
+            protected new LogoVisualisation Source => (LogoVisualisation)base.Source;
+
+            private IShader shader;
+            private Texture texture;
 
             //Asuming the logo is a circle, we don't need a second dimension.
-            public float Size;
+            private float size;
 
-            public Color4 Colour;
-            public float[] AudioData;
+            private Color4 colour;
+            private float[] audioData;
 
             private readonly QuadBatch<TexturedVertex2D> vertexBatch = new QuadBatch<TexturedVertex2D>(100, 10);
+
+            public VisualisationDrawNode(LogoVisualisation source)
+                : base(source)
+            {
+            }
+
+            public override void ApplyState()
+            {
+                base.ApplyState();
+
+                shader = Source.shader;
+                texture = Source.texture;
+                size = Source.DrawSize.X;
+                colour = Source.AccentColour;
+                audioData = Source.frequencyAmplitudes;
+            }
 
             public override void Draw(Action<TexturedVertex2D> vertexAction)
             {
                 base.Draw(vertexAction);
 
-                Shader.Bind();
-                Texture.TextureGL.Bind();
+                shader.Bind();
+                texture.TextureGL.Bind();
 
                 Vector2 inflation = DrawInfo.MatrixInverse.ExtractScale().Xy;
 
                 ColourInfo colourInfo = DrawColourInfo.Colour;
-                colourInfo.ApplyChild(Colour);
+                colourInfo.ApplyChild(colour);
 
-                if (AudioData != null)
+                if (audioData != null)
                 {
                     for (int j = 0; j < visualiser_rounds; j++)
                     {
                         for (int i = 0; i < bars_per_visualiser; i++)
                         {
-                            if (AudioData[i] < amplitude_dead_zone)
+                            if (audioData[i] < amplitude_dead_zone)
                                 continue;
 
                             float rotation = MathHelper.DegreesToRadians(i / (float)bars_per_visualiser * 360 + j * 360 / visualiser_rounds);
                             float rotationCos = (float)Math.Cos(rotation);
                             float rotationSin = (float)Math.Sin(rotation);
                             //taking the cos and sin to the 0..1 range
-                            var barPosition = new Vector2(rotationCos / 2 + 0.5f, rotationSin / 2 + 0.5f) * Size;
+                            var barPosition = new Vector2(rotationCos / 2 + 0.5f, rotationSin / 2 + 0.5f) * size;
 
-                            var barSize = new Vector2(Size * (float)Math.Sqrt(2 * (1 - Math.Cos(MathHelper.DegreesToRadians(360f / bars_per_visualiser)))) / 2f, bar_length * AudioData[i]);
+                            var barSize = new Vector2(size * (float)Math.Sqrt(2 * (1 - Math.Cos(MathHelper.DegreesToRadians(360f / bars_per_visualiser)))) / 2f, bar_length * audioData[i]);
                             //The distance between the position and the sides of the bar.
                             var bottomOffset = new Vector2(-rotationSin * barSize.X / 2, rotationCos * barSize.X / 2);
                             //The distance between the bottom side of the bar and the top side.
@@ -218,7 +223,7 @@ namespace osu.Game.Screens.Menu
                                 Vector2Extensions.Transform(barPosition + bottomOffset + amplitudeOffset, DrawInfo.Matrix)
                             );
 
-                            Texture.DrawQuad(
+                            texture.DrawQuad(
                                 rectangle,
                                 colourInfo,
                                 null,
@@ -229,7 +234,7 @@ namespace osu.Game.Screens.Menu
                     }
                 }
 
-                Shader.Unbind();
+                shader.Unbind();
             }
 
             protected override void Dispose(bool isDisposing)

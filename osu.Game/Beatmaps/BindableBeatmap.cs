@@ -12,7 +12,7 @@ namespace osu.Game.Beatmaps
 {
     /// <summary>
     /// A <see cref="Bindable{T}"/> for the <see cref="OsuGame"/> beatmap.
-    /// This should be used sparingly in-favour of <see cref="IBindable<WorkingBeatmap>"/>.
+    /// This should be used sparingly in-favour of <see cref="IBindable{WorkingBeatmap}"/>.
     /// </summary>
     public abstract class BindableBeatmap : NonNullableBindable<WorkingBeatmap>
     {
@@ -67,6 +67,6 @@ namespace osu.Game.Beatmaps
         /// If you are further binding to events of the retrieved <see cref="BindableBeatmap"/>, ensure a local reference is held.
         /// </summary>
         [NotNull]
-        public abstract BindableBeatmap GetBoundCopy();
+        public new abstract BindableBeatmap GetBoundCopy();
     }
 }

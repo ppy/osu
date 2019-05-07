@@ -10,7 +10,7 @@ namespace osu.Game.Overlays.Settings
     {
         protected override OsuDropdown<T> CreateDropdown() => new DropdownControl();
 
-        protected class DropdownControl : OsuEnumDropdown<T>
+        protected new class DropdownControl : OsuEnumDropdown<T>
         {
             public DropdownControl()
             {
