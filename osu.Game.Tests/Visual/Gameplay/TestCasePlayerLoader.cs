@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -34,20 +35,20 @@ namespace osu.Game.Tests.Visual.Gameplay
         [Test]
         public void TestLoadContinuation()
         {
-            AddStep("load dummy beatmap", () => stack.Push(loader = new PlayerLoader(() => new Player(false, false))));
+            Player player = null;
+            SlowLoadPlayer slowPlayer = null;
+
+            AddStep("load dummy beatmap", () => stack.Push(loader = new PlayerLoader(() => player = new Player(false, false))));
             AddUntilStep("wait for current", () => loader.IsCurrentScreen());
             AddStep("mouse in centre", () => InputManager.MoveMouseTo(loader.ScreenSpaceDrawQuad.Centre));
-            AddUntilStep("wait for no longer current", () => !loader.IsCurrentScreen());
+            AddUntilStep("wait for player to be current", () => player.IsCurrentScreen());
             AddStep("load slow dummy beatmap", () =>
             {
-                SlowLoadPlayer slow = null;
-
-                stack.Push(loader = new PlayerLoader(() => slow = new SlowLoadPlayer(false, false)));
-
-                Scheduler.AddDelayed(() => slow.Ready = true, 5000);
+                stack.Push(loader = new PlayerLoader(() => slowPlayer = new SlowLoadPlayer(false, false)));
+                Scheduler.AddDelayed(() => slowPlayer.AllowLoad.Set(), 5000);
             });
 
-            AddUntilStep("wait for no longer current", () => !loader.IsCurrentScreen());
+            AddUntilStep("wait for player to be current", () => slowPlayer.IsCurrentScreen());
         }
 
         [Test]
@@ -113,7 +114,7 @@ namespace osu.Game.Tests.Visual.Gameplay
 
         protected class SlowLoadPlayer : Player
         {
-            public bool Ready;
+            public readonly ManualResetEventSlim AllowLoad = new ManualResetEventSlim(false);
 
             public SlowLoadPlayer(bool allowPause = true, bool showResults = true)
                 : base(allowPause, showResults)
@@ -123,8 +124,8 @@ namespace osu.Game.Tests.Visual.Gameplay
             [BackgroundDependencyLoader]
             private void load()
             {
-                while (!Ready)
-                    Thread.Sleep(1);
+                if (!AllowLoad.Wait(TimeSpan.FromSeconds(10)))
+                    throw new TimeoutException();
             }
         }
     }
