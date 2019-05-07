@@ -16,6 +16,7 @@ using osu.Game.Graphics;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.UI;
+using osu.Game.Scoring;
 using osuTK;
 using osuTK.Graphics;
 
@@ -46,6 +47,8 @@ namespace osu.Game.Rulesets.Mods
             Combo.BindTo(scoreProcessor.Combo);
         }
 
+        public ScoreRank AdjustRank(ScoreRank rank, double accuracy) => rank;
+
         public virtual void ApplyToDrawableRuleset(DrawableRuleset<T> drawableRuleset)
         {
             var flashlight = CreateFlashlight();
@@ -64,24 +67,11 @@ namespace osu.Game.Rulesets.Mods
             internal BindableInt Combo;
             private IShader shader;
 
-            protected override DrawNode CreateDrawNode() => new FlashlightDrawNode();
+            protected override DrawNode CreateDrawNode() => new FlashlightDrawNode(this);
 
             public override bool RemoveCompletedTransforms => false;
 
             public List<BreakPeriod> Breaks;
-
-            protected override void ApplyDrawNode(DrawNode node)
-            {
-                base.ApplyDrawNode(node);
-
-                var flashNode = (FlashlightDrawNode)node;
-
-                flashNode.Shader = shader;
-                flashNode.ScreenSpaceDrawQuad = ScreenSpaceDrawQuad;
-                flashNode.FlashlightPosition = Vector2Extensions.Transform(FlashlightPosition, DrawInfo.Matrix);
-                flashNode.FlashlightSize = FlashlightSize * DrawInfo.Matrix.ExtractScale().Xy;
-                flashNode.FlashlightDim = FlashlightDim;
-            }
 
             [BackgroundDependencyLoader]
             private void load(ShaderManager shaderManager)
@@ -152,29 +142,47 @@ namespace osu.Game.Rulesets.Mods
                     Invalidate(Invalidation.DrawNode);
                 }
             }
-        }
 
-        private class FlashlightDrawNode : DrawNode
-        {
-            public IShader Shader;
-            public Quad ScreenSpaceDrawQuad;
-            public Vector2 FlashlightPosition;
-            public Vector2 FlashlightSize;
-            public float FlashlightDim;
-
-            public override void Draw(Action<TexturedVertex2D> vertexAction)
+            private class FlashlightDrawNode : DrawNode
             {
-                base.Draw(vertexAction);
+                protected new Flashlight Source => (Flashlight)base.Source;
 
-                Shader.Bind();
+                private IShader shader;
+                private Quad screenSpaceDrawQuad;
+                private Vector2 flashlightPosition;
+                private Vector2 flashlightSize;
+                private float flashlightDim;
 
-                Shader.GetUniform<Vector2>("flashlightPos").UpdateValue(ref FlashlightPosition);
-                Shader.GetUniform<Vector2>("flashlightSize").UpdateValue(ref FlashlightSize);
-                Shader.GetUniform<float>("flashlightDim").UpdateValue(ref FlashlightDim);
+                public FlashlightDrawNode(Flashlight source)
+                    : base(source)
+                {
+                }
 
-                Texture.WhitePixel.DrawQuad(ScreenSpaceDrawQuad, DrawColourInfo.Colour, vertexAction: vertexAction);
+                public override void ApplyState()
+                {
+                    base.ApplyState();
 
-                Shader.Unbind();
+                    shader = Source.shader;
+                    screenSpaceDrawQuad = Source.ScreenSpaceDrawQuad;
+                    flashlightPosition = Vector2Extensions.Transform(Source.FlashlightPosition, DrawInfo.Matrix);
+                    flashlightSize = Source.FlashlightSize * DrawInfo.Matrix.ExtractScale().Xy;
+                    flashlightDim = Source.FlashlightDim;
+                }
+
+                public override void Draw(Action<TexturedVertex2D> vertexAction)
+                {
+                    base.Draw(vertexAction);
+
+                    shader.Bind();
+
+                    shader.GetUniform<Vector2>("flashlightPos").UpdateValue(ref flashlightPosition);
+                    shader.GetUniform<Vector2>("flashlightSize").UpdateValue(ref flashlightSize);
+                    shader.GetUniform<float>("flashlightDim").UpdateValue(ref FlashlightDim);
+
+                    Texture.WhitePixel.DrawQuad(screenSpaceDrawQuad, DrawColourInfo.Colour, vertexAction: vertexAction);
+
+                    shader.Unbind();
+                }
             }
         }
     }

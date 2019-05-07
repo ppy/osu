@@ -12,6 +12,7 @@ using osu.Framework.Screens;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Scoring;
+using osu.Game.Scoring;
 using osu.Game.Screens;
 using osu.Game.Screens.Play;
 using osu.Game.Tests.Beatmaps;
@@ -96,6 +97,8 @@ namespace osu.Game.Tests.Visual.Gameplay
             {
                 Applied = true;
             }
+
+            public ScoreRank AdjustRank(ScoreRank rank, double accuracy) => rank;
         }
 
         private class TestPlayer : Player

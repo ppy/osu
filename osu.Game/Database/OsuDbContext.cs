@@ -70,7 +70,7 @@ namespace osu.Game.Database
                     cmd.ExecuteNonQuery();
                 }
             }
-            catch (Exception e)
+            catch
             {
                 connection.Close();
                 throw;

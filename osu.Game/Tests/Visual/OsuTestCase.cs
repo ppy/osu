@@ -31,7 +31,7 @@ namespace osu.Game.Tests.Visual
         [Cached(Type = typeof(IBindable<IReadOnlyList<Mod>>))]
         protected readonly Bindable<IReadOnlyList<Mod>> Mods = new Bindable<IReadOnlyList<Mod>>(Array.Empty<Mod>());
 
-        protected DependencyContainer Dependencies { get; private set; }
+        protected new DependencyContainer Dependencies { get; private set; }
 
         private readonly Lazy<Storage> localStorage;
         protected Storage LocalStorage => localStorage.Value;

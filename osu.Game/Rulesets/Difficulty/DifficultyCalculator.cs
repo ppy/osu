@@ -165,7 +165,7 @@ namespace osu.Game.Rulesets.Difficulty
         /// <summary>
         /// Creates the <see cref="Skill"/>s to calculate the difficulty of an <see cref="IBeatmap"/>.
         /// </summary>
-        /// <param name="beatmap">The <see cref="IBeatmap"/> whose difficulty will be calculated.</param
+        /// <param name="beatmap">The <see cref="IBeatmap"/> whose difficulty will be calculated.</param>
         /// <returns>The <see cref="Skill"/>s.</returns>
         protected abstract Skill[] CreateSkills(IBeatmap beatmap);
     }

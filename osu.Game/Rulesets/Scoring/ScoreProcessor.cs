@@ -10,6 +10,7 @@ using osu.Framework.Extensions;
 using osu.Framework.Extensions.TypeExtensions;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Judgements;
+using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.UI;
 using osu.Game.Scoring;
@@ -61,6 +62,11 @@ namespace osu.Game.Rulesets.Scoring
         public readonly BindableInt Combo = new BindableInt();
 
         /// <summary>
+        /// The current selected mods
+        /// </summary>
+        public readonly Bindable<IReadOnlyList<Mod>> Mods = new Bindable<IReadOnlyList<Mod>>(Array.Empty<Mod>());
+
+        /// <summary>
         /// Create a <see cref="HitWindows"/> for this processor.
         /// </summary>
         public virtual HitWindows CreateHitWindows() => new HitWindows();
@@ -98,7 +104,12 @@ namespace osu.Game.Rulesets.Scoring
         protected ScoreProcessor()
         {
             Combo.ValueChanged += delegate { HighestCombo.Value = Math.Max(HighestCombo.Value, Combo.Value); };
-            Accuracy.ValueChanged += delegate { Rank.Value = rankFrom(Accuracy.Value); };
+            Accuracy.ValueChanged += delegate
+            {
+                Rank.Value = rankFrom(Accuracy.Value);
+                foreach (var mod in Mods.Value.OfType<IApplicableToScoreProcessor>())
+                    Rank.Value = mod.AdjustRank(Rank.Value, Accuracy.Value);
+            };
         }
 
         private ScoreRank rankFrom(double acc)
@@ -154,7 +165,6 @@ namespace osu.Game.Rulesets.Scoring
         /// <summary>
         /// Notifies subscribers of <see cref="NewJudgement"/> that a new judgement has occurred.
         /// </summary>
-        /// <param name="judgement">The judgement to notify subscribers of.</param>
         /// <param name="result">The judgement scoring result to notify subscribers of.</param>
         protected void NotifyNewJudgement(JudgementResult result)
         {
@@ -283,7 +293,6 @@ namespace osu.Game.Rulesets.Scoring
         /// <summary>
         /// Reverts the score change of a <see cref="JudgementResult"/> that was applied to this <see cref="ScoreProcessor"/>.
         /// </summary>
-        /// <param name="judgement">The judgement to remove.</param>
         /// <param name="result">The judgement scoring result.</param>
         private void revertResult(JudgementResult result)
         {
@@ -340,7 +349,6 @@ namespace osu.Game.Rulesets.Scoring
         /// <summary>
         /// Reverts the score change of a <see cref="JudgementResult"/> that was applied to this <see cref="ScoreProcessor"/>.
         /// </summary>
-        /// <param name="judgement">The judgement to remove.</param>
         /// <param name="result">The judgement scoring result.</param>
         protected virtual void RevertResult(JudgementResult result)
         {
