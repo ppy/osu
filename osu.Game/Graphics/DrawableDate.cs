@@ -54,9 +54,11 @@ namespace osu.Game.Graphics
             var diffToNow = DateTimeOffset.Now.Subtract(Date);
 
             double timeUntilNextUpdate = 1000;
+
             if (Math.Abs(diffToNow.TotalSeconds) > 120)
             {
                 timeUntilNextUpdate *= 60;
+
                 if (Math.Abs(diffToNow.TotalMinutes) > 120)
                 {
                     timeUntilNextUpdate *= 60;

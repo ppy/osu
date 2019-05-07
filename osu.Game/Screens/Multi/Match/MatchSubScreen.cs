@@ -145,6 +145,7 @@ namespace osu.Game.Screens.Multi.Match
             header.Tabs.Current.BindValueChanged(tab =>
             {
                 const float fade_duration = 500;
+
                 if (tab.NewValue is SettingsMatchPage)
                 {
                     settings.Show();
@@ -206,7 +207,7 @@ namespace osu.Game.Screens.Multi.Match
             if (Beatmap.Value != beatmapManager.DefaultBeatmap)
                 return;
 
-            if (Beatmap.Value == null)
+            if (CurrentItem.Value == null)
                 return;
 
             // Try to retrieve the corresponding local beatmap

@@ -508,6 +508,7 @@ namespace osu.Game.Tests.Visual.SongSelect
                 },
                 Beatmaps = new List<BeatmapInfo>(),
             };
+
             for (int b = 1; b < 101; b++)
             {
                 toReturn.Beatmaps.Add(new BeatmapInfo

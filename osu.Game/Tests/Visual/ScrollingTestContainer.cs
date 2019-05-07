@@ -74,9 +74,11 @@ namespace osu.Game.Tests.Visual
                         case ScrollVisualisationMethod.Constant:
                             implementation = new ConstantScrollAlgorithm();
                             break;
+
                         case ScrollVisualisationMethod.Overlapping:
                             implementation = new OverlappingScrollAlgorithm(ControlPoints);
                             break;
+
                         case ScrollVisualisationMethod.Sequential:
                             implementation = new SequentialScrollAlgorithm(ControlPoints);
                             break;

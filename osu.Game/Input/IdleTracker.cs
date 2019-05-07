@@ -62,6 +62,7 @@ namespace osu.Game.Input
                 case MouseUpEvent _:
                 case MouseMoveEvent _:
                     return updateLastInteractionTime();
+
                 default:
                     return base.Handle(e);
             }

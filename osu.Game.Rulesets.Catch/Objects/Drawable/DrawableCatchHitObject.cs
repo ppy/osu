@@ -84,6 +84,7 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawable
                     case ArmedState.Miss:
                         this.FadeOut(250).RotateTo(Rotation * 2, 250, Easing.Out).Expire();
                         break;
+
                     case ArmedState.Hit:
                         this.FadeOut().Expire();
                         break;
