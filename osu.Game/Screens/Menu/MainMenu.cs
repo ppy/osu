@@ -132,6 +132,8 @@ namespace osu.Game.Screens.Menu
             Beatmap.ValueChanged += beatmap_ValueChanged;
         }
 
+        private const float logo_transform_duration = 300;
+
         protected override void LogoArriving(OsuLogo logo, bool resuming)
         {
             base.LogoArriving(logo, resuming);
@@ -145,20 +147,24 @@ namespace osu.Game.Screens.Menu
             {
                 buttons.State = ButtonSystemState.TopLevel;
 
-                const float length = 300;
+                this.FadeIn(logo_transform_duration, Easing.OutQuint);
+                this.MoveTo(new Vector2(0, 0), logo_transform_duration, Easing.OutQuint);
 
-                this.FadeIn(length, Easing.OutQuint);
-                this.MoveTo(new Vector2(0, 0), length, Easing.OutQuint);
-
-                sideFlashes.Delay(length).FadeIn(64, Easing.InQuint);
+                sideFlashes.Delay(logo_transform_duration).FadeIn(64, Easing.InQuint);
             }
         }
 
         protected override void LogoSuspending(OsuLogo logo)
         {
-            logo.FadeOut(300, Easing.InSine)
-                .ScaleTo(0.2f, 300, Easing.InSine)
-                .OnComplete(l => buttons.SetOsuLogo(null));
+            var logoTrackingDelegate = Scheduler.AddDelayed(() => buttons.SetOsuLogo(null), logo_transform_duration);
+
+            logo.FadeOut(logo_transform_duration, Easing.InSine)
+                .ScaleTo(0.2f, logo_transform_duration, Easing.InSine)
+                .OnAbort(_ =>
+                {
+                    logoTrackingDelegate.Cancel();
+                    buttons.SetOsuLogo(null);
+                });
         }
 
         private void beatmap_ValueChanged(ValueChangedEvent<WorkingBeatmap> e)
