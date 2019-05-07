@@ -206,7 +206,7 @@ namespace osu.Game.Screens.Multi.Match
             if (Beatmap.Value != beatmapManager.DefaultBeatmap)
                 return;
 
-            if (Beatmap.Value == null)
+            if (CurrentItem.Value == null)
                 return;
 
             // Try to retrieve the corresponding local beatmap
