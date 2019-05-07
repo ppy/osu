@@ -1,10 +1,12 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Drawables;
 using osu.Game.Online.API;
@@ -86,8 +88,61 @@ namespace osu.Game.Tests.Visual.UserInterface
                 AddStep("online (login first)", () => { });
         }
 
+        [Test]
+        public void TestUnloadAndReload()
+        {
+            var backgrounds = new List<TestUpdateableBeatmapBackgroundSprite>();
+            ScrollContainer scrollContainer = null;
+
+            AddStep("create backgrounds hierarchy", () =>
+            {
+                FillFlowContainer backgroundFlow;
+
+                Child = scrollContainer = new ScrollContainer
+                {
+                    Size = new Vector2(500),
+                    Child = backgroundFlow = new FillFlowContainer
+                    {
+                        RelativeSizeAxes = Axes.X,
+                        AutoSizeAxes = Axes.Y,
+                        Direction = FillDirection.Vertical,
+                        Spacing = new Vector2(10),
+                        Padding = new MarginPadding { Bottom = 250 }
+                    }
+                };
+
+                for (int i = 0; i < 25; i++)
+                {
+                    var background = new TestUpdateableBeatmapBackgroundSprite { RelativeSizeAxes = Axes.Both };
+
+                    if (i % 2 == 0)
+                        background.Beatmap.Value = testBeatmap.Beatmaps.First();
+
+                    backgroundFlow.Add(new Container
+                    {
+                        RelativeSizeAxes = Axes.X,
+                        Height = 100,
+                        Masking = true,
+                        Child = background
+                    });
+
+                    backgrounds.Add(background);
+                }
+            });
+
+            var loadedBackgrounds = backgrounds.Where(b => b.ContentLoaded);
+
+            int initialLoadCount = 0;
+
+            AddUntilStep("some loaded", () => (initialLoadCount = loadedBackgrounds.Count()) > 0);
+            AddStep("scroll to bottom", () => scrollContainer.ScrollToEnd());
+            AddUntilStep("some unloaded", () => loadedBackgrounds.Count() < initialLoadCount);
+        }
+
         private class TestUpdateableBeatmapBackgroundSprite : UpdateableBeatmapBackgroundSprite
         {
+            protected override double UnloadDelay => 2000;
+
             public bool ContentLoaded => ((DelayedLoadUnloadWrapper)InternalChildren.LastOrDefault())?.Content?.IsLoaded ?? false;
         }
     }
