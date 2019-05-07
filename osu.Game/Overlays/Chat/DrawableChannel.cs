@@ -99,6 +99,7 @@ namespace osu.Game.Overlays.Chat
         private void pendingMessageResolved(Message existing, Message updated)
         {
             var found = ChatLineFlow.Children.LastOrDefault(c => c.Message == existing);
+
             if (found != null)
             {
                 Trace.Assert(updated.Id.HasValue, "An updated message was returned with no ID.");

@@ -44,8 +44,6 @@ namespace osu.Game.Screens.Play
 
         public bool HasFailed { get; private set; }
 
-        public bool PauseOnFocusLost { get; set; } = true;
-
         private Bindable<bool> mouseWheelDisabled;
 
         private readonly Bindable<bool> storyboardReplacesBackground = new Bindable<bool>();
@@ -72,7 +70,7 @@ namespace osu.Game.Screens.Play
 
         [Cached]
         [Cached(Type = typeof(IBindable<IReadOnlyList<Mod>>))]
-        protected readonly Bindable<IReadOnlyList<Mod>> Mods = new Bindable<IReadOnlyList<Mod>>(Array.Empty<Mod>());
+        protected new readonly Bindable<IReadOnlyList<Mod>> Mods = new Bindable<IReadOnlyList<Mod>>(Array.Empty<Mod>());
 
         private readonly bool allowPause;
         private readonly bool showResults;
@@ -106,6 +104,8 @@ namespace osu.Game.Screens.Play
             showStoryboard = config.GetBindable<bool>(OsuSetting.ShowStoryboard);
 
             ScoreProcessor = DrawableRuleset.CreateScoreProcessor();
+            ScoreProcessor.Mods.BindTo(Mods);
+
             if (!ScoreProcessor.Mode.Disabled)
                 config.BindWith(OsuSetting.ScoreDisplayMode, ScoreProcessor.Mode);
 
@@ -385,15 +385,6 @@ namespace osu.Game.Screens.Play
             && !HasFailed
             // already resuming
             && !IsResuming;
-
-        protected override void Update()
-        {
-            base.Update();
-
-            // eagerly pause when we lose window focus (if we are locally playing).
-            if (PauseOnFocusLost && !Game.IsActive.Value)
-                Pause();
-        }
 
         public void Pause()
         {

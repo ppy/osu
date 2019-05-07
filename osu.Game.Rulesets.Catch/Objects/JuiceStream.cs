@@ -95,6 +95,7 @@ namespace osu.Game.Rulesets.Catch.Objects
                             X = X + Path.PositionAt(e.PathProgress).X / CatchPlayfield.BASE_WIDTH,
                         });
                         break;
+
                     case SliderEventType.Head:
                     case SliderEventType.Tail:
                     case SliderEventType.Repeat:

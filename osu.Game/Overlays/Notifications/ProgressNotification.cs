@@ -54,11 +54,13 @@ namespace osu.Game.Overlays.Notifications
                                 Light.Pulsate = false;
                                 progressBar.Active = false;
                                 break;
+
                             case ProgressNotificationState.Active:
                                 Light.Colour = colourActive;
                                 Light.Pulsate = true;
                                 progressBar.Active = true;
                                 break;
+
                             case ProgressNotificationState.Cancelled:
                                 Light.Colour = colourCancelled;
                                 Light.Pulsate = false;
@@ -145,6 +147,7 @@ namespace osu.Game.Overlays.Notifications
                 case ProgressNotificationState.Cancelled:
                     base.Close();
                     break;
+
                 case ProgressNotificationState.Active:
                 case ProgressNotificationState.Queued:
                     if (CancelRequested?.Invoke() != false)
