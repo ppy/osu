@@ -85,11 +85,6 @@ namespace osu.Game.Rulesets.Mania.Scoring
         protected override double HealthAdjustmentFactorFor(JudgementResult result)
             => result.Type == HitResult.Miss ? hpMissMultiplier : hpMultiplier;
 
-
-
-
-
-
         public override HitWindows CreateHitWindows() => new ManiaHitWindows();
     }
 }

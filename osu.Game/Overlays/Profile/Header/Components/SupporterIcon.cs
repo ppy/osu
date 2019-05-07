@@ -34,6 +34,7 @@ namespace osu.Game.Overlays.Profile.Header.Components
                 {
                     content.Show();
                     iconContainer.Clear();
+
                     for (int i = 0; i < count; i++)
                     {
                         iconContainer.Add(new SpriteIcon
