@@ -84,6 +84,7 @@ namespace osu.Game.Database
         private void flushEvents(bool perform)
         {
             Action[] events;
+
             lock (queuedEvents)
             {
                 events = queuedEvents.ToArray();
@@ -147,6 +148,7 @@ namespace osu.Game.Database
             List<TModel> imported = new List<TModel>();
 
             int current = 0;
+
             foreach (string path in paths)
             {
                 if (notification.State == ProgressNotificationState.Cancelled)
@@ -563,7 +565,7 @@ namespace osu.Game.Database
         /// <summary>
         /// Check whether an existing model already exists for a new import item.
         /// </summary>
-        /// <param name="model">The new model proposed for import.
+        /// <param name="model">The new model proposed for import.</param>
         /// <returns>An existing model which matches the criteria to skip importing, else null.</returns>
         protected TModel CheckForExisting(TModel model) => model.Hash == null ? null : ModelStore.ConsumableItems.FirstOrDefault(b => b.Hash == model.Hash);
 

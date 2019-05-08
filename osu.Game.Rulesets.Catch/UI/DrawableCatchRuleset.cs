@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Collections.Generic;
 using osu.Framework.Input;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
@@ -10,6 +11,7 @@ using osu.Game.Rulesets.Catch.Objects;
 using osu.Game.Rulesets.Catch.Objects.Drawable;
 using osu.Game.Rulesets.Catch.Replays;
 using osu.Game.Rulesets.Catch.Scoring;
+using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.UI;
@@ -23,8 +25,8 @@ namespace osu.Game.Rulesets.Catch.UI
 
         protected override bool UserScrollSpeedAdjustment => false;
 
-        public DrawableCatchRuleset(Ruleset ruleset, WorkingBeatmap beatmap)
-            : base(ruleset, beatmap)
+        public DrawableCatchRuleset(Ruleset ruleset, WorkingBeatmap beatmap, IReadOnlyList<Mod> mods)
+            : base(ruleset, beatmap, mods)
         {
             Direction.Value = ScrollingDirection.Down;
             TimeRange.Value = BeatmapDifficulty.DifficultyRange(beatmap.BeatmapInfo.BaseDifficulty.ApproachRate, 1800, 1200, 450);
@@ -34,24 +36,31 @@ namespace osu.Game.Rulesets.Catch.UI
 
         protected override ReplayInputHandler CreateReplayInputHandler(Replay replay) => new CatchFramedReplayInputHandler(replay);
 
-        protected override Playfield CreatePlayfield() => new CatchPlayfield(Beatmap.BeatmapInfo.BaseDifficulty, GetVisualRepresentation);
+        protected override Playfield CreatePlayfield() => new CatchPlayfield(Beatmap.BeatmapInfo.BaseDifficulty, CreateDrawableRepresentation);
+
+        public override PlayfieldAdjustmentContainer CreatePlayfieldAdjustmentContainer() => new CatchPlayfieldAdjustmentContainer();
 
         protected override PassThroughInputManager CreateInputManager() => new CatchInputManager(Ruleset.RulesetInfo);
 
-        public override DrawableHitObject<CatchHitObject> GetVisualRepresentation(CatchHitObject h)
+        public override DrawableHitObject<CatchHitObject> CreateDrawableRepresentation(CatchHitObject h)
         {
             switch (h)
             {
                 case Banana banana:
                     return new DrawableBanana(banana);
+
                 case Fruit fruit:
                     return new DrawableFruit(fruit);
+
                 case JuiceStream stream:
-                    return new DrawableJuiceStream(stream, GetVisualRepresentation);
+                    return new DrawableJuiceStream(stream, CreateDrawableRepresentation);
+
                 case BananaShower shower:
-                    return new DrawableBananaShower(shower, GetVisualRepresentation);
+                    return new DrawableBananaShower(shower, CreateDrawableRepresentation);
+
                 case TinyDroplet tiny:
                     return new DrawableTinyDroplet(tiny);
+
                 case Droplet droplet:
                     return new DrawableDroplet(droplet);
             }

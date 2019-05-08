@@ -8,11 +8,11 @@ using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
 using osu.Game.Beatmaps;
-using osu.Game.Graphics;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.UI;
+using osu.Game.Scoring;
 using osuTK;
 using osuTK.Graphics;
 
@@ -24,7 +24,7 @@ namespace osu.Game.Rulesets.Osu.Mods
         public override string Description => "Play with blinds on your screen.";
         public override string Acronym => "BL";
 
-        public override FontAwesome Icon => FontAwesome.fa_adjust;
+        public override IconUsage Icon => FontAwesome.Solid.Adjust;
         public override ModType Type => ModType.DifficultyIncrease;
 
         public override bool Ranked => false;
@@ -41,6 +41,8 @@ namespace osu.Game.Rulesets.Osu.Mods
         {
             scoreProcessor.Health.ValueChanged += health => { blinds.AnimateClosedness((float)health.NewValue); };
         }
+
+        public ScoreRank AdjustRank(ScoreRank rank, double accuracy) => rank;
 
         /// <summary>
         /// Element for the Blinds mod drawing 2 black boxes covering the whole screen which resize inside a restricted area with some leniency.

@@ -70,7 +70,8 @@ namespace osu.Game.Tests.Beatmaps
             {
                 offset = MathHelper.Clamp(seek, 0, Length);
                 lastReferenceTime = null;
-                return true;
+
+                return offset == seek;
             }
 
             public override void Start()

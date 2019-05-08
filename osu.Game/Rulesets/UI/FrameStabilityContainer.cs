@@ -36,7 +36,10 @@ namespace osu.Game.Rulesets.UI
         private void load(GameplayClock clock)
         {
             if (clock != null)
+            {
                 parentGameplayClock = clock;
+                gameplayClock.IsPaused.BindTo(clock.IsPaused);
+            }
         }
 
         protected override void LoadComplete()
@@ -65,10 +68,12 @@ namespace osu.Game.Rulesets.UI
 
         private const double sixty_frame_time = 1000.0 / 60;
 
+        private bool firstConsumption = true;
+
         public override bool UpdateSubTree()
         {
             requireMoreUpdateLoops = true;
-            validState = true;
+            validState = !gameplayClock.IsPaused.Value;
 
             int loops = 0;
 
@@ -100,9 +105,20 @@ namespace osu.Game.Rulesets.UI
 
             try
             {
-                if (Math.Abs(manualClock.CurrentTime - newProposedTime) > sixty_frame_time * 1.2f)
+                if (firstConsumption)
                 {
-                    newProposedTime = manualClock.Rate > 0
+                    // On the first update, frame-stability seeking would result in unexpected/unwanted behaviour.
+                    // Instead we perform an initial seek to the proposed time.
+                    manualClock.CurrentTime = newProposedTime;
+
+                    // do a second process to clear out ElapsedTime
+                    framedClock.ProcessFrame();
+
+                    firstConsumption = false;
+                }
+                else if (Math.Abs(manualClock.CurrentTime - newProposedTime) > sixty_frame_time * 1.2f)
+                {
+                    newProposedTime = newProposedTime > manualClock.CurrentTime
                         ? Math.Min(newProposedTime, manualClock.CurrentTime + sixty_frame_time)
                         : Math.Max(newProposedTime, manualClock.CurrentTime - sixty_frame_time);
                 }

@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using osu.Framework.Audio.Track;
+using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics.Textures;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Difficulty;
@@ -52,7 +53,7 @@ namespace osu.Game.Beatmaps
             {
                 public override IEnumerable<Mod> GetModsFor(ModType type) => new Mod[] { };
 
-                public override DrawableRuleset CreateDrawableRulesetWith(WorkingBeatmap beatmap)
+                public override DrawableRuleset CreateDrawableRulesetWith(WorkingBeatmap beatmap, IReadOnlyList<Mod> mods)
                 {
                     throw new NotImplementedException();
                 }
@@ -73,9 +74,18 @@ namespace osu.Game.Beatmaps
                 private class DummyBeatmapConverter : IBeatmapConverter
                 {
                     public event Action<HitObject, IEnumerable<HitObject>> ObjectConverted;
+
                     public IBeatmap Beatmap { get; set; }
+
                     public bool CanConvert => true;
-                    public IBeatmap Convert() => Beatmap;
+
+                    public IBeatmap Convert()
+                    {
+                        foreach (var obj in Beatmap.HitObjects)
+                            ObjectConverted?.Invoke(obj, obj.Yield());
+
+                        return Beatmap;
+                    }
                 }
             }
         }

@@ -3,23 +3,16 @@
 
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
-using osu.Framework.Input.Bindings;
 using osu.Framework.Screens;
 using osu.Game.Graphics.Containers;
-using osu.Game.Input.Bindings;
 
 namespace osu.Game.Screens.Multi
 {
-    public abstract class MultiplayerSubScreen : OsuScreen, IMultiplayerSubScreen, IKeyBindingHandler<GlobalAction>
+    public abstract class MultiplayerSubScreen : OsuScreen, IMultiplayerSubScreen
     {
         public override bool DisallowExternalBeatmapRulesetChanges => false;
 
-        public override bool RemoveWhenNotAlive => false;
-
         public virtual string ShortTitle => Title;
-
-        [Resolved(CanBeNull = true)]
-        protected OsuGame Game { get; private set; }
 
         [Resolved(CanBeNull = true)]
         protected IRoomManager RoomManager { get; private set; }
@@ -57,21 +50,6 @@ namespace osu.Game.Screens.Multi
             this.FadeOut(WaveContainer.DISAPPEAR_DURATION, Easing.OutQuint);
             this.MoveToX(-200, WaveContainer.DISAPPEAR_DURATION, Easing.OutQuint);
         }
-
-        public override bool OnPressed(GlobalAction action)
-        {
-            if (!this.IsCurrentScreen()) return false;
-
-            if (action == GlobalAction.Back)
-            {
-                this.Exit();
-                return true;
-            }
-
-            return false;
-        }
-
-        public bool OnReleased(GlobalAction action) => action == GlobalAction.Back;
 
         public override string ToString() => Title;
     }

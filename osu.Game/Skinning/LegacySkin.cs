@@ -49,15 +49,19 @@ namespace osu.Game.Skinning
                 case "Play/Miss":
                     componentName = "hit0";
                     break;
+
                 case "Play/Meh":
                     componentName = "hit50";
                     break;
+
                 case "Play/Good":
                     componentName = "hit100";
                     break;
+
                 case "Play/Great":
                     componentName = "hit300";
                     break;
+
                 case "Play/osu/number-text":
                     return !hasFont(Configuration.HitCircleFont)
                         ? null
@@ -82,6 +86,7 @@ namespace osu.Game.Skinning
             float ratio = 2;
 
             var texture = Textures.Get($"{componentName}@2x");
+
             if (texture == null)
             {
                 ratio = 1;
@@ -184,6 +189,7 @@ namespace osu.Game.Skinning
                 float ratio = 36;
 
                 var texture = textures.Get($"{textureName}@2x");
+
                 if (texture == null)
                 {
                     ratio = 18;

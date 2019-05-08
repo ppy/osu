@@ -113,6 +113,7 @@ namespace osu.Game.Online.API
                         }
 
                         break;
+
                     case APIState.Offline:
                     case APIState.Connecting:
                         //work to restore a connection...
@@ -253,7 +254,7 @@ namespace osu.Game.Online.API
                 handleWebException(we);
                 return false;
             }
-            catch (Exception e)
+            catch
             {
                 return false;
             }
@@ -266,20 +267,18 @@ namespace osu.Game.Online.API
             get => state;
             private set
             {
-                APIState oldState = state;
-                APIState newState = value;
+                if (state == value)
+                    return;
 
+                APIState oldState = state;
                 state = value;
 
-                if (oldState != newState)
+                log.Add($@"We just went {state}!");
+                Scheduler.Add(delegate
                 {
-                    log.Add($@"We just went {newState}!");
-                    Scheduler.Add(delegate
-                    {
-                        components.ForEach(c => c.APIStateChanged(this, newState));
-                        OnStateChange?.Invoke(oldState, newState);
-                    });
-                }
+                    components.ForEach(c => c.APIStateChanged(this, state));
+                    OnStateChange?.Invoke(oldState, state);
+                });
             }
         }
 
@@ -302,6 +301,7 @@ namespace osu.Game.Online.API
                 case HttpStatusCode.Unauthorized:
                     Logout();
                     return true;
+
                 case HttpStatusCode.RequestTimeout:
                     failureCount++;
                     log.Add($@"API failure count is now {failureCount}");
