@@ -117,6 +117,7 @@ namespace osu.Game.Rulesets.Mania
                         new ManiaModNoFail(),
                         new MultiMod(new ManiaModHalfTime(), new ManiaModDaycore()),
                     };
+
                 case ModType.DifficultyIncrease:
                     return new Mod[]
                     {
@@ -126,6 +127,7 @@ namespace osu.Game.Rulesets.Mania
                         new MultiMod(new ManiaModFadeIn(), new ManiaModHidden()),
                         new ManiaModFlashlight(),
                     };
+
                 case ModType.Conversion:
                     return new Mod[]
                     {
@@ -142,16 +144,19 @@ namespace osu.Game.Rulesets.Mania
                         new ManiaModDualStages(),
                         new ManiaModMirror(),
                     };
+
                 case ModType.Automation:
                     return new Mod[]
                     {
                         new MultiMod(new ManiaModAutoplay(), new ModCinema()),
                     };
+
                 case ModType.Fun:
                     return new Mod[]
                     {
                         new MultiMod(new ModWindUp<ManiaHitObject>(), new ModWindDown<ManiaHitObject>())
                     };
+
                 default:
                     return new Mod[] { };
             }
@@ -214,6 +219,7 @@ namespace osu.Game.Rulesets.Mania
                         SpecialAction = ManiaAction.Special1,
                         NormalActionStart = ManiaAction.Key1,
                     }.GenerateKeyBindingsFor(variant, out _);
+
                 case PlayfieldType.Dual:
                     int keys = getDualStageKeyCount(variant);
 
@@ -271,6 +277,7 @@ namespace osu.Game.Rulesets.Mania
             {
                 default:
                     return $"{variant}K";
+
                 case PlayfieldType.Dual:
                 {
                     var keys = getDualStageKeyCount(variant);

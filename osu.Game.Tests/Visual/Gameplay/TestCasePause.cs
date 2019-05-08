@@ -196,9 +196,10 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             public bool PauseOverlayVisible => PauseOverlay.State == Visibility.Visible;
 
-            public PausePlayer()
+            protected override void LoadComplete()
             {
-                PauseOnFocusLost = false;
+                base.LoadComplete();
+                HUDOverlay.HoldToQuit.PauseOnFocusLost = false;
             }
         }
     }

@@ -63,15 +63,20 @@ namespace osu.Game.Beatmaps.Drawables
             {
                 case DifficultyRating.Easy:
                     return palette.Green;
+
                 default:
                 case DifficultyRating.Normal:
                     return palette.Blue;
+
                 case DifficultyRating.Hard:
                     return palette.Yellow;
+
                 case DifficultyRating.Insane:
                     return palette.Pink;
+
                 case DifficultyRating.Expert:
                     return palette.Purple;
+
                 case DifficultyRating.ExpertPlus:
                     return palette.Gray0;
             }

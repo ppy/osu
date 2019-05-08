@@ -41,6 +41,7 @@ namespace osu.Game.Scoring.Legacy
                     case 3:
                         Statistics[HitResult.Great] = value;
                         break;
+
                     case 2:
                         Statistics[HitResult.Perfect] = value;
                         break;
@@ -81,6 +82,7 @@ namespace osu.Game.Scoring.Legacy
                     case 1:
                         Statistics[HitResult.Good] = value;
                         break;
+
                     case 3:
                         Statistics[HitResult.Ok] = value;
                         break;

@@ -15,6 +15,7 @@ namespace osu.Game.Rulesets.Catch.Judgements
             {
                 default:
                     return 0;
+
                 case HitResult.Perfect:
                     return 10;
             }
@@ -26,6 +27,7 @@ namespace osu.Game.Rulesets.Catch.Judgements
             {
                 default:
                     return 0;
+
                 case HitResult.Perfect:
                     return 0.004;
             }
