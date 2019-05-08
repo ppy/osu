@@ -204,7 +204,6 @@ namespace osu.Game.Overlays.Profile.Header
                         {
                             RelativeSizeAxes = Axes.X,
                             Height = 30,
-                            FillMode = FillMode.Fit
                         },
                         rankCount = new OsuSpriteText
                         {
