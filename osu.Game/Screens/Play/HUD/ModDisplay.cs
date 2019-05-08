@@ -24,6 +24,8 @@ namespace osu.Game.Screens.Play.HUD
 
         public bool DisplayUnrankedText = true;
 
+        public bool AllowExpand = true;
+
         private readonly Bindable<IReadOnlyList<Mod>> current = new Bindable<IReadOnlyList<Mod>>();
 
         public Bindable<IReadOnlyList<Mod>> Current
@@ -87,7 +89,9 @@ namespace osu.Game.Screens.Play.HUD
         protected override void LoadComplete()
         {
             base.LoadComplete();
+
             appearTransform();
+            iconsContainer.FadeInFromZero(fade_duration, Easing.OutQuint);
         }
 
         private void appearTransform()
@@ -97,14 +101,17 @@ namespace osu.Game.Screens.Play.HUD
             else
                 unrankedText.Hide();
 
-            iconsContainer.FinishTransforms();
-            iconsContainer.FadeInFromZero(fade_duration, Easing.OutQuint);
             expand();
+
             using (iconsContainer.BeginDelayedSequence(1200))
                 contract();
         }
 
-        private void expand() => iconsContainer.TransformSpacingTo(new Vector2(5, 0), 500, Easing.OutQuint);
+        private void expand()
+        {
+            if (AllowExpand)
+                iconsContainer.TransformSpacingTo(new Vector2(5, 0), 500, Easing.OutQuint);
+        }
 
         private void contract() => iconsContainer.TransformSpacingTo(new Vector2(-25, 0), 500, Easing.OutQuint);
 
