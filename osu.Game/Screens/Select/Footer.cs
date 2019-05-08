@@ -56,6 +56,7 @@ namespace osu.Game.Screens.Select
 
         private readonly List<OverlayContainer> overlays = new List<OverlayContainer>();
 
+        /// <param name="button">THe button to be added.</param>
         /// <param name="text">Text on the button.</param>
         /// <param name="colour">Colour of the button.</param>
         /// <param name="hotkey">Hotkey of the button.</param>

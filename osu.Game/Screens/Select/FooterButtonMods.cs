@@ -1,4 +1,4 @@
-﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Bindables;
@@ -13,7 +13,7 @@ namespace osu.Game.Screens.Select
 {
     public class FooterButtonMods : FooterButton
     {
-        public FooterButtonMods(Bindable<IEnumerable<Mod>> mods)
+        public FooterButtonMods(Bindable<IReadOnlyList<Mod>> mods)
         {
             FooterModDisplay modDisplay;
 
@@ -21,7 +21,8 @@ namespace osu.Game.Screens.Select
             {
                 Anchor = Anchor.CentreLeft,
                 Origin = Anchor.CentreLeft,
-                Child = modDisplay = new FooterModDisplay {
+                Child = modDisplay = new FooterModDisplay
+                {
                     DisplayUnrankedText = false,
                     Scale = new Vector2(0.8f)
                 },
