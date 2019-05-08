@@ -101,15 +101,19 @@ namespace osu.Game.Rulesets.Taiko.Tests
                 case 1:
                     addCentreHit(false);
                     break;
+
                 case 2:
                     addCentreHit(true);
                     break;
+
                 case 3:
                     addDrumRoll(false);
                     break;
+
                 case 4:
                     addDrumRoll(true);
                     break;
+
                 case 5:
                     addSwell();
                     delay = scroll_time - 100;
@@ -122,6 +126,7 @@ namespace osu.Game.Rulesets.Taiko.Tests
                 default:
                     playfieldContainer.Delay(delay).ResizeTo(new Vector2(1, rng.Next(25, 400)), 500);
                     break;
+
                 case 6:
                     playfieldContainer.Delay(delay).ResizeTo(new Vector2(1, TaikoPlayfield.DEFAULT_HEIGHT), 500);
                     break;

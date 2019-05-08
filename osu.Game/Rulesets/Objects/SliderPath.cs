@@ -95,6 +95,7 @@ namespace osu.Game.Rulesets.Objects
             path.Clear();
 
             int i = 0;
+
             for (; i < calculatedPath.Count && cumulativeLength[i] < d0; ++i)
             {
             }
@@ -142,6 +143,7 @@ namespace osu.Game.Rulesets.Objects
             {
                 case PathType.Linear:
                     return PathApproximator.ApproximateLinear(subControlPoints);
+
                 case PathType.PerfectCurve:
                     //we can only use CircularArc iff we have exactly three control points and no dissection.
                     if (ControlPoints.Length != 3 || subControlPoints.Length != 3)
@@ -155,6 +157,7 @@ namespace osu.Game.Rulesets.Objects
                         break;
 
                     return subpath;
+
                 case PathType.Catmull:
                     return PathApproximator.ApproximateCatmull(subControlPoints);
             }

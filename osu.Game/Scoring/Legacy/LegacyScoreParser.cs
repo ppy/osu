@@ -89,6 +89,7 @@ namespace osu.Game.Scoring.Legacy
                             throw new IOException("input .lzma is too short");
 
                         long outSize = 0;
+
                         for (int i = 0; i < 8; i++)
                         {
                             int v = replayInStream.ReadByte();

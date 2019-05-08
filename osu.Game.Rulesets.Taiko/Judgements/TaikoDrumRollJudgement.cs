@@ -16,6 +16,7 @@ namespace osu.Game.Rulesets.Taiko.Judgements
             {
                 case HitResult.Miss:
                     return 0;
+
                 default:
                     return base.HealthIncreaseFor(result);
             }

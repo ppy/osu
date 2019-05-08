@@ -46,8 +46,10 @@ namespace osu.Game.Rulesets.Mods
             {
                 case ScoreRank.X:
                     return ScoreRank.XH;
+
                 case ScoreRank.S:
                     return ScoreRank.SH;
+
                 default:
                     return rank;
             }

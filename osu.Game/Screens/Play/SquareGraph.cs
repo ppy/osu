@@ -169,6 +169,7 @@ namespace osu.Game.Screens.Play
             var max = values.Max();
 
             float step = values.Length / (float)ColumnCount;
+
             for (float i = 0; i < values.Length; i += step)
             {
                 newValues.Add((float)values[(int)i] / max);
