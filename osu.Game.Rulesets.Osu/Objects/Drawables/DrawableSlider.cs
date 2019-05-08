@@ -130,13 +130,13 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             }
         }
 
-        public bool Tracking;
+        public readonly Bindable<bool> Tracking = new Bindable<bool>();
 
         protected override void Update()
         {
             base.Update();
 
-            Tracking = Ball.Tracking;
+            Tracking.Value = Ball.Tracking;
 
             double completionProgress = MathHelper.Clamp((Time.Current - slider.StartTime) / slider.Duration, 0, 1);
 

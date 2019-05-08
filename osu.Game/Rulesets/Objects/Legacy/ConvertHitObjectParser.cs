@@ -84,6 +84,7 @@ namespace osu.Game.Rulesets.Objects.Legacy
                     var points = new Vector2[pointCount];
 
                     int pointIndex = 1;
+
                     foreach (string t in pointSplit)
                     {
                         if (t.Length == 1)
@@ -93,12 +94,15 @@ namespace osu.Game.Rulesets.Objects.Legacy
                                 case @"C":
                                     pathType = PathType.Catmull;
                                     break;
+
                                 case @"B":
                                     pathType = PathType.Bezier;
                                     break;
+
                                 case @"L":
                                     pathType = PathType.Linear;
                                     break;
+
                                 case @"P":
                                     pathType = PathType.PerfectCurve;
                                     break;
@@ -143,6 +147,7 @@ namespace osu.Game.Rulesets.Objects.Legacy
                     if (split.Length > 9 && split[9].Length > 0)
                     {
                         string[] sets = split[9].Split('|');
+
                         for (int i = 0; i < nodes; i++)
                         {
                             if (i >= sets.Length)
@@ -162,6 +167,7 @@ namespace osu.Game.Rulesets.Objects.Legacy
                     if (split.Length > 8 && split[8].Length > 0)
                     {
                         string[] adds = split[8].Split('|');
+
                         for (int i = 0; i < nodes; i++)
                         {
                             if (i >= adds.Length)

@@ -46,8 +46,10 @@ namespace osu.Game.Rulesets.Osu.UI
             {
                 case HitCircle circle:
                     return new DrawableHitCircle(circle);
+
                 case Slider slider:
                     return new DrawableSlider(slider);
+
                 case Spinner spinner:
                     return new DrawableSpinner(spinner);
             }

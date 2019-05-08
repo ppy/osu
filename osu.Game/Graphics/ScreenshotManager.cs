@@ -104,9 +104,11 @@ namespace osu.Game.Graphics
                     case ScreenshotFormat.Png:
                         image.SaveAsPng(stream);
                         break;
+
                     case ScreenshotFormat.Jpg:
                         image.SaveAsJpeg(stream);
                         break;
+
                     default:
                         throw new ArgumentOutOfRangeException(nameof(screenshotFormat));
                 }

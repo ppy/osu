@@ -100,6 +100,7 @@ namespace osu.Game.Graphics.UserInterface
         public void StopAnimation()
         {
             int i = 0;
+
             foreach (var star in stars.Children)
             {
                 star.ClearTransforms(true);
@@ -120,6 +121,7 @@ namespace osu.Game.Graphics.UserInterface
         private void transformCount(float newValue)
         {
             int i = 0;
+
             foreach (var star in stars.Children)
             {
                 star.ClearTransforms(true);
