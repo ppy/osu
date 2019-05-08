@@ -17,6 +17,7 @@ namespace osu.Game.Rulesets.Mania.Judgements
             {
                 case HitResult.Miss:
                     return 0;
+
                 default:
                     return 0.040;
             }

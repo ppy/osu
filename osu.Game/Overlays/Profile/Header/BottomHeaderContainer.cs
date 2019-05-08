@@ -107,6 +107,7 @@ namespace osu.Game.Overlays.Profile.Header
             topLinkContainer.AddLink($@"{user.PostCount:#,##0} forum posts", $"https://osu.ppy.sh/users/{user.Id}/posts", creationParameters: embolden);
 
             string websiteWithoutProtcol = user.Website;
+
             if (!string.IsNullOrEmpty(websiteWithoutProtcol))
             {
                 if (Uri.TryCreate(websiteWithoutProtcol, UriKind.Absolute, out var uri))

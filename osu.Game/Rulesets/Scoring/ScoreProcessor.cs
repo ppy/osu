@@ -323,9 +323,11 @@ namespace osu.Game.Rulesets.Scoring
                 {
                     case HitResult.None:
                         break;
+
                     case HitResult.Miss:
                         Combo.Value = 0;
                         break;
+
                     default:
                         Combo.Value++;
                         break;
@@ -392,6 +394,7 @@ namespace osu.Game.Rulesets.Scoring
                 default:
                 case ScoringMode.Standardised:
                     return max_score * (base_portion * baseScore / maxBaseScore + combo_portion * HighestCombo.Value / maxHighestCombo) + bonusScore;
+
                 case ScoringMode.Classic:
                     // should emulate osu-stable's scoring as closely as we can (https://osu.ppy.sh/help/wiki/Score/ScoreV1)
                     return bonusScore + baseScore * (1 + Math.Max(0, HighestCombo.Value - 1) / 25);

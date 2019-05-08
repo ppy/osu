@@ -44,7 +44,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         protected override void CheckForResult(bool userTriggered, double timeOffset)
         {
             if (repeatPoint.StartTime <= Time.Current)
-                ApplyResult(r => r.Type = drawableSlider.Tracking ? HitResult.Great : HitResult.Miss);
+                ApplyResult(r => r.Type = drawableSlider.Tracking.Value ? HitResult.Great : HitResult.Miss);
         }
 
         protected override void UpdatePreemptState()
@@ -64,9 +64,11 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                 case ArmedState.Idle:
                     this.Delay(HitObject.TimePreempt).FadeOut();
                     break;
+
                 case ArmedState.Miss:
                     this.FadeOut(animDuration);
                     break;
+
                 case ArmedState.Hit:
                     this.FadeOut(animDuration, Easing.OutQuint)
                         .ScaleTo(Scale * 1.5f, animDuration, Easing.Out);

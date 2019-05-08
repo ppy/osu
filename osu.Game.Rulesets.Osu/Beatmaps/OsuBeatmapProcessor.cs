@@ -44,12 +44,14 @@ namespace osu.Game.Rulesets.Osu.Beatmaps
             if (endIndex < 0) throw new ArgumentOutOfRangeException(nameof(endIndex), $"{nameof(endIndex)} cannot be less than 0.");
 
             int extendedEndIndex = endIndex;
+
             if (endIndex < beatmap.HitObjects.Count - 1)
             {
                 // Extend the end index to include objects they are stacked on
                 for (int i = endIndex; i >= startIndex; i--)
                 {
                     int stackBaseIndex = i;
+
                     for (int n = stackBaseIndex + 1; n < beatmap.HitObjects.Count; n++)
                     {
                         OsuHitObject stackBaseObject = beatmap.HitObjects[stackBaseIndex];
@@ -87,6 +89,7 @@ namespace osu.Game.Rulesets.Osu.Beatmaps
 
             //Reverse pass for stack calculation.
             int extendedStartIndex = startIndex;
+
             for (int i = extendedEndIndex; i > startIndex; i--)
             {
                 int n = i;
@@ -138,6 +141,7 @@ namespace osu.Game.Rulesets.Osu.Beatmaps
                         if (objectN is Slider && Vector2Extensions.Distance(objectN.EndPosition, objectI.Position) < stack_distance)
                         {
                             int offset = objectI.StackHeight - objectN.StackHeight + 1;
+
                             for (int j = n + 1; j <= i; j++)
                             {
                                 //For each object which was declared under this slider, we will offset it to appear *below* the slider end (rather than above).

@@ -124,8 +124,10 @@ namespace osu.Game.Rulesets.Edit
             {
                 case ScrollEvent _:
                     return false;
+
                 case MouseEvent _:
                     return true;
+
                 default:
                     return false;
             }

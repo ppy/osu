@@ -236,10 +236,12 @@ namespace osu.Game.Screens.Edit.Compose.Components
                         beatDivisor.Next();
                         OnUserChange(Current.Value);
                         return true;
+
                     case Key.Left:
                         beatDivisor.Previous();
                         OnUserChange(Current.Value);
                         return true;
+
                     default:
                         return false;
                 }
@@ -307,18 +309,25 @@ namespace osu.Game.Screens.Edit.Compose.Components
                     {
                         case 2:
                             return colours.BlueLight;
+
                         case 4:
                             return colours.Blue;
+
                         case 8:
                             return colours.BlueDarker;
+
                         case 16:
                             return colours.PurpleDark;
+
                         case 3:
                             return colours.YellowLight;
+
                         case 6:
                             return colours.Yellow;
+
                         case 12:
                             return colours.YellowDarker;
+
                         default:
                             return Color4.White;
                     }

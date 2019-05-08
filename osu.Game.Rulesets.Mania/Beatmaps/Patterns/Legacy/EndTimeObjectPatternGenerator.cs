@@ -38,9 +38,11 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
                 case 8 when HitObject.Samples.Any(s => s.Name == SampleInfo.HIT_FINISH) && endTime - HitObject.StartTime < 1000:
                     addToPattern(pattern, 0, generateHold);
                     break;
+
                 case 8:
                     addToPattern(pattern, FindAvailableColumn(GetRandomColumn(), PreviousPattern), generateHold);
                     break;
+
                 default:
                     if (TotalColumns > 0)
                         addToPattern(pattern, GetRandomColumn(), generateHold);
