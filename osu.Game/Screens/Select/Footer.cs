@@ -6,7 +6,6 @@ using System.Collections.Generic;
 using System.Linq;
 using osuTK;
 using osuTK.Graphics;
-using osuTK.Input;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -34,22 +33,19 @@ namespace osu.Game.Screens.Select
 
         /// <param name="button">THe button to be added.</param>
         /// <param name="overlay">The <see cref="OverlayContainer"/> to be toggled by this button.</param>
-        /// <param name="hotkey">Hotkey of the button.</param>
-        public void AddButton(FooterButton button, OverlayContainer overlay, Key? hotkey = null)
+        public void AddButton(FooterButton button, OverlayContainer overlay)
         {
             overlays.Add(overlay);
-            AddButton(button, () => showOverlay(overlay), hotkey);
+            button.Action = () => showOverlay(overlay);
+
+            AddButton(button);
         }
 
         /// <param name="button">Button to be added.</param>
-        /// <param name="action">Action the button does.</param>
-        /// <param name="hotkey">Hotkey of the button.</param>
-        public void AddButton(FooterButton button, Action action, Key? hotkey = null)
+        public void AddButton(FooterButton button)
         {
-            button.Hotkey = hotkey;
             button.Hovered = updateModeLight;
             button.HoverLost = updateModeLight;
-            button.Action = action;
 
             buttons.Add(button);
         }
