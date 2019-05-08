@@ -1,4 +1,4 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Bindables;
@@ -37,6 +37,11 @@ namespace osu.Game.Screens.Select
         private class FooterModDisplay : ModDisplay
         {
             public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => Parent?.Parent?.ReceivePositionalInputAt(screenSpacePos) ?? false;
+
+            public FooterModDisplay()
+            {
+                AllowExpand = false;
+            }
         }
     }
 }
