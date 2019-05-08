@@ -77,6 +77,7 @@ namespace osu.Desktop
                     if (versionManager != null)
                         versionManager.State = Visibility.Visible;
                     break;
+
                 default:
                     if (versionManager != null)
                         versionManager.State = Visibility.Hidden;
@@ -87,6 +88,7 @@ namespace osu.Desktop
         public override void SetHost(GameHost host)
         {
             base.SetHost(host);
+
             if (host.Window is DesktopGameWindow desktopWindow)
             {
                 desktopWindow.CursorState |= CursorState.Hidden;

@@ -117,7 +117,7 @@ namespace osu.Game.Overlays.Profile
             infoTabControl.AddItem("Info");
             infoTabControl.AddItem("Modding");
 
-            centreHeaderContainer.DetailsVisible.BindValueChanged(visible => detailHeaderContainer.Alpha = visible.NewValue ? 1 : 0, true);
+            centreHeaderContainer.DetailsVisible.BindValueChanged(visible => detailHeaderContainer.Expanded = visible.NewValue, true);
             User.ValueChanged += e => updateDisplay(e.NewValue);
         }
 
