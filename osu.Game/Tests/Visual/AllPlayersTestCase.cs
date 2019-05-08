@@ -6,6 +6,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Screens;
 using osu.Framework.Timing;
 using osu.Game.Beatmaps;
+using osu.Game.Configuration;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Screens.Play;
@@ -41,6 +42,10 @@ namespace osu.Game.Tests.Visual
 
                 AddCheckSteps();
             }
+
+            OsuConfigManager manager;
+            Dependencies.Cache(manager = new OsuConfigManager(LocalStorage));
+            manager.GetBindable<double>(OsuSetting.DimLevel).Value = 1.0;
         }
 
         protected abstract void AddCheckSteps();

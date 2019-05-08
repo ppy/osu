@@ -212,6 +212,7 @@ namespace osu.Game.Rulesets.Taiko.UI
                 case DrawableBarLine barline:
                     barlineContainer.Add(barline.CreateProxy());
                     break;
+
                 case DrawableTaikoHitObject taikoObject:
                     topLevelHitContainer.Add(taikoObject.CreateProxiedContent());
                     break;
@@ -232,6 +233,7 @@ namespace osu.Game.Rulesets.Taiko.UI
                     if (result.IsHit)
                         hitExplosionContainer.Children.FirstOrDefault(e => e.JudgedObject == ((DrawableStrongNestedHit)judgedObject).MainObject)?.VisualiseSecondHit();
                     break;
+
                 default:
                     judgementContainer.Add(new DrawableTaikoJudgement(result, judgedObject)
                     {

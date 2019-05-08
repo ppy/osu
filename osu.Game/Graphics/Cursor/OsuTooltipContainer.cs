@@ -37,6 +37,7 @@ namespace osu.Game.Graphics.Cursor
                     if (value == text.Text) return;
 
                     text.Text = value;
+
                     if (IsPresent)
                     {
                         AutoSizeDuration = 250;

@@ -4,6 +4,7 @@
 using System;
 using System.Linq;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -70,6 +71,11 @@ namespace osu.Game.Screens.Play.HUD
             return base.OnMouseMove(e);
         }
 
+        public bool PauseOnFocusLost
+        {
+            set => button.PauseOnFocusLost = value;
+        }
+
         protected override void Update()
         {
             base.Update();
@@ -93,8 +99,10 @@ namespace osu.Game.Screens.Play.HUD
             public Action HoverGained;
             public Action HoverLost;
 
+            private readonly IBindable<bool> gameActive = new Bindable<bool>(true);
+
             [BackgroundDependencyLoader]
-            private void load(OsuColour colours)
+            private void load(OsuColour colours, Framework.Game game)
             {
                 Size = new Vector2(60);
 
@@ -135,6 +143,14 @@ namespace osu.Game.Screens.Play.HUD
                 };
 
                 bind();
+
+                gameActive.BindTo(game.IsActive);
+            }
+
+            protected override void LoadComplete()
+            {
+                base.LoadComplete();
+                gameActive.BindValueChanged(_ => updateActive(), true);
             }
 
             private void bind()
@@ -182,6 +198,31 @@ namespace osu.Game.Screens.Play.HUD
             {
                 HoverLost?.Invoke();
                 base.OnHoverLost(e);
+            }
+
+            private bool pauseOnFocusLost = true;
+
+            public bool PauseOnFocusLost
+            {
+                set
+                {
+                    if (pauseOnFocusLost == value)
+                        return;
+
+                    pauseOnFocusLost = value;
+                    if (IsLoaded)
+                        updateActive();
+                }
+            }
+
+            private void updateActive()
+            {
+                if (!pauseOnFocusLost) return;
+
+                if (gameActive.Value)
+                    AbortConfirm();
+                else
+                    BeginConfirm();
             }
 
             public bool OnPressed(GlobalAction action)

@@ -43,7 +43,24 @@ namespace osu.Game.Online.Leaderboards
 
         private void updateTexture()
         {
-            rankSprite.Texture = textures.Get($@"Grades/{Rank.GetDescription()}");
+            string textureName;
+
+            switch (Rank)
+            {
+                default:
+                    textureName = Rank.GetDescription();
+                    break;
+
+                case ScoreRank.SH:
+                    textureName = "SPlus";
+                    break;
+
+                case ScoreRank.XH:
+                    textureName = "SSPlus";
+                    break;
+            }
+
+            rankSprite.Texture = textures.Get($@"Grades/{textureName}");
         }
 
         public void UpdateRank(ScoreRank newRank)

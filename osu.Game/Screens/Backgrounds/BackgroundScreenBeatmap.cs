@@ -76,6 +76,7 @@ namespace osu.Game.Screens.Backgrounds
         private void switchBackground(BeatmapBackground b)
         {
             float newDepth = 0;
+
             if (Background != null)
             {
                 newDepth = Background.Depth + 1;

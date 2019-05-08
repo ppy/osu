@@ -26,6 +26,7 @@ namespace osu.Game.Beatmaps.Formats
             Section section = Section.None;
 
             string line;
+
             while ((line = stream.ReadLine()) != null)
             {
                 if (ShouldSkipLine(line))
