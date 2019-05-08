@@ -30,54 +30,39 @@ namespace osu.Game.Screens.Select
 
         private readonly FillFlowContainer<FooterButton> buttons;
 
-        /// <param name="button">Button to be added.</param>
-        /// <param name="text">Text on the button.</param>
-        /// <param name="colour">Colour of the button.</param>
+        private readonly List<OverlayContainer> overlays = new List<OverlayContainer>();
+
+        /// <param name="button">THe button to be added.</param>
+        /// <param name="overlay">The <see cref="OverlayContainer"/> to be toggled by this button.</param>
         /// <param name="hotkey">Hotkey of the button.</param>
-        /// <param name="action">Action the button does.</param>
-        /// <param name="depth">
-        /// <para>Higher depth to be put on the left, and lower to be put on the right.</para>
-        /// <para>Notice this is different to <see cref="Options.BeatmapOptionsOverlay"/>!</para>
-        /// </param>
-        public void AddButton(FooterButton button, string text, Color4 colour, Action action, Key? hotkey = null, float depth = 0)
+        public void AddButton(FooterButton button, OverlayContainer overlay, Key? hotkey = null)
         {
-            button.Text = text;
-            button.Depth = depth;
-            button.SelectedColour = colour;
-            button.DeselectedColour = colour.Opacity(0.5f);
+            overlays.Add(overlay);
+            AddButton(button, () => showOverlay(overlay), hotkey);
+        }
+
+        /// <param name="button">Button to be added.</param>
+        /// <param name="action">Action the button does.</param>
+        /// <param name="hotkey">Hotkey of the button.</param>
+        public void AddButton(FooterButton button, Action action, Key? hotkey = null)
+        {
             button.Hotkey = hotkey;
             button.Hovered = updateModeLight;
             button.HoverLost = updateModeLight;
             button.Action = action;
 
             buttons.Add(button);
-            buttons.SetLayoutPosition(button, -depth);
         }
 
-        private readonly List<OverlayContainer> overlays = new List<OverlayContainer>();
-
-        /// <param name="button">THe button to be added.</param>
-        /// <param name="text">Text on the button.</param>
-        /// <param name="colour">Colour of the button.</param>
-        /// <param name="hotkey">Hotkey of the button.</param>
-        /// <param name="overlay">The <see cref="OverlayContainer"/> to be toggled by this button.</param>
-        /// <param name="depth">
-        /// <para>Higher depth to be put on the left, and lower to be put on the right.</para>
-        /// <para>Notice this is different to <see cref="Options.BeatmapOptionsOverlay"/>!</para>
-        /// </param>
-        public void AddButton(FooterButton button, string text, Color4 colour, OverlayContainer overlay, Key? hotkey = null, float depth = 0)
+        private void showOverlay(OverlayContainer overlay)
         {
-            overlays.Add(overlay);
-            AddButton(button, text, colour, () =>
+            foreach (var o in overlays)
             {
-                foreach (var o in overlays)
-                {
-                    if (o == overlay)
-                        o.ToggleVisibility();
-                    else
-                        o.Hide();
-                }
-            }, hotkey, depth);
+                if (o == overlay)
+                    o.ToggleVisibility();
+                else
+                    o.Hide();
+            }
         }
 
         private void updateModeLight() => modeLight.FadeColour(buttons.FirstOrDefault(b => b.IsHovered)?.SelectedColour ?? Color4.Transparent, TRANSITION_LENGTH, Easing.OutQuint);

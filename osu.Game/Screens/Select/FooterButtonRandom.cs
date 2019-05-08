@@ -1,9 +1,12 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using osu.Framework.Allocation;
+using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Events;
+using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 
 namespace osu.Game.Screens.Select
@@ -22,6 +25,14 @@ namespace osu.Game.Screens.Select
                 Text = @"rewind",
                 Alpha = 0
             });
+        }
+
+        [BackgroundDependencyLoader]
+        private void load(OsuColour colours)
+        {
+            SelectedColour = colours.Green;
+            DeselectedColour = SelectedColour.Opacity(0.5f);
+            Text = @"random";
         }
 
         protected override bool OnKeyDown(KeyDownEvent e)

@@ -223,9 +223,9 @@ namespace osu.Game.Screens.Select
 
             if (Footer != null)
             {
-                Footer.AddButton(new FooterButtonMods(mods), @"mods", colours.Yellow, ModSelect, Key.F1);
-                Footer.AddButton(new FooterButtonRandom(), @"random", colours.Green, triggerRandom, Key.F2);
-                Footer.AddButton(new FooterButton(), @"options", colours.Blue, BeatmapOptions, Key.F3);
+                Footer.AddButton(new FooterButtonMods(mods), ModSelect, Key.F1);
+                Footer.AddButton(new FooterButtonRandom(), triggerRandom, Key.F2);
+                Footer.AddButton(new FooterButtonOptions(), BeatmapOptions, Key.F3);
 
                 BeatmapOptions.AddButton(@"Delete", @"all difficulties", FontAwesome.Solid.Trash, colours.Pink, () => delete(Beatmap.Value.BeatmapSetInfo), Key.Number4, float.MaxValue);
                 BeatmapOptions.AddButton(@"Remove", @"from unplayed", FontAwesome.Regular.TimesCircle, colours.Purple, null, Key.Number1);
