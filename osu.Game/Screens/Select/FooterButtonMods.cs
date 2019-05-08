@@ -11,6 +11,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Game.Graphics;
 using osuTK;
+using osuTK.Input;
 
 namespace osu.Game.Screens.Select
 {
@@ -43,6 +44,7 @@ namespace osu.Game.Screens.Select
             SelectedColour = colours.Yellow;
             DeselectedColour = SelectedColour.Opacity(0.5f);
             Text = @"mods";
+            Hotkey = Key.F1;
         }
 
         private class FooterModDisplay : ModDisplay
