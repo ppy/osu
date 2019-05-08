@@ -8,6 +8,7 @@ using osu.Framework.Extensions;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
@@ -42,6 +43,8 @@ namespace osu.Game.Overlays.KeyBinding
                 this.FadeTo(!matchingFilter ? 0 : 1);
             }
         }
+
+        public bool FilteringActive { get; set; }
 
         private OsuSpriteText text;
         private OsuTextFlowContainer pressAKey;
@@ -115,6 +118,7 @@ namespace osu.Game.Overlays.KeyBinding
         public void RestoreDefaults()
         {
             int i = 0;
+
             foreach (var d in Defaults)
             {
                 var button = buttons[i++];

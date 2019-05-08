@@ -11,7 +11,7 @@ namespace osu.Game.Graphics.UserInterface
         public BackButton()
         {
             Text = @"back";
-            Icon = FontAwesome.fa_osu_left_o;
+            Icon = OsuIcon.LeftCircle;
             Anchor = Anchor.BottomLeft;
             Origin = Anchor.BottomLeft;
         }

@@ -1,12 +1,15 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Collections.Generic;
+using System.Threading;
 using osu.Framework.Bindables;
+using osu.Framework.Graphics;
 using osu.Game.Users;
 
 namespace osu.Game.Online.API
 {
-    public class DummyAPIAccess : IAPIProvider
+    public class DummyAPIAccess : Component, IAPIProvider
     {
         public Bindable<User> LocalUser { get; } = new Bindable<User>(new User
         {
@@ -20,7 +23,23 @@ namespace osu.Game.Online.API
 
         public string Endpoint => "http://localhost";
 
-        public APIState State => LocalUser.Value.Id == 1 ? APIState.Offline : APIState.Online;
+        private APIState state = APIState.Online;
+
+        private readonly List<IOnlineComponent> components = new List<IOnlineComponent>();
+
+        public APIState State
+        {
+            get => state;
+            private set
+            {
+                if (state == value)
+                    return;
+
+                state = value;
+
+                Scheduler.Add(() => components.ForEach(c => c.APIStateChanged(this, value)));
+            }
+        }
 
         public virtual void Queue(APIRequest request)
         {
@@ -28,28 +47,36 @@ namespace osu.Game.Online.API
 
         public void Register(IOnlineComponent component)
         {
-            // todo: add support
+            Scheduler.Add(delegate { components.Add(component); });
+            component.APIStateChanged(this, state);
         }
 
         public void Unregister(IOnlineComponent component)
         {
-            // todo: add support
+            Scheduler.Add(delegate { components.Remove(component); });
         }
 
         public void Login(string username, string password)
         {
             LocalUser.Value = new User
             {
-                Username = @"Dummy",
+                Username = username,
                 Id = 1001,
             };
+
+            State = APIState.Online;
         }
 
         public void Logout()
         {
             LocalUser.Value = new GuestUser();
+            State = APIState.Offline;
         }
 
-        public RegistrationRequest.RegistrationRequestErrors CreateAccount(string email, string username, string password) => null;
+        public RegistrationRequest.RegistrationRequestErrors CreateAccount(string email, string username, string password)
+        {
+            Thread.Sleep(200);
+            return null;
+        }
     }
 }

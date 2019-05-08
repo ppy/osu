@@ -26,12 +26,15 @@ namespace osu.Game.Online.API.Requests
                 {
                     case PrimaryFilter.Open:
                         break;
+
                     case PrimaryFilter.Owned:
                         target += "/owned";
                         break;
+
                     case PrimaryFilter.Participated:
                         target += "/participated";
                         break;
+
                     case PrimaryFilter.RecentlyEnded:
                         target += "/ended";
                         break;

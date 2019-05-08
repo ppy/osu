@@ -95,6 +95,7 @@ namespace osu.Game.Rulesets.Objects
             path.Clear();
 
             int i = 0;
+
             for (; i < calculatedPath.Count && cumulativeLength[i] < d0; ++i)
             {
             }
@@ -142,6 +143,7 @@ namespace osu.Game.Rulesets.Objects
             {
                 case PathType.Linear:
                     return PathApproximator.ApproximateLinear(subControlPoints);
+
                 case PathType.PerfectCurve:
                     //we can only use CircularArc iff we have exactly three control points and no dissection.
                     if (ControlPoints.Length != 3 || subControlPoints.Length != 3)
@@ -155,6 +157,7 @@ namespace osu.Game.Rulesets.Objects
                         break;
 
                     return subpath;
+
                 case PathType.Catmull:
                     return PathApproximator.ApproximateCatmull(subControlPoints);
             }
@@ -276,13 +279,6 @@ namespace osu.Game.Rulesets.Objects
                 return false;
 
             return ControlPoints.SequenceEqual(other.ControlPoints) && ExpectedDistance.Equals(other.ExpectedDistance) && Type == other.Type;
-        }
-
-        public override bool Equals(object obj)
-        {
-            if (ReferenceEquals(null, obj)) return false;
-
-            return obj is SliderPath other && Equals(other);
         }
     }
 }

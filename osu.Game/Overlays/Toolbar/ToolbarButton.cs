@@ -4,6 +4,7 @@
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Backgrounds;
@@ -27,13 +28,13 @@ namespace osu.Game.Overlays.Toolbar
             IconContainer.Show();
         }
 
-        public void SetIcon(FontAwesome icon) => SetIcon(new SpriteIcon
+        public void SetIcon(IconUsage icon) => SetIcon(new SpriteIcon
         {
             Size = new Vector2(20),
             Icon = icon
         });
 
-        public FontAwesome Icon
+        public IconUsage Icon
         {
             set => SetIcon(value);
         }

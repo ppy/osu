@@ -13,8 +13,7 @@ namespace osu.Game.Storyboards
         public bool EnabledWhenPassing = true;
         public bool EnabledWhenFailing = true;
 
-        private readonly List<IStoryboardElement> elements = new List<IStoryboardElement>();
-        public IEnumerable<IStoryboardElement> Elements => elements;
+        public List<IStoryboardElement> Elements = new List<IStoryboardElement>();
 
         public StoryboardLayer(string name, int depth)
         {
@@ -24,7 +23,7 @@ namespace osu.Game.Storyboards
 
         public void Add(IStoryboardElement element)
         {
-            elements.Add(element);
+            Elements.Add(element);
         }
 
         public DrawableStoryboardLayer CreateDrawable()

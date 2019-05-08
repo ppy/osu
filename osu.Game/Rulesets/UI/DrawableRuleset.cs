@@ -1,4 +1,4 @@
-﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
@@ -11,7 +11,6 @@ using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics.Cursor;
@@ -82,7 +81,8 @@ namespace osu.Game.Rulesets.UI
         /// <summary>
         /// The mods which are to be applied.
         /// </summary>
-        private readonly IEnumerable<Mod> mods;
+        [Cached(typeof(IReadOnlyList<Mod>))]
+        private readonly IReadOnlyList<Mod> mods;
 
         private FrameStabilityContainer frameStabilityContainer;
 
@@ -93,16 +93,19 @@ namespace osu.Game.Rulesets.UI
         /// </summary>
         /// <param name="ruleset">The ruleset being represented.</param>
         /// <param name="workingBeatmap">The beatmap to create the hit renderer for.</param>
-        protected DrawableRuleset(Ruleset ruleset, WorkingBeatmap workingBeatmap)
+        /// <param name="mods">The <see cref="Mod"/>s to apply.</param>
+        protected DrawableRuleset(Ruleset ruleset, WorkingBeatmap workingBeatmap, IReadOnlyList<Mod> mods)
             : base(ruleset)
         {
-            Debug.Assert(workingBeatmap != null, "DrawableRuleset initialized with a null beatmap.");
+            if (workingBeatmap == null)
+                throw new ArgumentException("Beatmap cannot be null.", nameof(workingBeatmap));
+
+            this.mods = mods.ToArray();
 
             RelativeSizeAxes = Axes.Both;
 
-            Beatmap = (Beatmap<TObject>)workingBeatmap.GetPlayableBeatmap(ruleset.RulesetInfo);
+            Beatmap = (Beatmap<TObject>)workingBeatmap.GetPlayableBeatmap(ruleset.RulesetInfo, mods);
 
-            mods = workingBeatmap.Mods.Value;
             applyBeatmapMods(mods);
 
             KeyBindingInputManager = CreateInputManager();
@@ -124,6 +127,7 @@ namespace osu.Game.Rulesets.UI
             onScreenDisplay = dependencies.Get<OnScreenDisplay>();
 
             Config = dependencies.Get<RulesetConfigCache>().GetConfigFor(Ruleset);
+
             if (Config != null)
             {
                 dependencies.Cache(Config);
@@ -133,22 +137,29 @@ namespace osu.Game.Rulesets.UI
             return dependencies;
         }
 
+        public virtual PlayfieldAdjustmentContainer CreatePlayfieldAdjustmentContainer() => new PlayfieldAdjustmentContainer();
+
         [BackgroundDependencyLoader]
         private void load(OsuConfigManager config)
         {
-            KeyBindingInputManager.AddRange(new Drawable[]
-            {
-                Playfield
-            });
-
             InternalChildren = new Drawable[]
             {
                 frameStabilityContainer = new FrameStabilityContainer
                 {
-                    Child = KeyBindingInputManager,
+                    Child = KeyBindingInputManager
+                        .WithChild(CreatePlayfieldAdjustmentContainer()
+                            .WithChild(Playfield)
+                        )
                 },
                 Overlays = new Container { RelativeSizeAxes = Axes.Both }
             };
+
+            if ((ResumeOverlay = CreateResumeOverlay()) != null)
+            {
+                AddInternal(CreateInputManager()
+                    .WithChild(CreatePlayfieldAdjustmentContainer()
+                        .WithChild(ResumeOverlay)));
+            }
 
             applyRulesetMods(mods, config);
 
@@ -161,7 +172,7 @@ namespace osu.Game.Rulesets.UI
         private void loadObjects()
         {
             foreach (TObject h in Beatmap.HitObjects)
-                addRepresentation(h);
+                addHitObject(h);
 
             Playfield.PostProcess();
 
@@ -169,13 +180,29 @@ namespace osu.Game.Rulesets.UI
                 mod.ApplyToDrawableHitObjects(Playfield.HitObjectContainer.Objects);
         }
 
+        public override void RequestResume(Action continueResume)
+        {
+            if (ResumeOverlay != null && (Cursor == null || (Cursor.LastFrameState == Visibility.Visible && Contains(Cursor.ActiveCursor.ScreenSpaceDrawQuad.Centre))))
+            {
+                ResumeOverlay.GameplayCursor = Cursor;
+                ResumeOverlay.ResumeAction = continueResume;
+                ResumeOverlay.Show();
+            }
+            else
+                continueResume();
+        }
+
+        public ResumeOverlay ResumeOverlay { get; private set; }
+
+        protected virtual ResumeOverlay CreateResumeOverlay() => null;
+
         /// <summary>
         /// Creates and adds the visual representation of a <see cref="TObject"/> to this <see cref="DrawableRuleset{TObject}"/>.
         /// </summary>
         /// <param name="hitObject">The <see cref="TObject"/> to add the visual representation for.</param>
-        private void addRepresentation(TObject hitObject)
+        private void addHitObject(TObject hitObject)
         {
-            var drawableObject = GetVisualRepresentation(hitObject);
+            var drawableObject = CreateDrawableRepresentation(hitObject);
 
             if (drawableObject == null)
                 return;
@@ -200,6 +227,12 @@ namespace osu.Game.Rulesets.UI
 
             if (replayInputManager.ReplayInputHandler != null)
                 replayInputManager.ReplayInputHandler.GamefieldToScreenSpace = Playfield.GamefieldToScreenSpace;
+
+            if (!ProvidingUserCursor)
+            {
+                // The cursor is hidden by default (see Playfield.load()), but should be shown when there's a replay
+                Playfield.Cursor?.Show();
+            }
         }
 
         /// <summary>
@@ -207,9 +240,9 @@ namespace osu.Game.Rulesets.UI
         /// </summary>
         /// <param name="h">The HitObject to make drawable.</param>
         /// <returns>The DrawableHitObject.</returns>
-        public abstract DrawableHitObject<TObject> GetVisualRepresentation(TObject h);
+        public abstract DrawableHitObject<TObject> CreateDrawableRepresentation(TObject h);
 
-        public void Attach(KeyCounterCollection keyCounter) =>
+        public void Attach(KeyCounterDisplay keyCounter) =>
             (KeyBindingInputManager as ICanAttachKeyCounter)?.Attach(keyCounter);
 
         /// <summary>
@@ -232,7 +265,7 @@ namespace osu.Game.Rulesets.UI
         /// Applies the active mods to the Beatmap.
         /// </summary>
         /// <param name="mods"></param>
-        private void applyBeatmapMods(IEnumerable<Mod> mods)
+        private void applyBeatmapMods(IReadOnlyList<Mod> mods)
         {
             if (mods == null)
                 return;
@@ -244,8 +277,9 @@ namespace osu.Game.Rulesets.UI
         /// <summary>
         /// Applies the active mods to this DrawableRuleset.
         /// </summary>
-        /// <param name="mods"></param>
-        private void applyRulesetMods(IEnumerable<Mod> mods, OsuConfigManager config)
+        /// <param name="mods">The <see cref="Mod"/>s to apply.</param>
+        /// <param name="config">The <see cref="OsuConfigManager"/> to apply.</param>
+        private void applyRulesetMods(IReadOnlyList<Mod> mods, OsuConfigManager config)
         {
             if (mods == null)
                 return;
@@ -261,7 +295,9 @@ namespace osu.Game.Rulesets.UI
 
         protected override bool OnHover(HoverEvent e) => true; // required for IProvideCursor
 
-        public override CursorContainer Cursor => Playfield.Cursor;
+        CursorContainer IProvideCursor.Cursor => Playfield.Cursor;
+
+        public override GameplayCursorContainer Cursor => Playfield.Cursor;
 
         public bool ProvidingUserCursor => Playfield.Cursor != null && !HasReplayLoaded.Value;
 
@@ -331,13 +367,20 @@ namespace osu.Game.Rulesets.UI
         /// <summary>
         /// The cursor being displayed by the <see cref="Playfield"/>. May be null if no cursor is provided.
         /// </summary>
-        public abstract CursorContainer Cursor { get; }
+        public abstract GameplayCursorContainer Cursor { get; }
 
         /// <summary>
         /// Sets a replay to be used, overriding local input.
         /// </summary>
         /// <param name="replayScore">The replay, null for local input.</param>
         public abstract void SetReplayScore(Score replayScore);
+
+        /// <summary>
+        /// Invoked when the interactive user requests resuming from a paused state.
+        /// Allows potentially delaying the resume process until an interaction is performed.
+        /// </summary>
+        /// <param name="continueResume">The action to run when resuming is to be completed.</param>
+        public abstract void RequestResume(Action continueResume);
 
         /// <summary>
         /// Create a <see cref="ScoreProcessor"/> for the associated ruleset  and link with this

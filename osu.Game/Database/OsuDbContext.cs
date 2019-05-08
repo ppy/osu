@@ -60,6 +60,7 @@ namespace osu.Game.Database
             this.connectionString = connectionString;
 
             var connection = Database.GetDbConnection();
+
             try
             {
                 connection.Open();
@@ -70,7 +71,7 @@ namespace osu.Game.Database
                     cmd.ExecuteNonQuery();
                 }
             }
-            catch (Exception e)
+            catch
             {
                 connection.Close();
                 throw;
@@ -170,9 +171,11 @@ namespace osu.Game.Database
                         default:
                             frameworkLogLevel = Framework.Logging.LogLevel.Debug;
                             break;
+
                         case LogLevel.Warning:
                             frameworkLogLevel = Framework.Logging.LogLevel.Important;
                             break;
+
                         case LogLevel.Error:
                         case LogLevel.Critical:
                             frameworkLogLevel = Framework.Logging.LogLevel.Error;

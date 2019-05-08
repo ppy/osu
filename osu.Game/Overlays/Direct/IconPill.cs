@@ -4,7 +4,7 @@
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
-using osu.Game.Graphics;
+using osu.Framework.Graphics.Sprites;
 using osuTK;
 using osuTK.Graphics;
 
@@ -20,7 +20,7 @@ namespace osu.Game.Overlays.Direct
 
         private readonly Container iconContainer;
 
-        public IconPill(FontAwesome icon)
+        public IconPill(IconUsage icon)
         {
             AutoSizeAxes = Axes.Both;
             Masking = true;

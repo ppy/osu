@@ -5,7 +5,7 @@ using osu.Framework.Graphics.Sprites;
 
 namespace osu.Game.Graphics
 {
-    public struct OsuFont
+    public static class OsuFont
     {
         /// <summary>
         /// The default font size.
@@ -42,8 +42,7 @@ namespace osu.Game.Graphics
             {
                 case Typeface.Exo:
                     return "Exo2.0";
-                case Typeface.FontAwesome:
-                    return "FontAwesome";
+
                 case Typeface.Venera:
                     return "Venera";
             }
@@ -63,9 +62,9 @@ namespace osu.Game.Graphics
         /// <summary>
         /// Retrieves the string representation of a <see cref="FontWeight"/>.
         /// </summary>
-        /// <param name="typeface">The <see cref="Typeface"/>.</param>
+        /// <param name="family">The family string.</param>
         /// <param name="weight">The <see cref="FontWeight"/>.</param>
-        /// <returns>The string representation of <paramref name="weight"/> in the specified <paramref name="typeface"/>.</returns>
+        /// <returns>The string representation of <paramref name="weight"/> in the specified <paramref name="family"/>.</returns>
         public static string GetWeightString(string family, FontWeight weight)
         {
             string weightString = weight.ToString();
@@ -83,6 +82,7 @@ namespace osu.Game.Graphics
         /// <summary>
         /// Creates a new <see cref="FontUsage"/> by applying adjustments to this <see cref="FontUsage"/>.
         /// </summary>
+        /// <param name="usage">The base <see cref="FontUsage"/>.</param>
         /// <param name="typeface">The font typeface. If null, the value is copied from this <see cref="FontUsage"/>.</param>
         /// <param name="size">The text size. If null, the value is copied from this <see cref="FontUsage"/>.</param>
         /// <param name="weight">The font weight. If null, the value is copied from this <see cref="FontUsage"/>.</param>
@@ -101,7 +101,6 @@ namespace osu.Game.Graphics
     public enum Typeface
     {
         Exo,
-        FontAwesome,
         Venera,
     }
 

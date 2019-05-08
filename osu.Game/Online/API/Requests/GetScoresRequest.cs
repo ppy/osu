@@ -10,7 +10,7 @@ using osu.Game.Online.API.Requests.Responses;
 
 namespace osu.Game.Online.API.Requests
 {
-    public class GetScoresRequest : APIRequest<APIScores>
+    public class GetScoresRequest : APIRequest<APILegacyScores>
     {
         private readonly BeatmapInfo beatmap;
         private readonly BeatmapLeaderboardScope scope;
@@ -31,9 +31,9 @@ namespace osu.Game.Online.API.Requests
             Success += onSuccess;
         }
 
-        private void onSuccess(APIScores r)
+        private void onSuccess(APILegacyScores r)
         {
-            foreach (APIScoreInfo score in r.Scores)
+            foreach (APILegacyScoreInfo score in r.Scores)
                 score.Beatmap = beatmap;
         }
 

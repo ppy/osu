@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using osu.Framework.Graphics.Sprites;
 using osu.Game.Graphics;
 using osu.Game.Overlays.Settings;
 using osu.Game.Rulesets;
@@ -9,7 +10,7 @@ namespace osu.Game.Overlays.KeyBinding
 {
     public class RulesetBindingsSection : SettingsSection
     {
-        public override FontAwesome Icon => (ruleset.CreateInstance().CreateIcon() as SpriteIcon)?.Icon ?? FontAwesome.fa_osu_hot;
+        public override IconUsage Icon => (ruleset.CreateInstance().CreateIcon() as SpriteIcon)?.Icon ?? OsuIcon.Hot;
         public override string Header => ruleset.Name;
 
         private readonly RulesetInfo ruleset;

@@ -1,8 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using osu.Framework.Graphics.Sprites;
 using osu.Game.Beatmaps;
-using osu.Game.Graphics;
 using osu.Game.Scoring;
 using osu.Game.Screens.Ranking.Pages;
 
@@ -19,7 +19,7 @@ namespace osu.Game.Screens.Ranking.Types
             this.beatmap = beatmap;
         }
 
-        public FontAwesome Icon => FontAwesome.fa_user;
+        public IconUsage Icon => FontAwesome.Solid.User;
 
         public string Name => @"Local Leaderboard";
 

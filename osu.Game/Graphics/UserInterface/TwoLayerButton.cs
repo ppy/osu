@@ -12,6 +12,7 @@ using osu.Game.Graphics.Containers;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Framework.Audio.Track;
 using System;
+using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Events;
 
@@ -149,7 +150,7 @@ namespace osu.Game.Graphics.UserInterface
             };
         }
 
-        public FontAwesome Icon
+        public IconUsage Icon
         {
             set => bouncingIcon.Icon = value;
         }
@@ -207,7 +208,7 @@ namespace osu.Game.Graphics.UserInterface
 
             private readonly SpriteIcon icon;
 
-            public FontAwesome Icon
+            public IconUsage Icon
             {
                 set => icon.Icon = value;
             }

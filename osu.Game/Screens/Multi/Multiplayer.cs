@@ -95,7 +95,7 @@ namespace osu.Game.Screens.Multi
                     {
                         RelativeSizeAxes = Axes.Both,
                         Padding = new MarginPadding { Top = Header.HEIGHT },
-                        Child = screenStack = new ScreenStack(loungeSubScreen = new LoungeSubScreen()) { RelativeSizeAxes = Axes.Both }
+                        Child = screenStack = new OsuScreenStack(loungeSubScreen = new LoungeSubScreen()) { RelativeSizeAxes = Axes.Both }
                     },
                     new Header(screenStack),
                     createButton = new HeaderButton
@@ -248,6 +248,7 @@ namespace osu.Game.Screens.Multi
             if (screenStack.CurrentScreen is MatchSubScreen)
             {
                 var track = Beatmap.Value.Track;
+
                 if (track != null)
                 {
                     track.Looping = true;
@@ -276,7 +277,7 @@ namespace osu.Game.Screens.Multi
 
             updatePollingRate(isIdle.Value);
 
-            if (screenStack.CurrentScreen == null)
+            if (screenStack.CurrentScreen == null && this.IsCurrentScreen())
                 this.Exit();
         }
 

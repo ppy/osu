@@ -84,6 +84,7 @@ namespace osu.Game.Graphics.Containers
                 case GlobalAction.Back:
                     State = Visibility.Hidden;
                     return true;
+
                 case GlobalAction.Select:
                     return true;
             }
@@ -107,6 +108,7 @@ namespace osu.Game.Graphics.Containers
                         State = Visibility.Hidden;
 
                     break;
+
                 case Visibility.Hidden:
                     if (PlaySamplesOnStateChange) samplePopOut?.Play();
                     if (BlockScreenWideMouse) osuGame?.RemoveBlockingOverlay(this);

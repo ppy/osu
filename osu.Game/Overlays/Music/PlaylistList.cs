@@ -190,6 +190,7 @@ namespace osu.Game.Overlays.Music
                 // the item positions as they are being transformed
                 float heightAccumulator = 0;
                 int dstIndex = 0;
+
                 for (; dstIndex < items.Count; dstIndex++)
                 {
                     // Using BoundingBox here takes care of scale, paddings, etc...
@@ -229,6 +230,11 @@ namespace osu.Game.Overlays.Music
                         if (value)
                             InvalidateLayout();
                     }
+                }
+
+                public bool FilteringActive
+                {
+                    set { }
                 }
 
                 public IEnumerable<IFilterable> FilterableChildren => Children;

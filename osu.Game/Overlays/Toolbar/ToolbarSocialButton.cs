@@ -2,7 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
-using osu.Game.Graphics;
+using osu.Framework.Graphics.Sprites;
 
 namespace osu.Game.Overlays.Toolbar
 {
@@ -10,7 +10,7 @@ namespace osu.Game.Overlays.Toolbar
     {
         public ToolbarSocialButton()
         {
-            Icon = FontAwesome.fa_users;
+            Icon = FontAwesome.Solid.Users;
         }
 
         [BackgroundDependencyLoader(true)]
