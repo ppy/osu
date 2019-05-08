@@ -102,6 +102,14 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             return true;
         }
 
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            // This width only gets updated on the application of a transform, so this needs to be initialized here.
+            zoomedContent.Width = DrawWidth * currentZoom;
+        }
+
         private float zoomTarget = 1;
 
         private void setZoomTarget(float newZoom, float focusPoint)
