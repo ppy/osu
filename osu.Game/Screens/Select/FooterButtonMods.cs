@@ -7,6 +7,9 @@ using osu.Framework.Graphics.Containers;
 using osu.Game.Screens.Play.HUD;
 using osu.Game.Rulesets.Mods;
 using System.Collections.Generic;
+using osu.Framework.Allocation;
+using osu.Framework.Extensions.Color4Extensions;
+using osu.Game.Graphics;
 using osuTK;
 
 namespace osu.Game.Screens.Select
@@ -32,6 +35,14 @@ namespace osu.Game.Screens.Select
 
             if (mods != null)
                 modDisplay.Current = mods;
+        }
+
+        [BackgroundDependencyLoader]
+        private void load(OsuColour colours)
+        {
+            SelectedColour = colours.Yellow;
+            DeselectedColour = SelectedColour.Opacity(0.5f);
+            Text = @"mods";
         }
 
         private class FooterModDisplay : ModDisplay
