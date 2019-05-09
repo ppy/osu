@@ -20,7 +20,8 @@ namespace osu.Game.Rulesets.UI
         public FrameStabilityContainer()
         {
             RelativeSizeAxes = Axes.Both;
-            gameplayClock = new GameplayClock(framedClock = new FramedClock(manualClock = new ManualClock()));
+
+            GameplayClock = new GameplayClock(framedClock = new FramedClock(manualClock = new ManualClock()));
         }
 
         private readonly ManualClock manualClock;
@@ -28,7 +29,7 @@ namespace osu.Game.Rulesets.UI
         private readonly FramedClock framedClock;
 
         [Cached]
-        private GameplayClock gameplayClock;
+        public GameplayClock GameplayClock { get; }
 
         private IFrameBasedClock parentGameplayClock;
 
@@ -38,7 +39,7 @@ namespace osu.Game.Rulesets.UI
             if (clock != null)
             {
                 parentGameplayClock = clock;
-                gameplayClock.IsPaused.BindTo(clock.IsPaused);
+                GameplayClock.IsPaused.BindTo(clock.IsPaused);
             }
         }
 
@@ -73,7 +74,7 @@ namespace osu.Game.Rulesets.UI
         public override bool UpdateSubTree()
         {
             requireMoreUpdateLoops = true;
-            validState = !gameplayClock.IsPaused.Value;
+            validState = !GameplayClock.IsPaused.Value;
 
             int loops = 0;
 
@@ -160,7 +161,7 @@ namespace osu.Game.Rulesets.UI
             if (parentGameplayClock == null)
                 parentGameplayClock = Clock;
 
-            Clock = gameplayClock;
+            Clock = GameplayClock;
             ProcessCustomClock = false;
         }
 
