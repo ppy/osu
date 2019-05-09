@@ -54,9 +54,11 @@ namespace osu.Game.Rulesets.Taiko.UI
             int currentIndex = 0;
             int currentBeat = 0;
             double time = timingPoints[currentIndex].Time;
+
             while (time <= lastHitTime)
             {
                 int nextIndex = currentIndex + 1;
+
                 if (nextIndex < timingPoints.Count && time > timingPoints[nextIndex].Time)
                 {
                     currentIndex = nextIndex;
@@ -95,10 +97,13 @@ namespace osu.Game.Rulesets.Taiko.UI
             {
                 case CentreHit centreHit:
                     return new DrawableCentreHit(centreHit);
+
                 case RimHit rimHit:
                     return new DrawableRimHit(rimHit);
+
                 case DrumRoll drumRoll:
                     return new DrawableDrumRoll(drumRoll);
+
                 case Swell swell:
                     return new DrawableSwell(swell);
             }

@@ -127,6 +127,7 @@ namespace osu.Game.Rulesets.UI
             onScreenDisplay = dependencies.Get<OnScreenDisplay>();
 
             Config = dependencies.Get<RulesetConfigCache>().GetConfigFor(Ruleset);
+
             if (Config != null)
             {
                 dependencies.Cache(Config);

@@ -32,9 +32,11 @@ namespace osu.Game.Beatmaps.Drawables
                 case BeatmapSetCoverType.Cover:
                     resource = set.OnlineInfo.Covers.Cover;
                     break;
+
                 case BeatmapSetCoverType.Card:
                     resource = set.OnlineInfo.Covers.Card;
                     break;
+
                 case BeatmapSetCoverType.List:
                     resource = set.OnlineInfo.Covers.List;
                     break;
