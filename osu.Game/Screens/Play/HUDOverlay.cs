@@ -129,6 +129,7 @@ namespace osu.Game.Screens.Play
         private void replayLoadedValueChanged(ValueChangedEvent<bool> e)
         {
             PlayerSettingsOverlay.ReplayLoaded = e.NewValue;
+            HoldToQuit.PauseOnFocusLost = !e.NewValue;
 
             if (e.NewValue)
             {
