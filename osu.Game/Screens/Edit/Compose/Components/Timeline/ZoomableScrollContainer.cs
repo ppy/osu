@@ -92,7 +92,13 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             }
         }
 
-        private void updateZoomedContentWidth() => zoomedContent.Width = DrawWidth * currentZoom;
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            // This width only gets updated on the application of a transform, so this needs to be initialized here.
+            updateZoomedContentWidth();
+        }
 
         protected override bool OnScroll(ScrollEvent e)
         {
@@ -104,13 +110,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             return true;
         }
 
-        protected override void LoadComplete()
-        {
-            base.LoadComplete();
-
-            // This width only gets updated on the application of a transform, so this needs to be initialized here.
-            updateZoomedContentWidth();
-        }
+        private void updateZoomedContentWidth() => zoomedContent.Width = DrawWidth * currentZoom;
 
         private float zoomTarget = 1;
 
