@@ -17,10 +17,14 @@ namespace osu.Game.Rulesets.UI
     /// </summary>
     public class FrameStabilityContainer : Container, IHasReplayHandler
     {
-        public FrameStabilityContainer()
+        private readonly double gameplayStartTime;
+
+        public FrameStabilityContainer(double gameplayStartTime = double.MinValue)
         {
             RelativeSizeAxes = Axes.Both;
             gameplayClock = new GameplayClock(framedClock = new FramedClock(manualClock = new ManualClock()));
+
+            this.gameplayStartTime = gameplayStartTime;
         }
 
         private readonly ManualClock manualClock;
@@ -116,6 +120,8 @@ namespace osu.Game.Rulesets.UI
 
                     firstConsumption = false;
                 }
+                else if (manualClock.CurrentTime < gameplayStartTime)
+                    manualClock.CurrentTime = newProposedTime = Math.Min(gameplayStartTime, newProposedTime);
                 else if (Math.Abs(manualClock.CurrentTime - newProposedTime) > sixty_frame_time * 1.2f)
                 {
                     newProposedTime = newProposedTime > manualClock.CurrentTime

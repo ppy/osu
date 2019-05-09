@@ -74,6 +74,26 @@ namespace osu.Game.Tests.Visual.Gameplay
         }
 
         [Test]
+        public void TestInitialSeekWithGameplayStart()
+        {
+            seekManualTo(1000);
+            createStabilityContainer(30000);
+
+            confirmSeek(1000);
+            checkFrameCount(0);
+
+            seekManualTo(10000);
+            confirmSeek(10000);
+
+            checkFrameCount(1);
+
+            seekManualTo(130000);
+            confirmSeek(130000);
+
+            checkFrameCount(6002);
+        }
+
+        [Test]
         public void TestInitialSeek()
         {
             seekManualTo(100000);
