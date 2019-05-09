@@ -385,7 +385,7 @@ namespace osu.Game.Database
         /// Delete multiple items.
         /// This will post notifications tracking progress.
         /// </summary>
-        public void Delete(List<TModel> items)
+        public void Delete(List<TModel> items, bool silent = false)
         {
             if (items.Count == 0) return;
 
@@ -396,7 +396,8 @@ namespace osu.Game.Database
                 State = ProgressNotificationState.Active,
             };
 
-            PostNotification?.Invoke(notification);
+            if (!silent)
+                PostNotification?.Invoke(notification);
 
             int i = 0;
 
@@ -423,7 +424,7 @@ namespace osu.Game.Database
         /// Restore multiple items that were previously deleted.
         /// This will post notifications tracking progress.
         /// </summary>
-        public void Undelete(List<TModel> items)
+        public void Undelete(List<TModel> items, bool silent = false)
         {
             if (!items.Any()) return;
 
@@ -434,7 +435,8 @@ namespace osu.Game.Database
                 State = ProgressNotificationState.Active,
             };
 
-            PostNotification?.Invoke(notification);
+            if (!silent)
+                PostNotification?.Invoke(notification);
 
             int i = 0;
 
