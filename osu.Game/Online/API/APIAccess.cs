@@ -77,13 +77,13 @@ namespace osu.Game.Online.API
         /// <param name="component"></param>
         public void Register(IOnlineComponent component)
         {
-            Scheduler.Add(delegate { components.Add(component); });
+            Schedule(() => components.Add(component));
             component.APIStateChanged(this, state);
         }
 
         public void Unregister(IOnlineComponent component)
         {
-            Scheduler.Add(delegate { components.Remove(component); });
+            Schedule(() => components.Remove(component));
         }
 
         public string AccessToken => authentication.RequestAccessToken();
@@ -274,7 +274,7 @@ namespace osu.Game.Online.API
                 state = value;
 
                 log.Add($@"We just went {state}!");
-                Scheduler.Add(delegate
+                Schedule(() =>
                 {
                     components.ForEach(c => c.APIStateChanged(this, state));
                     OnStateChange?.Invoke(oldState, state);
