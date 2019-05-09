@@ -107,7 +107,7 @@ namespace osu.Game.Tests.Visual.UserInterface
                         AutoSizeAxes = Axes.Y,
                         Direction = FillDirection.Vertical,
                         Spacing = new Vector2(10),
-                        Padding = new MarginPadding { Bottom = 250 }
+                        Padding = new MarginPadding { Bottom = 550 }
                     }
                 };
 
@@ -132,11 +132,9 @@ namespace osu.Game.Tests.Visual.UserInterface
 
             var loadedBackgrounds = backgrounds.Where(b => b.ContentLoaded);
 
-            int initialLoadCount = 0;
-
-            AddUntilStep("some loaded", () => (initialLoadCount = loadedBackgrounds.Count()) > 0);
+            AddUntilStep("some loaded", () => loadedBackgrounds.Any());
             AddStep("scroll to bottom", () => scrollContainer.ScrollToEnd());
-            AddUntilStep("some unloaded", () => loadedBackgrounds.Count() < initialLoadCount);
+            AddUntilStep("all unloaded", () => !loadedBackgrounds.Any());
         }
 
         private class TestUpdateableBeatmapBackgroundSprite : UpdateableBeatmapBackgroundSprite
