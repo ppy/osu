@@ -355,9 +355,11 @@ namespace osu.Game.Online.API
 
             password = null;
             authentication.Clear();
-            State = APIState.Offline;
 
+            // Scheduled prior to state change such that the state changed event is invoked with the correct user present
             Schedule(() => LocalUser.Value = createGuestUser());
+
+            State = APIState.Offline;
         }
 
         private static User createGuestUser() => new GuestUser();
