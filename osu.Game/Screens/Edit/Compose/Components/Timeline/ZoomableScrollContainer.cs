@@ -92,6 +92,8 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             }
         }
 
+        private void updateZoomedContentWidth() => zoomedContent.Width = DrawWidth * currentZoom;
+
         protected override bool OnScroll(ScrollEvent e)
         {
             if (e.IsPrecise)
@@ -107,7 +109,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             base.LoadComplete();
 
             // This width only gets updated on the application of a transform, so this needs to be initialized here.
-            zoomedContent.Width = DrawWidth * currentZoom;
+            updateZoomedContentWidth();
         }
 
         private float zoomTarget = 1;
@@ -171,7 +173,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
                 d.currentZoom = newZoom;
 
-                d.zoomedContent.Width = d.DrawWidth * d.currentZoom;
+                d.updateZoomedContentWidth();
                 // Temporarily here to make sure ScrollTo gets the correct DrawSize for scrollable area.
                 // TODO: Make sure draw size gets invalidated properly on the framework side, and remove this once it is.
                 d.Invalidate(Invalidation.DrawSize);
