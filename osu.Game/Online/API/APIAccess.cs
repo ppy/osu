@@ -352,10 +352,12 @@ namespace osu.Game.Online.API
         public void Logout()
         {
             flushQueue();
+
             password = null;
             authentication.Clear();
-            LocalUser.Value = createGuestUser();
             State = APIState.Offline;
+
+            Schedule(() => LocalUser.Value = createGuestUser());
         }
 
         private static User createGuestUser() => new GuestUser();
