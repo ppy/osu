@@ -19,6 +19,11 @@ namespace osu.Game.Rulesets.UI
     {
         private readonly double gameplayStartTime;
 
+        /// <summary>
+        /// The number of frames (per parent frame) which can be run in an attempt to catch-up to real-time.
+        /// </summary>
+        public int MaxCatchUpFrames { get; set; } = 5;
+
         public FrameStabilityContainer(double gameplayStartTime = double.MinValue)
         {
             RelativeSizeAxes = Axes.Both;
@@ -68,8 +73,6 @@ namespace osu.Game.Rulesets.UI
 
         private bool isAttached => ReplayInputHandler != null;
 
-        private const int max_catch_up_updates_per_frame = 50;
-
         private const double sixty_frame_time = 1000.0 / 60;
 
         private bool firstConsumption = true;
@@ -81,7 +84,7 @@ namespace osu.Game.Rulesets.UI
 
             int loops = 0;
 
-            while (validState && requireMoreUpdateLoops && loops++ < max_catch_up_updates_per_frame)
+            while (validState && requireMoreUpdateLoops && loops++ < MaxCatchUpFrames)
             {
                 updateClock();
 
