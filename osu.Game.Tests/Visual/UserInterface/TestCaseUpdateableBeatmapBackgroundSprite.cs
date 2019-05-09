@@ -132,7 +132,7 @@ namespace osu.Game.Tests.Visual.UserInterface
 
             var loadedBackgrounds = backgrounds.Where(b => b.ContentLoaded);
 
-            AddUntilStep("some loaded", () => (initialLoadCount = loadedBackgrounds.Count()) > 0);
+            AddUntilStep("some loaded", () => loadedBackgrounds.Any());
             AddStep("scroll to bottom", () => scrollContainer.ScrollToEnd());
             AddUntilStep("all unloaded", () => !loadedBackgrounds.Any());
         }
