@@ -66,6 +66,7 @@ namespace osu.Game.Rulesets.Mania.Edit
             {
                 case DrawableNote note:
                     return new NoteSelectionBlueprint(note);
+
                 case DrawableHoldNote holdNote:
                     return new HoldNoteSelectionBlueprint(holdNote);
             }

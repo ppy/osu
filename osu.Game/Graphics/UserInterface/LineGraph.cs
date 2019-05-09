@@ -93,6 +93,7 @@ namespace osu.Game.Graphics.UserInterface
         protected override void Update()
         {
             base.Update();
+
             if (!pathCached.IsValid)
             {
                 applyPath();

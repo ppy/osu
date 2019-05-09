@@ -258,6 +258,7 @@ namespace osu.Game.Screens.Multi.Lounge.Components
 
                 // nice little progressive fade
                 int time = 500;
+
                 foreach (var c in fill.Children)
                 {
                     c.Delay(500 - time).FadeOut(time, Easing.Out);

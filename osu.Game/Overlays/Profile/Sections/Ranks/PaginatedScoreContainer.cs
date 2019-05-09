@@ -54,6 +54,7 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
                     default:
                         drawableScores = scores.Select(score => new DrawablePerformanceScore(score, includeWeight ? Math.Pow(0.95, ItemsContainer.Count) : (double?)null));
                         break;
+
                     case ScoreType.Recent:
                         drawableScores = scores.Select(score => new DrawableTotalScore(score));
                         break;

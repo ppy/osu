@@ -161,6 +161,7 @@ namespace osu.Game.Graphics.Containers
 
             float headerH = (ExpandableHeader?.LayoutSize.Y ?? 0) + (FixedHeader?.LayoutSize.Y ?? 0);
             float footerH = Footer?.LayoutSize.Y ?? 0;
+
             if (headerH != headerHeight || footerH != footerHeight)
             {
                 headerHeight = headerH;
@@ -192,6 +193,7 @@ namespace osu.Game.Graphics.Containers
                 foreach (var section in Children)
                 {
                     float diff = Math.Abs(scrollContainer.GetChildPosInContent(section) - currentScroll - scrollOffset);
+
                     if (diff < minDiff)
                     {
                         minDiff = diff;

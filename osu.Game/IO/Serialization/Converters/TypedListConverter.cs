@@ -65,6 +65,7 @@ namespace osu.Game.IO.Serialization.Converters
 
             var lookupTable = new List<string>();
             var objects = new List<JObject>();
+
             foreach (var item in list)
             {
                 var type = item.GetType();
@@ -75,6 +76,7 @@ namespace osu.Game.IO.Serialization.Converters
                     typeString += $", {assemblyName.Version}";
 
                 int typeId = lookupTable.IndexOf(typeString);
+
                 if (typeId == -1)
                 {
                     lookupTable.Add(typeString);

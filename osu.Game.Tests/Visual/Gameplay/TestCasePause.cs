@@ -157,6 +157,8 @@ namespace osu.Game.Tests.Visual.Gameplay
         private void confirmPaused()
         {
             confirmClockRunning(false);
+            AddAssert("player not exited", () => Player.IsCurrentScreen());
+            AddAssert("player not failed", () => !Player.HasFailed);
             AddAssert("pause overlay shown", () => Player.PauseOverlayVisible);
         }
 
@@ -196,9 +198,10 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             public bool PauseOverlayVisible => PauseOverlay.State == Visibility.Visible;
 
-            public PausePlayer()
+            protected override void LoadComplete()
             {
-                PauseOnFocusLost = false;
+                base.LoadComplete();
+                HUDOverlay.HoldToQuit.PauseOnFocusLost = false;
             }
         }
     }

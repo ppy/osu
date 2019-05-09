@@ -53,6 +53,7 @@ namespace osu.Game.Screens.Select
                 var autoType = auto.GetType();
 
                 var mods = Mods.Value;
+
                 if (mods.All(m => m.GetType() != autoType))
                 {
                     Mods.Value = mods.Append(auto).ToArray();
