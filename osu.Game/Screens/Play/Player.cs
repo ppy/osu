@@ -137,7 +137,11 @@ namespace osu.Game.Screens.Play
                 DrawableRuleset.Cursor?.CreateProxy() ?? new Container(),
                 HUDOverlay = new HUDOverlay(ScoreProcessor, DrawableRuleset, Mods.Value)
                 {
-                    HoldToQuit = { Action = performUserRequestedExit },
+                    HoldToQuit =
+                    {
+                        Action = performUserRequestedExit,
+                        IsPaused = { BindTarget = GameplayClockContainer.IsPaused }
+                    },
                     PlayerSettingsOverlay = { PlaybackSettings = { UserPlaybackRate = { BindTarget = GameplayClockContainer.UserPlaybackRate } } },
                     KeyCounter = { Visible = { BindTarget = DrawableRuleset.HasReplayLoaded } },
                     RequestSeek = GameplayClockContainer.Seek,

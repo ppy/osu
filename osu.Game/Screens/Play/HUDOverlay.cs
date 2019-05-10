@@ -35,6 +35,8 @@ namespace osu.Game.Screens.Play
         public readonly HoldForMenuButton HoldToQuit;
         public readonly PlayerSettingsOverlay PlayerSettingsOverlay;
 
+        public readonly IBindable<bool> IsPaused = new Bindable<bool>();
+
         private Bindable<bool> showHud;
         private readonly Container visibilityContainer;
         private readonly BindableBool replayLoaded = new BindableBool();
