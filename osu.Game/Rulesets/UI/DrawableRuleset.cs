@@ -144,7 +144,7 @@ namespace osu.Game.Rulesets.UI
         {
             InternalChildren = new Drawable[]
             {
-                frameStabilityContainer = new FrameStabilityContainer
+                frameStabilityContainer = new FrameStabilityContainer(GameplayStartTime)
                 {
                     Child = KeyBindingInputManager
                         .WithChild(CreatePlayfieldAdjustmentContainer()
