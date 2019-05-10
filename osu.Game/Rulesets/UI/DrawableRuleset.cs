@@ -60,6 +60,8 @@ namespace osu.Game.Rulesets.UI
         /// </summary>
         public Container Overlays { get; private set; }
 
+        public override GameplayClock FrameStableClock => frameStabilityContainer.GameplayClock;
+
         /// <summary>
         /// Invoked when a <see cref="JudgementResult"/> has been applied by a <see cref="DrawableHitObject"/>.
         /// </summary>
@@ -339,6 +341,11 @@ namespace osu.Game.Rulesets.UI
         /// Whether the game is paused. Used to block user input.
         /// </summary>
         public readonly BindableBool IsPaused = new BindableBool();
+
+        /// <summary>
+        /// The frame-stable clock which is being used for playfield display.
+        /// </summary>
+        public abstract GameplayClock FrameStableClock { get; }
 
         /// <summary>~
         /// The associated ruleset.
