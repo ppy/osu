@@ -17,10 +17,19 @@ namespace osu.Game.Rulesets.UI
     /// </summary>
     public class FrameStabilityContainer : Container, IHasReplayHandler
     {
-        public FrameStabilityContainer()
+        private readonly double gameplayStartTime;
+
+        /// <summary>
+        /// The number of frames (per parent frame) which can be run in an attempt to catch-up to real-time.
+        /// </summary>
+        public int MaxCatchUpFrames { get; set; } = 5;
+
+        public FrameStabilityContainer(double gameplayStartTime = double.MinValue)
         {
             RelativeSizeAxes = Axes.Both;
             gameplayClock = new GameplayClock(framedClock = new FramedClock(manualClock = new ManualClock()));
+
+            this.gameplayStartTime = gameplayStartTime;
         }
 
         private readonly ManualClock manualClock;
@@ -64,8 +73,6 @@ namespace osu.Game.Rulesets.UI
 
         private bool isAttached => ReplayInputHandler != null;
 
-        private const int max_catch_up_updates_per_frame = 50;
-
         private const double sixty_frame_time = 1000.0 / 60;
 
         private bool firstConsumption = true;
@@ -77,7 +84,7 @@ namespace osu.Game.Rulesets.UI
 
             int loops = 0;
 
-            while (validState && requireMoreUpdateLoops && loops++ < max_catch_up_updates_per_frame)
+            while (validState && requireMoreUpdateLoops && loops++ < MaxCatchUpFrames)
             {
                 updateClock();
 
@@ -116,6 +123,8 @@ namespace osu.Game.Rulesets.UI
 
                     firstConsumption = false;
                 }
+                else if (manualClock.CurrentTime < gameplayStartTime)
+                    manualClock.CurrentTime = newProposedTime = Math.Min(gameplayStartTime, newProposedTime);
                 else if (Math.Abs(manualClock.CurrentTime - newProposedTime) > sixty_frame_time * 1.2f)
                 {
                     newProposedTime = newProposedTime > manualClock.CurrentTime
