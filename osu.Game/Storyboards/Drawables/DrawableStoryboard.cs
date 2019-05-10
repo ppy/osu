@@ -58,7 +58,7 @@ namespace osu.Game.Storyboards.Drawables
         }
 
         [BackgroundDependencyLoader(true)]
-        private void load(FileStore fileStore, GameplayClock clock, CancellationToken cancellationToken)
+        private void load(FileStore fileStore, GameplayClock clock, CancellationToken? cancellationToken)
         {
             if (clock != null)
                 Clock = clock;
@@ -67,8 +67,7 @@ namespace osu.Game.Storyboards.Drawables
 
             foreach (var layer in Storyboard.Layers)
             {
-                if (cancellationToken.IsCancellationRequested)
-                    break;
+                cancellationToken?.ThrowIfCancellationRequested();
 
                 Add(layer.CreateDrawable());
             }
