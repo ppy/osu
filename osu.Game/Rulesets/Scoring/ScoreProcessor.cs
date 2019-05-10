@@ -360,6 +360,9 @@ namespace osu.Game.Rulesets.Scoring
 
             JudgedHits--;
 
+            if (result.Type != HitResult.None)
+                scoreResultCounts[result.Type] = scoreResultCounts.GetOrDefault(result.Type) - 1;
+
             if (result.Judgement.IsBonus)
             {
                 if (result.IsHit)
