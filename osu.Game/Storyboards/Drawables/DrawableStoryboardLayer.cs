@@ -25,12 +25,11 @@ namespace osu.Game.Storyboards.Drawables
         }
 
         [BackgroundDependencyLoader]
-        private void load(CancellationToken cancellationToken)
+        private void load(CancellationToken? cancellationToken)
         {
             foreach (var element in Layer.Elements)
             {
-                if (cancellationToken.IsCancellationRequested)
-                    break;
+                cancellationToken?.ThrowIfCancellationRequested();
 
                 if (element.IsDrawable)
                     AddInternal(element.CreateDrawable());
