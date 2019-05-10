@@ -115,7 +115,7 @@ namespace osu.Game.Screens.Play
         {
             base.Update();
 
-            float newX = (float)MathHelper.Clamp(Interpolation.Lerp(handleBase.X, NormalizedValue * UsableWidth, Time.Elapsed / 40), 0, UsableWidth);
+            float newX = (float)Interpolation.Lerp(handleBase.X, NormalizedValue * UsableWidth, MathHelper.Clamp(Time.Elapsed / 40, 0, 1));
 
             fill.Width = newX;
             handleBase.X = newX;
