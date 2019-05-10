@@ -18,12 +18,24 @@ namespace osu.Game.Rulesets.Osu
             set => ((OsuKeyBindingContainer)KeyBindingContainer).AllowUserPresses = value;
         }
 
+        public bool AllowUserCursorMovement { get; set; } = true;
+
         protected override RulesetKeyBindingContainer CreateKeyBindingContainer(RulesetInfo ruleset, int variant, SimultaneousBindingMode unique)
             => new OsuKeyBindingContainer(ruleset, variant, unique);
 
         public OsuInputManager(RulesetInfo ruleset)
             : base(ruleset, 0, SimultaneousBindingMode.Unique)
         {
+        }
+
+        protected override bool Handle(UIEvent e)
+        {
+            if (!AllowUserCursorMovement && e is MouseMoveEvent)
+            {
+                return false;
+            }
+
+            return base.Handle(e);
         }
 
         private class OsuKeyBindingContainer : RulesetKeyBindingContainer
