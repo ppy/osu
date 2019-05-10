@@ -143,7 +143,7 @@ namespace osu.Game.Rulesets.UI
         public virtual PlayfieldAdjustmentContainer CreatePlayfieldAdjustmentContainer() => new PlayfieldAdjustmentContainer();
 
         [BackgroundDependencyLoader]
-        private void load(OsuConfigManager config, CancellationToken cancellationToken)
+        private void load(OsuConfigManager config, CancellationToken? cancellationToken)
         {
             InternalChildren = new Drawable[]
             {
@@ -172,18 +172,15 @@ namespace osu.Game.Rulesets.UI
         /// <summary>
         /// Creates and adds drawable representations of hit objects to the play field.
         /// </summary>
-        private void loadObjects(CancellationToken cancellationToken)
+        private void loadObjects(CancellationToken? cancellationToken)
         {
             foreach (TObject h in Beatmap.HitObjects)
             {
-                if (cancellationToken.IsCancellationRequested)
-                    break;
-
+                cancellationToken?.ThrowIfCancellationRequested();
                 addHitObject(h);
             }
 
-            if (cancellationToken.IsCancellationRequested)
-                return;
+            cancellationToken?.ThrowIfCancellationRequested();
 
             Playfield.PostProcess();
 
