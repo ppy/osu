@@ -74,6 +74,26 @@ namespace osu.Game.Tests.Visual.Gameplay
         }
 
         [Test]
+        public void TestInitialSeekWithGameplayStart()
+        {
+            seekManualTo(1000);
+            createStabilityContainer(30000);
+
+            confirmSeek(1000);
+            checkFrameCount(0);
+
+            seekManualTo(10000);
+            confirmSeek(10000);
+
+            checkFrameCount(1);
+
+            seekManualTo(130000);
+            confirmSeek(130000);
+
+            checkFrameCount(6002);
+        }
+
+        [Test]
         public void TestInitialSeek()
         {
             seekManualTo(100000);
@@ -83,7 +103,11 @@ namespace osu.Game.Tests.Visual.Gameplay
             checkFrameCount(0);
         }
 
-        private void createStabilityContainer() => AddStep("create container", () => mainContainer.Child = new FrameStabilityContainer().WithChild(consumer = new ClockConsumingChild()));
+        private const int max_frames_catchup = 50;
+
+        private void createStabilityContainer(double gameplayStartTime = double.MinValue) => AddStep("create container", () =>
+            mainContainer.Child = new FrameStabilityContainer(gameplayStartTime) { MaxCatchUpFrames = max_frames_catchup }
+                .WithChild(consumer = new ClockConsumingChild()));
 
         private void seekManualTo(double time) => AddStep($"seek manual clock to {time}", () => manualClock.CurrentTime = time);
 
