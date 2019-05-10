@@ -186,7 +186,7 @@ namespace osu.Game.Tests.Visual.Gameplay
 
         protected override Player CreatePlayer(Ruleset ruleset) => new PausePlayer();
 
-        protected class PausePlayer : Player
+        protected class PausePlayer : TestPlayer
         {
             public new GameplayClockContainer GameplayClockContainer => base.GameplayClockContainer;
 
@@ -197,12 +197,6 @@ namespace osu.Game.Tests.Visual.Gameplay
             public bool FailOverlayVisible => FailOverlay.State == Visibility.Visible;
 
             public bool PauseOverlayVisible => PauseOverlay.State == Visibility.Visible;
-
-            protected override void LoadComplete()
-            {
-                base.LoadComplete();
-                HUDOverlay.HoldToQuit.PauseOnFocusLost = false;
-            }
         }
     }
 }

@@ -1,12 +1,10 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using NUnit.Framework;
 using osu.Framework.Allocation;
-using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Screens;
 using osu.Game.Rulesets.Mods;
@@ -34,7 +32,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         [Test]
         public void TestLoadContinuation()
         {
-            AddStep("load dummy beatmap", () => stack.Push(loader = new PlayerLoader(() => new Player(false, false))));
+            AddStep("load dummy beatmap", () => stack.Push(loader = new PlayerLoader(() => new TestPlayer(false, false))));
             AddUntilStep("wait for current", () => loader.IsCurrentScreen());
             AddStep("mouse in centre", () => InputManager.MoveMouseTo(loader.ScreenSpaceDrawQuad.Centre));
             AddUntilStep("wait for no longer current", () => !loader.IsCurrentScreen());
@@ -101,17 +99,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             public ScoreRank AdjustRank(ScoreRank rank, double accuracy) => rank;
         }
 
-        private class TestPlayer : Player
-        {
-            public new Bindable<IReadOnlyList<Mod>> Mods => base.Mods;
-
-            public TestPlayer()
-                : base(false, false)
-            {
-            }
-        }
-
-        protected class SlowLoadPlayer : Player
+        protected class SlowLoadPlayer : TestPlayer
         {
             public bool Ready;
 
