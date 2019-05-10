@@ -23,7 +23,7 @@ namespace osu.Game.Rulesets.UI
         /// The number of frames (per parent frame) which can be run in an attempt to catch-up to real-time.
         /// </summary>
         public int MaxCatchUpFrames { get; set; } = 5;
-        
+
         [Cached]
         public GameplayClock GameplayClock { get; }
 
