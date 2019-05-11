@@ -24,7 +24,7 @@ namespace osu.Game.Rulesets.Catch.Mods
 
         private class CatchModRelaxHelper : Drawable, IKeyBindingHandler<CatchAction>, IRequireHighFrequencyMousePosition
         {
-            private CatcherArea.Catcher catcher;
+            private readonly CatcherArea.Catcher catcher;
 
             public CatchModRelaxHelper(CatchPlayfield catchPlayfield)
             {
