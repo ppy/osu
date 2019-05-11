@@ -13,17 +13,21 @@ using osu.Game.Rulesets.UI;
 using osuTK;
 using System;
 
-namespace osu.Game.Rulesets.Catch.Mods {
-    public class CatchModRelax : ModRelax, IApplicableToDrawableRuleset<CatchHitObject> {
+namespace osu.Game.Rulesets.Catch.Mods
+{
+    public class CatchModRelax : ModRelax, IApplicableToDrawableRuleset<CatchHitObject>
+    {
         public override string Description => @"Use the mouse to control the catcher.";
 
         public void ApplyToDrawableRuleset(DrawableRuleset<CatchHitObject> drawableRuleset) =>
             (drawableRuleset.Playfield.Parent as Container).Add(new CatchModRelaxHelper(drawableRuleset.Playfield as CatchPlayfield));
 
-        private class CatchModRelaxHelper : Drawable, IKeyBindingHandler<CatchAction>, IRequireHighFrequencyMousePosition {
+        private class CatchModRelaxHelper : Drawable, IKeyBindingHandler<CatchAction>, IRequireHighFrequencyMousePosition
+        {
             private CatcherArea.Catcher catcher;
 
-            public CatchModRelaxHelper(CatchPlayfield catchPlayfield) {
+            public CatchModRelaxHelper(CatchPlayfield catchPlayfield)
+            {
                 catcher = catchPlayfield.CatcherArea.MovableCatcher;
                 RelativeSizeAxes = Axes.Both;
             }
@@ -32,7 +36,8 @@ namespace osu.Game.Rulesets.Catch.Mods {
             public bool OnPressed(CatchAction action) => true;
             public bool OnReleased(CatchAction action) => true;
 
-            protected override bool OnMouseMove(MouseMoveEvent e) {
+            protected override bool OnMouseMove(MouseMoveEvent e)
+            {
                 //lock catcher to mouse position horizontally
                 catcher.X = e.MousePosition.X / DrawSize.X;
 
