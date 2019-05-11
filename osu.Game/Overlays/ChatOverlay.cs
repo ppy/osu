@@ -198,6 +198,11 @@ namespace osu.Game.Overlays
                 channelSelectionOverlay.State = Visibility.Visible;
                 return;
             }
+            
+            if (e.NewValue.Name == "+")
+            {
+                return;
+            }
 
             textbox.Current.Disabled = e.NewValue.ReadOnly;
 
