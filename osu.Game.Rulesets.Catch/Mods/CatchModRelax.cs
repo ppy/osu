@@ -20,7 +20,7 @@ namespace osu.Game.Rulesets.Catch.Mods
         public override string Description => @"Use the mouse to control the catcher.";
 
         public void ApplyToDrawableRuleset(DrawableRuleset<CatchHitObject> drawableRuleset) =>
-            (drawableRuleset.Playfield.Parent as Container).Add(new CatchModRelaxHelper(drawableRuleset.Playfield as CatchPlayfield));
+            ((Container)drawableRuleset.Playfield.Parent).Add(new CatchModRelaxHelper(drawableRuleset.Playfield as CatchPlayfield));
 
         private class CatchModRelaxHelper : Drawable, IKeyBindingHandler<CatchAction>, IRequireHighFrequencyMousePosition
         {
