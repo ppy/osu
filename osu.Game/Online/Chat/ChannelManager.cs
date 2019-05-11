@@ -84,7 +84,11 @@ namespace osu.Game.Online.Chat
                                    ?? new Channel(user);
         }
 
-        private void currentChannelChanged(ValueChangedEvent<Channel> e) => JoinChannel(e.NewValue);
+        private void currentChannelChanged(ValueChangedEvent<Channel> e)
+        {
+            if (e.NewValue?.Name != "+")
+                JoinChannel(e.NewValue);
+        }
 
         /// <summary>
         /// Ensure we run post actions in sequence, once at a time.
