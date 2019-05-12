@@ -64,16 +64,15 @@ namespace osu.Game.Overlays.Volume
                 },
                 icon = new SpriteIcon
                 {
-                    Anchor = Anchor.CentreLeft,
-                    Origin = Anchor.CentreLeft,
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
                     Size = new Vector2(20),
                 }
             });
 
             Current.ValueChanged += muted =>
             {
-                icon.Icon = muted.NewValue ? FontAwesome.Solid.VolumeOff : FontAwesome.Solid.VolumeUp;
-                icon.Margin = new MarginPadding { Left = muted.NewValue ? width / 2 - 15 : width / 2 - 10 }; //Magic numbers to line up both icons because they're different widths
+                icon.Icon = muted.NewValue ? FontAwesome.Solid.VolumeMute : FontAwesome.Solid.VolumeUp;
             };
             Current.TriggerChange();
         }
