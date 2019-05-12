@@ -7,6 +7,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Input;
 using osu.Framework.Input.Events;
+using osu.Framework.MathUtils;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Osu.Objects;
@@ -35,6 +36,9 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         private class OsuFlashlight : Flashlight, IRequireHighFrequencyMousePosition
         {
+            private const double follow_delay = 120;
+            private double lastPositionUpdate;
+
             public OsuFlashlight()
             {
                 FlashlightSize = new Vector2(0, getSizeFor(0));
@@ -48,7 +52,16 @@ namespace osu.Game.Rulesets.Osu.Mods
 
             protected override bool OnMouseMove(MouseMoveEvent e)
             {
-                FlashlightPosition = e.MousePosition;
+                var position = FlashlightPosition;
+                var destination = e.MousePosition;
+
+                double frameTime = Clock.CurrentTime - lastPositionUpdate;
+                double interp = Interpolation.ApplyEasing(Easing.Out, MathHelper.Clamp(frameTime / follow_delay, 0, 1));
+                FlashlightPosition = new Vector2(
+                    (float)Interpolation.Lerp(position.X, destination.X, interp),
+                    (float)Interpolation.Lerp(position.Y, destination.Y, interp)
+                );
+                lastPositionUpdate = Clock.CurrentTime;
                 return base.OnMouseMove(e);
             }
 
