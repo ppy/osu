@@ -505,6 +505,8 @@ namespace osu.Game.Screens.Select
         {
             ModSelect.Hide();
 
+            BeatmapOptions.Hide();
+
             this.ScaleTo(1.1f, 250, Easing.InSine);
 
             this.FadeOut(250);
