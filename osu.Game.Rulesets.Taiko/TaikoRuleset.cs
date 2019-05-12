@@ -24,7 +24,7 @@ namespace osu.Game.Rulesets.Taiko
 {
     public class TaikoRuleset : Ruleset
     {
-        public override DrawableRuleset CreateDrawableRulesetWith(WorkingBeatmap beatmap) => new DrawableTaikoRuleset(this, beatmap);
+        public override DrawableRuleset CreateDrawableRulesetWith(WorkingBeatmap beatmap, IReadOnlyList<Mod> mods) => new DrawableTaikoRuleset(this, beatmap, mods);
         public override IBeatmapConverter CreateBeatmapConverter(IBeatmap beatmap) => new TaikoBeatmapConverter(beatmap);
 
         public override IEnumerable<KeyBinding> GetDefaultKeyBindings(int variant = 0) => new[]
@@ -86,6 +86,7 @@ namespace osu.Game.Rulesets.Taiko
                         new TaikoModNoFail(),
                         new MultiMod(new TaikoModHalfTime(), new TaikoModDaycore()),
                     };
+
                 case ModType.DifficultyIncrease:
                     return new Mod[]
                     {
@@ -95,17 +96,20 @@ namespace osu.Game.Rulesets.Taiko
                         new TaikoModHidden(),
                         new TaikoModFlashlight(),
                     };
+
                 case ModType.Automation:
                     return new Mod[]
                     {
                         new MultiMod(new TaikoModAutoplay(), new ModCinema()),
                         new TaikoModRelax(),
                     };
+
                 case ModType.Fun:
                     return new Mod[]
                     {
                         new MultiMod(new ModWindUp<TaikoHitObject>(), new ModWindDown<TaikoHitObject>())
                     };
+
                 default:
                     return new Mod[] { };
             }

@@ -112,8 +112,8 @@ namespace osu.Game
 
         // todo: move this to SongSelect once Screen has the ability to unsuspend.
         [Cached]
-        [Cached(Type = typeof(IBindable<IEnumerable<Mod>>))]
-        private readonly Bindable<IEnumerable<Mod>> selectedMods = new Bindable<IEnumerable<Mod>>(new Mod[] { });
+        [Cached(typeof(IBindable<IReadOnlyList<Mod>>))]
+        private readonly Bindable<IReadOnlyList<Mod>> mods = new Bindable<IReadOnlyList<Mod>>(Array.Empty<Mod>());
 
         public OsuGame(string[] args = null)
         {
@@ -272,11 +272,11 @@ namespace osu.Game
         /// Present a score's replay immediately.
         /// The user should have already requested this interactively.
         /// </summary>
-        /// <param name="beatmap">The beatmap to select.</param>
         public void PresentScore(ScoreInfo score)
         {
             var databasedScore = ScoreManager.GetScore(score);
             var databasedScoreInfo = databasedScore.ScoreInfo;
+
             if (databasedScore.Replay == null)
             {
                 Logger.Log("The loaded score has no replay data.", LoggingTarget.Information);
@@ -284,6 +284,7 @@ namespace osu.Game
             }
 
             var databasedBeatmap = BeatmapManager.QueryBeatmap(b => b.ID == databasedScoreInfo.Beatmap.ID);
+
             if (databasedBeatmap == null)
             {
                 Logger.Log("Tried to load a score for a beatmap we don't have!", LoggingTarget.Information);
@@ -293,9 +294,8 @@ namespace osu.Game
             performFromMainMenu(() =>
             {
                 ruleset.Value = databasedScoreInfo.Ruleset;
-
                 Beatmap.Value = BeatmapManager.GetWorkingBeatmap(databasedBeatmap);
-                Beatmap.Value.Mods.Value = databasedScoreInfo.Mods;
+                mods.Value = databasedScoreInfo.Mods;
 
                 menuScreen.Push(new PlayerLoader(() => new ReplayPlayer(databasedScore)));
             }, $"watch {databasedScoreInfo}", bypassScreenAllowChecks: true);
@@ -666,9 +666,11 @@ namespace osu.Game
                 case GlobalAction.ToggleChat:
                     chatOverlay.ToggleVisibility();
                     return true;
+
                 case GlobalAction.ToggleSocial:
                     social.ToggleVisibility();
                     return true;
+
                 case GlobalAction.ResetInputSettings:
                     var sensitivity = frameworkConfig.GetBindable<double>(FrameworkSetting.CursorSensitivity);
 
@@ -679,15 +681,19 @@ namespace osu.Game
                     frameworkConfig.Set(FrameworkSetting.IgnoredInputHandlers, string.Empty);
                     frameworkConfig.GetBindable<ConfineMouseMode>(FrameworkSetting.ConfineMouseMode).SetDefault();
                     return true;
+
                 case GlobalAction.ToggleToolbar:
                     Toolbar.ToggleVisibility();
                     return true;
+
                 case GlobalAction.ToggleSettings:
                     settings.ToggleVisibility();
                     return true;
+
                 case GlobalAction.ToggleDirect:
                     direct.ToggleVisibility();
                     return true;
+
                 case GlobalAction.ToggleGameplayMouseButtons:
                     LocalConfig.Set(OsuSetting.MouseDisableButtons, !LocalConfig.Get<bool>(OsuSetting.MouseDisableButtons));
                     return true;
@@ -765,6 +771,7 @@ namespace osu.Game
                 case Intro intro:
                     introScreen = intro;
                     break;
+
                 case MainMenu menu:
                     menuScreen = menu;
                     break;

@@ -55,6 +55,7 @@ namespace osu.Game.Overlays
                     SectionsContainer.FadeOut(300, Easing.OutQuint);
                     ContentContainer.MoveToX(-WIDTH, 500, Easing.OutQuint);
                     break;
+
                 case Visibility.Hidden:
                     Background.FadeTo(0.6f, 500, Easing.OutQuint);
                     Sidebar?.FadeColour(Color4.White, 300, Easing.OutQuint);

@@ -6,6 +6,7 @@ using System.Linq;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Events;
@@ -72,6 +73,7 @@ namespace osu.Game.Overlays.Dialog
             set
             {
                 buttonsContainer.ChildrenEnumerable = value;
+
                 foreach (PopupDialogButton b in value)
                 {
                     var action = b.Action;
@@ -222,6 +224,7 @@ namespace osu.Game.Overlays.Dialog
 
             // press button at number if 1-9 on number row or keypad are pressed
             var k = e.Key;
+
             if (k >= Key.Number1 && k <= Key.Number9)
             {
                 pressButtonAtIndex(k - Key.Number1);

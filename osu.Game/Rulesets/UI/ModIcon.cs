@@ -76,18 +76,22 @@ namespace osu.Game.Rulesets.UI
                     backgroundColour = colours.Yellow;
                     highlightedColour = colours.YellowLight;
                     break;
+
                 case ModType.DifficultyReduction:
                     backgroundColour = colours.Green;
                     highlightedColour = colours.GreenLight;
                     break;
+
                 case ModType.Automation:
                     backgroundColour = colours.Blue;
                     highlightedColour = colours.BlueLight;
                     break;
+
                 case ModType.Conversion:
                     backgroundColour = colours.Purple;
                     highlightedColour = colours.PurpleLight;
                     break;
+
                 case ModType.Fun:
                     backgroundColour = colours.Pink;
                     highlightedColour = colours.PinkLight;

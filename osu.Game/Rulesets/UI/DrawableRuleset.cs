@@ -11,8 +11,8 @@ using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
+using System.Threading;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Input;
@@ -60,6 +60,8 @@ namespace osu.Game.Rulesets.UI
         /// </summary>
         public Container Overlays { get; private set; }
 
+        public override GameplayClock FrameStableClock => frameStabilityContainer.GameplayClock;
+
         /// <summary>
         /// Invoked when a <see cref="JudgementResult"/> has been applied by a <see cref="DrawableHitObject"/>.
         /// </summary>
@@ -82,7 +84,8 @@ namespace osu.Game.Rulesets.UI
         /// <summary>
         /// The mods which are to be applied.
         /// </summary>
-        private readonly IEnumerable<Mod> mods;
+        [Cached(typeof(IReadOnlyList<Mod>))]
+        private readonly IReadOnlyList<Mod> mods;
 
         private FrameStabilityContainer frameStabilityContainer;
 
@@ -93,16 +96,19 @@ namespace osu.Game.Rulesets.UI
         /// </summary>
         /// <param name="ruleset">The ruleset being represented.</param>
         /// <param name="workingBeatmap">The beatmap to create the hit renderer for.</param>
-        protected DrawableRuleset(Ruleset ruleset, WorkingBeatmap workingBeatmap)
+        /// <param name="mods">The <see cref="Mod"/>s to apply.</param>
+        protected DrawableRuleset(Ruleset ruleset, WorkingBeatmap workingBeatmap, IReadOnlyList<Mod> mods)
             : base(ruleset)
         {
-            Debug.Assert(workingBeatmap != null, "DrawableRuleset initialized with a null beatmap.");
+            if (workingBeatmap == null)
+                throw new ArgumentException("Beatmap cannot be null.", nameof(workingBeatmap));
+
+            this.mods = mods.ToArray();
 
             RelativeSizeAxes = Axes.Both;
 
-            Beatmap = (Beatmap<TObject>)workingBeatmap.GetPlayableBeatmap(ruleset.RulesetInfo);
+            Beatmap = (Beatmap<TObject>)workingBeatmap.GetPlayableBeatmap(ruleset.RulesetInfo, mods);
 
-            mods = workingBeatmap.Mods.Value;
             applyBeatmapMods(mods);
 
             KeyBindingInputManager = CreateInputManager();
@@ -124,6 +130,7 @@ namespace osu.Game.Rulesets.UI
             onScreenDisplay = dependencies.Get<OnScreenDisplay>();
 
             Config = dependencies.Get<RulesetConfigCache>().GetConfigFor(Ruleset);
+
             if (Config != null)
             {
                 dependencies.Cache(Config);
@@ -136,11 +143,11 @@ namespace osu.Game.Rulesets.UI
         public virtual PlayfieldAdjustmentContainer CreatePlayfieldAdjustmentContainer() => new PlayfieldAdjustmentContainer();
 
         [BackgroundDependencyLoader]
-        private void load(OsuConfigManager config)
+        private void load(OsuConfigManager config, CancellationToken? cancellationToken)
         {
             InternalChildren = new Drawable[]
             {
-                frameStabilityContainer = new FrameStabilityContainer
+                frameStabilityContainer = new FrameStabilityContainer(GameplayStartTime)
                 {
                     Child = KeyBindingInputManager
                         .WithChild(CreatePlayfieldAdjustmentContainer()
@@ -159,16 +166,21 @@ namespace osu.Game.Rulesets.UI
 
             applyRulesetMods(mods, config);
 
-            loadObjects();
+            loadObjects(cancellationToken);
         }
 
         /// <summary>
         /// Creates and adds drawable representations of hit objects to the play field.
         /// </summary>
-        private void loadObjects()
+        private void loadObjects(CancellationToken? cancellationToken)
         {
             foreach (TObject h in Beatmap.HitObjects)
+            {
+                cancellationToken?.ThrowIfCancellationRequested();
                 addHitObject(h);
+            }
+
+            cancellationToken?.ThrowIfCancellationRequested();
 
             Playfield.PostProcess();
 
@@ -223,6 +235,12 @@ namespace osu.Game.Rulesets.UI
 
             if (replayInputManager.ReplayInputHandler != null)
                 replayInputManager.ReplayInputHandler.GamefieldToScreenSpace = Playfield.GamefieldToScreenSpace;
+
+            if (!ProvidingUserCursor)
+            {
+                // The cursor is hidden by default (see Playfield.load()), but should be shown when there's a replay
+                Playfield.Cursor?.Show();
+            }
         }
 
         /// <summary>
@@ -255,7 +273,7 @@ namespace osu.Game.Rulesets.UI
         /// Applies the active mods to the Beatmap.
         /// </summary>
         /// <param name="mods"></param>
-        private void applyBeatmapMods(IEnumerable<Mod> mods)
+        private void applyBeatmapMods(IReadOnlyList<Mod> mods)
         {
             if (mods == null)
                 return;
@@ -267,8 +285,9 @@ namespace osu.Game.Rulesets.UI
         /// <summary>
         /// Applies the active mods to this DrawableRuleset.
         /// </summary>
-        /// <param name="mods"></param>
-        private void applyRulesetMods(IEnumerable<Mod> mods, OsuConfigManager config)
+        /// <param name="mods">The <see cref="Mod"/>s to apply.</param>
+        /// <param name="config">The <see cref="OsuConfigManager"/> to apply.</param>
+        private void applyRulesetMods(IReadOnlyList<Mod> mods, OsuConfigManager config)
         {
             if (mods == null)
                 return;
@@ -322,6 +341,11 @@ namespace osu.Game.Rulesets.UI
         /// Whether the game is paused. Used to block user input.
         /// </summary>
         public readonly BindableBool IsPaused = new BindableBool();
+
+        /// <summary>
+        /// The frame-stable clock which is being used for playfield display.
+        /// </summary>
+        public abstract GameplayClock FrameStableClock { get; }
 
         /// <summary>~
         /// The associated ruleset.

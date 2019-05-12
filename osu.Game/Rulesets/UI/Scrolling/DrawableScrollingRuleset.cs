@@ -13,6 +13,7 @@ using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Configuration;
 using osu.Game.Input.Bindings;
+using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Timing;
@@ -64,7 +65,7 @@ namespace osu.Game.Rulesets.UI.Scrolling
         protected virtual ScrollVisualisationMethod VisualisationMethod => ScrollVisualisationMethod.Sequential;
 
         /// <summary>
-        /// Whether the player can change <see cref="VisibleTimeRange"/>.
+        /// Whether the player can change <see cref="TimeRange"/>.
         /// </summary>
         protected virtual bool UserScrollSpeedAdjustment => true;
 
@@ -80,8 +81,8 @@ namespace osu.Game.Rulesets.UI.Scrolling
         [Cached(Type = typeof(IScrollingInfo))]
         private readonly LocalScrollingInfo scrollingInfo;
 
-        protected DrawableScrollingRuleset(Ruleset ruleset, WorkingBeatmap beatmap)
-            : base(ruleset, beatmap)
+        protected DrawableScrollingRuleset(Ruleset ruleset, WorkingBeatmap beatmap, IReadOnlyList<Mod> mods)
+            : base(ruleset, beatmap, mods)
         {
             scrollingInfo = new LocalScrollingInfo();
             scrollingInfo.Direction.BindTo(Direction);
@@ -92,9 +93,11 @@ namespace osu.Game.Rulesets.UI.Scrolling
                 case ScrollVisualisationMethod.Sequential:
                     scrollingInfo.Algorithm = new SequentialScrollAlgorithm(controlPoints);
                     break;
+
                 case ScrollVisualisationMethod.Overlapping:
                     scrollingInfo.Algorithm = new OverlappingScrollAlgorithm(controlPoints);
                     break;
+
                 case ScrollVisualisationMethod.Constant:
                     scrollingInfo.Algorithm = new ConstantScrollAlgorithm();
                     break;
@@ -159,6 +162,7 @@ namespace osu.Game.Rulesets.UI.Scrolling
                 case GlobalAction.IncreaseScrollSpeed:
                     this.TransformBindableTo(TimeRange, TimeRange.Value - time_span_step, 200, Easing.OutQuint);
                     return true;
+
                 case GlobalAction.DecreaseScrollSpeed:
                     this.TransformBindableTo(TimeRange, TimeRange.Value + time_span_step, 200, Easing.OutQuint);
                     return true;

@@ -82,6 +82,7 @@ namespace osu.Game.Storyboards
             where T : struct
         {
             var initialized = false;
+
             foreach (var command in commands.OrderBy(l => l))
             {
                 if (!initialized)
