@@ -56,6 +56,6 @@ namespace osu.Game.Tests.Visual
             LoadScreen(Player);
         }
 
-        protected virtual Player CreatePlayer(Ruleset ruleset) => new Player(false, false);
+        protected virtual Player CreatePlayer(Ruleset ruleset) => new TestPlayer(false, false);
     }
 }
