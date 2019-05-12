@@ -89,8 +89,6 @@ namespace osu.Game.Screens.Select
 
         protected SongSelect()
         {
-            const float carousel_width = 640;
-
             AddRangeInternal(new Drawable[]
             {
                 new ParallaxContainer
@@ -103,7 +101,8 @@ namespace osu.Game.Screens.Select
                         new WedgeBackground
                         {
                             RelativeSizeAxes = Axes.Both,
-                            Padding = new MarginPadding { Right = carousel_width * 0.76f },
+                            Padding = new MarginPadding { Right = -150 },
+                            Size = new Vector2(wedged_container_size.X, 1),
                         }
                     }
                 },
@@ -144,8 +143,8 @@ namespace osu.Game.Screens.Select
                             Carousel = new BeatmapCarousel
                             {
                                 Masking = false,
-                                RelativeSizeAxes = Axes.Y,
-                                Size = new Vector2(carousel_width, 1),
+                                RelativeSizeAxes = Axes.Both,
+                                Size = new Vector2(wedged_container_size.X, 1),
                                 Anchor = Anchor.CentreRight,
                                 Origin = Anchor.CentreRight,
                                 SelectionChanged = updateSelectedBeatmap,
