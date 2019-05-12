@@ -416,8 +416,7 @@ namespace osu.Game.Screens.Play
 
             // breaks and time-based conditions may allow instant resume.
             double time = GameplayClockContainer.GameplayClock.CurrentTime;
-            if (Beatmap.Value.Beatmap.Breaks.Any(b => time >= b.StartTime && time <= b.EndTime) ||
-                time < Beatmap.Value.Beatmap.HitObjects.First().StartTime)
+            if (Beatmap.Value.Beatmap.Breaks.Any(b => b.Contains(time)) || time < Beatmap.Value.Beatmap.HitObjects.First().StartTime)
                 completeResume();
             else
                 DrawableRuleset.RequestResume(completeResume);
