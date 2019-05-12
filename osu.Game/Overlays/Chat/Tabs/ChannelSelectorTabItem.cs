@@ -31,5 +31,13 @@ namespace osu.Game.Overlays.Chat.Tabs
             BackgroundInactive = colour.Gray2;
             BackgroundActive = colour.Gray3;
         }
+
+        public class ChannelSelectorTabChannel : Channel
+        {
+            public ChannelSelectorTabChannel()
+            {
+                Name = "+";
+            }
+        }
     }
 }
