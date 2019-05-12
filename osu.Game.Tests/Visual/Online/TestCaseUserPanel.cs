@@ -61,11 +61,11 @@ namespace osu.Game.Tests.Visual.Online
         public void UserActivitiesTests()
         {
             AddStep("idle", () => { flyte.Activity.Value = null; });
-            AddStep("spectating", () => { flyte.Activity.Value = new UserActivitySpectating(); });
-            AddStep("solo", () => { flyte.Activity.Value = new UserActivitySoloGame(null, null); });
-            AddStep("choosing", () => { flyte.Activity.Value = new UserActivityChoosingBeatmap(); });
-            AddStep("editing", () => { flyte.Activity.Value = new UserActivityEditing(null); });
-            AddStep("modding", () => { flyte.Activity.Value = new UserActivityModding(); });
+            AddStep("spectating", () => { flyte.Activity.Value = new UserActivity.UserActivitySpectating(); });
+            AddStep("solo", () => { flyte.Activity.Value = new UserActivity.UserActivitySoloGame(null, null); });
+            AddStep("choosing", () => { flyte.Activity.Value = new UserActivity.UserActivityChoosingBeatmap(); });
+            AddStep("editing", () => { flyte.Activity.Value = new UserActivity.UserActivityEditing(null); });
+            AddStep("modding", () => { flyte.Activity.Value = new UserActivity.UserActivityModding(); });
         }
     }
 }
