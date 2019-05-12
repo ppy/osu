@@ -57,9 +57,9 @@ namespace osu.Game.Users
                 var avatar = new Avatar(user)
                 {
                     RelativeSizeAxes = Axes.Both,
-                    OnLoadComplete = d => d.FadeInFromZero(300, Easing.OutQuint),
                 };
 
+                avatar.OnLoadComplete += d => d.FadeInFromZero(300, Easing.OutQuint);
                 avatar.OpenOnClick.BindTo(OpenOnClick);
 
                 Add(displayedAvatar = new DelayedLoadWrapper(avatar));

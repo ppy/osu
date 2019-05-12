@@ -67,10 +67,12 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                 case ArmedState.Idle:
                     this.Delay(HitObject.TimePreempt).FadeOut();
                     break;
+
                 case ArmedState.Miss:
                     this.FadeOut(ANIM_DURATION);
                     this.FadeColour(Color4.Red, ANIM_DURATION / 2);
                     break;
+
                 case ArmedState.Hit:
                     this.FadeOut(ANIM_DURATION, Easing.OutQuint);
                     this.ScaleTo(Scale * 1.5f, ANIM_DURATION, Easing.Out);

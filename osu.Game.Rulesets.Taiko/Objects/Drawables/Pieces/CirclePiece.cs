@@ -9,6 +9,7 @@ using osu.Game.Graphics.Backgrounds;
 using osuTK.Graphics;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Framework.Audio.Track;
+using osu.Framework.Graphics.Effects;
 
 namespace osu.Game.Rulesets.Taiko.Objects.Drawables.Pieces
 {

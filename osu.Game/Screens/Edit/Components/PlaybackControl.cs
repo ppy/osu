@@ -7,6 +7,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Events;
 using osu.Framework.Timing;
@@ -38,7 +39,7 @@ namespace osu.Game.Screens.Edit.Components
                     Origin = Anchor.Centre,
                     Scale = new Vector2(1.4f),
                     IconScale = new Vector2(1.4f),
-                    Icon = FontAwesome.fa_play_circle_o,
+                    Icon = FontAwesome.Regular.PlayCircle,
                     Action = togglePause,
                     Padding = new MarginPadding { Left = 20 }
                 },
@@ -88,7 +89,7 @@ namespace osu.Game.Screens.Edit.Components
         {
             base.Update();
 
-            playButton.Icon = adjustableClock.IsRunning ? FontAwesome.fa_pause_circle_o : FontAwesome.fa_play_circle_o;
+            playButton.Icon = adjustableClock.IsRunning ? FontAwesome.Regular.PauseCircle : FontAwesome.Regular.PlayCircle;
         }
 
         private class PlaybackTabControl : OsuTabControl<double>

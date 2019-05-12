@@ -3,13 +3,13 @@
 
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.UserInterface;
-using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.Chat;
 using osuTK;
 using System;
 using System.Linq;
 using osu.Framework.Bindables;
+using osu.Framework.Graphics.Sprites;
 
 namespace osu.Game.Overlays.Chat.Tabs
 {
@@ -31,14 +31,14 @@ namespace osu.Game.Overlays.Chat.Tabs
 
             AddInternal(new SpriteIcon
             {
-                Icon = FontAwesome.fa_comments,
+                Icon = FontAwesome.Solid.Comments,
                 Anchor = Anchor.CentreLeft,
                 Origin = Anchor.CentreLeft,
                 Size = new Vector2(20),
                 Margin = new MarginPadding(10),
             });
 
-            AddTabItem(selectorTab = new ChannelSelectorTabItem(new Channel { Name = "+" }));
+            AddTabItem(selectorTab = new ChannelSelectorTabItem());
 
             ChannelSelectorActive.BindTo(selectorTab.Active);
         }
@@ -58,6 +58,7 @@ namespace osu.Game.Overlays.Chat.Tabs
             {
                 default:
                     return new ChannelTabItem(value) { OnRequestClose = tabCloseRequested };
+
                 case ChannelType.PM:
                     return new PrivateChannelTabItem(value) { OnRequestClose = tabCloseRequested };
             }

@@ -8,6 +8,7 @@ using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Screens;
 using osu.Game.Graphics.Containers;
@@ -24,6 +25,8 @@ namespace osu.Game.Screens.Ranking
 {
     public abstract class Results : OsuScreen
     {
+        protected const float BACKGROUND_BLUR = 20;
+
         private Container circleOuterBackground;
         private Container circleOuter;
         private Container circleInner;
@@ -37,8 +40,6 @@ namespace osu.Game.Screens.Ranking
         protected readonly ScoreInfo Score;
 
         private Container currentPage;
-
-        private static readonly Vector2 background_blur = new Vector2(20);
 
         protected override BackgroundScreen CreateBackground() => new BackgroundScreenBeatmap(Beatmap.Value);
 
@@ -58,7 +59,7 @@ namespace osu.Game.Screens.Ranking
         public override void OnEntering(IScreen last)
         {
             base.OnEntering(last);
-            (Background as BackgroundScreenBeatmap)?.BlurTo(background_blur, 2500, Easing.OutQuint);
+            ((BackgroundScreenBeatmap)Background).BlurAmount.Value = BACKGROUND_BLUR;
             Background.ScaleTo(1.1f, transition_time, Easing.OutQuint);
 
             allCircles.ForEach(c =>

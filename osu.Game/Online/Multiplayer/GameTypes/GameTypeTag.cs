@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Sprites;
 using osu.Game.Graphics;
 using osuTK;
 
@@ -17,7 +18,7 @@ namespace osu.Game.Online.Multiplayer.GameTypes
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
-                Icon = FontAwesome.fa_refresh,
+                Icon = FontAwesome.Solid.Sync,
                 Size = new Vector2(size),
                 Colour = colours.Blue,
                 Shadow = false,

@@ -44,17 +44,14 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             RelativeSizeAxes = Axes.Y;
             Width = tracker_width;
 
-            InternalChildren = new[]
+            AddInternal(Tracker = new Box
             {
-                Tracker = new Box
-                {
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
-                    RelativeSizeAxes = Axes.Both,
-                    EdgeSmoothness = new Vector2(0.5f, 0),
-                    Alpha = 0.75f
-                }
-            };
+                Anchor = Anchor.Centre,
+                Origin = Anchor.Centre,
+                RelativeSizeAxes = Axes.Both,
+                EdgeSmoothness = new Vector2(0.5f, 0),
+                Alpha = 0.75f
+            });
         }
 
         protected override void UpdateState(ArmedState state)

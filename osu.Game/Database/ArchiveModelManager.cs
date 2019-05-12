@@ -84,6 +84,7 @@ namespace osu.Game.Database
         private void flushEvents(bool perform)
         {
             Action[] events;
+
             lock (queuedEvents)
             {
                 events = queuedEvents.ToArray();
@@ -147,6 +148,7 @@ namespace osu.Game.Database
             List<TModel> imported = new List<TModel>();
 
             int current = 0;
+
             foreach (string path in paths)
             {
                 if (notification.State == ProgressNotificationState.Cancelled)
@@ -383,7 +385,7 @@ namespace osu.Game.Database
         /// Delete multiple items.
         /// This will post notifications tracking progress.
         /// </summary>
-        public void Delete(List<TModel> items)
+        public void Delete(List<TModel> items, bool silent = false)
         {
             if (items.Count == 0) return;
 
@@ -394,7 +396,8 @@ namespace osu.Game.Database
                 State = ProgressNotificationState.Active,
             };
 
-            PostNotification?.Invoke(notification);
+            if (!silent)
+                PostNotification?.Invoke(notification);
 
             int i = 0;
 
@@ -421,7 +424,7 @@ namespace osu.Game.Database
         /// Restore multiple items that were previously deleted.
         /// This will post notifications tracking progress.
         /// </summary>
-        public void Undelete(List<TModel> items)
+        public void Undelete(List<TModel> items, bool silent = false)
         {
             if (!items.Any()) return;
 
@@ -432,7 +435,8 @@ namespace osu.Game.Database
                 State = ProgressNotificationState.Active,
             };
 
-            PostNotification?.Invoke(notification);
+            if (!silent)
+                PostNotification?.Invoke(notification);
 
             int i = 0;
 
@@ -563,7 +567,7 @@ namespace osu.Game.Database
         /// <summary>
         /// Check whether an existing model already exists for a new import item.
         /// </summary>
-        /// <param name="model">The new model proposed for import.
+        /// <param name="model">The new model proposed for import.</param>
         /// <returns>An existing model which matches the criteria to skip importing, else null.</returns>
         protected TModel CheckForExisting(TModel model) => model.Hash == null ? null : ModelStore.ConsumableItems.FirstOrDefault(b => b.Hash == model.Hash);
 

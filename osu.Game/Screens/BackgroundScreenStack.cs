@@ -11,6 +11,7 @@ namespace osu.Game.Screens
     public class BackgroundScreenStack : ScreenStack
     {
         public BackgroundScreenStack()
+            : base(false)
         {
             Scale = new Vector2(1.06f);
             RelativeSizeAxes = Axes.Both;
@@ -20,7 +21,7 @@ namespace osu.Game.Screens
 
         //public float ParallaxAmount { set => parallax.ParallaxAmount = ParallaxContainer.DEFAULT_PARALLAX_AMOUNT * value; }
 
-        public new void Push(BackgroundScreen screen)
+        public void Push(BackgroundScreen screen)
         {
             if (screen == null)
                 return;

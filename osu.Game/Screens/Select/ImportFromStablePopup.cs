@@ -2,7 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using osu.Game.Graphics;
+using osu.Framework.Graphics.Sprites;
 using osu.Game.Overlays.Dialog;
 
 namespace osu.Game.Screens.Select
@@ -14,7 +14,7 @@ namespace osu.Game.Screens.Select
             HeaderText = @"You have no beatmaps!";
             BodyText = "An existing copy of osu! was found, though.\nWould you like to import your beatmaps (and skins)?";
 
-            Icon = FontAwesome.fa_plane;
+            Icon = FontAwesome.Solid.Plane;
 
             Buttons = new PopupDialogButton[]
             {

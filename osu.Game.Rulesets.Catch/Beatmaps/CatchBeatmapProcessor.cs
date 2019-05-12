@@ -31,6 +31,7 @@ namespace osu.Game.Rulesets.Catch.Beatmaps
             initialiseHyperDash((List<CatchHitObject>)Beatmap.HitObjects);
 
             int index = 0;
+
             foreach (var obj in Beatmap.HitObjects.OfType<CatchHitObject>())
             {
                 obj.IndexInBeatmap = index++;
@@ -58,6 +59,7 @@ namespace osu.Game.Rulesets.Catch.Beatmaps
                         }
 
                         break;
+
                     case JuiceStream juiceStream:
                         foreach (var nested in juiceStream.NestedHitObjects)
                         {
@@ -103,6 +105,7 @@ namespace osu.Game.Rulesets.Catch.Beatmaps
                 double timeToNext = nextObject.StartTime - currentObject.StartTime - 1000f / 60f / 4; // 1/4th of a frame of grace time, taken from osu-stable
                 double distanceToNext = Math.Abs(nextObject.X - currentObject.X) - (lastDirection == thisDirection ? lastExcess : halfCatcherWidth);
                 float distanceToHyper = (float)(timeToNext * CatcherArea.Catcher.BASE_SPEED - distanceToNext);
+
                 if (distanceToHyper < 0)
                 {
                     currentObject.HyperDashTarget = nextObject;

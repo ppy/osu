@@ -54,7 +54,7 @@ namespace osu.Game.Screens.Multi
         private OsuGameBase game { get; set; }
 
         [Resolved]
-        private APIAccess api { get; set; }
+        private IAPIProvider api { get; set; }
 
         [Resolved(CanBeNull = true)]
         private OsuLogo logo { get; set; }
@@ -95,7 +95,7 @@ namespace osu.Game.Screens.Multi
                     {
                         RelativeSizeAxes = Axes.Both,
                         Padding = new MarginPadding { Top = Header.HEIGHT },
-                        Child = screenStack = new ScreenStack(loungeSubScreen = new LoungeSubScreen()) { RelativeSizeAxes = Axes.Both }
+                        Child = screenStack = new OsuScreenStack(loungeSubScreen = new LoungeSubScreen()) { RelativeSizeAxes = Axes.Both }
                     },
                     new Header(screenStack),
                     createButton = new HeaderButton
@@ -163,7 +163,7 @@ namespace osu.Game.Screens.Multi
             this.Push(new PlayerLoader(player));
         }
 
-        public void APIStateChanged(APIAccess api, APIState state)
+        public void APIStateChanged(IAPIProvider api, APIState state)
         {
             if (state != APIState.Online)
                 forcefullyExit();
@@ -248,6 +248,7 @@ namespace osu.Game.Screens.Multi
             if (screenStack.CurrentScreen is MatchSubScreen)
             {
                 var track = Beatmap.Value.Track;
+
                 if (track != null)
                 {
                     track.Looping = true;
@@ -276,7 +277,7 @@ namespace osu.Game.Screens.Multi
 
             updatePollingRate(isIdle.Value);
 
-            if (screenStack.CurrentScreen == null)
+            if (screenStack.CurrentScreen == null && this.IsCurrentScreen())
                 this.Exit();
         }
 

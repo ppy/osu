@@ -43,7 +43,7 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
         {
             RelativeSizeAxes = Axes.X;
 
-            InternalChildren = new Drawable[]
+            AddRangeInternal(new Drawable[]
             {
                 bodyPiece = new BodyPiece
                 {
@@ -67,7 +67,7 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
                     Anchor = Anchor.TopCentre,
                     Origin = Anchor.TopCentre
                 }
-            };
+            });
 
             foreach (var tick in tickContainer)
                 AddNested(tick);

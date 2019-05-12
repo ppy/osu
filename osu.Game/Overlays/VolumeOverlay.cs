@@ -105,12 +105,14 @@ namespace osu.Game.Overlays
                     else
                         volumeMeterMaster.Decrease(amount, isPrecise);
                     return true;
+
                 case GlobalAction.IncreaseVolume:
                     if (State == Visibility.Hidden)
                         Show();
                     else
                         volumeMeterMaster.Increase(amount, isPrecise);
                     return true;
+
                 case GlobalAction.ToggleMute:
                     Show();
                     muteButton.Current.Value = !muteButton.Current.Value;

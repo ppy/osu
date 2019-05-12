@@ -26,7 +26,7 @@ namespace osu.Game.Tests.Visual
         {
             Beatmap.Value = new TestWorkingBeatmap(ruleset.RulesetInfo, null);
 
-            LoadComponentAsync(new Editor(), LoadScreen);
+            LoadScreen(new Editor());
         }
     }
 }

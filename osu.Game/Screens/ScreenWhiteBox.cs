@@ -14,6 +14,7 @@ using osuTK.Graphics;
 using osu.Game.Graphics;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Graphics.Sprites;
 
 namespace osu.Game.Screens
 {
@@ -112,7 +113,7 @@ namespace osu.Game.Screens
                             {
                                 new SpriteIcon
                                 {
-                                    Icon = FontAwesome.fa_universal_access,
+                                    Icon = FontAwesome.Solid.UniversalAccess,
                                     Anchor = Anchor.TopCentre,
                                     Origin = Anchor.TopCentre,
                                     Size = new Vector2(50),
@@ -188,7 +189,7 @@ namespace osu.Game.Screens
         {
             public ChildModeButton()
             {
-                Icon = FontAwesome.fa_osu_right_o;
+                Icon = OsuIcon.RightCircle;
                 Anchor = Anchor.BottomRight;
                 Origin = Anchor.BottomRight;
             }

@@ -4,6 +4,7 @@
 using osuTK;
 using osuTK.Graphics;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Events;
 
 namespace osu.Game.Graphics.UserInterface
@@ -41,7 +42,7 @@ namespace osu.Game.Graphics.UserInterface
         /// <summary>
         /// The icon.
         /// </summary>
-        public FontAwesome Icon
+        public IconUsage Icon
         {
             get => icon.Icon;
             set => icon.Icon = value;

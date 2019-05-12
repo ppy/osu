@@ -13,8 +13,10 @@ using osu.Game.Users;
 
 namespace osu.Game.Screens.Backgrounds
 {
-    public class BackgroundScreenDefault : BlurrableBackgroundScreen
+    public class BackgroundScreenDefault : BackgroundScreen
     {
+        private Background background;
+
         private int currentDisplay;
         private const int background_count = 5;
 
@@ -34,15 +36,15 @@ namespace osu.Game.Screens.Backgrounds
 
             currentDisplay = RNG.Next(0, background_count);
 
-            Next();
+            display(createBackground());
         }
 
         private void display(Background newBackground)
         {
-            Background?.FadeOut(800, Easing.InOutSine);
-            Background?.Expire();
+            background?.FadeOut(800, Easing.InOutSine);
+            background?.Expire();
 
-            AddInternal(Background = newBackground);
+            AddInternal(background = newBackground);
             currentDisplay++;
         }
 
@@ -51,19 +53,21 @@ namespace osu.Game.Screens.Backgrounds
         public void Next()
         {
             nextTask?.Cancel();
-            nextTask = Scheduler.AddDelayed(() =>
-            {
-                Background background;
+            nextTask = Scheduler.AddDelayed(() => { LoadComponentAsync(createBackground(), display); }, 100);
+        }
 
-                if (user.Value?.IsSupporter ?? false)
-                    background = new SkinnedBackground(skin.Value, backgroundName);
-                else
-                    background = new Background(backgroundName);
+        private Background createBackground()
+        {
+            Background newBackground;
 
-                background.Depth = currentDisplay;
+            if (user.Value?.IsSupporter ?? false)
+                newBackground = new SkinnedBackground(skin.Value, backgroundName);
+            else
+                newBackground = new Background(backgroundName);
 
-                LoadComponentAsync(background, display);
-            }, 100);
+            newBackground.Depth = currentDisplay;
+
+            return newBackground;
         }
 
         private class SkinnedBackground : Background

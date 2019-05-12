@@ -26,6 +26,7 @@ namespace osu.Game.Beatmaps.Formats
             Section section = Section.None;
 
             string line;
+
             while ((line = stream.ReadLine()) != null)
             {
                 if (ShouldSkipLine(line))
@@ -95,7 +96,7 @@ namespace osu.Game.Beatmaps.Formats
             {
                 colour = new Color4(byte.Parse(split[0]), byte.Parse(split[1]), byte.Parse(split[2]), split.Length == 4 ? byte.Parse(split[3]) : (byte)255);
             }
-            catch (Exception e)
+            catch
             {
                 throw new InvalidOperationException(@"Color must be specified with 8-bit integer components");
             }

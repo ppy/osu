@@ -119,9 +119,6 @@ namespace osu.Game
             dependencies.CacheAs(this);
             dependencies.Cache(LocalConfig);
 
-            //this completely overrides the framework default. will need to change once we make a proper FontStore.
-            dependencies.Cache(Fonts = new FontStore(new GlyphStore(Resources, @"Fonts/FontAwesome")));
-
             Fonts.AddStore(new GlyphStore(Resources, @"Fonts/osuFont"));
             Fonts.AddStore(new GlyphStore(Resources, @"Fonts/Exo2.0-Medium"));
             Fonts.AddStore(new GlyphStore(Resources, @"Fonts/Exo2.0-MediumItalic"));
@@ -152,15 +149,29 @@ namespace osu.Game
 
             API = new APIAccess(LocalConfig);
 
-            dependencies.Cache(API);
             dependencies.CacheAs<IAPIProvider>(API);
 
             var defaultBeatmap = new DummyWorkingBeatmap(this);
 
             dependencies.Cache(RulesetStore = new RulesetStore(contextFactory));
             dependencies.Cache(FileStore = new FileStore(contextFactory, Host.Storage));
+
+            // ordering is important here to ensure foreign keys rules are not broken in ModelStore.Cleanup()
+            dependencies.Cache(ScoreManager = new ScoreManager(RulesetStore, () => BeatmapManager, Host.Storage, contextFactory, Host));
             dependencies.Cache(BeatmapManager = new BeatmapManager(Host.Storage, contextFactory, RulesetStore, API, Audio, Host, defaultBeatmap));
-            dependencies.Cache(ScoreManager = new ScoreManager(RulesetStore, BeatmapManager, Host.Storage, contextFactory, Host));
+
+            // this should likely be moved to ArchiveModelManager when another case appers where it is necessary
+            // to have inter-dependent model managers. this could be obtained with an IHasForeign<T> interface to
+            // allow lookups to be done on the child (ScoreManager in this case) to perform the cascading delete.
+            List<ScoreInfo> getBeatmapScores(BeatmapSetInfo set)
+            {
+                var beatmapIds = BeatmapManager.QueryBeatmaps(b => b.BeatmapSetInfoID == set.ID).Select(b => b.ID).ToList();
+                return ScoreManager.QueryScores(s => beatmapIds.Contains(s.Beatmap.ID)).ToList();
+            }
+
+            BeatmapManager.ItemRemoved += i => ScoreManager.Delete(getBeatmapScores(i), true);
+            BeatmapManager.ItemAdded += (i, existing) => ScoreManager.Undelete(getBeatmapScores(i), true);
+
             dependencies.Cache(KeyBindingStore = new KeyBindingStore(contextFactory, RulesetStore));
             dependencies.Cache(SettingsStore = new SettingsStore(contextFactory));
             dependencies.Cache(RulesetConfigCache = new RulesetConfigCache(SettingsStore));

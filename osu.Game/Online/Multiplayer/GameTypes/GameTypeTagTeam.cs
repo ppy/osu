@@ -3,6 +3,7 @@
 
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Sprites;
 using osu.Game.Graphics;
 using osuTK;
 
@@ -25,14 +26,14 @@ namespace osu.Game.Online.Multiplayer.GameTypes
                 {
                     new SpriteIcon
                     {
-                        Icon = FontAwesome.fa_refresh,
+                        Icon = FontAwesome.Solid.Sync,
                         Size = new Vector2(size * 0.75f),
                         Colour = colours.Blue,
                         Shadow = false,
                     },
                     new SpriteIcon
                     {
-                        Icon = FontAwesome.fa_refresh,
+                        Icon = FontAwesome.Solid.Sync,
                         Size = new Vector2(size * 0.75f),
                         Colour = colours.Pink,
                         Shadow = false,

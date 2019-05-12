@@ -6,6 +6,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.MathUtils;
 using osu.Game.Rulesets.Catch.Objects.Drawable.Pieces;
@@ -42,7 +43,7 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawable
             // todo: this should come from the skin.
             AccentColour = colourForRepresentation(HitObject.VisualRepresentation);
 
-            InternalChildren = new[]
+            AddRangeInternal(new[]
             {
                 createPulp(HitObject.VisualRepresentation),
                 border = new Circle
@@ -70,7 +71,7 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawable
                         }
                     }
                 },
-            };
+            });
 
             if (HitObject.HyperDash)
             {
@@ -105,6 +106,7 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawable
             {
                 default:
                     return new Container();
+
                 case FruitVisualRepresentation.Raspberry:
                     return new Container
                     {
@@ -143,6 +145,7 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawable
                             },
                         }
                     };
+
                 case FruitVisualRepresentation.Pineapple:
                     return new Container
                     {
@@ -181,6 +184,7 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawable
                             },
                         }
                     };
+
                 case FruitVisualRepresentation.Pear:
                     return new Container
                     {
@@ -213,6 +217,7 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawable
                             },
                         }
                     };
+
                 case FruitVisualRepresentation.Grape:
                     return new Container
                     {
@@ -245,6 +250,7 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawable
                             },
                         }
                     };
+
                 case FruitVisualRepresentation.Banana:
                     return new Container
                     {
@@ -282,19 +288,25 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawable
                 default:
                 case FruitVisualRepresentation.Pear:
                     return new Color4(17, 136, 170, 255);
+
                 case FruitVisualRepresentation.Grape:
                     return new Color4(204, 102, 0, 255);
+
                 case FruitVisualRepresentation.Raspberry:
                     return new Color4(121, 9, 13, 255);
+
                 case FruitVisualRepresentation.Pineapple:
                     return new Color4(102, 136, 0, 255);
+
                 case FruitVisualRepresentation.Banana:
                     switch (RNG.Next(0, 3))
                     {
                         default:
                             return new Color4(255, 240, 0, 255);
+
                         case 1:
                             return new Color4(255, 192, 0, 255);
+
                         case 2:
                             return new Color4(214, 221, 28, 255);
                     }

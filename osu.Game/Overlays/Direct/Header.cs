@@ -4,6 +4,7 @@
 using System.ComponentModel;
 using osuTK.Graphics;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Sprites;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Overlays.SearchableList;
@@ -16,7 +17,7 @@ namespace osu.Game.Overlays.Direct
 
         protected override DirectTab DefaultTab => DirectTab.Search;
         protected override Drawable CreateHeaderText() => new OsuSpriteText { Text = @"osu!direct", Font = OsuFont.GetFont(size: 25) };
-        protected override FontAwesome Icon => FontAwesome.fa_osu_chevron_down_o;
+        protected override IconUsage Icon => OsuIcon.ChevronDownCircle;
 
         public Header()
         {

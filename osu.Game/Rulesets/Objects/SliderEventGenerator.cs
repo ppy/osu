@@ -38,7 +38,7 @@ namespace osu.Game.Rulesets.Objects
 
                     for (var d = tickDistance; d <= length; d += tickDistance)
                     {
-                        if (d > length - minDistanceFromEnd)
+                        if (d >= length - minDistanceFromEnd)
                             break;
 
                         var pathProgress = d / length;
