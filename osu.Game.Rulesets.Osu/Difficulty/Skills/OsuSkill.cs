@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#define OSU_SKILL_STRAIN_AFTER_NOTE // defined => use time between current and next, commented => use time between prev and current
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -19,7 +21,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
     public abstract class OsuSkill : Skill
     {
 
-        private const bool strain_after_note = true; // true => use time between current and next, false => use time between prev and current
         protected virtual double MaxStrainTime  => 200; 
         private const double difficulty_multiplier = 0.0675;
 
@@ -48,7 +49,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
 
         private double currentStrain = 1; // We keep track of the strain level at all times throughout the beatmap.
-        private double currentSectionPeak = 1; // We also keep track of the peak strain level in the current section.
 
         private readonly List<double> expDifficulties = new List<double>(); // list of exp(k*difficulty) for each note
         private readonly List<double> timestamps = new List<double>();  // list of timestamps for each note
@@ -91,7 +91,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             double legacyScalingFactor = 10;
             double stars = Math.Sqrt(currentStrain * legacyScalingFactor) * difficulty_multiplier;
 
-            if (strain_after_note) scaleLastHitObject(current.DeltaTime);
+#if OSU_SKILL_STRAIN_AFTER_NOTE
+            scaleLastHitObject(current.DeltaTime);
+#endif
 
             double expDifficulty = Math.Exp(star_bonus_k * starsToDifficulty(stars)) ;
 
@@ -106,8 +108,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
             expDifficulties.Add(expDifficulty);
             timestamps.Add(current.StartTime);
-            if (!strain_after_note) scaleLastHitObject(current.DeltaTime);
 
+#if !OSU_SKILL_STRAIN_AFTER_NOTE
+            scaleLastHitObject(current.DeltaTime);
+#endif
 
             Previous.Push(current);
         }
@@ -128,11 +132,13 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         /// </summary>
         public override void Calculate()
         {
-            if (strain_after_note && !last_scaled)
+#if OSU_SKILL_STRAIN_AFTER_NOTE
+            if (!last_scaled)
             {
                 scaleLastHitObject();
                 last_scaled = true;
             }
+#endif
 
             // difficulty to FC the remainder of the map from every position, used later to calculate expected map length. 
             var difficultyPartialSums = new double[expDifficulties.Count];
@@ -218,7 +224,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
 
             double skill = skillLevel(fcProb, difficulty);
-            double firstLength;
 
             int max_iterations = 5;
 
