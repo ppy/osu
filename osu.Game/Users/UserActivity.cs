@@ -11,58 +11,59 @@ namespace osu.Game.Users
     {
         public abstract string Status { get; }
         public virtual Color4 GetAppropriateColour(OsuColour colours) => colours.GreenDarker;
-    }
 
-    public class UserActivityModding : UserActivity
-    {
-        public override string Status => "Modding a map";
-        public override Color4 GetAppropriateColour(OsuColour colours) => colours.PurpleDark;
-    }
-
-    public class UserActivityChoosingBeatmap : UserActivity
-    {
-        public override string Status => "Choosing a beatmap";
-    }
-
-    public class UserActivityMultiplayerGame : UserActivity
-    {
-        public override string Status => "Multiplaying";
-    }
-
-    public class UserActivityEditing : UserActivity
-    {
-        public UserActivityEditing(BeatmapInfo info)
+        public class UserActivityModding : UserActivity
         {
-            Beatmap = info;
+            public override string Status => "Modding a map";
+            public override Color4 GetAppropriateColour(OsuColour colours) => colours.PurpleDark;
         }
 
-        public override string Status => @"Editing a beatmap";
-
-        public BeatmapInfo Beatmap { get; }
-    }
-
-    public class UserActivitySoloGame : UserActivity
-    {
-        public UserActivitySoloGame(BeatmapInfo info, Rulesets.RulesetInfo ruleset)
+        public class UserActivityChoosingBeatmap : UserActivity
         {
-            Beatmap = info;
-            Ruleset = ruleset;
+            public override string Status => "Choosing a beatmap";
         }
 
-        public override string Status => @"Solo Game";
+        public class UserActivityMultiplayerGame : UserActivity
+        {
+            public override string Status => "Multiplaying";
+        }
 
-        public BeatmapInfo Beatmap { get; }
+        public class UserActivityEditing : UserActivity
+        {
+            public UserActivityEditing(BeatmapInfo info)
+            {
+                Beatmap = info;
+            }
 
-        public Rulesets.RulesetInfo Ruleset { get; }
+            public override string Status => @"Editing a beatmap";
+
+            public BeatmapInfo Beatmap { get; }
+        }
+
+        public class UserActivitySoloGame : UserActivity
+        {
+            public UserActivitySoloGame(BeatmapInfo info, Rulesets.RulesetInfo ruleset)
+            {
+                Beatmap = info;
+                Ruleset = ruleset;
+            }
+
+            public override string Status => @"Solo Game";
+
+            public BeatmapInfo Beatmap { get; }
+
+            public Rulesets.RulesetInfo Ruleset { get; }
+        }
+
+        public class UserActivitySpectating : UserActivity
+        {
+            public override string Status => @"Spectating a game";
+        }
+
+        public class UserActivityInLobby : UserActivity
+        {
+            public override string Status => @"in Multiplayer Lobby";
+        }
     }
 
-    public class UserActivitySpectating : UserActivity
-    {
-        public override string Status => @"Spectating a game";
-    }
-
-    public class UserActivityInLobby : UserActivity
-    {
-        public override string Status => @"in Multiplayer Lobby";
-    }
 }
