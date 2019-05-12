@@ -99,7 +99,7 @@ namespace osu.Game.Rulesets.Scoring
         /// <summary>
         /// The default conditions for failing.
         /// </summary>
-        protected virtual bool DefaultFailCondition => Health.Value == Health.MinValue;
+        protected virtual bool DefaultFailCondition => Health.Value < Health.MinValue + 1e-15;
 
         protected ScoreProcessor()
         {
