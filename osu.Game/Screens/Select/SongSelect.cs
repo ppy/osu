@@ -39,6 +39,7 @@ namespace osu.Game.Screens.Select
     public abstract class SongSelect : OsuScreen
     {
         private static readonly Vector2 wedged_container_size = new Vector2(0.5f, 245);
+
         protected const float BACKGROUND_BLUR = 20;
         private const float left_area_padding = 20;
 
@@ -144,7 +145,7 @@ namespace osu.Game.Screens.Select
                             {
                                 Masking = false,
                                 RelativeSizeAxes = Axes.Both,
-                                Size = new Vector2(wedged_container_size.X, 1),
+                                Size = new Vector2(1 - wedged_container_size.X, 1),
                                 Anchor = Anchor.CentreRight,
                                 Origin = Anchor.CentreRight,
                                 SelectionChanged = updateSelectedBeatmap,
