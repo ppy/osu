@@ -38,7 +38,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             Player player = null;
             SlowLoadPlayer slowPlayer = null;
 
-            AddStep("load dummy beatmap", () => stack.Push(loader = new PlayerLoader(() => player = new Player(false, false))));
+            AddStep("load dummy beatmap", () => stack.Push(loader = new PlayerLoader(() => player = new TestPlayer(false, false))));
             AddUntilStep("wait for current", () => loader.IsCurrentScreen());
             AddStep("mouse in centre", () => InputManager.MoveMouseTo(loader.ScreenSpaceDrawQuad.Centre));
             AddUntilStep("wait for player to be current", () => player.IsCurrentScreen());
@@ -102,17 +102,17 @@ namespace osu.Game.Tests.Visual.Gameplay
             public ScoreRank AdjustRank(ScoreRank rank, double accuracy) => rank;
         }
 
-        private class TestPlayer : Player
+        private class TestPlayer : Visual.TestPlayer
         {
             public new Bindable<IReadOnlyList<Mod>> Mods => base.Mods;
 
-            public TestPlayer()
-                : base(false, false)
+            public TestPlayer(bool allowPause = true, bool showResults = true)
+                : base(allowPause, showResults)
             {
             }
         }
 
-        protected class SlowLoadPlayer : Player
+        protected class SlowLoadPlayer : Visual.TestPlayer
         {
             public readonly ManualResetEventSlim AllowLoad = new ManualResetEventSlim(false);
 
