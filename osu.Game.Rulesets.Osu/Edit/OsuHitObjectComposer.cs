@@ -42,8 +42,10 @@ namespace osu.Game.Rulesets.Osu.Edit
             {
                 case DrawableHitCircle circle:
                     return new HitCircleSelectionBlueprint(circle);
+
                 case DrawableSlider slider:
                     return new SliderSelectionBlueprint(slider);
+
                 case DrawableSpinner spinner:
                     return new SpinnerSelectionBlueprint(spinner);
             }

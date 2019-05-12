@@ -35,6 +35,7 @@ namespace osu.Game.Rulesets.Osu.Tests
                         yield return createConvertValue(nested);
 
                     break;
+
                 default:
                     yield return createConvertValue(hitObject);
 
