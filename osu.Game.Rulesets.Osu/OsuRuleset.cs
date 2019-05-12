@@ -30,7 +30,7 @@ namespace osu.Game.Rulesets.Osu
 {
     public class OsuRuleset : Ruleset
     {
-        public override DrawableRuleset CreateDrawableRulesetWith(WorkingBeatmap beatmap) => new DrawableOsuRuleset(this, beatmap);
+        public override DrawableRuleset CreateDrawableRulesetWith(WorkingBeatmap beatmap, IReadOnlyList<Mod> mods) => new DrawableOsuRuleset(this, beatmap, mods);
         public override IBeatmapConverter CreateBeatmapConverter(IBeatmap beatmap) => new OsuBeatmapConverter(beatmap);
         public override IBeatmapProcessor CreateBeatmapProcessor(IBeatmap beatmap) => new OsuBeatmapProcessor(beatmap);
 
@@ -104,6 +104,7 @@ namespace osu.Game.Rulesets.Osu
                         new MultiMod(new OsuModHalfTime(), new OsuModDaycore()),
                         new OsuModSpunOut(),
                     };
+
                 case ModType.DifficultyIncrease:
                     return new Mod[]
                     {
@@ -113,11 +114,13 @@ namespace osu.Game.Rulesets.Osu
                         new OsuModHidden(),
                         new MultiMod(new OsuModFlashlight(), new OsuModBlinds()),
                     };
+
                 case ModType.Conversion:
                     return new Mod[]
                     {
                         new OsuModTarget(),
                     };
+
                 case ModType.Automation:
                     return new Mod[]
                     {
@@ -125,6 +128,7 @@ namespace osu.Game.Rulesets.Osu
                         new OsuModRelax(),
                         new OsuModAutopilot(),
                     };
+
                 case ModType.Fun:
                     return new Mod[]
                     {
@@ -133,6 +137,7 @@ namespace osu.Game.Rulesets.Osu
                         new OsuModGrow(),
                         new MultiMod(new ModWindUp<OsuHitObject>(), new ModWindDown<OsuHitObject>()),
                     };
+
                 default:
                     return new Mod[] { };
             }

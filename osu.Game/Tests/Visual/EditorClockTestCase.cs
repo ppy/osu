@@ -18,7 +18,7 @@ namespace osu.Game.Tests.Visual
     public abstract class EditorClockTestCase : OsuTestCase
     {
         protected readonly BindableBeatDivisor BeatDivisor = new BindableBeatDivisor();
-        protected readonly EditorClock Clock;
+        protected new readonly EditorClock Clock;
 
         protected EditorClockTestCase()
         {
