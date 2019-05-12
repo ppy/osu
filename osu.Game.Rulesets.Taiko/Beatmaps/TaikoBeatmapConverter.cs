@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Objects;
@@ -117,9 +117,10 @@ namespace osu.Game.Rulesets.Taiko.Beatmaps
 
                 if (!isForCurrentRuleset && tickSpacing > 0 && osuDuration < 2 * speedAdjustedBeatLength)
                 {
-                    List<List<SampleInfo>> allSamples = curveData != null ? curveData.RepeatSamples : new List<List<SampleInfo>>(new[] { samples });
+                    List<List<SampleInfo>> allSamples = curveData != null ? curveData.NodeSamples : new List<List<SampleInfo>>(new[] { samples });
 
                     int i = 0;
+
                     for (double j = obj.StartTime; j <= obj.StartTime + taikoDuration + tickSpacing / 8; j += tickSpacing)
                     {
                         List<SampleInfo> currentSamples = allSamples[i];

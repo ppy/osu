@@ -1,11 +1,11 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Audio.Track;
-using osu.Framework.Configuration;
+using osu.Framework.Bindables;
 using osu.Framework.Screens;
 using osu.Framework.Graphics;
 using osu.Framework.MathUtils;
@@ -13,8 +13,8 @@ using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.IO.Archives;
 using osu.Game.Screens.Backgrounds;
-using OpenTK;
-using OpenTK.Graphics;
+using osuTK;
+using osuTK.Graphics;
 using osu.Game.Overlays;
 
 namespace osu.Game.Screens.Menu
@@ -28,18 +28,16 @@ namespace osu.Game.Screens.Menu
         /// </summary>
         public bool DidLoadMenu;
 
-        private readonly Bindable<WorkingBeatmap> beatmap = new Bindable<WorkingBeatmap>();
-
         private MainMenu mainMenu;
         private SampleChannel welcome;
         private SampleChannel seeya;
 
-        protected override bool HideOverlaysOnEnter => true;
-        protected override OverlayActivation InitialOverlayActivationMode => OverlayActivation.Disabled;
+        public override bool HideOverlaysOnEnter => true;
+        public override OverlayActivation InitialOverlayActivationMode => OverlayActivation.Disabled;
 
         public override bool CursorVisible => false;
 
-        protected override BackgroundScreen CreateBackground() => new BackgroundScreenEmpty();
+        protected override BackgroundScreen CreateBackground() => new BackgroundScreenBlack();
 
         private Bindable<bool> menuVoice;
         private Bindable<bool> menuMusic;
@@ -47,16 +45,14 @@ namespace osu.Game.Screens.Menu
         private WorkingBeatmap introBeatmap;
 
         [BackgroundDependencyLoader]
-        private void load(AudioManager audio, OsuConfigManager config, BeatmapManager beatmaps, Framework.Game game, BindableBeatmap beatmap)
+        private void load(AudioManager audio, OsuConfigManager config, BeatmapManager beatmaps, Framework.Game game)
         {
-            this.beatmap.BindTo(beatmap);
-
             menuVoice = config.GetBindable<bool>(OsuSetting.MenuVoice);
             menuMusic = config.GetBindable<bool>(OsuSetting.MenuMusic);
 
             BeatmapSetInfo setInfo = null;
 
-            if (!menuMusic)
+            if (!menuMusic.Value)
             {
                 var sets = beatmaps.GetAllUsableBeatmapSets();
                 if (sets.Count > 0)
@@ -95,15 +91,15 @@ namespace osu.Game.Screens.Menu
 
             if (!resuming)
             {
-                beatmap.Value = introBeatmap;
+                Beatmap.Value = introBeatmap;
 
-                if (menuVoice)
+                if (menuVoice.Value)
                     welcome.Play();
 
                 Scheduler.AddDelayed(delegate
                 {
                     // Only start the current track if it is the menu music. A beatmap's track is started when entering the Main Manu.
-                    if (menuMusic)
+                    if (menuMusic.Value)
                         track.Start();
 
                     LoadComponentAsync(mainMenu = new MainMenu());
@@ -111,12 +107,11 @@ namespace osu.Game.Screens.Menu
                     Scheduler.AddDelayed(delegate
                     {
                         DidLoadMenu = true;
-                        Push(mainMenu);
+                        this.Push(mainMenu);
                     }, delay_step_one);
                 }, delay_step_two);
             }
 
-            logo.RelativePositionAxes = Axes.Both;
             logo.Colour = Color4.White;
             logo.Ripple = false;
 
@@ -145,31 +140,30 @@ namespace osu.Game.Screens.Menu
             }
         }
 
-        protected override void OnSuspending(Screen next)
+        public override void OnSuspending(IScreen next)
         {
-            Content.FadeOut(300);
+            this.FadeOut(300);
             base.OnSuspending(next);
         }
 
-        protected override bool OnExiting(Screen next)
+        public override bool OnExiting(IScreen next)
         {
             //cancel exiting if we haven't loaded the menu yet.
             return !DidLoadMenu;
         }
 
-        protected override void OnResuming(Screen last)
+        public override void OnResuming(IScreen last)
         {
-            if (!(last is MainMenu))
-                Content.FadeIn(300);
+            this.FadeIn(300);
 
             double fadeOutTime = EXIT_DELAY;
             //we also handle the exit transition.
-            if (menuVoice)
+            if (menuVoice.Value)
                 seeya.Play();
             else
                 fadeOutTime = 500;
 
-            Scheduler.AddDelayed(Exit, fadeOutTime);
+            Scheduler.AddDelayed(this.Exit, fadeOutTime);
 
             //don't want to fade out completely else we will stop running updates and shit will hit the fan.
             Game.FadeTo(0.01f, fadeOutTime);

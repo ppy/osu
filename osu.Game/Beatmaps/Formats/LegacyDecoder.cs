@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using System.Collections.Generic;
@@ -7,7 +7,7 @@ using System.IO;
 using osu.Framework.Logging;
 using osu.Game.Audio;
 using osu.Game.Beatmaps.ControlPoints;
-using OpenTK.Graphics;
+using osuTK.Graphics;
 
 namespace osu.Game.Beatmaps.Formats
 {
@@ -26,6 +26,7 @@ namespace osu.Game.Beatmaps.Formats
             Section section = Section.None;
 
             string line;
+
             while ((line = stream.ReadLine()) != null)
             {
                 if (ShouldSkipLine(line))
@@ -72,6 +73,7 @@ namespace osu.Game.Beatmaps.Formats
             var index = line.AsSpan().IndexOf("//".AsSpan());
             if (index > 0)
                 return line.Substring(0, index);
+
             return line;
         }
 
@@ -94,7 +96,7 @@ namespace osu.Game.Beatmaps.Formats
             {
                 colour = new Color4(byte.Parse(split[0]), byte.Parse(split[1]), byte.Parse(split[2]), split.Length == 4 ? byte.Parse(split[3]) : (byte)255);
             }
-            catch (Exception e)
+            catch
             {
                 throw new InvalidOperationException(@"Color must be specified with 8-bit integer components");
             }
@@ -115,6 +117,7 @@ namespace osu.Game.Beatmaps.Formats
             else
             {
                 if (!(output is IHasCustomColours tHasCustomColours)) return;
+
                 tHasCustomColours.CustomColours[pair.Key] = colour;
             }
         }

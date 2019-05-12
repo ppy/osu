@@ -1,12 +1,12 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
-using OpenTK;
+using osuTK;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Animations;
 using osu.Framework.Graphics.Textures;
-using System.Linq;
 using osu.Game.Beatmaps;
 
 namespace osu.Game.Storyboards.Drawables
@@ -64,20 +64,22 @@ namespace osu.Game.Storyboards.Drawables
         }
 
         [BackgroundDependencyLoader]
-        private void load(IBindableBeatmap beatmap, TextureStore textureStore)
+        private void load(IBindable<WorkingBeatmap> beatmap, TextureStore textureStore)
         {
             var basePath = Animation.Path.ToLowerInvariant();
+
             for (var frame = 0; frame < Animation.FrameCount; frame++)
             {
                 var framePath = basePath.Replace(".", frame + ".");
 
-                var path = beatmap.Value.BeatmapSetInfo.Files.FirstOrDefault(f => f.Filename.ToLowerInvariant() == framePath)?.FileInfo.StoragePath;
+                var path = beatmap.Value.BeatmapSetInfo.Files.Find(f => f.Filename.ToLowerInvariant() == framePath)?.FileInfo.StoragePath;
                 if (path == null)
                     continue;
 
                 var texture = textureStore.Get(path);
                 AddFrame(texture, Animation.FrameDelay);
             }
+
             Animation.ApplyTransforms(this);
         }
     }

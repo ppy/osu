@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Framework.Allocation;
@@ -33,18 +33,17 @@ namespace osu.Game.Rulesets.Taiko.UI
                 case HitResult.Good:
                     JudgementBody.Colour = colours.GreenLight;
                     break;
+
                 case HitResult.Great:
                     JudgementBody.Colour = colours.BlueLight;
                     break;
             }
         }
 
-        protected override void LoadComplete()
+        protected override void ApplyHitAnimations()
         {
-            if (Result.IsHit)
-                this.MoveToY(-100, 500);
-
-            base.LoadComplete();
+            this.MoveToY(-100, 500);
+            base.ApplyHitAnimations();
         }
     }
 }

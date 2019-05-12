@@ -1,46 +1,52 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
-using osu.Framework.Configuration;
+using osu.Framework.Bindables;
 using osu.Framework.Platform;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets;
+using osu.Game.Rulesets.Mods;
 
 namespace osu.Game.Tests.Visual
 {
     public abstract class OsuTestCase : TestCase
     {
+        [Cached(typeof(Bindable<WorkingBeatmap>))]
+        [Cached(typeof(IBindable<WorkingBeatmap>))]
         private readonly OsuTestBeatmap beatmap = new OsuTestBeatmap(new DummyWorkingBeatmap());
+
         protected BindableBeatmap Beatmap => beatmap;
 
+        [Cached]
+        [Cached(typeof(IBindable<RulesetInfo>))]
         protected readonly Bindable<RulesetInfo> Ruleset = new Bindable<RulesetInfo>();
 
-        protected DependencyContainer Dependencies { get; private set; }
+        [Cached]
+        [Cached(Type = typeof(IBindable<IReadOnlyList<Mod>>))]
+        protected readonly Bindable<IReadOnlyList<Mod>> Mods = new Bindable<IReadOnlyList<Mod>>(Array.Empty<Mod>());
+
+        protected new DependencyContainer Dependencies { get; private set; }
 
         private readonly Lazy<Storage> localStorage;
         protected Storage LocalStorage => localStorage.Value;
 
         protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
         {
-            Dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
+            // This is the earliest we can get OsuGameBase, which is used by the dummy working beatmap to find textures
+            beatmap.Default = new DummyWorkingBeatmap(parent.Get<OsuGameBase>());
 
-            Dependencies.CacheAs<BindableBeatmap>(beatmap);
-            Dependencies.CacheAs<IBindableBeatmap>(beatmap);
-
-            Dependencies.CacheAs(Ruleset);
-            Dependencies.CacheAs<IBindable<RulesetInfo>>(Ruleset);
-
-            return Dependencies;
+            return Dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
         }
 
         protected OsuTestCase()
         {
-            localStorage = new Lazy<Storage>(() => new DesktopStorage($"{GetType().Name}-{Guid.NewGuid()}", null));
+            localStorage = new Lazy<Storage>(() => new NativeStorage($"{GetType().Name}-{Guid.NewGuid()}"));
         }
 
         [BackgroundDependencyLoader]
@@ -55,11 +61,7 @@ namespace osu.Game.Tests.Visual
         {
             base.Dispose(isDisposing);
 
-            if (beatmap != null)
-            {
-                beatmap.Disabled = true;
-                beatmap.Value.Track.Stop();
-            }
+            beatmap?.Value.Track.Stop();
 
             if (localStorage.IsValueCreated)
             {

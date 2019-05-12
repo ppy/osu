@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
@@ -11,7 +11,7 @@ namespace osu.Game.Graphics.UserInterface
         public BackButton()
         {
             Text = @"back";
-            Icon = FontAwesome.fa_osu_left_o;
+            Icon = OsuIcon.LeftCircle;
             Anchor = Anchor.BottomLeft;
             Origin = Anchor.BottomLeft;
         }

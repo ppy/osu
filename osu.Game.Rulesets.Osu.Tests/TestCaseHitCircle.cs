@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -8,7 +8,7 @@ using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Objects.Drawables;
 using osu.Game.Tests.Visual;
-using OpenTK;
+using osuTK;
 using System.Collections.Generic;
 using System;
 using osu.Game.Rulesets.Mods;
@@ -30,7 +30,6 @@ namespace osu.Game.Rulesets.Osu.Tests
         protected override Container<Drawable> Content => content;
 
         private int depthIndex;
-        protected readonly List<Mod> Mods = new List<Mod>();
 
         public TestCaseHitCircle()
         {
@@ -68,7 +67,7 @@ namespace osu.Game.Rulesets.Osu.Tests
                 Depth = depthIndex++
             };
 
-            foreach (var mod in Mods.OfType<IApplicableToDrawableHitObjects>())
+            foreach (var mod in Mods.Value.OfType<IApplicableToDrawableHitObjects>())
                 mod.ApplyToDrawableHitObjects(new[] { drawable });
 
             Add(drawable);
@@ -89,7 +88,8 @@ namespace osu.Game.Rulesets.Osu.Tests
         {
             private readonly bool auto;
 
-            public TestDrawableHitCircle(HitCircle h, bool auto) : base(h)
+            public TestDrawableHitCircle(HitCircle h, bool auto)
+                : base(h)
             {
                 this.auto = auto;
             }

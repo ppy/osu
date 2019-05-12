@@ -1,11 +1,11 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Graphics;
 using osu.Framework.Input.Bindings;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Taiko.Objects.Drawables.Pieces;
-using OpenTK;
+using osuTK;
 using System.Linq;
 using osu.Game.Audio;
 using System.Collections.Generic;
@@ -24,15 +24,15 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
         protected DrawableTaikoHitObject(TaikoHitObject hitObject)
             : base(hitObject)
         {
-            InternalChildren = new[]
+            AddRangeInternal(new[]
             {
                 nonProxiedContent = new Container
                 {
                     RelativeSizeAxes = Axes.Both,
                     Child = Content = new Container { RelativeSizeAxes = Axes.Both }
                 },
-                proxiedContent = new Container { RelativeSizeAxes = Axes.Both }
-            };
+                proxiedContent = new ProxiedContentContainer { RelativeSizeAxes = Axes.Both }
+            });
         }
 
         /// <summary>
@@ -49,6 +49,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
         protected void ProxyContent()
         {
             if (isProxied) return;
+
             isProxied = true;
 
             nonProxiedContent.Remove(Content);
@@ -62,6 +63,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
         protected void UnproxyContent()
         {
             if (!isProxied) return;
+
             isProxied = false;
 
             proxiedContent.Remove(Content);
@@ -75,6 +77,12 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
 
         public abstract bool OnPressed(TaikoAction action);
         public virtual bool OnReleased(TaikoAction action) => false;
+
+        private class ProxiedContentContainer : Container
+        {
+            public override double LifetimeStart => Parent?.LifetimeStart ?? base.LifetimeStart;
+            public override double LifetimeEnd => Parent?.LifetimeEnd ?? base.LifetimeEnd;
+        }
     }
 
     public abstract class DrawableTaikoHitObject<TaikoHitType> : DrawableTaikoHitObject
@@ -103,6 +111,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             MainPiece.KiaiMode = HitObject.Kiai;
 
             var strongObject = HitObject.NestedHitObjects.OfType<StrongHitObject>().FirstOrDefault();
+
             if (strongObject != null)
             {
                 var strongHit = CreateStrongHit(strongObject);

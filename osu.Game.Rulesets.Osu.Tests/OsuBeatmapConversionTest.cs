@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using System.Collections.Generic;
@@ -33,9 +33,12 @@ namespace osu.Game.Rulesets.Osu.Tests
                 case Slider slider:
                     foreach (var nested in slider.NestedHitObjects)
                         yield return createConvertValue(nested);
+
                     break;
+
                 default:
                     yield return createConvertValue(hitObject);
+
                     break;
             }
 

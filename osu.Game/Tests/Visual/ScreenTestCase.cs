@@ -1,7 +1,8 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
-using osu.Framework.Screens;
+using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Game.Screens;
 
 namespace osu.Game.Tests.Visual
@@ -9,40 +10,28 @@ namespace osu.Game.Tests.Visual
     /// <summary>
     /// A test case which can be used to test a screen (that relies on OnEntering being called to execute startup instructions).
     /// </summary>
-    public abstract class ScreenTestCase : OsuTestCase
+    public abstract class ScreenTestCase : ManualInputManagerTestCase
     {
-        private readonly TestOsuScreen baseScreen;
+        private readonly OsuScreenStack stack;
+
+        private readonly Container content;
+
+        protected override Container<Drawable> Content => content;
 
         protected ScreenTestCase()
         {
-            Add(baseScreen = new TestOsuScreen());
+            base.Content.AddRange(new Drawable[]
+            {
+                stack = new OsuScreenStack { RelativeSizeAxes = Axes.Both },
+                content = new Container { RelativeSizeAxes = Axes.Both }
+            });
         }
 
-        protected void LoadScreen(OsuScreen screen) => baseScreen.LoadScreen(screen);
-
-        public class TestOsuScreen : OsuScreen
+        protected void LoadScreen(OsuScreen screen)
         {
-            private OsuScreen nextScreen;
-
-            public void LoadScreen(OsuScreen screen) => Schedule(() =>
-            {
-                nextScreen = screen;
-
-                if (IsCurrentScreen)
-                {
-                    Push(screen);
-                    nextScreen = null;
-                }
-                else
-                    MakeCurrent();
-            });
-
-            protected override void OnResuming(Screen last)
-            {
-                base.OnResuming(last);
-                if (nextScreen != null)
-                    LoadScreen(nextScreen);
-            }
+            if (stack.CurrentScreen != null)
+                stack.Exit();
+            stack.Push(screen);
         }
     }
 }

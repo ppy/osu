@@ -1,24 +1,39 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
+using System;
 using osu.Framework.Allocation;
-using osu.Framework.Configuration;
+using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Events;
 using osu.Game.Graphics;
-using OpenTK;
-using OpenTK.Graphics;
+using osuTK;
+using osuTK.Graphics;
 
 namespace osu.Game.Overlays.Volume
 {
     public class MuteButton : Container, IHasCurrentValue<bool>
     {
-        public Bindable<bool> Current { get; } = new Bindable<bool>();
+        private readonly Bindable<bool> current = new Bindable<bool>();
+
+        public Bindable<bool> Current
+        {
+            get => current;
+            set
+            {
+                if (value == null)
+                    throw new ArgumentNullException(nameof(value));
+
+                current.UnbindBindings();
+                current.BindTo(value);
+            }
+        }
 
         private Color4 hoveredColour, unhoveredColour;
         private const float width = 100;
@@ -55,10 +70,10 @@ namespace osu.Game.Overlays.Volume
                 }
             });
 
-            Current.ValueChanged += newValue =>
+            Current.ValueChanged += muted =>
             {
-                icon.Icon = newValue ? FontAwesome.fa_volume_off : FontAwesome.fa_volume_up;
-                icon.Margin = new MarginPadding { Left = newValue ? width / 2 - 15 : width / 2 - 10 }; //Magic numbers to line up both icons because they're different widths
+                icon.Icon = muted.NewValue ? FontAwesome.Solid.VolumeOff : FontAwesome.Solid.VolumeUp;
+                icon.Margin = new MarginPadding { Left = muted.NewValue ? width / 2 - 15 : width / 2 - 10 }; //Magic numbers to line up both icons because they're different widths
             };
             Current.TriggerChange();
         }

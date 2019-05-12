@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using System.Collections.Generic;
@@ -11,8 +11,8 @@ using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Taiko.Objects.Drawables.Pieces;
-using OpenTK;
-using OpenTK.Graphics;
+using osuTK;
+using osuTK.Graphics;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Rulesets.Scoring;
 
@@ -135,7 +135,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
         {
             if (userTriggered)
             {
-                var nextTick = ticks.FirstOrDefault(j => !j.IsHit);
+                var nextTick = ticks.Find(j => !j.IsHit);
 
                 nextTick?.TriggerResult(HitResult.Great);
 
@@ -192,6 +192,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
                     using (BeginAbsoluteSequence(HitObject.StartTime - preempt, true))
                         targetRing.ScaleTo(target_ring_scale, preempt * 4, Easing.OutQuint);
                     break;
+
                 case ArmedState.Miss:
                 case ArmedState.Hit:
                     this.FadeOut(out_transition_time, Easing.Out);
@@ -229,6 +230,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             // Ensure alternating centre and rim hits
             if (lastWasCentre == isCentre)
                 return false;
+
             lastWasCentre = isCentre;
 
             UpdateResult(true);
