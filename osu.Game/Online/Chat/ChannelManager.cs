@@ -87,7 +87,7 @@ namespace osu.Game.Online.Chat
 
         private void currentChannelChanged(ValueChangedEvent<Channel> e)
         {
-            if (!(e.NewValue is ChannelSelectorTabChannel))
+            if (!(e.NewValue is ChannelSelectorTabItem.ChannelSelectorTabChannel))
                 JoinChannel(e.NewValue);
         }
 
