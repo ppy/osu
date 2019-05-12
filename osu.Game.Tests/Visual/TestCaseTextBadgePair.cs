@@ -42,7 +42,6 @@ namespace osu.Game.Tests.Visual
             AddStep(@"Hide text", () => textBadgePair.HideText(200));
             AddStep(@"Show text", () => textBadgePair.ShowText(200));
             AddStep(@"Different text", () => textBadgePair.ChangeText(200, "This one's a little bit wider"));
-            AddWaitStep(1);
             AddStep(@"Different text", () => textBadgePair.ChangeText(200, "Ok?.."));
         }
     }

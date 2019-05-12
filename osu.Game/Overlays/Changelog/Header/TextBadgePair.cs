@@ -1,7 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
@@ -12,6 +11,7 @@ using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Events;
 using osu.Game.Graphics.UserInterface;
 using System;
+using osu.Game.Graphics;
 
 namespace osu.Game.Overlays.Changelog.Header
 {
@@ -36,7 +36,7 @@ namespace osu.Game.Overlays.Changelog.Header
             {
                 Text = new SpriteText
                 {
-                    TextSize = 21, // web: 16,
+                    Font = OsuFont.GetFont(size: 21), // web: 16,
                     Text = displayText,
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
@@ -56,6 +56,8 @@ namespace osu.Game.Overlays.Changelog.Header
         /// <param name="duration">
         /// The duration of popping in and popping out not combined.
         /// Full change takes double this time.</param>
+        /// <param name="displayText"></param>
+        /// <param name="easing"></param>
         public void ChangeText(double duration = 0, string displayText = null, Easing easing = Easing.InOutCubic)
         {
             LineBadge.Collapse();

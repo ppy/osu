@@ -54,21 +54,18 @@ namespace osu.Game.Overlays.Changelog
                         new SpriteText
                         {
                             Text = LatestBuild.UpdateStream.DisplayName,
-                            Font = @"Exo2.0-Bold",
-                            TextSize = 14, // web: 12,
+                            Font = OsuFont.GetFont(weight: FontWeight.Bold, size: 14), // web: 12,
                             Margin = new MarginPadding { Top = 6 },
                         },
                         new SpriteText
                         {
                             Text = LatestBuild.DisplayVersion,
-                            Font = @"Exo2.0-Light",
-                            TextSize = 20, // web: 16,
+                            Font = OsuFont.GetFont(weight: FontWeight.Light, size: 20), // web: 16,
                         },
                         new SpriteText
                         {
                             Text = LatestBuild.Users > 0 ? $"{LatestBuild.Users:N0} users online" : null,
-                            TextSize = 12, // web: 10,
-                            Font = @"Exo2.0-Regular",
+                            Font = OsuFont.GetFont(weight: FontWeight.Regular, size: 12), // web: 10,
                             Colour = new Color4(203, 164, 218, 255),
                         },
                     }

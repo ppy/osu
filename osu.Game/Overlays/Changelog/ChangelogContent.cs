@@ -4,7 +4,6 @@
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
-using osu.Game.Online.API;
 using osu.Game.Online.API.Requests.Responses;
 using System;
 using osuTK.Graphics;
@@ -13,7 +12,6 @@ namespace osu.Game.Overlays.Changelog
 {
     public class ChangelogContent : FillFlowContainer
     {
-        private APIAccess api;
         private ChangelogContentGroup changelogContentGroup;
 
         public delegate void BuildSelectedEventHandler(APIChangelogBuild build, EventArgs args);

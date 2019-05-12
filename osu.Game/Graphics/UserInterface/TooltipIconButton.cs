@@ -36,7 +36,7 @@ namespace osu.Game.Graphics.UserInterface
         /// </summary>
         public bool IsEnabled
         {
-            get { return isEnabled; }
+            get => isEnabled;
             set
             {
                 isEnabled = value;
@@ -77,6 +77,7 @@ namespace osu.Game.Graphics.UserInterface
                 sampleClick?.Play();
                 Action?.Invoke();
             }
+
             return base.OnClick(e);
         }
 

@@ -1,7 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-
 using NUnit.Framework;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays;
@@ -20,7 +19,9 @@ namespace osu.Game.Tests.Visual
             Add(changelog = new ChangelogOverlay());
             AddStep(@"Show", changelog.Show);
             AddStep(@"Hide", changelog.Hide);
-            AddWaitStep(3);
+
+            AddWaitStep("wait for hide", 3);
+
             AddStep(@"Show with Lazer 2018.712.0", () =>
             {
                 changelog.FetchAndShowBuild(new APIChangelogBuild
@@ -30,9 +31,11 @@ namespace osu.Game.Tests.Visual
                 });
                 changelog.Show();
             });
-            AddWaitStep(3);
+
+            AddWaitStep("wait for show", 3);
             AddStep(@"Hide", changelog.Hide);
-            AddWaitStep(3);
+            AddWaitStep("wait for hide", 3);
+
             AddStep(@"Show with listing", () =>
             {
                 changelog.ShowListing();
