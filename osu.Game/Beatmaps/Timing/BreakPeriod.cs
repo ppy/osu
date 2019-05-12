@@ -29,5 +29,12 @@ namespace osu.Game.Beatmaps.Timing
         /// Whether the break has any effect. Breaks that are too short are culled before they are added to the beatmap.
         /// </summary>
         public bool HasEffect => Duration >= MIN_BREAK_DURATION;
+
+        /// <summary>
+        /// Whether this break contains a specified time.
+        /// </summary>
+        /// <param name="time">The time to check in milliseconds.</param>
+        /// <returns>Whether the time falls within this <see cref="BreakPeriod"/>.</returns>
+        public bool Contains(double time) => time >= StartTime && time <= EndTime;
     }
 }

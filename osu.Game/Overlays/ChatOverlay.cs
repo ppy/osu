@@ -199,6 +199,9 @@ namespace osu.Game.Overlays
                 return;
             }
 
+            if (e.NewValue is ChannelSelectorTabItem.ChannelSelectorTabChannel)
+                return;
+
             textbox.Current.Disabled = e.NewValue.ReadOnly;
 
             if (channelTabControl.Current.Value != e.NewValue)
@@ -268,7 +271,7 @@ namespace osu.Game.Overlays
         private void selectTab(int index)
         {
             var channel = channelTabControl.Items.Skip(index).FirstOrDefault();
-            if (channel != null && channel.Name != "+")
+            if (channel != null && !(channel is ChannelSelectorTabItem.ChannelSelectorTabChannel))
                 channelTabControl.Current.Value = channel;
         }
 
