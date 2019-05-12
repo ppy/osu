@@ -161,8 +161,10 @@ namespace osu.Game.Overlays
         private void fetchListing()
         {
             header.ShowListing();
+
             if (isAtListing)
                 return;
+
             isAtListing = true;
             var req = new GetChangelogRequest();
             badges.SelectNone();
@@ -173,8 +175,10 @@ namespace osu.Game.Overlays
         public void ShowListing()
         {
             header.ShowListing();
+
             if (isAtListing)
                 return;
+
             isAtListing = true;
             content.Hide();
             listing.Show();
@@ -187,8 +191,8 @@ namespace osu.Game.Overlays
         /// <summary>
         /// Fetches and shows a specific build from a specific update stream.
         /// </summary>
-        /// <param name="build">Must contain at least <see cref="APIChangelogBuild.UpdateStream.Name"/> and
-        /// <see cref="APIChangelogBuild.Version"/>. If <see cref="APIChangelogBuild.UpdateStream.DisplayName"/> and
+        /// <param name="build">Must contain at least <see cref="UpdateStream.Name"/> and
+        /// <see cref="APIChangelogBuild.Version"/>. If <see cref="UpdateStream.DisplayName"/> and
         /// <see cref="APIChangelogBuild.DisplayVersion"/> are specified, the header will instantly display them.</param>
         /// <param name="updateBadges">Whether to update badges. Should be set to false in case
         /// the function is called by selecting a badge, to avoid an infinite loop.</param>

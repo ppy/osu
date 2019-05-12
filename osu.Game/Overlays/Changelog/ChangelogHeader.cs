@@ -10,6 +10,7 @@ using osu.Framework.Graphics.Textures;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Overlays.Changelog.Header;
 using System;
+using osu.Game.Graphics;
 using osuTK;
 using osuTK.Graphics;
 
@@ -97,14 +98,12 @@ namespace osu.Game.Overlays.Changelog
                                 new OsuSpriteText
                                 {
                                     Text = "Changelog ",
-                                    Font = @"Exo2.0-Light",
-                                    TextSize = 38, // web: 30
+                                    Font = OsuFont.GetFont(weight: FontWeight.Light, size: 38), // web: 30,
                                 },
                                 titleStream = new OsuSpriteText
                                 {
                                     Text = "Listing",
-                                    TextSize = 38, // web: 30
-                                    Font = @"Exo2.0-Light",
+                                    Font = OsuFont.GetFont(weight: FontWeight.Light, size: 38), // web: 30,
                                     Colour = Purple,
                                 },
                             }

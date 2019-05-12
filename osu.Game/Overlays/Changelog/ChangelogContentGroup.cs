@@ -65,19 +65,17 @@ namespace osu.Game.Overlays.Changelog
                                 new SpriteText
                                 {
                                     Text = build.UpdateStream.DisplayName,
-                                    TextSize = 28, // web: 24,
-                                    Font = @"Exo2.0-Medium",
+                                    Font = OsuFont.GetFont(weight: FontWeight.Medium, size: 28), // web: 24,
                                 },
                                 new SpriteText
                                 {
                                     Text = " ",
-                                    TextSize = 28,
+                                    Font = OsuFont.GetFont(weight: FontWeight.Medium, size: 28), // web: 24,
                                 },
                                 new SpriteText
                                 {
                                     Text = build.DisplayVersion,
-                                    TextSize = 28, // web: 24,
-                                    Font = @"Exo2.0-Light",
+                                    Font = OsuFont.GetFont(weight: FontWeight.Light, size: 28), // web: 24,
                                     Colour = StreamColour.FromStreamName(build.UpdateStream.Name),
                                 },
                             }
@@ -100,9 +98,8 @@ namespace osu.Game.Overlays.Changelog
                     // do we need .ToUniversalTime() here?
                     // also, this should be a temporary solution to weekdays in >localized< date strings
                     Text = build.CreatedAt.Date.ToLongDateString().Replace(build.CreatedAt.ToString("dddd") + ", ", ""),
-                    TextSize = 17, // web: 14,
+                    Font = OsuFont.GetFont(weight: FontWeight.Medium, size: 17), // web: 14,
                     Colour = OsuColour.FromHex(@"FD5"),
-                    Font = @"Exo2.0-Medium",
                     Anchor = Anchor.TopCentre,
                     Origin = Anchor.TopCentre,
                     Margin = new MarginPadding { Top = 5 },
@@ -130,9 +127,8 @@ namespace osu.Game.Overlays.Changelog
                     // do we need .ToUniversalTime() here?
                     // also, this should be a temporary solution to weekdays in >localized< date strings
                     Text = build.CreatedAt.Date.ToLongDateString().Replace(build.CreatedAt.ToString("dddd") + ", ", ""),
-                    TextSize = 28, // web: 24,
+                    Font = OsuFont.GetFont(weight: FontWeight.Light, size: 28), // web: 24,
                     Colour = OsuColour.FromHex(@"FD5"),
-                    Font = @"Exo2.0-Light",
                     Anchor = Anchor.TopCentre,
                     Origin = Anchor.TopCentre,
                     Margin = new MarginPadding { Top = 20 },
@@ -155,14 +151,12 @@ namespace osu.Game.Overlays.Changelog
                             new SpriteText
                             {
                                 Text = build.UpdateStream.DisplayName,
-                                TextSize = 20, // web: 18,
-                                Font = @"Exo2.0-Medium",
+                                Font = OsuFont.GetFont(weight: FontWeight.Medium, size: 20), // web: 19,
                             },
                             new SpriteText
                             {
                                 Text = build.DisplayVersion,
-                                TextSize = 20, // web: 18,
-                                Font = @"Exo2.0-Light",
+                                Font = OsuFont.GetFont(weight: FontWeight.Light, size: 20), // web: 19,
                                 Colour = StreamColour.FromStreamName(build.UpdateStream.Name),
                             },
                         },
@@ -226,8 +220,7 @@ namespace osu.Game.Overlays.Changelog
                 ChangelogEntries.Add(new SpriteText
                 {
                     Text = category.Key,
-                    TextSize = 24, // web: 18,
-                    Font = @"Exo2.0-Bold",
+                    Font = OsuFont.GetFont(weight: FontWeight.Bold, size: 24), // web: 24,
                     Margin = new MarginPadding { Top = 35, Bottom = 15 },
                 });
 
@@ -240,40 +233,47 @@ namespace osu.Game.Overlays.Changelog
                         AutoSizeAxes = Axes.Y,
                         Margin = new MarginPadding { Vertical = 5 },
                     };
+
                     title.AddIcon(FontAwesome.Solid.Check, t =>
                     {
-                        t.TextSize = 12;
+                        t.Font = OsuFont.GetFont(size: 12);
                         t.Padding = new MarginPadding { Left = -17, Right = 5 };
                     });
-                    title.AddText(entry.Title, t => { t.TextSize = 18; });
+
+                    title.AddText(entry.Title, t => { t.Font = OsuFont.GetFont(size: 18); });
 
                     if (!string.IsNullOrEmpty(entry.Repository))
                     {
-                        title.AddText(" (", t => t.TextSize = 18);
+                        title.AddText(" (", t => t.Font = OsuFont.GetFont(size: 18));
                         title.AddLink($"{entry.Repository.Replace("ppy/", "")}#{entry.GithubPullRequestId}",
                             entry.GithubUrl, Online.Chat.LinkAction.External, null,
-                            null, t => { t.TextSize = 18; });
-                        title.AddText(")", t => t.TextSize = 18);
+                            null, t => { t.Font = OsuFont.GetFont(size: 18); });
+                        title.AddText(")", t => t.Font = OsuFont.GetFont(size: 18));
                     }
 
-                    title.AddText(" by ", t => t.TextSize = 14);
+                    title.AddText(" by ", t => t.Font = OsuFont.GetFont(size: 14));
+
                     if (entry.GithubUser.GithubUrl != null)
                         title.AddLink(entry.GithubUser.DisplayName, entry.GithubUser.GithubUrl,
                             Online.Chat.LinkAction.External, null, null,
-                            t => t.TextSize = 14);
+                            t => t.Font = OsuFont.GetFont(size: 14));
                     else
-                        title.AddText(entry.GithubUser.DisplayName, t => t.TextSize = 14); //web: 12;
+                        title.AddText(entry.GithubUser.DisplayName, t => t.Font = OsuFont.GetFont(size: 14)); //web: 12;
+
                     ChangelogEntries.Add(title);
+
                     TextFlowContainer messageContainer = new TextFlowContainer
                     {
                         AutoSizeAxes = Axes.Y,
                         RelativeSizeAxes = Axes.X,
                     };
+
                     messageContainer.AddText($"{entry.MessageHtml?.Replace("<p>", "").Replace("</p>", "")}\n", t =>
                     {
-                        t.TextSize = 14; // web: 12,
+                        t.Font = OsuFont.GetFont(size: 14); // web: 12,
                         t.Colour = new Color4(235, 184, 254, 255);
                     });
+
                     ChangelogEntries.Add(messageContainer);
                 }
             }

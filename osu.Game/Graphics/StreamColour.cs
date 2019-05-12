@@ -36,6 +36,7 @@ namespace osu.Game.Graphics
             if (!string.IsNullOrEmpty(name))
                 if (colours.TryGetValue(name, out ColourInfo colour))
                     return colour;
+
             return new Color4(0, 0, 0, 255);
         }
     }
