@@ -40,6 +40,11 @@ namespace osu.Game.Screens.Play
 
         public override OverlayActivation InitialOverlayActivationMode => OverlayActivation.UserTriggered;
 
+        /// <summary>
+        /// Whether gameplay should pause when the game window focus is lost.
+        /// </summary>
+        protected virtual bool PauseOnFocusLost => true;
+
         public Action RestartRequested;
 
         public bool HasFailed { get; private set; }
@@ -132,7 +137,11 @@ namespace osu.Game.Screens.Play
                 DrawableRuleset.Cursor?.CreateProxy() ?? new Container(),
                 HUDOverlay = new HUDOverlay(ScoreProcessor, DrawableRuleset, Mods.Value)
                 {
-                    HoldToQuit = { Action = performUserRequestedExit },
+                    HoldToQuit =
+                    {
+                        Action = performUserRequestedExit,
+                        IsPaused = { BindTarget = GameplayClockContainer.IsPaused }
+                    },
                     PlayerSettingsOverlay = { PlaybackSettings = { UserPlaybackRate = { BindTarget = GameplayClockContainer.UserPlaybackRate } } },
                     KeyCounter = { Visible = { BindTarget = DrawableRuleset.HasReplayLoaded } },
                     RequestSeek = GameplayClockContainer.Seek,
@@ -166,6 +175,8 @@ namespace osu.Game.Screens.Play
                     },
                 }
             };
+
+            DrawableRuleset.HasReplayLoaded.BindValueChanged(e => HUDOverlay.HoldToQuit.PauseOnFocusLost = !e.NewValue && PauseOnFocusLost, true);
 
             // bind clock into components that require it
             DrawableRuleset.IsPaused.BindTo(GameplayClockContainer.IsPaused);
