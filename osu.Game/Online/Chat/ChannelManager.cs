@@ -10,6 +10,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Logging;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
+using osu.Game.Overlays.Chat.Tabs;
 using osu.Game.Users;
 
 namespace osu.Game.Online.Chat
@@ -86,7 +87,7 @@ namespace osu.Game.Online.Chat
 
         private void currentChannelChanged(ValueChangedEvent<Channel> e)
         {
-            if (e.NewValue?.Name != "+")
+            if (!(e.NewValue is ChannelSelectorTabChannel))
                 JoinChannel(e.NewValue);
         }
 
