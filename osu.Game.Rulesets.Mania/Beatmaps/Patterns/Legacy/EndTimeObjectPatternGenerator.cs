@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
 using osu.Game.Rulesets.Mania.MathUtils;
@@ -38,9 +38,11 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
                 case 8 when HitObject.Samples.Any(s => s.Name == SampleInfo.HIT_FINISH) && endTime - HitObject.StartTime < 1000:
                     addToPattern(pattern, 0, generateHold);
                     break;
+
                 case 8:
                     addToPattern(pattern, FindAvailableColumn(GetRandomColumn(), PreviousPattern), generateHold);
                     break;
+
                 default:
                     if (TotalColumns > 0)
                         addToPattern(pattern, GetRandomColumn(), generateHold);

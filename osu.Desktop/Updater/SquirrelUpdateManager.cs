@@ -1,20 +1,24 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.IO;
+using System.Reflection;
 using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Graphics.Sprites;
 using osu.Framework.Logging;
 using osu.Game;
 using osu.Game.Graphics;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Notifications;
-using OpenTK;
-using OpenTK.Graphics;
+using osuTK;
+using osuTK.Graphics;
 using Squirrel;
+using LogLevel = Splat.LogLevel;
 
 namespace osu.Desktop.Updater
 {
@@ -35,7 +39,10 @@ namespace osu.Desktop.Updater
             notificationOverlay = notification;
 
             if (game.IsDeployedBuild)
+            {
+                Splat.Locator.CurrentMutable.Register(() => new SquirrelLogger(), typeof(Splat.ILogger));
                 Schedule(() => Task.Run(() => checkForUpdateAsync()));
+            }
         }
 
         private async void checkForUpdateAsync(bool useDeltaPatching = true, UpdateProgressNotification notification = null)
@@ -152,11 +159,37 @@ namespace osu.Desktop.Updater
                     {
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
-                        Icon = FontAwesome.fa_upload,
+                        Icon = FontAwesome.Solid.Upload,
                         Colour = Color4.White,
                         Size = new Vector2(20),
                     }
                 });
+            }
+        }
+
+        private class SquirrelLogger : Splat.ILogger, IDisposable
+        {
+            private readonly string path;
+            private readonly object locker = new object();
+            public LogLevel Level { get; set; } = LogLevel.Info;
+
+            public SquirrelLogger()
+            {
+                var file = Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly()?.Location ?? Directory.GetCurrentDirectory()), "SquirrelSetupUpdater.log");
+                if (File.Exists(file)) File.Delete(file);
+                path = file;
+            }
+
+            public void Write(string message, LogLevel logLevel)
+            {
+                if (logLevel < Level)
+                    return;
+
+                lock (locker) File.AppendAllText(path, message + "\r\n");
+            }
+
+            public void Dispose()
+            {
             }
         }
     }

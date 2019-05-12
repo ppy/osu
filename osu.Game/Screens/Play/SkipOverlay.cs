@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using osu.Framework;
@@ -9,13 +9,13 @@ using osu.Framework.Audio.Sample;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Threading;
-using osu.Framework.Timing;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Screens.Ranking;
-using OpenTK;
-using OpenTK.Graphics;
+using osuTK;
+using osuTK.Graphics;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Graphics.Sprites;
 using osu.Game.Graphics.Containers;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
@@ -27,8 +27,7 @@ namespace osu.Game.Screens.Play
     {
         private readonly double startTime;
 
-        public IAdjustableClock AdjustableClock;
-        public IFrameBasedClock FramedClock;
+        public Action<double> RequestSeek;
 
         private Button button;
         private Box remainingTimeBox;
@@ -39,6 +38,10 @@ namespace osu.Game.Screens.Play
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => true;
         protected override bool BlockPositionalInput => false;
 
+        /// <summary>
+        /// Displays a skip overlay, giving the user the ability to skip forward.
+        /// </summary>
+        /// <param name="startTime">The time at which gameplay begins to appear.</param>
         public SkipOverlay(double startTime)
         {
             this.startTime = startTime;
@@ -46,24 +49,21 @@ namespace osu.Game.Screens.Play
             State = Visibility.Visible;
 
             RelativePositionAxes = Axes.Both;
-            RelativeSizeAxes = Axes.Both;
+            RelativeSizeAxes = Axes.X;
 
             Position = new Vector2(0.5f, 0.7f);
-            Size = new Vector2(1, 0.14f);
+            Size = new Vector2(1, 100);
 
             Origin = Anchor.Centre;
         }
 
-        [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
+        [BackgroundDependencyLoader(true)]
+        private void load(OsuColour colours, GameplayClock clock)
         {
             var baseClock = Clock;
 
-            if (FramedClock != null)
-            {
-                Clock = FramedClock;
-                ProcessCustomClock = false;
-            }
+            if (clock != null)
+                Clock = clock;
 
             Children = new Drawable[]
             {
@@ -91,16 +91,21 @@ namespace osu.Game.Screens.Play
             };
         }
 
-        private const double skip_required_cutoff = 3000;
+        /// <summary>
+        /// Duration before gameplay start time required before skip button displays.
+        /// </summary>
+        private const double skip_buffer = 1000;
+
         private const double fade_time = 300;
 
-        private double beginFadeTime => startTime - skip_required_cutoff - fade_time;
+        private double beginFadeTime => startTime - fade_time;
 
         protected override void LoadComplete()
         {
             base.LoadComplete();
 
-            if (startTime < skip_required_cutoff)
+            // skip is not required if there is no extra "empty" time to skip.
+            if (Clock.CurrentTime > beginFadeTime - skip_buffer)
             {
                 Alpha = 0;
                 Expire();
@@ -111,7 +116,7 @@ namespace osu.Game.Screens.Play
             using (BeginAbsoluteSequence(beginFadeTime))
                 this.FadeOut(fade_time);
 
-            button.Action = () => AdjustableClock?.Seek(startTime - skip_required_cutoff - fade_time);
+            button.Action = () => RequestSeek?.Invoke(beginFadeTime);
 
             displayTime = Time.Current;
 
@@ -158,7 +163,7 @@ namespace osu.Game.Screens.Play
 
             public Visibility State
             {
-                get { return state; }
+                get => state;
                 set
                 {
                     bool stateChanged = value != state;
@@ -178,6 +183,7 @@ namespace osu.Game.Screens.Play
                                 using (BeginDelayedSequence(1000))
                                     scheduledHide = Schedule(() => State = Visibility.Hidden);
                             break;
+
                         case Visibility.Hidden:
                             this.FadeOut(1000, Easing.OutExpo);
                             break;
@@ -263,9 +269,9 @@ namespace osu.Game.Screens.Play
                                 Direction = FillDirection.Horizontal,
                                 Children = new[]
                                 {
-                                    new SpriteIcon { Size = new Vector2(15), Shadow = true, Icon = FontAwesome.fa_chevron_right },
-                                    new SpriteIcon { Size = new Vector2(15), Shadow = true, Icon = FontAwesome.fa_chevron_right },
-                                    new SpriteIcon { Size = new Vector2(15), Shadow = true, Icon = FontAwesome.fa_chevron_right },
+                                    new SpriteIcon { Size = new Vector2(15), Shadow = true, Icon = FontAwesome.Solid.ChevronRight },
+                                    new SpriteIcon { Size = new Vector2(15), Shadow = true, Icon = FontAwesome.Solid.ChevronRight },
+                                    new SpriteIcon { Size = new Vector2(15), Shadow = true, Icon = FontAwesome.Solid.ChevronRight },
                                 }
                             },
                             new OsuSpriteText
@@ -273,8 +279,7 @@ namespace osu.Game.Screens.Play
                                 Anchor = Anchor.TopCentre,
                                 RelativePositionAxes = Axes.Y,
                                 Y = 0.7f,
-                                TextSize = 12,
-                                Font = @"Exo2.0-Bold",
+                                Font = OsuFont.GetFont(weight: FontWeight.Bold, size: 12),
                                 Origin = Anchor.Centre,
                                 Text = @"SKIP",
                             },
@@ -313,7 +318,7 @@ namespace osu.Game.Screens.Play
 
             protected override bool OnClick(ClickEvent e)
             {
-                if (!Enabled)
+                if (!Enabled.Value)
                     return false;
 
                 sampleConfirm.Play();

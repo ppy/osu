@@ -1,6 +1,7 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
@@ -13,8 +14,10 @@ using osu.Game.Rulesets.Mania.Beatmaps;
 using osu.Game.Rulesets.Mania.Objects;
 using osu.Game.Rulesets.Mania.Objects.Drawables;
 using osu.Game.Rulesets.Mania.UI;
+using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.UI.Scrolling;
-using OpenTK;
+using osu.Game.Tests.Visual;
+using osuTK;
 
 namespace osu.Game.Rulesets.Mania.Tests
 {
@@ -22,6 +25,9 @@ namespace osu.Game.Rulesets.Mania.Tests
     public class TestCaseStage : ManiaInputTestCase
     {
         private const int columns = 4;
+
+        [Cached(typeof(IReadOnlyList<Mod>))]
+        private IReadOnlyList<Mod> mods { get; set; } = Array.Empty<Mod>();
 
         private readonly List<ManiaStage> stages = new List<ManiaStage>();
 
@@ -122,7 +128,7 @@ namespace osu.Game.Rulesets.Mania.Tests
         {
             var specialAction = ManiaAction.Special1;
 
-            var stage = new ManiaStage(0, new StageDefinition { Columns = 2 }, ref action, ref specialAction) { VisibleTimeRange = { Value = 2000 } };
+            var stage = new ManiaStage(0, new StageDefinition { Columns = 2 }, ref action, ref specialAction);
             stages.Add(stage);
 
             return new ScrollingTestContainer(direction)
@@ -131,6 +137,7 @@ namespace osu.Game.Rulesets.Mania.Tests
                 Origin = Anchor.Centre,
                 RelativeSizeAxes = Axes.Y,
                 AutoSizeAxes = Axes.X,
+                TimeRange = 2000,
                 Child = stage
             };
         }

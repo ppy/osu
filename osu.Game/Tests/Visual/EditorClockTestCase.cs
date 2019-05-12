@@ -1,13 +1,13 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Input.Events;
 using osu.Framework.Timing;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Screens.Edit;
-using osu.Game.Screens.Edit.Screens.Compose;
 
 namespace osu.Game.Tests.Visual
 {
@@ -18,7 +18,7 @@ namespace osu.Game.Tests.Visual
     public abstract class EditorClockTestCase : OsuTestCase
     {
         protected readonly BindableBeatDivisor BeatDivisor = new BindableBeatDivisor();
-        protected readonly EditorClock Clock;
+        protected new readonly EditorClock Clock;
 
         protected EditorClockTestCase()
         {
@@ -42,10 +42,10 @@ namespace osu.Game.Tests.Visual
             Beatmap.BindValueChanged(beatmapChanged, true);
         }
 
-        private void beatmapChanged(WorkingBeatmap working)
+        private void beatmapChanged(ValueChangedEvent<WorkingBeatmap> e)
         {
-            Clock.ControlPointInfo = working.Beatmap.ControlPointInfo;
-            Clock.ChangeSource((IAdjustableClock)working.Track ?? new StopwatchClock());
+            Clock.ControlPointInfo = e.NewValue.Beatmap.ControlPointInfo;
+            Clock.ChangeSource((IAdjustableClock)e.NewValue.Track ?? new StopwatchClock());
             Clock.ProcessFrame();
         }
 

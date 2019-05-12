@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using System.Collections.Generic;
@@ -11,6 +11,7 @@ using osu.Framework.MathUtils;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Rulesets.Judgements;
+using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Taiko.Judgements;
@@ -19,7 +20,7 @@ using osu.Game.Rulesets.Taiko.Objects.Drawables;
 using osu.Game.Rulesets.Taiko.UI;
 using osu.Game.Tests.Beatmaps;
 using osu.Game.Tests.Visual;
-using OpenTK;
+using osuTK;
 using osu.Game.Rulesets.Scoring;
 
 namespace osu.Game.Rulesets.Taiko.Tests
@@ -33,7 +34,7 @@ namespace osu.Game.Rulesets.Taiko.Tests
         protected override double TimePerAction => default_duration * 2;
 
         private readonly Random rng = new Random(1337);
-        private TaikoRulesetContainer rulesetContainer;
+        private DrawableTaikoRuleset drawableRuleset;
         private Container playfieldContainer;
 
         [BackgroundDependencyLoader]
@@ -78,7 +79,7 @@ namespace osu.Game.Rulesets.Taiko.Tests
                     Ruleset = new TaikoRuleset().RulesetInfo
                 },
                 ControlPointInfo = controlPointInfo
-            });
+            }, Clock);
 
             Add(playfieldContainer = new Container
             {
@@ -86,7 +87,7 @@ namespace osu.Game.Rulesets.Taiko.Tests
                 Origin = Anchor.Centre,
                 RelativeSizeAxes = Axes.X,
                 Height = 768,
-                Children = new[] { rulesetContainer = new TaikoRulesetContainer(new TaikoRuleset(), beatmap) }
+                Children = new[] { drawableRuleset = new DrawableTaikoRuleset(new TaikoRuleset(), beatmap, Array.Empty<Mod>()) }
             });
         }
 
@@ -100,15 +101,19 @@ namespace osu.Game.Rulesets.Taiko.Tests
                 case 1:
                     addCentreHit(false);
                     break;
+
                 case 2:
                     addCentreHit(true);
                     break;
+
                 case 3:
                     addDrumRoll(false);
                     break;
+
                 case 4:
                     addDrumRoll(true);
                     break;
+
                 case 5:
                     addSwell();
                     delay = scroll_time - 100;
@@ -121,6 +126,7 @@ namespace osu.Game.Rulesets.Taiko.Tests
                 default:
                     playfieldContainer.Delay(delay).ResizeTo(new Vector2(1, rng.Next(25, 400)), 500);
                     break;
+
                 case 6:
                     playfieldContainer.Delay(delay).ResizeTo(new Vector2(1, TaikoPlayfield.DEFAULT_HEIGHT), 500);
                     break;
@@ -139,7 +145,7 @@ namespace osu.Game.Rulesets.Taiko.Tests
 
             var h = new DrawableTestHit(hit) { X = RNG.NextSingle(hitResult == HitResult.Good ? -0.1f : -0.05f, hitResult == HitResult.Good ? 0.1f : 0.05f) };
 
-            ((TaikoPlayfield)rulesetContainer.Playfield).OnNewResult(h, new JudgementResult(new TaikoJudgement()) { Type = hitResult });
+            ((TaikoPlayfield)drawableRuleset.Playfield).OnNewResult(h, new JudgementResult(new TaikoJudgement()) { Type = hitResult });
         }
 
         private void addStrongHitJudgement(bool kiai)
@@ -154,33 +160,33 @@ namespace osu.Game.Rulesets.Taiko.Tests
 
             var h = new DrawableTestHit(hit) { X = RNG.NextSingle(hitResult == HitResult.Good ? -0.1f : -0.05f, hitResult == HitResult.Good ? 0.1f : 0.05f) };
 
-            ((TaikoPlayfield)rulesetContainer.Playfield).OnNewResult(h, new JudgementResult(new TaikoJudgement()) { Type = hitResult });
-            ((TaikoPlayfield)rulesetContainer.Playfield).OnNewResult(new TestStrongNestedHit(h), new JudgementResult(new TaikoStrongJudgement()) { Type = HitResult.Great });
+            ((TaikoPlayfield)drawableRuleset.Playfield).OnNewResult(h, new JudgementResult(new TaikoJudgement()) { Type = hitResult });
+            ((TaikoPlayfield)drawableRuleset.Playfield).OnNewResult(new TestStrongNestedHit(h), new JudgementResult(new TaikoStrongJudgement()) { Type = HitResult.Great });
         }
 
         private void addMissJudgement()
         {
-            ((TaikoPlayfield)rulesetContainer.Playfield).OnNewResult(new DrawableTestHit(new Hit()), new JudgementResult(new TaikoJudgement()) { Type = HitResult.Miss });
+            ((TaikoPlayfield)drawableRuleset.Playfield).OnNewResult(new DrawableTestHit(new Hit()), new JudgementResult(new TaikoJudgement()) { Type = HitResult.Miss });
         }
 
         private void addBarLine(bool major, double delay = scroll_time)
         {
-            BarLine bl = new BarLine { StartTime = rulesetContainer.Playfield.Time.Current + delay };
+            BarLine bl = new BarLine { StartTime = drawableRuleset.Playfield.Time.Current + delay };
 
-            rulesetContainer.Playfield.Add(major ? new DrawableBarLineMajor(bl) : new DrawableBarLine(bl));
+            drawableRuleset.Playfield.Add(major ? new DrawableBarLineMajor(bl) : new DrawableBarLine(bl));
         }
 
         private void addSwell(double duration = default_duration)
         {
             var swell = new Swell
             {
-                StartTime = rulesetContainer.Playfield.Time.Current + scroll_time,
+                StartTime = drawableRuleset.Playfield.Time.Current + scroll_time,
                 Duration = duration,
             };
 
             swell.ApplyDefaults(new ControlPointInfo(), new BeatmapDifficulty());
 
-            rulesetContainer.Playfield.Add(new DrawableSwell(swell));
+            drawableRuleset.Playfield.Add(new DrawableSwell(swell));
         }
 
         private void addDrumRoll(bool strong, double duration = default_duration)
@@ -190,40 +196,40 @@ namespace osu.Game.Rulesets.Taiko.Tests
 
             var d = new DrumRoll
             {
-                StartTime = rulesetContainer.Playfield.Time.Current + scroll_time,
+                StartTime = drawableRuleset.Playfield.Time.Current + scroll_time,
                 IsStrong = strong,
                 Duration = duration,
             };
 
             d.ApplyDefaults(new ControlPointInfo(), new BeatmapDifficulty());
 
-            rulesetContainer.Playfield.Add(new DrawableDrumRoll(d));
+            drawableRuleset.Playfield.Add(new DrawableDrumRoll(d));
         }
 
         private void addCentreHit(bool strong)
         {
             Hit h = new Hit
             {
-                StartTime = rulesetContainer.Playfield.Time.Current + scroll_time,
+                StartTime = drawableRuleset.Playfield.Time.Current + scroll_time,
                 IsStrong = strong
             };
 
             h.ApplyDefaults(new ControlPointInfo(), new BeatmapDifficulty());
 
-            rulesetContainer.Playfield.Add(new DrawableCentreHit(h));
+            drawableRuleset.Playfield.Add(new DrawableCentreHit(h));
         }
 
         private void addRimHit(bool strong)
         {
             Hit h = new Hit
             {
-                StartTime = rulesetContainer.Playfield.Time.Current + scroll_time,
+                StartTime = drawableRuleset.Playfield.Time.Current + scroll_time,
                 IsStrong = strong
             };
 
             h.ApplyDefaults(new ControlPointInfo(), new BeatmapDifficulty());
 
-            rulesetContainer.Playfield.Add(new DrawableRimHit(h));
+            drawableRuleset.Playfield.Add(new DrawableRimHit(h));
         }
 
         private class TestStrongNestedHit : DrawableStrongNestedHit

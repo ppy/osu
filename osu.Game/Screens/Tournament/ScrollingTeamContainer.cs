@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using System.Collections.Generic;
@@ -14,8 +14,8 @@ using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Threading;
 using osu.Game.Screens.Tournament.Teams;
-using OpenTK;
-using OpenTK.Graphics;
+using osuTK;
+using osuTK.Graphics;
 
 namespace osu.Game.Screens.Tournament
 {
@@ -84,9 +84,10 @@ namespace osu.Game.Screens.Tournament
         }
 
         private ScrollState _scrollState;
+
         private ScrollState scrollState
         {
-            get { return _scrollState; }
+            get => _scrollState;
 
             set
             {
@@ -107,12 +108,14 @@ namespace osu.Game.Screens.Tournament
                         speedTo(1000f, 200);
                         tracker.FadeOut(100);
                         break;
+
                     case ScrollState.Stopping:
                         speedTo(0f, 2000);
                         tracker.FadeIn(200);
 
                         delayedStateChangeDelegate = Scheduler.AddDelayed(() => scrollState = ScrollState.Stopped, 2300);
                         break;
+
                     case ScrollState.Stopped:
                         // Find closest to center
                         if (!Children.Any())
@@ -154,6 +157,7 @@ namespace osu.Game.Screens.Tournament
 
                         delayedStateChangeDelegate = Scheduler.AddDelayed(() => scrollState = ScrollState.Idle, 10000);
                         break;
+
                     case ScrollState.Idle:
                         resetSelected();
 
@@ -326,9 +330,10 @@ namespace osu.Game.Screens.Tournament
             private readonly Box outline;
 
             private bool selected;
+
             public bool Selected
             {
-                get { return selected; }
+                get => selected;
 
                 set
                 {

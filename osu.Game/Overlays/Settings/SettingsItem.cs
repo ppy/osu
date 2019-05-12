@@ -1,21 +1,22 @@
-// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
 using osu.Framework.Allocation;
-using OpenTK.Graphics;
-using osu.Framework.Configuration;
+using osu.Framework.Bindables;
+using osuTK.Graphics;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
+using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Events;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
-using OpenTK;
+using osuTK;
 
 namespace osu.Game.Overlays.Settings
 {
@@ -39,7 +40,7 @@ namespace osu.Game.Overlays.Settings
 
         public virtual string LabelText
         {
-            get { return text?.Text ?? string.Empty; }
+            get => text?.Text ?? string.Empty;
             set
             {
                 if (text == null)
@@ -58,12 +59,13 @@ namespace osu.Game.Overlays.Settings
 
         public virtual Bindable<T> Bindable
         {
-            get { return bindable; }
+            get => bindable;
 
             set
             {
                 bindable = value;
                 controlWithCurrent?.Current.BindTo(bindable);
+
                 if (ShowsDefaultIndicator)
                 {
                     restoreDefaultButton.Bindable = bindable.GetBoundCopy();
@@ -72,16 +74,14 @@ namespace osu.Game.Overlays.Settings
             }
         }
 
-        public IEnumerable<string> FilterTerms => new[] { LabelText };
+        public virtual IEnumerable<string> FilterTerms => new[] { LabelText };
 
         public bool MatchingFilter
         {
-            set
-            {
-                // probably needs a better transition.
-                this.FadeTo(value ? 1 : 0);
-            }
+            set => this.FadeTo(value ? 1 : 0);
         }
+
+        public bool FilteringActive { get; set; }
 
         protected SettingsItem()
         {
@@ -115,12 +115,12 @@ namespace osu.Game.Overlays.Settings
 
             public Bindable<T> Bindable
             {
-                get { return bindable; }
+                get => bindable;
                 set
                 {
                     bindable = value;
-                    bindable.ValueChanged += newValue => UpdateState();
-                    bindable.DisabledChanged += disabled => UpdateState();
+                    bindable.ValueChanged += _ => UpdateState();
+                    bindable.DisabledChanged += _ => UpdateState();
                 }
             }
 

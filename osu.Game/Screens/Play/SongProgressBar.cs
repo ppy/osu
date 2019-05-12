@@ -1,13 +1,14 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
-using OpenTK;
-using OpenTK.Graphics;
+using osuTK;
+using osuTK.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.UserInterface;
+using osu.Framework.MathUtils;
 
 namespace osu.Game.Screens.Play
 {
@@ -20,22 +21,22 @@ namespace osu.Game.Screens.Play
 
         public Color4 FillColour
         {
-            set { fill.Colour = value; }
+            set => fill.Colour = value;
         }
 
         public double StartTime
         {
-            set { CurrentNumber.MinValue = value; }
+            set => CurrentNumber.MinValue = value;
         }
 
         public double EndTime
         {
-            set { CurrentNumber.MaxValue = value; }
+            set => CurrentNumber.MaxValue = value;
         }
 
         public double CurrentTime
         {
-            set { CurrentNumber.Value = value; }
+            set => CurrentNumber.Value = value;
         }
 
         public SongProgressBar(float barHeight, float handleBarHeight, Vector2 handleSize)
@@ -107,11 +108,19 @@ namespace osu.Game.Screens.Play
 
         protected override void UpdateValue(float value)
         {
-            var xFill = value * UsableWidth;
-            fill.Width = xFill;
-            handleBase.X = xFill;
+            // handled in update
         }
 
-        protected override void OnUserChange() => OnSeek?.Invoke(Current);
+        protected override void Update()
+        {
+            base.Update();
+
+            float newX = (float)Interpolation.Lerp(handleBase.X, NormalizedValue * UsableWidth, MathHelper.Clamp(Time.Elapsed / 40, 0, 1));
+
+            fill.Width = newX;
+            handleBase.X = newX;
+        }
+
+        protected override void OnUserChange(double value) => OnSeek?.Invoke(value);
     }
 }

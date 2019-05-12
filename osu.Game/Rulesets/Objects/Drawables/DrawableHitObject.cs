@@ -1,11 +1,11 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
-using osu.Framework.Configuration;
+using osu.Framework.Bindables;
 using osu.Framework.Extensions.TypeExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Primitives;
@@ -15,7 +15,7 @@ using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Skinning;
-using OpenTK.Graphics;
+using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Objects.Drawables
 {
@@ -59,7 +59,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
         public bool AllJudged => Judged && NestedHitObjects.All(h => h.AllJudged);
 
         /// <summary>
-        /// Whether this <see cref="DrawableHitObject"/> has been hit. This occurs if <see cref="Result.IsHit"/> is <see cref="true"/>.
+        /// Whether this <see cref="DrawableHitObject"/> has been hit. This occurs if <see cref="Result"/> is hit.
         /// Note: This does NOT include nested hitobjects.
         /// </summary>
         public bool IsHit => Result?.IsHit ?? false;
@@ -85,6 +85,8 @@ namespace osu.Game.Rulesets.Objects.Drawables
         public override bool RemoveCompletedTransforms => false;
         protected override bool RequiresChildrenUpdate => true;
 
+        public override bool IsPresent => base.IsPresent || State.Value == ArmedState.Idle && Clock?.CurrentTime >= LifetimeStart;
+
         public readonly Bindable<ArmedState> State = new Bindable<ArmedState>();
 
         protected DrawableHitObject(HitObject hitObject)
@@ -96,6 +98,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
         private void load()
         {
             var judgement = HitObject.CreateJudgement();
+
             if (judgement != null)
             {
                 Result = CreateResult(judgement);
@@ -119,18 +122,20 @@ namespace osu.Game.Rulesets.Objects.Drawables
             }
         }
 
+        protected override void ClearInternal(bool disposeChildren = true) => throw new InvalidOperationException($"Should never clear a {nameof(DrawableHitObject)}");
+
         protected override void LoadComplete()
         {
             base.LoadComplete();
 
-            State.ValueChanged += state =>
+            State.ValueChanged += armed =>
             {
-                UpdateState(state);
+                UpdateState(armed.NewValue);
 
                 // apply any custom state overrides
-                ApplyCustomUpdateState?.Invoke(this, state);
+                ApplyCustomUpdateState?.Invoke(this, armed.NewValue);
 
-                if (State == ArmedState.Hit)
+                if (armed.NewValue == ArmedState.Hit)
                     PlaySamples();
             };
 
@@ -146,6 +151,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
 
         /// <summary>
         /// Plays all the hit sounds for this <see cref="DrawableHitObject"/>.
+        /// This is invoked automatically when this <see cref="DrawableHitObject"/> is hit.
         /// </summary>
         public void PlaySamples() => Samples?.Play();
 
@@ -167,13 +173,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
             }
         }
 
-        public override bool UpdateSubTreeMasking(Drawable source, RectangleF maskingBounds)
-        {
-            if (!AllJudged)
-                return false;
-
-            return base.UpdateSubTreeMasking(source, maskingBounds);
-        }
+        protected override bool ComputeIsMaskedAway(RectangleF maskingBounds) => AllJudged && base.ComputeIsMaskedAway(maskingBounds);
 
         protected override void UpdateAfterChildren()
         {
@@ -213,15 +213,27 @@ namespace osu.Game.Rulesets.Objects.Drawables
             {
                 case HitResult.None:
                     break;
+
                 case HitResult.Miss:
                     State.Value = ArmedState.Miss;
                     break;
+
                 default:
                     State.Value = ArmedState.Hit;
                     break;
             }
 
             OnNewResult?.Invoke(this, Result);
+        }
+
+        /// <summary>
+        /// Will called at least once after the <see cref="Drawable.LifetimeEnd"/> of this <see cref="DrawableHitObject"/> has been passed.
+        /// </summary>
+        internal void OnLifetimeEnd()
+        {
+            foreach (var nested in NestedHitObjects)
+                nested.OnLifetimeEnd();
+            UpdateResult(false);
         }
 
         /// <summary>

@@ -1,5 +1,5 @@
-// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using System.Collections.Generic;
@@ -11,13 +11,11 @@ using Microsoft.EntityFrameworkCore;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Track;
 using osu.Framework.Extensions;
-using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
 using osu.Game.Beatmaps.Formats;
 using osu.Game.Database;
-using osu.Game.Graphics;
 using osu.Game.IO.Archives;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
@@ -52,16 +50,13 @@ namespace osu.Game.Beatmaps
         public event Action<DownloadBeatmapSetRequest> BeatmapDownloadFailed;
 
         /// <summary>
-        /// Fired when a beatmap load is requested (into the interactive game UI).
-        /// </summary>
-        public Action<BeatmapSetInfo> PresentBeatmap;
-
-        /// <summary>
         /// A default representation of a WorkingBeatmap to use when no beatmap is available.
         /// </summary>
-        public WorkingBeatmap DefaultBeatmap { private get; set; }
+        public readonly WorkingBeatmap DefaultBeatmap;
 
         public override string[] HandledExtensions => new[] { ".osz" };
+
+        protected override string[] HashableFileTypes => new[] { ".osu" };
 
         protected override string ImportFromStablePath => "Songs";
 
@@ -69,22 +64,28 @@ namespace osu.Game.Beatmaps
 
         private readonly BeatmapStore beatmaps;
 
-        private readonly APIAccess api;
+        private readonly IAPIProvider api;
 
         private readonly AudioManager audioManager;
 
+        private readonly GameHost host;
+
         private readonly List<DownloadBeatmapSetRequest> currentDownloads = new List<DownloadBeatmapSetRequest>();
 
-        public BeatmapManager(Storage storage, IDatabaseContextFactory contextFactory, RulesetStore rulesets, APIAccess api, AudioManager audioManager, IIpcHost importHost = null)
-            : base(storage, contextFactory, new BeatmapStore(contextFactory), importHost)
+        public BeatmapManager(Storage storage, IDatabaseContextFactory contextFactory, RulesetStore rulesets, IAPIProvider api, AudioManager audioManager, GameHost host = null,
+                              WorkingBeatmap defaultBeatmap = null)
+            : base(storage, contextFactory, new BeatmapStore(contextFactory), host)
         {
-            beatmaps = (BeatmapStore)ModelStore;
-            beatmaps.BeatmapHidden += b => BeatmapHidden?.Invoke(b);
-            beatmaps.BeatmapRestored += b => BeatmapRestored?.Invoke(b);
-
             this.rulesets = rulesets;
             this.api = api;
             this.audioManager = audioManager;
+            this.host = host;
+
+            DefaultBeatmap = defaultBeatmap;
+
+            beatmaps = (BeatmapStore)ModelStore;
+            beatmaps.BeatmapHidden += b => BeatmapHidden?.Invoke(b);
+            beatmaps.BeatmapRestored += b => BeatmapRestored?.Invoke(b);
         }
 
         protected override void Populate(BeatmapSetInfo beatmapSet, ArchiveReader archive)
@@ -101,15 +102,22 @@ namespace osu.Game.Beatmaps
                 b.BeatmapSet = beatmapSet;
             }
 
-            validateOnlineIds(beatmapSet.Beatmaps);
+            validateOnlineIds(beatmapSet);
 
             foreach (BeatmapInfo b in beatmapSet.Beatmaps)
-                fetchAndPopulateOnlineValues(b, beatmapSet.Beatmaps);
+                fetchAndPopulateOnlineValues(b);
+        }
+
+        protected override void PreImport(BeatmapSetInfo beatmapSet)
+        {
+            if (beatmapSet.Beatmaps.Any(b => b.BaseDifficulty == null))
+                throw new InvalidOperationException($"Cannot import {nameof(BeatmapInfo)} with null {nameof(BeatmapInfo.BaseDifficulty)}.");
 
             // check if a set already exists with the same online id, delete if it does.
             if (beatmapSet.OnlineBeatmapSetID != null)
             {
                 var existingOnlineId = beatmaps.ConsumableItems.FirstOrDefault(b => b.OnlineBeatmapSetID == beatmapSet.OnlineBeatmapSetID);
+
                 if (existingOnlineId != null)
                 {
                     Delete(existingOnlineId);
@@ -119,27 +127,30 @@ namespace osu.Game.Beatmaps
             }
         }
 
-        private void validateOnlineIds(List<BeatmapInfo> beatmaps)
+        private void validateOnlineIds(BeatmapSetInfo beatmapSet)
         {
-            var beatmapIds = beatmaps.Where(b => b.OnlineBeatmapID.HasValue).Select(b => b.OnlineBeatmapID).ToList();
+            var beatmapIds = beatmapSet.Beatmaps.Where(b => b.OnlineBeatmapID.HasValue).Select(b => b.OnlineBeatmapID).ToList();
 
-            // ensure all IDs are unique in this set and none match existing IDs in the local beatmap store.
-            if (beatmapIds.GroupBy(b => b).Any(g => g.Count() > 1) || QueryBeatmaps(b => beatmapIds.Contains(b.OnlineBeatmapID)).Any())
-                // remove all online IDs if any problems were found.
-                beatmaps.ForEach(b => b.OnlineBeatmapID = null);
-        }
-
-        protected override BeatmapSetInfo CheckForExisting(BeatmapSetInfo model)
-        {
-            // check if this beatmap has already been imported and exit early if so
-            var existingHashMatch = beatmaps.ConsumableItems.FirstOrDefault(b => b.Hash == model.Hash);
-            if (existingHashMatch != null)
+            // ensure all IDs are unique
+            if (beatmapIds.GroupBy(b => b).Any(g => g.Count() > 1))
             {
-                Undelete(existingHashMatch);
-                return existingHashMatch;
+                resetIds();
+                return;
             }
 
-            return null;
+            // find any existing beatmaps in the database that have matching online ids
+            var existingBeatmaps = QueryBeatmaps(b => beatmapIds.Contains(b.OnlineBeatmapID)).ToList();
+
+            if (existingBeatmaps.Count > 0)
+            {
+                // reset the import ids (to force a re-fetch) *unless* they match the candidate CheckForExisting set.
+                // we can ignore the case where the new ids are contained by the CheckForExisting set as it will either be used (import skipped) or deleted.
+                var existing = CheckForExisting(beatmapSet);
+                if (existing == null || existingBeatmaps.Any(b => !existing.Beatmaps.Contains(b)))
+                    resetIds();
+            }
+
+            void resetIds() => beatmapSet.Beatmaps.ForEach(b => b.OnlineBeatmapID = null);
         }
 
         /// <summary>
@@ -148,26 +159,16 @@ namespace osu.Game.Beatmaps
         /// </summary>
         /// <param name="beatmapSetInfo">The <see cref="BeatmapSetInfo"/> to be downloaded.</param>
         /// <param name="noVideo">Whether the beatmap should be downloaded without video. Defaults to false.</param>
-        public void Download(BeatmapSetInfo beatmapSetInfo, bool noVideo = false)
+        /// <returns>Downloading can happen</returns>
+        public bool Download(BeatmapSetInfo beatmapSetInfo, bool noVideo = false)
         {
             var existing = GetExistingDownload(beatmapSetInfo);
 
-            if (existing != null || api == null) return;
-
-            if (!api.LocalUser.Value.IsSupporter)
-            {
-                PostNotification?.Invoke(new SimpleNotification
-                {
-                    Icon = FontAwesome.fa_superpowers,
-                    Text = "You gotta be an osu!supporter to download for now 'yo"
-                });
-                return;
-            }
+            if (existing != null || api == null) return false;
 
             var downloadNotification = new DownloadNotification
             {
-                CompletionText = $"Imported {beatmapSetInfo.Metadata.Artist} - {beatmapSetInfo.Metadata.Title}!",
-                Text = $"Downloading {beatmapSetInfo.Metadata.Artist} - {beatmapSetInfo.Metadata.Title}",
+                Text = $"Downloading {beatmapSetInfo}",
             };
 
             var request = new DownloadBeatmapSetRequest(beatmapSetInfo, noVideo);
@@ -178,26 +179,12 @@ namespace osu.Game.Beatmaps
                 downloadNotification.Progress = progress;
             };
 
-            request.Success += data =>
+            request.Success += filename =>
             {
-                downloadNotification.Text = $"Importing {beatmapSetInfo.Metadata.Artist} - {beatmapSetInfo.Metadata.Title}";
-
                 Task.Factory.StartNew(() =>
                 {
-                    BeatmapSetInfo importedBeatmap;
-
                     // This gets scheduled back to the update thread, but we want the import to run in the background.
-                    using (var stream = new MemoryStream(data))
-                    using (var archive = new ZipArchiveReader(stream, beatmapSetInfo.ToString()))
-                        importedBeatmap = Import(archive);
-
-                    downloadNotification.CompletionClickAction = () =>
-                    {
-                        PresentCompletedImport(importedBeatmap.Yield());
-                        return true;
-                    };
-                    downloadNotification.State = ProgressNotificationState.Completed;
-
+                    Import(downloadNotification, filename);
                     currentDownloads.Remove(request);
                 }, TaskCreationOptions.LongRunning);
             };
@@ -225,14 +212,19 @@ namespace osu.Game.Beatmaps
             PostNotification?.Invoke(downloadNotification);
 
             // don't run in the main api queue as this is a long-running task.
-            Task.Factory.StartNew(() => request.Perform(api), TaskCreationOptions.LongRunning);
+            Task.Factory.StartNew(() =>
+            {
+                try
+                {
+                    request.Perform(api);
+                }
+                catch
+                {
+                    // no need to handle here as exceptions will filter down to request.Failure above.
+                }
+            }, TaskCreationOptions.LongRunning);
             BeatmapDownloadBegan?.Invoke(request);
-        }
-
-        protected override void PresentCompletedImport(IEnumerable<BeatmapSetInfo> imported)
-        {
-            base.PresentCompletedImport(imported);
-            PresentBeatmap?.Invoke(imported.LastOrDefault());
+            return true;
         }
 
         /// <summary>
@@ -258,17 +250,20 @@ namespace osu.Game.Beatmaps
         /// Retrieve a <see cref="WorkingBeatmap"/> instance for the provided <see cref="BeatmapInfo"/>
         /// </summary>
         /// <param name="beatmapInfo">The beatmap to lookup.</param>
-        /// <param name="previous">The currently loaded <see cref="WorkingBeatmap"/>. Allows for optimisation where elements are shared with the new beatmap.</param>
+        /// <param name="previous">The currently loaded <see cref="WorkingBeatmap"/>. Allows for optimisation where elements are shared with the new beatmap. May be returned if beatmapInfo requested matches</param>
         /// <returns>A <see cref="WorkingBeatmap"/> instance correlating to the provided <see cref="BeatmapInfo"/>.</returns>
         public WorkingBeatmap GetWorkingBeatmap(BeatmapInfo beatmapInfo, WorkingBeatmap previous = null)
         {
+            if (beatmapInfo?.ID > 0 && previous != null && previous.BeatmapInfo?.ID == beatmapInfo.ID)
+                return previous;
+
             if (beatmapInfo?.BeatmapSet == null || beatmapInfo == DefaultBeatmap?.BeatmapInfo)
                 return DefaultBeatmap;
 
             if (beatmapInfo.Metadata == null)
                 beatmapInfo.Metadata = beatmapInfo.BeatmapSet.Metadata;
 
-            WorkingBeatmap working = new BeatmapManagerWorkingBeatmap(Files.Store, beatmapInfo, audioManager);
+            WorkingBeatmap working = new BeatmapManagerWorkingBeatmap(Files.Store, new LargeTextureStore(host?.CreateTextureLoaderStore(Files.Store)), beatmapInfo, audioManager);
 
             previous?.TransferTo(working);
 
@@ -281,6 +276,18 @@ namespace osu.Game.Beatmaps
         /// <param name="query">The query.</param>
         /// <returns>The first result for the provided query, or null if no results were found.</returns>
         public BeatmapSetInfo QueryBeatmapSet(Expression<Func<BeatmapSetInfo, bool>> query) => beatmaps.ConsumableItems.AsNoTracking().FirstOrDefault(query);
+
+        protected override bool CanUndelete(BeatmapSetInfo existing, BeatmapSetInfo import)
+        {
+            if (!base.CanUndelete(existing, import))
+                return false;
+
+            var existingIds = existing.Beatmaps.Select(b => b.OnlineBeatmapID).OrderBy(i => i);
+            var importIds = import.Beatmaps.Select(b => b.OnlineBeatmapID).OrderBy(i => i);
+
+            // force re-import if we are not in a sane state.
+            return existing.OnlineBeatmapSetID == import.OnlineBeatmapSetID && existingIds.SequenceEqual(importIds);
+        }
 
         /// <summary>
         /// Returns a list of all usable <see cref="BeatmapSetInfo"/>s.
@@ -315,24 +322,11 @@ namespace osu.Game.Beatmaps
         /// <returns>Results from the provided query.</returns>
         public IQueryable<BeatmapInfo> QueryBeatmaps(Expression<Func<BeatmapInfo, bool>> query) => beatmaps.Beatmaps.AsNoTracking().Where(query);
 
-        /// <summary>
-        /// Create a SHA-2 hash from the provided archive based on contained beatmap (.osu) file content.
-        /// </summary>
-        private string computeBeatmapSetHash(ArchiveReader reader)
-        {
-            // for now, concatenate all .osu files in the set to create a unique hash.
-            MemoryStream hashable = new MemoryStream();
-            foreach (string file in reader.Filenames.Where(f => f.EndsWith(".osu")))
-                using (Stream s = reader.GetStream(file))
-                    s.CopyTo(hashable);
-
-            return hashable.ComputeSHA2Hash();
-        }
-
         protected override BeatmapSetInfo CreateModel(ArchiveReader reader)
         {
             // let's make sure there are actually .osu files to import.
             string mapName = reader.Filenames.FirstOrDefault(f => f.EndsWith(".osu"));
+
             if (string.IsNullOrEmpty(mapName))
             {
                 Logger.Log($"No beatmap files found in the beatmap archive ({reader.Name}).", LoggingTarget.Database);
@@ -347,8 +341,7 @@ namespace osu.Game.Beatmaps
             {
                 OnlineBeatmapSetID = beatmap.BeatmapInfo.BeatmapSet?.OnlineBeatmapSetID,
                 Beatmaps = new List<BeatmapInfo>(),
-                Hash = computeBeatmapSetHash(reader),
-                Metadata = beatmap.Metadata
+                Metadata = beatmap.Metadata,
             };
         }
 
@@ -391,10 +384,9 @@ namespace osu.Game.Beatmaps
         /// Query the API to populate missing values like OnlineBeatmapID / OnlineBeatmapSetID or (Rank-)Status.
         /// </summary>
         /// <param name="beatmap">The beatmap to populate.</param>
-        /// <param name="otherBeatmaps">The other beatmaps contained within this set.</param>
         /// <param name="force">Whether to re-query if the provided beatmap already has populated values.</param>
         /// <returns>True if population was successful.</returns>
-        private bool fetchAndPopulateOnlineValues(BeatmapInfo beatmap, IEnumerable<BeatmapInfo> otherBeatmaps, bool force = false)
+        private bool fetchAndPopulateOnlineValues(BeatmapInfo beatmap, bool force = false)
         {
             if (api?.State != APIState.Online)
                 return false;
@@ -417,13 +409,6 @@ namespace osu.Game.Beatmaps
 
                 beatmap.Status = res.Status;
                 beatmap.BeatmapSet.Status = res.BeatmapSet.Status;
-
-                if (otherBeatmaps.Any(b => b.OnlineBeatmapID == res.OnlineBeatmapID))
-                {
-                    Logger.Log("Another beatmap in the same set already mapped to this ID. We'll skip adding it this time.", LoggingTarget.Database);
-                    return false;
-                }
-
                 beatmap.BeatmapSet.OnlineBeatmapSetID = res.OnlineBeatmapSetID;
                 beatmap.OnlineBeatmapID = res.OnlineBeatmapID;
 
