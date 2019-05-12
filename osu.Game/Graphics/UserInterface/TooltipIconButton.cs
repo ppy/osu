@@ -1,7 +1,6 @@
 ﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using OpenTK;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
@@ -11,6 +10,8 @@ using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Events;
 using System;
+using osu.Framework.Graphics.Sprites;
+using osuTK;
 
 namespace osu.Game.Graphics.UserInterface
 {
@@ -43,10 +44,10 @@ namespace osu.Game.Graphics.UserInterface
             }
         }
 
-        public FontAwesome Icon
+        public IconUsage Icon
         {
-            get { return icon.Icon; }
-            set { icon.Icon = value; }
+            get => icon.Icon;
+            set => icon.Icon = value;
         }
 
         public TooltipIconButton()

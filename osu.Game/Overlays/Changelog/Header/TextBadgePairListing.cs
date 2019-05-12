@@ -1,10 +1,10 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
-using OpenTK.Graphics;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Input.Events;
+using osuTK.Graphics;
 
 namespace osu.Game.Overlays.Changelog.Header
 {
@@ -12,7 +12,8 @@ namespace osu.Game.Overlays.Changelog.Header
     {
         private readonly ColourInfo badgeColour;
 
-        public TextBadgePairListing(ColourInfo badgeColour) : base(badgeColour, "Listing", false)
+        public TextBadgePairListing(ColourInfo badgeColour)
+            : base(badgeColour, "Listing", false)
         {
             IsActivated = true;
             this.badgeColour = badgeColour;
@@ -27,13 +28,14 @@ namespace osu.Game.Overlays.Changelog.Header
 
             // this doesn't work without the scheduler
             // (because the text isn't yet fully drawn when it's loaded?)
-            Text.OnLoadComplete = d => Scheduler.Add(UpdateBadgeWidth);
+            Text.OnLoadComplete += d => Scheduler.Add(UpdateBadgeWidth);
         }
 
         public override void Activate()
         {
             if (IsActivated)
                 return;
+
             IsActivated = true;
             LineBadge.Uncollapse();
             Text.Font = "Exo2.0-Bold";

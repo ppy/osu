@@ -1,7 +1,6 @@
 ﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using OpenTK.Graphics;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -9,6 +8,7 @@ using osu.Framework.Input.Events;
 using osu.Game.Online.API.Requests.Responses;
 using System;
 using System.Collections.Generic;
+using osuTK.Graphics;
 
 namespace osu.Game.Overlays.Changelog
 {
@@ -58,6 +58,7 @@ namespace osu.Game.Overlays.Changelog
         public void SelectNone()
         {
             selectedStreamId = -1;
+
             if (badgesContainer != null)
             {
                 foreach (StreamBadge streamBadge in badgesContainer)
@@ -109,6 +110,7 @@ namespace osu.Game.Overlays.Changelog
                 else
                     streamBadge.Deactivate();
             }
+
             return base.OnHover(e);
         }
 
@@ -121,6 +123,7 @@ namespace osu.Game.Overlays.Changelog
                 else if (streamBadge.LatestBuild.UpdateStream.Id == selectedStreamId)
                     streamBadge.DisableDim();
             }
+
             base.OnHoverLost(e);
         }
     }

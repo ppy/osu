@@ -1,18 +1,17 @@
 ﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using OpenTK;
-using OpenTK.Graphics;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
-using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Overlays.Changelog.Header;
 using System;
+using osuTK;
+using osuTK.Graphics;
 
 namespace osu.Game.Overlays.Changelog
 {
@@ -141,7 +140,7 @@ namespace osu.Game.Overlays.Changelog
                                     Origin = Anchor.Centre,
                                     Size = new Vector2(7),
                                     Colour = Purple,
-                                    Icon = FontAwesome.fa_chevron_right,
+                                    Icon = FontAwesome.Solid.ChevronRight,
                                     Alpha = 0,
                                     X = -200,
                                 },

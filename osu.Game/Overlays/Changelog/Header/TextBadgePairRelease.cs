@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Graphics.Colour;
 
@@ -7,10 +7,10 @@ namespace osu.Game.Overlays.Changelog.Header
 {
     public class TextBadgePairRelease : TextBadgePair
     {
-        private TextBadgePairListing listingBadge;
         private const float transition_duration = 125;
 
-        public TextBadgePairRelease(ColourInfo badgeColour, string displayText) : base(badgeColour, displayText)
+        public TextBadgePairRelease(ColourInfo badgeColour, string displayText)
+            : base(badgeColour, displayText)
         {
             Text.Font = "Exo2.0-Bold";
             Text.Y = 20;
@@ -28,6 +28,7 @@ namespace osu.Game.Overlays.Changelog.Header
             }
             else
                 ShowText(transition_duration, displayText);
+
             IsActivated = true;
         }
 
