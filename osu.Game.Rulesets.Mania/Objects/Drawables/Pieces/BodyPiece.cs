@@ -145,6 +145,7 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables.Pieces
             const float animation_length = 50;
 
             Foreground.ClearTransforms(false, nameof(Foreground.Colour));
+
             if (hitting)
             {
                 // wait for the next sync point

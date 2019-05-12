@@ -77,6 +77,7 @@ namespace osu.Game.Rulesets.Objects
                 case HitResult.Perfect:
                 case HitResult.Ok:
                     return false;
+
                 default:
                     return true;
             }
@@ -126,16 +127,22 @@ namespace osu.Game.Rulesets.Objects
             {
                 case HitResult.Perfect:
                     return Perfect / 2;
+
                 case HitResult.Great:
                     return Great / 2;
+
                 case HitResult.Good:
                     return Good / 2;
+
                 case HitResult.Ok:
                     return Ok / 2;
+
                 case HitResult.Meh:
                     return Meh / 2;
+
                 case HitResult.Miss:
                     return Miss / 2;
+
                 default:
                     throw new ArgumentException(nameof(result));
             }

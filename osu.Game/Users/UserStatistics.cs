@@ -85,14 +85,19 @@ namespace osu.Game.Users
                     {
                         case ScoreRank.XH:
                             return SSPlus;
+
                         case ScoreRank.X:
                             return SS;
+
                         case ScoreRank.SH:
                             return SPlus;
+
                         case ScoreRank.S:
                             return S;
+
                         case ScoreRank.A:
                             return A;
+
                         default:
                             throw new ArgumentException($"API does not return {rank.ToString()}");
                     }

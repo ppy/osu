@@ -105,6 +105,7 @@ namespace osu.Game.Rulesets.UI
                         return false;
 
                     break;
+
                 case MouseUpEvent mouseUp:
                     if (!CurrentState.Mouse.IsPressed(mouseUp.Button))
                         return false;

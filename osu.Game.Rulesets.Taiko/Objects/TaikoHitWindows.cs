@@ -25,6 +25,7 @@ namespace osu.Game.Rulesets.Taiko.Objects
                 case HitResult.Good:
                 case HitResult.Miss:
                     return true;
+
                 default:
                     return false;
             }

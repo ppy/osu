@@ -25,9 +25,9 @@ namespace osu.Game.Scoring
         protected override string ImportFromStablePath => "Replays";
 
         private readonly RulesetStore rulesets;
-        private readonly BeatmapManager beatmaps;
+        private readonly Func<BeatmapManager> beatmaps;
 
-        public ScoreManager(RulesetStore rulesets, BeatmapManager beatmaps, Storage storage, IDatabaseContextFactory contextFactory, IIpcHost importHost = null)
+        public ScoreManager(RulesetStore rulesets, Func<BeatmapManager> beatmaps, Storage storage, IDatabaseContextFactory contextFactory, IIpcHost importHost = null)
             : base(storage, contextFactory, new ScoreStore(contextFactory, storage), importHost)
         {
             this.rulesets = rulesets;
@@ -43,7 +43,7 @@ namespace osu.Game.Scoring
             {
                 try
                 {
-                    return new DatabasedLegacyScoreParser(rulesets, beatmaps).Parse(stream).ScoreInfo;
+                    return new DatabasedLegacyScoreParser(rulesets, beatmaps()).Parse(stream).ScoreInfo;
                 }
                 catch (LegacyScoreParser.BeatmapNotFoundException e)
                 {
@@ -53,7 +53,7 @@ namespace osu.Game.Scoring
             }
         }
 
-        public Score GetScore(ScoreInfo score) => new LegacyDatabasedScore(score, rulesets, beatmaps, Files.Store);
+        public Score GetScore(ScoreInfo score) => new LegacyDatabasedScore(score, rulesets, beatmaps(), Files.Store);
 
         public List<ScoreInfo> GetAllUsableScores() => ModelStore.ConsumableItems.Where(s => !s.DeletePending).ToList();
 
