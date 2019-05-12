@@ -14,6 +14,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
 {
     public abstract class SliderBody : CompositeDrawable
     {
+        public const float DEFAULT_BORDER_SIZE = 1;
+
         private readonly SliderPath path;
         protected Path Path => path;
 
@@ -150,7 +152,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
                 }
             }
 
-            private float borderSize = 1f;
+            private float borderSize = DEFAULT_BORDER_SIZE;
 
             public float BorderSize
             {
