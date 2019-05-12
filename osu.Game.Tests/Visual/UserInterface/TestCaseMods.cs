@@ -83,7 +83,6 @@ namespace osu.Game.Tests.Visual.UserInterface
 
             var easierMods = instance.GetModsFor(ModType.DifficultyReduction);
             var harderMods = instance.GetModsFor(ModType.DifficultyIncrease);
-            var assistMods = instance.GetModsFor(ModType.Automation);
 
             var noFailMod = easierMods.FirstOrDefault(m => m is OsuModNoFail);
             var hiddenMod = harderMods.FirstOrDefault(m => m is OsuModHidden);
