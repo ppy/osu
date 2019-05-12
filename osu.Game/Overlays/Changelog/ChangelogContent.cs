@@ -1,13 +1,13 @@
 ﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using OpenTK.Graphics;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests.Responses;
 using System;
+using osuTK.Graphics;
 
 namespace osu.Game.Overlays.Changelog
 {
@@ -25,7 +25,7 @@ namespace osu.Game.Overlays.Changelog
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
             Direction = FillDirection.Vertical;
-            Padding = new MarginPadding{ Bottom = 100 };
+            Padding = new MarginPadding { Bottom = 100 };
         }
 
         public void ShowListing(APIChangelogBuild[] changelog)
@@ -47,6 +47,7 @@ namespace osu.Game.Overlays.Changelog
                             Margin = new MarginPadding { Top = 30 },
                         });
                     }
+
                     changelogContentGroup = new ChangelogContentGroup(build, true);
                     changelogContentGroup.BuildSelected += OnBuildSelected;
                     changelogContentGroup.GenerateText(build.ChangelogEntries);

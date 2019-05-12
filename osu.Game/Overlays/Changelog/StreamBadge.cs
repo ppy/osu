@@ -1,7 +1,6 @@
 ﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using OpenTK.Graphics;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
@@ -13,6 +12,7 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API.Requests.Responses;
 using System;
+using osuTK.Graphics;
 
 namespace osu.Game.Overlays.Changelog
 {
@@ -66,9 +66,7 @@ namespace osu.Game.Overlays.Changelog
                         },
                         new SpriteText
                         {
-                            Text = LatestBuild.Users > 0 ?
-                                $"{LatestBuild.Users:N0} users online" :
-                                null,
+                            Text = LatestBuild.Users > 0 ? $"{LatestBuild.Users:N0} users online" : null,
                             TextSize = 12, // web: 10,
                             Font = @"Exo2.0-Regular",
                             Colour = new Color4(203, 164, 218, 255),
@@ -100,6 +98,7 @@ namespace osu.Game.Overlays.Changelog
         {
             isActivated = false;
             DisableDim();
+
             if (!IsHovered)
             {
                 this.FadeTo(0.5f, transition_duration);
@@ -132,6 +131,7 @@ namespace osu.Game.Overlays.Changelog
             }
             else
                 EnableDim();
+
             base.OnHoverLost(e);
         }
 

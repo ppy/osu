@@ -1,12 +1,9 @@
 ﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using OpenTK;
-using OpenTK.Graphics;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
-using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -18,13 +15,19 @@ using osu.Game.Online.API.Requests;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays.Changelog;
 using System;
+using osu.Framework.Extensions.Color4Extensions;
+using osu.Framework.Graphics.Effects;
+using osuTK;
+using osuTK.Graphics;
 
 namespace osu.Game.Overlays
 {
     public class ChangelogOverlay : WaveOverlayContainer
     {
         private readonly ChangelogHeader header;
+
         private readonly ChangelogBadges badges;
+
         //private readonly ChangelogChart chart;
         private readonly ChangelogContent listing;
         private readonly ChangelogContent content;
@@ -35,7 +38,7 @@ namespace osu.Game.Overlays
 
         private SampleChannel sampleBack;
 
-        private APIAccess api;
+        private IAPIProvider api;
 
         private bool isAtListing;
         private float savedScrollPosition;
@@ -99,7 +102,7 @@ namespace osu.Game.Overlays
         }
 
         [BackgroundDependencyLoader]
-        private void load(APIAccess api, AudioManager audio)
+        private void load(IAPIProvider api, AudioManager audio)
         {
             this.api = api;
             sampleBack = audio.Sample.Get(@"UI/generic-select-soft"); // @"UI/screen-back" feels non-fitting here
@@ -146,6 +149,7 @@ namespace osu.Game.Overlays
                         ShowListing();
                         sampleBack?.Play();
                     }
+
                     return true;
             }
 

@@ -1,8 +1,6 @@
 ﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using OpenTK;
-using OpenTK.Graphics;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
@@ -12,12 +10,15 @@ using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API.Requests.Responses;
 using System;
 using System.Collections.Generic;
+using osuTK;
+using osuTK.Graphics;
 
 namespace osu.Game.Overlays.Changelog
 {
     public class ChangelogContentGroup : FillFlowContainer
     {
         private readonly TooltipIconButton chevronPrevious, chevronNext;
+
         private readonly SortedDictionary<string, List<ChangelogEntry>> categories =
             new SortedDictionary<string, List<ChangelogEntry>>();
 
@@ -47,7 +48,7 @@ namespace osu.Game.Overlays.Changelog
                         chevronPrevious = new TooltipIconButton
                         {
                             IsEnabled = false,
-                            Icon = FontAwesome.fa_chevron_left,
+                            Icon = FontAwesome.Solid.ChevronLeft,
                             Size = new Vector2(24),
                             Action = () =>
                             {
@@ -84,7 +85,7 @@ namespace osu.Game.Overlays.Changelog
                         chevronNext = new TooltipIconButton
                         {
                             IsEnabled = false,
-                            Icon = FontAwesome.fa_chevron_right,
+                            Icon = FontAwesome.Solid.ChevronRight,
                             Size = new Vector2(24),
                             Action = () =>
                             {
@@ -181,7 +182,8 @@ namespace osu.Game.Overlays.Changelog
             {
                 clickableBuildText.Action = null;
                 clickableBuildText.FadeTo(0.5f, 500);
-                Scheduler.AddDelayed(() => {
+                Scheduler.AddDelayed(() =>
+                {
                     clickableBuildText.Action = () => OnBuildSelected(build);
                     clickableBuildText.FadeIn(500);
                 }, 2000);
@@ -195,6 +197,7 @@ namespace osu.Game.Overlays.Changelog
                 chevronPrevious.TooltipText = previousVersion;
                 chevronPrevious.IsEnabled = true;
             }
+
             if (!string.IsNullOrEmpty(nextVersion))
             {
                 chevronNext.TooltipText = nextVersion;
@@ -227,6 +230,7 @@ namespace osu.Game.Overlays.Changelog
                     Font = @"Exo2.0-Bold",
                     Margin = new MarginPadding { Top = 35, Bottom = 15 },
                 });
+
                 foreach (ChangelogEntry entry in category.Value)
                 {
                     LinkFlowContainer title = new LinkFlowContainer
@@ -236,12 +240,13 @@ namespace osu.Game.Overlays.Changelog
                         AutoSizeAxes = Axes.Y,
                         Margin = new MarginPadding { Vertical = 5 },
                     };
-                    title.AddIcon(FontAwesome.fa_check, t =>
+                    title.AddIcon(FontAwesome.Solid.Check, t =>
                     {
                         t.TextSize = 12;
                         t.Padding = new MarginPadding { Left = -17, Right = 5 };
                     });
                     title.AddText(entry.Title, t => { t.TextSize = 18; });
+
                     if (!string.IsNullOrEmpty(entry.Repository))
                     {
                         title.AddText(" (", t => t.TextSize = 18);
@@ -250,6 +255,7 @@ namespace osu.Game.Overlays.Changelog
                             null, t => { t.TextSize = 18; });
                         title.AddText(")", t => t.TextSize = 18);
                     }
+
                     title.AddText(" by ", t => t.TextSize = 14);
                     if (entry.GithubUser.GithubUrl != null)
                         title.AddLink(entry.GithubUser.DisplayName, entry.GithubUser.GithubUrl,
