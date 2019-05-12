@@ -8,6 +8,7 @@ using System.Linq;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions;
 using osu.Framework.Extensions.TypeExtensions;
+using osu.Framework.MathUtils;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Mods;
@@ -99,7 +100,7 @@ namespace osu.Game.Rulesets.Scoring
         /// <summary>
         /// The default conditions for failing.
         /// </summary>
-        protected virtual bool DefaultFailCondition => Health.Value == Health.MinValue;
+        protected virtual bool DefaultFailCondition => Precision.AlmostBigger(Health.MinValue, Health.Value);
 
         protected ScoreProcessor()
         {
