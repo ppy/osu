@@ -12,12 +12,14 @@ namespace osu.Game.Rulesets.Catch.Difficulty.Skills
 {
     public class Movement : Skill
     {
+
         private const float absolute_player_positioning_error = 16f;
         private const float normalized_hitobject_radius = 41.0f;
         private const double direction_change_bonus = 12.5;
 
         protected override double SkillMultiplier => 850;
         protected override double StrainDecayBase => 0.2;
+        protected override int SectionLength => 750;
 
         protected override double DecayWeight => 0.94;
 

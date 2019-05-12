@@ -16,10 +16,6 @@ namespace osu.Game.Rulesets.Difficulty
 {
     public abstract class DifficultyCalculator
     {
-        /// <summary>
-        /// The length of each strain section.
-        /// </summary>
-        protected virtual int SectionLength => 400;
 
         private readonly Ruleset ruleset;
         private readonly WorkingBeatmap beatmap;
@@ -70,9 +66,6 @@ namespace osu.Game.Rulesets.Difficulty
                 return CreateDifficultyAttributes(beatmap, mods, skills, clockRate);
 
             var difficultyHitObjects = CreateDifficultyHitObjects(beatmap, clockRate).OrderBy(h => h.BaseObject.StartTime).ToList();
-
-            double sectionLength = SectionLength * clockRate;
-
 
             foreach (DifficultyHitObject h in difficultyHitObjects)
             {

@@ -25,14 +25,14 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         }
 
 
-        private IEnumerable<OsuHitObjectDifficulty> hitObjectDifficulties(Skill[] skills)
+        private IEnumerable<OsuHitObjectDifficulty> hitObjectDifficulties(OsuSkill aim, OsuSkill speed)
         {
-            var timesIt = skills[0].Timestamps.GetEnumerator();
-            var aimStarsIt = skills[0].HitObjectStars().GetEnumerator();
-            var aimCumStarsIt = skills[0].CumulativeHitObjectStars().GetEnumerator();
+            var timesIt = aim.Timestamps.GetEnumerator();
+            var aimStarsIt = aim.HitObjectStars().GetEnumerator();
+            var aimCumStarsIt = aim.CumulativeHitObjectStars().GetEnumerator();
 
-            var speedStarsIt = skills[1].HitObjectStars().GetEnumerator();
-            var speedCumStarsIt = skills[1].CumulativeHitObjectStars().GetEnumerator();
+            var speedStarsIt = speed.HitObjectStars().GetEnumerator();
+            var speedCumStarsIt = speed.CumulativeHitObjectStars().GetEnumerator();
 
             while(timesIt.MoveNext() && aimStarsIt.MoveNext() && aimCumStarsIt.MoveNext() && speedStarsIt.MoveNext() && speedCumStarsIt.MoveNext())
             {
@@ -51,16 +51,19 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
         protected override DifficultyAttributes CreateDifficultyAttributes(IBeatmap beatmap, Mod[] mods, Skill[] skills, double clockRate)
         {
+            var aim = (OsuSkill)skills[0];
+            var speed = (OsuSkill)skills[1];
+
             if (beatmap.HitObjects.Count == 0)
                 return new OsuDifficultyAttributes { Mods = mods };
 
-            IList<double> aimComboSR = skills[0].ComboSR;
-            IList<double> aimMissCounts = skills[0].MissCounts;
+            IList<double> aimComboSR = aim.ComboSR;
+            IList<double> aimMissCounts = aim.MissCounts;
 
-            IList<double> speedComboSR = skills[1].ComboSR;
-            IList<double> speedMissCounts = skills[1].MissCounts;
+            IList<double> speedComboSR = speed.ComboSR;
+            IList<double> speedMissCounts = speed.MissCounts;
 
-            double missSrIncrement = Skill.MissSRIncrement;
+            double missSrIncrement = OsuSkill.MissSRIncrement;
 
 
             double aimRating = aimComboSR.Last();
@@ -89,7 +92,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 ApproachRate = preempt > 1200 ? (1800 - preempt) / 120 : (1200 - preempt) / 150 + 5,
                 OverallDifficulty = (80 - hitWindowGreat) / 6,
                 MaxCombo = maxCombo,
-                HitObjectDifficulties = hitObjectDifficulties(skills).Where(x => x.AimStars != 0).ToList(),
+                HitObjectDifficulties = hitObjectDifficulties(aim, speed).Where(x => x.AimStars != 0).ToList(), // only used for charts
             };
         }
 

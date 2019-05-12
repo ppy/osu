@@ -22,6 +22,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         public double OverallDifficulty;
         public int MaxCombo;
 
-        public IList<OsuHitObjectDifficulty> HitObjectDifficulties;
+        public IList<OsuHitObjectDifficulty> HitObjectDifficulties; // only used for charts
     }
 }
