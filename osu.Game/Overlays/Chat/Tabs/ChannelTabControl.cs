@@ -38,7 +38,7 @@ namespace osu.Game.Overlays.Chat.Tabs
                 Margin = new MarginPadding(10),
             });
 
-            AddTabItem(selectorTab = new ChannelSelectorTabItem(new Channel { Name = "+" }));
+            AddTabItem(selectorTab = new ChannelSelectorTabItem());
 
             ChannelSelectorActive.BindTo(selectorTab.Active);
         }
