@@ -93,7 +93,7 @@ namespace osu.Game.Tests.Visual.Online
             AddUntilStep("remove all channels", () =>
             {
                 var first = channelTabControl.Items.First();
-                if (first.Name == "+")
+                if (first is ChannelSelectorTabItem.ChannelSelectorTabChannel)
                     return true;
 
                 channelTabControl.RemoveChannel(first);
