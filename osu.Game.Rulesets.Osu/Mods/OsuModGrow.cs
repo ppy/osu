@@ -3,7 +3,7 @@
 
 using System.Collections.Generic;
 using osu.Framework.Graphics;
-using osu.Game.Graphics;
+using osu.Framework.Graphics.Sprites;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Osu.Objects;
@@ -17,7 +17,7 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         public override string Acronym => "GR";
 
-        public override FontAwesome Icon => FontAwesome.fa_arrows_v;
+        public override IconUsage Icon => FontAwesome.Solid.ArrowsAltV;
 
         public override ModType Type => ModType.Fun;
 
@@ -33,6 +33,7 @@ namespace osu.Game.Rulesets.Osu.Mods
                 {
                     case DrawableSpinner _:
                         continue;
+
                     default:
                         drawable.ApplyCustomUpdateState += ApplyCustomState;
                         break;
@@ -51,6 +52,7 @@ namespace osu.Game.Rulesets.Osu.Mods
                 case DrawableSliderTail _:
                     // special cases we should *not* be scaling.
                     break;
+
                 case DrawableSlider _:
                 case DrawableHitCircle _:
                 {

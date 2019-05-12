@@ -3,6 +3,7 @@
 
 using System.Linq;
 using osu.Framework.Allocation;
+using osu.Framework.Graphics.Sprites;
 using osu.Framework.Screens;
 using osu.Game.Graphics;
 using osu.Game.Screens.Play;
@@ -20,7 +21,7 @@ namespace osu.Game.Screens.Select
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
-            BeatmapOptions.AddButton(@"Edit", @"beatmap", FontAwesome.fa_pencil, colours.Yellow, () =>
+            BeatmapOptions.AddButton(@"Edit", @"beatmap", FontAwesome.Solid.PencilAlt, colours.Yellow, () =>
             {
                 ValidForResume = false;
                 Edit();
@@ -51,10 +52,11 @@ namespace osu.Game.Screens.Select
                 var auto = Ruleset.Value.CreateInstance().GetAutoplayMod();
                 var autoType = auto.GetType();
 
-                var mods = SelectedMods.Value;
+                var mods = Mods.Value;
+
                 if (mods.All(m => m.GetType() != autoType))
                 {
-                    SelectedMods.Value = mods.Append(auto);
+                    Mods.Value = mods.Append(auto).ToArray();
                     removeAutoModOnResume = true;
                 }
             }

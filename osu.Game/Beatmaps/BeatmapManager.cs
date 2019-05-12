@@ -105,15 +105,19 @@ namespace osu.Game.Beatmaps
             validateOnlineIds(beatmapSet);
 
             foreach (BeatmapInfo b in beatmapSet.Beatmaps)
-                fetchAndPopulateOnlineValues(b, beatmapSet.Beatmaps);
+                fetchAndPopulateOnlineValues(b);
         }
 
         protected override void PreImport(BeatmapSetInfo beatmapSet)
         {
+            if (beatmapSet.Beatmaps.Any(b => b.BaseDifficulty == null))
+                throw new InvalidOperationException($"Cannot import {nameof(BeatmapInfo)} with null {nameof(BeatmapInfo.BaseDifficulty)}.");
+
             // check if a set already exists with the same online id, delete if it does.
             if (beatmapSet.OnlineBeatmapSetID != null)
             {
                 var existingOnlineId = beatmaps.ConsumableItems.FirstOrDefault(b => b.OnlineBeatmapSetID == beatmapSet.OnlineBeatmapSetID);
+
                 if (existingOnlineId != null)
                 {
                     Delete(existingOnlineId);
@@ -214,7 +218,7 @@ namespace osu.Game.Beatmaps
                 {
                     request.Perform(api);
                 }
-                catch (Exception e)
+                catch
                 {
                     // no need to handle here as exceptions will filter down to request.Failure above.
                 }
@@ -322,6 +326,7 @@ namespace osu.Game.Beatmaps
         {
             // let's make sure there are actually .osu files to import.
             string mapName = reader.Filenames.FirstOrDefault(f => f.EndsWith(".osu"));
+
             if (string.IsNullOrEmpty(mapName))
             {
                 Logger.Log($"No beatmap files found in the beatmap archive ({reader.Name}).", LoggingTarget.Database);
@@ -379,10 +384,9 @@ namespace osu.Game.Beatmaps
         /// Query the API to populate missing values like OnlineBeatmapID / OnlineBeatmapSetID or (Rank-)Status.
         /// </summary>
         /// <param name="beatmap">The beatmap to populate.</param>
-        /// <param name="otherBeatmaps">The other beatmaps contained within this set.</param>
         /// <param name="force">Whether to re-query if the provided beatmap already has populated values.</param>
         /// <returns>True if population was successful.</returns>
-        private bool fetchAndPopulateOnlineValues(BeatmapInfo beatmap, IEnumerable<BeatmapInfo> otherBeatmaps, bool force = false)
+        private bool fetchAndPopulateOnlineValues(BeatmapInfo beatmap, bool force = false)
         {
             if (api?.State != APIState.Online)
                 return false;
@@ -405,13 +409,6 @@ namespace osu.Game.Beatmaps
 
                 beatmap.Status = res.Status;
                 beatmap.BeatmapSet.Status = res.BeatmapSet.Status;
-
-                if (otherBeatmaps.Any(b => b.OnlineBeatmapID == res.OnlineBeatmapID))
-                {
-                    Logger.Log("Another beatmap in the same set already mapped to this ID. We'll skip adding it this time.", LoggingTarget.Database);
-                    return false;
-                }
-
                 beatmap.BeatmapSet.OnlineBeatmapSetID = res.OnlineBeatmapSetID;
                 beatmap.OnlineBeatmapID = res.OnlineBeatmapID;
 

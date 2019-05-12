@@ -184,6 +184,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
 
             double approachRateFactor = 1.0f;
+
             if (Attributes.ApproachRate > 10.33f)
                 approachRateFactor += 0.3f * (Attributes.ApproachRate - 10.33f);
             else if (Attributes.ApproachRate < 8.0f)

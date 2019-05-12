@@ -12,6 +12,7 @@ using osu.Game.Graphics;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Graphics.Sprites;
 using osu.Game.Screens.Ranking;
 using osu.Game.Rulesets.Scoring;
 
@@ -76,7 +77,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
                             Size = new Vector2(48),
-                            Icon = FontAwesome.fa_asterisk,
+                            Icon = FontAwesome.Solid.Asterisk,
                             Shadow = false,
                         },
                     }
@@ -221,9 +222,11 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                 case ArmedState.Idle:
                     Expire(true);
                     break;
+
                 case ArmedState.Hit:
                     sequence.ScaleTo(Scale * 1.2f, 320, Easing.Out);
                     break;
+
                 case ArmedState.Miss:
                     sequence.ScaleTo(Scale * 0.8f, 320, Easing.In);
                     break;

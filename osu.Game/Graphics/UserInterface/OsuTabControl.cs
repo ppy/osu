@@ -254,7 +254,7 @@ namespace osu.Game.Graphics.UserInterface
                     {
                         new SpriteIcon
                         {
-                            Icon = FontAwesome.fa_ellipsis_h,
+                            Icon = FontAwesome.Solid.EllipsisH,
                             Size = new Vector2(14),
                             Origin = Anchor.Centre,
                             Anchor = Anchor.Centre,

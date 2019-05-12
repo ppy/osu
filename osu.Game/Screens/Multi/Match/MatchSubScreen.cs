@@ -1,8 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System.Collections.Generic;
-using System.Linq;
+using System;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -41,9 +40,6 @@ namespace osu.Game.Screens.Multi.Match
 
         [Resolved(typeof(Room))]
         protected Bindable<PlaylistItem> CurrentItem { get; private set; }
-
-        [Resolved]
-        protected Bindable<IEnumerable<Mod>> SelectedMods { get; private set; }
 
         [Resolved]
         private BeatmapManager beatmapManager { get; set; }
@@ -149,6 +145,7 @@ namespace osu.Game.Screens.Multi.Match
             header.Tabs.Current.BindValueChanged(tab =>
             {
                 const float fade_duration = 500;
+
                 if (tab.NewValue is SettingsMatchPage)
                 {
                     settings.Show();
@@ -182,6 +179,9 @@ namespace osu.Game.Screens.Multi.Match
         public override bool OnExiting(IScreen next)
         {
             RoomManager?.PartRoom();
+
+            Mods.Value = Array.Empty<Mod>();
+
             return base.OnExiting(next);
         }
 
@@ -194,7 +194,7 @@ namespace osu.Game.Screens.Multi.Match
             var localBeatmap = e.NewValue?.Beatmap == null ? null : beatmapManager.QueryBeatmap(b => b.OnlineBeatmapID == e.NewValue.Beatmap.OnlineBeatmapID);
 
             Beatmap.Value = beatmapManager.GetWorkingBeatmap(localBeatmap);
-            SelectedMods.Value = e.NewValue?.RequiredMods ?? Enumerable.Empty<Mod>();
+            Mods.Value = e.NewValue?.RequiredMods?.ToArray() ?? Array.Empty<Mod>();
             if (e.NewValue?.Ruleset != null)
                 Ruleset.Value = e.NewValue.Ruleset;
         }
@@ -207,7 +207,7 @@ namespace osu.Game.Screens.Multi.Match
             if (Beatmap.Value != beatmapManager.DefaultBeatmap)
                 return;
 
-            if (Beatmap.Value == null)
+            if (CurrentItem.Value == null)
                 return;
 
             // Try to retrieve the corresponding local beatmap
@@ -222,8 +222,6 @@ namespace osu.Game.Screens.Multi.Match
 
         private void onStart()
         {
-            Beatmap.Value.Mods.Value = SelectedMods.Value.ToArray();
-
             switch (type.Value)
             {
                 default:

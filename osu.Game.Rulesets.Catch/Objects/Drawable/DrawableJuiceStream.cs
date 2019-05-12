@@ -13,17 +13,17 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawable
     {
         private readonly Container dropletContainer;
 
-        public DrawableJuiceStream(JuiceStream s, Func<CatchHitObject, DrawableHitObject<CatchHitObject>> getVisualRepresentation = null)
+        public DrawableJuiceStream(JuiceStream s, Func<CatchHitObject, DrawableHitObject<CatchHitObject>> createDrawableRepresentation = null)
             : base(s)
         {
             RelativeSizeAxes = Axes.Both;
             Origin = Anchor.BottomLeft;
             X = 0;
 
-            InternalChild = dropletContainer = new Container { RelativeSizeAxes = Axes.Both, };
+            AddInternal(dropletContainer = new Container { RelativeSizeAxes = Axes.Both, });
 
             foreach (var o in s.NestedHitObjects.Cast<CatchHitObject>())
-                AddNested(getVisualRepresentation?.Invoke(o));
+                AddNested(createDrawableRepresentation?.Invoke(o));
         }
 
         protected override void AddNested(DrawableHitObject h)
