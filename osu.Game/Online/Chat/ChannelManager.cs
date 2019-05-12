@@ -10,6 +10,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Logging;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
+using osu.Game.Overlays.Chat.Tabs;
 using osu.Game.Users;
 
 namespace osu.Game.Online.Chat
@@ -84,7 +85,11 @@ namespace osu.Game.Online.Chat
                                    ?? new Channel(user);
         }
 
-        private void currentChannelChanged(ValueChangedEvent<Channel> e) => JoinChannel(e.NewValue);
+        private void currentChannelChanged(ValueChangedEvent<Channel> e)
+        {
+            if (!(e.NewValue is ChannelSelectorTabItem.ChannelSelectorTabChannel))
+                JoinChannel(e.NewValue);
+        }
 
         /// <summary>
         /// Ensure we run post actions in sequence, once at a time.
