@@ -1,4 +1,4 @@
-﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Game.Beatmaps.Formats;
@@ -37,8 +37,7 @@ namespace osu.Game.Skinning
                             skin.CursorExpand = pair.Value != "0";
                             break;
                         case @"SliderBorderSize":
-                            if (Single.TryParse(pair.Value, NumberStyles.Number, CultureInfo.CreateSpecificCulture("en-US"), out float size))
-                                skin.SliderBorderSize = size;
+                            skin.SliderBorderSize = Parsing.ParseFloat(pair.Value);
                             break;
                     }
 
