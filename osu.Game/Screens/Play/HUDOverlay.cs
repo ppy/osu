@@ -131,14 +131,12 @@ namespace osu.Game.Screens.Play
         {
             base.LoadComplete();
 
-            replayLoaded.ValueChanged += replayLoadedValueChanged;
-            replayLoaded.TriggerChange();
+            replayLoaded.BindValueChanged(replayLoadedValueChanged, true);
         }
 
         private void replayLoadedValueChanged(ValueChangedEvent<bool> e)
         {
             PlayerSettingsOverlay.ReplayLoaded = e.NewValue;
-            HoldToQuit.PauseOnFocusLost = !e.NewValue;
 
             if (e.NewValue)
             {
