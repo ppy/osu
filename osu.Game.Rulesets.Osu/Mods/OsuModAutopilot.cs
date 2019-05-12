@@ -29,7 +29,7 @@ namespace osu.Game.Rulesets.Osu.Mods
         private OsuInputManager inputManager;
 
         private List<OsuReplayFrame> replayFrames;
-        private int frameIndex = 0;
+        private int frameIndex;
 
         public void Update(Playfield playfield)
         {
@@ -44,7 +44,7 @@ namespace osu.Game.Rulesets.Osu.Mods
             {
                 // If we are, move to the next frame, and update the mouse position
                 frameIndex++;
-                new MousePositionAbsoluteInput() { Position = playfield.ToScreenSpace(replayFrames[frameIndex].Position) }.Apply(inputManager.CurrentState, inputManager);
+                new MousePositionAbsoluteInput { Position = playfield.ToScreenSpace(replayFrames[frameIndex].Position) }.Apply(inputManager.CurrentState, inputManager);
             }
 
             // TODO: Implement the functionality to automatically spin spinners
