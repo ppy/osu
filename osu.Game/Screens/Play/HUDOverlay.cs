@@ -35,6 +35,10 @@ namespace osu.Game.Screens.Play
         public readonly HoldForMenuButton HoldToQuit;
         public readonly PlayerSettingsOverlay PlayerSettingsOverlay;
 
+        private readonly ScoreProcessor scoreProcessor;
+        private readonly DrawableRuleset drawableRuleset;
+        private readonly IReadOnlyList<Mod> mods;
+
         private Bindable<bool> showHud;
         private readonly Container visibilityContainer;
         private readonly BindableBool replayLoaded = new BindableBool();
@@ -45,6 +49,10 @@ namespace osu.Game.Screens.Play
 
         public HUDOverlay(ScoreProcessor scoreProcessor, DrawableRuleset drawableRuleset, IReadOnlyList<Mod> mods)
         {
+            this.scoreProcessor = scoreProcessor;
+            this.drawableRuleset = drawableRuleset;
+            this.mods = mods;
+
             RelativeSizeAxes = Axes.Both;
 
             Children = new Drawable[]
@@ -89,20 +97,21 @@ namespace osu.Game.Screens.Play
                     }
                 }
             };
+        }
 
+        [BackgroundDependencyLoader(true)]
+        private void load(OsuConfigManager config, NotificationOverlay notificationOverlay)
+        {
             BindProcessor(scoreProcessor);
             BindDrawableRuleset(drawableRuleset);
 
             Progress.Objects = drawableRuleset.Objects;
             Progress.AllowSeeking = drawableRuleset.HasReplayLoaded.Value;
             Progress.RequestSeek = time => RequestSeek(time);
+            Progress.ReferenceClock = drawableRuleset.FrameStableClock;
 
             ModDisplay.Current.Value = mods;
-        }
 
-        [BackgroundDependencyLoader(true)]
-        private void load(OsuConfigManager config, NotificationOverlay notificationOverlay)
-        {
             showHud = config.GetBindable<bool>(OsuSetting.ShowInterface);
             showHud.ValueChanged += visible => visibilityContainer.FadeTo(visible.NewValue ? 1 : 0, duration);
             showHud.TriggerChange();
@@ -122,8 +131,7 @@ namespace osu.Game.Screens.Play
         {
             base.LoadComplete();
 
-            replayLoaded.ValueChanged += replayLoadedValueChanged;
-            replayLoaded.TriggerChange();
+            replayLoaded.BindValueChanged(replayLoadedValueChanged, true);
         }
 
         private void replayLoadedValueChanged(ValueChangedEvent<bool> e)

@@ -4,14 +4,12 @@
 using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
-using osu.Framework.Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
-using osu.Framework.Graphics.Sprites;
-using osu.Framework.Graphics.Textures;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Online.Leaderboards;
 using osu.Game.Overlays.Profile.Header.Components;
 using osu.Game.Scoring;
 using osu.Game.Users;
@@ -185,8 +183,6 @@ namespace osu.Game.Overlays.Profile.Header
 
         private class ScoreRankInfo : CompositeDrawable
         {
-            private readonly ScoreRank rank;
-            private readonly Sprite rankSprite;
             private readonly OsuSpriteText rankCount;
 
             public int RankCount
@@ -196,8 +192,6 @@ namespace osu.Game.Overlays.Profile.Header
 
             public ScoreRankInfo(ScoreRank rank)
             {
-                this.rank = rank;
-
                 AutoSizeAxes = Axes.Both;
                 InternalChild = new FillFlowContainer
                 {
@@ -206,10 +200,10 @@ namespace osu.Game.Overlays.Profile.Header
                     Direction = FillDirection.Vertical,
                     Children = new Drawable[]
                     {
-                        rankSprite = new Sprite
+                        new DrawableRank(rank)
                         {
-                            RelativeSizeAxes = Axes.Both,
-                            FillMode = FillMode.Fit
+                            RelativeSizeAxes = Axes.X,
+                            Height = 30,
                         },
                         rankCount = new OsuSpriteText
                         {
@@ -219,12 +213,6 @@ namespace osu.Game.Overlays.Profile.Header
                         }
                     }
                 };
-            }
-
-            [BackgroundDependencyLoader]
-            private void load(TextureStore textures)
-            {
-                rankSprite.Texture = textures.Get($"Grades/{rank.GetDescription()}");
             }
         }
     }
