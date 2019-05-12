@@ -13,4 +13,3 @@ namespace osu.iOS
         }
     }
 }
-

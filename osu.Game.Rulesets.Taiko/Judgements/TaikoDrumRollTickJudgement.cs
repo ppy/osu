@@ -15,6 +15,7 @@ namespace osu.Game.Rulesets.Taiko.Judgements
             {
                 case HitResult.Great:
                     return 200;
+
                 default:
                     return 0;
             }
@@ -26,6 +27,7 @@ namespace osu.Game.Rulesets.Taiko.Judgements
             {
                 case HitResult.Great:
                     return 0.15;
+
                 default:
                     return 0;
             }

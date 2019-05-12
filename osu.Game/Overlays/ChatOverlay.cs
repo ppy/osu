@@ -199,12 +199,16 @@ namespace osu.Game.Overlays
                 return;
             }
 
+            if (e.NewValue is ChannelSelectorTabItem.ChannelSelectorTabChannel)
+                return;
+
             textbox.Current.Disabled = e.NewValue.ReadOnly;
 
             if (channelTabControl.Current.Value != e.NewValue)
                 Scheduler.Add(() => channelTabControl.Current.Value = e.NewValue);
 
             var loaded = loadedChannels.Find(d => d.Channel == e.NewValue);
+
             if (loaded == null)
             {
                 currentChannelContainer.FadeOut(500, Easing.OutQuint);
@@ -267,7 +271,7 @@ namespace osu.Game.Overlays
         private void selectTab(int index)
         {
             var channel = channelTabControl.Items.Skip(index).FirstOrDefault();
-            if (channel != null && channel.Name != "+")
+            if (channel != null && !(channel is ChannelSelectorTabItem.ChannelSelectorTabChannel))
                 channelTabControl.Current.Value = channel;
         }
 
@@ -288,6 +292,7 @@ namespace osu.Game.Overlays
                     case Key.Number9:
                         selectTab((int)e.Key - (int)Key.Number1);
                         return true;
+
                     case Key.Number0:
                         selectTab(9);
                         return true;

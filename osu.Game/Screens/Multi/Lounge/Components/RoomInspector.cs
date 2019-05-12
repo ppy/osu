@@ -97,7 +97,7 @@ namespace osu.Game.Screens.Multi.Lounge.Components
                                                         Anchor = Anchor.BottomLeft,
                                                         Origin = Anchor.BottomLeft,
                                                         Font = OsuFont.GetFont(size: 30),
-                                                        Current = Name
+                                                        Current = RoomName
                                                     },
                                                 },
                                             },
@@ -246,7 +246,7 @@ namespace osu.Game.Screens.Multi.Lounge.Components
             }
 
             [Resolved]
-            private APIAccess api { get; set; }
+            private IAPIProvider api { get; set; }
 
             private GetRoomScoresRequest request;
 
@@ -258,6 +258,7 @@ namespace osu.Game.Screens.Multi.Lounge.Components
 
                 // nice little progressive fade
                 int time = 500;
+
                 foreach (var c in fill.Children)
                 {
                     c.Delay(500 - time).FadeOut(time, Easing.Out);

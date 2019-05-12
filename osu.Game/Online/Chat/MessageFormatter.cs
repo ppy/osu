@@ -51,6 +51,7 @@ namespace osu.Game.Online.Chat
         private static void handleMatches(Regex regex, string display, string link, MessageFormatterResult result, int startIndex = 0, LinkAction? linkActionOverride = null)
         {
             int captureOffset = 0;
+
             foreach (Match m in regex.Matches(result.Text, startIndex))
             {
                 var index = m.Index - captureOffset;
@@ -114,51 +115,63 @@ namespace osu.Game.Online.Chat
                             case "b":
                             case "beatmaps":
                                 return new LinkDetails(LinkAction.OpenBeatmap, args[3]);
+
                             case "s":
                             case "beatmapsets":
                             case "d":
                                 return new LinkDetails(LinkAction.OpenBeatmapSet, args[3]);
+
                             case "u":
                                 return new LinkDetails(LinkAction.OpenUserProfile, args[3]);
                         }
                     }
 
                     return new LinkDetails(LinkAction.External, null);
+
                 case "osu":
                     // every internal link also needs some kind of argument
                     if (args.Length < 3)
                         return new LinkDetails(LinkAction.External, null);
 
                     LinkAction linkType;
+
                     switch (args[1])
                     {
                         case "chan":
                             linkType = LinkAction.OpenChannel;
                             break;
+
                         case "edit":
                             linkType = LinkAction.OpenEditorTimestamp;
                             break;
+
                         case "b":
                             linkType = LinkAction.OpenBeatmap;
                             break;
+
                         case "s":
                         case "dl":
                             linkType = LinkAction.OpenBeatmapSet;
                             break;
+
                         case "spectate":
                             linkType = LinkAction.Spectate;
                             break;
+
                         case "u":
                             linkType = LinkAction.OpenUserProfile;
                             break;
+
                         default:
                             linkType = LinkAction.External;
                             break;
                     }
 
                     return new LinkDetails(linkType, args[2]);
+
                 case "osump":
                     return new LinkDetails(LinkAction.JoinMultiplayerMatch, args[1]);
+
                 default:
                     return new LinkDetails(LinkAction.External, null);
             }

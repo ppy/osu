@@ -22,7 +22,7 @@ namespace osu.Game.Overlays
 {
     public class SocialOverlay : SearchableListOverlay<SocialTab, SocialSortCriteria, SortDirection>, IOnlineComponent
     {
-        private APIAccess api;
+        private IAPIProvider api;
         private readonly LoadingAnimation loading;
         private FillFlowContainer<SocialPanel> panels;
 
@@ -89,7 +89,7 @@ namespace osu.Game.Overlays
         }
 
         [BackgroundDependencyLoader]
-        private void load(APIAccess api)
+        private void load(IAPIProvider api)
         {
             this.api = api;
             api.Register(this);
@@ -111,6 +111,7 @@ namespace osu.Game.Overlays
                 ChildrenEnumerable = Users.Select(u =>
                 {
                     SocialPanel panel;
+
                     switch (displayStyle)
                     {
                         case PanelDisplayStyle.Grid:
@@ -120,6 +121,7 @@ namespace osu.Game.Overlays
                                 Origin = Anchor.TopCentre
                             };
                             break;
+
                         default:
                             panel = new SocialListPanel(u);
                             break;
@@ -167,6 +169,7 @@ namespace osu.Game.Overlays
                     friendRequest.Success += updateUsers;
                     api.Queue(getUsersRequest = friendRequest);
                     break;
+
                 default:
                     var userRequest = new GetUsersRequest(); // TODO filter arguments!
                     userRequest.Success += response => updateUsers(response.Select(r => r.User));
@@ -193,13 +196,14 @@ namespace osu.Game.Overlays
             }
         }
 
-        public void APIStateChanged(APIAccess api, APIState state)
+        public void APIStateChanged(IAPIProvider api, APIState state)
         {
             switch (state)
             {
                 case APIState.Online:
                     Scheduler.AddOnce(updateSearch);
                     break;
+
                 default:
                     Users = null;
                     clearPanels();

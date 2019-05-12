@@ -33,5 +33,7 @@ namespace osu.Game.Graphics.UserInterface
         {
             set => this.FadeTo(value ? 1 : 0);
         }
+
+        public bool FilteringActive { get; set; }
     }
 }

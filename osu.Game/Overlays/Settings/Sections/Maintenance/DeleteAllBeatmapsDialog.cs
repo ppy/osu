@@ -2,7 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using osu.Game.Graphics;
+using osu.Framework.Graphics.Sprites;
 using osu.Game.Overlays.Dialog;
 
 namespace osu.Game.Overlays.Settings.Sections.Maintenance
@@ -13,7 +13,7 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
         {
             BodyText = "Everything?";
 
-            Icon = FontAwesome.fa_trash_o;
+            Icon = FontAwesome.Regular.TrashAlt;
             HeaderText = @"Confirm deletion of";
             Buttons = new PopupDialogButton[]
             {
