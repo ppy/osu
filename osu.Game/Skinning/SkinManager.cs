@@ -76,6 +76,7 @@ namespace osu.Game.Skinning
             base.Populate(model, archive);
 
             Skin reference = getSkin(model);
+
             if (!string.IsNullOrEmpty(reference.Configuration.SkinInfo.Name))
             {
                 model.Name = reference.Configuration.SkinInfo.Name;

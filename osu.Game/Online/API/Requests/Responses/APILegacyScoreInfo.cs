@@ -75,21 +75,27 @@ namespace osu.Game.Online.API.Requests.Responses
                         case @"count_geki":
                             CountGeki = kvp.Value;
                             break;
+
                         case @"count_300":
                             Count300 = kvp.Value;
                             break;
+
                         case @"count_katu":
                             CountKatu = kvp.Value;
                             break;
+
                         case @"count_100":
                             Count100 = kvp.Value;
                             break;
+
                         case @"count_50":
                             Count50 = kvp.Value;
                             break;
+
                         case @"count_miss":
                             CountMiss = kvp.Value;
                             break;
+
                         default:
                             continue;
                     }

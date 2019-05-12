@@ -162,6 +162,7 @@ namespace osu.Game.Overlays.Profile.Header
             titleText.Colour = OsuColour.FromHex(user?.Colour ?? "fff");
 
             userStats.Clear();
+
             if (user?.Statistics != null)
             {
                 userStats.Add(new UserStatsLine("Ranked Score", user.Statistics.RankedScore.ToString("#,##0")));

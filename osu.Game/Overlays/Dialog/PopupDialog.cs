@@ -73,6 +73,7 @@ namespace osu.Game.Overlays.Dialog
             set
             {
                 buttonsContainer.ChildrenEnumerable = value;
+
                 foreach (PopupDialogButton b in value)
                 {
                     var action = b.Action;
@@ -223,6 +224,7 @@ namespace osu.Game.Overlays.Dialog
 
             // press button at number if 1-9 on number row or keypad are pressed
             var k = e.Key;
+
             if (k >= Key.Number1 && k <= Key.Number9)
             {
                 pressButtonAtIndex(k - Key.Number1);

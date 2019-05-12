@@ -79,6 +79,7 @@ namespace osu.Game.Rulesets.Edit
                         Show();
                         Selected?.Invoke(this);
                         break;
+
                     case SelectionState.NotSelected:
                         Hide();
                         Deselected?.Invoke(this);

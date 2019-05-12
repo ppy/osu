@@ -8,6 +8,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.MathUtils;
+using osu.Framework.Testing;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Cursor;
 using osu.Game.Screens.Edit.Compose.Components.Timeline;
@@ -18,38 +19,49 @@ namespace osu.Game.Tests.Visual.Editor
 {
     public class TestCaseZoomableScrollContainer : ManualInputManagerTestCase
     {
-        private readonly ZoomableScrollContainer scrollContainer;
-        private readonly Drawable innerBox;
+        private ZoomableScrollContainer scrollContainer;
+        private Drawable innerBox;
 
-        public TestCaseZoomableScrollContainer()
+        [SetUpSteps]
+        public void SetUpSteps()
         {
-            Children = new Drawable[]
+            AddStep("Add new scroll container", () =>
             {
-                new Container
+                Children = new Drawable[]
                 {
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
-                    RelativeSizeAxes = Axes.X,
-                    Height = 250,
-                    Width = 0.75f,
-                    Children = new Drawable[]
+                    new Container
                     {
-                        new Box
+                        Anchor = Anchor.Centre,
+                        Origin = Anchor.Centre,
+                        RelativeSizeAxes = Axes.X,
+                        Height = 250,
+                        Width = 0.75f,
+                        Children = new Drawable[]
                         {
-                            RelativeSizeAxes = Axes.Both,
-                            Colour = OsuColour.Gray(30)
-                        },
-                        scrollContainer = new ZoomableScrollContainer { RelativeSizeAxes = Axes.Both }
-                    }
-                },
-                new MenuCursor()
-            };
+                            new Box
+                            {
+                                RelativeSizeAxes = Axes.Both,
+                                Colour = OsuColour.Gray(30)
+                            },
+                            scrollContainer = new ZoomableScrollContainer { RelativeSizeAxes = Axes.Both }
+                        }
+                    },
+                    new MenuCursor()
+                };
 
-            scrollContainer.Add(innerBox = new Box
-            {
-                RelativeSizeAxes = Axes.Both,
-                Colour = ColourInfo.GradientHorizontal(new Color4(0.8f, 0.6f, 0.4f, 1f), new Color4(0.4f, 0.6f, 0.8f, 1f))
+                scrollContainer.Add(innerBox = new Box
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Colour = ColourInfo.GradientHorizontal(new Color4(0.8f, 0.6f, 0.4f, 1f), new Color4(0.4f, 0.6f, 0.8f, 1f))
+                });
             });
+            AddUntilStep("Scroll container is loaded", () => scrollContainer.LoadState >= LoadState.Loaded);
+        }
+
+        [Test]
+        public void TestWidthInitialization()
+        {
+            AddAssert("Inner container width was initialized", () => innerBox.DrawWidth > 0);
         }
 
         [Test]
