@@ -9,6 +9,7 @@ using osu.Game.Rulesets.Catch.Objects;
 using osu.Game.Rulesets.Catch.Objects.Drawable;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Objects.Drawables;
+using osu.Game.Rulesets.UI;
 using osu.Game.Rulesets.UI.Scrolling;
 
 namespace osu.Game.Rulesets.Catch.UI
@@ -18,6 +19,8 @@ namespace osu.Game.Rulesets.Catch.UI
         public const float BASE_WIDTH = 512;
 
         internal readonly CatcherArea CatcherArea;
+
+        protected override GameplayCursorContainer CreateCursor() => new CatchCursorContainer();
 
         public CatchPlayfield(BeatmapDifficulty difficulty, Func<CatchHitObject, DrawableHitObject<CatchHitObject>> createDrawableRepresentation)
         {
