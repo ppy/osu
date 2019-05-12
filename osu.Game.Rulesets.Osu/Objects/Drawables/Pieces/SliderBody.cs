@@ -70,7 +70,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
         public float BorderSize
         {
             get => path.BorderSize;
-            set {
+            set
+            {
                 if (path.BorderSize == value)
                     return;
 
@@ -154,7 +155,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
             public float BorderSize
             {
                 get => borderSize;
-                set {
+                set
+                {
                     if (borderSize == value)
                         return;
 
