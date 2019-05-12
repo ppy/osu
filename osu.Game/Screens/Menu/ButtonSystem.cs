@@ -186,9 +186,11 @@ namespace osu.Game.Screens.Menu
             {
                 case GlobalAction.Back:
                     return goBack();
+
                 case GlobalAction.Select:
                     logo?.Click();
                     return true;
+
                 default:
                     return false;
             }
@@ -204,9 +206,11 @@ namespace osu.Game.Screens.Menu
                     State = ButtonSystemState.Initial;
                     sampleBack?.Play();
                     return true;
+
                 case ButtonSystemState.Play:
                     backButton.Click();
                     return true;
+
                 default:
                     return false;
             }
@@ -218,12 +222,15 @@ namespace osu.Game.Screens.Menu
             {
                 default:
                     return true;
+
                 case ButtonSystemState.Initial:
                     State = ButtonSystemState.TopLevel;
                     return true;
+
                 case ButtonSystemState.TopLevel:
                     buttonsTopLevel.First().Click();
                     return false;
+
                 case ButtonSystemState.Play:
                     buttonsPlay.First().Click();
                     return false;
@@ -287,12 +294,14 @@ namespace osu.Game.Screens.Menu
                             logo.ScaleTo(1, 800, Easing.OutExpo);
                         }, buttonArea.Alpha * 150);
                     break;
+
                 case ButtonSystemState.TopLevel:
                 case ButtonSystemState.Play:
                     switch (lastState)
                     {
                         case ButtonSystemState.TopLevel: // coming from toplevel to play
                             break;
+
                         case ButtonSystemState.Initial:
                             logo.ClearTransforms(targetMember: nameof(Position));
 
@@ -312,6 +321,7 @@ namespace osu.Game.Screens.Menu
                                 game?.Toolbar.Show();
                             }, 200);
                             break;
+
                         default:
                             logo.ClearTransforms(targetMember: nameof(Position));
                             logoTrackingContainer.StartTracking(logo, 0, Easing.In);
@@ -320,6 +330,7 @@ namespace osu.Game.Screens.Menu
                     }
 
                     break;
+
                 case ButtonSystemState.EnteringMode:
                     logoTrackingContainer.StartTracking(logo, 0, Easing.In);
                     break;

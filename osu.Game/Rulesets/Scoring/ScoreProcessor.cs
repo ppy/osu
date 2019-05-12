@@ -8,8 +8,10 @@ using System.Linq;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions;
 using osu.Framework.Extensions.TypeExtensions;
+using osu.Framework.MathUtils;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Judgements;
+using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.UI;
 using osu.Game.Scoring;
@@ -61,6 +63,11 @@ namespace osu.Game.Rulesets.Scoring
         public readonly BindableInt Combo = new BindableInt();
 
         /// <summary>
+        /// The current selected mods
+        /// </summary>
+        public readonly Bindable<IReadOnlyList<Mod>> Mods = new Bindable<IReadOnlyList<Mod>>(Array.Empty<Mod>());
+
+        /// <summary>
         /// Create a <see cref="HitWindows"/> for this processor.
         /// </summary>
         public virtual HitWindows CreateHitWindows() => new HitWindows();
@@ -93,12 +100,17 @@ namespace osu.Game.Rulesets.Scoring
         /// <summary>
         /// The default conditions for failing.
         /// </summary>
-        protected virtual bool DefaultFailCondition => Health.Value == Health.MinValue;
+        protected virtual bool DefaultFailCondition => Precision.AlmostBigger(Health.MinValue, Health.Value);
 
         protected ScoreProcessor()
         {
             Combo.ValueChanged += delegate { HighestCombo.Value = Math.Max(HighestCombo.Value, Combo.Value); };
-            Accuracy.ValueChanged += delegate { Rank.Value = rankFrom(Accuracy.Value); };
+            Accuracy.ValueChanged += delegate
+            {
+                Rank.Value = rankFrom(Accuracy.Value);
+                foreach (var mod in Mods.Value.OfType<IApplicableToScoreProcessor>())
+                    Rank.Value = mod.AdjustRank(Rank.Value, Accuracy.Value);
+            };
         }
 
         private ScoreRank rankFrom(double acc)
@@ -312,9 +324,11 @@ namespace osu.Game.Rulesets.Scoring
                 {
                     case HitResult.None:
                         break;
+
                     case HitResult.Miss:
                         Combo.Value = 0;
                         break;
+
                     default:
                         Combo.Value++;
                         break;
@@ -346,6 +360,9 @@ namespace osu.Game.Rulesets.Scoring
             Health.Value = result.HealthAtJudgement;
 
             JudgedHits--;
+
+            if (result.Type != HitResult.None)
+                scoreResultCounts[result.Type] = scoreResultCounts.GetOrDefault(result.Type) - 1;
 
             if (result.Judgement.IsBonus)
             {
@@ -381,6 +398,7 @@ namespace osu.Game.Rulesets.Scoring
                 default:
                 case ScoringMode.Standardised:
                     return max_score * (base_portion * baseScore / maxBaseScore + combo_portion * HighestCombo.Value / maxHighestCombo) + bonusScore;
+
                 case ScoringMode.Classic:
                     // should emulate osu-stable's scoring as closely as we can (https://osu.ppy.sh/help/wiki/Score/ScoreV1)
                     return bonusScore + baseScore * (1 + Math.Max(0, HighestCombo.Value - 1) / 25);

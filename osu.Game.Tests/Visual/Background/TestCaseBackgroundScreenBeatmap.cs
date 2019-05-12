@@ -328,7 +328,7 @@ namespace osu.Game.Tests.Visual.Background
             public bool IsBlurCorrect() => ((FadeAccessibleBackground)Background).CurrentBlur == new Vector2(BACKGROUND_BLUR);
         }
 
-        private class TestPlayer : Player
+        private class TestPlayer : Visual.TestPlayer
         {
             protected override BackgroundScreen CreateBackground() => new FadeAccessibleBackground(Beatmap.Value);
 

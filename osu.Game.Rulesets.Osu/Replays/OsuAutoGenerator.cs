@@ -199,6 +199,7 @@ namespace osu.Game.Rulesets.Osu.Replays
 
             // Wait until Auto could "see and react" to the next note.
             double waitTime = h.StartTime - Math.Max(0.0, h.TimePreempt - reactionTime);
+
             if (waitTime > lastFrame.Time)
             {
                 lastFrame = new OsuReplayFrame(waitTime, lastFrame.Position) { Actions = lastFrame.Actions };
@@ -314,6 +315,7 @@ namespace osu.Game.Rulesets.Osu.Replays
 
                     endFrame.Position = endPosition;
                     break;
+
                 case Slider slider:
                     for (double j = FrameDelay; j < slider.Duration; j += FrameDelay)
                     {

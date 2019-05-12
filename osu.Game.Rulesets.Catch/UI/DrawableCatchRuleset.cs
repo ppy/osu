@@ -48,14 +48,19 @@ namespace osu.Game.Rulesets.Catch.UI
             {
                 case Banana banana:
                     return new DrawableBanana(banana);
+
                 case Fruit fruit:
                     return new DrawableFruit(fruit);
+
                 case JuiceStream stream:
                     return new DrawableJuiceStream(stream, CreateDrawableRepresentation);
+
                 case BananaShower shower:
                     return new DrawableBananaShower(shower, CreateDrawableRepresentation);
+
                 case TinyDroplet tiny:
                     return new DrawableTinyDroplet(tiny);
+
                 case Droplet droplet:
                     return new DrawableDroplet(droplet);
             }

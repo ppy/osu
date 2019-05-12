@@ -20,12 +20,14 @@ namespace osu.Game.Graphics
             {
                 default:
                     throw new ArgumentException(@"Invalid hex string length!");
+
                 case 3:
                     return new Color4(
                         (byte)(Convert.ToByte(hex.Substring(0, 1), 16) * 17),
                         (byte)(Convert.ToByte(hex.Substring(1, 1), 16) * 17),
                         (byte)(Convert.ToByte(hex.Substring(2, 1), 16) * 17),
                         255);
+
                 case 6:
                     return new Color4(
                         Convert.ToByte(hex.Substring(0, 2), 16),
@@ -92,5 +94,15 @@ namespace osu.Game.Graphics
         public readonly Color4 ChatBlue = FromHex(@"17292e");
 
         public readonly Color4 ContextMenuGray = FromHex(@"223034");
+
+        public readonly Color4 CommunityUserGreenLight = FromHex(@"deff87");
+        public readonly Color4 CommunityUserGreen = FromHex(@"05ffa2");
+        public readonly Color4 CommunityUserGreenDark = FromHex(@"a6cc00");
+        public readonly Color4 CommunityUserGrayGreenLighter = FromHex(@"9ebab1");
+        public readonly Color4 CommunityUserGrayGreenLight = FromHex(@"77998e");
+        public readonly Color4 CommunityUserGrayGreen = FromHex(@"4e7466");
+        public readonly Color4 CommunityUserGrayGreenDark = FromHex(@"33413c");
+        public readonly Color4 CommunityUserGrayGreenDarker = FromHex(@"2c3532");
+        public readonly Color4 CommunityUserGrayGreenDarkest = FromHex(@"1e2422");
     }
 }

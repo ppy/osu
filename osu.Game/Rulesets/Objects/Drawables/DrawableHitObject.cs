@@ -98,6 +98,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
         private void load()
         {
             var judgement = HitObject.CreateJudgement();
+
             if (judgement != null)
             {
                 Result = CreateResult(judgement);
@@ -212,9 +213,11 @@ namespace osu.Game.Rulesets.Objects.Drawables
             {
                 case HitResult.None:
                     break;
+
                 case HitResult.Miss:
                     State.Value = ArmedState.Miss;
                     break;
+
                 default:
                     State.Value = ArmedState.Hit;
                     break;
