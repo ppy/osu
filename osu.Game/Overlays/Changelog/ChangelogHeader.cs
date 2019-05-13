@@ -30,7 +30,7 @@ namespace osu.Game.Overlays.Changelog
 
         public event ListingSelectedEventHandler ListingSelected;
 
-        private const float cover_height = 280;
+        private const float cover_height = 150;
         private const float title_height = 50;
         private const float icon_size = 50;
         private const float icon_margin = 20;
@@ -40,12 +40,22 @@ namespace osu.Game.Overlays.Changelog
         {
             RelativeSizeAxes = Axes.X;
             Height = cover_height;
+
             Children = new Drawable[]
             {
-                coverImage = new Sprite
+                new Container
                 {
-                    RelativeSizeAxes = Axes.Both,
-                    FillMode = FillMode.Fill,
+                    RelativeSizeAxes = Axes.X,
+                    Height = cover_height,
+                    Masking = true,
+                    Children = new Drawable[]
+                    {
+                        coverImage = new Sprite
+                        {
+                            RelativeSizeAxes = Axes.Both,
+                            FillMode = FillMode.Fill,
+                        },
+                    }
                 },
                 new Container
                 {
