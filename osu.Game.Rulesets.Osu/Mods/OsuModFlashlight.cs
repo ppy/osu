@@ -37,7 +37,6 @@ namespace osu.Game.Rulesets.Osu.Mods
         private class OsuFlashlight : Flashlight, IRequireHighFrequencyMousePosition
         {
             private const double follow_delay = 120;
-            private double lastPositionUpdate;
 
             public OsuFlashlight()
             {
@@ -55,13 +54,8 @@ namespace osu.Game.Rulesets.Osu.Mods
                 var position = FlashlightPosition;
                 var destination = e.MousePosition;
 
-                double frameTime = Clock.CurrentTime - lastPositionUpdate;
-                double interp = Interpolation.ApplyEasing(Easing.Out, MathHelper.Clamp(frameTime / follow_delay, 0, 1));
-                FlashlightPosition = new Vector2(
-                    (float)Interpolation.Lerp(position.X, destination.X, interp),
-                    (float)Interpolation.Lerp(position.Y, destination.Y, interp)
-                );
-                lastPositionUpdate = Clock.CurrentTime;
+                FlashlightPosition = Interpolation.ValueAt(MathHelper.Clamp(Clock.ElapsedFrameTime, 0, follow_delay), position, destination, 0, follow_delay, Easing.Out);
+
                 return base.OnMouseMove(e);
             }
 
