@@ -28,7 +28,6 @@ namespace osu.Game.Overlays
 
         private readonly ChangelogBadges badges;
 
-        //private readonly ChangelogChart chart;
         private readonly ChangelogContent listing;
         private readonly ChangelogContent content;
 
@@ -88,7 +87,6 @@ namespace osu.Game.Overlays
                         {
                             header = new ChangelogHeader(),
                             badges = new ChangelogBadges(),
-                            //chart = new ChangelogChart(),
                             listing = new ChangelogContent(),
                             content = new ChangelogContent()
                         },
@@ -183,7 +181,6 @@ namespace osu.Game.Overlays
             content.Hide();
             listing.Show();
             badges.SelectNone();
-            //chart.ShowAllUpdateStreams();
             listing.Show();
             scroll.ScrollTo(savedScrollPosition);
         }
@@ -208,7 +205,6 @@ namespace osu.Game.Overlays
             if (updateBadges)
                 badges.SelectUpdateStream(build.UpdateStream.Name);
 
-            //chart.ShowUpdateStream(build.UpdateStream.Name);
             req.Success += apiChangelog =>
             {
                 listing.Hide();
