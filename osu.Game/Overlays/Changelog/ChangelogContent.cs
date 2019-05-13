@@ -6,6 +6,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Online.API.Requests.Responses;
 using System;
+using System.Collections.Generic;
 using osuTK.Graphics;
 
 namespace osu.Game.Overlays.Changelog
@@ -26,7 +27,7 @@ namespace osu.Game.Overlays.Changelog
             Padding = new MarginPadding { Bottom = 100 };
         }
 
-        public void ShowListing(APIChangelogBuild[] changelog)
+        public void ShowListing(List<APIChangelogBuild> changelog)
         {
             DateTime currentDate = new DateTime();
             Clear();

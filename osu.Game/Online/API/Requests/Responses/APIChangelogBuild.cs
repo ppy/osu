@@ -21,9 +21,6 @@ namespace osu.Game.Online.API.Requests.Responses
         [JsonProperty("users")]
         public long Users { get; set; }
 
-        [JsonProperty("is_featured")]
-        public bool IsFeatured { get; set; }
-
         [JsonProperty("created_at")]
         public DateTimeOffset CreatedAt { get; set; }
 
@@ -114,7 +111,13 @@ namespace osu.Game.Online.API.Requests.Responses
         [JsonProperty("name")]
         public string Name { get; set; }
 
+        [JsonProperty("is_featured")]
+        public bool IsFeatured { get; set; }
+
         [JsonProperty("display_name")]
         public string DisplayName { get; set; }
+
+        [JsonProperty("latest_build")]
+        public APIChangelogBuild LatestBuild { get; set; }
     }
 }

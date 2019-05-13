@@ -21,7 +21,5 @@ namespace osu.Game.Online.API.Requests
 
         protected override string Target => $@"changelog/{(!string.IsNullOrEmpty(updateStream) ?
             updateStream + "/" : "")}chart-config";
-
-        protected override string Uri => $@"https://houtarouoreki.github.io/fake-api/{Target}"; // for testing
     }
 }

@@ -17,6 +17,5 @@ namespace osu.Game.Online.API.Requests
         }
 
         protected override string Target => $@"changelog/{name}/{version}";
-        protected override string Uri => $@"https://houtarouoreki.github.io/fake-api/{Target}"; // for testing
     }
 }

@@ -32,14 +32,16 @@ namespace osu.Game.Overlays.Changelog
         private SampleChannel sampleClick;
         private SampleChannel sampleHover;
 
-        public readonly APIChangelogBuild LatestBuild;
+        public readonly UpdateStream Stream;
+
         private readonly FillFlowContainer<SpriteText> text;
 
-        public StreamBadge(APIChangelogBuild latestBuild)
+        public StreamBadge(UpdateStream stream)
         {
-            LatestBuild = latestBuild;
+            Stream = stream;
+
             Height = badge_height;
-            Width = LatestBuild.IsFeatured ? badge_width * 2 : badge_width;
+            Width = stream.IsFeatured ? badge_width * 2 : badge_width;
             Padding = new MarginPadding(5);
             isActivated = true;
             Children = new Drawable[]
@@ -53,18 +55,18 @@ namespace osu.Game.Overlays.Changelog
                     {
                         new SpriteText
                         {
-                            Text = LatestBuild.UpdateStream.DisplayName,
+                            Text = stream.DisplayName,
                             Font = OsuFont.GetFont(weight: FontWeight.Bold, size: 14), // web: 12,
                             Margin = new MarginPadding { Top = 6 },
                         },
                         new SpriteText
                         {
-                            Text = LatestBuild.DisplayVersion,
+                            Text = stream.LatestBuild.DisplayVersion,
                             Font = OsuFont.GetFont(weight: FontWeight.Light, size: 20), // web: 16,
                         },
                         new SpriteText
                         {
-                            Text = LatestBuild.Users > 0 ? $"{LatestBuild.Users:N0} users online" : null,
+                            Text = stream.LatestBuild.Users > 0 ? $"{stream.LatestBuild.Users:N0} users online" : null,
                             Font = OsuFont.GetFont(weight: FontWeight.Regular, size: 12), // web: 10,
                             Colour = new Color4(203, 164, 218, 255),
                         },
@@ -73,7 +75,7 @@ namespace osu.Game.Overlays.Changelog
                 lineBadge = new LineBadge(false)
                 {
                     Anchor = Anchor.TopCentre,
-                    Colour = StreamColour.FromStreamName(LatestBuild.UpdateStream.Name),
+                    Colour = StreamColour.FromStreamName(stream.Name),
                     UncollapsedSize = 4,
                     CollapsedSize = 2,
                 },
