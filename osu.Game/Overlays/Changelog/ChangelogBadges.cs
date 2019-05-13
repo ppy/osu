@@ -45,9 +45,9 @@ namespace osu.Game.Overlays.Changelog
             };
         }
 
-        public void Populate(List<APIChangelogBuild> latestBuilds)
+        public void Populate(List<UpdateStream> streams)
         {
-            foreach (APIChangelogBuild updateStream in latestBuilds)
+            foreach (UpdateStream updateStream in streams)
             {
                 var streamBadge = new StreamBadge(updateStream);
                 streamBadge.Selected += onBadgeSelected;
@@ -75,9 +75,9 @@ namespace osu.Game.Overlays.Changelog
         {
             foreach (StreamBadge streamBadge in badgesContainer)
             {
-                if (streamBadge.LatestBuild.UpdateStream.Name == updateStream)
+                if (streamBadge.Stream.Name == updateStream)
                 {
-                    selectedStreamId = streamBadge.LatestBuild.UpdateStream.Id;
+                    selectedStreamId = streamBadge.Stream.Id;
                     streamBadge.Activate();
                 }
                 else
@@ -87,13 +87,13 @@ namespace osu.Game.Overlays.Changelog
 
         private void onBadgeSelected(StreamBadge source, EventArgs args)
         {
-            selectedStreamId = source.LatestBuild.UpdateStream.Id;
+            selectedStreamId = source.Stream.Id;
             OnSelected(source);
         }
 
         protected virtual void OnSelected(StreamBadge source)
         {
-            Selected?.Invoke(source.LatestBuild, EventArgs.Empty);
+            Selected?.Invoke(source.Stream.LatestBuild, EventArgs.Empty);
         }
 
         protected override bool OnHover(HoverEvent e)
@@ -102,7 +102,7 @@ namespace osu.Game.Overlays.Changelog
             {
                 if (selectedStreamId >= 0)
                 {
-                    if (selectedStreamId != streamBadge.LatestBuild.UpdateStream.Id)
+                    if (selectedStreamId != streamBadge.Stream.Id)
                         streamBadge.Deactivate();
                     else
                         streamBadge.EnableDim();
@@ -120,7 +120,7 @@ namespace osu.Game.Overlays.Changelog
             {
                 if (selectedStreamId < 0)
                     streamBadge.Activate();
-                else if (streamBadge.LatestBuild.UpdateStream.Id == selectedStreamId)
+                else if (streamBadge.Stream.Id == selectedStreamId)
                     streamBadge.DisableDim();
             }
 

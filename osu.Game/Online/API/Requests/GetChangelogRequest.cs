@@ -5,9 +5,8 @@ using osu.Game.Online.API.Requests.Responses;
 
 namespace osu.Game.Online.API.Requests
 {
-    public class GetChangelogRequest : APIRequest<APIChangelogBuild[]>
+    public class GetChangelogRequest : APIRequest<APIChangelogIndex>
     {
         protected override string Target => @"changelog";
-        protected override string Uri => $@"https://houtarouoreki.github.io/fake-api/{Target}/index"; // for testing
     }
 }

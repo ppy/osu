@@ -111,7 +111,7 @@ namespace osu.Game.Overlays
         protected override void LoadComplete()
         {
             var req = new GetChangelogLatestBuildsRequest();
-            req.Success += badges.Populate;
+            req.Success += res => badges.Populate(res.Streams);
             api.Queue(req);
             fetchListing();
             base.LoadComplete();
@@ -168,7 +168,7 @@ namespace osu.Game.Overlays
             isAtListing = true;
             var req = new GetChangelogRequest();
             badges.SelectNone();
-            req.Success += listing.ShowListing;
+            req.Success += res => listing.ShowListing(res.Builds);
             api.Queue(req);
         }
 
