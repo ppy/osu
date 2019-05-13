@@ -76,6 +76,8 @@ namespace osu.Game
 
         private BeatmapSetOverlay beatmapSetOverlay;
 
+        private ChangelogOverlay changelogOverlay;
+
         [Cached]
         private readonly ScreenshotManager screenshotManager = new ScreenshotManager();
 
@@ -448,6 +450,7 @@ namespace osu.Game
             loadComponentSingleFile(settings = new MainSettings { GetToolbarHeight = () => ToolbarOffset }, leftFloatingOverlayContent.Add);
             loadComponentSingleFile(userProfile = new UserProfileOverlay(), overlayContent.Add);
             loadComponentSingleFile(beatmapSetOverlay = new BeatmapSetOverlay(), overlayContent.Add);
+            loadComponentSingleFile(changelogOverlay = new ChangelogOverlay(), overlayContent.Add);
 
             loadComponentSingleFile(loginOverlay = new LoginOverlay
             {
@@ -480,6 +483,7 @@ namespace osu.Game
             dependencies.Cache(notifications);
             dependencies.Cache(loginOverlay);
             dependencies.Cache(dialogOverlay);
+            dependencies.Cache(changelogOverlay);
             dependencies.Cache(accountCreation);
 
             chatOverlay.StateChanged += state => channelManager.HighPollRate.Value = state == Visibility.Visible;
