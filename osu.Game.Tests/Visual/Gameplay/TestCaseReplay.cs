@@ -33,6 +33,8 @@ namespace osu.Game.Tests.Visual.Gameplay
             public new ScoreProcessor ScoreProcessor => base.ScoreProcessor;
             public new HUDOverlay HUDOverlay => base.HUDOverlay;
 
+            protected override bool PauseOnFocusLost => false;
+
             public ScoreAccessibleReplayPlayer(Score score)
                 : base(score)
             {

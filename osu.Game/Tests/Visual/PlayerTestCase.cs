@@ -1,4 +1,4 @@
-﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Linq;
@@ -33,7 +33,7 @@ namespace osu.Game.Tests.Visual
         }
 
         [SetUpSteps]
-        public void SetUpSteps()
+        public virtual void SetUpSteps()
         {
             AddStep(ruleset.RulesetInfo.Name, loadPlayer);
             AddUntilStep("player loaded", () => Player.IsLoaded && Player.Alpha == 1);
@@ -56,6 +56,6 @@ namespace osu.Game.Tests.Visual
             LoadScreen(Player);
         }
 
-        protected virtual Player CreatePlayer(Ruleset ruleset) => new Player(false, false);
+        protected virtual Player CreatePlayer(Ruleset ruleset) => new TestPlayer(false, false);
     }
 }

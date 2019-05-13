@@ -25,6 +25,8 @@ namespace osu.Game.Screens.Play.HUD
     {
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => true;
 
+        public readonly Bindable<bool> IsPaused = new Bindable<bool>();
+
         private readonly Button button;
 
         public Action Action
@@ -51,7 +53,8 @@ namespace osu.Game.Screens.Play.HUD
                 button = new Button
                 {
                     HoverGained = () => text.FadeIn(500, Easing.OutQuint),
-                    HoverLost = () => text.FadeOut(500, Easing.OutQuint)
+                    HoverLost = () => text.FadeOut(500, Easing.OutQuint),
+                    IsPaused = { BindTarget = IsPaused }
                 }
             };
             AutoSizeAxes = Axes.Both;
@@ -93,6 +96,8 @@ namespace osu.Game.Screens.Play.HUD
             private SpriteIcon icon;
             private CircularProgress circularProgress;
             private Circle overlayCircle;
+
+            public readonly Bindable<bool> IsPaused = new Bindable<bool>();
 
             protected override bool AllowMultipleFires => true;
 
@@ -217,7 +222,7 @@ namespace osu.Game.Screens.Play.HUD
 
             private void updateActive()
             {
-                if (!pauseOnFocusLost) return;
+                if (!pauseOnFocusLost || IsPaused.Value) return;
 
                 if (gameActive.Value)
                     AbortConfirm();

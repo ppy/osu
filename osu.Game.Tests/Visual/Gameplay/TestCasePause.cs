@@ -6,6 +6,7 @@ using NUnit.Framework;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Screens;
+using osu.Framework.Testing;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Cursor;
 using osu.Game.Rulesets;
@@ -29,6 +30,14 @@ namespace osu.Game.Tests.Visual.Gameplay
             : base(new OsuRuleset())
         {
             base.Content.Add(content = new MenuCursorContainer { RelativeSizeAxes = Axes.Both });
+        }
+
+        [SetUpSteps]
+        public override void SetUpSteps()
+        {
+            base.SetUpSteps();
+            AddStep("resume player", () => Player.GameplayClockContainer.Start());
+            confirmClockRunning(true);
         }
 
         [Test]
@@ -186,7 +195,7 @@ namespace osu.Game.Tests.Visual.Gameplay
 
         protected override Player CreatePlayer(Ruleset ruleset) => new PausePlayer();
 
-        protected class PausePlayer : Player
+        protected class PausePlayer : TestPlayer
         {
             public new GameplayClockContainer GameplayClockContainer => base.GameplayClockContainer;
 
@@ -198,10 +207,10 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             public bool PauseOverlayVisible => PauseOverlay.State == Visibility.Visible;
 
-            protected override void LoadComplete()
+            public override void OnEntering(IScreen last)
             {
-                base.LoadComplete();
-                HUDOverlay.HoldToQuit.PauseOnFocusLost = false;
+                base.OnEntering(last);
+                GameplayClockContainer.Stop();
             }
         }
     }
