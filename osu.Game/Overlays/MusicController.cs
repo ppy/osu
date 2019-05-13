@@ -56,6 +56,9 @@ namespace osu.Game.Overlays
         private Container playerContainer;
 
         [Resolved]
+        private OsuGame osuGame { get; set; }
+
+        [Resolved]
         private Bindable<WorkingBeatmap> beatmap { get; set; }
 
         [Resolved]
@@ -210,7 +213,7 @@ namespace osu.Game.Overlays
             seekDelegate?.Cancel();
             seekDelegate = Schedule(() =>
             {
-                if (!beatmap.Disabled)
+                if (osuGame.screenStack.CurrentScreen is osu.Game.Screens.Multi.Multiplayer || !beatmap.Disabled)
                     current?.Track.Seek(progress);
             });
         }
