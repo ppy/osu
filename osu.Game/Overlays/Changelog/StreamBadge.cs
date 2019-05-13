@@ -32,11 +32,11 @@ namespace osu.Game.Overlays.Changelog
         private SampleChannel sampleClick;
         private SampleChannel sampleHover;
 
-        public readonly UpdateStream Stream;
+        public readonly APIUpdateStream Stream;
 
         private readonly FillFlowContainer<SpriteText> text;
 
-        public StreamBadge(UpdateStream stream)
+        public StreamBadge(APIUpdateStream stream)
         {
             Stream = stream;
 

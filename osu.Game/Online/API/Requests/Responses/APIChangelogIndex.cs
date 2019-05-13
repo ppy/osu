@@ -9,6 +9,6 @@ namespace osu.Game.Online.API.Requests.Responses
     {
         public List<APIChangelogBuild> Builds;
 
-        public List<UpdateStream> Streams;
+        public List<APIUpdateStream> Streams;
     }
 }

@@ -27,7 +27,7 @@ namespace osu.Game.Tests.Visual
                 changelog.FetchAndShowBuild(new APIChangelogBuild
                 {
                     Version = "2018.712.0",
-                    UpdateStream = new UpdateStream { Name = "lazer" },
+                    UpdateStream = new APIUpdateStream { Name = "lazer" },
                 });
                 changelog.Show();
             });
