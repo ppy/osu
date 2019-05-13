@@ -189,8 +189,8 @@ namespace osu.Game.Overlays
         /// <summary>
         /// Fetches and shows a specific build from a specific update stream.
         /// </summary>
-        /// <param name="build">Must contain at least <see cref="UpdateStream.Name"/> and
-        /// <see cref="APIChangelogBuild.Version"/>. If <see cref="UpdateStream.DisplayName"/> and
+        /// <param name="build">Must contain at least <see cref="APIUpdateStream.Name"/> and
+        /// <see cref="APIChangelogBuild.Version"/>. If <see cref="APIUpdateStream.DisplayName"/> and
         /// <see cref="APIChangelogBuild.DisplayVersion"/> are specified, the header will instantly display them.</param>
         /// <param name="updateBadges">Whether to update badges. Should be set to false in case
         /// the function is called by selecting a badge, to avoid an infinite loop.</param>

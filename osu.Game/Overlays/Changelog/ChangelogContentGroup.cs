@@ -19,8 +19,8 @@ namespace osu.Game.Overlays.Changelog
     {
         private readonly TooltipIconButton chevronPrevious, chevronNext;
 
-        private readonly SortedDictionary<string, List<ChangelogEntry>> categories =
-            new SortedDictionary<string, List<ChangelogEntry>>();
+        private readonly SortedDictionary<string, List<APIChangelogEntry>> categories =
+            new SortedDictionary<string, List<APIChangelogEntry>>();
 
         public delegate void BuildSelectedEventHandler(APIChangelogBuild build, EventArgs args);
 
@@ -204,18 +204,18 @@ namespace osu.Game.Overlays.Changelog
             BuildSelected?.Invoke(build, EventArgs.Empty);
         }
 
-        public void GenerateText(List<ChangelogEntry> changelogEntries)
+        public void GenerateText(List<APIChangelogEntry> changelogEntries)
         {
             // sort entries by category
-            foreach (ChangelogEntry entry in changelogEntries)
+            foreach (APIChangelogEntry entry in changelogEntries)
             {
                 if (!categories.ContainsKey(entry.Category))
-                    categories.Add(entry.Category, new List<ChangelogEntry> { entry });
+                    categories.Add(entry.Category, new List<APIChangelogEntry> { entry });
                 else
                     categories[entry.Category].Add(entry);
             }
 
-            foreach (KeyValuePair<string, List<ChangelogEntry>> category in categories)
+            foreach (KeyValuePair<string, List<APIChangelogEntry>> category in categories)
             {
                 ChangelogEntries.Add(new SpriteText
                 {
@@ -224,7 +224,7 @@ namespace osu.Game.Overlays.Changelog
                     Margin = new MarginPadding { Top = 35, Bottom = 15 },
                 });
 
-                foreach (ChangelogEntry entry in category.Value)
+                foreach (APIChangelogEntry entry in category.Value)
                 {
                     LinkFlowContainer title = new LinkFlowContainer
                     {

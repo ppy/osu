@@ -45,9 +45,9 @@ namespace osu.Game.Overlays.Changelog
             };
         }
 
-        public void Populate(List<UpdateStream> streams)
+        public void Populate(List<APIUpdateStream> streams)
         {
-            foreach (UpdateStream updateStream in streams)
+            foreach (APIUpdateStream updateStream in streams)
             {
                 var streamBadge = new StreamBadge(updateStream);
                 streamBadge.Selected += onBadgeSelected;
