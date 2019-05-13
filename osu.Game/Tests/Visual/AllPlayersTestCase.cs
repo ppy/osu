@@ -76,6 +76,6 @@ namespace osu.Game.Tests.Visual
             return Player;
         }
 
-        protected virtual Player CreatePlayer(Ruleset ruleset) => new Player(false, false);
+        protected virtual Player CreatePlayer(Ruleset ruleset) => new TestPlayer(false, false);
     }
 }
