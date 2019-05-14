@@ -9,7 +9,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
     {
         protected override string Header => "Keyboard";
 
-        public KeyboardSettings(KeyBindingOverlay keyConfig)
+        public KeyboardSettings(KeyBindingPanel keyConfig)
         {
             Children = new Drawable[]
             {
