@@ -204,21 +204,25 @@ namespace osu.Game.Tests.Beatmaps.Formats
             {
                 var controlPoints = decoder.Decode(stream).ControlPointInfo;
 
-                Assert.That(controlPoints.DifficultyPoints, Has.Count.EqualTo(2));
-                Assert.That(controlPoints.DifficultyPoints[0].SpeedMultiplier, Is.EqualTo(1.5).Within(0.1));
-                Assert.That(controlPoints.DifficultyPoints[1].SpeedMultiplier, Is.EqualTo(0.75).Within(0.1));
+                Assert.That(controlPoints.DifficultyPointAt(500).SpeedMultiplier, Is.EqualTo(1.5).Within(0.1));
+                Assert.That(controlPoints.DifficultyPointAt(1500).SpeedMultiplier, Is.EqualTo(1.5).Within(0.1));
+                Assert.That(controlPoints.DifficultyPointAt(2500).SpeedMultiplier, Is.EqualTo(0.75).Within(0.1));
+                Assert.That(controlPoints.DifficultyPointAt(3500).SpeedMultiplier, Is.EqualTo(1.5).Within(0.1));
 
-                Assert.That(controlPoints.EffectPoints, Has.Count.EqualTo(2));
-                Assert.That(controlPoints.EffectPoints[0].KiaiMode, Is.True);
-                Assert.That(controlPoints.EffectPoints[1].KiaiMode, Is.True);
+                Assert.That(controlPoints.EffectPointAt(500).KiaiMode, Is.True);
+                Assert.That(controlPoints.EffectPointAt(1500).KiaiMode, Is.True);
+                Assert.That(controlPoints.EffectPointAt(2500).KiaiMode, Is.False);
+                Assert.That(controlPoints.EffectPointAt(3500).KiaiMode, Is.True);
 
-                Assert.That(controlPoints.SamplePoints, Has.Count.EqualTo(2));
-                Assert.That(controlPoints.SamplePoints[0].SampleBank, Is.EqualTo("drum"));
-                Assert.That(controlPoints.SamplePoints[1].SampleBank, Is.EqualTo("normal"));
+                Assert.That(controlPoints.SamplePointAt(500).SampleBank, Is.EqualTo("drum"));
+                Assert.That(controlPoints.SamplePointAt(1500).SampleBank, Is.EqualTo("drum"));
+                Assert.That(controlPoints.SamplePointAt(2500).SampleBank, Is.EqualTo("normal"));
+                Assert.That(controlPoints.SamplePointAt(3500).SampleBank, Is.EqualTo("drum"));
 
-                Assert.That(controlPoints.TimingPoints, Has.Count.EqualTo(2));
-                Assert.That(controlPoints.TimingPoints[0].BeatLength, Is.EqualTo(500));
-                Assert.That(controlPoints.TimingPoints[1].BeatLength, Is.EqualTo(250));
+                Assert.That(controlPoints.TimingPointAt(500).BeatLength, Is.EqualTo(500));
+                Assert.That(controlPoints.TimingPointAt(1500).BeatLength, Is.EqualTo(500));
+                Assert.That(controlPoints.TimingPointAt(2500).BeatLength, Is.EqualTo(250));
+                Assert.That(controlPoints.TimingPointAt(3500).BeatLength, Is.EqualTo(500));
             }
         }
 
