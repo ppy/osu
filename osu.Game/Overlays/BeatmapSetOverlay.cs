@@ -4,10 +4,8 @@
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
-using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Events;
 using osu.Game.Beatmaps;
@@ -19,11 +17,10 @@ using osu.Game.Overlays.BeatmapSet;
 using osu.Game.Overlays.BeatmapSet.Scores;
 using osu.Game.Rulesets;
 using osuTK;
-using osuTK.Graphics;
 
 namespace osu.Game.Overlays
 {
-    public class BeatmapSetOverlay : WaveOverlayContainer
+    public class BeatmapSetOverlay : FullscreenOverlay
     {
         private const int fade_duration = 300;
 
@@ -46,24 +43,6 @@ namespace osu.Game.Overlays
         {
             Info info;
             ScoresContainer scores;
-            Waves.FirstWaveColour = OsuColour.Gray(0.4f);
-            Waves.SecondWaveColour = OsuColour.Gray(0.3f);
-            Waves.ThirdWaveColour = OsuColour.Gray(0.2f);
-            Waves.FourthWaveColour = OsuColour.Gray(0.1f);
-
-            Anchor = Anchor.TopCentre;
-            Origin = Anchor.TopCentre;
-            RelativeSizeAxes = Axes.Both;
-            Width = 0.85f;
-
-            Masking = true;
-            EdgeEffect = new EdgeEffectParameters
-            {
-                Colour = Color4.Black.Opacity(0),
-                Type = EdgeEffectType.Shadow,
-                Radius = 3,
-                Offset = new Vector2(0f, 1f),
-            };
 
             Children = new Drawable[]
             {
