@@ -17,7 +17,7 @@ using osu.Game.Users;
 namespace osu.Game.Tests.Visual.Online
 {
     [TestFixture]
-    public class TestCaseUserProfile : OsuTestCase
+    public class TestCaseUserProfileOverlay : OsuTestCase
     {
         private readonly TestUserProfileOverlay profile;
 
@@ -27,7 +27,6 @@ namespace osu.Game.Tests.Visual.Online
         public override IReadOnlyList<Type> RequiredTypes => new[]
         {
             typeof(ProfileHeader),
-            typeof(UserProfileOverlay),
             typeof(RankGraph),
             typeof(LineGraph),
             typeof(SectionsContainer<>),
@@ -72,7 +71,7 @@ namespace osu.Game.Tests.Visual.Online
             Achievements = new User.UserAchievement[0],
         };
 
-        public TestCaseUserProfile()
+        public TestCaseUserProfileOverlay()
         {
             Add(profile = new TestUserProfileOverlay());
         }
