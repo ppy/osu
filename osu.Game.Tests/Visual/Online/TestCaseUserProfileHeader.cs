@@ -38,7 +38,7 @@ namespace osu.Game.Tests.Visual.Online
             header = new ProfileHeader();
             Add(header);
 
-            AddStep("Show offline dummy", () => header.User.Value = TestCaseUserProfile.TEST_USER);
+            AddStep("Show offline dummy", () => header.User.Value = TestCaseUserProfileOverlay.TEST_USER);
 
             AddStep("Show null dummy", () => header.User.Value = new User
             {

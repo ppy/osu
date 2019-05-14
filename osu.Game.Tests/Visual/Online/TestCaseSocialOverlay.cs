@@ -11,19 +11,18 @@ using osu.Game.Users;
 namespace osu.Game.Tests.Visual.Online
 {
     [TestFixture]
-    public class TestCaseSocial : OsuTestCase
+    public class TestCaseSocialOverlay : OsuTestCase
     {
         public override IReadOnlyList<Type> RequiredTypes => new[]
         {
             typeof(UserPanel),
             typeof(SocialPanel),
             typeof(FilterControl),
-            typeof(SocialOverlay),
             typeof(SocialGridPanel),
             typeof(SocialListPanel)
         };
 
-        public TestCaseSocial()
+        public TestCaseSocialOverlay()
         {
             SocialOverlay s = new SocialOverlay
             {
