@@ -28,18 +28,6 @@ namespace osu.Game.Overlays
 
         public const float CONTENT_X_MARGIN = 70;
 
-        protected override void PopIn()
-        {
-            base.PopIn();
-            FadeEdgeEffectTo(0.5f, WaveContainer.APPEAR_DURATION, Easing.In);
-        }
-
-        protected override void PopOut()
-        {
-            base.PopOut();
-            FadeEdgeEffectTo(0, WaveContainer.DISAPPEAR_DURATION, Easing.Out);
-        }
-
         public void ShowUser(long userId) => ShowUser(new User { Id = userId });
 
         public void ShowUser(User user, bool fetchOnline = true)

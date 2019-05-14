@@ -84,16 +84,10 @@ namespace osu.Game.Overlays
             this.rulesets = rulesets;
         }
 
-        protected override void PopIn()
+        protected override void PopOutComplete()
         {
-            base.PopIn();
-            FadeEdgeEffectTo(0.25f, WaveContainer.APPEAR_DURATION, Easing.In);
-        }
-
-        protected override void PopOut()
-        {
-            base.PopOut();
-            FadeEdgeEffectTo(0, WaveContainer.DISAPPEAR_DURATION, Easing.Out).OnComplete(_ => beatmapSet.Value = null);
+            base.PopOutComplete();
+            beatmapSet.Value = null;
         }
 
         protected override bool OnClick(ClickEvent e)

@@ -6,6 +6,7 @@ using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Effects;
 using osu.Game.Graphics;
+using osu.Game.Graphics.Containers;
 using osu.Game.Online.API;
 using osuTK.Graphics;
 
@@ -37,6 +38,22 @@ namespace osu.Game.Overlays
                 Type = EdgeEffectType.Shadow,
                 Radius = 10
             };
+        }
+
+        protected override void PopIn()
+        {
+            base.PopIn();
+            FadeEdgeEffectTo(0.4f, WaveContainer.APPEAR_DURATION, Easing.Out);
+        }
+
+        protected override void PopOut()
+        {
+            base.PopOut();
+            FadeEdgeEffectTo(0, WaveContainer.DISAPPEAR_DURATION, Easing.In).OnComplete(_ => PopOutComplete());
+        }
+
+        protected virtual void PopOutComplete()
+        {
         }
 
         protected override void LoadComplete()
