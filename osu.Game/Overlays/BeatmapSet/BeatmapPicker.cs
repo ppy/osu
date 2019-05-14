@@ -28,7 +28,7 @@ namespace osu.Game.Overlays.BeatmapSet
         private const float tile_spacing = 2;
 
         private readonly DifficultiesContainer difficulties;
-        private readonly OsuSpriteText version, starRating;
+        private readonly OsuSpriteText version;
         private readonly Statistic plays, favourites;
 
         public readonly Bindable<BeatmapInfo> Beatmap = new Bindable<BeatmapInfo>();
@@ -61,7 +61,6 @@ namespace osu.Game.Overlays.BeatmapSet
                 });
             }
 
-            starRating.FadeOut(100);
             Beatmap.Value = BeatmapSet?.Beatmaps.FirstOrDefault();
             plays.Value = BeatmapSet?.OnlineInfo.PlayCount ?? 0;
             favourites.Value = BeatmapSet?.OnlineInfo.FavouriteCount ?? 0;
@@ -90,7 +89,6 @@ namespace osu.Game.Overlays.BeatmapSet
                             OnLostHover = () =>
                             {
                                 showBeatmap(Beatmap.Value);
-                                starRating.FadeOut(100);
                             },
                         },
                         new FillFlowContainer
@@ -105,15 +103,6 @@ namespace osu.Game.Overlays.BeatmapSet
                                     Anchor = Anchor.BottomLeft,
                                     Origin = Anchor.BottomLeft,
                                     Font = OsuFont.GetFont(size: 20, weight: FontWeight.Bold)
-                                },
-                                starRating = new OsuSpriteText
-                                {
-                                    Anchor = Anchor.BottomLeft,
-                                    Origin = Anchor.BottomLeft,
-                                    Font = OsuFont.GetFont(size: 13, weight: FontWeight.Bold),
-                                    Text = "Star Difficulty",
-                                    Alpha = 0,
-                                    Margin = new MarginPadding { Bottom = 1 },
                                 },
                             },
                         },
@@ -143,7 +132,6 @@ namespace osu.Game.Overlays.BeatmapSet
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
-            starRating.Colour = colours.Yellow;
             updateDisplay();
         }
 
