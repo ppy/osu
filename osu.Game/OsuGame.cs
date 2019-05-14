@@ -99,6 +99,8 @@ namespace osu.Game
 
         private readonly List<OverlayContainer> overlays = new List<OverlayContainer>();
 
+        private readonly List<OverlayContainer> toolbarElements = new List<OverlayContainer>();
+
         private readonly List<OverlayContainer> visibleBlockingOverlays = new List<OverlayContainer>();
 
         // todo: move this to SongSelect once Screen has the ability to unsuspend.
@@ -142,8 +144,8 @@ namespace osu.Game
 
             if (hideToolbarElements)
             {
-                Toolbar.State = Visibility.Hidden;
-                musicController.State = Visibility.Hidden;
+                foreach (var overlay in toolbarElements)
+                    overlay.State = Visibility.Hidden;
             }
         }
 
@@ -420,7 +422,11 @@ namespace osu.Game
                     CloseAllOverlays(false);
                     menuScreen?.MakeCurrent();
                 },
-            }, topMostOverlayContent.Add);
+            }, d =>
+            {
+                topMostOverlayContent.Add(d);
+                toolbarElements.Add(d);
+            });
 
             loadComponentSingleFile(volume = new VolumeOverlay(), leftFloatingOverlayContent.Add);
             loadComponentSingleFile(new OnScreenDisplay(), Add, true);
@@ -455,7 +461,11 @@ namespace osu.Game
                 GetToolbarHeight = () => ToolbarOffset,
                 Anchor = Anchor.TopRight,
                 Origin = Anchor.TopRight,
-            }, rightFloatingOverlayContent.Add, true);
+            }, d =>
+            {
+                rightFloatingOverlayContent.Add(d);
+                toolbarElements.Add(d);
+            }, true);
 
             loadComponentSingleFile(new AccountCreationOverlay(), topMostOverlayContent.Add, true);
             loadComponentSingleFile(new DialogOverlay(), topMostOverlayContent.Add, true);
