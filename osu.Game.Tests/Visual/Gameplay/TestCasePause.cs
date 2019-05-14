@@ -86,8 +86,8 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddStep("move cursor outside", () => InputManager.MoveMouseTo(Player.ScreenSpaceDrawQuad.TopLeft - new Vector2(10)));
 
             pauseAndConfirm();
-            resumeAndConfirm();
 
+            resume();
             pause();
 
             confirmClockRunning(true);
