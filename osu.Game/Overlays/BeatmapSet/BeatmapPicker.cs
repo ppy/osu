@@ -174,7 +174,6 @@ namespace osu.Game.Overlays.BeatmapSet
 
             public readonly BeatmapInfo Beatmap;
 
-            public Action<BeatmapInfo> OnHovered;
             public Action<BeatmapInfo> OnClicked;
             public event Action<DifficultySelectorState> StateChanged;
 
@@ -229,7 +228,6 @@ namespace osu.Game.Overlays.BeatmapSet
             protected override bool OnHover(HoverEvent e)
             {
                 fadeIn();
-                OnHovered?.Invoke(Beatmap);
                 return base.OnHover(e);
             }
 
