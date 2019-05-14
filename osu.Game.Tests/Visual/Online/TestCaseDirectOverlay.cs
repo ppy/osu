@@ -11,7 +11,7 @@ using osu.Game.Rulesets;
 namespace osu.Game.Tests.Visual.Online
 {
     [TestFixture]
-    public class TestCaseDirect : OsuTestCase
+    public class TestCaseDirectOverlay : OsuTestCase
     {
         private DirectOverlay direct;
         private RulesetStore rulesets;
