@@ -195,6 +195,34 @@ namespace osu.Game.Tests.Beatmaps.Formats
         }
 
         [Test]
+        public void TestDecodeOverlappingTimingPoints()
+        {
+            var decoder = new LegacyBeatmapDecoder { ApplyOffsets = false };
+
+            using (var resStream = TestResources.OpenResource("overlapping-control-points.osu"))
+            using (var stream = new StreamReader(resStream))
+            {
+                var controlPoints = decoder.Decode(stream).ControlPointInfo;
+
+                Assert.That(controlPoints.DifficultyPoints, Has.Count.EqualTo(2));
+                Assert.That(controlPoints.DifficultyPoints[0].SpeedMultiplier, Is.EqualTo(1.5).Within(0.1));
+                Assert.That(controlPoints.DifficultyPoints[1].SpeedMultiplier, Is.EqualTo(0.75).Within(0.1));
+
+                Assert.That(controlPoints.EffectPoints, Has.Count.EqualTo(2));
+                Assert.That(controlPoints.EffectPoints[0].KiaiMode, Is.True);
+                Assert.That(controlPoints.EffectPoints[1].KiaiMode, Is.True);
+
+                Assert.That(controlPoints.SamplePoints, Has.Count.EqualTo(2));
+                Assert.That(controlPoints.SamplePoints[0].SampleBank, Is.EqualTo("drum"));
+                Assert.That(controlPoints.SamplePoints[1].SampleBank, Is.EqualTo("normal"));
+
+                Assert.That(controlPoints.TimingPoints, Has.Count.EqualTo(2));
+                Assert.That(controlPoints.TimingPoints[0].BeatLength, Is.EqualTo(500));
+                Assert.That(controlPoints.TimingPoints[1].BeatLength, Is.EqualTo(250));
+            }
+        }
+
+        [Test]
         public void TestDecodeBeatmapColours()
         {
             var decoder = new LegacySkinDecoder();
