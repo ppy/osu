@@ -24,7 +24,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddUntilStep("key counter counted keys", () => ((ScoreAccessiblePlayer)Player).HUDOverlay.KeyCounter.Children.Any(kc => kc.CountPresses > 0));
         }
 
-        private class ScoreAccessiblePlayer : Player
+        private class ScoreAccessiblePlayer : TestPlayer
         {
             public new ScoreProcessor ScoreProcessor => base.ScoreProcessor;
             public new HUDOverlay HUDOverlay => base.HUDOverlay;

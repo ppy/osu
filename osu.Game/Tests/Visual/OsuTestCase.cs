@@ -15,7 +15,7 @@ using osu.Game.Rulesets.Mods;
 
 namespace osu.Game.Tests.Visual
 {
-    public abstract class OsuTestCase : TestCase
+    public abstract class OsuTestCase : TestScene
     {
         [Cached(typeof(Bindable<WorkingBeatmap>))]
         [Cached(typeof(IBindable<WorkingBeatmap>))]
@@ -31,7 +31,7 @@ namespace osu.Game.Tests.Visual
         [Cached(Type = typeof(IBindable<IReadOnlyList<Mod>>))]
         protected readonly Bindable<IReadOnlyList<Mod>> Mods = new Bindable<IReadOnlyList<Mod>>(Array.Empty<Mod>());
 
-        protected DependencyContainer Dependencies { get; private set; }
+        protected new DependencyContainer Dependencies { get; private set; }
 
         private readonly Lazy<Storage> localStorage;
         protected Storage LocalStorage => localStorage.Value;
@@ -76,21 +76,21 @@ namespace osu.Game.Tests.Visual
             }
         }
 
-        protected override ITestCaseTestRunner CreateRunner() => new OsuTestCaseTestRunner();
+        protected override ITestSceneTestRunner CreateRunner() => new OsuTestCaseTestRunner();
 
-        public class OsuTestCaseTestRunner : OsuGameBase, ITestCaseTestRunner
+        public class OsuTestCaseTestRunner : OsuGameBase, ITestSceneTestRunner
         {
-            private TestCaseTestRunner.TestRunner runner;
+            private TestSceneTestRunner.TestRunner runner;
 
             protected override void LoadAsyncComplete()
             {
                 // this has to be run here rather than LoadComplete because
                 // TestCase.cs is checking the IsLoaded state (on another thread) and expects
                 // the runner to be loaded at that point.
-                Add(runner = new TestCaseTestRunner.TestRunner());
+                Add(runner = new TestSceneTestRunner.TestRunner());
             }
 
-            public void RunTestBlocking(TestCase test) => runner.RunTestBlocking(test);
+            public void RunTestBlocking(TestScene test) => runner.RunTestBlocking(test);
         }
 
         private class OsuTestBeatmap : BindableBeatmap

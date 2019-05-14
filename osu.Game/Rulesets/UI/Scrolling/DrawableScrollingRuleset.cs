@@ -65,7 +65,7 @@ namespace osu.Game.Rulesets.UI.Scrolling
         protected virtual ScrollVisualisationMethod VisualisationMethod => ScrollVisualisationMethod.Sequential;
 
         /// <summary>
-        /// Whether the player can change <see cref="VisibleTimeRange"/>.
+        /// Whether the player can change <see cref="TimeRange"/>.
         /// </summary>
         protected virtual bool UserScrollSpeedAdjustment => true;
 
@@ -93,9 +93,11 @@ namespace osu.Game.Rulesets.UI.Scrolling
                 case ScrollVisualisationMethod.Sequential:
                     scrollingInfo.Algorithm = new SequentialScrollAlgorithm(controlPoints);
                     break;
+
                 case ScrollVisualisationMethod.Overlapping:
                     scrollingInfo.Algorithm = new OverlappingScrollAlgorithm(controlPoints);
                     break;
+
                 case ScrollVisualisationMethod.Constant:
                     scrollingInfo.Algorithm = new ConstantScrollAlgorithm();
                     break;
@@ -160,6 +162,7 @@ namespace osu.Game.Rulesets.UI.Scrolling
                 case GlobalAction.IncreaseScrollSpeed:
                     this.TransformBindableTo(TimeRange, TimeRange.Value - time_span_step, 200, Easing.OutQuint);
                     return true;
+
                 case GlobalAction.DecreaseScrollSpeed:
                     this.TransformBindableTo(TimeRange, TimeRange.Value + time_span_step, 200, Easing.OutQuint);
                     return true;

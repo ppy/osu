@@ -353,6 +353,8 @@ namespace osu.Game.Rulesets.Osu.Tests
         {
             public new ScoreProcessor ScoreProcessor => base.ScoreProcessor;
 
+            protected override bool PauseOnFocusLost => false;
+
             public ScoreAccessibleReplayPlayer(Score score)
                 : base(score, false, false)
             {

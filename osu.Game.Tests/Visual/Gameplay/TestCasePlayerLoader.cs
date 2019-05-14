@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -10,41 +11,44 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Screens;
 using osu.Game.Rulesets.Mods;
+using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Scoring;
+using osu.Game.Scoring;
 using osu.Game.Screens;
 using osu.Game.Screens.Play;
+using osu.Game.Tests.Beatmaps;
 
 namespace osu.Game.Tests.Visual.Gameplay
 {
     public class TestCasePlayerLoader : ManualInputManagerTestCase
     {
         private PlayerLoader loader;
-        private readonly OsuScreenStack stack;
+        private OsuScreenStack stack;
 
-        public TestCasePlayerLoader()
+        [SetUp]
+        public void Setup() => Schedule(() =>
         {
-            InputManager.Add(stack = new OsuScreenStack { RelativeSizeAxes = Axes.Both });
-        }
+            InputManager.Child = stack = new OsuScreenStack { RelativeSizeAxes = Axes.Both };
+            Beatmap.Value = new TestWorkingBeatmap(new TestBeatmap(new OsuRuleset().RulesetInfo), Clock);
+        });
 
         [Test]
         public void TestLoadContinuation()
         {
-            AddStep("load dummy beatmap", () => stack.Push(loader = new PlayerLoader(() => new Player(false, false))));
+            Player player = null;
+            SlowLoadPlayer slowPlayer = null;
+
+            AddStep("load dummy beatmap", () => stack.Push(loader = new PlayerLoader(() => player = new TestPlayer(false, false))));
             AddUntilStep("wait for current", () => loader.IsCurrentScreen());
             AddStep("mouse in centre", () => InputManager.MoveMouseTo(loader.ScreenSpaceDrawQuad.Centre));
-            AddUntilStep("wait for no longer current", () => !loader.IsCurrentScreen());
-            AddStep("exit loader", () => loader.Exit());
-            AddUntilStep("wait for no longer alive", () => !loader.IsAlive);
+            AddUntilStep("wait for player to be current", () => player.IsCurrentScreen());
             AddStep("load slow dummy beatmap", () =>
             {
-                SlowLoadPlayer slow = null;
-
-                stack.Push(loader = new PlayerLoader(() => slow = new SlowLoadPlayer(false, false)));
-
-                Scheduler.AddDelayed(() => slow.Ready = true, 5000);
+                stack.Push(loader = new PlayerLoader(() => slowPlayer = new SlowLoadPlayer(false, false)));
+                Scheduler.AddDelayed(() => slowPlayer.AllowLoad.Set(), 5000);
             });
 
-            AddUntilStep("wait for no longer current", () => !loader.IsCurrentScreen());
+            AddUntilStep("wait for player to be current", () => slowPlayer.IsCurrentScreen());
         }
 
         [Test]
@@ -58,41 +62,25 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddStep("load player", () =>
             {
                 Mods.Value = new[] { gameMod = new TestMod() };
-                InputManager.MoveMouseTo(loader.ScreenSpaceDrawQuad.Centre);
-                stack.Push(new PlayerLoader(() => player = new TestPlayer()));
+                stack.Push(loader = new PlayerLoader(() => player = new TestPlayer()));
             });
 
-            AddUntilStep("wait for player to become current", () =>
-            {
-                if (player.IsCurrentScreen())
-                {
-                    playerMod1 = (TestMod)player.Mods.Value.Single();
-                    return true;
-                }
-
-                return false;
-            });
-
+            AddUntilStep("wait for loader to become current", () => loader.IsCurrentScreen());
+            AddStep("mouse in centre", () => InputManager.MoveMouseTo(loader.ScreenSpaceDrawQuad.Centre));
+            AddUntilStep("wait for player to be current", () => player.IsCurrentScreen());
+            AddStep("retrieve mods", () => playerMod1 = (TestMod)player.Mods.Value.Single());
             AddAssert("game mods not applied", () => gameMod.Applied == false);
             AddAssert("player mods applied", () => playerMod1.Applied);
 
             AddStep("restart player", () =>
             {
+                var lastPlayer = player;
                 player = null;
-                player.Restart();
+                lastPlayer.Restart();
             });
 
-            AddUntilStep("wait for player to become current", () =>
-            {
-                if (player.IsCurrentScreen())
-                {
-                    playerMod2 = (TestMod)player.Mods.Value.Single();
-                    return true;
-                }
-
-                return false;
-            });
-
+            AddUntilStep("wait for player to be current", () => player.IsCurrentScreen());
+            AddStep("retrieve mods", () => playerMod2 = (TestMod)player.Mods.Value.Single());
             AddAssert("game mods not applied", () => gameMod.Applied == false);
             AddAssert("player has different mods", () => playerMod1 != playerMod2);
             AddAssert("player mods applied", () => playerMod2.Applied);
@@ -110,21 +98,23 @@ namespace osu.Game.Tests.Visual.Gameplay
             {
                 Applied = true;
             }
+
+            public ScoreRank AdjustRank(ScoreRank rank, double accuracy) => rank;
         }
 
-        private class TestPlayer : Player
+        private class TestPlayer : Visual.TestPlayer
         {
             public new Bindable<IReadOnlyList<Mod>> Mods => base.Mods;
 
-            public TestPlayer()
-                : base(false, false)
+            public TestPlayer(bool allowPause = true, bool showResults = true)
+                : base(allowPause, showResults)
             {
             }
         }
 
-        protected class SlowLoadPlayer : Player
+        protected class SlowLoadPlayer : Visual.TestPlayer
         {
-            public bool Ready;
+            public readonly ManualResetEventSlim AllowLoad = new ManualResetEventSlim(false);
 
             public SlowLoadPlayer(bool allowPause = true, bool showResults = true)
                 : base(allowPause, showResults)
@@ -134,8 +124,8 @@ namespace osu.Game.Tests.Visual.Gameplay
             [BackgroundDependencyLoader]
             private void load()
             {
-                while (!Ready)
-                    Thread.Sleep(1);
+                if (!AllowLoad.Wait(TimeSpan.FromSeconds(10)))
+                    throw new TimeoutException();
             }
         }
     }

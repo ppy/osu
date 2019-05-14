@@ -55,12 +55,26 @@ namespace osu.Game.Screens
         protected new OsuGameBase Game => base.Game as OsuGameBase;
 
         /// <summary>
-        /// The <see cref="UserStatus"/> to set the user's status automatically to when this screen is entered / resumed.
-        /// Note that the user status won't be automatically set if :
-        /// <para>- <see cref="ScreenStatus"/> is overriden and returns null</para>
-        /// <para>- The current <see cref="UserStatus"/> is <see cref="UserStatusDoNotDisturb"/> or <see cref="UserStatusOffline"/></para>
+        /// The <see cref="UserActivity"/> to set the user's activity automatically to when this screen is entered
         /// </summary>
-        protected virtual UserStatus ScreenStatus => new UserStatusOnline();
+        protected virtual UserActivity InitialScreenActivity => null;
+
+        /// <summary>
+        /// The <see cref="UserActivity"/> for this screen.
+        /// </summary>
+        protected UserActivity ScreenActivity
+        {
+            get => activity;
+            set
+            {
+                if (value == activity) return;
+
+                activity = value;
+                setUserActivity(activity);
+            }
+        }
+
+        private UserActivity activity;
 
         /// <summary>
         /// Whether to disallow changes to game-wise Beatmap/Ruleset bindables for this screen (and all children).
@@ -68,6 +82,8 @@ namespace osu.Game.Screens
         public virtual bool DisallowExternalBeatmapRulesetChanges => false;
 
         private SampleChannel sampleExit;
+
+        protected virtual bool PlayResumeSound => true;
 
         public virtual float BackgroundParallaxAmount => 1;
 
@@ -98,19 +114,21 @@ namespace osu.Game.Screens
         [Resolved(canBeNull: true)]
         private OsuLogo logo { get; set; }
 
-        [Resolved(canBeNull: true)]
-        private IAPIProvider api { get; set; }
+        private IAPIProvider api;
 
         protected OsuScreen()
         {
             Anchor = Anchor.Centre;
             Origin = Anchor.Centre;
+
+            activity = null;
         }
 
         [BackgroundDependencyLoader(true)]
-        private void load(OsuGame osu, AudioManager audio)
+        private void load(OsuGame osu, AudioManager audio, IAPIProvider provider)
         {
             sampleExit = audio.Sample.Get(@"UI/screen-back");
+            api = provider;
         }
 
         public virtual bool OnPressed(GlobalAction action)
@@ -130,10 +148,11 @@ namespace osu.Game.Screens
 
         public override void OnResuming(IScreen last)
         {
-            sampleExit?.Play();
+            if (PlayResumeSound)
+                sampleExit?.Play();
             applyArrivingDefaults(true);
 
-            setUserStatus(ScreenStatus);
+            setUserActivity(activity);
 
             base.OnResuming(last);
         }
@@ -141,6 +160,7 @@ namespace osu.Game.Screens
         public override void OnSuspending(IScreen next)
         {
             base.OnSuspending(next);
+
             onSuspendingLogo();
         }
 
@@ -150,7 +170,7 @@ namespace osu.Game.Screens
 
             backgroundStack?.Push(localBackground = CreateBackground());
 
-            setUserStatus(ScreenStatus);
+            ScreenActivity = InitialScreenActivity;
 
             base.OnEntering(last);
         }
@@ -169,10 +189,11 @@ namespace osu.Game.Screens
             return false;
         }
 
-        private void setUserStatus(UserStatus status)
+        private void setUserActivity(UserActivity activity)
         {
-            if (api != null && status != null && !(api.LocalUser.Value.Status.Value is UserStatusDoNotDisturb) && !(api.LocalUser.Value.Status.Value is UserStatusOffline)) //only sets the user's status to the given one if
-                api.LocalUser.Value.Status.Value = status; //status is not null and the current status isn't either UserStatusDoNotDisturb or UserStatusOffline
+            if (api == null) return;
+
+            api.LocalUser.Value.Activity.Value = activity;
         }
 
         /// <summary>

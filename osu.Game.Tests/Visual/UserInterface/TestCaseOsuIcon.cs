@@ -9,7 +9,6 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
-using osu.Framework.Testing;
 using osu.Game.Graphics;
 using osuTK;
 using osuTK.Graphics;
@@ -17,7 +16,7 @@ using osuTK.Graphics;
 namespace osu.Game.Tests.Visual.UserInterface
 {
     [TestFixture]
-    public class TestCaseOsuIcon : TestCase
+    public class TestCaseOsuIcon : OsuTestCase
     {
         public TestCaseOsuIcon()
         {

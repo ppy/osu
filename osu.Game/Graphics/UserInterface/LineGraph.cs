@@ -9,6 +9,7 @@ using osuTK;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Lines;
+using osuTK.Graphics;
 
 namespace osu.Game.Graphics.UserInterface
 {
@@ -63,6 +64,12 @@ namespace osu.Game.Graphics.UserInterface
             }
         }
 
+        public Color4 LineColour
+        {
+            get => maskingContainer.Colour;
+            set => maskingContainer.Colour = value;
+        }
+
         public LineGraph()
         {
             Add(maskingContainer = new Container<Path>
@@ -86,6 +93,7 @@ namespace osu.Game.Graphics.UserInterface
         protected override void Update()
         {
             base.Update();
+
             if (!pathCached.IsValid)
             {
                 applyPath();

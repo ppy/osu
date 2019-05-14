@@ -7,6 +7,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Caching;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Effects;
 using osuTK;
 using osuTK.Input;
 using osuTK.Graphics;
@@ -71,6 +72,7 @@ namespace osu.Game.Overlays.Toolbar
         private void load(RulesetStore rulesets, Bindable<RulesetInfo> parentRuleset)
         {
             this.rulesets = rulesets;
+
             foreach (var r in rulesets.AvailableRulesets)
             {
                 modeButtons.Add(new ToolbarRulesetButton

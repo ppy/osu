@@ -14,6 +14,7 @@ using osu.Game.Graphics;
 using osuTK;
 using osuTK.Graphics;
 using osu.Framework.Extensions.Color4Extensions;
+using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Transforms;
 using osu.Framework.Threading;
 using osu.Game.Configuration;
@@ -188,6 +189,7 @@ namespace osu.Game.Overlays
                         optionCount = 1;
                         if (val) selectedOption = 0;
                         break;
+
                     case Enum _:
                         var values = Enum.GetValues(description.RawValue.GetType());
                         optionCount = values.Length;
