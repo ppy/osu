@@ -9,6 +9,7 @@ using osu.Framework.Logging;
 using osu.Game.Online.API;
 using osu.Game.Rulesets;
 using osu.Game.Users;
+using static osu.Game.Users.UserActivity;
 using User = osu.Game.Users.User;
 
 namespace osu.Desktop
@@ -28,32 +29,43 @@ namespace osu.Desktop
 
             user.ValueChanged += usr =>
             {
-                usr.OldValue.Status.ValueChanged -= updateStatus;
-                usr.NewValue.Status.ValueChanged += updateStatus;
+                usr.NewValue.Activity.ValueChanged += activity => updateStatus(user.Value.Status.Value, activity.NewValue);
+                usr.NewValue.Status.ValueChanged += status => updateStatus(status.NewValue, user.Value.Activity.Value);
             };
 
-            user.Value.Status.ValueChanged += updateStatus;
+            user.TriggerChange();
 
-            client.OnReady += (_, __) => Logger.Log("Discord RPC Client ready.", LoggingTarget.Network, LogLevel.Debug);
-            client.OnError += (_, e) => Logger.Log($"An error occurred with Discord RPC Client : {e.Message}", LoggingTarget.Network, LogLevel.Debug);
-            client.OnConnectionFailed += (_, e) => Logger.Log("Discord RPC Client failed to initialize : is discord running ?", LoggingTarget.Network, LogLevel.Debug);
-            client.OnPresenceUpdate += (_, __) => Logger.Log("Updated Discord Rich Presence", LoggingTarget.Network, LogLevel.Debug);
+            enableLogging();
 
             client.Initialize();
         }
 
-        private void updateStatus(ValueChangedEvent<UserStatus> e)
+        private void enableLogging()
         {
-            var presence = defaultPresence(e.NewValue.Message);
+            client.OnReady += (_, __) => Logger.Log("Discord RPC Client ready.", LoggingTarget.Network, LogLevel.Debug);
+            client.OnError += (_, e) => Logger.Log($"An error occurred with Discord RPC Client : {e.Message}", LoggingTarget.Network, LogLevel.Debug);
+            client.OnConnectionFailed += (_, e) => Logger.Log("Discord RPC Client failed to initialize : is discord running ?", LoggingTarget.Network, LogLevel.Debug);
+            client.OnPresenceUpdate += (_, __) => Logger.Log("Updated Discord Rich Presence", LoggingTarget.Network, LogLevel.Debug);
+        }
 
-            switch (e.NewValue)
+        private void updateStatus(UserStatus st, UserActivity a)
+        {
+            var presence = defaultPresence(st is UserStatusOnline ? a?.Status : st.Message);
+
+            if (!(st is UserStatusOnline)) //don't update the presence any further if the current user status is DND / Offline & simply return with the default presence
             {
-                case UserStatusSoloGame game:
+                client.SetPresence(presence);
+                return;
+            }
+
+            switch (a)
+            {
+                case UserActivitySoloGame game:
                     presence.State = $"{game.Beatmap.Metadata.Artist} - {game.Beatmap.Metadata.Title} [{game.Beatmap.Version}]";
                     setPresenceGamemode(game.Ruleset, presence);
                     break;
 
-                case UserStatusEditing editing:
+                case UserActivityEditing editing:
                     presence.State = $"{editing.Beatmap.Metadata.Artist} - {editing.Beatmap.Metadata.Title} " + (!string.IsNullOrEmpty(editing.Beatmap.Version) ? $"[{editing.Beatmap.Version}]" : "");
                     presence.Assets.SmallImageKey = "edit";
                     presence.Assets.SmallImageText = "editing";
