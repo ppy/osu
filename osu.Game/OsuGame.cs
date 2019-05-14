@@ -99,6 +99,8 @@ namespace osu.Game
 
         private readonly List<OverlayContainer> overlays = new List<OverlayContainer>();
 
+        private readonly List<OverlayContainer> toolbarElements = new List<OverlayContainer>();
+
         private readonly List<OverlayContainer> visibleBlockingOverlays = new List<OverlayContainer>();
 
         // todo: move this to SongSelect once Screen has the ability to unsuspend.
@@ -134,12 +136,17 @@ namespace osu.Game
         /// <summary>
         /// Close all game-wide overlays.
         /// </summary>
-        /// <param name="toolbar">Whether the toolbar should also be hidden.</param>
-        public void CloseAllOverlays(bool toolbar = true)
+        /// <param name="hideToolbarElements">Whether the toolbar (and accompanying controls) should also be hidden.</param>
+        public void CloseAllOverlays(bool hideToolbarElements = true)
         {
             foreach (var overlay in overlays)
                 overlay.State = Visibility.Hidden;
-            if (toolbar) Toolbar.State = Visibility.Hidden;
+
+            if (hideToolbarElements)
+            {
+                foreach (var overlay in toolbarElements)
+                    overlay.State = Visibility.Hidden;
+            }
         }
 
         private DependencyContainer dependencies;
@@ -415,7 +422,11 @@ namespace osu.Game
                     CloseAllOverlays(false);
                     menuScreen?.MakeCurrent();
                 },
-            }, topMostOverlayContent.Add);
+            }, d =>
+            {
+                topMostOverlayContent.Add(d);
+                toolbarElements.Add(d);
+            });
 
             loadComponentSingleFile(volume = new VolumeOverlay(), leftFloatingOverlayContent.Add);
             loadComponentSingleFile(new OnScreenDisplay(), Add, true);
@@ -450,7 +461,11 @@ namespace osu.Game
                 GetToolbarHeight = () => ToolbarOffset,
                 Anchor = Anchor.TopRight,
                 Origin = Anchor.TopRight,
-            }, rightFloatingOverlayContent.Add, true);
+            }, d =>
+            {
+                rightFloatingOverlayContent.Add(d);
+                toolbarElements.Add(d);
+            }, true);
 
             loadComponentSingleFile(new AccountCreationOverlay(), topMostOverlayContent.Add, true);
             loadComponentSingleFile(new DialogOverlay(), topMostOverlayContent.Add, true);
