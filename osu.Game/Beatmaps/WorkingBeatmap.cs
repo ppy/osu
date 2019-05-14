@@ -27,6 +27,8 @@ namespace osu.Game.Beatmaps
 
         public readonly BeatmapMetadata Metadata;
 
+        public bool previewableTrackOverride;
+
         protected WorkingBeatmap(BeatmapInfo beatmapInfo)
         {
             BeatmapInfo = beatmapInfo;

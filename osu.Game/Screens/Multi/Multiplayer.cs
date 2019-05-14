@@ -61,6 +61,8 @@ namespace osu.Game.Screens.Multi
 
         public Multiplayer()
         {
+            previewableTrackOverride = true;
+
             Anchor = Anchor.Centre;
             Origin = Anchor.Centre;
             RelativeSizeAxes = Axes.Both;
@@ -185,6 +187,7 @@ namespace osu.Game.Screens.Multi
         {
             this.FadeIn();
             waves.Show();
+            base.OnEntering(last);
         }
 
         public override bool OnExiting(IScreen next)
