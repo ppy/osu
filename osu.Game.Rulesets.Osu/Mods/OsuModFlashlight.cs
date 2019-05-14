@@ -36,8 +36,6 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         private class OsuFlashlight : Flashlight, IRequireHighFrequencyMousePosition
         {
-            private const double follow_delay = 120;
-
             public OsuFlashlight()
             {
                 FlashlightSize = new Vector2(0, getSizeFor(0));
@@ -51,10 +49,13 @@ namespace osu.Game.Rulesets.Osu.Mods
 
             protected override bool OnMouseMove(MouseMoveEvent e)
             {
+                const double follow_delay = 120;
+
                 var position = FlashlightPosition;
                 var destination = e.MousePosition;
 
-                FlashlightPosition = Interpolation.ValueAt(MathHelper.Clamp(Clock.ElapsedFrameTime, 0, follow_delay), position, destination, 0, follow_delay, Easing.Out);
+                FlashlightPosition = Interpolation.ValueAt(
+                    MathHelper.Clamp(Clock.ElapsedFrameTime, 0, follow_delay), position, destination, 0, follow_delay, Easing.Out);
 
                 return base.OnMouseMove(e);
             }
