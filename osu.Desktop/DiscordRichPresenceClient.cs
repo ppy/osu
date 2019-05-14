@@ -112,5 +112,11 @@ namespace osu.Desktop
                 LargeImageText = user.Value.Username
             }
         };
+
+        protected override void Dispose(bool isDisposing)
+        {
+            client.Dispose();
+            base.Dispose(isDisposing);
+        }
     }
 }
