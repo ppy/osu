@@ -43,9 +43,11 @@ namespace osu.Game.Screens.Play
         private bool hideOverlays;
         public override bool HideOverlaysOnEnter => hideOverlays;
 
-        protected override UserStatus ScreenStatus => null; //shows the previous screen status
+        protected override UserActivity InitialScreenActivity => null; //shows the previous screen status
 
         public override bool DisallowExternalBeatmapRulesetChanges => true;
+
+        protected override bool PlayResumeSound => false;
 
         private Task loadTask;
 
@@ -166,7 +168,11 @@ namespace osu.Game.Screens.Play
             logo.ScaleTo(new Vector2(0.15f), duration, Easing.In);
             logo.FadeIn(350);
 
-            Scheduler.AddDelayed(() => { content.StartTracking(logo, resuming ? 0 : 500, Easing.InOutExpo); }, resuming ? 0 : 500);
+            Scheduler.AddDelayed(() =>
+            {
+                if (this.IsCurrentScreen())
+                    content.StartTracking(logo, resuming ? 0 : 500, Easing.InOutExpo);
+            }, resuming ? 0 : 500);
         }
 
         protected override void LogoExiting(OsuLogo logo)
@@ -323,7 +329,6 @@ namespace osu.Game.Screens.Play
             private readonly Drawable facade;
             private LoadingAnimation loading;
             private Sprite backgroundSprite;
-            private ModDisplay modDisplay;
 
             public bool Loading
             {

@@ -10,6 +10,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
@@ -50,7 +51,6 @@ namespace osu.Game.Overlays
         private BeatmapManager beatmaps;
 
         private List<BeatmapSetInfo> beatmapSets;
-        private BeatmapSetInfo currentSet;
 
         private Container dragContainer;
         private Container playerContainer;
@@ -301,6 +301,7 @@ namespace osu.Game.Overlays
             queuedDirection = TransformDirection.Prev;
 
             var playable = beatmapSets.TakeWhile(i => i.ID != current.BeatmapSetInfo.ID).LastOrDefault() ?? beatmapSets.LastOrDefault();
+
             if (playable != null)
             {
                 beatmap.Value = beatmaps.GetWorkingBeatmap(playable.Beatmaps.First(), beatmap.Value);
@@ -314,6 +315,7 @@ namespace osu.Game.Overlays
                 queuedDirection = TransformDirection.Next;
 
             var playable = beatmapSets.SkipWhile(i => i.ID != current.BeatmapSetInfo.ID).Skip(1).FirstOrDefault() ?? beatmapSets.FirstOrDefault();
+
             if (playable != null)
             {
                 beatmap.Value = beatmaps.GetWorkingBeatmap(playable.Beatmaps.First(), beatmap.Value);
@@ -417,6 +419,7 @@ namespace osu.Game.Overlays
                             newBackground.MoveToX(0, 500, Easing.OutCubic);
                             background.MoveToX(-400, 500, Easing.OutCubic);
                             break;
+
                         case TransformDirection.Prev:
                             newBackground.Position = new Vector2(-400, 0);
                             newBackground.MoveToX(0, 500, Easing.OutCubic);

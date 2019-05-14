@@ -77,6 +77,7 @@ namespace osu.Game.Rulesets.Objects
                 case HitResult.Perfect:
                 case HitResult.Ok:
                     return false;
+
                 default:
                     return true;
             }
@@ -126,16 +127,22 @@ namespace osu.Game.Rulesets.Objects
             {
                 case HitResult.Perfect:
                     return Perfect / 2;
+
                 case HitResult.Great:
                     return Great / 2;
+
                 case HitResult.Good:
                     return Good / 2;
+
                 case HitResult.Ok:
                     return Ok / 2;
+
                 case HitResult.Meh:
                     return Meh / 2;
+
                 case HitResult.Miss:
                     return Miss / 2;
+
                 default:
                     throw new ArgumentException(nameof(result));
             }
@@ -143,7 +150,7 @@ namespace osu.Game.Rulesets.Objects
 
         /// <summary>
         /// Given a time offset, whether the <see cref="HitObject"/> can ever be hit in the future with a non-<see cref="HitResult.Miss"/> result.
-        /// This happens if <paramref name="timeOffset"/> is less than what is required for a <see cref="SuccessfulHitWindow"/> result.
+        /// This happens if <paramref name="timeOffset"/> is less than what is required for <see cref="LowestSuccessfulHitResult"/>.
         /// </summary>
         /// <param name="timeOffset">The time offset.</param>
         /// <returns>Whether the <see cref="HitObject"/> can be hit at any point in the future from this time offset.</returns>

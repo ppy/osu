@@ -12,10 +12,11 @@ namespace osu.Game.Tests.Visual.Online
     [TestFixture]
     public class TestCaseUserPanel : OsuTestCase
     {
+        private readonly UserPanel flyte;
+        private readonly UserPanel peppy;
+
         public TestCaseUserPanel()
         {
-            UserPanel flyte;
-            UserPanel peppy;
             Add(new FillFlowContainer
             {
                 Anchor = Anchor.Centre,
@@ -38,20 +39,33 @@ namespace osu.Game.Tests.Visual.Online
                         Country = new Country { FlagName = @"AU" },
                         CoverUrl = @"https://osu.ppy.sh/images/headers/profile-covers/c3.jpg",
                         IsSupporter = true,
+                        SupportLevel = 3,
                     }) { Width = 300 },
                 },
             });
 
             flyte.Status.Value = new UserStatusOnline();
-            peppy.Status.Value = new UserStatusSoloGame(null, null);
+            peppy.Status.Value = null;
+        }
 
-            AddStep(@"spectating", () => { flyte.Status.Value = new UserStatusSpectating(); });
-            AddStep(@"multiplaying", () => { flyte.Status.Value = new UserStatusMultiplayerGame(); });
-            AddStep(@"modding", () => { flyte.Status.Value = new UserStatusModding(); });
-            AddStep(@"editing", () => { flyte.Status.Value = new UserStatusEditing(null); });
-            AddStep(@"choosing", () => { flyte.Status.Value = new UserStatusChoosingBeatmap(); });
-            AddStep(@"offline", () => { flyte.Status.Value = new UserStatusOffline(); });
-            AddStep(@"null status", () => { flyte.Status.Value = null; });
+        [Test]
+        public void UserStatusesTests()
+        {
+            AddStep("online", () => { peppy.Status.Value = new UserStatusOnline(); });
+            AddStep(@"do not disturb", () => { peppy.Status.Value = new UserStatusDoNotDisturb(); });
+            AddStep(@"offline", () => { peppy.Status.Value = new UserStatusOffline(); });
+            AddStep(@"null status", () => { peppy.Status.Value = null; });
+        }
+
+        [Test]
+        public void UserActivitiesTests()
+        {
+            AddStep("idle", () => { flyte.Activity.Value = null; });
+            AddStep("spectating", () => { flyte.Activity.Value = new UserActivity.UserActivitySpectating(); });
+            AddStep("solo", () => { flyte.Activity.Value = new UserActivity.UserActivitySoloGame(null, null); });
+            AddStep("choosing", () => { flyte.Activity.Value = new UserActivity.UserActivityChoosingBeatmap(); });
+            AddStep("editing", () => { flyte.Activity.Value = new UserActivity.UserActivityEditing(null); });
+            AddStep("modding", () => { flyte.Activity.Value = new UserActivity.UserActivityModding(); });
         }
     }
 }

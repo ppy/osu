@@ -25,8 +25,10 @@ namespace osu.Game.Screens.Play
             {
                 default:
                     return button.ToString();
+
                 case MouseButton.Left:
                     return @"M1";
+
                 case MouseButton.Right:
                     return @"M2";
             }

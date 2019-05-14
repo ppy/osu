@@ -175,7 +175,7 @@ namespace osu.Desktop.Updater
 
             public SquirrelLogger()
             {
-                var file = Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location), "SquirrelSetupUpdater.log");
+                var file = Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly()?.Location ?? Directory.GetCurrentDirectory()), "SquirrelSetupUpdater.log");
                 if (File.Exists(file)) File.Delete(file);
                 path = file;
             }

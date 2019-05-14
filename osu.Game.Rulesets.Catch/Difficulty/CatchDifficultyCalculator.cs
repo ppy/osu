@@ -57,32 +57,20 @@ namespace osu.Game.Rulesets.Catch.Difficulty
 
             CatchHitObject lastObject = null;
 
-            foreach (var hitObject in beatmap.HitObjects.OfType<CatchHitObject>())
+            // In 2B beatmaps, it is possible that a normal Fruit is placed in the middle of a JuiceStream.
+            foreach (var hitObject in beatmap.HitObjects
+                                             .SelectMany(obj => obj is JuiceStream stream ? stream.NestedHitObjects : new[] { obj })
+                                             .Cast<CatchHitObject>()
+                                             .OrderBy(x => x.StartTime))
             {
-                if (lastObject == null)
-                {
-                    lastObject = hitObject;
+                // We want to only consider fruits that contribute to the combo.
+                if (hitObject is BananaShower || hitObject is TinyDroplet)
                     continue;
-                }
 
-                switch (hitObject)
-                {
-                    // We want to only consider fruits that contribute to the combo. Droplets are addressed as accuracy and spinners are not relevant for "skill" calculations.
-                    case Fruit fruit:
-                        yield return new CatchDifficultyHitObject(fruit, lastObject, clockRate, halfCatchWidth);
+                if (lastObject != null)
+                    yield return new CatchDifficultyHitObject(hitObject, lastObject, clockRate, halfCatchWidth);
 
-                        lastObject = hitObject;
-                        break;
-                    case JuiceStream _:
-                        foreach (var nested in hitObject.NestedHitObjects.OfType<CatchHitObject>().Where(o => !(o is TinyDroplet)))
-                        {
-                            yield return new CatchDifficultyHitObject(nested, lastObject, clockRate, halfCatchWidth);
-
-                            lastObject = nested;
-                        }
-
-                        break;
-                }
+                lastObject = hitObject;
             }
         }
 

@@ -18,7 +18,7 @@ using osuTK;
 
 namespace osu.Game.Overlays
 {
-    public class KeyBindingOverlay : SettingsOverlay
+    public class KeyBindingPanel : SettingsPanel
     {
         protected override Drawable CreateHeader() => new SettingsHeader("key configuration", "Customise your keys!");
 
@@ -38,7 +38,7 @@ namespace osu.Game.Overlays
             });
         }
 
-        public KeyBindingOverlay()
+        public KeyBindingPanel()
             : base(true)
         {
         }

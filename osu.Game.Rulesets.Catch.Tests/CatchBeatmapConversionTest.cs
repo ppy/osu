@@ -36,11 +36,13 @@ namespace osu.Game.Rulesets.Catch.Tests
                         yield return new ConvertValue((CatchHitObject)nested);
 
                     break;
+
                 case BananaShower shower:
                     foreach (var nested in shower.NestedHitObjects)
                         yield return new ConvertValue((CatchHitObject)nested);
 
                     break;
+
                 default:
                     yield return new ConvertValue((CatchHitObject)hitObject);
 

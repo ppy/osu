@@ -19,7 +19,7 @@ namespace osu.Game.Screens.Select
 
         public override bool AllowExternalScreenChange => true;
 
-        protected override UserStatus ScreenStatus => new UserStatusChoosingBeatmap();
+        protected override UserActivity InitialScreenActivity => new UserActivity.UserActivityChoosingBeatmap();
 
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
@@ -56,6 +56,7 @@ namespace osu.Game.Screens.Select
                 var autoType = auto.GetType();
 
                 var mods = Mods.Value;
+
                 if (mods.All(m => m.GetType() != autoType))
                 {
                     Mods.Value = mods.Append(auto).ToArray();
