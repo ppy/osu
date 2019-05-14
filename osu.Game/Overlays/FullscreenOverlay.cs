@@ -65,7 +65,7 @@ namespace osu.Game.Overlays
         protected override void Dispose(bool isDisposing)
         {
             base.Dispose(isDisposing);
-            API.Unregister(this);
+            API?.Unregister(this);
         }
 
         public virtual void APIStateChanged(IAPIProvider api, APIState state)
