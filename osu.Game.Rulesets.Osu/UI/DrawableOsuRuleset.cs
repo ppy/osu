@@ -63,8 +63,13 @@ namespace osu.Game.Rulesets.Osu.UI
         {
             get
             {
-                var first = (OsuHitObject)Objects.First();
-                return first.StartTime - Math.Max(2000, first.TimePreempt);
+                if (Objects.Any())
+                {
+                    var first = (OsuHitObject)Objects.First();
+                    return first.StartTime - Math.Max(2000, first.TimePreempt);
+                }
+
+                return 0;
             }
         }
     }
