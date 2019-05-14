@@ -11,12 +11,12 @@ namespace osu.Game.Tests.Visual.Settings
     [TestFixture]
     public class TestCaseSettings : OsuTestCase
     {
-        private readonly SettingsOverlay settings;
+        private readonly SettingsPanel settings;
         private readonly DialogOverlay dialogOverlay;
 
         public TestCaseSettings()
         {
-            settings = new MainSettings
+            settings = new SettingsOverlay
             {
                 State = Visibility.Visible
             };
