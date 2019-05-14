@@ -9,17 +9,17 @@ namespace osu.Game.Tests.Visual.Settings
     [TestFixture]
     public class TestCaseKeyConfiguration : OsuTestCase
     {
-        private readonly KeyBindingOverlay overlay;
+        private readonly KeyBindingPanel panel;
 
         public TestCaseKeyConfiguration()
         {
-            Child = overlay = new KeyBindingOverlay();
+            Child = panel = new KeyBindingPanel();
         }
 
         protected override void LoadComplete()
         {
             base.LoadComplete();
-            overlay.Show();
+            panel.Show();
         }
     }
 }
