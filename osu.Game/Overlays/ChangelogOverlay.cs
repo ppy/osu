@@ -10,34 +10,27 @@ using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Input.Bindings;
-using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays.Changelog;
 using System;
-using osu.Framework.Extensions.Color4Extensions;
-using osu.Framework.Graphics.Effects;
 using osuTK;
 using osuTK.Graphics;
 
 namespace osu.Game.Overlays
 {
-    public class ChangelogOverlay : WaveOverlayContainer
+    public class ChangelogOverlay : FullscreenOverlay
     {
-        private readonly ChangelogHeader header;
+        private ChangelogHeader header;
 
-        private readonly ChangelogBadges badges;
+        private ChangelogBadges badges;
 
-        private readonly ChangelogContent listing;
-        private readonly ChangelogContent content;
+        private ChangelogContent listing;
+        private ChangelogContent content;
 
-        private readonly ScrollContainer scroll;
-
-        private readonly Color4 purple = new Color4(191, 4, 255, 255);
+        private ScrollContainer scroll;
 
         private SampleChannel sampleBack;
-
-        private IAPIProvider api;
 
         private bool isAtListing;
         private float savedScrollPosition;
@@ -45,27 +38,14 @@ namespace osu.Game.Overlays
         // receive input outside our bounds so we can trigger a close event on ourselves.
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => true;
 
-        public ChangelogOverlay()
+        [BackgroundDependencyLoader]
+        private void load(AudioManager audio, OsuColour colour)
         {
             // these possibly need adjusting?
-            Waves.FirstWaveColour = OsuColour.FromHex(@"bf04ff");
+            Waves.FirstWaveColour = colour.Violet;
             Waves.SecondWaveColour = OsuColour.FromHex(@"8F03BF");
             Waves.ThirdWaveColour = OsuColour.FromHex(@"600280");
             Waves.FourthWaveColour = OsuColour.FromHex(@"300140");
-
-            Anchor = Anchor.TopCentre;
-            Origin = Anchor.TopCentre;
-            RelativeSizeAxes = Axes.Both;
-            Width = 0.85f;
-            Masking = true;
-
-            EdgeEffect = new EdgeEffectParameters
-            {
-                Colour = Color4.Black.Opacity(0),
-                Type = EdgeEffectType.Shadow,
-                Radius = 3,
-                Offset = new Vector2(0f, 1f),
-            };
 
             Children = new Drawable[]
             {
@@ -97,12 +77,7 @@ namespace osu.Game.Overlays
             badges.Selected += onBuildSelected;
             listing.BuildSelected += onBuildSelected;
             content.BuildSelected += onBuildSelected;
-        }
 
-        [BackgroundDependencyLoader]
-        private void load(IAPIProvider api, AudioManager audio)
-        {
-            this.api = api;
             sampleBack = audio.Sample.Get(@"UI/generic-select-soft"); // @"UI/screen-back" feels non-fitting here
         }
 
@@ -168,7 +143,8 @@ namespace osu.Game.Overlays
                 listing.ShowListing(res.Builds);
                 badges.Populate(res.Streams);
             };
-            api.Queue(req);
+
+            API.Queue(req);
         }
 
         public void ShowListing()
@@ -217,7 +193,8 @@ namespace osu.Game.Overlays
                     savedScrollPosition = scroll.Current;
                 isAtListing = false;
             };
-            api.Queue(req);
+
+            API.Queue(req);
         }
     }
 }
