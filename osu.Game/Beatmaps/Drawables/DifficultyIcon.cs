@@ -5,6 +5,7 @@ using System;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
@@ -16,7 +17,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Beatmaps.Drawables
 {
-    public class DifficultyIcon : DifficultyColouredContainer
+    public class DifficultyIcon : DifficultyColouredContainer, IHasTooltip
     {
         private readonly RulesetInfo ruleset;
 
@@ -27,9 +28,12 @@ namespace osu.Game.Beatmaps.Drawables
                 throw new ArgumentNullException(nameof(beatmap));
 
             this.ruleset = ruleset ?? beatmap.Ruleset;
+            TooltipText = beatmap.StarDifficulty.ToString("Star Difficulty 0.##");
 
             Size = new Vector2(20);
         }
+
+        public string TooltipText { get; set; }
 
         [BackgroundDependencyLoader]
         private void load()
