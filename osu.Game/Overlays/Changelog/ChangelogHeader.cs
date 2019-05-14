@@ -18,13 +18,10 @@ namespace osu.Game.Overlays.Changelog
 {
     public class ChangelogHeader : Container
     {
-        protected Color4 Purple = new Color4(191, 4, 255, 255);
-        private readonly Sprite coverImage;
-        private readonly Sprite headerBadge;
-        private readonly OsuSpriteText titleStream;
-        private readonly TextBadgePairListing listing;
-        private readonly SpriteIcon chevron;
-        private readonly TextBadgePairRelease releaseStream;
+        private OsuSpriteText titleStream;
+        private TextBadgePairListing listing;
+        private SpriteIcon chevron;
+        private TextBadgePairRelease releaseStream;
 
         public delegate void ListingSelectedEventHandler();
 
@@ -36,7 +33,8 @@ namespace osu.Game.Overlays.Changelog
         private const float icon_margin = 20;
         private const float version_height = 40;
 
-        public ChangelogHeader()
+        [BackgroundDependencyLoader]
+        private void load(OsuColour colours, TextureStore textures)
         {
             RelativeSizeAxes = Axes.X;
             Height = cover_height;
@@ -50,9 +48,10 @@ namespace osu.Game.Overlays.Changelog
                     Masking = true,
                     Children = new Drawable[]
                     {
-                        coverImage = new Sprite
+                        new Sprite
                         {
                             RelativeSizeAxes = Axes.Both,
+                            Texture = textures.Get(@"https://osu.ppy.sh/images/headers/changelog.jpg"),
                             FillMode = FillMode.Fill,
                         },
                     }
@@ -69,15 +68,17 @@ namespace osu.Game.Overlays.Changelog
                         {
                             X = icon_margin,
                             Masking = true,
-                            BorderColour = Purple,
+                            BorderColour = colours.Violet,
                             BorderThickness = 3,
                             MaskingSmoothness = 1,
                             Size = new Vector2(50),
                             Children = new Drawable[]
                             {
-                                headerBadge = new Sprite
+                                new Sprite
                                 {
                                     RelativeSizeAxes = Axes.Both,
+                                    // todo: https://osu.ppy.sh/images/icons/changelog.svg
+                                    Texture = textures.Get(@"https://i.imgur.com/HQM3Vhp.png"),
                                     Size = new Vector2(0.8f),
                                     Anchor = Anchor.Centre,
                                     Origin = Anchor.Centre,
@@ -92,7 +93,7 @@ namespace osu.Game.Overlays.Changelog
                                     RelativeSizeAxes = Axes.Both,
                                     Alpha = 0,
                                     AlwaysPresent = true,
-                                    Colour = Purple,
+                                    Colour = colours.Violet,
                                 }
                             }
                         },
@@ -114,7 +115,7 @@ namespace osu.Game.Overlays.Changelog
                                 {
                                     Text = "Listing",
                                     Font = OsuFont.GetFont(weight: FontWeight.Light, size: 38), // web: 30,
-                                    Colour = Purple,
+                                    Colour = colours.Violet,
                                 },
                             }
                         }
@@ -129,7 +130,7 @@ namespace osu.Game.Overlays.Changelog
                     Direction = FillDirection.Horizontal,
                     Children = new Drawable[]
                     {
-                        listing = new TextBadgePairListing(Purple),
+                        listing = new TextBadgePairListing(colours.Violet),
                         new Container // without a container, moving the chevron wont work
                         {
                             Anchor = Anchor.CentreLeft,
@@ -148,25 +149,26 @@ namespace osu.Game.Overlays.Changelog
                                     Anchor = Anchor.Centre,
                                     Origin = Anchor.Centre,
                                     Size = new Vector2(7),
-                                    Colour = Purple,
+                                    Colour = colours.Violet,
                                     Icon = FontAwesome.Solid.ChevronRight,
                                     Alpha = 0,
                                     X = -200,
                                 },
                             },
                         },
-                        releaseStream = new TextBadgePairRelease(Purple, "Lazer")
+                        releaseStream = new TextBadgePairRelease(colours.Violet, "Lazer")
                     },
                 },
                 new Box
                 {
-                    Colour = Purple,
+                    Colour = colours.Violet,
                     RelativeSizeAxes = Axes.X,
                     Height = 2,
                     Anchor = Anchor.BottomLeft,
                     Origin = Anchor.CentreLeft,
                 },
             };
+
             listing.Activated += OnListingSelected;
             releaseStream.Activated += OnReleaseSelected;
         }
@@ -197,15 +199,6 @@ namespace osu.Game.Overlays.Changelog
         protected virtual void OnReleaseSelected(object source, EventArgs e)
         {
             titleStream.FlashColour(Color4.White, 500, Easing.OutQuad);
-        }
-
-        [BackgroundDependencyLoader]
-        private void load(TextureStore textures)
-        {
-            // should be added to osu-resources?
-            // headerBadge.Texture = textures.Get(@"https://osu.ppy.sh/images/icons/changelog.svg"); // this is not working
-            headerBadge.Texture = textures.Get(@"https://i.imgur.com/HQM3Vhp.png");
-            coverImage.Texture = textures.Get(@"https://osu.ppy.sh/images/headers/changelog.jpg");
         }
     }
 }
