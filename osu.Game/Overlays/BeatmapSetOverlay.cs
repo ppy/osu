@@ -11,7 +11,6 @@ using osu.Framework.Input.Events;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
-using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Game.Overlays.BeatmapSet;
 using osu.Game.Overlays.BeatmapSet.Scores;
@@ -29,7 +28,6 @@ namespace osu.Game.Overlays
 
         private readonly Header header;
 
-        private IAPIProvider api;
         private RulesetStore rulesets;
 
         private readonly ScrollContainer scroll;
@@ -81,9 +79,8 @@ namespace osu.Game.Overlays
         }
 
         [BackgroundDependencyLoader]
-        private void load(IAPIProvider api, RulesetStore rulesets)
+        private void load(RulesetStore rulesets)
         {
-            this.api = api;
             this.rulesets = rulesets;
         }
 
@@ -114,7 +111,7 @@ namespace osu.Game.Overlays
                 beatmapSet.Value = res.ToBeatmapSet(rulesets);
                 header.Picker.Beatmap.Value = header.BeatmapSet.Value.Beatmaps.First(b => b.OnlineBeatmapID == beatmapId);
             };
-            api.Queue(req);
+            API.Queue(req);
             Show();
         }
 
@@ -123,7 +120,7 @@ namespace osu.Game.Overlays
             beatmapSet.Value = null;
             var req = new GetBeatmapSetRequest(beatmapSetId);
             req.Success += res => beatmapSet.Value = res.ToBeatmapSet(rulesets);
-            api.Queue(req);
+            API.Queue(req);
             Show();
         }
 
