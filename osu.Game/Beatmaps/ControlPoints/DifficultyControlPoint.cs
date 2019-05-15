@@ -1,7 +1,7 @@
-// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
-using OpenTK;
+using osuTK;
 
 namespace osu.Game.Beatmaps.ControlPoints
 {
@@ -17,5 +17,10 @@ namespace osu.Game.Beatmaps.ControlPoints
         }
 
         private double speedMultiplier = 1;
+
+        public override bool EquivalentTo(ControlPoint other)
+            => base.EquivalentTo(other)
+               && other is DifficultyControlPoint difficulty
+               && SpeedMultiplier.Equals(difficulty.SpeedMultiplier);
     }
 }

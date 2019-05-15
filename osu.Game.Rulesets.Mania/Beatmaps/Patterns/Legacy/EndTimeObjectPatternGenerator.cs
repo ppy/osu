@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
 using osu.Game.Rulesets.Mania.MathUtils;
@@ -19,43 +19,37 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
         public EndTimeObjectPatternGenerator(FastRandom random, HitObject hitObject, ManiaBeatmap beatmap, IBeatmap originalBeatmap)
             : base(random, hitObject, beatmap, new Pattern(), originalBeatmap)
         {
-            var endtimeData = HitObject as IHasEndTime;
-
-            endTime = endtimeData?.EndTime ?? 0;
+            endTime = (HitObject as IHasEndTime)?.EndTime ?? 0;
         }
 
-        public override Pattern Generate()
+        public override IEnumerable<Pattern> Generate()
+        {
+            yield return generate();
+        }
+
+        private Pattern generate()
         {
             var pattern = new Pattern();
 
             bool generateHold = endTime - HitObject.StartTime >= 100;
 
-            if (TotalColumns == 8)
+            switch (TotalColumns)
             {
-                if (HitObject.Samples.Any(s => s.Name == SampleInfo.HIT_FINISH) && endTime - HitObject.StartTime < 1000)
+                case 8 when HitObject.Samples.Any(s => s.Name == SampleInfo.HIT_FINISH) && endTime - HitObject.StartTime < 1000:
                     addToPattern(pattern, 0, generateHold);
-                else
-                    addToPattern(pattern, getNextRandomColumn(RandomStart), generateHold);
+                    break;
+
+                case 8:
+                    addToPattern(pattern, FindAvailableColumn(GetRandomColumn(), PreviousPattern), generateHold);
+                    break;
+
+                default:
+                    if (TotalColumns > 0)
+                        addToPattern(pattern, GetRandomColumn(), generateHold);
+                    break;
             }
-            else if (TotalColumns > 0)
-                addToPattern(pattern, getNextRandomColumn(0), generateHold);
 
             return pattern;
-        }
-
-        /// <summary>
-        /// Picks a random column after a column.
-        /// </summary>
-        /// <param name="start">The starting column.</param>
-        /// <returns>A random column after <paramref name="start"/>.</returns>
-        private int getNextRandomColumn(int start)
-        {
-            int nextColumn = Random.Next(start, TotalColumns);
-
-            while (PreviousPattern.ColumnHasObject(nextColumn))
-                nextColumn = Random.Next(start, TotalColumns);
-
-            return nextColumn;
         }
 
         /// <summary>

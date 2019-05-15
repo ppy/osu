@@ -1,16 +1,17 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
-using osu.Framework.Input;
+using osu.Framework.Graphics.Sprites;
+using osu.Framework.Input.Events;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
-using OpenTK;
-using OpenTK.Graphics;
+using osuTK;
+using osuTK.Graphics;
 
 namespace osu.Game.Screens.Play.PlayerSettings
 {
@@ -34,10 +35,11 @@ namespace osu.Game.Screens.Play.PlayerSettings
 
         public bool Expanded
         {
-            get { return expanded; }
+            get => expanded;
             set
             {
                 if (expanded == value) return;
+
                 expanded = value;
 
                 content.ClearTransforms();
@@ -93,9 +95,8 @@ namespace osu.Game.Screens.Play.PlayerSettings
                                 {
                                     Origin = Anchor.CentreLeft,
                                     Anchor = Anchor.CentreLeft,
-                                    Text = Title.ToUpper(),
-                                    TextSize = 17,
-                                    Font = @"Exo2.0-Bold",
+                                    Text = Title.ToUpperInvariant(),
+                                    Font = OsuFont.GetFont(weight: FontWeight.Bold, size: 17),
                                     Margin = new MarginPadding { Left = 10 },
                                 },
                                 button = new IconButton
@@ -103,7 +104,7 @@ namespace osu.Game.Screens.Play.PlayerSettings
                                     Origin = Anchor.Centre,
                                     Anchor = Anchor.CentreRight,
                                     Position = new Vector2(-15, 0),
-                                    Icon = FontAwesome.fa_bars,
+                                    Icon = FontAwesome.Solid.Bars,
                                     Scale = new Vector2(0.75f),
                                     Action = () => Expanded = !Expanded,
                                 },
@@ -127,6 +128,27 @@ namespace osu.Game.Screens.Play.PlayerSettings
             };
         }
 
+        private const float fade_duration = 800;
+        private const float inactive_alpha = 0.5f;
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+            this.Delay(600).FadeTo(inactive_alpha, fade_duration, Easing.OutQuint);
+        }
+
+        protected override bool OnHover(HoverEvent e)
+        {
+            this.FadeIn(fade_duration, Easing.OutQuint);
+            return true;
+        }
+
+        protected override void OnHoverLost(HoverLostEvent e)
+        {
+            this.FadeTo(inactive_alpha, fade_duration, Easing.OutQuint);
+            base.OnHoverLost(e);
+        }
+
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
@@ -139,7 +161,6 @@ namespace osu.Game.Screens.Play.PlayerSettings
 
         protected override Container<Drawable> Content => content;
 
-        protected override bool OnHover(InputState state) => true;
-        protected override bool OnMouseDown(InputState state, MouseDownEventArgs args) => true;
+        protected override bool OnMouseDown(MouseDownEvent e) => true;
     }
 }

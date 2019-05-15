@@ -1,7 +1,8 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
 using osu.Game.Rulesets.Objects;
 
 namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns
@@ -42,9 +43,9 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns
         }
 
         /// <summary>
-        /// Generates the pattern for <see cref="HitObject"/>, filled with hit objects.
+        /// Generates the patterns for <see cref="HitObject"/>, each filled with hit objects.
         /// </summary>
-        /// <returns>The <see cref="Pattern"/> containing the hit objects.</returns>
-        public abstract Pattern Generate();
+        /// <returns>The <see cref="Pattern"/>s containing the hit objects.</returns>
+        public abstract IEnumerable<Pattern> Generate();
     }
 }

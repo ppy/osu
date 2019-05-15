@@ -1,20 +1,21 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
-using osu.Framework.Configuration;
+using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Input.Events;
 using osu.Framework.Threading;
 using osu.Game.Graphics;
 using osu.Game.Input.Bindings;
 using osu.Game.Overlays.Volume;
-using OpenTK;
-using OpenTK.Graphics;
+using osuTK;
+using osuTK.Graphics;
 
 namespace osu.Game.Overlays
 {
@@ -27,7 +28,7 @@ namespace osu.Game.Overlays
         private VolumeMeter volumeMeterMusic;
         private MuteButton muteButton;
 
-        protected override bool BlockPassThroughMouse => false;
+        protected override bool BlockPositionalInput => false;
 
         private readonly BindableDouble muteAdjustment = new BindableDouble();
 
@@ -73,9 +74,9 @@ namespace osu.Game.Overlays
             volumeMeterEffect.Bindable.BindTo(audio.VolumeSample);
             volumeMeterMusic.Bindable.BindTo(audio.VolumeTrack);
 
-            muteButton.Current.ValueChanged += mute =>
+            muteButton.Current.ValueChanged += muted =>
             {
-                if (mute)
+                if (muted.NewValue)
                     audio.AddAdjustment(AdjustableProperty.Volume, muteAdjustment);
                 else
                     audio.RemoveAdjustment(AdjustableProperty.Volume, muteAdjustment);
@@ -86,19 +87,13 @@ namespace osu.Game.Overlays
         {
             base.LoadComplete();
 
-            volumeMeterMaster.Bindable.ValueChanged += _ => settingChanged();
-            volumeMeterEffect.Bindable.ValueChanged += _ => settingChanged();
-            volumeMeterMusic.Bindable.ValueChanged += _ => settingChanged();
-            muteButton.Current.ValueChanged += _ => settingChanged();
+            volumeMeterMaster.Bindable.ValueChanged += _ => Show();
+            volumeMeterEffect.Bindable.ValueChanged += _ => Show();
+            volumeMeterMusic.Bindable.ValueChanged += _ => Show();
+            muteButton.Current.ValueChanged += _ => Show();
         }
 
-        private void settingChanged()
-        {
-            Show();
-            schedulePopOut();
-        }
-
-        public bool Adjust(GlobalAction action)
+        public bool Adjust(GlobalAction action, float amount = 1, bool isPrecise = false)
         {
             if (!IsLoaded) return false;
 
@@ -108,17 +103,19 @@ namespace osu.Game.Overlays
                     if (State == Visibility.Hidden)
                         Show();
                     else
-                        volumeMeterMaster.Decrease();
+                        volumeMeterMaster.Decrease(amount, isPrecise);
                     return true;
+
                 case GlobalAction.IncreaseVolume:
                     if (State == Visibility.Hidden)
                         Show();
                     else
-                        volumeMeterMaster.Increase();
+                        volumeMeterMaster.Increase(amount, isPrecise);
                     return true;
+
                 case GlobalAction.ToggleMute:
                     Show();
-                    muteButton.Current.Value = !muteButton.Current;
+                    muteButton.Current.Value = !muteButton.Current.Value;
                     return true;
             }
 
@@ -126,6 +123,14 @@ namespace osu.Game.Overlays
         }
 
         private ScheduledDelegate popOutDelegate;
+
+        public override void Show()
+        {
+            if (State == Visibility.Visible)
+                schedulePopOut();
+
+            base.Show();
+        }
 
         protected override void PopIn()
         {
@@ -140,10 +145,33 @@ namespace osu.Game.Overlays
             this.FadeOut(100);
         }
 
+        protected override bool OnMouseMove(MouseMoveEvent e)
+        {
+            // keep the scheduled event correctly timed as long as we have movement.
+            schedulePopOut();
+            return base.OnMouseMove(e);
+        }
+
+        protected override bool OnHover(HoverEvent e)
+        {
+            schedulePopOut();
+            return true;
+        }
+
+        protected override void OnHoverLost(HoverLostEvent e)
+        {
+            schedulePopOut();
+            base.OnHoverLost(e);
+        }
+
         private void schedulePopOut()
         {
             popOutDelegate?.Cancel();
-            this.Delay(1000).Schedule(Hide, out popOutDelegate);
+            this.Delay(1000).Schedule(() =>
+            {
+                if (!IsHovered)
+                    Hide();
+            }, out popOutDelegate);
         }
     }
 }

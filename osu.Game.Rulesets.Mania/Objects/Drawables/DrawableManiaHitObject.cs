@@ -1,31 +1,61 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
+using JetBrains.Annotations;
+using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Game.Rulesets.Objects.Drawables;
+using osu.Game.Rulesets.UI.Scrolling;
 
 namespace osu.Game.Rulesets.Mania.Objects.Drawables
 {
-    public abstract class DrawableManiaHitObject<TObject> : DrawableHitObject<ManiaHitObject>
-        where TObject : ManiaHitObject
+    public abstract class DrawableManiaHitObject : DrawableHitObject<ManiaHitObject>
     {
         /// <summary>
-        /// The key that will trigger input for this hit object.
+        /// Whether this <see cref="DrawableManiaHitObject"/> should always remain alive.
         /// </summary>
-        protected ManiaAction Action { get; }
+        internal bool AlwaysAlive;
 
-        public new TObject HitObject;
+        /// <summary>
+        /// The <see cref="ManiaAction"/> which causes this <see cref="DrawableManiaHitObject{TObject}"/> to be hit.
+        /// </summary>
+        protected readonly IBindable<ManiaAction> Action = new Bindable<ManiaAction>();
 
-        protected DrawableManiaHitObject(TObject hitObject, ManiaAction? action = null)
+        protected readonly IBindable<ScrollingDirection> Direction = new Bindable<ScrollingDirection>();
+
+        protected DrawableManiaHitObject(ManiaHitObject hitObject)
             : base(hitObject)
         {
-            Anchor = Anchor.TopCentre;
-            Origin = Anchor.TopCentre;
+        }
 
-            HitObject = hitObject;
-
+        [BackgroundDependencyLoader(true)]
+        private void load([CanBeNull] IBindable<ManiaAction> action, [NotNull] IScrollingInfo scrollingInfo)
+        {
             if (action != null)
-                Action = action.Value;
+                Action.BindTo(action);
+
+            Direction.BindTo(scrollingInfo.Direction);
+            Direction.BindValueChanged(OnDirectionChanged, true);
+        }
+
+        protected override bool ShouldBeAlive => AlwaysAlive || base.ShouldBeAlive;
+
+        protected virtual void OnDirectionChanged(ValueChangedEvent<ScrollingDirection> e)
+        {
+            Anchor = Origin = e.NewValue == ScrollingDirection.Up ? Anchor.TopCentre : Anchor.BottomCentre;
+        }
+    }
+
+    public abstract class DrawableManiaHitObject<TObject> : DrawableManiaHitObject
+        where TObject : ManiaHitObject
+    {
+        public new readonly TObject HitObject;
+
+        protected DrawableManiaHitObject(TObject hitObject)
+            : base(hitObject)
+        {
+            HitObject = hitObject;
         }
 
         protected override void UpdateState(ArmedState state)
@@ -35,6 +65,7 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
                 case ArmedState.Miss:
                     this.FadeOut(150, Easing.In).Expire();
                     break;
+
                 case ArmedState.Hit:
                     this.FadeOut(150, Easing.OutQuint).Expire();
                     break;

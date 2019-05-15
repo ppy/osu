@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using System.Collections.Generic;
@@ -8,11 +8,14 @@ using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Difficulty;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Scoring;
+using osu.Game.Scoring;
 
 namespace osu.Game.Rulesets.Mania.Difficulty
 {
     public class ManiaPerformanceCalculator : PerformanceCalculator
     {
+        protected new ManiaDifficultyAttributes Attributes => (ManiaDifficultyAttributes)base.Attributes;
+
         private Mod[] mods;
 
         // Score after being scaled by non-difficulty-increasing mods
@@ -25,7 +28,7 @@ namespace osu.Game.Rulesets.Mania.Difficulty
         private int countMeh;
         private int countMiss;
 
-        public ManiaPerformanceCalculator(Ruleset ruleset, WorkingBeatmap beatmap, Score score)
+        public ManiaPerformanceCalculator(Ruleset ruleset, WorkingBeatmap beatmap, ScoreInfo score)
             : base(ruleset, beatmap, score)
         {
         }
@@ -105,16 +108,14 @@ namespace osu.Game.Rulesets.Mania.Difficulty
 
         private double computeAccuracyValue(double strainValue)
         {
-            // Todo: This int cast is temporary to achieve 1:1 results with osu!stable, and should be remoevd in the future
-            double hitWindowGreat = (int)(Beatmap.HitObjects.First().HitWindows.Great / 2) / TimeRate;
-            if (hitWindowGreat <= 0)
+            if (Attributes.GreatHitWindow <= 0)
                 return 0;
 
             // Lots of arbitrary values from testing.
             // Considering to use derivation from perfect accuracy in a probabilistic manner - assume normal distribution
-            double accuracyValue = Math.Max(0.0, 0.2 - (hitWindowGreat - 34) * 0.006667)
-                                       * strainValue
-                                       * Math.Pow(Math.Max(0.0, scaledScore - 960000) / 40000, 1.1);
+            double accuracyValue = Math.Max(0.0, 0.2 - (Attributes.GreatHitWindow - 34) * 0.006667)
+                                   * strainValue
+                                   * Math.Pow(Math.Max(0.0, scaledScore - 960000) / 40000, 1.1);
 
             // Bonus for many hitcircles - it's harder to keep good accuracy up for longer
             // accuracyValue *= Math.Min(1.15, Math.Pow(totalHits / 1500.0, 0.3));

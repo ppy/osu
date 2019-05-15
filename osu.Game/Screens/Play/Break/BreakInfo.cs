@@ -1,11 +1,12 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
-using osu.Game.Rulesets.Scoring;
-using OpenTK;
+using osu.Game.Scoring;
+using osuTK;
 
 namespace osu.Game.Screens.Play.Break
 {
@@ -28,9 +29,8 @@ namespace osu.Game.Screens.Play.Break
                     {
                         Anchor = Anchor.TopCentre,
                         Origin = Anchor.TopCentre,
-                        Text = "current progress".ToUpper(),
-                        TextSize = 15,
-                        Font = "Exo2.0-Black",
+                        Text = "current progress".ToUpperInvariant(),
+                        Font = OsuFont.GetFont(weight: FontWeight.Black, size: 15),
                     },
                     new FillFlowContainer
                     {

@@ -1,10 +1,11 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Graphics;
-using osu.Framework.Input;
-using OpenTK;
-using OpenTK.Input;
+using osu.Framework.Graphics.Sprites;
+using osu.Framework.Input.Events;
+using osuTK;
+using osuTK.Input;
 
 namespace osu.Game.Graphics.UserInterface
 {
@@ -21,7 +22,7 @@ namespace osu.Game.Graphics.UserInterface
             {
                 new SpriteIcon
                 {
-                    Icon = FontAwesome.fa_search,
+                    Icon = FontAwesome.Solid.Search,
                     Origin = Anchor.CentreRight,
                     Anchor = Anchor.CentreRight,
                     Margin = new MarginPadding { Right = 10 },
@@ -32,13 +33,11 @@ namespace osu.Game.Graphics.UserInterface
             PlaceholderText = "type to search";
         }
 
-        protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
+        protected override bool OnKeyDown(KeyDownEvent e)
         {
-            if (HandlePendingText(state)) return true;
-
-            if (!state.Keyboard.ControlPressed && !state.Keyboard.ShiftPressed)
+            if (!e.ControlPressed && !e.ShiftPressed)
             {
-                switch (args.Key)
+                switch (e.Key)
                 {
                     case Key.Left:
                     case Key.Right:
@@ -50,7 +49,7 @@ namespace osu.Game.Graphics.UserInterface
 
             if (!AllowCommit)
             {
-                switch (args.Key)
+                switch (e.Key)
                 {
                     case Key.KeypadEnter:
                     case Key.Enter:
@@ -58,16 +57,16 @@ namespace osu.Game.Graphics.UserInterface
                 }
             }
 
-            if (state.Keyboard.ShiftPressed)
+            if (e.ShiftPressed)
             {
-                switch (args.Key)
+                switch (e.Key)
                 {
                     case Key.Delete:
                         return false;
                 }
             }
 
-            return base.OnKeyDown(state, args);
+            return base.OnKeyDown(e);
         }
     }
 }

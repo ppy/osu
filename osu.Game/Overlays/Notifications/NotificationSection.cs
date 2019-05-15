@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using System.Collections.Generic;
@@ -10,7 +10,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
-using OpenTK;
+using osuTK;
 using osu.Game.Graphics.Containers;
 
 namespace osu.Game.Overlays.Notifications
@@ -39,7 +39,7 @@ namespace osu.Game.Overlays.Notifications
 
         public string ClearText
         {
-            get { return clearText; }
+            get => clearText;
             set
             {
                 clearText = value;
@@ -51,11 +51,11 @@ namespace osu.Game.Overlays.Notifications
 
         public string Title
         {
-            get { return title; }
+            get => title;
             set
             {
                 title = value;
-                if (titleText != null) titleText.Text = title.ToUpper();
+                if (titleText != null) titleText.Text = title.ToUpperInvariant();
             }
         }
 
@@ -101,14 +101,14 @@ namespace osu.Game.Overlays.Notifications
                             {
                                 titleText = new OsuSpriteText
                                 {
-                                    Text = title.ToUpper(),
-                                    Font = @"Exo2.0-Black",
+                                    Text = title.ToUpperInvariant(),
+                                    Font = OsuFont.GetFont(weight: FontWeight.Black)
                                 },
                                 countText = new OsuSpriteText
                                 {
                                     Text = "3",
                                     Colour = colours.Yellow,
-                                    Font = @"Exo2.0-Black",
+                                    Font = OsuFont.GetFont(weight: FontWeight.Black)
                                 },
                             }
                         },
@@ -153,8 +153,8 @@ namespace osu.Game.Overlays.Notifications
 
             public string Text
             {
-                get { return text.Text; }
-                set { text.Text = value.ToUpper(); }
+                get => text.Text;
+                set => text.Text = value.ToUpperInvariant();
             }
         }
 

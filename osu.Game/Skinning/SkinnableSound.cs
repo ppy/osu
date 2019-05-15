@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using System.Linq;
@@ -31,6 +31,8 @@ namespace osu.Game.Skinning
 
         public void Play() => channels?.ForEach(c => c.Play());
 
+        public override bool IsPresent => false; // We don't need to receive updates.
+
         protected override void SkinChanged(ISkinSource skin, bool allowFallback)
         {
             channels = samples.Select(s =>
@@ -44,19 +46,17 @@ namespace osu.Game.Skinning
 
         private SampleChannel loadChannel(SampleInfo info, Func<string, SampleChannel> getSampleFunction)
         {
-            SampleChannel ch = null;
+            foreach (var lookup in info.LookupNames)
+            {
+                var ch = getSampleFunction($"Gameplay/{lookup}");
+                if (ch == null)
+                    continue;
 
-            if (info.Namespace != null)
-                ch = getSampleFunction($"Gameplay/{info.Namespace}/{info.Bank}-{info.Name}");
-
-            // try without namespace as a fallback.
-            if (ch == null)
-                ch = getSampleFunction($"Gameplay/{info.Bank}-{info.Name}");
-
-            if (ch != null)
                 ch.Volume.Value = info.Volume / 100.0;
+                return ch;
+            }
 
-            return ch;
+            return null;
         }
     }
 }

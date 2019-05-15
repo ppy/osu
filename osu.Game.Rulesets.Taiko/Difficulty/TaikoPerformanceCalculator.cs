@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using System.Collections.Generic;
@@ -9,12 +9,13 @@ using osu.Game.Rulesets.Difficulty;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.Taiko.Objects;
+using osu.Game.Scoring;
 
 namespace osu.Game.Rulesets.Taiko.Difficulty
 {
     public class TaikoPerformanceCalculator : PerformanceCalculator
     {
-        private readonly int beatmapMaxCombo;
+        protected new TaikoDifficultyAttributes Attributes => (TaikoDifficultyAttributes)base.Attributes;
 
         private Mod[] mods;
         private int countGreat;
@@ -22,10 +23,9 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
         private int countMeh;
         private int countMiss;
 
-        public TaikoPerformanceCalculator(Ruleset ruleset, WorkingBeatmap beatmap, Score score)
+        public TaikoPerformanceCalculator(Ruleset ruleset, WorkingBeatmap beatmap, ScoreInfo score)
             : base(ruleset, beatmap, score)
         {
-            beatmapMaxCombo = Beatmap.HitObjects.Count(h => h is Hit);
         }
 
         public override double Calculate(Dictionary<string, double> categoryDifficulty = null)
@@ -78,13 +78,13 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
             strainValue *= Math.Pow(0.985, countMiss);
 
             // Combo scaling
-            if (beatmapMaxCombo > 0)
-                strainValue *= Math.Min(Math.Pow(Score.MaxCombo, 0.5) / Math.Pow(beatmapMaxCombo, 0.5), 1.0);
+            if (Attributes.MaxCombo > 0)
+                strainValue *= Math.Min(Math.Pow(Score.MaxCombo, 0.5) / Math.Pow(Attributes.MaxCombo, 0.5), 1.0);
 
             if (mods.Any(m => m is ModHidden))
                 strainValue *= 1.025;
 
-            if (mods.Any(m => m is ModFlashlight))
+            if (mods.Any(m => m is ModFlashlight<TaikoHitObject>))
                 // Apply length bonus again if flashlight is on simply because it becomes a lot harder on longer maps.
                 strainValue *= 1.05 * lengthBonus;
 
@@ -94,14 +94,12 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
 
         private double computeAccuracyValue()
         {
-            // Todo: This int cast is temporary to achieve 1:1 results with osu!stable, and should be remoevd in the future
-            double hitWindowGreat = (int)(Beatmap.HitObjects.First().HitWindows.Great / 2) / TimeRate;
-            if (hitWindowGreat <= 0)
+            if (Attributes.GreatHitWindow <= 0)
                 return 0;
 
             // Lots of arbitrary values from testing.
             // Considering to use derivation from perfect accuracy in a probabilistic manner - assume normal distribution
-            double accValue = Math.Pow(150.0 / hitWindowGreat, 1.1) * Math.Pow(Score.Accuracy, 15) * 22.0;
+            double accValue = Math.Pow(150.0 / Attributes.GreatHitWindow, 1.1) * Math.Pow(Score.Accuracy, 15) * 22.0;
 
             // Bonus for many hitcircles - it's harder to keep good accuracy up for longer
             return accValue * Math.Min(1.15, Math.Pow(totalHits / 1500.0, 0.3));

@@ -1,10 +1,12 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using osu.Game.Rulesets.Objects.Types;
 using System;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
+using osu.Game.Rulesets.Judgements;
+using osu.Game.Rulesets.Taiko.Judgements;
 
 namespace osu.Game.Rulesets.Taiko.Objects
 {
@@ -54,12 +56,12 @@ namespace osu.Game.Rulesets.Taiko.Objects
 
         protected override void CreateNestedHitObjects()
         {
-            base.CreateNestedHitObjects();
-
             createTicks();
 
             RequiredGoodHits = NestedHitObjects.Count * Math.Min(0.15, 0.05 + 0.10 / 6 * overallDifficulty);
             RequiredGreatHits = NestedHitObjects.Count * Math.Min(0.30, 0.10 + 0.20 / 6 * overallDifficulty);
+
+            base.CreateNestedHitObjects();
         }
 
         private void createTicks()
@@ -68,6 +70,7 @@ namespace osu.Game.Rulesets.Taiko.Objects
                 return;
 
             bool first = true;
+
             for (double t = StartTime; t < EndTime + tickSpacing / 2; t += tickSpacing)
             {
                 AddNested(new DrumRollTick
@@ -81,5 +84,7 @@ namespace osu.Game.Rulesets.Taiko.Objects
                 first = false;
             }
         }
+
+        public override Judgement CreateJudgement() => new TaikoDrumRollJudgement();
     }
 }

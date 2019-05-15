@@ -10,6 +10,12 @@
 # User-specific files (MonoDevelop/Xamarin Studio)
 *.userprefs
 
+### Cake ###
+tools/**
+build/tools/**
+
+fastlane/report.xml
+
 # Build results
 bin/[Dd]ebug/
 [Dd]ebugPublic/
@@ -98,6 +104,7 @@ $tf/
 _ReSharper*/
 *.[Rr]e[Ss]harper
 *.DotSettings.user
+inspectcode
 
 # JustCode is a .NET coding add-in
 .JustCode
@@ -247,7 +254,11 @@ paket-files/
 .fake/
 
 # JetBrains Rider
-.idea/
+.idea/.idea.osu/.idea/*.xml
+.idea/.idea.osu/.idea/codeStyles/*.xml
+.idea/.idea.osu/.idea/dataSources/*.xml
+.idea/.idea.osu/.idea/dictionaries/*.xml
+.idea/.idea.osu/*.iml
 *.sln.iml
 
 # CodeRush
@@ -257,3 +268,5 @@ paket-files/
 __pycache__/
 *.pyc
 Staging/
+
+inspectcodereport.xml

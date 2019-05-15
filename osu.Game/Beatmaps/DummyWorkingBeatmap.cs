@@ -1,9 +1,10 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using System.Collections.Generic;
 using osu.Framework.Audio.Track;
+using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics.Textures;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Difficulty;
@@ -31,9 +32,6 @@ namespace osu.Game.Beatmaps
                     DrainRate = 0,
                     CircleSize = 0,
                     OverallDifficulty = 0,
-                    ApproachRate = 0,
-                    SliderMultiplier = 0,
-                    SliderTickRate = 0,
                 },
                 Ruleset = new DummyRulesetInfo()
             })
@@ -45,7 +43,7 @@ namespace osu.Game.Beatmaps
 
         protected override Texture GetBackground() => game?.Textures.Get(@"Backgrounds/bg4");
 
-        protected override Track GetTrack() => new TrackVirtual();
+        protected override Track GetTrack() => new TrackVirtual { Length = 1000 };
 
         private class DummyRulesetInfo : RulesetInfo
         {
@@ -55,7 +53,7 @@ namespace osu.Game.Beatmaps
             {
                 public override IEnumerable<Mod> GetModsFor(ModType type) => new Mod[] { };
 
-                public override RulesetContainer CreateRulesetContainerWith(WorkingBeatmap beatmap)
+                public override DrawableRuleset CreateDrawableRulesetWith(WorkingBeatmap beatmap, IReadOnlyList<Mod> mods)
                 {
                     throw new NotImplementedException();
                 }
@@ -76,9 +74,18 @@ namespace osu.Game.Beatmaps
                 private class DummyBeatmapConverter : IBeatmapConverter
                 {
                     public event Action<HitObject, IEnumerable<HitObject>> ObjectConverted;
+
                     public IBeatmap Beatmap { get; set; }
+
                     public bool CanConvert => true;
-                    public IBeatmap Convert() => Beatmap;
+
+                    public IBeatmap Convert()
+                    {
+                        foreach (var obj in Beatmap.HitObjects)
+                            ObjectConverted?.Invoke(obj, obj.Yield());
+
+                        return Beatmap;
+                    }
                 }
             }
         }

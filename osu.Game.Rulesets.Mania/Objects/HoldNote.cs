@@ -1,8 +1,10 @@
-// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
+using osu.Game.Rulesets.Judgements;
+using osu.Game.Rulesets.Mania.Judgements;
 using osu.Game.Rulesets.Objects.Types;
 
 namespace osu.Game.Rulesets.Mania.Objects
@@ -15,9 +17,10 @@ namespace osu.Game.Rulesets.Mania.Objects
         public double EndTime => StartTime + Duration;
 
         private double duration;
+
         public double Duration
         {
-            get { return duration; }
+            get => duration;
             set
             {
                 duration = value;
@@ -27,7 +30,7 @@ namespace osu.Game.Rulesets.Mania.Objects
 
         public override double StartTime
         {
-            get { return base.StartTime; }
+            get => base.StartTime;
             set
             {
                 base.StartTime = value;
@@ -38,7 +41,7 @@ namespace osu.Game.Rulesets.Mania.Objects
 
         public override int Column
         {
-            get { return base.Column; }
+            get => base.Column;
             set
             {
                 base.Column = value;
@@ -55,7 +58,7 @@ namespace osu.Game.Rulesets.Mania.Objects
         /// <summary>
         /// The tail note of the hold.
         /// </summary>
-        public readonly Note Tail = new Note();
+        public readonly TailNote Tail = new TailNote();
 
         /// <summary>
         /// The time between ticks of this hold.
@@ -68,9 +71,6 @@ namespace osu.Game.Rulesets.Mania.Objects
 
             TimingControlPoint timingPoint = controlPointInfo.TimingPointAt(StartTime);
             tickSpacing = timingPoint.BeatLength / difficulty.SliderTickRate;
-
-            Head.ApplyDefaults(controlPointInfo, difficulty);
-            Tail.ApplyDefaults(controlPointInfo, difficulty);
         }
 
         protected override void CreateNestedHitObjects()
@@ -78,6 +78,9 @@ namespace osu.Game.Rulesets.Mania.Objects
             base.CreateNestedHitObjects();
 
             createTicks();
+
+            AddNested(Head);
+            AddNested(Tail);
         }
 
         private void createTicks()
@@ -94,5 +97,7 @@ namespace osu.Game.Rulesets.Mania.Objects
                 });
             }
         }
+
+        public override Judgement CreateJudgement() => new HoldNoteJudgement();
     }
 }

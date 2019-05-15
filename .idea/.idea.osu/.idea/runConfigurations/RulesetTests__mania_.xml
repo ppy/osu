@@ -1,6 +1,6 @@
 <component name="ProjectRunConfigurationManager">
   <configuration default="false" name="RulesetTests (mania)" type="DotNetProject" factoryName=".NET Project">
-    <option name="EXE_PATH" value="$PROJECT_DIR$/osu.Game.Rulesets.Mania.Tests/bin/Debug/netcoreapp2.1/osu.Game.Rulesets.Mania.Tests.dll" />
+    <option name="EXE_PATH" value="$PROJECT_DIR$/osu.Game.Rulesets.Mania.Tests/bin/Debug/netcoreapp2.2/osu.Game.Rulesets.Mania.Tests.dll" />
     <option name="PROGRAM_PARAMETERS" value="" />
     <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/osu.Game.Rulesets.Mania.Tests" />
     <option name="PASS_PARENT_ENVS" value="1" />

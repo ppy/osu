@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using System.Collections.Generic;
@@ -12,7 +12,8 @@ using osu.Game.Tests.Beatmaps;
 
 namespace osu.Game.Rulesets.Taiko.Tests
 {
-    internal class TaikoBeatmapConversionTest : BeatmapConversionTest<ConvertValue>
+    [TestFixture]
+    public class TaikoBeatmapConversionTest : BeatmapConversionTest<ConvertValue>
     {
         protected override string ResourceAssembly => "osu.Game.Rulesets.Taiko";
 
@@ -41,7 +42,7 @@ namespace osu.Game.Rulesets.Taiko.Tests
         protected override Ruleset CreateRuleset() => new TaikoRuleset();
     }
 
-    internal struct ConvertValue : IEquatable<ConvertValue>
+    public struct ConvertValue : IEquatable<ConvertValue>
     {
         /// <summary>
         /// A sane value to account for osu!stable using ints everwhere.
