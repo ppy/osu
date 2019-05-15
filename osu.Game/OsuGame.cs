@@ -1,4 +1,4 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
@@ -437,7 +437,7 @@ namespace osu.Game
             loadComponentSingleFile(settings = new SettingsOverlay { GetToolbarHeight = () => ToolbarOffset }, leftFloatingOverlayContent.Add, true);
             loadComponentSingleFile(userProfile = new UserProfileOverlay(), overlayContent.Add, true);
             loadComponentSingleFile(beatmapSetOverlay = new BeatmapSetOverlay(), overlayContent.Add, true);
-            loadComponentSingleFile(new ChangelogOverlay(), overlayContent.Add, true);
+            var changelogOverlay = loadComponentSingleFile(new ChangelogOverlay(), overlayContent.Add, true);
 
             loadComponentSingleFile(new LoginOverlay
             {
@@ -479,7 +479,7 @@ namespace osu.Game
             }
 
             // eventually informational overlays should be displayed in a stack, but for now let's only allow one to stay open at a time.
-            var informationalOverlays = new OverlayContainer[] { beatmapSetOverlay, userProfile };
+            var informationalOverlays = new OverlayContainer[] { beatmapSetOverlay, userProfile, changelogOverlay };
             overlays.AddRange(informationalOverlays);
 
             foreach (var overlay in informationalOverlays)
