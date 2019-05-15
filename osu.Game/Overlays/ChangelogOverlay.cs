@@ -13,7 +13,6 @@ using osu.Game.Input.Bindings;
 using osu.Game.Online.API.Requests;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays.Changelog;
-using osuTK;
 using osuTK.Graphics;
 
 namespace osu.Game.Overlays
@@ -32,9 +31,6 @@ namespace osu.Game.Overlays
         private SampleChannel sampleBack;
 
         private float savedScrollPosition;
-
-        // receive input outside our bounds so we can trigger a close event on ourselves.
-        public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => true;
 
         [BackgroundDependencyLoader]
         private void load(AudioManager audio, OsuColour colour)
