@@ -157,28 +157,32 @@ namespace osu.Game.Overlays
         /// <see cref="APIChangelogBuild.DisplayVersion"/> are specified, the header will instantly display them.</param>
         public void ShowBuild(APIChangelogBuild build)
         {
-            var req = new GetChangelogBuildRequest(build.UpdateStream.Name, build.Version);
-
-            if (build.UpdateStream.DisplayName != null && build.DisplayVersion != null)
-                header.ShowBuild(build.UpdateStream.DisplayName, build.DisplayVersion);
-            else
-                req.Success += res => header.ShowBuild(res.UpdateStream.DisplayName, res.DisplayVersion);
-
+            header.ShowBuild(build.UpdateStream.DisplayName, build.DisplayVersion);
             badges.SelectUpdateStream(build.UpdateStream.Name);
 
-            req.Success += apiChangelog =>
+            listing.Hide();
+
+            void displayBuild(APIChangelogBuild populatedBuild)
             {
-                listing.Hide();
                 content.Show();
-                content.ShowBuild(apiChangelog);
+                content.ShowBuild(populatedBuild);
+
                 if (scroll.Current > scroll.GetChildPosInContent(content))
                     scroll.ScrollTo(content);
+
                 if (isAtListing)
                     savedScrollPosition = scroll.Current;
                 isAtListing = false;
-            };
+            }
 
-            API.Queue(req);
+            if (build.Versions != null)
+                displayBuild(build);
+            else
+            {
+                var req = new GetChangelogBuildRequest(build.UpdateStream.Name, build.Version);
+                req.Success += displayBuild;
+                API.Queue(req);
+            }
         }
     }
 }
