@@ -3,6 +3,7 @@
 
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osuTK.Graphics;
 
@@ -29,7 +30,7 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
                     new OsuSpriteText
                     {
                         Text = ((losers ? "Losers " : "") + grouping.Name).ToUpper(),
-                        Font = "Exo2.0-Bold",
+                        Font = OsuFont.GetFont(weight: FontWeight.Bold),
                         Colour = Color4.Black,
                         Origin = Anchor.TopCentre,
                         Anchor = Anchor.TopCentre

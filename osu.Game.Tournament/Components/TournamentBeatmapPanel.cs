@@ -86,7 +86,7 @@ namespace osu.Game.Tournament.Components
                             Text = new LocalisedString((
                                 $"{Beatmap.Metadata.ArtistUnicode} - {Beatmap.Metadata.TitleUnicode}",
                                 $"{Beatmap.Metadata.Artist} - {Beatmap.Metadata.Title}")),
-                            Font = @"Exo2.0-BoldItalic",
+                            Font = OsuFont.GetFont(weight: FontWeight.Bold, italics: true),
                         },
                         new FillFlowContainer
                         {

@@ -6,6 +6,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
+using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 
 namespace osu.Game.Tournament.Components
@@ -30,7 +31,7 @@ namespace osu.Game.Tournament.Components
             AcronymText = new OsuSpriteText
             {
                 Text = team?.Acronym?.ToUpperInvariant() ?? string.Empty,
-                Font = @"Exo2.0-Regular"
+                Font = OsuFont.GetFont(weight: FontWeight.Regular),
             };
         }
 
