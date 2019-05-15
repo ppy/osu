@@ -58,7 +58,7 @@ namespace osu.Game.Tests.Visual.Menus
             bool logoVisible = false;
 
             AddStep("begin loading", () => LoadScreen(loader = new TestLoader()));
-            AddWaitStep("wait", 2);
+            AddWaitStep("wait", 3);
             AddStep("finish loading", () =>
             {
                 logoVisible = loader.Logo?.Alpha > 0;
