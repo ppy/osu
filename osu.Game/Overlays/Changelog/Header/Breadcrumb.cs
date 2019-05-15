@@ -15,20 +15,19 @@ using osu.Game.Graphics;
 
 namespace osu.Game.Overlays.Changelog.Header
 {
-    public class TextBadgePair : Container
+    public abstract class Breadcrumb : Container
     {
         protected SpriteText Text;
         protected LineBadge LineBadge;
+
         public bool IsActivated { get; protected set; }
 
-        public delegate void ActivatedEventHandler(object source, EventArgs args);
-
-        public event ActivatedEventHandler Activated;
+        public Action Action;
 
         private SampleChannel sampleHover;
         private SampleChannel sampleActivate;
 
-        public TextBadgePair(ColourInfo badgeColour, string displayText = "Listing", bool startCollapsed = true)
+        protected Breadcrumb(ColourInfo badgeColour, string displayText = "Listing", bool startCollapsed = true)
         {
             AutoSizeAxes = Axes.X;
             RelativeSizeAxes = Axes.Y;
@@ -53,52 +52,29 @@ namespace osu.Game.Overlays.Changelog.Header
             };
         }
 
-        /// <param name="duration">
-        /// The duration of popping in and popping out not combined.
-        /// Full change takes double this time.</param>
-        /// <param name="displayText"></param>
-        /// <param name="easing"></param>
-        public void ChangeText(double duration = 0, string displayText = null, Easing easing = Easing.InOutCubic)
-        {
-            LineBadge.Collapse();
-            Text.MoveToY(20, duration, easing)
-                .FadeOut(duration, easing)
-                .Then()
-                .MoveToY(0, duration, easing)
-                .FadeIn(duration, easing);
-
-            // since using .finally/.oncomplete after first fadeout made the badge not hide
-            // sometimes in visual tests (https://streamable.com/0qssq), I'm using a scheduler here
-            Scheduler.AddDelayed(() =>
-            {
-                if (!string.IsNullOrEmpty(displayText))
-                    Text.Text = displayText;
-                LineBadge.Uncollapse();
-            }, duration);
-        }
-
         public virtual void Deactivate()
         {
+            if (!IsActivated)
+                return;
+
             IsActivated = false;
             LineBadge.Collapse();
-            Text.Font = "Exo2.0-Regular";
+            Text.Font = Text.Font.With(weight: FontWeight.Regular);
         }
 
         public virtual void Activate()
         {
+            if (IsActivated)
+                return;
+
             IsActivated = true;
             LineBadge.Uncollapse();
-            Text.Font = "Exo2.0-Bold";
+            Text.Font = Text.Font.With(weight: FontWeight.Bold);
         }
 
         public void SetTextColour(ColourInfo newColour, double duration = 0, Easing easing = Easing.None)
         {
             Text.FadeColour(newColour, duration, easing);
-        }
-
-        public void SetBadgeColour(ColourInfo newColour, double duration = 0, Easing easing = Easing.None)
-        {
-            LineBadge.FadeColour(newColour, duration, easing);
         }
 
         public void HideText(double duration = 0, Easing easing = Easing.InOutCubic)
@@ -110,11 +86,18 @@ namespace osu.Game.Overlays.Changelog.Header
 
         public void ShowText(double duration = 0, string displayText = null, Easing easing = Easing.InOutCubic)
         {
-            LineBadge.Uncollapse();
-            if (!string.IsNullOrEmpty(displayText))
-                Text.Text = displayText;
-            Text.MoveToY(0, duration, easing)
+            LineBadge.Collapse();
+            Text.MoveToY(20, duration, easing)
+                .FadeOut(duration, easing)
+                .Then()
+                .MoveToY(0, duration, easing)
                 .FadeIn(duration, easing);
+
+            Scheduler.AddDelayed(() =>
+            {
+                Text.Text = displayText;
+                LineBadge.Uncollapse();
+            }, duration);
         }
 
         protected override bool OnHover(HoverEvent e)
@@ -126,14 +109,11 @@ namespace osu.Game.Overlays.Changelog.Header
 
         protected override bool OnClick(ClickEvent e)
         {
-            OnActivated();
+            Action?.Invoke();
+            Activate();
             sampleActivate?.Play();
-            return base.OnClick(e);
-        }
 
-        protected virtual void OnActivated()
-        {
-            Activated?.Invoke(this, EventArgs.Empty);
+            return true;
         }
 
         [BackgroundDependencyLoader]

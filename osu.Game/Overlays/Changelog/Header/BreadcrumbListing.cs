@@ -4,31 +4,32 @@
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Input.Events;
+using osu.Game.Graphics;
 using osuTK.Graphics;
 
 namespace osu.Game.Overlays.Changelog.Header
 {
-    public class TextBadgePairListing : TextBadgePair
+    public class BreadcrumbListing : Breadcrumb
     {
         private readonly ColourInfo badgeColour;
 
-        public TextBadgePairListing(ColourInfo badgeColour)
+        public BreadcrumbListing(ColourInfo badgeColour)
             : base(badgeColour, "Listing", false)
         {
-            IsActivated = true;
             this.badgeColour = badgeColour;
-            Text.Font = "Exo2.0-Bold";
+            Text.Font = Text.Font.With(weight: FontWeight.Bold);
             Text.Anchor = Anchor.TopCentre;
             Text.Origin = Anchor.TopCentre;
 
-            // I'm using this for constant badge width here, so that the whole
-            // thing doesn't jump left/right when listing's size changes
-            // due to different font weight (and thus width)
-            LineBadge.RelativeSizeAxes = Axes.None;
+            AutoSizeAxes = Axes.None;
+        }
 
-            // this doesn't work without the scheduler
-            // (because the text isn't yet fully drawn when it's loaded?)
-            Text.OnLoadComplete += d => Scheduler.Add(UpdateBadgeWidth);
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            Activate();
+            Width = Text.DrawWidth;
         }
 
         public override void Activate()
@@ -36,24 +37,17 @@ namespace osu.Game.Overlays.Changelog.Header
             if (IsActivated)
                 return;
 
-            IsActivated = true;
-            LineBadge.Uncollapse();
-            Text.Font = "Exo2.0-Bold";
+            base.Activate();
             SetTextColour(Color4.White, 100);
         }
 
         public override void Deactivate()
         {
-            IsActivated = false;
-            LineBadge.Collapse();
-            Text.Font = "Exo2.0-Regular";
-            SetTextColour(badgeColour, 100);
-        }
+            if (!IsActivated)
+                return;
 
-        protected override bool OnClick(ClickEvent e)
-        {
-            Activate();
-            return base.OnClick(e);
+            base.Deactivate();
+            SetTextColour(badgeColour, 100);
         }
 
         protected override bool OnHover(HoverEvent e)
@@ -68,7 +62,5 @@ namespace osu.Game.Overlays.Changelog.Header
                 LineBadge.Collapse();
             base.OnHoverLost(e);
         }
-
-        public void UpdateBadgeWidth() => LineBadge.ResizeWidthTo(Text.DrawWidth);
     }
 }

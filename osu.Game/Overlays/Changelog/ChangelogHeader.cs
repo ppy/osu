@@ -9,7 +9,6 @@ using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Overlays.Changelog.Header;
-using System;
 using osu.Game.Graphics;
 using osuTK;
 using osuTK.Graphics;
@@ -19,9 +18,9 @@ namespace osu.Game.Overlays.Changelog
     public class ChangelogHeader : Container
     {
         private OsuSpriteText titleStream;
-        private TextBadgePairListing listing;
+        private BreadcrumbListing listing;
         private SpriteIcon chevron;
-        private TextBadgePairRelease releaseStream;
+        private BreadcrumbRelease releaseStream;
 
         public delegate void ListingSelectedEventHandler();
 
@@ -130,7 +129,10 @@ namespace osu.Game.Overlays.Changelog
                     Direction = FillDirection.Horizontal,
                     Children = new Drawable[]
                     {
-                        listing = new TextBadgePairListing(colours.Violet),
+                        listing = new BreadcrumbListing(colours.Violet)
+                        {
+                            Action = () => ListingSelected?.Invoke()
+                        },
                         new Container // without a container, moving the chevron wont work
                         {
                             Anchor = Anchor.CentreLeft,
@@ -156,7 +158,10 @@ namespace osu.Game.Overlays.Changelog
                                 },
                             },
                         },
-                        releaseStream = new TextBadgePairRelease(colours.Violet, "Lazer")
+                        releaseStream = new BreadcrumbRelease(colours.Violet, "Lazer")
+                        {
+                            Action = () => titleStream.FlashColour(Color4.White, 500, Easing.OutQuad)
+                        }
                     },
                 },
                 new Box
@@ -168,15 +173,12 @@ namespace osu.Game.Overlays.Changelog
                     Origin = Anchor.CentreLeft,
                 },
             };
-
-            listing.Activated += OnListingSelected;
-            releaseStream.Activated += OnReleaseSelected;
         }
 
         public void ShowBuild(string displayName, string displayVersion)
         {
             listing.Deactivate();
-            releaseStream.Activate($"{displayName} {displayVersion}");
+            releaseStream.ShowBuild($"{displayName} {displayVersion}");
             titleStream.Text = displayName;
             titleStream.FlashColour(Color4.White, 500, Easing.OutQuad);
             chevron.MoveToX(0, 100).FadeIn(100);
@@ -189,16 +191,6 @@ namespace osu.Game.Overlays.Changelog
             titleStream.Text = "Listing";
             titleStream.FlashColour(Color4.White, 500, Easing.OutQuad);
             chevron.MoveToX(-20, 100).FadeOut(100);
-        }
-
-        protected virtual void OnListingSelected(object source, EventArgs e)
-        {
-            ListingSelected?.Invoke();
-        }
-
-        protected virtual void OnReleaseSelected(object source, EventArgs e)
-        {
-            titleStream.FlashColour(Color4.White, 500, Easing.OutQuad);
         }
     }
 }
