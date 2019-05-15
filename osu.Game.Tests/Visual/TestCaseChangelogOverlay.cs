@@ -24,7 +24,7 @@ namespace osu.Game.Tests.Visual
 
             AddStep(@"Show with Lazer 2018.712.0", () =>
             {
-                changelog.FetchAndShowBuild(new APIChangelogBuild
+                changelog.ShowBuild(new APIChangelogBuild
                 {
                     Version = "2018.712.0",
                     UpdateStream = new APIUpdateStream { Name = "lazer" },

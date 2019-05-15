@@ -13,7 +13,6 @@ using osu.Game.Input.Bindings;
 using osu.Game.Online.API.Requests;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays.Changelog;
-using System;
 using osuTK;
 using osuTK.Graphics;
 
@@ -23,7 +22,7 @@ namespace osu.Game.Overlays
     {
         private ChangelogHeader header;
 
-        private BadgeDisplay badgeDisplay;
+        private BadgeDisplay badges;
 
         private ChangelogContent listing;
         private ChangelogContent content;
@@ -32,7 +31,6 @@ namespace osu.Game.Overlays
 
         private SampleChannel sampleBack;
 
-        private bool isAtListing;
         private float savedScrollPosition;
 
         // receive input outside our bounds so we can trigger a close event on ourselves.
@@ -66,7 +64,7 @@ namespace osu.Game.Overlays
                         Children = new Drawable[]
                         {
                             header = new ChangelogHeader(),
-                            badgeDisplay = new BadgeDisplay(),
+                            badges = new BadgeDisplay(),
                             listing = new ChangelogContent(),
                             content = new ChangelogContent()
                         },
@@ -75,9 +73,10 @@ namespace osu.Game.Overlays
             };
 
             header.ListingSelected += ShowListing;
-            badgeDisplay.Selected += onBuildSelected;
-            listing.BuildSelected += onBuildSelected;
-            content.BuildSelected += onBuildSelected;
+
+            badges.Selected += ShowBuild;
+            listing.BuildSelected += ShowBuild;
+            content.BuildSelected += ShowBuild;
 
             sampleBack = audio.Sample.Get(@"UI/generic-select-soft"); // @"UI/screen-back" feels non-fitting here
         }
@@ -127,38 +126,29 @@ namespace osu.Game.Overlays
             return false;
         }
 
-        private void onBuildSelected(APIChangelogBuild build, EventArgs e) => FetchAndShowBuild(build);
-
         private void fetchListing()
         {
             header.ShowListing();
 
-            if (isAtListing)
-                return;
-
-            isAtListing = true;
             var req = new GetChangelogRequest();
-            badgeDisplay.SelectNone();
             req.Success += res =>
             {
                 listing.ShowListing(res.Builds);
-                badgeDisplay.Populate(res.Streams);
+                badges.Populate(res.Streams);
             };
 
             API.Queue(req);
         }
 
+        private bool isAtListing;
+
         public void ShowListing()
         {
+            isAtListing = true;
             header.ShowListing();
 
-            if (isAtListing)
-                return;
-
-            isAtListing = true;
             content.Hide();
-            listing.Show();
-            badgeDisplay.SelectNone();
+            badges.SelectNone();
             listing.Show();
             scroll.ScrollTo(savedScrollPosition);
         }
@@ -169,9 +159,7 @@ namespace osu.Game.Overlays
         /// <param name="build">Must contain at least <see cref="APIUpdateStream.Name"/> and
         /// <see cref="APIChangelogBuild.Version"/>. If <see cref="APIUpdateStream.DisplayName"/> and
         /// <see cref="APIChangelogBuild.DisplayVersion"/> are specified, the header will instantly display them.</param>
-        /// <param name="updateBadges">Whether to update badges. Should be set to false in case
-        /// the function is called by selecting a badge, to avoid an infinite loop.</param>
-        public void FetchAndShowBuild(APIChangelogBuild build, bool updateBadges = true)
+        public void ShowBuild(APIChangelogBuild build)
         {
             var req = new GetChangelogBuildRequest(build.UpdateStream.Name, build.Version);
 
@@ -180,8 +168,7 @@ namespace osu.Game.Overlays
             else
                 req.Success += res => header.ShowBuild(res.UpdateStream.DisplayName, res.DisplayVersion);
 
-            if (updateBadges)
-                badgeDisplay.SelectUpdateStream(build.UpdateStream.Name);
+            badges.SelectUpdateStream(build.UpdateStream.Name);
 
             req.Success += apiChangelog =>
             {

@@ -23,9 +23,7 @@ namespace osu.Game.Overlays.Changelog
         private readonly SortedDictionary<string, List<APIChangelogEntry>> categories =
             new SortedDictionary<string, List<APIChangelogEntry>>();
 
-        public delegate void BuildSelectedEventHandler(APIChangelogBuild build, EventArgs args);
-
-        public event BuildSelectedEventHandler BuildSelected;
+        public event Action<APIChangelogBuild> BuildSelected;
 
         public readonly FillFlowContainer ChangelogEntries;
 
@@ -53,7 +51,7 @@ namespace osu.Game.Overlays.Changelog
                             Size = new Vector2(24),
                             Action = () =>
                             {
-                                OnBuildSelected(build.Versions.Previous);
+                                BuildSelected?.Invoke(build.Versions.Previous);
                                 chevronPrevious.IsEnabled = false;
                             },
                         },
@@ -88,7 +86,7 @@ namespace osu.Game.Overlays.Changelog
                             Size = new Vector2(24),
                             Action = () =>
                             {
-                                OnBuildSelected(build.Versions.Next);
+                                BuildSelected?.Invoke(build.Versions.Next);
                                 chevronNext.IsEnabled = false;
                             },
                         },
@@ -141,7 +139,7 @@ namespace osu.Game.Overlays.Changelog
                     Origin = Anchor.TopCentre,
                     AutoSizeAxes = Axes.Both,
                     Margin = new MarginPadding { Top = 20 },
-                    Action = () => OnBuildSelected(build),
+                    Action = () => BuildSelected?.Invoke(build),
                     Child = new FillFlowContainer
                     {
                         Direction = FillDirection.Horizontal,
@@ -179,7 +177,7 @@ namespace osu.Game.Overlays.Changelog
                 clickableBuildText.FadeTo(0.5f, 500);
                 Scheduler.AddDelayed(() =>
                 {
-                    clickableBuildText.Action = () => OnBuildSelected(build);
+                    clickableBuildText.Action = () => BuildSelected?.Invoke(build);
                     clickableBuildText.FadeIn(500);
                 }, 2000);
             };
@@ -198,11 +196,6 @@ namespace osu.Game.Overlays.Changelog
                 chevronNext.TooltipText = nextVersion;
                 chevronNext.IsEnabled = true;
             }
-        }
-
-        protected virtual void OnBuildSelected(APIChangelogBuild build)
-        {
-            BuildSelected?.Invoke(build, EventArgs.Empty);
         }
 
         public void GenerateText(List<APIChangelogEntry> changelogEntries)
