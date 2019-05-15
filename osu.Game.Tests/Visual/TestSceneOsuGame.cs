@@ -3,7 +3,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -23,6 +22,7 @@ using osu.Game.Online.API;
 using osu.Game.Online.Chat;
 using osu.Game.Overlays;
 using osu.Game.Rulesets;
+using osu.Game.Rulesets.Mods;
 using osu.Game.Scoring;
 using osu.Game.Screens.Menu;
 using osu.Game.Skinning;
@@ -43,8 +43,6 @@ namespace osu.Game.Tests.Visual
         {
             typeof(OsuGame),
             typeof(RavenLogger),
-            typeof(Bindable<RulesetInfo>),
-            typeof(IBindable<RulesetInfo>),
             typeof(OsuLogo),
             typeof(IdleTracker),
             typeof(OnScreenDisplay),
@@ -60,12 +58,17 @@ namespace osu.Game.Tests.Visual
             typeof(MusicController),
             typeof(AccountCreationOverlay),
             typeof(DialogOverlay),
+            typeof(ScreenshotManager)
         };
 
         private IReadOnlyList<Type> requiredGameBaseDependencies => new[]
         {
             typeof(OsuGameBase),
             typeof(DatabaseContextFactory),
+            typeof(Bindable<RulesetInfo>),
+            typeof(IBindable<RulesetInfo>),
+            typeof(Bindable<IReadOnlyList<Mod>>),
+            typeof(IBindable<IReadOnlyList<Mod>>),
             typeof(LargeTextureStore),
             typeof(OsuConfigManager),
             typeof(SkinManager),
@@ -86,7 +89,7 @@ namespace osu.Game.Tests.Visual
         };
 
         [BackgroundDependencyLoader]
-        private void load(GameHost host)
+        private void load(GameHost host, OsuGameBase gameBase)
         {
             OsuGame game = new OsuGame();
             game.SetHost(host);
@@ -103,8 +106,22 @@ namespace osu.Game.Tests.Visual
 
             AddUntilStep("wait for load", () => game.IsLoaded);
 
-            AddAssert("check OsuGame DI members", () => requiredGameDependencies.All(d => game.Dependencies.Get(d) != null));
-            AddAssert("check OsuGameBase DI members", () => requiredGameBaseDependencies.All(d => Dependencies.Get(d) != null));
+            AddAssert("check OsuGame DI members", () =>
+            {
+                foreach (var type in requiredGameDependencies)
+                    if (game.Dependencies.Get(type) == null)
+                        throw new Exception($"{type} has not been cached");
+
+                return true;
+            });
+            AddAssert("check OsuGameBase DI members", () =>
+            {
+                foreach (var type in requiredGameBaseDependencies)
+                    if (gameBase.Dependencies.Get(type) == null)
+                        throw new Exception($"{type} has not been cached");
+
+                return true;
+            });
         }
     }
 }
