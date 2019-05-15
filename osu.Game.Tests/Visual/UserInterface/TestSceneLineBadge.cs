@@ -7,11 +7,11 @@ using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics.UserInterface;
 using osuTK.Graphics;
 
-namespace osu.Game.Tests.Visual
+namespace osu.Game.Tests.Visual.UserInterface
 {
-    public class TestCaseLineBadge : OsuTestCase
+    public class TestSceneLineBadge : OsuTestScene
     {
-        public TestCaseLineBadge()
+        public TestSceneLineBadge()
         {
             Container container;
             LineBadge lineBadge;

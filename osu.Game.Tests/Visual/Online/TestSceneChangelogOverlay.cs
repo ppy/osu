@@ -5,10 +5,10 @@ using NUnit.Framework;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays;
 
-namespace osu.Game.Tests.Visual
+namespace osu.Game.Tests.Visual.Online
 {
     [TestFixture]
-    public class TestCaseChangelogOverlay : OsuTestCase
+    public class TestSceneChangelogOverlay : OsuTestScene
     {
         private ChangelogOverlay changelog;
 

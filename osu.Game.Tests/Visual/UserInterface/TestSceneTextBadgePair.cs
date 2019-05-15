@@ -8,11 +8,11 @@ using osu.Framework.Graphics.Shapes;
 using osu.Game.Overlays.Changelog.Header;
 using osuTK.Graphics;
 
-namespace osu.Game.Tests.Visual
+namespace osu.Game.Tests.Visual.UserInterface
 {
-    public class TestCaseTextBadgePair : OsuTestCase
+    public class TestSceneTextBadgePair : OsuTestScene
     {
-        public TestCaseTextBadgePair()
+        public TestSceneTextBadgePair()
         {
             Breadcrumb breadcrumb;
 
