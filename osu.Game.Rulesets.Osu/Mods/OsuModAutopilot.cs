@@ -34,10 +34,7 @@ namespace osu.Game.Rulesets.Osu.Mods
         public void Update(Playfield playfield)
         {
             // If we are on the last replay frame, no need to do anything
-            if (frameIndex == replayFrames.Count - 1)
-            {
-                return;
-            }
+            if (frameIndex == replayFrames.Count - 1) return;
 
             // Check if we are closer to the next replay frame then the current one
             if (Math.Abs(replayFrames[frameIndex].Time - playfield.Time.Current) >= Math.Abs(replayFrames[frameIndex + 1].Time - playfield.Time.Current))
