@@ -10,6 +10,7 @@ using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API.Requests.Responses;
 using System;
 using System.Collections.Generic;
+using System.Text.RegularExpressions;
 using osuTK;
 using osuTK.Graphics;
 
@@ -262,19 +263,23 @@ namespace osu.Game.Overlays.Changelog
 
                     ChangelogEntries.Add(title);
 
-                    TextFlowContainer messageContainer = new TextFlowContainer
+                    if (!string.IsNullOrEmpty(entry.MessageHtml))
                     {
-                        AutoSizeAxes = Axes.Y,
-                        RelativeSizeAxes = Axes.X,
-                    };
+                        TextFlowContainer messageContainer = new TextFlowContainer
+                        {
+                            AutoSizeAxes = Axes.Y,
+                            RelativeSizeAxes = Axes.X,
+                        };
 
-                    messageContainer.AddText($"{entry.MessageHtml?.Replace("<p>", "").Replace("</p>", "")}\n", t =>
-                    {
-                        t.Font = OsuFont.GetFont(size: 14); // web: 12,
-                        t.Colour = new Color4(235, 184, 254, 255);
-                    });
+                        // todo: use markdown parsing once API returns markdown
+                        messageContainer.AddText(Regex.Replace(entry.MessageHtml, @"<(.|\n)*?>", string.Empty), t =>
+                        {
+                            t.Font = OsuFont.GetFont(size: 14); // web: 12,
+                            t.Colour = new Color4(235, 184, 254, 255);
+                        });
 
-                    ChangelogEntries.Add(messageContainer);
+                        ChangelogEntries.Add(messageContainer);
+                    }
                 }
             }
         }
