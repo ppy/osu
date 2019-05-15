@@ -267,7 +267,7 @@ namespace osu.Game.Tests.Visual.Background
             AddUntilStep("Song select has selection", () => songSelect.Carousel.SelectedBeatmap != null);
             AddStep("Set default user settings", () =>
             {
-                Beatmap.Value.Mods.Value = Beatmap.Value.Mods.Value.Concat(new[] { new OsuModNoFail() });
+                Mods.Value = Mods.Value.Concat(new[] { new OsuModNoFail() }).ToArray();
                 songSelect.DimLevel.Value = 0.7f;
                 songSelect.BlurLevel.Value = 0.4f;
             });
@@ -328,7 +328,7 @@ namespace osu.Game.Tests.Visual.Background
             public bool IsBlurCorrect() => ((FadeAccessibleBackground)Background).CurrentBlur == new Vector2(BACKGROUND_BLUR);
         }
 
-        private class TestPlayer : Player
+        private class TestPlayer : Visual.TestPlayer
         {
             protected override BackgroundScreen CreateBackground() => new FadeAccessibleBackground(Beatmap.Value);
 

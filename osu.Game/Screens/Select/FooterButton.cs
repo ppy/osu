@@ -6,6 +6,7 @@ using osuTK;
 using osuTK.Graphics;
 using osuTK.Input;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Events;
@@ -20,11 +21,11 @@ namespace osu.Game.Screens.Select
 
         public string Text
         {
-            get => spriteText?.Text;
+            get => SpriteText?.Text;
             set
             {
-                if (spriteText != null)
-                    spriteText.Text = value;
+                if (SpriteText != null)
+                    SpriteText.Text = value;
             }
         }
 
@@ -53,7 +54,8 @@ namespace osu.Game.Screens.Select
             }
         }
 
-        private readonly SpriteText spriteText;
+        protected readonly Container TextContainer;
+        protected readonly SpriteText SpriteText;
         private readonly Box box;
         private readonly Box light;
 
@@ -61,8 +63,18 @@ namespace osu.Game.Screens.Select
 
         public FooterButton()
         {
+            AutoSizeAxes = Axes.Both;
             Children = new Drawable[]
             {
+                TextContainer = new Container
+                {
+                    Size = new Vector2(100, 50),
+                    Child = SpriteText = new OsuSpriteText
+                    {
+                        Anchor = Anchor.Centre,
+                        Origin = Anchor.Centre,
+                    }
+                },
                 box = new Box
                 {
                     RelativeSizeAxes = Axes.Both,
@@ -78,11 +90,6 @@ namespace osu.Game.Screens.Select
                     EdgeSmoothness = new Vector2(2, 0),
                     RelativeSizeAxes = Axes.X,
                 },
-                spriteText = new OsuSpriteText
-                {
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
-                }
             };
         }
 

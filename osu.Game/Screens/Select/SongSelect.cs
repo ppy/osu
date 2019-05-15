@@ -39,6 +39,7 @@ namespace osu.Game.Screens.Select
     public abstract class SongSelect : OsuScreen
     {
         private static readonly Vector2 wedged_container_size = new Vector2(0.5f, 245);
+
         protected const float BACKGROUND_BLUR = 20;
         private const float left_area_padding = 20;
 
@@ -84,13 +85,11 @@ namespace osu.Game.Screens.Select
         private readonly Bindable<RulesetInfo> decoupledRuleset = new Bindable<RulesetInfo>();
 
         [Cached]
-        [Cached(Type = typeof(IBindable<IEnumerable<Mod>>))]
-        protected readonly Bindable<IEnumerable<Mod>> SelectedMods = new Bindable<IEnumerable<Mod>>(new Mod[] { });
+        [Cached(Type = typeof(IBindable<IReadOnlyList<Mod>>))]
+        private readonly Bindable<IReadOnlyList<Mod>> mods = new Bindable<IReadOnlyList<Mod>>(Array.Empty<Mod>()); // Bound to the game's mods, but is not reset on exiting
 
         protected SongSelect()
         {
-            const float carousel_width = 640;
-
             AddRangeInternal(new Drawable[]
             {
                 new ParallaxContainer
@@ -103,7 +102,8 @@ namespace osu.Game.Screens.Select
                         new WedgeBackground
                         {
                             RelativeSizeAxes = Axes.Both,
-                            Padding = new MarginPadding { Right = carousel_width * 0.76f },
+                            Padding = new MarginPadding { Right = -150 },
+                            Size = new Vector2(wedged_container_size.X, 1),
                         }
                     }
                 },
@@ -144,8 +144,8 @@ namespace osu.Game.Screens.Select
                             Carousel = new BeatmapCarousel
                             {
                                 Masking = false,
-                                RelativeSizeAxes = Axes.Y,
-                                Size = new Vector2(carousel_width, 1),
+                                RelativeSizeAxes = Axes.Both,
+                                Size = new Vector2(1 - wedged_container_size.X, 1),
                                 Anchor = Anchor.CentreRight,
                                 Origin = Anchor.CentreRight,
                                 SelectionChanged = updateSelectedBeatmap,
@@ -217,16 +217,15 @@ namespace osu.Game.Screens.Select
         }
 
         [BackgroundDependencyLoader(true)]
-        private void load(BeatmapManager beatmaps, AudioManager audio, DialogOverlay dialog, OsuColour colours, SkinManager skins, Bindable<IEnumerable<Mod>> selectedMods)
+        private void load(BeatmapManager beatmaps, AudioManager audio, DialogOverlay dialog, OsuColour colours, SkinManager skins)
         {
-            if (selectedMods != null)
-                SelectedMods.BindTo(selectedMods);
+            mods.BindTo(Mods);
 
             if (Footer != null)
             {
-                Footer.AddButton(@"mods", colours.Yellow, ModSelect, Key.F1);
-                Footer.AddButton(@"random", colours.Green, triggerRandom, Key.F2);
-                Footer.AddButton(@"options", colours.Blue, BeatmapOptions, Key.F3);
+                Footer.AddButton(new FooterButtonMods(mods), ModSelect);
+                Footer.AddButton(new FooterButtonRandom { Action = triggerRandom });
+                Footer.AddButton(new FooterButtonOptions(), BeatmapOptions);
 
                 BeatmapOptions.AddButton(@"Delete", @"all difficulties", FontAwesome.Solid.Trash, colours.Pink, () => delete(Beatmap.Value.BeatmapSetInfo), Key.Number4, float.MaxValue);
                 BeatmapOptions.AddButton(@"Remove", @"from unplayed", FontAwesome.Regular.TimesCircle, colours.Purple, null, Key.Number1);
@@ -269,6 +268,7 @@ namespace osu.Game.Screens.Select
         protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
         {
             dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
+
             dependencies.CacheAs(this);
             dependencies.CacheAs(decoupledRuleset);
             dependencies.CacheAs<IBindable<RulesetInfo>>(decoupledRuleset);
@@ -388,13 +388,11 @@ namespace osu.Game.Screens.Select
             {
                 Logger.Log($"updating selection with beatmap:{beatmap?.ID.ToString() ?? "null"} ruleset:{ruleset?.ID.ToString() ?? "null"}");
 
-                bool preview = false;
-
                 if (ruleset?.Equals(decoupledRuleset.Value) == false)
                 {
                     Logger.Log($"ruleset changed from \"{decoupledRuleset.Value}\" to \"{ruleset}\"");
 
-                    Beatmap.Value.Mods.Value = Enumerable.Empty<Mod>();
+                    mods.Value = Array.Empty<Mod>();
                     decoupledRuleset.Value = ruleset;
 
                     // force a filter before attempting to change the beatmap.
@@ -507,6 +505,8 @@ namespace osu.Game.Screens.Select
         {
             ModSelect.Hide();
 
+            BeatmapOptions.Hide();
+
             this.ScaleTo(1.1f, 250, Easing.InSine);
 
             this.FadeOut(250);
@@ -529,8 +529,8 @@ namespace osu.Game.Screens.Select
             if (Beatmap.Value.Track != null)
                 Beatmap.Value.Track.Looping = false;
 
-            SelectedMods.UnbindAll();
-            Beatmap.Value.Mods.Value = new Mod[] { };
+            mods.UnbindAll();
+            Mods.Value = Array.Empty<Mod>();
 
             return false;
         }
@@ -557,8 +557,6 @@ namespace osu.Game.Screens.Select
         /// <param name="beatmap">The working beatmap.</param>
         protected virtual void UpdateBeatmap(WorkingBeatmap beatmap)
         {
-            beatmap.Mods.BindTo(SelectedMods);
-
             Logger.Log($"working beatmap updated to {beatmap}");
 
             if (Background is BackgroundScreenBeatmap backgroundModeBeatmap)

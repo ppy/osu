@@ -117,6 +117,7 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
                 if (editorInfo.Selected.Value != null)
                 {
                     editorInfo.Selected.Value.Grouping.Value = grouping.NewValue;
+
                     if (editorInfo.Selected.Value.Date.Value < grouping.NewValue.StartDate.Value)
                     {
                         editorInfo.Selected.Value.Date.Value = grouping.NewValue.StartDate.Value;

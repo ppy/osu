@@ -95,6 +95,7 @@ namespace osu.Game.Tournament.Screens.Gameplay.Components
                         if (currentTeamScore.Value < currentMatch.Value.PointsToWin)
                             currentTeamScore.Value++;
                         return true;
+
                     case MouseButton.Right:
                         if (currentTeamScore.Value > 0)
                             currentTeamScore.Value--;

@@ -8,5 +8,7 @@ namespace osu.Game.Online.API.Requests.Responses
     public class APIMod : IMod
     {
         public string Acronym { get; set; }
+
+        public bool Equals(IMod other) => Acronym == other?.Acronym;
     }
 }

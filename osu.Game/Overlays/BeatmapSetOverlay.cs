@@ -4,7 +4,6 @@
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
-using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -12,17 +11,15 @@ using osu.Framework.Input.Events;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
-using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Game.Overlays.BeatmapSet;
 using osu.Game.Overlays.BeatmapSet.Scores;
 using osu.Game.Rulesets;
 using osuTK;
-using osuTK.Graphics;
 
 namespace osu.Game.Overlays
 {
-    public class BeatmapSetOverlay : WaveOverlayContainer
+    public class BeatmapSetOverlay : FullscreenOverlay
     {
         private const int fade_duration = 300;
 
@@ -31,7 +28,6 @@ namespace osu.Game.Overlays
 
         private readonly Header header;
 
-        private IAPIProvider api;
         private RulesetStore rulesets;
 
         private readonly ScrollContainer scroll;
@@ -45,24 +41,6 @@ namespace osu.Game.Overlays
         {
             Info info;
             ScoresContainer scores;
-            Waves.FirstWaveColour = OsuColour.Gray(0.4f);
-            Waves.SecondWaveColour = OsuColour.Gray(0.3f);
-            Waves.ThirdWaveColour = OsuColour.Gray(0.2f);
-            Waves.FourthWaveColour = OsuColour.Gray(0.1f);
-
-            Anchor = Anchor.TopCentre;
-            Origin = Anchor.TopCentre;
-            RelativeSizeAxes = Axes.Both;
-            Width = 0.85f;
-
-            Masking = true;
-            EdgeEffect = new EdgeEffectParameters
-            {
-                Colour = Color4.Black.Opacity(0),
-                Type = EdgeEffectType.Shadow,
-                Radius = 3,
-                Offset = new Vector2(0f, 1f),
-            };
 
             Children = new Drawable[]
             {
@@ -101,22 +79,15 @@ namespace osu.Game.Overlays
         }
 
         [BackgroundDependencyLoader]
-        private void load(IAPIProvider api, RulesetStore rulesets)
+        private void load(RulesetStore rulesets)
         {
-            this.api = api;
             this.rulesets = rulesets;
         }
 
-        protected override void PopIn()
+        protected override void PopOutComplete()
         {
-            base.PopIn();
-            FadeEdgeEffectTo(0.25f, WaveContainer.APPEAR_DURATION, Easing.In);
-        }
-
-        protected override void PopOut()
-        {
-            base.PopOut();
-            FadeEdgeEffectTo(0, WaveContainer.DISAPPEAR_DURATION, Easing.Out).OnComplete(_ => beatmapSet.Value = null);
+            base.PopOutComplete();
+            beatmapSet.Value = null;
         }
 
         protected override bool OnClick(ClickEvent e)
@@ -134,7 +105,7 @@ namespace osu.Game.Overlays
                 beatmapSet.Value = res.ToBeatmapSet(rulesets);
                 header.Picker.Beatmap.Value = header.BeatmapSet.Value.Beatmaps.First(b => b.OnlineBeatmapID == beatmapId);
             };
-            api.Queue(req);
+            API.Queue(req);
             Show();
         }
 
@@ -143,7 +114,7 @@ namespace osu.Game.Overlays
             beatmapSet.Value = null;
             var req = new GetBeatmapSetRequest(beatmapSetId);
             req.Success += res => beatmapSet.Value = res.ToBeatmapSet(rulesets);
-            api.Queue(req);
+            API.Queue(req);
             Show();
         }
 

@@ -22,9 +22,11 @@ using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Cursor;
+using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Localisation;
 using osu.Game.Rulesets;
+using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.UI;
 
 namespace osu.Game.Screens.Select
@@ -309,12 +311,12 @@ namespace osu.Game.Screens.Select
                     try
                     {
                         // Try to get the beatmap with the user's ruleset
-                        playableBeatmap = beatmap.GetPlayableBeatmap(ruleset);
+                        playableBeatmap = beatmap.GetPlayableBeatmap(ruleset, Array.Empty<Mod>());
                     }
                     catch (BeatmapInvalidForRulesetException)
                     {
                         // Can't be converted to the user's ruleset, so use the beatmap's own ruleset
-                        playableBeatmap = beatmap.GetPlayableBeatmap(beatmap.BeatmapInfo.Ruleset);
+                        playableBeatmap = beatmap.GetPlayableBeatmap(beatmap.BeatmapInfo.Ruleset, Array.Empty<Mod>());
                     }
 
                     labels.AddRange(playableBeatmap.GetStatistics().Select(s => new InfoLabel(s)));

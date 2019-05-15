@@ -9,6 +9,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
@@ -17,6 +18,7 @@ using osu.Framework.Logging;
 using osu.Framework.Platform;
 using osu.Framework.Threading;
 using osu.Game.Graphics;
+using osu.Game.Graphics.Containers;
 using osu.Game.Input;
 using osu.Game.Input.Bindings;
 using osu.Game.Online.API;
@@ -47,6 +49,10 @@ namespace osu.Game.Screens.Menu
 
         private OsuLogo logo;
 
+        /// <summary>
+        /// Assign the <see cref="OsuLogo"/> that this ButtonSystem should manage the position of.
+        /// </summary>
+        /// <param name="logo">The instance of the logo to be assigned. If null, we are suspending from the screen that uses this ButtonSystem.</param>
         public void SetOsuLogo(OsuLogo logo)
         {
             this.logo = logo;
@@ -60,9 +66,13 @@ namespace osu.Game.Screens.Menu
 
                 updateLogoState();
             }
+            else
+            {
+                // We should stop tracking as the facade is now out of scope.
+                logoTrackingContainer.StopTracking();
+            }
         }
 
-        private readonly Drawable iconFacade;
         private readonly ButtonArea buttonArea;
 
         private readonly Button backButton;
@@ -72,26 +82,29 @@ namespace osu.Game.Screens.Menu
 
         private SampleChannel sampleBack;
 
+        private readonly LogoTrackingContainer logoTrackingContainer;
+
         public ButtonSystem()
         {
             RelativeSizeAxes = Axes.Both;
 
-            Child = buttonArea = new ButtonArea();
+            Child = logoTrackingContainer = new LogoTrackingContainer
+            {
+                RelativeSizeAxes = Axes.Both,
+                Child = buttonArea = new ButtonArea()
+            };
 
-            buttonArea.AddRange(new[]
+            buttonArea.AddRange(new Drawable[]
             {
                 new Button(@"settings", string.Empty, FontAwesome.Solid.Cog, new Color4(85, 85, 85, 255), () => OnSettings?.Invoke(), -WEDGE_WIDTH, Key.O),
                 backButton = new Button(@"back", @"button-back-select", OsuIcon.LeftCircle, new Color4(51, 58, 94, 255), () => State = ButtonSystemState.TopLevel, -WEDGE_WIDTH)
                 {
                     VisibleState = ButtonSystemState.Play,
                 },
-                iconFacade = new Container //need a container to make the osu! icon flow properly.
-                {
-                    Size = new Vector2(0, ButtonArea.BUTTON_AREA_HEIGHT)
-                }
+                logoTrackingContainer.LogoFacade.With(d => d.Scale = new Vector2(0.74f))
             });
 
-            buttonArea.Flow.CentreTarget = iconFacade;
+            buttonArea.Flow.CentreTarget = logoTrackingContainer.LogoFacade;
         }
 
         [Resolved(CanBeNull = true)]
@@ -102,6 +115,9 @@ namespace osu.Game.Screens.Menu
 
         [Resolved(CanBeNull = true)]
         private NotificationOverlay notifications { get; set; }
+
+        [Resolved(CanBeNull = true)]
+        private LoginOverlay loginOverlay { get; set; }
 
         [BackgroundDependencyLoader(true)]
         private void load(AudioManager audio, IdleTracker idleTracker, GameHost host)
@@ -121,6 +137,15 @@ namespace osu.Game.Screens.Menu
             buttonArea.AddRange(buttonsPlay);
             buttonArea.AddRange(buttonsTopLevel);
 
+            buttonArea.ForEach(b =>
+            {
+                if (b is Button)
+                {
+                    b.Origin = Anchor.CentreLeft;
+                    b.Anchor = Anchor.CentreLeft;
+                }
+            });
+
             isIdle.ValueChanged += idle => updateIdleState(idle.NewValue);
 
             if (idleTracker != null) isIdle.BindTo(idleTracker.IsIdle);
@@ -135,7 +160,12 @@ namespace osu.Game.Screens.Menu
                 notifications?.Post(new SimpleNotification
                 {
                     Text = "You gotta be logged in to multi 'yo!",
-                    Icon = FontAwesome.Solid.Globe
+                    Icon = FontAwesome.Solid.Globe,
+                    Activated = () =>
+                    {
+                        loginOverlay?.Show();
+                        return true;
+                    }
                 });
 
                 return;
@@ -156,9 +186,11 @@ namespace osu.Game.Screens.Menu
             {
                 case GlobalAction.Back:
                     return goBack();
+
                 case GlobalAction.Select:
                     logo?.Click();
                     return true;
+
                 default:
                     return false;
             }
@@ -174,9 +206,11 @@ namespace osu.Game.Screens.Menu
                     State = ButtonSystemState.Initial;
                     sampleBack?.Play();
                     return true;
+
                 case ButtonSystemState.Play:
                     backButton.Click();
                     return true;
+
                 default:
                     return false;
             }
@@ -188,12 +222,15 @@ namespace osu.Game.Screens.Menu
             {
                 default:
                     return true;
+
                 case ButtonSystemState.Initial:
                     State = ButtonSystemState.TopLevel;
                     return true;
+
                 case ButtonSystemState.TopLevel:
                     buttonsTopLevel.First().Click();
                     return false;
+
                 case ButtonSystemState.Play:
                     buttonsPlay.First().Click();
                     return false;
@@ -248,74 +285,55 @@ namespace osu.Game.Screens.Menu
                     logoDelayedAction?.Cancel();
                     logoDelayedAction = Scheduler.AddDelayed(() =>
                         {
-                            logoTracking = false;
+                            logoTrackingContainer.StopTracking();
 
                             game?.Toolbar.Hide();
 
                             logo.ClearTransforms(targetMember: nameof(Position));
-                            logo.RelativePositionAxes = Axes.Both;
-
                             logo.MoveTo(new Vector2(0.5f), 800, Easing.OutExpo);
                             logo.ScaleTo(1, 800, Easing.OutExpo);
                         }, buttonArea.Alpha * 150);
                     break;
+
                 case ButtonSystemState.TopLevel:
                 case ButtonSystemState.Play:
                     switch (lastState)
                     {
                         case ButtonSystemState.TopLevel: // coming from toplevel to play
                             break;
+
                         case ButtonSystemState.Initial:
                             logo.ClearTransforms(targetMember: nameof(Position));
-                            logo.RelativePositionAxes = Axes.None;
 
                             bool impact = logo.Scale.X > 0.6f;
 
                             if (lastState == ButtonSystemState.Initial)
                                 logo.ScaleTo(0.5f, 200, Easing.In);
 
-                            logo.MoveTo(logoTrackingPosition, lastState == ButtonSystemState.EnteringMode ? 0 : 200, Easing.In);
+                            logoTrackingContainer.StartTracking(logo, lastState == ButtonSystemState.EnteringMode ? 0 : 200, Easing.In);
 
                             logoDelayedAction?.Cancel();
                             logoDelayedAction = Scheduler.AddDelayed(() =>
                             {
-                                logoTracking = true;
-
                                 if (impact)
                                     logo.Impact();
 
                                 game?.Toolbar.Show();
                             }, 200);
                             break;
+
                         default:
                             logo.ClearTransforms(targetMember: nameof(Position));
-                            logo.RelativePositionAxes = Axes.None;
-                            logoTracking = true;
+                            logoTrackingContainer.StartTracking(logo, 0, Easing.In);
                             logo.ScaleTo(0.5f, 200, Easing.OutQuint);
                             break;
                     }
 
                     break;
+
                 case ButtonSystemState.EnteringMode:
-                    logoTracking = true;
+                    logoTrackingContainer.StartTracking(logo, 0, Easing.In);
                     break;
-            }
-        }
-
-        private Vector2 logoTrackingPosition => logo.Parent.ToLocalSpace(iconFacade.ScreenSpaceDrawQuad.Centre);
-
-        private bool logoTracking;
-
-        protected override void Update()
-        {
-            base.Update();
-
-            if (logo != null)
-            {
-                if (logoTracking && logo.RelativePositionAxes == Axes.None && iconFacade.IsLoaded)
-                    logo.Position = logoTrackingPosition;
-
-                iconFacade.Width = logo.SizeForFlow * 0.5f;
             }
         }
     }

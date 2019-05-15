@@ -148,6 +148,7 @@ namespace osu.Game.Tournament.Screens.MapPool
                 else
                 {
                     var existing = currentMatch.Value.PicksBans.FirstOrDefault(p => p.BeatmapID == map.Beatmap.OnlineBeatmapID);
+
                     if (existing != null)
                     {
                         currentMatch.Value.PicksBans.Remove(existing);

@@ -124,6 +124,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             }
 
             var result = HitObject.HitWindows.ResultFor(timeOffset);
+
             if (result == HitResult.None)
             {
                 Shake(Math.Abs(timeOffset) - HitObject.HitWindows.HalfWindowFor(HitResult.Miss));
@@ -158,11 +159,13 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                     // override lifetime end as FadeIn may have been changed externally, causing out expiration to be too early.
                     LifetimeEnd = HitObject.StartTime + HitObject.HitWindows.HalfWindowFor(HitResult.Miss);
                     break;
+
                 case ArmedState.Miss:
                     ApproachCircle.FadeOut(50);
                     this.FadeOut(100);
                     Expire();
                     break;
+
                 case ArmedState.Hit:
                     ApproachCircle.FadeOut(50);
 

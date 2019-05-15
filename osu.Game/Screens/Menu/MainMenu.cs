@@ -11,6 +11,7 @@ using osu.Framework.Screens;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
+using osu.Game.Overlays;
 using osu.Game.Screens.Backgrounds;
 using osu.Game.Screens.Charts;
 using osu.Game.Screens.Direct;
@@ -42,7 +43,7 @@ namespace osu.Game.Screens.Menu
         protected override BackgroundScreen CreateBackground() => background;
 
         [BackgroundDependencyLoader(true)]
-        private void load(OsuGame game = null)
+        private void load(DirectOverlay direct, SettingsOverlay settings)
         {
             if (host.CanExit)
                 AddInternal(new ExitConfirmOverlay { Action = this.Exit });
@@ -76,17 +77,15 @@ namespace osu.Game.Screens.Menu
                     case ButtonSystemState.Exit:
                         Background.FadeColour(Color4.White, 500, Easing.OutSine);
                         break;
+
                     default:
                         Background.FadeColour(OsuColour.Gray(0.8f), 500, Easing.OutSine);
                         break;
                 }
             };
 
-            if (game != null)
-            {
-                buttons.OnSettings = game.ToggleSettings;
-                buttons.OnDirect = game.ToggleDirect;
-            }
+            buttons.OnSettings = () => settings?.ToggleVisibility();
+            buttons.OnDirect = () => direct?.ToggleVisibility();
 
             LoadComponentAsync(background = new BackgroundScreenDefault());
             preloadSongSelect();
