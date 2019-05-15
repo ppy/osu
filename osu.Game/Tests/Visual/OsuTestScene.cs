@@ -85,7 +85,7 @@ namespace osu.Game.Tests.Visual
             protected override void LoadAsyncComplete()
             {
                 // this has to be run here rather than LoadComplete because
-                // TestCase.cs is checking the IsLoaded state (on another thread) and expects
+                // TestScene.cs is checking the IsLoaded state (on another thread) and expects
                 // the runner to be loaded at that point.
                 Add(runner = new TestSceneTestRunner.TestRunner());
             }
