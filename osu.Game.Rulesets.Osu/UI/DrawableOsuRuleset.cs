@@ -65,8 +65,8 @@ namespace osu.Game.Rulesets.Osu.UI
             {
                 if (Objects.FirstOrDefault() is OsuHitObject first)
                     return first.StartTime - Math.Max(2000, first.TimePreempt);
-                else
-                    return 0;
+
+                return 0;
             }
         }
     }
