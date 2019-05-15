@@ -183,7 +183,7 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
 
             background.FadeColour(winner ? colourWinner : colourNormal, winner ? 500 : 0, Easing.OutQuint);
 
-            scoreText.Font = AcronymText.Font = winner ? "Exo2.0-Bold" : "Exo2.0-Regular";
+            scoreText.Font = AcronymText.Font = OsuFont.GetFont(weight: winner ? FontWeight.Bold : FontWeight.Regular);
         }
 
         public MenuItem[] ContextMenuItems
