@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Graphics.Colour;
+using osu.Game.Graphics;
 
 namespace osu.Game.Overlays.Changelog.Header
 {
@@ -12,7 +13,7 @@ namespace osu.Game.Overlays.Changelog.Header
         public BreadcrumbRelease(ColourInfo badgeColour, string displayText)
             : base(badgeColour, displayText)
         {
-            Text.Font = "Exo2.0-Bold";
+            Text.Font = Text.Font.With(weight: FontWeight.Bold);
             Text.Y = 20;
             Text.Alpha = 0;
         }
