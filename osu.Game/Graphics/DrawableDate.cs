@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using Humanizer;
@@ -12,14 +12,27 @@ namespace osu.Game.Graphics
 {
     public class DrawableDate : OsuSpriteText, IHasTooltip
     {
-        private readonly DateTimeOffset date;
+        private DateTimeOffset date;
+
+        public DateTimeOffset Date
+        {
+            get => date;
+            set
+            {
+                if (date == value)
+                    return;
+
+                date = value.ToLocalTime();
+
+                if (LoadState >= LoadState.Ready)
+                    updateTime();
+            }
+        }
 
         public DrawableDate(DateTimeOffset date)
         {
-            AutoSizeAxes = Axes.Both;
-            Font = "Exo2.0-RegularItalic";
-
-            this.date = date.ToLocalTime();
+            Font = OsuFont.GetFont(weight: FontWeight.Regular, italics: true);
+            Date = date;
         }
 
         [BackgroundDependencyLoader]
@@ -38,17 +51,19 @@ namespace osu.Game.Graphics
         {
             updateTime();
 
-            var diffToNow = DateTimeOffset.Now.Subtract(date);
+            var diffToNow = DateTimeOffset.Now.Subtract(Date);
 
             double timeUntilNextUpdate = 1000;
-            if (diffToNow.TotalSeconds > 60)
+
+            if (Math.Abs(diffToNow.TotalSeconds) > 120)
             {
                 timeUntilNextUpdate *= 60;
-                if (diffToNow.TotalMinutes > 60)
+
+                if (Math.Abs(diffToNow.TotalMinutes) > 120)
                 {
                     timeUntilNextUpdate *= 60;
 
-                    if (diffToNow.TotalHours > 24)
+                    if (Math.Abs(diffToNow.TotalHours) > 48)
                         timeUntilNextUpdate *= 24;
                 }
             }
@@ -56,10 +71,10 @@ namespace osu.Game.Graphics
             Scheduler.AddDelayed(updateTimeWithReschedule, timeUntilNextUpdate);
         }
 
-        public override bool HandleMouseInput => true;
+        protected virtual string Format() => Date.Humanize();
 
-        private void updateTime() => Text = date.Humanize();
+        private void updateTime() => Text = Format();
 
-        public string TooltipText => date.ToString();
+        public virtual string TooltipText => string.Format($"{Date:MMMM d, yyyy h:mm tt \"UTC\"z}");
     }
 }

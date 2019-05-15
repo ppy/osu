@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using System.Linq;
@@ -13,20 +13,18 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawable
     {
         private readonly Container dropletContainer;
 
-        public DrawableJuiceStream(JuiceStream s, Func<CatchHitObject, DrawableHitObject<CatchHitObject>> getVisualRepresentation = null)
+        public DrawableJuiceStream(JuiceStream s, Func<CatchHitObject, DrawableHitObject<CatchHitObject>> createDrawableRepresentation = null)
             : base(s)
         {
             RelativeSizeAxes = Axes.Both;
             Origin = Anchor.BottomLeft;
             X = 0;
 
-            InternalChild = dropletContainer = new Container { RelativeSizeAxes = Axes.Both, };
+            AddInternal(dropletContainer = new Container { RelativeSizeAxes = Axes.Both, });
 
             foreach (var o in s.NestedHitObjects.Cast<CatchHitObject>())
-                AddNested(getVisualRepresentation?.Invoke(o));
+                AddNested(createDrawableRepresentation?.Invoke(o));
         }
-
-        protected override bool ProvidesJudgement => false;
 
         protected override void AddNested(DrawableHitObject h)
         {

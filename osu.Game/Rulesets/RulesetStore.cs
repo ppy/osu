@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using System.Collections.Generic;
@@ -22,7 +22,8 @@ namespace osu.Game.Rulesets
         {
             AppDomain.CurrentDomain.AssemblyResolve += currentDomain_AssemblyResolve;
 
-            foreach (string file in Directory.GetFiles(Environment.CurrentDirectory, $"{ruleset_library_prefix}.*.dll"))
+            foreach (string file in Directory.GetFiles(Environment.CurrentDirectory, $"{ruleset_library_prefix}.*.dll")
+                                             .Where(f => !Path.GetFileName(f).Contains("Tests")))
                 loadRulesetFromFile(file);
         }
 
@@ -84,10 +85,17 @@ namespace osu.Game.Rulesets
                 {
                     try
                     {
-                        var instance = r.CreateInstance();
+                        var instanceInfo = ((Ruleset)Activator.CreateInstance(Type.GetType(r.InstantiationInfo, asm =>
+                        {
+                            // for the time being, let's ignore the version being loaded.
+                            // this allows for debug builds to successfully load rulesets (even though debug rulesets have a 0.0.0 version).
+                            asm.Version = null;
+                            return Assembly.Load(asm);
+                        }, null), (RulesetInfo)null)).RulesetInfo;
 
-                        r.Name = instance.Description;
-                        r.ShortName = instance.ShortName;
+                        r.Name = instanceInfo.Name;
+                        r.ShortName = instanceInfo.ShortName;
+                        r.InstantiationInfo = instanceInfo.InstantiationInfo;
 
                         r.Available = true;
                     }
@@ -117,7 +125,7 @@ namespace osu.Game.Rulesets
             }
             catch (Exception e)
             {
-                Logger.Error(e, "Failed to load ruleset");
+                Logger.Error(e, $"Failed to load ruleset {filename}");
             }
         }
     }

@@ -1,13 +1,14 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
-using OpenTK;
+using osuTK;
 using osu.Framework;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.UserInterface;
 using System.Linq;
+using osu.Framework.Graphics.Sprites;
 
 namespace osu.Game.Graphics.UserInterface
 {
@@ -27,12 +28,12 @@ namespace osu.Game.Graphics.UserInterface
         {
             Height = 32;
             TabContainer.Spacing = new Vector2(padding, 0f);
-            Current.ValueChanged += tab =>
+            Current.ValueChanged += index =>
             {
                 foreach (var t in TabContainer.Children.OfType<BreadcrumbTabItem>())
                 {
                     var tIndex = TabContainer.IndexOf(t);
-                    var tabIndex = TabContainer.IndexOf(TabMap[tab]);
+                    var tabIndex = TabContainer.IndexOf(TabMap[index.NewValue]);
 
                     t.State = tIndex < tabIndex ? Visibility.Hidden : Visibility.Visible;
                     t.Chevron.FadeTo(tIndex <= tabIndex ? 0f : 1f, 500, Easing.OutQuint);
@@ -47,20 +48,21 @@ namespace osu.Game.Graphics.UserInterface
             public readonly SpriteIcon Chevron;
 
             //don't allow clicking between transitions and don't make the chevron clickable
-            public override bool ReceiveMouseInputAt(Vector2 screenSpacePos) => Alpha == 1f && Text.ReceiveMouseInputAt(screenSpacePos);
+            public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => Alpha == 1f && Text.ReceivePositionalInputAt(screenSpacePos);
 
-            public override bool HandleKeyboardInput => State == Visibility.Visible;
-            public override bool HandleMouseInput => State == Visibility.Visible;
+            public override bool HandleNonPositionalInput => State == Visibility.Visible;
+            public override bool HandlePositionalInput => State == Visibility.Visible;
             public override bool IsRemovable => true;
 
             private Visibility state;
 
             public Visibility State
             {
-                get { return state; }
+                get => state;
                 set
                 {
                     if (value == state) return;
+
                     state = value;
 
                     const float transition_duration = 500;
@@ -80,9 +82,10 @@ namespace osu.Game.Graphics.UserInterface
                 }
             }
 
-            public BreadcrumbTabItem(T value) : base(value)
+            public BreadcrumbTabItem(T value)
+                : base(value)
             {
-                Text.TextSize = 18;
+                Text.Font = Text.Font.With(size: 18);
                 Text.Margin = new MarginPadding { Vertical = 8 };
                 Padding = new MarginPadding { Right = padding + item_chevron_size };
                 Add(Chevron = new SpriteIcon
@@ -90,7 +93,7 @@ namespace osu.Game.Graphics.UserInterface
                     Anchor = Anchor.CentreRight,
                     Origin = Anchor.CentreLeft,
                     Size = new Vector2(item_chevron_size),
-                    Icon = FontAwesome.fa_chevron_right,
+                    Icon = FontAwesome.Solid.ChevronRight,
                     Margin = new MarginPadding { Left = padding },
                     Alpha = 0f,
                 });

@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using System.Collections.Generic;
@@ -11,9 +11,12 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Graphics;
-using OpenTK;
-using OpenTK.Graphics;
+using osuTK;
+using osuTK.Graphics;
 using osu.Framework.Extensions.Color4Extensions;
+using osu.Framework.Graphics.Effects;
+using osu.Framework.Graphics.Transforms;
+using osu.Framework.Threading;
 using osu.Game.Configuration;
 using osu.Game.Graphics.Sprites;
 
@@ -22,9 +25,6 @@ namespace osu.Game.Overlays
     public class OnScreenDisplay : Container
     {
         private readonly Container box;
-
-        public override bool HandleKeyboardInput => false;
-        public override bool HandleMouseInput => false;
 
         private readonly SpriteText textLine1;
         private readonly SpriteText textLine2;
@@ -70,16 +70,14 @@ namespace osu.Game.Overlays
                         textLine1 = new OsuSpriteText
                         {
                             Padding = new MarginPadding(10),
-                            Font = @"Exo2.0-Black",
+                            Font = OsuFont.GetFont(size: 14, weight: FontWeight.Black),
                             Spacing = new Vector2(1, 0),
-                            TextSize = 14,
                             Anchor = Anchor.TopCentre,
                             Origin = Anchor.TopCentre,
                         },
                         textLine2 = new OsuSpriteText
                         {
-                            TextSize = 24,
-                            Font = @"Exo2.0-Light",
+                            Font = OsuFont.GetFont(size: 24, weight: FontWeight.Light),
                             Padding = new MarginPadding { Left = 10, Right = 10 },
                             Anchor = Anchor.Centre,
                             Origin = Anchor.BottomCentre,
@@ -106,8 +104,7 @@ namespace osu.Game.Overlays
                                     Anchor = Anchor.TopCentre,
                                     Origin = Anchor.TopCentre,
                                     Margin = new MarginPadding { Bottom = 15 },
-                                    Font = @"Exo2.0-Bold",
-                                    TextSize = 12,
+                                    Font = OsuFont.GetFont(size: 12, weight: FontWeight.Bold),
                                     Alpha = 0.3f,
                                 },
                             }
@@ -135,7 +132,7 @@ namespace osu.Game.Overlays
         /// <exception cref="InvalidOperationException">If <paramref name="configManager"/> is already being tracked from the same <paramref name="source"/>.</exception>
         public void BeginTracking(object source, ITrackableConfigManager configManager)
         {
-            if (configManager == null)　throw new ArgumentNullException(nameof(configManager));
+            if (configManager == null) throw new ArgumentNullException(nameof(configManager));
 
             if (trackedConfigManagers.ContainsKey((source, configManager)))
                 throw new InvalidOperationException($"{nameof(configManager)} is already registered.");
@@ -159,10 +156,10 @@ namespace osu.Game.Overlays
         /// <exception cref="InvalidOperationException">If <paramref name="configManager"/> is not being tracked from the same <see cref="source"/>.</exception>
         public void StopTracking(object source, ITrackableConfigManager configManager)
         {
-            if (configManager == null)　throw new ArgumentNullException(nameof(configManager));
+            if (configManager == null) throw new ArgumentNullException(nameof(configManager));
 
             if (!trackedConfigManagers.TryGetValue((source, configManager), out var existing))
-                throw new InvalidOperationException($"{nameof(configManager)} is not registered.");
+                return;
 
             existing.Unload();
             existing.SettingChanged -= display;
@@ -174,28 +171,30 @@ namespace osu.Game.Overlays
         {
             Schedule(() =>
             {
-                textLine1.Text = description.Name.ToUpper();
+                textLine1.Text = description.Name.ToUpperInvariant();
                 textLine2.Text = description.Value;
-                textLine3.Text = description.Shortcut.ToUpper();
+                textLine3.Text = description.Shortcut.ToUpperInvariant();
 
                 if (string.IsNullOrEmpty(textLine3.Text))
                     textLine3.Text = "NO KEY BOUND";
 
-                Display(box);
+                DisplayTemporarily(box);
 
                 int optionCount = 0;
                 int selectedOption = -1;
 
-                if (description.RawValue is bool)
+                switch (description.RawValue)
                 {
-                    optionCount = 1;
-                    if ((bool)description.RawValue) selectedOption = 0;
-                }
-                else if (description.RawValue is Enum)
-                {
-                    var values = Enum.GetValues(description.RawValue.GetType());
-                    optionCount = values.Length;
-                    selectedOption = Convert.ToInt32(description.RawValue);
+                    case bool val:
+                        optionCount = 1;
+                        if (val) selectedOption = 0;
+                        break;
+
+                    case Enum _:
+                        var values = Enum.GetValues(description.RawValue.GetType());
+                        optionCount = values.Length;
+                        selectedOption = Convert.ToInt32(description.RawValue);
+                        break;
                 }
 
                 textLine2.Origin = optionCount > 0 ? Anchor.BottomCentre : Anchor.Centre;
@@ -213,15 +212,29 @@ namespace osu.Game.Overlays
             });
         }
 
-        protected virtual void Display(Drawable toDisplay)
+        private TransformSequence<Drawable> fadeIn;
+        private ScheduledDelegate fadeOut;
+
+        protected virtual void DisplayTemporarily(Drawable toDisplay)
         {
-            toDisplay.Animate(
-                b => b.FadeIn(500, Easing.OutQuint),
-                b => b.ResizeHeightTo(height, 500, Easing.OutQuint)
-            ).Then(
-                b => b.FadeOutFromOne(1500, Easing.InQuint),
-                b => b.ResizeHeightTo(height_contracted, 1500, Easing.InQuint)
-            );
+            // avoid starting a new fade-in if one is already active.
+            if (fadeIn == null)
+            {
+                fadeIn = toDisplay.Animate(
+                    b => b.FadeIn(500, Easing.OutQuint),
+                    b => b.ResizeHeightTo(height, 500, Easing.OutQuint)
+                );
+
+                fadeIn.Finally(_ => fadeIn = null);
+            }
+
+            fadeOut?.Cancel();
+            fadeOut = Scheduler.AddDelayed(() =>
+            {
+                toDisplay.Animate(
+                    b => b.FadeOutFromOne(1500, Easing.InQuint),
+                    b => b.ResizeHeightTo(height_contracted, 1500, Easing.InQuint));
+            }, 500);
         }
 
         private class OptionLight : Container

@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
 using osu.Framework.Allocation;
@@ -9,8 +9,8 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Rulesets;
-using OpenTK;
-using OpenTK.Graphics;
+using osuTK;
+using osuTK.Graphics;
 using DebugUtils = osu.Game.Utils.DebugUtils;
 
 namespace osu.Game.Overlays.Settings
@@ -56,14 +56,13 @@ namespace osu.Game.Overlays.Settings
                     Anchor = Anchor.TopCentre,
                     Origin = Anchor.TopCentre,
                     Text = game.Name,
-                    TextSize = 18,
-                    Font = @"Exo2.0-Bold",
+                    Font = OsuFont.GetFont(size: 18, weight: FontWeight.Bold),
                 },
                 new OsuSpriteText
                 {
                     Anchor = Anchor.TopCentre,
                     Origin = Anchor.TopCentre,
-                    TextSize = 14,
+                    Font = OsuFont.GetFont(size: 14),
                     Text = game.Version,
                     Colour = DebugUtils.IsDebug ? colours.Red : Color4.White,
                 },

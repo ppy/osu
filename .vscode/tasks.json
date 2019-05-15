@@ -11,7 +11,6 @@
                 "build",
                 "--no-restore",
                 "osu.Desktop",
-                "/p:TargetFramework=netcoreapp2.1",
                 "/p:GenerateFullPaths=true",
                 "/m",
                 "/verbosity:m"
@@ -27,7 +26,6 @@
                 "build",
                 "--no-restore",
                 "osu.Desktop",
-                "/p:TargetFramework=netcoreapp2.1",
                 "/p:Configuration=Release",
                 "/p:GenerateFullPaths=true",
                 "/m",
@@ -44,7 +42,6 @@
                 "build",
                 "--no-restore",
                 "osu.Game.Tests",
-                "/p:TargetFramework=netcoreapp2.1",
                 "/p:GenerateFullPaths=true",
                 "/m",
                 "/verbosity:m"
@@ -60,7 +57,6 @@
                 "build",
                 "--no-restore",
                 "osu.Game.Tests",
-                "/p:TargetFramework=netcoreapp2.1",
                 "/p:Configuration=Release",
                 "/p:GenerateFullPaths=true",
                 "/m",
@@ -70,11 +66,12 @@
             "problemMatcher": "$msCompile"
         },
         {
-            "label": "Restore (netcoreapp2.1)",
+            "label": "Restore (netcoreapp2.2)",
             "type": "shell",
             "command": "dotnet",
             "args": [
-                "restore"
+                "restore",
+                "osu.sln"
             ],
             "problemMatcher": []
         }

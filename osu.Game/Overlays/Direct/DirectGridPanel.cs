@@ -1,17 +1,18 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
-using OpenTK;
-using OpenTK.Graphics;
+using osuTK;
+using osuTK.Graphics;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Localisation;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Framework.Graphics.Shapes;
-using osu.Framework.Input;
+using osu.Framework.Graphics.Sprites;
+using osu.Framework.Input.Events;
+using osu.Framework.Localisation;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Drawables;
 
@@ -29,9 +30,10 @@ namespace osu.Game.Overlays.Direct
         protected override PlayButton PlayButton => playButton;
         protected override Box PreviewBar => progressBar;
 
-        public DirectGridPanel(BeatmapSetInfo beatmap) : base(beatmap)
+        public DirectGridPanel(BeatmapSetInfo beatmap)
+            : base(beatmap)
         {
-            Width = 400;
+            Width = 380;
             Height = 140 + vertical_padding; //full height of all the elements plus vertical padding (autosize uses the image)
         }
 
@@ -44,7 +46,7 @@ namespace osu.Game.Overlays.Direct
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours, LocalisationEngine localisation)
+        private void load(OsuColour colours)
         {
             Content.CornerRadius = 4;
 
@@ -74,14 +76,13 @@ namespace osu.Game.Overlays.Direct
                             {
                                 new OsuSpriteText
                                 {
-                                    Text = localisation.GetUnicodePreference(SetInfo.Metadata.TitleUnicode, SetInfo.Metadata.Title),
-                                    TextSize = 18,
-                                    Font = @"Exo2.0-BoldItalic",
+                                    Text = new LocalisedString((SetInfo.Metadata.TitleUnicode, SetInfo.Metadata.Title)),
+                                    Font = OsuFont.GetFont(size: 18, weight: FontWeight.Bold, italics: true)
                                 },
                                 new OsuSpriteText
                                 {
-                                    Text = localisation.GetUnicodePreference(SetInfo.Metadata.ArtistUnicode, SetInfo.Metadata.Artist),
-                                    Font = @"Exo2.0-BoldItalic",
+                                    Text = new LocalisedString((SetInfo.Metadata.ArtistUnicode, SetInfo.Metadata.Artist)),
+                                    Font = OsuFont.GetFont(weight: FontWeight.Bold, italics: true)
                                 },
                             },
                         },
@@ -127,15 +128,14 @@ namespace osu.Game.Overlays.Direct
                                                 new OsuSpriteText
                                                 {
                                                     Text = "mapped by ",
-                                                    TextSize = 14,
+                                                    Font = OsuFont.GetFont(size: 14),
                                                     Shadow = false,
                                                     Colour = colours.Gray5,
                                                 },
                                                 new OsuSpriteText
                                                 {
                                                     Text = SetInfo.Metadata.Author.Username,
-                                                    TextSize = 14,
-                                                    Font = @"Exo2.0-SemiBoldItalic",
+                                                    Font = OsuFont.GetFont(size: 14, weight: FontWeight.SemiBold, italics: true),
                                                     Shadow = false,
                                                     Colour = colours.BlueDark,
                                                 },
@@ -150,7 +150,7 @@ namespace osu.Game.Overlays.Direct
                                                 new OsuSpriteText
                                                 {
                                                     Text = SetInfo.Metadata.Source,
-                                                    TextSize = 14,
+                                                    Font = OsuFont.GetFont(size: 14),
                                                     Shadow = false,
                                                     Colour = colours.Gray5,
                                                     Alpha = string.IsNullOrEmpty(SetInfo.Metadata.Source) ? 0f : 1f,
@@ -168,11 +168,10 @@ namespace osu.Game.Overlays.Direct
                                 },
                                 new DownloadButton(SetInfo)
                                 {
-                                    Size = new Vector2(30),
+                                    Size = new Vector2(50, 30),
                                     Margin = new MarginPadding(horizontal_padding),
-                                    Anchor = Anchor.CentreRight,
-                                    Origin = Anchor.CentreRight,
-                                    Colour = colours.Gray5,
+                                    Anchor = Anchor.TopRight,
+                                    Origin = Anchor.TopRight,
                                 },
                             },
                         },
@@ -187,11 +186,8 @@ namespace osu.Game.Overlays.Direct
                     Margin = new MarginPadding { Top = vertical_padding, Right = vertical_padding },
                     Children = new[]
                     {
-                        new Statistic(FontAwesome.fa_play_circle, SetInfo.OnlineInfo?.PlayCount ?? 0)
-                        {
-                            Margin = new MarginPadding { Right = 1 },
-                        },
-                        new Statistic(FontAwesome.fa_heart, SetInfo.OnlineInfo?.FavouriteCount ?? 0),
+                        new Statistic(FontAwesome.Solid.PlayCircle, SetInfo.OnlineInfo?.PlayCount ?? 0),
+                        new Statistic(FontAwesome.Solid.Heart, SetInfo.OnlineInfo?.FavouriteCount ?? 0),
                     },
                 },
                 statusContainer = new FillFlowContainer
@@ -210,34 +206,36 @@ namespace osu.Game.Overlays.Direct
 
             if (SetInfo.OnlineInfo?.HasVideo ?? false)
             {
-                statusContainer.Add(new IconPill(FontAwesome.fa_film));
+                statusContainer.Add(new IconPill(FontAwesome.Solid.Film));
             }
 
             if (SetInfo.OnlineInfo?.HasStoryboard ?? false)
             {
-                statusContainer.Add(new IconPill(FontAwesome.fa_image));
+                statusContainer.Add(new IconPill(FontAwesome.Solid.Image));
             }
 
-            statusContainer.Add(new BeatmapSetOnlineStatusPill(12, new MarginPadding { Horizontal = 10, Vertical = 5 })
+            statusContainer.Add(new BeatmapSetOnlineStatusPill
             {
+                TextSize = 12,
+                TextPadding = new MarginPadding { Horizontal = 10, Vertical = 5 },
                 Status = SetInfo.OnlineInfo?.Status ?? BeatmapSetOnlineStatus.None,
             });
 
             PreviewPlaying.ValueChanged += _ => updateStatusContainer();
         }
 
-        protected override bool OnHover(InputState state)
+        protected override bool OnHover(HoverEvent e)
         {
             updateStatusContainer();
-            return base.OnHover(state);
+            return base.OnHover(e);
         }
 
-        protected override void OnHoverLost(InputState state)
+        protected override void OnHoverLost(HoverLostEvent e)
         {
-            base.OnHoverLost(state);
+            base.OnHoverLost(e);
             updateStatusContainer();
         }
 
-        private void updateStatusContainer() => statusContainer.FadeTo(IsHovered || PreviewPlaying ? 0 : 1, 120, Easing.InOutQuint);
+        private void updateStatusContainer() => statusContainer.FadeTo(IsHovered || PreviewPlaying.Value ? 0 : 1, 120, Easing.InOutQuint);
     }
 }

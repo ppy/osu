@@ -1,8 +1,8 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
-using System.Linq;
+using osu.Framework.Bindables;
 using osu.Framework.Configuration;
 using osu.Game.Rulesets;
 
@@ -43,7 +43,8 @@ namespace osu.Game.Configuration
         {
             base.AddBindable(lookup, bindable);
 
-            var setting = databasedSettings.FirstOrDefault(s => (int)s.Key == (int)(object)lookup);
+            var setting = databasedSettings.Find(s => (int)s.Key == (int)(object)lookup);
+
             if (setting != null)
             {
                 bindable.Parse(setting.Value);
@@ -61,9 +62,9 @@ namespace osu.Game.Configuration
                 databasedSettings.Add(setting);
             }
 
-            bindable.ValueChanged += v =>
+            bindable.ValueChanged += b =>
             {
-                setting.Value = v;
+                setting.Value = b.NewValue;
                 settings.Update(setting);
             };
         }

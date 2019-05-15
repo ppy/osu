@@ -1,11 +1,11 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
-using OpenTK;
-using OpenTK.Graphics;
+using osuTK;
+using osuTK.Graphics;
 using osu.Framework.Allocation;
-using osu.Framework.Configuration;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.UserInterface;
@@ -13,8 +13,8 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Screens.Select.Filter;
 using Container = osu.Framework.Graphics.Containers.Container;
-using osu.Framework.Input;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Input.Events;
 using osu.Game.Configuration;
 using osu.Game.Rulesets;
 
@@ -29,9 +29,10 @@ namespace osu.Game.Screens.Select
         private readonly TabControl<GroupMode> groupTabs;
 
         private SortMode sort = SortMode.Title;
+
         public SortMode Sort
         {
-            get { return sort; }
+            get => sort;
             set
             {
                 if (sort != value)
@@ -43,9 +44,10 @@ namespace osu.Game.Screens.Select
         }
 
         private GroupMode group = GroupMode.All;
+
         public GroupMode Group
         {
-            get { return group; }
+            get => group;
             set
             {
                 if (group != value)
@@ -61,15 +63,16 @@ namespace osu.Game.Screens.Select
             Group = group,
             Sort = sort,
             SearchText = searchTextBox.Text,
-            AllowConvertedBeatmaps = showConverted,
-            Ruleset = ruleset
+            AllowConvertedBeatmaps = showConverted.Value,
+            Ruleset = ruleset.Value
         };
 
         public Action Exit;
 
         private readonly SearchTextBox searchTextBox;
 
-        public override bool ReceiveMouseInputAt(Vector2 screenSpacePos) => base.ReceiveMouseInputAt(screenSpacePos) || groupTabs.ReceiveMouseInputAt(screenSpacePos) || sortTabs.ReceiveMouseInputAt(screenSpacePos);
+        public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) =>
+            base.ReceivePositionalInputAt(screenSpacePos) || groupTabs.ReceivePositionalInputAt(screenSpacePos) || sortTabs.ReceivePositionalInputAt(screenSpacePos);
 
         public FilterControl()
         {
@@ -143,12 +146,12 @@ namespace osu.Game.Screens.Select
                 }
             };
 
-            searchTextBox.Current.ValueChanged += t => FilterChanged?.Invoke(CreateCriteria());
+            searchTextBox.Current.ValueChanged += _ => FilterChanged?.Invoke(CreateCriteria());
 
             groupTabs.PinItem(GroupMode.All);
             groupTabs.PinItem(GroupMode.RecentlyPlayed);
-            groupTabs.Current.ValueChanged += val => Group = val;
-            sortTabs.Current.ValueChanged += val => Sort = val;
+            groupTabs.Current.ValueChanged += group => Group = group.NewValue;
+            sortTabs.Current.ValueChanged += sort => Sort = sort.NewValue;
         }
 
         public void Deactivate()
@@ -163,32 +166,30 @@ namespace osu.Game.Screens.Select
             searchTextBox.HoldFocus = true;
         }
 
-        private readonly Bindable<RulesetInfo> ruleset = new Bindable<RulesetInfo>();
+        private readonly IBindable<RulesetInfo> ruleset = new Bindable<RulesetInfo>();
 
         private Bindable<bool> showConverted;
 
         public readonly Box Background;
 
         [BackgroundDependencyLoader(permitNulls: true)]
-        private void load(OsuColour colours, OsuGame osu, OsuConfigManager config)
+        private void load(OsuColour colours, IBindable<RulesetInfo> parentRuleset, OsuConfigManager config)
         {
             sortTabs.AccentColour = colours.GreenLight;
 
             showConverted = config.GetBindable<bool>(OsuSetting.ShowConvertedBeatmaps);
-            showConverted.ValueChanged += val => updateCriteria();
+            showConverted.ValueChanged += _ => updateCriteria();
 
-            if (osu != null)
-                ruleset.BindTo(osu.Ruleset);
-            ruleset.ValueChanged += val => updateCriteria();
-            ruleset.TriggerChange();
+            ruleset.BindTo(parentRuleset);
+            ruleset.BindValueChanged(_ => updateCriteria(), true);
         }
 
         private void updateCriteria() => FilterChanged?.Invoke(CreateCriteria());
 
-        protected override bool OnMouseDown(InputState state, MouseDownEventArgs args) => true;
+        protected override bool OnMouseDown(MouseDownEvent e) => true;
 
-        protected override bool OnMouseMove(InputState state) => true;
+        protected override bool OnMouseMove(MouseMoveEvent e) => true;
 
-        protected override bool OnClick(InputState state) => true;
+        protected override bool OnClick(ClickEvent e) => true;
     }
 }

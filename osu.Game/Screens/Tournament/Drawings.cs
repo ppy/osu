@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using System.Collections.Generic;
@@ -18,10 +18,12 @@ using osu.Game.Graphics.UserInterface;
 using osu.Game.Screens.Backgrounds;
 using osu.Game.Screens.Tournament.Components;
 using osu.Game.Screens.Tournament.Teams;
-using OpenTK;
-using OpenTK.Graphics;
+using osuTK;
+using osuTK.Graphics;
 using osu.Framework.IO.Stores;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Screens;
+using osu.Game.Graphics;
 
 namespace osu.Game.Screens.Tournament
 {
@@ -29,7 +31,7 @@ namespace osu.Game.Screens.Tournament
     {
         private const string results_filename = "drawings_results.txt";
 
-        protected override bool HideOverlaysOnEnter => true;
+        public override bool HideOverlaysOnEnter => true;
 
         protected override BackgroundScreen CreateBackground() => new BackgroundScreenDefault();
 
@@ -49,8 +51,8 @@ namespace osu.Game.Screens.Tournament
 
         private DependencyContainer dependencies;
 
-        protected override IReadOnlyDependencyContainer CreateLocalDependencies(IReadOnlyDependencyContainer parent) =>
-            dependencies = new DependencyContainer(base.CreateLocalDependencies(parent));
+        protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent) =>
+            dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
 
         [BackgroundDependencyLoader]
         private void load(TextureStore textures, Storage storage)
@@ -59,7 +61,7 @@ namespace osu.Game.Screens.Tournament
 
             TextureStore flagStore = new TextureStore();
             // Local flag store
-            flagStore.AddStore(new RawTextureLoaderStore(new NamespacedResourceStore<byte[]>(new StorageBackedResourceStore(storage), "Drawings")));
+            flagStore.AddStore(new TextureLoaderStore(new NamespacedResourceStore<byte[]>(new StorageBackedResourceStore(storage), "Drawings")));
             // Default texture store
             flagStore.AddStore(textures);
 
@@ -70,13 +72,13 @@ namespace osu.Game.Screens.Tournament
 
             if (!TeamList.Teams.Any())
             {
-                Exit();
+                this.Exit();
                 return;
             }
 
             drawingsConfig = new DrawingsConfigManager(storage);
 
-            Children = new Drawable[]
+            InternalChildren = new Drawable[]
             {
                 new Box
                 {
@@ -150,8 +152,7 @@ namespace osu.Game.Screens.Tournament
 
                                     Alpha = 0,
 
-                                    Font = "Exo2.0-Light",
-                                    TextSize = 42f
+                                    Font = OsuFont.GetFont(weight: FontWeight.Light, size: 42),
                                 }
                             }
                         },
@@ -174,8 +175,7 @@ namespace osu.Game.Screens.Tournament
                                     Origin = Anchor.TopCentre,
 
                                     Text = "Control Panel",
-                                    TextSize = 22f,
-                                    Font = "Exo2.0-Bold"
+                                    Font = OsuFont.GetFont(weight: FontWeight.Bold, size: 22),
                                 },
                                 new FillFlowContainer
                                 {
@@ -318,16 +318,17 @@ namespace osu.Game.Screens.Tournament
                     using (StreamReader sr = new StreamReader(stream))
                     {
                         string line;
+
                         while ((line = sr.ReadLine()?.Trim()) != null)
                         {
                             if (string.IsNullOrEmpty(line))
                                 continue;
 
-                            if (line.ToUpper().StartsWith("GROUP"))
+                            if (line.ToUpperInvariant().StartsWith("GROUP"))
                                 continue;
 
                             // ReSharper disable once AccessToModifiedClosure
-                            DrawingsTeam teamToAdd = allTeams.FirstOrDefault(t => t.FullName == line);
+                            DrawingsTeam teamToAdd = allTeams.Find(t => t.FullName == line);
 
                             if (teamToAdd == null)
                                 continue;

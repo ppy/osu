@@ -1,11 +1,10 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
-using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -16,28 +15,24 @@ using osu.Game.Rulesets.Mania.Objects.Drawables;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.UI;
 using osu.Game.Rulesets.UI.Scrolling;
-using OpenTK;
-using OpenTK.Graphics;
+using osuTK;
+using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Mania.UI
 {
     /// <summary>
     /// A collection of <see cref="Column"/>s.
     /// </summary>
-    internal class ManiaStage : ScrollingPlayfield
+    public class ManiaStage : ScrollingPlayfield
     {
-        public const float HIT_TARGET_POSITION = 50;
+        public const float COLUMN_SPACING = 1;
 
-        /// <summary>
-        /// Whether this playfield should be inverted. This flips everything inside the playfield.
-        /// </summary>
-        public readonly Bindable<bool> Inverted = new Bindable<bool>(true);
+        public const float HIT_TARGET_POSITION = 50;
 
         public IReadOnlyList<Column> Columns => columnFlow.Children;
         private readonly FillFlowContainer<Column> columnFlow;
 
-        protected override Container<Drawable> Content => content;
-        private readonly Container<Drawable> content;
+        private readonly Container barLineContainer;
 
         public Container<DrawableManiaJudgement> Judgements => judgements;
         private readonly JudgementContainer<DrawableManiaJudgement> judgements;
@@ -47,10 +42,11 @@ namespace osu.Game.Rulesets.Mania.UI
         private List<Color4> normalColumnColours = new List<Color4>();
         private Color4 specialColumnColour;
 
+        public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => Columns.Any(c => c.ReceivePositionalInputAt(screenSpacePos));
+
         private readonly int firstColumnIndex;
 
         public ManiaStage(int firstColumnIndex, StageDefinition definition, ref ManiaAction normalColumnStartAction, ref ManiaAction specialColumnStartAction)
-            : base(ScrollingDirection.Up)
         {
             this.firstColumnIndex = firstColumnIndex;
 
@@ -92,8 +88,8 @@ namespace osu.Game.Rulesets.Mania.UI
                                     RelativeSizeAxes = Axes.Y,
                                     AutoSizeAxes = Axes.X,
                                     Direction = FillDirection.Horizontal,
-                                    Padding = new MarginPadding { Left = 1, Right = 1 },
-                                    Spacing = new Vector2(1, 0)
+                                    Padding = new MarginPadding { Left = COLUMN_SPACING, Right = COLUMN_SPACING },
+                                    Spacing = new Vector2(COLUMN_SPACING, 0)
                                 },
                             }
                         },
@@ -106,13 +102,13 @@ namespace osu.Game.Rulesets.Mania.UI
                             Width = 1366, // Bar lines should only be masked on the vertical axis
                             BypassAutoSizeAxes = Axes.Both,
                             Masking = true,
-                            Child = content = new Container
+                            Child = barLineContainer = new Container
                             {
                                 Name = "Bar lines",
                                 Anchor = Anchor.TopCentre,
                                 Origin = Anchor.TopCentre,
                                 RelativeSizeAxes = Axes.Y,
-                                Padding = new MarginPadding { Top = HIT_TARGET_POSITION }
+                                Child = HitObjectContainer
                             }
                         },
                         judgements = new JudgementContainer<DrawableManiaJudgement>
@@ -131,29 +127,27 @@ namespace osu.Game.Rulesets.Mania.UI
             for (int i = 0; i < definition.Columns; i++)
             {
                 var isSpecial = definition.IsSpecialColumn(i);
-                var column = new Column
+                var column = new Column(firstColumnIndex + i)
                 {
                     IsSpecial = isSpecial,
-                    Action = isSpecial ? specialColumnStartAction++ : normalColumnStartAction++
+                    Action = { Value = isSpecial ? specialColumnStartAction++ : normalColumnStartAction++ }
                 };
 
                 AddColumn(column);
             }
 
-            Inverted.ValueChanged += invertedChanged;
-            Inverted.TriggerChange();
-        }
-
-        private void invertedChanged(bool newValue)
-        {
-            Scale = new Vector2(1, newValue ? -1 : 1);
-            Judgements.Scale = Scale;
+            Direction.BindValueChanged(dir =>
+            {
+                barLineContainer.Padding = new MarginPadding
+                {
+                    Top = dir.NewValue == ScrollingDirection.Up ? HIT_TARGET_POSITION : 0,
+                    Bottom = dir.NewValue == ScrollingDirection.Down ? HIT_TARGET_POSITION : 0,
+                };
+            }, true);
         }
 
         public void AddColumn(Column c)
         {
-            c.VisibleTimeRange.BindTo(VisibleTimeRange);
-
             topLevelContainer.Add(c.TopLevelContainer.CreateProxy());
             columnFlow.Add(c);
             AddNested(c);
@@ -162,20 +156,40 @@ namespace osu.Game.Rulesets.Mania.UI
         public override void Add(DrawableHitObject h)
         {
             var maniaObject = (ManiaHitObject)h.HitObject;
+
+            int columnIndex = -1;
+
+            maniaObject.ColumnBindable.BindValueChanged(_ =>
+            {
+                if (columnIndex != -1)
+                    Columns.ElementAt(columnIndex).Remove(h);
+
+                columnIndex = maniaObject.Column - firstColumnIndex;
+                Columns.ElementAt(columnIndex).Add(h);
+            }, true);
+
+            h.OnNewResult += OnNewResult;
+        }
+
+        public override bool Remove(DrawableHitObject h)
+        {
+            var maniaObject = (ManiaHitObject)h.HitObject;
             int columnIndex = maniaObject.Column - firstColumnIndex;
-            Columns.ElementAt(columnIndex).Add(h);
-            h.OnJudgement += OnJudgement;
+            Columns.ElementAt(columnIndex).Remove(h);
+
+            h.OnNewResult -= OnNewResult;
+            return true;
         }
 
         public void Add(BarLine barline) => base.Add(new DrawableBarLine(barline));
 
-        internal void OnJudgement(DrawableHitObject judgedObject, Judgement judgement)
+        internal void OnNewResult(DrawableHitObject judgedObject, JudgementResult result)
         {
-            if (!judgedObject.DisplayJudgement)
+            if (!judgedObject.DisplayResult || !DisplayJudgements.Value)
                 return;
 
             judgements.Clear();
-            judgements.Add(new DrawableManiaJudgement(judgement, judgedObject)
+            judgements.Add(new DrawableManiaJudgement(result, judgedObject)
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
@@ -218,7 +232,7 @@ namespace osu.Game.Rulesets.Mania.UI
         {
             // Due to masking differences, it is not possible to get the width of the columns container automatically
             // While masking on effectively only the Y-axis, so we need to set the width of the bar line container manually
-            content.Width = columnFlow.Width;
+            barLineContainer.Width = columnFlow.Width;
         }
     }
 }

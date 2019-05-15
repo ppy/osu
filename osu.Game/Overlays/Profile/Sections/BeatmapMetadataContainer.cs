@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
@@ -7,8 +7,10 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Localisation;
 using osu.Game.Beatmaps;
+using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
+
 namespace osu.Game.Overlays.Profile.Sections
 {
     /// <summary>
@@ -28,11 +30,14 @@ namespace osu.Game.Overlays.Profile.Sections
         public string TooltipText { get; }
 
         [BackgroundDependencyLoader(true)]
-        private void load(LocalisationEngine locale, BeatmapSetOverlay beatmapSetOverlay)
+        private void load(BeatmapSetOverlay beatmapSetOverlay)
         {
             Action = () =>
             {
-                if (beatmap.BeatmapSet?.OnlineBeatmapSetID != null) beatmapSetOverlay?.FetchAndShowBeatmapSet(beatmap.BeatmapSet.OnlineBeatmapSetID.Value);
+                if (beatmap.OnlineBeatmapID != null)
+                    beatmapSetOverlay?.FetchAndShowBeatmap(beatmap.OnlineBeatmapID.Value);
+                else if (beatmap.BeatmapSet?.OnlineBeatmapSetID != null)
+                    beatmapSetOverlay?.FetchAndShowBeatmapSet(beatmap.BeatmapSet.OnlineBeatmapSetID.Value);
             };
 
             Child = new FillFlowContainer
@@ -42,19 +47,16 @@ namespace osu.Game.Overlays.Profile.Sections
                 {
                     new OsuSpriteText
                     {
-                        Current = locale.GetUnicodePreference(
+                        Text = new LocalisedString((
                             $"{beatmap.Metadata.TitleUnicode ?? beatmap.Metadata.Title} [{beatmap.Version}] ",
-                            $"{beatmap.Metadata.Title ?? beatmap.Metadata.TitleUnicode} [{beatmap.Version}] "
-                        ),
-                        TextSize = 15,
-                        Font = "Exo2.0-SemiBoldItalic",
+                            $"{beatmap.Metadata.Title ?? beatmap.Metadata.TitleUnicode} [{beatmap.Version}] ")),
+                        Font = OsuFont.GetFont(size: 15, weight: FontWeight.SemiBold, italics: true)
                     },
                     new OsuSpriteText
                     {
-                        Current = locale.GetUnicodePreference(beatmap.Metadata.ArtistUnicode, beatmap.Metadata.Artist),
-                        TextSize = 12,
+                        Text = new LocalisedString((beatmap.Metadata.ArtistUnicode, beatmap.Metadata.Artist)),
                         Padding = new MarginPadding { Top = 3 },
-                        Font = "Exo2.0-RegularItalic",
+                        Font = OsuFont.GetFont(size: 12, weight: FontWeight.Regular, italics: true)
                     },
                 },
             };

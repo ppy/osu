@@ -1,5 +1,5 @@
-// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using System.Collections.Generic;
@@ -38,10 +38,13 @@ namespace osu.Game.Screens.Select.Carousel
                 default:
                 case SortMode.Artist:
                     return string.Compare(BeatmapSet.Metadata.Artist, otherSet.BeatmapSet.Metadata.Artist, StringComparison.InvariantCultureIgnoreCase);
+
                 case SortMode.Title:
                     return string.Compare(BeatmapSet.Metadata.Title, otherSet.BeatmapSet.Metadata.Title, StringComparison.InvariantCultureIgnoreCase);
+
                 case SortMode.Author:
                     return string.Compare(BeatmapSet.Metadata.Author.Username, otherSet.BeatmapSet.Metadata.Author.Username, StringComparison.InvariantCultureIgnoreCase);
+
                 case SortMode.Difficulty:
                     return BeatmapSet.MaxStarDifficulty.CompareTo(otherSet.BeatmapSet.MaxStarDifficulty);
             }
@@ -50,7 +53,7 @@ namespace osu.Game.Screens.Select.Carousel
         public override void Filter(FilterCriteria criteria)
         {
             base.Filter(criteria);
-            Filtered.Value = InternalChildren.All(i => i.Filtered);
+            Filtered.Value = InternalChildren.All(i => i.Filtered.Value);
         }
 
         public override string ToString() => BeatmapSet.ToString();
