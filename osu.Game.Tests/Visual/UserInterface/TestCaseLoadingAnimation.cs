@@ -9,7 +9,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Tests.Visual.UserInterface
 {
-    public class TestCaseLoadingAnimation : GridTestScene //todo: this should be an OsuTestCase
+    public class TestCaseLoadingAnimation : GridTestScene //todo: this should be an OsuTestScene
     {
         public TestCaseLoadingAnimation()
             : base(2, 2)
