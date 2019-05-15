@@ -12,9 +12,8 @@ using osuTK.Graphics;
 
 namespace osu.Game.Overlays.Changelog
 {
-    public class ChangelogBadges : Container
+    public class BadgeDisplay : CompositeDrawable
     {
-        private const float container_height = 106.5f;
         private const float vertical_padding = 20;
         private const float horizontal_padding = 85;
 
@@ -25,11 +24,11 @@ namespace osu.Game.Overlays.Changelog
         private readonly FillFlowContainer<StreamBadge> badgesContainer;
         private long selectedStreamId = -1;
 
-        public ChangelogBadges()
+        public BadgeDisplay()
         {
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
-            Children = new Drawable[]
+            InternalChildren = new Drawable[]
             {
                 new Box
                 {

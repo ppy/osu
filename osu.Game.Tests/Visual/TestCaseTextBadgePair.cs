@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Overlays.Changelog.Header;
@@ -13,7 +14,7 @@ namespace osu.Game.Tests.Visual
     {
         public TestCaseTextBadgePair()
         {
-            TextBadgePair textBadgePair;
+            Breadcrumb breadcrumb;
 
             Add(new Container
             {
@@ -29,7 +30,7 @@ namespace osu.Game.Tests.Visual
                         Alpha = 0.5f,
                         RelativeSizeAxes = Axes.Both,
                     },
-                    textBadgePair = new TextBadgePair(Color4.DeepSkyBlue, "Test")
+                    breadcrumb = new TestBadgePair(Color4.DeepSkyBlue, "Test")
                     {
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
@@ -37,12 +38,20 @@ namespace osu.Game.Tests.Visual
                 }
             });
 
-            AddStep(@"Deactivate", textBadgePair.Deactivate);
-            AddStep(@"Activate", textBadgePair.Activate);
-            AddStep(@"Hide text", () => textBadgePair.HideText(200));
-            AddStep(@"Show text", () => textBadgePair.ShowText(200));
-            AddStep(@"Different text", () => textBadgePair.ChangeText(200, "This one's a little bit wider"));
-            AddStep(@"Different text", () => textBadgePair.ChangeText(200, "Ok?.."));
+            AddStep(@"Deactivate", breadcrumb.Deactivate);
+            AddStep(@"Activate", breadcrumb.Activate);
+            AddStep(@"Hide text", () => breadcrumb.HideText(200));
+            AddStep(@"Show text", () => breadcrumb.ShowText(200));
+            AddStep(@"Different text", () => breadcrumb.ShowText(200, "This one's a little bit wider"));
+            AddStep(@"Different text", () => breadcrumb.ShowText(200, "Ok?.."));
+        }
+
+        private class TestBadgePair : Breadcrumb
+        {
+            public TestBadgePair(ColourInfo badgeColour, string displayText = "Listing", bool startCollapsed = true)
+                : base(badgeColour, displayText, startCollapsed)
+            {
+            }
         }
     }
 }

@@ -23,7 +23,7 @@ namespace osu.Game.Overlays
     {
         private ChangelogHeader header;
 
-        private ChangelogBadges badges;
+        private BadgeDisplay badgeDisplay;
 
         private ChangelogContent listing;
         private ChangelogContent content;
@@ -66,15 +66,16 @@ namespace osu.Game.Overlays
                         Children = new Drawable[]
                         {
                             header = new ChangelogHeader(),
-                            badges = new ChangelogBadges(),
+                            badgeDisplay = new BadgeDisplay(),
                             listing = new ChangelogContent(),
                             content = new ChangelogContent()
                         },
                     },
                 },
             };
+
             header.ListingSelected += ShowListing;
-            badges.Selected += onBuildSelected;
+            badgeDisplay.Selected += onBuildSelected;
             listing.BuildSelected += onBuildSelected;
             content.BuildSelected += onBuildSelected;
 
@@ -137,11 +138,11 @@ namespace osu.Game.Overlays
 
             isAtListing = true;
             var req = new GetChangelogRequest();
-            badges.SelectNone();
+            badgeDisplay.SelectNone();
             req.Success += res =>
             {
                 listing.ShowListing(res.Builds);
-                badges.Populate(res.Streams);
+                badgeDisplay.Populate(res.Streams);
             };
 
             API.Queue(req);
@@ -157,7 +158,7 @@ namespace osu.Game.Overlays
             isAtListing = true;
             content.Hide();
             listing.Show();
-            badges.SelectNone();
+            badgeDisplay.SelectNone();
             listing.Show();
             scroll.ScrollTo(savedScrollPosition);
         }
@@ -180,7 +181,7 @@ namespace osu.Game.Overlays
                 req.Success += res => header.ShowBuild(res.UpdateStream.DisplayName, res.DisplayVersion);
 
             if (updateBadges)
-                badges.SelectUpdateStream(build.UpdateStream.Name);
+                badgeDisplay.SelectUpdateStream(build.UpdateStream.Name);
 
             req.Success += apiChangelog =>
             {

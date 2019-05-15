@@ -5,11 +5,11 @@ using osu.Framework.Graphics.Colour;
 
 namespace osu.Game.Overlays.Changelog.Header
 {
-    public class TextBadgePairRelease : TextBadgePair
+    public class BreadcrumbRelease : Breadcrumb
     {
         private const float transition_duration = 125;
 
-        public TextBadgePairRelease(ColourInfo badgeColour, string displayText)
+        public BreadcrumbRelease(ColourInfo badgeColour, string displayText)
             : base(badgeColour, displayText)
         {
             Text.Font = "Exo2.0-Bold";
@@ -17,24 +17,17 @@ namespace osu.Game.Overlays.Changelog.Header
             Text.Alpha = 0;
         }
 
-        public void SetText(string displayText) => Text.Text = displayText;
-
-        public void Activate(string displayText = null)
+        public void ShowBuild(string displayText = null)
         {
-            if (IsActivated)
-            {
-                if (displayText != Text.Text)
-                    ChangeText(transition_duration, displayText);
-            }
-            else
-                ShowText(transition_duration, displayText);
-
+            ShowText(transition_duration, displayText);
             IsActivated = true;
         }
 
         public override void Deactivate()
         {
-            IsActivated = false;
+            if (!IsActivated)
+                return;
+
             HideText(transition_duration);
         }
     }
