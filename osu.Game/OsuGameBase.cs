@@ -29,6 +29,7 @@ using osu.Game.Input;
 using osu.Game.Input.Bindings;
 using osu.Game.IO;
 using osu.Game.Rulesets;
+using osu.Game.Rulesets.Mods;
 using osu.Game.Scoring;
 using osu.Game.Skinning;
 using osuTK.Input;
@@ -69,7 +70,16 @@ namespace osu.Game
 
         protected override Container<Drawable> Content => content;
 
-        private Bindable<WorkingBeatmap> beatmap;
+        private Bindable<WorkingBeatmap> beatmap; // cached via load() method
+
+        [Cached]
+        [Cached(typeof(IBindable<RulesetInfo>))]
+        protected readonly Bindable<RulesetInfo> Ruleset = new Bindable<RulesetInfo>();
+
+        // todo: move this to SongSelect once Screen has the ability to unsuspend.
+        [Cached]
+        [Cached(Type = typeof(IBindable<IReadOnlyList<Mod>>))]
+        protected readonly Bindable<IReadOnlyList<Mod>> Mods = new Bindable<IReadOnlyList<Mod>>(Array.Empty<Mod>());
 
         protected Bindable<WorkingBeatmap> Beatmap => beatmap;
 
