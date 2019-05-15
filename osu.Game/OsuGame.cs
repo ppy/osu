@@ -89,7 +89,7 @@ namespace osu.Game
 
         public readonly Bindable<OverlayActivation> OverlayActivationMode = new Bindable<OverlayActivation>();
 
-        public OsuScreenStack screenStack;
+        private OsuScreenStack screenStack;
         private VolumeOverlay volume;
         private OnScreenDisplay onscreenDisplay;
         private OsuLogo osuLogo;

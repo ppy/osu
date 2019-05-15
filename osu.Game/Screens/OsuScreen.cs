@@ -57,8 +57,7 @@ namespace osu.Game.Screens
         /// </summary>
         public virtual bool DisallowExternalBeatmapRulesetChanges => false;
 
-        public const bool DEFAULT_PREVIEWABLE_TRACK_OVERRIDE = false;
-        protected bool previewableTrackOverride = DEFAULT_PREVIEWABLE_TRACK_OVERRIDE;
+        protected bool previewableTrackOverride = false;
 
         private SampleChannel sampleExit;
 
@@ -149,10 +148,7 @@ namespace osu.Game.Screens
                 onExitingLogo();
 
             if (base.OnExiting(next))
-            {
-                Beatmap.Value.previewableTrackOverride = DEFAULT_PREVIEWABLE_TRACK_OVERRIDE;
                 return true;
-            }
 
             if (localBackground != null && backgroundStack?.CurrentScreen == localBackground)
                 backgroundStack?.Exit();
