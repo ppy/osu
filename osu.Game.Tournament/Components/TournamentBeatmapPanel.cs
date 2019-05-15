@@ -171,6 +171,7 @@ namespace osu.Game.Tournament.Components
                     case TeamColour.Red:
                         BorderColour = Color4.Red;
                         break;
+
                     case TeamColour.Blue:
                         BorderColour = Color4.Blue;
                         break;
@@ -182,6 +183,7 @@ namespace osu.Game.Tournament.Components
                         Colour = Color4.White;
                         Alpha = 1;
                         break;
+
                     case ChoiceType.Ban:
                         Colour = Color4.Gray;
                         Alpha = 0.5f;
@@ -199,6 +201,7 @@ namespace osu.Game.Tournament.Components
         private void picksBansOnCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
             var list = (ObservableCollection<BeatmapChoice>)sender;
+
             if (sender != currentMatch.Value.PicksBans)
             {
                 // todo: we need a last attribute in bindable valuechanged events badly.

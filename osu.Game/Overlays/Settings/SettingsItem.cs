@@ -9,6 +9,7 @@ using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
+using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
@@ -87,7 +88,7 @@ namespace osu.Game.Overlays.Settings
         {
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
-            Padding = new MarginPadding { Right = SettingsOverlay.CONTENT_MARGINS };
+            Padding = new MarginPadding { Right = SettingsPanel.CONTENT_MARGINS };
 
             InternalChildren = new Drawable[]
             {
@@ -96,7 +97,7 @@ namespace osu.Game.Overlays.Settings
                 {
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
-                    Padding = new MarginPadding { Left = SettingsOverlay.CONTENT_MARGINS },
+                    Padding = new MarginPadding { Left = SettingsPanel.CONTENT_MARGINS },
                     Child = Control = CreateControl()
                 },
             };
@@ -131,7 +132,7 @@ namespace osu.Game.Overlays.Settings
             public RestoreDefaultValueButton()
             {
                 RelativeSizeAxes = Axes.Y;
-                Width = SettingsOverlay.CONTENT_MARGINS;
+                Width = SettingsPanel.CONTENT_MARGINS;
                 Alpha = 0f;
             }
 

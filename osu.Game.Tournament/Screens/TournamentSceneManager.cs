@@ -158,6 +158,7 @@ namespace osu.Game.Tournament.Screens
                 case MapPoolScreen _:
                     chatContainer.FadeIn(100);
                     break;
+
                 default:
                     chatContainer.FadeOut(100);
                     break;

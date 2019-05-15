@@ -70,6 +70,7 @@ namespace osu.Game.Rulesets.Taiko.Objects
                 return;
 
             bool first = true;
+
             for (double t = StartTime; t < EndTime + tickSpacing / 2; t += tickSpacing)
             {
                 AddNested(new DrumRollTick

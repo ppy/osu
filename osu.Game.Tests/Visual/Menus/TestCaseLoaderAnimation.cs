@@ -23,7 +23,11 @@ namespace osu.Game.Tests.Visual.Menus
 
         public TestCaseLoaderAnimation()
         {
-            Child = logo = new OsuLogo { Depth = float.MinValue };
+            Child = logo = new OsuLogo
+            {
+                Alpha = 0,
+                Depth = float.MinValue
+            };
         }
 
         [Test]
@@ -39,7 +43,7 @@ namespace osu.Game.Tests.Visual.Menus
                 LoadScreen(loader);
             });
 
-            AddAssert("loaded", () =>
+            AddUntilStep("loaded", () =>
             {
                 logoVisible = loader.Logo?.Alpha > 0;
                 return loader.Logo != null && loader.ScreenLoaded;
@@ -54,7 +58,7 @@ namespace osu.Game.Tests.Visual.Menus
             bool logoVisible = false;
 
             AddStep("begin loading", () => LoadScreen(loader = new TestLoader()));
-            AddWaitStep("wait", 2);
+            AddWaitStep("wait", 3);
             AddStep("finish loading", () =>
             {
                 logoVisible = loader.Logo?.Alpha > 0;

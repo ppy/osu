@@ -9,7 +9,7 @@ namespace osu.Game.Rulesets.UI
     public class GameplayCursorContainer : CursorContainer
     {
         /// <summary>
-        /// Because Show/Hide are executed by a parent, <see cref="State"/> is updated immediately even if the cursor
+        /// Because Show/Hide are executed by a parent, <see cref="VisibilityContainer.State"/> is updated immediately even if the cursor
         /// is in a non-updating state (via <see cref="FrameStabilityContainer"/> limitations).
         ///
         /// This holds the true visibility value.

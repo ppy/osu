@@ -5,6 +5,7 @@ using System;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.Scoring;
+using osu.Game.Scoring;
 
 namespace osu.Game.Rulesets.Mods
 {
@@ -23,6 +24,8 @@ namespace osu.Game.Rulesets.Mods
         {
             scoreProcessor.FailConditions += FailCondition;
         }
+
+        public ScoreRank AdjustRank(ScoreRank rank, double accuracy) => rank;
 
         protected virtual bool FailCondition(ScoreProcessor scoreProcessor) => scoreProcessor.Combo.Value == 0;
     }

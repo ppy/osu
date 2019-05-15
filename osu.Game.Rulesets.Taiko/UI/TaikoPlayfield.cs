@@ -6,6 +6,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Graphics;
@@ -211,6 +212,7 @@ namespace osu.Game.Rulesets.Taiko.UI
                 case DrawableBarLine barline:
                     barlineContainer.Add(barline.CreateProxy());
                     break;
+
                 case DrawableTaikoHitObject taikoObject:
                     topLevelHitContainer.Add(taikoObject.CreateProxiedContent());
                     break;
@@ -231,6 +233,7 @@ namespace osu.Game.Rulesets.Taiko.UI
                     if (result.IsHit)
                         hitExplosionContainer.Children.FirstOrDefault(e => e.JudgedObject == ((DrawableStrongNestedHit)judgedObject).MainObject)?.VisualiseSecondHit();
                     break;
+
                 default:
                     judgementContainer.Add(new DrawableTaikoJudgement(result, judgedObject)
                     {

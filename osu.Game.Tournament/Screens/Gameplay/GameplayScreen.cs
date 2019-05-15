@@ -190,9 +190,11 @@ namespace osu.Game.Tournament.Screens.Gameplay
                         }
 
                         break;
+
                     case TourneyState.Ranking:
                         scheduledOperation = Scheduler.AddDelayed(contract, 10000);
                         break;
+
                     default:
                         chat.Expand();
                         expand();

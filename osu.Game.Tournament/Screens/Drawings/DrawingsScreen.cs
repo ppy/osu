@@ -230,6 +230,7 @@ namespace osu.Game.Tournament.Screens.Drawings
                     using (StreamReader sr = new StreamReader(stream))
                     {
                         string line;
+
                         while ((line = sr.ReadLine()?.Trim()) != null)
                         {
                             if (string.IsNullOrEmpty(line))

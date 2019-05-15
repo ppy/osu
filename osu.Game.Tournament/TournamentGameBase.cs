@@ -33,7 +33,6 @@ namespace osu.Game.Tournament
 
         private DependencyContainer dependencies;
 
-        [Cached]
         private readonly Bindable<RulesetInfo> ruleset = new Bindable<RulesetInfo>();
 
         private Bindable<Size> windowSize;
@@ -130,6 +129,7 @@ namespace osu.Game.Tournament
             foreach (var id in group.Pairings)
             {
                 var found = ladder.Pairings.FirstOrDefault(p => p.ID == id);
+
                 if (found != null)
                 {
                     found.Grouping.Value = group;
@@ -174,6 +174,7 @@ namespace osu.Game.Tournament
         private bool addBeatmaps()
         {
             bool addedInfo = false;
+
             foreach (var g in ladder.Groupings)
             foreach (var b in g.Beatmaps)
                 if (b.BeatmapInfo == null)
@@ -228,6 +229,7 @@ namespace osu.Game.Tournament
         {
             base.Update();
             var minWidth = (int)(windowSize.Value.Height / 9f * 16 + 400);
+
             if (windowSize.Value.Width < minWidth)
             {
                 // todo: can be removed after ppy/osu-framework#1975

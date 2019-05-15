@@ -86,6 +86,7 @@ namespace osu.Game.Tournament.Screens.Ladder
             headings.Clear();
 
             int id = 1;
+
             foreach (var pairing in PairingsContainer.OrderBy(d => d.Y).ThenBy(d => d.X))
             {
                 pairing.Pairing.ID = id++;

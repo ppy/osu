@@ -26,6 +26,11 @@ namespace osu.Game.Beatmaps.Drawables
             this.beatmapSetCoverType = beatmapSetCoverType;
         }
 
+        /// <summary>
+        /// Delay before the background is unloaded while off-screen.
+        /// </summary>
+        protected virtual double UnloadDelay => 10000;
+
         private BeatmapInfo lastModel;
 
         protected override DelayedLoadWrapper CreateDelayedLoadWrapper(Drawable content, double timeBeforeLoad)
@@ -34,13 +39,13 @@ namespace osu.Game.Beatmaps.Drawables
             {
                 // If DelayedLoadUnloadWrapper is attempting to RELOAD the same content (Beatmap), that means that it was
                 // previously UNLOADED and thus its children have been disposed of, so we need to recreate them here.
-                if (lastModel == Beatmap.Value && Beatmap.Value != null)
+                if (lastModel == Beatmap.Value)
                     return CreateDrawable(Beatmap.Value);
 
                 // If the model has changed since the previous unload (or if there was no load), then we can safely use the given content
                 lastModel = Beatmap.Value;
                 return content;
-            }, timeBeforeLoad, 10000);
+            }, timeBeforeLoad, UnloadDelay);
         }
 
         protected override Drawable CreateDrawable(BeatmapInfo model)

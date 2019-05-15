@@ -16,7 +16,7 @@ namespace osu.Game.Rulesets.Osu.Tests
 
         public TestCaseSliderHidden()
         {
-            Mods.Add(new OsuModHidden());
+            Mods.Value = new[] { new OsuModHidden() };
         }
     }
 }
