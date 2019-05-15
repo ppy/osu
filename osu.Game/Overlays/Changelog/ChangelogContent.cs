@@ -15,9 +15,7 @@ namespace osu.Game.Overlays.Changelog
     {
         private ChangelogContentGroup changelogContentGroup;
 
-        public delegate void BuildSelectedEventHandler(APIChangelogBuild build, EventArgs args);
-
-        public event BuildSelectedEventHandler BuildSelected;
+        public event Action<APIChangelogBuild> BuildSelected;
 
         public ChangelogContent()
         {
@@ -48,7 +46,7 @@ namespace osu.Game.Overlays.Changelog
                     }
 
                     changelogContentGroup = new ChangelogContentGroup(build, true);
-                    changelogContentGroup.BuildSelected += OnBuildSelected;
+                    changelogContentGroup.BuildSelected += b => BuildSelected?.Invoke(b);
                     changelogContentGroup.GenerateText(build.ChangelogEntries);
                     Add(changelogContentGroup);
                     currentDate = build.CreatedAt.Date;
@@ -64,7 +62,7 @@ namespace osu.Game.Overlays.Changelog
                     });
 
                     changelogContentGroup = new ChangelogContentGroup(build, false);
-                    changelogContentGroup.BuildSelected += OnBuildSelected;
+                    changelogContentGroup.BuildSelected += b => BuildSelected?.Invoke(b);
                     changelogContentGroup.GenerateText(build.ChangelogEntries);
                     Add(changelogContentGroup);
                 }
@@ -77,12 +75,7 @@ namespace osu.Game.Overlays.Changelog
             changelogContentGroup.GenerateText(changelogBuild.ChangelogEntries);
             changelogContentGroup.UpdateChevronTooltips(changelogBuild.Versions.Previous?.DisplayVersion,
                 changelogBuild.Versions.Next?.DisplayVersion);
-            changelogContentGroup.BuildSelected += OnBuildSelected;
-        }
-
-        protected virtual void OnBuildSelected(APIChangelogBuild build, EventArgs args)
-        {
-            BuildSelected?.Invoke(build, EventArgs.Empty);
+            changelogContentGroup.BuildSelected += b => BuildSelected?.Invoke(b);
         }
     }
 }
