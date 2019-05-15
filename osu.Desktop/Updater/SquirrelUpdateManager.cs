@@ -169,12 +169,17 @@ namespace osu.Desktop.Updater
         {
             public LogLevel Level { get; set; } = LogLevel.Info;
 
+            private Logger logger;
+
             public void Write(string message, LogLevel logLevel)
             {
                 if (logLevel < Level)
                     return;
 
-                Logger.Log(message);
+                if (logger == null)
+                    logger = Logger.GetLogger("updater");
+
+                logger.Add(message);
             }
 
             public void Dispose()
