@@ -31,11 +31,9 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Input;
 using osu.Game.Overlays.Notifications;
-using osu.Game.Rulesets;
 using osu.Game.Screens.Play;
 using osu.Game.Input.Bindings;
 using osu.Game.Online.Chat;
-using osu.Game.Rulesets.Mods;
 using osu.Game.Skinning;
 using osuTK.Graphics;
 using osu.Game.Overlays.Volume;
@@ -89,7 +87,6 @@ namespace osu.Game
         private Intro introScreen;
 
         private Bindable<int> configRuleset;
-        private readonly Bindable<RulesetInfo> ruleset = new Bindable<RulesetInfo>();
 
         private Bindable<int> configSkin;
 
@@ -102,11 +99,6 @@ namespace osu.Game
         private readonly List<OverlayContainer> toolbarElements = new List<OverlayContainer>();
 
         private readonly List<OverlayContainer> visibleBlockingOverlays = new List<OverlayContainer>();
-
-        // todo: move this to SongSelect once Screen has the ability to unsuspend.
-        [Cached]
-        [Cached(typeof(IBindable<IReadOnlyList<Mod>>))]
-        private readonly Bindable<IReadOnlyList<Mod>> mods = new Bindable<IReadOnlyList<Mod>>(Array.Empty<Mod>());
 
         public OsuGame(string[] args = null)
         {
@@ -176,15 +168,12 @@ namespace osu.Game
 
             dependencies.Cache(RavenLogger);
 
-            dependencies.CacheAs(ruleset);
-            dependencies.CacheAs<IBindable<RulesetInfo>>(ruleset);
-
             dependencies.Cache(osuLogo = new OsuLogo { Alpha = 0 });
 
             // bind config int to database RulesetInfo
             configRuleset = LocalConfig.GetBindable<int>(OsuSetting.Ruleset);
-            ruleset.Value = RulesetStore.GetRuleset(configRuleset.Value) ?? RulesetStore.AvailableRulesets.First();
-            ruleset.ValueChanged += r => configRuleset.Value = r.NewValue.ID ?? 0;
+            Ruleset.Value = RulesetStore.GetRuleset(configRuleset.Value) ?? RulesetStore.AvailableRulesets.First();
+            Ruleset.ValueChanged += r => configRuleset.Value = r.NewValue.ID ?? 0;
 
             // bind config int to database SkinInfo
             configSkin = LocalConfig.GetBindable<int>(OsuSetting.Skin);
@@ -255,9 +244,9 @@ namespace osu.Game
                 }
 
                 // Use first beatmap available for current ruleset, else switch ruleset.
-                var first = databasedSet.Beatmaps.Find(b => b.Ruleset == ruleset.Value) ?? databasedSet.Beatmaps.First();
+                var first = databasedSet.Beatmaps.Find(b => b.Ruleset == Ruleset.Value) ?? databasedSet.Beatmaps.First();
 
-                ruleset.Value = first.Ruleset;
+                Ruleset.Value = first.Ruleset;
                 Beatmap.Value = BeatmapManager.GetWorkingBeatmap(first);
             }, $"load {beatmap}", bypassScreenAllowChecks: true, targetScreen: typeof(PlaySongSelect));
         }
@@ -287,9 +276,9 @@ namespace osu.Game
 
             performFromMainMenu(() =>
             {
-                ruleset.Value = databasedScoreInfo.Ruleset;
+                Ruleset.Value = databasedScoreInfo.Ruleset;
                 Beatmap.Value = BeatmapManager.GetWorkingBeatmap(databasedBeatmap);
-                mods.Value = databasedScoreInfo.Mods;
+                Mods.Value = databasedScoreInfo.Mods;
 
                 menuScreen.Push(new PlayerLoader(() => new ReplayPlayer(databasedScore)));
             }, $"watch {databasedScoreInfo}", bypassScreenAllowChecks: true);
