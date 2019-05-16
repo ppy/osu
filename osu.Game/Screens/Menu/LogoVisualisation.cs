@@ -38,7 +38,7 @@ namespace osu.Game.Screens.Menu
         private const float bar_length_const = 600;
 
         /// <summary>
-        /// The calculated max length of each bar in the visualiser from the audio value
+        /// The calculated max length of each bar in the osu!logo visualizer (calculated from the audio value)
         /// </summary>
         private static float bar_length => Convert.ToSingle(bar_length_const * (audio == null ? 1 : audio.Volume.Value));
 
