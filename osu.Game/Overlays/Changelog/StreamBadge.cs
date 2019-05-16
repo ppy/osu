@@ -56,18 +56,18 @@ namespace osu.Game.Overlays.Changelog
                         new SpriteText
                         {
                             Text = stream.DisplayName,
-                            Font = OsuFont.GetFont(weight: FontWeight.Bold, size: 14), // web: 12,
+                            Font = OsuFont.GetFont(weight: FontWeight.Bold, size: 12),
                             Margin = new MarginPadding { Top = 6 },
                         },
                         new SpriteText
                         {
                             Text = stream.LatestBuild.DisplayVersion,
-                            Font = OsuFont.GetFont(weight: FontWeight.Light, size: 20), // web: 16,
+                            Font = OsuFont.GetFont(weight: FontWeight.Light, size: 16),
                         },
                         new SpriteText
                         {
                             Text = stream.LatestBuild.Users > 0 ? $"{stream.LatestBuild.Users:N0} users online" : null,
-                            Font = OsuFont.GetFont(weight: FontWeight.Regular, size: 12), // web: 10,
+                            Font = OsuFont.GetFont(weight: FontWeight.Regular, size: 10),
                             Colour = new Color4(203, 164, 218, 255),
                         },
                     }

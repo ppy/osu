@@ -35,7 +35,7 @@ namespace osu.Game.Overlays.Changelog.Header
             {
                 Text = new SpriteText
                 {
-                    Font = OsuFont.GetFont(size: 21), // web: 16,
+                    Font = OsuFont.GetFont(size: 16),
                     Text = displayText,
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
