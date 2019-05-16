@@ -2,8 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.IO;
-using System.Reflection;
 using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
@@ -169,23 +167,19 @@ namespace osu.Desktop.Updater
 
         private class SquirrelLogger : Splat.ILogger, IDisposable
         {
-            private readonly string path;
-            private readonly object locker = new object();
             public LogLevel Level { get; set; } = LogLevel.Info;
 
-            public SquirrelLogger()
-            {
-                var file = Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly()?.Location ?? Directory.GetCurrentDirectory()), "SquirrelSetupUpdater.log");
-                if (File.Exists(file)) File.Delete(file);
-                path = file;
-            }
+            private Logger logger;
 
             public void Write(string message, LogLevel logLevel)
             {
                 if (logLevel < Level)
                     return;
 
-                lock (locker) File.AppendAllText(path, message + "\r\n");
+                if (logger == null)
+                    logger = Logger.GetLogger("updater");
+
+                logger.Add(message);
             }
 
             public void Dispose()
