@@ -40,7 +40,7 @@ namespace osu.Game.Screens.Menu
         /// <summary>
         /// The calculated max length of each bar in the osu!logo visualizer (calculated from the audio value)
         /// </summary>
-        private static float barLength => Convert.ToSingle(bar_length_const * (audio == null ? 1 : audio.Volume.Value));
+        private static float barLength => Convert.ToSingle(bar_length_const * audio.Volume.Value);
 
         /// <summary>
         /// The number of bars in one rotation of the visualiser.
@@ -65,7 +65,7 @@ namespace osu.Game.Screens.Menu
         /// <summary>
         /// The minimum amplitude to show a bar.
         /// </summary>
-        private static float amplitude_dead_zone = 1f / bar_length_const;
+        private const float amplitude_dead_zone = 1f / bar_length_const;
 
         private int indexOffset;
 
@@ -80,6 +80,7 @@ namespace osu.Game.Screens.Menu
         private Bindable<Skin> skin;
 
         private static AudioManager audio;
+
         public LogoVisualisation()
         {
             texture = Texture.WhitePixel;
