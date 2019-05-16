@@ -87,8 +87,9 @@ namespace osu.Game.Overlays.Direct
                                                 {
                                                     Origin = Anchor.CentreLeft,
                                                     Anchor = Anchor.CentreLeft,
-                                                    Size = new Vector2(height / 2),
+                                                    Size = new Vector2(height / 3),
                                                     FillMode = FillMode.Fit,
+                                                    Margin = new MarginPadding { Right = 10 },
                                                 },
                                                 new FillFlowContainer
                                                 {
@@ -151,7 +152,7 @@ namespace osu.Game.Overlays.Direct
                                     Child = new DownloadButton(SetInfo)
                                     {
                                         Size = new Vector2(height - vertical_padding * 3),
-                                        Margin = new MarginPadding { Left = vertical_padding, Right = vertical_padding },
+                                        Margin = new MarginPadding { Left = vertical_padding * 2, Right = vertical_padding },
                                     },
                                 },
                                 new FillFlowContainer
