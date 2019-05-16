@@ -15,6 +15,7 @@ using osu.Framework.Graphics.Sprites;
 using osu.Framework.Localisation;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Drawables;
+using osu.Game.Graphics.Containers;
 
 namespace osu.Game.Overlays.Direct
 {
@@ -163,26 +164,21 @@ namespace osu.Game.Overlays.Direct
                                     {
                                         new Statistic(FontAwesome.Solid.PlayCircle, SetInfo.OnlineInfo?.PlayCount ?? 0),
                                         new Statistic(FontAwesome.Solid.Heart, SetInfo.OnlineInfo?.FavouriteCount ?? 0),
-                                        new FillFlowContainer
+                                        new LinkFlowContainer(s =>
+                                        {
+                                            s.Shadow = false;
+                                            s.Font = OsuFont.GetFont(size: 14);
+                                        })
                                         {
                                             Anchor = Anchor.TopRight,
                                             Origin = Anchor.TopRight,
                                             AutoSizeAxes = Axes.Both,
-                                            Direction = FillDirection.Horizontal,
-                                            Children = new[]
-                                            {
-                                                new OsuSpriteText
-                                                {
-                                                    Text = "mapped by ",
-                                                    Font = OsuFont.GetFont(size: 14)
-                                                },
-                                                new OsuSpriteText
-                                                {
-                                                    Text = SetInfo.Metadata.Author.Username,
-                                                    Font = OsuFont.GetFont(size: 14, weight: FontWeight.SemiBold, italics: true)
-                                                },
-                                            },
-                                        },
+                                        }.With(d =>
+                                        {
+                                            d.AutoSizeAxes = Axes.Both;
+                                            d.AddText("mapped by ");
+                                            d.AddUserLink(SetInfo.Metadata.Author);
+                                        }),
                                         new OsuSpriteText
                                         {
                                             Text = SetInfo.Metadata.Source,
