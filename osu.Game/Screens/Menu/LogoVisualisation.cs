@@ -40,7 +40,7 @@ namespace osu.Game.Screens.Menu
         /// <summary>
         /// The calculated max length of each bar in the osu!logo visualizer (calculated from the audio value)
         /// </summary>
-        private static float bar_length => Convert.ToSingle(bar_length_const * (audio == null ? 1 : audio.Volume.Value));
+        private static float barLength => Convert.ToSingle(bar_length_const * (audio == null ? 1 : audio.Volume.Value));
 
         /// <summary>
         /// The number of bars in one rotation of the visualiser.
@@ -87,13 +87,13 @@ namespace osu.Game.Screens.Menu
         }
 
         [BackgroundDependencyLoader]
-        private void load(ShaderManager shaders, IBindable<WorkingBeatmap> beatmap, IAPIProvider api, SkinManager skinManager, AudioManager Audio)
+        private void load(ShaderManager shaders, IBindable<WorkingBeatmap> beatmap, IAPIProvider api, SkinManager skinManager, AudioManager audioManager)
         {
             this.beatmap.BindTo(beatmap);
             shader = shaders.Load(VertexShaderDescriptor.TEXTURE_2, FragmentShaderDescriptor.TEXTURE_ROUNDED);
             user = api.LocalUser.GetBoundCopy();
             skin = skinManager.CurrentSkin.GetBoundCopy();
-            audio = Audio;
+            audio = audioManager;
 
             user.ValueChanged += _ => updateColour();
             skin.BindValueChanged(_ => updateColour(), true);
@@ -219,7 +219,7 @@ namespace osu.Game.Screens.Menu
                             //taking the cos and sin to the 0..1 range
                             var barPosition = new Vector2(rotationCos / 2 + 0.5f, rotationSin / 2 + 0.5f) * size;
 
-                            var barSize = new Vector2(size * (float)Math.Sqrt(2 * (1 - Math.Cos(MathHelper.DegreesToRadians(360f / bars_per_visualiser)))) / 2f, bar_length * audioData[i]);
+                            var barSize = new Vector2(size * (float)Math.Sqrt(2 * (1 - Math.Cos(MathHelper.DegreesToRadians(360f / bars_per_visualiser)))) / 2f, barLength * audioData[i]);
                             //The distance between the position and the sides of the bar.
                             var bottomOffset = new Vector2(-rotationSin * barSize.X / 2, rotationCos * barSize.X / 2);
                             //The distance between the bottom side of the bar and the top side.
