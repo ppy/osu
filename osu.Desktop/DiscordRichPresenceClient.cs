@@ -80,19 +80,19 @@ namespace osu.Desktop
             switch (ruleset.ID)
             {
                 case 0:
-                    presence.Assets.SmallImageKey = "osu";
+                    presence.Assets.SmallImageKey = ruleset.ShortName;
                     break;
 
                 case 1:
-                    presence.Assets.SmallImageKey = "taiko";
+                    presence.Assets.SmallImageKey = ruleset.ShortName;
                     break;
 
                 case 2:
-                    presence.Assets.SmallImageKey = "fruits";
+                    presence.Assets.SmallImageKey = ruleset.ShortName;
                     break;
 
                 case 3:
-                    presence.Assets.SmallImageKey = "mania";
+                    presence.Assets.SmallImageKey = ruleset.ShortName;
                     break;
 
                 default:
