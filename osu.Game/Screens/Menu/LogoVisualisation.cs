@@ -35,7 +35,12 @@ namespace osu.Game.Screens.Menu
         /// <summary>
         /// The maximum length of each bar in the visualiser. Will be reduced when kiai is not activated.
         /// </summary>
-        private static float bar_length => Convert.ToSingle(650 * (audio == null ? 1 : audio.Volume.Value));
+        private const float bar_length_const = 600;
+
+        /// <summary>
+        /// The calculated max length of each bar in the visualiser from the audio value
+        /// </summary>
+        private static float bar_length => Convert.ToSingle(bar_length_const * (audio == null ? 1 : audio.Volume.Value));
 
         /// <summary>
         /// The number of bars in one rotation of the visualiser.
@@ -60,7 +65,7 @@ namespace osu.Game.Screens.Menu
         /// <summary>
         /// The minimum amplitude to show a bar.
         /// </summary>
-        private static float amplitude_dead_zone = 1f / bar_length;
+        private static float amplitude_dead_zone = 1f / bar_length_const;
 
         private int indexOffset;
 
