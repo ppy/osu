@@ -19,6 +19,7 @@ using System;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
+using osu.Framework.Audio;
 
 namespace osu.Game.Screens.Menu
 {
@@ -34,7 +35,7 @@ namespace osu.Game.Screens.Menu
         /// <summary>
         /// The maximum length of each bar in the visualiser. Will be reduced when kiai is not activated.
         /// </summary>
-        private const float bar_length = 600;
+        private static float bar_length => Convert.ToSingle(650 * (audio == null ? 1 : audio.Volume.Value));
 
         /// <summary>
         /// The number of bars in one rotation of the visualiser.
@@ -59,7 +60,7 @@ namespace osu.Game.Screens.Menu
         /// <summary>
         /// The minimum amplitude to show a bar.
         /// </summary>
-        private const float amplitude_dead_zone = 1f / bar_length;
+        private static float amplitude_dead_zone = 1f / bar_length;
 
         private int indexOffset;
 
@@ -73,6 +74,7 @@ namespace osu.Game.Screens.Menu
         private Bindable<User> user;
         private Bindable<Skin> skin;
 
+        private static AudioManager audio;
         public LogoVisualisation()
         {
             texture = Texture.WhitePixel;
@@ -80,12 +82,13 @@ namespace osu.Game.Screens.Menu
         }
 
         [BackgroundDependencyLoader]
-        private void load(ShaderManager shaders, IBindable<WorkingBeatmap> beatmap, IAPIProvider api, SkinManager skinManager)
+        private void load(ShaderManager shaders, IBindable<WorkingBeatmap> beatmap, IAPIProvider api, SkinManager skinManager, AudioManager Audio)
         {
             this.beatmap.BindTo(beatmap);
             shader = shaders.Load(VertexShaderDescriptor.TEXTURE_2, FragmentShaderDescriptor.TEXTURE_ROUNDED);
             user = api.LocalUser.GetBoundCopy();
             skin = skinManager.CurrentSkin.GetBoundCopy();
+            audio = Audio;
 
             user.ValueChanged += _ => updateColour();
             skin.BindValueChanged(_ => updateColour(), true);
