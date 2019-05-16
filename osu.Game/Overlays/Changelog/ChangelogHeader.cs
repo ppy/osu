@@ -108,12 +108,12 @@ namespace osu.Game.Overlays.Changelog
                                 new OsuSpriteText
                                 {
                                     Text = "Changelog ",
-                                    Font = OsuFont.GetFont(weight: FontWeight.Light, size: 38), // web: 30,
+                                    Font = OsuFont.GetFont(weight: FontWeight.Light, size: 30),
                                 },
                                 titleStream = new OsuSpriteText
                                 {
                                     Text = "Listing",
-                                    Font = OsuFont.GetFont(weight: FontWeight.Light, size: 38), // web: 30,
+                                    Font = OsuFont.GetFont(weight: FontWeight.Light, size: 30),
                                     Colour = colours.Violet,
                                 },
                             }

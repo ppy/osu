@@ -64,17 +64,17 @@ namespace osu.Game.Overlays.Changelog
                                 new SpriteText
                                 {
                                     Text = build.UpdateStream.DisplayName,
-                                    Font = OsuFont.GetFont(weight: FontWeight.Medium, size: 28), // web: 24,
+                                    Font = OsuFont.GetFont(weight: FontWeight.Medium, size: 24),
                                 },
                                 new SpriteText
                                 {
                                     Text = " ",
-                                    Font = OsuFont.GetFont(weight: FontWeight.Medium, size: 28), // web: 24,
+                                    Font = OsuFont.GetFont(weight: FontWeight.Medium, size: 24),
                                 },
                                 new SpriteText
                                 {
                                     Text = build.DisplayVersion,
-                                    Font = OsuFont.GetFont(weight: FontWeight.Light, size: 28), // web: 24,
+                                    Font = OsuFont.GetFont(weight: FontWeight.Light, size: 24),
                                     Colour = StreamColour.FromStreamName(build.UpdateStream.Name),
                                 },
                             }
@@ -97,7 +97,7 @@ namespace osu.Game.Overlays.Changelog
                     // do we need .ToUniversalTime() here?
                     // also, this should be a temporary solution to weekdays in >localized< date strings
                     Text = build.CreatedAt.Date.ToLongDateString().Replace(build.CreatedAt.ToString("dddd") + ", ", ""),
-                    Font = OsuFont.GetFont(weight: FontWeight.Medium, size: 17), // web: 14,
+                    Font = OsuFont.GetFont(weight: FontWeight.Medium, size: 14),
                     Colour = OsuColour.FromHex(@"FD5"),
                     Anchor = Anchor.TopCentre,
                     Origin = Anchor.TopCentre,
@@ -126,7 +126,7 @@ namespace osu.Game.Overlays.Changelog
                     // do we need .ToUniversalTime() here?
                     // also, this should be a temporary solution to weekdays in >localized< date strings
                     Text = build.CreatedAt.Date.ToLongDateString().Replace(build.CreatedAt.ToString("dddd") + ", ", ""),
-                    Font = OsuFont.GetFont(weight: FontWeight.Light, size: 28), // web: 24,
+                    Font = OsuFont.GetFont(weight: FontWeight.Light, size: 24),
                     Colour = OsuColour.FromHex(@"FD5"),
                     Anchor = Anchor.TopCentre,
                     Origin = Anchor.TopCentre,
@@ -150,12 +150,12 @@ namespace osu.Game.Overlays.Changelog
                             new SpriteText
                             {
                                 Text = build.UpdateStream.DisplayName,
-                                Font = OsuFont.GetFont(weight: FontWeight.Medium, size: 20), // web: 19,
+                                Font = OsuFont.GetFont(weight: FontWeight.Medium, size: 19),
                             },
                             new SpriteText
                             {
                                 Text = build.DisplayVersion,
-                                Font = OsuFont.GetFont(weight: FontWeight.Light, size: 20), // web: 19,
+                                Font = OsuFont.GetFont(weight: FontWeight.Light, size: 19),
                                 Colour = StreamColour.FromStreamName(build.UpdateStream.Name),
                             },
                         },
@@ -214,7 +214,7 @@ namespace osu.Game.Overlays.Changelog
                 ChangelogEntries.Add(new SpriteText
                 {
                     Text = category.Key,
-                    Font = OsuFont.GetFont(weight: FontWeight.Bold, size: 24), // web: 24,
+                    Font = OsuFont.GetFont(weight: FontWeight.Bold, size: 24),
                     Margin = new MarginPadding { Top = 35, Bottom = 15 },
                 });
 
@@ -252,7 +252,7 @@ namespace osu.Game.Overlays.Changelog
                             Online.Chat.LinkAction.External, null, null,
                             t => t.Font = OsuFont.GetFont(size: 14));
                     else
-                        title.AddText(entry.GithubUser.DisplayName, t => t.Font = OsuFont.GetFont(size: 14)); //web: 12;
+                        title.AddText(entry.GithubUser.DisplayName, t => t.Font = OsuFont.GetFont(size: 12));
 
                     ChangelogEntries.Add(title);
 
@@ -267,7 +267,7 @@ namespace osu.Game.Overlays.Changelog
                         // todo: use markdown parsing once API returns markdown
                         messageContainer.AddText(Regex.Replace(entry.MessageHtml, @"<(.|\n)*?>", string.Empty), t =>
                         {
-                            t.Font = OsuFont.GetFont(size: 14); // web: 12,
+                            t.Font = OsuFont.GetFont(size: 12);
                             t.Colour = new Color4(235, 184, 254, 255);
                         });
 
