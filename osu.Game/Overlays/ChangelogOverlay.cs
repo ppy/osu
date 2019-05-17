@@ -82,22 +82,12 @@ namespace osu.Game.Overlays
             sampleBack = audio.Sample.Get(@"UI/generic-select-soft");
         }
 
-        protected override void LoadComplete()
-        {
-            base.LoadComplete();
-            fetchListing();
-        }
-
         protected override void PopIn()
         {
             base.PopIn();
-            FadeEdgeEffectTo(0.25f, WaveContainer.APPEAR_DURATION, Easing.In);
-        }
 
-        protected override void PopOut()
-        {
-            base.PopOut();
-            FadeEdgeEffectTo(0, WaveContainer.DISAPPEAR_DURATION, Easing.Out);
+            if (!initialFetchPerformed)
+                fetchListing();
         }
 
         public override bool OnPressed(GlobalAction action)
@@ -151,8 +141,12 @@ namespace osu.Game.Overlays
             loadContent(new ChangelogBuild(build));
         }
 
+        private bool initialFetchPerformed;
+
         private void fetchListing()
         {
+            initialFetchPerformed = true;
+
             var req = new GetChangelogRequest();
             req.Success += res =>
             {
@@ -165,6 +159,7 @@ namespace osu.Game.Overlays
 
                 ShowListing();
             };
+            req.Failure += _ => initialFetchPerformed = false;
 
             API.Queue(req);
         }
