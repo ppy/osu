@@ -64,22 +64,6 @@ namespace osu.Game.Overlays.Changelog
             }
         }
 
-        public void SelectNone()
-        {
-            Current.Value = null;
-
-            if (badgesContainer != null)
-            {
-                foreach (StreamBadge streamBadge in badgesContainer)
-                {
-                    if (!IsHovered)
-                        streamBadge.Activate();
-                    else
-                        streamBadge.Deactivate();
-                }
-            }
-        }
-
         protected override bool OnHover(HoverEvent e)
         {
             foreach (StreamBadge streamBadge in badgesContainer.Children)
