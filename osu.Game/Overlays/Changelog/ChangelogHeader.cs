@@ -1,4 +1,4 @@
-﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
@@ -50,7 +50,7 @@ namespace osu.Game.Overlays.Changelog
                         new Sprite
                         {
                             RelativeSizeAxes = Axes.Both,
-                            Texture = textures.Get(@"https://osu.ppy.sh/images/headers/changelog.jpg"),
+                            Texture = textures.Get(@"Headers/changelog"),
                             FillMode = FillMode.Fill,
                         },
                     }
@@ -76,8 +76,7 @@ namespace osu.Game.Overlays.Changelog
                                 new Sprite
                                 {
                                     RelativeSizeAxes = Axes.Both,
-                                    // todo: https://osu.ppy.sh/images/icons/changelog.svg
-                                    Texture = textures.Get(@"https://i.imgur.com/HQM3Vhp.png"),
+                                    Texture = textures.Get(@"Icons/changelog"),
                                     Size = new Vector2(0.8f),
                                     Anchor = Anchor.Centre,
                                     Origin = Anchor.Centre,
