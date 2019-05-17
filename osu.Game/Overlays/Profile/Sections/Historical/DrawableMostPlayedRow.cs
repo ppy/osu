@@ -17,7 +17,6 @@ namespace osu.Game.Overlays.Profile.Sections.Historical
     {
         private readonly BeatmapInfo beatmap;
         private readonly int playCount;
-        private OsuHoverContainer mapperContainer;
 
         public DrawableMostPlayedRow(BeatmapInfo beatmap, int playCount)
         {
@@ -34,36 +33,20 @@ namespace osu.Game.Overlays.Profile.Sections.Historical
             CoverType = BeatmapSetCoverType.List,
         };
 
-        [BackgroundDependencyLoader(true)]
-        private void load(UserProfileOverlay profileOverlay)
+        [BackgroundDependencyLoader]
+        private void load()
         {
             LeftFlowContainer.Add(new BeatmapMetadataContainer(beatmap));
-            LeftFlowContainer.Add(new FillFlowContainer
+            LeftFlowContainer.Add(new LinkFlowContainer(t => t.Font = OsuFont.GetFont(size: 12))
             {
                 RelativeSizeAxes = Axes.X,
                 AutoSizeAxes = Axes.Y,
                 Direction = FillDirection.Horizontal,
-                Children = new Drawable[]
-                {
-                    new OsuSpriteText
-                    {
-                        Text = @"mapped by ",
-                        Font = OsuFont.GetFont(size: 12)
-                    },
-                    mapperContainer = new OsuHoverContainer
-                    {
-                        AutoSizeAxes = Axes.Both,
-                        Children = new Drawable[]
-                        {
-                            new OsuSpriteText
-                            {
-                                Text = beatmap.Metadata.AuthorString,
-                                Font = OsuFont.GetFont(size: 12, weight: FontWeight.Medium, italics: true)
-                            }
-                        }
-                    },
-                }
-            });
+            }.With(d =>
+            {
+                d.AddText("mapped by ");
+                d.AddUserLink(beatmap.Metadata.Author);
+            }));
 
             RightFlowContainer.Add(new FillFlowContainer
             {
@@ -89,9 +72,6 @@ namespace osu.Game.Overlays.Profile.Sections.Historical
                     },
                 }
             });
-
-            if (profileOverlay != null)
-                mapperContainer.Action = () => profileOverlay.ShowUser(beatmap.BeatmapSet.Metadata.Author);
         }
     }
 }
