@@ -249,6 +249,10 @@ namespace osu.Game.Screens.Play
             if (!this.IsCurrentScreen()) return;
 
             sampleRestart?.Play();
+
+            // if a restart has been requested, cancel any pending completion (user has shown intent to restart).
+            onCompletionEvent = null;
+
             ValidForResume = false;
             RestartRequested?.Invoke();
             this.Exit();
