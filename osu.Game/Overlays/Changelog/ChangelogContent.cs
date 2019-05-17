@@ -10,7 +10,7 @@ namespace osu.Game.Overlays.Changelog
 {
     public class ChangelogContent : FillFlowContainer
     {
-        public event Action<APIChangelogBuild> BuildSelected;
+        public Action<APIChangelogBuild> BuildSelected;
 
         public void SelectBuild(APIChangelogBuild build) => BuildSelected?.Invoke(build);
 

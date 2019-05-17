@@ -2,6 +2,8 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
+using System.Linq;
+using System.Threading;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
@@ -24,7 +26,7 @@ namespace osu.Game.Overlays
 
         private BadgeDisplay badges;
 
-        private Container content;
+        private Container<ChangelogContent> content;
 
         private SampleChannel sampleBack;
 
@@ -58,7 +60,7 @@ namespace osu.Game.Overlays
                         {
                             header = new ChangelogHeader(),
                             badges = new BadgeDisplay(),
-                            content = new Container
+                            content = new Container<ChangelogContent>
                             {
                                 RelativeSizeAxes = Axes.X,
                                 AutoSizeAxes = Axes.Y,
@@ -103,7 +105,7 @@ namespace osu.Game.Overlays
             switch (action)
             {
                 case GlobalAction.Back:
-                    if (content.Child is ChangelogContent)
+                    if (content.Child is ChangelogListing)
                     {
                         State = Visibility.Hidden;
                     }
@@ -119,30 +121,14 @@ namespace osu.Game.Overlays
             return false;
         }
 
-        private void fetchListing()
-        {
-            header.ShowListing();
-
-            var req = new GetChangelogRequest();
-            req.Success += res =>
-            {
-                // remap streams to builds to ensure model equality
-                res.Builds.ForEach(b => b.UpdateStream = res.Streams.Find(s => s.Id == b.UpdateStream.Id));
-                res.Streams.ForEach(s => s.LatestBuild.UpdateStream = res.Streams.Find(s2 => s2.Id == s.LatestBuild.UpdateStream.Id));
-
-                builds = res.Builds;
-                ShowListing();
-                badges.Populate(res.Streams);
-            };
-
-            API.Queue(req);
-        }
-
         public void ShowListing()
         {
+            if (content.Children.FirstOrDefault() is ChangelogListing)
+                return;
+
             header.ShowListing();
             badges.Current.Value = null;
-            content.Child = new ChangelogListing(builds);
+            loadContent(new ChangelogListing(builds));
         }
 
         /// <summary>
@@ -162,17 +148,42 @@ namespace osu.Game.Overlays
             header.ShowBuild(build.UpdateStream.DisplayName, build.DisplayVersion);
             badges.Current.Value = build.UpdateStream;
 
-            void displayBuild(APIChangelogBuild populatedBuild) =>
-                content.Child = new ChangelogBuild(populatedBuild);
+            loadContent(new ChangelogBuild(build));
+        }
 
-            if (build.Versions != null)
-                displayBuild(build);
-            else
+        private void fetchListing()
+        {
+            var req = new GetChangelogRequest();
+            req.Success += res =>
             {
-                var req = new GetChangelogBuildRequest(build.UpdateStream.Name, build.Version);
-                req.Success += displayBuild;
-                API.Queue(req);
-            }
+                // remap streams to builds to ensure model equality
+                res.Builds.ForEach(b => b.UpdateStream = res.Streams.Find(s => s.Id == b.UpdateStream.Id));
+                res.Streams.ForEach(s => s.LatestBuild.UpdateStream = res.Streams.Find(s2 => s2.Id == s.LatestBuild.UpdateStream.Id));
+
+                builds = res.Builds;
+                badges.Populate(res.Streams);
+
+                ShowListing();
+            };
+
+            API.Queue(req);
+        }
+
+        private CancellationTokenSource loadContentTask;
+
+        private void loadContent(ChangelogContent newContent)
+        {
+            content.FadeTo(0.2f, 300, Easing.OutQuint);
+
+            loadContentTask?.Cancel();
+
+            LoadComponentAsync(newContent, c =>
+            {
+                content.FadeIn(300, Easing.OutQuint);
+
+                c.BuildSelected = ShowBuild;
+                content.Child = c;
+            }, (loadContentTask = new CancellationTokenSource()).Token);
         }
     }
 }

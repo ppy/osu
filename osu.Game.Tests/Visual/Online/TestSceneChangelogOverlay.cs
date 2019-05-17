@@ -22,6 +22,8 @@ namespace osu.Game.Tests.Visual.Online
             typeof(StreamBadge),
             typeof(ChangelogHeader),
             typeof(ChangelogContent),
+            typeof(ChangelogListing),
+            typeof(ChangelogBuild),
             typeof(ChangelogContentGroup),
             typeof(Breadcrumb),
             typeof(BreadcrumbListing),
