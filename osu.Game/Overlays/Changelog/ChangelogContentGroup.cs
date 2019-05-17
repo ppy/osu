@@ -6,11 +6,11 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
-using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API.Requests.Responses;
 using System;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
+using osu.Game.Overlays.Changelog.Components;
 using osuTK;
 using osuTK.Graphics;
 
