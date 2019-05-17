@@ -71,7 +71,12 @@ namespace osu.Game.Overlays
             header.ListingSelected += ShowListing;
 
             // todo: better
-            badges.Current.ValueChanged += e => ShowBuild(e.NewValue.LatestBuild);
+            badges.Current.ValueChanged += e =>
+            {
+                if (e.NewValue?.LatestBuild != null)
+                    ShowBuild(e.NewValue.LatestBuild);
+            };
+
             listing.BuildSelected += ShowBuild;
             content.BuildSelected += ShowBuild;
 
@@ -149,7 +154,7 @@ namespace osu.Game.Overlays
             header.ShowListing();
 
             content.Hide();
-            badges.SelectNone();
+            badges.Current.Value = null;
             listing.Show();
             scroll.ScrollTo(savedScrollPosition);
         }
