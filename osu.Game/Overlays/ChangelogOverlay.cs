@@ -26,11 +26,7 @@ namespace osu.Game.Overlays
         private ChangelogContent listing;
         private ChangelogContent content;
 
-        private ScrollContainer scroll;
-
         private SampleChannel sampleBack;
-
-        private float savedScrollPosition;
 
         [BackgroundDependencyLoader]
         private void load(AudioManager audio, OsuColour colour)
@@ -48,7 +44,7 @@ namespace osu.Game.Overlays
                     RelativeSizeAxes = Axes.Both,
                     Colour = new Color4(49, 36, 54, 255),
                 },
-                scroll = new ScrollContainer
+                new ScrollContainer
                 {
                     RelativeSizeAxes = Axes.Both,
                     ScrollbarVisible = false,
@@ -106,15 +102,9 @@ namespace osu.Game.Overlays
             switch (action)
             {
                 case GlobalAction.Back:
-                    if (isAtListing)
+                    if (listing.Alpha == 1)
                     {
-                        if (scroll.Current > scroll.GetChildPosInContent(listing))
-                        {
-                            scroll.ScrollTo(0);
-                            sampleBack?.Play();
-                        }
-                        else
-                            State = Visibility.Hidden;
+                        State = Visibility.Hidden;
                     }
                     else
                     {
@@ -146,17 +136,13 @@ namespace osu.Game.Overlays
             API.Queue(req);
         }
 
-        private bool isAtListing;
-
         public void ShowListing()
         {
-            isAtListing = true;
             header.ShowListing();
 
             content.Hide();
             badges.Current.Value = null;
             listing.Show();
-            scroll.ScrollTo(savedScrollPosition);
         }
 
         /// <summary>
@@ -182,13 +168,6 @@ namespace osu.Game.Overlays
             {
                 content.Show();
                 content.ShowBuild(populatedBuild);
-
-                if (scroll.Current > scroll.GetChildPosInContent(content))
-                    scroll.ScrollTo(content);
-
-                if (isAtListing)
-                    savedScrollPosition = scroll.Current;
-                isAtListing = false;
             }
 
             if (build.Versions != null)
