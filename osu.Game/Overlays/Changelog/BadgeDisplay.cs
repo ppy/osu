@@ -6,8 +6,8 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Events;
 using osu.Game.Online.API.Requests.Responses;
-using System;
 using System.Collections.Generic;
+using osu.Framework.Bindables;
 using osuTK.Graphics;
 
 namespace osu.Game.Overlays.Changelog
@@ -17,10 +17,9 @@ namespace osu.Game.Overlays.Changelog
         private const float vertical_padding = 20;
         private const float horizontal_padding = 85;
 
-        public event Action<APIChangelogBuild> Selected;
+        public readonly Bindable<APIUpdateStream> Current = new Bindable<APIUpdateStream>();
 
         private readonly FillFlowContainer<StreamBadge> badgesContainer;
-        private long selectedStreamId = -1;
 
         public BadgeDisplay()
         {
@@ -40,23 +39,34 @@ namespace osu.Game.Overlays.Changelog
                     Padding = new MarginPadding { Vertical = vertical_padding, Horizontal = horizontal_padding },
                 },
             };
+
+            Current.ValueChanged += e =>
+            {
+                foreach (StreamBadge streamBadge in badgesContainer)
+                {
+                    if (!IsHovered || e.NewValue.Id == streamBadge.Stream.Id)
+                        streamBadge.Activate();
+                    else
+                        streamBadge.Deactivate();
+                }
+            };
         }
 
         public void Populate(List<APIUpdateStream> streams)
         {
-            SelectNone();
+            Current.Value = null;
 
             foreach (APIUpdateStream updateStream in streams)
             {
                 var streamBadge = new StreamBadge(updateStream);
-                streamBadge.Selected += onBadgeSelected;
+                streamBadge.Selected += () => Current.Value = updateStream;
                 badgesContainer.Add(streamBadge);
             }
         }
 
         public void SelectNone()
         {
-            selectedStreamId = -1;
+            Current.Value = null;
 
             if (badgesContainer != null)
             {
@@ -70,45 +80,10 @@ namespace osu.Game.Overlays.Changelog
             }
         }
 
-        public void SelectUpdateStream(string updateStream)
-        {
-            foreach (StreamBadge streamBadge in badgesContainer)
-            {
-                if (streamBadge.Stream.Name == updateStream)
-                {
-                    selectedStreamId = streamBadge.Stream.Id;
-                    streamBadge.Activate();
-                }
-                else
-                    streamBadge.Deactivate();
-            }
-        }
-
-        private void onBadgeSelected(StreamBadge source, EventArgs args)
-        {
-            selectedStreamId = source.Stream.Id;
-            OnSelected(source);
-        }
-
-        protected virtual void OnSelected(StreamBadge source)
-        {
-            Selected?.Invoke(source.Stream.LatestBuild);
-        }
-
         protected override bool OnHover(HoverEvent e)
         {
             foreach (StreamBadge streamBadge in badgesContainer.Children)
-            {
-                if (selectedStreamId >= 0)
-                {
-                    if (selectedStreamId != streamBadge.Stream.Id)
-                        streamBadge.Deactivate();
-                    else
-                        streamBadge.EnableDim();
-                }
-                else
-                    streamBadge.Deactivate();
-            }
+                streamBadge.EnableDim();
 
             return base.OnHover(e);
         }
@@ -116,12 +91,7 @@ namespace osu.Game.Overlays.Changelog
         protected override void OnHoverLost(HoverLostEvent e)
         {
             foreach (StreamBadge streamBadge in badgesContainer.Children)
-            {
-                if (selectedStreamId < 0)
-                    streamBadge.Activate();
-                else if (streamBadge.Stream.Id == selectedStreamId)
-                    streamBadge.DisableDim();
-            }
+                streamBadge.DisableDim();
 
             base.OnHoverLost(e);
         }
