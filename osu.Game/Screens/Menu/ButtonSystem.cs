@@ -332,7 +332,7 @@ namespace osu.Game.Screens.Menu
                     break;
 
                 case ButtonSystemState.EnteringMode:
-                    logoTrackingContainer.StartTracking(logo, 0, Easing.In);
+                    logoTrackingContainer.StartTracking(logo, 400, Easing.InSine);
                     break;
             }
         }
