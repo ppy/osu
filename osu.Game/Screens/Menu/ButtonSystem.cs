@@ -332,7 +332,8 @@ namespace osu.Game.Screens.Menu
                     break;
 
                 case ButtonSystemState.EnteringMode:
-                    logoTrackingContainer.StartTracking(logo, 400, Easing.InSine);
+                    // When coming from the Initial (untracked) state, interpolate to the tracking position over a brief duration instead of tracking immediately.
+                    logoTrackingContainer.StartTracking(logo, lastState == ButtonSystemState.Initial ? 400 : 0, Easing.InSine);
                     break;
             }
         }
