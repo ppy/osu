@@ -73,7 +73,7 @@ namespace osu.Game.Overlays.Changelog
                 lineBadge = new LineBadge(false)
                 {
                     Anchor = Anchor.TopCentre,
-                    Colour = StreamColour.FromStreamName(stream.Name),
+                    Colour = stream.Colour,
                     UncollapsedSize = 4,
                     CollapsedSize = 2,
                 },
