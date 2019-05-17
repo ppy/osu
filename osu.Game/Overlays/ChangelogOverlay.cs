@@ -33,10 +33,10 @@ namespace osu.Game.Overlays
         [BackgroundDependencyLoader]
         private void load(AudioManager audio, OsuColour colour)
         {
-            Waves.FirstWaveColour = colour.Violet;
-            Waves.SecondWaveColour = OsuColour.FromHex(@"8F03BF");
-            Waves.ThirdWaveColour = OsuColour.FromHex(@"600280");
-            Waves.FourthWaveColour = OsuColour.FromHex(@"300140");
+            Waves.FirstWaveColour = colour.GreyVioletLight;
+            Waves.SecondWaveColour = colour.GreyViolet;
+            Waves.ThirdWaveColour = colour.GreyVioletDark;
+            Waves.FourthWaveColour = colour.GreyVioletDarker;
 
             Children = new Drawable[]
             {
