@@ -70,7 +70,8 @@ namespace osu.Game.Overlays
 
             header.ListingSelected += ShowListing;
 
-            badges.Selected += ShowBuild;
+            // todo: better
+            badges.Current.ValueChanged += e => ShowBuild(e.NewValue.LatestBuild);
             listing.BuildSelected += ShowBuild;
             content.BuildSelected += ShowBuild;
 
@@ -129,6 +130,10 @@ namespace osu.Game.Overlays
             var req = new GetChangelogRequest();
             req.Success += res =>
             {
+                // remap streams to builds to ensure model equality
+                res.Builds.ForEach(b => b.UpdateStream = res.Streams.Find(s => s.Id == b.UpdateStream.Id));
+                res.Streams.ForEach(s => s.LatestBuild.UpdateStream = res.Streams.Find(s2 => s2.Id == s.LatestBuild.UpdateStream.Id));
+
                 listing.ShowListing(res.Builds);
                 badges.Populate(res.Streams);
             };
@@ -157,8 +162,14 @@ namespace osu.Game.Overlays
         /// <see cref="APIChangelogBuild.DisplayVersion"/> are specified, the header will instantly display them.</param>
         public void ShowBuild(APIChangelogBuild build)
         {
+            if (build == null)
+            {
+                ShowListing();
+                return;
+            }
+
             header.ShowBuild(build.UpdateStream.DisplayName, build.DisplayVersion);
-            badges.SelectUpdateStream(build.UpdateStream.Name);
+            badges.Current.Value = build.UpdateStream;
 
             listing.Hide();
 

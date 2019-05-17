@@ -1,4 +1,4 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
@@ -81,18 +81,13 @@ namespace osu.Game.Overlays.Changelog
                                     Anchor = Anchor.Centre,
                                     Origin = Anchor.Centre,
                                 },
-
-                                // this box has 2 functions:
-                                // - ensures the circle doesn't disappear on the X and Y edges
-                                // - gets rid of the white "contamination" on the circle (due to smoothing)
-                                //   (https://i.imgur.com/SMuvWBZ.png)
                                 new Box
                                 {
                                     RelativeSizeAxes = Axes.Both,
+                                    Colour = colours.Violet,
                                     Alpha = 0,
                                     AlwaysPresent = true,
-                                    Colour = colours.Violet,
-                                }
+                                },
                             }
                         },
                         new FillFlowContainer
