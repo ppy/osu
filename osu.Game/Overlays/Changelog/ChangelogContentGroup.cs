@@ -75,7 +75,7 @@ namespace osu.Game.Overlays.Changelog
                                 {
                                     Text = build.DisplayVersion,
                                     Font = OsuFont.GetFont(weight: FontWeight.Light, size: 24),
-                                    Colour = StreamColour.FromStreamName(build.UpdateStream.Name),
+                                    Colour = build.UpdateStream.Colour,
                                 },
                             }
                         },
@@ -156,7 +156,7 @@ namespace osu.Game.Overlays.Changelog
                             {
                                 Text = build.DisplayVersion,
                                 Font = OsuFont.GetFont(weight: FontWeight.Light, size: 19),
-                                Colour = StreamColour.FromStreamName(build.UpdateStream.Name),
+                                Colour = build.UpdateStream.Colour,
                             },
                         },
                     }
