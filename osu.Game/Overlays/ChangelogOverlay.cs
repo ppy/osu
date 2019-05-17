@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
@@ -23,15 +24,15 @@ namespace osu.Game.Overlays
 
         private BadgeDisplay badges;
 
-        private ChangelogContent listing;
-        private ChangelogContent content;
+        private Container content;
 
         private SampleChannel sampleBack;
+
+        private List<APIChangelogBuild> builds;
 
         [BackgroundDependencyLoader]
         private void load(AudioManager audio, OsuColour colour)
         {
-            // these possibly need adjusting?
             Waves.FirstWaveColour = colour.Violet;
             Waves.SecondWaveColour = OsuColour.FromHex(@"8F03BF");
             Waves.ThirdWaveColour = OsuColour.FromHex(@"600280");
@@ -57,8 +58,11 @@ namespace osu.Game.Overlays
                         {
                             header = new ChangelogHeader(),
                             badges = new BadgeDisplay(),
-                            listing = new ChangelogContent(),
-                            content = new ChangelogContent()
+                            content = new Container
+                            {
+                                RelativeSizeAxes = Axes.X,
+                                AutoSizeAxes = Axes.Y,
+                            }
                         },
                     },
                 },
@@ -73,10 +77,7 @@ namespace osu.Game.Overlays
                     ShowBuild(e.NewValue.LatestBuild);
             };
 
-            listing.BuildSelected += ShowBuild;
-            content.BuildSelected += ShowBuild;
-
-            sampleBack = audio.Sample.Get(@"UI/generic-select-soft"); // @"UI/screen-back" feels non-fitting here
+            sampleBack = audio.Sample.Get(@"UI/generic-select-soft");
         }
 
         protected override void LoadComplete()
@@ -102,7 +103,7 @@ namespace osu.Game.Overlays
             switch (action)
             {
                 case GlobalAction.Back:
-                    if (listing.Alpha == 1)
+                    if (content.Child is ChangelogContent)
                     {
                         State = Visibility.Hidden;
                     }
@@ -129,7 +130,8 @@ namespace osu.Game.Overlays
                 res.Builds.ForEach(b => b.UpdateStream = res.Streams.Find(s => s.Id == b.UpdateStream.Id));
                 res.Streams.ForEach(s => s.LatestBuild.UpdateStream = res.Streams.Find(s2 => s2.Id == s.LatestBuild.UpdateStream.Id));
 
-                listing.ShowListing(res.Builds);
+                builds = res.Builds;
+                ShowListing();
                 badges.Populate(res.Streams);
             };
 
@@ -139,10 +141,8 @@ namespace osu.Game.Overlays
         public void ShowListing()
         {
             header.ShowListing();
-
-            content.Hide();
             badges.Current.Value = null;
-            listing.Show();
+            content.Child = new ChangelogListing(builds);
         }
 
         /// <summary>
@@ -162,13 +162,8 @@ namespace osu.Game.Overlays
             header.ShowBuild(build.UpdateStream.DisplayName, build.DisplayVersion);
             badges.Current.Value = build.UpdateStream;
 
-            listing.Hide();
-
-            void displayBuild(APIChangelogBuild populatedBuild)
-            {
-                content.Show();
-                content.ShowBuild(populatedBuild);
-            }
+            void displayBuild(APIChangelogBuild populatedBuild) =>
+                content.Child = new ChangelogBuild(populatedBuild);
 
             if (build.Versions != null)
                 displayBuild(build);
