@@ -9,9 +9,9 @@ using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Events;
-using osu.Game.Graphics.UserInterface;
 using System;
 using osu.Game.Graphics;
+using osu.Game.Overlays.Changelog.Components;
 
 namespace osu.Game.Overlays.Changelog.Header
 {

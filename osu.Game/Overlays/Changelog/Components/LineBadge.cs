@@ -4,7 +4,7 @@
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Shapes;
 
-namespace osu.Game.Graphics.UserInterface
+namespace osu.Game.Overlays.Changelog.Components
 {
     /// <summary>
     /// A simple rounded expandable line. Set its <see cref="Anchor"/>
