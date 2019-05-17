@@ -83,7 +83,7 @@ namespace osu.Game.Overlays.Settings
                             Font = OsuFont.GetFont(size: header_size),
                             Text = Header,
                             Colour = colours.Yellow,
-                            Margin = new MarginPadding { Left = SettingsOverlay.CONTENT_MARGINS, Right = SettingsOverlay.CONTENT_MARGINS }
+                            Margin = new MarginPadding { Left = SettingsPanel.CONTENT_MARGINS, Right = SettingsPanel.CONTENT_MARGINS }
                         },
                         FlowContent
                     }
