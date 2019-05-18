@@ -81,7 +81,7 @@ namespace osu.Game.Overlays.Chat
 
             ChatLineFlow.AddRange(displayMessages.Select(CreateChatLine));
 
-            if (scroll.IsScrolledToEnd(10) || !ChatLineFlow.Children.Any() || newMessages.Any(m => m is LocalMessage))
+            //if (scroll.IsScrolledToEnd(10) || !ChatLineFlow.Children.Any() || newMessages.Any(m => m is LocalMessage))
                 scrollToEnd();
 
             var staleMessages = ChatLineFlow.Children.Where(c => c.LifetimeEnd == double.MaxValue).ToArray();
