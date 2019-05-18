@@ -22,7 +22,7 @@ namespace osu.Game.Tournament.Screens.Gameplay.Components
     public class MatchHeader : Container
     {
         [BackgroundDependencyLoader]
-        private void load(LadderInfo ladder)
+        private void load()
         {
             RelativeSizeAxes = Axes.X;
             Height = 95;
