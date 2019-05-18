@@ -138,7 +138,7 @@ namespace osu.Game.Overlays
             header.ShowBuild(build.UpdateStream.DisplayName, build.DisplayVersion);
             badges.Current.Value = build.UpdateStream;
 
-            loadContent(new ChangelogBuild(build));
+            loadContent(new ChangelogSingleBuild(build));
         }
 
         private bool initialFetchPerformed;

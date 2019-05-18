@@ -11,6 +11,7 @@ using osu.Framework.Input.Events;
 using osu.Game.Graphics;
 using osu.Game.Online.API.Requests.Responses;
 using System;
+using osu.Game.Graphics.Sprites;
 using osu.Game.Overlays.Changelog.Components;
 using osuTK.Graphics;
 
@@ -51,18 +52,18 @@ namespace osu.Game.Overlays.Changelog
                     Direction = FillDirection.Vertical,
                     Children = new[]
                     {
-                        new SpriteText
+                        new OsuSpriteText
                         {
                             Text = stream.DisplayName,
                             Font = OsuFont.GetFont(weight: FontWeight.Bold, size: 12),
                             Margin = new MarginPadding { Top = 6 },
                         },
-                        new SpriteText
+                        new OsuSpriteText
                         {
                             Text = stream.LatestBuild.DisplayVersion,
                             Font = OsuFont.GetFont(weight: FontWeight.Light, size: 16),
                         },
-                        new SpriteText
+                        new OsuSpriteText
                         {
                             Text = stream.LatestBuild.Users > 0 ? $"{stream.LatestBuild.Users:N0} users online" : null,
                             Font = OsuFont.GetFont(weight: FontWeight.Regular, size: 10),
