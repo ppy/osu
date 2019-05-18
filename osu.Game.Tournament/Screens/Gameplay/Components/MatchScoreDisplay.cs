@@ -10,7 +10,6 @@ using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Tournament.IPC;
-using osu.Game.Tournament.Screens.Ladder.Components;
 using osuTK.Graphics;
 
 namespace osu.Game.Tournament.Screens.Gameplay.Components
@@ -21,8 +20,6 @@ namespace osu.Game.Tournament.Screens.Gameplay.Components
         private readonly Color4 blue = new Color4(17, 136, 170, 255);
 
         private const float bar_height = 20;
-
-        private readonly Bindable<MatchPairing> currentMatch = new Bindable<MatchPairing>();
 
         private readonly BindableInt score1 = new BindableInt();
         private readonly BindableInt score2 = new BindableInt();
@@ -78,8 +75,6 @@ namespace osu.Game.Tournament.Screens.Gameplay.Components
         [BackgroundDependencyLoader]
         private void load(LadderInfo ladder, MatchIPCInfo ipc)
         {
-            currentMatch.BindTo(ladder.CurrentMatch);
-
             score1.BindValueChanged(_ => updateScores());
             score1.BindTo(ipc.Score1);
 
