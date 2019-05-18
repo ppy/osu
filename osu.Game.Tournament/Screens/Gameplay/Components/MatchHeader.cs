@@ -210,7 +210,7 @@ namespace osu.Game.Tournament.Screens.Gameplay.Components
                 {
                     new Box
                     {
-                        Colour = new Color4(95, 41, 60, 255),
+                        Colour = new Color4(47, 71, 67, 255),
                         RelativeSizeAxes = Axes.Both,
                     },
                     new OsuSpriteText
