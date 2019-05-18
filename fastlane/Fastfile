@@ -35,7 +35,7 @@ platform :ios do
     changelog.gsub!('$BUILD_ID', options[:build])
 
     pilot(
-      wait_processing_interval: 900,
+      wait_processing_interval: 1800,
       changelog: changelog,
       ipa: './osu.iOS/bin/iPhone/Release/osu.iOS.ipa'
     )
