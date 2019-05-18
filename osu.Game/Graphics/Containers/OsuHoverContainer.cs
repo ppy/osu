@@ -22,7 +22,8 @@ namespace osu.Game.Graphics.Containers
 
         protected override bool OnHover(HoverEvent e)
         {
-            EffectTargets.ForEach(d => d.FadeColour(HoverColour, FADE_DURATION, Easing.OutQuint));
+            if (Action != null)
+                EffectTargets.ForEach(d => d.FadeColour(HoverColour, FADE_DURATION, Easing.OutQuint));
             return base.OnHover(e);
         }
 

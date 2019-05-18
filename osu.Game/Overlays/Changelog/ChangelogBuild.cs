@@ -1,50 +1,168 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System.Threading;
-using System.Threading.Tasks;
-using osu.Framework.Allocation;
-using osu.Game.Online.API;
-using osu.Game.Online.API.Requests;
+using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Sprites;
+using osu.Game.Graphics;
+using osu.Game.Graphics.Containers;
 using osu.Game.Online.API.Requests.Responses;
+using System;
+using System.Collections.Generic;
+using System.Text.RegularExpressions;
+using osu.Game.Graphics.Sprites;
+using osuTK.Graphics;
 
 namespace osu.Game.Overlays.Changelog
 {
-    public class ChangelogBuild : ChangelogContent
+    public class ChangelogBuild : FillFlowContainer
     {
-        private APIChangelogBuild changelogBuild;
+        public Action<APIChangelogBuild> SelectBuild;
 
-        public ChangelogBuild(APIChangelogBuild changelogBuild)
+        protected readonly APIChangelogBuild Build;
+
+        public readonly FillFlowContainer ChangelogEntries;
+
+        public ChangelogBuild(APIChangelogBuild build)
         {
-            this.changelogBuild = changelogBuild;
-        }
+            Build = build;
 
-        [BackgroundDependencyLoader]
-        private void load(CancellationToken? cancellation, IAPIProvider api)
-        {
-            var req = new GetChangelogBuildRequest(changelogBuild.UpdateStream.Name, changelogBuild.Version);
-            bool complete = false;
+            RelativeSizeAxes = Axes.X;
+            AutoSizeAxes = Axes.Y;
+            Direction = FillDirection.Vertical;
+            Padding = new MarginPadding { Horizontal = 70 };
 
-            req.Success += res =>
+            Children = new Drawable[]
             {
-                changelogBuild = res;
-                complete = true;
+                CreateHeader(),
+                ChangelogEntries = new FillFlowContainer
+                {
+                    RelativeSizeAxes = Axes.X,
+                    AutoSizeAxes = Axes.Y,
+                    Direction = FillDirection.Vertical,
+                },
             };
 
-            req.Failure += _ => complete = true;
+            var categories = new SortedDictionary<string, List<APIChangelogEntry>>();
 
-            api.Queue(req);
+            // sort entries by category
+            foreach (APIChangelogEntry entry in build.ChangelogEntries)
+            {
+                if (!categories.ContainsKey(entry.Category))
+                    categories.Add(entry.Category, new List<APIChangelogEntry> { entry });
+                else
+                    categories[entry.Category].Add(entry);
+            }
 
-            while (!complete && cancellation?.IsCancellationRequested != true)
-                Task.Delay(1);
+            foreach (KeyValuePair<string, List<APIChangelogEntry>> category in categories)
+            {
+                ChangelogEntries.Add(new OsuSpriteText
+                {
+                    Text = category.Key,
+                    Font = OsuFont.GetFont(weight: FontWeight.Bold, size: 24),
+                    Margin = new MarginPadding { Top = 35, Bottom = 15 },
+                });
 
-            var changelogContentGroup = new ChangelogContentGroup(changelogBuild);
-            changelogContentGroup.GenerateText(changelogBuild.ChangelogEntries);
-            changelogContentGroup.UpdateChevronTooltips(changelogBuild.Versions.Previous?.DisplayVersion,
-                changelogBuild.Versions.Next?.DisplayVersion);
-            changelogContentGroup.BuildSelected += SelectBuild;
+                foreach (APIChangelogEntry entry in category.Value)
+                {
+                    LinkFlowContainer title = new LinkFlowContainer
+                    {
+                        Direction = FillDirection.Full,
+                        RelativeSizeAxes = Axes.X,
+                        AutoSizeAxes = Axes.Y,
+                        Margin = new MarginPadding { Vertical = 5 },
+                    };
 
-            Add(changelogContentGroup);
+                    title.AddIcon(FontAwesome.Solid.Check, t =>
+                    {
+                        t.Font = OsuFont.GetFont(size: 12);
+                        t.Padding = new MarginPadding { Left = -17, Right = 5 };
+                    });
+
+                    title.AddText(entry.Title, t => { t.Font = OsuFont.GetFont(size: 18); });
+
+                    if (!string.IsNullOrEmpty(entry.Repository))
+                    {
+                        title.AddText(" (", t => t.Font = OsuFont.GetFont(size: 18));
+                        title.AddLink($"{entry.Repository.Replace("ppy/", "")}#{entry.GithubPullRequestId}",
+                            entry.GithubUrl, Online.Chat.LinkAction.External, null,
+                            null, t => { t.Font = OsuFont.GetFont(size: 18); });
+                        title.AddText(")", t => t.Font = OsuFont.GetFont(size: 18));
+                    }
+
+                    title.AddText(" by ", t => t.Font = OsuFont.GetFont(size: 14));
+
+                    if (entry.GithubUser.GithubUrl != null)
+                        title.AddLink(entry.GithubUser.DisplayName, entry.GithubUser.GithubUrl,
+                            Online.Chat.LinkAction.External, null, null,
+                            t => t.Font = OsuFont.GetFont(size: 14));
+                    else
+                        title.AddText(entry.GithubUser.DisplayName, t => t.Font = OsuFont.GetFont(size: 12));
+
+                    ChangelogEntries.Add(title);
+
+                    if (!string.IsNullOrEmpty(entry.MessageHtml))
+                    {
+                        TextFlowContainer messageContainer = new TextFlowContainer
+                        {
+                            AutoSizeAxes = Axes.Y,
+                            RelativeSizeAxes = Axes.X,
+                        };
+
+                        // todo: use markdown parsing once API returns markdown
+                        messageContainer.AddText(Regex.Replace(entry.MessageHtml, @"<(.|\n)*?>", string.Empty), t =>
+                        {
+                            t.Font = OsuFont.GetFont(size: 12);
+                            t.Colour = new Color4(235, 184, 254, 255);
+                        });
+
+                        ChangelogEntries.Add(messageContainer);
+                    }
+                }
+            }
         }
+
+        protected virtual FillFlowContainer CreateHeader() => new FillFlowContainer
+        {
+            Anchor = Anchor.TopCentre,
+            Origin = Anchor.TopCentre,
+            AutoSizeAxes = Axes.Both,
+            Direction = FillDirection.Horizontal,
+            Margin = new MarginPadding { Top = 20 },
+            Children = new Drawable[]
+            {
+                new OsuHoverContainer
+                {
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    AutoSizeAxes = Axes.Both,
+                    Action = () => SelectBuild?.Invoke(Build),
+                    Child = new FillFlowContainer<SpriteText>
+                    {
+                        AutoSizeAxes = Axes.Both,
+                        Margin = new MarginPadding { Horizontal = 40 },
+                        Children = new[]
+                        {
+                            new OsuSpriteText
+                            {
+                                Text = Build.UpdateStream.DisplayName,
+                                Font = OsuFont.GetFont(weight: FontWeight.Medium, size: 19),
+                            },
+                            new OsuSpriteText
+                            {
+                                Text = " ",
+                                Font = OsuFont.GetFont(weight: FontWeight.Medium, size: 19),
+                            },
+                            new OsuSpriteText
+                            {
+                                Text = Build.DisplayVersion,
+                                Font = OsuFont.GetFont(weight: FontWeight.Light, size: 19),
+                                Colour = Build.UpdateStream.Colour,
+                            },
+                        }
+                    }
+                },
+            }
+        };
     }
 }

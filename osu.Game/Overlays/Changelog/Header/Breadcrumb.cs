@@ -11,6 +11,7 @@ using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Events;
 using System;
 using osu.Game.Graphics;
+using osu.Game.Graphics.Sprites;
 using osu.Game.Overlays.Changelog.Components;
 
 namespace osu.Game.Overlays.Changelog.Header
@@ -33,7 +34,7 @@ namespace osu.Game.Overlays.Changelog.Header
             RelativeSizeAxes = Axes.Y;
             Children = new Drawable[]
             {
-                Text = new SpriteText
+                Text = new OsuSpriteText
                 {
                     Font = OsuFont.GetFont(size: 16),
                     Text = displayText,
