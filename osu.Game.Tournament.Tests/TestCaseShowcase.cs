@@ -9,7 +9,7 @@ using osu.Game.Tournament.Screens.Showcase;
 
 namespace osu.Game.Tournament.Tests
 {
-    public class TestCaseShowcase : OsuTestCase
+    public class TestCaseShowcase : OsuTestScene
     {
         public override IReadOnlyList<Type> RequiredTypes => new[]
         {

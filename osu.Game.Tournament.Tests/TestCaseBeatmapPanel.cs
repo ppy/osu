@@ -15,7 +15,7 @@ using osu.Game.Tournament.Components;
 
 namespace osu.Game.Tournament.Tests
 {
-    public class TestCaseBeatmapPanel : OsuTestCase
+    public class TestCaseBeatmapPanel : OsuTestScene
     {
         [Resolved]
         private IAPIProvider api { get; set; }

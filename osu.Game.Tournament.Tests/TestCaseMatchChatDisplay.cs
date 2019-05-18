@@ -14,7 +14,7 @@ using osuTK;
 
 namespace osu.Game.Tournament.Tests
 {
-    public class TestCaseMatchChatDisplay : OsuTestCase
+    public class TestCaseMatchChatDisplay : OsuTestScene
     {
         private readonly Channel testChannel = new Channel();
 

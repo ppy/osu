@@ -6,7 +6,7 @@ using osu.Game.Tests.Visual;
 
 namespace osu.Game.Tournament.Tests
 {
-    public class LadderTestCase : OsuTestCase
+    public class LadderTestCase : OsuTestScene
     {
         [Resolved]
         protected LadderInfo Ladder { get; private set; }
