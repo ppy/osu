@@ -1,20 +1,22 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using osu.Framework.Allocation;
+using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Game.Online.API.Requests.Responses;
-using osu.Game.Overlays.Changelog.Components;
 using osuTK;
 
 namespace osu.Game.Overlays.Changelog
@@ -82,29 +84,19 @@ namespace osu.Game.Overlays.Changelog
                     });
                 }
 
-                TooltipIconButton left, right;
+                NavigationIconButton left, right;
 
                 fill.AddRange(new[]
                 {
-                    left = new TooltipIconButton
+                    left = new NavigationIconButton(Build.Versions?.Previous)
                     {
-                        Anchor = Anchor.Centre,
-                        Origin = Anchor.Centre,
                         Icon = FontAwesome.Solid.ChevronLeft,
-                        Size = new Vector2(24),
-                        TooltipText = Build.Versions?.Previous?.DisplayVersion,
-                        IsEnabled = Build.Versions?.Previous != null,
-                        Action = () => { SelectBuild?.Invoke(Build.Versions.Previous); },
+                        SelectBuild = b => SelectBuild(b)
                     },
-                    right = new TooltipIconButton
+                    right = new NavigationIconButton(Build.Versions?.Next)
                     {
-                        Anchor = Anchor.Centre,
-                        Origin = Anchor.Centre,
                         Icon = FontAwesome.Solid.ChevronRight,
-                        Size = new Vector2(24),
-                        TooltipText = Build.Versions?.Next?.DisplayVersion,
-                        IsEnabled = Build.Versions?.Next != null,
-                        Action = () => { SelectBuild?.Invoke(Build.Versions.Next); },
+                        SelectBuild = b => SelectBuild(b)
                     },
                 });
 
@@ -112,6 +104,34 @@ namespace osu.Game.Overlays.Changelog
                 fill.SetLayoutPosition(right, 1);
 
                 return fill;
+            }
+        }
+
+        private class NavigationIconButton : IconButton
+        {
+            public Action<APIChangelogBuild> SelectBuild;
+
+            public NavigationIconButton(APIChangelogBuild build)
+            {
+                Anchor = Anchor.Centre;
+                Origin = Anchor.Centre;
+
+                if (build == null) return;
+
+                TooltipText = build.DisplayVersion;
+
+                Action = () =>
+                {
+                    SelectBuild?.Invoke(build);
+                    Enabled.Value = false;
+                };
+            }
+
+            [BackgroundDependencyLoader]
+            private void load(OsuColour colours)
+            {
+                HoverColour = colours.GreyVioletLight.Opacity(0.6f);
+                FlashColour = colours.GreyVioletLighter;
             }
         }
     }
