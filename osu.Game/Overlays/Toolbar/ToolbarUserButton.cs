@@ -5,6 +5,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Effects;
+using osu.Framework.Input.Commands;
 using osu.Game.Graphics;
 using osu.Game.Online.API;
 using osu.Game.Users;
@@ -43,11 +44,12 @@ namespace osu.Game.Overlays.Toolbar
         }
 
         [BackgroundDependencyLoader(true)]
-        private void load(IAPIProvider api, LoginOverlay login)
+        private void load(IAPIProvider api, LoginOverlay login, ToggleOverlayCommand<LoginOverlay> toggleOverlayCommand)
         {
             api.Register(this);
 
             StateContainer = login;
+            Command = toggleOverlayCommand;
         }
 
         public void APIStateChanged(IAPIProvider api, APIState state)

@@ -24,6 +24,7 @@ using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input;
 using osu.Framework.Input.Bindings;
+using osu.Framework.Input.Commands;
 using osu.Framework.Platform;
 using osu.Framework.Threading;
 using osu.Game.Beatmaps;
@@ -53,17 +54,19 @@ namespace osu.Game
         public Toolbar Toolbar;
 
         private ChatOverlay chatOverlay;
+        private ToggleOverlayCommand<ChatOverlay> toggleChatOverlayCommand;
 
         private ChannelManager channelManager;
 
         private NotificationOverlay notifications;
 
         private DirectOverlay direct;
+        private ToggleOverlayCommand<DirectOverlay> toggleDirectOverlayCommand;
 
         private SocialOverlay social;
+        private ToggleOverlayCommand<SocialOverlay> toggleSocialOverlayCommand;
 
         private UserProfileOverlay userProfile;
-
         private BeatmapSetOverlay beatmapSetOverlay;
 
         [Cached]
@@ -93,6 +96,7 @@ namespace osu.Game
         private readonly string[] args;
 
         private SettingsPanel settings;
+        private ToggleOverlayCommand<SettingsPanel> toggleSettingsOverlayCommand;
 
         private readonly List<OverlayContainer> overlays = new List<OverlayContainer>();
 
@@ -404,6 +408,66 @@ namespace osu.Game
                 });
             });
 
+            loadComponentSingleFile(volume = new VolumeOverlay(), leftFloatingOverlayContent.Add);
+            loadComponentSingleFile(new OnScreenDisplay(), Add, true);
+
+            loadComponentSingleFile(notifications = new NotificationOverlay
+            {
+                GetToolbarHeight = () => ToolbarOffset,
+                Anchor = Anchor.TopRight,
+                Origin = Anchor.TopRight,
+            }, rightFloatingOverlayContent.Add, true);
+            dependencies.Cache(new ToggleOverlayCommand<NotificationOverlay>(notifications));
+
+            loadComponentSingleFile(screenshotManager, Add);
+
+            //overlay elements
+            loadComponentSingleFile(direct = new DirectOverlay(), overlayContent.Add, true);
+            dependencies.Cache(toggleDirectOverlayCommand = new ToggleOverlayCommand<DirectOverlay>(direct));
+
+            loadComponentSingleFile(social = new SocialOverlay(), overlayContent.Add, true);
+            dependencies.Cache(toggleSocialOverlayCommand = new ToggleOverlayCommand<SocialOverlay>(social));
+
+            loadComponentSingleFile(channelManager = new ChannelManager(), AddInternal, true);
+
+            loadComponentSingleFile(chatOverlay = new ChatOverlay(), overlayContent.Add, true);
+            dependencies.Cache(toggleChatOverlayCommand = new ToggleOverlayCommand<ChatOverlay>(chatOverlay));
+
+            loadComponentSingleFile(settings = new SettingsOverlay { GetToolbarHeight = () => ToolbarOffset }, leftFloatingOverlayContent.Add, true);
+            dependencies.Cache(toggleSettingsOverlayCommand = new ToggleOverlayCommand<SettingsPanel>(settings));
+
+            loadComponentSingleFile(userProfile = new UserProfileOverlay(), overlayContent.Add, true);
+            dependencies.Cache(new ToggleOverlayCommand<UserProfileOverlay>(userProfile));
+
+            loadComponentSingleFile(beatmapSetOverlay = new BeatmapSetOverlay(), overlayContent.Add, true);
+            dependencies.Cache(new ToggleOverlayCommand<BeatmapSetOverlay>(beatmapSetOverlay));
+
+            LoginOverlay loginOverlay;
+            loadComponentSingleFile(loginOverlay=new LoginOverlay
+            {
+                GetToolbarHeight = () => ToolbarOffset,
+                Anchor = Anchor.TopRight,
+                Origin = Anchor.TopRight,
+            }, rightFloatingOverlayContent.Add, true);
+            dependencies.Cache(new ToggleOverlayCommand<LoginOverlay>(loginOverlay));
+
+            MusicController musicController;
+            loadComponentSingleFile(musicController = new MusicController
+            {
+                GetToolbarHeight = () => ToolbarOffset,
+                Anchor = Anchor.TopRight,
+                Origin = Anchor.TopRight,
+            }, d =>
+            {
+                rightFloatingOverlayContent.Add(d);
+                toolbarElements.Add(d);
+            }, true);
+            dependencies.Cache(new ToggleOverlayCommand<MusicController>(musicController));
+
+            loadComponentSingleFile(new AccountCreationOverlay(), topMostOverlayContent.Add, true);
+            loadComponentSingleFile(new DialogOverlay(), topMostOverlayContent.Add, true);
+            loadComponentSingleFile(externalLinkOpener = new ExternalLinkOpener(), topMostOverlayContent.Add);
+
             loadComponentSingleFile(Toolbar = new Toolbar
             {
                 OnHome = delegate
@@ -416,49 +480,6 @@ namespace osu.Game
                 topMostOverlayContent.Add(d);
                 toolbarElements.Add(d);
             });
-
-            loadComponentSingleFile(volume = new VolumeOverlay(), leftFloatingOverlayContent.Add);
-            loadComponentSingleFile(new OnScreenDisplay(), Add, true);
-
-            loadComponentSingleFile(notifications = new NotificationOverlay
-            {
-                GetToolbarHeight = () => ToolbarOffset,
-                Anchor = Anchor.TopRight,
-                Origin = Anchor.TopRight,
-            }, rightFloatingOverlayContent.Add, true);
-
-            loadComponentSingleFile(screenshotManager, Add);
-
-            //overlay elements
-            loadComponentSingleFile(direct = new DirectOverlay(), overlayContent.Add, true);
-            loadComponentSingleFile(social = new SocialOverlay(), overlayContent.Add, true);
-            loadComponentSingleFile(channelManager = new ChannelManager(), AddInternal, true);
-            loadComponentSingleFile(chatOverlay = new ChatOverlay(), overlayContent.Add, true);
-            loadComponentSingleFile(settings = new SettingsOverlay { GetToolbarHeight = () => ToolbarOffset }, leftFloatingOverlayContent.Add, true);
-            loadComponentSingleFile(userProfile = new UserProfileOverlay(), overlayContent.Add, true);
-            loadComponentSingleFile(beatmapSetOverlay = new BeatmapSetOverlay(), overlayContent.Add, true);
-
-            loadComponentSingleFile(new LoginOverlay
-            {
-                GetToolbarHeight = () => ToolbarOffset,
-                Anchor = Anchor.TopRight,
-                Origin = Anchor.TopRight,
-            }, rightFloatingOverlayContent.Add, true);
-
-            loadComponentSingleFile(new MusicController
-            {
-                GetToolbarHeight = () => ToolbarOffset,
-                Anchor = Anchor.TopRight,
-                Origin = Anchor.TopRight,
-            }, d =>
-            {
-                rightFloatingOverlayContent.Add(d);
-                toolbarElements.Add(d);
-            }, true);
-
-            loadComponentSingleFile(new AccountCreationOverlay(), topMostOverlayContent.Add, true);
-            loadComponentSingleFile(new DialogOverlay(), topMostOverlayContent.Add, true);
-            loadComponentSingleFile(externalLinkOpener = new ExternalLinkOpener(), topMostOverlayContent.Add);
 
             chatOverlay.StateChanged += state => channelManager.HighPollRate.Value = state == Visibility.Visible;
 
@@ -645,11 +666,11 @@ namespace osu.Game
             switch (action)
             {
                 case GlobalAction.ToggleChat:
-                    chatOverlay.ToggleVisibility();
+                    toggleChatOverlayCommand.Execute();
                     return true;
 
                 case GlobalAction.ToggleSocial:
-                    social.ToggleVisibility();
+                    toggleSocialOverlayCommand.Execute();
                     return true;
 
                 case GlobalAction.ResetInputSettings:
@@ -668,11 +689,11 @@ namespace osu.Game
                     return true;
 
                 case GlobalAction.ToggleSettings:
-                    settings.ToggleVisibility();
+                    toggleSettingsOverlayCommand.Execute();
                     return true;
 
                 case GlobalAction.ToggleDirect:
-                    direct.ToggleVisibility();
+                    toggleDirectOverlayCommand.Execute();
                     return true;
 
                 case GlobalAction.ToggleGameplayMouseButtons:

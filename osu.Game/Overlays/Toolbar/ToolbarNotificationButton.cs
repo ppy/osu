@@ -7,6 +7,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Input.Commands;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osuTK;
@@ -39,9 +40,10 @@ namespace osu.Game.Overlays.Toolbar
         }
 
         [BackgroundDependencyLoader(true)]
-        private void load(NotificationOverlay notificationOverlay)
+        private void load(NotificationOverlay notificationOverlay, ToggleOverlayCommand<NotificationOverlay> toggleOverlayCommand)
         {
             StateContainer = notificationOverlay;
+            Command = toggleOverlayCommand;
 
             if (notificationOverlay != null)
                 NotificationCount.BindTo(notificationOverlay.UnreadCount);

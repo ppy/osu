@@ -3,6 +3,7 @@
 
 using osu.Framework.Allocation;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Input.Commands;
 
 namespace osu.Game.Overlays.Toolbar
 {
@@ -14,9 +15,10 @@ namespace osu.Game.Overlays.Toolbar
         }
 
         [BackgroundDependencyLoader(true)]
-        private void load(MusicController music)
+        private void load(MusicController music, ToggleOverlayCommand<MusicController> toggleOverlayCommand)
         {
             StateContainer = music;
+            Command = toggleOverlayCommand;
         }
     }
 }

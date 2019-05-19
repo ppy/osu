@@ -5,12 +5,11 @@ using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
-using osu.Framework.Input.Commands;
 using osu.Game.Graphics;
 
 namespace osu.Game.Overlays.Toolbar
 {
-    public class ToolbarOverlayToggleButton : ToolbarButton
+    public abstract class ToolbarOverlayToggleButton : ToolbarButton
     {
         private readonly Box stateBackground;
 
@@ -25,13 +24,12 @@ namespace osu.Game.Overlays.Toolbar
 
                 if (stateContainer != null)
                 {
-                    Command = new DelegateCommand(stateContainer.ToggleVisibility);
                     stateContainer.StateChanged += stateChanged;
                 }
             }
         }
 
-        public ToolbarOverlayToggleButton()
+        protected ToolbarOverlayToggleButton()
         {
             Add(stateBackground = new Box
             {

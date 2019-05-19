@@ -3,6 +3,7 @@
 
 using osu.Framework.Allocation;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Input.Commands;
 
 namespace osu.Game.Overlays.Toolbar
 {
@@ -16,9 +17,10 @@ namespace osu.Game.Overlays.Toolbar
         }
 
         [BackgroundDependencyLoader(true)]
-        private void load(SettingsOverlay settings)
+        private void load(SettingsOverlay settings, ToggleOverlayCommand<SettingsPanel> toggleOverlayCommand)
         {
             StateContainer = settings;
+            Command = toggleOverlayCommand;
         }
     }
 }
