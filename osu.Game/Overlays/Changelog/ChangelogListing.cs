@@ -27,6 +27,8 @@ namespace osu.Game.Overlays.Changelog
         {
             DateTime currentDate = DateTime.MinValue;
 
+            if (entries == null) return;
+
             foreach (APIChangelogBuild build in entries)
             {
                 if (build.CreatedAt.Date != currentDate)
