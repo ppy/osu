@@ -7,6 +7,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Input.Commands;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
@@ -94,7 +95,7 @@ namespace osu.Game.Overlays.BeatmapSet.Buttons
                 },
             });
 
-            button.Action = () =>
+            button.Command = new DelegateCommand(() =>
             {
                 if (State.Value != DownloadState.NotDownloaded)
                 {
@@ -103,7 +104,7 @@ namespace osu.Game.Overlays.BeatmapSet.Buttons
                 }
 
                 beatmaps.Download(BeatmapSet.Value, noVideo);
-            };
+            });
 
             localUser.BindTo(api.LocalUser);
             localUser.BindValueChanged(userChanged, true);

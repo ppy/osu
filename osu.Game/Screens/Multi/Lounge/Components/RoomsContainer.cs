@@ -9,6 +9,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Input.Commands;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.Multiplayer;
 using osuTK;
@@ -88,7 +89,7 @@ namespace osu.Game.Screens.Multi.Lounge.Components
         private void addRooms(IEnumerable<Room> rooms)
         {
             foreach (var r in rooms)
-                roomFlow.Add(new DrawableRoom(r) { Action = () => selectRoom(r) });
+                roomFlow.Add(new DrawableRoom(r) { Command = new DelegateCommand(() => selectRoom(r)) });
 
             Filter(currentFilter);
         }
@@ -98,7 +99,7 @@ namespace osu.Game.Screens.Multi.Lounge.Components
             foreach (var r in rooms)
             {
                 var toRemove = roomFlow.Single(d => d.Room == r);
-                toRemove.Action = null;
+                toRemove.Command = null;
 
                 roomFlow.Remove(toRemove);
 

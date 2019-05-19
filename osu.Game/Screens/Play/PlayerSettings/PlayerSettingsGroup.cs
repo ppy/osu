@@ -6,6 +6,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Input.Commands;
 using osu.Framework.Input.Events;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
@@ -106,7 +107,7 @@ namespace osu.Game.Screens.Play.PlayerSettings
                                     Position = new Vector2(-15, 0),
                                     Icon = FontAwesome.Solid.Bars,
                                     Scale = new Vector2(0.75f),
-                                    Action = () => Expanded = !Expanded,
+                                    Command = new DelegateCommand(() => Expanded = !Expanded)
                                 },
                             }
                         },

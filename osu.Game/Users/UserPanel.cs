@@ -18,6 +18,7 @@ using osu.Game.Graphics.UserInterface;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Input.Commands;
 using osu.Game.Graphics.Containers;
 using osu.Game.Overlays.Profile.Header.Components;
 
@@ -41,7 +42,7 @@ namespace osu.Game.Users
 
         public new Action Action;
 
-        protected Action ViewProfile;
+        protected ICommand ViewProfile;
 
         public UserPanel(User user)
         {
@@ -198,11 +199,11 @@ namespace osu.Game.Users
             Status.ValueChanged += status => displayStatus(status.NewValue);
             Status.ValueChanged += status => statusBg.FadeColour(status.NewValue?.GetAppropriateColour(colours) ?? colours.Gray5, 500, Easing.OutQuint);
 
-            base.Action = ViewProfile = () =>
-            {
-                Action?.Invoke();
-                profile?.ShowUser(user);
-            };
+            base.Command = ViewProfile = new DelegateCommand(() =>
+             {
+                 Action?.Invoke();
+                 profile?.ShowUser(user);
+             });
         }
 
         protected override void LoadComplete()

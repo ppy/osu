@@ -10,6 +10,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Input.Commands;
 using osu.Framework.Input.Events;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
@@ -55,7 +56,7 @@ namespace osu.Game.Overlays.Chat.Selection
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
 
-            Action = () => { (channel.Joined.Value ? OnRequestLeave : OnRequestJoin)?.Invoke(channel); };
+            Command = new DelegateCommand(() => { (channel.Joined.Value ? OnRequestLeave : OnRequestJoin)?.Invoke(channel); });
 
             Children = new Drawable[]
             {

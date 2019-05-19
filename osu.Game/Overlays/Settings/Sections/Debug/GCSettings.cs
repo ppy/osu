@@ -7,6 +7,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics;
+using osu.Framework.Input.Commands;
 
 namespace osu.Game.Overlays.Settings.Sections.Debug
 {
@@ -30,7 +31,7 @@ namespace osu.Game.Overlays.Settings.Sections.Debug
                 new SettingsButton
                 {
                     Text = "Force garbage collection",
-                    Action = GC.Collect
+                    Command = new DelegateCommand(GC.Collect)
                 },
             };
 

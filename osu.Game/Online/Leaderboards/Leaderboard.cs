@@ -10,6 +10,7 @@ using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Input.Commands;
 using osu.Framework.Threading;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
@@ -136,7 +137,7 @@ namespace osu.Game.Online.Leaderboards
                     case PlaceholderState.NetworkFailure:
                         replacePlaceholder(new RetrievalFailurePlaceholder
                         {
-                            OnRetry = UpdateScores,
+                            OnRetry = new DelegateCommand(UpdateScores)
                         });
                         break;
 

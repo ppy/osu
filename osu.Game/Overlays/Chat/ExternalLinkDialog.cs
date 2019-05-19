@@ -3,6 +3,7 @@
 
 using System;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Input.Commands;
 using osu.Game.Overlays.Dialog;
 
 namespace osu.Game.Overlays.Chat
@@ -21,7 +22,7 @@ namespace osu.Game.Overlays.Chat
                 new PopupDialogOkButton
                 {
                     Text = @"Yes. Go for it.",
-                    Action = openExternalLinkAction
+                    Command = new DelegateCommand(openExternalLinkAction)
                 },
                 new PopupDialogCancelButton
                 {

@@ -9,6 +9,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Input.Commands;
 using osu.Framework.Input.Events;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Backgrounds;
@@ -76,16 +77,16 @@ namespace osu.Game.Overlays.Dialog
 
                 foreach (PopupDialogButton b in value)
                 {
-                    var action = b.Action;
-                    b.Action = () =>
+                    var action = b.Command;
+                    b.Command = new DelegateCommand(() =>
                     {
                         if (actionInvoked) return;
 
                         actionInvoked = true;
-                        action?.Invoke();
+                        action?.Execute();
 
                         Hide();
-                    };
+                    });
                 }
             }
         }

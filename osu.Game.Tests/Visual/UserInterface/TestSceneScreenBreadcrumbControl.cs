@@ -6,6 +6,7 @@ using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Input.Commands;
 using osu.Framework.Screens;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
@@ -112,7 +113,7 @@ namespace osu.Game.Tests.Visual.UserInterface
                             Origin = Anchor.TopCentre,
                             Width = 100,
                             Text = $"Push {NextTitle}",
-                            Action = () => PushNext(),
+                            Command = new DelegateCommand(() => PushNext())
                         },
                     },
                 };

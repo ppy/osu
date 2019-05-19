@@ -7,10 +7,11 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Input.Commands;
+using osu.Game.Graphics.Containers;
 using osuTK;
 using osuTK.Graphics;
 using osuTK.Input;
-using osu.Game.Graphics.Containers;
 
 namespace osu.Game.Screens.Select.Options
 {
@@ -102,11 +103,11 @@ namespace osu.Game.Screens.Select.Options
                 Icon = icon,
                 ButtonColour = colour,
                 Depth = depth,
-                Action = () =>
+                Command = new DelegateCommand(() =>
                 {
                     Hide();
                     action?.Invoke();
-                },
+                }),
                 HotKey = hotkey
             };
 

@@ -7,6 +7,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.UserInterface;
+using osu.Framework.Input.Commands;
 using osu.Game.Graphics.Cursor;
 using osu.Game.Graphics.UserInterface;
 using osuTK;
@@ -88,10 +89,10 @@ namespace osu.Game.Tests.Visual.UserInterface
             {
                 new OsuMenuItem(@"Simple option"),
                 new OsuMenuItem(@"Simple very very long option"),
-                new OsuMenuItem(@"Change width", MenuItemType.Highlighted, () => this.ResizeWidthTo(Width * 2, 100, Easing.OutQuint)),
-                new OsuMenuItem(@"Change height", MenuItemType.Highlighted, () => this.ResizeHeightTo(Height * 2, 100, Easing.OutQuint)),
-                new OsuMenuItem(@"Change width back", MenuItemType.Destructive, () => this.ResizeWidthTo(Width / 2, 100, Easing.OutQuint)),
-                new OsuMenuItem(@"Change height back", MenuItemType.Destructive, () => this.ResizeHeightTo(Height / 2, 100, Easing.OutQuint)),
+                new OsuMenuItem(@"Change width", MenuItemType.Highlighted, new DelegateCommand(() => this.ResizeWidthTo(Width * 2, 100, Easing.OutQuint))),
+                new OsuMenuItem(@"Change height", MenuItemType.Highlighted, new DelegateCommand(() => this.ResizeHeightTo(Height * 2, 100, Easing.OutQuint))),
+                new OsuMenuItem(@"Change width back", MenuItemType.Destructive, new DelegateCommand(() => this.ResizeWidthTo(Width / 2, 100, Easing.OutQuint))),
+                new OsuMenuItem(@"Change height back", MenuItemType.Destructive, new DelegateCommand(() => this.ResizeHeightTo(Height / 2, 100, Easing.OutQuint)))
             };
         }
     }

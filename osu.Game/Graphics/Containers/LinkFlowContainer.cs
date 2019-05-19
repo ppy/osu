@@ -8,6 +8,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics.Sprites;
 using System.Collections.Generic;
 using osu.Framework.Graphics;
+using osu.Framework.Input.Commands;
 using osu.Framework.Logging;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Notifications;
@@ -86,7 +87,7 @@ namespace osu.Game.Graphics.Containers
             {
                 RelativeSizeAxes = Axes.Both,
                 TooltipText = tooltipText ?? (url != text ? url : string.Empty),
-                Action = action ?? (() =>
+                Command = new DelegateCommand(action ?? (() =>
                 {
                     switch (linkType)
                     {
@@ -129,9 +130,9 @@ namespace osu.Game.Graphics.Containers
                             break;
 
                         default:
-                            throw new NotImplementedException($"This {nameof(LinkAction)} ({linkType.ToString()}) is missing an associated action.");
+                            throw new NotImplementedException($"This {nameof(LinkAction)} ({linkType.ToString()}) is missing an associated command.");
                     }
-                }),
+                })),
             });
 
             return drawables;

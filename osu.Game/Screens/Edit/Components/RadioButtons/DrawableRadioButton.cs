@@ -9,6 +9,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Input.Commands;
 using osu.Framework.Input.Events;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
@@ -38,7 +39,7 @@ namespace osu.Game.Screens.Edit.Components.RadioButtons
             this.button = button;
 
             Text = button.Text;
-            Action = button.Action;
+            Command = new DelegateCommand(button.Action);
 
             RelativeSizeAxes = Axes.X;
 

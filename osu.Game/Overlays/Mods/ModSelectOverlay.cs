@@ -18,6 +18,7 @@ using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Input.Commands;
 using osu.Game.Graphics.Containers;
 using osu.Game.Rulesets;
 using osu.Game.Graphics.UserInterface;
@@ -358,7 +359,7 @@ namespace osu.Game.Overlays.Mods
                                             {
                                                 Width = 180,
                                                 Text = "Deselect All",
-                                                Action = DeselectAll,
+                                                Command = new DelegateCommand(DeselectAll),
                                                 Margin = new MarginPadding
                                                 {
                                                     Right = 20

@@ -3,6 +3,7 @@
 
 using osu.Framework.Allocation;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Input.Commands;
 using osu.Game.Beatmaps;
 using osu.Game.Overlays.Dialog;
 
@@ -29,7 +30,7 @@ namespace osu.Game.Screens.Select
                 new PopupDialogOkButton
                 {
                     Text = @"Yes. Totally. Delete it.",
-                    Action = () => manager.Delete(beatmap),
+                    Command = new DelegateCommand(() => manager.Delete(beatmap))
                 },
                 new PopupDialogCancelButton
                 {

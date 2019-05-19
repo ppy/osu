@@ -12,6 +12,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.UserInterface;
+using osu.Framework.Input.Commands;
 using osu.Framework.Localisation;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Drawables;
@@ -114,15 +115,15 @@ namespace osu.Game.Screens.Select.Carousel
                 List<MenuItem> items = new List<MenuItem>();
 
                 if (Item.State.Value == CarouselItemState.NotSelected)
-                    items.Add(new OsuMenuItem("Expand", MenuItemType.Highlighted, () => Item.State.Value = CarouselItemState.Selected));
+                    items.Add(new OsuMenuItem("Expand", MenuItemType.Highlighted, new DelegateCommand(() => Item.State.Value = CarouselItemState.Selected)));
 
                 if (beatmapSet.OnlineBeatmapSetID != null)
-                    items.Add(new OsuMenuItem("Details...", MenuItemType.Standard, () => viewDetails?.Invoke(beatmapSet.OnlineBeatmapSetID.Value)));
+                    items.Add(new OsuMenuItem("Details...", MenuItemType.Standard, new DelegateCommand(() => viewDetails?.Invoke(beatmapSet.OnlineBeatmapSetID.Value))));
 
                 if (beatmapSet.Beatmaps.Any(b => b.Hidden))
-                    items.Add(new OsuMenuItem("Restore all hidden", MenuItemType.Standard, () => restoreHiddenRequested?.Invoke(beatmapSet)));
+                    items.Add(new OsuMenuItem("Restore all hidden", MenuItemType.Standard, new DelegateCommand(() => restoreHiddenRequested?.Invoke(beatmapSet))));
 
-                items.Add(new OsuMenuItem("Delete", MenuItemType.Destructive, () => dialogOverlay?.Push(new BeatmapDeleteDialog(beatmapSet))));
+                items.Add(new OsuMenuItem("Delete", MenuItemType.Destructive, new DelegateCommand(() => dialogOverlay?.Push(new BeatmapDeleteDialog(beatmapSet)))));
 
                 return items.ToArray();
             }

@@ -7,6 +7,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Input.Commands;
 using osu.Framework.Logging;
 using osu.Framework.Screens;
 using osu.Game.Graphics;
@@ -110,10 +111,10 @@ namespace osu.Game.Screens.Multi
                             Right = 10 + HORIZONTAL_OVERFLOW_PADDING,
                         },
                         Text = "Create room",
-                        Action = () => loungeSubScreen.Open(new Room
+                        Command = new DelegateCommand(() => loungeSubScreen.Open(new Room
                         {
                             Name = { Value = $"{api.LocalUser}'s awesome room" }
-                        }),
+                        }))
                     },
                     roomManager = new RoomManager()
                 }

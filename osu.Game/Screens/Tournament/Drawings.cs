@@ -22,6 +22,7 @@ using osuTK;
 using osuTK.Graphics;
 using osu.Framework.IO.Stores;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Input.Commands;
 using osu.Framework.Screens;
 using osu.Game.Graphics;
 
@@ -198,21 +199,21 @@ namespace osu.Game.Screens.Tournament
                                             RelativeSizeAxes = Axes.X,
 
                                             Text = "Begin random",
-                                            Action = teamsContainer.StartScrolling,
+                                            Command = new DelegateCommand(teamsContainer.StartScrolling),
                                         },
                                         new TriangleButton
                                         {
                                             RelativeSizeAxes = Axes.X,
 
                                             Text = "Stop random",
-                                            Action = teamsContainer.StopScrolling,
+                                            Command = new DelegateCommand(teamsContainer.StopScrolling),
                                         },
                                         new TriangleButton
                                         {
                                             RelativeSizeAxes = Axes.X,
 
                                             Text = "Reload",
-                                            Action = reloadTeams
+                                            Command = new DelegateCommand(reloadTeams)
                                         }
                                     }
                                 },
@@ -237,7 +238,7 @@ namespace osu.Game.Screens.Tournament
                                             RelativeSizeAxes = Axes.X,
 
                                             Text = "Reset",
-                                            Action = () => reset()
+                                            Command = new DelegateCommand(() => reset())
                                         }
                                     }
                                 }

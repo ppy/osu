@@ -3,6 +3,7 @@
 
 using System;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Input.Commands;
 using osu.Game.Overlays.Dialog;
 
 namespace osu.Game.Screens.Select
@@ -21,7 +22,7 @@ namespace osu.Game.Screens.Select
                 new PopupDialogOkButton
                 {
                     Text = @"Yes please!",
-                    Action = importFromStable
+                    Command = new DelegateCommand(importFromStable)
                 },
                 new PopupDialogCancelButton
                 {

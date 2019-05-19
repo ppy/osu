@@ -1,7 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
@@ -10,6 +9,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.UserInterface;
+using osu.Framework.Input.Commands;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
@@ -199,7 +199,7 @@ namespace osu.Game.Overlays.Chat
         {
             private readonly User sender;
 
-            private Action startChatAction;
+            private ICommand startChatCommand;
 
             public MessageSender(User sender)
             {
@@ -209,14 +209,14 @@ namespace osu.Game.Overlays.Chat
             [BackgroundDependencyLoader(true)]
             private void load(UserProfileOverlay profile, ChannelManager chatManager)
             {
-                Action = () => profile?.ShowUser(sender);
-                startChatAction = () => chatManager?.OpenPrivateChannel(sender);
+                Command = new DelegateCommand(() => profile?.ShowUser(sender));
+                startChatCommand = new DelegateCommand(() => chatManager?.OpenPrivateChannel(sender));
             }
 
             public MenuItem[] ContextMenuItems => new MenuItem[]
             {
-                new OsuMenuItem("View Profile", MenuItemType.Highlighted, Action),
-                new OsuMenuItem("Start Chat", MenuItemType.Standard, startChatAction),
+                new OsuMenuItem("View Profile", MenuItemType.Highlighted, Command),
+                new OsuMenuItem("Start Chat", MenuItemType.Standard, startChatCommand)
             };
         }
 

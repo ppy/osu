@@ -1,9 +1,9 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Input.Commands;
 using osu.Framework.Input.Events;
 using osu.Game.Graphics.Containers;
 using osuTK;
@@ -12,13 +12,13 @@ namespace osu.Game.Online.Leaderboards
 {
     public class RetrievalFailurePlaceholder : Placeholder
     {
-        public Action OnRetry;
+        public ICommand OnRetry;
 
         public RetrievalFailurePlaceholder()
         {
             AddArbitraryDrawable(new RetryButton
             {
-                Action = () => OnRetry?.Invoke(),
+                Command = OnRetry,
                 Padding = new MarginPadding { Right = 10 }
             });
 
@@ -29,7 +29,7 @@ namespace osu.Game.Online.Leaderboards
         {
             private readonly SpriteIcon icon;
 
-            public new Action Action;
+            public new ICommand Command;
 
             public RetryButton()
             {
@@ -38,7 +38,7 @@ namespace osu.Game.Online.Leaderboards
                 Child = new OsuClickableContainer
                 {
                     AutoSizeAxes = Axes.Both,
-                    Action = () => Action?.Invoke(),
+                    Command = Command,
                     Child = icon = new SpriteIcon
                     {
                         Icon = FontAwesome.Solid.Sync,

@@ -4,6 +4,7 @@
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
+using osu.Framework.Input.Commands;
 using osu.Game.Beatmaps;
 using osuTK;
 
@@ -39,7 +40,7 @@ namespace osu.Game.Screens.Multi.Match.Components
                 return;
             }
 
-            Action = () => osuGame.ShowBeatmap(beatmap.OnlineBeatmapID ?? 0);
+            Command = new DelegateCommand(() => osuGame.ShowBeatmap(beatmap.OnlineBeatmapID ?? 0));
             Enabled.Value = true;
         }
     }

@@ -20,6 +20,7 @@ using osu.Framework.Input.Events;
 using osu.Game.Input.Bindings;
 using Humanizer;
 using osu.Framework.Graphics.Effects;
+using osu.Framework.Input.Commands;
 
 namespace osu.Game.Screens.Play
 {
@@ -176,11 +177,11 @@ namespace osu.Game.Screens.Play
                 Origin = Anchor.TopCentre,
                 Anchor = Anchor.TopCentre,
                 Height = button_height,
-                Action = delegate
+                Command = new DelegateCommand(delegate
                 {
                     action?.Invoke();
                     Hide();
-                }
+                })
             };
 
             button.Selected.ValueChanged += selected => buttonSelectionChanged(button, selected.NewValue);

@@ -10,6 +10,7 @@ using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Input.Commands;
 using osu.Framework.Input.Events;
 using osu.Game.Graphics.UserInterface;
 
@@ -36,7 +37,7 @@ namespace osu.Game.Screens.Select
         public void AddButton(FooterButton button, OverlayContainer overlay)
         {
             overlays.Add(overlay);
-            button.Action = () => showOverlay(overlay);
+            button.Command = new DelegateCommand(() => showOverlay(overlay));
 
             AddButton(button);
         }
@@ -87,7 +88,7 @@ namespace osu.Game.Screens.Select
                 {
                     Anchor = Anchor.BottomLeft,
                     Origin = Anchor.BottomLeft,
-                    Action = () => OnBack?.Invoke()
+                    Command = new DelegateCommand(() => OnBack?.Invoke())
                 },
                 new FillFlowContainer
                 {

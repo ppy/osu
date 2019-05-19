@@ -5,6 +5,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Input.Commands;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Online.API.Requests;
@@ -94,7 +95,7 @@ namespace osu.Game.Overlays.Direct
                 Ruleset = ruleset;
                 bindable.ValueChanged += Bindable_ValueChanged;
                 Bindable_ValueChanged(new ValueChangedEvent<RulesetInfo>(bindable.Value, bindable.Value));
-                Action = () => bindable.Value = Ruleset;
+                Command = new DelegateCommand(() => bindable.Value = Ruleset);
             }
 
             protected override void Dispose(bool isDisposing)

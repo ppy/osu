@@ -10,6 +10,7 @@ using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
+using osu.Framework.Input.Commands;
 using osu.Framework.Input.Events;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
@@ -108,10 +109,10 @@ namespace osu.Game.Overlays.Chat.Tabs
                             Margin = new MarginPadding { Right = 20 },
                             Origin = Anchor.CentreRight,
                             Anchor = Anchor.CentreRight,
-                            Action = delegate
+                            Command = new DelegateCommand(delegate
                             {
                                 if (IsRemovable) OnRequestClose?.Invoke(this);
-                            },
+                            })
                         },
                     },
                 },

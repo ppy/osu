@@ -5,6 +5,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
+using osu.Framework.Input.Commands;
 using osu.Framework.Localisation;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
@@ -32,13 +33,13 @@ namespace osu.Game.Overlays.Profile.Sections
         [BackgroundDependencyLoader(true)]
         private void load(BeatmapSetOverlay beatmapSetOverlay)
         {
-            Action = () =>
+            Command = new DelegateCommand(() =>
             {
                 if (beatmap.OnlineBeatmapID != null)
                     beatmapSetOverlay?.FetchAndShowBeatmap(beatmap.OnlineBeatmapID.Value);
                 else if (beatmap.BeatmapSet?.OnlineBeatmapSetID != null)
                     beatmapSetOverlay?.FetchAndShowBeatmapSet(beatmap.BeatmapSet.OnlineBeatmapSetID.Value);
-            };
+            });
 
             Child = new FillFlowContainer
             {

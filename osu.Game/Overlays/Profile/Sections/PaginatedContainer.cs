@@ -1,11 +1,11 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using osuTK;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Input.Commands;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
@@ -13,6 +13,7 @@ using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API;
 using osu.Game.Rulesets;
 using osu.Game.Users;
+using osuTK;
 
 namespace osu.Game.Overlays.Profile.Sections
 {
@@ -57,7 +58,7 @@ namespace osu.Game.Overlays.Profile.Sections
                 ShowMoreButton = new OsuHoverContainer
                 {
                     Alpha = 0,
-                    Action = ShowMore,
+                    Command = new DelegateCommand(ShowMore),
                     AutoSizeAxes = Axes.Both,
                     Anchor = Anchor.TopCentre,
                     Origin = Anchor.TopCentre,

@@ -7,6 +7,7 @@ using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Input.Commands;
 using osu.Framework.Input.Events;
 using osu.Game.Audio;
 using osu.Game.Beatmaps;
@@ -66,7 +67,7 @@ namespace osu.Game.Overlays.BeatmapSet.Buttons
                 },
             };
 
-            Action = () => playButton.Click();
+            Command = new DelegateCommand(() => playButton.Click());
             Playing.ValueChanged += playing => progress.FadeTo(playing.NewValue ? 1 : 0, 100);
         }
 

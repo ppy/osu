@@ -1,8 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
 using osu.Framework.Graphics.UserInterface;
+using osu.Framework.Input.Commands;
 
 namespace osu.Game.Graphics.UserInterface
 {
@@ -16,8 +16,8 @@ namespace osu.Game.Graphics.UserInterface
             Type = type;
         }
 
-        public OsuMenuItem(string text, MenuItemType type, Action action)
-            : base(text, action)
+        public OsuMenuItem(string text, MenuItemType type, ICommand command)
+            : base(text, command)
         {
             Type = type;
         }

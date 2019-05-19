@@ -13,6 +13,7 @@ using osuTK;
 using osuTK.Graphics;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Input.Commands;
 using osu.Framework.Input.Events;
 using osu.Game.Graphics.Containers;
 
@@ -107,7 +108,7 @@ namespace osu.Game.Overlays.Notifications
                         closeButton = new CloseButton
                         {
                             Alpha = 0,
-                            Action = Close,
+                            Command = new DelegateCommand(Close),
                             Anchor = Anchor.CentreRight,
                             Origin = Anchor.CentreRight,
                             Margin = new MarginPadding

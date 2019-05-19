@@ -2,28 +2,29 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using osuTK.Graphics;
-using osu.Framework.Screens;
-using osu.Game.Screens.Backgrounds;
+using System.Collections.Generic;
+using osu.Framework;
+using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
-using osu.Game.Graphics;
-using osu.Game.Screens.Edit.Components.Timelines.Summary;
-using osu.Framework.Allocation;
-using osu.Framework.Bindables;
 using osu.Framework.Graphics.UserInterface;
+using osu.Framework.Input.Commands;
 using osu.Framework.Input.Events;
 using osu.Framework.Platform;
+using osu.Framework.Screens;
 using osu.Framework.Timing;
+using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Screens.Backgrounds;
 using osu.Game.Screens.Edit.Components;
 using osu.Game.Screens.Edit.Components.Menus;
+using osu.Game.Screens.Edit.Components.Timelines.Summary;
 using osu.Game.Screens.Edit.Compose;
 using osu.Game.Screens.Edit.Design;
+using osuTK.Graphics;
 using osuTK.Input;
-using System.Collections.Generic;
-using osu.Framework;
 
 namespace osu.Game.Screens.Edit
 {
@@ -70,11 +71,11 @@ namespace osu.Game.Screens.Edit
 
             if (RuntimeInfo.IsDesktop)
             {
-                fileMenuItems.Add(new EditorMenuItem("Export", MenuItemType.Standard, exportBeatmap));
+                fileMenuItems.Add(new EditorMenuItem("Export", MenuItemType.Standard, new DelegateCommand(exportBeatmap)));
                 fileMenuItems.Add(new EditorMenuItemSpacer());
             }
 
-            fileMenuItems.Add(new EditorMenuItem("Exit", MenuItemType.Standard, this.Exit));
+            fileMenuItems.Add(new EditorMenuItem("Exit", MenuItemType.Standard, new DelegateCommand(this.Exit)));
 
             InternalChildren = new[]
             {

@@ -9,6 +9,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Input.Commands;
 using osu.Game.Beatmaps.Drawables;
 using osu.Game.Graphics;
 using osu.Game.Online.Multiplayer;
@@ -111,7 +112,7 @@ namespace osu.Game.Screens.Multi.Match.Components
 
             CurrentItem.BindValueChanged(item => modDisplay.Current.Value = item.NewValue?.RequiredMods?.ToArray() ?? Array.Empty<Mod>(), true);
 
-            beatmapButton.Action = () => RequestBeatmapSelection?.Invoke();
+            beatmapButton.Command = new DelegateCommand(RequestBeatmapSelection);
         }
 
         private class BeatmapSelectButton : HeaderButton

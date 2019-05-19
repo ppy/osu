@@ -14,6 +14,7 @@ using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
+using osu.Framework.Input.Commands;
 using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
 using osu.Framework.Threading;
@@ -151,7 +152,7 @@ namespace osu.Game.Overlays
                                                 {
                                                     Anchor = Anchor.Centre,
                                                     Origin = Anchor.Centre,
-                                                    Action = prev,
+                                                    Command = new DelegateCommand(prev),
                                                     Icon = FontAwesome.Solid.StepBackward,
                                                 },
                                                 playButton = new MusicIconButton
@@ -160,14 +161,14 @@ namespace osu.Game.Overlays
                                                     Origin = Anchor.Centre,
                                                     Scale = new Vector2(1.4f),
                                                     IconScale = new Vector2(1.4f),
-                                                    Action = play,
+                                                    Command = new DelegateCommand(play),
                                                     Icon = FontAwesome.Regular.PlayCircle,
                                                 },
                                                 nextButton = new MusicIconButton
                                                 {
                                                     Anchor = Anchor.Centre,
                                                     Origin = Anchor.Centre,
-                                                    Action = () => next(),
+                                                    Command = new DelegateCommand(() => next()),
                                                     Icon = FontAwesome.Solid.StepForward,
                                                 },
                                             }
@@ -178,7 +179,7 @@ namespace osu.Game.Overlays
                                             Anchor = Anchor.CentreRight,
                                             Position = new Vector2(-bottom_black_area_height / 2, 0),
                                             Icon = FontAwesome.Solid.Bars,
-                                            Action = () => playlist.ToggleVisibility(),
+                                            Command = new DelegateCommand(() => playlist.ToggleVisibility())
                                         },
                                     }
                                 },

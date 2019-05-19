@@ -9,6 +9,7 @@ using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Input.Commands;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
@@ -244,7 +245,7 @@ namespace osu.Game.Screens.Multi.Match.Components
                                                     Origin = Anchor.BottomCentre,
                                                     Size = new Vector2(230, 55),
                                                     Enabled = { Value = false },
-                                                    Action = apply,
+                                                    Command = new DelegateCommand(apply)
                                                 },
                                                 ErrorText = new OsuSpriteText
                                                 {

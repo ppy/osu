@@ -3,6 +3,7 @@
 
 using System;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Input.Commands;
 using osu.Game.Overlays.Dialog;
 
 namespace osu.Game.Overlays.Settings.Sections.Maintenance
@@ -20,7 +21,7 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
                 new PopupDialogOkButton
                 {
                     Text = @"Yes. Go for it.",
-                    Action = deleteAction
+                    Command = new DelegateCommand(deleteAction)
                 },
                 new PopupDialogCancelButton
                 {

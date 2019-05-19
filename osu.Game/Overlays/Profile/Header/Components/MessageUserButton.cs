@@ -5,6 +5,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Input.Commands;
 using osu.Game.Online.API;
 using osu.Game.Online.Chat;
 using osu.Game.Users;
@@ -44,14 +45,14 @@ namespace osu.Game.Overlays.Profile.Header.Components
                 Size = new Vector2(50, 14)
             };
 
-            Action = () =>
+            Command = new DelegateCommand(() =>
             {
                 if (!Content.IsPresent) return;
 
                 channelManager?.OpenPrivateChannel(User.Value);
                 userOverlay?.Hide();
                 chatOverlay?.Show();
-            };
+            });
 
             User.ValueChanged += e => Content.Alpha = !e.NewValue.PMFriendsOnly && apiProvider.LocalUser.Value.Id != e.NewValue.Id ? 1 : 0;
         }

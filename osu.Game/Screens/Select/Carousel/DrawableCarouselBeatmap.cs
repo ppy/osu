@@ -11,6 +11,7 @@ using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
+using osu.Framework.Input.Commands;
 using osu.Framework.Input.Events;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Drawables;
@@ -175,13 +176,13 @@ namespace osu.Game.Screens.Select.Carousel
             {
                 List<MenuItem> items = new List<MenuItem>
                 {
-                    new OsuMenuItem("Play", MenuItemType.Highlighted, () => startRequested?.Invoke(beatmap)),
-                    new OsuMenuItem("Edit", MenuItemType.Standard, () => editRequested?.Invoke(beatmap)),
-                    new OsuMenuItem("Hide", MenuItemType.Destructive, () => hideRequested?.Invoke(beatmap)),
+                    new OsuMenuItem("Play", MenuItemType.Highlighted, new DelegateCommand(() => startRequested?.Invoke(beatmap))),
+                    new OsuMenuItem("Edit", MenuItemType.Standard, new DelegateCommand(() => editRequested?.Invoke(beatmap))),
+                    new OsuMenuItem("Hide", MenuItemType.Destructive, new DelegateCommand(() => hideRequested?.Invoke(beatmap)))
                 };
 
                 if (beatmap.OnlineBeatmapID.HasValue)
-                    items.Add(new OsuMenuItem("Details", MenuItemType.Standard, () => beatmapOverlay?.FetchAndShowBeatmap(beatmap.OnlineBeatmapID.Value)));
+                    items.Add(new OsuMenuItem("Details", MenuItemType.Standard, new DelegateCommand(() => beatmapOverlay?.FetchAndShowBeatmap(beatmap.OnlineBeatmapID.Value))));
 
                 return items.ToArray();
             }

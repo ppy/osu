@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
+using osu.Framework.Input.Commands;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Skinning;
@@ -30,25 +31,25 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
                 Add(importBeatmapsButton = new SettingsButton
                 {
                     Text = "Import beatmaps from stable",
-                    Action = () =>
+                    Command = new DelegateCommand(() =>
                     {
                         importBeatmapsButton.Enabled.Value = false;
                         beatmaps.ImportFromStableAsync().ContinueWith(t => Schedule(() => importBeatmapsButton.Enabled.Value = true));
-                    }
+                    })
                 });
             }
 
             Add(deleteBeatmapsButton = new DangerousSettingsButton
             {
                 Text = "Delete ALL beatmaps",
-                Action = () =>
+                Command = new DelegateCommand(() =>
                 {
                     dialogOverlay?.Push(new DeleteAllBeatmapsDialog(() =>
                     {
                         deleteBeatmapsButton.Enabled.Value = false;
                         Task.Run(() => beatmaps.Delete(beatmaps.GetAllUsableBeatmapSets())).ContinueWith(t => Schedule(() => deleteBeatmapsButton.Enabled.Value = true));
                     }));
-                }
+                })
             });
 
             if (skins.SupportsImportFromStable)
@@ -56,11 +57,11 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
                 Add(importSkinsButton = new SettingsButton
                 {
                     Text = "Import skins from stable",
-                    Action = () =>
+                    Command = new DelegateCommand(() =>
                     {
                         importSkinsButton.Enabled.Value = false;
                         skins.ImportFromStableAsync().ContinueWith(t => Schedule(() => importSkinsButton.Enabled.Value = true));
-                    }
+                    })
                 });
             }
 
@@ -69,19 +70,19 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
                 deleteSkinsButton = new DangerousSettingsButton
                 {
                     Text = "Delete ALL skins",
-                    Action = () =>
+                    Command = new DelegateCommand(() =>
                     {
                         dialogOverlay?.Push(new DeleteAllBeatmapsDialog(() =>
                         {
                             deleteSkinsButton.Enabled.Value = false;
                             Task.Run(() => skins.Delete(skins.GetAllUserSkins())).ContinueWith(t => Schedule(() => deleteSkinsButton.Enabled.Value = true));
                         }));
-                    }
+                    })
                 },
                 restoreButton = new SettingsButton
                 {
                     Text = "Restore all hidden difficulties",
-                    Action = () =>
+                    Command = new DelegateCommand(() =>
                     {
                         restoreButton.Enabled.Value = false;
                         Task.Run(() =>
@@ -89,16 +90,16 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
                             foreach (var b in beatmaps.QueryBeatmaps(b => b.Hidden).ToList())
                                 beatmaps.Restore(b);
                         }).ContinueWith(t => Schedule(() => restoreButton.Enabled.Value = true));
-                    }
+                    })
                 },
                 undeleteButton = new SettingsButton
                 {
                     Text = "Restore all recently deleted beatmaps",
-                    Action = () =>
+                    Command = new DelegateCommand(() =>
                     {
                         undeleteButton.Enabled.Value = false;
                         Task.Run(() => beatmaps.Undelete(beatmaps.QueryBeatmapSets(b => b.DeletePending).ToList())).ContinueWith(t => Schedule(() => undeleteButton.Enabled.Value = true));
-                    }
+                    })
                 },
             });
         }

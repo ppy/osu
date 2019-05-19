@@ -15,6 +15,7 @@ using osu.Game.Graphics;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Input.Commands;
 
 namespace osu.Game.Screens
 {
@@ -149,7 +150,7 @@ namespace osu.Game.Screens
                     Anchor = Anchor.BottomLeft,
                     Origin = Anchor.BottomLeft,
                     Alpha = 0,
-                    Action = this.Exit
+                    Command = new DelegateCommand(this.Exit)
                 },
                 childModeButtons = new FillFlowContainer
                 {
@@ -170,7 +171,7 @@ namespace osu.Game.Screens
                         Text = $@"{t.Name}",
                         BackgroundColour = getColourFor(t),
                         HoverColour = getColourFor(t).Lighten(0.2f),
-                        Action = delegate { this.Push(Activator.CreateInstance(t) as Screen); }
+                        Command = new DelegateCommand(delegate { this.Push(Activator.CreateInstance(t) as Screen); })
                     });
                 }
             }

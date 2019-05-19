@@ -9,6 +9,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
+using osu.Framework.Input.Commands;
 using osu.Framework.Input.Events;
 using osu.Game.Graphics.Containers;
 
@@ -57,7 +58,7 @@ namespace osu.Game.Users
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre
                 },
-                Action = openProfile
+                Command = new DelegateCommand(openProfile)
             });
 
             clickableArea.Enabled.BindTo(OpenOnClick);

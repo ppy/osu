@@ -61,10 +61,10 @@ namespace osu.Game.Tests.Visual.Multiplayer
             AddAssert("has 2 rooms", () => container.Rooms.Count == 2);
             AddAssert("first room removed", () => container.Rooms.All(r => r.Room.RoomID.Value != 0));
 
-            AddStep("select first room", () => container.Rooms.First().Action?.Invoke());
+            AddStep("select first room", () => container.Rooms.First().Command?.Execute());
             AddAssert("first room selected", () => Room == roomManager.Rooms.First());
 
-            AddStep("join first room", () => container.Rooms.First().Action?.Invoke());
+            AddStep("join first room", () => container.Rooms.First().Command?.Execute());
             AddAssert("first room joined", () => roomManager.Rooms.First().Status.Value is JoinedRoomStatus);
         }
 

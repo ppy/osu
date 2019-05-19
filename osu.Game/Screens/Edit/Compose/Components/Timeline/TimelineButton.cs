@@ -6,6 +6,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Input.Commands;
 using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
 using osuTK;
@@ -28,7 +29,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
         public TimelineButton()
         {
-            InternalChild = button = new TimelineIconButton { Action = () => Action?.Invoke() };
+            InternalChild = button = new TimelineIconButton { Command = new DelegateCommand(Action) };
 
             button.Enabled.BindTo(Enabled);
             Width = button.ButtonSize.X;

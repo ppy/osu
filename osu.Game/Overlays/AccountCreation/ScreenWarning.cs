@@ -6,6 +6,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
+using osu.Framework.Input.Commands;
 using osu.Framework.Screens;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
@@ -98,12 +99,12 @@ namespace osu.Game.Overlays.AccountCreation
                         {
                             Text = "Help, I can't access my account!",
                             Margin = new MarginPadding { Top = 50 },
-                            Action = () => game?.OpenUrlExternally(help_centre_url)
+                            Command = new DelegateCommand(() => game?.OpenUrlExternally(help_centre_url))
                         },
                         new DangerousSettingsButton
                         {
                             Text = "I understand. This account isn't for me.",
-                            Action = () => this.Push(new ScreenEntry())
+                            Command = new DelegateCommand(() => this.Push(new ScreenEntry()))
                         },
                         furtherAssistance = new LinkFlowContainer(cp => cp.Font = cp.Font.With(size: 12))
                         {

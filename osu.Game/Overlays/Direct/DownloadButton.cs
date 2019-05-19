@@ -5,6 +5,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Input.Commands;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
@@ -77,7 +78,7 @@ namespace osu.Game.Overlays.Direct
         {
             this.colours = colours;
 
-            button.Action = () =>
+            button.Command = new DelegateCommand(() =>
             {
                 switch (State.Value)
                 {
@@ -94,7 +95,7 @@ namespace osu.Game.Overlays.Direct
                         beatmaps.Download(BeatmapSet.Value, noVideo);
                         break;
                 }
-            };
+            });
         }
 
         private void updateState(DownloadState state)

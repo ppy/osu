@@ -4,6 +4,7 @@
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Input.Commands;
 using osu.Framework.Screens;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
@@ -57,7 +58,7 @@ namespace osu.Game.Overlays.AccountCreation
                     {
                         Text = "Let's create an account!",
                         Margin = new MarginPadding { Vertical = 120 },
-                        Action = () => this.Push(new ScreenWarning())
+                        Command = new DelegateCommand(() => this.Push(new ScreenWarning()))
                     }
                 }
             };

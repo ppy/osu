@@ -5,6 +5,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Bindings;
+using osu.Framework.Input.Commands;
 using osu.Framework.Input.Events;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
@@ -34,7 +35,7 @@ namespace osu.Game.Overlays
             {
                 Anchor = Anchor.BottomLeft,
                 Origin = Anchor.BottomLeft,
-                Action = Hide
+                Command = new DelegateCommand(Hide)
             });
         }
 

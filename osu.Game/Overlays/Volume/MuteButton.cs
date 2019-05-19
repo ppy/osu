@@ -9,6 +9,7 @@ using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
+using osu.Framework.Input.Commands;
 using osu.Framework.Input.Events;
 using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
@@ -46,7 +47,7 @@ namespace osu.Game.Overlays.Volume
 
             Size = new Vector2(width, HEIGHT);
 
-            Action = () => Current.Value = !Current.Value;
+            Command = new DelegateCommand(() => Current.Value = !Current.Value);
         }
 
         [BackgroundDependencyLoader]

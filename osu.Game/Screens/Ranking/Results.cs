@@ -18,6 +18,7 @@ using osuTK.Graphics;
 using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Input.Commands;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Scoring;
 
@@ -259,7 +260,7 @@ namespace osu.Game.Screens.Ranking
                 {
                     Anchor = Anchor.BottomLeft,
                     Origin = Anchor.BottomLeft,
-                    Action = this.Exit
+                    Command = new DelegateCommand(this.Exit)
                 },
             };
 

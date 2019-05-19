@@ -12,6 +12,7 @@ using osuTK;
 using osuTK.Input;
 using osuTK.Graphics;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Input.Commands;
 using osu.Framework.Input.Events;
 using osu.Game.Rulesets;
 
@@ -78,7 +79,7 @@ namespace osu.Game.Overlays.Toolbar
                 modeButtons.Add(new ToolbarRulesetButton
                 {
                     Ruleset = r,
-                    Action = delegate { ruleset.Value = r; }
+                    Command = new DelegateCommand(delegate { ruleset.Value = r; })
                 });
             }
 

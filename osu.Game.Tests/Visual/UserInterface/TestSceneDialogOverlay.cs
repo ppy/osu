@@ -3,6 +3,7 @@
 
 using NUnit.Framework;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Input.Commands;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Dialog;
 
@@ -27,12 +28,12 @@ namespace osu.Game.Tests.Visual.UserInterface
                     new PopupDialogOkButton
                     {
                         Text = @"I never want to see this again.",
-                        Action = () => System.Console.WriteLine(@"OK"),
+                        Command = new DelegateCommand(() => System.Console.WriteLine(@"OK"))
                     },
                     new PopupDialogCancelButton
                     {
                         Text = @"Firetruck, I still want quick ranks!",
-                        Action = () => System.Console.WriteLine(@"Cancel"),
+                        Command = new DelegateCommand(() => System.Console.WriteLine(@"Cancel"))
                     },
                 },
             }));

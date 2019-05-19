@@ -8,6 +8,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Input.Commands;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osuTK;
@@ -87,7 +88,7 @@ namespace osu.Game.Overlays.Notifications
                             Text = clearText,
                             Anchor = Anchor.TopRight,
                             Origin = Anchor.TopRight,
-                            Action = clearAll
+                            Command = new DelegateCommand(clearAll)
                         },
                         new FillFlowContainer
                         {

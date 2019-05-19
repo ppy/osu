@@ -12,6 +12,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
+using osu.Framework.Input.Commands;
 using osu.Framework.Input.Events;
 using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
@@ -95,13 +96,13 @@ namespace osu.Game.Screens.Edit.Compose.Components
                                                     new DivisorButton
                                                     {
                                                         Icon = FontAwesome.Solid.ChevronLeft,
-                                                        Action = beatDivisor.Previous
+                                                        Command = new DelegateCommand(beatDivisor.Previous)
                                                     },
                                                     new DivisorText(beatDivisor),
                                                     new DivisorButton
                                                     {
                                                         Icon = FontAwesome.Solid.ChevronRight,
-                                                        Action = beatDivisor.Next
+                                                        Command = new DelegateCommand(beatDivisor.Next)
                                                     }
                                                 },
                                             },

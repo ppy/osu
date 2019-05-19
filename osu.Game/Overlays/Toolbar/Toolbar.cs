@@ -11,6 +11,7 @@ using osuTK;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Input.Commands;
 using osu.Framework.Input.Events;
 
 namespace osu.Game.Overlays.Toolbar
@@ -55,7 +56,7 @@ namespace osu.Game.Overlays.Toolbar
                         new ToolbarSettingsButton(),
                         new ToolbarHomeButton
                         {
-                            Action = () => OnHome?.Invoke()
+                            Command = new DelegateCommand(() => OnHome?.Invoke())
                         },
                         new ToolbarRulesetSelector()
                     }

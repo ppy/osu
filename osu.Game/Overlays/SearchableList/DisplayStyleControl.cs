@@ -6,6 +6,7 @@ using osuTK;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Input.Commands;
 using osu.Game.Graphics.Containers;
 
 namespace osu.Game.Overlays.SearchableList
@@ -79,7 +80,7 @@ namespace osu.Game.Overlays.SearchableList
 
                 bindable.ValueChanged += Bindable_ValueChanged;
                 Bindable_ValueChanged(new ValueChangedEvent<PanelDisplayStyle>(bindable.Value, bindable.Value));
-                Action = () => bindable.Value = this.style;
+                Command = new DelegateCommand(() => bindable.Value = this.style);
             }
 
             private void Bindable_ValueChanged(ValueChangedEvent<PanelDisplayStyle> e)

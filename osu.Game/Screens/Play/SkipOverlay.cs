@@ -18,6 +18,7 @@ using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Graphics.Containers;
 using osu.Framework.Input.Bindings;
+using osu.Framework.Input.Commands;
 using osu.Framework.Input.Events;
 using osu.Game.Input.Bindings;
 
@@ -116,7 +117,7 @@ namespace osu.Game.Screens.Play
             using (BeginAbsoluteSequence(beginFadeTime))
                 this.FadeOut(fade_time);
 
-            button.Action = () => RequestSeek?.Invoke(beginFadeTime);
+            button.Command = new DelegateCommand(() => RequestSeek?.Invoke(beginFadeTime));
 
             displayTime = Time.Current;
 

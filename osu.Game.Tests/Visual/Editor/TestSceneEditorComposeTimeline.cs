@@ -10,6 +10,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.UserInterface;
+using osu.Framework.Input.Commands;
 using osu.Framework.Timing;
 using osu.Game.Beatmaps;
 using osu.Game.Screens.Edit.Compose.Components.Timeline;
@@ -111,7 +112,7 @@ namespace osu.Game.Tests.Visual.Editor
                 Size = new Vector2(100, 50);
                 Text = "Start";
 
-                Action = onClick;
+                Command = new DelegateCommand(onClick);
             }
 
             [BackgroundDependencyLoader]

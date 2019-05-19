@@ -5,6 +5,7 @@ using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Input.Commands;
 using osu.Game.Graphics;
 
 namespace osu.Game.Overlays.Toolbar
@@ -24,7 +25,7 @@ namespace osu.Game.Overlays.Toolbar
 
                 if (stateContainer != null)
                 {
-                    Action = stateContainer.ToggleVisibility;
+                    Command = new DelegateCommand(stateContainer.ToggleVisibility);
                     stateContainer.StateChanged += stateChanged;
                 }
             }

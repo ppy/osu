@@ -9,6 +9,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
+using osu.Framework.Input.Commands;
 using osu.Framework.Input.Events;
 using osu.Framework.Timing;
 using osu.Game.Graphics;
@@ -40,7 +41,7 @@ namespace osu.Game.Screens.Edit.Components
                     Scale = new Vector2(1.4f),
                     IconScale = new Vector2(1.4f),
                     Icon = FontAwesome.Regular.PlayCircle,
-                    Action = togglePause,
+                    Command = new DelegateCommand(togglePause),
                     Padding = new MarginPadding { Left = 20 }
                 },
                 new OsuSpriteText

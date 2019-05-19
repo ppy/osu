@@ -3,6 +3,7 @@
 
 using osu.Framework;
 using osu.Framework.Allocation;
+using osu.Framework.Input.Commands;
 using osu.Framework.Platform;
 using osu.Game.Configuration;
 
@@ -26,7 +27,7 @@ namespace osu.Game.Overlays.Settings.Sections.General
                 Add(new SettingsButton
                 {
                     Text = "Open osu! folder",
-                    Action = storage.OpenInNativeExplorer,
+                    Command = new DelegateCommand(storage.OpenInNativeExplorer)
                 });
             }
         }

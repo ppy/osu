@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Input.Commands;
 using osu.Game.Beatmaps;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
@@ -81,7 +82,7 @@ namespace osu.Game.Screens.Select.Leaderboards
 
         protected override LeaderboardScore CreateDrawableScore(ScoreInfo model, int index) => new LeaderboardScore(model, index)
         {
-            Action = () => ScoreSelected?.Invoke(model)
+            Command = new DelegateCommand(() => ScoreSelected?.Invoke(model))
         };
     }
 }

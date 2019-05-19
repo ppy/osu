@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Graphics;
+using osu.Framework.Input.Commands;
 
 namespace osu.Game.Overlays.Settings.Sections.Input
 {
@@ -17,7 +18,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                 {
                     Text = "Key configuration",
                     TooltipText = "Change global shortcut keys and gameplay bindings",
-                    Action = keyConfig.ToggleVisibility
+                    Command = new DelegateCommand(keyConfig.ToggleVisibility)
                 },
             };
         }

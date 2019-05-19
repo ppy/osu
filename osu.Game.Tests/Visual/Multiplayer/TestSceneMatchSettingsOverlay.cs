@@ -84,7 +84,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 };
             });
 
-            AddStep("create room", () => settings.ApplyButton.Action.Invoke());
+            AddStep("create room", () => settings.ApplyButton.Command.Execute());
             AddAssert("has correct name", () => createdRoom.Name.Value == expected_name);
             AddAssert("has correct duration", () => createdRoom.Duration.Value == expectedDuration);
         }
@@ -101,14 +101,14 @@ namespace osu.Game.Tests.Visual.Multiplayer
             });
             AddAssert("error not displayed", () => !settings.ErrorText.IsPresent);
 
-            AddStep("create room", () => settings.ApplyButton.Action.Invoke());
+            AddStep("create room", () => settings.ApplyButton.Command.Execute());
             AddAssert("error displayed", () => settings.ErrorText.IsPresent);
             AddAssert("error has correct text", () => settings.ErrorText.Text == TestRoomManager.FAILED_TEXT);
 
             AddStep("create room no fail", () =>
             {
                 fail = false;
-                settings.ApplyButton.Action.Invoke();
+                settings.ApplyButton.Command.Execute();
             });
 
             AddUntilStep("error not displayed", () => !settings.ErrorText.IsPresent);
