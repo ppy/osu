@@ -363,6 +363,7 @@ namespace osu.Game
             ScoreManager.PresentImport = items => PresentScore(items.First());
 
             Container logoContainer;
+            SafeAreaContainer safeAreaContainer;
 
             dependencies.CacheAs(idleTracker = new GameIdleTracker(6000));
 
@@ -374,21 +375,35 @@ namespace osu.Game
                     ActionRequested = action => volume.Adjust(action),
                     ScrollActionRequested = (action, amount, isPrecise) => volume.Adjust(action, amount, isPrecise),
                 },
-                screenContainer = new ScalingContainer(ScalingMode.ExcludeOverlays)
+                safeAreaContainer = new SafeAreaContainer
                 {
                     RelativeSizeAxes = Axes.Both,
+                    AppliedEdges = Edges.All,
                     Children = new Drawable[]
                     {
-                        screenStack = new OsuScreenStack { RelativeSizeAxes = Axes.Both },
-                        logoContainer = new Container { RelativeSizeAxes = Axes.Both },
+                        screenContainer = new ScalingContainer(ScalingMode.ExcludeOverlays)
+                        {
+                            RelativeSizeAxes = Axes.Both,
+                            Children = new Drawable[]
+                            {
+                                screenStack = new OsuScreenStack { RelativeSizeAxes = Axes.Both },
+                                logoContainer = new Container { RelativeSizeAxes = Axes.Both },
+                            }
+                            
+                        },
+                        overlayContent = new Container { RelativeSizeAxes = Axes.Both },
+                        rightFloatingOverlayContent = new Container { RelativeSizeAxes = Axes.Both },
+                        leftFloatingOverlayContent = new Container { RelativeSizeAxes = Axes.Both },
+                        topMostOverlayContent = new Container { RelativeSizeAxes = Axes.Both },
                     }
                 },
-                overlayContent = new Container { RelativeSizeAxes = Axes.Both },
-                rightFloatingOverlayContent = new Container { RelativeSizeAxes = Axes.Both },
-                leftFloatingOverlayContent = new Container { RelativeSizeAxes = Axes.Both },
-                topMostOverlayContent = new Container { RelativeSizeAxes = Axes.Both },
                 idleTracker
             });
+
+            // Currently we must cache a single SafeAreaContainer at the top level since loadComponentSingleFile will only
+            // use the dependencies of OsuGame.  Once this issue is resolved, individual SafeAreaContainers may be used in the
+            // previous call to AddRange.
+            dependencies.CacheAs<ISnapTargetContainer>(safeAreaContainer);
 
             screenStack.ScreenPushed += screenPushed;
             screenStack.ScreenExited += screenExited;
