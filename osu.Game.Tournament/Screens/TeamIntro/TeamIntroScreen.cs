@@ -24,7 +24,7 @@ namespace osu.Game.Tournament.Screens.TeamIntro
         private readonly Bindable<MatchPairing> currentMatch = new Bindable<MatchPairing>();
 
         [BackgroundDependencyLoader]
-        private void load(LadderInfo ladder, Storage storage)
+        private void load(Storage storage)
         {
             RelativeSizeAxes = Axes.Both;
 
@@ -43,7 +43,7 @@ namespace osu.Game.Tournament.Screens.TeamIntro
             };
 
             currentMatch.BindValueChanged(matchChanged);
-            currentMatch.BindTo(ladder.CurrentMatch);
+            currentMatch.BindTo(LadderInfo.CurrentMatch);
         }
 
         private void matchChanged(ValueChangedEvent<MatchPairing> pairing)

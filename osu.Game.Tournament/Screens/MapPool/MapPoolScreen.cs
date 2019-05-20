@@ -94,10 +94,10 @@ namespace osu.Game.Tournament.Screens.MapPool
         }
 
         [BackgroundDependencyLoader]
-        private void load(LadderInfo ladder, MatchIPCInfo ipc)
+        private void load(MatchIPCInfo ipc)
         {
             currentMatch.BindValueChanged(matchChanged);
-            currentMatch.BindTo(ladder.CurrentMatch);
+            currentMatch.BindTo(LadderInfo.CurrentMatch);
 
             ipc.Beatmap.BindValueChanged(beatmapChanged);
         }
