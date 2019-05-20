@@ -10,12 +10,13 @@ using osu.Framework.Graphics.Textures;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Overlays.Changelog.Header;
 using osu.Game.Graphics;
+using osu.Game.Graphics.UserInterface;
 using osuTK;
 using osuTK.Graphics;
 
 namespace osu.Game.Overlays.Changelog
 {
-    public class ChangelogHeader : Container
+    public class ChangelogHeader : OverlayHeader
     {
         private OsuSpriteText titleStream;
         private BreadcrumbListing listing;
@@ -26,35 +27,36 @@ namespace osu.Game.Overlays.Changelog
 
         public event ListingSelectedEventHandler ListingSelected;
 
-        private const float cover_height = 150;
         private const float title_height = 50;
         private const float icon_size = 50;
         private const float icon_margin = 20;
         private const float version_height = 40;
 
-        [BackgroundDependencyLoader]
-        private void load(OsuColour colours, TextureStore textures)
+        public void ShowBuild(string displayName, string displayVersion)
         {
-            RelativeSizeAxes = Axes.X;
-            Height = cover_height;
+            listing.Deactivate();
+            releaseStream.ShowBuild($"{displayName} {displayVersion}");
+            titleStream.Text = displayName;
+            titleStream.FlashColour(Color4.White, 500, Easing.OutQuad);
+            chevron.MoveToX(0, 100).FadeIn(100);
+        }
 
+        public void ShowListing()
+        {
+            releaseStream.Deactivate();
+            listing.Activate();
+            titleStream.Text = "Listing";
+            titleStream.FlashColour(Color4.White, 500, Easing.OutQuad);
+            chevron.MoveToX(-20, 100).FadeOut(100);
+        }
+
+        protected override Drawable CreateBackground() => new HeaderBackground();
+
+        protected override Drawable CreateContent() => new Container
+        {
+            RelativeSizeAxes = Axes.Both,
             Children = new Drawable[]
             {
-                new Container
-                {
-                    RelativeSizeAxes = Axes.X,
-                    Height = cover_height,
-                    Masking = true,
-                    Children = new Drawable[]
-                    {
-                        new Sprite
-                        {
-                            RelativeSizeAxes = Axes.Both,
-                            Texture = textures.Get(@"Headers/changelog"),
-                            FillMode = FillMode.Fill,
-                        },
-                    }
-                },
                 new Container
                 {
                     Height = title_height,
@@ -67,7 +69,7 @@ namespace osu.Game.Overlays.Changelog
                         {
                             X = icon_margin,
                             Masking = true,
-                            BorderColour = colours.Violet,
+                            //BorderColour = colours.Violet,
                             BorderThickness = 3,
                             MaskingSmoothness = 1,
                             Size = new Vector2(50),
@@ -76,7 +78,7 @@ namespace osu.Game.Overlays.Changelog
                                 new Sprite
                                 {
                                     RelativeSizeAxes = Axes.Both,
-                                    Texture = textures.Get(@"Icons/changelog"),
+                                    //Texture = textures.Get(@"Icons/changelog"),
                                     Size = new Vector2(0.8f),
                                     Anchor = Anchor.Centre,
                                     Origin = Anchor.Centre,
@@ -84,7 +86,7 @@ namespace osu.Game.Overlays.Changelog
                                 new Box
                                 {
                                     RelativeSizeAxes = Axes.Both,
-                                    Colour = colours.Violet,
+                                    //Colour = colours.Violet,
                                     Alpha = 0,
                                     AlwaysPresent = true,
                                 },
@@ -108,7 +110,7 @@ namespace osu.Game.Overlays.Changelog
                                 {
                                     Text = "Listing",
                                     Font = OsuFont.GetFont(weight: FontWeight.Light, size: 30),
-                                    Colour = colours.Violet,
+                                    //Colour = colours.Violet,
                                 },
                             }
                         }
@@ -123,7 +125,7 @@ namespace osu.Game.Overlays.Changelog
                     Direction = FillDirection.Horizontal,
                     Children = new Drawable[]
                     {
-                        listing = new BreadcrumbListing(colours.Violet)
+                        listing = new BreadcrumbListing( /*colours.Violet*/ Color4.WhiteSmoke)
                         {
                             Action = () => ListingSelected?.Invoke()
                         },
@@ -145,14 +147,14 @@ namespace osu.Game.Overlays.Changelog
                                     Anchor = Anchor.Centre,
                                     Origin = Anchor.Centre,
                                     Size = new Vector2(7),
-                                    Colour = colours.Violet,
+                                    // Colour = colours.Violet,
                                     Icon = FontAwesome.Solid.ChevronRight,
                                     Alpha = 0,
                                     X = -200,
                                 },
                             },
                         },
-                        releaseStream = new BreadcrumbRelease(colours.Violet, "Lazer")
+                        releaseStream = new BreadcrumbRelease( /*colours.Violet*/ Color4.WhiteSmoke, "Lazer")
                         {
                             Action = () => titleStream.FlashColour(Color4.White, 500, Easing.OutQuad)
                         }
@@ -160,31 +162,45 @@ namespace osu.Game.Overlays.Changelog
                 },
                 new Box
                 {
-                    Colour = colours.Violet,
+                    //Colour = colours.Violet,
                     RelativeSizeAxes = Axes.X,
                     Height = 2,
                     Anchor = Anchor.BottomLeft,
                     Origin = Anchor.CentreLeft,
                 },
-            };
+            }
+        };
+
+        protected override ScreenTitle CreateTitle() => new ChangelogHeaderTitle();
+
+        public class HeaderBackground : Sprite
+        {
+            public HeaderBackground()
+            {
+                RelativeSizeAxes = Axes.Both;
+                FillMode = FillMode.Fill;
+            }
+
+            [BackgroundDependencyLoader]
+            private void load(TextureStore textures)
+            {
+                Texture = textures.Get(@"Headers/changelog");
+            }
         }
 
-        public void ShowBuild(string displayName, string displayVersion)
+        private class ChangelogHeaderTitle : ScreenTitle
         {
-            listing.Deactivate();
-            releaseStream.ShowBuild($"{displayName} {displayVersion}");
-            titleStream.Text = displayName;
-            titleStream.FlashColour(Color4.White, 500, Easing.OutQuad);
-            chevron.MoveToX(0, 100).FadeIn(100);
-        }
+            public ChangelogHeaderTitle()
+            {
+                Title = "Changelog";
+                Section = "Listing";
+            }
 
-        public void ShowListing()
-        {
-            releaseStream.Deactivate();
-            listing.Activate();
-            titleStream.Text = "Listing";
-            titleStream.FlashColour(Color4.White, 500, Easing.OutQuad);
-            chevron.MoveToX(-20, 100).FadeOut(100);
+            [BackgroundDependencyLoader]
+            private void load(OsuColour colours)
+            {
+                AccentColour = colours.Seafoam;
+            }
         }
     }
 }
