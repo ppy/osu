@@ -71,11 +71,16 @@ namespace osu.Game.Screens.Select
             Origin = Anchor.BottomCentre;
             Children = new Drawable[]
             {
-                new Box
+                new EdgeSnappingContainer
                 {
+                    SnappedEdges = Edges.Left | Edges.Right | Edges.Bottom,
                     RelativeSizeAxes = Axes.Both,
-                    Size = Vector2.One,
-                    Colour = Color4.Black.Opacity(0.5f),
+                    Child = new Box
+                    {
+                        RelativeSizeAxes = Axes.Both,
+                        Size = Vector2.One,
+                        Colour = Color4.Black.Opacity(0.5f),
+                    }
                 },
                 modeLight = new Box
                 {

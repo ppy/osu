@@ -30,10 +30,15 @@ namespace osu.Game.Overlays.Settings
             RelativeSizeAxes = Axes.Y;
             InternalChildren = new Drawable[]
             {
-                new Box
+                new EdgeSnappingContainer
                 {
-                    Colour = Color4.Black,
+                    SnappedEdges = Edges.Left | Edges.Bottom | Edges.Top,
                     RelativeSizeAxes = Axes.Both,
+                    Child = new Box
+                    {
+                        Colour = Color4.Black,
+                        RelativeSizeAxes = Axes.Both,
+                    }
                 },
                 new SidebarScrollContainer
                 {

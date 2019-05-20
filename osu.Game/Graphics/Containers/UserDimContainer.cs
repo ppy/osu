@@ -18,7 +18,7 @@ namespace osu.Game.Graphics.Containers
     /// A container that applies user-configured visual settings to its contents.
     /// This container specifies behavior that applies to both Storyboards and Backgrounds.
     /// </summary>
-    public class UserDimContainer : Container
+    public class UserDimContainer : EdgeSnappingContainer
     {
         private const float background_fade_duration = 800;
 
@@ -71,6 +71,7 @@ namespace osu.Game.Graphics.Containers
         public UserDimContainer(bool isStoryboard = false)
         {
             this.isStoryboard = isStoryboard;
+            SnappedEdges = Edges.All;
             AddInternal(DimContainer = new Container { RelativeSizeAxes = Axes.Both });
         }
 

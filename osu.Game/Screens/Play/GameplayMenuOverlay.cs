@@ -65,78 +65,83 @@ namespace osu.Game.Screens.Play
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
-            Children = new Drawable[]
+            Child = new EdgeSnappingContainer
             {
-                new Box
+                RelativeSizeAxes = Axes.Both,
+                SnappedEdges = Edges.All,
+                Children = new Drawable[]
                 {
-                    RelativeSizeAxes = Axes.Both,
-                    Colour = Color4.Black,
-                    Alpha = background_alpha,
-                },
-                new FillFlowContainer
-                {
-                    RelativeSizeAxes = Axes.X,
-                    AutoSizeAxes = Axes.Y,
-                    Direction = FillDirection.Vertical,
-                    Spacing = new Vector2(0, 50),
-                    Origin = Anchor.Centre,
-                    Anchor = Anchor.Centre,
-                    Children = new Drawable[]
+                    new Box
                     {
-                        new FillFlowContainer
+                        RelativeSizeAxes = Axes.Both,
+                        Colour = Color4.Black,
+                        Alpha = background_alpha,
+                    },
+                    new FillFlowContainer
+                    {
+                        RelativeSizeAxes = Axes.X,
+                        AutoSizeAxes = Axes.Y,
+                        Direction = FillDirection.Vertical,
+                        Spacing = new Vector2(0, 50),
+                        Origin = Anchor.Centre,
+                        Anchor = Anchor.Centre,
+                        Children = new Drawable[]
                         {
-                            Origin = Anchor.TopCentre,
-                            Anchor = Anchor.TopCentre,
-                            RelativeSizeAxes = Axes.X,
-                            AutoSizeAxes = Axes.Y,
-                            Direction = FillDirection.Vertical,
-                            Spacing = new Vector2(0, 20),
-                            Children = new Drawable[]
+                            new FillFlowContainer
                             {
-                                new OsuSpriteText
+                                Origin = Anchor.TopCentre,
+                                Anchor = Anchor.TopCentre,
+                                RelativeSizeAxes = Axes.X,
+                                AutoSizeAxes = Axes.Y,
+                                Direction = FillDirection.Vertical,
+                                Spacing = new Vector2(0, 20),
+                                Children = new Drawable[]
                                 {
-                                    Text = Header,
-                                    Font = OsuFont.GetFont(size: 30),
-                                    Spacing = new Vector2(5, 0),
-                                    Origin = Anchor.TopCentre,
-                                    Anchor = Anchor.TopCentre,
-                                    Colour = colours.Yellow,
-                                    Shadow = true,
-                                    ShadowColour = new Color4(0, 0, 0, 0.25f)
-                                },
-                                new OsuSpriteText
-                                {
-                                    Text = Description,
-                                    Origin = Anchor.TopCentre,
-                                    Anchor = Anchor.TopCentre,
-                                    Shadow = true,
-                                    ShadowColour = new Color4(0, 0, 0, 0.25f)
+                                    new OsuSpriteText
+                                    {
+                                        Text = Header,
+                                        Font = OsuFont.GetFont(size: 30),
+                                        Spacing = new Vector2(5, 0),
+                                        Origin = Anchor.TopCentre,
+                                        Anchor = Anchor.TopCentre,
+                                        Colour = colours.Yellow,
+                                        Shadow = true,
+                                        ShadowColour = new Color4(0, 0, 0, 0.25f)
+                                    },
+                                    new OsuSpriteText
+                                    {
+                                        Text = Description,
+                                        Origin = Anchor.TopCentre,
+                                        Anchor = Anchor.TopCentre,
+                                        Shadow = true,
+                                        ShadowColour = new Color4(0, 0, 0, 0.25f)
+                                    }
                                 }
-                            }
-                        },
-                        InternalButtons = new FillFlowContainer<DialogButton>
-                        {
-                            Origin = Anchor.TopCentre,
-                            Anchor = Anchor.TopCentre,
-                            RelativeSizeAxes = Axes.X,
-                            AutoSizeAxes = Axes.Y,
-                            Direction = FillDirection.Vertical,
-                            Masking = true,
-                            EdgeEffect = new EdgeEffectParameters
-                            {
-                                Type = EdgeEffectType.Shadow,
-                                Colour = Color4.Black.Opacity(0.6f),
-                                Radius = 50
                             },
-                        },
-                        retryCounterContainer = new FillFlowContainer
-                        {
-                            Origin = Anchor.TopCentre,
-                            Anchor = Anchor.TopCentre,
-                            AutoSizeAxes = Axes.Both,
+                            InternalButtons = new FillFlowContainer<DialogButton>
+                            {
+                                Origin = Anchor.TopCentre,
+                                Anchor = Anchor.TopCentre,
+                                RelativeSizeAxes = Axes.X,
+                                AutoSizeAxes = Axes.Y,
+                                Direction = FillDirection.Vertical,
+                                Masking = true,
+                                EdgeEffect = new EdgeEffectParameters
+                                {
+                                    Type = EdgeEffectType.Shadow,
+                                    Colour = Color4.Black.Opacity(0.6f),
+                                    Radius = 50
+                                },
+                            },
+                            retryCounterContainer = new FillFlowContainer
+                            {
+                                Origin = Anchor.TopCentre,
+                                Anchor = Anchor.TopCentre,
+                                AutoSizeAxes = Axes.Both,
+                            }
                         }
-                    }
-                },
+                    },
+                }
             };
 
             updateRetryCount();

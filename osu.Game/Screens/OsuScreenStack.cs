@@ -3,6 +3,7 @@
 
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Screens;
 using osu.Game.Graphics.Containers;
 
@@ -30,10 +31,15 @@ namespace osu.Game.Screens
 
         private void initializeStack()
         {
-            InternalChild = parallaxContainer = new ParallaxContainer
+            InternalChild = new EdgeSnappingContainer
             {
+                SnappedEdges = Edges.All,
                 RelativeSizeAxes = Axes.Both,
-                Child = backgroundScreenStack = new BackgroundScreenStack { RelativeSizeAxes = Axes.Both },
+                Child = parallaxContainer = new ParallaxContainer
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Child = backgroundScreenStack = new BackgroundScreenStack { RelativeSizeAxes = Axes.Both },
+                }
             };
 
             ScreenPushed += onScreenChange;

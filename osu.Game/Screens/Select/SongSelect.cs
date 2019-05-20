@@ -92,18 +92,23 @@ namespace osu.Game.Screens.Select
         {
             AddRangeInternal(new Drawable[]
             {
-                new ParallaxContainer
+                new EdgeSnappingContainer
                 {
-                    Masking = true,
-                    ParallaxAmount = 0.005f,
+                    SnappedEdges = Edges.All,
                     RelativeSizeAxes = Axes.Both,
-                    Children = new[]
+                    Child = new ParallaxContainer
                     {
-                        new WedgeBackground
+                        Masking = true,
+                        ParallaxAmount = 0.005f,
+                        RelativeSizeAxes = Axes.Both,
+                        Children = new[]
                         {
-                            RelativeSizeAxes = Axes.Both,
-                            Padding = new MarginPadding { Right = -150 },
-                            Size = new Vector2(wedged_container_size.X, 1),
+                            new WedgeBackground
+                            {
+                                RelativeSizeAxes = Axes.Both,
+                                Padding = new MarginPadding { Right = -150 },
+                                Size = new Vector2(wedged_container_size.X, 1),
+                            }
                         }
                     }
                 },
@@ -141,15 +146,20 @@ namespace osu.Game.Screens.Select
                         Width = 0.5f,
                         Children = new Drawable[]
                         {
-                            Carousel = new BeatmapCarousel
+                            new EdgeSnappingContainer
                             {
-                                Masking = false,
                                 RelativeSizeAxes = Axes.Both,
-                                Size = new Vector2(1 - wedged_container_size.X, 1),
-                                Anchor = Anchor.CentreRight,
-                                Origin = Anchor.CentreRight,
-                                SelectionChanged = updateSelectedBeatmap,
-                                BeatmapSetsChanged = carouselBeatmapsLoaded,
+                                SnappedEdges = Edges.Right,
+                                Child = Carousel = new BeatmapCarousel
+                                {
+                                    Masking = false,
+                                    RelativeSizeAxes = Axes.Both,
+                                    Size = new Vector2(1 - wedged_container_size.X, 1),
+                                    Anchor = Anchor.CentreRight,
+                                    Origin = Anchor.CentreRight,
+                                    SelectionChanged = updateSelectedBeatmap,
+                                    BeatmapSetsChanged = carouselBeatmapsLoaded,
+                                }
                             },
                             FilterControl = new FilterControl
                             {
