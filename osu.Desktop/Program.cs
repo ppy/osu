@@ -44,7 +44,7 @@ namespace osu.Desktop
                     switch (args.FirstOrDefault() ?? string.Empty)
                     {
                         default:
-                            host.Run(new OsuGameDesktop(args));
+                            host.Run(GameDesktop.GetSuitableDesktopGame(args));
                             break;
                     }
                 }
