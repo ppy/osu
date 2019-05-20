@@ -21,7 +21,7 @@ namespace osu.Game.Tests.Visual.Online
             typeof(ProfileHeader),
             typeof(RankGraph),
             typeof(LineGraph),
-            typeof(ProfileHeaderTabControl),
+            typeof(HeaderTabControl),
             typeof(CentreHeaderContainer),
             typeof(BottomHeaderContainer),
             typeof(DetailHeaderContainer),

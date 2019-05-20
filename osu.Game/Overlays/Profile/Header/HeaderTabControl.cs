@@ -13,7 +13,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Overlays.Profile.Header
 {
-    public class ProfileHeaderTabControl : TabControl<string>
+    public class HeaderTabControl : TabControl<string>
     {
         private readonly Box bar;
 
@@ -32,7 +32,7 @@ namespace osu.Game.Overlays.Profile.Header
 
                 foreach (TabItem<string> tabItem in TabContainer)
                 {
-                    ((ProfileHeaderTabItem)tabItem).AccentColour = value;
+                    ((HeaderTabItem)tabItem).AccentColour = value;
                 }
             }
         }
@@ -43,7 +43,7 @@ namespace osu.Game.Overlays.Profile.Header
             set => TabContainer.Padding = value;
         }
 
-        public ProfileHeaderTabControl()
+        public HeaderTabControl()
         {
             TabContainer.Masking = false;
             TabContainer.Spacing = new Vector2(15, 0);
@@ -59,12 +59,12 @@ namespace osu.Game.Overlays.Profile.Header
 
         protected override Dropdown<string> CreateDropdown() => null;
 
-        protected override TabItem<string> CreateTabItem(string value) => new ProfileHeaderTabItem(value)
+        protected override TabItem<string> CreateTabItem(string value) => new HeaderTabItem(value)
         {
             AccentColour = AccentColour
         };
 
-        private class ProfileHeaderTabItem : TabItem<string>
+        private class HeaderTabItem : TabItem<string>
         {
             private readonly OsuSpriteText text;
             private readonly Drawable bar;
@@ -86,7 +86,7 @@ namespace osu.Game.Overlays.Profile.Header
                 }
             }
 
-            public ProfileHeaderTabItem(string value)
+            public HeaderTabItem(string value)
                 : base(value)
             {
                 AutoSizeAxes = Axes.X;
