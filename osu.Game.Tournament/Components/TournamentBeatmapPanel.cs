@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.Linq;
 using osu.Framework.Allocation;
@@ -146,9 +145,14 @@ namespace osu.Game.Tournament.Components
 
         private void matchChanged(ValueChangedEvent<MatchPairing> pairing)
         {
+            if (pairing.OldValue != null)
+                pairing.OldValue.PicksBans.CollectionChanged -= picksBansOnCollectionChanged;
             pairing.NewValue.PicksBans.CollectionChanged += picksBansOnCollectionChanged;
             updateState();
         }
+
+        private void picksBansOnCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+            => updateState();
 
         private BeatmapChoice choice;
 
@@ -196,20 +200,6 @@ namespace osu.Game.Tournament.Components
                 BorderThickness = 0;
                 Alpha = 1;
             }
-        }
-
-        private void picksBansOnCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
-        {
-            var list = (ObservableCollection<BeatmapChoice>)sender;
-
-            if (sender != currentMatch.Value.PicksBans)
-            {
-                // todo: we need a last attribute in bindable valuechanged events badly.
-                list.CollectionChanged -= picksBansOnCollectionChanged;
-                return;
-            }
-
-            updateState();
         }
     }
 }
