@@ -219,10 +219,10 @@ namespace osu.Game.Tests.Beatmaps.Formats
                 Assert.That(controlPoints.SamplePointAt(2500).SampleBank, Is.EqualTo("normal"));
                 Assert.That(controlPoints.SamplePointAt(3500).SampleBank, Is.EqualTo("drum"));
 
-                Assert.That(controlPoints.TimingPointAt(500).BeatLength, Is.EqualTo(500));
-                Assert.That(controlPoints.TimingPointAt(1500).BeatLength, Is.EqualTo(500));
-                Assert.That(controlPoints.TimingPointAt(2500).BeatLength, Is.EqualTo(250));
-                Assert.That(controlPoints.TimingPointAt(3500).BeatLength, Is.EqualTo(500));
+                Assert.That(controlPoints.TimingPointAt(500).BeatLength, Is.EqualTo(500).Within(0.1));
+                Assert.That(controlPoints.TimingPointAt(1500).BeatLength, Is.EqualTo(500).Within(0.1));
+                Assert.That(controlPoints.TimingPointAt(2500).BeatLength, Is.EqualTo(250).Within(0.1));
+                Assert.That(controlPoints.TimingPointAt(3500).BeatLength, Is.EqualTo(500).Within(0.1));
             }
         }
 
