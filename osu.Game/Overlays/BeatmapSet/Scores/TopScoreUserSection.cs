@@ -83,7 +83,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                                 Origin = Anchor.CentreLeft,
                                 AutoSizeAxes = Axes.Both,
                             },
-                            date = new SpriteText
+                            date = new OsuSpriteText
                             {
                                 Anchor = Anchor.CentreLeft,
                                 Origin = Anchor.CentreLeft,
