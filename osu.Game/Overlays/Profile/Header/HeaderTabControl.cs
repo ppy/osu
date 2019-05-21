@@ -17,7 +17,7 @@ namespace osu.Game.Overlays.Profile.Header
     {
         private readonly Box bar;
 
-        private Color4 accentColour;
+        private Color4 accentColour = Color4.White;
 
         public Color4 AccentColour
         {
