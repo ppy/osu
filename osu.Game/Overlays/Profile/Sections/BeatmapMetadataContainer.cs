@@ -4,7 +4,6 @@
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Cursor;
 using osu.Framework.Localisation;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
@@ -16,7 +15,7 @@ namespace osu.Game.Overlays.Profile.Sections
     /// <summary>
     /// Display artist/title/mapper information, commonly used as the left portion of a profile or score display row (see <see cref="DrawableProfileRow"/>).
     /// </summary>
-    public class BeatmapMetadataContainer : OsuHoverContainer, IHasTooltip
+    public class BeatmapMetadataContainer : OsuHoverContainer
     {
         private readonly BeatmapInfo beatmap;
 
@@ -26,8 +25,6 @@ namespace osu.Game.Overlays.Profile.Sections
             AutoSizeAxes = Axes.Both;
             TooltipText = $"{beatmap.Metadata.Artist} - {beatmap.Metadata.Title}";
         }
-
-        public string TooltipText { get; }
 
         [BackgroundDependencyLoader(true)]
         private void load(BeatmapSetOverlay beatmapSetOverlay)
