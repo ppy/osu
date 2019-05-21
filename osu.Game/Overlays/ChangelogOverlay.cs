@@ -94,7 +94,7 @@ namespace osu.Game.Overlays
 
             badges.Current.ValueChanged += e =>
             {
-                if (e.NewValue != null)
+                if (e.NewValue?.LatestBuild != null && e.NewValue != Current.Value?.UpdateStream)
                     ShowBuild(e.NewValue.LatestBuild);
             };
 
