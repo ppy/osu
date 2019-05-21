@@ -38,7 +38,7 @@ namespace osu.Game.Overlays.Profile.Header
                 new Box
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Colour = colours.CommunityUserGrayGreenDark
+                    Colour = colours.GreySeafoam
                 },
                 new FillFlowContainer
                 {

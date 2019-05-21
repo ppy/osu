@@ -5,6 +5,7 @@ using NUnit.Framework;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.MathUtils;
+using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Screens.Play.HUD;
 using osuTK;
@@ -53,7 +54,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             };
             Add(stars);
 
-            SpriteText starsLabel = new SpriteText
+            SpriteText starsLabel = new OsuSpriteText
             {
                 Origin = Anchor.BottomLeft,
                 Anchor = Anchor.BottomLeft,
