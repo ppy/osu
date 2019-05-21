@@ -41,5 +41,7 @@ namespace osu.Game.Online.API.Requests.Responses
             [JsonProperty("previous")]
             public APIChangelogBuild Previous { get; set; }
         }
+
+        public override string ToString() => $"{UpdateStream.DisplayName} {DisplayVersion}";
     }
 }
