@@ -95,6 +95,8 @@ namespace osu.Game.Overlays.Profile
 
         protected override ScreenTitle CreateTitle() => new ProfileHeaderTitle();
 
+        private void updateDisplay(User user) => coverContainer.User = user;
+
         private class ProfileHeaderTitle : ScreenTitle
         {
             public ProfileHeaderTitle()
@@ -109,7 +111,5 @@ namespace osu.Game.Overlays.Profile
                 AccentColour = colours.Seafoam;
             }
         }
-
-        private void updateDisplay(User user) => coverContainer.User = user;
     }
 }
