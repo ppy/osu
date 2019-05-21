@@ -1,4 +1,4 @@
-﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
@@ -588,7 +588,7 @@ namespace osu.Game
 
         private Task asyncLoadStream;
 
-        private void loadComponentSingleFile<T>(T d, Action<T> add, bool cache = false)
+        private T loadComponentSingleFile<T>(T d, Action<T> add, bool cache = false)
             where T : Drawable
         {
             if (cache)
@@ -636,6 +636,8 @@ namespace osu.Game
                     }
                 });
             });
+
+            return d;
         }
 
         public bool OnPressed(GlobalAction action)
