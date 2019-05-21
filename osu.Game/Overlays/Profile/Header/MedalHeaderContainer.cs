@@ -34,7 +34,7 @@ namespace osu.Game.Overlays.Profile.Header
                 new Box
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Colour = colours.CommunityUserGrayGreenDarkest,
+                    Colour = colours.GreySeafoamDarker,
                 },
                 new Container //artificial shadow
                 {
