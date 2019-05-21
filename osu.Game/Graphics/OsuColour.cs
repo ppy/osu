@@ -77,7 +77,7 @@ namespace osu.Game.Graphics
 
         public readonly Color4 Seafoam = FromHex(@"05ffa2");
         public readonly Color4 GreySeafoamLighter = FromHex(@"9ebab1");
-        public readonly Color4 GreySeafoamLight = FromHex(@"4e7466");
+        public readonly Color4 GreySeafoamLight = FromHex(@"4d7365");
         public readonly Color4 GreySeafoam = FromHex(@"33413c");
         public readonly Color4 GreySeafoamDark = FromHex(@"2c3532");
         public readonly Color4 GreySeafoamDarker = FromHex(@"1e2422");
