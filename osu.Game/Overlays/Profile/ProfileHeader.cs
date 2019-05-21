@@ -124,7 +124,7 @@ namespace osu.Game.Overlays.Profile
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
-            infoTabControl.AccentColour = colours.CommunityUserGreen;
+            infoTabControl.AccentColour = colours.Seafoam;
         }
 
         public Bindable<User> User = new Bindable<User>();
@@ -145,7 +145,7 @@ namespace osu.Game.Overlays.Profile
             [BackgroundDependencyLoader]
             private void load(OsuColour colours)
             {
-                AccentColour = colours.CommunityUserGreen;
+                AccentColour = colours.Seafoam;
             }
         }
     }
