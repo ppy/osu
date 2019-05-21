@@ -58,7 +58,10 @@ namespace osu.Game.Overlays
                         Direction = FillDirection.Vertical,
                         Children = new Drawable[]
                         {
-                            header = new ChangelogHeader(),
+                            header = new ChangelogHeader
+                            {
+                                ListingSelected = ShowListing,
+                            },
                             badges = new BadgeDisplay(),
                             content = new Container<ChangelogContent>
                             {
@@ -69,8 +72,6 @@ namespace osu.Game.Overlays
                     },
                 },
             };
-
-            header.ListingSelected += ShowListing;
 
             // todo: better
             badges.Current.ValueChanged += e =>
@@ -135,7 +136,7 @@ namespace osu.Game.Overlays
                 return;
             }
 
-            header.ShowBuild(build.UpdateStream.DisplayName, build.DisplayVersion);
+            header.ShowBuild(build);
             badges.Current.Value = build.UpdateStream;
 
             loadContent(new ChangelogSingleBuild(build));
