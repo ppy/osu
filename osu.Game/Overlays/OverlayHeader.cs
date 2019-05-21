@@ -4,13 +4,12 @@
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
-using osu.Game.Overlays.Profile.Header;
 
 namespace osu.Game.Overlays
 {
     public abstract class OverlayHeader : Container
     {
-        protected readonly HeaderTabControl TabControl;
+        protected readonly OverlayHeaderTabControl TabControl;
 
         private const float cover_height = 150;
         private const float cover_info_height = 75;
@@ -41,7 +40,7 @@ namespace osu.Game.Overlays
                     Children = new Drawable[]
                     {
                         CreateTitle().With(t => t.X = -ScreenTitle.ICON_WIDTH),
-                        TabControl = new HeaderTabControl
+                        TabControl = new OverlayHeaderTabControl
                         {
                             Anchor = Anchor.BottomLeft,
                             Origin = Anchor.BottomLeft,

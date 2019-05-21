@@ -11,9 +11,9 @@ using osu.Game.Graphics.UserInterface;
 using osuTK;
 using osuTK.Graphics;
 
-namespace osu.Game.Overlays.Profile.Header
+namespace osu.Game.Overlays
 {
-    public class HeaderTabControl : TabControl<string>
+    public class OverlayHeaderTabControl : TabControl<string>
     {
         private readonly Box bar;
 
@@ -43,7 +43,7 @@ namespace osu.Game.Overlays.Profile.Header
             set => TabContainer.Padding = value;
         }
 
-        public HeaderTabControl()
+        public OverlayHeaderTabControl()
         {
             TabContainer.Masking = false;
             TabContainer.Spacing = new Vector2(15, 0);
