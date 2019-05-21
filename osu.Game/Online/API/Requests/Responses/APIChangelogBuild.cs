@@ -42,7 +42,7 @@ namespace osu.Game.Online.API.Requests.Responses
             public APIChangelogBuild Previous { get; set; }
         }
 
-        public bool Equals(APIChangelogBuild other) => this.Id == other?.Id;
+        public bool Equals(APIChangelogBuild other) => Id == other?.Id;
 
         public override string ToString() => $"{UpdateStream.DisplayName} {DisplayVersion}";
     }
