@@ -25,13 +25,7 @@ namespace osu.Game.Online.API.Requests.Responses
         [JsonProperty("latest_build")]
         public APIChangelogBuild LatestBuild { get; set; }
 
-        public bool Equals(APIUpdateStream other)
-        {
-            if (ReferenceEquals(null, other)) return false;
-            if (ReferenceEquals(this, other)) return true;
-
-            return Id == other.Id;
-        }
+        public bool Equals(APIUpdateStream other) => this.Id == other?.Id;
 
         public ColourInfo Colour
         {

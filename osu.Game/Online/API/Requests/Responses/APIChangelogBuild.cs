@@ -7,7 +7,7 @@ using System.Collections.Generic;
 
 namespace osu.Game.Online.API.Requests.Responses
 {
-    public class APIChangelogBuild
+    public class APIChangelogBuild : IEquatable<APIChangelogBuild>
     {
         [JsonProperty("id")]
         public long Id { get; set; }
@@ -41,6 +41,8 @@ namespace osu.Game.Online.API.Requests.Responses
             [JsonProperty("previous")]
             public APIChangelogBuild Previous { get; set; }
         }
+
+        public bool Equals(APIChangelogBuild other) => this.Id == other?.Id;
 
         public override string ToString() => $"{UpdateStream.DisplayName} {DisplayVersion}";
     }

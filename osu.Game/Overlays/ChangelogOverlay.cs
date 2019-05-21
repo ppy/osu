@@ -1,12 +1,14 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
+using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -31,6 +33,23 @@ namespace osu.Game.Overlays
         private SampleChannel sampleBack;
 
         private List<APIChangelogBuild> builds;
+
+        public readonly Bindable<APIChangelogBuild> Current = new Bindable<APIChangelogBuild>();
+
+        public void ShowListing() => Current.Value = null;
+
+        /// <summary>
+        /// Fetches and shows a specific build from a specific update stream.
+        /// </summary>
+        /// <param name="build">Must contain at least <see cref="APIUpdateStream.Name"/> and
+        /// <see cref="APIChangelogBuild.Version"/>. If <see cref="APIUpdateStream.DisplayName"/> and
+        /// <see cref="APIChangelogBuild.DisplayVersion"/> are specified, the header will instantly display them.</param>
+        public void ShowBuild([NotNull] APIChangelogBuild build)
+        {
+            if (build == null) throw new ArgumentNullException(nameof(build));
+
+            Current.Value = build;
+        }
 
         [BackgroundDependencyLoader]
         private void load(AudioManager audio, OsuColour colour)
@@ -73,22 +92,30 @@ namespace osu.Game.Overlays
                 },
             };
 
-            // todo: better
             badges.Current.ValueChanged += e =>
             {
-                if (e.NewValue?.LatestBuild != null)
+                if (e.NewValue != null)
                     ShowBuild(e.NewValue.LatestBuild);
             };
 
             sampleBack = audio.Sample.Get(@"UI/generic-select-soft");
-        }
 
-        protected override void PopIn()
-        {
-            base.PopIn();
+            header.Current.BindTo(Current);
 
-            if (!initialFetchPerformed)
-                fetchListing();
+            Current.BindValueChanged(e =>
+            {
+                if (e.NewValue != null)
+                {
+                    badges.Current.Value = e.NewValue.UpdateStream;
+
+                    loadContent(new ChangelogSingleBuild(e.NewValue));
+                }
+                else
+                {
+                    badges.Current.Value = null;
+                    loadContent(new ChangelogListing(builds));
+                }
+            });
         }
 
         public override bool OnPressed(GlobalAction action)
@@ -96,13 +123,13 @@ namespace osu.Game.Overlays
             switch (action)
             {
                 case GlobalAction.Back:
-                    if (content.Child is ChangelogListing)
+                    if (Current.Value == null)
                     {
                         State = Visibility.Hidden;
                     }
                     else
                     {
-                        ShowListing();
+                        Current.Value = null;
                         sampleBack?.Play();
                     }
 
@@ -112,34 +139,12 @@ namespace osu.Game.Overlays
             return false;
         }
 
-        public void ShowListing()
+        protected override void PopIn()
         {
-            if (content.Children.FirstOrDefault() is ChangelogListing)
-                return;
+            base.PopIn();
 
-            header.ShowListing();
-            badges.Current.Value = null;
-            loadContent(new ChangelogListing(builds));
-        }
-
-        /// <summary>
-        /// Fetches and shows a specific build from a specific update stream.
-        /// </summary>
-        /// <param name="build">Must contain at least <see cref="APIUpdateStream.Name"/> and
-        /// <see cref="APIChangelogBuild.Version"/>. If <see cref="APIUpdateStream.DisplayName"/> and
-        /// <see cref="APIChangelogBuild.DisplayVersion"/> are specified, the header will instantly display them.</param>
-        public void ShowBuild(APIChangelogBuild build)
-        {
-            if (build == null)
-            {
-                ShowListing();
-                return;
-            }
-
-            header.ShowBuild(build);
-            badges.Current.Value = build.UpdateStream;
-
-            loadContent(new ChangelogSingleBuild(build));
+            if (!initialFetchPerformed)
+                fetchListing();
         }
 
         private bool initialFetchPerformed;
@@ -158,7 +163,7 @@ namespace osu.Game.Overlays
                 builds = res.Builds;
                 badges.Populate(res.Streams);
 
-                ShowListing();
+                Current.TriggerChange();
             };
             req.Failure += _ => initialFetchPerformed = false;
 

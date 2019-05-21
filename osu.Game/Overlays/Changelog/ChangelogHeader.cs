@@ -3,6 +3,7 @@
 
 using System;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -17,6 +18,8 @@ namespace osu.Game.Overlays.Changelog
 {
     public class ChangelogHeader : OverlayHeader
     {
+        public readonly Bindable<APIChangelogBuild> Current = new Bindable<APIChangelogBuild>();
+
         public Action ListingSelected;
 
         private const string listing_string = "Listing";
@@ -29,6 +32,8 @@ namespace osu.Game.Overlays.Changelog
                 if (e.NewValue == listing_string)
                     ListingSelected?.Invoke();
             };
+
+            Current.ValueChanged += showBuild;
         }
 
         [BackgroundDependencyLoader]
@@ -37,35 +42,24 @@ namespace osu.Game.Overlays.Changelog
             TabControl.AccentColour = colours.Violet;
         }
 
-        private APIChangelogBuild displayedBuild;
-
         private ChangelogHeaderTitle title;
 
-        public void ShowBuild(APIChangelogBuild build)
+        private void showBuild(ValueChangedEvent<APIChangelogBuild> e)
         {
-            hideBuildTab();
+            if (e.OldValue != null)
+                TabControl.RemoveItem(e.OldValue.ToString());
 
-            displayedBuild = build;
-
-            TabControl.AddItem(build.ToString());
-            TabControl.Current.Value = build.ToString();
-
-            title.Version = build.UpdateStream.DisplayName;
-        }
-
-        public void ShowListing()
-        {
-            hideBuildTab();
-
-            title.Version = null;
-        }
-
-        private void hideBuildTab()
-        {
-            if (displayedBuild != null)
+            if (e.NewValue != null)
             {
-                TabControl.RemoveItem(displayedBuild.ToString());
-                displayedBuild = null;
+                TabControl.AddItem(e.NewValue.ToString());
+                TabControl.Current.Value = e.NewValue.ToString();
+
+                title.Version = e.NewValue.UpdateStream.DisplayName;
+            }
+            else
+            {
+                TabControl.Current.Value = listing_string;
+                title.Version = null;
             }
         }
 
