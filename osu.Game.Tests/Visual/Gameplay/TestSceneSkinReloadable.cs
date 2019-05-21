@@ -7,9 +7,9 @@ using osu.Framework.Audio.Sample;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
-using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
 using osu.Game.Graphics;
+using osu.Game.Graphics.Sprites;
 using osu.Game.Skinning;
 using osuTK.Graphics;
 
@@ -76,7 +76,7 @@ namespace osu.Game.Tests.Visual.Gameplay
                         Colour = Color4.Black,
                         RelativeSizeAxes = Axes.Both,
                     },
-                    new SpriteText
+                    new OsuSpriteText
                     {
                         Font = OsuFont.Default.With(size: 40),
                         Anchor = Anchor.Centre,
