@@ -7,7 +7,6 @@ using NUnit.Framework;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Changelog;
-using osu.Game.Overlays.Changelog.Header;
 
 namespace osu.Game.Tests.Visual.Online
 {
@@ -25,9 +24,6 @@ namespace osu.Game.Tests.Visual.Online
             typeof(ChangelogListing),
             typeof(ChangelogSingleBuild),
             typeof(ChangelogBuild),
-            typeof(Breadcrumb),
-            typeof(BreadcrumbListing),
-            typeof(BreadcrumbRelease),
         };
 
         protected override void LoadComplete()
