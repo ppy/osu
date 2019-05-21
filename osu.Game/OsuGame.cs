@@ -4,44 +4,44 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using osu.Framework.Configuration;
-using osu.Framework.Screens;
-using osu.Game.Configuration;
-using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
-using osu.Game.Overlays;
-using osu.Framework.Logging;
-using osu.Framework.Allocation;
-using osu.Game.Overlays.Toolbar;
-using osu.Game.Screens;
-using osu.Game.Screens.Menu;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Bindables;
+using osu.Framework.Configuration;
 using osu.Framework.Extensions.IEnumerableExtensions;
+using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Commands;
+using osu.Framework.Logging;
 using osu.Framework.Platform;
+using osu.Framework.Screens;
 using osu.Framework.Threading;
 using osu.Game.Beatmaps;
+using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Input;
-using osu.Game.Overlays.Notifications;
-using osu.Game.Screens.Play;
 using osu.Game.Input.Bindings;
+using osu.Game.Input.Commands;
 using osu.Game.Online.Chat;
-using osu.Game.Skinning;
-using osuTK.Graphics;
+using osu.Game.Overlays;
+using osu.Game.Overlays.Notifications;
+using osu.Game.Overlays.Toolbar;
 using osu.Game.Overlays.Volume;
 using osu.Game.Scoring;
+using osu.Game.Screens;
+using osu.Game.Screens.Menu;
+using osu.Game.Screens.Play;
 using osu.Game.Screens.Select;
+using osu.Game.Skinning;
 using osu.Game.Utils;
-using LogLevel = osu.Framework.Logging.LogLevel;
+using osuTK.Graphics;
 
 namespace osu.Game
 {
@@ -54,17 +54,17 @@ namespace osu.Game
         public Toolbar Toolbar;
 
         private ChatOverlay chatOverlay;
-        private ToggleOverlayCommand<ChatOverlay> toggleChatOverlayCommand;
+        private ToggleOnlineOverlayCommand<ChatOverlay> toggleChatOverlayCommand;
 
         private ChannelManager channelManager;
 
         private NotificationOverlay notifications;
 
         private DirectOverlay direct;
-        private ToggleOverlayCommand<DirectOverlay> toggleDirectOverlayCommand;
+        private ToggleOnlineOverlayCommand<DirectOverlay> toggleDirectOverlayCommand;
 
         private SocialOverlay social;
-        private ToggleOverlayCommand<SocialOverlay> toggleSocialOverlayCommand;
+        private ToggleOnlineOverlayCommand<SocialOverlay> toggleSocialOverlayCommand;
 
         private UserProfileOverlay userProfile;
         private BeatmapSetOverlay beatmapSetOverlay;
@@ -423,15 +423,15 @@ namespace osu.Game
 
             //overlay elements
             loadComponentSingleFile(direct = new DirectOverlay(), overlayContent.Add, true);
-            dependencies.Cache(toggleDirectOverlayCommand = new ToggleOverlayCommand<DirectOverlay>(direct));
+            dependencies.Cache(toggleDirectOverlayCommand = new ToggleOnlineOverlayCommand<DirectOverlay>(direct, API));
 
             loadComponentSingleFile(social = new SocialOverlay(), overlayContent.Add, true);
-            dependencies.Cache(toggleSocialOverlayCommand = new ToggleOverlayCommand<SocialOverlay>(social));
+            dependencies.Cache(toggleSocialOverlayCommand = new ToggleOnlineOverlayCommand<SocialOverlay>(social, API));
 
             loadComponentSingleFile(channelManager = new ChannelManager(), AddInternal, true);
 
             loadComponentSingleFile(chatOverlay = new ChatOverlay(), overlayContent.Add, true);
-            dependencies.Cache(toggleChatOverlayCommand = new ToggleOverlayCommand<ChatOverlay>(chatOverlay));
+            dependencies.Cache(toggleChatOverlayCommand = new ToggleOnlineOverlayCommand<ChatOverlay>(chatOverlay, API));
 
             loadComponentSingleFile(settings = new SettingsOverlay { GetToolbarHeight = () => ToolbarOffset }, leftFloatingOverlayContent.Add, true);
             dependencies.Cache(toggleSettingsOverlayCommand = new ToggleOverlayCommand<SettingsPanel>(settings));
@@ -443,7 +443,7 @@ namespace osu.Game
             dependencies.Cache(new ToggleOverlayCommand<BeatmapSetOverlay>(beatmapSetOverlay));
 
             LoginOverlay loginOverlay;
-            loadComponentSingleFile(loginOverlay=new LoginOverlay
+            loadComponentSingleFile(loginOverlay = new LoginOverlay
             {
                 GetToolbarHeight = () => ToolbarOffset,
                 Anchor = Anchor.TopRight,

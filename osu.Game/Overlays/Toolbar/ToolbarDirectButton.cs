@@ -2,8 +2,8 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
-using osu.Framework.Input.Commands;
 using osu.Game.Graphics;
+using osu.Game.Input.Commands;
 
 namespace osu.Game.Overlays.Toolbar
 {
@@ -15,7 +15,7 @@ namespace osu.Game.Overlays.Toolbar
         }
 
         [BackgroundDependencyLoader(true)]
-        private void load(DirectOverlay direct, ToggleOverlayCommand<DirectOverlay> toggleOverlayCommand)
+        private void load(DirectOverlay direct, ToggleOnlineOverlayCommand<DirectOverlay> toggleOverlayCommand)
         {
             StateContainer = direct;
             Command = toggleOverlayCommand;
