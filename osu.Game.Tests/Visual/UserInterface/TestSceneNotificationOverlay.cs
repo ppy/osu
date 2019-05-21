@@ -9,6 +9,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.MathUtils;
+using osu.Game.Graphics.Sprites;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Notifications;
 
@@ -40,7 +41,7 @@ namespace osu.Game.Tests.Visual.UserInterface
                 Origin = Anchor.TopRight
             });
 
-            SpriteText displayedCount = new SpriteText();
+            SpriteText displayedCount = new OsuSpriteText();
 
             Content.Add(displayedCount);
 
