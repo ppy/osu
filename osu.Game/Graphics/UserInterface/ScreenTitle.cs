@@ -19,19 +19,16 @@ namespace osu.Game.Graphics.UserInterface
 
         protected IconUsage Icon
         {
-            get => iconSprite.Icon;
             set => iconSprite.Icon = value;
         }
 
         protected string Title
         {
-            get => titleText.Text;
             set => titleText.Text = value;
         }
 
         protected string Section
         {
-            get => pageText.Text;
             set => pageText.Text = value;
         }
 
