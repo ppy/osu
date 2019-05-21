@@ -4,9 +4,9 @@
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Sprites;
 using osu.Framework.Screens;
 using osu.Framework.Testing;
+using osu.Game.Graphics.Sprites;
 using osu.Game.Screens;
 using osu.Game.Screens.Play;
 using osuTK.Graphics;
@@ -54,7 +54,7 @@ namespace osu.Game.Tests.Visual
             [BackgroundDependencyLoader]
             private void load()
             {
-                AddInternal(new SpriteText
+                AddInternal(new OsuSpriteText
                 {
                     Text = screenText,
                     Colour = Color4.White,
