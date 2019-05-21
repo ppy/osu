@@ -170,26 +170,65 @@ namespace osu.Game.Tests.Beatmaps.Formats
                 var controlPoints = beatmap.ControlPointInfo;
 
                 Assert.AreEqual(4, controlPoints.TimingPoints.Count);
-                var timingPoint = controlPoints.TimingPoints[0];
+                Assert.AreEqual(42, controlPoints.DifficultyPoints.Count);
+                Assert.AreEqual(42, controlPoints.SamplePoints.Count);
+                Assert.AreEqual(42, controlPoints.EffectPoints.Count);
+
+                var timingPoint = controlPoints.TimingPointAt(0);
+                Assert.AreEqual(956, timingPoint.Time);
+                Assert.AreEqual(329.67032967033, timingPoint.BeatLength);
+                Assert.AreEqual(TimeSignatures.SimpleQuadruple, timingPoint.TimeSignature);
+
+                timingPoint = controlPoints.TimingPointAt(48428);
                 Assert.AreEqual(956, timingPoint.Time);
                 Assert.AreEqual(329.67032967033d, timingPoint.BeatLength);
                 Assert.AreEqual(TimeSignatures.SimpleQuadruple, timingPoint.TimeSignature);
 
-                Assert.AreEqual(5, controlPoints.DifficultyPoints.Count);
-                var difficultyPoint = controlPoints.DifficultyPoints[0];
-                Assert.AreEqual(116999, difficultyPoint.Time);
-                Assert.AreEqual(0.75000000000000189d, difficultyPoint.SpeedMultiplier);
+                timingPoint = controlPoints.TimingPointAt(119637);
+                Assert.AreEqual(119637, timingPoint.Time);
+                Assert.AreEqual(659.340659340659, timingPoint.BeatLength);
+                Assert.AreEqual(TimeSignatures.SimpleQuadruple, timingPoint.TimeSignature);
 
-                Assert.AreEqual(34, controlPoints.SamplePoints.Count);
-                var soundPoint = controlPoints.SamplePoints[0];
+                var difficultyPoint = controlPoints.DifficultyPointAt(0);
+                Assert.AreEqual(0, difficultyPoint.Time);
+                Assert.AreEqual(1.0, difficultyPoint.SpeedMultiplier);
+
+                difficultyPoint = controlPoints.DifficultyPointAt(48428);
+                Assert.AreEqual(48428, difficultyPoint.Time);
+                Assert.AreEqual(1.0, difficultyPoint.SpeedMultiplier);
+
+                difficultyPoint = controlPoints.DifficultyPointAt(116999);
+                Assert.AreEqual(116999, difficultyPoint.Time);
+                Assert.AreEqual(0.75, difficultyPoint.SpeedMultiplier, 0.1);
+
+                var soundPoint = controlPoints.SamplePointAt(0);
                 Assert.AreEqual(956, soundPoint.Time);
                 Assert.AreEqual("soft", soundPoint.SampleBank);
                 Assert.AreEqual(60, soundPoint.SampleVolume);
 
-                Assert.AreEqual(8, controlPoints.EffectPoints.Count);
-                var effectPoint = controlPoints.EffectPoints[0];
+                soundPoint = controlPoints.SamplePointAt(53373);
+                Assert.AreEqual(53373, soundPoint.Time);
+                Assert.AreEqual("soft", soundPoint.SampleBank);
+                Assert.AreEqual(60, soundPoint.SampleVolume);
+
+                soundPoint = controlPoints.SamplePointAt(119637);
+                Assert.AreEqual(119637, soundPoint.Time);
+                Assert.AreEqual("soft", soundPoint.SampleBank);
+                Assert.AreEqual(80, soundPoint.SampleVolume);
+
+                var effectPoint = controlPoints.EffectPointAt(0);
+                Assert.AreEqual(0, effectPoint.Time);
+                Assert.IsFalse(effectPoint.KiaiMode);
+                Assert.IsFalse(effectPoint.OmitFirstBarLine);
+
+                effectPoint = controlPoints.EffectPointAt(53703);
                 Assert.AreEqual(53703, effectPoint.Time);
                 Assert.IsTrue(effectPoint.KiaiMode);
+                Assert.IsFalse(effectPoint.OmitFirstBarLine);
+
+                effectPoint = controlPoints.EffectPointAt(119637);
+                Assert.AreEqual(119637, effectPoint.Time);
+                Assert.IsFalse(effectPoint.KiaiMode);
                 Assert.IsFalse(effectPoint.OmitFirstBarLine);
             }
         }
