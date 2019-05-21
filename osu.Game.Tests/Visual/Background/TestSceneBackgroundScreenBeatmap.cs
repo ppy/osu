@@ -9,7 +9,6 @@ using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Events;
 using osu.Framework.Input.States;
 using osu.Framework.Platform;
@@ -19,6 +18,7 @@ using osu.Game.Configuration;
 using osu.Game.Database;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
+using osu.Game.Graphics.Sprites;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Scoring;
@@ -240,7 +240,7 @@ namespace osu.Game.Tests.Visual.Background
         {
             player.StoryboardEnabled.Value = false;
             player.ReplacesBackground.Value = false;
-            player.CurrentStoryboardContainer.Add(new SpriteText
+            player.CurrentStoryboardContainer.Add(new OsuSpriteText
             {
                 Size = new Vector2(250, 50),
                 Alpha = 1,
