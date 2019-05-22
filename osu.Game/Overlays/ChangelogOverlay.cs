@@ -26,8 +26,6 @@ namespace osu.Game.Overlays
     {
         private ChangelogHeader header;
 
-        private UpdateStreamBadgeArea updateStreamBadges;
-
         private Container<ChangelogContent> content;
 
         private SampleChannel sampleBack;
@@ -81,7 +79,6 @@ namespace osu.Game.Overlays
                             {
                                 ListingSelected = ShowListing,
                             },
-                            updateStreamBadges = new UpdateStreamBadgeArea(),
                             content = new Container<ChangelogContent>
                             {
                                 RelativeSizeAxes = Axes.X,
@@ -92,12 +89,6 @@ namespace osu.Game.Overlays
                 },
             };
 
-            updateStreamBadges.Current.ValueChanged += e =>
-            {
-                if (e.NewValue?.LatestBuild != null && e.NewValue != Current.Value?.UpdateStream)
-                    ShowBuild(e.NewValue.LatestBuild);
-            };
-
             sampleBack = audio.Sample.Get(@"UI/generic-select-soft");
 
             header.Current.BindTo(Current);
@@ -105,16 +96,9 @@ namespace osu.Game.Overlays
             Current.BindValueChanged(e =>
             {
                 if (e.NewValue != null)
-                {
-                    updateStreamBadges.Current.Value = e.NewValue.UpdateStream;
-
                     loadContent(new ChangelogSingleBuild(e.NewValue));
-                }
                 else
-                {
-                    updateStreamBadges.Current.Value = null;
                     loadContent(new ChangelogListing(builds));
-                }
             });
         }
 
@@ -161,7 +145,7 @@ namespace osu.Game.Overlays
                 res.Streams.ForEach(s => s.LatestBuild.UpdateStream = res.Streams.Find(s2 => s2.Id == s.LatestBuild.UpdateStream.Id));
 
                 builds = res.Builds;
-                updateStreamBadges.Populate(res.Streams);
+                header.Streams.Populate(res.Streams);
 
                 Current.TriggerChange();
             };

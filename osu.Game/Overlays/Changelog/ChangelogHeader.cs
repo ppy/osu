@@ -22,6 +22,8 @@ namespace osu.Game.Overlays.Changelog
 
         public Action ListingSelected;
 
+        public UpdateStreamBadgeArea Streams;
+
         private const string listing_string = "Listing";
 
         public ChangelogHeader()
@@ -34,6 +36,12 @@ namespace osu.Game.Overlays.Changelog
             };
 
             Current.ValueChanged += showBuild;
+
+            Streams.Current.ValueChanged += e =>
+            {
+                if (e.NewValue?.LatestBuild != null && e.NewValue != Current.Value?.UpdateStream)
+                    Current.Value = e.NewValue.LatestBuild;
+            };
         }
 
         [BackgroundDependencyLoader]
@@ -54,11 +62,14 @@ namespace osu.Game.Overlays.Changelog
                 TabControl.AddItem(e.NewValue.ToString());
                 TabControl.Current.Value = e.NewValue.ToString();
 
+                Streams.Current.Value = e.NewValue.UpdateStream;
+
                 title.Version = e.NewValue.UpdateStream.DisplayName;
             }
             else
             {
                 TabControl.Current.Value = listing_string;
+                Streams.Current.Value = null;
                 title.Version = null;
             }
         }
@@ -67,10 +78,11 @@ namespace osu.Game.Overlays.Changelog
 
         protected override Drawable CreateContent() => new Container
         {
-            RelativeSizeAxes = Axes.Both,
+            RelativeSizeAxes = Axes.X,
+            AutoSizeAxes = Axes.Y,
             Children = new Drawable[]
             {
-                // todo: move badge display here
+                Streams = new UpdateStreamBadgeArea(),
             }
         };
 
