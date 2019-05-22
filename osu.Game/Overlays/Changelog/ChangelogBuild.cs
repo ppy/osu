@@ -1,4 +1,4 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Graphics;
@@ -8,7 +8,7 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Online.API.Requests.Responses;
 using System;
-using System.Collections.Generic;
+using System.Linq;
 using System.Text.RegularExpressions;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Users;
@@ -44,30 +44,20 @@ namespace osu.Game.Overlays.Changelog
                 },
             };
 
-            var categories = new SortedDictionary<string, List<APIChangelogEntry>>();
-
-            // sort entries by category
-            foreach (APIChangelogEntry entry in build.ChangelogEntries)
-            {
-                if (!categories.ContainsKey(entry.Category))
-                    categories.Add(entry.Category, new List<APIChangelogEntry> { entry });
-                else
-                    categories[entry.Category].Add(entry);
-            }
-
-            foreach (KeyValuePair<string, List<APIChangelogEntry>> category in categories)
+            foreach (var categoryEntries in build.ChangelogEntries.GroupBy(b => b.Category).OrderBy(c => c.Key))
             {
                 ChangelogEntries.Add(new OsuSpriteText
                 {
-                    Text = category.Key,
+                    Text = categoryEntries.Key,
                     Font = OsuFont.GetFont(weight: FontWeight.Bold, size: 24),
                     Margin = new MarginPadding { Top = 35, Bottom = 15 },
                 });
 
-                foreach (APIChangelogEntry entry in category.Value)
+                var fontLarge = OsuFont.GetFont(size: 18);
                 var fontMedium = OsuFont.GetFont(size: 14);
                 var fontSmall = OsuFont.GetFont(size: 12);
 
+                foreach (APIChangelogEntry entry in categoryEntries)
                 {
                     LinkFlowContainer title = new LinkFlowContainer
                     {
