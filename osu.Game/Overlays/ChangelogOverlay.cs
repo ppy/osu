@@ -26,7 +26,7 @@ namespace osu.Game.Overlays
     {
         private ChangelogHeader header;
 
-        private StreamBadgeArea streamBadges;
+        private UpdateStreamBadgeArea updateStreamBadges;
 
         private Container<ChangelogContent> content;
 
@@ -81,7 +81,7 @@ namespace osu.Game.Overlays
                             {
                                 ListingSelected = ShowListing,
                             },
-                            streamBadges = new StreamBadgeArea(),
+                            updateStreamBadges = new UpdateStreamBadgeArea(),
                             content = new Container<ChangelogContent>
                             {
                                 RelativeSizeAxes = Axes.X,
@@ -92,7 +92,7 @@ namespace osu.Game.Overlays
                 },
             };
 
-            streamBadges.Current.ValueChanged += e =>
+            updateStreamBadges.Current.ValueChanged += e =>
             {
                 if (e.NewValue?.LatestBuild != null && e.NewValue != Current.Value?.UpdateStream)
                     ShowBuild(e.NewValue.LatestBuild);
@@ -106,13 +106,13 @@ namespace osu.Game.Overlays
             {
                 if (e.NewValue != null)
                 {
-                    streamBadges.Current.Value = e.NewValue.UpdateStream;
+                    updateStreamBadges.Current.Value = e.NewValue.UpdateStream;
 
                     loadContent(new ChangelogSingleBuild(e.NewValue));
                 }
                 else
                 {
-                    streamBadges.Current.Value = null;
+                    updateStreamBadges.Current.Value = null;
                     loadContent(new ChangelogListing(builds));
                 }
             });
@@ -161,7 +161,7 @@ namespace osu.Game.Overlays
                 res.Streams.ForEach(s => s.LatestBuild.UpdateStream = res.Streams.Find(s2 => s2.Id == s.LatestBuild.UpdateStream.Id));
 
                 builds = res.Builds;
-                streamBadges.Populate(res.Streams);
+                updateStreamBadges.Populate(res.Streams);
 
                 Current.TriggerChange();
             };

@@ -17,8 +17,8 @@ namespace osu.Game.Tests.Visual.Online
 
         public override IReadOnlyList<Type> RequiredTypes => new[]
         {
-            typeof(StreamBadgeArea),
-            typeof(StreamBadge),
+            typeof(UpdateStreamBadgeArea),
+            typeof(UpdateStreamBadge),
             typeof(ChangelogHeader),
             typeof(ChangelogContent),
             typeof(ChangelogListing),
