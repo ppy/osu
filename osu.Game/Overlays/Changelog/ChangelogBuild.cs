@@ -1,4 +1,4 @@
-﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Graphics;
@@ -65,6 +65,9 @@ namespace osu.Game.Overlays.Changelog
                 });
 
                 foreach (APIChangelogEntry entry in category.Value)
+                var fontMedium = OsuFont.GetFont(size: 14);
+                var fontSmall = OsuFont.GetFont(size: 12);
+
                 {
                     LinkFlowContainer title = new LinkFlowContainer
                     {
@@ -76,51 +79,51 @@ namespace osu.Game.Overlays.Changelog
 
                     title.AddIcon(FontAwesome.Solid.Check, t =>
                     {
-                        t.Font = OsuFont.GetFont(size: 12);
+                        t.Font = fontSmall;
                         t.Padding = new MarginPadding { Left = -17, Right = 5 };
                     });
 
-                    title.AddText(entry.Title, t => { t.Font = OsuFont.GetFont(size: 18); });
+                    title.AddText(entry.Title, t => { t.Font = fontLarge; });
 
                     if (!string.IsNullOrEmpty(entry.Repository))
                     {
-                        title.AddText(" (", t => t.Font = OsuFont.GetFont(size: 18));
+                        title.AddText(" (", t => t.Font = fontLarge);
                         title.AddLink($"{entry.Repository.Replace("ppy/", "")}#{entry.GithubPullRequestId}", entry.GithubUrl, Online.Chat.LinkAction.External,
-                            creationParameters: t => { t.Font = OsuFont.GetFont(size: 18); });
-                        title.AddText(")", t => t.Font = OsuFont.GetFont(size: 18));
+                            creationParameters: t => { t.Font = fontLarge; });
+                        title.AddText(")", t => t.Font = fontLarge);
                     }
 
-                    title.AddText(" by ", t => t.Font = OsuFont.GetFont(size: 14));
+                    title.AddText(" by ", t => t.Font = fontMedium);
 
                     if (entry.GithubUser.UserId != null)
                         title.AddUserLink(new User
                         {
                             Username = entry.GithubUser.OsuUsername,
                             Id = entry.GithubUser.UserId.Value
-                        }, t => t.Font = OsuFont.GetFont(size: 14));
+                        }, t => t.Font = fontMedium);
                     else if (entry.GithubUser.GithubUrl != null)
-                        title.AddLink(entry.GithubUser.DisplayName, entry.GithubUser.GithubUrl, Online.Chat.LinkAction.External, null, null, t => t.Font = OsuFont.GetFont(size: 14));
+                        title.AddLink(entry.GithubUser.DisplayName, entry.GithubUser.GithubUrl, Online.Chat.LinkAction.External, null, null, t => t.Font = fontMedium);
                     else
-                        title.AddText(entry.GithubUser.DisplayName, t => t.Font = OsuFont.GetFont(size: 12));
+                        title.AddText(entry.GithubUser.DisplayName, t => t.Font = fontSmall);
 
                     ChangelogEntries.Add(title);
 
                     if (!string.IsNullOrEmpty(entry.MessageHtml))
                     {
-                        TextFlowContainer messageContainer = new TextFlowContainer
+                        TextFlowContainer message = new TextFlowContainer
                         {
                             AutoSizeAxes = Axes.Y,
                             RelativeSizeAxes = Axes.X,
                         };
 
                         // todo: use markdown parsing once API returns markdown
-                        messageContainer.AddText(Regex.Replace(entry.MessageHtml, @"<(.|\n)*?>", string.Empty), t =>
+                        message.AddText(Regex.Replace(entry.MessageHtml, @"<(.|\n)*?>", string.Empty), t =>
                         {
-                            t.Font = OsuFont.GetFont(size: 12);
+                            t.Font = fontSmall;
                             t.Colour = new Color4(235, 184, 254, 255);
                         });
 
-                        ChangelogEntries.Add(messageContainer);
+                        ChangelogEntries.Add(message);
                     }
                 }
             }
