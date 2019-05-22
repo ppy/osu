@@ -57,7 +57,11 @@ namespace osu.Game.Overlays.Mods
 
         protected override bool OnKeyDown(KeyDownEvent e)
         {
-            if (ToggleKeys != null)
+            if(e.Key == Key.Number1)
+            {
+                DeselectAll();
+            }
+            else if (ToggleKeys != null)
             {
                 var index = Array.IndexOf(ToggleKeys, e.Key);
                 if (index > -1 && index < buttons.Length)
