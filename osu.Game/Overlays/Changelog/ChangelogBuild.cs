@@ -11,6 +11,7 @@ using System;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Users;
 using osuTK.Graphics;
 
 namespace osu.Game.Overlays.Changelog
@@ -84,18 +85,21 @@ namespace osu.Game.Overlays.Changelog
                     if (!string.IsNullOrEmpty(entry.Repository))
                     {
                         title.AddText(" (", t => t.Font = OsuFont.GetFont(size: 18));
-                        title.AddLink($"{entry.Repository.Replace("ppy/", "")}#{entry.GithubPullRequestId}",
-                            entry.GithubUrl, Online.Chat.LinkAction.External, null,
-                            null, t => { t.Font = OsuFont.GetFont(size: 18); });
+                        title.AddLink($"{entry.Repository.Replace("ppy/", "")}#{entry.GithubPullRequestId}", entry.GithubUrl, Online.Chat.LinkAction.External,
+                            creationParameters: t => { t.Font = OsuFont.GetFont(size: 18); });
                         title.AddText(")", t => t.Font = OsuFont.GetFont(size: 18));
                     }
 
                     title.AddText(" by ", t => t.Font = OsuFont.GetFont(size: 14));
 
-                    if (entry.GithubUser.GithubUrl != null)
-                        title.AddLink(entry.GithubUser.DisplayName, entry.GithubUser.GithubUrl,
-                            Online.Chat.LinkAction.External, null, null,
-                            t => t.Font = OsuFont.GetFont(size: 14));
+                    if (entry.GithubUser.UserId != null)
+                        title.AddUserLink(new User
+                        {
+                            Username = entry.GithubUser.OsuUsername,
+                            Id = entry.GithubUser.UserId.Value
+                        }, t => t.Font = OsuFont.GetFont(size: 14));
+                    else if (entry.GithubUser.GithubUrl != null)
+                        title.AddLink(entry.GithubUser.DisplayName, entry.GithubUser.GithubUrl, Online.Chat.LinkAction.External, null, null, t => t.Font = OsuFont.GetFont(size: 14));
                     else
                         title.AddText(entry.GithubUser.DisplayName, t => t.Font = OsuFont.GetFont(size: 12));
 
