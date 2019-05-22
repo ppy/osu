@@ -80,7 +80,7 @@ namespace osu.Game.Overlays.Profile.Header.Components
         private void load(OsuColour colours)
         {
             background.Colour = colours.Pink;
-            iconContainer.Colour = colours.CommunityUserGrayGreenDark;
+            iconContainer.Colour = colours.GreySeafoam;
         }
     }
 }
