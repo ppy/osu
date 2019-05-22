@@ -4,17 +4,17 @@
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
-using osu.Game.Overlays.Changelog.Components;
+using osu.Game.Graphics.UserInterface;
 using osuTK.Graphics;
 
 namespace osu.Game.Tests.Visual.UserInterface
 {
-    public class TestSceneLineBadge : OsuTestScene
+    public class TestSceneExpandingBar : OsuTestScene
     {
-        public TestSceneLineBadge()
+        public TestSceneExpandingBar()
         {
             Container container;
-            LineBadge lineBadge;
+            ExpandingBar expandingBar;
 
             Add(container = new Container
             {
@@ -28,24 +28,23 @@ namespace osu.Game.Tests.Visual.UserInterface
                         Alpha = 0.5f,
                         RelativeSizeAxes = Axes.Both,
                     },
-                    lineBadge = new LineBadge
+                    expandingBar = new ExpandingBar
                     {
                         Anchor = Anchor.Centre,
-                        UncollapsedSize = 10,
+                        ExpandedSize = 10,
                         CollapsedSize = 2,
                         Colour = Color4.DeepSkyBlue,
                     }
                 }
             });
 
-            AddStep(@"", () => { });
-            AddStep(@"Collapse", () => lineBadge.Collapse());
-            AddStep(@"Uncollapse", () => lineBadge.Uncollapse());
+            AddStep(@"Collapse", () => expandingBar.Collapse());
+            AddStep(@"Uncollapse", () => expandingBar.Expand());
             AddSliderStep(@"Resize container", 1, 300, 150, value => container.ResizeTo(value));
-            AddStep(@"Horizontal", () => lineBadge.IsHorizontal = true);
-            AddStep(@"Anchor top", () => lineBadge.Anchor = Anchor.TopCentre);
-            AddStep(@"Vertical", () => lineBadge.IsHorizontal = false);
-            AddStep(@"Anchor left", () => lineBadge.Anchor = Anchor.CentreLeft);
+            AddStep(@"Horizontal", () => expandingBar.RelativeSizeAxes = Axes.X);
+            AddStep(@"Anchor top", () => expandingBar.Anchor = Anchor.TopCentre);
+            AddStep(@"Vertical", () => expandingBar.RelativeSizeAxes = Axes.Y);
+            AddStep(@"Anchor left", () => expandingBar.Anchor = Anchor.CentreLeft);
         }
     }
 }
