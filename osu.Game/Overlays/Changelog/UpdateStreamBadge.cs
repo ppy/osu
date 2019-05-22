@@ -10,35 +10,30 @@ using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Events;
 using osu.Game.Graphics;
 using osu.Game.Online.API.Requests.Responses;
-using System;
+using osu.Framework.Graphics.UserInterface;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osuTK.Graphics;
 
 namespace osu.Game.Overlays.Changelog
 {
-    public class StreamBadge : ClickableContainer
+    public class UpdateStreamBadge : TabItem<APIUpdateStream>
     {
         private const float badge_height = 66.5f;
         private const float badge_width = 100;
         private const float transition_duration = 100;
 
-        public event Action Selected;
-
-        private bool isActivated;
+        private readonly bool isActivated;
 
         private readonly ExpandingBar expandingBar;
         private SampleChannel sampleClick;
         private SampleChannel sampleHover;
 
-        public readonly APIUpdateStream Stream;
-
         private readonly FillFlowContainer<SpriteText> text;
 
-        public StreamBadge(APIUpdateStream stream)
+        public UpdateStreamBadge(APIUpdateStream stream)
+            : base(stream)
         {
-            Stream = stream;
-
             Height = badge_height;
             Width = stream.IsFeatured ? badge_width * 2 : badge_width;
             Padding = new MarginPadding(5);
@@ -82,32 +77,20 @@ namespace osu.Game.Overlays.Changelog
             };
         }
 
-        /// <param name="withoutFiringUpdates">In case we don't want to
-        /// fire the <see cref="Selected"/> event.</param>
-        public void Activate(bool withoutFiringUpdates = true)
+        protected override void OnActivated()
         {
-            isActivated = true;
             this.FadeIn(transition_duration);
             expandingBar.Expand();
-            if (!withoutFiringUpdates)
-                Selected?.Invoke();
         }
 
-        public void Deactivate()
+        protected override void OnDeactivated()
         {
-            isActivated = false;
-            DisableDim();
-
-            if (!IsHovered)
-            {
-                this.FadeTo(0.5f, transition_duration);
-                expandingBar.Collapse();
-            }
+            this.FadeTo(0.5f, transition_duration);
+            expandingBar.Collapse();
         }
 
         protected override bool OnClick(ClickEvent e)
         {
-            Activate(false);
             sampleClick?.Play();
             return base.OnClick(e);
         }
