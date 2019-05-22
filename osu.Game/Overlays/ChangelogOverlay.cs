@@ -26,7 +26,7 @@ namespace osu.Game.Overlays
     {
         private ChangelogHeader header;
 
-        private BadgeDisplay badges;
+        private StreamBadgeArea streamBadges;
 
         private Container<ChangelogContent> content;
 
@@ -81,7 +81,7 @@ namespace osu.Game.Overlays
                             {
                                 ListingSelected = ShowListing,
                             },
-                            badges = new BadgeDisplay(),
+                            streamBadges = new StreamBadgeArea(),
                             content = new Container<ChangelogContent>
                             {
                                 RelativeSizeAxes = Axes.X,
@@ -92,7 +92,7 @@ namespace osu.Game.Overlays
                 },
             };
 
-            badges.Current.ValueChanged += e =>
+            streamBadges.Current.ValueChanged += e =>
             {
                 if (e.NewValue?.LatestBuild != null && e.NewValue != Current.Value?.UpdateStream)
                     ShowBuild(e.NewValue.LatestBuild);
@@ -106,13 +106,13 @@ namespace osu.Game.Overlays
             {
                 if (e.NewValue != null)
                 {
-                    badges.Current.Value = e.NewValue.UpdateStream;
+                    streamBadges.Current.Value = e.NewValue.UpdateStream;
 
                     loadContent(new ChangelogSingleBuild(e.NewValue));
                 }
                 else
                 {
-                    badges.Current.Value = null;
+                    streamBadges.Current.Value = null;
                     loadContent(new ChangelogListing(builds));
                 }
             });
@@ -161,7 +161,7 @@ namespace osu.Game.Overlays
                 res.Streams.ForEach(s => s.LatestBuild.UpdateStream = res.Streams.Find(s2 => s2.Id == s.LatestBuild.UpdateStream.Id));
 
                 builds = res.Builds;
-                badges.Populate(res.Streams);
+                streamBadges.Populate(res.Streams);
 
                 Current.TriggerChange();
             };

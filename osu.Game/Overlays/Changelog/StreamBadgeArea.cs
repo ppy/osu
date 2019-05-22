@@ -12,7 +12,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Overlays.Changelog
 {
-    public class BadgeDisplay : CompositeDrawable
+    public class StreamBadgeArea : CompositeDrawable
     {
         private const float vertical_padding = 20;
         private const float horizontal_padding = 85;
@@ -21,7 +21,7 @@ namespace osu.Game.Overlays.Changelog
 
         private readonly FillFlowContainer<StreamBadge> badgesContainer;
 
-        public BadgeDisplay()
+        public StreamBadgeArea()
         {
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;

@@ -77,6 +77,7 @@ namespace osu.Game.Overlays.Changelog
                     Colour = stream.Colour,
                     ExpandedSize = 4,
                     CollapsedSize = 2,
+                    IsCollapsed = true
                 },
             };
         }
