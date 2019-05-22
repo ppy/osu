@@ -4,6 +4,7 @@
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
@@ -23,13 +24,15 @@ namespace osu.Game.Overlays.Changelog
         private const float badge_width = 100;
         private const float transition_duration = 100;
 
-        private readonly bool isActivated;
-
         private readonly ExpandingBar expandingBar;
         private SampleChannel sampleClick;
         private SampleChannel sampleHover;
 
         private readonly FillFlowContainer<SpriteText> text;
+
+        public readonly Bindable<APIUpdateStream> SelectedTab = new Bindable<APIUpdateStream>();
+
+        private readonly Container fadeContainer;
 
         public UpdateStreamBadge(APIUpdateStream stream)
             : base(stream)
@@ -37,57 +40,54 @@ namespace osu.Game.Overlays.Changelog
             Height = badge_height;
             Width = stream.IsFeatured ? badge_width * 2 : badge_width;
             Padding = new MarginPadding(5);
-            isActivated = true;
-            Children = new Drawable[]
+            Child = fadeContainer = new Container
             {
-                text = new FillFlowContainer<SpriteText>
+                RelativeSizeAxes = Axes.Both,
+                Children = new Drawable[]
                 {
-                    AutoSizeAxes = Axes.X,
-                    RelativeSizeAxes = Axes.Y,
-                    Direction = FillDirection.Vertical,
-                    Children = new[]
+                    text = new FillFlowContainer<SpriteText>
                     {
-                        new OsuSpriteText
+                        AutoSizeAxes = Axes.X,
+                        RelativeSizeAxes = Axes.Y,
+                        Direction = FillDirection.Vertical,
+                        Children = new[]
                         {
-                            Text = stream.DisplayName,
-                            Font = OsuFont.GetFont(weight: FontWeight.Bold, size: 12),
-                            Margin = new MarginPadding { Top = 6 },
-                        },
-                        new OsuSpriteText
-                        {
-                            Text = stream.LatestBuild.DisplayVersion,
-                            Font = OsuFont.GetFont(weight: FontWeight.Light, size: 16),
-                        },
-                        new OsuSpriteText
-                        {
-                            Text = stream.LatestBuild.Users > 0 ? $"{stream.LatestBuild.Users:N0} users online" : null,
-                            Font = OsuFont.GetFont(weight: FontWeight.Regular, size: 10),
-                            Colour = new Color4(203, 164, 218, 255),
-                        },
-                    }
-                },
-                expandingBar = new ExpandingBar
-                {
-                    Anchor = Anchor.TopCentre,
-                    Colour = stream.Colour,
-                    ExpandedSize = 4,
-                    CollapsedSize = 2,
-                    IsCollapsed = true
-                },
+                            new OsuSpriteText
+                            {
+                                Text = stream.DisplayName,
+                                Font = OsuFont.GetFont(weight: FontWeight.Bold, size: 12),
+                                Margin = new MarginPadding { Top = 6 },
+                            },
+                            new OsuSpriteText
+                            {
+                                Text = stream.LatestBuild.DisplayVersion,
+                                Font = OsuFont.GetFont(weight: FontWeight.Light, size: 16),
+                            },
+                            new OsuSpriteText
+                            {
+                                Text = stream.LatestBuild.Users > 0 ? $"{stream.LatestBuild.Users:N0} users online" : null,
+                                Font = OsuFont.GetFont(weight: FontWeight.Regular, size: 10),
+                                Colour = new Color4(203, 164, 218, 255),
+                            },
+                        }
+                    },
+                    expandingBar = new ExpandingBar
+                    {
+                        Anchor = Anchor.TopCentre,
+                        Colour = stream.Colour,
+                        ExpandedSize = 4,
+                        CollapsedSize = 2,
+                        IsCollapsed = true
+                    },
+                }
             };
+
+            SelectedTab.ValueChanged += _ => updateState();
         }
 
-        protected override void OnActivated()
-        {
-            this.FadeIn(transition_duration);
-            expandingBar.Expand();
-        }
+        protected override void OnActivated() => updateState();
 
-        protected override void OnDeactivated()
-        {
-            this.FadeTo(0.5f, transition_duration);
-            expandingBar.Collapse();
-        }
+        protected override void OnDeactivated() => updateState();
 
         protected override bool OnClick(ClickEvent e)
         {
@@ -98,28 +98,46 @@ namespace osu.Game.Overlays.Changelog
         protected override bool OnHover(HoverEvent e)
         {
             sampleHover?.Play();
-            DisableDim();
-            this.FadeIn(transition_duration);
-            expandingBar.Expand();
+            updateState();
+
             return base.OnHover(e);
         }
 
         protected override void OnHoverLost(HoverLostEvent e)
         {
-            if (!isActivated)
-            {
-                this.FadeTo(0.5f, transition_duration);
-                expandingBar.Collapse();
-            }
-            else
-                EnableDim();
-
+            updateState();
             base.OnHoverLost(e);
         }
 
-        public void EnableDim() => text.FadeTo(0.5f, transition_duration);
+        private void updateState()
+        {
+            if (Active.Value || IsHovered || SelectedTab.Value == null)
+            {
+                expandingBar.Expand();
+                fadeContainer.FadeTo(1, transition_duration);
+            }
+            else
+            {
+                expandingBar.Collapse();
+                fadeContainer.FadeTo(0.5f, transition_duration);
+            }
 
-        public void DisableDim() => text.FadeIn(transition_duration);
+            text.FadeTo(externalDimRequested && !IsHovered ? 0.5f : 1, transition_duration);
+        }
+
+        private bool externalDimRequested;
+
+        public void EnableDim()
+        {
+            externalDimRequested = true;
+            updateState();
+        }
+
+        public void DisableDim()
+        {
+            externalDimRequested = false;
+            updateState();
+        }
 
         [BackgroundDependencyLoader]
         private void load(AudioManager audio)

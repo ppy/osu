@@ -14,9 +14,6 @@ namespace osu.Game.Overlays.Changelog
 {
     public class UpdateStreamBadgeArea : TabControl<APIUpdateStream>
     {
-        private const float vertical_padding = 20;
-        private const float horizontal_padding = 85;
-
         public UpdateStreamBadgeArea()
         {
             RelativeSizeAxes = Axes.X;
@@ -65,8 +62,8 @@ namespace osu.Game.Overlays.Changelog
             flow.AllowMultiline = true;
             flow.Padding = new MarginPadding
             {
-                Vertical = vertical_padding,
-                Horizontal = horizontal_padding,
+                Vertical = 20,
+                Horizontal = 85,
             };
 
             return flow;
@@ -75,6 +72,6 @@ namespace osu.Game.Overlays.Changelog
         protected override Dropdown<APIUpdateStream> CreateDropdown() => null;
 
         protected override TabItem<APIUpdateStream> CreateTabItem(APIUpdateStream value) =>
-            new UpdateStreamBadge(value);
+            new UpdateStreamBadge(value) { SelectedTab = { BindTarget = Current } };
     }
 }
