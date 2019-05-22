@@ -73,9 +73,7 @@ namespace osu.Game.Overlays.Changelog
 
                     existing.Add(new OsuSpriteText
                     {
-                        // do we need .ToUniversalTime() here?
-                        // also, this should be a temporary solution to weekdays in >localized< date strings
-                        Text = Build.CreatedAt.Date.ToLongDateString().Replace(Build.CreatedAt.ToString("dddd") + ", ", ""),
+                        Text = Build.CreatedAt.Date.ToString("dd MMM yyyy"),
                         Font = OsuFont.GetFont(weight: FontWeight.Regular, size: 14),
                         Colour = OsuColour.FromHex(@"FD5"),
                         Anchor = Anchor.BottomCentre,
