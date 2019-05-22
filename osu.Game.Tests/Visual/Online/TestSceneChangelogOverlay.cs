@@ -43,7 +43,7 @@ namespace osu.Game.Tests.Visual.Online
                     Version = "2018.712.0",
                     DisplayVersion = "2018.712.0",
                     UpdateStream = new APIUpdateStream { Name = "lazer" },
-                    ChangelogEntries = new List<APIChangelogEntry>()
+                    ChangelogEntries = new List<APIChangelogEntry>
                     {
                         new APIChangelogEntry
                         {
