@@ -12,7 +12,7 @@ using osu.Game.Graphics;
 using osu.Game.Online.API.Requests.Responses;
 using System;
 using osu.Game.Graphics.Sprites;
-using osu.Game.Overlays.Changelog.Components;
+using osu.Game.Graphics.UserInterface;
 using osuTK.Graphics;
 
 namespace osu.Game.Overlays.Changelog
@@ -27,7 +27,7 @@ namespace osu.Game.Overlays.Changelog
 
         private bool isActivated;
 
-        private readonly LineBadge lineBadge;
+        private readonly ExpandingBar expandingBar;
         private SampleChannel sampleClick;
         private SampleChannel sampleHover;
 
@@ -71,11 +71,11 @@ namespace osu.Game.Overlays.Changelog
                         },
                     }
                 },
-                lineBadge = new LineBadge(false)
+                expandingBar = new ExpandingBar
                 {
                     Anchor = Anchor.TopCentre,
                     Colour = stream.Colour,
-                    UncollapsedSize = 4,
+                    ExpandedSize = 4,
                     CollapsedSize = 2,
                 },
             };
@@ -87,7 +87,7 @@ namespace osu.Game.Overlays.Changelog
         {
             isActivated = true;
             this.FadeIn(transition_duration);
-            lineBadge.Uncollapse();
+            expandingBar.Expand();
             if (!withoutFiringUpdates)
                 Selected?.Invoke();
         }
@@ -100,7 +100,7 @@ namespace osu.Game.Overlays.Changelog
             if (!IsHovered)
             {
                 this.FadeTo(0.5f, transition_duration);
-                lineBadge.Collapse(200);
+                expandingBar.Collapse();
             }
         }
 
@@ -116,7 +116,7 @@ namespace osu.Game.Overlays.Changelog
             sampleHover?.Play();
             DisableDim();
             this.FadeIn(transition_duration);
-            lineBadge.Uncollapse();
+            expandingBar.Expand();
             return base.OnHover(e);
         }
 
@@ -125,7 +125,7 @@ namespace osu.Game.Overlays.Changelog
             if (!isActivated)
             {
                 this.FadeTo(0.5f, transition_duration);
-                lineBadge.Collapse(200);
+                expandingBar.Collapse();
             }
             else
                 EnableDim();
