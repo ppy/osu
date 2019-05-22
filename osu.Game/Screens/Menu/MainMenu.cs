@@ -155,9 +155,11 @@ namespace osu.Game.Screens.Menu
 
         protected override void LogoSuspending(OsuLogo logo)
         {
-            logo.FadeOut(300, Easing.InSine)
-                .ScaleTo(0.2f, 300, Easing.InSine)
-                .OnComplete(l => buttons.SetOsuLogo(null));
+            var seq = logo.FadeOut(300, Easing.InSine)
+                          .ScaleTo(0.2f, 300, Easing.InSine);
+
+            seq.OnComplete(_ => buttons.SetOsuLogo(null));
+            seq.OnAbort(_ => buttons.SetOsuLogo(null));
         }
 
         private void beatmap_ValueChanged(ValueChangedEvent<WorkingBeatmap> e)
