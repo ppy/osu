@@ -34,6 +34,8 @@ namespace osu.Game.Overlays
 
         private List<APIChangelogBuild> builds;
 
+        private List<APIUpdateStream> streams;
+
         [BackgroundDependencyLoader]
         private void load(AudioManager audio, OsuColour colour)
         {
@@ -87,7 +89,11 @@ namespace osu.Game.Overlays
             });
         }
 
-        public void ShowListing() => Current.Value = null;
+        public void ShowListing()
+        {
+            Current.Value = null;
+            State = Visibility.Visible;
+        }
 
         /// <summary>
         /// Fetches and shows a specific build from a specific update stream.
@@ -100,6 +106,27 @@ namespace osu.Game.Overlays
             if (build == null) throw new ArgumentNullException(nameof(build));
 
             Current.Value = build;
+            State = Visibility.Visible;
+        }
+
+        public void ShowBuild([NotNull] string updateStream, [NotNull] string version)
+        {
+            if (updateStream == null) throw new ArgumentNullException(nameof(updateStream));
+            if (version == null) throw new ArgumentNullException(nameof(version));
+
+            performAfterFetch(() =>
+            {
+                var build = builds.Find(b => b.Version == version && b.UpdateStream.Name == updateStream)
+                            ?? streams.Find(s => s.Name == updateStream)?.LatestBuild;
+
+                if (build != null)
+                {
+                    Current.Value = build;
+                    State = Visibility.Visible;
+                }
+            });
+
+            State = Visibility.Visible;
         }
 
         public override bool OnPressed(GlobalAction action)
@@ -127,15 +154,23 @@ namespace osu.Game.Overlays
         {
             base.PopIn();
 
-            if (!initialFetchPerformed)
-                fetchListing();
+            if (initialFetchTask == null)
+                // fetch and refresh to show listing, if no other request was made via Show methods
+                performAfterFetch(() => Current.TriggerChange());
         }
 
-        private bool initialFetchPerformed;
+        private Task initialFetchTask;
 
-        private void fetchListing()
+        private void performAfterFetch(Action action) => fetchListing()?.ContinueWith(_ => Schedule(action));
+
+        private Task fetchListing()
         {
-            initialFetchPerformed = true;
+            if (initialFetchTask != null)
+                return initialFetchTask;
+
+            var tcs = new TaskCompletionSource<bool>();
+
+            initialFetchTask = tcs.Task;
 
             Task.Run(() =>
             {
@@ -147,14 +182,17 @@ namespace osu.Game.Overlays
                     res.Streams.ForEach(s => s.LatestBuild.UpdateStream = res.Streams.Find(s2 => s2.Id == s.LatestBuild.UpdateStream.Id));
 
                     builds = res.Builds;
+                    streams = res.Streams;
+
                     header.Streams.Populate(res.Streams);
 
-                    Current.TriggerChange();
+                    tcs.SetResult(true);
                 };
-                req.Failure += _ => initialFetchPerformed = false;
-
+                req.Failure += _ => initialFetchTask = null;
                 req.Perform(API);
             });
+
+            return initialFetchTask;
         }
 
         private CancellationTokenSource loadContentTask;
