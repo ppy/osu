@@ -38,6 +38,11 @@ namespace osu.Game.Rulesets.Judgements
         public int HighestComboAtJudgement { get; internal set; }
 
         /// <summary>
+        /// The health prior to this <see cref="JudgementResult"/> occurring.
+        /// </summary>
+        public double HealthAtJudgement { get; internal set; }
+
+        /// <summary>
         /// Whether a miss or hit occurred.
         /// </summary>
         public bool HasResult => Type > HitResult.None;
@@ -55,5 +60,7 @@ namespace osu.Game.Rulesets.Judgements
         {
             Judgement = judgement;
         }
+
+        public override string ToString() => $"{Type} (Score:{Judgement.NumericResultFor(this)} HP:{Judgement.HealthIncreaseFor(this)} {Judgement})";
     }
 }

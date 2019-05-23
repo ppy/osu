@@ -2,10 +2,11 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
-using osu.Framework.Configuration;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Graphics.Sprites;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Backgrounds;
 using osuTK;
@@ -47,23 +48,23 @@ namespace osu.Game.Overlays.BeatmapSet.Buttons
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
-                    Icon = FontAwesome.fa_heart_o,
+                    Icon = FontAwesome.Regular.Heart,
                     Size = new Vector2(18),
                     Shadow = false,
                 },
             });
 
-            Favourited.ValueChanged += value =>
+            Favourited.ValueChanged += favourited =>
             {
-                if (value)
+                if (favourited.NewValue)
                 {
                     pink.FadeIn(200);
-                    icon.Icon = FontAwesome.fa_heart;
+                    icon.Icon = FontAwesome.Solid.Heart;
                 }
                 else
                 {
                     pink.FadeOut(200);
-                    icon.Icon = FontAwesome.fa_heart_o;
+                    icon.Icon = FontAwesome.Regular.Heart;
                 }
             };
 

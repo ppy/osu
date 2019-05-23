@@ -6,6 +6,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
@@ -90,7 +91,7 @@ namespace osu.Game.Overlays.Chat.Tabs
                             Origin = Anchor.CentreLeft,
                             Anchor = Anchor.CentreLeft,
                             Text = value.ToString(),
-                            TextSize = 18,
+                            Font = OsuFont.GetFont(size: 18)
                         },
                         TextBold = new OsuSpriteText
                         {
@@ -99,8 +100,7 @@ namespace osu.Game.Overlays.Chat.Tabs
                             Origin = Anchor.CentreLeft,
                             Anchor = Anchor.CentreLeft,
                             Text = value.ToString(),
-                            Font = @"Exo2.0-Bold",
-                            TextSize = 18,
+                            Font = OsuFont.GetFont(size: 18, weight: FontWeight.Bold)
                         },
                         CloseButton = new TabCloseButton
                         {
@@ -118,7 +118,7 @@ namespace osu.Game.Overlays.Chat.Tabs
             };
         }
 
-        protected virtual FontAwesome DisplayIcon => FontAwesome.fa_hashtag;
+        protected virtual IconUsage DisplayIcon => FontAwesome.Solid.Hashtag;
 
         protected virtual bool ShowCloseOnHover => true;
 
@@ -127,7 +127,7 @@ namespace osu.Game.Overlays.Chat.Tabs
             if (IsRemovable && ShowCloseOnHover)
                 CloseButton.FadeIn(200, Easing.OutQuint);
 
-            if (!Active)
+            if (!Active.Value)
                 box.FadeColour(backgroundHover, TRANSITION_LENGTH, Easing.OutQuint);
             return true;
         }
@@ -158,7 +158,7 @@ namespace osu.Game.Overlays.Chat.Tabs
 
         private void updateState()
         {
-            if (Active)
+            if (Active.Value)
                 FadeActive();
             else
                 FadeInactive();

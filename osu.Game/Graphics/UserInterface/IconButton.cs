@@ -4,6 +4,7 @@
 using osuTK;
 using osuTK.Graphics;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Events;
 
 namespace osu.Game.Graphics.UserInterface
@@ -19,7 +20,7 @@ namespace osu.Game.Graphics.UserInterface
         /// </summary>
         public Color4 IconColour
         {
-            get { return iconColour ?? Color4.White; }
+            get => iconColour ?? Color4.White;
             set
             {
                 iconColour = value;
@@ -34,17 +35,17 @@ namespace osu.Game.Graphics.UserInterface
         /// </summary>
         public Color4 IconHoverColour
         {
-            get { return iconHoverColour ?? IconColour; }
-            set { iconHoverColour = value; }
+            get => iconHoverColour ?? IconColour;
+            set => iconHoverColour = value;
         }
 
         /// <summary>
         /// The icon.
         /// </summary>
-        public FontAwesome Icon
+        public IconUsage Icon
         {
-            get { return icon.Icon; }
-            set { icon.Icon = value; }
+            get => icon.Icon;
+            set => icon.Icon = value;
         }
 
         /// <summary>
@@ -52,8 +53,8 @@ namespace osu.Game.Graphics.UserInterface
         /// </summary>
         public Vector2 IconScale
         {
-            get { return icon.Scale; }
-            set { icon.Scale = value; }
+            get => icon.Scale;
+            set => icon.Scale = value;
         }
 
         /// <summary>

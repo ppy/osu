@@ -5,7 +5,6 @@ using osuTK;
 using osu.Game.Rulesets.Objects.Types;
 using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.IO;
 using osu.Game.Beatmaps.Formats;
 using osu.Game.Audio;
@@ -46,9 +45,11 @@ namespace osu.Game.Rulesets.Objects.Legacy
             {
                 string[] split = text.Split(',');
 
-                Vector2 pos = new Vector2((int)Convert.ToSingle(split[0], CultureInfo.InvariantCulture), (int)Convert.ToSingle(split[1], CultureInfo.InvariantCulture));
+                Vector2 pos = new Vector2((int)Parsing.ParseFloat(split[0], Parsing.MAX_COORDINATE_VALUE), (int)Parsing.ParseFloat(split[1], Parsing.MAX_COORDINATE_VALUE));
 
-                ConvertHitObjectType type = (ConvertHitObjectType)int.Parse(split[3]);
+                double startTime = Parsing.ParseDouble(split[2]) + Offset;
+
+                ConvertHitObjectType type = (ConvertHitObjectType)Parsing.ParseInt(split[3]);
 
                 int comboOffset = (int)(type & ConvertHitObjectType.ComboOffset) >> 4;
                 type &= ~ConvertHitObjectType.ComboOffset;
@@ -56,7 +57,7 @@ namespace osu.Game.Rulesets.Objects.Legacy
                 bool combo = type.HasFlag(ConvertHitObjectType.NewCombo);
                 type &= ~ConvertHitObjectType.NewCombo;
 
-                var soundType = (LegacySoundType)int.Parse(split[4]);
+                var soundType = (LegacySoundType)Parsing.ParseInt(split[4]);
                 var bankInfo = new SampleBankInfo();
 
                 HitObject result = null;
@@ -83,6 +84,7 @@ namespace osu.Game.Rulesets.Objects.Legacy
                     var points = new Vector2[pointCount];
 
                     int pointIndex = 1;
+
                     foreach (string t in pointSplit)
                     {
                         if (t.Length == 1)
@@ -92,12 +94,15 @@ namespace osu.Game.Rulesets.Objects.Legacy
                                 case @"C":
                                     pathType = PathType.Catmull;
                                     break;
+
                                 case @"B":
                                     pathType = PathType.Bezier;
                                     break;
+
                                 case @"L":
                                     pathType = PathType.Linear;
                                     break;
+
                                 case @"P":
                                     pathType = PathType.PerfectCurve;
                                     break;
@@ -107,7 +112,7 @@ namespace osu.Game.Rulesets.Objects.Legacy
                         }
 
                         string[] temp = t.Split(':');
-                        points[pointIndex++] = new Vector2((int)Convert.ToDouble(temp[0], CultureInfo.InvariantCulture), (int)Convert.ToDouble(temp[1], CultureInfo.InvariantCulture)) - pos;
+                        points[pointIndex++] = new Vector2((int)Parsing.ParseDouble(temp[0], Parsing.MAX_COORDINATE_VALUE), (int)Parsing.ParseDouble(temp[1], Parsing.MAX_COORDINATE_VALUE)) - pos;
                     }
 
                     // osu-stable special-cased colinear perfect curves to a CurveType.Linear
@@ -116,7 +121,7 @@ namespace osu.Game.Rulesets.Objects.Legacy
                     if (points.Length == 3 && pathType == PathType.PerfectCurve && isLinear(points))
                         pathType = PathType.Linear;
 
-                    int repeatCount = Convert.ToInt32(split[6], CultureInfo.InvariantCulture);
+                    int repeatCount = Parsing.ParseInt(split[6]);
 
                     if (repeatCount > 9000)
                         throw new ArgumentOutOfRangeException(nameof(repeatCount), @"Repeat count is way too high");
@@ -125,7 +130,7 @@ namespace osu.Game.Rulesets.Objects.Legacy
                     repeatCount = Math.Max(0, repeatCount - 1);
 
                     if (split.Length > 7)
-                        length = Convert.ToDouble(split[7], CultureInfo.InvariantCulture);
+                        length = Math.Max(0, Parsing.ParseDouble(split[7]));
 
                     if (split.Length > 10)
                         readCustomSampleBanks(split[10], bankInfo);
@@ -142,6 +147,7 @@ namespace osu.Game.Rulesets.Objects.Legacy
                     if (split.Length > 9 && split[9].Length > 0)
                     {
                         string[] sets = split[9].Split('|');
+
                         for (int i = 0; i < nodes; i++)
                         {
                             if (i >= sets.Length)
@@ -161,6 +167,7 @@ namespace osu.Game.Rulesets.Objects.Legacy
                     if (split.Length > 8 && split[8].Length > 0)
                     {
                         string[] adds = split[8].Split('|');
+
                         for (int i = 0; i < nodes; i++)
                         {
                             if (i >= adds.Length)
@@ -184,7 +191,9 @@ namespace osu.Game.Rulesets.Objects.Legacy
                 }
                 else if (type.HasFlag(ConvertHitObjectType.Spinner))
                 {
-                    result = CreateSpinner(new Vector2(512, 384) / 2, combo, comboOffset, Convert.ToDouble(split[5], CultureInfo.InvariantCulture) + Offset);
+                    double endTime = Math.Max(startTime, Parsing.ParseDouble(split[5]) + Offset);
+
+                    result = CreateSpinner(new Vector2(512, 384) / 2, combo, comboOffset, endTime);
 
                     if (split.Length > 6)
                         readCustomSampleBanks(split[6], bankInfo);
@@ -193,12 +202,12 @@ namespace osu.Game.Rulesets.Objects.Legacy
                 {
                     // Note: Hold is generated by BMS converts
 
-                    double endTime = Convert.ToDouble(split[2], CultureInfo.InvariantCulture);
+                    double endTime = Math.Max(startTime, Parsing.ParseDouble(split[2]));
 
                     if (split.Length > 5 && !string.IsNullOrEmpty(split[5]))
                     {
                         string[] ss = split[5].Split(':');
-                        endTime = Convert.ToDouble(ss[0], CultureInfo.InvariantCulture);
+                        endTime = Math.Max(startTime, Parsing.ParseDouble(ss[0]));
                         readCustomSampleBanks(string.Join(":", ss.Skip(1)), bankInfo);
                     }
 
@@ -211,7 +220,7 @@ namespace osu.Game.Rulesets.Objects.Legacy
                     return null;
                 }
 
-                result.StartTime = Convert.ToDouble(split[2], CultureInfo.InvariantCulture) + Offset;
+                result.StartTime = startTime;
 
                 if (result.Samples.Count == 0)
                     result.Samples = convertSoundType(soundType, bankInfo);
@@ -222,8 +231,14 @@ namespace osu.Game.Rulesets.Objects.Legacy
             }
             catch (FormatException)
             {
-                throw new FormatException("One or more hit objects were malformed.");
+                Logger.Log("A hitobject could not be parsed correctly and will be ignored", LoggingTarget.Runtime, LogLevel.Important);
             }
+            catch (OverflowException)
+            {
+                Logger.Log("A hitobject could not be parsed correctly and will be ignored", LoggingTarget.Runtime, LogLevel.Important);
+            }
+
+            return null;
         }
 
         private void readCustomSampleBanks(string str, SampleBankInfo bankInfo)
@@ -233,8 +248,8 @@ namespace osu.Game.Rulesets.Objects.Legacy
 
             string[] split = str.Split(':');
 
-            var bank = (LegacyBeatmapDecoder.LegacySampleBank)int.Parse(split[0]);
-            var addbank = (LegacyBeatmapDecoder.LegacySampleBank)int.Parse(split[1]);
+            var bank = (LegacyBeatmapDecoder.LegacySampleBank)Parsing.ParseInt(split[0]);
+            var addbank = (LegacyBeatmapDecoder.LegacySampleBank)Parsing.ParseInt(split[1]);
 
             string stringBank = bank.ToString().ToLowerInvariant();
             if (stringBank == @"none")
@@ -247,10 +262,10 @@ namespace osu.Game.Rulesets.Objects.Legacy
             bankInfo.Add = string.IsNullOrEmpty(stringAddBank) ? stringBank : stringAddBank;
 
             if (split.Length > 2)
-                bankInfo.CustomSampleBank = int.Parse(split[2]);
+                bankInfo.CustomSampleBank = Parsing.ParseInt(split[2]);
 
             if (split.Length > 3)
-                bankInfo.Volume = int.Parse(split[3]);
+                bankInfo.Volume = Math.Max(0, Parsing.ParseInt(split[3]));
 
             bankInfo.Filename = split.Length > 4 ? split[4] : null;
         }
@@ -301,7 +316,16 @@ namespace osu.Game.Rulesets.Objects.Legacy
         {
             // Todo: This should return the normal SampleInfos if the specified sample file isn't found, but that's a pretty edge-case scenario
             if (!string.IsNullOrEmpty(bankInfo.Filename))
-                return new List<SampleInfo> { new FileSampleInfo { Filename = bankInfo.Filename } };
+            {
+                return new List<SampleInfo>
+                {
+                    new FileSampleInfo
+                    {
+                        Filename = bankInfo.Filename,
+                        Volume = bankInfo.Volume
+                    }
+                };
+            }
 
             var soundTypes = new List<SampleInfo>
             {

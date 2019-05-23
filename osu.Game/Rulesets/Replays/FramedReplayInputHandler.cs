@@ -3,11 +3,11 @@
 
 using System;
 using System.Collections.Generic;
+using JetBrains.Annotations;
 using osu.Framework.Input.StateChanges;
 using osu.Game.Input.Handlers;
 using osu.Game.Replays;
 using osuTK;
-using osuTK.Input;
 
 namespace osu.Game.Rulesets.Replays
 {
@@ -22,12 +22,37 @@ namespace osu.Game.Rulesets.Replays
 
         protected List<ReplayFrame> Frames => replay.Frames;
 
-        public TFrame CurrentFrame => !HasFrames ? null : (TFrame)Frames[currentFrameIndex];
-        public TFrame NextFrame => !HasFrames ? null : (TFrame)Frames[nextFrameIndex];
+        public TFrame CurrentFrame
+        {
+            get
+            {
+                if (!HasFrames || !currentFrameIndex.HasValue)
+                    return null;
 
-        private int currentFrameIndex;
+                return (TFrame)Frames[currentFrameIndex.Value];
+            }
+        }
 
-        private int nextFrameIndex => MathHelper.Clamp(currentFrameIndex + (currentDirection > 0 ? 1 : -1), 0, Frames.Count - 1);
+        public TFrame NextFrame
+        {
+            get
+            {
+                if (!HasFrames)
+                    return null;
+
+                if (!currentFrameIndex.HasValue)
+                    return (TFrame)Frames[0];
+
+                if (currentDirection > 0)
+                    return currentFrameIndex == Frames.Count - 1 ? null : (TFrame)Frames[currentFrameIndex.Value + 1];
+                else
+                    return currentFrameIndex == 0 ? null : (TFrame)Frames[nextFrameIndex];
+            }
+        }
+
+        private int? currentFrameIndex;
+
+        private int nextFrameIndex => currentFrameIndex.HasValue ? MathHelper.Clamp(currentFrameIndex.Value + (currentDirection > 0 ? 1 : -1), 0, Frames.Count - 1) : 0;
 
         protected FramedReplayInputHandler(Replay replay)
         {
@@ -47,12 +72,12 @@ namespace osu.Game.Rulesets.Replays
 
         public override List<IInput> GetPendingInputs() => new List<IInput>();
 
-        public bool AtLastFrame => currentFrameIndex == Frames.Count - 1;
-        public bool AtFirstFrame => currentFrameIndex == 0;
-
         private const double sixty_frame_time = 1000.0 / 60;
 
-        protected double CurrentTime { get; private set; }
+        protected virtual double AllowedImportantTimeSpan => sixty_frame_time * 1.2;
+
+        protected double? CurrentTime { get; private set; }
+
         private int currentDirection;
 
         /// <summary>
@@ -63,14 +88,24 @@ namespace osu.Game.Rulesets.Replays
 
         protected bool HasFrames => Frames.Count > 0;
 
-        private bool inImportantSection =>
-            HasFrames && FrameAccuratePlayback &&
-            //a button is in a pressed state
-            IsImportant(currentDirection > 0 ? CurrentFrame : NextFrame) &&
-            //the next frame is within an allowable time span
-            Math.Abs(CurrentTime - NextFrame?.Time ?? 0) <= sixty_frame_time * 1.2;
+        private bool inImportantSection
+        {
+            get
+            {
+                if (!HasFrames || !FrameAccuratePlayback)
+                    return false;
 
-        protected virtual bool IsImportant(TFrame frame) => false;
+                var frame = currentDirection > 0 ? CurrentFrame : NextFrame;
+
+                if (frame == null)
+                    return false;
+
+                return IsImportant(frame) && //a button is in a pressed state
+                       Math.Abs(CurrentTime - NextFrame?.Time ?? 0) <= AllowedImportantTimeSpan; //the next frame is within an allowable time span
+            }
+        }
+
+        protected virtual bool IsImportant([NotNull] TFrame frame) => false;
 
         /// <summary>
         /// Update the current frame based on an incoming time value.
@@ -81,46 +116,36 @@ namespace osu.Game.Rulesets.Replays
         /// <returns>The usable time value. If null, we should not advance time as we do not have enough data.</returns>
         public override double? SetFrameFromTime(double time)
         {
-            currentDirection = time.CompareTo(CurrentTime);
-            if (currentDirection == 0) currentDirection = 1;
+            if (!CurrentTime.HasValue)
+            {
+                currentDirection = 1;
+            }
+            else
+            {
+                currentDirection = time.CompareTo(CurrentTime);
+                if (currentDirection == 0) currentDirection = 1;
+            }
 
             if (HasFrames)
             {
-                // check if the next frame is in the "future" for the current playback direction
-                if (currentDirection != time.CompareTo(NextFrame.Time))
+                // check if the next frame is valid for the current playback direction.
+                // validity is if the next frame is equal or "earlier"
+                var compare = time.CompareTo(NextFrame?.Time);
+
+                if (compare == 0 || compare == currentDirection)
+                {
+                    if (advanceFrame())
+                        return CurrentTime = CurrentFrame.Time;
+                }
+                else
                 {
                     // if we didn't change frames, we need to ensure we are allowed to run frames in between, else return null.
                     if (inImportantSection)
                         return null;
                 }
-                else if (advanceFrame())
-                {
-                    // If going backwards, we need to execute once _before_ the frame time to reverse any judgements
-                    // that would occur as a result of this frame in forward playback
-                    if (currentDirection == -1)
-                        return CurrentTime = CurrentFrame.Time - 1;
-                    return CurrentTime = CurrentFrame.Time;
-                }
             }
 
             return CurrentTime = time;
-        }
-
-        protected class ReplayMouseState : osu.Framework.Input.States.MouseState
-        {
-            public ReplayMouseState(Vector2 position)
-            {
-                Position = position;
-            }
-        }
-
-        protected class ReplayKeyboardState : osu.Framework.Input.States.KeyboardState
-        {
-            public ReplayKeyboardState(List<Key> keys)
-            {
-                foreach (var key in keys)
-                    Keys.Add(key);
-            }
         }
     }
 }

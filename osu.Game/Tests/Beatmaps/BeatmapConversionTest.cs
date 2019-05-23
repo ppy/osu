@@ -35,10 +35,12 @@ namespace osu.Game.Tests.Beatmaps
             Assert.Multiple(() =>
             {
                 int mappingCounter = 0;
+
                 while (true)
                 {
                     if (mappingCounter >= ourResult.Mappings.Count && mappingCounter >= expectedResult.Mappings.Count)
                         break;
+
                     if (mappingCounter >= ourResult.Mappings.Count)
                         Assert.Fail($"A conversion did not generate any hitobjects, but should have, for hitobject at time: {expectedResult.Mappings[mappingCounter].StartTime}\n");
                     else if (mappingCounter >= expectedResult.Mappings.Count)
@@ -60,10 +62,12 @@ namespace osu.Game.Tests.Beatmaps
                         Assert.Multiple(() =>
                         {
                             int objectCounter = 0;
+
                             while (true)
                             {
                                 if (objectCounter >= ourMapping.Objects.Count && objectCounter >= expectedMapping.Objects.Count)
                                     break;
+
                                 if (objectCounter >= ourMapping.Objects.Count)
                                     Assert.Fail($"The conversion did not generate a hitobject, but should have, for hitobject at time: {expectedMapping.StartTime}:\n"
                                                 + $"Expected: {JsonConvert.SerializeObject(expectedMapping.Objects[objectCounter])}\n");
@@ -189,7 +193,10 @@ namespace osu.Game.Tests.Beatmaps
         public List<TConvertValue> Objects = new List<TConvertValue>();
 
         [JsonProperty("Objects")]
-        private List<TConvertValue> setObjects { set => Objects = value; }
+        private List<TConvertValue> setObjects
+        {
+            set => Objects = value;
+        }
 
         public virtual bool Equals(ConvertMapping<TConvertValue> other) => StartTime.Equals(other?.StartTime);
     }

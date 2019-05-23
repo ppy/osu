@@ -6,7 +6,7 @@ using System.Linq;
 using osuTK;
 using osuTK.Graphics;
 using osu.Framework.Allocation;
-using osu.Framework.Configuration;
+using osu.Framework.Bindables;
 using osu.Framework.Extensions;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
@@ -58,14 +58,14 @@ namespace osu.Game.Graphics.UserInterface
         }
 
         private Color4 accentColour;
+
         public Color4 AccentColour
         {
-            get { return accentColour; }
+            get => accentColour;
             set
             {
                 accentColour = value;
-                var dropdown = Dropdown as IHasAccentColour;
-                if (dropdown != null)
+                if (Dropdown is IHasAccentColour dropdown)
                     dropdown.AccentColour = value;
                 foreach (var i in TabContainer.Children.OfType<IHasAccentColour>())
                     i.AccentColour = value;
@@ -101,13 +101,14 @@ namespace osu.Game.Graphics.UserInterface
             protected readonly Box Bar;
 
             private Color4 accentColour;
+
             public Color4 AccentColour
             {
-                get { return accentColour; }
+                get => accentColour;
                 set
                 {
                     accentColour = value;
-                    if (!Active)
+                    if (!Active.Value)
                         Text.Colour = value;
                 }
             }
@@ -128,14 +129,14 @@ namespace osu.Game.Graphics.UserInterface
 
             protected override bool OnHover(HoverEvent e)
             {
-                if (!Active)
+                if (!Active.Value)
                     fadeActive();
                 return true;
             }
 
             protected override void OnHoverLost(HoverLostEvent e)
             {
-                if (!Active)
+                if (!Active.Value)
                     fadeInactive();
             }
 
@@ -146,7 +147,8 @@ namespace osu.Game.Graphics.UserInterface
                     AccentColour = colours.Blue;
             }
 
-            public OsuTabItem(T value) : base(value)
+            public OsuTabItem(T value)
+                : base(value)
             {
                 AutoSizeAxes = Axes.X;
                 RelativeSizeAxes = Axes.Y;
@@ -159,7 +161,7 @@ namespace osu.Game.Graphics.UserInterface
                         Origin = Anchor.BottomLeft,
                         Anchor = Anchor.BottomLeft,
                         Text = (value as IHasDescription)?.Description ?? (value as Enum)?.GetDescription() ?? value.ToString(),
-                        TextSize = 14,
+                        Font = OsuFont.GetFont(size: 14)
                     },
                     Bar = new Box
                     {
@@ -173,7 +175,7 @@ namespace osu.Game.Graphics.UserInterface
                     new HoverClickSounds()
                 };
 
-                Active.BindValueChanged(val => Text.Font = val ? @"Exo2.0-Bold" : @"Exo2.0", true);
+                Active.BindValueChanged(active => Text.Font = Text.Font.With(Typeface.Exo, weight: active.NewValue ? FontWeight.Bold : FontWeight.Medium), true);
             }
 
             protected override void OnActivated() => fadeActive();
@@ -224,11 +226,7 @@ namespace osu.Game.Graphics.UserInterface
             {
                 public override Color4 AccentColour
                 {
-                    get
-                    {
-                        return base.AccentColour;
-                    }
-
+                    get => base.AccentColour;
                     set
                     {
                         base.AccentColour = value;
@@ -256,7 +254,7 @@ namespace osu.Game.Graphics.UserInterface
                     {
                         new SpriteIcon
                         {
-                            Icon = FontAwesome.fa_ellipsis_h,
+                            Icon = FontAwesome.Solid.EllipsisH,
                             Size = new Vector2(14),
                             Origin = Anchor.Centre,
                             Anchor = Anchor.Centre,

@@ -8,7 +8,9 @@ using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
+using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Events;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
@@ -63,6 +65,8 @@ namespace osu.Game.Online.Leaderboards
 
             statisticsLabels = GetStatistics(score).Select(s => new ScoreComponentLabel(s)).ToList();
 
+            Avatar innerAvatar;
+
             Children = new Drawable[]
             {
                 new Container
@@ -75,9 +79,7 @@ namespace osu.Game.Online.Leaderboards
                         {
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
-                            Font = @"Exo2.0-MediumItalic",
-                            TextSize = 22,
-                            // ReSharper disable once ImpureMethodCallOnReadonlyValueField
+                            Font = OsuFont.GetFont(size: 22, italics: true),
                             Text = RankPosition.ToString(),
                         },
                     },
@@ -110,12 +112,11 @@ namespace osu.Game.Online.Leaderboards
                             Children = new[]
                             {
                                 avatar = new DelayedLoadWrapper(
-                                    new Avatar(user)
+                                    innerAvatar = new Avatar(user)
                                     {
                                         RelativeSizeAxes = Axes.Both,
                                         CornerRadius = corner_radius,
                                         Masking = true,
-                                        OnLoadComplete = d => d.FadeInFromZero(200),
                                         EdgeEffect = new EdgeEffectParameters
                                         {
                                             Type = EdgeEffectType.Shadow,
@@ -137,8 +138,7 @@ namespace osu.Game.Online.Leaderboards
                                         nameLabel = new OsuSpriteText
                                         {
                                             Text = user.Username,
-                                            Font = @"Exo2.0-BoldItalic",
-                                            TextSize = 23,
+                                            Font = OsuFont.GetFont(size: 23, weight: FontWeight.Bold, italics: true)
                                         },
                                         new FillFlowContainer
                                         {
@@ -187,7 +187,7 @@ namespace osu.Game.Online.Leaderboards
                                     Spacing = new Vector2(5f, 0f),
                                     Children = new Drawable[]
                                     {
-                                        scoreLabel = new GlowingSpriteText(score.TotalScore.ToString(@"N0"), @"Venera", 23, Color4.White, OsuColour.FromHex(@"83ccfa")),
+                                        scoreLabel = new GlowingSpriteText(score.TotalScore.ToString(@"N0"), OsuFont.Numeric.With(size: 23), Color4.White, OsuColour.FromHex(@"83ccfa")),
                                         RankContainer = new Container
                                         {
                                             Size = new Vector2(40f, 20f),
@@ -216,6 +216,8 @@ namespace osu.Game.Online.Leaderboards
                     },
                 },
             };
+
+            innerAvatar.OnLoadComplete += d => d.FadeInFromZero(200);
         }
 
         public override void Show()
@@ -257,8 +259,8 @@ namespace osu.Game.Online.Leaderboards
 
         protected virtual IEnumerable<LeaderboardScoreStatistic> GetStatistics(ScoreInfo model) => new[]
         {
-            new LeaderboardScoreStatistic(FontAwesome.fa_link, "Max Combo", model.MaxCombo.ToString()),
-            new LeaderboardScoreStatistic(FontAwesome.fa_crosshairs, "Accuracy", string.Format(model.Accuracy % 1 == 0 ? @"{0:P0}" : @"{0:P2}", model.Accuracy))
+            new LeaderboardScoreStatistic(FontAwesome.Solid.Link, "Max Combo", model.MaxCombo.ToString()),
+            new LeaderboardScoreStatistic(FontAwesome.Solid.Crosshairs, "Accuracy", string.Format(model.Accuracy % 1 == 0 ? @"{0:P0}" : @"{0:P2}", model.Accuracy))
         };
 
         protected override bool OnHover(HoverEvent e)
@@ -275,7 +277,7 @@ namespace osu.Game.Online.Leaderboards
 
         private class GlowingSpriteText : Container
         {
-            public GlowingSpriteText(string text, string font, int textSize, Color4 textColour, Color4 glowColour)
+            public GlowingSpriteText(string text, FontUsage font, Color4 textColour, Color4 glowColour)
             {
                 AutoSizeAxes = Axes.Both;
 
@@ -296,9 +298,7 @@ namespace osu.Game.Online.Leaderboards
                             {
                                 Anchor = Anchor.Centre,
                                 Origin = Anchor.Centre,
-                                Font = font,
-                                FixedWidth = true,
-                                TextSize = textSize,
+                                Font = font.With(fixedWidth: true),
                                 Text = text,
                                 Colour = glowColour,
                                 Shadow = false,
@@ -309,9 +309,7 @@ namespace osu.Game.Online.Leaderboards
                     {
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
-                        Font = font,
-                        FixedWidth = true,
-                        TextSize = textSize,
+                        Font = font.With(fixedWidth: true),
                         Text = text,
                         Colour = textColour,
                         Shadow = false,
@@ -356,7 +354,7 @@ namespace osu.Game.Online.Leaderboards
                                     Size = new Vector2(icon_size),
                                     Rotation = 45,
                                     Colour = OsuColour.FromHex(@"3087ac"),
-                                    Icon = FontAwesome.fa_square,
+                                    Icon = FontAwesome.Solid.Square,
                                     Shadow = true,
                                 },
                                 new SpriteIcon
@@ -369,7 +367,7 @@ namespace osu.Game.Online.Leaderboards
                                 },
                             },
                         },
-                        new GlowingSpriteText(statistic.Value, @"Exo2.0-Bold", 17, Color4.White, OsuColour.FromHex(@"83ccfa"))
+                        new GlowingSpriteText(statistic.Value, OsuFont.GetFont(size: 17, weight: FontWeight.Bold), Color4.White, OsuColour.FromHex(@"83ccfa"))
                         {
                             Anchor = Anchor.CentreLeft,
                             Origin = Anchor.CentreLeft,
@@ -381,11 +379,11 @@ namespace osu.Game.Online.Leaderboards
 
         public class LeaderboardScoreStatistic
         {
-            public FontAwesome Icon;
+            public IconUsage Icon;
             public string Value;
             public string Name;
 
-            public LeaderboardScoreStatistic(FontAwesome icon, string name, string value)
+            public LeaderboardScoreStatistic(IconUsage icon, string name, string value)
             {
                 Icon = icon;
                 Name = name;

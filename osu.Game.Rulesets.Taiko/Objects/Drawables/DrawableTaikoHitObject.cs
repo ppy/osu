@@ -24,7 +24,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
         protected DrawableTaikoHitObject(TaikoHitObject hitObject)
             : base(hitObject)
         {
-            InternalChildren = new[]
+            AddRangeInternal(new[]
             {
                 nonProxiedContent = new Container
                 {
@@ -32,7 +32,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
                     Child = Content = new Container { RelativeSizeAxes = Axes.Both }
                 },
                 proxiedContent = new ProxiedContentContainer { RelativeSizeAxes = Axes.Both }
-            };
+            });
         }
 
         /// <summary>
@@ -49,6 +49,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
         protected void ProxyContent()
         {
             if (isProxied) return;
+
             isProxied = true;
 
             nonProxiedContent.Remove(Content);
@@ -62,6 +63,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
         protected void UnproxyContent()
         {
             if (!isProxied) return;
+
             isProxied = false;
 
             proxiedContent.Remove(Content);
@@ -109,6 +111,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             MainPiece.KiaiMode = HitObject.Kiai;
 
             var strongObject = HitObject.NestedHitObjects.OfType<StrongHitObject>().FirstOrDefault();
+
             if (strongObject != null)
             {
                 var strongHit = CreateStrongHit(strongObject);

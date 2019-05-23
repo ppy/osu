@@ -64,7 +64,7 @@ namespace osu.Game.Graphics.Backgrounds
 
         private readonly SortedList<TriangleParticle> parts = new SortedList<TriangleParticle>(Comparer<TriangleParticle>.Default);
 
-        private Shader shader;
+        private IShader shader;
         private readonly Texture texture;
 
         public Triangles()
@@ -75,7 +75,7 @@ namespace osu.Game.Graphics.Backgrounds
         [BackgroundDependencyLoader]
         private void load(ShaderManager shaders)
         {
-            shader = shaders?.Load(VertexShaderDescriptor.TEXTURE_2, FragmentShaderDescriptor.TEXTURE_ROUNDED);
+            shader = shaders.Load(VertexShaderDescriptor.TEXTURE_2, FragmentShaderDescriptor.TEXTURE_ROUNDED);
         }
 
         protected override void LoadComplete()
@@ -86,7 +86,7 @@ namespace osu.Game.Graphics.Backgrounds
 
         public float TriangleScale
         {
-            get { return triangleScale; }
+            get => triangleScale;
             set
             {
                 float change = value / triangleScale;
@@ -110,10 +110,10 @@ namespace osu.Game.Graphics.Backgrounds
             if (CreateNewTriangles)
                 addTriangles(false);
 
-            float adjustedAlpha = HideAlphaDiscrepancies ?
+            float adjustedAlpha = HideAlphaDiscrepancies
                 // Cubically scale alpha to make it drop off more sharply.
-                (float)Math.Pow(DrawColourInfo.Colour.AverageColour.Linear.A, 3) :
-                1;
+                ? (float)Math.Pow(DrawColourInfo.Colour.AverageColour.Linear.A, 3)
+                : 1;
 
             float elapsedSeconds = (float)Time.Elapsed / 1000;
             // Since position is relative, the velocity needs to scale inversely with DrawHeight.
@@ -178,71 +178,75 @@ namespace osu.Game.Graphics.Backgrounds
         /// <returns>The colour.</returns>
         protected virtual Color4 CreateTriangleShade() => Interpolation.ValueAt(RNG.NextSingle(), ColourDark, ColourLight, 0, 1);
 
-        protected override DrawNode CreateDrawNode() => new TrianglesDrawNode();
-
-        private readonly TrianglesDrawNodeSharedData sharedData = new TrianglesDrawNodeSharedData();
-        protected override void ApplyDrawNode(DrawNode node)
-        {
-            base.ApplyDrawNode(node);
-
-            var trianglesNode = (TrianglesDrawNode)node;
-
-            trianglesNode.Shader = shader;
-            trianglesNode.Texture = texture;
-            trianglesNode.Size = DrawSize;
-            trianglesNode.Shared = sharedData;
-
-            trianglesNode.Parts.Clear();
-            trianglesNode.Parts.AddRange(parts);
-        }
-
-        private class TrianglesDrawNodeSharedData
-        {
-            public readonly LinearBatch<TexturedVertex2D> VertexBatch = new LinearBatch<TexturedVertex2D>(100 * 3, 10, PrimitiveType.Triangles);
-        }
+        protected override DrawNode CreateDrawNode() => new TrianglesDrawNode(this);
 
         private class TrianglesDrawNode : DrawNode
         {
-            public Shader Shader;
-            public Texture Texture;
+            protected new Triangles Source => (Triangles)base.Source;
 
-            public TrianglesDrawNodeSharedData Shared;
+            private IShader shader;
+            private Texture texture;
 
-            public readonly List<TriangleParticle> Parts = new List<TriangleParticle>();
-            public Vector2 Size;
+            private readonly List<TriangleParticle> parts = new List<TriangleParticle>();
+            private Vector2 size;
+
+            private readonly LinearBatch<TexturedVertex2D> vertexBatch = new LinearBatch<TexturedVertex2D>(100 * 3, 10, PrimitiveType.Triangles);
+
+            public TrianglesDrawNode(Triangles source)
+                : base(source)
+            {
+            }
+
+            public override void ApplyState()
+            {
+                base.ApplyState();
+
+                shader = Source.shader;
+                texture = Source.texture;
+                size = Source.DrawSize;
+
+                parts.Clear();
+                parts.AddRange(Source.parts);
+            }
 
             public override void Draw(Action<TexturedVertex2D> vertexAction)
             {
                 base.Draw(vertexAction);
 
-                Shader.Bind();
-                Texture.TextureGL.Bind();
+                shader.Bind();
+                texture.TextureGL.Bind();
 
                 Vector2 localInflationAmount = edge_smoothness * DrawInfo.MatrixInverse.ExtractScale().Xy;
 
-                foreach (TriangleParticle particle in Parts)
+                foreach (TriangleParticle particle in parts)
                 {
                     var offset = triangle_size * new Vector2(particle.Scale * 0.5f, particle.Scale * 0.866f);
-                    var size = new Vector2(2 * offset.X, offset.Y);
 
                     var triangle = new Triangle(
-                        Vector2Extensions.Transform(particle.Position * Size, DrawInfo.Matrix),
-                        Vector2Extensions.Transform(particle.Position * Size + offset, DrawInfo.Matrix),
-                        Vector2Extensions.Transform(particle.Position * Size + new Vector2(-offset.X, offset.Y), DrawInfo.Matrix)
+                        Vector2Extensions.Transform(particle.Position * size, DrawInfo.Matrix),
+                        Vector2Extensions.Transform(particle.Position * size + offset, DrawInfo.Matrix),
+                        Vector2Extensions.Transform(particle.Position * size + new Vector2(-offset.X, offset.Y), DrawInfo.Matrix)
                     );
 
                     ColourInfo colourInfo = DrawColourInfo.Colour;
                     colourInfo.ApplyChild(particle.Colour);
 
-                    Texture.DrawTriangle(
+                    texture.DrawTriangle(
                         triangle,
                         colourInfo,
                         null,
-                        Shared.VertexBatch.AddAction,
-                        Vector2.Divide(localInflationAmount, size));
+                        vertexBatch.AddAction,
+                        Vector2.Divide(localInflationAmount, new Vector2(2 * offset.X, offset.Y)));
                 }
 
-                Shader.Unbind();
+                shader.Unbind();
+            }
+
+            protected override void Dispose(bool isDisposing)
+            {
+                base.Dispose(isDisposing);
+
+                vertexBatch.Dispose();
             }
         }
 

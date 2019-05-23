@@ -60,7 +60,7 @@ namespace osu.Desktop.Overlays
                             {
                                 new OsuSpriteText
                                 {
-                                    Font = @"Exo2.0-Bold",
+                                    Font = OsuFont.GetFont(weight: FontWeight.Bold),
                                     Text = game.Name
                                 },
                                 new OsuSpriteText
@@ -74,9 +74,8 @@ namespace osu.Desktop.Overlays
                         {
                             Anchor = Anchor.TopCentre,
                             Origin = Anchor.TopCentre,
-                            TextSize = 12,
+                            Font = OsuFont.Numeric.With(size: 12),
                             Colour = colours.Yellow,
-                            Font = @"Venera",
                             Text = @"Development Build"
                         },
                         new Sprite
@@ -96,6 +95,7 @@ namespace osu.Desktop.Overlays
 
             var version = game.Version;
             var lastVersion = config.Get<string>(OsuSetting.Version);
+
             if (game.IsDeployedBuild && version != lastVersion)
             {
                 config.Set(OsuSetting.Version, version);
@@ -111,7 +111,7 @@ namespace osu.Desktop.Overlays
             public UpdateCompleteNotification(string version, Action<string> openUrl = null)
             {
                 Text = $"You are now running osu!lazer {version}.\nClick to see what's new!";
-                Icon = FontAwesome.fa_check_square;
+                Icon = FontAwesome.Solid.CheckSquare;
                 Activated = delegate
                 {
                     openUrl?.Invoke($"https://osu.ppy.sh/home/changelog/lazer/{version}");

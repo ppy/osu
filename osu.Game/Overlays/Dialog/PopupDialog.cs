@@ -6,7 +6,9 @@ using System.Linq;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Events;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Backgrounds;
@@ -38,7 +40,7 @@ namespace osu.Game.Overlays.Dialog
 
         private bool actionInvoked;
 
-        public FontAwesome Icon
+        public IconUsage Icon
         {
             get => icon.Icon;
             set => icon.Icon = value;
@@ -53,6 +55,7 @@ namespace osu.Game.Overlays.Dialog
             {
                 if (text == value)
                     return;
+
                 text = value;
 
                 header.Text = value;
@@ -70,6 +73,7 @@ namespace osu.Game.Overlays.Dialog
             set
             {
                 buttonsContainer.ChildrenEnumerable = value;
+
                 foreach (PopupDialogButton b in value)
                 {
                     var action = b.Action;
@@ -164,14 +168,14 @@ namespace osu.Game.Overlays.Dialog
                                                 {
                                                     Origin = Anchor.Centre,
                                                     Anchor = Anchor.Centre,
-                                                    Icon = FontAwesome.fa_close,
+                                                    Icon = FontAwesome.Solid.TimesCircle,
                                                     Size = new Vector2(50),
                                                 },
                                             },
                                         },
                                     },
                                 },
-                                header = new OsuTextFlowContainer(t => t.TextSize = 25)
+                                header = new OsuTextFlowContainer(t => t.Font = t.Font.With(size: 25))
                                 {
                                     Origin = Anchor.TopCentre,
                                     Anchor = Anchor.TopCentre,
@@ -180,7 +184,7 @@ namespace osu.Game.Overlays.Dialog
                                     Padding = new MarginPadding(15),
                                     TextAnchor = Anchor.TopCentre,
                                 },
-                                body = new OsuTextFlowContainer(t => t.TextSize = 18)
+                                body = new OsuTextFlowContainer(t => t.Font = t.Font.With(size: 18))
                                 {
                                     RelativeSizeAxes = Axes.X,
                                     AutoSizeAxes = Axes.Y,
@@ -220,6 +224,7 @@ namespace osu.Game.Overlays.Dialog
 
             // press button at number if 1-9 on number row or keypad are pressed
             var k = e.Key;
+
             if (k >= Key.Number1 && k <= Key.Number9)
             {
                 pressButtonAtIndex(k - Key.Number1);

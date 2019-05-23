@@ -19,6 +19,7 @@ using osu.Framework.Graphics.Textures;
 using osuTK.Input;
 using osu.Framework.Graphics.Shapes;
 using System;
+using osu.Framework.Graphics.Effects;
 using osu.Framework.Input.Events;
 using osu.Framework.MathUtils;
 
@@ -219,13 +220,11 @@ namespace osu.Game.Overlays
                     {
                         if (drawableMedal.State != DisplayState.Full)
                             drawableMedal.State = DisplayState.Icon;
-                    })
-                    .Delay(step_duration).Schedule(() =>
+                    }).Delay(step_duration).Schedule(() =>
                     {
                         if (drawableMedal.State != DisplayState.Full)
                             drawableMedal.State = DisplayState.MedalUnlocked;
-                    })
-                    .Delay(step_duration).Schedule(() =>
+                    }).Delay(step_duration).Schedule(() =>
                     {
                         if (drawableMedal.State != DisplayState.Full)
                             drawableMedal.State = DisplayState.Full;

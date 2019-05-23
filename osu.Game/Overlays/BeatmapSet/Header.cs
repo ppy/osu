@@ -6,6 +6,7 @@ using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Drawables;
@@ -115,8 +116,7 @@ namespace osu.Game.Overlays.BeatmapSet
                                         {
                                             title = new OsuSpriteText
                                             {
-                                                Font = @"Exo2.0-BoldItalic",
-                                                TextSize = 37,
+                                                Font = OsuFont.GetFont(size: 37, weight: FontWeight.Bold, italics: true)
                                             },
                                             externalLink = new ExternalLinkButton
                                             {
@@ -126,11 +126,7 @@ namespace osu.Game.Overlays.BeatmapSet
                                             },
                                         }
                                     },
-                                    artist = new OsuSpriteText
-                                    {
-                                        Font = @"Exo2.0-SemiBoldItalic",
-                                        TextSize = 25,
-                                    },
+                                    artist = new OsuSpriteText { Font = OsuFont.GetFont(size: 25, weight: FontWeight.SemiBold, italics: true) },
                                     new Container
                                     {
                                         RelativeSizeAxes = Axes.X,
@@ -181,8 +177,8 @@ namespace osu.Game.Overlays.BeatmapSet
                 },
             };
 
-            Picker.Beatmap.ValueChanged += b => Details.Beatmap = b;
-            Picker.Beatmap.ValueChanged += b => externalLink.Link = $@"https://osu.ppy.sh/beatmapsets/{BeatmapSet.Value?.OnlineBeatmapSetID}#{b?.Ruleset.ShortName}/{b?.OnlineBeatmapID}";
+            Picker.Beatmap.ValueChanged += b => Details.Beatmap = b.NewValue;
+            Picker.Beatmap.ValueChanged += b => externalLink.Link = $@"https://osu.ppy.sh/beatmapsets/{BeatmapSet.Value?.OnlineBeatmapSetID}#{b.NewValue?.Ruleset.ShortName}/{b.NewValue?.OnlineBeatmapID}";
         }
 
         [BackgroundDependencyLoader]
@@ -192,16 +188,16 @@ namespace osu.Game.Overlays.BeatmapSet
 
             State.BindValueChanged(_ => updateDownloadButtons());
 
-            BeatmapSet.BindValueChanged(beatmapSet =>
+            BeatmapSet.BindValueChanged(setInfo =>
             {
-                Picker.BeatmapSet = author.BeatmapSet = Details.BeatmapSet = beatmapSet;
+                Picker.BeatmapSet = author.BeatmapSet = Details.BeatmapSet = setInfo.NewValue;
 
-                title.Text = beatmapSet?.Metadata.Title ?? string.Empty;
-                artist.Text = beatmapSet?.Metadata.Artist ?? string.Empty;
-                onlineStatusPill.Status = beatmapSet?.OnlineInfo.Status ?? BeatmapSetOnlineStatus.None;
-                cover.BeatmapSet = beatmapSet;
+                title.Text = setInfo.NewValue?.Metadata.Title ?? string.Empty;
+                artist.Text = setInfo.NewValue?.Metadata.Artist ?? string.Empty;
+                onlineStatusPill.Status = setInfo.NewValue?.OnlineInfo.Status ?? BeatmapSetOnlineStatus.None;
+                cover.BeatmapSet = setInfo.NewValue;
 
-                if (beatmapSet != null)
+                if (setInfo.NewValue != null)
                 {
                     downloadButtonsContainer.FadeIn(transition_duration);
                     favouriteButton.FadeIn(transition_duration);
@@ -219,25 +215,28 @@ namespace osu.Game.Overlays.BeatmapSet
         private void updateDownloadButtons()
         {
             if (BeatmapSet.Value == null) return;
+
             switch (State.Value)
             {
                 case DownloadState.LocallyAvailable:
                     // temporary for UX until new design is implemented.
-                    downloadButtonsContainer.Child = new osu.Game.Overlays.Direct.DownloadButton(BeatmapSet)
+                    downloadButtonsContainer.Child = new osu.Game.Overlays.Direct.DownloadButton(BeatmapSet.Value)
                     {
                         Width = 50,
                         RelativeSizeAxes = Axes.Y
                     };
                     break;
+
                 case DownloadState.Downloading:
                 case DownloadState.Downloaded:
                     // temporary to avoid showing two buttons for maps with novideo. will be fixed in new beatmap overlay design.
-                    downloadButtonsContainer.Child = new DownloadButton(BeatmapSet);
+                    downloadButtonsContainer.Child = new DownloadButton(BeatmapSet.Value);
                     break;
+
                 default:
-                    downloadButtonsContainer.Child = new DownloadButton(BeatmapSet);
+                    downloadButtonsContainer.Child = new DownloadButton(BeatmapSet.Value);
                     if (BeatmapSet.Value.OnlineInfo.HasVideo)
-                        downloadButtonsContainer.Add(new DownloadButton(BeatmapSet, true));
+                        downloadButtonsContainer.Add(new DownloadButton(BeatmapSet.Value, true));
                     break;
             }
         }

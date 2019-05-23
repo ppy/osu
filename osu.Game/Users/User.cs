@@ -2,8 +2,10 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.ComponentModel;
+using System.Linq;
 using Newtonsoft.Json;
-using osu.Framework.Configuration;
+using osu.Framework.Bindables;
 
 namespace osu.Game.Users
 {
@@ -34,8 +36,8 @@ namespace osu.Game.Users
         [JsonProperty(@"cover_url")]
         public string CoverUrl
         {
-            get { return Cover?.Url; }
-            set { Cover = new UserCover { Url = value }; }
+            get => Cover?.Url;
+            set => Cover = new UserCover { Url = value };
         }
 
         [JsonProperty(@"cover")]
@@ -59,6 +61,9 @@ namespace osu.Game.Users
         [JsonProperty(@"is_supporter")]
         public bool IsSupporter;
 
+        [JsonProperty(@"support_level")]
+        public int SupportLevel;
+
         [JsonProperty(@"is_gmt")]
         public bool IsGMT;
 
@@ -70,6 +75,9 @@ namespace osu.Game.Users
 
         [JsonProperty(@"is_active")]
         public bool Active;
+
+        [JsonProperty(@"pm_friends_only")]
+        public bool PMFriendsOnly;
 
         [JsonProperty(@"interests")]
         public string Interests;
@@ -104,8 +112,16 @@ namespace osu.Game.Users
         [JsonProperty(@"post_count")]
         public int PostCount;
 
-        [JsonProperty(@"playstyle")]
-        public string[] PlayStyle;
+        [JsonProperty(@"follower_count")]
+        public int[] FollowerCount;
+
+        [JsonProperty]
+        private string[] playstyle
+        {
+            set { PlayStyles = value?.Select(str => Enum.Parse(typeof(PlayStyle), str, true)).Cast<PlayStyle>().ToArray(); }
+        }
+
+        public PlayStyle[] PlayStyles;
 
         [JsonProperty(@"playmode")]
         public string PlayMode;
@@ -143,6 +159,18 @@ namespace osu.Game.Users
         [JsonProperty("badges")]
         public Badge[] Badges;
 
+        [JsonProperty("user_achievements")]
+        public UserAchievement[] Achievements;
+
+        public class UserAchievement
+        {
+            [JsonProperty("achieved_at")]
+            public DateTimeOffset AchievedAt;
+
+            [JsonProperty("achievement_id")]
+            public int ID;
+        }
+
         public override string ToString() => Username;
 
         /// <summary>
@@ -153,5 +181,20 @@ namespace osu.Game.Users
             Username = "system",
             Id = 0
         };
+
+        public enum PlayStyle
+        {
+            [Description("Keyboard")]
+            Keyboard,
+
+            [Description("Mouse")]
+            Mouse,
+
+            [Description("Tablet")]
+            Tablet,
+
+            [Description("Touch Screen")]
+            Touch,
+        }
     }
 }

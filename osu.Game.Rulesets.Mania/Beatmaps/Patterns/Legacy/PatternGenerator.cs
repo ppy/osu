@@ -87,6 +87,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
                 return 4;
             if (val >= 1 - p3)
                 return 3;
+
             return val >= 1 - p2 ? 2 : 1;
         }
 
@@ -157,6 +158,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
 
             // Ensure that we have at least one free column, so that an endless loop is avoided
             bool hasValidColumns = false;
+
             for (int i = lowerBound.Value; i < upperBound.Value; i++)
             {
                 hasValidColumns = isValid(i);

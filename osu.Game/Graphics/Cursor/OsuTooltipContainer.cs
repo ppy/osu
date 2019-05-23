@@ -6,8 +6,8 @@ using osuTK.Graphics;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
+using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics.Sprites;
 
@@ -17,7 +17,8 @@ namespace osu.Game.Graphics.Cursor
     {
         protected override ITooltip CreateTooltip() => new OsuTooltip();
 
-        public OsuTooltipContainer(CursorContainer cursor) : base(cursor)
+        public OsuTooltipContainer(CursorContainer cursor)
+            : base(cursor)
         {
         }
 
@@ -36,6 +37,7 @@ namespace osu.Game.Graphics.Cursor
                     if (value == text.Text) return;
 
                     text.Text = value;
+
                     if (IsPresent)
                     {
                         AutoSizeDuration = 250;
@@ -45,8 +47,6 @@ namespace osu.Game.Graphics.Cursor
                         AutoSizeDuration = 0;
                 }
             }
-
-            private const float text_size = 16;
 
             public OsuTooltip()
             {
@@ -69,9 +69,8 @@ namespace osu.Game.Graphics.Cursor
                     },
                     text = new OsuSpriteText
                     {
-                        TextSize = text_size,
                         Padding = new MarginPadding(5),
-                        Font = @"Exo2.0-Regular",
+                        Font = OsuFont.GetFont(weight: FontWeight.Regular)
                     }
                 };
             }

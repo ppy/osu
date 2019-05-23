@@ -65,6 +65,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
             if (originalPattern.HitObjects.Count() == 1)
             {
                 yield return originalPattern;
+
                 yield break;
             }
 
@@ -135,6 +136,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
             {
                 if (convertType.HasFlag(PatternType.LowProbability))
                     return generateNRandomNotes(HitObject.StartTime, 0.78, 0.3, 0);
+
                 return generateNRandomNotes(HitObject.StartTime, 0.85, 0.36, 0.03);
             }
 
@@ -142,6 +144,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
             {
                 if (convertType.HasFlag(PatternType.LowProbability))
                     return generateNRandomNotes(HitObject.StartTime, 0.43, 0.08, 0);
+
                 return generateNRandomNotes(HitObject.StartTime, 0.56, 0.18, 0);
             }
 
@@ -149,11 +152,13 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
             {
                 if (convertType.HasFlag(PatternType.LowProbability))
                     return generateNRandomNotes(HitObject.StartTime, 0.3, 0, 0);
+
                 return generateNRandomNotes(HitObject.StartTime, 0.37, 0.08, 0);
             }
 
             if (convertType.HasFlag(PatternType.LowProbability))
                 return generateNRandomNotes(HitObject.StartTime, 0.17, 0, 0);
+
             return generateNRandomNotes(HitObject.StartTime, 0.27, 0, 0);
         }
 
@@ -174,6 +179,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
 
             int usableColumns = TotalColumns - RandomStart - PreviousPattern.ColumnWithObjects;
             int nextColumn = GetRandomColumn();
+
             for (int i = 0; i < Math.Min(usableColumns, noteCount); i++)
             {
                 // Find available column
@@ -212,6 +218,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
                 nextColumn = FindAvailableColumn(nextColumn, PreviousPattern);
 
             int lastColumn = nextColumn;
+
             for (int i = 0; i < noteCount; i++)
             {
                 addToPattern(pattern, nextColumn, startTime, startTime);
@@ -294,6 +301,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
             int interval = Random.Next(1, TotalColumns - (legacy ? 1 : 0));
 
             int nextColumn = GetColumn((HitObject as IHasXPosition)?.X ?? 0, true);
+
             for (int i = 0; i <= spanCount; i++)
             {
                 addToPattern(pattern, nextColumn, startTime, startTime);
@@ -336,16 +344,19 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
                     p3 = 0;
                     p4 = 0;
                     break;
+
                 case 3:
                     p2 = Math.Min(p2, 0.1);
                     p3 = 0;
                     p4 = 0;
                     break;
+
                 case 4:
                     p2 = Math.Min(p2, 0.3);
                     p3 = Math.Min(p3, 0.04);
                     p4 = 0;
                     break;
+
                 case 5:
                     p2 = Math.Min(p2, 0.34);
                     p3 = Math.Min(p3, 0.1);
@@ -435,6 +446,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
             bool ignoreHead = !sampleInfoListAt(startTime).Any(s => s.Name == SampleInfo.HIT_WHISTLE || s.Name == SampleInfo.HIT_FINISH || s.Name == SampleInfo.HIT_CLAP);
 
             var rowPattern = new Pattern();
+
             for (int i = 0; i <= spanCount; i++)
             {
                 if (!(ignoreHead && startTime == HitObject.StartTime))

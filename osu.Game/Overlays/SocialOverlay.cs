@@ -3,7 +3,7 @@
 
 using System.Collections.Generic;
 using System.Linq;
-using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osuTK;
 using osuTK.Graphics;
 using osu.Framework.Graphics;
@@ -15,14 +15,12 @@ using osu.Game.Online.API.Requests;
 using osu.Game.Overlays.SearchableList;
 using osu.Game.Overlays.Social;
 using osu.Game.Users;
-using osu.Framework.Configuration;
 using osu.Framework.Threading;
 
 namespace osu.Game.Overlays
 {
-    public class SocialOverlay : SearchableListOverlay<SocialTab, SocialSortCriteria, SortDirection>, IOnlineComponent
+    public class SocialOverlay : SearchableListOverlay<SocialTab, SocialSortCriteria, SortDirection>
     {
-        private APIAccess api;
         private readonly LoadingAnimation loading;
         private FillFlowContainer<SocialPanel> panels;
 
@@ -34,9 +32,10 @@ namespace osu.Game.Overlays
         protected override SearchableListFilterControl<SocialSortCriteria, SortDirection> CreateFilterControl() => new FilterControl();
 
         private IEnumerable<User> users;
+
         public IEnumerable<User> Users
         {
-            get { return users; }
+            get => users;
             set
             {
                 if (users?.Equals(value) ?? false)
@@ -57,7 +56,7 @@ namespace osu.Game.Overlays
 
             Filter.Search.Current.ValueChanged += text =>
             {
-                if (!string.IsNullOrEmpty(text))
+                if (!string.IsNullOrEmpty(text.NewValue))
                 {
                     // force searching in players until searching for friends is supported
                     Header.Tabs.Current.Value = SocialTab.AllPlayers;
@@ -67,31 +66,24 @@ namespace osu.Game.Overlays
                 }
             };
 
-            Header.Tabs.Current.ValueChanged += tab => Scheduler.AddOnce(updateSearch);
+            Header.Tabs.Current.ValueChanged += _ => Scheduler.AddOnce(updateSearch);
 
-            Filter.Tabs.Current.ValueChanged += sortCriteria => Scheduler.AddOnce(updateSearch);
+            Filter.Tabs.Current.ValueChanged += _ => Scheduler.AddOnce(updateSearch);
 
-            Filter.DisplayStyleControl.DisplayStyle.ValueChanged += recreatePanels;
-            Filter.DisplayStyleControl.Dropdown.Current.ValueChanged += sortOrder => Scheduler.AddOnce(updateSearch);
+            Filter.DisplayStyleControl.DisplayStyle.ValueChanged += style => recreatePanels(style.NewValue);
+            Filter.DisplayStyleControl.Dropdown.Current.ValueChanged += _ => Scheduler.AddOnce(updateSearch);
 
             currentQuery.ValueChanged += query =>
             {
                 queryChangedDebounce?.Cancel();
 
-                if (string.IsNullOrEmpty(query))
+                if (string.IsNullOrEmpty(query.NewValue))
                     Scheduler.AddOnce(updateSearch);
                 else
                     queryChangedDebounce = Scheduler.AddDelayed(updateSearch, 500);
             };
 
             currentQuery.BindTo(Filter.Search.Current);
-        }
-
-        [BackgroundDependencyLoader]
-        private void load(APIAccess api)
-        {
-            this.api = api;
-            api.Register(this);
         }
 
         private void recreatePanels(PanelDisplayStyle displayStyle)
@@ -110,6 +102,7 @@ namespace osu.Game.Overlays
                 ChildrenEnumerable = Users.Select(u =>
                 {
                     SocialPanel panel;
+
                     switch (displayStyle)
                     {
                         case PanelDisplayStyle.Grid:
@@ -119,10 +112,12 @@ namespace osu.Game.Overlays
                                 Origin = Anchor.TopCentre
                             };
                             break;
+
                         default:
                             panel = new SocialListPanel(u);
                             break;
                     }
+
                     panel.Status.BindTo(u.Status);
                     return panel;
                 })
@@ -130,7 +125,7 @@ namespace osu.Game.Overlays
 
             LoadComponentAsync(newPanels, f =>
             {
-                if(panels != null)
+                if (panels != null)
                     ScrollFlow.Remove(panels);
 
                 ScrollFlow.Add(panels = newPanels);
@@ -155,7 +150,7 @@ namespace osu.Game.Overlays
             loading.Hide();
             getUsersRequest?.Cancel();
 
-            if (api?.IsLoggedIn != true)
+            if (API?.IsLoggedIn != true)
                 return;
 
             switch (Header.Tabs.Current.Value)
@@ -163,14 +158,16 @@ namespace osu.Game.Overlays
                 case SocialTab.Friends:
                     var friendRequest = new GetFriendsRequest(); // TODO filter arguments?
                     friendRequest.Success += updateUsers;
-                    api.Queue(getUsersRequest = friendRequest);
+                    API.Queue(getUsersRequest = friendRequest);
                     break;
+
                 default:
                     var userRequest = new GetUsersRequest(); // TODO filter arguments!
                     userRequest.Success += response => updateUsers(response.Select(r => r.User));
-                    api.Queue(getUsersRequest = userRequest);
+                    API.Queue(getUsersRequest = userRequest);
                     break;
             }
+
             loading.Show();
         }
 
@@ -190,13 +187,14 @@ namespace osu.Game.Overlays
             }
         }
 
-        public void APIStateChanged(APIAccess api, APIState state)
+        public override void APIStateChanged(IAPIProvider api, APIState state)
         {
             switch (state)
             {
                 case APIState.Online:
                     Scheduler.AddOnce(updateSearch);
                     break;
+
                 default:
                     Users = null;
                     clearPanels();

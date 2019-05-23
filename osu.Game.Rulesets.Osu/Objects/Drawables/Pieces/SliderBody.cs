@@ -14,15 +14,17 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
 {
     public abstract class SliderBody : CompositeDrawable
     {
+        public const float DEFAULT_BORDER_SIZE = 1;
+
         private readonly SliderPath path;
         protected Path Path => path;
 
         private readonly BufferedContainer container;
 
-        public float PathWidth
+        public float PathRadius
         {
-            get => path.PathWidth;
-            set => path.PathWidth = value;
+            get => path.PathRadius;
+            set => path.PathRadius = value;
         }
 
         /// <summary>
@@ -40,6 +42,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
             {
                 if (path.AccentColour == value)
                     return;
+
                 path.AccentColour = value;
 
                 container.ForceRedraw();
@@ -56,7 +59,25 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
             {
                 if (path.BorderColour == value)
                     return;
+
                 path.BorderColour = value;
+
+                container.ForceRedraw();
+            }
+        }
+
+        /// <summary>
+        /// Used to size the path border.
+        /// </summary>
+        public float BorderSize
+        {
+            get => path.BorderSize;
+            set
+            {
+                if (path.BorderSize == value)
+                    return;
+
+                path.BorderSize = value;
 
                 container.ForceRedraw();
             }
@@ -90,6 +111,9 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
 
         private class SliderPath : SmoothPath
         {
+            private const float border_max_size = 8f;
+            private const float border_min_size = 0f;
+
             private const float border_portion = 0.128f;
             private const float gradient_portion = 1 - border_portion;
 
@@ -105,6 +129,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
                 {
                     if (borderColour == value)
                         return;
+
                     borderColour = value;
 
                     InvalidateTexture();
@@ -120,18 +145,40 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
                 {
                     if (accentColour == value)
                         return;
+
                     accentColour = value;
 
                     InvalidateTexture();
                 }
             }
 
+            private float borderSize = DEFAULT_BORDER_SIZE;
+
+            public float BorderSize
+            {
+                get => borderSize;
+                set
+                {
+                    if (borderSize == value)
+                        return;
+
+                    if (value < border_min_size || value > border_max_size)
+                        return;
+
+                    borderSize = value;
+
+                    InvalidateTexture();
+                }
+            }
+
+            private float calculatedBorderPortion => BorderSize * border_portion;
+
             protected override Color4 ColourAt(float position)
             {
-                if (position <= border_portion)
+                if (calculatedBorderPortion != 0f && position <= calculatedBorderPortion)
                     return BorderColour;
 
-                position -= border_portion;
+                position -= calculatedBorderPortion;
                 return new Color4(AccentColour.R, AccentColour.G, AccentColour.B, (opacity_at_edge - (opacity_at_edge - opacity_at_centre) * position / gradient_portion) * AccentColour.A);
             }
         }

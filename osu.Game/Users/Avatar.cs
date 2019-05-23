@@ -3,10 +3,9 @@
 
 using System;
 using osu.Framework.Allocation;
-using osu.Framework.Configuration;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Input.Events;
@@ -65,21 +64,22 @@ namespace osu.Game.Users
 
         private void openProfile()
         {
-            if (!OpenOnClick)
+            if (!OpenOnClick.Value)
                 return;
 
             if (user != null)
                 game?.ShowUser(user.Id);
         }
 
-        private class ClickableArea : OsuClickableContainer, IHasTooltip
+        private class ClickableArea : OsuClickableContainer
         {
-            public string TooltipText => Enabled.Value ? @"View Profile" : null;
+            public override string TooltipText => Enabled.Value ? @"View Profile" : null;
 
             protected override bool OnClick(ClickEvent e)
             {
-                if (!Enabled)
+                if (!Enabled.Value)
                     return false;
+
                 return base.OnClick(e);
             }
         }

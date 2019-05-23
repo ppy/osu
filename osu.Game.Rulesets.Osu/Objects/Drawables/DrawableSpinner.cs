@@ -11,7 +11,8 @@ using osuTK.Graphics;
 using osu.Game.Graphics;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Allocation;
-using osu.Framework.Configuration;
+using osu.Framework.Bindables;
+using osu.Framework.Graphics.Sprites;
 using osu.Game.Screens.Ranking;
 using osu.Game.Rulesets.Scoring;
 
@@ -42,7 +43,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         private Color4 normalColour;
         private Color4 completeColour;
 
-        public DrawableSpinner(Spinner s) : base(s)
+        public DrawableSpinner(Spinner s)
+            : base(s)
         {
             Origin = Anchor.Centre;
             Position = s.Position;
@@ -75,7 +77,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
                             Size = new Vector2(48),
-                            Icon = FontAwesome.fa_asterisk,
+                            Icon = FontAwesome.Solid.Asterisk,
                             Shadow = false,
                         },
                     }
@@ -130,7 +132,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             circle.Colour = colours.BlueDark;
             glow.Colour = colours.BlueDark;
 
-            positionBindable.BindValueChanged(v => Position = v);
+            positionBindable.BindValueChanged(pos => Position = pos.NewValue);
             positionBindable.BindTo(HitObject.PositionBindable);
         }
 
@@ -220,9 +222,11 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                 case ArmedState.Idle:
                     Expire(true);
                     break;
+
                 case ArmedState.Hit:
                     sequence.ScaleTo(Scale * 1.2f, 320, Easing.Out);
                     break;
+
                 case ArmedState.Miss:
                     sequence.ScaleTo(Scale * 0.8f, 320, Easing.In);
                     break;

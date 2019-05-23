@@ -10,7 +10,7 @@ using osu.Game.Graphics;
 using osuTK;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Allocation;
-using osu.Framework.Configuration;
+using osu.Framework.Bindables;
 using osu.Framework.Input.Events;
 
 namespace osu.Game.Overlays.Toolbar
@@ -22,7 +22,7 @@ namespace osu.Game.Overlays.Toolbar
 
         public Action OnHome;
 
-        private readonly ToolbarUserArea userArea;
+        private ToolbarUserButton userButton;
 
         protected override bool BlockPositionalInput => false;
 
@@ -34,6 +34,13 @@ namespace osu.Game.Overlays.Toolbar
         private readonly Bindable<OverlayActivation> overlayActivationMode = new Bindable<OverlayActivation>(OverlayActivation.All);
 
         public Toolbar()
+        {
+            RelativeSizeAxes = Axes.X;
+            Size = new Vector2(1, HEIGHT);
+        }
+
+        [BackgroundDependencyLoader(true)]
+        private void load(OsuGame osuGame)
         {
             Children = new Drawable[]
             {
@@ -68,24 +75,17 @@ namespace osu.Game.Overlays.Toolbar
                         new ToolbarMusicButton(),
                         //new ToolbarButton
                         //{
-                        //    Icon = FontAwesome.fa_search
+                        //    Icon = FontAwesome.Solid.search
                         //},
-                        userArea = new ToolbarUserArea(),
+                        userButton = new ToolbarUserButton(),
                         new ToolbarNotificationButton(),
                     }
                 }
             };
 
-            RelativeSizeAxes = Axes.X;
-            Size = new Vector2(1, HEIGHT);
-        }
-
-        [BackgroundDependencyLoader(true)]
-        private void load(OsuGame osuGame)
-        {
             StateChanged += visibility =>
             {
-                if (overlayActivationMode == OverlayActivation.Disabled)
+                if (overlayActivationMode.Value == OverlayActivation.Disabled)
                     State = Visibility.Hidden;
             };
 
@@ -143,7 +143,7 @@ namespace osu.Game.Overlays.Toolbar
 
         protected override void PopOut()
         {
-            userArea?.LoginOverlay.Hide();
+            userButton?.StateContainer.Hide();
 
             this.MoveToY(-DrawSize.Y, transition_time, Easing.OutQuint);
             this.FadeOut(transition_time);

@@ -5,7 +5,7 @@ using osuTK;
 using osuTK.Graphics;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Effects;
 using osu.Framework.Input.Events;
 using osu.Game.Users;
 
@@ -15,7 +15,8 @@ namespace osu.Game.Overlays.Social
     {
         private const double hover_transition_time = 400;
 
-        public SocialPanel(User user) : base(user)
+        public SocialPanel(User user)
+            : base(user)
         {
         }
 

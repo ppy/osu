@@ -5,7 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
-using osu.Framework.Configuration;
+using osu.Framework.Bindables;
 using osu.Game.Beatmaps;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
@@ -23,7 +23,7 @@ namespace osu.Game.Screens.Select.Leaderboards
 
         public BeatmapInfo Beatmap
         {
-            get { return beatmap; }
+            get => beatmap;
             set
             {
                 if (beatmap == value)
@@ -43,7 +43,7 @@ namespace osu.Game.Screens.Select.Leaderboards
         private IBindable<RulesetInfo> ruleset { get; set; }
 
         [Resolved]
-        private APIAccess api { get; set; }
+        private IAPIProvider api { get; set; }
 
         [BackgroundDependencyLoader]
         private void load()
@@ -55,7 +55,7 @@ namespace osu.Game.Screens.Select.Leaderboards
         {
             if (Scope == BeatmapLeaderboardScope.Local)
             {
-                Scores = scoreManager.QueryScores(s => s.Beatmap.ID == Beatmap.ID).ToArray();
+                Scores = scoreManager.QueryScores(s => !s.DeletePending && s.Beatmap.ID == Beatmap.ID).OrderByDescending(s => s.TotalScore).ToArray();
                 PlaceholderState = Scores.Any() ? PlaceholderState.Successful : PlaceholderState.NoScores;
                 return null;
             }

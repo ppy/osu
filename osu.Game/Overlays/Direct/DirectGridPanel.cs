@@ -10,10 +10,12 @@ using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Drawables;
+using osu.Game.Graphics.Containers;
 
 namespace osu.Game.Overlays.Direct
 {
@@ -29,7 +31,8 @@ namespace osu.Game.Overlays.Direct
         protected override PlayButton PlayButton => playButton;
         protected override Box PreviewBar => progressBar;
 
-        public DirectGridPanel(BeatmapSetInfo beatmap) : base(beatmap)
+        public DirectGridPanel(BeatmapSetInfo beatmap)
+            : base(beatmap)
         {
             Width = 380;
             Height = 140 + vertical_padding; //full height of all the elements plus vertical padding (autosize uses the image)
@@ -75,13 +78,12 @@ namespace osu.Game.Overlays.Direct
                                 new OsuSpriteText
                                 {
                                     Text = new LocalisedString((SetInfo.Metadata.TitleUnicode, SetInfo.Metadata.Title)),
-                                    TextSize = 18,
-                                    Font = @"Exo2.0-BoldItalic",
+                                    Font = OsuFont.GetFont(size: 18, weight: FontWeight.Bold, italics: true)
                                 },
                                 new OsuSpriteText
                                 {
                                     Text = new LocalisedString((SetInfo.Metadata.ArtistUnicode, SetInfo.Metadata.Artist)),
-                                    Font = @"Exo2.0-BoldItalic",
+                                    Font = OsuFont.GetFont(weight: FontWeight.Bold, italics: true)
                                 },
                             },
                         },
@@ -118,29 +120,16 @@ namespace osu.Game.Overlays.Direct
                                     },
                                     Children = new Drawable[]
                                     {
-                                        new FillFlowContainer
+                                        new LinkFlowContainer(s =>
                                         {
-                                            AutoSizeAxes = Axes.Both,
-                                            Direction = FillDirection.Horizontal,
-                                            Children = new[]
-                                            {
-                                                new OsuSpriteText
-                                                {
-                                                    Text = "mapped by ",
-                                                    TextSize = 14,
-                                                    Shadow = false,
-                                                    Colour = colours.Gray5,
-                                                },
-                                                new OsuSpriteText
-                                                {
-                                                    Text = SetInfo.Metadata.Author.Username,
-                                                    TextSize = 14,
-                                                    Font = @"Exo2.0-SemiBoldItalic",
-                                                    Shadow = false,
-                                                    Colour = colours.BlueDark,
-                                                },
-                                            },
-                                        },
+                                            s.Shadow = false;
+                                            s.Font = OsuFont.GetFont(size: 14);
+                                        }).With(d =>
+                                        {
+                                            d.AutoSizeAxes = Axes.Both;
+                                            d.AddText("mapped by ", t => t.Colour = colours.Gray5);
+                                            d.AddUserLink(SetInfo.Metadata.Author);
+                                        }),
                                         new Container
                                         {
                                             AutoSizeAxes = Axes.X,
@@ -150,7 +139,7 @@ namespace osu.Game.Overlays.Direct
                                                 new OsuSpriteText
                                                 {
                                                     Text = SetInfo.Metadata.Source,
-                                                    TextSize = 14,
+                                                    Font = OsuFont.GetFont(size: 14),
                                                     Shadow = false,
                                                     Colour = colours.Gray5,
                                                     Alpha = string.IsNullOrEmpty(SetInfo.Metadata.Source) ? 0f : 1f,
@@ -186,11 +175,8 @@ namespace osu.Game.Overlays.Direct
                     Margin = new MarginPadding { Top = vertical_padding, Right = vertical_padding },
                     Children = new[]
                     {
-                        new Statistic(FontAwesome.fa_play_circle, SetInfo.OnlineInfo?.PlayCount ?? 0)
-                        {
-                            Margin = new MarginPadding { Right = 1 },
-                        },
-                        new Statistic(FontAwesome.fa_heart, SetInfo.OnlineInfo?.FavouriteCount ?? 0),
+                        new Statistic(FontAwesome.Solid.PlayCircle, SetInfo.OnlineInfo?.PlayCount ?? 0),
+                        new Statistic(FontAwesome.Solid.Heart, SetInfo.OnlineInfo?.FavouriteCount ?? 0),
                     },
                 },
                 statusContainer = new FillFlowContainer
@@ -209,12 +195,12 @@ namespace osu.Game.Overlays.Direct
 
             if (SetInfo.OnlineInfo?.HasVideo ?? false)
             {
-                statusContainer.Add(new IconPill(FontAwesome.fa_film));
+                statusContainer.Add(new IconPill(FontAwesome.Solid.Film));
             }
 
             if (SetInfo.OnlineInfo?.HasStoryboard ?? false)
             {
-                statusContainer.Add(new IconPill(FontAwesome.fa_image));
+                statusContainer.Add(new IconPill(FontAwesome.Solid.Image));
             }
 
             statusContainer.Add(new BeatmapSetOnlineStatusPill
@@ -239,6 +225,6 @@ namespace osu.Game.Overlays.Direct
             updateStatusContainer();
         }
 
-        private void updateStatusContainer() => statusContainer.FadeTo(IsHovered || PreviewPlaying ? 0 : 1, 120, Easing.InOutQuint);
+        private void updateStatusContainer() => statusContainer.FadeTo(IsHovered || PreviewPlaying.Value ? 0 : 1, 120, Easing.InOutQuint);
     }
 }

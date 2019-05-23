@@ -4,10 +4,11 @@
 using System;
 using System.Linq;
 using osu.Framework.Allocation;
-using osu.Framework.Configuration;
+using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
@@ -34,7 +35,7 @@ namespace osu.Game.Overlays.Music
         private PlaylistList list;
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours, BindableBeatmap beatmap, BeatmapManager beatmaps)
+        private void load(OsuColour colours, Bindable<WorkingBeatmap> beatmap, BeatmapManager beatmaps)
         {
             this.beatmap.BindTo(beatmap);
             this.beatmaps = beatmaps;
@@ -81,6 +82,7 @@ namespace osu.Game.Overlays.Music
             filter.Search.OnCommit = (sender, newText) =>
             {
                 BeatmapInfo toSelect = list.FirstVisibleSet?.Beatmaps?.FirstOrDefault();
+
                 if (toSelect != null)
                 {
                     beatmap.Value = beatmaps.GetWorkingBeatmap(toSelect);

@@ -14,6 +14,7 @@ using osu.Game.Graphics;
 using osuTK;
 using osuTK.Graphics;
 using osu.Framework.Extensions.Color4Extensions;
+using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Transforms;
 using osu.Framework.Threading;
 using osu.Game.Configuration;
@@ -69,16 +70,14 @@ namespace osu.Game.Overlays
                         textLine1 = new OsuSpriteText
                         {
                             Padding = new MarginPadding(10),
-                            Font = @"Exo2.0-Black",
+                            Font = OsuFont.GetFont(size: 14, weight: FontWeight.Black),
                             Spacing = new Vector2(1, 0),
-                            TextSize = 14,
                             Anchor = Anchor.TopCentre,
                             Origin = Anchor.TopCentre,
                         },
                         textLine2 = new OsuSpriteText
                         {
-                            TextSize = 24,
-                            Font = @"Exo2.0-Light",
+                            Font = OsuFont.GetFont(size: 24, weight: FontWeight.Light),
                             Padding = new MarginPadding { Left = 10, Right = 10 },
                             Anchor = Anchor.Centre,
                             Origin = Anchor.BottomCentre,
@@ -105,8 +104,7 @@ namespace osu.Game.Overlays
                                     Anchor = Anchor.TopCentre,
                                     Origin = Anchor.TopCentre,
                                     Margin = new MarginPadding { Bottom = 15 },
-                                    Font = @"Exo2.0-Bold",
-                                    TextSize = 12,
+                                    Font = OsuFont.GetFont(size: 12, weight: FontWeight.Bold),
                                     Alpha = 0.3f,
                                 },
                             }
@@ -191,6 +189,7 @@ namespace osu.Game.Overlays
                         optionCount = 1;
                         if (val) selectedOption = 0;
                         break;
+
                     case Enum _:
                         var values = Enum.GetValues(description.RawValue.GetType());
                         optionCount = values.Length;

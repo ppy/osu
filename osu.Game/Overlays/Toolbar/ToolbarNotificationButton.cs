@@ -2,10 +2,11 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
-using osu.Framework.Configuration;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Graphics.Sprites;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osuTK;
@@ -23,7 +24,7 @@ namespace osu.Game.Overlays.Toolbar
 
         public ToolbarNotificationButton()
         {
-            Icon = FontAwesome.fa_bars;
+            Icon = FontAwesome.Solid.Bars;
             TooltipMain = "Notifications";
             TooltipSub = "Waiting for 'ya";
 
@@ -47,11 +48,11 @@ namespace osu.Game.Overlays.Toolbar
 
             NotificationCount.ValueChanged += count =>
             {
-                if (count == 0)
+                if (count.NewValue == 0)
                     countDisplay.FadeOut(200, Easing.OutQuint);
                 else
                 {
-                    countDisplay.Count = count;
+                    countDisplay.Count = count.NewValue;
                     countDisplay.FadeIn(200, Easing.OutQuint);
                 }
             };
@@ -66,7 +67,7 @@ namespace osu.Game.Overlays.Toolbar
 
             public int Count
             {
-                get { return count; }
+                get => count;
                 set
                 {
                     if (count == value)
@@ -99,11 +100,10 @@ namespace osu.Game.Overlays.Toolbar
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
                         Y = -1,
-                        TextSize = 14,
+                        Font = OsuFont.GetFont(size: 14, weight: FontWeight.Bold),
                         Padding = new MarginPadding(5),
                         Colour = Color4.White,
                         UseFullGlyphHeight = true,
-                        Font = "Exo2.0-Bold",
                     }
                 };
             }

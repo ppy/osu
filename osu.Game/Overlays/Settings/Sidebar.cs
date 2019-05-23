@@ -88,7 +88,7 @@ namespace osu.Game.Overlays.Settings
 
         public ExpandedState State
         {
-            get { return state; }
+            get => state;
             set
             {
                 expandEvent?.Cancel();
@@ -102,6 +102,7 @@ namespace osu.Game.Overlays.Settings
                     default:
                         this.ResizeTo(new Vector2(DEFAULT_WIDTH, Height), 500, Easing.OutQuint);
                         break;
+
                     case ExpandedState.Expanded:
                         this.ResizeTo(new Vector2(EXPANDED_WIDTH, Height), 500, Easing.OutQuint);
                         break;

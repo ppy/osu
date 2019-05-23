@@ -17,18 +17,15 @@ namespace osu.Game.Overlays.Notifications
     {
         public string Text
         {
-            set
-            {
-                Schedule(() => textDrawable.Text = value);
-            }
+            set => Schedule(() => textDrawable.Text = value);
         }
 
         public string CompletionText { get; set; } = "Task has completed!";
 
         public float Progress
         {
-            get { return progressBar.Progress; }
-            set { Schedule(() => progressBar.Progress = value); }
+            get => progressBar.Progress;
+            set => Schedule(() => progressBar.Progress = value);
         }
 
         protected override void LoadComplete()
@@ -41,9 +38,8 @@ namespace osu.Game.Overlays.Notifications
 
         public virtual ProgressNotificationState State
         {
-            get { return state; }
-            set
-            {
+            get => state;
+            set =>
                 Schedule(() =>
                 {
                     bool stateChanged = state != value;
@@ -58,11 +54,13 @@ namespace osu.Game.Overlays.Notifications
                                 Light.Pulsate = false;
                                 progressBar.Active = false;
                                 break;
+
                             case ProgressNotificationState.Active:
                                 Light.Colour = colourActive;
                                 Light.Pulsate = true;
                                 progressBar.Active = true;
                                 break;
+
                             case ProgressNotificationState.Cancelled:
                                 Light.Colour = colourCancelled;
                                 Light.Pulsate = false;
@@ -82,7 +80,6 @@ namespace osu.Game.Overlays.Notifications
                         }
                     }
                 });
-            }
         }
 
         private ProgressNotificationState state;
@@ -115,10 +112,7 @@ namespace osu.Game.Overlays.Notifications
                 RelativeSizeAxes = Axes.Both,
             });
 
-            Content.Add(textDrawable = new OsuTextFlowContainer(t =>
-            {
-                t.TextSize = 16;
-            })
+            Content.Add(textDrawable = new OsuTextFlowContainer
             {
                 Colour = OsuColour.Gray(128),
                 AutoSizeAxes = Axes.Y,
@@ -153,6 +147,7 @@ namespace osu.Game.Overlays.Notifications
                 case ProgressNotificationState.Cancelled:
                     base.Close();
                     break;
+
                 case ProgressNotificationState.Active:
                 case ProgressNotificationState.Queued:
                     if (CancelRequested?.Invoke() != false)
@@ -181,9 +176,10 @@ namespace osu.Game.Overlays.Notifications
             private Color4 colourInactive;
 
             private float progress;
+
             public float Progress
             {
-                get { return progress; }
+                get => progress;
                 set
                 {
                     if (progress == value) return;
@@ -197,7 +193,7 @@ namespace osu.Game.Overlays.Notifications
 
             public bool Active
             {
-                get { return active; }
+                get => active;
                 set
                 {
                     active = value;

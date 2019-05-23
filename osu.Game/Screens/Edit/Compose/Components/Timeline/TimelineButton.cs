@@ -2,9 +2,10 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using osu.Framework.Configuration;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Sprites;
 using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
 using osuTK;
@@ -17,10 +18,10 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
         public Action Action;
         public readonly BindableBool Enabled = new BindableBool(true);
 
-        public FontAwesome Icon
+        public IconUsage Icon
         {
-            get { return button.Icon; }
-            set { button.Icon = value; }
+            get => button.Icon;
+            set => button.Icon = value;
         }
 
         private readonly IconButton button;

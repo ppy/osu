@@ -1,40 +1,93 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using osuTK;
+using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Shapes;
+using osu.Game.Beatmaps;
+using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
+using osuTK;
 using System.Collections.Generic;
 using System.Linq;
-using osu.Framework.Allocation;
-using osu.Game.Beatmaps;
-using osu.Game.Online.API;
-using osu.Game.Online.API.Requests.Responses;
+using osu.Game.Scoring;
 
 namespace osu.Game.Overlays.BeatmapSet.Scores
 {
-    public class ScoresContainer : Container
+    public class ScoresContainer : CompositeDrawable
     {
         private const int spacing = 15;
         private const int fade_duration = 200;
 
-        private readonly FillFlowContainer flow;
+        private readonly Box background;
+        private readonly ScoreTable scoreTable;
+
         private readonly DrawableTopScore topScore;
         private readonly LoadingAnimation loadingAnimation;
+
+        [Resolved]
+        private IAPIProvider api { get; set; }
+
+        public ScoresContainer()
+        {
+            RelativeSizeAxes = Axes.X;
+            AutoSizeAxes = Axes.Y;
+
+            InternalChildren = new Drawable[]
+            {
+                background = new Box
+                {
+                    RelativeSizeAxes = Axes.Both,
+                },
+                new FillFlowContainer
+                {
+                    Anchor = Anchor.TopCentre,
+                    Origin = Anchor.TopCentre,
+                    RelativeSizeAxes = Axes.X,
+                    AutoSizeAxes = Axes.Y,
+                    Width = 0.95f,
+                    Direction = FillDirection.Vertical,
+                    Spacing = new Vector2(0, spacing),
+                    Margin = new MarginPadding { Vertical = spacing },
+                    Children = new Drawable[]
+                    {
+                        topScore = new DrawableTopScore(),
+                        scoreTable = new ScoreTable
+                        {
+                            Anchor = Anchor.TopCentre,
+                            Origin = Anchor.TopCentre,
+                        }
+                    }
+                },
+                loadingAnimation = new LoadingAnimation
+                {
+                    Alpha = 0,
+                    Margin = new MarginPadding(20)
+                },
+            };
+        }
+
+        [BackgroundDependencyLoader]
+        private void load(OsuColour colours)
+        {
+            background.Colour = colours.Gray2;
+            updateDisplay();
+        }
 
         private bool loading
         {
             set => loadingAnimation.FadeTo(value ? 1 : 0, fade_duration);
         }
 
-        private IEnumerable<APIScoreInfo> scores;
-        private BeatmapInfo beatmap;
+        private GetScoresRequest getScoresRequest;
+        private IReadOnlyList<ScoreInfo> scores;
 
-        public IEnumerable<APIScoreInfo> Scores
+        public IReadOnlyList<ScoreInfo> Scores
         {
-            get { return scores; }
+            get => scores;
             set
             {
                 getScoresRequest?.Cancel();
@@ -44,8 +97,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
             }
         }
 
-        private GetScoresRequest getScoresRequest;
-        private APIAccess api;
+        private BeatmapInfo beatmap;
 
         public BeatmapInfo Beatmap
         {
@@ -71,68 +123,15 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
         {
             loading = false;
 
-            var scoreCount = scores?.Count() ?? 0;
+            scoreTable.Scores = scores?.Count > 1 ? scores : new List<ScoreInfo>();
 
-            if (scoreCount == 0)
+            if (scores?.Any() == true)
             {
-                topScore.Hide();
-                flow.Clear();
-                return;
+                topScore.Score = scores.FirstOrDefault();
+                topScore.Show();
             }
-
-            topScore.Score = scores.FirstOrDefault();
-            topScore.Show();
-
-            flow.Clear();
-
-            if (scoreCount < 2)
-                return;
-
-            for (int i = 1; i < scoreCount; i++)
-                flow.Add(new DrawableScore(i, scores.ElementAt(i)));
-        }
-
-        public ScoresContainer()
-        {
-            RelativeSizeAxes = Axes.X;
-            AutoSizeAxes = Axes.Y;
-            Children = new Drawable[]
-            {
-                new FillFlowContainer
-                {
-                    Anchor = Anchor.TopCentre,
-                    Origin = Anchor.TopCentre,
-                    RelativeSizeAxes = Axes.X,
-                    AutoSizeAxes = Axes.Y,
-                    Width = 0.95f,
-                    Direction = FillDirection.Vertical,
-                    Spacing = new Vector2(0, spacing),
-                    Margin = new MarginPadding { Vertical = spacing },
-                    Children = new Drawable[]
-                    {
-                        topScore = new DrawableTopScore(),
-                        flow = new FillFlowContainer
-                        {
-                            RelativeSizeAxes = Axes.X,
-                            AutoSizeAxes = Axes.Y,
-                            Direction = FillDirection.Vertical,
-                            Spacing = new Vector2(0, 1),
-                        },
-                    }
-                },
-                loadingAnimation = new LoadingAnimation
-                {
-                    Alpha = 0,
-                    Margin = new MarginPadding(20)
-                },
-            };
-        }
-
-        [BackgroundDependencyLoader]
-        private void load(APIAccess api)
-        {
-            this.api = api;
-            updateDisplay();
+            else
+                topScore.Hide();
         }
 
         protected override void Dispose(bool isDisposing)

@@ -5,6 +5,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Events;
 using osu.Game.Graphics.Containers;
@@ -73,7 +74,7 @@ namespace osu.Game.Graphics.UserInterface
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
-            Enabled.BindValueChanged(enabled => this.FadeColour(enabled ? Color4.White : colours.Gray9, 200, Easing.OutQuint), true);
+            Enabled.BindValueChanged(enabled => this.FadeColour(enabled.NewValue ? Color4.White : colours.Gray9, 200, Easing.OutQuint), true);
         }
 
         protected override bool OnHover(HoverEvent e)

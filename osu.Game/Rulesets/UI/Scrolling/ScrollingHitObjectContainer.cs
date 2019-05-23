@@ -2,8 +2,8 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Caching;
-using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Objects.Types;
@@ -72,6 +72,7 @@ namespace osu.Game.Rulesets.UI.Scrolling
                     case ScrollingDirection.Down:
                         scrollLength = DrawSize.Y;
                         break;
+
                     default:
                         scrollLength = DrawSize.X;
                         break;
@@ -97,6 +98,7 @@ namespace osu.Game.Rulesets.UI.Scrolling
                     case ScrollingDirection.Down:
                         hitObject.Height = scrollingInfo.Algorithm.GetLength(hitObject.HitObject.StartTime, endTime.EndTime, timeRange.Value, scrollLength);
                         break;
+
                     case ScrollingDirection.Left:
                     case ScrollingDirection.Right:
                         hitObject.Width = scrollingInfo.Algorithm.GetLength(hitObject.HitObject.StartTime, endTime.EndTime, timeRange.Value, scrollLength);
@@ -129,12 +131,15 @@ namespace osu.Game.Rulesets.UI.Scrolling
                 case ScrollingDirection.Up:
                     hitObject.Y = scrollingInfo.Algorithm.PositionAt(hitObject.HitObject.StartTime, currentTime, timeRange.Value, scrollLength);
                     break;
+
                 case ScrollingDirection.Down:
                     hitObject.Y = -scrollingInfo.Algorithm.PositionAt(hitObject.HitObject.StartTime, currentTime, timeRange.Value, scrollLength);
                     break;
+
                 case ScrollingDirection.Left:
                     hitObject.X = scrollingInfo.Algorithm.PositionAt(hitObject.HitObject.StartTime, currentTime, timeRange.Value, scrollLength);
                     break;
+
                 case ScrollingDirection.Right:
                     hitObject.X = -scrollingInfo.Algorithm.PositionAt(hitObject.HitObject.StartTime, currentTime, timeRange.Value, scrollLength);
                     break;

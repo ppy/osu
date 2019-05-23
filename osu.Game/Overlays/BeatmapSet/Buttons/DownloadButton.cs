@@ -2,10 +2,11 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
-using osu.Framework.Configuration;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
+using osu.Framework.Graphics.Sprites;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
@@ -22,7 +23,7 @@ namespace osu.Game.Overlays.BeatmapSet.Buttons
     {
         private readonly bool noVideo;
 
-        public string TooltipText => button.Enabled ? "Download this beatmap" : "Login to download";
+        public string TooltipText => button.Enabled.Value ? "Download this beatmap" : "Login to download";
 
         private readonly IBindable<User> localUser = new Bindable<User>();
 
@@ -39,7 +40,7 @@ namespace osu.Game.Overlays.BeatmapSet.Buttons
         }
 
         [BackgroundDependencyLoader]
-        private void load(APIAccess api, BeatmapManager beatmaps)
+        private void load(IAPIProvider api, BeatmapManager beatmaps)
         {
             FillFlowContainer textSprites;
 
@@ -77,13 +78,13 @@ namespace osu.Game.Overlays.BeatmapSet.Buttons
                                     Depth = -1,
                                     Anchor = Anchor.CentreRight,
                                     Origin = Anchor.CentreRight,
-                                    Icon = FontAwesome.fa_download,
+                                    Icon = FontAwesome.Solid.Download,
                                     Size = new Vector2(16),
                                     Margin = new MarginPadding { Right = 5 },
                                 },
                             }
                         },
-                        new DownloadProgressBar(BeatmapSet)
+                        new DownloadProgressBar(BeatmapSet.Value)
                         {
                             Depth = -2,
                             Anchor = Anchor.BottomLeft,
@@ -101,7 +102,7 @@ namespace osu.Game.Overlays.BeatmapSet.Buttons
                     return;
                 }
 
-                beatmaps.Download(BeatmapSet, noVideo);
+                beatmaps.Download(BeatmapSet.Value, noVideo);
             };
 
             localUser.BindTo(api.LocalUser);
@@ -110,7 +111,7 @@ namespace osu.Game.Overlays.BeatmapSet.Buttons
 
             State.BindValueChanged(state =>
             {
-                switch (state)
+                switch (state.NewValue)
                 {
                     case DownloadState.Downloading:
                         textSprites.Children = new Drawable[]
@@ -118,39 +119,38 @@ namespace osu.Game.Overlays.BeatmapSet.Buttons
                             new OsuSpriteText
                             {
                                 Text = "Downloading...",
-                                TextSize = 13,
-                                Font = @"Exo2.0-Bold",
+                                Font = OsuFont.GetFont(size: 13, weight: FontWeight.Bold)
                             },
                         };
                         break;
+
                     case DownloadState.Downloaded:
                         textSprites.Children = new Drawable[]
                         {
                             new OsuSpriteText
                             {
                                 Text = "Importing...",
-                                TextSize = 13,
-                                Font = @"Exo2.0-Bold",
+                                Font = OsuFont.GetFont(size: 13, weight: FontWeight.Bold)
                             },
                         };
                         break;
+
                     case DownloadState.LocallyAvailable:
                         this.FadeOut(200);
                         break;
+
                     case DownloadState.NotDownloaded:
                         textSprites.Children = new Drawable[]
                         {
                             new OsuSpriteText
                             {
                                 Text = "Download",
-                                TextSize = 13,
-                                Font = @"Exo2.0-Bold",
+                                Font = OsuFont.GetFont(size: 13, weight: FontWeight.Bold)
                             },
                             new OsuSpriteText
                             {
                                 Text = BeatmapSet.Value.OnlineInfo.HasVideo && noVideo ? "without Video" : string.Empty,
-                                TextSize = 11,
-                                Font = @"Exo2.0-Bold",
+                                Font = OsuFont.GetFont(size: 11, weight: FontWeight.Bold)
                             },
                         };
                         this.FadeIn(200);
@@ -159,8 +159,8 @@ namespace osu.Game.Overlays.BeatmapSet.Buttons
             }, true);
         }
 
-        private void userChanged(User user) => button.Enabled.Value = !(user is GuestUser);
+        private void userChanged(ValueChangedEvent<User> e) => button.Enabled.Value = !(e.NewValue is GuestUser);
 
-        private void enabledChanged(bool enabled) => this.FadeColour(enabled ? Color4.White : Color4.Gray, 200, Easing.OutQuint);
+        private void enabledChanged(ValueChangedEvent<bool> e) => this.FadeColour(e.NewValue ? Color4.White : Color4.Gray, 200, Easing.OutQuint);
     }
 }

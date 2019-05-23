@@ -192,6 +192,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
                     using (BeginAbsoluteSequence(HitObject.StartTime - preempt, true))
                         targetRing.ScaleTo(target_ring_scale, preempt * 4, Easing.OutQuint);
                     break;
+
                 case ArmedState.Miss:
                 case ArmedState.Hit:
                     this.FadeOut(out_transition_time, Easing.Out);
@@ -229,6 +230,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             // Ensure alternating centre and rim hits
             if (lastWasCentre == isCentre)
                 return false;
+
             lastWasCentre = isCentre;
 
             UpdateResult(true);

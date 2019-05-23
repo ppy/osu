@@ -1,21 +1,60 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Threading;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Textures;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics.Backgrounds;
+using osu.Game.Graphics.Containers;
 
 namespace osu.Game.Screens.Backgrounds
 {
-    public class BackgroundScreenBeatmap : BlurrableBackgroundScreen
+    public class BackgroundScreenBeatmap : BackgroundScreen
     {
+        protected Background Background;
+
         private WorkingBeatmap beatmap;
+
+        /// <summary>
+        /// Whether or not user dim settings should be applied to this Background.
+        /// </summary>
+        public readonly Bindable<bool> EnableUserDim = new Bindable<bool>();
+
+        public readonly Bindable<bool> StoryboardReplacesBackground = new Bindable<bool>();
+
+        /// <summary>
+        /// The amount of blur to be applied in addition to user-specified blur.
+        /// </summary>
+        public readonly Bindable<float> BlurAmount = new Bindable<float>();
+
+        private readonly UserDimContainer fadeContainer;
+
+        protected virtual UserDimContainer CreateFadeContainer() => new UserDimContainer { RelativeSizeAxes = Axes.Both };
+
+        public BackgroundScreenBeatmap(WorkingBeatmap beatmap = null)
+        {
+            Beatmap = beatmap;
+            InternalChild = fadeContainer = CreateFadeContainer();
+            fadeContainer.EnableUserDim.BindTo(EnableUserDim);
+            fadeContainer.BlurAmount.BindTo(BlurAmount);
+        }
+
+        [BackgroundDependencyLoader]
+        private void load()
+        {
+            var background = new BeatmapBackground(beatmap);
+            LoadComponent(background);
+            switchBackground(background);
+        }
+
+        private CancellationTokenSource cancellationSource;
 
         public WorkingBeatmap Beatmap
         {
-            get { return beatmap; }
+            get => beatmap;
             set
             {
                 if (beatmap == value && beatmap != null)
@@ -25,51 +64,52 @@ namespace osu.Game.Screens.Backgrounds
 
                 Schedule(() =>
                 {
-                    LoadComponentAsync(new BeatmapBackground(beatmap), b => Schedule(() =>
-                    {
-                        float newDepth = 0;
-                        if (Background != null)
-                        {
-                            newDepth = Background.Depth + 1;
-                            Background.FinishTransforms();
-                            Background.FadeOut(250);
-                            Background.Expire();
-                        }
+                    if ((Background as BeatmapBackground)?.Beatmap == beatmap)
+                        return;
 
-                        b.Depth = newDepth;
-                        AddInternal(Background = b);
-                        Background.BlurSigma = BlurTarget;
-                    }));
+                    cancellationSource?.Cancel();
+                    LoadComponentAsync(new BeatmapBackground(beatmap), switchBackground, (cancellationSource = new CancellationTokenSource()).Token);
                 });
             }
         }
 
-        public BackgroundScreenBeatmap(WorkingBeatmap beatmap = null)
+        private void switchBackground(BeatmapBackground b)
         {
-            Beatmap = beatmap;
+            float newDepth = 0;
+
+            if (Background != null)
+            {
+                newDepth = Background.Depth + 1;
+                Background.FinishTransforms();
+                Background.FadeOut(250);
+                Background.Expire();
+            }
+
+            b.Depth = newDepth;
+            fadeContainer.Background = Background = b;
+            StoryboardReplacesBackground.BindTo(fadeContainer.StoryboardReplacesBackground);
         }
 
         public override bool Equals(BackgroundScreen other)
         {
-            var otherBeatmapBackground = other as BackgroundScreenBeatmap;
-            if (otherBeatmapBackground == null) return false;
+            if (!(other is BackgroundScreenBeatmap otherBeatmapBackground)) return false;
 
             return base.Equals(other) && beatmap == otherBeatmapBackground.Beatmap;
         }
 
-        private class BeatmapBackground : Background
+        protected class BeatmapBackground : Background
         {
-            private readonly WorkingBeatmap beatmap;
+            public readonly WorkingBeatmap Beatmap;
 
             public BeatmapBackground(WorkingBeatmap beatmap)
             {
-                this.beatmap = beatmap;
+                Beatmap = beatmap;
             }
 
             [BackgroundDependencyLoader]
             private void load(TextureStore textures)
             {
-                Sprite.Texture = beatmap?.Background ?? textures.Get(@"Backgrounds/bg1");
+                Sprite.Texture = Beatmap?.Background ?? textures.Get(@"Backgrounds/bg1");
             }
         }
     }

@@ -17,10 +17,11 @@ namespace osu.Game.Overlays.Toolbar
 
         public OverlayContainer StateContainer
         {
-            get { return stateContainer; }
+            get => stateContainer;
             set
             {
                 stateContainer = value;
+
                 if (stateContainer != null)
                 {
                     Action = stateContainer.ToggleVisibility;
@@ -55,6 +56,7 @@ namespace osu.Game.Overlays.Toolbar
                 case Visibility.Hidden:
                     stateBackground.FadeOut(200);
                     break;
+
                 case Visibility.Visible:
                     stateBackground.FadeIn(200);
                     break;

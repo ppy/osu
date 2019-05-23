@@ -3,13 +3,14 @@
 
 using System.Linq;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Caching;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Effects;
 using osuTK;
 using osuTK.Input;
 using osuTK.Graphics;
-using osu.Framework.Configuration;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Events;
 using osu.Game.Rulesets;
@@ -71,6 +72,7 @@ namespace osu.Game.Overlays.Toolbar
         private void load(RulesetStore rulesets, Bindable<RulesetInfo> parentRuleset)
         {
             this.rulesets = rulesets;
+
             foreach (var r in rulesets.AvailableRulesets)
             {
                 modeButtons.Add(new ToolbarRulesetButton
@@ -115,11 +117,11 @@ namespace osu.Game.Overlays.Toolbar
             Size = new Vector2(modeButtons.DrawSize.X, 1);
         }
 
-        private void rulesetChanged(RulesetInfo ruleset)
+        private void rulesetChanged(ValueChangedEvent<RulesetInfo> e)
         {
             foreach (ToolbarRulesetButton m in modeButtons.Children.Cast<ToolbarRulesetButton>())
             {
-                bool isActive = m.Ruleset.ID == ruleset.ID;
+                bool isActive = m.Ruleset.ID == e.NewValue.ID;
                 m.Active = isActive;
                 if (isActive)
                     activeButton = m;

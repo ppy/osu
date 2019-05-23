@@ -1,17 +1,18 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
+using System.Collections.Generic;
 using osu.Framework.Allocation;
-using osu.Framework.Configuration;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input.Events;
-using osu.Framework.Timing;
-using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Notifications;
+using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.UI;
 using osu.Game.Screens.Play.HUD;
@@ -24,7 +25,7 @@ namespace osu.Game.Screens.Play
     {
         private const int duration = 100;
 
-        public readonly KeyCounterCollection KeyCounter;
+        public readonly KeyCounterDisplay KeyCounter;
         public readonly RollingCounter<int> ComboCounter;
         public readonly ScoreCounter ScoreCounter;
         public readonly RollingCounter<double> AccuracyCounter;
@@ -34,14 +35,24 @@ namespace osu.Game.Screens.Play
         public readonly HoldForMenuButton HoldToQuit;
         public readonly PlayerSettingsOverlay PlayerSettingsOverlay;
 
+        private readonly ScoreProcessor scoreProcessor;
+        private readonly DrawableRuleset drawableRuleset;
+        private readonly IReadOnlyList<Mod> mods;
+
         private Bindable<bool> showHud;
         private readonly Container visibilityContainer;
         private readonly BindableBool replayLoaded = new BindableBool();
 
         private static bool hasShownNotificationOnce;
 
-        public HUDOverlay(ScoreProcessor scoreProcessor, RulesetContainer rulesetContainer, WorkingBeatmap working, IClock offsetClock, IAdjustableClock adjustableClock)
+        public Action<double> RequestSeek;
+
+        public HUDOverlay(ScoreProcessor scoreProcessor, DrawableRuleset drawableRuleset, IReadOnlyList<Mod> mods)
         {
+            this.scoreProcessor = scoreProcessor;
+            this.drawableRuleset = drawableRuleset;
+            this.mods = mods;
+
             RelativeSizeAxes = Axes.Both;
 
             Children = new Drawable[]
@@ -81,33 +92,31 @@ namespace osu.Game.Screens.Play
                     Direction = FillDirection.Vertical,
                     Children = new Drawable[]
                     {
-                        KeyCounter = CreateKeyCounter(adjustableClock as IFrameBasedClock),
+                        KeyCounter = CreateKeyCounter(),
                         HoldToQuit = CreateHoldForMenuButton(),
                     }
                 }
             };
-
-            BindProcessor(scoreProcessor);
-            BindRulesetContainer(rulesetContainer);
-
-            Progress.Objects = rulesetContainer.Objects;
-            Progress.AudioClock = offsetClock;
-            Progress.AllowSeeking = rulesetContainer.HasReplayLoaded;
-            Progress.OnSeek = pos => adjustableClock.Seek(pos);
-
-            ModDisplay.Current.BindTo(working.Mods);
-
-            PlayerSettingsOverlay.PlaybackSettings.AdjustableClock = adjustableClock;
         }
 
         [BackgroundDependencyLoader(true)]
         private void load(OsuConfigManager config, NotificationOverlay notificationOverlay)
         {
+            BindProcessor(scoreProcessor);
+            BindDrawableRuleset(drawableRuleset);
+
+            Progress.Objects = drawableRuleset.Objects;
+            Progress.AllowSeeking = drawableRuleset.HasReplayLoaded.Value;
+            Progress.RequestSeek = time => RequestSeek(time);
+            Progress.ReferenceClock = drawableRuleset.FrameStableClock;
+
+            ModDisplay.Current.Value = mods;
+
             showHud = config.GetBindable<bool>(OsuSetting.ShowInterface);
-            showHud.ValueChanged += hudVisibility => visibilityContainer.FadeTo(hudVisibility ? 1 : 0, duration);
+            showHud.ValueChanged += visible => visibilityContainer.FadeTo(visible.NewValue ? 1 : 0, duration);
             showHud.TriggerChange();
 
-            if (!showHud && !hasShownNotificationOnce)
+            if (!showHud.Value && !hasShownNotificationOnce)
             {
                 hasShownNotificationOnce = true;
 
@@ -122,15 +131,14 @@ namespace osu.Game.Screens.Play
         {
             base.LoadComplete();
 
-            replayLoaded.ValueChanged += replayLoadedValueChanged;
-            replayLoaded.TriggerChange();
+            replayLoaded.BindValueChanged(replayLoadedValueChanged, true);
         }
 
-        private void replayLoadedValueChanged(bool loaded)
+        private void replayLoadedValueChanged(ValueChangedEvent<bool> e)
         {
-            PlayerSettingsOverlay.ReplayLoaded = loaded;
+            PlayerSettingsOverlay.ReplayLoaded = e.NewValue;
 
-            if (loaded)
+            if (e.NewValue)
             {
                 PlayerSettingsOverlay.Show();
                 ModDisplay.FadeIn(200);
@@ -144,13 +152,13 @@ namespace osu.Game.Screens.Play
             }
         }
 
-        protected virtual void BindRulesetContainer(RulesetContainer rulesetContainer)
+        protected virtual void BindDrawableRuleset(DrawableRuleset drawableRuleset)
         {
-            (rulesetContainer.KeyBindingInputManager as ICanAttachKeyCounter)?.Attach(KeyCounter);
+            (drawableRuleset as ICanAttachKeyCounter)?.Attach(KeyCounter);
 
-            replayLoaded.BindTo(rulesetContainer.HasReplayLoaded);
+            replayLoaded.BindTo(drawableRuleset.HasReplayLoaded);
 
-            Progress.BindRulestContainer(rulesetContainer);
+            Progress.BindDrawableRuleset(drawableRuleset);
         }
 
         protected override bool OnKeyDown(KeyDownEvent e)
@@ -202,13 +210,12 @@ namespace osu.Game.Screens.Play
             Margin = new MarginPadding { Top = 20 }
         };
 
-        protected virtual KeyCounterCollection CreateKeyCounter(IFrameBasedClock offsetClock) => new KeyCounterCollection
+        protected virtual KeyCounterDisplay CreateKeyCounter() => new KeyCounterDisplay
         {
             FadeTime = 50,
             Anchor = Anchor.BottomRight,
             Origin = Anchor.BottomRight,
             Margin = new MarginPadding(10),
-            AudioClock = offsetClock
         };
 
         protected virtual SongProgress CreateProgress() => new SongProgress
@@ -241,8 +248,7 @@ namespace osu.Game.Screens.Play
             ComboCounter?.Current.BindTo(processor.Combo);
             HealthDisplay?.Current.BindTo(processor.Health);
 
-            var shd = HealthDisplay as StandardHealthDisplay;
-            if (shd != null)
+            if (HealthDisplay is StandardHealthDisplay shd)
                 processor.NewJudgement += shd.Flash;
         }
     }

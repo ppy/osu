@@ -9,14 +9,17 @@ using osu.Game.Replays;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Taiko.Objects;
 using osu.Game.Rulesets.Replays;
+using osu.Game.Rulesets.Taiko.Beatmaps;
 
 namespace osu.Game.Rulesets.Taiko.Replays
 {
-    public class TaikoAutoGenerator : AutoGenerator<TaikoHitObject>
+    public class TaikoAutoGenerator : AutoGenerator
     {
+        public new TaikoBeatmap Beatmap => (TaikoBeatmap)base.Beatmap;
+
         private const double swell_hit_speed = 50;
 
-        public TaikoAutoGenerator(Beatmap<TaikoHitObject> beatmap)
+        public TaikoAutoGenerator(IBeatmap beatmap)
             : base(beatmap)
         {
             Replay = new Replay();
@@ -49,6 +52,7 @@ namespace osu.Game.Rulesets.Taiko.Replays
                     int count = 0;
                     int req = swell.RequiredHits;
                     double hitRate = Math.Min(swell_hit_speed, swell.Duration / req);
+
                     for (double j = h.StartTime; j < endTime; j += hitRate)
                     {
                         TaikoAction action;
@@ -59,12 +63,15 @@ namespace osu.Game.Rulesets.Taiko.Replays
                             case 0:
                                 action = TaikoAction.LeftCentre;
                                 break;
+
                             case 1:
                                 action = TaikoAction.LeftRim;
                                 break;
+
                             case 2:
                                 action = TaikoAction.RightCentre;
                                 break;
+
                             case 3:
                                 action = TaikoAction.RightRim;
                                 break;

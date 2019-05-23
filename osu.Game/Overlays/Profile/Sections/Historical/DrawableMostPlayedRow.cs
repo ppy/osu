@@ -6,6 +6,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Drawables;
+using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osuTK;
@@ -16,7 +17,6 @@ namespace osu.Game.Overlays.Profile.Sections.Historical
     {
         private readonly BeatmapInfo beatmap;
         private readonly int playCount;
-        private OsuHoverContainer mapperContainer;
 
         public DrawableMostPlayedRow(BeatmapInfo beatmap, int playCount)
         {
@@ -33,37 +33,20 @@ namespace osu.Game.Overlays.Profile.Sections.Historical
             CoverType = BeatmapSetCoverType.List,
         };
 
-        [BackgroundDependencyLoader(true)]
-        private void load(UserProfileOverlay profileOverlay)
+        [BackgroundDependencyLoader]
+        private void load()
         {
             LeftFlowContainer.Add(new BeatmapMetadataContainer(beatmap));
-            LeftFlowContainer.Add(new FillFlowContainer
+            LeftFlowContainer.Add(new LinkFlowContainer(t => t.Font = OsuFont.GetFont(size: 12))
             {
                 RelativeSizeAxes = Axes.X,
                 AutoSizeAxes = Axes.Y,
                 Direction = FillDirection.Horizontal,
-                Children = new Drawable[]
-                {
-                    new OsuSpriteText
-                    {
-                        Text = @"mapped by ",
-                        TextSize = 12,
-                    },
-                    mapperContainer = new OsuHoverContainer
-                    {
-                        AutoSizeAxes = Axes.Both,
-                        Children = new Drawable[]
-                        {
-                            new OsuSpriteText
-                            {
-                                Text = beatmap.Metadata.AuthorString,
-                                TextSize = 12,
-                                Font = @"Exo2.0-MediumItalic"
-                            }
-                        }
-                    },
-                }
-            });
+            }.With(d =>
+            {
+                d.AddText("mapped by ");
+                d.AddUserLink(beatmap.Metadata.Author);
+            }));
 
             RightFlowContainer.Add(new FillFlowContainer
             {
@@ -78,22 +61,17 @@ namespace osu.Game.Overlays.Profile.Sections.Historical
                         Anchor = Anchor.BottomRight,
                         Origin = Anchor.BottomRight,
                         Text = playCount.ToString(),
-                        TextSize = 18,
-                        Font = @"Exo2.0-SemiBoldItalic"
+                        Font = OsuFont.GetFont(size: 18, weight: FontWeight.SemiBold, italics: true)
                     },
                     new OsuSpriteText
                     {
                         Anchor = Anchor.BottomRight,
                         Origin = Anchor.BottomRight,
                         Text = @"times played ",
-                        TextSize = 12,
-                        Font = @"Exo2.0-RegularItalic"
+                        Font = OsuFont.GetFont(size: 12, weight: FontWeight.Regular, italics: true)
                     },
                 }
             });
-
-            if (profileOverlay != null)
-                mapperContainer.Action = () => profileOverlay.ShowUser(beatmap.BeatmapSet.Metadata.Author);
         }
     }
 }

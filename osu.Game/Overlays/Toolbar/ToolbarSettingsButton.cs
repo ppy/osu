@@ -2,7 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
-using osu.Game.Graphics;
+using osu.Framework.Graphics.Sprites;
 
 namespace osu.Game.Overlays.Toolbar
 {
@@ -10,13 +10,13 @@ namespace osu.Game.Overlays.Toolbar
     {
         public ToolbarSettingsButton()
         {
-            Icon = FontAwesome.fa_gear;
+            Icon = FontAwesome.Solid.Cog;
             TooltipMain = "Settings";
             TooltipSub = "Change your settings";
         }
 
         [BackgroundDependencyLoader(true)]
-        private void load(MainSettings settings)
+        private void load(SettingsOverlay settings)
         {
             StateContainer = settings;
         }

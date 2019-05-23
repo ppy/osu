@@ -4,7 +4,7 @@
 using System;
 using System.Linq;
 using osu.Framework.Allocation;
-using osu.Framework.Configuration;
+using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
@@ -94,13 +94,13 @@ namespace osu.Game.Screens.Edit.Compose.Components
                                                 {
                                                     new DivisorButton
                                                     {
-                                                        Icon = FontAwesome.fa_chevron_left,
+                                                        Icon = FontAwesome.Solid.ChevronLeft,
                                                         Action = beatDivisor.Previous
                                                     },
                                                     new DivisorText(beatDivisor),
                                                     new DivisorButton
                                                     {
-                                                        Icon = FontAwesome.fa_chevron_right,
+                                                        Icon = FontAwesome.Solid.ChevronRight,
                                                         Action = beatDivisor.Next
                                                     }
                                                 },
@@ -118,7 +118,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
                         },
                         new Drawable[]
                         {
-                            new TextFlowContainer(s => s.TextSize = 14)
+                            new TextFlowContainer(s => s.Font = s.Font.With(size: 14))
                             {
                                 Padding = new MarginPadding { Horizontal = 15 },
                                 Text = "beat snap divisor",
@@ -157,12 +157,8 @@ namespace osu.Game.Screens.Edit.Compose.Components
             protected override void LoadComplete()
             {
                 base.LoadComplete();
-
-                beatDivisor.ValueChanged += v => updateText();
-                updateText();
+                beatDivisor.BindValueChanged(val => Text = $"1/{val.NewValue}", true);
             }
-
-            private void updateText() => Text = $"1/{beatDivisor.Value}";
         }
 
         private class DivisorButton : IconButton
@@ -219,9 +215,9 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
                 AddInternal(marker = new Marker());
 
-                CurrentNumber.ValueChanged += v =>
+                CurrentNumber.ValueChanged += div =>
                 {
-                    marker.MoveToX(getMappedPosition(v), 100, Easing.OutQuint);
+                    marker.MoveToX(getMappedPosition(div.NewValue), 100, Easing.OutQuint);
                     marker.Flash();
                 };
             }
@@ -238,12 +234,14 @@ namespace osu.Game.Screens.Edit.Compose.Components
                 {
                     case Key.Right:
                         beatDivisor.Next();
-                        OnUserChange(Current);
+                        OnUserChange(Current.Value);
                         return true;
+
                     case Key.Left:
                         beatDivisor.Previous();
-                        OnUserChange(Current);
+                        OnUserChange(Current.Value);
                         return true;
+
                     default:
                         return false;
                 }
@@ -279,7 +277,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
                 var xPosition = (ToLocalSpace(screenSpaceMousePosition).X - RangePadding) / UsableWidth;
 
                 CurrentNumber.Value = availableDivisors.OrderBy(d => Math.Abs(getMappedPosition(d) - xPosition)).First();
-                OnUserChange(Current);
+                OnUserChange(Current.Value);
             }
 
             private float getMappedPosition(float divisor) => (float)Math.Pow((divisor - 1) / (availableDivisors.Last() - 1), 0.90f);
@@ -311,18 +309,25 @@ namespace osu.Game.Screens.Edit.Compose.Components
                     {
                         case 2:
                             return colours.BlueLight;
+
                         case 4:
                             return colours.Blue;
+
                         case 8:
                             return colours.BlueDarker;
+
                         case 16:
                             return colours.PurpleDark;
+
                         case 3:
                             return colours.YellowLight;
+
                         case 6:
                             return colours.Yellow;
+
                         case 12:
                             return colours.YellowDarker;
+
                         default:
                             return Color4.White;
                     }

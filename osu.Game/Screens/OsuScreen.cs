@@ -1,11 +1,12 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore.Internal;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
-using osu.Framework.Configuration;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Screens;
@@ -14,6 +15,7 @@ using osu.Game.Input.Bindings;
 using osu.Game.Rulesets;
 using osu.Game.Screens.Menu;
 using osu.Game.Overlays;
+using osu.Game.Rulesets.Mods;
 
 namespace osu.Game.Screens
 {
@@ -50,15 +52,33 @@ namespace osu.Game.Screens
 
         protected new OsuGameBase Game => base.Game as OsuGameBase;
 
-        public virtual bool AllowBeatmapRulesetChange => true;
+        /// <summary>
+        /// Whether to disallow changes to game-wise Beatmap/Ruleset bindables for this screen (and all children).
+        /// </summary>
+        public virtual bool DisallowExternalBeatmapRulesetChanges => false;
 
-        protected readonly Bindable<WorkingBeatmap> Beatmap = new Bindable<WorkingBeatmap>();
+        private SampleChannel sampleExit;
+
+        protected virtual bool PlayResumeSound => true;
 
         public virtual float BackgroundParallaxAmount => 1;
 
-        protected readonly Bindable<RulesetInfo> Ruleset = new Bindable<RulesetInfo>();
+        public Bindable<WorkingBeatmap> Beatmap { get; private set; }
 
-        private SampleChannel sampleExit;
+        public Bindable<RulesetInfo> Ruleset { get; private set; }
+
+        public Bindable<IReadOnlyList<Mod>> Mods { get; private set; }
+
+        protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
+        {
+            var screenDependencies = new OsuScreenDependencies(DisallowExternalBeatmapRulesetChanges, parent);
+
+            Beatmap = screenDependencies.Beatmap;
+            Ruleset = screenDependencies.Ruleset;
+            Mods = screenDependencies.Mods;
+
+            return base.CreateChildDependencies(screenDependencies);
+        }
 
         protected BackgroundScreen Background => backgroundStack?.CurrentScreen as BackgroundScreen;
 
@@ -77,11 +97,8 @@ namespace osu.Game.Screens
         }
 
         [BackgroundDependencyLoader(true)]
-        private void load(BindableBeatmap beatmap, OsuGame osu, AudioManager audio, Bindable<RulesetInfo> ruleset)
+        private void load(OsuGame osu, AudioManager audio)
         {
-            Beatmap.BindTo(beatmap);
-            Ruleset.BindTo(ruleset);
-
             sampleExit = audio.Sample.Get(@"UI/screen-back");
         }
 
@@ -102,7 +119,8 @@ namespace osu.Game.Screens
 
         public override void OnResuming(IScreen last)
         {
-            sampleExit?.Play();
+            if (PlayResumeSound)
+                sampleExit?.Play();
             applyArrivingDefaults(true);
 
             base.OnResuming(last);
@@ -134,7 +152,6 @@ namespace osu.Game.Screens
             if (localBackground != null && backgroundStack?.CurrentScreen == localBackground)
                 backgroundStack?.Exit();
 
-            Beatmap.UnbindAll();
             return false;
         }
 
@@ -165,7 +182,7 @@ namespace osu.Game.Screens
             logo.FadeOut(300, Easing.OutQuint);
             logo.Anchor = Anchor.TopLeft;
             logo.Origin = Anchor.Centre;
-            logo.RelativePositionAxes = Axes.None;
+            logo.RelativePositionAxes = Axes.Both;
             logo.BeatMatching = true;
             logo.Triangles = true;
             logo.Ripple = true;

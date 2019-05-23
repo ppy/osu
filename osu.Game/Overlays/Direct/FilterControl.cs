@@ -2,7 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
-using osu.Framework.Configuration;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics;
@@ -39,7 +39,7 @@ namespace osu.Game.Overlays.Direct
         {
             DisplayStyleControl.Dropdown.AccentColour = colours.BlueDark;
 
-            Ruleset.Value = ruleset ?? rulesets.GetRuleset(0);
+            Ruleset.Value = ruleset.Value ?? rulesets.GetRuleset(0);
             foreach (var r in rulesets.AvailableRulesets)
                 modeButtons.Add(new RulesetToggleButton(Ruleset, r));
         }
@@ -68,9 +68,9 @@ namespace osu.Game.Overlays.Direct
 
             private readonly ConstrainedIconContainer iconContainer;
 
-            private void Bindable_ValueChanged(RulesetInfo obj)
+            private void Bindable_ValueChanged(ValueChangedEvent<RulesetInfo> e)
             {
-                iconContainer.FadeTo(Ruleset.ID == obj?.ID ? 1f : 0.5f, 100);
+                iconContainer.FadeTo(Ruleset.ID == e.NewValue?.ID ? 1f : 0.5f, 100);
             }
 
             public override bool HandleNonPositionalInput => !bindable.Disabled && base.HandleNonPositionalInput;
@@ -93,7 +93,7 @@ namespace osu.Game.Overlays.Direct
 
                 Ruleset = ruleset;
                 bindable.ValueChanged += Bindable_ValueChanged;
-                Bindable_ValueChanged(bindable.Value);
+                Bindable_ValueChanged(new ValueChangedEvent<RulesetInfo>(bindable.Value, bindable.Value));
                 Action = () => bindable.Value = Ruleset;
             }
 
@@ -116,5 +116,6 @@ namespace osu.Game.Overlays.Direct
         Ranked,
         Rating,
         Plays,
+        Favourites,
     }
 }

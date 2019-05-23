@@ -11,6 +11,7 @@ using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics;
 using osu.Game.Screens.Edit.Components.Timelines.Summary;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Events;
 using osu.Framework.Platform;
@@ -21,6 +22,8 @@ using osu.Game.Screens.Edit.Components.Menus;
 using osu.Game.Screens.Edit.Compose;
 using osu.Game.Screens.Edit.Design;
 using osuTK.Input;
+using System.Collections.Generic;
+using osu.Framework;
 
 namespace osu.Game.Screens.Edit
 {
@@ -29,7 +32,8 @@ namespace osu.Game.Screens.Edit
         protected override BackgroundScreen CreateBackground() => new BackgroundScreenCustom(@"Backgrounds/bg4");
 
         public override bool HideOverlaysOnEnter => true;
-        public override bool AllowBeatmapRulesetChange => false;
+
+        public override bool DisallowExternalBeatmapRulesetChanges => true;
 
         private Box bottomBackground;
         private Container screenContainer;
@@ -51,7 +55,7 @@ namespace osu.Game.Screens.Edit
         {
             this.host = host;
 
-            // TODO: should probably be done at a RulesetContainer level to share logic with Player.
+            // TODO: should probably be done at a DrawableRuleset level to share logic with Player.
             var sourceClock = (IAdjustableClock)Beatmap.Value.Track ?? new StopwatchClock();
             clock = new EditorClock(Beatmap.Value, beatDivisor) { IsCoupled = false };
             clock.ChangeSource(sourceClock);
@@ -61,9 +65,16 @@ namespace osu.Game.Screens.Edit
             dependencies.Cache(beatDivisor);
 
             EditorMenuBar menuBar;
-            TimeInfoContainer timeInfo;
-            SummaryTimeline timeline;
-            PlaybackControl playback;
+
+            var fileMenuItems = new List<MenuItem>();
+
+            if (RuntimeInfo.IsDesktop)
+            {
+                fileMenuItems.Add(new EditorMenuItem("Export", MenuItemType.Standard, exportBeatmap));
+                fileMenuItems.Add(new EditorMenuItemSpacer());
+            }
+
+            fileMenuItems.Add(new EditorMenuItem("Exit", MenuItemType.Standard, this.Exit));
 
             InternalChildren = new[]
             {
@@ -92,12 +103,7 @@ namespace osu.Game.Screens.Edit
                         {
                             new MenuItem("File")
                             {
-                                Items = new[]
-                                {
-                                    new EditorMenuItem("Export", MenuItemType.Standard, exportBeatmap),
-                                    new EditorMenuItemSpacer(),
-                                    new EditorMenuItem("Exit", MenuItemType.Standard, this.Exit)
-                                }
+                                Items = fileMenuItems
                             }
                         }
                     }
@@ -165,6 +171,7 @@ namespace osu.Game.Screens.Edit
                 case Key.Left:
                     seek(e, -1);
                     return true;
+
                 case Key.Right:
                     seek(e, 1);
                     return true;
@@ -210,6 +217,7 @@ namespace osu.Game.Screens.Edit
         public override bool OnExiting(IScreen next)
         {
             Background.FadeColour(Color4.White, 500);
+
             if (Beatmap.Value.Track != null)
             {
                 Beatmap.Value.Track.Tempo.Value = 1;
@@ -221,18 +229,20 @@ namespace osu.Game.Screens.Edit
 
         private void exportBeatmap() => host.OpenFileExternally(Beatmap.Value.Save());
 
-        private void onModeChanged(EditorScreenMode mode)
+        private void onModeChanged(ValueChangedEvent<EditorScreenMode> e)
         {
             currentScreen?.Exit();
 
-            switch (mode)
+            switch (e.NewValue)
             {
                 case EditorScreenMode.Compose:
                     currentScreen = new ComposeScreen();
                     break;
+
                 case EditorScreenMode.Design:
                     currentScreen = new DesignScreen();
                     break;
+
                 default:
                     currentScreen = new EditorScreen();
                     break;

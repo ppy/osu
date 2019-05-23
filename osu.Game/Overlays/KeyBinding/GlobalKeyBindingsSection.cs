@@ -1,7 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using osu.Game.Graphics;
+using osu.Framework.Graphics.Sprites;
 using osu.Game.Input.Bindings;
 using osu.Game.Overlays.Settings;
 
@@ -9,7 +9,7 @@ namespace osu.Game.Overlays.KeyBinding
 {
     public class GlobalKeyBindingsSection : SettingsSection
     {
-        public override FontAwesome Icon => FontAwesome.fa_globe;
+        public override IconUsage Icon => FontAwesome.Solid.Globe;
         public override string Header => "Global";
 
         public GlobalKeyBindingsSection(GlobalActionContainer manager)
@@ -33,7 +33,8 @@ namespace osu.Game.Overlays.KeyBinding
         {
             protected override string Header => "In Game";
 
-            public InGameKeyBindingsSubsection(GlobalActionContainer manager) : base(null)
+            public InGameKeyBindingsSubsection(GlobalActionContainer manager)
+                : base(null)
             {
                 Defaults = manager.InGameKeyBindings;
             }

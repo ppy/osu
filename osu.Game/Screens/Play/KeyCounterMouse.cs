@@ -11,7 +11,8 @@ namespace osu.Game.Screens.Play
     {
         public MouseButton Button { get; }
 
-        public KeyCounterMouse(MouseButton button) : base(getStringRepresentation(button))
+        public KeyCounterMouse(MouseButton button)
+            : base(getStringRepresentation(button))
         {
             Button = button;
         }
@@ -24,8 +25,10 @@ namespace osu.Game.Screens.Play
             {
                 default:
                     return button.ToString();
+
                 case MouseButton.Left:
                     return @"M1";
+
                 case MouseButton.Right:
                     return @"M2";
             }

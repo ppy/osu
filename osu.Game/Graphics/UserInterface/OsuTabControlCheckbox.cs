@@ -24,14 +24,15 @@ namespace osu.Game.Graphics.UserInterface
         private readonly SpriteIcon icon;
 
         private Color4? accentColour;
+
         public Color4 AccentColour
         {
-            get { return accentColour.GetValueOrDefault(); }
+            get => accentColour.GetValueOrDefault();
             set
             {
                 accentColour = value;
 
-                if (Current)
+                if (Current.Value)
                 {
                     text.Colour = AccentColour;
                     icon.Colour = AccentColour;
@@ -41,8 +42,8 @@ namespace osu.Game.Graphics.UserInterface
 
         public string Text
         {
-            get { return text.Text; }
-            set { text.Text = value; }
+            get => text.Text;
+            set => text.Text = value;
         }
 
         private const float transition_length = 500;
@@ -67,7 +68,7 @@ namespace osu.Game.Graphics.UserInterface
 
         protected override void OnHoverLost(HoverLostEvent e)
         {
-            if (!Current)
+            if (!Current.Value)
                 fadeOut();
 
             base.OnHoverLost(e);
@@ -94,15 +95,11 @@ namespace osu.Game.Graphics.UserInterface
                     Direction = FillDirection.Horizontal,
                     Children = new Drawable[]
                     {
-                        text = new OsuSpriteText
-                        {
-                            TextSize = 14,
-                            Font = @"Exo2.0-Bold",
-                        },
+                        text = new OsuSpriteText { Font = OsuFont.GetFont(size: 14, weight: FontWeight.Bold) },
                         icon = new SpriteIcon
                         {
                             Size = new Vector2(14),
-                            Icon = FontAwesome.fa_circle_o,
+                            Icon = FontAwesome.Regular.Circle,
                             Shadow = true,
                         },
                     },
@@ -118,17 +115,17 @@ namespace osu.Game.Graphics.UserInterface
                 }
             };
 
-            Current.ValueChanged += v =>
+            Current.ValueChanged += selected =>
             {
-                if (v)
+                if (selected.NewValue)
                 {
                     fadeIn();
-                    icon.Icon = FontAwesome.fa_check_circle_o;
+                    icon.Icon = FontAwesome.Regular.CheckCircle;
                 }
                 else
                 {
                     fadeOut();
-                    icon.Icon = FontAwesome.fa_circle_o;
+                    icon.Icon = FontAwesome.Regular.Circle;
                 }
             };
         }

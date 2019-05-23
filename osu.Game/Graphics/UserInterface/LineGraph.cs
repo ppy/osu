@@ -9,6 +9,7 @@ using osuTK;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Lines;
+using osuTK.Graphics;
 
 namespace osu.Game.Graphics.UserInterface
 {
@@ -44,7 +45,7 @@ namespace osu.Game.Graphics.UserInterface
         /// </summary>
         public IEnumerable<float> Values
         {
-            get { return values; }
+            get => values;
             set
             {
                 values = value.ToArray();
@@ -63,13 +64,19 @@ namespace osu.Game.Graphics.UserInterface
             }
         }
 
+        public Color4 LineColour
+        {
+            get => maskingContainer.Colour;
+            set => maskingContainer.Colour = value;
+        }
+
         public LineGraph()
         {
             Add(maskingContainer = new Container<Path>
             {
                 Masking = true,
                 RelativeSizeAxes = Axes.Both,
-                Child = path = new SmoothPath { RelativeSizeAxes = Axes.Both, PathWidth = 1 }
+                Child = path = new SmoothPath { RelativeSizeAxes = Axes.Both, PathRadius = 1 }
             });
         }
 
@@ -86,6 +93,7 @@ namespace osu.Game.Graphics.UserInterface
         protected override void Update()
         {
             base.Update();
+
             if (!pathCached.IsValid)
             {
                 applyPath();
@@ -102,9 +110,10 @@ namespace osu.Game.Graphics.UserInterface
 
             for (int i = 0; i < values.Length; i++)
             {
-                float x = (i + count - values.Length) / (float)(count - 1) * DrawWidth - 1;
-                float y = GetYPosition(values[i]) * DrawHeight - 1;
-                // the -1 is for inner offset in path (actually -PathWidth)
+                // Make sure that we are accounting for path width when calculating vertex positions
+                // We need to apply 2x the path radius to account for it because the full diameter of the line accounts into height
+                float x = (i + count - values.Length) / (float)(count - 1) * (DrawWidth - 2 * path.PathRadius);
+                float y = GetYPosition(values[i]) * (DrawHeight - 2 * path.PathRadius);
                 path.AddVertex(new Vector2(x, y));
             }
         }
@@ -112,6 +121,7 @@ namespace osu.Game.Graphics.UserInterface
         protected float GetYPosition(float value)
         {
             if (ActualMaxValue == ActualMinValue) return 0;
+
             return (ActualMaxValue - value) / (ActualMaxValue - ActualMinValue);
         }
     }

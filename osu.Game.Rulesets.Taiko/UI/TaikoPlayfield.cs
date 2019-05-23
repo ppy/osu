@@ -6,6 +6,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Graphics;
@@ -24,7 +25,7 @@ namespace osu.Game.Rulesets.Taiko.UI
     public class TaikoPlayfield : ScrollingPlayfield
     {
         /// <summary>
-        /// Default height of a <see cref="TaikoPlayfield"/> when inside a <see cref="TaikoRulesetContainer"/>.
+        /// Default height of a <see cref="TaikoPlayfield"/> when inside a <see cref="DrawableTaikoRuleset"/>.
         /// </summary>
         public const float DEFAULT_HEIGHT = 178;
 
@@ -55,143 +56,137 @@ namespace osu.Game.Rulesets.Taiko.UI
 
         public TaikoPlayfield(ControlPointInfo controlPoints)
         {
-            InternalChild = new PlayfieldAdjustmentContainer
+            InternalChildren = new Drawable[]
             {
-                Anchor = Anchor.CentreLeft,
-                Origin = Anchor.CentreLeft,
-                RelativeSizeAxes = Axes.Both,
-                Children = new Drawable[]
+                backgroundContainer = new Container
                 {
-                    backgroundContainer = new Container
+                    Name = "Transparent playfield background",
+                    RelativeSizeAxes = Axes.Both,
+                    Masking = true,
+                    EdgeEffect = new EdgeEffectParameters
                     {
-                        Name = "Transparent playfield background",
-                        RelativeSizeAxes = Axes.Both,
-                        Masking = true,
-                        EdgeEffect = new EdgeEffectParameters
+                        Type = EdgeEffectType.Shadow,
+                        Colour = Color4.Black.Opacity(0.2f),
+                        Radius = 5,
+                    },
+                    Children = new Drawable[]
+                    {
+                        background = new Box
                         {
-                            Type = EdgeEffectType.Shadow,
-                            Colour = Color4.Black.Opacity(0.2f),
-                            Radius = 5,
+                            RelativeSizeAxes = Axes.Both,
+                            Alpha = 0.6f
                         },
-                        Children = new Drawable[]
-                        {
-                            background = new Box
-                            {
-                                RelativeSizeAxes = Axes.Both,
-                                Alpha = 0.6f
-                            },
-                        }
-                    },
-                    new Container
-                    {
-                        Name = "Right area",
-                        RelativeSizeAxes = Axes.Both,
-                        Padding = new MarginPadding { Left = left_area_size },
-                        Children = new Drawable[]
-                        {
-                            new Container
-                            {
-                                Name = "Masked elements before hit objects",
-                                RelativeSizeAxes = Axes.Both,
-                                Padding = new MarginPadding { Left = HIT_TARGET_OFFSET },
-                                Masking = true,
-                                Children = new Drawable[]
-                                {
-                                    hitExplosionContainer = new Container<HitExplosion>
-                                    {
-                                        RelativeSizeAxes = Axes.Both,
-                                        FillMode = FillMode.Fit,
-                                        Blending = BlendingMode.Additive,
-                                    },
-                                    HitTarget = new HitTarget
-                                    {
-                                        Anchor = Anchor.CentreLeft,
-                                        Origin = Anchor.Centre,
-                                        RelativeSizeAxes = Axes.Both,
-                                        FillMode = FillMode.Fit
-                                    }
-                                }
-                            },
-                            barlineContainer = new Container
-                            {
-                                RelativeSizeAxes = Axes.Both,
-                                Padding = new MarginPadding { Left = HIT_TARGET_OFFSET }
-                            },
-                            new Container
-                            {
-                                Name = "Hit objects",
-                                RelativeSizeAxes = Axes.Both,
-                                Padding = new MarginPadding { Left = HIT_TARGET_OFFSET },
-                                Masking = true,
-                                Child = HitObjectContainer
-                            },
-                            kiaiExplosionContainer = new Container<KiaiHitExplosion>
-                            {
-                                Name = "Kiai hit explosions",
-                                RelativeSizeAxes = Axes.Both,
-                                FillMode = FillMode.Fit,
-                                Margin = new MarginPadding { Left = HIT_TARGET_OFFSET },
-                                Blending = BlendingMode.Additive
-                            },
-                            judgementContainer = new JudgementContainer<DrawableTaikoJudgement>
-                            {
-                                Name = "Judgements",
-                                RelativeSizeAxes = Axes.Y,
-                                Margin = new MarginPadding { Left = HIT_TARGET_OFFSET },
-                                Blending = BlendingMode.Additive
-                            },
-                        }
-                    },
-                    overlayBackgroundContainer = new Container
-                    {
-                        Name = "Left overlay",
-                        RelativeSizeAxes = Axes.Y,
-                        Size = new Vector2(left_area_size, 1),
-                        Children = new Drawable[]
-                        {
-                            overlayBackground = new Box
-                            {
-                                RelativeSizeAxes = Axes.Both,
-                            },
-                            new InputDrum(controlPoints)
-                            {
-                                Anchor = Anchor.CentreRight,
-                                Origin = Anchor.CentreRight,
-                                Scale = new Vector2(0.9f),
-                                Margin = new MarginPadding { Right = 20 }
-                            },
-                            new Box
-                            {
-                                Anchor = Anchor.TopRight,
-                                RelativeSizeAxes = Axes.Y,
-                                Width = 10,
-                                Colour = Framework.Graphics.Colour.ColourInfo.GradientHorizontal(Color4.Black.Opacity(0.6f), Color4.Black.Opacity(0)),
-                            },
-                        }
-                    },
-                    new Container
-                    {
-                        Name = "Border",
-                        RelativeSizeAxes = Axes.Both,
-                        Masking = true,
-                        MaskingSmoothness = 0,
-                        BorderThickness = 2,
-                        AlwaysPresent = true,
-                        Children = new[]
-                        {
-                            new Box
-                            {
-                                RelativeSizeAxes = Axes.Both,
-                                Alpha = 0,
-                                AlwaysPresent = true
-                            }
-                        }
-                    },
-                    topLevelHitContainer = new Container
-                    {
-                        Name = "Top level hit objects",
-                        RelativeSizeAxes = Axes.Both,
                     }
+                },
+                new Container
+                {
+                    Name = "Right area",
+                    RelativeSizeAxes = Axes.Both,
+                    Padding = new MarginPadding { Left = left_area_size },
+                    Children = new Drawable[]
+                    {
+                        new Container
+                        {
+                            Name = "Masked elements before hit objects",
+                            RelativeSizeAxes = Axes.Both,
+                            Padding = new MarginPadding { Left = HIT_TARGET_OFFSET },
+                            Masking = true,
+                            Children = new Drawable[]
+                            {
+                                hitExplosionContainer = new Container<HitExplosion>
+                                {
+                                    RelativeSizeAxes = Axes.Both,
+                                    FillMode = FillMode.Fit,
+                                    Blending = BlendingMode.Additive,
+                                },
+                                HitTarget = new HitTarget
+                                {
+                                    Anchor = Anchor.CentreLeft,
+                                    Origin = Anchor.Centre,
+                                    RelativeSizeAxes = Axes.Both,
+                                    FillMode = FillMode.Fit
+                                }
+                            }
+                        },
+                        barlineContainer = new Container
+                        {
+                            RelativeSizeAxes = Axes.Both,
+                            Padding = new MarginPadding { Left = HIT_TARGET_OFFSET }
+                        },
+                        new Container
+                        {
+                            Name = "Hit objects",
+                            RelativeSizeAxes = Axes.Both,
+                            Padding = new MarginPadding { Left = HIT_TARGET_OFFSET },
+                            Masking = true,
+                            Child = HitObjectContainer
+                        },
+                        kiaiExplosionContainer = new Container<KiaiHitExplosion>
+                        {
+                            Name = "Kiai hit explosions",
+                            RelativeSizeAxes = Axes.Both,
+                            FillMode = FillMode.Fit,
+                            Margin = new MarginPadding { Left = HIT_TARGET_OFFSET },
+                            Blending = BlendingMode.Additive
+                        },
+                        judgementContainer = new JudgementContainer<DrawableTaikoJudgement>
+                        {
+                            Name = "Judgements",
+                            RelativeSizeAxes = Axes.Y,
+                            Margin = new MarginPadding { Left = HIT_TARGET_OFFSET },
+                            Blending = BlendingMode.Additive
+                        },
+                    }
+                },
+                overlayBackgroundContainer = new Container
+                {
+                    Name = "Left overlay",
+                    RelativeSizeAxes = Axes.Y,
+                    Size = new Vector2(left_area_size, 1),
+                    Children = new Drawable[]
+                    {
+                        overlayBackground = new Box
+                        {
+                            RelativeSizeAxes = Axes.Both,
+                        },
+                        new InputDrum(controlPoints)
+                        {
+                            Anchor = Anchor.CentreRight,
+                            Origin = Anchor.CentreRight,
+                            Scale = new Vector2(0.9f),
+                            Margin = new MarginPadding { Right = 20 }
+                        },
+                        new Box
+                        {
+                            Anchor = Anchor.TopRight,
+                            RelativeSizeAxes = Axes.Y,
+                            Width = 10,
+                            Colour = Framework.Graphics.Colour.ColourInfo.GradientHorizontal(Color4.Black.Opacity(0.6f), Color4.Black.Opacity(0)),
+                        },
+                    }
+                },
+                new Container
+                {
+                    Name = "Border",
+                    RelativeSizeAxes = Axes.Both,
+                    Masking = true,
+                    MaskingSmoothness = 0,
+                    BorderThickness = 2,
+                    AlwaysPresent = true,
+                    Children = new[]
+                    {
+                        new Box
+                        {
+                            RelativeSizeAxes = Axes.Both,
+                            Alpha = 0,
+                            AlwaysPresent = true
+                        }
+                    }
+                },
+                topLevelHitContainer = new Container
+                {
+                    Name = "Top level hit objects",
+                    RelativeSizeAxes = Axes.Both,
                 }
             };
         }
@@ -217,6 +212,7 @@ namespace osu.Game.Rulesets.Taiko.UI
                 case DrawableBarLine barline:
                     barlineContainer.Add(barline.CreateProxy());
                     break;
+
                 case DrawableTaikoHitObject taikoObject:
                     topLevelHitContainer.Add(taikoObject.CreateProxiedContent());
                     break;
@@ -225,7 +221,7 @@ namespace osu.Game.Rulesets.Taiko.UI
 
         internal void OnNewResult(DrawableHitObject judgedObject, JudgementResult result)
         {
-            if (!DisplayJudgements)
+            if (!DisplayJudgements.Value)
                 return;
 
             if (!judgedObject.DisplayResult)
@@ -237,6 +233,7 @@ namespace osu.Game.Rulesets.Taiko.UI
                     if (result.IsHit)
                         hitExplosionContainer.Children.FirstOrDefault(e => e.JudgedObject == ((DrawableStrongNestedHit)judgedObject).MainObject)?.VisualiseSecondHit();
                     break;
+
                 default:
                     judgementContainer.Add(new DrawableTaikoJudgement(result, judgedObject)
                     {

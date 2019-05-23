@@ -4,17 +4,19 @@
 using System;
 using System.Collections.Generic;
 using osu.Framework.Allocation;
-using osu.Framework.Configuration;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.OpenGL.Vertices;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.Shaders;
+using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
 using osu.Game.Beatmaps.Timing;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.UI;
+using osu.Game.Scoring;
 using osuTK;
 using osuTK.Graphics;
 
@@ -24,7 +26,7 @@ namespace osu.Game.Rulesets.Mods
     {
         public override string Name => "Flashlight";
         public override string Acronym => "FL";
-        public override FontAwesome Icon => FontAwesome.fa_osu_mod_flashlight;
+        public override IconUsage Icon => OsuIcon.ModFlashlight;
         public override ModType Type => ModType.DifficultyIncrease;
         public override string Description => "Restricted view area.";
         public override bool Ranked => true;
@@ -34,7 +36,7 @@ namespace osu.Game.Rulesets.Mods
         }
     }
 
-    public abstract class ModFlashlight<T> : ModFlashlight, IApplicableToRulesetContainer<T>, IApplicableToScoreProcessor
+    public abstract class ModFlashlight<T> : ModFlashlight, IApplicableToDrawableRuleset<T>, IApplicableToScoreProcessor
         where T : HitObject
     {
         public const double FLASHLIGHT_FADE_DURATION = 800;
@@ -45,15 +47,17 @@ namespace osu.Game.Rulesets.Mods
             Combo.BindTo(scoreProcessor.Combo);
         }
 
-        public virtual void ApplyToRulesetContainer(RulesetContainer<T> rulesetContainer)
+        public ScoreRank AdjustRank(ScoreRank rank, double accuracy) => rank;
+
+        public virtual void ApplyToDrawableRuleset(DrawableRuleset<T> drawableRuleset)
         {
             var flashlight = CreateFlashlight();
             flashlight.Combo = Combo;
             flashlight.RelativeSizeAxes = Axes.Both;
             flashlight.Colour = Color4.Black;
-            rulesetContainer.KeyBindingInputManager.Add(flashlight);
+            drawableRuleset.KeyBindingInputManager.Add(flashlight);
 
-            flashlight.Breaks = rulesetContainer.Beatmap.Breaks;
+            flashlight.Breaks = drawableRuleset.Beatmap.Breaks;
         }
 
         public abstract Flashlight CreateFlashlight();
@@ -61,25 +65,13 @@ namespace osu.Game.Rulesets.Mods
         public abstract class Flashlight : Drawable
         {
             internal BindableInt Combo;
-            private Shader shader;
+            private IShader shader;
 
-            protected override DrawNode CreateDrawNode() => new FlashlightDrawNode();
+            protected override DrawNode CreateDrawNode() => new FlashlightDrawNode(this);
 
             public override bool RemoveCompletedTransforms => false;
 
             public List<BreakPeriod> Breaks;
-
-            protected override void ApplyDrawNode(DrawNode node)
-            {
-                base.ApplyDrawNode(node);
-
-                var flashNode = (FlashlightDrawNode)node;
-
-                flashNode.Shader = shader;
-                flashNode.ScreenSpaceDrawQuad = ScreenSpaceDrawQuad;
-                flashNode.FlashlightPosition = Vector2Extensions.Transform(FlashlightPosition, DrawInfo.Matrix);
-                flashNode.FlashlightSize = Vector2Extensions.Transform(FlashlightSize, DrawInfo.Matrix);
-            }
 
             [BackgroundDependencyLoader]
             private void load(ShaderManager shaderManager)
@@ -93,22 +85,24 @@ namespace osu.Game.Rulesets.Mods
 
                 Combo.ValueChanged += OnComboChange;
 
-                this.FadeInFromZero(FLASHLIGHT_FADE_DURATION);
-
-                foreach (var breakPeriod in Breaks)
+                using (BeginAbsoluteSequence(0))
                 {
-                    if (breakPeriod.Duration < FLASHLIGHT_FADE_DURATION * 2) continue;
+                    foreach (var breakPeriod in Breaks)
+                    {
+                        if (breakPeriod.Duration < FLASHLIGHT_FADE_DURATION * 2) continue;
 
-                    this.Delay(breakPeriod.StartTime + FLASHLIGHT_FADE_DURATION).FadeOutFromOne(FLASHLIGHT_FADE_DURATION);
-                    this.Delay(breakPeriod.EndTime - FLASHLIGHT_FADE_DURATION).FadeInFromZero(FLASHLIGHT_FADE_DURATION);
+                        this.Delay(breakPeriod.StartTime + FLASHLIGHT_FADE_DURATION).FadeOutFromOne(FLASHLIGHT_FADE_DURATION);
+                        this.Delay(breakPeriod.EndTime - FLASHLIGHT_FADE_DURATION).FadeInFromZero(FLASHLIGHT_FADE_DURATION);
+                    }
                 }
             }
 
-            protected abstract void OnComboChange(int newCombo);
+            protected abstract void OnComboChange(ValueChangedEvent<int> e);
 
             protected abstract string FragmentShader { get; }
 
             private Vector2 flashlightPosition;
+
             protected Vector2 FlashlightPosition
             {
                 get => flashlightPosition;
@@ -122,6 +116,7 @@ namespace osu.Game.Rulesets.Mods
             }
 
             private Vector2 flashlightSize;
+
             protected Vector2 FlashlightSize
             {
                 get => flashlightSize;
@@ -133,27 +128,61 @@ namespace osu.Game.Rulesets.Mods
                     Invalidate(Invalidation.DrawNode);
                 }
             }
-        }
 
-        private class FlashlightDrawNode : DrawNode
-        {
-            public Shader Shader;
-            public Quad ScreenSpaceDrawQuad;
-            public Vector2 FlashlightPosition;
-            public Vector2 FlashlightSize;
+            private float flashlightDim;
 
-            public override void Draw(Action<TexturedVertex2D> vertexAction)
+            public float FlashlightDim
             {
-                base.Draw(vertexAction);
+                get => flashlightDim;
+                set
+                {
+                    if (flashlightDim == value) return;
 
-                Shader.Bind();
+                    flashlightDim = value;
+                    Invalidate(Invalidation.DrawNode);
+                }
+            }
 
-                Shader.GetUniform<Vector2>("flashlightPos").UpdateValue(ref FlashlightPosition);
-                Shader.GetUniform<Vector2>("flashlightSize").UpdateValue(ref FlashlightSize);
+            private class FlashlightDrawNode : DrawNode
+            {
+                protected new Flashlight Source => (Flashlight)base.Source;
 
-                Texture.WhitePixel.DrawQuad(ScreenSpaceDrawQuad, DrawColourInfo.Colour, vertexAction: vertexAction);
+                private IShader shader;
+                private Quad screenSpaceDrawQuad;
+                private Vector2 flashlightPosition;
+                private Vector2 flashlightSize;
+                private float flashlightDim;
 
-                Shader.Unbind();
+                public FlashlightDrawNode(Flashlight source)
+                    : base(source)
+                {
+                }
+
+                public override void ApplyState()
+                {
+                    base.ApplyState();
+
+                    shader = Source.shader;
+                    screenSpaceDrawQuad = Source.ScreenSpaceDrawQuad;
+                    flashlightPosition = Vector2Extensions.Transform(Source.FlashlightPosition, DrawInfo.Matrix);
+                    flashlightSize = Source.FlashlightSize * DrawInfo.Matrix.ExtractScale().Xy;
+                    flashlightDim = Source.FlashlightDim;
+                }
+
+                public override void Draw(Action<TexturedVertex2D> vertexAction)
+                {
+                    base.Draw(vertexAction);
+
+                    shader.Bind();
+
+                    shader.GetUniform<Vector2>("flashlightPos").UpdateValue(ref flashlightPosition);
+                    shader.GetUniform<Vector2>("flashlightSize").UpdateValue(ref flashlightSize);
+                    shader.GetUniform<float>("flashlightDim").UpdateValue(ref flashlightDim);
+
+                    Texture.WhitePixel.DrawQuad(screenSpaceDrawQuad, DrawColourInfo.Colour, vertexAction: vertexAction);
+
+                    shader.Unbind();
+                }
             }
         }
     }

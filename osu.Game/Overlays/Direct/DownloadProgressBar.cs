@@ -37,16 +37,18 @@ namespace osu.Game.Overlays.Direct
 
             State.BindValueChanged(state =>
             {
-                switch (state)
+                switch (state.NewValue)
                 {
                     case DownloadState.NotDownloaded:
                         progressBar.Current.Value = 0;
                         progressBar.FadeOut(500);
                         break;
+
                     case DownloadState.Downloading:
                         progressBar.FadeIn(400, Easing.OutQuint);
                         progressBar.ResizeHeightTo(4, 400, Easing.OutQuint);
                         break;
+
                     case DownloadState.Downloaded:
                         progressBar.FadeIn(400, Easing.OutQuint);
                         progressBar.ResizeHeightTo(4, 400, Easing.OutQuint);
@@ -54,6 +56,7 @@ namespace osu.Game.Overlays.Direct
                         progressBar.Current.Value = 1;
                         progressBar.FillColour = colours.Yellow;
                         break;
+
                     case DownloadState.LocallyAvailable:
                         progressBar.FadeOut(500);
                         break;

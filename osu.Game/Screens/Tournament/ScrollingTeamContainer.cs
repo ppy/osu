@@ -84,9 +84,10 @@ namespace osu.Game.Screens.Tournament
         }
 
         private ScrollState _scrollState;
+
         private ScrollState scrollState
         {
-            get { return _scrollState; }
+            get => _scrollState;
 
             set
             {
@@ -107,12 +108,14 @@ namespace osu.Game.Screens.Tournament
                         speedTo(1000f, 200);
                         tracker.FadeOut(100);
                         break;
+
                     case ScrollState.Stopping:
                         speedTo(0f, 2000);
                         tracker.FadeIn(200);
 
                         delayedStateChangeDelegate = Scheduler.AddDelayed(() => scrollState = ScrollState.Stopped, 2300);
                         break;
+
                     case ScrollState.Stopped:
                         // Find closest to center
                         if (!Children.Any())
@@ -154,6 +157,7 @@ namespace osu.Game.Screens.Tournament
 
                         delayedStateChangeDelegate = Scheduler.AddDelayed(() => scrollState = ScrollState.Idle, 10000);
                         break;
+
                     case ScrollState.Idle:
                         resetSelected();
 
@@ -326,9 +330,10 @@ namespace osu.Game.Screens.Tournament
             private readonly Box outline;
 
             private bool selected;
+
             public bool Selected
             {
-                get { return selected; }
+                get => selected;
 
                 set
                 {

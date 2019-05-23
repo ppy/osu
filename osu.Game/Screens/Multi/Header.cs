@@ -7,10 +7,8 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Screens;
 using osu.Game.Graphics;
-using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays.SearchableList;
-using osuTK;
 using osuTK.Graphics;
 
 namespace osu.Game.Screens.Multi
@@ -19,11 +17,11 @@ namespace osu.Game.Screens.Multi
     {
         public const float HEIGHT = 121;
 
-        private readonly OsuSpriteText screenType;
         private readonly HeaderBreadcrumbControl breadcrumbs;
 
         public Header(ScreenStack stack)
         {
+            MultiHeaderTitle title;
             RelativeSizeAxes = Axes.X;
             Height = HEIGHT;
 
@@ -40,40 +38,11 @@ namespace osu.Game.Screens.Multi
                     Padding = new MarginPadding { Horizontal = SearchableListOverlay.WIDTH_PADDING + OsuScreen.HORIZONTAL_OVERFLOW_PADDING },
                     Children = new Drawable[]
                     {
-                        new FillFlowContainer
+                        title = new MultiHeaderTitle
                         {
                             Anchor = Anchor.CentreLeft,
                             Origin = Anchor.BottomLeft,
-                            Position = new Vector2(-35f, 5f),
-                            AutoSizeAxes = Axes.Both,
-                            Direction = FillDirection.Horizontal,
-                            Spacing = new Vector2(10f, 0f),
-                            Children = new Drawable[]
-                            {
-                                new SpriteIcon
-                                {
-                                    Size = new Vector2(25),
-                                    Icon = FontAwesome.fa_osu_multi,
-                                },
-                                new FillFlowContainer
-                                {
-                                    AutoSizeAxes = Axes.Both,
-                                    Direction = FillDirection.Horizontal,
-                                    Children = new[]
-                                    {
-                                        new OsuSpriteText
-                                        {
-                                            Text = "multiplayer ",
-                                            TextSize = 25,
-                                        },
-                                        screenType = new OsuSpriteText
-                                        {
-                                            TextSize = 25,
-                                            Font = @"Exo2.0-Light",
-                                        },
-                                    },
-                                },
-                            },
+                            X = -ScreenTitle.ICON_WIDTH,
                         },
                         breadcrumbs = new HeaderBreadcrumbControl(stack)
                         {
@@ -85,10 +54,10 @@ namespace osu.Game.Screens.Multi
                 },
             };
 
-            breadcrumbs.Current.ValueChanged += s =>
+            breadcrumbs.Current.ValueChanged += screen =>
             {
-                if (s is IMultiplayerSubScreen mpScreen)
-                    screenType.Text = mpScreen.ShortTitle.ToLowerInvariant();
+                if (screen.NewValue is IMultiplayerSubScreen multiScreen)
+                    title.Screen = multiScreen;
             };
 
             breadcrumbs.Current.TriggerChange();
@@ -97,8 +66,23 @@ namespace osu.Game.Screens.Multi
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
-            screenType.Colour = colours.Yellow;
             breadcrumbs.StripColour = colours.Green;
+        }
+
+        private class MultiHeaderTitle : ScreenTitle
+        {
+            public IMultiplayerSubScreen Screen
+            {
+                set => Section = value.ShortTitle.ToLowerInvariant();
+            }
+
+            [BackgroundDependencyLoader]
+            private void load(OsuColour colours)
+            {
+                Title = "multi";
+                Icon = OsuIcon.Multi;
+                AccentColour = colours.Yellow;
+            }
         }
 
         private class HeaderBreadcrumbControl : ScreenBreadcrumbControl

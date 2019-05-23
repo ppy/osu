@@ -3,75 +3,30 @@
 
 using System.Linq;
 using osu.Framework.Allocation;
-using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.UserInterface;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
-using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Game.Overlays.Profile;
 using osu.Game.Overlays.Profile.Sections;
 using osu.Game.Users;
 using osuTK;
-using osuTK.Graphics;
 
 namespace osu.Game.Overlays
 {
-    public class UserProfileOverlay : WaveOverlayContainer
+    public class UserProfileOverlay : FullscreenOverlay
     {
         private ProfileSection lastSection;
         private ProfileSection[] sections;
         private GetUserRequest userReq;
-        private APIAccess api;
         protected ProfileHeader Header;
         private SectionsContainer<ProfileSection> sectionsContainer;
         private ProfileTabControl tabs;
 
-        public const float CONTENT_X_MARGIN = 50;
-
-        public UserProfileOverlay()
-        {
-            Waves.FirstWaveColour = OsuColour.Gray(0.4f);
-            Waves.SecondWaveColour = OsuColour.Gray(0.3f);
-            Waves.ThirdWaveColour = OsuColour.Gray(0.2f);
-            Waves.FourthWaveColour = OsuColour.Gray(0.1f);
-
-            RelativeSizeAxes = Axes.Both;
-            RelativePositionAxes = Axes.Both;
-            Width = 0.85f;
-            Anchor = Anchor.TopCentre;
-            Origin = Anchor.TopCentre;
-
-            Masking = true;
-            EdgeEffect = new EdgeEffectParameters
-            {
-                Colour = Color4.Black.Opacity(0),
-                Type = EdgeEffectType.Shadow,
-                Radius = 10
-            };
-        }
-
-        [BackgroundDependencyLoader]
-        private void load(APIAccess api)
-        {
-            this.api = api;
-        }
-
-        protected override void PopIn()
-        {
-            base.PopIn();
-            FadeEdgeEffectTo(0.5f, WaveContainer.APPEAR_DURATION, Easing.In);
-        }
-
-        protected override void PopOut()
-        {
-            base.PopOut();
-            FadeEdgeEffectTo(0, WaveContainer.DISAPPEAR_DURATION, Easing.Out);
-        }
+        public const float CONTENT_X_MARGIN = 70;
 
         public void ShowUser(long userId) => ShowUser(new User { Id = userId });
 
@@ -81,7 +36,7 @@ namespace osu.Game.Overlays
 
             Show();
 
-            if (user.Id == Header?.User?.Id)
+            if (user.Id == Header?.User.Value?.Id)
                 return;
 
             userReq?.Cancel();
@@ -113,12 +68,10 @@ namespace osu.Game.Overlays
                 Colour = OsuColour.Gray(0.2f)
             });
 
-            Header = new ProfileHeader(user);
-
             Add(sectionsContainer = new SectionsContainer<ProfileSection>
             {
                 RelativeSizeAxes = Axes.Both,
-                ExpandableHeader = Header,
+                ExpandableHeader = Header = new ProfileHeader(),
                 FixedHeader = tabs,
                 HeaderBackground = new Box
                 {
@@ -126,16 +79,16 @@ namespace osu.Game.Overlays
                     RelativeSizeAxes = Axes.Both
                 }
             });
-            sectionsContainer.SelectedSection.ValueChanged += s =>
+            sectionsContainer.SelectedSection.ValueChanged += section =>
             {
-                if (lastSection != s)
+                if (lastSection != section.NewValue)
                 {
-                    lastSection = s;
+                    lastSection = section.NewValue;
                     tabs.Current.Value = lastSection;
                 }
             };
 
-            tabs.Current.ValueChanged += s =>
+            tabs.Current.ValueChanged += section =>
             {
                 if (lastSection == null)
                 {
@@ -144,9 +97,10 @@ namespace osu.Game.Overlays
                         tabs.Current.Value = lastSection;
                     return;
                 }
-                if (lastSection != s)
+
+                if (lastSection != section.NewValue)
                 {
-                    lastSection = s;
+                    lastSection = section.NewValue;
                     sectionsContainer.ScrollTo(lastSection);
                 }
             };
@@ -155,7 +109,7 @@ namespace osu.Game.Overlays
             {
                 userReq = new GetUserRequest(user.Id);
                 userReq.Success += userLoadComplete;
-                api.Queue(userReq);
+                API.Queue(userReq);
             }
             else
             {
@@ -168,13 +122,14 @@ namespace osu.Game.Overlays
 
         private void userLoadComplete(User user)
         {
-            Header.User = user;
+            Header.User.Value = user;
 
             if (user.ProfileOrder != null)
             {
                 foreach (string id in user.ProfileOrder)
                 {
                     var sec = sections.FirstOrDefault(s => s.Identifier == id);
+
                     if (sec != null)
                     {
                         sec.User.Value = user;
@@ -212,7 +167,8 @@ namespace osu.Game.Overlays
 
             private class ProfileTabItem : PageTabItem
             {
-                public ProfileTabItem(ProfileSection value) : base(value)
+                public ProfileTabItem(ProfileSection value)
+                    : base(value)
                 {
                     Text.Text = value.Title;
                 }

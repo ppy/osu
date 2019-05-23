@@ -14,6 +14,7 @@ using osuTK.Graphics;
 using osu.Game.Graphics;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Graphics.Sprites;
 
 namespace osu.Game.Screens
 {
@@ -112,32 +113,32 @@ namespace osu.Game.Screens
                             {
                                 new SpriteIcon
                                 {
-                                    Icon = FontAwesome.fa_universal_access,
+                                    Icon = FontAwesome.Solid.UniversalAccess,
                                     Anchor = Anchor.TopCentre,
                                     Origin = Anchor.TopCentre,
                                     Size = new Vector2(50),
                                 },
                                 new OsuSpriteText
                                 {
+                                    Anchor = Anchor.TopCentre,
+                                    Origin = Anchor.TopCentre,
                                     Text = GetType().Name,
                                     Colour = getColourFor(GetType()).Lighten(0.8f),
-                                    Anchor = Anchor.TopCentre,
-                                    Origin = Anchor.TopCentre,
-                                    TextSize = 50,
+                                    Font = OsuFont.GetFont(size: 50),
                                 },
                                 new OsuSpriteText
                                 {
+                                    Anchor = Anchor.TopCentre,
+                                    Origin = Anchor.TopCentre,
                                     Text = "is not yet ready for use!",
-                                    TextSize = 20,
-                                    Anchor = Anchor.TopCentre,
-                                    Origin = Anchor.TopCentre,
+                                    Font = OsuFont.GetFont(size: 20),
                                 },
                                 new OsuSpriteText
                                 {
-                                    Text = "please check back a bit later.",
-                                    TextSize = 14,
                                     Anchor = Anchor.TopCentre,
                                     Origin = Anchor.TopCentre,
+                                    Text = "please check back a bit later.",
+                                    Font = OsuFont.GetFont(size: 14),
                                 },
                             }
                         },
@@ -169,10 +170,7 @@ namespace osu.Game.Screens
                         Text = $@"{t.Name}",
                         BackgroundColour = getColourFor(t),
                         HoverColour = getColourFor(t).Lighten(0.2f),
-                        Action = delegate
-                        {
-                           this.Push(Activator.CreateInstance(t) as Screen);
-                        }
+                        Action = delegate { this.Push(Activator.CreateInstance(t) as Screen); }
                     });
                 }
             }
@@ -191,7 +189,7 @@ namespace osu.Game.Screens
         {
             public ChildModeButton()
             {
-                Icon = FontAwesome.fa_osu_right_o;
+                Icon = OsuIcon.RightCircle;
                 Anchor = Anchor.BottomRight;
                 Origin = Anchor.BottomRight;
             }

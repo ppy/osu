@@ -25,15 +25,15 @@ namespace osu.Game.Rulesets.Catch.UI
 {
     public class CatcherArea : Container
     {
-        public const float CATCHER_SIZE = 100;
+        public const float CATCHER_SIZE = 106.75f;
 
         protected internal readonly Catcher MovableCatcher;
 
-        public Func<CatchHitObject, DrawableHitObject<CatchHitObject>> GetVisualRepresentation;
+        public Func<CatchHitObject, DrawableHitObject<CatchHitObject>> CreateDrawableRepresentation;
 
         public Container ExplodingFruitTarget
         {
-            set { MovableCatcher.ExplodingFruitTarget = value; }
+            set => MovableCatcher.ExplodingFruitTarget = value;
         }
 
         public CatcherArea(BeatmapDifficulty difficulty = null)
@@ -60,12 +60,12 @@ namespace osu.Game.Rulesets.Catch.UI
                 if (lastPlateableFruit.IsLoaded)
                     action();
                 else
-                    lastPlateableFruit.OnLoadComplete = _ => action();
+                    lastPlateableFruit.OnLoadComplete += _ => action();
             }
 
             if (result.IsHit && fruit.CanBePlated)
             {
-                var caughtFruit = (DrawableCatchHitObject)GetVisualRepresentation?.Invoke(fruit.HitObject);
+                var caughtFruit = (DrawableCatchHitObject)CreateDrawableRepresentation?.Invoke(fruit.HitObject);
 
                 if (caughtFruit == null) return;
 
@@ -158,7 +158,7 @@ namespace osu.Game.Rulesets.Catch.UI
 
             protected bool Dashing
             {
-                get { return dashing; }
+                get => dashing;
                 set
                 {
                     if (value == dashing) return;
@@ -176,7 +176,7 @@ namespace osu.Game.Rulesets.Catch.UI
             /// </summary>
             protected bool Trail
             {
-                get { return trail; }
+                get => trail;
                 set
                 {
                     if (value == trail) return;
@@ -292,6 +292,7 @@ namespace osu.Game.Rulesets.Catch.UI
                 const float hyper_dash_transition_length = 180;
 
                 bool previouslyHyperDashing = HyperDashing;
+
                 if (modifier <= 1 || X == targetPosition)
                 {
                     hyperDashModifier = 1;
@@ -325,9 +326,11 @@ namespace osu.Game.Rulesets.Catch.UI
                     case CatchAction.MoveLeft:
                         currentDirection--;
                         return true;
+
                     case CatchAction.MoveRight:
                         currentDirection++;
                         return true;
+
                     case CatchAction.Dash:
                         Dashing = true;
                         return true;
@@ -343,9 +346,11 @@ namespace osu.Game.Rulesets.Catch.UI
                     case CatchAction.MoveLeft:
                         currentDirection++;
                         return true;
+
                     case CatchAction.MoveRight:
                         currentDirection--;
                         return true;
+
                     case CatchAction.Dash:
                         Dashing = false;
                         return true;

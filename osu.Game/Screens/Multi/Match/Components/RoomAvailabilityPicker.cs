@@ -33,13 +33,14 @@ namespace osu.Game.Screens.Multi.Match.Components
             AddItem(RoomAvailability.InviteOnly);
         }
 
-        private class RoomAvailabilityPickerItem : DisableableTabItem<RoomAvailability>
+        private class RoomAvailabilityPickerItem : DisableableTabItem
         {
             private const float transition_duration = 200;
 
             private readonly Box hover, selection;
 
-            public RoomAvailabilityPickerItem(RoomAvailability value) : base(value)
+            public RoomAvailabilityPickerItem(RoomAvailability value)
+                : base(value)
             {
                 RelativeSizeAxes = Axes.Y;
                 Width = 102;
@@ -68,7 +69,7 @@ namespace osu.Game.Screens.Multi.Match.Components
                     {
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
-                        Font = @"Exo2.0-Bold",
+                        Font = OsuFont.GetFont(weight: FontWeight.Bold),
                         Text = value.GetDescription(),
                     },
                 };
