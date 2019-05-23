@@ -67,7 +67,7 @@ namespace osu.Game.Overlays
         private class HeaderTabItem : TabItem<string>
         {
             private readonly OsuSpriteText text;
-            private readonly Drawable bar;
+            private readonly ExpandingBar bar;
 
             private Color4 accentColour;
 
@@ -92,7 +92,7 @@ namespace osu.Game.Overlays
                 AutoSizeAxes = Axes.X;
                 RelativeSizeAxes = Axes.Y;
 
-                Children = new[]
+                Children = new Drawable[]
                 {
                     text = new OsuSpriteText
                     {
@@ -102,12 +102,11 @@ namespace osu.Game.Overlays
                         Text = value,
                         Font = OsuFont.GetFont()
                     },
-                    bar = new Circle
+                    bar = new ExpandingBar
                     {
-                        RelativeSizeAxes = Axes.X,
-                        Height = 0,
-                        Origin = Anchor.CentreLeft,
-                        Anchor = Anchor.BottomLeft,
+                        Anchor = Anchor.BottomCentre,
+                        ExpandedSize = 7.5f,
+                        CollapsedSize = 0
                     },
                     new HoverClickSounds()
                 };
@@ -138,7 +137,7 @@ namespace osu.Game.Overlays
                 if (Active.Value || IsHovered)
                 {
                     text.FadeColour(Color4.White, 120, Easing.InQuad);
-                    bar.ResizeHeightTo(7.5f, 120, Easing.InQuad);
+                    bar.Expand();
 
                     if (Active.Value)
                         text.Font = text.Font.With(weight: FontWeight.Bold);
@@ -146,7 +145,7 @@ namespace osu.Game.Overlays
                 else
                 {
                     text.FadeColour(AccentColour, 120, Easing.InQuad);
-                    bar.ResizeHeightTo(0, 120, Easing.InQuad);
+                    bar.Collapse();
                     text.Font = text.Font.With(weight: FontWeight.Medium);
                 }
             }
