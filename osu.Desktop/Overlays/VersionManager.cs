@@ -1,7 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -96,33 +95,37 @@ namespace osu.Desktop.Overlays
             var version = game.Version;
             var lastVersion = config.Get<string>(OsuSetting.Version);
 
-            if (game.IsDeployedBuild && version != lastVersion)
+            //if (game.IsDeployedBuild && version != lastVersion)
             {
                 config.Set(OsuSetting.Version, version);
 
                 // only show a notification if we've previously saved a version to the config file (ie. not the first run).
                 if (!string.IsNullOrEmpty(lastVersion))
-                    notificationOverlay.Post(new UpdateCompleteNotification(version, host.OpenUrlExternally));
+                    notificationOverlay.Post(new UpdateCompleteNotification(version));
             }
         }
 
         private class UpdateCompleteNotification : SimpleNotification
         {
-            public UpdateCompleteNotification(string version, Action<string> openUrl = null)
+            private readonly string version;
+
+            public UpdateCompleteNotification(string version)
             {
+                this.version = version;
                 Text = $"You are now running osu!lazer {version}.\nClick to see what's new!";
-                Icon = FontAwesome.Solid.CheckSquare;
-                Activated = delegate
-                {
-                    openUrl?.Invoke($"https://osu.ppy.sh/home/changelog/lazer/{version}");
-                    return true;
-                };
             }
 
             [BackgroundDependencyLoader]
-            private void load(OsuColour colours)
+            private void load(OsuColour colours, ChangelogOverlay changelog)
             {
+                Icon = FontAwesome.Solid.CheckSquare;
                 IconBackgound.Colour = colours.BlueDark;
+
+                Activated = delegate
+                {
+                    changelog.ShowBuild("lazer", version);
+                    return true;
+                };
             }
         }
 
