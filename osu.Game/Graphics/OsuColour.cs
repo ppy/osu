@@ -40,8 +40,10 @@ namespace osu.Game.Graphics
         // See https://github.com/ppy/osu-web/blob/master/resources/assets/less/colors.less
         public readonly Color4 PurpleLighter = FromHex(@"eeeeff");
         public readonly Color4 PurpleLight = FromHex(@"aa88ff");
+        public readonly Color4 PurpleLightAlternative = FromHex(@"cba4da");
         public readonly Color4 Purple = FromHex(@"8866ee");
         public readonly Color4 PurpleDark = FromHex(@"6644cc");
+        public readonly Color4 PurpleDarkAlternative = FromHex(@"312436");
         public readonly Color4 PurpleDarker = FromHex(@"441188");
 
         public readonly Color4 PinkLighter = FromHex(@"ffddee");

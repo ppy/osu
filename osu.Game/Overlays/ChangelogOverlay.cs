@@ -18,12 +18,13 @@ using osu.Game.Input.Bindings;
 using osu.Game.Online.API.Requests;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays.Changelog;
-using osuTK.Graphics;
 
 namespace osu.Game.Overlays
 {
     public class ChangelogOverlay : FullscreenOverlay
     {
+        public readonly Bindable<APIChangelogBuild> Current = new Bindable<APIChangelogBuild>();
+
         private ChangelogHeader header;
 
         private Container<ChangelogContent> content;
@@ -31,23 +32,6 @@ namespace osu.Game.Overlays
         private SampleChannel sampleBack;
 
         private List<APIChangelogBuild> builds;
-
-        public readonly Bindable<APIChangelogBuild> Current = new Bindable<APIChangelogBuild>();
-
-        public void ShowListing() => Current.Value = null;
-
-        /// <summary>
-        /// Fetches and shows a specific build from a specific update stream.
-        /// </summary>
-        /// <param name="build">Must contain at least <see cref="APIUpdateStream.Name"/> and
-        /// <see cref="APIChangelogBuild.Version"/>. If <see cref="APIUpdateStream.DisplayName"/> and
-        /// <see cref="APIChangelogBuild.DisplayVersion"/> are specified, the header will instantly display them.</param>
-        public void ShowBuild([NotNull] APIChangelogBuild build)
-        {
-            if (build == null) throw new ArgumentNullException(nameof(build));
-
-            Current.Value = build;
-        }
 
         [BackgroundDependencyLoader]
         private void load(AudioManager audio, OsuColour colour)
@@ -62,7 +46,7 @@ namespace osu.Game.Overlays
                 new Box
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Colour = new Color4(49, 36, 54, 255),
+                    Colour = colour.PurpleDarkAlternative,
                 },
                 new ScrollContainer
                 {
@@ -100,6 +84,21 @@ namespace osu.Game.Overlays
                 else
                     loadContent(new ChangelogListing(builds));
             });
+        }
+
+        public void ShowListing() => Current.Value = null;
+
+        /// <summary>
+        /// Fetches and shows a specific build from a specific update stream.
+        /// </summary>
+        /// <param name="build">Must contain at least <see cref="APIUpdateStream.Name"/> and
+        /// <see cref="APIChangelogBuild.Version"/>. If <see cref="APIUpdateStream.DisplayName"/> and
+        /// <see cref="APIChangelogBuild.DisplayVersion"/> are specified, the header will instantly display them.</param>
+        public void ShowBuild([NotNull] APIChangelogBuild build)
+        {
+            if (build == null) throw new ArgumentNullException(nameof(build));
+
+            Current.Value = build;
         }
 
         public override bool OnPressed(GlobalAction action)

@@ -31,10 +31,7 @@ namespace osu.Game.Overlays.Changelog
         {
             Current.Value = null;
 
-            foreach (APIUpdateStream updateStream in streams)
-            {
-                AddItem(updateStream);
-            }
+            foreach (APIUpdateStream updateStream in streams) AddItem(updateStream);
         }
 
         protected override bool OnHover(HoverEvent e)
