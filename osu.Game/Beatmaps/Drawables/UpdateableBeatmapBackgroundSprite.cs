@@ -39,7 +39,7 @@ namespace osu.Game.Beatmaps.Drawables
             {
                 // If DelayedLoadUnloadWrapper is attempting to RELOAD the same content (Beatmap), that means that it was
                 // previously UNLOADED and thus its children have been disposed of, so we need to recreate them here.
-                if (lastModel == Beatmap.Value)
+                if (lastModel != null && lastModel == Beatmap.Value)
                     return CreateDrawable(Beatmap.Value);
 
                 // If the model has changed since the previous unload (or if there was no load), then we can safely use the given content
