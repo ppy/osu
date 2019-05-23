@@ -39,7 +39,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             });
 
             AddStep(@"Collapse", () => expandingBar.Collapse());
-            AddStep(@"Uncollapse", () => expandingBar.Expand());
+            AddStep(@"Expand", () => expandingBar.Expand());
             AddSliderStep(@"Resize container", 1, 300, 150, value => container.ResizeTo(value));
             AddStep(@"Horizontal", () => expandingBar.RelativeSizeAxes = Axes.X);
             AddStep(@"Anchor top", () => expandingBar.Anchor = Anchor.TopCentre);
