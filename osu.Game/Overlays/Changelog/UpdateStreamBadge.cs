@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using Humanizer;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
@@ -14,6 +15,7 @@ using osu.Game.Online.API.Requests.Responses;
 using osu.Framework.Graphics.UserInterface;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
+using osuTK;
 using osuTK.Graphics;
 
 namespace osu.Game.Overlays.Changelog
@@ -37,9 +39,9 @@ namespace osu.Game.Overlays.Changelog
         public UpdateStreamBadge(APIUpdateStream stream)
             : base(stream)
         {
-            Height = badge_height;
-            Width = stream.IsFeatured ? badge_width * 2 : badge_width;
+            Size = new Vector2(stream.IsFeatured ? badge_width * 2 : badge_width, badge_height);
             Padding = new MarginPadding(5);
+
             Child = fadeContainer = new Container
             {
                 RelativeSizeAxes = Axes.Both,
@@ -65,7 +67,7 @@ namespace osu.Game.Overlays.Changelog
                             },
                             new OsuSpriteText
                             {
-                                Text = stream.LatestBuild.Users > 0 ? $"{stream.LatestBuild.Users:N0} users online" : null,
+                                Text = stream.LatestBuild.Users > 0 ? $"{stream.LatestBuild.Users:N0} {"user".Pluralize(stream.LatestBuild.Users == 1)} online" : null,
                                 Font = OsuFont.GetFont(weight: FontWeight.Regular, size: 10),
                                 Colour = new Color4(203, 164, 218, 255),
                             },
