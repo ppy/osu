@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Threading;
+using System.Threading.Tasks;
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
@@ -136,21 +137,24 @@ namespace osu.Game.Overlays
         {
             initialFetchPerformed = true;
 
-            var req = new GetChangelogRequest();
-            req.Success += res =>
+            Task.Run(() =>
             {
-                // remap streams to builds to ensure model equality
-                res.Builds.ForEach(b => b.UpdateStream = res.Streams.Find(s => s.Id == b.UpdateStream.Id));
-                res.Streams.ForEach(s => s.LatestBuild.UpdateStream = res.Streams.Find(s2 => s2.Id == s.LatestBuild.UpdateStream.Id));
+                var req = new GetChangelogRequest();
+                req.Success += res =>
+                {
+                    // remap streams to builds to ensure model equality
+                    res.Builds.ForEach(b => b.UpdateStream = res.Streams.Find(s => s.Id == b.UpdateStream.Id));
+                    res.Streams.ForEach(s => s.LatestBuild.UpdateStream = res.Streams.Find(s2 => s2.Id == s.LatestBuild.UpdateStream.Id));
 
-                builds = res.Builds;
-                header.Streams.Populate(res.Streams);
+                    builds = res.Builds;
+                    header.Streams.Populate(res.Streams);
 
-                Current.TriggerChange();
-            };
-            req.Failure += _ => initialFetchPerformed = false;
+                    Current.TriggerChange();
+                };
+                req.Failure += _ => initialFetchPerformed = false;
 
-            API.Queue(req);
+                req.Perform(API);
+            });
         }
 
         private CancellationTokenSource loadContentTask;
