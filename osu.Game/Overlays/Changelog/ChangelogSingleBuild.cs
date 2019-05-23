@@ -33,26 +33,31 @@ namespace osu.Game.Overlays.Changelog
         [BackgroundDependencyLoader]
         private void load(CancellationToken? cancellation, IAPIProvider api)
         {
-            var req = new GetChangelogBuildRequest(build.UpdateStream.Name, build.Version);
             bool complete = false;
 
+            var req = new GetChangelogBuildRequest(build.UpdateStream.Name, build.Version);
             req.Success += res =>
             {
                 build = res;
                 complete = true;
             };
-
             req.Failure += _ => complete = true;
 
-            api.Queue(req);
+            Task.Run(() => req.Perform(api));
 
-            while (!complete && cancellation?.IsCancellationRequested != true)
-                Task.Delay(1);
-
-            Children = new Drawable[]
+            while (!complete)
             {
-                new ChangelogBuildWithNavigation(build) { SelectBuild = SelectBuild },
-            };
+                if (cancellation?.IsCancellationRequested == true)
+                {
+                    req.Cancel();
+                    return;
+                }
+
+                Task.Delay(1);
+            }
+
+            if (build != null)
+                Child = new ChangelogBuildWithNavigation(build) { SelectBuild = SelectBuild };
         }
 
         public class ChangelogBuildWithNavigation : ChangelogBuild
