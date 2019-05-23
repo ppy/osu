@@ -6,7 +6,6 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
-using osu.Framework.Platform;
 using osu.Game;
 using osu.Game.Configuration;
 using osu.Game.Graphics;
@@ -24,15 +23,13 @@ namespace osu.Desktop.Overlays
         private OsuConfigManager config;
         private OsuGameBase game;
         private NotificationOverlay notificationOverlay;
-        private GameHost host;
 
         [BackgroundDependencyLoader]
-        private void load(NotificationOverlay notification, OsuColour colours, TextureStore textures, OsuGameBase game, OsuConfigManager config, GameHost host)
+        private void load(NotificationOverlay notification, OsuColour colours, TextureStore textures, OsuGameBase game, OsuConfigManager config)
         {
             notificationOverlay = notification;
             this.config = config;
             this.game = game;
-            this.host = host;
 
             AutoSizeAxes = Axes.Both;
             Anchor = Anchor.BottomCentre;

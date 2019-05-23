@@ -168,12 +168,10 @@ namespace osu.Game.Overlays
             if (initialFetchTask != null)
                 return initialFetchTask;
 
-            var tcs = new TaskCompletionSource<bool>();
-
-            initialFetchTask = tcs.Task;
-
-            Task.Run(() =>
+            return initialFetchTask = Task.Run(async () =>
             {
+                var tcs = new TaskCompletionSource<bool>();
+
                 var req = new GetChangelogRequest();
                 req.Success += res =>
                 {
@@ -190,9 +188,9 @@ namespace osu.Game.Overlays
                 };
                 req.Failure += _ => initialFetchTask = null;
                 req.Perform(API);
-            });
 
-            return initialFetchTask;
+                await tcs.Task;
+            });
         }
 
         private CancellationTokenSource loadContentTask;
