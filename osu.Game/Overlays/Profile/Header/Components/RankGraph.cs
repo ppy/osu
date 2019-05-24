@@ -170,7 +170,7 @@ namespace osu.Game.Overlays.Profile.Header.Components
 
             public void UpdateBallPosition(float mouseXPosition)
             {
-                int duration = 200;
+                const int duration = 200;
                 int index = calculateIndex(mouseXPosition);
                 Vector2 position = calculateBallPosition(index);
                 movingBall.MoveToY(position.Y, duration, Easing.OutQuint);
