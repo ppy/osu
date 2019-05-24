@@ -11,6 +11,7 @@ using osu.Game.Rulesets.Osu.Objects.Drawables.Pieces;
 using osuTK;
 using osu.Game.Rulesets.Scoring;
 using osuTK.Graphics;
+using osu.Framework.Graphics.Shapes;
 
 namespace osu.Game.Rulesets.Osu.Objects.Drawables
 {
@@ -22,6 +23,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         private readonly FlashPiece flash;
         private readonly ExplodePiece explode;
         private readonly NumberPiece number;
+        private readonly CircularContainer dot;
         private readonly GlowPiece glow;
 
         private readonly IBindable<Vector2> positionBindable = new Bindable<Vector2>();
@@ -70,6 +72,17 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                             number = new NumberPiece
                             {
                                 Text = (HitObject.IndexInCurrentCombo + 1).ToString(),
+                            },
+                            dot = new CircularContainer
+                            {
+                                Anchor = Anchor.Centre,
+                                Origin = Anchor.Centre,
+                                Masking = true,
+                                Size = new Vector2(30),
+                                Child = new Box
+                                {
+                                    RelativeSizeAxes = Axes.Both,
+                                }
                             },
                             ring = new RingPiece(),
                             flash = new FlashPiece(),
@@ -182,6 +195,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                         ring.FadeOut();
                         circle.FadeOut();
                         number.FadeOut();
+                        dot.FadeOut();
 
                         this.FadeOut(800);
                         explodeContainer.ScaleTo(1.5f, 400, Easing.OutQuad);
