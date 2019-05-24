@@ -12,6 +12,7 @@ using osuTK;
 using osu.Game.Rulesets.Scoring;
 using osuTK.Graphics;
 using osu.Framework.Graphics.Shapes;
+using osu.Game.Rulesets.Osu.Configuration;
 
 namespace osu.Game.Rulesets.Osu.Objects.Drawables
 {
@@ -22,6 +23,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         private readonly RingPiece ring;
         private readonly FlashPiece flash;
         private readonly ExplodePiece explode;
+        private readonly Container numberContainer;
         private readonly NumberPiece number;
         private readonly CircularContainer dot;
         private readonly GlowPiece glow;
@@ -29,6 +31,11 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         private readonly IBindable<Vector2> positionBindable = new Bindable<Vector2>();
         private readonly IBindable<int> stackHeightBindable = new Bindable<int>();
         private readonly IBindable<float> scaleBindable = new Bindable<float>();
+
+        [Resolved(CanBeNull = true)]
+        private OsuRulesetConfigManager config { get; set; }
+
+        private Bindable<bool> hitcircleDot;
 
         public OsuAction? HitAction => circle.HitAction;
 
@@ -69,19 +76,29 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                                     return true;
                                 },
                             },
-                            number = new NumberPiece
-                            {
-                                Text = (HitObject.IndexInCurrentCombo + 1).ToString(),
-                            },
-                            dot = new CircularContainer
+                            numberContainer = new Container
                             {
                                 Anchor = Anchor.Centre,
                                 Origin = Anchor.Centre,
-                                Masking = true,
-                                Size = new Vector2(30),
-                                Child = new Box
+                                AutoSizeAxes = Axes.Both,
+                                Children = new Drawable[]
                                 {
-                                    RelativeSizeAxes = Axes.Both,
+                                    number = new NumberPiece
+                                    {
+                                        Text = (HitObject.IndexInCurrentCombo + 1).ToString(),
+                                    },
+                                    dot = new CircularContainer
+                                    {
+                                        Anchor = Anchor.Centre,
+                                        Origin = Anchor.Centre,
+                                        Masking = true,
+                                        Size = new Vector2(30),
+                                        Child = new Box
+                                        {
+                                            RelativeSizeAxes = Axes.Both,
+                                        },
+                                        Alpha = 0,
+                                    },
                                 }
                             },
                             ring = new RingPiece(),
@@ -99,6 +116,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
             //may not be so correct
             Size = circle.DrawSize;
+
+            hitcircleDot = new Bindable<bool>();
         }
 
         [BackgroundDependencyLoader]
@@ -111,6 +130,46 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             positionBindable.BindTo(HitObject.PositionBindable);
             stackHeightBindable.BindTo(HitObject.StackHeightBindable);
             scaleBindable.BindTo(HitObject.ScaleBindable);
+
+            config?.BindWith(OsuRulesetSetting.HitcircleDot, hitcircleDot);
+            hitcircleDot.ValueChanged += _ => switchDotState();
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            if (hitcircleDot.Value)
+            {
+                number.FadeOut();
+                dot.FadeIn();
+            }
+        }
+
+        private void switchDotState()
+        {
+            var duration = 500;
+
+            if (hitcircleDot.Value)
+            {
+                showDot(duration);
+            }
+            else
+            {
+                hideDot(duration);
+            }
+        }
+
+        private void showDot(int duration)
+        {
+            dot.FadeIn(duration, Easing.OutQuint);
+            number.FadeOut(duration, Easing.OutQuint);
+        }
+
+        private void hideDot(int duration)
+        {
+            dot.FadeOut(duration, Easing.OutQuint);
+            number.FadeIn(duration, Easing.OutQuint);
         }
 
         public override Color4 AccentColour
@@ -194,8 +253,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                         //after the flash, we can hide some elements that were behind it
                         ring.FadeOut();
                         circle.FadeOut();
-                        number.FadeOut();
-                        dot.FadeOut();
+                        numberContainer.FadeOut();
 
                         this.FadeOut(800);
                         explodeContainer.ScaleTo(1.5f, 400, Easing.OutQuad);
