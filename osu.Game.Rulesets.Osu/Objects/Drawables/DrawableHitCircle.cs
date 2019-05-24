@@ -35,7 +35,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         [Resolved(CanBeNull = true)]
         private OsuRulesetConfigManager config { get; set; }
 
-        private Bindable<bool> hitcircleDot;
+        private readonly Bindable<bool> hitcircleDot;
 
         public OsuAction? HitAction => circle.HitAction;
 
@@ -148,7 +148,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
         private void switchDotState()
         {
-            var duration = 500;
+            const int duration = 500;
 
             if (hitcircleDot.Value)
             {
