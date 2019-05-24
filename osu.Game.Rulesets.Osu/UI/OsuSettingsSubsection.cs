@@ -39,6 +39,11 @@ namespace osu.Game.Rulesets.Osu.UI
                     LabelText = "Cursor trail",
                     Bindable = config.GetBindable<bool>(OsuRulesetSetting.ShowCursorTrail)
                 },
+                new SettingsCheckbox
+                {
+                    LabelText = "Show dot on a hitcircle instead of numbers",
+                    Bindable = config.GetBindable<bool>(OsuRulesetSetting.HitcircleDot)
+                },
             };
         }
     }
