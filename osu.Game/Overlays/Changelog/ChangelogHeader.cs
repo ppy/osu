@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -62,7 +63,7 @@ namespace osu.Game.Overlays.Changelog
                 TabControl.AddItem(e.NewValue.ToString());
                 TabControl.Current.Value = e.NewValue.ToString();
 
-                Streams.Current.Value = e.NewValue.UpdateStream;
+                Streams.Current.Value = Streams.Items.FirstOrDefault(s => s.Name == e.NewValue.UpdateStream.Name);
 
                 title.Version = e.NewValue.UpdateStream.DisplayName;
             }
