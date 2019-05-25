@@ -94,6 +94,24 @@ Task("Package")
         });
     });
 
+Task("Download Previous Release Assets")
+    .Does(() =>
+    {
+        var latestRelease = gitHubClient.Repository.Release.GetLatest(githubUserName, githubRepoName).GetAwaiter().GetResult();
+
+        if (!latestRelease.Assets.Any(asset => asset.Name == "RELEASES"))
+        {
+            Warning("The last release was not a squirrel one");
+            return;
+        }
+
+        var squirrelAssets = latestRelease.Assets.Where(asset => !asset.Name.EndsWith("exe") && !asset.Name.EndsWith("zip"));
+
+        EnsureDirectoryExists(previousReleasesDirectory);
+
+        foreach (var asset in squirrelAssets)
+            DownloadFile(asset.Url, previousReleasesDirectory.CombineWithFilePath(asset.Name));
+    });
 
 Task("Deploy")
     .IsDependentOn("Display Header")
@@ -101,6 +119,7 @@ Task("Deploy")
     .IsDependentOn("Update Appveyor Version")
     .IsDependentOn("Clean")
     .IsDependentOn("Compile")
-    .IsDependentOn("Package");
+    .IsDependentOn("Package")
+    .IsDependentOn("Download Previous Release Assets");
 
 RunTarget(target);
