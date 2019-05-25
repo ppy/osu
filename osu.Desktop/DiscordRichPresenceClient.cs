@@ -77,28 +77,10 @@ namespace osu.Desktop
 
         private void setPresenceGamemode(RulesetInfo ruleset, RichPresence presence)
         {
-            switch (ruleset.ID)
-            {
-                case 0:
-                    presence.Assets.SmallImageKey = ruleset.ShortName;
-                    break;
-
-                case 1:
-                    presence.Assets.SmallImageKey = ruleset.ShortName;
-                    break;
-
-                case 2:
-                    presence.Assets.SmallImageKey = ruleset.ShortName;
-                    break;
-
-                case 3:
-                    presence.Assets.SmallImageKey = ruleset.ShortName;
-                    break;
-
-                default:
-                    presence.Assets.SmallImageKey = "unknown";
-                    break;
-            }
+            if (ruleset.ID != null && ruleset.ID <= 3) //legacy rulesets use an ID between 0 and 3
+                presence.Assets.SmallImageKey = ruleset.ShortName;
+            else
+                presence.Assets.SmallImageKey = "unknown"; //not a legay ruleset so let's display the unknown ruleset icon.
 
             presence.Assets.SmallImageText = ruleset.ShortName;
         }
