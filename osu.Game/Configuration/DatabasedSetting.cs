@@ -15,6 +15,8 @@ namespace osu.Game.Configuration
 
         public int? Variant { get; set; }
 
+        public int? SkinInfoID { get; set; }
+
         [Column("Key")]
         public int IntKey
         {
