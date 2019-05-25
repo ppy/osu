@@ -31,6 +31,7 @@ namespace osu.Game.Tests.Visual.Online
             var data = new int[89];
             var dataWithZeros = new int[89];
             var smallData = new int[89];
+            var edgyData = new int[89];
 
             for (int i = 0; i < 89; i++)
                 data[i] = dataWithZeros[i] = (i + 1) * 1000;
@@ -40,6 +41,14 @@ namespace osu.Game.Tests.Visual.Online
 
             for (int i = 79; i < 89; i++)
                 smallData[i] = 100000 - i * 1000;
+
+            bool edge = true;
+
+            for (int i = 0; i < 20; i++)
+            {
+                edgyData[i] = 100000 + (edge ? 1000 : -1000) * (i + 1);
+                edge = !edge;
+            }
 
             Add(new Container
             {
@@ -117,6 +126,22 @@ namespace osu.Game.Tests.Visual.Online
                     RankHistory = new User.RankHistoryData
                     {
                         Data = smallData,
+                    }
+                };
+            });
+
+            AddStep("graph with edges", () =>
+            {
+                graph.User.Value = new User
+                {
+                    Statistics = new UserStatistics
+                    {
+                        Ranks = new UserStatistics.UserRanks { Global = 12000 },
+                        PP = 12345,
+                    },
+                    RankHistory = new User.RankHistoryData
+                    {
+                        Data = edgyData,
                     }
                 };
             });
