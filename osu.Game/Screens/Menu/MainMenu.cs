@@ -21,6 +21,7 @@ using osu.Game.Screens.Select;
 using osu.Game.Screens.Tournament;
 using osu.Framework.Platform;
 using osu.Game.Overlays;
+using osu.Framework.Graphics.Containers;
 
 namespace osu.Game.Screens.Menu
 {
@@ -48,10 +49,17 @@ namespace osu.Game.Screens.Menu
         [BackgroundDependencyLoader(true)]
         private void load(DirectOverlay direct, SettingsOverlay settings)
         {
-            if (host.CanExit)
-                AddInternal(new ExitConfirmOverlay { Action = this.Exit });
+            var edgeSnappingContainer = new EdgeSnappingContainer
+            {
+                SnappedEdges = Edges.All,
+                RelativeSizeAxes = Axes.Both
+            };
 
-            AddRangeInternal(new Drawable[]
+            if (host.CanExit)
+                edgeSnappingContainer.Add(new ExitConfirmOverlay { Action = this.Exit });
+
+            
+            edgeSnappingContainer.AddRange(new Drawable[]
             {
                 new ParallaxContainer
                 {
@@ -71,6 +79,8 @@ namespace osu.Game.Screens.Menu
                 },
                 sideFlashes = new MenuSideFlashes(),
             });
+
+            InternalChild = edgeSnappingContainer;
 
             buttons.StateChanged += state =>
             {
