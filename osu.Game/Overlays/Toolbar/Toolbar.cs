@@ -32,6 +32,7 @@ namespace osu.Game.Overlays.Toolbar
         private const float alpha_normal = 0.6f;
 
         private readonly Bindable<OverlayActivation> overlayActivationMode = new Bindable<OverlayActivation>(OverlayActivation.All);
+        private ToolbarBackground background;
 
         public Toolbar()
         {
@@ -44,7 +45,7 @@ namespace osu.Game.Overlays.Toolbar
         {
             Children = new Drawable[]
             {
-                new ToolbarBackground(),
+                background = new ToolbarBackground(),
                 new FillFlowContainer
                 {
                     Direction = FillDirection.Horizontal,
@@ -146,7 +147,7 @@ namespace osu.Game.Overlays.Toolbar
         {
             userButton?.StateContainer.Hide();
 
-            this.MoveToY(-DrawSize.Y, transition_time, Easing.OutQuint);
+            this.MoveToY(background.Padding.Top - DrawSize.Y, transition_time, Easing.OutQuint);
             this.FadeOut(transition_time);
         }
     }
