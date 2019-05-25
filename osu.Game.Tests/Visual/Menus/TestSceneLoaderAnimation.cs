@@ -53,38 +53,12 @@ namespace osu.Game.Tests.Visual.Menus
         }
 
         [Test]
-        public void TestShortLoad()
+        public void TestDelayedLoad()
         {
-            bool logoVisible = false;
-
             AddStep("begin loading", () => LoadScreen(loader = new TestLoader()));
-            AddWaitStep("wait", 3);
-            AddStep("finish loading", () =>
-            {
-                logoVisible = loader.Logo?.Alpha > 0;
-                loader.AllowLoad.Set();
-            });
-
+            AddUntilStep("wait for logo visible", () => loader.Logo?.Alpha > 0);
+            AddStep("finish loading", () => loader.AllowLoad.Set());
             AddAssert("loaded", () => loader.Logo != null && loader.ScreenLoaded);
-            AddAssert("logo was visible", () => logoVisible);
-            AddUntilStep("logo gone", () => loader.Logo?.Alpha == 0);
-        }
-
-        [Test]
-        public void TestLongLoad()
-        {
-            bool logoVisible = false;
-
-            AddStep("begin loading", () => LoadScreen(loader = new TestLoader()));
-            AddWaitStep("wait", 10);
-            AddStep("finish loading", () =>
-            {
-                logoVisible = loader.Logo?.Alpha > 0;
-                loader.AllowLoad.Set();
-            });
-
-            AddAssert("loaded", () => loader.Logo != null && loader.ScreenLoaded);
-            AddAssert("logo was visible", () => logoVisible);
             AddUntilStep("logo gone", () => loader.Logo?.Alpha == 0);
         }
 
