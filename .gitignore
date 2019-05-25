@@ -270,3 +270,4 @@ __pycache__/
 Staging/
 
 inspectcodereport.xml
+/out
