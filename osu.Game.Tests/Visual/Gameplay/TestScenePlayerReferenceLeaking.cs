@@ -24,7 +24,9 @@ namespace osu.Game.Tests.Visual.Gameplay
                 GC.WaitForPendingFinalizers();
                 int count = 0;
 
-                workingWeakReferences.ForEachAlive(_ => count++);
+                foreach (var unused in workingWeakReferences)
+                    count++;
+
                 return count == 1;
             });
 
@@ -34,7 +36,9 @@ namespace osu.Game.Tests.Visual.Gameplay
                 GC.WaitForPendingFinalizers();
                 int count = 0;
 
-                playerWeakReferences.ForEachAlive(_ => count++);
+                foreach (var unused in playerWeakReferences)
+                    count++;
+
                 return count == 1;
             });
         }
