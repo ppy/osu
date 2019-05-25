@@ -39,11 +39,16 @@ namespace osu.Game.Overlays
 
             Children = new Drawable[]
             {
-                new Box
+                new EdgeSnappingContainer
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Colour = Color4.Black,
-                    Alpha = 0.6f
+                    SnappedEdges = Edges.Right | Edges.Bottom,
+                    Child = new Box
+                    {
+                        RelativeSizeAxes = Axes.Both,
+                        Colour = Color4.Black,
+                        Alpha = 0.6f
+                    },
                 },
                 new OsuScrollContainer
                 {
