@@ -28,7 +28,8 @@ namespace osu.Game.Audio
         private void load()
         {
             track = GetTrack();
-            track.Completed += () => Schedule(Stop);
+            if (track != null)
+                track.Completed += () => Schedule(Stop);
         }
 
         /// <summary>
@@ -56,19 +57,25 @@ namespace osu.Game.Audio
         /// <summary>
         /// Starts playing this <see cref="PreviewTrack"/>.
         /// </summary>
-        public void Start() => startDelegate = Schedule(() =>
+        /// <returns>Whether the track is started or already playing.</returns>
+        public bool Start()
         {
             if (track == null)
-                return;
+                return false;
 
-            if (hasStarted)
-                return;
+            startDelegate = Schedule(() =>
+            {
+                if (hasStarted)
+                    return;
 
-            hasStarted = true;
+                hasStarted = true;
 
-            track.Restart();
-            Started?.Invoke();
-        });
+                track.Restart();
+                Started?.Invoke();
+            });
+
+            return true;
+        }
 
         /// <summary>
         /// Stops playing this <see cref="PreviewTrack"/>.

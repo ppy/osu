@@ -41,7 +41,7 @@ namespace osu.Game.Overlays.Profile.Header
                 new Box
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Colour = colours.CommunityUserGrayGreenDarker,
+                    Colour = colours.GreySeafoamDark,
                 },
                 new FillFlowContainer
                 {
@@ -107,7 +107,7 @@ namespace osu.Game.Overlays.Profile.Header
                                             RelativeSizeAxes = Axes.X,
                                             Height = 1.5f,
                                             Margin = new MarginPadding { Top = 10 },
-                                            Colour = colours.CommunityUserGrayGreenLighter,
+                                            Colour = colours.GreySeafoamLighter,
                                         },
                                         new Container
                                         {
@@ -125,7 +125,7 @@ namespace osu.Game.Overlays.Profile.Header
                                                     Margin = new MarginPadding { Left = 40 },
                                                     Origin = Anchor.CentreLeft,
                                                     Anchor = Anchor.CentreLeft,
-                                                    Colour = colours.CommunityUserGrayGreenLighter,
+                                                    Colour = colours.GreySeafoamLighter,
                                                 }
                                             }
                                         },
