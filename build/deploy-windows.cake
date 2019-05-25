@@ -1,7 +1,9 @@
 #load "deploy-base.cake"
 #addin "nuget:?package=Octokit&version=0.32.0"
-
+using System.Diagnostics;
 using Octokit;
+var editBinTool = new FilePath("./exetools/editbin.exe");
+var rceditTool = new FilePath("./exetools/rcedit-x64.exe");
 
 var target = Argument("target", "Deploy");
 
@@ -19,19 +21,20 @@ bool incrementVersion = Argument("incrementVersion", true);
 // desktop project
 var desktopProject = rootDirectory.CombineWithFilePath("osu.Desktop/osu.Desktop.csproj");
 var desktopOutputDirectory = outputDirectory.Combine("osu.Desktop");
+var desktopIcon = rootDirectory.CombineWithFilePath("osu.Desktop/lazer.ico");
 string framework = "netcoreapp2.2";
 string runtime = "win-x64";
 string configuration = "Release";
 string version;
 
 Task("Determine Version")
-    .Does(() => 
+    .Does(() =>
     {
         var latestRelease = gitHubClient.Repository.Release.GetLatest(githubUserName, githubRepoName).GetAwaiter().GetResult();
 
         if (latestRelease == null)
             Information("This is the first GitHub release");
-        else 
+        else
         {
             Information($"Last GitHub release was {latestRelease.Name}");
 
@@ -52,27 +55,38 @@ Task("Determine Version")
 
 Task("Update Appveyor Version")
     .WithCriteria(AppVeyor.IsRunningOnAppVeyor)
-    .Does(() => 
+    .Does(() =>
     {
         AppVeyor.UpdateBuildVersion(version);
     });
 
-Task("Dotnet Publish")
-    .Does(() => 
+Task("Compile")
+    .Does(() =>
     {
         DotNetCorePublish(Context.MakeAbsolute(desktopProject).FullPath, new DotNetCorePublishSettings
         {
             Framework = framework,
             Runtime = runtime,
             OutputDirectory = desktopOutputDirectory,
+            ArgumentCustomization = args => args.Append($"/p:Version={version}")
         });
+
+        var osuexe = Context.MakeAbsolute(new FilePath($"{desktopOutputDirectory}/osu!.exe"));
+
+        Information("Changing the subsystem to windows");
+        Process.Start(editBinTool.FullPath, $"/SUBSYSTEM:WINDOWS {osuexe}").WaitForExit();
+
+        Information("Changing the icon");
+        Process.Start(rceditTool.FullPath, $"{osuexe} --set-icon {desktopIcon}").WaitForExit();
     });
+
+
 
 Task("Deploy")
     .IsDependentOn("Display Header")
     .IsDependentOn("Determine Version")
     .IsDependentOn("Update Appveyor Version")
     .IsDependentOn("Clean")
-    .IsDependentOn("Dotnet Publish");
+    .IsDependentOn("Compile");
 
 RunTarget(target);
