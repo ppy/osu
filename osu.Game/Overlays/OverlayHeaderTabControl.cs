@@ -11,13 +11,13 @@ using osu.Game.Graphics.UserInterface;
 using osuTK;
 using osuTK.Graphics;
 
-namespace osu.Game.Overlays.Profile.Header
+namespace osu.Game.Overlays
 {
-    public class ProfileHeaderTabControl : TabControl<string>
+    public class OverlayHeaderTabControl : TabControl<string>
     {
         private readonly Box bar;
 
-        private Color4 accentColour;
+        private Color4 accentColour = Color4.White;
 
         public Color4 AccentColour
         {
@@ -32,7 +32,7 @@ namespace osu.Game.Overlays.Profile.Header
 
                 foreach (TabItem<string> tabItem in TabContainer)
                 {
-                    ((ProfileHeaderTabItem)tabItem).AccentColour = value;
+                    ((HeaderTabItem)tabItem).AccentColour = value;
                 }
             }
         }
@@ -43,7 +43,7 @@ namespace osu.Game.Overlays.Profile.Header
             set => TabContainer.Padding = value;
         }
 
-        public ProfileHeaderTabControl()
+        public OverlayHeaderTabControl()
         {
             TabContainer.Masking = false;
             TabContainer.Spacing = new Vector2(15, 0);
@@ -59,15 +59,15 @@ namespace osu.Game.Overlays.Profile.Header
 
         protected override Dropdown<string> CreateDropdown() => null;
 
-        protected override TabItem<string> CreateTabItem(string value) => new ProfileHeaderTabItem(value)
+        protected override TabItem<string> CreateTabItem(string value) => new HeaderTabItem(value)
         {
             AccentColour = AccentColour
         };
 
-        private class ProfileHeaderTabItem : TabItem<string>
+        private class HeaderTabItem : TabItem<string>
         {
             private readonly OsuSpriteText text;
-            private readonly Drawable bar;
+            private readonly ExpandingBar bar;
 
             private Color4 accentColour;
 
@@ -86,13 +86,13 @@ namespace osu.Game.Overlays.Profile.Header
                 }
             }
 
-            public ProfileHeaderTabItem(string value)
+            public HeaderTabItem(string value)
                 : base(value)
             {
                 AutoSizeAxes = Axes.X;
                 RelativeSizeAxes = Axes.Y;
 
-                Children = new[]
+                Children = new Drawable[]
                 {
                     text = new OsuSpriteText
                     {
@@ -102,12 +102,11 @@ namespace osu.Game.Overlays.Profile.Header
                         Text = value,
                         Font = OsuFont.GetFont()
                     },
-                    bar = new Circle
+                    bar = new ExpandingBar
                     {
-                        RelativeSizeAxes = Axes.X,
-                        Height = 0,
-                        Origin = Anchor.CentreLeft,
-                        Anchor = Anchor.BottomLeft,
+                        Anchor = Anchor.BottomCentre,
+                        ExpandedSize = 7.5f,
+                        CollapsedSize = 0
                     },
                     new HoverClickSounds()
                 };
@@ -138,7 +137,7 @@ namespace osu.Game.Overlays.Profile.Header
                 if (Active.Value || IsHovered)
                 {
                     text.FadeColour(Color4.White, 120, Easing.InQuad);
-                    bar.ResizeHeightTo(7.5f, 120, Easing.InQuad);
+                    bar.Expand();
 
                     if (Active.Value)
                         text.Font = text.Font.With(weight: FontWeight.Bold);
@@ -146,7 +145,7 @@ namespace osu.Game.Overlays.Profile.Header
                 else
                 {
                     text.FadeColour(AccentColour, 120, Easing.InQuad);
-                    bar.ResizeHeightTo(0, 120, Easing.InQuad);
+                    bar.Collapse();
                     text.Font = text.Font.With(weight: FontWeight.Medium);
                 }
             }

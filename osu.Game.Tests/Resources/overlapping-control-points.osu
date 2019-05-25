@@ -1,0 +1,19 @@
+osu file format v14
+
+[TimingPoints]
+
+// Timing then inherited
+0,500,4,2,0,100,1,0
+0,-66.6666666666667,4,3,0,100,0,1
+
+// Inherited then timing (equivalent to previous)
+1000,-66.6666666666667,4,3,0,100,0,1
+1000,500,4,2,0,100,1,0
+
+// Inherited then timing (different to previous)
+2000,-133.333333333333,4,1,0,100,0,0
+2000,250,4,2,0,100,1,0
+
+// Timing then inherited (different to previous)
+3000,500,4,2,0,100,1,0
+3000,-66.6666666666667,4,3,0,100,0,1
