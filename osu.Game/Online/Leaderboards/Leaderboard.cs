@@ -231,7 +231,7 @@ namespace osu.Game.Online.Leaderboards
                 if (getScoresRequest == null)
                     return;
 
-                if (api?.IsLoggedIn != true)
+                if (api?.IsLoggedIn.Value != true)
                 {
                     PlaceholderState = PlaceholderState.NotLoggedIn;
                     return;

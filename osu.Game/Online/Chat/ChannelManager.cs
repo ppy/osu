@@ -118,7 +118,7 @@ namespace osu.Game.Online.Chat
 
             postQueue.Enqueue(() =>
             {
-                if (!api.IsLoggedIn)
+                if (!api.IsLoggedIn.Value)
                 {
                     target.AddNewMessages(new ErrorMessage("Please sign in to participate in chat!"));
                     return;
@@ -379,7 +379,7 @@ namespace osu.Game.Online.Chat
 
         protected override Task Poll()
         {
-            if (!api.IsLoggedIn)
+            if (!api.IsLoggedIn.Value)
                 return base.Poll();
 
             var fetchReq = new GetUpdatesRequest(lastMessageId);

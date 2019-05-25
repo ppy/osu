@@ -155,7 +155,7 @@ namespace osu.Game.Screens.Menu
 
         private void onMulti()
         {
-            if (!api.IsLoggedIn)
+            if (!api.IsLoggedIn.Value)
             {
                 notifications?.Post(new SimpleNotification
                 {

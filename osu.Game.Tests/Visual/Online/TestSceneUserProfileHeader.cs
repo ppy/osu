@@ -68,7 +68,7 @@ namespace osu.Game.Tests.Visual.Online
         {
             AddStep(name, () =>
             {
-                if (api.IsLoggedIn)
+                if (api.IsLoggedIn.Value)
                 {
                     var request = new GetUserRequest(fallback.Id);
                     request.Success += user => header.User.Value = user;

@@ -17,7 +17,7 @@ namespace osu.Game.Online.API
             Id = 1001,
         });
 
-        public bool IsLoggedIn => true;
+        public Bindable<bool> IsLoggedIn => new Bindable<bool>(true);
 
         public string ProvidedUsername => LocalUser.Value.Username;
 

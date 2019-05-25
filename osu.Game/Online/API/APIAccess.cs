@@ -55,6 +55,8 @@ namespace osu.Game.Online.API
             authentication.TokenString = config.Get<string>(OsuSetting.Token);
             authentication.Token.ValueChanged += onTokenChanged;
 
+            LocalUser.BindValueChanged((_) => IsLoggedIn.Value = getIsLoggedInInternal());
+
             var thread = new Thread(run)
             {
                 Name = "APIAccess",
@@ -104,7 +106,7 @@ namespace osu.Game.Online.API
                         log.Add(@"In a failing state, waiting a bit before we try again...");
                         Thread.Sleep(5000);
 
-                        if (!IsLoggedIn) goto case APIState.Connecting;
+                        if (!IsLoggedIn.Value) goto case APIState.Connecting;
 
                         if (queue.Count == 0)
                         {
@@ -244,7 +246,7 @@ namespace osu.Game.Online.API
                 req.Perform(this);
 
                 //we could still be in initialisation, at which point we don't want to say we're Online yet.
-                if (IsLoggedIn) State = APIState.Online;
+                if (IsLoggedIn.Value) State = APIState.Online;
 
                 failureCount = 0;
                 return true;
@@ -322,7 +324,9 @@ namespace osu.Game.Online.API
             return true;
         }
 
-        public bool IsLoggedIn => LocalUser.Value.Id > 1;
+        public Bindable<bool> IsLoggedIn => new Bindable<bool>(getIsLoggedInInternal());
+
+        private bool getIsLoggedInInternal() => LocalUser.Value.Id > 1;
 
         public void Queue(APIRequest request)
         {

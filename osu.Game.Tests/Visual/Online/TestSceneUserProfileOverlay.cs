@@ -95,7 +95,7 @@ namespace osu.Game.Tests.Visual.Online
                 IsSupporter = true,
                 Country = new Country { FullName = @"Australia", FlagName = @"AU" },
                 CoverUrl = @"https://osu.ppy.sh/images/headers/profile-covers/c3.jpg"
-            }, api.IsLoggedIn));
+            }, api.IsLoggedIn.Value));
 
             AddStep("Show flyte", () => profile.ShowUser(new User
             {
@@ -103,7 +103,7 @@ namespace osu.Game.Tests.Visual.Online
                 Id = 3103765,
                 Country = new Country { FullName = @"Japan", FlagName = @"JP" },
                 CoverUrl = @"https://osu.ppy.sh/images/headers/profile-covers/c6.jpg"
-            }, api.IsLoggedIn));
+            }, api.IsLoggedIn.Value));
 
             AddStep("Hide", profile.Hide);
             AddStep("Show without reload", profile.Show);

@@ -118,7 +118,7 @@ namespace osu.Game.Screens.Multi
 
         protected override Task Poll()
         {
-            if (!api.IsLoggedIn)
+            if (!api.IsLoggedIn.Value)
                 return base.Poll();
 
             var tcs = new TaskCompletionSource<bool>();

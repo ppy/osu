@@ -64,7 +64,7 @@ namespace osu.Game.Tests.Visual.UserInterface
         [Test]
         public void TestOnlineBeatmap()
         {
-            if (api.IsLoggedIn)
+            if (api.IsLoggedIn.Value)
             {
                 var req = new GetBeatmapSetRequest(1);
                 api.Queue(req);

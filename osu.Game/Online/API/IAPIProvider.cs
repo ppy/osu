@@ -16,7 +16,7 @@ namespace osu.Game.Online.API
         /// <summary>
         /// Returns whether the local user is logged in.
         /// </summary>
-        bool IsLoggedIn { get; }
+        Bindable<bool> IsLoggedIn { get; }
 
         /// <summary>
         /// The last username provided by the end-user.
