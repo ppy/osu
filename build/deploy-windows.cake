@@ -8,6 +8,8 @@ var target = Argument("target", "Deploy");
 // github
 string githubUserName = "ppy";
 string githubRepoName = "osu";
+bool uploadToGithub = Argument("uploadToGithub", false);
+var gitHubClient = new GitHubClient(new ProductHeaderValue("osu-deploy"));
 
 var previousReleasesDirectory = tempDirectory.Combine("previousReleases");
 
@@ -25,8 +27,7 @@ string version;
 Task("Determine Version")
     .Does(() => 
     {
-        var api = new GitHubClient(new ProductHeaderValue("osu-deploy"));
-        var latestRelease = api.Repository.Release.GetLatest(githubUserName, githubRepoName).GetAwaiter().GetResult();
+        var latestRelease = gitHubClient.Repository.Release.GetLatest(githubUserName, githubRepoName).GetAwaiter().GetResult();
 
         if (latestRelease == null)
             Information("This is the first GitHub release");
@@ -49,6 +50,13 @@ Task("Determine Version")
         Information($"Determined version: {version}");
     });
 
+Task("Update Appveyor Version")
+    .WithCriteria(AppVeyor.IsRunningOnAppVeyor)
+    .Does(() => 
+    {
+        AppVeyor.UpdateBuildVersion(version);
+    });
+
 Task("Dotnet Publish")
     .Does(() => 
     {
@@ -62,8 +70,9 @@ Task("Dotnet Publish")
 
 Task("Deploy")
     .IsDependentOn("Display Header")
-    .IsDependentOn("Clean")
     .IsDependentOn("Determine Version")
+    .IsDependentOn("Update Appveyor Version")
+    .IsDependentOn("Clean")
     .IsDependentOn("Dotnet Publish");
 
 RunTarget(target);
