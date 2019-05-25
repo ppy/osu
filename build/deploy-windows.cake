@@ -19,12 +19,14 @@ bool incrementVersion = Argument("incrementVersion", true);
 
 
 // desktop project
-var desktopProject = rootDirectory.CombineWithFilePath("osu.Desktop/osu.Desktop.csproj");
-var desktopOutputDirectory = outputDirectory.Combine("osu.Desktop");
+var desktopProject = Context.MakeAbsolute(rootDirectory.CombineWithFilePath("osu.Desktop/osu.Desktop.csproj"));
+var desktopOutputDirectory = Context.MakeAbsolute(outputDirectory.Combine("osu.Desktop"));
 var desktopIcon = rootDirectory.CombineWithFilePath("osu.Desktop/lazer.ico");
+var desktopNuspec = Context.MakeAbsolute(rootDirectory.CombineWithFilePath("osu.Desktop/osu.nuspec"));
 string framework = "netcoreapp2.2";
 string runtime = "win-x64";
-string configuration = "Release";
+string buildConfiguration = "Release";
+string deployConfigution = "Deploy";
 string version;
 
 Task("Determine Version")
@@ -63,7 +65,7 @@ Task("Update Appveyor Version")
 Task("Compile")
     .Does(() =>
     {
-        DotNetCorePublish(Context.MakeAbsolute(desktopProject).FullPath, new DotNetCorePublishSettings
+        DotNetCorePublish(desktopProject.FullPath, new DotNetCorePublishSettings
         {
             Framework = framework,
             Runtime = runtime,
@@ -80,6 +82,17 @@ Task("Compile")
         Process.Start(rceditTool.FullPath, $"{osuexe} --set-icon {desktopIcon}").WaitForExit();
     });
 
+Task("Package")
+    .Does(() =>
+    {
+        NuGetPack(desktopNuspec.FullPath, new NuGetPackSettings
+        {
+            Version = version,
+            BasePath = desktopOutputDirectory,
+            OutputDirectory = outputDirectory,
+            ArgumentCustomization = args => args.Append($"-Properties Configuration={deployConfigution}")
+        });
+    });
 
 
 Task("Deploy")
@@ -87,6 +100,7 @@ Task("Deploy")
     .IsDependentOn("Determine Version")
     .IsDependentOn("Update Appveyor Version")
     .IsDependentOn("Clean")
-    .IsDependentOn("Compile");
+    .IsDependentOn("Compile")
+    .IsDependentOn("Package");
 
 RunTarget(target);
