@@ -55,7 +55,7 @@ namespace osu.Game.Online.API
             authentication.TokenString = config.Get<string>(OsuSetting.Token);
             authentication.Token.ValueChanged += onTokenChanged;
 
-            LocalUser.BindValueChanged((_) => IsLoggedIn.Value = getIsLoggedInInternal());
+            LocalUser.BindValueChanged(_ => IsLoggedIn.Value = getIsLoggedInInternal());
 
             var thread = new Thread(run)
             {
