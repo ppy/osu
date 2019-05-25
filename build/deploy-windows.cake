@@ -11,7 +11,7 @@ string githubRepoName = "osu";
 
 var previousReleasesDirectory = tempDirectory.Combine("previousReleases");
 
-bool incrementVersion = Argument("target", true);
+bool incrementVersion = Argument("incrementVersion", true);
 
 
 // desktop project
