@@ -138,28 +138,24 @@ namespace osu.Game.Screens.Select
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
                     Width = 2, //avoid horizontal masking so the panels don't clip when screen stack is pushed.
-                    Child = new Container
+                    Child = new EdgeSnappingContainer
                     {
                         RelativeSizeAxes = Axes.Both,
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
                         Width = 0.5f,
+                        SnappedEdges = Edges.Horizontal, // vertical snapping will have no effect as the parent container is masking
                         Children = new Drawable[]
                         {
-                            new EdgeSnappingContainer
+                            Carousel = new BeatmapCarousel
                             {
+                                Masking = false,
                                 RelativeSizeAxes = Axes.Both,
-                                SnappedEdges = Edges.Right,
-                                Child = Carousel = new BeatmapCarousel
-                                {
-                                    Masking = false,
-                                    RelativeSizeAxes = Axes.Both,
-                                    Size = new Vector2(1 - wedged_container_size.X, 1),
-                                    Anchor = Anchor.CentreRight,
-                                    Origin = Anchor.CentreRight,
-                                    SelectionChanged = updateSelectedBeatmap,
-                                    BeatmapSetsChanged = carouselBeatmapsLoaded,
-                                }
+                                Size = new Vector2(1 - wedged_container_size.X, 1),
+                                Anchor = Anchor.CentreRight,
+                                Origin = Anchor.CentreRight,
+                                SelectionChanged = updateSelectedBeatmap,
+                                BeatmapSetsChanged = carouselBeatmapsLoaded,
                             },
                             FilterControl = new FilterControl
                             {
