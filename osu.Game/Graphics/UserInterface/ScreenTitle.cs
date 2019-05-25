@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
@@ -12,26 +13,33 @@ namespace osu.Game.Graphics.UserInterface
 {
     public abstract class ScreenTitle : CompositeDrawable, IHasAccentColour
     {
-        private readonly SpriteIcon iconSprite;
+        public const float ICON_WIDTH = ICON_SIZE + icon_spacing;
+
+        protected const float ICON_SIZE = 25;
+
+        private SpriteIcon iconSprite;
         private readonly OsuSpriteText titleText, pageText;
-        public const float ICON_WIDTH = icon_size + icon_spacing;
-        private const float icon_size = 25, icon_spacing = 10;
+
+        private const float icon_spacing = 10;
 
         protected IconUsage Icon
         {
-            get => iconSprite.Icon;
-            set => iconSprite.Icon = value;
+            set
+            {
+                if (iconSprite == null)
+                    throw new InvalidOperationException($"Cannot use {nameof(Icon)} with a custom {nameof(CreateIcon)} function.");
+
+                iconSprite.Icon = value;
+            }
         }
 
         protected string Title
         {
-            get => titleText.Text;
             set => titleText.Text = value;
         }
 
         protected string Section
         {
-            get => pageText.Text;
             set => pageText.Text = value;
         }
 
@@ -40,6 +48,11 @@ namespace osu.Game.Graphics.UserInterface
             get => pageText.Colour;
             set => pageText.Colour = value;
         }
+
+        protected virtual Drawable CreateIcon() => iconSprite = new SpriteIcon
+        {
+            Size = new Vector2(ICON_SIZE),
+        };
 
         protected ScreenTitle()
         {
@@ -51,12 +64,9 @@ namespace osu.Game.Graphics.UserInterface
                 {
                     AutoSizeAxes = Axes.Both,
                     Spacing = new Vector2(icon_spacing, 0),
-                    Children = new Drawable[]
+                    Children = new[]
                     {
-                        iconSprite = new SpriteIcon
-                        {
-                            Size = new Vector2(icon_size),
-                        },
+                        CreateIcon(),
                         new FillFlowContainer
                         {
                             AutoSizeAxes = Axes.Both,

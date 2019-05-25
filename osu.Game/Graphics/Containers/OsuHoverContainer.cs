@@ -20,16 +20,39 @@ namespace osu.Game.Graphics.Containers
 
         protected virtual IEnumerable<Drawable> EffectTargets => new[] { Content };
 
+        public OsuHoverContainer()
+        {
+            Enabled.ValueChanged += e =>
+            {
+                if (!e.NewValue) unhover();
+            };
+        }
+
+        private bool isHovered;
+
         protected override bool OnHover(HoverEvent e)
         {
+            if (!Enabled.Value)
+                return false;
+
             EffectTargets.ForEach(d => d.FadeColour(HoverColour, FADE_DURATION, Easing.OutQuint));
+            isHovered = true;
+
             return base.OnHover(e);
         }
 
         protected override void OnHoverLost(HoverLostEvent e)
         {
-            EffectTargets.ForEach(d => d.FadeColour(IdleColour, FADE_DURATION, Easing.OutQuint));
+            unhover();
             base.OnHoverLost(e);
+        }
+
+        private void unhover()
+        {
+            if (!isHovered) return;
+
+            isHovered = false;
+            EffectTargets.ForEach(d => d.FadeColour(IdleColour, FADE_DURATION, Easing.OutQuint));
         }
 
         [BackgroundDependencyLoader]
