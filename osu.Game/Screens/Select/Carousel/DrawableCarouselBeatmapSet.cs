@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -11,14 +12,17 @@ using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Localisation;
+using osu.Framework.Platform;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Drawables;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays;
+using osu.Game.Overlays.Notifications;
 using osuTK;
 using osuTK.Graphics;
 
@@ -31,6 +35,8 @@ namespace osu.Game.Screens.Select.Carousel
 
         private DialogOverlay dialogOverlay;
         private readonly BeatmapSetInfo beatmapSet;
+        private Storage storage;
+        private NotificationOverlay notifications;
 
         public DrawableCarouselBeatmapSet(CarouselBeatmapSet set)
             : base(set)
@@ -39,8 +45,11 @@ namespace osu.Game.Screens.Select.Carousel
         }
 
         [BackgroundDependencyLoader(true)]
-        private void load(BeatmapManager manager, BeatmapSetOverlay beatmapOverlay, DialogOverlay overlay)
+        private void load(BeatmapManager manager, BeatmapSetOverlay beatmapOverlay, DialogOverlay overlay, Storage storage, NotificationOverlay notifications)
         {
+            this.storage = storage;
+            this.notifications = notifications;
+
             restoreHiddenRequested = s => s.Beatmaps.ForEach(manager.Restore);
             dialogOverlay = overlay;
             if (beatmapOverlay != null)
@@ -107,6 +116,44 @@ namespace osu.Game.Screens.Select.Carousel
             };
         }
 
+        private void saveAudio()
+        {
+            BeatmapMetadata metadata = beatmapSet.Metadata;
+            string localAudioPath = @"\files\" + beatmapSet.Files?.Find(f => f.Filename.Equals(metadata.AudioFile)).FileInfo.StoragePath;
+            string audioName = metadata.Artist + " - " + metadata.Title + ".mp3";
+
+            //just to be sure there's no invalid symbols
+            audioName = string.Join("", audioName.Split(Path.GetInvalidFileNameChars()));
+            audioName = string.Join("", audioName.Split(Path.GetInvalidPathChars()));
+
+            string storagePath = storage.GetFullPath("");
+
+            string songsDirectory = storagePath + @"\saved songs";
+            if (!Directory.Exists(songsDirectory))
+            {
+                Directory.CreateDirectory(songsDirectory);
+            }
+
+            string finalFilePath = songsDirectory + @"\" + audioName;
+
+            if (!File.Exists(finalFilePath))
+            {
+                File.Copy(storagePath + localAudioPath, finalFilePath);
+                notifications?.Post(new ProgressCompletionNotification
+                {
+                    Text = $@"{audioName} has been successfully exported!",
+                });
+            }
+            else
+            {
+                notifications?.Post(new SimpleNotification
+                {
+                    Text = $@"{audioName} already exists!",
+                    Icon = FontAwesome.Solid.Cross,
+                });
+            }
+        }
+
         public MenuItem[] ContextMenuItems
         {
             get
@@ -122,6 +169,7 @@ namespace osu.Game.Screens.Select.Carousel
                 if (beatmapSet.Beatmaps.Any(b => b.Hidden))
                     items.Add(new OsuMenuItem("Restore all hidden", MenuItemType.Standard, () => restoreHiddenRequested?.Invoke(beatmapSet)));
 
+                items.Add(new OsuMenuItem("Save audio as an mp3 file", MenuItemType.Standard, saveAudio));
                 items.Add(new OsuMenuItem("Delete", MenuItemType.Destructive, () => dialogOverlay?.Push(new BeatmapDeleteDialog(beatmapSet))));
 
                 return items.ToArray();
