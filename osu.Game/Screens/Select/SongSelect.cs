@@ -140,16 +140,16 @@ namespace osu.Game.Screens.Select
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
                     Width = 2, //avoid horizontal masking so the panels don't clip when screen stack is pushed.
-                    Child = new EdgeSnappingContainer
+                    Children = new Drawable[]
                     {
-                        RelativeSizeAxes = Axes.Both,
-                        Anchor = Anchor.Centre,
-                        Origin = Anchor.Centre,
-                        Width = 0.5f,
-                        SnappedEdges = Edges.Horizontal, // vertical snapping will have no effect as the parent container is masking
-                        Children = new Drawable[]
+                        new EdgeSnappingContainer
                         {
-                            Carousel = new BeatmapCarousel
+                            RelativeSizeAxes = Axes.Both,
+                            Anchor = Anchor.Centre,
+                            Origin = Anchor.Centre,
+                            Width = 0.5f,
+                            SnappedEdges = Edges.Horizontal, // vertical snapping will have no effect as the parent container is masking
+                            Child = Carousel = new BeatmapCarousel
                             {
                                 Masking = false,
                                 RelativeSizeAxes = Axes.Both,
@@ -159,19 +159,22 @@ namespace osu.Game.Screens.Select
                                 SelectionChanged = updateSelectedBeatmap,
                                 BeatmapSetsChanged = carouselBeatmapsLoaded,
                             },
-                            FilterControl = new FilterControl
+                        },
+                        FilterControl = new FilterControl
+                        {
+                            RelativeSizeAxes = Axes.X,
+                            Anchor = Anchor.TopCentre,
+                            Origin = Anchor.TopCentre,
+                            Height = 100,
+                            Width = 0.5f,
+                            FilterChanged = c => Carousel.Filter(c),
+                            Background = { Width = 2 },
+                            Exit = () =>
                             {
-                                RelativeSizeAxes = Axes.X,
-                                Height = 100,
-                                FilterChanged = c => Carousel.Filter(c),
-                                Background = { Width = 2 },
-                                Exit = () =>
-                                {
-                                    if (this.IsCurrentScreen())
-                                        this.Exit();
-                                },
+                                if (this.IsCurrentScreen())
+                                    this.Exit();
                             },
-                        }
+                        },
                     },
                 },
                 beatmapInfoWedgeMaskingContainer = new Container

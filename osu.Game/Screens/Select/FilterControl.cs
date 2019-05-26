@@ -78,11 +78,16 @@ namespace osu.Game.Screens.Select
         {
             Children = new Drawable[]
             {
-                Background = new Box
+                new EdgeSnappingContainer
                 {
-                    Colour = Color4.Black,
-                    Alpha = 0.8f,
                     RelativeSizeAxes = Axes.Both,
+                    SnappedEdges = Edges.Horizontal,
+                    Child = Background = new Box
+                    {
+                        Colour = Color4.Black,
+                        Alpha = 0.8f,
+                        RelativeSizeAxes = Axes.Both,
+                    },
                 },
                 new Container
                 {
