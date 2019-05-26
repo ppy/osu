@@ -389,7 +389,6 @@ namespace osu.Game
                                 screenStack = new OsuScreenStack { RelativeSizeAxes = Axes.Both },
                                 logoContainer = new Container { RelativeSizeAxes = Axes.Both },
                             }
-                            
                         },
                         overlayContent = new Container { RelativeSizeAxes = Axes.Both },
                         rightFloatingOverlayContent = new Container { RelativeSizeAxes = Axes.Both },

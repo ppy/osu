@@ -58,7 +58,6 @@ namespace osu.Game.Screens.Menu
             if (host.CanExit)
                 edgeSnappingContainer.Add(new ExitConfirmOverlay { Action = this.Exit });
 
-            
             edgeSnappingContainer.AddRange(new Drawable[]
             {
                 new ParallaxContainer
