@@ -57,6 +57,11 @@ namespace osu.Game.Overlays
             AutoSizeAxes = Axes.X;
         }
 
+        /// <summary>
+        /// Individual <see cref="SettingsPanel"/>s should not dim the main content.
+        /// </summary>
+        protected override bool DimMainContent => false;
+
         protected virtual IEnumerable<SettingsSection> CreateSections() => null;
 
         [BackgroundDependencyLoader]

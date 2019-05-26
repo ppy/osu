@@ -44,6 +44,11 @@ namespace osu.Game.Overlays
 
         public override bool AcceptsFocus => keyBindingPanel.State != Visibility.Visible;
 
+        /// <summary>
+        /// <see cref="SettingsOverlay"/> is a special case that should dim the main content.
+        /// </summary>
+        protected override bool DimMainContent => true;
+
         private void keyBindingPanelStateChanged(Visibility visibility)
         {
             switch (visibility)
