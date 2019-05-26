@@ -82,11 +82,16 @@ namespace osu.Game.Screens.Select
                         Colour = Color4.Black.Opacity(0.5f),
                     }
                 },
-                modeLight = new Box
+                new EdgeSnappingContainer
                 {
+                    SnappedEdges = Edges.Horizontal,
                     RelativeSizeAxes = Axes.X,
-                    Height = 3,
-                    Position = new Vector2(0, -3),
+                    Child = modeLight = new Box
+                    {
+                        RelativeSizeAxes = Axes.X,
+                        Height = 3,
+                        Position = new Vector2(0, -3),
+                    }
                 },
                 new BackButton
                 {

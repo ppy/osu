@@ -63,14 +63,21 @@ namespace osu.Game.Screens.Select.Options
 
             Children = new Drawable[]
             {
-                holder = new Box
+                new EdgeSnappingContainer
                 {
+                    RelativeSizeAxes = Axes.Both,
                     Origin = Anchor.BottomLeft,
                     Anchor = Anchor.BottomLeft,
-                    RelativeSizeAxes = Axes.Both,
-                    Height = 0.5f,
-                    Scale = new Vector2(1, 0),
-                    Colour = Color4.Black.Opacity(0.5f),
+                    SnappedEdges = Edges.Horizontal,
+                    Child = holder = new Box
+                    {
+                        Origin = Anchor.BottomLeft,
+                        Anchor = Anchor.BottomLeft,
+                        RelativeSizeAxes = Axes.Both,
+                        Height = 0.5f,
+                        Scale = new Vector2(1, 0),
+                        Colour = Color4.Black.Opacity(0.5f),
+                    },
                 },
                 buttonsContainer = new ReverseChildIDFillFlowContainer<BeatmapOptionsButton>
                 {
