@@ -6,6 +6,7 @@ using System.IO;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Logging;
+using osu.Framework.Platform;
 using osu.Framework.Platform.Windows;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Legacy;
@@ -26,17 +27,17 @@ namespace osu.Game.Tournament.IPC
         private int lastBeatmapId;
 
         [BackgroundDependencyLoader]
-        private void load(LadderInfo ladder)
+        private void load(LadderInfo ladder, GameHost host)
         {
             StableStorage stable;
 
             try
             {
-                stable = new StableStorage();
+                stable = new StableStorage(host as DesktopGameHost);
             }
-            catch
+            catch (Exception e)
             {
-                Logger.Log("Stable installation could not be found; disabling file based IPC");
+                Logger.Error(e, "Stable installation could not be found; disabling file based IPC");
                 return;
             }
 
@@ -170,8 +171,8 @@ namespace osu.Game.Tournament.IPC
                 }
             }
 
-            public StableStorage()
-                : base(string.Empty, null)
+            public StableStorage(DesktopGameHost host)
+                : base(string.Empty, host)
             {
             }
         }
