@@ -486,8 +486,10 @@ namespace osu.Game.Screens.Play
                 return true;
 
             GameplayClockContainer.ResetLocalAdjustments();
-            
-            GameplayClockContainer.Start();
+
+            if(ValidForResume)
+                GameplayClockContainer.Start();
+
             fadeOut();
             return base.OnExiting(next);
         }
