@@ -3,17 +3,15 @@
 
 using osu.Framework.Bindables;
 using osuTK;
-using osuTK.Graphics;
-using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Events;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Users;
+using osu.Framework.Allocation;
 
 namespace osu.Game.Overlays.Profile.Sections.Kudosu
 {
@@ -32,13 +30,6 @@ namespace osu.Game.Overlays.Profile.Sections.Kudosu
             AutoSizeAxes = Axes.Y;
             Masking = true;
             CornerRadius = 3;
-            EdgeEffect = new EdgeEffectParameters
-            {
-                Type = EdgeEffectType.Shadow,
-                Offset = new Vector2(0f, 1f),
-                Radius = 3f,
-                Colour = Color4.Black.Opacity(0.2f),
-            };
             Children = new Drawable[]
             {
                 new Box
@@ -50,6 +41,8 @@ namespace osu.Game.Overlays.Profile.Sections.Kudosu
                 {
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
+                    Direction = FillDirection.Horizontal,
+                    Spacing = new Vector2(5, 0),
                     Children = new[]
                     {
                         total = new CountSection(
@@ -76,6 +69,8 @@ namespace osu.Game.Overlays.Profile.Sections.Kudosu
         private class CountSection : Container
         {
             private readonly OsuSpriteText valueText;
+            private readonly OsuTextFlowContainer descriptionText;
+            private readonly Box lineBackground;
 
             public new int Count
             {
@@ -87,7 +82,7 @@ namespace osu.Game.Overlays.Profile.Sections.Kudosu
                 RelativeSizeAxes = Axes.X;
                 Width = 0.5f;
                 AutoSizeAxes = Axes.Y;
-                Padding = new MarginPadding { Horizontal = 10, Top = 10, Bottom = 20 };
+                Padding = new MarginPadding { Top = 10, Bottom = 20 };
                 Child = new FillFlowContainer
                 {
                     AutoSizeAxes = Axes.Y,
@@ -96,31 +91,28 @@ namespace osu.Game.Overlays.Profile.Sections.Kudosu
                     Spacing = new Vector2(0, 5),
                     Children = new Drawable[]
                     {
-                        new FillFlowContainer
+                        new CircularContainer
                         {
-                            AutoSizeAxes = Axes.Both,
-                            Direction = FillDirection.Horizontal,
-                            Spacing = new Vector2(5, 0),
-                            Children = new Drawable[]
+                            Masking = true,
+                            RelativeSizeAxes = Axes.X,
+                            Height = 5,
+                            Child = lineBackground = new Box
                             {
-                                new OsuSpriteText
-                                {
-                                    Anchor = Anchor.BottomLeft,
-                                    Origin = Anchor.BottomLeft,
-                                    Text = header + ":",
-                                    Font = OsuFont.GetFont(size: 20, weight: FontWeight.Regular, italics: true)
-                                },
-                                valueText = new OsuSpriteText
-                                {
-                                    Anchor = Anchor.BottomLeft,
-                                    Origin = Anchor.BottomLeft,
-                                    Text = "0",
-                                    Font = OsuFont.GetFont(size: 40, weight: FontWeight.Regular, italics: true),
-                                    UseFullGlyphHeight = false,
-                                }
+                                RelativeSizeAxes = Axes.Both,
                             }
                         },
-                        new OsuTextFlowContainer(t => t.Font = t.Font.With(size: 19))
+                        new OsuSpriteText
+                        {
+                            Text = header,
+                            Font = OsuFont.GetFont(size: 15, weight: FontWeight.Bold)
+                        },
+                        valueText = new OsuSpriteText
+                        {
+                            Text = "0",
+                            Font = OsuFont.GetFont(size: 50, weight: FontWeight.Light),
+                            UseFullGlyphHeight = false,
+                        },
+                        descriptionText = new OsuTextFlowContainer(t => t.Font = t.Font.With(size: 17))
                         {
                             RelativeSizeAxes = Axes.X,
                             AutoSizeAxes = Axes.Y,
@@ -128,6 +120,13 @@ namespace osu.Game.Overlays.Profile.Sections.Kudosu
                         }
                     }
                 };
+            }
+
+            [BackgroundDependencyLoader]
+            private void load(OsuColour colours)
+            {
+                lineBackground.Colour = colours.Yellow;
+                descriptionText.Colour = colours.GreySeafoamLighter;
             }
         }
     }
