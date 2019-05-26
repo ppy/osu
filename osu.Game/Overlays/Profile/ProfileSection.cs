@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -15,6 +16,9 @@ namespace osu.Game.Overlays.Profile
 {
     public abstract class ProfileSection : FillFlowContainer
     {
+        private readonly Box underscore;
+        private const int underscore_height = 2;
+
         public abstract string Title { get; }
 
         public abstract string Identifier { get; }
@@ -32,14 +36,32 @@ namespace osu.Game.Overlays.Profile
             RelativeSizeAxes = Axes.X;
             InternalChildren = new Drawable[]
             {
-                new OsuSpriteText
+                new FillFlowContainer
                 {
-                    Text = Title,
-                    Font = OsuFont.GetFont(size: 20, weight: FontWeight.Regular, italics: true),
+                    AutoSizeAxes = Axes.Both,
+                    Direction = FillDirection.Vertical,
+                    Spacing = new Vector2(4),
                     Margin = new MarginPadding
                     {
                         Horizontal = UserProfileOverlay.CONTENT_X_MARGIN,
                         Vertical = 10
+                    },
+                    Children = new Drawable[]
+                    {
+                        new OsuSpriteText
+                        {
+                            Text = Title,
+                            Font = OsuFont.GetFont(size: 20, weight: FontWeight.Bold),
+                        },
+                        new Container
+                        {
+                            Height = underscore_height,
+                            RelativeSizeAxes = Axes.X,
+                            Child = underscore = new Box
+                            {
+                                RelativeSizeAxes = Axes.Both,
+                            }
+                        }
                     }
                 },
                 content = new FillFlowContainer
@@ -71,6 +93,12 @@ namespace osu.Game.Overlays.Profile
                 Origin = Anchor.Centre,
                 Margin = new MarginPadding { Top = 100, Bottom = 100 }
             });
+        }
+
+        [BackgroundDependencyLoader]
+        private void load(OsuColour colours)
+        {
+            underscore.Colour = colours.Seafoam;
         }
     }
 }
