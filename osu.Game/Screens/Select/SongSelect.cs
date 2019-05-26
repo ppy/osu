@@ -172,21 +172,15 @@ namespace osu.Game.Screens.Select
                         }
                     },
                 },
-                new EdgeSnappingContainer
+                beatmapInfoWedge = new BeatmapInfoWedge
                 {
-                    SnappedEdges = Edges.Left,
+                    Size = wedged_container_size,
                     RelativeSizeAxes = Axes.X,
-                    AutoSizeAxes = Axes.Y,
-                    Child = beatmapInfoWedge = new BeatmapInfoWedge
+                    Margin = new MarginPadding
                     {
-                        Size = wedged_container_size,
-                        RelativeSizeAxes = Axes.X,
-                        Margin = new MarginPadding
-                        {
-                            Top = left_area_padding,
-                            Right = left_area_padding,
-                        },
-                    }
+                        Top = left_area_padding,
+                        Right = left_area_padding,
+                    },
                 },
                 new ResetScrollContainer(() => Carousel.ScrollToSelected())
                 {
