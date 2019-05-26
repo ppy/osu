@@ -90,6 +90,8 @@ namespace osu.Game.Screens.Select
 
         protected SongSelect()
         {
+            Container beatmapInfoWedgeMaskingContainer;
+
             AddRangeInternal(new Drawable[]
             {
                 new EdgeSnappingContainer
@@ -172,15 +174,16 @@ namespace osu.Game.Screens.Select
                         }
                     },
                 },
-                beatmapInfoWedge = new BeatmapInfoWedge
+                beatmapInfoWedgeMaskingContainer = new Container
                 {
-                    Size = wedged_container_size,
                     RelativeSizeAxes = Axes.X,
-                    Margin = new MarginPadding
+                    AutoSizeAxes = Axes.Y,
+                    Masking = true,
+                    Child = beatmapInfoWedge = new BeatmapInfoWedge
                     {
-                        Top = left_area_padding,
-                        Right = left_area_padding,
-                    },
+                        Size = wedged_container_size,
+                        RelativeSizeAxes = Axes.X,
+                    }
                 },
                 new ResetScrollContainer(() => Carousel.ScrollToSelected())
                 {
@@ -188,6 +191,14 @@ namespace osu.Game.Screens.Select
                     Width = 250,
                 }
             });
+
+            beatmapInfoWedgeMaskingContainer.Padding = new MarginPadding
+            {
+                Left = -beatmapInfoWedge.BorderThickness,
+                Top = left_area_padding,
+                Bottom = left_area_padding,
+                Right = left_area_padding
+            };
 
             if (ShowFooter)
             {
