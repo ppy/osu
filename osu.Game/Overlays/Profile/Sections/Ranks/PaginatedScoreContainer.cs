@@ -41,8 +41,8 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
 
                 if (!scores.Any() && VisiblePages == 1)
                 {
-                    ShowMoreButton.Hide();
-                    ShowMoreLoading.Hide();
+                    MoreButton.Hide();
+                    MoreButton.IsLoading = false;
                     MissingText.Show();
                     return;
                 }
@@ -63,9 +63,8 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
                 LoadComponentsAsync(drawableScores, s =>
                 {
                     MissingText.Hide();
-                    ShowMoreButton.FadeTo(scores.Count == ItemsPerPage ? 1 : 0);
-                    ShowMoreLoading.Hide();
-
+                    MoreButton.FadeTo(scores.Count == ItemsPerPage ? 1 : 0);
+                    MoreButton.IsLoading = false;
                     ItemsContainer.AddRange(s);
                 });
             });
