@@ -40,11 +40,16 @@ namespace osu.Game.Overlays
 
             AddRange(new Drawable[]
             {
-                new Box
+                new EdgeSnappingContainer
                 {
-                    RelativeSizeAxes = Axes.Y,
-                    Width = 300,
-                    Colour = ColourInfo.GradientHorizontal(Color4.Black.Opacity(0.75f), Color4.Black.Opacity(0))
+                    RelativeSizeAxes = Axes.Both,
+                    SnappedEdges = Edges.All,
+                    Child = new Box
+                    {
+                        RelativeSizeAxes = Axes.Y,
+                        Width = 300,
+                        Colour = ColourInfo.GradientHorizontal(Color4.Black.Opacity(0.75f), Color4.Black.Opacity(0))
+                    },
                 },
                 new FillFlowContainer
                 {
