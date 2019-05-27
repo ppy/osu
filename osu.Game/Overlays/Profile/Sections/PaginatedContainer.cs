@@ -55,6 +55,8 @@ namespace osu.Game.Overlays.Profile.Sections
                 {
                     AutoSizeAxes = Axes.Y,
                     RelativeSizeAxes = Axes.X,
+                    Direction = FillDirection.Vertical,
+                    Spacing = new Vector2(0, 3),
                 },
                 MoreButton = new ShowMoreButton
                 {
