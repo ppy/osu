@@ -48,23 +48,23 @@ namespace osu.Game.Overlays.Profile.Sections
                 new OsuSpriteText
                 {
                     Text = header,
-                    Font = OsuFont.GetFont(size: 15, weight: FontWeight.Regular, italics: true),
+                    Font = OsuFont.GetFont(size: 20, weight: FontWeight.Bold),
                     Margin = new MarginPadding { Top = 10, Bottom = 10 },
                 },
                 ItemsContainer = new FillFlowContainer
                 {
                     AutoSizeAxes = Axes.Y,
                     RelativeSizeAxes = Axes.X,
-                    Margin = new MarginPadding { Bottom = 10 }
                 },
                 MoreButton = new ShowMoreButton
                 {
                     Alpha = 0,
+                    Margin = new MarginPadding { Top = 10 },
                     Action = ShowMore,
                 },
                 MissingText = new OsuSpriteText
                 {
-                    Font = OsuFont.GetFont(size: 14),
+                    Font = OsuFont.GetFont(size: 15),
                     Text = missing,
                     Alpha = 0,
                 },
