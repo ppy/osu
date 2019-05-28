@@ -210,7 +210,7 @@ namespace osu.Game.Tests.Visual.SongSelect
         }
 
         [Test]
-        public void TestAddNewBeatmap()
+        public void TestAddNewBeatmapWhileSelectingRandom()
         {
             const int test_count = 10;
             int beatmapChangedCount = 0;
