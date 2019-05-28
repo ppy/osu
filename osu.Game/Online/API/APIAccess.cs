@@ -55,7 +55,7 @@ namespace osu.Game.Online.API
             authentication.TokenString = config.Get<string>(OsuSetting.Token);
             authentication.Token.ValueChanged += onTokenChanged;
 
-            LocalUser.BindValueChanged(_ => IsLoggedIn.Value = getIsLoggedInInternal());
+            LocalUser.BindValueChanged(_ => IsLoggedIn.Value = LocalUser.Value.Id > 1, true);
 
             var thread = new Thread(run)
             {
@@ -324,9 +324,7 @@ namespace osu.Game.Online.API
             return true;
         }
 
-        public Bindable<bool> IsLoggedIn => new Bindable<bool>(getIsLoggedInInternal());
-
-        private bool getIsLoggedInInternal() => LocalUser.Value.Id > 1;
+        public Bindable<bool> IsLoggedIn { get; } = new Bindable<bool>();
 
         public void Queue(APIRequest request)
         {
