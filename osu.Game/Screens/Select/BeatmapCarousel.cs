@@ -158,6 +158,9 @@ namespace osu.Game.Screens.Select
 
                 var newSet = createCarouselSet(beatmapSet);
 
+                // Since we're about to remove the selected beatmap, store its ID so we can go back if needed.
+                var previouslySelectedID = selectedBeatmap?.Beatmap.ID;
+
                 if (existingSet != null)
                     root.RemoveChild(existingSet);
 
@@ -173,7 +176,7 @@ namespace osu.Game.Screens.Select
 
                 //check if we can/need to maintain our current selection.
                 if (hadSelection)
-                    select((CarouselItem)newSet.Beatmaps.FirstOrDefault(b => b.Beatmap.ID == selectedBeatmap?.Beatmap.ID) ?? newSet);
+                    select((CarouselItem)newSet.Beatmaps.FirstOrDefault(b => b.Beatmap.ID == previouslySelectedID) ?? newSet);
 
                 itemsCache.Invalidate();
                 Schedule(() => BeatmapSetsChanged?.Invoke());

@@ -234,6 +234,18 @@ namespace osu.Game.Tests.Visual.SongSelect
             AddAssert($"Beatmap changed {test_count} times", () => beatmapChangedCount == test_count);
         }
 
+        [Test]
+        public void TestHideSetSelectsCorrectBeatmap()
+        {
+            int? previousID = null;
+            createSongSelect();
+            importForRuleset(0);
+            AddStep("Move to last difficulty", () => songSelect.Carousel.SelectBeatmap(songSelect.Carousel.BeatmapSets.First().Beatmaps.Last()));
+            AddStep("Store current ID", () => previousID = songSelect.Carousel.SelectedBeatmap.ID);
+            AddStep("Hide first beatmap", () => manager.Hide(songSelect.Carousel.SelectedBeatmapSet.Beatmaps.First()));
+            AddAssert("Selected beatmap has not changed", () => songSelect.Carousel.SelectedBeatmap.ID == previousID);
+        }
+
         private void importForRuleset(int id) => AddStep($"import test map for ruleset {id}",
             () => manager.Import(createTestBeatmapSet(getImportId(), rulesets.AvailableRulesets.Where(r => r.ID == id).ToArray())));
 
