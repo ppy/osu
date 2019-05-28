@@ -22,8 +22,6 @@ namespace osu.Game.Overlays.Profile.Sections.Recent
 
         protected override void ShowMore()
         {
-            base.ShowMore();
-
             request = new GetUserRecentActivitiesRequest(User.Value.Id, VisiblePages++ * ItemsPerPage);
             request.Success += activities => Schedule(() =>
             {
