@@ -2,15 +2,11 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
-using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Events;
 using osu.Game.Graphics;
-using osuTK;
-using osuTK.Graphics;
 
 namespace osu.Game.Overlays.Profile.Sections
 {
@@ -18,7 +14,6 @@ namespace osu.Game.Overlays.Profile.Sections
     {
         private const int fade_duration = 200;
 
-        private Box underscoreLine;
         private readonly Box coloredBackground;
         private readonly Container background;
 
@@ -35,22 +30,15 @@ namespace osu.Game.Overlays.Profile.Sections
         protected DrawableProfileRow()
         {
             RelativeSizeAxes = Axes.X;
-            Height = 60;
+            Height = 40;
             InternalChildren = new Drawable[]
             {
                 background = new Container
                 {
                     RelativeSizeAxes = Axes.Both,
                     Masking = true,
-                    CornerRadius = 3,
+                    CornerRadius = 10,
                     Alpha = 0,
-                    EdgeEffect = new EdgeEffectParameters
-                    {
-                        Type = EdgeEffectType.Shadow,
-                        Offset = new Vector2(0f, 1f),
-                        Radius = 1f,
-                        Colour = Color4.Black.Opacity(0.2f),
-                    },
                     Child = coloredBackground = new Box { RelativeSizeAxes = Axes.Both }
                 },
                 Content = new Container
@@ -68,13 +56,6 @@ namespace osu.Game.Overlays.Profile.Sections
         {
             AddRange(new Drawable[]
             {
-                underscoreLine = new Box
-                {
-                    Anchor = Anchor.BottomCentre,
-                    Origin = Anchor.BottomCentre,
-                    RelativeSizeAxes = Axes.X,
-                    Height = 1,
-                },
                 new FillFlowContainer
                 {
                     RelativeSizeAxes = Axes.Both,
@@ -103,7 +84,7 @@ namespace osu.Game.Overlays.Profile.Sections
                 },
             });
 
-            coloredBackground.Colour = underscoreLine.Colour = colour.Gray4;
+            coloredBackground.Colour = colour.Gray4;
         }
 
         protected override bool OnClick(ClickEvent e) => true;
@@ -111,14 +92,12 @@ namespace osu.Game.Overlays.Profile.Sections
         protected override bool OnHover(HoverEvent e)
         {
             background.FadeIn(fade_duration, Easing.OutQuint);
-            underscoreLine.FadeOut(fade_duration, Easing.OutQuint);
             return true;
         }
 
         protected override void OnHoverLost(HoverLostEvent e)
         {
             background.FadeOut(fade_duration, Easing.OutQuint);
-            underscoreLine.FadeIn(fade_duration, Easing.OutQuint);
             base.OnHoverLost(e);
         }
     }

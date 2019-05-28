@@ -12,7 +12,7 @@ namespace osu.Game.Overlays.Profile.Sections
 {
     public class ClickableLink : Container
     {
-        private const int duration = 300;
+        private const int duration = 200;
 
         protected readonly BeatmapInfo Beatmap;
         protected Action ClickAction;

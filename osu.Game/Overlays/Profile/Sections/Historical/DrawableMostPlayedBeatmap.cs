@@ -25,7 +25,7 @@ namespace osu.Game.Overlays.Profile.Sections.Historical
         private readonly Box background;
         private Color4 idleBackgroundColour;
         private Color4 hoveredBackgroundColour;
-        private const int duration = 300;
+        private const int duration = 200;
         private const int cover_width = 100;
         private const int corner_radius = 10;
         private readonly SpriteIcon icon;
