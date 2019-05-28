@@ -37,5 +37,11 @@ namespace osu.Game.Configuration
 
             SettingChanged?.Invoke();
         }
+
+        public void Delete(DatabasedSetting setting)
+        {
+            using (var usage = ContextFactory.GetForWrite())
+                usage.Context.Remove(setting);
+        }
     }
 }
