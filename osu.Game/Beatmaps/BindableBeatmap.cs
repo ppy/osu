@@ -1,11 +1,9 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
 using System.Diagnostics;
 using JetBrains.Annotations;
 using osu.Framework.Audio;
-using osu.Framework.Audio.Track;
 using osu.Framework.Bindables;
 
 namespace osu.Game.Beatmaps
@@ -16,32 +14,26 @@ namespace osu.Game.Beatmaps
     /// </summary>
     public abstract class BindableBeatmap : NonNullableBindable<WorkingBeatmap>
     {
-        private AudioManager audioManager;
+        protected AudioManager AudioManager;
+
         private WorkingBeatmap lastBeatmap;
 
-        protected BindableBeatmap(WorkingBeatmap defaultValue)
+        protected BindableBeatmap(WorkingBeatmap defaultValue, AudioManager audioManager)
             : base(defaultValue)
         {
+            // we don't want to attempt to update tracks if we are a bound copy.
+            if (audioManager != null)
+            {
+                AudioManager = audioManager;
+                ValueChanged += b => updateAudioTrack(b.NewValue);
+
+                // If the track has changed prior to this being called, let's register it
+                if (Value != Default)
+                    updateAudioTrack(Value);
+            }
         }
 
-        /// <summary>
-        /// Registers an <see cref="AudioManager"/> for <see cref="Track"/>s to be added to.
-        /// </summary>
-        /// <param name="audioManager">The <see cref="AudioManager"/> to register.</param>
-        protected void RegisterAudioManager([NotNull] AudioManager audioManager)
-        {
-            if (this.audioManager != null) throw new InvalidOperationException($"Cannot register multiple {nameof(AudioManager)}s.");
-
-            this.audioManager = audioManager;
-
-            ValueChanged += b => registerAudioTrack(b.NewValue);
-
-            // If the track has changed prior to this being called, let's register it
-            if (Value != Default)
-                registerAudioTrack(Value);
-        }
-
-        private void registerAudioTrack(WorkingBeatmap beatmap)
+        private void updateAudioTrack(WorkingBeatmap beatmap)
         {
             var trackLoaded = lastBeatmap?.TrackLoaded ?? false;
 
@@ -55,8 +47,6 @@ namespace osu.Game.Beatmaps
 
                     lastBeatmap.RecycleTrack();
                 }
-
-                audioManager.Tracks.AddItem(beatmap.Track);
             }
 
             lastBeatmap = beatmap;
