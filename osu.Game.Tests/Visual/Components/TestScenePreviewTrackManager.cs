@@ -111,11 +111,11 @@ namespace osu.Game.Tests.Visual.Components
 
         private class TestPreviewTrackManager : PreviewTrackManager
         {
-            protected override TrackManagerPreviewTrack CreatePreviewTrack(BeatmapSetInfo beatmapSetInfo, TrackManager trackManager) => new TestPreviewTrack(beatmapSetInfo, trackManager);
+            protected override TrackManagerPreviewTrack CreatePreviewTrack(BeatmapSetInfo beatmapSetInfo, TrackStore trackStore) => new TestPreviewTrack(beatmapSetInfo, trackStore);
 
             protected class TestPreviewTrack : TrackManagerPreviewTrack
             {
-                public TestPreviewTrack(BeatmapSetInfo beatmapSetInfo, TrackManager trackManager)
+                public TestPreviewTrack(BeatmapSetInfo beatmapSetInfo, TrackStore trackManager)
                     : base(beatmapSetInfo, trackManager)
                 {
                 }

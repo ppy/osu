@@ -255,7 +255,7 @@ namespace osu.Game.Screens.Multi
 
                     if (!track.IsRunning)
                     {
-                        game.Audio.AddItemToList(track);
+                        game.Audio.AddItem(track);
                         track.Seek(Beatmap.Value.Metadata.PreviewTime);
                         track.Start();
                     }

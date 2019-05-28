@@ -20,19 +20,19 @@ namespace osu.Game.Audio
         private readonly BindableDouble muteBindable = new BindableDouble();
 
         private AudioManager audio;
-        private TrackManager trackManager;
+        private TrackStore trackStore;
 
         private TrackManagerPreviewTrack current;
 
         [BackgroundDependencyLoader]
         private void load(AudioManager audio, FrameworkConfigManager config)
         {
-            trackManager = new TrackManager(new OnlineStore());
+            trackStore = new TrackStore(new OnlineStore());
 
             this.audio = audio;
-            audio.AddItem(trackManager);
+            audio.AddItem(trackStore);
 
-            config.BindWith(FrameworkSetting.VolumeMusic, trackManager.Volume);
+            config.BindWith(FrameworkSetting.VolumeMusic, trackStore.Volume);
         }
 
         /// <summary>
@@ -42,19 +42,19 @@ namespace osu.Game.Audio
         /// <returns>The playable <see cref="PreviewTrack"/>.</returns>
         public PreviewTrack Get(BeatmapSetInfo beatmapSetInfo)
         {
-            var track = CreatePreviewTrack(beatmapSetInfo, trackManager);
+            var track = CreatePreviewTrack(beatmapSetInfo, trackStore);
 
             track.Started += () =>
             {
                 current?.Stop();
                 current = track;
-                audio.Track.AddAdjustment(AdjustableProperty.Volume, muteBindable);
+                audio.Tracks.AddAdjustment(AdjustableProperty.Volume, muteBindable);
             };
 
             track.Stopped += () =>
             {
                 current = null;
-                audio.Track.RemoveAdjustment(AdjustableProperty.Volume, muteBindable);
+                audio.Tracks.RemoveAdjustment(AdjustableProperty.Volume, muteBindable);
             };
 
             return track;
@@ -81,16 +81,16 @@ namespace osu.Game.Audio
         /// <summary>
         /// Creates the <see cref="TrackManagerPreviewTrack"/>.
         /// </summary>
-        protected virtual TrackManagerPreviewTrack CreatePreviewTrack(BeatmapSetInfo beatmapSetInfo, TrackManager trackManager) => new TrackManagerPreviewTrack(beatmapSetInfo, trackManager);
+        protected virtual TrackManagerPreviewTrack CreatePreviewTrack(BeatmapSetInfo beatmapSetInfo, TrackStore trackStore) => new TrackManagerPreviewTrack(beatmapSetInfo, trackStore);
 
         protected class TrackManagerPreviewTrack : PreviewTrack
         {
             public IPreviewTrackOwner Owner { get; private set; }
 
             private readonly BeatmapSetInfo beatmapSetInfo;
-            private readonly TrackManager trackManager;
+            private readonly TrackStore trackManager;
 
-            public TrackManagerPreviewTrack(BeatmapSetInfo beatmapSetInfo, TrackManager trackManager)
+            public TrackManagerPreviewTrack(BeatmapSetInfo beatmapSetInfo, TrackStore trackManager)
             {
                 this.beatmapSetInfo = beatmapSetInfo;
                 this.trackManager = trackManager;

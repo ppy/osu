@@ -39,7 +39,7 @@ namespace osu.Game.Skinning
             {
                 var ch = loadChannel(s, skin.GetSample);
                 if (ch == null && allowFallback)
-                    ch = loadChannel(s, audio.Sample.Get);
+                    ch = loadChannel(s, audio.Samples.Get);
                 return ch;
             }).Where(c => c != null).ToArray();
         }
