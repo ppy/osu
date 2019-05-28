@@ -35,14 +35,14 @@ namespace osu.Game.Overlays.Profile.Header
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
-            iconColour = colours.CommunityUserGrayGreenLighter;
+            iconColour = colours.GreySeafoamLighter;
 
             InternalChildren = new Drawable[]
             {
                 new Box
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Colour = colours.CommunityUserGrayGreenDarker,
+                    Colour = colours.GreySeafoamDark,
                 },
                 new FillFlowContainer
                 {
@@ -87,18 +87,18 @@ namespace osu.Game.Overlays.Profile.Header
 
             addSpacer(topLinkContainer);
 
-            if (user.PlayStyles?.Length > 0)
-            {
-                topLinkContainer.AddText("Plays with ");
-                topLinkContainer.AddText(string.Join(", ", user.PlayStyles.Select(style => style.GetDescription())), embolden);
-
-                addSpacer(topLinkContainer);
-            }
-
             if (user.LastVisit.HasValue)
             {
                 topLinkContainer.AddText("Last seen ");
                 topLinkContainer.AddText(new DrawableDate(user.LastVisit.Value), embolden);
+
+                addSpacer(topLinkContainer);
+            }
+
+            if (user.PlayStyles?.Length > 0)
+            {
+                topLinkContainer.AddText("Plays with ");
+                topLinkContainer.AddText(string.Join(", ", user.PlayStyles.Select(style => style.GetDescription())), embolden);
 
                 addSpacer(topLinkContainer);
             }
