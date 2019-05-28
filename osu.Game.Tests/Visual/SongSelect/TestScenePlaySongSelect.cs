@@ -209,7 +209,33 @@ namespace osu.Game.Tests.Visual.SongSelect
             AddAssert("start not requested", () => !startRequested);
         }
 
-        private void importForRuleset(int id) => AddStep($"import test map for ruleset {id}", () => manager.Import(createTestBeatmapSet(getImportId(), rulesets.AvailableRulesets.Where(r => r.ID == id).ToArray())));
+        [Test]
+        public void TestAddNewBeatmap()
+        {
+            const int test_count = 10;
+            int beatmapChangedCount = 0;
+            createSongSelect();
+            AddStep("Setup counter", () =>
+            {
+                beatmapChangedCount = 0;
+                songSelect.Carousel.BeatmapSetsChanged += () => beatmapChangedCount++;
+            });
+            AddRepeatStep($"Create beatmaps {test_count} times", () =>
+            {
+                manager.Import(createTestBeatmapSet(getImportId(), rulesets.AvailableRulesets.Where(r => r.ID == 0).ToArray()));
+
+                Scheduler.AddDelayed(() =>
+                {
+                    // Wait for debounce
+                    songSelect.Carousel.SelectNextRandom();
+                }, 400);
+            }, test_count);
+
+            AddAssert($"Beatmap changed {test_count} times", () => beatmapChangedCount == test_count);
+        }
+
+        private void importForRuleset(int id) => AddStep($"import test map for ruleset {id}",
+            () => manager.Import(createTestBeatmapSet(getImportId(), rulesets.AvailableRulesets.Where(r => r.ID == id).ToArray())));
 
         private static int importId;
         private int getImportId() => ++importId;
