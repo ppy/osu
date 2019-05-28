@@ -35,7 +35,7 @@ namespace osu.Game.Overlays.Profile.Sections
         protected APIRequest RetrievalRequest;
         protected RulesetStore Rulesets;
 
-        public PaginatedContainer(Bindable<User> user, string header, string missing)
+        protected PaginatedContainer(Bindable<User> user, string header, string missing)
         {
             User.BindTo(user);
 
@@ -114,6 +114,7 @@ namespace osu.Game.Overlays.Profile.Sections
                 {
                     if (isLoading == value)
                         return;
+
                     isLoading = value;
 
                     if (value)
