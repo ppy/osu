@@ -53,92 +53,81 @@ namespace osu.Game.Overlays.Profile.Sections.Historical
                     BeatmapSet = beatmap.BeatmapSet,
                     CoverType = BeatmapSetCoverType.List,
                 },
-                new GridContainer
+                new Container
                 {
                     RelativeSizeAxes = Axes.Both,
-                    ColumnDimensions = new[]
+                    Padding = new MarginPadding { Left = cover_width - corner_radius },
+                    Children = new Drawable[]
                     {
-                        new Dimension(GridSizeMode.Absolute, cover_width - corner_radius),
-                        new Dimension(),
-                    },
-                    Content = new[]
-                    {
-                        new Drawable[]
+                        new Container
                         {
-                            new Container
+                            RelativeSizeAxes = Axes.Both,
+                            Masking = true,
+                            CornerRadius = corner_radius,
+                            Children = new Drawable[]
                             {
-                                RelativeSizeAxes = Axes.Both,
-                            },
-                            new Container
-                            {
-                                RelativeSizeAxes = Axes.Both,
-                                Masking = true,
-                                CornerRadius = corner_radius,
-                                Children = new Drawable[]
+                                background = new Box
                                 {
-                                    background = new Box
+                                    RelativeSizeAxes = Axes.Both,
+                                },
+                                new Container
+                                {
+                                    RelativeSizeAxes = Axes.Both,
+                                    Padding = new MarginPadding { Left = 15, Right = 20 },
+                                    Children = new Drawable[]
                                     {
-                                        RelativeSizeAxes = Axes.Both,
-                                    },
-                                    new Container
-                                    {
-                                        RelativeSizeAxes = Axes.Both,
-                                        Padding = new MarginPadding { Left = 15, Right = 20 },
-                                        Children = new Drawable[]
+                                        new BeatmapName(beatmap)
                                         {
-                                            new BeatmapName(beatmap)
+                                            Anchor = Anchor.CentreLeft,
+                                            Origin = Anchor.BottomLeft,
+                                            Margin = new MarginPadding { Bottom = 2 },
+                                        },
+                                        new FillFlowContainer
+                                        {
+                                            AutoSizeAxes = Axes.Both,
+                                            Anchor = Anchor.CentreLeft,
+                                            Origin = Anchor.TopLeft,
+                                            Direction = FillDirection.Horizontal,
+                                            Margin = new MarginPadding { Top = 2 },
+                                            Children = new Drawable[]
                                             {
-                                                Anchor = Anchor.CentreLeft,
-                                                Origin = Anchor.BottomLeft,
-                                                Margin = new MarginPadding { Bottom = 2 },
-                                            },
-                                            new FillFlowContainer
-                                            {
-                                                AutoSizeAxes = Axes.Both,
-                                                Anchor = Anchor.CentreLeft,
-                                                Origin = Anchor.TopLeft,
-                                                Direction = FillDirection.Horizontal,
-                                                Margin = new MarginPadding { Top = 2 },
-                                                Children = new Drawable[]
+                                                mapperText = new OsuSpriteText
                                                 {
-                                                    mapperText = new OsuSpriteText
-                                                    {
-                                                        Text = "mapped by ",
-                                                        Font = OsuFont.GetFont(size: 15, weight: FontWeight.Regular),
-                                                    },
-                                                    new MapperName(beatmap),
-                                                }
-                                            },
-                                            new FillFlowContainer
+                                                    Text = "mapped by ",
+                                                    Font = OsuFont.GetFont(size: 15, weight: FontWeight.Regular),
+                                                },
+                                                new MapperName(beatmap),
+                                            }
+                                        },
+                                        new FillFlowContainer
+                                        {
+                                            Anchor = Anchor.CentreRight,
+                                            Origin = Anchor.CentreRight,
+                                            AutoSizeAxes = Axes.Both,
+                                            Direction = FillDirection.Horizontal,
+                                            Children = new Drawable[]
                                             {
-                                                Anchor = Anchor.CentreRight,
-                                                Origin = Anchor.CentreRight,
-                                                AutoSizeAxes = Axes.Both,
-                                                Direction = FillDirection.Horizontal,
-                                                Children = new Drawable[]
+                                                icon = new SpriteIcon
                                                 {
-                                                    icon = new SpriteIcon
-                                                    {
-                                                        Icon = FontAwesome.Solid.CaretRight,
-                                                        Origin = Anchor.Centre,
-                                                        Anchor = Anchor.Centre,
-                                                        Size = new Vector2(20),
-                                                    },
-                                                    playCountText = new OsuSpriteText
-                                                    {
-                                                        Origin = Anchor.Centre,
-                                                        Anchor = Anchor.Centre,
-                                                        Text = playCount.ToString(),
-                                                        Font = OsuFont.GetFont(size: 30, weight: FontWeight.Regular, italics: false, fixedWidth: true),
-                                                    },
-                                                }
+                                                    Icon = FontAwesome.Solid.CaretRight,
+                                                    Origin = Anchor.Centre,
+                                                    Anchor = Anchor.Centre,
+                                                    Size = new Vector2(20),
+                                                },
+                                                playCountText = new OsuSpriteText
+                                                {
+                                                    Origin = Anchor.Centre,
+                                                    Anchor = Anchor.Centre,
+                                                    Text = playCount.ToString(),
+                                                    Font = OsuFont.GetFont(size: 30, weight: FontWeight.Regular, italics: false, fixedWidth: true),
+                                                },
                                             }
                                         }
-                                    },
-                                }
+                                    }
+                                },
                             }
                         }
-                    },
+                    }
                 }
             };
         }
