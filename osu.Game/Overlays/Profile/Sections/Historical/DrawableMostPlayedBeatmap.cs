@@ -7,7 +7,6 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Events;
-using osu.Framework.Localisation;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Drawables;
 using osu.Game.Graphics;
@@ -15,7 +14,6 @@ using osu.Game.Graphics.Sprites;
 using osu.Game.Users;
 using osuTK;
 using osuTK.Graphics;
-using System;
 
 namespace osu.Game.Overlays.Profile.Sections.Historical
 {
@@ -76,7 +74,7 @@ namespace osu.Game.Overlays.Profile.Sections.Historical
                                     Padding = new MarginPadding { Left = 15, Right = 20 },
                                     Children = new Drawable[]
                                     {
-                                        new BeatmapName(beatmap)
+                                        new BeatmapLink(beatmap, BeatmapLinkType.TitleVersionAuthor)
                                         {
                                             Anchor = Anchor.CentreLeft,
                                             Origin = Anchor.BottomLeft,
@@ -119,7 +117,7 @@ namespace osu.Game.Overlays.Profile.Sections.Historical
                                                     Origin = Anchor.Centre,
                                                     Anchor = Anchor.Centre,
                                                     Text = playCount.ToString(),
-                                                    Font = OsuFont.GetFont(size: 30, weight: FontWeight.Regular, italics: false, fixedWidth: true),
+                                                    Font = OsuFont.GetFont(size: 30, weight: FontWeight.Regular, fixedWidth: true),
                                                 },
                                             }
                                         }
@@ -151,99 +149,6 @@ namespace osu.Game.Overlays.Profile.Sections.Historical
         {
             background.FadeColour(idleBackgroundColour, duration, Easing.OutQuint);
             base.OnHoverLost(e);
-        }
-
-        private class ClickableLink : Container
-        {
-            protected readonly BeatmapInfo Beatmap;
-            protected Action ClickAction;
-            private Container underscore;
-            protected FillFlowContainer TextContent;
-            protected Box UnderscoreBackground;
-
-            public ClickableLink(BeatmapInfo beatmap)
-            {
-                Beatmap = beatmap;
-                AutoSizeAxes = Axes.Both;
-                Child = new Container
-                {
-                    AutoSizeAxes = Axes.Both,
-                    Children = new Drawable[]
-                    {
-                        underscore = new Container
-                        {
-                            Anchor = Anchor.BottomLeft,
-                            Origin = Anchor.BottomLeft,
-                            RelativeSizeAxes = Axes.X,
-                            Height = 1,
-                            Alpha = 0,
-                            AlwaysPresent = true,
-                            Child = UnderscoreBackground = new Box
-                            {
-                                RelativeSizeAxes = Axes.Both,
-                            }
-                        },
-                        TextContent = new FillFlowContainer
-                        {
-                            Direction = FillDirection.Horizontal,
-                            AutoSizeAxes = Axes.Both,
-                        },
-                    },
-                };
-            }
-
-            protected override bool OnHover(HoverEvent e)
-            {
-                underscore.FadeIn(duration, Easing.OutQuint);
-                return base.OnHover(e);
-            }
-
-            protected override void OnHoverLost(HoverLostEvent e)
-            {
-                underscore.FadeOut(duration, Easing.OutQuint);
-                base.OnHoverLost(e);
-            }
-
-            protected override bool OnClick(ClickEvent e)
-            {
-                ClickAction?.Invoke();
-                return base.OnClick(e);
-            }
-        }
-
-        private class BeatmapName : ClickableLink
-        {
-            public BeatmapName(BeatmapInfo beatmap)
-                : base(beatmap)
-            {
-                TextContent.AddRange(new Drawable[]
-                {
-                    new OsuSpriteText
-                    {
-                        Text = new LocalisedString((
-                            $"{Beatmap.Metadata.TitleUnicode ?? Beatmap.Metadata.Title} [{Beatmap.Version}] ",
-                            $"{Beatmap.Metadata.Title ?? Beatmap.Metadata.TitleUnicode} [{Beatmap.Version}] ")),
-                        Font = OsuFont.GetFont(size: 20, weight: FontWeight.Bold)
-                    },
-                    new OsuSpriteText
-                    {
-                        Text = "by " + new LocalisedString((Beatmap.Metadata.ArtistUnicode, Beatmap.Metadata.Artist)),
-                        Font = OsuFont.GetFont(size: 20, weight: FontWeight.Regular)
-                    },
-                });
-            }
-
-            [BackgroundDependencyLoader(true)]
-            private void load(BeatmapSetOverlay beatmapSetOverlay)
-            {
-                ClickAction = () =>
-                {
-                    if (Beatmap.OnlineBeatmapID != null)
-                        beatmapSetOverlay?.FetchAndShowBeatmap(Beatmap.OnlineBeatmapID.Value);
-                    else if (Beatmap.BeatmapSet?.OnlineBeatmapSetID != null)
-                        beatmapSetOverlay?.FetchAndShowBeatmapSet(Beatmap.BeatmapSet.OnlineBeatmapSetID.Value);
-                };
-            }
         }
 
         private class MapperName : ClickableLink
