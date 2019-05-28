@@ -106,6 +106,7 @@ namespace osu.Game.Overlays.Profile.Sections
             private readonly FillFlowContainer content;
 
             private bool isLoading;
+
             public bool IsLoading
             {
                 set
@@ -123,10 +124,7 @@ namespace osu.Game.Overlays.Profile.Sections
                         content.FadeIn(duration, Easing.OutQuint);
                     }
                 }
-                get
-                {
-                    return isLoading;
-                }
+                get => isLoading;
             }
 
             public ShowMoreButton()
