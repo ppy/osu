@@ -17,7 +17,7 @@ namespace osu.Game.Online.API
             Id = 1001,
         });
 
-        public Bindable<bool> IsLoggedIn => new Bindable<bool>(true);
+        public Bindable<bool> IsLoggedIn { get; } = new Bindable<bool>();
 
         public string ProvidedUsername => LocalUser.Value.Username;
 
@@ -65,12 +65,14 @@ namespace osu.Game.Online.API
             };
 
             State = APIState.Online;
+            IsLoggedIn.Value = true;
         }
 
         public void Logout()
         {
             LocalUser.Value = new GuestUser();
             State = APIState.Offline;
+            IsLoggedIn.Value = false;
         }
 
         public RegistrationRequest.RegistrationRequestErrors CreateAccount(string email, string username, string password)
