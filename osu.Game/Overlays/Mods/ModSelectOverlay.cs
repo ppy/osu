@@ -56,8 +56,8 @@ namespace osu.Game.Overlays.Mods
             Ruleset.BindTo(ruleset);
             if (mods != null) SelectedMods.BindTo(mods);
 
-            sampleOn = audio.Sample.Get(@"UI/check-on");
-            sampleOff = audio.Sample.Get(@"UI/check-off");
+            sampleOn = audio.Samples.Get(@"UI/check-on");
+            sampleOff = audio.Samples.Get(@"UI/check-off");
         }
 
         protected override void LoadComplete()

@@ -56,7 +56,7 @@ namespace osu.Game.Beatmaps
                     lastBeatmap.RecycleTrack();
                 }
 
-                audioManager.Track.AddItem(beatmap.Track);
+                audioManager.Tracks.AddItem(beatmap.Track);
             }
 
             lastBeatmap = beatmap;

@@ -193,7 +193,7 @@ namespace osu.Game
 
             // tracks play so loud our samples can't keep up.
             // this adds a global reduction of track volume for the time being.
-            Audio.Track.AddAdjustment(AdjustableProperty.Volume, new BindableDouble(0.8));
+            Audio.Tracks.AddAdjustment(AdjustableProperty.Volume, new BindableDouble(0.8));
 
             beatmap = new OsuBindableBeatmap(defaultBeatmap, Audio);
 

@@ -76,8 +76,8 @@ namespace osu.Game.Screens.Menu
             introBeatmap = beatmaps.GetWorkingBeatmap(setInfo.Beatmaps[0]);
             track = introBeatmap.Track;
 
-            welcome = audio.Sample.Get(@"welcome");
-            seeya = audio.Sample.Get(@"seeya");
+            welcome = audio.Samples.Get(@"welcome");
+            seeya = audio.Samples.Get(@"seeya");
         }
 
         private const double delay_step_one = 2300;

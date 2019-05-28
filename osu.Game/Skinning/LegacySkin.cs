@@ -21,7 +21,7 @@ namespace osu.Game.Skinning
     {
         protected TextureStore Textures;
 
-        protected SampleManager Samples;
+        protected SampleStore Samples;
 
         public LegacySkin(SkinInfo skin, IResourceStore<byte[]> storage, AudioManager audioManager)
             : this(skin, new LegacySkinResourceStore<SkinFileInfo>(skin, storage), audioManager, "skin.ini")
@@ -38,7 +38,7 @@ namespace osu.Game.Skinning
             else
                 Configuration = new SkinConfiguration();
 
-            Samples = audioManager.GetSampleManager(storage);
+            Samples = audioManager.GetSampleStore(storage);
             Textures = new TextureStore(new TextureLoaderStore(storage));
         }
 
