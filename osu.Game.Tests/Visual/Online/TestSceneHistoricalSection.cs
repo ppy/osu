@@ -23,7 +23,7 @@ namespace osu.Game.Tests.Visual.Online
                 typeof(HistoricalSection),
                 typeof(PaginatedMostPlayedBeatmapContainer),
                 typeof(DrawableMostPlayedBeatmap),
-                typeof(DrawableProfileRow)
+                typeof(DrawableScore)
             };
 
         public TestSceneHistoricalSection()
