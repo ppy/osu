@@ -32,11 +32,6 @@ namespace osu.Game.Overlays.Profile.Sections.Kudosu
             CornerRadius = 3;
             Children = new Drawable[]
             {
-                new Box
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    Colour = OsuColour.Gray(0.2f)
-                },
                 new FillFlowContainer
                 {
                     RelativeSizeAxes = Axes.X,

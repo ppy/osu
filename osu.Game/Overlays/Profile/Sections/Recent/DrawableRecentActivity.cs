@@ -14,9 +14,11 @@ using osu.Game.Online.Leaderboards;
 
 namespace osu.Game.Overlays.Profile.Sections.Recent
 {
-    public class DrawableRecentActivity : DrawableProfileRow
+    public class DrawableRecentActivity : Container
     {
         private IAPIProvider api;
+
+        protected override Container<Drawable> Content { get; }
 
         private readonly APIRecentActivity activity;
 
@@ -25,6 +27,19 @@ namespace osu.Game.Overlays.Profile.Sections.Recent
         public DrawableRecentActivity(APIRecentActivity activity)
         {
             this.activity = activity;
+
+            RelativeSizeAxes = Axes.X;
+            Height = 40;
+            InternalChildren = new Drawable[]
+            {
+                Content = new Container
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Anchor = Anchor.TopCentre,
+                    Origin = Anchor.TopCentre,
+                    Width = 0.97f,
+                },
+            };
         }
 
         [BackgroundDependencyLoader]
@@ -32,20 +47,47 @@ namespace osu.Game.Overlays.Profile.Sections.Recent
         {
             this.api = api;
 
-            LeftFlowContainer.Padding = new MarginPadding { Left = 10, Right = 160 };
-
-            LeftFlowContainer.Add(content = new LinkFlowContainer
+            AddRange(new Drawable[]
             {
-                AutoSizeAxes = Axes.Y,
-                RelativeSizeAxes = Axes.X,
-            });
-
-            RightFlowContainer.Add(new DrawableDate(activity.CreatedAt)
-            {
-                Font = OsuFont.GetFont(size: 13),
-                Colour = OsuColour.Gray(0xAA),
-                Anchor = Anchor.TopRight,
-                Origin = Anchor.TopRight,
+                new FillFlowContainer
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Direction = FillDirection.Horizontal,
+                    Children = new[]
+                    {
+                        CreateLeftVisual(),
+                        new FillFlowContainer
+                        {
+                            RelativeSizeAxes = Axes.X,
+                            AutoSizeAxes = Axes.Y,
+                            Anchor = Anchor.CentreLeft,
+                            Origin = Anchor.CentreLeft,
+                            Margin = new MarginPadding { Left = 10 },
+                            Direction = FillDirection.Vertical,
+                            Padding = new MarginPadding { Left = 10, Right = 160 },
+                            Child = content = new LinkFlowContainer
+                            {
+                                AutoSizeAxes = Axes.Y,
+                                RelativeSizeAxes = Axes.X,
+                            }
+                        },
+                    }
+                },
+                new FillFlowContainer
+                {
+                    RelativeSizeAxes = Axes.X,
+                    AutoSizeAxes = Axes.Y,
+                    Anchor = Anchor.CentreRight,
+                    Origin = Anchor.CentreRight,
+                    Direction = FillDirection.Vertical,
+                    Child = new DrawableDate(activity.CreatedAt)
+                    {
+                        Font = OsuFont.GetFont(size: 13),
+                        Colour = OsuColour.Gray(0xAA),
+                        Anchor = Anchor.TopRight,
+                        Origin = Anchor.TopRight,
+                    }
+                },
             });
 
             var formatted = createMessage();
@@ -53,7 +95,7 @@ namespace osu.Game.Overlays.Profile.Sections.Recent
             content.AddLinks(formatted.Text, formatted.Links);
         }
 
-        protected override Drawable CreateLeftVisual()
+        protected Drawable CreateLeftVisual()
         {
             switch (activity.Type)
             {
@@ -61,7 +103,7 @@ namespace osu.Game.Overlays.Profile.Sections.Recent
                     return new DrawableRank(activity.ScoreRank)
                     {
                         RelativeSizeAxes = Axes.Y,
-                        Width = 60,
+                        Width = 40,
                         FillMode = FillMode.Fit,
                     };
 
@@ -69,7 +111,7 @@ namespace osu.Game.Overlays.Profile.Sections.Recent
                     return new MedalIcon(activity.Achievement.Slug)
                     {
                         RelativeSizeAxes = Axes.Y,
-                        Width = 60,
+                        Width = 40,
                         FillMode = FillMode.Fit,
                     };
 
@@ -77,7 +119,7 @@ namespace osu.Game.Overlays.Profile.Sections.Recent
                     return new Container
                     {
                         RelativeSizeAxes = Axes.Y,
-                        Width = 60,
+                        Width = 40,
                         FillMode = FillMode.Fit,
                     };
             }

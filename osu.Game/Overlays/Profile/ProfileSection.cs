@@ -17,6 +17,7 @@ namespace osu.Game.Overlays.Profile
     public abstract class ProfileSection : FillFlowContainer
     {
         private readonly Box underscore;
+        private readonly Box sectionDivider;
         private const int underscore_height = 2;
 
         public abstract string Title { get; }
@@ -75,11 +76,11 @@ namespace osu.Game.Overlays.Profile
                         Bottom = 20
                     }
                 },
-                new Box
+                sectionDivider = new Box
                 {
                     RelativeSizeAxes = Axes.X,
-                    Height = 1,
-                    Colour = OsuColour.Gray(34),
+                    Height = 4,
+                    Colour = Color4.Black,
                     EdgeSmoothness = new Vector2(1)
                 }
             };

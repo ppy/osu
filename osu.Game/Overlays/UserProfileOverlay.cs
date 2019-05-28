@@ -32,7 +32,8 @@ namespace osu.Game.Overlays
 
         public void ShowUser(User user, bool fetchOnline = true)
         {
-            if (user == User.SYSTEM_USER) return;
+            if (user == User.SYSTEM_USER)
+                return;
 
             Show();
 
@@ -65,7 +66,7 @@ namespace osu.Game.Overlays
             Add(new Box
             {
                 RelativeSizeAxes = Axes.Both,
-                Colour = OsuColour.Gray(0.2f)
+                Colour = OsuColour.Gray(0.1f)
             });
 
             Add(sectionsContainer = new SectionsContainer<ProfileSection>
