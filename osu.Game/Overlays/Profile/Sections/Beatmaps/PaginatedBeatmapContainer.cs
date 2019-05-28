@@ -34,8 +34,8 @@ namespace osu.Game.Overlays.Profile.Sections.Beatmaps
             request = new GetUserBeatmapsRequest(User.Value.Id, type, VisiblePages++ * ItemsPerPage);
             request.Success += sets => Schedule(() =>
             {
-                ShowMoreButton.FadeTo(sets.Count == ItemsPerPage ? 1 : 0);
-                ShowMoreLoading.Hide();
+                MoreButton.FadeTo(sets.Count == ItemsPerPage ? 1 : 0);
+                MoreButton.IsLoading = false;
 
                 if (!sets.Any() && VisiblePages == 1)
                 {
