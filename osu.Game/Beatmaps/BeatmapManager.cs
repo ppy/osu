@@ -2,10 +2,12 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using osu.Framework.Audio;
@@ -14,6 +16,7 @@ using osu.Framework.Extensions;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
+using osu.Framework.Threading;
 using osu.Game.Beatmaps.Formats;
 using osu.Game.Database;
 using osu.Game.IO.Archives;
@@ -72,6 +75,8 @@ namespace osu.Game.Beatmaps
 
         private readonly List<DownloadBeatmapSetRequest> currentDownloads = new List<DownloadBeatmapSetRequest>();
 
+        private readonly BeatmapUpdateQueue updateQueue;
+
         public BeatmapManager(Storage storage, IDatabaseContextFactory contextFactory, RulesetStore rulesets, IAPIProvider api, AudioManager audioManager, GameHost host = null,
                               WorkingBeatmap defaultBeatmap = null)
             : base(storage, contextFactory, new BeatmapStore(contextFactory), host)
@@ -86,9 +91,11 @@ namespace osu.Game.Beatmaps
             beatmaps = (BeatmapStore)ModelStore;
             beatmaps.BeatmapHidden += b => BeatmapHidden?.Invoke(b);
             beatmaps.BeatmapRestored += b => BeatmapRestored?.Invoke(b);
+
+            updateQueue = new BeatmapUpdateQueue(api);
         }
 
-        protected override void Populate(BeatmapSetInfo beatmapSet, ArchiveReader archive)
+        protected override async Task Populate(BeatmapSetInfo beatmapSet, ArchiveReader archive, CancellationToken cancellationToken = default)
         {
             if (archive != null)
                 beatmapSet.Beatmaps = createBeatmapDifficulties(archive);
@@ -104,8 +111,7 @@ namespace osu.Game.Beatmaps
 
             validateOnlineIds(beatmapSet);
 
-            foreach (BeatmapInfo b in beatmapSet.Beatmaps)
-                fetchAndPopulateOnlineValues(b);
+            await Task.WhenAll(beatmapSet.Beatmaps.Select(b => updateQueue.Enqueue(new UpdateItem(b, cancellationToken)).Task).ToArray());
         }
 
         protected override void PreImport(BeatmapSetInfo beatmapSet)
@@ -181,10 +187,10 @@ namespace osu.Game.Beatmaps
 
             request.Success += filename =>
             {
-                Task.Factory.StartNew(() =>
+                Task.Factory.StartNew(async () =>
                 {
                     // This gets scheduled back to the update thread, but we want the import to run in the background.
-                    Import(downloadNotification, filename);
+                    await Import(downloadNotification, filename);
                     currentDownloads.Remove(request);
                 }, TaskCreationOptions.LongRunning);
             };
@@ -382,47 +388,6 @@ namespace osu.Game.Beatmaps
         }
 
         /// <summary>
-        /// Query the API to populate missing values like OnlineBeatmapID / OnlineBeatmapSetID or (Rank-)Status.
-        /// </summary>
-        /// <param name="beatmap">The beatmap to populate.</param>
-        /// <param name="force">Whether to re-query if the provided beatmap already has populated values.</param>
-        /// <returns>True if population was successful.</returns>
-        private bool fetchAndPopulateOnlineValues(BeatmapInfo beatmap, bool force = false)
-        {
-            if (api?.State != APIState.Online)
-                return false;
-
-            if (!force && beatmap.OnlineBeatmapID != null && beatmap.BeatmapSet.OnlineBeatmapSetID != null
-                && beatmap.Status != BeatmapSetOnlineStatus.None && beatmap.BeatmapSet.Status != BeatmapSetOnlineStatus.None)
-                return true;
-
-            Logger.Log("Attempting online lookup for the missing values...", LoggingTarget.Database);
-
-            try
-            {
-                var req = new GetBeatmapRequest(beatmap);
-
-                req.Perform(api);
-
-                var res = req.Result;
-
-                Logger.Log($"Successfully mapped to {res.OnlineBeatmapSetID} / {res.OnlineBeatmapID}.", LoggingTarget.Database);
-
-                beatmap.Status = res.Status;
-                beatmap.BeatmapSet.Status = res.BeatmapSet.Status;
-                beatmap.BeatmapSet.OnlineBeatmapSetID = res.OnlineBeatmapSetID;
-                beatmap.OnlineBeatmapID = res.OnlineBeatmapID;
-
-                return true;
-            }
-            catch (Exception e)
-            {
-                Logger.Log($"Failed ({e})", LoggingTarget.Database);
-                return false;
-            }
-        }
-
-        /// <summary>
         /// A dummy WorkingBeatmap for the purpose of retrieving a beatmap for star difficulty calculation.
         /// </summary>
         private class DummyConversionBeatmap : WorkingBeatmap
@@ -453,6 +418,112 @@ namespace osu.Game.Beatmaps
             private class SilencedProgressCompletionNotification : ProgressCompletionNotification
             {
                 public override bool IsImportant => false;
+            }
+        }
+
+        private class BeatmapUpdateQueue
+        {
+            private readonly IAPIProvider api;
+            private readonly Queue<UpdateItem> queue = new Queue<UpdateItem>();
+
+            private int activeThreads;
+
+            public BeatmapUpdateQueue(IAPIProvider api)
+            {
+                this.api = api;
+            }
+
+            public UpdateItem Enqueue(UpdateItem item)
+            {
+                lock (queue)
+                {
+                    queue.Enqueue(item);
+
+                    if (activeThreads >= 16)
+                        return item;
+
+                    new Thread(runWork) { IsBackground = true }.Start();
+                    activeThreads++;
+                }
+
+                return item;
+            }
+
+            private void runWork()
+            {
+                while (true)
+                {
+                    UpdateItem toProcess;
+
+                    lock (queue)
+                    {
+                        if (queue.Count == 0)
+                            break;
+
+                        toProcess = queue.Dequeue();
+                    }
+
+                    toProcess.PerformUpdate(api);
+                }
+
+                lock (queue)
+                    activeThreads--;
+            }
+        }
+
+        private class UpdateItem
+        {
+            public Task Task => tcs.Task;
+
+            private readonly BeatmapInfo beatmap;
+            private readonly CancellationToken cancellationToken;
+
+            private readonly TaskCompletionSource<bool> tcs = new TaskCompletionSource<bool>();
+
+            public UpdateItem(BeatmapInfo beatmap, CancellationToken cancellationToken)
+            {
+                this.beatmap = beatmap;
+                this.cancellationToken = cancellationToken;
+            }
+
+            public void PerformUpdate(IAPIProvider api)
+            {
+                if (cancellationToken.IsCancellationRequested)
+                {
+                    tcs.SetCanceled();
+                    return;
+                }
+
+                if (api?.State != APIState.Online)
+                {
+                    tcs.SetResult(false);
+                    return;
+                }
+
+                Logger.Log("Attempting online lookup for the missing values...", LoggingTarget.Database);
+
+                var req = new GetBeatmapRequest(beatmap);
+
+                req.Success += res =>
+                {
+                    Logger.Log($"Successfully mapped to {res.OnlineBeatmapSetID} / {res.OnlineBeatmapID}.", LoggingTarget.Database);
+
+                    beatmap.Status = res.Status;
+                    beatmap.BeatmapSet.Status = res.BeatmapSet.Status;
+                    beatmap.BeatmapSet.OnlineBeatmapSetID = res.OnlineBeatmapSetID;
+                    beatmap.OnlineBeatmapID = res.OnlineBeatmapID;
+
+                    tcs.SetResult(true);
+                };
+
+                req.Failure += e =>
+                {
+                    Logger.Log($"Failed ({e})", LoggingTarget.Database);
+
+                    tcs.SetResult(false);
+                };
+
+                req.Perform(api);
             }
         }
     }

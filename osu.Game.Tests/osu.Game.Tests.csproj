@@ -18,4 +18,9 @@
     <ProjectReference Include="..\osu.Game.Rulesets.Mania\osu.Game.Rulesets.Mania.csproj" />
     <ProjectReference Include="..\osu.Game.Rulesets.Taiko\osu.Game.Rulesets.Taiko.csproj" />
   </ItemGroup>
+  <ItemGroup>
+    <Reference Include="Microsoft.Win32.Registry, Version=4.1.1.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
+      <HintPath>..\..\..\..\..\usr\local\share\dotnet\sdk\NuGetFallbackFolder\microsoft.win32.registry\4.5.0\ref\netstandard2.0\Microsoft.Win32.Registry.dll</HintPath>
+    </Reference>
+  </ItemGroup>
 </Project>
