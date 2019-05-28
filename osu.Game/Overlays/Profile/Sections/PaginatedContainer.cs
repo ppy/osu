@@ -20,7 +20,7 @@ using osu.Game.Users;
 
 namespace osu.Game.Overlays.Profile.Sections
 {
-    public class PaginatedContainer : FillFlowContainer
+    public abstract class PaginatedContainer : FillFlowContainer
     {
         protected readonly FillFlowContainer ItemsContainer;
         protected readonly ShowMoreButton MoreButton;
@@ -92,7 +92,7 @@ namespace osu.Game.Overlays.Profile.Sections
                 ShowMore();
         }
 
-        protected virtual void ShowMore() => MoreButton.IsLoading = true;
+        protected abstract void ShowMore();
 
         protected class ShowMoreButton : CircularContainer
         {
@@ -109,8 +109,11 @@ namespace osu.Game.Overlays.Profile.Sections
 
             public bool IsLoading
             {
+                get => isLoading;
                 set
                 {
+                    if (isLoading == value)
+                        return;
                     isLoading = value;
 
                     if (value)
@@ -124,7 +127,6 @@ namespace osu.Game.Overlays.Profile.Sections
                         content.FadeIn(duration, Easing.OutQuint);
                     }
                 }
-                get => isLoading;
             }
 
             public ShowMoreButton()
@@ -141,7 +143,6 @@ namespace osu.Game.Overlays.Profile.Sections
                     },
                     content = new FillFlowContainer
                     {
-                        Alpha = 0,
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
                         AutoSizeAxes = Axes.Both,
@@ -190,6 +191,7 @@ namespace osu.Game.Overlays.Profile.Sections
 
             protected override bool OnClick(ClickEvent e)
             {
+                IsLoading = true;
                 Action.Invoke();
                 return base.OnClick(e);
             }

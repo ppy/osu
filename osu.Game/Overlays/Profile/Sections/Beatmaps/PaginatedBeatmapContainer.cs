@@ -29,8 +29,6 @@ namespace osu.Game.Overlays.Profile.Sections.Beatmaps
 
         protected override void ShowMore()
         {
-            base.ShowMore();
-
             request = new GetUserBeatmapsRequest(User.Value.Id, type, VisiblePages++ * ItemsPerPage);
             request.Success += sets => Schedule(() =>
             {
