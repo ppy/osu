@@ -281,20 +281,19 @@ namespace osu.Game
 
         private class OsuBindableBeatmap : BindableBeatmap
         {
-            public OsuBindableBeatmap(WorkingBeatmap defaultValue, AudioManager audioManager)
-                : this(defaultValue)
+            public OsuBindableBeatmap(WorkingBeatmap defaultValue)
+                : base(defaultValue, null)
             {
-                RegisterAudioManager(audioManager);
             }
 
-            public OsuBindableBeatmap(WorkingBeatmap defaultValue)
-                : base(defaultValue)
+            public OsuBindableBeatmap(WorkingBeatmap defaultValue, AudioManager audioManager)
+                : base(defaultValue, audioManager)
             {
             }
 
             public override BindableBeatmap GetBoundCopy()
             {
-                var copy = new OsuBindableBeatmap(Default);
+                var copy = new OsuBindableBeatmap(Default, AudioManager);
                 copy.BindTo(this);
                 return copy;
             }

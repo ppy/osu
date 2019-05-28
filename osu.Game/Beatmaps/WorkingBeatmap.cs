@@ -11,6 +11,7 @@ using osu.Framework.IO.File;
 using System.IO;
 using System.Linq;
 using System.Threading;
+using osu.Framework.Audio;
 using osu.Game.IO.Serialization;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Objects;
@@ -150,6 +151,9 @@ namespace osu.Game.Beatmaps
 
         public bool SkinLoaded => skin.IsResultAvailable;
         public Skin Skin => skin.Value;
+
+        public AudioManager AudioManager { get; set; }
+
         protected virtual Skin GetSkin() => new DefaultSkin();
         private readonly RecyclableLazy<Skin> skin;
 
@@ -175,7 +179,7 @@ namespace osu.Game.Beatmaps
         /// Eagerly dispose of the audio track associated with this <see cref="WorkingBeatmap"/> (if any).
         /// Accessing track again will load a fresh instance.
         /// </summary>
-        public void RecycleTrack() => track.Recycle();
+        public virtual void RecycleTrack() => track.Recycle();
 
         public class RecyclableLazy<T>
         {

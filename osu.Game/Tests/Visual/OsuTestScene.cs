@@ -19,7 +19,7 @@ namespace osu.Game.Tests.Visual
     {
         [Cached(typeof(Bindable<WorkingBeatmap>))]
         [Cached(typeof(IBindable<WorkingBeatmap>))]
-        private readonly OsuTestBeatmap beatmap = new OsuTestBeatmap(new DummyWorkingBeatmap());
+        private readonly OsuTestBeatmap beatmap = new OsuTestBeatmap(new DummyWorkingBeatmap(), null);
 
         protected BindableBeatmap Beatmap => beatmap;
 
@@ -52,8 +52,6 @@ namespace osu.Game.Tests.Visual
         [BackgroundDependencyLoader]
         private void load(AudioManager audioManager, RulesetStore rulesets)
         {
-            beatmap.SetAudioManager(audioManager);
-
             Ruleset.Value = rulesets.AvailableRulesets.First();
         }
 
@@ -95,16 +93,14 @@ namespace osu.Game.Tests.Visual
 
         private class OsuTestBeatmap : BindableBeatmap
         {
-            public OsuTestBeatmap(WorkingBeatmap defaultValue)
-                : base(defaultValue)
+            public OsuTestBeatmap(WorkingBeatmap defaultValue, AudioManager audioManager)
+                : base(defaultValue, audioManager)
             {
             }
 
-            public void SetAudioManager(AudioManager audioManager) => RegisterAudioManager(audioManager);
-
             public override BindableBeatmap GetBoundCopy()
             {
-                var copy = new OsuTestBeatmap(Default);
+                var copy = new OsuTestBeatmap(Default, AudioManager);
                 copy.BindTo(this);
                 return copy;
             }

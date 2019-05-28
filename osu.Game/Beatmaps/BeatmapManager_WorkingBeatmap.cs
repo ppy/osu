@@ -20,14 +20,13 @@ namespace osu.Game.Beatmaps
         protected class BeatmapManagerWorkingBeatmap : WorkingBeatmap
         {
             private readonly IResourceStore<byte[]> store;
-            private readonly AudioManager audioManager;
 
             public BeatmapManagerWorkingBeatmap(IResourceStore<byte[]> store, TextureStore textureStore, BeatmapInfo beatmapInfo, AudioManager audioManager)
                 : base(beatmapInfo)
             {
                 this.store = store;
                 this.textureStore = textureStore;
-                this.audioManager = audioManager;
+                AudioManager = audioManager;
             }
 
             protected override IBeatmap GetBeatmap()
@@ -46,6 +45,8 @@ namespace osu.Game.Beatmaps
             private string getPathForFile(string filename) => BeatmapSetInfo.Files.First(f => string.Equals(f.Filename, filename, StringComparison.InvariantCultureIgnoreCase)).FileInfo.StoragePath;
 
             private TextureStore textureStore;
+
+            private IAdjustableResourceStore<Track> trackStore;
 
             protected override bool BackgroundStillValid(Texture b) => false; // bypass lazy logic. we want to return a new background each time for refcounting purposes.
 
@@ -68,13 +69,20 @@ namespace osu.Game.Beatmaps
             {
                 try
                 {
-                    var trackData = store.GetStream(getPathForFile(Metadata.AudioFile));
-                    return trackData == null ? null : new TrackBass(trackData);
+                    return (trackStore ?? (trackStore = AudioManager.GetTrackStore(store))).Get(getPathForFile(Metadata.AudioFile));
                 }
                 catch
                 {
                     return null;
                 }
+            }
+
+            public override void RecycleTrack()
+            {
+                base.RecycleTrack();
+
+                trackStore?.Dispose();
+                trackStore = null;
             }
 
             public override void TransferTo(WorkingBeatmap other)
@@ -135,7 +143,7 @@ namespace osu.Game.Beatmaps
 
                 try
                 {
-                    skin = new LegacyBeatmapSkin(BeatmapInfo, store, audioManager);
+                    skin = new LegacyBeatmapSkin(BeatmapInfo, store, AudioManager);
                 }
                 catch (Exception e)
                 {

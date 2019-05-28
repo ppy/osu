@@ -5,6 +5,7 @@ using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Audio.Track;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.IO.Stores;
 using osu.Game.Audio;
 using osu.Game.Beatmaps;
 
@@ -111,11 +112,11 @@ namespace osu.Game.Tests.Visual.Components
 
         private class TestPreviewTrackManager : PreviewTrackManager
         {
-            protected override TrackManagerPreviewTrack CreatePreviewTrack(BeatmapSetInfo beatmapSetInfo, TrackStore trackStore) => new TestPreviewTrack(beatmapSetInfo, trackStore);
+            protected override TrackManagerPreviewTrack CreatePreviewTrack(BeatmapSetInfo beatmapSetInfo, IResourceStore<Track> trackStore) => new TestPreviewTrack(beatmapSetInfo, trackStore);
 
             protected class TestPreviewTrack : TrackManagerPreviewTrack
             {
-                public TestPreviewTrack(BeatmapSetInfo beatmapSetInfo, TrackStore trackManager)
+                public TestPreviewTrack(BeatmapSetInfo beatmapSetInfo, IResourceStore<Track> trackManager)
                     : base(beatmapSetInfo, trackManager)
                 {
                 }

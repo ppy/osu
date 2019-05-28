@@ -20,17 +20,16 @@ namespace osu.Game.Audio
         private readonly BindableDouble muteBindable = new BindableDouble();
 
         private AudioManager audio;
-        private TrackStore trackStore;
+        private IAdjustableResourceStore<Track> trackStore;
 
         private TrackManagerPreviewTrack current;
 
         [BackgroundDependencyLoader]
         private void load(AudioManager audio, FrameworkConfigManager config)
         {
-            trackStore = new TrackStore(new OnlineStore());
+            trackStore = audio.GetTrackStore(new OnlineStore());
 
             this.audio = audio;
-            audio.AddItem(trackStore);
 
             config.BindWith(FrameworkSetting.VolumeMusic, trackStore.Volume);
         }
@@ -81,16 +80,16 @@ namespace osu.Game.Audio
         /// <summary>
         /// Creates the <see cref="TrackManagerPreviewTrack"/>.
         /// </summary>
-        protected virtual TrackManagerPreviewTrack CreatePreviewTrack(BeatmapSetInfo beatmapSetInfo, TrackStore trackStore) => new TrackManagerPreviewTrack(beatmapSetInfo, trackStore);
+        protected virtual TrackManagerPreviewTrack CreatePreviewTrack(BeatmapSetInfo beatmapSetInfo, IResourceStore<Track> trackStore) => new TrackManagerPreviewTrack(beatmapSetInfo, trackStore);
 
         protected class TrackManagerPreviewTrack : PreviewTrack
         {
             public IPreviewTrackOwner Owner { get; private set; }
 
             private readonly BeatmapSetInfo beatmapSetInfo;
-            private readonly TrackStore trackManager;
+            private readonly IResourceStore<Track> trackManager;
 
-            public TrackManagerPreviewTrack(BeatmapSetInfo beatmapSetInfo, TrackStore trackManager)
+            public TrackManagerPreviewTrack(BeatmapSetInfo beatmapSetInfo, IResourceStore<Track> trackManager)
             {
                 this.beatmapSetInfo = beatmapSetInfo;
                 this.trackManager = trackManager;
