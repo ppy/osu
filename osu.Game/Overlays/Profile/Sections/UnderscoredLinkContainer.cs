@@ -11,12 +11,13 @@ using System.Collections.Generic;
 
 namespace osu.Game.Overlays.Profile.Sections
 {
-    public class UnderscoredLinkContainer : Container
+    public abstract class UnderscoredLinkContainer : Container
     {
         private const int duration = 200;
-        public Action ClickAction;
         private readonly Container underscore;
         private readonly FillFlowContainer<OsuSpriteText> textContent;
+
+        protected Action ClickAction;
 
         public IReadOnlyList<OsuSpriteText> Text
         {
@@ -28,7 +29,7 @@ namespace osu.Game.Overlays.Profile.Sections
             }
         }
 
-        public UnderscoredLinkContainer()
+        protected UnderscoredLinkContainer()
         {
             AutoSizeAxes = Axes.Both;
             Child = new Container

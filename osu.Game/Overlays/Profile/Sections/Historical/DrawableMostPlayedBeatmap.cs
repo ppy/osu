@@ -30,8 +30,7 @@ namespace osu.Game.Overlays.Profile.Sections.Historical
         private const int corner_radius = 10;
         private readonly SpriteIcon icon;
         private readonly OsuSpriteText playCountText;
-        private readonly UnderscoredLinkContainer mapper;
-        private readonly UnderscoredLinkContainer beatmapName;
+        private readonly UnderscoredUserLink mapper;
 
         public DrawableMostPlayedBeatmap(BeatmapInfo beatmap, int playCount)
         {
@@ -76,7 +75,7 @@ namespace osu.Game.Overlays.Profile.Sections.Historical
                                     Padding = new MarginPadding { Left = 15, Right = 20 },
                                     Children = new Drawable[]
                                     {
-                                        beatmapName = new UnderscoredLinkContainer
+                                        new UnderscoredBeatmapLink(beatmap)
                                         {
                                             Anchor = Anchor.CentreLeft,
                                             Origin = Anchor.BottomLeft,
@@ -111,7 +110,7 @@ namespace osu.Game.Overlays.Profile.Sections.Historical
                                                     Text = "mapped by ",
                                                     Font = OsuFont.GetFont(size: 15, weight: FontWeight.Regular),
                                                 },
-                                                mapper = new UnderscoredLinkContainer
+                                                mapper = new UnderscoredUserLink(beatmap.Metadata.Author.Id)
                                                 {
                                                     Text = new OsuSpriteText[]
                                                     {
@@ -157,22 +156,13 @@ namespace osu.Game.Overlays.Profile.Sections.Historical
             };
         }
 
-        [BackgroundDependencyLoader(permitNulls: true)]
-        private void load(OsuColour colors, UserProfileOverlay userProfileOverlay, BeatmapSetOverlay beatmapSetOverlay)
+        [BackgroundDependencyLoader]
+        private void load(OsuColour colors)
         {
             idleBackgroundColour = background.Colour = colors.GreySeafoam;
             hoveredBackgroundColour = colors.GreySeafoamLight;
             mapperText.Colour = mapper.Colour = colors.GreySeafoamLighter;
             icon.Colour = playCountText.Colour = colors.Yellow;
-
-            mapper.ClickAction = () => userProfileOverlay.ShowUser(beatmap.Metadata.Author.Id);
-            beatmapName.ClickAction = () =>
-            {
-                if (beatmap.OnlineBeatmapID != null)
-                    beatmapSetOverlay?.FetchAndShowBeatmap(beatmap.OnlineBeatmapID.Value);
-                else if (beatmap.BeatmapSet?.OnlineBeatmapSetID != null)
-                    beatmapSetOverlay?.FetchAndShowBeatmapSet(beatmap.BeatmapSet.OnlineBeatmapSetID.Value);
-            };
         }
 
         protected override bool OnHover(HoverEvent e)
