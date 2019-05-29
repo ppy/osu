@@ -1,11 +1,10 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Audio.Track;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.IO.Stores;
 using osu.Game.Audio;
 using osu.Game.Beatmaps;
 
@@ -116,13 +115,15 @@ namespace osu.Game.Tests.Visual.Components
 
             protected class TestPreviewTrack : TrackManagerPreviewTrack
             {
-                public TestPreviewTrack(BeatmapSetInfo beatmapSetInfo, IResourceStore<Track> trackManager)
+                private readonly ITrackStore trackManager;
+
                 public TestPreviewTrack(BeatmapSetInfo beatmapSetInfo, ITrackStore trackManager)
                     : base(beatmapSetInfo, trackManager)
                 {
+                    this.trackManager = trackManager;
                 }
 
-                protected override Track GetTrack() => new TrackVirtual { Length = 100000 };
+                protected override Track GetTrack() => trackManager.GetVirtual(100000);
             }
         }
     }

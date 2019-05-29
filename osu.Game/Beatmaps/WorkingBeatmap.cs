@@ -15,12 +15,13 @@ using osu.Framework.Audio;
 using osu.Game.IO.Serialization;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Objects;
+using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.UI;
 using osu.Game.Skinning;
 
 namespace osu.Game.Beatmaps
 {
-    public abstract partial class WorkingBeatmap : IDisposable
+    public abstract class WorkingBeatmap : IDisposable
     {
         public readonly BeatmapInfo BeatmapInfo;
 
@@ -47,11 +48,37 @@ namespace osu.Game.Beatmaps
                 return b;
             });
 
-            track = new RecyclableLazy<Track>(() => GetTrack() ?? new VirtualBeatmapTrack(Beatmap));
+            track = new RecyclableLazy<Track>(() => GetTrack() ?? GetVirtualTrack(Beatmap));
             background = new RecyclableLazy<Texture>(GetBackground, BackgroundStillValid);
             waveform = new RecyclableLazy<Waveform>(GetWaveform);
             storyboard = new RecyclableLazy<Storyboard>(GetStoryboard);
             skin = new RecyclableLazy<Skin>(GetSkin);
+        }
+
+        protected virtual Track GetVirtualTrack(IBeatmap beatmap)
+        {
+            const double excess_length = 1000;
+
+            var lastObject = beatmap.HitObjects.LastOrDefault();
+
+            double length;
+
+            switch (lastObject)
+            {
+                case null:
+                    length = excess_length;
+                    break;
+
+                case IHasEndTime endTime:
+                    length = endTime.EndTime + excess_length;
+                    break;
+
+                default:
+                    length = lastObject.StartTime + excess_length;
+                    break;
+            }
+
+            return AudioManager.Tracks.GetVirtual(length);
         }
 
         /// <summary>

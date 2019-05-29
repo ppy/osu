@@ -43,7 +43,7 @@ namespace osu.Game.Beatmaps
 
         protected override Texture GetBackground() => game?.Textures.Get(@"Backgrounds/bg4");
 
-        protected override Track GetTrack() => new TrackVirtual { Length = 1000 };
+        protected override Track GetTrack() => game?.Audio.Tracks.GetVirtual(1000);
 
         private class DummyRulesetInfo : RulesetInfo
         {
