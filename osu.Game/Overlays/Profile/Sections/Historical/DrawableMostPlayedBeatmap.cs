@@ -19,9 +19,7 @@ namespace osu.Game.Overlays.Profile.Sections.Historical
 {
     public class DrawableMostPlayedBeatmap : Container
     {
-        private readonly BeatmapInfo beatmap;
         private readonly OsuSpriteText mapperText;
-        private readonly int playCount;
         private readonly Box background;
         private Color4 idleBackgroundColour;
         private Color4 hoveredBackgroundColour;
@@ -34,9 +32,6 @@ namespace osu.Game.Overlays.Profile.Sections.Historical
 
         public DrawableMostPlayedBeatmap(BeatmapInfo beatmap, int playCount)
         {
-            this.beatmap = beatmap;
-            this.playCount = playCount;
-
             RelativeSizeAxes = Axes.X;
             Height = 60;
             Masking = true;
@@ -80,7 +75,7 @@ namespace osu.Game.Overlays.Profile.Sections.Historical
                                             Anchor = Anchor.CentreLeft,
                                             Origin = Anchor.BottomLeft,
                                             Margin = new MarginPadding { Bottom = 2 },
-                                            Text = new OsuSpriteText[]
+                                            Text = new[]
                                             {
                                                 new OsuSpriteText
                                                 {
@@ -112,7 +107,7 @@ namespace osu.Game.Overlays.Profile.Sections.Historical
                                                 },
                                                 mapper = new UnderscoredUserLink(beatmap.Metadata.Author.Id)
                                                 {
-                                                    Text = new OsuSpriteText[]
+                                                    Text = new[]
                                                     {
                                                         new OsuSpriteText
                                                         {
