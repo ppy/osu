@@ -58,5 +58,13 @@ namespace osu.Game.Skinning
 
             return null;
         }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+
+            foreach (var c in channels)
+                c.Dispose();
+        }
     }
 }
