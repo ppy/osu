@@ -18,6 +18,7 @@ namespace osu.Game.Overlays.Profile.Sections.Kudosu
     public class KudosuInfo : Container
     {
         private readonly Bindable<User> user = new Bindable<User>();
+
         public KudosuInfo(Bindable<User> user)
         {
             this.user.BindTo(user);
@@ -54,7 +55,9 @@ namespace osu.Game.Overlays.Profile.Sections.Kudosu
                 avaliable.Count = u.NewValue?.Kudosu.Available ?? 0;
             };
         }
+
         protected override bool OnClick(ClickEvent e) => true;
+
         private class CountSection : Container
         {
             private readonly OsuSpriteText valueText;
@@ -65,6 +68,7 @@ namespace osu.Game.Overlays.Profile.Sections.Kudosu
             {
                 set => valueText.Text = value.ToString();
             }
+
             public CountSection(string header, string description)
             {
                 RelativeSizeAxes = Axes.X;
