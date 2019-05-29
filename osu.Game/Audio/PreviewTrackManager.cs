@@ -20,7 +20,7 @@ namespace osu.Game.Audio
         private readonly BindableDouble muteBindable = new BindableDouble();
 
         private AudioManager audio;
-        private IAdjustableResourceStore<Track> trackStore;
+        private ITrackStore trackStore;
 
         private TrackManagerPreviewTrack current;
 
@@ -80,16 +80,16 @@ namespace osu.Game.Audio
         /// <summary>
         /// Creates the <see cref="TrackManagerPreviewTrack"/>.
         /// </summary>
-        protected virtual TrackManagerPreviewTrack CreatePreviewTrack(BeatmapSetInfo beatmapSetInfo, IResourceStore<Track> trackStore) => new TrackManagerPreviewTrack(beatmapSetInfo, trackStore);
+        protected virtual TrackManagerPreviewTrack CreatePreviewTrack(BeatmapSetInfo beatmapSetInfo, ITrackStore trackStore) => new TrackManagerPreviewTrack(beatmapSetInfo, trackStore);
 
         protected class TrackManagerPreviewTrack : PreviewTrack
         {
             public IPreviewTrackOwner Owner { get; private set; }
 
             private readonly BeatmapSetInfo beatmapSetInfo;
-            private readonly IResourceStore<Track> trackManager;
+            private readonly ITrackStore trackManager;
 
-            public TrackManagerPreviewTrack(BeatmapSetInfo beatmapSetInfo, IResourceStore<Track> trackManager)
+            public TrackManagerPreviewTrack(BeatmapSetInfo beatmapSetInfo, ITrackStore trackManager)
             {
                 this.beatmapSetInfo = beatmapSetInfo;
                 this.trackManager = trackManager;

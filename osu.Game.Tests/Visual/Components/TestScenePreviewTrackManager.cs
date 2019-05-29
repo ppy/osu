@@ -1,4 +1,4 @@
-﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 using NUnit.Framework;
@@ -112,11 +112,12 @@ namespace osu.Game.Tests.Visual.Components
 
         private class TestPreviewTrackManager : PreviewTrackManager
         {
-            protected override TrackManagerPreviewTrack CreatePreviewTrack(BeatmapSetInfo beatmapSetInfo, IResourceStore<Track> trackStore) => new TestPreviewTrack(beatmapSetInfo, trackStore);
+            protected override TrackManagerPreviewTrack CreatePreviewTrack(BeatmapSetInfo beatmapSetInfo, ITrackStore trackStore) => new TestPreviewTrack(beatmapSetInfo, trackStore);
 
             protected class TestPreviewTrack : TrackManagerPreviewTrack
             {
                 public TestPreviewTrack(BeatmapSetInfo beatmapSetInfo, IResourceStore<Track> trackManager)
+                public TestPreviewTrack(BeatmapSetInfo beatmapSetInfo, ITrackStore trackManager)
                     : base(beatmapSetInfo, trackManager)
                 {
                 }
