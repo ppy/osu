@@ -38,14 +38,8 @@ namespace osu.Game.Overlays.Profile.Sections.Kudosu
                     Spacing = new Vector2(5, 0),
                     Children = new[]
                     {
-                        total = new CountSection(
-                            "Total Kudosu Earned",
-                            "Based on how much of a contribution the user has made to beatmap moderation. See this link for more information."
-                        ),
-                        avaliable = new CountSection(
-                            "Kudosu Avaliable",
-                            "Kudosu can be traded for kudosu stars, which will help your beatmap get more attention. This is the number of kudosu you haven't traded in yet."
-                        ),
+                        total = new CountTotal(),
+                        avaliable = new CountAvailable()
                     }
                 }
             };
@@ -58,10 +52,30 @@ namespace osu.Game.Overlays.Profile.Sections.Kudosu
 
         protected override bool OnClick(ClickEvent e) => true;
 
+        private class CountAvailable : CountSection
+        {
+            public CountAvailable()
+                : base("Kudosu Avaliable")
+            {
+                DescriptionText.Text = "Kudosu can be traded for kudosu stars, which will help your beatmap get more attention. This is the number of kudosu you haven't traded in yet.";
+            }
+        }
+
+        private class CountTotal : CountSection
+        {
+            public CountTotal()
+                : base("Total Kudosu Earned")
+            {
+                DescriptionText.AddText("Based on how much of a contribution the user has made to beatmap moderation. See ");
+                DescriptionText.AddLink("this link", "https://osu.ppy.sh/wiki/Kudosu");
+                DescriptionText.AddText(" for more information.");
+            }
+        }
+
         private class CountSection : Container
         {
             private readonly OsuSpriteText valueText;
-            private readonly OsuTextFlowContainer descriptionText;
+            protected readonly LinkFlowContainer DescriptionText;
             private readonly Box lineBackground;
 
             public new int Count
@@ -69,7 +83,7 @@ namespace osu.Game.Overlays.Profile.Sections.Kudosu
                 set => valueText.Text = value.ToString();
             }
 
-            public CountSection(string header, string description)
+            public CountSection(string header)
             {
                 RelativeSizeAxes = Axes.X;
                 Width = 0.5f;
@@ -104,11 +118,10 @@ namespace osu.Game.Overlays.Profile.Sections.Kudosu
                             Font = OsuFont.GetFont(size: 40, weight: FontWeight.Light),
                             UseFullGlyphHeight = false,
                         },
-                        descriptionText = new OsuTextFlowContainer(t => t.Font = t.Font.With(size: 14))
+                        DescriptionText = new LinkFlowContainer(t => t.Font = t.Font.With(size: 14))
                         {
                             RelativeSizeAxes = Axes.X,
                             AutoSizeAxes = Axes.Y,
-                            Text = description
                         }
                     }
                 };
@@ -118,7 +131,7 @@ namespace osu.Game.Overlays.Profile.Sections.Kudosu
             private void load(OsuColour colours)
             {
                 lineBackground.Colour = colours.Yellow;
-                descriptionText.Colour = colours.GreySeafoamLighter;
+                DescriptionText.Colour = colours.GreySeafoamLighter;
             }
         }
     }
