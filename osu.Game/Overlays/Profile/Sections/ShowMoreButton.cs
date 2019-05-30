@@ -51,49 +51,47 @@ namespace osu.Game.Overlays.Profile.Sections
 
         public ShowMoreButton()
         {
-            Anchor = Anchor.TopCentre;
-            Origin = Anchor.TopCentre;
             AutoSizeAxes = Axes.Both;
             Children = new Drawable[]
             {
-                    new CircularContainer
+                new CircularContainer
+                {
+                    Masking = true,
+                    Size = new Vector2(140, 30),
+                    Children = new Drawable[]
                     {
-                        Masking = true,
-                        Size = new Vector2(140, 30),
-                        Children = new Drawable[]
+                        background = new Box
                         {
-                            background = new Box
+                            RelativeSizeAxes = Axes.Both,
+                        },
+                        content = new FillFlowContainer
+                        {
+                            Anchor = Anchor.Centre,
+                            Origin = Anchor.Centre,
+                            AutoSizeAxes = Axes.Both,
+                            Direction = FillDirection.Horizontal,
+                            Spacing = new Vector2(7),
+                            Children = new Drawable[]
                             {
-                                RelativeSizeAxes = Axes.Both,
-                            },
-                            content = new FillFlowContainer
-                            {
-                                Anchor = Anchor.Centre,
-                                Origin = Anchor.Centre,
-                                AutoSizeAxes = Axes.Both,
-                                Direction = FillDirection.Horizontal,
-                                Spacing = new Vector2(7),
-                                Children = new Drawable[]
+                                new ChevronIcon(),
+                                new OsuSpriteText
                                 {
-                                    new ChevronIcon(),
-                                    new OsuSpriteText
-                                    {
-                                        Anchor = Anchor.Centre,
-                                        Origin = Anchor.Centre,
-                                        Font = OsuFont.GetFont(size: 12, weight: FontWeight.Bold),
-                                        Text = "show more".ToUpper(),
-                                    },
-                                    new ChevronIcon(),
-                                }
-                            },
-                            loading = new LoadingAnimation
-                            {
-                                Anchor = Anchor.Centre,
-                                Origin = Anchor.Centre,
-                                Size = new Vector2(12)
-                            },
-                        }
+                                    Anchor = Anchor.Centre,
+                                    Origin = Anchor.Centre,
+                                    Font = OsuFont.GetFont(size: 12, weight: FontWeight.Bold),
+                                    Text = "show more".ToUpper(),
+                                },
+                                new ChevronIcon(),
+                            }
+                        },
+                        loading = new LoadingAnimation
+                        {
+                            Anchor = Anchor.Centre,
+                            Origin = Anchor.Centre,
+                            Size = new Vector2(12)
+                        },
                     }
+                }
             };
         }
 
