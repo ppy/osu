@@ -92,11 +92,22 @@ namespace osu.Game.Screens.Play
                     }
                 }
             });
-
-            loadNewPlayer();
         }
 
-        private void playerLoaded(Player player) => info.Loading = false;
+
+        private void playerLoaded(Player player)
+        {
+            if (IsDisposed)
+            {
+                // If the loader has already been disposed by the time the load task invokes the callback, we have an unpushed player that should
+                // be disposed explicitly
+                player.Dispose();
+                return;
+            }
+
+            info.Loading = false;
+            this.player = player;
+        }
 
         public override void OnResuming(IScreen last)
         {
@@ -107,20 +118,19 @@ namespace osu.Game.Screens.Play
             info.Loading = true;
 
             //we will only be resumed if the player has requested a re-run (see ValidForResume setting above)
-            loadNewPlayer();
+            loadTask = CreatePlayerLoadTask(playerLoaded);
 
             this.Delay(400).Schedule(pushWhenLoaded);
         }
 
-        private void loadNewPlayer()
+        protected virtual Task CreatePlayerLoadTask(Action<Player> onLoad)
         {
-            var restartCount = player?.RestartCount + 1 ?? 0;
+            var p = createPlayer();
 
-            player = createPlayer();
-            player.RestartCount = restartCount;
-            player.RestartRequested = restartRequested;
+            p.RestartCount = player?.RestartCount + 1 ?? 0;
+            p.RestartRequested = restartRequested;
 
-            loadTask = LoadComponentAsync(player, playerLoaded);
+            return LoadComponentAsync(p, onLoad);
         }
 
         private void contentIn()
@@ -182,6 +192,8 @@ namespace osu.Game.Screens.Play
         {
             inputManager = GetContainingInputManager();
             base.LoadComplete();
+
+            loadTask = CreatePlayerLoadTask(playerLoaded);
         }
 
         private ScheduledDelegate pushDebounce;
@@ -190,7 +202,7 @@ namespace osu.Game.Screens.Play
         // Here because IsHovered will not update unless we do so.
         public override bool HandlePositionalInput => true;
 
-        private bool readyForPush => player.LoadState == LoadState.Ready && IsHovered && GetContainingInputManager()?.DraggedDrawable == null;
+        private bool readyForPush =>  player?.LoadState == LoadState.Ready && IsHovered && GetContainingInputManager()?.DraggedDrawable == null;
 
         private void pushWhenLoaded()
         {
@@ -266,7 +278,7 @@ namespace osu.Game.Screens.Play
             if (isDisposing)
             {
                 // if the player never got pushed, we should explicitly dispose it.
-                loadTask?.ContinueWith(_ => player.Dispose());
+                loadTask?.ContinueWith(_ => player?.Dispose());
             }
         }
 

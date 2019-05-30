@@ -269,7 +269,12 @@ namespace osu.Game.Screens.Play
 
             ValidForResume = false;
 
-            if (!showResults) return;
+            if (!showResults)
+            {
+                // If results shouldn't be shown on completion, just exit
+                this.Exit();
+                return;
+            }
 
             using (BeginDelayedSequence(1000))
             {
