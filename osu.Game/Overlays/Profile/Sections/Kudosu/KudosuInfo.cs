@@ -96,15 +96,15 @@ namespace osu.Game.Overlays.Profile.Sections.Kudosu
                         new OsuSpriteText
                         {
                             Text = header,
-                            Font = OsuFont.GetFont(size: 15, weight: FontWeight.Bold)
+                            Font = OsuFont.GetFont(size: 12, weight: FontWeight.Bold)
                         },
                         valueText = new OsuSpriteText
                         {
                             Text = "0",
-                            Font = OsuFont.GetFont(size: 50, weight: FontWeight.Light),
+                            Font = OsuFont.GetFont(size: 40, weight: FontWeight.Light),
                             UseFullGlyphHeight = false,
                         },
-                        descriptionText = new OsuTextFlowContainer(t => t.Font = t.Font.With(size: 17))
+                        descriptionText = new OsuTextFlowContainer(t => t.Font = t.Font.With(size: 14))
                         {
                             RelativeSizeAxes = Axes.X,
                             AutoSizeAxes = Axes.Y,
