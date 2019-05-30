@@ -96,7 +96,7 @@ namespace osu.Game.Overlays.Profile.Header.Components
             if (ranks?.Length > 1)
             {
                 graph.UpdateBallPosition(e.MousePosition.X);
-                graph.ShowBall();
+                graph.ShowBar();
             }
 
             return base.OnHover(e);
@@ -114,7 +114,7 @@ namespace osu.Game.Overlays.Profile.Header.Components
         {
             if (ranks?.Length > 1)
             {
-                graph.HideBall();
+                graph.HideBar();
             }
 
             base.OnHoverLost(e);
@@ -123,31 +123,41 @@ namespace osu.Game.Overlays.Profile.Header.Components
         private class RankChartLineGraph : LineGraph
         {
             private readonly CircularContainer movingBall;
+            private readonly Container bar;
             private readonly Box ballBg;
-            private readonly Box movingBar;
+            private readonly Box line;
 
             public Action<int> OnBallMove;
 
             public RankChartLineGraph()
             {
-                Add(movingBar = new Box
+                Add(bar = new Container
                 {
                     Origin = Anchor.TopCentre,
                     RelativeSizeAxes = Axes.Y,
-                    Width = 1.5f,
+                    AutoSizeAxes = Axes.X,
                     Alpha = 0,
                     RelativePositionAxes = Axes.Both,
-                });
-
-                Add(movingBall = new CircularContainer
-                {
-                    Origin = Anchor.Centre,
-                    Size = new Vector2(18),
-                    Alpha = 0,
-                    Masking = true,
-                    BorderThickness = 4,
-                    RelativePositionAxes = Axes.Both,
-                    Child = ballBg = new Box { RelativeSizeAxes = Axes.Both }
+                    Children = new Drawable[]
+                    {
+                        line = new Box
+                        {
+                            Anchor = Anchor.Centre,
+                            Origin = Anchor.Centre,
+                            RelativeSizeAxes = Axes.Y,
+                            Width = 1.5f,
+                        },
+                        movingBall = new CircularContainer
+                        {
+                            Anchor = Anchor.TopCentre,
+                            Origin = Anchor.Centre,
+                            Size = new Vector2(18),
+                            Masking = true,
+                            BorderThickness = 4,
+                            RelativePositionAxes = Axes.Y,
+                            Child = ballBg = new Box { RelativeSizeAxes = Axes.Both }
+                        }
+                    }
                 });
             }
 
@@ -155,29 +165,22 @@ namespace osu.Game.Overlays.Profile.Header.Components
             private void load(OsuColour colours)
             {
                 ballBg.Colour = colours.GreySeafoamDarker;
-                movingBall.BorderColour = colours.Yellow;
-                movingBar.Colour = colours.Yellow;
+                movingBall.BorderColour = line.Colour = colours.Yellow;
             }
 
             public void UpdateBallPosition(float mouseXPosition)
             {
+                const int duration = 200;
                 int index = calculateIndex(mouseXPosition);
-                movingBall.Position = calculateBallPosition(index);
-                movingBar.X = movingBall.X;
+                Vector2 position = calculateBallPosition(index);
+                movingBall.MoveToY(position.Y, duration, Easing.OutQuint);
+                bar.MoveToX(position.X, duration, Easing.OutQuint);
                 OnBallMove.Invoke(index);
             }
 
-            public void ShowBall()
-            {
-                movingBall.FadeIn(fade_duration);
-                movingBar.FadeIn(fade_duration);
-            }
+            public void ShowBar() => bar.FadeIn(fade_duration);
 
-            public void HideBall()
-            {
-                movingBall.FadeOut(fade_duration);
-                movingBar.FadeOut(fade_duration);
-            }
+            public void HideBar() => bar.FadeOut(fade_duration);
 
             private int calculateIndex(float mouseXPosition) => (int)Math.Round(mouseXPosition / DrawWidth * (DefaultValueCount - 1));
 
