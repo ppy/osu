@@ -12,11 +12,11 @@ using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API;
 using osu.Game.Rulesets;
 using osu.Framework.Input.Events;
-using System;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
-using osuTK.Graphics;
 using osu.Game.Users;
+using osu.Game.Graphics.Containers;
+using System.Collections.Generic;
 
 namespace osu.Game.Overlays.Profile.Sections
 {
@@ -94,16 +94,13 @@ namespace osu.Game.Overlays.Profile.Sections
 
         protected abstract void ShowMore();
 
-        protected class ShowMoreButton : CircularContainer
+        protected class ShowMoreButton : OsuHoverContainer
         {
-            private const int duration = 300;
-            private Color4 idleColour;
-            private Color4 hoveredColour;
-
-            public Action Action;
             private readonly Box background;
             private readonly LoadingAnimation loading;
             private readonly FillFlowContainer content;
+
+            protected override IEnumerable<Drawable> EffectTargets => new[] { background };
 
             private bool isLoading;
 
@@ -119,13 +116,13 @@ namespace osu.Game.Overlays.Profile.Sections
 
                     if (value)
                     {
-                        loading.FadeIn(duration, Easing.OutQuint);
-                        content.FadeOut(duration, Easing.OutQuint);
+                        loading.FadeIn(FADE_DURATION, Easing.OutQuint);
+                        content.FadeOut(FADE_DURATION, Easing.OutQuint);
                     }
                     else
                     {
-                        loading.FadeOut(duration, Easing.OutQuint);
-                        content.FadeIn(duration, Easing.OutQuint);
+                        loading.FadeOut(FADE_DURATION, Easing.OutQuint);
+                        content.FadeIn(FADE_DURATION, Easing.OutQuint);
                     }
                 }
             }
@@ -134,66 +131,60 @@ namespace osu.Game.Overlays.Profile.Sections
             {
                 Anchor = Anchor.TopCentre;
                 Origin = Anchor.TopCentre;
-                Masking = true;
-                Size = new Vector2(140, 30);
+                AutoSizeAxes = Axes.Both;
                 Children = new Drawable[]
                 {
-                    background = new Box
+                    new CircularContainer
                     {
-                        RelativeSizeAxes = Axes.Both,
-                    },
-                    content = new FillFlowContainer
-                    {
-                        Anchor = Anchor.Centre,
-                        Origin = Anchor.Centre,
-                        AutoSizeAxes = Axes.Both,
-                        Direction = FillDirection.Horizontal,
-                        Spacing = new Vector2(7),
+                        Masking = true,
+                        Size = new Vector2(140, 30),
                         Children = new Drawable[]
                         {
-                            new ChevronIcon(),
-                            new OsuSpriteText
+                            background = new Box
+                            {
+                                RelativeSizeAxes = Axes.Both,
+                            },
+                            content = new FillFlowContainer
                             {
                                 Anchor = Anchor.Centre,
                                 Origin = Anchor.Centre,
-                                Font = OsuFont.GetFont(size: 14, weight: FontWeight.Bold),
-                                Text = "show more".ToUpper(),
+                                AutoSizeAxes = Axes.Both,
+                                Direction = FillDirection.Horizontal,
+                                Spacing = new Vector2(7),
+                                Children = new Drawable[]
+                                {
+                                    new ChevronIcon(),
+                                    new OsuSpriteText
+                                    {
+                                        Anchor = Anchor.Centre,
+                                        Origin = Anchor.Centre,
+                                        Font = OsuFont.GetFont(size: 12, weight: FontWeight.Bold),
+                                        Text = "show more".ToUpper(),
+                                    },
+                                    new ChevronIcon(),
+                                }
                             },
-                            new ChevronIcon(),
+                            loading = new LoadingAnimation
+                            {
+                                Anchor = Anchor.Centre,
+                                Origin = Anchor.Centre,
+                                Size = new Vector2(12)
+                            },
                         }
-                    },
-                    loading = new LoadingAnimation
-                    {
-                        Anchor = Anchor.Centre,
-                        Origin = Anchor.Centre,
-                        Size = new Vector2(20)
-                    },
+                    }
                 };
             }
 
             [BackgroundDependencyLoader]
             private void load(OsuColour colors)
             {
-                background.Colour = idleColour = colors.GreySeafoam;
-                hoveredColour = colors.GreySeafoamLight;
-            }
-
-            protected override bool OnHover(HoverEvent e)
-            {
-                background.FadeColour(hoveredColour, duration, Easing.OutQuint);
-                return base.OnHover(e);
-            }
-
-            protected override void OnHoverLost(HoverLostEvent e)
-            {
-                background.FadeColour(idleColour, duration, Easing.OutQuint);
-                base.OnHoverLost(e);
+                IdleColour = colors.GreySeafoam;
+                HoverColour = colors.GreySeafoamLight;
             }
 
             protected override bool OnClick(ClickEvent e)
             {
                 IsLoading = true;
-                Action.Invoke();
                 return base.OnClick(e);
             }
 
