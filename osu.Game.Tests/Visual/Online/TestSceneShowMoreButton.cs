@@ -10,8 +10,6 @@ namespace osu.Game.Tests.Visual.Online
 {
     public class TestSceneShowMoreButton : OsuTestScene
     {
-        private readonly ShowMoreButton button;
-
         public override IReadOnlyList<Type> RequiredTypes => new[]
         {
             typeof(ShowMoreButton),
@@ -19,6 +17,8 @@ namespace osu.Game.Tests.Visual.Online
 
         public TestSceneShowMoreButton()
         {
+            ShowMoreButton button;
+
             Add(button = new ShowMoreButton
             {
                 Anchor = Anchor.Centre,
