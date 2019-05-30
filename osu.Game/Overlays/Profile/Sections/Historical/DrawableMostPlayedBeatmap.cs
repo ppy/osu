@@ -6,32 +6,33 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
-using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Drawables;
 using osu.Game.Graphics;
+using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osuTK;
-using osuTK.Graphics;
+using System.Collections.Generic;
 
 namespace osu.Game.Overlays.Profile.Sections.Historical
 {
-    public class DrawableMostPlayedBeatmap : Container
+    public class DrawableMostPlayedBeatmap : OsuHoverContainer
     {
         private readonly OsuSpriteText mapperText;
         private readonly Box background;
-        private Color4 idleBackgroundColour;
-        private Color4 hoveredBackgroundColour;
-        private const int duration = 200;
         private const int cover_width = 100;
         private const int corner_radius = 10;
         private readonly SpriteIcon icon;
         private readonly OsuSpriteText playCountText;
         private readonly UnderscoredUserLink mapper;
 
+        protected override IEnumerable<Drawable> EffectTargets => new[] { background };
+
         public DrawableMostPlayedBeatmap(BeatmapInfo beatmap, int playCount)
         {
+            Enabled.Value = true; //manually enabled, because we have no action
+
             RelativeSizeAxes = Axes.X;
             Height = 60;
             Masking = true;
@@ -154,22 +155,10 @@ namespace osu.Game.Overlays.Profile.Sections.Historical
         [BackgroundDependencyLoader]
         private void load(OsuColour colors)
         {
-            idleBackgroundColour = background.Colour = colors.GreySeafoam;
-            hoveredBackgroundColour = colors.GreySeafoamLight;
+            IdleColour = colors.GreySeafoam;
+            HoverColour = colors.GreySeafoamLight;
             mapperText.Colour = mapper.Colour = colors.GreySeafoamLighter;
             icon.Colour = playCountText.Colour = colors.Yellow;
-        }
-
-        protected override bool OnHover(HoverEvent e)
-        {
-            background.FadeColour(hoveredBackgroundColour, duration, Easing.OutQuint);
-            return base.OnHover(e);
-        }
-
-        protected override void OnHoverLost(HoverLostEvent e)
-        {
-            background.FadeColour(idleBackgroundColour, duration, Easing.OutQuint);
-            base.OnHoverLost(e);
         }
     }
 }
