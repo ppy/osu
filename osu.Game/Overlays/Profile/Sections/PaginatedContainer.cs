@@ -54,6 +54,8 @@ namespace osu.Game.Overlays.Profile.Sections
                 },
                 MoreButton = new ShowMoreButton
                 {
+                    Anchor = Anchor.TopCentre,
+                    Origin = Anchor.TopCentre,
                     Alpha = 0,
                     Margin = new MarginPadding { Top = 10 },
                     Action = ShowMore,
