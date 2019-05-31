@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
@@ -58,12 +59,17 @@ namespace osu.Game.Overlays.Changelog
                 }
                 else
                 {
-                    Add(new Box
+                    Add(new Container
                     {
                         RelativeSizeAxes = Axes.X,
                         Height = 1,
-                        Colour = new Color4(32, 24, 35, 255),
+                        Padding = new MarginPadding { Horizontal = ChangelogBuild.HORIZONTAL_PADDING },
                         Margin = new MarginPadding { Top = 30 },
+                        Child = new Box
+                        {
+                            RelativeSizeAxes = Axes.Both,
+                            Colour = new Color4(32, 24, 35, 255),
+                        }
                     });
                 }
 

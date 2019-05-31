@@ -18,6 +18,8 @@ namespace osu.Game.Overlays.Changelog
 {
     public class ChangelogBuild : FillFlowContainer
     {
+        public const float HORIZONTAL_PADDING = 70;
+
         public Action<APIChangelogBuild> SelectBuild;
 
         protected readonly APIChangelogBuild Build;
@@ -31,7 +33,7 @@ namespace osu.Game.Overlays.Changelog
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
             Direction = FillDirection.Vertical;
-            Padding = new MarginPadding { Horizontal = 70 };
+            Padding = new MarginPadding { Horizontal = HORIZONTAL_PADDING };
 
             Children = new Drawable[]
             {
