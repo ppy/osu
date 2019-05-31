@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Input.Events;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
@@ -17,8 +18,11 @@ namespace osu.Game.Overlays.Settings
 {
     public class SettingsFooter : FillFlowContainer
     {
+        private OsuGameBase game;
+        private ChangelogOverlay changelog;
+
         [BackgroundDependencyLoader]
-        private void load(OsuGameBase game, OsuColour colours, RulesetStore rulesets)
+        private void load(OsuGameBase game, OsuColour colours, RulesetStore rulesets, ChangelogOverlay changelog)
         {
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
@@ -67,6 +71,17 @@ namespace osu.Game.Overlays.Settings
                     Colour = DebugUtils.IsDebug ? colours.Red : Color4.White,
                 },
             };
+
+            this.game = game;
+            this.changelog = changelog;
+        }
+
+        protected override bool OnClick(ClickEvent e)
+        {
+            if (!game.IsDeployedBuild) return base.OnClick(e);
+
+            changelog?.ShowBuild("lazer", game.Version);
+            return base.OnClick(e);
         }
     }
 }
