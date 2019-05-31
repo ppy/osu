@@ -76,11 +76,11 @@ namespace osu.Game.Graphics.UserInterface
                             {
                                 titleText = new OsuSpriteText
                                 {
-                                    Font = OsuFont.GetFont(size: 25),
+                                    Font = OsuFont.GetFont(size: 30, weight: FontWeight.Light),
                                 },
                                 pageText = new OsuSpriteText
                                 {
-                                    Font = OsuFont.GetFont(size: 25),
+                                    Font = OsuFont.GetFont(size: 30, weight: FontWeight.Light),
                                 }
                             }
                         }
