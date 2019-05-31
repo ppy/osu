@@ -43,6 +43,7 @@ namespace osu.Game.Overlays.Changelog
             };
             req.Failure += _ => complete = true;
 
+            // This is done on a separate thread to support cancellation below
             Task.Run(() => req.Perform(api));
 
             while (!complete)
@@ -53,7 +54,7 @@ namespace osu.Game.Overlays.Changelog
                     return;
                 }
 
-                Task.Delay(1);
+                Thread.Sleep(10);
             }
 
             if (build != null)
