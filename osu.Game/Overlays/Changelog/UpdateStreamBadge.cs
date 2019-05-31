@@ -87,6 +87,13 @@ namespace osu.Game.Overlays.Changelog
             SelectedTab.BindValueChanged(_ => updateState(), true);
         }
 
+        [BackgroundDependencyLoader]
+        private void load(AudioManager audio)
+        {
+            sampleClick = audio.Sample.Get(@"UI/generic-select-soft");
+            sampleHover = audio.Sample.Get(@"UI/generic-hover-soft");
+        }
+
         protected override void OnActivated() => updateState();
 
         protected override void OnDeactivated() => updateState();
@@ -145,13 +152,6 @@ namespace osu.Game.Overlays.Changelog
         {
             externalDimRequested = false;
             updateState();
-        }
-
-        [BackgroundDependencyLoader]
-        private void load(AudioManager audio)
-        {
-            sampleClick = audio.Sample.Get(@"UI/generic-select-soft");
-            sampleHover = audio.Sample.Get(@"UI/generic-hover-soft");
         }
     }
 }
