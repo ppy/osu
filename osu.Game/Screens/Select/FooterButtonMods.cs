@@ -48,7 +48,7 @@ namespace osu.Game.Screens.Select
         {
             base.UpdateAfterChildren();
 
-            float finalWidth = !modDisplay.Current.Value.Any() ? DEFAULT_SIZE.X : DEFAULT_SIZE.X + modDisplay.IconsContainer.Width;
+            float finalWidth = !modDisplay.Current.Value.Any() ? DefaultSize.X : DefaultSize.X + modDisplay.IconsContainer.Width;
             Width = Interpolation.ValueAt(MathHelper.Clamp(Clock.ElapsedFrameTime, 0, 1000), Width, finalWidth, 0, 500, Easing.OutQuint);
         }
 
