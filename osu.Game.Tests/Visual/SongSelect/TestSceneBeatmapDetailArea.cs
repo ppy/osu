@@ -30,7 +30,7 @@ namespace osu.Game.Tests.Visual.SongSelect
                 Size = new Vector2(550f, 450f),
             });
 
-            AddStep("all metrics", () => detailsArea.Beatmap = new DummyWorkingBeatmap(game)
+            AddStep("all metrics", () => detailsArea.Beatmap = new DummyWorkingBeatmap(null, null)
                 {
                     BeatmapInfo =
                     {
@@ -58,7 +58,7 @@ namespace osu.Game.Tests.Visual.SongSelect
                 }
             );
 
-            AddStep("all except source", () => detailsArea.Beatmap = new DummyWorkingBeatmap(game)
+            AddStep("all except source", () => detailsArea.Beatmap = new DummyWorkingBeatmap(null, null)
             {
                 BeatmapInfo =
                 {
@@ -84,7 +84,7 @@ namespace osu.Game.Tests.Visual.SongSelect
                 }
             });
 
-            AddStep("ratings", () => detailsArea.Beatmap = new DummyWorkingBeatmap(game)
+            AddStep("ratings", () => detailsArea.Beatmap = new DummyWorkingBeatmap(null, null)
             {
                 BeatmapInfo =
                 {
@@ -109,7 +109,7 @@ namespace osu.Game.Tests.Visual.SongSelect
                 }
             });
 
-            AddStep("fails+retries", () => detailsArea.Beatmap = new DummyWorkingBeatmap(game)
+            AddStep("fails+retries", () => detailsArea.Beatmap = new DummyWorkingBeatmap(null, null)
             {
                 BeatmapInfo =
                 {
@@ -135,7 +135,7 @@ namespace osu.Game.Tests.Visual.SongSelect
                 }
             });
 
-            AddStep("null metrics", () => detailsArea.Beatmap = new DummyWorkingBeatmap(game)
+            AddStep("null metrics", () => detailsArea.Beatmap = new DummyWorkingBeatmap(null, null)
             {
                 BeatmapInfo =
                 {

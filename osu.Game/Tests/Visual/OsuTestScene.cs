@@ -10,6 +10,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Track;
 using osu.Framework.Bindables;
+using osu.Framework.Graphics.Textures;
 using osu.Framework.Platform;
 using osu.Framework.Testing;
 using osu.Framework.Timing;
@@ -45,9 +46,11 @@ namespace osu.Game.Tests.Visual
         protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
         {
             // This is the earliest we can get OsuGameBase, which is used by the dummy working beatmap to find textures
-            beatmap = new OsuTestBeatmap(new DummyWorkingBeatmap(parent.Get<OsuGameBase>()))
+            var working = new DummyWorkingBeatmap(parent.Get<AudioManager>(), parent.Get<TextureStore>());
+
+            beatmap = new OsuTestBeatmap(working)
             {
-                Default = new DummyWorkingBeatmap(parent.Get<OsuGameBase>())
+                Default = working
             };
 
             return Dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
@@ -63,7 +66,7 @@ namespace osu.Game.Tests.Visual
 
         protected virtual IBeatmap CreateBeatmap(RulesetInfo ruleset) => new TestBeatmap(ruleset);
 
-        protected WorkingBeatmap CreateWorkingBeatmap(RulesetInfo ruleset = null) =>
+        protected WorkingBeatmap CreateWorkingBeatmap(RulesetInfo ruleset) =>
             CreateWorkingBeatmap(CreateBeatmap(ruleset));
 
         protected virtual WorkingBeatmap CreateWorkingBeatmap(IBeatmap beatmap) =>

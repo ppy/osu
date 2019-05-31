@@ -11,6 +11,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Rulesets.Osu;
 using osuTK.Graphics;
 
 namespace osu.Game.Tests.Visual.Editor
@@ -95,7 +96,7 @@ namespace osu.Game.Tests.Visual.Editor
                     Child = graph = new TestWaveformGraph
                     {
                         RelativeSizeAxes = Axes.Both,
-                        Waveform = new DummyWorkingBeatmap(game).Waveform,
+                        Waveform = CreateWorkingBeatmap(new OsuRuleset().RulesetInfo).Waveform,
                     },
                 };
             });
