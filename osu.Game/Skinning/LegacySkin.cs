@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -139,6 +140,8 @@ namespace osu.Game.Skinning
                 string path = getPathForFile(name);
                 return path == null ? null : underlyingStore.GetStream(path);
             }
+
+            public IEnumerable<string> GetAvailableResources() => source.Files.Select(f => f.Filename);
 
             byte[] IResourceStore<byte[]>.Get(string name) => GetAsync(name).Result;
 
