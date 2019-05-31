@@ -42,9 +42,11 @@ namespace osu.Game.Tests
 
         protected override Texture GetBackground() => null;
 
-        protected override Waveform GetWaveform() => new Waveform(trackStore.GetStream(reader.Filenames.First(f => f.EndsWith(".mp3"))));
+        protected override Waveform GetWaveform() => new Waveform(trackStore.GetStream(firstAudioFile));
 
-        protected override Track GetTrack() => trackStore.Get(reader.Filenames.First(f => f.EndsWith(".mp3")));
+        protected override Track GetTrack() => trackStore.Get(firstAudioFile);
+
+        private string firstAudioFile => reader.Filenames.First(f => f.EndsWith(".mp3"));
 
         private Stream getBeatmapStream() => reader.GetStream(reader.Filenames.First(f => f.EndsWith(".osu")));
 
