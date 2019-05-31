@@ -22,11 +22,10 @@ namespace osu.Game.Beatmaps
             private readonly IResourceStore<byte[]> store;
 
             public BeatmapManagerWorkingBeatmap(IResourceStore<byte[]> store, TextureStore textureStore, BeatmapInfo beatmapInfo, AudioManager audioManager)
-                : base(beatmapInfo)
+                : base(beatmapInfo, audioManager)
             {
                 this.store = store;
                 this.textureStore = textureStore;
-                AudioManager = audioManager;
             }
 
             protected override IBeatmap GetBeatmap()

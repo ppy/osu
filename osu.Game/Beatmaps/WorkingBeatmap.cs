@@ -29,8 +29,11 @@ namespace osu.Game.Beatmaps
 
         public readonly BeatmapMetadata Metadata;
 
-        protected WorkingBeatmap(BeatmapInfo beatmapInfo)
+        protected AudioManager AudioManager { get; }
+
+        protected WorkingBeatmap(BeatmapInfo beatmapInfo, AudioManager audioManager)
         {
+            AudioManager = audioManager;
             BeatmapInfo = beatmapInfo;
             BeatmapSetInfo = beatmapInfo.BeatmapSet;
             Metadata = beatmapInfo.Metadata ?? BeatmapSetInfo?.Metadata ?? new BeatmapMetadata();
@@ -178,8 +181,6 @@ namespace osu.Game.Beatmaps
 
         public bool SkinLoaded => skin.IsResultAvailable;
         public Skin Skin => skin.Value;
-
-        public AudioManager AudioManager { get; set; }
 
         protected virtual Skin GetSkin() => new DefaultSkin();
         private readonly RecyclableLazy<Skin> skin;
