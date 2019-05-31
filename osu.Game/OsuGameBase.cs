@@ -161,7 +161,7 @@ namespace osu.Game
 
             dependencies.CacheAs<IAPIProvider>(API);
 
-            var defaultBeatmap = new DummyWorkingBeatmap(this);
+            var defaultBeatmap = new DummyWorkingBeatmap(Audio, Textures);
 
             dependencies.Cache(RulesetStore = new RulesetStore(contextFactory));
             dependencies.Cache(FileStore = new FileStore(contextFactory, Host.Storage));
