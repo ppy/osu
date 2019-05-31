@@ -21,7 +21,7 @@ namespace osu.Game.Overlays.Settings
         private OsuGameBase game;
         private ChangelogOverlay changelog;
 
-        [BackgroundDependencyLoader]
+        [BackgroundDependencyLoader(true)]
         private void load(OsuGameBase game, OsuColour colours, RulesetStore rulesets, ChangelogOverlay changelog)
         {
             RelativeSizeAxes = Axes.X;
