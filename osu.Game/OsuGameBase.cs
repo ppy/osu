@@ -195,7 +195,7 @@ namespace osu.Game
             // this adds a global reduction of track volume for the time being.
             Audio.Tracks.AddAdjustment(AdjustableProperty.Volume, new BindableDouble(0.8));
 
-            beatmap = new OsuBindableBeatmap(defaultBeatmap, Audio);
+            beatmap = new OsuBindableBeatmap(defaultBeatmap);
 
             dependencies.CacheAs<IBindable<WorkingBeatmap>>(beatmap);
             dependencies.CacheAs(beatmap);
@@ -282,20 +282,8 @@ namespace osu.Game
         private class OsuBindableBeatmap : BindableBeatmap
         {
             public OsuBindableBeatmap(WorkingBeatmap defaultValue)
-                : base(defaultValue, null)
+                : base(defaultValue)
             {
-            }
-
-            public OsuBindableBeatmap(WorkingBeatmap defaultValue, AudioManager audioManager)
-                : base(defaultValue, audioManager)
-            {
-            }
-
-            public override BindableBeatmap GetBoundCopy()
-            {
-                var copy = new OsuBindableBeatmap(Default, AudioManager);
-                copy.BindTo(this);
-                return copy;
             }
         }
 

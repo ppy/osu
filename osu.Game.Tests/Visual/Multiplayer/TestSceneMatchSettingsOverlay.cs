@@ -19,6 +19,9 @@ namespace osu.Game.Tests.Visual.Multiplayer
 {
     public class TestSceneMatchSettingsOverlay : MultiplayerTestScene
     {
+        [Resolved]
+        private OsuGameBase game { get; set; }
+
         public override IReadOnlyList<Type> RequiredTypes => new[]
         {
             typeof(MatchSettingsOverlay)
@@ -57,7 +60,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             AddStep("set name", () => Room.Name.Value = "Room name");
             AddAssert("button disabled", () => !settings.ApplyButton.Enabled.Value);
 
-            AddStep("set beatmap", () => Room.Playlist.Add(new PlaylistItem { Beatmap = new DummyWorkingBeatmap().BeatmapInfo }));
+            AddStep("set beatmap", () => Room.Playlist.Add(new PlaylistItem { Beatmap = new DummyWorkingBeatmap(game).BeatmapInfo }));
             AddAssert("button enabled", () => settings.ApplyButton.Enabled.Value);
 
             AddStep("clear name", () => Room.Name.Value = "");

@@ -2,8 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Diagnostics;
-using JetBrains.Annotations;
-using osu.Framework.Audio;
 using osu.Framework.Bindables;
 
 namespace osu.Game.Beatmaps
@@ -14,28 +12,19 @@ namespace osu.Game.Beatmaps
     /// </summary>
     public abstract class BindableBeatmap : NonNullableBindable<WorkingBeatmap>
     {
-        protected AudioManager AudioManager;
-
         private WorkingBeatmap lastBeatmap;
 
-        protected BindableBeatmap(WorkingBeatmap defaultValue, AudioManager audioManager)
+        protected BindableBeatmap(WorkingBeatmap defaultValue)
             : base(defaultValue)
         {
-            // we don't want to attempt to update tracks if we are a bound copy.
-            if (audioManager != null)
-            {
-                AudioManager = audioManager;
-                ValueChanged += b => updateAudioTrack(b.NewValue);
-
-                // If the track has changed prior to this being called, let's register it
-                if (Value != Default)
-                    updateAudioTrack(Value);
-            }
+            BindValueChanged(b => updateAudioTrack(b.NewValue), true);
         }
 
         private void updateAudioTrack(WorkingBeatmap beatmap)
         {
             var trackLoaded = lastBeatmap?.TrackLoaded ?? false;
+
+            //beatmap.AudioManager = AudioManager;
 
             // compare to last beatmap as sometimes the two may share a track representation (optimisation, see WorkingBeatmap.TransferTo)
             if (!trackLoaded || lastBeatmap?.Track != beatmap.Track)
@@ -51,12 +40,5 @@ namespace osu.Game.Beatmaps
 
             lastBeatmap = beatmap;
         }
-
-        /// <summary>
-        /// Retrieve a new <see cref="BindableBeatmap"/> instance weakly bound to this <see cref="BindableBeatmap"/>.
-        /// If you are further binding to events of the retrieved <see cref="BindableBeatmap"/>, ensure a local reference is held.
-        /// </summary>
-        [NotNull]
-        public new abstract BindableBeatmap GetBoundCopy();
     }
 }
