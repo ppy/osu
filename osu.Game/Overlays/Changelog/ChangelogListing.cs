@@ -47,12 +47,12 @@ namespace osu.Game.Overlays.Changelog
 
                     Add(new OsuSpriteText
                     {
-                        Text = build.CreatedAt.Date.ToString("dd MMM yyyy"),
-                        Font = OsuFont.GetFont(weight: FontWeight.Regular, size: 24),
-                        Colour = OsuColour.FromHex(@"FD5"),
                         Anchor = Anchor.TopCentre,
                         Origin = Anchor.TopCentre,
                         Margin = new MarginPadding { Top = 15 },
+                        Text = build.CreatedAt.Date.ToString("dd MMM yyyy"),
+                        Font = OsuFont.GetFont(weight: FontWeight.Regular, size: 24),
+                        Colour = OsuColour.FromHex(@"FD5"),
                     });
 
                     currentDate = build.CreatedAt.Date;

@@ -120,10 +120,7 @@ namespace osu.Game.Overlays
                             ?? streams.Find(s => s.Name == updateStream)?.LatestBuild;
 
                 if (build != null)
-                {
-                    Current.Value = build;
-                    State = Visibility.Visible;
-                }
+                    ShowBuild(build);
             });
 
             State = Visibility.Visible;
@@ -193,13 +190,13 @@ namespace osu.Game.Overlays
             });
         }
 
-        private CancellationTokenSource loadContentTask;
+        private CancellationTokenSource loadContentCancellation;
 
         private void loadContent(ChangelogContent newContent)
         {
             content.FadeTo(0.2f, 300, Easing.OutQuint);
 
-            loadContentTask?.Cancel();
+            loadContentCancellation?.Cancel();
 
             LoadComponentAsync(newContent, c =>
             {
@@ -207,7 +204,7 @@ namespace osu.Game.Overlays
 
                 c.BuildSelected = ShowBuild;
                 content.Child = c;
-            }, (loadContentTask = new CancellationTokenSource()).Token);
+            }, (loadContentCancellation = new CancellationTokenSource()).Token);
         }
     }
 }
