@@ -13,7 +13,7 @@ using osu.Game.Tests.Resources;
 namespace osu.Game.Tests
 {
     /// <summary>
-    /// A <see cref="WorkingBeatmap"/> that is used for testcases that include waveforms.
+    /// A <see cref="WorkingBeatmap"/> that is used for test scenes that include waveforms.
     /// </summary>
     public class WaveformTestBeatmap : WorkingBeatmap
     {

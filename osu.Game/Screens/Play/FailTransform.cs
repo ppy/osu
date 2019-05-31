@@ -71,6 +71,7 @@ namespace osu.Game.Screens.Play
 
             // TODO: Use RNG with 'seed' if it was implemented.
             Random randObj = new Random(seed);
+
             foreach (DrawableHitObject obj in d.Objects)
             {
                 obj.Rotation += RNG.NextSingle(0.2f);
