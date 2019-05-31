@@ -26,10 +26,6 @@ namespace osu.Game.Screens.Play
         private readonly WorkingBeatmap beatmap;
         private readonly IReadOnlyList<Mod> mods;
 
-        private readonly bool allowLeadIn;
-
-        private readonly double gameplayStartTime;
-
         /// <summary>
         /// The original source (usually a <see cref="WorkingBeatmap"/>'s track).
         /// </summary>
@@ -90,8 +86,6 @@ namespace osu.Game.Screens.Play
 
             GameplayClock.IsPaused.BindTo(IsPaused);
         }
-
-        private double totalOffset => userOffsetClock.Offset + platformOffsetClock.Offset;
 
         [BackgroundDependencyLoader]
         private void load(OsuConfigManager config)
