@@ -137,7 +137,7 @@ namespace osu.Game.Screens.Multi.Match.Components
 
             private class BackgroundSprite : UpdateableBeatmapBackgroundSprite
             {
-                protected override double FadeDuration => 200;
+                protected override double TransformDuration => 200;
             }
         }
     }
