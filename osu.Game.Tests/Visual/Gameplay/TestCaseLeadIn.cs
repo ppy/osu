@@ -15,7 +15,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Tests.Visual.Gameplay
 {
-    public class TestCaseLeadIn : RateAdjustedBeatmapTestCase
+    public class TestCaseLeadIn : RateAdjustedBeatmapTestScene
     {
         private Ruleset ruleset;
 
@@ -52,15 +52,16 @@ namespace osu.Game.Tests.Visual.Gameplay
         {
             Beatmap.Value = new TestWorkingBeatmap(beatmap, Clock);
 
-            LoadScreen(player = new LeadInPlayer
-            {
-                AllowPause = false,
-                AllowResults = false,
-            });
+            LoadScreen(player = new LeadInPlayer());
         }
 
         private class LeadInPlayer : Player
         {
+            public LeadInPlayer()
+                : base(false, false)
+            {
+            }
+
             public double? FirstFrameClockTime;
 
             public new GameplayClockContainer GameplayClockContainer => base.GameplayClockContainer;
@@ -72,6 +73,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             protected override void UpdateAfterChildren()
             {
                 base.UpdateAfterChildren();
+
                 if (!FirstFrameClockTime.HasValue)
                 {
                     FirstFrameClockTime = GameplayClockContainer.GameplayClock.CurrentTime;
