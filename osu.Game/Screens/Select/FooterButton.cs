@@ -54,6 +54,7 @@ namespace osu.Game.Screens.Select
             }
         }
 
+        protected readonly Vector2 DEFAULT_SIZE = new Vector2(100, 50);
         protected readonly Container TextContainer;
         protected readonly SpriteText SpriteText;
         private readonly Box box;
@@ -63,12 +64,12 @@ namespace osu.Game.Screens.Select
 
         public FooterButton()
         {
-            AutoSizeAxes = Axes.Both;
+            Size = DEFAULT_SIZE;
             Children = new Drawable[]
             {
                 TextContainer = new Container
                 {
-                    Size = new Vector2(100, 50),
+                    Size = DEFAULT_SIZE,
                     Child = SpriteText = new OsuSpriteText
                     {
                         Anchor = Anchor.Centre,
