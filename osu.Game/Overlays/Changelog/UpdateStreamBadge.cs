@@ -84,7 +84,7 @@ namespace osu.Game.Overlays.Changelog
                 }
             };
 
-            SelectedTab.ValueChanged += _ => updateState();
+            SelectedTab.BindValueChanged(_ => updateState(), true);
         }
 
         protected override void OnActivated() => updateState();
@@ -113,7 +113,13 @@ namespace osu.Game.Overlays.Changelog
 
         private void updateState()
         {
-            if (Active.Value || IsHovered || SelectedTab.Value == null)
+            // Expand based on the local state
+            bool shouldExpand = Active.Value || IsHovered;
+
+            // Expand based on whether no build is selected and the badge area is hovered
+            shouldExpand |= SelectedTab.Value == null && !externalDimRequested;
+
+            if (shouldExpand)
             {
                 expandingBar.Expand();
                 fadeContainer.FadeTo(1, transition_duration);
