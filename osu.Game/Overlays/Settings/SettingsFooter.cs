@@ -78,10 +78,11 @@ namespace osu.Game.Overlays.Settings
 
         protected override bool OnClick(ClickEvent e)
         {
-            if (!game.IsDeployedBuild) return base.OnClick(e);
-
-            changelog?.ShowBuild("lazer", game.Version);
-            return base.OnClick(e);
+            if (game.IsDeployedBuild)
+            {
+                changelog?.ShowBuild("lazer", game.Version);
+            }
+            return true;
         }
     }
 }
