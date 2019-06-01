@@ -213,7 +213,7 @@ namespace osu.Game.Screens.Select
                 });
             }
 
-            BeatmapDetails.Leaderboard.ScoreSelected += s => this.Push(new SoloResults(s));
+            ShowResults();
         }
 
         [BackgroundDependencyLoader(true)]
@@ -573,6 +573,8 @@ namespace osu.Game.Screens.Select
             if (beatmap.Track != null)
                 beatmap.Track.Looping = true;
         }
+
+        public virtual void ShowResults() => BeatmapDetails.Leaderboard.ScoreSelected += s => this.Push(new SoloResults(s));
 
         private void ensurePlayingSelected(bool restart = false)
         {

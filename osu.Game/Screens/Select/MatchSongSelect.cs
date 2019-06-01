@@ -11,6 +11,7 @@ using osu.Game.Beatmaps;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Screens.Multi;
+using osu.Game.Screens.Play;
 
 namespace osu.Game.Screens.Select
 {
@@ -78,5 +79,7 @@ namespace osu.Game.Screens.Select
             Ruleset.Disabled = false;
             Mods.Disabled = false;
         }
+
+        public override void ShowResults() => BeatmapDetails.Leaderboard.ScoreSelected += s => this.Push(new MatchSoloResults(s));
     }
 }
