@@ -4,9 +4,9 @@
 using Humanizer;
 using osu.Framework.Graphics;
 using osu.Game.Scoring;
-using osu.Game.Screens.Multi;
+using osu.Game.Screens.Play;
 
-namespace osu.Game.Screens.Play
+namespace osu.Game.Screens.Multi.Match.Components
 {
     public class MatchSoloResults : SoloResults, IMultiplayerSubScreen
     {

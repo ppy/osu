@@ -13,7 +13,6 @@ using osu.Game.Online.Multiplayer.GameTypes;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Screens.Multi.Match.Components;
 using osu.Game.Screens.Multi.Play;
-using osu.Game.Screens.Select;
 using PlaylistItem = osu.Game.Online.Multiplayer.PlaylistItem;
 
 namespace osu.Game.Screens.Multi.Match
