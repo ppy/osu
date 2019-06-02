@@ -27,6 +27,7 @@ using osu.Game.Scoring;
 using osu.Game.Screens.Ranking;
 using osu.Game.Skinning;
 using osu.Game.Storyboards.Drawables;
+using osuTK.Graphics;
 
 namespace osu.Game.Screens.Play
 {
@@ -454,6 +455,7 @@ namespace osu.Game.Screens.Play
 
             Background.EnableUserDim.Value = true;
             Background.BlurAmount.Value = 0;
+            Background.FadeColour(Color4.White, 250);
 
             Background.StoryboardReplacesBackground.BindTo(storyboardReplacesBackground);
             StoryboardContainer.StoryboardReplacesBackground.BindTo(storyboardReplacesBackground);

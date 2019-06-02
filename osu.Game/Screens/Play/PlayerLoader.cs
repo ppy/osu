@@ -284,12 +284,14 @@ namespace osu.Game.Screens.Play
                 // Preview user-defined background dim and blur when hovered on the visual settings panel.
                 Background.EnableUserDim.Value = true;
                 Background.BlurAmount.Value = 0;
+                Background.FadeColour(Color4.White, 250);
             }
             else
             {
                 // Returns background dim and blur to the values specified by PlayerLoader.
                 Background.EnableUserDim.Value = false;
                 Background.BlurAmount.Value = BACKGROUND_BLUR;
+                Background.FadeColour(Color4.Gray, 250);
             }
         }
 
