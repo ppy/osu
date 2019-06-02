@@ -455,7 +455,7 @@ namespace osu.Game.Screens.Play
 
             Background.EnableUserDim.Value = true;
             Background.BlurAmount.Value = 0;
-            Background.FadeColour(Color4.White, 250);
+            Background.FadeColour(Color4.White, 800, Easing.OutQuint);
 
             Background.StoryboardReplacesBackground.BindTo(storyboardReplacesBackground);
             StoryboardContainer.StoryboardReplacesBackground.BindTo(storyboardReplacesBackground);
