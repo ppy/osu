@@ -18,11 +18,14 @@ namespace osu.Game.Overlays.Settings
 {
     public class SettingsFooter : FillFlowContainer
     {
-        private OsuGameBase game;
-        private ChangelogOverlay changelog;
+        [Resolved]
+        private OsuGameBase game { get; set; }
+
+        [Resolved(CanBeNull = true)]
+        private ChangelogOverlay changelog { get; set; }
 
         [BackgroundDependencyLoader(true)]
-        private void load(OsuGameBase game, OsuColour colours, RulesetStore rulesets, ChangelogOverlay changelog)
+        private void load(OsuGameBase game, OsuColour colours, RulesetStore rulesets)
         {
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
@@ -71,9 +74,6 @@ namespace osu.Game.Overlays.Settings
                     Colour = DebugUtils.IsDebug ? colours.Red : Color4.White,
                 },
             };
-
-            this.game = game;
-            this.changelog = changelog;
         }
 
         protected override bool OnClick(ClickEvent e)
@@ -82,6 +82,7 @@ namespace osu.Game.Overlays.Settings
             {
                 changelog?.ShowBuild("lazer", game.Version);
             }
+
             return true;
         }
     }
