@@ -176,7 +176,7 @@ namespace osu.Game.Screens.Menu
 
         private void updateIdleState(bool isIdle)
         {
-            if (isIdle && State != ButtonSystemState.Exit)
+            if (isIdle && State != ButtonSystemState.Exit && State != ButtonSystemState.EnteringMode)
                 State = ButtonSystemState.Initial;
         }
 
