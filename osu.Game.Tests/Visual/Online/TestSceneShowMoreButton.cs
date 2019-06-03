@@ -23,6 +23,7 @@ namespace osu.Game.Tests.Visual.Online
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
+                Action = () => { }
             });
 
             AddStep("switch loading state", () => button.IsLoading = !button.IsLoading);
