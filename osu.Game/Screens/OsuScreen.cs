@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore.Internal;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
@@ -14,6 +15,7 @@ using osu.Game.Input.Bindings;
 using osu.Game.Rulesets;
 using osu.Game.Screens.Menu;
 using osu.Game.Overlays;
+using osu.Game.Rulesets.Mods;
 
 namespace osu.Game.Screens
 {
@@ -57,11 +59,15 @@ namespace osu.Game.Screens
 
         private SampleChannel sampleExit;
 
+        protected virtual bool PlayResumeSound => true;
+
         public virtual float BackgroundParallaxAmount => 1;
 
-        public Bindable<WorkingBeatmap> Beatmap { get; set; }
+        public Bindable<WorkingBeatmap> Beatmap { get; private set; }
 
-        public Bindable<RulesetInfo> Ruleset { get; set; }
+        public Bindable<RulesetInfo> Ruleset { get; private set; }
+
+        public Bindable<IReadOnlyList<Mod>> Mods { get; private set; }
 
         protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
         {
@@ -69,6 +75,7 @@ namespace osu.Game.Screens
 
             Beatmap = screenDependencies.Beatmap;
             Ruleset = screenDependencies.Ruleset;
+            Mods = screenDependencies.Mods;
 
             return base.CreateChildDependencies(screenDependencies);
         }
@@ -112,7 +119,8 @@ namespace osu.Game.Screens
 
         public override void OnResuming(IScreen last)
         {
-            sampleExit?.Play();
+            if (PlayResumeSound)
+                sampleExit?.Play();
             applyArrivingDefaults(true);
 
             base.OnResuming(last);

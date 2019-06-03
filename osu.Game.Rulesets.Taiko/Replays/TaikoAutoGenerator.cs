@@ -52,6 +52,7 @@ namespace osu.Game.Rulesets.Taiko.Replays
                     int count = 0;
                     int req = swell.RequiredHits;
                     double hitRate = Math.Min(swell_hit_speed, swell.Duration / req);
+
                     for (double j = h.StartTime; j < endTime; j += hitRate)
                     {
                         TaikoAction action;
@@ -62,12 +63,15 @@ namespace osu.Game.Rulesets.Taiko.Replays
                             case 0:
                                 action = TaikoAction.LeftCentre;
                                 break;
+
                             case 1:
                                 action = TaikoAction.LeftRim;
                                 break;
+
                             case 2:
                                 action = TaikoAction.RightCentre;
                                 break;
+
                             case 3:
                                 action = TaikoAction.RightRim;
                                 break;

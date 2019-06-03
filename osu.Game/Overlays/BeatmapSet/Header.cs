@@ -6,6 +6,7 @@ using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Drawables;
@@ -225,11 +226,13 @@ namespace osu.Game.Overlays.BeatmapSet
                         RelativeSizeAxes = Axes.Y
                     };
                     break;
+
                 case DownloadState.Downloading:
                 case DownloadState.Downloaded:
                     // temporary to avoid showing two buttons for maps with novideo. will be fixed in new beatmap overlay design.
                     downloadButtonsContainer.Child = new DownloadButton(BeatmapSet.Value);
                     break;
+
                 default:
                     downloadButtonsContainer.Child = new DownloadButton(BeatmapSet.Value);
                     if (BeatmapSet.Value.OnlineInfo.HasVideo)

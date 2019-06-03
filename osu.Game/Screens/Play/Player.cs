@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
@@ -39,11 +40,14 @@ namespace osu.Game.Screens.Play
 
         public override OverlayActivation InitialOverlayActivationMode => OverlayActivation.UserTriggered;
 
+        /// <summary>
+        /// Whether gameplay should pause when the game window focus is lost.
+        /// </summary>
+        protected virtual bool PauseOnFocusLost => true;
+
         public Action RestartRequested;
 
         public bool HasFailed { get; private set; }
-
-        public bool PauseOnFocusLost { get; set; } = true;
 
         private Bindable<bool> mouseWheelDisabled;
 
@@ -69,6 +73,10 @@ namespace osu.Game.Screens.Play
 
         protected GameplayClockContainer GameplayClockContainer { get; private set; }
 
+        [Cached]
+        [Cached(Type = typeof(IBindable<IReadOnlyList<Mod>>))]
+        protected new readonly Bindable<IReadOnlyList<Mod>> Mods = new Bindable<IReadOnlyList<Mod>>(Array.Empty<Mod>());
+
         private readonly bool allowPause;
         private readonly bool showResults;
 
@@ -88,6 +96,8 @@ namespace osu.Game.Screens.Play
         {
             this.api = api;
 
+            Mods.Value = base.Mods.Value.Select(m => m.CreateCopy()).ToArray();
+
             WorkingBeatmap working = loadBeatmap();
 
             if (working == null)
@@ -99,10 +109,12 @@ namespace osu.Game.Screens.Play
             showStoryboard = config.GetBindable<bool>(OsuSetting.ShowStoryboard);
 
             ScoreProcessor = DrawableRuleset.CreateScoreProcessor();
+            ScoreProcessor.Mods.BindTo(Mods);
+
             if (!ScoreProcessor.Mode.Disabled)
                 config.BindWith(OsuSetting.ScoreDisplayMode, ScoreProcessor.Mode);
 
-            InternalChild = GameplayClockContainer = new GameplayClockContainer(working, DrawableRuleset.GameplayStartTime);
+            InternalChild = GameplayClockContainer = new GameplayClockContainer(working, Mods.Value, DrawableRuleset.GameplayStartTime);
 
             GameplayClockContainer.Children = new[]
             {
@@ -123,9 +135,13 @@ namespace osu.Game.Screens.Play
                 },
                 // display the cursor above some HUD elements.
                 DrawableRuleset.Cursor?.CreateProxy() ?? new Container(),
-                HUDOverlay = new HUDOverlay(ScoreProcessor, DrawableRuleset, working)
+                HUDOverlay = new HUDOverlay(ScoreProcessor, DrawableRuleset, Mods.Value)
                 {
-                    HoldToQuit = { Action = performUserRequestedExit },
+                    HoldToQuit =
+                    {
+                        Action = performUserRequestedExit,
+                        IsPaused = { BindTarget = GameplayClockContainer.IsPaused }
+                    },
                     PlayerSettingsOverlay = { PlaybackSettings = { UserPlaybackRate = { BindTarget = GameplayClockContainer.UserPlaybackRate } } },
                     KeyCounter = { Visible = { BindTarget = DrawableRuleset.HasReplayLoaded } },
                     RequestSeek = GameplayClockContainer.Seek,
@@ -160,6 +176,8 @@ namespace osu.Game.Screens.Play
                 }
             };
 
+            DrawableRuleset.HasReplayLoaded.BindValueChanged(e => HUDOverlay.HoldToQuit.PauseOnFocusLost = !e.NewValue && PauseOnFocusLost, true);
+
             // bind clock into components that require it
             DrawableRuleset.IsPaused.BindTo(GameplayClockContainer.IsPaused);
 
@@ -170,7 +188,7 @@ namespace osu.Game.Screens.Play
             ScoreProcessor.AllJudged += onCompletion;
             ScoreProcessor.Failed += onFail;
 
-            foreach (var mod in Beatmap.Value.Mods.Value.OfType<IApplicableToScoreProcessor>())
+            foreach (var mod in Mods.Value.OfType<IApplicableToScoreProcessor>())
                 mod.ApplyToScoreProcessor(ScoreProcessor);
         }
 
@@ -192,7 +210,7 @@ namespace osu.Game.Screens.Play
 
                 try
                 {
-                    DrawableRuleset = rulesetInstance.CreateDrawableRulesetWith(working);
+                    DrawableRuleset = rulesetInstance.CreateDrawableRulesetWith(working, Mods.Value);
                 }
                 catch (BeatmapInvalidForRulesetException)
                 {
@@ -200,7 +218,7 @@ namespace osu.Game.Screens.Play
                     // let's try again forcing the beatmap's ruleset.
                     ruleset = beatmap.BeatmapInfo.Ruleset;
                     rulesetInstance = ruleset.CreateInstance();
-                    DrawableRuleset = rulesetInstance.CreateDrawableRulesetWith(Beatmap.Value);
+                    DrawableRuleset = rulesetInstance.CreateDrawableRulesetWith(Beatmap.Value, Mods.Value);
                 }
 
                 if (!DrawableRuleset.Objects.Any())
@@ -231,6 +249,10 @@ namespace osu.Game.Screens.Play
             if (!this.IsCurrentScreen()) return;
 
             sampleRestart?.Play();
+
+            // if a restart has been requested, cancel any pending completion (user has shown intent to restart).
+            onCompletionEvent = null;
+
             ValidForResume = false;
             RestartRequested?.Invoke();
             this.Exit();
@@ -271,7 +293,7 @@ namespace osu.Game.Screens.Play
             {
                 Beatmap = Beatmap.Value.BeatmapInfo,
                 Ruleset = ruleset,
-                Mods = Beatmap.Value.Mods.Value.ToArray(),
+                Mods = Mods.Value.ToArray(),
                 User = api.LocalUser.Value,
             };
 
@@ -325,7 +347,7 @@ namespace osu.Game.Screens.Play
 
         private bool onFail()
         {
-            if (Beatmap.Value.Mods.Value.OfType<IApplicableFailOverride>().Any(m => !m.AllowFail))
+            if (Mods.Value.OfType<IApplicableFailOverride>().Any(m => !m.AllowFail))
                 return false;
 
             GameplayClockContainer.Stop();
@@ -379,15 +401,6 @@ namespace osu.Game.Screens.Play
             // already resuming
             && !IsResuming;
 
-        protected override void Update()
-        {
-            base.Update();
-
-            // eagerly pause when we lose window focus (if we are locally playing).
-            if (PauseOnFocusLost && !Game.IsActive.Value)
-                Pause();
-        }
-
         public void Pause()
         {
             if (!canPause) return;
@@ -405,8 +418,9 @@ namespace osu.Game.Screens.Play
             IsResuming = true;
             PauseOverlay.Hide();
 
-            // time-based conditions may allow instant resume.
-            if (GameplayClockContainer.GameplayClock.CurrentTime < Beatmap.Value.Beatmap.HitObjects.First().StartTime)
+            // breaks and time-based conditions may allow instant resume.
+            double time = GameplayClockContainer.GameplayClock.CurrentTime;
+            if (Beatmap.Value.Beatmap.Breaks.Any(b => b.Contains(time)) || time < Beatmap.Value.Beatmap.HitObjects.First().StartTime)
                 completeResume();
             else
                 DrawableRuleset.RequestResume(completeResume);

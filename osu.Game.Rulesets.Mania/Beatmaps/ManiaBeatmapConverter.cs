@@ -48,6 +48,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
             if (IsForCurrentRuleset)
             {
                 TargetColumns = (int)Math.Max(1, roundedCircleSize);
+
                 if (TargetColumns >= 10)
                 {
                     TargetColumns = TargetColumns / 2;

@@ -37,6 +37,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
                 case SliderPosition.Start:
                     Position = slider.StackedPosition + slider.Path.PositionAt(0);
                     break;
+
                 case SliderPosition.End:
                     Position = slider.StackedPosition + slider.Path.PositionAt(1);
                     break;

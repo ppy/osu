@@ -33,6 +33,7 @@ namespace osu.Game.Rulesets.Osu.Mods
                 {
                     case DrawableSpinner _:
                         continue;
+
                     default:
                         drawable.ApplyCustomUpdateState += ApplyCustomState;
                         break;
@@ -51,6 +52,7 @@ namespace osu.Game.Rulesets.Osu.Mods
                 case DrawableSliderTail _:
                     // special cases we should *not* be scaling.
                     break;
+
                 case DrawableSlider _:
                 case DrawableHitCircle _:
                 {

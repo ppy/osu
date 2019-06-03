@@ -2,16 +2,17 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input.Events;
-using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Notifications;
+using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.UI;
 using osu.Game.Screens.Play.HUD;
@@ -34,6 +35,10 @@ namespace osu.Game.Screens.Play
         public readonly HoldForMenuButton HoldToQuit;
         public readonly PlayerSettingsOverlay PlayerSettingsOverlay;
 
+        private readonly ScoreProcessor scoreProcessor;
+        private readonly DrawableRuleset drawableRuleset;
+        private readonly IReadOnlyList<Mod> mods;
+
         private Bindable<bool> showHud;
         private readonly Container visibilityContainer;
         private readonly BindableBool replayLoaded = new BindableBool();
@@ -42,8 +47,12 @@ namespace osu.Game.Screens.Play
 
         public Action<double> RequestSeek;
 
-        public HUDOverlay(ScoreProcessor scoreProcessor, DrawableRuleset drawableRuleset, WorkingBeatmap working)
+        public HUDOverlay(ScoreProcessor scoreProcessor, DrawableRuleset drawableRuleset, IReadOnlyList<Mod> mods)
         {
+            this.scoreProcessor = scoreProcessor;
+            this.drawableRuleset = drawableRuleset;
+            this.mods = mods;
+
             RelativeSizeAxes = Axes.Both;
 
             Children = new Drawable[]
@@ -88,20 +97,21 @@ namespace osu.Game.Screens.Play
                     }
                 }
             };
+        }
 
+        [BackgroundDependencyLoader(true)]
+        private void load(OsuConfigManager config, NotificationOverlay notificationOverlay)
+        {
             BindProcessor(scoreProcessor);
             BindDrawableRuleset(drawableRuleset);
 
             Progress.Objects = drawableRuleset.Objects;
             Progress.AllowSeeking = drawableRuleset.HasReplayLoaded.Value;
             Progress.RequestSeek = time => RequestSeek(time);
+            Progress.ReferenceClock = drawableRuleset.FrameStableClock;
 
-            ModDisplay.Current.BindTo(working.Mods);
-        }
+            ModDisplay.Current.Value = mods;
 
-        [BackgroundDependencyLoader(true)]
-        private void load(OsuConfigManager config, NotificationOverlay notificationOverlay)
-        {
             showHud = config.GetBindable<bool>(OsuSetting.ShowInterface);
             showHud.ValueChanged += visible => visibilityContainer.FadeTo(visible.NewValue ? 1 : 0, duration);
             showHud.TriggerChange();
@@ -121,8 +131,7 @@ namespace osu.Game.Screens.Play
         {
             base.LoadComplete();
 
-            replayLoaded.ValueChanged += replayLoadedValueChanged;
-            replayLoaded.TriggerChange();
+            replayLoaded.BindValueChanged(replayLoadedValueChanged, true);
         }
 
         private void replayLoadedValueChanged(ValueChangedEvent<bool> e)

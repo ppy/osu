@@ -130,13 +130,13 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             }
         }
 
-        public bool Tracking;
+        public readonly Bindable<bool> Tracking = new Bindable<bool>();
 
         protected override void Update()
         {
             base.Update();
 
-            Tracking = Ball.Tracking;
+            Tracking.Value = Ball.Tracking;
 
             double completionProgress = MathHelper.Clamp((Time.Current - slider.StartTime) / slider.Duration, 0, 1);
 
@@ -160,9 +160,10 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         {
             base.SkinChanged(skin, allowFallback);
 
-            Body.AccentColour = skin.GetValue<SkinConfiguration, Color4?>(s => s.CustomColours.ContainsKey("SliderTrackOverride") ? s.CustomColours["SliderTrackOverride"] : (Color4?)null) ?? Body.AccentColour;
-            Body.BorderColour = skin.GetValue<SkinConfiguration, Color4?>(s => s.CustomColours.ContainsKey("SliderBorder") ? s.CustomColours["SliderBorder"] : (Color4?)null) ?? Body.BorderColour;
-            Ball.AccentColour = skin.GetValue<SkinConfiguration, Color4?>(s => s.CustomColours.ContainsKey("SliderBall") ? s.CustomColours["SliderBall"] : (Color4?)null) ?? Ball.AccentColour;
+            Body.BorderSize = skin.GetValue<SkinConfiguration, float?>(s => s.SliderBorderSize) ?? SliderBody.DEFAULT_BORDER_SIZE;
+            Body.AccentColour = skin.GetValue<SkinConfiguration, Color4?>(s => s.CustomColours.ContainsKey("SliderTrackOverride") ? s.CustomColours["SliderTrackOverride"] : (Color4?)null) ?? AccentColour;
+            Body.BorderColour = skin.GetValue<SkinConfiguration, Color4?>(s => s.CustomColours.ContainsKey("SliderBorder") ? s.CustomColours["SliderBorder"] : (Color4?)null) ?? Color4.White;
+            Ball.AccentColour = skin.GetValue<SkinConfiguration, Color4?>(s => s.CustomColours.ContainsKey("SliderBall") ? s.CustomColours["SliderBall"] : (Color4?)null) ?? AccentColour;
         }
 
         protected override void CheckForResult(bool userTriggered, double timeOffset)
