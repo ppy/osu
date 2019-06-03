@@ -18,6 +18,8 @@ namespace osu.Game.Overlays.Profile.Sections
 {
     public class ShowMoreButton : OsuHoverContainer
     {
+        private const float fade_duration = 200;
+
         private readonly Box background;
         private readonly LoadingAnimation loading;
         private readonly FillFlowContainer content;
@@ -38,13 +40,13 @@ namespace osu.Game.Overlays.Profile.Sections
 
                 if (value)
                 {
-                    loading.FadeIn(FADE_DURATION, Easing.OutQuint);
-                    content.FadeOut(FADE_DURATION, Easing.OutQuint);
+                    loading.FadeIn(fade_duration, Easing.OutQuint);
+                    content.FadeOut(fade_duration, Easing.OutQuint);
                 }
                 else
                 {
-                    loading.FadeOut(FADE_DURATION, Easing.OutQuint);
-                    content.FadeIn(FADE_DURATION, Easing.OutQuint);
+                    loading.FadeOut(fade_duration, Easing.OutQuint);
+                    content.FadeIn(fade_duration, Easing.OutQuint);
                 }
             }
         }
