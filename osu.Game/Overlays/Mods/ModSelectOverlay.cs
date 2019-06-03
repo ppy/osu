@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osuTK;
+using osuTK.Input;
 using osuTK.Graphics;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
@@ -23,6 +24,7 @@ using osu.Game.Rulesets;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays.Mods.Sections;
 using osu.Game.Screens;
+using osu.Framework.Input.Events;
 
 namespace osu.Game.Overlays.Mods
 {
@@ -33,6 +35,7 @@ namespace osu.Game.Overlays.Mods
         protected Color4 LowMultiplierColour, HighMultiplierColour;
 
         protected readonly TriangleButton DeselectAllButton;
+        protected readonly TriangleButton CloseButton;
         protected readonly OsuSpriteText MultiplierLabel, UnrankedLabel;
         private readonly FillFlowContainer footerContainer;
 
@@ -190,6 +193,16 @@ namespace osu.Game.Overlays.Mods
             }
 
             refreshSelectedMods();
+        }
+
+        protected override bool OnKeyDown(KeyDownEvent e)
+        {
+            if (e.Key == Key.Number1)
+                DeselectAll();
+            else if (e.Key == Key.Number2)
+                PopOut();
+
+            return base.OnKeyDown(e);
         }
 
         private void refreshSelectedMods() => SelectedMods.Value = ModSectionsContainer.Children.SelectMany(s => s.SelectedMods).ToArray();
@@ -357,8 +370,18 @@ namespace osu.Game.Overlays.Mods
                                             DeselectAllButton = new TriangleButton
                                             {
                                                 Width = 180,
-                                                Text = "Deselect All",
+                                                Text = "1. Deselect All",
                                                 Action = DeselectAll,
+                                                Margin = new MarginPadding
+                                                {
+                                                    Right = 20
+                                                }
+                                            },
+                                            CloseButton = new TriangleButton
+                                            {
+                                                Width = 180,
+                                                Text = "2. Close",
+                                                Action = PopOut,
                                                 Margin = new MarginPadding
                                                 {
                                                     Right = 20
