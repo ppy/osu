@@ -1,4 +1,4 @@
-﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
@@ -37,6 +37,8 @@ namespace osu.Game.Overlays.Profile.Sections
                     return;
 
                 isLoading = value;
+
+                Enabled.Value = !isLoading;
 
                 if (value)
                 {
