@@ -42,7 +42,7 @@ namespace osu.Game.Tests.Visual.Online
                 {
                     Version = "2018.712.0",
                     DisplayVersion = "2018.712.0",
-                    UpdateStream = new APIUpdateStream { Name = "lazer" },
+                    UpdateStream = new APIUpdateStream { Name = OsuGameBase.CLIENT_STREAM_NAME },
                     ChangelogEntries = new List<APIChangelogEntry>
                     {
                         new APIChangelogEntry
