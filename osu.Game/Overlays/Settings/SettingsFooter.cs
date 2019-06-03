@@ -5,10 +5,10 @@ using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Input.Events;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Graphics.UserInterface;
 using osu.Game.Rulesets;
 using osuTK;
 using osuTK.Graphics;
@@ -18,9 +18,6 @@ namespace osu.Game.Overlays.Settings
 {
     public class SettingsFooter : FillFlowContainer
     {
-        [Resolved]
-        private OsuGameBase game { get; set; }
-
         [Resolved(CanBeNull = true)]
         private ChangelogOverlay changelog { get; set; }
 
@@ -65,25 +62,49 @@ namespace osu.Game.Overlays.Settings
                     Text = game.Name,
                     Font = OsuFont.GetFont(size: 18, weight: FontWeight.Bold),
                 },
-                new OsuSpriteText
+                new BuildDisplay(game.Version, DebugUtils.IsDebug)
                 {
                     Anchor = Anchor.TopCentre,
                     Origin = Anchor.TopCentre,
-                    Font = OsuFont.GetFont(size: 14),
-                    Text = game.Version,
-                    Colour = DebugUtils.IsDebug ? colours.Red : Color4.White,
-                },
+                }
             };
         }
 
-        protected override bool OnClick(ClickEvent e)
+        private class BuildDisplay : OsuAnimatedButton
         {
-            if (game.IsDeployedBuild)
+            private readonly string version;
+            private readonly bool isDebug;
+
+            [Resolved]
+            private OsuColour colours { get; set; }
+
+            public BuildDisplay(string version, bool isDebug)
             {
-                changelog?.ShowBuild(OsuGameBase.CLIENT_STREAM_NAME, game.Version);
+                this.version = version;
+                this.isDebug = isDebug;
+
+                Content.RelativeSizeAxes = Axes.Y;
+                Content.AutoSizeAxes = AutoSizeAxes = Axes.X;
+                Height = 20;
             }
 
-            return true;
+            [BackgroundDependencyLoader(true)]
+            private void load(ChangelogOverlay changelog)
+            {
+                if (!isDebug)
+                    Action = () => changelog?.ShowBuild(OsuGameBase.CLIENT_STREAM_NAME, version);
+
+                Add(new OsuSpriteText
+                {
+                    Font = OsuFont.GetFont(size: 16),
+
+                    Text = version,
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    Padding = new MarginPadding(5),
+                    Colour = isDebug ? colours.Red : Color4.White,
+                });
+            }
         }
     }
 }
