@@ -6,10 +6,8 @@ using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Shapes;
-using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Events;
-using osu.Game.Graphics.Sprites;
 using osuTK.Graphics;
 
 namespace osu.Game.Graphics.UserInterface
@@ -79,13 +77,5 @@ namespace osu.Game.Graphics.UserInterface
             Content.ScaleTo(1, 1000, Easing.OutElastic);
             return base.OnMouseUp(e);
         }
-
-        protected override SpriteText CreateText() => new OsuSpriteText
-        {
-            Depth = -1,
-            Origin = Anchor.Centre,
-            Anchor = Anchor.Centre,
-            Font = OsuFont.GetFont(weight: FontWeight.Bold)
-        };
     }
 }
