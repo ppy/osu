@@ -222,15 +222,14 @@ namespace osu.Game.Overlays.Chat
             {
                 get
                 {
-                    List<MenuItem> items = new List<MenuItem>
-                    {
-                        new OsuMenuItem("View Profile", MenuItemType.Highlighted, Action)
-                    };
+                    bool isOtherPlayer = sender.Id != api.LocalUser.Value.Id;
+                    MenuItem[] items = new MenuItem[isOtherPlayer ? 2 : 1];
+                    items[0] = new OsuMenuItem("View Profile", MenuItemType.Highlighted, Action);
 
-                    if (sender.Id != api.LocalUser.Value.Id)
-                        items.Add(new OsuMenuItem("Start Chat", MenuItemType.Standard, startChatAction));
+                    if (isOtherPlayer)
+                        items[1] = new OsuMenuItem("Start Chat", MenuItemType.Standard, startChatAction);
 
-                    return items.ToArray();
+                    return items;
                 }
             }
         }
