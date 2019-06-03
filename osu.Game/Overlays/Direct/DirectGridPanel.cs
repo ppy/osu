@@ -15,6 +15,7 @@ using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Drawables;
+using osu.Game.Graphics.Containers;
 
 namespace osu.Game.Overlays.Direct
 {
@@ -119,28 +120,16 @@ namespace osu.Game.Overlays.Direct
                                     },
                                     Children = new Drawable[]
                                     {
-                                        new FillFlowContainer
+                                        new LinkFlowContainer(s =>
                                         {
-                                            AutoSizeAxes = Axes.Both,
-                                            Direction = FillDirection.Horizontal,
-                                            Children = new[]
-                                            {
-                                                new OsuSpriteText
-                                                {
-                                                    Text = "mapped by ",
-                                                    Font = OsuFont.GetFont(size: 14),
-                                                    Shadow = false,
-                                                    Colour = colours.Gray5,
-                                                },
-                                                new OsuSpriteText
-                                                {
-                                                    Text = SetInfo.Metadata.Author.Username,
-                                                    Font = OsuFont.GetFont(size: 14, weight: FontWeight.SemiBold, italics: true),
-                                                    Shadow = false,
-                                                    Colour = colours.BlueDark,
-                                                },
-                                            },
-                                        },
+                                            s.Shadow = false;
+                                            s.Font = OsuFont.GetFont(size: 14);
+                                        }).With(d =>
+                                        {
+                                            d.AutoSizeAxes = Axes.Both;
+                                            d.AddText("mapped by ", t => t.Colour = colours.Gray5);
+                                            d.AddUserLink(SetInfo.Metadata.Author);
+                                        }),
                                         new Container
                                         {
                                             AutoSizeAxes = Axes.X,

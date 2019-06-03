@@ -6,7 +6,6 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Input.Events;
@@ -72,9 +71,9 @@ namespace osu.Game.Users
                 game?.ShowUser(user.Id);
         }
 
-        private class ClickableArea : OsuClickableContainer, IHasTooltip
+        private class ClickableArea : OsuClickableContainer
         {
-            public string TooltipText => Enabled.Value ? @"View Profile" : null;
+            public override string TooltipText => Enabled.Value ? @"View Profile" : null;
 
             protected override bool OnClick(ClickEvent e)
             {

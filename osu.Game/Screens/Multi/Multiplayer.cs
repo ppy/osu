@@ -248,6 +248,7 @@ namespace osu.Game.Screens.Multi
             if (screenStack.CurrentScreen is MatchSubScreen)
             {
                 var track = Beatmap.Value.Track;
+
                 if (track != null)
                 {
                     track.Looping = true;
@@ -276,7 +277,7 @@ namespace osu.Game.Screens.Multi
 
             updatePollingRate(isIdle.Value);
 
-            if (screenStack.CurrentScreen == null)
+            if (screenStack.CurrentScreen == null && this.IsCurrentScreen())
                 this.Exit();
         }
 

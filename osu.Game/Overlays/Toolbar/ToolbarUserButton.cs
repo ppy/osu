@@ -4,7 +4,7 @@
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Effects;
 using osu.Game.Graphics;
 using osu.Game.Online.API;
 using osu.Game.Users;
@@ -58,6 +58,7 @@ namespace osu.Game.Overlays.Toolbar
                     Text = @"Guest";
                     avatar.User = new User();
                     break;
+
                 case APIState.Online:
                     Text = api.LocalUser.Value.Username;
                     avatar.User = api.LocalUser.Value;
