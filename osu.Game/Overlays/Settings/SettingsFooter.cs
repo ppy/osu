@@ -18,9 +18,6 @@ namespace osu.Game.Overlays.Settings
 {
     public class SettingsFooter : FillFlowContainer
     {
-        [Resolved(CanBeNull = true)]
-        private ChangelogOverlay changelog { get; set; }
-
         [BackgroundDependencyLoader]
         private void load(OsuGameBase game, OsuColour colours, RulesetStore rulesets)
         {
