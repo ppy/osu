@@ -80,7 +80,7 @@ namespace osu.Game.Overlays.Settings
         {
             if (game.IsDeployedBuild)
             {
-                changelog?.ShowBuild("lazer", game.Version);
+                changelog?.ShowBuild(OsuGameBase.CLIENT_STREAM_NAME, game.Version);
             }
 
             return true;
