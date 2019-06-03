@@ -102,8 +102,8 @@ namespace osu.Game.Overlays.Profile.Sections
         [BackgroundDependencyLoader]
         private void load(OsuColour colors)
         {
-            IdleColour = colors.GreySeafoam;
-            HoverColour = colors.GreySeafoamLight;
+            IdleColour = colors.GreySeafoamDark;
+            HoverColour = colors.GreySeafoam;
         }
 
         protected override bool OnClick(ClickEvent e)
