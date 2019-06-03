@@ -8,13 +8,12 @@ using osu.Game.Overlays.Settings;
 using osu.Game.Overlays.Settings.Sections;
 using osuTK.Graphics;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace osu.Game.Overlays
 {
     public class SettingsOverlay : SettingsPanel
     {
-        private readonly KeyBindingPanel keyBindingPanel;
-
         protected override IEnumerable<SettingsSection> CreateSections() => new SettingsSection[]
         {
             new GeneralSection(),
@@ -22,11 +21,13 @@ namespace osu.Game.Overlays
             new GameplaySection(),
             new AudioSection(),
             new SkinSection(),
-            new InputSection(keyBindingPanel),
+            new InputSection(createSubPanel(new KeyBindingPanel())),
             new OnlineSection(),
             new MaintenanceSection(),
             new DebugSection(),
         };
+
+        private readonly List<SettingsSubPanel> subPanels = new List<SettingsSubPanel>();
 
         protected override Drawable CreateHeader() => new SettingsHeader("settings", "Change the way osu! behaves");
         protected override Drawable CreateFooter() => new SettingsFooter();
@@ -34,17 +35,23 @@ namespace osu.Game.Overlays
         public SettingsOverlay()
             : base(true)
         {
-            keyBindingPanel = new KeyBindingPanel
-            {
-                Depth = 1,
-                Anchor = Anchor.TopRight,
-            };
-            keyBindingPanel.StateChanged += keyBindingPanelStateChanged;
         }
 
-        public override bool AcceptsFocus => keyBindingPanel.State != Visibility.Visible;
+        public override bool AcceptsFocus => subPanels.All(s => s.State != Visibility.Visible);
 
-        private void keyBindingPanelStateChanged(Visibility visibility)
+        private T createSubPanel<T>(T subPanel)
+            where T : SettingsSubPanel
+        {
+            subPanel.Depth = 1;
+            subPanel.Anchor = Anchor.TopRight;
+            subPanel.StateChanged += subPanelStateChanged;
+
+            subPanels.Add(subPanel);
+
+            return subPanel;
+        }
+
+        private void subPanelStateChanged(Visibility visibility)
         {
             switch (visibility)
             {
@@ -66,12 +73,13 @@ namespace osu.Game.Overlays
             }
         }
 
-        protected override float ExpandedPosition => keyBindingPanel.State == Visibility.Visible ? -WIDTH : base.ExpandedPosition;
+        protected override float ExpandedPosition => subPanels.Any(s => s.State == Visibility.Visible) ? -WIDTH : base.ExpandedPosition;
 
         [BackgroundDependencyLoader]
         private void load()
         {
-            ContentContainer.Add(keyBindingPanel);
+            foreach (var s in subPanels)
+                ContentContainer.Add(s);
         }
     }
 }
