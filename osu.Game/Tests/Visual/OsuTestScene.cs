@@ -61,7 +61,8 @@ namespace osu.Game.Tests.Visual
         {
             base.Dispose(isDisposing);
 
-            beatmap?.Value.Track.Stop();
+            if (beatmap?.Value.TrackLoaded == true)
+                beatmap.Value.Track.Stop();
 
             if (localStorage.IsValueCreated)
             {
