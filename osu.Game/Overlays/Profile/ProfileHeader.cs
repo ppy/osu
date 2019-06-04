@@ -11,6 +11,7 @@ using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays.Profile.Header;
+using osu.Game.Overlays.Profile.Header.Components;
 using osu.Game.Users;
 
 namespace osu.Game.Overlays.Profile
@@ -18,6 +19,7 @@ namespace osu.Game.Overlays.Profile
     public class ProfileHeader : OverlayHeader
     {
         private UserCoverBackground coverContainer;
+        private readonly GamemodeControl gamemodeControl;
 
         public Bindable<User> User = new Bindable<User>();
 
@@ -32,12 +34,20 @@ namespace osu.Game.Overlays.Profile
             TabControl.AddItem("Modding");
 
             centreHeaderContainer.DetailsVisible.BindValueChanged(visible => detailHeaderContainer.Expanded = visible.NewValue, true);
+
+            Add(gamemodeControl = new GamemodeControl
+            {
+                Anchor = Anchor.TopRight,
+                Origin = Anchor.TopRight,
+                Y = 100,
+                Margin = new MarginPadding { Right = 30 },
+            });
         }
 
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
-            TabControl.AccentColour = colours.Seafoam;
+            TabControl.AccentColour = gamemodeControl.AccentColour = colours.Seafoam;
         }
 
         protected override Drawable CreateBackground() =>
