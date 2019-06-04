@@ -48,7 +48,7 @@ namespace osu.Game.Overlays.Profile.Header.Components
 
                 isDefault = value;
 
-                icon.FadeTo(isDefault ? 1 : 0, 100, Easing.OutQuint);
+                icon.FadeTo(isDefault ? 1 : 0, 200, Easing.OutQuint);
             }
         }
 
@@ -59,34 +59,34 @@ namespace osu.Game.Overlays.Profile.Header.Components
 
             Children = new Drawable[]
             {
-                    new FillFlowContainer
+                new FillFlowContainer
+                {
+                    AutoSizeAxes = Axes.Both,
+                    Origin = Anchor.BottomLeft,
+                    Anchor = Anchor.BottomLeft,
+                    Direction = FillDirection.Horizontal,
+                    Spacing = new Vector2(3, 0),
+                    Children = new Drawable[]
                     {
-                        AutoSizeAxes = Axes.Both,
-                        Origin = Anchor.BottomLeft,
-                        Anchor = Anchor.BottomLeft,
-                        Direction = FillDirection.Horizontal,
-                        Spacing = new Vector2(3, 0),
-                        Children = new Drawable[]
+                        text = new OsuSpriteText
                         {
-                            text = new OsuSpriteText
-                            {
-                                Origin = Anchor.Centre,
-                                Anchor = Anchor.Centre,
-                                Text = value.Name,
-                                Font = OsuFont.GetFont()
-                            },
-                            icon = new SpriteIcon
-                            {
-                                Origin = Anchor.Centre,
-                                Anchor = Anchor.Centre,
-                                Alpha = 0,
-                                AlwaysPresent = true,
-                                Icon = FontAwesome.Solid.Star,
-                                Size = new Vector2(12),
-                            },
-                        }
-                    },
-                    new HoverClickSounds()
+                            Origin = Anchor.Centre,
+                            Anchor = Anchor.Centre,
+                            Text = value.Name,
+                            Font = OsuFont.GetFont()
+                        },
+                        icon = new SpriteIcon
+                        {
+                            Origin = Anchor.Centre,
+                            Anchor = Anchor.Centre,
+                            Alpha = 0,
+                            AlwaysPresent = true,
+                            Icon = FontAwesome.Solid.Star,
+                            Size = new Vector2(12),
+                        },
+                    }
+                },
+                new HoverClickSounds()
             };
         }
 

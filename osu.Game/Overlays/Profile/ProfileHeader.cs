@@ -113,6 +113,7 @@ namespace osu.Game.Overlays.Profile
             string playMode = user.PlayMode;
 
             gamemodeControl.SetDefaultGamemode(playMode);
+            gamemodeControl.SelectDefaultGamemode();
             gamemodeControl.FadeInFromZero(100, Easing.OutQuint);
         }
 
