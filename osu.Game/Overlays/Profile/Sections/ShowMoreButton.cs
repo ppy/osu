@@ -108,14 +108,18 @@ namespace osu.Game.Overlays.Profile.Sections
 
         protected override bool OnClick(ClickEvent e)
         {
-            var clickResult = base.OnClick(e);
+            if (!Enabled.Value)
+                return false;
 
-            if (IsLoading)
-                return clickResult;
-
-            IsLoading |= clickResult;
-
-            return clickResult;
+            try
+            {
+                return base.OnClick(e);
+            }
+            finally
+            {
+                // run afterwards as this will disable this button.
+                IsLoading = true;
+            }
         }
 
         private class ChevronIcon : SpriteIcon
