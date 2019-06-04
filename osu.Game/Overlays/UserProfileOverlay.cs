@@ -152,8 +152,9 @@ namespace osu.Game.Overlays
                 }
             }
 
-            gamemodeControl.SetDefaultGamemode(user.PlayMode);
+            gamemodeControl.SetDefaultGamemode(user?.PlayMode ?? "osu");
             gamemodeControl.SelectDefaultGamemode();
+
             gamemodeControl.FadeInFromZero(100, Easing.OutQuint);
         }
 
