@@ -150,7 +150,7 @@ namespace osu.Game.Screens.Menu
 
             if (idleTracker != null) isIdle.BindTo(idleTracker.IsIdle);
 
-            sampleBack = audio.Sample.Get(@"Menu/button-back-select");
+            sampleBack = audio.Samples.Get(@"Menu/button-back-select");
         }
 
         private void onMulti()
@@ -176,7 +176,7 @@ namespace osu.Game.Screens.Menu
 
         private void updateIdleState(bool isIdle)
         {
-            if (isIdle && State != ButtonSystemState.Exit)
+            if (isIdle && State != ButtonSystemState.Exit && State != ButtonSystemState.EnteringMode)
                 State = ButtonSystemState.Initial;
         }
 
