@@ -147,7 +147,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
                 if (i < values.Count - 1 && missCount < values[i + 1])
                 {
-                    t = (missCount - values[i]) / (values[i + 1] / values[i]);
+                    t = (missCount - values[i]) / (values[i + 1] - values[i]);
 
                     return sr - (i + 1 + t) * increment;
                 }
