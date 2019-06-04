@@ -16,11 +16,11 @@ using osuTK.Graphics;
 
 namespace osu.Game.Overlays.Profile.Header.Components
 {
-    public class GamemodeControl : TabControl<string>
+    public class GamemodeControl : TabControl<RulesetInfo>
     {
-        protected override Dropdown<string> CreateDropdown() => null;
+        protected override Dropdown<RulesetInfo> CreateDropdown() => null;
 
-        protected override TabItem<string> CreateTabItem(string value) => new GamemodeTabItem(value)
+        protected override TabItem<RulesetInfo> CreateTabItem(RulesetInfo value) => new GamemodeTabItem(value)
         {
             AccentColour = AccentColour
         };
@@ -37,9 +37,9 @@ namespace osu.Game.Overlays.Profile.Header.Components
 
                 accentColour = value;
 
-                foreach (TabItem<string> tabItem in TabContainer)
+                foreach (GamemodeTabItem tabItem in TabContainer)
                 {
-                    ((GamemodeTabItem)tabItem).AccentColour = value;
+                    tabItem.AccentColour = value;
                 }
             }
         }
@@ -55,17 +55,19 @@ namespace osu.Game.Overlays.Profile.Header.Components
         private void load(RulesetStore rulesets)
         {
             foreach (var r in rulesets.AvailableRulesets)
-                AddItem(r.ShortName);
-            //AddItem(r.Name);
+            {
+                AddItem(r);
+            }
         }
 
         public void SetDefaultGamemode(string gamemode)
         {
             foreach (GamemodeTabItem i in TabContainer)
             {
-                if (i.Value == gamemode)
+                if (i.Value.ShortName == gamemode)
                 {
                     i.IsDefault = true;
+                    Current.Value = i.Value;
                     return;
                 }
             }
@@ -77,7 +79,7 @@ namespace osu.Game.Overlays.Profile.Header.Components
             AutoSizeAxes = Axes.Both,
         };
 
-        private class GamemodeTabItem : TabItem<string>
+        private class GamemodeTabItem : TabItem<RulesetInfo>
         {
             private readonly OsuSpriteText text;
             private readonly SpriteIcon icon;
@@ -114,7 +116,7 @@ namespace osu.Game.Overlays.Profile.Header.Components
                 }
             }
 
-            public GamemodeTabItem(string value)
+            public GamemodeTabItem(RulesetInfo value)
                 : base(value)
             {
                 AutoSizeAxes = Axes.Both;
@@ -134,7 +136,7 @@ namespace osu.Game.Overlays.Profile.Header.Components
                             {
                                 Origin = Anchor.Centre,
                                 Anchor = Anchor.Centre,
-                                Text = value,
+                                Text = value.Name,
                                 Font = OsuFont.GetFont()
                             },
                             icon = new SpriteIcon
