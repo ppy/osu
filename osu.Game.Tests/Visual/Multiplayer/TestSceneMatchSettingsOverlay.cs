@@ -18,9 +18,6 @@ namespace osu.Game.Tests.Visual.Multiplayer
 {
     public class TestSceneMatchSettingsOverlay : MultiplayerTestScene
     {
-        [Resolved]
-        private OsuGameBase game { get; set; }
-
         public override IReadOnlyList<Type> RequiredTypes => new[]
         {
             typeof(MatchSettingsOverlay)

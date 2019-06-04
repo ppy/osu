@@ -24,8 +24,6 @@ namespace osu.Game.Beatmaps
         {
             var trackLoaded = lastBeatmap?.TrackLoaded ?? false;
 
-            //beatmap.AudioManager = AudioManager;
-
             // compare to last beatmap as sometimes the two may share a track representation (optimisation, see WorkingBeatmap.TransferTo)
             if (!trackLoaded || lastBeatmap?.Track != beatmap.Track)
             {

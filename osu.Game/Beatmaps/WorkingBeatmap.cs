@@ -51,18 +51,18 @@ namespace osu.Game.Beatmaps
                 return b;
             });
 
-            track = new RecyclableLazy<Track>(() => GetTrack() ?? GetVirtualTrack(Beatmap));
+            track = new RecyclableLazy<Track>(() => GetTrack() ?? GetVirtualTrack());
             background = new RecyclableLazy<Texture>(GetBackground, BackgroundStillValid);
             waveform = new RecyclableLazy<Waveform>(GetWaveform);
             storyboard = new RecyclableLazy<Storyboard>(GetStoryboard);
             skin = new RecyclableLazy<Skin>(GetSkin);
         }
 
-        protected virtual Track GetVirtualTrack(IBeatmap beatmap)
+        protected virtual Track GetVirtualTrack()
         {
             const double excess_length = 1000;
 
-            var lastObject = beatmap.HitObjects.LastOrDefault();
+            var lastObject = Beatmap.HitObjects.LastOrDefault();
 
             double length;
 
