@@ -59,9 +59,16 @@ namespace osu.Game.Overlays.Profile.Header.Components
         {
             foreach (GamemodeTabItem i in TabContainer)
             {
-                if (i.Value.ShortName == gamemode)
+                i.IsDefault = i.Value.ShortName == gamemode;
+            }
+        }
+
+        public void SelectDefaultGamemode()
+        {
+            foreach (GamemodeTabItem i in TabContainer)
+            {
+                if (i.IsDefault)
                 {
-                    i.IsDefault = true;
                     Current.Value = i.Value;
                     return;
                 }
