@@ -90,8 +90,8 @@ namespace osu.Game.Overlays.Changelog
         [BackgroundDependencyLoader]
         private void load(AudioManager audio)
         {
-            sampleClick = audio.Sample.Get(@"UI/generic-select-soft");
-            sampleHover = audio.Sample.Get(@"UI/generic-hover-soft");
+            sampleClick = audio.Samples.Get(@"UI/generic-select-soft");
+            sampleHover = audio.Samples.Get(@"UI/generic-hover-soft");
         }
 
         protected override void OnActivated() => updateState();
