@@ -32,7 +32,6 @@ namespace osu.Game.Rulesets.Difficulty.Preprocessing
 
         public readonly double ClockRate;
 
-
         /// <summary>
         /// Creates a new <see cref="DifficultyHitObject"/>.
         /// </summary>

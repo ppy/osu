@@ -20,7 +20,7 @@ namespace osu.Game.Rulesets.Difficulty.Skills
         protected virtual int SectionLength => 400;
 
         /// <summary>
-        /// The peak strain for each <see cref="DifficultyCalculator.SectionLength"/> section of the beatmap.
+        /// The peak strain for each <see cref="SectionLength"/> section of the beatmap.
         /// </summary>
         public IList<double> StrainPeaks => strainPeaks;
 
@@ -47,10 +47,9 @@ namespace osu.Game.Rulesets.Difficulty.Skills
 
         private double currentStrain = 1; // We keep track of the strain level at all times throughout the beatmap.
         private double currentSectionPeak = 1; // We also keep track of the peak strain level in the current section.
-        private double currentSectionEnd = 0;
+        private double currentSectionEnd;
 
         private readonly List<double> strainPeaks = new List<double>();
-
 
         /// <summary>
         /// Process a <see cref="DifficultyHitObject"/> and update current strain values accordingly.

@@ -8,14 +8,14 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 {
     public class OsuDifficultyAttributes : DifficultyAttributes
     {
-        public double MissSRIncrement;
+        public double MissStarRatingIncrement;
 
         public double AimStrain;
-        public IList<double> AimComboSR;
+        public IList<double> AimComboStarRatings;
         public IList<double> AimMissCounts;
 
         public double SpeedStrain;
-        public IList<double> SpeedComboSR;
+        public IList<double> SpeedComboStarRatings;
         public IList<double> SpeedMissCounts;
 
         public double ApproachRate;

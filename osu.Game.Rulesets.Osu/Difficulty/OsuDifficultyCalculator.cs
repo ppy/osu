@@ -18,35 +18,31 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 {
     public class OsuDifficultyCalculator : DifficultyCalculator
     {
-
         public OsuDifficultyCalculator(Ruleset ruleset, WorkingBeatmap beatmap)
             : base(ruleset, beatmap)
         {
         }
 
-
         private IEnumerable<OsuHitObjectDifficulty> hitObjectDifficulties(OsuSkill aim, OsuSkill speed)
         {
-            var timesIt = aim.Timestamps.GetEnumerator();
-            var aimStarsIt = aim.HitObjectStars().GetEnumerator();
-            var aimCumStarsIt = aim.CumulativeHitObjectStars().GetEnumerator();
-
-            var speedStarsIt = speed.HitObjectStars().GetEnumerator();
-            var speedCumStarsIt = speed.CumulativeHitObjectStars().GetEnumerator();
-
-            while(timesIt.MoveNext() && aimStarsIt.MoveNext() && aimCumStarsIt.MoveNext() && speedStarsIt.MoveNext() && speedCumStarsIt.MoveNext())
+            using (var timesIt = aim.Timestamps.GetEnumerator())
+            using (var aimStarsIt = aim.HitObjectStars().GetEnumerator())
+            using (var aimCumStarsIt = aim.CumulativeHitObjectStars().GetEnumerator())
+            using (var speedStarsIt = speed.HitObjectStars().GetEnumerator())
+            using (var speedCumStarsIt = speed.CumulativeHitObjectStars().GetEnumerator())
             {
-                yield return new OsuHitObjectDifficulty
+                while (timesIt.MoveNext() && aimStarsIt.MoveNext() && aimCumStarsIt.MoveNext() && speedStarsIt.MoveNext() && speedCumStarsIt.MoveNext())
                 {
-                    Time = timesIt.Current,
-                    AimStars = aimStarsIt.Current,
-                    AimCumulativeStars = aimCumStarsIt.Current,
-                    SpeedStars = speedStarsIt.Current,
-                    SpeedCumulativeStars = speedCumStarsIt.Current
-                };
+                    yield return new OsuHitObjectDifficulty
+                    {
+                        Time = timesIt.Current,
+                        AimStars = aimStarsIt.Current,
+                        AimCumulativeStars = aimCumStarsIt.Current,
+                        SpeedStars = speedStarsIt.Current,
+                        SpeedCumulativeStars = speedCumStarsIt.Current
+                    };
+                }
             }
-
-
         }
 
         protected override DifficultyAttributes CreateDifficultyAttributes(IBeatmap beatmap, Mod[] mods, Skill[] skills, double clockRate)
@@ -57,17 +53,16 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             if (beatmap.HitObjects.Count == 0)
                 return new OsuDifficultyAttributes { Mods = mods };
 
-            IList<double> aimComboSR = aim.ComboSR;
+            IList<double> aimComboSr = aim.ComboStarRatings;
             IList<double> aimMissCounts = aim.MissCounts;
 
-            IList<double> speedComboSR = speed.ComboSR;
+            IList<double> speedComboSr = speed.ComboStarRatings;
             IList<double> speedMissCounts = speed.MissCounts;
 
-            double missSrIncrement = OsuSkill.MissSRIncrement;
+            const double miss_sr_increment = OsuSkill.MISS_STAR_RATING_INCREMENT;
 
-
-            double aimRating = aimComboSR.Last();
-            double speedRating = speedComboSR.Last();
+            double aimRating = aimComboSr.Last();
+            double speedRating = speedComboSr.Last();
             double starRating = aimRating + speedRating + Math.Abs(aimRating - speedRating) / 2;
 
             // Todo: These int casts are temporary to achieve 1:1 results with osu!stable, and should be removed in the future
@@ -82,12 +77,12 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             {
                 StarRating = starRating,
                 Mods = mods,
-                MissSRIncrement = missSrIncrement,
+                MissStarRatingIncrement = miss_sr_increment,
                 AimStrain = aimRating,
-                AimComboSR = aimComboSR,
+                AimComboStarRatings = aimComboSr,
                 AimMissCounts = aimMissCounts,
                 SpeedStrain = speedRating,
-                SpeedComboSR = speedComboSR,
+                SpeedComboStarRatings = speedComboSr,
                 SpeedMissCounts = speedMissCounts,
                 ApproachRate = preempt > 1200 ? (1800 - preempt) / 120 : (1200 - preempt) / 150 + 5,
                 OverallDifficulty = (80 - hitWindowGreat) / 6,

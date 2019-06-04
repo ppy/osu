@@ -86,20 +86,19 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             return totalValue;
         }
 
-        private double interpComboSR(IList<double> values, double scoreCombo, double mapCombo)
+        private double interpComboStarRating(IList<double> values, double scoreCombo, double mapCombo)
         {
-
-
             if (mapCombo == 0)
             {
                 return values.Last();
             }
 
             double comboRatio = scoreCombo / mapCombo;
-            double pos = Math.Min(comboRatio * (values.Count), (double)values.Count);
+            double pos = Math.Min(comboRatio * (values.Count), values.Count);
             int i = (int)pos;
 
-            if (i == values.Count) {
+            if (i == values.Count)
+            {
                 return values.Last();
             }
 
@@ -112,26 +111,27 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             double lb = i == 0 ? 0 : values[i - 1];
 
             double t = pos - i;
-            double ret = lb * (1-t) + ub * t;
+            double ret = lb * (1 - t) + ub * t;
 
             return ret;
         }
 
-        private double interpMissCountSR(double SR, IList<double> values, int missCount)
+        private double interpMissCountStarRating(double sr, IList<double> values, int missCount)
         {
-            double increment = Attributes.MissSRIncrement;
+            double increment = Attributes.MissStarRatingIncrement;
             double t;
 
             if (missCount == 0)
             {
                 // zero misses, return SR
-                return SR;
+                return sr;
             }
 
-            if (missCount<values[0])
+            if (missCount < values[0])
             {
-                return SR - increment * missCount / values[0];
+                return sr - increment * missCount / values[0];
             }
+
             for (int i = 0; i < values.Count; ++i)
             {
                 if (missCount == values[i])
@@ -141,47 +141,36 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                         // if there are duplicates, take the lowest SR that can achieve miss count
                         continue;
                     }
-                    return SR - (i + 1) * increment;
-                }
-                if (i<values.Count-1 && missCount < values[i+1])
-                {
-                    t = (double)(missCount - values[i]) / (double)(values[i + 1] / values[i]);
 
-                    return SR - (i + 1 + t) * increment;
+                    return sr - (i + 1) * increment;
+                }
+
+                if (i < values.Count - 1 && missCount < values[i + 1])
+                {
+                    t = (missCount - values[i]) / (values[i + 1] / values[i]);
+
+                    return sr - (i + 1 + t) * increment;
                 }
             }
 
             // more misses than max evaluated, interpolate to zero
-            t = (double)(missCount - values.Last()) / (double)(beatmapMaxCombo - values.Last());
-            return (SR - values.Count * increment) * (1 - t);
-
-        }
-
-
-        IList<double> getTransformedStrains(IList<double> strains)
-        {
-            var transformed = new List<double>();
-
-            return strains.Select(s => Math.Pow(5.0f * Math.Max(1.0f, s / 0.0675f) - 4.0f, 3.0f) / 100000.0f).ToList();
+            t = (missCount - values.Last()) / (beatmapMaxCombo - values.Last());
+            return (sr - values.Count * increment) * (1 - t);
         }
 
         private double computeAimValue(Dictionary<string, double> categoryRatings = null)
         {
-            double aimComboSR = interpComboSR(Attributes.AimComboSR, scoreMaxCombo, beatmapMaxCombo);
-            double aimMissCountSR = interpMissCountSR(Attributes.AimStrain, Attributes.AimMissCounts, countMiss);
-            double rawAim = Math.Pow(aimComboSR,combo_weight) * Math.Pow(aimMissCountSR, 1-combo_weight);
+            double aimComboStarRating = interpComboStarRating(Attributes.AimComboStarRatings, scoreMaxCombo, beatmapMaxCombo);
+            double aimMissCountStarRating = interpMissCountStarRating(Attributes.AimStrain, Attributes.AimMissCounts, countMiss);
+            double rawAim = Math.Pow(aimComboStarRating, combo_weight) * Math.Pow(aimMissCountStarRating, 1 - combo_weight);
 
             if (mods.Any(m => m is OsuModTouchDevice))
                 rawAim = Math.Pow(rawAim, 0.8);
 
             double aimValue = Math.Pow(5.0f * Math.Max(1.0f, rawAim / 0.0675f) - 4.0f, 3.0f) / 100000.0f;
 
-            //System.Console.WriteLine($"aim: [ {String.Join(", ", getTransformedStrains(Attributes.AimComboSR))}]");
-            //System.Console.WriteLine($"aim Misses: [ {String.Join(", ", Attributes.AimMissCounts)}]");
-
             // discourage misses
             aimValue *= Math.Pow(miss_decay, countMiss);
-
 
             double approachRateFactor = 1.0f;
 
@@ -216,20 +205,18 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             if (categoryRatings != null)
             {
                 categoryRatings.Add("Aim", aimValue);
-                categoryRatings.Add("Aim Combo Stars", aimComboSR);
-                categoryRatings.Add("Aim Miss Count Stars", aimMissCountSR );
-
+                categoryRatings.Add("Aim Combo Stars", aimComboStarRating);
+                categoryRatings.Add("Aim Miss Count Stars", aimMissCountStarRating);
             }
-
 
             return aimValue;
         }
 
         private double computeSpeedValue(Dictionary<string, double> categoryRatings = null)
         {
-            double speedComboSR = interpComboSR(Attributes.SpeedComboSR, scoreMaxCombo, beatmapMaxCombo);
-            double speedMissCountSR = interpMissCountSR(Attributes.SpeedStrain, Attributes.SpeedMissCounts, countMiss);
-            double rawSpeed = Math.Pow(speedComboSR, combo_weight) * Math.Pow(speedMissCountSR, 1-combo_weight);
+            double speedComboStarRating = interpComboStarRating(Attributes.SpeedComboStarRatings, scoreMaxCombo, beatmapMaxCombo);
+            double speedMissCountStarRating = interpMissCountStarRating(Attributes.SpeedStrain, Attributes.SpeedMissCounts, countMiss);
+            double rawSpeed = Math.Pow(speedComboStarRating, combo_weight) * Math.Pow(speedMissCountStarRating, 1 - combo_weight);
             //System.Console.WriteLine($"speed Misses: [ {String.Join(", ", Attributes.SpeedMissCounts)}]");
 
             double speedValue = Math.Pow(5.0f * Math.Max(1.0f, rawSpeed / 0.0675f) - 4.0f, 3.0f) / 100000.0f;
@@ -254,10 +241,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             if (categoryRatings != null)
             {
                 categoryRatings.Add("Speed", speedValue);
-                categoryRatings.Add("Speed Combo Stars", speedComboSR);
-                categoryRatings.Add("Speed Miss Count Stars", speedMissCountSR);
+                categoryRatings.Add("Speed Combo Stars", speedComboStarRating);
+                categoryRatings.Add("Speed Miss Count Stars", speedMissCountStarRating);
             }
-
 
             return speedValue;
         }
@@ -289,11 +275,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             if (mods.Any(m => m is OsuModFlashlight))
                 accuracyValue *= 1.02f;
 
-
-            if (categoryRatings != null)
-            {
-                categoryRatings.Add("Accuracy", accuracyValue);
-            }
+            categoryRatings?.Add("Accuracy", accuracyValue);
 
             return accuracyValue;
         }

@@ -16,7 +16,6 @@ namespace osu.Game.Rulesets.Difficulty
 {
     public abstract class DifficultyCalculator
     {
-
         private readonly Ruleset ruleset;
         private readonly WorkingBeatmap beatmap;
 
@@ -77,7 +76,6 @@ namespace osu.Game.Rulesets.Difficulty
             {
                 s.Calculate();
             }
-            
 
             return CreateDifficultyAttributes(beatmap, mods, skills, clockRate);
         }
