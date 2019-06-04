@@ -38,6 +38,8 @@ namespace osu.Game.Overlays.Profile.Sections
 
                 isLoading = value;
 
+                Enabled.Value = !isLoading;
+
                 if (value)
                 {
                     loading.FadeIn(fade_duration, Easing.OutQuint);
@@ -106,11 +108,14 @@ namespace osu.Game.Overlays.Profile.Sections
 
         protected override bool OnClick(ClickEvent e)
         {
-            if (IsLoading)
-                return true;
+            var clickResult = base.OnClick(e);
 
-            IsLoading = true;
-            return base.OnClick(e);
+            if (IsLoading)
+                return clickResult;
+
+            IsLoading |= clickResult;
+
+            return clickResult;
         }
 
         private class ChevronIcon : SpriteIcon
