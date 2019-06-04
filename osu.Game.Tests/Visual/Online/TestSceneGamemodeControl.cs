@@ -18,10 +18,10 @@ namespace osu.Game.Tests.Visual.Online
             typeof(GamemodeTabItem),
         };
 
-        private readonly GamemodeControl control;
-
         public TestSceneGamemodeControl()
         {
+            GamemodeControl control;
+
             Child = control = new GamemodeControl
             {
                 Anchor = Anchor.Centre,
@@ -32,7 +32,7 @@ namespace osu.Game.Tests.Visual.Online
             AddStep("set mania as default", () => control.SetDefaultGamemode("mania"));
             AddStep("set taiko as default", () => control.SetDefaultGamemode("taiko"));
             AddStep("set catch as default", () => control.SetDefaultGamemode("fruits"));
-            AddStep("select default gamemode", () => control.SelectDefaultGamemode());
+            AddStep("select default gamemode", control.SelectDefaultGamemode);
 
             AddStep("set random colour", () => control.AccentColour = new Color4(RNG.NextSingle(), RNG.NextSingle(), RNG.NextSingle(), 1));
         }
