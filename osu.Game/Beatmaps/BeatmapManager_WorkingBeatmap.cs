@@ -45,7 +45,7 @@ namespace osu.Game.Beatmaps
 
             private TextureStore textureStore;
 
-            private IAdjustableResourceStore<Track> trackStore;
+            private ITrackStore trackStore;
 
             protected override bool BackgroundStillValid(Texture b) => false; // bypass lazy logic. we want to return a new background each time for refcounting purposes.
 

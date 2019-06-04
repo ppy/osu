@@ -21,13 +21,10 @@ namespace osu.Game.Tests.Visual.Editor
     {
         private WorkingBeatmap waveformBeatmap;
 
-        private OsuGameBase game;
-
         [BackgroundDependencyLoader]
-        private void load(AudioManager audio, OsuGameBase game)
+        private void load(AudioManager audio)
         {
             waveformBeatmap = new WaveformTestBeatmap(audio);
-            this.game = game;
         }
 
         [TestCase(1f)]
