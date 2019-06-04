@@ -76,7 +76,7 @@ namespace osu.Game.Graphics.Containers
 
         private void fadeIn()
         {
-            EffectTargets.ForEach(d => d.FadeColour(Color4.Black, FADE_DURATION * 10, Easing.OutQuint));
+            EffectTargets.ForEach(d => d.FadeColour(HoverColour, FADE_DURATION, Easing.OutQuint));
         }
     }
 }
