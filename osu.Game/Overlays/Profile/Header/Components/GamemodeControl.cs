@@ -32,9 +32,9 @@ namespace osu.Game.Overlays.Profile.Header.Components
 
                 accentColour = value;
 
-                foreach (GamemodeTabItem tabItem in TabContainer)
+                foreach (TabItem<RulesetInfo> tabItem in TabContainer)
                 {
-                    tabItem.AccentColour = value;
+                    ((GamemodeTabItem)tabItem).AccentColour = value;
                 }
             }
         }
@@ -57,19 +57,19 @@ namespace osu.Game.Overlays.Profile.Header.Components
 
         public void SetDefaultGamemode(string gamemode)
         {
-            foreach (GamemodeTabItem i in TabContainer)
+            foreach (TabItem<RulesetInfo> tabItem in TabContainer)
             {
-                i.IsDefault = i.Value.ShortName == gamemode;
+                ((GamemodeTabItem)tabItem).IsDefault = ((GamemodeTabItem)tabItem).Value.ShortName == gamemode;
             }
         }
 
         public void SelectDefaultGamemode()
         {
-            foreach (GamemodeTabItem i in TabContainer)
+            foreach (TabItem<RulesetInfo> tabItem in TabContainer)
             {
-                if (i.IsDefault)
+                if (((GamemodeTabItem)tabItem).IsDefault)
                 {
-                    Current.Value = i.Value;
+                    Current.Value = ((GamemodeTabItem)tabItem).Value;
                     return;
                 }
             }
