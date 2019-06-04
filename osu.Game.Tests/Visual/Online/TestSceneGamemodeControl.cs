@@ -1,10 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.MathUtils;
-using osu.Game.Graphics;
 using osu.Game.Overlays.Profile.Header.Components;
 using osuTK.Graphics;
 using System;
@@ -37,12 +35,6 @@ namespace osu.Game.Tests.Visual.Online
             AddStep("select default gamemode", () => control.SelectDefaultGamemode());
 
             AddStep("set random colour", () => control.AccentColour = new Color4(RNG.NextSingle(), RNG.NextSingle(), RNG.NextSingle(), 1));
-        }
-
-        [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
-        {
-            control.AccentColour = colours.Seafoam;
         }
     }
 }
