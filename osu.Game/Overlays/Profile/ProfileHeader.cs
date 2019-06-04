@@ -37,6 +37,7 @@ namespace osu.Game.Overlays.Profile
 
             Add(gamemodeControl = new GamemodeControl
             {
+                Alpha = 0,
                 Anchor = Anchor.TopRight,
                 Origin = Anchor.TopRight,
                 Y = 100,
@@ -105,7 +106,16 @@ namespace osu.Game.Overlays.Profile
 
         protected override ScreenTitle CreateTitle() => new ProfileHeaderTitle();
 
-        private void updateDisplay(User user) => coverContainer.User = user;
+        private void updateDisplay(User user)
+        {
+            coverContainer.User = user;
+
+            string playMode = user.PlayMode;
+
+            gamemodeControl.Current.Value = playMode;
+            gamemodeControl.SetDefaultGamemode(playMode);
+            gamemodeControl.FadeInFromZero(100, Easing.OutQuint);
+        }
 
         private class ProfileHeaderTitle : ScreenTitle
         {
