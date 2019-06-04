@@ -11,6 +11,7 @@ using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API.Requests;
 using osu.Game.Overlays.Profile;
+using osu.Game.Overlays.Profile.Header.Components;
 using osu.Game.Overlays.Profile.Sections;
 using osu.Game.Users;
 using osuTK;
@@ -25,6 +26,7 @@ namespace osu.Game.Overlays
         protected ProfileHeader Header;
         private SectionsContainer<ProfileSection> sectionsContainer;
         private ProfileTabControl tabs;
+        private GamemodeControl gamemodeControl;
 
         public const float CONTENT_X_MARGIN = 70;
 
@@ -32,7 +34,8 @@ namespace osu.Game.Overlays
 
         public void ShowUser(User user, bool fetchOnline = true)
         {
-            if (user == User.SYSTEM_USER) return;
+            if (user == User.SYSTEM_USER)
+                return;
 
             Show();
 
@@ -77,7 +80,7 @@ namespace osu.Game.Overlays
                 {
                     Colour = OsuColour.Gray(34),
                     RelativeSizeAxes = Axes.Both
-                }
+                },
             });
             sectionsContainer.SelectedSection.ValueChanged += section =>
             {
@@ -118,6 +121,15 @@ namespace osu.Game.Overlays
             }
 
             sectionsContainer.ScrollToTop();
+
+            Header.Add(gamemodeControl = new GamemodeControl
+            {
+                Alpha = 0,
+                Anchor = Anchor.TopRight,
+                Origin = Anchor.TopRight,
+                Y = 100,
+                Margin = new MarginPadding { Right = 30 },
+            });
         }
 
         private void userLoadComplete(User user)
@@ -139,6 +151,10 @@ namespace osu.Game.Overlays
                     }
                 }
             }
+
+            gamemodeControl.SetDefaultGamemode(user.PlayMode);
+            gamemodeControl.SelectDefaultGamemode();
+            gamemodeControl.FadeInFromZero(100, Easing.OutQuint);
         }
 
         private class ProfileTabControl : PageTabControl<ProfileSection>

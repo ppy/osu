@@ -5,6 +5,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.UserInterface;
+using osu.Game.Graphics;
 using osu.Game.Rulesets;
 using osuTK;
 using osuTK.Graphics;
@@ -47,12 +48,14 @@ namespace osu.Game.Overlays.Profile.Header.Components
         }
 
         [BackgroundDependencyLoader]
-        private void load(RulesetStore rulesets)
+        private void load(RulesetStore rulesets, OsuColour colours)
         {
             foreach (var r in rulesets.AvailableRulesets)
             {
                 AddItem(r);
             }
+
+            AccentColour = colours.Seafoam;
         }
 
         public void SetDefaultGamemode(string gamemode)
