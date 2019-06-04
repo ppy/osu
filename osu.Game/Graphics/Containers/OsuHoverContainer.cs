@@ -24,7 +24,8 @@ namespace osu.Game.Graphics.Containers
         {
             Enabled.ValueChanged += e =>
             {
-                if (!e.NewValue) unhover();
+                if (!e.NewValue)
+                    unhover();
             };
         }
 
@@ -49,7 +50,8 @@ namespace osu.Game.Graphics.Containers
 
         private void unhover()
         {
-            if (!isHovered) return;
+            if (!isHovered)
+                return;
 
             isHovered = false;
             EffectTargets.ForEach(d => d.FadeColour(IdleColour, FADE_DURATION, Easing.OutQuint));
