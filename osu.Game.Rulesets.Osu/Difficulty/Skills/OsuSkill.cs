@@ -21,9 +21,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         protected virtual double MaxStrainTime => 200;
         private const double difficulty_multiplier = 0.0675;
 
-        // repeating a section adds this much difficulty
-        protected virtual double StarBonusPerLengthDouble => 0.0655;
-        private double starBonusK => Math.Log(2) / StarBonusPerLengthDouble;
+        // Repeating a section multiplies difficulty by this factor
+        protected virtual double StarMultiplierPerRepeat => 1.06769273731;
+        private double starBonusK => 1 / Math.Log(StarMultiplierPerRepeat,2);
 
         // Constant difficulty sections of this length match previous star rating
         protected virtual double StarBonusBaseTime => (8.0 * 1000.0);
@@ -38,14 +38,14 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         // maps with this expected length will match previous star rating
         private const double target_fc_base_time = 30 * 1000;
 
-        private double targetFcDifficultyAdjustment => -skillLevel(target_fc_base_time / target_fc_time, 0);
+        private double targetFcDifficultyMultiplier => 1/skillLevel(target_fc_base_time / target_fc_time, 1);
 
         // size of lists used to interpolate combo SR and miss count SR for performance calc
         private const int difficulty_count = 20;
 
         private double currentStrain = 1; // We keep track of the strain level at all times throughout the beatmap.
 
-        private readonly List<double> expDifficulties = new List<double>(); // list of exp(k*difficulty) for each note
+        private readonly List<double> powDifficulties = new List<double>(); // list of difficulty^k for each note
         private readonly List<double> timestamps = new List<double>(); // list of timestamps for each note
         private double fcProb;
         private bool lastScaled;
@@ -56,7 +56,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
         public IList<double> Timestamps => timestamps;
 
-        public IEnumerable<double> HitObjectStars() => expDifficulties.Select(d => difficultyToStars(Math.Log(d) / starBonusK));
+        public IEnumerable<double> HitObjectStars() => powDifficulties.Select(d => difficultyToStars(Math.Log(d) / starBonusK));
 
         public IEnumerable<double> CumulativeHitObjectStars()
         {
@@ -64,10 +64,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
             // Difficulty calculated according to probability of FC
             // iterate backwards to calculate probs of FCing the remainder of map from a given point
-            foreach (double d in expDifficulties)
+            foreach (double d in powDifficulties)
             {
                 total += d;
-                yield return difficultyToStars(Math.Log(total) / starBonusK);
+                yield return difficultyToStars(Math.Pow(total, 1.0 / starBonusK));
             }
         }
 
@@ -87,7 +87,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             scaleLastHitObject(current.DeltaTime);
 #endif
 
-            double expDifficulty = Math.Exp(starBonusK * starsToDifficulty(stars));
+            double powDifficulty = Math.Pow(stars, starBonusK);
 
             // add zero difficulty notes corresponding to slider ticks/slider ends so combo is reflected properly
             // (slider difficulty is currently handled in the following note)
@@ -95,11 +95,11 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
             for (int i = 0; i < extraNestedCount; ++i)
             {
-                expDifficulties.Add(0);
+                powDifficulties.Add(0);
                 timestamps.Add(current.StartTime);
             }
 
-            expDifficulties.Add(expDifficulty);
+            powDifficulties.Add(powDifficulty);
             timestamps.Add(current.StartTime);
 
 #if !OSU_SKILL_STRAIN_AFTER_NOTE
@@ -111,8 +111,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
         private void scaleLastHitObject(double t = double.PositiveInfinity)
         {
-            if (expDifficulties.Count != 0)
-                expDifficulties[expDifficulties.Count - 1] *= Math.Min(t, MaxStrainTime) / StarBonusBaseTime;
+            if (powDifficulties.Count != 0)
+                powDifficulties[powDifficulties.Count - 1] *= Math.Min(t, MaxStrainTime) / StarBonusBaseTime;
         }
 
         /// <summary>
@@ -129,15 +129,15 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 #endif
 
             // difficulty to FC the remainder of the map from every position, used later to calculate expected map length.
-            var difficultyPartialSums = new double[expDifficulties.Count];
+            var difficultyPartialSums = new double[powDifficulties.Count];
 
             double total = 0;
 
             // Difficulty calculated according to probability of FC
             // iterate backwards to calculate probs of FCing the remainder of map from a given point
-            for (int i = expDifficulties.Count - 1; i >= 0; --i)
+            for (int i = powDifficulties.Count - 1; i >= 0; --i)
             {
-                total += expDifficulties[i];
+                total += powDifficulties[i];
                 difficultyPartialSums[i] = total;
             }
 
@@ -184,14 +184,14 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         {
             int last = first + count - 1;
 
-            if (difficultyPartialSums[first] - remainder <= 1e-10)
+            if (Math.Abs(difficultyPartialSums[first] - remainder) <= 1e-10)
             {
-                // remainder is the expDifficulty of the rest of the map after last
+                // remainder is the powDifficulty of the rest of the map after "last"
                 // if first and remainder are equal, the section has no notes, so return zero stars
-                return -1e100;
+                return 0;
             }
 
-            double difficulty = Math.Log(difficultyPartialSums[first] - remainder) / starBonusK;
+            double difficulty = Math.Pow(difficultyPartialSums[first] - remainder, 1/starBonusK);
 
             // hard to calculate skill directly so approximate and iteratively improve. Normally gets to within 1% in 2 iterations
 
@@ -206,7 +206,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             if (fcProb > 0.9)
             {
                 fcProb = 0.5;
-                return skillLevel(0.5, difficulty) + targetFcDifficultyAdjustment;
+                return skillLevel(0.5, difficulty) * targetFcDifficultyMultiplier;
             }
 
             double skill = skillLevel(fcProb, difficulty);
@@ -226,7 +226,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
                 if (fcProb > 0.9)
                 {
                     fcProb = 0.5;
-                    return skillLevel(0.5, difficulty) + targetFcDifficultyAdjustment;
+                    return skillLevel(0.5, difficulty) * targetFcDifficultyMultiplier;
                 }
 
                 skill = skillLevel(fcProb, difficulty);
@@ -242,10 +242,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             {
                 // map is very long, return skill level to pass with 50% probability
                 fcProb = 0.5;
-                return skillLevel(0.5, difficulty) + targetFcDifficultyAdjustment;
+                return skillLevel(0.5, difficulty) * targetFcDifficultyMultiplier;
             }
 
-            return skill + targetFcDifficultyAdjustment;
+            return skill * targetFcDifficultyMultiplier;
         }
 
         private double getExpectedTimePlayedBeforeFc(double skill, double[] difficultyPartialSums, int first, int count, double remainder = 0)
@@ -256,7 +256,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
             double length = 0;
             double lastTime = timestamps[first] - MaxStrainTime;
-            double expSkill = Math.Exp(-starBonusK * skill);
+            double powSkill = Math.Pow(skill, -starBonusK);
 
             for (int i = first; i <= last; ++i)
             {
@@ -272,8 +272,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
                 // We need to play this note again every time we fail after it until we pass the remainder of the map
                 // If we fail before, we don't play it
 
-                // difficultyPartialSums is a list of exp(k*d) for each note where d is the difficulty to pass the remainder of the map
-                double probabilityOfPassingRemainderOfMap = passProbFromExp(expSkill, difficultyPartialSums[i] - remainder);
+                // difficultyPartialSums is a list of d^k for each note where d is the difficulty to pass the remainder of the map
+                double probabilityOfPassingRemainderOfMap = passProbFromPow(powSkill, difficultyPartialSums[i] - remainder);
                 double expectedNotePlaysBeforeFc = 1 / probabilityOfPassingRemainderOfMap;
                 length += expectedNotePlaysBeforeFc * (deltaT);
                 lastTime = timestamps[i];
@@ -283,25 +283,22 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         }
 
         // probability a player of the given skill passes a map of the given difficulty
-        private double passProbability(double skill, double difficulty) => Math.Exp(-Math.Exp(-starBonusK * (skill - difficulty)));
+        private double passProbability(double skill, double difficulty) => Math.Exp(-Math.Pow(skill / difficulty, -starBonusK));
 
-        // same as above but pass in exp(-k*skill) and exp(k*difficulty)
-        private double passProbFromExp(double expSkill, double expDifficulty) => Math.Exp(-expSkill * expDifficulty);
+        // same as above but pass in skill^-k and difficulty^k
+        private double passProbFromPow(double powSkill, double powDifficulty) => Math.Exp(-powSkill * powDifficulty);
 
         // inverse of passProbability
-        private double skillLevel(double probability, double difficulty) => difficulty - Math.Log(-Math.Log(probability)) / starBonusK;
+        private double skillLevel(double probability, double difficulty) => difficulty * Math.Pow(-Math.Log(probability), -1 / starBonusK);
 
         private double starsToDifficulty(double val)
         {
-            if (val > 0)
-                return (Math.Log(val));
-
-            return -1e100;
+            return val;
         }
 
         private double difficultyToStars(double val)
         {
-            return Math.Exp(val);
+            return val;
         }
 
         private void calculateMissStarRating()
@@ -315,7 +312,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
                 double missStars = stars - (i + 1) * MISS_STAR_RATING_INCREMENT;
 
                 // skill is the same skill who can FC a missStars map with same length as this one in 4 hours
-                double skill = starsToDifficulty(missStars) - targetFcDifficultyAdjustment;
+                double skill = starsToDifficulty(missStars) / targetFcDifficultyMultiplier;
 
                 double[] missProbs = getMissProbabilities(skill);
 
@@ -327,19 +324,18 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         {
             // slider breaks should be a miss :(
 
-            var result = new double[expDifficulties.Count];
+            var result = new double[powDifficulties.Count];
 
-            double expSkill = Math.Exp(-starBonusK * skill);
+            double powSkill = Math.Pow(skill, -starBonusK);
 
-            for (int i = 0; i < expDifficulties.Count; ++i)
+            for (int i = 0; i < powDifficulties.Count; ++i)
             {
-                result[i] = 1 - passProbFromExp(expSkill, expDifficulties[i]);
+                result[i] = 1 - passProbFromPow(powSkill, powDifficulties[i]);
             }
 
             return result;
         }
 
-        // find first miss count achievable with at least probability p
         private List<double> printMissDistribution(double[] missProbabilities)
         {
             var distribution = new PoissionBinomial(missProbabilities);
