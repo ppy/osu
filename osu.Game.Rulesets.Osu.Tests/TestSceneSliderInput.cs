@@ -20,7 +20,6 @@ using osu.Game.Rulesets.Replays;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring;
 using osu.Game.Screens.Play;
-using osu.Game.Tests.Beatmaps;
 using osu.Game.Tests.Visual;
 using osuTK;
 
@@ -299,7 +298,7 @@ namespace osu.Game.Rulesets.Osu.Tests
         {
             AddStep("load player", () =>
             {
-                Beatmap.Value = new TestWorkingBeatmap(new Beatmap<OsuHitObject>
+                Beatmap.Value = CreateWorkingBeatmap(new Beatmap<OsuHitObject>
                 {
                     HitObjects =
                     {
@@ -323,7 +322,7 @@ namespace osu.Game.Rulesets.Osu.Tests
                         BaseDifficulty = new BeatmapDifficulty { SliderTickRate = 3 },
                         Ruleset = new OsuRuleset().RulesetInfo
                     },
-                }, Clock);
+                });
 
                 var p = new ScoreAccessibleReplayPlayer(new Score { Replay = new Replay { Frames = frames } });
 
