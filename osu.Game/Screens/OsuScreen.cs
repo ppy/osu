@@ -99,7 +99,7 @@ namespace osu.Game.Screens
         [BackgroundDependencyLoader(true)]
         private void load(OsuGame osu, AudioManager audio)
         {
-            sampleExit = audio.Sample.Get(@"UI/screen-back");
+            sampleExit = audio.Samples.Get(@"UI/screen-back");
         }
 
         public virtual bool OnPressed(GlobalAction action)

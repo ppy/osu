@@ -1,4 +1,4 @@
-﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
@@ -18,7 +18,6 @@ using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Taiko;
 using osu.Game.Screens.Select;
-using osu.Game.Tests.Beatmaps;
 using osuTK;
 
 namespace osu.Game.Tests.Visual.SongSelect
@@ -136,7 +135,7 @@ namespace osu.Game.Tests.Visual.SongSelect
             AddStep($"select {b?.Metadata.Title ?? "null"} beatmap", () =>
             {
                 infoBefore = infoWedge.Info;
-                infoWedge.Beatmap = Beatmap.Value = b == null ? Beatmap.Default : new TestWorkingBeatmap(b);
+                infoWedge.Beatmap = Beatmap.Value = b == null ? Beatmap.Default : CreateWorkingBeatmap(b);
             });
 
             AddUntilStep("wait for async load", () => infoWedge.Info != infoBefore);
