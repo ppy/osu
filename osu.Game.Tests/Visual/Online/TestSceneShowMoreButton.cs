@@ -17,16 +17,39 @@ namespace osu.Game.Tests.Visual.Online
 
         public TestSceneShowMoreButton()
         {
-            ShowMoreButton button;
+            ShowMoreButton button = null;
+
+            int fireCount = 0;
 
             Add(button = new ShowMoreButton
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
-                Action = () => { }
+                Action = () =>
+                {
+                    fireCount++;
+                    // ReSharper disable once AccessToModifiedClosure
+                    // ReSharper disable once PossibleNullReferenceException
+                    Scheduler.AddDelayed(() => button.IsLoading = false, 2000);
+                }
             });
 
-            AddStep("switch loading state", () => button.IsLoading = !button.IsLoading);
+            AddStep("click button", () => button.Click());
+
+            AddAssert("action fired once", () => fireCount == 1);
+            AddAssert("is in loading state", () => button.IsLoading);
+
+            AddStep("click button", () => button.Click());
+
+            AddAssert("action not fired", () => fireCount == 1);
+            AddAssert("is in loading state", () => button.IsLoading);
+
+            AddUntilStep("wait for loaded", () => !button.IsLoading);
+
+            AddStep("click button", () => button.Click());
+
+            AddAssert("action fired twice", () => fireCount == 2);
+            AddAssert("is in loading state", () => button.IsLoading);
         }
     }
 }
