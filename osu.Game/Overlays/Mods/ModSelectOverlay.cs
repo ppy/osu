@@ -198,9 +198,9 @@ namespace osu.Game.Overlays.Mods
         protected override bool OnKeyDown(KeyDownEvent e)
         {
             if (e.Key == Key.Number1)
-                DeselectAll();
+                DeselectAllButton.Click();
             else if (e.Key == Key.Number2)
-                PopOut();
+                CloseButton.Click();
 
             return base.OnKeyDown(e);
         }
@@ -381,7 +381,7 @@ namespace osu.Game.Overlays.Mods
                                             {
                                                 Width = 180,
                                                 Text = "2. Close",
-                                                Action = PopOut,
+                                                Action = Hide,
                                                 Margin = new MarginPadding
                                                 {
                                                     Right = 20
