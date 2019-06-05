@@ -114,7 +114,8 @@ namespace osu.Game.Screens
         [Resolved(canBeNull: true)]
         private OsuLogo logo { get; set; }
 
-        private IAPIProvider api;
+        [Resolved(canBeNull: true)]
+        private IAPIProvider api { get; set; }
 
         protected OsuScreen()
         {
@@ -128,7 +129,6 @@ namespace osu.Game.Screens
         private void load(OsuGame osu, AudioManager audio, IAPIProvider provider)
         {
             sampleExit = audio.Sample.Get(@"UI/screen-back");
-            api = provider;
         }
 
         public virtual bool OnPressed(GlobalAction action)
