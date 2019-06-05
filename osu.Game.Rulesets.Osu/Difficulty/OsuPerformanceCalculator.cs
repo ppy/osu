@@ -161,7 +161,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         private double computeAimValue(Dictionary<string, double> categoryRatings = null)
         {
             double aimComboStarRating = interpComboStarRating(Attributes.AimComboStarRatings, scoreMaxCombo, beatmapMaxCombo);
-            double aimMissCountStarRating = interpMissCountStarRating(Attributes.AimStrain, Attributes.AimMissCounts, countMiss);
+            double aimMissCountStarRating = interpMissCountStarRating(Attributes.AimComboStarRatings.Last(), Attributes.AimMissCounts, countMiss);
             double rawAim = Math.Pow(aimComboStarRating, combo_weight) * Math.Pow(aimMissCountStarRating, 1 - combo_weight);
 
             if (mods.Any(m => m is OsuModTouchDevice))
@@ -215,7 +215,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         private double computeSpeedValue(Dictionary<string, double> categoryRatings = null)
         {
             double speedComboStarRating = interpComboStarRating(Attributes.SpeedComboStarRatings, scoreMaxCombo, beatmapMaxCombo);
-            double speedMissCountStarRating = interpMissCountStarRating(Attributes.SpeedStrain, Attributes.SpeedMissCounts, countMiss);
+            double speedMissCountStarRating = interpMissCountStarRating(Attributes.SpeedComboStarRatings.Last(), Attributes.SpeedMissCounts, countMiss);
             double rawSpeed = Math.Pow(speedComboStarRating, combo_weight) * Math.Pow(speedMissCountStarRating, 1 - combo_weight);
 
             double speedValue = Math.Pow(5.0f * Math.Max(1.0f, rawSpeed / 0.0675f) - 4.0f, 3.0f) / 100000.0f;
