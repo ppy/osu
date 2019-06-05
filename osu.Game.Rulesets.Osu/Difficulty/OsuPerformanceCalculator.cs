@@ -217,7 +217,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             double speedComboStarRating = interpComboStarRating(Attributes.SpeedComboStarRatings, scoreMaxCombo, beatmapMaxCombo);
             double speedMissCountStarRating = interpMissCountStarRating(Attributes.SpeedStrain, Attributes.SpeedMissCounts, countMiss);
             double rawSpeed = Math.Pow(speedComboStarRating, combo_weight) * Math.Pow(speedMissCountStarRating, 1 - combo_weight);
-            //System.Console.WriteLine($"speed Misses: [ {String.Join(", ", Attributes.SpeedMissCounts)}]");
 
             double speedValue = Math.Pow(5.0f * Math.Max(1.0f, rawSpeed / 0.0675f) - 4.0f, 3.0f) / 100000.0f;
 

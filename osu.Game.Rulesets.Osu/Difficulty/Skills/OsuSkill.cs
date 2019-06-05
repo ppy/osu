@@ -23,7 +23,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
         // Repeating a section multiplies difficulty by this factor
         protected virtual double StarMultiplierPerRepeat => 1.06769273731;
-        private double starBonusK => 1 / Math.Log(StarMultiplierPerRepeat,2);
+        private double starBonusK => 1 / Math.Log(StarMultiplierPerRepeat, 2);
 
         // Constant difficulty sections of this length match previous star rating
         protected virtual double StarBonusBaseTime => (8.0 * 1000.0);
@@ -38,7 +38,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         // maps with this expected length will match previous star rating
         private const double target_fc_base_time = 30 * 1000;
 
-        private double targetFcDifficultyMultiplier => 1/skillLevel(target_fc_base_time / target_fc_time, 1);
+        private double targetFcDifficultyMultiplier => 1 / skillLevel(target_fc_base_time / target_fc_time, 1);
 
         // size of lists used to interpolate combo SR and miss count SR for performance calc
         private const int difficulty_count = 20;
@@ -55,21 +55,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         public IList<double> ComboStarRatings { get; private set; }
 
         public IList<double> Timestamps => timestamps;
-
-        public IEnumerable<double> HitObjectStars() => powDifficulties.Select(d => difficultyToStars(Math.Log(d) / starBonusK));
-
-        public IEnumerable<double> CumulativeHitObjectStars()
-        {
-            double total = 0;
-
-            // Difficulty calculated according to probability of FC
-            // iterate backwards to calculate probs of FCing the remainder of map from a given point
-            foreach (double d in powDifficulties)
-            {
-                total += d;
-                yield return difficultyToStars(Math.Pow(total, 1.0 / starBonusK));
-            }
-        }
 
         /// <summary>
         /// Process a <see cref="DifficultyHitObject"/> and update current strain values.
@@ -191,7 +176,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
                 return 0;
             }
 
-            double difficulty = Math.Pow(difficultyPartialSums[first] - remainder, 1/starBonusK);
+            double difficulty = Math.Pow(difficultyPartialSums[first] - remainder, 1 / starBonusK);
 
             // hard to calculate skill directly so approximate and iteratively improve. Normally gets to within 1% in 2 iterations
 
@@ -331,28 +316,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             for (int i = 0; i < powDifficulties.Count; ++i)
             {
                 result[i] = 1 - passProbFromPow(powSkill, powDifficulties[i]);
-            }
-
-            return result;
-        }
-
-        private List<double> printMissDistribution(double[] missProbabilities)
-        {
-            var distribution = new PoissionBinomial(missProbabilities);
-            var result = new List<double>();
-            int missCount = 0;
-
-            while (missCount < 10000)
-            {
-                double p = distribution.Cdf(missCount);
-                result.Add(p);
-
-                if (p > 0.99)
-                {
-                    break;
-                }
-
-                ++missCount;
             }
 
             return result;

@@ -23,28 +23,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         {
         }
 
-        private IEnumerable<OsuHitObjectDifficulty> hitObjectDifficulties(OsuSkill aim, OsuSkill speed)
-        {
-            using (var timesIt = aim.Timestamps.GetEnumerator())
-            using (var aimStarsIt = aim.HitObjectStars().GetEnumerator())
-            using (var aimCumStarsIt = aim.CumulativeHitObjectStars().GetEnumerator())
-            using (var speedStarsIt = speed.HitObjectStars().GetEnumerator())
-            using (var speedCumStarsIt = speed.CumulativeHitObjectStars().GetEnumerator())
-            {
-                while (timesIt.MoveNext() && aimStarsIt.MoveNext() && aimCumStarsIt.MoveNext() && speedStarsIt.MoveNext() && speedCumStarsIt.MoveNext())
-                {
-                    yield return new OsuHitObjectDifficulty
-                    {
-                        Time = timesIt.Current,
-                        AimStars = aimStarsIt.Current,
-                        AimCumulativeStars = aimCumStarsIt.Current,
-                        SpeedStars = speedStarsIt.Current,
-                        SpeedCumulativeStars = speedCumStarsIt.Current
-                    };
-                }
-            }
-        }
-
         protected override DifficultyAttributes CreateDifficultyAttributes(IBeatmap beatmap, Mod[] mods, Skill[] skills, double clockRate)
         {
             var aim = (OsuSkill)skills[0];
@@ -87,7 +65,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 ApproachRate = preempt > 1200 ? (1800 - preempt) / 120 : (1200 - preempt) / 150 + 5,
                 OverallDifficulty = (80 - hitWindowGreat) / 6,
                 MaxCombo = maxCombo,
-                HitObjectDifficulties = hitObjectDifficulties(aim, speed).Where(x => x.AimStars != 0).ToList(), // only used for charts
             };
         }
 
