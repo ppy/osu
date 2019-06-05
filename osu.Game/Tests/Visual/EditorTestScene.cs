@@ -1,4 +1,4 @@
-﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
@@ -6,7 +6,6 @@ using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Game.Rulesets;
 using osu.Game.Screens.Edit;
-using osu.Game.Tests.Beatmaps;
 
 namespace osu.Game.Tests.Visual
 {
@@ -24,7 +23,7 @@ namespace osu.Game.Tests.Visual
         [BackgroundDependencyLoader]
         private void load()
         {
-            Beatmap.Value = new TestWorkingBeatmap(ruleset.RulesetInfo, null);
+            Beatmap.Value = CreateWorkingBeatmap(ruleset.RulesetInfo);
 
             LoadScreen(new Editor());
         }

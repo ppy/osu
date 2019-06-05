@@ -1,4 +1,4 @@
-﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
@@ -16,7 +16,6 @@ using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring;
 using osu.Game.Screens;
 using osu.Game.Screens.Play;
-using osu.Game.Tests.Beatmaps;
 
 namespace osu.Game.Tests.Visual.Gameplay
 {
@@ -29,7 +28,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         public void Setup() => Schedule(() =>
         {
             InputManager.Child = stack = new OsuScreenStack { RelativeSizeAxes = Axes.Both };
-            Beatmap.Value = new TestWorkingBeatmap(new TestBeatmap(new OsuRuleset().RulesetInfo), Clock);
+            Beatmap.Value = CreateWorkingBeatmap(new OsuRuleset().RulesetInfo);
         });
 
         [Test]

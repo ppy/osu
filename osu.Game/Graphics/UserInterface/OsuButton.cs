@@ -17,11 +17,11 @@ namespace osu.Game.Graphics.UserInterface
     /// <summary>
     /// A button with added default sound effects.
     /// </summary>
-    public class OsuButton : Button
+    public abstract class OsuButton : Button
     {
         private Box hover;
 
-        public OsuButton()
+        protected OsuButton()
         {
             Height = 40;
 

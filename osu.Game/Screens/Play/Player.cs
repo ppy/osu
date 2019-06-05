@@ -103,7 +103,7 @@ namespace osu.Game.Screens.Play
             if (working == null)
                 return;
 
-            sampleRestart = audio.Sample.Get(@"Gameplay/restart");
+            sampleRestart = audio.Samples.Get(@"Gameplay/restart");
 
             mouseWheelDisabled = config.GetBindable<bool>(OsuSetting.MouseDisableWheel);
             showStoryboard = config.GetBindable<bool>(OsuSetting.ShowStoryboard);
