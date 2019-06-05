@@ -22,13 +22,11 @@ namespace osu.Game.Overlays.Profile.Sections.Recent
 
         protected override void ShowMore()
         {
-            base.ShowMore();
-
             request = new GetUserRecentActivitiesRequest(User.Value.Id, VisiblePages++ * ItemsPerPage);
             request.Success += activities => Schedule(() =>
             {
-                ShowMoreButton.FadeTo(activities.Count == ItemsPerPage ? 1 : 0);
-                ShowMoreLoading.Hide();
+                MoreButton.FadeTo(activities.Count == ItemsPerPage ? 1 : 0);
+                MoreButton.IsLoading = false;
 
                 if (!activities.Any() && VisiblePages == 1)
                 {
