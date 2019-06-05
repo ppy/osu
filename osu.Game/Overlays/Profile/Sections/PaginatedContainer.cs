@@ -7,20 +7,17 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics;
-using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
-using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API;
 using osu.Game.Rulesets;
 using osu.Game.Users;
 
 namespace osu.Game.Overlays.Profile.Sections
 {
-    public class PaginatedContainer : FillFlowContainer
+    public abstract class PaginatedContainer : FillFlowContainer
     {
         protected readonly FillFlowContainer ItemsContainer;
-        protected readonly OsuHoverContainer ShowMoreButton;
-        protected readonly LoadingAnimation ShowMoreLoading;
+        protected readonly ShowMoreButton MoreButton;
         protected readonly OsuSpriteText MissingText;
 
         protected int VisiblePages;
@@ -32,7 +29,7 @@ namespace osu.Game.Overlays.Profile.Sections
         protected APIRequest RetrievalRequest;
         protected RulesetStore Rulesets;
 
-        public PaginatedContainer(Bindable<User> user, string header, string missing)
+        protected PaginatedContainer(Bindable<User> user, string header, string missing)
         {
             User.BindTo(user);
 
@@ -45,38 +42,27 @@ namespace osu.Game.Overlays.Profile.Sections
                 new OsuSpriteText
                 {
                     Text = header,
-                    Font = OsuFont.GetFont(size: 15, weight: FontWeight.Regular, italics: true),
+                    Font = OsuFont.GetFont(size: 20, weight: FontWeight.Bold),
                     Margin = new MarginPadding { Top = 10, Bottom = 10 },
                 },
                 ItemsContainer = new FillFlowContainer
                 {
                     AutoSizeAxes = Axes.Y,
                     RelativeSizeAxes = Axes.X,
-                    Margin = new MarginPadding { Bottom = 10 }
+                    Direction = FillDirection.Vertical,
+                    Spacing = new Vector2(0, 2),
                 },
-                ShowMoreButton = new OsuHoverContainer
+                MoreButton = new ShowMoreButton
                 {
+                    Anchor = Anchor.TopCentre,
+                    Origin = Anchor.TopCentre,
                     Alpha = 0,
+                    Margin = new MarginPadding { Top = 10 },
                     Action = ShowMore,
-                    AutoSizeAxes = Axes.Both,
-                    Anchor = Anchor.TopCentre,
-                    Origin = Anchor.TopCentre,
-                    Child = new OsuSpriteText
-                    {
-                        Font = OsuFont.GetFont(size: 14),
-                        Text = "show more",
-                        Padding = new MarginPadding { Vertical = 10, Horizontal = 15 },
-                    }
-                },
-                ShowMoreLoading = new LoadingAnimation
-                {
-                    Anchor = Anchor.TopCentre,
-                    Origin = Anchor.TopCentre,
-                    Size = new Vector2(14),
                 },
                 MissingText = new OsuSpriteText
                 {
-                    Font = OsuFont.GetFont(size: 14),
+                    Font = OsuFont.GetFont(size: 15),
                     Text = missing,
                     Alpha = 0,
                 },
@@ -97,16 +83,11 @@ namespace osu.Game.Overlays.Profile.Sections
         {
             VisiblePages = 0;
             ItemsContainer.Clear();
-            ShowMoreButton.Hide();
 
             if (e.NewValue != null)
                 ShowMore();
         }
 
-        protected virtual void ShowMore()
-        {
-            ShowMoreLoading.Show();
-            ShowMoreButton.Hide();
-        }
+        protected abstract void ShowMore();
     }
 }

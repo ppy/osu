@@ -81,6 +81,9 @@ namespace osu.Game.Online.Chat
             if (user == null)
                 throw new ArgumentNullException(nameof(user));
 
+            if (user.Id == api.LocalUser.Value.Id)
+                return;
+
             CurrentChannel.Value = JoinedChannels.FirstOrDefault(c => c.Type == ChannelType.PM && c.Users.Count == 1 && c.Users.Any(u => u.Id == user.Id))
                                    ?? new Channel(user);
         }
