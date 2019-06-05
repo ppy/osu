@@ -23,13 +23,13 @@ namespace osu.Game.Rulesets.Catch.Tests
             AddAssert("First note is hyperdash", () => Beatmap.Value.Beatmap.HitObjects[0] is Fruit f && f.HyperDash);
         }
 
-        protected override IBeatmap CreateBeatmap(Ruleset ruleset)
+        protected override IBeatmap CreateBeatmap(RulesetInfo ruleset)
         {
             var beatmap = new Beatmap
             {
                 BeatmapInfo =
                 {
-                    Ruleset = ruleset.RulesetInfo,
+                    Ruleset = ruleset,
                     BaseDifficulty = new BeatmapDifficulty { CircleSize = 3.6f }
                 }
             };
