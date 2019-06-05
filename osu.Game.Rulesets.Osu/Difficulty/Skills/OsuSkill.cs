@@ -1,14 +1,17 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#define OSU_SKILL_STRAIN_AFTER_NOTE // defined => use time between current and next, commented => use time between prev and current
+// If OSU_SKILL_STRAIN_AFTER_NOTE defined, a note's duration is the time between current note and next note,
+// If commented, it's the duration between previous and current.
+
+#define OSU_SKILL_STRAIN_AFTER_NOTE
 
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using MathNet.Numerics.Distributions;
 using osu.Game.Rulesets.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Difficulty.Skills;
+using osu.Game.Rulesets.Difficulty.Utils;
 
 namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 {
@@ -18,29 +21,51 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
     /// </summary>
     public abstract class OsuSkill : Skill
     {
+        /// <summary>
+        /// Strain time is assigned to a note for the minimum of it's duration and this value.
+        /// </summary>
         protected virtual double MaxStrainTime => 200;
+
+        /// <summary>
+        /// Star multiplier from legacy difficulty calc
+        /// </summary>
         private const double difficulty_multiplier = 0.0675;
 
-        // Repeating a section multiplies difficulty by this factor
+        /// <summary>
+        /// Repeating a section multiplies difficulty by this factor
+        /// </summary>
         protected virtual double StarMultiplierPerRepeat => 1.06769273731;
+
         private double starBonusK => 1 / Math.Log(StarMultiplierPerRepeat, 2);
 
-        // Constant difficulty sections of this length match previous star rating
+        /// <summary>
+        /// Constant difficulty sections of this length match old difficulty values.
+        /// </summary>
         protected virtual double StarBonusBaseTime => (8.0 * 1000.0);
 
-        // Final star rating is player skill level who can FC the map once per target_fc_time
+        /// <summary>
+        /// Final star rating is player skill level who can FC the map once per this amount of time (in ms).
+        /// </summary>
         private const double target_fc_time = 4 * 60 * 60 * 1000;
 
-        // minimum precision for fc time, though typically will be around 5x more precise
-        // current setting of 0.05 usually takes 2 iterations, gives around 4dp for star ratings
-        private const double target_fc_precision = 0.05;
+        /// <summary>
+        /// Minimum precision for time spent for a player to full combo the map, though typically will be around 5x more precise.
+        /// </summary>
+        private const double target_fc_precision = 0.05; // current setting of 0.05 usually takes 2 iterations, gives around 4dp for star ratings
 
-        // maps with this expected length will match previous star rating
+        /// <summary>
+        /// Maps with this expected length will match legacy difficulty values.
+        /// </summary>
         private const double target_fc_base_time = 30 * 1000;
 
+        /// <summary>
+        /// Multiplier used to preserve star rating for maps with length <see cref="target_fc_base_time"/>
+        /// </summary>
         private double targetFcDifficultyMultiplier => 1 / skillLevel(target_fc_base_time / target_fc_time, 1);
 
-        // size of lists used to interpolate combo SR and miss count SR for performance calc
+        /// <summary>
+        /// Size of lists used to interpolate combo difficulty value and miss count difficulty value for performance calculations.
+        /// </summary>
         private const int difficulty_count = 20;
 
         private double currentStrain = 1; // We keep track of the strain level at all times throughout the beatmap.
@@ -94,6 +119,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             Previous.Push(current);
         }
 
+        /// <summary>
+        /// Apply note duration scaling to the last hit object
+        /// </summary>
         private void scaleLastHitObject(double t = double.PositiveInfinity)
         {
             if (powDifficulties.Count != 0)
@@ -140,7 +168,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
         private double strainDecay(double ms) => Math.Pow(StrainDecayBase, ms / 1000);
 
-        // get skill to fc easiest section with e.g. 5% combo, 10%, 15%, ... 100% combo
+        /// <summary>
+        /// Get skill to fc easiest section with e.g. 5% combo, 10%, 15%, ... 100% combo.
+        /// </summary>
         private void calculateSkillToFcSubsets(double[] difficultyPartialSums)
         {
             ComboStarRatings = new double[difficulty_count];
@@ -165,6 +195,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             }
         }
 
+        /// <summary>
+        /// Calculates skill required to Full Combo the given section of a map in target_fc_time.
+        /// </summary>
         private double getSkillToFcInTargetTime(double[] difficultyPartialSums, int first, int count, double remainder)
         {
             int last = first + count - 1;
@@ -233,6 +266,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             return skill * targetFcDifficultyMultiplier;
         }
 
+        /// <summary>
+        /// Calculate the average time a player with the given skill will take to Full Combo the given section of a map.
+        /// </summary>
         private double getExpectedTimePlayedBeforeFc(double skill, double[] difficultyPartialSums, int first, int count, double remainder = 0)
         {
             int last = first + count - 1;
@@ -267,25 +303,40 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             return length;
         }
 
-        // probability a player of the given skill passes a map of the given difficulty
+        /// <summary>
+        /// The probability a player of the given skill passes a map of the given difficulty
+        /// </summary>
         private double passProbability(double skill, double difficulty) => Math.Exp(-Math.Pow(skill / difficulty, -starBonusK));
 
-        // same as above but pass in skill^-k and difficulty^k
+        /// <summary>
+        /// The probability a player of the given skill passes a map of the given difficulty. Unlike passProbability, this gives an exponential relationship with skill and difficulty.
+        /// </summary>
         private double passProbFromPow(double powSkill, double powDifficulty) => Math.Exp(-powSkill * powDifficulty);
 
-        // inverse of passProbability
+        /// <summary>
+        /// Player skill level that passes a map of the given difficulty with the given probability
+        /// </summary>
         private double skillLevel(double probability, double difficulty) => difficulty * Math.Pow(-Math.Log(probability), -1 / starBonusK);
 
+        /// <summary>
+        /// Convert star rating (calculated from strain) to "difficulty" in the probability formula.
+        /// </summary>
         private double starsToDifficulty(double val)
         {
             return val;
         }
 
+        /// <summary>
+        /// Convert "difficulty" in the probability formula to star rating (calculated from strain).
+        /// </summary>
         private double difficultyToStars(double val)
         {
             return val;
         }
 
+        /// <summary>
+        /// Calculate miss count for a list of star ratings (used to evaluate miss count of plays).
+        /// </summary>
         private void calculateMissStarRating()
         {
             MissCounts = new double[difficulty_count];
@@ -305,6 +356,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             }
         }
 
+        /// <summary>
+        /// Calculate the probability of missing each note given a skill level.
+        /// </summary>
         private double[] getMissProbabilities(double skill)
         {
             // slider breaks should be a miss :(
@@ -321,10 +375,12 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             return result;
         }
 
-        // find first miss count achievable with at least probability p
+        /// <summary>
+        /// Find first miss count achievable with at least probability p
+        /// </summary>
         private int getMissCount(double p, double[] missProbabilities)
         {
-            var distribution = new PoissionBinomial(missProbabilities);
+            var distribution = new PoissonBinomial(missProbabilities);
 
             int missCount = 0;
 
@@ -339,47 +395,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             }
 
             return 10000;
-        }
-
-        // note: NOT poisson OR binomial, it's its own thing
-        private class PoissionBinomial
-        {
-            // approximate poisson binomial CDF defined by miss probabilities
-            // see "Refined Normal Approximation (RNA)" from
-            // https://www.researchgate.net/publication/257017356_On_computing_the_distribution_function_for_the_Poisson_binomial_distribution
-            // In future maybe use an exact method for small map length
-
-            private readonly double mu, sigma, v;
-
-            public PoissionBinomial(IList<double> probabilities)
-            {
-                mu = probabilities.Sum();
-
-                sigma = 0;
-                double gamma = 0;
-
-                foreach (double p in probabilities)
-                {
-                    sigma += p * (1 - p);
-                    gamma += p * (1 - p) * (1 - 2 * p);
-                }
-
-                sigma = Math.Sqrt(sigma);
-
-                v = gamma / (6 * Math.Pow(sigma, 3));
-            }
-
-            public double Cdf(double count)
-            {
-                double k = (count + 0.5 - mu) / sigma;
-
-                double result = Normal.CDF(0, 1, k) + v * (1 - k * k) * Normal.PDF(0, 1, k);
-
-                if (result < 0) return 0;
-                if (result > 1) return 1;
-
-                return result;
-            }
         }
     }
 }
