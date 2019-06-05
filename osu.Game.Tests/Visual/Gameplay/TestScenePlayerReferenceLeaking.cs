@@ -3,7 +3,6 @@
 
 using System;
 using osu.Framework.Lists;
-using osu.Framework.Timing;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets;
 using osu.Game.Screens.Play;
@@ -43,9 +42,9 @@ namespace osu.Game.Tests.Visual.Gameplay
             });
         }
 
-        protected override WorkingBeatmap CreateWorkingBeatmap(IBeatmap beatmap, IFrameBasedClock clock)
+        protected override WorkingBeatmap CreateWorkingBeatmap(IBeatmap beatmap)
         {
-            var working = base.CreateWorkingBeatmap(beatmap, clock);
+            var working = base.CreateWorkingBeatmap(beatmap);
             workingWeakReferences.Add(working);
             return working;
         }
