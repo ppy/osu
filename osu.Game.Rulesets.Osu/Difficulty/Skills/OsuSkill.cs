@@ -33,20 +33,23 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
         /// <summary>
         /// Repeating a section multiplies difficulty by this factor
+        /// Increasing this number increases the impact of map length on SR and decreases the impact of difficulty spikes.
         /// </summary>
-        protected virtual double StarMultiplierPerRepeat => 1.06769273731;
+        protected virtual double StarMultiplierPerRepeat => 1.0677;
 
         private double starBonusK => 1 / Math.Log(StarMultiplierPerRepeat, 2);
 
         /// <summary>
         /// Constant difficulty sections of this length match old difficulty values.
+        /// Decreasing this value increases star rating of all maps equally
         /// </summary>
         protected virtual double StarBonusBaseTime => (8.0 * 1000.0);
 
         /// <summary>
         /// Final star rating is player skill level who can FC the map once per this amount of time (in ms).
+        /// Decrease this number to give longer maps more PP.
         /// </summary>
-        private const double target_fc_time = 4 * 60 * 60 * 1000;
+        private const double target_retry_time_before_fc = 4 * 60 * 60 * 1000;
 
         /// <summary>
         /// Minimum precision for time spent for a player to full combo the map, though typically will be around 5x more precise.
@@ -54,14 +57,15 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         private const double target_fc_precision = 0.05; // current setting of 0.05 usually takes 2 iterations, gives around 4dp for star ratings
 
         /// <summary>
-        /// Maps with this expected length will match legacy difficulty values.
+        /// Maps with this expected length will match legacy PP values.
+        /// Decrease this value to increase PP For all maps equally
         /// </summary>
         private const double target_fc_base_time = 30 * 1000;
 
         /// <summary>
         /// Multiplier used to preserve star rating for maps with length <see cref="target_fc_base_time"/>
         /// </summary>
-        private double targetFcDifficultyMultiplier => 1 / skillLevel(target_fc_base_time / target_fc_time, 1);
+        private double targetFcDifficultyMultiplier => 1 / skillLevel(target_fc_base_time / target_retry_time_before_fc, 1);
 
         /// <summary>
         /// Size of lists used to interpolate combo difficulty value and miss count difficulty value for performance calculations.
@@ -212,15 +216,17 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             }
 
             double difficulty = Math.Pow(difficultyPartialSums[first] - remainder, 1 / starBonusK);
+            double mapLength = timestamps[last] - timestamps[first];
+            double targetFcTime = target_retry_time_before_fc + mapLength;
 
             // hard to calculate skill directly so approximate and iteratively improve. Normally gets to within 1% in 2 iterations
 
             // initial guess of average play length
-            double averageLength = (timestamps[last] - timestamps[first]) * 0.3;
+            double averageLength = mapLength * 0.3;
 
             // fcProb being a member variable is horrible. Want to use fcProb for whole map in miss SR calc
             // the last time this function is called happens to be for the whole map
-            fcProb = averageLength / target_fc_time;
+            fcProb = averageLength / targetFcTime;
 
             // map is super long, these calculations might not even make sense, return skill level to pass with 50% probability
             if (fcProb > 0.9)
@@ -240,29 +246,15 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
                 // x ms per fc, fc with probability p per attempt, so on average x*p ms per attempt
                 averageLength = expectedTimeBeforeFc * passProbability(skill, difficulty);
-                fcProb = averageLength / target_fc_time;
-
-                // map too long
-                if (fcProb > 0.9)
-                {
-                    fcProb = 0.5;
-                    return skillLevel(0.5, difficulty) * targetFcDifficultyMultiplier;
-                }
+                fcProb = averageLength / targetFcTime;
 
                 skill = skillLevel(fcProb, difficulty);
 
-                if (Math.Abs(expectedTimeBeforeFc - target_fc_time) / target_fc_time < target_fc_precision)
+                if (Math.Abs(expectedTimeBeforeFc - targetFcTime) / targetFcTime < target_fc_precision)
                 {
                     // enough precision already
                     break;
                 }
-            }
-
-            if (fcProb > 0.5)
-            {
-                // map is very long, return skill level to pass with 50% probability
-                fcProb = 0.5;
-                return skillLevel(0.5, difficulty) * targetFcDifficultyMultiplier;
             }
 
             return skill * targetFcDifficultyMultiplier;
