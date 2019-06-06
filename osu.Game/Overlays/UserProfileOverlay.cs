@@ -26,7 +26,7 @@ namespace osu.Game.Overlays
         protected ProfileHeader Header;
         private SectionsContainer<ProfileSection> sectionsContainer;
         private ProfileTabControl tabs;
-        private GamemodeControl gamemodeControl;
+        private ProfileRulesetSelector rulesetSelector;
 
         public const float CONTENT_X_MARGIN = 70;
 
@@ -122,7 +122,7 @@ namespace osu.Game.Overlays
 
             sectionsContainer.ScrollToTop();
 
-            Header.Add(gamemodeControl = new GamemodeControl
+            Header.Add(rulesetSelector = new ProfileRulesetSelector
             {
                 Alpha = 0,
                 Anchor = Anchor.TopRight,
@@ -152,10 +152,10 @@ namespace osu.Game.Overlays
                 }
             }
 
-            gamemodeControl.SetDefaultGamemode(user.PlayMode ?? "osu");
-            gamemodeControl.SelectDefaultGamemode();
+            rulesetSelector.SetDefaultGamemode(user.PlayMode ?? "osu");
+            rulesetSelector.SelectDefaultGamemode();
 
-            gamemodeControl.FadeInFromZero(100, Easing.OutQuint);
+            rulesetSelector.FadeInFromZero(100, Easing.OutQuint);
         }
 
         private class ProfileTabControl : PageTabControl<ProfileSection>
