@@ -102,6 +102,9 @@ namespace osu.Game.Skinning
         /// <returns>A <see cref="Skin"/> instance correlating to the provided <see cref="SkinInfo"/>.</returns>
         private Skin getSkin(SkinInfo skinInfo)
         {
+            if (skinInfo == null)
+                return null;
+
             if (skinInfo == SkinInfo.Default)
                 return Default;
 
