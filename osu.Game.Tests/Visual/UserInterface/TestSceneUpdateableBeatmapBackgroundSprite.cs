@@ -41,7 +41,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             TestUpdateableBeatmapBackgroundSprite background = null;
 
             AddStep("load null beatmap", () => Child = background = new TestUpdateableBeatmapBackgroundSprite { RelativeSizeAxes = Axes.Both });
-            AddAssert("no content", () => !background.ContentLoaded);
+            AddUntilStep("content loaded", () => background.ContentLoaded);
         }
 
         [Test]
