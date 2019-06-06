@@ -15,7 +15,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Overlays.Profile.Header.Components
 {
-    public class GamemodeTabItem : TabItem<RulesetInfo>
+    public class RulesetTabItem : TabItem<RulesetInfo>
     {
         private readonly OsuSpriteText text;
         private readonly SpriteIcon icon;
@@ -52,7 +52,7 @@ namespace osu.Game.Overlays.Profile.Header.Components
             }
         }
 
-        public GamemodeTabItem(RulesetInfo value)
+        public RulesetTabItem(RulesetInfo value)
             : base(value)
         {
             AutoSizeAxes = Axes.Both;

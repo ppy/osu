@@ -12,11 +12,11 @@ using osuTK.Graphics;
 
 namespace osu.Game.Overlays.Profile.Header.Components
 {
-    public class GamemodeControl : TabControl<RulesetInfo>
+    public class ProfileRulesetSelector : TabControl<RulesetInfo>
     {
         protected override Dropdown<RulesetInfo> CreateDropdown() => null;
 
-        protected override TabItem<RulesetInfo> CreateTabItem(RulesetInfo value) => new GamemodeTabItem(value)
+        protected override TabItem<RulesetInfo> CreateTabItem(RulesetInfo value) => new RulesetTabItem(value)
         {
             AccentColour = AccentColour
         };
@@ -35,12 +35,12 @@ namespace osu.Game.Overlays.Profile.Header.Components
 
                 foreach (TabItem<RulesetInfo> tabItem in TabContainer)
                 {
-                    ((GamemodeTabItem)tabItem).AccentColour = value;
+                    ((RulesetTabItem)tabItem).AccentColour = value;
                 }
             }
         }
 
-        public GamemodeControl()
+        public ProfileRulesetSelector()
         {
             TabContainer.Masking = false;
             TabContainer.Spacing = new Vector2(10, 0);
@@ -62,7 +62,7 @@ namespace osu.Game.Overlays.Profile.Header.Components
         {
             foreach (TabItem<RulesetInfo> tabItem in TabContainer)
             {
-                ((GamemodeTabItem)tabItem).IsDefault = ((GamemodeTabItem)tabItem).Value.ShortName == gamemode;
+                ((RulesetTabItem)tabItem).IsDefault = ((RulesetTabItem)tabItem).Value.ShortName == gamemode;
             }
         }
 
@@ -70,9 +70,9 @@ namespace osu.Game.Overlays.Profile.Header.Components
         {
             foreach (TabItem<RulesetInfo> tabItem in TabContainer)
             {
-                if (((GamemodeTabItem)tabItem).IsDefault)
+                if (((RulesetTabItem)tabItem).IsDefault)
                 {
-                    Current.Value = ((GamemodeTabItem)tabItem).Value;
+                    Current.Value = ((RulesetTabItem)tabItem).Value;
                     return;
                 }
             }
