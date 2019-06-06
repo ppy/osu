@@ -210,7 +210,8 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
                         Vector2 pos = parts[i].Position;
                         float localTime = parts[i].Time;
 
-                        texture.DrawQuad(
+                        DrawQuad(
+                            texture,
                             new Quad(pos.X - size.X / 2, pos.Y - size.Y / 2, size.X, size.Y),
                             DrawColourInfo.Colour,
                             null,
