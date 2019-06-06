@@ -76,7 +76,7 @@ namespace osu.Game.Overlays
                 },
             };
 
-            sampleBack = audio.Sample.Get(@"UI/generic-select-soft");
+            sampleBack = audio.Samples.Get(@"UI/generic-select-soft");
 
             header.Current.BindTo(Current);
 

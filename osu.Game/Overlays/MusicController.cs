@@ -350,7 +350,7 @@ namespace osu.Game.Overlays
                     direction = last > next ? TransformDirection.Prev : TransformDirection.Next;
                 }
 
-                current.Track.Completed -= currentTrackCompleted;
+                //current.Track.Completed -= currentTrackCompleted;
             }
 
             current = beatmap.NewValue;

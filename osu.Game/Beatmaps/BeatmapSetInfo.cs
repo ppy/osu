@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
@@ -19,6 +20,8 @@ namespace osu.Game.Beatmaps
             get => onlineBeatmapSetID;
             set => onlineBeatmapSetID = value > 0 ? value : null;
         }
+
+        public DateTimeOffset DateAdded { get; set; }
 
         public BeatmapSetOnlineStatus Status { get; set; } = BeatmapSetOnlineStatus.None;
 
