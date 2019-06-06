@@ -66,6 +66,7 @@ namespace osu.Game.Graphics.UserInterface
             set
             {
                 Content.RelativeSizeAxes = Axes.None;
+                Content.AutoSizeAxes = Axes.None;
                 Content.Size = value;
             }
         }

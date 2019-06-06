@@ -2,15 +2,17 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using osu.Game.Database;
 
 namespace osu.Game.Migrations
 {
     [DbContext(typeof(OsuDbContext))]
-    partial class OsuDbContextModelSnapshot : ModelSnapshot
+    [Migration("20190605091246_AddDateAddedColumnToBeatmapSet")]
+    partial class AddDateAddedColumnToBeatmapSet
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -205,16 +207,12 @@ namespace osu.Game.Migrations
 
                     b.Property<int?>("RulesetID");
 
-                    b.Property<int?>("SkinInfoID");
-
                     b.Property<string>("StringValue")
                         .HasColumnName("Value");
 
                     b.Property<int?>("Variant");
 
                     b.HasKey("ID");
-
-                    b.HasIndex("SkinInfoID");
 
                     b.HasIndex("RulesetID", "Variant");
 
@@ -446,13 +444,6 @@ namespace osu.Game.Migrations
                     b.HasOne("osu.Game.Beatmaps.BeatmapMetadata", "Metadata")
                         .WithMany("BeatmapSets")
                         .HasForeignKey("MetadataID");
-                });
-
-            modelBuilder.Entity("osu.Game.Configuration.DatabasedSetting", b =>
-                {
-                    b.HasOne("osu.Game.Skinning.SkinInfo")
-                        .WithMany("Settings")
-                        .HasForeignKey("SkinInfoID");
                 });
 
             modelBuilder.Entity("osu.Game.Scoring.ScoreFileInfo", b =>
