@@ -84,7 +84,6 @@ namespace osu.Game.Tests.Visual.UserInterface
             testLocalCursor();
             testUserCursorOverride();
             testMultipleLocalCursors();
-            ReturnUserInput();
         }
 
         /// <summary>
