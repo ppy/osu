@@ -7,6 +7,7 @@ using System.Linq;
 using System.Threading;
 using NUnit.Framework;
 using osu.Framework.Allocation;
+using osu.Framework.Audio;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Input.Events;
@@ -54,7 +55,7 @@ namespace osu.Game.Tests.Visual.Background
         private RulesetStore rulesets;
 
         [BackgroundDependencyLoader]
-        private void load(GameHost host)
+        private void load(GameHost host, AudioManager audio)
         {
             factory = new DatabaseContextFactory(LocalStorage);
             factory.ResetDatabase();
@@ -68,7 +69,7 @@ namespace osu.Game.Tests.Visual.Background
                 usage.Migrate();
 
             Dependencies.Cache(rulesets = new RulesetStore(factory));
-            Dependencies.Cache(manager = new BeatmapManager(LocalStorage, factory, rulesets, null, null, host, Beatmap.Default));
+            Dependencies.Cache(manager = new BeatmapManager(LocalStorage, factory, rulesets, null, audio, host, Beatmap.Default));
             Dependencies.Cache(new OsuConfigManager(LocalStorage));
 
             manager.Import(TestResources.GetTestBeatmapForImport());

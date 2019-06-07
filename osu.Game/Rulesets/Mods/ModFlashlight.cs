@@ -179,7 +179,7 @@ namespace osu.Game.Rulesets.Mods
                     shader.GetUniform<Vector2>("flashlightSize").UpdateValue(ref flashlightSize);
                     shader.GetUniform<float>("flashlightDim").UpdateValue(ref flashlightDim);
 
-                    Texture.WhitePixel.DrawQuad(screenSpaceDrawQuad, DrawColourInfo.Colour, vertexAction: vertexAction);
+                    DrawQuad(Texture.WhitePixel, screenSpaceDrawQuad, DrawColourInfo.Colour, vertexAction: vertexAction);
 
                     shader.Unbind();
                 }
