@@ -4,11 +4,8 @@
 using NUnit.Framework;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
-using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Sprites;
-using osu.Game.Graphics;
+using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics.Containers;
-using osu.Game.Graphics.Sprites;
 using osuTK;
 using osuTK.Graphics;
 
@@ -18,8 +15,7 @@ namespace osu.Game.Tests.Visual.UserInterface
     public class TestSceneOsuHoverContainer : ManualInputManagerTestScene
     {
         private OsuHoverTestContainer hoverContainer;
-        private OsuSpriteText textContainer;
-        private ColourInfo currentColour => textContainer.DrawColourInfo.Colour;
+        private Box colourContainer;
 
         [SetUp]
         public void SetUp() => Schedule(() =>
@@ -28,19 +24,11 @@ namespace osu.Game.Tests.Visual.UserInterface
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
-                AutoSizeAxes = Axes.Both,
-                Child = new FillFlowContainer<SpriteText>
+                Size = new Vector2(100),
+                Child = colourContainer = new Box
                 {
-                    AutoSizeAxes = Axes.Both,
-                    Children = new[]
-                    {
-                        textContainer = new OsuSpriteText
-                        {
-                            Text = "Test",
-                            Font = OsuFont.GetFont(weight: FontWeight.Medium, size: 20),
-                        },
-                    }
-                }
+                    RelativeSizeAxes = Axes.Both,
+                },
             };
         });
 
@@ -191,6 +179,8 @@ namespace osu.Game.Tests.Visual.UserInterface
 
         private void waitUntilColourIs(ColourInfo expectedColour)
             => AddUntilStep($"Wait until hover colour is {expectedColour}", () => currentColour.Equals(expectedColour));
+
+        private ColourInfo currentColour => colourContainer.DrawColourInfo.Colour;
 
         /// <summary>
         ///     Moves the cursor to top left corner of the screen
