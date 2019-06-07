@@ -69,34 +69,69 @@ namespace osu.Game.Overlays.Changelog
                         Margin = new MarginPadding { Vertical = 5 },
                     };
 
+                    var entryColor = entry.Major != null && (bool)entry.Major ? OsuColour.FromHex("#fd5") : Color4.White;
+
                     title.AddIcon(FontAwesome.Solid.Check, t =>
                     {
                         t.Font = fontSmall;
+                        t.Colour = entryColor;
                         t.Padding = new MarginPadding { Left = -17, Right = 5 };
                     });
 
-                    title.AddText(entry.Title, t => { t.Font = fontLarge; });
+                    title.AddText(entry.Title, t =>
+                    {
+                        t.Font = fontLarge;
+                        t.Colour = entryColor;
+                    });
 
                     if (!string.IsNullOrEmpty(entry.Repository))
                     {
-                        title.AddText(" (", t => t.Font = fontLarge);
+                        title.AddText(" (", t =>
+                        {
+                            t.Font = fontLarge;
+                            t.Colour = entryColor;
+                        });
                         title.AddLink($"{entry.Repository.Replace("ppy/", "")}#{entry.GithubPullRequestId}", entry.GithubUrl, Online.Chat.LinkAction.External,
-                            creationParameters: t => { t.Font = fontLarge; });
-                        title.AddText(")", t => t.Font = fontLarge);
+                            creationParameters: t =>
+                            {
+                                t.Font = fontLarge;
+                                t.Colour = entryColor;
+                            });
+                        title.AddText(")", t =>
+                        {
+                            t.Font = fontLarge;
+                            t.Colour = entryColor;
+                        });
                     }
 
-                    title.AddText(" by ", t => t.Font = fontMedium);
+                    title.AddText(" by ", t =>
+                    {
+                        t.Font = fontMedium;
+                        t.Colour = entryColor;
+                    });
 
                     if (entry.GithubUser.UserId != null)
                         title.AddUserLink(new User
                         {
                             Username = entry.GithubUser.OsuUsername,
                             Id = entry.GithubUser.UserId.Value
-                        }, t => t.Font = fontMedium);
+                        }, t =>
+                        {
+                            t.Font = fontMedium;
+                            t.Colour = entryColor;
+                        });
                     else if (entry.GithubUser.GithubUrl != null)
-                        title.AddLink(entry.GithubUser.DisplayName, entry.GithubUser.GithubUrl, Online.Chat.LinkAction.External, null, null, t => t.Font = fontMedium);
+                        title.AddLink(entry.GithubUser.DisplayName, entry.GithubUser.GithubUrl, Online.Chat.LinkAction.External, null, null, t =>
+                        {
+                            t.Font = fontMedium;
+                            t.Colour = entryColor;
+                        });
                     else
-                        title.AddText(entry.GithubUser.DisplayName, t => t.Font = fontSmall);
+                        title.AddText(entry.GithubUser.DisplayName, t =>
+                        {
+                            t.Font = fontSmall;
+                            t.Colour = entryColor;
+                        });
 
                     ChangelogEntries.Add(title);
 
