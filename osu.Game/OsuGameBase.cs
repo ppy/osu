@@ -161,7 +161,7 @@ namespace osu.Game
 
             dependencies.CacheAs<IAPIProvider>(API);
 
-            var defaultBeatmap = new DummyWorkingBeatmap(this);
+            var defaultBeatmap = new DummyWorkingBeatmap(Audio, Textures);
 
             dependencies.Cache(RulesetStore = new RulesetStore(contextFactory));
             dependencies.Cache(FileStore = new FileStore(contextFactory, Host.Storage));
@@ -193,9 +193,9 @@ namespace osu.Game
 
             // tracks play so loud our samples can't keep up.
             // this adds a global reduction of track volume for the time being.
-            Audio.Track.AddAdjustment(AdjustableProperty.Volume, new BindableDouble(0.8));
+            Audio.Tracks.AddAdjustment(AdjustableProperty.Volume, new BindableDouble(0.8));
 
-            beatmap = new OsuBindableBeatmap(defaultBeatmap, Audio);
+            beatmap = new OsuBindableBeatmap(defaultBeatmap);
 
             dependencies.CacheAs<IBindable<WorkingBeatmap>>(beatmap);
             dependencies.CacheAs(beatmap);
@@ -281,22 +281,9 @@ namespace osu.Game
 
         private class OsuBindableBeatmap : BindableBeatmap
         {
-            public OsuBindableBeatmap(WorkingBeatmap defaultValue, AudioManager audioManager)
-                : this(defaultValue)
-            {
-                RegisterAudioManager(audioManager);
-            }
-
             public OsuBindableBeatmap(WorkingBeatmap defaultValue)
                 : base(defaultValue)
             {
-            }
-
-            public override BindableBeatmap GetBoundCopy()
-            {
-                var copy = new OsuBindableBeatmap(Default);
-                copy.BindTo(this);
-                return copy;
             }
         }
 

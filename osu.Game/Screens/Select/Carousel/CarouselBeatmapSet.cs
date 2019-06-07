@@ -45,6 +45,9 @@ namespace osu.Game.Screens.Select.Carousel
                 case SortMode.Author:
                     return string.Compare(BeatmapSet.Metadata.Author.Username, otherSet.BeatmapSet.Metadata.Author.Username, StringComparison.InvariantCultureIgnoreCase);
 
+                case SortMode.DateAdded:
+                    return otherSet.BeatmapSet.DateAdded.CompareTo(BeatmapSet.DateAdded);
+
                 case SortMode.Difficulty:
                     return BeatmapSet.MaxStarDifficulty.CompareTo(otherSet.BeatmapSet.MaxStarDifficulty);
             }
