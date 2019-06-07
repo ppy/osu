@@ -10,6 +10,8 @@ This project is still heavily under development, but is in a state where users a
 
 We are accepting bug reports (please report with as much detail as possible). Feature requests are welcome as long as you read and understand the contribution guidelines listed below.
 
+Detailed changelogs are published on the [official osu! site](https://osu.ppy.sh/home/changelog).
+
 ## Requirements
 
 - A desktop platform with the [.NET Core SDK 2.2](https://www.microsoft.com/net/learn/get-started) or higher installed.
@@ -20,17 +22,24 @@ We are accepting bug reports (please report with as much detail as possible). Fe
 
 ### Releases
 
-If you are not interested in developing the game, please head over to the [releases](https://github.com/ppy/osu/releases) to download a precompiled build with automatic updating enabled.
+![](https://puu.sh/DCmvA/f6a74f5fbb.png)
 
-- Windows (x64) users should download and run `install.exe`.
-- macOS users (10.12 "Sierra" and higher) should download and run `osu.app.zip`.
-- iOS users can join the [TestFlight beta program](https://t.co/xQJmHkfC18).
+If you are not interested in developing the game, you can consume our [binary releases](https://github.com/ppy/osu/releases).
+
+**Latest build:***
+
+| [Windows (x64)](https://github.com/ppy/osu/releases/latest/download/install.exe)  | [macOS 10.12+](https://github.com/ppy/osu/releases/latest/download/osu.app.zip) |
+| ------------- | ------------- |
+
+- **Linux** users are recommended to self-compile until we have official deployment in place.
+- **iOS** users can join the [TestFlight beta program](https://t.co/xQJmHkfC18) (note that due to high demand this is reulgarly full).
+- **Android** users can self-compile, and expect a public beta soon.
 
 If your platform is not listed above, there is still a chance you can manually build it by following the instructions below.
 
 ### Downloading the source code
 
-Clone the repository **including submodules**:
+Clone the repository:
 
 ```shell
 git clone https://github.com/ppy/osu
@@ -45,7 +54,7 @@ git pull
 
 ### Building
 
-Build configurations for the recommended IDEs (listed above) are included. You should use the provided Build/Run functionality of your IDE to get things going. When testing or building new components, it's highly encouraged you use the `VisualTests` project/configuration. More information on this provided below.
+Build configurations for the recommended IDEs (listed above) are included. You should use the provided Build/Run functionality of your IDE to get things going. When testing or building new components, it's highly encouraged you use the `VisualTests` project/configuration. More information on this provided [below](#contributing).
 
 > Visual Studio Code users must run the `Restore` task before any build attempt.
 
