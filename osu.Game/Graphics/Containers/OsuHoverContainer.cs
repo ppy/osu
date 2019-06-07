@@ -24,11 +24,13 @@ namespace osu.Game.Graphics.Containers
         {
             Enabled.ValueChanged += e =>
             {
-                if (e.NewValue && isHovered)
-                    fadeIn();
-
-                if (!e.NewValue)
-                    unhover();
+                if (isHovered)
+                {
+                    if (e.NewValue)
+                        fadeIn();
+                    else
+                        fadeOut();
+                }
             };
         }
 
@@ -36,6 +38,9 @@ namespace osu.Game.Graphics.Containers
 
         protected override bool OnHover(HoverEvent e)
         {
+            if (isHovered)
+                return false;
+
             isHovered = true;
 
             if (!Enabled.Value)
@@ -48,17 +53,13 @@ namespace osu.Game.Graphics.Containers
 
         protected override void OnHoverLost(HoverLostEvent e)
         {
-            unhover();
-            base.OnHoverLost(e);
-        }
-
-        private void unhover()
-        {
             if (!isHovered)
                 return;
 
             isHovered = false;
-            EffectTargets.ForEach(d => d.FadeColour(IdleColour, FADE_DURATION, Easing.OutQuint));
+            fadeOut();
+
+            base.OnHoverLost(e);
         }
 
         [BackgroundDependencyLoader]
@@ -77,6 +78,11 @@ namespace osu.Game.Graphics.Containers
         private void fadeIn()
         {
             EffectTargets.ForEach(d => d.FadeColour(HoverColour, FADE_DURATION, Easing.OutQuint));
+        }
+
+        private void fadeOut()
+        {
+            EffectTargets.ForEach(d => d.FadeColour(IdleColour, FADE_DURATION, Easing.OutQuint));
         }
     }
 }
