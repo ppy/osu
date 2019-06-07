@@ -94,14 +94,6 @@ namespace osu.Game.Tests.Visual
             });
         }
 
-        /// <summary>
-        /// Returns input back to the user.
-        /// </summary>
-        protected void ReturnUserInput()
-        {
-            AddStep("Return user input", returnUserInput);
-        }
-
         protected override void Update()
         {
             base.Update();
