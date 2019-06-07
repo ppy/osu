@@ -376,7 +376,7 @@ namespace osu.Game.Overlays.Mods
                                             DeselectAllButton = new TriangleButton
                                             {
                                                 Width = 180,
-                                                Text = "1. Deselect All",
+                                                Text = "Deselect All",
                                                 Action = DeselectAll,
                                                 Margin = new MarginPadding
                                                 {
@@ -386,7 +386,7 @@ namespace osu.Game.Overlays.Mods
                                             CloseButton = new TriangleButton
                                             {
                                                 Width = 180,
-                                                Text = "2. Close",
+                                                Text = "Close",
                                                 Action = Hide,
                                                 Margin = new MarginPadding
                                                 {
