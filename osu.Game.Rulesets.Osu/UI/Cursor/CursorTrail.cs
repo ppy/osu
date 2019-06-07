@@ -54,7 +54,8 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
 
             for (int i = 0; i < max_sprites; i++)
             {
-                // InvalidationID 1 forces an update of each part of the cursor trail the first time ApplyState is ran on the draw node
+                // InvalidationID 1 forces an update of each part of the cursor trail the first time ApplyState is run on the draw node
+                // This is to prevent garbage data from being sent to the vertex shader, resulting in visual issues on some platforms
                 parts[i].InvalidationID = 1;
                 parts[i].WasUpdated = true;
             }
