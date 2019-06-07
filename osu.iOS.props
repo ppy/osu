@@ -105,8 +105,8 @@
     <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite.Core" Version="2.2.1" />
     <PackageReference Include="Newtonsoft.Json" Version="12.0.1" />
     <PackageReference Include="ppy.osu.Game.Resources" Version="2019.128.0" />
-    <PackageReference Include="ppy.osu.Framework" Version="2019.523.0" />
-    <PackageReference Include="ppy.osu.Framework.iOS" Version="2019.523.0" />
+    <PackageReference Include="ppy.osu.Framework" Version="2019.606.1" />
+    <PackageReference Include="ppy.osu.Framework.iOS" Version="2019.606.1" />
     <PackageReference Include="SharpCompress" Version="0.22.0" />
     <PackageReference Include="NUnit" Version="3.11.0" />
     <PackageReference Include="SharpRaven" Version="2.4.0" />
