@@ -20,18 +20,9 @@ namespace osu.Game.Tests.Visual.UserInterface
         private OsuHoverTestContainer hoverContainer;
         private OsuSpriteText textContainer;
         private ColourInfo currentColour => textContainer.DrawColourInfo.Colour;
-        private ColourInfo idleColour => hoverContainer.IdleColourPublic;
-        private ColourInfo hoverColour => hoverContainer.HoverColourPublic;
-
-        public TestSceneOsuHoverContainer()
-        {
-            setupUI();
-        }
 
         [SetUp]
-        public void TestSceneOsuHoverContainer_SetUp() => Schedule(() => setupUI());
-
-        private void setupUI()
+        public void SetUp() => Schedule(() =>
         {
             Child = hoverContainer = new OsuHoverTestContainer
             {
@@ -51,12 +42,12 @@ namespace osu.Game.Tests.Visual.UserInterface
                     }
                 }
             };
-        }
+        });
 
         [Description("Checks IsHovered property value on a container when it is hovered/unhovered.")]
         [TestCase(true, TestName = "Enabled_Check_IsHovered")]
         [TestCase(false, TestName = "Disabled_Check_IsHovered")]
-        public void Check_IsHovered_HasProperValue(bool isEnabled)
+        public void TestIsHoveredHasProperValue(bool isEnabled)
         {
             moveOut();
             setContainerEnabledTo(isEnabled);
@@ -80,101 +71,101 @@ namespace osu.Game.Tests.Visual.UserInterface
 
         [Test]
         [Description("Checks colour fading on an enabled container when it is hovered/unhovered.")]
-        public void WhenEnabled_Fades()
+        public void TestTransitionWhileEnabled()
         {
             moveOut();
             enableContainer();
 
-            checkColour(idleColour);
+            checkColour(OsuHoverTestContainer.IDLE_COLOUR);
 
             moveToText();
-            waitUntilColourIs(hoverColour);
+            waitUntilColourIs(OsuHoverTestContainer.HOVER_COLOUR);
 
             moveOut();
-            waitUntilColourIs(idleColour);
+            waitUntilColourIs(OsuHoverTestContainer.IDLE_COLOUR);
 
             moveToText();
-            waitUntilColourIs(hoverColour);
+            waitUntilColourIs(OsuHoverTestContainer.HOVER_COLOUR);
 
             moveOut();
-            waitUntilColourIs(idleColour);
+            waitUntilColourIs(OsuHoverTestContainer.IDLE_COLOUR);
 
             ReturnUserInput();
         }
 
         [Test]
         [Description("Checks colour fading on a disabled container when it is hovered/unhovered.")]
-        public void WhenDisabled_DoesNotFade()
+        public void TestNoTransitionWhileDisabled()
         {
             moveOut();
             disableContainer();
 
-            checkColour(idleColour);
+            checkColour(OsuHoverTestContainer.IDLE_COLOUR);
 
             moveToText();
-            checkColour(idleColour);
+            checkColour(OsuHoverTestContainer.IDLE_COLOUR);
 
             moveOut();
-            checkColour(idleColour);
+            checkColour(OsuHoverTestContainer.IDLE_COLOUR);
 
             moveToText();
-            checkColour(idleColour);
+            checkColour(OsuHoverTestContainer.IDLE_COLOUR);
 
             moveOut();
-            checkColour(idleColour);
+            checkColour(OsuHoverTestContainer.IDLE_COLOUR);
 
             ReturnUserInput();
         }
 
         [Test]
         [Description("Checks that when a disabled & hovered container gets enabled, colour fading happens")]
-        public void WhileHovering_WhenGetsEnabled_Fades()
+        public void TestBecomesEnabledTransition()
         {
             moveOut();
             disableContainer();
-            checkColour(idleColour);
+            checkColour(OsuHoverTestContainer.IDLE_COLOUR);
 
             moveToText();
-            checkColour(idleColour);
+            checkColour(OsuHoverTestContainer.IDLE_COLOUR);
 
             enableContainer();
-            waitUntilColourIs(hoverColour);
+            waitUntilColourIs(OsuHoverTestContainer.HOVER_COLOUR);
         }
 
         [Test]
         [Description("Checks that when an enabled & hovered container gets disabled, colour fading happens")]
-        public void WhileHovering_WhenGetsDisabled_Fades()
+        public void TestBecomesDisabledTransition()
         {
             moveOut();
             enableContainer();
-            checkColour(idleColour);
+            checkColour(OsuHoverTestContainer.IDLE_COLOUR);
 
             moveToText();
-            waitUntilColourIs(hoverColour);
+            waitUntilColourIs(OsuHoverTestContainer.HOVER_COLOUR);
 
             disableContainer();
-            waitUntilColourIs(idleColour);
+            waitUntilColourIs(OsuHoverTestContainer.IDLE_COLOUR);
         }
 
         [Test]
         [Description("Checks that when a hovered container gets enabled and disabled multiple times, colour fading happens")]
-        public void WhileHovering_WhenEnabledChangesMultipleTimes_Fades()
+        public void TestDisabledChangesMultipleTimes()
         {
             moveOut();
             enableContainer();
-            checkColour(idleColour);
+            checkColour(OsuHoverTestContainer.IDLE_COLOUR);
 
             moveToText();
-            waitUntilColourIs(hoverColour);
+            waitUntilColourIs(OsuHoverTestContainer.HOVER_COLOUR);
 
             disableContainer();
-            waitUntilColourIs(idleColour);
+            waitUntilColourIs(OsuHoverTestContainer.IDLE_COLOUR);
 
             enableContainer();
-            waitUntilColourIs(hoverColour);
+            waitUntilColourIs(OsuHoverTestContainer.HOVER_COLOUR);
 
             disableContainer();
-            waitUntilColourIs(idleColour);
+            waitUntilColourIs(OsuHoverTestContainer.IDLE_COLOUR);
         }
 
         private void enableContainer() => setContainerEnabledTo(true);
@@ -209,8 +200,14 @@ namespace osu.Game.Tests.Visual.UserInterface
 
         private sealed class OsuHoverTestContainer : OsuHoverContainer
         {
-            public Color4 HoverColourPublic => HoverColour;
-            public Color4 IdleColourPublic => IdleColour;
+            public static readonly Color4 HOVER_COLOUR = Color4.Red;
+            public static readonly Color4 IDLE_COLOUR = Color4.Green;
+
+            public OsuHoverTestContainer()
+            {
+                HoverColour = HOVER_COLOUR;
+                IdleColour = IDLE_COLOUR;
+            }
         }
     }
 }
