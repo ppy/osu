@@ -22,6 +22,7 @@ namespace osu.Game.Tests.Visual.UserInterface
         {
             Child = hoverContainer = new OsuHoverTestContainer
             {
+                Enabled = { Value = true },
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
                 Size = new Vector2(100),
@@ -30,6 +31,8 @@ namespace osu.Game.Tests.Visual.UserInterface
                     RelativeSizeAxes = Axes.Both,
                 },
             };
+
+            doMoveOut();
         });
 
         [Description("Checks IsHovered property value on a container when it is hovered/unhovered.")]
@@ -37,7 +40,6 @@ namespace osu.Game.Tests.Visual.UserInterface
         [TestCase(false, TestName = "Disabled_Check_IsHovered")]
         public void TestIsHoveredHasProperValue(bool isEnabled)
         {
-            moveOut();
             setContainerEnabledTo(isEnabled);
 
             checkNotHovered();
@@ -61,7 +63,6 @@ namespace osu.Game.Tests.Visual.UserInterface
         [Description("Checks colour fading on an enabled container when it is hovered/unhovered.")]
         public void TestTransitionWhileEnabled()
         {
-            moveOut();
             enableContainer();
 
             checkColour(OsuHoverTestContainer.IDLE_COLOUR);
@@ -85,7 +86,6 @@ namespace osu.Game.Tests.Visual.UserInterface
         [Description("Checks colour fading on a disabled container when it is hovered/unhovered.")]
         public void TestNoTransitionWhileDisabled()
         {
-            moveOut();
             disableContainer();
 
             checkColour(OsuHoverTestContainer.IDLE_COLOUR);
@@ -109,7 +109,6 @@ namespace osu.Game.Tests.Visual.UserInterface
         [Description("Checks that when a disabled & hovered container gets enabled, colour fading happens")]
         public void TestBecomesEnabledTransition()
         {
-            moveOut();
             disableContainer();
             checkColour(OsuHoverTestContainer.IDLE_COLOUR);
 
@@ -124,7 +123,6 @@ namespace osu.Game.Tests.Visual.UserInterface
         [Description("Checks that when an enabled & hovered container gets disabled, colour fading happens")]
         public void TestBecomesDisabledTransition()
         {
-            moveOut();
             enableContainer();
             checkColour(OsuHoverTestContainer.IDLE_COLOUR);
 
@@ -139,7 +137,6 @@ namespace osu.Game.Tests.Visual.UserInterface
         [Description("Checks that when a hovered container gets enabled and disabled multiple times, colour fading happens")]
         public void TestDisabledChangesMultipleTimes()
         {
-            moveOut();
             enableContainer();
             checkColour(OsuHoverTestContainer.IDLE_COLOUR);
 
