@@ -55,8 +55,6 @@ namespace osu.Game.Tests.Visual.UserInterface
 
             moveOut();
             checkNotHovered();
-
-            ReturnUserInput();
         }
 
         [Test]
@@ -78,8 +76,6 @@ namespace osu.Game.Tests.Visual.UserInterface
 
             moveOut();
             waitUntilColourIs(OsuHoverTestContainer.IDLE_COLOUR);
-
-            ReturnUserInput();
         }
 
         [Test]
@@ -101,8 +97,6 @@ namespace osu.Game.Tests.Visual.UserInterface
 
             moveOut();
             checkColour(OsuHoverTestContainer.IDLE_COLOUR);
-
-            ReturnUserInput();
         }
 
         [Test]
