@@ -2,13 +2,10 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
-using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Lines;
-using osu.Framework.Graphics.Primitives;
 using osuTK;
 using osuTK.Graphics;
-using osuTK.Graphics.ES30;
 
 namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
 {
@@ -18,8 +15,6 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
 
         private readonly SliderPath path;
         protected Path Path => path;
-
-        private readonly BufferedContainer container;
 
         public float PathRadius
         {
@@ -44,8 +39,6 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
                     return;
 
                 path.AccentColour = value;
-
-                container.ForceRedraw();
             }
         }
 
@@ -61,8 +54,6 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
                     return;
 
                 path.BorderColour = value;
-
-                container.ForceRedraw();
             }
         }
 
@@ -78,23 +69,12 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
                     return;
 
                 path.BorderSize = value;
-
-                container.ForceRedraw();
             }
         }
 
-        public Quad PathDrawQuad => container.ScreenSpaceDrawQuad;
-
         protected SliderBody()
         {
-            InternalChild = container = new BufferedContainer
-            {
-                RelativeSizeAxes = Axes.Both,
-                CacheDrawnFrameBuffer = true,
-                Child = path = new SliderPath { Blending = BlendingMode.None }
-            };
-
-            container.Attach(RenderbufferInternalFormat.DepthComponent16);
+            InternalChild = path = new SliderPath();
         }
 
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => path.ReceivePositionalInputAt(screenSpacePos);
@@ -103,11 +83,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
         /// Sets the vertices of the path which should be drawn by this <see cref="SliderBody"/>.
         /// </summary>
         /// <param name="vertices">The vertices</param>
-        protected void SetVertices(IReadOnlyList<Vector2> vertices)
-        {
-            path.Vertices = vertices;
-            container.ForceRedraw();
-        }
+        protected void SetVertices(IReadOnlyList<Vector2> vertices) => path.Vertices = vertices;
 
         private class SliderPath : SmoothPath
         {
