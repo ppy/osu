@@ -197,10 +197,16 @@ namespace osu.Game.Overlays.Mods
 
         protected override bool OnKeyDown(KeyDownEvent e)
         {
-            if (e.Key == Key.Number1)
-                DeselectAllButton.Click();
-            else if (e.Key == Key.Number2)
-                CloseButton.Click();
+            switch (e.Key)
+            {
+                case Key.Number1:
+                    DeselectAllButton.Click();
+                    return true;
+
+                case Key.Number2:
+                    CloseButton.Click();
+                    return true;
+            }
 
             return base.OnKeyDown(e);
         }
