@@ -263,16 +263,21 @@ namespace osu.Game.Rulesets.Objects.Drawables
             return judgementOccurred;
         }
 
+        private bool objectFailed = false;
         private const float failDuration = 2500;
 
         /// <summary>
-        /// Applies the failing animation on the object
+        /// Applies the failing animation on this <see cref="DrawableHitObject"\>
         /// </summary>
         internal void Fail()
         {
+            if (objectFailed)
+                return;
+
             this.RotateTo(RNG.NextSingle(-90, 90), failDuration);
             this.ScaleTo(Scale * 0.5f, failDuration);
             this.MoveToOffset(new Vector2(0, 400), failDuration);
+            objectFailed = true;
         }
 
         /// <summary>
