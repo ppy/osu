@@ -9,7 +9,6 @@ using osu.Framework.Bindables;
 using osu.Framework.Extensions.TypeExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Primitives;
-using osu.Framework.Graphics.Transforms;
 using osu.Framework.MathUtils;
 using osu.Game.Audio;
 using osu.Game.Graphics;
@@ -92,9 +91,14 @@ namespace osu.Game.Rulesets.Objects.Drawables
 
         public readonly Bindable<ArmedState> State = new Bindable<ArmedState>();
 
+        private bool objectFailed;
+        
+        private const float fail_duration = 2500;
+
         protected DrawableHitObject(HitObject hitObject)
         {
             HitObject = hitObject;
+            objectFailed = false;
         }
 
         [BackgroundDependencyLoader]
@@ -263,20 +267,17 @@ namespace osu.Game.Rulesets.Objects.Drawables
             return judgementOccurred;
         }
 
-        private bool objectFailed = false;
-        private const float failDuration = 2500;
-
         /// <summary>
-        /// Applies the failing animation on this <see cref="DrawableHitObject"\>
+        /// Applies the failing animation on this <see cref="DrawableHitObject"/>.
         /// </summary>
-        internal void Fail()
+        public void Fail()
         {
             if (objectFailed)
                 return;
 
-            this.RotateTo(RNG.NextSingle(-90, 90), failDuration);
-            this.ScaleTo(Scale * 0.5f, failDuration);
-            this.MoveToOffset(new Vector2(0, 400), failDuration);
+            this.RotateTo(RNG.NextSingle(-90, 90), fail_duration);
+            this.ScaleTo(Scale * 0.5f, fail_duration);
+            this.MoveToOffset(new Vector2(0, 400), fail_duration);
             objectFailed = true;
         }
 
