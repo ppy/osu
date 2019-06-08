@@ -74,7 +74,7 @@ namespace osu.Game.Overlays.Changelog
                         Margin = new MarginPadding { Vertical = 5 },
                     };
 
-                    var entryColour = entry.Major != null && (bool)entry.Major ? colours.YellowLight : Color4.White;
+                    var entryColour = entry.Major ? colours.YellowLight : Color4.White;
 
                     title.AddIcon(FontAwesome.Solid.Check, t =>
                     {
