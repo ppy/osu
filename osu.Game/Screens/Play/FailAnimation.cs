@@ -85,23 +85,13 @@ namespace osu.Game.Screens.Play
             applyToPlayfield(drawableRuleset.Playfield);
         }
 
-        private readonly List<DrawableHitObject> appliedObjects = new List<DrawableHitObject>();
-
         private void applyToPlayfield(Playfield playfield)
         {
             foreach (var nested in playfield.NestedPlayfields)
                 applyToPlayfield(nested);
 
             foreach (DrawableHitObject obj in playfield.HitObjectContainer.AliveObjects)
-            {
-                if (appliedObjects.Contains(obj))
-                    continue;
-
-                obj.RotateTo(RNG.NextSingle(-90, 90), duration);
-                obj.ScaleTo(obj.Scale * 0.5f, duration);
-                obj.MoveToOffset(new Vector2(0, 400), duration);
-                appliedObjects.Add(obj);
-            }
+                obj.Fail();
         }
 
         protected override void Dispose(bool isDisposing)
