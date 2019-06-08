@@ -1,4 +1,4 @@
-﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
@@ -9,12 +9,15 @@ using osu.Framework.Bindables;
 using osu.Framework.Extensions.TypeExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Primitives;
+using osu.Framework.Graphics.Transforms;
+using osu.Framework.MathUtils;
 using osu.Game.Audio;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Skinning;
+using osuTK;
 using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Objects.Drawables
@@ -258,6 +261,18 @@ namespace osu.Game.Rulesets.Objects.Drawables
             CheckForResult(userTriggered, Time.Current - endTime);
 
             return judgementOccurred;
+        }
+
+        private const float failDuration = 2500;
+
+        /// <summary>
+        /// Applies the failing animation on the object
+        /// </summary>
+        internal void Fail()
+        {
+            this.RotateTo(RNG.NextSingle(-90, 90), failDuration);
+            this.ScaleTo(Scale * 0.5f, failDuration);
+            this.MoveToOffset(new Vector2(0, 400), failDuration);
         }
 
         /// <summary>
