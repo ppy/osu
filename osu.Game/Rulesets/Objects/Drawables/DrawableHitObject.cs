@@ -92,7 +92,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
         public readonly Bindable<ArmedState> State = new Bindable<ArmedState>();
 
         private bool objectFailed;
-        
+
         private const float fail_duration = 2500;
 
         protected DrawableHitObject(HitObject hitObject)
