@@ -69,7 +69,7 @@ namespace osu.Game.Screens.Play
             });
 
             track.AddAdjustment(AdjustableProperty.Frequency, trackFreq);
-            
+
             drawableRuleset.Playfield.DisplayJudgements.Value = false;
 
             applyToPlayfield(drawableRuleset.Playfield);
