@@ -2,57 +2,68 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Graphics.Effects;
+using osu.Framework.Graphics.UserInterface;
 using osu.Game.Rulesets;
 using osuTK.Graphics;
+using osu.Framework.Graphics;
 
 namespace osu.Game.Overlays.Toolbar
 {
-    public class ToolbarRulesetButton : ToolbarButton
+    public class ToolbarRulesetButton : TabItem<RulesetInfo>
     {
-        private RulesetInfo ruleset;
+        private readonly DrawableRuleset ruleset;
 
-        public RulesetInfo Ruleset
+        public ToolbarRulesetButton(RulesetInfo value)
+            : base(value)
         {
-            get => ruleset;
-            set
+            AutoSizeAxes = Axes.X;
+            RelativeSizeAxes = Axes.Y;
+            Child = ruleset = new DrawableRuleset
             {
-                ruleset = value;
+                Active = false,
+            };
 
-                var rInstance = ruleset.CreateInstance();
+            var rInstance = value.CreateInstance();
 
-                TooltipMain = rInstance.Description;
-                TooltipSub = $"Play some {rInstance.Description}";
-                SetIcon(rInstance.CreateIcon());
-            }
+            ruleset.TooltipMain = rInstance.Description;
+            ruleset.TooltipSub = $"Play some {rInstance.Description}";
+            ruleset.SetIcon(rInstance.CreateIcon());
         }
 
-        public bool Active
+        protected override void OnActivated() => ruleset.Active = true;
+
+        protected override void OnDeactivated() => ruleset.Active = false;
+
+        private class DrawableRuleset : ToolbarButton
         {
-            set
+            public bool Active
             {
-                if (value)
+                set
                 {
-                    IconContainer.Colour = Color4.White;
-                    IconContainer.EdgeEffect = new EdgeEffectParameters
+                    if (value)
                     {
-                        Type = EdgeEffectType.Glow,
-                        Colour = new Color4(255, 194, 224, 100),
-                        Radius = 15,
-                        Roundness = 15,
-                    };
-                }
-                else
-                {
-                    IconContainer.Colour = new Color4(255, 194, 224, 255);
-                    IconContainer.EdgeEffect = new EdgeEffectParameters();
+                        IconContainer.Colour = Color4.White;
+                        IconContainer.EdgeEffect = new EdgeEffectParameters
+                        {
+                            Type = EdgeEffectType.Glow,
+                            Colour = new Color4(255, 194, 224, 100),
+                            Radius = 15,
+                            Roundness = 15,
+                        };
+                    }
+                    else
+                    {
+                        IconContainer.Colour = new Color4(255, 194, 224, 255);
+                        IconContainer.EdgeEffect = new EdgeEffectParameters();
+                    }
                 }
             }
-        }
 
-        protected override void LoadComplete()
-        {
-            base.LoadComplete();
-            IconContainer.Scale *= 1.4f;
+            protected override void LoadComplete()
+            {
+                base.LoadComplete();
+                IconContainer.Scale *= 1.4f;
+            }
         }
     }
 }
