@@ -11,7 +11,6 @@ using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API.Requests;
 using osu.Game.Overlays.Profile;
-using osu.Game.Overlays.Profile.Header.Components;
 using osu.Game.Overlays.Profile.Sections;
 using osu.Game.Users;
 using osuTK;
@@ -26,7 +25,6 @@ namespace osu.Game.Overlays
         protected ProfileHeader Header;
         private SectionsContainer<ProfileSection> sectionsContainer;
         private ProfileTabControl tabs;
-        private ProfileRulesetSelector rulesetSelector;
 
         public const float CONTENT_X_MARGIN = 70;
 
@@ -121,15 +119,6 @@ namespace osu.Game.Overlays
             }
 
             sectionsContainer.ScrollToTop();
-
-            Header.Add(rulesetSelector = new ProfileRulesetSelector
-            {
-                Alpha = 0,
-                Anchor = Anchor.TopRight,
-                Origin = Anchor.TopRight,
-                Y = 100,
-                Margin = new MarginPadding { Right = 30 },
-            });
         }
 
         private void userLoadComplete(User user)
@@ -151,11 +140,6 @@ namespace osu.Game.Overlays
                     }
                 }
             }
-
-            rulesetSelector.SetDefaultGamemode(user.PlayMode ?? "osu");
-            rulesetSelector.SelectDefaultGamemode();
-
-            rulesetSelector.FadeInFromZero(100, Easing.OutQuint);
         }
 
         private class ProfileTabControl : PageTabControl<ProfileSection>
