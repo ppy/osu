@@ -86,7 +86,6 @@ namespace osu.Game.Overlays.Toolbar
             }
 
             Current.BindTo(parentRuleset);
-            Current.Disabled = false;
             Current.DisabledChanged += disabledChanged;
             Current.BindValueChanged(rulesetChanged);
         }
