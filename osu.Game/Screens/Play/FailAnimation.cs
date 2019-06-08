@@ -69,6 +69,8 @@ namespace osu.Game.Screens.Play
             });
 
             track.AddAdjustment(AdjustableProperty.Frequency, trackFreq);
+            
+            drawableRuleset.Playfield.DisplayJudgements.Value = false;
 
             applyToPlayfield(drawableRuleset.Playfield);
             drawableRuleset.Playfield.HitObjectContainer.FlashColour(Color4.Red, 500);
@@ -90,8 +92,7 @@ namespace osu.Game.Screens.Play
             foreach (var nested in playfield.NestedPlayfields)
                 applyToPlayfield(nested);
 
-            foreach (DrawableHitObject obj in playfield.HitObjectContainer.AliveObjects)
-                obj.Fail();
+            playfield.Fail();
         }
 
         protected override void Dispose(bool isDisposing)
