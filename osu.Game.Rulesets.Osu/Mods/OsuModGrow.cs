@@ -28,16 +28,16 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         public override double ScoreMultiplier => 1;
 
-        protected Bindable<bool> IncreaseFirstObjectGrowVisibility = new Bindable<bool>();
+        protected Bindable<bool> IncreaseFirstObjectVisibility = new Bindable<bool>();
 
         public void ReadFromConfig(OsuConfigManager config)
         {
-            IncreaseFirstObjectGrowVisibility = config.GetBindable<bool>(OsuSetting.IncreaseFirstObjectGrowVisibility);
+            IncreaseFirstObjectVisibility = config.GetBindable<bool>(OsuSetting.IncreaseFirstObjectVisibility);
         }
 
         public void ApplyToDrawableHitObjects(IEnumerable<DrawableHitObject> drawables)
         {
-            foreach (var drawable in drawables.Skip(IncreaseFirstObjectGrowVisibility.Value ? 1 : 0))
+            foreach (var drawable in drawables.Skip(IncreaseFirstObjectVisibility.Value ? 1 : 0))
             {
                 switch (drawable)
                 {
