@@ -27,7 +27,7 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
 
         private Bindable<ScalingMode> scalingMode;
         private Bindable<Size> sizeFullscreen;
-        private readonly BindableList<WindowMode> windowModes = new BindableList<WindowMode>();
+        private readonly IBindableList<WindowMode> windowModes = new BindableList<WindowMode>();
 
         private OsuGameBase game;
         private SettingsDropdown<Size> resolutionDropdown;

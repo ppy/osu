@@ -13,6 +13,7 @@ using System.Text.RegularExpressions;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Users;
 using osuTK.Graphics;
+using osu.Framework.Allocation;
 
 namespace osu.Game.Overlays.Changelog
 {
@@ -45,8 +46,12 @@ namespace osu.Game.Overlays.Changelog
                     Direction = FillDirection.Vertical,
                 },
             };
+        }
 
-            foreach (var categoryEntries in build.ChangelogEntries.GroupBy(b => b.Category).OrderBy(c => c.Key))
+        [BackgroundDependencyLoader]
+        private void load(OsuColour colours)
+        {
+            foreach (var categoryEntries in Build.ChangelogEntries.GroupBy(b => b.Category).OrderBy(c => c.Key))
             {
                 ChangelogEntries.Add(new OsuSpriteText
                 {
@@ -69,34 +74,69 @@ namespace osu.Game.Overlays.Changelog
                         Margin = new MarginPadding { Vertical = 5 },
                     };
 
+                    var entryColour = entry.Major ? colours.YellowLight : Color4.White;
+
                     title.AddIcon(FontAwesome.Solid.Check, t =>
                     {
                         t.Font = fontSmall;
+                        t.Colour = entryColour;
                         t.Padding = new MarginPadding { Left = -17, Right = 5 };
                     });
 
-                    title.AddText(entry.Title, t => { t.Font = fontLarge; });
+                    title.AddText(entry.Title, t =>
+                    {
+                        t.Font = fontLarge;
+                        t.Colour = entryColour;
+                    });
 
                     if (!string.IsNullOrEmpty(entry.Repository))
                     {
-                        title.AddText(" (", t => t.Font = fontLarge);
+                        title.AddText(" (", t =>
+                        {
+                            t.Font = fontLarge;
+                            t.Colour = entryColour;
+                        });
                         title.AddLink($"{entry.Repository.Replace("ppy/", "")}#{entry.GithubPullRequestId}", entry.GithubUrl, Online.Chat.LinkAction.External,
-                            creationParameters: t => { t.Font = fontLarge; });
-                        title.AddText(")", t => t.Font = fontLarge);
+                            creationParameters: t =>
+                            {
+                                t.Font = fontLarge;
+                                t.Colour = entryColour;
+                            });
+                        title.AddText(")", t =>
+                        {
+                            t.Font = fontLarge;
+                            t.Colour = entryColour;
+                        });
                     }
 
-                    title.AddText(" by ", t => t.Font = fontMedium);
+                    title.AddText(" by ", t =>
+                    {
+                        t.Font = fontMedium;
+                        t.Colour = entryColour;
+                    });
 
                     if (entry.GithubUser.UserId != null)
                         title.AddUserLink(new User
                         {
                             Username = entry.GithubUser.OsuUsername,
                             Id = entry.GithubUser.UserId.Value
-                        }, t => t.Font = fontMedium);
+                        }, t =>
+                        {
+                            t.Font = fontMedium;
+                            t.Colour = entryColour;
+                        });
                     else if (entry.GithubUser.GithubUrl != null)
-                        title.AddLink(entry.GithubUser.DisplayName, entry.GithubUser.GithubUrl, Online.Chat.LinkAction.External, null, null, t => t.Font = fontMedium);
+                        title.AddLink(entry.GithubUser.DisplayName, entry.GithubUser.GithubUrl, Online.Chat.LinkAction.External, null, null, t =>
+                        {
+                            t.Font = fontMedium;
+                            t.Colour = entryColour;
+                        });
                     else
-                        title.AddText(entry.GithubUser.DisplayName, t => t.Font = fontSmall);
+                        title.AddText(entry.GithubUser.DisplayName, t =>
+                        {
+                            t.Font = fontSmall;
+                            t.Colour = entryColour;
+                        });
 
                     ChangelogEntries.Add(title);
 
