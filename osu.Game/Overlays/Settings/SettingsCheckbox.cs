@@ -14,7 +14,6 @@ namespace osu.Game.Overlays.Settings
 
         public override string LabelText
         {
-            get => checkbox.LabelText;
             set => checkbox.LabelText = value;
         }
     }
