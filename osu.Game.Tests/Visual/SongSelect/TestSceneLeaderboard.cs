@@ -188,7 +188,7 @@ namespace osu.Game.Tests.Visual.SongSelect
                 },
                 new ScoreInfo
                 {
-                    Rank = ScoreRank.F,
+                    Rank = ScoreRank.D,
                     Accuracy = 0.6025,
                     MaxCombo = 244,
                     TotalScore = 1707827,
@@ -206,7 +206,7 @@ namespace osu.Game.Tests.Visual.SongSelect
                 },
                 new ScoreInfo
                 {
-                    Rank = ScoreRank.F,
+                    Rank = ScoreRank.D,
                     Accuracy = 0.5140,
                     MaxCombo = 244,
                     TotalScore = 1707827,
@@ -224,7 +224,7 @@ namespace osu.Game.Tests.Visual.SongSelect
                 },
                 new ScoreInfo
                 {
-                    Rank = ScoreRank.F,
+                    Rank = ScoreRank.D,
                     Accuracy = 0.4222,
                     MaxCombo = 244,
                     TotalScore = 1707827,
