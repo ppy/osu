@@ -49,7 +49,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         /// Final star rating is player skill level who can FC the map once per this amount of time (in ms).
         /// Decrease this number to give longer maps more PP.
         /// </summary>
-        private const double target_retry_time_before_fc = 4 * 60 * 60 * 1000;
+        private const double target_retry_time_before_fc = 3.5 * 60 * 60 * 1000;
 
         /// <summary>
         /// Minimum precision for time spent for a player to full combo the map, though typically will be around 5x more precise.
@@ -60,7 +60,13 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         /// Maps with this expected length will match legacy PP values.
         /// Decrease this value to increase PP For all maps equally
         /// </summary>
-        private const double target_fc_base_time = 30 * 1000;
+        private const double target_fc_base_time = 33 * 1000;
+
+        /// <summary>
+        /// Time taken to retry and get to the beginning of a map.
+        /// Increasing adds more weight to the first few notes of a map when calculating expected time to FC.
+        /// </summary>
+        private const double minimum_retry_time = 3 * 1000;
 
         /// <summary>
         /// Multiplier used to preserve star rating for maps with length <see cref="target_fc_base_time"/>
@@ -228,13 +234,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             // the last time this function is called happens to be for the whole map
             fcProb = averageLength / targetFcTime;
 
-            // map is super long, these calculations might not even make sense, return skill level to pass with 50% probability
-            if (fcProb > 0.9)
-            {
-                fcProb = 0.5;
-                return skillLevel(0.5, difficulty) * targetFcDifficultyMultiplier;
-            }
-
             double skill = skillLevel(fcProb, difficulty);
 
             const int max_iterations = 5;
@@ -270,7 +269,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             // note: calculating this separately for each skill isn't really correct, maybe fix in future
 
             double length = 0;
-            double lastTime = timestamps[first] - MaxStrainTime;
+            double lastTime = timestamps.First() - minimum_retry_time;
             double powSkill = Math.Pow(skill, -starBonusK);
 
             for (int i = first; i <= last; ++i)
