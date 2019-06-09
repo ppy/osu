@@ -15,7 +15,6 @@ namespace osu.Game.Graphics.UserInterface
     public class LoadingAnimation : VisibilityContainer
     {
         private readonly SpriteIcon spinner;
-        private readonly SpriteIcon spinnerShadow;
 
         private const float spin_duration = 600;
         private const float transition_duration = 200;
@@ -29,22 +28,13 @@ namespace osu.Game.Graphics.UserInterface
 
             Children = new Drawable[]
             {
-                spinnerShadow = new SpriteIcon
-                {
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
-                    RelativeSizeAxes = Axes.Both,
-                    Position = new Vector2(1, 1),
-                    Colour = Color4.Black,
-                    Alpha = 0.4f,
-                    Icon = FontAwesome.Solid.CircleNotch
-                },
                 spinner = new SpriteIcon
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
                     RelativeSizeAxes = Axes.Both,
-                    Icon = FontAwesome.Solid.CircleNotch
+                    Icon = FontAwesome.Solid.CircleNotch,
+                    Shadow = true
                 }
             };
         }
@@ -54,7 +44,6 @@ namespace osu.Game.Graphics.UserInterface
             base.LoadComplete();
 
             spinner.Spin(spin_duration, RotationDirection.Clockwise);
-            spinnerShadow.Spin(spin_duration, RotationDirection.Clockwise);
         }
 
         protected override void PopIn() => this.FadeIn(transition_duration * 2, Easing.OutQuint);
