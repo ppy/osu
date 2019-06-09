@@ -20,11 +20,6 @@ namespace osu.Game.Overlays.Settings.Sections.Gameplay
                     LabelText = "Increase visibility of first object with \"Hidden\" mod",
                     Bindable = config.GetBindable<bool>(OsuSetting.IncreaseFirstObjectVisibility)
                 },
-                new SettingsCheckbox
-                {
-                    LabelText = "Increase visibility of first object with \"Grow\" mod",
-                    Bindable = config.GetBindable<bool>(OsuSetting.IncreaseFirstObjectGrowVisibility)
-                },
             };
         }
     }

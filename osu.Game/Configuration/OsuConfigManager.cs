@@ -85,8 +85,6 @@ namespace osu.Game.Configuration
 
             Set(OsuSetting.IncreaseFirstObjectVisibility, true);
 
-            Set(OsuSetting.IncreaseFirstObjectGrowVisibility, true);
-
             // Update
             Set(OsuSetting.ReleaseStream, ReleaseStream.Lazer);
 
@@ -160,7 +158,6 @@ namespace osu.Game.Configuration
         BeatmapSkins,
         BeatmapHitsounds,
         IncreaseFirstObjectVisibility,
-        IncreaseFirstObjectGrowVisibility,
         ScoreDisplayMode,
         ExternalLinkWarning,
         Scaling,
