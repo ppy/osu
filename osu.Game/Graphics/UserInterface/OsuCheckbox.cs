@@ -34,24 +34,24 @@ namespace osu.Game.Graphics.UserInterface
         {
             set
             {
-                if (labelSpriteText != null)
-                    labelSpriteText.Text = value;
+                if (labelText != null)
+                    labelText.Text = value;
             }
         }
 
         public MarginPadding LabelPadding
         {
-            get => labelSpriteText?.Padding ?? new MarginPadding();
+            get => labelText?.Padding ?? new MarginPadding();
             set
             {
-                if (labelSpriteText != null)
-                    labelSpriteText.Padding = value;
+                if (labelText != null)
+                    labelText.Padding = value;
             }
         }
 
         protected readonly Nub Nub;
 
-        private readonly OsuTextFlowContainer labelSpriteText;
+        private readonly OsuTextFlowContainer labelText;
         private SampleChannel sampleChecked;
         private SampleChannel sampleUnchecked;
 
@@ -64,7 +64,7 @@ namespace osu.Game.Graphics.UserInterface
 
             Children = new Drawable[]
             {
-                labelSpriteText = new OsuTextFlowContainer
+                labelText = new OsuTextFlowContainer
                 {
                     AutoSizeAxes = Axes.Y,
                     RelativeSizeAxes = Axes.X,
@@ -81,7 +81,7 @@ namespace osu.Game.Graphics.UserInterface
 
             Nub.Current.BindTo(Current);
 
-            Current.DisabledChanged += disabled => { labelSpriteText.Alpha = Nub.Alpha = disabled ? 0.3f : 1; };
+            Current.DisabledChanged += disabled => { labelText.Alpha = Nub.Alpha = disabled ? 0.3f : 1; };
         }
 
         protected override void LoadComplete()
