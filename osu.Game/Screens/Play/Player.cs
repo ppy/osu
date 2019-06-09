@@ -491,7 +491,7 @@ namespace osu.Game.Screens.Play
 
             GameplayClockContainer.ResetLocalAdjustments();
 
-            if(ValidForResume)
+            if (ValidForResume)
                 GameplayClockContainer.Start();
 
             fadeOut();
