@@ -157,7 +157,7 @@ namespace osu.Game.Tests.Visual.Online
                             FlagName = @"TH",
                         },
                     },
-                    Rank = ScoreRank.F,
+                    Rank = ScoreRank.D,
                     PP = 160,
                     MaxCombo = 1234,
                     TotalScore = 123456,
