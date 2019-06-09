@@ -86,12 +86,6 @@ namespace osu.Game.Screens.Play
             GameplayClock.IsPaused.BindTo(IsPaused);
         }
 
-        protected override void Dispose(bool isDisposing)
-        {
-            base.Dispose(isDisposing);
-            (sourceClock as IAdjustableAudioComponent)?.RemoveAdjustment(AdjustableProperty.Frequency, pauseFreqAdjust);
-        }
-
         private double totalOffset => userOffsetClock.Offset + platformOffsetClock.Offset;
 
         private readonly BindableDouble pauseFreqAdjust = new BindableDouble(1);
@@ -154,7 +148,7 @@ namespace osu.Game.Screens.Play
 
         public void Stop()
         {
-            this.TransformBindableTo(pauseFreqAdjust, 0, 200, Easing.Out).OnComplete(_ => { adjustableClock.Stop(); });
+            this.TransformBindableTo(pauseFreqAdjust, 0, 200, Easing.Out).OnComplete(_ => adjustableClock.Stop());
 
             IsPaused.Value = true;
         }
@@ -186,6 +180,12 @@ namespace osu.Game.Screens.Play
 
             foreach (var mod in mods.OfType<IApplicableToClock>())
                 mod.ApplyToClock(sourceClock);
+        }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+            (sourceClock as IAdjustableAudioComponent)?.RemoveAdjustment(AdjustableProperty.Frequency, pauseFreqAdjust);
         }
     }
 }
