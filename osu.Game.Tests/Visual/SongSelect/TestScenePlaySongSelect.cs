@@ -210,7 +210,7 @@ namespace osu.Game.Tests.Visual.SongSelect
             AddAssert("start not requested", () => !startRequested);
         }
 
-        private void importForRuleset(int id) => AddStep($"import test map for ruleset {id}", () => manager.Import(createTestBeatmapSet(getImportId(), rulesets.AvailableRulesets.Where(r => r.ID == id).ToArray())));
+        private void importForRuleset(int id) => AddStep($"import test map for ruleset {id}", () => manager.Import(createTestBeatmapSet(getImportId(), rulesets.AvailableRulesets.Where(r => r.ID == id).ToArray())).Wait());
 
         private static int importId;
         private int getImportId() => ++importId;
@@ -232,7 +232,7 @@ namespace osu.Game.Tests.Visual.SongSelect
                 var usableRulesets = rulesets.AvailableRulesets.Where(r => r.ID != 2).ToArray();
 
                 for (int i = 0; i < 100; i += 10)
-                    manager.Import(createTestBeatmapSet(i, usableRulesets));
+                    manager.Import(createTestBeatmapSet(i, usableRulesets)).Wait();
             });
         }
 
