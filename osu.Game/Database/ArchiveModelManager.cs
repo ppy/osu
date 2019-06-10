@@ -577,7 +577,7 @@ namespace osu.Game.Database
         /// <param name="model">The model to populate.</param>
         /// <param name="archive">The archive to use as a reference for population. May be null.</param>
         /// <param name="cancellationToken">An optional cancellation token.</param>
-        protected virtual async Task Populate(TModel model, [CanBeNull] ArchiveReader archive, CancellationToken cancellationToken = default) => await Task.CompletedTask;
+        protected virtual Task Populate(TModel model, [CanBeNull] ArchiveReader archive, CancellationToken cancellationToken = default) => Task.CompletedTask;
 
         /// <summary>
         /// Perform any final actions before the import to database executes.
