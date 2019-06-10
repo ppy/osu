@@ -154,6 +154,9 @@ namespace osu.Game.Database
 
             await Task.WhenAll(paths.Select(path => Import(path, notification.CancellationToken).ContinueWith(t =>
             {
+                if (notification.CancellationToken.IsCancellationRequested)
+                    return;
+
                 lock (notification)
                 {
                     current++;
@@ -172,7 +175,7 @@ namespace osu.Game.Database
                     var e = t.Exception.InnerException ?? t.Exception;
                     Logger.Error(e, $@"Could not import ({Path.GetFileName(path)})");
                 }
-            })));
+            }, TaskContinuationOptions.NotOnCanceled)));
 
             if (imported.Count == 0)
             {
@@ -207,6 +210,8 @@ namespace osu.Game.Database
         /// <returns>The imported model, if successful.</returns>
         public async Task<TModel> Import(string path, CancellationToken cancellationToken = default)
         {
+            cancellationToken.ThrowIfCancellationRequested();
+
             TModel import;
             using (ArchiveReader reader = getReaderFrom(path))
                 import = await Import(reader, cancellationToken);
@@ -240,6 +245,8 @@ namespace osu.Game.Database
         /// <param name="cancellationToken">An optional cancellation token.</param>
         public async Task<TModel> Import(ArchiveReader archive, CancellationToken cancellationToken = default)
         {
+            cancellationToken.ThrowIfCancellationRequested();
+
             try
             {
                 var model = CreateModel(archive);
@@ -249,6 +256,10 @@ namespace osu.Game.Database
                 model.Hash = computeHash(archive);
 
                 return await Import(model, archive, cancellationToken);
+            }
+            catch (TaskCanceledException)
+            {
+                throw;
             }
             catch (Exception e)
             {
@@ -286,6 +297,8 @@ namespace osu.Game.Database
         /// <param name="cancellationToken">An optional cancellation token.</param>
         public async Task<TModel> Import(TModel item, ArchiveReader archive = null, CancellationToken cancellationToken = default) => await Task.Factory.StartNew(async () =>
         {
+            cancellationToken.ThrowIfCancellationRequested();
+
             delayEvents();
 
             try
@@ -300,10 +313,6 @@ namespace osu.Game.Database
                 try
                 {
                     await Populate(item, archive, cancellationToken);
-                }
-                catch (TaskCanceledException)
-                {
-                    return item = null;
                 }
                 finally
                 {
@@ -364,7 +373,7 @@ namespace osu.Game.Database
             }
 
             return item;
-        }, CancellationToken.None, TaskCreationOptions.HideScheduler, IMPORT_SCHEDULER).Unwrap();
+        }, cancellationToken, TaskCreationOptions.HideScheduler, IMPORT_SCHEDULER).Unwrap();
 
         /// <summary>
         /// Perform an update of the specified item.
