@@ -173,7 +173,7 @@ namespace osu.Game.Database
                 }
                 catch (Exception e)
                 {
-                    Logger.Error(e, $@"Could not import ({Path.GetFileName(path)})");
+                    Logger.Error(e, $@"Could not import ({Path.GetFileName(path)})", LoggingTarget.Database);
                 }
             }));
 
@@ -227,7 +227,7 @@ namespace osu.Game.Database
             }
             catch (Exception e)
             {
-                Logger.Error(e, $@"Could not delete original file after import ({Path.GetFileName(path)})");
+                LogForModel(import, $@"Could not delete original file after import ({Path.GetFileName(path)})", e);
             }
 
             return import;
@@ -247,7 +247,7 @@ namespace osu.Game.Database
         {
             cancellationToken.ThrowIfCancellationRequested();
 
-            TModel model;
+            TModel model = null;
 
             try
             {
@@ -263,7 +263,7 @@ namespace osu.Game.Database
             }
             catch (Exception e)
             {
-                Logger.Error(e, $"Model creation of {archive.Name} failed.", LoggingTarget.Database);
+                LogForModel(model, $"Model creation of {archive.Name} failed.", e);
                 return null;
             }
 
@@ -276,6 +276,16 @@ namespace osu.Game.Database
         /// Large files should be avoided if possible.
         /// </summary>
         protected abstract string[] HashableFileTypes { get; }
+
+        protected static void LogForModel(TModel model, string message, Exception e = null)
+        {
+            string prefix = $"[{(model?.Hash ?? "?????").Substring(0, 5)}]";
+
+            if (e != null)
+                Logger.Error(e, $"{prefix} {message}", LoggingTarget.Database);
+            else
+                Logger.Log($"{prefix} {message}", LoggingTarget.Database);
+        }
 
         /// <summary>
         /// Create a SHA-2 hash from the provided archive based on file content of all files matching <see cref="HashableFileTypes"/>.
@@ -308,14 +318,14 @@ namespace osu.Game.Database
                 if (!Delete(item))
                 {
                     // We may have not yet added the model to the underlying table, but should still clean up files.
-                    Logger.Log($"Dereferencing files for incomplete import of {item}.", LoggingTarget.Database);
+                    LogForModel(item, "Dereferencing files for incomplete import.");
                     Files.Dereference(item.Files.Select(f => f.FileInfo).ToArray());
                 }
             }
 
             try
             {
-                Logger.Log($"Importing {item}...", LoggingTarget.Database);
+                LogForModel(item, "Beginning import...");
 
                 item.Files = archive != null ? createFileInfos(archive, Files) : new List<TFileModel>();
 
@@ -334,7 +344,7 @@ namespace osu.Game.Database
                             if (CanUndelete(existing, item))
                             {
                                 Undelete(existing);
-                                Logger.Log($"Found existing {humanisedModelName} for {item} (ID {existing.ID}). Skipping import.", LoggingTarget.Database);
+                                LogForModel(item, $"Found existing {humanisedModelName} for {item} (ID {existing.ID}) – skipping import.");
                                 handleEvent(() => ItemAdded?.Invoke(existing, true));
 
                                 // existing item will be used; rollback new import and exit early.
@@ -342,11 +352,9 @@ namespace osu.Game.Database
                                 flushEvents(true);
                                 return existing;
                             }
-                            else
-                            {
-                                Delete(existing);
-                                ModelStore.PurgeDeletable(s => s.ID == existing.ID);
-                            }
+
+                            Delete(existing);
+                            ModelStore.PurgeDeletable(s => s.ID == existing.ID);
                         }
 
                         PreImport(item);
@@ -361,12 +369,12 @@ namespace osu.Game.Database
                     }
                 }
 
-                Logger.Log($"Import of {item} successfully completed!", LoggingTarget.Database);
+                LogForModel(item, "Import successfully completed!");
             }
             catch (Exception e)
             {
                 if (!(e is TaskCanceledException))
-                    Logger.Error(e, $"Import of {item} failed and has been rolled back.", LoggingTarget.Database);
+                    LogForModel(item, "Database import or population failed and has been rolled back.", e);
 
                 rollback();
                 flushEvents(false);

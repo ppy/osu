@@ -110,7 +110,7 @@ namespace osu.Game.Beatmaps
 
             validateOnlineIds(beatmapSet);
 
-            await Task.WhenAll(beatmapSet.Beatmaps.Select(b => updateQueue.Perform(b, cancellationToken)).ToArray());
+            await updateQueue.Perform(beatmapSet, cancellationToken);
         }
 
         protected override void PreImport(BeatmapSetInfo beatmapSet)
@@ -127,7 +127,7 @@ namespace osu.Game.Beatmaps
                 {
                     Delete(existingOnlineId);
                     beatmaps.PurgeDeletable(s => s.ID == existingOnlineId.ID);
-                    Logger.Log($"Found existing beatmap set with same OnlineBeatmapSetID ({beatmapSet.OnlineBeatmapSetID}). It has been purged.", LoggingTarget.Database);
+                    LogForModel(beatmapSet, $"Found existing beatmap set with same OnlineBeatmapSetID ({beatmapSet.OnlineBeatmapSetID}). It has been purged.");
                 }
             }
         }
@@ -433,23 +433,29 @@ namespace osu.Game.Beatmaps
                 this.api = api;
             }
 
-            public Task Perform(BeatmapInfo beatmap, CancellationToken cancellationToken)
-                => Task.Factory.StartNew(() => perform(beatmap, cancellationToken), cancellationToken, TaskCreationOptions.HideScheduler, updateScheduler);
-
-            private void perform(BeatmapInfo beatmap, CancellationToken cancellation)
+            public async Task Perform(BeatmapSetInfo beatmapSet, CancellationToken cancellationToken)
             {
-                cancellation.ThrowIfCancellationRequested();
-
                 if (api?.State != APIState.Online)
                     return;
 
-                Logger.Log("Attempting online lookup for the missing values...", LoggingTarget.Database);
+                LogForModel(beatmapSet, "Performing online lookups...");
+                await Task.WhenAll(beatmapSet.Beatmaps.Select(b => Perform(beatmapSet, b, cancellationToken)).ToArray());
+            }
+
+            // todo: expose this when we need to do individual difficulty lookups.
+            protected Task Perform(BeatmapSetInfo beatmapSet, BeatmapInfo beatmap, CancellationToken cancellationToken)
+                => Task.Factory.StartNew(() => perform(beatmapSet, beatmap), cancellationToken, TaskCreationOptions.HideScheduler, updateScheduler);
+
+            private void perform(BeatmapSetInfo set, BeatmapInfo beatmap)
+            {
+                if (api?.State != APIState.Online)
+                    return;
 
                 var req = new GetBeatmapRequest(beatmap);
 
                 req.Success += res =>
                 {
-                    Logger.Log($"Successfully mapped to {res.OnlineBeatmapSetID} / {res.OnlineBeatmapID}.", LoggingTarget.Database);
+                    LogForModel(set, $"Online retrieval mapped {beatmap} to {res.OnlineBeatmapSetID} / {res.OnlineBeatmapID}.");
 
                     beatmap.Status = res.Status;
                     beatmap.BeatmapSet.Status = res.BeatmapSet.Status;
@@ -457,7 +463,7 @@ namespace osu.Game.Beatmaps
                     beatmap.OnlineBeatmapID = res.OnlineBeatmapID;
                 };
 
-                req.Failure += e => { Logger.Log($"Failed ({e})", LoggingTarget.Database); };
+                req.Failure += e => { LogForModel(set, $"Online retrieval failed for {beatmap}", e); };
 
                 // intentionally blocking to limit web request concurrency
                 req.Perform(api);
