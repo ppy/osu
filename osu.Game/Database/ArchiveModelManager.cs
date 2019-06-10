@@ -1,4 +1,4 @@
-﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
@@ -11,7 +11,6 @@ using JetBrains.Annotations;
 using Microsoft.EntityFrameworkCore;
 using osu.Framework;
 using osu.Framework.Extensions;
-using osu.Framework.Extensions.TypeExtensions;
 using osu.Framework.IO.File;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
@@ -32,7 +31,7 @@ namespace osu.Game.Database
     /// </summary>
     /// <typeparam name="TModel">The model type.</typeparam>
     /// <typeparam name="TFileModel">The associated file join type.</typeparam>
-    public abstract class ArchiveModelManager<TModel, TFileModel> : ICanAcceptFiles
+    public abstract class ArchiveModelManager<TModel, TFileModel> : ArchiveModelManager, ICanAcceptFiles
         where TModel : class, IHasFiles<TFileModel>, IHasPrimaryKey, ISoftDelete
         where TFileModel : INamedFileInfo, new()
     {
@@ -112,11 +111,8 @@ namespace osu.Game.Database
                 a.Invoke();
         }
 
-        private readonly ThreadedTaskScheduler importScheduler;
-
         protected ArchiveModelManager(Storage storage, IDatabaseContextFactory contextFactory, MutableDatabaseBackedStoreWithFileIncludes<TModel, TFileModel> modelStore, IIpcHost importHost = null)
         {
-            importScheduler = new ThreadedTaskScheduler(16, $"{GetType().ReadableName()}.Import");
             ContextFactory = contextFactory;
 
             ModelStore = modelStore;
@@ -152,55 +148,55 @@ namespace osu.Game.Database
 
             var term = $"{typeof(TModel).Name.Replace("Info", "").ToLower()}";
 
-            var tasks = new List<Task>();
-
             int current = 0;
 
-            foreach (string path in paths)
+            var imported = new List<TModel>();
+
+            await Task.WhenAll(paths.Select(path => Import(path, notification.CancellationToken).ContinueWith(t =>
             {
-                tasks.Add(Import(path, notification.CancellationToken).ContinueWith(t =>
+                lock (notification)
                 {
-                    lock (notification)
-                    {
-                        current++;
+                    current++;
 
-                        notification.Text = $"Imported {current} of {paths.Length} {term}s";
-                        notification.Progress = (float)current / paths.Length;
-                    }
+                    notification.Text = $"Imported {current} of {paths.Length} {term}s";
+                    notification.Progress = (float)current / paths.Length;
+                }
 
-                    if (t.Exception != null)
-                    {
-                        var e = t.Exception.InnerException ?? t.Exception;
-                        Logger.Error(e, $@"Could not import ({Path.GetFileName(path)})");
-                    }
-                }));
+                if (t.Exception == null)
+                {
+                    lock (imported)
+                        imported.Add(t.Result);
+                }
+                else
+                {
+                    var e = t.Exception.InnerException ?? t.Exception;
+                    Logger.Error(e, $@"Could not import ({Path.GetFileName(path)})");
+                }
+            })));
+
+            if (imported.Count == 0)
+            {
+                notification.Text = "Import failed!";
+                notification.State = ProgressNotificationState.Cancelled;
             }
+            else
+            {
+                notification.CompletionText = imported.Count == 1
+                    ? $"Imported {imported.First()}!"
+                    : $"Imported {current} {term}s!";
 
-            await Task.WhenAll(tasks);
+                if (imported.Count > 0 && PresentImport != null)
+                {
+                    notification.CompletionText += " Click to view.";
+                    notification.CompletionClickAction = () =>
+                    {
+                        PresentImport?.Invoke(imported);
+                        return true;
+                    };
+                }
 
-            // if (imported.Count == 0)
-            // {
-            //     notification.Text = "Import failed!";
-            //     notification.State = ProgressNotificationState.Cancelled;
-            // }
-            // else
-            // {
-            //     notification.CompletionText = imported.Count == 1
-            //         ? $"Imported {imported.First()}!"
-            //         : $"Imported {current} {term}s!";
-            //
-            //     if (imported.Count > 0 && PresentImport != null)
-            //     {
-            //         notification.CompletionText += " Click to view.";
-            //         notification.CompletionClickAction = () =>
-            //         {
-            //             PresentImport?.Invoke(imported);
-            //             return true;
-            //         };
-            //     }
-            //
-            //     notification.State = ProgressNotificationState.Completed;
-            // }
+                notification.State = ProgressNotificationState.Completed;
+            }
         }
 
         /// <summary>
@@ -368,7 +364,7 @@ namespace osu.Game.Database
             }
 
             return item;
-        }, CancellationToken.None, TaskCreationOptions.None, importScheduler).Unwrap();
+        }, CancellationToken.None, TaskCreationOptions.HideScheduler, IMPORT_SCHEDULER).Unwrap();
 
         /// <summary>
         /// Perform an update of the specified item.
@@ -614,5 +610,11 @@ namespace osu.Game.Database
 
             throw new InvalidFormatException($"{path} is not a valid archive");
         }
+    }
+
+    public abstract class ArchiveModelManager
+    {
+        // allow sharing static across all generic types
+        protected static readonly ThreadedTaskScheduler IMPORT_SCHEDULER = new ThreadedTaskScheduler(1);
     }
 }

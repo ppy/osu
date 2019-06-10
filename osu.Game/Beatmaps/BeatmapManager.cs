@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -111,7 +110,7 @@ namespace osu.Game.Beatmaps
 
             validateOnlineIds(beatmapSet);
 
-            await Task.WhenAll(beatmapSet.Beatmaps.Select(b => updateQueue.Enqueue(new UpdateItem(b, cancellationToken)).Task).ToArray());
+            await Task.WhenAll(beatmapSet.Beatmaps.Select(b => updateQueue.Perform(b, cancellationToken)).ToArray());
         }
 
         protected override void PreImport(BeatmapSetInfo beatmapSet)
@@ -424,81 +423,24 @@ namespace osu.Game.Beatmaps
         private class BeatmapUpdateQueue
         {
             private readonly IAPIProvider api;
-            private readonly Queue<UpdateItem> queue = new Queue<UpdateItem>();
 
-            private int activeThreads;
+            private readonly ThreadedTaskScheduler updateScheduler = new ThreadedTaskScheduler(4);
 
             public BeatmapUpdateQueue(IAPIProvider api)
             {
                 this.api = api;
             }
 
-            public UpdateItem Enqueue(UpdateItem item)
+            public Task Perform(BeatmapInfo beatmap, CancellationToken cancellationToken)
+                => Task.Factory.StartNew(() => perform(beatmap, cancellationToken), cancellationToken, TaskCreationOptions.HideScheduler, updateScheduler);
+
+            private void perform(BeatmapInfo beatmap, CancellationToken cancellation)
             {
-                lock (queue)
-                {
-                    queue.Enqueue(item);
-
-                    if (activeThreads >= 16)
-                        return item;
-
-                    new Thread(runWork) { IsBackground = true }.Start();
-                    activeThreads++;
-                }
-
-                return item;
-            }
-
-            private void runWork()
-            {
-                while (true)
-                {
-                    UpdateItem toProcess;
-
-                    lock (queue)
-                    {
-                        if (queue.Count == 0)
-                            break;
-
-                        toProcess = queue.Dequeue();
-                    }
-
-                    toProcess.PerformUpdate(api);
-                }
-
-                lock (queue)
-                    activeThreads--;
-            }
-        }
-
-        private class UpdateItem
-        {
-            public Task Task => tcs.Task;
-
-            private readonly BeatmapInfo beatmap;
-            private readonly CancellationToken cancellationToken;
-
-            private readonly TaskCompletionSource<bool> tcs = new TaskCompletionSource<bool>();
-
-            public UpdateItem(BeatmapInfo beatmap, CancellationToken cancellationToken)
-            {
-                this.beatmap = beatmap;
-                this.cancellationToken = cancellationToken;
-            }
-
-            public void PerformUpdate(IAPIProvider api)
-            {
-                if (cancellationToken.IsCancellationRequested)
-                {
-                    tcs.SetCanceled();
+                if (cancellation.IsCancellationRequested)
                     return;
-                }
 
                 if (api?.State != APIState.Online)
-                {
-                    tcs.SetResult(false);
                     return;
-                }
 
                 Logger.Log("Attempting online lookup for the missing values...", LoggingTarget.Database);
 
@@ -512,17 +454,14 @@ namespace osu.Game.Beatmaps
                     beatmap.BeatmapSet.Status = res.BeatmapSet.Status;
                     beatmap.BeatmapSet.OnlineBeatmapSetID = res.OnlineBeatmapSetID;
                     beatmap.OnlineBeatmapID = res.OnlineBeatmapID;
-
-                    tcs.SetResult(true);
                 };
 
                 req.Failure += e =>
                 {
                     Logger.Log($"Failed ({e})", LoggingTarget.Database);
-
-                    tcs.SetResult(false);
                 };
 
+                // intentionally blocking to limit web request concurrency
                 req.Perform(api);
             }
         }
