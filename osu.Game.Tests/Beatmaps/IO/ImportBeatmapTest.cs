@@ -11,6 +11,7 @@ using NUnit.Framework;
 using osu.Framework.Platform;
 using osu.Game.IPC;
 using osu.Framework.Allocation;
+using osu.Framework.Logging;
 using osu.Game.Beatmaps;
 using osu.Game.IO;
 using osu.Game.Tests.Resources;
@@ -96,24 +97,31 @@ namespace osu.Game.Tests.Beatmaps.IO
             {
                 try
                 {
+                    int itemAddRemoveFireCount = 0;
+                    int loggedExceptionCount = 0;
+
+                    Logger.NewEntry += l =>
+                    {
+                        if (l.Target == LoggingTarget.Database && l.Exception != null)
+                            Interlocked.Increment(ref loggedExceptionCount);
+                    };
+
                     var osu = loadOsu(host);
                     var manager = osu.Dependencies.Get<BeatmapManager>();
                     var files = osu.Dependencies.Get<FileStore>();
 
-                    int fireCount = 0;
-
                     // ReSharper disable once AccessToModifiedClosure
-                    manager.ItemAdded += (_, __) => fireCount++;
-                    manager.ItemRemoved += _ => fireCount++;
+                    manager.ItemAdded += (_, __) => Interlocked.Increment(ref itemAddRemoveFireCount);
+                    manager.ItemRemoved += _ => Interlocked.Increment(ref itemAddRemoveFireCount);
 
                     var imported = await LoadOszIntoOsu(osu);
 
-                    Assert.AreEqual(0, fireCount -= 1);
+                    Assert.AreEqual(0, itemAddRemoveFireCount -= 1);
 
                     imported.Hash += "-changed";
                     manager.Update(imported);
 
-                    Assert.AreEqual(0, fireCount -= 2);
+                    Assert.AreEqual(0, itemAddRemoveFireCount -= 2);
 
                     Assert.AreEqual(1, manager.GetAllUsableBeatmapSets().Count);
                     Assert.AreEqual(1, manager.QueryBeatmapSets(_ => true).ToList().Count);
@@ -145,7 +153,7 @@ namespace osu.Game.Tests.Beatmaps.IO
                     }
 
                     // no events should be fired in the case of a rollback.
-                    Assert.AreEqual(0, fireCount);
+                    Assert.AreEqual(0, itemAddRemoveFireCount);
 
                     Assert.AreEqual(1, manager.GetAllUsableBeatmapSets().Count);
                     Assert.AreEqual(1, manager.QueryBeatmapSets(_ => true).ToList().Count);
@@ -153,6 +161,8 @@ namespace osu.Game.Tests.Beatmaps.IO
 
                     Assert.AreEqual(18, files.QueryFiles(_ => true).Count());
                     Assert.AreEqual(18, files.QueryFiles(f => f.ReferenceCount == 1).Count());
+
+                    Assert.AreEqual(1, loggedExceptionCount);
                 }
                 finally
                 {
