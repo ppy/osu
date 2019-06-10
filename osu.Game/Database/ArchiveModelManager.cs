@@ -361,6 +361,10 @@ namespace osu.Game.Database
 
                 Logger.Log($"Import of {item} successfully completed!", LoggingTarget.Database);
             }
+            catch (TaskCanceledException)
+            {
+                throw;
+            }
             catch (Exception e)
             {
                 Logger.Error(e, $"Import of {item} failed and has been rolled back.", LoggingTarget.Database);
