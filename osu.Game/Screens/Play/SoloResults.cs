@@ -46,7 +46,7 @@ namespace osu.Game.Screens.Play
             }
         }
 
-        private bool hasOnlineReplay => Score is APILegacyScoreInfo apiScore && apiScore.OnlineScoreID != null & apiScore.Replay;
+        private bool hasOnlineReplay => Score is APILegacyScoreInfo apiScore && apiScore.OnlineScoreID != null && apiScore.Replay;
 
         private void onReplay()
         {
