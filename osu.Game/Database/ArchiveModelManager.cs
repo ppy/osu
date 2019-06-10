@@ -252,15 +252,15 @@ namespace osu.Game.Database
         {
             cancellationToken.ThrowIfCancellationRequested();
 
+            TModel model;
+
             try
             {
-                var model = CreateModel(archive);
+                model = CreateModel(archive);
 
                 if (model == null) return null;
 
                 model.Hash = computeHash(archive);
-
-                return await Import(model, archive, cancellationToken);
             }
             catch (TaskCanceledException)
             {
@@ -271,6 +271,8 @@ namespace osu.Game.Database
                 Logger.Error(e, $"Model creation of {archive.Name} failed.", LoggingTarget.Database);
                 return null;
             }
+
+            return await Import(model, archive, cancellationToken);
         }
 
         /// <summary>
@@ -340,7 +342,9 @@ namespace osu.Game.Database
                                 Logger.Log($"Found existing {nameof(TModel)} for {item} (ID {existing.ID}). Skipping import.", LoggingTarget.Database);
                                 handleEvent(() => ItemAdded?.Invoke(existing, true));
 
+                                // existing item will be used; rollback new import and exit early.
                                 rollback();
+                                flushEvents(true);
                                 return existing;
                             }
                             else
@@ -370,14 +374,11 @@ namespace osu.Game.Database
                     Logger.Error(e, $"Import of {item} failed and has been rolled back.", LoggingTarget.Database);
 
                 rollback();
-                item = null;
-            }
-            finally
-            {
-                // we only want to flush events after we've confirmed the write context didn't have any errors.
-                flushEvents(item != null);
+                flushEvents(false);
+                throw;
             }
 
+            flushEvents(true);
             return item;
         }, cancellationToken, TaskCreationOptions.HideScheduler, IMPORT_SCHEDULER).Unwrap();
 
