@@ -8,7 +8,6 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Overlays.Direct;
 using osu.Game.Rulesets.Osu;
-using osu.Game.Tests.Beatmaps;
 using osuTK;
 
 namespace osu.Game.Tests.Visual.Online
@@ -25,7 +24,7 @@ namespace osu.Game.Tests.Visual.Online
         [BackgroundDependencyLoader]
         private void load()
         {
-            var beatmap = new TestWorkingBeatmap(new OsuRuleset().RulesetInfo, null);
+            var beatmap = CreateWorkingBeatmap(new OsuRuleset().RulesetInfo);
             beatmap.BeatmapSetInfo.OnlineInfo.HasVideo = true;
             beatmap.BeatmapSetInfo.OnlineInfo.HasStoryboard = true;
 

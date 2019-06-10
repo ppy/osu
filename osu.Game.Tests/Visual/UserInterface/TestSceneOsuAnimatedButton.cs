@@ -3,14 +3,13 @@
 
 using System;
 using osu.Framework.Graphics;
-using osu.Framework.Testing;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osuTK;
 
 namespace osu.Game.Tests.Visual.UserInterface
 {
-    public class TestSceneOsuAnimatedButton : GridTestScene
+    public class TestSceneOsuAnimatedButton : OsuGridTestScene
     {
         public TestSceneOsuAnimatedButton()
             : base(3, 2)

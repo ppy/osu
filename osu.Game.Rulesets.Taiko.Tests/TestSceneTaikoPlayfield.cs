@@ -18,7 +18,6 @@ using osu.Game.Rulesets.Taiko.Judgements;
 using osu.Game.Rulesets.Taiko.Objects;
 using osu.Game.Rulesets.Taiko.Objects.Drawables;
 using osu.Game.Rulesets.Taiko.UI;
-using osu.Game.Tests.Beatmaps;
 using osu.Game.Tests.Visual;
 using osuTK;
 using osu.Game.Rulesets.Scoring;
@@ -64,7 +63,7 @@ namespace osu.Game.Rulesets.Taiko.Tests
             var controlPointInfo = new ControlPointInfo();
             controlPointInfo.TimingPoints.Add(new TimingControlPoint());
 
-            WorkingBeatmap beatmap = new TestWorkingBeatmap(new Beatmap
+            WorkingBeatmap beatmap = CreateWorkingBeatmap(new Beatmap
             {
                 HitObjects = new List<HitObject> { new CentreHit() },
                 BeatmapInfo = new BeatmapInfo
@@ -79,7 +78,7 @@ namespace osu.Game.Rulesets.Taiko.Tests
                     Ruleset = new TaikoRuleset().RulesetInfo
                 },
                 ControlPointInfo = controlPointInfo
-            }, Clock);
+            });
 
             Add(playfieldContainer = new Container
             {
