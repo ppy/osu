@@ -96,7 +96,7 @@ namespace osu.Game.Screens.Play
         {
             this.api = api;
 
-            Mods.Value = base.Mods.Value.Select(m => m.CreateCopy()).ToArray();
+            Mods.Value = PlayerMods;
 
             WorkingBeatmap working = loadBeatmap();
 
@@ -307,6 +307,8 @@ namespace osu.Game.Screens.Play
 
             return score;
         }
+
+        protected virtual IReadOnlyList<Mod> PlayerMods => base.Mods.Value.Select(m => m.CreateCopy()).ToArray();
 
         protected override bool OnScroll(ScrollEvent e) => mouseWheelDisabled.Value && !GameplayClockContainer.IsPaused.Value;
 
