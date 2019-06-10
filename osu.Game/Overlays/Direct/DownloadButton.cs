@@ -77,6 +77,12 @@ namespace osu.Game.Overlays.Direct
         {
             this.colours = colours;
 
+            if (BeatmapSet.Value.OnlineInfo.Availability?.DownloadDisabled ?? false)
+            {
+                button.Enabled.Value = false;
+                button.TooltipText = "Unavailable";
+            }
+
             button.Action = () =>
             {
                 switch (State.Value)

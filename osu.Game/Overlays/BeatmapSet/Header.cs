@@ -11,7 +11,6 @@ using osu.Framework.Graphics.Shapes;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Drawables;
 using osu.Game.Graphics;
-using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays.BeatmapSet.Buttons;
@@ -210,7 +209,7 @@ namespace osu.Game.Overlays.BeatmapSet
                     downloadButtonsContainer.FadeOut(transition_duration);
                     favouriteButton.FadeOut(transition_duration);
                 }
-                
+
                 if (setInfo.NewValue?.OnlineInfo.Availability?.DownloadDisabled ?? false)
                 {
                     this.ResizeHeightTo(460, transition_duration / 2);
@@ -237,31 +236,28 @@ namespace osu.Game.Overlays.BeatmapSet
                 return;
             }
 
-            else
+            switch (State.Value)
             {
-                switch (State.Value)
-                {
-                    case DownloadState.LocallyAvailable:
-                        // temporary for UX until new design is implemented.
-                        downloadButtonsContainer.Child = new osu.Game.Overlays.Direct.DownloadButton(BeatmapSet.Value)
-                        {
-                            Width = 50,
-                            RelativeSizeAxes = Axes.Y
-                        };
-                        break;
+                case DownloadState.LocallyAvailable:
+                    // temporary for UX until new design is implemented.
+                    downloadButtonsContainer.Child = new osu.Game.Overlays.Direct.DownloadButton(BeatmapSet.Value)
+                    {
+                        Width = 50,
+                        RelativeSizeAxes = Axes.Y
+                    };
+                    break;
 
-                    case DownloadState.Downloading:
-                    case DownloadState.Downloaded:
-                        // temporary to avoid showing two buttons for maps with novideo. will be fixed in new beatmap overlay design.
-                        downloadButtonsContainer.Child = new DownloadButton(BeatmapSet.Value);
-                        break;
+                case DownloadState.Downloading:
+                case DownloadState.Downloaded:
+                    // temporary to avoid showing two buttons for maps with novideo. will be fixed in new beatmap overlay design.
+                    downloadButtonsContainer.Child = new DownloadButton(BeatmapSet.Value);
+                    break;
 
-                    default:
-                        downloadButtonsContainer.Child = new DownloadButton(BeatmapSet.Value);
-                        if (BeatmapSet.Value.OnlineInfo.HasVideo)
-                            downloadButtonsContainer.Add(new DownloadButton(BeatmapSet.Value, true));
-                        break;
-                }
+                default:
+                    downloadButtonsContainer.Child = new DownloadButton(BeatmapSet.Value);
+                    if (BeatmapSet.Value.OnlineInfo.HasVideo)
+                        downloadButtonsContainer.Add(new DownloadButton(BeatmapSet.Value, true));
+                    break;
             }
         }
     }
