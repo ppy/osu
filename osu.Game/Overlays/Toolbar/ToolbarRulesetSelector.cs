@@ -40,7 +40,7 @@ namespace osu.Game.Overlays.Toolbar
             RelativeSizeAxes = Axes.Y;
             AutoSizeAxes = Axes.X;
 
-            AddRangeInternal(new Drawable[]
+            AddRangeInternal(new[]
             {
                 new OpaqueBackground
                 {
@@ -48,7 +48,7 @@ namespace osu.Game.Overlays.Toolbar
                 },
                 modeButtonLine = new Container
                 {
-                    Size = new Vector2(padding* 2 + ToolbarButton.WIDTH, 3),
+                    Size = new Vector2(padding * 2 + ToolbarButton.WIDTH, 3),
                     Anchor = Anchor.BottomLeft,
                     Origin = Anchor.TopLeft,
                     Masking = true,
