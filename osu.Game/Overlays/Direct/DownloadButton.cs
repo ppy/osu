@@ -81,6 +81,7 @@ namespace osu.Game.Overlays.Direct
             {
                 button.Enabled.Value = false;
                 button.TooltipText = "Unavailable";
+                return;
             }
 
             button.Action = () =>
