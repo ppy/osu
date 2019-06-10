@@ -23,6 +23,7 @@ namespace osu.Game.Overlays.Toolbar
         private const float padding = 10;
         private readonly Drawable modeButtonLine;
         private RulesetStore rulesets;
+        private readonly Bindable<RulesetInfo> globalRuleset = new Bindable<RulesetInfo>();
 
         public override bool HandleNonPositionalInput => !Current.Disabled && base.HandleNonPositionalInput;
         public override bool HandlePositionalInput => !Current.Disabled && base.HandlePositionalInput;
@@ -79,16 +80,19 @@ namespace osu.Game.Overlays.Toolbar
         private void load(RulesetStore rulesets, Bindable<RulesetInfo> parentRuleset)
         {
             this.rulesets = rulesets;
+            globalRuleset.BindTo(parentRuleset);
 
             foreach (var r in rulesets.AvailableRulesets)
             {
                 AddItem(r);
             }
 
-            Current.BindTo(parentRuleset);
-            Current.DisabledChanged += disabledChanged;
-            Current.BindValueChanged(rulesetChanged);
+            globalRuleset.BindValueChanged(globalRulesetChanged);
+            globalRuleset.DisabledChanged += disabledChanged;
+            Current.BindValueChanged(localRulesetChanged);
         }
+
+        private void globalRulesetChanged(ValueChangedEvent<RulesetInfo> e) => Current.Value = e.NewValue;
 
         protected override bool OnKeyDown(KeyDownEvent e)
         {
@@ -109,8 +113,13 @@ namespace osu.Game.Overlays.Toolbar
 
         private readonly Cached activeMode = new Cached();
 
-        private void rulesetChanged(ValueChangedEvent<RulesetInfo> e)
+        private void localRulesetChanged(ValueChangedEvent<RulesetInfo> e)
         {
+            if (!globalRuleset.Disabled)
+            {
+                globalRuleset.Value = e.NewValue;
+            }
+
             activeMode.Invalidate();
         }
 
