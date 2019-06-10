@@ -286,6 +286,15 @@ namespace osu.Game.Overlays
 
         private int distinctCount(List<string> list) => list.Distinct().ToArray().Length;
 
+        public void ShowTextSearch(string searchText)
+        {
+            currentQuery.Value = searchText;
+
+            // Hide first to put the direct overlay into the foreground if its behind another overlay.
+            Hide();
+            Show();
+        }
+
         public class ResultCounts
         {
             public readonly int Artists;

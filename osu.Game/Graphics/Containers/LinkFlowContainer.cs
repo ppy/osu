@@ -11,6 +11,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Logging;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Notifications;
+using osu.Game.Screens.Select;
 using osu.Game.Users;
 
 namespace osu.Game.Graphics.Containers
@@ -126,6 +127,10 @@ namespace osu.Game.Graphics.Containers
                         case LinkAction.OpenUserProfile:
                             if (long.TryParse(linkArgument, out long userId))
                                 game?.ShowUser(userId);
+                            break;
+                        
+                        case LinkAction.OpenTextSearch:
+                            game?.ShowDirectTextSearch(linkArgument);
                             break;
 
                         default:
