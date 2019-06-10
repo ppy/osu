@@ -77,10 +77,8 @@ namespace osu.Game.Tests.Beatmaps.IO
                     Assert.IsTrue(imported.ID == importedSecondTime.ID);
                     Assert.IsTrue(imported.Beatmaps.First().ID == importedSecondTime.Beatmaps.First().ID);
 
-                    var manager = osu.Dependencies.Get<BeatmapManager>();
-
-                    Assert.AreEqual(1, manager.GetAllUsableBeatmapSets().Count);
-                    Assert.AreEqual(1, manager.QueryBeatmapSets(_ => true).ToList().Count);
+                    checkBeatmapSetCount(osu, 1);
+                    checkSingleReferencedFileCount(osu, 18);
                 }
                 finally
                 {
@@ -108,7 +106,6 @@ namespace osu.Game.Tests.Beatmaps.IO
 
                     var osu = loadOsu(host);
                     var manager = osu.Dependencies.Get<BeatmapManager>();
-                    var files = osu.Dependencies.Get<FileStore>();
 
                     // ReSharper disable once AccessToModifiedClosure
                     manager.ItemAdded += (_, __) => Interlocked.Increment(ref itemAddRemoveFireCount);
@@ -123,11 +120,9 @@ namespace osu.Game.Tests.Beatmaps.IO
 
                     Assert.AreEqual(0, itemAddRemoveFireCount -= 2);
 
-                    Assert.AreEqual(1, manager.GetAllUsableBeatmapSets().Count);
-                    Assert.AreEqual(1, manager.QueryBeatmapSets(_ => true).ToList().Count);
-                    Assert.AreEqual(12, manager.QueryBeatmaps(_ => true).ToList().Count);
-
-                    Assert.AreEqual(18, files.QueryFiles(_ => true).Count());
+                    checkBeatmapSetCount(osu, 1);
+                    checkBeatmapCount(osu, 12);
+                    checkSingleReferencedFileCount(osu, 18);
 
                     var breakTemp = TestResources.GetTestBeatmapForImport();
 
@@ -155,12 +150,10 @@ namespace osu.Game.Tests.Beatmaps.IO
                     // no events should be fired in the case of a rollback.
                     Assert.AreEqual(0, itemAddRemoveFireCount);
 
-                    Assert.AreEqual(1, manager.GetAllUsableBeatmapSets().Count);
-                    Assert.AreEqual(1, manager.QueryBeatmapSets(_ => true).ToList().Count);
-                    Assert.AreEqual(12, manager.QueryBeatmaps(_ => true).ToList().Count);
+                    checkBeatmapSetCount(osu, 1);
+                    checkBeatmapCount(osu, 12);
 
-                    Assert.AreEqual(18, files.QueryFiles(_ => true).Count());
-                    Assert.AreEqual(18, files.QueryFiles(f => f.ReferenceCount == 1).Count());
+                    checkSingleReferencedFileCount(osu, 18);
 
                     Assert.AreEqual(1, loggedExceptionCount);
                 }
@@ -193,8 +186,7 @@ namespace osu.Game.Tests.Beatmaps.IO
                     Assert.IsTrue(imported.Beatmaps.First().ID < importedSecondTime.Beatmaps.First().ID);
 
                     // only one beatmap will exist as the online set ID matched, causing purging of the first import.
-                    Assert.AreEqual(1, manager.GetAllUsableBeatmapSets().Count);
-                    Assert.AreEqual(1, manager.QueryBeatmapSets(_ => true).ToList().Count);
+                    checkBeatmapSetCount(osu, 1);
                 }
                 finally
                 {
@@ -396,9 +388,30 @@ namespace osu.Game.Tests.Beatmaps.IO
             var manager = osu.Dependencies.Get<BeatmapManager>();
             manager.Delete(imported);
 
-            Assert.IsTrue(manager.GetAllUsableBeatmapSets().Count == 0);
-            Assert.AreEqual(1, manager.QueryBeatmapSets(_ => true).ToList().Count);
+            checkBeatmapSetCount(osu, 0);
+            checkBeatmapSetCount(osu, 1, true);
+            checkSingleReferencedFileCount(osu, 0);
+
             Assert.IsTrue(manager.QueryBeatmapSets(_ => true).First().DeletePending);
+        }
+
+        private void checkBeatmapSetCount(OsuGameBase osu, int expected, bool includeDeletePending = false)
+        {
+            var manager = osu.Dependencies.Get<BeatmapManager>();
+
+            Assert.AreEqual(expected, includeDeletePending
+                ? manager.QueryBeatmapSets(_ => true).ToList().Count
+                : manager.GetAllUsableBeatmapSets().Count);
+        }
+
+        private void checkBeatmapCount(OsuGameBase osu, int expected)
+        {
+            Assert.AreEqual(expected, osu.Dependencies.Get<BeatmapManager>().QueryBeatmaps(_ => true).ToList().Count);
+        }
+
+        private void checkSingleReferencedFileCount(OsuGameBase osu, int expected)
+        {
+            Assert.AreEqual(expected, osu.Dependencies.Get<FileStore>().QueryFiles(f => f.ReferenceCount == 1).Count());
         }
 
         private OsuGameBase loadOsu(GameHost host)
