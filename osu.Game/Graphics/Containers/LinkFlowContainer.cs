@@ -89,9 +89,11 @@ namespace osu.Game.Graphics.Containers
                     foreach (string individualTag in text.Split(' '))
                         AddLink(individualTag + " ", null, LinkAction.OpenTextSearch, individualTag, "Open search");
                     break;
+
                 case MetadataType.Source:
                     AddLink(text, null, LinkAction.OpenTextSearch, text, "Open search");
                     break;
+
                 case MetadataType.Description:
                     AddText(text);
                     break;
