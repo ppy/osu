@@ -64,17 +64,17 @@ namespace osu.Game.Screens
         /// </summary>
         protected UserActivity ScreenActivity
         {
-            get => activity;
+            get => screenActivity;
             set
             {
-                if (value == activity) return;
+                if (value == screenActivity) return;
 
-                activity = value;
-                setUserActivity(activity);
+                screenActivity = value;
+                setUserActivity(screenActivity);
             }
         }
 
-        private UserActivity activity;
+        private UserActivity screenActivity;
 
         /// <summary>
         /// Whether to disallow changes to game-wise Beatmap/Ruleset bindables for this screen (and all children).
@@ -114,21 +114,21 @@ namespace osu.Game.Screens
         [Resolved(canBeNull: true)]
         private OsuLogo logo { get; set; }
 
-        private IAPIProvider api;
+        [Resolved(canBeNull: true)]
+        private IAPIProvider api { get; set; }
 
         protected OsuScreen()
         {
             Anchor = Anchor.Centre;
             Origin = Anchor.Centre;
 
-            activity = null;
+            screenActivity = null;
         }
 
         [BackgroundDependencyLoader(true)]
-        private void load(OsuGame osu, AudioManager audio, IAPIProvider provider)
+        private void load(OsuGame osu, AudioManager audio)
         {
-            sampleExit = audio.Sample.Get(@"UI/screen-back");
-            api = provider;
+            sampleExit = audio.Samples.Get(@"UI/screen-back");
         }
 
         public virtual bool OnPressed(GlobalAction action)
@@ -152,7 +152,7 @@ namespace osu.Game.Screens
                 sampleExit?.Play();
             applyArrivingDefaults(true);
 
-            setUserActivity(activity);
+            setUserActivity(screenActivity);
 
             base.OnResuming(last);
         }
