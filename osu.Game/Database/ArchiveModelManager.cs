@@ -154,25 +154,22 @@ namespace osu.Game.Database
 
             await Task.WhenAll(paths.Select(path => Import(path, notification.CancellationToken).ContinueWith(t =>
             {
-                if (notification.CancellationToken.IsCancellationRequested)
-                    return;
+                notification.CancellationToken.ThrowIfCancellationRequested();
 
-                lock (notification)
+                lock (imported)
                 {
-                    current++;
+                    Interlocked.Increment(ref current);
 
-                    notification.Text = $"Imported {current} of {paths.Length} {term}s";
-                    notification.Progress = (float)current / paths.Length;
-                }
-
-                if (t.Exception == null)
-                {
-                    lock (imported)
+                    if (t.Exception == null)
+                    {
                         imported.Add(t.Result);
-                }
-                else
-                {
-                    Logger.Error(t.Exception, $@"Could not import ({Path.GetFileName(path)})");
+                        notification.Text = $"Imported {current} of {paths.Length} {term}s";
+                        notification.Progress = (float)current / paths.Length;
+                    }
+                    else
+                    {
+                        Logger.Error(t.Exception, $@"Could not import ({Path.GetFileName(path)})");
+                    }
                 }
             }, TaskContinuationOptions.NotOnCanceled)));
 
@@ -300,23 +297,23 @@ namespace osu.Game.Database
 
             delayEvents();
 
+            void rollback()
+            {
+                if (!Delete(item))
+                {
+                    // We may have not yet added the model to the underlying table, but should still clean up files.
+                    Logger.Log($"Dereferencing files for incomplete import of {item}.", LoggingTarget.Database);
+                    Files.Dereference(item.Files.Select(f => f.FileInfo).ToArray());
+                }
+            }
+
             try
             {
                 Logger.Log($"Importing {item}...", LoggingTarget.Database);
 
                 item.Files = archive != null ? createFileInfos(archive, Files) : new List<TFileModel>();
 
-                var localItem = item;
-
-                try
-                {
-                    await Populate(item, archive, cancellationToken);
-                }
-                catch (Exception)
-                {
-                    if (!Delete(localItem))
-                        Files.Dereference(localItem.Files.Select(f => f.FileInfo).ToArray());
-                }
+                await Populate(item, archive, cancellationToken);
 
                 using (var write = ContextFactory.GetForWrite()) // used to share a context for full import. keep in mind this will block all writes.
                 {
@@ -333,6 +330,8 @@ namespace osu.Game.Database
                                 Undelete(existing);
                                 Logger.Log($"Found existing {nameof(TModel)} for {item} (ID {existing.ID}). Skipping import.", LoggingTarget.Database);
                                 handleEvent(() => ItemAdded?.Invoke(existing, true));
+
+                                rollback();
                                 return existing;
                             }
                             else
@@ -349,9 +348,6 @@ namespace osu.Game.Database
                     }
                     catch (Exception e)
                     {
-                        if (!Delete(item))
-                            Files.Dereference(item.Files.Select(f => f.FileInfo).ToArray());
-
                         write.Errors.Add(e);
                         throw;
                     }
@@ -359,13 +355,12 @@ namespace osu.Game.Database
 
                 Logger.Log($"Import of {item} successfully completed!", LoggingTarget.Database);
             }
-            catch (TaskCanceledException)
-            {
-                throw;
-            }
             catch (Exception e)
             {
-                Logger.Error(e, $"Import of {item} failed and has been rolled back.", LoggingTarget.Database);
+                if (!(e is TaskCanceledException))
+                    Logger.Error(e, $"Import of {item} failed and has been rolled back.", LoggingTarget.Database);
+
+                rollback();
                 item = null;
             }
             finally
