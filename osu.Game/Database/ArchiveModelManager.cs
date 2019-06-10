@@ -630,7 +630,15 @@ namespace osu.Game.Database
 
     public abstract class ArchiveModelManager
     {
-        // allow sharing static across all generic types
-        protected static readonly ThreadedTaskScheduler IMPORT_SCHEDULER = new ThreadedTaskScheduler(1);
+        private const int import_queue_request_concurrency = 1;
+
+        /// <summary>
+        /// A singleton scheduler shared by all <see cref="ArchiveModelManager{TModel,TFileModel}"/>.
+        /// </summary>
+        /// <remarks>
+        /// This scheduler generally performs IO and CPU intensive work so concurrency is limited harshly.
+        /// It is mainly being used as a queue mechanism for large imports.
+        /// </remarks>
+        protected static readonly ThreadedTaskScheduler IMPORT_SCHEDULER = new ThreadedTaskScheduler(import_queue_request_concurrency);
     }
 }
