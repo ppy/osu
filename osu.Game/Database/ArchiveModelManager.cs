@@ -172,8 +172,7 @@ namespace osu.Game.Database
                 }
                 else
                 {
-                    var e = t.Exception.InnerException ?? t.Exception;
-                    Logger.Error(e, $@"Could not import ({Path.GetFileName(path)})");
+                    Logger.Error(t.Exception, $@"Could not import ({Path.GetFileName(path)})");
                 }
             }, TaskContinuationOptions.NotOnCanceled)));
 
