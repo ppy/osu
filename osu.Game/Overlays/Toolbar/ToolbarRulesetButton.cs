@@ -6,6 +6,7 @@ using osu.Framework.Graphics.UserInterface;
 using osu.Game.Rulesets;
 using osuTK.Graphics;
 using osu.Framework.Graphics;
+using osu.Framework.Input.Events;
 
 namespace osu.Game.Overlays.Toolbar
 {
@@ -57,6 +58,12 @@ namespace osu.Game.Overlays.Toolbar
                         IconContainer.EdgeEffect = new EdgeEffectParameters();
                     }
                 }
+            }
+
+            protected override bool OnClick(ClickEvent e)
+            {
+                Parent.Click();
+                return base.OnClick(e);
             }
 
             protected override void LoadComplete()
