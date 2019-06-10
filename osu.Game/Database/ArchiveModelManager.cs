@@ -146,8 +146,6 @@ namespace osu.Game.Database
             notification.Progress = 0;
             notification.Text = "Import is initialising...";
 
-            var term = $"{typeof(TModel).Name.Replace("Info", "").ToLower()}";
-
             int current = 0;
 
             var imported = new List<TModel>();
@@ -164,7 +162,7 @@ namespace osu.Game.Database
                     {
                         imported.Add(model);
 
-                        notification.Text = $"Imported {current} of {paths.Length} {term}s";
+                        notification.Text = $"Imported {current} of {paths.Length} {humanisedModelName}s";
                         notification.Progress = (float)current / paths.Length;
                     }
                 }
@@ -191,7 +189,7 @@ namespace osu.Game.Database
             {
                 notification.CompletionText = imported.Count == 1
                     ? $"Imported {imported.First()}!"
-                    : $"Imported {current} {term}s!";
+                    : $"Imported {current} {humanisedModelName}s!";
 
                 if (imported.Count > 0 && PresentImport != null)
                 {
@@ -339,7 +337,7 @@ namespace osu.Game.Database
                             if (CanUndelete(existing, item))
                             {
                                 Undelete(existing);
-                                Logger.Log($"Found existing {nameof(TModel)} for {item} (ID {existing.ID}). Skipping import.", LoggingTarget.Database);
+                                Logger.Log($"Found existing {humanisedModelName} for {item} (ID {existing.ID}). Skipping import.", LoggingTarget.Database);
                                 handleEvent(() => ItemAdded?.Invoke(existing, true));
 
                                 // existing item will be used; rollback new import and exit early.
@@ -609,6 +607,8 @@ namespace osu.Game.Database
         protected virtual bool CanUndelete(TModel existing, TModel import) => true;
 
         private DbSet<TModel> queryModel() => ContextFactory.Get().Set<TModel>();
+
+        private string humanisedModelName => $"{typeof(TModel).Name.Replace("Info", "").ToLower()}";
 
         /// <summary>
         /// Creates an <see cref="ArchiveReader"/> from a valid storage path.
