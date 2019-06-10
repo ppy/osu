@@ -81,6 +81,23 @@ namespace osu.Game.Graphics.Containers
         public IEnumerable<Drawable> AddUserLink(User user, Action<SpriteText> creationParameters = null)
             => createLink(AddText(user.Username, creationParameters), user.Username, null, LinkAction.OpenUserProfile, user.Id.ToString(), "View profile");
 
+        public void AddMetadataLinks(string text, MetadataType type)
+        {
+            switch (type)
+            {
+                case MetadataType.Tags:
+                    foreach (string individualTag in text.Split(' '))
+                        AddLink(individualTag + " ", null, LinkAction.OpenTextSearch, individualTag, "Open search");
+                    break;
+                case MetadataType.Source:
+                    AddLink(text, null, LinkAction.OpenTextSearch, text, "Open search");
+                    break;
+                case MetadataType.Description:
+                    AddText(text);
+                    break;
+            }
+        }
+
         private IEnumerable<Drawable> createLink(IEnumerable<Drawable> drawables, string text, string url = null, LinkAction linkType = LinkAction.External, string linkArgument = null, string tooltipText = null, Action action = null)
         {
             AddInternal(new DrawableLinkCompiler(drawables.OfType<SpriteText>().ToList())

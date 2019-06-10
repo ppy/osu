@@ -14,6 +14,8 @@ using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osuTK;
 using osuTK.Graphics;
+using osu.Game.Online.Chat;
+using osu.Game.Screens.Select;
 
 namespace osu.Game.Overlays.BeatmapSet
 {
@@ -68,7 +70,7 @@ namespace osu.Game.Overlays.BeatmapSet
                             Child = new Container
                             {
                                 RelativeSizeAxes = Axes.Both,
-                                Child = new MetadataSection("Description"),
+                                Child = new MetadataSection(MetadataType.Description),
                             },
                         },
                         new Container
@@ -87,8 +89,8 @@ namespace osu.Game.Overlays.BeatmapSet
                                 LayoutDuration = transition_duration,
                                 Children = new[]
                                 {
-                                    source = new MetadataSection("Source"),
-                                    tags = new MetadataSection("Tags"),
+                                    source = new MetadataSection(MetadataType.Source),
+                                    tags = new MetadataSection(MetadataType.Tags),
                                 },
                             },
                         },
@@ -130,8 +132,9 @@ namespace osu.Game.Overlays.BeatmapSet
 
         private class MetadataSection : FillFlowContainer
         {
+            private readonly MetadataType type;
             private readonly OsuSpriteText header;
-            private readonly TextFlowContainer textFlow;
+            private readonly LinkFlowContainer linkFlow;
 
             public string Text
             {
@@ -144,19 +147,21 @@ namespace osu.Game.Overlays.BeatmapSet
                     }
 
                     this.FadeIn(transition_duration);
-                    textFlow.Clear();
-                    textFlow.AddText(value, s => s.Font = s.Font.With(size: 14));
+                    linkFlow.Clear();
+                    linkFlow.AddMetadataLinks(value, type);
                 }
             }
 
             public Color4 TextColour
             {
-                get => textFlow.Colour;
-                set => textFlow.Colour = value;
+                get => linkFlow.Colour;
+                set => linkFlow.Colour = value;
             }
 
-            public MetadataSection(string title)
+            public MetadataSection(MetadataType type)
             {
+                this.type = type;
+
                 RelativeSizeAxes = Axes.X;
                 AutoSizeAxes = Axes.Y;
                 Spacing = new Vector2(5f);
@@ -165,12 +170,12 @@ namespace osu.Game.Overlays.BeatmapSet
                 {
                     header = new OsuSpriteText
                     {
-                        Text = title,
+                        Text = type.ToString(),
                         Font = OsuFont.GetFont(size: 14, weight: FontWeight.Bold),
                         Shadow = false,
                         Margin = new MarginPadding { Top = 20 },
                     },
-                    textFlow = new OsuTextFlowContainer
+                    linkFlow = new LinkFlowContainer(s => s.Font = s.Font.With(size: 14))
                     {
                         RelativeSizeAxes = Axes.X,
                         AutoSizeAxes = Axes.Y,
@@ -181,7 +186,7 @@ namespace osu.Game.Overlays.BeatmapSet
             [BackgroundDependencyLoader]
             private void load(OsuColour colours)
             {
-                header.Colour = textFlow.Colour = colours.Gray5;
+                header.Colour = linkFlow.Colour = colours.Gray5;
             }
         }
     }

@@ -18,6 +18,7 @@ using osu.Game.Screens.Select.Details;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
+using osu.Game.Online.Chat;
 
 namespace osu.Game.Screens.Select
 {
@@ -123,9 +124,9 @@ namespace osu.Game.Screens.Select
                                         Margin = new MarginPadding { Top = spacing * 2 },
                                         Children = new[]
                                         {
-                                            description = new MetadataSection("Description"),
-                                            source = new MetadataSection("Source"),
-                                            tags = new MetadataSection("Tags"),
+                                            description = new MetadataSection(MetadataType.Description),
+                                            source = new MetadataSection(MetadataType.Source),
+                                            tags = new MetadataSection(MetadataType.Tags),
                                         },
                                     },
                                 },
@@ -275,11 +276,14 @@ namespace osu.Game.Screens.Select
 
         private class MetadataSection : Container
         {
+            private readonly MetadataType type;
             private readonly FillFlowContainer textContainer;
-            private TextFlowContainer textFlow;
+            private LinkFlowContainer linkFlow;
 
-            public MetadataSection(string title)
+            public MetadataSection(MetadataType type)
             {
+                this.type = type;
+
                 RelativeSizeAxes = Axes.X;
                 AutoSizeAxes = Axes.Y;
 
@@ -297,7 +301,7 @@ namespace osu.Game.Screens.Select
                             AutoSizeAxes = Axes.Y,
                             Child = new OsuSpriteText
                             {
-                                Text = title,
+                                Text = type.ToString(),
                                 Font = OsuFont.GetFont(weight: FontWeight.Bold, size: 14),
                             },
                         },
@@ -323,16 +327,16 @@ namespace osu.Game.Screens.Select
 
             private void setTextAsync(string text)
             {
-                LoadComponentAsync(new OsuTextFlowContainer(s => s.Font = s.Font.With(size: 14))
+                LoadComponentAsync(new LinkFlowContainer(s => s.Font = s.Font.With(size: 14))
                 {
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
                     Colour = Color4.White.Opacity(0.75f),
-                    Text = text
                 }, loaded =>
                 {
-                    textFlow?.Expire();
-                    textContainer.Add(textFlow = loaded);
+                    loaded.AddMetadataLinks(text, type);
+                    linkFlow?.Expire();
+                    textContainer.Add(linkFlow = loaded);
 
                     // fade in if we haven't yet.
                     textContainer.FadeIn(transition_duration);
@@ -369,5 +373,12 @@ namespace osu.Game.Screens.Select
                 loading.State = Visibility.Hidden;
             }
         }
+    }
+
+    public enum MetadataType
+    {
+        Tags,
+        Source,
+        Description
     }
 }
