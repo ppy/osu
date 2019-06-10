@@ -138,7 +138,7 @@ namespace osu.Game.Tests.Visual.SongSelect
         {
             createSongSelect();
             changeRuleset(2);
-            importForRuleset(0);
+            addRulesetImportStep(0);
             AddUntilStep("no selection", () => songSelect.Carousel.SelectedBeatmap == null);
         }
 
@@ -147,8 +147,8 @@ namespace osu.Game.Tests.Visual.SongSelect
         {
             createSongSelect();
             changeRuleset(2);
-            importForRuleset(2);
-            importForRuleset(1);
+            addRulesetImportStep(2);
+            addRulesetImportStep(1);
             AddUntilStep("has selection", () => songSelect.Carousel.SelectedBeatmap.RulesetID == 2);
 
             changeRuleset(1);
@@ -223,7 +223,7 @@ namespace osu.Game.Tests.Visual.SongSelect
             });
             AddRepeatStep($"Create beatmaps {test_count} times", () =>
             {
-                manager.Import(createTestBeatmapSet(getImportId(), rulesets.AvailableRulesets.Where(r => r.ID == 0).ToArray()));
+                importForRuleset(0);
 
                 Scheduler.AddDelayed(() =>
                 {
@@ -240,15 +240,16 @@ namespace osu.Game.Tests.Visual.SongSelect
         {
             int? previousID = null;
             createSongSelect();
-            importForRuleset(0);
+            addRulesetImportStep(0);
             AddStep("Move to last difficulty", () => songSelect.Carousel.SelectBeatmap(songSelect.Carousel.BeatmapSets.First().Beatmaps.Last()));
             AddStep("Store current ID", () => previousID = songSelect.Carousel.SelectedBeatmap.ID);
             AddStep("Hide first beatmap", () => manager.Hide(songSelect.Carousel.SelectedBeatmapSet.Beatmaps.First()));
             AddAssert("Selected beatmap has not changed", () => songSelect.Carousel.SelectedBeatmap.ID == previousID);
         }
 
-        private void importForRuleset(int id) => AddStep($"import test map for ruleset {id}",
-            () => manager.Import(createTestBeatmapSet(getImportId(), rulesets.AvailableRulesets.Where(r => r.ID == id).ToArray())));
+        private void addRulesetImportStep(int id) => AddStep($"import test map for ruleset {id}", () => importForRuleset(id));
+
+        private void importForRuleset(int id) => manager.Import(createTestBeatmapSet(getImportId(), rulesets.AvailableRulesets.Where(r => r.ID == id).ToArray()));
 
         private static int importId;
         private int getImportId() => ++importId;
