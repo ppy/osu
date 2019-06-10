@@ -135,14 +135,14 @@ namespace osu.Game.Tests.Beatmaps.IO
                         zip.SaveTo(outStream, SharpCompress.Common.CompressionType.Deflate);
                     }
 
-                    Assert.AreEqual(1, manager.GetAllUsableBeatmapSets().Count);
-                    Assert.AreEqual(1, manager.QueryBeatmapSets(_ => true).ToList().Count);
-                    Assert.AreEqual(12, manager.QueryBeatmaps(_ => true).ToList().Count);
-
-                    Assert.AreEqual(18, files.QueryFiles(_ => true).Count());
-
                     // this will trigger purging of the existing beatmap (online set id match) but should rollback due to broken osu.
-                    await manager.Import(breakTemp);
+                    try
+                    {
+                        await manager.Import(breakTemp);
+                    }
+                    catch
+                    {
+                    }
 
                     // no events should be fired in the case of a rollback.
                     Assert.AreEqual(0, fireCount);
