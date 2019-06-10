@@ -11,6 +11,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions;
+using osu.Framework.Logging;
 using osu.Framework.MathUtils;
 using osu.Framework.Platform;
 using osu.Framework.Screens;
@@ -215,11 +216,13 @@ namespace osu.Game.Tests.Visual.SongSelect
         {
             const int test_count = 10;
             int beatmapChangedCount = 0;
+            int debounceCount = 0;
             createSongSelect();
-            AddStep("Setup counter", () =>
+            AddStep("Setup counters", () =>
             {
                 beatmapChangedCount = 0;
-                songSelect.Carousel.SelectionChanged += _ => beatmapChangedCount++;
+                debounceCount = 0;
+                songSelect.Carousel.SelectionChanged += _ => beatmapChangedCount += 1;
             });
             AddRepeatStep($"Create beatmaps {test_count} times", () =>
             {
@@ -229,10 +232,14 @@ namespace osu.Game.Tests.Visual.SongSelect
                 {
                     // Wait for debounce
                     songSelect.Carousel.SelectNextRandom();
+                    ++debounceCount;
                 }, 400);
             }, test_count);
 
-            AddAssert($"Beatmap changed {test_count} times", () => beatmapChangedCount == test_count);
+            AddUntilStep("Debounce limit reached", () => debounceCount == test_count);
+
+            // The selected beatmap should have changed an additional 2 times since both initially loading songselect and the first import also triggers selectionChanged
+            AddAssert($"Beatmap changed {test_count + 2} times", () => beatmapChangedCount == test_count + 2);
         }
 
         [Test]
