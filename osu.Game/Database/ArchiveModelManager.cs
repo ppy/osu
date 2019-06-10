@@ -331,7 +331,7 @@ namespace osu.Game.Database
                             if (CanUndelete(existing, item))
                             {
                                 Undelete(existing);
-                                Logger.Log($"Found existing {typeof(TModel)} for {item} (ID {existing.ID}). Skipping import.", LoggingTarget.Database);
+                                Logger.Log($"Found existing {nameof(TModel)} for {item} (ID {existing.ID}). Skipping import.", LoggingTarget.Database);
                                 handleEvent(() => ItemAdded?.Invoke(existing, true));
                                 return existing;
                             }
