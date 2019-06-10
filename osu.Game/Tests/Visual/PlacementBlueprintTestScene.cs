@@ -15,19 +15,18 @@ namespace osu.Game.Tests.Visual
     [Cached(Type = typeof(IPlacementHandler))]
     public abstract class PlacementBlueprintTestScene : OsuTestScene, IPlacementHandler
     {
-        protected readonly Container HitObjectContainer;
+        protected Container HitObjectContainer;
         private PlacementBlueprint currentBlueprint;
 
         protected PlacementBlueprintTestScene()
         {
-            Beatmap.Value.BeatmapInfo.BaseDifficulty.CircleSize = 2;
-
             Add(HitObjectContainer = CreateHitObjectContainer());
         }
 
         [BackgroundDependencyLoader]
         private void load()
         {
+            Beatmap.Value.BeatmapInfo.BaseDifficulty.CircleSize = 2;
             Add(currentBlueprint = CreateBlueprint());
         }
 

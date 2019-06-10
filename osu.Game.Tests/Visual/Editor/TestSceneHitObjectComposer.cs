@@ -18,7 +18,6 @@ using osu.Game.Rulesets.Osu.Edit.Blueprints.HitCircles.Components;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Screens.Edit.Compose;
 using osu.Game.Screens.Edit.Compose.Components;
-using osu.Game.Tests.Beatmaps;
 using osuTK;
 
 namespace osu.Game.Tests.Visual.Editor
@@ -45,7 +44,7 @@ namespace osu.Game.Tests.Visual.Editor
         [BackgroundDependencyLoader]
         private void load()
         {
-            Beatmap.Value = new TestWorkingBeatmap(new Beatmap
+            Beatmap.Value = CreateWorkingBeatmap(new Beatmap
             {
                 HitObjects = new List<HitObject>
                 {

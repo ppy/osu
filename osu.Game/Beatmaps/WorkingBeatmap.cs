@@ -11,15 +11,17 @@ using osu.Framework.IO.File;
 using System.IO;
 using System.Linq;
 using System.Threading;
+using osu.Framework.Audio;
 using osu.Game.IO.Serialization;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Objects;
+using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.UI;
 using osu.Game.Skinning;
 
 namespace osu.Game.Beatmaps
 {
-    public abstract partial class WorkingBeatmap : IDisposable
+    public abstract class WorkingBeatmap : IDisposable
     {
         public readonly BeatmapInfo BeatmapInfo;
 
@@ -27,8 +29,11 @@ namespace osu.Game.Beatmaps
 
         public readonly BeatmapMetadata Metadata;
 
-        protected WorkingBeatmap(BeatmapInfo beatmapInfo)
+        protected AudioManager AudioManager { get; }
+
+        protected WorkingBeatmap(BeatmapInfo beatmapInfo, AudioManager audioManager)
         {
+            AudioManager = audioManager;
             BeatmapInfo = beatmapInfo;
             BeatmapSetInfo = beatmapInfo.BeatmapSet;
             Metadata = beatmapInfo.Metadata ?? BeatmapSetInfo?.Metadata ?? new BeatmapMetadata();
@@ -46,11 +51,37 @@ namespace osu.Game.Beatmaps
                 return b;
             });
 
-            track = new RecyclableLazy<Track>(() => GetTrack() ?? new VirtualBeatmapTrack(Beatmap));
+            track = new RecyclableLazy<Track>(() => GetTrack() ?? GetVirtualTrack());
             background = new RecyclableLazy<Texture>(GetBackground, BackgroundStillValid);
             waveform = new RecyclableLazy<Waveform>(GetWaveform);
             storyboard = new RecyclableLazy<Storyboard>(GetStoryboard);
             skin = new RecyclableLazy<Skin>(GetSkin);
+        }
+
+        protected virtual Track GetVirtualTrack()
+        {
+            const double excess_length = 1000;
+
+            var lastObject = Beatmap.HitObjects.LastOrDefault();
+
+            double length;
+
+            switch (lastObject)
+            {
+                case null:
+                    length = excess_length;
+                    break;
+
+                case IHasEndTime endTime:
+                    length = endTime.EndTime + excess_length;
+                    break;
+
+                default:
+                    length = lastObject.StartTime + excess_length;
+                    break;
+            }
+
+            return AudioManager.Tracks.GetVirtual(length);
         }
 
         /// <summary>
@@ -150,6 +181,7 @@ namespace osu.Game.Beatmaps
 
         public bool SkinLoaded => skin.IsResultAvailable;
         public Skin Skin => skin.Value;
+
         protected virtual Skin GetSkin() => new DefaultSkin();
         private readonly RecyclableLazy<Skin> skin;
 
@@ -175,7 +207,7 @@ namespace osu.Game.Beatmaps
         /// Eagerly dispose of the audio track associated with this <see cref="WorkingBeatmap"/> (if any).
         /// Accessing track again will load a fresh instance.
         /// </summary>
-        public void RecycleTrack() => track.Recycle();
+        public virtual void RecycleTrack() => track.Recycle();
 
         public class RecyclableLazy<T>
         {
