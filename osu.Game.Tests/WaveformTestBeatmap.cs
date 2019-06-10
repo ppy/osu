@@ -3,6 +3,7 @@
 
 using System.IO;
 using System.Linq;
+using osu.Framework.Audio;
 using osu.Framework.Audio.Track;
 using osu.Framework.Graphics.Textures;
 using osu.Game.Beatmaps;
@@ -19,12 +20,14 @@ namespace osu.Game.Tests
     {
         private readonly ZipArchiveReader reader;
         private readonly Stream stream;
+        private readonly ITrackStore trackStore;
 
-        public WaveformTestBeatmap()
-            : base(new BeatmapInfo())
+        public WaveformTestBeatmap(AudioManager audioManager)
+            : base(new BeatmapInfo(), audioManager)
         {
             stream = TestResources.GetTestBeatmapStream();
             reader = new ZipArchiveReader(stream);
+            trackStore = audioManager.GetTrackStore(reader);
         }
 
         public override void Dispose()
@@ -32,17 +35,19 @@ namespace osu.Game.Tests
             base.Dispose();
             stream?.Dispose();
             reader?.Dispose();
+            trackStore?.Dispose();
         }
 
         protected override IBeatmap GetBeatmap() => createTestBeatmap();
 
         protected override Texture GetBackground() => null;
 
-        protected override Waveform GetWaveform() => new Waveform(getAudioStream());
+        protected override Waveform GetWaveform() => new Waveform(trackStore.GetStream(firstAudioFile));
 
-        protected override Track GetTrack() => new TrackBass(getAudioStream());
+        protected override Track GetTrack() => trackStore.Get(firstAudioFile);
 
-        private Stream getAudioStream() => reader.GetStream(reader.Filenames.First(f => f.EndsWith(".mp3")));
+        private string firstAudioFile => reader.Filenames.First(f => f.EndsWith(".mp3"));
+
         private Stream getBeatmapStream() => reader.GetStream(reader.Filenames.First(f => f.EndsWith(".osu")));
 
         private Beatmap createTestBeatmap()
