@@ -152,26 +152,35 @@ namespace osu.Game.Database
 
             var imported = new List<TModel>();
 
-            await Task.WhenAll(paths.Select(path => Import(path, notification.CancellationToken).ContinueWith(t =>
+            await Task.WhenAll(paths.Select(async path =>
             {
                 notification.CancellationToken.ThrowIfCancellationRequested();
 
-                lock (imported)
+                try
                 {
-                    Interlocked.Increment(ref current);
+                    var model = await Import(path, notification.CancellationToken);
 
-                    if (t.Exception == null)
+                    lock (imported)
                     {
-                        imported.Add(t.Result);
+                        imported.Add(model);
+
                         notification.Text = $"Imported {current} of {paths.Length} {term}s";
                         notification.Progress = (float)current / paths.Length;
                     }
-                    else
-                    {
-                        Logger.Error(t.Exception, $@"Could not import ({Path.GetFileName(path)})");
-                    }
                 }
-            }, TaskContinuationOptions.NotOnCanceled)));
+                catch (TaskCanceledException)
+                {
+                    throw;
+                }
+                catch (Exception e)
+                {
+                    Logger.Error(e, $@"Could not import ({Path.GetFileName(path)})");
+                }
+                finally
+                {
+                    Interlocked.Increment(ref current);
+                }
+            }));
 
             if (imported.Count == 0)
             {
