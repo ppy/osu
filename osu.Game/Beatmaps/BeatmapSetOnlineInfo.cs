@@ -65,6 +65,11 @@ namespace osu.Game.Beatmaps
         /// The amount of people who have favourited this beatmap set.
         /// </summary>
         public int FavouriteCount { get; set; }
+
+        /// <summary>
+        /// The availability of this beatmap set.
+        /// </summary>
+        public BeatmapSetOnlineAvailability Availability { get; set; }
     }
 
     public class BeatmapSetOnlineCovers
@@ -73,7 +78,7 @@ namespace osu.Game.Beatmaps
 
         [JsonProperty(@"cover@2x")]
         public string Cover { get; set; }
-
+        
         public string CardLowRes { get; set; }
 
         [JsonProperty(@"card@2x")]
@@ -83,5 +88,14 @@ namespace osu.Game.Beatmaps
 
         [JsonProperty(@"list@2x")]
         public string List { get; set; }
+    }
+
+    public class BeatmapSetOnlineAvailability
+    {
+        [JsonProperty(@"download_disabled")]
+        public bool DownloadDisabled { get; set; }
+
+        [JsonProperty(@"more_information")]
+        public string ExternalLink { get; set; }
     }
 }
