@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Game.Scoring;
-using System;
 
 namespace osu.Game.Online.API.Requests
 {
@@ -15,6 +14,6 @@ namespace osu.Game.Online.API.Requests
             this.score = score;
         }
 
-        protected override String Target => $@"scores/{score.Ruleset.ShortName}/{score.OnlineScoreID}/download";
+        protected override string Target => $@"scores/{score.Ruleset.ShortName}/{score.OnlineScoreID}/download";
     }
 }

@@ -94,7 +94,6 @@ namespace osu.Game.Screens.Play
             });
         }
 
-
         private void playerLoaded(Player player)
         {
             if (IsDisposed)

@@ -12,7 +12,6 @@ using osu.Game.Scoring;
 using osu.Game.Scoring.Legacy;
 using System;
 using System.IO;
-using System.Threading;
 using System.Threading.Tasks;
 
 namespace osu.Game.Screens.Play
@@ -40,6 +39,27 @@ namespace osu.Game.Screens.Play
             this.createPlayerWithReplay = createPlayerWithReplay;
         }
 
+        protected virtual Score CreateReplayScore(string filename)
+        {
+            using (var stream = new FileStream(filename, FileMode.Open))
+            {
+                return new Score
+                {
+                    ScoreInfo = score,
+                    Replay = new DatabasedLegacyScoreParser(rulesets, beatmaps).Parse(stream).Replay,
+                };
+            }
+        }
+
+        protected void LoadReplay(string filename, Action<Player> onLoad)
+        {
+            replayScore = CreateReplayScore(filename);
+
+            var player = createPlayerWithReplay(replayScore);
+
+            LoadComponentAsync(player, onLoad);
+        }
+
         protected override Task CreatePlayerLoadTask(Action<Player> onLoad)
         {
             return Task.Run(() =>
@@ -48,18 +68,7 @@ namespace osu.Game.Screens.Play
 
                 request.Success += filename =>
                 {
-                    using (var stream = new FileStream(filename, FileMode.Open))
-                    {
-                        replayScore = new Score
-                        {
-                            ScoreInfo = score,
-                            Replay = new DatabasedLegacyScoreParser(rulesets, beatmaps).Parse(stream).Replay,
-                        };
-
-                        var player = createPlayerWithReplay(replayScore);
-
-                        LoadComponentAsync(player, onLoad);
-                    }
+                    LoadReplay(filename, onLoad);
                 };
 
                 request.Failure += e =>
