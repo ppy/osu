@@ -162,6 +162,7 @@ namespace osu.Game.Database
                     {
                         imported.Add(model);
 
+                        Interlocked.Increment(ref current);
                         notification.Text = $"Imported {current} of {paths.Length} {humanisedModelName}s";
                         notification.Progress = (float)current / paths.Length;
                     }
@@ -173,10 +174,6 @@ namespace osu.Game.Database
                 catch (Exception e)
                 {
                     Logger.Error(e, $@"Could not import ({Path.GetFileName(path)})");
-                }
-                finally
-                {
-                    Interlocked.Increment(ref current);
                 }
             }));
 
