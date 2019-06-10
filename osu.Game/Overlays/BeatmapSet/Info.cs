@@ -14,7 +14,6 @@ using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osuTK;
 using osuTK.Graphics;
-using osu.Game.Online.Chat;
 using osu.Game.Screens.Select;
 
 namespace osu.Game.Overlays.BeatmapSet
