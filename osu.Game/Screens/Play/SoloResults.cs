@@ -48,15 +48,8 @@ namespace osu.Game.Screens.Play
 
         private bool hasOnlineReplay => Score is APILegacyScoreInfo apiScore && apiScore.OnlineScoreID != null & apiScore.Replay;
 
-        private IReadOnlyList<Mod> previousMods;
-
         private void onReplay()
         {
-            // FIXME: why Mods.Disabled == true ?_?
-            Mods.Disabled = false;
-            previousMods = Mods.Value;
-            Mods.Value = Score.Mods;
-
             if (Score is APILegacyScoreInfo score)
             {
                 this.Push(new ReplayPlayerLoader(score, replayScore => createReplayPlayer(replayScore)));
@@ -67,14 +60,6 @@ namespace osu.Game.Screens.Play
         }
 
         private ReplayPlayer createReplayPlayer(Score score) => new ReplayPlayer(score, true, false);
-
-        public override void OnResuming(IScreen last)
-        {
-            base.OnResuming(last);
-
-            Mods.Value = previousMods;
-            previousMods = null;
-        }
 
         protected override IEnumerable<IResultPageInfo> CreateResultPages() => new IResultPageInfo[]
         {

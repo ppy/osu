@@ -8,9 +8,11 @@ using osu.Game.Beatmaps;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Game.Rulesets;
+using osu.Game.Rulesets.Mods;
 using osu.Game.Scoring;
 using osu.Game.Scoring.Legacy;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
 
@@ -59,6 +61,8 @@ namespace osu.Game.Screens.Play
 
             LoadComponentAsync(player, onLoad);
         }
+
+        protected override IReadOnlyList<Mod> DisplayMods => score.Mods;
 
         protected override Task CreatePlayerLoadTask(Action<Player> onLoad)
         {

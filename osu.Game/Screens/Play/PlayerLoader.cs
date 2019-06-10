@@ -71,7 +71,7 @@ namespace osu.Game.Screens.Play
                 RelativeSizeAxes = Axes.Both,
             }).WithChildren(new Drawable[]
             {
-                info = new BeatmapMetadataDisplay(Beatmap.Value, Mods.Value, content.LogoFacade)
+                info = new BeatmapMetadataDisplay(Beatmap.Value, DisplayMods, content.LogoFacade)
                 {
                     Alpha = 0,
                     Anchor = Anchor.Centre,
@@ -121,6 +121,8 @@ namespace osu.Game.Screens.Play
 
             this.Delay(400).Schedule(pushWhenLoaded);
         }
+
+        protected virtual IReadOnlyList<Mod> DisplayMods => Mods.Value;
 
         protected virtual Task CreatePlayerLoadTask(Action<Player> onLoad)
         {
