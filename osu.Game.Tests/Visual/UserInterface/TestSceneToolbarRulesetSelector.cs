@@ -6,6 +6,8 @@ using osu.Game.Overlays.Toolbar;
 using System;
 using System.Collections.Generic;
 using osu.Framework.Graphics;
+using System.Linq;
+using osu.Framework.MathUtils;
 
 namespace osu.Game.Tests.Visual.UserInterface
 {
@@ -28,7 +30,11 @@ namespace osu.Game.Tests.Visual.UserInterface
                 AutoSizeAxes = Axes.X,
                 Height = Toolbar.HEIGHT,
                 Child = selector = new ToolbarRulesetSelector()
+            });
 
+            AddStep("Select random", () =>
+            {
+                selector.Current.Value = selector.Items.ElementAt(RNG.Next(selector.Items.Count()));
             });
         }
     }
