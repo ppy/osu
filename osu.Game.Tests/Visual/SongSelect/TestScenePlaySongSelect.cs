@@ -219,7 +219,7 @@ namespace osu.Game.Tests.Visual.SongSelect
             AddStep("Setup counter", () =>
             {
                 beatmapChangedCount = 0;
-                songSelect.Carousel.BeatmapSetsChanged += () => beatmapChangedCount++;
+                songSelect.Carousel.SelectionChanged += _ => beatmapChangedCount++;
             });
             AddRepeatStep($"Create beatmaps {test_count} times", () =>
             {
