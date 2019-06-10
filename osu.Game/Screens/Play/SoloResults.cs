@@ -9,7 +9,6 @@ using osu.Framework.Screens;
 using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API.Requests.Responses;
-using osu.Game.Rulesets.Mods;
 using osu.Game.Scoring;
 using osu.Game.Screens.Ranking;
 using osu.Game.Screens.Ranking.Types;
@@ -18,7 +17,6 @@ namespace osu.Game.Screens.Play
 {
     public class SoloResults : Results
     {
-
         private ScoreManager scores;
 
         public SoloResults(ScoreInfo score)
@@ -52,7 +50,7 @@ namespace osu.Game.Screens.Play
         {
             if (Score is APILegacyScoreInfo score)
             {
-                this.Push(new ReplayPlayerLoader(score, replayScore => createReplayPlayer(replayScore)));
+                this.Push(new ReplayPlayerLoader(score, createReplayPlayer));
                 return;
             }
 

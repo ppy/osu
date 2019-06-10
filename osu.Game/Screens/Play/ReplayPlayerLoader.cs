@@ -18,13 +18,13 @@ using System.Threading.Tasks;
 
 namespace osu.Game.Screens.Play
 {
-    class ReplayPlayerLoader : PlayerLoader
+    public class ReplayPlayerLoader : PlayerLoader
     {
         private readonly ScoreInfo score;
 
-        private Score replayScore = null;
+        private Score replayScore;
 
-        private Func<Score, Player> createPlayerWithReplay;
+        private readonly Func<Score, Player> createPlayerWithReplay;
 
         [Resolved]
         private IAPIProvider api { get; set; }
@@ -35,7 +35,8 @@ namespace osu.Game.Screens.Play
         [Resolved]
         private BeatmapManager beatmaps { get; set; }
 
-        public ReplayPlayerLoader(ScoreInfo score, Func<Score, Player> createPlayerWithReplay) : base(null)
+        public ReplayPlayerLoader(ScoreInfo score, Func<Score, Player> createPlayerWithReplay)
+            : base(null)
         {
             this.score = score;
             this.createPlayerWithReplay = createPlayerWithReplay;
@@ -78,7 +79,7 @@ namespace osu.Game.Screens.Play
                 request.Failure += e =>
                 {
                     Logger.Error(e, @"Replay download failed!");
-                    Schedule(() => this.Exit());
+                    Schedule(this.Exit);
                 };
 
                 // TODO: check whether framework is supposed to throw when file not found for download (as it is doing now) or trigger failure
@@ -89,7 +90,7 @@ namespace osu.Game.Screens.Play
                 catch (Exception e)
                 {
                     Logger.Error(e, @"Replay download failed!");
-                    Schedule(() => this.Exit());
+                    Schedule(this.Exit);
                 }
             });
         }

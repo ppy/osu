@@ -28,7 +28,6 @@ namespace osu.Game.Tests.Visual.Gameplay
             playerLoader = null;
         });
 
-
         [Test]
         public void TestWaitForDownload()
         {
@@ -53,14 +52,15 @@ namespace osu.Game.Tests.Visual.Gameplay
         {
             private readonly ScoreInfo score;
 
-            public DownloadReplayRequest DownloadRequest = null;
+            public DownloadReplayRequest DownloadRequest;
 
-            public TestReplayPlayerLoader(ScoreInfo score, Func<Score, Player> createPlayer) : base(score, createPlayer)
+            public TestReplayPlayerLoader(ScoreInfo score, Func<Score, Player> createPlayer)
+                : base(score, createPlayer)
             {
                 this.score = score;
             }
 
-            Action<Player> onPlayerLoad;
+            private Action<Player> onPlayerLoad;
 
             protected override Task CreatePlayerLoadTask(Action<Player> onLoad)
             {

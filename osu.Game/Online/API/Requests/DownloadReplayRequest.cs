@@ -5,9 +5,9 @@ using osu.Game.Scoring;
 
 namespace osu.Game.Online.API.Requests
 {
-    class DownloadReplayRequest : APIDownloadRequest
+    public class DownloadReplayRequest : APIDownloadRequest
     {
-        private ScoreInfo score;
+        private readonly ScoreInfo score;
 
         public DownloadReplayRequest(ScoreInfo score)
         {

@@ -203,7 +203,7 @@ namespace osu.Game.Screens.Play
         // Here because IsHovered will not update unless we do so.
         public override bool HandlePositionalInput => true;
 
-        private bool readyForPush =>  player?.LoadState == LoadState.Ready && IsHovered && GetContainingInputManager()?.DraggedDrawable == null;
+        private bool readyForPush => player?.LoadState == LoadState.Ready && IsHovered && GetContainingInputManager()?.DraggedDrawable == null;
 
         private void pushWhenLoaded()
         {
