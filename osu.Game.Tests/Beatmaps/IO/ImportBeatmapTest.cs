@@ -12,6 +12,7 @@ using osu.Framework.Platform;
 using osu.Game.IPC;
 using osu.Framework.Allocation;
 using osu.Game.Beatmaps;
+using osu.Game.IO;
 using osu.Game.Tests.Resources;
 using SharpCompress.Archives.Zip;
 
@@ -97,6 +98,7 @@ namespace osu.Game.Tests.Beatmaps.IO
                 {
                     var osu = loadOsu(host);
                     var manager = osu.Dependencies.Get<BeatmapManager>();
+                    var files = osu.Dependencies.Get<FileStore>();
 
                     int fireCount = 0;
 
@@ -112,6 +114,12 @@ namespace osu.Game.Tests.Beatmaps.IO
                     manager.Update(imported);
 
                     Assert.AreEqual(0, fireCount -= 2);
+
+                    Assert.AreEqual(1, manager.GetAllUsableBeatmapSets().Count);
+                    Assert.AreEqual(1, manager.QueryBeatmapSets(_ => true).ToList().Count);
+                    Assert.AreEqual(12, manager.QueryBeatmaps(_ => true).ToList().Count);
+
+                    Assert.AreEqual(18, files.QueryFiles(_ => true).Count());
 
                     var breakTemp = TestResources.GetTestBeatmapForImport();
 
@@ -131,6 +139,8 @@ namespace osu.Game.Tests.Beatmaps.IO
                     Assert.AreEqual(1, manager.QueryBeatmapSets(_ => true).ToList().Count);
                     Assert.AreEqual(12, manager.QueryBeatmaps(_ => true).ToList().Count);
 
+                    Assert.AreEqual(18, files.QueryFiles(_ => true).Count());
+
                     // this will trigger purging of the existing beatmap (online set id match) but should rollback due to broken osu.
                     await manager.Import(breakTemp);
 
@@ -140,6 +150,9 @@ namespace osu.Game.Tests.Beatmaps.IO
                     Assert.AreEqual(1, manager.GetAllUsableBeatmapSets().Count);
                     Assert.AreEqual(1, manager.QueryBeatmapSets(_ => true).ToList().Count);
                     Assert.AreEqual(12, manager.QueryBeatmaps(_ => true).ToList().Count);
+
+                    Assert.AreEqual(18, files.QueryFiles(_ => true).Count());
+                    Assert.AreEqual(18, files.QueryFiles(f => f.ReferenceCount == 1).Count());
                 }
                 finally
                 {
