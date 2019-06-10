@@ -305,8 +305,7 @@ namespace osu.Game.Database
             {
                 Logger.Log($"Importing {item}...", LoggingTarget.Database);
 
-                if (archive != null)
-                    item.Files = createFileInfos(archive, Files);
+                item.Files = archive != null ? createFileInfos(archive, Files) : new List<TFileModel>();
 
                 var localItem = item;
 
@@ -314,7 +313,7 @@ namespace osu.Game.Database
                 {
                     await Populate(item, archive, cancellationToken);
                 }
-                finally
+                catch (Exception)
                 {
                     if (!Delete(localItem))
                         Files.Dereference(localItem.Files.Select(f => f.FileInfo).ToArray());
