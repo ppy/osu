@@ -342,6 +342,7 @@ namespace osu.Game.Beatmaps
                 OnlineBeatmapSetID = beatmap.BeatmapInfo.BeatmapSet?.OnlineBeatmapSetID,
                 Beatmaps = new List<BeatmapInfo>(),
                 Metadata = beatmap.Metadata,
+                DateAdded = DateTimeOffset.UtcNow
             };
         }
 
@@ -429,7 +430,7 @@ namespace osu.Game.Beatmaps
             private readonly IBeatmap beatmap;
 
             public DummyConversionBeatmap(IBeatmap beatmap)
-                : base(beatmap.BeatmapInfo)
+                : base(beatmap.BeatmapInfo, null)
             {
                 this.beatmap = beatmap;
             }

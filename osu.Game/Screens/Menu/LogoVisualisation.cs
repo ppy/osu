@@ -189,7 +189,6 @@ namespace osu.Game.Screens.Menu
                 base.Draw(vertexAction);
 
                 shader.Bind();
-                texture.TextureGL.Bind();
 
                 Vector2 inflation = DrawInfo.MatrixInverse.ExtractScale().Xy;
 
@@ -224,7 +223,8 @@ namespace osu.Game.Screens.Menu
                                 Vector2Extensions.Transform(barPosition + bottomOffset + amplitudeOffset, DrawInfo.Matrix)
                             );
 
-                            texture.DrawQuad(
+                            DrawQuad(
+                                texture,
                                 rectangle,
                                 colourInfo,
                                 null,

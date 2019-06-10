@@ -113,7 +113,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         public void TestPauseAfterFail()
         {
             AddUntilStep("wait for fail", () => Player.HasFailed);
-            AddAssert("fail overlay shown", () => Player.FailOverlayVisible);
+            AddUntilStep("fail overlay shown", () => Player.FailOverlayVisible);
 
             confirmClockRunning(false);
 
