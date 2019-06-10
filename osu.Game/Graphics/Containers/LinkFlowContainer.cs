@@ -145,7 +145,7 @@ namespace osu.Game.Graphics.Containers
                             if (long.TryParse(linkArgument, out long userId))
                                 game?.ShowUser(userId);
                             break;
-                        
+
                         case LinkAction.OpenTextSearch:
                             game?.ShowDirectTextSearch(linkArgument);
                             break;
