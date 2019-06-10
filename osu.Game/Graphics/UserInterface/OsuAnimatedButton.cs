@@ -74,6 +74,12 @@ namespace osu.Game.Graphics.UserInterface
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
+            if (AutoSizeAxes != Axes.None)
+            {
+                content.RelativeSizeAxes = (Axes.Both & ~AutoSizeAxes);
+                content.AutoSizeAxes = AutoSizeAxes;
+            }
+
             Enabled.BindValueChanged(enabled => this.FadeColour(enabled.NewValue ? Color4.White : colours.Gray9, 200, Easing.OutQuint), true);
         }
 
