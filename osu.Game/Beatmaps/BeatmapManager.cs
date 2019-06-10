@@ -424,7 +424,9 @@ namespace osu.Game.Beatmaps
         {
             private readonly IAPIProvider api;
 
-            private readonly ThreadedTaskScheduler updateScheduler = new ThreadedTaskScheduler(4);
+            private const int update_queue_request_concurrency = 4;
+
+            private readonly ThreadedTaskScheduler updateScheduler = new ThreadedTaskScheduler(update_queue_request_concurrency);
 
             public BeatmapUpdateQueue(IAPIProvider api)
             {
@@ -455,10 +457,7 @@ namespace osu.Game.Beatmaps
                     beatmap.OnlineBeatmapID = res.OnlineBeatmapID;
                 };
 
-                req.Failure += e =>
-                {
-                    Logger.Log($"Failed ({e})", LoggingTarget.Database);
-                };
+                req.Failure += e => { Logger.Log($"Failed ({e})", LoggingTarget.Database); };
 
                 // intentionally blocking to limit web request concurrency
                 req.Perform(api);
