@@ -436,8 +436,7 @@ namespace osu.Game.Beatmaps
 
             private void perform(BeatmapInfo beatmap, CancellationToken cancellation)
             {
-                if (cancellation.IsCancellationRequested)
-                    return;
+                cancellation.ThrowIfCancellationRequested();
 
                 if (api?.State != APIState.Online)
                     return;
