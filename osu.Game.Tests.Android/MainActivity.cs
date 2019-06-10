@@ -10,7 +10,6 @@ namespace osu.Game.Tests.Android
     [Activity(Theme = "@android:style/Theme.NoTitleBar", MainLauncher = true, ScreenOrientation = ScreenOrientation.SensorLandscape, SupportsPictureInPicture = false, ConfigurationChanges = ConfigChanges.Orientation | ConfigChanges.ScreenSize, HardwareAccelerated = true)]
     public class MainActivity : AndroidGameActivity
     {
-        protected override Framework.Game CreateGame()
-            => new OsuTestBrowser();
+        protected override Framework.Game CreateGame() => new OsuTestBrowser();
     }
 }
