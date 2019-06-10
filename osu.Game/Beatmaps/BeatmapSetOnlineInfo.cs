@@ -78,7 +78,7 @@ namespace osu.Game.Beatmaps
 
         [JsonProperty(@"cover@2x")]
         public string Cover { get; set; }
-        
+
         public string CardLowRes { get; set; }
 
         [JsonProperty(@"card@2x")]

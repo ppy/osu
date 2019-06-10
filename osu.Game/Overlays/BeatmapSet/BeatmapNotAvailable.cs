@@ -1,9 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
-using System.Collections.Generic;
-using System.Text;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -11,7 +8,6 @@ using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
-using osuTK;
 using osuTK.Graphics;
 
 namespace osu.Game.Overlays.BeatmapSet
@@ -23,7 +19,7 @@ namespace osu.Game.Overlays.BeatmapSet
         public override void Show()
         {
             AutoSizeAxes = Axes.Both;
-            Margin = new MarginPadding() { Top = 10 };
+            Margin = new MarginPadding { Top = 10 };
 
             Children = new Drawable[]
             {
@@ -36,13 +32,13 @@ namespace osu.Game.Overlays.BeatmapSet
                 {
                     AutoSizeAxes = Axes.Both,
                     Direction = FillDirection.Vertical,
-                    Margin = new MarginPadding() { Top = 10, Left = 5, Right = 20 },
+                    Margin = new MarginPadding { Top = 10, Left = 5, Right = 20 },
 
                     Children = new Drawable[]
                     {
                         new OsuSpriteText
                         {
-                            Margin = new MarginPadding() { Bottom = 10, Horizontal = 5 },
+                            Margin = new MarginPadding { Bottom = 10, Horizontal = 5 },
                             Font = OsuFont.GetFont(size: 20, weight: FontWeight.Medium),
                             Text = "This beatmap is currently not available for download.",
                             Colour = Color4.Orange,
