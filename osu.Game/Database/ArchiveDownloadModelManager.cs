@@ -43,7 +43,15 @@ namespace osu.Game.Database
             this.api = api;
         }
 
-        protected abstract TDownloadRequestModel CreateDownloadRequest(TModel model);
+        /// <summary>
+        /// Creates the download request for this <see cref="TModel"/>.
+        /// The <paramref name="options"/> parameters will be provided when the download was initiated with extra options meant
+        /// to be used in the creation of the request.
+        /// </summary>
+        /// <param name="model">The <see cref="TModel"/> to be downloaded.</param>
+        /// <param name="options">Extra parameters for request creation, null if none were passed.</param>
+        /// <returns>The request object.</returns>
+        protected abstract TDownloadRequestModel CreateDownloadRequest(TModel model, object[] options);
 
         /// <summary>
         /// Downloads a <see cref="TModel"/>.
@@ -55,7 +63,24 @@ namespace osu.Game.Database
         {
             if (!canDownload(model)) return false;
 
-            var request = CreateDownloadRequest(model);
+            var request = CreateDownloadRequest(model, null);
+
+            performDownloadWithRequest(request);
+
+            return true;
+        }
+
+        /// <summary>
+        /// Downloads a <see cref="TModel"/> with optional parameters for the download request.
+        /// </summary>
+        /// <param name="model">The <see cref="TModel"/> to be downloaded.</param>
+        /// <param name="extra">Optional parameters to be used for creating the download request.</param>
+        /// <returns>Whether downloading can happen.</returns>
+        public bool Download(TModel model, params object[] extra)
+        {
+            if (!canDownload(model)) return false;
+
+            var request = CreateDownloadRequest(model, extra);
 
             performDownloadWithRequest(request);
 
