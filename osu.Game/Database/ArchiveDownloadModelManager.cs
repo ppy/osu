@@ -1,4 +1,7 @@
-﻿using osu.Framework.Logging;
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
+
+using osu.Framework.Logging;
 using osu.Framework.Platform;
 using osu.Game.Online.API;
 using osu.Game.Overlays.Notifications;
@@ -8,13 +11,26 @@ using System.Threading.Tasks;
 
 namespace osu.Game.Database
 {
+    /// <summary>
+    /// An <see cref="ArchiveModelManager{TModel, TFileModel}"/> that has the ability to download models using an <see cref="IAPIProvider"/> and
+    /// import them into the store.
+    /// </summary>
+    /// <typeparam name="TModel">The model type.</typeparam>
+    /// <typeparam name="TFileModel">The associated file join type.</typeparam>
+    /// <typeparam name="TDownloadRequestModel">The associated <see cref="ArchiveDownloadModelRequest{TModel}"/> for this model.</typeparam>
     public abstract class ArchiveDownloadModelManager<TModel, TFileModel, TDownloadRequestModel> : ArchiveModelManager<TModel, TFileModel>
         where TModel : class, IHasFiles<TFileModel>, IHasPrimaryKey, ISoftDelete
         where TFileModel : INamedFileInfo, new()
         where TDownloadRequestModel : ArchiveDownloadModelRequest<TModel>
     {
+        /// <summary>
+        /// Fired when a <see cref="TModel"/> download begins.
+        /// </summary>
         public event Action<TDownloadRequestModel> DownloadBegan;
 
+        /// <summary>
+        /// Fired when a <see cref="TModel"/> download is interrupted, either due to user cancellation or failure.
+        /// </summary>
         public event Action<TDownloadRequestModel> DownloadFailed;
 
         private readonly IAPIProvider api;
@@ -29,6 +45,12 @@ namespace osu.Game.Database
 
         protected abstract TDownloadRequestModel CreateDownloadRequest(TModel model);
 
+        /// <summary>
+        /// Downloads a <see cref="TModel"/>.
+        /// This will post notifications tracking progress.
+        /// </summary>
+        /// <param name="model">The <see cref="TModel"/> to be downloaded.</param>
+        /// <returns>Whether downloading can happen.</returns>
         public bool Download(TModel model)
         {
             if (!canDownload(model)) return false;
@@ -40,6 +62,11 @@ namespace osu.Game.Database
             return true;
         }
 
+        /// <summary>
+        /// Gets an existing <see cref="TModel"/> download request if it exists.
+        /// </summary>
+        /// <param name="model">The <see cref="TModel"/> whose request is wanted.</param>
+        /// <returns>The <see cref="TDownloadRequestModel"/> object if it exists, otherwise null.</returns>
         public TDownloadRequestModel GetExistingDownload(TModel model) => currentDownloads.Find(r => r.Info.Equals(model));
 
         private bool canDownload(TModel model) => GetExistingDownload(model) == null && api != null;
@@ -73,7 +100,7 @@ namespace osu.Game.Database
                 if (error is OperationCanceledException) return;
 
                 notification.State = ProgressNotificationState.Cancelled;
-                // TODO: implement a Name for every model that we can use in this message
+                // TODO: maybe implement a Name for every model that we can use in this message?
                 Logger.Error(error, "Download failed!");
                 currentDownloads.Remove(request);
             };
