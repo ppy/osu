@@ -1,11 +1,12 @@
-﻿using osu.Game.Online.API;
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
+
+using osu.Game.Online.API;
 using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace osu.Game.Database
 {
-    public interface IDownloadModelManager<TModel> : IModelManager<TModel>
+    public interface IModelDownloader<TModel> : IModelManager<TModel>
         where TModel : class
     {
         /// <summary>
@@ -38,10 +39,10 @@ namespace osu.Game.Database
         bool Download(TModel model, params object[] extra);
 
         /// <summary>
-        /// Checks whether a given <see cref="TModel"/> is available in the local store already.
+        /// Gets an existing <see cref="TModel"/> download request if it exists.
         /// </summary>
-        /// <param name="model">The <see cref="TModel"/> whose existence needs to be checked.</param>
-        /// <returns>Whether the <see cref="TModel"/> exists locally.</returns>
+        /// <param name="model">The <see cref="TModel"/> whose request is wanted.</param>
+        /// <returns>The <see cref="ArchiveDownloadModelRequest{TModel}"/> object if it exists, otherwise null.</returns>
         ArchiveDownloadModelRequest<TModel> GetExistingDownload(TModel model);
     }
 }

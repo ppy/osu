@@ -18,7 +18,7 @@ namespace osu.Game.Database
     /// </summary>
     /// <typeparam name="TModel">The model type.</typeparam>
     /// <typeparam name="TFileModel">The associated file join type.</typeparam>
-    public abstract class ArchiveDownloadModelManager<TModel, TFileModel> : ArchiveModelManager<TModel, TFileModel>, IDownloadModelManager<TModel>
+    public abstract class ArchiveDownloadModelManager<TModel, TFileModel> : ArchiveModelManager<TModel, TFileModel>, IModelDownloader<TModel>
         where TModel : class, IHasFiles<TFileModel>, IHasPrimaryKey, ISoftDelete
         where TFileModel : INamedFileInfo, new()
     {
@@ -71,13 +71,13 @@ namespace osu.Game.Database
             return true;
         }
 
+        /// <summary>
+        /// Checks whether a given <see cref="TModel"/> is available in the local store already.
+        /// </summary>
+        /// <param name="model">The <see cref="TModel"/> whose existence needs to be checked.</param>
+        /// <returns>Whether the <see cref="TModel"/> exists locally.</returns>
         public virtual bool IsAvailableLocally(TModel model) => modelStore.ConsumableItems.Any(m => m.Equals(model) && !m.DeletePending);
 
-        /// <summary>
-        /// Gets an existing <see cref="TModel"/> download request if it exists.
-        /// </summary>
-        /// <param name="model">The <see cref="TModel"/> whose request is wanted.</param>
-        /// <returns>The <see cref="ArchiveDownloadModelRequest{TModel}"/> object if it exists, otherwise null.</returns>
         public ArchiveDownloadModelRequest<TModel> GetExistingDownload(TModel model) => currentDownloads.Find(r => r.Info.Equals(model));
 
         private bool canDownload(TModel model) => GetExistingDownload(model) == null && api != null;
