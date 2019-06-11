@@ -200,7 +200,7 @@ namespace osu.Game.Overlays
             beatmaps.ItemAdded += handleBeatmapAdded;
             beatmaps.ItemRemoved += handleBeatmapRemoved;
 
-            playlist.StateChanged += s => playlistButton.FadeColour(s == Visibility.Visible ? colours.Yellow : Color4.White, 200, Easing.OutQuint);
+            playlist.State.ValueChanged += s => playlistButton.FadeColour(s.NewValue == Visibility.Visible ? colours.Yellow : Color4.White, 200, Easing.OutQuint);
         }
 
         private ScheduledDelegate seekDelegate;
@@ -449,7 +449,7 @@ namespace osu.Game.Overlays
 
             // This is here mostly as a performance fix.
             // If the playlist is not hidden it will update children even when the music controller is hidden (due to AlwaysPresent).
-            playlist.State = Visibility.Hidden;
+            playlist.Hide();
 
             this.FadeOut(transition_length, Easing.OutQuint);
             dragContainer.ScaleTo(0.9f, transition_length, Easing.OutQuint);

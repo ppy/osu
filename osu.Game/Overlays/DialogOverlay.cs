@@ -37,8 +37,8 @@ namespace osu.Game.Overlays
             dialogContainer.Add(currentDialog);
 
             currentDialog.Show();
-            currentDialog.StateChanged += state => onDialogOnStateChanged(dialog, state);
-            State = Visibility.Visible;
+            currentDialog.State.ValueChanged += state => onDialogOnStateChanged(dialog, state.NewValue);
+            Show();
         }
 
         protected override bool PlaySamplesOnStateChange => false;
@@ -53,7 +53,7 @@ namespace osu.Game.Overlays
             dialog.Delay(PopupDialog.EXIT_DURATION).Expire();
 
             if (dialog == currentDialog)
-                State = Visibility.Hidden;
+                Hide();
         }
 
         protected override void PopIn()
@@ -66,7 +66,7 @@ namespace osu.Game.Overlays
         {
             base.PopOut();
 
-            if (currentDialog?.State == Visibility.Visible)
+            if (currentDialog?.State.Value == Visibility.Visible)
             {
                 currentDialog.Hide();
                 return;
