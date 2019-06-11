@@ -279,7 +279,7 @@ namespace osu.Game.Screens.Select
 
         protected virtual void ExitFromBack()
         {
-            if (ModSelect.State == Visibility.Visible)
+            if (ModSelect.State.Value == Visibility.Visible)
             {
                 ModSelect.Hide();
                 return;
@@ -521,7 +521,7 @@ namespace osu.Game.Screens.Select
             if (base.OnExiting(next))
                 return true;
 
-            beatmapInfoWedge.State = Visibility.Hidden;
+            beatmapInfoWedge.Hide();
 
             this.FadeOut(100);
 

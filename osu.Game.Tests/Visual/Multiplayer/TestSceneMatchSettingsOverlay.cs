@@ -36,7 +36,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             settings = new TestRoomSettings
             {
                 RelativeSizeAxes = Axes.Both,
-                State = Visibility.Visible
+                State = { Value = Visibility.Visible }
             };
 
             Child = settings;
