@@ -16,7 +16,7 @@ namespace osu.Game.Online
     /// A component which tracks a beatmap through potential download/import/deletion.
     /// </summary>
     public abstract class DownloadTrackingComposite<TModel, TModelManager> : CompositeDrawable
-        where TModel : class
+        where TModel : class, IEquatable<TModel>
         where TModelManager : class, IDownloadModelManager<TModel>
     {
         public readonly Bindable<TModel> ModelInfo = new Bindable<TModel>();
