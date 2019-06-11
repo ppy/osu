@@ -1,11 +1,12 @@
-﻿using osu.Game.Online.API;
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
+
+using osu.Game.Online.API;
 using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace osu.Game.Database
 {
-    public interface IDownloadModelManager<TModel> : IModelManager<TModel>
+    public interface IModelDownloader<TModel> : IModelManager<TModel>
         where TModel : class
     {
         /// <summary>
