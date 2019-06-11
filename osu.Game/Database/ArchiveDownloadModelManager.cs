@@ -31,16 +31,25 @@ namespace osu.Game.Database
 
         public bool Download(TModel model)
         {
-            var existing = GetExistingDownload(model);
-
-            if (existing != null || api == null) return false;
-
-            DownloadNotification notification = new DownloadNotification
-            {
-                Text = $"Downloading {model}",
-            };
+            if (!canDownload(model)) return false;
 
             var request = CreateDownloadRequest(model);
+
+            performDownloadWithRequest(request);
+
+            return true;
+        }
+
+        public TDownloadRequestModel GetExistingDownload(TModel model) => currentDownloads.Find(r => r.Info.Equals(model));
+
+        private bool canDownload(TModel model) => GetExistingDownload(model) == null && api != null;
+
+        private void performDownloadWithRequest(TDownloadRequestModel request)
+        {
+            DownloadNotification notification = new DownloadNotification
+            {
+                Text = $"Downloading {request.Info}",
+            };
 
             request.DownloadProgressed += progress =>
             {
@@ -92,11 +101,7 @@ namespace osu.Game.Database
             }, TaskCreationOptions.LongRunning);
 
             DownloadBegan?.Invoke(request);
-
-            return true;
         }
-
-        public TDownloadRequestModel GetExistingDownload(TModel model) => currentDownloads.Find(r => r.Info.Equals(model));
 
         private class DownloadNotification : ProgressNotification
         {
