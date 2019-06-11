@@ -2,11 +2,9 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics.Containers;
-using osu.Game.Beatmaps;
 using osu.Game.Database;
 using osu.Game.Online.API;
 
@@ -19,7 +17,7 @@ namespace osu.Game.Online
         where TModel : class, IEquatable<TModel>
         where TModelManager : class, IModelDownloader<TModel>
     {
-        public readonly Bindable<TModel> ModelInfo = new Bindable<TModel>();
+        protected readonly Bindable<TModel> ModelInfo = new Bindable<TModel>();
 
         private TModelManager manager;
 
