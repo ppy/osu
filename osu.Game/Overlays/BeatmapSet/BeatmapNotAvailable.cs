@@ -5,6 +5,7 @@ using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
@@ -14,9 +15,36 @@ namespace osu.Game.Overlays.BeatmapSet
 {
     public class BeatmapNotAvailable : Container
     {
-        private LinkFlowContainer linkContainer;
+        private BeatmapSetInfo beatmapSet;
 
-        public override void Show()
+        public BeatmapSetInfo BeatmapSet
+        {
+            get => beatmapSet;
+            set
+            {
+                if (value == beatmapSet) return;
+
+                beatmapSet = value;
+
+                if (beatmapSet?.OnlineInfo.Availability != null)
+                {
+                    Header?.ResizeHeightTo(450, 500);
+                    Show();
+                }
+                else
+                {
+                    Header?.ResizeHeightTo(400, 500);
+                    Hide();
+                }
+            }
+        }
+
+        public Header Header;
+
+        private readonly OsuSpriteText text;
+        private readonly LinkFlowContainer link;
+
+        public BeatmapNotAvailable()
         {
             AutoSizeAxes = Axes.Both;
             Margin = new MarginPadding { Top = 10 };
@@ -36,14 +64,13 @@ namespace osu.Game.Overlays.BeatmapSet
 
                     Children = new Drawable[]
                     {
-                        new OsuSpriteText
+                        text = new OsuSpriteText
                         {
                             Margin = new MarginPadding { Bottom = 10, Horizontal = 5 },
                             Font = OsuFont.GetFont(size: 20, weight: FontWeight.Medium),
-                            Text = "This beatmap is currently not available for download.",
                             Colour = Color4.Orange,
                         },
-                        linkContainer = new LinkFlowContainer(text => text.Font = OsuFont.GetFont(size: 14))
+                        link = new LinkFlowContainer(t => t.Font = OsuFont.GetFont(size: 14))
                         {
                             Direction = FillDirection.Full,
                             RelativeSizeAxes = Axes.X,
@@ -54,12 +81,25 @@ namespace osu.Game.Overlays.BeatmapSet
                 },
             };
 
+            Hide();
+        }
+
+        public override void Show()
+        {
+            text.Text = BeatmapSet.OnlineInfo.Availability.DownloadDisabled
+                ? "This beatmap is currently not available for download."
+                : "Portions of this beatmap have been removed at the request of the creator or a third-party rights holder.";
+
+            link.AddLink("Check here for more information.", BeatmapSet.OnlineInfo.Availability.ExternalLink);
+
             base.Show();
         }
 
-        public string Link
+        public override void Hide()
         {
-            set => linkContainer.AddLink("Check here for more information.", value);
+            link.RemoveAll(x => true);
+
+            base.Hide();
         }
     }
 }
