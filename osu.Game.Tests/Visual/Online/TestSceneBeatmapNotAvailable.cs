@@ -1,13 +1,11 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using NUnit.Framework;
 using osu.Game.Beatmaps;
 using osu.Game.Overlays.BeatmapSet;
 
 namespace osu.Game.Tests.Visual.Online
 {
-    [TestFixture]
     public class TestSceneBeatmapNotAvailable : OsuTestScene
     {
         public TestSceneBeatmapNotAvailable()
