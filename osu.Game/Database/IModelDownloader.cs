@@ -39,10 +39,10 @@ namespace osu.Game.Database
         bool Download(TModel model, params object[] extra);
 
         /// <summary>
-        /// Checks whether a given <see cref="TModel"/> is available in the local store already.
+        /// Gets an existing <see cref="TModel"/> download request if it exists.
         /// </summary>
-        /// <param name="model">The <see cref="TModel"/> whose existence needs to be checked.</param>
-        /// <returns>Whether the <see cref="TModel"/> exists locally.</returns>
+        /// <param name="model">The <see cref="TModel"/> whose request is wanted.</param>
+        /// <returns>The <see cref="ArchiveDownloadModelRequest{TModel}"/> object if it exists, otherwise null.</returns>
         ArchiveDownloadModelRequest<TModel> GetExistingDownload(TModel model);
     }
 }
