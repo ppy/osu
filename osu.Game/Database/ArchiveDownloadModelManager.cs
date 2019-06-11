@@ -73,14 +73,8 @@ namespace osu.Game.Database
         }
 
         /// <summary>
-        /// Checks whether a given <see cref="TModel"/> is available in the local store already.
-        /// </summary>
-        /// <param name="model">The <see cref="TModel"/> whose existence needs to be checked.</param>
-        /// <returns>Whether the <see cref="TModel"/> exists locally.</returns>
-        public bool IsAvailableLocally(TModel model) => modelStore.ConsumableItems.Any(m => m.Equals(model));
-
-        /// <summary>
         /// Downloads a <see cref="TModel"/> with optional parameters for the download request.
+        /// This will post notifications tracking progress.
         /// </summary>
         /// <param name="model">The <see cref="TModel"/> to be downloaded.</param>
         /// <param name="extra">Optional parameters to be used for creating the download request.</param>
@@ -95,6 +89,13 @@ namespace osu.Game.Database
 
             return true;
         }
+
+        /// <summary>
+        /// Checks whether a given <see cref="TModel"/> is available in the local store already.
+        /// </summary>
+        /// <param name="model">The <see cref="TModel"/> whose existence needs to be checked.</param>
+        /// <returns>Whether the <see cref="TModel"/> exists locally.</returns>
+        public bool IsAvailableLocally(TModel model) => modelStore.ConsumableItems.Any(m => m.Equals(model));
 
         /// <summary>
         /// Gets an existing <see cref="TModel"/> download request if it exists.
