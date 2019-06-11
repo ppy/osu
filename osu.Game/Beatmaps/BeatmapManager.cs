@@ -426,7 +426,7 @@ namespace osu.Game.Beatmaps
 
             private const int update_queue_request_concurrency = 4;
 
-            private readonly ThreadedTaskScheduler updateScheduler = new ThreadedTaskScheduler(update_queue_request_concurrency);
+            private readonly ThreadedTaskScheduler updateScheduler = new ThreadedTaskScheduler(update_queue_request_concurrency, nameof(BeatmapUpdateQueue));
 
             public BeatmapUpdateQueue(IAPIProvider api)
             {
