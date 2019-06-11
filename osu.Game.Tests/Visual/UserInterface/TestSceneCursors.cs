@@ -192,7 +192,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             public CursorContainer Cursor { get; }
             public bool ProvidingUserCursor { get; }
 
-            public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => base.ReceivePositionalInputAt(screenSpacePos) || SmoothTransition && !ProvidingUserCursor;
+            public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => base.ReceivePositionalInputAt(screenSpacePos) || (SmoothTransition && !ProvidingUserCursor);
 
             private readonly Box background;
 
