@@ -6,10 +6,9 @@ using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Events;
-using osu.Game.Graphics.Sprites;
+using osu.Game.Graphics.Containers;
 using osuTK.Graphics;
 
 namespace osu.Game.Graphics.UserInterface
@@ -33,27 +32,26 @@ namespace osu.Game.Graphics.UserInterface
 
         public string LabelText
         {
-            get => labelSpriteText?.Text;
             set
             {
-                if (labelSpriteText != null)
-                    labelSpriteText.Text = value;
+                if (labelText != null)
+                    labelText.Text = value;
             }
         }
 
         public MarginPadding LabelPadding
         {
-            get => labelSpriteText?.Padding ?? new MarginPadding();
+            get => labelText?.Padding ?? new MarginPadding();
             set
             {
-                if (labelSpriteText != null)
-                    labelSpriteText.Padding = value;
+                if (labelText != null)
+                    labelText.Padding = value;
             }
         }
 
         protected readonly Nub Nub;
 
-        private readonly SpriteText labelSpriteText;
+        private readonly OsuTextFlowContainer labelText;
         private SampleChannel sampleChecked;
         private SampleChannel sampleUnchecked;
 
@@ -62,24 +60,28 @@ namespace osu.Game.Graphics.UserInterface
             AutoSizeAxes = Axes.Y;
             RelativeSizeAxes = Axes.X;
 
+            const float nub_padding = 5;
+
             Children = new Drawable[]
             {
-                labelSpriteText = new OsuSpriteText(),
+                labelText = new OsuTextFlowContainer
+                {
+                    AutoSizeAxes = Axes.Y,
+                    RelativeSizeAxes = Axes.X,
+                    Padding = new MarginPadding { Right = Nub.EXPANDED_SIZE + nub_padding }
+                },
                 Nub = new Nub
                 {
                     Anchor = Anchor.CentreRight,
                     Origin = Anchor.CentreRight,
-                    Margin = new MarginPadding { Right = 5 },
+                    Margin = new MarginPadding { Right = nub_padding },
                 },
                 new HoverClickSounds()
             };
 
             Nub.Current.BindTo(Current);
 
-            Current.DisabledChanged += disabled =>
-            {
-                labelSpriteText.Alpha = Nub.Alpha = disabled ? 0.3f : 1;
-            };
+            Current.DisabledChanged += disabled => labelText.Alpha = Nub.Alpha = disabled ? 0.3f : 1;
         }
 
         protected override void LoadComplete()
