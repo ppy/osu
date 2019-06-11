@@ -289,9 +289,6 @@ namespace osu.Game.Overlays
         public void ShowTextSearch(string searchText)
         {
             currentQuery.Value = searchText;
-
-            // Hide first to put the direct overlay into the foreground if its behind another overlay.
-            Hide();
             Show();
         }
 
