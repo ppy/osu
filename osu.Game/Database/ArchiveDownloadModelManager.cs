@@ -18,18 +18,12 @@ namespace osu.Game.Database
     /// </summary>
     /// <typeparam name="TModel">The model type.</typeparam>
     /// <typeparam name="TFileModel">The associated file join type.</typeparam>
-    public abstract class ArchiveDownloadModelManager<TModel, TFileModel> : ArchiveModelManager<TModel, TFileModel>
+    public abstract class ArchiveDownloadModelManager<TModel, TFileModel> : ArchiveModelManager<TModel, TFileModel>, IDownloadModelManager<TModel>
         where TModel : class, IHasFiles<TFileModel>, IHasPrimaryKey, ISoftDelete
         where TFileModel : INamedFileInfo, new()
     {
-        /// <summary>
-        /// Fired when a <see cref="TModel"/> download begins.
-        /// </summary>
         public event Action<ArchiveDownloadModelRequest<TModel>> DownloadBegan;
 
-        /// <summary>
-        /// Fired when a <see cref="TModel"/> download is interrupted, either due to user cancellation or failure.
-        /// </summary>
         public event Action<ArchiveDownloadModelRequest<TModel>> DownloadFailed;
 
         private readonly IAPIProvider api;
@@ -55,12 +49,6 @@ namespace osu.Game.Database
         /// <returns>The request object.</returns>
         protected abstract ArchiveDownloadModelRequest<TModel> CreateDownloadRequest(TModel model, object[] options);
 
-        /// <summary>
-        /// Downloads a <see cref="TModel"/>.
-        /// This will post notifications tracking progress.
-        /// </summary>
-        /// <param name="model">The <see cref="TModel"/> to be downloaded.</param>
-        /// <returns>Whether downloading can happen.</returns>
         public bool Download(TModel model)
         {
             if (!canDownload(model)) return false;
@@ -72,13 +60,6 @@ namespace osu.Game.Database
             return true;
         }
 
-        /// <summary>
-        /// Downloads a <see cref="TModel"/> with optional parameters for the download request.
-        /// This will post notifications tracking progress.
-        /// </summary>
-        /// <param name="model">The <see cref="TModel"/> to be downloaded.</param>
-        /// <param name="extra">Optional parameters to be used for creating the download request.</param>
-        /// <returns>Whether downloading can happen.</returns>
         public bool Download(TModel model, params object[] extra)
         {
             if (!canDownload(model)) return false;
@@ -90,12 +71,7 @@ namespace osu.Game.Database
             return true;
         }
 
-        /// <summary>
-        /// Checks whether a given <see cref="TModel"/> is available in the local store already.
-        /// </summary>
-        /// <param name="model">The <see cref="TModel"/> whose existence needs to be checked.</param>
-        /// <returns>Whether the <see cref="TModel"/> exists locally.</returns>
-        public bool IsAvailableLocally(TModel model) => modelStore.ConsumableItems.Any(m => m.Equals(model));
+        public virtual bool IsAvailableLocally(TModel model) => modelStore.ConsumableItems.Any(m => m.Equals(model) && !m.DeletePending);
 
         /// <summary>
         /// Gets an existing <see cref="TModel"/> download request if it exists.
