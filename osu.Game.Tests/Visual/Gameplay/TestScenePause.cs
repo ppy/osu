@@ -203,9 +203,9 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             public new HUDOverlay HUDOverlay => base.HUDOverlay;
 
-            public bool FailOverlayVisible => FailOverlay.State == Visibility.Visible;
+            public bool FailOverlayVisible => FailOverlay.State.Value == Visibility.Visible;
 
-            public bool PauseOverlayVisible => PauseOverlay.State == Visibility.Visible;
+            public bool PauseOverlayVisible => PauseOverlay.State.Value == Visibility.Visible;
 
             public override void OnEntering(IScreen last)
             {
