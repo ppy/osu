@@ -38,7 +38,7 @@ namespace osu.Game.Database
         private readonly List<TDownloadRequestModel> currentDownloads = new List<TDownloadRequestModel>();
 
         protected ArchiveDownloadModelManager(Storage storage, IDatabaseContextFactory contextFactory, IAPIProvider api, MutableDatabaseBackedStoreWithFileIncludes<TModel, TFileModel> modelStore, IIpcHost importHost = null)
-            :base(storage, contextFactory, modelStore, importHost)
+            : base(storage, contextFactory, modelStore, importHost)
         {
             this.api = api;
         }
