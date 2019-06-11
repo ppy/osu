@@ -25,7 +25,7 @@ namespace osu.Game.Beatmaps
     /// <summary>
     /// Handles the storage and retrieval of Beatmaps/WorkingBeatmaps.
     /// </summary>
-    public partial class BeatmapManager : ArchiveDownloadModelManager<BeatmapSetInfo, BeatmapSetFileInfo, DownloadBeatmapSetRequest>
+    public partial class BeatmapManager : ArchiveDownloadModelManager<BeatmapSetInfo, BeatmapSetFileInfo>
     {
         /// <summary>
         /// Fired when a single difficulty has been hidden.
@@ -58,8 +58,6 @@ namespace osu.Game.Beatmaps
 
         private readonly GameHost host;
 
-        private readonly List<DownloadBeatmapSetRequest> currentDownloads = new List<DownloadBeatmapSetRequest>();
-
         public BeatmapManager(Storage storage, IDatabaseContextFactory contextFactory, RulesetStore rulesets, IAPIProvider api, AudioManager audioManager, GameHost host = null,
                               WorkingBeatmap defaultBeatmap = null)
             : base(storage, contextFactory, api, new BeatmapStore(contextFactory), host)
@@ -76,7 +74,7 @@ namespace osu.Game.Beatmaps
             beatmaps.BeatmapRestored += b => BeatmapRestored?.Invoke(b);
         }
 
-        protected override DownloadBeatmapSetRequest CreateDownloadRequest(BeatmapSetInfo set, object[] options) => new DownloadBeatmapSetRequest(set, (options?.FirstOrDefault() as bool?) ?? false);
+        protected override ArchiveDownloadModelRequest<BeatmapSetInfo> CreateDownloadRequest(BeatmapSetInfo set, object[] options) => new DownloadBeatmapSetRequest(set, (options?.FirstOrDefault() as bool?) ?? false);
 
         protected override void Populate(BeatmapSetInfo beatmapSet, ArchiveReader archive)
         {

@@ -7,17 +7,16 @@ namespace osu.Game.Online.API.Requests
 {
     public class DownloadBeatmapSetRequest : ArchiveDownloadModelRequest<BeatmapSetInfo>
     {
-        public readonly BeatmapSetInfo BeatmapSet;
-
         private readonly bool noVideo;
+        private readonly BeatmapSetInfo set;
 
         public DownloadBeatmapSetRequest(BeatmapSetInfo set, bool noVideo)
             : base(set)
         {
             this.noVideo = noVideo;
-            BeatmapSet = set;
+            this.set = set;
         }
 
-        protected override string Target => $@"beatmapsets/{BeatmapSet.OnlineBeatmapSetID}/download{(noVideo ? "?noVideo=1" : "")}";
+        protected override string Target => $@"beatmapsets/{set.OnlineBeatmapSetID}/download{(noVideo ? "?noVideo=1" : "")}";
     }
 }

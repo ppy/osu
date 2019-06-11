@@ -7,7 +7,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Beatmaps;
-using osu.Game.Online.API.Requests;
+using osu.Game.Online.API;
 
 namespace osu.Game.Overlays.Direct
 {
@@ -49,7 +49,7 @@ namespace osu.Game.Overlays.Direct
 
             beatmaps.DownloadBegan += download =>
             {
-                if (download.BeatmapSet.OnlineBeatmapSetID == BeatmapSet.Value?.OnlineBeatmapSetID)
+                if (download.Info.OnlineBeatmapSetID == BeatmapSet.Value?.OnlineBeatmapSetID)
                     attachDownload(download);
             };
 
@@ -76,9 +76,9 @@ namespace osu.Game.Overlays.Direct
 
         #endregion
 
-        private DownloadBeatmapSetRequest attachedRequest;
+        private ArchiveDownloadModelRequest<BeatmapSetInfo> attachedRequest;
 
-        private void attachDownload(DownloadBeatmapSetRequest request)
+        private void attachDownload(ArchiveDownloadModelRequest<BeatmapSetInfo> request)
         {
             if (attachedRequest != null)
             {
