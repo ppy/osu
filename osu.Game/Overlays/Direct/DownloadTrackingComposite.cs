@@ -47,7 +47,7 @@ namespace osu.Game.Overlays.Direct
                     attachDownload(beatmaps.GetExistingDownload(setInfo.NewValue));
             }, true);
 
-            beatmaps.BeatmapDownloadBegan += download =>
+            beatmaps.DownloadBegan += download =>
             {
                 if (download.BeatmapSet.OnlineBeatmapSetID == BeatmapSet.Value?.OnlineBeatmapSetID)
                     attachDownload(download);
@@ -65,7 +65,7 @@ namespace osu.Game.Overlays.Direct
 
             if (beatmaps != null)
             {
-                beatmaps.BeatmapDownloadBegan -= attachDownload;
+                beatmaps.DownloadBegan -= attachDownload;
                 beatmaps.ItemAdded -= setAdded;
             }
 
