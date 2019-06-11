@@ -18,25 +18,23 @@ namespace osu.Game.Database
     /// </summary>
     /// <typeparam name="TModel">The model type.</typeparam>
     /// <typeparam name="TFileModel">The associated file join type.</typeparam>
-    /// <typeparam name="TDownloadRequestModel">The associated <see cref="ArchiveDownloadModelRequest{TModel}"/> for this model.</typeparam>
-    public abstract class ArchiveDownloadModelManager<TModel, TFileModel, TDownloadRequestModel> : ArchiveModelManager<TModel, TFileModel>
+    public abstract class ArchiveDownloadModelManager<TModel, TFileModel> : ArchiveModelManager<TModel, TFileModel>
         where TModel : class, IHasFiles<TFileModel>, IHasPrimaryKey, ISoftDelete
         where TFileModel : INamedFileInfo, new()
-        where TDownloadRequestModel : ArchiveDownloadModelRequest<TModel>
     {
         /// <summary>
         /// Fired when a <see cref="TModel"/> download begins.
         /// </summary>
-        public event Action<TDownloadRequestModel> DownloadBegan;
+        public event Action<ArchiveDownloadModelRequest<TModel>> DownloadBegan;
 
         /// <summary>
         /// Fired when a <see cref="TModel"/> download is interrupted, either due to user cancellation or failure.
         /// </summary>
-        public event Action<TDownloadRequestModel> DownloadFailed;
+        public event Action<ArchiveDownloadModelRequest<TModel>> DownloadFailed;
 
         private readonly IAPIProvider api;
 
-        private readonly List<TDownloadRequestModel> currentDownloads = new List<TDownloadRequestModel>();
+        private readonly List<ArchiveDownloadModelRequest<TModel>> currentDownloads = new List<ArchiveDownloadModelRequest<TModel>>();
 
         private readonly MutableDatabaseBackedStoreWithFileIncludes<TModel, TFileModel> modelStore;
 
@@ -55,7 +53,7 @@ namespace osu.Game.Database
         /// <param name="model">The <see cref="TModel"/> to be downloaded.</param>
         /// <param name="options">Extra parameters for request creation, null if none were passed.</param>
         /// <returns>The request object.</returns>
-        protected abstract TDownloadRequestModel CreateDownloadRequest(TModel model, object[] options);
+        protected abstract ArchiveDownloadModelRequest<TModel> CreateDownloadRequest(TModel model, object[] options);
 
         /// <summary>
         /// Downloads a <see cref="TModel"/>.
@@ -102,12 +100,12 @@ namespace osu.Game.Database
         /// Gets an existing <see cref="TModel"/> download request if it exists.
         /// </summary>
         /// <param name="model">The <see cref="TModel"/> whose request is wanted.</param>
-        /// <returns>The <see cref="TDownloadRequestModel"/> object if it exists, otherwise null.</returns>
-        public TDownloadRequestModel GetExistingDownload(TModel model) => currentDownloads.Find(r => r.Info.Equals(model));
+        /// <returns>The <see cref="ArchiveDownloadModelRequest{TModel}"/> object if it exists, otherwise null.</returns>
+        public ArchiveDownloadModelRequest<TModel> GetExistingDownload(TModel model) => currentDownloads.Find(r => r.Info.Equals(model));
 
         private bool canDownload(TModel model) => GetExistingDownload(model) == null && api != null;
 
-        private void performDownloadWithRequest(TDownloadRequestModel request)
+        private void performDownloadWithRequest(ArchiveDownloadModelRequest<TModel> request)
         {
             DownloadNotification notification = new DownloadNotification
             {
