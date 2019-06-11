@@ -97,7 +97,7 @@ namespace osu.Game.Overlays.Settings.Sections.General
                     {
                         new LoadingAnimation
                         {
-                            State = Visibility.Visible,
+                            State = { Value = Visibility.Visible },
                             Anchor = Anchor.TopCentre,
                             Origin = Anchor.TopCentre,
                         },

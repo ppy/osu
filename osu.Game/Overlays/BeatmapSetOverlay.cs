@@ -92,7 +92,7 @@ namespace osu.Game.Overlays
 
         protected override bool OnClick(ClickEvent e)
         {
-            State = Visibility.Hidden;
+            Hide();
             return true;
         }
 
