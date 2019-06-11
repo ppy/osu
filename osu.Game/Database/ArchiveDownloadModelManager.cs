@@ -7,6 +7,7 @@ using osu.Game.Online.API;
 using osu.Game.Overlays.Notifications;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace osu.Game.Database
@@ -37,10 +38,13 @@ namespace osu.Game.Database
 
         private readonly List<TDownloadRequestModel> currentDownloads = new List<TDownloadRequestModel>();
 
+        private readonly MutableDatabaseBackedStoreWithFileIncludes<TModel, TFileModel> modelStore;
+
         protected ArchiveDownloadModelManager(Storage storage, IDatabaseContextFactory contextFactory, IAPIProvider api, MutableDatabaseBackedStoreWithFileIncludes<TModel, TFileModel> modelStore, IIpcHost importHost = null)
             : base(storage, contextFactory, modelStore, importHost)
         {
             this.api = api;
+            this.modelStore = modelStore;
         }
 
         /// <summary>
@@ -69,6 +73,13 @@ namespace osu.Game.Database
 
             return true;
         }
+
+        /// <summary>
+        /// Checks whether a given <see cref="TModel"/> is available in the local store already.
+        /// </summary>
+        /// <param name="model">The <see cref="TModel"/> whose existence needs to be checked.</param>
+        /// <returns>Whether the <see cref="TModel"/> exists locally.</returns>
+        public bool IsAvailableLocally(TModel model) => modelStore.ConsumableItems.Any(m => m.Equals(model));
 
         /// <summary>
         /// Downloads a <see cref="TModel"/> with optional parameters for the download request.
