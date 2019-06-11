@@ -222,7 +222,7 @@ namespace osu.Game.Tests.Visual.SongSelect
             {
                 beatmapChangedCount = 0;
                 debounceCount = 0;
-                songSelect.Carousel.SelectionChanged += _ => beatmapChangedCount += 1;
+                songSelect.Carousel.SelectionChanged += _ => beatmapChangedCount++;
             });
             AddRepeatStep($"Create beatmaps {test_count} times", () =>
             {
