@@ -32,10 +32,10 @@ namespace osu.Game.Overlays.BeatmapSet
         private readonly UpdateableBeatmapSetCover cover;
         private readonly OsuSpriteText title, artist;
         private readonly AuthorInfo author;
-        private readonly BeatmapNotAvailable unavailableContainer;
-        private readonly FillFlowContainer downloadButtonsContainer;
+        private readonly BeatmapNotAvailable beatmapNotAvailable;
         private readonly BeatmapSetOnlineStatusPill onlineStatusPill;
         public Details Details;
+        public FillFlowContainer DownloadButtonsContainer;
 
         public readonly BeatmapPicker Picker;
 
@@ -135,7 +135,7 @@ namespace osu.Game.Overlays.BeatmapSet
                                         Margin = new MarginPadding { Top = 20 },
                                         Child = author = new AuthorInfo(),
                                     },
-                                    unavailableContainer = new BeatmapNotAvailable(),
+                                    beatmapNotAvailable = new BeatmapNotAvailable { Header = this },
                                     new Container
                                     {
                                         RelativeSizeAxes = Axes.X,
@@ -144,7 +144,7 @@ namespace osu.Game.Overlays.BeatmapSet
                                         Children = new Drawable[]
                                         {
                                             favouriteButton = new FavouriteButton(),
-                                            downloadButtonsContainer = new FillFlowContainer
+                                            DownloadButtonsContainer = new FillFlowContainer
                                             {
                                                 RelativeSizeAxes = Axes.Both,
                                                 Padding = new MarginPadding { Left = buttons_height + buttons_spacing },
@@ -192,7 +192,7 @@ namespace osu.Game.Overlays.BeatmapSet
 
             BeatmapSet.BindValueChanged(setInfo =>
             {
-                Picker.BeatmapSet = author.BeatmapSet = Details.BeatmapSet = setInfo.NewValue;
+                Picker.BeatmapSet = author.BeatmapSet = beatmapNotAvailable.BeatmapSet = Details.BeatmapSet = setInfo.NewValue;
 
                 title.Text = setInfo.NewValue?.Metadata.Title ?? string.Empty;
                 artist.Text = setInfo.NewValue?.Metadata.Artist ?? string.Empty;
@@ -201,25 +201,13 @@ namespace osu.Game.Overlays.BeatmapSet
 
                 if (setInfo.NewValue != null)
                 {
-                    downloadButtonsContainer.FadeIn(transition_duration);
+                    DownloadButtonsContainer.FadeIn(transition_duration);
                     favouriteButton.FadeIn(transition_duration);
                 }
                 else
                 {
-                    downloadButtonsContainer.FadeOut(transition_duration);
+                    DownloadButtonsContainer.FadeOut(transition_duration);
                     favouriteButton.FadeOut(transition_duration);
-                }
-
-                if (setInfo.NewValue?.OnlineInfo.Availability?.DownloadDisabled ?? false)
-                {
-                    this.ResizeHeightTo(460, transition_duration / 2);
-                    unavailableContainer.Show();
-                    unavailableContainer.Link = setInfo.NewValue.OnlineInfo.Availability.ExternalLink;
-                }
-                else
-                {
-                    this.ResizeHeightTo(400, transition_duration / 2);
-                    unavailableContainer.Hide();
                 }
 
                 updateDownloadButtons();
@@ -232,7 +220,7 @@ namespace osu.Game.Overlays.BeatmapSet
 
             if (BeatmapSet.Value.OnlineInfo.Availability?.DownloadDisabled ?? false)
             {
-                downloadButtonsContainer.RemoveAll(x => true);
+                DownloadButtonsContainer.RemoveAll(x => true);
                 return;
             }
 
@@ -240,7 +228,7 @@ namespace osu.Game.Overlays.BeatmapSet
             {
                 case DownloadState.LocallyAvailable:
                     // temporary for UX until new design is implemented.
-                    downloadButtonsContainer.Child = new osu.Game.Overlays.Direct.DownloadButton(BeatmapSet.Value)
+                    DownloadButtonsContainer.Child = new osu.Game.Overlays.Direct.DownloadButton(BeatmapSet.Value)
                     {
                         Width = 50,
                         RelativeSizeAxes = Axes.Y
@@ -250,13 +238,13 @@ namespace osu.Game.Overlays.BeatmapSet
                 case DownloadState.Downloading:
                 case DownloadState.Downloaded:
                     // temporary to avoid showing two buttons for maps with novideo. will be fixed in new beatmap overlay design.
-                    downloadButtonsContainer.Child = new DownloadButton(BeatmapSet.Value);
+                    DownloadButtonsContainer.Child = new DownloadButton(BeatmapSet.Value);
                     break;
 
                 default:
-                    downloadButtonsContainer.Child = new DownloadButton(BeatmapSet.Value);
+                    DownloadButtonsContainer.Child = new DownloadButton(BeatmapSet.Value);
                     if (BeatmapSet.Value.OnlineInfo.HasVideo)
-                        downloadButtonsContainer.Add(new DownloadButton(BeatmapSet.Value, true));
+                        DownloadButtonsContainer.Add(new DownloadButton(BeatmapSet.Value, true));
                     break;
             }
         }
