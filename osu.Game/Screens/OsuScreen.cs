@@ -56,8 +56,12 @@ namespace osu.Game.Screens
 
         /// <summary>
         /// The <see cref="UserActivity"/> to set the user's activity automatically to when this screen is entered
+        /// <para>This <see cref="ScreenActivity"/> will be automatically set to <see cref="InitialScreenActivity"/> for this screen on entering unless
+        /// <see cref="ScreenActivity"/> is manually set before.</para>
         /// </summary>
         protected virtual UserActivity InitialScreenActivity => null;
+
+        private UserActivity screenActivity;
 
         /// <summary>
         /// The <see cref="UserActivity"/> for this screen.
@@ -73,8 +77,6 @@ namespace osu.Game.Screens
                 setUserActivity(screenActivity);
             }
         }
-
-        private UserActivity screenActivity;
 
         /// <summary>
         /// Whether to disallow changes to game-wise Beatmap/Ruleset bindables for this screen (and all children).
@@ -170,7 +172,8 @@ namespace osu.Game.Screens
 
             backgroundStack?.Push(localBackground = CreateBackground());
 
-            ScreenActivity = InitialScreenActivity;
+            if (screenActivity == null)
+                ScreenActivity = InitialScreenActivity;
 
             base.OnEntering(last);
         }
