@@ -82,6 +82,10 @@ namespace osu.Game.Graphics.UserInterface
                 }
             }
 
+            public override void Hide() => State = Visibility.Hidden;
+
+            public override void Show() => State = Visibility.Visible;
+
             public BreadcrumbTabItem(T value)
                 : base(value)
             {
