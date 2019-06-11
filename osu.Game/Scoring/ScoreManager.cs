@@ -11,12 +11,14 @@ using osu.Framework.Platform;
 using osu.Game.Beatmaps;
 using osu.Game.Database;
 using osu.Game.IO.Archives;
+using osu.Game.Online.API;
+using osu.Game.Online.API.Requests;
 using osu.Game.Rulesets;
 using osu.Game.Scoring.Legacy;
 
 namespace osu.Game.Scoring
 {
-    public class ScoreManager : ArchiveModelManager<ScoreInfo, ScoreFileInfo>
+    public class ScoreManager : ArchiveDownloadModelManager<ScoreInfo, ScoreFileInfo>
     {
         public override string[] HandledExtensions => new[] { ".osr" };
 
@@ -27,8 +29,8 @@ namespace osu.Game.Scoring
         private readonly RulesetStore rulesets;
         private readonly Func<BeatmapManager> beatmaps;
 
-        public ScoreManager(RulesetStore rulesets, Func<BeatmapManager> beatmaps, Storage storage, IDatabaseContextFactory contextFactory, IIpcHost importHost = null)
-            : base(storage, contextFactory, new ScoreStore(contextFactory, storage), importHost)
+        public ScoreManager(RulesetStore rulesets, Func<BeatmapManager> beatmaps, Storage storage, IAPIProvider api, IDatabaseContextFactory contextFactory, IIpcHost importHost = null)
+            : base(storage, contextFactory, api, new ScoreStore(contextFactory, storage), importHost)
         {
             this.rulesets = rulesets;
             this.beatmaps = beatmaps;
@@ -60,5 +62,7 @@ namespace osu.Game.Scoring
         public IEnumerable<ScoreInfo> QueryScores(Expression<Func<ScoreInfo, bool>> query) => ModelStore.ConsumableItems.AsNoTracking().Where(query);
 
         public ScoreInfo Query(Expression<Func<ScoreInfo, bool>> query) => ModelStore.ConsumableItems.AsNoTracking().FirstOrDefault(query);
+
+        protected override ArchiveDownloadModelRequest<ScoreInfo> CreateDownloadRequest(ScoreInfo score, object[] options) => new DownloadReplayRequest(score);
     }
 }
