@@ -46,7 +46,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             {
                 Origin = Anchor.TopRight,
                 Anchor = Anchor.TopRight,
-                State = Visibility.Visible,
+                State = { Value = Visibility.Visible },
             });
 
             AddStep("Restart", restart);

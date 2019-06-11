@@ -176,7 +176,7 @@ namespace osu.Game.Tests.Visual.UserInterface
         /// Checks if a cursor is visible.
         /// </summary>
         /// <param name="cursorContainer">The cursor to check.</param>
-        private bool checkVisible(CursorContainer cursorContainer) => cursorContainer.State == Visibility.Visible;
+        private bool checkVisible(CursorContainer cursorContainer) => cursorContainer.State.Value == Visibility.Visible;
 
         /// <summary>
         /// Checks if a cursor is at the current inputmanager screen position.
@@ -218,7 +218,7 @@ namespace osu.Game.Tests.Visual.UserInterface
                     },
                     Cursor = new TestCursorContainer
                     {
-                        State = providesUserCursor ? Visibility.Hidden : Visibility.Visible,
+                        State = { Value = providesUserCursor ? Visibility.Hidden : Visibility.Visible },
                     }
                 };
             }
