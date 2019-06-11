@@ -84,10 +84,10 @@ namespace osu.Game.Overlays.Toolbar
                 }
             };
 
-            StateChanged += visibility =>
+            State.ValueChanged += visibility =>
             {
                 if (overlayActivationMode.Value == OverlayActivation.Disabled)
-                    State = Visibility.Hidden;
+                    Hide();
             };
 
             if (osuGame != null)

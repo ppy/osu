@@ -25,6 +25,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "osu.Game.Rulesets.Taiko.Tes
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "osu.Game.Rulesets.Osu.Tests", "osu.Game.Rulesets.Osu.Tests\osu.Game.Rulesets.Osu.Tests.csproj", "{DECCCC75-67AD-4C3D-BB84-FD0E01323511}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "osu.Framework", "..\osu-framework\osu.Framework\osu.Framework.csproj", "{C7D2DA3C-97BF-403C-9F75-115C8A64DAC1}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "osu.Framework.NativeLibs", "..\osu-framework\osu.Framework.NativeLibs\osu.Framework.NativeLibs.csproj", "{35AD7F4C-81DC-4060-BFD1-C376DC4C4801}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -79,6 +83,14 @@ Global
 		{DECCCC75-67AD-4C3D-BB84-FD0E01323511}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DECCCC75-67AD-4C3D-BB84-FD0E01323511}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{DECCCC75-67AD-4C3D-BB84-FD0E01323511}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C7D2DA3C-97BF-403C-9F75-115C8A64DAC1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C7D2DA3C-97BF-403C-9F75-115C8A64DAC1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C7D2DA3C-97BF-403C-9F75-115C8A64DAC1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C7D2DA3C-97BF-403C-9F75-115C8A64DAC1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{35AD7F4C-81DC-4060-BFD1-C376DC4C4801}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{35AD7F4C-81DC-4060-BFD1-C376DC4C4801}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{35AD7F4C-81DC-4060-BFD1-C376DC4C4801}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{35AD7F4C-81DC-4060-BFD1-C376DC4C4801}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

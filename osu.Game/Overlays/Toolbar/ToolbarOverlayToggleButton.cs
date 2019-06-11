@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -15,6 +16,8 @@ namespace osu.Game.Overlays.Toolbar
 
         private OverlayContainer stateContainer;
 
+        private readonly Bindable<Visibility> overlayState = new Bindable<Visibility>();
+
         public OverlayContainer StateContainer
         {
             get => stateContainer;
@@ -22,10 +25,12 @@ namespace osu.Game.Overlays.Toolbar
             {
                 stateContainer = value;
 
+                overlayState.UnbindBindings();
+
                 if (stateContainer != null)
                 {
                     Action = stateContainer.ToggleVisibility;
-                    stateContainer.StateChanged += stateChanged;
+                    overlayState.BindTo(stateContainer.State);
                 }
             }
         }
@@ -40,18 +45,13 @@ namespace osu.Game.Overlays.Toolbar
                 Depth = 2,
                 Alpha = 0,
             });
+
+            overlayState.ValueChanged += stateChanged;
         }
 
-        protected override void Dispose(bool isDisposing)
+        private void stateChanged(ValueChangedEvent<Visibility> state)
         {
-            base.Dispose(isDisposing);
-            if (stateContainer != null)
-                stateContainer.StateChanged -= stateChanged;
-        }
-
-        private void stateChanged(Visibility state)
-        {
-            switch (state)
+            switch (state.NewValue)
             {
                 case Visibility.Hidden:
                     stateBackground.FadeOut(200);
