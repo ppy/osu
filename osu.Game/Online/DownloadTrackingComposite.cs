@@ -17,7 +17,7 @@ namespace osu.Game.Online
     /// </summary>
     public abstract class DownloadTrackingComposite<TModel, TModelManager> : CompositeDrawable
         where TModel : class, IEquatable<TModel>
-        where TModelManager : class, IDownloadModelManager<TModel>
+        where TModelManager : class, IModelDownloader<TModel>
     {
         public readonly Bindable<TModel> ModelInfo = new Bindable<TModel>();
 
@@ -127,7 +127,7 @@ namespace osu.Game.Online
 
         private void setDownloadStateFromManager(TModel s, DownloadState state) => Schedule(() =>
         {
-            if (s.Equals(ModelInfo.Value))
+            if (!s.Equals(ModelInfo.Value))
                 return;
 
             State.Value = state;
