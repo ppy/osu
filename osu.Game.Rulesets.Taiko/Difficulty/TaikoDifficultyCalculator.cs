@@ -27,7 +27,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
         protected override DifficultyAttributes CreateDifficultyAttributes(IBeatmap beatmap, Mod[] mods, Skill[] skills, double clockRate)
         {
             if (beatmap.HitObjects.Count == 0)
-                return new TaikoDifficultyAttributes { Mods = mods };
+                return new TaikoDifficultyAttributes { Mods = mods, Skills = skills };
 
             return new TaikoDifficultyAttributes
             {
@@ -36,6 +36,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
                 // Todo: This int cast is temporary to achieve 1:1 results with osu!stable, and should be removed in the future
                 GreatHitWindow = (int)(beatmap.HitObjects.First().HitWindows.Great / 2) / clockRate,
                 MaxCombo = beatmap.HitObjects.Count(h => h is Hit),
+                Skills = skills
             };
         }
 
