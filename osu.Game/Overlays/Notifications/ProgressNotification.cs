@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Threading;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -36,6 +37,10 @@ namespace osu.Game.Overlays.Notifications
             State = state;
         }
 
+        private readonly CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
+
+        public CancellationToken CancellationToken => cancellationTokenSource.Token;
+
         public virtual ProgressNotificationState State
         {
             get => state;
@@ -62,6 +67,8 @@ namespace osu.Game.Overlays.Notifications
                                 break;
 
                             case ProgressNotificationState.Cancelled:
+                                cancellationTokenSource.Cancel();
+
                                 Light.Colour = colourCancelled;
                                 Light.Pulsate = false;
                                 progressBar.Active = false;
