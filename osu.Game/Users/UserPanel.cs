@@ -42,7 +42,7 @@ namespace osu.Game.Users
 
         public readonly Bindable<UserStatus> Status = new Bindable<UserStatus>();
 
-        public readonly Bindable<UserActivity> Activity = new Bindable<UserActivity>();
+        public readonly IBindable<UserActivity> Activity = new Bindable<UserActivity>();
 
         public new Action Action;
 

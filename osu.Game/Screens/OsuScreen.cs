@@ -193,7 +193,7 @@ namespace osu.Game.Screens
         private void updateActivity()
         {
             if (api != null)
-                api.LocalUser.Value.Activity.Value = activity;
+                api.Activity.Value = activity;
         }
 
         /// <summary>
