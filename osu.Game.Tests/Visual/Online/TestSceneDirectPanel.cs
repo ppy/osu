@@ -6,7 +6,9 @@ using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Game.Beatmaps;
 using osu.Game.Overlays.Direct;
+using osu.Game.Rulesets;
 using osu.Game.Rulesets.Osu;
 using osuTK;
 
@@ -21,12 +23,34 @@ namespace osu.Game.Tests.Visual.Online
             typeof(IconPill)
         };
 
+        private BeatmapSetInfo getBeatmapSet(RulesetInfo ruleset, bool downloadable)
+        {
+            var beatmap = CreateWorkingBeatmap(ruleset).BeatmapSetInfo;
+            beatmap.OnlineInfo.HasVideo = true;
+            beatmap.OnlineInfo.HasStoryboard = true;
+
+            beatmap.OnlineInfo.Availability = new BeatmapSetOnlineAvailability
+            {
+                DownloadDisabled = !downloadable,
+                ExternalLink = "http://localhost",
+            };
+
+            return beatmap;
+        }
+
         [BackgroundDependencyLoader]
         private void load()
         {
-            var beatmap = CreateWorkingBeatmap(new OsuRuleset().RulesetInfo);
-            beatmap.BeatmapSetInfo.OnlineInfo.HasVideo = true;
-            beatmap.BeatmapSetInfo.OnlineInfo.HasStoryboard = true;
+            var ruleset = new OsuRuleset().RulesetInfo;
+
+            var normal = CreateWorkingBeatmap(ruleset).BeatmapSetInfo;
+            normal.OnlineInfo.HasVideo = true;
+            normal.OnlineInfo.HasStoryboard = true;
+
+            var downloadable = getBeatmapSet(ruleset, true);
+            var undownloadable = getBeatmapSet(ruleset, false);
+
+            DirectPanel undownloadableGridPanel, undownloadableListPanel;
 
             Child = new FillFlowContainer
             {
@@ -37,10 +61,17 @@ namespace osu.Game.Tests.Visual.Online
                 Spacing = new Vector2(0, 20),
                 Children = new Drawable[]
                 {
-                    new DirectGridPanel(beatmap.BeatmapSetInfo),
-                    new DirectListPanel(beatmap.BeatmapSetInfo)
-                }
+                    new DirectGridPanel(normal),
+                    new DirectGridPanel(downloadable),
+                    undownloadableGridPanel = new DirectGridPanel(undownloadable),
+                    new DirectListPanel(normal),
+                    new DirectListPanel(downloadable),
+                    undownloadableListPanel = new DirectListPanel(undownloadable),
+                },
             };
+
+            AddAssert("is download button disabled on last grid panel", () => !undownloadableGridPanel.DownloadButton.Enabled.Value);
+            AddAssert("is download button disabled on last list panel", () => !undownloadableListPanel.DownloadButton.Enabled.Value);
         }
     }
 }
