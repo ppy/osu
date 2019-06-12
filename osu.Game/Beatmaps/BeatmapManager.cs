@@ -110,7 +110,7 @@ namespace osu.Game.Beatmaps
 
             validateOnlineIds(beatmapSet);
 
-            await updateQueue.Perform(beatmapSet, cancellationToken);
+            await updateQueue.UpdateAsync(beatmapSet, cancellationToken);
         }
 
         protected override void PreImport(BeatmapSetInfo beatmapSet)
@@ -433,20 +433,20 @@ namespace osu.Game.Beatmaps
                 this.api = api;
             }
 
-            public async Task Perform(BeatmapSetInfo beatmapSet, CancellationToken cancellationToken)
+            public async Task UpdateAsync(BeatmapSetInfo beatmapSet, CancellationToken cancellationToken)
             {
                 if (api?.State != APIState.Online)
                     return;
 
                 LogForModel(beatmapSet, "Performing online lookups...");
-                await Task.WhenAll(beatmapSet.Beatmaps.Select(b => Perform(beatmapSet, b, cancellationToken)).ToArray());
+                await Task.WhenAll(beatmapSet.Beatmaps.Select(b => UpdateAsync(beatmapSet, b, cancellationToken)).ToArray());
             }
 
             // todo: expose this when we need to do individual difficulty lookups.
-            protected Task Perform(BeatmapSetInfo beatmapSet, BeatmapInfo beatmap, CancellationToken cancellationToken)
-                => Task.Factory.StartNew(() => perform(beatmapSet, beatmap), cancellationToken, TaskCreationOptions.HideScheduler, updateScheduler);
+            protected Task UpdateAsync(BeatmapSetInfo beatmapSet, BeatmapInfo beatmap, CancellationToken cancellationToken)
+                => Task.Factory.StartNew(() => update(beatmapSet, beatmap), cancellationToken, TaskCreationOptions.HideScheduler, updateScheduler);
 
-            private void perform(BeatmapSetInfo set, BeatmapInfo beatmap)
+            private void update(BeatmapSetInfo set, BeatmapInfo beatmap)
             {
                 if (api?.State != APIState.Online)
                     return;
