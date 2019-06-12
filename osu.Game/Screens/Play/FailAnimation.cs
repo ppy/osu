@@ -68,7 +68,7 @@ namespace osu.Game.Screens.Play
 
             drawableRuleset.Playfield.DisplayJudgements.Value = false;
 
-            applyToPlayfield(drawableRuleset.Playfield);
+            drawableRuleset.Playfield.Fail();
             drawableRuleset.Playfield.HitObjectContainer.FlashColour(Color4.Red, 500);
             drawableRuleset.Playfield.HitObjectContainer.FadeOut(duration / 2);
         }
@@ -80,15 +80,7 @@ namespace osu.Game.Screens.Play
             if (!started)
                 return;
 
-            applyToPlayfield(drawableRuleset.Playfield);
-        }
-
-        private void applyToPlayfield(Playfield playfield)
-        {
-            foreach (var nested in playfield.NestedPlayfields)
-                applyToPlayfield(nested);
-
-            playfield.Fail();
+            drawableRuleset.Playfield.Fail();
         }
 
         protected override void Dispose(bool isDisposing)

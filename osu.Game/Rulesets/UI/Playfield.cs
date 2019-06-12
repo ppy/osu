@@ -143,6 +143,10 @@ namespace osu.Game.Rulesets.UI
         /// <summary>
         /// Applies the fail animation on alive <see cref="DrawableHitObject"/>s in the container.
         /// </summary>
-        public void Fail() => HitObjectContainer.AliveObjects.ForEach(h => h.Fail());
+        public void Fail()
+        {
+            NestedPlayfields.ForEach(p => p.Fail());
+            HitObjectContainer.AliveObjects.ForEach(h => h.Fail());
+        }
     }
 }
