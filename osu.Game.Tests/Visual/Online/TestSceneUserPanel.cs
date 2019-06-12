@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using NUnit.Framework;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Users;
@@ -61,12 +62,16 @@ namespace osu.Game.Tests.Visual.Online
         [Test]
         public void UserActivitiesTests()
         {
-            AddStep("idle", () => { peppy.Activity.Value = null; });
-            AddStep("spectating", () => { peppy.Activity.Value = new UserActivity.Spectating(); });
-            AddStep("solo", () => { peppy.Activity.Value = new UserActivity.SoloGame(null, null); });
-            AddStep("choosing", () => { peppy.Activity.Value = new UserActivity.ChoosingBeatmap(); });
-            AddStep("editing", () => { peppy.Activity.Value = new UserActivity.Editing(null); });
-            AddStep("modding", () => { peppy.Activity.Value = new UserActivity.Modding(); });
+            Bindable<UserActivity> activity = new Bindable<UserActivity>();
+
+            peppy.Activity.BindTo(activity);
+
+            AddStep("idle", () => { activity.Value = null; });
+            AddStep("spectating", () => { activity.Value = new UserActivity.Spectating(); });
+            AddStep("solo", () => { activity.Value = new UserActivity.SoloGame(null, null); });
+            AddStep("choosing", () => { activity.Value = new UserActivity.ChoosingBeatmap(); });
+            AddStep("editing", () => { activity.Value = new UserActivity.Editing(null); });
+            AddStep("modding", () => { activity.Value = new UserActivity.Modding(); });
         }
     }
 }
