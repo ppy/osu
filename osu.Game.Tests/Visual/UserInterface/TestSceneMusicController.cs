@@ -23,8 +23,8 @@ namespace osu.Game.Tests.Visual.UserInterface
             };
             Add(mc);
 
-            AddToggleStep(@"toggle visibility", state => mc.State = state ? Visibility.Visible : Visibility.Hidden);
-            AddStep(@"show", () => mc.State = Visibility.Visible);
+            AddToggleStep(@"toggle visibility", state => mc.State.Value = state ? Visibility.Visible : Visibility.Hidden);
+            AddStep(@"show", () => mc.Show());
             AddToggleStep(@"toggle beatmap lock", state => Beatmap.Disabled = state);
         }
     }

@@ -252,7 +252,7 @@ namespace osu.Game.Overlays
             if (!IsLoaded)
                 return;
 
-            if (State == Visibility.Hidden)
+            if (State.Value == Visibility.Hidden)
                 return;
 
             if (API == null)

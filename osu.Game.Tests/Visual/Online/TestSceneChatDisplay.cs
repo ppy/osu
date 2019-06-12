@@ -38,7 +38,7 @@ namespace osu.Game.Tests.Visual.Online
             Children = new Drawable[]
             {
                 channelManager,
-                new ChatOverlay { State = Visibility.Visible }
+                new ChatOverlay { State = { Value = Visibility.Visible } }
             };
         }
     }
