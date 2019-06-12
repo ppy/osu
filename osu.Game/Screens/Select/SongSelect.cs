@@ -32,6 +32,7 @@ using osuTK.Input;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using osu.Framework.Graphics.Sprites;
 
 namespace osu.Game.Screens.Select
@@ -256,8 +257,8 @@ namespace osu.Game.Screens.Select
                     if (!beatmaps.GetAllUsableBeatmapSets().Any() && beatmaps.StableInstallationAvailable)
                         dialogOverlay.Push(new ImportFromStablePopup(() =>
                         {
-                            beatmaps.ImportFromStableAsync();
-                            skins.ImportFromStableAsync();
+                            Task.Run(beatmaps.ImportFromStableAsync);
+                            Task.Run(skins.ImportFromStableAsync);
                         }));
                 });
             }
@@ -278,7 +279,7 @@ namespace osu.Game.Screens.Select
 
         protected virtual void ExitFromBack()
         {
-            if (ModSelect.State == Visibility.Visible)
+            if (ModSelect.State.Value == Visibility.Visible)
             {
                 ModSelect.Hide();
                 return;
@@ -520,7 +521,7 @@ namespace osu.Game.Screens.Select
             if (base.OnExiting(next))
                 return true;
 
-            beatmapInfoWedge.State = Visibility.Hidden;
+            beatmapInfoWedge.Hide();
 
             this.FadeOut(100);
 
@@ -594,11 +595,17 @@ namespace osu.Game.Screens.Select
         {
             bindBindables();
 
+            // If a selection was already obtained, do not attempt to update the selected beatmap.
+            if (Carousel.SelectedBeatmapSet != null)
+                return;
+
+            // Attempt to select the current beatmap on the carousel, if it is valid to be selected.
             if (!Beatmap.IsDefault && Beatmap.Value.BeatmapSetInfo?.DeletePending == false && Beatmap.Value.BeatmapSetInfo?.Protected == false
                 && Carousel.SelectBeatmap(Beatmap.Value.BeatmapInfo, false))
                 return;
 
-            if (Carousel.SelectedBeatmapSet == null && !Carousel.SelectNextRandom())
+            // If the current active beatmap could not be selected, select a new random beatmap.
+            if (!Carousel.SelectNextRandom())
             {
                 // in the case random selection failed, we want to trigger selectionChanged
                 // to show the dummy beatmap (we have nothing else to display).

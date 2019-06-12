@@ -24,6 +24,7 @@ using osu.Game.Screens.Edit.Design;
 using osuTK.Input;
 using System.Collections.Generic;
 using osu.Framework;
+using osu.Game.Users;
 
 namespace osu.Game.Screens.Edit
 {
@@ -46,6 +47,8 @@ namespace osu.Game.Screens.Edit
 
         private DependencyContainer dependencies;
         private GameHost host;
+
+        protected override UserActivity InitialActivity => new UserActivity.Editing(Beatmap.Value.BeatmapInfo);
 
         protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
             => dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
