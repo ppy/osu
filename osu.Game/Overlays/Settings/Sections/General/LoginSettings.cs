@@ -154,8 +154,9 @@ namespace osu.Game.Overlays.Settings.Sections.General
                     };
 
                     panel.Status.BindTo(api.LocalUser.Value.Status);
+                    panel.Activity.BindTo(api.LocalUser.Value.Activity);
 
-                    dropdown.Current.ValueChanged += action =>
+                    dropdown.Current.BindValueChanged(action =>
                     {
                         switch (action.NewValue)
                         {
@@ -178,9 +179,7 @@ namespace osu.Game.Overlays.Settings.Sections.General
                                 api.Logout();
                                 break;
                         }
-                    };
-                    dropdown.Current.TriggerChange();
-
+                    }, true);
                     break;
             }
 
