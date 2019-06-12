@@ -55,8 +55,6 @@ namespace osu.Game.Beatmaps
 
         private readonly BeatmapStore beatmaps;
 
-        private readonly IAPIProvider api;
-
         private readonly AudioManager audioManager;
 
         private readonly GameHost host;
@@ -68,7 +66,6 @@ namespace osu.Game.Beatmaps
             : base(storage, contextFactory, api, new BeatmapStore(contextFactory), host)
         {
             this.rulesets = rulesets;
-            this.api = api;
             this.audioManager = audioManager;
             this.host = host;
 
@@ -80,7 +77,7 @@ namespace osu.Game.Beatmaps
 
             updateQueue = new BeatmapUpdateQueue(api);
         }
-        
+
         protected override ArchiveDownloadRequest<BeatmapSetInfo> CreateDownloadRequest(BeatmapSetInfo set, object[] options) => new DownloadBeatmapSetRequest(set, (options?.FirstOrDefault() as bool?) ?? false);
 
         protected override Task Populate(BeatmapSetInfo beatmapSet, ArchiveReader archive, CancellationToken cancellationToken = default)

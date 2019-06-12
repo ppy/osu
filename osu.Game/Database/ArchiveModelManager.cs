@@ -35,8 +35,6 @@ namespace osu.Game.Database
         where TModel : class, IHasFiles<TFileModel>, IHasPrimaryKey, ISoftDelete
         where TFileModel : INamedFileInfo, new()
     {
-        public delegate void ItemAddedDelegate(TModel model, bool existing);
-
         /// <summary>
         /// Set an endpoint for notifications to be posted to.
         /// </summary>
