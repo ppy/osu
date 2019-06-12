@@ -25,7 +25,7 @@ namespace osu.Game.Beatmaps
     /// <summary>
     /// Handles the storage and retrieval of Beatmaps/WorkingBeatmaps.
     /// </summary>
-    public partial class BeatmapManager : ArchiveDownloadModelManager<BeatmapSetInfo, BeatmapSetFileInfo>
+    public partial class BeatmapManager : DownloadableArchiveModelManager<BeatmapSetInfo, BeatmapSetFileInfo>
     {
         /// <summary>
         /// Fired when a single difficulty has been hidden.
