@@ -1,7 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using osu.Framework.Allocation;
 using osu.Framework.Caching;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -18,21 +17,17 @@ using System.Linq;
 
 namespace osu.Game.Overlays.Toolbar
 {
-    public class ToolbarRulesetSelector : TabControl<RulesetInfo>
+    public class ToolbarRulesetSelector : RulesetSelector
     {
         private const float padding = 10;
         private readonly Drawable modeButtonLine;
-        private RulesetStore rulesets;
-        private readonly Bindable<RulesetInfo> globalRuleset = new Bindable<RulesetInfo>();
 
-        public override bool HandleNonPositionalInput => !globalRuleset.Disabled && base.HandleNonPositionalInput;
-        public override bool HandlePositionalInput => !globalRuleset.Disabled && base.HandlePositionalInput;
+        public override bool HandleNonPositionalInput => !GlobalRuleset.Disabled && base.HandleNonPositionalInput;
+        public override bool HandlePositionalInput => !GlobalRuleset.Disabled && base.HandlePositionalInput;
 
-        public override bool PropagatePositionalInputSubTree => !globalRuleset.Disabled && base.PropagatePositionalInputSubTree;
+        public override bool PropagatePositionalInputSubTree => !GlobalRuleset.Disabled && base.PropagatePositionalInputSubTree;
 
         private void disabledChanged(bool isDisabled) => this.FadeColour(isDisabled ? Color4.Gray : Color4.White, 300);
-
-        protected override Dropdown<RulesetInfo> CreateDropdown() => null;
 
         protected override TabItem<RulesetInfo> CreateTabItem(RulesetInfo value) => new ToolbarRulesetTabButton(value);
 
@@ -66,6 +61,8 @@ namespace osu.Game.Overlays.Toolbar
                     }
                 }
             });
+
+            GlobalRuleset.DisabledChanged += disabledChanged;
         }
 
         protected override TabFillFlowContainer CreateTabFlow() => new TabFillFlowContainer
@@ -76,24 +73,6 @@ namespace osu.Game.Overlays.Toolbar
             Padding = new MarginPadding { Left = padding, Right = padding },
         };
 
-        [BackgroundDependencyLoader]
-        private void load(RulesetStore rulesets, Bindable<RulesetInfo> parentRuleset)
-        {
-            this.rulesets = rulesets;
-            globalRuleset.BindTo(parentRuleset);
-
-            foreach (var r in rulesets.AvailableRulesets)
-            {
-                AddItem(r);
-            }
-
-            globalRuleset.BindValueChanged(globalRulesetChanged);
-            globalRuleset.DisabledChanged += disabledChanged;
-            Current.BindValueChanged(localRulesetChanged);
-        }
-
-        private void globalRulesetChanged(ValueChangedEvent<RulesetInfo> e) => Current.Value = e.NewValue;
-
         protected override bool OnKeyDown(KeyDownEvent e)
         {
             base.OnKeyDown(e);
@@ -102,7 +81,7 @@ namespace osu.Game.Overlays.Toolbar
             {
                 int requested = e.Key - Key.Number1;
 
-                RulesetInfo found = rulesets.AvailableRulesets.Skip(requested).FirstOrDefault();
+                RulesetInfo found = AvaliableRulesets.AvailableRulesets.Skip(requested).FirstOrDefault();
                 if (found != null)
                     Current.Value = found;
                 return true;
@@ -113,12 +92,9 @@ namespace osu.Game.Overlays.Toolbar
 
         private readonly Cached activeMode = new Cached();
 
-        private void localRulesetChanged(ValueChangedEvent<RulesetInfo> e)
+        protected override void OnLocalRulesetChanged(ValueChangedEvent<RulesetInfo> e)
         {
-            if (!globalRuleset.Disabled)
-            {
-                globalRuleset.Value = e.NewValue;
-            }
+            base.OnLocalRulesetChanged(e);
 
             activeMode.Invalidate();
         }
