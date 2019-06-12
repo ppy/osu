@@ -100,7 +100,7 @@ namespace osu.Game.Screens.Select
         {
             void removeOldInfo()
             {
-                State = beatmap == null ? Visibility.Hidden : Visibility.Visible;
+                State.Value = beatmap == null ? Visibility.Hidden : Visibility.Visible;
 
                 Info?.FadeOut(250);
                 Info?.Expire();
