@@ -594,7 +594,7 @@ namespace osu.Game.Screens.Select
         {
             bindBindables();
 
-            // As a selection was already obtained, do not attempt to update the selected beatmap.
+            // If a selection was already obtained, do not attempt to update the selected beatmap.
             if (Carousel.SelectedBeatmapSet != null)
                 return;
 
