@@ -57,7 +57,7 @@ namespace osu.Game.Skinning
                 SourceChanged?.Invoke();
             };
 
-            UserSkin = getSkin(Query(s => s.Name == "user") ?? Import(new SkinInfo { Name = "user", Creator = "user" }));
+            UserSkin = getSkin(Query(s => s.Name == "user") ?? Import(new SkinInfo { Name = "user", Creator = "user" }).Result);
         }
 
         /// <summary>
