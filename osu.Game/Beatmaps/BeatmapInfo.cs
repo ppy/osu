@@ -119,7 +119,7 @@ namespace osu.Game.Beatmaps
         /// </summary>
         public List<ScoreInfo> Scores { get; set; }
 
-        public override string ToString() => $"{Metadata} [{Version}]";
+        public override string ToString() => $"{Metadata} [{Version}]".Trim();
 
         public bool Equals(BeatmapInfo other)
         {
