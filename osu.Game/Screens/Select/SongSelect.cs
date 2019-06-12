@@ -595,11 +595,17 @@ namespace osu.Game.Screens.Select
         {
             bindBindables();
 
+            // If a selection was already obtained, do not attempt to update the selected beatmap.
+            if (Carousel.SelectedBeatmapSet != null)
+                return;
+
+            // Attempt to select the current beatmap on the carousel, if it is valid to be selected.
             if (!Beatmap.IsDefault && Beatmap.Value.BeatmapSetInfo?.DeletePending == false && Beatmap.Value.BeatmapSetInfo?.Protected == false
                 && Carousel.SelectBeatmap(Beatmap.Value.BeatmapInfo, false))
                 return;
 
-            if (Carousel.SelectedBeatmapSet == null && !Carousel.SelectNextRandom())
+            // If the current active beatmap could not be selected, select a new random beatmap.
+            if (!Carousel.SelectNextRandom())
             {
                 // in the case random selection failed, we want to trigger selectionChanged
                 // to show the dummy beatmap (we have nothing else to display).
