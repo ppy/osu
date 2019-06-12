@@ -161,8 +161,8 @@ namespace osu.Game.Database
                     lock (imported)
                     {
                         imported.Add(model);
+                        current++;
 
-                        Interlocked.Increment(ref current);
                         notification.Text = $"Imported {current} of {paths.Length} {humanisedModelName}s";
                         notification.Progress = (float)current / paths.Length;
                     }
