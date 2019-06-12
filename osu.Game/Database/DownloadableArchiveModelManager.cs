@@ -22,13 +22,13 @@ namespace osu.Game.Database
         where TModel : class, IHasFiles<TFileModel>, IHasPrimaryKey, ISoftDelete
         where TFileModel : INamedFileInfo, new()
     {
-        public event Action<ArchiveDownloadModelRequest<TModel>> DownloadBegan;
+        public event Action<ArchiveDownloadRequest<TModel>> DownloadBegan;
 
-        public event Action<ArchiveDownloadModelRequest<TModel>> DownloadFailed;
+        public event Action<ArchiveDownloadRequest<TModel>> DownloadFailed;
 
         private readonly IAPIProvider api;
 
-        private readonly List<ArchiveDownloadModelRequest<TModel>> currentDownloads = new List<ArchiveDownloadModelRequest<TModel>>();
+        private readonly List<ArchiveDownloadRequest<TModel>> currentDownloads = new List<ArchiveDownloadRequest<TModel>>();
 
         private readonly MutableDatabaseBackedStoreWithFileIncludes<TModel, TFileModel> modelStore;
 
@@ -47,7 +47,7 @@ namespace osu.Game.Database
         /// <param name="model">The <see cref="TModel"/> to be downloaded.</param>
         /// <param name="options">Extra parameters for request creation, null if none were passed.</param>
         /// <returns>The request object.</returns>
-        protected abstract ArchiveDownloadModelRequest<TModel> CreateDownloadRequest(TModel model, object[] options);
+        protected abstract ArchiveDownloadRequest<TModel> CreateDownloadRequest(TModel model, object[] options);
 
         public bool Download(TModel model)
         {
@@ -78,11 +78,11 @@ namespace osu.Game.Database
         /// <returns>Whether the <see cref="TModel"/> exists locally.</returns>
         public virtual bool IsAvailableLocally(TModel model) => modelStore.ConsumableItems.Any(m => m.Equals(model) && !m.DeletePending);
 
-        public ArchiveDownloadModelRequest<TModel> GetExistingDownload(TModel model) => currentDownloads.Find(r => r.Info.Equals(model));
+        public ArchiveDownloadRequest<TModel> GetExistingDownload(TModel model) => currentDownloads.Find(r => r.Info.Equals(model));
 
         private bool canDownload(TModel model) => GetExistingDownload(model) == null && api != null;
 
-        private void performDownloadWithRequest(ArchiveDownloadModelRequest<TModel> request)
+        private void performDownloadWithRequest(ArchiveDownloadRequest<TModel> request)
         {
             DownloadNotification notification = new DownloadNotification
             {

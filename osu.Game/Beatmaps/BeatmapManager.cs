@@ -74,7 +74,7 @@ namespace osu.Game.Beatmaps
             beatmaps.BeatmapRestored += b => BeatmapRestored?.Invoke(b);
         }
 
-        protected override ArchiveDownloadModelRequest<BeatmapSetInfo> CreateDownloadRequest(BeatmapSetInfo set, object[] options) => new DownloadBeatmapSetRequest(set, (options?.FirstOrDefault() as bool?) ?? false);
+        protected override ArchiveDownloadRequest<BeatmapSetInfo> CreateDownloadRequest(BeatmapSetInfo set, object[] options) => new DownloadBeatmapSetRequest(set, (options?.FirstOrDefault() as bool?) ?? false);
 
         protected override void Populate(BeatmapSetInfo beatmapSet, ArchiveReader archive)
         {
