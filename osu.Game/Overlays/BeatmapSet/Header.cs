@@ -104,8 +104,8 @@ namespace osu.Game.Overlays.BeatmapSet
                                 {
                                     new Container
                                     {
+                                        AutoSizeAxes = Axes.Y,
                                         RelativeSizeAxes = Axes.X,
-                                        Height = 113,
                                         Child = Picker = new BeatmapPicker(),
                                     },
                                     new FillFlowContainer
