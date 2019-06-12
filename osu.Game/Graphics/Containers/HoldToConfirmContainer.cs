@@ -27,7 +27,7 @@ namespace osu.Game.Graphics.Containers
 
         protected void BeginConfirm()
         {
-            if (confirming || !AllowMultipleFires && fired) return;
+            if (confirming || (!AllowMultipleFires && fired)) return;
 
             confirming = true;
 
