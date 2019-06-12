@@ -6,6 +6,10 @@ using System;
 
 namespace osu.Game.Database
 {
+    /// <summary>
+    /// Represents a <see cref="IModelManager{TModel}"/> that can download new models from an external source.
+    /// </summary>
+    /// <typeparam name="TModel">The model type.</typeparam>
     public interface IModelDownloader<TModel> : IModelManager<TModel>
         where TModel : class
     {
@@ -23,7 +27,7 @@ namespace osu.Game.Database
 
         /// <summary>
         /// Downloads a <see cref="TModel"/>.
-        /// This will post notifications tracking progress.
+        /// This may post notifications tracking progress.
         /// </summary>
         /// <param name="model">The <see cref="TModel"/> to be downloaded.</param>
         /// <returns>Whether downloading can happen.</returns>
@@ -31,7 +35,7 @@ namespace osu.Game.Database
 
         /// <summary>
         /// Downloads a <see cref="TModel"/> with optional parameters for the download request.
-        /// This will post notifications tracking progress.
+        /// This may post notifications tracking progress.
         /// </summary>
         /// <param name="model">The <see cref="TModel"/> to be downloaded.</param>
         /// <param name="extra">Optional parameters to be used for creating the download request.</param>
