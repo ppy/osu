@@ -5,7 +5,7 @@ using System;
 
 namespace osu.Game.Online.API
 {
-    public abstract class ArchiveDownloadModelRequest<TModel> : APIDownloadRequest
+    public abstract class ArchiveDownloadRequest<TModel> : APIDownloadRequest
         where TModel : class
     {
         public readonly TModel Info;
@@ -14,7 +14,7 @@ namespace osu.Game.Online.API
 
         public event Action<float> DownloadProgressed;
 
-        protected ArchiveDownloadModelRequest(TModel model)
+        protected ArchiveDownloadRequest(TModel model)
         {
             Info = model;
 

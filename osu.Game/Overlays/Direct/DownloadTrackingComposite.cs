@@ -76,9 +76,9 @@ namespace osu.Game.Overlays.Direct
 
         #endregion
 
-        private ArchiveDownloadModelRequest<BeatmapSetInfo> attachedRequest;
+        private ArchiveDownloadRequest<BeatmapSetInfo> attachedRequest;
 
-        private void attachDownload(ArchiveDownloadModelRequest<BeatmapSetInfo> request)
+        private void attachDownload(ArchiveDownloadRequest<BeatmapSetInfo> request)
         {
             if (attachedRequest != null)
             {

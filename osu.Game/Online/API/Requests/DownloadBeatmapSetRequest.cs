@@ -5,7 +5,7 @@ using osu.Game.Beatmaps;
 
 namespace osu.Game.Online.API.Requests
 {
-    public class DownloadBeatmapSetRequest : ArchiveDownloadModelRequest<BeatmapSetInfo>
+    public class DownloadBeatmapSetRequest : ArchiveDownloadRequest<BeatmapSetInfo>
     {
         private readonly bool noVideo;
         private readonly BeatmapSetInfo set;
