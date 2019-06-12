@@ -163,7 +163,7 @@ namespace osu.Game.Database
                         imported.Add(model);
                         current++;
 
-                        notification.Text = $"Imported {current} of {paths.Length} {humanisedModelName}s";
+                        notification.Text = $"Imported {current} of {paths.Length} {HumanisedModelName}s";
                         notification.Progress = (float)current / paths.Length;
                     }
                 }
@@ -186,7 +186,7 @@ namespace osu.Game.Database
             {
                 notification.CompletionText = imported.Count == 1
                     ? $"Imported {imported.First()}!"
-                    : $"Imported {current} {humanisedModelName}s!";
+                    : $"Imported {current} {HumanisedModelName}s!";
 
                 if (imported.Count > 0 && PresentImport != null)
                 {
@@ -344,7 +344,7 @@ namespace osu.Game.Database
                             if (CanUndelete(existing, item))
                             {
                                 Undelete(existing);
-                                LogForModel(item, $"Found existing {humanisedModelName} for {item} (ID {existing.ID}) – skipping import.");
+                                LogForModel(item, $"Found existing {HumanisedModelName} for {item} (ID {existing.ID}) – skipping import.");
                                 handleEvent(() => ItemAdded?.Invoke(existing, true));
 
                                 // existing item will be used; rollback new import and exit early.
@@ -424,7 +424,8 @@ namespace osu.Game.Database
             var notification = new ProgressNotification
             {
                 Progress = 0,
-                CompletionText = $"Deleted all {typeof(TModel).Name.Replace("Info", "").ToLower()}s!",
+                Text = $"Preparing to delete all {HumanisedModelName}s...",
+                CompletionText = $"Deleted all {HumanisedModelName}s!",
                 State = ProgressNotificationState.Active,
             };
 
@@ -441,7 +442,7 @@ namespace osu.Game.Database
                         // user requested abort
                         return;
 
-                    notification.Text = $"Deleting ({++i} of {items.Count})";
+                    notification.Text = $"Deleting {HumanisedModelName}s ({++i} of {items.Count})";
 
                     Delete(b);
 
@@ -613,7 +614,7 @@ namespace osu.Game.Database
 
         private DbSet<TModel> queryModel() => ContextFactory.Get().Set<TModel>();
 
-        private string humanisedModelName => $"{typeof(TModel).Name.Replace("Info", "").ToLower()}";
+        protected virtual string HumanisedModelName => $"{typeof(TModel).Name.Replace("Info", "").ToLower()}";
 
         /// <summary>
         /// Creates an <see cref="ArchiveReader"/> from a valid storage path.
