@@ -27,7 +27,7 @@ namespace osu.Game.Tests.Visual.Settings
         {
             settings = new SettingsOverlay
             {
-                State = Visibility.Visible
+                State = { Value = Visibility.Visible }
             };
             Add(dialogOverlay = new DialogOverlay
             {
