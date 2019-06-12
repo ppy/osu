@@ -43,7 +43,7 @@ namespace osu.Game.Screens.Play
         private bool hideOverlays;
         public override bool HideOverlaysOnEnter => hideOverlays;
 
-        protected override UserActivity InitialScreenActivity => null; //shows the previous screen status
+        protected override UserActivity InitialActivity => null; //shows the previous screen status
 
         public override bool DisallowExternalBeatmapRulesetChanges => true;
 

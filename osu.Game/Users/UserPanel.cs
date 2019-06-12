@@ -42,7 +42,7 @@ namespace osu.Game.Users
 
         public readonly Bindable<UserStatus> Status = new Bindable<UserStatus>();
 
-        public readonly Bindable<UserActivity> Activity = new Bindable<UserActivity>();
+        public readonly IBindable<UserActivity> Activity = new Bindable<UserActivity>();
 
         public new Action Action;
 
@@ -231,17 +231,18 @@ namespace osu.Game.Users
                 statusBar.ResizeHeightTo(status_height, transition_duration, Easing.OutQuint);
                 statusBar.FadeIn(transition_duration, Easing.OutQuint);
                 this.ResizeHeightTo(height, transition_duration, Easing.OutQuint);
-
-                if (status is UserStatusOnline && activity != null)
-                {
-                    statusMessage.Text = activity.Status;
-                    statusBg.FadeColour(activity.GetAppropriateColour(colours), 500, Easing.OutQuint);
-                    return;
-                }
             }
 
-            statusMessage.Text = status?.Message;
-            statusBg.FadeColour(status?.GetAppropriateColour(colours) ?? colours.Gray5, 500, Easing.OutQuint);
+            if (status is UserStatusOnline && activity != null)
+            {
+                statusMessage.Text = activity.Status;
+                statusBg.FadeColour(activity.GetAppropriateColour(colours), 500, Easing.OutQuint);
+            }
+            else
+            {
+                statusMessage.Text = status?.Message;
+                statusBg.FadeColour(status?.GetAppropriateColour(colours) ?? colours.Gray5, 500, Easing.OutQuint);
+            }
         }
 
         public MenuItem[] ContextMenuItems => new MenuItem[]

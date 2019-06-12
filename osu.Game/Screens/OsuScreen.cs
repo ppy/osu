@@ -56,25 +56,27 @@ namespace osu.Game.Screens
 
         /// <summary>
         /// The <see cref="UserActivity"/> to set the user's activity automatically to when this screen is entered
+        /// <para>This <see cref="Activity"/> will be automatically set to <see cref="InitialActivity"/> for this screen on entering unless
+        /// <see cref="Activity"/> is manually set before.</para>
         /// </summary>
-        protected virtual UserActivity InitialScreenActivity => null;
+        protected virtual UserActivity InitialActivity => null;
+
+        private UserActivity activity;
 
         /// <summary>
-        /// The <see cref="UserActivity"/> for this screen.
+        /// The current <see cref="UserActivity"/> for this screen.
         /// </summary>
-        protected UserActivity ScreenActivity
+        protected UserActivity Activity
         {
-            get => screenActivity;
+            get => activity;
             set
             {
-                if (value == screenActivity) return;
+                if (value == activity) return;
 
-                screenActivity = value;
-                setUserActivity(screenActivity);
+                activity = value;
+                updateActivity();
             }
         }
-
-        private UserActivity screenActivity;
 
         /// <summary>
         /// Whether to disallow changes to game-wise Beatmap/Ruleset bindables for this screen (and all children).
@@ -121,8 +123,6 @@ namespace osu.Game.Screens
         {
             Anchor = Anchor.Centre;
             Origin = Anchor.Centre;
-
-            screenActivity = null;
         }
 
         [BackgroundDependencyLoader(true)]
@@ -152,7 +152,7 @@ namespace osu.Game.Screens
                 sampleExit?.Play();
             applyArrivingDefaults(true);
 
-            setUserActivity(screenActivity);
+            updateActivity();
 
             base.OnResuming(last);
         }
@@ -170,7 +170,8 @@ namespace osu.Game.Screens
 
             backgroundStack?.Push(localBackground = CreateBackground());
 
-            ScreenActivity = InitialScreenActivity;
+            if (activity == null)
+                Activity = InitialActivity;
 
             base.OnEntering(last);
         }
@@ -189,11 +190,10 @@ namespace osu.Game.Screens
             return false;
         }
 
-        private void setUserActivity(UserActivity activity)
+        private void updateActivity()
         {
-            if (api == null) return;
-
-            api.LocalUser.Value.Activity.Value = activity;
+            if (api != null)
+                api.Activity.Value = activity;
         }
 
         /// <summary>
