@@ -32,6 +32,7 @@ using osuTK.Input;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using osu.Framework.Graphics.Sprites;
 
 namespace osu.Game.Screens.Select
@@ -256,8 +257,8 @@ namespace osu.Game.Screens.Select
                     if (!beatmaps.GetAllUsableBeatmapSets().Any() && beatmaps.StableInstallationAvailable)
                         dialogOverlay.Push(new ImportFromStablePopup(() =>
                         {
-                            beatmaps.ImportFromStableAsync();
-                            skins.ImportFromStableAsync();
+                            Task.Run(beatmaps.ImportFromStableAsync);
+                            Task.Run(skins.ImportFromStableAsync);
                         }));
                 });
             }
