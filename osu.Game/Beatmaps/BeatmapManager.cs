@@ -235,7 +235,7 @@ namespace osu.Game.Beatmaps
         /// <returns>Results from the provided query.</returns>
         public IQueryable<BeatmapInfo> QueryBeatmaps(Expression<Func<BeatmapInfo, bool>> query) => beatmaps.Beatmaps.AsNoTracking().Where(query);
 
-        public override bool IsAvailableLocally(BeatmapSetInfo set) => beatmaps.ConsumableItems.Any(s => s.OnlineBeatmapSetID == set.OnlineBeatmapSetID && !s.DeletePending && !s.Protected);
+        protected override string HumanisedModelName => "beatmap";
 
         protected override BeatmapSetInfo CreateModel(ArchiveReader reader)
         {
