@@ -26,6 +26,7 @@ namespace osu.Game.Overlays.BeatmapSet
 
                 beatmapSet = value;
 
+                removeLinks();
                 if (beatmapSet?.OnlineInfo.Availability != null)
                 {
                     Header?.ResizeHeightTo(450, 500);
@@ -95,11 +96,6 @@ namespace osu.Game.Overlays.BeatmapSet
             base.Show();
         }
 
-        public override void Hide()
-        {
-            link.RemoveAll(x => true);
-
-            base.Hide();
-        }
+        private void removeLinks() => link?.RemoveAll(x => true);
     }
 }
