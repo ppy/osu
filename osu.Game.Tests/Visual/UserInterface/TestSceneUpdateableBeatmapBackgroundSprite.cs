@@ -32,7 +32,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             this.api = api;
             this.rulesets = rulesets;
 
-            testBeatmap = ImportBeatmapTest.LoadOszIntoOsu(osu);
+            testBeatmap = ImportBeatmapTest.LoadOszIntoOsu(osu).Result;
         }
 
         [Test]

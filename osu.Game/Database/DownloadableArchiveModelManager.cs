@@ -1,4 +1,4 @@
-﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Logging;
@@ -97,9 +97,10 @@ namespace osu.Game.Database
 
             request.Success += filename =>
             {
-                Task.Factory.StartNew(() =>
+                Task.Factory.StartNew(async () =>
                 {
-                    Import(notification, filename);
+                    // This gets scheduled back to the update thread, but we want the import to run in the background.
+                    await Import(notification, filename);
                     currentDownloads.Remove(request);
                 }, TaskCreationOptions.LongRunning);
             };

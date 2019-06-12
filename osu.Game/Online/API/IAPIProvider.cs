@@ -14,6 +14,11 @@ namespace osu.Game.Online.API
         Bindable<User> LocalUser { get; }
 
         /// <summary>
+        /// The current user's activity.
+        /// </summary>
+        Bindable<UserActivity> Activity { get; }
+
+        /// <summary>
         /// Returns whether the local user is logged in.
         /// </summary>
         bool IsLoggedIn { get; }
