@@ -155,7 +155,7 @@ namespace osu.Game.Screens.Select
                 int? previouslySelectedID = null;
                 CarouselBeatmapSet existingSet = beatmapSets.FirstOrDefault(b => b.BeatmapSet.ID == beatmapSet.ID);
 
-                // Since we're about to remove the selected beatmap, store its ID so we can go back if needed.
+                // If the selected beatmap is about to be removed, store its ID so it can be re-selected if required
                 if (existingSet?.State?.Value == CarouselItemState.Selected)
                     previouslySelectedID = selectedBeatmap?.Beatmap.ID;
 
