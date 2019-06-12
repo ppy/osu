@@ -30,7 +30,7 @@ namespace osu.Game.Rulesets.Mania.Difficulty
         protected override DifficultyAttributes CreateDifficultyAttributes(IBeatmap beatmap, Mod[] mods, Skill[] skills, double clockRate)
         {
             if (beatmap.HitObjects.Count == 0)
-                return new ManiaDifficultyAttributes { Mods = mods };
+                return new ManiaDifficultyAttributes { Mods = mods, Skills = skills };
 
             return new ManiaDifficultyAttributes
             {
@@ -38,6 +38,7 @@ namespace osu.Game.Rulesets.Mania.Difficulty
                 Mods = mods,
                 // Todo: This int cast is temporary to achieve 1:1 results with osu!stable, and should be removed in the future
                 GreatHitWindow = (int)(beatmap.HitObjects.First().HitWindows.Great / 2) / clockRate,
+                Skills = skills
             };
         }
 
