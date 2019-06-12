@@ -12,11 +12,12 @@ namespace osu.Game.Tests.Visual.Online
     [TestFixture]
     public class TestSceneUserPanel : OsuTestScene
     {
-        private readonly UserPanel flyte;
         private readonly UserPanel peppy;
 
         public TestSceneUserPanel()
         {
+            UserPanel flyte;
+
             Add(new FillFlowContainer
             {
                 Anchor = Anchor.Centre,
@@ -60,12 +61,12 @@ namespace osu.Game.Tests.Visual.Online
         [Test]
         public void UserActivitiesTests()
         {
-            AddStep("idle", () => { flyte.Activity.Value = null; });
-            AddStep("spectating", () => { flyte.Activity.Value = new UserActivity.Spectating(); });
-            AddStep("solo", () => { flyte.Activity.Value = new UserActivity.SoloGame(null, null); });
-            AddStep("choosing", () => { flyte.Activity.Value = new UserActivity.ChoosingBeatmap(); });
-            AddStep("editing", () => { flyte.Activity.Value = new UserActivity.Editing(null); });
-            AddStep("modding", () => { flyte.Activity.Value = new UserActivity.Modding(); });
+            AddStep("idle", () => { peppy.Activity.Value = null; });
+            AddStep("spectating", () => { peppy.Activity.Value = new UserActivity.Spectating(); });
+            AddStep("solo", () => { peppy.Activity.Value = new UserActivity.SoloGame(null, null); });
+            AddStep("choosing", () => { peppy.Activity.Value = new UserActivity.ChoosingBeatmap(); });
+            AddStep("editing", () => { peppy.Activity.Value = new UserActivity.Editing(null); });
+            AddStep("modding", () => { peppy.Activity.Value = new UserActivity.Modding(); });
         }
     }
 }
