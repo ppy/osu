@@ -34,7 +34,7 @@ namespace osu.Game.Overlays.Toolbar
 
         protected override Dropdown<RulesetInfo> CreateDropdown() => null;
 
-        protected override TabItem<RulesetInfo> CreateTabItem(RulesetInfo value) => new ToolbarRulesetButton(value);
+        protected override TabItem<RulesetInfo> CreateTabItem(RulesetInfo value) => new ToolbarRulesetTabButton(value);
 
         public ToolbarRulesetSelector()
         {

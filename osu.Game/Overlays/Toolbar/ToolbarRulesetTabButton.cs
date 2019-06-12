@@ -10,16 +10,16 @@ using osu.Framework.Input.Events;
 
 namespace osu.Game.Overlays.Toolbar
 {
-    public class ToolbarRulesetButton : TabItem<RulesetInfo>
+    public class ToolbarRulesetTabButton : TabItem<RulesetInfo>
     {
-        private readonly DrawableRuleset ruleset;
+        private readonly RulesetButton ruleset;
 
-        public ToolbarRulesetButton(RulesetInfo value)
+        public ToolbarRulesetTabButton(RulesetInfo value)
             : base(value)
         {
             AutoSizeAxes = Axes.X;
             RelativeSizeAxes = Axes.Y;
-            Child = ruleset = new DrawableRuleset
+            Child = ruleset = new RulesetButton
             {
                 Active = false,
             };
@@ -35,7 +35,7 @@ namespace osu.Game.Overlays.Toolbar
 
         protected override void OnDeactivated() => ruleset.Active = false;
 
-        private class DrawableRuleset : ToolbarButton
+        private class RulesetButton : ToolbarButton
         {
             public bool Active
             {
