@@ -123,8 +123,6 @@ namespace osu.Game.Screens
         {
             Anchor = Anchor.Centre;
             Origin = Anchor.Centre;
-
-            screenActivity = null;
         }
 
         [BackgroundDependencyLoader(true)]
