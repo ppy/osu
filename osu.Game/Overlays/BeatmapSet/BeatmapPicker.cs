@@ -91,7 +91,8 @@ namespace osu.Game.Overlays.BeatmapSet
                     {
                         difficulties = new DifficultiesContainer
                         {
-                            AutoSizeAxes = Axes.Both,
+                            AutoSizeAxes = Axes.Y,
+                            RelativeSizeAxes = Axes.X,
                             Margin = new MarginPadding { Left = -(tile_icon_padding + tile_spacing / 2) },
                             OnLostHover = () =>
                             {
