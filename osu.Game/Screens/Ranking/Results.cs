@@ -275,7 +275,7 @@ namespace osu.Game.Screens.Ranking
                 currentPage = page.NewValue?.CreatePage();
 
                 if (currentPage != null)
-                    circleInner.Add(currentPage);
+                    LoadComponentAsync(currentPage, circleInner.Add);
             }, true);
         }
 
