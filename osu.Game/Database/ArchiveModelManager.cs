@@ -1,4 +1,4 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
@@ -132,13 +132,13 @@ namespace osu.Game.Database
         /// This will post notifications tracking progress.
         /// </summary>
         /// <param name="paths">One or more archive locations on disk.</param>
-        public async Task Import(params string[] paths)
+        public Task Import(params string[] paths)
         {
             var notification = new ProgressNotification { State = ProgressNotificationState.Active };
 
             PostNotification?.Invoke(notification);
 
-            await Import(notification, paths);
+            return Import(notification, paths);
         }
 
         protected async Task Import(ProgressNotification notification, params string[] paths)
@@ -243,7 +243,7 @@ namespace osu.Game.Database
         /// </summary>
         /// <param name="archive">The archive to be imported.</param>
         /// <param name="cancellationToken">An optional cancellation token.</param>
-        public async Task<TModel> Import(ArchiveReader archive, CancellationToken cancellationToken = default)
+        public Task<TModel> Import(ArchiveReader archive, CancellationToken cancellationToken = default)
         {
             cancellationToken.ThrowIfCancellationRequested();
 
@@ -267,7 +267,7 @@ namespace osu.Game.Database
                 return null;
             }
 
-            return await Import(model, archive, cancellationToken);
+            return Import(model, archive, cancellationToken);
         }
 
         /// <summary>
@@ -548,24 +548,24 @@ namespace osu.Game.Database
         /// <summary>
         /// This is a temporary method and will likely be replaced by a full-fledged (and more correctly placed) migration process in the future.
         /// </summary>
-        public async Task ImportFromStableAsync()
+        public Task ImportFromStableAsync()
         {
             var stable = GetStableStorage?.Invoke();
 
             if (stable == null)
             {
                 Logger.Log("No osu!stable installation available!", LoggingTarget.Information, LogLevel.Error);
-                return;
+                return Task.CompletedTask;
             }
 
             if (!stable.ExistsDirectory(ImportFromStablePath))
             {
                 // This handles situations like when the user does not have a Skins folder
                 Logger.Log($"No {ImportFromStablePath} folder available in osu!stable installation", LoggingTarget.Information, LogLevel.Error);
-                return;
+                return Task.CompletedTask;
             }
 
-            await Task.Run(async () => await Import(stable.GetDirectories(ImportFromStablePath).Select(f => stable.GetFullPath(f)).ToArray()));
+            return Task.Run(async () => await Import(stable.GetDirectories(ImportFromStablePath).Select(f => stable.GetFullPath(f)).ToArray()));
         }
 
         #endregion
