@@ -60,12 +60,12 @@ namespace osu.Desktop
 
             switch (a)
             {
-                case UserActivity.SoloGame game:
+                case SoloGame game:
                     presence.State = $"{game.Beatmap.Metadata.Artist} - {game.Beatmap.Metadata.Title} [{game.Beatmap.Version}]";
                     setPresenceGamemode(game.Ruleset, presence);
                     break;
 
-                case UserActivity.Editing editing:
+                case Editing editing:
                     presence.State = $"{editing.Beatmap.Metadata.Artist} - {editing.Beatmap.Metadata.Title} " + (!string.IsNullOrEmpty(editing.Beatmap.Version) ? $"[{editing.Beatmap.Version}]" : "");
                     presence.Assets.SmallImageKey = "edit";
                     presence.Assets.SmallImageText = "editing";
