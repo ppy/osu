@@ -273,6 +273,9 @@ namespace osu.Game.Rulesets.Objects.Drawables
             if (objectFailed)
                 return;
 
+            foreach (var obj in NestedHitObjects)
+                obj.Fail();
+
             this.RotateTo(RNG.NextSingle(-90, 90), fail_duration);
             this.ScaleTo(Scale * 0.5f, fail_duration);
             this.MoveToOffset(new Vector2(0, 400), fail_duration);
