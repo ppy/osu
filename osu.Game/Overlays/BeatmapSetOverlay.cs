@@ -26,7 +26,7 @@ namespace osu.Game.Overlays
         public const float X_PADDING = 40;
         public const float RIGHT_WIDTH = 275;
 
-        private readonly Header header;
+        public readonly Header Header;
 
         private RulesetStore rulesets;
 
@@ -60,7 +60,7 @@ namespace osu.Game.Overlays
                         Direction = FillDirection.Vertical,
                         Children = new Drawable[]
                         {
-                            header = new Header(),
+                            Header = new Header(),
                             info = new Info(),
                             scores = new ScoresContainer(),
                         },
@@ -68,10 +68,10 @@ namespace osu.Game.Overlays
                 },
             };
 
-            header.BeatmapSet.BindTo(beatmapSet);
+            Header.BeatmapSet.BindTo(beatmapSet);
             info.BeatmapSet.BindTo(beatmapSet);
 
-            header.Picker.Beatmap.ValueChanged += b =>
+            Header.Picker.Beatmap.ValueChanged += b =>
             {
                 info.Beatmap = b.NewValue;
                 scores.Beatmap = b.NewValue;
@@ -103,7 +103,7 @@ namespace osu.Game.Overlays
             req.Success += res =>
             {
                 beatmapSet.Value = res.ToBeatmapSet(rulesets);
-                header.Picker.Beatmap.Value = header.BeatmapSet.Value.Beatmaps.First(b => b.OnlineBeatmapID == beatmapId);
+                Header.Picker.Beatmap.Value = Header.BeatmapSet.Value.Beatmaps.First(b => b.OnlineBeatmapID == beatmapId);
             };
             API.Queue(req);
             Show();
