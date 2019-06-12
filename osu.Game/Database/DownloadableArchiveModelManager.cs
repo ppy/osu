@@ -79,7 +79,7 @@ namespace osu.Game.Database
         /// <returns>Whether the <see cref="TModel"/> exists locally.</returns>
         public virtual bool IsAvailableLocally(TModel model) => modelStore.ConsumableItems.Any(m => m.Equals(model) && !m.DeletePending);
 
-        public ArchiveDownloadRequest<TModel> GetExistingDownload(TModel model) => currentDownloads.Find(r => r.Info.Equals(model));
+        public ArchiveDownloadRequest<TModel> GetExistingDownload(TModel model) => currentDownloads.Find(r => r.Model.Equals(model));
 
         private bool canDownload(TModel model) => GetExistingDownload(model) == null && api != null;
 
@@ -87,7 +87,7 @@ namespace osu.Game.Database
         {
             DownloadNotification notification = new DownloadNotification
             {
-                Text = $"Downloading {request.Info}",
+                Text = $"Downloading {request.Model}",
             };
 
             request.DownloadProgressed += progress =>
