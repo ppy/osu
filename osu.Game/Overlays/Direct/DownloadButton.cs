@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
@@ -25,6 +26,8 @@ namespace osu.Game.Overlays.Direct
         private readonly ShakeContainer shakeContainer;
 
         private readonly OsuAnimatedButton button;
+
+        public readonly BindableBool Enabled = new BindableBool(true);
 
         public DownloadButton(BeatmapSetInfo beatmapSet, bool noVideo = false)
             : base(beatmapSet)
@@ -62,6 +65,8 @@ namespace osu.Game.Overlays.Direct
                     }
                 }
             };
+
+            Enabled.BindTo(button.Enabled);
         }
 
         protected override void LoadComplete()
@@ -79,7 +84,7 @@ namespace osu.Game.Overlays.Direct
 
             if (BeatmapSet.Value.OnlineInfo.Availability?.DownloadDisabled ?? false)
             {
-                button.Enabled.Value = false;
+                Enabled.Value = false;
                 button.TooltipText = "Unavailable";
                 return;
             }
