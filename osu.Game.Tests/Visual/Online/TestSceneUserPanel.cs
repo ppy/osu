@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using NUnit.Framework;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Users;
@@ -12,11 +13,12 @@ namespace osu.Game.Tests.Visual.Online
     [TestFixture]
     public class TestSceneUserPanel : OsuTestScene
     {
-        private readonly UserPanel flyte;
         private readonly UserPanel peppy;
 
         public TestSceneUserPanel()
         {
+            UserPanel flyte;
+
             Add(new FillFlowContainer
             {
                 Anchor = Anchor.Centre,
@@ -60,12 +62,16 @@ namespace osu.Game.Tests.Visual.Online
         [Test]
         public void UserActivitiesTests()
         {
-            AddStep("idle", () => { flyte.Activity.Value = null; });
-            AddStep("spectating", () => { flyte.Activity.Value = new UserActivity.UserActivitySpectating(); });
-            AddStep("solo", () => { flyte.Activity.Value = new UserActivity.UserActivitySoloGame(null, null); });
-            AddStep("choosing", () => { flyte.Activity.Value = new UserActivity.UserActivityChoosingBeatmap(); });
-            AddStep("editing", () => { flyte.Activity.Value = new UserActivity.UserActivityEditing(null); });
-            AddStep("modding", () => { flyte.Activity.Value = new UserActivity.UserActivityModding(); });
+            Bindable<UserActivity> activity = new Bindable<UserActivity>();
+
+            peppy.Activity.BindTo(activity);
+
+            AddStep("idle", () => { activity.Value = null; });
+            AddStep("spectating", () => { activity.Value = new UserActivity.Spectating(); });
+            AddStep("solo", () => { activity.Value = new UserActivity.SoloGame(null, null); });
+            AddStep("choosing", () => { activity.Value = new UserActivity.ChoosingBeatmap(); });
+            AddStep("editing", () => { activity.Value = new UserActivity.Editing(null); });
+            AddStep("modding", () => { activity.Value = new UserActivity.Modding(); });
         }
     }
 }

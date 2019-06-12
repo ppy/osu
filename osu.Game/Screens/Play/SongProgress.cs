@@ -106,7 +106,7 @@ namespace osu.Game.Screens.Play
 
         protected override void LoadComplete()
         {
-            State = Visibility.Visible;
+            Show();
 
             replayLoaded.ValueChanged += loaded => AllowSeeking = loaded.NewValue;
             replayLoaded.TriggerChange();

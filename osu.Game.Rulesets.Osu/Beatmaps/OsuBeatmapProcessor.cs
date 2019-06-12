@@ -69,7 +69,7 @@ namespace osu.Game.Rulesets.Osu.Beatmaps
                             break;
 
                         if (Vector2Extensions.Distance(stackBaseObject.Position, objectN.Position) < stack_distance
-                            || stackBaseObject is Slider && Vector2Extensions.Distance(stackBaseObject.EndPosition, objectN.Position) < stack_distance)
+                            || (stackBaseObject is Slider && Vector2Extensions.Distance(stackBaseObject.EndPosition, objectN.Position) < stack_distance))
                         {
                             stackBaseIndex = n;
 

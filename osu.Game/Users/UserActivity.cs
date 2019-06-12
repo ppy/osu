@@ -12,57 +12,57 @@ namespace osu.Game.Users
         public abstract string Status { get; }
         public virtual Color4 GetAppropriateColour(OsuColour colours) => colours.GreenDarker;
 
-        public class UserActivityModding : UserActivity
+        public class Modding : UserActivity
         {
             public override string Status => "Modding a map";
             public override Color4 GetAppropriateColour(OsuColour colours) => colours.PurpleDark;
         }
 
-        public class UserActivityChoosingBeatmap : UserActivity
+        public class ChoosingBeatmap : UserActivity
         {
             public override string Status => "Choosing a beatmap";
         }
 
-        public class UserActivityMultiplayerGame : UserActivity
+        public class MultiplayerGame : UserActivity
         {
-            public override string Status => "Multiplaying";
+            public override string Status => "Playing with others";
         }
 
-        public class UserActivityEditing : UserActivity
+        public class Editing : UserActivity
         {
-            public UserActivityEditing(BeatmapInfo info)
+            public BeatmapInfo Beatmap { get; }
+
+            public Editing(BeatmapInfo info)
             {
                 Beatmap = info;
             }
 
             public override string Status => @"Editing a beatmap";
-
-            public BeatmapInfo Beatmap { get; }
         }
 
-        public class UserActivitySoloGame : UserActivity
+        public class SoloGame : UserActivity
         {
-            public UserActivitySoloGame(BeatmapInfo info, Rulesets.RulesetInfo ruleset)
+            public BeatmapInfo Beatmap { get; }
+
+            public Rulesets.RulesetInfo Ruleset { get; }
+
+            public SoloGame(BeatmapInfo info, Rulesets.RulesetInfo ruleset)
             {
                 Beatmap = info;
                 Ruleset = ruleset;
             }
 
-            public override string Status => @"Solo Game";
-
-            public BeatmapInfo Beatmap { get; }
-
-            public Rulesets.RulesetInfo Ruleset { get; }
+            public override string Status => @"Playing alone";
         }
 
-        public class UserActivitySpectating : UserActivity
+        public class Spectating : UserActivity
         {
             public override string Status => @"Spectating a game";
         }
 
-        public class UserActivityInLobby : UserActivity
+        public class InLobby : UserActivity
         {
-            public override string Status => @"in Multiplayer Lobby";
+            public override string Status => @"In a Multiplayer Lobby";
         }
     }
 }

@@ -48,7 +48,7 @@ namespace osu.Game.Screens.Edit
         private DependencyContainer dependencies;
         private GameHost host;
 
-        protected override UserActivity InitialScreenActivity => new UserActivity.UserActivityEditing(Beatmap.Value.BeatmapInfo);
+        protected override UserActivity InitialActivity => new UserActivity.Editing(Beatmap.Value.BeatmapInfo);
 
         protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
             => dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
