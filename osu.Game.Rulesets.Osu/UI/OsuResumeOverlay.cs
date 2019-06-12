@@ -22,7 +22,7 @@ namespace osu.Game.Rulesets.Osu.UI
 
         private GameplayCursorContainer localCursorContainer;
 
-        public override CursorContainer LocalCursor => State == Visibility.Visible ? localCursorContainer : null;
+        public override CursorContainer LocalCursor => State.Value == Visibility.Visible ? localCursorContainer : null;
 
         protected override string Message => "Click the orange cursor to resume";
 

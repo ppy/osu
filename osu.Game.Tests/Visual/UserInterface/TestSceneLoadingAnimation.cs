@@ -3,13 +3,12 @@
 
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Shapes;
-using osu.Framework.Testing;
 using osu.Game.Graphics.UserInterface;
 using osuTK.Graphics;
 
 namespace osu.Game.Tests.Visual.UserInterface
 {
-    public class TestSceneLoadingAnimation : GridTestScene //todo: this should be an OsuTestScene
+    public class TestSceneLoadingAnimation : OsuGridTestScene
     {
         public TestSceneLoadingAnimation()
             : base(2, 2)

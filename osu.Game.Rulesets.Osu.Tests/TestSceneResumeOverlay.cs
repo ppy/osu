@@ -46,11 +46,11 @@ namespace osu.Game.Rulesets.Osu.Tests
 
             AddStep("move mouse away", () => InputManager.MoveMouseTo(ScreenSpaceDrawQuad.TopLeft));
             AddStep("click", () => osuInputManager.GameClick());
-            AddAssert("not dismissed", () => !resumeFired && resume.State == Visibility.Visible);
+            AddAssert("not dismissed", () => !resumeFired && resume.State.Value == Visibility.Visible);
 
             AddStep("move mouse back", () => InputManager.MoveMouseTo(ScreenSpaceDrawQuad.Centre));
             AddStep("click", () => osuInputManager.GameClick());
-            AddAssert("dismissed", () => resumeFired && resume.State == Visibility.Hidden);
+            AddAssert("dismissed", () => resumeFired && resume.State.Value == Visibility.Hidden);
         }
 
         private class ManualOsuInputManager : OsuInputManager
