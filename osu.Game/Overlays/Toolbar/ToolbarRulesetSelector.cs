@@ -25,10 +25,10 @@ namespace osu.Game.Overlays.Toolbar
         private RulesetStore rulesets;
         private readonly Bindable<RulesetInfo> globalRuleset = new Bindable<RulesetInfo>();
 
-        public override bool HandleNonPositionalInput => !Current.Disabled && base.HandleNonPositionalInput;
-        public override bool HandlePositionalInput => !Current.Disabled && base.HandlePositionalInput;
+        public override bool HandleNonPositionalInput => !globalRuleset.Disabled && base.HandleNonPositionalInput;
+        public override bool HandlePositionalInput => !globalRuleset.Disabled && base.HandlePositionalInput;
 
-        public override bool PropagatePositionalInputSubTree => !Current.Disabled && base.PropagatePositionalInputSubTree;
+        public override bool PropagatePositionalInputSubTree => !globalRuleset.Disabled && base.PropagatePositionalInputSubTree;
 
         private void disabledChanged(bool isDisabled) => this.FadeColour(isDisabled ? Color4.Gray : Color4.White, 300);
 
