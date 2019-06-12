@@ -78,10 +78,9 @@ namespace osu.Game.Rulesets.Objects.Drawables
         public JudgementResult Result { get; private set; }
 
         private bool judgementOccurred;
-
-        public bool Interactive = true;
-        public override bool HandleNonPositionalInput => Interactive;
-        public override bool HandlePositionalInput => Interactive;
+        
+        public override bool PropagatePositionalInputSubTree => !objectFailed;
+        public override bool PropagateNonPositionalInputSubTree => !objectFailed;
 
         public override bool RemoveWhenNotAlive => false;
         public override bool RemoveCompletedTransforms => false;
@@ -278,6 +277,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
             this.RotateTo(RNG.NextSingle(-90, 90), fail_duration);
             this.ScaleTo(Scale * 0.5f, fail_duration);
             this.MoveToOffset(new Vector2(0, 400), fail_duration);
+            
             objectFailed = true;
         }
 
