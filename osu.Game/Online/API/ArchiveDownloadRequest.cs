@@ -8,7 +8,7 @@ namespace osu.Game.Online.API
     public abstract class ArchiveDownloadRequest<TModel> : APIDownloadRequest
         where TModel : class
     {
-        public readonly TModel Info;
+        public readonly TModel Model;
 
         public float Progress;
 
@@ -16,7 +16,7 @@ namespace osu.Game.Online.API
 
         protected ArchiveDownloadRequest(TModel model)
         {
-            Info = model;
+            Model = model;
 
             Progressed += (current, total) => DownloadProgressed?.Invoke(Progress = (float)current / total);
         }

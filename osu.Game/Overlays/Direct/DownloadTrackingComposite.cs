@@ -49,7 +49,7 @@ namespace osu.Game.Overlays.Direct
 
             beatmaps.DownloadBegan += download =>
             {
-                if (download.Info.OnlineBeatmapSetID == BeatmapSet.Value?.OnlineBeatmapSetID)
+                if (download.Model.OnlineBeatmapSetID == BeatmapSet.Value?.OnlineBeatmapSetID)
                     attachDownload(download);
             };
 
