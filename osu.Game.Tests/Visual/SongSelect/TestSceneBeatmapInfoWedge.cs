@@ -1,4 +1,4 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
@@ -7,7 +7,6 @@ using JetBrains.Annotations;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Rulesets;
@@ -48,7 +47,7 @@ namespace osu.Game.Tests.Visual.SongSelect
 
             AddStep("show", () =>
             {
-                infoWedge.State = Visibility.Visible;
+                infoWedge.Show();
                 infoWedge.Beatmap = Beatmap.Value;
             });
 
@@ -57,11 +56,11 @@ namespace osu.Game.Tests.Visual.SongSelect
 
             AddWaitStep("wait for select", 3);
 
-            AddStep("hide", () => { infoWedge.State = Visibility.Hidden; });
+            AddStep("hide", () => { infoWedge.Hide(); });
 
             AddWaitStep("wait for hide", 3);
 
-            AddStep("show", () => { infoWedge.State = Visibility.Visible; });
+            AddStep("show", () => { infoWedge.Show(); });
 
             foreach (var rulesetInfo in rulesets.AvailableRulesets)
             {

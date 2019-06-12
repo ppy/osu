@@ -360,13 +360,13 @@ namespace osu.Game.Screens.Select
             protected override void PopIn()
             {
                 this.FadeIn(transition_duration, Easing.OutQuint);
-                loading.State = Visibility.Visible;
+                loading.Show();
             }
 
             protected override void PopOut()
             {
                 this.FadeOut(transition_duration, Easing.OutQuint);
-                loading.State = Visibility.Hidden;
+                loading.Hide();
             }
         }
     }
