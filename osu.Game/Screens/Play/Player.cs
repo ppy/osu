@@ -361,7 +361,7 @@ namespace osu.Game.Screens.Play
             // There is a chance that we could be in a paused state as the ruleset's internal clock (see FrameStabilityContainer)
             // could process an extra frame after the GameplayClock is stopped.
             // In such cases we want the fail state to precede a user triggered pause.
-            if (PauseOverlay.State == Visibility.Visible)
+            if (PauseOverlay.State.Value == Visibility.Visible)
                 PauseOverlay.Hide();
 
             failAnimation.Start();
