@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Bindables;
@@ -44,6 +45,8 @@ namespace osu.Game
     /// </summary>
     public class OsuGameBase : Framework.Game, ICanAcceptFiles
     {
+        public const string CLIENT_STREAM_NAME = "lazer";
+
         protected OsuConfigManager LocalConfig;
 
         protected BeatmapManager BeatmapManager;
@@ -268,13 +271,13 @@ namespace osu.Game
 
         private readonly List<ICanAcceptFiles> fileImporters = new List<ICanAcceptFiles>();
 
-        public void Import(params string[] paths)
+        public async Task Import(params string[] paths)
         {
             var extension = Path.GetExtension(paths.First())?.ToLowerInvariant();
 
             foreach (var importer in fileImporters)
                 if (importer.HandledExtensions.Contains(extension))
-                    importer.Import(paths);
+                    await importer.Import(paths);
         }
 
         public string[] HandledExtensions => fileImporters.SelectMany(i => i.HandledExtensions).ToArray();

@@ -282,7 +282,7 @@ namespace osu.Game.Screens.Play
 
                     var score = CreateScore();
                     if (DrawableRuleset.ReplayScore == null)
-                        scoreManager.Import(score);
+                        scoreManager.Import(score).Wait();
 
                     this.Push(CreateResults(score));
 
