@@ -23,7 +23,7 @@ namespace osu.Game.Tests.Visual.Menus
 
         public TestSceneToolbar()
         {
-            var toolbar = new Toolbar { State = Visibility.Visible };
+            var toolbar = new Toolbar { State = { Value = Visibility.Visible } };
             ToolbarNotificationButton notificationButton = null;
 
             AddStep("create toolbar", () =>

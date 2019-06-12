@@ -19,14 +19,14 @@ namespace osu.Game.Graphics.UserInterface
     public class OsuAnimatedButton : OsuClickableContainer
     {
         /// <summary>
-        /// The colour that should be flashed when the <see cref="IconButton"/> is clicked.
+        /// The colour that should be flashed when the <see cref="OsuAnimatedButton"/> is clicked.
         /// </summary>
         protected Color4 FlashColour = Color4.White.Opacity(0.3f);
 
         private Color4 hoverColour = Color4.White.Opacity(0.1f);
 
         /// <summary>
-        /// The background colour of the <see cref="IconButton"/> while it is hovered.
+        /// The background colour of the <see cref="OsuAnimatedButton"/> while it is hovered.
         /// </summary>
         protected Color4 HoverColour
         {

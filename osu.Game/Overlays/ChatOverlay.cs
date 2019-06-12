@@ -56,7 +56,7 @@ namespace osu.Game.Overlays
         private readonly Container channelSelectionContainer;
         private readonly ChannelSelectionOverlay channelSelectionOverlay;
 
-        public override bool Contains(Vector2 screenSpacePos) => chatContainer.ReceivePositionalInputAt(screenSpacePos) || channelSelectionOverlay.State == Visibility.Visible && channelSelectionOverlay.ReceivePositionalInputAt(screenSpacePos);
+        public override bool Contains(Vector2 screenSpacePos) => chatContainer.ReceivePositionalInputAt(screenSpacePos) || (channelSelectionOverlay.State.Value == Visibility.Visible && channelSelectionOverlay.ReceivePositionalInputAt(screenSpacePos));
 
         public ChatOverlay()
         {
@@ -130,7 +130,7 @@ namespace osu.Game.Overlays
                                             RelativeSizeAxes = Axes.Both,
                                             Height = 1,
                                             PlaceholderText = "type your message",
-                                            Exit = () => State = Visibility.Hidden,
+                                            Exit = Hide,
                                             OnCommit = postMessage,
                                             ReleaseFocusOnCommit = false,
                                             HoldFocus = true,
@@ -163,19 +163,19 @@ namespace osu.Game.Overlays
             };
 
             channelTabControl.Current.ValueChanged += current => channelManager.CurrentChannel.Value = current.NewValue;
-            channelTabControl.ChannelSelectorActive.ValueChanged += active => channelSelectionOverlay.State = active.NewValue ? Visibility.Visible : Visibility.Hidden;
-            channelSelectionOverlay.StateChanged += state =>
+            channelTabControl.ChannelSelectorActive.ValueChanged += active => channelSelectionOverlay.State.Value = active.NewValue ? Visibility.Visible : Visibility.Hidden;
+            channelSelectionOverlay.State.ValueChanged += state =>
             {
-                if (state == Visibility.Hidden && channelManager.CurrentChannel.Value == null)
+                if (state.NewValue == Visibility.Hidden && channelManager.CurrentChannel.Value == null)
                 {
-                    channelSelectionOverlay.State = Visibility.Visible;
-                    State = Visibility.Hidden;
+                    channelSelectionOverlay.Show();
+                    Hide();
                     return;
                 }
 
-                channelTabControl.ChannelSelectorActive.Value = state == Visibility.Visible;
+                channelTabControl.ChannelSelectorActive.Value = state.NewValue == Visibility.Visible;
 
-                if (state == Visibility.Visible)
+                if (state.NewValue == Visibility.Visible)
                 {
                     textbox.HoldFocus = false;
                     if (1f - ChatHeight.Value < channel_selection_min_height)
@@ -195,7 +195,7 @@ namespace osu.Game.Overlays
             {
                 textbox.Current.Disabled = true;
                 currentChannelContainer.Clear(false);
-                channelSelectionOverlay.State = Visibility.Visible;
+                channelSelectionOverlay.Show();
                 return;
             }
 
@@ -253,7 +253,7 @@ namespace osu.Game.Overlays
                 double targetChatHeight = startDragChatHeight - (e.MousePosition.Y - e.MouseDownPosition.Y) / Parent.DrawSize.Y;
 
                 // If the channel selection screen is shown, mind its minimum height
-                if (channelSelectionOverlay.State == Visibility.Visible && targetChatHeight > 1f - channel_selection_min_height)
+                if (channelSelectionOverlay.State.Value == Visibility.Visible && targetChatHeight > 1f - channel_selection_min_height)
                     targetChatHeight = 1f - channel_selection_min_height;
 
                 ChatHeight.Value = targetChatHeight;
@@ -325,7 +325,7 @@ namespace osu.Game.Overlays
             this.MoveToY(Height, transition_length, Easing.InSine);
             this.FadeOut(transition_length, Easing.InSine);
 
-            channelSelectionOverlay.State = Visibility.Hidden;
+            channelSelectionOverlay.Hide();
 
             textbox.HoldFocus = false;
             base.PopOut();

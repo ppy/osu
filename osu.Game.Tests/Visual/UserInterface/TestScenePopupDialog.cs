@@ -16,7 +16,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             var popup = new PopupDialog
             {
                 RelativeSizeAxes = Axes.Both,
-                State = Framework.Graphics.Containers.Visibility.Visible,
+                State = { Value = Framework.Graphics.Containers.Visibility.Visible },
                 Icon = FontAwesome.Solid.AssistiveListeningSystems,
                 HeaderText = @"This is a test popup",
                 BodyText = "I can say lots of stuff and even wrap my words!",
