@@ -392,7 +392,8 @@ namespace osu.Game.Database
             var notification = new ProgressNotification
             {
                 Progress = 0,
-                CompletionText = $"Deleted all {typeof(TModel).Name.Replace("Info", "").ToLower()}s!",
+                Text = $"Preparing to delete all {humanisedModelName}s...",
+                CompletionText = $"Deleted all {humanisedModelName}s!",
                 State = ProgressNotificationState.Active,
             };
 
@@ -409,7 +410,7 @@ namespace osu.Game.Database
                         // user requested abort
                         return;
 
-                    notification.Text = $"Deleting ({++i} of {items.Count})";
+                    notification.Text = $"Deleting {humanisedModelName}s ({++i} of {items.Count})";
 
                     Delete(b);
 
