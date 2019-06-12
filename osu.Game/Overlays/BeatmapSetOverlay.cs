@@ -118,10 +118,17 @@ namespace osu.Game.Overlays
             Show();
         }
 
-        public void ShowBeatmapSet(BeatmapSetInfo set)
+        public void ShowBeatmapSet(BeatmapSetInfo set, bool refetch = true)
         {
             // Re-fetching is the correct way forward.
-            FetchAndShowBeatmapSet(set?.OnlineBeatmapSetID ?? 0);
+            if (refetch)
+                FetchAndShowBeatmapSet(set?.OnlineBeatmapSetID ?? 0);
+            else
+            {
+                beatmapSet.Value = set;
+                Show();
+            }
+
             scroll.ScrollTo(0);
         }
     }
