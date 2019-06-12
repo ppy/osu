@@ -30,18 +30,22 @@ namespace osu.Game.Users
 
         public class Editing : UserActivity
         {
+            public BeatmapInfo Beatmap { get; }
+
             public Editing(BeatmapInfo info)
             {
                 Beatmap = info;
             }
 
             public override string Status => @"Editing a beatmap";
-
-            public BeatmapInfo Beatmap { get; }
         }
 
         public class SoloGame : UserActivity
         {
+            public BeatmapInfo Beatmap { get; }
+
+            public Rulesets.RulesetInfo Ruleset { get; }
+
             public SoloGame(BeatmapInfo info, Rulesets.RulesetInfo ruleset)
             {
                 Beatmap = info;
@@ -49,10 +53,6 @@ namespace osu.Game.Users
             }
 
             public override string Status => @"Playing alone";
-
-            public BeatmapInfo Beatmap { get; }
-
-            public Rulesets.RulesetInfo Ruleset { get; }
         }
 
         public class Spectating : UserActivity
