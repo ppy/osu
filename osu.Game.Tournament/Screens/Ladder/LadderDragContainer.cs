@@ -36,11 +36,5 @@ namespace osu.Game.Tournament.Screens.Ladder
 
             return true;
         }
-
-        protected override void Update()
-        {
-            base.Update();
-            Invalidate();
-        }
     }
 }
