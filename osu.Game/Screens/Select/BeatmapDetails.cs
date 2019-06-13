@@ -10,7 +10,6 @@ using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using System.Linq;
 using osu.Game.Online.API;
-using osu.Game.Online.API.Requests;
 using osu.Framework.Threading;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Extensions.Color4Extensions;
@@ -18,7 +17,8 @@ using osu.Game.Screens.Select.Details;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
-using osu.Game.Online.API.Requests.Responses;
+using osu.Game.Online.API.Requests;
+using osu.Game.Rulesets;
 
 namespace osu.Game.Screens.Select
 {
@@ -40,6 +40,9 @@ namespace osu.Game.Screens.Select
         private IAPIProvider api;
 
         private ScheduledDelegate pendingBeatmapSwitch;
+
+        [Resolved]
+        private RulesetStore rulesets { get; set; }
 
         private BeatmapInfo beatmap;
 
@@ -182,10 +185,9 @@ namespace osu.Game.Screens.Select
             tags.Text = Beatmap?.Metadata?.Tags;
 
             // metrics may have been previously fetched
-            // Todo:
             if (Beatmap?.BeatmapSet?.Metrics != null)
             {
-                updateMetrics(new APIBeatmapMetrics { Ratings = Beatmap.BeatmapSet.Metrics.Ratings });
+                updateMetrics(Beatmap);
                 return;
             }
 
@@ -193,15 +195,19 @@ namespace osu.Game.Screens.Select
             if (Beatmap?.OnlineBeatmapID != null)
             {
                 var requestedBeatmap = Beatmap;
-                var lookup = new GetBeatmapDetailsRequest(requestedBeatmap);
+                var lookup = new GetBeatmapRequest(requestedBeatmap);
                 lookup.Success += res =>
                 {
                     if (beatmap != requestedBeatmap)
                         //the beatmap has been changed since we started the lookup.
                         return;
 
-                    requestedBeatmap.Metrics = res;
-                    Schedule(() => updateMetrics(res));
+                    var b = res.ToBeatmap(rulesets);
+
+                    requestedBeatmap.BeatmapSet.Metrics = b.BeatmapSet.Metrics;
+                    requestedBeatmap.Metrics = b.Metrics;
+
+                    Schedule(() => updateMetrics(requestedBeatmap));
                 };
                 lookup.Failure += e => Schedule(() => updateMetrics());
                 api.Queue(lookup);
@@ -212,14 +218,14 @@ namespace osu.Game.Screens.Select
             updateMetrics();
         }
 
-        private void updateMetrics(APIBeatmapMetrics metrics = null)
+        private void updateMetrics(BeatmapInfo beatmap = null)
         {
-            var hasRatings = metrics?.Ratings?.Any() ?? false;
-            var hasRetriesFails = (metrics?.Retries?.Any() ?? false) && (metrics.Fails?.Any() ?? false);
+            var hasRatings = beatmap?.BeatmapSet?.Metrics?.Ratings?.Any() ?? false;
+            var hasRetriesFails = (beatmap?.Metrics?.Retries?.Any() ?? false) && (beatmap.Metrics.Fails?.Any() ?? false);
 
             if (hasRatings)
             {
-                ratings.Metrics = new BeatmapSetMetrics { Ratings = metrics.Ratings };
+                ratings.Metrics = beatmap.BeatmapSet.Metrics;
                 ratingsContainer.FadeIn(transition_duration);
             }
             else
@@ -230,7 +236,7 @@ namespace osu.Game.Screens.Select
 
             if (hasRetriesFails)
             {
-                failRetryGraph.Metrics = metrics;
+                failRetryGraph.Metrics = beatmap.Metrics;
                 failRetryContainer.FadeIn(transition_duration);
             }
             else
