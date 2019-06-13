@@ -51,32 +51,19 @@ namespace osu.Game.Overlays.Mods
                 ButtonsContainer.Children = modContainers;
                 buttons = modContainers.OfType<ModButton>().ToArray();
 
-                Expanded = value.Any();
-            }
-        }
-
-        private bool expanded = true;
-
-        public bool Expanded
-        {
-            set
-            {
-                if (expanded == value) return;
-
-                expanded = value;
-
-                this.ClearTransforms();
+                var expanded = value.Any();
 
                 if (expanded)
                 {
                     this.AutoSizeAxes = Axes.Y;
                     this.headerLabel.FadeIn(200);
+                    Show();
                 }
                 else
                 {
                     this.AutoSizeAxes = Axes.None;
                     this.headerLabel.FadeOut(200);
-                    this.ResizeHeightTo(0, 200, Easing.OutQuint);
+                    this.ResizeHeightTo(0, 200, Easing.OutQuint).OnComplete((c) => Hide());
                 }
             }
         }
