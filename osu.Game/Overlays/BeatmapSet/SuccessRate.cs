@@ -37,8 +37,8 @@ namespace osu.Game.Overlays.BeatmapSet
 
         private void updateDisplay()
         {
-            int passCount = beatmap?.OnlineInfo.PassCount ?? 0;
-            int playCount = beatmap?.OnlineInfo.PlayCount ?? 0;
+            int passCount = beatmap?.OnlineInfo?.PassCount ?? 0;
+            int playCount = beatmap?.OnlineInfo?.PlayCount ?? 0;
 
             var rate = playCount != 0 ? (float)passCount / playCount : 0;
             successPercent.Text = rate.ToString("P0");
