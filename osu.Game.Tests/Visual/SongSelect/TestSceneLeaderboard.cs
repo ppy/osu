@@ -270,7 +270,6 @@ namespace osu.Game.Tests.Visual.SongSelect
                 },
                 Metrics = new BeatmapMetrics
                 {
-                    Ratings = Enumerable.Range(0, 11).ToArray(),
                     Fails = Enumerable.Range(1, 100).Select(i => i % 12 - 6).ToArray(),
                     Retries = Enumerable.Range(-2, 100).Select(i => i % 12 - 6).ToArray(),
                 },

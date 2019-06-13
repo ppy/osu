@@ -32,6 +32,10 @@ namespace osu.Game.Tests.Visual.SongSelect
 
             AddStep("all metrics", () => detailsArea.Beatmap = new DummyWorkingBeatmap(null, null)
                 {
+                    BeatmapSetInfo =
+                    {
+                        Metrics = new BeatmapSetMetrics { Ratings = Enumerable.Range(0, 11).ToArray() }
+                    },
                     BeatmapInfo =
                     {
                         Version = "All Metrics",
@@ -50,7 +54,6 @@ namespace osu.Game.Tests.Visual.SongSelect
                         StarDifficulty = 5.3f,
                         Metrics = new BeatmapMetrics
                         {
-                            Ratings = Enumerable.Range(0, 11).ToArray(),
                             Fails = Enumerable.Range(1, 100).Select(i => i % 12 - 6).ToArray(),
                             Retries = Enumerable.Range(-2, 100).Select(i => i % 12 - 6).ToArray(),
                         },
@@ -60,6 +63,10 @@ namespace osu.Game.Tests.Visual.SongSelect
 
             AddStep("all except source", () => detailsArea.Beatmap = new DummyWorkingBeatmap(null, null)
             {
+                BeatmapSetInfo =
+                {
+                    Metrics = new BeatmapSetMetrics { Ratings = Enumerable.Range(0, 11).ToArray() }
+                },
                 BeatmapInfo =
                 {
                     Version = "All Metrics",
@@ -77,7 +84,6 @@ namespace osu.Game.Tests.Visual.SongSelect
                     StarDifficulty = 5.3f,
                     Metrics = new BeatmapMetrics
                     {
-                        Ratings = Enumerable.Range(0, 11).ToArray(),
                         Fails = Enumerable.Range(1, 100).Select(i => i % 12 - 6).ToArray(),
                         Retries = Enumerable.Range(-2, 100).Select(i => i % 12 - 6).ToArray(),
                     },
@@ -86,6 +92,10 @@ namespace osu.Game.Tests.Visual.SongSelect
 
             AddStep("ratings", () => detailsArea.Beatmap = new DummyWorkingBeatmap(null, null)
             {
+                BeatmapSetInfo =
+                {
+                    Metrics = new BeatmapSetMetrics { Ratings = Enumerable.Range(0, 11).ToArray() }
+                },
                 BeatmapInfo =
                 {
                     Version = "Only Ratings",
@@ -101,11 +111,7 @@ namespace osu.Game.Tests.Visual.SongSelect
                         OverallDifficulty = 6,
                         ApproachRate = 6,
                     },
-                    StarDifficulty = 4.8f,
-                    Metrics = new BeatmapMetrics
-                    {
-                        Ratings = Enumerable.Range(0, 11).ToArray(),
-                    },
+                    StarDifficulty = 4.8f
                 }
             });
 
