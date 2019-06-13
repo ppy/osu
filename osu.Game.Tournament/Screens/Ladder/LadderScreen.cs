@@ -59,7 +59,7 @@ namespace osu.Game.Tournament.Screens.Ladder
                 AddPairing(pairing);
 
             // todo: fix this
-            Scheduler.AddDelayed(() => layout.Invalidate(), 100, true);
+            Scheduler.AddDelayed(() => layout.Invalidate(), 1000, true);
         }
 
         protected virtual void AddPairing(MatchPairing pairing)
