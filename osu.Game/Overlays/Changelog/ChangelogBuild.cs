@@ -51,6 +51,9 @@ namespace osu.Game.Overlays.Changelog
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
+            if(Build.ChangelogEntries == null)
+                return;
+
             foreach (var categoryEntries in Build.ChangelogEntries.GroupBy(b => b.Category).OrderBy(c => c.Key))
             {
                 ChangelogEntries.Add(new OsuSpriteText
