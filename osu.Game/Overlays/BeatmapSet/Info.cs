@@ -68,7 +68,7 @@ namespace osu.Game.Overlays.BeatmapSet
                                 RelativeSizeAxes = Axes.Both,
                                 Child = description = new MetadataSection(MetadataType.Description, transition_duration)
                                 {
-                                    HeaderMargin = new MarginPadding() { Top = 20 },
+                                    HeaderMargin = new MarginPadding { Top = 20 },
                                 },
                             },
                         },
@@ -90,11 +90,11 @@ namespace osu.Game.Overlays.BeatmapSet
                                 {
                                     source = new MetadataSection(MetadataType.Source, transition_duration)
                                     {
-                                        HeaderMargin = new MarginPadding() { Top = 20 },
+                                        HeaderMargin = new MarginPadding { Top = 20 },
                                     },
                                     tags = new MetadataSection(MetadataType.Tags, transition_duration)
                                     {
-                                        HeaderMargin = new MarginPadding() { Top = 20 },
+                                        HeaderMargin = new MarginPadding { Top = 20 },
                                     },
                                 },
                             },
