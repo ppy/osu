@@ -311,7 +311,7 @@ namespace osu.Game
                 }
 
                 public override bool EnableDrag => true; // allow right-mouse dragging for absolute scroll in scroll containers.
-                public override bool EnableClick => true;
+                public override bool EnableClick => false;
                 public override bool ChangeFocusOnClick => false;
             }
         }
