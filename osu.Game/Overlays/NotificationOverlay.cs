@@ -81,13 +81,13 @@ namespace osu.Game.Overlays
 
         private void updateProcessingMode()
         {
-            bool enabled = OverlayActivationMode.Value == OverlayActivation.All || State == Visibility.Visible;
+            bool enabled = OverlayActivationMode.Value == OverlayActivation.All || State.Value == Visibility.Visible;
 
             notificationsEnabler?.Cancel();
 
             if (enabled)
                 // we want a slight delay before toggling notifications on to avoid the user becoming overwhelmed.
-                notificationsEnabler = Scheduler.AddDelayed(() => processingPosts = true, State == Visibility.Visible ? 0 : 1000);
+                notificationsEnabler = Scheduler.AddDelayed(() => processingPosts = true, State.Value == Visibility.Visible ? 0 : 1000);
             else
                 processingPosts = false;
         }
@@ -96,7 +96,7 @@ namespace osu.Game.Overlays
         {
             base.LoadComplete();
 
-            StateChanged += _ => updateProcessingMode();
+            State.ValueChanged += _ => updateProcessingMode();
             OverlayActivationMode.BindValueChanged(_ => updateProcessingMode(), true);
         }
 
@@ -128,7 +128,7 @@ namespace osu.Game.Overlays
             section?.Add(notification, notification.DisplayOnTop ? -runningDepth : runningDepth);
 
             if (notification.IsImportant)
-                State = Visibility.Visible;
+                Show();
 
             updateCounts();
         });

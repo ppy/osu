@@ -45,7 +45,7 @@ namespace osu.Game.Tests.Visual.UserInterface
 
             Content.Add(displayedCount);
 
-            void setState(Visibility state) => AddStep(state.ToString(), () => manager.State = state);
+            void setState(Visibility state) => AddStep(state.ToString(), () => manager.State.Value = state);
             void checkProgressingCount(int expected) => AddAssert($"progressing count is {expected}", () => progressingNotifications.Count == expected);
 
             manager.UnreadCount.ValueChanged += count => { displayedCount.Text = $"displayed count: {count.NewValue}"; };

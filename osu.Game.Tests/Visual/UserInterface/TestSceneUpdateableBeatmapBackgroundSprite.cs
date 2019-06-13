@@ -32,7 +32,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             this.api = api;
             this.rulesets = rulesets;
 
-            testBeatmap = ImportBeatmapTest.LoadOszIntoOsu(osu);
+            testBeatmap = ImportBeatmapTest.LoadOszIntoOsu(osu).Result;
         }
 
         [Test]
@@ -41,7 +41,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             TestUpdateableBeatmapBackgroundSprite background = null;
 
             AddStep("load null beatmap", () => Child = background = new TestUpdateableBeatmapBackgroundSprite { RelativeSizeAxes = Axes.Both });
-            AddUntilStep("wait for load", () => background.ContentLoaded);
+            AddUntilStep("content loaded", () => background.ContentLoaded);
         }
 
         [Test]

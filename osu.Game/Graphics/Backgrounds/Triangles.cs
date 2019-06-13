@@ -214,7 +214,6 @@ namespace osu.Game.Graphics.Backgrounds
                 base.Draw(vertexAction);
 
                 shader.Bind();
-                texture.TextureGL.Bind();
 
                 Vector2 localInflationAmount = edge_smoothness * DrawInfo.MatrixInverse.ExtractScale().Xy;
 
@@ -231,7 +230,8 @@ namespace osu.Game.Graphics.Backgrounds
                     ColourInfo colourInfo = DrawColourInfo.Colour;
                     colourInfo.ApplyChild(particle.Colour);
 
-                    texture.DrawTriangle(
+                    DrawTriangle(
+                        texture,
                         triangle,
                         colourInfo,
                         null,
