@@ -127,7 +127,7 @@ namespace osu.Game.Tournament.Screens.TeamWin
                                 Origin = Anchor.TopCentre,
                                 Colour = col,
                                 Text = "WINNER",
-                                Font = OsuFont.GetFont(Typeface.Aquatico, 15, FontWeight.Regular),
+                                Font = TournamentFont.GetFont(TournamentTypeface.Aquatico, 15, FontWeight.Regular),
                             },
                             new OsuSpriteText
                             {
@@ -135,7 +135,7 @@ namespace osu.Game.Tournament.Screens.TeamWin
                                 Origin = Anchor.TopCentre,
                                 Colour = col,
                                 Text = pairing.Grouping.Value?.Name.Value ?? "Unknown Grouping",
-                                Font = OsuFont.GetFont(Typeface.Aquatico, 50, FontWeight.Light),
+                                Font = TournamentFont.GetFont(TournamentTypeface.Aquatico, 50, FontWeight.Light),
                                 Spacing = new Vector2(10, 0),
                             },
                             new OsuSpriteText
@@ -144,7 +144,7 @@ namespace osu.Game.Tournament.Screens.TeamWin
                                 Origin = Anchor.TopCentre,
                                 Colour = col,
                                 Text = pairing.Date.Value.ToUniversalTime().ToString("dd MMMM HH:mm UTC"),
-                                Font = OsuFont.GetFont(Typeface.Aquatico, 20, FontWeight.Light),
+                                Font = TournamentFont.GetFont(TournamentTypeface.Aquatico, 20, FontWeight.Light),
                             },
                         }
                     }
@@ -204,7 +204,7 @@ namespace osu.Game.Tournament.Screens.TeamWin
                             new OsuSpriteText
                             {
                                 Text = team?.FullName.ToUpper() ?? "???",
-                                Font = OsuFont.GetFont(Typeface.Aquatico, 40, FontWeight.Light),
+                                Font = TournamentFont.GetFont(TournamentTypeface.Aquatico, 40, FontWeight.Light),
                                 Colour = Color4.Black,
                                 Origin = Anchor.TopCentre,
                                 Anchor = Anchor.TopCentre,
