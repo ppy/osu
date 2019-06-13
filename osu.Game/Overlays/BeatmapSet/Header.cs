@@ -135,7 +135,7 @@ namespace osu.Game.Overlays.BeatmapSet
                                         Margin = new MarginPadding { Top = 20 },
                                         Child = author = new AuthorInfo(),
                                     },
-                                    beatmapNotAvailable = new BeatmapNotAvailable { Header = this },
+                                    beatmapNotAvailable = new BeatmapNotAvailable(),
                                     new Container
                                     {
                                         RelativeSizeAxes = Axes.X,
