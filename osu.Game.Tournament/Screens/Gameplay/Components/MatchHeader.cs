@@ -176,7 +176,7 @@ namespace osu.Game.Tournament.Screens.Gameplay.Components
                             X = (flip ? -1 : 1) * 90,
                             Y = -10,
                             Colour = colour,
-                            Font = OsuFont.GetFont(typeface: Typeface.Aquatico, weight: FontWeight.Regular, size: 20),
+                            Font = TournamentFont.GetFont(typeface: TournamentTypeface.Aquatico, weight: FontWeight.Regular, size: 20),
                             Origin = anchor,
                             Anchor = anchor,
                         },
@@ -219,7 +219,7 @@ namespace osu.Game.Tournament.Screens.Gameplay.Components
                         Origin = Anchor.Centre,
                         Colour = Color4.White,
                         Text = match.NewValue.Grouping.Value?.Name.Value ?? "Unknown Grouping",
-                        Font = OsuFont.GetFont(typeface: Typeface.Aquatico, weight: FontWeight.Regular, size: 18),
+                        Font = TournamentFont.GetFont(typeface: TournamentTypeface.Aquatico, weight: FontWeight.Regular, size: 18),
                     },
                 };
             }

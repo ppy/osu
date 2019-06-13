@@ -122,8 +122,8 @@ namespace osu.Game.Tournament.Screens.Gameplay.Components
             public bool Winning
             {
                 set => DisplayedCountSpriteText.Font = value
-                    ? OsuFont.GetFont(typeface: Typeface.Aquatico, weight: FontWeight.Regular, size: 60)
-                    : OsuFont.GetFont(typeface: Typeface.Aquatico, weight: FontWeight.Light, size: 40);
+                    ? TournamentFont.GetFont(typeface: TournamentTypeface.Aquatico, weight: FontWeight.Regular, size: 60)
+                    : TournamentFont.GetFont(typeface: TournamentTypeface.Aquatico, weight: FontWeight.Light, size: 40);
             }
         }
     }

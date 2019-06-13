@@ -45,9 +45,6 @@ namespace osu.Game.Graphics
 
                 case Typeface.Venera:
                     return "Venera";
-
-                case Typeface.Aquatico:
-                    return "Aquatico";
             }
 
             return null;
@@ -73,7 +70,7 @@ namespace osu.Game.Graphics
             string weightString = weight.ToString();
 
             // Only exo has an explicit "regular" weight, other fonts do not
-            if (weight == FontWeight.Regular && family != GetFamilyString(Typeface.Exo) && family != GetFamilyString(Typeface.Aquatico))
+            if (weight == FontWeight.Regular && family != GetFamilyString(Typeface.Exo))
                 weightString = string.Empty;
 
             return weightString;
@@ -105,7 +102,6 @@ namespace osu.Game.Graphics
     {
         Exo,
         Venera,
-        Aquatico // tournament use only
     }
 
     public enum FontWeight
