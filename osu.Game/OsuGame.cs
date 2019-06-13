@@ -132,12 +132,12 @@ namespace osu.Game
         public void CloseAllOverlays(bool hideToolbarElements = true)
         {
             foreach (var overlay in overlays)
-                overlay.State = Visibility.Hidden;
+                overlay.Hide();
 
             if (hideToolbarElements)
             {
                 foreach (var overlay in toolbarElements)
-                    overlay.State = Visibility.Hidden;
+                    overlay.Hide();
             }
         }
 
@@ -435,6 +435,7 @@ namespace osu.Game
             loadComponentSingleFile(channelManager = new ChannelManager(), AddInternal, true);
             loadComponentSingleFile(chatOverlay = new ChatOverlay(), overlayContent.Add, true);
             loadComponentSingleFile(settings = new SettingsOverlay { GetToolbarHeight = () => ToolbarOffset }, leftFloatingOverlayContent.Add, true);
+            var changelogOverlay = loadComponentSingleFile(new ChangelogOverlay(), overlayContent.Add, true);
             loadComponentSingleFile(userProfile = new UserProfileOverlay(), overlayContent.Add, true);
             loadComponentSingleFile(beatmapSetOverlay = new BeatmapSetOverlay(), overlayContent.Add, true);
 
@@ -460,7 +461,7 @@ namespace osu.Game
             loadComponentSingleFile(new DialogOverlay(), topMostOverlayContent.Add, true);
             loadComponentSingleFile(externalLinkOpener = new ExternalLinkOpener(), topMostOverlayContent.Add);
 
-            chatOverlay.StateChanged += state => channelManager.HighPollRate.Value = state == Visibility.Visible;
+            chatOverlay.State.ValueChanged += state => channelManager.HighPollRate.Value = state.NewValue == Visibility.Visible;
 
             Add(externalLinkOpener = new ExternalLinkOpener());
 
@@ -469,9 +470,9 @@ namespace osu.Game
 
             foreach (var overlay in singleDisplaySideOverlays)
             {
-                overlay.StateChanged += state =>
+                overlay.State.ValueChanged += state =>
                 {
-                    if (state == Visibility.Hidden) return;
+                    if (state.NewValue == Visibility.Hidden) return;
 
                     singleDisplaySideOverlays.Where(o => o != overlay).ForEach(o => o.Hide());
                 };
@@ -483,26 +484,26 @@ namespace osu.Game
 
             foreach (var overlay in informationalOverlays)
             {
-                overlay.StateChanged += state =>
+                overlay.State.ValueChanged += state =>
                 {
-                    if (state == Visibility.Hidden) return;
+                    if (state.NewValue == Visibility.Hidden) return;
 
                     informationalOverlays.Where(o => o != overlay).ForEach(o => o.Hide());
                 };
             }
 
             // ensure only one of these overlays are open at once.
-            var singleDisplayOverlays = new OverlayContainer[] { chatOverlay, social, direct };
+            var singleDisplayOverlays = new OverlayContainer[] { chatOverlay, social, direct, changelogOverlay };
             overlays.AddRange(singleDisplayOverlays);
 
             foreach (var overlay in singleDisplayOverlays)
             {
-                overlay.StateChanged += state =>
+                overlay.State.ValueChanged += state =>
                 {
                     // informational overlays should be dismissed on a show or hide of a full overlay.
                     informationalOverlays.ForEach(o => o.Hide());
 
-                    if (state == Visibility.Hidden) return;
+                    if (state.NewValue == Visibility.Hidden) return;
 
                     singleDisplayOverlays.Where(o => o != overlay).ForEach(o => o.Hide());
                 };
@@ -517,16 +518,16 @@ namespace osu.Game
             {
                 float offset = 0;
 
-                if (settings.State == Visibility.Visible)
+                if (settings.State.Value == Visibility.Visible)
                     offset += ToolbarButton.WIDTH / 2;
-                if (notifications.State == Visibility.Visible)
+                if (notifications.State.Value == Visibility.Visible)
                     offset -= ToolbarButton.WIDTH / 2;
 
                 screenContainer.MoveToX(offset, SettingsPanel.TRANSITION_LENGTH, Easing.OutQuint);
             }
 
-            settings.StateChanged += _ => updateScreenOffset();
-            notifications.StateChanged += _ => updateScreenOffset();
+            settings.State.ValueChanged += _ => updateScreenOffset();
+            notifications.State.ValueChanged += _ => updateScreenOffset();
         }
 
         public class GameIdleTracker : IdleTracker
@@ -767,7 +768,7 @@ namespace osu.Game
                 if (newOsuScreen.HideOverlaysOnEnter)
                     CloseAllOverlays();
                 else
-                    Toolbar.State = Visibility.Visible;
+                    Toolbar.Show();
             }
         }
 

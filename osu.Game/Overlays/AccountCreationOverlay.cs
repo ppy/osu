@@ -109,7 +109,7 @@ namespace osu.Game.Overlays
                     break;
 
                 case APIState.Online:
-                    State = Visibility.Hidden;
+                    Hide();
                     break;
             }
         }

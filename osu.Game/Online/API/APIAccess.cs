@@ -37,7 +37,9 @@ namespace osu.Game.Online.API
 
         public Bindable<User> LocalUser { get; } = new Bindable<User>(createGuestUser());
 
-        protected bool HasLogin => authentication.Token.Value != null || !string.IsNullOrEmpty(ProvidedUsername) && !string.IsNullOrEmpty(password);
+        public Bindable<UserActivity> Activity { get; } = new Bindable<UserActivity>();
+
+        protected bool HasLogin => authentication.Token.Value != null || (!string.IsNullOrEmpty(ProvidedUsername) && !string.IsNullOrEmpty(password));
 
         private readonly CancellationTokenSource cancellationToken = new CancellationTokenSource();
 
@@ -54,6 +56,12 @@ namespace osu.Game.Online.API
 
             authentication.TokenString = config.Get<string>(OsuSetting.Token);
             authentication.Token.ValueChanged += onTokenChanged;
+
+            LocalUser.BindValueChanged(u =>
+            {
+                u.OldValue?.Activity.UnbindFrom(Activity);
+                u.NewValue.Activity.BindTo(Activity);
+            }, true);
 
             var thread = new Thread(run)
             {

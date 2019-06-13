@@ -69,6 +69,7 @@ namespace osu.Game.Overlays.Toolbar
                     AutoSizeAxes = Axes.X,
                     Children = new Drawable[]
                     {
+                        new ToolbarChangelogButton(),
                         new ToolbarDirectButton(),
                         new ToolbarChatButton(),
                         new ToolbarSocialButton(),
@@ -83,10 +84,10 @@ namespace osu.Game.Overlays.Toolbar
                 }
             };
 
-            StateChanged += visibility =>
+            State.ValueChanged += visibility =>
             {
                 if (overlayActivationMode.Value == OverlayActivation.Disabled)
-                    State = Visibility.Hidden;
+                    Hide();
             };
 
             if (osuGame != null)

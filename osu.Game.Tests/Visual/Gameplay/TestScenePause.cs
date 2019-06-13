@@ -113,7 +113,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         public void TestPauseAfterFail()
         {
             AddUntilStep("wait for fail", () => Player.HasFailed);
-            AddAssert("fail overlay shown", () => Player.FailOverlayVisible);
+            AddUntilStep("fail overlay shown", () => Player.FailOverlayVisible);
 
             confirmClockRunning(false);
 
@@ -189,7 +189,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddAssert("pause overlay " + (isShown ? "shown" : "hidden"), () => Player.PauseOverlayVisible == isShown);
 
         private void confirmClockRunning(bool isRunning) =>
-            AddAssert("clock " + (isRunning ? "running" : "stopped"), () => Player.GameplayClockContainer.GameplayClock.IsRunning == isRunning);
+            AddUntilStep("clock " + (isRunning ? "running" : "stopped"), () => Player.GameplayClockContainer.GameplayClock.IsRunning == isRunning);
 
         protected override bool AllowFail => true;
 
@@ -203,9 +203,9 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             public new HUDOverlay HUDOverlay => base.HUDOverlay;
 
-            public bool FailOverlayVisible => FailOverlay.State == Visibility.Visible;
+            public bool FailOverlayVisible => FailOverlay.State.Value == Visibility.Visible;
 
-            public bool PauseOverlayVisible => PauseOverlay.State == Visibility.Visible;
+            public bool PauseOverlayVisible => PauseOverlay.State.Value == Visibility.Visible;
 
             public override void OnEntering(IScreen last)
             {

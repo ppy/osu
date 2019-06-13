@@ -20,14 +20,14 @@ namespace osu.Game.Rulesets.Catch.Tests
         {
         }
 
-        protected override IBeatmap CreateBeatmap(Ruleset ruleset)
+        protected override IBeatmap CreateBeatmap(RulesetInfo ruleset)
         {
             var beatmap = new Beatmap
             {
                 BeatmapInfo = new BeatmapInfo
                 {
                     BaseDifficulty = new BeatmapDifficulty { CircleSize = 6, SliderMultiplier = 3 },
-                    Ruleset = ruleset.RulesetInfo
+                    Ruleset = ruleset
                 }
             };
 
