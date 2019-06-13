@@ -39,7 +39,6 @@ namespace osu.Game.Tournament.Components
                 {
                     Anchor = Anchor.TopCentre,
                     Origin = Anchor.TopCentre,
-
                     Text = "Control Panel",
                     Font = OsuFont.GetFont(weight: FontWeight.Bold, size: 22)
                 },
@@ -47,13 +46,10 @@ namespace osu.Game.Tournament.Components
                 {
                     Anchor = Anchor.TopCentre,
                     Origin = Anchor.TopCentre,
-
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
                     Width = 0.75f,
-
                     Position = new Vector2(0, 35f),
-
                     Direction = FillDirection.Vertical,
                     Spacing = new Vector2(0, 5f),
                 },

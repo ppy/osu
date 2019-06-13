@@ -228,21 +228,22 @@ namespace osu.Game.Tournament.Components
                     s.Font = OsuFont.GetFont(weight: FontWeight.Bold, size: 15);
                 }
 
-                bool first = true;
-
-                foreach (var t in tuples)
+                for (var i = 0; i < tuples.Length; i++)
                 {
-                    if (!first)
+                    var tuple = tuples[i];
+
+                    if (i > 0)
+                    {
                         AddText(" / ", s =>
                         {
                             cp(s, OsuColour.Gray(0.33f));
                             s.Spacing = new Vector2(-2, 0);
                         });
+                    }
 
-                    AddText(new OsuSpriteText { Text = t.heading }, s => cp(s, OsuColour.Gray(0.33f)));
+                    AddText(new OsuSpriteText { Text = tuple.heading }, s => cp(s, OsuColour.Gray(0.33f)));
                     AddText(" ", s => cp(s, OsuColour.Gray(0.33f)));
-                    AddText(new OsuSpriteText { Text = t.content }, s => cp(s, OsuColour.Gray(0.5f)));
-                    first = false;
+                    AddText(new OsuSpriteText { Text = tuple.content }, s => cp(s, OsuColour.Gray(0.5f)));
                 }
             }
         }

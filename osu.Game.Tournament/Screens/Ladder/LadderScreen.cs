@@ -24,6 +24,8 @@ namespace osu.Game.Tournament.Screens.Ladder
 
         protected LadderDragContainer ScrollContent;
 
+        protected Container Content;
+
         [BackgroundDependencyLoader]
         private void load(OsuColour colours, Storage storage)
         {
@@ -32,7 +34,7 @@ namespace osu.Game.Tournament.Screens.Ladder
 
             RelativeSizeAxes = Axes.Both;
 
-            InternalChild = new Container
+            InternalChild = Content = new Container
             {
                 RelativeSizeAxes = Axes.Both,
                 Children = new Drawable[]

@@ -5,15 +5,26 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
 {
     public class TournamentProgression
     {
-        public int Item1;
-        public int Item2;
+        public int SourceID;
+        public int TargetID;
+
+        // migration
+        public int Item1
+        {
+            set => SourceID = value;
+        }
+
+        public int Item2
+        {
+            set => TargetID = value;
+        }
 
         public bool Losers;
 
-        public TournamentProgression(int item1, int item2, bool losers = false)
+        public TournamentProgression(int sourceID, int targetID, bool losers = false)
         {
-            Item1 = item1;
-            Item2 = item2;
+            SourceID = sourceID;
+            TargetID = targetID;
             Losers = losers;
         }
     }

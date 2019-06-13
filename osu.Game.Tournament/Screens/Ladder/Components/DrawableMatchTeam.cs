@@ -138,7 +138,6 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
             }, true);
         }
 
-        //TODO: use OnClick instead once we have per-button clicks.
         protected override bool OnClick(ClickEvent e)
         {
             if (Team == null || editorInfo != null) return false;
@@ -196,8 +195,8 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
                 return new MenuItem[]
                 {
                     new OsuMenuItem("Set as current", MenuItemType.Standard, setCurrent),
-                    new OsuMenuItem("Join with", MenuItemType.Standard, () => ladderEditor.RequestJoin(pairing, false)),
-                    new OsuMenuItem("Join with (loser)", MenuItemType.Standard, () => ladderEditor.RequestJoin(pairing, true)),
+                    new OsuMenuItem("Join with", MenuItemType.Standard, () => ladderEditor.BeginJoin(pairing, false)),
+                    new OsuMenuItem("Join with (loser)", MenuItemType.Standard, () => ladderEditor.BeginJoin(pairing, true)),
                     new OsuMenuItem("Remove", MenuItemType.Destructive, () => ladderEditor.Remove(pairing)),
                 };
             }

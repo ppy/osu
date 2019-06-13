@@ -11,9 +11,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
-using osu.Framework.IO.Stores;
 using osu.Framework.Localisation;
-using osu.Framework.Platform;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Drawables;
 using osu.Game.Graphics;
@@ -48,7 +46,7 @@ namespace osu.Game.Tournament.Components
         }
 
         [BackgroundDependencyLoader]
-        private void load(LadderInfo ladder, Storage storage)
+        private void load(LadderInfo ladder, TextureStore textures)
         {
             currentMatch.BindValueChanged(matchChanged);
             currentMatch.BindTo(ladder.CurrentMatch);
@@ -135,7 +133,7 @@ namespace osu.Game.Tournament.Components
             if (!string.IsNullOrEmpty(mods))
                 AddInternal(new Sprite
                 {
-                    Texture = new LargeTextureStore(new TextureLoaderStore(new StorageBackedResourceStore(storage))).Get($"mods/{mods}"),
+                    Texture = textures.Get($"mods/{mods}"),
                     Anchor = Anchor.CentreRight,
                     Origin = Anchor.CentreRight,
                     Margin = new MarginPadding(20),
