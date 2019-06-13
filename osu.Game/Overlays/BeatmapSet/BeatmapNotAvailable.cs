@@ -8,7 +8,6 @@ using osu.Framework.Graphics.Shapes;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
-using osu.Game.Graphics.Sprites;
 using osuTK.Graphics;
 
 namespace osu.Game.Overlays.BeatmapSet
@@ -29,47 +28,42 @@ namespace osu.Game.Overlays.BeatmapSet
                 removeLinks();
 
                 if (beatmapSet?.OnlineInfo.Availability != null)
-                {
-                    Header?.ResizeHeightTo(450, 500);
                     Show();
-                }
                 else
-                {
-                    Header?.ResizeHeightTo(400, 500);
                     Hide();
-                }
             }
         }
 
-        public Header Header;
-
-        private readonly OsuSpriteText text;
+        private readonly OsuTextFlowContainer text;
         private readonly LinkFlowContainer link;
 
         public BeatmapNotAvailable()
         {
-            AutoSizeAxes = Axes.Both;
-            Margin = new MarginPadding { Top = 10 };
+            RelativeSizeAxes = Axes.X;
+            AutoSizeAxes = Axes.Y;
+            Padding = new MarginPadding { Top = 10, Right = 20 };
 
             Children = new Drawable[]
             {
                 new Box
                 {
-                    Colour = Color4.Black.Opacity(0.6f),
                     RelativeSizeAxes = Axes.Both,
+                    Colour = Color4.Black.Opacity(0.6f),
                 },
                 new FillFlowContainer
                 {
-                    AutoSizeAxes = Axes.Both,
+                    RelativeSizeAxes = Axes.X,
+                    AutoSizeAxes = Axes.Y,
                     Direction = FillDirection.Vertical,
                     Margin = new MarginPadding { Top = 10, Left = 5, Right = 20 },
 
                     Children = new Drawable[]
                     {
-                        text = new OsuSpriteText
+                        text = new OsuTextFlowContainer(t => t.Font = OsuFont.GetFont(size: 20, weight: FontWeight.Medium))
                         {
+                            RelativeSizeAxes = Axes.X,
+                            AutoSizeAxes = Axes.Y,
                             Margin = new MarginPadding { Bottom = 10, Horizontal = 5 },
-                            Font = OsuFont.GetFont(size: 20, weight: FontWeight.Medium),
                             Colour = Color4.Orange,
                         },
                         link = new LinkFlowContainer(t => t.Font = OsuFont.GetFont(size: 14))
