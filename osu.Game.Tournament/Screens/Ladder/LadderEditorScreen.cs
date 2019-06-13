@@ -27,7 +27,7 @@ namespace osu.Game.Tournament.Screens.Ladder
         [BackgroundDependencyLoader]
         private void load()
         {
-            ((Container)InternalChild).Add(new LadderEditorSettings
+            Content.Add(new LadderEditorSettings
             {
                 Anchor = Anchor.TopRight,
                 Origin = Anchor.TopRight,
@@ -58,9 +58,9 @@ namespace osu.Game.Tournament.Screens.Ladder
             updateInfo();
         }
 
-        public void RequestJoin(MatchPairing pairing, bool losers)
+        public void BeginJoin(MatchPairing pairing, bool losers)
         {
-            ScrollContent.Add(new JoinRequestHandler(PairingsContainer, pairing, losers, updateInfo));
+            ScrollContent.Add(new JoinVisualiser(PairingsContainer, pairing, losers, updateInfo));
         }
 
         public MenuItem[] ContextMenuItems
@@ -91,7 +91,7 @@ namespace osu.Game.Tournament.Screens.Ladder
             PairingsContainer.FirstOrDefault(p => p.Pairing == pairing)?.Remove();
         }
 
-        private class JoinRequestHandler : CompositeDrawable
+        private class JoinVisualiser : CompositeDrawable
         {
             private readonly Container<DrawableMatchPairing> pairingsContainer;
             public readonly MatchPairing Source;
@@ -100,7 +100,7 @@ namespace osu.Game.Tournament.Screens.Ladder
 
             private ProgressionPath path;
 
-            public JoinRequestHandler(Container<DrawableMatchPairing> pairingsContainer, MatchPairing source, bool losers, Action complete)
+            public JoinVisualiser(Container<DrawableMatchPairing> pairingsContainer, MatchPairing source, bool losers, Action complete)
             {
                 this.pairingsContainer = pairingsContainer;
                 RelativeSizeAxes = Axes.Both;

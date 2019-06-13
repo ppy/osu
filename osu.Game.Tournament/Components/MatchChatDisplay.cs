@@ -15,8 +15,6 @@ namespace osu.Game.Tournament.Components
     {
         private readonly Bindable<string> chatChannel = new Bindable<string>();
 
-        protected override ChatLine CreateMessage(Message message) => new MatchMessage(message);
-
         private ChannelManager manager;
 
         [BackgroundDependencyLoader(true)]
@@ -54,6 +52,8 @@ namespace osu.Game.Tournament.Components
                 }, true);
             }
         }
+
+        protected override ChatLine CreateMessage(Message message) => new MatchMessage(message);
 
         protected class MatchMessage : StandAloneMessage
         {

@@ -15,7 +15,7 @@ namespace osu.Game.Tournament.Components
             get => bindable;
             set
             {
-                bindable = value;
+                bindable = value.GetBoundCopy();
                 bindable.BindValueChanged(dto =>
                     base.Bindable.Value = dto.NewValue.ToUniversalTime().ToString("yyyy-MM-ddTHH:mm:ssZ"), true);
             }
@@ -35,6 +35,7 @@ namespace osu.Game.Tournament.Components
                 }
                 catch
                 {
+                    // reset textbox content to its last valid state on a parse failure.
                     bindable.TriggerChange();
                 }
             };

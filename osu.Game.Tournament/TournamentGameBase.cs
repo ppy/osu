@@ -110,8 +110,8 @@ namespace osu.Game.Tournament
             // assign progressions
             foreach (var pair in ladder.Progressions)
             {
-                var src = ladder.Pairings.FirstOrDefault(p => p.ID == pair.Item1);
-                var dest = ladder.Pairings.FirstOrDefault(p => p.ID == pair.Item2);
+                var src = ladder.Pairings.FirstOrDefault(p => p.ID == pair.SourceID);
+                var dest = ladder.Pairings.FirstOrDefault(p => p.ID == pair.TargetID);
 
                 if (src == null) throw new InvalidOperationException();
 
