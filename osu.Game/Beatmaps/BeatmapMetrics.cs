@@ -1,7 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System.Collections.Generic;
+using System;
 using Newtonsoft.Json;
 
 namespace osu.Game.Beatmaps
@@ -14,18 +14,18 @@ namespace osu.Game.Beatmaps
         /// <summary>
         /// Total vote counts of user ratings on a scale of 0..10 where 0 is unused (probably will be fixed at API?).
         /// </summary>
-        public IEnumerable<int> Ratings { get; set; }
+        public int[] Ratings { get; set; } = Array.Empty<int>();
 
         /// <summary>
         /// Points of failure on a relative time scale (usually 0..100).
         /// </summary>
         [JsonProperty(@"fail")]
-        public IEnumerable<int> Fails { get; set; }
+        public int[] Fails { get; set; } = Array.Empty<int>();
 
         /// <summary>
         /// Points of retry on a relative time scale (usually 0..100).
         /// </summary>
         [JsonProperty(@"exit")]
-        public IEnumerable<int> Retries { get; set; }
+        public int[] Retries { get; set; } = Array.Empty<int>();
     }
 }
