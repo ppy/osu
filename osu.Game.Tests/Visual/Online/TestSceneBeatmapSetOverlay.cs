@@ -56,6 +56,8 @@ namespace osu.Game.Tests.Visual.Online
 
             AddStep(@"show online", () => overlay.FetchAndShowBeatmapSet(55));
 
+            AddStep(@"show quaver", () => overlay.FetchAndShowBeatmapSet(873811));
+
             AddStep(@"show first", () =>
             {
                 overlay.ShowBeatmapSet(new BeatmapSetInfo
