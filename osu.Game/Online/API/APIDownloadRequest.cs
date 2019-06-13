@@ -11,7 +11,7 @@ namespace osu.Game.Online.API
         private string filename;
 
         /// <summary>
-        /// Sets the extension of the file outputted by this request.
+        /// Used to set the extension of the file returned by this request.
         /// </summary>
         protected virtual string FileExtension { get; } = @".tmp";
 
