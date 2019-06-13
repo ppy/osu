@@ -95,7 +95,13 @@ namespace osu.Game.Overlays.BeatmapSet
                         new Container
                         {
                             RelativeSizeAxes = Axes.Both,
-                            Padding = new MarginPadding { Top = 20, Bottom = 30, Horizontal = BeatmapSetOverlay.X_PADDING },
+                            Padding = new MarginPadding
+                            {
+                                Top = 20,
+                                Bottom = 30,
+                                Left = BeatmapSetOverlay.X_PADDING,
+                                Right = BeatmapSetOverlay.RIGHT_WIDTH + BeatmapSetOverlay.X_PADDING,
+                            },
                             Child = new FillFlowContainer
                             {
                                 RelativeSizeAxes = Axes.Both,
