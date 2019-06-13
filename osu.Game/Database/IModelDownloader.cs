@@ -23,6 +23,12 @@ namespace osu.Game.Database
         /// </summary>
         event Action<ArchiveDownloadRequest<TModel>> DownloadFailed;
 
+
+        /// <summary>
+        /// Checks whether a given <see cref="TModel"/> is already available in the local store.
+        /// </summary>
+        /// <param name="model">The <see cref="TModel"/> whose existence needs to be checked.</param>
+        /// <returns>Whether the <see cref="TModel"/> exists.</returns>
         bool IsAvailableLocally(TModel model);
 
         /// <summary>
