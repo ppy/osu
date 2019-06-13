@@ -14,11 +14,12 @@ namespace osu.Game.Overlays.BeatmapSet
 {
     public class SuccessRate : Container
     {
+        protected readonly FailRetryGraph Graph;
+
         private readonly FillFlowContainer header;
         private readonly OsuSpriteText successRateLabel, successPercent, graphLabel;
         private readonly Bar successRate;
         private readonly Container percentContainer;
-        private readonly FailRetryGraph graph;
 
         private BeatmapInfo beatmap;
 
@@ -45,7 +46,7 @@ namespace osu.Game.Overlays.BeatmapSet
             successRate.Length = rate;
             percentContainer.ResizeWidthTo(successRate.Length, 250, Easing.InOutCubic);
 
-            graph.Metrics = beatmap?.Metrics;
+            Graph.Metrics = beatmap?.Metrics;
         }
 
         public SuccessRate()
@@ -94,7 +95,7 @@ namespace osu.Game.Overlays.BeatmapSet
                         },
                     },
                 },
-                graph = new FailRetryGraph
+                Graph = new FailRetryGraph
                 {
                     Anchor = Anchor.BottomLeft,
                     Origin = Anchor.BottomLeft,
@@ -117,7 +118,7 @@ namespace osu.Game.Overlays.BeatmapSet
         {
             base.UpdateAfterChildren();
 
-            graph.Padding = new MarginPadding { Top = header.DrawHeight };
+            Graph.Padding = new MarginPadding { Top = header.DrawHeight };
         }
     }
 }
