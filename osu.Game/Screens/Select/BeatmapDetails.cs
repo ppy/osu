@@ -18,6 +18,7 @@ using osu.Game.Screens.Select.Details;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
+using osu.Game.Online.API.Requests.Responses;
 
 namespace osu.Game.Screens.Select
 {
@@ -181,9 +182,10 @@ namespace osu.Game.Screens.Select
             tags.Text = Beatmap?.Metadata?.Tags;
 
             // metrics may have been previously fetched
-            if (Beatmap?.Metrics != null)
+            // Todo:
+            if (Beatmap?.BeatmapSet?.Metrics != null)
             {
-                updateMetrics(Beatmap.Metrics);
+                updateMetrics(new APIBeatmapMetrics { Ratings = Beatmap.BeatmapSet.Metrics.Ratings });
                 return;
             }
 
@@ -210,22 +212,19 @@ namespace osu.Game.Screens.Select
             updateMetrics();
         }
 
-        private void updateMetrics(BeatmapMetrics metrics = null)
+        private void updateMetrics(APIBeatmapMetrics metrics = null)
         {
             var hasRatings = metrics?.Ratings?.Any() ?? false;
             var hasRetriesFails = (metrics?.Retries?.Any() ?? false) && (metrics.Fails?.Any() ?? false);
 
             if (hasRatings)
             {
-                ratings.Metrics = metrics;
+                ratings.Metrics = new BeatmapSetMetrics { Ratings = metrics.Ratings };
                 ratingsContainer.FadeIn(transition_duration);
             }
             else
             {
-                ratings.Metrics = new BeatmapMetrics
-                {
-                    Ratings = new int[10],
-                };
+                ratings.Metrics = new BeatmapSetMetrics { Ratings = new int[10] };
                 ratingsContainer.FadeTo(0.25f, transition_duration);
             }
 

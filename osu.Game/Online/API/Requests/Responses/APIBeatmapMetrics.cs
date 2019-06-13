@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using Newtonsoft.Json;
 using osu.Game.Beatmaps;
 
@@ -19,9 +20,12 @@ namespace osu.Game.Online.API.Requests.Responses
             }
         }
 
+        public int[] Ratings { get; set; } = Array.Empty<int>();
+
         //and other metrics in the beatmap set.
+        // Todo: What
         [JsonProperty(@"beatmapset")]
-        private BeatmapMetrics beatmapSet
+        private BeatmapSetMetrics beatmapSet
         {
             set => Ratings = value.Ratings;
         }

@@ -87,6 +87,7 @@ namespace osu.Game.Tests.Visual.Online
                             Cover = @"https://assets.ppy.sh/beatmaps/415886/covers/cover.jpg?1465651778",
                         },
                     },
+                    Metrics = new BeatmapSetMetrics { Ratings = Enumerable.Range(0, 11).ToArray() },
                     Beatmaps = new List<BeatmapInfo>
                     {
                         new BeatmapInfo
@@ -111,7 +112,6 @@ namespace osu.Game.Tests.Visual.Online
                             },
                             Metrics = new BeatmapMetrics
                             {
-                                Ratings = Enumerable.Range(0, 11).ToArray(),
                                 Fails = Enumerable.Range(1, 100).Select(i => i % 12 - 6).ToArray(),
                                 Retries = Enumerable.Range(-2, 100).Select(i => i % 12 - 6).ToArray(),
                             },
@@ -138,7 +138,6 @@ namespace osu.Game.Tests.Visual.Online
                             },
                             Metrics = new BeatmapMetrics
                             {
-                                Ratings = Enumerable.Range(0, 11).ToArray(),
                                 Fails = Enumerable.Range(1, 100).Select(i => i % 12 - 6).ToArray(),
                                 Retries = Enumerable.Range(-2, 100).Select(i => i % 12 - 6).ToArray(),
                             },
@@ -165,7 +164,6 @@ namespace osu.Game.Tests.Visual.Online
                             },
                             Metrics = new BeatmapMetrics
                             {
-                                Ratings = Enumerable.Range(0, 11).ToArray(),
                                 Fails = Enumerable.Range(1, 100).Select(i => i % 12 - 6).ToArray(),
                                 Retries = Enumerable.Range(-2, 100).Select(i => i % 12 - 6).ToArray(),
                             },
@@ -192,7 +190,6 @@ namespace osu.Game.Tests.Visual.Online
                             },
                             Metrics = new BeatmapMetrics
                             {
-                                Ratings = Enumerable.Range(0, 11).ToArray(),
                                 Fails = Enumerable.Range(1, 100).Select(i => i % 12 - 6).ToArray(),
                                 Retries = Enumerable.Range(-2, 100).Select(i => i % 12 - 6).ToArray(),
                             },
@@ -219,7 +216,6 @@ namespace osu.Game.Tests.Visual.Online
                             },
                             Metrics = new BeatmapMetrics
                             {
-                                Ratings = Enumerable.Range(0, 11).ToArray(),
                                 Fails = Enumerable.Range(1, 100).Select(i => i % 12 - 6).ToArray(),
                                 Retries = Enumerable.Range(-2, 100).Select(i => i % 12 - 6).ToArray(),
                             },
@@ -258,6 +254,7 @@ namespace osu.Game.Tests.Visual.Online
                             Cover = @"https://assets.ppy.sh/beatmaps/625493/covers/cover.jpg?1499167472",
                         },
                     },
+                    Metrics = new BeatmapSetMetrics { Ratings = Enumerable.Range(0, 11).ToArray() },
                     Beatmaps = new List<BeatmapInfo>
                     {
                         new BeatmapInfo
@@ -282,7 +279,6 @@ namespace osu.Game.Tests.Visual.Online
                             },
                             Metrics = new BeatmapMetrics
                             {
-                                Ratings = Enumerable.Range(0, 11).ToArray(),
                                 Fails = Enumerable.Range(1, 100).Select(i => i % 12 - 6).ToArray(),
                                 Retries = Enumerable.Range(-2, 100).Select(i => i % 12 - 6).ToArray(),
                             },
@@ -309,7 +305,6 @@ namespace osu.Game.Tests.Visual.Online
                             },
                             Metrics = new BeatmapMetrics
                             {
-                                Ratings = Enumerable.Range(0, 11).ToArray(),
                                 Fails = Enumerable.Range(1, 100).Select(i => i % 12 - 6).ToArray(),
                                 Retries = Enumerable.Range(-2, 100).Select(i => i % 12 - 6).ToArray(),
                             },
@@ -336,7 +331,6 @@ namespace osu.Game.Tests.Visual.Online
                             },
                             Metrics = new BeatmapMetrics
                             {
-                                Ratings = Enumerable.Range(0, 11).ToArray(),
                                 Fails = Enumerable.Range(1, 100).Select(i => i % 12 - 6).ToArray(),
                                 Retries = Enumerable.Range(-2, 100).Select(i => i % 12 - 6).ToArray(),
                             },
@@ -363,7 +357,6 @@ namespace osu.Game.Tests.Visual.Online
                             },
                             Metrics = new BeatmapMetrics
                             {
-                                Ratings = Enumerable.Range(0, 11).ToArray(),
                                 Fails = Enumerable.Range(1, 100).Select(i => i % 12 - 6).ToArray(),
                                 Retries = Enumerable.Range(-2, 100).Select(i => i % 12 - 6).ToArray(),
                             },
@@ -390,7 +383,6 @@ namespace osu.Game.Tests.Visual.Online
                             },
                             Metrics = new BeatmapMetrics
                             {
-                                Ratings = Enumerable.Range(0, 11).ToArray(),
                                 Fails = Enumerable.Range(1, 100).Select(i => i % 12 - 6).ToArray(),
                                 Retries = Enumerable.Range(-2, 100).Select(i => i % 12 - 6).ToArray(),
                             },

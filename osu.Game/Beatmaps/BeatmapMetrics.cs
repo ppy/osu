@@ -7,15 +7,10 @@ using Newtonsoft.Json;
 namespace osu.Game.Beatmaps
 {
     /// <summary>
-    /// Beatmap metrics based on acculumated online data from community plays.
+    /// Beatmap metrics based on accumulated online data from community plays.
     /// </summary>
     public class BeatmapMetrics
     {
-        /// <summary>
-        /// Total vote counts of user ratings on a scale of 0..10 where 0 is unused (probably will be fixed at API?).
-        /// </summary>
-        public int[] Ratings { get; set; } = Array.Empty<int>();
-
         /// <summary>
         /// Points of failure on a relative time scale (usually 0..100).
         /// </summary>
