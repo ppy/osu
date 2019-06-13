@@ -10,8 +10,6 @@ using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
-using osu.Game.Graphics.Containers;
-using osu.Game.Graphics.Sprites;
 using osu.Game.Screens.Select.Details;
 using osuTK;
 using osuTK.Graphics;
@@ -70,7 +68,7 @@ namespace osu.Game.Overlays.BeatmapSet
                                 RelativeSizeAxes = Axes.Both,
                                 Child = description = new MetadataSection(MetadataType.Description, transition_duration)
                                 {
-                                    HeaderMargin = new MarginPadding() { Top = 20},
+                                    HeaderMargin = new MarginPadding() { Top = 20 },
                                 },
                             },
                         },
@@ -92,11 +90,11 @@ namespace osu.Game.Overlays.BeatmapSet
                                 {
                                     source = new MetadataSection(MetadataType.Source, transition_duration)
                                     {
-                                        HeaderMargin = new MarginPadding() { Top = 20},
+                                        HeaderMargin = new MarginPadding() { Top = 20 },
                                     },
                                     tags = new MetadataSection(MetadataType.Tags, transition_duration)
                                     {
-                                        HeaderMargin = new MarginPadding() { Top = 20},
+                                        HeaderMargin = new MarginPadding() { Top = 20 },
                                     },
                                 },
                             },

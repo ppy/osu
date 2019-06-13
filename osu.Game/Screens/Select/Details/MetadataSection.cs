@@ -14,20 +14,23 @@ namespace osu.Game.Screens.Select.Details
 {
     public class MetadataSection : FillFlowContainer
     {
-        private readonly float transition_duration;
+        private readonly float transitionDuration;
         private readonly MetadataType type;
         private readonly OsuSpriteText header;
-        private LinkFlowContainer linkFlow;
+        private readonly LinkFlowContainer linkFlow;
+
         public Color4 TextColour
         {
             get => linkFlow.Colour;
             set => linkFlow.Colour = value;
         }
+
         public Color4 HeaderColour
         {
             get => header.Colour;
             set => header.Colour = value;
         }
+
         public MarginPadding HeaderMargin
         {
             get => header.Margin;
@@ -40,20 +43,20 @@ namespace osu.Game.Screens.Select.Details
             {
                 if (string.IsNullOrEmpty(value))
                 {
-                    this.FadeOut(transition_duration);
+                    this.FadeOut(transitionDuration);
                     return;
                 }
 
-                this.FadeIn(transition_duration);
+                this.FadeIn(transitionDuration);
                 linkFlow.Clear();
-                AddMetadataLinks(value, type);
+                addMetadataLinks(value, type);
             }
         }
 
-        public MetadataSection(MetadataType type, float transition_duration)
+        public MetadataSection(MetadataType type, float transitionDuration)
         {
             this.type = type;
-            this.transition_duration = transition_duration;
+            this.transitionDuration = transitionDuration;
 
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
@@ -75,7 +78,7 @@ namespace osu.Game.Screens.Select.Details
             };
         }
 
-        private void AddMetadataLinks(string text, MetadataType type)
+        private void addMetadataLinks(string text, MetadataType type)
         {
             switch (type)
             {

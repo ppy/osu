@@ -17,7 +17,6 @@ using osu.Framework.Extensions.Color4Extensions;
 using osu.Game.Screens.Select.Details;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
-using osu.Game.Graphics.Containers;
 
 namespace osu.Game.Screens.Select
 {

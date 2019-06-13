@@ -11,7 +11,6 @@ using osu.Framework.Logging;
 using osu.Game.Online.Chat;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Notifications;
-using osu.Game.Screens.Select.Details;
 using osu.Game.Users;
 
 namespace osu.Game.Graphics.Containers
