@@ -58,6 +58,7 @@ namespace osu.Game.Screens.Select
 
         public BeatmapDetails()
         {
+            Color4 linkColour = Color4.White.Opacity(0.75f);
             Children = new Drawable[]
             {
                 new Box
@@ -123,9 +124,18 @@ namespace osu.Game.Screens.Select
                                         Margin = new MarginPadding { Top = spacing * 2 },
                                         Children = new[]
                                         {
-                                            description = new MetadataSection(MetadataType.Description),
-                                            source = new MetadataSection(MetadataType.Source),
-                                            tags = new MetadataSection(MetadataType.Tags),
+                                            description = new MetadataSection(MetadataType.Description, transition_duration)
+                                            {
+                                                TextColour = linkColour,
+                                            },
+                                            source = new MetadataSection(MetadataType.Source, transition_duration)
+                                            {
+                                                TextColour = linkColour,
+                                            },
+                                            tags = new MetadataSection(MetadataType.Tags, transition_duration)
+                                            {
+                                                TextColour = linkColour,
+                                            },
                                         },
                                     },
                                 },
@@ -273,76 +283,6 @@ namespace osu.Game.Screens.Select
             }
         }
 
-        private class MetadataSection : Container
-        {
-            private readonly MetadataType type;
-            private readonly FillFlowContainer textContainer;
-            private LinkFlowContainer linkFlow;
-
-            public MetadataSection(MetadataType type)
-            {
-                this.type = type;
-
-                RelativeSizeAxes = Axes.X;
-                AutoSizeAxes = Axes.Y;
-
-                InternalChild = textContainer = new FillFlowContainer
-                {
-                    Alpha = 0,
-                    RelativeSizeAxes = Axes.X,
-                    AutoSizeAxes = Axes.Y,
-                    Spacing = new Vector2(spacing / 2),
-                    Children = new Drawable[]
-                    {
-                        new Container
-                        {
-                            RelativeSizeAxes = Axes.X,
-                            AutoSizeAxes = Axes.Y,
-                            Child = new OsuSpriteText
-                            {
-                                Text = type.ToString(),
-                                Font = OsuFont.GetFont(weight: FontWeight.Bold, size: 14),
-                            },
-                        },
-                    },
-                };
-            }
-
-            public string Text
-            {
-                set
-                {
-                    if (string.IsNullOrEmpty(value))
-                    {
-                        this.FadeOut(transition_duration);
-                        return;
-                    }
-
-                    this.FadeIn(transition_duration);
-
-                    setTextAsync(value);
-                }
-            }
-
-            private void setTextAsync(string text)
-            {
-                LoadComponentAsync(new LinkFlowContainer(s => s.Font = s.Font.With(size: 14))
-                {
-                    RelativeSizeAxes = Axes.X,
-                    AutoSizeAxes = Axes.Y,
-                    Colour = Color4.White.Opacity(0.75f),
-                }, loaded =>
-                {
-                    loaded.AddMetadataLinks(text, type);
-                    linkFlow?.Expire();
-                    textContainer.Add(linkFlow = loaded);
-
-                    // fade in if we haven't yet.
-                    textContainer.FadeIn(transition_duration);
-                });
-            }
-        }
-
         private class DimmedLoadingAnimation : VisibilityContainer
         {
             private readonly LoadingAnimation loading;
@@ -372,12 +312,5 @@ namespace osu.Game.Screens.Select
                 loading.Hide();
             }
         }
-    }
-
-    public enum MetadataType
-    {
-        Tags,
-        Source,
-        Description
     }
 }

@@ -1,17 +1,17 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using osu.Game.Online.Chat;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics.Sprites;
-using System.Collections.Generic;
 using osu.Framework.Graphics;
 using osu.Framework.Logging;
+using osu.Game.Online.Chat;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Notifications;
-using osu.Game.Screens.Select;
+using osu.Game.Screens.Select.Details;
 using osu.Game.Users;
 
 namespace osu.Game.Graphics.Containers
@@ -80,25 +80,6 @@ namespace osu.Game.Graphics.Containers
 
         public IEnumerable<Drawable> AddUserLink(User user, Action<SpriteText> creationParameters = null)
             => createLink(AddText(user.Username, creationParameters), user.Username, null, LinkAction.OpenUserProfile, user.Id.ToString(), "View profile");
-
-        public void AddMetadataLinks(string text, MetadataType type)
-        {
-            switch (type)
-            {
-                case MetadataType.Tags:
-                    foreach (string individualTag in text.Split(' '))
-                        AddLink(individualTag + " ", null, LinkAction.OpenTextSearch, individualTag, "Open search");
-                    break;
-
-                case MetadataType.Source:
-                    AddLink(text, null, LinkAction.OpenTextSearch, text, "Open search");
-                    break;
-
-                case MetadataType.Description:
-                    AddText(text);
-                    break;
-            }
-        }
 
         private IEnumerable<Drawable> createLink(IEnumerable<Drawable> drawables, string text, string url = null, LinkAction linkType = LinkAction.External, string linkArgument = null, string tooltipText = null, Action action = null)
         {
