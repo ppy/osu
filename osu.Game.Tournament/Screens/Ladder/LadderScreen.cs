@@ -22,7 +22,7 @@ namespace osu.Game.Tournament.Screens.Ladder
         private Container<Path> paths;
         private Container headings;
 
-        protected ScrollableContainer ScrollContent;
+        protected LadderDragContainer ScrollContent;
 
         [BackgroundDependencyLoader]
         private void load(OsuColour colours, Storage storage)
@@ -42,7 +42,7 @@ namespace osu.Game.Tournament.Screens.Ladder
                         RelativeSizeAxes = Axes.Both,
                         Loop = true,
                     },
-                    ScrollContent = new ScrollableContainer
+                    ScrollContent = new LadderDragContainer
                     {
                         RelativeSizeAxes = Axes.Both,
                         Children = new Drawable[]
@@ -133,8 +133,5 @@ namespace osu.Game.Tournament.Screens.Ladder
 
             layout.Validate();
         }
-
-        // todo: remove after ppy/osu-framework#1980 is merged.
-        public override bool HandlePositionalInput => true;
     }
 }
