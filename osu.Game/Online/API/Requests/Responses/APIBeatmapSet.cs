@@ -73,7 +73,7 @@ namespace osu.Game.Online.API.Requests.Responses
                 OnlineBeatmapSetID = OnlineBeatmapSetID,
                 Metadata = this,
                 Status = Status,
-                Metrics = new BeatmapSetMetrics { Ratings = ratings },
+                Metrics = ratings == null ? null : new BeatmapSetMetrics { Ratings = ratings },
                 OnlineInfo = new BeatmapSetOnlineInfo
                 {
                     Covers = covers,
