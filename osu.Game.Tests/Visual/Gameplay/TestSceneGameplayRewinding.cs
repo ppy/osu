@@ -49,8 +49,8 @@ namespace osu.Game.Tests.Visual.Gameplay
         {
             AddStep($"seek to {time}", () => player.GameplayClockContainer.Seek(time));
 
-            // Allow 2 frames of lenience
-            AddUntilStep("wait for seek to finish", () => Precision.AlmostEquals(time, player.DrawableRuleset.FrameStableClock.CurrentTime, 32));
+            // Allow a few frames of lenience
+            AddUntilStep("wait for seek to finish", () => Precision.AlmostEquals(time, player.DrawableRuleset.FrameStableClock.CurrentTime, 100));
         }
 
         protected override Player CreatePlayer(Ruleset ruleset)
