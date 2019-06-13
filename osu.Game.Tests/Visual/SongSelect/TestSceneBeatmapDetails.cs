@@ -138,6 +138,25 @@ namespace osu.Game.Tests.Visual.SongSelect
             });
 
             AddStep("null beatmap", () => details.Beatmap = null);
+
+            AddStep("online ratings/retries/fails", () => details.Beatmap = new BeatmapInfo
+            {
+                OnlineBeatmapID = 162,
+                Version = "online ratings/retries/fails",
+                Metadata = new BeatmapMetadata
+                {
+                    Source = "osu!lazer",
+                    Tags = "this beatmap has online ratings/retries/fails",
+                },
+                BaseDifficulty = new BeatmapDifficulty
+                {
+                    CircleSize = 7,
+                    DrainRate = 1,
+                    OverallDifficulty = 5.7f,
+                    ApproachRate = 3.5f,
+                },
+                StarDifficulty = 5.3f
+            });
         }
     }
 }
