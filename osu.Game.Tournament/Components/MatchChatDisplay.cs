@@ -4,9 +4,11 @@
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Graphics;
 using osu.Game.Online.Chat;
 using osu.Game.Overlays.Chat;
 using osu.Game.Tournament.IPC;
+using osuTK;
 using osuTK.Graphics;
 
 namespace osu.Game.Tournament.Components
@@ -16,6 +18,16 @@ namespace osu.Game.Tournament.Components
         private readonly Bindable<string> chatChannel = new Bindable<string>();
 
         private ChannelManager manager;
+
+        public MatchChatDisplay()
+        {
+            RelativeSizeAxes = Axes.X;
+            Y = 100;
+            Size = new Vector2(0.45f, 112);
+            Margin = new MarginPadding(10);
+            Anchor = Anchor.BottomCentre;
+            Origin = Anchor.BottomCentre;
+        }
 
         [BackgroundDependencyLoader(true)]
         private void load(MatchIPCInfo ipc)

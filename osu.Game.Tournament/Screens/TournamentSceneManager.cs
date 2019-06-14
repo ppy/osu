@@ -32,17 +32,8 @@ namespace osu.Game.Tournament.Screens
         private Container screens;
         private VideoSprite video;
 
-        //todo: make less temporary
         [Cached]
-        private MatchChatDisplay chat = new MatchChatDisplay
-        {
-            RelativeSizeAxes = Axes.X,
-            Y = 100,
-            Size = new Vector2(0.45f, 112),
-            Margin = new MarginPadding(10),
-            Anchor = Anchor.BottomCentre,
-            Origin = Anchor.BottomCentre,
-        };
+        private MatchChatDisplay chat = new MatchChatDisplay();
 
         private Container chatContainer;
 
