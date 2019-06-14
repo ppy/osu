@@ -2,18 +2,22 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
-using osu.Framework.Platform;
 using osu.Game.Tests.Visual;
-using osu.Game.Tournament.Screens;
+using osu.Game.Tournament.Components;
+using osu.Game.Tournament.Screens.Gameplay;
 
 namespace osu.Game.Tournament.Tests
 {
-    public class TestCaseSceneManager : OsuTestScene
+    public class TestSceneGameplayScreen : OsuTestScene
     {
+        [Cached]
+        private MatchChatDisplay chat = new MatchChatDisplay();
+
         [BackgroundDependencyLoader]
-        private void load(Storage storage)
+        private void load()
         {
-            Add(new TournamentSceneManager());
+            Add(new GameplayScreen());
+            Add(chat);
         }
     }
 }

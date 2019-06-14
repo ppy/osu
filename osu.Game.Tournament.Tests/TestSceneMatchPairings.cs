@@ -11,7 +11,7 @@ using osu.Game.Tournament.Screens.Ladder.Components;
 
 namespace osu.Game.Tournament.Tests
 {
-    public class TestCaseMatchPairings : OsuTestScene
+    public class TestSceneMatchPairings : OsuTestScene
     {
         public override IReadOnlyList<Type> RequiredTypes => new[]
         {
@@ -21,7 +21,7 @@ namespace osu.Game.Tournament.Tests
             typeof(DrawableTournamentTeam),
         };
 
-        public TestCaseMatchPairings()
+        public TestSceneMatchPairings()
         {
             Container<DrawableMatchPairing> level1;
             Container<DrawableMatchPairing> level2;
