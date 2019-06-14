@@ -27,7 +27,7 @@ namespace osu.Game.Overlays.Direct
         private FillFlowContainer bottomPanel, statusContainer;
         private PlayButton playButton;
         private Box progressBar;
-        
+
         protected override PlayButton PlayButton => playButton;
         protected override Box PreviewBar => progressBar;
 

@@ -29,7 +29,7 @@ namespace osu.Game.Beatmaps.Drawables
         {
             if (beatmap == null)
                 throw new ArgumentNullException(nameof(beatmap));
-            
+
             this.ruleset = ruleset ?? beatmap.Ruleset;
 
             Size = new Vector2(20);

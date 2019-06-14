@@ -37,7 +37,7 @@ namespace osu.Game.Beatmaps.Drawables
             {
                 case DifficultyType.Easy:
                     return palette.Green;
-                    
+
                 case DifficultyType.Normal:
                     return palette.Blue;
 

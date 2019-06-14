@@ -31,7 +31,7 @@ namespace osu.Game.Overlays.Direct
         private Box progressBar;
 
         protected override bool FadePlayButton => false;
-        
+
         protected override PlayButton PlayButton => playButton;
         protected override Box PreviewBar => progressBar;
 
