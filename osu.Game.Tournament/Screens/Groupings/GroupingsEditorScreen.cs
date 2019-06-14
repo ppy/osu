@@ -8,10 +8,12 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics;
+using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays.Settings;
 using osu.Game.Tournament.Components;
 using osu.Game.Tournament.Screens.Ladder.Components;
+using osuTK;
 
 namespace osu.Game.Tournament.Screens.Groupings
 {
@@ -28,26 +30,27 @@ namespace osu.Game.Tournament.Screens.Groupings
                     RelativeSizeAxes = Axes.Both,
                     Colour = OsuColour.Gray(0.2f),
                 },
-                new FillFlowContainer
+                new OsuScrollContainer
                 {
-                    Direction = FillDirection.Vertical,
                     RelativeSizeAxes = Axes.Both,
                     Width = 0.9f,
                     Anchor = Anchor.TopCentre,
                     Origin = Anchor.TopCentre,
+                    Child = items = new FillFlowContainer<GroupingRow>
+                    {
+                        Direction = FillDirection.Vertical,
+                        RelativeSizeAxes = Axes.X,
+                        AutoSizeAxes = Axes.Y,
+                    },
+                },
+                new ControlPanel
+                {
                     Children = new Drawable[]
                     {
-                        items = new FillFlowContainer<GroupingRow>
-                        {
-                            Direction = FillDirection.Vertical,
-                            RelativeSizeAxes = Axes.X,
-                            AutoSizeAxes = Axes.Y,
-                        },
                         new TriangleButton
                         {
-                            Margin = new MarginPadding(20),
-                            Width = 100,
-                            Text = "Add",
+                            RelativeSizeAxes = Axes.X,
+                            Text = "Add new",
                             Action = addNew
                         },
                     }
@@ -70,7 +73,13 @@ namespace osu.Game.Tournament.Screens.Groupings
 
         private void addNew()
         {
-            items.Add(new GroupingRow(new TournamentGrouping { StartDate = { Value = DateTimeOffset.UtcNow } }, updateGroupings));
+            items.Add(new GroupingRow(new TournamentGrouping
+            {
+                StartDate =
+                {
+                    Value = DateTimeOffset.UtcNow
+                }
+            }, updateGroupings));
             updateGroupings();
         }
 
@@ -85,31 +94,64 @@ namespace osu.Game.Tournament.Screens.Groupings
 
             public GroupingRow(TournamentGrouping grouping, Action onDelete)
             {
+                Margin = new MarginPadding(10);
+
                 Grouping = grouping;
                 InternalChildren = new Drawable[]
                 {
+                    new Box
+                    {
+                        Colour = OsuColour.Gray(0.1f),
+                        RelativeSizeAxes = Axes.Both,
+                    },
                     new FillFlowContainer
                     {
+                        Margin = new MarginPadding(5),
+                        Padding = new MarginPadding { Right = 160 },
+                        Spacing = new Vector2(5),
                         Direction = FillDirection.Full,
                         RelativeSizeAxes = Axes.X,
                         AutoSizeAxes = Axes.Y,
                         Children = new Drawable[]
                         {
-                            new SettingsTextBox { Width = 0.3f, Bindable = Grouping.Name },
-                            new SettingsTextBox { Width = 0.3f, Bindable = Grouping.Description },
-                            new SettingsSlider<int> { LabelText = "Best of", Width = 0.3f, Bindable = Grouping.BestOf },
-                            new DangerousSettingsButton
+                            new SettingsTextBox
                             {
-                                Width = 0.1f,
-                                Text = "Delete",
-                                Action = () =>
-                                {
-                                    Expire();
-                                    onDelete();
-                                }
+                                LabelText = "Name",
+                                Width = 0.33f,
+                                Bindable = Grouping.Name
                             },
-                            new DateTextBox { Width = 0.3f, Bindable = Grouping.StartDate },
+                            new SettingsTextBox
+                            {
+                                LabelText = "Description",
+                                Width = 0.33f,
+                                Bindable = Grouping.Description
+                            },
+                            new DateTextBox
+                            {
+                                LabelText = "Start Time",
+                                Width = 0.33f,
+                                Bindable = Grouping.StartDate
+                            },
+                            new SettingsSlider<int>
+                            {
+                                LabelText = "Best of",
+                                Width = 0.33f,
+                                Bindable = Grouping.BestOf
+                            },
                         }
+                    },
+                    new DangerousSettingsButton
+                    {
+                        Anchor = Anchor.CentreRight,
+                        Origin = Anchor.CentreRight,
+                        RelativeSizeAxes = Axes.None,
+                        Width = 150,
+                        Text = "Delete",
+                        Action = () =>
+                        {
+                            Expire();
+                            onDelete();
+                        },
                     }
                 };
 
