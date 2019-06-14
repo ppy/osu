@@ -10,7 +10,6 @@ using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Video;
 using osu.Framework.Platform;
 using osu.Game.Graphics.UserInterface;
-using osu.Game.Screens;
 using osu.Game.Tournament.Components;
 using osu.Game.Tournament.Screens.Drawings;
 using osu.Game.Tournament.Screens.Gameplay;
@@ -27,7 +26,7 @@ using osuTK.Graphics;
 namespace osu.Game.Tournament.Screens
 {
     [Cached]
-    public class TournamentSceneManager : OsuScreen
+    public class TournamentSceneManager : CompositeDrawable
     {
         private Container screens;
         private VideoSprite video;
@@ -36,6 +35,11 @@ namespace osu.Game.Tournament.Screens
         private MatchChatDisplay chat = new MatchChatDisplay();
 
         private Container chatContainer;
+
+        public TournamentSceneManager()
+        {
+            RelativeSizeAxes = Axes.Both;
+        }
 
         [BackgroundDependencyLoader]
         private void load(LadderInfo ladder, Storage storage)

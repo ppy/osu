@@ -3,7 +3,6 @@
 
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
-using osu.Framework.Screens;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Cursor;
 using osu.Game.Tournament.Screens;
@@ -19,7 +18,7 @@ namespace osu.Game.Tournament
             Add(new OsuContextMenuContainer
             {
                 RelativeSizeAxes = Axes.Both,
-                Child = new ScreenStack(new TournamentSceneManager()) { RelativeSizeAxes = Axes.Both }
+                Child = new TournamentSceneManager()
             });
 
             MenuCursorContainer.Cursor.Alpha = 0;
