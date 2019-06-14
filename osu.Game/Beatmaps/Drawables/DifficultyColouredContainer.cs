@@ -31,54 +31,30 @@ namespace osu.Game.Beatmaps.Drawables
             AccentColour = getColour(beatmap);
         }
 
-        private enum DifficultyRating
-        {
-            Easy,
-            Normal,
-            Hard,
-            Insane,
-            Expert,
-            ExpertPlus
-        }
-
-        private DifficultyRating getDifficultyRating(BeatmapInfo beatmap)
-        {
-            if (beatmap == null)
-                throw new ArgumentNullException(nameof(beatmap));
-
-            var rating = beatmap.StarDifficulty;
-
-            if (rating < 2.0) return DifficultyRating.Easy;
-            if (rating < 2.7) return DifficultyRating.Normal;
-            if (rating < 4.0) return DifficultyRating.Hard;
-            if (rating < 5.3) return DifficultyRating.Insane;
-            if (rating < 6.5) return DifficultyRating.Expert;
-
-            return DifficultyRating.ExpertPlus;
-        }
-
         private Color4 getColour(BeatmapInfo beatmap)
         {
-            switch (getDifficultyRating(beatmap))
+            switch (DifficultyRating.GetDifficultyType(beatmap))
             {
-                case DifficultyRating.Easy:
+                case DifficultyType.Easy:
                     return palette.Green;
-
-                default:
-                case DifficultyRating.Normal:
+                    
+                case DifficultyType.Normal:
                     return palette.Blue;
 
-                case DifficultyRating.Hard:
+                case DifficultyType.Hard:
                     return palette.Yellow;
 
-                case DifficultyRating.Insane:
+                case DifficultyType.Insane:
                     return palette.Pink;
 
-                case DifficultyRating.Expert:
+                case DifficultyType.Expert:
                     return palette.Purple;
 
-                case DifficultyRating.ExpertPlus:
+                case DifficultyType.ExpertPlus:
                     return palette.Gray0;
+
+                default:
+                    return Color4.Black;
             }
         }
     }

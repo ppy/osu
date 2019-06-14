@@ -31,7 +31,7 @@ namespace osu.Game.Overlays.Direct
         private Box progressBar;
 
         protected override bool FadePlayButton => false;
-
+        
         protected override PlayButton PlayButton => playButton;
         protected override Box PreviewBar => progressBar;
 
@@ -128,7 +128,7 @@ namespace osu.Game.Overlays.Direct
                                                     AutoSizeAxes = Axes.X,
                                                     Height = 20,
                                                     Margin = new MarginPadding { Top = vertical_padding, Bottom = vertical_padding },
-                                                    Children = GetDifficultyIcons(),
+                                                    Children = GetDifficultyChildren(),
                                                 },
                                             },
                                         },

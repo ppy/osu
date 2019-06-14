@@ -17,6 +17,7 @@ using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Drawables;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Rulesets;
 using osuTK;
 using osuTK.Graphics;
 
@@ -27,10 +28,12 @@ namespace osu.Game.Overlays.Direct
         public readonly BeatmapSetInfo SetInfo;
 
         private const double hover_transition_time = 400;
+        private const int maximum_difficulty_icons = 15;
 
         private Container content;
 
         private BeatmapSetOverlay beatmapSetOverlay;
+        private RulesetStore rulesetStore;
 
         public PreviewTrack Preview => PlayButton.Preview;
         public Bindable<bool> PreviewPlaying => PlayButton.Playing;
@@ -63,9 +66,10 @@ namespace osu.Game.Overlays.Direct
         };
 
         [BackgroundDependencyLoader(permitNulls: true)]
-        private void load(BeatmapManager beatmaps, OsuColour colours, BeatmapSetOverlay beatmapSetOverlay)
+        private void load(BeatmapManager beatmaps, OsuColour colours, BeatmapSetOverlay beatmapSetOverlay, RulesetStore rulesets)
         {
             this.beatmapSetOverlay = beatmapSetOverlay;
+            rulesetStore = rulesets;
 
             AddInternal(content = new Container
             {
@@ -135,14 +139,24 @@ namespace osu.Game.Overlays.Direct
             };
         }
 
-        protected List<DifficultyIcon> GetDifficultyIcons()
+        protected List<Drawable> GetDifficultyChildren()
         {
-            var icons = new List<DifficultyIcon>();
+            var children = new List<Drawable>();
 
-            foreach (var b in SetInfo.Beatmaps.OrderBy(beatmap => beatmap.StarDifficulty))
-                icons.Add(new DifficultyIcon(b));
+            if (SetInfo.Beatmaps.Count > maximum_difficulty_icons)
+            {
+                foreach (var ruleset in rulesetStore.AvailableRulesets.OrderBy(r => r.ID))
+                {
+                    List<BeatmapInfo> list;
+                    if ((list = SetInfo.Beatmaps.FindAll(b => b.Ruleset == ruleset)).Any())
+                        children.Add(new DifficultyIconWithCounter(ruleset, list, this is DirectGridPanel ? Color4.Black : Color4.White));
+                }
+            }
+            else
+                foreach (var b in SetInfo.Beatmaps.OrderBy(beatmap => beatmap.StarDifficulty))
+                    children.Add(new DifficultyIcon(b));
 
-            return icons;
+            return children;
         }
 
         protected Drawable CreateBackground() => new UpdateableBeatmapSetCover
