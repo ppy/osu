@@ -44,6 +44,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         [Test]
         public void TestNoJudgementsOnRewind()
         {
+            AddUntilStep("wait for track to start running", () => track.IsRunning);
             addSeekStep(3000);
             AddAssert("all judged", () => player.DrawableRuleset.Playfield.AllHitObjects.All(h => h.Judged));
             AddStep("clear results", () => player.AppliedResults.Clear());
