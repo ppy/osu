@@ -68,7 +68,7 @@ namespace osu.Game.Tournament.Screens.Groupings
         protected override void LoadComplete()
         {
             base.LoadComplete();
-            Scheduler.AddDelayed(() => LadderInfo.Groupings = items.Children.Select(c => c.Grouping).ToList(), 500, true);
+            Scheduler.AddDelayed(updateGroupings, 500, true);
         }
 
         private void addNew()
@@ -80,12 +80,14 @@ namespace osu.Game.Tournament.Screens.Groupings
                     Value = DateTimeOffset.UtcNow
                 }
             }, updateGroupings));
+
             updateGroupings();
         }
 
         private void updateGroupings()
         {
-            LadderInfo.Groupings = items.Children.Select(c => c.Grouping).ToList();
+            LadderInfo.Groupings.Clear();
+            LadderInfo.Groupings.AddRange(items.Children.Select(c => c.Grouping));
         }
 
         public class GroupingRow : CompositeDrawable
