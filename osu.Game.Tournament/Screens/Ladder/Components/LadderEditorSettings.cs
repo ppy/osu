@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input.Events;
@@ -74,10 +75,7 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
                     },
                 },
                 textboxTeam2 = new OsuTextBox { RelativeSizeAxes = Axes.X, Height = 20 },
-                groupingDropdown = new SettingsDropdown<TournamentGrouping>
-                {
-                    Bindable = new Bindable<TournamentGrouping>(),
-                },
+                groupingDropdown = new SettingsGroupingDropdown(ladderInfo.Groupings),
                 losersCheckbox = new PlayerCheckbox
                 {
                     LabelText = "Losers Bracket",
@@ -89,24 +87,11 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
                 }
             };
 
-            IEnumerable<TournamentGrouping> groupingOptions = null;
-
-            void updateDropdownItems()
-            {
-                groupingOptions = ladderInfo.Groupings.Prepend(new TournamentGrouping());
-                groupingDropdown.Items = groupingOptions;
-            }
-
-            ladderInfo.Groupings.ItemsRemoved += _ => updateDropdownItems();
-            ladderInfo.Groupings.ItemsAdded += _ => updateDropdownItems();
-
-            updateDropdownItems();
-
             editorInfo.Selected.ValueChanged += selection =>
             {
                 textboxTeam1.Text = selection.NewValue?.Team1.Value?.Acronym;
                 textboxTeam2.Text = selection.NewValue?.Team2.Value?.Acronym;
-                groupingDropdown.Bindable.Value = selection.NewValue?.Grouping.Value ?? groupingOptions.First();
+                groupingDropdown.Bindable.Value = selection.NewValue?.Grouping.Value;
                 losersCheckbox.Current.Value = selection.NewValue?.Losers.Value ?? false;
                 dateTimeBox.Bindable.Value = selection.NewValue?.Date.Value ?? DateTimeOffset.UtcNow;
             };
@@ -163,6 +148,40 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
 
         protected override void OnHoverLost(HoverLostEvent e)
         {
+        }
+
+        private class SettingsGroupingDropdown : SettingsDropdown<TournamentGrouping>
+        {
+            public SettingsGroupingDropdown(BindableList<TournamentGrouping> groupings)
+            {
+                Bindable = new Bindable<TournamentGrouping>();
+
+                foreach (var g in groupings.Prepend(new TournamentGrouping()))
+                    add(g);
+
+                groupings.ItemsRemoved += items => items.ForEach(i => Control.RemoveDropdownItem(i));
+                groupings.ItemsAdded += items => items.ForEach(add);
+            }
+
+            private readonly List<IUnbindable> refBindables = new List<IUnbindable>();
+
+            private T boundReference<T>(T obj)
+                where T : IBindable
+            {
+                obj = (T)obj.GetBoundCopy();
+                refBindables.Add(obj);
+                return obj;
+            }
+
+            private void add(TournamentGrouping grouping)
+            {
+                Control.AddDropdownItem(grouping);
+                boundReference(grouping.Name).BindValueChanged(_ =>
+                {
+                    Control.RemoveDropdownItem(grouping);
+                    Control.AddDropdownItem(grouping);
+                });
+            }
         }
     }
 }

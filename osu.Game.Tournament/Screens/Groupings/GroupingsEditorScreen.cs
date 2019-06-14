@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -62,39 +61,31 @@ namespace osu.Game.Tournament.Screens.Groupings
         private void load()
         {
             foreach (var g in LadderInfo.Groupings)
-                items.Add(new GroupingRow(g, updateGroupings));
-        }
-
-        protected override void LoadComplete()
-        {
-            base.LoadComplete();
-            Scheduler.AddDelayed(updateGroupings, 500, true);
+                items.Add(new GroupingRow(g));
         }
 
         private void addNew()
         {
-            items.Add(new GroupingRow(new TournamentGrouping
+            var grouping = new TournamentGrouping
             {
                 StartDate =
                 {
                     Value = DateTimeOffset.UtcNow
                 }
-            }, updateGroupings));
+            };
 
-            updateGroupings();
-        }
-
-        private void updateGroupings()
-        {
-            LadderInfo.Groupings.Clear();
-            LadderInfo.Groupings.AddRange(items.Children.Select(c => c.Grouping));
+            items.Add(new GroupingRow(grouping));
+            LadderInfo.Groupings.Add(grouping);
         }
 
         public class GroupingRow : CompositeDrawable
         {
             public readonly TournamentGrouping Grouping;
 
-            public GroupingRow(TournamentGrouping grouping, Action onDelete)
+            [Resolved]
+            private LadderInfo ladderInfo { get; set; }
+
+            public GroupingRow(TournamentGrouping grouping)
             {
                 Margin = new MarginPadding(10);
 
@@ -152,7 +143,7 @@ namespace osu.Game.Tournament.Screens.Groupings
                         Action = () =>
                         {
                             Expire();
-                            onDelete();
+                            ladderInfo.Groupings.Remove(Grouping);
                         },
                     }
                 };
