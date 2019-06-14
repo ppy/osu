@@ -19,6 +19,7 @@ using osu.Game.Tournament.Screens.MapPool;
 using osu.Game.Tournament.Screens.Schedule;
 using osu.Game.Tournament.Screens.Showcase;
 using osu.Game.Tournament.Screens.TeamIntro;
+using osu.Game.Tournament.Screens.Teams;
 using osu.Game.Tournament.Screens.TeamWin;
 using osuTK;
 using osuTK.Graphics;
@@ -72,6 +73,7 @@ namespace osu.Game.Tournament.Screens
                                 new ScheduleScreen(),
                                 new LadderScreen(),
                                 new LadderEditorScreen(),
+                                new TeamsEditorScreen(),
                                 new GroupingsEditorScreen(),
                                 new ShowcaseScreen(),
                                 new MapPoolScreen(),
@@ -105,8 +107,9 @@ namespace osu.Game.Tournament.Screens
                             Direction = FillDirection.Vertical,
                             Children = new Drawable[]
                             {
-                                new OsuButton { RelativeSizeAxes = Axes.X, Text = "Bracket Editor", Action = () => SetScreen(typeof(LadderEditorScreen)) },
+                                new OsuButton { RelativeSizeAxes = Axes.X, Text = "Team Editor", Action = () => SetScreen(typeof(TeamsEditorScreen)) },
                                 new OsuButton { RelativeSizeAxes = Axes.X, Text = "Groupings Editor", Action = () => SetScreen(typeof(GroupingsEditorScreen)) },
+                                new OsuButton { RelativeSizeAxes = Axes.X, Text = "Bracket Editor", Action = () => SetScreen(typeof(LadderEditorScreen)) },
                                 new Container { RelativeSizeAxes = Axes.X, Height = 50 },
                                 new OsuButton { RelativeSizeAxes = Axes.X, Text = "Drawings", Action = () => SetScreen(typeof(DrawingsScreen)) },
                                 new OsuButton { RelativeSizeAxes = Axes.X, Text = "Showcase", Action = () => SetScreen(typeof(ShowcaseScreen)) },
