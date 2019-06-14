@@ -6,6 +6,7 @@ using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
+using osu.Framework.Audio.Track;
 using osu.Framework.MathUtils;
 using osu.Framework.Timing;
 using osu.Game.Beatmaps;
@@ -31,8 +32,14 @@ namespace osu.Game.Tests.Visual.Gameplay
         {
         }
 
+        private Track track;
+
         protected override WorkingBeatmap CreateWorkingBeatmap(IBeatmap beatmap)
-            => new ClockBackedTestWorkingBeatmap(beatmap, new FramedClock(new ManualClock { Rate = 1 }), audioManager);
+        {
+            var working = new ClockBackedTestWorkingBeatmap(beatmap, new FramedClock(new ManualClock { Rate = 1 }), audioManager);
+            track = working.Track;
+            return working;
+        }
 
         [Test]
         public void TestNotJudgementsOnRewind()
@@ -47,7 +54,7 @@ namespace osu.Game.Tests.Visual.Gameplay
 
         private void addSeekStep(double time)
         {
-            AddStep($"seek to {time}", () => player.GameplayClockContainer.Seek(time));
+            AddStep($"seek to {time}", () => track.Seek(time));
 
             // Allow a few frames of lenience
             AddUntilStep("wait for seek to finish", () => Precision.AlmostEquals(time, player.DrawableRuleset.FrameStableClock.CurrentTime, 100));
