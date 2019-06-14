@@ -32,13 +32,15 @@ namespace osu.Game.Tournament.Screens.Gameplay
         private readonly Color4 red = new Color4(186, 0, 18, 255);
         private readonly Color4 blue = new Color4(17, 136, 170, 255);
 
-        [Resolved]
+        [Resolved(canBeNull: true)]
         private TournamentSceneManager sceneManager { get; set; }
 
+        [Resolved]
+        private MatchChatDisplay chat { get; set; }
+
         [BackgroundDependencyLoader]
-        private void load(LadderInfo ladder, MatchIPCInfo ipc, MatchChatDisplay chat)
+        private void load(LadderInfo ladder, MatchIPCInfo ipc)
         {
-            this.chat = chat;
             this.ipc = ipc;
 
             AddRangeInternal(new Drawable[]
@@ -132,7 +134,6 @@ namespace osu.Game.Tournament.Screens.Gameplay
         }
 
         private ScheduledDelegate scheduledOperation;
-        private MatchChatDisplay chat;
         private MatchScoreDisplay scoreDisplay;
 
         private TourneyState lastState;
@@ -155,7 +156,7 @@ namespace osu.Game.Tournament.Screens.Gameplay
 
                 void expand()
                 {
-                    chat.Expand();
+                    chat?.Expand();
 
                     using (BeginDelayedSequence(300, true))
                     {
@@ -168,8 +169,8 @@ namespace osu.Game.Tournament.Screens.Gameplay
                 {
                     SongBar.Expanded = false;
                     scoreDisplay.FadeOut(100);
-                    using (chat.BeginDelayedSequence(500))
-                        chat.Contract();
+                    using (chat?.BeginDelayedSequence(500))
+                        chat?.Contract();
                 }
 
                 switch (state.NewValue)
