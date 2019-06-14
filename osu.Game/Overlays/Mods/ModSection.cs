@@ -55,15 +55,15 @@ namespace osu.Game.Overlays.Mods
 
                 if (expanded)
                 {
-                    this.AutoSizeAxes = Axes.Y;
-                    this.headerLabel.FadeIn(200);
+                    AutoSizeAxes = Axes.Y;
+                    headerLabel.FadeIn(200);
                     Show();
                 }
                 else
                 {
-                    this.AutoSizeAxes = Axes.None;
-                    this.headerLabel.FadeOut(200);
-                    this.ResizeHeightTo(0, 200, Easing.OutQuint).OnComplete((c) => Hide());
+                    AutoSizeAxes = Axes.None;
+                    headerLabel.FadeOut(200);
+                    this.ResizeHeightTo(0, 200, Easing.OutQuint).OnComplete(c => Hide());
                 }
             }
         }
