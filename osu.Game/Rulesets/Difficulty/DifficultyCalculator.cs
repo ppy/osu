@@ -93,9 +93,7 @@ namespace osu.Game.Rulesets.Difficulty
                     s.Process(h);
             }
 
-            // The peak strain will not be saved for the last section in the above loop
-            foreach (Skill s in skills)
-                s.SaveCurrentPeak();
+            // The peak strain is not saved for the last section in stable (bug compatibility)
 
             return CreateDifficultyAttributes(beatmap, mods, skills, clockRate);
         }
