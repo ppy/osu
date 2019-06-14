@@ -28,6 +28,9 @@ namespace osu.Game.Tournament.Screens.MapPool
 
         private readonly Bindable<MatchPairing> currentMatch = new Bindable<MatchPairing>();
 
+        [Resolved(canBeNull: true)]
+        private TournamentSceneManager sceneManager { get; set; }
+
         private TeamColour pickColour;
         private ChoiceType pickType;
 
@@ -168,9 +171,6 @@ namespace osu.Game.Tournament.Screens.MapPool
             currentMatch.Value.PicksBans.Clear();
             setNextMode();
         }
-
-        [Resolved]
-        private TournamentSceneManager sceneManager { get; set; }
 
         private ScheduledDelegate scheduledChange;
 
