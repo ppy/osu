@@ -71,6 +71,7 @@ namespace osu.Game.Tournament
                 Text = "Save Changes",
                 Width = 140,
                 Height = 50,
+                Depth = float.MinValue,
                 Anchor = Anchor.BottomRight,
                 Origin = Anchor.BottomRight,
                 Padding = new MarginPadding(10),
