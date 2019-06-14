@@ -104,9 +104,10 @@ namespace osu.Game.Tournament.Screens.MapPool
 
         private void beatmapChanged(ValueChangedEvent<BeatmapInfo> beatmap)
         {
-            if (currentMatch.Value.PicksBans.Count(p => p.Type == ChoiceType.Ban) < 2)
+            if (currentMatch.Value == null || currentMatch.Value.PicksBans.Count(p => p.Type == ChoiceType.Ban) < 2)
                 return;
 
+            // if bans have already been placed, beatmap changes result in a selection being made autoamtically
             if (beatmap.NewValue.OnlineBeatmapID != null)
                 addForBeatmap(beatmap.NewValue.OnlineBeatmapID.Value);
         }
