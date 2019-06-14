@@ -51,9 +51,9 @@ namespace osu.Game.Overlays.Mods
                 ButtonsContainer.Children = modContainers;
                 buttons = modContainers.OfType<ModButton>().ToArray();
 
-                var expanded = value.Any();
+                var expand = value.Any();
 
-                if (expanded)
+                if (expand)
                 {
                     AutoSizeAxes = Axes.Y;
                     headerLabel.FadeIn(200);
