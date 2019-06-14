@@ -14,7 +14,7 @@ using osuTK;
 
 namespace osu.Game.Tournament.Tests
 {
-    public class TestCaseMatchChatDisplay : OsuTestScene
+    public class TestSceneMatchChatDisplay : OsuTestScene
     {
         private readonly Channel testChannel = new Channel();
 
@@ -43,7 +43,7 @@ namespace osu.Game.Tournament.Tests
         [Cached]
         private MatchIPCInfo matchInfo = new MatchIPCInfo(); // hide parent
 
-        public TestCaseMatchChatDisplay()
+        public TestSceneMatchChatDisplay()
         {
             MatchChatDisplay chatDisplay;
 

@@ -4,22 +4,21 @@
 using System;
 using System.Collections.Generic;
 using osu.Framework.Allocation;
-using osu.Game.Tests.Visual;
-using osu.Game.Tournament.Screens.Schedule;
+using osu.Game.Tournament.Screens.MapPool;
 
 namespace osu.Game.Tournament.Tests
 {
-    public class TestCaseSchedule : OsuTestScene
+    public class TestSceneMapPool : LadderTestScene
     {
         public override IReadOnlyList<Type> RequiredTypes => new[]
         {
-            typeof(ScheduleScreen)
+            typeof(MapPoolScreen)
         };
 
         [BackgroundDependencyLoader]
         private void load()
         {
-            Add(new ScheduleScreen());
+            Add(new MapPoolScreen { Width = 0.7f });
         }
     }
 }

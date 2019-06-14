@@ -6,11 +6,11 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Game.Tournament.Screens.Ladder.Components;
-using osu.Game.Tournament.Screens.TeamWin;
+using osu.Game.Tournament.Screens.TeamIntro;
 
 namespace osu.Game.Tournament.Tests
 {
-    public class TestCaseTeamWin : LadderTestCase
+    public class TestSceneTeamIntro : LadderTestScene
     {
         [Cached]
         private readonly Bindable<MatchPairing> currentMatch = new Bindable<MatchPairing>();
@@ -24,7 +24,7 @@ namespace osu.Game.Tournament.Tests
             pairing.Grouping.Value = Ladder.Groupings.FirstOrDefault(g => g.Name.Value == "Finals");
             currentMatch.Value = pairing;
 
-            Add(new TeamWinScreen
+            Add(new TeamIntroScreen
             {
                 FillMode = FillMode.Fit,
                 FillAspectRatio = 16 / 9f

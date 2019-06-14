@@ -8,7 +8,7 @@ using osu.Game.Tournament.Screens.Ladder;
 
 namespace osu.Game.Tournament.Tests
 {
-    public class TestCaseLadderManager : LadderTestCase
+    public class TestSceneLadderManager : LadderTestScene
     {
         [BackgroundDependencyLoader]
         private void load()

@@ -5,9 +5,9 @@ using osu.Game.Tournament.Screens.Groupings;
 
 namespace osu.Game.Tournament.Tests
 {
-    public class TestCaseGroupingsEditorScreen : LadderTestCase
+    public class TestSceneGroupingsEditorScreen : LadderTestScene
     {
-        public TestCaseGroupingsEditorScreen()
+        public TestSceneGroupingsEditorScreen()
         {
             Add(new GroupingsEditorScreen());
         }
