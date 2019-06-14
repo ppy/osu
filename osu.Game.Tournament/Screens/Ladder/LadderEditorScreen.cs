@@ -24,6 +24,8 @@ namespace osu.Game.Tournament.Screens.Ladder
         [Cached]
         private LadderEditorInfo editorInfo = new LadderEditorInfo();
 
+        protected override bool DrawLoserPaths => true;
+
         [BackgroundDependencyLoader]
         private void load()
         {
@@ -35,32 +37,9 @@ namespace osu.Game.Tournament.Screens.Ladder
             });
         }
 
-        private void updateInfo()
-        {
-            LadderInfo.Pairings = PairingsContainer.Select(p => p.Pairing).ToList();
-            foreach (var g in LadderInfo.Groupings)
-                g.Pairings = LadderInfo.Pairings.Where(p => p.Grouping.Value == g).Select(p => p.ID).ToList();
-
-            LadderInfo.Progressions = LadderInfo.Pairings.Where(p => p.Progression.Value != null).Select(p => new TournamentProgression(p.ID, p.Progression.Value.ID)).Concat(
-                                                    LadderInfo.Pairings.Where(p => p.LosersProgression.Value != null).Select(p => new TournamentProgression(p.ID, p.LosersProgression.Value.ID, true)))
-                                                .ToList();
-        }
-
-        protected override void AddPairing(MatchPairing pairing)
-        {
-            base.AddPairing(pairing);
-            updateInfo();
-        }
-
-        protected override void UpdateLayout()
-        {
-            base.UpdateLayout();
-            updateInfo();
-        }
-
         public void BeginJoin(MatchPairing pairing, bool losers)
         {
-            ScrollContent.Add(new JoinVisualiser(PairingsContainer, pairing, losers, updateInfo));
+            ScrollContent.Add(new JoinVisualiser(PairingsContainer, pairing, losers, UpdateLayout));
         }
 
         public MenuItem[] ContextMenuItems
@@ -75,7 +54,7 @@ namespace osu.Game.Tournament.Screens.Ladder
                     new OsuMenuItem("Create new match", MenuItemType.Highlighted, () =>
                     {
                         var pos = PairingsContainer.ToLocalSpace(GetContainingInputManager().CurrentState.Mouse.Position);
-                        AddPairing(new MatchPairing { Position = { Value = new Point((int)pos.X, (int)pos.Y) } });
+                        LadderInfo.Pairings.Add(new MatchPairing { Position = { Value = new Point((int)pos.X, (int)pos.Y) } });
                     }),
                     new OsuMenuItem("Reset teams", MenuItemType.Destructive, () =>
                     {

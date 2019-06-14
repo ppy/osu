@@ -57,16 +57,33 @@ namespace osu.Game.Tournament.Screens.Ladder
                 }
             };
 
+            void addPairing(MatchPairing pairing) =>
+                PairingsContainer.Add(new DrawableMatchPairing(pairing, this is LadderEditorScreen)
+                {
+                    Changed = () => layout.Invalidate()
+                });
+
             foreach (var pairing in LadderInfo.Pairings)
-                AddPairing(pairing);
+                addPairing(pairing);
 
-            // todo: fix this
-            Scheduler.AddDelayed(() => layout.Invalidate(), 1000, true);
-        }
+            LadderInfo.Groupings.ItemsAdded += _ => layout.Invalidate();
+            LadderInfo.Groupings.ItemsRemoved += _ => layout.Invalidate();
 
-        protected virtual void AddPairing(MatchPairing pairing)
-        {
-            PairingsContainer.Add(new DrawableMatchPairing(pairing, this is LadderEditorScreen));
+            LadderInfo.Pairings.ItemsAdded += pairings =>
+            {
+                foreach (var p in pairings)
+                    addPairing(p);
+                layout.Invalidate();
+            };
+
+            LadderInfo.Pairings.ItemsRemoved += pairings =>
+            {
+                foreach (var p in pairings)
+                foreach (var d in PairingsContainer.Where(d => d.Pairing == p))
+                    d.Expire();
+
+                layout.Invalidate();
+            };
         }
 
         private Cached layout = new Cached();
@@ -81,6 +98,8 @@ namespace osu.Game.Tournament.Screens.Ladder
 
         private Color4 normalPathColour;
         private Color4 losersPathColour;
+
+        protected virtual bool DrawLoserPaths => false;
 
         protected virtual void UpdateLayout()
         {
@@ -102,6 +121,20 @@ namespace osu.Game.Tournament.Screens.Ladder
                         pairing.Pairing.Progression.Value = null;
                     else
                         paths.Add(new ProgressionPath(pairing, dest) { Colour = pairing.Pairing.Losers.Value ? losersPathColour : normalPathColour });
+                }
+
+                if (DrawLoserPaths)
+                {
+                    if (pairing.Pairing.LosersProgression.Value != null)
+                    {
+                        var dest = PairingsContainer.FirstOrDefault(p => p.Pairing == pairing.Pairing.LosersProgression.Value);
+
+                        if (dest == null)
+                            // clean up outdated progressions.
+                            pairing.Pairing.LosersProgression.Value = null;
+                        else
+                            paths.Add(new ProgressionPath(pairing, dest) { Colour = losersPathColour.Opacity(0.1f) });
+                    }
                 }
             }
 
