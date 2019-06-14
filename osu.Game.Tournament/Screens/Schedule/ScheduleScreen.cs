@@ -48,9 +48,9 @@ namespace osu.Game.Tournament.Screens.Schedule
             currentMatch.BindTo(ladder.CurrentMatch);
         }
 
-        private void matchChanged(ValueChangedEvent<MatchPairing> pairing)
+        private void matchChanged(ValueChangedEvent<MatchPairing> match)
         {
-            if (pairing.NewValue == null)
+            if (match.NewValue == null)
             {
                 mainContainer.Clear();
                 return;
@@ -110,14 +110,14 @@ namespace osu.Game.Tournament.Screens.Schedule
                             {
                                 Margin = new MarginPadding { Left = -10, Bottom = 10, Top = -5 },
                                 Spacing = new Vector2(10, 0),
-                                Text = currentMatch.Value.Grouping.Value.Name.Value,
+                                Text = match.NewValue.Grouping.Value?.Name.Value,
                                 Colour = Color4.Black,
                                 Font = OsuFont.GetFont(size: 20)
                             },
-                            new SchedulePairing(currentMatch.Value, false),
+                            new SchedulePairing(match.NewValue, false),
                             new OsuSpriteText
                             {
-                                Text = "Start Time " + pairing.NewValue.Date.Value.ToUniversalTime().ToString("HH:mm UTC"),
+                                Text = "Start Time " + match.NewValue.Date.Value.ToUniversalTime().ToString("HH:mm UTC"),
                                 Colour = Color4.Black,
                                 Font = OsuFont.GetFont(size: 20)
                             },
