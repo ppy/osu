@@ -13,7 +13,7 @@ namespace osu.Game.Tournament
     {
         public List<MatchPairing> Pairings = new List<MatchPairing>();
         public List<TournamentProgression> Progressions = new List<TournamentProgression>();
-        public List<TournamentGrouping> Groupings = new List<TournamentGrouping>();
+        public BindableList<TournamentGrouping> Groupings = new BindableList<TournamentGrouping>();
         public List<TournamentTeam> Teams = new List<TournamentTeam>();
 
         [JsonIgnore]

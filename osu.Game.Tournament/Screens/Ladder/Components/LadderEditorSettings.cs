@@ -39,8 +39,6 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
         {
             var teamEntries = ladderInfo.Teams;
 
-            var groupingOptions = ladderInfo.Groupings.Prepend(new TournamentGrouping());
-
             Children = new Drawable[]
             {
                 new Container
@@ -77,8 +75,7 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
                 textboxTeam2 = new OsuTextBox { RelativeSizeAxes = Axes.X, Height = 20 },
                 groupingDropdown = new SettingsDropdown<TournamentGrouping>
                 {
-                    Bindable = new Bindable<TournamentGrouping> { Default = groupingOptions.First() },
-                    Items = groupingOptions
+                    Bindable = new Bindable<TournamentGrouping>(),
                 },
                 losersCheckbox = new PlayerCheckbox
                 {
@@ -90,6 +87,17 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
                     Bindable = new Bindable<DateTimeOffset>()
                 }
             };
+
+            var groupingOptions = ladderInfo.Groupings.Prepend(new TournamentGrouping());
+
+            void updateDropdownItems()
+            {
+                groupingOptions = ladderInfo.Groupings.Prepend(new TournamentGrouping());
+                groupingDropdown.Items = groupingOptions;
+            }
+
+            ladderInfo.Groupings.ItemsRemoved += _ => updateDropdownItems();
+            ladderInfo.Groupings.ItemsAdded += _ => updateDropdownItems();
 
             editorInfo.Selected.ValueChanged += selection =>
             {
