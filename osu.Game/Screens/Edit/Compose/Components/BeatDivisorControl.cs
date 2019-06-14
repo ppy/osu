@@ -171,7 +171,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
                 // Small offset to look a bit better centered along with the divisor text
                 Y = 1;
 
-                ButtonSize = new Vector2(20);
+                Size = new Vector2(20);
                 IconScale = new Vector2(0.6f);
             }
 

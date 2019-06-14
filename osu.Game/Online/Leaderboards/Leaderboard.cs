@@ -23,7 +23,7 @@ namespace osu.Game.Online.Leaderboards
     {
         private const double fade_duration = 300;
 
-        private readonly ScrollContainer scrollContainer;
+        private readonly OsuScrollContainer scrollContainer;
         private readonly Container placeholderContainer;
 
         private FillFlowContainer<LeaderboardScore> scrollFlow;

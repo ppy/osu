@@ -30,6 +30,9 @@ namespace osu.Game.Users
         private const float content_padding = 10;
         private const float status_height = 30;
 
+        [Resolved(canBeNull: true)]
+        private OsuColour colours { get; set; }
+
         private Container statusBar;
         private Box statusBg;
         private OsuSpriteText statusMessage;
@@ -38,6 +41,8 @@ namespace osu.Game.Users
         protected override Container<Drawable> Content => content;
 
         public readonly Bindable<UserStatus> Status = new Bindable<UserStatus>();
+
+        public readonly IBindable<UserActivity> Activity = new Bindable<UserActivity>();
 
         public new Action Action;
 
@@ -54,14 +59,12 @@ namespace osu.Game.Users
         }
 
         [BackgroundDependencyLoader(permitNulls: true)]
-        private void load(OsuColour colours, UserProfileOverlay profile)
+        private void load(UserProfileOverlay profile)
         {
             if (colours == null)
                 throw new ArgumentNullException(nameof(colours));
 
             FillFlowContainer infoContainer;
-
-            UserCoverBackground coverBackground;
 
             AddInternal(content = new Container
             {
@@ -77,13 +80,16 @@ namespace osu.Game.Users
 
                 Children = new Drawable[]
                 {
-                    new DelayedLoadWrapper(coverBackground = new UserCoverBackground
+                    new DelayedLoadUnloadWrapper(() => new UserCoverBackground
                     {
                         RelativeSizeAxes = Axes.Both,
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
                         User = user,
-                    }, 300) { RelativeSizeAxes = Axes.Both },
+                    }, 300, 5000)
+                    {
+                        RelativeSizeAxes = Axes.Both,
+                    },
                     new Box
                     {
                         RelativeSizeAxes = Axes.Both,
@@ -184,8 +190,6 @@ namespace osu.Game.Users
                 }
             });
 
-            coverBackground.OnLoadComplete += d => d.FadeInFromZero(400, Easing.Out);
-
             if (user.IsSupporter)
             {
                 infoContainer.Add(new SupporterIcon
@@ -195,8 +199,8 @@ namespace osu.Game.Users
                 });
             }
 
-            Status.ValueChanged += status => displayStatus(status.NewValue);
-            Status.ValueChanged += status => statusBg.FadeColour(status.NewValue?.GetAppropriateColour(colours) ?? colours.Gray5, 500, Easing.OutQuint);
+            Status.ValueChanged += status => displayStatus(status.NewValue, Activity.Value);
+            Activity.ValueChanged += activity => displayStatus(Status.Value, activity.NewValue);
 
             base.Action = ViewProfile = () =>
             {
@@ -211,7 +215,7 @@ namespace osu.Game.Users
             Status.TriggerChange();
         }
 
-        private void displayStatus(UserStatus status)
+        private void displayStatus(UserStatus status, UserActivity activity = null)
         {
             const float transition_duration = 500;
 
@@ -226,8 +230,17 @@ namespace osu.Game.Users
                 statusBar.ResizeHeightTo(status_height, transition_duration, Easing.OutQuint);
                 statusBar.FadeIn(transition_duration, Easing.OutQuint);
                 this.ResizeHeightTo(height, transition_duration, Easing.OutQuint);
+            }
 
-                statusMessage.Text = status.Message;
+            if (status is UserStatusOnline && activity != null)
+            {
+                statusMessage.Text = activity.Status;
+                statusBg.FadeColour(activity.GetAppropriateColour(colours), 500, Easing.OutQuint);
+            }
+            else
+            {
+                statusMessage.Text = status?.Message;
+                statusBg.FadeColour(status?.GetAppropriateColour(colours) ?? colours.Gray5, 500, Easing.OutQuint);
             }
         }
 

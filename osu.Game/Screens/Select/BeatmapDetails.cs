@@ -30,7 +30,7 @@ namespace osu.Game.Screens.Select
         private readonly AdvancedStats advanced;
         private readonly DetailBox ratingsContainer;
         private readonly UserRatings ratings;
-        private readonly ScrollContainer metadataScroll;
+        private readonly OsuScrollContainer metadataScroll;
         private readonly MetadataSection description, source, tags;
         private readonly Container failRetryContainer;
         private readonly FailRetryGraph failRetryGraph;
@@ -107,7 +107,7 @@ namespace osu.Game.Screens.Select
                                         },
                                     },
                                 },
-                                metadataScroll = new ScrollContainer
+                                metadataScroll = new OsuScrollContainer
                                 {
                                     RelativeSizeAxes = Axes.X,
                                     Width = 0.5f,
@@ -360,13 +360,13 @@ namespace osu.Game.Screens.Select
             protected override void PopIn()
             {
                 this.FadeIn(transition_duration, Easing.OutQuint);
-                loading.State = Visibility.Visible;
+                loading.Show();
             }
 
             protected override void PopOut()
             {
                 this.FadeOut(transition_duration, Easing.OutQuint);
-                loading.State = Visibility.Hidden;
+                loading.Hide();
             }
         }
     }
