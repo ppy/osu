@@ -3,7 +3,7 @@
 
 using osu.Framework.Testing;
 using osu.Game.Graphics;
-using osu.Game.Screens.Backgrounds;
+using osu.Game.Graphics.Backgrounds;
 
 namespace osu.Game.Tournament.Tests
 {
@@ -13,7 +13,7 @@ namespace osu.Game.Tournament.Tests
         {
             base.LoadComplete();
 
-            LoadComponentAsync(new BackgroundScreenDefault
+            LoadComponentAsync(new Background("Menu/menu-background-0")
             {
                 Colour = OsuColour.Gray(0.5f),
                 Depth = 10
