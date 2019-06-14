@@ -42,7 +42,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         }
 
         [Test]
-        public void TestNotJudgementsOnRewind()
+        public void TestNoJudgementsOnRewind()
         {
             addSeekStep(3000);
             AddAssert("all judged", () => player.DrawableRuleset.Playfield.AllHitObjects.All(h => h.Judged));
