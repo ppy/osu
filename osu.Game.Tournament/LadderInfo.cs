@@ -11,10 +11,12 @@ namespace osu.Game.Tournament
 {
     public class LadderInfo
     {
-        public List<MatchPairing> Pairings = new List<MatchPairing>();
-        public List<TournamentProgression> Progressions = new List<TournamentProgression>();
+        public BindableList<MatchPairing> Pairings = new BindableList<MatchPairing>();
         public BindableList<TournamentGrouping> Groupings = new BindableList<TournamentGrouping>();
-        public List<TournamentTeam> Teams = new List<TournamentTeam>();
+        public BindableList<TournamentTeam> Teams = new BindableList<TournamentTeam>();
+
+        // only used for serialisation
+        public List<TournamentProgression> Progressions = new List<TournamentProgression>();
 
         [JsonIgnore]
         public Bindable<MatchPairing> CurrentMatch = new Bindable<MatchPairing>();

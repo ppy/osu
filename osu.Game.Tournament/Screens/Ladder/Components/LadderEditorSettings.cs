@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -88,7 +89,7 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
                 }
             };
 
-            var groupingOptions = ladderInfo.Groupings.Prepend(new TournamentGrouping());
+            IEnumerable<TournamentGrouping> groupingOptions = null;
 
             void updateDropdownItems()
             {
@@ -98,6 +99,8 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
 
             ladderInfo.Groupings.ItemsRemoved += _ => updateDropdownItems();
             ladderInfo.Groupings.ItemsAdded += _ => updateDropdownItems();
+
+            updateDropdownItems();
 
             editorInfo.Selected.ValueChanged += selection =>
             {

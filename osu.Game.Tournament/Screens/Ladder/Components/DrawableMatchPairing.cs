@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
+using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -73,24 +75,54 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
                 }
             };
 
-            pairing.Team1.BindValueChanged(_ => updateTeams());
-            pairing.Team2.BindValueChanged(_ => updateTeams());
-            pairing.Team1Score.BindValueChanged(_ => updateWinConditions());
-            pairing.Team2Score.BindValueChanged(_ => updateWinConditions());
-            pairing.Grouping.BindValueChanged(_ => updateWinConditions());
-            pairing.Completed.BindValueChanged(_ => updateProgression());
-            pairing.Progression.BindValueChanged(_ => updateProgression());
-            pairing.LosersProgression.BindValueChanged(_ => updateProgression());
-            pairing.Losers.BindValueChanged(_ => updateTeams());
-            pairing.Current.BindValueChanged(_ => updateCurrentMatch(), true);
-            pairing.Position.BindValueChanged(pos =>
+            boundReference(pairing.Team1).BindValueChanged(_ => updateTeams());
+            boundReference(pairing.Team2).BindValueChanged(_ => updateTeams());
+            boundReference(pairing.Team1Score).BindValueChanged(_ => updateWinConditions());
+            boundReference(pairing.Team2Score).BindValueChanged(_ => updateWinConditions());
+            boundReference(pairing.Grouping).BindValueChanged(_ =>
             {
-                if (IsDragged) return;
-
-                Position = new Vector2(pos.NewValue.X, pos.NewValue.Y);
+                updateWinConditions();
+                Changed?.Invoke();
+            });
+            boundReference(pairing.Completed).BindValueChanged(_ => updateProgression());
+            boundReference(pairing.Progression).BindValueChanged(_ => updateProgression());
+            boundReference(pairing.LosersProgression).BindValueChanged(_ => updateProgression());
+            boundReference(pairing.Losers).BindValueChanged(_ =>
+            {
+                updateTeams();
+                Changed?.Invoke();
+            });
+            boundReference(pairing.Current).BindValueChanged(_ => updateCurrentMatch(), true);
+            boundReference(pairing.Position).BindValueChanged(pos =>
+            {
+                if (!IsDragged)
+                    Position = new Vector2(pos.NewValue.X, pos.NewValue.Y);
+                Changed?.Invoke();
             }, true);
 
             updateTeams();
+        }
+
+        /// <summary>
+        /// Fired when somethign changed that requires a ladder redraw.
+        /// </summary>
+        public Action Changed;
+
+        private readonly List<IUnbindable> refBindables = new List<IUnbindable>();
+
+        private T boundReference<T>(T obj)
+            where T : IBindable
+        {
+            obj = (T)obj.GetBoundCopy();
+            refBindables.Add(obj);
+            return obj;
+        }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+            foreach (var b in refBindables)
+                b.UnbindAll();
         }
 
         private void updateCurrentMatch()
@@ -149,6 +181,8 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
                 transferProgression(Pairing.Progression?.Value, Pairing.Winner);
                 transferProgression(Pairing.LosersProgression?.Value, Pairing.Loser);
             }
+
+            Changed?.Invoke();
         }
 
         private void transferProgression(MatchPairing destination, TournamentTeam team)
@@ -273,7 +307,7 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
             Pairing.Progression.Value = null;
             Pairing.LosersProgression.Value = null;
 
-            Expire();
+            ladderInfo.Pairings.Remove(Pairing);
         }
     }
 }

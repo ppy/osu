@@ -21,6 +21,7 @@ using osu.Game.Online.API.Requests;
 using osu.Game.Rulesets;
 using osu.Game.Tournament.Components;
 using osu.Game.Tournament.IPC;
+using osu.Game.Tournament.Screens.Ladder.Components;
 using osuTK.Input;
 
 namespace osu.Game.Tournament
@@ -244,6 +245,13 @@ namespace osu.Game.Tournament
 
         protected virtual void SaveChanges()
         {
+            foreach (var g in ladder.Groupings)
+                g.Pairings = ladder.Pairings.Where(p => p.Grouping.Value == g).Select(p => p.ID).ToList();
+
+            ladder.Progressions = ladder.Pairings.Where(p => p.Progression.Value != null).Select(p => new TournamentProgression(p.ID, p.Progression.Value.ID)).Concat(
+                                            ladder.Pairings.Where(p => p.LosersProgression.Value != null).Select(p => new TournamentProgression(p.ID, p.LosersProgression.Value.ID, true)))
+                                        .ToList();
+
             using (var stream = storage.GetStream(bracket_filename, FileAccess.Write, FileMode.Create))
             using (var sw = new StreamWriter(stream))
             {
