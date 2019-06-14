@@ -223,7 +223,9 @@ namespace osu.Game.Tournament
 
         protected override void LoadComplete()
         {
+            MenuCursorContainer.Cursor.AlwaysPresent = true; // required for tooltip display
             MenuCursorContainer.Cursor.Alpha = 0;
+
             base.LoadComplete();
         }
 
