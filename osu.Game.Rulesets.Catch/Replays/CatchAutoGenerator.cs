@@ -46,8 +46,8 @@ namespace osu.Game.Rulesets.Catch.Replays
                 //So we can either make it there without a dash or not.
                 double speedRequired = positionChange == 0 ? 0 : positionChange / timeAvailable;
 
-                bool dashRequired = speedRequired > movement_speed && h.StartTime != 0;
-                bool impossibleJump = speedRequired > movement_speed * 2 && h.StartTime != 0;
+                bool dashRequired = speedRequired > movement_speed;
+                bool impossibleJump = speedRequired > movement_speed * 2;
 
                 // todo: get correct catcher size, based on difficulty CS.
                 const float catcher_width_half = CatcherArea.CATCHER_SIZE / CatchPlayfield.BASE_WIDTH * 0.3f * 0.5f;
