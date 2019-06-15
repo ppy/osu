@@ -187,17 +187,24 @@ namespace osu.Game.Screens.Select
             // metrics may have been previously fetched
             if (Beatmap?.BeatmapSet?.Metrics != null && Beatmap?.Metrics != null)
             {
-                updateMetrics(Beatmap.BeatmapSet.Metrics, Beatmap.Metrics);
+                updateMetrics();
                 return;
             }
 
-            // metrics may not be fetched but can be
-            if (Beatmap?.OnlineBeatmapID != null)
+            // for now, let's early abort if an OnlineBeatmapID is not present (should have been populated at import time).
+            if (Beatmap?.OnlineBeatmapID == null)
             {
-                var requestedBeatmap = Beatmap;
+                updateMetrics();
+                return;
+            }
 
-                var lookup = new GetBeatmapRequest(requestedBeatmap);
-                lookup.Success += res =>
+            var requestedBeatmap = Beatmap;
+
+            var lookup = new GetBeatmapRequest(requestedBeatmap);
+
+            lookup.Success += res =>
+            {
+                Schedule(() =>
                 {
                     if (beatmap != requestedBeatmap)
                         //the beatmap has been changed since we started the lookup.
@@ -212,27 +219,34 @@ namespace osu.Game.Screens.Select
 
                     requestedBeatmap.Metrics = b.Metrics;
 
-                    Schedule(() => updateMetrics(b.BeatmapSet.Metrics, b.Metrics));
-                };
+                    updateMetrics();
+                });
+            };
 
-                lookup.Failure += e => Schedule(() => updateMetrics(Beatmap?.BeatmapSet?.Metrics, Beatmap?.Metrics));
+            lookup.Failure += e =>
+            {
+                Schedule(() =>
+                {
+                    if (beatmap != requestedBeatmap)
+                        //the beatmap has been changed since we started the lookup.
+                        return;
 
-                api.Queue(lookup);
-                loading.Show();
-                return;
-            }
+                    updateMetrics();
+                });
+            };
 
-            updateMetrics(Beatmap?.BeatmapSet?.Metrics, Beatmap?.Metrics);
+            api.Queue(lookup);
+            loading.Show();
         }
 
-        private void updateMetrics(BeatmapSetMetrics setMetrics, BeatmapMetrics beatmapMetrics)
+        private void updateMetrics()
         {
-            var hasRatings = setMetrics?.Ratings?.Any() ?? false;
-            var hasRetriesFails = (beatmapMetrics?.Retries?.Any() ?? false) && (beatmapMetrics.Fails?.Any() ?? false);
+            var hasRatings = beatmap?.BeatmapSet?.Metrics?.Ratings?.Any() ?? false;
+            var hasRetriesFails = (beatmap?.Metrics?.Retries?.Any() ?? false) && (beatmap?.Metrics.Fails?.Any() ?? false);
 
             if (hasRatings)
             {
-                ratings.Metrics = setMetrics;
+                ratings.Metrics = beatmap.BeatmapSet.Metrics;
                 ratingsContainer.FadeIn(transition_duration);
             }
             else
@@ -243,7 +257,7 @@ namespace osu.Game.Screens.Select
 
             if (hasRetriesFails)
             {
-                failRetryGraph.Metrics = beatmapMetrics;
+                failRetryGraph.Metrics = beatmap.Metrics;
                 failRetryContainer.FadeIn(transition_duration);
             }
             else
