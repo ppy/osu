@@ -19,6 +19,7 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays;
+using osu.Game.Rulesets;
 using osuTK;
 using osuTK.Graphics;
 
@@ -26,6 +27,7 @@ namespace osu.Game.Screens.Select.Carousel
 {
     public class DrawableCarouselBeatmapSet : DrawableCarouselItem, IHasContextMenu
     {
+        private RulesetStore rulesets;
         private Action<BeatmapSetInfo> restoreHiddenRequested;
         private Action<int> viewDetails;
 
@@ -39,8 +41,10 @@ namespace osu.Game.Screens.Select.Carousel
         }
 
         [BackgroundDependencyLoader(true)]
-        private void load(BeatmapManager manager, BeatmapSetOverlay beatmapOverlay, DialogOverlay overlay)
+        private void load(BeatmapManager manager, BeatmapSetOverlay beatmapOverlay, DialogOverlay overlay, RulesetStore rulesets)
         {
+            this.rulesets = rulesets;
+
             restoreHiddenRequested = s => s.Beatmaps.ForEach(manager.Restore);
             dialogOverlay = overlay;
             if (beatmapOverlay != null)
@@ -95,16 +99,37 @@ namespace osu.Game.Screens.Select.Carousel
                                     TextPadding = new MarginPadding { Horizontal = 8, Vertical = 2 },
                                     Status = beatmapSet.Status
                                 },
-                                new FillFlowContainer<FilterableDifficultyIcon>
+                                new FillFlowContainer
                                 {
                                     AutoSizeAxes = Axes.Both,
-                                    Children = ((CarouselBeatmapSet)Item).Beatmaps.Select(b => new FilterableDifficultyIcon(b)).ToList()
+                                    Children = getDifficulties(),
                                 },
                             }
                         }
                     }
                 }
             };
+        }
+
+        private const int maximum_difficulty_icons = 18;
+
+        private List<Drawable> getDifficulties()
+        {
+            var beatmaps = ((CarouselBeatmapSet)Item).Beatmaps.ToList();
+            var drawables = new List<Drawable>();
+
+            if (beatmaps.Count > maximum_difficulty_icons)
+            {
+                foreach (var ruleset in rulesets.AvailableRulesets.OrderBy(r => r.ID))
+                {
+                    List <CarouselBeatmap> list;
+                    if ((list = beatmaps.FindAll(b => b.Beatmap.Ruleset.ID == ruleset.ID)).Any())
+                        drawables.Add(new FilterableDifficultyIconWithCounter(ruleset, list));
+                }
+            }
+            else beatmaps.ForEach(b => drawables.Add(new FilterableDifficultyIcon(b)));
+
+            return drawables;
         }
 
         public MenuItem[] ContextMenuItems
@@ -195,6 +220,29 @@ namespace osu.Game.Screens.Select.Carousel
                 filtered.BindTo(item.Filtered);
                 filtered.ValueChanged += isFiltered => Schedule(() => this.FadeTo(isFiltered.NewValue ? 0.1f : 1, 100));
                 filtered.TriggerChange();
+            }
+        }
+
+        public class FilterableDifficultyIconWithCounter : DifficultyIconWithCounter
+        {
+            private readonly List<CarouselBeatmap> beatmaps;
+
+            public FilterableDifficultyIconWithCounter(RulesetInfo ruleset, List<CarouselBeatmap> beatmaps)
+                : base(ruleset, beatmaps.Select(b => b.Beatmap).ToList(), Color4.White) => this.beatmaps = beatmaps;
+
+            [BackgroundDependencyLoader]
+            private void load()
+            {
+                beatmaps.ForEach(b => b.Filtered.ValueChanged += _ => updateCounter());
+                updateCounter(); // Trigger change
+            }
+
+            private void updateCounter()
+            {
+                var filteredList = beatmaps.FindAll(b => !b.Filtered.Value);
+
+                this.FadeTo(filteredList.Any() ? 1 : 0.1f, 100);
+                Beatmaps = (filteredList.Any() ? filteredList.Select(b => b.Beatmap).ToList() : beatmaps.Select(b => b.Beatmap).ToList());
             }
         }
     }
