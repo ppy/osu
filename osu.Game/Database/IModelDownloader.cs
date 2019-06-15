@@ -23,7 +23,6 @@ namespace osu.Game.Database
         /// </summary>
         event Action<ArchiveDownloadRequest<TModel>> DownloadFailed;
 
-
         /// <summary>
         /// Checks whether a given <see cref="TModel"/> is already available in the local store.
         /// </summary>
