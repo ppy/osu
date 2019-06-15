@@ -28,33 +28,57 @@ namespace osu.Game.Beatmaps.Drawables
                 throw new ArgumentNullException(nameof(palette));
 
             this.palette = palette;
-            AccentColour = getColour(beatmap);
+            AccentColour = GetColour(beatmap);
         }
 
-        private Color4 getColour(BeatmapInfo beatmap)
+        private enum DifficultyRating
         {
-            switch (DifficultyRating.GetDifficultyType(beatmap))
+            Easy,
+            Normal,
+            Hard,
+            Insane,
+            Expert,
+            ExpertPlus
+        }
+
+        private DifficultyRating getDifficultyRating(BeatmapInfo beatmap)
+        {
+            if (beatmap == null)
+                throw new ArgumentNullException(nameof(beatmap));
+
+            var rating = beatmap.StarDifficulty;
+
+            if (rating < 2.0) return DifficultyRating.Easy;
+            if (rating < 2.7) return DifficultyRating.Normal;
+            if (rating < 4.0) return DifficultyRating.Hard;
+            if (rating < 5.3) return DifficultyRating.Insane;
+            if (rating < 6.5) return DifficultyRating.Expert;
+
+            return DifficultyRating.ExpertPlus;
+        }
+
+        protected Color4 GetColour(BeatmapInfo beatmap)
+        {
+            switch (getDifficultyRating(beatmap))
             {
-                case DifficultyType.Easy:
+                case DifficultyRating.Easy:
                     return palette.Green;
 
-                case DifficultyType.Normal:
+                default:
+                case DifficultyRating.Normal:
                     return palette.Blue;
 
-                case DifficultyType.Hard:
+                case DifficultyRating.Hard:
                     return palette.Yellow;
 
-                case DifficultyType.Insane:
+                case DifficultyRating.Insane:
                     return palette.Pink;
 
-                case DifficultyType.Expert:
+                case DifficultyRating.Expert:
                     return palette.Purple;
 
-                case DifficultyType.ExpertPlus:
+                case DifficultyRating.ExpertPlus:
                     return palette.Gray0;
-
-                default:
-                    return Color4.Black;
             }
         }
     }
