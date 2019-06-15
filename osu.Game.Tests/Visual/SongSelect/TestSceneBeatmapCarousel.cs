@@ -10,6 +10,7 @@ using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions;
 using osu.Framework.Graphics;
+using osu.Framework.MathUtils;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Rulesets;
@@ -516,7 +517,8 @@ namespace osu.Game.Tests.Visual.SongSelect
                     OnlineBeatmapID = b * 10,
                     Path = $"extra{b}.osu",
                     Version = $"Extra {b}",
-                    StarDifficulty = 2,
+                    Ruleset = rulesets.GetRuleset(b % 4),
+                    StarDifficulty = RNG.NextDouble(1, 10),
                     BaseDifficulty = new BeatmapDifficulty
                     {
                         OverallDifficulty = 3.5f,
