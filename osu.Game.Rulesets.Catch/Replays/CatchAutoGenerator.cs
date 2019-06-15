@@ -1,4 +1,4 @@
-﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
@@ -47,6 +47,7 @@ namespace osu.Game.Rulesets.Catch.Replays
                 double speedRequired = positionChange / timeAvailable;
 
                 bool dashRequired = speedRequired > movement_speed && h.StartTime != 0;
+                bool impossibleJump = speedRequired > movement_speed * 2 && h.StartTime != 0;
 
                 // todo: get correct catcher size, based on difficulty CS.
                 const float catcher_width_half = CatcherArea.CATCHER_SIZE / CatchPlayfield.BASE_WIDTH * 0.3f * 0.5f;
@@ -59,7 +60,7 @@ namespace osu.Game.Rulesets.Catch.Replays
                     return;
                 }
 
-                if (h is Banana)
+                if (h is Banana || impossibleJump)
                 {
                     // auto bananas unrealistically warp to catch 100% combo.
                     Replay.Frames.Add(new CatchReplayFrame(h.StartTime, h.X));
