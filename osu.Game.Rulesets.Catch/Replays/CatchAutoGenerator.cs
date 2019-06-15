@@ -1,4 +1,4 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
@@ -60,9 +60,8 @@ namespace osu.Game.Rulesets.Catch.Replays
                     return;
                 }
 
-                if (h is Banana || impossibleJump)
+                if (impossibleJump)
                 {
-                    // auto bananas unrealistically warp to catch 100% combo.
                     Replay.Frames.Add(new CatchReplayFrame(h.StartTime, h.X));
                 }
                 else if (h.HyperDash)
