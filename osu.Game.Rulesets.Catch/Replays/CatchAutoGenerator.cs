@@ -43,7 +43,8 @@ namespace osu.Game.Rulesets.Catch.Replays
                 float positionChange = Math.Abs(lastPosition - h.X);
                 double timeAvailable = h.StartTime - lastTime;
 
-                //So we can either make it there without a dash or not.
+                // So we can either make it there without a dash or not.
+                // If positionChange is 0, we don't need to move so speedRequired should also be 0 (could be NaN if timeAvailable is 0 too)
                 double speedRequired = positionChange == 0 ? 0 : positionChange / timeAvailable;
 
                 bool dashRequired = speedRequired > movement_speed;
