@@ -31,11 +31,9 @@ namespace osu.Game.Rulesets.Catch.Difficulty
 
         protected override DifficultyAttributes CreateDifficultyAttributes(IBeatmap beatmap, Mod[] mods, Skill[] skills, double clockRate, double upTo = double.PositiveInfinity)
         {
-            IReadOnlyList<HitObject> hitObjects;
-            if (double.IsPositiveInfinity(upTo))
-                hitObjects = beatmap.HitObjects;
-            else
-                hitObjects = beatmap.HitObjects.Where(h => h.StartTime <= upTo).ToList();
+            var hitObjects = double.IsPositiveInfinity(upTo)
+                ? beatmap.HitObjects
+                : beatmap.HitObjects.Where(h => h.StartTime <= upTo).ToList();
 
             if (hitObjects.Count == 0)
                 return new CatchDifficultyAttributes { Mods = mods, Skills = skills };

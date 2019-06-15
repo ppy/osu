@@ -17,6 +17,7 @@ namespace osu.Game.Rulesets.Difficulty
         /// <see cref="DifficultyAttributes"/> that are going to be used for performance calculation
         /// </summary>
         protected DifficultyAttributes Attributes;
+
         protected readonly List<TimedDifficultyAttributes> TimedAttributes;
 
         protected readonly Ruleset Ruleset;

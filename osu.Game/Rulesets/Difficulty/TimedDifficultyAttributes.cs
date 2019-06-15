@@ -10,8 +10,8 @@ namespace osu.Game.Rulesets.Difficulty
 
         public TimedDifficultyAttributes(double time, DifficultyAttributes attributes)
         {
-            this.Time = time;
-            this.Attributes = attributes;
+            Time = time;
+            Attributes = attributes;
         }
     }
 }
