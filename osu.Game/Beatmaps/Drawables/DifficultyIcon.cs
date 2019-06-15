@@ -81,9 +81,8 @@ namespace osu.Game.Beatmaps.Drawables
     public class DifficultyIconWithCounter : Container
     {
         private readonly List<BeatmapInfo> beatmaps;
-
-        private OsuSpriteText text;
-        private DifficultyIcon icon;
+        private readonly OsuSpriteText text;
+        private readonly DifficultyIcon icon;
 
         protected List<BeatmapInfo> Beatmaps
         {

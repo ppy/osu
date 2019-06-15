@@ -122,7 +122,7 @@ namespace osu.Game.Screens.Select.Carousel
             {
                 foreach (var ruleset in rulesets.AvailableRulesets.OrderBy(r => r.ID))
                 {
-                    List <CarouselBeatmap> list;
+                    List<CarouselBeatmap> list;
                     if ((list = beatmaps.FindAll(b => b.Beatmap.Ruleset.ID == ruleset.ID)).Any())
                         drawables.Add(new FilterableDifficultyIconWithCounter(ruleset, list));
                 }
@@ -228,7 +228,10 @@ namespace osu.Game.Screens.Select.Carousel
             private readonly List<CarouselBeatmap> beatmaps;
 
             public FilterableDifficultyIconWithCounter(RulesetInfo ruleset, List<CarouselBeatmap> beatmaps)
-                : base(ruleset, beatmaps.Select(b => b.Beatmap).ToList(), Color4.White) => this.beatmaps = beatmaps;
+                : base(ruleset, beatmaps.Select(b => b.Beatmap).ToList(), Color4.White)
+            {
+                this.beatmaps = beatmaps;
+            }
 
             [BackgroundDependencyLoader]
             private void load()
