@@ -44,7 +44,7 @@ namespace osu.Game.Rulesets.Catch.Replays
                 double timeAvailable = h.StartTime - lastTime;
 
                 //So we can either make it there without a dash or not.
-                double speedRequired = positionChange / timeAvailable;
+                double speedRequired = positionChange == 0 ? 0 : positionChange / timeAvailable;
 
                 bool dashRequired = speedRequired > movement_speed && h.StartTime != 0;
                 bool impossibleJump = speedRequired > movement_speed * 2 && h.StartTime != 0;
