@@ -31,7 +31,7 @@ namespace osu.Game.Overlays
 
         private RulesetStore rulesets;
 
-        private readonly ScrollContainer scroll;
+        private readonly OsuScrollContainer scroll;
 
         private readonly Bindable<BeatmapSetInfo> beatmapSet = new Bindable<BeatmapSetInfo>();
 
@@ -50,7 +50,7 @@ namespace osu.Game.Overlays
                     RelativeSizeAxes = Axes.Both,
                     Colour = OsuColour.Gray(0.2f)
                 },
-                scroll = new ScrollContainer
+                scroll = new OsuScrollContainer
                 {
                     RelativeSizeAxes = Axes.Both,
                     ScrollbarVisible = false,
