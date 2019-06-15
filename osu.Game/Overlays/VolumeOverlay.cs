@@ -100,17 +100,19 @@ namespace osu.Game.Overlays
             switch (action)
             {
                 case GlobalAction.DecreaseVolume:
-                    if (State == Visibility.Hidden)
+                    if (State.Value == Visibility.Hidden)
                         Show();
                     else
                         volumeMeterMaster.Decrease(amount, isPrecise);
                     return true;
+
                 case GlobalAction.IncreaseVolume:
-                    if (State == Visibility.Hidden)
+                    if (State.Value == Visibility.Hidden)
                         Show();
                     else
                         volumeMeterMaster.Increase(amount, isPrecise);
                     return true;
+
                 case GlobalAction.ToggleMute:
                     Show();
                     muteButton.Current.Value = !muteButton.Current.Value;
@@ -124,7 +126,7 @@ namespace osu.Game.Overlays
 
         public override void Show()
         {
-            if (State == Visibility.Visible)
+            if (State.Value == Visibility.Visible)
                 schedulePopOut();
 
             base.Show();

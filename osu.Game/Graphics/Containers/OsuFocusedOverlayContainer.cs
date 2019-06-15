@@ -51,10 +51,10 @@ namespace osu.Game.Graphics.Containers
             if (osuGame != null)
                 OverlayActivationMode.BindTo(osuGame.OverlayActivationMode);
 
-            samplePopIn = audio.Sample.Get(@"UI/overlay-pop-in");
-            samplePopOut = audio.Sample.Get(@"UI/overlay-pop-out");
+            samplePopIn = audio.Samples.Get(@"UI/overlay-pop-in");
+            samplePopOut = audio.Samples.Get(@"UI/overlay-pop-out");
 
-            StateChanged += onStateChanged;
+            State.ValueChanged += onStateChanged;
         }
 
         /// <summary>
@@ -70,7 +70,7 @@ namespace osu.Game.Graphics.Containers
         {
             if (!base.ReceivePositionalInputAt(e.ScreenSpaceMousePosition))
             {
-                State = Visibility.Hidden;
+                Hide();
                 return true;
             }
 
@@ -82,8 +82,9 @@ namespace osu.Game.Graphics.Containers
             switch (action)
             {
                 case GlobalAction.Back:
-                    State = Visibility.Hidden;
+                    Hide();
                     return true;
+
                 case GlobalAction.Select:
                     return true;
             }
@@ -93,9 +94,9 @@ namespace osu.Game.Graphics.Containers
 
         public bool OnReleased(GlobalAction action) => false;
 
-        private void onStateChanged(Visibility visibility)
+        private void onStateChanged(ValueChangedEvent<Visibility> state)
         {
-            switch (visibility)
+            switch (state.NewValue)
             {
                 case Visibility.Visible:
                     if (OverlayActivationMode.Value != OverlayActivation.Disabled)
@@ -104,9 +105,10 @@ namespace osu.Game.Graphics.Containers
                         if (BlockScreenWideMouse && DimMainContent) osuGame?.AddBlockingOverlay(this);
                     }
                     else
-                        State = Visibility.Hidden;
+                        Hide();
 
                     break;
+
                 case Visibility.Hidden:
                     if (PlaySamplesOnStateChange) samplePopOut?.Play();
                     if (BlockScreenWideMouse) osuGame?.RemoveBlockingOverlay(this);

@@ -22,7 +22,7 @@ namespace osu.Game.Overlays.Toolbar
 
         public Action OnHome;
 
-        private ToolbarUserArea userArea;
+        private ToolbarUserButton userButton;
 
         protected override bool BlockPositionalInput => false;
 
@@ -69,24 +69,25 @@ namespace osu.Game.Overlays.Toolbar
                     AutoSizeAxes = Axes.X,
                     Children = new Drawable[]
                     {
+                        new ToolbarChangelogButton(),
                         new ToolbarDirectButton(),
                         new ToolbarChatButton(),
                         new ToolbarSocialButton(),
                         new ToolbarMusicButton(),
                         //new ToolbarButton
                         //{
-                        //    Icon = FontAwesome.fa_search
+                        //    Icon = FontAwesome.Solid.search
                         //},
-                        userArea = new ToolbarUserArea(),
+                        userButton = new ToolbarUserButton(),
                         new ToolbarNotificationButton(),
                     }
                 }
             };
 
-            StateChanged += visibility =>
+            State.ValueChanged += visibility =>
             {
                 if (overlayActivationMode.Value == OverlayActivation.Disabled)
-                    State = Visibility.Hidden;
+                    Hide();
             };
 
             if (osuGame != null)
@@ -143,7 +144,7 @@ namespace osu.Game.Overlays.Toolbar
 
         protected override void PopOut()
         {
-            userArea?.LoginOverlay.Hide();
+            userButton?.StateContainer.Hide();
 
             this.MoveToY(-DrawSize.Y, transition_time, Easing.OutQuint);
             this.FadeOut(transition_time);

@@ -12,6 +12,7 @@ using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
+using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
@@ -97,7 +98,7 @@ namespace osu.Game.Screens.Multi.Lounge.Components
                                                         Anchor = Anchor.BottomLeft,
                                                         Origin = Anchor.BottomLeft,
                                                         Font = OsuFont.GetFont(size: 30),
-                                                        Current = Name
+                                                        Current = RoomName
                                                     },
                                                 },
                                             },
@@ -226,7 +227,7 @@ namespace osu.Game.Screens.Multi.Lounge.Components
             {
                 Padding = new MarginPadding { Horizontal = 10 };
 
-                InternalChild = new ScrollContainer
+                InternalChild = new OsuScrollContainer
                 {
                     RelativeSizeAxes = Axes.Both,
                     Child = fill = new FillFlowContainer
@@ -246,7 +247,7 @@ namespace osu.Game.Screens.Multi.Lounge.Components
             }
 
             [Resolved]
-            private APIAccess api { get; set; }
+            private IAPIProvider api { get; set; }
 
             private GetRoomScoresRequest request;
 
@@ -258,6 +259,7 @@ namespace osu.Game.Screens.Multi.Lounge.Components
 
                 // nice little progressive fade
                 int time = 500;
+
                 foreach (var c in fill.Children)
                 {
                     c.Delay(500 - time).FadeOut(time, Easing.Out);

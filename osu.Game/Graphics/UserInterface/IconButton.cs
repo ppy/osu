@@ -4,13 +4,14 @@
 using osuTK;
 using osuTK.Graphics;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Events;
 
 namespace osu.Game.Graphics.UserInterface
 {
     public class IconButton : OsuAnimatedButton
     {
-        public const float BUTTON_SIZE = 30;
+        public const float DEFAULT_BUTTON_SIZE = 30;
 
         private Color4? iconColour;
 
@@ -41,7 +42,7 @@ namespace osu.Game.Graphics.UserInterface
         /// <summary>
         /// The icon.
         /// </summary>
-        public FontAwesome Icon
+        public IconUsage Icon
         {
             get => icon.Icon;
             set => icon.Icon = value;
@@ -56,25 +57,11 @@ namespace osu.Game.Graphics.UserInterface
             set => icon.Scale = value;
         }
 
-        /// <summary>
-        /// The size of the <see cref="IconButton"/> while it is not being pressed.
-        /// </summary>
-        public Vector2 ButtonSize
-        {
-            get => Content.Size;
-            set
-            {
-                Content.RelativeSizeAxes = Axes.None;
-                Content.Size = value;
-            }
-        }
-
         private readonly SpriteIcon icon;
 
         public IconButton()
         {
-            AutoSizeAxes = Axes.Both;
-            ButtonSize = new Vector2(BUTTON_SIZE);
+            Size = new Vector2(DEFAULT_BUTTON_SIZE);
 
             Add(icon = new SpriteIcon
             {

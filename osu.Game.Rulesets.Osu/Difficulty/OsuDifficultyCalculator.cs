@@ -35,7 +35,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 hitObjects = beatmap.HitObjects.Where(h => h.StartTime <= upTo).ToList();
 
             if (hitObjects.Count == 0)
-                return new OsuDifficultyAttributes { Mods = mods };
+                return new OsuDifficultyAttributes { Mods = mods, Skills = skills };
 
             double aimRating = Math.Sqrt(skills[0].DifficultyValue()) * difficulty_multiplier;
             double speedRating = Math.Sqrt(skills[1].DifficultyValue()) * difficulty_multiplier;
@@ -60,7 +60,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 ApproachRate = preempt > 1200 ? (1800 - preempt) / 120 : (1200 - preempt) / 150 + 5,
                 OverallDifficulty = (80 - hitWindowGreat) / 6,
                 MaxCombo = maxCombo,
-                CountHitCircles = hitCircles
+                CountHitCircles = hitCircles,
+                Skills = skills
             };
         }
 

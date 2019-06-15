@@ -7,6 +7,7 @@ using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.TypeExtensions;
+using osu.Framework.Graphics;
 using osu.Framework.Graphics.Primitives;
 using osu.Game.Audio;
 using osu.Game.Graphics;
@@ -58,7 +59,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
         public bool AllJudged => Judged && NestedHitObjects.All(h => h.AllJudged);
 
         /// <summary>
-        /// Whether this <see cref="DrawableHitObject"/> has been hit. This occurs if <see cref="Result.IsHit"/> is <see cref="true"/>.
+        /// Whether this <see cref="DrawableHitObject"/> has been hit. This occurs if <see cref="Result"/> is hit.
         /// Note: This does NOT include nested hitobjects.
         /// </summary>
         public bool IsHit => Result?.IsHit ?? false;
@@ -84,7 +85,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
         public override bool RemoveCompletedTransforms => false;
         protected override bool RequiresChildrenUpdate => true;
 
-        public override bool IsPresent => base.IsPresent || State.Value == ArmedState.Idle && Clock?.CurrentTime >= LifetimeStart;
+        public override bool IsPresent => base.IsPresent || (State.Value == ArmedState.Idle && Clock?.CurrentTime >= LifetimeStart);
 
         public readonly Bindable<ArmedState> State = new Bindable<ArmedState>();
 
@@ -97,6 +98,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
         private void load()
         {
             var judgement = HitObject.CreateJudgement();
+
             if (judgement != null)
             {
                 Result = CreateResult(judgement);
@@ -119,6 +121,8 @@ namespace osu.Game.Rulesets.Objects.Drawables
                 AddInternal(Samples = new SkinnableSound(samples));
             }
         }
+
+        protected override void ClearInternal(bool disposeChildren = true) => throw new InvalidOperationException($"Should never clear a {nameof(DrawableHitObject)}");
 
         protected override void LoadComplete()
         {
@@ -163,6 +167,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
                 {
                     OnRevertResult?.Invoke(this, Result);
 
+                    Result.TimeOffset = 0;
                     Result.Type = HitResult.None;
                     State.Value = ArmedState.Idle;
                 }
@@ -209,9 +214,11 @@ namespace osu.Game.Rulesets.Objects.Drawables
             {
                 case HitResult.None:
                     break;
+
                 case HitResult.Miss:
                     State.Value = ArmedState.Miss;
                     break;
+
                 default:
                     State.Value = ArmedState.Hit;
                     break;
@@ -221,7 +228,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
         }
 
         /// <summary>
-        /// Will called at least once after the <see cref="LifetimeEnd"/> of this <see cref="DrawableHitObject"/> has been passed.
+        /// Will called at least once after the <see cref="Drawable.LifetimeEnd"/> of this <see cref="DrawableHitObject"/> has been passed.
         /// </summary>
         internal void OnLifetimeEnd()
         {
@@ -237,6 +244,10 @@ namespace osu.Game.Rulesets.Objects.Drawables
         /// <returns>Whether a scoring result has occurred from this <see cref="DrawableHitObject"/> or any nested <see cref="DrawableHitObject"/>.</returns>
         protected bool UpdateResult(bool userTriggered)
         {
+            // It's possible for input to get into a bad state when rewinding gameplay, so results should not be processed
+            if (Time.Elapsed < 0)
+                return false;
+
             judgementOccurred = false;
 
             if (AllJudged)

@@ -10,6 +10,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics;
+using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.Multiplayer;
@@ -91,7 +92,7 @@ namespace osu.Game.Screens.Multi.Match.Components
                         {
                             new Drawable[]
                             {
-                                new ScrollContainer
+                                new OsuScrollContainer
                                 {
                                     Padding = new MarginPadding
                                     {
@@ -265,7 +266,7 @@ namespace osu.Game.Screens.Multi.Match.Components
                 };
 
                 TypePicker.Current.BindValueChanged(type => typeLabel.Text = type.NewValue?.Name ?? string.Empty, true);
-                Name.BindValueChanged(name => NameField.Text = name.NewValue, true);
+                RoomName.BindValueChanged(name => NameField.Text = name.NewValue, true);
                 Availability.BindValueChanged(availability => AvailabilityPicker.Current.Value = availability.NewValue, true);
                 Type.BindValueChanged(type => TypePicker.Current.Value = type.NewValue, true);
                 MaxParticipants.BindValueChanged(count => MaxParticipantsField.Text = count.NewValue?.ToString(), true);
@@ -285,7 +286,7 @@ namespace osu.Game.Screens.Multi.Match.Components
             {
                 hideError();
 
-                Name.Value = NameField.Text;
+                RoomName.Value = NameField.Text;
                 Availability.Value = AvailabilityPicker.Current.Value;
                 Type.Value = TypePicker.Current.Value;
 
@@ -316,8 +317,12 @@ namespace osu.Game.Screens.Multi.Match.Components
 
         private class SettingsTextBox : OsuTextBox
         {
-            protected override Color4 BackgroundUnfocused => Color4.Black;
-            protected override Color4 BackgroundFocused => Color4.Black;
+            [BackgroundDependencyLoader]
+            private void load()
+            {
+                BackgroundUnfocused = Color4.Black;
+                BackgroundFocused = Color4.Black;
+            }
         }
 
         private class SettingsNumberTextBox : SettingsTextBox
@@ -327,8 +332,12 @@ namespace osu.Game.Screens.Multi.Match.Components
 
         private class SettingsPasswordTextBox : OsuPasswordTextBox
         {
-            protected override Color4 BackgroundUnfocused => Color4.Black;
-            protected override Color4 BackgroundFocused => Color4.Black;
+            [BackgroundDependencyLoader]
+            private void load()
+            {
+                BackgroundUnfocused = Color4.Black;
+                BackgroundFocused = Color4.Black;
+            }
         }
 
         private class SectionContainer : FillFlowContainer<Section>

@@ -14,7 +14,6 @@ using osu.Game.Audio;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
-using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Game.Overlays.Direct;
 using osu.Game.Overlays.SearchableList;
@@ -28,7 +27,6 @@ namespace osu.Game.Overlays
     {
         private const float panel_padding = 10f;
 
-        private APIAccess api;
         private RulesetStore rulesets;
 
         private readonly FillFlowContainer resultCountsContainer;
@@ -58,6 +56,7 @@ namespace osu.Game.Overlays
                 var artists = new List<string>();
                 var songs = new List<string>();
                 var tags = new List<string>();
+
                 foreach (var s in beatmapSets)
                 {
                     artists.Add(s.Metadata.Artist);
@@ -86,8 +85,6 @@ namespace osu.Game.Overlays
 
         public DirectOverlay()
         {
-            RelativeSizeAxes = Axes.Both;
-
             // osu!direct colours are not part of the standard palette
 
             Waves.FirstWaveColour = OsuColour.FromHex(@"19b0e2");
@@ -164,9 +161,8 @@ namespace osu.Game.Overlays
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours, APIAccess api, RulesetStore rulesets, PreviewTrackManager previewTrackManager)
+        private void load(OsuColour colours, RulesetStore rulesets, PreviewTrackManager previewTrackManager)
         {
-            this.api = api;
             this.rulesets = rulesets;
             this.previewTrackManager = previewTrackManager;
 
@@ -210,6 +206,7 @@ namespace osu.Game.Overlays
                                 Anchor = Anchor.TopCentre,
                                 Origin = Anchor.TopCentre,
                             };
+
                         default:
                             return new DirectListPanel(b);
                     }
@@ -255,10 +252,10 @@ namespace osu.Game.Overlays
             if (!IsLoaded)
                 return;
 
-            if (State == Visibility.Hidden)
+            if (State.Value == Visibility.Hidden)
                 return;
 
-            if (api == null)
+            if (API == null)
                 return;
 
             previewTrackManager.StopAnyPlaying(this);
@@ -284,7 +281,7 @@ namespace osu.Game.Overlays
                 });
             };
 
-            api.Queue(getSetsRequest);
+            API.Queue(getSetsRequest);
         }
 
         private int distinctCount(List<string> list) => list.Distinct().ToArray().Length;

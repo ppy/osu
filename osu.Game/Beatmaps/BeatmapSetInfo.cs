@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
@@ -20,6 +21,8 @@ namespace osu.Game.Beatmaps
             set => onlineBeatmapSetID = value > 0 ? value : null;
         }
 
+        public DateTimeOffset DateAdded { get; set; }
+
         public BeatmapSetOnlineStatus Status { get; set; } = BeatmapSetOnlineStatus.None;
 
         public BeatmapMetadata Metadata { get; set; }
@@ -28,6 +31,9 @@ namespace osu.Game.Beatmaps
 
         [NotMapped]
         public BeatmapSetOnlineInfo OnlineInfo { get; set; }
+
+        [NotMapped]
+        public BeatmapSetMetrics Metrics { get; set; }
 
         public double MaxStarDifficulty => Beatmaps?.Max(b => b.StarDifficulty) ?? 0;
 

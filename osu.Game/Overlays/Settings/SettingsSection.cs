@@ -11,6 +11,7 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using System.Collections.Generic;
 using System.Linq;
+using osu.Framework.Graphics.Sprites;
 
 namespace osu.Game.Overlays.Settings
 {
@@ -19,7 +20,7 @@ namespace osu.Game.Overlays.Settings
         protected FillFlowContainer FlowContent;
         protected override Container<Drawable> Content => FlowContent;
 
-        public abstract FontAwesome Icon { get; }
+        public abstract IconUsage Icon { get; }
         public abstract string Header { get; }
 
         public IEnumerable<IFilterable> FilterableChildren => Children.OfType<IFilterable>();
@@ -33,6 +34,8 @@ namespace osu.Game.Overlays.Settings
         {
             set => this.FadeTo(value ? 1 : 0);
         }
+
+        public bool FilteringActive { get; set; }
 
         protected SettingsSection()
         {
@@ -80,7 +83,7 @@ namespace osu.Game.Overlays.Settings
                             Font = OsuFont.GetFont(size: header_size),
                             Text = Header,
                             Colour = colours.Yellow,
-                            Margin = new MarginPadding { Left = SettingsOverlay.CONTENT_MARGINS, Right = SettingsOverlay.CONTENT_MARGINS }
+                            Margin = new MarginPadding { Left = SettingsPanel.CONTENT_MARGINS, Right = SettingsPanel.CONTENT_MARGINS }
                         },
                         FlowContent
                     }

@@ -11,9 +11,11 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Graphics.Sprites;
 using osu.Framework.Localisation;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Drawables;
+using osu.Game.Graphics.Containers;
 
 namespace osu.Game.Overlays.Direct
 {
@@ -85,8 +87,9 @@ namespace osu.Game.Overlays.Direct
                                                 {
                                                     Origin = Anchor.CentreLeft,
                                                     Anchor = Anchor.CentreLeft,
-                                                    Size = new Vector2(height / 2),
+                                                    Size = new Vector2(height / 3),
                                                     FillMode = FillMode.Fit,
+                                                    Margin = new MarginPadding { Right = 10 },
                                                 },
                                                 new FillFlowContainer
                                                 {
@@ -149,7 +152,7 @@ namespace osu.Game.Overlays.Direct
                                     Child = new DownloadButton(SetInfo)
                                     {
                                         Size = new Vector2(height - vertical_padding * 3),
-                                        Margin = new MarginPadding { Left = vertical_padding, Right = vertical_padding },
+                                        Margin = new MarginPadding { Left = vertical_padding * 2, Right = vertical_padding },
                                     },
                                 },
                                 new FillFlowContainer
@@ -160,28 +163,23 @@ namespace osu.Game.Overlays.Direct
                                     Direction = FillDirection.Vertical,
                                     Children = new Drawable[]
                                     {
-                                        new Statistic(FontAwesome.fa_play_circle, SetInfo.OnlineInfo?.PlayCount ?? 0),
-                                        new Statistic(FontAwesome.fa_heart, SetInfo.OnlineInfo?.FavouriteCount ?? 0),
-                                        new FillFlowContainer
+                                        new Statistic(FontAwesome.Solid.PlayCircle, SetInfo.OnlineInfo?.PlayCount ?? 0),
+                                        new Statistic(FontAwesome.Solid.Heart, SetInfo.OnlineInfo?.FavouriteCount ?? 0),
+                                        new LinkFlowContainer(s =>
+                                        {
+                                            s.Shadow = false;
+                                            s.Font = OsuFont.GetFont(size: 14);
+                                        })
                                         {
                                             Anchor = Anchor.TopRight,
                                             Origin = Anchor.TopRight,
                                             AutoSizeAxes = Axes.Both,
-                                            Direction = FillDirection.Horizontal,
-                                            Children = new[]
-                                            {
-                                                new OsuSpriteText
-                                                {
-                                                    Text = "mapped by ",
-                                                    Font = OsuFont.GetFont(size: 14)
-                                                },
-                                                new OsuSpriteText
-                                                {
-                                                    Text = SetInfo.Metadata.Author.Username,
-                                                    Font = OsuFont.GetFont(size: 14, weight: FontWeight.SemiBold, italics: true)
-                                                },
-                                            },
-                                        },
+                                        }.With(d =>
+                                        {
+                                            d.AutoSizeAxes = Axes.Both;
+                                            d.AddText("mapped by ");
+                                            d.AddUserLink(SetInfo.Metadata.Author);
+                                        }),
                                         new OsuSpriteText
                                         {
                                             Text = SetInfo.Metadata.Source,
@@ -210,12 +208,12 @@ namespace osu.Game.Overlays.Direct
 
             if (SetInfo.OnlineInfo?.HasVideo ?? false)
             {
-                statusContainer.Add(new IconPill(FontAwesome.fa_film) { IconSize = new Vector2(20) });
+                statusContainer.Add(new IconPill(FontAwesome.Solid.Film) { IconSize = new Vector2(20) });
             }
 
             if (SetInfo.OnlineInfo?.HasStoryboard ?? false)
             {
-                statusContainer.Add(new IconPill(FontAwesome.fa_image) { IconSize = new Vector2(20) });
+                statusContainer.Add(new IconPill(FontAwesome.Solid.Image) { IconSize = new Vector2(20) });
             }
 
             statusContainer.Add(new BeatmapSetOnlineStatusPill

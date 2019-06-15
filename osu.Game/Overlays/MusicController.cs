@@ -10,6 +10,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
@@ -22,6 +23,7 @@ using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays.Music;
+using osu.Game.Rulesets.Mods;
 using osuTK;
 using osuTK.Graphics;
 
@@ -49,12 +51,20 @@ namespace osu.Game.Overlays
         private BeatmapManager beatmaps;
 
         private List<BeatmapSetInfo> beatmapSets;
-        private BeatmapSetInfo currentSet;
 
         private Container dragContainer;
         private Container playerContainer;
 
-        private readonly Bindable<WorkingBeatmap> beatmap = new Bindable<WorkingBeatmap>();
+        [Resolved]
+        private Bindable<WorkingBeatmap> beatmap { get; set; }
+
+        [Resolved]
+        private IBindable<IReadOnlyList<Mod>> mods { get; set; }
+
+        /// <summary>
+        /// Provide a source for the toolbar height.
+        /// </summary>
+        public Func<float> GetToolbarHeight;
 
         public MusicController()
         {
@@ -68,7 +78,6 @@ namespace osu.Game.Overlays
         [BackgroundDependencyLoader]
         private void load(Bindable<WorkingBeatmap> beatmap, BeatmapManager beatmaps, OsuColour colours)
         {
-            this.beatmap.BindTo(beatmap);
             this.beatmaps = beatmaps;
 
             Children = new Drawable[]
@@ -143,7 +152,7 @@ namespace osu.Game.Overlays
                                                     Anchor = Anchor.Centre,
                                                     Origin = Anchor.Centre,
                                                     Action = prev,
-                                                    Icon = FontAwesome.fa_step_backward,
+                                                    Icon = FontAwesome.Solid.StepBackward,
                                                 },
                                                 playButton = new MusicIconButton
                                                 {
@@ -152,14 +161,14 @@ namespace osu.Game.Overlays
                                                     Scale = new Vector2(1.4f),
                                                     IconScale = new Vector2(1.4f),
                                                     Action = play,
-                                                    Icon = FontAwesome.fa_play_circle_o,
+                                                    Icon = FontAwesome.Regular.PlayCircle,
                                                 },
                                                 nextButton = new MusicIconButton
                                                 {
                                                     Anchor = Anchor.Centre,
                                                     Origin = Anchor.Centre,
                                                     Action = () => next(),
-                                                    Icon = FontAwesome.fa_step_forward,
+                                                    Icon = FontAwesome.Solid.StepForward,
                                                 },
                                             }
                                         },
@@ -168,7 +177,7 @@ namespace osu.Game.Overlays
                                             Origin = Anchor.Centre,
                                             Anchor = Anchor.CentreRight,
                                             Position = new Vector2(-bottom_black_area_height / 2, 0),
-                                            Icon = FontAwesome.fa_bars,
+                                            Icon = FontAwesome.Solid.Bars,
                                             Action = () => playlist.ToggleVisibility(),
                                         },
                                     }
@@ -191,7 +200,7 @@ namespace osu.Game.Overlays
             beatmaps.ItemAdded += handleBeatmapAdded;
             beatmaps.ItemRemoved += handleBeatmapRemoved;
 
-            playlist.StateChanged += s => playlistButton.FadeColour(s == Visibility.Visible ? colours.Yellow : Color4.White, 200, Easing.OutQuint);
+            playlist.State.ValueChanged += s => playlistButton.FadeColour(s.NewValue == Visibility.Visible ? colours.Yellow : Color4.White, 200, Easing.OutQuint);
         }
 
         private ScheduledDelegate seekDelegate;
@@ -226,6 +235,7 @@ namespace osu.Game.Overlays
         {
             beatmap.BindValueChanged(beatmapChanged, true);
             beatmap.BindDisabledChanged(beatmapDisabledChanged, true);
+            mods.BindValueChanged(_ => updateAudioAdjustments(), true);
             base.LoadComplete();
         }
 
@@ -244,6 +254,8 @@ namespace osu.Game.Overlays
         {
             base.UpdateAfterChildren();
             Height = dragContainer.Height;
+
+            dragContainer.Padding = new MarginPadding { Top = GetToolbarHeight?.Invoke() ?? 0 };
         }
 
         protected override void Update()
@@ -257,13 +269,13 @@ namespace osu.Game.Overlays
                 progressBar.EndTime = track.Length;
                 progressBar.CurrentTime = track.CurrentTime;
 
-                playButton.Icon = track.IsRunning ? FontAwesome.fa_pause_circle_o : FontAwesome.fa_play_circle_o;
+                playButton.Icon = track.IsRunning ? FontAwesome.Regular.PauseCircle : FontAwesome.Regular.PlayCircle;
             }
             else
             {
                 progressBar.CurrentTime = 0;
                 progressBar.EndTime = 1;
-                playButton.Icon = FontAwesome.fa_play_circle_o;
+                playButton.Icon = FontAwesome.Regular.PlayCircle;
             }
         }
 
@@ -289,6 +301,7 @@ namespace osu.Game.Overlays
             queuedDirection = TransformDirection.Prev;
 
             var playable = beatmapSets.TakeWhile(i => i.ID != current.BeatmapSetInfo.ID).LastOrDefault() ?? beatmapSets.LastOrDefault();
+
             if (playable != null)
             {
                 beatmap.Value = beatmaps.GetWorkingBeatmap(playable.Beatmaps.First(), beatmap.Value);
@@ -302,6 +315,7 @@ namespace osu.Game.Overlays
                 queuedDirection = TransformDirection.Next;
 
             var playable = beatmapSets.SkipWhile(i => i.ID != current.BeatmapSetInfo.ID).Skip(1).FirstOrDefault() ?? beatmapSets.FirstOrDefault();
+
             if (playable != null)
             {
                 beatmap.Value = beatmaps.GetWorkingBeatmap(playable.Beatmaps.First(), beatmap.Value);
@@ -336,7 +350,7 @@ namespace osu.Game.Overlays
                     direction = last > next ? TransformDirection.Prev : TransformDirection.Next;
                 }
 
-                current.Track.Completed -= currentTrackCompleted;
+                //current.Track.Completed -= currentTrackCompleted;
             }
 
             current = beatmap.NewValue;
@@ -347,8 +361,21 @@ namespace osu.Game.Overlays
             progressBar.CurrentTime = 0;
 
             updateDisplay(current, direction);
+            updateAudioAdjustments();
 
             queuedDirection = null;
+        }
+
+        private void updateAudioAdjustments()
+        {
+            var track = current?.Track;
+            if (track == null)
+                return;
+
+            track.ResetSpeedAdjustments();
+
+            foreach (var mod in mods.Value.OfType<IApplicableToClock>())
+                mod.ApplyToClock(track);
         }
 
         private void currentTrackCompleted() => Schedule(() =>
@@ -392,6 +419,7 @@ namespace osu.Game.Overlays
                             newBackground.MoveToX(0, 500, Easing.OutCubic);
                             background.MoveToX(-400, 500, Easing.OutCubic);
                             break;
+
                         case TransformDirection.Prev:
                             newBackground.Position = new Vector2(-400, 0);
                             newBackground.MoveToX(0, 500, Easing.OutCubic);
@@ -421,7 +449,7 @@ namespace osu.Game.Overlays
 
             // This is here mostly as a performance fix.
             // If the playlist is not hidden it will update children even when the music controller is hidden (due to AlwaysPresent).
-            playlist.State = Visibility.Hidden;
+            playlist.Hide();
 
             this.FadeOut(transition_length, Easing.OutQuint);
             dragContainer.ScaleTo(0.9f, transition_length, Easing.OutQuint);
@@ -436,11 +464,25 @@ namespace osu.Game.Overlays
 
         private class MusicIconButton : IconButton
         {
+            public MusicIconButton()
+            {
+                AutoSizeAxes = Axes.Both;
+            }
+
             [BackgroundDependencyLoader]
             private void load(OsuColour colours)
             {
                 HoverColour = colours.YellowDark.Opacity(0.6f);
                 FlashColour = colours.Yellow;
+            }
+
+            protected override void LoadComplete()
+            {
+                base.LoadComplete();
+
+                // works with AutoSizeAxes above to make buttons autosize with the scale animation.
+                Content.AutoSizeAxes = Axes.None;
+                Content.Size = new Vector2(DEFAULT_BUTTON_SIZE);
             }
         }
 

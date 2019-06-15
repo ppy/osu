@@ -8,6 +8,7 @@ using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
+using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Events;
@@ -64,6 +65,8 @@ namespace osu.Game.Online.Leaderboards
 
             statisticsLabels = GetStatistics(score).Select(s => new ScoreComponentLabel(s)).ToList();
 
+            Avatar innerAvatar;
+
             Children = new Drawable[]
             {
                 new Container
@@ -109,12 +112,11 @@ namespace osu.Game.Online.Leaderboards
                             Children = new[]
                             {
                                 avatar = new DelayedLoadWrapper(
-                                    new Avatar(user)
+                                    innerAvatar = new Avatar(user)
                                     {
                                         RelativeSizeAxes = Axes.Both,
                                         CornerRadius = corner_radius,
                                         Masking = true,
-                                        OnLoadComplete = d => d.FadeInFromZero(200),
                                         EdgeEffect = new EdgeEffectParameters
                                         {
                                             Type = EdgeEffectType.Shadow,
@@ -214,6 +216,8 @@ namespace osu.Game.Online.Leaderboards
                     },
                 },
             };
+
+            innerAvatar.OnLoadComplete += d => d.FadeInFromZero(200);
         }
 
         public override void Show()
@@ -255,8 +259,8 @@ namespace osu.Game.Online.Leaderboards
 
         protected virtual IEnumerable<LeaderboardScoreStatistic> GetStatistics(ScoreInfo model) => new[]
         {
-            new LeaderboardScoreStatistic(FontAwesome.fa_link, "Max Combo", model.MaxCombo.ToString()),
-            new LeaderboardScoreStatistic(FontAwesome.fa_crosshairs, "Accuracy", string.Format(model.Accuracy % 1 == 0 ? @"{0:P0}" : @"{0:P2}", model.Accuracy))
+            new LeaderboardScoreStatistic(FontAwesome.Solid.Link, "Max Combo", model.MaxCombo.ToString()),
+            new LeaderboardScoreStatistic(FontAwesome.Solid.Crosshairs, "Accuracy", string.Format(model.Accuracy % 1 == 0 ? @"{0:P0}" : @"{0:P2}", model.Accuracy))
         };
 
         protected override bool OnHover(HoverEvent e)
@@ -350,7 +354,7 @@ namespace osu.Game.Online.Leaderboards
                                     Size = new Vector2(icon_size),
                                     Rotation = 45,
                                     Colour = OsuColour.FromHex(@"3087ac"),
-                                    Icon = FontAwesome.fa_square,
+                                    Icon = FontAwesome.Solid.Square,
                                     Shadow = true,
                                 },
                                 new SpriteIcon
@@ -375,11 +379,11 @@ namespace osu.Game.Online.Leaderboards
 
         public class LeaderboardScoreStatistic
         {
-            public FontAwesome Icon;
+            public IconUsage Icon;
             public string Value;
             public string Name;
 
-            public LeaderboardScoreStatistic(FontAwesome icon, string name, string value)
+            public LeaderboardScoreStatistic(IconUsage icon, string name, string value)
             {
                 Icon = icon;
                 Name = name;

@@ -1,5 +1,5 @@
 #addin "nuget:?package=CodeFileSanity&version=0.0.21"
-#addin "nuget:?package=JetBrains.ReSharper.CommandLineTools&version=2018.2.2"
+#addin "nuget:?package=JetBrains.ReSharper.CommandLineTools&version=2019.1.1"
 #tool "nuget:?package=NVika.MSBuild&version=1.0.1"
 var nVikaToolPath = GetFiles("./tools/NVika.MSBuild.*/tools/NVika.exe").First();
 
@@ -46,7 +46,9 @@ Task("InspectCode")
             OutputFile = "inspectcodereport.xml",
         });
 
-        StartProcess(nVikaToolPath, @"parsereport ""inspectcodereport.xml"" --treatwarningsaserrors");
+        int returnCode = StartProcess(nVikaToolPath, $@"parsereport ""inspectcodereport.xml"" --treatwarningsaserrors");
+        if (returnCode != 0)
+            throw new Exception($"inspectcode failed with return code {returnCode}");
     });
 
 Task("CodeFileSanity")

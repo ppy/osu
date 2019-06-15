@@ -94,13 +94,13 @@ namespace osu.Game.Screens.Edit.Compose.Components
                                                 {
                                                     new DivisorButton
                                                     {
-                                                        Icon = FontAwesome.fa_chevron_left,
+                                                        Icon = FontAwesome.Solid.ChevronLeft,
                                                         Action = beatDivisor.Previous
                                                     },
                                                     new DivisorText(beatDivisor),
                                                     new DivisorButton
                                                     {
-                                                        Icon = FontAwesome.fa_chevron_right,
+                                                        Icon = FontAwesome.Solid.ChevronRight,
                                                         Action = beatDivisor.Next
                                                     }
                                                 },
@@ -171,7 +171,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
                 // Small offset to look a bit better centered along with the divisor text
                 Y = 1;
 
-                ButtonSize = new Vector2(20);
+                Size = new Vector2(20);
                 IconScale = new Vector2(0.6f);
             }
 
@@ -236,10 +236,12 @@ namespace osu.Game.Screens.Edit.Compose.Components
                         beatDivisor.Next();
                         OnUserChange(Current.Value);
                         return true;
+
                     case Key.Left:
                         beatDivisor.Previous();
                         OnUserChange(Current.Value);
                         return true;
+
                     default:
                         return false;
                 }
@@ -307,18 +309,25 @@ namespace osu.Game.Screens.Edit.Compose.Components
                     {
                         case 2:
                             return colours.BlueLight;
+
                         case 4:
                             return colours.Blue;
+
                         case 8:
                             return colours.BlueDarker;
+
                         case 16:
                             return colours.PurpleDark;
+
                         case 3:
                             return colours.YellowLight;
+
                         case 6:
                             return colours.Yellow;
+
                         case 12:
                             return colours.YellowDarker;
+
                         default:
                             return Color4.White;
                     }

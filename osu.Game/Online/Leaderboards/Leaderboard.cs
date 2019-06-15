@@ -23,7 +23,7 @@ namespace osu.Game.Online.Leaderboards
     {
         private const double fade_duration = 300;
 
-        private readonly ScrollContainer scrollContainer;
+        private readonly OsuScrollContainer scrollContainer;
         private readonly Container placeholderContainer;
 
         private FillFlowContainer<LeaderboardScore> scrollFlow;
@@ -74,6 +74,7 @@ namespace osu.Game.Online.Leaderboards
                     scrollContainer.Add(scrollFlow);
 
                     int i = 0;
+
                     foreach (var s in scrollFlow.Children)
                     {
                         using (s.BeginDelayedSequence(i++ * 50, true))
@@ -138,18 +139,23 @@ namespace osu.Game.Online.Leaderboards
                             OnRetry = UpdateScores,
                         });
                         break;
+
                     case PlaceholderState.Unavailable:
                         replacePlaceholder(new MessagePlaceholder(@"Leaderboards are not available for this beatmap!"));
                         break;
+
                     case PlaceholderState.NoScores:
                         replacePlaceholder(new MessagePlaceholder(@"No records yet!"));
                         break;
+
                     case PlaceholderState.NotLoggedIn:
                         replacePlaceholder(new MessagePlaceholder(@"Please sign in to view online leaderboards!"));
                         break;
+
                     case PlaceholderState.NotSupporter:
                         replacePlaceholder(new MessagePlaceholder(@"Please invest in an osu!supporter tag to view this leaderboard!"));
                         break;
+
                     default:
                         replacePlaceholder(null);
                         break;
@@ -174,12 +180,12 @@ namespace osu.Game.Online.Leaderboards
             };
         }
 
-        private APIAccess api;
+        private IAPIProvider api;
 
         private ScheduledDelegate pendingUpdateScores;
 
         [BackgroundDependencyLoader(true)]
-        private void load(APIAccess api)
+        private void load(IAPIProvider api)
         {
             this.api = api;
             api?.Register(this);
@@ -195,7 +201,7 @@ namespace osu.Game.Online.Leaderboards
 
         private APIRequest getScoresRequest;
 
-        public void APIStateChanged(APIAccess api, APIState state)
+        public void APIStateChanged(IAPIProvider api, APIState state)
         {
             if (state == APIState.Online)
                 UpdateScores();

@@ -28,6 +28,8 @@ namespace osu.Game.Overlays.Settings
             set => this.FadeTo(value ? 1 : 0);
         }
 
+        public bool FilteringActive { get; set; }
+
         protected SettingsSubsection()
         {
             RelativeSizeAxes = Axes.X;
@@ -51,7 +53,7 @@ namespace osu.Game.Overlays.Settings
                 new OsuSpriteText
                 {
                     Text = Header.ToUpperInvariant(),
-                    Margin = new MarginPadding { Bottom = 10, Left = SettingsOverlay.CONTENT_MARGINS, Right = SettingsOverlay.CONTENT_MARGINS },
+                    Margin = new MarginPadding { Bottom = 10, Left = SettingsPanel.CONTENT_MARGINS, Right = SettingsPanel.CONTENT_MARGINS },
                     Font = OsuFont.GetFont(weight: FontWeight.Black),
                 },
                 FlowContent

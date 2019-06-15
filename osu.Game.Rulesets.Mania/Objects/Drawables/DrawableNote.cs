@@ -5,7 +5,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
 using osuTK.Graphics;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Effects;
 using osu.Framework.Input.Bindings;
 using osu.Game.Rulesets.Mania.Objects.Drawables.Pieces;
 using osu.Game.Rulesets.Scoring;
@@ -29,7 +29,7 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
             CornerRadius = 5;
             Masking = true;
 
-            InternalChild = headPiece = new NotePiece();
+            AddInternal(headPiece = new NotePiece());
         }
 
         protected override void OnDirectionChanged(ValueChangedEvent<ScrollingDirection> e)

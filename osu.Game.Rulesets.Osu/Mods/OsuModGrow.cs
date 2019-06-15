@@ -2,8 +2,11 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
+using System.Linq;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
-using osu.Game.Graphics;
+using osu.Framework.Graphics.Sprites;
+using osu.Game.Configuration;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Osu.Objects;
@@ -11,13 +14,13 @@ using osu.Game.Rulesets.Osu.Objects.Drawables;
 
 namespace osu.Game.Rulesets.Osu.Mods
 {
-    internal class OsuModGrow : Mod, IApplicableToDrawableHitObjects
+    internal class OsuModGrow : Mod, IReadFromConfig, IApplicableToDrawableHitObjects
     {
         public override string Name => "Grow";
 
         public override string Acronym => "GR";
 
-        public override FontAwesome Icon => FontAwesome.fa_arrows_v;
+        public override IconUsage Icon => FontAwesome.Solid.ArrowsAltV;
 
         public override ModType Type => ModType.Fun;
 
@@ -25,14 +28,22 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         public override double ScoreMultiplier => 1;
 
+        private Bindable<bool> increaseFirstObjectVisibility = new Bindable<bool>();
+
+        public void ReadFromConfig(OsuConfigManager config)
+        {
+            increaseFirstObjectVisibility = config.GetBindable<bool>(OsuSetting.IncreaseFirstObjectVisibility);
+        }
+
         public void ApplyToDrawableHitObjects(IEnumerable<DrawableHitObject> drawables)
         {
-            foreach (var drawable in drawables)
+            foreach (var drawable in drawables.Skip(increaseFirstObjectVisibility.Value ? 1 : 0))
             {
                 switch (drawable)
                 {
                     case DrawableSpinner _:
                         continue;
+
                     default:
                         drawable.ApplyCustomUpdateState += ApplyCustomState;
                         break;
@@ -51,6 +62,7 @@ namespace osu.Game.Rulesets.Osu.Mods
                 case DrawableSliderTail _:
                     // special cases we should *not* be scaling.
                     break;
+
                 case DrawableSlider _:
                 case DrawableHitCircle _:
                 {

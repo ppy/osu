@@ -20,6 +20,7 @@ using osu.Game.Screens.Multi;
 using osu.Game.Screens.Select;
 using osu.Game.Screens.Tournament;
 using osu.Framework.Platform;
+using osu.Game.Overlays;
 
 namespace osu.Game.Screens.Menu
 {
@@ -40,10 +41,12 @@ namespace osu.Game.Screens.Menu
         [Resolved]
         private GameHost host { get; set; }
 
-        protected override BackgroundScreen CreateBackground() => new BackgroundScreenDefault();
+        private BackgroundScreenDefault background;
+
+        protected override BackgroundScreen CreateBackground() => background;
 
         [BackgroundDependencyLoader(true)]
-        private void load(OsuGame game = null)
+        private void load(DirectOverlay direct, SettingsOverlay settings)
         {
             if (host.CanExit)
                 AddInternal(new ExitConfirmOverlay { Action = this.Exit });
@@ -77,18 +80,17 @@ namespace osu.Game.Screens.Menu
                     case ButtonSystemState.Exit:
                         Background.FadeColour(Color4.White, 500, Easing.OutSine);
                         break;
+
                     default:
                         Background.FadeColour(OsuColour.Gray(0.8f), 500, Easing.OutSine);
                         break;
                 }
             };
 
-            if (game != null)
-            {
-                buttons.OnSettings = game.ToggleSettings;
-                buttons.OnDirect = game.ToggleDirect;
-            }
+            buttons.OnSettings = () => settings?.ToggleVisibility();
+            buttons.OnDirect = () => direct?.ToggleVisibility();
 
+            LoadComponentAsync(background = new BackgroundScreenDefault());
             preloadSongSelect();
         }
 
@@ -153,9 +155,11 @@ namespace osu.Game.Screens.Menu
 
         protected override void LogoSuspending(OsuLogo logo)
         {
-            logo.FadeOut(300, Easing.InSine)
-                .ScaleTo(0.2f, 300, Easing.InSine)
-                .OnComplete(l => buttons.SetOsuLogo(null));
+            var seq = logo.FadeOut(300, Easing.InSine)
+                          .ScaleTo(0.2f, 300, Easing.InSine);
+
+            seq.OnComplete(_ => buttons.SetOsuLogo(null));
+            seq.OnAbort(_ => buttons.SetOsuLogo(null));
         }
 
         private void beatmap_ValueChanged(ValueChangedEvent<WorkingBeatmap> e)

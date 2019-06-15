@@ -6,7 +6,7 @@ using System.Diagnostics;
 using System.Runtime.InteropServices;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.OpenGL.Buffers;
+using osu.Framework.Graphics.Batches;
 using osu.Framework.Graphics.OpenGL.Vertices;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.Shaders;
@@ -43,22 +43,7 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
 
         private readonly InputResampler resampler = new InputResampler();
 
-        protected override DrawNode CreateDrawNode() => new TrailDrawNode();
-
-        protected override void ApplyDrawNode(DrawNode node)
-        {
-            base.ApplyDrawNode(node);
-
-            TrailDrawNode tNode = (TrailDrawNode)node;
-            tNode.Shader = shader;
-            tNode.Texture = texture;
-            tNode.Size = size;
-            tNode.Time = time;
-
-            for (int i = 0; i < parts.Length; ++i)
-                if (parts[i].InvalidationID > tNode.Parts[i].InvalidationID)
-                    tNode.Parts[i] = parts[i];
-        }
+        protected override DrawNode CreateDrawNode() => new TrailDrawNode(this);
 
         public CursorTrail()
         {
@@ -69,8 +54,9 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
 
             for (int i = 0; i < max_sprites; i++)
             {
-                parts[i].InvalidationID = 0;
-                parts[i].WasUpdated = true;
+                // InvalidationID 1 forces an update of each part of the cursor trail the first time ApplyState is run on the draw node
+                // This is to prevent garbage data from being sent to the vertex shader, resulting in visual issues on some platforms
+                parts[i].InvalidationID = 1;
             }
         }
 
@@ -162,89 +148,79 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
             public Vector2 Position;
             public float Time;
             public long InvalidationID;
-            public bool WasUpdated;
         }
 
         private class TrailDrawNode : DrawNode
         {
-            public IShader Shader;
-            public Texture Texture;
+            protected new CursorTrail Source => (CursorTrail)base.Source;
 
-            public float Time;
+            private IShader shader;
+            private Texture texture;
 
-            public readonly TrailPart[] Parts = new TrailPart[max_sprites];
-            public Vector2 Size;
+            private float time;
 
-            private readonly VertexBuffer<TexturedTrailVertex> vertexBuffer = new QuadVertexBuffer<TexturedTrailVertex>(max_sprites, BufferUsageHint.DynamicDraw);
+            private readonly TrailPart[] parts = new TrailPart[max_sprites];
+            private Vector2 size;
 
-            public TrailDrawNode()
+            private readonly VertexBatch<TexturedTrailVertex> vertexBatch = new QuadBatch<TexturedTrailVertex>(max_sprites, 1);
+
+            public TrailDrawNode(CursorTrail source)
+                : base(source)
             {
                 for (int i = 0; i < max_sprites; i++)
+                    parts[i].InvalidationID = 0;
+            }
+
+            public override void ApplyState()
+            {
+                base.ApplyState();
+
+                shader = Source.shader;
+                texture = Source.texture;
+                size = Source.size;
+                time = Source.time;
+
+                for (int i = 0; i < Source.parts.Length; ++i)
                 {
-                    Parts[i].InvalidationID = 0;
-                    Parts[i].WasUpdated = false;
+                    if (Source.parts[i].InvalidationID > parts[i].InvalidationID)
+                        parts[i] = Source.parts[i];
                 }
             }
 
             public override void Draw(Action<TexturedVertex2D> vertexAction)
             {
-                Shader.GetUniform<float>("g_FadeClock").UpdateValue(ref Time);
-
-                int updateStart = -1, updateEnd = 0;
-                for (int i = 0; i < Parts.Length; ++i)
-                {
-                    if (Parts[i].WasUpdated)
-                    {
-                        if (updateStart == -1)
-                            updateStart = i;
-                        updateEnd = i + 1;
-
-                        int start = i * 4;
-                        int end = start;
-
-                        Vector2 pos = Parts[i].Position;
-                        float time = Parts[i].Time;
-
-                        Texture.DrawQuad(
-                            new Quad(pos.X - Size.X / 2, pos.Y - Size.Y / 2, Size.X, Size.Y),
-                            DrawColourInfo.Colour,
-                            null,
-                            v => vertexBuffer.Vertices[end++] = new TexturedTrailVertex
-                            {
-                                Position = v.Position,
-                                TexturePosition = v.TexturePosition,
-                                Time = time + 1,
-                                Colour = v.Colour,
-                            });
-
-                        Parts[i].WasUpdated = false;
-                    }
-                    else if (updateStart != -1)
-                    {
-                        vertexBuffer.UpdateRange(updateStart * 4, updateEnd * 4);
-                        updateStart = -1;
-                    }
-                }
-
-                // Update all remaining vertices that have been changed.
-                if (updateStart != -1)
-                    vertexBuffer.UpdateRange(updateStart * 4, updateEnd * 4);
-
                 base.Draw(vertexAction);
 
-                Shader.Bind();
+                shader.Bind();
+                shader.GetUniform<float>("g_FadeClock").UpdateValue(ref time);
 
-                Texture.TextureGL.Bind();
-                vertexBuffer.Draw();
+                for (int i = 0; i < parts.Length; ++i)
+                {
+                    Vector2 pos = parts[i].Position;
+                    float localTime = parts[i].Time;
 
-                Shader.Unbind();
+                    DrawQuad(
+                        texture,
+                        new Quad(pos.X - size.X / 2, pos.Y - size.Y / 2, size.X, size.Y),
+                        DrawColourInfo.Colour,
+                        null,
+                        v => vertexBatch.Add(new TexturedTrailVertex
+                        {
+                            Position = v.Position,
+                            TexturePosition = v.TexturePosition,
+                            Time = localTime + 1,
+                            Colour = v.Colour,
+                        }));
+                }
+
+                shader.Unbind();
             }
 
             protected override void Dispose(bool isDisposing)
             {
                 base.Dispose(isDisposing);
 
-                vertexBuffer.Dispose();
+                vertexBatch.Dispose();
             }
         }
 

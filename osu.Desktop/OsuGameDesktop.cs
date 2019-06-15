@@ -7,13 +7,13 @@ using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 using osu.Desktop.Overlays;
-using osu.Framework.Graphics.Containers;
 using osu.Framework.Platform;
 using osu.Game;
 using osuTK.Input;
 using Microsoft.Win32;
 using osu.Desktop.Updater;
 using osu.Framework;
+using osu.Framework.Logging;
 using osu.Framework.Platform.Windows;
 using osu.Framework.Screens;
 using osu.Game.Screens.Menu;
@@ -35,12 +35,15 @@ namespace osu.Desktop
         {
             try
             {
-                return new StableStorage();
+                if (Host is DesktopGameHost desktopHost)
+                    return new StableStorage(desktopHost);
             }
-            catch
+            catch (Exception e)
             {
-                return null;
+                Logger.Error(e, "Error while searching for stable install");
             }
+
+            return null;
         }
 
         protected override void LoadComplete()
@@ -52,7 +55,7 @@ namespace osu.Desktop
                 LoadComponentAsync(versionManager = new VersionManager { Depth = int.MinValue }, v =>
                 {
                     Add(v);
-                    v.State = Visibility.Visible;
+                    v.Show();
                 });
 
                 if (RuntimeInfo.OS == RuntimeInfo.Platform.Windows)
@@ -70,12 +73,11 @@ namespace osu.Desktop
             {
                 case Intro _:
                 case MainMenu _:
-                    if (versionManager != null)
-                        versionManager.State = Visibility.Visible;
+                    versionManager?.Show();
                     break;
+
                 default:
-                    if (versionManager != null)
-                        versionManager.State = Visibility.Hidden;
+                    versionManager?.Hide();
                     break;
             }
         }
@@ -83,6 +85,7 @@ namespace osu.Desktop
         public override void SetHost(GameHost host)
         {
             base.SetHost(host);
+
             if (host.Window is DesktopGameWindow desktopWindow)
             {
                 desktopWindow.CursorState |= CursorState.Hidden;
@@ -139,8 +142,8 @@ namespace osu.Desktop
                 return null;
             }
 
-            public StableStorage()
-                : base(string.Empty, null)
+            public StableStorage(DesktopGameHost host)
+                : base(string.Empty, host)
             {
             }
         }
