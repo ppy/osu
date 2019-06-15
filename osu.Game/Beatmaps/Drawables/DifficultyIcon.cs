@@ -24,6 +24,13 @@ namespace osu.Game.Beatmaps.Drawables
     {
         private readonly RulesetInfo ruleset;
 
+        private Box iconBox;
+
+        public BeatmapInfo Beatmap
+        {
+            set => iconBox.Colour = GetColour(value);
+        }
+
         public DifficultyIcon(BeatmapInfo beatmap, RulesetInfo ruleset = null)
             : base(beatmap)
         {
@@ -53,7 +60,7 @@ namespace osu.Game.Beatmaps.Drawables
                         Type = EdgeEffectType.Shadow,
                         Radius = 5,
                     },
-                    Child = new Box
+                    Child = iconBox = new Box
                     {
                         RelativeSizeAxes = Axes.Both,
                         Colour = AccentColour,
@@ -71,107 +78,53 @@ namespace osu.Game.Beatmaps.Drawables
         }
     }
 
-    public class DifficultyIconWithCounter : FillFlowContainer
+    public class DifficultyIconWithCounter : Container
     {
         private readonly List<BeatmapInfo> beatmaps;
-        private readonly RulesetInfo ruleset;
-        private readonly Color4 numberColor;
-        private readonly DifficultyType rating;
 
-        private OsuColour palette;
+        private OsuSpriteText text;
+        private DifficultyIcon icon;
+
+        protected List<BeatmapInfo> Beatmaps
+        {
+            set
+            {
+                if (value?.Any() ?? false)
+                {
+                    text.Text = value.Count.ToString();
+                    icon.Beatmap = value.OrderBy(b => b.StarDifficulty).Last();
+                }
+            }
+        }
 
         public DifficultyIconWithCounter(RulesetInfo ruleset, List<BeatmapInfo> beatmaps, Color4 numberColor)
         {
-            this.numberColor = numberColor;
             this.beatmaps = beatmaps;
-            this.ruleset = ruleset;
 
-            rating = DifficultyRating.GetDifficultyType(beatmaps.OrderBy(b => b.StarDifficulty).Last().StarDifficulty);
-        }
-
-        [BackgroundDependencyLoader]
-        private void load(OsuColour palette)
-        {
-            this.palette = palette;
-
-            AutoSizeAxes = Axes.X;
-            RelativeSizeAxes = Axes.Y;
-            Direction = FillDirection.Horizontal;
+            AutoSizeAxes = Axes.Both;
+            Margin = new MarginPadding { Right = 6 };
             Children = new Drawable[]
             {
-                new Container
+                icon = new DifficultyIcon(beatmaps.OrderBy(b => b.StarDifficulty).Last(), ruleset)
                 {
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
-                    Size = new Vector2(20),
-                    Children = new Drawable[]
-                    {
-                        new CircularContainer
-                        {
-                            RelativeSizeAxes = Axes.Both,
-                            Scale = new Vector2(0.84f),
-                            Anchor = Anchor.Centre,
-                            Origin = Anchor.Centre,
-                            Masking = true,
-                            EdgeEffect = new EdgeEffectParameters
-                            {
-                                Colour = Color4.Black.Opacity(0.08f),
-                                Type = EdgeEffectType.Shadow,
-                                Radius = 5,
-                            },
-                            Child = new Box
-                            {
-                                RelativeSizeAxes = Axes.Both,
-                                Colour = getColour(rating),
-                            },
-                        },
-                        new ConstrainedIconContainer
-                        {
-                            Anchor = Anchor.Centre,
-                            Origin = Anchor.Centre,
-                            RelativeSizeAxes = Axes.Both,
-                            Icon = ruleset?.CreateInstance().CreateIcon(),
-                        }
-                    }
+                    Anchor = Anchor.CentreLeft,
+                    Origin = Anchor.CentreLeft,
                 },
-                new OsuSpriteText
+                text = new OsuSpriteText
                 {
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
-                    RelativeSizeAxes = Axes.Y,
-                    Padding = new MarginPadding { Right = 5, Top = 3 },
-                    Colour = numberColor,
+                    Anchor = Anchor.CentreRight,
+                    Origin = Anchor.CentreRight,
+                    Padding = new MarginPadding { Left = 21 },
                     Font = OsuFont.GetFont(size: 14, weight: FontWeight.SemiBold),
-                    Text = beatmaps.Count.ToString(),
+                    Colour = numberColor,
                 },
             };
         }
 
-        private Color4 getColour(DifficultyType rating)
+        [BackgroundDependencyLoader]
+        private void load()
         {
-            switch (rating)
-            {
-                case DifficultyType.Easy:
-                    return palette.Green;
-
-                case DifficultyType.Normal:
-                    return palette.Blue;
-
-                case DifficultyType.Hard:
-                    return palette.Yellow;
-
-                case DifficultyType.Insane:
-                    return palette.Pink;
-
-                case DifficultyType.Expert:
-                    return palette.Purple;
-
-                case DifficultyType.ExpertPlus:
-                    return palette.Gray0;
-
-                default:
-                    return Color4.Black;
-            }
+            Beatmaps = beatmaps;
         }
     }
 }
