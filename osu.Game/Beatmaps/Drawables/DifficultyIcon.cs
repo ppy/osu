@@ -37,7 +37,7 @@ namespace osu.Game.Beatmaps.Drawables
 
         public string TooltipText { get; set; }
 
-        public ITooltip GetCustomTooltip() => new DifficultyIconTooltip();
+        public ITooltip GetCustomTooltip() => new DifficultyIconTooltip(AccentColour);
 
         public class DifficultyIconTooltip : VisibilityContainer, ITooltip
         {
@@ -46,7 +46,7 @@ namespace osu.Game.Beatmaps.Drawables
 
             public string TooltipText { get; set; }
 
-            public DifficultyIconTooltip()
+            public DifficultyIconTooltip(Color4 accentColour)
             {
                 AutoSizeAxes = Axes.Both;
                 Masking = true;
@@ -84,6 +84,7 @@ namespace osu.Game.Beatmaps.Drawables
                                         Anchor = Anchor.Centre,
                                         Origin = Anchor.Centre,
                                         Font = OsuFont.GetFont(size: 16, weight: FontWeight.Regular),
+                                        Colour = accentColour
                                     },
                                     new SpriteIcon
                                     {
@@ -92,7 +93,7 @@ namespace osu.Game.Beatmaps.Drawables
                                         Margin = new MarginPadding { Left = 4 },
                                         Icon = FontAwesome.Solid.Star,
                                         Size = new Vector2(12),
-                                        Colour = Color4.White,
+                                        Colour = accentColour,
                                     },
                                 }
                             }
