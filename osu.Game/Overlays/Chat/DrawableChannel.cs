@@ -18,7 +18,7 @@ namespace osu.Game.Overlays.Chat
     {
         public readonly Channel Channel;
         protected readonly ChatLineContainer ChatLineFlow;
-        private readonly ScrollContainer scroll;
+        private readonly OsuScrollContainer scroll;
 
         public DrawableChannel(Channel channel)
         {
