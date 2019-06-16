@@ -464,11 +464,25 @@ namespace osu.Game.Overlays
 
         private class MusicIconButton : IconButton
         {
+            public MusicIconButton()
+            {
+                AutoSizeAxes = Axes.Both;
+            }
+
             [BackgroundDependencyLoader]
             private void load(OsuColour colours)
             {
                 HoverColour = colours.YellowDark.Opacity(0.6f);
                 FlashColour = colours.Yellow;
+            }
+
+            protected override void LoadComplete()
+            {
+                base.LoadComplete();
+
+                // works with AutoSizeAxes above to make buttons autosize with the scale animation.
+                Content.AutoSizeAxes = Axes.None;
+                Content.Size = new Vector2(DEFAULT_BUTTON_SIZE);
             }
         }
 

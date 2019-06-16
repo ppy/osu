@@ -9,6 +9,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics;
+using osu.Game.Graphics.Containers;
 using osu.Game.Online.API.Requests;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays.Profile.Sections;
@@ -36,7 +37,7 @@ namespace osu.Game.Tests.Visual.Online
                     RelativeSizeAxes = Axes.Both,
                     Colour = OsuColour.Gray(0.2f)
                 },
-                new ScrollContainer
+                new OsuScrollContainer
                 {
                     RelativeSizeAxes = Axes.Both,
                     Child = new FillFlowContainer<DrawableRecentActivity>
