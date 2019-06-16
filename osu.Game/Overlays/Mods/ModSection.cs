@@ -52,12 +52,8 @@ namespace osu.Game.Overlays.Mods
                 buttons = modContainers.OfType<ModButton>().ToArray();
 
                 var expand = value.Any();
-                if (expand)
-                    Show();
-                else
-                    Hide();
-
                 headerLabel.FadeTo(expand ? 1 : 0, 200);
+                this.FadeTo(expand ? 1 : 0);
             }
         }
 
