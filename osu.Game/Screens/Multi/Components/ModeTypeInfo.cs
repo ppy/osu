@@ -56,7 +56,7 @@ namespace osu.Game.Screens.Multi.Components
             if (item?.Beatmap != null)
             {
                 drawableRuleset.FadeIn(transition_duration);
-                drawableRuleset.Child = new DifficultyIcon(item.Beatmap, item.Ruleset) { Size = new Vector2(height) };
+                drawableRuleset.Child = new DifficultyIcon(item.Beatmap, item.Ruleset, true) { Size = new Vector2(height) };
             }
             else
                 drawableRuleset.FadeOut(transition_duration);
