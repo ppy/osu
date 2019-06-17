@@ -200,7 +200,7 @@ namespace osu.Game.Overlays.Profile.Header
                     Direction = FillDirection.Vertical,
                     Children = new Drawable[]
                     {
-                        new DrawableRank(rank)
+                        new UpdateableRank(rank)
                         {
                             RelativeSizeAxes = Axes.X,
                             Height = 30,

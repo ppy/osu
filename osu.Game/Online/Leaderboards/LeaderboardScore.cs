@@ -193,7 +193,7 @@ namespace osu.Game.Online.Leaderboards
                                             Size = new Vector2(40f, 20f),
                                             Children = new[]
                                             {
-                                                scoreRank = new DrawableRank(score.Rank)
+                                                scoreRank = new UpdateableRank(score.Rank)
                                                 {
                                                     Anchor = Anchor.Centre,
                                                     Origin = Anchor.Centre,

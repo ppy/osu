@@ -12,48 +12,46 @@ using System;
 
 namespace osu.Game.Online.Leaderboards
 {
-    public class DrawableRank : ModelBackedDrawable<ScoreRank>
+    public class UpdateableRank : ModelBackedDrawable<ScoreRank>
     {
-        private TextureStore textures;
-
         public ScoreRank Rank
         {
             get => Model;
             set => Model = value;
         }
 
+        public UpdateableRank(ScoreRank rank) => Rank = rank;
+
+        protected override Drawable CreateDrawable(ScoreRank rank) => new DrawableRank(rank)
+        {
+            RelativeSizeAxes = Axes.Both,
+            Anchor = Anchor.Centre,
+            Origin = Anchor.Centre,
+            FillMode = FillMode.Fit,
+        };
+    }
+
+    public class DrawableRank : Sprite
+    {
         private ScoreRank rank;
 
-        public DrawableRank(ScoreRank rank)
-        {
-            this.rank = rank;
-        }
+        public DrawableRank(ScoreRank rank) => this.rank = rank;
 
-        [BackgroundDependencyLoader]
+        [BackgroundDependencyLoader(true)]
         private void load(TextureStore ts)
         {
-            textures = ts ?? throw new ArgumentNullException(nameof(ts));
-            Rank = rank;
-        }
+            if (ts == null)
+                throw new ArgumentNullException(nameof(ts));
 
-        protected override Drawable CreateDrawable(ScoreRank rank)
-        {
-            return new Sprite
-            {
-                RelativeSizeAxes = Axes.Both,
-                Anchor = Anchor.Centre,
-                Origin = Anchor.Centre,
-                FillMode = FillMode.Fit,
-                Texture = textures.Get($"Grades/{getTextureName()}"),
-            };
+            Texture = ts.Get($@"Grades/{getTextureName()}");
         }
 
         private string getTextureName()
         {
-            switch (Rank)
+            switch (rank)
             {
                 default:
-                    return Rank.GetDescription();
+                    return rank.GetDescription();
 
                 case ScoreRank.SH:
                     return "SPlus";
