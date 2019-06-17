@@ -40,6 +40,8 @@ namespace osu.Game.Tournament.Screens.Groupings
                         Direction = FillDirection.Vertical,
                         RelativeSizeAxes = Axes.X,
                         AutoSizeAxes = Axes.Y,
+                        LayoutDuration = 200,
+                        LayoutEasing = Easing.OutQuint,
                     },
                 },
                 new ControlPanel
