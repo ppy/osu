@@ -27,53 +27,39 @@ namespace osu.Game.Users
         public string FlagName;
     }
 
-    public class DrawableFlag : Container, IHasTooltip
+    public class DrawableFlag : ModelBackedDrawable<Country>, IHasTooltip
     {
-        private readonly Sprite sprite;
         private TextureStore textures;
 
-        private Country country;
+        private readonly Country country;
 
         public Country Country
         {
-            get => country;
-            set
-            {
-                if (value == country)
-                    return;
-
-                country = value;
-
-                if (LoadState >= LoadState.Ready)
-                    sprite.Texture = getFlagTexture();
-            }
+            get => Model;
+            set => Model = value;
         }
 
-        public string TooltipText => country?.FullName;
+        public string TooltipText => Country?.FullName;
 
         public DrawableFlag(Country country = null)
         {
             this.country = country;
-
-            Children = new Drawable[]
-            {
-                sprite = new Sprite
-                {
-                    RelativeSizeAxes = Axes.Both,
-                },
-            };
         }
 
         [BackgroundDependencyLoader]
         private void load(TextureStore ts)
         {
-            if (ts == null)
-                throw new ArgumentNullException(nameof(ts));
-
-            textures = ts;
-            sprite.Texture = getFlagTexture();
+            textures = ts ?? throw new ArgumentNullException(nameof(ts));
+            Country = country;
         }
 
-        private Texture getFlagTexture() => textures.Get($@"Flags/{country?.FlagName ?? @"__"}");
+        protected override Drawable CreateDrawable(Country country)
+        {
+            return new Sprite
+            {
+                RelativeSizeAxes = Axes.Both,
+                Texture = textures.Get($@"Flags/{country?.FlagName ?? @"__"}"),
+            };
+        }
     }
 }
