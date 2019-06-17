@@ -8,29 +8,18 @@ namespace osu.Game.Rulesets
 {
     public abstract class BindableRulesetSelector : RulesetSelector
     {
-        protected readonly Bindable<RulesetInfo> GlobalRuleset = new Bindable<RulesetInfo>();
-
         [BackgroundDependencyLoader]
         private void load(Bindable<RulesetInfo> parentRuleset)
         {
-            GlobalRuleset.BindTo(parentRuleset);
-
-            GlobalRuleset.BindValueChanged(globalRulesetChanged);
-            Current.BindValueChanged(OnLocalRulesetChanged);
+            Current.BindTo(parentRuleset);
+            Current.BindValueChanged(OnRulesetChanged);
         }
 
-        private void globalRulesetChanged(ValueChangedEvent<RulesetInfo> e) => OnGlobalRulesetChanged(e);
-
-        protected virtual void OnGlobalRulesetChanged(ValueChangedEvent<RulesetInfo> e)
+        protected virtual void OnRulesetChanged(ValueChangedEvent<RulesetInfo> e)
         {
-            Current.Value = e.NewValue;
-        }
-
-        protected virtual void OnLocalRulesetChanged(ValueChangedEvent<RulesetInfo> e)
-        {
-            if (!GlobalRuleset.Disabled)
+            if (Current.Disabled)
             {
-                GlobalRuleset.Value = e.NewValue;
+                return;
             }
         }
     }

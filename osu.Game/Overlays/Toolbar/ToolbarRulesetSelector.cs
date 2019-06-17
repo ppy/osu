@@ -22,10 +22,10 @@ namespace osu.Game.Overlays.Toolbar
         private const float padding = 10;
         private readonly Drawable modeButtonLine;
 
-        public override bool HandleNonPositionalInput => !GlobalRuleset.Disabled && base.HandleNonPositionalInput;
-        public override bool HandlePositionalInput => !GlobalRuleset.Disabled && base.HandlePositionalInput;
+        public override bool HandleNonPositionalInput => !Current.Disabled && base.HandleNonPositionalInput;
+        public override bool HandlePositionalInput => !Current.Disabled && base.HandlePositionalInput;
 
-        public override bool PropagatePositionalInputSubTree => !GlobalRuleset.Disabled && base.PropagatePositionalInputSubTree;
+        public override bool PropagatePositionalInputSubTree => !Current.Disabled && base.PropagatePositionalInputSubTree;
 
         private void disabledChanged(bool isDisabled) => this.FadeColour(isDisabled ? Color4.Gray : Color4.White, 300);
 
@@ -62,7 +62,7 @@ namespace osu.Game.Overlays.Toolbar
                 }
             });
 
-            GlobalRuleset.DisabledChanged += disabledChanged;
+            Current.DisabledChanged += disabledChanged;
         }
 
         protected override TabFillFlowContainer CreateTabFlow() => new TabFillFlowContainer
@@ -92,9 +92,9 @@ namespace osu.Game.Overlays.Toolbar
 
         private readonly Cached activeMode = new Cached();
 
-        protected override void OnLocalRulesetChanged(ValueChangedEvent<RulesetInfo> e)
+        protected override void OnRulesetChanged(ValueChangedEvent<RulesetInfo> e)
         {
-            base.OnLocalRulesetChanged(e);
+            base.OnRulesetChanged(e);
 
             activeMode.Invalidate();
         }
