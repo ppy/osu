@@ -41,6 +41,9 @@ namespace osu.Game.Tests.Visual.Online
             typeof(SuccessRate),
         };
 
+        private RulesetInfo maniaRuleset;
+        private RulesetInfo taikoRuleset;
+
         public TestSceneBeatmapSetOverlay()
         {
             Add(overlay = new BeatmapSetOverlay());
@@ -49,13 +52,25 @@ namespace osu.Game.Tests.Visual.Online
         [BackgroundDependencyLoader]
         private void load(RulesetStore rulesets)
         {
-            var mania = rulesets.GetRuleset(3);
-            var taiko = rulesets.GetRuleset(1);
+            maniaRuleset = rulesets.GetRuleset(3);
+            taikoRuleset = rulesets.GetRuleset(1);
+        }
 
+        [Test]
+        public void TestLoading()
+        {
             AddStep(@"show loading", () => overlay.ShowBeatmapSet(null));
+        }
 
+        [Test]
+        public void TestOnline()
+        {
             AddStep(@"show online", () => overlay.FetchAndShowBeatmapSet(55));
+        }
 
+        [Test]
+        public void TestLocalBeatmaps()
+        {
             AddStep(@"show first", () =>
             {
                 overlay.ShowBeatmapSet(new BeatmapSetInfo
@@ -87,13 +102,14 @@ namespace osu.Game.Tests.Visual.Online
                             Cover = @"https://assets.ppy.sh/beatmaps/415886/covers/cover.jpg?1465651778",
                         },
                     },
+                    Metrics = new BeatmapSetMetrics { Ratings = Enumerable.Range(0, 11).ToArray() },
                     Beatmaps = new List<BeatmapInfo>
                     {
                         new BeatmapInfo
                         {
                             StarDifficulty = 1.36,
                             Version = @"BASIC",
-                            Ruleset = mania,
+                            Ruleset = maniaRuleset,
                             BaseDifficulty = new BeatmapDifficulty
                             {
                                 CircleSize = 4,
@@ -111,16 +127,15 @@ namespace osu.Game.Tests.Visual.Online
                             },
                             Metrics = new BeatmapMetrics
                             {
-                                Ratings = Enumerable.Range(0, 11),
-                                Fails = Enumerable.Range(1, 100).Select(i => i % 12 - 6),
-                                Retries = Enumerable.Range(-2, 100).Select(i => i % 12 - 6),
+                                Fails = Enumerable.Range(1, 100).Select(i => i % 12 - 6).ToArray(),
+                                Retries = Enumerable.Range(-2, 100).Select(i => i % 12 - 6).ToArray(),
                             },
                         },
                         new BeatmapInfo
                         {
                             StarDifficulty = 2.22,
                             Version = @"NOVICE",
-                            Ruleset = mania,
+                            Ruleset = maniaRuleset,
                             BaseDifficulty = new BeatmapDifficulty
                             {
                                 CircleSize = 4,
@@ -138,16 +153,15 @@ namespace osu.Game.Tests.Visual.Online
                             },
                             Metrics = new BeatmapMetrics
                             {
-                                Ratings = Enumerable.Range(0, 11),
-                                Fails = Enumerable.Range(1, 100).Select(i => i % 12 - 6),
-                                Retries = Enumerable.Range(-2, 100).Select(i => i % 12 - 6),
+                                Fails = Enumerable.Range(1, 100).Select(i => i % 12 - 6).ToArray(),
+                                Retries = Enumerable.Range(-2, 100).Select(i => i % 12 - 6).ToArray(),
                             },
                         },
                         new BeatmapInfo
                         {
                             StarDifficulty = 3.49,
                             Version = @"ADVANCED",
-                            Ruleset = mania,
+                            Ruleset = maniaRuleset,
                             BaseDifficulty = new BeatmapDifficulty
                             {
                                 CircleSize = 4,
@@ -165,16 +179,15 @@ namespace osu.Game.Tests.Visual.Online
                             },
                             Metrics = new BeatmapMetrics
                             {
-                                Ratings = Enumerable.Range(0, 11),
-                                Fails = Enumerable.Range(1, 100).Select(i => i % 12 - 6),
-                                Retries = Enumerable.Range(-2, 100).Select(i => i % 12 - 6),
+                                Fails = Enumerable.Range(1, 100).Select(i => i % 12 - 6).ToArray(),
+                                Retries = Enumerable.Range(-2, 100).Select(i => i % 12 - 6).ToArray(),
                             },
                         },
                         new BeatmapInfo
                         {
                             StarDifficulty = 4.24,
                             Version = @"EXHAUST",
-                            Ruleset = mania,
+                            Ruleset = maniaRuleset,
                             BaseDifficulty = new BeatmapDifficulty
                             {
                                 CircleSize = 4,
@@ -192,16 +205,15 @@ namespace osu.Game.Tests.Visual.Online
                             },
                             Metrics = new BeatmapMetrics
                             {
-                                Ratings = Enumerable.Range(0, 11),
-                                Fails = Enumerable.Range(1, 100).Select(i => i % 12 - 6),
-                                Retries = Enumerable.Range(-2, 100).Select(i => i % 12 - 6),
+                                Fails = Enumerable.Range(1, 100).Select(i => i % 12 - 6).ToArray(),
+                                Retries = Enumerable.Range(-2, 100).Select(i => i % 12 - 6).ToArray(),
                             },
                         },
                         new BeatmapInfo
                         {
                             StarDifficulty = 5.26,
                             Version = @"GRAVITY",
-                            Ruleset = mania,
+                            Ruleset = maniaRuleset,
                             BaseDifficulty = new BeatmapDifficulty
                             {
                                 CircleSize = 4,
@@ -219,9 +231,8 @@ namespace osu.Game.Tests.Visual.Online
                             },
                             Metrics = new BeatmapMetrics
                             {
-                                Ratings = Enumerable.Range(0, 11),
-                                Fails = Enumerable.Range(1, 100).Select(i => i % 12 - 6),
-                                Retries = Enumerable.Range(-2, 100).Select(i => i % 12 - 6),
+                                Fails = Enumerable.Range(1, 100).Select(i => i % 12 - 6).ToArray(),
+                                Retries = Enumerable.Range(-2, 100).Select(i => i % 12 - 6).ToArray(),
                             },
                         },
                     },
@@ -258,13 +269,14 @@ namespace osu.Game.Tests.Visual.Online
                             Cover = @"https://assets.ppy.sh/beatmaps/625493/covers/cover.jpg?1499167472",
                         },
                     },
+                    Metrics = new BeatmapSetMetrics { Ratings = Enumerable.Range(0, 11).ToArray() },
                     Beatmaps = new List<BeatmapInfo>
                     {
                         new BeatmapInfo
                         {
                             StarDifficulty = 1.40,
                             Version = @"yzrin's Kantan",
-                            Ruleset = taiko,
+                            Ruleset = taikoRuleset,
                             BaseDifficulty = new BeatmapDifficulty
                             {
                                 CircleSize = 2,
@@ -282,16 +294,15 @@ namespace osu.Game.Tests.Visual.Online
                             },
                             Metrics = new BeatmapMetrics
                             {
-                                Ratings = Enumerable.Range(0, 11),
-                                Fails = Enumerable.Range(1, 100).Select(i => i % 12 - 6),
-                                Retries = Enumerable.Range(-2, 100).Select(i => i % 12 - 6),
+                                Fails = Enumerable.Range(1, 100).Select(i => i % 12 - 6).ToArray(),
+                                Retries = Enumerable.Range(-2, 100).Select(i => i % 12 - 6).ToArray(),
                             },
                         },
                         new BeatmapInfo
                         {
                             StarDifficulty = 2.23,
                             Version = @"Futsuu",
-                            Ruleset = taiko,
+                            Ruleset = taikoRuleset,
                             BaseDifficulty = new BeatmapDifficulty
                             {
                                 CircleSize = 2,
@@ -309,16 +320,15 @@ namespace osu.Game.Tests.Visual.Online
                             },
                             Metrics = new BeatmapMetrics
                             {
-                                Ratings = Enumerable.Range(0, 11),
-                                Fails = Enumerable.Range(1, 100).Select(i => i % 12 - 6),
-                                Retries = Enumerable.Range(-2, 100).Select(i => i % 12 - 6),
+                                Fails = Enumerable.Range(1, 100).Select(i => i % 12 - 6).ToArray(),
+                                Retries = Enumerable.Range(-2, 100).Select(i => i % 12 - 6).ToArray(),
                             },
                         },
                         new BeatmapInfo
                         {
                             StarDifficulty = 3.19,
                             Version = @"Muzukashii",
-                            Ruleset = taiko,
+                            Ruleset = taikoRuleset,
                             BaseDifficulty = new BeatmapDifficulty
                             {
                                 CircleSize = 2,
@@ -336,16 +346,15 @@ namespace osu.Game.Tests.Visual.Online
                             },
                             Metrics = new BeatmapMetrics
                             {
-                                Ratings = Enumerable.Range(0, 11),
-                                Fails = Enumerable.Range(1, 100).Select(i => i % 12 - 6),
-                                Retries = Enumerable.Range(-2, 100).Select(i => i % 12 - 6),
+                                Fails = Enumerable.Range(1, 100).Select(i => i % 12 - 6).ToArray(),
+                                Retries = Enumerable.Range(-2, 100).Select(i => i % 12 - 6).ToArray(),
                             },
                         },
                         new BeatmapInfo
                         {
                             StarDifficulty = 3.97,
                             Version = @"Charlotte's Oni",
-                            Ruleset = taiko,
+                            Ruleset = taikoRuleset,
                             BaseDifficulty = new BeatmapDifficulty
                             {
                                 CircleSize = 5,
@@ -363,16 +372,15 @@ namespace osu.Game.Tests.Visual.Online
                             },
                             Metrics = new BeatmapMetrics
                             {
-                                Ratings = Enumerable.Range(0, 11),
-                                Fails = Enumerable.Range(1, 100).Select(i => i % 12 - 6),
-                                Retries = Enumerable.Range(-2, 100).Select(i => i % 12 - 6),
+                                Fails = Enumerable.Range(1, 100).Select(i => i % 12 - 6).ToArray(),
+                                Retries = Enumerable.Range(-2, 100).Select(i => i % 12 - 6).ToArray(),
                             },
                         },
                         new BeatmapInfo
                         {
                             StarDifficulty = 5.08,
                             Version = @"Labyrinth Oni",
-                            Ruleset = taiko,
+                            Ruleset = taikoRuleset,
                             BaseDifficulty = new BeatmapDifficulty
                             {
                                 CircleSize = 5,
@@ -390,16 +398,24 @@ namespace osu.Game.Tests.Visual.Online
                             },
                             Metrics = new BeatmapMetrics
                             {
-                                Ratings = Enumerable.Range(0, 11),
-                                Fails = Enumerable.Range(1, 100).Select(i => i % 12 - 6),
-                                Retries = Enumerable.Range(-2, 100).Select(i => i % 12 - 6),
+                                Fails = Enumerable.Range(1, 100).Select(i => i % 12 - 6).ToArray(),
+                                Retries = Enumerable.Range(-2, 100).Select(i => i % 12 - 6).ToArray(),
                             },
                         },
                     },
                 });
             });
+        }
 
+        [Test]
+        public void TestHide()
+        {
             AddStep(@"hide", overlay.Hide);
+        }
+
+        [Test]
+        public void TestShowWithNoReload()
+        {
             AddStep(@"show without reload", overlay.Show);
         }
     }
