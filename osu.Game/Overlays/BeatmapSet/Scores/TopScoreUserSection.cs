@@ -13,7 +13,6 @@ using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Online.Leaderboards;
 using osu.Game.Scoring;
-using osu.Game.Users;
 using osu.Game.Users.Drawables;
 using osuTK;
 using osuTK.Graphics;
