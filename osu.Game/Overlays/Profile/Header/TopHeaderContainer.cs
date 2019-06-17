@@ -12,6 +12,7 @@ using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays.Profile.Header.Components;
 using osu.Game.Users;
+using osu.Game.Users.Drawables;
 using osuTK;
 
 namespace osu.Game.Overlays.Profile.Header
@@ -27,7 +28,7 @@ namespace osu.Game.Overlays.Profile.Header
         private OsuSpriteText usernameText;
         private ExternalLinkButton openUserExternally;
         private OsuSpriteText titleText;
-        private DrawableFlag userFlag;
+        private UpdateableFlag userFlag;
         private OsuSpriteText userCountryText;
         private FillFlowContainer userStats;
 
@@ -51,7 +52,7 @@ namespace osu.Game.Overlays.Profile.Header
                     AutoSizeAxes = Axes.X,
                     Anchor = Anchor.CentreLeft,
                     Origin = Anchor.CentreLeft,
-                    Children = new[]
+                    Children = new Drawable[]
                     {
                         avatar = new UpdateableAvatar
                         {
@@ -115,7 +116,7 @@ namespace osu.Game.Overlays.Profile.Header
                                             Margin = new MarginPadding { Top = 5 },
                                             Children = new Drawable[]
                                             {
-                                                userFlag = new DrawableFlag
+                                                userFlag = new UpdateableFlag
                                                 {
                                                     Size = new Vector2(30, 20)
                                                 },
