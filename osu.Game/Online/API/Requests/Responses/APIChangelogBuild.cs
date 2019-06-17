@@ -31,9 +31,9 @@ namespace osu.Game.Online.API.Requests.Responses
         public List<APIChangelogEntry> ChangelogEntries { get; set; }
 
         [JsonProperty("versions")]
-        public VersionNatigation Versions { get; set; }
+        public VersionNavigation Versions { get; set; }
 
-        public class VersionNatigation
+        public class VersionNavigation
         {
             [JsonProperty("next")]
             public APIChangelogBuild Next { get; set; }
