@@ -48,6 +48,11 @@ namespace osu.Game.Rulesets.UI
         public readonly BindableBool DisplayJudgements = new BindableBool(true);
 
         /// <summary>
+        /// Whether this playfield has failed
+        /// </summary>
+        public readonly BindableBool HasFailed = new BindableBool();
+
+        /// <summary>
         /// Creates a new <see cref="Playfield"/>.
         /// </summary>
         protected Playfield()
@@ -147,6 +152,8 @@ namespace osu.Game.Rulesets.UI
         {
             NestedPlayfields.ForEach(p => p.Fail());
             HitObjectContainer.AliveObjects.ForEach(h => h.Fail());
+
+            HasFailed.Value = true;
         }
     }
 }
