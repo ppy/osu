@@ -7,7 +7,6 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
-using osu.Framework.Graphics.Video;
 using osu.Framework.Platform;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Tournament.Components;
@@ -30,7 +29,7 @@ namespace osu.Game.Tournament.Screens
     public class TournamentSceneManager : CompositeDrawable
     {
         private Container screens;
-        private VideoSprite video;
+        private TourneyVideo video;
 
         [Cached]
         private MatchChatDisplay chat = new MatchChatDisplay();
@@ -59,11 +58,10 @@ namespace osu.Game.Tournament.Screens
                     //Masking = true,
                     Children = new Drawable[]
                     {
-                        video = new VideoSprite(storage.GetStream("BG Logoless - OWC.m4v"))
+                        video = new TourneyVideo(storage.GetStream("BG Logoless - OWC.m4v"))
                         {
                             Loop = true,
                             RelativeSizeAxes = Axes.Both,
-                            FillMode = FillMode.Fit,
                         },
                         screens = new Container
                         {

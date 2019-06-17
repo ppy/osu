@@ -5,7 +5,6 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Video;
 using osu.Framework.Platform;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
@@ -24,8 +23,8 @@ namespace osu.Game.Tournament.Screens.TeamWin
         private readonly Bindable<MatchPairing> currentMatch = new Bindable<MatchPairing>();
         private readonly Bindable<bool> currentCompleted = new Bindable<bool>();
 
-        private VideoSprite blueWinVideo;
-        private VideoSprite redWinVideo;
+        private TourneyVideo blueWinVideo;
+        private TourneyVideo redWinVideo;
 
         [BackgroundDependencyLoader]
         private void load(LadderInfo ladder, Storage storage)
@@ -34,13 +33,13 @@ namespace osu.Game.Tournament.Screens.TeamWin
 
             InternalChildren = new Drawable[]
             {
-                blueWinVideo = new VideoSprite(storage.GetStream(@"BG Team - Win Blue.m4v"))
+                blueWinVideo = new TourneyVideo(storage.GetStream(@"BG Team - Win Blue.m4v"))
                 {
                     Alpha = 1,
                     RelativeSizeAxes = Axes.Both,
                     Loop = true,
                 },
-                redWinVideo = new VideoSprite(storage.GetStream(@"BG Team - Win Red.m4v"))
+                redWinVideo = new TourneyVideo(storage.GetStream(@"BG Team - Win Red.m4v"))
                 {
                     Alpha = 0,
                     RelativeSizeAxes = Axes.Both,
