@@ -5,7 +5,6 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Video;
 using osu.Framework.Platform;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
@@ -30,7 +29,7 @@ namespace osu.Game.Tournament.Screens.TeamIntro
 
             InternalChildren = new Drawable[]
             {
-                new VideoSprite(storage.GetStream(@"BG Team - Both OWC.m4v"))
+                new TourneyVideo(storage.GetStream(@"BG Team - Both OWC.m4v"))
                 {
                     RelativeSizeAxes = Axes.Both,
                     Loop = true,

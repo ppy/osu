@@ -8,10 +8,10 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
-using osu.Framework.Graphics.Video;
 using osu.Framework.Platform;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Tournament.Components;
 using osu.Game.Tournament.Screens.Ladder.Components;
 using osuTK;
 using osuTK.Graphics;
@@ -33,7 +33,7 @@ namespace osu.Game.Tournament.Screens.Schedule
 
             InternalChildren = new Drawable[]
             {
-                new VideoSprite(storage.GetStream(@"BG Side Logo - OWC.m4v"))
+                new TourneyVideo(storage.GetStream(@"BG Side Logo - OWC.m4v"))
                 {
                     RelativeSizeAxes = Axes.Both,
                     Loop = true,
