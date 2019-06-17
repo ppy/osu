@@ -26,8 +26,7 @@ namespace osu.Game.Tests.Visual.UserInterface
                 {
                     new NamedIconButton("No change", new IconButton()),
                     new NamedIconButton("Background colours", new ColouredIconButton()),
-                    new NamedIconButton("Full-width", new IconButton { ButtonSize = new Vector2(200, 30) }),
-                    new NamedIconButton("Unchanging size", new IconButton(), false),
+                    new NamedIconButton("Full-width", new IconButton { Size = new Vector2(200, 30) }),
                     new NamedIconButton("Icon colours", new IconButton
                     {
                         IconColour = Color4.Green,
@@ -48,7 +47,7 @@ namespace osu.Game.Tests.Visual.UserInterface
 
         private class NamedIconButton : Container
         {
-            public NamedIconButton(string name, IconButton button, bool allowSizeChange = true)
+            public NamedIconButton(string name, IconButton button)
             {
                 AutoSizeAxes = Axes.Y;
                 Width = 200;
@@ -101,13 +100,7 @@ namespace osu.Game.Tests.Visual.UserInterface
                     }
                 };
 
-                if (allowSizeChange)
-                    iconContainer.AutoSizeAxes = Axes.Both;
-                else
-                {
-                    iconContainer.RelativeSizeAxes = Axes.X;
-                    iconContainer.Height = 30;
-                }
+                iconContainer.AutoSizeAxes = Axes.Both;
 
                 button.Anchor = Anchor.Centre;
                 button.Origin = Anchor.Centre;
