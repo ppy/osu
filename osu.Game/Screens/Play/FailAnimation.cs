@@ -22,13 +22,13 @@ namespace osu.Game.Screens.Play
     {
         public Action OnComplete;
 
+        public const float FAIL_DURATION = 2500;
+
         private readonly DrawableRuleset drawableRuleset;
 
         private readonly BindableDouble trackFreq = new BindableDouble(1);
 
         private Track track;
-
-        private const float duration = 2500;
 
         private SampleChannel failSample;
 
@@ -58,7 +58,7 @@ namespace osu.Game.Screens.Play
 
             failSample.Play();
 
-            this.TransformBindableTo(trackFreq, 0, duration).OnComplete(_ =>
+            this.TransformBindableTo(trackFreq, 0, FAIL_DURATION).OnComplete(_ =>
             {
                 OnComplete?.Invoke();
                 Expire();
@@ -70,7 +70,7 @@ namespace osu.Game.Screens.Play
 
             drawableRuleset.Playfield.Fail();
             drawableRuleset.Playfield.HitObjectContainer.FlashColour(Color4.Red, 500);
-            drawableRuleset.Playfield.HitObjectContainer.FadeOut(duration / 2);
+            drawableRuleset.Playfield.HitObjectContainer.FadeOut(FAIL_DURATION / 2);
         }
 
         protected override void Update()
