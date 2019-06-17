@@ -1,17 +1,13 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
 using osu.Framework.Input.Events;
-using osu.Game.Graphics.Sprites;
-using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays.Settings;
 using osu.Game.Screens.Play.PlayerSettings;
 using osu.Game.Tournament.Components;
@@ -24,11 +20,11 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
 
         protected override string Title => @"ladder";
 
-        private OsuTextBox textboxTeam1;
-        private OsuTextBox textboxTeam2;
         private SettingsDropdown<TournamentGrouping> groupingDropdown;
         private PlayerCheckbox losersCheckbox;
         private DateTextBox dateTimeBox;
+        private SettingsTeamDropdown team1Dropdown;
+        private SettingsTeamDropdown team2Dropdown;
 
         [Resolved]
         private LadderEditorInfo editorInfo { get; set; }
@@ -39,99 +35,32 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
         [BackgroundDependencyLoader]
         private void load()
         {
-            var teamEntries = ladderInfo.Teams;
-
             Children = new Drawable[]
             {
-                new Container
-                {
-                    RelativeSizeAxes = Axes.X,
-                    AutoSizeAxes = Axes.Y,
-                    Padding = new MarginPadding { Horizontal = padding },
-                    Children = new Drawable[]
-                    {
-                        new OsuSpriteText
-                        {
-                            Anchor = Anchor.CentreLeft,
-                            Origin = Anchor.CentreLeft,
-                            Text = "Team1",
-                        },
-                    },
-                },
-                textboxTeam1 = new OsuTextBox { RelativeSizeAxes = Axes.X, Height = 20 },
-                new Container
-                {
-                    RelativeSizeAxes = Axes.X,
-                    AutoSizeAxes = Axes.Y,
-                    Padding = new MarginPadding { Horizontal = padding },
-                    Children = new Drawable[]
-                    {
-                        new OsuSpriteText
-                        {
-                            Anchor = Anchor.CentreLeft,
-                            Origin = Anchor.CentreLeft,
-                            Text = "Team2",
-                        },
-                    },
-                },
-                textboxTeam2 = new OsuTextBox { RelativeSizeAxes = Axes.X, Height = 20 },
-                groupingDropdown = new SettingsGroupingDropdown(ladderInfo.Groupings),
-                losersCheckbox = new PlayerCheckbox
-                {
-                    LabelText = "Losers Bracket",
-                    Bindable = new Bindable<bool>()
-                },
-                dateTimeBox = new DateTextBox
-                {
-                    Bindable = new Bindable<DateTimeOffset>()
-                }
+                team1Dropdown = new SettingsTeamDropdown(ladderInfo.Teams) { LabelText = "Team 1" },
+                team2Dropdown = new SettingsTeamDropdown(ladderInfo.Teams) { LabelText = "Team 2" },
+                groupingDropdown = new SettingsGroupingDropdown(ladderInfo.Groupings) { LabelText = "Grouping" },
+                losersCheckbox = new PlayerCheckbox { LabelText = "Losers Bracket" },
+                dateTimeBox = new DateTextBox { LabelText = "Match Time" },
             };
 
             editorInfo.Selected.ValueChanged += selection =>
             {
-                textboxTeam1.Text = selection.NewValue?.Team1.Value?.Acronym.Value;
-                textboxTeam2.Text = selection.NewValue?.Team2.Value?.Acronym.Value;
-                groupingDropdown.Bindable.Value = selection.NewValue?.Grouping.Value;
-                losersCheckbox.Current.Value = selection.NewValue?.Losers.Value ?? false;
-                dateTimeBox.Bindable.Value = selection.NewValue?.Date.Value ?? DateTimeOffset.UtcNow;
-            };
+                groupingDropdown.Bindable = selection.NewValue?.Grouping;
+                losersCheckbox.Bindable = selection.NewValue?.Losers;
+                dateTimeBox.Bindable = selection.NewValue?.Date;
 
-            textboxTeam1.OnCommit = (val, newText) =>
-            {
-                if (newText && editorInfo.Selected.Value != null)
-                    editorInfo.Selected.Value.Team1.Value = teamEntries.FirstOrDefault(t => t.Acronym.Value == val.Text);
-            };
-
-            textboxTeam2.OnCommit = (val, newText) =>
-            {
-                if (newText && editorInfo.Selected.Value != null)
-                    editorInfo.Selected.Value.Team2.Value = teamEntries.FirstOrDefault(t => t.Acronym.Value == val.Text);
+                team1Dropdown.Bindable = selection.NewValue?.Team1;
+                team2Dropdown.Bindable = selection.NewValue?.Team2;
             };
 
             groupingDropdown.Bindable.ValueChanged += grouping =>
             {
-                if (editorInfo.Selected.Value != null)
+                if (editorInfo.Selected.Value?.Date.Value < grouping.NewValue?.StartDate.Value)
                 {
-                    editorInfo.Selected.Value.Grouping.Value = grouping.NewValue;
-
-                    if (editorInfo.Selected.Value.Date.Value < grouping.NewValue.StartDate.Value)
-                    {
-                        editorInfo.Selected.Value.Date.Value = grouping.NewValue.StartDate.Value;
-                        editorInfo.Selected.TriggerChange();
-                    }
+                    editorInfo.Selected.Value.Date.Value = grouping.NewValue.StartDate.Value;
+                    editorInfo.Selected.TriggerChange();
                 }
-            };
-
-            losersCheckbox.Current.ValueChanged += losers =>
-            {
-                if (editorInfo.Selected.Value != null)
-                    editorInfo.Selected.Value.Losers.Value = losers.NewValue;
-            };
-
-            dateTimeBox.Bindable.ValueChanged += date =>
-            {
-                if (editorInfo.Selected.Value != null)
-                    editorInfo.Selected.Value.Date.Value = date.NewValue;
             };
         }
 
@@ -180,6 +109,38 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
                 {
                     Control.RemoveDropdownItem(grouping);
                     Control.AddDropdownItem(grouping);
+                });
+            }
+        }
+
+        private class SettingsTeamDropdown : SettingsDropdown<TournamentTeam>
+        {
+            public SettingsTeamDropdown(BindableList<TournamentTeam> teams)
+            {
+                foreach (var g in teams.Prepend(new TournamentTeam()))
+                    add(g);
+
+                teams.ItemsRemoved += items => items.ForEach(i => Control.RemoveDropdownItem(i));
+                teams.ItemsAdded += items => items.ForEach(add);
+            }
+
+            private readonly List<IUnbindable> refBindables = new List<IUnbindable>();
+
+            private T boundReference<T>(T obj)
+                where T : IBindable
+            {
+                obj = (T)obj.GetBoundCopy();
+                refBindables.Add(obj);
+                return obj;
+            }
+
+            private void add(TournamentTeam team)
+            {
+                Control.AddDropdownItem(team);
+                boundReference(team.FullName).BindValueChanged(_ =>
+                {
+                    Control.RemoveDropdownItem(team);
+                    Control.AddDropdownItem(team);
                 });
             }
         }
