@@ -103,7 +103,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                     Text = $"#{index + 1}",
                     Font = OsuFont.GetFont(size: text_size, weight: FontWeight.Bold)
                 },
-                new DrawableRank(score.Rank)
+                new UpdateableRank(score.Rank)
                 {
                     Size = new Vector2(30, 20)
                 },

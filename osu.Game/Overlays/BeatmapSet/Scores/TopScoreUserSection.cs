@@ -22,7 +22,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
     public class TopScoreUserSection : CompositeDrawable
     {
         private readonly SpriteText rankText;
-        private readonly DrawableRank rank;
+        private readonly UpdateableRank rank;
         private readonly UpdateableAvatar avatar;
         private readonly LinkFlowContainer usernameText;
         private readonly SpriteText date;
@@ -46,7 +46,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                         Text = "#1",
                         Font = OsuFont.GetFont(size: 30, weight: FontWeight.Bold, italics: true)
                     },
-                    rank = new DrawableRank(ScoreRank.D)
+                    rank = new UpdateableRank(ScoreRank.D)
                     {
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
@@ -121,7 +121,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                 usernameText.Clear();
                 usernameText.AddUserLink(value.User);
 
-                rank.UpdateRank(value.Rank);
+                rank.Rank = value.Rank;
             }
         }
     }
