@@ -9,14 +9,12 @@ using osu.Framework.Bindables;
 using osu.Framework.Extensions.TypeExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Primitives;
-using osu.Framework.MathUtils;
 using osu.Game.Audio;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Skinning;
-using osuTK;
 using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Objects.Drawables
@@ -79,8 +77,8 @@ namespace osu.Game.Rulesets.Objects.Drawables
 
         private bool judgementOccurred;
 
-        public override bool PropagatePositionalInputSubTree => !objectFailed;
-        public override bool PropagateNonPositionalInputSubTree => !objectFailed;
+        public override bool PropagatePositionalInputSubTree => !HasFailed.Value;
+        public override bool PropagateNonPositionalInputSubTree => !HasFailed.Value;
 
         public override bool RemoveWhenNotAlive => false;
         public override bool RemoveCompletedTransforms => false;
@@ -90,10 +88,8 @@ namespace osu.Game.Rulesets.Objects.Drawables
 
         public readonly Bindable<ArmedState> State = new Bindable<ArmedState>();
 
-        private bool objectFailed;
-
-        private const float fail_duration = 2500;
-
+        public BindableBool HasFailed = new BindableBool();
+        
         protected DrawableHitObject(HitObject hitObject)
         {
             HitObject = hitObject;
@@ -203,6 +199,9 @@ namespace osu.Game.Rulesets.Objects.Drawables
         /// <param name="application">The callback that applies changes to the <see cref="JudgementResult"/>.</param>
         protected void ApplyResult(Action<JudgementResult> application)
         {
+            if (HasFailed.Value)
+                return;
+
             application?.Invoke(Result);
 
             if (!Result.HasResult)
@@ -268,19 +267,9 @@ namespace osu.Game.Rulesets.Objects.Drawables
         /// <summary>
         /// Applies the failing animation on this <see cref="DrawableHitObject"/>.
         /// </summary>
-        public void Fail()
+        public virtual void Fail()
         {
-            if (objectFailed)
-                return;
-
-            foreach (var obj in NestedHitObjects)
-                obj.Fail();
-
-            this.RotateTo(RNG.NextSingle(-90, 90), fail_duration);
-            this.ScaleTo(Scale * 0.5f, fail_duration);
-            this.MoveToOffset(new Vector2(0, 400), fail_duration);
-
-            objectFailed = true;
+            HasFailed.Value = true;
         }
 
         /// <summary>
