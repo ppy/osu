@@ -73,8 +73,8 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
 
         public MatchPairing()
         {
-            Team1.BindValueChanged(t => Team1Acronym = t.NewValue?.Acronym, true);
-            Team2.BindValueChanged(t => Team2Acronym = t.NewValue?.Acronym, true);
+            Team1.BindValueChanged(t => Team1Acronym = t.NewValue?.Acronym.Value, true);
+            Team2.BindValueChanged(t => Team2Acronym = t.NewValue?.Acronym.Value, true);
         }
 
         public MatchPairing(TournamentTeam team1 = null, TournamentTeam team2 = null)

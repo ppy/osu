@@ -89,8 +89,8 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
 
             editorInfo.Selected.ValueChanged += selection =>
             {
-                textboxTeam1.Text = selection.NewValue?.Team1.Value?.Acronym;
-                textboxTeam2.Text = selection.NewValue?.Team2.Value?.Acronym;
+                textboxTeam1.Text = selection.NewValue?.Team1.Value?.Acronym.Value;
+                textboxTeam2.Text = selection.NewValue?.Team2.Value?.Acronym.Value;
                 groupingDropdown.Bindable.Value = selection.NewValue?.Grouping.Value;
                 losersCheckbox.Current.Value = selection.NewValue?.Losers.Value ?? false;
                 dateTimeBox.Bindable.Value = selection.NewValue?.Date.Value ?? DateTimeOffset.UtcNow;
@@ -99,13 +99,13 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
             textboxTeam1.OnCommit = (val, newText) =>
             {
                 if (newText && editorInfo.Selected.Value != null)
-                    editorInfo.Selected.Value.Team1.Value = teamEntries.FirstOrDefault(t => t.Acronym == val.Text);
+                    editorInfo.Selected.Value.Team1.Value = teamEntries.FirstOrDefault(t => t.Acronym.Value == val.Text);
             };
 
             textboxTeam2.OnCommit = (val, newText) =>
             {
                 if (newText && editorInfo.Selected.Value != null)
-                    editorInfo.Selected.Value.Team2.Value = teamEntries.FirstOrDefault(t => t.Acronym == val.Text);
+                    editorInfo.Selected.Value.Team2.Value = teamEntries.FirstOrDefault(t => t.Acronym.Value == val.Text);
             };
 
             groupingDropdown.Bindable.ValueChanged += grouping =>

@@ -27,8 +27,8 @@ namespace osu.Game.Tournament.Tests
             Container<DrawableMatchPairing> level2;
 
             var pairing1 = new MatchPairing(
-                new TournamentTeam { FlagName = "AU", FullName = "Australia", },
-                new TournamentTeam { FlagName = "JP", FullName = "Japan", Acronym = "JPN" })
+                new TournamentTeam { FlagName = { Value = "AU" }, FullName = { Value = "Australia" }, },
+                new TournamentTeam { FlagName = { Value = "JP" }, FullName = { Value = "Japan" }, Acronym = { Value = "JPN" } })
             {
                 Team1Score = { Value = 4 },
                 Team2Score = { Value = 1 },
@@ -37,8 +37,8 @@ namespace osu.Game.Tournament.Tests
             var pairing2 = new MatchPairing(
                 new TournamentTeam
                 {
-                    FlagName = "RO",
-                    FullName = "Romania",
+                    FlagName = { Value = "RO" },
+                    FullName = { Value = "Romania" },
                 }
             );
 
@@ -77,7 +77,7 @@ namespace osu.Game.Tournament.Tests
             level1.Children[1].Pairing.Progression.Value = level2.Children[0].Pairing;
 
             AddRepeatStep("change scores", () => pairing1.Team2Score.Value++, 4);
-            AddStep("add new team", () => pairing2.Team2.Value = new TournamentTeam { FlagName = "PT", FullName = "Portugal" });
+            AddStep("add new team", () => pairing2.Team2.Value = new TournamentTeam { FlagName = { Value = "PT" }, FullName = { Value = "Portugal" } });
             AddStep("Add progression", () => level1.Children[2].Pairing.Progression.Value = level2.Children[1].Pairing);
 
             AddStep("start match", () => pairing2.StartMatch());

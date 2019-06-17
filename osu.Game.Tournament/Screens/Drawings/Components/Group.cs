@@ -85,7 +85,7 @@ namespace osu.Game.Tournament.Screens.Drawings.Components
 
         public bool ContainsTeam(string fullName)
         {
-            return allTeams.Any(t => t.Team.FullName == fullName);
+            return allTeams.Any(t => t.Team.FullName.Value == fullName);
         }
 
         public bool RemoveTeam(TournamentTeam team)
@@ -113,7 +113,7 @@ namespace osu.Game.Tournament.Screens.Drawings.Components
         {
             StringBuilder sb = new StringBuilder();
             foreach (GroupTeam gt in allTeams)
-                sb.AppendLine(gt.Team.FullName);
+                sb.AppendLine(gt.Team.FullName.Value);
             return sb.ToString();
         }
 
@@ -132,7 +132,7 @@ namespace osu.Game.Tournament.Screens.Drawings.Components
 
                 AcronymText.Anchor = Anchor.TopCentre;
                 AcronymText.Origin = Anchor.TopCentre;
-                AcronymText.Text = team.Acronym.ToUpperInvariant();
+                AcronymText.Text = team.Acronym.Value.ToUpperInvariant();
                 AcronymText.Font = OsuFont.GetFont(weight: FontWeight.Bold, size: 10);
 
                 InternalChildren = new Drawable[]
