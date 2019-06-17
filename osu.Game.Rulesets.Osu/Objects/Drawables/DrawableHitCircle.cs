@@ -117,10 +117,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
         protected override void CheckForResult(bool userTriggered, double timeOffset)
         {
-            if (HasFailed.Value)
-                return;
-
-            if (!userTriggered)
+            if (!userTriggered || HasFailed.Value)
             {
                 if (!HitObject.HitWindows.CanBeHit(timeOffset))
                     ApplyResult(r => r.Type = HitResult.Miss);
