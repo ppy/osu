@@ -53,6 +53,11 @@ namespace osu.Game.Users.Drawables
         /// </summary>
         public readonly BindableBool OpenOnClick = new BindableBool(true);
 
+        public UpdateableAvatar(User user = null)
+        {
+            User = user;
+        }
+
         protected override Drawable CreateDrawable(User user)
         {
             if (user == null && !ShowGuestOnNull)

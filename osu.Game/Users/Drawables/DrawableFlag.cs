@@ -19,7 +19,10 @@ namespace osu.Game.Users.Drawables
             set => Model = value;
         }
 
-        public UpdateableFlag(Country country = null) => Country = country;
+        public UpdateableFlag(Country country = null)
+        {
+            Country = country;
+        }
 
         protected override Drawable CreateDrawable(Country country) => new DrawableFlag(country)
         {
@@ -33,7 +36,10 @@ namespace osu.Game.Users.Drawables
 
         public string TooltipText => country?.FullName;
 
-        public DrawableFlag(Country country) => this.country = country;
+        public DrawableFlag(Country country)
+        {
+            this.country = country;
+        }
 
         [BackgroundDependencyLoader]
         private void load(TextureStore ts)

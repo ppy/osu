@@ -20,7 +20,10 @@ namespace osu.Game.Online.Leaderboards
             set => Model = value;
         }
 
-        public UpdateableRank(ScoreRank rank) => Rank = rank;
+        public UpdateableRank(ScoreRank rank)
+        {
+            Rank = rank;
+        }
 
         protected override Drawable CreateDrawable(ScoreRank rank) => new DrawableRank(rank)
         {
@@ -33,9 +36,12 @@ namespace osu.Game.Online.Leaderboards
 
     public class DrawableRank : Sprite
     {
-        private ScoreRank rank;
+        private readonly ScoreRank rank;
 
-        public DrawableRank(ScoreRank rank) => this.rank = rank;
+        public DrawableRank(ScoreRank rank)
+        {
+            this.rank = rank;
+        }
 
         [BackgroundDependencyLoader(true)]
         private void load(TextureStore ts)
