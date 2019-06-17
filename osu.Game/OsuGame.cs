@@ -181,7 +181,7 @@ namespace osu.Game
             configSkin.ValueChanged += skinId => SkinManager.CurrentSkinInfo.Value = SkinManager.Query(s => s.ID == skinId.NewValue) ?? SkinInfo.Default;
             configSkin.TriggerChange();
 
-            LocalConfig.BindWith(OsuSetting.VolumeInactive, inactiveVolumeAdjust);
+            LocalConfig.BindWith(OsuSetting.VolumeInactive, inactiveVolume);
 
             IsActive.BindValueChanged(active => updateActiveState(active.NewValue), true);
         }
@@ -686,14 +686,22 @@ namespace osu.Game
             return false;
         }
 
-        private readonly BindableDouble inactiveVolumeAdjust = new BindableDouble();
+        private readonly BindableDouble inactiveVolume = new BindableDouble();
+
+        private readonly BindableDouble inactiveVolAdjust = new BindableDouble();
 
         private void updateActiveState(bool isActive)
         {
             if (isActive)
-                Audio.RemoveAdjustment(AdjustableProperty.Volume, inactiveVolumeAdjust);
+            {
+                this.TransformBindableTo(inactiveVolAdjust, 1, 750, Easing.In)
+                    .Finally(_ => Audio.RemoveAdjustment(AdjustableProperty.Volume, inactiveVolAdjust)); //wait for the transition to finish to remove the inactive audio adjustement
+            }
             else
-                Audio.AddAdjustment(AdjustableProperty.Volume, inactiveVolumeAdjust);
+            {
+                Audio.AddAdjustment(AdjustableProperty.Volume, inactiveVolAdjust);
+                this.TransformBindableTo(inactiveVolAdjust, inactiveVolume.Value, 750, Easing.Out);
+            }
         }
 
         public bool OnReleased(GlobalAction action) => false;
