@@ -100,13 +100,13 @@ namespace osu.Game.Tournament
             // assign teams
             foreach (var pairing in ladder.Pairings)
             {
-                pairing.Team1.Value = ladder.Teams.FirstOrDefault(t => t.Acronym == pairing.Team1Acronym);
-                pairing.Team2.Value = ladder.Teams.FirstOrDefault(t => t.Acronym == pairing.Team2Acronym);
+                pairing.Team1.Value = ladder.Teams.FirstOrDefault(t => t.Acronym.Value == pairing.Team1Acronym);
+                pairing.Team2.Value = ladder.Teams.FirstOrDefault(t => t.Acronym.Value == pairing.Team2Acronym);
 
                 foreach (var conditional in pairing.ConditionalPairings)
                 {
-                    conditional.Team1.Value = ladder.Teams.FirstOrDefault(t => t.Acronym == conditional.Team1Acronym);
-                    conditional.Team2.Value = ladder.Teams.FirstOrDefault(t => t.Acronym == conditional.Team2Acronym);
+                    conditional.Team1.Value = ladder.Teams.FirstOrDefault(t => t.Acronym.Value == conditional.Team1Acronym);
+                    conditional.Team2.Value = ladder.Teams.FirstOrDefault(t => t.Acronym.Value == conditional.Team2Acronym);
                     conditional.Grouping.Value = pairing.Grouping.Value;
                 }
             }
@@ -207,7 +207,7 @@ namespace osu.Game.Tournament
 
             foreach (var t in ladder.Teams)
             {
-                if (!string.IsNullOrEmpty(t.FullName))
+                if (!string.IsNullOrEmpty(t.FullName.Value))
                     continue;
 
                 var result = countries.FirstOrDefault(c => c.Acronym == t.Acronym);

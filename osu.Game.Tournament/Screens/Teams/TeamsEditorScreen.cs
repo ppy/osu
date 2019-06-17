@@ -1,8 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -11,7 +11,6 @@ using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays.Settings;
 using osu.Game.Tournament.Components;
-using osu.Game.Tournament.Screens.Ladder.Components;
 using osuTK;
 
 namespace osu.Game.Tournament.Screens.Teams
@@ -66,13 +65,7 @@ namespace osu.Game.Tournament.Screens.Teams
 
         private void addNew()
         {
-            var team = new TournamentTeam
-            {
-                StartDate =
-                {
-                    Value = DateTimeOffset.UtcNow
-                }
-            };
+            var team = new TournamentTeam();
 
             items.Add(new TeamRow(team));
             LadderInfo.Teams.Add(team);
@@ -82,6 +75,8 @@ namespace osu.Game.Tournament.Screens.Teams
         {
             public readonly TournamentTeam Team;
 
+            private readonly Container drawableContainer;
+
             [Resolved]
             private LadderInfo ladderInfo { get; set; }
 
@@ -90,6 +85,7 @@ namespace osu.Game.Tournament.Screens.Teams
                 Margin = new MarginPadding(10);
 
                 Team = team;
+
                 InternalChildren = new Drawable[]
                 {
                     new Box
@@ -110,26 +106,26 @@ namespace osu.Game.Tournament.Screens.Teams
                             new SettingsTextBox
                             {
                                 LabelText = "Name",
-                                Width = 0.33f,
+                                Width = 0.25f,
+                                Bindable = Team.FullName
+                            },
+                            new SettingsTextBox
+                            {
+                                LabelText = "Acronym",
+                                Width = 0.25f,
                                 Bindable = Team.Acronym
                             },
                             new SettingsTextBox
                             {
-                                LabelText = "Description",
-                                Width = 0.33f,
-                                Bindable = Team.Description
+                                LabelText = "Flag",
+                                Width = 0.25f,
+                                Bindable = Team.FlagName
                             },
-                            new DateTextBox
+                            drawableContainer = new Container
                             {
-                                LabelText = "Start Time",
-                                Width = 0.33f,
-                                Bindable = Team.StartDate
-                            },
-                            new SettingsSlider<int>
-                            {
-                                LabelText = "Best of",
-                                Width = 0.33f,
-                                Bindable = Team.BestOf
+                                Width = 0.22f,
+                                RelativeSizeAxes = Axes.X,
+                                Height = 50,
                             },
                         }
                     },
@@ -150,6 +146,26 @@ namespace osu.Game.Tournament.Screens.Teams
 
                 RelativeSizeAxes = Axes.X;
                 AutoSizeAxes = Axes.Y;
+
+                Team.FlagName.BindValueChanged(updateDrawable, true);
+            }
+
+            private void updateDrawable(ValueChangedEvent<string> flag)
+            {
+                drawableContainer.Child = new RowTeam(Team);
+            }
+
+            private class RowTeam : DrawableTournamentTeam
+            {
+                public RowTeam(TournamentTeam team)
+                    : base(team)
+                {
+                    InternalChild = Flag;
+                    RelativeSizeAxes = Axes.Both;
+
+                    Flag.Anchor = Anchor.Centre;
+                    Flag.Origin = Anchor.Centre;
+                }
             }
         }
     }

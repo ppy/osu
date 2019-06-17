@@ -199,7 +199,7 @@ namespace osu.Game.Tournament.Screens.TeamIntro
                             Flag,
                             new OsuSpriteText
                             {
-                                Text = team?.FullName.ToUpper() ?? "???",
+                                Text = team?.FullName.Value.ToUpper() ?? "???",
                                 Font = TournamentFont.GetFont(TournamentTypeface.Aquatico, 40, FontWeight.Light),
                                 Colour = Color4.Black,
                                 Origin = Anchor.TopCentre,

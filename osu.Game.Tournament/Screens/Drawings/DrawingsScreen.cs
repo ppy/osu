@@ -169,7 +169,7 @@ namespace osu.Game.Tournament.Screens.Drawings
         {
             groupsContainer.AddTeam(team);
 
-            fullTeamNameText.Text = team.FullName;
+            fullTeamNameText.Text = team.FullName.Value;
             fullTeamNameText.FadeIn(200);
 
             writeResults(groupsContainer.GetStringRepresentation());
@@ -204,7 +204,7 @@ namespace osu.Game.Tournament.Screens.Drawings
 
             foreach (TournamentTeam t in TeamList.Teams)
             {
-                if (groupsContainer.ContainsTeam(t.FullName))
+                if (groupsContainer.ContainsTeam(t.FullName.Value))
                     continue;
 
                 allTeams.Add(t);
@@ -240,7 +240,7 @@ namespace osu.Game.Tournament.Screens.Drawings
                                 continue;
 
                             // ReSharper disable once AccessToModifiedClosure
-                            TournamentTeam teamToAdd = allTeams.FirstOrDefault(t => t.FullName == line);
+                            TournamentTeam teamToAdd = allTeams.FirstOrDefault(t => t.FullName.Value == line);
 
                             if (teamToAdd == null)
                                 continue;

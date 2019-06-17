@@ -172,7 +172,7 @@ namespace osu.Game.Tournament.Screens.Gameplay.Components
                         Flag,
                         new OsuSpriteText
                         {
-                            Text = team?.FullName.ToUpper() ?? "???",
+                            Text = team?.FullName.Value.ToUpper() ?? "???",
                             X = (flip ? -1 : 1) * 90,
                             Y = -10,
                             Colour = colour,

@@ -30,7 +30,7 @@ namespace osu.Game.Tournament.Components
 
             AcronymText = new OsuSpriteText
             {
-                Text = team?.Acronym?.ToUpperInvariant() ?? string.Empty,
+                Text = team?.Acronym.Value?.ToUpperInvariant() ?? string.Empty,
                 Font = OsuFont.GetFont(weight: FontWeight.Regular),
             };
         }
