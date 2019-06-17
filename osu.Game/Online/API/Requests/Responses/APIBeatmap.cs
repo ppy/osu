@@ -57,6 +57,9 @@ namespace osu.Game.Online.API.Requests.Responses
         [JsonProperty(@"version")]
         private string version { get; set; }
 
+        [JsonProperty(@"failtimes")]
+        private BeatmapMetrics metrics { get; set; }
+
         public BeatmapInfo ToBeatmap(RulesetStore rulesets)
         {
             var set = BeatmapSet?.ToBeatmapSet(rulesets) ?? new BeatmapSetInfo
@@ -74,6 +77,7 @@ namespace osu.Game.Online.API.Requests.Responses
                 Version = version,
                 Status = Status,
                 BeatmapSet = set,
+                Metrics = metrics,
                 BaseDifficulty = new BeatmapDifficulty
                 {
                     DrainRate = drainRate,

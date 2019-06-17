@@ -54,6 +54,9 @@ namespace osu.Game.Online.API.Requests.Responses
         [JsonProperty(@"last_updated")]
         private DateTimeOffset lastUpdated { get; set; }
 
+        [JsonProperty(@"ratings")]
+        private int[] ratings { get; set; }
+
         [JsonProperty(@"user_id")]
         private long creatorId
         {
@@ -70,6 +73,7 @@ namespace osu.Game.Online.API.Requests.Responses
                 OnlineBeatmapSetID = OnlineBeatmapSetID,
                 Metadata = this,
                 Status = Status,
+                Metrics = ratings == null ? null : new BeatmapSetMetrics { Ratings = ratings },
                 OnlineInfo = new BeatmapSetOnlineInfo
                 {
                     Covers = covers,
