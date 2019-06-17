@@ -17,7 +17,7 @@ using System.Linq;
 
 namespace osu.Game.Overlays.Toolbar
 {
-    public class ToolbarRulesetSelector : RulesetSelector
+    public class ToolbarRulesetSelector : BindableRulesetSelector
     {
         private const float padding = 10;
         private readonly Drawable modeButtonLine;
