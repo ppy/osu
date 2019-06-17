@@ -23,14 +23,14 @@ namespace osu.Game.Beatmaps.Drawables
     {
         private readonly RulesetInfo ruleset;
 
-        public DifficultyIcon(BeatmapInfo beatmap, RulesetInfo ruleset = null)
+        public DifficultyIcon(BeatmapInfo beatmap, RulesetInfo ruleset = null, Boolean shouldShowTooltip = false)
             : base(beatmap)
         {
             if (beatmap == null)
                 throw new ArgumentNullException(nameof(beatmap));
 
             this.ruleset = ruleset ?? beatmap.Ruleset;
-            TooltipText = $"{beatmap.Version}${beatmap.StarDifficulty.ToString("0.##")}";
+            TooltipText = shouldShowTooltip ? $"{beatmap.Version}${beatmap.StarDifficulty.ToString("0.##")}" : String.Empty;
 
             Size = new Vector2(20);
         }
@@ -115,7 +115,7 @@ namespace osu.Game.Beatmaps.Drawables
                 starRating.Text = info[1];
             }
 
-            public void Move(Vector2 pos) => this.Position = pos;
+            public void Move(Vector2 pos) => Position = pos;
 
             protected override void PopIn() => this.FadeIn(200, Easing.OutQuint);
 
