@@ -47,7 +47,7 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
             editorInfo.Selected.ValueChanged += selection =>
             {
                 groupingDropdown.Bindable = selection.NewValue?.Grouping;
-                losersCheckbox.Bindable = selection.NewValue?.Losers;
+                losersCheckbox.Current = selection.NewValue?.Losers;
                 dateTimeBox.Bindable = selection.NewValue?.Date;
 
                 team1Dropdown.Bindable = selection.NewValue?.Team1;
