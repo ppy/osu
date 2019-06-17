@@ -262,8 +262,9 @@ namespace osu.Game.Online.API
                 handleWebException(we);
                 return false;
             }
-            catch
+            catch (Exception ex)
             {
+                Logger.Error(ex, "Error occurred while handling an API request.");
                 return false;
             }
         }
