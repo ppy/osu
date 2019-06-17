@@ -686,6 +686,8 @@ namespace osu.Game
             return false;
         }
 
+        #region Inactive audio dimming
+
         private readonly BindableDouble userInactiveVolume = new BindableDouble();
 
         private readonly BindableDouble inactiveVolumeFade = new BindableDouble();
@@ -703,6 +705,8 @@ namespace osu.Game
                 this.TransformBindableTo(inactiveVolumeFade, userInactiveVolume.Value, 1500, Easing.OutSine);
             }
         }
+
+        #endregion
 
         public bool OnReleased(GlobalAction action) => false;
 
