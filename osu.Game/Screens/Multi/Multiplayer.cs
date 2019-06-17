@@ -251,13 +251,11 @@ namespace osu.Game.Screens.Multi
 
                 if (track != null)
                 {
+                    track.RestartPoint = Beatmap.Value.Metadata.PreviewTime;
                     track.Looping = true;
 
                     if (!track.IsRunning)
-                    {
-                        track.Seek(Beatmap.Value.Metadata.PreviewTime);
-                        track.Start();
-                    }
+                        track.Restart();
                 }
 
                 createButton.Hide();
