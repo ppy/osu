@@ -3,8 +3,10 @@
 
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
+using osu.Framework.MathUtils;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Scoring;
+using osu.Game.Screens.Play;
 using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Objects.Drawables
@@ -48,6 +50,22 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                 ApplyResult(r => r.Type = Tracking ? HitResult.Great : HitResult.Miss);
         }
 
-        private void updatePosition() => Position = HitObject.Position - slider.Position;
+        private void updatePosition()
+        {
+            if (!HasFailed.Value)
+                Position = HitObject.Position - slider.Position;
+        }
+
+        public override void Fail()
+        {
+            if (HasFailed.Value)
+                return;
+
+            this.RotateTo(RNG.NextSingle(-90, 90), FailAnimation.FAIL_DURATION);
+            this.ScaleTo(Scale * 0.5f, FailAnimation.FAIL_DURATION);
+            this.MoveToOffset(new Vector2(0, 400), FailAnimation.FAIL_DURATION);
+
+            base.Fail();
+        }
     }
 }

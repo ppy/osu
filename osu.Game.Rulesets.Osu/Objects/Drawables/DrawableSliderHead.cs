@@ -36,11 +36,11 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         protected override void Update()
         {
             base.Update();
-
+            
             double completionProgress = MathHelper.Clamp((Time.Current - slider.StartTime) / slider.Duration, 0, 1);
 
             //todo: we probably want to reconsider this before adding scoring, but it looks and feels nice.
-            if (!IsHit)
+            if (!IsHit && !HasFailed.Value)
                 Position = slider.CurvePositionAt(completionProgress);
         }
 
@@ -48,6 +48,10 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
         protected override void Shake(double maximumLength) => OnShake?.Invoke(maximumLength);
 
-        private void updatePosition() => Position = HitObject.Position - slider.Position;
+        private void updatePosition()
+        {
+            if (!HasFailed.Value)
+                Position = HitObject.Position - slider.Position;
+        }
     }
 }

@@ -136,6 +136,9 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         {
             base.Update();
 
+            if (HasFailed.Value)
+                return;
+
             Tracking.Value = Ball.Tracking;
 
             double completionProgress = MathHelper.Clamp((Time.Current - slider.StartTime) / slider.Duration, 0, 1);
@@ -191,6 +194,9 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
         protected override void UpdateCurrentState(ArmedState state)
         {
+            if (HasFailed.Value)
+                return;
+
             Ball.FadeIn();
             Ball.ScaleTo(HitObject.Scale);
 
@@ -217,5 +223,21 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         public Drawable ProxiedLayer => HeadCircle.ApproachCircle;
 
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => Body.ReceivePositionalInputAt(screenSpacePos);
+
+        /// <summary>
+        /// Applies the failing animation on this <see cref="DrawableSlider"/>
+        /// </summary>
+        public override void Fail()
+        {
+            if (HasFailed.Value)
+                return;
+
+            HeadCircle.Fail();
+            TailCircle.Fail();
+            Body.Fail();
+            Ball.Fail();
+
+            base.Fail();
+        }
     }
 }

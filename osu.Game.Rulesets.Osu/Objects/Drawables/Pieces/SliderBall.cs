@@ -12,6 +12,8 @@ using osu.Game.Rulesets.Objects.Types;
 using osuTK.Graphics;
 using osu.Game.Skinning;
 using osuTK;
+using osu.Framework.Bindables;
+using osu.Game.Screens.Play;
 
 namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
 {
@@ -22,6 +24,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
         private Color4 accentColour = Color4.Black;
 
         public Func<OsuAction?> GetInitialHitAction;
+
+        public readonly BindableBool HasFailed = new BindableBool();
 
         /// <summary>
         /// The colour that is used for the slider ball.
@@ -212,9 +216,17 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
             return action == OsuAction.LeftButton || action == OsuAction.RightButton;
         }
 
-        public void UpdateProgress(double completionProgress)
+        public void UpdateProgress(double completionProgress) => Position = slider.CurvePositionAt(completionProgress);
+
+        public void Fail()
         {
-            Position = slider.CurvePositionAt(completionProgress);
+            if (HasFailed.Value)
+                return;
+
+            this.ScaleTo(Scale * 0.5f, FailAnimation.FAIL_DURATION);
+            this.MoveToOffset(new Vector2(0, 400), FailAnimation.FAIL_DURATION);
+
+            HasFailed.Value = true;
         }
     }
 }
