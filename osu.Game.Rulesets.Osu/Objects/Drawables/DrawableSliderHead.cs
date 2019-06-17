@@ -36,7 +36,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         protected override void Update()
         {
             base.Update();
-            
+
             double completionProgress = MathHelper.Clamp((Time.Current - slider.StartTime) / slider.Duration, 0, 1);
 
             //todo: we probably want to reconsider this before adding scoring, but it looks and feels nice.

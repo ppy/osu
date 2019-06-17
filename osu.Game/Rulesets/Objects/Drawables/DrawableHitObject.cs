@@ -89,7 +89,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
         public readonly Bindable<ArmedState> State = new Bindable<ArmedState>();
 
         public BindableBool HasFailed = new BindableBool();
-        
+
         protected DrawableHitObject(HitObject hitObject)
         {
             HitObject = hitObject;
