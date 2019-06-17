@@ -16,6 +16,7 @@ using osu.Game.Overlays.Settings;
 using osu.Game.Tournament.Components;
 using osu.Game.Users;
 using osuTK;
+using osuTK.Graphics;
 
 namespace osu.Game.Tournament.Screens.Teams
 {
@@ -45,6 +46,7 @@ namespace osu.Game.Tournament.Screens.Teams
                         AutoSizeAxes = Axes.Y,
                         LayoutDuration = 200,
                         LayoutEasing = Easing.OutQuint,
+                        Spacing = new Vector2(20)
                     },
                 },
                 new ControlPanel
@@ -88,11 +90,15 @@ namespace osu.Game.Tournament.Screens.Teams
 
             public TeamRow(TournamentTeam team)
             {
-                PlayerEditor playerEditor;
-
-                Margin = new MarginPadding(10);
-
                 Team = team;
+
+                Masking = true;
+                CornerRadius = 10;
+
+                PlayerEditor playerEditor = new PlayerEditor(Team)
+                {
+                    Width = 0.95f
+                };
 
                 InternalChildren = new Drawable[]
                 {
@@ -101,10 +107,16 @@ namespace osu.Game.Tournament.Screens.Teams
                         Colour = OsuColour.Gray(0.1f),
                         RelativeSizeAxes = Axes.Both,
                     },
+                    drawableContainer = new Container
+                    {
+                        Size = new Vector2(100, 50),
+                        Margin = new MarginPadding(10),
+                        Anchor = Anchor.TopRight,
+                        Origin = Anchor.TopRight,
+                    },
                     new FillFlowContainer
                     {
                         Margin = new MarginPadding(5),
-                        Padding = new MarginPadding { Right = 160 },
                         Spacing = new Vector2(5),
                         Direction = FillDirection.Full,
                         RelativeSizeAxes = Axes.X,
@@ -114,56 +126,40 @@ namespace osu.Game.Tournament.Screens.Teams
                             new SettingsTextBox
                             {
                                 LabelText = "Name",
-                                Width = 0.25f,
+                                Width = 0.2f,
                                 Bindable = Team.FullName
                             },
                             new SettingsTextBox
                             {
                                 LabelText = "Acronym",
-                                Width = 0.25f,
+                                Width = 0.2f,
                                 Bindable = Team.Acronym
                             },
                             new SettingsTextBox
                             {
                                 LabelText = "Flag",
-                                Width = 0.25f,
+                                Width = 0.2f,
                                 Bindable = Team.FlagName
                             },
-                            drawableContainer = new Container
-                            {
-                                Width = 0.22f,
-                                RelativeSizeAxes = Axes.X,
-                                Height = 50,
-                            },
-                            playerEditor = new PlayerEditor(Team)
-                        }
-                    },
-                    new FillFlowContainer
-                    {
-                        Anchor = Anchor.CentreRight,
-                        Origin = Anchor.CentreRight,
-                        RelativeSizeAxes = Axes.None,
-                        Width = 150,
-                        Spacing = new Vector2(10),
-                        AutoSizeAxes = Axes.Y,
-                        Direction = FillDirection.Vertical,
-                        Children = new Drawable[]
-                        {
                             new SettingsButton
                             {
-                                RelativeSizeAxes = Axes.X,
+                                Width = 0.11f,
+                                Margin = new MarginPadding(10),
                                 Text = "Add player",
                                 Action = () => playerEditor.AddUser()
                             },
                             new DangerousSettingsButton
                             {
+                                Width = 0.11f,
                                 Text = "Delete Team",
+                                Margin = new MarginPadding(10),
                                 Action = () =>
                                 {
                                     Expire();
                                     ladderInfo.Teams.Remove(Team);
                                 },
-                            }
+                            },
+                            playerEditor
                         }
                     },
                 };
@@ -242,8 +238,16 @@ namespace osu.Game.Tournament.Screens.Teams
                         RelativeSizeAxes = Axes.X;
                         AutoSizeAxes = Axes.Y;
 
+                        Masking = true;
+                        CornerRadius = 5;
+
                         InternalChildren = new Drawable[]
                         {
+                            new Box
+                            {
+                                Colour = OsuColour.Gray(0.2f),
+                                RelativeSizeAxes = Axes.Both,
+                            },
                             new FillFlowContainer
                             {
                                 Margin = new MarginPadding(5),
@@ -262,7 +266,7 @@ namespace osu.Game.Tournament.Screens.Teams
                                     },
                                     drawableContainer = new Container
                                     {
-                                        Size = new Vector2(100, 50),
+                                        Size = new Vector2(100, 70),
                                     },
                                 }
                             },
