@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -9,8 +10,11 @@ using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Online.API;
+using osu.Game.Online.API.Requests;
 using osu.Game.Overlays.Settings;
 using osu.Game.Tournament.Components;
+using osu.Game.Users;
 using osuTK;
 
 namespace osu.Game.Tournament.Screens.Teams
@@ -39,6 +43,8 @@ namespace osu.Game.Tournament.Screens.Teams
                         Direction = FillDirection.Vertical,
                         RelativeSizeAxes = Axes.X,
                         AutoSizeAxes = Axes.Y,
+                        LayoutDuration = 200,
+                        LayoutEasing = Easing.OutQuint,
                     },
                 },
                 new ControlPanel
@@ -82,6 +88,8 @@ namespace osu.Game.Tournament.Screens.Teams
 
             public TeamRow(TournamentTeam team)
             {
+                PlayerEditor playerEditor;
+
                 Margin = new MarginPadding(10);
 
                 Team = team;
@@ -127,21 +135,37 @@ namespace osu.Game.Tournament.Screens.Teams
                                 RelativeSizeAxes = Axes.X,
                                 Height = 50,
                             },
+                            playerEditor = new PlayerEditor(Team)
                         }
                     },
-                    new DangerousSettingsButton
+                    new FillFlowContainer
                     {
                         Anchor = Anchor.CentreRight,
                         Origin = Anchor.CentreRight,
                         RelativeSizeAxes = Axes.None,
                         Width = 150,
-                        Text = "Delete",
-                        Action = () =>
+                        Spacing = new Vector2(10),
+                        AutoSizeAxes = Axes.Y,
+                        Direction = FillDirection.Vertical,
+                        Children = new Drawable[]
                         {
-                            Expire();
-                            ladderInfo.Teams.Remove(Team);
-                        },
-                    }
+                            new SettingsButton
+                            {
+                                RelativeSizeAxes = Axes.X,
+                                Text = "Add player",
+                                Action = () => playerEditor.AddUser()
+                            },
+                            new DangerousSettingsButton
+                            {
+                                Text = "Delete Team",
+                                Action = () =>
+                                {
+                                    Expire();
+                                    ladderInfo.Teams.Remove(Team);
+                                },
+                            }
+                        }
+                    },
                 };
 
                 RelativeSizeAxes = Axes.X;
@@ -165,6 +189,142 @@ namespace osu.Game.Tournament.Screens.Teams
 
                     Flag.Anchor = Anchor.Centre;
                     Flag.Origin = Anchor.Centre;
+                }
+            }
+
+            public class PlayerEditor : CompositeDrawable
+            {
+                private readonly TournamentTeam team;
+                private readonly FillFlowContainer flow;
+
+                public PlayerEditor(TournamentTeam team)
+                {
+                    this.team = team;
+
+                    RelativeSizeAxes = Axes.X;
+                    AutoSizeAxes = Axes.Y;
+
+                    InternalChild = flow = new FillFlowContainer
+                    {
+                        RelativeSizeAxes = Axes.X,
+                        AutoSizeAxes = Axes.Y,
+                        Direction = FillDirection.Vertical,
+                        LayoutDuration = 200,
+                        LayoutEasing = Easing.OutQuint,
+                        ChildrenEnumerable = team.Players.Select(p => new PlayerRow(team, p))
+                    };
+                }
+
+                public void AddUser()
+                {
+                    var user = new User();
+                    team.Players.Add(user);
+                    flow.Add(new PlayerRow(team, user));
+                }
+
+                public class PlayerRow : CompositeDrawable
+                {
+                    private readonly User user;
+
+                    [Resolved]
+                    protected IAPIProvider API { get; private set; }
+
+                    private readonly Bindable<string> userId = new Bindable<string>();
+
+                    private readonly Container drawableContainer;
+
+                    public PlayerRow(TournamentTeam team, User user)
+                    {
+                        this.user = user;
+
+                        Margin = new MarginPadding(10);
+
+                        RelativeSizeAxes = Axes.X;
+                        AutoSizeAxes = Axes.Y;
+
+                        InternalChildren = new Drawable[]
+                        {
+                            new FillFlowContainer
+                            {
+                                Margin = new MarginPadding(5),
+                                Padding = new MarginPadding { Right = 160 },
+                                Spacing = new Vector2(5),
+                                Direction = FillDirection.Horizontal,
+                                AutoSizeAxes = Axes.Both,
+                                Children = new Drawable[]
+                                {
+                                    new SettingsTextBox
+                                    {
+                                        LabelText = "User ID",
+                                        RelativeSizeAxes = Axes.None,
+                                        Width = 200,
+                                        Bindable = userId,
+                                    },
+                                    drawableContainer = new Container
+                                    {
+                                        Size = new Vector2(100, 50),
+                                    },
+                                }
+                            },
+                            new DangerousSettingsButton
+                            {
+                                Anchor = Anchor.CentreRight,
+                                Origin = Anchor.CentreRight,
+                                RelativeSizeAxes = Axes.None,
+                                Width = 150,
+                                Text = "Delete Player",
+                                Action = () =>
+                                {
+                                    Expire();
+                                    team.Players.Remove(user);
+                                },
+                            }
+                        };
+                    }
+
+                    [BackgroundDependencyLoader]
+                    private void load()
+                    {
+                        userId.Value = user.Id.ToString();
+                        userId.BindValueChanged(idString =>
+                        {
+                            long parsed;
+
+                            long.TryParse(idString.NewValue, out parsed);
+
+                            user.Id = parsed;
+
+                            if (idString.NewValue != idString.OldValue)
+                                user.Username = string.Empty;
+
+                            if (!string.IsNullOrEmpty(user.Username))
+                            {
+                                updatePanel();
+                                return;
+                            }
+
+                            var req = new GetUserRequest(user.Id);
+
+                            req.Success += res =>
+                            {
+                                user.Username = res.Username;
+                                updatePanel();
+                            };
+
+                            req.Failure += _ =>
+                            {
+                                user.Id = 1;
+                                updatePanel();
+                            };
+
+                            API.Queue(req);
+                        }, true);
+                    }
+
+                    private void updatePanel()
+                    {
+                        drawableContainer.Child = new UserPanel(user) { Width = 300 };
+                    }
                 }
             }
         }
