@@ -697,7 +697,7 @@ namespace osu.Game
             if (isActive)
             {
                 this.TransformBindableTo(inactiveVolumeFade, 1, 500, Easing.OutQuint)
-                    .Finally(_ => Audio.RemoveAdjustment(AdjustableProperty.Volume, inactiveVolumeFade)); //wait for the transition to finish to remove the inactive audio adjustement
+                    .Finally(_ => Audio.RemoveAdjustment(AdjustableProperty.Volume, inactiveVolumeFade)); //wait for the transition to finish to remove the inactive audio adjustment
             }
             else
             {
