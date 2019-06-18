@@ -7,8 +7,6 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics;
-using osu.Game.Graphics.Containers;
-using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays.Settings;
 using osu.Game.Tournament.Components;
 using osu.Game.Tournament.Models;
@@ -16,67 +14,23 @@ using osuTK;
 
 namespace osu.Game.Tournament.Screens.Editors
 {
-    public class RoundEditorScreen : TournamentScreen, IProvideVideo
+    public class RoundEditorScreen : TournamentEditorScreen<RoundEditorScreen.RoundRow>
     {
-        private readonly FillFlowContainer<RoundRow> items;
-
-        public RoundEditorScreen()
-        {
-            AddRangeInternal(new Drawable[]
-            {
-                new Box
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    Colour = OsuColour.Gray(0.2f),
-                },
-                new OsuScrollContainer
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    Width = 0.9f,
-                    Anchor = Anchor.TopCentre,
-                    Origin = Anchor.TopCentre,
-                    Child = items = new FillFlowContainer<RoundRow>
-                    {
-                        Direction = FillDirection.Vertical,
-                        RelativeSizeAxes = Axes.X,
-                        AutoSizeAxes = Axes.Y,
-                        LayoutDuration = 200,
-                        LayoutEasing = Easing.OutQuint,
-                    },
-                },
-                new ControlPanel
-                {
-                    Children = new Drawable[]
-                    {
-                        new TriangleButton
-                        {
-                            RelativeSizeAxes = Axes.X,
-                            Text = "Add new",
-                            Action = addNew
-                        },
-                    }
-                }
-            });
-        }
-
         [BackgroundDependencyLoader]
         private void load()
         {
             foreach (var r in LadderInfo.Rounds)
-                items.Add(new RoundRow(r));
+                Flow.Add(new RoundRow(r));
         }
 
-        private void addNew()
+        protected override void AddNew()
         {
             var round = new TournamentRound
             {
-                StartDate =
-                {
-                    Value = DateTimeOffset.UtcNow
-                }
+                StartDate = { Value = DateTimeOffset.UtcNow }
             };
 
-            items.Add(new RoundRow(round));
+            Flow.Add(new RoundRow(round));
             LadderInfo.Rounds.Add(round);
         }
 
@@ -141,7 +95,7 @@ namespace osu.Game.Tournament.Screens.Editors
                         Origin = Anchor.CentreRight,
                         RelativeSizeAxes = Axes.None,
                         Width = 150,
-                        Text = "Delete",
+                        Text = "Delete Round",
                         Action = () =>
                         {
                             Expire();
