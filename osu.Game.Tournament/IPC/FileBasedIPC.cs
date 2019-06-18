@@ -13,6 +13,7 @@ using osu.Game.Beatmaps.Legacy;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Game.Rulesets;
+using osu.Game.Tournament.Models;
 
 namespace osu.Game.Tournament.IPC
 {

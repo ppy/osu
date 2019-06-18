@@ -10,6 +10,7 @@ using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Tournament.IPC;
+using osu.Game.Tournament.Models;
 using osuTK.Graphics;
 
 namespace osu.Game.Tournament.Screens.Gameplay.Components

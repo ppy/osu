@@ -3,6 +3,7 @@
 
 using osu.Framework.Allocation;
 using osu.Game.Tests.Visual;
+using osu.Game.Tournament.Models;
 
 namespace osu.Game.Tournament.Tests
 {

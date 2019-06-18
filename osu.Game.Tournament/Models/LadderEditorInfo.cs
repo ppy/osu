@@ -3,7 +3,7 @@
 
 using osu.Framework.Bindables;
 
-namespace osu.Game.Tournament.Screens.Ladder.Components
+namespace osu.Game.Tournament.Models
 {
     public class LadderEditorInfo
     {

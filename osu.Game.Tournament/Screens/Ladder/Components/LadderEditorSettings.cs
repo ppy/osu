@@ -11,6 +11,7 @@ using osu.Framework.Input.Events;
 using osu.Game.Overlays.Settings;
 using osu.Game.Screens.Play.PlayerSettings;
 using osu.Game.Tournament.Components;
+using osu.Game.Tournament.Models;
 
 namespace osu.Game.Tournament.Screens.Ladder.Components
 {

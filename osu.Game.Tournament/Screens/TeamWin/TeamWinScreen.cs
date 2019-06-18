@@ -9,7 +9,7 @@ using osu.Framework.Platform;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Tournament.Components;
-using osu.Game.Tournament.Screens.Ladder.Components;
+using osu.Game.Tournament.Models;
 using osu.Game.Tournament.Screens.Showcase;
 using osuTK;
 using osuTK.Graphics;

@@ -8,7 +8,7 @@ using osu.Game.Online.Chat;
 using osu.Game.Tests.Visual;
 using osu.Game.Tournament.Components;
 using osu.Game.Tournament.IPC;
-using osu.Game.Tournament.Screens.Ladder.Components;
+using osu.Game.Tournament.Models;
 using osu.Game.Users;
 
 namespace osu.Game.Tournament.Tests

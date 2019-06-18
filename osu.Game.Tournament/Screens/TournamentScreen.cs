@@ -4,15 +4,16 @@
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Game.Tournament.Models;
 
 namespace osu.Game.Tournament.Screens
 {
-    public class TournamentScreen : CompositeDrawable
+    public abstract class TournamentScreen : CompositeDrawable
     {
         [Resolved]
         protected LadderInfo LadderInfo { get; private set; }
 
-        public TournamentScreen()
+        protected TournamentScreen()
         {
             RelativeSizeAxes = Axes.Both;
         }

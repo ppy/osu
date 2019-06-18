@@ -4,7 +4,6 @@
 using osu.Framework.Allocation;
 using osu.Framework.Platform;
 using osu.Game.Tests.Visual;
-using osu.Game.Tournament.Screens;
 
 namespace osu.Game.Tournament.Tests
 {
