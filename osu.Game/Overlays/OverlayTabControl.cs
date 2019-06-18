@@ -5,13 +5,15 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Events;
+using osu.Game.Graphics;
+using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osuTK;
 using osuTK.Graphics;
 
 namespace osu.Game.Overlays
 {
-    public class OverlayTabControl<T> : TabControl<T>
+    public abstract class OverlayTabControl<T> : TabControl<T>
     {
         private readonly Box bar;
 
@@ -57,14 +59,13 @@ namespace osu.Game.Overlays
 
         protected override Dropdown<T> CreateDropdown() => null;
 
-        protected override TabItem<T> CreateTabItem(T value) => new OverlayTabItem<T>(value)
-        {
-            AccentColour = AccentColour
-        };
+        protected override TabItem<T> CreateTabItem(T value) => new OverlayTabItem<T>(value);
 
         protected class OverlayTabItem<U> : TabItem<U>
         {
             private readonly ExpandingBar bar;
+
+            protected readonly OsuSpriteText Text;
 
             private Color4 accentColour;
 
@@ -91,6 +92,13 @@ namespace osu.Game.Overlays
 
                 Children = new Drawable[]
                 {
+                    Text = new OsuSpriteText
+                    {
+                        Margin = new MarginPadding { Bottom = 10 },
+                        Origin = Anchor.BottomLeft,
+                        Anchor = Anchor.BottomLeft,
+                        Font = OsuFont.GetFont(),
+                    },
                     bar = new ExpandingBar
                     {
                         Anchor = Anchor.BottomCentre,
@@ -119,9 +127,19 @@ namespace osu.Game.Overlays
                     OnDeactivated();
             }
 
-            protected override void OnActivated() => bar.Expand();
+            protected override void OnActivated()
+            {
+                bar.Expand();
+                Text.FadeColour(Color4.White, 120, Easing.InQuad);
+                Text.Font = Text.Font.With(weight: FontWeight.Bold);
+            }
 
-            protected override void OnDeactivated() => bar.Collapse();
+            protected override void OnDeactivated()
+            {
+                bar.Collapse();
+                Text.FadeColour(AccentColour, 120, Easing.InQuad);
+                Text.Font = Text.Font.With(weight: FontWeight.Medium);
+            }
 
             private void updateState()
             {
