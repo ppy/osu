@@ -28,7 +28,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         protected override void AddCheckSteps()
         {
             AddUntilStep("wait for fail", () => Player.HasFailed);
-            AddUntilStep("wait for fail overlay", () => ((FailPlayer)Player).FailOverlay.State == Visibility.Visible);
+            AddUntilStep("wait for fail overlay", () => ((FailPlayer)Player).FailOverlay.State.Value == Visibility.Visible);
         }
 
         private class FailPlayer : TestPlayer

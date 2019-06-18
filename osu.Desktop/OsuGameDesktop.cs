@@ -7,7 +7,6 @@ using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 using osu.Desktop.Overlays;
-using osu.Framework.Graphics.Containers;
 using osu.Framework.Platform;
 using osu.Game;
 using osuTK.Input;
@@ -56,7 +55,7 @@ namespace osu.Desktop
                 LoadComponentAsync(versionManager = new VersionManager { Depth = int.MinValue }, v =>
                 {
                     Add(v);
-                    v.State = Visibility.Visible;
+                    v.Show();
                 });
 
                 if (RuntimeInfo.OS == RuntimeInfo.Platform.Windows)
@@ -74,13 +73,11 @@ namespace osu.Desktop
             {
                 case Intro _:
                 case MainMenu _:
-                    if (versionManager != null)
-                        versionManager.State = Visibility.Visible;
+                    versionManager?.Show();
                     break;
 
                 default:
-                    if (versionManager != null)
-                        versionManager.State = Visibility.Hidden;
+                    versionManager?.Hide();
                     break;
             }
         }

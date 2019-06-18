@@ -120,7 +120,7 @@ namespace osu.Desktop.Overlays
 
                 Activated = delegate
                 {
-                    changelog.ShowBuild("lazer", version);
+                    changelog.ShowBuild(OsuGameBase.CLIENT_STREAM_NAME, version);
                     return true;
                 };
             }

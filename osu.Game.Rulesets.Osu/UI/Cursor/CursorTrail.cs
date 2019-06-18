@@ -6,7 +6,7 @@ using System.Diagnostics;
 using System.Runtime.InteropServices;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.OpenGL.Buffers;
+using osu.Framework.Graphics.Batches;
 using osu.Framework.Graphics.OpenGL.Vertices;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.Shaders;
@@ -57,7 +57,6 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
                 // InvalidationID 1 forces an update of each part of the cursor trail the first time ApplyState is run on the draw node
                 // This is to prevent garbage data from being sent to the vertex shader, resulting in visual issues on some platforms
                 parts[i].InvalidationID = 1;
-                parts[i].WasUpdated = true;
             }
         }
 
@@ -149,7 +148,6 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
             public Vector2 Position;
             public float Time;
             public long InvalidationID;
-            public bool WasUpdated;
         }
 
         private class TrailDrawNode : DrawNode
@@ -164,16 +162,13 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
             private readonly TrailPart[] parts = new TrailPart[max_sprites];
             private Vector2 size;
 
-            private readonly VertexBuffer<TexturedTrailVertex> vertexBuffer = new QuadVertexBuffer<TexturedTrailVertex>(max_sprites, BufferUsageHint.DynamicDraw);
+            private readonly VertexBatch<TexturedTrailVertex> vertexBatch = new QuadBatch<TexturedTrailVertex>(max_sprites, 1);
 
             public TrailDrawNode(CursorTrail source)
                 : base(source)
             {
                 for (int i = 0; i < max_sprites; i++)
-                {
                     parts[i].InvalidationID = 0;
-                    parts[i].WasUpdated = false;
-                }
             }
 
             public override void ApplyState()
@@ -194,56 +189,29 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
 
             public override void Draw(Action<TexturedVertex2D> vertexAction)
             {
-                shader.GetUniform<float>("g_FadeClock").UpdateValue(ref time);
-
-                int updateStart = -1, updateEnd = 0;
-
-                for (int i = 0; i < parts.Length; ++i)
-                {
-                    if (parts[i].WasUpdated)
-                    {
-                        if (updateStart == -1)
-                            updateStart = i;
-                        updateEnd = i + 1;
-
-                        int start = i * 4;
-                        int end = start;
-
-                        Vector2 pos = parts[i].Position;
-                        float localTime = parts[i].Time;
-
-                        DrawQuad(
-                            texture,
-                            new Quad(pos.X - size.X / 2, pos.Y - size.Y / 2, size.X, size.Y),
-                            DrawColourInfo.Colour,
-                            null,
-                            v => vertexBuffer.Vertices[end++] = new TexturedTrailVertex
-                            {
-                                Position = v.Position,
-                                TexturePosition = v.TexturePosition,
-                                Time = localTime + 1,
-                                Colour = v.Colour,
-                            });
-
-                        parts[i].WasUpdated = false;
-                    }
-                    else if (updateStart != -1)
-                    {
-                        vertexBuffer.UpdateRange(updateStart * 4, updateEnd * 4);
-                        updateStart = -1;
-                    }
-                }
-
-                // Update all remaining vertices that have been changed.
-                if (updateStart != -1)
-                    vertexBuffer.UpdateRange(updateStart * 4, updateEnd * 4);
-
                 base.Draw(vertexAction);
 
                 shader.Bind();
+                shader.GetUniform<float>("g_FadeClock").UpdateValue(ref time);
 
-                texture.TextureGL.Bind();
-                vertexBuffer.Draw();
+                for (int i = 0; i < parts.Length; ++i)
+                {
+                    Vector2 pos = parts[i].Position;
+                    float localTime = parts[i].Time;
+
+                    DrawQuad(
+                        texture,
+                        new Quad(pos.X - size.X / 2, pos.Y - size.Y / 2, size.X, size.Y),
+                        DrawColourInfo.Colour,
+                        null,
+                        v => vertexBatch.Add(new TexturedTrailVertex
+                        {
+                            Position = v.Position,
+                            TexturePosition = v.TexturePosition,
+                            Time = localTime + 1,
+                            Colour = v.Colour,
+                        }));
+                }
 
                 shader.Unbind();
             }
@@ -252,7 +220,7 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
             {
                 base.Dispose(isDisposing);
 
-                vertexBuffer.Dispose();
+                vertexBatch.Dispose();
             }
         }
 

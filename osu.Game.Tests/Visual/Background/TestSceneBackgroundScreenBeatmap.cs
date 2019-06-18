@@ -72,7 +72,7 @@ namespace osu.Game.Tests.Visual.Background
             Dependencies.Cache(manager = new BeatmapManager(LocalStorage, factory, rulesets, null, audio, host, Beatmap.Default));
             Dependencies.Cache(new OsuConfigManager(LocalStorage));
 
-            manager.Import(TestResources.GetTestBeatmapForImport());
+            manager.Import(TestResources.GetTestBeatmapForImport()).Wait();
 
             Beatmap.SetDefault();
         }

@@ -27,12 +27,15 @@ using osu.Game.Scoring;
 using osu.Game.Screens.Ranking;
 using osu.Game.Skinning;
 using osu.Game.Storyboards.Drawables;
+using osu.Game.Users;
 
 namespace osu.Game.Screens.Play
 {
     public class Player : ScreenWithBeatmapBackground
     {
         protected override bool AllowBackButton => false; // handled by HoldForMenuButton
+
+        protected override UserActivity InitialActivity => new UserActivity.SoloGame(Beatmap.Value.BeatmapInfo, Ruleset.Value);
 
         public override float BackgroundParallaxAmount => 0.1f;
 
@@ -279,7 +282,7 @@ namespace osu.Game.Screens.Play
 
                     var score = CreateScore();
                     if (DrawableRuleset.ReplayScore == null)
-                        scoreManager.Import(score);
+                        scoreManager.Import(score).Wait();
 
                     this.Push(CreateResults(score));
 
@@ -358,7 +361,7 @@ namespace osu.Game.Screens.Play
             // There is a chance that we could be in a paused state as the ruleset's internal clock (see FrameStabilityContainer)
             // could process an extra frame after the GameplayClock is stopped.
             // In such cases we want the fail state to precede a user triggered pause.
-            if (PauseOverlay.State == Visibility.Visible)
+            if (PauseOverlay.State.Value == Visibility.Visible)
                 PauseOverlay.Hide();
 
             failAnimation.Start();

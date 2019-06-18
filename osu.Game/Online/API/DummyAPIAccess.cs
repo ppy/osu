@@ -17,6 +17,8 @@ namespace osu.Game.Online.API
             Id = 1001,
         });
 
+        public Bindable<UserActivity> Activity { get; } = new Bindable<UserActivity>();
+
         public bool IsLoggedIn => true;
 
         public string ProvidedUsername => LocalUser.Value.Username;
@@ -39,6 +41,15 @@ namespace osu.Game.Online.API
 
                 Scheduler.Add(() => components.ForEach(c => c.APIStateChanged(this, value)));
             }
+        }
+
+        public DummyAPIAccess()
+        {
+            LocalUser.BindValueChanged(u =>
+            {
+                u.OldValue?.Activity.UnbindFrom(Activity);
+                u.NewValue.Activity.BindTo(Activity);
+            }, true);
         }
 
         public virtual void Queue(APIRequest request)
