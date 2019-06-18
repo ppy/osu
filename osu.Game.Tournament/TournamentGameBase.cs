@@ -107,7 +107,7 @@ namespace osu.Game.Tournament
                 {
                     conditional.Team1.Value = ladder.Teams.FirstOrDefault(t => t.Acronym.Value == conditional.Team1Acronym);
                     conditional.Team2.Value = ladder.Teams.FirstOrDefault(t => t.Acronym.Value == conditional.Team2Acronym);
-                    conditional.Grouping.Value = pairing.Grouping.Value;
+                    conditional.Round.Value = pairing.Round.Value;
                 }
             }
 
@@ -128,17 +128,17 @@ namespace osu.Game.Tournament
                 }
             }
 
-            // link pairings to groupings
-            foreach (var group in ladder.Groupings)
-            foreach (var id in group.Pairings)
+            // link pairings to rounds
+            foreach (var round in ladder.Rounds)
+            foreach (var id in round.Pairings)
             {
                 var found = ladder.Pairings.FirstOrDefault(p => p.ID == id);
 
                 if (found != null)
                 {
-                    found.Grouping.Value = group;
-                    if (group.StartDate.Value > found.Date.Value)
-                        found.Date.Value = group.StartDate.Value;
+                    found.Round.Value = round;
+                    if (round.StartDate.Value > found.Date.Value)
+                        found.Date.Value = round.StartDate.Value;
                 }
             }
 
@@ -179,8 +179,8 @@ namespace osu.Game.Tournament
         {
             bool addedInfo = false;
 
-            foreach (var g in ladder.Groupings)
-            foreach (var b in g.Beatmaps)
+            foreach (var r in ladder.Rounds)
+            foreach (var b in r.Beatmaps)
                 if (b.BeatmapInfo == null)
                 {
                     var req = new GetBeatmapRequest(new BeatmapInfo { OnlineBeatmapID = b.ID });
@@ -245,8 +245,8 @@ namespace osu.Game.Tournament
 
         protected virtual void SaveChanges()
         {
-            foreach (var g in ladder.Groupings)
-                g.Pairings = ladder.Pairings.Where(p => p.Grouping.Value == g).Select(p => p.ID).ToList();
+            foreach (var r in ladder.Rounds)
+                r.Pairings = ladder.Pairings.Where(p => p.Round.Value == r).Select(p => p.ID).ToList();
 
             ladder.Progressions = ladder.Pairings.Where(p => p.Progression.Value != null).Select(p => new TournamentProgression(p.ID, p.Progression.Value.ID)).Concat(
                                             ladder.Pairings.Where(p => p.LosersProgression.Value != null).Select(p => new TournamentProgression(p.ID, p.LosersProgression.Value.ID, true)))

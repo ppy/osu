@@ -218,7 +218,7 @@ namespace osu.Game.Tournament.Screens.Gameplay.Components
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
                         Colour = Color4.White,
-                        Text = match.NewValue.Grouping.Value?.Name.Value ?? "Unknown Grouping",
+                        Text = match.NewValue.Round.Value?.Name.Value ?? "Unknown Round",
                         Font = TournamentFont.GetFont(typeface: TournamentTypeface.Aquatico, weight: FontWeight.Regular, size: 18),
                     },
                 };

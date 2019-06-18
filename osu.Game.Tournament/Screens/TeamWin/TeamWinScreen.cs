@@ -133,7 +133,7 @@ namespace osu.Game.Tournament.Screens.TeamWin
                                 Anchor = Anchor.TopCentre,
                                 Origin = Anchor.TopCentre,
                                 Colour = col,
-                                Text = pairing.Grouping.Value?.Name.Value ?? "Unknown Grouping",
+                                Text = pairing.Round.Value?.Name.Value ?? "Unknown Round",
                                 Font = TournamentFont.GetFont(TournamentTypeface.Aquatico, 50, FontWeight.Light),
                                 Spacing = new Vector2(10, 0),
                             },

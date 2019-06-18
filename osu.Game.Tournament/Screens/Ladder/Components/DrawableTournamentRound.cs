@@ -11,7 +11,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Tournament.Screens.Ladder.Components
 {
-    public class DrawableTournamentGrouping : CompositeDrawable
+    public class DrawableTournamentRound : CompositeDrawable
     {
         [UsedImplicitly]
         private readonly Bindable<string> name;
@@ -19,7 +19,7 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
         [UsedImplicitly]
         private readonly Bindable<string> description;
 
-        public DrawableTournamentGrouping(TournamentGrouping grouping, bool losers = false)
+        public DrawableTournamentRound(TournamentRound round, bool losers = false)
         {
             OsuSpriteText textName;
             OsuSpriteText textDescription;
@@ -47,11 +47,11 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
                 }
             };
 
-            name = grouping.Name.GetBoundCopy();
-            name.BindValueChanged(n => textName.Text = ((losers ? "Losers " : "") + grouping.Name).ToUpper(), true);
+            name = round.Name.GetBoundCopy();
+            name.BindValueChanged(n => textName.Text = ((losers ? "Losers " : "") + round.Name).ToUpper(), true);
 
-            description = grouping.Name.GetBoundCopy();
-            description.BindValueChanged(n => textDescription.Text = grouping.Description.Value.ToUpper(), true);
+            description = round.Name.GetBoundCopy();
+            description.BindValueChanged(n => textDescription.Text = round.Description.Value.ToUpper(), true);
         }
     }
 }

@@ -110,7 +110,7 @@ namespace osu.Game.Tournament.Screens.Schedule
                             {
                                 Margin = new MarginPadding { Left = -10, Bottom = 10, Top = -5 },
                                 Spacing = new Vector2(10, 0),
-                                Text = match.NewValue.Grouping.Value?.Name.Value,
+                                Text = match.NewValue.Round.Value?.Name.Value,
                                 Colour = Color4.Black,
                                 Font = OsuFont.GetFont(size: 20)
                             },

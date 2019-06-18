@@ -14,13 +14,13 @@ using osu.Game.Tournament.Components;
 using osu.Game.Tournament.Screens.Ladder.Components;
 using osuTK;
 
-namespace osu.Game.Tournament.Screens.Groupings
+namespace osu.Game.Tournament.Screens.Rounds
 {
-    public class GroupingsEditorScreen : TournamentScreen, IProvideVideo
+    public class RoundEditorScreen : TournamentScreen, IProvideVideo
     {
-        private readonly FillFlowContainer<GroupingRow> items;
+        private readonly FillFlowContainer<RoundRow> items;
 
-        public GroupingsEditorScreen()
+        public RoundEditorScreen()
         {
             AddRangeInternal(new Drawable[]
             {
@@ -35,7 +35,7 @@ namespace osu.Game.Tournament.Screens.Groupings
                     Width = 0.9f,
                     Anchor = Anchor.TopCentre,
                     Origin = Anchor.TopCentre,
-                    Child = items = new FillFlowContainer<GroupingRow>
+                    Child = items = new FillFlowContainer<RoundRow>
                     {
                         Direction = FillDirection.Vertical,
                         RelativeSizeAxes = Axes.X,
@@ -62,13 +62,13 @@ namespace osu.Game.Tournament.Screens.Groupings
         [BackgroundDependencyLoader]
         private void load()
         {
-            foreach (var g in LadderInfo.Groupings)
-                items.Add(new GroupingRow(g));
+            foreach (var r in LadderInfo.Rounds)
+                items.Add(new RoundRow(r));
         }
 
         private void addNew()
         {
-            var grouping = new TournamentGrouping
+            var round = new TournamentRound
             {
                 StartDate =
                 {
@@ -76,22 +76,22 @@ namespace osu.Game.Tournament.Screens.Groupings
                 }
             };
 
-            items.Add(new GroupingRow(grouping));
-            LadderInfo.Groupings.Add(grouping);
+            items.Add(new RoundRow(round));
+            LadderInfo.Rounds.Add(round);
         }
 
-        public class GroupingRow : CompositeDrawable
+        public class RoundRow : CompositeDrawable
         {
-            public readonly TournamentGrouping Grouping;
+            public readonly TournamentRound Round;
 
             [Resolved]
             private LadderInfo ladderInfo { get; set; }
 
-            public GroupingRow(TournamentGrouping grouping)
+            public RoundRow(TournamentRound round)
             {
                 Margin = new MarginPadding(10);
 
-                Grouping = grouping;
+                Round = round;
                 InternalChildren = new Drawable[]
                 {
                     new Box
@@ -113,25 +113,25 @@ namespace osu.Game.Tournament.Screens.Groupings
                             {
                                 LabelText = "Name",
                                 Width = 0.33f,
-                                Bindable = Grouping.Name
+                                Bindable = Round.Name
                             },
                             new SettingsTextBox
                             {
                                 LabelText = "Description",
                                 Width = 0.33f,
-                                Bindable = Grouping.Description
+                                Bindable = Round.Description
                             },
                             new DateTextBox
                             {
                                 LabelText = "Start Time",
                                 Width = 0.33f,
-                                Bindable = Grouping.StartDate
+                                Bindable = Round.StartDate
                             },
                             new SettingsSlider<int>
                             {
                                 LabelText = "Best of",
                                 Width = 0.33f,
-                                Bindable = Grouping.BestOf
+                                Bindable = Round.BestOf
                             },
                         }
                     },
@@ -145,7 +145,7 @@ namespace osu.Game.Tournament.Screens.Groupings
                         Action = () =>
                         {
                             Expire();
-                            ladderInfo.Groupings.Remove(Grouping);
+                            ladderInfo.Rounds.Remove(Round);
                         },
                     }
                 };

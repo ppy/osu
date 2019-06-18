@@ -66,8 +66,8 @@ namespace osu.Game.Tournament.Screens.Ladder
             foreach (var pairing in LadderInfo.Pairings)
                 addPairing(pairing);
 
-            LadderInfo.Groupings.ItemsAdded += _ => layout.Invalidate();
-            LadderInfo.Groupings.ItemsRemoved += _ => layout.Invalidate();
+            LadderInfo.Rounds.ItemsAdded += _ => layout.Invalidate();
+            LadderInfo.Rounds.ItemsRemoved += _ => layout.Invalidate();
 
             LadderInfo.Pairings.ItemsAdded += pairings =>
             {
@@ -138,13 +138,13 @@ namespace osu.Game.Tournament.Screens.Ladder
                 }
             }
 
-            foreach (var group in LadderInfo.Groupings)
+            foreach (var round in LadderInfo.Rounds)
             {
-                var topPairing = PairingsContainer.Where(p => !p.Pairing.Losers.Value && p.Pairing.Grouping.Value == group).OrderBy(p => p.Y).FirstOrDefault();
+                var topPairing = PairingsContainer.Where(p => !p.Pairing.Losers.Value && p.Pairing.Round.Value == round).OrderBy(p => p.Y).FirstOrDefault();
 
                 if (topPairing == null) continue;
 
-                headings.Add(new DrawableTournamentGrouping(group)
+                headings.Add(new DrawableTournamentRound(round)
                 {
                     Position = headings.ToLocalSpace((topPairing.ScreenSpaceDrawQuad.TopLeft + topPairing.ScreenSpaceDrawQuad.TopRight) / 2),
                     Margin = new MarginPadding { Bottom = 10 },
@@ -152,13 +152,13 @@ namespace osu.Game.Tournament.Screens.Ladder
                 });
             }
 
-            foreach (var group in LadderInfo.Groupings)
+            foreach (var round in LadderInfo.Rounds)
             {
-                var topPairing = PairingsContainer.Where(p => p.Pairing.Losers.Value && p.Pairing.Grouping.Value == group).OrderBy(p => p.Y).FirstOrDefault();
+                var topPairing = PairingsContainer.Where(p => p.Pairing.Losers.Value && p.Pairing.Round.Value == round).OrderBy(p => p.Y).FirstOrDefault();
 
                 if (topPairing == null) continue;
 
-                headings.Add(new DrawableTournamentGrouping(group, true)
+                headings.Add(new DrawableTournamentRound(round, true)
                 {
                     Position = headings.ToLocalSpace((topPairing.ScreenSpaceDrawQuad.TopLeft + topPairing.ScreenSpaceDrawQuad.TopRight) / 2),
                     Margin = new MarginPadding { Bottom = 10 },

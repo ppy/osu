@@ -5,7 +5,7 @@ using osu.Game.Beatmaps;
 
 namespace osu.Game.Tournament.Screens.Ladder.Components
 {
-    public class GroupingBeatmap
+    public class RoundBeatmap
     {
         public int ID;
         public string Mods;

@@ -12,9 +12,9 @@ using osu.Game.Graphics.UserInterface;
 using osu.Game.Tournament.Components;
 using osu.Game.Tournament.Screens.Drawings;
 using osu.Game.Tournament.Screens.Gameplay;
-using osu.Game.Tournament.Screens.Groupings;
 using osu.Game.Tournament.Screens.Ladder;
 using osu.Game.Tournament.Screens.MapPool;
+using osu.Game.Tournament.Screens.Rounds;
 using osu.Game.Tournament.Screens.Schedule;
 using osu.Game.Tournament.Screens.Showcase;
 using osu.Game.Tournament.Screens.TeamIntro;
@@ -72,7 +72,7 @@ namespace osu.Game.Tournament.Screens
                                 new LadderScreen(),
                                 new LadderEditorScreen(),
                                 new TeamsEditorScreen(),
-                                new GroupingsEditorScreen(),
+                                new RoundEditorScreen(),
                                 new ShowcaseScreen(),
                                 new MapPoolScreen(),
                                 new TeamIntroScreen(),
@@ -106,7 +106,7 @@ namespace osu.Game.Tournament.Screens
                             Children = new Drawable[]
                             {
                                 new OsuButton { RelativeSizeAxes = Axes.X, Text = "Team Editor", Action = () => SetScreen(typeof(TeamsEditorScreen)) },
-                                new OsuButton { RelativeSizeAxes = Axes.X, Text = "Groupings Editor", Action = () => SetScreen(typeof(GroupingsEditorScreen)) },
+                                new OsuButton { RelativeSizeAxes = Axes.X, Text = "Rounds Editor", Action = () => SetScreen(typeof(RoundEditorScreen)) },
                                 new OsuButton { RelativeSizeAxes = Axes.X, Text = "Bracket Editor", Action = () => SetScreen(typeof(LadderEditorScreen)) },
                                 new Container { RelativeSizeAxes = Axes.X, Height = 50 },
                                 new OsuButton { RelativeSizeAxes = Axes.X, Text = "Drawings", Action = () => SetScreen(typeof(DrawingsScreen)) },
