@@ -267,7 +267,11 @@ namespace osu.Game.Tournament.Screens.Editors
 
                             req.Success += res =>
                             {
+                                // TODO: this should be done in a better way.
                                 user.Username = res.Username;
+                                user.Country = res.Country;
+                                user.Cover = res.Cover;
+
                                 updatePanel();
                             };
 
