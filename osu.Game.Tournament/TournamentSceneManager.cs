@@ -72,7 +72,7 @@ namespace osu.Game.Tournament
                                 new ScheduleScreen(),
                                 new LadderScreen(),
                                 new LadderEditorScreen(),
-                                new TeamsEditorScreen(),
+                                new TeamEditorScreen(),
                                 new RoundEditorScreen(),
                                 new ShowcaseScreen(),
                                 new MapPoolScreen(),
@@ -106,7 +106,7 @@ namespace osu.Game.Tournament
                             Direction = FillDirection.Vertical,
                             Children = new Drawable[]
                             {
-                                new OsuButton { RelativeSizeAxes = Axes.X, Text = "Team Editor", Action = () => SetScreen(typeof(TeamsEditorScreen)) },
+                                new OsuButton { RelativeSizeAxes = Axes.X, Text = "Team Editor", Action = () => SetScreen(typeof(TeamEditorScreen)) },
                                 new OsuButton { RelativeSizeAxes = Axes.X, Text = "Rounds Editor", Action = () => SetScreen(typeof(RoundEditorScreen)) },
                                 new OsuButton { RelativeSizeAxes = Axes.X, Text = "Bracket Editor", Action = () => SetScreen(typeof(LadderEditorScreen)) },
                                 new Container { RelativeSizeAxes = Axes.X, Height = 50 },

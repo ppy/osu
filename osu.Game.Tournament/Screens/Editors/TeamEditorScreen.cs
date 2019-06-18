@@ -20,11 +20,11 @@ using osuTK;
 
 namespace osu.Game.Tournament.Screens.Editors
 {
-    public class TeamsEditorScreen : TournamentScreen, IProvideVideo
+    public class TeamEditorScreen : TournamentScreen, IProvideVideo
     {
         private readonly FillFlowContainer<TeamRow> items;
 
-        public TeamsEditorScreen()
+        public TeamEditorScreen()
         {
             AddRangeInternal(new Drawable[]
             {

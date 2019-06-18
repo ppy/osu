@@ -5,11 +5,11 @@ using osu.Game.Tournament.Screens.Editors;
 
 namespace osu.Game.Tournament.Tests
 {
-    public class TestSceneTeamsEditorScreen : LadderTestScene
+    public class TestSceneRoundEditorScreen : LadderTestScene
     {
-        public TestSceneTeamsEditorScreen()
+        public TestSceneRoundEditorScreen()
         {
-            Add(new TeamsEditorScreen());
+            Add(new RoundEditorScreen());
         }
     }
 }
