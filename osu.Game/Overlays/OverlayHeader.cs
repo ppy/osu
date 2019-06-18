@@ -1,8 +1,11 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.UserInterface;
+using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
 
 namespace osu.Game.Overlays
@@ -13,6 +16,12 @@ namespace osu.Game.Overlays
 
         private const float cover_height = 150;
         private const float cover_info_height = 75;
+
+        protected abstract Drawable CreateBackground();
+
+        protected abstract Drawable CreateContent();
+
+        protected abstract ScreenTitle CreateTitle();
 
         protected OverlayHeader()
         {
@@ -61,10 +70,27 @@ namespace osu.Game.Overlays
             };
         }
 
-        protected abstract Drawable CreateBackground();
+        protected class OverlayHeaderTabControl : OverlayTabControl<string>
+        {
+            protected override TabItem<string> CreateTabItem(string value) => new HeaderTabItem(value)
+            {
+                AccentColour = AccentColour
+            };
 
-        protected abstract Drawable CreateContent();
+            [BackgroundDependencyLoader]
+            private void load(OsuColour colours)
+            {
+                AccentColour = colours.Seafoam;
+            }
 
-        protected abstract ScreenTitle CreateTitle();
+            private class HeaderTabItem : OverlayTabItem<string>
+            {
+                public HeaderTabItem(string value)
+                    : base(value)
+                {
+                    Text = value;
+                }
+            }
+        }
     }
 }

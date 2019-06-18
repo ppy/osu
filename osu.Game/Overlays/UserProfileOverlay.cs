@@ -141,9 +141,12 @@ namespace osu.Game.Overlays
             }
         }
 
-        private class ProfileTabControl : PageTabControl<ProfileSection>
+        private class ProfileTabControl : OverlayTabControl<ProfileSection>
         {
-            private readonly Box bottom;
+            protected override TabItem<ProfileSection> CreateTabItem(ProfileSection value) => new ProfileTabItem(value)
+            {
+                AccentColour = AccentColour
+            };
 
             public ProfileTabControl()
             {
@@ -151,33 +154,21 @@ namespace osu.Game.Overlays
                 TabContainer.AutoSizeAxes |= Axes.X;
                 TabContainer.Anchor |= Anchor.x1;
                 TabContainer.Origin |= Anchor.x1;
-                AddInternal(bottom = new Box
-                {
-                    RelativeSizeAxes = Axes.X,
-                    Height = 1,
-                    Anchor = Anchor.BottomCentre,
-                    Origin = Anchor.BottomCentre,
-                    EdgeSmoothness = new Vector2(1)
-                });
-            }
-
-            protected override TabItem<ProfileSection> CreateTabItem(ProfileSection value) => new ProfileTabItem(value);
-
-            protected override Dropdown<ProfileSection> CreateDropdown() => null;
-
-            private class ProfileTabItem : PageTabItem
-            {
-                public ProfileTabItem(ProfileSection value)
-                    : base(value)
-                {
-                    Text.Text = value.Title;
-                }
             }
 
             [BackgroundDependencyLoader]
             private void load(OsuColour colours)
             {
-                bottom.Colour = colours.Yellow;
+                AccentColour = colours.Seafoam;
+            }
+
+            private class ProfileTabItem : OverlayTabItem<ProfileSection>
+            {
+                public ProfileTabItem(ProfileSection value)
+                    : base(value)
+                {
+                    Text = value.Title;
+                }
             }
         }
     }

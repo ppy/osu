@@ -13,7 +13,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Overlays
 {
-    public class OverlayHeaderTabControl : TabControl<string>
+    public class OverlayTabControl<T> : TabControl<T>
     {
         private readonly Box bar;
 
@@ -30,9 +30,9 @@ namespace osu.Game.Overlays
                 accentColour = value;
                 bar.Colour = value;
 
-                foreach (TabItem<string> tabItem in TabContainer)
+                foreach (TabItem<T> tabItem in TabContainer)
                 {
-                    ((HeaderTabItem)tabItem).AccentColour = value;
+                    ((OverlayTabItem<T>)tabItem).AccentColour = value;
                 }
             }
         }
@@ -43,7 +43,7 @@ namespace osu.Game.Overlays
             set => TabContainer.Padding = value;
         }
 
-        public OverlayHeaderTabControl()
+        public OverlayTabControl()
         {
             TabContainer.Masking = false;
             TabContainer.Spacing = new Vector2(15, 0);
@@ -57,17 +57,23 @@ namespace osu.Game.Overlays
             });
         }
 
-        protected override Dropdown<string> CreateDropdown() => null;
+        protected override Dropdown<T> CreateDropdown() => null;
 
-        protected override TabItem<string> CreateTabItem(string value) => new HeaderTabItem(value)
+        protected override TabItem<T> CreateTabItem(T value) => new OverlayTabItem<T>(value)
         {
             AccentColour = AccentColour
         };
 
-        private class HeaderTabItem : TabItem<string>
+        protected class OverlayTabItem<U> : TabItem<U>
         {
             private readonly OsuSpriteText text;
             private readonly ExpandingBar bar;
+
+            public string Text
+            {
+                get => text.Text;
+                set => text.Text = value;
+            }
 
             private Color4 accentColour;
 
@@ -86,7 +92,7 @@ namespace osu.Game.Overlays
                 }
             }
 
-            public HeaderTabItem(string value)
+            public OverlayTabItem(U value)
                 : base(value)
             {
                 AutoSizeAxes = Axes.X;
@@ -99,7 +105,6 @@ namespace osu.Game.Overlays
                         Margin = new MarginPadding { Bottom = 10 },
                         Origin = Anchor.BottomLeft,
                         Anchor = Anchor.BottomLeft,
-                        Text = value,
                         Font = OsuFont.GetFont()
                     },
                     bar = new ExpandingBar
