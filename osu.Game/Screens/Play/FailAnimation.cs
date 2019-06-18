@@ -1,16 +1,15 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using osu.Framework.Audio;
-using osu.Framework.Bindables;
-using osu.Game.Rulesets.UI;
 using System;
 using osu.Framework.Allocation;
+using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Audio.Track;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Game.Beatmaps;
-using osuTK.Graphics;
+using osu.Game.Rulesets.UI;
 
 namespace osu.Game.Screens.Play
 {

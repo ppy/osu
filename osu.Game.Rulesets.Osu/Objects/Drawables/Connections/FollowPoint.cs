@@ -8,7 +8,9 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.MathUtils;
 using osu.Game.Skinning;
+using osu.Game.Screens.Play;
 
 namespace osu.Game.Rulesets.Osu.Objects.Drawables.Connections
 {
@@ -42,6 +44,13 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Connections
                     Alpha = 0.5f,
                 }
             }, restrictSize: false);
+        }
+
+        public void Fail()
+        {
+            this.FadeOut(FailAnimation.FAIL_DURATION / 2, Easing.OutQuad);
+            this.ScaleTo(Scale * 0.5f, FailAnimation.FAIL_DURATION);
+            this.MoveToOffset(new Vector2(RNG.NextSingle(-100, 100), 400), FailAnimation.FAIL_DURATION);
         }
     }
 }

@@ -13,8 +13,6 @@ using osu.Framework.Graphics.Containers;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Mods;
 using osuTK;
-using osuTK.Graphics;
-using osu.Game.Screens.Play;
 
 namespace osu.Game.Rulesets.UI
 {

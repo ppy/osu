@@ -46,6 +46,8 @@ namespace osu.Game.Rulesets.Osu.UI
                     Depth = -1,
                 },
             };
+
+            connectionLayer.HasFailed.BindTo(HasFailed);
         }
 
         public override void Add(DrawableHitObject h)
