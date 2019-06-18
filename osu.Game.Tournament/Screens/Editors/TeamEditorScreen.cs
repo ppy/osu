@@ -128,12 +128,12 @@ namespace osu.Game.Tournament.Screens.Editors
 
             private void updateDrawable(ValueChangedEvent<string> flag)
             {
-                drawableContainer.Child = new RowTeam(Team);
+                drawableContainer.Child = new DrawableTeamFlag(Team);
             }
 
-            private class RowTeam : DrawableTournamentTeam
+            private class DrawableTeamFlag : DrawableTournamentTeam
             {
-                public RowTeam(TournamentTeam team)
+                public DrawableTeamFlag(TournamentTeam team)
                     : base(team)
                 {
                     InternalChild = Flag;
