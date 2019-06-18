@@ -17,7 +17,6 @@ using osu.Framework.Platform;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API.Requests;
-using osu.Game.Rulesets;
 using osu.Game.Tournament.IPC;
 using osu.Game.Tournament.Models;
 using osuTK.Input;
@@ -33,8 +32,6 @@ namespace osu.Game.Tournament
         private Storage storage;
 
         private DependencyContainer dependencies;
-
-        private readonly Bindable<RulesetInfo> ruleset = new Bindable<RulesetInfo>();
 
         private Bindable<Size> windowSize;
         private FileBasedIPC ipc;
