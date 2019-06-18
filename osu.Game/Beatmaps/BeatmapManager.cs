@@ -78,7 +78,8 @@ namespace osu.Game.Beatmaps
             updateQueue = new BeatmapUpdateQueue(api);
         }
 
-        protected override ArchiveDownloadRequest<BeatmapSetInfo> CreateDownloadRequest(BeatmapSetInfo set, object[] options) => new DownloadBeatmapSetRequest(set, (options?.FirstOrDefault() as bool?) ?? false);
+        protected override ArchiveDownloadRequest<BeatmapSetInfo> CreateDownloadRequest(BeatmapSetInfo set, bool minimiseDownloadSize) =>
+            new DownloadBeatmapSetRequest(set, minimiseDownloadSize);
 
         protected override Task Populate(BeatmapSetInfo beatmapSet, ArchiveReader archive, CancellationToken cancellationToken = default)
         {

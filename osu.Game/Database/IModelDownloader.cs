@@ -31,21 +31,12 @@ namespace osu.Game.Database
         bool IsAvailableLocally(TModel model);
 
         /// <summary>
-        /// Downloads a <see cref="TModel"/>.
-        /// This may post notifications tracking progress.
+        /// Begin a download for the requested <see cref="TModel"/>.
         /// </summary>
         /// <param name="model">The <see cref="TModel"/> to be downloaded.</param>
-        /// <returns>Whether downloading can happen.</returns>
-        bool Download(TModel model);
-
-        /// <summary>
-        /// Downloads a <see cref="TModel"/> with optional parameters for the download request.
-        /// This may post notifications tracking progress.
-        /// </summary>
-        /// <param name="model">The <see cref="TModel"/> to be downloaded.</param>
-        /// <param name="extra">Optional parameters to be used for creating the download request.</param>
-        /// <returns>Whether downloading can happen.</returns>
-        bool Download(TModel model, params object[] extra);
+        /// <param name="minimiseDownloadSize">Whether this download should be optimised for slow connections. Generally means extras are not included in the download bundle..</param>
+        /// <returns>Whether the download was started.</returns>
+        bool Download(TModel model, bool minimiseDownloadSize);
 
         /// <summary>
         /// Gets an existing <see cref="TModel"/> download request if it exists.
