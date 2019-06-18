@@ -20,7 +20,7 @@ namespace osu.Game.Tournament.Screens.Ladder
 {
     public class LadderScreen : TournamentScreen, IProvideVideo
     {
-        protected Container<DrawableMatchPairing> PairingsContainer;
+        protected Container<DrawableTournamentMatch> MatchesContainer;
         private Container<Path> paths;
         private Container headings;
 
@@ -53,35 +53,35 @@ namespace osu.Game.Tournament.Screens.Ladder
                         {
                             paths = new Container<Path> { RelativeSizeAxes = Axes.Both },
                             headings = new Container { RelativeSizeAxes = Axes.Both },
-                            PairingsContainer = new Container<DrawableMatchPairing> { RelativeSizeAxes = Axes.Both },
+                            MatchesContainer = new Container<DrawableTournamentMatch> { RelativeSizeAxes = Axes.Both },
                         }
                     },
                 }
             };
 
-            void addPairing(MatchPairing pairing) =>
-                PairingsContainer.Add(new DrawableMatchPairing(pairing, this is LadderEditorScreen)
+            void addMatch(TournamentMatch match) =>
+                MatchesContainer.Add(new DrawableTournamentMatch(match, this is LadderEditorScreen)
                 {
                     Changed = () => layout.Invalidate()
                 });
 
-            foreach (var pairing in LadderInfo.Pairings)
-                addPairing(pairing);
+            foreach (var match in LadderInfo.Matches)
+                addMatch(match);
 
             LadderInfo.Rounds.ItemsAdded += _ => layout.Invalidate();
             LadderInfo.Rounds.ItemsRemoved += _ => layout.Invalidate();
 
-            LadderInfo.Pairings.ItemsAdded += pairings =>
+            LadderInfo.Matches.ItemsAdded += matches =>
             {
-                foreach (var p in pairings)
-                    addPairing(p);
+                foreach (var p in matches)
+                    addMatch(p);
                 layout.Invalidate();
             };
 
-            LadderInfo.Pairings.ItemsRemoved += pairings =>
+            LadderInfo.Matches.ItemsRemoved += matches =>
             {
-                foreach (var p in pairings)
-                foreach (var d in PairingsContainer.Where(d => d.Pairing == p))
+                foreach (var p in matches)
+                foreach (var d in MatchesContainer.Where(d => d.Match == p))
                     d.Expire();
 
                 layout.Invalidate();
@@ -110,45 +110,45 @@ namespace osu.Game.Tournament.Screens.Ladder
 
             int id = 1;
 
-            foreach (var pairing in PairingsContainer.OrderBy(d => d.Y).ThenBy(d => d.X))
+            foreach (var match in MatchesContainer.OrderBy(d => d.Y).ThenBy(d => d.X))
             {
-                pairing.Pairing.ID = id++;
+                match.Match.ID = id++;
 
-                if (pairing.Pairing.Progression.Value != null)
+                if (match.Match.Progression.Value != null)
                 {
-                    var dest = PairingsContainer.FirstOrDefault(p => p.Pairing == pairing.Pairing.Progression.Value);
+                    var dest = MatchesContainer.FirstOrDefault(p => p.Match == match.Match.Progression.Value);
 
                     if (dest == null)
                         // clean up outdated progressions.
-                        pairing.Pairing.Progression.Value = null;
+                        match.Match.Progression.Value = null;
                     else
-                        paths.Add(new ProgressionPath(pairing, dest) { Colour = pairing.Pairing.Losers.Value ? losersPathColour : normalPathColour });
+                        paths.Add(new ProgressionPath(match, dest) { Colour = match.Match.Losers.Value ? losersPathColour : normalPathColour });
                 }
 
                 if (DrawLoserPaths)
                 {
-                    if (pairing.Pairing.LosersProgression.Value != null)
+                    if (match.Match.LosersProgression.Value != null)
                     {
-                        var dest = PairingsContainer.FirstOrDefault(p => p.Pairing == pairing.Pairing.LosersProgression.Value);
+                        var dest = MatchesContainer.FirstOrDefault(p => p.Match == match.Match.LosersProgression.Value);
 
                         if (dest == null)
                             // clean up outdated progressions.
-                            pairing.Pairing.LosersProgression.Value = null;
+                            match.Match.LosersProgression.Value = null;
                         else
-                            paths.Add(new ProgressionPath(pairing, dest) { Colour = losersPathColour.Opacity(0.1f) });
+                            paths.Add(new ProgressionPath(match, dest) { Colour = losersPathColour.Opacity(0.1f) });
                     }
                 }
             }
 
             foreach (var round in LadderInfo.Rounds)
             {
-                var topPairing = PairingsContainer.Where(p => !p.Pairing.Losers.Value && p.Pairing.Round.Value == round).OrderBy(p => p.Y).FirstOrDefault();
+                var topMatch = MatchesContainer.Where(p => !p.Match.Losers.Value && p.Match.Round.Value == round).OrderBy(p => p.Y).FirstOrDefault();
 
-                if (topPairing == null) continue;
+                if (topMatch == null) continue;
 
                 headings.Add(new DrawableTournamentRound(round)
                 {
-                    Position = headings.ToLocalSpace((topPairing.ScreenSpaceDrawQuad.TopLeft + topPairing.ScreenSpaceDrawQuad.TopRight) / 2),
+                    Position = headings.ToLocalSpace((topMatch.ScreenSpaceDrawQuad.TopLeft + topMatch.ScreenSpaceDrawQuad.TopRight) / 2),
                     Margin = new MarginPadding { Bottom = 10 },
                     Origin = Anchor.BottomCentre,
                 });
@@ -156,13 +156,13 @@ namespace osu.Game.Tournament.Screens.Ladder
 
             foreach (var round in LadderInfo.Rounds)
             {
-                var topPairing = PairingsContainer.Where(p => p.Pairing.Losers.Value && p.Pairing.Round.Value == round).OrderBy(p => p.Y).FirstOrDefault();
+                var topMatch = MatchesContainer.Where(p => p.Match.Losers.Value && p.Match.Round.Value == round).OrderBy(p => p.Y).FirstOrDefault();
 
-                if (topPairing == null) continue;
+                if (topMatch == null) continue;
 
                 headings.Add(new DrawableTournamentRound(round, true)
                 {
-                    Position = headings.ToLocalSpace((topPairing.ScreenSpaceDrawQuad.TopLeft + topPairing.ScreenSpaceDrawQuad.TopRight) / 2),
+                    Position = headings.ToLocalSpace((topMatch.ScreenSpaceDrawQuad.TopLeft + topMatch.ScreenSpaceDrawQuad.TopRight) / 2),
                     Margin = new MarginPadding { Bottom = 10 },
                     Origin = Anchor.BottomCentre,
                 });

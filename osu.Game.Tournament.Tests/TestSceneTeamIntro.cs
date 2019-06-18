@@ -13,16 +13,16 @@ namespace osu.Game.Tournament.Tests
     public class TestSceneTeamIntro : LadderTestScene
     {
         [Cached]
-        private readonly Bindable<MatchPairing> currentMatch = new Bindable<MatchPairing>();
+        private readonly Bindable<TournamentMatch> currentMatch = new Bindable<TournamentMatch>();
 
         [BackgroundDependencyLoader]
         private void load()
         {
-            var pairing = new MatchPairing();
-            pairing.Team1.Value = Ladder.Teams.FirstOrDefault(t => t.Acronym.Value == "USA");
-            pairing.Team2.Value = Ladder.Teams.FirstOrDefault(t => t.Acronym.Value == "JPN");
-            pairing.Round.Value = Ladder.Rounds.FirstOrDefault(g => g.Name.Value == "Finals");
-            currentMatch.Value = pairing;
+            var match = new TournamentMatch();
+            match.Team1.Value = Ladder.Teams.FirstOrDefault(t => t.Acronym.Value == "USA");
+            match.Team2.Value = Ladder.Teams.FirstOrDefault(t => t.Acronym.Value == "JPN");
+            match.Round.Value = Ladder.Rounds.FirstOrDefault(g => g.Name.Value == "Finals");
+            currentMatch.Value = match;
 
             Add(new TeamIntroScreen
             {

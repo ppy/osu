@@ -53,7 +53,7 @@ namespace osu.Game.Tournament.Tests
                 Origin = Anchor.Centre,
             });
 
-            ladderInfo.CurrentMatch.Value = new MatchPairing
+            ladderInfo.CurrentMatch.Value = new TournamentMatch
             {
                 Team1 =
                 {

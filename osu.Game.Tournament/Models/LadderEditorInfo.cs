@@ -7,6 +7,6 @@ namespace osu.Game.Tournament.Models
 {
     public class LadderEditorInfo
     {
-        public readonly Bindable<MatchPairing> Selected = new Bindable<MatchPairing>();
+        public readonly Bindable<TournamentMatch> Selected = new Bindable<TournamentMatch>();
     }
 }

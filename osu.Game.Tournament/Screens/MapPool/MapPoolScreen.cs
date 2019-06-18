@@ -26,7 +26,7 @@ namespace osu.Game.Tournament.Screens.MapPool
     {
         private readonly FillFlowContainer<FillFlowContainer<TournamentBeatmapPanel>> mapFlows;
 
-        private readonly Bindable<MatchPairing> currentMatch = new Bindable<MatchPairing>();
+        private readonly Bindable<TournamentMatch> currentMatch = new Bindable<TournamentMatch>();
 
         [Resolved(canBeNull: true)]
         private TournamentSceneManager sceneManager { get; set; }
@@ -203,7 +203,7 @@ namespace osu.Game.Tournament.Screens.MapPool
             }
         }
 
-        private void matchChanged(ValueChangedEvent<MatchPairing> match)
+        private void matchChanged(ValueChangedEvent<TournamentMatch> match)
         {
             mapFlows.Clear();
 

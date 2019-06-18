@@ -17,14 +17,14 @@ using SixLabors.Primitives;
 
 namespace osu.Game.Tournament.Screens.Ladder.Components
 {
-    public class DrawableMatchPairing : CompositeDrawable
+    public class DrawableTournamentMatch : CompositeDrawable
     {
-        public readonly MatchPairing Pairing;
+        public readonly TournamentMatch Match;
         private readonly bool editor;
         protected readonly FillFlowContainer<DrawableMatchTeam> Flow;
         private readonly Drawable selectionBox;
         private readonly Drawable currentMatchSelectionBox;
-        private Bindable<MatchPairing> globalSelection;
+        private Bindable<TournamentMatch> globalSelection;
 
         [Resolved(CanBeNull = true)]
         private LadderEditorInfo editorInfo { get; set; }
@@ -32,9 +32,9 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
         [Resolved(CanBeNull = true)]
         private LadderInfo ladderInfo { get; set; }
 
-        public DrawableMatchPairing(MatchPairing pairing, bool editor = false)
+        public DrawableTournamentMatch(TournamentMatch match, bool editor = false)
         {
-            Pairing = pairing;
+            Match = match;
             this.editor = editor;
 
             AutoSizeAxes = Axes.Both;
@@ -75,25 +75,25 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
                 }
             };
 
-            boundReference(pairing.Team1).BindValueChanged(_ => updateTeams());
-            boundReference(pairing.Team2).BindValueChanged(_ => updateTeams());
-            boundReference(pairing.Team1Score).BindValueChanged(_ => updateWinConditions());
-            boundReference(pairing.Team2Score).BindValueChanged(_ => updateWinConditions());
-            boundReference(pairing.Round).BindValueChanged(_ =>
+            boundReference(match.Team1).BindValueChanged(_ => updateTeams());
+            boundReference(match.Team2).BindValueChanged(_ => updateTeams());
+            boundReference(match.Team1Score).BindValueChanged(_ => updateWinConditions());
+            boundReference(match.Team2Score).BindValueChanged(_ => updateWinConditions());
+            boundReference(match.Round).BindValueChanged(_ =>
             {
                 updateWinConditions();
                 Changed?.Invoke();
             });
-            boundReference(pairing.Completed).BindValueChanged(_ => updateProgression());
-            boundReference(pairing.Progression).BindValueChanged(_ => updateProgression());
-            boundReference(pairing.LosersProgression).BindValueChanged(_ => updateProgression());
-            boundReference(pairing.Losers).BindValueChanged(_ =>
+            boundReference(match.Completed).BindValueChanged(_ => updateProgression());
+            boundReference(match.Progression).BindValueChanged(_ => updateProgression());
+            boundReference(match.LosersProgression).BindValueChanged(_ => updateProgression());
+            boundReference(match.Losers).BindValueChanged(_ =>
             {
                 updateTeams();
                 Changed?.Invoke();
             });
-            boundReference(pairing.Current).BindValueChanged(_ => updateCurrentMatch(), true);
-            boundReference(pairing.Position).BindValueChanged(pos =>
+            boundReference(match.Current).BindValueChanged(_ => updateCurrentMatch(), true);
+            boundReference(match.Position).BindValueChanged(pos =>
             {
                 if (!IsDragged)
                     Position = new Vector2(pos.NewValue.X, pos.NewValue.Y);
@@ -127,7 +127,7 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
 
         private void updateCurrentMatch()
         {
-            if (Pairing.Current.Value)
+            if (Match.Current.Value)
                 currentMatchSelectionBox.Show();
             else
                 currentMatchSelectionBox.Hide();
@@ -149,9 +149,9 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
                 {
                     selectionBox.Show();
                     if (editor)
-                        editorInfo.Selected.Value = Pairing;
+                        editorInfo.Selected.Value = Match;
                     else
-                        ladderInfo.CurrentMatch.Value = Pairing;
+                        ladderInfo.CurrentMatch.Value = Match;
                 }
                 else
                     selectionBox.Hide();
@@ -160,36 +160,36 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
 
         private void updateProgression()
         {
-            if (!Pairing.Completed.Value)
+            if (!Match.Completed.Value)
             {
                 // ensure we clear any of our teams from our progression.
                 // this is not pretty logic but should suffice for now.
-                if (Pairing.Progression.Value != null && Pairing.Progression.Value.Team1.Value == Pairing.Team1.Value)
-                    Pairing.Progression.Value.Team1.Value = null;
+                if (Match.Progression.Value != null && Match.Progression.Value.Team1.Value == Match.Team1.Value)
+                    Match.Progression.Value.Team1.Value = null;
 
-                if (Pairing.Progression.Value != null && Pairing.Progression.Value.Team2.Value == Pairing.Team2.Value)
-                    Pairing.Progression.Value.Team2.Value = null;
+                if (Match.Progression.Value != null && Match.Progression.Value.Team2.Value == Match.Team2.Value)
+                    Match.Progression.Value.Team2.Value = null;
 
-                if (Pairing.LosersProgression.Value != null && Pairing.LosersProgression.Value.Team1.Value == Pairing.Team1.Value)
-                    Pairing.LosersProgression.Value.Team1.Value = null;
+                if (Match.LosersProgression.Value != null && Match.LosersProgression.Value.Team1.Value == Match.Team1.Value)
+                    Match.LosersProgression.Value.Team1.Value = null;
 
-                if (Pairing.LosersProgression.Value != null && Pairing.LosersProgression.Value.Team2.Value == Pairing.Team2.Value)
-                    Pairing.LosersProgression.Value.Team2.Value = null;
+                if (Match.LosersProgression.Value != null && Match.LosersProgression.Value.Team2.Value == Match.Team2.Value)
+                    Match.LosersProgression.Value.Team2.Value = null;
             }
             else
             {
-                transferProgression(Pairing.Progression?.Value, Pairing.Winner);
-                transferProgression(Pairing.LosersProgression?.Value, Pairing.Loser);
+                transferProgression(Match.Progression?.Value, Match.Winner);
+                transferProgression(Match.LosersProgression?.Value, Match.Loser);
             }
 
             Changed?.Invoke();
         }
 
-        private void transferProgression(MatchPairing destination, TournamentTeam team)
+        private void transferProgression(TournamentMatch destination, TournamentTeam team)
         {
             if (destination == null) return;
 
-            bool progressionAbove = destination.ID < Pairing.ID;
+            bool progressionAbove = destination.ID < Match.ID;
 
             Bindable<TournamentTeam> destinationTeam;
 
@@ -210,12 +210,12 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
 
         private void updateWinConditions()
         {
-            if (Pairing.Round.Value == null) return;
+            if (Match.Round.Value == null) return;
 
-            var instaWinAmount = Pairing.Round.Value.BestOf.Value / 2;
+            var instaWinAmount = Match.Round.Value.BestOf.Value / 2;
 
-            Pairing.Completed.Value = Pairing.Round.Value.BestOf.Value > 0
-                                      && (Pairing.Team1Score.Value + Pairing.Team2Score.Value >= Pairing.Round.Value.BestOf.Value || Pairing.Team1Score.Value > instaWinAmount || Pairing.Team2Score.Value > instaWinAmount);
+            Match.Completed.Value = Match.Round.Value.BestOf.Value > 0
+                                    && (Match.Team1Score.Value + Match.Team2Score.Value >= Match.Round.Value.BestOf.Value || Match.Team1Score.Value > instaWinAmount || Match.Team2Score.Value > instaWinAmount);
         }
 
         protected override void LoadComplete()
@@ -228,7 +228,7 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
                 globalSelection = editorInfo.Selected.GetBoundCopy();
                 globalSelection.BindValueChanged(s =>
                 {
-                    if (s.NewValue != Pairing) Selected = false;
+                    if (s.NewValue != Match) Selected = false;
                 });
             }
         }
@@ -240,25 +240,25 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
 
             // todo: teams may need to be bindable for transitions at a later point.
 
-            if (Pairing.Team1.Value == null || Pairing.Team2.Value == null)
-                Pairing.CancelMatchStart();
+            if (Match.Team1.Value == null || Match.Team2.Value == null)
+                Match.CancelMatchStart();
 
-            if (Pairing.ConditionalPairings.Count > 0)
+            if (Match.ConditionalMatches.Count > 0)
             {
-                foreach (var conditional in Pairing.ConditionalPairings)
+                foreach (var conditional in Match.ConditionalMatches)
                 {
-                    var team1Match = conditional.Acronyms.Contains(Pairing.Team1Acronym);
-                    var team2Match = conditional.Acronyms.Contains(Pairing.Team2Acronym);
+                    var team1Match = conditional.Acronyms.Contains(Match.Team1Acronym);
+                    var team2Match = conditional.Acronyms.Contains(Match.Team2Acronym);
 
                     if (team1Match && team2Match)
-                        Pairing.Date.Value = conditional.Date.Value;
+                        Match.Date.Value = conditional.Date.Value;
                 }
             }
 
             Flow.Children = new[]
             {
-                new DrawableMatchTeam(Pairing.Team1.Value, Pairing, Pairing.Losers.Value),
-                new DrawableMatchTeam(Pairing.Team2.Value, Pairing, Pairing.Losers.Value)
+                new DrawableMatchTeam(Match.Team1.Value, Match, Match.Losers.Value),
+                new DrawableMatchTeam(Match.Team2.Value, Match, Match.Losers.Value)
             };
 
             SchedulerAfterChildren.Add(() => Scheduler.Add(updateProgression));
@@ -282,7 +282,7 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
 
         protected override bool OnClick(ClickEvent e)
         {
-            if (editorInfo == null || Pairing is ConditionalMatchPairing)
+            if (editorInfo == null || Match is ConditionalTournamentMatch)
                 return false;
 
             Selected = true;
@@ -297,17 +297,17 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
             this.MoveToOffset(e.Delta);
 
             var pos = Position;
-            Pairing.Position.Value = new Point((int)pos.X, (int)pos.Y);
+            Match.Position.Value = new Point((int)pos.X, (int)pos.Y);
             return true;
         }
 
         public void Remove()
         {
             Selected = false;
-            Pairing.Progression.Value = null;
-            Pairing.LosersProgression.Value = null;
+            Match.Progression.Value = null;
+            Match.LosersProgression.Value = null;
 
-            ladderInfo.Pairings.Remove(Pairing);
+            ladderInfo.Matches.Remove(Match);
         }
     }
 }

@@ -55,7 +55,7 @@ namespace osu.Game.Tournament.Screens.Gameplay.Components
             private readonly Color4 red = new Color4(129, 68, 65, 255);
             private readonly Color4 blue = new Color4(41, 91, 97, 255);
 
-            private readonly Bindable<MatchPairing> currentMatch = new Bindable<MatchPairing>();
+            private readonly Bindable<TournamentMatch> currentMatch = new Bindable<TournamentMatch>();
             private readonly Bindable<TournamentTeam> currentTeam = new Bindable<TournamentTeam>();
             private readonly Bindable<int?> currentTeamScore = new Bindable<int?>();
 
@@ -74,7 +74,7 @@ namespace osu.Game.Tournament.Screens.Gameplay.Components
                 currentMatch.BindTo(ladder.CurrentMatch);
             }
 
-            private void matchChanged(ValueChangedEvent<MatchPairing> match)
+            private void matchChanged(ValueChangedEvent<TournamentMatch> match)
             {
                 currentTeamScore.UnbindBindings();
                 currentTeamScore.BindTo(teamColour == TeamColour.Red ? match.NewValue.Team1Score : match.NewValue.Team2Score);
@@ -187,7 +187,7 @@ namespace osu.Game.Tournament.Screens.Gameplay.Components
 
         private class RoundDisplay : CompositeDrawable
         {
-            private readonly Bindable<MatchPairing> currentMatch = new Bindable<MatchPairing>();
+            private readonly Bindable<TournamentMatch> currentMatch = new Bindable<TournamentMatch>();
 
             public RoundDisplay()
             {
@@ -204,7 +204,7 @@ namespace osu.Game.Tournament.Screens.Gameplay.Components
                 currentMatch.BindTo(ladder.CurrentMatch);
             }
 
-            private void matchChanged(ValueChangedEvent<MatchPairing> match)
+            private void matchChanged(ValueChangedEvent<TournamentMatch> match)
             {
                 InternalChildren = new Drawable[]
                 {

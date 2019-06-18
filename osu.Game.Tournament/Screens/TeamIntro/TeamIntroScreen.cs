@@ -20,7 +20,7 @@ namespace osu.Game.Tournament.Screens.TeamIntro
     {
         private Container mainContainer;
 
-        private readonly Bindable<MatchPairing> currentMatch = new Bindable<MatchPairing>();
+        private readonly Bindable<TournamentMatch> currentMatch = new Bindable<TournamentMatch>();
 
         [BackgroundDependencyLoader]
         private void load(Storage storage)
@@ -45,9 +45,9 @@ namespace osu.Game.Tournament.Screens.TeamIntro
             currentMatch.BindTo(LadderInfo.CurrentMatch);
         }
 
-        private void matchChanged(ValueChangedEvent<MatchPairing> pairing)
+        private void matchChanged(ValueChangedEvent<TournamentMatch> match)
         {
-            if (pairing.NewValue == null)
+            if (match.NewValue == null)
             {
                 mainContainer.Clear();
                 return;
@@ -55,7 +55,7 @@ namespace osu.Game.Tournament.Screens.TeamIntro
 
             mainContainer.Children = new Drawable[]
             {
-                new TeamWithPlayers(pairing.NewValue.Team1.Value, true)
+                new TeamWithPlayers(match.NewValue.Team1.Value, true)
                 {
                     RelativeSizeAxes = Axes.Both,
                     Width = 0.5f,
@@ -63,7 +63,7 @@ namespace osu.Game.Tournament.Screens.TeamIntro
                     Anchor = Anchor.Centre,
                     Origin = Anchor.CentreRight
                 },
-                new TeamWithPlayers(pairing.NewValue.Team2.Value)
+                new TeamWithPlayers(match.NewValue.Team2.Value)
                 {
                     RelativeSizeAxes = Axes.Both,
                     Width = 0.5f,
@@ -71,7 +71,7 @@ namespace osu.Game.Tournament.Screens.TeamIntro
                     Anchor = Anchor.Centre,
                     Origin = Anchor.CentreLeft
                 },
-                new RoundDisplay(pairing.NewValue)
+                new RoundDisplay(match.NewValue)
                 {
                     RelativeSizeAxes = Axes.Both,
                     Height = 0.25f,
@@ -83,7 +83,7 @@ namespace osu.Game.Tournament.Screens.TeamIntro
 
         private class RoundDisplay : CompositeDrawable
         {
-            public RoundDisplay(MatchPairing pairing)
+            public RoundDisplay(TournamentMatch match)
             {
                 var col = OsuColour.Gray(0.33f);
 
@@ -112,7 +112,7 @@ namespace osu.Game.Tournament.Screens.TeamIntro
                                 Anchor = Anchor.TopCentre,
                                 Origin = Anchor.TopCentre,
                                 Colour = col,
-                                Text = pairing.Round.Value?.Name.Value ?? "Unknown Round",
+                                Text = match.Round.Value?.Name.Value ?? "Unknown Round",
                                 Spacing = new Vector2(10, 0),
                                 Font = OsuFont.GetFont(size: 50, weight: FontWeight.Light)
                             },
@@ -121,7 +121,7 @@ namespace osu.Game.Tournament.Screens.TeamIntro
                                 Anchor = Anchor.TopCentre,
                                 Origin = Anchor.TopCentre,
                                 Colour = col,
-                                Text = pairing.Date.Value.ToUniversalTime().ToString("dd MMMM HH:mm UTC"),
+                                Text = match.Date.Value.ToUniversalTime().ToString("dd MMMM HH:mm UTC"),
                                 Font = OsuFont.GetFont(size: 20)
                             },
                         }
