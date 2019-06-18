@@ -13,6 +13,8 @@ using osu.Framework.Graphics.Containers;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Mods;
 using osuTK;
+using osuTK.Graphics;
+using osu.Game.Screens.Play;
 
 namespace osu.Game.Rulesets.UI
 {
@@ -134,6 +136,9 @@ namespace osu.Game.Rulesets.UI
         {
             base.Update();
 
+            if (HasFailed.Value)
+                HitObjectContainer.AliveObjects.ForEach(h => h.Fail());
+
             if (beatmap != null)
                 foreach (var mod in mods)
                     if (mod is IUpdatableByPlayfield updatable)
@@ -151,8 +156,8 @@ namespace osu.Game.Rulesets.UI
         public void Fail()
         {
             NestedPlayfields.ForEach(p => p.Fail());
-            HitObjectContainer.AliveObjects.ForEach(h => h.Fail());
 
+            DisplayJudgements.Value = false;
             HasFailed.Value = true;
         }
     }

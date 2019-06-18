@@ -52,7 +52,8 @@ namespace osu.Game.Screens.Play
         /// <exception cref="InvalidOperationException">Thrown if started more than once.</exception>
         public void Start()
         {
-            if (started) throw new InvalidOperationException("Animation cannot be started more than once.");
+            if (started)
+                throw new InvalidOperationException("Animation cannot be started more than once.");
 
             started = true;
 
@@ -65,21 +66,6 @@ namespace osu.Game.Screens.Play
             });
 
             track.AddAdjustment(AdjustableProperty.Frequency, trackFreq);
-
-            drawableRuleset.Playfield.DisplayJudgements.Value = false;
-
-            drawableRuleset.Playfield.Fail();
-            drawableRuleset.Playfield.HitObjectContainer.FlashColour(Color4.Red, 500);
-            drawableRuleset.Playfield.HitObjectContainer.FadeOut(FAIL_DURATION / 2);
-        }
-
-        protected override void Update()
-        {
-            base.Update();
-
-            if (!started)
-                return;
-
             drawableRuleset.Playfield.Fail();
         }
 
