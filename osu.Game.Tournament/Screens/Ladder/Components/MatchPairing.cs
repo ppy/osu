@@ -51,7 +51,7 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
         public readonly ObservableCollection<BeatmapChoice> PicksBans = new ObservableCollection<BeatmapChoice>();
 
         [JsonIgnore]
-        public readonly Bindable<TournamentGrouping> Grouping = new Bindable<TournamentGrouping>();
+        public readonly Bindable<TournamentRound> Round = new Bindable<TournamentRound>();
 
         [JsonIgnore]
         public readonly Bindable<MatchPairing> Progression = new Bindable<MatchPairing>();
@@ -90,7 +90,7 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
         [JsonIgnore]
         public TournamentTeam Loser => !Completed.Value ? null : Team1Score.Value > Team2Score.Value ? Team2.Value : Team1.Value;
 
-        public int PointsToWin => Grouping.Value?.BestOf.Value / 2 + 1 ?? 0;
+        public int PointsToWin => Round.Value?.BestOf.Value / 2 + 1 ?? 0;
 
         /// <summary>
         /// Remove scores from the match, in case of a false click or false start.

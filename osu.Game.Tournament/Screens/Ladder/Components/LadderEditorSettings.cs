@@ -20,7 +20,7 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
 
         protected override string Title => @"ladder";
 
-        private SettingsDropdown<TournamentGrouping> groupingDropdown;
+        private SettingsDropdown<TournamentRound> roundDropdown;
         private PlayerCheckbox losersCheckbox;
         private DateTextBox dateTimeBox;
         private SettingsTeamDropdown team1Dropdown;
@@ -39,14 +39,14 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
             {
                 team1Dropdown = new SettingsTeamDropdown(ladderInfo.Teams) { LabelText = "Team 1" },
                 team2Dropdown = new SettingsTeamDropdown(ladderInfo.Teams) { LabelText = "Team 2" },
-                groupingDropdown = new SettingsGroupingDropdown(ladderInfo.Groupings) { LabelText = "Grouping" },
+                roundDropdown = new SettingsRoundDropdown(ladderInfo.Rounds) { LabelText = "Round" },
                 losersCheckbox = new PlayerCheckbox { LabelText = "Losers Bracket" },
                 dateTimeBox = new DateTextBox { LabelText = "Match Time" },
             };
 
             editorInfo.Selected.ValueChanged += selection =>
             {
-                groupingDropdown.Bindable = selection.NewValue?.Grouping;
+                roundDropdown.Bindable = selection.NewValue?.Round;
                 losersCheckbox.Current = selection.NewValue?.Losers;
                 dateTimeBox.Bindable = selection.NewValue?.Date;
 
@@ -54,11 +54,11 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
                 team2Dropdown.Bindable = selection.NewValue?.Team2;
             };
 
-            groupingDropdown.Bindable.ValueChanged += grouping =>
+            roundDropdown.Bindable.ValueChanged += round =>
             {
-                if (editorInfo.Selected.Value?.Date.Value < grouping.NewValue?.StartDate.Value)
+                if (editorInfo.Selected.Value?.Date.Value < round.NewValue?.StartDate.Value)
                 {
-                    editorInfo.Selected.Value.Date.Value = grouping.NewValue.StartDate.Value;
+                    editorInfo.Selected.Value.Date.Value = round.NewValue.StartDate.Value;
                     editorInfo.Selected.TriggerChange();
                 }
             };
@@ -79,17 +79,17 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
         {
         }
 
-        private class SettingsGroupingDropdown : SettingsDropdown<TournamentGrouping>
+        private class SettingsRoundDropdown : SettingsDropdown<TournamentRound>
         {
-            public SettingsGroupingDropdown(BindableList<TournamentGrouping> groupings)
+            public SettingsRoundDropdown(BindableList<TournamentRound> rounds)
             {
-                Bindable = new Bindable<TournamentGrouping>();
+                Bindable = new Bindable<TournamentRound>();
 
-                foreach (var g in groupings.Prepend(new TournamentGrouping()))
-                    add(g);
+                foreach (var r in rounds.Prepend(new TournamentRound()))
+                    add(r);
 
-                groupings.ItemsRemoved += items => items.ForEach(i => Control.RemoveDropdownItem(i));
-                groupings.ItemsAdded += items => items.ForEach(add);
+                rounds.ItemsRemoved += items => items.ForEach(i => Control.RemoveDropdownItem(i));
+                rounds.ItemsAdded += items => items.ForEach(add);
             }
 
             private readonly List<IUnbindable> refBindables = new List<IUnbindable>();
@@ -102,13 +102,13 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
                 return obj;
             }
 
-            private void add(TournamentGrouping grouping)
+            private void add(TournamentRound round)
             {
-                Control.AddDropdownItem(grouping);
-                boundReference(grouping.Name).BindValueChanged(_ =>
+                Control.AddDropdownItem(round);
+                boundReference(round.Name).BindValueChanged(_ =>
                 {
-                    Control.RemoveDropdownItem(grouping);
-                    Control.AddDropdownItem(grouping);
+                    Control.RemoveDropdownItem(round);
+                    Control.AddDropdownItem(round);
                 });
             }
         }
@@ -117,8 +117,8 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
         {
             public SettingsTeamDropdown(BindableList<TournamentTeam> teams)
             {
-                foreach (var g in teams.Prepend(new TournamentTeam()))
-                    add(g);
+                foreach (var t in teams.Prepend(new TournamentTeam()))
+                    add(t);
 
                 teams.ItemsRemoved += items => items.ForEach(i => Control.RemoveDropdownItem(i));
                 teams.ItemsAdded += items => items.ForEach(add);

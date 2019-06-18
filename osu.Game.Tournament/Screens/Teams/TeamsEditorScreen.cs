@@ -66,8 +66,8 @@ namespace osu.Game.Tournament.Screens.Teams
         [BackgroundDependencyLoader]
         private void load()
         {
-            foreach (var g in LadderInfo.Teams)
-                items.Add(new TeamRow(g));
+            foreach (var t in LadderInfo.Teams)
+                items.Add(new TeamRow(t));
         }
 
         private void addNew()

@@ -179,7 +179,7 @@ namespace osu.Game.Tournament.Screens.MapPool
             if (currentMatch.Value == null)
                 return;
 
-            if (currentMatch.Value.Grouping.Value.Beatmaps.All(b => b.BeatmapInfo.OnlineBeatmapID != beatmapId))
+            if (currentMatch.Value.Round.Value.Beatmaps.All(b => b.BeatmapInfo.OnlineBeatmapID != beatmapId))
                 // don't attempt to add if the beatmap isn't in our pool
                 return;
 
@@ -207,12 +207,12 @@ namespace osu.Game.Tournament.Screens.MapPool
         {
             mapFlows.Clear();
 
-            if (match.NewValue.Grouping.Value != null)
+            if (match.NewValue.Round.Value != null)
             {
                 FillFlowContainer<TournamentBeatmapPanel> currentFlow = null;
                 string currentMod = null;
 
-                foreach (var b in match.NewValue.Grouping.Value.Beatmaps)
+                foreach (var b in match.NewValue.Round.Value.Beatmaps)
                 {
                     if (currentFlow == null || currentMod != b.Mods)
                     {

@@ -79,7 +79,7 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
             boundReference(pairing.Team2).BindValueChanged(_ => updateTeams());
             boundReference(pairing.Team1Score).BindValueChanged(_ => updateWinConditions());
             boundReference(pairing.Team2Score).BindValueChanged(_ => updateWinConditions());
-            boundReference(pairing.Grouping).BindValueChanged(_ =>
+            boundReference(pairing.Round).BindValueChanged(_ =>
             {
                 updateWinConditions();
                 Changed?.Invoke();
@@ -210,12 +210,12 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
 
         private void updateWinConditions()
         {
-            if (Pairing.Grouping.Value == null) return;
+            if (Pairing.Round.Value == null) return;
 
-            var instaWinAmount = Pairing.Grouping.Value.BestOf.Value / 2;
+            var instaWinAmount = Pairing.Round.Value.BestOf.Value / 2;
 
-            Pairing.Completed.Value = Pairing.Grouping.Value.BestOf.Value > 0
-                                      && (Pairing.Team1Score.Value + Pairing.Team2Score.Value >= Pairing.Grouping.Value.BestOf.Value || Pairing.Team1Score.Value > instaWinAmount || Pairing.Team2Score.Value > instaWinAmount);
+            Pairing.Completed.Value = Pairing.Round.Value.BestOf.Value > 0
+                                      && (Pairing.Team1Score.Value + Pairing.Team2Score.Value >= Pairing.Round.Value.BestOf.Value || Pairing.Team1Score.Value > instaWinAmount || Pairing.Team2Score.Value > instaWinAmount);
         }
 
         protected override void LoadComplete()

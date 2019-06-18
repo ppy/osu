@@ -12,7 +12,7 @@ namespace osu.Game.Tournament
     public class LadderInfo
     {
         public BindableList<MatchPairing> Pairings = new BindableList<MatchPairing>();
-        public BindableList<TournamentGrouping> Groupings = new BindableList<TournamentGrouping>();
+        public BindableList<TournamentRound> Rounds = new BindableList<TournamentRound>();
         public BindableList<TournamentTeam> Teams = new BindableList<TournamentTeam>();
 
         // only used for serialisation

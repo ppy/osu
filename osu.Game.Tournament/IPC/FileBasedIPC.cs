@@ -61,7 +61,7 @@ namespace osu.Game.Tournament.IPC
                             {
                                 lastBeatmapId = beatmapId;
 
-                                var existing = ladder.CurrentMatch.Value?.Grouping.Value?.Beatmaps.FirstOrDefault(b => b.ID == beatmapId && b.BeatmapInfo != null);
+                                var existing = ladder.CurrentMatch.Value?.Round.Value?.Beatmaps.FirstOrDefault(b => b.ID == beatmapId && b.BeatmapInfo != null);
 
                                 if (existing != null)
                                     Beatmap.Value = existing.BeatmapInfo;
