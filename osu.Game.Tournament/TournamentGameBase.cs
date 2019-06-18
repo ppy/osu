@@ -1,7 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
@@ -116,7 +115,8 @@ namespace osu.Game.Tournament
                 var src = ladder.Matches.FirstOrDefault(p => p.ID == pair.SourceID);
                 var dest = ladder.Matches.FirstOrDefault(p => p.ID == pair.TargetID);
 
-                if (src == null) throw new InvalidOperationException();
+                if (src == null)
+                    continue;
 
                 if (dest != null)
                 {
