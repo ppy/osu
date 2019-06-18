@@ -188,7 +188,7 @@ namespace osu.Game.Tests.Visual.SongSelect
                 },
                 new ScoreInfo
                 {
-                    Rank = ScoreRank.F,
+                    Rank = ScoreRank.D,
                     Accuracy = 0.6025,
                     MaxCombo = 244,
                     TotalScore = 1707827,
@@ -206,7 +206,7 @@ namespace osu.Game.Tests.Visual.SongSelect
                 },
                 new ScoreInfo
                 {
-                    Rank = ScoreRank.F,
+                    Rank = ScoreRank.D,
                     Accuracy = 0.5140,
                     MaxCombo = 244,
                     TotalScore = 1707827,
@@ -224,7 +224,7 @@ namespace osu.Game.Tests.Visual.SongSelect
                 },
                 new ScoreInfo
                 {
-                    Rank = ScoreRank.F,
+                    Rank = ScoreRank.D,
                     Accuracy = 0.4222,
                     MaxCombo = 244,
                     TotalScore = 1707827,
@@ -270,9 +270,8 @@ namespace osu.Game.Tests.Visual.SongSelect
                 },
                 Metrics = new BeatmapMetrics
                 {
-                    Ratings = Enumerable.Range(0, 11),
-                    Fails = Enumerable.Range(1, 100).Select(i => i % 12 - 6),
-                    Retries = Enumerable.Range(-2, 100).Select(i => i % 12 - 6),
+                    Fails = Enumerable.Range(1, 100).Select(i => i % 12 - 6).ToArray(),
+                    Retries = Enumerable.Range(-2, 100).Select(i => i % 12 - 6).ToArray(),
                 },
             };
         }

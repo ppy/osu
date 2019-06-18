@@ -413,12 +413,12 @@ namespace osu.Game.Overlays.Mods
         {
             if (selectedMod != null)
             {
-                if (State == Visibility.Visible) sampleOn?.Play();
+                if (State.Value == Visibility.Visible) sampleOn?.Play();
                 DeselectTypes(selectedMod.IncompatibleMods, true);
             }
             else
             {
-                if (State == Visibility.Visible) sampleOff?.Play();
+                if (State.Value == Visibility.Visible) sampleOff?.Play();
             }
 
             refreshSelectedMods();

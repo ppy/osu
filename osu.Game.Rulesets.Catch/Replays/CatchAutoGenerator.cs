@@ -43,10 +43,13 @@ namespace osu.Game.Rulesets.Catch.Replays
                 float positionChange = Math.Abs(lastPosition - h.X);
                 double timeAvailable = h.StartTime - lastTime;
 
-                //So we can either make it there without a dash or not.
-                double speedRequired = positionChange / timeAvailable;
+                // So we can either make it there without a dash or not.
+                // If positionChange is 0, we don't need to move, so speedRequired should also be 0 (could be NaN if timeAvailable is 0 too)
+                // The case where positionChange > 0 and timeAvailable == 0 results in PositiveInfinity which provides expected beheaviour.
+                double speedRequired = positionChange == 0 ? 0 : positionChange / timeAvailable;
 
-                bool dashRequired = speedRequired > movement_speed && h.StartTime != 0;
+                bool dashRequired = speedRequired > movement_speed;
+                bool impossibleJump = speedRequired > movement_speed * 2;
 
                 // todo: get correct catcher size, based on difficulty CS.
                 const float catcher_width_half = CatcherArea.CATCHER_SIZE / CatchPlayfield.BASE_WIDTH * 0.3f * 0.5f;
@@ -59,9 +62,8 @@ namespace osu.Game.Rulesets.Catch.Replays
                     return;
                 }
 
-                if (h is Banana)
+                if (impossibleJump)
                 {
-                    // auto bananas unrealistically warp to catch 100% combo.
                     Replay.Frames.Add(new CatchReplayFrame(h.StartTime, h.X));
                 }
                 else if (h.HyperDash)
