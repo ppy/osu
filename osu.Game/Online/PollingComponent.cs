@@ -4,6 +4,7 @@
 using System;
 using System.Threading.Tasks;
 using osu.Framework.Graphics;
+using osu.Framework.IO.Network;
 using osu.Framework.Threading;
 
 namespace osu.Game.Online
@@ -83,7 +84,11 @@ namespace osu.Game.Online
         {
             scheduledPoll = null;
             pollingActive = true;
-            Poll().ContinueWith(_ => pollComplete());
+
+            if (NetworkHelper.NetworkAvailable)
+                Poll().ContinueWith(_ => pollComplete());
+            else
+                pollComplete();
         }
 
         /// <summary>
