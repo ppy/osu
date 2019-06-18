@@ -9,7 +9,7 @@ namespace osu.Game.Tournament.Models
 {
     public class LadderInfo
     {
-        public BindableList<MatchPairing> Pairings = new BindableList<MatchPairing>();
+        public BindableList<TournamentMatch> Matches = new BindableList<TournamentMatch>();
         public BindableList<TournamentRound> Rounds = new BindableList<TournamentRound>();
         public BindableList<TournamentTeam> Teams = new BindableList<TournamentTeam>();
 
@@ -17,6 +17,6 @@ namespace osu.Game.Tournament.Models
         public List<TournamentProgression> Progressions = new List<TournamentProgression>();
 
         [JsonIgnore]
-        public Bindable<MatchPairing> CurrentMatch = new Bindable<MatchPairing>();
+        public Bindable<TournamentMatch> CurrentMatch = new Bindable<TournamentMatch>();
     }
 }

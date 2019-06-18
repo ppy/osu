@@ -10,10 +10,10 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
 {
     public class ProgressionPath : Path
     {
-        public DrawableMatchPairing Source { get; private set; }
-        public DrawableMatchPairing Destination { get; private set; }
+        public DrawableTournamentMatch Source { get; private set; }
+        public DrawableTournamentMatch Destination { get; private set; }
 
-        public ProgressionPath(DrawableMatchPairing source, DrawableMatchPairing destination)
+        public ProgressionPath(DrawableTournamentMatch source, DrawableTournamentMatch destination)
         {
             Source = source;
             Destination = destination;

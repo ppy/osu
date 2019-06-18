@@ -23,7 +23,7 @@ namespace osu.Game.Tournament.Screens.Gameplay
     {
         private readonly BindableBool warmup = new BindableBool();
 
-        private readonly Bindable<MatchPairing> currentMatch = new Bindable<MatchPairing>();
+        private readonly Bindable<TournamentMatch> currentMatch = new Bindable<TournamentMatch>();
 
         public readonly Bindable<TourneyState> State = new Bindable<TourneyState>();
         private TriangleButton warmupButton;

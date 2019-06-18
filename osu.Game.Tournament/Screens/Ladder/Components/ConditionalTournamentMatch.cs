@@ -6,9 +6,9 @@ using osu.Game.Tournament.Models;
 namespace osu.Game.Tournament.Screens.Ladder.Components
 {
     /// <summary>
-    /// A pairing that may not necessarily occur.
+    /// A match that may not necessarily occur.
     /// </summary>
-    public class ConditionalMatchPairing : MatchPairing
+    public class ConditionalTournamentMatch : TournamentMatch
     {
     }
 }

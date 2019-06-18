@@ -15,7 +15,7 @@ namespace osu.Game.Tournament.Models
     /// A collection of two teams competing in a head-to-head match.
     /// </summary>
     [Serializable]
-    public class MatchPairing
+    public class TournamentMatch
     {
         public int ID;
 
@@ -54,10 +54,10 @@ namespace osu.Game.Tournament.Models
         public readonly Bindable<TournamentRound> Round = new Bindable<TournamentRound>();
 
         [JsonIgnore]
-        public readonly Bindable<MatchPairing> Progression = new Bindable<MatchPairing>();
+        public readonly Bindable<TournamentMatch> Progression = new Bindable<TournamentMatch>();
 
         [JsonIgnore]
-        public readonly Bindable<MatchPairing> LosersProgression = new Bindable<MatchPairing>();
+        public readonly Bindable<TournamentMatch> LosersProgression = new Bindable<TournamentMatch>();
 
         /// <summary>
         /// Should not be set directly. Use LadderInfo.CurrentMatch.Value = this instead.
@@ -67,17 +67,17 @@ namespace osu.Game.Tournament.Models
         public readonly Bindable<DateTimeOffset> Date = new Bindable<DateTimeOffset>();
 
         [JsonProperty]
-        public readonly BindableList<ConditionalMatchPairing> ConditionalPairings = new BindableList<ConditionalMatchPairing>();
+        public readonly BindableList<ConditionalTournamentMatch> ConditionalMatches = new BindableList<ConditionalTournamentMatch>();
 
         public readonly Bindable<Point> Position = new Bindable<Point>();
 
-        public MatchPairing()
+        public TournamentMatch()
         {
             Team1.BindValueChanged(t => Team1Acronym = t.NewValue?.Acronym.Value, true);
             Team2.BindValueChanged(t => Team2Acronym = t.NewValue?.Acronym.Value, true);
         }
 
-        public MatchPairing(TournamentTeam team1 = null, TournamentTeam team2 = null)
+        public TournamentMatch(TournamentTeam team1 = null, TournamentTeam team2 = null)
             : this()
         {
             Team1.Value = team1;

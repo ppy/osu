@@ -61,7 +61,7 @@ namespace osu.Game.Tournament
 
             readBracket();
 
-            ladder.CurrentMatch.Value = ladder.Pairings.FirstOrDefault(p => p.Current.Value);
+            ladder.CurrentMatch.Value = ladder.Matches.FirstOrDefault(p => p.Current.Value);
 
             dependencies.CacheAs<MatchIPCInfo>(ipc = new FileBasedIPC());
             Add(ipc);
@@ -97,24 +97,24 @@ namespace osu.Game.Tournament
             bool addedInfo = false;
 
             // assign teams
-            foreach (var pairing in ladder.Pairings)
+            foreach (var match in ladder.Matches)
             {
-                pairing.Team1.Value = ladder.Teams.FirstOrDefault(t => t.Acronym.Value == pairing.Team1Acronym);
-                pairing.Team2.Value = ladder.Teams.FirstOrDefault(t => t.Acronym.Value == pairing.Team2Acronym);
+                match.Team1.Value = ladder.Teams.FirstOrDefault(t => t.Acronym.Value == match.Team1Acronym);
+                match.Team2.Value = ladder.Teams.FirstOrDefault(t => t.Acronym.Value == match.Team2Acronym);
 
-                foreach (var conditional in pairing.ConditionalPairings)
+                foreach (var conditional in match.ConditionalMatches)
                 {
                     conditional.Team1.Value = ladder.Teams.FirstOrDefault(t => t.Acronym.Value == conditional.Team1Acronym);
                     conditional.Team2.Value = ladder.Teams.FirstOrDefault(t => t.Acronym.Value == conditional.Team2Acronym);
-                    conditional.Round.Value = pairing.Round.Value;
+                    conditional.Round.Value = match.Round.Value;
                 }
             }
 
             // assign progressions
             foreach (var pair in ladder.Progressions)
             {
-                var src = ladder.Pairings.FirstOrDefault(p => p.ID == pair.SourceID);
-                var dest = ladder.Pairings.FirstOrDefault(p => p.ID == pair.TargetID);
+                var src = ladder.Matches.FirstOrDefault(p => p.ID == pair.SourceID);
+                var dest = ladder.Matches.FirstOrDefault(p => p.ID == pair.TargetID);
 
                 if (src == null) throw new InvalidOperationException();
 
@@ -127,11 +127,11 @@ namespace osu.Game.Tournament
                 }
             }
 
-            // link pairings to rounds
+            // link matches to rounds
             foreach (var round in ladder.Rounds)
-            foreach (var id in round.Pairings)
+            foreach (var id in round.Matches)
             {
-                var found = ladder.Pairings.FirstOrDefault(p => p.ID == id);
+                var found = ladder.Matches.FirstOrDefault(p => p.ID == id);
 
                 if (found != null)
                 {
@@ -245,10 +245,10 @@ namespace osu.Game.Tournament
         protected virtual void SaveChanges()
         {
             foreach (var r in ladder.Rounds)
-                r.Pairings = ladder.Pairings.Where(p => p.Round.Value == r).Select(p => p.ID).ToList();
+                r.Matches = ladder.Matches.Where(p => p.Round.Value == r).Select(p => p.ID).ToList();
 
-            ladder.Progressions = ladder.Pairings.Where(p => p.Progression.Value != null).Select(p => new TournamentProgression(p.ID, p.Progression.Value.ID)).Concat(
-                                            ladder.Pairings.Where(p => p.LosersProgression.Value != null).Select(p => new TournamentProgression(p.ID, p.LosersProgression.Value.ID, true)))
+            ladder.Progressions = ladder.Matches.Where(p => p.Progression.Value != null).Select(p => new TournamentProgression(p.ID, p.Progression.Value.ID)).Concat(
+                                            ladder.Matches.Where(p => p.LosersProgression.Value != null).Select(p => new TournamentProgression(p.ID, p.LosersProgression.Value.ID, true)))
                                         .ToList();
 
             using (var stream = storage.GetStream(bracket_filename, FileAccess.Write, FileMode.Create))

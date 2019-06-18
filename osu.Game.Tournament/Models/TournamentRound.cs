@@ -22,7 +22,7 @@ namespace osu.Game.Tournament.Models
         public readonly Bindable<DateTimeOffset> StartDate = new Bindable<DateTimeOffset>();
 
         // only used for serialisation
-        public List<int> Pairings = new List<int>();
+        public List<int> Matches = new List<int>();
 
         public override string ToString() => Name.Value ?? "None";
     }

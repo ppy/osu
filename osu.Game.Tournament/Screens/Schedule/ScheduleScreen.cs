@@ -21,7 +21,7 @@ namespace osu.Game.Tournament.Screens.Schedule
 {
     public class ScheduleScreen : TournamentScreen, IProvideVideo
     {
-        private readonly Bindable<MatchPairing> currentMatch = new Bindable<MatchPairing>();
+        private readonly Bindable<TournamentMatch> currentMatch = new Bindable<TournamentMatch>();
         private Container mainContainer;
         private LadderInfo ladder;
 
@@ -49,7 +49,7 @@ namespace osu.Game.Tournament.Screens.Schedule
             currentMatch.BindTo(ladder.CurrentMatch);
         }
 
-        private void matchChanged(ValueChangedEvent<MatchPairing> match)
+        private void matchChanged(ValueChangedEvent<TournamentMatch> match)
         {
             if (match.NewValue == null)
             {
@@ -57,10 +57,10 @@ namespace osu.Game.Tournament.Screens.Schedule
                 return;
             }
 
-            var upcoming = ladder.Pairings.Where(p => !p.Completed.Value && p.Team1.Value != null && p.Team2.Value != null && Math.Abs(p.Date.Value.DayOfYear - DateTimeOffset.UtcNow.DayOfYear) < 4);
+            var upcoming = ladder.Matches.Where(p => !p.Completed.Value && p.Team1.Value != null && p.Team2.Value != null && Math.Abs(p.Date.Value.DayOfYear - DateTimeOffset.UtcNow.DayOfYear) < 4);
             var conditionals = ladder
-                               .Pairings.Where(p => !p.Completed.Value && (p.Team1.Value == null || p.Team2.Value == null) && Math.Abs(p.Date.Value.DayOfYear - DateTimeOffset.UtcNow.DayOfYear) < 4)
-                               .SelectMany(m => m.ConditionalPairings.Where(cp => m.Acronyms.TrueForAll(a => cp.Acronyms.Contains(a))));
+                               .Matches.Where(p => !p.Completed.Value && (p.Team1.Value == null || p.Team2.Value == null) && Math.Abs(p.Date.Value.DayOfYear - DateTimeOffset.UtcNow.DayOfYear) < 4)
+                               .SelectMany(m => m.ConditionalMatches.Where(cp => m.Acronyms.TrueForAll(a => cp.Acronyms.Contains(a))));
 
             upcoming = upcoming.Concat(conditionals);
             upcoming = upcoming.OrderBy(p => p.Date.Value).Take(12);
@@ -85,18 +85,18 @@ namespace osu.Game.Tournament.Screens.Schedule
                                 {
                                     RelativeSizeAxes = Axes.Both,
                                     Width = 0.4f,
-                                    ChildrenEnumerable = ladder.Pairings
+                                    ChildrenEnumerable = ladder.Matches
                                                                .Where(p => p.Completed.Value && p.Team1.Value != null && p.Team2.Value != null
                                                                            && Math.Abs(p.Date.Value.DayOfYear - DateTimeOffset.UtcNow.DayOfYear) < 4)
                                                                .OrderByDescending(p => p.Date.Value)
                                                                .Take(8)
-                                                               .Select(p => new SchedulePairing(p))
+                                                               .Select(p => new ScheduleMatch(p))
                                 },
                                 new ScheduleContainer("match overview")
                                 {
                                     RelativeSizeAxes = Axes.Both,
                                     Width = 0.6f,
-                                    ChildrenEnumerable = upcoming.Select(p => new SchedulePairing(p))
+                                    ChildrenEnumerable = upcoming.Select(p => new ScheduleMatch(p))
                                 },
                             }
                         }
@@ -115,7 +115,7 @@ namespace osu.Game.Tournament.Screens.Schedule
                                 Colour = Color4.Black,
                                 Font = OsuFont.GetFont(size: 20)
                             },
-                            new SchedulePairing(match.NewValue, false),
+                            new ScheduleMatch(match.NewValue, false),
                             new OsuSpriteText
                             {
                                 Text = "Start Time " + match.NewValue.Date.Value.ToUniversalTime().ToString("HH:mm UTC"),
@@ -128,21 +128,21 @@ namespace osu.Game.Tournament.Screens.Schedule
             };
         }
 
-        public class SchedulePairing : DrawableMatchPairing
+        public class ScheduleMatch : DrawableTournamentMatch
         {
-            public SchedulePairing(MatchPairing pairing, bool showTimestamp = true)
-                : base(pairing)
+            public ScheduleMatch(TournamentMatch match, bool showTimestamp = true)
+                : base(match)
             {
                 Flow.Direction = FillDirection.Horizontal;
 
-                bool conditional = pairing is ConditionalMatchPairing;
+                bool conditional = match is ConditionalTournamentMatch;
 
                 if (conditional)
                     Colour = OsuColour.Gray(0.5f);
 
                 if (showTimestamp)
                 {
-                    AddInternal(new DrawableDate(Pairing.Date.Value)
+                    AddInternal(new DrawableDate(Match.Date.Value)
                     {
                         Anchor = Anchor.TopRight,
                         Origin = Anchor.TopLeft,
@@ -157,7 +157,7 @@ namespace osu.Game.Tournament.Screens.Schedule
                         Colour = Color4.Black,
                         Alpha = conditional ? 0.6f : 1,
                         Margin = new MarginPadding { Horizontal = 10, Vertical = 5 },
-                        Text = pairing.Date.Value.ToUniversalTime().ToString("HH:mm UTC") + (conditional ? " (conditional)" : "")
+                        Text = match.Date.Value.ToUniversalTime().ToString("HH:mm UTC") + (conditional ? " (conditional)" : "")
                     });
                 }
             }

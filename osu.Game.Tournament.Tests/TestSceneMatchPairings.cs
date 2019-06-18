@@ -12,22 +12,22 @@ using osu.Game.Tournament.Screens.Ladder.Components;
 
 namespace osu.Game.Tournament.Tests
 {
-    public class TestSceneMatchPairings : OsuTestScene
+    public class TestSceneMatches : OsuTestScene
     {
         public override IReadOnlyList<Type> RequiredTypes => new[]
         {
-            typeof(MatchPairing),
-            typeof(DrawableMatchPairing),
+            typeof(TournamentMatch),
+            typeof(DrawableTournamentMatch),
             typeof(DrawableMatchTeam),
             typeof(DrawableTournamentTeam),
         };
 
-        public TestSceneMatchPairings()
+        public TestSceneMatches()
         {
-            Container<DrawableMatchPairing> level1;
-            Container<DrawableMatchPairing> level2;
+            Container<DrawableTournamentMatch> level1;
+            Container<DrawableTournamentMatch> level2;
 
-            var pairing1 = new MatchPairing(
+            var match1 = new TournamentMatch(
                 new TournamentTeam { FlagName = { Value = "AU" }, FullName = { Value = "Australia" }, },
                 new TournamentTeam { FlagName = { Value = "JP" }, FullName = { Value = "Japan" }, Acronym = { Value = "JPN" } })
             {
@@ -35,7 +35,7 @@ namespace osu.Game.Tournament.Tests
                 Team2Score = { Value = 1 },
             };
 
-            var pairing2 = new MatchPairing(
+            var match2 = new TournamentMatch(
                 new TournamentTeam
                 {
                     FlagName = { Value = "RO" },
@@ -49,47 +49,47 @@ namespace osu.Game.Tournament.Tests
                 Direction = FillDirection.Horizontal,
                 Children = new Drawable[]
                 {
-                    level1 = new FillFlowContainer<DrawableMatchPairing>
+                    level1 = new FillFlowContainer<DrawableTournamentMatch>
                     {
                         AutoSizeAxes = Axes.X,
                         Direction = FillDirection.Vertical,
                         Children = new[]
                         {
-                            new DrawableMatchPairing(pairing1),
-                            new DrawableMatchPairing(pairing2),
-                            new DrawableMatchPairing(new MatchPairing()),
+                            new DrawableTournamentMatch(match1),
+                            new DrawableTournamentMatch(match2),
+                            new DrawableTournamentMatch(new TournamentMatch()),
                         }
                     },
-                    level2 = new FillFlowContainer<DrawableMatchPairing>
+                    level2 = new FillFlowContainer<DrawableTournamentMatch>
                     {
                         AutoSizeAxes = Axes.X,
                         Direction = FillDirection.Vertical,
                         Margin = new MarginPadding(20),
                         Children = new[]
                         {
-                            new DrawableMatchPairing(new MatchPairing()),
-                            new DrawableMatchPairing(new MatchPairing())
+                            new DrawableTournamentMatch(new TournamentMatch()),
+                            new DrawableTournamentMatch(new TournamentMatch())
                         }
                     }
                 }
             };
 
-            level1.Children[0].Pairing.Progression.Value = level2.Children[0].Pairing;
-            level1.Children[1].Pairing.Progression.Value = level2.Children[0].Pairing;
+            level1.Children[0].Match.Progression.Value = level2.Children[0].Match;
+            level1.Children[1].Match.Progression.Value = level2.Children[0].Match;
 
-            AddRepeatStep("change scores", () => pairing1.Team2Score.Value++, 4);
-            AddStep("add new team", () => pairing2.Team2.Value = new TournamentTeam { FlagName = { Value = "PT" }, FullName = { Value = "Portugal" } });
-            AddStep("Add progression", () => level1.Children[2].Pairing.Progression.Value = level2.Children[1].Pairing);
+            AddRepeatStep("change scores", () => match1.Team2Score.Value++, 4);
+            AddStep("add new team", () => match2.Team2.Value = new TournamentTeam { FlagName = { Value = "PT" }, FullName = { Value = "Portugal" } });
+            AddStep("Add progression", () => level1.Children[2].Match.Progression.Value = level2.Children[1].Match);
 
-            AddStep("start match", () => pairing2.StartMatch());
+            AddStep("start match", () => match2.StartMatch());
 
-            AddRepeatStep("change scores", () => pairing2.Team1Score.Value++, 10);
+            AddRepeatStep("change scores", () => match2.Team1Score.Value++, 10);
 
-            AddStep("start submatch", () => level2.Children[0].Pairing.StartMatch());
+            AddStep("start submatch", () => level2.Children[0].Match.StartMatch());
 
-            AddRepeatStep("change scores", () => level2.Children[0].Pairing.Team1Score.Value++, 5);
+            AddRepeatStep("change scores", () => level2.Children[0].Match.Team1Score.Value++, 5);
 
-            AddRepeatStep("change scores", () => level2.Children[0].Pairing.Team2Score.Value++, 4);
+            AddRepeatStep("change scores", () => level2.Children[0].Match.Team2Score.Value++, 4);
         }
     }
 }

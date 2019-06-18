@@ -32,7 +32,7 @@ namespace osu.Game.Tournament.Components
 
         public const float HEIGHT = 50;
 
-        private readonly Bindable<MatchPairing> currentMatch = new Bindable<MatchPairing>();
+        private readonly Bindable<TournamentMatch> currentMatch = new Bindable<TournamentMatch>();
         private Box flash;
 
         public TournamentBeatmapPanel(BeatmapInfo beatmap, string mods = null)
@@ -141,11 +141,11 @@ namespace osu.Game.Tournament.Components
                 });
         }
 
-        private void matchChanged(ValueChangedEvent<MatchPairing> pairing)
+        private void matchChanged(ValueChangedEvent<TournamentMatch> match)
         {
-            if (pairing.OldValue != null)
-                pairing.OldValue.PicksBans.CollectionChanged -= picksBansOnCollectionChanged;
-            pairing.NewValue.PicksBans.CollectionChanged += picksBansOnCollectionChanged;
+            if (match.OldValue != null)
+                match.OldValue.PicksBans.CollectionChanged -= picksBansOnCollectionChanged;
+            match.NewValue.PicksBans.CollectionChanged += picksBansOnCollectionChanged;
             updateState();
         }
 

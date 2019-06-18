@@ -39,9 +39,9 @@ namespace osu.Game.Tournament.Screens.Editors
             });
         }
 
-        public void BeginJoin(MatchPairing pairing, bool losers)
+        public void BeginJoin(TournamentMatch match, bool losers)
         {
-            ScrollContent.Add(new JoinVisualiser(PairingsContainer, pairing, losers, UpdateLayout));
+            ScrollContent.Add(new JoinVisualiser(MatchesContainer, match, losers, UpdateLayout));
         }
 
         public MenuItem[] ContextMenuItems
@@ -55,35 +55,35 @@ namespace osu.Game.Tournament.Screens.Editors
                 {
                     new OsuMenuItem("Create new match", MenuItemType.Highlighted, () =>
                     {
-                        var pos = PairingsContainer.ToLocalSpace(GetContainingInputManager().CurrentState.Mouse.Position);
-                        LadderInfo.Pairings.Add(new MatchPairing { Position = { Value = new Point((int)pos.X, (int)pos.Y) } });
+                        var pos = MatchesContainer.ToLocalSpace(GetContainingInputManager().CurrentState.Mouse.Position);
+                        LadderInfo.Matches.Add(new TournamentMatch { Position = { Value = new Point((int)pos.X, (int)pos.Y) } });
                     }),
                     new OsuMenuItem("Reset teams", MenuItemType.Destructive, () =>
                     {
-                        foreach (var p in PairingsContainer)
-                            p.Pairing.Reset();
+                        foreach (var p in MatchesContainer)
+                            p.Match.Reset();
                     })
                 };
             }
         }
 
-        public void Remove(MatchPairing pairing)
+        public void Remove(TournamentMatch match)
         {
-            PairingsContainer.FirstOrDefault(p => p.Pairing == pairing)?.Remove();
+            MatchesContainer.FirstOrDefault(p => p.Match == match)?.Remove();
         }
 
         private class JoinVisualiser : CompositeDrawable
         {
-            private readonly Container<DrawableMatchPairing> pairingsContainer;
-            public readonly MatchPairing Source;
+            private readonly Container<DrawableTournamentMatch> matchesContainer;
+            public readonly TournamentMatch Source;
             private readonly bool losers;
             private readonly Action complete;
 
             private ProgressionPath path;
 
-            public JoinVisualiser(Container<DrawableMatchPairing> pairingsContainer, MatchPairing source, bool losers, Action complete)
+            public JoinVisualiser(Container<DrawableTournamentMatch> matchesContainer, TournamentMatch source, bool losers, Action complete)
             {
-                this.pairingsContainer = pairingsContainer;
+                this.matchesContainer = matchesContainer;
                 RelativeSizeAxes = Axes.Both;
 
                 Source = source;
@@ -95,9 +95,9 @@ namespace osu.Game.Tournament.Screens.Editors
                     Source.Progression.Value = null;
             }
 
-            private DrawableMatchPairing findTarget(InputState state)
+            private DrawableTournamentMatch findTarget(InputState state)
             {
-                return pairingsContainer.FirstOrDefault(d => d.ReceivePositionalInputAt(state.Mouse.Position));
+                return matchesContainer.FirstOrDefault(d => d.ReceivePositionalInputAt(state.Mouse.Position));
             }
 
             public override bool ReceivePositionalInputAt(Vector2 screenSpacePos)
@@ -118,7 +118,7 @@ namespace osu.Game.Tournament.Screens.Editors
                 if (found == null)
                     return false;
 
-                AddInternal(path = new ProgressionPath(pairingsContainer.First(c => c.Pairing == Source), found)
+                AddInternal(path = new ProgressionPath(matchesContainer.First(c => c.Match == Source), found)
                 {
                     Colour = Color4.Yellow,
                 });
@@ -132,12 +132,12 @@ namespace osu.Game.Tournament.Screens.Editors
 
                 if (found != null)
                 {
-                    if (found.Pairing != Source)
+                    if (found.Match != Source)
                     {
                         if (losers)
-                            Source.LosersProgression.Value = found.Pairing;
+                            Source.LosersProgression.Value = found.Match;
                         else
-                            Source.Progression.Value = found.Pairing;
+                            Source.Progression.Value = found.Match;
                     }
 
                     complete?.Invoke();
