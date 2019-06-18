@@ -8,6 +8,7 @@ using osu.Framework.Graphics;
 using osu.Game.Online.Chat;
 using osu.Game.Overlays.Chat;
 using osu.Game.Tournament.IPC;
+using osu.Game.Tournament.Models;
 using osuTK;
 using osuTK.Graphics;
 

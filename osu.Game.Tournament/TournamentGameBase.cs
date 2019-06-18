@@ -19,9 +19,8 @@ using osu.Game.Beatmaps;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API.Requests;
 using osu.Game.Rulesets;
-using osu.Game.Tournament.Components;
 using osu.Game.Tournament.IPC;
-using osu.Game.Tournament.Screens.Ladder.Components;
+using osu.Game.Tournament.Models;
 using osuTK.Input;
 
 namespace osu.Game.Tournament

@@ -11,10 +11,10 @@ using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays.Settings;
 using osu.Game.Tournament.Components;
-using osu.Game.Tournament.Screens.Ladder.Components;
+using osu.Game.Tournament.Models;
 using osuTK;
 
-namespace osu.Game.Tournament.Screens.Rounds
+namespace osu.Game.Tournament.Screens.Editors
 {
     public class RoundEditorScreen : TournamentScreen, IProvideVideo
     {

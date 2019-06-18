@@ -6,7 +6,7 @@ using System.Collections.Generic;
 using Newtonsoft.Json;
 using osu.Framework.Bindables;
 
-namespace osu.Game.Tournament.Screens.Ladder.Components
+namespace osu.Game.Tournament.Models
 {
     [Serializable]
     public class TournamentRound

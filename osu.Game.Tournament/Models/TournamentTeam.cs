@@ -6,7 +6,7 @@ using Newtonsoft.Json;
 using osu.Framework.Bindables;
 using osu.Game.Users;
 
-namespace osu.Game.Tournament.Components
+namespace osu.Game.Tournament.Models
 {
     [Serializable]
     public class TournamentTeam

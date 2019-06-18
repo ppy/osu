@@ -11,6 +11,8 @@ using osu.Framework.Graphics.Lines;
 using osu.Framework.Platform;
 using osu.Game.Graphics;
 using osu.Game.Tournament.Components;
+using osu.Game.Tournament.Models;
+using osu.Game.Tournament.Screens.Editors;
 using osu.Game.Tournament.Screens.Ladder.Components;
 using osuTK.Graphics;
 

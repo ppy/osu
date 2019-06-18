@@ -4,10 +4,8 @@
 using System.Collections.Generic;
 using Newtonsoft.Json;
 using osu.Framework.Bindables;
-using osu.Game.Tournament.Components;
-using osu.Game.Tournament.Screens.Ladder.Components;
 
-namespace osu.Game.Tournament
+namespace osu.Game.Tournament.Models
 {
     public class LadderInfo
     {

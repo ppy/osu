@@ -3,6 +3,9 @@
 
 namespace osu.Game.Tournament.Screens
 {
+    /// <summary>
+    /// Marker interface for a screen which provides its own local video background.
+    /// </summary>
     public interface IProvideVideo
     {
     }

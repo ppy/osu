@@ -7,6 +7,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Tournament.Models;
 using osuTK.Graphics;
 
 namespace osu.Game.Tournament.Screens.Ladder.Components

@@ -3,7 +3,7 @@
 
 using osu.Game.Beatmaps;
 
-namespace osu.Game.Tournament.Screens.Ladder.Components
+namespace osu.Game.Tournament.Models
 {
     public class RoundBeatmap
     {

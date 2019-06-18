@@ -6,10 +6,10 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using Newtonsoft.Json;
 using osu.Framework.Bindables;
-using osu.Game.Tournament.Components;
+using osu.Game.Tournament.Screens.Ladder.Components;
 using SixLabors.Primitives;
 
-namespace osu.Game.Tournament.Screens.Ladder.Components
+namespace osu.Game.Tournament.Models
 {
     /// <summary>
     /// A collection of two teams competing in a head-to-head match.

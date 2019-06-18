@@ -14,10 +14,11 @@ using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Game.Overlays.Settings;
 using osu.Game.Tournament.Components;
+using osu.Game.Tournament.Models;
 using osu.Game.Users;
 using osuTK;
 
-namespace osu.Game.Tournament.Screens.Teams
+namespace osu.Game.Tournament.Screens.Editors
 {
     public class TeamsEditorScreen : TournamentScreen, IProvideVideo
     {

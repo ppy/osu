@@ -14,6 +14,8 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Tournament.Components;
+using osu.Game.Tournament.Models;
+using osu.Game.Tournament.Screens.Editors;
 using osuTK;
 using osuTK.Graphics;
 using osuTK.Input;

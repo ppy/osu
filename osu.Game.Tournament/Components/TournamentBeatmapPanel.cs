@@ -16,7 +16,7 @@ using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Drawables;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
-using osu.Game.Tournament.Screens.Ladder.Components;
+using osu.Game.Tournament.Models;
 using osuTK;
 using osuTK.Graphics;
 

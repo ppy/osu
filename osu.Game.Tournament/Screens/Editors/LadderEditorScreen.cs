@@ -11,12 +11,14 @@ using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Events;
 using osu.Framework.Input.States;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Tournament.Models;
+using osu.Game.Tournament.Screens.Ladder;
 using osu.Game.Tournament.Screens.Ladder.Components;
 using osuTK;
 using osuTK.Graphics;
 using SixLabors.Primitives;
 
-namespace osu.Game.Tournament.Screens.Ladder
+namespace osu.Game.Tournament.Screens.Editors
 {
     [Cached]
     public class LadderEditorScreen : LadderScreen, IHasContextMenu
