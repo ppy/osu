@@ -65,50 +65,6 @@ namespace osu.Game.Database
         // ReSharper disable once NotAccessedField.Local (we should keep a reference to this so it is not finalised)
         private ArchiveImportIPCChannel ipc;
 
-        private readonly List<Action> queuedEvents = new List<Action>();
-
-        /// <summary>
-        /// Allows delaying of outwards events until an operation is confirmed (at a database level).
-        /// </summary>
-        private bool delayingEvents;
-
-        /// <summary>
-        /// Begin delaying outwards events.
-        /// </summary>
-        private void delayEvents() => delayingEvents = true;
-
-        /// <summary>
-        /// Flush delayed events and disable delaying.
-        /// </summary>
-        /// <param name="perform">Whether the flushed events should be performed.</param>
-        private void flushEvents(bool perform)
-        {
-            Action[] events;
-
-            lock (queuedEvents)
-            {
-                events = queuedEvents.ToArray();
-                queuedEvents.Clear();
-            }
-
-            if (perform)
-            {
-                foreach (var a in events)
-                    a.Invoke();
-            }
-
-            delayingEvents = false;
-        }
-
-        private void handleEvent(Action a)
-        {
-            if (delayingEvents)
-                lock (queuedEvents)
-                    queuedEvents.Add(a);
-            else
-                a.Invoke();
-        }
-
         protected ArchiveModelManager(Storage storage, IDatabaseContextFactory contextFactory, MutableDatabaseBackedStoreWithFileIncludes<TModel, TFileModel> modelStore, IIpcHost importHost = null)
         {
             ContextFactory = contextFactory;
@@ -630,6 +586,54 @@ namespace osu.Game.Database
 
             throw new InvalidFormatException($"{path} is not a valid archive");
         }
+
+        #region Event handling / delaying
+
+        private readonly List<Action> queuedEvents = new List<Action>();
+
+        /// <summary>
+        /// Allows delaying of outwards events until an operation is confirmed (at a database level).
+        /// </summary>
+        private bool delayingEvents;
+
+        /// <summary>
+        /// Begin delaying outwards events.
+        /// </summary>
+        private void delayEvents() => delayingEvents = true;
+
+        /// <summary>
+        /// Flush delayed events and disable delaying.
+        /// </summary>
+        /// <param name="perform">Whether the flushed events should be performed.</param>
+        private void flushEvents(bool perform)
+        {
+            Action[] events;
+
+            lock (queuedEvents)
+            {
+                events = queuedEvents.ToArray();
+                queuedEvents.Clear();
+            }
+
+            if (perform)
+            {
+                foreach (var a in events)
+                    a.Invoke();
+            }
+
+            delayingEvents = false;
+        }
+
+        private void handleEvent(Action a)
+        {
+            if (delayingEvents)
+                lock (queuedEvents)
+                    queuedEvents.Add(a);
+            else
+                a.Invoke();
+        }
+
+        #endregion
     }
 
     public abstract class ArchiveModelManager
