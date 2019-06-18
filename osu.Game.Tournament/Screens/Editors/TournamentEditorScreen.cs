@@ -46,7 +46,7 @@ namespace osu.Game.Tournament.Screens.Editors
                 {
                     Children = new Drawable[]
                     {
-                        new TriangleButton
+                        new OsuButton
                         {
                             RelativeSizeAxes = Axes.X,
                             Text = "Add new",

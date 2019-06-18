@@ -128,21 +128,21 @@ namespace osu.Game.Tournament.Screens.Drawings
                 // Control panel container
                 new ControlPanel
                 {
-                    new TriangleButton
+                    new OsuButton
                     {
                         RelativeSizeAxes = Axes.X,
 
                         Text = "Begin random",
                         Action = teamsContainer.StartScrolling,
                     },
-                    new TriangleButton
+                    new OsuButton
                     {
                         RelativeSizeAxes = Axes.X,
 
                         Text = "Stop random",
                         Action = teamsContainer.StopScrolling,
                     },
-                    new TriangleButton
+                    new OsuButton
                     {
                         RelativeSizeAxes = Axes.X,
 
@@ -150,7 +150,7 @@ namespace osu.Game.Tournament.Screens.Drawings
                         Action = reloadTeams
                     },
                     new ControlPanel.Spacer(),
-                    new TriangleButton
+                    new OsuButton
                     {
                         RelativeSizeAxes = Axes.X,
 

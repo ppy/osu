@@ -34,10 +34,10 @@ namespace osu.Game.Tournament.Screens.MapPool
         private TeamColour pickColour;
         private ChoiceType pickType;
 
-        private readonly TriangleButton buttonRedBan;
-        private readonly TriangleButton buttonBlueBan;
-        private readonly TriangleButton buttonRedPick;
-        private readonly TriangleButton buttonBluePick;
+        private readonly OsuButton buttonRedBan;
+        private readonly OsuButton buttonBlueBan;
+        private readonly OsuButton buttonRedPick;
+        private readonly OsuButton buttonBluePick;
 
         public MapPoolScreen()
         {
@@ -60,32 +60,32 @@ namespace osu.Game.Tournament.Screens.MapPool
                         {
                             Text = "Current Mode"
                         },
-                        buttonRedBan = new TriangleButton
+                        buttonRedBan = new OsuButton
                         {
                             RelativeSizeAxes = Axes.X,
                             Text = "Red Ban",
                             Action = () => setMode(TeamColour.Red, ChoiceType.Ban)
                         },
-                        buttonBlueBan = new TriangleButton
+                        buttonBlueBan = new OsuButton
                         {
                             RelativeSizeAxes = Axes.X,
                             Text = "Blue Ban",
                             Action = () => setMode(TeamColour.Blue, ChoiceType.Ban)
                         },
-                        buttonRedPick = new TriangleButton
+                        buttonRedPick = new OsuButton
                         {
                             RelativeSizeAxes = Axes.X,
                             Text = "Red Pick",
                             Action = () => setMode(TeamColour.Red, ChoiceType.Pick)
                         },
-                        buttonBluePick = new TriangleButton
+                        buttonBluePick = new OsuButton
                         {
                             RelativeSizeAxes = Axes.X,
                             Text = "Blue Pick",
                             Action = () => setMode(TeamColour.Blue, ChoiceType.Pick)
                         },
                         new ControlPanel.Spacer(),
-                        new TriangleButton
+                        new OsuButton
                         {
                             RelativeSizeAxes = Axes.X,
                             Text = "Reset",
