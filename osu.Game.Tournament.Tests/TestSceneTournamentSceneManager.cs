@@ -7,7 +7,7 @@ using osu.Game.Tests.Visual;
 
 namespace osu.Game.Tournament.Tests
 {
-    public class TestSceneSceneManager : OsuTestScene
+    public class TestSceneTournamentSceneManager : OsuTestScene
     {
         [BackgroundDependencyLoader]
         private void load(Storage storage)

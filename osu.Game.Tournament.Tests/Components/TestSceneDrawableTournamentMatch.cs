@@ -10,14 +10,13 @@ using osu.Game.Tournament.Components;
 using osu.Game.Tournament.Models;
 using osu.Game.Tournament.Screens.Ladder.Components;
 
-namespace osu.Game.Tournament.Tests
+namespace osu.Game.Tournament.Tests.Components
 {
     public class TestSceneDrawableTournamentMatch : OsuTestScene
     {
         public override IReadOnlyList<Type> RequiredTypes => new[]
         {
             typeof(TournamentMatch),
-            typeof(DrawableTournamentMatch),
             typeof(DrawableTournamentTeam),
         };
 

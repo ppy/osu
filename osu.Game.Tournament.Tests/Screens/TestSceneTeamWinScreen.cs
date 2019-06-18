@@ -8,9 +8,9 @@ using osu.Framework.Graphics;
 using osu.Game.Tournament.Models;
 using osu.Game.Tournament.Screens.TeamWin;
 
-namespace osu.Game.Tournament.Tests
+namespace osu.Game.Tournament.Tests.Screens
 {
-    public class TestSceneTeamWin : LadderTestScene
+    public class TestSceneTeamWinScreen : LadderTestScene
     {
         [Cached]
         private readonly Bindable<TournamentMatch> currentMatch = new Bindable<TournamentMatch>();

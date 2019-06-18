@@ -6,9 +6,9 @@ using osu.Framework.Graphics;
 using osu.Game.Graphics.Cursor;
 using osu.Game.Tournament.Screens.Ladder;
 
-namespace osu.Game.Tournament.Tests
+namespace osu.Game.Tournament.Tests.Screens
 {
-    public class TestSceneLadderManager : LadderTestScene
+    public class TestSceneLadderScreen : LadderTestScene
     {
         [BackgroundDependencyLoader]
         private void load()

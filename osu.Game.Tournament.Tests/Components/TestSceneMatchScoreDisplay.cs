@@ -7,7 +7,7 @@ using osu.Framework.MathUtils;
 using osu.Game.Tournament.IPC;
 using osu.Game.Tournament.Screens.Gameplay.Components;
 
-namespace osu.Game.Tournament.Tests
+namespace osu.Game.Tournament.Tests.Components
 {
     public class TestSceneMatchScoreDisplay : LadderTestScene
     {
