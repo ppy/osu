@@ -10,13 +10,13 @@ using osu.Game.Tournament.Components;
 using osu.Game.Tournament.IPC;
 using osu.Game.Tournament.Screens.Ladder.Components;
 using osu.Game.Users;
-using osuTK;
 
 namespace osu.Game.Tournament.Tests
 {
-    public class TestSceneMatchChatDisplay : OsuTestScene
+    public class TestSceneTournamentMatchChatDisplay : OsuTestScene
     {
         private readonly Channel testChannel = new Channel();
+        private readonly Channel testChannel2 = new Channel();
 
         private readonly User admin = new User
         {
@@ -43,15 +43,14 @@ namespace osu.Game.Tournament.Tests
         [Cached]
         private MatchIPCInfo matchInfo = new MatchIPCInfo(); // hide parent
 
-        public TestSceneMatchChatDisplay()
-        {
-            MatchChatDisplay chatDisplay;
+        private readonly TournamentMatchChatDisplay chatDisplay;
 
-            Add(chatDisplay = new MatchChatDisplay
+        public TestSceneTournamentMatchChatDisplay()
+        {
+            Add(chatDisplay = new TournamentMatchChatDisplay
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
-                Size = new Vector2(400, 80)
             });
 
             ladderInfo.CurrentMatch.Value = new MatchPairing
@@ -73,35 +72,59 @@ namespace osu.Game.Tournament.Tests
         {
             base.LoadComplete();
 
-            AddStep("message from admin", () => testChannel.AddLocalEcho(new LocalEchoMessage
+            AddStep("message from admin", () => testChannel.AddNewMessages(new Message(nextMessageId())
             {
                 Sender = admin,
                 Content = "I am a wang!"
             }));
 
-            AddStep("message from team red", () => testChannel.AddLocalEcho(new LocalEchoMessage
+            AddStep("message from team red", () => testChannel.AddNewMessages(new Message(nextMessageId())
             {
                 Sender = redUser,
                 Content = "I am team red."
             }));
 
-            AddStep("message from team red", () => testChannel.AddLocalEcho(new LocalEchoMessage
+            AddStep("message from team red", () => testChannel.AddNewMessages(new Message(nextMessageId())
             {
                 Sender = redUser,
                 Content = "I plan to win!"
             }));
 
-            AddStep("message from team blue", () => testChannel.AddLocalEcho(new LocalEchoMessage
+            AddStep("message from team blue", () => testChannel.AddNewMessages(new Message(nextMessageId())
             {
                 Sender = blueUser,
                 Content = "Not on my watch. Prepare to eat saaaaaaaaaand. Lots and lots of saaaaaaand."
             }));
 
-            AddStep("message from admin", () => testChannel.AddLocalEcho(new LocalEchoMessage
+            AddStep("message from admin", () => testChannel.AddNewMessages(new Message(nextMessageId())
             {
                 Sender = admin,
                 Content = "Okay okay, calm down guys. Let's do this!"
             }));
+
+            AddStep("multiple messages", () => testChannel.AddNewMessages(new Message(nextMessageId())
+                {
+                    Sender = admin,
+                    Content = "I spam you!"
+                },
+                new Message(nextMessageId())
+                {
+                    Sender = admin,
+                    Content = "I spam you!!!1"
+                },
+                new Message(nextMessageId())
+                {
+                    Sender = admin,
+                    Content = "I spam you!1!1"
+                }));
+
+            AddStep("change channel to 2", () => chatDisplay.Channel.Value = testChannel2);
+
+            AddStep("change channel to 1", () => chatDisplay.Channel.Value = testChannel);
         }
+
+        private int messageId;
+
+        private long? nextMessageId() => messageId++;
     }
 }
