@@ -1,7 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -20,36 +19,20 @@ using osuTK;
 
 namespace osu.Game.Tournament.Screens.Editors
 {
-    public class RoundEditorScreen : TournamentEditorScreen<RoundEditorScreen.RoundRow>
+    public class RoundEditorScreen : TournamentEditorScreen<RoundEditorScreen.RoundRow, TournamentRound>
     {
-        [BackgroundDependencyLoader]
-        private void load()
-        {
-            foreach (var r in LadderInfo.Rounds)
-                Flow.Add(new RoundRow(r));
-        }
+        protected override BindableList<TournamentRound> Storage => LadderInfo.Rounds;
 
-        protected override void AddNew()
+        public class RoundRow : CompositeDrawable, IModelBacked<TournamentRound>
         {
-            var round = new TournamentRound
-            {
-                StartDate = { Value = DateTimeOffset.UtcNow }
-            };
-
-            Flow.Add(new RoundRow(round));
-            LadderInfo.Rounds.Add(round);
-        }
-
-        public class RoundRow : CompositeDrawable
-        {
-            public readonly TournamentRound Round;
+            public TournamentRound Model { get; }
 
             [Resolved]
             private LadderInfo ladderInfo { get; set; }
 
             public RoundRow(TournamentRound round)
             {
-                Round = round;
+                Model = round;
 
                 Masking = true;
                 CornerRadius = 10;
@@ -80,25 +63,25 @@ namespace osu.Game.Tournament.Screens.Editors
                             {
                                 LabelText = "Name",
                                 Width = 0.33f,
-                                Bindable = Round.Name
+                                Bindable = Model.Name
                             },
                             new SettingsTextBox
                             {
                                 LabelText = "Description",
                                 Width = 0.33f,
-                                Bindable = Round.Description
+                                Bindable = Model.Description
                             },
                             new DateTextBox
                             {
                                 LabelText = "Start Time",
                                 Width = 0.33f,
-                                Bindable = Round.StartDate
+                                Bindable = Model.StartDate
                             },
                             new SettingsSlider<int>
                             {
                                 LabelText = "Best of",
                                 Width = 0.33f,
-                                Bindable = Round.BestOf
+                                Bindable = Model.BestOf
                             },
                             new SettingsButton
                             {
@@ -120,7 +103,7 @@ namespace osu.Game.Tournament.Screens.Editors
                         Action = () =>
                         {
                             Expire();
-                            ladderInfo.Rounds.Remove(Round);
+                            ladderInfo.Rounds.Remove(Model);
                         },
                     }
                 };
@@ -161,7 +144,7 @@ namespace osu.Game.Tournament.Screens.Editors
 
                 public class RoundBeatmapRow : CompositeDrawable
                 {
-                    private readonly RoundBeatmap beatmap;
+                    public RoundBeatmap Model { get; }
 
                     [Resolved]
                     protected IAPIProvider API { get; private set; }
@@ -174,7 +157,7 @@ namespace osu.Game.Tournament.Screens.Editors
 
                     public RoundBeatmapRow(TournamentRound team, RoundBeatmap beatmap)
                     {
-                        this.beatmap = beatmap;
+                        Model = beatmap;
 
                         Margin = new MarginPadding(10);
 
@@ -239,51 +222,51 @@ namespace osu.Game.Tournament.Screens.Editors
                     [BackgroundDependencyLoader]
                     private void load(RulesetStore rulesets)
                     {
-                        beatmapId.Value = beatmap.ID.ToString();
+                        beatmapId.Value = Model.ID.ToString();
                         beatmapId.BindValueChanged(idString =>
                         {
                             int parsed;
 
                             int.TryParse(idString.NewValue, out parsed);
 
-                            beatmap.ID = parsed;
+                            Model.ID = parsed;
 
                             if (idString.NewValue != idString.OldValue)
-                                beatmap.BeatmapInfo = null;
+                                Model.BeatmapInfo = null;
 
-                            if (beatmap.BeatmapInfo != null)
+                            if (Model.BeatmapInfo != null)
                             {
                                 updatePanel();
                                 return;
                             }
 
-                            var req = new GetBeatmapRequest(new BeatmapInfo { OnlineBeatmapID = beatmap.ID });
+                            var req = new GetBeatmapRequest(new BeatmapInfo { OnlineBeatmapID = Model.ID });
 
                             req.Success += res =>
                             {
-                                beatmap.BeatmapInfo = res.ToBeatmap(rulesets);
+                                Model.BeatmapInfo = res.ToBeatmap(rulesets);
                                 updatePanel();
                             };
 
                             req.Failure += _ =>
                             {
-                                beatmap.BeatmapInfo = null;
+                                Model.BeatmapInfo = null;
                                 updatePanel();
                             };
 
                             API.Queue(req);
                         }, true);
 
-                        mods.Value = beatmap.Mods;
-                        mods.BindValueChanged(modString => beatmap.Mods = modString.NewValue);
+                        mods.Value = Model.Mods;
+                        mods.BindValueChanged(modString => Model.Mods = modString.NewValue);
                     }
 
                     private void updatePanel()
                     {
                         drawableContainer.Clear();
 
-                        if (beatmap.BeatmapInfo != null)
-                            drawableContainer.Child = new TournamentBeatmapPanel(beatmap.BeatmapInfo, beatmap.Mods)
+                        if (Model.BeatmapInfo != null)
+                            drawableContainer.Child = new TournamentBeatmapPanel(Model.BeatmapInfo, Model.Mods)
                             {
                                 Anchor = Anchor.CentreLeft,
                                 Origin = Anchor.CentreLeft,
@@ -293,5 +276,7 @@ namespace osu.Game.Tournament.Screens.Editors
                 }
             }
         }
+
+        protected override RoundRow CreateDrawable(TournamentRound model) => new RoundRow(model);
     }
 }

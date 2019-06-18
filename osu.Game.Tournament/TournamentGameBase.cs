@@ -1,7 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
 using System.Linq;
@@ -140,7 +139,6 @@ namespace osu.Game.Tournament
 
             addedInfo |= addPlayers();
             addedInfo |= addBeatmaps();
-            addedInfo |= addCountries();
 
             if (addedInfo)
                 SaveChanges();
@@ -185,36 +183,6 @@ namespace osu.Game.Tournament
 
                     addedInfo = true;
                 }
-
-            return addedInfo;
-        }
-
-        /// <summary>
-        /// Add missing country info based on acronyms.
-        /// </summary>
-        private bool addCountries()
-        {
-            bool addedInfo = false;
-
-            List<TournamentTeam> countries;
-            using (Stream stream = Resources.GetStream("Resources/countries.json"))
-            using (var sr = new StreamReader(stream))
-                countries = JsonConvert.DeserializeObject<List<TournamentTeam>>(sr.ReadToEnd());
-
-            foreach (var t in ladder.Teams)
-            {
-                if (!string.IsNullOrEmpty(t.FullName.Value))
-                    continue;
-
-                var result = countries.FirstOrDefault(c => c.Acronym == t.Acronym);
-
-                if (result == null) continue;
-
-                t.Acronym = result.Acronym;
-                t.FlagName = result.FlagName;
-                t.FullName = result.FullName;
-                addedInfo = true;
-            }
 
             return addedInfo;
         }

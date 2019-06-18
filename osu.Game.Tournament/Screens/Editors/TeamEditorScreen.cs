@@ -1,13 +1,17 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using Newtonsoft.Json;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics;
+using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Game.Overlays.Settings;
@@ -18,26 +22,40 @@ using osuTK;
 
 namespace osu.Game.Tournament.Screens.Editors
 {
-    public class TeamEditorScreen : TournamentEditorScreen<TeamEditorScreen.TeamRow>
+    public class TeamEditorScreen : TournamentEditorScreen<TeamEditorScreen.TeamRow, TournamentTeam>
     {
+        [Resolved]
+        private Framework.Game game { get; set; }
+
+        protected override BindableList<TournamentTeam> Storage => LadderInfo.Teams;
+
         [BackgroundDependencyLoader]
         private void load()
         {
-            foreach (var t in LadderInfo.Teams)
-                Flow.Add(new TeamRow(t));
+            ControlPanel.Add(new OsuButton
+            {
+                RelativeSizeAxes = Axes.X,
+                Text = "Add all countries",
+                Action = addAllCountries
+            });
         }
 
-        protected override void AddNew()
-        {
-            var team = new TournamentTeam();
+        protected override TeamRow CreateDrawable(TournamentTeam model) => new TeamRow(model);
 
-            Flow.Add(new TeamRow(team));
-            LadderInfo.Teams.Add(team);
+        private void addAllCountries()
+        {
+            List<TournamentTeam> countries;
+            using (Stream stream = game.Resources.GetStream("Resources/countries.json"))
+            using (var sr = new StreamReader(stream))
+                countries = JsonConvert.DeserializeObject<List<TournamentTeam>>(sr.ReadToEnd());
+
+            foreach (var c in countries)
+                Storage.Add(c);
         }
 
-        public class TeamRow : CompositeDrawable
+        public class TeamRow : CompositeDrawable, IModelBacked<TournamentTeam>
         {
-            public readonly TournamentTeam Team;
+            public TournamentTeam Model { get; }
 
             private readonly Container drawableContainer;
 
@@ -46,12 +64,12 @@ namespace osu.Game.Tournament.Screens.Editors
 
             public TeamRow(TournamentTeam team)
             {
-                Team = team;
+                Model = team;
 
                 Masking = true;
                 CornerRadius = 10;
 
-                PlayerEditor playerEditor = new PlayerEditor(Team)
+                PlayerEditor playerEditor = new PlayerEditor(Model)
                 {
                     Width = 0.95f
                 };
@@ -83,19 +101,19 @@ namespace osu.Game.Tournament.Screens.Editors
                             {
                                 LabelText = "Name",
                                 Width = 0.2f,
-                                Bindable = Team.FullName
+                                Bindable = Model.FullName
                             },
                             new SettingsTextBox
                             {
                                 LabelText = "Acronym",
                                 Width = 0.2f,
-                                Bindable = Team.Acronym
+                                Bindable = Model.Acronym
                             },
                             new SettingsTextBox
                             {
                                 LabelText = "Flag",
                                 Width = 0.2f,
-                                Bindable = Team.FlagName
+                                Bindable = Model.FlagName
                             },
                             new SettingsButton
                             {
@@ -112,7 +130,7 @@ namespace osu.Game.Tournament.Screens.Editors
                                 Action = () =>
                                 {
                                     Expire();
-                                    ladderInfo.Teams.Remove(Team);
+                                    ladderInfo.Teams.Remove(Model);
                                 },
                             },
                             playerEditor
@@ -123,12 +141,12 @@ namespace osu.Game.Tournament.Screens.Editors
                 RelativeSizeAxes = Axes.X;
                 AutoSizeAxes = Axes.Y;
 
-                Team.FlagName.BindValueChanged(updateDrawable, true);
+                Model.FlagName.BindValueChanged(updateDrawable, true);
             }
 
             private void updateDrawable(ValueChangedEvent<string> flag)
             {
-                drawableContainer.Child = new DrawableTeamFlag(Team);
+                drawableContainer.Child = new DrawableTeamFlag(Model);
             }
 
             private class DrawableTeamFlag : DrawableTournamentTeam

@@ -1,23 +1,33 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using osu.Framework.Allocation;
+using osu.Framework.Bindables;
+using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Overlays.Settings;
 using osu.Game.Tournament.Components;
 using osuTK;
 
 namespace osu.Game.Tournament.Screens.Editors
 {
-    public abstract class TournamentEditorScreen<T> : TournamentScreen, IProvideVideo
-        where T : Drawable
+    public abstract class TournamentEditorScreen<TDrawable, TModel> : TournamentScreen, IProvideVideo
+        where TDrawable : Drawable, IModelBacked<TModel>
+        where TModel : class, new()
     {
-        protected readonly FillFlowContainer<T> Flow;
+        protected abstract BindableList<TModel> Storage { get; }
 
-        protected TournamentEditorScreen()
+        private FillFlowContainer<TDrawable> flow;
+
+        protected ControlPanel ControlPanel;
+
+        [BackgroundDependencyLoader]
+        private void load()
         {
             AddRangeInternal(new Drawable[]
             {
@@ -32,7 +42,7 @@ namespace osu.Game.Tournament.Screens.Editors
                     Width = 0.9f,
                     Anchor = Anchor.TopCentre,
                     Origin = Anchor.TopCentre,
-                    Child = Flow = new FillFlowContainer<T>
+                    Child = flow = new FillFlowContainer<TDrawable>
                     {
                         Direction = FillDirection.Vertical,
                         RelativeSizeAxes = Axes.X,
@@ -42,7 +52,7 @@ namespace osu.Game.Tournament.Screens.Editors
                         Spacing = new Vector2(20)
                     },
                 },
-                new ControlPanel
+                ControlPanel = new ControlPanel
                 {
                     Children = new Drawable[]
                     {
@@ -50,13 +60,25 @@ namespace osu.Game.Tournament.Screens.Editors
                         {
                             RelativeSizeAxes = Axes.X,
                             Text = "Add new",
-                            Action = AddNew
+                            Action = () => Storage.Add(new TModel())
+                        },
+                        new DangerousSettingsButton
+                        {
+                            RelativeSizeAxes = Axes.X,
+                            Text = "Clear all",
+                            Action = Storage.Clear
                         },
                     }
                 }
             });
+
+            Storage.ItemsAdded += items => items.ForEach(i => flow.Add(CreateDrawable(i)));
+            Storage.ItemsRemoved += items => items.ForEach(i => flow.RemoveAll(d => d.Model == i));
+
+            foreach (var model in Storage)
+                flow.Add(CreateDrawable(model));
         }
 
-        protected abstract void AddNew();
+        protected abstract TDrawable CreateDrawable(TModel model);
     }
 }
