@@ -36,7 +36,7 @@ namespace osu.Game.Tournament.Screens.Gameplay
         private TournamentSceneManager sceneManager { get; set; }
 
         [Resolved]
-        private MatchChatDisplay chat { get; set; }
+        private TournamentMatchChatDisplay chat { get; set; }
 
         [BackgroundDependencyLoader]
         private void load(LadderInfo ladder, MatchIPCInfo ipc)

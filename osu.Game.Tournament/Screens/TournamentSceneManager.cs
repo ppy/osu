@@ -32,7 +32,7 @@ namespace osu.Game.Tournament.Screens
         private TourneyVideo video;
 
         [Cached]
-        private MatchChatDisplay chat = new MatchChatDisplay();
+        private TournamentMatchChatDisplay chat = new TournamentMatchChatDisplay();
 
         private Container chatContainer;
 

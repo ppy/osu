@@ -11,7 +11,7 @@ namespace osu.Game.Tournament.Tests
     public class TestSceneGameplayScreen : OsuTestScene
     {
         [Cached]
-        private MatchChatDisplay chat = new MatchChatDisplay();
+        private TournamentMatchChatDisplay chat = new TournamentMatchChatDisplay();
 
         [BackgroundDependencyLoader]
         private void load()

@@ -13,13 +13,13 @@ using osuTK.Graphics;
 
 namespace osu.Game.Tournament.Components
 {
-    public class MatchChatDisplay : StandAloneChatDisplay
+    public class TournamentMatchChatDisplay : StandAloneChatDisplay
     {
         private readonly Bindable<string> chatChannel = new Bindable<string>();
 
         private ChannelManager manager;
 
-        public MatchChatDisplay()
+        public TournamentMatchChatDisplay()
         {
             RelativeSizeAxes = Axes.X;
             Y = 100;
