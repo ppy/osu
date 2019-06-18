@@ -38,7 +38,7 @@ namespace osu.Game.IPC
             }
 
             if (importer.HandledExtensions.Contains(Path.GetExtension(path)?.ToLowerInvariant()))
-                importer.Import(path);
+                await importer.Import(path);
         }
     }
 
