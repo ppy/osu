@@ -50,7 +50,7 @@ namespace osu.Game.Overlays.BeatmapSet
 
         private void updateDisplay()
         {
-            bpm.Value = BeatmapSet?.OnlineInfo.BPM.ToString(@"0.##") ?? "-";
+            bpm.Value = BeatmapSet?.OnlineInfo?.BPM.ToString(@"0.##") ?? "-";
 
             if (beatmap == null)
             {
