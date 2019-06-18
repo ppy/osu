@@ -22,7 +22,7 @@ namespace osu.Game.Tournament.Models
         [JsonProperty]
         public readonly BindableList<RoundBeatmap> Beatmaps = new BindableList<RoundBeatmap>();
 
-        public readonly Bindable<DateTimeOffset> StartDate = new Bindable<DateTimeOffset>();
+        public readonly Bindable<DateTimeOffset> StartDate = new Bindable<DateTimeOffset> { Value = DateTimeOffset.UtcNow };
 
         // only used for serialisation
         public List<int> Matches = new List<int>();
