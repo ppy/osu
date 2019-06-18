@@ -8,12 +8,10 @@ using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.UserInterface;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
-using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API.Requests;
 using osu.Game.Overlays.Profile;
 using osu.Game.Overlays.Profile.Sections;
 using osu.Game.Users;
-using osuTK;
 
 namespace osu.Game.Overlays
 {
@@ -141,43 +139,34 @@ namespace osu.Game.Overlays
             }
         }
 
-        private class ProfileTabControl : PageTabControl<ProfileSection>
+        private class ProfileTabControl : OverlayTabControl<ProfileSection>
         {
-            private readonly Box bottom;
-
             public ProfileTabControl()
             {
                 TabContainer.RelativeSizeAxes &= ~Axes.X;
                 TabContainer.AutoSizeAxes |= Axes.X;
                 TabContainer.Anchor |= Anchor.x1;
                 TabContainer.Origin |= Anchor.x1;
-                AddInternal(bottom = new Box
-                {
-                    RelativeSizeAxes = Axes.X,
-                    Height = 1,
-                    Anchor = Anchor.BottomCentre,
-                    Origin = Anchor.BottomCentre,
-                    EdgeSmoothness = new Vector2(1)
-                });
             }
 
-            protected override TabItem<ProfileSection> CreateTabItem(ProfileSection value) => new ProfileTabItem(value);
+            protected override TabItem<ProfileSection> CreateTabItem(ProfileSection value) => new ProfileTabItem(value)
+            {
+                AccentColour = AccentColour
+            };
 
-            protected override Dropdown<ProfileSection> CreateDropdown() => null;
+            [BackgroundDependencyLoader]
+            private void load(OsuColour colours)
+            {
+                AccentColour = colours.Seafoam;
+            }
 
-            private class ProfileTabItem : PageTabItem
+            private class ProfileTabItem : OverlayTabItem<ProfileSection>
             {
                 public ProfileTabItem(ProfileSection value)
                     : base(value)
                 {
                     Text.Text = value.Title;
                 }
-            }
-
-            [BackgroundDependencyLoader]
-            private void load(OsuColour colours)
-            {
-                bottom.Colour = colours.Yellow;
             }
         }
     }
