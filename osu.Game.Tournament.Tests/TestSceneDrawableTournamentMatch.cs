@@ -12,17 +12,16 @@ using osu.Game.Tournament.Screens.Ladder.Components;
 
 namespace osu.Game.Tournament.Tests
 {
-    public class TestSceneMatches : OsuTestScene
+    public class TestSceneDrawableTournamentMatch : OsuTestScene
     {
         public override IReadOnlyList<Type> RequiredTypes => new[]
         {
             typeof(TournamentMatch),
             typeof(DrawableTournamentMatch),
-            typeof(DrawableMatchTeam),
             typeof(DrawableTournamentTeam),
         };
 
-        public TestSceneMatches()
+        public TestSceneDrawableTournamentMatch()
         {
             Container<DrawableTournamentMatch> level1;
             Container<DrawableTournamentMatch> level2;
