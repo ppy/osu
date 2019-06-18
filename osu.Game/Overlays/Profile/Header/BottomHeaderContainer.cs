@@ -92,7 +92,7 @@ namespace osu.Game.Overlays.Profile.Header
                 topLinkContainer.AddText("Currently online");
                 addSpacer(topLinkContainer);
             }
-            else if(user.LastVisit.HasValue)
+            else if (user.LastVisit.HasValue)
             {
                 topLinkContainer.AddText("Last seen ");
                 topLinkContainer.AddText(new DrawableDate(user.LastVisit.Value), embolden);
