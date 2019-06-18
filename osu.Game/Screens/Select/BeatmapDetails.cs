@@ -10,7 +10,6 @@ using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using System.Linq;
 using osu.Game.Online.API;
-using osu.Game.Online.API.Requests;
 using osu.Framework.Threading;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Extensions.Color4Extensions;
@@ -18,6 +17,8 @@ using osu.Game.Screens.Select.Details;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
+using osu.Game.Online.API.Requests;
+using osu.Game.Rulesets;
 
 namespace osu.Game.Screens.Select
 {
@@ -39,6 +40,9 @@ namespace osu.Game.Screens.Select
         private IAPIProvider api;
 
         private ScheduledDelegate pendingBeatmapSwitch;
+
+        [Resolved]
+        private RulesetStore rulesets { get; set; }
 
         private BeatmapInfo beatmap;
 
@@ -181,57 +185,79 @@ namespace osu.Game.Screens.Select
             tags.Text = Beatmap?.Metadata?.Tags;
 
             // metrics may have been previously fetched
-            if (Beatmap?.Metrics != null)
+            if (Beatmap?.BeatmapSet?.Metrics != null && Beatmap?.Metrics != null)
             {
-                updateMetrics(Beatmap.Metrics);
+                updateMetrics();
                 return;
             }
 
-            // metrics may not be fetched but can be
-            if (Beatmap?.OnlineBeatmapID != null)
+            // for now, let's early abort if an OnlineBeatmapID is not present (should have been populated at import time).
+            if (Beatmap?.OnlineBeatmapID == null)
             {
-                var requestedBeatmap = Beatmap;
-                var lookup = new GetBeatmapDetailsRequest(requestedBeatmap);
-                lookup.Success += res =>
+                updateMetrics();
+                return;
+            }
+
+            var requestedBeatmap = Beatmap;
+
+            var lookup = new GetBeatmapRequest(requestedBeatmap);
+
+            lookup.Success += res =>
+            {
+                Schedule(() =>
                 {
                     if (beatmap != requestedBeatmap)
                         //the beatmap has been changed since we started the lookup.
                         return;
 
-                    requestedBeatmap.Metrics = res;
-                    Schedule(() => updateMetrics(res));
-                };
-                lookup.Failure += e => Schedule(() => updateMetrics());
-                api.Queue(lookup);
-                loading.Show();
-                return;
-            }
+                    var b = res.ToBeatmap(rulesets);
 
-            updateMetrics();
+                    if (requestedBeatmap.BeatmapSet == null)
+                        requestedBeatmap.BeatmapSet = b.BeatmapSet;
+                    else
+                        requestedBeatmap.BeatmapSet.Metrics = b.BeatmapSet.Metrics;
+
+                    requestedBeatmap.Metrics = b.Metrics;
+
+                    updateMetrics();
+                });
+            };
+
+            lookup.Failure += e =>
+            {
+                Schedule(() =>
+                {
+                    if (beatmap != requestedBeatmap)
+                        //the beatmap has been changed since we started the lookup.
+                        return;
+
+                    updateMetrics();
+                });
+            };
+
+            api.Queue(lookup);
+            loading.Show();
         }
 
-        private void updateMetrics(BeatmapMetrics metrics = null)
+        private void updateMetrics()
         {
-            var hasRatings = metrics?.Ratings?.Any() ?? false;
-            var hasRetriesFails = (metrics?.Retries?.Any() ?? false) && (metrics.Fails?.Any() ?? false);
+            var hasRatings = beatmap?.BeatmapSet?.Metrics?.Ratings?.Any() ?? false;
+            var hasRetriesFails = (beatmap?.Metrics?.Retries?.Any() ?? false) && (beatmap?.Metrics.Fails?.Any() ?? false);
 
             if (hasRatings)
             {
-                ratings.Metrics = metrics;
+                ratings.Metrics = beatmap.BeatmapSet.Metrics;
                 ratingsContainer.FadeIn(transition_duration);
             }
             else
             {
-                ratings.Metrics = new BeatmapMetrics
-                {
-                    Ratings = new int[10],
-                };
+                ratings.Metrics = new BeatmapSetMetrics { Ratings = new int[10] };
                 ratingsContainer.FadeTo(0.25f, transition_duration);
             }
 
             if (hasRetriesFails)
             {
-                failRetryGraph.Metrics = metrics;
+                failRetryGraph.Metrics = beatmap.Metrics;
                 failRetryContainer.FadeIn(transition_duration);
             }
             else
