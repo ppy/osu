@@ -8,6 +8,9 @@ using osu.Game.Users;
 
 namespace osu.Game.Tournament.Models
 {
+    /// <summary>
+    /// A team representation. For official tournaments this is generally a country.
+    /// </summary>
     [Serializable]
     public class TournamentTeam
     {
