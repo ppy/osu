@@ -26,7 +26,7 @@ namespace osu.Game.Tournament.Screens.Gameplay
         private readonly Bindable<TournamentMatch> currentMatch = new Bindable<TournamentMatch>();
 
         public readonly Bindable<TourneyState> State = new Bindable<TourneyState>();
-        private TriangleButton warmupButton;
+        private OsuButton warmupButton;
         private MatchIPCInfo ipc;
 
         private readonly Color4 red = new Color4(186, 0, 18, 255);
@@ -103,13 +103,13 @@ namespace osu.Game.Tournament.Screens.Gameplay
                 {
                     Children = new Drawable[]
                     {
-                        warmupButton = new TriangleButton
+                        warmupButton = new OsuButton
                         {
                             RelativeSizeAxes = Axes.X,
                             Text = "Toggle warmup",
                             Action = () => warmup.Toggle()
                         },
-                        new TriangleButton
+                        new OsuButton
                         {
                             RelativeSizeAxes = Axes.X,
                             Text = "Toggle chat",
