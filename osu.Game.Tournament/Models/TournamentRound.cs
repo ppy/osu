@@ -20,7 +20,7 @@ namespace osu.Game.Tournament.Models
         public readonly BindableInt BestOf = new BindableInt(9) { Default = 9, MinValue = 3, MaxValue = 23 };
 
         [JsonProperty]
-        public readonly List<RoundBeatmap> Beatmaps = new List<RoundBeatmap>();
+        public readonly BindableList<RoundBeatmap> Beatmaps = new BindableList<RoundBeatmap>();
 
         public readonly Bindable<DateTimeOffset> StartDate = new Bindable<DateTimeOffset>();
 

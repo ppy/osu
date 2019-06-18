@@ -81,7 +81,7 @@ namespace osu.Game.Tournament.Components
                             Anchor = Anchor.TopCentre,
                             Origin = Anchor.TopCentre,
                             Text = new LocalisedString((
-                                $"{Beatmap.Metadata.ArtistUnicode} - {Beatmap.Metadata.TitleUnicode}",
+                                $"{Beatmap.Metadata.ArtistUnicode ?? Beatmap.Metadata.Artist} - {Beatmap.Metadata.TitleUnicode ?? Beatmap.Metadata.Title}",
                                 $"{Beatmap.Metadata.Artist} - {Beatmap.Metadata.Title}")),
                             Font = OsuFont.GetFont(weight: FontWeight.Bold, italics: true),
                         },
