@@ -9,7 +9,10 @@ namespace osu.Game.Tournament.Tests.Screens
     {
         public TestSceneRoundEditorScreen()
         {
-            Add(new RoundEditorScreen());
+            Add(new RoundEditorScreen
+            {
+                Width = 0.85f // create room for control panel
+            });
         }
     }
 }
