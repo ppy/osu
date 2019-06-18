@@ -3,13 +3,13 @@
 
 using osu.Game.Tournament.Screens.Editors;
 
-namespace osu.Game.Tournament.Tests
+namespace osu.Game.Tournament.Tests.Screens
 {
-    public class TestSceneRoundEditorScreen : LadderTestScene
+    public class TestSceneTeamEditorScreen : LadderTestScene
     {
-        public TestSceneRoundEditorScreen()
+        public TestSceneTeamEditorScreen()
         {
-            Add(new RoundEditorScreen());
+            Add(new TeamEditorScreen());
         }
     }
 }

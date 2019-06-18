@@ -10,7 +10,4 @@
   <ItemGroup Label="Project References">
     <ProjectReference Include="..\osu.Game\osu.Game.csproj" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Screens\Rounds" />
-  </ItemGroup>
 </Project>

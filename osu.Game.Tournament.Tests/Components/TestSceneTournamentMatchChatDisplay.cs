@@ -11,7 +11,7 @@ using osu.Game.Tournament.IPC;
 using osu.Game.Tournament.Models;
 using osu.Game.Users;
 
-namespace osu.Game.Tournament.Tests
+namespace osu.Game.Tournament.Tests.Components
 {
     public class TestSceneTournamentMatchChatDisplay : OsuTestScene
     {
