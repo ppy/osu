@@ -7,7 +7,7 @@ using osu.Game.Tournament.Models;
 
 namespace osu.Game.Tournament.Tests
 {
-    public class LadderTestScene : OsuTestScene
+    public abstract class LadderTestScene : OsuTestScene
     {
         [Resolved]
         protected LadderInfo Ladder { get; private set; }
