@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
-using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Lines;
@@ -16,8 +15,6 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
     public abstract class SliderBody : CompositeDrawable
     {
         public const float DEFAULT_BORDER_SIZE = 1;
-
-        public readonly BindableBool HasFailed = new BindableBool();
 
         private readonly SliderPath path;
         protected Path Path => path;
@@ -87,14 +84,9 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
 
         public void Fail()
         {
-            if (HasFailed.Value)
-                return;
-
             this.RotateTo(RNG.NextSingle(-90, 90), FailAnimation.FAIL_DURATION);
             this.ScaleTo(Scale * 0.5f, FailAnimation.FAIL_DURATION);
             this.MoveToOffset(new Vector2(0, 400), FailAnimation.FAIL_DURATION);
-
-            HasFailed.Value = true;
         }
 
         /// <summary>

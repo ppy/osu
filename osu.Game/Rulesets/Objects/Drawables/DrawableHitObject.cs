@@ -6,15 +6,19 @@ using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Extensions.TypeExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Primitives;
+using osu.Framework.MathUtils;
 using osu.Game.Audio;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Scoring;
+using osu.Game.Screens.Play;
 using osu.Game.Skinning;
+using osuTK;
 using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Objects.Drawables
@@ -77,8 +81,8 @@ namespace osu.Game.Rulesets.Objects.Drawables
 
         private bool judgementOccurred;
 
-        public override bool PropagatePositionalInputSubTree => !HasFailed.Value;
-        public override bool PropagateNonPositionalInputSubTree => !HasFailed.Value;
+        public override bool PropagatePositionalInputSubTree => !HasFailed;
+        public override bool PropagateNonPositionalInputSubTree => !HasFailed;
 
         public override bool RemoveWhenNotAlive => false;
         public override bool RemoveCompletedTransforms => false;
@@ -88,7 +92,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
 
         public readonly Bindable<ArmedState> State = new Bindable<ArmedState>();
 
-        public BindableBool HasFailed = new BindableBool();
+        protected bool HasFailed;
 
         protected DrawableHitObject(HitObject hitObject)
         {
@@ -160,6 +164,9 @@ namespace osu.Game.Rulesets.Objects.Drawables
         {
             base.Update();
 
+            if (HasFailed)
+                return;
+
             if (Result != null && Result.HasResult)
             {
                 var endTime = (HitObject as IHasEndTime)?.EndTime ?? HitObject.StartTime;
@@ -200,7 +207,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
         /// <param name="application">The callback that applies changes to the <see cref="JudgementResult"/>.</param>
         protected void ApplyResult(Action<JudgementResult> application)
         {
-            if (HasFailed.Value)
+            if (HasFailed)
                 return;
 
             application?.Invoke(Result);
@@ -274,7 +281,20 @@ namespace osu.Game.Rulesets.Objects.Drawables
         /// </summary>
         public virtual void Fail()
         {
-            HasFailed.Value = true;
+            this.FadeOut(FailAnimation.FAIL_DURATION / 2, Easing.OutQuad);
+
+            if (HasFailed)
+                return;
+
+            foreach (var nestedHitObject in NestedHitObjects)
+                nestedHitObject.Fail();
+
+            this.FlashColour(Color4.Red, 500);
+            this.RotateTo(RNG.NextSingle(-90, 90), FailAnimation.FAIL_DURATION);
+            this.ScaleTo(Scale * 0.5f, FailAnimation.FAIL_DURATION);
+            this.MoveToOffset(new Vector2(0, 400), FailAnimation.FAIL_DURATION);
+
+            HasFailed = true;
         }
 
         /// <summary>

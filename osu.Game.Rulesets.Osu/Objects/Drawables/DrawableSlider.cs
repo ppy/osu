@@ -136,7 +136,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         {
             base.Update();
 
-            if (HasFailed.Value)
+            if (HasFailed)
                 return;
 
             Tracking.Value = Ball.Tracking;
@@ -194,9 +194,6 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
         protected override void UpdateCurrentState(ArmedState state)
         {
-            if (HasFailed.Value)
-                return;
-
             Ball.FadeIn();
             Ball.ScaleTo(HitObject.Scale);
 
@@ -229,14 +226,13 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         /// </summary>
         public override void Fail()
         {
-            if (HasFailed.Value)
+            if (HasFailed)
                 return;
 
-            HeadCircle.Fail();
-            TailCircle.Fail();
             Body.Fail();
             Ball.Fail();
 
+            HasFailed = true;
             base.Fail();
         }
     }

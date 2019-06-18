@@ -25,8 +25,6 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
 
         public Func<OsuAction?> GetInitialHitAction;
 
-        public readonly BindableBool HasFailed = new BindableBool();
-
         /// <summary>
         /// The colour that is used for the slider ball.
         /// </summary>
@@ -220,13 +218,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
 
         public void Fail()
         {
-            if (HasFailed.Value)
-                return;
-
             this.ScaleTo(Scale * 0.5f, FailAnimation.FAIL_DURATION);
             this.MoveToOffset(new Vector2(0, 400), FailAnimation.FAIL_DURATION);
-
-            HasFailed.Value = true;
         }
     }
 }

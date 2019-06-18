@@ -11,8 +11,6 @@ using osu.Game.Rulesets.Osu.Objects.Drawables.Pieces;
 using osuTK;
 using osu.Game.Rulesets.Scoring;
 using osuTK.Graphics;
-using osu.Game.Screens.Play;
-using osu.Framework.MathUtils;
 
 namespace osu.Game.Rulesets.Osu.Objects.Drawables
 {
@@ -117,7 +115,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
         protected override void CheckForResult(bool userTriggered, double timeOffset)
         {
-            if (!userTriggered || HasFailed.Value)
+            if (!userTriggered)
             {
                 if (!HitObject.HitWindows.CanBeHit(timeOffset))
                     ApplyResult(r => r.Type = HitResult.Miss);
@@ -195,20 +193,5 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         }
 
         public Drawable ProxiedLayer => ApproachCircle;
-
-        /// <summary>
-        /// Applies the failing animation on this <see cref="DrawableHitCircle"/>.
-        /// </summary>
-        public override void Fail()
-        {
-            if (HasFailed.Value)
-                return;
-
-            this.RotateTo(RNG.NextSingle(-90, 90), FailAnimation.FAIL_DURATION);
-            this.ScaleTo(Scale * 0.5f, FailAnimation.FAIL_DURATION);
-            this.MoveToOffset(new Vector2(0, 400), FailAnimation.FAIL_DURATION);
-
-            base.Fail();
-        }
     }
 }

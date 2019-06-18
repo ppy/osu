@@ -40,7 +40,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             double completionProgress = MathHelper.Clamp((Time.Current - slider.StartTime) / slider.Duration, 0, 1);
 
             //todo: we probably want to reconsider this before adding scoring, but it looks and feels nice.
-            if (!IsHit && !HasFailed.Value)
+            if (!IsHit && !HasFailed)
                 Position = slider.CurvePositionAt(completionProgress);
         }
 
@@ -50,7 +50,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
         private void updatePosition()
         {
-            if (!HasFailed.Value)
+            if (!HasFailed)
                 Position = HitObject.Position - slider.Position;
         }
     }
