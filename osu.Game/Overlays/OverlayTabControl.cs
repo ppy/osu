@@ -43,7 +43,7 @@ namespace osu.Game.Overlays
             set => TabContainer.Padding = value;
         }
 
-        public OverlayTabControl()
+        protected OverlayTabControl()
         {
             TabContainer.Masking = false;
             TabContainer.Spacing = new Vector2(15, 0);
