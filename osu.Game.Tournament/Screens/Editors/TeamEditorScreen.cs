@@ -102,7 +102,7 @@ namespace osu.Game.Tournament.Screens.Editors
                                 Width = 0.11f,
                                 Margin = new MarginPadding(10),
                                 Text = "Add player",
-                                Action = () => playerEditor.AddUser()
+                                Action = () => playerEditor.CreateNew()
                             },
                             new DangerousSettingsButton
                             {
@@ -167,7 +167,7 @@ namespace osu.Game.Tournament.Screens.Editors
                     };
                 }
 
-                public void AddUser()
+                public void CreateNew()
                 {
                     var user = new User();
                     team.Players.Add(user);
