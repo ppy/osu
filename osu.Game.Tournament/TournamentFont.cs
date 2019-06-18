@@ -67,4 +67,9 @@ namespace osu.Game.Tournament
             return weightString;
         }
     }
+
+    public enum TournamentTypeface
+    {
+        Aquatico
+    }
 }
