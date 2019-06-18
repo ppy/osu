@@ -9,11 +9,10 @@ using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input;
 using osu.Framework.Input.Events;
 using osu.Game.Rulesets.Objects.Types;
-using osuTK.Graphics;
 using osu.Game.Skinning;
-using osuTK;
-using osu.Framework.Bindables;
 using osu.Game.Screens.Play;
+using osuTK;
+using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
 {
