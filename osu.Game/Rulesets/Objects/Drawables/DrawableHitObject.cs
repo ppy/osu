@@ -282,11 +282,11 @@ namespace osu.Game.Rulesets.Objects.Drawables
         {
             this.FadeOut(FailAnimation.FAIL_DURATION / 2, Easing.OutQuad);
 
-            if (HasFailed)
-                return;
-
             foreach (var nestedHitObject in NestedHitObjects)
                 nestedHitObject.Fail();
+
+            if (HasFailed)
+                return;
 
             this.FlashColour(Color4.Red, 500);
             this.RotateTo(RNG.NextSingle(-90, 90), FailAnimation.FAIL_DURATION);
