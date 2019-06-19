@@ -94,16 +94,7 @@ namespace osu.Game.Database
                 }, TaskCreationOptions.LongRunning);
             };
 
-            request.Failure += error =>
-            {
-                DownloadFailed?.Invoke(request);
-
-                if (error is OperationCanceledException) return;
-
-                notification.State = ProgressNotificationState.Cancelled;
-                Logger.Error(error, $"{HumanisedModelName.Titleize()} download failed!");
-                currentDownloads.Remove(request);
-            };
+            request.Failure += error => handleRequestFailure(request, notification, error);
 
             notification.CancelRequested += () =>
             {
@@ -122,12 +113,25 @@ namespace osu.Game.Database
                 {
                     request.Perform(api);
                 }
-                catch
+                catch (Exception e)
                 {
+                    // 404s (and maybe other failures) don't fire request.Failure so for now they handled here as well
+                    handleRequestFailure(request, notification, e);
                 }
             }, TaskCreationOptions.LongRunning);
 
             DownloadBegan?.Invoke(request);
+        }
+
+        private void handleRequestFailure(ArchiveDownloadRequest<TModel> req, ProgressNotification notification, Exception e)
+        {
+            DownloadFailed?.Invoke(req);
+
+            if (e is OperationCanceledException) return;
+
+            notification.State = ProgressNotificationState.Cancelled;
+            Logger.Error(e, $"{HumanisedModelName.Titleize()} download failed!");
+            currentDownloads.Remove(req);
         }
 
         private class DownloadNotification : ProgressNotification
