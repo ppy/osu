@@ -22,7 +22,9 @@ namespace osu.Game.Scoring
 
         protected override string[] HashableFileTypes => new[] { ".osr" };
 
-        protected override string ImportFromStablePath => "Replays";
+        protected override string ImportFromStablePath => @"Data\r";
+
+        protected override bool StableDirectoryBased => false;
 
         private readonly RulesetStore rulesets;
         private readonly Func<BeatmapManager> beatmaps;
@@ -36,10 +38,12 @@ namespace osu.Game.Scoring
 
         protected override ScoreInfo CreateModel(ArchiveReader archive)
         {
-            if (archive == null)
+            string filename = archive?.Filenames.FirstOrDefault(f => f.EndsWith(".osr"));
+
+            if (filename == null)
                 return null;
 
-            using (var stream = archive.GetStream(archive.Filenames.First(f => f.EndsWith(".osr"))))
+            using (var stream = archive.GetStream(filename))
             {
                 try
                 {

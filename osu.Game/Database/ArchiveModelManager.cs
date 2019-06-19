@@ -1,4 +1,4 @@
-﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
@@ -547,6 +547,11 @@ namespace osu.Game.Database
         protected virtual string ImportFromStablePath => null;
 
         /// <summary>
+        /// Does stable import look for directories rather than files
+        /// </summary>
+        protected abstract bool StableDirectoryBased { get; }
+
+        /// <summary>
         /// This is a temporary method and will likely be replaced by a full-fledged (and more correctly placed) migration process in the future.
         /// </summary>
         public Task ImportFromStableAsync()
@@ -566,7 +571,11 @@ namespace osu.Game.Database
                 return Task.CompletedTask;
             }
 
-            return Task.Run(async () => await Import(stable.GetDirectories(ImportFromStablePath).Select(f => stable.GetFullPath(f)).ToArray()));
+            return Task.Run(async () =>
+            {
+                var paths = StableDirectoryBased ? stable.GetDirectories(ImportFromStablePath) : stable.GetFiles(ImportFromStablePath);
+                await Import(paths.Select(f => stable.GetFullPath(f)).ToArray());
+            });
         }
 
         #endregion
