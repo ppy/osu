@@ -26,7 +26,7 @@ namespace osu.Game.Overlays.BeatmapSet
 
                 beatmapSet = value;
 
-                bool unavailable = BeatmapSet?.OnlineInfo.Availability != null;
+                bool unavailable = (BeatmapSet?.OnlineInfo.Availability?.DownloadDisabled ?? false) || (BeatmapSet?.OnlineInfo.Availability?.ExternalLink != null);
                 this.FadeTo(unavailable ? 1 : 0);
 
                 linkContainer.Clear();
@@ -56,23 +56,22 @@ namespace osu.Game.Overlays.BeatmapSet
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
                     Direction = FillDirection.Vertical,
-                    Margin = new MarginPadding { Top = 10, Left = 5, Right = 20 },
+                    Padding = new MarginPadding(10),
                     Children = new Drawable[]
                     {
-                        textContainer = new TextFlowContainer(t => { t.Font = OsuFont.GetFont(size: 20, weight: FontWeight.Medium); t.Margin = new MarginPadding { Horizontal = 5 }; })
+                        textContainer = new TextFlowContainer(t => t.Font = OsuFont.GetFont(size: 20, weight: FontWeight.Medium))
                         {
                             Direction = FillDirection.Full,
                             RelativeSizeAxes = Axes.X,
                             AutoSizeAxes = Axes.Y,
-                            Margin = new MarginPadding { Bottom = 10 },
                             Colour = Color4.Orange,
                         },
-                        linkContainer = new LinkFlowContainer(t => { t.Font = OsuFont.GetFont(size: 14); t.Margin = new MarginPadding { Horizontal = 5 }; })
+                        linkContainer = new LinkFlowContainer(t => t.Font = OsuFont.GetFont(size: 14))
                         {
                             Direction = FillDirection.Full,
                             RelativeSizeAxes = Axes.X,
                             AutoSizeAxes = Axes.Y,
-                            Margin = new MarginPadding { Bottom = 10 },
+                            Padding = new MarginPadding { Top = 10 },
                         },
                     },
                 },

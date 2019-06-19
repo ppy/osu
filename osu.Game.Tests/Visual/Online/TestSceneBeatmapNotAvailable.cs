@@ -1,51 +1,97 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using NUnit.Framework;
 using osu.Game.Beatmaps;
 using osu.Game.Overlays.BeatmapSet;
 
 namespace osu.Game.Tests.Visual.Online
 {
+    [TestFixture]
     public class TestSceneBeatmapNotAvailable : OsuTestScene
     {
+        BeatmapNotAvailable container;
+
         public TestSceneBeatmapNotAvailable()
         {
-            var container = new BeatmapNotAvailable();
+            Add(container = new BeatmapNotAvailable());
+        }
 
-            Add(container);
-
-            AddStep("set undownloadable beatmapset", () => container.BeatmapSet = new BeatmapSetInfo
+        [Test]
+        public void TestUndownloadableWithLink()
+        {
+            AddStep("set undownloadable beatmapset with link", () => container.BeatmapSet = new BeatmapSetInfo
             {
                 OnlineInfo = new BeatmapSetOnlineInfo
                 {
                     Availability = new BeatmapSetOnlineAvailability
                     {
                         DownloadDisabled = true,
-                        ExternalLink = @"https://gist.githubusercontent.com/peppy/99e6959772083cdfde8a/raw",
+                        ExternalLink = @"https://osu.ppy.sh",
                     },
                 },
             });
 
-            AddAssert("is container visible", () => container.Alpha == 1);
-            AddStep("set downloadable beatmapset", () => container.BeatmapSet = new BeatmapSetInfo
+            visiblityAssert(true);
+        }
+
+        [Test]
+        public void TestUndownloadableNoLink()
+        {
+            AddStep("set undownloadable beatmapset without link", () => container.BeatmapSet = new BeatmapSetInfo
+            {
+                OnlineInfo = new BeatmapSetOnlineInfo
+                {
+                    Availability = new BeatmapSetOnlineAvailability
+                    {
+                        DownloadDisabled = true,
+                    },
+                },
+            });
+
+            visiblityAssert(true);
+        }
+
+
+
+        [Test]
+        public void TestPartsRemovedWithLink()
+        {
+            AddStep("set parts-removed beatmapset with link", () => container.BeatmapSet = new BeatmapSetInfo
             {
                 OnlineInfo = new BeatmapSetOnlineInfo
                 {
                     Availability = new BeatmapSetOnlineAvailability
                     {
                         DownloadDisabled = false,
-                        ExternalLink = @"https://gist.githubusercontent.com/peppy/99e6959772083cdfde8a/raw",
+                        ExternalLink = @"https://osu.ppy.sh",
                     },
                 },
             });
 
-            AddAssert("is container still visible", () => container.Alpha == 1);
+            visiblityAssert(true);
+        }
+
+        [Test]
+        public void TestNormal()
+        {
             AddStep("set normal beatmapset", () => container.BeatmapSet = new BeatmapSetInfo
             {
-                OnlineInfo = new BeatmapSetOnlineInfo(),
+                OnlineInfo = new BeatmapSetOnlineInfo
+                {
+                    Availability = new BeatmapSetOnlineAvailability
+                    {
+                        DownloadDisabled = false,
+                    },
+                },
             });
 
-            AddAssert("is container hidden", () => container.Alpha == 0);
+            visiblityAssert(false);
+        }
+
+        private void visiblityAssert(bool shown)
+        {
+            AddAssert($"is container {(shown ? "visible" : "hidden")}", () => container.Alpha == (shown ? 1 : 0));
         }
     }
 }

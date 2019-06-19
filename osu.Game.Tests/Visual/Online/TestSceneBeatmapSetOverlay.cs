@@ -565,7 +565,7 @@ namespace osu.Game.Tests.Visual.Online
 
             downloadAssert(true);
 
-            AddStep(@"show undownloadable", () =>
+            AddStep(@"show undownloadable (no link)", () =>
             {
                 overlay.ShowBeatmapSet(new BeatmapSetInfo
                 {
@@ -586,7 +586,6 @@ namespace osu.Game.Tests.Visual.Online
                         Availability = new BeatmapSetOnlineAvailability
                         {
                             DownloadDisabled = true,
-                            ExternalLink = @"https://gist.githubusercontent.com/peppy/99e6959772083cdfde8a/raw",
                         },
                         Preview = @"https://b.ppy.sh/preview/53853.mp3",
                         PlayCount = 436213,
