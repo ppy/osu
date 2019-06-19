@@ -64,9 +64,8 @@ namespace osu.Game.Tests.Visual.Online
                 OnlineBeatmapSetID = 1,
                 Metadata = new BeatmapMetadata
                 {
-                    // Create random metadata, then we can check if sorting works based on these
-                    Artist = $"peppy",
-                    Title = $"test set!",
+                    Artist = "peppy",
+                    Title = "test set!",
                     AuthorString = "peppy",
                 },
                 OnlineInfo = new BeatmapSetOnlineInfo { Covers = new BeatmapSetOnlineCovers { Cover = "" }, },
