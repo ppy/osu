@@ -14,7 +14,6 @@ namespace osu.Game.Tests.Visual.Online
 
             Add(container);
 
-            AddAssert("is container hidden", () => container.Alpha == 0);
             AddStep("set undownloadable beatmapset", () => container.BeatmapSet = new BeatmapSetInfo
             {
                 OnlineInfo = new BeatmapSetOnlineInfo
