@@ -135,7 +135,11 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                     Spacing = new Vector2(5, 0),
                     Children = new Drawable[]
                     {
-                        new UpdateableFlag(score.User.Country) { Size = new Vector2(20, 13) },
+                        new UpdateableFlag(score.User.Country)
+                        {
+                            Size = new Vector2(20, 13),
+                            ShowPlaceholderOnNull = false,
+                        },
                         username
                     }
                 },

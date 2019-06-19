@@ -14,14 +14,25 @@ namespace osu.Game.Users.Drawables
             set => Model = value;
         }
 
+        /// <summary>
+        /// Whether to show a place holder on null country.
+        /// </summary>
+        public bool ShowPlaceholderOnNull = true;
+
         public UpdateableFlag(Country country = null)
         {
             Country = country;
         }
 
-        protected override Drawable CreateDrawable(Country country) => new DrawableFlag(country)
+        protected override Drawable CreateDrawable(Country country)
         {
-            RelativeSizeAxes = Axes.Both,
-        };
+            if (country == null && !ShowPlaceholderOnNull)
+                return null;
+
+            return new DrawableFlag(country)
+            {
+                RelativeSizeAxes = Axes.Both,
+            };
+        }
     }
 }

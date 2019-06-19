@@ -60,6 +60,7 @@ namespace osu.Game.Overlays.Profile.Header
                             Masking = true,
                             CornerRadius = avatar_size * 0.25f,
                             OpenOnClick = { Value = false },
+                            ShowGuestOnNull = false,
                         },
                         new Container
                         {
@@ -118,7 +119,8 @@ namespace osu.Game.Overlays.Profile.Header
                                             {
                                                 userFlag = new UpdateableFlag
                                                 {
-                                                    Size = new Vector2(30, 20)
+                                                    Size = new Vector2(30, 20),
+                                                    ShowPlaceholderOnNull = false,
                                                 },
                                                 userCountryText = new OsuSpriteText
                                                 {
