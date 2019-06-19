@@ -10,7 +10,7 @@ namespace osu.Game.Tests.Visual.Online
     [TestFixture]
     public class TestSceneBeatmapNotAvailable : OsuTestScene
     {
-        BeatmapNotAvailable container;
+        private readonly BeatmapNotAvailable container;
 
         public TestSceneBeatmapNotAvailable()
         {
