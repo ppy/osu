@@ -3,7 +3,6 @@
 
 using NUnit.Framework;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
 using osu.Framework.Timing;
 using osu.Game.Overlays;
 
@@ -23,9 +22,9 @@ namespace osu.Game.Tests.Visual.UserInterface
             };
             Add(mc);
 
-            AddToggleStep(@"toggle visibility", state => mc.State.Value = state ? Visibility.Visible : Visibility.Hidden);
             AddStep(@"show", () => mc.Show());
             AddToggleStep(@"toggle beatmap lock", state => Beatmap.Disabled = state);
+            AddStep(@"show", () => mc.Hide());
         }
     }
 }
