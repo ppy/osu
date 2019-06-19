@@ -27,7 +27,11 @@ namespace osu.Game.Overlays.BeatmapSet
 
                 beatmapSet = value;
 
-                updateText();
+                var unavailable = availability != null;
+                this.FadeTo(unavailable ? 1 : 0);
+
+                if (unavailable)
+                    updateText();
             }
         }
 
@@ -79,9 +83,6 @@ namespace osu.Game.Overlays.BeatmapSet
 
         private void updateText()
         {
-            if (availability == null)
-                return;
-
             text.Text = availability.DownloadDisabled
                 ? "This beatmap is currently not available for download."
                 : "Portions of this beatmap have been removed at the request of the creator or a third-party rights holder.";
