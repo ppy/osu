@@ -190,7 +190,7 @@ namespace osu.Game.Screens.Select.Carousel
             private readonly BindableBool filtered = new BindableBool();
 
             public FilterableDifficultyIcon(CarouselBeatmap item)
-                : base(item.Beatmap)
+                : base(item.Beatmap, shouldShowTooltip: true)
             {
                 filtered.BindTo(item.Filtered);
                 filtered.ValueChanged += isFiltered => Schedule(() => this.FadeTo(isFiltered.NewValue ? 0.1f : 1, 100));
