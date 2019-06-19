@@ -3,8 +3,6 @@
 
 using osu.Framework.Allocation;
 using osu.Framework.Extensions;
-using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
 using osu.Game.Scoring;
@@ -12,28 +10,6 @@ using System;
 
 namespace osu.Game.Online.Leaderboards
 {
-    public class UpdateableRank : ModelBackedDrawable<ScoreRank>
-    {
-        public ScoreRank Rank
-        {
-            get => Model;
-            set => Model = value;
-        }
-
-        public UpdateableRank(ScoreRank rank)
-        {
-            Rank = rank;
-        }
-
-        protected override Drawable CreateDrawable(ScoreRank rank) => new DrawableRank(rank)
-        {
-            RelativeSizeAxes = Axes.Both,
-            Anchor = Anchor.Centre,
-            Origin = Anchor.Centre,
-            FillMode = FillMode.Fit,
-        };
-    }
-
     public class DrawableRank : Sprite
     {
         private readonly ScoreRank rank;
