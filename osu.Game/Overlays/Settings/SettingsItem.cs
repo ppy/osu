@@ -63,6 +63,9 @@ namespace osu.Game.Overlays.Settings
 
             set
             {
+                if (bindable != null)
+                    controlWithCurrent?.Current.UnbindFrom(bindable);
+
                 bindable = value;
                 controlWithCurrent?.Current.BindTo(bindable);
 

@@ -78,6 +78,9 @@ namespace osu.Game.Users
         [JsonProperty(@"is_active")]
         public bool Active;
 
+        [JsonProperty(@"is_online")]
+        public bool IsOnline;
+
         [JsonProperty(@"pm_friends_only")]
         public bool PMFriendsOnly;
 
