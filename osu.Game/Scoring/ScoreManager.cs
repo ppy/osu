@@ -38,12 +38,10 @@ namespace osu.Game.Scoring
 
         protected override ScoreInfo CreateModel(ArchiveReader archive)
         {
-            string filename = archive?.Filenames.FirstOrDefault(f => f.EndsWith(".osr"));
-
-            if (filename == null)
+            if (archive == null)
                 return null;
 
-            using (var stream = archive.GetStream(filename))
+            using (var stream = archive.GetStream(archive.Filenames.FirstOrDefault(f => f.EndsWith(".osr"))))
             {
                 try
                 {
