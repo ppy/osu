@@ -160,7 +160,8 @@ namespace osu.Game.Database
 
                     lock (imported)
                     {
-                        imported.Add(model);
+                        if (model != null)
+                            imported.Add(model);
                         current++;
 
                         notification.Text = $"Imported {current} of {paths.Length} {HumanisedModelName}s";
@@ -243,7 +244,7 @@ namespace osu.Game.Database
         /// </summary>
         /// <param name="archive">The archive to be imported.</param>
         /// <param name="cancellationToken">An optional cancellation token.</param>
-        public Task<TModel> Import(ArchiveReader archive, CancellationToken cancellationToken = default)
+        public async Task<TModel> Import(ArchiveReader archive, CancellationToken cancellationToken = default)
         {
             cancellationToken.ThrowIfCancellationRequested();
 
@@ -267,7 +268,7 @@ namespace osu.Game.Database
                 return null;
             }
 
-            return Import(model, archive, cancellationToken);
+            return await Import(model, archive, cancellationToken);
         }
 
         /// <summary>
