@@ -22,16 +22,12 @@ namespace osu.Game.Overlays.BeatmapSet
             get => beatmapSet;
             set
             {
-                if (value == beatmapSet) return;
+                if (value == beatmapSet)
+                    return;
 
                 beatmapSet = value;
 
-                link?.Clear();
-
-                if (beatmapSet?.OnlineInfo.Availability != null)
-                    Show();
-                else
-                    Hide();
+                updateText();
             }
         }
 
@@ -81,16 +77,17 @@ namespace osu.Game.Overlays.BeatmapSet
             };
         }
 
-        public override void Show()
+        private void updateText()
         {
+            if (availability == null)
+                return;
+
             text.Text = availability.DownloadDisabled
                 ? "This beatmap is currently not available for download."
                 : "Portions of this beatmap have been removed at the request of the creator or a third-party rights holder.";
 
             if (!string.IsNullOrEmpty(availability.ExternalLink))
                 link.AddLink("Check here for more information.", availability.ExternalLink);
-
-            base.Show();
         }
     }
 }

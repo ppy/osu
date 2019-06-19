@@ -242,6 +242,8 @@ namespace osu.Game.Tests.Visual.Online
                 }, false);
             });
 
+            downloadAssert(true);
+
             AddStep(@"show second", () =>
             {
                 overlay.ShowBeatmapSet(new BeatmapSetInfo
@@ -408,6 +410,8 @@ namespace osu.Game.Tests.Visual.Online
                     },
                 }, false);
             });
+
+            downloadAssert(true);
         }
 
         [Test]
@@ -559,6 +563,8 @@ namespace osu.Game.Tests.Visual.Online
                 }, false);
             });
 
+            downloadAssert(true);
+
             AddStep(@"show undownloadable", () =>
             {
                 overlay.ShowBeatmapSet(new BeatmapSetInfo
@@ -705,7 +711,12 @@ namespace osu.Game.Tests.Visual.Online
                 }, false);
             });
 
-            AddAssert(@"is download button removed", () => overlay.Header.DownloadButtonsContainer.Any());
+            downloadAssert(false);
+        }
+
+        private void downloadAssert(bool shown)
+        {
+            AddAssert($"is download button {(shown ? "shown" : "hidden")}", () => overlay.Header.DownloadButtonsContainer.Any() == shown);
         }
 
         [Test]
