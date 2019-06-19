@@ -152,6 +152,7 @@ namespace osu.Game.Overlays.Profile.Header
 
         private void updateUser(User user)
         {
+            avatar.ClearUser();
             avatar.User = user;
             usernameText.Text = user?.Username ?? string.Empty;
             openUserExternally.Link = $@"https://osu.ppy.sh/users/{user?.Id ?? 0}";
