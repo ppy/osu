@@ -146,11 +146,12 @@ namespace osu.Game.Database
             notification.Progress = 0;
             notification.Text = "Import is initialising...";
 
+            string[] filteredPaths = paths.Where(canImportPath).ToArray();
             int current = 0;
 
             var imported = new List<TModel>();
 
-            await Task.WhenAll(paths.Where(canImportPath).Select(async path =>
+            await Task.WhenAll(filteredPaths.Select(async path =>
             {
                 notification.CancellationToken.ThrowIfCancellationRequested();
 
@@ -163,8 +164,8 @@ namespace osu.Game.Database
                         imported.Add(model);
                         current++;
 
-                        notification.Text = $"Imported {current} of {paths.Length} {HumanisedModelName}s";
-                        notification.Progress = (float)current / paths.Length;
+                        notification.Text = $"Imported {current} of {filteredPaths.Length} {HumanisedModelName}s";
+                        notification.Progress = (float)current / filteredPaths.Length;
                     }
                 }
                 catch (TaskCanceledException)
