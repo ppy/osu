@@ -61,7 +61,6 @@ namespace osu.Game.Overlays.BeatmapSet
                     {
                         textContainer = new TextFlowContainer(t => t.Font = OsuFont.GetFont(size: 20, weight: FontWeight.Medium))
                         {
-
                             Direction = FillDirection.Full,
                             RelativeSizeAxes = Axes.X,
                             AutoSizeAxes = Axes.Y,
