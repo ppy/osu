@@ -150,7 +150,7 @@ namespace osu.Game.Database
 
             var imported = new List<TModel>();
 
-            await Task.WhenAll(paths.Select(async path =>
+            await Task.WhenAll(paths.Where(canImportPath).Select(async path =>
             {
                 notification.CancellationToken.ThrowIfCancellationRequested();
 
@@ -160,8 +160,7 @@ namespace osu.Game.Database
 
                     lock (imported)
                     {
-                        if (model != null)
-                            imported.Add(model);
+                        imported.Add(model);
                         current++;
 
                         notification.Text = $"Imported {current} of {paths.Length} {HumanisedModelName}s";
@@ -201,6 +200,8 @@ namespace osu.Game.Database
 
                 notification.State = ProgressNotificationState.Completed;
             }
+
+            bool canImportPath(string path) => StableDirectoryBased || HandledExtensions.Any(ext => Path.GetExtension(path)?.ToLowerInvariant() == ext);
         }
 
         /// <summary>
