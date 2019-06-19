@@ -62,6 +62,8 @@ namespace osu.Game.Beatmaps
 
         protected override string ImportFromStablePath => "Songs";
 
+        protected override bool StableDirectoryBased => true;
+
         private readonly RulesetStore rulesets;
 
         private readonly BeatmapStore beatmaps;
