@@ -59,20 +59,20 @@ namespace osu.Game.Overlays.BeatmapSet
                     Margin = new MarginPadding { Top = 10, Left = 5, Right = 20 },
                     Children = new Drawable[]
                     {
-                        textContainer = new TextFlowContainer(t => t.Font = OsuFont.GetFont(size: 20, weight: FontWeight.Medium))
+                        textContainer = new TextFlowContainer(t => { t.Font = OsuFont.GetFont(size: 20, weight: FontWeight.Medium); t.Margin = new MarginPadding { Horizontal = 5 }; })
                         {
                             Direction = FillDirection.Full,
                             RelativeSizeAxes = Axes.X,
                             AutoSizeAxes = Axes.Y,
-                            Margin = new MarginPadding { Bottom = 10, Horizontal = 5 },
+                            Margin = new MarginPadding { Bottom = 10 },
                             Colour = Color4.Orange,
                         },
-                        linkContainer = new LinkFlowContainer(t => t.Font = OsuFont.GetFont(size: 14))
+                        linkContainer = new LinkFlowContainer(t => { t.Font = OsuFont.GetFont(size: 14); t.Margin = new MarginPadding { Horizontal = 5 }; })
                         {
                             Direction = FillDirection.Full,
                             RelativeSizeAxes = Axes.X,
                             AutoSizeAxes = Axes.Y,
-                            Margin = new MarginPadding { Bottom = 10, Horizontal = 5 },
+                            Margin = new MarginPadding { Bottom = 10 },
                         },
                     },
                 },
