@@ -1,21 +1,16 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using osu.Framework.Allocation;
 using osu.Framework.Graphics.UserInterface;
-using osu.Game.Graphics;
 
 namespace osu.Game.Overlays
 {
     public class OverlayHeaderTabControl : OverlayTabControl<string>
     {
-        protected override TabItem<string> CreateTabItem(string value) => new OverlayHeaderTabItem(value);
-
-        [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
+        protected override TabItem<string> CreateTabItem(string value) => new OverlayHeaderTabItem(value)
         {
-            AccentColour = colours.Seafoam;
-        }
+            AccentColour = AccentColour,
+        };
 
         private class OverlayHeaderTabItem : OverlayTabItem<string>
         {

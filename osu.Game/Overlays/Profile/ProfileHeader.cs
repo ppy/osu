@@ -34,6 +34,12 @@ namespace osu.Game.Overlays.Profile
             centreHeaderContainer.DetailsVisible.BindValueChanged(visible => detailHeaderContainer.Expanded = visible.NewValue, true);
         }
 
+        [BackgroundDependencyLoader]
+        private void load(OsuColour colours)
+        {
+            TabControl.AccentColour = colours.Seafoam;
+        }
+
         protected override Drawable CreateBackground() =>
             new Container
             {
