@@ -67,6 +67,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                             Offset = new Vector2(0, 2),
                             Radius = 1,
                         },
+                        ShowGuestOnNull = false,
                     },
                     new FillFlowContainer
                     {
@@ -94,6 +95,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                                 Anchor = Anchor.CentreLeft,
                                 Origin = Anchor.CentreLeft,
                                 Size = new Vector2(20, 13),
+                                ShowPlaceholderOnNull = false,
                             },
                         }
                     }
