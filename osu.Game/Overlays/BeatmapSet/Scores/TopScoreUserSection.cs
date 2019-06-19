@@ -114,6 +114,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
         {
             set
             {
+                avatar.ClearUser();
                 avatar.User = value.User;
                 flag.Country = value.User.Country;
                 date.Text = $@"achieved {value.Date.Humanize()}";

@@ -47,6 +47,15 @@ namespace osu.Game.Users
             updateAvatar();
         }
 
+        /// <summary>
+        /// Clears the user instantly
+        /// </summary>
+        public void ClearUser()
+        {
+            user = null;
+            displayedAvatar?.FadeOut().Expire();
+        }
+
         private void updateAvatar()
         {
             displayedAvatar?.FadeOut(300);
