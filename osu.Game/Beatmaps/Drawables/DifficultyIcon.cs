@@ -30,7 +30,7 @@ namespace osu.Game.Beatmaps.Drawables
                 throw new ArgumentNullException(nameof(beatmap));
 
             this.ruleset = ruleset ?? beatmap.Ruleset;
-            TooltipText = shouldShowTooltip ? $"{beatmap.Version}${beatmap.StarDifficulty.ToString("0.##")}" : String.Empty;
+            TooltipText = shouldShowTooltip ? $"{beatmap.Version}${beatmap.StarDifficulty:0.##}" : String.Empty;
 
             Size = new Vector2(20);
         }
