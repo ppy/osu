@@ -220,7 +220,7 @@ namespace osu.Game.Overlays.BeatmapSet
 
             if (BeatmapSet.Value.OnlineInfo.Availability?.DownloadDisabled ?? false)
             {
-                DownloadButtonsContainer.RemoveAll(x => true);
+                DownloadButtonsContainer.Clear();
                 return;
             }
 
@@ -228,7 +228,7 @@ namespace osu.Game.Overlays.BeatmapSet
             {
                 case DownloadState.LocallyAvailable:
                     // temporary for UX until new design is implemented.
-                    DownloadButtonsContainer.Child = new osu.Game.Overlays.Direct.DownloadButton(BeatmapSet.Value)
+                    DownloadButtonsContainer.Child = new Direct.DownloadButton(BeatmapSet.Value)
                     {
                         Width = 50,
                         RelativeSizeAxes = Axes.Y
