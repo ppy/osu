@@ -52,8 +52,6 @@ namespace osu.Game.Tests.Visual.Online
             visiblityAssert(true);
         }
 
-
-
         [Test]
         public void TestPartsRemovedWithLink()
         {
