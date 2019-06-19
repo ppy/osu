@@ -24,11 +24,10 @@ using osuTK.Graphics;
 namespace osu.Game.Tests.Visual.UserInterface
 {
     [Description("mod select and icon display")]
-    public class TestSceneMods : OsuTestScene
+    public class TestSceneModSelectOverlay : OsuTestScene
     {
         public override IReadOnlyList<Type> RequiredTypes => new[]
         {
-            typeof(ModSelectOverlay),
             typeof(ModDisplay),
             typeof(ModSection),
             typeof(ModIcon),
