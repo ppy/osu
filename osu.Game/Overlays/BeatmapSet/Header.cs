@@ -45,7 +45,7 @@ namespace osu.Game.Overlays.BeatmapSet
             ExternalLinkButton externalLink;
 
             RelativeSizeAxes = Axes.X;
-            AutoSizeAxes = Axes.Y;
+            Height = 400;
             Masking = true;
 
             EdgeEffect = new EdgeEffectParameters
@@ -72,8 +72,7 @@ namespace osu.Game.Overlays.BeatmapSet
                 },
                 new Container
                 {
-                    RelativeSizeAxes = Axes.X,
-                    AutoSizeAxes = Axes.Y,
+                    RelativeSizeAxes = Axes.Both,
                     Padding = new MarginPadding { Top = tabs_height },
                     Children = new Drawable[]
                     {
@@ -95,26 +94,18 @@ namespace osu.Game.Overlays.BeatmapSet
                         },
                         new Container
                         {
-                            RelativeSizeAxes = Axes.X,
-                            AutoSizeAxes = Axes.Y,
-                            Padding = new MarginPadding
-                            {
-                                Top = 20,
-                                Bottom = 30,
-                                Left = BeatmapSetOverlay.X_PADDING,
-                                Right = BeatmapSetOverlay.RIGHT_WIDTH + BeatmapSetOverlay.X_PADDING,
-                            },
+                            RelativeSizeAxes = Axes.Both,
+                            Padding = new MarginPadding { Top = 20, Bottom = 30, Horizontal = BeatmapSetOverlay.X_PADDING },
                             Child = new FillFlowContainer
                             {
-                                RelativeSizeAxes = Axes.X,
-                                AutoSizeAxes = Axes.Y,
+                                RelativeSizeAxes = Axes.Both,
                                 Direction = FillDirection.Vertical,
                                 Children = new Drawable[]
                                 {
                                     new Container
                                     {
                                         RelativeSizeAxes = Axes.X,
-                                        AutoSizeAxes = Axes.Y,
+                                        Height = 113,
                                         Child = Picker = new BeatmapPicker(),
                                     },
                                     new FillFlowContainer
@@ -167,7 +158,7 @@ namespace osu.Game.Overlays.BeatmapSet
                             Anchor = Anchor.BottomRight,
                             Origin = Anchor.BottomRight,
                             AutoSizeAxes = Axes.Both,
-                            Margin = new MarginPadding { Top = BeatmapSetOverlay.TOP_PADDING, Right = BeatmapSetOverlay.X_PADDING },
+                            Margin = new MarginPadding { Right = BeatmapSetOverlay.X_PADDING },
                             Direction = FillDirection.Vertical,
                             Spacing = new Vector2(10),
                             Children = new Drawable[]
