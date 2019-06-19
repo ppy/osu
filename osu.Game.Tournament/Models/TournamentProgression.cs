@@ -15,17 +15,6 @@ namespace osu.Game.Tournament.Models
         public int SourceID;
         public int TargetID;
 
-        // migration
-        public int Item1
-        {
-            set => SourceID = value;
-        }
-
-        public int Item2
-        {
-            set => TargetID = value;
-        }
-
         public bool Losers;
 
         public TournamentProgression(int sourceID, int targetID, bool losers = false)
