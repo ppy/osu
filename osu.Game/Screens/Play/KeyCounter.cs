@@ -75,9 +75,6 @@ namespace osu.Game.Screens.Play
         [BackgroundDependencyLoader(true)]
         private void load(TextureStore textures, GameplayClock clock)
         {
-            if (clock != null)
-                Clock = clock;
-
             Children = new Drawable[]
             {
                 buttonSprite = new Sprite
