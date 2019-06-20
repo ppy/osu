@@ -94,9 +94,8 @@ namespace osu.Game.Tests.Visual.UserInterface
             AddStep(@"progress #1", sendUploadProgress);
             AddStep(@"progress #2", sendDownloadProgress);
 
-            checkDisplayedCount(3);
-
             checkProgressingCount(2);
+            checkDisplayedCount(3);
         }
 
         [Test]
@@ -114,7 +113,7 @@ namespace osu.Game.Tests.Visual.UserInterface
 
             checkProgressingCount(0);
 
-            checkDisplayedCount(3);
+            checkDisplayedCount(2);
 
             AddStep(@"simple #1", sendHelloNotification);
 
@@ -125,7 +124,7 @@ namespace osu.Game.Tests.Visual.UserInterface
         public void TestSpam()
         {
             setState(Visibility.Visible);
-            AddStep("send barrage", () => sendBarrage());
+            AddRepeatStep("send barrage", sendBarrage, 10);
         }
 
         protected override void Update()
@@ -191,7 +190,7 @@ namespace osu.Game.Tests.Visual.UserInterface
 
         private void checkProgressingCount(int expected) => AddAssert($"progressing count is {expected}", () => progressingNotifications.Count == expected);
 
-        private void sendBarrage(int remaining = 10)
+        private void sendBarrage()
         {
             switch (RNG.Next(0, 4))
             {
@@ -211,9 +210,6 @@ namespace osu.Game.Tests.Visual.UserInterface
                     sendDownloadProgress();
                     break;
             }
-
-            if (remaining > 0)
-                Scheduler.AddDelayed(() => sendBarrage(remaining - 1), 80);
         }
 
         private void sendAmazingNotification()
