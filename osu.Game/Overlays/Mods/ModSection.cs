@@ -50,6 +50,18 @@ namespace osu.Game.Overlays.Mods
 
                 ButtonsContainer.Children = modContainers;
                 buttons = modContainers.OfType<ModButton>().ToArray();
+
+                if (value.Any())
+                {
+                    headerLabel.FadeIn(200);
+                    this.FadeIn(200);
+                }
+                else
+                {
+                    // transition here looks weird as mods instantly disappear.
+                    headerLabel.Hide();
+                    Hide();
+                }
             }
         }
 
