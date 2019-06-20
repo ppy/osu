@@ -36,6 +36,11 @@ namespace osu.Game.Overlays.Mods
 
         private CancellationTokenSource modsLoadCts;
 
+        /// <summary>
+        /// True when all mod icons have completed loading.
+        /// </summary>
+        public bool ModIconsLoaded { get; private set; } = true;
+
         public IEnumerable<Mod> Mods
         {
             set
@@ -52,7 +57,13 @@ namespace osu.Game.Overlays.Mods
                 }).ToArray();
 
                 modsLoadCts?.Cancel();
-                LoadComponentsAsync(modContainers, c => ButtonsContainer.ChildrenEnumerable = c, (modsLoadCts = new CancellationTokenSource()).Token);
+                ModIconsLoaded = false;
+
+                LoadComponentsAsync(modContainers, c =>
+                {
+                    ModIconsLoaded = true;
+                    ButtonsContainer.ChildrenEnumerable = c;
+                }, (modsLoadCts = new CancellationTokenSource()).Token);
 
                 buttons = modContainers.OfType<ModButton>().ToArray();
 
