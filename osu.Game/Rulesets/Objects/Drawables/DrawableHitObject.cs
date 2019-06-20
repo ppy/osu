@@ -92,7 +92,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
 
         public readonly Bindable<ArmedState> State = new Bindable<ArmedState>();
 
-        public readonly BindableBool HasFailed = new BindableBool();
+        protected bool HasFailed;
 
         protected DrawableHitObject(HitObject hitObject)
         {
@@ -204,7 +204,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
         /// <param name="application">The callback that applies changes to the <see cref="JudgementResult"/>.</param>
         protected void ApplyResult(Action<JudgementResult> application)
         {
-            if (HasFailed.Value)
+            if (HasFailed)
                 return;
 
             application?.Invoke(Result);
@@ -297,7 +297,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
         /// </summary>
         public virtual void Fail()
         {
-            if (HasFailed.Value)
+            if (HasFailed)
                 return;
 
             this.RotateTo(RNG.NextSingle(-90, 90), FailAnimation.FAIL_DURATION);
@@ -306,7 +306,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
 
             this.FlashColour(Color4.Red, 500);
             this.FadeOut(FailAnimation.FAIL_DURATION / 2);
-            HasFailed.Value = true;
+            HasFailed = true;
         }
     }
 
