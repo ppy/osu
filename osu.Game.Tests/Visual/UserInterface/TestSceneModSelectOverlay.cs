@@ -232,10 +232,10 @@ namespace osu.Game.Tests.Visual.UserInterface
 
         private void checkSelected(Mod mod)
         {
-            AddAssert($"check {mod.Name} is selected", () =>
+            AddUntilStep($"check {mod.Name} is selected", () =>
             {
                 var button = modSelect.GetModButton(mod);
-                return modSelect.SelectedMods.Value.Single(m => m.Name == mod.Name) != null && button.SelectedMod.GetType() == mod.GetType() && button.Selected;
+                return modSelect.SelectedMods.Value.SingleOrDefault(m => m.Name == mod.Name) != null && button.SelectedMod.GetType() == mod.GetType() && button.Selected;
             });
         }
 
