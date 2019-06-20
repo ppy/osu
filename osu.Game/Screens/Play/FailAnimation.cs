@@ -5,16 +5,11 @@ using osu.Framework.Audio;
 using osu.Framework.Bindables;
 using osu.Game.Rulesets.UI;
 using System;
-using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Audio.Track;
 using osu.Framework.Graphics;
-using osu.Framework.MathUtils;
 using osu.Game.Beatmaps;
-using osu.Game.Rulesets.Objects.Drawables;
-using osuTK;
-using osuTK.Graphics;
 
 namespace osu.Game.Screens.Play
 {
@@ -26,13 +21,13 @@ namespace osu.Game.Screens.Play
     {
         public Action OnComplete;
 
+        public const float FAIL_DURATION = 2500;
+
         private readonly DrawableRuleset drawableRuleset;
 
         private readonly BindableDouble trackFreq = new BindableDouble(1);
 
         private Track track;
-
-        private const float duration = 2500;
 
         private SampleChannel failSample;
 
@@ -56,13 +51,14 @@ namespace osu.Game.Screens.Play
         /// <exception cref="InvalidOperationException">Thrown if started more than once.</exception>
         public void Start()
         {
-            if (started) throw new InvalidOperationException("Animation cannot be started more than once.");
+            if (started)
+                throw new InvalidOperationException("Animation cannot be started more than once.");
 
             started = true;
 
             failSample.Play();
 
-            this.TransformBindableTo(trackFreq, 0, duration).OnComplete(_ =>
+            this.TransformBindableTo(trackFreq, 0, FAIL_DURATION).OnComplete(_ =>
             {
                 OnComplete?.Invoke();
                 Expire();
@@ -70,38 +66,7 @@ namespace osu.Game.Screens.Play
 
             track.AddAdjustment(AdjustableProperty.Frequency, trackFreq);
 
-            applyToPlayfield(drawableRuleset.Playfield);
-            drawableRuleset.Playfield.HitObjectContainer.FlashColour(Color4.Red, 500);
-            drawableRuleset.Playfield.HitObjectContainer.FadeOut(duration / 2);
-        }
-
-        protected override void Update()
-        {
-            base.Update();
-
-            if (!started)
-                return;
-
-            applyToPlayfield(drawableRuleset.Playfield);
-        }
-
-        private readonly List<DrawableHitObject> appliedObjects = new List<DrawableHitObject>();
-
-        private void applyToPlayfield(Playfield playfield)
-        {
-            foreach (var nested in playfield.NestedPlayfields)
-                applyToPlayfield(nested);
-
-            foreach (DrawableHitObject obj in playfield.HitObjectContainer.AliveObjects)
-            {
-                if (appliedObjects.Contains(obj))
-                    continue;
-
-                obj.RotateTo(RNG.NextSingle(-90, 90), duration);
-                obj.ScaleTo(obj.Scale * 0.5f, duration);
-                obj.MoveToOffset(new Vector2(0, 400), duration);
-                appliedObjects.Add(obj);
-            }
+            drawableRuleset.Playfield.Fail();
         }
 
         protected override void Dispose(bool isDisposing)

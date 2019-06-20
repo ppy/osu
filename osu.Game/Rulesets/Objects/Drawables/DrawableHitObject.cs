@@ -9,12 +9,15 @@ using osu.Framework.Bindables;
 using osu.Framework.Extensions.TypeExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Primitives;
+using osu.Framework.MathUtils;
 using osu.Game.Audio;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Scoring;
+using osu.Game.Screens.Play;
 using osu.Game.Skinning;
+using osuTK;
 using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Objects.Drawables
@@ -88,6 +91,8 @@ namespace osu.Game.Rulesets.Objects.Drawables
         public override bool IsPresent => base.IsPresent || (State.Value == ArmedState.Idle && Clock?.CurrentTime >= LifetimeStart);
 
         public readonly Bindable<ArmedState> State = new Bindable<ArmedState>();
+
+        public readonly BindableBool HasFailed = new BindableBool();
 
         protected DrawableHitObject(HitObject hitObject)
         {
@@ -199,6 +204,9 @@ namespace osu.Game.Rulesets.Objects.Drawables
         /// <param name="application">The callback that applies changes to the <see cref="JudgementResult"/>.</param>
         protected void ApplyResult(Action<JudgementResult> application)
         {
+            if (HasFailed.Value)
+                return;
+
             application?.Invoke(Result);
 
             if (!Result.HasResult)
@@ -283,6 +291,23 @@ namespace osu.Game.Rulesets.Objects.Drawables
         /// </summary>
         /// <param name="judgement">The <see cref="Judgement"/> that provides the scoring information.</param>
         protected virtual JudgementResult CreateResult(Judgement judgement) => new JudgementResult(judgement);
+
+        /// <summary>
+        /// Applies the failing animation on this <see cref="DrawableHitObject"/>.
+        /// </summary>
+        public virtual void Fail()
+        {
+            if (HasFailed.Value)
+                return;
+
+            this.RotateTo(RNG.NextSingle(-90, 90), FailAnimation.FAIL_DURATION);
+            this.ScaleTo(Scale * 0.5f, FailAnimation.FAIL_DURATION);
+            this.MoveToOffset(new Vector2(0, 400), FailAnimation.FAIL_DURATION);
+
+            this.FlashColour(Color4.Red, 500);
+            this.FadeOut(FailAnimation.FAIL_DURATION / 2);
+            HasFailed.Value = true;
+        }
     }
 
     public abstract class DrawableHitObject<TObject> : DrawableHitObject

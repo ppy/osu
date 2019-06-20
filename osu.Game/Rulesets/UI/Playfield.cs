@@ -48,6 +48,11 @@ namespace osu.Game.Rulesets.UI
         public readonly BindableBool DisplayJudgements = new BindableBool(true);
 
         /// <summary>
+        /// Whether this <see cref="Playfield"/> has failed.
+        /// </summary>
+        protected readonly BindableBool HasFailed = new BindableBool();
+
+        /// <summary>
         /// Creates a new <see cref="Playfield"/>.
         /// </summary>
         protected Playfield()
@@ -129,6 +134,9 @@ namespace osu.Game.Rulesets.UI
         {
             base.Update();
 
+            if (HasFailed.Value)
+                HitObjectContainer.AliveObjects.ForEach(h => h.Fail());
+
             if (beatmap != null)
                 foreach (var mod in mods)
                     if (mod is IUpdatableByPlayfield updatable)
@@ -139,5 +147,15 @@ namespace osu.Game.Rulesets.UI
         /// Creates the container that will be used to contain the <see cref="DrawableHitObject"/>s.
         /// </summary>
         protected virtual HitObjectContainer CreateHitObjectContainer() => new HitObjectContainer();
+
+        /// <summary>
+        /// Applies the failing animation on this <see cref="Playfield"/>
+        /// </summary>
+        public void Fail()
+        {
+            NestedPlayfields.ForEach(p => p.Fail());
+            DisplayJudgements.Value = false;
+            HasFailed.Value = true;
+        }
     }
 }
