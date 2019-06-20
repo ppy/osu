@@ -10,6 +10,7 @@ using osu.Game.Rulesets.Mods;
 using System;
 using System.Linq;
 using System.Collections.Generic;
+using System.Threading;
 using osu.Framework.Input.Events;
 using osu.Game.Graphics;
 
@@ -33,6 +34,8 @@ namespace osu.Game.Overlays.Mods
 
         public IEnumerable<Mod> SelectedMods => buttons.Select(b => b.SelectedMod).Where(m => m != null);
 
+        private CancellationTokenSource modsLoadCts;
+
         public IEnumerable<Mod> Mods
         {
             set
@@ -48,7 +51,9 @@ namespace osu.Game.Overlays.Mods
                     };
                 }).ToArray();
 
-                ButtonsContainer.Children = modContainers;
+                modsLoadCts?.Cancel();
+                LoadComponentsAsync(modContainers, c => ButtonsContainer.ChildrenEnumerable = c, (modsLoadCts = new CancellationTokenSource()).Token);
+
                 buttons = modContainers.OfType<ModButton>().ToArray();
 
                 if (value.Any())
