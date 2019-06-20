@@ -295,18 +295,23 @@ namespace osu.Game.Rulesets.Objects.Drawables
         /// <summary>
         /// Applies the failing animation on this <see cref="DrawableHitObject"/>.
         /// </summary>
-        public virtual void Fail()
+        public void Fail()
         {
             if (HasFailed)
                 return;
 
-            this.RotateTo(RNG.NextSingle(-90, 90), FailAnimation.FAIL_DURATION);
-            this.ScaleTo(Scale * 0.5f, FailAnimation.FAIL_DURATION);
-            this.MoveToOffset(new Vector2(0, 400), FailAnimation.FAIL_DURATION);
+            OnFail();
 
             this.FlashColour(Color4.Red, 500);
             this.FadeOut(FailAnimation.FAIL_DURATION / 2);
             HasFailed = true;
+        }
+
+        protected virtual void OnFail()
+        {
+            this.RotateTo(RNG.NextSingle(-90, 90), FailAnimation.FAIL_DURATION);
+            this.ScaleTo(Scale * 0.5f, FailAnimation.FAIL_DURATION);
+            this.MoveToOffset(new Vector2(0, 400), FailAnimation.FAIL_DURATION);
         }
     }
 
