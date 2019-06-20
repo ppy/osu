@@ -216,13 +216,13 @@ namespace osu.Game.Tests.Visual.UserInterface
 
         private void testRankedText(Mod mod)
         {
-            AddWaitStep("wait for fade", 1);
+            waitForLoad();
             AddAssert("check for ranked", () => modSelect.UnrankedLabel.Alpha == 0);
             selectNext(mod);
-            AddWaitStep("wait for fade", 1);
+            waitForLoad();
             AddAssert("check for unranked", () => modSelect.UnrankedLabel.Alpha != 0);
             selectPrevious(mod);
-            AddWaitStep("wait for fade", 1);
+            waitForLoad();
             AddAssert("check for ranked", () => modSelect.UnrankedLabel.Alpha == 0);
         }
 
@@ -232,15 +232,22 @@ namespace osu.Game.Tests.Visual.UserInterface
 
         private void checkSelected(Mod mod)
         {
-            AddUntilStep($"check {mod.Name} is selected", () =>
+            waitForLoad();
+            AddAssert($"check {mod.Name} is selected", () =>
             {
                 var button = modSelect.GetModButton(mod);
-                return modSelect.SelectedMods.Value.SingleOrDefault(m => m.Name == mod.Name) != null && button.SelectedMod.GetType() == mod.GetType() && button.Selected;
+                return modSelect.SelectedMods.Value.Single(m => m.Name == mod.Name) != null && button.SelectedMod.GetType() == mod.GetType() && button.Selected;
             });
+        }
+
+        private void waitForLoad()
+        {
+            AddAssert("wait for icons to load", () => modSelect.AllLoaded);
         }
 
         private void checkNotSelected(Mod mod)
         {
+            waitForLoad();
             AddAssert($"check {mod.Name} is not selected", () =>
             {
                 var button = modSelect.GetModButton(mod);
@@ -253,6 +260,8 @@ namespace osu.Game.Tests.Visual.UserInterface
         private class TestModSelectOverlay : ModSelectOverlay
         {
             public new Bindable<IReadOnlyList<Mod>> SelectedMods => base.SelectedMods;
+
+            public bool AllLoaded => ModSectionsContainer.Children.All(c => c.ModIconsLoaded);
 
             public ModButton GetModButton(Mod mod)
             {
