@@ -242,7 +242,7 @@ namespace osu.Game.Tests.Visual.UserInterface
 
         private void waitForLoad()
         {
-            AddAssert("wait for icons to load", () => modSelect.AllLoaded);
+            AddUntilStep("wait for icons to load", () => modSelect.AllLoaded);
         }
 
         private void checkNotSelected(Mod mod)
