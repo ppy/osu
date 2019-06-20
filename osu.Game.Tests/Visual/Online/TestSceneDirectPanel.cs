@@ -23,16 +23,20 @@ namespace osu.Game.Tests.Visual.Online
             typeof(IconPill)
         };
 
-        private BeatmapSetInfo getBeatmapSet(RulesetInfo ruleset, bool downloadable)
+        private BeatmapSetInfo getUndownloadableBeatmapSet(RulesetInfo ruleset)
         {
             var beatmap = CreateWorkingBeatmap(ruleset).BeatmapSetInfo;
+            beatmap.Metadata.Artist = "test";
+            beatmap.Metadata.Title = "undownloadable";
+            beatmap.Metadata.AuthorString = "test";
+
             beatmap.OnlineInfo.HasVideo = true;
             beatmap.OnlineInfo.HasStoryboard = true;
 
             beatmap.OnlineInfo.Availability = new BeatmapSetOnlineAvailability
             {
-                DownloadDisabled = !downloadable,
-                ExternalLink = "http://localhost",
+                DownloadDisabled = true,
+                ExternalLink = "http://osu.ppy.sh",
             };
 
             return beatmap;
@@ -47,31 +51,31 @@ namespace osu.Game.Tests.Visual.Online
             normal.OnlineInfo.HasVideo = true;
             normal.OnlineInfo.HasStoryboard = true;
 
-            var downloadable = getBeatmapSet(ruleset, true);
-            var undownloadable = getBeatmapSet(ruleset, false);
-
+            var undownloadable = getUndownloadableBeatmapSet(ruleset);
             DirectPanel undownloadableGridPanel, undownloadableListPanel;
 
-            Child = new FillFlowContainer
+            Child = new BasicScrollContainer
             {
-                RelativeSizeAxes = Axes.X,
-                AutoSizeAxes = Axes.Y,
-                Direction = FillDirection.Vertical,
-                Padding = new MarginPadding(20),
-                Spacing = new Vector2(0, 20),
-                Children = new Drawable[]
+                RelativeSizeAxes = Axes.Both,
+                Child = new FillFlowContainer
                 {
-                    new DirectGridPanel(normal),
-                    new DirectGridPanel(downloadable),
-                    undownloadableGridPanel = new DirectGridPanel(undownloadable),
-                    new DirectListPanel(normal),
-                    new DirectListPanel(downloadable),
-                    undownloadableListPanel = new DirectListPanel(undownloadable),
+                    RelativeSizeAxes = Axes.X,
+                    AutoSizeAxes = Axes.Y,
+                    Direction = FillDirection.Vertical,
+                    Padding = new MarginPadding(20),
+                    Spacing = new Vector2(0, 20),
+                    Children = new Drawable[]
+                    {
+                        new DirectGridPanel(normal),
+                        new DirectListPanel(normal),
+                        undownloadableGridPanel = new DirectGridPanel(undownloadable),
+                        undownloadableListPanel = new DirectListPanel(undownloadable),
+                    },
                 },
             };
 
-            AddAssert("is download button disabled on last grid panel", () => !undownloadableGridPanel.DownloadButton.Enabled.Value);
-            AddAssert("is download button disabled on last list panel", () => !undownloadableListPanel.DownloadButton.Enabled.Value);
+            AddAssert("is download button disabled on second grid panel", () => !undownloadableGridPanel.DownloadButton.Enabled.Value);
+            AddAssert("is download button disabled on second list panel", () => !undownloadableListPanel.DownloadButton.Enabled.Value);
         }
     }
 }
