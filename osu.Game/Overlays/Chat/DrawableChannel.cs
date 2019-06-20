@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using osu.Framework.Allocation;
 using osuTK.Graphics;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -17,15 +18,18 @@ namespace osu.Game.Overlays.Chat
     public class DrawableChannel : Container
     {
         public readonly Channel Channel;
-        protected readonly ChatLineContainer ChatLineFlow;
-        private readonly OsuScrollContainer scroll;
+        protected ChatLineContainer ChatLineFlow;
+        private OsuScrollContainer scroll;
 
         public DrawableChannel(Channel channel)
         {
             Channel = channel;
-
             RelativeSizeAxes = Axes.Both;
+        }
 
+        [BackgroundDependencyLoader]
+        private void load()
+        {
             Children = new Drawable[]
             {
                 scroll = new OsuScrollContainer
@@ -48,18 +52,17 @@ namespace osu.Game.Overlays.Chat
                     },
                 }
             };
-        }
-
-        protected override void LoadComplete()
-        {
-            base.LoadComplete();
 
             newMessagesArrived(Channel.Messages);
 
             Channel.NewMessagesArrived += newMessagesArrived;
             Channel.MessageRemoved += messageRemoved;
             Channel.PendingMessageResolved += pendingMessageResolved;
+        }
 
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
             scrollToEnd();
         }
 
