@@ -16,6 +16,9 @@ namespace osu.Game.Overlays.BeatmapSet
     {
         private BeatmapSetInfo beatmapSet;
 
+        private bool downloadDisabled => BeatmapSet?.OnlineInfo.Availability.DownloadDisabled ?? false;
+        private bool hasExternalLink => !string.IsNullOrEmpty(BeatmapSet?.OnlineInfo.Availability.ExternalLink);
+
         public BeatmapSetInfo BeatmapSet
         {
             get => beatmapSet;
@@ -26,12 +29,14 @@ namespace osu.Game.Overlays.BeatmapSet
 
                 beatmapSet = value;
 
-                bool unavailable = (BeatmapSet?.OnlineInfo.Availability?.DownloadDisabled ?? false) || (BeatmapSet?.OnlineInfo.Availability?.ExternalLink != null);
-                this.FadeTo(unavailable ? 1 : 0);
-
                 linkContainer.Clear();
-                if (unavailable)
+
+                if (downloadDisabled || hasExternalLink)
+                {
+                    Show();
                     updateText();
+                }
+                else Hide();
             }
         }
 
@@ -80,11 +85,11 @@ namespace osu.Game.Overlays.BeatmapSet
 
         private void updateText()
         {
-            textContainer.Text = BeatmapSet.OnlineInfo.Availability.DownloadDisabled
+            textContainer.Text = downloadDisabled
                 ? "This beatmap is currently not available for download."
                 : "Portions of this beatmap have been removed at the request of the creator or a third-party rights holder.";
 
-            if (!string.IsNullOrEmpty(BeatmapSet.OnlineInfo.Availability.ExternalLink))
+            if (hasExternalLink)
                 linkContainer.AddLink("Check here for more information.", BeatmapSet.OnlineInfo.Availability.ExternalLink);
         }
     }
