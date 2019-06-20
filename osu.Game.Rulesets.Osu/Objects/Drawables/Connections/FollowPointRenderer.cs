@@ -3,9 +3,9 @@
 
 using System;
 using System.Collections.Generic;
-using osuTK;
 using osu.Framework.Graphics;
 using osu.Game.Rulesets.Objects.Types;
+using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Objects.Drawables.Connections
 {
@@ -99,6 +99,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Connections
                             Alpha = 0,
                             Scale = new Vector2(1.5f),
                         });
+
+                        HasFailed.BindValueChanged(_ => fp.Fail(), true);
 
                         using (fp.BeginAbsoluteSequence(fadeInTime))
                         {
