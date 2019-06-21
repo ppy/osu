@@ -64,14 +64,14 @@ namespace osu.Game.Overlays.BeatmapSet
                     Padding = new MarginPadding(10),
                     Children = new Drawable[]
                     {
-                        textContainer = new TextFlowContainer(t => t.Font = OsuFont.GetFont(size: 20, weight: FontWeight.Medium))
+                        textContainer = new TextFlowContainer(t => t.Font = OsuFont.GetFont(size: 14, weight: FontWeight.Medium))
                         {
                             Direction = FillDirection.Full,
                             RelativeSizeAxes = Axes.X,
                             AutoSizeAxes = Axes.Y,
                             Colour = Color4.Orange,
                         },
-                        linkContainer = new LinkFlowContainer(t => t.Font = OsuFont.GetFont(size: 14))
+                        linkContainer = new LinkFlowContainer(t => t.Font = OsuFont.GetFont(size: 10))
                         {
                             Direction = FillDirection.Full,
                             RelativeSizeAxes = Axes.X,
