@@ -52,6 +52,20 @@ namespace osu.Game.Users.Drawables
             User = user;
         }
 
+        /// <summary>
+        /// Fades and expires the <see cref="ModelBackedDrawable{T}.DisplayedDrawable"/>, and sets the
+        /// <see cref="ModelBackedDrawable{T}.Model"/> to null.
+        /// </summary>
+        /// <remarks>
+        /// Can be used when the <see cref="ModelBackedDrawable{T}.DisplayedDrawable"/> needs to be removed instantly.
+        /// </remarks>
+        public void Reset()
+        {
+            DisplayedDrawable?.FadeOut().Expire();
+
+            User = null;
+        }
+
         protected override Drawable CreateDrawable(User user)
         {
             if (user == null && !ShowGuestOnNull)
