@@ -9,6 +9,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Logging;
 using osu.Framework.Screens;
+using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Backgrounds;
 using osu.Game.Graphics.Containers;
@@ -185,6 +186,28 @@ namespace osu.Game.Screens.Multi
         {
             this.FadeIn();
             waves.Show();
+
+            beginHandlingTrack();
+        }
+
+        public override void OnResuming(IScreen last)
+        {
+            this.FadeIn(250);
+            this.ScaleTo(1, 250, Easing.OutSine);
+
+            base.OnResuming(last);
+
+            beginHandlingTrack();
+        }
+
+        public override void OnSuspending(IScreen next)
+        {
+            this.ScaleTo(1.1f, 250, Easing.InSine);
+            this.FadeOut(250);
+
+            endHandlingTrack();
+
+            roomManager.TimeBetweenPolls = 0;
         }
 
         public override bool OnExiting(IScreen next)
@@ -193,12 +216,10 @@ namespace osu.Game.Screens.Multi
 
             this.Delay(WaveContainer.DISAPPEAR_DURATION).FadeOut();
 
-            cancelLooping();
-
             if (screenStack.CurrentScreen != null)
                 loungeSubScreen.MakeCurrent();
 
-            updatePollingRate(isIdle.Value);
+            endHandlingTrack();
 
             base.OnExiting(next);
             return false;
@@ -212,23 +233,58 @@ namespace osu.Game.Screens.Multi
             logo.Delay(WaveContainer.DISAPPEAR_DURATION / 2).FadeOut();
         }
 
-        public override void OnResuming(IScreen last)
+        private void beginHandlingTrack()
         {
-            this.FadeIn(250);
-            this.ScaleTo(1, 250, Easing.OutSine);
-
-            base.OnResuming(last);
-
-            updatePollingRate(isIdle.Value);
+            Beatmap.BindValueChanged(updateTrack, true);
         }
 
-        public override void OnSuspending(IScreen next)
+        private void endHandlingTrack()
         {
-            this.ScaleTo(1.1f, 250, Easing.InSine);
-            this.FadeOut(250);
-
             cancelLooping();
-            roomManager.TimeBetweenPolls = 0;
+            Beatmap.ValueChanged -= updateTrack;
+        }
+
+        private void screenPushed(IScreen lastScreen, IScreen newScreen) => subScreenChanged(newScreen);
+
+        private void screenExited(IScreen lastScreen, IScreen newScreen)
+        {
+            subScreenChanged(newScreen);
+
+            if (screenStack.CurrentScreen == null && this.IsCurrentScreen())
+                this.Exit();
+        }
+
+        private void subScreenChanged(IScreen newScreen)
+        {
+            updatePollingRate(isIdle.Value);
+            createButton.FadeTo(newScreen is MatchSubScreen ? 0 : 1, 200);
+
+            updateTrack();
+        }
+
+        private void updateTrack(ValueChangedEvent<WorkingBeatmap> _ = null)
+        {
+            bool isMatch = screenStack.CurrentScreen is MatchSubScreen;
+
+            Beatmap.Disabled = isMatch;
+
+            if (isMatch)
+            {
+                var track = Beatmap.Value?.Track;
+
+                if (track != null)
+                {
+                    track.RestartPoint = Beatmap.Value.Metadata.PreviewTime;
+                    track.Looping = true;
+
+                    if (!track.IsRunning)
+                        track.Restart();
+                }
+            }
+            else
+            {
+                cancelLooping();
+            }
         }
 
         private void cancelLooping()
@@ -236,49 +292,10 @@ namespace osu.Game.Screens.Multi
             var track = Beatmap?.Value?.Track;
 
             if (track != null)
-                track.Looping = false;
-        }
-
-        protected override void Update()
-        {
-            base.Update();
-
-            if (!this.IsCurrentScreen()) return;
-
-            if (screenStack.CurrentScreen is MatchSubScreen)
             {
-                var track = Beatmap.Value.Track;
-
-                if (track != null)
-                {
-                    track.Looping = true;
-
-                    if (!track.IsRunning)
-                    {
-                        game.Audio.AddItem(track);
-                        track.Seek(Beatmap.Value.Metadata.PreviewTime);
-                        track.Start();
-                    }
-                }
-
-                createButton.Hide();
+                track.Looping = false;
+                track.RestartPoint = 0;
             }
-            else if (screenStack.CurrentScreen is LoungeSubScreen)
-                createButton.Show();
-        }
-
-        private void screenPushed(IScreen lastScreen, IScreen newScreen)
-            => updatePollingRate(isIdle.Value);
-
-        private void screenExited(IScreen lastScreen, IScreen newScreen)
-        {
-            if (lastScreen is MatchSubScreen)
-                cancelLooping();
-
-            updatePollingRate(isIdle.Value);
-
-            if (screenStack.CurrentScreen == null && this.IsCurrentScreen())
-                this.Exit();
         }
 
         protected override void Dispose(bool isDisposing)
