@@ -172,6 +172,8 @@ namespace osu.Game.Overlays.Mods
                                     AutoSizeAxes = Axes.Y,
                                     Spacing = new Vector2(0f, 10f),
                                     Width = content_width,
+                                    LayoutDuration = 200,
+                                    LayoutEasing = Easing.OutQuint,
                                     Children = new ModSection[]
                                     {
                                         new DifficultyReductionSection { Action = modButtonPressed },
