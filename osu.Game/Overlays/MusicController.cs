@@ -70,9 +70,6 @@ namespace osu.Game.Overlays
         {
             Width = 400;
             Margin = new MarginPadding(10);
-
-            // required to let MusicController handle beatmap cycling.
-            AlwaysPresent = true;
         }
 
         [BackgroundDependencyLoader]
@@ -349,18 +346,11 @@ namespace osu.Game.Overlays
 
                     direction = last > next ? TransformDirection.Prev : TransformDirection.Next;
                 }
-
-                //current.Track.Completed -= currentTrackCompleted;
             }
-
-            current = beatmap.NewValue;
-
-            if (current != null)
-                current.Track.Completed += currentTrackCompleted;
 
             progressBar.CurrentTime = 0;
 
-            updateDisplay(current, direction);
+            updateDisplay(current = beatmap.NewValue, direction);
             updateAudioAdjustments();
 
             queuedDirection = null;
@@ -377,12 +367,6 @@ namespace osu.Game.Overlays
             foreach (var mod in mods.Value.OfType<IApplicableToClock>())
                 mod.ApplyToClock(track);
         }
-
-        private void currentTrackCompleted() => Schedule(() =>
-        {
-            if (!current.Track.Looping && !beatmap.Disabled && beatmapSets.Any())
-                next();
-        });
 
         private ScheduledDelegate pendingBeatmapSwitch;
 
@@ -446,10 +430,6 @@ namespace osu.Game.Overlays
         protected override void PopOut()
         {
             base.PopOut();
-
-            // This is here mostly as a performance fix.
-            // If the playlist is not hidden it will update children even when the music controller is hidden (due to AlwaysPresent).
-            playlist.Hide();
 
             this.FadeOut(transition_length, Easing.OutQuint);
             dragContainer.ScaleTo(0.9f, transition_length, Easing.OutQuint);
@@ -548,5 +528,10 @@ namespace osu.Game.Overlays
                 return base.OnDragEnd(e);
             }
         }
+
+        /// <summary>
+        /// Play the next random or playlist track.
+        /// </summary>
+        public void NextTrack() => next();
     }
 }
