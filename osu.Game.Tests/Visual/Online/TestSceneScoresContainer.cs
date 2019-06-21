@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -39,8 +40,7 @@ namespace osu.Game.Tests.Visual.Online
             {
                 Anchor = Anchor.TopCentre,
                 Origin = Anchor.TopCentre,
-                AutoSizeAxes = Axes.Y,
-                RelativeSizeAxes = Axes.X,
+                RelativeSizeAxes = Axes.Both,
                 Width = 0.8f,
                 Children = new Drawable[]
                 {
@@ -173,7 +173,9 @@ namespace osu.Game.Tests.Visual.Online
                 s.Statistics.Add(HitResult.Miss, RNG.Next(2000));
             }
 
-            scoresContainer.Scores = scores;
+            AddStep("Load all scores", () => scoresContainer.Scores = scores);
+            AddStep("Load null scores", () => scoresContainer.Scores = null);
+            AddStep("Load only one score", () => scoresContainer.Scores = new[] { scores.First() });
         }
 
         [BackgroundDependencyLoader]

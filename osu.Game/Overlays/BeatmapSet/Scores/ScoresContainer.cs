@@ -124,6 +124,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
             loading = false;
 
             scoreTable.Scores = scores?.Count > 1 ? scores : new List<ScoreInfo>();
+            scoreTable.FadeTo(scores?.Count > 1 ? 1 : 0);
 
             if (scores?.Any() == true)
             {
