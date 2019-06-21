@@ -4,6 +4,7 @@
 using System;
 using System.IO;
 using System.Linq;
+using Microsoft.Win32;
 using osu.Framework.Allocation;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
@@ -148,6 +149,18 @@ namespace osu.Game.Tournament.IPC
                             return stableInstallPath;
 
                         stableInstallPath = "G:\\My Drive\\Main\\osu!mappool";
+
+                        if (checkExists(stableInstallPath))
+                            return stableInstallPath;
+                    }
+                    catch
+                    {
+                    }
+
+                    try
+                    {
+                        using (RegistryKey key = Registry.ClassesRoot.OpenSubKey("osu"))
+                            stableInstallPath = key?.OpenSubKey(@"shell\open\command")?.GetValue(String.Empty).ToString().Split('"')[1].Replace("osu!.exe", "");
 
                         if (checkExists(stableInstallPath))
                             return stableInstallPath;
