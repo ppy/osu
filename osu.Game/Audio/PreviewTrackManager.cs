@@ -9,7 +9,6 @@ using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Track;
 using osu.Framework.Bindables;
-using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.IO.Stores;
 using osu.Game.Beatmaps;
@@ -26,7 +25,7 @@ namespace osu.Game.Audio
         private TrackManagerPreviewTrack current;
 
         [BackgroundDependencyLoader]
-        private void load(AudioManager audio, FrameworkConfigManager config)
+        private void load(AudioManager audio)
         {
             // this is a temporary solution to get around muting ourselves.
             // todo: update this once we have a BackgroundTrackManager or similar.
@@ -36,8 +35,6 @@ namespace osu.Game.Audio
             trackStore.AddAdjustment(AdjustableProperty.Volume, audio.VolumeTrack);
 
             this.audio = audio;
-
-            config.BindWith(FrameworkSetting.VolumeMusic, trackStore.Volume);
         }
 
         /// <summary>
