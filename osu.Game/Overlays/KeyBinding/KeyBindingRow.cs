@@ -313,6 +313,14 @@ namespace osu.Game.Overlays.KeyBinding
                 Size = new Vector2(80, 20);
             }
 
+            protected override bool OnMouseUp(MouseUpEvent e)
+            {
+                base.OnMouseUp(e);
+
+                // without this, the mouse up triggers a finalise (and deselection) of the current binding target.
+                return true;
+            }
+
             [BackgroundDependencyLoader]
             private void load(OsuColour colours)
             {
