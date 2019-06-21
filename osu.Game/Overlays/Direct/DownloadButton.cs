@@ -85,7 +85,7 @@ namespace osu.Game.Overlays.Direct
             if (BeatmapSet.Value.OnlineInfo.Availability?.DownloadDisabled ?? false)
             {
                 Enabled.Value = false;
-                button.TooltipText = "Unavailable";
+                button.TooltipText = "This beatmap is currently not available for download.";
                 return;
             }
 
