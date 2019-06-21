@@ -3,6 +3,7 @@
 
 using System.Collections.Generic;
 using osu.Framework.Allocation;
+using osu.Framework.Development;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics;
@@ -12,7 +13,6 @@ using osu.Game.Graphics.UserInterface;
 using osu.Game.Rulesets;
 using osuTK;
 using osuTK.Graphics;
-using DebugUtils = osu.Game.Utils.DebugUtils;
 
 namespace osu.Game.Overlays.Settings
 {
@@ -59,7 +59,7 @@ namespace osu.Game.Overlays.Settings
                     Text = game.Name,
                     Font = OsuFont.GetFont(size: 18, weight: FontWeight.Bold),
                 },
-                new BuildDisplay(game.Version, DebugUtils.IsDebug)
+                new BuildDisplay(game.Version, DebugUtils.IsDebugBuild)
                 {
                     Anchor = Anchor.TopCentre,
                     Origin = Anchor.TopCentre,

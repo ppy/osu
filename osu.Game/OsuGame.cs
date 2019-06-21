@@ -181,9 +181,11 @@ namespace osu.Game
             configSkin.ValueChanged += skinId => SkinManager.CurrentSkinInfo.Value = SkinManager.Query(s => s.ID == skinId.NewValue) ?? SkinInfo.Default;
             configSkin.TriggerChange();
 
-            LocalConfig.BindWith(OsuSetting.VolumeInactive, inactiveVolumeAdjust);
+            LocalConfig.BindWith(OsuSetting.VolumeInactive, userInactiveVolume);
 
             IsActive.BindValueChanged(active => updateActiveState(active.NewValue), true);
+
+            Beatmap.BindValueChanged(beatmapChanged, true);
         }
 
         private ExternalLinkOpener externalLinkOpener;
@@ -283,6 +285,23 @@ namespace osu.Game
                 menuScreen.Push(new PlayerLoader(() => new ReplayPlayer(databasedScore)));
             }, $"watch {databasedScoreInfo}", bypassScreenAllowChecks: true);
         }
+
+        #region Beatmap jukebox progression
+
+        private void beatmapChanged(ValueChangedEvent<WorkingBeatmap> beatmap)
+        {
+            var nextBeatmap = beatmap.NewValue;
+            if (nextBeatmap?.Track != null)
+                nextBeatmap.Track.Completed += currentTrackCompleted;
+        }
+
+        private void currentTrackCompleted()
+        {
+            if (!Beatmap.Value.Track.Looping && !Beatmap.Disabled)
+                musicController.NextTrack();
+        }
+
+        #endregion
 
         private ScheduledDelegate performFromMainMenuTask;
 
@@ -446,7 +465,7 @@ namespace osu.Game
                 Origin = Anchor.TopRight,
             }, rightFloatingOverlayContent.Add, true);
 
-            loadComponentSingleFile(new MusicController
+            loadComponentSingleFile(musicController = new MusicController
             {
                 GetToolbarHeight = () => ToolbarOffset,
                 Anchor = Anchor.TopRight,
@@ -686,15 +705,27 @@ namespace osu.Game
             return false;
         }
 
-        private readonly BindableDouble inactiveVolumeAdjust = new BindableDouble();
+        #region Inactive audio dimming
+
+        private readonly BindableDouble userInactiveVolume = new BindableDouble();
+
+        private readonly BindableDouble inactiveVolumeFade = new BindableDouble();
 
         private void updateActiveState(bool isActive)
         {
             if (isActive)
-                Audio.RemoveAdjustment(AdjustableProperty.Volume, inactiveVolumeAdjust);
+            {
+                this.TransformBindableTo(inactiveVolumeFade, 1, 500, Easing.OutQuint)
+                    .Finally(_ => Audio.RemoveAdjustment(AdjustableProperty.Volume, inactiveVolumeFade)); //wait for the transition to finish to remove the inactive audio adjustment
+            }
             else
-                Audio.AddAdjustment(AdjustableProperty.Volume, inactiveVolumeAdjust);
+            {
+                Audio.AddAdjustment(AdjustableProperty.Volume, inactiveVolumeFade);
+                this.TransformBindableTo(inactiveVolumeFade, userInactiveVolume.Value, 1500, Easing.OutSine);
+            }
         }
+
+        #endregion
 
         public bool OnReleased(GlobalAction action) => false;
 
@@ -707,7 +738,10 @@ namespace osu.Game
         private Container topMostOverlayContent;
 
         private FrameworkConfigManager frameworkConfig;
+
         private ScalingContainer screenContainer;
+
+        private MusicController musicController;
 
         protected override bool OnExiting()
         {
