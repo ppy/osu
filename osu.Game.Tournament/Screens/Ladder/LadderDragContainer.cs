@@ -3,6 +3,7 @@
 
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Primitives;
 using osu.Framework.Input.Events;
 using osuTK;
 
@@ -17,6 +18,8 @@ namespace osu.Game.Tournament.Screens.Ladder
         private Vector2 target;
 
         private float scale = 1;
+
+        protected override bool ComputeIsMaskedAway(RectangleF maskingBounds) => false;
 
         protected override bool OnDrag(DragEvent e)
         {
