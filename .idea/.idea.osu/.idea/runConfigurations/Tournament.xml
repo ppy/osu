@@ -1,7 +1,7 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="osu!" type="DotNetProject" factoryName=".NET Project" folderName="osu!">
+  <configuration default="false" name="Tournament" type="DotNetProject" factoryName=".NET Project" folderName="Tournament">
     <option name="EXE_PATH" value="$PROJECT_DIR$/osu.Desktop/bin/Debug/netcoreapp2.2/osu!.dll" />
-    <option name="PROGRAM_PARAMETERS" value="" />
+    <option name="PROGRAM_PARAMETERS" value="--tournament" />
     <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/osu.Desktop" />
     <option name="PASS_PARENT_ENVS" value="1" />
     <option name="USE_EXTERNAL_CONSOLE" value="0" />
