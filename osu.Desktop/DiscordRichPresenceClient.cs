@@ -50,7 +50,7 @@ namespace osu.Desktop
 
         private void updateStatus(UserStatus st, UserActivity a)
         {
-            var presence = defaultPresence(st is UserStatusOnline ? a?.Status : st.Message);
+            var presence = defaultPresence(st is UserStatusOnline ? a?.Status ?? st.Message : st.Message); //display the current user activity if the user status is online & user activity != null, else display the current user online status
 
             if (!(st is UserStatusOnline)) //don't update the presence any further if the current user status is DND / Offline & simply return with the default presence
             {
@@ -80,7 +80,7 @@ namespace osu.Desktop
             if (ruleset.ID != null && ruleset.ID <= 3) //legacy rulesets use an ID between 0 and 3
                 presence.Assets.SmallImageKey = ruleset.ShortName;
             else
-                presence.Assets.SmallImageKey = "unknown"; //not a legay ruleset so let's display the unknown ruleset icon.
+                presence.Assets.SmallImageKey = "unknown"; //not a legacy ruleset so let's display the unknown ruleset icon.
 
             presence.Assets.SmallImageText = ruleset.ShortName;
         }
