@@ -26,7 +26,7 @@ namespace osu.Game.Audio
         private TrackManagerPreviewTrack current;
 
         [BackgroundDependencyLoader]
-        private void load(AudioManager audio, FrameworkConfigManager config)
+        private void load(AudioManager audio)
         {
             // this is a temporary solution to get around muting ourselves.
             // todo: update this once we have a BackgroundTrackManager or similar.
