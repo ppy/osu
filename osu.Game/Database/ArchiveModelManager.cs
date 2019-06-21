@@ -246,7 +246,7 @@ namespace osu.Game.Database
         /// </summary>
         /// <param name="archive">The archive to be imported.</param>
         /// <param name="cancellationToken">An optional cancellation token.</param>
-        public async Task<TModel> Import(ArchiveReader archive, CancellationToken cancellationToken = default)
+        public Task<TModel> Import(ArchiveReader archive, CancellationToken cancellationToken = default)
         {
             cancellationToken.ThrowIfCancellationRequested();
 
@@ -256,7 +256,7 @@ namespace osu.Game.Database
             {
                 model = CreateModel(archive);
 
-                if (model == null) return null;
+                if (model == null) return Task.FromResult<TModel>(null);
 
                 model.Hash = computeHash(archive);
             }
@@ -270,7 +270,7 @@ namespace osu.Game.Database
                 return null;
             }
 
-            return await Import(model, archive, cancellationToken);
+            return Import(model, archive, cancellationToken);
         }
 
         /// <summary>
