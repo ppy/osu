@@ -24,11 +24,10 @@ using osuTK.Graphics;
 namespace osu.Game.Tests.Visual.UserInterface
 {
     [Description("mod select and icon display")]
-    public class TestSceneMods : OsuTestScene
+    public class TestSceneModSelectOverlay : OsuTestScene
     {
         public override IReadOnlyList<Type> RequiredTypes => new[]
         {
-            typeof(ModSelectOverlay),
             typeof(ModDisplay),
             typeof(ModSection),
             typeof(ModIcon),
@@ -217,13 +216,13 @@ namespace osu.Game.Tests.Visual.UserInterface
 
         private void testRankedText(Mod mod)
         {
-            AddWaitStep("wait for fade", 1);
+            waitForLoad();
             AddAssert("check for ranked", () => modSelect.UnrankedLabel.Alpha == 0);
             selectNext(mod);
-            AddWaitStep("wait for fade", 1);
+            waitForLoad();
             AddAssert("check for unranked", () => modSelect.UnrankedLabel.Alpha != 0);
             selectPrevious(mod);
-            AddWaitStep("wait for fade", 1);
+            waitForLoad();
             AddAssert("check for ranked", () => modSelect.UnrankedLabel.Alpha == 0);
         }
 
@@ -233,6 +232,7 @@ namespace osu.Game.Tests.Visual.UserInterface
 
         private void checkSelected(Mod mod)
         {
+            waitForLoad();
             AddAssert($"check {mod.Name} is selected", () =>
             {
                 var button = modSelect.GetModButton(mod);
@@ -240,8 +240,14 @@ namespace osu.Game.Tests.Visual.UserInterface
             });
         }
 
+        private void waitForLoad()
+        {
+            AddUntilStep("wait for icons to load", () => modSelect.AllLoaded);
+        }
+
         private void checkNotSelected(Mod mod)
         {
+            waitForLoad();
             AddAssert($"check {mod.Name} is not selected", () =>
             {
                 var button = modSelect.GetModButton(mod);
@@ -254,6 +260,8 @@ namespace osu.Game.Tests.Visual.UserInterface
         private class TestModSelectOverlay : ModSelectOverlay
         {
             public new Bindable<IReadOnlyList<Mod>> SelectedMods => base.SelectedMods;
+
+            public bool AllLoaded => ModSectionsContainer.Children.All(c => c.ModIconsLoaded);
 
             public ModButton GetModButton(Mod mod)
             {

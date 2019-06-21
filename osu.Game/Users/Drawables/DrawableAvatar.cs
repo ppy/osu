@@ -11,9 +11,9 @@ using osu.Framework.Graphics.Textures;
 using osu.Framework.Input.Events;
 using osu.Game.Graphics.Containers;
 
-namespace osu.Game.Users
+namespace osu.Game.Users.Drawables
 {
-    public class Avatar : Container
+    public class DrawableAvatar : Container
     {
         /// <summary>
         /// Whether to open the user's profile when clicked.
@@ -29,7 +29,7 @@ namespace osu.Game.Users
         /// An avatar for specified user.
         /// </summary>
         /// <param name="user">The user. A null value will get a placeholder avatar.</param>
-        public Avatar(User user = null)
+        public DrawableAvatar(User user = null)
         {
             this.user = user;
         }
