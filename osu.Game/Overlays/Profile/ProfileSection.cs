@@ -23,6 +23,7 @@ namespace osu.Game.Overlays.Profile
 
         private readonly FillFlowContainer content;
         private readonly Box background;
+        private readonly Box underscore;
 
         protected override Container<Drawable> Content => content;
 
@@ -51,14 +52,30 @@ namespace osu.Game.Overlays.Profile
                     RelativeSizeAxes = Axes.X,
                     Children = new Drawable[]
                     {
-                        new OsuSpriteText
+                        new Container
                         {
-                            Text = Title,
-                            Font = OsuFont.GetFont(size: 20, weight: FontWeight.Regular, italics: true),
+                            AutoSizeAxes = Axes.Both,
                             Margin = new MarginPadding
                             {
                                 Horizontal = UserProfileOverlay.CONTENT_X_MARGIN,
-                                Vertical = 10
+                                Top = 15,
+                                Bottom = 10,
+                            },
+                            Children = new Drawable[]
+                            {
+                                new OsuSpriteText
+                                {
+                                    Text = Title,
+                                    Font = OsuFont.GetFont(size: 20, weight: FontWeight.Bold),
+                                },
+                                underscore = new Box
+                                {
+                                    Anchor = Anchor.BottomCentre,
+                                    Origin = Anchor.TopCentre,
+                                    Margin = new MarginPadding { Top = 4 },
+                                    RelativeSizeAxes = Axes.X,
+                                    Height = 2,
+                                }
                             }
                         },
                         content = new FillFlowContainer
@@ -81,6 +98,7 @@ namespace osu.Game.Overlays.Profile
         private void load(OsuColour colours)
         {
             background.Colour = colours.GreySeafoamDarker;
+            underscore.Colour = colours.Seafoam;
         }
 
         private class SectionTriangles : Container
