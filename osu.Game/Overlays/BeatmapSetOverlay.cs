@@ -24,6 +24,7 @@ namespace osu.Game.Overlays
         private const int fade_duration = 300;
 
         public const float X_PADDING = 40;
+        public const float TOP_PADDING = 25;
         public const float RIGHT_WIDTH = 275;
 
         private readonly Header header;
