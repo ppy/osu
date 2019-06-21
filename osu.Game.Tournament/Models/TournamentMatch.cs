@@ -64,7 +64,7 @@ namespace osu.Game.Tournament.Models
         /// </summary>
         public readonly Bindable<bool> Current = new Bindable<bool>();
 
-        public readonly Bindable<DateTimeOffset> Date = new Bindable<DateTimeOffset>();
+        public readonly Bindable<DateTimeOffset> Date = new Bindable<DateTimeOffset>(DateTimeOffset.Now);
 
         [JsonProperty]
         public readonly BindableList<ConditionalTournamentMatch> ConditionalMatches = new BindableList<ConditionalTournamentMatch>();
