@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
+using osu.Framework.Development;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
@@ -12,7 +13,6 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Notifications;
-using osu.Game.Utils;
 using osuTK;
 using osuTK.Graphics;
 
@@ -61,7 +61,7 @@ namespace osu.Desktop.Overlays
                                 },
                                 new OsuSpriteText
                                 {
-                                    Colour = DebugUtils.IsDebug ? colours.Red : Color4.White,
+                                    Colour = DebugUtils.IsDebugBuild ? colours.Red : Color4.White,
                                     Text = game.Version
                                 },
                             }
