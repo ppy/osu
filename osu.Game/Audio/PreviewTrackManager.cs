@@ -36,8 +36,6 @@ namespace osu.Game.Audio
             trackStore.AddAdjustment(AdjustableProperty.Volume, audio.VolumeTrack);
 
             this.audio = audio;
-
-            config.BindWith(FrameworkSetting.VolumeMusic, trackStore.Volume);
         }
 
         /// <summary>
