@@ -22,7 +22,11 @@ namespace osu.Game.Rulesets.Taiko.Tests
 
         protected override bool AllowFail => true;
 
-        protected override Player CreatePlayer(Ruleset ruleset) => new ScoreAccessiblePlayer();
+        protected override Player CreatePlayer(Ruleset ruleset)
+        {
+            Mods.Value = Mods.Value.Concat(new[] { new TaikoModSuddenDeath() }).ToArray();
+            return new ScoreAccessiblePlayer();
+        }
 
         protected override IBeatmap CreateBeatmap(RulesetInfo ruleset) =>
             new TaikoBeatmap
@@ -45,7 +49,6 @@ namespace osu.Game.Rulesets.Taiko.Tests
             AddStep("Setup judgements", () =>
             {
                 judged = false;
-                Mods.Value = Mods.Value.Concat(new[] { new TaikoModSuddenDeath() }).ToArray();
                 ((ScoreAccessiblePlayer)Player).ScoreProcessor.NewJudgement += b => judged = true;
             });
             AddUntilStep("swell judged", () => judged);
