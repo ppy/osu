@@ -146,12 +146,11 @@ namespace osu.Game.Database
             notification.Progress = 0;
             notification.Text = "Import is initialising...";
 
-            string[] filteredPaths = paths.Where(canImportPath).ToArray();
             int current = 0;
 
             var imported = new List<TModel>();
 
-            await Task.WhenAll(filteredPaths.Select(async path =>
+            await Task.WhenAll(paths.Select(async path =>
             {
                 notification.CancellationToken.ThrowIfCancellationRequested();
 
@@ -164,8 +163,8 @@ namespace osu.Game.Database
                         imported.Add(model);
                         current++;
 
-                        notification.Text = $"Imported {current} of {filteredPaths.Length} {HumanisedModelName}s";
-                        notification.Progress = (float)current / filteredPaths.Length;
+                        notification.Text = $"Imported {current} of {paths.Length} {HumanisedModelName}s";
+                        notification.Progress = (float)current / paths.Length;
                     }
                 }
                 catch (TaskCanceledException)
@@ -201,8 +200,6 @@ namespace osu.Game.Database
 
                 notification.State = ProgressNotificationState.Completed;
             }
-
-            bool canImportPath(string path) => StableDirectoryBased || HandledExtensions.Any(ext => Path.GetExtension(path)?.ToLowerInvariant() == ext);
         }
 
         /// <summary>
@@ -537,7 +534,7 @@ namespace osu.Game.Database
         /// <summary>
         /// Set a storage with access to an osu-stable install for import purposes.
         /// </summary>
-        public Func<Storage> GetStableStorage { private get; set; }
+        public Func<Storage> GetStableStorage { protected get; set; }
 
         /// <summary>
         /// Denotes whether an osu-stable installation is present to perform automated imports from.
@@ -550,9 +547,9 @@ namespace osu.Game.Database
         protected virtual string ImportFromStablePath => null;
 
         /// <summary>
-        /// Does stable import look for directories rather than files
+        /// Selects paths to import from.
         /// </summary>
-        protected abstract bool StableDirectoryBased { get; }
+        protected abstract IEnumerable<string> GetStableImportPaths();
 
         /// <summary>
         /// This is a temporary method and will likely be replaced by a full-fledged (and more correctly placed) migration process in the future.
@@ -574,11 +571,7 @@ namespace osu.Game.Database
                 return Task.CompletedTask;
             }
 
-            return Task.Run(async () =>
-            {
-                var paths = StableDirectoryBased ? stable.GetDirectories(ImportFromStablePath) : stable.GetFiles(ImportFromStablePath);
-                await Import(paths.Select(f => stable.GetFullPath(f)).ToArray());
-            });
+            return Task.Run(async () => await Import(GetStableImportPaths().Select(f => stable.GetFullPath(f)).ToArray()));
         }
 
         #endregion

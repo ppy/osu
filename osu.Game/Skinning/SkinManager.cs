@@ -32,8 +32,6 @@ namespace osu.Game.Skinning
 
         protected override string ImportFromStablePath => "Skins";
 
-        protected override bool StableDirectoryBased => true;
-
         public SkinManager(Storage storage, DatabaseContextFactory contextFactory, IIpcHost importHost, AudioManager audio)
             : base(storage, contextFactory, new SkinStore(contextFactory, storage), importHost)
         {
@@ -55,6 +53,8 @@ namespace osu.Game.Skinning
                 SourceChanged?.Invoke();
             };
         }
+
+        protected override IEnumerable<string> GetStableImportPaths() => GetStableStorage().GetDirectories(ImportFromStablePath);
 
         /// <summary>
         /// Returns a list of all usable <see cref="SkinInfo"/>s. Includes the special default skin plus all skins from <see cref="GetAllUserSkins"/>.

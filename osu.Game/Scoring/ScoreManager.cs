@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Linq.Expressions;
 using Microsoft.EntityFrameworkCore;
@@ -23,8 +24,6 @@ namespace osu.Game.Scoring
         protected override string[] HashableFileTypes => new[] { ".osr" };
 
         protected override string ImportFromStablePath => @"Data\r";
-
-        protected override bool StableDirectoryBased => false;
 
         private readonly RulesetStore rulesets;
         private readonly Func<BeatmapManager> beatmaps;
@@ -54,6 +53,10 @@ namespace osu.Game.Scoring
                 }
             }
         }
+
+        protected override IEnumerable<string> GetStableImportPaths()
+            => GetStableStorage().GetFiles(ImportFromStablePath)
+                                 .Where(p => HandledExtensions.Any(ext => Path.GetExtension(p)?.Equals(ext, StringComparison.InvariantCultureIgnoreCase) ?? false));
 
         public Score GetScore(ScoreInfo score) => new LegacyDatabasedScore(score, rulesets, beatmaps(), Files.Store);
 

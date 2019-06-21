@@ -62,8 +62,6 @@ namespace osu.Game.Beatmaps
 
         protected override string ImportFromStablePath => "Songs";
 
-        protected override bool StableDirectoryBased => true;
-
         private readonly RulesetStore rulesets;
 
         private readonly BeatmapStore beatmaps;
@@ -95,6 +93,8 @@ namespace osu.Game.Beatmaps
 
             updateQueue = new BeatmapUpdateQueue(api);
         }
+
+        protected override IEnumerable<string> GetStableImportPaths() => GetStableStorage().GetDirectories(ImportFromStablePath);
 
         protected override Task Populate(BeatmapSetInfo beatmapSet, ArchiveReader archive, CancellationToken cancellationToken = default)
         {
