@@ -114,7 +114,7 @@ namespace osu.Game.Overlays
                 base.OnHover(e);
 
                 if (!Active.Value)
-                    OnActivated();
+                    HoverAction();
 
                 return true;
             }
@@ -124,20 +124,18 @@ namespace osu.Game.Overlays
                 base.OnHoverLost(e);
 
                 if (!Active.Value)
-                    OnDeactivated();
+                    UnhoverAction();
             }
 
             protected override void OnActivated()
             {
-                bar.Expand();
-                Text.FadeColour(Color4.White, 120, Easing.InQuad);
+                HoverAction();
                 Text.Font = Text.Font.With(weight: FontWeight.Bold);
             }
 
             protected override void OnDeactivated()
             {
-                bar.Collapse();
-                Text.FadeColour(AccentColour, 120, Easing.InQuad);
+                UnhoverAction();
                 Text.Font = Text.Font.With(weight: FontWeight.Medium);
             }
 
@@ -147,6 +145,18 @@ namespace osu.Game.Overlays
                     OnActivated();
                 else
                     OnDeactivated();
+            }
+
+            protected virtual void HoverAction()
+            {
+                bar.Expand();
+                Text.FadeColour(Color4.White, 120, Easing.InQuad);
+            }
+
+            protected virtual void UnhoverAction()
+            {
+                bar.Collapse();
+                Text.FadeColour(AccentColour, 120, Easing.InQuad);
             }
         }
     }
