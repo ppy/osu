@@ -39,11 +39,25 @@ namespace osu.Game.Tests.Visual.Online
             header = new ProfileHeader();
             Add(header);
 
-            AddStep("Show offline dummy", () => header.User.Value = TestSceneUserProfileOverlay.TEST_USER);
+            AddStep("Show test dummy", () => header.User.Value = TestSceneUserProfileOverlay.TEST_USER);
 
             AddStep("Show null dummy", () => header.User.Value = new User
             {
                 Username = "Null"
+            });
+
+            AddStep("Show online dummy", () => header.User.Value = new User
+            {
+                Username = "IAmOnline",
+                LastVisit = DateTimeOffset.Now,
+                IsOnline = true,
+            });
+
+            AddStep("Show offline dummy", () => header.User.Value = new User
+            {
+                Username = "IAmOffline",
+                LastVisit = DateTimeOffset.Now,
+                IsOnline = false,
             });
 
             addOnlineStep("Show ppy", new User
