@@ -74,17 +74,12 @@ namespace osu.Game.Overlays.Chat
             }
         }
 
+        private bool senderHasBackground => !string.IsNullOrEmpty(message.Sender.Colour);
+
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
             customUsernameColour = colours.ChatBlue;
-        }
-
-        private bool senderHasBackground => !string.IsNullOrEmpty(message.Sender.Colour);
-
-        protected override void LoadComplete()
-        {
-            base.LoadComplete();
 
             bool hasBackground = senderHasBackground;
 
@@ -179,6 +174,11 @@ namespace osu.Game.Overlays.Chat
             };
 
             updateMessageContent();
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
             FinishTransforms(true);
         }
 
