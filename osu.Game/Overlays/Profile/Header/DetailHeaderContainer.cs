@@ -116,6 +116,7 @@ namespace osu.Game.Overlays.Profile.Header
                                     Anchor = Anchor.CentreRight,
                                     Origin = Anchor.CentreRight,
                                     Direction = FillDirection.Horizontal,
+                                    Spacing = new Vector2(5),
                                     Children = new[]
                                     {
                                         scoreRankInfos[ScoreRank.XH] = new ScoreRankInfo(ScoreRank.XH),
@@ -200,7 +201,7 @@ namespace osu.Game.Overlays.Profile.Header
                     Direction = FillDirection.Vertical,
                     Children = new Drawable[]
                     {
-                        new UpdateableRank(rank)
+                        new DrawableRank(rank)
                         {
                             RelativeSizeAxes = Axes.X,
                             Height = 30,
