@@ -74,7 +74,7 @@ namespace osu.Game.Screens.Ranking.Pages
                             RelativeSizeAxes = Axes.X,
                             Height = user_header_height,
                         },
-                        new DrawableRank(Score.Rank)
+                        new UpdateableRank(Score.Rank)
                         {
                             Anchor = Anchor.TopCentre,
                             Origin = Anchor.TopCentre,
