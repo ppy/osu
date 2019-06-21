@@ -15,11 +15,10 @@ using osu.Game.Overlays.Chat.Tabs;
 namespace osu.Game.Tests.Visual.Online
 {
     [Description("Testing chat api and overlay")]
-    public class TestSceneChatDisplay : OsuTestScene
+    public class TestSceneChatOverlay : OsuTestScene
     {
         public override IReadOnlyList<Type> RequiredTypes => new[]
         {
-            typeof(ChatOverlay),
             typeof(ChatLine),
             typeof(DrawableChannel),
             typeof(ChannelSelectorTabItem),
