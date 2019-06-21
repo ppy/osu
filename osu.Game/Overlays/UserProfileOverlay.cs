@@ -66,7 +66,7 @@ namespace osu.Game.Overlays
             Add(new Box
             {
                 RelativeSizeAxes = Axes.Both,
-                Colour = OsuColour.Gray(0.2f)
+                Colour = OsuColour.Gray(0.1f)
             });
 
             Add(sectionsContainer = new ProfileSectionsContainer
