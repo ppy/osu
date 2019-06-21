@@ -171,7 +171,7 @@ namespace osu.Game.Overlays
             channelTabControl.ChannelSelectorActive.ValueChanged += active => channelSelectionOverlay.State.Value = active.NewValue ? Visibility.Visible : Visibility.Hidden;
             channelSelectionOverlay.State.ValueChanged += state =>
             {
-                if (state.NewValue == Visibility.Hidden && channelManager.CurrentChannel.Value == null)
+                if (state.NewValue == Visibility.Hidden && channelManager.JoinedChannels.Count == 0)
                 {
                     channelSelectionOverlay.Show();
                     Hide();
