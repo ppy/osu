@@ -143,6 +143,7 @@ namespace osu.Game.Screens.Select.Carousel
                         Origin = Anchor.Centre,
                         FillMode = FillMode.Fill,
                     },
+                    // Todo: This should be a fill flow, but has invalidation issues (see https://github.com/ppy/osu-framework/issues/223)
                     new Container
                     {
                         Depth = -1,
