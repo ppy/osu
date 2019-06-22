@@ -74,7 +74,7 @@ namespace osu.Game.Tests.Visual.Components
         {
             AddStep("move mouse", () => InputManager.MoveMouseTo(box2.ScreenSpaceDrawQuad.Centre));
 
-            AddAssert("check not idle", () => box1.IsIdle);
+            AddAssert("check idle", () => box1.IsIdle);
             AddAssert("check not idle", () => !box2.IsIdle);
             AddAssert("check idle", () => box3.IsIdle);
             AddAssert("check idle", () => box4.IsIdle);
@@ -82,10 +82,10 @@ namespace osu.Game.Tests.Visual.Components
             AddStep("move mouse", () => InputManager.MoveMouseTo(box3.ScreenSpaceDrawQuad.Centre));
             AddStep("move mouse", () => InputManager.MoveMouseTo(box4.ScreenSpaceDrawQuad.Centre));
 
-            AddAssert("check not idle", () => box1.IsIdle);
+            AddAssert("check idle", () => box1.IsIdle);
             AddAssert("check not idle", () => !box2.IsIdle);
-            AddAssert("check idle", () => !box3.IsIdle);
-            AddAssert("check idle", () => !box4.IsIdle);
+            AddAssert("check not idle", () => !box3.IsIdle);
+            AddAssert("check not idle", () => !box4.IsIdle);
 
             AddUntilStep("Wait for all idle", () => box1.IsIdle && box2.IsIdle && box3.IsIdle && box4.IsIdle);
         }
