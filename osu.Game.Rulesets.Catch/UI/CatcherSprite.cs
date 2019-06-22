@@ -13,8 +13,6 @@ namespace osu.Game.Rulesets.Catch.UI
 {
     public class CatcherSprite : SkinReloadableDrawable
     {
-        private Drawable catcher;
-
         public CatcherSprite()
         {
             Size = new Vector2(CatcherArea.CATCHER_SIZE);
@@ -26,10 +24,10 @@ namespace osu.Game.Rulesets.Catch.UI
         [BackgroundDependencyLoader]
         private void load(TextureStore textures)
         {
-            InternalChild = new Container()
+            InternalChild = new Container
             {
                 RelativeSizeAxes = Axes.Both,
-                Child = catcher = new SkinnableDrawable("fruit-catcher-idle", _ => new Sprite()
+                Child = new SkinnableDrawable("fruit-catcher-idle", _ => new Sprite
                 {
                     Texture = textures.Get(@"Play/Catch/fruit-catcher-idle"),
                     RelativeSizeAxes = Axes.Both,
