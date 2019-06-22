@@ -26,7 +26,7 @@ namespace osu.Game.Rulesets.Catch.Tests
             typeof(CatcherSprite),
         };
 
-        private Container container;
+        private readonly Container container;
 
         public TestSceneCatcherSkinning()
         {
@@ -79,7 +79,11 @@ namespace osu.Game.Rulesets.Catch.Tests
 
         private class CatchCustomSkinSourceContainer : Container, ISkinSource
         {
-            public event Action SourceChanged;
+            public event Action SourceChanged
+            {
+                add { }
+                remove { }
+            }
 
             public Drawable GetDrawableComponent(string componentName) => new CatcherCustomSkin();
 
