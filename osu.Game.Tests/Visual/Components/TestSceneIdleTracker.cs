@@ -61,7 +61,7 @@ namespace osu.Game.Tests.Visual.Components
         [Test]
         public void TestNudge()
         {
-            AddStep("move to top left", () => InputManager.MoveMouseTo(box1.ScreenSpaceDrawQuad.Centre));
+            AddStep("move to top left", () => InputManager.MoveMouseTo(box1));
 
             waitForAllIdle();
 
@@ -76,15 +76,15 @@ namespace osu.Game.Tests.Visual.Components
         [Test]
         public void TestMovement()
         {
-            AddStep("move to top right", () => InputManager.MoveMouseTo(box2.ScreenSpaceDrawQuad.Centre));
+            AddStep("move to top right", () => InputManager.MoveMouseTo(box2));
 
             checkIdleStatus(box1, true);
             checkIdleStatus(box2, false);
             checkIdleStatus(box3, true);
             checkIdleStatus(box4, true);
 
-            AddStep("move to bottom left", () => InputManager.MoveMouseTo(box3.ScreenSpaceDrawQuad.Centre));
-            AddStep("move to bottom right", () => InputManager.MoveMouseTo(box4.ScreenSpaceDrawQuad.Centre));
+            AddStep("move to bottom left", () => InputManager.MoveMouseTo(box3));
+            AddStep("move to bottom right", () => InputManager.MoveMouseTo(box4));
 
             checkIdleStatus(box1, true);
             checkIdleStatus(box2, false);
@@ -97,7 +97,7 @@ namespace osu.Game.Tests.Visual.Components
         [Test]
         public void TestTimings()
         {
-            AddStep("move to centre", () => InputManager.MoveMouseTo(ScreenSpaceDrawQuad.Centre));
+            AddStep("move to centre", () => InputManager.MoveMouseTo(Content));
 
             checkIdleStatus(box1, false);
             checkIdleStatus(box2, false);
