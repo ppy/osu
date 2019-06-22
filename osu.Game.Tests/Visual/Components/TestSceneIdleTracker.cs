@@ -25,6 +25,7 @@ namespace osu.Game.Tests.Visual.Components
             {
                 box1 = new IdleTrackingBox(1000)
                 {
+                    Name = "TopLeft",
                     RelativeSizeAxes = Axes.Both,
                     Colour = Color4.Red,
                     Anchor = Anchor.TopLeft,
@@ -32,6 +33,7 @@ namespace osu.Game.Tests.Visual.Components
                 },
                 box2 = new IdleTrackingBox(2000)
                 {
+                    Name = "TopRight",
                     RelativeSizeAxes = Axes.Both,
                     Colour = Color4.Green,
                     Anchor = Anchor.TopRight,
@@ -39,6 +41,7 @@ namespace osu.Game.Tests.Visual.Components
                 },
                 box3 = new IdleTrackingBox(3000)
                 {
+                    Name = "BottomLeft",
                     RelativeSizeAxes = Axes.Both,
                     Colour = Color4.Blue,
                     Anchor = Anchor.BottomLeft,
@@ -46,6 +49,7 @@ namespace osu.Game.Tests.Visual.Components
                 },
                 box4 = new IdleTrackingBox(4000)
                 {
+                    Name = "BottomRight",
                     RelativeSizeAxes = Axes.Both,
                     Colour = Color4.Orange,
                     Anchor = Anchor.BottomRight,
@@ -57,51 +61,80 @@ namespace osu.Game.Tests.Visual.Components
         [Test]
         public void TestNudge()
         {
-            AddStep("move mouse to top left", () => InputManager.MoveMouseTo(box1.ScreenSpaceDrawQuad.Centre));
+            AddStep("move to top left", () => InputManager.MoveMouseTo(box1.ScreenSpaceDrawQuad.Centre));
 
-            AddUntilStep("Wait for all idle", () => box1.IsIdle && box2.IsIdle && box3.IsIdle && box4.IsIdle);
+            waitForAllIdle();
 
             AddStep("nudge mouse", () => InputManager.MoveMouseTo(box1.ScreenSpaceDrawQuad.Centre + new Vector2(1)));
 
-            AddAssert("check not idle", () => !box1.IsIdle);
-            AddAssert("check idle", () => box2.IsIdle);
-            AddAssert("check idle", () => box3.IsIdle);
-            AddAssert("check idle", () => box4.IsIdle);
+            checkIdleStatus(box1, false);
+            checkIdleStatus(box2, true);
+            checkIdleStatus(box3, true);
+            checkIdleStatus(box4, true);
         }
 
         [Test]
         public void TestMovement()
         {
-            AddStep("move mouse", () => InputManager.MoveMouseTo(box2.ScreenSpaceDrawQuad.Centre));
+            AddStep("move to top right", () => InputManager.MoveMouseTo(box2.ScreenSpaceDrawQuad.Centre));
 
-            AddAssert("check idle", () => box1.IsIdle);
-            AddAssert("check not idle", () => !box2.IsIdle);
-            AddAssert("check idle", () => box3.IsIdle);
-            AddAssert("check idle", () => box4.IsIdle);
+            checkIdleStatus(box1, true);
+            checkIdleStatus(box2, false);
+            checkIdleStatus(box3, true);
+            checkIdleStatus(box4, true);
 
-            AddStep("move mouse", () => InputManager.MoveMouseTo(box3.ScreenSpaceDrawQuad.Centre));
-            AddStep("move mouse", () => InputManager.MoveMouseTo(box4.ScreenSpaceDrawQuad.Centre));
+            AddStep("move to bottom left", () => InputManager.MoveMouseTo(box3.ScreenSpaceDrawQuad.Centre));
+            AddStep("move to bottom right", () => InputManager.MoveMouseTo(box4.ScreenSpaceDrawQuad.Centre));
 
-            AddAssert("check idle", () => box1.IsIdle);
-            AddAssert("check not idle", () => !box2.IsIdle);
-            AddAssert("check not idle", () => !box3.IsIdle);
-            AddAssert("check not idle", () => !box4.IsIdle);
+            checkIdleStatus(box1, true);
+            checkIdleStatus(box2, false);
+            checkIdleStatus(box3, false);
+            checkIdleStatus(box4, false);
 
-            AddUntilStep("Wait for all idle", () => box1.IsIdle && box2.IsIdle && box3.IsIdle && box4.IsIdle);
+            waitForAllIdle();
         }
 
         [Test]
         public void TestTimings()
         {
-            AddStep("move mouse", () => InputManager.MoveMouseTo(ScreenSpaceDrawQuad.Centre));
+            AddStep("move to centre", () => InputManager.MoveMouseTo(ScreenSpaceDrawQuad.Centre));
 
-            AddAssert("check not idle", () => !box1.IsIdle && !box2.IsIdle && !box3.IsIdle && !box4.IsIdle);
+            checkIdleStatus(box1, false);
+            checkIdleStatus(box2, false);
+            checkIdleStatus(box3, false);
+            checkIdleStatus(box4, false);
+
             AddUntilStep("Wait for idle", () => box1.IsIdle);
-            AddAssert("check not idle", () => !box2.IsIdle && !box3.IsIdle && !box4.IsIdle);
+
+            checkIdleStatus(box1, true);
+            checkIdleStatus(box2, false);
+            checkIdleStatus(box3, false);
+            checkIdleStatus(box4, false);
+
             AddUntilStep("Wait for idle", () => box2.IsIdle);
-            AddAssert("check not idle", () => !box3.IsIdle && !box4.IsIdle);
+
+            checkIdleStatus(box1, true);
+            checkIdleStatus(box2, true);
+            checkIdleStatus(box3, false);
+            checkIdleStatus(box4, false);
+
             AddUntilStep("Wait for idle", () => box3.IsIdle);
 
+            checkIdleStatus(box1, true);
+            checkIdleStatus(box2, true);
+            checkIdleStatus(box3, true);
+            checkIdleStatus(box4, false);
+
+            waitForAllIdle();
+        }
+
+        private void checkIdleStatus(IdleTrackingBox box, bool expectedIdle)
+        {
+            AddAssert($"{box.Name} is {(expectedIdle ? "idle" : "active")}", () => box.IsIdle == expectedIdle);
+        }
+
+        private void waitForAllIdle()
+        {
             AddUntilStep("Wait for all idle", () => box1.IsIdle && box2.IsIdle && box3.IsIdle && box4.IsIdle);
         }
 
