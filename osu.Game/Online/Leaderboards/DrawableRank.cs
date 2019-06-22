@@ -3,72 +3,44 @@
 
 using osu.Framework.Allocation;
 using osu.Framework.Extensions;
-using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
 using osu.Game.Scoring;
+using System;
 
 namespace osu.Game.Online.Leaderboards
 {
-    public class DrawableRank : Container
+    public class DrawableRank : Sprite
     {
-        private readonly Sprite rankSprite;
-        private TextureStore textures;
-
-        public ScoreRank Rank { get; private set; }
+        private readonly ScoreRank rank;
 
         public DrawableRank(ScoreRank rank)
         {
-            Rank = rank;
-
-            Children = new Drawable[]
-            {
-                rankSprite = new Sprite
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
-                    FillMode = FillMode.Fit
-                },
-            };
+            this.rank = rank;
         }
 
-        [BackgroundDependencyLoader]
-        private void load(TextureStore textures)
+        [BackgroundDependencyLoader(true)]
+        private void load(TextureStore ts)
         {
-            this.textures = textures;
-            updateTexture();
+            if (ts == null)
+                throw new ArgumentNullException(nameof(ts));
+
+            Texture = ts.Get($@"Grades/{getTextureName()}");
         }
 
-        private void updateTexture()
+        private string getTextureName()
         {
-            string textureName;
-
-            switch (Rank)
+            switch (rank)
             {
                 default:
-                    textureName = Rank.GetDescription();
-                    break;
+                    return rank.GetDescription();
 
                 case ScoreRank.SH:
-                    textureName = "SPlus";
-                    break;
+                    return "SPlus";
 
                 case ScoreRank.XH:
-                    textureName = "SSPlus";
-                    break;
+                    return "SSPlus";
             }
-
-            rankSprite.Texture = textures.Get($@"Grades/{textureName}");
-        }
-
-        public void UpdateRank(ScoreRank newRank)
-        {
-            Rank = newRank;
-
-            if (LoadState >= LoadState.Ready)
-                updateTexture();
         }
     }
 }
