@@ -189,7 +189,7 @@ namespace osu.Game.Overlays
             }
 
             protected override FlowContainer<ProfileSection> CreateScrollContentContainer()
-            => new FillFlowContainer<ProfileSection>
+                => new FillFlowContainer<ProfileSection>
             {
                 Direction = FillDirection.Vertical,
                 AutoSizeAxes = Axes.Y,
