@@ -15,6 +15,7 @@ using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays.BeatmapSet.Buttons;
 using osu.Game.Overlays.Direct;
+using osu.Game.Rulesets;
 using osuTK;
 using osuTK.Graphics;
 using DownloadButton = osu.Game.Overlays.BeatmapSet.Buttons.DownloadButton;
@@ -40,6 +41,8 @@ namespace osu.Game.Overlays.BeatmapSet
 
         private readonly FavouriteButton favouriteButton;
 
+        private readonly RulesetTabControl tabControl;
+
         public Header()
         {
             ExternalLinkButton externalLink;
@@ -62,9 +65,13 @@ namespace osu.Game.Overlays.BeatmapSet
                 {
                     RelativeSizeAxes = Axes.X,
                     Height = tabs_height,
-                    Children = new[]
+                    Children = new Drawable[]
                     {
                         tabsBg = new Box
+                        {
+                            RelativeSizeAxes = Axes.Both,
+                        },
+                        tabControl = new RulesetTabControl
                         {
                             RelativeSizeAxes = Axes.Both,
                         },
@@ -187,20 +194,30 @@ namespace osu.Game.Overlays.BeatmapSet
                 },
             };
 
-            Picker.Beatmap.ValueChanged += b => Details.Beatmap = b.NewValue;
-            Picker.Beatmap.ValueChanged += b => externalLink.Link = $@"https://osu.ppy.sh/beatmapsets/{BeatmapSet.Value?.OnlineBeatmapSetID}#{b.NewValue?.Ruleset.ShortName}/{b.NewValue?.OnlineBeatmapID}";
+            Picker.Beatmap.ValueChanged += b =>
+            {
+                Details.Beatmap = b.NewValue;
+                externalLink.Link = $@"https://osu.ppy.sh/beatmapsets/{BeatmapSet.Value?.OnlineBeatmapSetID}#{b.NewValue?.Ruleset.ShortName}/{b.NewValue?.OnlineBeatmapID}";
+
+                tabControl.SelectRuleset(b.NewValue?.Ruleset);
+            };
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
+        private void load(OsuColour colours, RulesetStore rulesets)
         {
             tabsBg.Colour = colours.Gray3;
+
+            foreach (var ruleset in rulesets.AvailableRulesets)
+                tabControl.AddItem(ruleset);
+
+            Picker.Ruleset.BindTo(tabControl.Current);
 
             State.BindValueChanged(_ => updateDownloadButtons());
 
             BeatmapSet.BindValueChanged(setInfo =>
             {
-                Picker.BeatmapSet = author.BeatmapSet = Details.BeatmapSet = setInfo.NewValue;
+                Picker.BeatmapSet = tabControl.BeatmapSet = author.BeatmapSet = Details.BeatmapSet = setInfo.NewValue;
 
                 title.Text = setInfo.NewValue?.Metadata.Title ?? string.Empty;
                 artist.Text = setInfo.NewValue?.Metadata.Artist ?? string.Empty;

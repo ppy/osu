@@ -39,6 +39,7 @@ namespace osu.Game.Tests.Visual.Online
             typeof(Info),
             typeof(PreviewButton),
             typeof(SuccessRate),
+            typeof(RulesetTabControl)
         };
 
         private RulesetInfo maniaRuleset;
