@@ -15,12 +15,6 @@ namespace osu.Game.Rulesets
             Current.BindValueChanged(OnRulesetChanged);
         }
 
-        protected virtual void OnRulesetChanged(ValueChangedEvent<RulesetInfo> e)
-        {
-            if (Current.Disabled)
-            {
-                return;
-            }
-        }
+        protected abstract void OnRulesetChanged(ValueChangedEvent<RulesetInfo> e);
     }
 }
