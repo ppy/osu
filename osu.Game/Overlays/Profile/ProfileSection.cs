@@ -3,6 +3,7 @@
 
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
@@ -118,9 +119,7 @@ namespace osu.Game.Overlays.Profile
                         Anchor = Anchor.BottomCentre,
                         Origin = Anchor.BottomCentre,
                         RelativeSizeAxes = Axes.Both,
-                        Height = 0.95f,
-                        TriangleScale = 4,
-                        Velocity = 0.5f,
+                        TriangleScale = 3,
                     },
                     foreground = new Box
                     {
@@ -133,8 +132,8 @@ namespace osu.Game.Overlays.Profile
             private void load(OsuColour colours)
             {
                 triangles.ColourLight = colours.GreySeafoamDark;
-                triangles.ColourDark = colours.GreySeafoamDarker;
-                foreground.Colour = ColourInfo.GradientVertical(colours.GreySeafoamDarker, new Color4(0, 0, 0, 0));
+                triangles.ColourDark = OsuColour.FromHex("171b1a");
+                foreground.Colour = ColourInfo.GradientVertical(colours.GreySeafoamDarker, colours.GreySeafoamDarker.Opacity(0));
             }
         }
     }
