@@ -188,8 +188,7 @@ namespace osu.Game.Overlays
                 RelativeSizeAxes = Axes.Both;
             }
 
-            protected override FlowContainer<ProfileSection> CreateScrollContentContainer()
-                => new FillFlowContainer<ProfileSection>
+            protected override FlowContainer<ProfileSection> CreateScrollContentContainer() => new FillFlowContainer<ProfileSection>
             {
                 Direction = FillDirection.Vertical,
                 AutoSizeAxes = Axes.Y,
