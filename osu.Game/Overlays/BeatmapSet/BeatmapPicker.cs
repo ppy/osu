@@ -17,6 +17,7 @@ using osu.Game.Beatmaps.Drawables;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Rulesets;
 using osuTK;
 using osuTK.Graphics;
 
@@ -32,6 +33,8 @@ namespace osu.Game.Overlays.BeatmapSet
         private readonly Statistic plays, favourites;
 
         public readonly Bindable<BeatmapInfo> Beatmap = new Bindable<BeatmapInfo>();
+
+        public readonly Bindable<RulesetInfo> Ruleset = new Bindable<RulesetInfo>();
 
         private BeatmapSetInfo beatmapSet;
 
@@ -50,27 +53,32 @@ namespace osu.Game.Overlays.BeatmapSet
 
         private void updateDisplay()
         {
-            difficulties.Clear();
+            updateChildren();
 
-            if (BeatmapSet != null)
-            {
-                difficulties.ChildrenEnumerable = BeatmapSet.Beatmaps.OrderBy(beatmap => beatmap.StarDifficulty).Select(b => new DifficultySelectorButton(b)
-                {
-                    State = DifficultySelectorState.NotSelected,
-                    OnHovered = beatmap =>
-                    {
-                        showBeatmap(beatmap);
-                        starRating.Text = beatmap.StarDifficulty.ToString("Star Difficulty 0.##");
-                        starRating.FadeIn(100);
-                    },
-                    OnClicked = beatmap => { Beatmap.Value = beatmap; },
-                });
-            }
-
-            starRating.FadeOut(100);
             Beatmap.Value = BeatmapSet?.Beatmaps.FirstOrDefault();
             plays.Value = BeatmapSet?.OnlineInfo.PlayCount ?? 0;
             favourites.Value = BeatmapSet?.OnlineInfo.FavouriteCount ?? 0;
+        }
+
+        private void updateChildren()
+        {
+            difficulties.Clear();
+
+            if (BeatmapSet == null)
+                return;
+
+            difficulties.ChildrenEnumerable = BeatmapSet.Beatmaps.OrderBy(beatmap => beatmap.StarDifficulty).ToList().FindAll(b => b.Ruleset.ID == Ruleset.Value.ID).Select(b => new DifficultySelectorButton(b)
+            {
+                State = DifficultySelectorState.NotSelected,
+                OnHovered = beatmap =>
+                {
+                    showBeatmap(beatmap);
+                    starRating.Text = beatmap.StarDifficulty.ToString("Star Difficulty 0.##");
+                    starRating.FadeIn(100);
+                },
+                OnClicked = beatmap => { Beatmap.Value = beatmap; },
+            });
+            starRating.FadeOut(100);
 
             updateDifficultyButtons();
         }
@@ -143,6 +151,14 @@ namespace osu.Game.Overlays.BeatmapSet
             {
                 showBeatmap(b.NewValue);
                 updateDifficultyButtons();
+            };
+
+            Ruleset.ValueChanged += r =>
+            {
+                updateChildren();
+
+                if (Beatmap.Value?.Ruleset.ID != r.NewValue?.ID)
+                    Beatmap.Value = BeatmapSet?.Beatmaps.FindAll(b => b.Ruleset.ID == r.NewValue.ID).FirstOrDefault();
             };
         }
 
