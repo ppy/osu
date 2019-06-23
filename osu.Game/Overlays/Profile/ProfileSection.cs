@@ -12,7 +12,6 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Backgrounds;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Users;
-using osuTK.Graphics;
 
 namespace osu.Game.Overlays.Profile
 {
