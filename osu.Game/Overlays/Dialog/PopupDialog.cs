@@ -134,9 +134,9 @@ namespace osu.Game.Overlays.Dialog
                             Origin = Anchor.BottomCentre,
                             RelativeSizeAxes = Axes.X,
                             AutoSizeAxes = Axes.Y,
-                            Position = new Vector2(0f, 60f),
+                            Position = new Vector2(0f, -40f),
                             Direction = FillDirection.Vertical,
-                            Spacing = new Vector2(0f, 10f),
+                            Spacing = new Vector2(0f, 5f),
                             Children = new Drawable[]
                             {
                                 new Container
@@ -146,7 +146,7 @@ namespace osu.Game.Overlays.Dialog
                                     Size = ringSize,
                                     Margin = new MarginPadding
                                     {
-                                        Bottom = 30,
+                                        Bottom = 0,
                                     },
                                     Children = new Drawable[]
                                     {
@@ -181,14 +181,17 @@ namespace osu.Game.Overlays.Dialog
                                     Anchor = Anchor.TopCentre,
                                     RelativeSizeAxes = Axes.X,
                                     AutoSizeAxes = Axes.Y,
-                                    Padding = new MarginPadding(15),
+                                    Padding = new MarginPadding(5),
                                     TextAnchor = Anchor.TopCentre,
                                 },
                                 body = new OsuTextFlowContainer(t => t.Font = t.Font.With(size: 18))
                                 {
                                     RelativeSizeAxes = Axes.X,
                                     AutoSizeAxes = Axes.Y,
-                                    Padding = new MarginPadding(15),
+                                    Padding = new MarginPadding {
+                                        Top = 5,
+                                        Bottom = -20,
+                                    },
                                     TextAnchor = Anchor.TopCentre,
                                 },
                             },
