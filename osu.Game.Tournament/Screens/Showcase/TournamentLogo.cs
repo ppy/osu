@@ -11,11 +11,20 @@ namespace osu.Game.Tournament.Screens.Showcase
 {
     public class TournamentLogo : CompositeDrawable
     {
-        public TournamentLogo()
+        public TournamentLogo(bool includeRoundBackground = true)
         {
             RelativeSizeAxes = Axes.X;
-            AutoSizeAxes = Axes.Y;
             Margin = new MarginPadding { Vertical = 5 };
+
+            if (includeRoundBackground)
+            {
+                AutoSizeAxes = Axes.Y;
+            }
+            else
+            {
+                Masking = true;
+                Height = 100;
+            }
         }
 
         [BackgroundDependencyLoader]
