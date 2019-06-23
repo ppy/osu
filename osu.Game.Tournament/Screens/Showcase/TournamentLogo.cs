@@ -6,7 +6,6 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
-using osuTK;
 
 namespace osu.Game.Tournament.Screens.Showcase
 {
@@ -15,7 +14,7 @@ namespace osu.Game.Tournament.Screens.Showcase
         public TournamentLogo()
         {
             RelativeSizeAxes = Axes.X;
-            Height = 95;
+            AutoSizeAxes = Axes.Y;
             Margin = new MarginPadding { Vertical = 5 };
         }
 
@@ -27,9 +26,6 @@ namespace osu.Game.Tournament.Screens.Showcase
                 Texture = textures.Get("game-screen-logo"),
                 Anchor = Anchor.TopCentre,
                 Origin = Anchor.TopCentre,
-                FillMode = FillMode.Fit,
-                RelativeSizeAxes = Axes.Both,
-                Size = Vector2.One
             };
         }
     }
