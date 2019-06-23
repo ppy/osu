@@ -134,7 +134,7 @@ namespace osu.Game.Overlays.Dialog
                             Origin = Anchor.BottomCentre,
                             RelativeSizeAxes = Axes.X,
                             AutoSizeAxes = Axes.Y,
-                            Position = new Vector2(0f, -50f),
+                            Position = new Vector2(0f, 60f),
                             Direction = FillDirection.Vertical,
                             Spacing = new Vector2(0f, 10f),
                             Children = new Drawable[]
