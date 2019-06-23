@@ -92,12 +92,7 @@ namespace osu.Game.Overlays.Toolbar
 
         private readonly Cached activeMode = new Cached();
 
-        protected override void OnRulesetChanged(ValueChangedEvent<RulesetInfo> e)
-        {
-            base.OnRulesetChanged(e);
-
-            activeMode.Invalidate();
-        }
+        protected override void OnRulesetChanged(ValueChangedEvent<RulesetInfo> e) => activeMode.Invalidate();
 
         protected override void UpdateAfterChildren()
         {
