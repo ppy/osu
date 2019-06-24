@@ -82,5 +82,18 @@ namespace osu.Game.Overlays
             foreach (var s in subPanels)
                 ContentContainer.Add(s);
         }
+
+        protected override void PopOut()
+        {
+            base.PopOut();
+
+            foreach (var s in subPanels)
+            {
+                if (s.State.Value == Visibility.Visible)
+                {
+                    s.Hide();
+                }
+            }
+        }
     }
 }
