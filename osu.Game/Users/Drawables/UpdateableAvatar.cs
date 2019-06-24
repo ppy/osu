@@ -5,6 +5,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Effects;
+using osu.Framework.Graphics.Transforms;
 
 namespace osu.Game.Users.Drawables
 {
@@ -51,16 +52,13 @@ namespace osu.Game.Users.Drawables
         /// </summary>
         public readonly BindableBool OpenOnClick = new BindableBool(true);
 
-        public UpdateableAvatar(User user = null, bool transformImmediately = false)
+        public UpdateableAvatar(User user = null, bool hideImmediately = false)
         {
+            TransformImmediately = hideImmediately;
             User = user;
-
-            if (transformImmediately)
-            {
-                TransformDuration = 0;
-                TransformImmediately = true;
-            }
         }
+
+        protected override TransformSequence<Drawable> ApplyHideTransforms(Drawable drawable) => TransformImmediately ? drawable?.FadeOut() : base.ApplyHideTransforms(drawable);
 
         protected override Drawable CreateDrawable(User user)
         {
