@@ -197,11 +197,7 @@ namespace osu.Game.Screens.Multi.Match
             Mods.Value = e.NewValue?.RequiredMods?.ToArray() ?? Array.Empty<Mod>();
 
             if (e.NewValue?.Ruleset != null)
-            {
-                Ruleset.Disabled = false;
                 Ruleset.Value = e.NewValue.Ruleset;
-                Ruleset.Disabled = true;
-            }
         }
 
         /// <summary>
