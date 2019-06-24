@@ -134,9 +134,9 @@ namespace osu.Game.Overlays.Dialog
                             Origin = Anchor.BottomCentre,
                             RelativeSizeAxes = Axes.X,
                             AutoSizeAxes = Axes.Y,
-                            Position = new Vector2(0f, -40f),
                             Direction = FillDirection.Vertical,
-                            Spacing = new Vector2(0f, 5f),
+                            Spacing = new Vector2(0f, 10f),
+                            Padding = new MarginPadding { Bottom = 10 },
                             Children = new Drawable[]
                             {
                                 new Container
@@ -144,10 +144,6 @@ namespace osu.Game.Overlays.Dialog
                                     Origin = Anchor.TopCentre,
                                     Anchor = Anchor.TopCentre,
                                     Size = ringSize,
-                                    Margin = new MarginPadding
-                                    {
-                                        Bottom = 0,
-                                    },
                                     Children = new Drawable[]
                                     {
                                         ring = new CircularContainer
@@ -181,18 +177,15 @@ namespace osu.Game.Overlays.Dialog
                                     Anchor = Anchor.TopCentre,
                                     RelativeSizeAxes = Axes.X,
                                     AutoSizeAxes = Axes.Y,
-                                    Padding = new MarginPadding(5),
                                     TextAnchor = Anchor.TopCentre,
                                 },
                                 body = new OsuTextFlowContainer(t => t.Font = t.Font.With(size: 18))
                                 {
+                                    Origin = Anchor.TopCentre,
+                                    Anchor = Anchor.TopCentre,
+                                    TextAnchor = Anchor.TopCentre,
                                     RelativeSizeAxes = Axes.X,
                                     AutoSizeAxes = Axes.Y,
-                                    Padding = new MarginPadding {
-                                        Top = 5,
-                                        Bottom = -20,
-                                    },
-                                    TextAnchor = Anchor.TopCentre,
                                 },
                             },
                         },
