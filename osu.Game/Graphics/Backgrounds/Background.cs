@@ -1,12 +1,11 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
-using OpenTK.Graphics;
-using osu.Game.Graphics.Textures;
+using osu.Framework.Graphics.Textures;
 
 namespace osu.Game.Graphics.Backgrounds
 {
@@ -28,7 +27,6 @@ namespace osu.Game.Graphics.Backgrounds
                 RelativeSizeAxes = Axes.Both,
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
-                Colour = Color4.DarkGray,
                 FillMode = FillMode.Fill,
             });
         }

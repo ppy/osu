@@ -1,112 +1,182 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
+using System;
+using System.Linq;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
+using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Sprites;
 using osu.Framework.Screens;
 using osu.Game.Graphics;
-using osu.Game.Graphics.Sprites;
-using OpenTK;
-using OpenTK.Graphics;
+using osu.Game.Graphics.Containers;
+using osu.Game.Online.API;
+using osuTK;
+using osuTK.Graphics;
 using osu.Game.Overlays;
+using osu.Game.Users;
 
 namespace osu.Game.Screens.Menu
 {
     public class Disclaimer : OsuScreen
     {
         private Intro intro;
-        private readonly SpriteIcon icon;
+        private SpriteIcon icon;
         private Color4 iconColour;
+        private LinkFlowContainer textFlow;
+        private LinkFlowContainer supportFlow;
 
-        protected override bool HideOverlaysOnEnter => true;
-        protected override OverlayActivation InitialOverlayActivationMode => OverlayActivation.Disabled;
+        public override bool HideOverlaysOnEnter => true;
+        public override OverlayActivation InitialOverlayActivationMode => OverlayActivation.Disabled;
 
         public override bool CursorVisible => false;
+
+        private Drawable heart;
+
+        private const float icon_y = -85;
+        private const float icon_size = 30;
+
+        private readonly Bindable<User> currentUser = new Bindable<User>();
 
         public Disclaimer()
         {
             ValidForResume = false;
+        }
 
-            Children = new Drawable[]
+        [BackgroundDependencyLoader]
+        private void load(OsuColour colours, IAPIProvider api)
+        {
+            InternalChildren = new Drawable[]
             {
-                new FillFlowContainer
+                icon = new SpriteIcon
                 {
-                    AutoSizeAxes = Axes.Both,
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
+                    Icon = FontAwesome.Solid.ExclamationTriangle,
+                    Size = new Vector2(icon_size),
+                    Y = icon_y,
+                },
+                new FillFlowContainer
+                {
+                    RelativeSizeAxes = Axes.X,
+                    AutoSizeAxes = Axes.Y,
                     Direction = FillDirection.Vertical,
-                    Spacing = new Vector2(0, 2),
+                    Y = icon_y + icon_size,
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.TopCentre,
                     Children = new Drawable[]
                     {
-                        icon = new SpriteIcon
+                        textFlow = new LinkFlowContainer
                         {
+                            RelativeSizeAxes = Axes.X,
+                            AutoSizeAxes = Axes.Y,
+                            TextAnchor = Anchor.TopCentre,
                             Anchor = Anchor.TopCentre,
                             Origin = Anchor.TopCentre,
-                            Icon = FontAwesome.fa_warning,
-                            Size = new Vector2(30),
+                            Spacing = new Vector2(0, 2),
                         },
-                        new OsuSpriteText
+                        supportFlow = new LinkFlowContainer
                         {
+                            RelativeSizeAxes = Axes.X,
+                            AutoSizeAxes = Axes.Y,
+                            TextAnchor = Anchor.TopCentre,
                             Anchor = Anchor.TopCentre,
                             Origin = Anchor.TopCentre,
-                            TextSize = 30,
-                            Text = "This is a development build",
-                            Margin = new MarginPadding
-                            {
-                                Bottom = 20
-                            },
-                        },
-                        new OsuSpriteText
-                        {
-                            Anchor = Anchor.TopCentre,
-                            Origin = Anchor.TopCentre,
-                            Text = "Don't expect shit to work perfectly as this is very much a work in progress."
-                        },
-                        new OsuSpriteText
-                        {
-                            Anchor = Anchor.TopCentre,
-                            Origin = Anchor.TopCentre,
-                            Text = "Don't report bugs because we are aware. Don't complain about missing features because we are adding them."
-                        },
-                        new OsuSpriteText
-                        {
-                            Anchor = Anchor.TopCentre,
-                            Origin = Anchor.TopCentre,
-                            Text = "Sit back and enjoy. Visit discord.gg/ppy if you want to help out!",
-                            Margin = new MarginPadding { Bottom = 20 },
-                        },
-                        new OsuSpriteText
-                        {
-                            Anchor = Anchor.TopCentre,
-                            Origin = Anchor.TopCentre,
-                            TextSize = 12,
-                            Text = "oh and yes, you will get seizures.",
+                            Alpha = 0,
+                            Spacing = new Vector2(0, 2),
                         },
                     }
                 }
             };
-        }
 
-        [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
-        {
-            LoadComponentAsync(intro = new Intro());
+            textFlow.AddText("This is an ", t => t.Font = t.Font.With(Typeface.Exo, 30, FontWeight.Light));
+            textFlow.AddText("early development build", t => t.Font = t.Font.With(Typeface.Exo, 30, FontWeight.SemiBold));
+
+            textFlow.AddParagraph("Things may not work as expected", t => t.Font = t.Font.With(size: 20));
+            textFlow.NewParagraph();
+
+            Action<SpriteText> format = t => t.Font = OsuFont.GetFont(size: 15, weight: FontWeight.SemiBold);
+
+            textFlow.AddParagraph("Detailed bug reports are welcomed via github issues.", format);
+            textFlow.NewParagraph();
+
+            textFlow.AddText("Visit ", format);
+            textFlow.AddLink("discord.gg/ppy", "https://discord.gg/ppy", creationParameters: format);
+            textFlow.AddText(" to help out or follow progress!", format);
+
+            textFlow.NewParagraph();
+            textFlow.NewParagraph();
+            textFlow.NewParagraph();
 
             iconColour = colours.Yellow;
+
+            currentUser.BindTo(api.LocalUser);
+            currentUser.BindValueChanged(e =>
+            {
+                supportFlow.Children.ForEach(d => d.FadeOut().Expire());
+
+                if (e.NewValue.IsSupporter)
+                {
+                    supportFlow.AddText("Thank you for supporting osu!", format);
+                }
+                else
+                {
+                    supportFlow.AddText("Consider becoming an ", format);
+                    supportFlow.AddLink("osu!supporter", "https://osu.ppy.sh/home/support", creationParameters: format);
+                    supportFlow.AddText(" to help support the game", format);
+                }
+
+                heart = supportFlow.AddIcon(FontAwesome.Solid.Heart, t =>
+                {
+                    t.Padding = new MarginPadding { Left = 5 };
+                    t.Font = t.Font.With(size: 12);
+                    t.Origin = Anchor.Centre;
+                    t.Colour = colours.Pink;
+                }).First();
+
+                if (IsLoaded)
+                    animateHeart();
+
+                if (supportFlow.IsPresent)
+                    supportFlow.FadeInFromZero(500);
+            }, true);
         }
 
-        protected override void OnEntering(Screen last)
+        private void animateHeart()
+        {
+            heart.FlashColour(Color4.White, 750, Easing.OutQuint).Loop();
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+            LoadComponentAsync(intro = new Intro());
+        }
+
+        public override void OnEntering(IScreen last)
         {
             base.OnEntering(last);
 
-            icon.Delay(1500).FadeColour(iconColour, 200);
+            icon.Delay(1000).FadeColour(iconColour, 200, Easing.OutQuint);
+            icon.Delay(1000)
+                .MoveToY(icon_y * 1.1f, 160, Easing.OutCirc)
+                .RotateTo(-10, 160, Easing.OutCirc)
+                .Then()
+                .MoveToY(icon_y, 160, Easing.InCirc)
+                .RotateTo(0, 160, Easing.InCirc);
 
-            Content
+            supportFlow.FadeOut().Delay(2000).FadeIn(500);
+
+            animateHeart();
+
+            this
                 .FadeInFromZero(500)
                 .Then(5500)
                 .FadeOut(250)
-                .Finally(d => Push(intro));
+                .ScaleTo(0.9f, 250, Easing.InQuint)
+                .Finally(d => this.Push(intro));
         }
     }
 }

@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using System.Collections.Generic;
@@ -30,6 +30,11 @@ namespace osu.Game.Audio
         public string Name;
 
         /// <summary>
+        /// An optional suffix to provide priority lookup. Falls back to non-suffixed <see cref="Name"/>.
+        /// </summary>
+        public string Suffix;
+
+        /// <summary>
         /// The sample volume.
         /// </summary>
         public int Volume;
@@ -42,9 +47,18 @@ namespace osu.Game.Audio
             get
             {
                 if (!string.IsNullOrEmpty(Namespace))
-                    yield return $"{Namespace}/{Bank}-{Name}";
+                {
+                    if (!string.IsNullOrEmpty(Suffix))
+                        yield return $"{Namespace}/{Bank}-{Name}{Suffix}";
 
-                yield return $"{Bank}-{Name}"; // Without namespace as a fallback even when we have a namespace
+                    yield return $"{Namespace}/{Bank}-{Name}";
+                }
+
+                // check non-namespace as a fallback even when we have a namespace
+                if (!string.IsNullOrEmpty(Suffix))
+                    yield return $"{Bank}-{Name}{Suffix}";
+
+                yield return $"{Bank}-{Name}";
             }
         }
 

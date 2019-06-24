@@ -1,12 +1,12 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
+using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
-using OpenTK.Graphics;
+using osuTK.Graphics;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Effects;
 using osu.Framework.Input.Bindings;
-using osu.Game.Rulesets.Mania.Judgements;
 using osu.Game.Rulesets.Mania.Objects.Drawables.Pieces;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.UI.Scrolling;
@@ -29,19 +29,19 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
             CornerRadius = 5;
             Masking = true;
 
-            InternalChild = headPiece = new NotePiece();
+            AddInternal(headPiece = new NotePiece());
         }
 
-        protected override void OnDirectionChanged(ScrollingDirection direction)
+        protected override void OnDirectionChanged(ValueChangedEvent<ScrollingDirection> e)
         {
-            base.OnDirectionChanged(direction);
+            base.OnDirectionChanged(e);
 
-            headPiece.Anchor = headPiece.Origin = direction == ScrollingDirection.Up ? Anchor.TopCentre : Anchor.BottomCentre;
+            headPiece.Anchor = headPiece.Origin = e.NewValue == ScrollingDirection.Up ? Anchor.TopCentre : Anchor.BottomCentre;
         }
 
         public override Color4 AccentColour
         {
-            get { return base.AccentColour; }
+            get => base.AccentColour;
             set
             {
                 base.AccentColour = value;
@@ -56,12 +56,12 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
             }
         }
 
-        protected override void CheckForJudgements(bool userTriggered, double timeOffset)
+        protected override void CheckForResult(bool userTriggered, double timeOffset)
         {
             if (!userTriggered)
             {
                 if (!HitObject.HitWindows.CanBeHit(timeOffset))
-                    AddJudgement(new ManiaJudgement { Result = HitResult.Miss });
+                    ApplyResult(r => r.Type = HitResult.Miss);
                 return;
             }
 
@@ -69,7 +69,7 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
             if (result == HitResult.None)
                 return;
 
-            AddJudgement(new ManiaJudgement { Result = result });
+            ApplyResult(r => r.Type = result);
         }
 
         public virtual bool OnPressed(ManiaAction action)
@@ -77,7 +77,7 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
             if (action != Action.Value)
                 return false;
 
-            return UpdateJudgement(true);
+            return UpdateResult(true);
         }
 
         public virtual bool OnReleased(ManiaAction action) => false;

@@ -1,233 +1,162 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
-using System;
 using System.Collections.Generic;
-using osu.Framework.Allocation;
-using osu.Framework.Configuration;
-using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.OpenGL.Textures;
 using osu.Framework.Graphics.Lines;
-using osu.Framework.Graphics.Textures;
-using OpenTK;
-using OpenTK.Graphics.ES30;
-using OpenTK.Graphics;
-using osu.Framework.Graphics.Primitives;
-using osu.Game.Rulesets.Objects.Types;
+using osuTK;
+using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
 {
-    public class SliderBody : Container, ISliderProgress
+    public abstract class SliderBody : CompositeDrawable
     {
-        private readonly Path path;
-        private readonly BufferedContainer container;
+        public const float DEFAULT_BORDER_SIZE = 1;
 
-        public float PathWidth
+        private readonly SliderPath path;
+        protected Path Path => path;
+
+        public float PathRadius
         {
-            get { return path.PathWidth; }
-            set { path.PathWidth = value; }
+            get => path.PathRadius;
+            set => path.PathRadius = value;
         }
 
         /// <summary>
         /// Offset in absolute coordinates from the start of the curve.
         /// </summary>
-        public Vector2 PathOffset { get; private set; }
+        public virtual Vector2 PathOffset => path.PositionInBoundingBox(path.Vertices[0]);
 
-        public readonly List<Vector2> CurrentCurve = new List<Vector2>();
-
-        public readonly Bindable<bool> SnakingIn = new Bindable<bool>();
-        public readonly Bindable<bool> SnakingOut = new Bindable<bool>();
-
-        public double? SnakedStart { get; private set; }
-        public double? SnakedEnd { get; private set; }
-
-        private Color4 accentColour = Color4.White;
         /// <summary>
         /// Used to colour the path.
         /// </summary>
         public Color4 AccentColour
         {
-            get { return accentColour; }
+            get => path.AccentColour;
             set
             {
-                if (accentColour == value)
+                if (path.AccentColour == value)
                     return;
-                accentColour = value;
 
-                if (LoadState >= LoadState.Ready)
-                    reloadTexture();
+                path.AccentColour = value;
             }
         }
 
-        private Color4 borderColour = Color4.White;
         /// <summary>
         /// Used to colour the path border.
         /// </summary>
         public new Color4 BorderColour
         {
-            get { return borderColour; }
+            get => path.BorderColour;
             set
             {
-                if (borderColour == value)
+                if (path.BorderColour == value)
                     return;
-                borderColour = value;
 
-                if (LoadState >= LoadState.Ready)
-                    reloadTexture();
+                path.BorderColour = value;
             }
         }
 
-        public Quad PathDrawQuad => container.ScreenSpaceDrawQuad;
-
-        private int textureWidth => (int)PathWidth * 2;
-
-        private Vector2 topLeftOffset;
-
-        private readonly Slider slider;
-        public SliderBody(Slider s)
+        /// <summary>
+        /// Used to size the path border.
+        /// </summary>
+        public float BorderSize
         {
-            slider = s;
-
-            Children = new Drawable[]
+            get => path.BorderSize;
+            set
             {
-                container = new BufferedContainer
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    CacheDrawnFrameBuffer = true,
-                    Children = new Drawable[]
-                    {
-                        path = new Path
-                        {
-                            Blending = BlendingMode.None,
-                        },
-                    }
-                },
-            };
+                if (path.BorderSize == value)
+                    return;
 
-            container.Attach(RenderbufferInternalFormat.DepthComponent16);
-        }
-
-        public override bool ReceiveMouseInputAt(Vector2 screenSpacePos) => path.ReceiveMouseInputAt(screenSpacePos);
-
-        public void SetRange(double p0, double p1)
-        {
-            if (p0 > p1)
-                MathHelper.Swap(ref p0, ref p1);
-
-            if (updateSnaking(p0, p1))
-            {
-                // The path is generated such that its size encloses it. This change of size causes the path
-                // to move around while snaking, so we need to offset it to make sure it maintains the
-                // same position as when it is fully snaked.
-                var newTopLeftOffset = path.PositionInBoundingBox(Vector2.Zero);
-                path.Position = topLeftOffset - newTopLeftOffset;
-
-                container.ForceRedraw();
+                path.BorderSize = value;
             }
         }
 
-        [BackgroundDependencyLoader]
-        private void load()
+        protected SliderBody()
         {
-            reloadTexture();
-            computeSize();
+            InternalChild = path = new SliderPath();
         }
 
-        private void reloadTexture()
+        public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => path.ReceivePositionalInputAt(screenSpacePos);
+
+        /// <summary>
+        /// Sets the vertices of the path which should be drawn by this <see cref="SliderBody"/>.
+        /// </summary>
+        /// <param name="vertices">The vertices</param>
+        protected void SetVertices(IReadOnlyList<Vector2> vertices) => path.Vertices = vertices;
+
+        private class SliderPath : SmoothPath
         {
-            var texture = new Texture(textureWidth, 1);
+            private const float border_max_size = 8f;
+            private const float border_min_size = 0f;
 
-            //initialise background
-            var raw = new RawTexture(textureWidth, 1);
-            var bytes = raw.Data;
+            private const float border_portion = 0.128f;
+            private const float gradient_portion = 1 - border_portion;
 
-            const float aa_portion = 0.02f;
-            const float border_portion = 0.128f;
-            const float gradient_portion = 1 - border_portion;
+            private const float opacity_at_centre = 0.3f;
+            private const float opacity_at_edge = 0.8f;
 
-            const float opacity_at_centre = 0.3f;
-            const float opacity_at_edge = 0.8f;
+            private Color4 borderColour = Color4.White;
 
-            for (int i = 0; i < textureWidth; i++)
+            public Color4 BorderColour
             {
-                float progress = (float)i / (textureWidth - 1);
-
-                if (progress <= border_portion)
+                get => borderColour;
+                set
                 {
-                    bytes[i * 4] = (byte)(BorderColour.R * 255);
-                    bytes[i * 4 + 1] = (byte)(BorderColour.G * 255);
-                    bytes[i * 4 + 2] = (byte)(BorderColour.B * 255);
-                    bytes[i * 4 + 3] = (byte)(Math.Min(progress / aa_portion, 1) * (BorderColour.A * 255));
-                }
-                else
-                {
-                    progress -= border_portion;
+                    if (borderColour == value)
+                        return;
 
-                    bytes[i * 4] = (byte)(AccentColour.R * 255);
-                    bytes[i * 4 + 1] = (byte)(AccentColour.G * 255);
-                    bytes[i * 4 + 2] = (byte)(AccentColour.B * 255);
-                    bytes[i * 4 + 3] = (byte)((opacity_at_edge - (opacity_at_edge - opacity_at_centre) * progress / gradient_portion) * (AccentColour.A * 255));
+                    borderColour = value;
+
+                    InvalidateTexture();
                 }
             }
 
-            texture.SetData(new TextureUpload(raw));
-            path.Texture = texture;
+            private Color4 accentColour = Color4.White;
 
-            container.ForceRedraw();
-        }
-
-        private void computeSize()
-        {
-            // Generate the entire curve
-            slider.Curve.GetPathToProgress(CurrentCurve, 0, 1);
-            foreach (Vector2 p in CurrentCurve)
-                path.AddVertex(p);
-
-            Size = path.Size;
-
-            topLeftOffset = path.PositionInBoundingBox(Vector2.Zero);
-            PathOffset = path.PositionInBoundingBox(CurrentCurve[0]);
-        }
-
-        private bool updateSnaking(double p0, double p1)
-        {
-            if (SnakedStart == p0 && SnakedEnd == p1) return false;
-
-            SnakedStart = p0;
-            SnakedEnd = p1;
-
-            slider.Curve.GetPathToProgress(CurrentCurve, p0, p1);
-
-            path.ClearVertices();
-            foreach (Vector2 p in CurrentCurve)
-                path.AddVertex(p);
-
-            return true;
-        }
-
-        public void UpdateProgress(double completionProgress)
-        {
-            var span = slider.SpanAt(completionProgress);
-            var spanProgress = slider.ProgressAt(completionProgress);
-
-            double start = 0;
-            double end = SnakingIn ? MathHelper.Clamp((Time.Current - (slider.StartTime - slider.TimePreempt)) / slider.TimeFadein, 0, 1) : 1;
-
-            if (span >= slider.SpanCount() - 1)
+            public Color4 AccentColour
             {
-                if (Math.Min(span, slider.SpanCount() - 1) % 2 == 1)
+                get => accentColour;
+                set
                 {
-                    start = 0;
-                    end = SnakingOut ? spanProgress : 1;
-                }
-                else
-                {
-                    start = SnakingOut ? spanProgress : 0;
+                    if (accentColour == value)
+                        return;
+
+                    accentColour = value;
+
+                    InvalidateTexture();
                 }
             }
 
-            SetRange(start, end);
+            private float borderSize = DEFAULT_BORDER_SIZE;
+
+            public float BorderSize
+            {
+                get => borderSize;
+                set
+                {
+                    if (borderSize == value)
+                        return;
+
+                    if (value < border_min_size || value > border_max_size)
+                        return;
+
+                    borderSize = value;
+
+                    InvalidateTexture();
+                }
+            }
+
+            private float calculatedBorderPortion => BorderSize * border_portion;
+
+            protected override Color4 ColourAt(float position)
+            {
+                if (calculatedBorderPortion != 0f && position <= calculatedBorderPortion)
+                    return BorderColour;
+
+                position -= calculatedBorderPortion;
+                return new Color4(AccentColour.R, AccentColour.G, AccentColour.B, (opacity_at_edge - (opacity_at_edge - opacity_at_centre) * position / gradient_portion) * AccentColour.A);
+            }
         }
     }
 }

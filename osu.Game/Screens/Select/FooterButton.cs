@@ -1,14 +1,15 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
-using OpenTK;
-using OpenTK.Graphics;
-using OpenTK.Input;
+using osuTK;
+using osuTK.Graphics;
+using osuTK.Input;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
-using osu.Framework.Input;
+using osu.Framework.Input.Events;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.Containers;
 
@@ -20,18 +21,19 @@ namespace osu.Game.Screens.Select
 
         public string Text
         {
-            get { return spriteText?.Text; }
+            get => SpriteText?.Text;
             set
             {
-                if (spriteText != null)
-                    spriteText.Text = value;
+                if (SpriteText != null)
+                    SpriteText.Text = value;
             }
         }
 
         private Color4 deselectedColour;
+
         public Color4 DeselectedColour
         {
-            get { return deselectedColour; }
+            get => deselectedColour;
             set
             {
                 deselectedColour = value;
@@ -41,9 +43,10 @@ namespace osu.Game.Screens.Select
         }
 
         private Color4 selectedColour;
+
         public Color4 SelectedColour
         {
-            get { return selectedColour; }
+            get => selectedColour;
             set
             {
                 selectedColour = value;
@@ -51,16 +54,27 @@ namespace osu.Game.Screens.Select
             }
         }
 
-        private readonly SpriteText spriteText;
+        protected readonly Container TextContainer;
+        protected readonly SpriteText SpriteText;
         private readonly Box box;
         private readonly Box light;
 
-        public override bool ReceiveMouseInputAt(Vector2 screenSpacePos) => box.ReceiveMouseInputAt(screenSpacePos);
+        public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => box.ReceivePositionalInputAt(screenSpacePos);
 
         public FooterButton()
         {
+            AutoSizeAxes = Axes.Both;
             Children = new Drawable[]
             {
+                TextContainer = new Container
+                {
+                    Size = new Vector2(100, 50),
+                    Child = SpriteText = new OsuSpriteText
+                    {
+                        Anchor = Anchor.Centre,
+                        Origin = Anchor.Centre,
+                    }
+                },
                 box = new Box
                 {
                     RelativeSizeAxes = Axes.Both,
@@ -76,11 +90,6 @@ namespace osu.Game.Screens.Select
                     EdgeSmoothness = new Vector2(2, 0),
                     RelativeSizeAxes = Axes.X,
                 },
-                spriteText = new OsuSpriteText
-                {
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
-                }
             };
         }
 
@@ -88,7 +97,7 @@ namespace osu.Game.Screens.Select
         public Action HoverLost;
         public Key? Hotkey;
 
-        protected override bool OnHover(InputState state)
+        protected override bool OnHover(HoverEvent e)
         {
             Hovered?.Invoke();
             light.ScaleTo(new Vector2(1, 2), Footer.TRANSITION_LENGTH, Easing.OutQuint);
@@ -96,42 +105,42 @@ namespace osu.Game.Screens.Select
             return true;
         }
 
-        protected override void OnHoverLost(InputState state)
+        protected override void OnHoverLost(HoverLostEvent e)
         {
             HoverLost?.Invoke();
             light.ScaleTo(new Vector2(1, 1), Footer.TRANSITION_LENGTH, Easing.OutQuint);
             light.FadeColour(DeselectedColour, Footer.TRANSITION_LENGTH, Easing.OutQuint);
         }
 
-        protected override bool OnMouseDown(InputState state, MouseDownEventArgs args)
+        protected override bool OnMouseDown(MouseDownEvent e)
         {
             box.FadeTo(0.3f, Footer.TRANSITION_LENGTH * 2, Easing.OutQuint);
-            return base.OnMouseDown(state, args);
+            return base.OnMouseDown(e);
         }
 
-        protected override bool OnMouseUp(InputState state, MouseUpEventArgs args)
+        protected override bool OnMouseUp(MouseUpEvent e)
         {
             box.FadeOut(Footer.TRANSITION_LENGTH, Easing.OutQuint);
-            return base.OnMouseUp(state, args);
+            return base.OnMouseUp(e);
         }
 
-        protected override bool OnClick(InputState state)
+        protected override bool OnClick(ClickEvent e)
         {
             box.ClearTransforms();
             box.Alpha = 1;
             box.FadeOut(Footer.TRANSITION_LENGTH * 3, Easing.OutQuint);
-            return base.OnClick(state);
+            return base.OnClick(e);
         }
 
-        protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
+        protected override bool OnKeyDown(KeyDownEvent e)
         {
-            if (!args.Repeat && args.Key == Hotkey)
+            if (!e.Repeat && e.Key == Hotkey)
             {
-                OnClick(state);
+                Click();
                 return true;
             }
 
-            return base.OnKeyDown(state, args);
+            return base.OnKeyDown(e);
         }
     }
 }
