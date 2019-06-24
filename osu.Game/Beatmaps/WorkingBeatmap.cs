@@ -11,6 +11,7 @@ using osu.Framework.IO.File;
 using System.IO;
 using System.Linq;
 using System.Threading;
+using System.Threading.Tasks;
 using osu.Framework.Audio;
 using osu.Game.IO.Serialization;
 using osu.Game.Rulesets;
@@ -38,7 +39,7 @@ namespace osu.Game.Beatmaps
             BeatmapSetInfo = beatmapInfo.BeatmapSet;
             Metadata = beatmapInfo.Metadata ?? BeatmapSetInfo?.Metadata ?? new BeatmapMetadata();
 
-            beatmap = new RecyclableLazy<IBeatmap>(() =>
+            beatmapLoadTask = Task.Factory.StartNew(() =>
             {
                 var b = GetBeatmap() ?? new Beatmap();
 
@@ -49,7 +50,7 @@ namespace osu.Game.Beatmaps
                 b.BeatmapInfo = BeatmapInfo;
 
                 return b;
-            });
+            }, beatmapCancellation.Token, TaskCreationOptions.LongRunning, TaskScheduler.Default);
 
             track = new RecyclableLazy<Track>(() => GetTrack() ?? GetVirtualTrack());
             background = new RecyclableLazy<Texture>(GetBackground, BackgroundStillValid);
@@ -153,10 +154,11 @@ namespace osu.Game.Beatmaps
 
         public override string ToString() => BeatmapInfo.ToString();
 
-        public bool BeatmapLoaded => beatmap.IsResultAvailable;
-        public IBeatmap Beatmap => beatmap.Value;
+        public bool BeatmapLoaded => beatmapLoadTask.IsCompleted;
+        public IBeatmap Beatmap => beatmapLoadTask.Result;
+        private readonly CancellationTokenSource beatmapCancellation = new CancellationTokenSource();
         protected abstract IBeatmap GetBeatmap();
-        private readonly RecyclableLazy<IBeatmap> beatmap;
+        private readonly Task<IBeatmap> beatmapLoadTask;
 
         public bool BackgroundLoaded => background.IsResultAvailable;
         public Texture Background => background.Value;
@@ -201,6 +203,8 @@ namespace osu.Game.Beatmaps
             waveform.Recycle();
             storyboard.Recycle();
             skin.Recycle();
+
+            beatmapCancellation.Cancel();
         }
 
         /// <summary>
