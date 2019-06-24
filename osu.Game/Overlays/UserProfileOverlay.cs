@@ -40,9 +40,7 @@ namespace osu.Game.Overlays
             if (user.Id == Header?.User.Value?.Id)
                 return;
 
-            userReq?.Cancel();
             Clear();
-            lastSection = null;
 
             sections = new ProfileSection[]
             {
@@ -55,30 +53,33 @@ namespace osu.Game.Overlays
                 new KudosuSection()
             };
 
-            tabs = new ProfileTabControl
+            AddRange(new Drawable[]
             {
-                RelativeSizeAxes = Axes.X,
-                Anchor = Anchor.TopCentre,
-                Origin = Anchor.TopCentre,
-                Height = 30
-            };
-
-            Add(new Box
-            {
-                RelativeSizeAxes = Axes.Both,
-                Colour = OsuColour.Gray(0.1f)
-            });
-
-            Add(sectionsContainer = new ProfileSectionsContainer
-            {
-                ExpandableHeader = Header = new ProfileHeader(),
-                FixedHeader = tabs,
-                HeaderBackground = new Box
+                new Box
                 {
-                    Colour = OsuColour.Gray(34),
-                    RelativeSizeAxes = Axes.Both
+                    RelativeSizeAxes = Axes.Both,
+                    Colour = OsuColour.Gray(0.1f)
+                },
+                sectionsContainer = new ProfileSectionsContainer
+                {
+                    ExpandableHeader = Header = new ProfileHeader(),
+                    FixedHeader = tabs = new ProfileTabControl
+                    {
+                        RelativeSizeAxes = Axes.X,
+                        Anchor = Anchor.TopCentre,
+                        Origin = Anchor.TopCentre,
+                        Height = 30
+                    },
+                    HeaderBackground = new Box
+                    {
+                        Colour = OsuColour.Gray(34),
+                        RelativeSizeAxes = Axes.Both
+                    }
                 }
             });
+
+            lastSection = null;
+
             sectionsContainer.SelectedSection.ValueChanged += section =>
             {
                 if (lastSection != section.NewValue)
@@ -104,6 +105,8 @@ namespace osu.Game.Overlays
                     sectionsContainer.ScrollTo(lastSection);
                 }
             };
+
+            userReq?.Cancel();
 
             if (fetchOnline)
             {
