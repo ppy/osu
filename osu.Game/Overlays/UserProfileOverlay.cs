@@ -13,6 +13,7 @@ using osu.Game.Online.API.Requests;
 using osu.Game.Overlays.Profile;
 using osu.Game.Overlays.Profile.Sections;
 using osu.Game.Users;
+using osuTK;
 
 namespace osu.Game.Overlays
 {
