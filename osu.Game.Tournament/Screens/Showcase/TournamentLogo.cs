@@ -6,17 +6,25 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
-using osuTK;
 
 namespace osu.Game.Tournament.Screens.Showcase
 {
     public class TournamentLogo : CompositeDrawable
     {
-        public TournamentLogo()
+        public TournamentLogo(bool includeRoundBackground = true)
         {
             RelativeSizeAxes = Axes.X;
-            Height = 95;
             Margin = new MarginPadding { Vertical = 5 };
+
+            if (includeRoundBackground)
+            {
+                AutoSizeAxes = Axes.Y;
+            }
+            else
+            {
+                Masking = true;
+                Height = 100;
+            }
         }
 
         [BackgroundDependencyLoader]
@@ -27,9 +35,6 @@ namespace osu.Game.Tournament.Screens.Showcase
                 Texture = textures.Get("game-screen-logo"),
                 Anchor = Anchor.TopCentre,
                 Origin = Anchor.TopCentre,
-                FillMode = FillMode.Fit,
-                RelativeSizeAxes = Axes.Both,
-                Size = Vector2.One
             };
         }
     }
