@@ -77,6 +77,7 @@ namespace osu.Game.Rulesets.Catch.Tests
             }
         }
 
+        [Cached(typeof(ISkinSource))]
         private class CatchCustomSkinSourceContainer : Container, ISkinSource
         {
             public event Action SourceChanged
@@ -92,12 +93,6 @@ namespace osu.Game.Rulesets.Catch.Tests
             public Texture GetTexture(string componentName) => throw new NotImplementedException();
 
             public TValue GetValue<TConfiguration, TValue>(Func<TConfiguration, TValue> query) where TConfiguration : SkinConfiguration => throw new NotImplementedException();
-
-            protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
-            {
-                ((DependencyContainer)parent).CacheAs<ISkinSource>(this);
-                return base.CreateChildDependencies(parent);
-            }
         }
     }
 }
