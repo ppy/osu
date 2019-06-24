@@ -12,17 +12,14 @@ namespace osu.Game.Skinning
     {
         protected override bool ApplySizeToDefault => true;
 
-        private readonly string defaultName;
-
-        protected override Sprite CreateDefault() => new Sprite { Texture = textures.Get(defaultName) };
+        protected override Sprite CreateDefault(string name) => new Sprite { Texture = textures.Get(name) };
 
         [Resolved]
         private TextureStore textures { get; set; }
 
-        public SkinnableSprite(string name, string defaultName, Func<ISkinSource, bool> allowFallback = null, bool restrictSize = true)
+        public SkinnableSprite(string name, Func<ISkinSource, bool> allowFallback = null, bool restrictSize = true)
             : base(name, allowFallback, restrictSize)
         {
-            this.defaultName = defaultName;
         }
     }
 }

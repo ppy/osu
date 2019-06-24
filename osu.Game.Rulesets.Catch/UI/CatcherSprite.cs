@@ -1,11 +1,9 @@
-﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Sprites;
-using osu.Framework.Graphics.Textures;
 using osu.Game.Skinning;
 using osuTK;
 
@@ -22,22 +20,13 @@ namespace osu.Game.Rulesets.Catch.UI
         }
 
         [BackgroundDependencyLoader]
-        private void load(TextureStore textures)
+        private void load()
         {
-            InternalChild = new Container
+            InternalChild = new SkinnableSprite(@"Play/Catch/fruit-catcher-idle")
             {
                 RelativeSizeAxes = Axes.Both,
-                Child = new SkinnableDrawable("fruit-catcher-idle", _ => new Sprite
-                {
-                    Texture = textures.Get(@"Play/Catch/fruit-catcher-idle"),
-                    RelativeSizeAxes = Axes.Both,
-                    Size = Vector2.One,
-                }, restrictSize: true)
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    Anchor = Anchor.TopCentre,
-                    Origin = Anchor.TopCentre,
-                }
+                Anchor = Anchor.TopCentre,
+                Origin = Anchor.TopCentre,
             };
         }
     }
