@@ -11,6 +11,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Events;
+using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osuTK;
 
@@ -43,6 +44,8 @@ namespace osu.Game.Graphics.UserInterface
                 this.ResizeWidthTo(newSize.X, 300, Easing.OutQuint);
             }
         }
+
+        protected override ScrollContainer<Drawable> CreateScrollContainer(Direction direction) => new OsuScrollContainer(direction);
 
         protected override DrawableMenuItem CreateDrawableMenuItem(MenuItem item) => new DrawableOsuMenuItem(item);
 
