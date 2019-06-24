@@ -172,6 +172,8 @@ namespace osu.Game.Overlays.Mods
                                     AutoSizeAxes = Axes.Y,
                                     Spacing = new Vector2(0f, 10f),
                                     Width = content_width,
+                                    LayoutDuration = 200,
+                                    LayoutEasing = Easing.OutQuint,
                                     Children = new ModSection[]
                                     {
                                         new DifficultyReductionSection { Action = modButtonPressed },
@@ -413,12 +415,12 @@ namespace osu.Game.Overlays.Mods
         {
             if (selectedMod != null)
             {
-                if (State == Visibility.Visible) sampleOn?.Play();
+                if (State.Value == Visibility.Visible) sampleOn?.Play();
                 DeselectTypes(selectedMod.IncompatibleMods, true);
             }
             else
             {
-                if (State == Visibility.Visible) sampleOff?.Play();
+                if (State.Value == Visibility.Visible) sampleOff?.Play();
             }
 
             refreshSelectedMods();

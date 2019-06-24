@@ -28,7 +28,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         protected override void AddCheckSteps()
         {
             AddUntilStep("wait for fail", () => Player.HasFailed);
-            AddUntilStep("wait for fail overlay", () => ((FailPlayer)Player).FailOverlay.State == Visibility.Visible);
+            AddUntilStep("wait for fail overlay", () => ((FailPlayer)Player).FailOverlay.State.Value == Visibility.Visible);
         }
 
         private class FailPlayer : TestPlayer
@@ -43,7 +43,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             protected override void LoadComplete()
             {
                 base.LoadComplete();
-                ScoreProcessor.FailConditions += _ => true;
+                ScoreProcessor.FailConditions += (_, __) => true;
             }
         }
     }

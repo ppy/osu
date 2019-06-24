@@ -70,9 +70,6 @@ namespace osu.Game.Overlays
         {
             Width = 400;
             Margin = new MarginPadding(10);
-
-            // required to let MusicController handle beatmap cycling.
-            AlwaysPresent = true;
         }
 
         [BackgroundDependencyLoader]
@@ -200,7 +197,7 @@ namespace osu.Game.Overlays
             beatmaps.ItemAdded += handleBeatmapAdded;
             beatmaps.ItemRemoved += handleBeatmapRemoved;
 
-            playlist.StateChanged += s => playlistButton.FadeColour(s == Visibility.Visible ? colours.Yellow : Color4.White, 200, Easing.OutQuint);
+            playlist.State.ValueChanged += s => playlistButton.FadeColour(s.NewValue == Visibility.Visible ? colours.Yellow : Color4.White, 200, Easing.OutQuint);
         }
 
         private ScheduledDelegate seekDelegate;
@@ -349,18 +346,11 @@ namespace osu.Game.Overlays
 
                     direction = last > next ? TransformDirection.Prev : TransformDirection.Next;
                 }
-
-                //current.Track.Completed -= currentTrackCompleted;
             }
-
-            current = beatmap.NewValue;
-
-            if (current != null)
-                current.Track.Completed += currentTrackCompleted;
 
             progressBar.CurrentTime = 0;
 
-            updateDisplay(current, direction);
+            updateDisplay(current = beatmap.NewValue, direction);
             updateAudioAdjustments();
 
             queuedDirection = null;
@@ -377,12 +367,6 @@ namespace osu.Game.Overlays
             foreach (var mod in mods.Value.OfType<IApplicableToClock>())
                 mod.ApplyToClock(track);
         }
-
-        private void currentTrackCompleted() => Schedule(() =>
-        {
-            if (!current.Track.Looping && !beatmap.Disabled && beatmapSets.Any())
-                next();
-        });
 
         private ScheduledDelegate pendingBeatmapSwitch;
 
@@ -447,10 +431,6 @@ namespace osu.Game.Overlays
         {
             base.PopOut();
 
-            // This is here mostly as a performance fix.
-            // If the playlist is not hidden it will update children even when the music controller is hidden (due to AlwaysPresent).
-            playlist.State = Visibility.Hidden;
-
             this.FadeOut(transition_length, Easing.OutQuint);
             dragContainer.ScaleTo(0.9f, transition_length, Easing.OutQuint);
         }
@@ -464,11 +444,25 @@ namespace osu.Game.Overlays
 
         private class MusicIconButton : IconButton
         {
+            public MusicIconButton()
+            {
+                AutoSizeAxes = Axes.Both;
+            }
+
             [BackgroundDependencyLoader]
             private void load(OsuColour colours)
             {
                 HoverColour = colours.YellowDark.Opacity(0.6f);
                 FlashColour = colours.Yellow;
+            }
+
+            protected override void LoadComplete()
+            {
+                base.LoadComplete();
+
+                // works with AutoSizeAxes above to make buttons autosize with the scale animation.
+                Content.AutoSizeAxes = Axes.None;
+                Content.Size = new Vector2(DEFAULT_BUTTON_SIZE);
             }
         }
 
@@ -534,5 +528,10 @@ namespace osu.Game.Overlays
                 return base.OnDragEnd(e);
             }
         }
+
+        /// <summary>
+        /// Play the next random or playlist track.
+        /// </summary>
+        public void NextTrack() => next();
     }
 }

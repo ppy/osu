@@ -24,13 +24,14 @@ namespace osu.Game.Overlays
         private const int fade_duration = 300;
 
         public const float X_PADDING = 40;
+        public const float TOP_PADDING = 25;
         public const float RIGHT_WIDTH = 275;
 
         private readonly Header header;
 
         private RulesetStore rulesets;
 
-        private readonly ScrollContainer scroll;
+        private readonly OsuScrollContainer scroll;
 
         private readonly Bindable<BeatmapSetInfo> beatmapSet = new Bindable<BeatmapSetInfo>();
 
@@ -49,7 +50,7 @@ namespace osu.Game.Overlays
                     RelativeSizeAxes = Axes.Both,
                     Colour = OsuColour.Gray(0.2f)
                 },
-                scroll = new ScrollContainer
+                scroll = new OsuScrollContainer
                 {
                     RelativeSizeAxes = Axes.Both,
                     ScrollbarVisible = false,
@@ -92,7 +93,7 @@ namespace osu.Game.Overlays
 
         protected override bool OnClick(ClickEvent e)
         {
-            State = Visibility.Hidden;
+            Hide();
             return true;
         }
 

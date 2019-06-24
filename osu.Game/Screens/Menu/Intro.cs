@@ -66,7 +66,7 @@ namespace osu.Game.Screens.Menu
                 if (setInfo == null)
                 {
                     // we need to import the default menu background beatmap
-                    setInfo = beatmaps.Import(new ZipArchiveReader(game.Resources.GetStream(@"Tracks/circles.osz"), "circles.osz"));
+                    setInfo = beatmaps.Import(new ZipArchiveReader(game.Resources.GetStream(@"Tracks/circles.osz"), "circles.osz")).Result;
 
                     setInfo.Protected = true;
                     beatmaps.Update(setInfo);
@@ -165,7 +165,7 @@ namespace osu.Game.Screens.Menu
 
             Scheduler.AddDelayed(this.Exit, fadeOutTime);
 
-            //don't want to fade out completely else we will stop running updates and shit will hit the fan.
+            //don't want to fade out completely else we will stop running updates.
             Game.FadeTo(0.01f, fadeOutTime);
 
             base.OnResuming(last);

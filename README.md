@@ -24,15 +24,15 @@ Detailed changelogs are published on the [official osu! site](https://osu.ppy.sh
 
 ![](https://puu.sh/DCmvA/f6a74f5fbb.png)
 
-If you are not interested in developing the game, you can consume our [binary releases](https://github.com/ppy/osu/releases).
+If you are not interested in developing the game, you can still consume our [binary releases](https://github.com/ppy/osu/releases).
 
-**Latest build:***
+**Latest build:**
 
 | [Windows (x64)](https://github.com/ppy/osu/releases/latest/download/install.exe)  | [macOS 10.12+](https://github.com/ppy/osu/releases/latest/download/osu.app.zip) |
 | ------------- | ------------- |
 
 - **Linux** users are recommended to self-compile until we have official deployment in place.
-- **iOS** users can join the [TestFlight beta program](https://t.co/xQJmHkfC18) (note that due to high demand this is reulgarly full).
+- **iOS** users can join the [TestFlight beta program](https://t.co/PasE1zrHhw) (note that due to high demand this is regularly full).
 - **Android** users can self-compile, and expect a public beta soon.
 
 If your platform is not listed above, there is still a chance you can manually build it by following the instructions below.
