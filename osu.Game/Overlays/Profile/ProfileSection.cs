@@ -131,7 +131,7 @@ namespace osu.Game.Overlays.Profile
             private void load(OsuColour colours)
             {
                 triangles.ColourLight = colours.GreySeafoamDark;
-                triangles.ColourDark = OsuColour.FromHex("171b1a");
+                triangles.ColourDark = colours.GreySeafoamDarker.Darken(0.2f);
                 foreground.Colour = ColourInfo.GradientVertical(colours.GreySeafoamDarker, colours.GreySeafoamDarker.Opacity(0));
             }
         }
