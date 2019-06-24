@@ -37,6 +37,10 @@ namespace osu.Game.Users.Drawables
             set => base.EdgeEffect = value;
         }
 
+        protected override bool TransformImmediately { get; }
+
+        protected override double TransformDuration { get; } = 1000;
+
         /// <summary>
         /// Whether to show a default guest representation on null user (as opposed to nothing).
         /// </summary>
@@ -47,23 +51,14 @@ namespace osu.Game.Users.Drawables
         /// </summary>
         public readonly BindableBool OpenOnClick = new BindableBool(true);
 
-        public UpdateableAvatar(User user = null)
+        public UpdateableAvatar(User user = null, bool transformImmediately = false)
         {
             User = user;
-        }
 
-        /// <summary>
-        /// Fades and expires the <see cref="ModelBackedDrawable{T}.DisplayedDrawable"/>, and sets the
-        /// <see cref="ModelBackedDrawable{T}.Model"/> to null.
-        /// </summary>
-        /// <remarks>
-        /// Can be used when the <see cref="ModelBackedDrawable{T}.DisplayedDrawable"/> needs to be removed instantly.
-        /// </remarks>
-        public void Reset()
-        {
-            DisplayedDrawable?.FadeOut().Expire();
-
-            User = null;
+            if (transformImmediately) {
+                TransformDuration = 0;
+                TransformImmediately = true;
+            }
         }
 
         protected override Drawable CreateDrawable(User user)
