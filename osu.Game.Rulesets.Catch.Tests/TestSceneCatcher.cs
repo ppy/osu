@@ -19,7 +19,7 @@ using osu.Framework.Graphics.Textures;
 namespace osu.Game.Rulesets.Catch.Tests
 {
     [TestFixture]
-    public class TestSceneCatcherSkinning : OsuTestScene
+    public class TestSceneCatcher : OsuTestScene
     {
         public override IReadOnlyList<Type> RequiredTypes => new[]
         {
@@ -28,7 +28,7 @@ namespace osu.Game.Rulesets.Catch.Tests
 
         private readonly Container container;
 
-        public TestSceneCatcherSkinning()
+        public TestSceneCatcher()
         {
             Child = container = new Container
             {
