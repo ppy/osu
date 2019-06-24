@@ -15,6 +15,10 @@ namespace osu.Game.Skinning
         }
     }
 
+    /// <summary>
+    /// A drawable which can be skinned via an <see cref="ISkinSource"/>.
+    /// </summary>
+    /// <typeparam name="T">The type of drawable.</typeparam>
     public class SkinnableDrawable<T> : SkinReloadableDrawable
         where T : Drawable
     {
@@ -32,7 +36,7 @@ namespace osu.Game.Skinning
         private readonly bool restrictSize;
 
         /// <summary>
-        ///
+        /// Create a new skinnable drawable.
         /// </summary>
         /// <param name="name">The namespace-complete resource name for this skinnable element.</param>
         /// <param name="defaultImplementation">A function to create the default skin implementation of this element.</param>
@@ -53,7 +57,10 @@ namespace osu.Game.Skinning
             RelativeSizeAxes = Axes.Both;
         }
 
-        protected virtual bool ApplySizeToDefault => false;
+        /// <summary>
+        /// Whether to apply size restrictions (specified via <see cref="restrictSize"/>) to the default implementation.
+        /// </summary>
+        protected virtual bool ApplySizeRestrictionsToDefault => false;
 
         protected override void SkinChanged(ISkinSource skin, bool allowFallback)
         {
@@ -69,7 +76,7 @@ namespace osu.Game.Skinning
 
             if (Drawable != null)
             {
-                if (restrictSize && (!isDefault || ApplySizeToDefault))
+                if (restrictSize && (!isDefault || ApplySizeRestrictionsToDefault))
                 {
                     Drawable.RelativeSizeAxes = Axes.Both;
                     Drawable.Size = Vector2.One;

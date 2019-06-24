@@ -8,9 +8,12 @@ using osu.Framework.Graphics.Textures;
 
 namespace osu.Game.Skinning
 {
+    /// <summary>
+    /// A skinnable element which uses a stable sprite and can therefore share implementation logic.
+    /// </summary>
     public class SkinnableSprite : SkinnableDrawable<Sprite>
     {
-        protected override bool ApplySizeToDefault => true;
+        protected override bool ApplySizeRestrictionsToDefault => true;
 
         protected override Sprite CreateDefault(string name) => new Sprite { Texture = textures.Get(name) };
 
