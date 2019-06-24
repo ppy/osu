@@ -17,8 +17,6 @@ namespace osu.Game.Users.Drawables
 
         protected override bool TransformImmediately { get; }
 
-        protected override double TransformDuration { get; } = 1000;
-
         /// <summary>
         /// Whether to show a place holder on null country.
         /// </summary>
