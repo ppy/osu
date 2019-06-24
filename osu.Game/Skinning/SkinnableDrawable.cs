@@ -23,7 +23,7 @@ namespace osu.Game.Skinning
         /// </summary>
         protected Drawable Drawable { get; private set; }
 
-        protected virtual T CreateDefault() => createDefault(componentName);
+        protected virtual T CreateDefault(string name) => createDefault(name);
 
         private readonly Func<string, T> createDefault;
 
@@ -63,7 +63,7 @@ namespace osu.Game.Skinning
 
             if (Drawable == null && allowFallback)
             {
-                Drawable = CreateDefault();
+                Drawable = CreateDefault(componentName);
                 isDefault = true;
             }
 
