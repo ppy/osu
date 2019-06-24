@@ -222,6 +222,7 @@ namespace osu.Game.Tournament
                 sw.Write(JsonConvert.SerializeObject(ladder,
                     new JsonSerializerSettings
                     {
+                        Formatting = Formatting.Indented,
                         NullValueHandling = NullValueHandling.Ignore,
                         DefaultValueHandling = DefaultValueHandling.Ignore,
                     }));
