@@ -27,7 +27,8 @@ namespace osu.Game.Users.Drawables
         {
             Country = country;
 
-            if (transformImmediately) {
+            if (transformImmediately)
+            {
                 TransformDuration = 0;
                 TransformImmediately = true;
             }

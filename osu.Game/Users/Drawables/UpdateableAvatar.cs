@@ -55,7 +55,8 @@ namespace osu.Game.Users.Drawables
         {
             User = user;
 
-            if (transformImmediately) {
+            if (transformImmediately)
+            {
                 TransformDuration = 0;
                 TransformImmediately = true;
             }
