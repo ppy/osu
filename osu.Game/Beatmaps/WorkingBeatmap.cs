@@ -39,19 +39,6 @@ namespace osu.Game.Beatmaps
             BeatmapSetInfo = beatmapInfo.BeatmapSet;
             Metadata = beatmapInfo.Metadata ?? BeatmapSetInfo?.Metadata ?? new BeatmapMetadata();
 
-            beatmapLoadTask = Task.Factory.StartNew(() =>
-            {
-                var b = GetBeatmap() ?? new Beatmap();
-
-                // The original beatmap version needs to be preserved as the database doesn't contain it
-                BeatmapInfo.BeatmapVersion = b.BeatmapInfo.BeatmapVersion;
-
-                // Use the database-backed info for more up-to-date values (beatmap id, ranked status, etc)
-                b.BeatmapInfo = BeatmapInfo;
-
-                return b;
-            }, beatmapCancellation.Token, TaskCreationOptions.LongRunning, TaskScheduler.Default);
-
             track = new RecyclableLazy<Track>(() => GetTrack() ?? GetVirtualTrack());
             background = new RecyclableLazy<Texture>(GetBackground, BackgroundStillValid);
             waveform = new RecyclableLazy<Waveform>(GetWaveform);
@@ -154,11 +141,26 @@ namespace osu.Game.Beatmaps
 
         public override string ToString() => BeatmapInfo.ToString();
 
-        public bool BeatmapLoaded => beatmapLoadTask.IsCompleted;
-        public IBeatmap Beatmap => beatmapLoadTask.Result;
+        public bool BeatmapLoaded => beatmapLoadTask?.IsCompleted ?? false;
+
+        public Task<IBeatmap> LoadBeatmapAsync() => (beatmapLoadTask ?? (beatmapLoadTask = Task.Factory.StartNew(() =>
+        {
+            var b = GetBeatmap() ?? new Beatmap();
+
+            // The original beatmap version needs to be preserved as the database doesn't contain it
+            BeatmapInfo.BeatmapVersion = b.BeatmapInfo.BeatmapVersion;
+
+            // Use the database-backed info for more up-to-date values (beatmap id, ranked status, etc)
+            b.BeatmapInfo = BeatmapInfo;
+
+            return b;
+        }, beatmapCancellation.Token, TaskCreationOptions.LongRunning, TaskScheduler.Default)));
+
+        public IBeatmap Beatmap => LoadBeatmapAsync().Result;
+
         private readonly CancellationTokenSource beatmapCancellation = new CancellationTokenSource();
         protected abstract IBeatmap GetBeatmap();
-        private readonly Task<IBeatmap> beatmapLoadTask;
+        private Task<IBeatmap> beatmapLoadTask;
 
         public bool BackgroundLoaded => background.IsResultAvailable;
         public Texture Background => background.Value;
