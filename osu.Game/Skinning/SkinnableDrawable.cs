@@ -23,6 +23,8 @@ namespace osu.Game.Skinning
         /// </summary>
         protected Drawable Drawable { get; private set; }
 
+        protected virtual T CreateDefault() => createDefault(componentName);
+
         private readonly Func<string, T> createDefault;
 
         private readonly string componentName;
@@ -37,34 +39,44 @@ namespace osu.Game.Skinning
         /// <param name="allowFallback">A conditional to decide whether to allow fallback to the default implementation if a skinned element is not present.</param>
         /// <param name="restrictSize">Whether a user-skin drawable should be limited to the size of our parent.</param>
         public SkinnableDrawable(string name, Func<string, T> defaultImplementation, Func<ISkinSource, bool> allowFallback = null, bool restrictSize = true)
+            : this(name, allowFallback, restrictSize)
+        {
+            createDefault = defaultImplementation;
+        }
+
+        protected SkinnableDrawable(string name, Func<ISkinSource, bool> allowFallback = null, bool restrictSize = true)
             : base(allowFallback)
         {
             componentName = name;
-            createDefault = defaultImplementation;
             this.restrictSize = restrictSize;
 
             RelativeSizeAxes = Axes.Both;
         }
 
+        protected virtual bool ApplySizeToDefault => false;
+
         protected override void SkinChanged(ISkinSource skin, bool allowFallback)
         {
             Drawable = skin.GetDrawableComponent(componentName);
 
+            bool isDefault = false;
+
+            if (Drawable == null && allowFallback)
+            {
+                Drawable = CreateDefault();
+                isDefault = true;
+            }
+
             if (Drawable != null)
             {
-                if (restrictSize)
+                if (restrictSize && (!isDefault || ApplySizeToDefault))
                 {
                     Drawable.RelativeSizeAxes = Axes.Both;
                     Drawable.Size = Vector2.One;
                     Drawable.Scale = Vector2.One;
                     Drawable.FillMode = FillMode.Fit;
                 }
-            }
-            else if (allowFallback)
-                Drawable = createDefault(componentName);
 
-            if (Drawable != null)
-            {
                 Drawable.Origin = Anchor.Centre;
                 Drawable.Anchor = Anchor.Centre;
 
