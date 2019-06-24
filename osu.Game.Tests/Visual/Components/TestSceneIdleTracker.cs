@@ -5,6 +5,7 @@ using NUnit.Framework;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Testing;
 using osu.Game.Input;
 using osuTK;
 using osuTK.Graphics;
@@ -19,11 +20,17 @@ namespace osu.Game.Tests.Visual.Components
         private readonly IdleTrackingBox box3;
         private readonly IdleTrackingBox box4;
 
+        [SetUpSteps]
+        public void SetUpSteps()
+        {
+            AddStep("reset mouse position", () => InputManager.MoveMouseTo(Vector2.Zero));
+        }
+
         public TestSceneIdleTracker()
         {
             Children = new Drawable[]
             {
-                box1 = new IdleTrackingBox(1000)
+                box1 = new IdleTrackingBox(2000)
                 {
                     Name = "TopLeft",
                     RelativeSizeAxes = Axes.Both,
@@ -31,7 +38,7 @@ namespace osu.Game.Tests.Visual.Components
                     Anchor = Anchor.TopLeft,
                     Origin = Anchor.TopLeft,
                 },
-                box2 = new IdleTrackingBox(2000)
+                box2 = new IdleTrackingBox(4000)
                 {
                     Name = "TopRight",
                     RelativeSizeAxes = Axes.Both,
@@ -39,7 +46,7 @@ namespace osu.Game.Tests.Visual.Components
                     Anchor = Anchor.TopRight,
                     Origin = Anchor.TopRight,
                 },
-                box3 = new IdleTrackingBox(3000)
+                box3 = new IdleTrackingBox(6000)
                 {
                     Name = "BottomLeft",
                     RelativeSizeAxes = Axes.Both,
@@ -47,7 +54,7 @@ namespace osu.Game.Tests.Visual.Components
                     Anchor = Anchor.BottomLeft,
                     Origin = Anchor.BottomLeft,
                 },
-                box4 = new IdleTrackingBox(4000)
+                box4 = new IdleTrackingBox(8000)
                 {
                     Name = "BottomRight",
                     RelativeSizeAxes = Axes.Both,
