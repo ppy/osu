@@ -40,15 +40,10 @@ namespace osu.Game.Rulesets.Catch.Tests
         [BackgroundDependencyLoader]
         private void load()
         {
-            AddStep("show default catcher implementation", () =>
-            {
-                container.Clear();
-                container.Child = new CatcherSprite();
-            });
+            AddStep("show default catcher implementation", () => { container.Child = new CatcherSprite(); });
 
             AddStep("show custom catcher implementation", () =>
             {
-                container.Clear();
                 container.Child = new CatchCustomSkinSourceContainer
                 {
                     Child = new CatcherSprite()
@@ -86,13 +81,25 @@ namespace osu.Game.Rulesets.Catch.Tests
                 remove { }
             }
 
-            public Drawable GetDrawableComponent(string componentName) => new CatcherCustomSkin();
+            public Drawable GetDrawableComponent(string componentName)
+            {
+                switch (componentName)
+                {
+                    case "Play/Catch/fruit-catcher-idle":
+                        return new CatcherCustomSkin();
+                }
 
-            public SampleChannel GetSample(string sampleName) => throw new NotImplementedException();
+                return null;
+            }
 
-            public Texture GetTexture(string componentName) => throw new NotImplementedException();
+            public SampleChannel GetSample(string sampleName) =>
+                throw new NotImplementedException();
 
-            public TValue GetValue<TConfiguration, TValue>(Func<TConfiguration, TValue> query) where TConfiguration : SkinConfiguration => throw new NotImplementedException();
+            public Texture GetTexture(string componentName) =>
+                throw new NotImplementedException();
+
+            public TValue GetValue<TConfiguration, TValue>(Func<TConfiguration, TValue> query) where TConfiguration : SkinConfiguration =>
+                throw new NotImplementedException();
         }
     }
 }
