@@ -26,7 +26,7 @@ namespace osu.Game.Tests.Visual.Components
         {
             InputManager.MoveMouseTo(Vector2.Zero);
 
-            Children = boxes = new IdleTrackingBox[]
+            Children = boxes = new[]
             {
                 box1 = new IdleTrackingBox(2000)
                 {
