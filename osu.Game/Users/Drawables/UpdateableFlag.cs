@@ -14,14 +14,23 @@ namespace osu.Game.Users.Drawables
             set => Model = value;
         }
 
+        protected override bool TransformImmediately { get; }
+
+        protected override double TransformDuration { get; } = 1000;
+
         /// <summary>
         /// Whether to show a place holder on null country.
         /// </summary>
         public bool ShowPlaceholderOnNull = true;
 
-        public UpdateableFlag(Country country = null)
+        public UpdateableFlag(Country country = null, bool transformImmediately = false)
         {
             Country = country;
+
+            if (transformImmediately) {
+                TransformDuration = 0;
+                TransformImmediately = true;
+            }
         }
 
         protected override Drawable CreateDrawable(Country country)
