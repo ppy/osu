@@ -50,6 +50,7 @@ namespace osu.Game.Input.Bindings
         {
             new KeyBinding(InputKey.Space, GlobalAction.SkipCutscene),
             new KeyBinding(InputKey.Tilde, GlobalAction.QuickRetry),
+            new KeyBinding(new[] { InputKey.Control, InputKey.Tilde }, GlobalAction.QuickExit),
             new KeyBinding(new[] { InputKey.Control, InputKey.Plus }, GlobalAction.IncreaseScrollSpeed),
             new KeyBinding(new[] { InputKey.Control, InputKey.Minus }, GlobalAction.DecreaseScrollSpeed),
         };
@@ -93,6 +94,9 @@ namespace osu.Game.Input.Bindings
 
         [Description("Quick retry (hold)")]
         QuickRetry,
+
+        [Description("Quick exit (Hold)")]
+        QuickExit,
 
         [Description("Take screenshot")]
         TakeScreenshot,
