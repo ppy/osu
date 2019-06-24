@@ -27,10 +27,6 @@ namespace osu.Game.Skinning
         /// </summary>
         protected Drawable Drawable { get; private set; }
 
-        protected virtual T CreateDefault(string name) => createDefault(name);
-
-        private readonly Func<string, T> createDefault;
-
         private readonly string componentName;
 
         private readonly bool restrictSize;
@@ -56,6 +52,10 @@ namespace osu.Game.Skinning
 
             RelativeSizeAxes = Axes.Both;
         }
+
+        private readonly Func<string, T> createDefault;
+
+        protected virtual T CreateDefault(string name) => createDefault(name);
 
         /// <summary>
         /// Whether to apply size restrictions (specified via <see cref="restrictSize"/>) to the default implementation.

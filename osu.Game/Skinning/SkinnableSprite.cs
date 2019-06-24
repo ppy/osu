@@ -15,8 +15,6 @@ namespace osu.Game.Skinning
     {
         protected override bool ApplySizeRestrictionsToDefault => true;
 
-        protected override Sprite CreateDefault(string name) => new Sprite { Texture = textures.Get(name) };
-
         [Resolved]
         private TextureStore textures { get; set; }
 
@@ -24,5 +22,7 @@ namespace osu.Game.Skinning
             : base(name, allowFallback, restrictSize)
         {
         }
+
+        protected override Sprite CreateDefault(string name) => new Sprite { Texture = textures.Get(name) };
     }
 }
