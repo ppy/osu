@@ -46,8 +46,10 @@ namespace osu.Game.Rulesets.Osu.UI
             {
                 case HitCircle circle:
                     return new DrawableHitCircle(circle);
+
                 case Slider slider:
                     return new DrawableSlider(slider);
+
                 case Spinner spinner:
                     return new DrawableSpinner(spinner);
             }
@@ -61,8 +63,10 @@ namespace osu.Game.Rulesets.Osu.UI
         {
             get
             {
-                var first = (OsuHitObject)Objects.First();
-                return first.StartTime - Math.Max(2000, first.TimePreempt);
+                if (Objects.FirstOrDefault() is OsuHitObject first)
+                    return first.StartTime - Math.Max(2000, first.TimePreempt);
+
+                return 0;
             }
         }
     }

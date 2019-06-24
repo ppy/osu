@@ -111,6 +111,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             MainPiece.KiaiMode = HitObject.Kiai;
 
             var strongObject = HitObject.NestedHitObjects.OfType<StrongHitObject>().FirstOrDefault();
+
             if (strongObject != null)
             {
                 var strongHit = CreateStrongHit(strongObject);

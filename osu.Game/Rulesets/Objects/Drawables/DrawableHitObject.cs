@@ -85,7 +85,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
         public override bool RemoveCompletedTransforms => false;
         protected override bool RequiresChildrenUpdate => true;
 
-        public override bool IsPresent => base.IsPresent || State.Value == ArmedState.Idle && Clock?.CurrentTime >= LifetimeStart;
+        public override bool IsPresent => base.IsPresent || (State.Value == ArmedState.Idle && Clock?.CurrentTime >= LifetimeStart);
 
         public readonly Bindable<ArmedState> State = new Bindable<ArmedState>();
 
@@ -98,6 +98,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
         private void load()
         {
             var judgement = HitObject.CreateJudgement();
+
             if (judgement != null)
             {
                 Result = CreateResult(judgement);
@@ -166,6 +167,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
                 {
                     OnRevertResult?.Invoke(this, Result);
 
+                    Result.TimeOffset = 0;
                     Result.Type = HitResult.None;
                     State.Value = ArmedState.Idle;
                 }
@@ -212,9 +214,11 @@ namespace osu.Game.Rulesets.Objects.Drawables
             {
                 case HitResult.None:
                     break;
+
                 case HitResult.Miss:
                     State.Value = ArmedState.Miss;
                     break;
+
                 default:
                     State.Value = ArmedState.Hit;
                     break;
@@ -240,6 +244,10 @@ namespace osu.Game.Rulesets.Objects.Drawables
         /// <returns>Whether a scoring result has occurred from this <see cref="DrawableHitObject"/> or any nested <see cref="DrawableHitObject"/>.</returns>
         protected bool UpdateResult(bool userTriggered)
         {
+            // It's possible for input to get into a bad state when rewinding gameplay, so results should not be processed
+            if (Time.Elapsed < 0)
+                return false;
+
             judgementOccurred = false;
 
             if (AllJudged)

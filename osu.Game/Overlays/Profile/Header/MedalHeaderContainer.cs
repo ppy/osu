@@ -34,7 +34,7 @@ namespace osu.Game.Overlays.Profile.Header
                 new Box
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Colour = colours.CommunityUserGrayGreenDarkest,
+                    Colour = colours.GreySeafoamDarker,
                 },
                 new Container //artificial shadow
                 {
@@ -68,9 +68,11 @@ namespace osu.Game.Overlays.Profile.Header
         {
             var badges = user.Badges;
             badgeFlowContainer.Clear();
+
             if (badges?.Length > 0)
             {
                 Show();
+
                 for (var index = 0; index < badges.Length; index++)
                 {
                     int displayIndex = index;

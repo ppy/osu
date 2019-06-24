@@ -182,9 +182,9 @@ namespace osu.Game.Screens.Menu
         [BackgroundDependencyLoader]
         private void load(AudioManager audio)
         {
-            sampleHover = audio.Sample.Get(@"Menu/button-hover");
+            sampleHover = audio.Samples.Get(@"Menu/button-hover");
             if (!string.IsNullOrEmpty(sampleName))
-                sampleClick = audio.Sample.Get($@"Menu/{sampleName}");
+                sampleClick = audio.Samples.Get($@"Menu/{sampleName}");
         }
 
         protected override bool OnMouseDown(MouseDownEvent e)
@@ -263,6 +263,7 @@ namespace osu.Game.Screens.Menu
                                 box.ScaleTo(new Vector2(0, 1), 500, Easing.OutExpo);
                                 this.FadeOut(500);
                                 break;
+
                             case 1:
                                 box.ScaleTo(new Vector2(0, 1), 400, Easing.InSine);
                                 this.FadeOut(800);
@@ -270,11 +271,13 @@ namespace osu.Game.Screens.Menu
                         }
 
                         break;
+
                     case ButtonState.Expanded:
                         const int expand_duration = 500;
                         box.ScaleTo(new Vector2(1, 1), expand_duration, Easing.OutExpo);
                         this.FadeIn(expand_duration / 6f);
                         break;
+
                     case ButtonState.Exploded:
                         const int explode_duration = 200;
                         box.ScaleTo(new Vector2(2, 1), explode_duration, Easing.OutExpo);
@@ -297,10 +300,12 @@ namespace osu.Game.Screens.Menu
                     case ButtonSystemState.Initial:
                         State = ButtonState.Contracted;
                         break;
+
                     case ButtonSystemState.EnteringMode:
                         ContractStyle = 1;
                         State = ButtonState.Contracted;
                         break;
+
                     default:
                         if (value == VisibleState)
                             State = ButtonState.Expanded;

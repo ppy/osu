@@ -152,9 +152,12 @@ namespace osu.Game.Screens.Select
         {
             Schedule(() =>
             {
+                int? previouslySelectedID = null;
                 CarouselBeatmapSet existingSet = beatmapSets.FirstOrDefault(b => b.BeatmapSet.ID == beatmapSet.ID);
 
-                bool hadSelection = existingSet?.State?.Value == CarouselItemState.Selected;
+                // If the selected beatmap is about to be removed, store its ID so it can be re-selected if required
+                if (existingSet?.State?.Value == CarouselItemState.Selected)
+                    previouslySelectedID = selectedBeatmap?.Beatmap.ID;
 
                 var newSet = createCarouselSet(beatmapSet);
 
@@ -172,8 +175,8 @@ namespace osu.Game.Screens.Select
                 applyActiveCriteria(false, false);
 
                 //check if we can/need to maintain our current selection.
-                if (hadSelection)
-                    select((CarouselItem)newSet.Beatmaps.FirstOrDefault(b => b.Beatmap.ID == selectedBeatmap?.Beatmap.ID) ?? newSet);
+                if (previouslySelectedID != null)
+                    select((CarouselItem)newSet.Beatmaps.FirstOrDefault(b => b.Beatmap.ID == previouslySelectedID) ?? newSet);
 
                 itemsCache.Invalidate();
                 Schedule(() => BeatmapSetsChanged?.Invoke());
@@ -257,6 +260,7 @@ namespace osu.Game.Screens.Select
 
                         select(beatmap);
                         return;
+
                     case CarouselBeatmapSet set:
                         if (skipDifficulties)
                             select(set);
@@ -292,6 +296,7 @@ namespace osu.Game.Screens.Select
             if (RandomAlgorithm.Value == RandomSelectAlgorithm.RandomPermutation)
             {
                 var notYetVisitedSets = visibleSets.Except(previouslyVisitedRandomSets).ToList();
+
                 if (!notYetVisitedSets.Any())
                 {
                     previouslyVisitedRandomSets.RemoveAll(s => visibleSets.Contains(s));
@@ -394,13 +399,16 @@ namespace osu.Game.Screens.Select
                 case Key.Up:
                     direction = -1;
                     break;
+
                 case Key.Down:
                     direction = 1;
                     break;
+
                 case Key.Left:
                     direction = -1;
                     skipDifficulties = true;
                     break;
+
                 case Key.Right:
                     direction = 1;
                     skipDifficulties = true;
@@ -465,8 +473,10 @@ namespace osu.Game.Screens.Select
                         case LoadState.NotLoaded:
                             LoadComponentAsync(item);
                             break;
+
                         case LoadState.Loading:
                             break;
+
                         default:
                             scrollableContent.Add(item);
                             break;
@@ -557,6 +567,7 @@ namespace osu.Game.Screens.Select
                             set.MoveToX(set.Item.State.Value == CarouselItemState.Selected ? -100 : 0, 500, Easing.OutExpo);
                             set.MoveToY(currentY, 750, Easing.OutExpo);
                             break;
+
                         case DrawableCarouselBeatmap beatmap:
                             if (beatmap.Item.State.Value == CarouselItemState.Selected)
                                 scrollTarget = currentY + beatmap.DrawHeight / 2 - DrawHeight / 2;

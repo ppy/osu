@@ -26,6 +26,7 @@ namespace osu.Game.Beatmaps.Formats
             Section section = Section.None;
 
             string line;
+
             while ((line = stream.ReadLine()) != null)
             {
                 if (ShouldSkipLine(line))
@@ -53,7 +54,7 @@ namespace osu.Game.Beatmaps.Formats
             }
         }
 
-        protected virtual bool ShouldSkipLine(string line) => string.IsNullOrWhiteSpace(line) || line.StartsWith("//", StringComparison.Ordinal);
+        protected virtual bool ShouldSkipLine(string line) => string.IsNullOrWhiteSpace(line) || line.AsSpan().TrimStart().StartsWith("//".AsSpan(), StringComparison.Ordinal);
 
         protected virtual void ParseLine(T output, Section section, string line)
         {
@@ -188,7 +189,7 @@ namespace osu.Game.Beatmaps.Formats
             Foreground = 3
         }
 
-        internal class LegacySampleControlPoint : SampleControlPoint
+        internal class LegacySampleControlPoint : SampleControlPoint, IEquatable<LegacySampleControlPoint>
         {
             public int CustomSampleBank;
 
@@ -202,10 +203,9 @@ namespace osu.Game.Beatmaps.Formats
                 return baseInfo;
             }
 
-            public override bool EquivalentTo(ControlPoint other)
-                => base.EquivalentTo(other)
-                   && other is LegacySampleControlPoint legacy
-                   && CustomSampleBank == legacy.CustomSampleBank;
+            public bool Equals(LegacySampleControlPoint other)
+                => base.Equals(other)
+                   && CustomSampleBank == other?.CustomSampleBank;
         }
     }
 }

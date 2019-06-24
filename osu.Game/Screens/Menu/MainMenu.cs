@@ -3,23 +3,21 @@
 
 using osuTK;
 using osuTK.Graphics;
-using osuTK.Input;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
-using osu.Framework.Input.Events;
+using osu.Framework.Platform;
 using osu.Framework.Screens;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
+using osu.Game.Overlays;
 using osu.Game.Screens.Backgrounds;
 using osu.Game.Screens.Charts;
 using osu.Game.Screens.Direct;
 using osu.Game.Screens.Edit;
 using osu.Game.Screens.Multi;
 using osu.Game.Screens.Select;
-using osu.Game.Screens.Tournament;
-using osu.Framework.Platform;
 
 namespace osu.Game.Screens.Menu
 {
@@ -27,7 +25,7 @@ namespace osu.Game.Screens.Menu
     {
         private ButtonSystem buttons;
 
-        public override bool HideOverlaysOnEnter => buttons.State == ButtonSystemState.Initial;
+        public override bool HideOverlaysOnEnter => buttons == null || buttons.State == ButtonSystemState.Initial;
 
         protected override bool AllowBackButton => buttons.State != ButtonSystemState.Initial && host.CanExit;
 
@@ -45,7 +43,7 @@ namespace osu.Game.Screens.Menu
         protected override BackgroundScreen CreateBackground() => background;
 
         [BackgroundDependencyLoader(true)]
-        private void load(OsuGame game = null)
+        private void load(DirectOverlay direct, SettingsOverlay settings)
         {
             if (host.CanExit)
                 AddInternal(new ExitConfirmOverlay { Action = this.Exit });
@@ -79,17 +77,15 @@ namespace osu.Game.Screens.Menu
                     case ButtonSystemState.Exit:
                         Background.FadeColour(Color4.White, 500, Easing.OutSine);
                         break;
+
                     default:
                         Background.FadeColour(OsuColour.Gray(0.8f), 500, Easing.OutSine);
                         break;
                 }
             };
 
-            if (game != null)
-            {
-                buttons.OnSettings = game.ToggleSettings;
-                buttons.OnDirect = game.ToggleDirect;
-            }
+            buttons.OnSettings = () => settings?.ToggleVisibility();
+            buttons.OnDirect = () => direct?.ToggleVisibility();
 
             LoadComponentAsync(background = new BackgroundScreenDefault());
             preloadSongSelect();
@@ -156,9 +152,11 @@ namespace osu.Game.Screens.Menu
 
         protected override void LogoSuspending(OsuLogo logo)
         {
-            logo.FadeOut(300, Easing.InSine)
-                .ScaleTo(0.2f, 300, Easing.InSine)
-                .OnComplete(l => buttons.SetOsuLogo(null));
+            var seq = logo.FadeOut(300, Easing.InSine)
+                          .ScaleTo(0.2f, 300, Easing.InSine);
+
+            seq.OnComplete(_ => buttons.SetOsuLogo(null));
+            seq.OnAbort(_ => buttons.SetOsuLogo(null));
         }
 
         private void beatmap_ValueChanged(ValueChangedEvent<WorkingBeatmap> e)
@@ -198,17 +196,6 @@ namespace osu.Game.Screens.Menu
             buttons.State = ButtonSystemState.Exit;
             this.FadeOut(3000);
             return base.OnExiting(next);
-        }
-
-        protected override bool OnKeyDown(KeyDownEvent e)
-        {
-            if (!e.Repeat && e.ControlPressed && e.ShiftPressed && e.Key == Key.D)
-            {
-                this.Push(new Drawings());
-                return true;
-            }
-
-            return base.OnKeyDown(e);
         }
     }
 }

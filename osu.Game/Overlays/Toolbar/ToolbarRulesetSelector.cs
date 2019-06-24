@@ -31,6 +31,7 @@ namespace osu.Game.Overlays.Toolbar
         public ToolbarRulesetSelector()
         {
             RelativeSizeAxes = Axes.Y;
+            AutoSizeAxes = Axes.X;
 
             Children = new[]
             {
@@ -72,6 +73,7 @@ namespace osu.Game.Overlays.Toolbar
         private void load(RulesetStore rulesets, Bindable<RulesetInfo> parentRuleset)
         {
             this.rulesets = rulesets;
+
             foreach (var r in rulesets.AvailableRulesets)
             {
                 modeButtons.Add(new ToolbarRulesetButton
@@ -109,12 +111,6 @@ namespace osu.Game.Overlays.Toolbar
         public override bool PropagatePositionalInputSubTree => !ruleset.Disabled && base.PropagatePositionalInputSubTree;
 
         private void disabledChanged(bool isDisabled) => this.FadeColour(isDisabled ? Color4.Gray : Color4.White, 300);
-
-        protected override void Update()
-        {
-            base.Update();
-            Size = new Vector2(modeButtons.DrawSize.X, 1);
-        }
 
         private void rulesetChanged(ValueChangedEvent<RulesetInfo> e)
         {

@@ -139,6 +139,7 @@ namespace osu.Game.Screens.Menu
             base.Update();
 
             float decayFactor = (float)Time.Elapsed * decay_per_milisecond;
+
             for (int i = 0; i < bars_per_visualiser; i++)
             {
                 //3% of extra bar length to make it a little faster when bar is almost at it's minimum
@@ -188,7 +189,6 @@ namespace osu.Game.Screens.Menu
                 base.Draw(vertexAction);
 
                 shader.Bind();
-                texture.TextureGL.Bind();
 
                 Vector2 inflation = DrawInfo.MatrixInverse.ExtractScale().Xy;
 
@@ -223,7 +223,8 @@ namespace osu.Game.Screens.Menu
                                 Vector2Extensions.Transform(barPosition + bottomOffset + amplitudeOffset, DrawInfo.Matrix)
                             );
 
-                            texture.DrawQuad(
+                            DrawQuad(
+                                texture,
                                 rectangle,
                                 colourInfo,
                                 null,

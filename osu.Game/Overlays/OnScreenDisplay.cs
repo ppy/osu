@@ -189,6 +189,7 @@ namespace osu.Game.Overlays
                         optionCount = 1;
                         if (val) selectedOption = 0;
                         break;
+
                     case Enum _:
                         var values = Enum.GetValues(description.RawValue.GetType());
                         optionCount = values.Length;

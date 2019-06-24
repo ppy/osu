@@ -3,55 +3,44 @@
 
 using osu.Framework.Allocation;
 using osu.Framework.Extensions;
-using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
 using osu.Game.Scoring;
+using System;
 
 namespace osu.Game.Online.Leaderboards
 {
-    public class DrawableRank : Container
+    public class DrawableRank : Sprite
     {
-        private readonly Sprite rankSprite;
-        private TextureStore textures;
-
-        public ScoreRank Rank { get; private set; }
+        private readonly ScoreRank rank;
 
         public DrawableRank(ScoreRank rank)
         {
-            Rank = rank;
+            this.rank = rank;
+        }
 
-            Children = new Drawable[]
+        [BackgroundDependencyLoader(true)]
+        private void load(TextureStore ts)
+        {
+            if (ts == null)
+                throw new ArgumentNullException(nameof(ts));
+
+            Texture = ts.Get($@"Grades/{getTextureName()}");
+        }
+
+        private string getTextureName()
+        {
+            switch (rank)
             {
-                rankSprite = new Sprite
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
-                    FillMode = FillMode.Fit
-                },
-            };
-        }
+                default:
+                    return rank.GetDescription();
 
-        [BackgroundDependencyLoader]
-        private void load(TextureStore textures)
-        {
-            this.textures = textures;
-            updateTexture();
-        }
+                case ScoreRank.SH:
+                    return "SPlus";
 
-        private void updateTexture()
-        {
-            rankSprite.Texture = textures.Get($@"Grades/{Rank.GetDescription()}");
-        }
-
-        public void UpdateRank(ScoreRank newRank)
-        {
-            Rank = newRank;
-
-            if (LoadState >= LoadState.Ready)
-                updateTexture();
+                case ScoreRank.XH:
+                    return "SSPlus";
+            }
         }
     }
 }

@@ -31,12 +31,13 @@ namespace osu.Game.Overlays
 
         private ChannelManager channelManager;
 
-        private readonly Container<DrawableChannel> currentChannelContainer;
+        private Container<DrawableChannel> currentChannelContainer;
+
         private readonly List<DrawableChannel> loadedChannels = new List<DrawableChannel>();
 
-        private readonly LoadingAnimation loading;
+        private LoadingAnimation loading;
 
-        private readonly FocusedTextBox textbox;
+        private FocusedTextBox textbox;
 
         private const int transition_length = 500;
 
@@ -44,19 +45,19 @@ namespace osu.Game.Overlays
 
         public const float TAB_AREA_HEIGHT = 50;
 
-        private readonly ChannelTabControl channelTabControl;
+        private ChannelTabControl channelTabControl;
 
-        private readonly Container chatContainer;
-        private readonly TabsArea tabsArea;
-        private readonly Box chatBackground;
-        private readonly Box tabBackground;
+        private Container chatContainer;
+        private TabsArea tabsArea;
+        private Box chatBackground;
+        private Box tabBackground;
 
         public Bindable<double> ChatHeight { get; set; }
 
-        private readonly Container channelSelectionContainer;
-        private readonly ChannelSelectionOverlay channelSelectionOverlay;
+        private Container channelSelectionContainer;
+        private ChannelSelectionOverlay channelSelectionOverlay;
 
-        public override bool Contains(Vector2 screenSpacePos) => chatContainer.ReceivePositionalInputAt(screenSpacePos) || channelSelectionOverlay.State == Visibility.Visible && channelSelectionOverlay.ReceivePositionalInputAt(screenSpacePos);
+        public override bool Contains(Vector2 screenSpacePos) => chatContainer.ReceivePositionalInputAt(screenSpacePos) || (channelSelectionOverlay.State.Value == Visibility.Visible && channelSelectionOverlay.ReceivePositionalInputAt(screenSpacePos));
 
         public ChatOverlay()
         {
@@ -64,7 +65,11 @@ namespace osu.Game.Overlays
             RelativePositionAxes = Axes.Both;
             Anchor = Anchor.BottomLeft;
             Origin = Anchor.BottomLeft;
+        }
 
+        [BackgroundDependencyLoader]
+        private void load(OsuConfigManager config, OsuColour colours, ChannelManager channelManager)
+        {
             const float padding = 5;
 
             Children = new Drawable[]
@@ -130,7 +135,7 @@ namespace osu.Game.Overlays
                                             RelativeSizeAxes = Axes.Both,
                                             Height = 1,
                                             PlaceholderText = "type your message",
-                                            Exit = () => State = Visibility.Hidden,
+                                            Exit = Hide,
                                             OnCommit = postMessage,
                                             ReleaseFocusOnCommit = false,
                                             HoldFocus = true,
@@ -154,7 +159,7 @@ namespace osu.Game.Overlays
                                     Anchor = Anchor.BottomLeft,
                                     Origin = Anchor.BottomLeft,
                                     RelativeSizeAxes = Axes.Both,
-                                    OnRequestLeave = channel => channelManager.LeaveChannel(channel)
+                                    OnRequestLeave = channelManager.LeaveChannel
                                 },
                             }
                         },
@@ -163,19 +168,19 @@ namespace osu.Game.Overlays
             };
 
             channelTabControl.Current.ValueChanged += current => channelManager.CurrentChannel.Value = current.NewValue;
-            channelTabControl.ChannelSelectorActive.ValueChanged += active => channelSelectionOverlay.State = active.NewValue ? Visibility.Visible : Visibility.Hidden;
-            channelSelectionOverlay.StateChanged += state =>
+            channelTabControl.ChannelSelectorActive.ValueChanged += active => channelSelectionOverlay.State.Value = active.NewValue ? Visibility.Visible : Visibility.Hidden;
+            channelSelectionOverlay.State.ValueChanged += state =>
             {
-                if (state == Visibility.Hidden && channelManager.CurrentChannel.Value == null)
+                if (state.NewValue == Visibility.Hidden && channelManager.JoinedChannels.Count == 0)
                 {
-                    channelSelectionOverlay.State = Visibility.Visible;
-                    State = Visibility.Hidden;
+                    channelSelectionOverlay.Show();
+                    Hide();
                     return;
                 }
 
-                channelTabControl.ChannelSelectorActive.Value = state == Visibility.Visible;
+                channelTabControl.ChannelSelectorActive.Value = state.NewValue == Visibility.Visible;
 
-                if (state == Visibility.Visible)
+                if (state.NewValue == Visibility.Visible)
                 {
                     textbox.HoldFocus = false;
                     if (1f - ChatHeight.Value < channel_selection_min_height)
@@ -186,8 +191,44 @@ namespace osu.Game.Overlays
             };
 
             channelSelectionOverlay.OnRequestJoin = channel => channelManager.JoinChannel(channel);
-            channelSelectionOverlay.OnRequestLeave = channel => channelManager.LeaveChannel(channel);
+            channelSelectionOverlay.OnRequestLeave = channelManager.LeaveChannel;
+
+            ChatHeight = config.GetBindable<double>(OsuSetting.ChatDisplayHeight);
+            ChatHeight.ValueChanged += height =>
+            {
+                chatContainer.Height = (float)height.NewValue;
+                channelSelectionContainer.Height = 1f - (float)height.NewValue;
+                tabBackground.FadeTo(height.NewValue == 1 ? 1 : 0.8f, 200);
+            };
+            ChatHeight.TriggerChange();
+
+            chatBackground.Colour = colours.ChatBlue;
+
+            this.channelManager = channelManager;
+
+            loading.Show();
+
+            // This is a relatively expensive (and blocking) operation.
+            // Scheduling it ensures that it won't be performed unless the user decides to open chat.
+            // TODO: Refactor OsuFocusedOverlayContainer / OverlayContainer to support delayed content loading.
+            Schedule(() =>
+            {
+                // TODO: consider scheduling bindable callbacks to not perform when overlay is not present.
+                channelManager.JoinedChannels.ItemsAdded += onChannelAddedToJoinedChannels;
+                channelManager.JoinedChannels.ItemsRemoved += onChannelRemovedFromJoinedChannels;
+                foreach (Channel channel in channelManager.JoinedChannels)
+                    channelTabControl.AddChannel(channel);
+
+                channelManager.AvailableChannels.ItemsAdded += availableChannelsChanged;
+                channelManager.AvailableChannels.ItemsRemoved += availableChannelsChanged;
+                channelSelectionOverlay.UpdateAvailableChannels(channelManager.AvailableChannels);
+
+                currentChannel = channelManager.CurrentChannel.GetBoundCopy();
+                currentChannel.BindValueChanged(currentChannelChanged, true);
+            });
         }
+
+        private Bindable<Channel> currentChannel;
 
         private void currentChannelChanged(ValueChangedEvent<Channel> e)
         {
@@ -195,9 +236,12 @@ namespace osu.Game.Overlays
             {
                 textbox.Current.Disabled = true;
                 currentChannelContainer.Clear(false);
-                channelSelectionOverlay.State = Visibility.Visible;
+                channelSelectionOverlay.Show();
                 return;
             }
+
+            if (e.NewValue is ChannelSelectorTabItem.ChannelSelectorTabChannel)
+                return;
 
             textbox.Current.Disabled = e.NewValue.ReadOnly;
 
@@ -205,6 +249,7 @@ namespace osu.Game.Overlays
                 Scheduler.Add(() => channelTabControl.Current.Value = e.NewValue);
 
             var loaded = loadedChannels.Find(d => d.Channel == e.NewValue);
+
             if (loaded == null)
             {
                 currentChannelContainer.FadeOut(500, Easing.OutQuint);
@@ -249,7 +294,7 @@ namespace osu.Game.Overlays
                 double targetChatHeight = startDragChatHeight - (e.MousePosition.Y - e.MouseDownPosition.Y) / Parent.DrawSize.Y;
 
                 // If the channel selection screen is shown, mind its minimum height
-                if (channelSelectionOverlay.State == Visibility.Visible && targetChatHeight > 1f - channel_selection_min_height)
+                if (channelSelectionOverlay.State.Value == Visibility.Visible && targetChatHeight > 1f - channel_selection_min_height)
                     targetChatHeight = 1f - channel_selection_min_height;
 
                 ChatHeight.Value = targetChatHeight;
@@ -267,7 +312,7 @@ namespace osu.Game.Overlays
         private void selectTab(int index)
         {
             var channel = channelTabControl.Items.Skip(index).FirstOrDefault();
-            if (channel != null && channel.Name != "+")
+            if (channel != null && !(channel is ChannelSelectorTabItem.ChannelSelectorTabChannel))
                 channelTabControl.Current.Value = channel;
         }
 
@@ -288,6 +333,7 @@ namespace osu.Game.Overlays
                     case Key.Number9:
                         selectTab((int)e.Key - (int)Key.Number1);
                         return true;
+
                     case Key.Number0:
                         selectTab(9);
                         return true;
@@ -320,39 +366,10 @@ namespace osu.Game.Overlays
             this.MoveToY(Height, transition_length, Easing.InSine);
             this.FadeOut(transition_length, Easing.InSine);
 
-            channelSelectionOverlay.State = Visibility.Hidden;
+            channelSelectionOverlay.Hide();
 
             textbox.HoldFocus = false;
             base.PopOut();
-        }
-
-        [BackgroundDependencyLoader]
-        private void load(OsuConfigManager config, OsuColour colours, ChannelManager channelManager)
-        {
-            ChatHeight = config.GetBindable<double>(OsuSetting.ChatDisplayHeight);
-            ChatHeight.ValueChanged += height =>
-            {
-                chatContainer.Height = (float)height.NewValue;
-                channelSelectionContainer.Height = 1f - (float)height.NewValue;
-                tabBackground.FadeTo(height.NewValue == 1 ? 1 : 0.8f, 200);
-            };
-            ChatHeight.TriggerChange();
-
-            chatBackground.Colour = colours.ChatBlue;
-
-            loading.Show();
-
-            this.channelManager = channelManager;
-            channelManager.CurrentChannel.ValueChanged += currentChannelChanged;
-            channelManager.JoinedChannels.ItemsAdded += onChannelAddedToJoinedChannels;
-            channelManager.JoinedChannels.ItemsRemoved += onChannelRemovedFromJoinedChannels;
-            channelManager.AvailableChannels.ItemsAdded += availableChannelsChanged;
-            channelManager.AvailableChannels.ItemsRemoved += availableChannelsChanged;
-
-            //for the case that channelmanager was faster at fetching the channels than our attachment to CollectionChanged.
-            channelSelectionOverlay.UpdateAvailableChannels(channelManager.AvailableChannels);
-            foreach (Channel channel in channelManager.JoinedChannels)
-                channelTabControl.AddChannel(channel);
         }
 
         private void onChannelAddedToJoinedChannels(IEnumerable<Channel> channels)

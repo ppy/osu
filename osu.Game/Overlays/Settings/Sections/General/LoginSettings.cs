@@ -88,6 +88,7 @@ namespace osu.Game.Overlays.Settings.Sections.General
                         }
                     };
                     break;
+
                 case APIState.Failing:
                 case APIState.Connecting:
                     LinkFlowContainer linkFlow;
@@ -96,7 +97,7 @@ namespace osu.Game.Overlays.Settings.Sections.General
                     {
                         new LoadingAnimation
                         {
-                            State = Visibility.Visible,
+                            State = { Value = Visibility.Visible },
                             Anchor = Anchor.TopCentre,
                             Origin = Anchor.TopCentre,
                         },
@@ -113,6 +114,7 @@ namespace osu.Game.Overlays.Settings.Sections.General
 
                     linkFlow.AddLink("cancel", api.Logout, string.Empty);
                     break;
+
                 case APIState.Online:
                     Children = new Drawable[]
                     {
@@ -152,8 +154,9 @@ namespace osu.Game.Overlays.Settings.Sections.General
                     };
 
                     panel.Status.BindTo(api.LocalUser.Value.Status);
+                    panel.Activity.BindTo(api.LocalUser.Value.Activity);
 
-                    dropdown.Current.ValueChanged += action =>
+                    dropdown.Current.BindValueChanged(action =>
                     {
                         switch (action.NewValue)
                         {
@@ -161,21 +164,22 @@ namespace osu.Game.Overlays.Settings.Sections.General
                                 api.LocalUser.Value.Status.Value = new UserStatusOnline();
                                 dropdown.StatusColour = colours.Green;
                                 break;
+
                             case UserAction.DoNotDisturb:
                                 api.LocalUser.Value.Status.Value = new UserStatusDoNotDisturb();
                                 dropdown.StatusColour = colours.Red;
                                 break;
+
                             case UserAction.AppearOffline:
                                 api.LocalUser.Value.Status.Value = new UserStatusOffline();
                                 dropdown.StatusColour = colours.Gray7;
                                 break;
+
                             case UserAction.SignOut:
                                 api.Logout();
                                 break;
                         }
-                    };
-                    dropdown.Current.TriggerChange();
-
+                    }, true);
                     break;
             }
 

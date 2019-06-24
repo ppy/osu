@@ -71,7 +71,7 @@ namespace osu.Game.Overlays.Music
                         {
                             RelativeSizeAxes = Axes.X,
                             AutoSizeAxes = Axes.Y,
-                            ExitRequested = () => State = Visibility.Hidden,
+                            ExitRequested = Hide,
                             FilterChanged = search => list.Filter(search),
                             Padding = new MarginPadding(10),
                         },
@@ -82,6 +82,7 @@ namespace osu.Game.Overlays.Music
             filter.Search.OnCommit = (sender, newText) =>
             {
                 BeatmapInfo toSelect = list.FirstVisibleSet?.Beatmaps?.FirstOrDefault();
+
                 if (toSelect != null)
                 {
                     beatmap.Value = beatmaps.GetWorkingBeatmap(toSelect);

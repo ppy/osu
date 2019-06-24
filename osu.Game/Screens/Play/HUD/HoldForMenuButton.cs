@@ -4,6 +4,7 @@
 using System;
 using System.Linq;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -23,6 +24,8 @@ namespace osu.Game.Screens.Play.HUD
     public class HoldForMenuButton : FillFlowContainer
     {
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => true;
+
+        public readonly Bindable<bool> IsPaused = new Bindable<bool>();
 
         private readonly Button button;
 
@@ -50,7 +53,8 @@ namespace osu.Game.Screens.Play.HUD
                 button = new Button
                 {
                     HoverGained = () => text.FadeIn(500, Easing.OutQuint),
-                    HoverLost = () => text.FadeOut(500, Easing.OutQuint)
+                    HoverLost = () => text.FadeOut(500, Easing.OutQuint),
+                    IsPaused = { BindTarget = IsPaused }
                 }
             };
             AutoSizeAxes = Axes.Both;
@@ -68,6 +72,11 @@ namespace osu.Game.Screens.Play.HUD
         {
             positionalAdjust = Vector2.Distance(e.ScreenSpaceMousePosition, button.ScreenSpaceDrawQuad.Centre) / 200;
             return base.OnMouseMove(e);
+        }
+
+        public bool PauseOnFocusLost
+        {
+            set => button.PauseOnFocusLost = value;
         }
 
         protected override void Update()
@@ -88,13 +97,17 @@ namespace osu.Game.Screens.Play.HUD
             private CircularProgress circularProgress;
             private Circle overlayCircle;
 
+            public readonly Bindable<bool> IsPaused = new Bindable<bool>();
+
             protected override bool AllowMultipleFires => true;
 
             public Action HoverGained;
             public Action HoverLost;
 
+            private readonly IBindable<bool> gameActive = new Bindable<bool>(true);
+
             [BackgroundDependencyLoader]
-            private void load(OsuColour colours)
+            private void load(OsuColour colours, Framework.Game game)
             {
                 Size = new Vector2(60);
 
@@ -135,6 +148,14 @@ namespace osu.Game.Screens.Play.HUD
                 };
 
                 bind();
+
+                gameActive.BindTo(game.IsActive);
+            }
+
+            protected override void LoadComplete()
+            {
+                base.LoadComplete();
+                gameActive.BindValueChanged(_ => updateActive(), true);
             }
 
             private void bind()
@@ -182,6 +203,31 @@ namespace osu.Game.Screens.Play.HUD
             {
                 HoverLost?.Invoke();
                 base.OnHoverLost(e);
+            }
+
+            private bool pauseOnFocusLost = true;
+
+            public bool PauseOnFocusLost
+            {
+                set
+                {
+                    if (pauseOnFocusLost == value)
+                        return;
+
+                    pauseOnFocusLost = value;
+                    if (IsLoaded)
+                        updateActive();
+                }
+            }
+
+            private void updateActive()
+            {
+                if (!pauseOnFocusLost || IsPaused.Value) return;
+
+                if (gameActive.Value)
+                    AbortConfirm();
+                else
+                    BeginConfirm();
             }
 
             public bool OnPressed(GlobalAction action)

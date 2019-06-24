@@ -85,14 +85,15 @@ namespace osu.Game.Rulesets.Mods
 
                 Combo.ValueChanged += OnComboChange;
 
-                this.FadeInFromZero(FLASHLIGHT_FADE_DURATION);
-
-                foreach (var breakPeriod in Breaks)
+                using (BeginAbsoluteSequence(0))
                 {
-                    if (breakPeriod.Duration < FLASHLIGHT_FADE_DURATION * 2) continue;
+                    foreach (var breakPeriod in Breaks)
+                    {
+                        if (breakPeriod.Duration < FLASHLIGHT_FADE_DURATION * 2) continue;
 
-                    this.Delay(breakPeriod.StartTime + FLASHLIGHT_FADE_DURATION).FadeOutFromOne(FLASHLIGHT_FADE_DURATION);
-                    this.Delay(breakPeriod.EndTime - FLASHLIGHT_FADE_DURATION).FadeInFromZero(FLASHLIGHT_FADE_DURATION);
+                        this.Delay(breakPeriod.StartTime + FLASHLIGHT_FADE_DURATION).FadeOutFromOne(FLASHLIGHT_FADE_DURATION);
+                        this.Delay(breakPeriod.EndTime - FLASHLIGHT_FADE_DURATION).FadeInFromZero(FLASHLIGHT_FADE_DURATION);
+                    }
                 }
             }
 
@@ -128,6 +129,20 @@ namespace osu.Game.Rulesets.Mods
                 }
             }
 
+            private float flashlightDim;
+
+            public float FlashlightDim
+            {
+                get => flashlightDim;
+                set
+                {
+                    if (flashlightDim == value) return;
+
+                    flashlightDim = value;
+                    Invalidate(Invalidation.DrawNode);
+                }
+            }
+
             private class FlashlightDrawNode : DrawNode
             {
                 protected new Flashlight Source => (Flashlight)base.Source;
@@ -136,6 +151,7 @@ namespace osu.Game.Rulesets.Mods
                 private Quad screenSpaceDrawQuad;
                 private Vector2 flashlightPosition;
                 private Vector2 flashlightSize;
+                private float flashlightDim;
 
                 public FlashlightDrawNode(Flashlight source)
                     : base(source)
@@ -149,7 +165,8 @@ namespace osu.Game.Rulesets.Mods
                     shader = Source.shader;
                     screenSpaceDrawQuad = Source.ScreenSpaceDrawQuad;
                     flashlightPosition = Vector2Extensions.Transform(Source.FlashlightPosition, DrawInfo.Matrix);
-                    flashlightSize = Vector2Extensions.Transform(Source.FlashlightSize, DrawInfo.Matrix);
+                    flashlightSize = Source.FlashlightSize * DrawInfo.Matrix.ExtractScale().Xy;
+                    flashlightDim = Source.FlashlightDim;
                 }
 
                 public override void Draw(Action<TexturedVertex2D> vertexAction)
@@ -160,8 +177,9 @@ namespace osu.Game.Rulesets.Mods
 
                     shader.GetUniform<Vector2>("flashlightPos").UpdateValue(ref flashlightPosition);
                     shader.GetUniform<Vector2>("flashlightSize").UpdateValue(ref flashlightSize);
+                    shader.GetUniform<float>("flashlightDim").UpdateValue(ref flashlightDim);
 
-                    Texture.WhitePixel.DrawQuad(screenSpaceDrawQuad, DrawColourInfo.Colour, vertexAction: vertexAction);
+                    DrawQuad(Texture.WhitePixel, screenSpaceDrawQuad, DrawColourInfo.Colour, vertexAction: vertexAction);
 
                     shader.Unbind();
                 }

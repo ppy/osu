@@ -12,6 +12,7 @@ using osu.Game.Rulesets.Objects.Drawables;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Input;
@@ -52,12 +53,14 @@ namespace osu.Game.Rulesets.UI
         /// <summary>
         /// The playfield.
         /// </summary>
-        public Playfield Playfield => playfield.Value;
+        public override Playfield Playfield => playfield.Value;
 
         /// <summary>
         /// Place to put drawables above hit objects but below UI.
         /// </summary>
         public Container Overlays { get; private set; }
+
+        public override GameplayClock FrameStableClock => frameStabilityContainer.GameplayClock;
 
         /// <summary>
         /// Invoked when a <see cref="JudgementResult"/> has been applied by a <see cref="DrawableHitObject"/>.
@@ -127,6 +130,7 @@ namespace osu.Game.Rulesets.UI
             onScreenDisplay = dependencies.Get<OnScreenDisplay>();
 
             Config = dependencies.Get<RulesetConfigCache>().GetConfigFor(Ruleset);
+
             if (Config != null)
             {
                 dependencies.Cache(Config);
@@ -139,11 +143,11 @@ namespace osu.Game.Rulesets.UI
         public virtual PlayfieldAdjustmentContainer CreatePlayfieldAdjustmentContainer() => new PlayfieldAdjustmentContainer();
 
         [BackgroundDependencyLoader]
-        private void load(OsuConfigManager config)
+        private void load(OsuConfigManager config, CancellationToken? cancellationToken)
         {
             InternalChildren = new Drawable[]
             {
-                frameStabilityContainer = new FrameStabilityContainer
+                frameStabilityContainer = new FrameStabilityContainer(GameplayStartTime)
                 {
                     Child = KeyBindingInputManager
                         .WithChild(CreatePlayfieldAdjustmentContainer()
@@ -162,16 +166,21 @@ namespace osu.Game.Rulesets.UI
 
             applyRulesetMods(mods, config);
 
-            loadObjects();
+            loadObjects(cancellationToken);
         }
 
         /// <summary>
         /// Creates and adds drawable representations of hit objects to the play field.
         /// </summary>
-        private void loadObjects()
+        private void loadObjects(CancellationToken? cancellationToken)
         {
             foreach (TObject h in Beatmap.HitObjects)
+            {
+                cancellationToken?.ThrowIfCancellationRequested();
                 addHitObject(h);
+            }
+
+            cancellationToken?.ThrowIfCancellationRequested();
 
             Playfield.PostProcess();
 
@@ -332,6 +341,16 @@ namespace osu.Game.Rulesets.UI
         /// Whether the game is paused. Used to block user input.
         /// </summary>
         public readonly BindableBool IsPaused = new BindableBool();
+
+        /// <summary>
+        /// The playfield.
+        /// </summary>
+        public abstract Playfield Playfield { get; }
+
+        /// <summary>
+        /// The frame-stable clock which is being used for playfield display.
+        /// </summary>
+        public abstract GameplayClock FrameStableClock { get; }
 
         /// <summary>~
         /// The associated ruleset.

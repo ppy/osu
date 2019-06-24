@@ -56,11 +56,12 @@ namespace osu.Game.Screens.Menu
                     case ButtonSystemState.Exit:
                     case ButtonSystemState.Initial:
                     case ButtonSystemState.EnteringMode:
-                        State = Visibility.Hidden;
+                        Hide();
                         break;
+
                     case ButtonSystemState.TopLevel:
                     case ButtonSystemState.Play:
-                        State = Visibility.Visible;
+                        Show();
                         break;
                 }
 
@@ -80,6 +81,10 @@ namespace osu.Game.Screens.Menu
                 StateChanged?.Invoke(state);
             }
         }
+
+        public override void Hide() => State = Visibility.Hidden;
+
+        public override void Show() => State = Visibility.Visible;
 
         public event Action<Visibility> StateChanged;
 
@@ -110,6 +115,7 @@ namespace osu.Game.Screens.Menu
                         case ButtonAreaBackgroundState.Flat:
                             this.ScaleTo(new Vector2(2, 0), 300, Easing.InSine);
                             break;
+
                         case ButtonAreaBackgroundState.Normal:
                             this.ScaleTo(Vector2.One, 400, Easing.OutQuint);
                             break;
@@ -128,6 +134,7 @@ namespace osu.Game.Screens.Menu
                         default:
                             State = ButtonAreaBackgroundState.Normal;
                             break;
+
                         case ButtonSystemState.Initial:
                         case ButtonSystemState.Exit:
                         case ButtonSystemState.EnteringMode:
