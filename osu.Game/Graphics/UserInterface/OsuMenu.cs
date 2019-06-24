@@ -1,18 +1,18 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
-using OpenTK.Graphics;
+using osuTK.Graphics;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
-using osu.Framework.Input;
+using osu.Framework.Input.Events;
 using osu.Game.Graphics.Sprites;
-using OpenTK;
+using osuTK;
 
 namespace osu.Game.Graphics.UserInterface
 {
@@ -71,8 +71,8 @@ namespace osu.Game.Graphics.UserInterface
             [BackgroundDependencyLoader]
             private void load(AudioManager audio)
             {
-                sampleHover = audio.Sample.Get(@"UI/generic-hover");
-                sampleClick = audio.Sample.Get(@"UI/generic-select");
+                sampleHover = audio.Samples.Get(@"UI/generic-hover");
+                sampleClick = audio.Samples.Get(@"UI/generic-select");
 
                 BackgroundColour = Color4.Transparent;
                 BackgroundColourHover = OsuColour.FromHex(@"172023");
@@ -88,34 +88,36 @@ namespace osu.Game.Graphics.UserInterface
                     case MenuItemType.Standard:
                         text.Colour = Color4.White;
                         break;
+
                     case MenuItemType.Destructive:
                         text.Colour = Color4.Red;
                         break;
+
                     case MenuItemType.Highlighted:
                         text.Colour = OsuColour.FromHex(@"ffcc22");
                         break;
                 }
             }
 
-            protected override bool OnHover(InputState state)
+            protected override bool OnHover(HoverEvent e)
             {
                 sampleHover.Play();
                 text.BoldText.FadeIn(transition_length, Easing.OutQuint);
                 text.NormalText.FadeOut(transition_length, Easing.OutQuint);
-                return base.OnHover(state);
+                return base.OnHover(e);
             }
 
-            protected override void OnHoverLost(InputState state)
+            protected override void OnHoverLost(HoverLostEvent e)
             {
                 text.BoldText.FadeOut(transition_length, Easing.OutQuint);
                 text.NormalText.FadeIn(transition_length, Easing.OutQuint);
-                base.OnHoverLost(state);
+                base.OnHoverLost(e);
             }
 
-            protected override bool OnClick(InputState state)
+            protected override bool OnClick(ClickEvent e)
             {
                 sampleClick.Play();
-                return base.OnClick(state);
+                return base.OnClick(e);
             }
 
             protected sealed override Drawable CreateContent() => text = CreateTextContainer();
@@ -125,7 +127,7 @@ namespace osu.Game.Graphics.UserInterface
             {
                 public string Text
                 {
-                    get { return NormalText.Text; }
+                    get => NormalText.Text;
                     set
                     {
                         NormalText.Text = value;
@@ -149,7 +151,7 @@ namespace osu.Game.Graphics.UserInterface
                         {
                             Anchor = Anchor.CentreLeft,
                             Origin = Anchor.CentreLeft,
-                            TextSize = text_size,
+                            Font = OsuFont.GetFont(size: text_size),
                             Margin = new MarginPadding { Horizontal = margin_horizontal, Vertical = MARGIN_VERTICAL },
                         },
                         BoldText = new OsuSpriteText
@@ -158,8 +160,7 @@ namespace osu.Game.Graphics.UserInterface
                             Alpha = 0,
                             Anchor = Anchor.CentreLeft,
                             Origin = Anchor.CentreLeft,
-                            TextSize = text_size,
-                            Font = @"Exo2.0-Bold",
+                            Font = OsuFont.GetFont(size: text_size, weight: FontWeight.Bold),
                             Margin = new MarginPadding { Horizontal = margin_horizontal, Vertical = MARGIN_VERTICAL },
                         }
                     };

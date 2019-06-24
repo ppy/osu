@@ -1,18 +1,19 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using System.Linq;
 using osu.Framework.Allocation;
-using osu.Framework.Configuration;
+using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
-using OpenTK;
-using OpenTK.Graphics;
+using osuTK;
+using osuTK.Graphics;
 
 namespace osu.Game.Overlays.Music
 {
@@ -34,7 +35,7 @@ namespace osu.Game.Overlays.Music
         private PlaylistList list;
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours, BindableBeatmap beatmap, BeatmapManager beatmaps)
+        private void load(OsuColour colours, Bindable<WorkingBeatmap> beatmap, BeatmapManager beatmaps)
         {
             this.beatmap.BindTo(beatmap);
             this.beatmaps = beatmaps;
@@ -70,7 +71,7 @@ namespace osu.Game.Overlays.Music
                         {
                             RelativeSizeAxes = Axes.X,
                             AutoSizeAxes = Axes.Y,
-                            ExitRequested = () => State = Visibility.Hidden,
+                            ExitRequested = Hide,
                             FilterChanged = search => list.Filter(search),
                             Padding = new MarginPadding(10),
                         },
@@ -81,6 +82,7 @@ namespace osu.Game.Overlays.Music
             filter.Search.OnCommit = (sender, newText) =>
             {
                 BeatmapInfo toSelect = list.FirstVisibleSet?.Beatmaps?.FirstOrDefault();
+
                 if (toSelect != null)
                 {
                     beatmap.Value = beatmaps.GetWorkingBeatmap(toSelect);
@@ -92,7 +94,7 @@ namespace osu.Game.Overlays.Music
         protected override void PopIn()
         {
             filter.Search.HoldFocus = true;
-            Schedule(() => GetContainingInputManager().ChangeFocus(filter.Search));
+            Schedule(() => filter.Search.TakeFocus());
 
             this.ResizeTo(new Vector2(1, playlist_height), transition_duration, Easing.OutQuint);
             this.FadeIn(transition_duration, Easing.OutQuint);

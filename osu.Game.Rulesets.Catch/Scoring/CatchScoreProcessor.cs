@@ -1,12 +1,10 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
-using System;
-using System.Linq;
 using osu.Game.Beatmaps;
-using osu.Game.Rulesets.Catch.Judgements;
 using osu.Game.Rulesets.Catch.Objects;
 using osu.Game.Rulesets.Judgements;
+using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.UI;
 
@@ -14,62 +12,32 @@ namespace osu.Game.Rulesets.Catch.Scoring
 {
     public class CatchScoreProcessor : ScoreProcessor<CatchHitObject>
     {
-        public CatchScoreProcessor(RulesetContainer<CatchHitObject> rulesetContainer)
-            : base(rulesetContainer)
+        public CatchScoreProcessor(DrawableRuleset<CatchHitObject> drawableRuleset)
+            : base(drawableRuleset)
         {
         }
 
         private float hpDrainRate;
 
-        protected override void SimulateAutoplay(Beatmap<CatchHitObject> beatmap)
+        protected override void ApplyBeatmap(Beatmap<CatchHitObject> beatmap)
         {
+            base.ApplyBeatmap(beatmap);
+
             hpDrainRate = beatmap.BeatmapInfo.BaseDifficulty.DrainRate;
-
-            foreach (var obj in beatmap.HitObjects)
-            {
-                switch (obj)
-                {
-                    case JuiceStream stream:
-                        foreach (var nestedObject in stream.NestedHitObjects)
-                            switch (nestedObject)
-                            {
-                                case TinyDroplet _:
-                                    AddJudgement(new CatchTinyDropletJudgement { Result = HitResult.Perfect });
-                                    break;
-                                case Droplet _:
-                                    AddJudgement(new CatchDropletJudgement { Result = HitResult.Perfect });
-                                    break;
-                                case Fruit _:
-                                    AddJudgement(new CatchJudgement { Result = HitResult.Perfect });
-                                    break;
-                            }
-                        break;
-                    case BananaShower shower:
-                        foreach (var _ in shower.NestedHitObjects.Cast<CatchHitObject>())
-                            AddJudgement(new CatchBananaJudgement { Result = HitResult.Perfect });
-                        break;
-                    case Fruit _:
-                        AddJudgement(new CatchJudgement { Result = HitResult.Perfect });
-                        break;
-                }
-            }
         }
 
-        private const double harshness = 0.01;
-
-        protected override void OnNewJudgement(Judgement judgement)
+        protected override double HealthAdjustmentFactorFor(JudgementResult result)
         {
-            base.OnNewJudgement(judgement);
-
-            if (judgement.Result == HitResult.Miss)
+            switch (result.Type)
             {
-                if (!judgement.IsBonus)
-                    Health.Value -= hpDrainRate * (harshness * 2);
-                return;
-            }
+                case HitResult.Miss:
+                    return hpDrainRate;
 
-            if (judgement is CatchJudgement catchJudgement)
-                Health.Value += Math.Max(catchJudgement.HealthIncrease - hpDrainRate, 0) * harshness;
+                default:
+                    return 10.2 - hpDrainRate; // Award less HP as drain rate is increased
+            }
         }
+
+        public override HitWindows CreateHitWindows() => new CatchHitWindows();
     }
 }

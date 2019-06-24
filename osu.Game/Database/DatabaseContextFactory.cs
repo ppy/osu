@@ -1,7 +1,6 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
-using System;
 using System.Linq;
 using System.Threading;
 using Microsoft.EntityFrameworkCore.Storage;
@@ -11,7 +10,7 @@ namespace osu.Game.Database
 {
     public class DatabaseContextFactory : IDatabaseContextFactory
     {
-        private readonly GameHost host;
+        private readonly Storage storage;
 
         private const string database_name = @"client";
 
@@ -26,9 +25,9 @@ namespace osu.Game.Database
 
         private IDbContextTransaction currentWriteTransaction;
 
-        public DatabaseContextFactory(GameHost host)
+        public DatabaseContextFactory(Storage storage)
         {
-            this.host = host;
+            this.storage = storage;
             recycleThreadContexts();
         }
 
@@ -67,7 +66,7 @@ namespace osu.Game.Database
                     context = threadContexts.Value;
                 }
             }
-            catch (Exception e)
+            catch
             {
                 // retrieval of a context could trigger a fatal error.
                 Monitor.Exit(writeLock);
@@ -115,9 +114,15 @@ namespace osu.Game.Database
             }
         }
 
-        private void recycleThreadContexts() => threadContexts = new ThreadLocal<OsuDbContext>(CreateContext);
+        private void recycleThreadContexts()
+        {
+            // Contexts for other threads are not disposed as they may be in use elsewhere. Instead, fresh contexts are exposed
+            // for other threads to use, and we rely on the finalizer inside OsuDbContext to handle their previous contexts
+            threadContexts?.Value.Dispose();
+            threadContexts = new ThreadLocal<OsuDbContext>(CreateContext, true);
+        }
 
-        protected virtual OsuDbContext CreateContext() => new OsuDbContext(host.Storage.GetDatabaseConnectionString(database_name))
+        protected virtual OsuDbContext CreateContext() => new OsuDbContext(storage.GetDatabaseConnectionString(database_name))
         {
             Database = { AutoTransactionsEnabled = false }
         };
@@ -127,9 +132,7 @@ namespace osu.Game.Database
             lock (writeLock)
             {
                 recycleThreadContexts();
-                GC.Collect();
-                GC.WaitForPendingFinalizers();
-                host.Storage.DeleteDatabase(database_name);
+                storage.DeleteDatabase(database_name);
             }
         }
     }

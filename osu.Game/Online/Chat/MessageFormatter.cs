@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using System.Collections.Generic;
@@ -25,19 +25,19 @@ namespace osu.Game.Online.Chat
         // This is in the format (<required>, [optional]):
         //      http[s]://<domain>.<tld>[:port][/path][?query][#fragment]
         private static readonly Regex advanced_link_regex = new Regex(
-                // protocol
-                @"(?<link>[a-z]*?:\/\/" +
-                // domain + tld
-                @"(?<domain>(?:[a-z0-9]\.|[a-z0-9][a-z0-9-]*[a-z0-9]\.)*[a-z0-9-]*[a-z0-9]" +
-                // port (optional)
-                @"(?::\d+)?)" +
-                // path (optional)
-                @"(?<path>(?:(?:\/+(?:[a-z0-9$_\.\+!\*\',;:\(\)@&~=-]|%[0-9a-f]{2})*)*" +
-                // query (optional)
-                @"(?:\?(?:[a-z0-9$_\+!\*\',;:\(\)@&=\/~-]|%[0-9a-f]{2})*)?)?" +
-                // fragment (optional)
-                @"(?:#(?:[a-z0-9$_\+!\*\',;:\(\)@&=\/~-]|%[0-9a-f]{2})*)?)?)",
-                RegexOptions.IgnoreCase);
+            // protocol
+            @"(?<link>[a-z]*?:\/\/" +
+            // domain + tld
+            @"(?<domain>(?:[a-z0-9]\.|[a-z0-9][a-z0-9-]*[a-z0-9]\.)*[a-z0-9-]*[a-z0-9]" +
+            // port (optional)
+            @"(?::\d+)?)" +
+            // path (optional)
+            @"(?<path>(?:(?:\/+(?:[a-z0-9$_\.\+!\*\',;:\(\)@&~=-]|%[0-9a-f]{2})*)*" +
+            // query (optional)
+            @"(?:\?(?:[a-z0-9$_\+!\*\',;:\(\)@&=\/~-]|%[0-9a-f]{2})*)?)?" +
+            // fragment (optional)
+            @"(?:#(?:[a-z0-9$_\+!\*\',;:\(\)@&=\/~-]|%[0-9a-f]{2})*)?)?)",
+            RegexOptions.IgnoreCase);
 
         // 00:00:000 (1,2,3) - test
         private static readonly Regex time_regex = new Regex(@"\d\d:\d\d:\d\d\d? [^-]*");
@@ -51,24 +51,25 @@ namespace osu.Game.Online.Chat
         private static void handleMatches(Regex regex, string display, string link, MessageFormatterResult result, int startIndex = 0, LinkAction? linkActionOverride = null)
         {
             int captureOffset = 0;
+
             foreach (Match m in regex.Matches(result.Text, startIndex))
             {
                 var index = m.Index - captureOffset;
 
                 var displayText = string.Format(display,
-                                                m.Groups[0],
-                                                m.Groups.Count > 1 ? m.Groups[1].Value : "",
-                                                m.Groups.Count > 2 ? m.Groups[2].Value : "").Trim();
+                    m.Groups[0],
+                    m.Groups.Count > 1 ? m.Groups[1].Value : "",
+                    m.Groups.Count > 2 ? m.Groups[2].Value : "").Trim();
 
                 var linkText = string.Format(link,
-                                                m.Groups[0],
-                                                m.Groups.Count > 1 ? m.Groups[1].Value : "",
-                                                m.Groups.Count > 2 ? m.Groups[2].Value : "").Trim();
+                    m.Groups[0],
+                    m.Groups.Count > 1 ? m.Groups[1].Value : "",
+                    m.Groups.Count > 2 ? m.Groups[2].Value : "").Trim();
 
                 if (displayText.Length == 0 || linkText.Length == 0) continue;
 
                 // Check for encapsulated links
-                if (result.Links.Find(l => l.Index <= index && l.Index + l.Length >= index + m.Length || index <= l.Index && index + m.Length >= l.Index + l.Length) == null)
+                if (result.Links.Find(l => (l.Index <= index && l.Index + l.Length >= index + m.Length) || (index <= l.Index && index + m.Length >= l.Index + l.Length)) == null)
                 {
                     result.Text = result.Text.Remove(index, m.Length).Insert(index, displayText);
 
@@ -114,51 +115,63 @@ namespace osu.Game.Online.Chat
                             case "b":
                             case "beatmaps":
                                 return new LinkDetails(LinkAction.OpenBeatmap, args[3]);
+
                             case "s":
                             case "beatmapsets":
                             case "d":
                                 return new LinkDetails(LinkAction.OpenBeatmapSet, args[3]);
+
                             case "u":
                                 return new LinkDetails(LinkAction.OpenUserProfile, args[3]);
                         }
                     }
 
                     return new LinkDetails(LinkAction.External, null);
+
                 case "osu":
                     // every internal link also needs some kind of argument
                     if (args.Length < 3)
                         return new LinkDetails(LinkAction.External, null);
 
                     LinkAction linkType;
+
                     switch (args[1])
                     {
                         case "chan":
                             linkType = LinkAction.OpenChannel;
                             break;
+
                         case "edit":
                             linkType = LinkAction.OpenEditorTimestamp;
                             break;
+
                         case "b":
                             linkType = LinkAction.OpenBeatmap;
                             break;
+
                         case "s":
                         case "dl":
                             linkType = LinkAction.OpenBeatmapSet;
                             break;
+
                         case "spectate":
                             linkType = LinkAction.Spectate;
                             break;
+
                         case "u":
                             linkType = LinkAction.OpenUserProfile;
                             break;
+
                         default:
                             linkType = LinkAction.External;
                             break;
                     }
 
                     return new LinkDetails(linkType, args[2]);
+
                 case "osump":
                     return new LinkDetails(LinkAction.JoinMultiplayerMatch, args[1]);
+
                 default:
                     return new LinkDetails(LinkAction.External, null);
             }

@@ -1,5 +1,5 @@
-// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
 using osu.Game.Beatmaps.ControlPoints;
@@ -39,7 +39,7 @@ namespace osu.Game.Beatmaps
         /// <summary>
         /// The hitobjects contained by this beatmap.
         /// </summary>
-        IEnumerable<HitObject> HitObjects { get; }
+        IReadOnlyList<HitObject> HitObjects { get; }
 
         /// <summary>
         /// Returns statistics for the <see cref="HitObjects"/> contained in this beatmap.

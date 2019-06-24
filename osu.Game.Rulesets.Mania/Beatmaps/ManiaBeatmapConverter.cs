@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using osu.Game.Rulesets.Mania.Objects;
 using System;
@@ -12,7 +12,7 @@ using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Mania.Beatmaps.Patterns;
 using osu.Game.Rulesets.Mania.MathUtils;
 using osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy;
-using OpenTK;
+using osuTK;
 using osu.Game.Audio;
 
 namespace osu.Game.Rulesets.Mania.Beatmaps
@@ -27,6 +27,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
         protected override IEnumerable<Type> ValidConversionTypes { get; } = new[] { typeof(IHasXPosition) };
 
         public int TargetColumns;
+        public bool Dual;
         public readonly bool IsForCurrentRuleset;
 
         // Internal for testing purposes
@@ -45,10 +46,18 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
             var roundedOverallDifficulty = Math.Round(beatmap.BeatmapInfo.BaseDifficulty.OverallDifficulty);
 
             if (IsForCurrentRuleset)
+            {
                 TargetColumns = (int)Math.Max(1, roundedCircleSize);
+
+                if (TargetColumns >= 10)
+                {
+                    TargetColumns = TargetColumns / 2;
+                    Dual = true;
+                }
+            }
             else
             {
-                float percentSliderOrSpinner = (float)beatmap.HitObjects.Count(h => h is IHasEndTime) / beatmap.HitObjects.Count();
+                float percentSliderOrSpinner = (float)beatmap.HitObjects.Count(h => h is IHasEndTime) / beatmap.HitObjects.Count;
                 if (percentSliderOrSpinner < 0.2)
                     TargetColumns = 7;
                 else if (percentSliderOrSpinner < 0.3 || roundedCircleSize >= 5)
@@ -70,14 +79,22 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
             return base.ConvertBeatmap(original);
         }
 
-        protected override Beatmap<ManiaHitObject> CreateBeatmap() => beatmap = new ManiaBeatmap(new StageDefinition { Columns = TargetColumns });
+        protected override Beatmap<ManiaHitObject> CreateBeatmap()
+        {
+            beatmap = new ManiaBeatmap(new StageDefinition { Columns = TargetColumns });
+
+            if (Dual)
+                beatmap.Stages.Add(new StageDefinition { Columns = TargetColumns });
+
+            return beatmap;
+        }
 
         protected override IEnumerable<ManiaHitObject> ConvertHitObject(HitObject original, IBeatmap beatmap)
         {
-            var maniaOriginal = original as ManiaHitObject;
-            if (maniaOriginal != null)
+            if (original is ManiaHitObject maniaOriginal)
             {
                 yield return maniaOriginal;
+
                 yield break;
             }
 
@@ -92,6 +109,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
 
         private readonly List<double> prevNoteTimes = new List<double>(max_notes_for_density);
         private double density = int.MaxValue;
+
         private void computeDensity(double newNoteTime)
         {
             if (prevNoteTimes.Count == max_notes_for_density)
@@ -104,6 +122,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
         private double lastTime;
         private Vector2 lastPosition;
         private PatternType lastStair = PatternType.Stair;
+
         private void recordNote(double time, Vector2 position)
         {
             lastTime = time;
@@ -180,7 +199,6 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
 
                 foreach (var obj in newPattern.HitObjects)
                     yield return obj;
-
             }
         }
 
@@ -247,7 +265,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
                 double segmentTime = (curveData.EndTime - HitObject.StartTime) / curveData.SpanCount();
 
                 int index = (int)(segmentTime == 0 ? 0 : (time - HitObject.StartTime) / segmentTime);
-                return curveData.RepeatSamples[index];
+                return curveData.NodeSamples[index];
             }
         }
     }

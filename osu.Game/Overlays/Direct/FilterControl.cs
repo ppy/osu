@@ -1,8 +1,8 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
-using osu.Framework.Configuration;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics;
@@ -10,8 +10,8 @@ using osu.Game.Graphics.Containers;
 using osu.Game.Online.API.Requests;
 using osu.Game.Overlays.SearchableList;
 using osu.Game.Rulesets;
-using OpenTK;
-using OpenTK.Graphics;
+using osuTK;
+using osuTK.Graphics;
 
 namespace osu.Game.Overlays.Direct
 {
@@ -39,7 +39,7 @@ namespace osu.Game.Overlays.Direct
         {
             DisplayStyleControl.Dropdown.AccentColour = colours.BlueDark;
 
-            Ruleset.Value = ruleset ?? rulesets.GetRuleset(0);
+            Ruleset.Value = ruleset.Value ?? rulesets.GetRuleset(0);
             foreach (var r in rulesets.AvailableRulesets)
                 modeButtons.Add(new RulesetToggleButton(Ruleset, r));
         }
@@ -68,13 +68,13 @@ namespace osu.Game.Overlays.Direct
 
             private readonly ConstrainedIconContainer iconContainer;
 
-            private void Bindable_ValueChanged(RulesetInfo obj)
+            private void Bindable_ValueChanged(ValueChangedEvent<RulesetInfo> e)
             {
-                iconContainer.FadeTo(Ruleset.ID == obj?.ID ? 1f : 0.5f, 100);
+                iconContainer.FadeTo(Ruleset.ID == e.NewValue?.ID ? 1f : 0.5f, 100);
             }
 
-            public override bool HandleKeyboardInput => !bindable.Disabled && base.HandleKeyboardInput;
-            public override bool HandleMouseInput => !bindable.Disabled && base.HandleMouseInput;
+            public override bool HandleNonPositionalInput => !bindable.Disabled && base.HandleNonPositionalInput;
+            public override bool HandlePositionalInput => !bindable.Disabled && base.HandlePositionalInput;
 
             public RulesetToggleButton(Bindable<RulesetInfo> bindable, RulesetInfo ruleset)
             {
@@ -93,7 +93,7 @@ namespace osu.Game.Overlays.Direct
 
                 Ruleset = ruleset;
                 bindable.ValueChanged += Bindable_ValueChanged;
-                Bindable_ValueChanged(bindable.Value);
+                Bindable_ValueChanged(new ValueChangedEvent<RulesetInfo>(bindable.Value, bindable.Value));
                 Action = () => bindable.Value = Ruleset;
             }
 
@@ -116,5 +116,6 @@ namespace osu.Game.Overlays.Direct
         Ranked,
         Rating,
         Plays,
+        Favourites,
     }
 }

@@ -1,15 +1,14 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Drawing.Imaging;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
-using osu.Framework.Configuration;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input;
 using osu.Framework.Input.Bindings;
@@ -19,6 +18,7 @@ using osu.Game.Configuration;
 using osu.Game.Input.Bindings;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Notifications;
+using SixLabors.ImageSharp;
 
 namespace osu.Game.Graphics
 {
@@ -51,7 +51,7 @@ namespace osu.Game.Graphics
             screenshotFormat = config.GetBindable<ScreenshotFormat>(OsuSetting.ScreenshotFormat);
             captureMenuCursor = config.GetBindable<bool>(OsuSetting.ScreenshotCaptureMenuCursor);
 
-            shutter = audio.Sample.Get("UI/shutter");
+            shutter = audio.Samples.Get("UI/shutter");
         }
 
         public bool OnPressed(GlobalAction action)
@@ -71,7 +71,7 @@ namespace osu.Game.Graphics
 
         private volatile int screenShotTasks;
 
-        public async Task TakeScreenshotAsync() => await Task.Run(async () =>
+        public Task TakeScreenshotAsync() => Task.Run(async () =>
         {
             Interlocked.Increment(ref screenShotTasks);
 
@@ -90,7 +90,7 @@ namespace osu.Game.Graphics
                 waitDelegate.Cancel();
             }
 
-            using (var bitmap = await host.TakeScreenshotAsync())
+            using (var image = await host.TakeScreenshotAsync())
             {
                 Interlocked.Decrement(ref screenShotTasks);
 
@@ -102,11 +102,13 @@ namespace osu.Game.Graphics
                 switch (screenshotFormat.Value)
                 {
                     case ScreenshotFormat.Png:
-                        bitmap.Save(stream, ImageFormat.Png);
+                        image.SaveAsPng(stream);
                         break;
+
                     case ScreenshotFormat.Jpg:
-                        bitmap.Save(stream, ImageFormat.Jpeg);
+                        image.SaveAsJpeg(stream);
                         break;
+
                     default:
                         throw new ArgumentOutOfRangeException(nameof(screenshotFormat));
                 }
@@ -127,14 +129,14 @@ namespace osu.Game.Graphics
         {
             base.Update();
 
-            if (cursorVisibility == false && Interlocked.CompareExchange(ref screenShotTasks, 0, 0) == 0)
+            if (cursorVisibility.Value == false && Interlocked.CompareExchange(ref screenShotTasks, 0, 0) == 0)
                 cursorVisibility.Value = true;
         }
 
         private string getFileName()
         {
             var dt = DateTime.Now;
-            var fileExt = screenshotFormat.ToString().ToLower();
+            var fileExt = screenshotFormat.ToString().ToLowerInvariant();
 
             var withoutIndex = $"osu_{dt:yyyy-MM-dd_HH-mm-ss}.{fileExt}";
             if (!storage.Exists(withoutIndex))

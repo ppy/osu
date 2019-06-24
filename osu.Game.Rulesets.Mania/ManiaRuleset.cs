@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using osu.Game.Beatmaps;
@@ -10,8 +10,10 @@ using osu.Game.Rulesets.UI;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Bindings;
 using osu.Game.Graphics;
+using osu.Game.Rulesets.Mania.Objects;
 using osu.Game.Rulesets.Mania.Replays;
 using osu.Game.Rulesets.Replays.Types;
 using osu.Game.Beatmaps.Legacy;
@@ -19,18 +21,22 @@ using osu.Game.Configuration;
 using osu.Game.Overlays.Settings;
 using osu.Game.Rulesets.Configuration;
 using osu.Game.Rulesets.Difficulty;
+using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Mania.Beatmaps;
 using osu.Game.Rulesets.Mania.Configuration;
 using osu.Game.Rulesets.Mania.Difficulty;
-using osu.Game.Rulesets.Scoring;
+using osu.Game.Rulesets.Mania.Edit;
+using osu.Game.Scoring;
 
 namespace osu.Game.Rulesets.Mania
 {
     public class ManiaRuleset : Ruleset
     {
-        public override RulesetContainer CreateRulesetContainerWith(WorkingBeatmap beatmap) => new ManiaRulesetContainer(this, beatmap);
+        public override DrawableRuleset CreateDrawableRulesetWith(WorkingBeatmap beatmap, IReadOnlyList<Mod> mods) => new DrawableManiaRuleset(this, beatmap, mods);
         public override IBeatmapConverter CreateBeatmapConverter(IBeatmap beatmap) => new ManiaBeatmapConverter(beatmap);
-        public override PerformanceCalculator CreatePerformanceCalculator(WorkingBeatmap beatmap, Score score) => new ManiaPerformanceCalculator(this, beatmap, score);
+        public override PerformanceCalculator CreatePerformanceCalculator(WorkingBeatmap beatmap, ScoreInfo score) => new ManiaPerformanceCalculator(this, beatmap, score);
+
+        public override HitObjectComposer CreateHitObjectComposer() => new ManiaHitObjectComposer(this);
 
         public override IEnumerable<Mod> ConvertLegacyMods(LegacyMods mods)
         {
@@ -111,6 +117,7 @@ namespace osu.Game.Rulesets.Mania
                         new ManiaModNoFail(),
                         new MultiMod(new ManiaModHalfTime(), new ManiaModDaycore()),
                     };
+
                 case ModType.DifficultyIncrease:
                     return new Mod[]
                     {
@@ -120,7 +127,8 @@ namespace osu.Game.Rulesets.Mania
                         new MultiMod(new ManiaModFadeIn(), new ManiaModHidden()),
                         new ManiaModFlashlight(),
                     };
-                case ModType.Special:
+
+                case ModType.Conversion:
                     return new Mod[]
                     {
                         new MultiMod(new ManiaModKey4(),
@@ -135,8 +143,20 @@ namespace osu.Game.Rulesets.Mania
                         new ManiaModRandom(),
                         new ManiaModDualStages(),
                         new ManiaModMirror(),
+                    };
+
+                case ModType.Automation:
+                    return new Mod[]
+                    {
                         new MultiMod(new ManiaModAutoplay(), new ModCinema()),
                     };
+
+                case ModType.Fun:
+                    return new Mod[]
+                    {
+                        new MultiMod(new ModWindUp<ManiaHitObject>(), new ModWindDown<ManiaHitObject>())
+                    };
+
                 default:
                     return new Mod[] { };
             }
@@ -146,7 +166,7 @@ namespace osu.Game.Rulesets.Mania
 
         public override string ShortName => "mania";
 
-        public override Drawable CreateIcon() => new SpriteIcon { Icon = FontAwesome.fa_osu_mania_o };
+        public override Drawable CreateIcon() => new SpriteIcon { Icon = OsuIcon.RulesetMania };
 
         public override DifficultyCalculator CreateDifficultyCalculator(WorkingBeatmap beatmap) => new ManiaDifficultyCalculator(this, beatmap);
 
@@ -154,7 +174,7 @@ namespace osu.Game.Rulesets.Mania
 
         public override IConvertibleReplayFrame CreateConvertibleReplayFrame() => new ManiaReplayFrame();
 
-        public override IRulesetConfigManager CreateConfig(SettingsStore settings) => new ManiaConfigManager(settings, RulesetInfo);
+        public override IRulesetConfigManager CreateConfig(SettingsStore settings) => new ManiaRulesetConfigManager(settings, RulesetInfo);
 
         public override RulesetSettingsSubsection CreateSettings() => new ManiaSettingsSubsection(this);
 
@@ -199,6 +219,7 @@ namespace osu.Game.Rulesets.Mania
                         SpecialAction = ManiaAction.Special1,
                         NormalActionStart = ManiaAction.Key1,
                     }.GenerateKeyBindingsFor(variant, out _);
+
                 case PlayfieldType.Dual:
                     int keys = getDualStageKeyCount(variant);
 
@@ -256,6 +277,7 @@ namespace osu.Game.Rulesets.Mania
             {
                 default:
                     return $"{variant}K";
+
                 case PlayfieldType.Dual:
                 {
                     var keys = getDualStageKeyCount(variant);
@@ -322,11 +344,11 @@ namespace osu.Game.Rulesets.Mania
                 for (int i = LeftKeys.Length - columns / 2; i < LeftKeys.Length; i++)
                     bindings.Add(new KeyBinding(LeftKeys[i], currentNormalAction++));
 
-                for (int i = 0; i < columns / 2; i++)
-                    bindings.Add(new KeyBinding(RightKeys[i], currentNormalAction++));
-
                 if (columns % 2 == 1)
                     bindings.Add(new KeyBinding(SpecialKey, SpecialAction));
+
+                for (int i = 0; i < columns / 2; i++)
+                    bindings.Add(new KeyBinding(RightKeys[i], currentNormalAction++));
 
                 nextNormalAction = currentNormalAction;
                 return bindings;
@@ -341,6 +363,7 @@ namespace osu.Game.Rulesets.Mania
         /// Number of columns in this stage lies at (item - Single).
         /// </summary>
         Single = 0,
+
         /// <summary>
         /// Columns are grouped into two stages.
         /// Overall number of columns lies at (item - Dual), further computation is required for

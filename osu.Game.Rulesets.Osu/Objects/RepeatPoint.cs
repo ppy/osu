@@ -1,9 +1,11 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
+using osu.Game.Rulesets.Judgements;
+using osu.Game.Rulesets.Osu.Judgements;
 
 namespace osu.Game.Rulesets.Osu.Objects
 {
@@ -16,10 +18,15 @@ namespace osu.Game.Rulesets.Osu.Objects
         {
             base.ApplyDefaultsToSelf(controlPointInfo, difficulty);
 
+            // Out preempt should be one span early to give the user ample warning.
+            TimePreempt += SpanDuration;
+
             // We want to show the first RepeatPoint as the TimePreempt dictates but on short (and possibly fast) sliders
             // we may need to cut down this time on following RepeatPoints to only show up to two RepeatPoints at any given time.
             if (RepeatIndex > 0)
                 TimePreempt = Math.Min(SpanDuration * 2, TimePreempt);
         }
+
+        public override Judgement CreateJudgement() => new OsuJudgement();
     }
 }

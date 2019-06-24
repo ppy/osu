@@ -1,19 +1,20 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using System.Collections.Generic;
-using OpenTK.Graphics;
+using System.Linq;
+using osuTK.Graphics;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
-using osu.Framework.Input;
+using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
-using OpenTK;
+using osuTK;
 
 namespace osu.Game.Overlays.Music
 {
@@ -26,9 +27,9 @@ namespace osu.Game.Overlays.Music
 
         private SpriteIcon handle;
         private TextFlowContainer text;
-        private IEnumerable<SpriteText> titleSprites;
-        private UnicodeBindableString titleBind;
-        private UnicodeBindableString artistBind;
+        private IEnumerable<Drawable> titleSprites;
+        private ILocalisedBindableString titleBind;
+        private ILocalisedBindableString artistBind;
 
         public readonly BeatmapSetInfo BeatmapSetInfo;
 
@@ -36,29 +37,31 @@ namespace osu.Game.Overlays.Music
 
         public bool IsDraggable { get; private set; }
 
-        protected override bool OnMouseDown(InputState state, MouseDownEventArgs args)
+        protected override bool OnMouseDown(MouseDownEvent e)
         {
             IsDraggable = handle.IsHovered;
-            return base.OnMouseDown(state, args);
+            return base.OnMouseDown(e);
         }
 
-        protected override bool OnMouseUp(InputState state, MouseUpEventArgs args)
+        protected override bool OnMouseUp(MouseUpEvent e)
         {
             IsDraggable = false;
-            return base.OnMouseUp(state, args);
+            return base.OnMouseUp(e);
         }
 
         private bool selected;
+
         public bool Selected
         {
-            get { return selected; }
+            get => selected;
             set
             {
                 if (value == selected) return;
+
                 selected = value;
 
                 FinishTransforms(true);
-                foreach (SpriteText s in titleSprites)
+                foreach (Drawable s in titleSprites)
                     s.FadeColour(Selected ? hoverColour : Color4.White, fade_duration);
             }
         }
@@ -73,7 +76,7 @@ namespace osu.Game.Overlays.Music
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours, LocalisationEngine localisation)
+        private void load(OsuColour colours, LocalisationManager localisation)
         {
             hoverColour = colours.Yellow;
             artistColour = colours.Gray9;
@@ -96,11 +99,10 @@ namespace osu.Game.Overlays.Music
                 },
             };
 
-            titleBind = localisation.GetUnicodePreference(metadata.TitleUnicode, metadata.Title);
-            artistBind = localisation.GetUnicodePreference(metadata.ArtistUnicode, metadata.Artist);
+            titleBind = localisation.GetLocalisedString(new LocalisedString((metadata.TitleUnicode, metadata.Title)));
+            artistBind = localisation.GetLocalisedString(new LocalisedString((metadata.ArtistUnicode, metadata.Artist)));
 
-            artistBind.ValueChanged += newText => recreateText();
-            artistBind.TriggerChange();
+            artistBind.BindValueChanged(_ => recreateText(), true);
         }
 
         private void recreateText()
@@ -108,34 +110,29 @@ namespace osu.Game.Overlays.Music
             text.Clear();
 
             //space after the title to put a space between the title and artist
-            titleSprites = text.AddText(titleBind.Value + @"  ", sprite =>
-            {
-                sprite.TextSize = 16;
-                sprite.Font = @"Exo2.0-Regular";
-            });
+            titleSprites = text.AddText(titleBind.Value + @"  ", sprite => sprite.Font = OsuFont.GetFont(weight: FontWeight.Regular)).OfType<SpriteText>();
 
             text.AddText(artistBind.Value, sprite =>
             {
-                sprite.TextSize = 14;
-                sprite.Font = @"Exo2.0-Bold";
+                sprite.Font = OsuFont.GetFont(size: 14, weight: FontWeight.Bold);
                 sprite.Colour = artistColour;
                 sprite.Padding = new MarginPadding { Top = 1 };
             });
         }
 
-        protected override bool OnHover(InputState state)
+        protected override bool OnHover(HoverEvent e)
         {
             handle.FadeIn(fade_duration);
 
-            return base.OnHover(state);
+            return base.OnHover(e);
         }
 
-        protected override void OnHoverLost(InputState state)
+        protected override void OnHoverLost(HoverLostEvent e)
         {
             handle.FadeOut(fade_duration);
         }
 
-        protected override bool OnClick(InputState state)
+        protected override bool OnClick(ClickEvent e)
         {
             OnSelect?.Invoke(BeatmapSetInfo);
             return true;
@@ -147,7 +144,7 @@ namespace osu.Game.Overlays.Music
 
         public bool MatchingFilter
         {
-            get { return matching; }
+            get => matching;
             set
             {
                 if (matching == value) return;
@@ -158,6 +155,8 @@ namespace osu.Game.Overlays.Music
             }
         }
 
+        public bool FilteringActive { get; set; }
+
         private class PlaylistItemHandle : SpriteIcon
         {
             public PlaylistItemHandle()
@@ -165,10 +164,12 @@ namespace osu.Game.Overlays.Music
                 Anchor = Anchor.TopLeft;
                 Origin = Anchor.TopLeft;
                 Size = new Vector2(12);
-                Icon = FontAwesome.fa_bars;
+                Icon = FontAwesome.Solid.Bars;
                 Alpha = 0f;
                 Margin = new MarginPadding { Left = 5, Top = 2 };
             }
+
+            public override bool HandlePositionalInput => IsPresent;
         }
     }
 
