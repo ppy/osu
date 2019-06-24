@@ -181,9 +181,9 @@ namespace osu.Game
             configSkin.ValueChanged += skinId => SkinManager.CurrentSkinInfo.Value = SkinManager.Query(s => s.ID == skinId.NewValue) ?? SkinInfo.Default;
             configSkin.TriggerChange();
 
-            LocalConfig.BindWith(OsuSetting.VolumeInactive, userInactiveVolume);
-
             IsActive.BindValueChanged(active => updateActiveState(active.NewValue), true);
+
+            Audio.AddAdjustment(AdjustableProperty.Volume, inactiveVolumeFade);
 
             Beatmap.BindValueChanged(beatmapChanged, true);
         }
@@ -707,22 +707,14 @@ namespace osu.Game
 
         #region Inactive audio dimming
 
-        private readonly BindableDouble userInactiveVolume = new BindableDouble();
-
         private readonly BindableDouble inactiveVolumeFade = new BindableDouble();
 
         private void updateActiveState(bool isActive)
         {
             if (isActive)
-            {
-                this.TransformBindableTo(inactiveVolumeFade, 1, 500, Easing.OutQuint)
-                    .Finally(_ => Audio.RemoveAdjustment(AdjustableProperty.Volume, inactiveVolumeFade)); //wait for the transition to finish to remove the inactive audio adjustment
-            }
+                this.TransformBindableTo(inactiveVolumeFade, 1, 400, Easing.OutQuint);
             else
-            {
-                Audio.AddAdjustment(AdjustableProperty.Volume, inactiveVolumeFade);
-                this.TransformBindableTo(inactiveVolumeFade, userInactiveVolume.Value, 1500, Easing.OutSine);
-            }
+                this.TransformBindableTo(inactiveVolumeFade, LocalConfig.Get<double>(OsuSetting.VolumeInactive), 4000, Easing.OutQuint);
         }
 
         #endregion

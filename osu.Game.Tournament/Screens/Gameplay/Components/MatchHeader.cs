@@ -5,7 +5,6 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Events;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
@@ -191,8 +190,6 @@ namespace osu.Game.Tournament.Screens.Gameplay.Components
 
             public RoundDisplay()
             {
-                CornerRadius = 10;
-                Masking = true;
                 Width = 200;
                 Height = 20;
             }
@@ -208,11 +205,6 @@ namespace osu.Game.Tournament.Screens.Gameplay.Components
             {
                 InternalChildren = new Drawable[]
                 {
-                    new Box
-                    {
-                        Colour = new Color4(47, 71, 67, 255),
-                        RelativeSizeAxes = Axes.Both,
-                    },
                     new OsuSpriteText
                     {
                         Anchor = Anchor.Centre,
