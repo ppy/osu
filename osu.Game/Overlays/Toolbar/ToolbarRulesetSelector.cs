@@ -62,7 +62,7 @@ namespace osu.Game.Overlays.Toolbar
             });
 
             Current.DisabledChanged += disabledChanged;
-            Current.ValueChanged += (value) => activeMode.Invalidate();
+            Current.ValueChanged += value => activeMode.Invalidate();
         }
 
         protected override TabFillFlowContainer CreateTabFlow() => new TabFillFlowContainer
