@@ -10,14 +10,13 @@ using osuTK.Graphics;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Rulesets;
 using osu.Framework.Graphics.UserInterface;
-using osu.Framework.Bindables;
 using osu.Framework.Input.Events;
 using osuTK.Input;
 using System.Linq;
 
 namespace osu.Game.Overlays.Toolbar
 {
-    public class ToolbarRulesetSelector : BindableRulesetSelector
+    public class ToolbarRulesetSelector : RulesetSelector
     {
         private const float padding = 10;
         private readonly Drawable modeButtonLine;
@@ -63,6 +62,7 @@ namespace osu.Game.Overlays.Toolbar
             });
 
             Current.DisabledChanged += disabledChanged;
+            Current.ValueChanged += (value) => activeMode.Invalidate();
         }
 
         protected override TabFillFlowContainer CreateTabFlow() => new TabFillFlowContainer
@@ -91,8 +91,6 @@ namespace osu.Game.Overlays.Toolbar
         }
 
         private readonly Cached activeMode = new Cached();
-
-        protected override void OnRulesetChanged(ValueChangedEvent<RulesetInfo> e) => activeMode.Invalidate();
 
         protected override void UpdateAfterChildren()
         {
