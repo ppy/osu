@@ -4,6 +4,7 @@
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.UserInterface;
 using osu.Game.Graphics;
@@ -21,7 +22,7 @@ namespace osu.Game.Overlays
         private ProfileSection[] sections;
         private GetUserRequest userReq;
         protected ProfileHeader Header;
-        private SectionsContainer<ProfileSection> sectionsContainer;
+        private ProfileSectionsContainer sectionsContainer;
         private ProfileTabControl tabs;
 
         public const float CONTENT_X_MARGIN = 70;
@@ -63,12 +64,11 @@ namespace osu.Game.Overlays
             Add(new Box
             {
                 RelativeSizeAxes = Axes.Both,
-                Colour = OsuColour.Gray(0.2f)
+                Colour = OsuColour.Gray(0.1f)
             });
 
-            Add(sectionsContainer = new SectionsContainer<ProfileSection>
+            Add(sectionsContainer = new ProfileSectionsContainer
             {
-                RelativeSizeAxes = Axes.Both,
                 ExpandableHeader = Header = new ProfileHeader(),
                 FixedHeader = tabs,
                 HeaderBackground = new Box
@@ -168,6 +168,22 @@ namespace osu.Game.Overlays
                     Text.Text = value.Title;
                 }
             }
+        }
+
+        private class ProfileSectionsContainer : SectionsContainer<ProfileSection>
+        {
+            public ProfileSectionsContainer()
+            {
+                RelativeSizeAxes = Axes.Both;
+            }
+
+            protected override FlowContainer<ProfileSection> CreateScrollContentContainer() => new FillFlowContainer<ProfileSection>
+            {
+                Direction = FillDirection.Vertical,
+                AutoSizeAxes = Axes.Y,
+                RelativeSizeAxes = Axes.X,
+                Spacing = new Vector2(0, 20),
+            };
         }
     }
 }
