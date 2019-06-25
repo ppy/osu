@@ -417,305 +417,14 @@ namespace osu.Game.Tests.Visual.Online
         [Test]
         public void TestUnavailable()
         {
-            AddStep(@"show parts-removed", () =>
-            {
-                overlay.ShowBeatmapSet(new BeatmapSetInfo
-                {
-                    Metadata = new BeatmapMetadata
-                    {
-                        Title = @"Sakura Kagetsu",
-                        Artist = @"AKITO",
-                        Source = @"DJMAX",
-                        Tags = @"J-Trance Pasonia",
-                        Author = new User
-                        {
-                            Username = @"Kharl",
-                            Id = 452,
-                        },
-                    },
-                    OnlineInfo = new BeatmapSetOnlineInfo
-                    {
-                        Availability = new BeatmapSetOnlineAvailability
-                        {
-                            DownloadDisabled = false,
-                            ExternalLink = @"https://gist.githubusercontent.com/peppy/079dc3f77e316f9cd40077d411319a72/raw",
-                        },
-                        Preview = @"https://b.ppy.sh/preview/119.mp3",
-                        PlayCount = 626927,
-                        FavouriteCount = 157,
-                        Submitted = new DateTime(2007, 10, 24),
-                        Ranked = new DateTime(2008, 4, 21),
-                        Status = BeatmapSetOnlineStatus.Ranked,
-                        BPM = 138,
-                        Covers = new BeatmapSetOnlineCovers
-                        {
-                            Cover = @"https://assets.ppy.sh/beatmaps/119/covers/cover.jpg?1539847784",
-                        },
-                    },
-                    Metrics = new BeatmapSetMetrics { Ratings = Enumerable.Range(0, 11).ToArray() },
-                    Beatmaps = new List<BeatmapInfo>
-                    {
-                        new BeatmapInfo
-                        {
-                            StarDifficulty = 1.51,
-                            Version = "Easy",
-                            Ruleset = osuRuleset,
-                            BaseDifficulty = new BeatmapDifficulty
-                            {
-                                CircleSize = 4,
-                                DrainRate = 2,
-                                OverallDifficulty = 1,
-                                ApproachRate = 1,
-                            },
-                            OnlineInfo = new BeatmapOnlineInfo
-                            {
-                                Length = 126000,
-                                CircleCount = 371,
-                                SliderCount = 35,
-                                PlayCount = 84498,
-                                PassCount = 37482,
-                            },
-                            Metrics = new BeatmapMetrics
-                            {
-                                Fails = Enumerable.Range(1, 100).Select(i => i % 12 - 6).ToArray(),
-                                Retries = Enumerable.Range(-2, 100).Select(i => i % 12 - 6).ToArray(),
-                            },
-                        },
-                        new BeatmapInfo
-                        {
-                            StarDifficulty = 2.23,
-                            Version = "Normal",
-                            Ruleset = osuRuleset,
-                            BaseDifficulty = new BeatmapDifficulty
-                            {
-                                CircleSize = 5,
-                                DrainRate = 4,
-                                OverallDifficulty = 3,
-                                ApproachRate = 3,
-                            },
-                            OnlineInfo = new BeatmapOnlineInfo
-                            {
-                                Length = 126000,
-                                CircleCount = 98,
-                                SliderCount = 28,
-                                PlayCount = 86427,
-                                PassCount = 23273,
-                            },
-                            Metrics = new BeatmapMetrics
-                            {
-                                Fails = Enumerable.Range(1, 100).Select(i => i % 12 - 6).ToArray(),
-                                Retries = Enumerable.Range(-2, 100).Select(i => i % 12 - 6).ToArray(),
-                            },
-                        },
-                        new BeatmapInfo
-                        {
-                            StarDifficulty = 2.83,
-                            Version = "Hard",
-                            Ruleset = osuRuleset,
-                            BaseDifficulty = new BeatmapDifficulty
-                            {
-                                CircleSize = 6,
-                                DrainRate = 6,
-                                OverallDifficulty = 6,
-                                ApproachRate = 6,
-                            },
-                            OnlineInfo = new BeatmapOnlineInfo
-                            {
-                                Length = 126000,
-                                CircleCount = 139,
-                                SliderCount = 37,
-                                PlayCount = 206523,
-                                PassCount = 44366,
-                            },
-                            Metrics = new BeatmapMetrics
-                            {
-                                Fails = Enumerable.Range(1, 100).Select(i => i % 12 - 6).ToArray(),
-                                Retries = Enumerable.Range(-2, 100).Select(i => i % 12 - 6).ToArray(),
-                            },
-                        },
-                        new BeatmapInfo
-                        {
-                            StarDifficulty = 4.26,
-                            Version = "Pasonia's Insane",
-                            Ruleset = osuRuleset,
-                            BaseDifficulty = new BeatmapDifficulty
-                            {
-                                CircleSize = 6,
-                                DrainRate = 6,
-                                OverallDifficulty = 6,
-                                ApproachRate = 6,
-                            },
-                            OnlineInfo = new BeatmapOnlineInfo
-                            {
-                                Length = 126000,
-                                CircleCount = 371,
-                                SliderCount = 35,
-                                PlayCount = 249479,
-                                PassCount = 14042,
-                            },
-                            Metrics = new BeatmapMetrics
-                            {
-                                Fails = Enumerable.Range(1, 100).Select(i => i % 12 - 6).ToArray(),
-                                Retries = Enumerable.Range(-2, 100).Select(i => i % 12 - 6).ToArray(),
-                            },
-                        },
-                    },
-                }, false);
-            });
-
+            AddStep(@"show parts-removed (has link)", () => overlay.ShowBeatmapSet(getTestUnavailableBeatmapSet(false, true), false));
             downloadAssert(true);
 
-            AddStep(@"show undownloadable (no link)", () =>
-            {
-                overlay.ShowBeatmapSet(new BeatmapSetInfo
-                {
-                    Metadata = new BeatmapMetadata
-                    {
-                        Title = @"China Express",
-                        Artist = @"Ryu*",
-                        Source = @"REFLEC BEAT",
-                        Tags = @"konami bemani lincle link iidx iidx18 iidx19 resort anthem plus la cataline mmzz",
-                        Author = new User
-                        {
-                            Username = @"yeahyeahyeahhh",
-                            Id = 58042,
-                        },
-                    },
-                    OnlineInfo = new BeatmapSetOnlineInfo
-                    {
-                        Availability = new BeatmapSetOnlineAvailability
-                        {
-                            DownloadDisabled = true,
-                        },
-                        Preview = @"https://b.ppy.sh/preview/53853.mp3",
-                        PlayCount = 436213,
-                        FavouriteCount = 105,
-                        Submitted = new DateTime(2012, 7, 1),
-                        Ranked = new DateTime(2012, 7, 18),
-                        Status = BeatmapSetOnlineStatus.Ranked,
-                        BPM = 171,
-                        Covers = new BeatmapSetOnlineCovers
-                        {
-                            Cover = @"https://assets.ppy.sh/beatmaps/53853/covers/cover.jpg?1456498562",
-                        },
-                    },
-                    Metrics = new BeatmapSetMetrics { Ratings = Enumerable.Range(0, 11).ToArray() },
-                    Beatmaps = new List<BeatmapInfo>
-                    {
-                        new BeatmapInfo
-                        {
-                            StarDifficulty = 1.85,
-                            Version = "Easy",
-                            Ruleset = osuRuleset,
-                            BaseDifficulty = new BeatmapDifficulty
-                            {
-                                CircleSize = 3,
-                                DrainRate = 2,
-                                OverallDifficulty = 2,
-                                ApproachRate = 3,
-                            },
-                            OnlineInfo = new BeatmapOnlineInfo
-                            {
-                                Length = 95000,
-                                CircleCount = 49,
-                                SliderCount = 60,
-                                PlayCount = 20308,
-                                PassCount = 10233,
-                            },
-                            Metrics = new BeatmapMetrics
-                            {
-                                Fails = Enumerable.Range(1, 100).Select(i => i % 12 - 6).ToArray(),
-                                Retries = Enumerable.Range(-2, 100).Select(i => i % 12 - 6).ToArray(),
-                            },
-                        },
-                        new BeatmapInfo
-                        {
-                            StarDifficulty = 2.36,
-                            Version = "Normal",
-                            Ruleset = osuRuleset,
-                            BaseDifficulty = new BeatmapDifficulty
-                            {
-                                CircleSize = 3,
-                                DrainRate = 2,
-                                OverallDifficulty = 2,
-                                ApproachRate = 5,
-                            },
-                            OnlineInfo = new BeatmapOnlineInfo
-                            {
-                                Length = 96000,
-                                CircleCount = 86,
-                                SliderCount = 67,
-                                PlayCount = 54015,
-                                PassCount = 25603,
-                            },
-                            Metrics = new BeatmapMetrics
-                            {
-                                Fails = Enumerable.Range(1, 100).Select(i => i % 12 - 6).ToArray(),
-                                Retries = Enumerable.Range(-2, 100).Select(i => i % 12 - 6).ToArray(),
-                            },
-                        },
-                        new BeatmapInfo
-                        {
-                            StarDifficulty = 4.42,
-                            Version = "Hyper",
-                            Ruleset = osuRuleset,
-                            BaseDifficulty = new BeatmapDifficulty
-                            {
-                                CircleSize = 4,
-                                DrainRate = 7,
-                                OverallDifficulty = 6,
-                                ApproachRate = 8,
-                            },
-                            OnlineInfo = new BeatmapOnlineInfo
-                            {
-                                Length = 96000,
-                                CircleCount = 215,
-                                SliderCount = 120,
-                                PlayCount = 111400,
-                                PassCount = 12583,
-                            },
-                            Metrics = new BeatmapMetrics
-                            {
-                                Fails = Enumerable.Range(1, 100).Select(i => i % 12 - 6).ToArray(),
-                                Retries = Enumerable.Range(-2, 100).Select(i => i % 12 - 6).ToArray(),
-                            },
-                        },
-                        new BeatmapInfo
-                        {
-                            StarDifficulty = 5.05,
-                            Version = "Another",
-                            Ruleset = osuRuleset,
-                            BaseDifficulty = new BeatmapDifficulty
-                            {
-                                CircleSize = 4,
-                                DrainRate = 7,
-                                OverallDifficulty = 9,
-                                ApproachRate = 9,
-                            },
-                            OnlineInfo = new BeatmapOnlineInfo
-                            {
-                                Length = 96000,
-                                CircleCount = 250,
-                                SliderCount = 75,
-                                PlayCount = 228253,
-                                PassCount = 53037,
-                            },
-                            Metrics = new BeatmapMetrics
-                            {
-                                Fails = Enumerable.Range(1, 100).Select(i => i % 12 - 6).ToArray(),
-                                Retries = Enumerable.Range(-2, 100).Select(i => i % 12 - 6).ToArray(),
-                            },
-                        },
-                    },
-                }, false);
-            });
-
+            AddStep(@"show undownloadable (no link)", () => overlay.ShowBeatmapSet(getTestUnavailableBeatmapSet(true, false), false));
             downloadAssert(false);
-        }
 
-        private void downloadAssert(bool shown)
-        {
-            AddAssert($"is download button {(shown ? "shown" : "hidden")}", () => overlay.Header.DownloadButtonsContainer.Any() == shown);
+            AddStep(@"show undownloadable (has link)", () => overlay.ShowBeatmapSet(getTestUnavailableBeatmapSet(true, true), false));
+            downloadAssert(false);
         }
 
         [Test]
@@ -729,5 +438,47 @@ namespace osu.Game.Tests.Visual.Online
         {
             AddStep(@"show without reload", overlay.Show);
         }
+
+        private void downloadAssert(bool shown)
+        {
+            AddAssert($"is download button {(shown ? "shown" : "hidden")}", () => overlay.Header.DownloadButtonsContainer.Any() == shown);
+        }
+
+        private BeatmapSetInfo getTestUnavailableBeatmapSet(bool undownloadable, bool hasLink) => new BeatmapSetInfo
+        {
+            Metadata = new BeatmapMetadata
+            {
+                Title = undownloadable ? "undownloadable" : "parts-removed",
+                Artist = "test beatmapset",
+                AuthorString = "test",
+            },
+            OnlineInfo = new BeatmapSetOnlineInfo
+            {
+                Availability = new BeatmapSetOnlineAvailability
+                {
+                    DownloadDisabled = undownloadable,
+                    ExternalLink = hasLink ? "https://osu.ppy.sh" : null,
+                },
+                Preview = @"https://b.ppy.sh/preview/1.mp3",
+                Covers = new BeatmapSetOnlineCovers(),
+            },
+            Metrics = new BeatmapSetMetrics { Ratings = Enumerable.Range(0, 11).ToArray() },
+            Beatmaps = new List<BeatmapInfo>
+            {
+                new BeatmapInfo
+                {
+                    StarDifficulty = 1.23,
+                    Version = "Test",
+                    Ruleset = osuRuleset,
+                    BaseDifficulty = new BeatmapDifficulty(),
+                    OnlineInfo = new BeatmapOnlineInfo(),
+                    Metrics = new BeatmapMetrics
+                    {
+                        Fails = Enumerable.Range(1, 100).Select(i => i % 12 - 6).ToArray(),
+                        Retries = Enumerable.Range(-2, 100).Select(i => i % 12 - 6).ToArray(),
+                    },
+                },
+            },
+        };
     }
 }
