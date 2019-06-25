@@ -406,6 +406,11 @@ namespace osu.Game
                             Anchor = Anchor.BottomLeft,
                             Origin = Anchor.BottomLeft,
                             Alpha = 0,
+                            Action = () =>
+                            {
+                                if ((screenStack.CurrentScreen as IOsuScreen)?.AllowBackButton == true)
+                                    screenStack.Exit();
+                            }
                         },
                         logoContainer = new Container { RelativeSizeAxes = Axes.Both },
                     }

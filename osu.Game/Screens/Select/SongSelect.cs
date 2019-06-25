@@ -34,10 +34,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Input.Bindings;
 
 namespace osu.Game.Screens.Select
 {
-    public abstract class SongSelect : OsuScreen
+    public abstract class SongSelect : OsuScreen, IKeyBindingHandler<GlobalAction>
     {
         private static readonly Vector2 wedged_container_size = new Vector2(0.5f, 245);
 
@@ -645,7 +646,7 @@ namespace osu.Game.Screens.Select
                 Schedule(() => BeatmapDetails.Leaderboard.RefreshScores())));
         }
 
-        public override bool OnPressed(GlobalAction action)
+        public virtual bool OnPressed(GlobalAction action)
         {
             if (!this.IsCurrentScreen()) return false;
 
@@ -656,8 +657,10 @@ namespace osu.Game.Screens.Select
                     return true;
             }
 
-            return base.OnPressed(action);
+            return false;
         }
+
+        public bool OnReleased(GlobalAction action) => action == GlobalAction.Select;
 
         protected override bool OnKeyDown(KeyDownEvent e)
         {
