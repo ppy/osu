@@ -5,6 +5,7 @@ using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Screens;
 using osu.Framework.Testing;
 using osu.Game.Graphics.Containers;
@@ -133,6 +134,22 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddStep("exit", () => Player.Exit());
 
             confirmPaused();
+
+            exitAndConfirm();
+        }
+
+        [Test]
+        public void TestExitViaHoldToExit()
+        {
+            AddStep("exit", () =>
+            {
+                InputManager.MoveMouseTo(Player.HUDOverlay.HoldToQuit.First(c => c is HoldToConfirmContainer));
+                InputManager.PressButton(MouseButton.Left);
+            });
+
+            confirmPaused();
+
+            AddStep("release", () => InputManager.ReleaseButton(MouseButton.Left));
 
             exitAndConfirm();
         }
