@@ -401,15 +401,14 @@ namespace osu.Game
                     Children = new Drawable[]
                     {
                         screenStack = new OsuScreenStack { RelativeSizeAxes = Axes.Both },
+                        backButton = new BackButton
+                        {
+                            Anchor = Anchor.BottomLeft,
+                            Origin = Anchor.BottomLeft,
+                            Alpha = 0,
+                        },
                         logoContainer = new Container { RelativeSizeAxes = Axes.Both },
                     }
-                },
-                backButton = new BackButton
-                {
-                    Anchor = Anchor.BottomLeft,
-                    Origin = Anchor.BottomLeft,
-                    Alpha = 0,
-                    Action = screenStack.Exit
                 },
                 overlayContent = new Container { RelativeSizeAxes = Axes.Both },
                 rightFloatingOverlayContent = new Container { RelativeSizeAxes = Axes.Both },
