@@ -36,6 +36,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             {
                 selector.Current.Value = selector.Items.ElementAt(RNG.Next(selector.Items.Count()));
             });
+            AddStep("Toggle disabled state", () => selector.Current.Disabled = !selector.Current.Disabled);
         }
     }
 }
