@@ -60,19 +60,6 @@ namespace osu.Game.Database
 
             var request = CreateDownloadRequest(model, minimiseDownloadSize);
 
-            performDownloadWithRequest(request);
-
-            return true;
-        }
-
-        public virtual bool IsAvailableLocally(TModel model) => modelStore.ConsumableItems.Any(m => m.Equals(model) && !m.DeletePending);
-
-        public ArchiveDownloadRequest<TModel> GetExistingDownload(TModel model) => currentDownloads.Find(r => r.Model.Equals(model));
-
-        private bool canDownload(TModel model) => GetExistingDownload(model) == null && api != null;
-
-        private void performDownloadWithRequest(ArchiveDownloadRequest<TModel> request)
-        {
             DownloadNotification notification = new DownloadNotification
             {
                 Text = $"Downloading {request.Model}",
@@ -94,7 +81,16 @@ namespace osu.Game.Database
                 }, TaskCreationOptions.LongRunning);
             };
 
-            request.Failure += error => handleRequestFailure(request, notification, error);
+            request.Failure += error =>
+            {
+                DownloadFailed?.Invoke(request);
+
+                if (error is OperationCanceledException) return;
+
+                notification.State = ProgressNotificationState.Cancelled;
+                Logger.Error(error, $"{HumanisedModelName.Titleize()} download failed!");
+                currentDownloads.Remove(request);
+            };
 
             notification.CancelRequested += () =>
             {
@@ -110,18 +106,15 @@ namespace osu.Game.Database
             Task.Factory.StartNew(() => request.Perform(api), TaskCreationOptions.LongRunning);
 
             DownloadBegan?.Invoke(request);
+
+            return true;
         }
 
-        private void handleRequestFailure(ArchiveDownloadRequest<TModel> req, ProgressNotification notification, Exception e)
-        {
-            DownloadFailed?.Invoke(req);
+        public virtual bool IsAvailableLocally(TModel model) => modelStore.ConsumableItems.Any(m => m.Equals(model) && !m.DeletePending);
 
-            if (e is OperationCanceledException) return;
+        public ArchiveDownloadRequest<TModel> GetExistingDownload(TModel model) => currentDownloads.Find(r => r.Model.Equals(model));
 
-            notification.State = ProgressNotificationState.Cancelled;
-            Logger.Error(e, $"{HumanisedModelName.Titleize()} download failed!");
-            currentDownloads.Remove(req);
-        }
+        private bool canDownload(TModel model) => GetExistingDownload(model) == null && api != null;
 
         private class DownloadNotification : ProgressNotification
         {
