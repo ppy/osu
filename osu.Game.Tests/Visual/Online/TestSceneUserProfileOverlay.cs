@@ -80,13 +80,13 @@ namespace osu.Game.Tests.Visual.Online
         {
             base.LoadComplete();
 
-            AddStep("Show offline dummy", () => profile.ShowUser(TEST_USER, false));
+            AddStep("Show offline dummy", () => profile.ShowUser(TEST_USER));
 
             AddStep("Show null dummy", () => profile.ShowUser(new User
             {
                 Username = @"Null",
                 Id = 1,
-            }, false));
+            }));
 
             AddStep("Show ppy", () => profile.ShowUser(new User
             {
@@ -95,7 +95,7 @@ namespace osu.Game.Tests.Visual.Online
                 IsSupporter = true,
                 Country = new Country { FullName = @"Australia", FlagName = @"AU" },
                 CoverUrl = @"https://osu.ppy.sh/images/headers/profile-covers/c3.jpg"
-            }, api.IsLoggedIn));
+            }));
 
             AddStep("Show flyte", () => profile.ShowUser(new User
             {
@@ -103,7 +103,7 @@ namespace osu.Game.Tests.Visual.Online
                 Id = 3103765,
                 Country = new Country { FullName = @"Japan", FlagName = @"JP" },
                 CoverUrl = @"https://osu.ppy.sh/images/headers/profile-covers/c6.jpg"
-            }, api.IsLoggedIn));
+            }));
 
             AddStep("Hide", profile.Hide);
             AddStep("Show without reload", profile.Show);

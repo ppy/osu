@@ -159,7 +159,7 @@ namespace osu.Game.Overlays.Profile.Header
                 }
             };
 
-            User.BindValueChanged(user => updateUser(user.NewValue));
+            User.BindValueChanged(user => updateUser(user.NewValue), true);
         }
 
         private void updateUser(User user)
