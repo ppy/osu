@@ -31,6 +31,8 @@ namespace osu.Game.Screens.Menu
         public override bool HideOverlaysOnEnter => true;
         public override OverlayActivation InitialOverlayActivationMode => OverlayActivation.Disabled;
 
+        public override bool AllowBackButton => false;
+
         public override bool CursorVisible => false;
 
         private Drawable heart;
