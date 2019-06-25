@@ -107,18 +107,7 @@ namespace osu.Game.Database
             currentDownloads.Add(request);
             PostNotification?.Invoke(notification);
 
-            Task.Factory.StartNew(() =>
-            {
-                try
-                {
-                    request.Perform(api);
-                }
-                catch (Exception e)
-                {
-                    // 404s (and maybe other failures) don't fire request.Failure so for now they handled here as well
-                    handleRequestFailure(request, notification, e);
-                }
-            }, TaskCreationOptions.LongRunning);
+            Task.Factory.StartNew(() => request.Perform(api), TaskCreationOptions.LongRunning);
 
             DownloadBegan?.Invoke(request);
         }
