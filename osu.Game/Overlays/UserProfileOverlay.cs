@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Linq;
+using System.Threading;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -20,65 +21,72 @@ namespace osu.Game.Overlays
 {
     public class UserProfileOverlay : FullscreenOverlay
     {
-        private ProfileSection lastSection;
-        private ProfileSection[] sections;
         private GetUserRequest userReq;
         protected ProfileHeader Header;
         private ProfileSectionsContainer sectionsContainer;
         private ProfileTabControl tabs;
 
+        private CancellationTokenSource cancellationSource;
+
         public const float CONTENT_X_MARGIN = 70;
+
+        public UserProfileOverlay()
+        {
+            Add(new Box
+            {
+                RelativeSizeAxes = Axes.Both,
+                Colour = OsuColour.Gray(0.1f)
+            });
+        }
 
         public void ShowUser(long userId) => ShowUser(new User { Id = userId });
 
-        public void ShowUser(User user, bool fetchOnline = true)
+        public void ShowUser(User user)
         {
+            cancellationSource?.Cancel();
+            cancellationSource = null;
+
+            userReq?.Cancel();
+            userReq = null;
+
             if (user == User.SYSTEM_USER) return;
 
             Show();
 
+            // we are already showing the correct user.
             if (user.Id == Header?.User.Value?.Id)
                 return;
 
-            Clear();
+            // temporary until this class supports proper bindable flow (like BeatmapSetOverlay).
+            sectionsContainer?.FadeOut(200);
+            sectionsContainer?.Expire();
 
-            sections = new ProfileSection[]
+            userReq = new GetUserRequest(user.Id);
+            userReq.Success += userLoadComplete;
+            API.Queue(userReq);
+        }
+
+        private void userLoadComplete(User user)
+        {
+            // temporary until this class supports proper bindable flow (like BeatmapSetOverlay).
+            sectionsContainer = new ProfileSectionsContainer
             {
-                //new AboutSection(),
-                new RecentSection(),
-                new RanksSection(),
-                //new MedalsSection(),
-                new HistoricalSection(),
-                new BeatmapsSection(),
-                new KudosuSection()
+                ExpandableHeader = Header = new ProfileHeader { User = { Value = user } },
+                FixedHeader = tabs = new ProfileTabControl
+                {
+                    RelativeSizeAxes = Axes.X,
+                    Anchor = Anchor.TopCentre,
+                    Origin = Anchor.TopCentre,
+                    Height = 30
+                },
+                HeaderBackground = new Box
+                {
+                    Colour = OsuColour.Gray(34),
+                    RelativeSizeAxes = Axes.Both
+                }
             };
 
-            AddRange(new Drawable[]
-            {
-                new Box
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    Colour = OsuColour.Gray(0.1f)
-                },
-                sectionsContainer = new ProfileSectionsContainer
-                {
-                    ExpandableHeader = Header = new ProfileHeader(),
-                    FixedHeader = tabs = new ProfileTabControl
-                    {
-                        RelativeSizeAxes = Axes.X,
-                        Anchor = Anchor.TopCentre,
-                        Origin = Anchor.TopCentre,
-                        Height = 30
-                    },
-                    HeaderBackground = new Box
-                    {
-                        Colour = OsuColour.Gray(34),
-                        RelativeSizeAxes = Axes.Both
-                    }
-                }
-            });
-
-            lastSection = null;
+            ProfileSection lastSection = null;
 
             sectionsContainer.SelectedSection.ValueChanged += section =>
             {
@@ -106,29 +114,19 @@ namespace osu.Game.Overlays
                 }
             };
 
-            userReq?.Cancel();
-
-            if (fetchOnline)
-            {
-                userReq = new GetUserRequest(user.Id);
-                userReq.Success += userLoadComplete;
-                API.Queue(userReq);
-            }
-            else
-            {
-                userReq = null;
-                userLoadComplete(user);
-            }
-
-            sectionsContainer.ScrollToTop();
-        }
-
-        private void userLoadComplete(User user)
-        {
-            Header.User.Value = user;
-
             if (user.ProfileOrder != null)
             {
+                var sections = new ProfileSection[]
+                {
+                    //new AboutSection(),
+                    new RecentSection(),
+                    new RanksSection(),
+                    //new MedalsSection(),
+                    new HistoricalSection(),
+                    new BeatmapsSection(),
+                    new KudosuSection()
+                };
+
                 foreach (string id in user.ProfileOrder)
                 {
                     var sec = sections.FirstOrDefault(s => s.Identifier == id);
@@ -142,6 +140,8 @@ namespace osu.Game.Overlays
                     }
                 }
             }
+
+            LoadComponentAsync(sectionsContainer, Add, (cancellationSource = new CancellationTokenSource()).Token);
         }
 
         private class ProfileTabControl : PageTabControl<ProfileSection>

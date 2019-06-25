@@ -26,7 +26,7 @@ namespace osu.Game.Overlays.Profile
 
         public ProfileHeader()
         {
-            User.ValueChanged += e => updateDisplay(e.NewValue);
+            User.BindValueChanged(e => updateDisplay(e.NewValue), true);
 
             TabControl.AddItem("Info");
             TabControl.AddItem("Modding");
