@@ -29,6 +29,7 @@ using osu.Framework.Threading;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
+using osu.Game.Graphics.UserInterface;
 using osu.Game.Input;
 using osu.Game.Overlays.Notifications;
 using osu.Game.Screens.Play;
@@ -82,6 +83,7 @@ namespace osu.Game
         private OsuScreenStack screenStack;
         private VolumeOverlay volume;
         private OsuLogo osuLogo;
+        private BackButton backButton;
 
         private MainMenu menuScreen;
         private Intro introScreen;
@@ -401,6 +403,13 @@ namespace osu.Game
                         screenStack = new OsuScreenStack { RelativeSizeAxes = Axes.Both },
                         logoContainer = new Container { RelativeSizeAxes = Axes.Both },
                     }
+                },
+                backButton = new BackButton
+                {
+                    Anchor = Anchor.BottomLeft,
+                    Origin = Anchor.BottomLeft,
+                    Alpha = 0,
+                    Action = screenStack.Exit
                 },
                 overlayContent = new Container { RelativeSizeAxes = Axes.Both },
                 rightFloatingOverlayContent = new Container { RelativeSizeAxes = Axes.Both },
@@ -795,6 +804,8 @@ namespace osu.Game
                     CloseAllOverlays();
                 else
                     Toolbar.Show();
+
+                backButton.Alpha = newOsuScreen.ShowBackButton ? 1 : 0;
             }
         }
 

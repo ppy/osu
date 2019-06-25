@@ -186,31 +186,27 @@ namespace osu.Game.Screens.Select
 
             if (ShowFooter)
             {
-                AddInternal(FooterPanels = new Container
+                AddRangeInternal(new[]
                 {
-                    Anchor = Anchor.BottomLeft,
-                    Origin = Anchor.BottomLeft,
-                    RelativeSizeAxes = Axes.X,
-                    AutoSizeAxes = Axes.Y,
-                    Margin = new MarginPadding
+                    FooterPanels = new Container
                     {
-                        Bottom = Footer.HEIGHT,
-                    },
-                });
-                AddInternal(Footer = new Footer
-                {
-                    OnBack = ExitFromBack,
-                });
-
-                FooterPanels.AddRange(new Drawable[]
-                {
-                    BeatmapOptions = new BeatmapOptionsOverlay(),
-                    ModSelect = new ModSelectOverlay
-                    {
+                        Anchor = Anchor.BottomLeft,
+                        Origin = Anchor.BottomLeft,
                         RelativeSizeAxes = Axes.X,
-                        Origin = Anchor.BottomCentre,
-                        Anchor = Anchor.BottomCentre,
-                    }
+                        AutoSizeAxes = Axes.Y,
+                        Margin = new MarginPadding { Bottom = Footer.HEIGHT },
+                        Children = new Drawable[]
+                        {
+                            BeatmapOptions = new BeatmapOptionsOverlay(),
+                            ModSelect = new ModSelectOverlay
+                            {
+                                RelativeSizeAxes = Axes.X,
+                                Origin = Anchor.BottomCentre,
+                                Anchor = Anchor.BottomCentre,
+                            }
+                        }
+                    },
+                    Footer = new Footer()
                 });
             }
 
