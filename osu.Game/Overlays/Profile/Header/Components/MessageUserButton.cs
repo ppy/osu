@@ -57,7 +57,8 @@ namespace osu.Game.Overlays.Profile.Header.Components
         [BackgroundDependencyLoader]
         private void load()
         {
-            User.BindValueChanged(e => Content.Alpha = !e.NewValue.PMFriendsOnly && apiProvider?.LocalUser.Value.Id != e.NewValue.Id ? 1 : 0, true);
+            User.BindValueChanged(
+                e => Content.Alpha = e.NewValue?.PMFriendsOnly != true && apiProvider?.LocalUser.Value.Id != e.NewValue?.Id ? 1 : 0, true);
         }
     }
 }
