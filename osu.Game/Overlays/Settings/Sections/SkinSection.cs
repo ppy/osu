@@ -108,7 +108,7 @@ namespace osu.Game.Overlays.Settings.Sections
 
         private class SkinSettingsDropdown : SettingsDropdown<SkinInfo>
         {
-            protected override OsuDropdown<SkinInfo> CreateDropdown() => new SkinDropdownControl { Items = Items };
+            protected override OsuDropdown<SkinInfo> CreateDropdown() => new SkinDropdownControl();
 
             private class SkinDropdownControl : DropdownControl
             {
