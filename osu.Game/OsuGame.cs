@@ -405,7 +405,6 @@ namespace osu.Game
                         {
                             Anchor = Anchor.BottomLeft,
                             Origin = Anchor.BottomLeft,
-                            Alpha = 0,
                             Action = () =>
                             {
                                 if ((screenStack.CurrentScreen as IOsuScreen)?.AllowBackButton == true)
@@ -809,7 +808,10 @@ namespace osu.Game
                 else
                     Toolbar.Show();
 
-                backButton.Alpha = newOsuScreen.ShowBackButton ? 1 : 0;
+                if (newOsuScreen.ShowBackButton)
+                    backButton.Show();
+                else
+                    backButton.Hide();
             }
         }
 
