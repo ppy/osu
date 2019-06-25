@@ -18,11 +18,6 @@ namespace osu.Game.Screens
         bool DisallowExternalBeatmapRulesetChanges { get; }
 
         /// <summary>
-        /// Whether a visual display for the back button should be shown.
-        /// </summary>
-        bool ShowBackButton { get; }
-
-        /// <summary>
         /// Whether the user can exit this this <see cref="IOsuScreen"/> by pressing the back button.
         /// </summary>
         bool AllowBackButton { get; }

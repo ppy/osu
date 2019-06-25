@@ -34,8 +34,6 @@ namespace osu.Game.Screens
 
         public string Description => Title;
 
-        public virtual bool ShowBackButton => AllowBackButton;
-
         public virtual bool AllowBackButton => true;
 
         public virtual bool AllowExternalScreenChange => false;
