@@ -32,6 +32,8 @@ namespace osu.Game.Screens.Menu
         private SampleChannel welcome;
         private SampleChannel seeya;
 
+        public override bool AllowBackButton => false;
+
         public override bool HideOverlaysOnEnter => true;
         public override OverlayActivation InitialOverlayActivationMode => OverlayActivation.Disabled;
 
