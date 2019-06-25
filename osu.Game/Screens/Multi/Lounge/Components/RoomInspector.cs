@@ -19,6 +19,7 @@ using osu.Game.Online.API.Requests;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Screens.Multi.Components;
 using osu.Game.Users;
+using osu.Game.Users.Drawables;
 using osuTK;
 using osuTK.Graphics;
 
