@@ -808,7 +808,7 @@ namespace osu.Game
                 else
                     Toolbar.Show();
 
-                if (newOsuScreen.ShowBackButton)
+                if (newOsuScreen.AllowBackButton)
                     backButton.Show();
                 else
                     backButton.Hide();
