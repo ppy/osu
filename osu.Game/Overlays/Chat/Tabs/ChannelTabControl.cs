@@ -57,10 +57,10 @@ namespace osu.Game.Overlays.Chat.Tabs
             switch (value.Type)
             {
                 default:
-                    return new ChannelTabItem(value) { OnRequestClose = tabCloseRequested };
+                    return new ChannelTabItem(value) { OnRequestClose = TabCloseRequested };
 
                 case ChannelType.PM:
-                    return new PrivateChannelTabItem(value) { OnRequestClose = tabCloseRequested };
+                    return new PrivateChannelTabItem(value) { OnRequestClose = TabCloseRequested };
             }
         }
 
@@ -103,7 +103,7 @@ namespace osu.Game.Overlays.Chat.Tabs
             selectorTab.Active.Value = false;
         }
 
-        private void tabCloseRequested(TabItem<Channel> tab)
+        protected void TabCloseRequested(TabItem<Channel> tab)
         {
             int totalTabs = TabContainer.Count - 1; // account for selectorTab
             int currentIndex = MathHelper.Clamp(TabContainer.IndexOf(tab), 1, totalTabs);

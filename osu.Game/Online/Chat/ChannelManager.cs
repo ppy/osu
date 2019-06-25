@@ -348,7 +348,8 @@ namespace osu.Game.Online.Chat
                 }
             }
 
-            if (CurrentChannel.Value == null)
+            // If no channel is currently selected, select the newly joined channel
+            if (CurrentChannel.Value == null || CurrentChannel.Value is ChannelSelectorTabItem.ChannelSelectorTabChannel)
                 CurrentChannel.Value = channel;
 
             if (!channel.MessagesLoaded)
