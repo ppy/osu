@@ -3,10 +3,12 @@
 
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
+using osu.Framework.Input.Bindings;
+using osu.Game.Input.Bindings;
 
 namespace osu.Game.Graphics.UserInterface
 {
-    public class BackButton : TwoLayerButton
+    public class BackButton : TwoLayerButton, IKeyBindingHandler<GlobalAction>
     {
         public BackButton()
         {
@@ -22,5 +24,18 @@ namespace osu.Game.Graphics.UserInterface
             BackgroundColour = colours.Pink;
             HoverColour = colours.PinkDark;
         }
+
+        public bool OnPressed(GlobalAction action)
+        {
+            if (action == GlobalAction.Back)
+            {
+                Action?.Invoke();
+                return true;
+            }
+
+            return false;
+        }
+
+        public bool OnReleased(GlobalAction action) => action == GlobalAction.Back;
     }
 }
