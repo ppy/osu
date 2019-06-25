@@ -32,6 +32,8 @@ namespace osu.Game.Screens.Menu
         private SampleChannel welcome;
         private SampleChannel seeya;
 
+        public override bool AllowBackButton => false;
+
         public override bool HideOverlaysOnEnter => true;
         public override OverlayActivation InitialOverlayActivationMode => OverlayActivation.Disabled;
 
@@ -165,7 +167,7 @@ namespace osu.Game.Screens.Menu
 
             Scheduler.AddDelayed(this.Exit, fadeOutTime);
 
-            //don't want to fade out completely else we will stop running updates and shit will hit the fan.
+            //don't want to fade out completely else we will stop running updates.
             Game.FadeTo(0.01f, fadeOutTime);
 
             base.OnResuming(last);

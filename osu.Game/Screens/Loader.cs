@@ -23,7 +23,7 @@ namespace osu.Game.Screens
 
         public override bool CursorVisible => false;
 
-        protected override bool AllowBackButton => false;
+        public override bool AllowBackButton => false;
 
         public Loader()
         {

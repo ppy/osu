@@ -24,9 +24,9 @@ Detailed changelogs are published on the [official osu! site](https://osu.ppy.sh
 
 ![](https://puu.sh/DCmvA/f6a74f5fbb.png)
 
-If you are not interested in developing the game, you can consume our [binary releases](https://github.com/ppy/osu/releases).
+If you are not interested in developing the game, you can still consume our [binary releases](https://github.com/ppy/osu/releases).
 
-**Latest build:***
+**Latest build:**
 
 | [Windows (x64)](https://github.com/ppy/osu/releases/latest/download/install.exe)  | [macOS 10.12+](https://github.com/ppy/osu/releases/latest/download/osu.app.zip) |
 | ------------- | ------------- |
@@ -72,7 +72,7 @@ If the build fails, try to restore nuget packages with `dotnet restore`.
 
 On Linux, the environment variable `LD_LIBRARY_PATH` must point to the build directory, located at `osu.Desktop/bin/Debug/$NETCORE_VERSION`.
 
-`$NETCORE_VERSION` is the version of .NET Core SDK. You can have it with `grep TargetFramework osu.Desktop/osu.Desktop.csproj | sed -r 's/.*>(.*)<\/.*/\1/'`.
+`$NETCORE_VERSION` is the version of the targeted .NET Core SDK. You can check it by running `grep TargetFramework osu.Desktop/osu.Desktop.csproj | sed -r 's/.*>(.*)<\/.*/\1/'`.
 
 For example, you can run osu! with the following command:
 
