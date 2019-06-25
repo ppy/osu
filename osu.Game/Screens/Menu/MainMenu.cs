@@ -3,24 +3,21 @@
 
 using osuTK;
 using osuTK.Graphics;
-using osuTK.Input;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
-using osu.Framework.Input.Events;
+using osu.Framework.Platform;
 using osu.Framework.Screens;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
+using osu.Game.Overlays;
 using osu.Game.Screens.Backgrounds;
 using osu.Game.Screens.Charts;
 using osu.Game.Screens.Direct;
 using osu.Game.Screens.Edit;
 using osu.Game.Screens.Multi;
 using osu.Game.Screens.Select;
-using osu.Game.Screens.Tournament;
-using osu.Framework.Platform;
-using osu.Game.Overlays;
 
 namespace osu.Game.Screens.Menu
 {
@@ -199,17 +196,6 @@ namespace osu.Game.Screens.Menu
             buttons.State = ButtonSystemState.Exit;
             this.FadeOut(3000);
             return base.OnExiting(next);
-        }
-
-        protected override bool OnKeyDown(KeyDownEvent e)
-        {
-            if (!e.Repeat && e.ControlPressed && e.ShiftPressed && e.Key == Key.D)
-            {
-                this.Push(new Drawings());
-                return true;
-            }
-
-            return base.OnKeyDown(e);
         }
     }
 }
