@@ -58,8 +58,8 @@ namespace osu.Game.Graphics.UserInterface
 
         protected override void PopOut()
         {
-            button.MoveToX(-TwoLayerButton.SIZE_EXTENDED.X / 2, 400);
-            button.FadeOut(200);
+            button.MoveToX(-TwoLayerButton.SIZE_EXTENDED.X / 2, 400, Easing.OutQuint);
+            button.FadeOut(400, Easing.OutQuint);
         }
     }
 }
