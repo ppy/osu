@@ -154,7 +154,6 @@ namespace osu.Game.Rulesets.UI
         public void Fail()
         {
             NestedPlayfields.ForEach(p => p.Fail());
-            DisplayJudgements.Value = false;
             HasFailed.Value = true;
         }
     }
