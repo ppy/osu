@@ -60,7 +60,7 @@ namespace osu.Game.Tests.Visual.UserInterface
                 channelManager.LeaveChannel(channel1);
                 channelManager.LeaveChannel(channel2);
             });
-            AddStep("Hide chat", () => chatOverlay.Hide());
+            AddStep("Show chat", () => chatOverlay.Show());
         }
 
         /// <summary>
@@ -70,7 +70,6 @@ namespace osu.Game.Tests.Visual.UserInterface
         [Test]
         public void TestToggleChatWithNoChannelsJoined()
         {
-            AddStep("Toggle chat overlay", () => chatOverlay.Show());
             AddAssert("Channel selection overlay was toggled", () => chatOverlay.SelectionOverlayState == Visibility.Visible);
             AddAssert("Chat overlay was shown", () => chatOverlay.State.Value == Visibility.Visible);
             AddStep("Close chat overlay", () => chatOverlay.Hide());
@@ -82,18 +81,17 @@ namespace osu.Game.Tests.Visual.UserInterface
         public void TestToggleChatWithChannelJoined()
         {
             AddStep("Join channel 1", () => channelManager.JoinChannel(channel1));
-            AddStep("Toggle chat overlay", () => chatOverlay.Show());
-            AddAssert("Channel selection overlay was not toggled", () => chatOverlay.SelectionOverlayState == Visibility.Hidden);
-            AddAssert("Chat overlay was shown", () => chatOverlay.State.Value == Visibility.Visible);
             AddStep("Close chat overlay", () => chatOverlay.Hide());
             AddAssert("Channel selection overlay was hidden", () => chatOverlay.SelectionOverlayState == Visibility.Hidden);
             AddAssert("Chat overlay was hidden", () => chatOverlay.State.Value == Visibility.Hidden);
+            AddStep("Close chat overlay", () => chatOverlay.Show());
+            AddAssert("Channel selection overlay was not toggled", () => chatOverlay.SelectionOverlayState == Visibility.Hidden);
+            AddAssert("Chat overlay was shown", () => chatOverlay.State.Value == Visibility.Visible);
         }
 
         [Test]
         public void TestTabbingAwayClosesSelector()
         {
-            AddStep("Toggle chat overlay", () => chatOverlay.Show());
             AddStep("Join channel 1", () => channelManager.JoinChannel(channel1));
             AddStep("Join channel 2", () => channelManager.JoinChannel(channel2));
 
@@ -106,7 +104,6 @@ namespace osu.Game.Tests.Visual.UserInterface
         [Test]
         public void TestCloseChannelWhileSelectorClosed()
         {
-            AddStep("Toggle chat overlay", () => chatOverlay.Show());
             AddStep("Join channel 1", () => channelManager.JoinChannel(channel1));
             AddStep("Join channel 2", () => channelManager.JoinChannel(channel2));
             AddStep("Switch to channel 2", () => clickDrawable(chatOverlay.AvailableTabs.First()));
