@@ -70,7 +70,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             AddStep("Toggle chat overlay", () => chatOverlay.Show());
             AddStep("Join channel 1", () => channelManager.JoinChannel(channel1));
             AddStep("Close channel 1", () => clickDrawable(chatOverlay.AvailableTabs.First().CloseButton.Child));
-            AddAssert("Current channel is channel selector", () => channelManager.CurrentChannel.Value is ChannelSelectorTabItem.ChannelSelectorTabChannel);
+            AddAssert("Current channel is null", () => channelManager.CurrentChannel.Value == null);
             AddStep("Join channel 1", () => channelManager.JoinChannel(channel1));
             AddAssert("Current channel is channel 1", () => channelManager.CurrentChannel.Value == channel1);
         }
