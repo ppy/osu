@@ -3,7 +3,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -69,7 +68,7 @@ namespace osu.Game.Tests.Visual.UserInterface
         {
             AddStep("Toggle chat overlay", () => chatOverlay.Show());
             AddStep("Join channel 1", () => channelManager.JoinChannel(channel1));
-            AddStep("Close channel 1", () => clickDrawable(chatOverlay.AvailableTabs.First().CloseButton.Child));
+            AddStep("Close channel 1", () => clickDrawable(((TestChannelTabItem)chatOverlay.TabMap[channel1]).CloseButton.Child));
             AddAssert("Current channel is null", () => channelManager.CurrentChannel.Value == null);
             AddStep("Join channel 1", () => channelManager.JoinChannel(channel1));
             AddAssert("Current channel is channel 1", () => channelManager.CurrentChannel.Value == channel1);
@@ -85,21 +84,14 @@ namespace osu.Game.Tests.Visual.UserInterface
         {
             protected override ChannelTabControl CreateChannelTabControl() => new TestTabControl();
 
-            public IEnumerable<TestChannelTabItem> AvailableTabs => ((TestTabControl)ChannelTabControl).AvailableTabs();
+            public IReadOnlyDictionary<Channel, TabItem<Channel>> TabMap => ((TestTabControl)ChannelTabControl).TabMap;
         }
 
         private class TestTabControl : ChannelTabControl
         {
             protected override TabItem<Channel> CreateTabItem(Channel value) => new TestChannelTabItem(value) { OnRequestClose = TabCloseRequested };
 
-            public IEnumerable<TestChannelTabItem> AvailableTabs()
-            {
-                foreach (var tab in TabContainer)
-                {
-                    if (!(tab is ChannelSelectorTabItem))
-                        yield return (TestChannelTabItem)tab;
-                }
-            }
+            public new IReadOnlyDictionary<Channel, TabItem<Channel>> TabMap => base.TabMap;
         }
 
         private class TestChannelTabItem : PrivateChannelTabItem
