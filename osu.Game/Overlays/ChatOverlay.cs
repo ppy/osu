@@ -356,9 +356,6 @@ namespace osu.Game.Overlays
 
             textbox.HoldFocus = true;
 
-            if (channelManager.CurrentChannel.Value == null || channelManager.CurrentChannel.Value is ChannelSelectorTabItem.ChannelSelectorTabChannel)
-                ChannelSelectionOverlay.Show();
-
             base.PopIn();
         }
 
