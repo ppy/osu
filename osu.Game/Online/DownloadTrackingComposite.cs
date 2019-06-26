@@ -58,25 +58,6 @@ namespace osu.Game.Online
             manager.ItemRemoved += itemRemoved;
         }
 
-        #region Disposal
-
-        protected override void Dispose(bool isDisposing)
-        {
-            base.Dispose(isDisposing);
-
-            if (manager != null)
-            {
-                manager.DownloadBegan -= attachDownload;
-                manager.ItemAdded -= itemAdded;
-            }
-
-            State.UnbindAll();
-
-            attachDownload(null);
-        }
-
-        #endregion
-
         private ArchiveDownloadRequest<TModel> attachedRequest;
 
         private void attachDownload(ArchiveDownloadRequest<TModel> request)
@@ -130,5 +111,24 @@ namespace osu.Game.Online
 
             State.Value = state;
         });
+
+        #region Disposal
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+
+            if (manager != null)
+            {
+                manager.DownloadBegan -= attachDownload;
+                manager.ItemAdded -= itemAdded;
+            }
+
+            State.UnbindAll();
+
+            attachDownload(null);
+        }
+
+        #endregion
     }
 }
