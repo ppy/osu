@@ -42,7 +42,6 @@ namespace osu.Game.Tests.Visual.Online
             typeof(BeatmapNotAvailable),
         };
 
-        private RulesetInfo osuRuleset;
         private RulesetInfo taikoRuleset;
         private RulesetInfo maniaRuleset;
 
@@ -54,7 +53,6 @@ namespace osu.Game.Tests.Visual.Online
         [BackgroundDependencyLoader]
         private void load(RulesetStore rulesets)
         {
-            osuRuleset = rulesets.GetRuleset(0);
             taikoRuleset = rulesets.GetRuleset(1);
             maniaRuleset = rulesets.GetRuleset(3);
         }
@@ -241,10 +239,14 @@ namespace osu.Game.Tests.Visual.Online
                     },
                 }, false);
             });
-
+            
             downloadAssert(true);
+        }
 
-            AddStep(@"show second", () =>
+        [Test]
+        public void TestUnavailable()
+        {
+            AddStep(@"show undownloadable", () =>
             {
                 overlay.ShowBeatmapSet(new BeatmapSetInfo
                 {
@@ -261,6 +263,11 @@ namespace osu.Game.Tests.Visual.Online
                     },
                     OnlineInfo = new BeatmapSetOnlineInfo
                     {
+                        Availability = new BeatmapSetOnlineAvailability
+                        {
+                            DownloadDisabled = true,
+                            ExternalLink = "https://osu.ppy.sh",
+                        },
                         Preview = @"https://b.ppy.sh/preview/625493.mp3",
                         PlayCount = 22996,
                         FavouriteCount = 58,
@@ -410,20 +417,7 @@ namespace osu.Game.Tests.Visual.Online
                     },
                 }, false);
             });
-
-            downloadAssert(true);
-        }
-
-        [Test]
-        public void TestUnavailable()
-        {
-            AddStep(@"show parts-removed (has link)", () => overlay.ShowBeatmapSet(getTestUnavailableBeatmapSet(false, true), false));
-            downloadAssert(true);
-
-            AddStep(@"show undownloadable (no link)", () => overlay.ShowBeatmapSet(getTestUnavailableBeatmapSet(true, false), false));
-            downloadAssert(false);
-
-            AddStep(@"show undownloadable (has link)", () => overlay.ShowBeatmapSet(getTestUnavailableBeatmapSet(true, true), false));
+            
             downloadAssert(false);
         }
 
@@ -443,42 +437,5 @@ namespace osu.Game.Tests.Visual.Online
         {
             AddAssert($"is download button {(shown ? "shown" : "hidden")}", () => overlay.Header.DownloadButtonsContainer.Any() == shown);
         }
-
-        private BeatmapSetInfo getTestUnavailableBeatmapSet(bool undownloadable, bool hasLink) => new BeatmapSetInfo
-        {
-            Metadata = new BeatmapMetadata
-            {
-                Title = undownloadable ? "undownloadable" : "parts-removed",
-                Artist = "test beatmapset",
-                AuthorString = "test",
-            },
-            OnlineInfo = new BeatmapSetOnlineInfo
-            {
-                Availability = new BeatmapSetOnlineAvailability
-                {
-                    DownloadDisabled = undownloadable,
-                    ExternalLink = hasLink ? "https://osu.ppy.sh" : null,
-                },
-                Preview = @"https://b.ppy.sh/preview/1.mp3",
-                Covers = new BeatmapSetOnlineCovers(),
-            },
-            Metrics = new BeatmapSetMetrics { Ratings = Enumerable.Range(0, 11).ToArray() },
-            Beatmaps = new List<BeatmapInfo>
-            {
-                new BeatmapInfo
-                {
-                    StarDifficulty = 1.23,
-                    Version = "Test",
-                    Ruleset = osuRuleset,
-                    BaseDifficulty = new BeatmapDifficulty(),
-                    OnlineInfo = new BeatmapOnlineInfo(),
-                    Metrics = new BeatmapMetrics
-                    {
-                        Fails = Enumerable.Range(1, 100).Select(i => i % 12 - 6).ToArray(),
-                        Retries = Enumerable.Range(-2, 100).Select(i => i % 12 - 6).ToArray(),
-                    },
-                },
-            },
-        };
     }
 }
