@@ -12,6 +12,7 @@ using osu.Game.Beatmaps.Drawables;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Online;
 using osu.Game.Overlays.BeatmapSet.Buttons;
 using osu.Game.Overlays.Direct;
 using osuTK;
@@ -20,7 +21,7 @@ using DownloadButton = osu.Game.Overlays.BeatmapSet.Buttons.DownloadButton;
 
 namespace osu.Game.Overlays.BeatmapSet
 {
-    public class Header : DownloadTrackingComposite
+    public class Header : BeatmapDownloadTrackingComposite
     {
         private const float transition_duration = 200;
         private const float tabs_height = 50;

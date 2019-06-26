@@ -9,11 +9,12 @@ using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Online;
 using osuTK;
 
 namespace osu.Game.Overlays.Direct
 {
-    public class DownloadButton : DownloadTrackingComposite
+    public class DownloadButton : BeatmapDownloadTrackingComposite
     {
         private readonly bool noVideo;
         private readonly SpriteIcon icon;
