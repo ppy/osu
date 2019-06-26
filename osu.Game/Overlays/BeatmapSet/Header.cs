@@ -34,7 +34,8 @@ namespace osu.Game.Overlays.BeatmapSet
         private readonly BeatmapNotAvailable beatmapNotAvailable;
         private readonly BeatmapSetOnlineStatusPill onlineStatusPill;
         public Details Details;
-        public FillFlowContainer DownloadButtonsContainer;
+
+        public readonly FillFlowContainer DownloadButtonsContainer;
 
         public readonly BeatmapPicker Picker;
 

@@ -52,7 +52,8 @@ namespace osu.Game.Tests.Visual.Online
             normal.OnlineInfo.HasStoryboard = true;
 
             var undownloadable = getUndownloadableBeatmapSet(ruleset);
-            DirectPanel undownloadableGridPanel, undownloadableListPanel;
+            TestDirectGridPanel undownloadableGridPanel;
+            TestDirectListPanel undownloadableListPanel;
 
             Child = new BasicScrollContainer
             {
@@ -68,14 +69,34 @@ namespace osu.Game.Tests.Visual.Online
                     {
                         new DirectGridPanel(normal),
                         new DirectListPanel(normal),
-                        undownloadableGridPanel = new DirectGridPanel(undownloadable),
-                        undownloadableListPanel = new DirectListPanel(undownloadable),
+                        undownloadableGridPanel = new TestDirectGridPanel(undownloadable),
+                        undownloadableListPanel = new TestDirectListPanel(undownloadable),
                     },
                 },
             };
 
-            AddAssert("is download button disabled on second grid panel", () => !undownloadableGridPanel.DownloadButton.Enabled.Value);
-            AddAssert("is download button disabled on second list panel", () => !undownloadableListPanel.DownloadButton.Enabled.Value);
+            AddAssert("is download button disabled on second grid panel", () => !undownloadableGridPanel.IsDownloadButtonEnabled);
+            AddAssert("is download button disabled on second list panel", () => !undownloadableListPanel.IsDownloadButtonEnabled);
+        }
+
+        private class TestDirectGridPanel : DirectGridPanel
+        {
+            public bool IsDownloadButtonEnabled => DownloadButton.Enabled.Value;
+
+            public TestDirectGridPanel(BeatmapSetInfo beatmap)
+                : base(beatmap)
+            {
+            }
+        }
+
+        private class TestDirectListPanel : DirectListPanel
+        {
+            public bool IsDownloadButtonEnabled => DownloadButton.Enabled.Value;
+
+            public TestDirectListPanel(BeatmapSetInfo beatmap)
+                : base(beatmap)
+            {
+            }
         }
     }
 }

@@ -34,7 +34,8 @@ namespace osu.Game.Overlays.Direct
 
         public PreviewTrack Preview => PlayButton.Preview;
         public Bindable<bool> PreviewPlaying => PlayButton.Playing;
-        public abstract DownloadButton DownloadButton { get; }
+
+        protected abstract DownloadButton DownloadButton { get; }
         protected abstract PlayButton PlayButton { get; }
         protected abstract Box PreviewBar { get; }
 

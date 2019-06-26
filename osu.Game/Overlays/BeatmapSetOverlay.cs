@@ -27,7 +27,7 @@ namespace osu.Game.Overlays
         public const float TOP_PADDING = 25;
         public const float RIGHT_WIDTH = 275;
 
-        public readonly Header Header;
+        protected readonly Header Header;
 
         private RulesetStore rulesets;
 
