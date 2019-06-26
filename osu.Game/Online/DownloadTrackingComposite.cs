@@ -50,7 +50,7 @@ namespace osu.Game.Online
 
             manager.DownloadBegan += download =>
             {
-                if (download.Info.Equals(ModelInfo.Value))
+                if (download.Model.Equals(ModelInfo.Value))
                     attachDownload(download);
             };
 
@@ -77,9 +77,9 @@ namespace osu.Game.Online
 
         #endregion
 
-        private ArchiveDownloadModelRequest<TModel> attachedRequest;
+        private ArchiveDownloadRequest<TModel> attachedRequest;
 
-        private void attachDownload(ArchiveDownloadModelRequest<TModel> request)
+        private void attachDownload(ArchiveDownloadRequest<TModel> request)
         {
             if (attachedRequest != null)
             {
@@ -119,7 +119,7 @@ namespace osu.Game.Online
 
         private void onRequestFailure(Exception e) => Schedule(() => attachDownload(null));
 
-        private void itemAdded(TModel s, bool existing) => setDownloadStateFromManager(s, DownloadState.LocallyAvailable);
+        private void itemAdded(TModel s) => setDownloadStateFromManager(s, DownloadState.LocallyAvailable);
 
         private void itemRemoved(TModel s) => setDownloadStateFromManager(s, DownloadState.NotDownloaded);
 
