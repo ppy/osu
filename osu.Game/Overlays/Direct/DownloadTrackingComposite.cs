@@ -7,7 +7,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Beatmaps;
-using osu.Game.Online.API.Requests;
+using osu.Game.Online.API;
 
 namespace osu.Game.Overlays.Direct
 {
@@ -47,9 +47,9 @@ namespace osu.Game.Overlays.Direct
                     attachDownload(beatmaps.GetExistingDownload(setInfo.NewValue));
             }, true);
 
-            beatmaps.BeatmapDownloadBegan += download =>
+            beatmaps.DownloadBegan += download =>
             {
-                if (download.BeatmapSet.OnlineBeatmapSetID == BeatmapSet.Value?.OnlineBeatmapSetID)
+                if (download.Model.OnlineBeatmapSetID == BeatmapSet.Value?.OnlineBeatmapSetID)
                     attachDownload(download);
             };
 
@@ -65,7 +65,7 @@ namespace osu.Game.Overlays.Direct
 
             if (beatmaps != null)
             {
-                beatmaps.BeatmapDownloadBegan -= attachDownload;
+                beatmaps.DownloadBegan -= attachDownload;
                 beatmaps.ItemAdded -= setAdded;
             }
 
@@ -76,9 +76,9 @@ namespace osu.Game.Overlays.Direct
 
         #endregion
 
-        private DownloadBeatmapSetRequest attachedRequest;
+        private ArchiveDownloadRequest<BeatmapSetInfo> attachedRequest;
 
-        private void attachDownload(DownloadBeatmapSetRequest request)
+        private void attachDownload(ArchiveDownloadRequest<BeatmapSetInfo> request)
         {
             if (attachedRequest != null)
             {
@@ -118,7 +118,7 @@ namespace osu.Game.Overlays.Direct
 
         private void onRequestFailure(Exception e) => Schedule(() => attachDownload(null));
 
-        private void setAdded(BeatmapSetInfo s, bool existing) => setDownloadStateFromManager(s, DownloadState.LocallyAvailable);
+        private void setAdded(BeatmapSetInfo s) => setDownloadStateFromManager(s, DownloadState.LocallyAvailable);
 
         private void setRemoved(BeatmapSetInfo s) => setDownloadStateFromManager(s, DownloadState.NotDownloaded);
 
