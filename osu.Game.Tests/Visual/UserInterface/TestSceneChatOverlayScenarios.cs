@@ -79,7 +79,12 @@ namespace osu.Game.Tests.Visual.UserInterface
         [Test]
         public void TestToggleChatWithChannelJoined()
         {
-            AddStep("Join channel 1", () => channelManager.JoinChannel(channel1));
+            AddStep("Join channel 1", () =>
+            {
+                channelManager.JoinChannel(channel1);
+                // Temporarily here to circumvent https://github.com/ppy/osu/issues/5152
+                channelManager.OpenChannel(channel1.Name);
+            });
             AddStep("Close chat overlay", () => chatOverlay.Hide());
             AddAssert("Channel selection overlay was hidden", () => chatOverlay.SelectionOverlayState == Visibility.Hidden);
             AddAssert("Chat overlay was hidden", () => chatOverlay.State.Value == Visibility.Hidden);
