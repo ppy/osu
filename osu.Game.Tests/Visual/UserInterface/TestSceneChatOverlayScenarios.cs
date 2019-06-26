@@ -94,9 +94,7 @@ namespace osu.Game.Tests.Visual.UserInterface
         {
             AddStep("Join channel 1", () => channelManager.JoinChannel(channel1));
             AddStep("Join channel 2", () => channelManager.JoinChannel(channel2));
-
-            // There is currently no way to map a tab drawable to its respective value at this level, so this test relies on the tab's location in AvailableTabs
-            AddStep("Switch to channel 2", () => clickDrawable(chatOverlay.AvailableTabs.First()));
+            AddStep("Switch to channel 2", () => clickDrawable(chatOverlay.TabMap[channel2]));
             AddAssert("Current channel is channel 2", () => channelManager.CurrentChannel.Value == channel2);
             AddAssert("Channel selector was closed", () => chatOverlay.SelectionOverlayState == Visibility.Hidden);
         }
@@ -106,11 +104,11 @@ namespace osu.Game.Tests.Visual.UserInterface
         {
             AddStep("Join channel 1", () => channelManager.JoinChannel(channel1));
             AddStep("Join channel 2", () => channelManager.JoinChannel(channel2));
-            AddStep("Switch to channel 2", () => clickDrawable(chatOverlay.AvailableTabs.First()));
-            AddStep("Close channel 2", () => clickDrawable(chatOverlay.AvailableTabs.First().CloseButton.Child));
+            AddStep("Switch to channel 2", () => clickDrawable(chatOverlay.TabMap[channel2]));
+            AddStep("Close channel 2", () => clickDrawable(((TestChannelTabItem)chatOverlay.TabMap[channel2]).CloseButton.Child));
             AddAssert("Selector remained closed", () => chatOverlay.SelectionOverlayState == Visibility.Hidden);
             AddAssert("Current channel is channel 2", () => channelManager.CurrentChannel.Value == channel1);
-            AddStep("Close channel 1", () => clickDrawable(chatOverlay.AvailableTabs.First().CloseButton.Child));
+            AddStep("Close channel 1", () => clickDrawable(((TestChannelTabItem)chatOverlay.TabMap[channel1]).CloseButton.Child));
             AddAssert("Channel selection overlay was toggled", () => chatOverlay.SelectionOverlayState == Visibility.Visible);
         }
 
@@ -126,21 +124,14 @@ namespace osu.Game.Tests.Visual.UserInterface
 
             protected override ChannelTabControl CreateChannelTabControl() => new TestTabControl();
 
-            public IEnumerable<TestChannelTabItem> AvailableTabs => ((TestTabControl)ChannelTabControl).AvailableTabs();
+            public IReadOnlyDictionary<Channel, TabItem<Channel>> TabMap => ((TestTabControl)ChannelTabControl).TabMap;
         }
 
         private class TestTabControl : ChannelTabControl
         {
             protected override TabItem<Channel> CreateTabItem(Channel value) => new TestChannelTabItem(value) { OnRequestClose = TabCloseRequested };
 
-            public IEnumerable<TestChannelTabItem> AvailableTabs()
-            {
-                foreach (var tab in TabContainer)
-                {
-                    if (!(tab is ChannelSelectorTabItem))
-                        yield return (TestChannelTabItem)tab;
-                }
-            }
+            public new IReadOnlyDictionary<Channel, TabItem<Channel>> TabMap => base.TabMap;
         }
 
         private class TestChannelTabItem : PrivateChannelTabItem
