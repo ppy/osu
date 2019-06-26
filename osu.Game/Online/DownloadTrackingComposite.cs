@@ -17,7 +17,7 @@ namespace osu.Game.Online
         where TModel : class, IEquatable<TModel>
         where TModelManager : class, IModelDownloader<TModel>
     {
-        protected readonly Bindable<TModel> ModelInfo = new Bindable<TModel>();
+        protected readonly Bindable<TModel> Model = new Bindable<TModel>();
 
         private TModelManager manager;
 
@@ -30,7 +30,7 @@ namespace osu.Game.Online
 
         protected DownloadTrackingComposite(TModel model = null)
         {
-            ModelInfo.Value = model;
+            Model.Value = model;
         }
 
         [BackgroundDependencyLoader(true)]
@@ -38,7 +38,7 @@ namespace osu.Game.Online
         {
             this.manager = manager;
 
-            ModelInfo.BindValueChanged(modelInfo =>
+            Model.BindValueChanged(modelInfo =>
             {
                 if (modelInfo.NewValue == null)
                     attachDownload(null);
@@ -50,7 +50,7 @@ namespace osu.Game.Online
 
             manager.DownloadBegan += download =>
             {
-                if (download.Model.Equals(ModelInfo.Value))
+                if (download.Model.Equals(Model.Value))
                     attachDownload(download);
             };
 
@@ -125,7 +125,7 @@ namespace osu.Game.Online
 
         private void setDownloadStateFromManager(TModel s, DownloadState state) => Schedule(() =>
         {
-            if (!s.Equals(ModelInfo.Value))
+            if (!s.Equals(Model.Value))
                 return;
 
             State.Value = state;
