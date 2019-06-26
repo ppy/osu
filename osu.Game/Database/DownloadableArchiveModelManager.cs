@@ -44,7 +44,7 @@ namespace osu.Game.Database
         /// Creates the download request for this <see cref="TModel"/>.
         /// </summary>
         /// <param name="model">The <see cref="TModel"/> to be downloaded.</param>
-        /// <param name="minimiseDownloadSize">Whether this download should be optimised for slow connections. Generally means extras are not included in the download bundle..</param>
+        /// <param name="minimiseDownloadSize">Whether this download should be optimised for slow connections. Generally means extras are not included in the download bundle.</param>
         /// <returns>The request object.</returns>
         protected abstract ArchiveDownloadRequest<TModel> CreateDownloadRequest(TModel model, bool minimiseDownloadSize);
 
@@ -52,7 +52,7 @@ namespace osu.Game.Database
         /// Begin a download for the requested <see cref="TModel"/>.
         /// </summary>
         /// <param name="model">The <see cref="TModel"/> to be downloaded.</param>
-        /// <param name="minimiseDownloadSize">Whether this download should be optimised for slow connections. Generally means extras are not included in the download bundle..</param>
+        /// <param name="minimiseDownloadSize">Whether this download should be optimised for slow connections. Generally means extras are not included in the download bundle.</param>
         /// <returns>Whether the download was started.</returns>
         public bool Download(TModel model, bool minimiseDownloadSize = false)
         {
