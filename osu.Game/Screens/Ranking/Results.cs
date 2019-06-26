@@ -16,7 +16,6 @@ using osu.Game.Screens.Backgrounds;
 using osuTK;
 using osuTK.Graphics;
 using osu.Game.Graphics;
-using osu.Game.Graphics.UserInterface;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Scoring;
@@ -254,13 +253,7 @@ namespace osu.Game.Screens.Ranking
                             }
                         }
                     }
-                },
-                new BackButton
-                {
-                    Anchor = Anchor.BottomLeft,
-                    Origin = Anchor.BottomLeft,
-                    Action = this.Exit
-                },
+                }
             };
 
             foreach (var t in CreateResultPages())
