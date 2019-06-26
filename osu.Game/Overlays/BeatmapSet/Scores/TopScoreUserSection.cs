@@ -13,7 +13,7 @@ using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Online.Leaderboards;
 using osu.Game.Scoring;
-using osu.Game.Users;
+using osu.Game.Users.Drawables;
 using osuTK;
 using osuTK.Graphics;
 
@@ -22,11 +22,11 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
     public class TopScoreUserSection : CompositeDrawable
     {
         private readonly SpriteText rankText;
-        private readonly DrawableRank rank;
+        private readonly UpdateableRank rank;
         private readonly UpdateableAvatar avatar;
         private readonly LinkFlowContainer usernameText;
         private readonly SpriteText date;
-        private readonly DrawableFlag flag;
+        private readonly UpdateableFlag flag;
 
         public TopScoreUserSection()
         {
@@ -46,14 +46,14 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                         Text = "#1",
                         Font = OsuFont.GetFont(size: 30, weight: FontWeight.Bold, italics: true)
                     },
-                    rank = new DrawableRank(ScoreRank.D)
+                    rank = new UpdateableRank(ScoreRank.D)
                     {
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
                         Size = new Vector2(40),
                         FillMode = FillMode.Fit,
                     },
-                    avatar = new UpdateableAvatar
+                    avatar = new UpdateableAvatar(hideImmediately: true)
                     {
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
@@ -67,6 +67,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                             Offset = new Vector2(0, 2),
                             Radius = 1,
                         },
+                        ShowGuestOnNull = false,
                     },
                     new FillFlowContainer
                     {
@@ -89,11 +90,12 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                                 Origin = Anchor.CentreLeft,
                                 Font = OsuFont.GetFont(size: 15, weight: FontWeight.Bold)
                             },
-                            flag = new DrawableFlag
+                            flag = new UpdateableFlag(hideImmediately: true)
                             {
                                 Anchor = Anchor.CentreLeft,
                                 Origin = Anchor.CentreLeft,
                                 Size = new Vector2(20, 13),
+                                ShowPlaceholderOnNull = false,
                             },
                         }
                     }
@@ -121,7 +123,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                 usernameText.Clear();
                 usernameText.AddUserLink(value.User);
 
-                rank.UpdateRank(value.Rank);
+                rank.Rank = value.Rank;
             }
         }
     }

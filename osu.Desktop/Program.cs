@@ -11,6 +11,7 @@ using osu.Framework.Development;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
 using osu.Game.IPC;
+using osu.Game.Tournament;
 
 namespace osu.Desktop
 {
@@ -45,6 +46,10 @@ namespace osu.Desktop
                     {
                         default:
                             host.Run(new OsuGameDesktop(args));
+                            break;
+
+                        case "--tournament":
+                            host.Run(new TournamentGame());
                             break;
                     }
                 }

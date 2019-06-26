@@ -4,7 +4,6 @@
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
 using osu.Game.Skinning;
 
@@ -25,7 +24,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
         [BackgroundDependencyLoader]
         private void load(TextureStore textures)
         {
-            Child = new SkinnableDrawable("Play/osu/approachcircle", name => new Sprite { Texture = textures.Get(name) });
+            Child = new SkinnableSprite("Play/osu/approachcircle");
         }
     }
 }

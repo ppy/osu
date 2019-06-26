@@ -237,7 +237,7 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
 
         private class ResolutionSettingsDropdown : SettingsDropdown<Size>
         {
-            protected override OsuDropdown<Size> CreateDropdown() => new ResolutionDropdownControl { Items = Items };
+            protected override OsuDropdown<Size> CreateDropdown() => new ResolutionDropdownControl();
 
             private class ResolutionDropdownControl : DropdownControl
             {

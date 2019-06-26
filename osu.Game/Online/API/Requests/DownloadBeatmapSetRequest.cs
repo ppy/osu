@@ -5,18 +5,16 @@ using osu.Game.Beatmaps;
 
 namespace osu.Game.Online.API.Requests
 {
-    public class DownloadBeatmapSetRequest : ArchiveDownloadModelRequest<BeatmapSetInfo>
+    public class DownloadBeatmapSetRequest : ArchiveDownloadRequest<BeatmapSetInfo>
     {
         private readonly bool noVideo;
-        private readonly BeatmapSetInfo set;
 
         public DownloadBeatmapSetRequest(BeatmapSetInfo set, bool noVideo)
             : base(set)
         {
             this.noVideo = noVideo;
-            this.set = set;
         }
 
-        protected override string Target => $@"beatmapsets/{set.OnlineBeatmapSetID}/download{(noVideo ? "?noVideo=1" : "")}";
+        protected override string Target => $@"beatmapsets/{Model.OnlineBeatmapSetID}/download{(noVideo ? "?noVideo=1" : "")}";
     }
 }

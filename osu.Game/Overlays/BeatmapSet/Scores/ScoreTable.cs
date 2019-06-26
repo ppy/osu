@@ -13,7 +13,7 @@ using osu.Game.Graphics.Sprites;
 using osu.Game.Online.Leaderboards;
 using osu.Game.Rulesets.UI;
 using osu.Game.Scoring;
-using osu.Game.Users;
+using osu.Game.Users.Drawables;
 using osuTK;
 using osuTK.Graphics;
 
@@ -103,7 +103,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                     Text = $"#{index + 1}",
                     Font = OsuFont.GetFont(size: text_size, weight: FontWeight.Bold)
                 },
-                new DrawableRank(score.Rank)
+                new UpdateableRank(score.Rank)
                 {
                     Size = new Vector2(30, 20)
                 },
@@ -135,7 +135,11 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                     Spacing = new Vector2(5, 0),
                     Children = new Drawable[]
                     {
-                        new DrawableFlag(score.User.Country) { Size = new Vector2(20, 13) },
+                        new UpdateableFlag(score.User.Country)
+                        {
+                            Size = new Vector2(20, 13),
+                            ShowPlaceholderOnNull = false,
+                        },
                         username
                     }
                 },

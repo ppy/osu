@@ -27,12 +27,15 @@ using osu.Game.Scoring;
 using osu.Game.Screens.Ranking;
 using osu.Game.Skinning;
 using osu.Game.Storyboards.Drawables;
+using osu.Game.Users;
 
 namespace osu.Game.Screens.Play
 {
     public class Player : ScreenWithBeatmapBackground
     {
-        protected override bool AllowBackButton => false; // handled by HoldForMenuButton
+        public override bool AllowBackButton => false; // handled by HoldForMenuButton
+
+        protected override UserActivity InitialActivity => new UserActivity.SoloGame(Beatmap.Value.BeatmapInfo, Ruleset.Value);
 
         public override float BackgroundParallaxAmount => 0.1f;
 
@@ -174,6 +177,16 @@ namespace osu.Game.Screens.Play
                         Restart();
                     },
                 },
+                new HotkeyExitOverlay
+                {
+                    Action = () =>
+                    {
+                        if (!this.IsCurrentScreen()) return;
+
+                        fadeOut(true);
+                        performImmediateExit();
+                    },
+                },
                 failAnimation = new FailAnimation(DrawableRuleset) { OnComplete = onFailComplete, }
             };
 
@@ -238,6 +251,16 @@ namespace osu.Game.Screens.Play
             return working;
         }
 
+        private void performImmediateExit()
+        {
+            // if a restart has been requested, cancel any pending completion (user has shown intent to restart).
+            onCompletionEvent = null;
+
+            ValidForResume = false;
+
+            performUserRequestedExit();
+        }
+
         private void performUserRequestedExit()
         {
             if (!this.IsCurrentScreen()) return;
@@ -279,7 +302,7 @@ namespace osu.Game.Screens.Play
 
                     var score = CreateScore();
                     if (DrawableRuleset.ReplayScore == null)
-                        scoreManager.Import(score);
+                        scoreManager.Import(score).Wait();
 
                     this.Push(CreateResults(score));
 

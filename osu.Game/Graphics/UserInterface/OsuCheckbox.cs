@@ -4,7 +4,6 @@
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
-using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Events;
@@ -15,17 +14,6 @@ namespace osu.Game.Graphics.UserInterface
 {
     public class OsuCheckbox : Checkbox
     {
-        private Bindable<bool> bindable;
-
-        public Bindable<bool> Bindable
-        {
-            set
-            {
-                bindable = value;
-                Current.BindTo(bindable);
-            }
-        }
-
         public Color4 CheckedColor { get; set; } = Color4.Cyan;
         public Color4 UncheckedColor { get; set; } = Color4.White;
         public int FadeDuration { get; set; }

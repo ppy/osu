@@ -6,9 +6,11 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Bindables;
+using osu.Framework.Development;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.IO.Stores;
@@ -33,7 +35,6 @@ using osu.Game.Rulesets.Mods;
 using osu.Game.Scoring;
 using osu.Game.Skinning;
 using osuTK.Input;
-using DebugUtils = osu.Game.Utils.DebugUtils;
 
 namespace osu.Game
 {
@@ -44,6 +45,8 @@ namespace osu.Game
     /// </summary>
     public class OsuGameBase : Framework.Game, ICanAcceptFiles
     {
+        public const string CLIENT_STREAM_NAME = "lazer";
+
         protected OsuConfigManager LocalConfig;
 
         protected BeatmapManager BeatmapManager;
@@ -94,7 +97,7 @@ namespace osu.Game
             get
             {
                 if (!IsDeployedBuild)
-                    return @"local " + (DebugUtils.IsDebug ? @"debug" : @"release");
+                    return @"local " + (DebugUtils.IsDebugBuild ? @"debug" : @"release");
 
                 var version = AssemblyVersion;
                 return $@"{version.Major}.{version.Minor}.{version.Build}";
@@ -180,7 +183,7 @@ namespace osu.Game
             }
 
             BeatmapManager.ItemRemoved += i => ScoreManager.Delete(getBeatmapScores(i), true);
-            BeatmapManager.ItemAdded += (i, existing) => ScoreManager.Undelete(getBeatmapScores(i), true);
+            BeatmapManager.ItemAdded += i => ScoreManager.Undelete(getBeatmapScores(i), true);
 
             dependencies.Cache(KeyBindingStore = new KeyBindingStore(contextFactory, RulesetStore));
             dependencies.Cache(SettingsStore = new SettingsStore(contextFactory));
@@ -268,13 +271,13 @@ namespace osu.Game
 
         private readonly List<ICanAcceptFiles> fileImporters = new List<ICanAcceptFiles>();
 
-        public void Import(params string[] paths)
+        public async Task Import(params string[] paths)
         {
             var extension = Path.GetExtension(paths.First())?.ToLowerInvariant();
 
             foreach (var importer in fileImporters)
                 if (importer.HandledExtensions.Contains(extension))
-                    importer.Import(paths);
+                    await importer.Import(paths);
         }
 
         public string[] HandledExtensions => fileImporters.SelectMany(i => i.HandledExtensions).ToArray();
