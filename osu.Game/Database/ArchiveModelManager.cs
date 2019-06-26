@@ -44,7 +44,7 @@ namespace osu.Game.Database
         /// Fired when a new <see cref="TModel"/> becomes available in the database.
         /// This is not guaranteed to run on the update thread.
         /// </summary>
-        public event Action<TModel, bool> ItemAdded;
+        public event Action<TModel> ItemAdded;
 
         /// <summary>
         /// Fired when a <see cref="TModel"/> is removed from the database.
@@ -70,7 +70,7 @@ namespace osu.Game.Database
             ContextFactory = contextFactory;
 
             ModelStore = modelStore;
-            ModelStore.ItemAdded += item => handleEvent(() => ItemAdded?.Invoke(item, false));
+            ModelStore.ItemAdded += item => handleEvent(() => ItemAdded?.Invoke(item));
             ModelStore.ItemRemoved += s => handleEvent(() => ItemRemoved?.Invoke(s));
 
             Files = new FileStore(contextFactory, storage);
@@ -299,8 +299,6 @@ namespace osu.Game.Database
                             {
                                 Undelete(existing);
                                 LogForModel(item, $"Found existing {HumanisedModelName} for {item} (ID {existing.ID}) – skipping import.");
-                                handleEvent(() => ItemAdded?.Invoke(existing, true));
-
                                 // existing item will be used; rollback new import and exit early.
                                 rollback();
                                 flushEvents(true);
