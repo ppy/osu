@@ -40,7 +40,7 @@ namespace osu.Game.Rulesets.Scoring
         /// <summary>
         /// Additional conditions on top of <see cref="DefaultFailCondition"/> that cause a failing state.
         /// </summary>
-        public event Func<ScoreProcessor, bool> FailConditions;
+        public event Func<ScoreProcessor, JudgementResult, bool> FailConditions;
 
         /// <summary>
         /// The current total score.
@@ -151,12 +151,12 @@ namespace osu.Game.Rulesets.Scoring
         /// This can only ever notify subscribers once.
         /// </para>
         /// </summary>
-        protected void UpdateFailed()
+        protected void UpdateFailed(JudgementResult result)
         {
             if (HasFailed)
                 return;
 
-            if (!DefaultFailCondition && FailConditions?.Invoke(this) != true)
+            if (!DefaultFailCondition && FailConditions?.Invoke(this, result) != true)
                 return;
 
             if (Failed?.Invoke() != false)
@@ -287,7 +287,7 @@ namespace osu.Game.Rulesets.Scoring
             ApplyResult(result);
             updateScore();
 
-            UpdateFailed();
+            UpdateFailed(result);
             NotifyNewJudgement(result);
         }
 
