@@ -8,19 +8,16 @@ namespace osu.Game.Rulesets
 {
     public abstract class RulesetSelector : TabControl<RulesetInfo>
     {
-        protected RulesetStore AvaliableRulesets;
+        [Resolved]
+        protected RulesetStore Rulesets { get; private set; }
 
         protected override Dropdown<RulesetInfo> CreateDropdown() => null;
 
         [BackgroundDependencyLoader]
-        private void load(RulesetStore rulesets)
+        private void load()
         {
-            AvaliableRulesets = rulesets;
-
-            foreach (var r in rulesets.AvailableRulesets)
-            {
+            foreach (var r in Rulesets.AvailableRulesets)
                 AddItem(r);
-            }
         }
     }
 }

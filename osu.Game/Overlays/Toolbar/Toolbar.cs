@@ -86,7 +86,8 @@ namespace osu.Game.Overlays.Toolbar
                 }
             };
 
-            rulesetSelector.Current.BindTarget = parentRuleset;
+            // Bound after the selector is added to the hierarchy to give it a chance to load the available rulesets
+            rulesetSelector.Current.BindTo(parentRuleset);
 
             State.ValueChanged += visibility =>
             {

@@ -1,7 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using osu.Framework.Caching;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Effects;
@@ -13,28 +12,25 @@ using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Events;
 using osuTK.Input;
 using System.Linq;
+using osu.Framework.Allocation;
 
 namespace osu.Game.Overlays.Toolbar
 {
     public class ToolbarRulesetSelector : RulesetSelector
     {
         private const float padding = 10;
-        private readonly Drawable modeButtonLine;
 
-        public override bool HandleNonPositionalInput => !Current.Disabled && base.HandleNonPositionalInput;
-        public override bool HandlePositionalInput => !Current.Disabled && base.HandlePositionalInput;
-
-        public override bool PropagatePositionalInputSubTree => !Current.Disabled && base.PropagatePositionalInputSubTree;
-
-        private void disabledChanged(bool isDisabled) => this.FadeColour(isDisabled ? Color4.Gray : Color4.White, 300);
-
-        protected override TabItem<RulesetInfo> CreateTabItem(RulesetInfo value) => new ToolbarRulesetTabButton(value);
+        private Drawable modeButtonLine;
 
         public ToolbarRulesetSelector()
         {
             RelativeSizeAxes = Axes.Y;
             AutoSizeAxes = Axes.X;
+        }
 
+        [BackgroundDependencyLoader]
+        private void load()
+        {
             AddRangeInternal(new[]
             {
                 new OpaqueBackground
@@ -60,10 +56,35 @@ namespace osu.Game.Overlays.Toolbar
                     }
                 }
             });
-
-            Current.DisabledChanged += disabledChanged;
-            Current.ValueChanged += value => activeMode.Invalidate();
         }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            Current.BindDisabledChanged(disabled => this.FadeColour(disabled ? Color4.Gray : Color4.White, 300), true);
+            Current.BindValueChanged(_ => moveLineToCurrent(), true);
+        }
+
+        private void moveLineToCurrent()
+        {
+            foreach (TabItem<RulesetInfo> tabItem in TabContainer)
+            {
+                if (tabItem.Value == Current.Value)
+                {
+                    modeButtonLine.MoveToX(tabItem.DrawPosition.X, 200, Easing.OutQuint);
+                    break;
+                }
+            }
+        }
+
+        public override bool HandleNonPositionalInput => !Current.Disabled && base.HandleNonPositionalInput;
+
+        public override bool HandlePositionalInput => !Current.Disabled && base.HandlePositionalInput;
+
+        public override bool PropagatePositionalInputSubTree => !Current.Disabled && base.PropagatePositionalInputSubTree;
+
+        protected override TabItem<RulesetInfo> CreateTabItem(RulesetInfo value) => new ToolbarRulesetTabButton(value);
 
         protected override TabFillFlowContainer CreateTabFlow() => new TabFillFlowContainer
         {
@@ -81,33 +102,13 @@ namespace osu.Game.Overlays.Toolbar
             {
                 int requested = e.Key - Key.Number1;
 
-                RulesetInfo found = AvaliableRulesets.AvailableRulesets.Skip(requested).FirstOrDefault();
+                RulesetInfo found = Rulesets.AvailableRulesets.Skip(requested).FirstOrDefault();
                 if (found != null)
                     Current.Value = found;
                 return true;
             }
 
             return false;
-        }
-
-        private readonly Cached activeMode = new Cached();
-
-        protected override void UpdateAfterChildren()
-        {
-            base.UpdateAfterChildren();
-
-            if (!activeMode.IsValid)
-            {
-                foreach (TabItem<RulesetInfo> tabItem in TabContainer)
-                {
-                    if (tabItem.Value == Current.Value)
-                    {
-                        modeButtonLine.MoveToX(tabItem.DrawPosition.X, 200, Easing.OutQuint);
-                        activeMode.Validate();
-                        return;
-                    }
-                }
-            }
         }
     }
 }
