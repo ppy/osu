@@ -1,7 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using osuTK;
@@ -24,8 +23,6 @@ namespace osu.Game.Screens.Select
         public const int TRANSITION_LENGTH = 300;
 
         private const float padding = 80;
-
-        public Action OnBack;
 
         private readonly FillFlowContainer<FooterButton> buttons;
 
@@ -82,12 +79,6 @@ namespace osu.Game.Screens.Select
                     RelativeSizeAxes = Axes.X,
                     Height = 3,
                     Position = new Vector2(0, -3),
-                },
-                new BackButton
-                {
-                    Anchor = Anchor.BottomLeft,
-                    Origin = Anchor.BottomLeft,
-                    Action = () => OnBack?.Invoke()
                 },
                 new FillFlowContainer
                 {
