@@ -195,6 +195,7 @@ namespace osu.Game.Screens.Multi.Match
 
             Beatmap.Value = beatmapManager.GetWorkingBeatmap(localBeatmap);
             Mods.Value = e.NewValue?.RequiredMods?.ToArray() ?? Array.Empty<Mod>();
+
             if (e.NewValue?.Ruleset != null)
                 Ruleset.Value = e.NewValue.Ruleset;
         }
