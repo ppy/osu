@@ -49,6 +49,8 @@ namespace osu.Game.Overlays.Chat.Tabs
                 // performTabSort might've made selectorTab's position wonky, fix it
                 TabContainer.SetLayoutPosition(selectorTab, float.MaxValue);
 
+            ((ChannelTabItem)item).OnRequestClose += tabCloseRequested;
+
             base.AddTabItem(item, addToDropdown);
         }
 
@@ -57,10 +59,10 @@ namespace osu.Game.Overlays.Chat.Tabs
             switch (value.Type)
             {
                 default:
-                    return new ChannelTabItem(value) { OnRequestClose = TabCloseRequested };
+                    return new ChannelTabItem(value);
 
                 case ChannelType.PM:
-                    return new PrivateChannelTabItem(value) { OnRequestClose = TabCloseRequested };
+                    return new PrivateChannelTabItem(value);
             }
         }
 
@@ -103,7 +105,7 @@ namespace osu.Game.Overlays.Chat.Tabs
             selectorTab.Active.Value = false;
         }
 
-        protected void TabCloseRequested(TabItem<Channel> tab)
+        private void tabCloseRequested(TabItem<Channel> tab)
         {
             int totalTabs = TabContainer.Count - 1; // account for selectorTab
             int currentIndex = MathHelper.Clamp(TabContainer.IndexOf(tab), 1, totalTabs);
