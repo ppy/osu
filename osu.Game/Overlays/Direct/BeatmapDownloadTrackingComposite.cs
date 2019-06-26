@@ -9,7 +9,7 @@ namespace osu.Game.Overlays.Direct
 {
     public abstract class BeatmapDownloadTrackingComposite : DownloadTrackingComposite<BeatmapSetInfo, BeatmapManager>
     {
-        public Bindable<BeatmapSetInfo> BeatmapSet => ModelInfo;
+        public Bindable<BeatmapSetInfo> BeatmapSet => Model;
 
         protected BeatmapDownloadTrackingComposite(BeatmapSetInfo set = null)
             : base(set)
