@@ -33,7 +33,7 @@ namespace osu.Game.Overlays.Direct
 
         protected override bool FadePlayButton => false;
 
-        public override DownloadButton DownloadButton => downloadButton;
+        protected override DownloadButton DownloadButton => downloadButton;
         protected override PlayButton PlayButton => playButton;
         protected override Box PreviewBar => progressBar;
 

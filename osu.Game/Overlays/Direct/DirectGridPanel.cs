@@ -29,7 +29,7 @@ namespace osu.Game.Overlays.Direct
         private PlayButton playButton;
         private Box progressBar;
 
-        public override DownloadButton DownloadButton => downloadButton;
+        protected override DownloadButton DownloadButton => downloadButton;
         protected override PlayButton PlayButton => playButton;
         protected override Box PreviewBar => progressBar;
 

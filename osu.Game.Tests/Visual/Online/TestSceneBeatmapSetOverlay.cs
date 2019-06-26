@@ -19,7 +19,7 @@ namespace osu.Game.Tests.Visual.Online
     [TestFixture]
     public class TestSceneBeatmapSetOverlay : OsuTestScene
     {
-        private readonly BeatmapSetOverlay overlay;
+        private readonly TestBeatmapSetOverlay overlay;
 
         public override IReadOnlyList<Type> RequiredTypes => new[]
         {
@@ -47,7 +47,7 @@ namespace osu.Game.Tests.Visual.Online
 
         public TestSceneBeatmapSetOverlay()
         {
-            Add(overlay = new BeatmapSetOverlay());
+            Add(overlay = new TestBeatmapSetOverlay());
         }
 
         [BackgroundDependencyLoader]
@@ -435,7 +435,12 @@ namespace osu.Game.Tests.Visual.Online
 
         private void downloadAssert(bool shown)
         {
-            AddAssert($"is download button {(shown ? "shown" : "hidden")}", () => overlay.Header.DownloadButtonsContainer.Any() == shown);
+            AddAssert($"is download button {(shown ? "shown" : "hidden")}", () => overlay.IsDownloadButtonsShown == shown);
+        }
+
+        private class TestBeatmapSetOverlay : BeatmapSetOverlay
+        {
+            public bool IsDownloadButtonsShown => Header.DownloadButtonsContainer.Any();
         }
     }
 }
