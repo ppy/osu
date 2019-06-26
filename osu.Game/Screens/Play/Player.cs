@@ -81,8 +81,6 @@ namespace osu.Game.Screens.Play
         [Cached(Type = typeof(IBindable<IReadOnlyList<Mod>>))]
         protected new readonly Bindable<IReadOnlyList<Mod>> Mods = new Bindable<IReadOnlyList<Mod>>(Array.Empty<Mod>());
 
-        protected readonly BindableInt Combo = new BindableInt();
-
         private readonly bool allowPause;
         private readonly bool showResults;
 
@@ -117,8 +115,7 @@ namespace osu.Game.Screens.Play
 
             ScoreProcessor = DrawableRuleset.CreateScoreProcessor();
             ScoreProcessor.Mods.BindTo(Mods);
-            ScoreProcessor.Combo.BindTo(Combo);
-            Combo.BindValueChanged(onComboChange);
+            ScoreProcessor.Combo.BindValueChanged(onComboChange);
 
             if (!ScoreProcessor.Mode.Disabled)
                 config.BindWith(OsuSetting.ScoreDisplayMode, ScoreProcessor.Mode);
