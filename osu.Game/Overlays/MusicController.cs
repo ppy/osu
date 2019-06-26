@@ -253,6 +253,12 @@ namespace osu.Game.Overlays
         {
             base.Update();
 
+            if (pendingBeatmapSwitch != null)
+            {
+                pendingBeatmapSwitch();
+                pendingBeatmapSwitch = null;
+            }
+
             var track = current?.TrackLoaded ?? false ? current.Track : null;
 
             if (track?.IsDummyDevice == false)
@@ -362,15 +368,12 @@ namespace osu.Game.Overlays
                 mod.ApplyToClock(track);
         }
 
-        private ScheduledDelegate pendingBeatmapSwitch;
+        private Action pendingBeatmapSwitch;
 
         private void updateDisplay(WorkingBeatmap beatmap, TransformDirection direction)
         {
-            //we might be off-screen when this update comes in.
-            //rather than Scheduling, manually handle this to avoid possible memory contention.
-            pendingBeatmapSwitch?.Cancel();
-
-            pendingBeatmapSwitch = Schedule(delegate
+            // avoid using scheduler as our scheduler may not be run for a long time, holding references to beatmaps.
+            pendingBeatmapSwitch = delegate
             {
                 // todo: this can likely be replaced with WorkingBeatmap.GetBeatmapAsync()
                 Task.Run(() =>
@@ -410,7 +413,7 @@ namespace osu.Game.Overlays
 
                     playerContainer.Add(newBackground);
                 });
-            });
+            };
         }
 
         protected override void PopIn()
