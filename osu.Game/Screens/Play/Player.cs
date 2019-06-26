@@ -66,6 +66,7 @@ namespace osu.Game.Screens.Play
         private IAPIProvider api;
 
         private SampleChannel sampleRestart;
+        private SampleChannel sampleComboBreak;
 
         protected ScoreProcessor ScoreProcessor { get; private set; }
         protected DrawableRuleset DrawableRuleset { get; private set; }
@@ -79,6 +80,8 @@ namespace osu.Game.Screens.Play
         [Cached]
         [Cached(Type = typeof(IBindable<IReadOnlyList<Mod>>))]
         protected new readonly Bindable<IReadOnlyList<Mod>> Mods = new Bindable<IReadOnlyList<Mod>>(Array.Empty<Mod>());
+
+        protected readonly BindableInt Combo = new BindableInt();
 
         private readonly bool allowPause;
         private readonly bool showResults;
@@ -107,12 +110,15 @@ namespace osu.Game.Screens.Play
                 return;
 
             sampleRestart = audio.Samples.Get(@"Gameplay/restart");
+            sampleComboBreak = audio.Samples.Get(@"Gameplay/combobreak");
 
             mouseWheelDisabled = config.GetBindable<bool>(OsuSetting.MouseDisableWheel);
             showStoryboard = config.GetBindable<bool>(OsuSetting.ShowStoryboard);
 
             ScoreProcessor = DrawableRuleset.CreateScoreProcessor();
             ScoreProcessor.Mods.BindTo(Mods);
+            ScoreProcessor.Combo.BindTo(Combo);
+            Combo.BindValueChanged(onComboChange);
 
             if (!ScoreProcessor.Mode.Disabled)
                 config.BindWith(OsuSetting.ScoreDisplayMode, ScoreProcessor.Mode);
@@ -263,6 +269,12 @@ namespace osu.Game.Screens.Play
         }
 
         private ScheduledDelegate onCompletionEvent;
+
+        private void onComboChange(ValueChangedEvent<int> combo)
+        {
+            if (combo.NewValue == 0 && combo.OldValue > 20)
+                sampleComboBreak?.Play();
+        }
 
         private void onCompletion()
         {
