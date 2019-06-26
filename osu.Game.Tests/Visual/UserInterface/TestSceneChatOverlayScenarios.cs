@@ -90,20 +90,6 @@ namespace osu.Game.Tests.Visual.UserInterface
             AddAssert("Chat overlay was hidden", () => chatOverlay.State.Value == Visibility.Hidden);
         }
 
-        /// <summary>
-        /// When a channel is joined and no previous channels are joined, the channel that was joined will be selected.
-        /// Channel selector closes when a new channel is selected. This is blocked for this scenario.
-        /// This test expects that the channel selection overlay remains open for this reason.
-        /// </summary>
-        [Test]
-        public void TestJoinChannelWhileOpen()
-        {
-            AddStep("Toggle chat overlay", () => chatOverlay.Show());
-            AddStep("Join channel 1", () => channelManager.JoinChannel(channel1));
-            AddAssert("Current channel is channel 1", () => channelManager.CurrentChannel.Value == channel1);
-            AddAssert("Channel selection overlay remained open", () => chatOverlay.SelectionOverlayState == Visibility.Visible);
-        }
-
         [Test]
         public void TestTabbingAwayClosesSelector()
         {
@@ -115,23 +101,6 @@ namespace osu.Game.Tests.Visual.UserInterface
             AddStep("Switch to channel 2", () => clickDrawable(chatOverlay.AvailableTabs.First()));
             AddAssert("Current channel is channel 2", () => channelManager.CurrentChannel.Value == channel2);
             AddAssert("Channel selector was closed", () => chatOverlay.SelectionOverlayState == Visibility.Hidden);
-        }
-
-        /// <summary>
-        /// When the current channel is closed, the next available channel will be selected.
-        /// Channel selector closes when a new channel is selected. This is blocked for this scenario.
-        /// This test expects that the channel selection overlay remains open for this reason.
-        /// </summary>
-        [Test]
-        public void TestCloseChannelWhileSelectorOpen()
-        {
-            AddStep("Toggle chat overlay", () => chatOverlay.Show());
-            AddStep("Join channel 1", () => channelManager.JoinChannel(channel1));
-            AddStep("Join channel 2", () => channelManager.JoinChannel(channel2));
-            AddAssert("Current channel is channel 1", () => channelManager.CurrentChannel.Value == channel1);
-            AddStep("Close channel 1", () => clickDrawable(chatOverlay.AvailableTabs.Last().CloseButton.Child));
-            AddAssert("Current channel is channel 2", () => channelManager.CurrentChannel.Value == channel2);
-            AddAssert("Channel selection overlay remained open", () => chatOverlay.SelectionOverlayState == Visibility.Visible);
         }
 
         [Test]
