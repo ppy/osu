@@ -35,18 +35,20 @@ namespace osu.Game.Screens.Play
 
         private void onReplay()
         {
-            if (scores.IsAvailableLocally(ModelInfo.Value))
+            if (scores.IsAvailableLocally(Model.Value))
             {
-                game.PresentScore(ModelInfo.Value);
+                game.PresentScore(Model.Value);
                 return;
             }
 
-            scores.Download(ModelInfo.Value);
+            scores.Download(Model.Value);
 
-            scores.ItemAdded += (score, _) =>
+            scores.ItemAdded += score =>
             {
-                if (score.Equals(ModelInfo.Value))
-                    game.PresentScore(ModelInfo.Value);
+                if (score.Equals(Model.Value))
+                    // use the newly added score instead of ModelInfo.Score because that won't have the Files property populated
+                    game.PresentScore(score);
+                    //ReplayLoaded?.Invoke(scores.GetScore(score));
             };
         }
     }

@@ -18,7 +18,7 @@ using osu.Game.Scoring.Legacy;
 
 namespace osu.Game.Scoring
 {
-    public class ScoreManager : ArchiveDownloadModelManager<ScoreInfo, ScoreFileInfo>
+    public class ScoreManager : DownloadableArchiveModelManager<ScoreInfo, ScoreFileInfo>
     {
         public override string[] HandledExtensions => new[] { ".osr" };
 
@@ -63,6 +63,6 @@ namespace osu.Game.Scoring
 
         public ScoreInfo Query(Expression<Func<ScoreInfo, bool>> query) => ModelStore.ConsumableItems.AsNoTracking().FirstOrDefault(query);
 
-        protected override ArchiveDownloadModelRequest<ScoreInfo> CreateDownloadRequest(ScoreInfo score, object[] options) => new DownloadReplayRequest(score);
+        protected override ArchiveDownloadRequest<ScoreInfo> CreateDownloadRequest(ScoreInfo score, bool minimiseDownload) => new DownloadReplayRequest(score);
     }
 }
