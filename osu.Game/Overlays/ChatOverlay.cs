@@ -158,13 +158,12 @@ namespace osu.Game.Overlays
                                     Colour = Color4.Black,
                                 },
                                 ChannelTabControl = CreateChannelTabControl().With(d =>
-                                    {
-                                        d.Anchor = Anchor.BottomLeft;
-                                        d.Origin = Anchor.BottomLeft;
-                                        d.RelativeSizeAxes = Axes.Both;
-                                        d.OnRequestLeave = channelManager.LeaveChannel;
-                                    }
-                                ),
+                                {
+                                    d.Anchor = Anchor.BottomLeft;
+                                    d.Origin = Anchor.BottomLeft;
+                                    d.RelativeSizeAxes = Axes.Both;
+                                    d.OnRequestLeave = channelManager.LeaveChannel;
+                                }),
                             }
                         },
                     },

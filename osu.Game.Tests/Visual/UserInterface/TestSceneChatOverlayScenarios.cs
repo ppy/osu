@@ -133,7 +133,7 @@ namespace osu.Game.Tests.Visual.UserInterface
 
         private class TestTabControl : ChannelTabControl
         {
-            protected override TabItem<Channel> CreateTabItem(Channel value) => new TestChannelTabItem(value) { OnRequestClose = TabCloseRequested };
+            protected override TabItem<Channel> CreateTabItem(Channel value) => new TestChannelTabItem(value);
 
             public new IReadOnlyDictionary<Channel, TabItem<Channel>> TabMap => base.TabMap;
         }
