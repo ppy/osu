@@ -12,10 +12,8 @@ using osuTK.Graphics;
 
 namespace osu.Game.Overlays.Profile.Header.Components
 {
-    public class ProfileRulesetSelector : TabControl<RulesetInfo>
+    public class ProfileRulesetSelector : RulesetSelector
     {
-        protected override Dropdown<RulesetInfo> CreateDropdown() => null;
-
         protected override TabItem<RulesetInfo> CreateTabItem(RulesetInfo value) => new RulesetTabItem(value)
         {
             AccentColour = AccentColour
@@ -48,13 +46,8 @@ namespace osu.Game.Overlays.Profile.Header.Components
         }
 
         [BackgroundDependencyLoader]
-        private void load(RulesetStore rulesets, OsuColour colours)
+        private void load(OsuColour colours)
         {
-            foreach (var r in rulesets.AvailableRulesets)
-            {
-                AddItem(r);
-            }
-
             AccentColour = colours.Seafoam;
         }
 

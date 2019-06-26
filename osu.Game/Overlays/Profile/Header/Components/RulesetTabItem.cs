@@ -94,7 +94,8 @@ namespace osu.Game.Overlays.Profile.Header.Components
         {
             base.OnHover(e);
 
-            updateState();
+            if (!Active.Value)
+                hoverAction();
 
             return true;
         }
@@ -103,29 +104,40 @@ namespace osu.Game.Overlays.Profile.Header.Components
         {
             base.OnHoverLost(e);
 
-            updateState();
+            if (!Active.Value)
+                unhoverAction();
         }
 
-        protected override void OnActivated() => updateState();
+        protected override void OnActivated()
+        {
+            hoverAction();
+            text.Font = text.Font.With(weight: FontWeight.Bold);
+        }
 
-        protected override void OnDeactivated() => updateState();
+        protected override void OnDeactivated()
+        {
+            unhoverAction();
+            text.Font = text.Font.With(weight: FontWeight.Medium);
+        }
 
         private void updateState()
         {
-            if (Active.Value || IsHovered)
-            {
-                text.FadeColour(Color4.White, 120, Easing.InQuad);
-                icon.FadeColour(Color4.White, 120, Easing.InQuad);
-
-                if (Active.Value)
-                    text.Font = text.Font.With(weight: FontWeight.Bold);
-            }
+            if (Active.Value)
+                OnActivated();
             else
-            {
-                text.FadeColour(AccentColour, 120, Easing.InQuad);
-                icon.FadeColour(AccentColour, 120, Easing.InQuad);
-                text.Font = text.Font.With(weight: FontWeight.Medium);
-            }
+                OnDeactivated();
+        }
+
+        private void hoverAction()
+        {
+            text.FadeColour(Color4.White, 120, Easing.InQuad);
+            icon.FadeColour(Color4.White, 120, Easing.InQuad);
+        }
+
+        private void unhoverAction()
+        {
+            text.FadeColour(AccentColour, 120, Easing.InQuad);
+            icon.FadeColour(AccentColour, 120, Easing.InQuad);
         }
     }
 }
