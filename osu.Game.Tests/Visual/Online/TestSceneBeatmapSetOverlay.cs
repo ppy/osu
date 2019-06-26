@@ -239,7 +239,7 @@ namespace osu.Game.Tests.Visual.Online
                     },
                 }, false);
             });
-            
+
             downloadAssert(true);
         }
 
@@ -417,7 +417,7 @@ namespace osu.Game.Tests.Visual.Online
                     },
                 }, false);
             });
-            
+
             downloadAssert(false);
         }
 
