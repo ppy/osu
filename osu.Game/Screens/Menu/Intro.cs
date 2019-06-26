@@ -15,11 +15,10 @@ using osu.Game.IO.Archives;
 using osu.Game.Screens.Backgrounds;
 using osuTK;
 using osuTK.Graphics;
-using osu.Game.Overlays;
 
 namespace osu.Game.Screens.Menu
 {
-    public class Intro : OsuScreen
+    public class Intro : StartupScreen
     {
         private const string menu_music_beatmap_hash = "3c8b1fcc9434dbb29e2fb613d3b9eada9d7bb6c125ceb32396c3b53437280c83";
 
@@ -31,11 +30,6 @@ namespace osu.Game.Screens.Menu
         private MainMenu mainMenu;
         private SampleChannel welcome;
         private SampleChannel seeya;
-
-        public override bool HideOverlaysOnEnter => true;
-        public override OverlayActivation InitialOverlayActivationMode => OverlayActivation.Disabled;
-
-        public override bool CursorVisible => false;
 
         protected override BackgroundScreen CreateBackground() => new BackgroundScreenBlack();
 
