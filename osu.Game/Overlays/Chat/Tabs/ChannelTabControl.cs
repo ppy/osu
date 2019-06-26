@@ -106,7 +106,9 @@ namespace osu.Game.Overlays.Chat.Tabs
             }
 
             base.SelectTab(tab);
-            selectorTab.Active.Value = false;
+
+            if (tab != null)
+                selectorTab.Active.Value = false;
         }
 
         protected void TabCloseRequested(TabItem<Channel> tab)

@@ -25,7 +25,7 @@ namespace osu.Game.Tests.Visual.Online
             typeof(ChannelTabControl),
         };
 
-        private readonly ChannelTabControl channelTabControl;
+        private readonly TestChannelTabControl channelTabControl;
 
         public TestSceneChannelTabControl()
         {
@@ -37,7 +37,7 @@ namespace osu.Game.Tests.Visual.Online
                 Anchor = Anchor.Centre,
                 Children = new Drawable[]
                 {
-                    channelTabControl = new ChannelTabControl
+                    channelTabControl = new TestChannelTabControl
                     {
                         RelativeSizeAxes = Axes.X,
                         Origin = Anchor.Centre,
@@ -70,7 +70,7 @@ namespace osu.Game.Tests.Visual.Online
             });
 
             channelTabControl.OnRequestLeave += channel => channelTabControl.RemoveChannel(channel);
-            channelTabControl.Current.ValueChanged += channel => currentText.Text = "Currently selected channel: " + channel.NewValue.ToString();
+            channelTabControl.Current.ValueChanged += channel => currentText.Text = "Currently selected channel: " + channel.NewValue?.ToString();
 
             AddStep("Add random private channel", addRandomPrivateChannel);
             AddAssert("There is only one channels", () => channelTabControl.Items.Count() == 2);
@@ -97,7 +97,7 @@ namespace osu.Game.Tests.Visual.Online
                 if (first is ChannelSelectorTabItem.ChannelSelectorTabChannel)
                     return true;
 
-                channelTabControl.RemoveChannel(first);
+                channelTabControl.Close(first);
                 return false;
             });
 
@@ -117,5 +117,13 @@ namespace osu.Game.Tests.Visual.Online
                 Type = ChannelType.Public,
                 Name = name
             });
+
+        private class TestChannelTabControl : ChannelTabControl
+        {
+            public void Close(Channel channel)
+            {
+                TabCloseRequested(TabMap[channel]);
+            }
+        }
     }
 }
