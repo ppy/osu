@@ -12,7 +12,7 @@ namespace osu.Game.Database
     public interface IModelManager<out TModel>
         where TModel : class
     {
-        event Action<TModel, bool> ItemAdded;
+        event Action<TModel> ItemAdded;
 
         event Action<TModel> ItemRemoved;
     }
