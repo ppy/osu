@@ -158,7 +158,7 @@ namespace osu.Game.Overlays.BeatmapSet
                                             Children = new Drawable[]
                                             {
                                                 favouriteButton = new FavouriteButton(),
-                                                downloadButtonsContainer = new FillFlowContainer
+                                                DownloadButtonsContainer = new FillFlowContainer
                                                 {
                                                     RelativeSizeAxes = Axes.Both,
                                                     Padding = new MarginPadding { Left = buttons_height + buttons_spacing },
@@ -225,7 +225,7 @@ namespace osu.Game.Overlays.BeatmapSet
 
                     loading.Show();
 
-                    downloadButtonsContainer.FadeOut(transition_duration);
+                    DownloadButtonsContainer.FadeOut(transition_duration);
                     favouriteButton.FadeOut(transition_duration);
                 }
                 else
@@ -240,7 +240,7 @@ namespace osu.Game.Overlays.BeatmapSet
                     onlineStatusPill.FadeIn(500, Easing.OutQuint);
                     onlineStatusPill.Status = setInfo.NewValue.OnlineInfo.Status;
 
-                    downloadButtonsContainer.FadeIn(transition_duration);
+                    DownloadButtonsContainer.FadeIn(transition_duration);
                     favouriteButton.FadeIn(transition_duration);
 
                     updateDownloadButtons();
