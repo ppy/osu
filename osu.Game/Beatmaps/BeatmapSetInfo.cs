@@ -32,6 +32,9 @@ namespace osu.Game.Beatmaps
         [NotMapped]
         public BeatmapSetOnlineInfo OnlineInfo { get; set; }
 
+        [NotMapped]
+        public BeatmapSetMetrics Metrics { get; set; }
+
         public double MaxStarDifficulty => Beatmaps?.Max(b => b.StarDifficulty) ?? 0;
 
         [NotMapped]
