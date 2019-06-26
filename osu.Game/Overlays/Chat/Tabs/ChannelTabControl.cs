@@ -88,7 +88,10 @@ namespace osu.Game.Overlays.Chat.Tabs
             RemoveItem(channel);
 
             if (Items.Count() <= 1)
+            {
                 Current.Value = null;
+                return;
+            }
 
             if (Current.Value == channel)
                 Current.Value = Items.FirstOrDefault();
