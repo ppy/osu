@@ -170,13 +170,7 @@ namespace osu.Game.Overlays
                 },
             };
 
-            ChannelTabControl.Current.ValueChanged += current =>
-            {
-                if (current.NewValue is ChannelSelectorTabItem.ChannelSelectorTabChannel)
-                    return;
-
-                currentChannel.Value = current.NewValue;
-            };
+            ChannelTabControl.Current.ValueChanged += current => channelManager.CurrentChannel.Value = current.NewValue;
             ChannelTabControl.ChannelSelectorActive.ValueChanged += active => channelSelectionOverlay.State.Value = active.NewValue ? Visibility.Visible : Visibility.Hidden;
             channelSelectionOverlay.State.ValueChanged += state =>
             {
