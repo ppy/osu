@@ -12,6 +12,7 @@ using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Testing;
 using osu.Game.Online.Chat;
 using osu.Game.Overlays;
+using osu.Game.Overlays.Chat.Selection;
 using osu.Game.Overlays.Chat.Tabs;
 using osu.Game.Users;
 using osuTK;
@@ -54,6 +55,7 @@ namespace osu.Game.Tests.Visual.UserInterface
         [SetUpSteps]
         public void SetUpSteps()
         {
+            AddStep("Hide chat", () => chatOverlay.Hide());
             AddStep("Leave channels", () =>
             {
                 channelManager.LeaveChannel(channel1);
@@ -69,7 +71,8 @@ namespace osu.Game.Tests.Visual.UserInterface
         [Test]
         public void TestToggleChatWithNoChannelsJoined()
         {
-            AddAssert("Channel selection overlay was toggled", () => chatOverlay.SelectionOverlayState == Visibility.Visible);
+            AddAssert("Channel selection overlay hidden", () => chatOverlay.SelectionOverlayState == Visibility.Hidden);
+            //TODO: Change this to check whether or not the chat overlay was shown once https://github.com/ppy/osu/issues/5161 is fixed
             AddAssert("Chat overlay was shown", () => chatOverlay.State.Value == Visibility.Visible);
             AddStep("Close chat overlay", () => chatOverlay.Hide());
             AddAssert("Channel selection overlay was hidden", () => chatOverlay.SelectionOverlayState == Visibility.Hidden);
@@ -82,7 +85,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             AddStep("Join channel 1", () =>
             {
                 channelManager.JoinChannel(channel1);
-                // Temporarily here to circumvent https://github.com/ppy/osu/issues/5152
+                // TODO: Temporarily here to circumvent https://github.com/ppy/osu/issues/5152. Remove once fixed.
                 channelManager.OpenChannel(channel1.Name);
             });
             AddStep("Close chat overlay", () => chatOverlay.Hide());
@@ -126,6 +129,8 @@ namespace osu.Game.Tests.Visual.UserInterface
         {
             public Visibility SelectionOverlayState => ChannelSelectionOverlay.State.Value;
 
+            public new ChannelSelectionOverlay ChannelSelectionOverlay => base.ChannelSelectionOverlay;
+
             protected override ChannelTabControl CreateChannelTabControl() => new TestTabControl();
 
             public IReadOnlyDictionary<Channel, TabItem<Channel>> TabMap => ((TestTabControl)ChannelTabControl).TabMap;
@@ -136,6 +141,12 @@ namespace osu.Game.Tests.Visual.UserInterface
             protected override TabItem<Channel> CreateTabItem(Channel value) => new TestChannelTabItem(value);
 
             public new IReadOnlyDictionary<Channel, TabItem<Channel>> TabMap => base.TabMap;
+
+            protected override void LoadComplete()
+            {
+                base.LoadComplete();
+                SelectTab(null);
+            }
         }
 
         private class TestChannelTabItem : PrivateChannelTabItem
