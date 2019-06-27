@@ -32,7 +32,8 @@ namespace osu.Game.Overlays
 
         public void ShowUser(User user, bool fetchOnline = true)
         {
-            if (user == User.SYSTEM_USER) return;
+            if (user == User.SYSTEM_USER)
+                return;
 
             Show();
 
@@ -76,7 +77,7 @@ namespace osu.Game.Overlays
                 {
                     Colour = OsuColour.Gray(34),
                     RelativeSizeAxes = Axes.Both
-                }
+                },
             });
             sectionsContainer.SelectedSection.ValueChanged += section =>
             {
