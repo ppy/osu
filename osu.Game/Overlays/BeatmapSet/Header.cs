@@ -38,7 +38,7 @@ namespace osu.Game.Overlays.BeatmapSet
         private readonly BeatmapSetOnlineStatusPill onlineStatusPill;
         public Details Details;
 
-        public bool DownloadButtonsVisibile => downloadButtonsContainer.Any();
+        public bool DownloadButtonsVisible => downloadButtonsContainer.Any();
 
         public readonly BeatmapPicker Picker;
 

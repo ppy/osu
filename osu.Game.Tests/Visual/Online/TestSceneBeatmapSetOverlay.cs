@@ -442,7 +442,7 @@ namespace osu.Game.Tests.Visual.Online
 
         private class TestBeatmapSetOverlay : BeatmapSetOverlay
         {
-            public bool DownloadButtonsVisible => Header.DownloadButtonsVisibile;
+            public bool DownloadButtonsVisible => Header.DownloadButtonsVisible;
         }
     }
 }
