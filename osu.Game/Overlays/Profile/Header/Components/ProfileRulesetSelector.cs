@@ -16,23 +16,6 @@ namespace osu.Game.Overlays.Profile.Header.Components
     {
         private Color4 accentColour = Color4.White;
 
-        public Color4 AccentColour
-        {
-            get => accentColour;
-            set
-            {
-                if (accentColour == value)
-                    return;
-
-                accentColour = value;
-
-                foreach (TabItem<RulesetInfo> tabItem in TabContainer)
-                {
-                    ((ProfileRulesetTabItem)tabItem).AccentColour = value;
-                }
-            }
-        }
-
         public ProfileRulesetSelector()
         {
             TabContainer.Masking = false;
@@ -43,13 +26,11 @@ namespace osu.Game.Overlays.Profile.Header.Components
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
-            AccentColour = colours.Seafoam;
-        }
+            accentColour = colours.Seafoam;
 
-        protected override TabItem<RulesetInfo> CreateTabItem(RulesetInfo value) => new ProfileRulesetTabItem(value)
-        {
-            AccentColour = AccentColour
-        };
+            foreach (TabItem<RulesetInfo> tabItem in TabContainer)
+                ((ProfileRulesetTabItem)tabItem).AccentColour = accentColour;
+        }
 
         public void SetDefaultRuleset(RulesetInfo ruleset)
         {
@@ -70,6 +51,11 @@ namespace osu.Game.Overlays.Profile.Header.Components
                 }
             }
         }
+
+        protected override TabItem<RulesetInfo> CreateTabItem(RulesetInfo value) => new ProfileRulesetTabItem(value)
+        {
+            AccentColour = accentColour
+        };
 
         protected override TabFillFlowContainer CreateTabFlow() => new TabFillFlowContainer
         {

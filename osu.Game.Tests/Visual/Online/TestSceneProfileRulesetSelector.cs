@@ -2,9 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Graphics;
-using osu.Framework.MathUtils;
 using osu.Game.Overlays.Profile.Header.Components;
-using osuTK.Graphics;
 using System;
 using System.Collections.Generic;
 using osu.Game.Rulesets.Catch;
@@ -37,8 +35,6 @@ namespace osu.Game.Tests.Visual.Online
             AddStep("set taiko as default", () => selector.SetDefaultRuleset(new TaikoRuleset().RulesetInfo));
             AddStep("set catch as default", () => selector.SetDefaultRuleset(new CatchRuleset().RulesetInfo));
             AddStep("select default ruleset", selector.SelectDefaultRuleset);
-
-            AddStep("set random colour", () => selector.AccentColour = new Color4(RNG.NextSingle(), RNG.NextSingle(), RNG.NextSingle(), 1));
         }
     }
 }
