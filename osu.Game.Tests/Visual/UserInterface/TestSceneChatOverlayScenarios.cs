@@ -43,7 +43,6 @@ namespace osu.Game.Tests.Visual.UserInterface
                 Child = container = new ChannelManagerContainer(new List<Channel> { channel1, channel2 }) { RelativeSizeAxes = Axes.Both, };
                 chatOverlay = container.ChatOverlay;
                 channelManager = container.ChannelManager;
-                chatOverlay.Show();
             });
         }
 
@@ -86,12 +85,10 @@ namespace osu.Game.Tests.Visual.UserInterface
 
         private class ChannelManagerContainer : Container
         {
-            [Cached]
-            private ChannelManager channelManager = new ChannelManager();
-
             public TestChatOverlay ChatOverlay { get; private set; }
 
-            public ChannelManager ChannelManager => channelManager;
+            [Cached]
+            public ChannelManager ChannelManager { get; } = new ChannelManager();
 
             private readonly List<Channel> channels;
 
@@ -103,15 +100,10 @@ namespace osu.Game.Tests.Visual.UserInterface
             [BackgroundDependencyLoader]
             private void load()
             {
-                var availableChannels = (BindableList<Channel>)channelManager.AvailableChannels;
+                ((BindableList<Channel>)ChannelManager.AvailableChannels).AddRange(channels);
 
-                availableChannels.AddRange(channels);
-
-                Child = ChatOverlay = new TestChatOverlay
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    Size = new Vector2(1)
-                };
+                Child = ChatOverlay = new TestChatOverlay { RelativeSizeAxes = Axes.Both, };
+                ChatOverlay.Show();
             }
         }
 
