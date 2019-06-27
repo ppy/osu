@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -45,6 +46,8 @@ namespace osu.Game.Overlays.Direct
 
         protected DirectPanel(BeatmapSetInfo setInfo)
         {
+            Debug.Assert(setInfo.OnlineBeatmapSetID != null);
+
             SetInfo = setInfo;
         }
 
@@ -119,11 +122,10 @@ namespace osu.Game.Overlays.Direct
 
         protected override bool OnClick(ClickEvent e)
         {
-            ShowInformation();
+            Debug.Assert(SetInfo.OnlineBeatmapSetID != null);
+            beatmapSetOverlay?.FetchAndShowBeatmapSet(SetInfo.OnlineBeatmapSetID.Value);
             return true;
         }
-
-        protected void ShowInformation() => beatmapSetOverlay?.ShowBeatmapSet(SetInfo);
 
         protected override void LoadComplete()
         {

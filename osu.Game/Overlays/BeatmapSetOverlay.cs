@@ -31,8 +31,6 @@ namespace osu.Game.Overlays
 
         private RulesetStore rulesets;
 
-        private readonly OsuScrollContainer scroll;
-
         private readonly Bindable<BeatmapSetInfo> beatmapSet = new Bindable<BeatmapSetInfo>();
 
         // receive input outside our bounds so we can trigger a close event on ourselves.
@@ -40,6 +38,7 @@ namespace osu.Game.Overlays
 
         public BeatmapSetOverlay()
         {
+            OsuScrollContainer scroll;
             Info info;
             ScoresContainer scores;
 
@@ -76,6 +75,8 @@ namespace osu.Game.Overlays
             {
                 info.Beatmap = b.NewValue;
                 scores.Beatmap = b.NewValue;
+
+                scroll.ScrollToStart();
             };
         }
 
@@ -119,18 +120,14 @@ namespace osu.Game.Overlays
             Show();
         }
 
-        public void ShowBeatmapSet(BeatmapSetInfo set, bool refetch = true)
+        /// <summary>
+        /// Show an already fully-populated beatmap set.
+        /// </summary>
+        /// <param name="set">The set to show.</param>
+        public void ShowBeatmapSet(BeatmapSetInfo set)
         {
-            // Re-fetching is the correct way forward.
-            if (refetch)
-                FetchAndShowBeatmapSet(set?.OnlineBeatmapSetID ?? 0);
-            else
-            {
-                beatmapSet.Value = set;
-                Show();
-            }
-
-            scroll.ScrollTo(0);
+            beatmapSet.Value = set;
+            Show();
         }
     }
 }
