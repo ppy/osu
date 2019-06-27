@@ -14,7 +14,6 @@ using osu.Game.Overlays;
 using osu.Game.Overlays.Chat.Selection;
 using osu.Game.Overlays.Chat.Tabs;
 using osu.Game.Users;
-using osuTK;
 using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.UserInterface
