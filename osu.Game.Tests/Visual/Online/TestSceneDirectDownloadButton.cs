@@ -3,11 +3,15 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using NUnit.Framework;
+using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Game.Beatmaps;
+using osu.Game.Online;
 using osu.Game.Overlays.Direct;
 using osu.Game.Rulesets.Osu;
+using osu.Game.Tests.Resources;
 using osuTK;
 
 namespace osu.Game.Tests.Visual.Online
@@ -20,6 +24,9 @@ namespace osu.Game.Tests.Visual.Online
         };
 
         private TestDownloadButton downloadButton;
+
+        [Resolved]
+        private BeatmapManager beatmaps { get; set; }
 
         [Test]
         public void TestDownloadableBeatmap()
@@ -35,9 +42,64 @@ namespace osu.Game.Tests.Visual.Online
             assertEnabled(false);
         }
 
+        [Test]
+        public void TestDownloadState()
+        {
+            AddUntilStep("ensure manager loaded", () => beatmaps != null);
+            ensureSoleilyRemoved();
+            createButtonWithBeatmap(createSoleily());
+            AddAssert("button state not downloaded", () => downloadButton.DownloadState == DownloadState.NotDownloaded);
+            AddStep("import soleily", () => beatmaps.Import(new[] { TestResources.GetTestBeatmapForImport() }));
+            AddUntilStep("wait for beatmap import", () => beatmaps.GetAllUsableBeatmapSets().Any(b => b.OnlineBeatmapSetID == 241526));
+            createButtonWithBeatmap(createSoleily());
+            AddAssert("button state downloaded", () => downloadButton.DownloadState == DownloadState.LocallyAvailable);
+            ensureSoleilyRemoved();
+            AddAssert("button state not downloaded", () => downloadButton.DownloadState == DownloadState.NotDownloaded);
+        }
+
+        private void ensureSoleilyRemoved()
+        {
+            AddStep("remove soleily", () =>
+            {
+                var beatmap = beatmaps.QueryBeatmapSet(b => b.OnlineBeatmapSetID == 241526);
+
+                if (beatmap != null) beatmaps.Delete(beatmap);
+            });
+        }
+
         private void assertEnabled(bool enabled)
         {
             AddAssert($"button {(enabled ? "enabled" : "disabled")}", () => downloadButton.DownloadEnabled == enabled);
+        }
+
+        private BeatmapSetInfo createSoleily()
+        {
+            return new BeatmapSetInfo
+            {
+                ID = 1,
+                OnlineBeatmapSetID = 241526,
+                OnlineInfo = new BeatmapSetOnlineInfo
+                {
+                    Availability = new BeatmapSetOnlineAvailability
+                    {
+                        DownloadDisabled = false,
+                        ExternalLink = string.Empty,
+                    },
+                },
+            };
+        }
+
+        private void createButtonWithBeatmap(BeatmapSetInfo beatmap)
+        {
+            AddStep("create button", () =>
+            {
+                Child = downloadButton = new TestDownloadButton(beatmap)
+                {
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    Size = new Vector2(75, 50),
+                };
+            });
         }
 
         private void createButton(bool downloadable)
@@ -84,6 +146,8 @@ namespace osu.Game.Tests.Visual.Online
         private class TestDownloadButton : DownloadButton
         {
             public new bool DownloadEnabled => base.DownloadEnabled;
+
+            public DownloadState DownloadState => State.Value;
 
             public TestDownloadButton(BeatmapSetInfo beatmapSet, bool noVideo = false)
                 : base(beatmapSet, noVideo)
