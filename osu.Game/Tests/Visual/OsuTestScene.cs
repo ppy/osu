@@ -139,7 +139,7 @@ namespace osu.Game.Tests.Visual
 
             protected override void Dispose(bool isDisposing)
             {
-                base.Dispose();
+                base.Dispose(isDisposing);
                 store?.Dispose();
             }
 
