@@ -34,21 +34,12 @@ namespace osu.Game.Overlays.BeatmapSet
                     RelativeSizeAxes = Axes.Both,
                     Colour = Color4.Black.Opacity(0.6f),
                 },
-                new FillFlowContainer
+                textContainer = new LinkFlowContainer(t => t.Font = OsuFont.GetFont(size: 14))
                 {
+                    Direction = FillDirection.Full,
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
-                    Direction = FillDirection.Vertical,
                     Padding = new MarginPadding(10),
-                    Children = new Drawable[]
-                    {
-                        textContainer = new LinkFlowContainer(t => t.Font = OsuFont.GetFont(size: 14))
-                        {
-                            Direction = FillDirection.Full,
-                            RelativeSizeAxes = Axes.X,
-                            AutoSizeAxes = Axes.Y,
-                        },
-                    },
                 },
             };
         }
@@ -56,6 +47,7 @@ namespace osu.Game.Overlays.BeatmapSet
         public BeatmapSetInfo BeatmapSet
         {
             get => beatmapSet;
+
             set
             {
                 if (value == beatmapSet)
@@ -76,7 +68,6 @@ namespace osu.Game.Overlays.BeatmapSet
         private void updateText()
         {
             textContainer.Clear();
-
             textContainer.AddParagraph(downloadDisabled
                 ? "This beatmap is currently not available for download."
                 : "Portions of this beatmap have been removed at the request of the creator or a third-party rights holder.", t => t.Colour = Color4.Orange);
