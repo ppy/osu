@@ -46,6 +46,11 @@ namespace osu.Game.Beatmaps
             skin = new RecyclableLazy<Skin>(GetSkin);
         }
 
+        ~WorkingBeatmap()
+        {
+            Dispose(false);
+        }
+
         protected virtual Track GetVirtualTrack()
         {
             const double excess_length = 1000;
@@ -199,21 +204,32 @@ namespace osu.Game.Beatmaps
                 other.track = track;
         }
 
-        public virtual void Dispose()
-        {
-            background.Recycle();
-            waveform.Recycle();
-            storyboard.Recycle();
-            skin.Recycle();
-
-            beatmapCancellation.Cancel();
-        }
-
         /// <summary>
         /// Eagerly dispose of the audio track associated with this <see cref="WorkingBeatmap"/> (if any).
         /// Accessing track again will load a fresh instance.
         /// </summary>
         public virtual void RecycleTrack() => track.Recycle();
+
+        #region Disposal
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected virtual void Dispose(bool isDisposing)
+        {
+            // recycling logic is not here for the time being, as components which use
+            // retrieved objects from WorkingBeatmap may not hold a reference to the WorkingBeatmap itself.
+            // this should be fine as each retrieved comopnent do have their own finalizers.
+
+            // cancelling the beatmap load is safe for now since the retrieval is a synchronous
+            // operation. if we add an async retrieval method this may need to be reconsidered.
+            beatmapCancellation.Cancel();
+        }
+
+        #endregion
 
         public class RecyclableLazy<T>
         {
