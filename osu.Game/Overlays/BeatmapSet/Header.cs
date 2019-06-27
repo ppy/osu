@@ -31,7 +31,7 @@ namespace osu.Game.Overlays.BeatmapSet
         private readonly UpdateableBeatmapSetCover cover;
         private readonly OsuSpriteText title, artist;
         private readonly AuthorInfo author;
-        private readonly BeatmapNotAvailable beatmapNotAvailable;
+        private readonly BeatmapAvailability beatmapAvailability;
         private readonly BeatmapSetOnlineStatusPill onlineStatusPill;
         public Details Details;
 
@@ -150,7 +150,7 @@ namespace osu.Game.Overlays.BeatmapSet
                                             Margin = new MarginPadding { Top = 20 },
                                             Child = author = new AuthorInfo(),
                                         },
-                                        beatmapNotAvailable = new BeatmapNotAvailable(),
+                                        beatmapAvailability = new BeatmapAvailability(),
                                         new Container
                                         {
                                             RelativeSizeAxes = Axes.X,
@@ -216,7 +216,7 @@ namespace osu.Game.Overlays.BeatmapSet
 
             BeatmapSet.BindValueChanged(setInfo =>
             {
-                Picker.BeatmapSet = author.BeatmapSet = beatmapNotAvailable.BeatmapSet = Details.BeatmapSet = setInfo.NewValue;
+                Picker.BeatmapSet = author.BeatmapSet = beatmapAvailability.BeatmapSet = Details.BeatmapSet = setInfo.NewValue;
                 cover.BeatmapSet = setInfo.NewValue;
 
                 if (setInfo.NewValue == null)

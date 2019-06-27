@@ -12,7 +12,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Overlays.BeatmapSet
 {
-    public class BeatmapNotAvailable : Container
+    public class BeatmapAvailability : Container
     {
         private BeatmapSetInfo beatmapSet;
 
@@ -43,7 +43,7 @@ namespace osu.Game.Overlays.BeatmapSet
         private readonly TextFlowContainer textContainer;
         private readonly LinkFlowContainer linkContainer;
 
-        public BeatmapNotAvailable()
+        public BeatmapAvailability()
         {
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
