@@ -6,10 +6,9 @@ using System.Collections.Generic;
 using NUnit.Framework;
 using osu.Framework.Graphics;
 using osu.Game.Beatmaps;
-using osu.Game.Rulesets;
+using osu.Game.Overlays.Direct;
 using osu.Game.Rulesets.Osu;
 using osuTK;
-using DownloadButton = osu.Game.Overlays.Direct.DownloadButton;
 
 namespace osu.Game.Tests.Visual.Online
 {
@@ -38,7 +37,7 @@ namespace osu.Game.Tests.Visual.Online
 
         private void assertEnabled(bool enabled)
         {
-            AddAssert($"button {(enabled ? "enabled" : "disabled")}", () => downloadButton.DownloadAllowed == enabled);
+            AddAssert($"button {(enabled ? "enabled" : "disabled")}", () => downloadButton.DownloadEnabled == enabled);
         }
 
         private void createButton(bool downloadable)
@@ -84,7 +83,7 @@ namespace osu.Game.Tests.Visual.Online
 
         private class TestDownloadButton : DownloadButton
         {
-            public new bool DownloadAllowed => base.DownloadAllowed;
+            public new bool DownloadEnabled => base.DownloadEnabled;
 
             public TestDownloadButton(BeatmapSetInfo beatmapSet, bool noVideo = false)
                 : base(beatmapSet, noVideo)
