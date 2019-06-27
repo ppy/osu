@@ -102,7 +102,8 @@ namespace osu.Game.Overlays.BeatmapSet
                         },
                         new Container
                         {
-                            RelativeSizeAxes = Axes.Both,
+                            RelativeSizeAxes = Axes.X,
+                            AutoSizeAxes = Axes.Y,
                             Padding = new MarginPadding
                             {
                                 Top = 20,
@@ -170,12 +171,13 @@ namespace osu.Game.Overlays.BeatmapSet
                                         },
                                     },
                                 },
-                                loading = new LoadingAnimation
-                                {
-                                    Anchor = Anchor.Centre,
-                                    Origin = Anchor.Centre,
-                                }
                             }
+                        },
+                        loading = new LoadingAnimation
+                        {
+                            Anchor = Anchor.Centre,
+                            Origin = Anchor.Centre,
+                            Scale = new Vector2(1.5f),
                         },
                         new FillFlowContainer
                         {
