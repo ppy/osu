@@ -32,7 +32,7 @@ namespace osu.Game.Tests
 
         protected override void Dispose(bool isDisposing)
         {
-            base.Dispose();
+            base.Dispose(isDisposing);
             stream?.Dispose();
             reader?.Dispose();
             trackStore?.Dispose();
