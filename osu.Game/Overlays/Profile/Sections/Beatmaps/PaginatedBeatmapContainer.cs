@@ -4,10 +4,15 @@
 using System.Linq;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Shapes;
+using osu.Game.Graphics;
+using osu.Game.Graphics.Sprites;
 using osu.Game.Online.API.Requests;
 using osu.Game.Overlays.Direct;
 using osu.Game.Users;
 using osuTK;
+using osuTK.Graphics;
 
 namespace osu.Game.Overlays.Profile.Sections.Beatmaps
 {
@@ -54,10 +59,52 @@ namespace osu.Game.Overlays.Profile.Sections.Beatmaps
             Api.Queue(request);
         }
 
+        protected override void OnUserChanged(ValueChangedEvent<User> e)
+        {
+            base.OnUserChanged(e);
+
+            var amountRequest = new GetUserBeatmapsRequest(User.Value.Id, type);
+            amountRequest.Success += sets => Schedule(() =>
+            {
+                if (!sets.Any())
+                    return;
+
+                HeaderContainer.Add(new Counter(sets.Count));
+            });
+
+            Api.Queue(amountRequest);
+        }
+
         protected override void Dispose(bool isDisposing)
         {
             base.Dispose(isDisposing);
             request?.Cancel();
+        }
+
+        private class Counter : CircularContainer
+        {
+            public Counter(int value)
+            {
+                Masking = true;
+                Anchor = Anchor.CentreLeft;
+                Origin = Anchor.CentreLeft;
+                Size = new Vector2(30);
+                Children = new Drawable[]
+                {
+                    new Box
+                    {
+                        RelativeSizeAxes = Axes.Both,
+                        Colour = Color4.Black,
+                    },
+                    new OsuSpriteText
+                    {
+                        Anchor = Anchor.Centre,
+                        Origin = Anchor.Centre,
+                        Text = value.ToString(),
+                        Font = OsuFont.GetFont(size: 20, weight: FontWeight.SemiBold)
+                    }
+                };
+            }
         }
     }
 }

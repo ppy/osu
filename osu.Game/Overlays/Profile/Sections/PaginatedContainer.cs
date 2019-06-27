@@ -17,6 +17,7 @@ namespace osu.Game.Overlays.Profile.Sections
     public abstract class PaginatedContainer : FillFlowContainer
     {
         protected readonly FillFlowContainer ItemsContainer;
+        protected readonly FillFlowContainer HeaderContainer;
         protected readonly ShowMoreButton MoreButton;
         protected readonly OsuSpriteText MissingText;
 
@@ -39,11 +40,22 @@ namespace osu.Game.Overlays.Profile.Sections
 
             Children = new Drawable[]
             {
-                new OsuSpriteText
+                HeaderContainer = new FillFlowContainer
                 {
-                    Text = header,
-                    Font = OsuFont.GetFont(size: 20, weight: FontWeight.Bold),
+                    AutoSizeAxes = Axes.Both,
+                    Direction = FillDirection.Horizontal,
+                    Spacing = new Vector2(5, 0),
                     Margin = new MarginPadding { Top = 10, Bottom = 10 },
+                    Children = new Drawable[]
+                    {
+                        new OsuSpriteText
+                        {
+                            Anchor = Anchor.CentreLeft,
+                            Origin = Anchor.CentreLeft,
+                            Text = header,
+                            Font = OsuFont.GetFont(size: 20, weight: FontWeight.Bold),
+                        },
+                    },
                 },
                 ItemsContainer = new FillFlowContainer
                 {
@@ -74,11 +86,11 @@ namespace osu.Game.Overlays.Profile.Sections
             Api = api;
             Rulesets = rulesets;
 
-            User.ValueChanged += onUserChanged;
+            User.ValueChanged += OnUserChanged;
             User.TriggerChange();
         }
 
-        private void onUserChanged(ValueChangedEvent<User> e)
+        protected virtual void OnUserChanged(ValueChangedEvent<User> e)
         {
             VisiblePages = 0;
             ItemsContainer.Clear();
