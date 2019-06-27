@@ -33,7 +33,7 @@ namespace osu.Game.Screens.Play
 {
     public class Player : ScreenWithBeatmapBackground
     {
-        protected override bool AllowBackButton => false; // handled by HoldForMenuButton
+        public override bool AllowBackButton => false; // handled by HoldForMenuButton
 
         protected override UserActivity InitialActivity => new UserActivity.SoloGame(Beatmap.Value.BeatmapInfo, Ruleset.Value);
 
@@ -177,6 +177,16 @@ namespace osu.Game.Screens.Play
                         Restart();
                     },
                 },
+                new HotkeyExitOverlay
+                {
+                    Action = () =>
+                    {
+                        if (!this.IsCurrentScreen()) return;
+
+                        fadeOut(true);
+                        performImmediateExit();
+                    },
+                },
                 failAnimation = new FailAnimation(DrawableRuleset) { OnComplete = onFailComplete, }
             };
 
@@ -239,6 +249,16 @@ namespace osu.Game.Screens.Play
             }
 
             return working;
+        }
+
+        private void performImmediateExit()
+        {
+            // if a restart has been requested, cancel any pending completion (user has shown intent to restart).
+            onCompletionEvent = null;
+
+            ValidForResume = false;
+
+            performUserRequestedExit();
         }
 
         private void performUserRequestedExit()

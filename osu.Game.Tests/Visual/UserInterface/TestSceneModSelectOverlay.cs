@@ -76,7 +76,7 @@ namespace osu.Game.Tests.Visual.UserInterface
         public void TestOsuMods()
         {
             var ruleset = rulesets.AvailableRulesets.First(r => r.ID == 0);
-            AddStep("change ruleset", () => { Ruleset.Value = ruleset; });
+            changeRuleset(ruleset);
 
             var instance = ruleset.CreateInstance();
 
@@ -108,7 +108,7 @@ namespace osu.Game.Tests.Visual.UserInterface
         public void TestManiaMods()
         {
             var ruleset = rulesets.AvailableRulesets.First(r => r.ID == 3);
-            AddStep("change ruleset", () => { Ruleset.Value = ruleset; });
+            changeRuleset(ruleset);
 
             testRankedText(ruleset.CreateInstance().GetModsFor(ModType.Conversion).First(m => m is ManiaModRandom));
         }
@@ -119,7 +119,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             var rulesetOsu = rulesets.AvailableRulesets.First(r => r.ID == 0);
             var rulesetMania = rulesets.AvailableRulesets.First(r => r.ID == 3);
 
-            AddStep("change ruleset to null", () => { Ruleset.Value = null; });
+            changeRuleset(null);
 
             var instance = rulesetOsu.CreateInstance();
             var easierMods = instance.GetModsFor(ModType.DifficultyReduction);
@@ -127,15 +127,15 @@ namespace osu.Game.Tests.Visual.UserInterface
 
             AddStep("set mods externally", () => { modDisplay.Current.Value = new[] { noFailMod }; });
 
-            AddStep("change ruleset to osu", () => { Ruleset.Value = rulesetOsu; });
+            changeRuleset(rulesetOsu);
 
             AddAssert("ensure mods still selected", () => modDisplay.Current.Value.Single(m => m is OsuModNoFail) != null);
 
-            AddStep("change ruleset to mania", () => { Ruleset.Value = rulesetMania; });
+            changeRuleset(rulesetMania);
 
             AddAssert("ensure mods not selected", () => !modDisplay.Current.Value.Any(m => m is OsuModNoFail));
 
-            AddStep("change ruleset to osu", () => { Ruleset.Value = rulesetOsu; });
+            changeRuleset(rulesetOsu);
 
             AddAssert("ensure mods not selected", () => !modDisplay.Current.Value.Any());
         }
@@ -216,14 +216,11 @@ namespace osu.Game.Tests.Visual.UserInterface
 
         private void testRankedText(Mod mod)
         {
-            AddWaitStep("wait for fade", 1);
-            AddAssert("check for ranked", () => modSelect.UnrankedLabel.Alpha == 0);
+            AddUntilStep("check for ranked", () => modSelect.UnrankedLabel.Alpha == 0);
             selectNext(mod);
-            AddWaitStep("wait for fade", 1);
-            AddAssert("check for unranked", () => modSelect.UnrankedLabel.Alpha != 0);
+            AddUntilStep("check for unranked", () => modSelect.UnrankedLabel.Alpha != 0);
             selectPrevious(mod);
-            AddWaitStep("wait for fade", 1);
-            AddAssert("check for ranked", () => modSelect.UnrankedLabel.Alpha == 0);
+            AddUntilStep("check for ranked", () => modSelect.UnrankedLabel.Alpha == 0);
         }
 
         private void selectNext(Mod mod) => AddStep($"left click {mod.Name}", () => modSelect.GetModButton(mod)?.SelectNext(1));
@@ -239,6 +236,15 @@ namespace osu.Game.Tests.Visual.UserInterface
             });
         }
 
+        private void changeRuleset(RulesetInfo ruleset)
+        {
+            AddStep($"change ruleset to {ruleset}", () => { Ruleset.Value = ruleset; });
+            waitForLoad();
+        }
+
+        private void waitForLoad() =>
+            AddUntilStep("wait for icons to load", () => modSelect.AllLoaded);
+
         private void checkNotSelected(Mod mod)
         {
             AddAssert($"check {mod.Name} is not selected", () =>
@@ -253,6 +259,8 @@ namespace osu.Game.Tests.Visual.UserInterface
         private class TestModSelectOverlay : ModSelectOverlay
         {
             public new Bindable<IReadOnlyList<Mod>> SelectedMods => base.SelectedMods;
+
+            public bool AllLoaded => ModSectionsContainer.Children.All(c => c.ModIconsLoaded);
 
             public ModButton GetModButton(Mod mod)
             {
