@@ -15,7 +15,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Overlays.Profile.Header.Components
 {
-    public class ProfileRulesetTabItem : TabItem<RulesetInfo>
+    public class ProfileRulesetTabItem : TabItem<RulesetInfo>, IHasAccentColour
     {
         private readonly OsuSpriteText text;
         private readonly SpriteIcon icon;
