@@ -1,4 +1,4 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Graphics;
@@ -92,51 +92,34 @@ namespace osu.Game.Overlays.Profile.Header.Components
         protected override bool OnHover(HoverEvent e)
         {
             base.OnHover(e);
-
-            if (!Active.Value)
-                hoverAction();
-
+            updateState();
             return true;
         }
 
         protected override void OnHoverLost(HoverLostEvent e)
         {
             base.OnHoverLost(e);
-
-            if (!Active.Value)
-                unhoverAction();
+            updateState();
         }
 
-        protected override void OnActivated()
-        {
-            hoverAction();
-            text.Font = text.Font.With(weight: FontWeight.Bold);
-        }
+        protected override void OnActivated() => updateState();
 
-        protected override void OnDeactivated()
-        {
-            unhoverAction();
-            text.Font = text.Font.With(weight: FontWeight.Medium);
-        }
+        protected override void OnDeactivated() => updateState();
 
         private void updateState()
         {
-            if (Active.Value)
-                OnActivated();
+            text.Font = text.Font.With(weight: Active.Value ? FontWeight.Bold : FontWeight.Medium);
+
+            if (IsHovered || Active.Value)
+            {
+                text.FadeColour(Color4.White, 120, Easing.InQuad);
+                icon.FadeColour(Color4.White, 120, Easing.InQuad);
+            }
             else
-                OnDeactivated();
-        }
-
-        private void hoverAction()
-        {
-            text.FadeColour(Color4.White, 120, Easing.InQuad);
-            icon.FadeColour(Color4.White, 120, Easing.InQuad);
-        }
-
-        private void unhoverAction()
-        {
-            text.FadeColour(AccentColour, 120, Easing.InQuad);
-            icon.FadeColour(AccentColour, 120, Easing.InQuad);
+            {
+                text.FadeColour(AccentColour, 120, Easing.InQuad);
+                icon.FadeColour(AccentColour, 120, Easing.InQuad);
+            }
         }
     }
 }
