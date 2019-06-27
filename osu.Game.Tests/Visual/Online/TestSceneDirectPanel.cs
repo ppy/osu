@@ -10,6 +10,7 @@ using osu.Game.Beatmaps;
 using osu.Game.Overlays.Direct;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Osu;
+using osu.Game.Users;
 using osuTK;
 
 namespace osu.Game.Tests.Visual.Online
@@ -23,24 +24,44 @@ namespace osu.Game.Tests.Visual.Online
             typeof(IconPill)
         };
 
-        private BeatmapSetInfo getUndownloadableBeatmapSet(RulesetInfo ruleset)
+        private BeatmapSetInfo getUndownloadableBeatmapSet(RulesetInfo ruleset) => new BeatmapSetInfo
         {
-            var beatmap = CreateWorkingBeatmap(ruleset).BeatmapSetInfo;
-            beatmap.Metadata.Artist = "test";
-            beatmap.Metadata.Title = "undownloadable";
-            beatmap.Metadata.AuthorString = "test";
-
-            beatmap.OnlineInfo.HasVideo = true;
-            beatmap.OnlineInfo.HasStoryboard = true;
-
-            beatmap.OnlineInfo.Availability = new BeatmapSetOnlineAvailability
+            OnlineBeatmapSetID = 123,
+            Metadata = new BeatmapMetadata
             {
-                DownloadDisabled = true,
-                ExternalLink = "http://osu.ppy.sh",
-            };
-
-            return beatmap;
-        }
+                Title = "undownloadable beatmap",
+                Artist = "test",
+                Source = "more tests",
+                Author = new User
+                {
+                    Username = "BanchoBot",
+                    Id = 3,
+                },
+            },
+            OnlineInfo = new BeatmapSetOnlineInfo
+            {
+                Availability = new BeatmapSetOnlineAvailability
+                {
+                    DownloadDisabled = true,
+                },
+                Preview = @"https://b.ppy.sh/preview/12345.mp3",
+                PlayCount = 123,
+                FavouriteCount = 456,
+                BPM = 111,
+                HasVideo = true,
+                HasStoryboard = true,
+                Covers = new BeatmapSetOnlineCovers(),
+            },
+            Beatmaps = new List<BeatmapInfo>
+            {
+                new BeatmapInfo
+                {
+                    Ruleset = ruleset,
+                    Version = "Test",
+                    StarDifficulty = 6.42,
+                }
+            }
+        };
 
         [BackgroundDependencyLoader]
         private void load()
