@@ -28,7 +28,7 @@ namespace osu.Game.Overlays.Profile.Header.Components
 
                 foreach (TabItem<RulesetInfo> tabItem in TabContainer)
                 {
-                    ((RulesetTabItem)tabItem).AccentColour = value;
+                    ((ProfileRulesetTabItem)tabItem).AccentColour = value;
                 }
             }
         }
@@ -46,7 +46,7 @@ namespace osu.Game.Overlays.Profile.Header.Components
             AccentColour = colours.Seafoam;
         }
 
-        protected override TabItem<RulesetInfo> CreateTabItem(RulesetInfo value) => new RulesetTabItem(value)
+        protected override TabItem<RulesetInfo> CreateTabItem(RulesetInfo value) => new ProfileRulesetTabItem(value)
         {
             AccentColour = AccentColour
         };
@@ -55,7 +55,7 @@ namespace osu.Game.Overlays.Profile.Header.Components
         {
             // Todo: This method shouldn't exist, but bindables don't provide the concept of observing a change to the default value
             foreach (TabItem<RulesetInfo> tabItem in TabContainer)
-                ((RulesetTabItem)tabItem).IsDefault = ((RulesetTabItem)tabItem).Value.ID == ruleset.ID;
+                ((ProfileRulesetTabItem)tabItem).IsDefault = ((ProfileRulesetTabItem)tabItem).Value.ID == ruleset.ID;
         }
 
         public void SelectDefaultRuleset()
@@ -63,9 +63,9 @@ namespace osu.Game.Overlays.Profile.Header.Components
             // Todo: This method shouldn't exist, but bindables don't provide the concept of observing a change to the default value
             foreach (TabItem<RulesetInfo> tabItem in TabContainer)
             {
-                if (((RulesetTabItem)tabItem).IsDefault)
+                if (((ProfileRulesetTabItem)tabItem).IsDefault)
                 {
-                    Current.Value = ((RulesetTabItem)tabItem).Value;
+                    Current.Value = ((ProfileRulesetTabItem)tabItem).Value;
                     return;
                 }
             }
