@@ -110,7 +110,15 @@ namespace osu.Game.Database
             return true;
         }
 
-        public virtual bool IsAvailableLocally(TModel model) => modelStore.ConsumableItems.Any(m => m.Equals(model) && !m.DeletePending);
+        public bool IsAvailableLocally(TModel model) => CheckLocalAvailability(model, modelStore.ConsumableItems.Where(m => !m.DeletePending));
+
+        /// <summary>
+        /// Performs implementation specific comparisons to determine whether a given model is present in the local store.
+        /// </summary>
+        /// <param name="model">The <see cref="TModel"/> whose existence needs to be checked.</param>
+        /// <param name="items">The usable items present in the store.</param>
+        /// <returns>Whether the <see cref="TModel"/> exists.</returns>
+        protected abstract bool CheckLocalAvailability(TModel model, IQueryable<TModel> items);
 
         public ArchiveDownloadRequest<TModel> GetExistingDownload(TModel model) => currentDownloads.Find(r => r.Model.Equals(model));
 
