@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
@@ -33,8 +34,11 @@ namespace osu.Game.Overlays.BeatmapSet
         private readonly OsuSpriteText title, artist;
         private readonly AuthorInfo author;
         private readonly FillFlowContainer downloadButtonsContainer;
+        private readonly BeatmapAvailability beatmapAvailability;
         private readonly BeatmapSetOnlineStatusPill onlineStatusPill;
         public Details Details;
+
+        public bool DownloadButtonsVisible => downloadButtonsContainer.Any();
 
         public readonly BeatmapPicker Picker;
 
@@ -100,7 +104,8 @@ namespace osu.Game.Overlays.BeatmapSet
                         },
                         new Container
                         {
-                            RelativeSizeAxes = Axes.Both,
+                            RelativeSizeAxes = Axes.X,
+                            AutoSizeAxes = Axes.Y,
                             Padding = new MarginPadding
                             {
                                 Top = 20,
@@ -149,6 +154,7 @@ namespace osu.Game.Overlays.BeatmapSet
                                             Margin = new MarginPadding { Top = 20 },
                                             Child = author = new AuthorInfo(),
                                         },
+                                        beatmapAvailability = new BeatmapAvailability(),
                                         new Container
                                         {
                                             RelativeSizeAxes = Axes.X,
@@ -167,12 +173,13 @@ namespace osu.Game.Overlays.BeatmapSet
                                         },
                                     },
                                 },
-                                loading = new LoadingAnimation
-                                {
-                                    Anchor = Anchor.Centre,
-                                    Origin = Anchor.Centre,
-                                }
                             }
+                        },
+                        loading = new LoadingAnimation
+                        {
+                            Anchor = Anchor.Centre,
+                            Origin = Anchor.Centre,
+                            Scale = new Vector2(1.5f),
                         },
                         new FillFlowContainer
                         {
@@ -214,7 +221,7 @@ namespace osu.Game.Overlays.BeatmapSet
 
             BeatmapSet.BindValueChanged(setInfo =>
             {
-                Picker.BeatmapSet = author.BeatmapSet = Details.BeatmapSet = setInfo.NewValue;
+                Picker.BeatmapSet = author.BeatmapSet = beatmapAvailability.BeatmapSet = Details.BeatmapSet = setInfo.NewValue;
                 cover.BeatmapSet = setInfo.NewValue;
 
                 if (setInfo.NewValue == null)
@@ -251,11 +258,17 @@ namespace osu.Game.Overlays.BeatmapSet
         {
             if (BeatmapSet.Value == null) return;
 
+            if (BeatmapSet.Value.OnlineInfo.Availability?.DownloadDisabled ?? false)
+            {
+                downloadButtonsContainer.Clear();
+                return;
+            }
+
             switch (State.Value)
             {
                 case DownloadState.LocallyAvailable:
                     // temporary for UX until new design is implemented.
-                    downloadButtonsContainer.Child = new osu.Game.Overlays.Direct.DownloadButton(BeatmapSet.Value)
+                    downloadButtonsContainer.Child = new Direct.DownloadButton(BeatmapSet.Value)
                     {
                         Width = 50,
                         RelativeSizeAxes = Axes.Y
