@@ -165,7 +165,8 @@ namespace osu.Game.Graphics.UserInterface
         protected override bool OnHover(HoverEvent e)
         {
             this.ResizeTo(SIZE_EXTENDED, transform_time, Easing.OutElastic);
-            IconLayer.FadeColour(HoverColour, transform_time, Easing.OutElastic);
+
+            IconLayer.FadeColour(HoverColour, transform_time / 2f, Easing.OutQuint);
 
             bouncingIcon.ScaleTo(1.1f, transform_time, Easing.OutElastic);
 
@@ -174,16 +175,13 @@ namespace osu.Game.Graphics.UserInterface
 
         protected override void OnHoverLost(HoverLostEvent e)
         {
-            this.ResizeTo(SIZE_RETRACTED, transform_time, Easing.OutElastic);
-            IconLayer.FadeColour(TextLayer.Colour, transform_time, Easing.OutElastic);
+            this.ResizeTo(SIZE_RETRACTED, transform_time, Easing.Out);
+            IconLayer.FadeColour(TextLayer.Colour, transform_time, Easing.Out);
 
-            bouncingIcon.ScaleTo(1, transform_time, Easing.OutElastic);
+            bouncingIcon.ScaleTo(1, transform_time, Easing.Out);
         }
 
-        protected override bool OnMouseDown(MouseDownEvent e)
-        {
-            return true;
-        }
+        protected override bool OnMouseDown(MouseDownEvent e) => true;
 
         protected override bool OnClick(ClickEvent e)
         {

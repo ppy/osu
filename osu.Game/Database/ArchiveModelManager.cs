@@ -31,12 +31,10 @@ namespace osu.Game.Database
     /// </summary>
     /// <typeparam name="TModel">The model type.</typeparam>
     /// <typeparam name="TFileModel">The associated file join type.</typeparam>
-    public abstract class ArchiveModelManager<TModel, TFileModel> : ArchiveModelManager, ICanAcceptFiles
+    public abstract class ArchiveModelManager<TModel, TFileModel> : ArchiveModelManager, ICanAcceptFiles, IModelManager<TModel>
         where TModel : class, IHasFiles<TFileModel>, IHasPrimaryKey, ISoftDelete
         where TFileModel : INamedFileInfo, new()
     {
-        public delegate void ItemAddedDelegate(TModel model, bool existing);
-
         /// <summary>
         /// Set an endpoint for notifications to be posted to.
         /// </summary>
@@ -46,7 +44,7 @@ namespace osu.Game.Database
         /// Fired when a new <see cref="TModel"/> becomes available in the database.
         /// This is not guaranteed to run on the update thread.
         /// </summary>
-        public event ItemAddedDelegate ItemAdded;
+        public event Action<TModel> ItemAdded;
 
         /// <summary>
         /// Fired when a <see cref="TModel"/> is removed from the database.
@@ -67,56 +65,12 @@ namespace osu.Game.Database
         // ReSharper disable once NotAccessedField.Local (we should keep a reference to this so it is not finalised)
         private ArchiveImportIPCChannel ipc;
 
-        private readonly List<Action> queuedEvents = new List<Action>();
-
-        /// <summary>
-        /// Allows delaying of outwards events until an operation is confirmed (at a database level).
-        /// </summary>
-        private bool delayingEvents;
-
-        /// <summary>
-        /// Begin delaying outwards events.
-        /// </summary>
-        private void delayEvents() => delayingEvents = true;
-
-        /// <summary>
-        /// Flush delayed events and disable delaying.
-        /// </summary>
-        /// <param name="perform">Whether the flushed events should be performed.</param>
-        private void flushEvents(bool perform)
-        {
-            Action[] events;
-
-            lock (queuedEvents)
-            {
-                events = queuedEvents.ToArray();
-                queuedEvents.Clear();
-            }
-
-            if (perform)
-            {
-                foreach (var a in events)
-                    a.Invoke();
-            }
-
-            delayingEvents = false;
-        }
-
-        private void handleEvent(Action a)
-        {
-            if (delayingEvents)
-                lock (queuedEvents)
-                    queuedEvents.Add(a);
-            else
-                a.Invoke();
-        }
-
         protected ArchiveModelManager(Storage storage, IDatabaseContextFactory contextFactory, MutableDatabaseBackedStoreWithFileIncludes<TModel, TFileModel> modelStore, IIpcHost importHost = null)
         {
             ContextFactory = contextFactory;
 
             ModelStore = modelStore;
-            ModelStore.ItemAdded += item => handleEvent(() => ItemAdded?.Invoke(item, false));
+            ModelStore.ItemAdded += item => handleEvent(() => ItemAdded?.Invoke(item));
             ModelStore.ItemRemoved += s => handleEvent(() => ItemRemoved?.Invoke(s));
 
             Files = new FileStore(contextFactory, storage);
@@ -345,8 +299,6 @@ namespace osu.Game.Database
                             {
                                 Undelete(existing);
                                 LogForModel(item, $"Found existing {HumanisedModelName} for {item} (ID {existing.ID}) – skipping import.");
-                                handleEvent(() => ItemAdded?.Invoke(existing, true));
-
                                 // existing item will be used; rollback new import and exit early.
                                 rollback();
                                 flushEvents(true);
@@ -632,6 +584,54 @@ namespace osu.Game.Database
 
             throw new InvalidFormatException($"{path} is not a valid archive");
         }
+
+        #region Event handling / delaying
+
+        private readonly List<Action> queuedEvents = new List<Action>();
+
+        /// <summary>
+        /// Allows delaying of outwards events until an operation is confirmed (at a database level).
+        /// </summary>
+        private bool delayingEvents;
+
+        /// <summary>
+        /// Begin delaying outwards events.
+        /// </summary>
+        private void delayEvents() => delayingEvents = true;
+
+        /// <summary>
+        /// Flush delayed events and disable delaying.
+        /// </summary>
+        /// <param name="perform">Whether the flushed events should be performed.</param>
+        private void flushEvents(bool perform)
+        {
+            Action[] events;
+
+            lock (queuedEvents)
+            {
+                events = queuedEvents.ToArray();
+                queuedEvents.Clear();
+            }
+
+            if (perform)
+            {
+                foreach (var a in events)
+                    a.Invoke();
+            }
+
+            delayingEvents = false;
+        }
+
+        private void handleEvent(Action a)
+        {
+            if (delayingEvents)
+                lock (queuedEvents)
+                    queuedEvents.Add(a);
+            else
+                a.Invoke();
+        }
+
+        #endregion
     }
 
     public abstract class ArchiveModelManager
