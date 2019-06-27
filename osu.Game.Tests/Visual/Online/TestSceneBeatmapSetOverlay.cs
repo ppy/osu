@@ -437,12 +437,12 @@ namespace osu.Game.Tests.Visual.Online
 
         private void downloadAssert(bool shown)
         {
-            AddAssert($"is download button {(shown ? "shown" : "hidden")}", () => overlay.IsDownloadButtonsShown == shown);
+            AddAssert($"is download button {(shown ? "shown" : "hidden")}", () => overlay.DownloadButtonsVisible == shown);
         }
 
         private class TestBeatmapSetOverlay : BeatmapSetOverlay
         {
-            public bool IsDownloadButtonsShown => Header.DownloadButtonsContainer.Any();
+            public bool DownloadButtonsVisible => Header.DownloadButtonsVisibile;
         }
     }
 }
