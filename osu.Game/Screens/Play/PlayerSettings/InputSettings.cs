@@ -25,6 +25,6 @@ namespace osu.Game.Screens.Play.PlayerSettings
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuConfigManager config) => mouseButtonsCheckbox.Bindable = config.GetBindable<bool>(OsuSetting.MouseDisableButtons);
+        private void load(OsuConfigManager config) => mouseButtonsCheckbox.Current = config.GetBindable<bool>(OsuSetting.MouseDisableButtons);
     }
 }
