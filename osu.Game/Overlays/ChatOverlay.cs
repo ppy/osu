@@ -379,6 +379,7 @@ namespace osu.Game.Overlays
             this.FadeOut(transition_length, Easing.InSine);
 
             ChannelSelectionOverlay.Hide();
+            channelManager.AvailableChannels.ItemsAdded -= toggleContinuation;
 
             textbox.HoldFocus = false;
             base.PopOut();
