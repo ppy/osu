@@ -50,7 +50,7 @@ namespace osu.Game.Rulesets.UI
         /// <summary>
         /// Whether this <see cref="Playfield"/> has failed.
         /// </summary>
-        protected readonly BindableBool HasFailed = new BindableBool();
+        public readonly BindableBool HasFailed = new BindableBool();
 
         /// <summary>
         /// Creates a new <see cref="Playfield"/>.
@@ -60,6 +60,8 @@ namespace osu.Game.Rulesets.UI
             RelativeSizeAxes = Axes.Both;
 
             hitObjectContainerLazy = new Lazy<HitObjectContainer>(CreateHitObjectContainer);
+
+            HasFailed.BindValueChanged(_ => fail(), true);
         }
 
         [Resolved]
@@ -148,14 +150,6 @@ namespace osu.Game.Rulesets.UI
         /// </summary>
         protected virtual HitObjectContainer CreateHitObjectContainer() => new HitObjectContainer();
 
-        /// <summary>
-        /// Applies the failing animation on this <see cref="Playfield"/>
-        /// </summary>
-        public void Fail()
-        {
-            NestedPlayfields.ForEach(p => p.Fail());
-            DisplayJudgements.Value = false;
-            HasFailed.Value = true;
-        }
+        private void fail() => NestedPlayfields.ForEach(p => p.HasFailed.Value = true);
     }
 }

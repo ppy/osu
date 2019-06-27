@@ -66,7 +66,7 @@ namespace osu.Game.Screens.Play
 
             track.AddAdjustment(AdjustableProperty.Frequency, trackFreq);
 
-            drawableRuleset.Playfield.Fail();
+            drawableRuleset.Playfield.HasFailed.Value = true;
         }
 
         protected override void Dispose(bool isDisposing)
