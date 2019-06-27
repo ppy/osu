@@ -30,7 +30,7 @@ namespace osu.Game.Tests
             trackStore = audioManager.GetTrackStore(reader);
         }
 
-        public override void Dispose()
+        protected override void Dispose(bool isDisposing)
         {
             base.Dispose();
             stream?.Dispose();

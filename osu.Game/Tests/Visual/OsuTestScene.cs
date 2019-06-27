@@ -137,7 +137,7 @@ namespace osu.Game.Tests.Visual
                     track = audio?.Tracks.GetVirtual(length);
             }
 
-            public override void Dispose()
+            protected override void Dispose(bool isDisposing)
             {
                 base.Dispose();
                 store?.Dispose();
