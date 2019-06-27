@@ -212,6 +212,12 @@ namespace osu.Game.Screens.Multi
 
         public override bool OnExiting(IScreen next)
         {
+            if (!(screenStack.CurrentScreen is LoungeSubScreen))
+            {
+                screenStack.Exit();
+                return true;
+            }
+
             waves.Hide();
 
             this.Delay(WaveContainer.DISAPPEAR_DURATION).FadeOut();

@@ -11,6 +11,7 @@ using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Online;
 using osu.Game.Online.API;
 using osu.Game.Overlays.Direct;
 using osu.Game.Users;
@@ -19,7 +20,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Overlays.BeatmapSet.Buttons
 {
-    public class DownloadButton : DownloadTrackingComposite, IHasTooltip
+    public class DownloadButton : BeatmapDownloadTrackingComposite, IHasTooltip
     {
         private readonly bool noVideo;
 

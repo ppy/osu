@@ -9,7 +9,7 @@ using osu.Game.Database;
 
 namespace osu.Game.Beatmaps
 {
-    public class BeatmapSetInfo : IHasPrimaryKey, IHasFiles<BeatmapSetFileInfo>, ISoftDelete
+    public class BeatmapSetInfo : IHasPrimaryKey, IHasFiles<BeatmapSetFileInfo>, ISoftDelete, IEquatable<BeatmapSetInfo>
     {
         public int ID { get; set; }
 
@@ -49,5 +49,7 @@ namespace osu.Game.Beatmaps
         public override string ToString() => Metadata?.ToString() ?? base.ToString();
 
         public bool Protected { get; set; }
+
+        public bool Equals(BeatmapSetInfo other) => OnlineBeatmapSetID == other?.OnlineBeatmapSetID;
     }
 }
