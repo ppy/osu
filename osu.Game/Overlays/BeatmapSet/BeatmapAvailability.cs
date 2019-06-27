@@ -19,29 +19,7 @@ namespace osu.Game.Overlays.BeatmapSet
         private bool downloadDisabled => BeatmapSet?.OnlineInfo.Availability?.DownloadDisabled ?? false;
         private bool hasExternalLink => !string.IsNullOrEmpty(BeatmapSet?.OnlineInfo.Availability?.ExternalLink);
 
-        public BeatmapSetInfo BeatmapSet
-        {
-            get => beatmapSet;
-            set
-            {
-                if (value == beatmapSet)
-                    return;
-
-                beatmapSet = value;
-
-                linkContainer.Clear();
-
-                if (downloadDisabled || hasExternalLink)
-                {
-                    Show();
-                    updateText();
-                }
-                else Hide();
-            }
-        }
-
-        private readonly TextFlowContainer textContainer;
-        private readonly LinkFlowContainer linkContainer;
+        private readonly LinkFlowContainer textContainer;
 
         public BeatmapAvailability()
         {
@@ -64,33 +42,51 @@ namespace osu.Game.Overlays.BeatmapSet
                     Padding = new MarginPadding(10),
                     Children = new Drawable[]
                     {
-                        textContainer = new TextFlowContainer(t => t.Font = OsuFont.GetFont(size: 14, weight: FontWeight.Medium))
+                        textContainer = new LinkFlowContainer(t => t.Font = OsuFont.GetFont(size: 14))
                         {
                             Direction = FillDirection.Full,
                             RelativeSizeAxes = Axes.X,
                             AutoSizeAxes = Axes.Y,
-                            Colour = Color4.Orange,
-                        },
-                        linkContainer = new LinkFlowContainer(t => t.Font = OsuFont.GetFont(size: 10))
-                        {
-                            Direction = FillDirection.Full,
-                            RelativeSizeAxes = Axes.X,
-                            AutoSizeAxes = Axes.Y,
-                            Padding = new MarginPadding { Top = 10 },
                         },
                     },
                 },
             };
         }
 
+        public BeatmapSetInfo BeatmapSet
+        {
+            get => beatmapSet;
+            set
+            {
+                if (value == beatmapSet)
+                    return;
+
+                beatmapSet = value;
+
+                if (downloadDisabled || hasExternalLink)
+                {
+                    Show();
+                    updateText();
+                }
+                else
+                    Hide();
+            }
+        }
+
         private void updateText()
         {
-            textContainer.Text = downloadDisabled
+            textContainer.Clear();
+
+            textContainer.AddParagraph(downloadDisabled
                 ? "This beatmap is currently not available for download."
-                : "Portions of this beatmap have been removed at the request of the creator or a third-party rights holder.";
+                : "Portions of this beatmap have been removed at the request of the creator or a third-party rights holder.", t => t.Colour = Color4.Orange);
 
             if (hasExternalLink)
-                linkContainer.AddLink("Check here for more information.", BeatmapSet.OnlineInfo.Availability.ExternalLink);
+            {
+                textContainer.NewParagraph();
+                textContainer.NewParagraph();
+                textContainer.AddLink("Check here for more information.", BeatmapSet.OnlineInfo.Availability.ExternalLink, creationParameters: t => t.Font = OsuFont.GetFont(size: 10));
+            }
         }
     }
 }
