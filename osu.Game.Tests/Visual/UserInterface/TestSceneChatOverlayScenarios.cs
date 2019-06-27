@@ -29,6 +29,7 @@ namespace osu.Game.Tests.Visual.UserInterface
 
         private TestChatOverlay chatOverlay;
         private ChannelManager channelManager;
+        private ChannelManagerContainer channelManagerContainer;
 
         private readonly Channel channel1 = new Channel(new User()) { Name = "test1" };
         private readonly Channel channel2 = new Channel(new User()) { Name = "test2" };
@@ -38,10 +39,9 @@ namespace osu.Game.Tests.Visual.UserInterface
         {
             Schedule(() =>
             {
-                ChannelManagerContainer container;
-                Child = container = new ChannelManagerContainer(new List<Channel> { channel1, channel2 }) { RelativeSizeAxes = Axes.Both, };
-                chatOverlay = container.ChatOverlay;
-                channelManager = container.ChannelManager;
+                Child = channelManagerContainer = new ChannelManagerContainer(new List<Channel> { channel1, channel2 }) { RelativeSizeAxes = Axes.Both, };
+                chatOverlay = channelManagerContainer.ChatOverlay;
+                channelManager = channelManagerContainer.ChannelManager;
             });
         }
 
@@ -76,6 +76,43 @@ namespace osu.Game.Tests.Visual.UserInterface
             AddAssert("Selector is visible", () => chatOverlay.SelectionOverlayState == Visibility.Visible);
         }
 
+        [Test]
+        public void TestShowWhileLoading()
+        {
+            setupUnloadedChannelsTest();
+            AddStep("Add some channels to available", () => channelManagerContainer.AddRange(new List<Channel> { channel1, channel2 }));
+            AddAssert("Selector is visible", () => chatOverlay.SelectionOverlayState == Visibility.Visible);
+        }
+
+        [Test]
+        public void TestHideWhileLoadingThenShow()
+        {
+            setupUnloadedChannelsTest();
+            AddStep("Close chat overlay", () => chatOverlay.Hide());
+            AddStep("Add some channels to available", () => channelManagerContainer.AddRange(new List<Channel> { channel1, channel2 }));
+            AddAssert("Selector is still closed", () => chatOverlay.SelectionOverlayState == Visibility.Hidden);
+        }
+
+        [Test]
+        public void TestShowWithChannelsJoined()
+        {
+            AddStep("Hide chat", () => chatOverlay.Hide());
+            AddStep("Join channel 1", () => channelManager.JoinChannel(channel1));
+            AddStep("Show chat", () => chatOverlay.Show());
+            AddAssert("Selector is still closed", () => chatOverlay.SelectionOverlayState == Visibility.Hidden);
+        }
+
+        private void setupUnloadedChannelsTest()
+        {
+            AddStep("Close chat overlay", () =>
+            {
+                chatOverlay.Hide();
+                channelManagerContainer.ClearAvailable();
+            });
+            AddStep("Toggle chat overlay", () => chatOverlay.Show());
+            AddAssert("Selector remained closed", () => chatOverlay.SelectionOverlayState == Visibility.Hidden);
+        }
+
         private void clickDrawable(Drawable d)
         {
             InputManager.MoveMouseTo(d);
@@ -89,18 +126,20 @@ namespace osu.Game.Tests.Visual.UserInterface
             [Cached]
             public ChannelManager ChannelManager { get; } = new ChannelManager();
 
-            private readonly List<Channel> channels;
+            public BindableList<Channel> AvailableChannels => (BindableList<Channel>)ChannelManager.AvailableChannels;
 
             public ChannelManagerContainer(List<Channel> channels)
             {
-                this.channels = channels;
+                AddRange(channels);
             }
+
+            public void ClearAvailable() => AvailableChannels.Clear();
+
+            public void AddRange(List<Channel> channels) => AvailableChannels.AddRange(channels);
 
             [BackgroundDependencyLoader]
             private void load()
             {
-                ((BindableList<Channel>)ChannelManager.AvailableChannels).AddRange(channels);
-
                 Child = ChatOverlay = new TestChatOverlay { RelativeSizeAxes = Axes.Both, };
                 ChatOverlay.Show();
             }

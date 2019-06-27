@@ -356,7 +356,21 @@ namespace osu.Game.Overlays
 
             textbox.HoldFocus = true;
 
+            // Don't show an empty channel selector if no channels are loaded yet.
+            if (!channelManager.AvailableChannels.Any())
+                channelManager.AvailableChannels.ItemsAdded += toggleContinuation;
+            else if (!channelManager.JoinedChannels.Any())
+                ChannelSelectionOverlay.Show();
+
             base.PopIn();
+        }
+
+        private void toggleContinuation(IEnumerable<Channel> channels)
+        {
+            if (!channelManager.JoinedChannels.Any() && State.Value == Visibility.Visible)
+                ChannelSelectionOverlay.Show();
+
+            channelManager.AvailableChannels.ItemsAdded -= toggleContinuation;
         }
 
         protected override void PopOut()
