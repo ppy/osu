@@ -56,6 +56,8 @@ namespace osu.Game.Skinning
 
         protected override IEnumerable<string> GetStableImportPaths() => GetStableStorage().GetDirectories(ImportFromStablePath);
 
+        protected override bool ShouldRemoveArchive(string path) => true;
+
         /// <summary>
         /// Returns a list of all usable <see cref="SkinInfo"/>s. Includes the special default skin plus all skins from <see cref="GetAllUserSkins"/>.
         /// </summary>

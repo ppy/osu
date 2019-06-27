@@ -83,6 +83,8 @@ namespace osu.Game.Beatmaps
 
         protected override IEnumerable<string> GetStableImportPaths() => GetStableStorage().GetDirectories(ImportFromStablePath);
 
+        protected override bool ShouldRemoveArchive(string path) => Path.GetExtension(path)?.ToLowerInvariant() == ".osz";
+
         protected override Task Populate(BeatmapSetInfo beatmapSet, ArchiveReader archive, CancellationToken cancellationToken = default)
         {
             if (archive != null)
