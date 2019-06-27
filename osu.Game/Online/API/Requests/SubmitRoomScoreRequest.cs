@@ -30,7 +30,10 @@ namespace osu.Game.Online.API.Requests
             req.ContentType = "application/json";
             req.Method = HttpMethod.Put;
 
-            req.AddRaw(JsonConvert.SerializeObject(scoreInfo));
+            req.AddRaw(JsonConvert.SerializeObject(scoreInfo, new JsonSerializerSettings
+            {
+                ReferenceLoopHandling = ReferenceLoopHandling.Ignore
+            }));
 
             return req;
         }
