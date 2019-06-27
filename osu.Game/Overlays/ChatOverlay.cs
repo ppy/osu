@@ -359,18 +359,10 @@ namespace osu.Game.Overlays
             // Don't show an empty channel selector if no channels are loaded yet.
             if (!channelManager.AvailableChannels.Any())
                 channelManager.AvailableChannels.ItemsAdded += toggleContinuation;
-            else if (!channelManager.JoinedChannels.Any())
-                ChannelSelectionOverlay.Show();
+            else
+                toggleSelectorIfEmpty();
 
             base.PopIn();
-        }
-
-        private void toggleContinuation(IEnumerable<Channel> channels)
-        {
-            if (!channelManager.JoinedChannels.Any() && State.Value == Visibility.Visible)
-                ChannelSelectionOverlay.Show();
-
-            channelManager.AvailableChannels.ItemsAdded -= toggleContinuation;
         }
 
         protected override void PopOut()
@@ -383,6 +375,19 @@ namespace osu.Game.Overlays
 
             textbox.HoldFocus = false;
             base.PopOut();
+        }
+
+        private void toggleContinuation(IEnumerable<Channel> channels)
+        {
+            toggleSelectorIfEmpty();
+
+            channelManager.AvailableChannels.ItemsAdded -= toggleContinuation;
+        }
+
+        private void toggleSelectorIfEmpty()
+        {
+            if (!channelManager.JoinedChannels.Any())
+                ChannelSelectionOverlay.Show();
         }
 
         private void onChannelAddedToJoinedChannels(IEnumerable<Channel> channels)
