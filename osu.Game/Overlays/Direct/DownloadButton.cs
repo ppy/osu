@@ -16,7 +16,7 @@ namespace osu.Game.Overlays.Direct
 {
     public class DownloadButton : BeatmapDownloadTrackingComposite
     {
-        protected bool DownloadAllowed => button.Enabled.Value;
+        protected bool DownloadEnabled => button.Enabled.Value;
 
         private readonly bool noVideo;
         private readonly SpriteIcon icon;
