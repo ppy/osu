@@ -18,7 +18,6 @@ namespace osu.Game.Online.Chat
     /// <summary>
     /// Manages everything channel related
     /// </summary>
-    [Cached]
     public class ChannelManager : PollingComponent
     {
         /// <summary>
