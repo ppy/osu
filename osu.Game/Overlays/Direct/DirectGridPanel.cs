@@ -25,7 +25,6 @@ namespace osu.Game.Overlays.Direct
         private const float vertical_padding = 5;
 
         private FillFlowContainer bottomPanel, statusContainer;
-        protected DownloadButton DownloadButton;
         private PlayButton playButton;
         private Box progressBar;
 
@@ -156,7 +155,7 @@ namespace osu.Game.Overlays.Direct
                                         },
                                     },
                                 },
-                                DownloadButton = new DownloadButton(SetInfo)
+                                new DownloadButton(SetInfo)
                                 {
                                     Size = new Vector2(50, 30),
                                     Margin = new MarginPadding(horizontal_padding),

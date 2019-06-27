@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
-using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
@@ -17,18 +16,16 @@ namespace osu.Game.Overlays.Direct
 {
     public class DownloadButton : BeatmapDownloadTrackingComposite
     {
+        protected bool DownloadAllowed => button.Enabled.Value;
+
         private readonly bool noVideo;
         private readonly SpriteIcon icon;
         private readonly SpriteIcon checkmark;
         private readonly Box background;
 
         private OsuColour colours;
-
         private readonly ShakeContainer shakeContainer;
-
         private readonly OsuAnimatedButton button;
-
-        public readonly BindableBool Enabled = new BindableBool(true);
 
         public DownloadButton(BeatmapSetInfo beatmapSet, bool noVideo = false)
             : base(beatmapSet)
@@ -66,8 +63,6 @@ namespace osu.Game.Overlays.Direct
                     }
                 }
             };
-
-            Enabled.BindTo(button.Enabled);
         }
 
         protected override void LoadComplete()
@@ -78,14 +73,14 @@ namespace osu.Game.Overlays.Direct
             FinishTransforms(true);
         }
 
-        [BackgroundDependencyLoader(permitNulls: true)]
+        [BackgroundDependencyLoader(true)]
         private void load(OsuColour colours, OsuGame game, BeatmapManager beatmaps)
         {
             this.colours = colours;
 
             if (BeatmapSet.Value.OnlineInfo.Availability?.DownloadDisabled ?? false)
             {
-                Enabled.Value = false;
+                button.Enabled.Value = false;
                 button.TooltipText = "This beatmap is currently not available for download.";
                 return;
             }
