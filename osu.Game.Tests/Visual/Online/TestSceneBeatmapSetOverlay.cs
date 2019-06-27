@@ -76,21 +76,22 @@ namespace osu.Game.Tests.Visual.Online
             {
                 overlay.ShowBeatmapSet(new BeatmapSetInfo
                 {
+                    OnlineBeatmapSetID = 1235,
                     Metadata = new BeatmapMetadata
                     {
-                        Title = @"Lachryma <Re:Queen’M>",
-                        Artist = @"Kaneko Chiharu",
-                        Source = @"SOUND VOLTEX III GRAVITY WARS",
-                        Tags = @"sdvx grace the 5th kac original song contest konami bemani",
+                        Title = @"an awesome beatmap",
+                        Artist = @"naru narusegawa",
+                        Source = @"hinata sou",
+                        Tags = @"test tag tag more tag",
                         Author = new User
                         {
-                            Username = @"Fresh Chicken",
-                            Id = 3984370,
+                            Username = @"BanchoBot",
+                            Id = 3,
                         },
                     },
                     OnlineInfo = new BeatmapSetOnlineInfo
                     {
-                        Preview = @"https://b.ppy.sh/preview/415886.mp3",
+                        Preview = @"https://b.ppy.sh/preview/12345.mp3",
                         PlayCount = 681380,
                         FavouriteCount = 356,
                         Submitted = new DateTime(2016, 2, 10),
@@ -237,7 +238,7 @@ namespace osu.Game.Tests.Visual.Online
                             },
                         },
                     },
-                }, false);
+                });
             });
 
             downloadAssert(true);
@@ -250,6 +251,7 @@ namespace osu.Game.Tests.Visual.Online
             {
                 overlay.ShowBeatmapSet(new BeatmapSetInfo
                 {
+                    OnlineBeatmapSetID = 1234,
                     Metadata = new BeatmapMetadata
                     {
                         Title = @"Soumatou Labyrinth",
@@ -415,7 +417,7 @@ namespace osu.Game.Tests.Visual.Online
                             },
                         },
                     },
-                }, false);
+                });
             });
 
             downloadAssert(false);
