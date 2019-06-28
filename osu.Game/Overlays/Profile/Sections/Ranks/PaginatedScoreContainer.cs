@@ -24,14 +24,12 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
             this.type = type;
             this.includeWeight = includeWeight;
 
-            ItemsPerPage = 5;
-
             ItemsContainer.Direction = FillDirection.Vertical;
         }
 
         protected override void ShowMore()
         {
-            request = new GetUserScoresRequest(User.Value.Id, type, VisiblePages++ * ItemsPerPage);
+            request = new GetUserScoresRequest(User.Value.Id, type, VisiblePages++ * ITEMS_PER_PAGE);
             request.Success += scores => Schedule(() =>
             {
                 foreach (var s in scores)
@@ -61,7 +59,7 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
                 LoadComponentsAsync(drawableScores, s =>
                 {
                     MissingText.Hide();
-                    MoreButton.FadeTo(scores.Count == ItemsPerPage ? 1 : 0);
+                    MoreButton.FadeTo(scores.Count == ITEMS_PER_PAGE ? 1 : 0);
                     MoreButton.IsLoading = false;
 
                     ItemsContainer.AddRange(s);

@@ -27,17 +27,15 @@ namespace osu.Game.Overlays.Profile.Sections.Beatmaps
         {
             this.type = type;
 
-            ItemsPerPage = 6;
-
             ItemsContainer.Spacing = new Vector2(panel_padding);
         }
 
         protected override void ShowMore()
         {
-            request = new GetUserBeatmapsRequest(User.Value.Id, type, VisiblePages++ * ItemsPerPage);
+            request = new GetUserBeatmapsRequest(User.Value.Id, type, VisiblePages++ * ITEMS_PER_PAGE);
             request.Success += sets => Schedule(() =>
             {
-                MoreButton.FadeTo(sets.Count == ItemsPerPage ? 1 : 0);
+                MoreButton.FadeTo(sets.Count == ITEMS_PER_PAGE ? 1 : 0);
                 MoreButton.IsLoading = false;
 
                 if (!sets.Any() && VisiblePages == 1)

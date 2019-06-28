@@ -17,15 +17,14 @@ namespace osu.Game.Overlays.Profile.Sections.Recent
         public PaginatedRecentActivityContainer(Bindable<User> user, string header, string missing)
             : base(user, header, missing)
         {
-            ItemsPerPage = 5;
         }
 
         protected override void ShowMore()
         {
-            request = new GetUserRecentActivitiesRequest(User.Value.Id, VisiblePages++ * ItemsPerPage);
+            request = new GetUserRecentActivitiesRequest(User.Value.Id, VisiblePages++ * ITEMS_PER_PAGE);
             request.Success += activities => Schedule(() =>
             {
-                MoreButton.FadeTo(activities.Count == ItemsPerPage ? 1 : 0);
+                MoreButton.FadeTo(activities.Count == ITEMS_PER_PAGE ? 1 : 0);
                 MoreButton.IsLoading = false;
 
                 if (!activities.Any() && VisiblePages == 1)
