@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -9,6 +10,7 @@ using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Online.API.Requests;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays.Direct;
 using osu.Game.Users;
 using osuTK;
@@ -63,16 +65,28 @@ namespace osu.Game.Overlays.Profile.Sections.Beatmaps
         {
             base.OnUserChanged(e);
 
-            var amountRequest = new GetUserBeatmapsRequest(User.Value.Id, type);
-            amountRequest.Success += sets => Schedule(() =>
+            int count = 0;
+
+            switch (type)
             {
-                if (!sets.Any())
-                    return;
+                case BeatmapSetType.Favourite:
+                    count = User.Value.FavouriteBeatmapsetCount[0];
+                    break;
+                case BeatmapSetType.Graveyard:
+                    count = User.Value.GraveyardBeatmapsetCount[0];
+                    break;
+                case BeatmapSetType.RankedAndApproved:
+                    count = User.Value.RankedAndApprovedBeatmapsetCount[0];
+                    break;
+                case BeatmapSetType.Unranked:
+                    count = User.Value.UnrankedBeatmapsetCount[0];
+                    break;
+            }
 
-                HeaderContainer.Add(new Counter(sets.Count));
-            });
+            if (count == 0)
+                return;
 
-            Api.Queue(amountRequest);
+            HeaderContainer.Add(new Counter(count));
         }
 
         protected override void Dispose(bool isDisposing)
