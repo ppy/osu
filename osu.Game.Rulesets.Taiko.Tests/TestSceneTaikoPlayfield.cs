@@ -247,10 +247,6 @@ namespace osu.Game.Rulesets.Taiko.Tests
                 : base(hitObject)
             {
             }
-
-            protected override void UpdateState(ArmedState state)
-            {
-            }
         }
     }
 }
