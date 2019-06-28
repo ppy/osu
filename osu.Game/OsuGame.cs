@@ -29,6 +29,7 @@ using osu.Framework.Threading;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
+using osu.Game.Graphics.UserInterface;
 using osu.Game.Input;
 using osu.Game.Overlays.Notifications;
 using osu.Game.Screens.Play;
@@ -82,6 +83,7 @@ namespace osu.Game
         private OsuScreenStack screenStack;
         private VolumeOverlay volume;
         private OsuLogo osuLogo;
+        private BackButton backButton;
 
         private MainMenu menuScreen;
         private Intro introScreen;
@@ -181,9 +183,9 @@ namespace osu.Game
             configSkin.ValueChanged += skinId => SkinManager.CurrentSkinInfo.Value = SkinManager.Query(s => s.ID == skinId.NewValue) ?? SkinInfo.Default;
             configSkin.TriggerChange();
 
-            LocalConfig.BindWith(OsuSetting.VolumeInactive, userInactiveVolume);
-
             IsActive.BindValueChanged(active => updateActiveState(active.NewValue), true);
+
+            Audio.AddAdjustment(AdjustableProperty.Volume, inactiveVolumeFade);
 
             Beatmap.BindValueChanged(beatmapChanged, true);
         }
@@ -399,6 +401,16 @@ namespace osu.Game
                     Children = new Drawable[]
                     {
                         screenStack = new OsuScreenStack { RelativeSizeAxes = Axes.Both },
+                        backButton = new BackButton
+                        {
+                            Anchor = Anchor.BottomLeft,
+                            Origin = Anchor.BottomLeft,
+                            Action = () =>
+                            {
+                                if ((screenStack.CurrentScreen as IOsuScreen)?.AllowBackButton == true)
+                                    screenStack.Exit();
+                            }
+                        },
                         logoContainer = new Container { RelativeSizeAxes = Axes.Both },
                     }
                 },
@@ -707,22 +719,14 @@ namespace osu.Game
 
         #region Inactive audio dimming
 
-        private readonly BindableDouble userInactiveVolume = new BindableDouble();
-
         private readonly BindableDouble inactiveVolumeFade = new BindableDouble();
 
         private void updateActiveState(bool isActive)
         {
             if (isActive)
-            {
-                this.TransformBindableTo(inactiveVolumeFade, 1, 500, Easing.OutQuint)
-                    .Finally(_ => Audio.RemoveAdjustment(AdjustableProperty.Volume, inactiveVolumeFade)); //wait for the transition to finish to remove the inactive audio adjustment
-            }
+                this.TransformBindableTo(inactiveVolumeFade, 1, 400, Easing.OutQuint);
             else
-            {
-                Audio.AddAdjustment(AdjustableProperty.Volume, inactiveVolumeFade);
-                this.TransformBindableTo(inactiveVolumeFade, userInactiveVolume.Value, 1500, Easing.OutSine);
-            }
+                this.TransformBindableTo(inactiveVolumeFade, LocalConfig.Get<double>(OsuSetting.VolumeInactive), 4000, Easing.OutQuint);
         }
 
         #endregion
@@ -803,6 +807,11 @@ namespace osu.Game
                     CloseAllOverlays();
                 else
                     Toolbar.Show();
+
+                if (newOsuScreen.AllowBackButton)
+                    backButton.Show();
+                else
+                    backButton.Hide();
             }
         }
 
