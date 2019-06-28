@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Extensions.TypeExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Primitives;
@@ -88,8 +89,6 @@ namespace osu.Game.Rulesets.Objects.Drawables
 
         public readonly Bindable<ArmedState> State = new Bindable<ArmedState>();
 
-        protected bool HasFailed;
-
         protected DrawableHitObject(HitObject hitObject)
         {
             HitObject = hitObject;
@@ -143,7 +142,17 @@ namespace osu.Game.Rulesets.Objects.Drawables
             State.TriggerChange();
         }
 
-        protected abstract void UpdateState(ArmedState state);
+        protected virtual void UpdateState(ArmedState state)
+        {
+            switch (state)
+            {
+                case ArmedState.Fail:
+                    this.RotateTo(RNG.NextSingle(-90, 90), FailAnimation.FAIL_DURATION);
+                    this.ScaleTo(Scale * 0.5f, FailAnimation.FAIL_DURATION);
+                    this.MoveToOffset(new Vector2(0, 400), FailAnimation.FAIL_DURATION);
+                    break;
+            }
+        }
 
         /// <summary>
         /// Bind to apply a custom state which can override the default implementation.
@@ -200,7 +209,8 @@ namespace osu.Game.Rulesets.Objects.Drawables
         /// <param name="application">The callback that applies changes to the <see cref="JudgementResult"/>.</param>
         protected void ApplyResult(Action<JudgementResult> application)
         {
-            if (HasFailed)
+            // Judgement Results must not be applied if in a failing state
+            if (State.Value == ArmedState.Fail)
                 return;
 
             application?.Invoke(Result);
@@ -293,21 +303,8 @@ namespace osu.Game.Rulesets.Objects.Drawables
         /// </summary>
         public void Fail()
         {
-            if (HasFailed)
-                return;
-
-            OnFail();
-
-            this.FlashColour(Color4.Red, 500);
-            this.FadeOut(FailAnimation.FAIL_DURATION / 2);
-            HasFailed = true;
-        }
-
-        protected virtual void OnFail()
-        {
-            this.RotateTo(RNG.NextSingle(-90, 90), FailAnimation.FAIL_DURATION);
-            this.ScaleTo(Scale * 0.5f, FailAnimation.FAIL_DURATION);
-            this.MoveToOffset(new Vector2(0, 400), FailAnimation.FAIL_DURATION);
+            NestedHitObjects.ForEach(h => h.Fail());
+            State.Value = ArmedState.Fail;
         }
     }
 
