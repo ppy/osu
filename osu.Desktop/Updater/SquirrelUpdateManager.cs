@@ -133,8 +133,8 @@ namespace osu.Desktop.Updater
                     Text = @"Update ready to install. Click to restart!",
                     Activated = () =>
                     {
-                        updateManager.PrepareUpdate();
-                        game.GracefullyExit();
+                        updateManager.PrepareUpdateAsync()
+                            .ContinueWith(_ => Schedule(() => game.GracefullyExit()));
                         return true;
                     }
                 };
