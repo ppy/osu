@@ -48,9 +48,14 @@ namespace osu.Game.Online.Chat
         /// </summary>
         public IBindableList<Channel> AvailableChannels => availableChannels;
 
-        private IAPIProvider api;
+        /// <summary>
+        /// Whether or not <see cref="JoinedChannels"/>, <see cref="AvailableChannels"/>, and <see cref="CurrentChannel"/> have been initialized.
+        /// </summary>
+        public readonly BindableBool IsInitialized = new BindableBool();
 
         public readonly BindableBool HighPollRate = new BindableBool();
+
+        private IAPIProvider api;
 
         public ChannelManager()
         {
@@ -231,8 +236,6 @@ namespace osu.Game.Online.Chat
                 channels.Find(c => c.Id == group.Key)?.AddNewMessages(group.ToArray());
         }
 
-        public Action OnInitializeChannels;
-
         private void initializeChannels()
         {
             var req = new ListChannelsRequest();
@@ -250,7 +253,7 @@ namespace osu.Game.Online.Chat
                         JoinChannel(ch);
                 }
 
-                OnInitializeChannels?.Invoke();
+                IsInitialized.Value = true;
             };
             req.Failure += error =>
             {
