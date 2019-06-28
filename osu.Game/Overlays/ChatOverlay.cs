@@ -364,7 +364,7 @@ namespace osu.Game.Overlays
 
             // Don't show an empty channel selector if no channels are loaded yet.
             if (!channelManager.AvailableChannels.Any())
-                channelManager.AvailableChannels.ItemsAdded += toggleContinuation;
+                channelManager.OnInitializeChannels += toggleContinuation;
             else
                 toggleSelectorIfEmpty();
 
@@ -377,17 +377,17 @@ namespace osu.Game.Overlays
             this.FadeOut(transition_length, Easing.InSine);
 
             ChannelSelectionOverlay.Hide();
-            channelManager.AvailableChannels.ItemsAdded -= toggleContinuation;
+            channelManager.OnInitializeChannels = null;
 
             textbox.HoldFocus = false;
             base.PopOut();
         }
 
-        private void toggleContinuation(IEnumerable<Channel> channels)
+        private void toggleContinuation()
         {
             toggleSelectorIfEmpty();
 
-            channelManager.AvailableChannels.ItemsAdded -= toggleContinuation;
+            channelManager.OnInitializeChannels = null;
         }
 
         private void toggleSelectorIfEmpty()

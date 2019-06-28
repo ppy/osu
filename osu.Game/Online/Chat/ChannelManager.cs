@@ -231,6 +231,8 @@ namespace osu.Game.Online.Chat
                 channels.Find(c => c.Id == group.Key)?.AddNewMessages(group.ToArray());
         }
 
+        public Action OnInitializeChannels;
+
         private void initializeChannels()
         {
             var req = new ListChannelsRequest();
@@ -247,6 +249,8 @@ namespace osu.Game.Online.Chat
                     if (joinDefaults && defaultChannels.Any(c => c.Equals(channel.Name, StringComparison.OrdinalIgnoreCase)))
                         JoinChannel(ch);
                 }
+
+                OnInitializeChannels?.Invoke();
             };
             req.Failure += error =>
             {
