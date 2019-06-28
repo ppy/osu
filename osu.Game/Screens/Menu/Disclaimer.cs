@@ -24,8 +24,8 @@ namespace osu.Game.Screens.Menu
         private Intro intro;
         private SpriteIcon icon;
         private Color4 iconColour;
-        private LinkFlowContainer textFlow;
-        private LinkFlowContainer supportFlow;
+        private OsuTextFlowContainer textFlow;
+        private OsuTextFlowContainer supportFlow;
 
         private Drawable heart;
 
@@ -62,7 +62,7 @@ namespace osu.Game.Screens.Menu
                     Origin = Anchor.TopCentre,
                     Children = new Drawable[]
                     {
-                        textFlow = new LinkFlowContainer
+                        textFlow = new OsuTextFlowContainer
                         {
                             RelativeSizeAxes = Axes.X,
                             AutoSizeAxes = Axes.Y,
@@ -71,7 +71,7 @@ namespace osu.Game.Screens.Menu
                             Origin = Anchor.TopCentre,
                             Spacing = new Vector2(0, 2),
                         },
-                        supportFlow = new LinkFlowContainer
+                        supportFlow = new OsuTextFlowContainer
                         {
                             RelativeSizeAxes = Axes.X,
                             AutoSizeAxes = Axes.Y,
@@ -96,9 +96,7 @@ namespace osu.Game.Screens.Menu
             textFlow.AddParagraph("Detailed bug reports are welcomed via github issues.", format);
             textFlow.NewParagraph();
 
-            textFlow.AddText("Visit ", format);
-            textFlow.AddLink("discord.gg/ppy", "https://discord.gg/ppy", creationParameters: format);
-            textFlow.AddText(" to help out or follow progress!", format);
+            textFlow.AddText("Visit discord.gg/ppy to help out or follow progress!", format);
 
             textFlow.NewParagraph();
             textFlow.NewParagraph();
@@ -112,15 +110,9 @@ namespace osu.Game.Screens.Menu
                 supportFlow.Children.ForEach(d => d.FadeOut().Expire());
 
                 if (e.NewValue.IsSupporter)
-                {
                     supportFlow.AddText("Thank you for supporting osu!", format);
-                }
                 else
-                {
-                    supportFlow.AddText("Consider becoming an ", format);
-                    supportFlow.AddLink("osu!supporter", "https://osu.ppy.sh/home/support", creationParameters: format);
-                    supportFlow.AddText(" to help support the game", format);
-                }
+                    supportFlow.AddText("Consider becoming an osu!supporter to help support the game", format);
 
                 heart = supportFlow.AddIcon(FontAwesome.Solid.Heart, t =>
                 {
