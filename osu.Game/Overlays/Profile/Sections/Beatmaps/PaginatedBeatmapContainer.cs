@@ -70,15 +70,19 @@ namespace osu.Game.Overlays.Profile.Sections.Beatmaps
                 case BeatmapSetType.Favourite:
                     count = User.Value.FavouriteBeatmapsetCount[0];
                     break;
+
                 case BeatmapSetType.Graveyard:
                     count = User.Value.GraveyardBeatmapsetCount[0];
                     break;
+
                 case BeatmapSetType.Loved:
                     count = User.Value.LovedBeatmapsetCount[0];
                     break;
+
                 case BeatmapSetType.RankedAndApproved:
                     count = User.Value.RankedAndApprovedBeatmapsetCount[0];
                     break;
+
                 case BeatmapSetType.Unranked:
                     count = User.Value.UnrankedBeatmapsetCount[0];
                     break;
