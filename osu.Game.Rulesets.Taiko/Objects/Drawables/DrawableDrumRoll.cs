@@ -97,6 +97,8 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
                     this.FadeOut(100).Expire();
                     break;
             }
+
+            base.UpdateState(state);
         }
 
         protected override DrawableStrongNestedHit CreateStrongHit(StrongHitObject hitObject) => new StrongNestedHit(hitObject, this);

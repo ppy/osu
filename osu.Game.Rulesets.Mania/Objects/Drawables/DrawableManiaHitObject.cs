@@ -70,6 +70,8 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
                     this.FadeOut(150, Easing.OutQuint).Expire();
                     break;
             }
+
+            base.UpdateState(state);
         }
     }
 }

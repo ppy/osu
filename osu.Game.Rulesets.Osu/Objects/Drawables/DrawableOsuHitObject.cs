@@ -51,6 +51,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                 using (BeginDelayedSequence(HitObject.TimePreempt + judgementOffset, true))
                     UpdateCurrentState(state);
             }
+
+            base.UpdateState(state);
         }
 
         protected override void SkinChanged(ISkinSource skin, bool allowFallback)
