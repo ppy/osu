@@ -25,7 +25,7 @@ namespace osu.Desktop.Updater
         private UpdateManager updateManager;
         private NotificationOverlay notificationOverlay;
 
-        public Task PrepareUpdate() => UpdateManager.RestartAppWhenExited();
+        public Task PrepareUpdateAsync() => UpdateManager.RestartAppWhenExited();
 
         [BackgroundDependencyLoader]
         private void load(NotificationOverlay notification, OsuGameBase game)
@@ -86,8 +86,7 @@ namespace osu.Desktop.Updater
                     }
                     else
                     {
-                        if (notification != null)
-                            notification.State = ProgressNotificationState.Cancelled;
+                        notification.State = ProgressNotificationState.Cancelled;
                         Logger.Error(e, @"update failed!");
                     }
                 }
@@ -130,7 +129,7 @@ namespace osu.Desktop.Updater
                     Activated = () =>
                     {
                         updateManager.PrepareUpdateAsync()
-                            .ContinueWith(_ => Schedule(() => game.GracefullyExit()));
+                                     .ContinueWith(_ => Schedule(() => game.GracefullyExit()));
                         return true;
                     }
                 };
