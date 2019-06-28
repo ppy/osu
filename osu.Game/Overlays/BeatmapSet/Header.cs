@@ -43,7 +43,7 @@ namespace osu.Game.Overlays.BeatmapSet
 
         public readonly BeatmapPicker Picker;
 
-        private readonly RulesetTabControl tabControl;
+        private readonly BeatmapRulesetSelector tabControl;
 
         private readonly FavouriteButton favouriteButton;
 
@@ -79,7 +79,7 @@ namespace osu.Game.Overlays.BeatmapSet
                         {
                             RelativeSizeAxes = Axes.Both,
                         },
-                        tabControl = new RulesetTabControl
+                        tabControl = new BeatmapRulesetSelector
                         {
                             RelativeSizeAxes = Axes.Both,
                         },

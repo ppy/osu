@@ -40,7 +40,7 @@ namespace osu.Game.Tests.Visual.Online
             typeof(PreviewButton),
             typeof(SuccessRate),
             typeof(BeatmapAvailability),
-            typeof(RulesetTabControl)
+            typeof(BeatmapRulesetSelector)
         };
 
         private RulesetInfo taikoRuleset;

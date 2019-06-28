@@ -18,7 +18,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Overlays.BeatmapSet
 {
-    public class RulesetTabControl : RulesetSelector
+    public class BeatmapRulesetSelector : RulesetSelector
     {
         private readonly Box bar;
 
@@ -44,7 +44,7 @@ namespace osu.Game.Overlays.BeatmapSet
             Origin = TabContainer.Origin,
         };
 
-        public RulesetTabControl()
+        public BeatmapRulesetSelector()
         {
             TabContainer.Anchor = Anchor.BottomCentre;
             TabContainer.Origin = Anchor.BottomCentre;
