@@ -77,10 +77,6 @@ namespace osu.Game.Rulesets.Objects.Drawables
 
         private bool judgementOccurred;
 
-        public bool Interactive = true;
-        public override bool HandleNonPositionalInput => Interactive;
-        public override bool HandlePositionalInput => Interactive;
-
         public override bool RemoveWhenNotAlive => false;
         public override bool RemoveCompletedTransforms => false;
         protected override bool RequiresChildrenUpdate => true;

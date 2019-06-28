@@ -45,9 +45,9 @@ namespace osu.Game.Graphics.UserInterface
             }
         }
 
-        protected override ScrollContainer<Drawable> CreateScrollContainer(Direction direction) => new OsuScrollContainer(direction);
-
         protected override DrawableMenuItem CreateDrawableMenuItem(MenuItem item) => new DrawableOsuMenuItem(item);
+
+        protected override ScrollContainer<Drawable> CreateScrollContainer(Direction direction) => new OsuScrollContainer(direction);
 
         protected override Menu CreateSubMenu() => new OsuMenu(Direction.Vertical)
         {
