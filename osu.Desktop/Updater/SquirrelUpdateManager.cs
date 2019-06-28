@@ -25,11 +25,7 @@ namespace osu.Desktop.Updater
         private UpdateManager updateManager;
         private NotificationOverlay notificationOverlay;
 
-        public void PrepareUpdate()
-        {
-            // Squirrel returns execution to us after the update process is started, so it's safe to use Wait() here
-            UpdateManager.RestartAppWhenExited().Wait();
-        }
+        public Task PrepareUpdate() => UpdateManager.RestartAppWhenExited();
 
         [BackgroundDependencyLoader]
         private void load(NotificationOverlay notification, OsuGameBase game)
