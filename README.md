@@ -72,7 +72,7 @@ If the build fails, try to restore nuget packages with `dotnet restore`.
 
 On Linux, the environment variable `LD_LIBRARY_PATH` must point to the build directory, located at `osu.Desktop/bin/Debug/$NETCORE_VERSION`.
 
-`$NETCORE_VERSION` is the version of .NET Core SDK. You can have it with `grep TargetFramework osu.Desktop/osu.Desktop.csproj | sed -r 's/.*>(.*)<\/.*/\1/'`.
+`$NETCORE_VERSION` is the version of the targeted .NET Core SDK. You can check it by running `grep TargetFramework osu.Desktop/osu.Desktop.csproj | sed -r 's/.*>(.*)<\/.*/\1/'`.
 
 For example, you can run osu! with the following command:
 
