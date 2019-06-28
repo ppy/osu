@@ -98,7 +98,17 @@ namespace osu.Game.Tests.Visual.UserInterface
         {
             AddStep("Hide chat", () => chatOverlay.Hide());
             AddStep("Join channel 1", () => channelManager.JoinChannel(channel1));
+            AddStep("Join channel 2", () => channelManager.JoinChannel(channel2));
             AddStep("Show chat", () => chatOverlay.Show());
+            AddAssert("Selector is still closed", () => chatOverlay.SelectionOverlayState == Visibility.Hidden);
+        }
+
+        [Test]
+        public void TestShowWhileLoadingWithJoined()
+        {
+            AddStep("Join channel 2", () => channelManager.JoinChannel(channel2));
+            setupUnloadedChannelsTest();
+            AddStep("Add some channels to available", () => channelManagerContainer.AddRange(new List<Channel> { channel1, channel2 }));
             AddAssert("Selector is still closed", () => chatOverlay.SelectionOverlayState == Visibility.Hidden);
         }
 
