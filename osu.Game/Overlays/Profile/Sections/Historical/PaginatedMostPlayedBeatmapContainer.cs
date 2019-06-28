@@ -18,14 +18,16 @@ namespace osu.Game.Overlays.Profile.Sections.Historical
             : base(user, "Most Played Beatmaps", "No records. :(")
         {
             ItemsContainer.Direction = FillDirection.Vertical;
+
+            ItemsPerPage = 5;
         }
 
         protected override void ShowMore()
         {
-            request = new GetUserMostPlayedBeatmapsRequest(User.Value.Id, VisiblePages++ * ITEMS_PER_PAGE);
+            request = new GetUserMostPlayedBeatmapsRequest(User.Value.Id, VisiblePages++ * ItemsPerPage, ItemsPerPage);
             request.Success += beatmaps => Schedule(() =>
             {
-                MoreButton.FadeTo(beatmaps.Count == ITEMS_PER_PAGE ? 1 : 0);
+                MoreButton.FadeTo(beatmaps.Count == ItemsPerPage ? 1 : 0);
                 MoreButton.IsLoading = false;
 
                 if (!beatmaps.Any() && VisiblePages == 1)

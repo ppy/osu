@@ -16,14 +16,13 @@ namespace osu.Game.Overlays.Profile.Sections
 {
     public abstract class PaginatedContainer : FillFlowContainer
     {
-        protected const int ITEMS_PER_PAGE = 5;
-
         protected readonly FillFlowContainer ItemsContainer;
         protected readonly FillFlowContainer HeaderContainer;
         protected readonly ShowMoreButton MoreButton;
         protected readonly OsuSpriteText MissingText;
 
         protected int VisiblePages;
+        protected int ItemsPerPage;
 
         protected readonly Bindable<User> User = new Bindable<User>();
 

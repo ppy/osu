@@ -11,16 +11,18 @@ namespace osu.Game.Online.API.Requests
         private readonly long userId;
         private readonly ScoreType type;
         private readonly int offset;
+        private readonly int limit;
 
-        public GetUserScoresRequest(long userId, ScoreType type, int offset = 0)
+        public GetUserScoresRequest(long userId, ScoreType type, int offset = 0, int limit = 0)
         {
             this.userId = userId;
             this.type = type;
             this.offset = offset;
+            this.limit = limit;
         }
 
         // ReSharper disable once ImpureMethodCallOnReadonlyValueField
-        protected override string Target => $@"users/{userId}/scores/{type.ToString().ToLowerInvariant()}?offset={offset}";
+        protected override string Target => $@"users/{userId}/scores/{type.ToString().ToLowerInvariant()}?offset={offset}&limit={limit}";
     }
 
     public enum ScoreType
