@@ -231,9 +231,15 @@ namespace osu.Game.Overlays
         {
             if (e.NewValue == null)
             {
-                textbox.Current.Disabled = true;
-                currentChannelContainer.Clear(false);
-                ChannelSelectionOverlay.Show();
+                // e.OldValue is null when this gets run from runOnceImmediately
+                // In that case, don't to show the selection overlay since the channel list might not have loaded yet.
+                if (e.OldValue != null)
+                {
+                    textbox.Current.Disabled = true;
+                    currentChannelContainer.Clear(false);
+                    ChannelSelectionOverlay.Show();
+                }
+
                 return;
             }
 

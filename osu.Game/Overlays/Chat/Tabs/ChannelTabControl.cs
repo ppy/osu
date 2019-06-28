@@ -105,6 +105,13 @@ namespace osu.Game.Overlays.Chat.Tabs
             selectorTab.Active.Value = false;
         }
 
+        protected override void LoadComplete()
+        {
+            // As ChannelSelector selection logic is handled elsewhere, do not select a tab on load if SelectedTab is null
+            if (SelectedTab != null)
+                SelectTab(SelectedTab);
+        }
+
         private void tabCloseRequested(TabItem<Channel> tab)
         {
             int totalTabs = TabContainer.Count - 1; // account for selectorTab
