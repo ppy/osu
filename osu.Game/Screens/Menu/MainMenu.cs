@@ -18,9 +18,6 @@ using osu.Game.Screens.Direct;
 using osu.Game.Screens.Edit;
 using osu.Game.Screens.Multi;
 using osu.Game.Screens.Select;
-using osu.Game.Screens.Tournament;
-using osu.Framework.Platform;
-using osu.Game.Overlays;
 using osu.Framework.Graphics.Containers;
 
 namespace osu.Game.Screens.Menu

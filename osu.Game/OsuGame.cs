@@ -384,7 +384,6 @@ namespace osu.Game
             ScoreManager.PresentImport = items => PresentScore(items.First());
 
             Container logoContainer;
-            SafeAreaContainer safeAreaContainer;
 
             dependencies.CacheAs(idleTracker = new GameIdleTracker(6000));
 
@@ -396,10 +395,10 @@ namespace osu.Game
                     ActionRequested = action => volume.Adjust(action),
                     ScrollActionRequested = (action, amount, isPrecise) => volume.Adjust(action, amount, isPrecise),
                 },
-                safeAreaContainer = new SafeAreaContainer
+                new SafeAreaContainer
                 {
                     RelativeSizeAxes = Axes.Both,
-                    AppliedEdges = Edges.All,
+                    SafeEdges = Edges.All,
                     Children = new Drawable[]
                     {
                         screenStack = new OsuScreenStack { RelativeSizeAxes = Axes.Both },
@@ -418,11 +417,6 @@ namespace osu.Game
                 },
                 idleTracker
             });
-
-            // Currently we must cache a single SafeAreaContainer at the top level since loadComponentSingleFile will only
-            // use the dependencies of OsuGame.  Once this issue is resolved, individual SafeAreaContainers may be used in the
-            // previous call to AddRange.
-            dependencies.CacheAs<ISnapTargetContainer>(safeAreaContainer);
 
             screenStack.ScreenPushed += screenPushed;
             screenStack.ScreenExited += screenExited;
