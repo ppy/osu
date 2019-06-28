@@ -7,6 +7,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
     {
         Idle,
         Hit,
-        Miss
+        Miss,
+        Fail
     }
 }
