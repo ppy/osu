@@ -46,7 +46,7 @@ namespace osu.Game.Overlays.BeatmapSet
         private readonly RulesetTabControl tabControl;
 
         private readonly FavouriteButton favouriteButton;
-        
+
         private readonly FillFlowContainer fadeContent;
 
         private readonly LoadingAnimation loading;
@@ -216,7 +216,7 @@ namespace osu.Game.Overlays.BeatmapSet
             {
                 Details.Beatmap = b.NewValue;
                 externalLink.Link = $@"https://osu.ppy.sh/beatmapsets/{BeatmapSet.Value?.OnlineBeatmapSetID}#{b.NewValue?.Ruleset.ShortName}/{b.NewValue?.OnlineBeatmapID}";
-                
+
                 tabControl.SelectRuleset(b.NewValue?.Ruleset);
             };
         }
@@ -225,9 +225,6 @@ namespace osu.Game.Overlays.BeatmapSet
         private void load(OsuColour colours, RulesetStore rulesets)
         {
             tabsBg.Colour = colours.Gray3;
-
-            foreach (var ruleset in rulesets.AvailableRulesets)
-                tabControl.AddItem(ruleset);
 
             Picker.Ruleset.BindTo(tabControl.Current);
 

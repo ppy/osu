@@ -18,7 +18,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Overlays.BeatmapSet
 {
-    public class RulesetTabControl : TabControl<RulesetInfo>
+    public class RulesetTabControl : RulesetSelector
     {
         private readonly Box bar;
 
@@ -37,8 +37,6 @@ namespace osu.Game.Overlays.BeatmapSet
                     ((RulesetTabItem)tabItem).BeatmapsCount = value?.Beatmaps.FindAll(r => r.Ruleset.ID == tabItem.Value.ID).Count ?? 0;
             }
         }
-
-        protected override Dropdown<RulesetInfo> CreateDropdown() => null;
 
         protected override TabItem<RulesetInfo> CreateTabItem(RulesetInfo value) => new RulesetTabItem(value)
         {
