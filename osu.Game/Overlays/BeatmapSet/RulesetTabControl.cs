@@ -55,7 +55,7 @@ namespace osu.Game.Overlays.BeatmapSet
                 Anchor = TabContainer.Anchor,
                 Origin = TabContainer.Origin,
                 RelativeSizeAxes = Axes.X,
-                Height = 2,
+                Height = 1,
             });
         }
 
@@ -81,7 +81,7 @@ namespace osu.Game.Overlays.BeatmapSet
         private class RulesetTabItem : TabItem<RulesetInfo>
         {
             private readonly OsuSpriteText text;
-            private readonly ExpandingBar bar;
+            private readonly Box hoverBox;
 
             private readonly OsuSpriteText count;
             private readonly Container countContainer;
@@ -137,11 +137,13 @@ namespace osu.Game.Overlays.BeatmapSet
                             },
                         },
                     },
-                    bar = new ExpandingBar
+                    hoverBox = new Box
                     {
-                        Anchor = Anchor.BottomCentre,
-                        ExpandedSize = 10f,
-                        CollapsedSize = 0f,
+                        Anchor = Anchor.BottomLeft,
+                        Origin = Anchor.BottomLeft,
+                        RelativeSizeAxes = Axes.X,
+                        Scale = new Vector2(1, 0),
+                        Height = 5,
                     },
                     new HoverClickSounds(),
                 };
@@ -153,7 +155,7 @@ namespace osu.Game.Overlays.BeatmapSet
                 this.colours = colours;
 
                 text.Colour = colours.GrayC;
-                bar.Colour = colours.Yellow;
+                hoverBox.Colour = colours.Yellow;
 
                 count.Colour = colours.Gray3;
                 countContainer.EdgeEffect = new EdgeEffectParameters
@@ -170,16 +172,13 @@ namespace osu.Game.Overlays.BeatmapSet
             protected override bool OnHover(HoverEvent e)
             {
                 base.OnHover(e);
-
                 updateState();
-
                 return true;
             }
 
             protected override void OnHoverLost(HoverLostEvent e)
             {
                 base.OnHoverLost(e);
-
                 updateState();
             }
 
@@ -189,22 +188,22 @@ namespace osu.Game.Overlays.BeatmapSet
 
             private void updateState()
             {
-                this.FadeTo(Enabled.Value ? 1 : 0.25f);
-
                 if ((Active.Value || IsHovered) && Enabled.Value)
                 {
                     text.FadeColour(Color4.White, 120, Easing.InQuad);
-                    bar.Expand();
+                    hoverBox.ScaleTo(new Vector2(1), 120);
 
                     text.Font = text.Font.With(weight: Active.Value ? FontWeight.Bold : FontWeight.Medium);
                 }
                 else
                 {
                     text.FadeColour(colours.GrayC, 120, Easing.InQuad);
-                    bar.Collapse();
+                    hoverBox.ScaleTo(new Vector2(1, 0), 120);
 
                     text.Font = text.Font.With(weight: FontWeight.Medium);
                 }
+
+                this.FadeTo(Enabled.Value ? 1 : 0.25f);
             }
         }
     }
