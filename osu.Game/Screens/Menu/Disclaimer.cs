@@ -109,10 +109,7 @@ namespace osu.Game.Screens.Menu
             {
                 supportFlow.Children.ForEach(d => d.FadeOut().Expire());
 
-                if (e.NewValue.IsSupporter)
-                    supportFlow.AddText("Thank you for supporting osu!", format);
-                else
-                    supportFlow.AddText("Consider becoming an osu!supporter to help support the game", format);
+                supportFlow.AddText(e.NewValue.IsSupporter ? "Thank you for supporting osu!" : "Consider becoming an osu!supporter to help support the game", format);
 
                 heart = supportFlow.AddIcon(FontAwesome.Solid.Heart, t =>
                 {
