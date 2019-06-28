@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -73,7 +74,10 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
             {
                 case OsuAction.LeftButton:
                 case OsuAction.RightButton:
-                    if (--downCount == 0)
+                    // Todo: Math.Max() is required as a temporary measure to address https://github.com/ppy/osu-framework/issues/2576
+                    downCount = Math.Max(0, downCount - 1);
+
+                    if (downCount == 0)
                         updateExpandedState();
                     break;
             }

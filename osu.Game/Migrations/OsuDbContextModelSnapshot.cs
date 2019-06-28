@@ -14,7 +14,7 @@ namespace osu.Game.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "2.2.1-servicing-10028");
+                .HasAnnotation("ProductVersion", "2.2.4-servicing-10062");
 
             modelBuilder.Entity("osu.Game.Beatmaps.BeatmapDifficulty", b =>
                 {
@@ -166,6 +166,8 @@ namespace osu.Game.Migrations
                     b.Property<int>("ID")
                         .ValueGeneratedOnAdd();
 
+                    b.Property<DateTimeOffset>("DateAdded");
+
                     b.Property<bool>("DeletePending");
 
                     b.Property<string>("Hash");
@@ -198,10 +200,12 @@ namespace osu.Game.Migrations
                     b.Property<int>("ID")
                         .ValueGeneratedOnAdd();
 
-                    b.Property<int>("IntKey")
+                    b.Property<string>("Key")
                         .HasColumnName("Key");
 
                     b.Property<int?>("RulesetID");
+
+                    b.Property<int?>("SkinInfoID");
 
                     b.Property<string>("StringValue")
                         .HasColumnName("Value");
@@ -209,6 +213,8 @@ namespace osu.Game.Migrations
                     b.Property<int?>("Variant");
 
                     b.HasKey("ID");
+
+                    b.HasIndex("SkinInfoID");
 
                     b.HasIndex("RulesetID", "Variant");
 
@@ -440,6 +446,13 @@ namespace osu.Game.Migrations
                     b.HasOne("osu.Game.Beatmaps.BeatmapMetadata", "Metadata")
                         .WithMany("BeatmapSets")
                         .HasForeignKey("MetadataID");
+                });
+
+            modelBuilder.Entity("osu.Game.Configuration.DatabasedSetting", b =>
+                {
+                    b.HasOne("osu.Game.Skinning.SkinInfo")
+                        .WithMany("Settings")
+                        .HasForeignKey("SkinInfoID");
                 });
 
             modelBuilder.Entity("osu.Game.Scoring.ScoreFileInfo", b =>

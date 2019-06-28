@@ -1,4 +1,4 @@
-﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
@@ -27,12 +27,15 @@ using osu.Game.Scoring;
 using osu.Game.Screens.Ranking;
 using osu.Game.Skinning;
 using osu.Game.Storyboards.Drawables;
+using osu.Game.Users;
 
 namespace osu.Game.Screens.Play
 {
     public class Player : ScreenWithBeatmapBackground
     {
-        protected override bool AllowBackButton => false; // handled by HoldForMenuButton
+        public override bool AllowBackButton => false; // handled by HoldForMenuButton
+
+        protected override UserActivity InitialActivity => new UserActivity.SoloGame(Beatmap.Value.BeatmapInfo, Ruleset.Value);
 
         public override float BackgroundParallaxAmount => 0.1f;
 
@@ -103,7 +106,7 @@ namespace osu.Game.Screens.Play
             if (working == null)
                 return;
 
-            sampleRestart = audio.Sample.Get(@"Gameplay/restart");
+            sampleRestart = audio.Samples.Get(@"Gameplay/restart");
 
             mouseWheelDisabled = config.GetBindable<bool>(OsuSetting.MouseDisableWheel);
             showStoryboard = config.GetBindable<bool>(OsuSetting.ShowStoryboard);
@@ -173,7 +176,18 @@ namespace osu.Game.Screens.Play
                         fadeOut(true);
                         Restart();
                     },
-                }
+                },
+                new HotkeyExitOverlay
+                {
+                    Action = () =>
+                    {
+                        if (!this.IsCurrentScreen()) return;
+
+                        fadeOut(true);
+                        performImmediateExit();
+                    },
+                },
+                failAnimation = new FailAnimation(DrawableRuleset) { OnComplete = onFailComplete, }
             };
 
             DrawableRuleset.HasReplayLoaded.BindValueChanged(e => HUDOverlay.HoldToQuit.PauseOnFocusLost = !e.NewValue && PauseOnFocusLost, true);
@@ -237,6 +251,16 @@ namespace osu.Game.Screens.Play
             return working;
         }
 
+        private void performImmediateExit()
+        {
+            // if a restart has been requested, cancel any pending completion (user has shown intent to restart).
+            onCompletionEvent = null;
+
+            ValidForResume = false;
+
+            performUserRequestedExit();
+        }
+
         private void performUserRequestedExit()
         {
             if (!this.IsCurrentScreen()) return;
@@ -278,7 +302,7 @@ namespace osu.Game.Screens.Play
 
                     var score = CreateScore();
                     if (DrawableRuleset.ReplayScore == null)
-                        scoreManager.Import(score);
+                        scoreManager.Import(score).Wait();
 
                     this.Push(CreateResults(score));
 
@@ -345,24 +369,32 @@ namespace osu.Game.Screens.Play
 
         protected FailOverlay FailOverlay { get; private set; }
 
+        private FailAnimation failAnimation;
+
         private bool onFail()
         {
             if (Mods.Value.OfType<IApplicableFailOverride>().Any(m => !m.AllowFail))
                 return false;
-
-            GameplayClockContainer.Stop();
 
             HasFailed = true;
 
             // There is a chance that we could be in a paused state as the ruleset's internal clock (see FrameStabilityContainer)
             // could process an extra frame after the GameplayClock is stopped.
             // In such cases we want the fail state to precede a user triggered pause.
-            if (PauseOverlay.State == Visibility.Visible)
+            if (PauseOverlay.State.Value == Visibility.Visible)
                 PauseOverlay.Hide();
+
+            failAnimation.Start();
+            return true;
+        }
+
+        // Called back when the transform finishes
+        private void onFailComplete()
+        {
+            GameplayClockContainer.Stop();
 
             FailOverlay.Retries = RestartCount;
             FailOverlay.Show();
-            return true;
         }
 
         #endregion
@@ -488,6 +520,13 @@ namespace osu.Game.Screens.Play
             if (pauseCooldownActive && !GameplayClockContainer.IsPaused.Value)
                 // still want to block if we are within the cooldown period and not already paused.
                 return true;
+
+            if (HasFailed && ValidForResume && !FailOverlay.IsPresent)
+                // ValidForResume is false when restarting
+            {
+                failAnimation.FinishTransforms(true);
+                return true;
+            }
 
             GameplayClockContainer.ResetLocalAdjustments();
 

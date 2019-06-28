@@ -1,5 +1,5 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="osu!" type="DotNetProject" factoryName=".NET Project">
+  <configuration default="false" name="osu!" type="DotNetProject" factoryName=".NET Project" folderName="osu!">
     <option name="EXE_PATH" value="$PROJECT_DIR$/osu.Desktop/bin/Debug/netcoreapp2.2/osu!.dll" />
     <option name="PROGRAM_PARAMETERS" value="" />
     <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/osu.Desktop" />

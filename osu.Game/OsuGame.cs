@@ -29,6 +29,7 @@ using osu.Framework.Threading;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
+using osu.Game.Graphics.UserInterface;
 using osu.Game.Input;
 using osu.Game.Overlays.Notifications;
 using osu.Game.Screens.Play;
@@ -82,6 +83,7 @@ namespace osu.Game
         private OsuScreenStack screenStack;
         private VolumeOverlay volume;
         private OsuLogo osuLogo;
+        private BackButton backButton;
 
         private MainMenu menuScreen;
         private Intro introScreen;
@@ -132,12 +134,12 @@ namespace osu.Game
         public void CloseAllOverlays(bool hideToolbarElements = true)
         {
             foreach (var overlay in overlays)
-                overlay.State = Visibility.Hidden;
+                overlay.Hide();
 
             if (hideToolbarElements)
             {
                 foreach (var overlay in toolbarElements)
-                    overlay.State = Visibility.Hidden;
+                    overlay.Hide();
             }
         }
 
@@ -181,9 +183,11 @@ namespace osu.Game
             configSkin.ValueChanged += skinId => SkinManager.CurrentSkinInfo.Value = SkinManager.Query(s => s.ID == skinId.NewValue) ?? SkinInfo.Default;
             configSkin.TriggerChange();
 
-            LocalConfig.BindWith(OsuSetting.VolumeInactive, inactiveVolumeAdjust);
-
             IsActive.BindValueChanged(active => updateActiveState(active.NewValue), true);
+
+            Audio.AddAdjustment(AdjustableProperty.Volume, inactiveVolumeFade);
+
+            Beatmap.BindValueChanged(beatmapChanged, true);
         }
 
         private ExternalLinkOpener externalLinkOpener;
@@ -284,6 +288,23 @@ namespace osu.Game
             }, $"watch {databasedScoreInfo}", bypassScreenAllowChecks: true);
         }
 
+        #region Beatmap jukebox progression
+
+        private void beatmapChanged(ValueChangedEvent<WorkingBeatmap> beatmap)
+        {
+            var nextBeatmap = beatmap.NewValue;
+            if (nextBeatmap?.Track != null)
+                nextBeatmap.Track.Completed += currentTrackCompleted;
+        }
+
+        private void currentTrackCompleted()
+        {
+            if (!Beatmap.Value.Track.Looping && !Beatmap.Disabled)
+                musicController.NextTrack();
+        }
+
+        #endregion
+
         private ScheduledDelegate performFromMainMenuTask;
 
         /// <summary>
@@ -381,19 +402,18 @@ namespace osu.Game
                     AppliedEdges = Edges.All,
                     Children = new Drawable[]
                     {
-                        screenContainer = new ScalingContainer(ScalingMode.ExcludeOverlays)
+                        screenStack = new OsuScreenStack { RelativeSizeAxes = Axes.Both },
+                        backButton = new BackButton
                         {
-                            RelativeSizeAxes = Axes.Both,
-                            Children = new Drawable[]
+                            Anchor = Anchor.BottomLeft,
+                            Origin = Anchor.BottomLeft,
+                            Action = () =>
                             {
-                                screenStack = new OsuScreenStack { RelativeSizeAxes = Axes.Both },
-                                logoContainer = new Container { RelativeSizeAxes = Axes.Both },
+                                if ((screenStack.CurrentScreen as IOsuScreen)?.AllowBackButton == true)
+                                    screenStack.Exit();
                             }
                         },
-                        overlayContent = new Container { RelativeSizeAxes = Axes.Both },
-                        rightFloatingOverlayContent = new Container { RelativeSizeAxes = Axes.Both },
-                        leftFloatingOverlayContent = new Container { RelativeSizeAxes = Axes.Both },
-                        topMostOverlayContent = new Container { RelativeSizeAxes = Axes.Both },
+                        logoContainer = new Container { RelativeSizeAxes = Axes.Both },
                     }
                 },
                 idleTracker
@@ -449,6 +469,7 @@ namespace osu.Game
             loadComponentSingleFile(channelManager = new ChannelManager(), AddInternal, true);
             loadComponentSingleFile(chatOverlay = new ChatOverlay(), overlayContent.Add, true);
             loadComponentSingleFile(settings = new SettingsOverlay { GetToolbarHeight = () => ToolbarOffset }, leftFloatingOverlayContent.Add, true);
+            var changelogOverlay = loadComponentSingleFile(new ChangelogOverlay(), overlayContent.Add, true);
             loadComponentSingleFile(userProfile = new UserProfileOverlay(), overlayContent.Add, true);
             loadComponentSingleFile(beatmapSetOverlay = new BeatmapSetOverlay(), overlayContent.Add, true);
 
@@ -459,7 +480,7 @@ namespace osu.Game
                 Origin = Anchor.TopRight,
             }, rightFloatingOverlayContent.Add, true);
 
-            loadComponentSingleFile(new MusicController
+            loadComponentSingleFile(musicController = new MusicController
             {
                 GetToolbarHeight = () => ToolbarOffset,
                 Anchor = Anchor.TopRight,
@@ -474,7 +495,7 @@ namespace osu.Game
             loadComponentSingleFile(new DialogOverlay(), topMostOverlayContent.Add, true);
             loadComponentSingleFile(externalLinkOpener = new ExternalLinkOpener(), topMostOverlayContent.Add);
 
-            chatOverlay.StateChanged += state => channelManager.HighPollRate.Value = state == Visibility.Visible;
+            chatOverlay.State.ValueChanged += state => channelManager.HighPollRate.Value = state.NewValue == Visibility.Visible;
 
             Add(externalLinkOpener = new ExternalLinkOpener());
 
@@ -483,9 +504,9 @@ namespace osu.Game
 
             foreach (var overlay in singleDisplaySideOverlays)
             {
-                overlay.StateChanged += state =>
+                overlay.State.ValueChanged += state =>
                 {
-                    if (state == Visibility.Hidden) return;
+                    if (state.NewValue == Visibility.Hidden) return;
 
                     singleDisplaySideOverlays.Where(o => o != overlay).ForEach(o => o.Hide());
                 };
@@ -497,26 +518,26 @@ namespace osu.Game
 
             foreach (var overlay in informationalOverlays)
             {
-                overlay.StateChanged += state =>
+                overlay.State.ValueChanged += state =>
                 {
-                    if (state == Visibility.Hidden) return;
+                    if (state.NewValue == Visibility.Hidden) return;
 
                     informationalOverlays.Where(o => o != overlay).ForEach(o => o.Hide());
                 };
             }
 
             // ensure only one of these overlays are open at once.
-            var singleDisplayOverlays = new OverlayContainer[] { chatOverlay, social, direct };
+            var singleDisplayOverlays = new OverlayContainer[] { chatOverlay, social, direct, changelogOverlay };
             overlays.AddRange(singleDisplayOverlays);
 
             foreach (var overlay in singleDisplayOverlays)
             {
-                overlay.StateChanged += state =>
+                overlay.State.ValueChanged += state =>
                 {
                     // informational overlays should be dismissed on a show or hide of a full overlay.
                     informationalOverlays.ForEach(o => o.Hide());
 
-                    if (state == Visibility.Hidden) return;
+                    if (state.NewValue == Visibility.Hidden) return;
 
                     singleDisplayOverlays.Where(o => o != overlay).ForEach(o => o.Hide());
                 };
@@ -531,16 +552,16 @@ namespace osu.Game
             {
                 float offset = 0;
 
-                if (settings.State == Visibility.Visible)
+                if (settings.State.Value == Visibility.Visible)
                     offset += ToolbarButton.WIDTH / 2;
-                if (notifications.State == Visibility.Visible)
+                if (notifications.State.Value == Visibility.Visible)
                     offset -= ToolbarButton.WIDTH / 2;
 
                 screenContainer.MoveToX(offset, SettingsPanel.TRANSITION_LENGTH, Easing.OutQuint);
             }
 
-            settings.StateChanged += _ => updateScreenOffset();
-            notifications.StateChanged += _ => updateScreenOffset();
+            settings.State.ValueChanged += _ => updateScreenOffset();
+            notifications.State.ValueChanged += _ => updateScreenOffset();
         }
 
         public class GameIdleTracker : IdleTracker
@@ -699,15 +720,19 @@ namespace osu.Game
             return false;
         }
 
-        private readonly BindableDouble inactiveVolumeAdjust = new BindableDouble();
+        #region Inactive audio dimming
+
+        private readonly BindableDouble inactiveVolumeFade = new BindableDouble();
 
         private void updateActiveState(bool isActive)
         {
             if (isActive)
-                Audio.RemoveAdjustment(AdjustableProperty.Volume, inactiveVolumeAdjust);
+                this.TransformBindableTo(inactiveVolumeFade, 1, 400, Easing.OutQuint);
             else
-                Audio.AddAdjustment(AdjustableProperty.Volume, inactiveVolumeAdjust);
+                this.TransformBindableTo(inactiveVolumeFade, LocalConfig.Get<double>(OsuSetting.VolumeInactive), 4000, Easing.OutQuint);
         }
+
+        #endregion
 
         public bool OnReleased(GlobalAction action) => false;
 
@@ -720,7 +745,10 @@ namespace osu.Game
         private Container topMostOverlayContent;
 
         private FrameworkConfigManager frameworkConfig;
+
         private ScalingContainer screenContainer;
+
+        private MusicController musicController;
 
         protected override bool OnExiting()
         {
@@ -781,7 +809,12 @@ namespace osu.Game
                 if (newOsuScreen.HideOverlaysOnEnter)
                     CloseAllOverlays();
                 else
-                    Toolbar.State = Visibility.Visible;
+                    Toolbar.Show();
+
+                if (newOsuScreen.AllowBackButton)
+                    backButton.Show();
+                else
+                    backButton.Hide();
             }
         }
 

@@ -28,8 +28,6 @@ namespace osu.Game.Overlays
 
         protected const float WIDTH = 400;
 
-        private const float sidebar_padding = 10;
-
         protected Container<Drawable> ContentContainer;
 
         protected override Container<Drawable> Content => ContentContainer;

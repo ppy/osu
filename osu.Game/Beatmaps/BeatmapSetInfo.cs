@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
@@ -8,7 +9,7 @@ using osu.Game.Database;
 
 namespace osu.Game.Beatmaps
 {
-    public class BeatmapSetInfo : IHasPrimaryKey, IHasFiles<BeatmapSetFileInfo>, ISoftDelete
+    public class BeatmapSetInfo : IHasPrimaryKey, IHasFiles<BeatmapSetFileInfo>, ISoftDelete, IEquatable<BeatmapSetInfo>
     {
         public int ID { get; set; }
 
@@ -20,6 +21,8 @@ namespace osu.Game.Beatmaps
             set => onlineBeatmapSetID = value > 0 ? value : null;
         }
 
+        public DateTimeOffset DateAdded { get; set; }
+
         public BeatmapSetOnlineStatus Status { get; set; } = BeatmapSetOnlineStatus.None;
 
         public BeatmapMetadata Metadata { get; set; }
@@ -28,6 +31,9 @@ namespace osu.Game.Beatmaps
 
         [NotMapped]
         public BeatmapSetOnlineInfo OnlineInfo { get; set; }
+
+        [NotMapped]
+        public BeatmapSetMetrics Metrics { get; set; }
 
         public double MaxStarDifficulty => Beatmaps?.Max(b => b.StarDifficulty) ?? 0;
 
@@ -43,5 +49,7 @@ namespace osu.Game.Beatmaps
         public override string ToString() => Metadata?.ToString() ?? base.ToString();
 
         public bool Protected { get; set; }
+
+        public bool Equals(BeatmapSetInfo other) => OnlineBeatmapSetID == other?.OnlineBeatmapSetID;
     }
 }
