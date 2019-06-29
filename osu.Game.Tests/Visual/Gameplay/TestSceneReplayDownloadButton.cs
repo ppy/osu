@@ -9,7 +9,6 @@ using osu.Game.Rulesets.Osu;
 using osu.Game.Scoring;
 using osu.Game.Screens.Play;
 using osu.Game.Users;
-using osuTK;
 using System;
 using System.Collections.Generic;
 
@@ -62,7 +61,8 @@ namespace osu.Game.Tests.Visual.Gameplay
         {
             public void SetDownloadState(DownloadState state) => State.Value = state;
 
-            public TestReplayDownloadButton(ScoreInfo score) : base(score)
+            public TestReplayDownloadButton(ScoreInfo score)
+                : base(score)
             {
             }
         }
