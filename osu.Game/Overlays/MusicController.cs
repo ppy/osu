@@ -218,15 +218,9 @@ namespace osu.Game.Overlays
             beatmapSets.Insert(index, beatmapSetInfo);
         }
 
-        private void handleBeatmapAdded(BeatmapSetInfo obj, bool existing)
-        {
-            if (existing)
-                return;
+        private void handleBeatmapAdded(BeatmapSetInfo set) => Schedule(() => beatmapSets.Add(set));
 
-            Schedule(() => beatmapSets.Add(obj));
-        }
-
-        private void handleBeatmapRemoved(BeatmapSetInfo obj) => Schedule(() => beatmapSets.RemoveAll(s => s.ID == obj.ID));
+        private void handleBeatmapRemoved(BeatmapSetInfo set) => Schedule(() => beatmapSets.RemoveAll(s => s.ID == set.ID));
 
         protected override void LoadComplete()
         {
@@ -258,6 +252,12 @@ namespace osu.Game.Overlays
         protected override void Update()
         {
             base.Update();
+
+            if (pendingBeatmapSwitch != null)
+            {
+                pendingBeatmapSwitch();
+                pendingBeatmapSwitch = null;
+            }
 
             var track = current?.TrackLoaded ?? false ? current.Track : null;
 
@@ -368,15 +368,12 @@ namespace osu.Game.Overlays
                 mod.ApplyToClock(track);
         }
 
-        private ScheduledDelegate pendingBeatmapSwitch;
+        private Action pendingBeatmapSwitch;
 
         private void updateDisplay(WorkingBeatmap beatmap, TransformDirection direction)
         {
-            //we might be off-screen when this update comes in.
-            //rather than Scheduling, manually handle this to avoid possible memory contention.
-            pendingBeatmapSwitch?.Cancel();
-
-            pendingBeatmapSwitch = Schedule(delegate
+            // avoid using scheduler as our scheduler may not be run for a long time, holding references to beatmaps.
+            pendingBeatmapSwitch = delegate
             {
                 // todo: this can likely be replaced with WorkingBeatmap.GetBeatmapAsync()
                 Task.Run(() =>
@@ -416,7 +413,7 @@ namespace osu.Game.Overlays
 
                     playerContainer.Add(newBackground);
                 });
-            });
+            };
         }
 
         protected override void PopIn()
