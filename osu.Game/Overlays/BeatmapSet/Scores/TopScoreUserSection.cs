@@ -53,7 +53,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                         Size = new Vector2(40),
                         FillMode = FillMode.Fit,
                     },
-                    avatar = new UpdateableAvatar
+                    avatar = new UpdateableAvatar(hideImmediately: true)
                     {
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
@@ -90,7 +90,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                                 Origin = Anchor.CentreLeft,
                                 Font = OsuFont.GetFont(size: 15, weight: FontWeight.Bold)
                             },
-                            flag = new UpdateableFlag
+                            flag = new UpdateableFlag(hideImmediately: true)
                             {
                                 Anchor = Anchor.CentreLeft,
                                 Origin = Anchor.CentreLeft,
