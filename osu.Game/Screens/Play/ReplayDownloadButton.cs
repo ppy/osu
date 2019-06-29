@@ -1,4 +1,7 @@
-﻿using osu.Framework.Allocation;
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
+
+using osu.Framework.Allocation;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics;
@@ -12,6 +15,7 @@ using osu.Game.Online.API.Requests.Responses;
 using osu.Framework.Graphics.Effects;
 using osuTK.Graphics;
 using osu.Framework.Extensions.Color4Extensions;
+using osu.Framework.Graphics.Containers;
 
 namespace osu.Game.Screens.Play
 {
@@ -32,6 +36,7 @@ namespace osu.Game.Screens.Play
         private SpriteIcon downloadIcon;
         private SpriteIcon playIcon;
         private ShakeContainer shakeContainer;
+        private CircularContainer circle;
 
         public string TooltipText
         {
@@ -50,9 +55,7 @@ namespace osu.Game.Screens.Play
         public ReplayDownloadButton(ScoreInfo score)
             : base(score)
         {
-            Size = new Vector2(size);
-            CornerRadius = size / 2;
-            Masking = true;
+            AutoSizeAxes = Axes.Both;
         }
 
         private bool hasReplay => (Model.Value is APILegacyScoreInfo apiScore && apiScore.Replay) || scores.IsAvailableLocally(Model.Value);
@@ -60,44 +63,48 @@ namespace osu.Game.Screens.Play
         [BackgroundDependencyLoader(true)]
         private void load()
         {
-            EdgeEffect = new EdgeEffectParameters
-            {
-                Colour = Color4.Black.Opacity(0.4f),
-                Type = EdgeEffectType.Shadow,
-                Radius = 5,
-            };
-
             InternalChild = shakeContainer = new ShakeContainer
             {
-                RelativeSizeAxes = Axes.Both,
-                Child = button = new OsuClickableContainer
+                AutoSizeAxes = Axes.Both,
+                Child = circle = new CircularContainer
                 {
-                    RelativeSizeAxes = Axes.Both,
-                    Children = new Drawable[]
+                    Masking = true,
+                    Size = new Vector2(size),
+                    EdgeEffect = new EdgeEffectParameters
                     {
-                        new Box
-                        {
-                            RelativeSizeAxes = Axes.Both,
-                            Colour = colours.GrayF,
-                        },
-                        playIcon = new SpriteIcon
-                        {
-                            Icon = FontAwesome.Solid.Play,
-                            Size = Vector2.Zero,
-                            Colour = colours.Gray3,
-                            Anchor = Anchor.Centre,
-                            Origin = Anchor.Centre,
-                        },
-                        downloadIcon = new SpriteIcon
-                        {
-                            Icon = FontAwesome.Solid.FileDownload,
-                            Size = Vector2.Zero,
-                            Colour = colours.Gray3,
-                            Anchor = Anchor.Centre,
-                            Origin = Anchor.Centre,
-                        },
+                        Colour = Color4.Black.Opacity(0.4f),
+                        Type = EdgeEffectType.Shadow,
+                        Radius = 5,
                     },
-                }
+                    Child = button = new OsuClickableContainer
+                    {
+                        RelativeSizeAxes = Axes.Both,
+                        Children = new Drawable[]
+                        {
+                            new Box
+                            {
+                                RelativeSizeAxes = Axes.Both,
+                                Colour = colours.GrayF,
+                            },
+                            playIcon = new SpriteIcon
+                            {
+                                Icon = FontAwesome.Solid.Play,
+                                Size = Vector2.Zero,
+                                Colour = colours.Gray3,
+                                Anchor = Anchor.Centre,
+                                Origin = Anchor.Centre,
+                            },
+                            downloadIcon = new SpriteIcon
+                            {
+                                Icon = FontAwesome.Solid.FileDownload,
+                                Size = Vector2.Zero,
+                                Colour = colours.Gray3,
+                                Anchor = Anchor.Centre,
+                                Origin = Anchor.Centre,
+                            },
+                        },
+                    }
+                },
             };
 
             button.Action = () =>
@@ -105,7 +112,7 @@ namespace osu.Game.Screens.Play
                 switch (State.Value)
                 {
                     case DownloadState.LocallyAvailable:
-                        game.PresentScore(Model.Value);
+                        game?.PresentScore(Model.Value);
                         break;
 
                     case DownloadState.NotDownloaded:
@@ -123,22 +130,19 @@ namespace osu.Game.Screens.Play
                 switch (state.NewValue)
                 {
                     case DownloadState.Downloading:
-                        FadeEdgeEffectTo(colours.Yellow, 400, Easing.OutQuint);
-                        button.Enabled.Value = false;
+                        circle.FadeEdgeEffectTo(colours.Yellow, 400, Easing.OutQuint);
                         break;
 
                     case DownloadState.LocallyAvailable:
                         playIcon.ResizeTo(13, 300, Easing.OutQuint);
                         downloadIcon.ResizeTo(Vector2.Zero, 300, Easing.OutExpo);
-                        FadeEdgeEffectTo(Color4.Black.Opacity(0.4f), 400, Easing.OutQuint);
-                        button.Enabled.Value = true;
+                        circle.FadeEdgeEffectTo(Color4.Black.Opacity(0.4f), 400, Easing.OutQuint);
                         break;
 
                     case DownloadState.NotDownloaded:
                         playIcon.ResizeTo(Vector2.Zero, 300, Easing.OutQuint);
                         downloadIcon.ResizeTo(13, 300, Easing.OutExpo);
-                        FadeEdgeEffectTo(Color4.Black.Opacity(0.4f), 400, Easing.OutQuint);
-                        button.Enabled.Value = true;
+                        circle.FadeEdgeEffectTo(Color4.Black.Opacity(0.4f), 400, Easing.OutQuint);
                         break;
                 }
             }, true);

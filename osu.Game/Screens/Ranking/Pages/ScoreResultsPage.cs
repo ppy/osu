@@ -173,7 +173,7 @@ namespace osu.Game.Screens.Ranking.Pages
                 {
                     Anchor = Anchor.BottomCentre,
                     Origin = Anchor.BottomCentre,
-                    Margin = new MarginPadding { Bottom = 10 },
+                    Margin = new MarginPadding { Bottom = 5 },
                 },
             };
 
