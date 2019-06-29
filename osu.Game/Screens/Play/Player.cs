@@ -66,7 +66,6 @@ namespace osu.Game.Screens.Play
         private IAPIProvider api;
 
         private SampleChannel sampleRestart;
-        private SampleChannel sampleComboBreak;
 
         protected ScoreProcessor ScoreProcessor { get; private set; }
         protected DrawableRuleset DrawableRuleset { get; private set; }
@@ -108,14 +107,12 @@ namespace osu.Game.Screens.Play
                 return;
 
             sampleRestart = audio.Samples.Get(@"Gameplay/restart");
-            sampleComboBreak = audio.Samples.Get(@"Gameplay/combobreak");
 
             mouseWheelDisabled = config.GetBindable<bool>(OsuSetting.MouseDisableWheel);
             showStoryboard = config.GetBindable<bool>(OsuSetting.ShowStoryboard);
 
             ScoreProcessor = DrawableRuleset.CreateScoreProcessor();
             ScoreProcessor.Mods.BindTo(Mods);
-            ScoreProcessor.Combo.BindValueChanged(onComboChange);
 
             if (!ScoreProcessor.Mode.Disabled)
                 config.BindWith(OsuSetting.ScoreDisplayMode, ScoreProcessor.Mode);
@@ -127,7 +124,7 @@ namespace osu.Game.Screens.Play
                 StoryboardContainer = CreateStoryboardContainer(),
                 new ScalingContainer(ScalingMode.Gameplay)
                 {
-                    Child = new LocalSkinOverrideContainer(working.Skin)
+                    Child = new LocalSkinOverrideContainer(working.Skin, ScoreProcessor.Combo)
                     {
                         RelativeSizeAxes = Axes.Both,
                         Child = DrawableRuleset
@@ -266,12 +263,6 @@ namespace osu.Game.Screens.Play
         }
 
         private ScheduledDelegate onCompletionEvent;
-
-        private void onComboChange(ValueChangedEvent<int> combo)
-        {
-            if (combo.NewValue == 0 && combo.OldValue > 20)
-                sampleComboBreak?.Play();
-        }
 
         private void onCompletion()
         {

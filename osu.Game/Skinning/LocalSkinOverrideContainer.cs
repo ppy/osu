@@ -3,6 +3,7 @@
 
 using System;
 using osu.Framework.Allocation;
+using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -23,11 +24,15 @@ namespace osu.Game.Skinning
         private readonly Bindable<bool> beatmapHitsounds = new Bindable<bool>();
 
         private readonly ISkin skin;
+
+        private readonly ComboEffects comboEffects;
+
         private ISkinSource fallbackSource;
 
-        public LocalSkinOverrideContainer(ISkin skin)
+        public LocalSkinOverrideContainer(ISkin skin, BindableInt combo)
         {
             this.skin = skin;
+            comboEffects = new ComboEffects(combo);
         }
 
         public Drawable GetDrawableComponent(string componentName)
@@ -87,6 +92,9 @@ namespace osu.Game.Skinning
             beatmapSkins.BindValueChanged(_ => onSourceChanged());
             beatmapHitsounds.BindValueChanged(_ => onSourceChanged());
 
+            AudioManager audio = dependencies.Get<AudioManager>();
+            comboEffects.SampleComboBreak = GetSample(@"Gameplay/combobreak") ?? audio.Samples.Get(@"Gameplay/combobreak");
+
             return dependencies;
         }
 
@@ -99,6 +107,22 @@ namespace osu.Game.Skinning
 
             if (fallbackSource != null)
                 fallbackSource.SourceChanged -= onSourceChanged;
+        }
+
+        private class ComboEffects
+        {
+            public SampleChannel SampleComboBreak;
+
+            public ComboEffects(BindableInt combo)
+            {
+                combo.BindValueChanged(onComboChange);
+            }
+
+            private void onComboChange(ValueChangedEvent<int> combo)
+            {
+                if (combo.NewValue == 0 && combo.OldValue > 20)
+                    SampleComboBreak?.Play();
+            }
         }
     }
 }
