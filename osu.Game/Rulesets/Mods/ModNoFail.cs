@@ -4,10 +4,11 @@
 using System;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Graphics;
+using osu.Game.Screens.Play;
 
 namespace osu.Game.Rulesets.Mods
 {
-    public abstract class ModNoFail : Mod, IApplicableFailOverride
+    public abstract class ModNoFail : Mod, IApplicableFailOverride, IApplicableToHUD
     {
         public override string Name => "No Fail";
         public override string Acronym => "NF";
@@ -22,5 +23,7 @@ namespace osu.Game.Rulesets.Mods
         /// We never fail, 'yo.
         /// </summary>
         public bool AllowFail => false;
+
+        public void ApplyToHUD(HUDOverlay overlay) => overlay.HealthDisplay.Hide();
     }
 }
