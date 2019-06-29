@@ -20,8 +20,6 @@ namespace osu.Game.Screens
 {
     public class ScreenWhiteBox : OsuScreen
     {
-        private readonly BackButton popButton;
-
         private const double transition_time = 1000;
 
         protected virtual IEnumerable<Type> PossibleChildren => null;
@@ -34,10 +32,6 @@ namespace osu.Game.Screens
         public override void OnEntering(IScreen last)
         {
             base.OnEntering(last);
-
-            //only show the pop button if we are entered form another screen.
-            if (last != null)
-                popButton.Alpha = 1;
 
             Alpha = 0;
             textContainer.Position = new Vector2(DrawSize.X / 16, 0);
@@ -143,13 +137,6 @@ namespace osu.Game.Screens
                             }
                         },
                     }
-                },
-                popButton = new BackButton
-                {
-                    Anchor = Anchor.BottomLeft,
-                    Origin = Anchor.BottomLeft,
-                    Alpha = 0,
-                    Action = this.Exit
                 },
                 childModeButtons = new FillFlowContainer
                 {

@@ -20,6 +20,7 @@ using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Graphics.Containers;
 using osu.Game.Overlays.Profile.Header.Components;
+using osu.Game.Users.Drawables;
 
 namespace osu.Game.Users
 {
@@ -137,7 +138,7 @@ namespace osu.Game.Users
                                         Spacing = new Vector2(5f, 0f),
                                         Children = new Drawable[]
                                         {
-                                            new DrawableFlag(user.Country)
+                                            new UpdateableFlag(user.Country)
                                             {
                                                 Width = 30f,
                                                 RelativeSizeAxes = Axes.Y,
