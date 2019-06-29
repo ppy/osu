@@ -25,13 +25,15 @@ namespace osu.Game.Rulesets
     {
         public readonly RulesetInfo RulesetInfo;
 
-        public IEnumerable<Mod> GetAllMods() => Enum.GetValues(typeof(ModType)).Cast<ModType>()
-                                                    // Confine all mods of each mod type into a single IEnumerable<Mod>
-                                                    .SelectMany(GetModsFor)
-                                                    // Filter out all null mods
-                                                    .Where(mod => mod != null)
-                                                    // Resolve MultiMods as their .Mods property
-                                                    .SelectMany(mod => (mod as MultiMod)?.Mods ?? new[] { mod });
+        public IEnumerable<Mod> GetAllMods(bool includeSystemMods) => Enum.GetValues(typeof(ModType)).Cast<ModType>()
+                                                                          // Include ModType.System in modtypes to querry if includeSystemMods is false, else skip it
+                                                                          .Reverse().Skip(includeSystemMods ? 0 : 1).Reverse()
+                                                                          // Confine all mods of each mod type into a single IEnumerable<Mod>
+                                                                          .SelectMany(GetModsFor)
+                                                                          // Filter out all null mods
+                                                                          .Where(mod => mod != null)
+                                                                          // Resolve MultiMods as their .Mods property
+                                                                          .SelectMany(mod => (mod as MultiMod)?.Mods ?? new[] { mod });
 
         public abstract IEnumerable<Mod> GetModsFor(ModType type);
 
@@ -42,7 +44,7 @@ namespace osu.Game.Rulesets
         /// <returns>An enumerable of constructed <see cref="Mod"/>s</returns>
         public virtual IEnumerable<Mod> ConvertLegacyMods(LegacyMods mods) => new Mod[] { };
 
-        public ModAutoplay GetAutoplayMod() => GetAllMods().OfType<ModAutoplay>().First();
+        public ModAutoplay GetAutoplayMod() => GetAllMods(false).OfType<ModAutoplay>().First();
 
         protected Ruleset(RulesetInfo rulesetInfo = null)
         {
