@@ -261,6 +261,8 @@ namespace osu.Game
         /// </summary>
         public void PresentScore(ScoreInfo score)
         {
+            // The given ScoreInfo may have missing properties if it was retrieved from online data. Re-retrieve it from the database
+            // to ensure all the required data for presenting a replay are present.
             var databasedScoreInfo = ScoreManager.Query(s => s.OnlineScoreID == score.OnlineScoreID);
             var databasedScore = ScoreManager.GetScore(databasedScoreInfo);
 
