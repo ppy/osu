@@ -20,6 +20,7 @@ using osu.Framework.Input.Events;
 using osu.Game.Input.Bindings;
 using Humanizer;
 using osu.Framework.Graphics.Effects;
+using osu.Game.Screens.Play.PlayerSettings;
 
 namespace osu.Game.Screens.Play
 {
@@ -54,6 +55,8 @@ namespace osu.Game.Screens.Play
         public IReadOnlyList<DialogButton> Buttons => InternalButtons;
 
         private FillFlowContainer retryCounterContainer;
+        private VisualSettings visualSettings;
+        private InputSettings inputSettings;
 
         protected GameplayMenuOverlay()
         {
@@ -137,6 +140,20 @@ namespace osu.Game.Screens.Play
                         }
                     }
                 },
+                new FillFlowContainer<PlayerSettingsGroup>
+                {
+                    Anchor = Anchor.TopRight,
+                    Origin = Anchor.TopRight,
+                    AutoSizeAxes = Axes.Both,
+                    Direction = FillDirection.Vertical,
+                    Spacing = new Vector2(0, 20),
+                    Margin = new MarginPadding(25),
+                    Children = new PlayerSettingsGroup[]
+                    {
+                        visualSettings = new VisualSettings { Expanded = false },
+                        inputSettings = new InputSettings { Expanded = false }
+                    }
+                }
             };
 
             updateRetryCount();
@@ -158,7 +175,13 @@ namespace osu.Game.Screens.Play
         }
 
         protected override void PopIn() => this.FadeIn(transition_duration, Easing.In);
-        protected override void PopOut() => this.FadeOut(transition_duration, Easing.In);
+        protected override void PopOut()
+        {
+            this.FadeOut(transition_duration, Easing.In);
+
+            visualSettings.Expanded = false;
+            inputSettings.Expanded = false;
+        }
 
         // Don't let mouse down events through the overlay or people can click circles while paused.
         protected override bool OnMouseDown(MouseDownEvent e) => true;
