@@ -20,23 +20,6 @@ namespace osu.Game.Screens.Play
         {
         }
 
-        [BackgroundDependencyLoader]
-        private void load()
-        {
-            if (scores.IsAvailableLocally(Score) || hasOnlineReplay)
-            {
-                AddInternal(new ReplayDownloadButton(Score)
-                {
-                    Anchor = Framework.Graphics.Anchor.BottomRight,
-                    Origin = Framework.Graphics.Anchor.BottomRight,
-                    Height = 80,
-                    Width = 100,
-                });
-            }
-        }
-
-        private bool hasOnlineReplay => Score is APILegacyScoreInfo apiScore && apiScore.OnlineScoreID != null && apiScore.Replay;
-
         protected override IEnumerable<IResultPageInfo> CreateResultPages() => new IResultPageInfo[]
         {
             new ScoreOverviewPageInfo(Score, Beatmap.Value),

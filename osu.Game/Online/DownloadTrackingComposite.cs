@@ -54,6 +54,12 @@ namespace osu.Game.Online
                     attachDownload(download);
             };
 
+            manager.DownloadFailed += download =>
+            {
+                if (download.Model.Equals(Model.Value))
+                    attachDownload(null);
+            };
+
             manager.ItemAdded += itemAdded;
             manager.ItemRemoved += itemRemoved;
         }
@@ -109,6 +115,9 @@ namespace osu.Game.Online
             if (!s.Equals(Model.Value))
                 return;
 
+            // when  model states are being updated from manager, update the model being held by us also so that it will
+            // be up do date when being consumed for reading files etc.
+            Model.Value = s;
             State.Value = state;
         });
 
