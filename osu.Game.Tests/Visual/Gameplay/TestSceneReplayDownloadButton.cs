@@ -1,5 +1,9 @@
-﻿using NUnit.Framework;
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
+
+using NUnit.Framework;
 using osu.Framework.Graphics;
+using osu.Game.Online;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Scoring;
@@ -19,11 +23,19 @@ namespace osu.Game.Tests.Visual.Gameplay
             typeof(ReplayDownloadButton)
         };
 
-        private ReplayDownloadButton downloadButton;
+        private TestReplayDownloadButton downloadButton;
 
         public TestSceneReplayDownloadButton()
         {
-            Add(new ReplayDownloadButton(getScoreInfo())
+            createButton();
+            AddStep(@"downloading state", () => downloadButton.SetDownloadState(DownloadState.Downloading));
+            AddStep(@"locally available state", () => downloadButton.SetDownloadState(DownloadState.LocallyAvailable));
+            AddStep(@"not downloaded state", () => downloadButton.SetDownloadState(DownloadState.NotDownloaded));
+        }
+
+        private void createButton()
+        {
+            AddStep(@"create button", () => Child = downloadButton = new TestReplayDownloadButton(getScoreInfo())
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
@@ -44,6 +56,15 @@ namespace osu.Game.Tests.Visual.Gameplay
                     Username = @"WubWoofWolf",
                 }
             };
+        }
+
+        private class TestReplayDownloadButton : ReplayDownloadButton
+        {
+            public void SetDownloadState(DownloadState state) => State.Value = state;
+
+            public TestReplayDownloadButton(ScoreInfo score) : base(score)
+            {
+            }
         }
     }
 }
