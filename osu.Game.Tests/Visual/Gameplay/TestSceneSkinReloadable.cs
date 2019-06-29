@@ -4,7 +4,6 @@
 using System;
 using NUnit.Framework;
 using osu.Framework.Audio.Sample;
-using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -29,7 +28,7 @@ namespace osu.Game.Tests.Visual.Gameplay
                 Child = new SkinSourceContainer
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Child = new LocalSkinOverrideContainer(secondarySource, new BindableInt())
+                    Child = new LocalSkinOverrideContainer(secondarySource)
                     {
                         RelativeSizeAxes = Axes.Both,
                         Child = consumer = new SkinConsumer("test", name => new NamedBox("Default Implementation"), source => true)
@@ -54,7 +53,7 @@ namespace osu.Game.Tests.Visual.Gameplay
                 Child = new SkinSourceContainer
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Child = target = new LocalSkinOverrideContainer(secondarySource, new BindableInt())
+                    Child = target = new LocalSkinOverrideContainer(secondarySource)
                     {
                         RelativeSizeAxes = Axes.Both,
                     }
