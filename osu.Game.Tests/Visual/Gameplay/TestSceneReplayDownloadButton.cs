@@ -26,29 +26,33 @@ namespace osu.Game.Tests.Visual.Gameplay
 
         public TestSceneReplayDownloadButton()
         {
-            createButton();
+            createButton(true);
             AddStep(@"downloading state", () => downloadButton.SetDownloadState(DownloadState.Downloading));
             AddStep(@"locally available state", () => downloadButton.SetDownloadState(DownloadState.LocallyAvailable));
             AddStep(@"not downloaded state", () => downloadButton.SetDownloadState(DownloadState.NotDownloaded));
+            createButton(false);
         }
 
-        private void createButton()
+        private void createButton(bool withReplay)
         {
-            AddStep(@"create button", () => Child = downloadButton = new TestReplayDownloadButton(getScoreInfo())
+            AddStep(withReplay ? @"create button with replay" : "create button without replay", () =>
             {
-                Anchor = Anchor.Centre,
-                Origin = Anchor.Centre,
+                Child = downloadButton = new TestReplayDownloadButton(getScoreInfo(withReplay))
+                {
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                };
             });
         }
 
-        private ScoreInfo getScoreInfo()
+        private ScoreInfo getScoreInfo(bool replayAvailable)
         {
             return new APILegacyScoreInfo
             {
                 ID = 1,
                 OnlineScoreID = 2553163309,
                 Ruleset = new OsuRuleset().RulesetInfo,
-                Replay = true,
+                Replay = replayAvailable,
                 User = new User
                 {
                     Id = 39828,

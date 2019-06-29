@@ -42,13 +42,17 @@ namespace osu.Game.Screens.Play
         {
             get
             {
-                if (scores.IsAvailableLocally(Model.Value))
-                    return @"Watch replay";
+                switch (getReplayAvailability())
+                {
+                    case ReplayAvailability.Local:
+                        return @"Watch replay";
 
-                if (Model.Value is APILegacyScoreInfo apiScore && apiScore.Replay)
-                    return @"Download replay";
+                    case ReplayAvailability.Online:
+                        return @"Download replay";
 
-                return @"Replay unavailable";
+                    default:
+                        return @"Replay unavailable";
+                }
             }
         }
 
@@ -57,8 +61,6 @@ namespace osu.Game.Screens.Play
         {
             AutoSizeAxes = Axes.Both;
         }
-
-        private bool hasReplay => (Model.Value is APILegacyScoreInfo apiScore && apiScore.Replay) || scores.IsAvailableLocally(Model.Value);
 
         [BackgroundDependencyLoader(true)]
         private void load()
@@ -146,6 +148,30 @@ namespace osu.Game.Screens.Play
                         break;
                 }
             }, true);
+
+            if (getReplayAvailability() == ReplayAvailability.NotAvailable)
+            {
+                button.Enabled.Value = false;
+                button.Alpha = 0.6f;
+            }
+        }
+
+        private ReplayAvailability getReplayAvailability()
+        {
+            if (scores.IsAvailableLocally(Model.Value))
+                return ReplayAvailability.Local;
+
+            if (Model.Value is APILegacyScoreInfo apiScore && apiScore.Replay)
+                return ReplayAvailability.Online;
+
+            return ReplayAvailability.NotAvailable;
+        }
+
+        private enum ReplayAvailability
+        {
+            Local,
+            Online,
+            NotAvailable,
         }
     }
 }
