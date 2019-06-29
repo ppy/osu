@@ -261,8 +261,8 @@ namespace osu.Game
         /// </summary>
         public void PresentScore(ScoreInfo score)
         {
-            var databasedScore = ScoreManager.GetScore(score);
-            var databasedScoreInfo = databasedScore.ScoreInfo;
+            var databasedScoreInfo = ScoreManager.Query(s => s.OnlineScoreID == score.OnlineScoreID);
+            var databasedScore = ScoreManager.GetScore(databasedScoreInfo);
 
             if (databasedScore.Replay == null)
             {

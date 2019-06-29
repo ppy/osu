@@ -115,11 +115,6 @@ namespace osu.Game.Online
             if (!s.Equals(Model.Value))
                 return;
 
-            // when  model states are being updated from manager, update the model being held by us also so that it will
-            // be up do date when being consumed for reading files etc.
-            // the value -> null -> value change is to force the bindable to update the value instance
-            Model.Value = null;
-            Model.Value = s;
             State.Value = state;
         });
 
