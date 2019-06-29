@@ -9,21 +9,12 @@ using osu.Framework.Graphics.Shaders;
 using osu.Game.Screens.Menu;
 using osuTK;
 using osu.Framework.Screens;
-using osu.Game.Overlays;
 
 namespace osu.Game.Screens
 {
-    public class Loader : OsuScreen
+    public class Loader : StartupScreen
     {
         private bool showDisclaimer;
-
-        public override bool HideOverlaysOnEnter => true;
-
-        public override OverlayActivation InitialOverlayActivationMode => OverlayActivation.Disabled;
-
-        public override bool CursorVisible => false;
-
-        protected override bool AllowBackButton => false;
 
         public Loader()
         {
