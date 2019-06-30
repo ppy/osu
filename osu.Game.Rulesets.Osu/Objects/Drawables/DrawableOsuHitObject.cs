@@ -18,6 +18,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
     {
         private readonly ShakeContainer shakeContainer;
 
+        public override bool HandlePositionalInput => true;
+
         protected DrawableOsuHitObject(OsuHitObject hitObject)
             : base(hitObject)
         {
