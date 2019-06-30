@@ -50,7 +50,7 @@ namespace osu.Game.Online.Leaderboards
                         triangles = new Triangles
                         {
                             RelativeSizeAxes = Axes.Both,
-                            TriangleScale = 1.25f,
+                            TriangleScale = 1,
                             Velocity = 0.5f,
                         },
                         name = new OsuSpriteText
