@@ -212,6 +212,7 @@ namespace osu.Game.Screens.Edit
         {
             if (action == GlobalAction.Back)
             {
+                // as we don't want to display the back button, manual handling of exit action is required.
                 this.Exit();
                 return true;
             }
