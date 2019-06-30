@@ -202,16 +202,16 @@ namespace osu.Game.Overlays.Dialog
             };
         }
 
-        public override bool OnPressed(GlobalAction action)
+        public override bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
         {
-            switch (action)
+            switch (e.Action)
             {
                 case GlobalAction.Select:
                     Buttons.OfType<PopupDialogOkButton>().FirstOrDefault()?.Click();
                     return true;
             }
 
-            return base.OnPressed(action);
+            return base.OnPressed(e);
         }
 
         protected override bool OnKeyDown(KeyDownEvent e)

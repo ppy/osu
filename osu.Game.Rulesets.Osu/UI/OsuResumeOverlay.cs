@@ -74,9 +74,9 @@ namespace osu.Game.Rulesets.Osu.UI
                 base.OnHoverLost(e);
             }
 
-            public bool OnPressed(OsuAction action)
+            public bool OnPressed(KeyBindingPressEvent<OsuAction> e)
             {
-                switch (action)
+                switch (e.Action)
                 {
                     case OsuAction.LeftButton:
                     case OsuAction.RightButton:
@@ -91,7 +91,7 @@ namespace osu.Game.Rulesets.Osu.UI
                 return false;
             }
 
-            public bool OnReleased(OsuAction action) => false;
+            public bool OnReleased(KeyBindingReleaseEvent<OsuAction> e) => false;
 
             public void ShowAt(Vector2 activeCursorPosition) => Schedule(() =>
             {

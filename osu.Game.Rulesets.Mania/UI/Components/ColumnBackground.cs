@@ -9,6 +9,7 @@ using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Bindings;
+using osu.Framework.Input.Events;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.UI.Scrolling;
 using osuTK.Graphics;
@@ -92,16 +93,16 @@ namespace osu.Game.Rulesets.Mania.UI.Components
                 direction.Value == ScrollingDirection.Up ? dimPoint : brightPoint);
         }
 
-        public bool OnPressed(ManiaAction action)
+        public bool OnPressed(KeyBindingPressEvent<ManiaAction> e)
         {
-            if (action == this.action.Value)
+            if (e.Action == this.action.Value)
                 backgroundOverlay.FadeTo(1, 50, Easing.OutQuint).Then().FadeTo(0.5f, 250, Easing.OutQuint);
             return false;
         }
 
-        public bool OnReleased(ManiaAction action)
+        public bool OnReleased(KeyBindingReleaseEvent<ManiaAction> e)
         {
-            if (action == this.action.Value)
+            if (e.Action == action.Value)
                 backgroundOverlay.FadeTo(0, 250, Easing.OutQuint);
             return false;
         }

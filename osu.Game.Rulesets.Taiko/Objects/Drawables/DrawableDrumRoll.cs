@@ -11,6 +11,7 @@ using osuTK.Graphics;
 using osu.Game.Rulesets.Taiko.Objects.Drawables.Pieces;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Input.Events;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Scoring;
 
@@ -48,7 +49,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
 
         protected override TaikoPiece CreateMainPiece() => new ElongatedCirclePiece();
 
-        public override bool OnPressed(TaikoAction action) => false;
+        public override bool OnPressed(KeyBindingPressEvent<TaikoAction> e) => false;
 
         private Color4 colourIdle;
         private Color4 colourEngaged;
@@ -116,7 +117,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
                 ApplyResult(r => r.Type = MainObject.IsHit ? HitResult.Great : HitResult.Miss);
             }
 
-            public override bool OnPressed(TaikoAction action) => false;
+            public override bool OnPressed(KeyBindingPressEvent<TaikoAction> e) => false;
         }
     }
 }

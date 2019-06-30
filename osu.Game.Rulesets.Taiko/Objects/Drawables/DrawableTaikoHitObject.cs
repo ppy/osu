@@ -11,6 +11,7 @@ using osu.Game.Audio;
 using System.Collections.Generic;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Primitives;
+using osu.Framework.Input.Events;
 
 namespace osu.Game.Rulesets.Taiko.Objects.Drawables
 {
@@ -75,8 +76,8 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
         /// </summary>
         public Drawable CreateProxiedContent() => proxiedContent.CreateProxy();
 
-        public abstract bool OnPressed(TaikoAction action);
-        public virtual bool OnReleased(TaikoAction action) => false;
+        public abstract bool OnPressed(KeyBindingPressEvent<TaikoAction> e);
+        public virtual bool OnReleased(KeyBindingReleaseEvent<TaikoAction> e) => false;
 
         private class ProxiedContentContainer : Container
         {

@@ -5,6 +5,7 @@ using System;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input.Bindings;
+using osu.Framework.Input.Events;
 using osu.Game.Skinning;
 using osuTK;
 
@@ -31,15 +32,16 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
             InternalChild = new SkinnableDrawable("Play/osu/hitcircle", _ => new DefaultCirclePiece());
         }
 
-        public bool OnPressed(OsuAction action)
+        public bool OnPressed(KeyBindingPressEvent<OsuAction> e)
         {
-            switch (action)
+            switch (e.Action)
             {
                 case OsuAction.LeftButton:
                 case OsuAction.RightButton:
+
                     if (IsHovered && (Hit?.Invoke() ?? false))
                     {
-                        HitAction = action;
+                        HitAction = e.Action;
                         return true;
                     }
 
@@ -49,6 +51,6 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
             return false;
         }
 
-        public bool OnReleased(OsuAction action) => false;
+        public bool OnReleased(KeyBindingReleaseEvent<OsuAction> e) => false;
     }
 }

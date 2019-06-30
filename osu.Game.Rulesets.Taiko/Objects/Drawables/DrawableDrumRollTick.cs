@@ -3,6 +3,7 @@
 
 using System;
 using osu.Framework.Graphics;
+using osu.Framework.Input.Events;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.Taiko.Objects.Drawables.Pieces;
@@ -49,7 +50,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             }
         }
 
-        public override bool OnPressed(TaikoAction action) => UpdateResult(true);
+        public override bool OnPressed(KeyBindingPressEvent<TaikoAction> e) => UpdateResult(true);
 
         protected override DrawableStrongNestedHit CreateStrongHit(StrongHitObject hitObject) => new StrongNestedHit(hitObject, this);
 
@@ -68,7 +69,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
                 ApplyResult(r => r.Type = MainObject.IsHit ? HitResult.Great : HitResult.Miss);
             }
 
-            public override bool OnPressed(TaikoAction action) => false;
+            public override bool OnPressed(KeyBindingPressEvent<TaikoAction> e) => false;
         }
     }
 }

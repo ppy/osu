@@ -58,9 +58,9 @@ namespace osu.Game.Graphics.UserInterface
 
         protected override Drawable GetDrawableCharacter(char c) => new OsuSpriteText { Text = c.ToString(), Font = OsuFont.GetFont(size: CalculatedTextSize) };
 
-        public virtual bool OnPressed(GlobalAction action)
+        public virtual bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
         {
-            if (action == GlobalAction.Back)
+            if (e.Action == GlobalAction.Back)
             {
                 KillFocus();
                 return true;
@@ -69,6 +69,6 @@ namespace osu.Game.Graphics.UserInterface
             return false;
         }
 
-        public bool OnReleased(GlobalAction action) => false;
+        public bool OnReleased(KeyBindingReleaseEvent<GlobalAction> e) => false;
     }
 }

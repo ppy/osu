@@ -4,6 +4,7 @@
 using System;
 using System.Linq;
 using osu.Framework.Graphics;
+using osu.Framework.Input.Events;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.Taiko.Objects.Drawables.Pieces;
@@ -51,7 +52,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
                 ApplyResult(r => r.Type = result);
         }
 
-        public override bool OnPressed(TaikoAction action)
+        public override bool OnPressed(KeyBindingPressEvent<TaikoAction> e)
         {
             if (pressHandledThisFrame)
                 return true;
@@ -59,13 +60,13 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             if (Judged)
                 return false;
 
-            validActionPressed = HitActions.Contains(action);
+            validActionPressed = HitActions.Contains(e.Action);
 
             // Only count this as handled if the new judgement is a hit
             var result = UpdateResult(true);
 
             if (IsHit)
-                HitAction = action;
+                HitAction = e.Action;
 
             // Regardless of whether we've hit or not, any secondary key presses in the same frame should be discarded
             // E.g. hitting a non-strong centre as a strong should not fall through and perform a hit on the next note
@@ -74,11 +75,11 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             return result;
         }
 
-        public override bool OnReleased(TaikoAction action)
+        public override bool OnReleased(KeyBindingReleaseEvent<TaikoAction> e)
         {
-            if (action == HitAction)
+            if (e.Action == HitAction)
                 HitAction = null;
-            return base.OnReleased(action);
+            return base.OnReleased(e);
         }
 
         protected override void Update()
@@ -186,7 +187,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
                     ApplyResult(r => r.Type = MainObject.Result.Type);
             }
 
-            public override bool OnPressed(TaikoAction action)
+            public override bool OnPressed(KeyBindingPressEvent<TaikoAction> e)
             {
                 // Don't process actions until the main hitobject is hit
                 if (!MainObject.IsHit)
@@ -197,7 +198,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
                     return false;
 
                 // Don't handle invalid hit action presses
-                if (!MainObject.HitActions.Contains(action))
+                if (!MainObject.HitActions.Contains(e.Action))
                     return false;
 
                 return UpdateResult(true);

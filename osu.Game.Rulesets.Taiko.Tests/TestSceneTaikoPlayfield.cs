@@ -7,6 +7,7 @@ using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Input.Events;
 using osu.Framework.MathUtils;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
@@ -238,7 +239,7 @@ namespace osu.Game.Rulesets.Taiko.Tests
             {
             }
 
-            public override bool OnPressed(TaikoAction action) => false;
+            public override bool OnPressed(KeyBindingPressEvent<TaikoAction> e) => false;
         }
 
         private class DrawableTestHit : DrawableHitObject<TaikoHitObject>

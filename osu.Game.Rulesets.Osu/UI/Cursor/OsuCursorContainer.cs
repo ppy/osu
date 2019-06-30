@@ -7,6 +7,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input.Bindings;
+using osu.Framework.Input.Events;
 using osu.Game.Rulesets.Osu.Configuration;
 using osu.Game.Rulesets.UI;
 
@@ -54,9 +55,9 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
                 (ActiveCursor as OsuCursor)?.Contract();
         }
 
-        public bool OnPressed(OsuAction action)
+        public bool OnPressed(KeyBindingPressEvent<OsuAction> e)
         {
-            switch (action)
+            switch (e.Action)
             {
                 case OsuAction.LeftButton:
                 case OsuAction.RightButton:
@@ -68,9 +69,9 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
             return false;
         }
 
-        public bool OnReleased(OsuAction action)
+        public bool OnReleased(KeyBindingReleaseEvent<OsuAction> e)
         {
-            switch (action)
+            switch (e.Action)
             {
                 case OsuAction.LeftButton:
                 case OsuAction.RightButton:

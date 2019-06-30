@@ -77,9 +77,9 @@ namespace osu.Game.Graphics.Containers
             return base.OnClick(e);
         }
 
-        public virtual bool OnPressed(GlobalAction action)
+        public virtual bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
         {
-            switch (action)
+            switch (e.Action)
             {
                 case GlobalAction.Back:
                     Hide();
@@ -92,13 +92,14 @@ namespace osu.Game.Graphics.Containers
             return false;
         }
 
-        public bool OnReleased(GlobalAction action) => false;
+        public bool OnReleased(KeyBindingReleaseEvent<GlobalAction> e) => false;
 
         private void onStateChanged(ValueChangedEvent<Visibility> state)
         {
             switch (state.NewValue)
             {
                 case Visibility.Visible:
+
                     if (OverlayActivationMode.Value != OverlayActivation.Disabled)
                     {
                         if (PlaySamplesOnStateChange) samplePopIn?.Play();

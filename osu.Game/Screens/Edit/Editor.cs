@@ -208,9 +208,9 @@ namespace osu.Game.Screens.Edit
             return true;
         }
 
-        public bool OnPressed(GlobalAction action)
+        public bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
         {
-            if (action == GlobalAction.Back)
+            if (e.Action == GlobalAction.Back)
             {
                 // as we don't want to display the back button, manual handling of exit action is required.
                 this.Exit();
@@ -220,7 +220,7 @@ namespace osu.Game.Screens.Edit
             return false;
         }
 
-        public bool OnReleased(GlobalAction action) => action == GlobalAction.Back;
+        public bool OnReleased(KeyBindingReleaseEvent<GlobalAction> e) => e.Action == GlobalAction.Back;
 
         public override void OnResuming(IScreen last)
         {

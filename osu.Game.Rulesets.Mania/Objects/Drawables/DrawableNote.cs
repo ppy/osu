@@ -7,6 +7,7 @@ using osuTK.Graphics;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Effects;
 using osu.Framework.Input.Bindings;
+using osu.Framework.Input.Events;
 using osu.Game.Rulesets.Mania.Objects.Drawables.Pieces;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.UI.Scrolling;
@@ -72,14 +73,14 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
             ApplyResult(r => r.Type = result);
         }
 
-        public virtual bool OnPressed(ManiaAction action)
+        public virtual bool OnPressed(KeyBindingPressEvent<ManiaAction> e)
         {
-            if (action != Action.Value)
+            if (e.Action != Action.Value)
                 return false;
 
             return UpdateResult(true);
         }
 
-        public virtual bool OnReleased(ManiaAction action) => false;
+        public virtual bool OnReleased(KeyBindingReleaseEvent<ManiaAction> e) => false;
     }
 }
