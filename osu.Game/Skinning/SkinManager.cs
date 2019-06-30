@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading;
@@ -56,7 +57,7 @@ namespace osu.Game.Skinning
 
         protected override IEnumerable<string> GetStableImportPaths() => GetStableStorage().GetDirectories(ImportFromStablePath);
 
-        protected override bool ShouldRemoveArchive(string path) => true;
+        protected override bool ShouldRemoveArchive(string path) => Path.GetExtension(path)?.ToLowerInvariant() == ".osk";
 
         /// <summary>
         /// Returns a list of all usable <see cref="SkinInfo"/>s. Includes the special default skin plus all skins from <see cref="GetAllUserSkins"/>.
