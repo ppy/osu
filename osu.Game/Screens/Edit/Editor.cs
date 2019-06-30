@@ -24,11 +24,13 @@ using osu.Game.Screens.Edit.Design;
 using osuTK.Input;
 using System.Collections.Generic;
 using osu.Framework;
+using osu.Framework.Input.Bindings;
+using osu.Game.Input.Bindings;
 using osu.Game.Users;
 
 namespace osu.Game.Screens.Edit
 {
-    public class Editor : OsuScreen
+    public class Editor : OsuScreen, IKeyBindingHandler<GlobalAction>
     {
         protected override BackgroundScreen CreateBackground() => new BackgroundScreenCustom(@"Backgrounds/bg4");
 
@@ -205,6 +207,19 @@ namespace osu.Game.Screens.Edit
 
             return true;
         }
+
+        public bool OnPressed(GlobalAction action)
+        {
+            if (action == GlobalAction.Back)
+            {
+                this.Exit();
+                return true;
+            }
+
+            return false;
+        }
+
+        public bool OnReleased(GlobalAction action) => action == GlobalAction.Back;
 
         public override void OnResuming(IScreen last)
         {
