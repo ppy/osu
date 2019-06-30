@@ -21,16 +21,8 @@ namespace osu.Game.Screens.Play
 {
     public class ReplayDownloadButton : DownloadTrackingComposite<ScoreInfo, ScoreManager>, IHasTooltip
     {
-        private const int size = 40;
-
-        [Resolved(canBeNull: true)]
-        private OsuGame game { get; set; }
-
         [Resolved]
         private ScoreManager scores { get; set; }
-
-        [Resolved]
-        private OsuColour colours { get; set; }
 
         private OsuClickableContainer button;
         private SpriteIcon downloadIcon;
@@ -42,7 +34,7 @@ namespace osu.Game.Screens.Play
         {
             get
             {
-                switch (getReplayAvailability())
+                switch (replayAvailability)
                 {
                     case ReplayAvailability.Local:
                         return @"Watch replay";
@@ -56,6 +48,20 @@ namespace osu.Game.Screens.Play
             }
         }
 
+        private ReplayAvailability replayAvailability
+        {
+            get
+            {
+                if (scores.IsAvailableLocally(Model.Value))
+                    return ReplayAvailability.Local;
+
+                if (Model.Value is APILegacyScoreInfo apiScore && apiScore.Replay)
+                    return ReplayAvailability.Online;
+
+                return ReplayAvailability.NotAvailable;
+            }
+        }
+
         public ReplayDownloadButton(ScoreInfo score)
             : base(score)
         {
@@ -63,7 +69,7 @@ namespace osu.Game.Screens.Play
         }
 
         [BackgroundDependencyLoader(true)]
-        private void load()
+        private void load(OsuGame game, OsuColour colours)
         {
             InternalChild = shakeContainer = new ShakeContainer
             {
@@ -71,7 +77,7 @@ namespace osu.Game.Screens.Play
                 Child = circle = new CircularContainer
                 {
                     Masking = true,
-                    Size = new Vector2(size),
+                    Size = new Vector2(40),
                     EdgeEffect = new EdgeEffectParameters
                     {
                         Colour = Color4.Black.Opacity(0.4f),
@@ -132,39 +138,30 @@ namespace osu.Game.Screens.Play
                 switch (state.NewValue)
                 {
                     case DownloadState.Downloading:
+                        playIcon.ResizeTo(Vector2.Zero, 400, Easing.OutQuint);
+                        downloadIcon.ResizeTo(13, 400, Easing.OutQuint);
                         circle.FadeEdgeEffectTo(colours.Yellow, 400, Easing.OutQuint);
                         break;
 
                     case DownloadState.LocallyAvailable:
-                        playIcon.ResizeTo(13, 300, Easing.OutQuint);
-                        downloadIcon.ResizeTo(Vector2.Zero, 300, Easing.OutExpo);
+                        playIcon.ResizeTo(13, 400, Easing.OutQuint);
+                        downloadIcon.ResizeTo(Vector2.Zero, 400, Easing.OutQuint);
                         circle.FadeEdgeEffectTo(Color4.Black.Opacity(0.4f), 400, Easing.OutQuint);
                         break;
 
                     case DownloadState.NotDownloaded:
-                        playIcon.ResizeTo(Vector2.Zero, 300, Easing.OutQuint);
-                        downloadIcon.ResizeTo(13, 300, Easing.OutExpo);
+                        playIcon.ResizeTo(Vector2.Zero, 400, Easing.OutQuint);
+                        downloadIcon.ResizeTo(13, 400, Easing.OutQuint);
                         circle.FadeEdgeEffectTo(Color4.Black.Opacity(0.4f), 400, Easing.OutQuint);
                         break;
                 }
             }, true);
 
-            if (getReplayAvailability() == ReplayAvailability.NotAvailable)
+            if (replayAvailability == ReplayAvailability.NotAvailable)
             {
                 button.Enabled.Value = false;
                 button.Alpha = 0.6f;
             }
-        }
-
-        private ReplayAvailability getReplayAvailability()
-        {
-            if (scores.IsAvailableLocally(Model.Value))
-                return ReplayAvailability.Local;
-
-            if (Model.Value is APILegacyScoreInfo apiScore && apiScore.Replay)
-                return ReplayAvailability.Online;
-
-            return ReplayAvailability.NotAvailable;
         }
 
         private enum ReplayAvailability
