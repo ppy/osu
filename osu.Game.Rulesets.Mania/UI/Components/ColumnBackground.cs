@@ -95,7 +95,7 @@ namespace osu.Game.Rulesets.Mania.UI.Components
 
         public bool OnPressed(KeyBindingPressEvent<ManiaAction> e)
         {
-            if (e.Action == this.action.Value)
+            if (e.Action == action.Value)
                 backgroundOverlay.FadeTo(1, 50, Easing.OutQuint).Then().FadeTo(0.5f, 250, Easing.OutQuint);
             return false;
         }

@@ -111,7 +111,7 @@ namespace osu.Game.Rulesets.Mania.UI.Components
 
         public bool OnPressed(KeyBindingPressEvent<ManiaAction> e)
         {
-            if (e.Action == this.action.Value)
+            if (e.Action == action.Value)
                 keyIcon.ScaleTo(1.4f, 50, Easing.OutQuint).Then().ScaleTo(1.3f, 250, Easing.OutQuint);
             return false;
         }
