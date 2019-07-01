@@ -154,6 +154,7 @@ namespace osu.Game
 
             Fonts.AddStore(new GlyphStore(Resources, @"Fonts/Venera"));
             Fonts.AddStore(new GlyphStore(Resources, @"Fonts/Venera-Light"));
+            Fonts.AddStore(new GlyphStore(Resources, @"Fonts/Venera-Medium"));
 
             runMigrations();
 
