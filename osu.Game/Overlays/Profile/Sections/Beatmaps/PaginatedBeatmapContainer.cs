@@ -19,7 +19,7 @@ namespace osu.Game.Overlays.Profile.Sections.Beatmaps
     public class PaginatedBeatmapContainer : PaginatedContainer
     {
         private const float panel_padding = 10f;
-        private int count;
+        private readonly BindableInt count = new BindableInt();
         private readonly Counter counterDrawable;
         private readonly BeatmapSetType type;
         private GetUserBeatmapsRequest request;
@@ -33,7 +33,11 @@ namespace osu.Game.Overlays.Profile.Sections.Beatmaps
 
             ItemsContainer.Spacing = new Vector2(panel_padding);
 
-            HeaderContainer.Add(counterDrawable = new Counter());
+            HeaderContainer.Add(counterDrawable = new Counter
+            {
+                Alpha = 0,
+            });
+            counterDrawable.Value.BindTo(count);
         }
 
         protected override void ShowMore()
@@ -58,7 +62,7 @@ namespace osu.Game.Overlays.Profile.Sections.Beatmaps
                     ItemsContainer.Add(panel);
                 }
 
-                MoreButton.FadeTo(ItemsContainer.Children.Count == count ? 0 : 1);
+                MoreButton.FadeTo(ItemsContainer.Children.Count == count.Value ? 0 : 1);
             });
 
             Api.Queue(request);
@@ -71,28 +75,25 @@ namespace osu.Game.Overlays.Profile.Sections.Beatmaps
             switch (type)
             {
                 case BeatmapSetType.Favourite:
-                    count = User.Value.FavouriteBeatmapsetCount[0];
+                    count.Value = User.Value.FavouriteBeatmapsetCount[0];
                     break;
 
                 case BeatmapSetType.Graveyard:
-                    count = User.Value.GraveyardBeatmapsetCount[0];
+                    count.Value = User.Value.GraveyardBeatmapsetCount[0];
                     break;
 
                 case BeatmapSetType.Loved:
-                    count = User.Value.LovedBeatmapsetCount[0];
+                    count.Value = User.Value.LovedBeatmapsetCount[0];
                     break;
 
                 case BeatmapSetType.RankedAndApproved:
-                    count = User.Value.RankedAndApprovedBeatmapsetCount[0];
+                    count.Value = User.Value.RankedAndApprovedBeatmapsetCount[0];
                     break;
 
                 case BeatmapSetType.Unranked:
-                    count = User.Value.UnrankedBeatmapsetCount[0];
+                    count.Value = User.Value.UnrankedBeatmapsetCount[0];
                     break;
             }
-
-            counterDrawable.Value = count;
-            counterDrawable.FadeTo(count > 0 ? 1 : 0);
         }
 
         protected override void Dispose(bool isDisposing)
@@ -104,20 +105,8 @@ namespace osu.Game.Overlays.Profile.Sections.Beatmaps
         private class Counter : CircularContainer
         {
             private readonly OsuSpriteText counterText;
-            private int counter;
 
-            public int Value
-            {
-                get => counter;
-                set
-                {
-                    if (counter == value)
-                        return;
-
-                    counter = value;
-                    counterText.Text = value.ToString();
-                }
-            }
+            public readonly BindableInt Value = new BindableInt();
 
             public Counter()
             {
@@ -139,6 +128,14 @@ namespace osu.Game.Overlays.Profile.Sections.Beatmaps
                         Font = OsuFont.GetFont(size: 20, weight: FontWeight.SemiBold)
                     }
                 };
+
+                Value.BindValueChanged(onValueChanged);
+            }
+
+            private void onValueChanged(ValueChangedEvent<int> v)
+            {
+                counterText.Text = v.NewValue.ToString();
+                this.FadeTo(v.NewValue > 0 ? 1 : 0);
             }
         }
     }
