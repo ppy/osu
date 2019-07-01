@@ -14,7 +14,7 @@ namespace osu.Game.Rulesets.Osu.Mods
         public override string Name => "Indecisive";
         public override string Acronym => "ID";
         public override IconUsage Icon => FontAwesome.Regular.QuestionCircle;
-        public override ModType Type => ModType.DifficultyIncrease;
+        public override ModType Type => ModType.Fun;
         public override string Description => "Nomod-Hidden alternation.";
         public override double ScoreMultiplier => 1;
 

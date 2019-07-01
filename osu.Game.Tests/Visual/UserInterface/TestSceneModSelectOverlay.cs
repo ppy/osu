@@ -85,7 +85,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             var assistMods = instance.GetModsFor(ModType.Automation);
 
             var noFailMod = easierMods.FirstOrDefault(m => m is OsuModNoFail);
-            var hiddenMod = harderMods.FirstOrDefault(m => m is OsuModHidden);
+            var hiddenMod = harderMods.OfType<MultiMod>().FirstOrDefault(m => m.Mods.Any(a => a is OsuModHidden));
 
             var doubleTimeMod = harderMods.OfType<MultiMod>().FirstOrDefault(m => m.Mods.Any(a => a is OsuModDoubleTime));
 
