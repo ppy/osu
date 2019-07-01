@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
 using System.Linq;
@@ -14,7 +14,7 @@ using osu.Game.Rulesets.Osu.Objects.Drawables;
 
 namespace osu.Game.Rulesets.Osu.Mods
 {
-    public class OsuModDeflate : Mod, IReadFromConfig, IApplicableToDrawableHitObjects
+    public class OsuModDeflate : Mod, IApplicableToDrawableHitObjects
     {
         public override string Name => "Deflate";
 
@@ -28,16 +28,9 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         public override double ScoreMultiplier => 1;
 
-        private Bindable<bool> increaseFirstObjectVisibility = new Bindable<bool>();
-
-        public void ReadFromConfig(OsuConfigManager config)
-        {
-            increaseFirstObjectVisibility = config.GetBindable<bool>(OsuSetting.IncreaseFirstObjectVisibility);
-        }
-
         public void ApplyToDrawableHitObjects(IEnumerable<DrawableHitObject> drawables)
         {
-            foreach (var drawable in drawables.Skip(increaseFirstObjectVisibility.Value ? 1 : 0))
+            foreach (var drawable in drawables)
             {
                 switch (drawable)
                 {
