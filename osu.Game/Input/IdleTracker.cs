@@ -48,9 +48,9 @@ namespace osu.Game.Input
             isIdle.Value = TimeSpentIdle > timeToIdle && AllowIdle;
         }
 
-        public bool OnPressed(PlatformAction action) => updateLastInteractionTime();
+        public bool OnPressed(KeyBindingPressEvent<PlatformAction> e) => updateLastInteractionTime();
 
-        public bool OnReleased(PlatformAction action) => updateLastInteractionTime();
+        public bool OnReleased(KeyBindingReleaseEvent<PlatformAction> e) => updateLastInteractionTime();
 
         protected override bool Handle(UIEvent e)
         {

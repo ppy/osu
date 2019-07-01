@@ -641,11 +641,11 @@ namespace osu.Game.Screens.Select
                 Schedule(() => BeatmapDetails.Leaderboard.RefreshScores())));
         }
 
-        public virtual bool OnPressed(GlobalAction action)
+        public virtual bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
         {
             if (!this.IsCurrentScreen()) return false;
 
-            switch (action)
+            switch (e.Action)
             {
                 case GlobalAction.Select:
                     FinaliseSelection();
@@ -655,7 +655,7 @@ namespace osu.Game.Screens.Select
             return false;
         }
 
-        public bool OnReleased(GlobalAction action) => action == GlobalAction.Select;
+        public bool OnReleased(KeyBindingReleaseEvent<GlobalAction> e) => e.Action == GlobalAction.Select;
 
         protected override bool OnKeyDown(KeyDownEvent e)
         {
@@ -664,6 +664,7 @@ namespace osu.Game.Screens.Select
             switch (e.Key)
             {
                 case Key.Delete:
+
                     if (e.ShiftPressed)
                     {
                         if (!Beatmap.IsDefault)

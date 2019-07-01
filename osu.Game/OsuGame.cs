@@ -24,6 +24,7 @@ using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input;
 using osu.Framework.Input.Bindings;
+using osu.Framework.Input.Events;
 using osu.Framework.Platform;
 using osu.Framework.Threading;
 using osu.Game.Beatmaps;
@@ -392,7 +393,7 @@ namespace osu.Game
                 new VolumeControlReceptor
                 {
                     RelativeSizeAxes = Axes.Both,
-                    ActionRequested = action => volume.Adjust(action),
+                    ActionRequested = e => volume.Adjust(e.Action),
                     ScrollActionRequested = (action, amount, isPrecise) => volume.Adjust(action, amount, isPrecise),
                 },
                 screenContainer = new ScalingContainer(ScalingMode.ExcludeOverlays)
@@ -672,11 +673,11 @@ namespace osu.Game
             return d;
         }
 
-        public bool OnPressed(GlobalAction action)
+        public bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
         {
             if (introScreen == null) return false;
 
-            switch (action)
+            switch (e.Action)
             {
                 case GlobalAction.ToggleChat:
                     chatOverlay.ToggleVisibility();
@@ -731,7 +732,7 @@ namespace osu.Game
 
         #endregion
 
-        public bool OnReleased(GlobalAction action) => false;
+        public bool OnReleased(KeyBindingReleaseEvent<GlobalAction> e) => false;
 
         private Container overlayContent;
 

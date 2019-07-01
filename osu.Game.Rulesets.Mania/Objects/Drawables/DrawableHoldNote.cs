@@ -9,6 +9,7 @@ using osu.Game.Rulesets.Mania.Objects.Drawables.Pieces;
 using osuTK.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input.Bindings;
+using osu.Framework.Input.Events;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.UI.Scrolling;
 
@@ -124,13 +125,13 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
             bodyPiece.Hitting = false;
         }
 
-        public bool OnPressed(ManiaAction action)
+        public bool OnPressed(KeyBindingPressEvent<ManiaAction> e)
         {
             // Make sure the action happened within the body of the hold note
             if (Time.Current < HitObject.StartTime || Time.Current > HitObject.EndTime)
                 return false;
 
-            if (action != Action.Value)
+            if (e.Action != Action.Value)
                 return false;
 
             // The user has pressed during the body of the hold note, after the head note and its hit windows have passed
@@ -140,13 +141,13 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
             return true;
         }
 
-        public bool OnReleased(ManiaAction action)
+        public bool OnReleased(KeyBindingReleaseEvent<ManiaAction> e)
         {
             // Make sure that the user started holding the key during the hold note
             if (!holdStartTime.HasValue)
                 return false;
 
-            if (action != Action.Value)
+            if (e.Action != Action.Value)
                 return false;
 
             EndHold();
@@ -171,9 +172,9 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
                 this.holdNote = holdNote;
             }
 
-            public override bool OnPressed(ManiaAction action)
+            public override bool OnPressed(KeyBindingPressEvent<ManiaAction> e)
             {
-                if (!base.OnPressed(action))
+                if (!base.OnPressed(e))
                     return false;
 
                 // If the key has been released too early, the user should not receive full score for the release
@@ -234,15 +235,15 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
                 });
             }
 
-            public override bool OnPressed(ManiaAction action) => false; // Tail doesn't handle key down
+            public override bool OnPressed(KeyBindingPressEvent<ManiaAction> e) => false; // Tail doesn't handle key down
 
-            public override bool OnReleased(ManiaAction action)
+            public override bool OnReleased(KeyBindingReleaseEvent<ManiaAction> e)
             {
                 // Make sure that the user started holding the key during the hold note
                 if (!holdNote.holdStartTime.HasValue)
                     return false;
 
-                if (action != Action.Value)
+                if (e.Action != Action.Value)
                     return false;
 
                 UpdateResult(true);

@@ -9,6 +9,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Input.Bindings;
+using osu.Framework.Input.Events;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.Taiko.Audio;
@@ -141,21 +142,21 @@ namespace osu.Game.Rulesets.Taiko.UI
                 centreHit.Colour = colours.Pink;
             }
 
-            public bool OnPressed(TaikoAction action)
+            public bool OnPressed(KeyBindingPressEvent<TaikoAction> e)
             {
                 Drawable target = null;
                 Drawable back = null;
 
                 var drumSample = sampleMappings.SampleAt(Time.Current);
 
-                if (action == CentreAction)
+                if (e.Action == CentreAction)
                 {
                     target = centreHit;
                     back = centre;
 
                     drumSample.Centre?.Play();
                 }
-                else if (action == RimAction)
+                else if (e.Action == RimAction)
                 {
                     target = rimHit;
                     back = rim;
@@ -187,7 +188,7 @@ namespace osu.Game.Rulesets.Taiko.UI
                 return false;
             }
 
-            public bool OnReleased(TaikoAction action) => false;
+            public bool OnReleased(KeyBindingReleaseEvent<TaikoAction> e) => false;
         }
     }
 }

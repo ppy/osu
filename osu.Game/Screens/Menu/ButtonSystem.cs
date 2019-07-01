@@ -14,6 +14,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Bindings;
+using osu.Framework.Input.Events;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
 using osu.Framework.Threading;
@@ -180,9 +181,9 @@ namespace osu.Game.Screens.Menu
                 State = ButtonSystemState.Initial;
         }
 
-        public bool OnPressed(GlobalAction action)
+        public bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
         {
-            switch (action)
+            switch (e.Action)
             {
                 case GlobalAction.Back:
                     return goBack();
@@ -196,7 +197,7 @@ namespace osu.Game.Screens.Menu
             }
         }
 
-        public bool OnReleased(GlobalAction action) => false;
+        public bool OnReleased(KeyBindingReleaseEvent<GlobalAction> e) => false;
 
         private bool goBack()
         {
@@ -297,6 +298,7 @@ namespace osu.Game.Screens.Menu
 
                 case ButtonSystemState.TopLevel:
                 case ButtonSystemState.Play:
+
                     switch (lastState)
                     {
                         case ButtonSystemState.TopLevel: // coming from toplevel to play

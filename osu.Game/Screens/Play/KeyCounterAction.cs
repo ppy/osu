@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Input.Bindings;
+using osu.Framework.Input.Events;
 
 namespace osu.Game.Screens.Play
 {
@@ -16,15 +17,15 @@ namespace osu.Game.Screens.Play
             Action = action;
         }
 
-        public bool OnPressed(T action)
+        public bool OnPressed(KeyBindingPressEvent<T> e)
         {
-            if (action.Equals(Action)) IsLit = true;
+            if (e.Action.Equals(Action)) IsLit = true;
             return false;
         }
 
-        public bool OnReleased(T action)
+        public bool OnReleased(KeyBindingReleaseEvent<T> e)
         {
-            if (action.Equals(Action)) IsLit = false;
+            if (e.Action.Equals(Action)) IsLit = false;
             return false;
         }
     }

@@ -10,6 +10,7 @@ using osu.Game.Rulesets.Objects.Drawables;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Input.Bindings;
+using osu.Framework.Input.Events;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Mania.UI.Components;
 using osu.Game.Rulesets.UI.Scrolling;
@@ -169,9 +170,9 @@ namespace osu.Game.Rulesets.Mania.UI
             });
         }
 
-        public bool OnPressed(ManiaAction action)
+        public bool OnPressed(KeyBindingPressEvent<ManiaAction> e)
         {
-            if (action != Action.Value)
+            if (e.Action != Action.Value)
                 return false;
 
             var nextObject =
@@ -185,7 +186,7 @@ namespace osu.Game.Rulesets.Mania.UI
             return true;
         }
 
-        public bool OnReleased(ManiaAction action) => false;
+        public bool OnReleased(KeyBindingReleaseEvent<ManiaAction> e) => false;
 
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos)
             // This probably shouldn't exist as is, but the columns in the stage are separated by a 1px border

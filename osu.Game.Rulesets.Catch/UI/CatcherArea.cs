@@ -7,6 +7,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input.Bindings;
+using osu.Framework.Input.Events;
 using osu.Framework.MathUtils;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Catch.Judgements;
@@ -317,9 +318,9 @@ namespace osu.Game.Rulesets.Catch.UI
                 }
             }
 
-            public bool OnPressed(CatchAction action)
+            public bool OnPressed(KeyBindingPressEvent<CatchAction> e)
             {
-                switch (action)
+                switch (e.Action)
                 {
                     case CatchAction.MoveLeft:
                         currentDirection--;
@@ -337,9 +338,9 @@ namespace osu.Game.Rulesets.Catch.UI
                 return false;
             }
 
-            public bool OnReleased(CatchAction action)
+            public bool OnReleased(KeyBindingReleaseEvent<CatchAction> e)
             {
-                switch (action)
+                switch (e.Action)
                 {
                     case CatchAction.MoveLeft:
                         currentDirection++;

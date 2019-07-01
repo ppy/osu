@@ -68,9 +68,9 @@ namespace osu.Game.Graphics.UserInterface
             return base.OnKeyDown(e);
         }
 
-        public override bool OnPressed(GlobalAction action)
+        public override bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
         {
-            if (action == GlobalAction.Back)
+            if (e.Action == GlobalAction.Back)
             {
                 if (Text.Length > 0)
                 {
@@ -79,7 +79,7 @@ namespace osu.Game.Graphics.UserInterface
                 }
             }
 
-            return base.OnPressed(action);
+            return base.OnPressed(e);
         }
 
         protected override void KillFocus()

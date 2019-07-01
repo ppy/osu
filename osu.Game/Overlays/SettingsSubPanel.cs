@@ -87,9 +87,9 @@ namespace osu.Game.Overlays
                 return base.OnMouseUp(e);
             }
 
-            public bool OnPressed(GlobalAction action)
+            public bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
             {
-                switch (action)
+                switch (e.Action)
                 {
                     case GlobalAction.Back:
                         Click();
@@ -99,7 +99,7 @@ namespace osu.Game.Overlays
                 return false;
             }
 
-            public bool OnReleased(GlobalAction action) => false;
+            public bool OnReleased(KeyBindingReleaseEvent<GlobalAction> e) => false;
         }
     }
 }

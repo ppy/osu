@@ -8,6 +8,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Input.Bindings;
+using osu.Framework.Input.Events;
 using osu.Framework.Lists;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
@@ -152,12 +153,12 @@ namespace osu.Game.Rulesets.UI.Scrolling
                 controlPoints.Add(new MultiplierControlPoint { Velocity = Beatmap.BeatmapInfo.BaseDifficulty.SliderMultiplier });
         }
 
-        public bool OnPressed(GlobalAction action)
+        public bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
         {
             if (!UserScrollSpeedAdjustment)
                 return false;
 
-            switch (action)
+            switch (e.Action)
             {
                 case GlobalAction.IncreaseScrollSpeed:
                     this.TransformBindableTo(TimeRange, TimeRange.Value - time_span_step, 200, Easing.OutQuint);
@@ -179,7 +180,7 @@ namespace osu.Game.Rulesets.UI.Scrolling
                 throw new ArgumentException($"{nameof(Playfield)} must be a {nameof(ScrollingPlayfield)} when using {nameof(DrawableScrollingRuleset<TObject>)}.");
         }
 
-        public bool OnReleased(GlobalAction action) => false;
+        public bool OnReleased(KeyBindingReleaseEvent<GlobalAction> e) => false;
 
         private class LocalScrollingInfo : IScrollingInfo
         {

@@ -6,6 +6,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input.Bindings;
+using osu.Framework.Input.Events;
 using osu.Game.Input.Bindings;
 
 namespace osu.Game.Graphics.UserInterface
@@ -37,9 +38,9 @@ namespace osu.Game.Graphics.UserInterface
             button.HoverColour = colours.PinkDark;
         }
 
-        public bool OnPressed(GlobalAction action)
+        public bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
         {
-            if (action == GlobalAction.Back)
+            if (e.Action == GlobalAction.Back)
             {
                 Action?.Invoke();
                 return true;
@@ -48,7 +49,7 @@ namespace osu.Game.Graphics.UserInterface
             return false;
         }
 
-        public bool OnReleased(GlobalAction action) => action == GlobalAction.Back;
+        public bool OnReleased(KeyBindingReleaseEvent<GlobalAction> e) => e.Action == GlobalAction.Back;
 
         protected override void PopIn()
         {
