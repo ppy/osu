@@ -4,11 +4,10 @@
 using System;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Graphics;
-using osu.Game.Screens.Play;
 
 namespace osu.Game.Rulesets.Mods
 {
-    public abstract class ModNoFail : Mod, IApplicableFailOverride, IApplicableToHUD
+    public abstract class ModNoFail : ModBlockFail
     {
         public override string Name => "No Fail";
         public override string Acronym => "NF";
@@ -18,12 +17,5 @@ namespace osu.Game.Rulesets.Mods
         public override double ScoreMultiplier => 0.5;
         public override bool Ranked => true;
         public override Type[] IncompatibleMods => new[] { typeof(ModRelax), typeof(ModSuddenDeath), typeof(ModAutoplay) };
-
-        /// <summary>
-        /// We never fail, 'yo.
-        /// </summary>
-        public bool AllowFail => false;
-
-        public void ApplyToHUD(HUDOverlay overlay) => overlay.HealthDisplay.Hide();
     }
 }
