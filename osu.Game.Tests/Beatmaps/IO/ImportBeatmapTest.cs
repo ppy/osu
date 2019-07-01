@@ -108,7 +108,7 @@ namespace osu.Game.Tests.Beatmaps.IO
                     var manager = osu.Dependencies.Get<BeatmapManager>();
 
                     // ReSharper disable once AccessToModifiedClosure
-                    manager.ItemAdded += (_, __) => Interlocked.Increment(ref itemAddRemoveFireCount);
+                    manager.ItemAdded += _ => Interlocked.Increment(ref itemAddRemoveFireCount);
                     manager.ItemRemoved += _ => Interlocked.Increment(ref itemAddRemoveFireCount);
 
                     var imported = await LoadOszIntoOsu(osu);
