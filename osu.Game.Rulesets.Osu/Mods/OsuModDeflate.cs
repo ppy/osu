@@ -2,11 +2,8 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
-using System.Linq;
-using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
-using osu.Game.Configuration;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Osu.Objects;
@@ -58,11 +55,11 @@ namespace osu.Game.Rulesets.Osu.Mods
 
                 case DrawableSlider _:
                 case DrawableHitCircle _:
-                    {
-                        using (drawable.BeginAbsoluteSequence(h.StartTime - h.TimePreempt, true))
-                            drawable.ScaleTo(2f).Then().ScaleTo(1f, h.TimePreempt); // sole difference to grow mod
-                        break;
-                    }
+                {
+                    using (drawable.BeginAbsoluteSequence(h.StartTime - h.TimePreempt, true))
+                        drawable.ScaleTo(2f).Then().ScaleTo(1f, h.TimePreempt); // sole difference to grow mod
+                    break;
+                }
             }
 
             // remove approach circles
