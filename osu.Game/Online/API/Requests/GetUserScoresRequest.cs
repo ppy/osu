@@ -13,7 +13,7 @@ namespace osu.Game.Online.API.Requests
         private readonly int offset;
         private readonly int limit;
 
-        public GetUserScoresRequest(long userId, ScoreType type, int offset = 0, int limit = 0)
+        public GetUserScoresRequest(long userId, ScoreType type, int offset = 0, int limit = 5)
         {
             this.userId = userId;
             this.type = type;

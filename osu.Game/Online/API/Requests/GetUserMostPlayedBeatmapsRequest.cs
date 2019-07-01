@@ -12,7 +12,7 @@ namespace osu.Game.Online.API.Requests
         private readonly int offset;
         private readonly int limit;
 
-        public GetUserMostPlayedBeatmapsRequest(long userId, int offset = 0, int limit = 0)
+        public GetUserMostPlayedBeatmapsRequest(long userId, int offset = 0, int limit = 5)
         {
             this.userId = userId;
             this.offset = offset;

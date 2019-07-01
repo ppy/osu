@@ -12,7 +12,7 @@ namespace osu.Game.Online.API.Requests
         private readonly int offset;
         private readonly int limit;
 
-        public GetUserRecentActivitiesRequest(long userId, int offset = 0, int limit = 0)
+        public GetUserRecentActivitiesRequest(long userId, int offset = 0, int limit = 5)
         {
             this.userId = userId;
             this.offset = offset;
