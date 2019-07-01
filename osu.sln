@@ -29,10 +29,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "osu.Game.Tournament", "osu.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "osu.Game.Tournament.Tests", "osu.Game.Tournament.Tests\osu.Game.Tournament.Tests.csproj", "{5789E78D-38F9-4072-AB7B-978F34B2C17F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "osu.Framework", "..\..\..\Desktop\osu-framework-master\osu.Framework\osu.Framework.csproj", "{05FD51FA-88EA-4895-85A0-FDE2D7DCF6F2}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "osu.Framework.NativeLibs", "..\..\..\Desktop\osu-framework-master\osu.Framework.NativeLibs\osu.Framework.NativeLibs.csproj", "{2E9365F4-25A1-41D1-90ED-F91B5A946DBD}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -91,14 +87,6 @@ Global
 		{5789E78D-38F9-4072-AB7B-978F34B2C17F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5789E78D-38F9-4072-AB7B-978F34B2C17F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5789E78D-38F9-4072-AB7B-978F34B2C17F}.Release|Any CPU.Build.0 = Release|Any CPU
-		{05FD51FA-88EA-4895-85A0-FDE2D7DCF6F2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{05FD51FA-88EA-4895-85A0-FDE2D7DCF6F2}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{05FD51FA-88EA-4895-85A0-FDE2D7DCF6F2}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{05FD51FA-88EA-4895-85A0-FDE2D7DCF6F2}.Release|Any CPU.Build.0 = Release|Any CPU
-		{2E9365F4-25A1-41D1-90ED-F91B5A946DBD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{2E9365F4-25A1-41D1-90ED-F91B5A946DBD}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{2E9365F4-25A1-41D1-90ED-F91B5A946DBD}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{2E9365F4-25A1-41D1-90ED-F91B5A946DBD}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
