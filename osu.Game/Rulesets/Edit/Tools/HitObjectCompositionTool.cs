@@ -1,23 +1,17 @@
-// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
-
-using osu.Game.Rulesets.Objects;
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 namespace osu.Game.Rulesets.Edit.Tools
 {
-    public class HitObjectCompositionTool<T> : ICompositionTool
-        where T : HitObject
+    public abstract class HitObjectCompositionTool
     {
-        public string Name { get; }
+        public readonly string Name;
 
-        public HitObjectCompositionTool()
-            : this(typeof(T).Name)
-        {
-        }
-
-        public HitObjectCompositionTool(string name)
+        protected HitObjectCompositionTool(string name)
         {
             Name = name;
         }
+
+        public abstract PlacementBlueprint CreatePlacementBlueprint();
     }
 }

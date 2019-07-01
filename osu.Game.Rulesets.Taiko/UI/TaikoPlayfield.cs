@@ -1,14 +1,14 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Beatmaps.ControlPoints;
-using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Judgements;
@@ -17,15 +17,15 @@ using osu.Game.Rulesets.UI.Scrolling;
 using osu.Game.Rulesets.Taiko.Objects;
 using osu.Game.Rulesets.Taiko.Objects.Drawables;
 using osu.Game.Rulesets.Taiko.Judgements;
-using OpenTK;
-using OpenTK.Graphics;
+using osuTK;
+using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Taiko.UI
 {
     public class TaikoPlayfield : ScrollingPlayfield
     {
         /// <summary>
-        /// Default height of a <see cref="TaikoPlayfield"/> when inside a <see cref="TaikoRulesetContainer"/>.
+        /// Default height of a <see cref="TaikoPlayfield"/> when inside a <see cref="DrawableTaikoRuleset"/>.
         /// </summary>
         public const float DEFAULT_HEIGHT = 178;
 
@@ -39,16 +39,10 @@ namespace osu.Game.Rulesets.Taiko.UI
         /// </summary>
         private const float left_area_size = 240;
 
-        protected override bool UserScrollSpeedAdjustment => false;
-
-        protected override SpeedChangeVisualisationMethod VisualisationMethod => SpeedChangeVisualisationMethod.Overlapping;
-
         private readonly Container<HitExplosion> hitExplosionContainer;
         private readonly Container<KiaiHitExplosion> kiaiExplosionContainer;
         private readonly JudgementContainer<DrawableTaikoJudgement> judgementContainer;
-
-        protected override Container<Drawable> Content => content;
-        private readonly Container content;
+        internal readonly HitTarget HitTarget;
 
         private readonly Container topLevelHitContainer;
 
@@ -62,9 +56,7 @@ namespace osu.Game.Rulesets.Taiko.UI
 
         public TaikoPlayfield(ControlPointInfo controlPoints)
         {
-            Direction.Value = ScrollingDirection.Left;
-
-            AddRangeInternal(new Drawable[]
+            InternalChildren = new Drawable[]
             {
                 backgroundContainer = new Container
                 {
@@ -107,7 +99,7 @@ namespace osu.Game.Rulesets.Taiko.UI
                                     FillMode = FillMode.Fit,
                                     Blending = BlendingMode.Additive,
                                 },
-                                new HitTarget
+                                HitTarget = new HitTarget
                                 {
                                     Anchor = Anchor.CentreLeft,
                                     Origin = Anchor.Centre,
@@ -121,12 +113,13 @@ namespace osu.Game.Rulesets.Taiko.UI
                             RelativeSizeAxes = Axes.Both,
                             Padding = new MarginPadding { Left = HIT_TARGET_OFFSET }
                         },
-                        content = new Container
+                        new Container
                         {
                             Name = "Hit objects",
                             RelativeSizeAxes = Axes.Both,
                             Padding = new MarginPadding { Left = HIT_TARGET_OFFSET },
-                            Masking = true
+                            Masking = true,
+                            Child = HitObjectContainer
                         },
                         kiaiExplosionContainer = new Container<KiaiHitExplosion>
                         {
@@ -195,9 +188,7 @@ namespace osu.Game.Rulesets.Taiko.UI
                     Name = "Top level hit objects",
                     RelativeSizeAxes = Axes.Both,
                 }
-            });
-
-            VisibleTimeRange.Value = 6000;
+            };
         }
 
         [BackgroundDependencyLoader]
@@ -221,6 +212,7 @@ namespace osu.Game.Rulesets.Taiko.UI
                 case DrawableBarLine barline:
                     barlineContainer.Add(barline.CreateProxy());
                     break;
+
                 case DrawableTaikoHitObject taikoObject:
                     topLevelHitContainer.Add(taikoObject.CreateProxiedContent());
                     break;
@@ -229,7 +221,7 @@ namespace osu.Game.Rulesets.Taiko.UI
 
         internal void OnNewResult(DrawableHitObject judgedObject, JudgementResult result)
         {
-            if (!DisplayJudgements)
+            if (!DisplayJudgements.Value)
                 return;
 
             if (!judgedObject.DisplayResult)
@@ -241,6 +233,7 @@ namespace osu.Game.Rulesets.Taiko.UI
                     if (result.IsHit)
                         hitExplosionContainer.Children.FirstOrDefault(e => e.JudgedObject == ((DrawableStrongNestedHit)judgedObject).MainObject)?.VisualiseSecondHit();
                     break;
+
                 default:
                     judgementContainer.Add(new DrawableTaikoJudgement(result, judgedObject)
                     {

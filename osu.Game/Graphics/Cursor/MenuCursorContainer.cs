@@ -1,5 +1,5 @@
-// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System.Linq;
 using osu.Framework.Graphics;
@@ -29,7 +29,7 @@ namespace osu.Game.Graphics.Cursor
         {
             AddRangeInternal(new Drawable[]
             {
-                Cursor = new MenuCursor { State = Visibility.Hidden },
+                Cursor = new MenuCursor { State = { Value = Visibility.Hidden } },
                 content = new Container { RelativeSizeAxes = Axes.Both }
             });
         }
@@ -43,6 +43,7 @@ namespace osu.Game.Graphics.Cursor
         }
 
         private IProvideCursor currentTarget;
+
         protected override void Update()
         {
             base.Update();
@@ -50,6 +51,7 @@ namespace osu.Game.Graphics.Cursor
             if (!CanShowCursor)
             {
                 currentTarget?.Cursor?.Hide();
+                currentTarget = null;
                 return;
             }
 

@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
@@ -7,12 +7,13 @@ using osu.Framework.Audio.Sample;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Events;
 using osu.Framework.MathUtils;
 using osu.Game.Graphics;
-using OpenTK;
-using OpenTK.Graphics;
+using osuTK;
+using osuTK.Graphics;
 
 namespace osu.Game.Screens.Select.Carousel
 {
@@ -68,7 +69,7 @@ namespace osu.Game.Screens.Select.Carousel
                 }
             };
 
-            sampleHover = audio.Sample.Get($@"SongSelect/song-ping-variation-{RNG.Next(1, 5)}");
+            sampleHover = audio.Samples.Get($@"SongSelect/song-ping-variation-{RNG.Next(1, 5)}");
             hoverLayer.Colour = colours.Blue.Opacity(0.1f);
         }
 
@@ -106,6 +107,7 @@ namespace osu.Game.Screens.Select.Carousel
                 case CarouselItemState.NotSelected:
                     Deselected();
                     break;
+
                 case CarouselItemState.Selected:
                     Selected();
                     break;

@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using System.Linq;
@@ -98,6 +98,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             circlePiece?.FlashBox.FinishTransforms();
 
             var offset = !AllJudged ? 0 : Time.Current - HitObject.StartTime;
+
             using (BeginDelayedSequence(HitObject.StartTime - Time.Current + offset, true))
             {
                 switch (State.Value)
@@ -108,15 +109,18 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
                         UnproxyContent();
                         this.Delay(HitObject.HitWindows.HalfWindowFor(HitResult.Miss)).Expire();
                         break;
+
                     case ArmedState.Miss:
                         this.FadeOut(100)
                             .Expire();
                         break;
+
                     case ArmedState.Hit:
                         // If we're far enough away from the left stage, we should bring outselves in front of it
                         ProxyContent();
 
                         var flash = circlePiece?.FlashBox;
+
                         if (flash != null)
                         {
                             flash.FadeTo(0.9f);
@@ -173,13 +177,13 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
 
                 if (!userTriggered)
                 {
-                    if (timeOffset > second_hit_window)
+                    if (timeOffset - MainObject.Result.TimeOffset > second_hit_window)
                         ApplyResult(r => r.Type = HitResult.Miss);
                     return;
                 }
 
-                if (Math.Abs(MainObject.Result.TimeOffset - timeOffset) < second_hit_window)
-                    ApplyResult(r => r.Type = HitResult.Great);
+                if (Math.Abs(timeOffset - MainObject.Result.TimeOffset) <= second_hit_window)
+                    ApplyResult(r => r.Type = MainObject.Result.Type);
             }
 
             public override bool OnPressed(TaikoAction action)

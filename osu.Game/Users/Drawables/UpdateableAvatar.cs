@@ -1,0 +1,77 @@
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
+
+using osu.Framework.Bindables;
+using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Effects;
+using osu.Framework.Graphics.Transforms;
+
+namespace osu.Game.Users.Drawables
+{
+    /// <summary>
+    /// An avatar which can update to a new user when needed.
+    /// </summary>
+    public class UpdateableAvatar : ModelBackedDrawable<User>
+    {
+        public User User
+        {
+            get => Model;
+            set => Model = value;
+        }
+
+        public new bool Masking
+        {
+            get => base.Masking;
+            set => base.Masking = value;
+        }
+
+        public new float CornerRadius
+        {
+            get => base.CornerRadius;
+            set => base.CornerRadius = value;
+        }
+
+        public new EdgeEffectParameters EdgeEffect
+        {
+            get => base.EdgeEffect;
+            set => base.EdgeEffect = value;
+        }
+
+        protected override bool TransformImmediately { get; }
+
+        /// <summary>
+        /// Whether to show a default guest representation on null user (as opposed to nothing).
+        /// </summary>
+        public bool ShowGuestOnNull = true;
+
+        /// <summary>
+        /// Whether to open the user's profile when clicked.
+        /// </summary>
+        public readonly BindableBool OpenOnClick = new BindableBool(true);
+
+        public UpdateableAvatar(User user = null, bool hideImmediately = false)
+        {
+            TransformImmediately = hideImmediately;
+            User = user;
+        }
+
+        protected override TransformSequence<Drawable> ApplyHideTransforms(Drawable drawable) => TransformImmediately ? drawable?.FadeOut() : base.ApplyHideTransforms(drawable);
+
+        protected override Drawable CreateDrawable(User user)
+        {
+            if (user == null && !ShowGuestOnNull)
+                return null;
+
+            var avatar = new DrawableAvatar(user)
+            {
+                RelativeSizeAxes = Axes.Both,
+            };
+
+            avatar.OnLoadComplete += d => d.FadeInFromZero(300, Easing.OutQuint);
+            avatar.OpenOnClick.BindTo(OpenOnClick);
+
+            return avatar;
+        }
+    }
+}

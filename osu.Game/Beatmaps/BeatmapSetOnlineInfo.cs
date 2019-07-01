@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using Newtonsoft.Json;
@@ -65,6 +65,11 @@ namespace osu.Game.Beatmaps
         /// The amount of people who have favourited this beatmap set.
         /// </summary>
         public int FavouriteCount { get; set; }
+
+        /// <summary>
+        /// The availability of this beatmap set.
+        /// </summary>
+        public BeatmapSetOnlineAvailability Availability { get; set; }
     }
 
     public class BeatmapSetOnlineCovers
@@ -83,5 +88,14 @@ namespace osu.Game.Beatmaps
 
         [JsonProperty(@"list@2x")]
         public string List { get; set; }
+    }
+
+    public class BeatmapSetOnlineAvailability
+    {
+        [JsonProperty(@"download_disabled")]
+        public bool DownloadDisabled { get; set; }
+
+        [JsonProperty(@"more_information")]
+        public string ExternalLink { get; set; }
     }
 }
