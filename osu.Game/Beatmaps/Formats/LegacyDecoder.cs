@@ -193,9 +193,9 @@ namespace osu.Game.Beatmaps.Formats
         {
             public int CustomSampleBank;
 
-            public override SampleInfo ApplyTo(SampleInfo sampleInfo)
+            public override HitSampleInfo ApplyTo(HitSampleInfo hitSampleInfo)
             {
-                var baseInfo = base.ApplyTo(sampleInfo);
+                var baseInfo = base.ApplyTo(hitSampleInfo);
 
                 if (string.IsNullOrEmpty(baseInfo.Suffix) && CustomSampleBank > 1)
                     baseInfo.Suffix = CustomSampleBank.ToString();
