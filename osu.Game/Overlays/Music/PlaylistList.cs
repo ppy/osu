@@ -1,17 +1,17 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
-using osu.Framework.Configuration;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input.Events;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics.Containers;
-using OpenTK;
+using osuTK;
 
 namespace osu.Game.Overlays.Music
 {
@@ -34,8 +34,8 @@ namespace osu.Game.Overlays.Music
 
         public new MarginPadding Padding
         {
-            get { return base.Padding; }
-            set { base.Padding = value; }
+            get => base.Padding;
+            set => base.Padding = value;
         }
 
         public BeatmapSetInfo FirstVisibleSet => items.FirstVisibleSet;
@@ -73,7 +73,7 @@ namespace osu.Game.Overlays.Music
             }
 
             [BackgroundDependencyLoader]
-            private void load(BeatmapManager beatmaps, IBindableBeatmap beatmap)
+            private void load(BeatmapManager beatmaps, IBindable<WorkingBeatmap> beatmap)
             {
                 beatmaps.GetAllUsableBeatmapSets().ForEach(addBeatmapSet);
                 beatmaps.ItemAdded += addBeatmapSet;
@@ -83,20 +83,20 @@ namespace osu.Game.Overlays.Music
                 beatmapBacking.ValueChanged += _ => updateSelectedSet();
             }
 
-            private void addBeatmapSet(BeatmapSetInfo obj)
+            private void addBeatmapSet(BeatmapSetInfo obj) => Schedule(() =>
             {
                 var newItem = new PlaylistItem(obj) { OnSelect = set => Selected?.Invoke(set) };
 
                 items.Add(newItem);
                 items.SetLayoutPosition(newItem, items.Count - 1);
-            }
+            });
 
-            private void removeBeatmapSet(BeatmapSetInfo obj)
+            private void removeBeatmapSet(BeatmapSetInfo obj) => Schedule(() =>
             {
                 var itemToRemove = items.FirstOrDefault(i => i.BeatmapSetInfo.ID == obj.ID);
                 if (itemToRemove != null)
                     items.Remove(itemToRemove);
-            }
+            });
 
             private void updateSelectedSet()
             {
@@ -106,8 +106,8 @@ namespace osu.Game.Overlays.Music
 
             public string SearchTerm
             {
-                get { return search.SearchTerm; }
-                set { search.SearchTerm = value; }
+                get => search.SearchTerm;
+                set => search.SearchTerm = value;
             }
 
             public BeatmapSetInfo FirstVisibleSet => items.FirstOrDefault(i => i.MatchingFilter)?.BeatmapSetInfo;
@@ -127,6 +127,7 @@ namespace osu.Game.Overlays.Music
                 nativeDragPosition = e.ScreenSpaceMousePosition;
                 if (draggedItem == null)
                     return base.OnDrag(e);
+
                 return true;
             }
 
@@ -186,6 +187,7 @@ namespace osu.Game.Overlays.Music
                 // the item positions as they are being transformed
                 float heightAccumulator = 0;
                 int dstIndex = 0;
+
                 for (; dstIndex < items.Count; dstIndex++)
                 {
                     // Using BoundingBox here takes care of scale, paddings, etc...
@@ -225,6 +227,11 @@ namespace osu.Game.Overlays.Music
                         if (value)
                             InvalidateLayout();
                     }
+                }
+
+                public bool FilteringActive
+                {
+                    set { }
                 }
 
                 public IEnumerable<IFilterable> FilterableChildren => Children;

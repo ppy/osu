@@ -1,11 +1,11 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
-using osu.Framework.Configuration;
+using osu.Framework.Bindables;
 using osu.Framework.Extensions.TypeExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Primitives;
@@ -15,7 +15,7 @@ using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Skinning;
-using OpenTK.Graphics;
+using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Objects.Drawables
 {
@@ -33,7 +33,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
 
         protected SkinnableSound Samples;
 
-        protected virtual IEnumerable<SampleInfo> GetSamples() => HitObject.Samples;
+        protected virtual IEnumerable<HitSampleInfo> GetSamples() => HitObject.Samples;
 
         private readonly Lazy<List<DrawableHitObject>> nestedHitObjects = new Lazy<List<DrawableHitObject>>();
         public IEnumerable<DrawableHitObject> NestedHitObjects => nestedHitObjects.IsValueCreated ? nestedHitObjects.Value : Enumerable.Empty<DrawableHitObject>();
@@ -59,7 +59,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
         public bool AllJudged => Judged && NestedHitObjects.All(h => h.AllJudged);
 
         /// <summary>
-        /// Whether this <see cref="DrawableHitObject"/> has been hit. This occurs if <see cref="Result.IsHit"/> is <see cref="true"/>.
+        /// Whether this <see cref="DrawableHitObject"/> has been hit. This occurs if <see cref="Result"/> is hit.
         /// Note: This does NOT include nested hitobjects.
         /// </summary>
         public bool IsHit => Result?.IsHit ?? false;
@@ -77,13 +77,11 @@ namespace osu.Game.Rulesets.Objects.Drawables
 
         private bool judgementOccurred;
 
-        public bool Interactive = true;
-        public override bool HandleNonPositionalInput => Interactive;
-        public override bool HandlePositionalInput => Interactive;
-
         public override bool RemoveWhenNotAlive => false;
         public override bool RemoveCompletedTransforms => false;
         protected override bool RequiresChildrenUpdate => true;
+
+        public override bool IsPresent => base.IsPresent || (State.Value == ArmedState.Idle && Clock?.CurrentTime >= LifetimeStart);
 
         public readonly Bindable<ArmedState> State = new Bindable<ArmedState>();
 
@@ -96,6 +94,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
         private void load()
         {
             var judgement = HitObject.CreateJudgement();
+
             if (judgement != null)
             {
                 Result = CreateResult(judgement);
@@ -105,7 +104,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
 
             var samples = GetSamples().ToArray();
 
-            if (samples.Any())
+            if (samples.Length > 0)
             {
                 if (HitObject.SampleControlPoint == null)
                     throw new ArgumentNullException(nameof(HitObject.SampleControlPoint), $"{nameof(HitObject)}s must always have an attached {nameof(HitObject.SampleControlPoint)}."
@@ -119,18 +118,20 @@ namespace osu.Game.Rulesets.Objects.Drawables
             }
         }
 
+        protected override void ClearInternal(bool disposeChildren = true) => throw new InvalidOperationException($"Should never clear a {nameof(DrawableHitObject)}");
+
         protected override void LoadComplete()
         {
             base.LoadComplete();
 
-            State.ValueChanged += state =>
+            State.ValueChanged += armed =>
             {
-                UpdateState(state);
+                UpdateState(armed.NewValue);
 
                 // apply any custom state overrides
-                ApplyCustomUpdateState?.Invoke(this, state);
+                ApplyCustomUpdateState?.Invoke(this, armed.NewValue);
 
-                if (State == ArmedState.Hit)
+                if (armed.NewValue == ArmedState.Hit)
                     PlaySamples();
             };
 
@@ -145,7 +146,8 @@ namespace osu.Game.Rulesets.Objects.Drawables
         public event Action<DrawableHitObject, ArmedState> ApplyCustomUpdateState;
 
         /// <summary>
-        /// Plays all the hitsounds for this <see cref="DrawableHitObject"/>.
+        /// Plays all the hit sounds for this <see cref="DrawableHitObject"/>.
+        /// This is invoked automatically when this <see cref="DrawableHitObject"/> is hit.
         /// </summary>
         public void PlaySamples() => Samples?.Play();
 
@@ -161,19 +163,14 @@ namespace osu.Game.Rulesets.Objects.Drawables
                 {
                     OnRevertResult?.Invoke(this, Result);
 
+                    Result.TimeOffset = 0;
                     Result.Type = HitResult.None;
                     State.Value = ArmedState.Idle;
                 }
             }
         }
 
-        public override bool UpdateSubTreeMasking(Drawable source, RectangleF maskingBounds)
-        {
-            if (!AllJudged)
-                return false;
-
-            return base.UpdateSubTreeMasking(source, maskingBounds);
-        }
+        protected override bool ComputeIsMaskedAway(RectangleF maskingBounds) => AllJudged && base.ComputeIsMaskedAway(maskingBounds);
 
         protected override void UpdateAfterChildren()
         {
@@ -213,9 +210,11 @@ namespace osu.Game.Rulesets.Objects.Drawables
             {
                 case HitResult.None:
                     break;
+
                 case HitResult.Miss:
                     State.Value = ArmedState.Miss;
                     break;
+
                 default:
                     State.Value = ArmedState.Hit;
                     break;
@@ -225,12 +224,26 @@ namespace osu.Game.Rulesets.Objects.Drawables
         }
 
         /// <summary>
+        /// Will called at least once after the <see cref="Drawable.LifetimeEnd"/> of this <see cref="DrawableHitObject"/> has been passed.
+        /// </summary>
+        internal void OnLifetimeEnd()
+        {
+            foreach (var nested in NestedHitObjects)
+                nested.OnLifetimeEnd();
+            UpdateResult(false);
+        }
+
+        /// <summary>
         /// Processes this <see cref="DrawableHitObject"/>, checking if a scoring result has occurred.
         /// </summary>
         /// <param name="userTriggered">Whether the user triggered this process.</param>
         /// <returns>Whether a scoring result has occurred from this <see cref="DrawableHitObject"/> or any nested <see cref="DrawableHitObject"/>.</returns>
         protected bool UpdateResult(bool userTriggered)
         {
+            // It's possible for input to get into a bad state when rewinding gameplay, so results should not be processed
+            if (Time.Elapsed < 0)
+                return false;
+
             judgementOccurred = false;
 
             if (AllJudged)

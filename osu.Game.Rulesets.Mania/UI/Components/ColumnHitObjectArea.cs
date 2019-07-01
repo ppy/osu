@@ -1,35 +1,32 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
-using osu.Framework.Configuration;
+using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics;
+using osu.Game.Rulesets.UI;
 using osu.Game.Rulesets.UI.Scrolling;
-using OpenTK.Graphics;
+using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Mania.UI.Components
 {
-    public class ColumnHitObjectArea : Container, IHasAccentColour
+    public class ColumnHitObjectArea : CompositeDrawable, IHasAccentColour
     {
         private const float hit_target_height = 10;
         private const float hit_target_bar_height = 2;
 
-        private Container<Drawable> content;
-        protected override Container<Drawable> Content => content;
-
         private readonly IBindable<ScrollingDirection> direction = new Bindable<ScrollingDirection>();
 
-        private Container hitTargetLine;
+        private readonly Container hitTargetLine;
+        private readonly Drawable hitTargetBar;
 
-        [BackgroundDependencyLoader]
-        private void load(IScrollingInfo scrollingInfo)
+        public ColumnHitObjectArea(HitObjectContainer hitObjectContainer)
         {
-            Drawable hitTargetBar;
-
             InternalChildren = new[]
             {
                 hitTargetBar = new Box
@@ -45,17 +42,17 @@ namespace osu.Game.Rulesets.Mania.UI.Components
                     Masking = true,
                     Child = new Box { RelativeSizeAxes = Axes.Both }
                 },
-                content = new Container
-                {
-                    Name = "Hit objects",
-                    RelativeSizeAxes = Axes.Both,
-                },
+                hitObjectContainer
             };
+        }
 
+        [BackgroundDependencyLoader]
+        private void load(IScrollingInfo scrollingInfo)
+        {
             direction.BindTo(scrollingInfo.Direction);
-            direction.BindValueChanged(direction =>
+            direction.BindValueChanged(dir =>
             {
-                Anchor anchor = direction == ScrollingDirection.Up ? Anchor.TopLeft : Anchor.BottomLeft;
+                Anchor anchor = dir.NewValue == ScrollingDirection.Up ? Anchor.TopLeft : Anchor.BottomLeft;
 
                 hitTargetBar.Anchor = hitTargetBar.Origin = anchor;
                 hitTargetLine.Anchor = hitTargetLine.Origin = anchor;
@@ -77,6 +74,7 @@ namespace osu.Game.Rulesets.Mania.UI.Components
             {
                 if (accentColour == value)
                     return;
+
                 accentColour = value;
 
                 updateColours();

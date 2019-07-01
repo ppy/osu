@@ -1,7 +1,7 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
-using OpenTK.Graphics;
+using osuTK.Graphics;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -11,7 +11,7 @@ using osu.Game.Graphics.Containers;
 
 namespace osu.Game.Overlays.SearchableList
 {
-    public abstract class SearchableListOverlay : WaveOverlayContainer
+    public abstract class SearchableListOverlay : FullscreenOverlay
     {
         public static readonly float WIDTH_PADDING = 80;
     }
@@ -32,8 +32,6 @@ namespace osu.Game.Overlays.SearchableList
 
         protected SearchableListOverlay()
         {
-            RelativeSizeAxes = Axes.Both;
-
             Children = new Drawable[]
             {
                 new Box
@@ -103,7 +101,7 @@ namespace osu.Game.Overlays.SearchableList
 
         protected override void OnFocus(FocusEvent e)
         {
-            GetContainingInputManager().ChangeFocus(Filter.Search);
+            Filter.Search.TakeFocus();
         }
 
         protected override void PopIn()

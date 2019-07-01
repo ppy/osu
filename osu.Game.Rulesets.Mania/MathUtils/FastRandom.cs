@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 
@@ -37,11 +37,11 @@ namespace osu.Game.Rulesets.Mania.MathUtils
         /// <returns>The random value.</returns>
         public uint NextUInt()
         {
-            uint t = X ^ X << 11;
+            uint t = X ^ (X << 11);
             X = Y;
             Y = Z;
             Z = W;
-            return W = W ^ W >> 19 ^ t ^ t >> 8;
+            return W = W ^ (W >> 19) ^ t ^ (t >> 8);
         }
 
         /// <summary>

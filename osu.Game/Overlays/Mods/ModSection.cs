@@ -1,8 +1,8 @@
-// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
-using OpenTK;
-using OpenTK.Input;
+using osuTK;
+using osuTK.Input;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
@@ -10,7 +10,9 @@ using osu.Game.Rulesets.Mods;
 using System;
 using System.Linq;
 using System.Collections.Generic;
+using System.Threading;
 using osu.Framework.Input.Events;
+using osu.Game.Graphics;
 
 namespace osu.Game.Overlays.Mods
 {
@@ -32,6 +34,13 @@ namespace osu.Game.Overlays.Mods
 
         public IEnumerable<Mod> SelectedMods => buttons.Select(b => b.SelectedMod).Where(m => m != null);
 
+        private CancellationTokenSource modsLoadCts;
+
+        /// <summary>
+        /// True when all mod icons have completed loading.
+        /// </summary>
+        public bool ModIconsLoaded { get; private set; } = true;
+
         public IEnumerable<Mod> Mods
         {
             set
@@ -47,8 +56,28 @@ namespace osu.Game.Overlays.Mods
                     };
                 }).ToArray();
 
-                ButtonsContainer.Children = modContainers;
+                modsLoadCts?.Cancel();
+                ModIconsLoaded = false;
+
+                LoadComponentsAsync(modContainers, c =>
+                {
+                    ModIconsLoaded = true;
+                    ButtonsContainer.ChildrenEnumerable = c;
+                }, (modsLoadCts = new CancellationTokenSource()).Token);
+
                 buttons = modContainers.OfType<ModButton>().ToArray();
+
+                if (value.Any())
+                {
+                    headerLabel.FadeIn(200);
+                    this.FadeIn(200);
+                }
+                else
+                {
+                    // transition here looks weird as mods instantly disappear.
+                    headerLabel.Hide();
+                    Hide();
+                }
             }
         }
 
@@ -76,10 +105,12 @@ namespace osu.Game.Overlays.Mods
         public void DeselectTypes(IEnumerable<Type> modTypes, bool immediate = false)
         {
             int delay = 0;
+
             foreach (var button in buttons)
             {
                 Mod selected = button.SelectedMod;
                 if (selected == null) continue;
+
                 foreach (var type in modTypes)
                     if (type.IsInstanceOfType(selected))
                     {
@@ -123,7 +154,7 @@ namespace osu.Game.Overlays.Mods
                     Origin = Anchor.TopLeft,
                     Anchor = Anchor.TopLeft,
                     Position = new Vector2(0f, 0f),
-                    Font = @"Exo2.0-Bold"
+                    Font = OsuFont.GetFont(weight: FontWeight.Bold)
                 },
                 ButtonsContainer = new FillFlowContainer<ModButtonEmpty>
                 {

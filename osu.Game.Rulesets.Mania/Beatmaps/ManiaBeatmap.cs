@@ -1,10 +1,10 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
 using System.Linq;
+using osu.Framework.Graphics.Sprites;
 using osu.Game.Beatmaps;
-using osu.Game.Graphics;
 using osu.Game.Rulesets.Mania.Objects;
 using osu.Game.Rulesets.Mania.UI;
 
@@ -42,13 +42,13 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
                 {
                     Name = @"Note Count",
                     Content = notes.ToString(),
-                    Icon = FontAwesome.fa_circle_o
+                    Icon = FontAwesome.Regular.Circle
                 },
                 new BeatmapStatistic
                 {
                     Name = @"Hold Note Count",
                     Content = holdnotes.ToString(),
-                    Icon = FontAwesome.fa_circle
+                    Icon = FontAwesome.Regular.Circle
                 },
             };
         }
