@@ -17,12 +17,12 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
     public class DrawableHitCircle : DrawableOsuHitObject, IDrawableHitObjectWithProxiedApproach
     {
         public ApproachCircle ApproachCircle;
-        private readonly CirclePiece circle;
-        private readonly RingPiece ring;
-        private readonly FlashPiece flash;
-        private readonly ExplodePiece explode;
-        private readonly NumberPiece number;
-        private readonly GlowPiece glow;
+        public readonly CirclePiece circle;
+        public readonly RingPiece ring;
+        public readonly FlashPiece flash;
+        public readonly ExplodePiece explode;
+        public readonly NumberPiece number;
+        public readonly GlowPiece glow;
 
         private readonly IBindable<Vector2> positionBindable = new Bindable<Vector2>();
         private readonly IBindable<int> stackHeightBindable = new Bindable<int>();
@@ -111,17 +111,6 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                 circle.Colour = AccentColour;
                 ApproachCircle.Colour = AccentColour;
             }
-        }
-
-        public void HideButApproachCircle()
-        {
-            circle.Hide();
-            circle.AlwaysPresent = true;
-            ring.Hide();
-            flash.Hide();
-            explode.Hide();
-            number.Hide();
-            glow.Hide();
         }
 
         protected override void CheckForResult(bool userTriggered, double timeOffset)

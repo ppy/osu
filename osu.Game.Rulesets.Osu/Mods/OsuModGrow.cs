@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Bindables;
@@ -27,6 +28,8 @@ namespace osu.Game.Rulesets.Osu.Mods
         public override string Description => "Hit them at the right size!";
 
         public override double ScoreMultiplier => 1;
+
+        public override Type[] IncompatibleMods => new[] { typeof(OsuModTraceable) };
 
         private Bindable<bool> increaseFirstObjectVisibility = new Bindable<bool>();
 

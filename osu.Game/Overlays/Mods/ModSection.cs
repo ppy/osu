@@ -112,7 +112,7 @@ namespace osu.Game.Overlays.Mods
                 if (selected == null) continue;
 
                 foreach (var type in modTypes)
-                    if (type.IsInstanceOfType(selected))
+                    if (type.IsInstanceOfType(selected) && !selected.GetType().IsSubclassOf(type))
                     {
                         if (immediate)
                             button.Deselect();
@@ -130,7 +130,7 @@ namespace osu.Game.Overlays.Mods
         {
             foreach (var button in buttons)
             {
-                int i = Array.FindIndex(button.Mods, m => modTypes.Any(t => t.IsInstanceOfType(m)));
+                int i = Array.FindIndex(button.Mods, m => modTypes.Any(t => t.IsInstanceOfType(m) && !m.GetType().IsSubclassOf(t)));
 
                 if (i >= 0)
                     button.SelectAt(i);

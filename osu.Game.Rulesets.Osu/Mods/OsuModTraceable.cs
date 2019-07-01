@@ -2,83 +2,63 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
+using System.Linq;
 using System.Collections.Generic;
-using osu.Game.Graphics;
+using osu.Framework.Graphics.Sprites;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Osu.Objects.Drawables;
-using osu.Framework.Graphics;
-using osu.Game.Rulesets.Objects.Types;
 
 namespace osu.Game.Rulesets.Osu.Mods
 {
-    internal class OsuModTraceable : Mod, IApplicableToDrawableHitObjects
+    internal class OsuModTraceable : OsuModHidden, IReadFromConfig, IApplicableToDrawableHitObjects
     {
         public override string Name => "Traceable";
-        public override string ShortenedName => "TC";
-        public override FontAwesome Icon => FontAwesome.fa_snapchat_ghost;
+        public override string Acronym => "TC";
+        public override IconUsage Icon => FontAwesome.Brands.SnapchatGhost;
         public override ModType Type => ModType.Fun;
         public override string Description => "Put your faith in the approach circles...";
         public override double ScoreMultiplier => 1;
+        public override Type[] IncompatibleMods => new[] { typeof(OsuModHidden), typeof(OsuModGrow) };
 
-        public void ApplyToDrawableHitObjects(IEnumerable<DrawableHitObject> drawables)
+        public override void ApplyToDrawableHitObjects(IEnumerable<DrawableHitObject> drawables)
         {
-            foreach (var drawable in drawables)
-                drawable.ApplyCustomUpdateState += ApplyTraceableState;
+            foreach (var drawable in drawables.Skip(IncreaseFirstObjectVisibility.Value ? 1 : 0))
+            {
+                switch (drawable)
+                {
+                    case DrawableHitCircle _:
+                        drawable.ApplyCustomUpdateState += ApplyTraceableState;
+                        break;
+                    case DrawableSlider slider:
+                        slider.ApplyCustomUpdateState += ApplyHiddenState;
+                        slider.HeadCircle.ApplyCustomUpdateState += ApplyTraceableState;
+                        break;
+                    default:
+                        drawable.ApplyCustomUpdateState += ApplyHiddenState;
+                        break;
+                }
+            }
         }
 
-        /* Similar to ApplyHiddenState, only different if drawable is DrawableHitCircle.
-         * If we'd use ApplyHiddenState instead but only on non-DrawableHitCircle's, then
-         * the nested object HeadCircle of DrawableSlider would still use ApplyHiddenState,
-         * thus treating the DrawableHitCircle with the hidden mod instead of the traceable mod.
-         */
         protected void ApplyTraceableState(DrawableHitObject drawable, ArmedState state)
         {
-            if (!(drawable is DrawableOsuHitObject d))
+            if (!(drawable is DrawableHitCircle circle))
                 return;
 
-            var h = d.HitObject;
+            var h = circle.HitObject;
 
-            var fadeOutStartTime = h.StartTime - h.TimePreempt + h.TimeFadeIn;
-
-            // new duration from completed fade in to end (before fading out)
-            var longFadeDuration = ((h as IHasEndTime)?.EndTime ?? h.StartTime) - fadeOutStartTime;
-
-            switch (drawable)
+            // we only want to see the approach circle
+            using (circle.BeginAbsoluteSequence(h.StartTime - h.TimePreempt, true))
             {
-                case DrawableHitCircle circle:
-                    // we only want to see the approach circle
-                    using (circle.BeginAbsoluteSequence(h.StartTime - h.TimePreempt, true))
-                        circle.HideButApproachCircle();
-
-                    // approach circle fades out quickly at StartTime
-                    using (drawable.BeginAbsoluteSequence(h.StartTime, true))
-                        circle.ApproachCircle.FadeOut(50);
-
-                    break;
-                case DrawableSlider slider:
-                    using (slider.BeginAbsoluteSequence(fadeOutStartTime, true))
-                        slider.Body.FadeOut(longFadeDuration, Easing.Out);
-
-                    break;
-                case DrawableSliderTick sliderTick:
-                    // slider ticks fade out over up to one second
-                    var tickFadeOutDuration = Math.Min(sliderTick.HitObject.TimePreempt - DrawableSliderTick.ANIM_DURATION, 1000);
-
-                    using (sliderTick.BeginAbsoluteSequence(sliderTick.HitObject.StartTime - tickFadeOutDuration, true))
-                        sliderTick.FadeOut(tickFadeOutDuration);
-
-                    break;
-                case DrawableSpinner spinner:
-                    // hide elements we don't care about.
-                    spinner.Disc.Hide();
-                    spinner.Ticks.Hide();
-                    spinner.Background.Hide();
-
-                    using (spinner.BeginAbsoluteSequence(fadeOutStartTime + longFadeDuration, true))
-                        spinner.FadeOut(h.TimePreempt);
-
-                    break;
+                circle.circle.Hide();   // CirclePiece
+                circle.circle.AlwaysPresent = true;
+                circle.ring.Hide();
+                circle.flash.Hide();
+                circle.explode.Hide();
+                circle.number.Hide();
+                circle.glow.Hide();
+                circle.ApproachCircle.Show();
             }
         }
     }
