@@ -118,6 +118,7 @@ namespace osu.Game.Overlays.Profile.Sections.Beatmaps
                     counterText.Text = value.ToString();
                 }
             }
+
             public Counter()
             {
                 Masking = true;
