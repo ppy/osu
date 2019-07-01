@@ -36,6 +36,11 @@ namespace osu.Game.Overlays.Settings.Sections.Gameplay
                 },
                 new SettingsCheckbox
                 {
+                    LabelText = "Hide health bar if you can't fail",
+                    Bindable = config.GetBindable<bool>(OsuSetting.HideHealthBar),
+                },
+                new SettingsCheckbox
+                {
                     LabelText = "Always show key overlay",
                     Bindable = config.GetBindable<bool>(OsuSetting.KeyOverlay)
                 },
