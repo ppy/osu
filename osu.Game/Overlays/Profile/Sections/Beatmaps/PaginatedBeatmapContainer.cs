@@ -20,7 +20,6 @@ namespace osu.Game.Overlays.Profile.Sections.Beatmaps
     {
         private const float panel_padding = 10f;
         private readonly BindableInt count = new BindableInt();
-        private readonly Counter counterDrawable;
         private readonly BeatmapSetType type;
         private GetUserBeatmapsRequest request;
 
@@ -32,6 +31,8 @@ namespace osu.Game.Overlays.Profile.Sections.Beatmaps
             ItemsPerPage = 6;
 
             ItemsContainer.Spacing = new Vector2(panel_padding);
+
+            Counter counterDrawable;
 
             HeaderContainer.Add(counterDrawable = new Counter
             {
