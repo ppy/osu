@@ -23,6 +23,7 @@ namespace osu.Game.Skinning
         private readonly Bindable<bool> beatmapHitsounds = new Bindable<bool>();
 
         private readonly ISkin skin;
+
         private ISkinSource fallbackSource;
 
         public LocalSkinOverrideContainer(ISkin skin)
