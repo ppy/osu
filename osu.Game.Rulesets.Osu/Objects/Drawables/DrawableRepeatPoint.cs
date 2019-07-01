@@ -1,13 +1,13 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using System.Collections.Generic;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Sprites;
 using osu.Framework.MathUtils;
 using osu.Game.Rulesets.Objects.Drawables;
-using OpenTK;
-using osu.Game.Graphics;
+using osuTK;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Skinning;
 
@@ -36,7 +36,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                 new SkinnableDrawable("Play/osu/reversearrow", _ => new SpriteIcon
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Icon = FontAwesome.fa_chevron_right
+                    Icon = FontAwesome.Solid.ChevronRight
                 }, restrictSize: false)
             };
         }
@@ -44,7 +44,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         protected override void CheckForResult(bool userTriggered, double timeOffset)
         {
             if (repeatPoint.StartTime <= Time.Current)
-                ApplyResult(r => r.Type = drawableSlider.Tracking ? HitResult.Great : HitResult.Miss);
+                ApplyResult(r => r.Type = drawableSlider.Tracking.Value ? HitResult.Great : HitResult.Miss);
         }
 
         protected override void UpdatePreemptState()
@@ -64,9 +64,11 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                 case ArmedState.Idle:
                     this.Delay(HitObject.TimePreempt).FadeOut();
                     break;
+
                 case ArmedState.Miss:
                     this.FadeOut(animDuration);
                     break;
+
                 case ArmedState.Hit:
                     this.FadeOut(animDuration, Easing.OutQuint)
                         .ScaleTo(Scale * 1.5f, animDuration, Easing.Out);
@@ -100,7 +102,6 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                 aimRotationVector = curve[i];
                 break;
             }
-
 
             float aimRotation = MathHelper.RadiansToDegrees((float)Math.Atan2(aimRotationVector.Y - Position.Y, aimRotationVector.X - Position.X));
             while (Math.Abs(aimRotation - Rotation) > 180)

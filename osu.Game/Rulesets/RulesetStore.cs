@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using System.Collections.Generic;
@@ -22,7 +22,8 @@ namespace osu.Game.Rulesets
         {
             AppDomain.CurrentDomain.AssemblyResolve += currentDomain_AssemblyResolve;
 
-            foreach (string file in Directory.GetFiles(Environment.CurrentDirectory, $"{ruleset_library_prefix}.*.dll"))
+            foreach (string file in Directory.GetFiles(Environment.CurrentDirectory, $"{ruleset_library_prefix}.*.dll")
+                                             .Where(f => !Path.GetFileName(f).Contains("Tests")))
                 loadRulesetFromFile(file);
         }
 
@@ -124,7 +125,7 @@ namespace osu.Game.Rulesets
             }
             catch (Exception e)
             {
-                Logger.Error(e, "Failed to load ruleset");
+                Logger.Error(e, $"Failed to load ruleset {filename}");
             }
         }
     }

@@ -1,23 +1,23 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Bindings;
 using osu.Game.Beatmaps;
-using osu.Game.Graphics;
 using osu.Game.Overlays.Settings;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Replays.Types;
-using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.UI;
 using osu.Game.Beatmaps.Legacy;
 using osu.Game.Configuration;
 using osu.Game.Rulesets.Configuration;
 using osu.Game.Rulesets.Difficulty;
+using osu.Game.Scoring;
 
 namespace osu.Game.Rulesets
 {
@@ -42,7 +42,7 @@ namespace osu.Game.Rulesets
         /// <returns>An enumerable of constructed <see cref="Mod"/>s</returns>
         public virtual IEnumerable<Mod> ConvertLegacyMods(LegacyMods mods) => new Mod[] { };
 
-        public Mod GetAutoplayMod() => GetAllMods().First(mod => mod is ModAutoplay);
+        public ModAutoplay GetAutoplayMod() => GetAllMods().OfType<ModAutoplay>().First();
 
         protected Ruleset(RulesetInfo rulesetInfo = null)
         {
@@ -53,9 +53,10 @@ namespace osu.Game.Rulesets
         /// Attempt to create a hit renderer for a beatmap
         /// </summary>
         /// <param name="beatmap">The beatmap to create the hit renderer for.</param>
+        /// <param name="mods">The <see cref="Mod"/>s to apply.</param>
         /// <exception cref="BeatmapInvalidForRulesetException">Unable to successfully load the beatmap to be usable with this ruleset.</exception>
         /// <returns></returns>
-        public abstract RulesetContainer CreateRulesetContainerWith(WorkingBeatmap beatmap);
+        public abstract DrawableRuleset CreateDrawableRulesetWith(WorkingBeatmap beatmap, IReadOnlyList<Mod> mods);
 
         /// <summary>
         /// Creates a <see cref="IBeatmapConverter"/> to convert a <see cref="IBeatmap"/> to one that is applicable for this <see cref="Ruleset"/>.
@@ -73,11 +74,11 @@ namespace osu.Game.Rulesets
 
         public abstract DifficultyCalculator CreateDifficultyCalculator(WorkingBeatmap beatmap);
 
-        public virtual PerformanceCalculator CreatePerformanceCalculator(WorkingBeatmap beatmap, Score score) => null;
+        public virtual PerformanceCalculator CreatePerformanceCalculator(WorkingBeatmap beatmap, ScoreInfo score) => null;
 
         public virtual HitObjectComposer CreateHitObjectComposer() => null;
 
-        public virtual Drawable CreateIcon() => new SpriteIcon { Icon = FontAwesome.fa_question_circle };
+        public virtual Drawable CreateIcon() => new SpriteIcon { Icon = FontAwesome.Solid.QuestionCircle };
 
         public abstract string Description { get; }
 

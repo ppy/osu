@@ -1,10 +1,9 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Timing;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using System;
@@ -27,14 +26,24 @@ namespace osu.Game.Screens.Play
 
         private const int margin = 10;
 
-        public IClock AudioClock;
-
-        public double StartTime { set { startTime = value; } }
-        public double EndTime { set { endTime = value; } }
-
-        [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
+        public double StartTime
         {
+            set => startTime = value;
+        }
+
+        public double EndTime
+        {
+            set => endTime = value;
+        }
+
+        private GameplayClock gameplayClock;
+
+        [BackgroundDependencyLoader(true)]
+        private void load(OsuColour colours, GameplayClock clock)
+        {
+            if (clock != null)
+                gameplayClock = clock;
+
             Children = new Drawable[]
             {
                 timeCurrent = new OsuSpriteText
@@ -42,7 +51,7 @@ namespace osu.Game.Screens.Play
                     Origin = Anchor.BottomLeft,
                     Anchor = Anchor.BottomLeft,
                     Colour = colours.BlueLighter,
-                    Font = @"Venera",
+                    Font = OsuFont.Numeric,
                     Margin = new MarginPadding
                     {
                         Left = margin,
@@ -53,14 +62,14 @@ namespace osu.Game.Screens.Play
                     Origin = Anchor.BottomCentre,
                     Anchor = Anchor.BottomCentre,
                     Colour = colours.BlueLighter,
-                    Font = @"Venera",
+                    Font = OsuFont.Numeric,
                 },
                 timeLeft = new OsuSpriteText
                 {
                     Origin = Anchor.BottomRight,
                     Anchor = Anchor.BottomRight,
                     Colour = colours.BlueLighter,
-                    Font = @"Venera",
+                    Font = OsuFont.Numeric,
                     Margin = new MarginPadding
                     {
                         Right = margin,
@@ -73,7 +82,9 @@ namespace osu.Game.Screens.Play
         {
             base.Update();
 
-            double songCurrentTime = AudioClock.CurrentTime - startTime;
+            var time = gameplayClock?.CurrentTime ?? Time.Current;
+
+            double songCurrentTime = time - startTime;
             int currentPercent = Math.Max(0, Math.Min(100, (int)(songCurrentTime / songLength * 100)));
             int currentSecond = (int)Math.Floor(songCurrentTime / 1000.0);
 
@@ -86,7 +97,7 @@ namespace osu.Game.Screens.Play
             if (currentSecond != previousSecond && songCurrentTime < songLength)
             {
                 timeCurrent.Text = formatTime(TimeSpan.FromSeconds(currentSecond));
-                timeLeft.Text = formatTime(TimeSpan.FromMilliseconds(endTime - AudioClock.CurrentTime));
+                timeLeft.Text = formatTime(TimeSpan.FromMilliseconds(endTime - time));
 
                 previousSecond = currentSecond;
             }

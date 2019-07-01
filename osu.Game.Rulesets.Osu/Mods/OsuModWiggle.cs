@@ -1,23 +1,23 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using System.Collections.Generic;
 using osu.Framework.Graphics;
-using osu.Game.Graphics;
+using osu.Framework.Graphics.Sprites;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Osu.Objects;
-using OpenTK;
+using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Mods
 {
     internal class OsuModWiggle : Mod, IApplicableToDrawableHitObjects
     {
         public override string Name => "Wiggle";
-        public override string ShortenedName => "WG";
-        public override FontAwesome Icon => FontAwesome.fa_certificate;
+        public override string Acronym => "WG";
+        public override IconUsage Icon => FontAwesome.Solid.Certificate;
         public override ModType Type => ModType.Fun;
         public override string Description => "They just won't stay still...";
         public override double ScoreMultiplier => 1;
@@ -36,6 +36,11 @@ namespace osu.Game.Rulesets.Osu.Mods
         {
             var osuObject = (OsuHitObject)drawable.HitObject;
             Vector2 origin = drawable.Position;
+
+            // Wiggle the repeat points with the slider instead of independently.
+            // Also fixes an issue with repeat points being positioned incorrectly.
+            if (osuObject is RepeatPoint)
+                return;
 
             Random objRand = new Random((int)osuObject.StartTime);
 

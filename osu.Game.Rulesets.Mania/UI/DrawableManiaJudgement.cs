@@ -1,5 +1,5 @@
-// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
@@ -19,25 +19,18 @@ namespace osu.Game.Rulesets.Mania.UI
         private void load()
         {
             if (JudgementText != null)
-                JudgementText.TextSize = 25;
+                JudgementText.Font = JudgementText.Font.With(size: 25);
         }
 
-        protected override void LoadComplete()
+        protected override double FadeInDuration => 50;
+
+        protected override void ApplyHitAnimations()
         {
-            base.LoadComplete();
+            JudgementBody.ScaleTo(0.8f);
+            JudgementBody.ScaleTo(1, 250, Easing.OutElastic);
 
-            this.FadeInFromZero(50, Easing.OutQuint);
-
-            if (Result.IsHit)
-            {
-                JudgementBody.ScaleTo(0.8f);
-                JudgementBody.ScaleTo(1, 250, Easing.OutElastic);
-
-                JudgementBody.Delay(50).ScaleTo(0.75f, 250);
-                this.Delay(50).FadeOut(200);
-            }
-
-            Expire();
+            JudgementBody.Delay(FadeInDuration).ScaleTo(0.75f, 250);
+            this.Delay(FadeInDuration).FadeOut(200);
         }
     }
 }
