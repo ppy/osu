@@ -127,7 +127,11 @@ namespace osu.Game.Screens.Play
                     Child = new LocalSkinOverrideContainer(working.Skin)
                     {
                         RelativeSizeAxes = Axes.Both,
-                        Child = DrawableRuleset
+                        Children = new Drawable[]
+                        {
+                            DrawableRuleset,
+                            new ComboEffects(ScoreProcessor)
+                        }
                     }
                 },
                 new BreakOverlay(working.Beatmap.BeatmapInfo.LetterboxInBreaks, ScoreProcessor)
