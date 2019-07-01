@@ -19,6 +19,8 @@ namespace osu.Game.Overlays.Profile.Sections.Beatmaps
     public class PaginatedBeatmapContainer : PaginatedContainer
     {
         private const float panel_padding = 10f;
+        private int count;
+        private readonly Counter counterDrawable;
         private readonly BeatmapSetType type;
         private GetUserBeatmapsRequest request;
 
@@ -30,6 +32,8 @@ namespace osu.Game.Overlays.Profile.Sections.Beatmaps
             ItemsPerPage = 6;
 
             ItemsContainer.Spacing = new Vector2(panel_padding);
+
+            HeaderContainer.Add(counterDrawable = new Counter());
         }
 
         protected override void ShowMore()
@@ -37,7 +41,6 @@ namespace osu.Game.Overlays.Profile.Sections.Beatmaps
             request = new GetUserBeatmapsRequest(User.Value.Id, type, VisiblePages++ * ItemsPerPage, ItemsPerPage);
             request.Success += sets => Schedule(() =>
             {
-                MoreButton.FadeTo(sets.Count == ItemsPerPage ? 1 : 0);
                 MoreButton.IsLoading = false;
 
                 if (!sets.Any() && VisiblePages == 1)
@@ -54,6 +57,8 @@ namespace osu.Game.Overlays.Profile.Sections.Beatmaps
                     var panel = new DirectGridPanel(s.ToBeatmapSet(Rulesets));
                     ItemsContainer.Add(panel);
                 }
+
+                MoreButton.FadeTo(ItemsContainer.Children.Count == count ? 0 : 1);
             });
 
             Api.Queue(request);
@@ -62,8 +67,6 @@ namespace osu.Game.Overlays.Profile.Sections.Beatmaps
         protected override void OnUserChanged(ValueChangedEvent<User> e)
         {
             base.OnUserChanged(e);
-
-            int count = 0;
 
             switch (type)
             {
@@ -88,10 +91,8 @@ namespace osu.Game.Overlays.Profile.Sections.Beatmaps
                     break;
             }
 
-            if (count == 0)
-                return;
-
-            HeaderContainer.Add(new Counter(count));
+            counterDrawable.Value = count;
+            counterDrawable.FadeTo(count > 0 ? 1 : 0);
         }
 
         protected override void Dispose(bool isDisposing)
@@ -102,7 +103,22 @@ namespace osu.Game.Overlays.Profile.Sections.Beatmaps
 
         private class Counter : CircularContainer
         {
-            public Counter(int value)
+            private readonly OsuSpriteText counterText;
+            private int counter;
+
+            public int Value
+            {
+                get => counter;
+                set
+                {
+                    if (counter == value)
+                        return;
+
+                    counter = value;
+                    counterText.Text = value.ToString();
+                }
+            }
+            public Counter()
             {
                 Masking = true;
                 Anchor = Anchor.CentreLeft;
@@ -115,11 +131,10 @@ namespace osu.Game.Overlays.Profile.Sections.Beatmaps
                         RelativeSizeAxes = Axes.Both,
                         Colour = Color4.Black,
                     },
-                    new OsuSpriteText
+                    counterText = new OsuSpriteText
                     {
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
-                        Text = value.ToString(),
                         Font = OsuFont.GetFont(size: 20, weight: FontWeight.SemiBold)
                     }
                 };
