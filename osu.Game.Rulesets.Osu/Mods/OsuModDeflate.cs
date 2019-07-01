@@ -1,84 +1,84 @@
 ﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using System.Collections.Generic;
+using System.Linq;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
-using osu.Game.Graphics;
+using osu.Framework.Graphics.Sprites;
+using osu.Game.Configuration;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects.Drawables;
+using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Objects.Drawables;
-using System.Collections.Generic;
-using OpenTK;
 
 namespace osu.Game.Rulesets.Osu.Mods
 {
-    public class OsuModDeflate : Mod, IApplicableToDrawableHitObjects
+    public class OsuModDeflate : Mod, IReadFromConfig, IApplicableToDrawableHitObjects
     {
         public override string Name => "Deflate";
-        public override string ShortenedName => "DF";
-        public override FontAwesome Icon => FontAwesome.fa_compress;
+
+        public override string Acronym => "DF";
+
+        public override IconUsage Icon => FontAwesome.Solid.CompressArrowsAlt;
+
         public override ModType Type => ModType.Fun;
+
         public override string Description => "Become one with the approach circle...";
+
         public override double ScoreMultiplier => 1;
+
+        private Bindable<bool> increaseFirstObjectVisibility = new Bindable<bool>();
+
+        public void ReadFromConfig(OsuConfigManager config)
+        {
+            increaseFirstObjectVisibility = config.GetBindable<bool>(OsuSetting.IncreaseFirstObjectVisibility);
+        }
 
         public void ApplyToDrawableHitObjects(IEnumerable<DrawableHitObject> drawables)
         {
-            foreach (var drawable in drawables)
-                drawable.ApplyCustomUpdateState += drawableOnApplyCustomUpdateState;
+            foreach (var drawable in drawables.Skip(increaseFirstObjectVisibility.Value ? 1 : 0))
+            {
+                switch (drawable)
+                {
+                    case DrawableSpinner _:
+                        continue;
+
+                    default:
+                        drawable.ApplyCustomUpdateState += ApplyCustomState;
+                        break;
+                }
+            }
         }
 
-        private void drawableOnApplyCustomUpdateState(DrawableHitObject drawable, ArmedState state)
+        protected virtual void ApplyCustomState(DrawableHitObject drawable, ArmedState state)
         {
-            if (!(drawable is DrawableOsuHitObject d))
-                return;
+            var h = (OsuHitObject)drawable.HitObject;
 
-            var h = d.HitObject;
-
-            const float rescale = 2;
-
+            // apply grow effect
             switch (drawable)
             {
-                case DrawableHitCircle c:
-                    c.ApproachCircle.Hide();
-                    using (d.BeginAbsoluteSequence(h.StartTime - h.TimePreempt))
-                    {
-                        var origScale = d.Scale;
-                        d.ScaleTo(1.1f, 1)
-                            .Then()
-                            .ScaleTo(origScale, h.TimePreempt);
-                    }
-                    switch (state)
-                    {
-                        case ArmedState.Miss:
-                            d.FadeOut(100);
-                            break;
-                        case ArmedState.Hit:
-                            d.FadeOut(800)
-                                .ScaleTo(d.Scale * 1.5f, 400, Easing.OutQuad);
-                            break;
-                    }
+                case DrawableSliderHead _:
+                case DrawableSliderTail _:
+                    // special cases we should *not* be scaling.
                     break;
 
-                case DrawableSlider s:
-                    using (d.BeginAbsoluteSequence(h.StartTime - h.TimePreempt + 1, true))
+                case DrawableSlider _:
+                case DrawableHitCircle _:
                     {
-                        float origPathWidth = s.Body.PathWidth;
-                        var origBodySize = s.Body.Size;
-                        var origBodyDrawPos = s.Body.DrawPosition;
-
-                        // Fits nicely for CS=4, too big on lower CS, too small on higher CS
-                        s.Body.Animate(
-                            b => b.MoveTo(origBodyDrawPos - new Vector2(origPathWidth)).MoveTo(origBodyDrawPos, h.TimePreempt),
-                            b => b.ResizeTo(origBodySize * rescale).ResizeTo(origBodySize, h.TimePreempt),
-                            b => b.TransformTo("PathWidth", origPathWidth * rescale).TransformTo("PathWidth", origPathWidth, h.TimePreempt)
-                        );
-                    }
-                    break;
-                case DrawableRepeatPoint rp:
-                    if (!rp.IsFirstRepeat)
+                        using (drawable.BeginAbsoluteSequence(h.StartTime - h.TimePreempt, true))
+                            drawable.ScaleTo(2f).Then().ScaleTo(1f, h.TimePreempt); // sole difference to grow mod
                         break;
-                    var origSizeRp = rp.Size;
-                    using (d.BeginAbsoluteSequence(h.StartTime - h.TimePreempt + 1, true))
-                        rp.ResizeTo(origSizeRp * rescale).ResizeTo(origSizeRp, h.TimePreempt);
+                    }
+            }
+
+            // remove approach circles
+            switch (drawable)
+            {
+                case DrawableHitCircle circle:
+                    // we don't want to see the approach circle
+                    using (circle.BeginAbsoluteSequence(h.StartTime - h.TimePreempt, true))
+                        circle.ApproachCircle.Hide();
                     break;
             }
         }
