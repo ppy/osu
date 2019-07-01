@@ -1,14 +1,13 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.IO;
-using System.Reflection;
 using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Graphics.Sprites;
 using osu.Framework.Logging;
 using osu.Game;
 using osu.Game.Graphics;
@@ -26,11 +25,7 @@ namespace osu.Desktop.Updater
         private UpdateManager updateManager;
         private NotificationOverlay notificationOverlay;
 
-        public void PrepareUpdate()
-        {
-            // Squirrel returns execution to us after the update process is started, so it's safe to use Wait() here
-            UpdateManager.RestartAppWhenExited().Wait();
-        }
+        public Task PrepareUpdateAsync() => UpdateManager.RestartAppWhenExited();
 
         [BackgroundDependencyLoader]
         private void load(NotificationOverlay notification, OsuGameBase game)
@@ -47,7 +42,7 @@ namespace osu.Desktop.Updater
         private async void checkForUpdateAsync(bool useDeltaPatching = true, UpdateProgressNotification notification = null)
         {
             //should we schedule a retry on completion of this check?
-            bool scheduleRetry = true;
+            bool scheduleRecheck = true;
 
             try
             {
@@ -87,10 +82,11 @@ namespace osu.Desktop.Updater
                         //could fail if deltas are unavailable for full update path (https://github.com/Squirrel/Squirrel.Windows/issues/959)
                         //try again without deltas.
                         checkForUpdateAsync(false, notification);
-                        scheduleRetry = false;
+                        scheduleRecheck = false;
                     }
                     else
                     {
+                        notification.State = ProgressNotificationState.Cancelled;
                         Logger.Error(e, @"update failed!");
                     }
                 }
@@ -101,11 +97,8 @@ namespace osu.Desktop.Updater
             }
             finally
             {
-                if (scheduleRetry)
+                if (scheduleRecheck)
                 {
-                    if (notification != null)
-                        notification.State = ProgressNotificationState.Cancelled;
-
                     //check again in 30 minutes.
                     Scheduler.AddDelayed(() => checkForUpdateAsync(), 60000 * 30);
                 }
@@ -135,8 +128,8 @@ namespace osu.Desktop.Updater
                     Text = @"Update ready to install. Click to restart!",
                     Activated = () =>
                     {
-                        updateManager.PrepareUpdate();
-                        game.GracefullyExit();
+                        updateManager.PrepareUpdateAsync()
+                                     .ContinueWith(_ => Schedule(() => game.GracefullyExit()));
                         return true;
                     }
                 };
@@ -158,7 +151,7 @@ namespace osu.Desktop.Updater
                     {
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
-                        Icon = FontAwesome.fa_upload,
+                        Icon = FontAwesome.Solid.Upload,
                         Colour = Color4.White,
                         Size = new Vector2(20),
                     }
@@ -168,23 +161,19 @@ namespace osu.Desktop.Updater
 
         private class SquirrelLogger : Splat.ILogger, IDisposable
         {
-            private readonly string path;
-            private readonly object locker = new object();
             public LogLevel Level { get; set; } = LogLevel.Info;
 
-            public SquirrelLogger()
-            {
-                var file = Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location), "SquirrelSetupUpdater.log");
-                if (File.Exists(file)) File.Delete(file);
-                path = file;
-            }
+            private Logger logger;
 
             public void Write(string message, LogLevel logLevel)
             {
                 if (logLevel < Level)
                     return;
 
-                lock (locker) File.AppendAllText(path, message + "\r\n");
+                if (logger == null)
+                    logger = Logger.GetLogger("updater");
+
+                logger.Add(message);
             }
 
             public void Dispose()

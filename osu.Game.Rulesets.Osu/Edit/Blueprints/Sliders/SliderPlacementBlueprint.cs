@@ -1,5 +1,5 @@
-// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
 using System.Linq;
@@ -47,6 +47,14 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
             setState(PlacementState.Initial);
         }
 
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            // Fixes a 1-frame position discrepancy due to the first mouse move event happening in the next frame
+            HitObject.Position = Parent?.ToLocalSpace(GetContainingInputManager().CurrentState.Mouse.Position) ?? Vector2.Zero;
+        }
+
         protected override bool OnMouseMove(MouseMoveEvent e)
         {
             switch (state)
@@ -54,6 +62,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
                 case PlacementState.Initial:
                     HitObject.Position = e.MousePosition;
                     return true;
+
                 case PlacementState.Body:
                     cursor = e.MousePosition - HitObject.Position;
                     return true;
@@ -69,6 +78,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
                 case PlacementState.Initial:
                     beginCurve();
                     break;
+
                 case PlacementState.Body:
                     switch (e.Button)
                     {

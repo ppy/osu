@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using System.IO;
@@ -11,6 +11,7 @@ using osu.Framework.Development;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
 using osu.Game.IPC;
+using osu.Game.Tournament;
 
 namespace osu.Desktop
 {
@@ -31,6 +32,7 @@ namespace osu.Desktop
                     var importer = new ArchiveImportIPCChannel(host);
                     // Restore the cwd so relative paths given at the command line work correctly
                     Directory.SetCurrentDirectory(cwd);
+
                     foreach (var file in args)
                     {
                         Console.WriteLine(@"Importing {0}", file);
@@ -44,6 +46,10 @@ namespace osu.Desktop
                     {
                         default:
                             host.Run(new OsuGameDesktop(args));
+                            break;
+
+                        case "--tournament":
+                            host.Run(new TournamentGame());
                             break;
                     }
                 }

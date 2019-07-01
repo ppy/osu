@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System.Linq;
 using System.Threading.Tasks;
@@ -25,9 +25,9 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
         [BackgroundDependencyLoader]
         private void load(BeatmapManager beatmaps, SkinManager skins, DialogOverlay dialogOverlay)
         {
-            Children = new Drawable[]
+            if (beatmaps.SupportsImportFromStable)
             {
-                importBeatmapsButton = new SettingsButton
+                Add(importBeatmapsButton = new SettingsButton
                 {
                     Text = "Import beatmaps from stable",
                     Action = () =>
@@ -35,20 +35,25 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
                         importBeatmapsButton.Enabled.Value = false;
                         beatmaps.ImportFromStableAsync().ContinueWith(t => Schedule(() => importBeatmapsButton.Enabled.Value = true));
                     }
-                },
-                deleteBeatmapsButton = new DangerousSettingsButton
+                });
+            }
+
+            Add(deleteBeatmapsButton = new DangerousSettingsButton
+            {
+                Text = "Delete ALL beatmaps",
+                Action = () =>
                 {
-                    Text = "Delete ALL beatmaps",
-                    Action = () =>
+                    dialogOverlay?.Push(new DeleteAllBeatmapsDialog(() =>
                     {
-                        dialogOverlay?.Push(new DeleteAllBeatmapsDialog(() =>
-                        {
-                            deleteBeatmapsButton.Enabled.Value = false;
-                            Task.Run(() => beatmaps.Delete(beatmaps.GetAllUsableBeatmapSets())).ContinueWith(t => Schedule(() => deleteBeatmapsButton.Enabled.Value = true));
-                        }));
-                    }
-                },
-                importSkinsButton = new SettingsButton
+                        deleteBeatmapsButton.Enabled.Value = false;
+                        Task.Run(() => beatmaps.Delete(beatmaps.GetAllUsableBeatmapSets())).ContinueWith(t => Schedule(() => deleteBeatmapsButton.Enabled.Value = true));
+                    }));
+                }
+            });
+
+            if (skins.SupportsImportFromStable)
+            {
+                Add(importSkinsButton = new SettingsButton
                 {
                     Text = "Import skins from stable",
                     Action = () =>
@@ -56,7 +61,11 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
                         importSkinsButton.Enabled.Value = false;
                         skins.ImportFromStableAsync().ContinueWith(t => Schedule(() => importSkinsButton.Enabled.Value = true));
                     }
-                },
+                });
+            }
+
+            AddRange(new Drawable[]
+            {
                 deleteSkinsButton = new DangerousSettingsButton
                 {
                     Text = "Delete ALL skins",
@@ -91,7 +100,7 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
                         Task.Run(() => beatmaps.Undelete(beatmaps.QueryBeatmapSets(b => b.DeletePending).ToList())).ContinueWith(t => Schedule(() => undeleteButton.Enabled.Value = true));
                     }
                 },
-            };
+            });
         }
     }
 }
