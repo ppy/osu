@@ -1,7 +1,8 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Events;
 using osuTK;
 using osuTK.Input;
@@ -21,7 +22,7 @@ namespace osu.Game.Graphics.UserInterface
             {
                 new SpriteIcon
                 {
-                    Icon = FontAwesome.fa_search,
+                    Icon = FontAwesome.Solid.Search,
                     Origin = Anchor.CentreRight,
                     Anchor = Anchor.CentreRight,
                     Margin = new MarginPadding { Right = 10 },

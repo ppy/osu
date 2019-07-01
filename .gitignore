@@ -11,8 +11,10 @@
 *.userprefs
 
 ### Cake ###
-tools/*
-!tools/cakebuild.csproj
+tools/**
+build/tools/**
+
+fastlane/report.xml
 
 # Build results
 bin/[Dd]ebug/

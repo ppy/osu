@@ -1,16 +1,20 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using JetBrains.Annotations;
 using Microsoft.EntityFrameworkCore;
+using osu.Framework;
+using osu.Framework.Extensions;
 using osu.Framework.IO.File;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
+using osu.Framework.Threading;
 using osu.Game.IO;
 using osu.Game.IO.Archives;
 using osu.Game.IPC;
@@ -27,7 +31,7 @@ namespace osu.Game.Database
     /// </summary>
     /// <typeparam name="TModel">The model type.</typeparam>
     /// <typeparam name="TFileModel">The associated file join type.</typeparam>
-    public abstract class ArchiveModelManager<TModel, TFileModel> : ICanAcceptFiles
+    public abstract class ArchiveModelManager<TModel, TFileModel> : ArchiveModelManager, ICanAcceptFiles, IModelManager<TModel>
         where TModel : class, IHasFiles<TFileModel>, IHasPrimaryKey, ISoftDelete
         where TFileModel : INamedFileInfo, new()
     {
@@ -50,6 +54,8 @@ namespace osu.Game.Database
 
         public virtual string[] HandledExtensions => new[] { ".zip" };
 
+        public virtual bool SupportsImportFromStable => RuntimeInfo.IsDesktop;
+
         protected readonly FileStore Files;
 
         protected readonly IDatabaseContextFactory ContextFactory;
@@ -59,55 +65,12 @@ namespace osu.Game.Database
         // ReSharper disable once NotAccessedField.Local (we should keep a reference to this so it is not finalised)
         private ArchiveImportIPCChannel ipc;
 
-        private readonly List<Action> queuedEvents = new List<Action>();
-
-        /// <summary>
-        /// Allows delaying of outwards events until an operation is confirmed (at a database level).
-        /// </summary>
-        private bool delayingEvents;
-
-        /// <summary>
-        /// Begin delaying outwards events.
-        /// </summary>
-        private void delayEvents() => delayingEvents = true;
-
-        /// <summary>
-        /// Flush delayed events and disable delaying.
-        /// </summary>
-        /// <param name="perform">Whether the flushed events should be performed.</param>
-        private void flushEvents(bool perform)
-        {
-            Action[] events;
-            lock (queuedEvents)
-            {
-                events = queuedEvents.ToArray();
-                queuedEvents.Clear();
-            }
-
-            if (perform)
-            {
-                foreach (var a in events)
-                    a.Invoke();
-            }
-
-            delayingEvents = false;
-        }
-
-        private void handleEvent(Action a)
-        {
-            if (delayingEvents)
-                lock (queuedEvents)
-                    queuedEvents.Add(a);
-            else
-                a.Invoke();
-        }
-
-        protected ArchiveModelManager(Storage storage, IDatabaseContextFactory contextFactory, MutableDatabaseBackedStore<TModel> modelStore, IIpcHost importHost = null)
+        protected ArchiveModelManager(Storage storage, IDatabaseContextFactory contextFactory, MutableDatabaseBackedStoreWithFileIncludes<TModel, TFileModel> modelStore, IIpcHost importHost = null)
         {
             ContextFactory = contextFactory;
 
             ModelStore = modelStore;
-            ModelStore.ItemAdded += s => handleEvent(() => ItemAdded?.Invoke(s));
+            ModelStore.ItemAdded += item => handleEvent(() => ItemAdded?.Invoke(item));
             ModelStore.ItemRemoved += s => handleEvent(() => ItemRemoved?.Invoke(s));
 
             Files = new FileStore(contextFactory, storage);
@@ -123,54 +86,50 @@ namespace osu.Game.Database
         /// This will post notifications tracking progress.
         /// </summary>
         /// <param name="paths">One or more archive locations on disk.</param>
-        public void Import(params string[] paths)
+        public Task Import(params string[] paths)
         {
-            var notification = new ProgressNotification
-            {
-                Text = "Import is initialising...",
-                Progress = 0,
-                State = ProgressNotificationState.Active,
-            };
+            var notification = new ProgressNotification { State = ProgressNotificationState.Active };
 
             PostNotification?.Invoke(notification);
 
-            List<TModel> imported = new List<TModel>();
+            return Import(notification, paths);
+        }
+
+        protected async Task Import(ProgressNotification notification, params string[] paths)
+        {
+            notification.Progress = 0;
+            notification.Text = "Import is initialising...";
 
             int current = 0;
-            foreach (string path in paths)
+
+            var imported = new List<TModel>();
+
+            await Task.WhenAll(paths.Select(async path =>
             {
-                if (notification.State == ProgressNotificationState.Cancelled)
-                    // user requested abort
-                    return;
+                notification.CancellationToken.ThrowIfCancellationRequested();
 
                 try
                 {
-                    notification.Text = $"Importing ({++current} of {paths.Length})\n{Path.GetFileName(path)}";
-                    using (ArchiveReader reader = getReaderFrom(path))
-                        imported.Add(Import(reader));
+                    var model = await Import(path, notification.CancellationToken);
 
-                    notification.Progress = (float)current / paths.Length;
+                    lock (imported)
+                    {
+                        imported.Add(model);
+                        current++;
 
-                    // We may or may not want to delete the file depending on where it is stored.
-                    //  e.g. reconstructing/repairing database with items from default storage.
-                    // Also, not always a single file, i.e. for LegacyFilesystemReader
-                    // TODO: Add a check to prevent files from storage to be deleted.
-                    try
-                    {
-                        if (File.Exists(path))
-                            File.Delete(path);
+                        notification.Text = $"Imported {current} of {paths.Length} {HumanisedModelName}s";
+                        notification.Progress = (float)current / paths.Length;
                     }
-                    catch (Exception e)
-                    {
-                        Logger.Error(e, $@"Could not delete original file after import ({Path.GetFileName(path)})");
-                    }
+                }
+                catch (TaskCanceledException)
+                {
+                    throw;
                 }
                 catch (Exception e)
                 {
-                    e = e.InnerException ?? e;
-                    Logger.Error(e, $@"Could not import ({Path.GetFileName(path)})");
+                    Logger.Error(e, $@"Could not import ({Path.GetFileName(path)})", LoggingTarget.Database);
                 }
-            }
+            }));
 
             if (imported.Count == 0)
             {
@@ -179,37 +138,121 @@ namespace osu.Game.Database
             }
             else
             {
-                notification.CompletionText = $"Imported {current} {typeof(TModel).Name.Replace("Info", "").ToLower()}s!";
-                notification.CompletionClickAction += () =>
+                notification.CompletionText = imported.Count == 1
+                    ? $"Imported {imported.First()}!"
+                    : $"Imported {current} {HumanisedModelName}s!";
+
+                if (imported.Count > 0 && PresentImport != null)
                 {
-                    if (imported.Count > 0)
-                        PresentCompletedImport(imported);
-                    return true;
-                };
+                    notification.CompletionText += " Click to view.";
+                    notification.CompletionClickAction = () =>
+                    {
+                        PresentImport?.Invoke(imported);
+                        return true;
+                    };
+                }
+
                 notification.State = ProgressNotificationState.Completed;
             }
         }
 
-        protected virtual void PresentCompletedImport(IEnumerable<TModel> imported)
+        /// <summary>
+        /// Import one <see cref="TModel"/> from the filesystem and delete the file on success.
+        /// </summary>
+        /// <param name="path">The archive location on disk.</param>
+        /// <param name="cancellationToken">An optional cancellation token.</param>
+        /// <returns>The imported model, if successful.</returns>
+        public async Task<TModel> Import(string path, CancellationToken cancellationToken = default)
         {
+            cancellationToken.ThrowIfCancellationRequested();
+
+            TModel import;
+            using (ArchiveReader reader = getReaderFrom(path))
+                import = await Import(reader, cancellationToken);
+
+            // We may or may not want to delete the file depending on where it is stored.
+            //  e.g. reconstructing/repairing database with items from default storage.
+            // Also, not always a single file, i.e. for LegacyFilesystemReader
+            // TODO: Add a check to prevent files from storage to be deleted.
+            try
+            {
+                if (import != null && File.Exists(path))
+                    File.Delete(path);
+            }
+            catch (Exception e)
+            {
+                LogForModel(import, $@"Could not delete original file after import ({Path.GetFileName(path)})", e);
+            }
+
+            return import;
         }
+
+        /// <summary>
+        /// Fired when the user requests to view the resulting import.
+        /// </summary>
+        public Action<IEnumerable<TModel>> PresentImport;
 
         /// <summary>
         /// Import an item from an <see cref="ArchiveReader"/>.
         /// </summary>
         /// <param name="archive">The archive to be imported.</param>
-        public TModel Import(ArchiveReader archive)
+        /// <param name="cancellationToken">An optional cancellation token.</param>
+        public Task<TModel> Import(ArchiveReader archive, CancellationToken cancellationToken = default)
         {
+            cancellationToken.ThrowIfCancellationRequested();
+
+            TModel model = null;
+
             try
             {
-                var model = CreateModel(archive);
-                return model == null ? null : Import(model, archive);
+                model = CreateModel(archive);
+
+                if (model == null) return null;
+
+                model.Hash = computeHash(archive);
+            }
+            catch (TaskCanceledException)
+            {
+                throw;
             }
             catch (Exception e)
             {
-                Logger.Error(e, $"Model creation of {archive.Name} failed.", LoggingTarget.Database);
+                LogForModel(model, $"Model creation of {archive.Name} failed.", e);
                 return null;
             }
+
+            return Import(model, archive, cancellationToken);
+        }
+
+        /// <summary>
+        /// Any file extensions which should be included in hash creation.
+        /// Generally should include all file types which determine the file's uniqueness.
+        /// Large files should be avoided if possible.
+        /// </summary>
+        protected abstract string[] HashableFileTypes { get; }
+
+        protected static void LogForModel(TModel model, string message, Exception e = null)
+        {
+            string prefix = $"[{(model?.Hash ?? "?????").Substring(0, 5)}]";
+
+            if (e != null)
+                Logger.Error(e, $"{prefix} {message}", LoggingTarget.Database);
+            else
+                Logger.Log($"{prefix} {message}", LoggingTarget.Database);
+        }
+
+        /// <summary>
+        /// Create a SHA-2 hash from the provided archive based on file content of all files matching <see cref="HashableFileTypes"/>.
+        /// </summary>
+        private string computeHash(ArchiveReader reader)
+        {
+            // for now, concatenate all .osu files in the set to create a unique hash.
+            MemoryStream hashable = new MemoryStream();
+            foreach (string file in reader.Filenames.Where(f => HashableFileTypes.Any(f.EndsWith)))
+                using (Stream s = reader.GetStream(file))
+                    s.CopyTo(hashable);
+
+            return hashable.ComputeSHA2Hash();
         }
 
         /// <summary>
@@ -217,13 +260,30 @@ namespace osu.Game.Database
         /// </summary>
         /// <param name="item">The model to be imported.</param>
         /// <param name="archive">An optional archive to use for model population.</param>
-        public TModel Import(TModel item, ArchiveReader archive = null)
+        /// <param name="cancellationToken">An optional cancellation token.</param>
+        public async Task<TModel> Import(TModel item, ArchiveReader archive = null, CancellationToken cancellationToken = default) => await Task.Factory.StartNew(async () =>
         {
+            cancellationToken.ThrowIfCancellationRequested();
+
             delayEvents();
+
+            void rollback()
+            {
+                if (!Delete(item))
+                {
+                    // We may have not yet added the model to the underlying table, but should still clean up files.
+                    LogForModel(item, "Dereferencing files for incomplete import.");
+                    Files.Dereference(item.Files.Select(f => f.FileInfo).ToArray());
+                }
+            }
 
             try
             {
-                Logger.Log($"Importing {item}...", LoggingTarget.Database);
+                LogForModel(item, "Beginning import...");
+
+                item.Files = archive != null ? createFileInfos(archive, Files) : new List<TFileModel>();
+
+                await Populate(item, archive, cancellationToken);
 
                 using (var write = ContextFactory.GetForWrite()) // used to share a context for full import. keep in mind this will block all writes.
                 {
@@ -235,14 +295,21 @@ namespace osu.Game.Database
 
                         if (existing != null)
                         {
-                            Logger.Log($"Found existing {typeof(TModel)} for {item} (ID {existing.ID}). Skipping import.", LoggingTarget.Database);
-                            return existing;
+                            if (CanUndelete(existing, item))
+                            {
+                                Undelete(existing);
+                                LogForModel(item, $"Found existing {HumanisedModelName} for {item} (ID {existing.ID}) – skipping import.");
+                                // existing item will be used; rollback new import and exit early.
+                                rollback();
+                                flushEvents(true);
+                                return existing;
+                            }
+
+                            Delete(existing);
+                            ModelStore.PurgeDeletable(s => s.ID == existing.ID);
                         }
 
-                        if (archive != null)
-                            item.Files = createFileInfos(archive, Files);
-
-                        Populate(item, archive);
+                        PreImport(item);
 
                         // import to store
                         ModelStore.Add(item);
@@ -254,21 +321,21 @@ namespace osu.Game.Database
                     }
                 }
 
-                Logger.Log($"Import of {item} successfully completed!", LoggingTarget.Database);
+                LogForModel(item, "Import successfully completed!");
             }
             catch (Exception e)
             {
-                Logger.Error(e, $"Import of {item} failed and has been rolled back.", LoggingTarget.Database);
-                item = null;
-            }
-            finally
-            {
-                // we only want to flush events after we've confirmed the write context didn't have any errors.
-                flushEvents(item != null);
+                if (!(e is TaskCanceledException))
+                    LogForModel(item, "Database import or population failed and has been rolled back.", e);
+
+                rollback();
+                flushEvents(false);
+                throw;
             }
 
+            flushEvents(true);
             return item;
-        }
+        }, cancellationToken, TaskCreationOptions.HideScheduler, IMPORT_SCHEDULER).Unwrap();
 
         /// <summary>
         /// Perform an update of the specified item.
@@ -302,18 +369,20 @@ namespace osu.Game.Database
         /// Delete multiple items.
         /// This will post notifications tracking progress.
         /// </summary>
-        public void Delete(List<TModel> items)
+        public void Delete(List<TModel> items, bool silent = false)
         {
             if (items.Count == 0) return;
 
             var notification = new ProgressNotification
             {
                 Progress = 0,
-                CompletionText = $"Deleted all {typeof(TModel).Name.Replace("Info", "").ToLower()}s!",
+                Text = $"Preparing to delete all {HumanisedModelName}s...",
+                CompletionText = $"Deleted all {HumanisedModelName}s!",
                 State = ProgressNotificationState.Active,
             };
 
-            PostNotification?.Invoke(notification);
+            if (!silent)
+                PostNotification?.Invoke(notification);
 
             int i = 0;
 
@@ -325,7 +394,7 @@ namespace osu.Game.Database
                         // user requested abort
                         return;
 
-                    notification.Text = $"Deleting ({++i} of {items.Count})";
+                    notification.Text = $"Deleting {HumanisedModelName}s ({++i} of {items.Count})";
 
                     Delete(b);
 
@@ -340,7 +409,7 @@ namespace osu.Game.Database
         /// Restore multiple items that were previously deleted.
         /// This will post notifications tracking progress.
         /// </summary>
-        public void Undelete(List<TModel> items)
+        public void Undelete(List<TModel> items, bool silent = false)
         {
             if (!items.Any()) return;
 
@@ -351,7 +420,8 @@ namespace osu.Game.Database
                 State = ProgressNotificationState.Active,
             };
 
-            PostNotification?.Invoke(notification);
+            if (!silent)
+                PostNotification?.Invoke(notification);
 
             int i = 0;
 
@@ -448,7 +518,7 @@ namespace osu.Game.Database
                 return Task.CompletedTask;
             }
 
-            return Task.Factory.StartNew(() => Import(stable.GetDirectories(ImportFromStablePath).Select(f => stable.GetFullPath(f)).ToArray()), TaskCreationOptions.LongRunning);
+            return Task.Run(async () => await Import(stable.GetDirectories(ImportFromStablePath).Select(f => stable.GetFullPath(f)).ToArray()));
         }
 
         #endregion
@@ -467,13 +537,36 @@ namespace osu.Game.Database
         /// </summary>
         /// <param name="model">The model to populate.</param>
         /// <param name="archive">The archive to use as a reference for population. May be null.</param>
-        protected virtual void Populate(TModel model, [CanBeNull] ArchiveReader archive)
+        /// <param name="cancellationToken">An optional cancellation token.</param>
+        protected virtual Task Populate(TModel model, [CanBeNull] ArchiveReader archive, CancellationToken cancellationToken = default) => Task.CompletedTask;
+
+        /// <summary>
+        /// Perform any final actions before the import to database executes.
+        /// </summary>
+        /// <param name="model">The model prepared for import.</param>
+        protected virtual void PreImport(TModel model)
         {
         }
 
-        protected virtual TModel CheckForExisting(TModel model) => null;
+        /// <summary>
+        /// Check whether an existing model already exists for a new import item.
+        /// </summary>
+        /// <param name="model">The new model proposed for import.</param>
+        /// <returns>An existing model which matches the criteria to skip importing, else null.</returns>
+        protected TModel CheckForExisting(TModel model) => model.Hash == null ? null : ModelStore.ConsumableItems.FirstOrDefault(b => b.Hash == model.Hash);
+
+        /// <summary>
+        /// After an existing <see cref="TModel"/> is found during an import process, the default behaviour is to restore the existing
+        /// item and skip the import. This method allows changing that behaviour.
+        /// </summary>
+        /// <param name="existing">The existing model.</param>
+        /// <param name="import">The newly imported model.</param>
+        /// <returns>Whether the existing model should be restored and used. Returning false will delete the existing a force a re-import.</returns>
+        protected virtual bool CanUndelete(TModel existing, TModel import) => true;
 
         private DbSet<TModel> queryModel() => ContextFactory.Get().Set<TModel>();
+
+        protected virtual string HumanisedModelName => $"{typeof(TModel).Name.Replace("Info", "").ToLower()}";
 
         /// <summary>
         /// Creates an <see cref="ArchiveReader"/> from a valid storage path.
@@ -485,8 +578,73 @@ namespace osu.Game.Database
             if (ZipUtils.IsZipArchive(path))
                 return new ZipArchiveReader(File.Open(path, FileMode.Open, FileAccess.Read, FileShare.Read), Path.GetFileName(path));
             if (Directory.Exists(path))
-                return new LegacyFilesystemReader(path);
+                return new LegacyDirectoryArchiveReader(path);
+            if (File.Exists(path))
+                return new LegacyFileArchiveReader(path);
+
             throw new InvalidFormatException($"{path} is not a valid archive");
         }
+
+        #region Event handling / delaying
+
+        private readonly List<Action> queuedEvents = new List<Action>();
+
+        /// <summary>
+        /// Allows delaying of outwards events until an operation is confirmed (at a database level).
+        /// </summary>
+        private bool delayingEvents;
+
+        /// <summary>
+        /// Begin delaying outwards events.
+        /// </summary>
+        private void delayEvents() => delayingEvents = true;
+
+        /// <summary>
+        /// Flush delayed events and disable delaying.
+        /// </summary>
+        /// <param name="perform">Whether the flushed events should be performed.</param>
+        private void flushEvents(bool perform)
+        {
+            Action[] events;
+
+            lock (queuedEvents)
+            {
+                events = queuedEvents.ToArray();
+                queuedEvents.Clear();
+            }
+
+            if (perform)
+            {
+                foreach (var a in events)
+                    a.Invoke();
+            }
+
+            delayingEvents = false;
+        }
+
+        private void handleEvent(Action a)
+        {
+            if (delayingEvents)
+                lock (queuedEvents)
+                    queuedEvents.Add(a);
+            else
+                a.Invoke();
+        }
+
+        #endregion
+    }
+
+    public abstract class ArchiveModelManager
+    {
+        private const int import_queue_request_concurrency = 1;
+
+        /// <summary>
+        /// A singleton scheduler shared by all <see cref="ArchiveModelManager{TModel,TFileModel}"/>.
+        /// </summary>
+        /// <remarks>
+        /// This scheduler generally performs IO and CPU intensive work so concurrency is limited harshly.
+        /// It is mainly being used as a queue mechanism for large imports.
+        /// </remarks>
+        protected static readonly ThreadedTaskScheduler IMPORT_SCHEDULER = new ThreadedTaskScheduler(import_queue_request_concurrency, nameof(ArchiveModelManager));
     }
 }

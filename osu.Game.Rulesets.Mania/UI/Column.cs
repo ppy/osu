@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System.Linq;
 using osuTK.Graphics;
@@ -8,11 +8,12 @@ using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Framework.Allocation;
-using osu.Framework.Configuration;
+using osu.Framework.Bindables;
 using osu.Framework.Input.Bindings;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Mania.UI.Components;
 using osu.Game.Rulesets.UI.Scrolling;
+using osuTK;
 
 namespace osu.Game.Rulesets.Mania.UI
 {
@@ -20,6 +21,11 @@ namespace osu.Game.Rulesets.Mania.UI
     {
         private const float column_width = 45;
         private const float special_column_width = 70;
+
+        /// <summary>
+        /// The index of this column as part of the whole playfield.
+        /// </summary>
+        public readonly int Index;
 
         public readonly Bindable<ManiaAction> Action = new Bindable<ManiaAction>();
 
@@ -30,8 +36,10 @@ namespace osu.Game.Rulesets.Mania.UI
         internal readonly Container TopLevelContainer;
         private readonly Container explosionContainer;
 
-        public Column()
+        public Column(int index)
         {
+            Index = index;
+
             RelativeSizeAxes = Axes.Y;
             Width = column_width;
 
@@ -74,28 +82,30 @@ namespace osu.Game.Rulesets.Mania.UI
 
             TopLevelContainer.Add(explosionContainer.CreateProxy());
 
-            Direction.BindValueChanged(d =>
+            Direction.BindValueChanged(dir =>
             {
                 hitTargetContainer.Padding = new MarginPadding
                 {
-                    Top = d == ScrollingDirection.Up ? ManiaStage.HIT_TARGET_POSITION : 0,
-                    Bottom = d == ScrollingDirection.Down ? ManiaStage.HIT_TARGET_POSITION : 0,
+                    Top = dir.NewValue == ScrollingDirection.Up ? ManiaStage.HIT_TARGET_POSITION : 0,
+                    Bottom = dir.NewValue == ScrollingDirection.Down ? ManiaStage.HIT_TARGET_POSITION : 0,
                 };
 
-                keyArea.Anchor = keyArea.Origin= d == ScrollingDirection.Up ? Anchor.TopLeft : Anchor.BottomLeft;
+                keyArea.Anchor = keyArea.Origin = dir.NewValue == ScrollingDirection.Up ? Anchor.TopLeft : Anchor.BottomLeft;
             }, true);
         }
 
         public override Axes RelativeSizeAxes => Axes.Y;
 
         private bool isSpecial;
+
         public bool IsSpecial
         {
-            get { return isSpecial; }
+            get => isSpecial;
             set
             {
                 if (isSpecial == value)
                     return;
+
                 isSpecial = value;
 
                 Width = isSpecial ? special_column_width : column_width;
@@ -103,13 +113,15 @@ namespace osu.Game.Rulesets.Mania.UI
         }
 
         private Color4 accentColour;
+
         public Color4 AccentColour
         {
-            get { return accentColour; }
+            get => accentColour;
             set
             {
                 if (accentColour == value)
                     return;
+
                 accentColour = value;
 
                 background.AccentColour = value;
@@ -137,9 +149,18 @@ namespace osu.Game.Rulesets.Mania.UI
             HitObjectContainer.Add(hitObject);
         }
 
+        public override bool Remove(DrawableHitObject h)
+        {
+            if (!base.Remove(h))
+                return false;
+
+            h.OnNewResult -= OnNewResult;
+            return true;
+        }
+
         internal void OnNewResult(DrawableHitObject judgedObject, JudgementResult result)
         {
-            if (!result.IsHit || !judgedObject.DisplayResult || !DisplayJudgements)
+            if (!result.IsHit || !judgedObject.DisplayResult || !DisplayJudgements.Value)
                 return;
 
             explosionContainer.Add(new HitExplosion(judgedObject)
@@ -150,7 +171,7 @@ namespace osu.Game.Rulesets.Mania.UI
 
         public bool OnPressed(ManiaAction action)
         {
-            if (action != Action)
+            if (action != Action.Value)
                 return false;
 
             var nextObject =
@@ -165,5 +186,9 @@ namespace osu.Game.Rulesets.Mania.UI
         }
 
         public bool OnReleased(ManiaAction action) => false;
+
+        public override bool ReceivePositionalInputAt(Vector2 screenSpacePos)
+            // This probably shouldn't exist as is, but the columns in the stage are separated by a 1px border
+            => DrawRectangle.Inflate(new Vector2(ManiaStage.COLUMN_SPACING / 2, 0)).Contains(ToLocalSpace(screenSpacePos));
     }
 }

@@ -1,24 +1,24 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using osuTK;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Online.Leaderboards;
 using osu.Game.Rulesets.Mods;
-using osu.Game.Screens.Select.Leaderboards;
-using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.UI;
+using osu.Game.Scoring;
 
 namespace osu.Game.Overlays.Profile.Sections.Ranks
 {
     public abstract class DrawableProfileScore : DrawableProfileRow
     {
         private readonly ScoreModsContainer modsContainer;
-        protected readonly Score Score;
+        protected readonly ScoreInfo Score;
 
-        protected DrawableProfileScore(Score score)
+        protected DrawableProfileScore(ScoreInfo score)
         {
             Score = score;
 
@@ -46,8 +46,7 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
                 Anchor = Anchor.TopRight,
                 Origin = Anchor.TopRight,
                 Colour = colour.GrayA,
-                TextSize = 11,
-                Font = "Exo2.0-RegularItalic"
+                Font = OsuFont.GetFont(size: 11, weight: FontWeight.Regular, italics: true)
             };
 
             RightFlowContainer.Add(text);
@@ -60,7 +59,7 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
                 modsContainer.Add(new ModIcon(mod) { Scale = new Vector2(0.5f) });
         }
 
-        protected override Drawable CreateLeftVisual() => new DrawableRank(Score.Rank)
+        protected override Drawable CreateLeftVisual() => new UpdateableRank(Score.Rank)
         {
             RelativeSizeAxes = Axes.Y,
             Width = 60,

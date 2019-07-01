@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using osu.Framework;
@@ -38,14 +38,14 @@ namespace osu.Game.Rulesets.Edit
         /// <summary>
         /// Invoked when this <see cref="SelectionBlueprint"/> has requested drag.
         /// </summary>
-        public event Action<DragEvent> DragRequested;
+        public event Action<SelectionBlueprint, DragEvent> DragRequested;
 
         /// <summary>
         /// The <see cref="DrawableHitObject"/> which this <see cref="SelectionBlueprint"/> applies to.
         /// </summary>
         public readonly DrawableHitObject HitObject;
 
-        protected override bool ShouldBeAlive => HitObject.IsAlive && HitObject.IsPresent || State == SelectionState.Selected;
+        protected override bool ShouldBeAlive => (HitObject.IsAlive && HitObject.IsPresent) || State == SelectionState.Selected;
         public override bool HandlePositionalInput => ShouldBeAlive;
         public override bool RemoveWhenNotAlive => false;
 
@@ -68,20 +68,25 @@ namespace osu.Game.Rulesets.Edit
             get => state;
             set
             {
-                if (state == value) return;
+                if (state == value)
+                    return;
 
                 state = value;
+
                 switch (state)
                 {
                     case SelectionState.Selected:
                         Show();
                         Selected?.Invoke(this);
                         break;
+
                     case SelectionState.NotSelected:
                         Hide();
                         Deselected?.Invoke(this);
                         break;
                 }
+
+                StateChanged?.Invoke(state);
             }
         }
 
@@ -130,11 +135,9 @@ namespace osu.Game.Rulesets.Edit
 
         protected override bool OnDrag(DragEvent e)
         {
-            DragRequested?.Invoke(e);
+            DragRequested?.Invoke(this, e);
             return true;
         }
-
-        public abstract void AdjustPosition(DragEvent dragEvent);
 
         /// <summary>
         /// The screen-space point that causes this <see cref="SelectionBlueprint"/> to be selected.

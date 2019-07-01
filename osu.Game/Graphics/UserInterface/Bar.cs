@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using osuTK;
 using osuTK.Graphics;
@@ -26,10 +26,7 @@ namespace osu.Game.Graphics.UserInterface
         /// </summary>
         public float Length
         {
-            get
-            {
-                return length;
-            }
+            get => length;
             set
             {
                 length = MathHelper.Clamp(value, 0, 1);
@@ -39,35 +36,21 @@ namespace osu.Game.Graphics.UserInterface
 
         public Color4 BackgroundColour
         {
-            get
-            {
-                return background.Colour;
-            }
-            set
-            {
-                background.Colour = value;
-            }
+            get => background.Colour;
+            set => background.Colour = value;
         }
 
         public Color4 AccentColour
         {
-            get
-            {
-                return bar.Colour;
-            }
-            set
-            {
-                bar.Colour = value;
-            }
+            get => bar.Colour;
+            set => bar.Colour = value;
         }
 
         private BarDirection direction = BarDirection.LeftToRight;
+
         public BarDirection Direction
         {
-            get
-            {
-                return direction;
-            }
+            get => direction;
             set
             {
                 direction = value;

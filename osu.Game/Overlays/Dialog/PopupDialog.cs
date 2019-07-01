@@ -1,12 +1,14 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Events;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Backgrounds;
@@ -38,7 +40,7 @@ namespace osu.Game.Overlays.Dialog
 
         private bool actionInvoked;
 
-        public FontAwesome Icon
+        public IconUsage Icon
         {
             get => icon.Icon;
             set => icon.Icon = value;
@@ -53,6 +55,7 @@ namespace osu.Game.Overlays.Dialog
             {
                 if (text == value)
                     return;
+
                 text = value;
 
                 header.Text = value;
@@ -70,6 +73,7 @@ namespace osu.Game.Overlays.Dialog
             set
             {
                 buttonsContainer.ChildrenEnumerable = value;
+
                 foreach (PopupDialogButton b in value)
                 {
                     var action = b.Action;
@@ -130,9 +134,9 @@ namespace osu.Game.Overlays.Dialog
                             Origin = Anchor.BottomCentre,
                             RelativeSizeAxes = Axes.X,
                             AutoSizeAxes = Axes.Y,
-                            Position = new Vector2(0f, -50f),
                             Direction = FillDirection.Vertical,
                             Spacing = new Vector2(0f, 10f),
+                            Padding = new MarginPadding { Bottom = 10 },
                             Children = new Drawable[]
                             {
                                 new Container
@@ -140,10 +144,6 @@ namespace osu.Game.Overlays.Dialog
                                     Origin = Anchor.TopCentre,
                                     Anchor = Anchor.TopCentre,
                                     Size = ringSize,
-                                    Margin = new MarginPadding
-                                    {
-                                        Bottom = 30,
-                                    },
                                     Children = new Drawable[]
                                     {
                                         ring = new CircularContainer
@@ -164,28 +164,28 @@ namespace osu.Game.Overlays.Dialog
                                                 {
                                                     Origin = Anchor.Centre,
                                                     Anchor = Anchor.Centre,
-                                                    Icon = FontAwesome.fa_close,
+                                                    Icon = FontAwesome.Solid.TimesCircle,
                                                     Size = new Vector2(50),
                                                 },
                                             },
                                         },
                                     },
                                 },
-                                header = new OsuTextFlowContainer(t => t.TextSize = 25)
+                                header = new OsuTextFlowContainer(t => t.Font = t.Font.With(size: 25))
                                 {
                                     Origin = Anchor.TopCentre,
                                     Anchor = Anchor.TopCentre,
                                     RelativeSizeAxes = Axes.X,
                                     AutoSizeAxes = Axes.Y,
-                                    Padding = new MarginPadding(15),
                                     TextAnchor = Anchor.TopCentre,
                                 },
-                                body = new OsuTextFlowContainer(t => t.TextSize = 18)
+                                body = new OsuTextFlowContainer(t => t.Font = t.Font.With(size: 18))
                                 {
+                                    Origin = Anchor.TopCentre,
+                                    Anchor = Anchor.TopCentre,
+                                    TextAnchor = Anchor.TopCentre,
                                     RelativeSizeAxes = Axes.X,
                                     AutoSizeAxes = Axes.Y,
-                                    Padding = new MarginPadding(15),
-                                    TextAnchor = Anchor.TopCentre,
                                 },
                             },
                         },
@@ -220,6 +220,7 @@ namespace osu.Game.Overlays.Dialog
 
             // press button at number if 1-9 on number row or keypad are pressed
             var k = e.Key;
+
             if (k >= Key.Number1 && k <= Key.Number9)
             {
                 pressButtonAtIndex(k - Key.Number1);

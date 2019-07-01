@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 namespace osu.Game.Rulesets.UI.Scrolling.Algorithms
 {
@@ -43,7 +43,7 @@ namespace osu.Game.Rulesets.UI.Scrolling.Algorithms
         /// <param name="currentTime">The current time.</param>
         /// <param name="timeRange">The amount of visible time.</param>
         /// <param name="scrollLength">The absolute spatial length through <see cref="timeRange"/>.</param>
-        /// <returns>The time at which <see cref="PositionAt(t)"/> == <paramref name="position"/>.</returns>
+        /// <returns>The time at which <see cref="PositionAt(double,double,double,float)"/> == <paramref name="position"/>.</returns>
         double TimeAt(float position, double currentTime, double timeRange, float scrollLength);
 
         /// <summary>

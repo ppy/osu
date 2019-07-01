@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using System.Collections.Generic;
@@ -21,6 +21,7 @@ namespace osu.Game.Rulesets.Catch.Tests
         [TestCase("basic")]
         [TestCase("spinner")]
         [TestCase("spinner-and-circles")]
+        [TestCase("slider")]
         public new void Test(string name)
         {
             base.Test(name);
@@ -33,13 +34,18 @@ namespace osu.Game.Rulesets.Catch.Tests
                 case JuiceStream stream:
                     foreach (var nested in stream.NestedHitObjects)
                         yield return new ConvertValue((CatchHitObject)nested);
+
                     break;
+
                 case BananaShower shower:
                     foreach (var nested in shower.NestedHitObjects)
                         yield return new ConvertValue((CatchHitObject)nested);
+
                     break;
+
                 default:
                     yield return new ConvertValue((CatchHitObject)hitObject);
+
                     break;
             }
         }

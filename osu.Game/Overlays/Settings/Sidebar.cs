@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using System.Linq;
@@ -11,6 +11,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Events;
 using osu.Framework.Threading;
+using osu.Game.Graphics.Containers;
 using osu.Game.Overlays.Toolbar;
 
 namespace osu.Game.Overlays.Settings
@@ -76,7 +77,7 @@ namespace osu.Game.Overlays.Settings
             return base.OnMouseMove(e);
         }
 
-        private class SidebarScrollContainer : ScrollContainer
+        private class SidebarScrollContainer : OsuScrollContainer
         {
             public SidebarScrollContainer()
             {
@@ -88,7 +89,7 @@ namespace osu.Game.Overlays.Settings
 
         public ExpandedState State
         {
-            get { return state; }
+            get => state;
             set
             {
                 expandEvent?.Cancel();
@@ -102,6 +103,7 @@ namespace osu.Game.Overlays.Settings
                     default:
                         this.ResizeTo(new Vector2(DEFAULT_WIDTH, Height), 500, Easing.OutQuint);
                         break;
+
                     case ExpandedState.Expanded:
                         this.ResizeTo(new Vector2(EXPANDED_WIDTH, Height), 500, Easing.OutQuint);
                         break;

@@ -1,16 +1,16 @@
-// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using osu.Framework;
 using osu.Framework.Allocation;
-using osu.Framework.Configuration;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Input;
 using osu.Framework.Input.Events;
 using osu.Framework.Timing;
 using osu.Game.Beatmaps;
+using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Screens.Edit.Compose;
 using osuTK;
@@ -20,7 +20,7 @@ namespace osu.Game.Rulesets.Edit
     /// <summary>
     /// A blueprint which governs the creation of a new <see cref="HitObject"/> to actualisation.
     /// </summary>
-    public abstract class PlacementBlueprint : CompositeDrawable, IStateful<PlacementState>, IRequireHighFrequencyMousePosition
+    public abstract class PlacementBlueprint : CompositeDrawable, IStateful<PlacementState>
     {
         /// <summary>
         /// Invoked when <see cref="State"/> has changed.
@@ -50,11 +50,15 @@ namespace osu.Game.Rulesets.Edit
 
             RelativeSizeAxes = Axes.Both;
 
+            // This is required to allow the blueprint's position to be updated via OnMouseMove/Handle
+            // on the same frame it is made visible via a PlacementState change.
+            AlwaysPresent = true;
+
             Alpha = 0;
         }
 
         [BackgroundDependencyLoader]
-        private void load(IBindableBeatmap beatmap, IAdjustableClock clock)
+        private void load(IBindable<WorkingBeatmap> beatmap, IAdjustableClock clock)
         {
             this.beatmap.BindTo(beatmap);
 
@@ -72,6 +76,7 @@ namespace osu.Game.Rulesets.Edit
             {
                 if (state == value)
                     return;
+
                 state = value;
 
                 if (state == PlacementState.Shown)
@@ -104,7 +109,8 @@ namespace osu.Game.Rulesets.Edit
         }
 
         /// <summary>
-        /// Invokes <see cref="HitObject.ApplyDefaults"/>, refreshing <see cref="HitObject.NestedHitObjects"/> and parameters for the <see cref="HitObject"/>.
+        /// Invokes <see cref="Objects.HitObject.ApplyDefaults(ControlPointInfo,BeatmapDifficulty)"/>,
+        /// refreshing <see cref="Objects.HitObject.NestedHitObjects"/> and parameters for the <see cref="HitObject"/>.
         /// </summary>
         protected void ApplyDefaultsToHitObject() => HitObject.ApplyDefaults(beatmap.Value.Beatmap.ControlPointInfo, beatmap.Value.Beatmap.BeatmapInfo.BaseDifficulty);
 
@@ -118,8 +124,10 @@ namespace osu.Game.Rulesets.Edit
             {
                 case ScrollEvent _:
                     return false;
+
                 case MouseEvent _:
                     return true;
+
                 default:
                     return false;
             }
