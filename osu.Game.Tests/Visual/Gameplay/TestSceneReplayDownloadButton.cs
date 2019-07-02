@@ -9,6 +9,7 @@ using osu.Game.Rulesets.Osu;
 using osu.Game.Scoring;
 using osu.Game.Screens.Play;
 using osu.Game.Users;
+using osuTK;
 using System;
 using System.Collections.Generic;
 
@@ -41,6 +42,7 @@ namespace osu.Game.Tests.Visual.Gameplay
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
+                    Size = new Vector2(80, 40),
                 };
             });
         }

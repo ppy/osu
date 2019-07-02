@@ -1,4 +1,4 @@
-﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
@@ -10,7 +10,6 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online;
-using osuTK;
 
 namespace osu.Game.Overlays.Direct
 {
@@ -25,7 +24,7 @@ namespace osu.Game.Overlays.Direct
 
         private OsuColour colours;
         private readonly ShakeContainer shakeContainer;
-        private readonly OsuAnimatedButton button;
+        private readonly OsuDownloadButton button;
 
         public DownloadButton(BeatmapSetInfo beatmapSet, bool noVideo = false)
             : base(beatmapSet)
@@ -35,33 +34,10 @@ namespace osu.Game.Overlays.Direct
             InternalChild = shakeContainer = new ShakeContainer
             {
                 RelativeSizeAxes = Axes.Both,
-                Child = button = new OsuAnimatedButton
+                Child = button = new OsuDownloadButton
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Children = new Drawable[]
-                    {
-                        background = new Box
-                        {
-                            RelativeSizeAxes = Axes.Both,
-                            Depth = float.MaxValue
-                        },
-                        icon = new SpriteIcon
-                        {
-                            Anchor = Anchor.Centre,
-                            Origin = Anchor.Centre,
-                            Size = new Vector2(13),
-                            Icon = FontAwesome.Solid.Download,
-                        },
-                        checkmark = new SpriteIcon
-                        {
-                            Anchor = Anchor.Centre,
-                            Origin = Anchor.Centre,
-                            X = 8,
-                            Size = Vector2.Zero,
-                            Icon = FontAwesome.Solid.Check,
-                        }
-                    }
-                }
+                },
             };
         }
 
@@ -69,7 +45,7 @@ namespace osu.Game.Overlays.Direct
         {
             base.LoadComplete();
 
-            State.BindValueChanged(state => updateState(state.NewValue), true);
+            button.State.BindTo(State);
             FinishTransforms(true);
         }
 
@@ -105,32 +81,11 @@ namespace osu.Game.Overlays.Direct
             };
         }
 
-        private void updateState(DownloadState state)
+        protected override void Dispose(bool isDisposing)
         {
-            switch (state)
-            {
-                case DownloadState.NotDownloaded:
-                    background.FadeColour(colours.Gray4, 500, Easing.InOutExpo);
-                    icon.MoveToX(0, 500, Easing.InOutExpo);
-                    checkmark.ScaleTo(Vector2.Zero, 500, Easing.InOutExpo);
-                    break;
+            base.Dispose(isDisposing);
 
-                case DownloadState.Downloading:
-                    background.FadeColour(colours.Blue, 500, Easing.InOutExpo);
-                    icon.MoveToX(0, 500, Easing.InOutExpo);
-                    checkmark.ScaleTo(Vector2.Zero, 500, Easing.InOutExpo);
-                    break;
-
-                case DownloadState.Downloaded:
-                    background.FadeColour(colours.Yellow, 500, Easing.InOutExpo);
-                    break;
-
-                case DownloadState.LocallyAvailable:
-                    background.FadeColour(colours.Green, 500, Easing.InOutExpo);
-                    icon.MoveToX(-8, 500, Easing.InOutExpo);
-                    checkmark.ScaleTo(new Vector2(13), 500, Easing.InOutExpo);
-                    break;
-            }
+            button?.State.UnbindAll();
         }
     }
 }

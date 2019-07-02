@@ -2,57 +2,28 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
-using osu.Framework.Graphics.Cursor;
-using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics;
-using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Online;
 using osu.Game.Scoring;
-using osuTK;
-using osu.Framework.Graphics.Sprites;
 using osu.Game.Online.API.Requests.Responses;
-using osu.Framework.Graphics.Effects;
-using osuTK.Graphics;
-using osu.Framework.Extensions.Color4Extensions;
-using osu.Framework.Graphics.Containers;
+using osu.Game.Graphics.UserInterface;
 
 namespace osu.Game.Screens.Play
 {
-    public class ReplayDownloadButton : DownloadTrackingComposite<ScoreInfo, ScoreManager>, IHasTooltip
+    public class ReplayDownloadButton : DownloadTrackingComposite<ScoreInfo, ScoreManager>
     {
         [Resolved]
         private ScoreManager scores { get; set; }
 
-        private OsuClickableContainer button;
-        private SpriteIcon downloadIcon;
-        private SpriteIcon playIcon;
+        private OsuDownloadButton button;
         private ShakeContainer shakeContainer;
-        private CircularContainer circle;
-
-        public string TooltipText
-        {
-            get
-            {
-                switch (replayAvailability)
-                {
-                    case ReplayAvailability.Local:
-                        return @"Watch replay";
-
-                    case ReplayAvailability.Online:
-                        return @"Download replay";
-
-                    default:
-                        return @"Replay unavailable";
-                }
-            }
-        }
 
         private ReplayAvailability replayAvailability
         {
             get
             {
-                if (scores.IsAvailableLocally(Model.Value))
+                if (State.Value == DownloadState.LocallyAvailable)
                     return ReplayAvailability.Local;
 
                 if (Model.Value is APILegacyScoreInfo apiScore && apiScore.Replay)
@@ -65,54 +36,18 @@ namespace osu.Game.Screens.Play
         public ReplayDownloadButton(ScoreInfo score)
             : base(score)
         {
-            AutoSizeAxes = Axes.Both;
         }
 
         [BackgroundDependencyLoader(true)]
-        private void load(OsuGame game, OsuColour colours)
+        private void load(OsuGame game)
         {
             InternalChild = shakeContainer = new ShakeContainer
             {
-                AutoSizeAxes = Axes.Both,
-                Child = circle = new CircularContainer
+                RelativeSizeAxes = Axes.Both,
+                Child = button = new OsuDownloadButton
                 {
-                    Masking = true,
-                    Size = new Vector2(40),
-                    EdgeEffect = new EdgeEffectParameters
-                    {
-                        Colour = Color4.Black.Opacity(0.4f),
-                        Type = EdgeEffectType.Shadow,
-                        Radius = 5,
-                    },
-                    Child = button = new OsuClickableContainer
-                    {
-                        RelativeSizeAxes = Axes.Both,
-                        Children = new Drawable[]
-                        {
-                            new Box
-                            {
-                                RelativeSizeAxes = Axes.Both,
-                                Colour = colours.GrayF,
-                            },
-                            playIcon = new SpriteIcon
-                            {
-                                Icon = FontAwesome.Solid.Play,
-                                Size = Vector2.Zero,
-                                Colour = colours.Gray3,
-                                Anchor = Anchor.Centre,
-                                Origin = Anchor.Centre,
-                            },
-                            downloadIcon = new SpriteIcon
-                            {
-                                Icon = FontAwesome.Solid.FileDownload,
-                                Size = Vector2.Zero,
-                                Colour = colours.Gray3,
-                                Anchor = Anchor.Centre,
-                                Origin = Anchor.Centre,
-                            },
-                        },
-                    }
-                },
+                    RelativeSizeAxes = Axes.Both,
+                }
             };
 
             button.Action = () =>
@@ -127,32 +62,29 @@ namespace osu.Game.Screens.Play
                         scores.Download(Model.Value);
                         break;
 
+                    case DownloadState.Downloaded:
                     case DownloadState.Downloading:
                         shakeContainer.Shake();
                         break;
                 }
             };
 
-            State.BindValueChanged(state =>
+            State.BindValueChanged((state) =>
             {
-                switch (state.NewValue)
+                button.State.Value = state.NewValue;
+
+                switch (replayAvailability)
                 {
-                    case DownloadState.Downloading:
-                        playIcon.ResizeTo(Vector2.Zero, 400, Easing.OutQuint);
-                        downloadIcon.ResizeTo(13, 400, Easing.OutQuint);
-                        circle.FadeEdgeEffectTo(colours.Yellow, 400, Easing.OutQuint);
+                    case ReplayAvailability.Local:
+                        button.TooltipText = @"Watch replay";
                         break;
 
-                    case DownloadState.LocallyAvailable:
-                        playIcon.ResizeTo(13, 400, Easing.OutQuint);
-                        downloadIcon.ResizeTo(Vector2.Zero, 400, Easing.OutQuint);
-                        circle.FadeEdgeEffectTo(Color4.Black.Opacity(0.4f), 400, Easing.OutQuint);
+                    case ReplayAvailability.Online:
+                        button.TooltipText = @"Download replay";
                         break;
 
-                    case DownloadState.NotDownloaded:
-                        playIcon.ResizeTo(Vector2.Zero, 400, Easing.OutQuint);
-                        downloadIcon.ResizeTo(13, 400, Easing.OutQuint);
-                        circle.FadeEdgeEffectTo(Color4.Black.Opacity(0.4f), 400, Easing.OutQuint);
+                    default:
+                        button.TooltipText = @"Replay unavailable";
                         break;
                 }
             }, true);
