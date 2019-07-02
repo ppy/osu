@@ -22,8 +22,20 @@ namespace osu.Game.Rulesets
         {
             AppDomain.CurrentDomain.AssemblyResolve += currentDomain_AssemblyResolve;
 
-            foreach (string file in Directory.GetFiles(Environment.CurrentDirectory, $"{ruleset_library_prefix}.*.dll")
-                                             .Where(f => !Path.GetFileName(f).Contains("Tests")))
+            addLoadedRulesets();
+
+            IEnumerable<string> files = new string[0];
+
+            try
+            {
+                files = Directory.GetFiles(Environment.CurrentDirectory, $"{ruleset_library_prefix}.*.dll");
+            }
+            catch (Exception e)
+            {
+                Logger.Error(e, $"Could not load rulesets from directory {Environment.CurrentDirectory}");
+            }
+
+            foreach (string file in files.Where(f => !Path.GetFileName(f).Contains("Tests")))
                 loadRulesetFromFile(file);
         }
 
@@ -111,6 +123,17 @@ namespace osu.Game.Rulesets
             }
         }
 
+        private static void addLoadedRulesets()
+        {
+            // on android the rulesets are already loaded
+            var loadedRulesets = AppDomain.CurrentDomain.GetAssemblies()
+                                                        .Where(assembly => assembly.GetName().Name.StartsWith(ruleset_library_prefix, StringComparison.InvariantCultureIgnoreCase))
+                                                        .Where(assembly => !assembly.GetName().Name.Contains("Tests"));
+
+            foreach (var ruleset in loadedRulesets)
+                addRuleset(ruleset);
+        }
+
         private static void loadRulesetFromFile(string file)
         {
             var filename = Path.GetFileNameWithoutExtension(file);
@@ -126,6 +149,21 @@ namespace osu.Game.Rulesets
             catch (Exception e)
             {
                 Logger.Error(e, $"Failed to load ruleset {filename}");
+            }
+        }
+
+        private static void addRuleset(Assembly assembly)
+        {
+            if (loaded_assemblies.ContainsKey(assembly))
+                return;
+
+            try
+            {
+                loaded_assemblies[assembly] = assembly.GetTypes().First(t => t.IsPublic && t.IsSubclassOf(typeof(Ruleset)));
+            }
+            catch (Exception e)
+            {
+                Logger.Error(e, $"Failed to add ruleset {assembly}");
             }
         }
     }
