@@ -13,9 +13,6 @@ namespace osu.Game.Screens.Play
 {
     public class ReplayDownloadButton : DownloadTrackingComposite<ScoreInfo, ScoreManager>
     {
-        [Resolved]
-        private ScoreManager scores { get; set; }
-
         private OsuDownloadButton button;
         private ShakeContainer shakeContainer;
 
@@ -39,7 +36,7 @@ namespace osu.Game.Screens.Play
         }
 
         [BackgroundDependencyLoader(true)]
-        private void load(OsuGame game)
+        private void load(OsuGame game, ScoreManager scores)
         {
             InternalChild = shakeContainer = new ShakeContainer
             {
@@ -69,7 +66,7 @@ namespace osu.Game.Screens.Play
                 }
             };
 
-            State.BindValueChanged((state) =>
+            State.BindValueChanged(state =>
             {
                 button.State.Value = state.NewValue;
 
