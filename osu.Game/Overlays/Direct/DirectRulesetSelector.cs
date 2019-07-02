@@ -43,7 +43,7 @@ namespace osu.Game.Overlays.Direct
             private readonly SpriteIcon icon;
 
             public DirectRulesetTabItem(RulesetInfo value)
-            : base(value)
+                : base(value)
             {
                 AutoSizeAxes = Axes.Both;
 
