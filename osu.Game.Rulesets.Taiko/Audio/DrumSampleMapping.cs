@@ -29,7 +29,7 @@ namespace osu.Game.Rulesets.Taiko.Audio
             foreach (var s in samplePoints)
             {
                 var centre = s.GetSampleInfo();
-                var rim = s.GetSampleInfo(SampleInfo.HIT_CLAP);
+                var rim = s.GetSampleInfo(HitSampleInfo.HIT_CLAP);
 
                 // todo: this is ugly
                 centre.Namespace = "taiko";
@@ -43,9 +43,9 @@ namespace osu.Game.Rulesets.Taiko.Audio
             }
         }
 
-        private SkinnableSound addSound(SampleInfo sampleInfo)
+        private SkinnableSound addSound(HitSampleInfo hitSampleInfo)
         {
-            var drawable = new SkinnableSound(sampleInfo);
+            var drawable = new SkinnableSound(hitSampleInfo);
             Sounds.Add(drawable);
             return drawable;
         }

@@ -2,23 +2,24 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics.Containers;
-using osu.Game.Beatmaps;
-using osu.Game.Online.API.Requests;
+using osu.Game.Database;
+using osu.Game.Online.API;
 
-namespace osu.Game.Overlays.Direct
+namespace osu.Game.Online
 {
     /// <summary>
     /// A component which tracks a beatmap through potential download/import/deletion.
     /// </summary>
-    public abstract class DownloadTrackingComposite : CompositeDrawable
+    public abstract class DownloadTrackingComposite<TModel, TModelManager> : CompositeDrawable
+        where TModel : class, IEquatable<TModel>
+        where TModelManager : class, IModelDownloader<TModel>
     {
-        public readonly Bindable<BeatmapSetInfo> BeatmapSet = new Bindable<BeatmapSetInfo>();
+        protected readonly Bindable<TModel> Model = new Bindable<TModel>();
 
-        private BeatmapManager beatmaps;
+        private TModelManager manager;
 
         /// <summary>
         /// Holds the current download state of the beatmap, whether is has already been downloaded, is in progress, or is not downloaded.
@@ -27,58 +28,39 @@ namespace osu.Game.Overlays.Direct
 
         protected readonly Bindable<double> Progress = new Bindable<double>();
 
-        protected DownloadTrackingComposite(BeatmapSetInfo beatmapSet = null)
+        protected DownloadTrackingComposite(TModel model = null)
         {
-            BeatmapSet.Value = beatmapSet;
+            Model.Value = model;
         }
 
         [BackgroundDependencyLoader(true)]
-        private void load(BeatmapManager beatmaps)
+        private void load(TModelManager manager)
         {
-            this.beatmaps = beatmaps;
+            this.manager = manager;
 
-            BeatmapSet.BindValueChanged(setInfo =>
+            Model.BindValueChanged(modelInfo =>
             {
-                if (setInfo.NewValue == null)
+                if (modelInfo.NewValue == null)
                     attachDownload(null);
-                else if (beatmaps.GetAllUsableBeatmapSetsEnumerable().Any(s => s.OnlineBeatmapSetID == setInfo.NewValue.OnlineBeatmapSetID))
+                else if (manager.IsAvailableLocally(modelInfo.NewValue))
                     State.Value = DownloadState.LocallyAvailable;
                 else
-                    attachDownload(beatmaps.GetExistingDownload(setInfo.NewValue));
+                    attachDownload(manager.GetExistingDownload(modelInfo.NewValue));
             }, true);
 
-            beatmaps.BeatmapDownloadBegan += download =>
+            manager.DownloadBegan += download =>
             {
-                if (download.BeatmapSet.OnlineBeatmapSetID == BeatmapSet.Value?.OnlineBeatmapSetID)
+                if (download.Model.Equals(Model.Value))
                     attachDownload(download);
             };
 
-            beatmaps.ItemAdded += setAdded;
-            beatmaps.ItemRemoved += setRemoved;
+            manager.ItemAdded += itemAdded;
+            manager.ItemRemoved += itemRemoved;
         }
 
-        #region Disposal
+        private ArchiveDownloadRequest<TModel> attachedRequest;
 
-        protected override void Dispose(bool isDisposing)
-        {
-            base.Dispose(isDisposing);
-
-            if (beatmaps != null)
-            {
-                beatmaps.BeatmapDownloadBegan -= attachDownload;
-                beatmaps.ItemAdded -= setAdded;
-            }
-
-            State.UnbindAll();
-
-            attachDownload(null);
-        }
-
-        #endregion
-
-        private DownloadBeatmapSetRequest attachedRequest;
-
-        private void attachDownload(DownloadBeatmapSetRequest request)
+        private void attachDownload(ArchiveDownloadRequest<TModel> request)
         {
             if (attachedRequest != null)
             {
@@ -118,16 +100,35 @@ namespace osu.Game.Overlays.Direct
 
         private void onRequestFailure(Exception e) => Schedule(() => attachDownload(null));
 
-        private void setAdded(BeatmapSetInfo s, bool existing) => setDownloadStateFromManager(s, DownloadState.LocallyAvailable);
+        private void itemAdded(TModel s) => setDownloadStateFromManager(s, DownloadState.LocallyAvailable);
 
-        private void setRemoved(BeatmapSetInfo s) => setDownloadStateFromManager(s, DownloadState.NotDownloaded);
+        private void itemRemoved(TModel s) => setDownloadStateFromManager(s, DownloadState.NotDownloaded);
 
-        private void setDownloadStateFromManager(BeatmapSetInfo s, DownloadState state) => Schedule(() =>
+        private void setDownloadStateFromManager(TModel s, DownloadState state) => Schedule(() =>
         {
-            if (s.OnlineBeatmapSetID != BeatmapSet.Value?.OnlineBeatmapSetID)
+            if (!s.Equals(Model.Value))
                 return;
 
             State.Value = state;
         });
+
+        #region Disposal
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+
+            if (manager != null)
+            {
+                manager.DownloadBegan -= attachDownload;
+                manager.ItemAdded -= itemAdded;
+            }
+
+            State.UnbindAll();
+
+            attachDownload(null);
+        }
+
+        #endregion
     }
 }
