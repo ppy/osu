@@ -46,8 +46,5 @@
   <ItemGroup>
     <AndroidResource Include="Resources\drawable\lazer.png" />
   </ItemGroup>
-  <ItemGroup>
-    <AndroidEnvironment Include="monogc.txt" />
-  </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\Android\Xamarin.Android.CSharp.targets" />
 </Project>
