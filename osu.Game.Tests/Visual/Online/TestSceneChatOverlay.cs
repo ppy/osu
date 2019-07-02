@@ -11,6 +11,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.UserInterface;
 using osu.Game.Online.Chat;
 using osu.Game.Overlays;
+using osu.Game.Overlays.Chat;
 using osu.Game.Overlays.Chat.Selection;
 using osu.Game.Overlays.Chat.Tabs;
 using osu.Game.Users;
@@ -48,17 +49,23 @@ namespace osu.Game.Tests.Visual.UserInterface
         [Test]
         public void TestHideOverlay()
         {
+            AddAssert("Chat overlay is visible", () => chatOverlay.State.Value == Visibility.Visible);
+            AddAssert("Selector is visible", () => chatOverlay.SelectionOverlayState == Visibility.Visible);
+
             AddStep("Close chat overlay", () => chatOverlay.Hide());
-            AddAssert("Channel selection overlay was hidden", () => chatOverlay.SelectionOverlayState == Visibility.Hidden);
+
             AddAssert("Chat overlay was hidden", () => chatOverlay.State.Value == Visibility.Hidden);
+            AddAssert("Channel selection overlay was hidden", () => chatOverlay.SelectionOverlayState == Visibility.Hidden);
         }
 
         [Test]
-        public void TestTabbingAwayClosesSelector()
+        public void TestSelectingChannelClosesSelector()
         {
             AddAssert("Selector is visible", () => chatOverlay.SelectionOverlayState == Visibility.Visible);
+
             AddStep("Join channel 1", () => channelManager.JoinChannel(channel1));
             AddStep("Switch to channel 1", () => clickDrawable(chatOverlay.TabMap[channel1]));
+
             AddAssert("Current channel is channel 1", () => channelManager.CurrentChannel.Value == channel1);
             AddAssert("Channel selector was closed", () => chatOverlay.SelectionOverlayState == Visibility.Hidden);
         }
