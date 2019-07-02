@@ -51,11 +51,6 @@ namespace osu.Game.Beatmaps
             total_count.Value++;
         }
 
-        ~WorkingBeatmap()
-        {
-            Dispose(false);
-        }
-
         protected virtual Track GetVirtualTrack()
         {
             const double excess_length = 1000;
