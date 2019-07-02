@@ -231,7 +231,7 @@ namespace osu.Game.Beatmaps
         {
             // recycling logic is not here for the time being, as components which use
             // retrieved objects from WorkingBeatmap may not hold a reference to the WorkingBeatmap itself.
-            // this should be fine as each retrieved comopnent do have their own finalizers.
+            // this should be fine as each retrieved component do have their own finalizers.
 
             // cancelling the beatmap load is safe for now since the retrieval is a synchronous
             // operation. if we add an async retrieval method this may need to be reconsidered.
