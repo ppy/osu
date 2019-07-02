@@ -20,7 +20,7 @@ namespace osu.Game.Overlays.Toolbar
     {
         private const float padding = 10;
 
-        private Drawable modeButtonLine;
+        protected Drawable ModeButtonLine { get; private set; }
 
         public ToolbarRulesetSelector()
         {
@@ -37,7 +37,7 @@ namespace osu.Game.Overlays.Toolbar
                 {
                     Depth = 1,
                 },
-                modeButtonLine = new Container
+                ModeButtonLine = new Container
                 {
                     Size = new Vector2(padding * 2 + ToolbarButton.WIDTH, 3),
                     Anchor = Anchor.BottomLeft,
@@ -66,17 +66,22 @@ namespace osu.Game.Overlays.Toolbar
             Current.BindValueChanged(_ => moveLineToCurrent(), true);
         }
 
-        private void moveLineToCurrent()
+        private bool hasInitialPosition;
+
+        // Scheduled to allow the flow layout to be computed before the line position is updated
+        private void moveLineToCurrent() => ScheduleAfterChildren(() =>
         {
-            foreach (TabItem<RulesetInfo> tabItem in TabContainer)
+            foreach (var tabItem in TabContainer)
             {
                 if (tabItem.Value == Current.Value)
                 {
-                    modeButtonLine.MoveToX(tabItem.DrawPosition.X, 200, Easing.OutQuint);
+                    ModeButtonLine.MoveToX(tabItem.DrawPosition.X, !hasInitialPosition ? 0 : 200, Easing.OutQuint);
                     break;
                 }
             }
-        }
+
+            hasInitialPosition = true;
+        });
 
         public override bool HandleNonPositionalInput => !Current.Disabled && base.HandleNonPositionalInput;
 
