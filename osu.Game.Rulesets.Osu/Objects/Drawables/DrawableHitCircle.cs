@@ -17,18 +17,18 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
     public class DrawableHitCircle : DrawableOsuHitObject, IDrawableHitObjectWithProxiedApproach
     {
         public ApproachCircle ApproachCircle;
-        public readonly CirclePiece circle;
-        public readonly RingPiece ring;
-        public readonly FlashPiece flash;
-        public readonly ExplodePiece explode;
-        public readonly NumberPiece number;
-        public readonly GlowPiece glow;
+        public readonly CirclePiece Circle;
+        public readonly RingPiece Ring;
+        public readonly FlashPiece Flash;
+        public readonly ExplodePiece Explode;
+        public readonly NumberPiece Number;
+        public readonly GlowPiece Glow;
 
         private readonly IBindable<Vector2> positionBindable = new Bindable<Vector2>();
         private readonly IBindable<int> stackHeightBindable = new Bindable<int>();
         private readonly IBindable<float> scaleBindable = new Bindable<float>();
 
-        public OsuAction? HitAction => circle.HitAction;
+        public OsuAction? HitAction => Circle.HitAction;
 
         private readonly Container explodeContainer;
 
@@ -55,8 +55,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                         Anchor = Anchor.Centre,
                         Children = new Drawable[]
                         {
-                            glow = new GlowPiece(),
-                            circle = new CirclePiece
+                            Glow = new GlowPiece(),
+                            Circle = new CirclePiece
                             {
                                 Hit = () =>
                                 {
@@ -67,13 +67,13 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                                     return true;
                                 },
                             },
-                            number = new NumberPiece
+                            Number = new NumberPiece
                             {
                                 Text = (HitObject.IndexInCurrentCombo + 1).ToString(),
                             },
-                            ring = new RingPiece(),
-                            flash = new FlashPiece(),
-                            explode = new ExplodePiece(),
+                            Ring = new RingPiece(),
+                            Flash = new FlashPiece(),
+                            Explode = new ExplodePiece(),
                             ApproachCircle = new ApproachCircle
                             {
                                 Alpha = 0,
@@ -85,7 +85,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             };
 
             //may not be so correct
-            Size = circle.DrawSize;
+            Size = Circle.DrawSize;
         }
 
         [BackgroundDependencyLoader]
@@ -106,9 +106,9 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             set
             {
                 base.AccentColour = value;
-                explode.Colour = AccentColour;
-                glow.Colour = AccentColour;
-                circle.Colour = AccentColour;
+                Explode.Colour = AccentColour;
+                Glow.Colour = AccentColour;
+                Circle.Colour = AccentColour;
                 ApproachCircle.Colour = AccentColour;
             }
         }
@@ -145,7 +145,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
         protected override void UpdateCurrentState(ArmedState state)
         {
-            glow.FadeOut(400);
+            Glow.FadeOut(400);
 
             switch (state)
             {
@@ -154,7 +154,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
                     Expire(true);
 
-                    circle.HitAction = null;
+                    Circle.HitAction = null;
 
                     // override lifetime end as FadeIn may have been changed externally, causing out expiration to be too early.
                     LifetimeEnd = HitObject.StartTime + HitObject.HitWindows.HalfWindowFor(HitResult.Miss);
@@ -170,18 +170,18 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                     ApproachCircle.FadeOut(50);
 
                     const double flash_in = 40;
-                    flash.FadeTo(0.8f, flash_in)
+                    Flash.FadeTo(0.8f, flash_in)
                          .Then()
                          .FadeOut(100);
 
-                    explode.FadeIn(flash_in);
+                    Explode.FadeIn(flash_in);
 
                     using (BeginDelayedSequence(flash_in, true))
                     {
                         //after the flash, we can hide some elements that were behind it
-                        ring.FadeOut();
-                        circle.FadeOut();
-                        number.FadeOut();
+                        Ring.FadeOut();
+                        Circle.FadeOut();
+                        Number.FadeOut();
 
                         this.FadeOut(800);
                         explodeContainer.ScaleTo(1.5f, 400, Easing.OutQuad);

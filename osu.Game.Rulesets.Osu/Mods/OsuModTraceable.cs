@@ -11,15 +11,15 @@ using osu.Game.Rulesets.Osu.Objects.Drawables;
 
 namespace osu.Game.Rulesets.Osu.Mods
 {
-    internal class OsuModTraceable : OsuModHidden, IReadFromConfig, IApplicableToDrawableHitObjects
+    internal class OsuModTraceable : OsuModHidden
     {
         public override string Name => "Traceable";
         public override string Acronym => "TC";
         public override IconUsage Icon => FontAwesome.Brands.SnapchatGhost;
-        public override ModType Type => ModType.Fun;
+        public override ModType Type => ModType.DifficultyIncrease;
         public override string Description => "Put your faith in the approach circles...";
         public override double ScoreMultiplier => 1;
-        public override Type[] IncompatibleMods => new[] { typeof(OsuModHidden), typeof(OsuModGrow) };
+        public override Type[] IncompatibleMods => new[] { typeof(OsuModGrow) };
 
         public override void ApplyToDrawableHitObjects(IEnumerable<DrawableHitObject> drawables)
         {
@@ -30,10 +30,12 @@ namespace osu.Game.Rulesets.Osu.Mods
                     case DrawableHitCircle _:
                         drawable.ApplyCustomUpdateState += ApplyTraceableState;
                         break;
+
                     case DrawableSlider slider:
                         slider.ApplyCustomUpdateState += ApplyHiddenState;
                         slider.HeadCircle.ApplyCustomUpdateState += ApplyTraceableState;
                         break;
+
                     default:
                         drawable.ApplyCustomUpdateState += ApplyHiddenState;
                         break;
@@ -51,13 +53,13 @@ namespace osu.Game.Rulesets.Osu.Mods
             // we only want to see the approach circle
             using (circle.BeginAbsoluteSequence(h.StartTime - h.TimePreempt, true))
             {
-                circle.circle.Hide();   // CirclePiece
-                circle.circle.AlwaysPresent = true;
-                circle.ring.Hide();
-                circle.flash.Hide();
-                circle.explode.Hide();
-                circle.number.Hide();
-                circle.glow.Hide();
+                circle.Circle.Hide(); // CirclePiece
+                circle.Circle.AlwaysPresent = true;
+                circle.Ring.Hide();
+                circle.Flash.Hide();
+                circle.Explode.Hide();
+                circle.Number.Hide();
+                circle.Glow.Hide();
                 circle.ApproachCircle.Show();
             }
         }
