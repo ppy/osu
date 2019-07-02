@@ -125,6 +125,7 @@ namespace osu.Game.Graphics.Containers
 
             // This is done as an optimization, such that invisible parts of the waves
             // are masked away, and thus do not consume fill rate.
+            // todo: revert https://github.com/ppy/osu/commit/aff9e3617da0c8fe252169fae287e39b44575b5e after FTB is fixed on iOS.
             wavesContainer.Height = Math.Max(0, DrawHeight - (contentContainer.DrawHeight - contentContainer.Y * DrawHeight));
         }
 
