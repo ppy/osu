@@ -157,7 +157,20 @@ namespace osu.Game.Beatmaps
             return b;
         }, beatmapCancellation.Token, TaskCreationOptions.LongRunning, TaskScheduler.Default)));
 
-        public IBeatmap Beatmap => LoadBeatmapAsync().Result;
+        public IBeatmap Beatmap
+        {
+            get
+            {
+                try
+                {
+                    return LoadBeatmapAsync().Result;
+                }
+                catch (TaskCanceledException)
+                {
+                    return null;
+                }
+            }
+        }
 
         private readonly CancellationTokenSource beatmapCancellation = new CancellationTokenSource();
         protected abstract IBeatmap GetBeatmap();
