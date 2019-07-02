@@ -24,19 +24,17 @@ namespace osu.Game.Rulesets
 
             addLoadedRulesets();
 
-            IEnumerable<string> files = new string[0];
-
             try
             {
-                files = Directory.GetFiles(Environment.CurrentDirectory, $"{ruleset_library_prefix}.*.dll");
+                string[] files = Directory.GetFiles(Environment.CurrentDirectory, $"{ruleset_library_prefix}.*.dll");
+
+                foreach (string file in files.Where(f => !Path.GetFileName(f).Contains("Tests")))
+                    loadRulesetFromFile(file);
             }
             catch (Exception e)
             {
                 Logger.Error(e, $"Could not load rulesets from directory {Environment.CurrentDirectory}");
             }
-
-            foreach (string file in files.Where(f => !Path.GetFileName(f).Contains("Tests")))
-                loadRulesetFromFile(file);
         }
 
         public RulesetStore(IDatabaseContextFactory factory)
@@ -125,13 +123,15 @@ namespace osu.Game.Rulesets
 
         private static void addLoadedRulesets()
         {
-            // on android the rulesets are already loaded
-            var loadedRulesets = AppDomain.CurrentDomain.GetAssemblies()
-                                                        .Where(assembly => assembly.GetName().Name.StartsWith(ruleset_library_prefix, StringComparison.InvariantCultureIgnoreCase))
-                                                        .Where(assembly => !assembly.GetName().Name.Contains("Tests"));
+            foreach (var ruleset in AppDomain.CurrentDomain.GetAssemblies())
+            {
+                string rulesetName = ruleset.GetName().Name;
 
-            foreach (var ruleset in loadedRulesets)
+                if (!rulesetName.StartsWith(ruleset_library_prefix, StringComparison.InvariantCultureIgnoreCase) || ruleset.GetName().Name.Contains("Tests"))
+                    continue;
+
                 addRuleset(ruleset);
+            }
         }
 
         private static void loadRulesetFromFile(string file)
