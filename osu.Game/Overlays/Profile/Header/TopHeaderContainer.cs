@@ -119,10 +119,11 @@ namespace osu.Game.Overlays.Profile.Header
                                             Margin = new MarginPadding { Top = 10 },
                                             Colour = colours.GreySeafoamLighter,
                                         },
-                                        new Container
+                                        new FillFlowContainer
                                         {
                                             AutoSizeAxes = Axes.Both,
                                             Margin = new MarginPadding { Top = 5 },
+                                            Direction = FillDirection.Horizontal,
                                             Children = new Drawable[]
                                             {
                                                 userFlag = new UpdateableFlag
@@ -133,7 +134,7 @@ namespace osu.Game.Overlays.Profile.Header
                                                 userCountryText = new OsuSpriteText
                                                 {
                                                     Font = OsuFont.GetFont(size: 17.5f, weight: FontWeight.Regular),
-                                                    Margin = new MarginPadding { Left = 40 },
+                                                    Margin = new MarginPadding { Left = 10 },
                                                     Origin = Anchor.CentreLeft,
                                                     Anchor = Anchor.CentreLeft,
                                                     Colour = colours.GreySeafoamLighter,
