@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
@@ -13,14 +14,19 @@ namespace osu.Game.Skinning
 {
     public class SkinnableSound : SkinReloadableDrawable
     {
-        private readonly SampleInfo[] samples;
+        private readonly ISampleInfo[] hitSamples;
         private SampleChannel[] channels;
 
         private AudioManager audio;
 
-        public SkinnableSound(params SampleInfo[] samples)
+        public SkinnableSound(IEnumerable<ISampleInfo> hitSamples)
         {
-            this.samples = samples;
+            this.hitSamples = hitSamples.ToArray();
+        }
+
+        public SkinnableSound(ISampleInfo hitSamples)
+        {
+            this.hitSamples = new[] { hitSamples };
         }
 
         [BackgroundDependencyLoader]
@@ -35,7 +41,7 @@ namespace osu.Game.Skinning
 
         protected override void SkinChanged(ISkinSource skin, bool allowFallback)
         {
-            channels = samples.Select(s =>
+            channels = hitSamples.Select(s =>
             {
                 var ch = loadChannel(s, skin.GetSample);
                 if (ch == null && allowFallback)
@@ -44,7 +50,7 @@ namespace osu.Game.Skinning
             }).Where(c => c != null).ToArray();
         }
 
-        private SampleChannel loadChannel(SampleInfo info, Func<string, SampleChannel> getSampleFunction)
+        private SampleChannel loadChannel(ISampleInfo info, Func<string, SampleChannel> getSampleFunction)
         {
             foreach (var lookup in info.LookupNames)
             {
