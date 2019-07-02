@@ -11,13 +11,12 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.UserInterface;
 using osu.Game.Online.Chat;
 using osu.Game.Overlays;
-using osu.Game.Overlays.Chat;
 using osu.Game.Overlays.Chat.Selection;
 using osu.Game.Overlays.Chat.Tabs;
 using osu.Game.Users;
 using osuTK.Input;
 
-namespace osu.Game.Tests.Visual.UserInterface
+namespace osu.Game.Tests.Visual.Online
 {
     public class TestSceneChatOverlay : ManualInputManagerTestScene
     {
@@ -155,9 +154,11 @@ namespace osu.Game.Tests.Visual.UserInterface
 
             public BindableList<Channel> AvailableChannels => (BindableList<Channel>)ChannelManager.AvailableChannels;
 
+            private readonly List<Channel> channels;
+
             public ChannelManagerContainer(List<Channel> channels)
             {
-                AddRange(channels);
+                this.channels = channels;
             }
 
             public void ClearAvailable() => AvailableChannels.Clear();
@@ -167,6 +168,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             [BackgroundDependencyLoader]
             private void load()
             {
+                AddRange(channels);
                 Child = ChatOverlay = new TestChatOverlay { RelativeSizeAxes = Axes.Both, };
                 ChannelManager.IsInitialized.Value = true;
                 ChatOverlay.Show();
