@@ -13,6 +13,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using osu.Framework.Audio;
+using osu.Framework.Statistics;
 using osu.Game.IO.Serialization;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Objects;
@@ -32,6 +33,8 @@ namespace osu.Game.Beatmaps
 
         protected AudioManager AudioManager { get; }
 
+        private static readonly GlobalStatistic<int> total_count = GlobalStatistics.Get<int>(nameof(Beatmaps), $"Total {nameof(WorkingBeatmap)}s");
+
         protected WorkingBeatmap(BeatmapInfo beatmapInfo, AudioManager audioManager)
         {
             AudioManager = audioManager;
@@ -44,11 +47,8 @@ namespace osu.Game.Beatmaps
             waveform = new RecyclableLazy<Waveform>(GetWaveform);
             storyboard = new RecyclableLazy<Storyboard>(GetStoryboard);
             skin = new RecyclableLazy<Skin>(GetSkin);
-        }
 
-        ~WorkingBeatmap()
-        {
-            Dispose(false);
+            total_count.Value++;
         }
 
         protected virtual Track GetVirtualTrack()
@@ -150,6 +150,7 @@ namespace osu.Game.Beatmaps
 
         public Task<IBeatmap> LoadBeatmapAsync() => (beatmapLoadTask ?? (beatmapLoadTask = Task.Factory.StartNew(() =>
         {
+            // Todo: Handle cancellation during beatmap parsing
             var b = GetBeatmap() ?? new Beatmap();
 
             // The original beatmap version needs to be preserved as the database doesn't contain it
@@ -161,7 +162,20 @@ namespace osu.Game.Beatmaps
             return b;
         }, beatmapCancellation.Token, TaskCreationOptions.LongRunning, TaskScheduler.Default)));
 
-        public IBeatmap Beatmap => LoadBeatmapAsync().Result;
+        public IBeatmap Beatmap
+        {
+            get
+            {
+                try
+                {
+                    return LoadBeatmapAsync().Result;
+                }
+                catch (TaskCanceledException)
+                {
+                    return null;
+                }
+            }
+        }
 
         private readonly CancellationTokenSource beatmapCancellation = new CancellationTokenSource();
         protected abstract IBeatmap GetBeatmap();
@@ -218,15 +232,28 @@ namespace osu.Game.Beatmaps
             GC.SuppressFinalize(this);
         }
 
+        private bool isDisposed;
+
         protected virtual void Dispose(bool isDisposing)
         {
+            if (isDisposed)
+                return;
+
+            isDisposed = true;
+
             // recycling logic is not here for the time being, as components which use
             // retrieved objects from WorkingBeatmap may not hold a reference to the WorkingBeatmap itself.
-            // this should be fine as each retrieved comopnent do have their own finalizers.
+            // this should be fine as each retrieved component do have their own finalizers.
 
             // cancelling the beatmap load is safe for now since the retrieval is a synchronous
             // operation. if we add an async retrieval method this may need to be reconsidered.
             beatmapCancellation.Cancel();
+            total_count.Value--;
+        }
+
+        ~WorkingBeatmap()
+        {
+            Dispose(false);
         }
 
         #endregion
