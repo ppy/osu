@@ -145,6 +145,7 @@ namespace osu.Game.Beatmaps
 
         public Task<IBeatmap> LoadBeatmapAsync() => (beatmapLoadTask ?? (beatmapLoadTask = Task.Factory.StartNew(() =>
         {
+            // Todo: Handle cancellation during beatmap parsing
             var b = GetBeatmap() ?? new Beatmap();
 
             // The original beatmap version needs to be preserved as the database doesn't contain it
