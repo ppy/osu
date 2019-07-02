@@ -3,8 +3,6 @@
 
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Shapes;
-using osu.Framework.Graphics.Sprites;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
@@ -18,11 +16,7 @@ namespace osu.Game.Overlays.Direct
         protected bool DownloadEnabled => button.Enabled.Value;
 
         private readonly bool noVideo;
-        private readonly SpriteIcon icon;
-        private readonly SpriteIcon checkmark;
-        private readonly Box background;
 
-        private OsuColour colours;
         private readonly ShakeContainer shakeContainer;
         private readonly OsuDownloadButton button;
 
@@ -50,10 +44,8 @@ namespace osu.Game.Overlays.Direct
         }
 
         [BackgroundDependencyLoader(true)]
-        private void load(OsuColour colours, OsuGame game, BeatmapManager beatmaps)
+        private void load(OsuGame game, BeatmapManager beatmaps)
         {
-            this.colours = colours;
-
             if (BeatmapSet.Value.OnlineInfo.Availability?.DownloadDisabled ?? false)
             {
                 button.Enabled.Value = false;
