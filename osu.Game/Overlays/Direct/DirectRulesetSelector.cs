@@ -80,15 +80,7 @@ namespace osu.Game.Overlays.Direct
 
             protected override void OnDeactivated() => updateState();
 
-            private void updateState()
-            {
-                if (IsHovered || Active.Value)
-                {
-                    icon.FadeColour(Color4.White, 120, Easing.InQuad);
-                }
-                else
-                    icon.FadeColour(Color4.Gray, 120, Easing.InQuad);
-            }
+            private void updateState() => icon.FadeColour(IsHovered || Active.Value ? Color4.White : Color4.Gray, 120, Easing.InQuad);
         }
     }
 }
