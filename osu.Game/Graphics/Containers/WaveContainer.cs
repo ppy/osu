@@ -95,6 +95,7 @@ namespace osu.Game.Graphics.Containers
             AddInternal(contentContainer = new Container
             {
                 RelativeSizeAxes = Axes.Both,
+                RelativePositionAxes = Axes.Both,
                 Anchor = Anchor.BottomCentre,
                 Origin = Anchor.BottomCentre,
             });
@@ -105,21 +106,15 @@ namespace osu.Game.Graphics.Containers
             foreach (var w in wavesContainer.Children)
                 w.Show();
 
-            this.FadeIn(100, Easing.OutQuint);
             contentContainer.MoveToY(0, APPEAR_DURATION, Easing.OutQuint);
-
-            this.FadeIn(100, Easing.OutQuint);
         }
 
         protected override void PopOut()
         {
-            this.FadeOut(DISAPPEAR_DURATION, Easing.InQuint);
-            contentContainer.MoveToY(DrawHeight * 2f, DISAPPEAR_DURATION, Easing.In);
-
             foreach (var w in wavesContainer.Children)
                 w.Hide();
 
-            this.FadeOut(DISAPPEAR_DURATION, Easing.InQuint);
+            contentContainer.MoveToY(2, DISAPPEAR_DURATION, Easing.In);
         }
 
         protected override void UpdateAfterChildren()
