@@ -51,6 +51,11 @@ namespace osu.Game.Beatmaps
             total_count.Value++;
         }
 
+        ~WorkingBeatmap()
+        {
+            Dispose(false);
+        }
+
         protected virtual Track GetVirtualTrack()
         {
             const double excess_length = 1000;
@@ -248,7 +253,6 @@ namespace osu.Game.Beatmaps
             // cancelling the beatmap load is safe for now since the retrieval is a synchronous
             // operation. if we add an async retrieval method this may need to be reconsidered.
             beatmapCancellation.Cancel();
-
             total_count.Value--;
         }
 
