@@ -33,7 +33,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
 
         protected SkinnableSound Samples;
 
-        protected virtual IEnumerable<SampleInfo> GetSamples() => HitObject.Samples;
+        protected virtual IEnumerable<HitSampleInfo> GetSamples() => HitObject.Samples;
 
         private readonly Lazy<List<DrawableHitObject>> nestedHitObjects = new Lazy<List<DrawableHitObject>>();
         public IEnumerable<DrawableHitObject> NestedHitObjects => nestedHitObjects.IsValueCreated ? nestedHitObjects.Value : Enumerable.Empty<DrawableHitObject>();
@@ -77,10 +77,6 @@ namespace osu.Game.Rulesets.Objects.Drawables
 
         private bool judgementOccurred;
 
-        public bool Interactive = true;
-        public override bool HandleNonPositionalInput => Interactive;
-        public override bool HandlePositionalInput => Interactive;
-
         public override bool RemoveWhenNotAlive => false;
         public override bool RemoveCompletedTransforms => false;
         protected override bool RequiresChildrenUpdate => true;
@@ -108,7 +104,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
 
             var samples = GetSamples().ToArray();
 
-            if (samples.Any())
+            if (samples.Length > 0)
             {
                 if (HitObject.SampleControlPoint == null)
                     throw new ArgumentNullException(nameof(HitObject.SampleControlPoint), $"{nameof(HitObject)}s must always have an attached {nameof(HitObject.SampleControlPoint)}."
