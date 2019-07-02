@@ -12,6 +12,7 @@
     <RootNamespace>osu.Game.Rulesets.Osu.Tests</RootNamespace>
     <AssemblyName>osu.Game.Rulesets.Osu.Tests.Android</AssemblyName>
     <AndroidManifest>Properties\AndroidManifest.xml</AndroidManifest>
+    <AndroidSupportedAbis>armeabi-v7a;x86;arm64-v8a</AndroidSupportedAbis>
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="MainActivity.cs" />
