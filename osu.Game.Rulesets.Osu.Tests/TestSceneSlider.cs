@@ -248,9 +248,9 @@ namespace osu.Game.Rulesets.Osu.Tests
 
         private void createCatmull(int repeats = 0)
         {
-            var repeatSamples = new List<List<SampleInfo>>();
+            var repeatSamples = new List<List<HitSampleInfo>>();
             for (int i = 0; i < repeats; i++)
-                repeatSamples.Add(new List<SampleInfo>());
+                repeatSamples.Add(new List<HitSampleInfo>());
 
             var slider = new Slider
             {
@@ -270,11 +270,11 @@ namespace osu.Game.Rulesets.Osu.Tests
             addSlider(slider, 3, 1);
         }
 
-        private List<List<SampleInfo>> createEmptySamples(int repeats)
+        private List<List<HitSampleInfo>> createEmptySamples(int repeats)
         {
-            var repeatSamples = new List<List<SampleInfo>>();
+            var repeatSamples = new List<List<HitSampleInfo>>();
             for (int i = 0; i < repeats; i++)
-                repeatSamples.Add(new List<SampleInfo>());
+                repeatSamples.Add(new List<HitSampleInfo>());
             return repeatSamples;
         }
 

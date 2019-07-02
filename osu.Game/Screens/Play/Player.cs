@@ -33,7 +33,7 @@ namespace osu.Game.Screens.Play
 {
     public class Player : ScreenWithBeatmapBackground
     {
-        protected override bool AllowBackButton => false; // handled by HoldForMenuButton
+        public override bool AllowBackButton => false; // handled by HoldForMenuButton
 
         protected override UserActivity InitialActivity => new UserActivity.SoloGame(Beatmap.Value.BeatmapInfo, Ruleset.Value);
 
@@ -127,7 +127,11 @@ namespace osu.Game.Screens.Play
                     Child = new LocalSkinOverrideContainer(working.Skin)
                     {
                         RelativeSizeAxes = Axes.Both,
-                        Child = DrawableRuleset
+                        Children = new Drawable[]
+                        {
+                            DrawableRuleset,
+                            new ComboEffects(ScoreProcessor)
+                        }
                     }
                 },
                 new BreakOverlay(working.Beatmap.BeatmapInfo.LetterboxInBreaks, ScoreProcessor)
@@ -184,7 +188,7 @@ namespace osu.Game.Screens.Play
                         if (!this.IsCurrentScreen()) return;
 
                         fadeOut(true);
-                        performUserRequestedExit();
+                        performImmediateExit();
                     },
                 },
                 failAnimation = new FailAnimation(DrawableRuleset) { OnComplete = onFailComplete, }
@@ -251,14 +255,19 @@ namespace osu.Game.Screens.Play
             return working;
         }
 
-        private void performUserRequestedExit()
+        private void performImmediateExit()
         {
-            if (!this.IsCurrentScreen()) return;
-
             // if a restart has been requested, cancel any pending completion (user has shown intent to restart).
             onCompletionEvent = null;
 
             ValidForResume = false;
+
+            performUserRequestedExit();
+        }
+
+        private void performUserRequestedExit()
+        {
+            if (!this.IsCurrentScreen()) return;
 
             this.Exit();
         }
