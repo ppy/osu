@@ -81,7 +81,10 @@ namespace osu.Game.Skinning
                         };
             }
 
-            var texture = GetTexture(componentName);
+            // temporary allowance is given for skins the fact that stable handles non-animatable items such as hitcircles (incorrectly)
+            // by (incorrectly) displaying the first frame of animation rather than the non-animated version.
+            // users have used this to "hide" certain elements like hit300.
+            var texture = GetTexture($"{componentName}-0") ?? GetTexture(componentName);
 
             if (texture == null)
                 return null;
