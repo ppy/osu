@@ -125,7 +125,7 @@ namespace osu.Game.Graphics.Containers
 
             // This is done as an optimization, such that invisible parts of the waves
             // are masked away, and thus do not consume fill rate.
-            wavesContainer.Height = Math.Max(0, DrawHeight - (contentContainer.DrawHeight - contentContainer.Y));
+            wavesContainer.Height = Math.Max(0, DrawHeight - (contentContainer.DrawHeight - contentContainer.Y * DrawHeight));
         }
 
         private class Wave : VisibilityContainer
