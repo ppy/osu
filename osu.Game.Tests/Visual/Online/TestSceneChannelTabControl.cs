@@ -25,7 +25,7 @@ namespace osu.Game.Tests.Visual.Online
             typeof(ChannelTabControl),
         };
 
-        private readonly TestChannelTabControl channelTabControl;
+        private readonly ChannelTabControl channelTabControl;
 
         public TestSceneChannelTabControl()
         {
@@ -37,7 +37,7 @@ namespace osu.Game.Tests.Visual.Online
                 Anchor = Anchor.Centre,
                 Children = new Drawable[]
                 {
-                    channelTabControl = new TestChannelTabControl
+                    channelTabControl = new ChannelTabControl
                     {
                         RelativeSizeAxes = Axes.X,
                         Origin = Anchor.Centre,
@@ -90,18 +90,6 @@ namespace osu.Game.Tests.Visual.Online
 
             AddStep("set second channel", () => channelTabControl.Current.Value = channelTabControl.Items.Skip(1).First());
             AddAssert("selector tab is inactive", () => !channelTabControl.ChannelSelectorActive.Value);
-
-            AddUntilStep("remove all channels", () =>
-            {
-                var first = channelTabControl.Items.First();
-                if (first is ChannelSelectorTabItem.ChannelSelectorTabChannel)
-                    return true;
-
-                channelTabControl.Close(first);
-                return false;
-            });
-
-            AddAssert("selector tab is active", () => channelTabControl.ChannelSelectorActive.Value);
         }
 
         private void addRandomPrivateChannel() =>
@@ -117,13 +105,5 @@ namespace osu.Game.Tests.Visual.Online
                 Type = ChannelType.Public,
                 Name = name
             });
-
-        private class TestChannelTabControl : ChannelTabControl
-        {
-            public void Close(Channel channel)
-            {
-                TabCloseRequested(TabMap[channel]);
-            }
-        }
     }
 }
