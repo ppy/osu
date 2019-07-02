@@ -29,6 +29,8 @@ namespace osu.Game.Graphics.Containers
 
         protected override Container<Drawable> Content => contentContainer;
 
+        protected override bool StartHidden => true;
+
         public Color4 FirstWaveColour
         {
             get => firstWave.Colour;

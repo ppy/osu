@@ -14,6 +14,8 @@ namespace osu.Game.Overlays
         protected override bool BlockNonPositionalInput => true;
         protected override Container<Drawable> Content => Waves;
 
+        protected override bool StartHidden => true;
+
         protected WaveOverlayContainer()
         {
             AddInternal(Waves = new WaveContainer
