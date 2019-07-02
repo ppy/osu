@@ -122,7 +122,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
         }
 
         // Normal and clap samples are handled by the drum
-        protected override IEnumerable<SampleInfo> GetSamples() => HitObject.Samples.Where(s => s.Name != SampleInfo.HIT_NORMAL && s.Name != SampleInfo.HIT_CLAP);
+        protected override IEnumerable<HitSampleInfo> GetSamples() => HitObject.Samples.Where(s => s.Name != HitSampleInfo.HIT_NORMAL && s.Name != HitSampleInfo.HIT_CLAP);
 
         protected override string SampleNamespace => "Taiko";
 

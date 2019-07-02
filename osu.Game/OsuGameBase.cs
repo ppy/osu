@@ -154,6 +154,7 @@ namespace osu.Game
 
             Fonts.AddStore(new GlyphStore(Resources, @"Fonts/Venera"));
             Fonts.AddStore(new GlyphStore(Resources, @"Fonts/Venera-Light"));
+            Fonts.AddStore(new GlyphStore(Resources, @"Fonts/Venera-Medium"));
 
             runMigrations();
 
@@ -183,7 +184,7 @@ namespace osu.Game
             }
 
             BeatmapManager.ItemRemoved += i => ScoreManager.Delete(getBeatmapScores(i), true);
-            BeatmapManager.ItemAdded += (i, existing) => ScoreManager.Undelete(getBeatmapScores(i), true);
+            BeatmapManager.ItemAdded += i => ScoreManager.Undelete(getBeatmapScores(i), true);
 
             dependencies.Cache(KeyBindingStore = new KeyBindingStore(contextFactory, RulesetStore));
             dependencies.Cache(SettingsStore = new SettingsStore(contextFactory));
