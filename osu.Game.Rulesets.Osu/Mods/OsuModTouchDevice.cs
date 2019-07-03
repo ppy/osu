@@ -12,5 +12,6 @@ namespace osu.Game.Rulesets.Osu.Mods
         public override double ScoreMultiplier => 1;
 
         public override bool Ranked => true;
+        public override bool System => true;
     }
 }

@@ -67,6 +67,12 @@ namespace osu.Game.Rulesets.Mods
         public virtual Type[] IncompatibleMods => new Type[] { };
 
         /// <summary>
+        /// Returns whether this mod is a ruleset system mod and cannot be user-selected
+        /// </summary>         
+        [JsonIgnore]
+        public virtual bool System => false;
+
+        /// <summary>
         /// Creates a copy of this <see cref="Mod"/> initialised to a default state.
         /// </summary>
         public virtual Mod CreateCopy() => (Mod)Activator.CreateInstance(GetType());
