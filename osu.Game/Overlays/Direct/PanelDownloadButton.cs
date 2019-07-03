@@ -1,4 +1,4 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
@@ -10,16 +10,16 @@ using osu.Game.Online;
 
 namespace osu.Game.Overlays.Direct
 {
-    public class DownloadButton : BeatmapDownloadTrackingComposite
+    public class PanelDownloadButton : BeatmapDownloadTrackingComposite
     {
         protected bool DownloadEnabled => button.Enabled.Value;
 
         private readonly bool noVideo;
 
         private readonly ShakeContainer shakeContainer;
-        private readonly OsuDownloadButton button;
+        private readonly DownloadButton button;
 
-        public DownloadButton(BeatmapSetInfo beatmapSet, bool noVideo = false)
+        public PanelDownloadButton(BeatmapSetInfo beatmapSet, bool noVideo = false)
             : base(beatmapSet)
         {
             this.noVideo = noVideo;
@@ -27,7 +27,7 @@ namespace osu.Game.Overlays.Direct
             InternalChild = shakeContainer = new ShakeContainer
             {
                 RelativeSizeAxes = Axes.Both,
-                Child = button = new OsuDownloadButton
+                Child = button = new DownloadButton
                 {
                     RelativeSizeAxes = Axes.Both,
                 },

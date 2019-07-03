@@ -11,7 +11,7 @@ using osuTK;
 
 namespace osu.Game.Graphics.UserInterface
 {
-    public class OsuDownloadButton : OsuAnimatedButton
+    public class DownloadButton : OsuAnimatedButton
     {
         public readonly Bindable<DownloadState> State = new Bindable<DownloadState>();
 
@@ -21,7 +21,7 @@ namespace osu.Game.Graphics.UserInterface
 
         private OsuColour colours;
 
-        public OsuDownloadButton()
+        public DownloadButton()
         {
             Children = new Drawable[]
             {

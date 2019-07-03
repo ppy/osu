@@ -13,7 +13,7 @@ namespace osu.Game.Screens.Play
 {
     public class ReplayDownloadButton : DownloadTrackingComposite<ScoreInfo, ScoreManager>
     {
-        private OsuDownloadButton button;
+        private DownloadButton button;
         private ShakeContainer shakeContainer;
 
         private ReplayAvailability replayAvailability
@@ -41,7 +41,7 @@ namespace osu.Game.Screens.Play
             InternalChild = shakeContainer = new ShakeContainer
             {
                 RelativeSizeAxes = Axes.Both,
-                Child = button = new OsuDownloadButton
+                Child = button = new DownloadButton
                 {
                     RelativeSizeAxes = Axes.Both,
                 }
