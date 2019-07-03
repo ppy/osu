@@ -71,12 +71,5 @@ namespace osu.Game.Overlays.Direct
                 }
             };
         }
-
-        protected override void Dispose(bool isDisposing)
-        {
-            base.Dispose(isDisposing);
-
-            button?.State.UnbindAll();
-        }
     }
 }
