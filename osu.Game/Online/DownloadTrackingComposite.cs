@@ -54,6 +54,12 @@ namespace osu.Game.Online
                     attachDownload(download);
             };
 
+            manager.DownloadFailed += download =>
+            {
+                if (download.Model.Equals(Model.Value))
+                    attachDownload(null);
+            };
+
             manager.ItemAdded += itemAdded;
             manager.ItemRemoved += itemRemoved;
         }
