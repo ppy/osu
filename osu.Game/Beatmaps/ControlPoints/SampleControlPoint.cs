@@ -1,11 +1,12 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using osu.Game.Audio;
 
 namespace osu.Game.Beatmaps.ControlPoints
 {
-    public class SampleControlPoint : ControlPoint
+    public class SampleControlPoint : ControlPoint, IEquatable<SampleControlPoint>
     {
         public const string DEFAULT_BANK = "normal";
 
@@ -23,8 +24,8 @@ namespace osu.Game.Beatmaps.ControlPoints
         /// Create a SampleInfo based on the sample settings in this control point.
         /// </summary>
         /// <param name="sampleName">The name of the same.</param>
-        /// <returns>A populated <see cref="SampleInfo"/>.</returns>
-        public SampleInfo GetSampleInfo(string sampleName = SampleInfo.HIT_NORMAL) => new SampleInfo
+        /// <returns>A populated <see cref="HitSampleInfo"/>.</returns>
+        public HitSampleInfo GetSampleInfo(string sampleName = HitSampleInfo.HIT_NORMAL) => new HitSampleInfo
         {
             Bank = SampleBank,
             Name = sampleName,
@@ -32,22 +33,20 @@ namespace osu.Game.Beatmaps.ControlPoints
         };
 
         /// <summary>
-        /// Applies <see cref="SampleBank"/> and <see cref="SampleVolume"/> to a <see cref="SampleInfo"/> if necessary, returning the modified <see cref="SampleInfo"/>.
+        /// Applies <see cref="SampleBank"/> and <see cref="SampleVolume"/> to a <see cref="HitSampleInfo"/> if necessary, returning the modified <see cref="HitSampleInfo"/>.
         /// </summary>
-        /// <param name="sampleInfo">The <see cref="SampleInfo"/>. This will not be modified.</param>
-        /// <returns>The modified <see cref="SampleInfo"/>. This does not share a reference with <paramref name="sampleInfo"/>.</returns>
-        public virtual SampleInfo ApplyTo(SampleInfo sampleInfo)
+        /// <param name="hitSampleInfo">The <see cref="HitSampleInfo"/>. This will not be modified.</param>
+        /// <returns>The modified <see cref="HitSampleInfo"/>. This does not share a reference with <paramref name="hitSampleInfo"/>.</returns>
+        public virtual HitSampleInfo ApplyTo(HitSampleInfo hitSampleInfo)
         {
-            var newSampleInfo = sampleInfo.Clone();
-            newSampleInfo.Bank = sampleInfo.Bank ?? SampleBank;
-            newSampleInfo.Volume = sampleInfo.Volume > 0 ? sampleInfo.Volume : SampleVolume;
+            var newSampleInfo = hitSampleInfo.Clone();
+            newSampleInfo.Bank = hitSampleInfo.Bank ?? SampleBank;
+            newSampleInfo.Volume = hitSampleInfo.Volume > 0 ? hitSampleInfo.Volume : SampleVolume;
             return newSampleInfo;
         }
 
-        public override bool EquivalentTo(ControlPoint other)
-            => base.EquivalentTo(other)
-               && other is SampleControlPoint sample
-               && SampleBank.Equals(sample.SampleBank)
-               && SampleVolume.Equals(sample.SampleVolume);
+        public bool Equals(SampleControlPoint other)
+            => base.Equals(other)
+               && string.Equals(SampleBank, other?.SampleBank) && SampleVolume == other?.SampleVolume;
     }
 }

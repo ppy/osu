@@ -1,4 +1,4 @@
-﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 using System.ComponentModel.DataAnnotations.Schema;
@@ -15,12 +15,10 @@ namespace osu.Game.Configuration
 
         public int? Variant { get; set; }
 
+        public int? SkinInfoID { get; set; }
+
         [Column("Key")]
-        public int IntKey
-        {
-            get => (int)Key;
-            private set => Key = value;
-        }
+        public string Key { get; set; }
 
         [Column("Value")]
         public string StringValue
@@ -29,10 +27,9 @@ namespace osu.Game.Configuration
             set => Value = value;
         }
 
-        public object Key;
         public object Value;
 
-        public DatabasedSetting(object key, object value)
+        public DatabasedSetting(string key, object value)
         {
             Key = key;
             Value = value;

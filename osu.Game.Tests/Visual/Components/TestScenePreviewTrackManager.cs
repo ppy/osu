@@ -111,16 +111,19 @@ namespace osu.Game.Tests.Visual.Components
 
         private class TestPreviewTrackManager : PreviewTrackManager
         {
-            protected override TrackManagerPreviewTrack CreatePreviewTrack(BeatmapSetInfo beatmapSetInfo, TrackManager trackManager) => new TestPreviewTrack(beatmapSetInfo, trackManager);
+            protected override TrackManagerPreviewTrack CreatePreviewTrack(BeatmapSetInfo beatmapSetInfo, ITrackStore trackStore) => new TestPreviewTrack(beatmapSetInfo, trackStore);
 
             protected class TestPreviewTrack : TrackManagerPreviewTrack
             {
-                public TestPreviewTrack(BeatmapSetInfo beatmapSetInfo, TrackManager trackManager)
+                private readonly ITrackStore trackManager;
+
+                public TestPreviewTrack(BeatmapSetInfo beatmapSetInfo, ITrackStore trackManager)
                     : base(beatmapSetInfo, trackManager)
                 {
+                    this.trackManager = trackManager;
                 }
 
-                protected override Track GetTrack() => new TrackVirtual { Length = 100000 };
+                protected override Track GetTrack() => trackManager.GetVirtual(100000);
             }
         }
     }

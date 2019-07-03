@@ -65,7 +65,7 @@ namespace osu.Game.Overlays.Profile.Header
                 new Box
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Colour = colours.CommunityUserGrayGreenDarkest,
+                    Colour = colours.GreySeafoamDarker,
                 },
                 fillFlow = new FillFlowContainer
                 {
@@ -116,6 +116,7 @@ namespace osu.Game.Overlays.Profile.Header
                                     Anchor = Anchor.CentreRight,
                                     Origin = Anchor.CentreRight,
                                     Direction = FillDirection.Horizontal,
+                                    Spacing = new Vector2(5),
                                     Children = new[]
                                     {
                                         scoreRankInfos[ScoreRank.XH] = new ScoreRankInfo(ScoreRank.XH),

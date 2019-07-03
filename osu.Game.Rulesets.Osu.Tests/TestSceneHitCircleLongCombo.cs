@@ -17,14 +17,14 @@ namespace osu.Game.Rulesets.Osu.Tests
         {
         }
 
-        protected override IBeatmap CreateBeatmap(Ruleset ruleset)
+        protected override IBeatmap CreateBeatmap(RulesetInfo ruleset)
         {
             var beatmap = new Beatmap
             {
                 BeatmapInfo = new BeatmapInfo
                 {
                     BaseDifficulty = new BeatmapDifficulty { CircleSize = 6 },
-                    Ruleset = ruleset.RulesetInfo
+                    Ruleset = ruleset
                 }
             };
 
