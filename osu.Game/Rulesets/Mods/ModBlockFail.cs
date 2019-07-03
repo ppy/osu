@@ -22,13 +22,12 @@ namespace osu.Game.Rulesets.Mods
         public void ReadFromConfig(OsuConfigManager config)
         {
             hideHealthBar = config.GetBindable<bool>(OsuSetting.HideHealthBar);
-            hideHealthBar.ValueChanged += v => healthDisplay?.FadeTo(v.NewValue ? 0 : 1, 250, Easing.OutQuint);
         }
 
         public void ApplyToHUD(HUDOverlay overlay)
         {
             healthDisplay = overlay.HealthDisplay;
-            hideHealthBar?.TriggerChange();
+            hideHealthBar.BindValueChanged(v => healthDisplay.FadeTo(v.NewValue ? 0 : 1, 250, Easing.OutQuint), true);
         }
     }
 }
