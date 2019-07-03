@@ -11,6 +11,7 @@ using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Game.Online.Leaderboards;
 using osu.Game.Rulesets;
+using osu.Game.Rulesets.Mods;
 using osu.Game.Scoring;
 
 namespace osu.Game.Screens.Select.Leaderboards
@@ -36,11 +37,30 @@ namespace osu.Game.Screens.Select.Leaderboards
             }
         }
 
+        private bool filterMods;
+
+        public bool FilterMods
+        {
+            get => filterMods;
+            set
+            {
+                if (value == filterMods)
+                    return;
+
+                filterMods = value;
+
+                UpdateScores();
+            }
+        }
+
         [Resolved]
         private ScoreManager scoreManager { get; set; }
 
         [Resolved]
         private IBindable<RulesetInfo> ruleset { get; set; }
+
+        [Resolved]
+        private IBindable<IReadOnlyList<Mod>> mods { get; set; }
 
         [Resolved]
         private IAPIProvider api { get; set; }
@@ -49,6 +69,11 @@ namespace osu.Game.Screens.Select.Leaderboards
         private void load()
         {
             ruleset.ValueChanged += _ => UpdateScores();
+            mods.ValueChanged += _ =>
+            {
+                if (filterMods)
+                    UpdateScores();
+            };
         }
 
         protected override APIRequest FetchScores(Action<IEnumerable<ScoreInfo>> scoresCallback)
@@ -72,7 +97,15 @@ namespace osu.Game.Screens.Select.Leaderboards
                 return null;
             }
 
-            var req = new GetScoresRequest(Beatmap, ruleset.Value ?? Beatmap.Ruleset, Scope);
+            IReadOnlyList<Mod> requestMods = null;
+
+            if (filterMods && mods.Value.Count == 0)
+                // add nomod for the request
+                requestMods = new Mod[] { new ModNoMod() };
+            else if (filterMods)
+                requestMods = mods.Value;
+
+            var req = new GetScoresRequest(Beatmap, ruleset.Value ?? Beatmap.Ruleset, Scope, requestMods);
 
             req.Success += r => scoresCallback?.Invoke(r.Scores);
 

@@ -41,6 +41,8 @@ namespace osu.Game.Screens.Select
                     RelativeSizeAxes = Axes.X,
                     OnFilter = (tab, mods) =>
                     {
+                        Leaderboard.FilterMods = mods;
+
                         switch (tab)
                         {
                             case BeatmapDetailTab.Details:
