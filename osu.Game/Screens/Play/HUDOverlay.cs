@@ -3,7 +3,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -41,7 +40,6 @@ namespace osu.Game.Screens.Play
         private readonly IReadOnlyList<Mod> mods;
 
         private Bindable<bool> showHud;
-        private Bindable<bool> hideHealthbar;
         private readonly Container visibilityContainer;
         private readonly BindableBool replayLoaded = new BindableBool();
 
@@ -79,11 +77,11 @@ namespace osu.Game.Screens.Play
                                 ComboCounter = CreateComboCounter(),
                             },
                         },
+                        HealthDisplay = CreateHealthDisplay(),
                         Progress = CreateProgress(),
                         ModDisplay = CreateModsContainer(),
                     }
                 },
-                HealthDisplay = CreateHealthDisplay(),
                 PlayerSettingsOverlay = CreatePlayerSettingsOverlay(),
                 new FillFlowContainer
                 {
@@ -114,14 +112,8 @@ namespace osu.Game.Screens.Play
 
             ModDisplay.Current.Value = mods;
 
-            hideHealthbar = config.GetBindable<bool>(OsuSetting.HideHealthBar);
             showHud = config.GetBindable<bool>(OsuSetting.ShowInterface);
-            showHud.ValueChanged += visible =>
-            {
-                visibilityContainer.FadeTo(visible.NewValue ? 1 : 0, duration);
-                if (!(hideHealthbar.Value && mods.OfType<ModBlockFail>().Any()))
-                    HealthDisplay.FadeTo(visible.NewValue ? 1 : 0, duration);
-            };
+            showHud.ValueChanged += visible => visibilityContainer.FadeTo(visible.NewValue ? 1 : 0, duration);
             showHud.TriggerChange();
 
             if (!showHud.Value && !hasShownNotificationOnce)
