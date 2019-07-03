@@ -39,6 +39,9 @@ namespace osu.Game.Screens.Select.Leaderboards
 
         private bool filterMods;
 
+        /// <summary>
+        /// Whether to apply the game's currently selected mods as a filter when retrieving scores.
+        /// </summary>
         public bool FilterMods
         {
             get => filterMods;
@@ -80,10 +83,25 @@ namespace osu.Game.Screens.Select.Leaderboards
         {
             if (Scope == BeatmapLeaderboardScope.Local)
             {
-                Scores = scoreManager
-                         .QueryScores(s => !s.DeletePending && s.Beatmap.ID == Beatmap.ID && s.Ruleset.ID == ruleset.Value.ID)
-                         .OrderByDescending(s => s.TotalScore).ToArray();
+                var scores = scoreManager
+                    .QueryScores(s => !s.DeletePending && s.Beatmap.ID == Beatmap.ID && s.Ruleset.ID == ruleset.Value.ID);
+
+                if (filterMods && !mods.Value.Any())
+                {
+                    // we need to filter out all scores that have any mods to get all local nomod scores
+                    scores = scores.Where(s => !s.Mods.Any());
+                }
+                else if (filterMods)
+                {
+                    // otherwise find all the scores that have *any* of the currently selected mods (similar to how web applies mod filters)
+                    // we're creating and using a string list representation of selected mods so that it can be translated into the DB query itself
+                    var selectedMods = mods.Value.Select(m => m.Acronym);
+                    scores = scores.Where(s => s.Mods.Any(m => selectedMods.Contains(m.Acronym)));
+                }
+
+                Scores = scores.OrderByDescending(s => s.TotalScore).ToArray();
                 PlaceholderState = Scores.Any() ? PlaceholderState.Successful : PlaceholderState.NoScores;
+
                 return null;
             }
 
@@ -101,7 +119,7 @@ namespace osu.Game.Screens.Select.Leaderboards
 
             IReadOnlyList<Mod> requestMods = null;
 
-            if (filterMods && mods.Value.Count == 0)
+            if (filterMods && !mods.Value.Any())
                 // add nomod for the request
                 requestMods = new Mod[] { new ModNoMod() };
             else if (filterMods)
