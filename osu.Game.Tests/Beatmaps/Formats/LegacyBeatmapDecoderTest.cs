@@ -354,14 +354,14 @@ namespace osu.Game.Tests.Beatmaps.Formats
                 Assert.IsNotNull(curveData);
                 Assert.AreEqual(new Vector2(192, 168), positionData.Position);
                 Assert.AreEqual(956, hitObjects[0].StartTime);
-                Assert.IsTrue(hitObjects[0].Samples.Any(s => s.Name == SampleInfo.HIT_NORMAL));
+                Assert.IsTrue(hitObjects[0].Samples.Any(s => s.Name == HitSampleInfo.HIT_NORMAL));
 
                 positionData = hitObjects[1] as IHasPosition;
 
                 Assert.IsNotNull(positionData);
                 Assert.AreEqual(new Vector2(304, 56), positionData.Position);
                 Assert.AreEqual(1285, hitObjects[1].StartTime);
-                Assert.IsTrue(hitObjects[1].Samples.Any(s => s.Name == SampleInfo.HIT_CLAP));
+                Assert.IsTrue(hitObjects[1].Samples.Any(s => s.Name == HitSampleInfo.HIT_CLAP));
             }
         }
 
@@ -384,7 +384,7 @@ namespace osu.Game.Tests.Beatmaps.Formats
                 Assert.AreEqual("soft-hitnormal8", getTestableSampleInfo(hitObjects[4]).LookupNames.First());
             }
 
-            SampleInfo getTestableSampleInfo(HitObject hitObject) => hitObject.SampleControlPoint.ApplyTo(hitObject.Samples[0]);
+            HitSampleInfo getTestableSampleInfo(HitObject hitObject) => hitObject.SampleControlPoint.ApplyTo(hitObject.Samples[0]);
         }
 
         [Test]
@@ -402,7 +402,7 @@ namespace osu.Game.Tests.Beatmaps.Formats
                 Assert.AreEqual("normal-hitnormal3", getTestableSampleInfo(hitObjects[2]).LookupNames.First());
             }
 
-            SampleInfo getTestableSampleInfo(HitObject hitObject) => hitObject.SampleControlPoint.ApplyTo(hitObject.Samples[0]);
+            HitSampleInfo getTestableSampleInfo(HitObject hitObject) => hitObject.SampleControlPoint.ApplyTo(hitObject.Samples[0]);
         }
 
         [Test]
@@ -422,7 +422,7 @@ namespace osu.Game.Tests.Beatmaps.Formats
                 Assert.AreEqual(70, getTestableSampleInfo(hitObjects[3]).Volume);
             }
 
-            SampleInfo getTestableSampleInfo(HitObject hitObject) => hitObject.SampleControlPoint.ApplyTo(hitObject.Samples[0]);
+            HitSampleInfo getTestableSampleInfo(HitObject hitObject) => hitObject.SampleControlPoint.ApplyTo(hitObject.Samples[0]);
         }
 
         [Test]
@@ -438,34 +438,34 @@ namespace osu.Game.Tests.Beatmaps.Formats
                 var slider1 = (ConvertSlider)hitObjects[0];
 
                 Assert.AreEqual(1, slider1.NodeSamples[0].Count);
-                Assert.AreEqual(SampleInfo.HIT_NORMAL, slider1.NodeSamples[0][0].Name);
+                Assert.AreEqual(HitSampleInfo.HIT_NORMAL, slider1.NodeSamples[0][0].Name);
                 Assert.AreEqual(1, slider1.NodeSamples[1].Count);
-                Assert.AreEqual(SampleInfo.HIT_NORMAL, slider1.NodeSamples[1][0].Name);
+                Assert.AreEqual(HitSampleInfo.HIT_NORMAL, slider1.NodeSamples[1][0].Name);
                 Assert.AreEqual(1, slider1.NodeSamples[2].Count);
-                Assert.AreEqual(SampleInfo.HIT_NORMAL, slider1.NodeSamples[2][0].Name);
+                Assert.AreEqual(HitSampleInfo.HIT_NORMAL, slider1.NodeSamples[2][0].Name);
 
                 var slider2 = (ConvertSlider)hitObjects[1];
 
                 Assert.AreEqual(2, slider2.NodeSamples[0].Count);
-                Assert.AreEqual(SampleInfo.HIT_NORMAL, slider2.NodeSamples[0][0].Name);
-                Assert.AreEqual(SampleInfo.HIT_CLAP, slider2.NodeSamples[0][1].Name);
+                Assert.AreEqual(HitSampleInfo.HIT_NORMAL, slider2.NodeSamples[0][0].Name);
+                Assert.AreEqual(HitSampleInfo.HIT_CLAP, slider2.NodeSamples[0][1].Name);
                 Assert.AreEqual(2, slider2.NodeSamples[1].Count);
-                Assert.AreEqual(SampleInfo.HIT_NORMAL, slider2.NodeSamples[1][0].Name);
-                Assert.AreEqual(SampleInfo.HIT_CLAP, slider2.NodeSamples[1][1].Name);
+                Assert.AreEqual(HitSampleInfo.HIT_NORMAL, slider2.NodeSamples[1][0].Name);
+                Assert.AreEqual(HitSampleInfo.HIT_CLAP, slider2.NodeSamples[1][1].Name);
                 Assert.AreEqual(2, slider2.NodeSamples[2].Count);
-                Assert.AreEqual(SampleInfo.HIT_NORMAL, slider2.NodeSamples[2][0].Name);
-                Assert.AreEqual(SampleInfo.HIT_CLAP, slider2.NodeSamples[2][1].Name);
+                Assert.AreEqual(HitSampleInfo.HIT_NORMAL, slider2.NodeSamples[2][0].Name);
+                Assert.AreEqual(HitSampleInfo.HIT_CLAP, slider2.NodeSamples[2][1].Name);
 
                 var slider3 = (ConvertSlider)hitObjects[2];
 
                 Assert.AreEqual(2, slider3.NodeSamples[0].Count);
-                Assert.AreEqual(SampleInfo.HIT_NORMAL, slider3.NodeSamples[0][0].Name);
-                Assert.AreEqual(SampleInfo.HIT_WHISTLE, slider3.NodeSamples[0][1].Name);
+                Assert.AreEqual(HitSampleInfo.HIT_NORMAL, slider3.NodeSamples[0][0].Name);
+                Assert.AreEqual(HitSampleInfo.HIT_WHISTLE, slider3.NodeSamples[0][1].Name);
                 Assert.AreEqual(1, slider3.NodeSamples[1].Count);
-                Assert.AreEqual(SampleInfo.HIT_NORMAL, slider3.NodeSamples[1][0].Name);
+                Assert.AreEqual(HitSampleInfo.HIT_NORMAL, slider3.NodeSamples[1][0].Name);
                 Assert.AreEqual(2, slider3.NodeSamples[2].Count);
-                Assert.AreEqual(SampleInfo.HIT_NORMAL, slider3.NodeSamples[2][0].Name);
-                Assert.AreEqual(SampleInfo.HIT_CLAP, slider3.NodeSamples[2][1].Name);
+                Assert.AreEqual(HitSampleInfo.HIT_NORMAL, slider3.NodeSamples[2][0].Name);
+                Assert.AreEqual(HitSampleInfo.HIT_CLAP, slider3.NodeSamples[2][1].Name);
             }
         }
 
