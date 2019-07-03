@@ -49,7 +49,6 @@ namespace osu.Game.Online.Leaderboards
                             RelativeSizeAxes = Axes.Both,
                             ColourDark = rankColour.Darken(0.1f),
                             ColourLight = rankColour.Lighten(0.1f),
-                            TriangleScale = 1,
                             Velocity = 0.25f,
                         },
                         new OsuSpriteText
