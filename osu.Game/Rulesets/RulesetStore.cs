@@ -143,8 +143,7 @@ namespace osu.Game.Rulesets
 
             try
             {
-                var assembly = Assembly.LoadFrom(file);
-                loaded_assemblies[assembly] = assembly.GetTypes().First(t => t.IsPublic && t.IsSubclassOf(typeof(Ruleset)));
+                addRuleset(Assembly.LoadFrom(file));
             }
             catch (Exception e)
             {
