@@ -86,6 +86,7 @@ namespace osu.Game.Screens.Menu
             if (!resuming)
             {
                 Beatmap.Value = introBeatmap;
+                introBeatmap = null;
 
                 if (menuVoice.Value)
                     welcome.Play();
@@ -94,7 +95,10 @@ namespace osu.Game.Screens.Menu
                 {
                     // Only start the current track if it is the menu music. A beatmap's track is started when entering the Main Manu.
                     if (menuMusic.Value)
+                    {
                         track.Start();
+                        track = null;
+                    }
 
                     LoadComponentAsync(mainMenu = new MainMenu());
 
