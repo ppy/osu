@@ -111,7 +111,7 @@ namespace osu.Game.Rulesets.Osu
                         new OsuModHardRock(),
                         new MultiMod(new OsuModSuddenDeath(), new OsuModPerfect()),
                         new MultiMod(new OsuModDoubleTime(), new OsuModNightcore()),
-                        new MultiMod(new OsuModHidden(), new OsuModTraceable()),
+                        new OsuModHidden(),
                         new MultiMod(new OsuModFlashlight(), new OsuModBlinds()),
                     };
 
@@ -136,6 +136,7 @@ namespace osu.Game.Rulesets.Osu
                         new OsuModWiggle(),
                         new MultiMod(new OsuModGrow(), new OsuModDeflate()),
                         new MultiMod(new ModWindUp<OsuHitObject>(), new ModWindDown<OsuHitObject>()),
+                        new OsuModTraceable(),
                     };
 
                 default:

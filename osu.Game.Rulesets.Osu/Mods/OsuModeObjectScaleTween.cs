@@ -23,7 +23,7 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         public override double ScoreMultiplier => 1;
 
-        public override Type[] IncompatibleMods => new[] { typeof(OsuModeObjectScaleTween) };
+        public override Type[] IncompatibleMods => new[] { typeof(OsuModTraceable) };
 
         protected virtual float StartScale => 1;
 

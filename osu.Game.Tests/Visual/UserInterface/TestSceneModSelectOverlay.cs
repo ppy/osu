@@ -85,7 +85,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             var assistMods = instance.GetModsFor(ModType.Automation);
 
             var noFailMod = easierMods.FirstOrDefault(m => m is OsuModNoFail);
-            var hiddenMod = harderMods.OfType<MultiMod>().FirstOrDefault(m => m.Mods.Any(a => a is OsuModHidden));
+            var hiddenMod = harderMods.FirstOrDefault(m => m is OsuModHidden);
 
             var doubleTimeMod = harderMods.OfType<MultiMod>().FirstOrDefault(m => m.Mods.Any(a => a is OsuModDoubleTime));
 
@@ -96,11 +96,10 @@ namespace osu.Game.Tests.Visual.UserInterface
 
             testSingleMod(noFailMod);
             testMultiMod(doubleTimeMod);
-            testMultiMod(hiddenMod);
             testIncompatibleMods(easy, hardRock);
             testDeselectAll(easierMods.Where(m => !(m is MultiMod)));
             testMultiplierTextColour(noFailMod, modSelect.LowMultiplierColour);
-            testMultiplierTextColour(hardRock, modSelect.HighMultiplierColour);
+            testMultiplierTextColour(hiddenMod, modSelect.HighMultiplierColour);
 
             testUnimplementedMod(autoPilotMod);
         }
