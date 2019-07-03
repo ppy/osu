@@ -112,7 +112,6 @@ namespace osu.Game.Overlays.Mods
                 if (selected == null) continue;
 
                 foreach (var type in modTypes)
-                {
                     if (type.IsInstanceOfType(selected))
                     {
                         if (immediate)
@@ -120,7 +119,6 @@ namespace osu.Game.Overlays.Mods
                         else
                             Scheduler.AddDelayed(button.Deselect, delay += 50);
                     }
-                }
             }
         }
 

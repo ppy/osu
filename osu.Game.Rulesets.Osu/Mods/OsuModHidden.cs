@@ -17,7 +17,6 @@ namespace osu.Game.Rulesets.Osu.Mods
     {
         public override string Description => @"Play with no approach circles and fading circles/sliders.";
         public override double ScoreMultiplier => 1.06;
-
         private const double fade_in_duration_multiplier = 0.4;
         private const double fade_out_duration_multiplier = 0.3;
 
