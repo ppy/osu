@@ -52,7 +52,6 @@
     <AndroidNativeLibrary Include="$(MSBuildThisFileDirectory)\osu.Android\lib\**\*.so">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </AndroidNativeLibrary>
-    <Content Include="$(MSBuildThisFileDirectory)\osu.Android\bass.dll" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="System" />
