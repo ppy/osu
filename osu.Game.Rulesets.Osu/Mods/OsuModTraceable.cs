@@ -20,7 +20,7 @@ namespace osu.Game.Rulesets.Osu.Mods
         public override ModType Type => ModType.DifficultyIncrease;
         public override string Description => "Put your faith in the approach circles...";
         public override double ScoreMultiplier => 1;
-        public override Type[] IncompatibleMods => new[] { typeof(OsuModGrow) };
+        public override Type[] IncompatibleMods => new[] { typeof(OsuModeObjectScaleTween) };
 
         public override void ApplyToDrawableHitObjects(IEnumerable<DrawableHitObject> drawables)
         {
