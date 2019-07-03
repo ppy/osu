@@ -22,8 +22,8 @@ namespace osu.Game.Rulesets
         {
             AppDomain.CurrentDomain.AssemblyResolve += currentDomain_AssemblyResolve;
 
-            //on android in release configuration the assemblies are loaded from the apk directly into memory.
-            //in this case there is no way to access the rulesets assemblies from the filesystem.
+            // On android in release configuration assemblies are loaded from the apk directly into memory.
+            // We cannot read assemblies from cwd, so should check loaded assemblies isntead.
             addLoadedRulesets();
 
             try
