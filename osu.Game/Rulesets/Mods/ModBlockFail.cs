@@ -2,14 +2,17 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Bindables;
+using osu.Framework.Graphics;
 using osu.Game.Configuration;
 using osu.Game.Screens.Play;
+using osu.Game.Screens.Play.HUD;
 
 namespace osu.Game.Rulesets.Mods
 {
     public abstract class ModBlockFail : Mod, IApplicableFailOverride, IApplicableToHUD, IReadFromConfig
     {
-        private Bindable<bool> hideHealthBar = new Bindable<bool>();
+        private Bindable<bool> hideHealthBar;
+        private HealthDisplay healthDisplay;
 
         /// <summary>
         /// We never fail, 'yo.
@@ -19,12 +22,13 @@ namespace osu.Game.Rulesets.Mods
         public void ReadFromConfig(OsuConfigManager config)
         {
             hideHealthBar = config.GetBindable<bool>(OsuSetting.HideHealthBar);
+            hideHealthBar.ValueChanged += v => healthDisplay?.FadeTo(v.NewValue ? 0 : 1, 250, Easing.OutQuint);
         }
 
         public void ApplyToHUD(HUDOverlay overlay)
         {
-            if (hideHealthBar.Value)
-                overlay.HealthDisplay.Hide();
+            healthDisplay = overlay.HealthDisplay;
+            hideHealthBar?.TriggerChange();
         }
     }
 }
