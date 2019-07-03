@@ -54,11 +54,17 @@ namespace osu.Game.Online.API.Requests.Responses
         [JsonProperty(@"last_updated")]
         private DateTimeOffset lastUpdated { get; set; }
 
+        [JsonProperty(@"ratings")]
+        private int[] ratings { get; set; }
+
         [JsonProperty(@"user_id")]
         private long creatorId
         {
             set => Author.Id = value;
         }
+
+        [JsonProperty(@"availability")]
+        private BeatmapSetOnlineAvailability availability { get; set; }
 
         [JsonProperty(@"beatmaps")]
         private IEnumerable<APIBeatmap> beatmaps { get; set; }
@@ -70,6 +76,7 @@ namespace osu.Game.Online.API.Requests.Responses
                 OnlineBeatmapSetID = OnlineBeatmapSetID,
                 Metadata = this,
                 Status = Status,
+                Metrics = ratings == null ? null : new BeatmapSetMetrics { Ratings = ratings },
                 OnlineInfo = new BeatmapSetOnlineInfo
                 {
                     Covers = covers,
@@ -83,6 +90,7 @@ namespace osu.Game.Online.API.Requests.Responses
                     Submitted = submitted,
                     Ranked = ranked,
                     LastUpdated = lastUpdated,
+                    Availability = availability,
                 },
                 Beatmaps = beatmaps?.Select(b => b.ToBeatmap(rulesets)).ToList(),
             };

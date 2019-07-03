@@ -16,7 +16,7 @@ namespace osu.Game.Graphics.Containers
         where T : Drawable
     {
         private Drawable expandableHeader, fixedHeader, footer, headerBackground;
-        private readonly ScrollContainer scrollContainer;
+        private readonly OsuScrollContainer scrollContainer;
         private readonly Container headerBackgroundContainer;
         private readonly FlowContainer<T> scrollContentContainer;
 
@@ -124,7 +124,7 @@ namespace osu.Game.Graphics.Containers
 
         public SectionsContainer()
         {
-            AddInternal(scrollContainer = new ScrollContainer
+            AddInternal(scrollContainer = new OsuScrollContainer
             {
                 RelativeSizeAxes = Axes.Both,
                 Masking = true,

@@ -7,6 +7,7 @@ using osu.Framework.Allocation;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
+using osu.Game.Overlays;
 using osu.Game.Overlays.Profile;
 using osu.Game.Overlays.Profile.Header;
 using osu.Game.Overlays.Profile.Header.Components;
@@ -21,7 +22,7 @@ namespace osu.Game.Tests.Visual.Online
             typeof(ProfileHeader),
             typeof(RankGraph),
             typeof(LineGraph),
-            typeof(ProfileHeaderTabControl),
+            typeof(OverlayHeaderTabControl),
             typeof(CentreHeaderContainer),
             typeof(BottomHeaderContainer),
             typeof(DetailHeaderContainer),
@@ -38,11 +39,25 @@ namespace osu.Game.Tests.Visual.Online
             header = new ProfileHeader();
             Add(header);
 
-            AddStep("Show offline dummy", () => header.User.Value = TestSceneUserProfileOverlay.TEST_USER);
+            AddStep("Show test dummy", () => header.User.Value = TestSceneUserProfileOverlay.TEST_USER);
 
             AddStep("Show null dummy", () => header.User.Value = new User
             {
                 Username = "Null"
+            });
+
+            AddStep("Show online dummy", () => header.User.Value = new User
+            {
+                Username = "IAmOnline",
+                LastVisit = DateTimeOffset.Now,
+                IsOnline = true,
+            });
+
+            AddStep("Show offline dummy", () => header.User.Value = new User
+            {
+                Username = "IAmOffline",
+                LastVisit = DateTimeOffset.Now,
+                IsOnline = false,
             });
 
             addOnlineStep("Show ppy", new User

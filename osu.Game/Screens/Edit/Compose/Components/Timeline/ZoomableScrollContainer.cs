@@ -7,11 +7,12 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Transforms;
 using osu.Framework.Input.Events;
 using osu.Framework.MathUtils;
+using osu.Game.Graphics.Containers;
 using osuTK;
 
 namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 {
-    public class ZoomableScrollContainer : ScrollContainer
+    public class ZoomableScrollContainer : OsuScrollContainer
     {
         /// <summary>
         /// The time to zoom into/out of a point.
