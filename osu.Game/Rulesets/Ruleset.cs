@@ -26,7 +26,7 @@ namespace osu.Game.Rulesets
         public readonly RulesetInfo RulesetInfo;
 
         public IEnumerable<Mod> GetAllMods(bool includeSystemMods) => Enum.GetValues(typeof(ModType)).Cast<ModType>()
-                                                                          // Include ModType.System in modtypes to querry if includeSystemMods is true, else skip it
+                                                                          // Include ModType.System in modtypes to querry if includeSystemMods is false, else skip it
                                                                           .Reverse().Skip(includeSystemMods ? 0 : 1).Reverse()
                                                                           // Confine all mods of each mod type into a single IEnumerable<Mod>
                                                                           .SelectMany(GetModsFor)
