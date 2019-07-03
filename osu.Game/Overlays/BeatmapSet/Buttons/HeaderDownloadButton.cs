@@ -20,7 +20,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Overlays.BeatmapSet.Buttons
 {
-    public class DownloadButton : BeatmapDownloadTrackingComposite, IHasTooltip
+    public class HeaderDownloadButton : BeatmapDownloadTrackingComposite, IHasTooltip
     {
         private readonly bool noVideo;
 
@@ -31,7 +31,7 @@ namespace osu.Game.Overlays.BeatmapSet.Buttons
         private ShakeContainer shakeContainer;
         private HeaderButton button;
 
-        public DownloadButton(BeatmapSetInfo beatmapSet, bool noVideo = false)
+        public HeaderDownloadButton(BeatmapSetInfo beatmapSet, bool noVideo = false)
             : base(beatmapSet)
         {
             this.noVideo = noVideo;
