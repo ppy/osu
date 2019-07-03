@@ -24,19 +24,9 @@ namespace osu.Game.Rulesets
 
             // On android in release configuration assemblies are loaded from the apk directly into memory.
             // We cannot read assemblies from cwd, so should check loaded assemblies instead.
-            addLoadedRulesets();
+            loadFromAppDomain();
 
-            try
-            {
-                string[] files = Directory.GetFiles(Environment.CurrentDirectory, $"{ruleset_library_prefix}.*.dll");
-
-                foreach (string file in files.Where(f => !Path.GetFileName(f).Contains("Tests")))
-                    loadRulesetFromFile(file);
-            }
-            catch
-            {
-                Logger.Log($"Could not load rulesets from directory {Environment.CurrentDirectory}");
-            }
+            loadFromDisk();
         }
 
         public RulesetStore(IDatabaseContextFactory factory)
@@ -123,7 +113,7 @@ namespace osu.Game.Rulesets
             }
         }
 
-        private static void addLoadedRulesets()
+        private static void loadFromAppDomain()
         {
             foreach (var ruleset in AppDomain.CurrentDomain.GetAssemblies())
             {
@@ -133,6 +123,21 @@ namespace osu.Game.Rulesets
                     continue;
 
                 addRuleset(ruleset);
+            }
+        }
+
+        private static void loadFromDisk()
+        {
+            try
+            {
+                string[] files = Directory.GetFiles(Environment.CurrentDirectory, $"{ruleset_library_prefix}.*.dll");
+
+                foreach (string file in files.Where(f => !Path.GetFileName(f).Contains("Tests")))
+                    loadRulesetFromFile(file);
+            }
+            catch
+            {
+                Logger.Log($"Could not load rulesets from directory {Environment.CurrentDirectory}");
             }
         }
 
