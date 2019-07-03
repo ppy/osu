@@ -3,9 +3,9 @@
 
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Events;
+using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Rulesets;
 using osuTK;
@@ -40,7 +40,7 @@ namespace osu.Game.Overlays.Direct
 
         private class DirectRulesetTabItem : TabItem<RulesetInfo>
         {
-            private readonly SpriteIcon icon;
+            private readonly ConstrainedIconContainer iconContainer;
 
             public DirectRulesetTabItem(RulesetInfo value)
                 : base(value)
@@ -49,11 +49,13 @@ namespace osu.Game.Overlays.Direct
 
                 Children = new Drawable[]
                 {
-                    icon = (SpriteIcon)value.CreateInstance().CreateIcon(),
+                    iconContainer = new ConstrainedIconContainer
+                    {
+                        Icon = value.CreateInstance().CreateIcon(),
+                        Size = new Vector2(32),
+                    },
                     new HoverClickSounds()
                 };
-
-                icon.Size = new Vector2(30);
             }
 
             protected override void LoadComplete()
@@ -80,7 +82,7 @@ namespace osu.Game.Overlays.Direct
 
             protected override void OnDeactivated() => updateState();
 
-            private void updateState() => icon.FadeColour(IsHovered || Active.Value ? Color4.White : Color4.Gray, 120, Easing.InQuad);
+            private void updateState() => iconContainer.FadeColour(IsHovered || Active.Value ? Color4.White : Color4.Gray, 120, Easing.InQuad);
         }
     }
 }
