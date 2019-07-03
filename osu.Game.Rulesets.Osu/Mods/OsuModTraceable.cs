@@ -3,8 +3,10 @@
 
 using System;
 using System.Linq;
+using osu.Framework.Bindables;
 using System.Collections.Generic;
 using osu.Framework.Graphics.Sprites;
+using osu.Game.Configuration;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Osu.Objects.Drawables;
@@ -12,19 +14,25 @@ using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Osu.Mods
 {
-    internal class OsuModTraceable : OsuModHidden
+    internal class OsuModTraceable : Mod, IReadFromConfig, IApplicableToDrawableHitObjects
     {
         public override string Name => "Traceable";
         public override string Acronym => "TC";
         public override IconUsage Icon => FontAwesome.Brands.SnapchatGhost;
-        public override ModType Type => ModType.DifficultyIncrease;
+        public override ModType Type => ModType.Fun;
         public override string Description => "Put your faith in the approach circles...";
         public override double ScoreMultiplier => 1;
-        public override Type[] IncompatibleMods => new[] { typeof(OsuModeObjectScaleTween) };
+        public override Type[] IncompatibleMods => new[] { typeof(OsuModHidden), typeof(OsuModeObjectScaleTween) };
+        private Bindable<bool> increaseFirstObjectVisibility = new Bindable<bool>();
 
-        public override void ApplyToDrawableHitObjects(IEnumerable<DrawableHitObject> drawables)
+        public void ReadFromConfig(OsuConfigManager config)
         {
-            foreach (var drawable in drawables.Skip(IncreaseFirstObjectVisibility.Value ? 1 : 0))
+            increaseFirstObjectVisibility = config.GetBindable<bool>(OsuSetting.IncreaseFirstObjectVisibility);
+        }
+
+        public void ApplyToDrawableHitObjects(IEnumerable<DrawableHitObject> drawables)
+        {
+            foreach (var drawable in drawables.Skip(increaseFirstObjectVisibility.Value ? 1 : 0))
                 drawable.ApplyCustomUpdateState += ApplyTraceableState;
         }
 
@@ -59,8 +67,10 @@ namespace osu.Game.Rulesets.Osu.Mods
 
                     break;
 
-                default:
-                    ApplyHiddenState(drawable, state);
+                case DrawableSpinner spinner:
+                    spinner.Disc.Hide();
+                    //spinner.Ticks.Hide(); // do they contribute to the theme? debatable
+                    spinner.Background.Hide();
 
                     break;
             }
