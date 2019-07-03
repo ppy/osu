@@ -73,7 +73,7 @@ namespace osu.Game.Scoring
             }
         }
 
-        private Mod[] getModsFromRuleset(DeserializedMod[] mods) => Ruleset.CreateInstance().GetAllMods(true).Where(mod => mods.Any(d => d.Acronym == mod.Acronym)).ToArray();
+        private Mod[] getModsFromRuleset(DeserializedMod[] mods) => Ruleset.CreateInstance().GetAllMods().Where(mod => mods.Any(d => d.Acronym == mod.Acronym)).ToArray();
 
         private string modsJson;
 

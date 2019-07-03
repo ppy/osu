@@ -9,7 +9,6 @@ namespace osu.Game.Rulesets.Mods
         DifficultyIncrease,
         Conversion,
         Automation,
-        Fun,
-        System
+        Fun
     }
 }

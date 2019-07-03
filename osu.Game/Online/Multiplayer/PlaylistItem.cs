@@ -73,7 +73,7 @@ namespace osu.Game.Online.Multiplayer
             if (_allowedMods != null)
             {
                 AllowedMods.Clear();
-                AllowedMods.AddRange(Ruleset.CreateInstance().GetAllMods(false).Where(mod => _allowedMods.Any(m => m.Acronym == mod.Acronym)));
+                AllowedMods.AddRange(Ruleset.CreateInstance().GetAllMods().Where(mod => _allowedMods.Any(m => m.Acronym == mod.Acronym)));
 
                 _allowedMods = null;
             }
@@ -81,7 +81,7 @@ namespace osu.Game.Online.Multiplayer
             if (_requiredMods != null)
             {
                 RequiredMods.Clear();
-                RequiredMods.AddRange(Ruleset.CreateInstance().GetAllMods(false).Where(mod => _requiredMods.Any(m => m.Acronym == mod.Acronym)));
+                RequiredMods.AddRange(Ruleset.CreateInstance().GetAllMods().Where(mod => _requiredMods.Any(m => m.Acronym == mod.Acronym)));
 
                 _requiredMods = null;
             }
