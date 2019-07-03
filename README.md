@@ -1,3 +1,7 @@
+<p align="center">
+  <img width="256" height="256" src="assets/lazer.png">
+</p>
+
 # osu!
 
 [![Build status](https://ci.appveyor.com/api/projects/status/u2p01nx7l6og8buh?svg=true)](https://ci.appveyor.com/project/peppy/osu)  [![CodeFactor](https://www.codefactor.io/repository/github/ppy/osu/badge)](https://www.codefactor.io/repository/github/ppy/osu) [![dev chat](https://discordapp.com/api/guilds/188630481301012481/widget.png?style=shield)](https://discord.gg/ppy)
@@ -21,8 +25,6 @@ Detailed changelogs are published on the [official osu! site](https://osu.ppy.sh
 ## Running osu!
 
 ### Releases
-
-![](https://puu.sh/DCmvA/f6a74f5fbb.png)
 
 If you are not interested in developing the game, you can still consume our [binary releases](https://github.com/ppy/osu/releases).
 
