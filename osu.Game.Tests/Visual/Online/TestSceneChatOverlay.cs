@@ -11,6 +11,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.UserInterface;
 using osu.Game.Online.Chat;
 using osu.Game.Overlays;
+using osu.Game.Overlays.Chat;
 using osu.Game.Overlays.Chat.Selection;
 using osu.Game.Overlays.Chat.Tabs;
 using osu.Game.Users;
@@ -22,9 +23,13 @@ namespace osu.Game.Tests.Visual.Online
     {
         public override IReadOnlyList<Type> RequiredTypes => new[]
         {
+            typeof(ChatLine),
+            typeof(DrawableChannel),
+            typeof(ChannelSelectorTabItem),
             typeof(ChannelTabControl),
             typeof(ChannelTabItem),
-            typeof(ChatOverlay),
+            typeof(PrivateChannelTabItem),
+            typeof(TabCloseButton),
         };
 
         private TestChatOverlay chatOverlay;
@@ -39,7 +44,10 @@ namespace osu.Game.Tests.Visual.Online
         {
             Schedule(() =>
             {
-                Child = channelManagerContainer = new ChannelManagerContainer(new List<Channel> { channel1, channel2 }) { RelativeSizeAxes = Axes.Both, };
+                Child = channelManagerContainer = new ChannelManagerContainer(new List<Channel> { channel1, channel2 })
+                {
+                    RelativeSizeAxes = Axes.Both,
+                };
                 chatOverlay = channelManagerContainer.ChatOverlay;
                 channelManager = channelManagerContainer.ChannelManager;
             });
@@ -74,10 +82,13 @@ namespace osu.Game.Tests.Visual.Online
         {
             AddStep("Join channel 1", () => channelManager.JoinChannel(channel1));
             AddStep("Join channel 2", () => channelManager.JoinChannel(channel2));
+
             AddStep("Switch to channel 2", () => clickDrawable(chatOverlay.TabMap[channel2]));
             AddStep("Close channel 2", () => clickDrawable(((TestChannelTabItem)chatOverlay.TabMap[channel2]).CloseButton.Child));
+
             AddAssert("Selector remained closed", () => chatOverlay.SelectionOverlayState == Visibility.Hidden);
             AddAssert("Current channel is channel 1", () => channelManager.CurrentChannel.Value == channel1);
+
             AddStep("Close channel 1", () => clickDrawable(((TestChannelTabItem)chatOverlay.TabMap[channel1]).CloseButton.Child));
             AddAssert("Selector is visible", () => chatOverlay.SelectionOverlayState == Visibility.Visible);
         }
@@ -86,7 +97,7 @@ namespace osu.Game.Tests.Visual.Online
         public void TestShowWhileLoading()
         {
             setupUnloadedChannelsTest();
-            fakeInitializeChat();
+            AddStep("Initialize ChannelManager", () => channelManager.IsInitialized.Value = true);
             AddAssert("Selector is visible", () => chatOverlay.SelectionOverlayState == Visibility.Visible);
         }
 
@@ -95,7 +106,7 @@ namespace osu.Game.Tests.Visual.Online
         {
             setupUnloadedChannelsTest();
             AddStep("Close chat overlay", () => chatOverlay.Hide());
-            fakeInitializeChat();
+            AddStep("Initialize ChannelManager", () => channelManager.IsInitialized.Value = true);
             AddAssert("Selector is still closed", () => chatOverlay.SelectionOverlayState == Visibility.Hidden);
         }
 
@@ -114,17 +125,8 @@ namespace osu.Game.Tests.Visual.Online
         {
             AddStep("Join channel 2", () => channelManager.JoinChannel(channel2));
             setupUnloadedChannelsTest();
-            fakeInitializeChat();
+            AddStep("Initialize ChannelManager", () => channelManager.IsInitialized.Value = true);
             AddAssert("Selector is still closed", () => chatOverlay.SelectionOverlayState == Visibility.Hidden);
-        }
-
-        private void fakeInitializeChat()
-        {
-            AddStep("Mimic first connection", () =>
-            {
-                channelManagerContainer.AddRange(new List<Channel> { channel1, channel2 });
-                channelManager.IsInitialized.Value = true;
-            });
         }
 
         private void setupUnloadedChannelsTest()
@@ -132,7 +134,6 @@ namespace osu.Game.Tests.Visual.Online
             AddStep("Close chat overlay", () =>
             {
                 chatOverlay.Hide();
-                channelManagerContainer.ClearAvailable();
                 channelManager.IsInitialized.Value = false;
             });
             AddStep("Toggle chat overlay", () => chatOverlay.Show());
@@ -152,8 +153,6 @@ namespace osu.Game.Tests.Visual.Online
             [Cached]
             public ChannelManager ChannelManager { get; } = new ChannelManager();
 
-            public BindableList<Channel> AvailableChannels => (BindableList<Channel>)ChannelManager.AvailableChannels;
-
             private readonly List<Channel> channels;
 
             public ChannelManagerContainer(List<Channel> channels)
@@ -161,14 +160,10 @@ namespace osu.Game.Tests.Visual.Online
                 this.channels = channels;
             }
 
-            public void ClearAvailable() => AvailableChannels.Clear();
-
-            public void AddRange(List<Channel> channels) => AvailableChannels.AddRange(channels);
-
             [BackgroundDependencyLoader]
             private void load()
             {
-                AddRange(channels);
+                ((BindableList<Channel>)ChannelManager.AvailableChannels).AddRange(channels);
                 Child = ChatOverlay = new TestChatOverlay { RelativeSizeAxes = Axes.Both, };
                 ChannelManager.IsInitialized.Value = true;
                 ChatOverlay.Show();
