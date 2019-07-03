@@ -96,7 +96,9 @@ namespace osu.Game.Graphics.UserInterface
                 }
             }
 
-            protected override DrawableMenuItem CreateDrawableMenuItem(MenuItem item) => new DrawableOsuDropdownMenuItem(item) { AccentColour = accentColour };
+            protected override Menu CreateSubMenu() => new OsuMenu(Direction.Vertical);
+
+            protected override DrawableDropdownMenuItem CreateDrawableDropdownMenuItem(MenuItem item) => new DrawableOsuDropdownMenuItem(item) { AccentColour = accentColour };
 
             protected override ScrollContainer<Drawable> CreateScrollContainer(Direction direction) => new OsuScrollContainer(direction);
 

@@ -16,7 +16,7 @@ using osu.Game.Rulesets.Scoring;
 
 namespace osu.Game.Scoring
 {
-    public class ScoreInfo : IHasFiles<ScoreFileInfo>, IHasPrimaryKey, ISoftDelete
+    public class ScoreInfo : IHasFiles<ScoreFileInfo>, IHasPrimaryKey, ISoftDelete, IEquatable<ScoreInfo>
     {
         public int ID { get; set; }
 
@@ -182,5 +182,7 @@ namespace osu.Game.Scoring
         }
 
         public override string ToString() => $"{User} playing {Beatmap}";
+
+        public bool Equals(ScoreInfo other) => other?.OnlineScoreID == OnlineScoreID;
     }
 }
