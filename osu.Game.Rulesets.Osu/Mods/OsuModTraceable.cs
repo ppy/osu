@@ -8,6 +8,7 @@ using osu.Framework.Graphics.Sprites;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Osu.Objects.Drawables;
+using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Osu.Mods
 {
@@ -24,43 +25,44 @@ namespace osu.Game.Rulesets.Osu.Mods
         public override void ApplyToDrawableHitObjects(IEnumerable<DrawableHitObject> drawables)
         {
             foreach (var drawable in drawables.Skip(IncreaseFirstObjectVisibility.Value ? 1 : 0))
-            {
-                switch (drawable)
-                {
-                    case DrawableHitCircle _:
-                        drawable.ApplyCustomUpdateState += ApplyTraceableState;
-                        break;
-
-                    case DrawableSlider slider:
-                        slider.ApplyCustomUpdateState += ApplyHiddenState;
-                        slider.HeadCircle.ApplyCustomUpdateState += ApplyTraceableState;
-                        break;
-
-                    default:
-                        drawable.ApplyCustomUpdateState += ApplyHiddenState;
-                        break;
-                }
-            }
+                drawable.ApplyCustomUpdateState += ApplyTraceableState;
         }
 
         protected void ApplyTraceableState(DrawableHitObject drawable, ArmedState state)
         {
-            if (!(drawable is DrawableHitCircle circle))
+            if (!(drawable is DrawableOsuHitObject d))
                 return;
 
-            var h = circle.HitObject;
+            var h = d.HitObject;
 
-            // we only want to see the approach circle
-            using (circle.BeginAbsoluteSequence(h.StartTime - h.TimePreempt, true))
+            switch (drawable)
             {
-                circle.Circle.Hide(); // CirclePiece
-                circle.Circle.AlwaysPresent = true;
-                circle.Ring.Hide();
-                circle.Flash.Hide();
-                circle.Explode.Hide();
-                circle.Number.Hide();
-                circle.Glow.Hide();
-                circle.ApproachCircle.Show();
+                case DrawableHitCircle circle:
+                    // we only want to see the approach circle
+                    using (circle.BeginAbsoluteSequence(h.StartTime - h.TimePreempt, true))
+                    {
+                        circle.Circle.Hide(); // CirclePiece
+                        circle.Circle.AlwaysPresent = true;
+                        circle.Ring.Hide();
+                        circle.Flash.Hide();
+                        circle.Explode.Hide();
+                        circle.Number.Hide();
+                        circle.Glow.Hide();
+                        circle.ApproachCircle.Show();
+                    }
+
+                    break;
+
+                case DrawableSlider slider:
+                    ApplyTraceableState(slider.HeadCircle, state);
+                    slider.Body.AccentColour = Color4.Transparent;
+
+                    break;
+
+                default:
+                    ApplyHiddenState(drawable, state);
+
+                    break;
             }
         }
     }
