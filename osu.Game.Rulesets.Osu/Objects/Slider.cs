@@ -99,7 +99,7 @@ namespace osu.Game.Rulesets.Osu.Objects
         /// </summary>
         internal float LazyTravelDistance;
 
-        public List<List<SampleInfo>> NodeSamples { get; set; } = new List<List<SampleInfo>>();
+        public List<List<HitSampleInfo>> NodeSamples { get; set; } = new List<List<HitSampleInfo>>();
 
         private int repeatCount;
 
@@ -157,12 +157,12 @@ namespace osu.Game.Rulesets.Osu.Objects
             foreach (var e in
                 SliderEventGenerator.Generate(StartTime, SpanDuration, Velocity, TickDistance, Path.Distance, this.SpanCount(), LegacyLastTickOffset))
             {
-                var firstSample = Samples.Find(s => s.Name == SampleInfo.HIT_NORMAL)
+                var firstSample = Samples.Find(s => s.Name == HitSampleInfo.HIT_NORMAL)
                                   ?? Samples.FirstOrDefault(); // TODO: remove this when guaranteed sort is present for samples (https://github.com/ppy/osu/issues/1933)
-                var sampleList = new List<SampleInfo>();
+                var sampleList = new List<HitSampleInfo>();
 
                 if (firstSample != null)
-                    sampleList.Add(new SampleInfo
+                    sampleList.Add(new HitSampleInfo
                     {
                         Bank = firstSample.Bank,
                         Volume = firstSample.Volume,
@@ -225,7 +225,7 @@ namespace osu.Game.Rulesets.Osu.Objects
             }
         }
 
-        private List<SampleInfo> getNodeSamples(int nodeIndex) =>
+        private List<HitSampleInfo> getNodeSamples(int nodeIndex) =>
             nodeIndex < NodeSamples.Count ? NodeSamples[nodeIndex] : Samples;
 
         public override Judgement CreateJudgement() => new OsuJudgement();
