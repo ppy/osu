@@ -3,6 +3,9 @@
 
 using System.Linq;
 using NUnit.Framework;
+using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
+using osu.Framework.Timing;
 using osu.Game.Screens.Play;
 using osuTK;
 using osuTK.Input;
@@ -19,9 +22,20 @@ namespace osu.Game.Tests.Visual.Gameplay
         public void SetUp() => Schedule(() =>
         {
             requestCount = 0;
-            Child = skip = new SkipOverlay(Clock.CurrentTime + 5000)
+            Child = new Container
             {
-                RequestSeek = _ => requestCount++
+                RelativeSizeAxes = Axes.Both,
+                Clock = new FramedOffsetClock(Clock)
+                {
+                    Offset = -Clock.CurrentTime,
+                },
+                Children = new Drawable[]
+                {
+                    skip = new SkipOverlay(5000)
+                    {
+                        RequestSeek = _ => requestCount++
+                    }
+                },
             };
         });
 
