@@ -33,6 +33,8 @@ namespace osu.Game.Screens.Menu
 
         protected override BackgroundScreen CreateBackground() => new BackgroundScreenBlack();
 
+        private readonly BindableDouble exitingVolumeFade = new BindableDouble(1);
+
         private Bindable<bool> menuVoice;
         private Bindable<bool> menuMusic;
         private Track track;
@@ -72,6 +74,8 @@ namespace osu.Game.Screens.Menu
 
             welcome = audio.Samples.Get(@"welcome");
             seeya = audio.Samples.Get(@"seeya");
+
+            audio.AddAdjustment(AdjustableProperty.Volume, exitingVolumeFade);
         }
 
         private const double delay_step_one = 2300;
@@ -161,7 +165,7 @@ namespace osu.Game.Screens.Menu
             else
                 fadeOutTime = 500;
 
-            Scheduler.AddDelayed(this.Exit, fadeOutTime);
+            this.TransformBindableTo(exitingVolumeFade, 0, fadeOutTime).OnComplete(_ => this.Exit());
 
             //don't want to fade out completely else we will stop running updates.
             Game.FadeTo(0.01f, fadeOutTime);
