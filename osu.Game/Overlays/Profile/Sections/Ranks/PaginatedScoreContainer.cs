@@ -39,6 +39,7 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
             VisiblePages = 0;
             ItemsContainer.Clear();
 
+            MoreButton.IsLoading = true;
             ShowMore();
         }
 
