@@ -201,14 +201,15 @@ namespace osu.Game.Screens.Play
 
             protected override bool OnMouseDown(MouseDownEvent e)
             {
+                Show();
                 scheduledHide?.Cancel();
-                return base.OnMouseDown(e);
+                return true;
             }
 
             protected override bool OnMouseUp(MouseUpEvent e)
             {
                 Show();
-                return base.OnMouseUp(e);
+                return true;
             }
 
             public override void Hide() => State = Visibility.Hidden;
