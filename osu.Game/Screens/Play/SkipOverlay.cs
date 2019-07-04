@@ -161,6 +161,8 @@ namespace osu.Game.Screens.Play
             private Visibility state;
             private ScheduledDelegate scheduledHide;
 
+            public override bool IsPresent => true;
+
             public Visibility State
             {
                 get => state;
