@@ -24,13 +24,12 @@ namespace osu.Game.Overlays.Profile.Sections.Historical
             this.playCount = playCount;
         }
 
-        protected override Drawable CreateLeftVisual() => new UpdateableBeatmapSetCover
+        protected override Drawable CreateLeftVisual() => new UpdateableBeatmapSetCover(BeatmapSetCoverType.List)
         {
             Anchor = Anchor.CentreLeft,
             Origin = Anchor.CentreLeft,
             Size = new Vector2(80, 50),
             BeatmapSet = beatmap.BeatmapSet,
-            CoverType = BeatmapSetCoverType.List,
         };
 
         [BackgroundDependencyLoader]

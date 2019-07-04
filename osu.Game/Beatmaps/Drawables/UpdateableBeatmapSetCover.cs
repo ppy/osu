@@ -9,79 +9,43 @@ using osu.Game.Graphics;
 
 namespace osu.Game.Beatmaps.Drawables
 {
-    public class UpdateableBeatmapSetCover : Container
+    public class UpdateableBeatmapSetCover : ModelBackedDrawable<BeatmapSetInfo>
     {
-        private Drawable displayedCover;
-
-        private BeatmapSetInfo beatmapSet;
+        private readonly BeatmapSetCoverType coverType;
 
         public BeatmapSetInfo BeatmapSet
         {
-            get => beatmapSet;
-            set
-            {
-                if (value == beatmapSet) return;
-
-                beatmapSet = value;
-
-                if (IsLoaded)
-                    updateCover();
-            }
+            get => Model;
+            set => Model = value;
         }
 
-        private BeatmapSetCoverType coverType = BeatmapSetCoverType.Cover;
-
-        public BeatmapSetCoverType CoverType
+        public new bool Masking
         {
-            get => coverType;
-            set
-            {
-                if (value == coverType) return;
-
-                coverType = value;
-
-                if (IsLoaded)
-                    updateCover();
-            }
+            get => base.Masking;
+            set => base.Masking = value;
         }
 
-        public UpdateableBeatmapSetCover()
+        public UpdateableBeatmapSetCover(BeatmapSetCoverType coverType = BeatmapSetCoverType.Cover)
         {
-            Child = new Box
+            this.coverType = coverType;
+        }
+
+        protected override Drawable CreateDrawable(BeatmapSetInfo setInfo)
+        {
+            if (setInfo != null)
+                return new BeatmapSetCover(setInfo, coverType)
+                {
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    RelativeSizeAxes = Axes.Both,
+                    FillMode = FillMode.Fill,
+                };
+
+            return new Box
             {
                 RelativeSizeAxes = Axes.Both,
                 Colour = ColourInfo.GradientVertical(OsuColour.Gray(0.2f), OsuColour.Gray(0.1f)),
             };
-        }
-
-        protected override void LoadComplete()
-        {
-            base.LoadComplete();
-            updateCover();
-        }
-
-        private void updateCover()
-        {
-            displayedCover?.FadeOut(400);
-            displayedCover?.Expire();
-            displayedCover = null;
-
-            if (beatmapSet != null)
-            {
-                BeatmapSetCover cover;
-
-                Add(displayedCover = new DelayedLoadWrapper(
-                    cover = new BeatmapSetCover(beatmapSet, coverType)
-                    {
-                        Anchor = Anchor.Centre,
-                        Origin = Anchor.Centre,
-                        RelativeSizeAxes = Axes.Both,
-                        FillMode = FillMode.Fill,
-                    })
-                );
-
-                cover.OnLoadComplete += d => d.FadeInFromZero(400, Easing.Out);
-            }
         }
     }
 }
