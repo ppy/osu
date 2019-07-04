@@ -160,10 +160,15 @@ namespace osu.Game.Overlays
             rulesetSelector.SetDefaultRuleset(rulesets.GetRuleset(user.PlayMode ?? "osu"));
             rulesetSelector.SelectDefaultRuleset();
             rulesetSelector.Current.BindValueChanged(rulesetChanged);
+
+            foreach (var s in sections)
+                s.Ruleset.BindTo(rulesetSelector.Current);
         }
 
         private void rulesetChanged(ValueChangedEvent<RulesetInfo> r)
         {
+            Header.IsLoading = true;
+
             var statsReq = new GetUserRequest(currentUser.Id, r.NewValue);
             statsReq.Success += user =>
             {
@@ -171,8 +176,6 @@ namespace osu.Game.Overlays
                 Header.IsLoading = false;
             };
             API.Queue(statsReq);
-
-            Header.IsLoading = true;
         }
 
         private class ProfileTabControl : OverlayTabControl<ProfileSection>

@@ -11,6 +11,7 @@ using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Backgrounds;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Rulesets;
 using osu.Game.Users;
 
 namespace osu.Game.Overlays.Profile
@@ -20,6 +21,8 @@ namespace osu.Game.Overlays.Profile
         public abstract string Title { get; }
 
         public abstract string Identifier { get; }
+
+        public Bindable<RulesetInfo> Ruleset = new Bindable<RulesetInfo>();
 
         private readonly FillFlowContainer content;
         private readonly Box background;

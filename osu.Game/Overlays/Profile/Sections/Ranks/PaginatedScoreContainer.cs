@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
+using osu.Game.Rulesets;
 
 namespace osu.Game.Overlays.Profile.Sections.Ranks
 {
@@ -17,6 +18,8 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
         private readonly bool includeWeight;
         private readonly ScoreType type;
         private GetUserScoresRequest request;
+
+        public Bindable<RulesetInfo> Ruleset = new Bindable<RulesetInfo>();
 
         public PaginatedScoreContainer(ScoreType type, Bindable<User> user, string header, string missing, bool includeWeight = false)
             : base(user, header, missing)
@@ -27,11 +30,21 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
             ItemsPerPage = 5;
 
             ItemsContainer.Direction = FillDirection.Vertical;
+
+            Ruleset.BindValueChanged(rulesetChanged);
+        }
+
+        private void rulesetChanged(ValueChangedEvent<RulesetInfo> r)
+        {
+            VisiblePages = 0;
+            ItemsContainer.Clear();
+
+            ShowMore();
         }
 
         protected override void ShowMore()
         {
-            request = new GetUserScoresRequest(User.Value.Id, type, VisiblePages++ * ItemsPerPage);
+            request = new GetUserScoresRequest(User.Value.Id, type, VisiblePages++ * ItemsPerPage, Ruleset.Value);
             request.Success += scores => Schedule(() =>
             {
                 foreach (var s in scores)
