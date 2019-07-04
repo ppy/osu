@@ -11,15 +11,19 @@ using osu.Framework.IO.File;
 using System.IO;
 using System.Linq;
 using System.Threading;
+using System.Threading.Tasks;
+using osu.Framework.Audio;
+using osu.Framework.Statistics;
 using osu.Game.IO.Serialization;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Objects;
+using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.UI;
 using osu.Game.Skinning;
 
 namespace osu.Game.Beatmaps
 {
-    public abstract partial class WorkingBeatmap : IDisposable
+    public abstract class WorkingBeatmap : IDisposable
     {
         public readonly BeatmapInfo BeatmapInfo;
 
@@ -27,30 +31,50 @@ namespace osu.Game.Beatmaps
 
         public readonly BeatmapMetadata Metadata;
 
-        protected WorkingBeatmap(BeatmapInfo beatmapInfo)
+        protected AudioManager AudioManager { get; }
+
+        private static readonly GlobalStatistic<int> total_count = GlobalStatistics.Get<int>(nameof(Beatmaps), $"Total {nameof(WorkingBeatmap)}s");
+
+        protected WorkingBeatmap(BeatmapInfo beatmapInfo, AudioManager audioManager)
         {
+            AudioManager = audioManager;
             BeatmapInfo = beatmapInfo;
             BeatmapSetInfo = beatmapInfo.BeatmapSet;
             Metadata = beatmapInfo.Metadata ?? BeatmapSetInfo?.Metadata ?? new BeatmapMetadata();
 
-            beatmap = new RecyclableLazy<IBeatmap>(() =>
-            {
-                var b = GetBeatmap() ?? new Beatmap();
-
-                // The original beatmap version needs to be preserved as the database doesn't contain it
-                BeatmapInfo.BeatmapVersion = b.BeatmapInfo.BeatmapVersion;
-
-                // Use the database-backed info for more up-to-date values (beatmap id, ranked status, etc)
-                b.BeatmapInfo = BeatmapInfo;
-
-                return b;
-            });
-
-            track = new RecyclableLazy<Track>(() => GetTrack() ?? new VirtualBeatmapTrack(Beatmap));
+            track = new RecyclableLazy<Track>(() => GetTrack() ?? GetVirtualTrack());
             background = new RecyclableLazy<Texture>(GetBackground, BackgroundStillValid);
             waveform = new RecyclableLazy<Waveform>(GetWaveform);
             storyboard = new RecyclableLazy<Storyboard>(GetStoryboard);
             skin = new RecyclableLazy<Skin>(GetSkin);
+
+            total_count.Value++;
+        }
+
+        protected virtual Track GetVirtualTrack()
+        {
+            const double excess_length = 1000;
+
+            var lastObject = Beatmap.HitObjects.LastOrDefault();
+
+            double length;
+
+            switch (lastObject)
+            {
+                case null:
+                    length = excess_length;
+                    break;
+
+                case IHasEndTime endTime:
+                    length = endTime.EndTime + excess_length;
+                    break;
+
+                default:
+                    length = lastObject.StartTime + excess_length;
+                    break;
+            }
+
+            return AudioManager.Tracks.GetVirtual(length);
         }
 
         /// <summary>
@@ -122,10 +146,40 @@ namespace osu.Game.Beatmaps
 
         public override string ToString() => BeatmapInfo.ToString();
 
-        public bool BeatmapLoaded => beatmap.IsResultAvailable;
-        public IBeatmap Beatmap => beatmap.Value;
+        public bool BeatmapLoaded => beatmapLoadTask?.IsCompleted ?? false;
+
+        public Task<IBeatmap> LoadBeatmapAsync() => (beatmapLoadTask ?? (beatmapLoadTask = Task.Factory.StartNew(() =>
+        {
+            // Todo: Handle cancellation during beatmap parsing
+            var b = GetBeatmap() ?? new Beatmap();
+
+            // The original beatmap version needs to be preserved as the database doesn't contain it
+            BeatmapInfo.BeatmapVersion = b.BeatmapInfo.BeatmapVersion;
+
+            // Use the database-backed info for more up-to-date values (beatmap id, ranked status, etc)
+            b.BeatmapInfo = BeatmapInfo;
+
+            return b;
+        }, beatmapCancellation.Token, TaskCreationOptions.LongRunning, TaskScheduler.Default)));
+
+        public IBeatmap Beatmap
+        {
+            get
+            {
+                try
+                {
+                    return LoadBeatmapAsync().Result;
+                }
+                catch (TaskCanceledException)
+                {
+                    return null;
+                }
+            }
+        }
+
+        private readonly CancellationTokenSource beatmapCancellation = new CancellationTokenSource();
         protected abstract IBeatmap GetBeatmap();
-        private readonly RecyclableLazy<IBeatmap> beatmap;
+        private Task<IBeatmap> beatmapLoadTask;
 
         public bool BackgroundLoaded => background.IsResultAvailable;
         public Texture Background => background.Value;
@@ -150,6 +204,7 @@ namespace osu.Game.Beatmaps
 
         public bool SkinLoaded => skin.IsResultAvailable;
         public Skin Skin => skin.Value;
+
         protected virtual Skin GetSkin() => new DefaultSkin();
         private readonly RecyclableLazy<Skin> skin;
 
@@ -163,19 +218,45 @@ namespace osu.Game.Beatmaps
                 other.track = track;
         }
 
-        public virtual void Dispose()
-        {
-            background.Recycle();
-            waveform.Recycle();
-            storyboard.Recycle();
-            skin.Recycle();
-        }
-
         /// <summary>
         /// Eagerly dispose of the audio track associated with this <see cref="WorkingBeatmap"/> (if any).
         /// Accessing track again will load a fresh instance.
         /// </summary>
-        public void RecycleTrack() => track.Recycle();
+        public virtual void RecycleTrack() => track.Recycle();
+
+        #region Disposal
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        private bool isDisposed;
+
+        protected virtual void Dispose(bool isDisposing)
+        {
+            if (isDisposed)
+                return;
+
+            isDisposed = true;
+
+            // recycling logic is not here for the time being, as components which use
+            // retrieved objects from WorkingBeatmap may not hold a reference to the WorkingBeatmap itself.
+            // this should be fine as each retrieved component do have their own finalizers.
+
+            // cancelling the beatmap load is safe for now since the retrieval is a synchronous
+            // operation. if we add an async retrieval method this may need to be reconsidered.
+            beatmapCancellation.Cancel();
+            total_count.Value--;
+        }
+
+        ~WorkingBeatmap()
+        {
+            Dispose(false);
+        }
+
+        #endregion
 
         public class RecyclableLazy<T>
         {

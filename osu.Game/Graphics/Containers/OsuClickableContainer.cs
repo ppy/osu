@@ -4,11 +4,12 @@
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Cursor;
 using osu.Game.Graphics.UserInterface;
 
 namespace osu.Game.Graphics.Containers
 {
-    public class OsuClickableContainer : ClickableContainer
+    public class OsuClickableContainer : ClickableContainer, IHasTooltip
     {
         private readonly HoverSampleSet sampleSet;
 
@@ -23,12 +24,14 @@ namespace osu.Game.Graphics.Containers
             this.sampleSet = sampleSet;
         }
 
+        public virtual string TooltipText { get; set; }
+
         [BackgroundDependencyLoader]
         private void load()
         {
             if (AutoSizeAxes != Axes.None)
             {
-                content.RelativeSizeAxes = RelativeSizeAxes;
+                content.RelativeSizeAxes = (Axes.Both & ~AutoSizeAxes);
                 content.AutoSizeAxes = AutoSizeAxes;
             }
 

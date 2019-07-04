@@ -53,7 +53,7 @@ namespace osu.Game.Rulesets.UI
         /// <summary>
         /// The playfield.
         /// </summary>
-        public Playfield Playfield => playfield.Value;
+        public override Playfield Playfield => playfield.Value;
 
         /// <summary>
         /// Place to put drawables above hit objects but below UI.
@@ -341,6 +341,11 @@ namespace osu.Game.Rulesets.UI
         /// Whether the game is paused. Used to block user input.
         /// </summary>
         public readonly BindableBool IsPaused = new BindableBool();
+
+        /// <summary>
+        /// The playfield.
+        /// </summary>
+        public abstract Playfield Playfield { get; }
 
         /// <summary>
         /// The frame-stable clock which is being used for playfield display.

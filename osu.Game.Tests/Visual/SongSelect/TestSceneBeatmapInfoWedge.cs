@@ -7,7 +7,6 @@ using JetBrains.Annotations;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Rulesets;
@@ -18,7 +17,6 @@ using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Taiko;
 using osu.Game.Screens.Select;
-using osu.Game.Tests.Beatmaps;
 using osuTK;
 
 namespace osu.Game.Tests.Visual.SongSelect
@@ -49,7 +47,7 @@ namespace osu.Game.Tests.Visual.SongSelect
 
             AddStep("show", () =>
             {
-                infoWedge.State = Visibility.Visible;
+                infoWedge.Show();
                 infoWedge.Beatmap = Beatmap.Value;
             });
 
@@ -58,11 +56,11 @@ namespace osu.Game.Tests.Visual.SongSelect
 
             AddWaitStep("wait for select", 3);
 
-            AddStep("hide", () => { infoWedge.State = Visibility.Hidden; });
+            AddStep("hide", () => { infoWedge.Hide(); });
 
             AddWaitStep("wait for hide", 3);
 
-            AddStep("show", () => { infoWedge.State = Visibility.Visible; });
+            AddStep("show", () => { infoWedge.Show(); });
 
             foreach (var rulesetInfo in rulesets.AvailableRulesets)
             {
@@ -136,7 +134,7 @@ namespace osu.Game.Tests.Visual.SongSelect
             AddStep($"select {b?.Metadata.Title ?? "null"} beatmap", () =>
             {
                 infoBefore = infoWedge.Info;
-                infoWedge.Beatmap = Beatmap.Value = b == null ? Beatmap.Default : new TestWorkingBeatmap(b);
+                infoWedge.Beatmap = Beatmap.Value = b == null ? Beatmap.Default : CreateWorkingBeatmap(b);
             });
 
             AddUntilStep("wait for async load", () => infoWedge.Info != infoBefore);
