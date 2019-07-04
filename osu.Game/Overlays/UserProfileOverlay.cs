@@ -3,6 +3,7 @@
 
 using System.Linq;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -28,6 +29,7 @@ namespace osu.Game.Overlays
         private ProfileSectionsContainer sectionsContainer;
         private ProfileTabControl tabs;
         private ProfileRulesetSelector rulesetSelector;
+        private User currentUser;
 
         public const float CONTENT_X_MARGIN = 70;
 
@@ -38,6 +40,8 @@ namespace osu.Game.Overlays
 
         public void ShowUser(User user, bool fetchOnline = true)
         {
+            currentUser = user;
+
             if (user == User.SYSTEM_USER)
                 return;
 
@@ -155,6 +159,22 @@ namespace osu.Game.Overlays
 
             rulesetSelector.SetDefaultRuleset(rulesets.GetRuleset(user.PlayMode ?? "osu"));
             rulesetSelector.SelectDefaultRuleset();
+            rulesetSelector.Current.BindValueChanged(rulesetChanged);
+        }
+
+        private void rulesetChanged(ValueChangedEvent<RulesetInfo> r)
+        {
+            if (currentUser == User.SYSTEM_USER)
+                return;
+
+            var statsReq = new GetUserRequest(currentUser.Id, r.NewValue);
+            statsReq.Success += updateUserStats;
+            API.Queue(statsReq);
+        }
+
+        private void updateUserStats(User user)
+        {
+            Header.User.Value = user;
         }
 
         private class ProfileTabControl : OverlayTabControl<ProfileSection>
