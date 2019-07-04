@@ -7,7 +7,6 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Timing;
 using osu.Game.Screens.Play;
-using osuTK;
 using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.Gameplay
