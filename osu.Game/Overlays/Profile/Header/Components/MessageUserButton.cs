@@ -53,7 +53,7 @@ namespace osu.Game.Overlays.Profile.Header.Components
                 chatOverlay?.Show();
             };
 
-            User.ValueChanged += e => Content.Alpha = !e.NewValue.PMFriendsOnly && apiProvider.LocalUser.Value.Id != e.NewValue.Id ? 1 : 0;
+            User.ValueChanged += e => Content.Alpha = e.NewValue != null && !e.NewValue.PMFriendsOnly && apiProvider.LocalUser.Value.Id != e.NewValue.Id ? 1 : 0;
         }
     }
 }

@@ -22,63 +22,39 @@ namespace osu.Game.Overlays
         private ProfileSection lastSection;
         private ProfileSection[] sections;
         private GetUserRequest userReq;
-        protected ProfileHeader Header;
-        private ProfileSectionsContainer sectionsContainer;
-        private ProfileTabControl tabs;
+        private readonly ProfileHeader header;
+        private readonly ProfileSectionsContainer sectionsContainer;
+        private readonly ProfileTabControl tabs;
 
         public const float CONTENT_X_MARGIN = 70;
 
-        public void ShowUser(long userId) => ShowUser(new User { Id = userId });
-
-        public void ShowUser(User user, bool fetchOnline = true)
+        public UserProfileOverlay()
         {
-            if (user == User.SYSTEM_USER)
-                return;
-
-            Show();
-
-            if (user.Id == Header?.User.Value?.Id)
-                return;
-
-            userReq?.Cancel();
-            Clear();
-            lastSection = null;
-
-            sections = new ProfileSection[]
+            Children = new Drawable[]
             {
-                //new AboutSection(),
-                new RecentSection(),
-                new RanksSection(),
-                //new MedalsSection(),
-                new HistoricalSection(),
-                new BeatmapsSection(),
-                new KudosuSection()
-            };
-
-            tabs = new ProfileTabControl
-            {
-                RelativeSizeAxes = Axes.X,
-                Anchor = Anchor.TopCentre,
-                Origin = Anchor.TopCentre,
-                Height = 30
-            };
-
-            Add(new Box
-            {
-                RelativeSizeAxes = Axes.Both,
-                Colour = OsuColour.Gray(0.1f)
-            });
-
-            Add(sectionsContainer = new ProfileSectionsContainer
-            {
-                ExpandableHeader = Header = new ProfileHeader(),
-                FixedHeader = tabs,
-                HeaderBackground = new Box
+                new Box
                 {
-                    Colour = OsuColour.Gray(34),
-                    RelativeSizeAxes = Axes.Both
+                    RelativeSizeAxes = Axes.Both,
+                    Colour = OsuColour.Gray(0.1f)
                 },
-            });
+                sectionsContainer = new ProfileSectionsContainer
+                {
+                    ExpandableHeader = header = new ProfileHeader(),
+                    FixedHeader = tabs = new ProfileTabControl
+                    {
+                        RelativeSizeAxes = Axes.X,
+                        Anchor = Anchor.TopCentre,
+                        Origin = Anchor.TopCentre,
+                        Height = 30
+                    },
+                    HeaderBackground = new Box
+                    {
+                        Colour = OsuColour.Gray(34),
+                        RelativeSizeAxes = Axes.Both
+                    },
+                }
+            };
+
             sectionsContainer.SelectedSection.ValueChanged += section =>
             {
                 if (lastSection != section.NewValue)
@@ -104,6 +80,36 @@ namespace osu.Game.Overlays
                     sectionsContainer.ScrollTo(lastSection);
                 }
             };
+        }
+
+        public void ShowUser(long userId) => ShowUser(new User { Id = userId });
+
+        public void ShowUser(User user, bool fetchOnline = true)
+        {
+            if (user == User.SYSTEM_USER) return;
+
+            Show();
+
+            if (user.Id == header.User.Value?.Id)
+                return;
+
+            userReq?.Cancel();
+            lastSection = null;
+
+            sections = new ProfileSection[]
+            {
+                //new AboutSection(),
+                new RecentSection(),
+                new RanksSection(),
+                //new MedalsSection(),
+                new HistoricalSection(),
+                new BeatmapsSection(),
+                new KudosuSection()
+            };
+
+            sectionsContainer.Clear();
+            tabs.Clear();
+            header.User.Value = null;
 
             if (fetchOnline)
             {
@@ -122,7 +128,7 @@ namespace osu.Game.Overlays
 
         private void userLoadComplete(User user)
         {
-            Header.User.Value = user;
+            header.User.Value = user;
 
             if (user.ProfileOrder != null)
             {

@@ -19,7 +19,7 @@ namespace osu.Game.Tests.Visual.Online
     [TestFixture]
     public class TestSceneUserProfileOverlay : OsuTestScene
     {
-        private readonly TestUserProfileOverlay profile;
+        private readonly UserProfileOverlay profile;
 
         [Resolved]
         private IAPIProvider api { get; set; }
@@ -30,7 +30,8 @@ namespace osu.Game.Tests.Visual.Online
             typeof(RankGraph),
             typeof(LineGraph),
             typeof(SectionsContainer<>),
-            typeof(SupporterIcon)
+            typeof(SupporterIcon),
+            typeof(UserProfileOverlay)
         };
 
         public static readonly User TEST_USER = new User
@@ -73,7 +74,7 @@ namespace osu.Game.Tests.Visual.Online
 
         public TestSceneUserProfileOverlay()
         {
-            Add(profile = new TestUserProfileOverlay());
+            Add(profile = new UserProfileOverlay());
         }
 
         protected override void LoadComplete()
@@ -107,11 +108,6 @@ namespace osu.Game.Tests.Visual.Online
 
             AddStep("Hide", profile.Hide);
             AddStep("Show without reload", profile.Show);
-        }
-
-        private class TestUserProfileOverlay : UserProfileOverlay
-        {
-            public new ProfileHeader Header => base.Header;
         }
     }
 }
