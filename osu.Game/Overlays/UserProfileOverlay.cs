@@ -165,8 +165,14 @@ namespace osu.Game.Overlays
         private void rulesetChanged(ValueChangedEvent<RulesetInfo> r)
         {
             var statsReq = new GetUserRequest(currentUser.Id, r.NewValue);
-            statsReq.Success += user => Header.UpdateStatistics(user);
+            statsReq.Success += user =>
+            {
+                Header.UpdateStatistics(user);
+                Header.IsLoading = false;
+            };
             API.Queue(statsReq);
+
+            Header.IsLoading = true;
         }
 
         private class ProfileTabControl : OverlayTabControl<ProfileSection>

@@ -12,6 +12,7 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays.Profile.Header;
 using osu.Game.Users;
+using osuTK.Graphics;
 
 namespace osu.Game.Overlays.Profile
 {
@@ -24,6 +25,30 @@ namespace osu.Game.Overlays.Profile
         private TopHeaderContainer topHeaderContainer;
         private CentreHeaderContainer centreHeaderContainer;
         private DetailHeaderContainer detailHeaderContainer;
+        private LoadingAnimation loadingAnimation;
+        private Box fadeBox;
+
+        private bool isLoading;
+
+        public bool IsLoading
+        {
+            get => isLoading;
+            set
+            {
+                if (isLoading == value)
+                    return;
+
+                isLoading = value;
+
+                fadeBox.FadeTo(value ? 1 : 0, 200, Easing.OutQuint);
+
+                if (value)
+                    loadingAnimation.Show();
+                else
+                    loadingAnimation.Hide();
+
+            }
+        }
 
         public ProfileHeader()
         {
@@ -59,38 +84,53 @@ namespace osu.Game.Overlays.Profile
                 }
             };
 
-        protected override Drawable CreateContent() => new FillFlowContainer
+        protected override Drawable CreateContent() => new Container
         {
             RelativeSizeAxes = Axes.X,
             AutoSizeAxes = Axes.Y,
-            Direction = FillDirection.Vertical,
             Children = new Drawable[]
             {
-                topHeaderContainer = new TopHeaderContainer
+                new FillFlowContainer()
                 {
                     RelativeSizeAxes = Axes.X,
-                    User = { BindTarget = User },
+                    AutoSizeAxes = Axes.Y,
+                    Direction = FillDirection.Vertical,
+                    Children = new Drawable[]
+                    {
+                        topHeaderContainer = new TopHeaderContainer
+                        {
+                            RelativeSizeAxes = Axes.X,
+                            User = { BindTarget = User },
+                        },
+                        centreHeaderContainer = new CentreHeaderContainer
+                        {
+                            RelativeSizeAxes = Axes.X,
+                            User = { BindTarget = User },
+                        },
+                        detailHeaderContainer = new DetailHeaderContainer
+                        {
+                            RelativeSizeAxes = Axes.X,
+                            User = { BindTarget = User },
+                        },
+                        new MedalHeaderContainer
+                        {
+                            RelativeSizeAxes = Axes.X,
+                            User = { BindTarget = User },
+                        },
+                        new BottomHeaderContainer
+                        {
+                            RelativeSizeAxes = Axes.X,
+                            User = { BindTarget = User },
+                        },
+                    }
                 },
-                centreHeaderContainer = new CentreHeaderContainer
+                fadeBox = new Box
                 {
-                    RelativeSizeAxes = Axes.X,
-                    User = { BindTarget = User },
+                    RelativeSizeAxes = Axes.Both,
+                    Colour = Color4.Black.Opacity(0.5f),
+                    Alpha = 0,
                 },
-                detailHeaderContainer = new DetailHeaderContainer
-                {
-                    RelativeSizeAxes = Axes.X,
-                    User = { BindTarget = User },
-                },
-                new MedalHeaderContainer
-                {
-                    RelativeSizeAxes = Axes.X,
-                    User = { BindTarget = User },
-                },
-                new BottomHeaderContainer
-                {
-                    RelativeSizeAxes = Axes.X,
-                    User = { BindTarget = User },
-                },
+                loadingAnimation = new LoadingAnimation()
             }
         };
 
