@@ -3,7 +3,6 @@
 
 using System;
 using osu.Framework.Lists;
-using osu.Framework.Timing;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets;
 using osu.Game.Screens.Play;
@@ -24,7 +23,9 @@ namespace osu.Game.Tests.Visual.Gameplay
                 GC.WaitForPendingFinalizers();
                 int count = 0;
 
-                workingWeakReferences.ForEachAlive(_ => count++);
+                foreach (var unused in workingWeakReferences)
+                    count++;
+
                 return count == 1;
             });
 
@@ -34,14 +35,16 @@ namespace osu.Game.Tests.Visual.Gameplay
                 GC.WaitForPendingFinalizers();
                 int count = 0;
 
-                playerWeakReferences.ForEachAlive(_ => count++);
+                foreach (var unused in playerWeakReferences)
+                    count++;
+
                 return count == 1;
             });
         }
 
-        protected override WorkingBeatmap CreateWorkingBeatmap(IBeatmap beatmap, IFrameBasedClock clock)
+        protected override WorkingBeatmap CreateWorkingBeatmap(IBeatmap beatmap)
         {
-            var working = base.CreateWorkingBeatmap(beatmap, clock);
+            var working = base.CreateWorkingBeatmap(beatmap);
             workingWeakReferences.Add(working);
             return working;
         }

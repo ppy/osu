@@ -12,6 +12,7 @@ using osu.Framework.Graphics.Shapes;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Input.Events;
+using osu.Game.Rulesets;
 
 namespace osu.Game.Overlays.Toolbar
 {
@@ -23,6 +24,7 @@ namespace osu.Game.Overlays.Toolbar
         public Action OnHome;
 
         private ToolbarUserButton userButton;
+        private ToolbarRulesetSelector rulesetSelector;
 
         protected override bool BlockPositionalInput => false;
 
@@ -40,7 +42,7 @@ namespace osu.Game.Overlays.Toolbar
         }
 
         [BackgroundDependencyLoader(true)]
-        private void load(OsuGame osuGame)
+        private void load(OsuGame osuGame, Bindable<RulesetInfo> parentRuleset)
         {
             Children = new Drawable[]
             {
@@ -57,7 +59,7 @@ namespace osu.Game.Overlays.Toolbar
                         {
                             Action = () => OnHome?.Invoke()
                         },
-                        new ToolbarRulesetSelector()
+                        rulesetSelector = new ToolbarRulesetSelector()
                     }
                 },
                 new FillFlowContainer
@@ -69,6 +71,7 @@ namespace osu.Game.Overlays.Toolbar
                     AutoSizeAxes = Axes.X,
                     Children = new Drawable[]
                     {
+                        new ToolbarChangelogButton(),
                         new ToolbarDirectButton(),
                         new ToolbarChatButton(),
                         new ToolbarSocialButton(),
@@ -83,10 +86,13 @@ namespace osu.Game.Overlays.Toolbar
                 }
             };
 
-            StateChanged += visibility =>
+            // Bound after the selector is added to the hierarchy to give it a chance to load the available rulesets
+            rulesetSelector.Current.BindTo(parentRuleset);
+
+            State.ValueChanged += visibility =>
             {
                 if (overlayActivationMode.Value == OverlayActivation.Disabled)
-                    State = Visibility.Hidden;
+                    Hide();
             };
 
             if (osuGame != null)

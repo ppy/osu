@@ -10,6 +10,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.MathUtils;
+using osu.Game.Graphics.Sprites;
 using osu.Game.Online.Chat;
 using osu.Game.Overlays.Chat.Tabs;
 using osu.Game.Users;
@@ -61,7 +62,7 @@ namespace osu.Game.Tests.Visual.Online
                 Anchor = Anchor.TopLeft,
                 Children = new Drawable[]
                 {
-                    currentText = new SpriteText
+                    currentText = new OsuSpriteText
                     {
                         Text = "Currently selected channel:"
                     }
