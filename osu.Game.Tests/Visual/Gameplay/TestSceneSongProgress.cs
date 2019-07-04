@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Collections.Generic;
 using NUnit.Framework;
 using osu.Framework.Allocation;
@@ -15,6 +16,11 @@ namespace osu.Game.Tests.Visual.Gameplay
     [TestFixture]
     public class TestSceneSongProgress : OsuTestScene
     {
+        public override IReadOnlyList<Type> RequiredTypes => new[]
+        {
+            typeof(SongProgressBar),
+        };
+
         private readonly SongProgress progress;
         private readonly TestSongProgressGraph graph;
 
@@ -46,24 +52,26 @@ namespace osu.Game.Tests.Visual.Gameplay
                 Origin = Anchor.TopLeft,
             });
 
-            AddWaitStep("wait some", 5);
             AddAssert("ensure not created", () => graph.CreationCount == 0);
 
             AddStep("display values", displayNewValues);
-            AddWaitStep("wait some", 5);
             AddUntilStep("wait for creation count", () => graph.CreationCount == 1);
 
             AddStep("Toggle Bar", () => progress.AllowSeeking = !progress.AllowSeeking);
-            AddWaitStep("wait some", 5);
             AddUntilStep("wait for creation count", () => graph.CreationCount == 1);
 
             AddStep("Toggle Bar", () => progress.AllowSeeking = !progress.AllowSeeking);
-            AddWaitStep("wait some", 5);
             AddUntilStep("wait for creation count", () => graph.CreationCount == 1);
             AddRepeatStep("New Values", displayNewValues, 5);
 
             AddWaitStep("wait some", 5);
             AddAssert("ensure debounced", () => graph.CreationCount == 2);
+
+            AddStep("hide graph", () => progress.CollapseGraph.Value = true);
+            AddStep("show graph", () => progress.CollapseGraph.Value = false);
+
+            AddStep("start", clock.Start);
+            AddStep("pause", clock.Stop);
         }
 
         private void displayNewValues()

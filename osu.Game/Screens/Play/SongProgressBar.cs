@@ -18,6 +18,7 @@ namespace osu.Game.Screens.Play
 
         private readonly Box fill;
         private readonly Container handleBase;
+        private readonly Container handleContainer;
 
         public Color4 FillColour
         {
@@ -73,7 +74,6 @@ namespace osu.Game.Screens.Play
                     Origin = Anchor.BottomLeft,
                     Anchor = Anchor.BottomLeft,
                     Width = 2,
-                    Height = barHeight + handleBarHeight,
                     Colour = Color4.White,
                     Position = new Vector2(2, 0),
                     Children = new Drawable[]
@@ -83,7 +83,7 @@ namespace osu.Game.Screens.Play
                             Name = "HandleBar box",
                             RelativeSizeAxes = Axes.Both,
                         },
-                        new Container
+                        handleContainer = new Container
                         {
                             Name = "Handle container",
                             Origin = Anchor.BottomCentre,
@@ -115,6 +115,7 @@ namespace osu.Game.Screens.Play
         {
             base.Update();
 
+            handleBase.Height = Height - handleContainer.Height;
             float newX = (float)Interpolation.Lerp(handleBase.X, NormalizedValue * UsableWidth, MathHelper.Clamp(Time.Elapsed / 40, 0, 1));
 
             fill.Width = newX;
