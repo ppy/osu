@@ -264,8 +264,6 @@ namespace osu.Game.Screens.Select
             sampleChangeBeatmap = audio.Samples.Get(@"SongSelect/select-expand");
             SampleConfirm = audio.Samples.Get(@"SongSelect/confirm-selection");
 
-            Carousel.LoadBeatmapSetsFromManager(this.beatmaps);
-
             if (dialogOverlay != null)
             {
                 Schedule(() =>

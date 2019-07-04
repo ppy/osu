@@ -29,6 +29,8 @@ namespace osu.Game.Graphics.Containers
 
         protected override Container<Drawable> Content => contentContainer;
 
+        protected override bool StartHidden => true;
+
         public Color4 FirstWaveColour
         {
             get => firstWave.Colour;
@@ -95,6 +97,7 @@ namespace osu.Game.Graphics.Containers
             AddInternal(contentContainer = new Container
             {
                 RelativeSizeAxes = Axes.Both,
+                RelativePositionAxes = Axes.Both,
                 Anchor = Anchor.BottomCentre,
                 Origin = Anchor.BottomCentre,
             });
@@ -105,21 +108,15 @@ namespace osu.Game.Graphics.Containers
             foreach (var w in wavesContainer.Children)
                 w.Show();
 
-            this.FadeIn(100, Easing.OutQuint);
             contentContainer.MoveToY(0, APPEAR_DURATION, Easing.OutQuint);
-
-            this.FadeIn(100, Easing.OutQuint);
         }
 
         protected override void PopOut()
         {
-            this.FadeOut(DISAPPEAR_DURATION, Easing.InQuint);
-            contentContainer.MoveToY(DrawHeight * 2f, DISAPPEAR_DURATION, Easing.In);
-
             foreach (var w in wavesContainer.Children)
                 w.Hide();
 
-            this.FadeOut(DISAPPEAR_DURATION, Easing.InQuint);
+            contentContainer.MoveToY(2, DISAPPEAR_DURATION, Easing.In);
         }
 
         protected override void UpdateAfterChildren()
@@ -128,7 +125,8 @@ namespace osu.Game.Graphics.Containers
 
             // This is done as an optimization, such that invisible parts of the waves
             // are masked away, and thus do not consume fill rate.
-            wavesContainer.Height = Math.Max(0, DrawHeight - (contentContainer.DrawHeight - contentContainer.Y));
+            // todo: revert https://github.com/ppy/osu/commit/aff9e3617da0c8fe252169fae287e39b44575b5e after FTB is fixed on iOS.
+            wavesContainer.Height = Math.Max(0, DrawHeight - (contentContainer.DrawHeight - contentContainer.Y * DrawHeight));
         }
 
         private class Wave : VisibilityContainer
