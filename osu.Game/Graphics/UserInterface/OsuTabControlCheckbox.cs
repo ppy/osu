@@ -37,6 +37,8 @@ namespace osu.Game.Graphics.UserInterface
                     text.Colour = AccentColour;
                     icon.Colour = AccentColour;
                 }
+
+                updateFade();
             }
         }
 
@@ -48,28 +50,22 @@ namespace osu.Game.Graphics.UserInterface
 
         private const float transition_length = 500;
 
-        private void fadeIn()
+        private void updateFade()
         {
-            box.FadeIn(transition_length, Easing.OutQuint);
-            text.FadeColour(Color4.White, transition_length, Easing.OutQuint);
-        }
-
-        private void fadeOut()
-        {
-            box.FadeOut(transition_length, Easing.OutQuint);
-            text.FadeColour(AccentColour, transition_length, Easing.OutQuint);
+            box.FadeTo(IsHovered ? 1 : 0, transition_length, Easing.OutQuint);
+            text.FadeColour(IsHovered ? Color4.White : AccentColour, transition_length, Easing.OutQuint);
         }
 
         protected override bool OnHover(HoverEvent e)
         {
-            fadeIn();
+            updateFade();
             return base.OnHover(e);
         }
 
         protected override void OnHoverLost(HoverLostEvent e)
         {
             if (!Current.Value)
-                fadeOut();
+                updateFade();
 
             base.OnHoverLost(e);
         }
@@ -117,16 +113,7 @@ namespace osu.Game.Graphics.UserInterface
 
             Current.ValueChanged += selected =>
             {
-                if (selected.NewValue)
-                {
-                    fadeIn();
-                    icon.Icon = FontAwesome.Regular.CheckCircle;
-                }
-                else
-                {
-                    fadeOut();
-                    icon.Icon = FontAwesome.Regular.Circle;
-                }
+                icon.Icon = selected.NewValue ? FontAwesome.Regular.CheckCircle : FontAwesome.Regular.Circle;
             };
         }
     }
