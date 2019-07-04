@@ -35,13 +35,16 @@ namespace osu.Game.Screens.Menu
 
         private readonly BindableDouble exitingVolumeFade = new BindableDouble(1);
 
+        [Resolved]
+        private AudioManager audio { get; set; }
+
         private Bindable<bool> menuVoice;
         private Bindable<bool> menuMusic;
         private Track track;
         private WorkingBeatmap introBeatmap;
 
         [BackgroundDependencyLoader]
-        private void load(AudioManager audio, OsuConfigManager config, BeatmapManager beatmaps, Framework.Game game)
+        private void load(OsuConfigManager config, BeatmapManager beatmaps, Framework.Game game)
         {
             menuVoice = config.GetBindable<bool>(OsuSetting.MenuVoice);
             menuMusic = config.GetBindable<bool>(OsuSetting.MenuMusic);
@@ -74,8 +77,6 @@ namespace osu.Game.Screens.Menu
 
             welcome = audio.Samples.Get(@"welcome");
             seeya = audio.Samples.Get(@"seeya");
-
-            audio.AddAdjustment(AdjustableProperty.Volume, exitingVolumeFade);
         }
 
         private const double delay_step_one = 2300;
@@ -165,6 +166,7 @@ namespace osu.Game.Screens.Menu
             else
                 fadeOutTime = 500;
 
+            audio.AddAdjustment(AdjustableProperty.Volume, exitingVolumeFade);
             this.TransformBindableTo(exitingVolumeFade, 0, fadeOutTime).OnComplete(_ => this.Exit());
 
             //don't want to fade out completely else we will stop running updates.
