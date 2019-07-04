@@ -173,17 +173,22 @@ namespace osu.Game.Overlays.Profile.Header
             titleText.Text = user?.Title ?? string.Empty;
             titleText.Colour = OsuColour.FromHex(user?.Colour ?? "fff");
 
+            UpdateStatistics(user?.Statistics);
+        }
+
+        public void UpdateStatistics(UserStatistics statistics)
+        {
             userStats.Clear();
 
-            if (user?.Statistics != null)
+            if (statistics != null)
             {
-                userStats.Add(new UserStatsLine("Ranked Score", user.Statistics.RankedScore.ToString("#,##0")));
-                userStats.Add(new UserStatsLine("Hit Accuracy", Math.Round(user.Statistics.Accuracy, 2).ToString("#0.00'%'")));
-                userStats.Add(new UserStatsLine("Play Count", user.Statistics.PlayCount.ToString("#,##0")));
-                userStats.Add(new UserStatsLine("Total Score", user.Statistics.TotalScore.ToString("#,##0")));
-                userStats.Add(new UserStatsLine("Total Hits", user.Statistics.TotalHits.ToString("#,##0")));
-                userStats.Add(new UserStatsLine("Maximum Combo", user.Statistics.MaxCombo.ToString("#,##0")));
-                userStats.Add(new UserStatsLine("Replays Watched by Others", user.Statistics.ReplaysWatched.ToString("#,##0")));
+                userStats.Add(new UserStatsLine("Ranked Score", statistics.RankedScore.ToString("#,##0")));
+                userStats.Add(new UserStatsLine("Hit Accuracy", Math.Round(statistics.Accuracy, 2).ToString("#0.00'%'")));
+                userStats.Add(new UserStatsLine("Play Count", statistics.PlayCount.ToString("#,##0")));
+                userStats.Add(new UserStatsLine("Total Score", statistics.TotalScore.ToString("#,##0")));
+                userStats.Add(new UserStatsLine("Total Hits", statistics.TotalHits.ToString("#,##0")));
+                userStats.Add(new UserStatsLine("Maximum Combo", statistics.MaxCombo.ToString("#,##0")));
+                userStats.Add(new UserStatsLine("Replays Watched by Others", statistics.ReplaysWatched.ToString("#,##0")));
             }
         }
 

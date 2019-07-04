@@ -21,6 +21,7 @@ namespace osu.Game.Overlays.Profile
 
         public Bindable<User> User = new Bindable<User>();
 
+        private TopHeaderContainer topHeaderContainer;
         private CentreHeaderContainer centreHeaderContainer;
         private DetailHeaderContainer detailHeaderContainer;
 
@@ -65,7 +66,7 @@ namespace osu.Game.Overlays.Profile
             Direction = FillDirection.Vertical,
             Children = new Drawable[]
             {
-                new TopHeaderContainer
+                topHeaderContainer = new TopHeaderContainer
                 {
                     RelativeSizeAxes = Axes.X,
                     User = { BindTarget = User },
@@ -92,6 +93,13 @@ namespace osu.Game.Overlays.Profile
                 },
             }
         };
+
+        public void UpdateStatistics(User user)
+        {
+            topHeaderContainer.UpdateStatistics(user.Statistics);
+            centreHeaderContainer.UpdateStatistics(user.Statistics);
+            detailHeaderContainer.UpdateDisplay(user);
+        }
 
         protected override ScreenTitle CreateTitle() => new ProfileHeaderTitle();
 

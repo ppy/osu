@@ -21,6 +21,8 @@ namespace osu.Game.Overlays.Profile.Header
 
         private OverlinedInfoContainer hiddenDetailGlobal;
         private OverlinedInfoContainer hiddenDetailCountry;
+        private LevelProgressBar progressBar;
+        private LevelBadge levelBadge;
 
         public CentreHeaderContainer()
         {
@@ -84,7 +86,7 @@ namespace osu.Game.Overlays.Profile.Header
                     Margin = new MarginPadding { Right = UserProfileOverlay.CONTENT_X_MARGIN },
                     Children = new Drawable[]
                     {
-                        new LevelBadge
+                        levelBadge = new LevelBadge
                         {
                             Anchor = Anchor.CentreRight,
                             Origin = Anchor.CentreRight,
@@ -98,7 +100,7 @@ namespace osu.Game.Overlays.Profile.Header
                             Width = 200,
                             Height = 6,
                             Margin = new MarginPadding { Right = 50 },
-                            Child = new LevelProgressBar
+                            Child = progressBar = new LevelProgressBar
                             {
                                 RelativeSizeAxes = Axes.Both,
                                 User = { BindTarget = User }
@@ -138,13 +140,15 @@ namespace osu.Game.Overlays.Profile.Header
                 expandedDetailContainer.FadeTo(visible.NewValue ? 1 : 0, 200, Easing.OutQuint);
             });
 
-            User.BindValueChanged(user => updateDisplay(user.NewValue));
+            User.BindValueChanged(user => UpdateStatistics(user.NewValue?.Statistics));
         }
 
-        private void updateDisplay(User user)
+        public void UpdateStatistics(UserStatistics statistics)
         {
-            hiddenDetailGlobal.Content = user?.Statistics?.Ranks.Global?.ToString("\\##,##0") ?? "-";
-            hiddenDetailCountry.Content = user?.Statistics?.Ranks.Country?.ToString("\\##,##0") ?? "-";
+            hiddenDetailGlobal.Content = statistics?.Ranks.Global?.ToString("\\##,##0") ?? "-";
+            hiddenDetailCountry.Content = statistics?.Ranks.Country?.ToString("\\##,##0") ?? "-";
+            progressBar.UpdateProgress(statistics);
+            levelBadge.UpdateLevel(statistics);
         }
     }
 }

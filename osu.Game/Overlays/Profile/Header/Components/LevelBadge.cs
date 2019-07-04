@@ -46,12 +46,12 @@ namespace osu.Game.Overlays.Profile.Header.Components
                 }
             };
 
-            User.BindValueChanged(user => updateLevel(user.NewValue));
+            User.BindValueChanged(user => UpdateLevel(user.NewValue?.Statistics));
         }
 
-        private void updateLevel(User user)
+        public void UpdateLevel(UserStatistics statistics)
         {
-            levelText.Text = user?.Statistics?.Level.Current.ToString() ?? "0";
+            levelText.Text = statistics?.Level.Current.ToString() ?? "0";
         }
     }
 }
