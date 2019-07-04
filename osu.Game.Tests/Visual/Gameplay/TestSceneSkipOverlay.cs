@@ -31,7 +31,7 @@ namespace osu.Game.Tests.Visual.Gameplay
                 },
                 Children = new Drawable[]
                 {
-                    skip = new SkipOverlay(5000)
+                    skip = new SkipOverlay(6000)
                     {
                         RequestSeek = _ => requestCount++
                     }
@@ -42,11 +42,12 @@ namespace osu.Game.Tests.Visual.Gameplay
         [Test]
         public void TestFadeOnIdle()
         {
-            AddStep("move mouse", () => InputManager.MoveMouseTo(Vector2.Zero));
-            AddUntilStep("wait for fade", () => skip.Children.First().Alpha == 0);
+            AddUntilStep("fully visible", () => skip.Children.First().Alpha == 1);
+            AddUntilStep("wait for fade", () => skip.Children.First().Alpha < 1);
+
             AddStep("move mouse", () => InputManager.MoveMouseTo(skip.ScreenSpaceDrawQuad.Centre));
-            AddUntilStep("visible again", () => skip.Children.First().Alpha > 0);
-            AddUntilStep("wait for fade", () => skip.Children.First().Alpha == 0);
+            AddUntilStep("fully visible", () => skip.Children.First().Alpha == 1);
+            AddUntilStep("wait for fade", () => skip.Children.First().Alpha < 1);
         }
 
         [Test]
