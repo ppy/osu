@@ -3,6 +3,7 @@
 
 using System.Collections.Generic;
 using osu.Game.Online.API.Requests.Responses;
+using osu.Game.Rulesets;
 
 namespace osu.Game.Online.API.Requests
 {
@@ -11,16 +12,18 @@ namespace osu.Game.Online.API.Requests
         private readonly long userId;
         private readonly ScoreType type;
         private readonly int offset;
+        private readonly RulesetInfo ruleset;
 
-        public GetUserScoresRequest(long userId, ScoreType type, int offset = 0)
+        public GetUserScoresRequest(long userId, ScoreType type, int offset = 0, RulesetInfo ruleset = null)
         {
             this.userId = userId;
             this.type = type;
             this.offset = offset;
+            this.ruleset = ruleset;
         }
 
         // ReSharper disable once ImpureMethodCallOnReadonlyValueField
-        protected override string Target => $@"users/{userId}/scores/{type.ToString().ToLowerInvariant()}?offset={offset}";
+        protected override string Target => $@"users/{userId}/scores/{type.ToString().ToLowerInvariant()}?offset={offset}{(ruleset != null ? "&mode=" + ruleset.ShortName : "")}";
     }
 
     public enum ScoreType
