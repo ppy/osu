@@ -33,7 +33,7 @@ namespace osu.Game.Online.API.Requests.Responses
         [JsonProperty("versions")]
         public VersionNavigation Versions { get; set; }
 
-        public object Url => $"https://osu.ppy.sh/home/changelog/{UpdateStream.Name}/{Version}";
+        public string Url => $"https://osu.ppy.sh/home/changelog/{UpdateStream.Name}/{Version}";
 
         public class VersionNavigation
         {
