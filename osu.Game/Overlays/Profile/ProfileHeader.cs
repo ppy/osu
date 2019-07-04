@@ -46,7 +46,6 @@ namespace osu.Game.Overlays.Profile
                     loadingAnimation.Show();
                 else
                     loadingAnimation.Hide();
-
             }
         }
 
@@ -90,7 +89,7 @@ namespace osu.Game.Overlays.Profile
             AutoSizeAxes = Axes.Y,
             Children = new Drawable[]
             {
-                new FillFlowContainer()
+                new FillFlowContainer
                 {
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
