@@ -30,6 +30,11 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
             ItemsPerPage = 5;
 
             ItemsContainer.Direction = FillDirection.Vertical;
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
 
             Ruleset.BindValueChanged(rulesetChanged);
         }
