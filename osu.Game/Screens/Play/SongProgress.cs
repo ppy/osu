@@ -107,7 +107,7 @@ namespace osu.Game.Screens.Play
             if (clock != null)
                 gameplayClock = clock;
 
-            config.BindWith(OsuSetting.CollapseProgressGraph, CollapseGraph);
+            config.BindWith(OsuSetting.ShowProgressGraph, CollapseGraph);
 
             graph.FillColour = bar.FillColour = colours.BlueLighter;
         }
