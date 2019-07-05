@@ -176,7 +176,7 @@ namespace osu.Game.Database
             // TODO: Add a check to prevent files from storage to be deleted.
             try
             {
-                if (import != null && File.Exists(path) && ShouldRemoveArchive(path))
+                if (import != null && File.Exists(path) && ShouldDeleteArchive(path))
                     File.Delete(path);
             }
             catch (Exception e)
@@ -504,9 +504,11 @@ namespace osu.Game.Database
         protected abstract IEnumerable<string> GetStableImportPaths();
 
         /// <summary>
-        /// Should this archive be removed after importing?
+        /// Whether this specified path should be removed after successful import.
         /// </summary>
-        protected virtual bool ShouldRemoveArchive(string path) => false;
+        /// <param name="path">The path for consideration. May be a file or a directory.</param>
+        /// <returns>Whether to perform deletion.</returns>
+        protected virtual bool ShouldDeleteArchive(string path) => false;
 
         /// <summary>
         /// This is a temporary method and will likely be replaced by a full-fledged (and more correctly placed) migration process in the future.
