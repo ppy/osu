@@ -25,7 +25,7 @@ namespace osu.Game.Scoring
 
         protected override string[] HashableFileTypes => new[] { ".osr" };
 
-        protected override string ImportFromStablePath => @"Data\r";
+        protected override string ImportFromStablePath => Path.Combine("Data", "r");
 
         private readonly RulesetStore rulesets;
         private readonly Func<BeatmapManager> beatmaps;
