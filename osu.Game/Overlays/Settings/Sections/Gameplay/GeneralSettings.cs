@@ -36,8 +36,8 @@ namespace osu.Game.Overlays.Settings.Sections.Gameplay
                 },
                 new SettingsCheckbox
                 {
-                    LabelText = "Collapse song progress graph",
-                    Bindable = config.GetBindable<bool>(OsuSetting.CollapseProgressGraph)
+                    LabelText = "Show difficulty graph on progress bar",
+                    Bindable = config.GetBindable<bool>(OsuSetting.ShowProgressGraph)
                 },
                 new SettingsCheckbox
                 {
