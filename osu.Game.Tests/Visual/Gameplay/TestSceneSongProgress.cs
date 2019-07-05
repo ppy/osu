@@ -6,9 +6,12 @@ using System.Collections.Generic;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Shapes;
 using osu.Framework.MathUtils;
 using osu.Framework.Testing;
 using osu.Framework.Timing;
+using osu.Game.Graphics;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Screens.Play;
 
@@ -24,6 +27,7 @@ namespace osu.Game.Tests.Visual.Gameplay
 
         private SongProgress progress;
         private TestSongProgressGraph graph;
+        private readonly Container progressContainer;
 
         private readonly StopwatchClock clock;
         private readonly FramedClock framedClock;
@@ -35,6 +39,20 @@ namespace osu.Game.Tests.Visual.Gameplay
         {
             clock = new StopwatchClock();
             gameplayClock = new GameplayClock(framedClock = new FramedClock(clock));
+
+            Add(progressContainer = new Container
+            {
+                RelativeSizeAxes = Axes.X,
+                Anchor = Anchor.BottomCentre,
+                Origin = Anchor.BottomCentre,
+                Height = 100,
+                Y = -100,
+                Child = new Box
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Colour = OsuColour.Gray(1),
+                }
+            });
         }
 
         [SetUpSteps]
@@ -48,7 +66,7 @@ namespace osu.Game.Tests.Visual.Gameplay
                     progress = null;
                 }
 
-                Add(progress = new SongProgress
+                progressContainer.Add(progress = new SongProgress
                 {
                     RelativeSizeAxes = Axes.X,
                     Anchor = Anchor.BottomLeft,
@@ -91,6 +109,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         public void TestDisplay()
         {
             AddStep("display max values", displayMaxValues);
+            AddUntilStep("wait for graph", () => graph.CreationCount == 1);
             AddStep("start", clock.Start);
             AddStep("show bar", () => progress.AllowSeeking = true);
             AddStep("hide graph", () => progress.CollapseGraph.Value = true);
