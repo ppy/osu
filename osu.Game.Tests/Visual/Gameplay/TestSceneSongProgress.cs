@@ -112,10 +112,10 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddUntilStep("wait for graph", () => graph.CreationCount == 1);
             AddStep("start", clock.Start);
             AddStep("show bar", () => progress.AllowSeeking.Value = true);
-            AddStep("hide graph", () => progress.CollapseGraph.Value = true);
+            AddStep("hide graph", () => progress.ShowGraph.Value = false);
             AddStep("hide Bar", () => progress.AllowSeeking.Value = false);
             AddStep("show bar", () => progress.AllowSeeking.Value = true);
-            AddStep("show graph", () => progress.CollapseGraph.Value = false);
+            AddStep("show graph", () => progress.ShowGraph.Value = true);
             AddStep("stop", clock.Stop);
         }
 
