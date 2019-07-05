@@ -114,7 +114,8 @@ namespace osu.Game.Database
 
                     lock (imported)
                     {
-                        imported.Add(model);
+                        if (model != null)
+                            imported.Add(model);
                         current++;
 
                         notification.Text = $"Imported {current} of {paths.Length} {HumanisedModelName}s";
@@ -140,7 +141,7 @@ namespace osu.Game.Database
             {
                 notification.CompletionText = imported.Count == 1
                     ? $"Imported {imported.First()}!"
-                    : $"Imported {current} {HumanisedModelName}s!";
+                    : $"Imported {imported.Count} {HumanisedModelName}s!";
 
                 if (imported.Count > 0 && PresentImport != null)
                 {
