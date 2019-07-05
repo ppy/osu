@@ -50,33 +50,6 @@ namespace osu.Game.Graphics.UserInterface
 
         private const float transition_length = 500;
 
-        private void updateFade()
-        {
-            box.FadeTo(IsHovered ? 1 : 0, transition_length, Easing.OutQuint);
-            text.FadeColour(IsHovered ? Color4.White : AccentColour, transition_length, Easing.OutQuint);
-        }
-
-        protected override bool OnHover(HoverEvent e)
-        {
-            updateFade();
-            return base.OnHover(e);
-        }
-
-        protected override void OnHoverLost(HoverLostEvent e)
-        {
-            if (!Current.Value)
-                updateFade();
-
-            base.OnHoverLost(e);
-        }
-
-        [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
-        {
-            if (accentColour == null)
-                AccentColour = colours.Blue;
-        }
-
         public OsuTabControlCheckbox()
         {
             AutoSizeAxes = Axes.Both;
@@ -111,10 +84,34 @@ namespace osu.Game.Graphics.UserInterface
                 }
             };
 
-            Current.ValueChanged += selected =>
-            {
-                icon.Icon = selected.NewValue ? FontAwesome.Regular.CheckCircle : FontAwesome.Regular.Circle;
-            };
+            Current.ValueChanged += selected => { icon.Icon = selected.NewValue ? FontAwesome.Regular.CheckCircle : FontAwesome.Regular.Circle; };
+        }
+
+        [BackgroundDependencyLoader]
+        private void load(OsuColour colours)
+        {
+            if (accentColour == null)
+                AccentColour = colours.Blue;
+        }
+
+        protected override bool OnHover(HoverEvent e)
+        {
+            updateFade();
+            return base.OnHover(e);
+        }
+
+        protected override void OnHoverLost(HoverLostEvent e)
+        {
+            if (!Current.Value)
+                updateFade();
+
+            base.OnHoverLost(e);
+        }
+
+        private void updateFade()
+        {
+            box.FadeTo(IsHovered ? 1 : 0, transition_length, Easing.OutQuint);
+            text.FadeColour(IsHovered ? Color4.White : AccentColour, transition_length, Easing.OutQuint);
         }
     }
 }
