@@ -54,14 +54,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             foreach (var s in Enum.GetValues(typeof(ButtonSystemState)).OfType<ButtonSystemState>().Skip(1))
                 AddStep($"State to {s}", () => buttons.State = s);
 
-            AddStep("Enter mode", () =>
-            {
-                buttons.State = ButtonSystemState.EnteringMode;
-                buttons.FadeOut(MainMenu.FADE_OUT_DURATION, Easing.InSine);
-                buttons.MoveTo(new Vector2(-800, 0), MainMenu.FADE_OUT_DURATION, Easing.InSine);
-                logo.FadeOut(300, Easing.InSine)
-                    .ScaleTo(0.2f, 300, Easing.InSine);
-            });
+            AddStep("Enter mode", performEnterMode);
 
             AddStep("Return to menu", () =>
             {
@@ -76,14 +69,16 @@ namespace osu.Game.Tests.Visual.UserInterface
         [Test]
         public void TestSmoothExit()
         {
-            AddStep("Enter mode", () =>
-            {
-                buttons.State = ButtonSystemState.EnteringMode;
-                buttons.FadeOut(400, Easing.InSine);
-                buttons.MoveTo(new Vector2(-800, 0), 400, Easing.InSine);
-                logo.FadeOut(300, Easing.InSine)
-                    .ScaleTo(0.2f, 300, Easing.InSine);
-            });
+            AddStep("Enter mode", performEnterMode);
+        }
+
+        private void performEnterMode()
+        {
+            buttons.State = ButtonSystemState.EnteringMode;
+            buttons.FadeOut(MainMenu.FADE_OUT_DURATION, Easing.InSine);
+            buttons.MoveTo(new Vector2(-800, 0), MainMenu.FADE_OUT_DURATION, Easing.InSine);
+            logo.FadeOut(300, Easing.InSine)
+                .ScaleTo(0.2f, 300, Easing.InSine);
         }
     }
 }
