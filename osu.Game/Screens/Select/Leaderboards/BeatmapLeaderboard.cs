@@ -105,6 +105,12 @@ namespace osu.Game.Screens.Select.Leaderboards
                 return null;
             }
 
+            if (api?.IsLoggedIn != true)
+            {
+                PlaceholderState = PlaceholderState.NotLoggedIn;
+                return null;
+            }
+
             if (Beatmap?.OnlineBeatmapID == null)
             {
                 PlaceholderState = PlaceholderState.Unavailable;
