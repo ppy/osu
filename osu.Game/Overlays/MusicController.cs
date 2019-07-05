@@ -559,5 +559,10 @@ namespace osu.Game.Overlays
             play();
             return true;
         }
+
+        /// <summary>
+        /// Returns whether the current beatmap track is playing.
+        /// </summary>
+        public bool IsPlaying => beatmap.Value.Track.IsRunning;
     }
 }
