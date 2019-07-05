@@ -50,13 +50,13 @@ namespace osu.Game.Online.API.Requests
         {
             StringBuilder query = new StringBuilder(@"?");
 
-            query.Append($@"type={scope.ToString().ToLowerInvariant()}&");
-            query.Append($@"mode={ruleset.ShortName}&");
+            query.Append($@"type={scope.ToString().ToLowerInvariant()}");
+            query.Append($@"&mode={ruleset.ShortName}");
 
             foreach (var mod in mods)
-                query.Append($@"mods[]={mod.Acronym}&");
+                query.Append($@"&mods[]={mod.Acronym}");
 
-            return query.ToString().TrimEnd('&');
+            return query.ToString();
         }
     }
 }
