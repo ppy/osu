@@ -9,6 +9,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Screens.Menu;
+using osuTK;
 using osuTK.Graphics;
 
 namespace osu.Game.Tests.Visual.UserInterface
@@ -43,6 +44,24 @@ namespace osu.Game.Tests.Visual.UserInterface
 
             foreach (var s in Enum.GetValues(typeof(ButtonSystemState)).OfType<ButtonSystemState>().Skip(1))
                 AddStep($"State to {s}", () => buttons.State = s);
+
+            AddStep("Exiting menu", () =>
+            {
+                buttons.State = ButtonSystemState.EnteringMode;
+                buttons.FadeOut(400, Easing.InSine);
+                buttons.MoveTo(new Vector2(-800, 0), 400, Easing.InSine);
+                logo.FadeOut(300, Easing.InSine)
+                    .ScaleTo(0.2f, 300, Easing.InSine);
+            });
+
+            AddStep("Entering menu", () =>
+            {
+                buttons.State = ButtonSystemState.Play;
+                buttons.FadeIn(400, Easing.OutQuint);
+                buttons.MoveTo(new Vector2(0), 400, Easing.OutQuint);
+                logo.FadeColour(Color4.White, 100, Easing.OutQuint);
+                logo.FadeIn(100, Easing.OutQuint);
+            });
         }
     }
 }
