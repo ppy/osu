@@ -77,8 +77,8 @@ namespace osu.Game.Screens.Play
 
         public SongProgress()
         {
-            Height = bottom_bar_height + graph_height + handle_size.Y;
-            Y = bottom_bar_height;
+            Masking = true;
+            Height = bottom_bar_height + graph_height + handle_size.Y + OsuFont.Numeric.Size;
 
             Children = new Drawable[]
             {
@@ -88,7 +88,6 @@ namespace osu.Game.Screens.Play
                     Anchor = Anchor.BottomLeft,
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
-                    Margin = new MarginPadding { Bottom = bottom_bar_height + graph_height },
                 },
                 graph = new SongProgressGraph
                 {
