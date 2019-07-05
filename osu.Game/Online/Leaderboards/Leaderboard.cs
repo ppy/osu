@@ -231,12 +231,6 @@ namespace osu.Game.Online.Leaderboards
                 if (getScoresRequest == null)
                     return;
 
-                if (api?.IsLoggedIn != true)
-                {
-                    PlaceholderState = PlaceholderState.NotLoggedIn;
-                    return;
-                }
-
                 getScoresRequest.Failure += e => Schedule(() =>
                 {
                     if (e is OperationCanceledException)
