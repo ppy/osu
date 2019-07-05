@@ -20,6 +20,7 @@ namespace osu.Game.Screens.Play
 {
     public class SongProgress : OverlayContainer
     {
+        private const int info_height = 20;
         private const int bottom_bar_height = 5;
         private const float graph_height = SquareGraph.Column.WIDTH * 6;
         private static readonly Vector2 handle_size = new Vector2(10, 18);
@@ -31,10 +32,19 @@ namespace osu.Game.Screens.Play
         private readonly SongProgressInfo info;
 
         public Action<double> RequestSeek;
+
+        /// <summary>
+        /// Whether seeking is allowed and the progress bar should be shown.
+        /// </summary>
+        public readonly Bindable<bool> AllowSeeking = new Bindable<bool>();
+
+        /// <summary>
+        /// Whether the difficulty graph should be shown.
+        /// </summary>
         public readonly Bindable<bool> CollapseGraph = new Bindable<bool>();
 
-        public override bool HandleNonPositionalInput => AllowSeeking;
-        public override bool HandlePositionalInput => AllowSeeking;
+        public override bool HandleNonPositionalInput => AllowSeeking.Value;
+        public override bool HandlePositionalInput => AllowSeeking.Value;
 
         private double firstHitTime => objects.First().StartTime;
         private double lastHitTime => ((objects.Last() as IHasEndTime)?.EndTime ?? objects.Last().StartTime) + 1;
@@ -55,22 +65,6 @@ namespace osu.Game.Screens.Play
             }
         }
 
-        private bool allowSeeking;
-
-        public bool AllowSeeking
-        {
-            get => allowSeeking;
-            set
-            {
-                if (allowSeeking == value) return;
-
-                allowSeeking = value;
-                updateBarVisibility();
-            }
-        }
-
-        private readonly BindableBool replayLoaded = new BindableBool();
-
         public IClock ReferenceClock;
 
         private IClock gameplayClock;
@@ -78,7 +72,7 @@ namespace osu.Game.Screens.Play
         public SongProgress()
         {
             Masking = true;
-            Height = bottom_bar_height + graph_height + handle_size.Y + OsuFont.Numeric.Size;
+            Height = bottom_bar_height + graph_height + handle_size.Y + info_height;
 
             Children = new Drawable[]
             {
@@ -87,7 +81,7 @@ namespace osu.Game.Screens.Play
                     Origin = Anchor.BottomLeft,
                     Anchor = Anchor.BottomLeft,
                     RelativeSizeAxes = Axes.X,
-                    AutoSizeAxes = Axes.Y,
+                    Height = info_height,
                 },
                 graph = new SongProgressGraph
                 {
@@ -122,18 +116,17 @@ namespace osu.Game.Screens.Play
         {
             Show();
 
-            replayLoaded.BindValueChanged(loaded => AllowSeeking = loaded.NewValue, true);
+            AllowSeeking.BindValueChanged(_ => updateBarVisibility(), true);
             CollapseGraph.BindValueChanged(_ => updateGraphVisibility(), true);
         }
 
         public void BindDrawableRuleset(DrawableRuleset drawableRuleset)
         {
-            replayLoaded.BindTo(drawableRuleset.HasReplayLoaded);
+            AllowSeeking.BindTo(drawableRuleset.HasReplayLoaded);
         }
 
         protected override void PopIn()
         {
-            updateBarVisibility();
             this.FadeIn(500, Easing.OutQuint);
         }
 
@@ -160,8 +153,8 @@ namespace osu.Game.Screens.Play
 
         private void updateBarVisibility()
         {
-            bar.FadeTo(allowSeeking ? 1 : 0, transition_duration, Easing.In);
-            this.MoveTo(new Vector2(0, allowSeeking ? 0 : bottom_bar_height), transition_duration, Easing.In);
+            bar.FadeTo(AllowSeeking.Value ? 1 : 0, transition_duration, Easing.In);
+            this.MoveTo(new Vector2(0, AllowSeeking.Value ? 0 : bottom_bar_height), transition_duration, Easing.In);
 
             updateInfoMargin();
         }
@@ -178,7 +171,7 @@ namespace osu.Game.Screens.Play
 
         private void updateInfoMargin()
         {
-            float finalMargin = bottom_bar_height + (allowSeeking ? handle_size.Y : 0) + (CollapseGraph.Value ? 0 : graph_height);
+            float finalMargin = bottom_bar_height + (AllowSeeking.Value ? handle_size.Y : 0) + (CollapseGraph.Value ? 0 : graph_height);
             info.TransformTo(nameof(info.Margin), new MarginPadding { Bottom = finalMargin }, transition_duration, Easing.In);
         }
     }
