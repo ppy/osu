@@ -4,12 +4,9 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Linq;
-using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Game.Beatmaps;
 using osu.Game.Online.Leaderboards;
-using osu.Game.Rulesets;
 using osu.Game.Scoring;
 using osu.Game.Screens.Select.Leaderboards;
 using osu.Game.Users;
@@ -26,8 +23,6 @@ namespace osu.Game.Tests.Visual.SongSelect
             typeof(MessagePlaceholder),
             typeof(RetrievalFailurePlaceholder),
         };
-
-        private RulesetStore rulesets;
 
         private readonly FailableLeaderboard leaderboard;
 
@@ -55,12 +50,6 @@ namespace osu.Game.Tests.Visual.SongSelect
             AddStep(@"WIP beatmap", wipBeatmap);
             AddStep(@"Graveyard beatmap", graveyardBeatmap);
             AddStep(@"Unpublished beatmap", unpublishedBeatmap);
-        }
-
-        [BackgroundDependencyLoader]
-        private void load(RulesetStore rulesets)
-        {
-            this.rulesets = rulesets;
         }
 
         private void newScores()
