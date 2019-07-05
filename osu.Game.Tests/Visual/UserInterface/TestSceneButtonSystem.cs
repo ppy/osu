@@ -48,8 +48,8 @@ namespace osu.Game.Tests.Visual.UserInterface
             AddStep("Exiting menu", () =>
             {
                 buttons.State = ButtonSystemState.EnteringMode;
-                buttons.FadeOut(400, Easing.InSine);
-                buttons.MoveTo(new Vector2(-800, 0), 400, Easing.InSine);
+                buttons.FadeOut(MainMenu.FADE_OUT_DURATION, Easing.InSine);
+                buttons.MoveTo(new Vector2(-800, 0), MainMenu.FADE_OUT_DURATION, Easing.InSine);
                 logo.FadeOut(300, Easing.InSine)
                     .ScaleTo(0.2f, 300, Easing.InSine);
             });
@@ -57,8 +57,8 @@ namespace osu.Game.Tests.Visual.UserInterface
             AddStep("Entering menu", () =>
             {
                 buttons.State = ButtonSystemState.Play;
-                buttons.FadeIn(400, Easing.OutQuint);
-                buttons.MoveTo(new Vector2(0), 400, Easing.OutQuint);
+                buttons.FadeIn(MainMenu.FADE_IN_DURATION, Easing.OutQuint);
+                buttons.MoveTo(new Vector2(0), MainMenu.FADE_IN_DURATION, Easing.OutQuint);
                 logo.FadeColour(Color4.White, 100, Easing.OutQuint);
                 logo.FadeIn(100, Easing.OutQuint);
             });
