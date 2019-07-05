@@ -86,11 +86,7 @@ namespace osu.Game.Screens.Play
                 }
             }, true);
 
-            if (replayAvailability == ReplayAvailability.NotAvailable)
-            {
-                button.Enabled.Value = false;
-                button.Alpha = 0.6f;
-            }
+            button.Enabled.Value = replayAvailability != ReplayAvailability.NotAvailable;
         }
 
         private enum ReplayAvailability
