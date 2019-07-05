@@ -724,20 +724,23 @@ namespace osu.Game
 
                 case GlobalAction.MusicPlay:
                     if (!musicController.IsLoaded) return true;
+
                     if (musicController.PlayTrack())
                         osd.Display(new Overlays.OSD.OsdIconToast(musicController.IsPlaying ? "Play track" : "Pause track", musicController.IsPlaying ? FontAwesome.Solid.PlayCircle : FontAwesome.Solid.PauseCircle));
                     return true;
 
                 case GlobalAction.MusicNext:
                     if (!musicController.IsLoaded) return true;
+
                     if (musicController.NextTrack())
                         osd.Display(new Overlays.OSD.OsdIconToast("Next track", FontAwesome.Solid.FastForward));
                     return true;
 
                 case GlobalAction.MusicPrev:
                     if (!musicController.IsLoaded) return true;
+
                     if (musicController.PreviousTrack())
-                        osd.Display(new Overlays.OSD.OsdIconToast("Previous track", FontAwesome.Solid.FastForward));
+                        osd.Display(new Overlays.OSD.OsdIconToast("Previous track", FontAwesome.Solid.FastBackward));
                     return true;
             }
 

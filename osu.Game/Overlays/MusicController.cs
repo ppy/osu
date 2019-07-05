@@ -551,6 +551,7 @@ namespace osu.Game.Overlays
 
         /// <summary>
         /// Play or pause the current beatmap track.
+        /// </summary>
         /// <returns>Returns whether the current track could be played / paused or not</returns>
         public bool PlayTrack()
         {
