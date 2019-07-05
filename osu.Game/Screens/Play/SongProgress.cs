@@ -38,10 +38,7 @@ namespace osu.Game.Screens.Play
         /// </summary>
         public readonly Bindable<bool> AllowSeeking = new Bindable<bool>();
 
-        /// <summary>
-        /// Whether the difficulty graph should be shown.
-        /// </summary>
-        public readonly Bindable<bool> CollapseGraph = new Bindable<bool>();
+        public readonly Bindable<bool> ShowGraph = new Bindable<bool>();
 
         public override bool HandleNonPositionalInput => AllowSeeking.Value;
         public override bool HandlePositionalInput => AllowSeeking.Value;
@@ -107,7 +104,7 @@ namespace osu.Game.Screens.Play
             if (clock != null)
                 gameplayClock = clock;
 
-            config.BindWith(OsuSetting.ShowProgressGraph, CollapseGraph);
+            config.BindWith(OsuSetting.ShowProgressGraph, ShowGraph);
 
             graph.FillColour = bar.FillColour = colours.BlueLighter;
         }
@@ -117,7 +114,7 @@ namespace osu.Game.Screens.Play
             Show();
 
             AllowSeeking.BindValueChanged(_ => updateBarVisibility(), true);
-            CollapseGraph.BindValueChanged(_ => updateGraphVisibility(), true);
+            ShowGraph.BindValueChanged(_ => updateGraphVisibility(), true);
         }
 
         public void BindDrawableRuleset(DrawableRuleset drawableRuleset)
@@ -163,15 +160,15 @@ namespace osu.Game.Screens.Play
         {
             float barHeight = bottom_bar_height + handle_size.Y;
 
-            bar.ResizeHeightTo(CollapseGraph.Value ? barHeight : barHeight + graph_height, transition_duration, Easing.In);
-            graph.MoveToY(CollapseGraph.Value ? bottom_bar_height + graph_height : 0, transition_duration, Easing.In);
+            bar.ResizeHeightTo(ShowGraph.Value ? barHeight + graph_height : barHeight, transition_duration, Easing.In);
+            graph.MoveToY(ShowGraph.Value ? 0 : bottom_bar_height + graph_height, transition_duration, Easing.In);
 
             updateInfoMargin();
         }
 
         private void updateInfoMargin()
         {
-            float finalMargin = bottom_bar_height + (AllowSeeking.Value ? handle_size.Y : 0) + (CollapseGraph.Value ? 0 : graph_height);
+            float finalMargin = bottom_bar_height + (AllowSeeking.Value ? handle_size.Y : 0) + (ShowGraph.Value ? graph_height : 0);
             info.TransformTo(nameof(info.Margin), new MarginPadding { Bottom = finalMargin }, transition_duration, Easing.In);
         }
     }
