@@ -55,8 +55,16 @@ namespace osu.Game.Screens.Select.Leaderboards
         {
             if (Scope == BeatmapLeaderboardScope.Local)
             {
-                Scores = scoreManager.QueryScores(s => !s.DeletePending && s.Beatmap.ID == Beatmap.ID).OrderByDescending(s => s.TotalScore).ToArray();
+                Scores = scoreManager
+                         .QueryScores(s => !s.DeletePending && s.Beatmap.ID == Beatmap.ID && s.Ruleset.ID == ruleset.Value.ID)
+                         .OrderByDescending(s => s.TotalScore).ToArray();
                 PlaceholderState = Scores.Any() ? PlaceholderState.Successful : PlaceholderState.NoScores;
+                return null;
+            }
+
+            if (api?.IsLoggedIn != true)
+            {
+                PlaceholderState = PlaceholderState.NotLoggedIn;
                 return null;
             }
 
