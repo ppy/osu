@@ -28,6 +28,5 @@ namespace osu.Android
                 Task.Factory.StartNew(() => Import(fileToLoad), TaskCreationOptions.LongRunning);
             }
         }
-
     }
 }
