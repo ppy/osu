@@ -38,6 +38,10 @@ namespace osu.Game.Input.Bindings
             new KeyBinding(InputKey.MouseWheelDown, GlobalAction.DecreaseVolume),
             new KeyBinding(InputKey.F4, GlobalAction.ToggleMute),
 
+            new KeyBinding(InputKey.F5, GlobalAction.MusicPrev),
+            new KeyBinding(InputKey.F6, GlobalAction.MusicNext),
+            new KeyBinding(InputKey.X, GlobalAction.MusicPlay),
+
             new KeyBinding(InputKey.Escape, GlobalAction.Back),
             new KeyBinding(InputKey.MouseButton1, GlobalAction.Back),
 
@@ -87,6 +91,16 @@ namespace osu.Game.Input.Bindings
 
         [Description("Toggle mute")]
         ToggleMute,
+
+        // Game-wide beatmap jukebox keybindings
+        [Description("Jukebox next track")]
+        MusicNext,
+
+        [Description("Jukebox previous track")]
+        MusicPrev,
+
+        [Description("Jukebox play / pause current track")]
+        MusicPlay,
 
         // In-Game Keybindings
         [Description("Skip cutscene")]
