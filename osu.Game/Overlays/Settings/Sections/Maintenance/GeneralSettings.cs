@@ -58,7 +58,7 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
             {
                 Add(importScoresButton = new SettingsButton
                 {
-                    Text = "Import replays from stable",
+                    Text = "Import scores from stable",
                     Action = () =>
                     {
                         importScoresButton.Enabled.Value = false;
