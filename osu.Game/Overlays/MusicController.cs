@@ -529,6 +529,35 @@ namespace osu.Game.Overlays
         /// <summary>
         /// Play the next random or playlist track.
         /// </summary>
-        public void NextTrack() => next();
+        /// <returns>Returns whether the track could be changed or not</returns>
+        public bool NextTrack()
+        {
+            if (beatmap.Disabled) return false;
+
+            next();
+            return true;
+        }
+
+        /// <summary>
+        /// Play the previous random or playlist track.
+        /// </summary>
+        public bool PreviousTrack()
+        {
+            if (beatmap.Disabled) return false;
+
+            prev();
+            return true;
+        }
+
+        /// <summary>
+        /// Play or pause the current beatmap track.
+        /// <returns>Returns whether the current track could be played / paused or not</returns>
+        public bool PlayTrack()
+        {
+            if (beatmap.Disabled) return false;
+
+            play();
+            return true;
+        }
     }
 }
