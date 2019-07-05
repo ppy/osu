@@ -47,7 +47,14 @@ namespace osu.Game.Tests.Visual.SongSelect
             AddStep(@"No supporter", () => leaderboard.SetRetrievalState(PlaceholderState.NotSupporter));
             AddStep(@"Not logged in", () => leaderboard.SetRetrievalState(PlaceholderState.NotLoggedIn));
             AddStep(@"Unavailable", () => leaderboard.SetRetrievalState(PlaceholderState.Unavailable));
-            AddStep(@"Real beatmap", realBeatmap);
+            AddStep(@"Ranked beatmap", rankedBeatmap);
+            AddStep(@"Approved beatmap", approvedBeatmap);
+            AddStep(@"Qualified beatmap", qualifiedBeatmap);
+            AddStep(@"Loved beatmap", lovedBeatmap);
+            AddStep(@"Pending beatmap", pendingBeatmap);
+            AddStep(@"WIP beatmap", wipBeatmap);
+            AddStep(@"Graveyard beatmap", graveyardBeatmap);
+            AddStep(@"Unpublished beatmap", unpublishedBeatmap);
         }
 
         [BackgroundDependencyLoader]
@@ -245,34 +252,75 @@ namespace osu.Game.Tests.Visual.SongSelect
             leaderboard.Scores = scores;
         }
 
-        private void realBeatmap()
+        private void rankedBeatmap()
         {
             leaderboard.Beatmap = new BeatmapInfo
             {
-                StarDifficulty = 1.36,
-                Version = @"BASIC",
                 OnlineBeatmapID = 1113057,
-                Ruleset = rulesets.GetRuleset(0),
-                BaseDifficulty = new BeatmapDifficulty
-                {
-                    CircleSize = 4,
-                    DrainRate = 6.5f,
-                    OverallDifficulty = 6.5f,
-                    ApproachRate = 5,
-                },
-                OnlineInfo = new BeatmapOnlineInfo
-                {
-                    Length = 115000,
-                    CircleCount = 265,
-                    SliderCount = 71,
-                    PlayCount = 47906,
-                    PassCount = 19899,
-                },
-                Metrics = new BeatmapMetrics
-                {
-                    Fails = Enumerable.Range(1, 100).Select(i => i % 12 - 6).ToArray(),
-                    Retries = Enumerable.Range(-2, 100).Select(i => i % 12 - 6).ToArray(),
-                },
+                Status = BeatmapSetOnlineStatus.Ranked,
+            };
+        }
+
+        private void approvedBeatmap()
+        {
+            leaderboard.Beatmap = new BeatmapInfo
+            {
+                OnlineBeatmapID = 1113057,
+                Status = BeatmapSetOnlineStatus.Approved,
+            };
+        }
+
+        private void qualifiedBeatmap()
+        {
+            leaderboard.Beatmap = new BeatmapInfo
+            {
+                OnlineBeatmapID = 1113057,
+                Status = BeatmapSetOnlineStatus.Qualified,
+            };
+        }
+
+        private void lovedBeatmap()
+        {
+            leaderboard.Beatmap = new BeatmapInfo
+            {
+                OnlineBeatmapID = 1113057,
+                Status = BeatmapSetOnlineStatus.Loved,
+            };
+        }
+
+        private void pendingBeatmap()
+        {
+            leaderboard.Beatmap = new BeatmapInfo
+            {
+                OnlineBeatmapID = 1113057,
+                Status = BeatmapSetOnlineStatus.Pending,
+            };
+        }
+
+        private void wipBeatmap()
+        {
+            leaderboard.Beatmap = new BeatmapInfo
+            {
+                OnlineBeatmapID = 1113057,
+                Status = BeatmapSetOnlineStatus.WIP,
+            };
+        }
+
+        private void graveyardBeatmap()
+        {
+            leaderboard.Beatmap = new BeatmapInfo
+            {
+                OnlineBeatmapID = 1113057,
+                Status = BeatmapSetOnlineStatus.Graveyard,
+            };
+        }
+
+        private void unpublishedBeatmap()
+        {
+            leaderboard.Beatmap = new BeatmapInfo
+            {
+                OnlineBeatmapID = null,
+                Status = BeatmapSetOnlineStatus.None,
             };
         }
 
