@@ -116,17 +116,6 @@ namespace osu.Game.Online.API.Requests.Responses
         [JsonProperty(@"mods")]
         private string[] modStrings { get; set; }
 
-        public override BeatmapInfo Beatmap
-        {
-            get => base.Beatmap;
-            set
-            {
-                base.Beatmap = value;
-                if (Beatmap.Ruleset != null)
-                    Ruleset = value.Ruleset;
-            }
-        }
-
         public override RulesetInfo Ruleset
         {
             get => base.Ruleset;
