@@ -55,8 +55,6 @@ namespace osu.Game.Skinning
             };
         }
 
-        protected override IEnumerable<string> GetStableImportPaths() => GetStableStorage().GetDirectories(ImportFromStablePath);
-
         protected override bool ShouldDeleteArchive(string path) => Path.GetExtension(path)?.ToLowerInvariant() == ".osk";
 
         /// <summary>
