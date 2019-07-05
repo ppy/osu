@@ -172,7 +172,7 @@ namespace osu.Game.Screens.Play
             float barHeight = bottom_bar_height + handle_size.Y;
 
             bar.ResizeHeightTo(CollapseGraph.Value ? barHeight : barHeight + graph_height, transition_duration, Easing.In);
-            graph.MoveToY(CollapseGraph.Value ? graph_height : 0, transition_duration, Easing.In);
+            graph.MoveToY(CollapseGraph.Value ? bottom_bar_height + graph_height : 0, transition_duration, Easing.In);
 
             updateInfoMargin();
         }
