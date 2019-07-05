@@ -68,6 +68,12 @@ namespace osu.Game.Screens.Select.Leaderboards
                 return null;
             }
 
+            if (Beatmap?.OnlineBeatmapID == null)
+            {
+                PlaceholderState = PlaceholderState.Unavailable;
+                return null;
+            }
+
             switch (Beatmap?.Status)
             {
                 case BeatmapSetOnlineStatus.Graveyard:
