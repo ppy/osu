@@ -6,6 +6,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Configuration;
 using osu.Framework.Configuration.Tracking;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Sprites;
 using osu.Game.Overlays;
 
 namespace osu.Game.Tests.Visual.UserInterface
@@ -23,6 +24,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             Add(osd);
 
             AddStep("Display empty osd toast", () => osd.Display(new Overlays.OSD.OsdToast()));
+            AddStep("Display osd toast with icon and message", () => osd.Display(new Overlays.OSD.OsdIconToast("Hey there !", FontAwesome.Solid.HandSpock)));
             AddRepeatStep("Change toggle (no bind)", () => config.ToggleSetting(TestConfigSetting.ToggleSettingNoKeybind), 2);
             AddRepeatStep("Change toggle (with bind)", () => config.ToggleSetting(TestConfigSetting.ToggleSettingWithKeybind), 2);
             AddRepeatStep("Change enum (no bind)", () => config.IncrementEnumSetting(TestConfigSetting.EnumSettingNoKeybind), 3);
