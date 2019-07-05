@@ -38,7 +38,10 @@ namespace osu.Game.Online.API.Requests
         private void onSuccess(APILegacyScores r)
         {
             foreach (APILegacyScoreInfo score in r.Scores)
+            {
                 score.Beatmap = beatmap;
+                score.Ruleset = ruleset;
+            }
         }
 
         protected override string Target => $@"beatmaps/{beatmap.OnlineBeatmapID}/scores{createQueryParameters()}";
