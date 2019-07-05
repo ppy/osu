@@ -12,6 +12,8 @@ var configuration = Argument("configuration", "Release");
 
 var rootDirectory = new DirectoryPath("..");
 var solution = rootDirectory.CombineWithFilePath("osu.sln");
+var androidSolution = rootDirectory.CombineWithFilePath("osu.Android.sln");
+var iOSSolution = rootDirectory.CombineWithFilePath("osu.iOS.sln");
 
 ///////////////////////////////////////////////////////////////////////////////
 // TASKS
@@ -40,16 +42,21 @@ Task("Test")
 Task("InspectCode")
     .WithCriteria(IsRunningOnWindows())
     .IsDependentOn("Compile")
-    .Does(() => {
-        InspectCode(solution, new InspectCodeSettings {
-            CachesHome = "inspectcode",
-            OutputFile = "inspectcodereport.xml",
-        });
+    .DoesForEach(
+        new [] { solution, androidSolution, iOSSolution },
+        inspectSolution => {
+            string reportFileName = $"inspectcodereport.{inspectSolution.GetFilenameWithoutExtension()}.xml";
 
-        int returnCode = StartProcess(nVikaToolPath, $@"parsereport ""inspectcodereport.xml"" --treatwarningsaserrors");
-        if (returnCode != 0)
-            throw new Exception($"inspectcode failed with return code {returnCode}");
-    });
+            InspectCode(inspectSolution, new InspectCodeSettings {
+                CachesHome = $"inspectcode{inspectSolution.GetFilenameWithoutExtension()}",
+                OutputFile = reportFileName,
+            });
+
+            int returnCode = StartProcess(nVikaToolPath, $@"parsereport ""{reportFileName}"" --treatwarningsaserrors");
+            if (returnCode != 0)
+                throw new Exception($"inspectcode failed with return code {returnCode}");
+        }
+    );
 
 Task("CodeFileSanity")
     .Does(() => {
