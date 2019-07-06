@@ -101,7 +101,7 @@ namespace osu.Game.Screens.Menu
                     // Only start the current track if it is the menu music. A beatmap's track is started when entering the Main Manu.
                     if (menuMusic.Value)
                     {
-                        track.Start();
+                        track.Restart();
                         track = null;
                     }
 
