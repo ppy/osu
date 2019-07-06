@@ -43,13 +43,7 @@ namespace osu.Game.Tests.Visual.SongSelect
             AddStep(@"Not logged in", () => leaderboard.SetRetrievalState(PlaceholderState.NotLoggedIn));
             AddStep(@"Unavailable", () => leaderboard.SetRetrievalState(PlaceholderState.Unavailable));
             AddStep(@"Ranked beatmap", rankedBeatmap);
-            AddStep(@"Approved beatmap", approvedBeatmap);
-            AddStep(@"Qualified beatmap", qualifiedBeatmap);
-            AddStep(@"Loved beatmap", lovedBeatmap);
             AddStep(@"Pending beatmap", pendingBeatmap);
-            AddStep(@"WIP beatmap", wipBeatmap);
-            AddStep(@"Graveyard beatmap", graveyardBeatmap);
-            AddStep(@"Unpublished beatmap", unpublishedBeatmap);
         }
 
         private void newScores()
@@ -250,66 +244,12 @@ namespace osu.Game.Tests.Visual.SongSelect
             };
         }
 
-        private void approvedBeatmap()
-        {
-            leaderboard.Beatmap = new BeatmapInfo
-            {
-                OnlineBeatmapID = 1113057,
-                Status = BeatmapSetOnlineStatus.Approved,
-            };
-        }
-
-        private void qualifiedBeatmap()
-        {
-            leaderboard.Beatmap = new BeatmapInfo
-            {
-                OnlineBeatmapID = 1113057,
-                Status = BeatmapSetOnlineStatus.Qualified,
-            };
-        }
-
-        private void lovedBeatmap()
-        {
-            leaderboard.Beatmap = new BeatmapInfo
-            {
-                OnlineBeatmapID = 1113057,
-                Status = BeatmapSetOnlineStatus.Loved,
-            };
-        }
-
         private void pendingBeatmap()
         {
             leaderboard.Beatmap = new BeatmapInfo
             {
                 OnlineBeatmapID = 1113057,
                 Status = BeatmapSetOnlineStatus.Pending,
-            };
-        }
-
-        private void wipBeatmap()
-        {
-            leaderboard.Beatmap = new BeatmapInfo
-            {
-                OnlineBeatmapID = 1113057,
-                Status = BeatmapSetOnlineStatus.WIP,
-            };
-        }
-
-        private void graveyardBeatmap()
-        {
-            leaderboard.Beatmap = new BeatmapInfo
-            {
-                OnlineBeatmapID = 1113057,
-                Status = BeatmapSetOnlineStatus.Graveyard,
-            };
-        }
-
-        private void unpublishedBeatmap()
-        {
-            leaderboard.Beatmap = new BeatmapInfo
-            {
-                OnlineBeatmapID = null,
-                Status = BeatmapSetOnlineStatus.None,
             };
         }
 
