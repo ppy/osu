@@ -15,19 +15,14 @@ namespace osu.Android
 
         public OsuGameAndroid(params string[] args)
         {
-            
         }
 
-        public List<string> FilesToImport
-        {
-            get;
-            set;
-        }
+        public List<string> FilesToImport { get; set; }
 
         protected override void LoadComplete()
         {
             base.LoadComplete();
-            if(FilesToImport != null && FilesToImport.Count > 0)
+            if (FilesToImport != null && FilesToImport.Count > 0)
             {
                 Task.Factory.StartNew(() => Import(FilesToImport.ToArray()), TaskCreationOptions.LongRunning);
             }
