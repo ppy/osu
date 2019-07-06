@@ -31,42 +31,9 @@
         <category
             android:name="android.intent.category.LAUNCHER" />
       </intent-filter>
-      
-      <intent-filter>
-        <action
-            android:name="android.intent.action.VIEW" />
-        <category
-            android:name="android.intent.category.DEFAULT" />
-        <category
-            android:name="android.intent.category.BROWSABLE" />
-        <data android:scheme="file" />
-        <data android:mimeType="*/*" />
-        <data
-            android:pathPattern=".*\.osz" />
-        <data
-            android:pathPattern=".*\..*\.osz" />
-        <data
-            android:pathPattern=".*\..*\..*\.osz" />
-        <data
-            android:pathPattern=".*\..*\..*\..*\.osz" />
-        <data
-            android:pathPattern=".*\..*\..*\..*\..*\.osz" />
-        <data android:host="*" />
-      </intent-filter>
-      
-      <intent-filter>
-        <action
-            android:name="android.intent.action.VIEW" />
-        <category
-            android:name="android.intent.category.DEFAULT" />
-        <category
-            android:name="android.intent.category.BROWSABLE" />
-        <data android:scheme="file" />
-        <data android:host="*" />
-        <data android:pathPattern=".*\.osz" />
-      </intent-filter>
-      
-      <intent-filter>
+
+      <!-- firefox and fileexplorer -->
+      <!--intent-filter>
         <action
             android:name="android.intent.action.VIEW" />
         <category
@@ -82,93 +49,31 @@
         <data
             android:mimeType="application/octet-stream"
             android:scheme="file" />
-      </intent-filter>
+      </intent-filter-->
 
+      <!-- only qq -->
       <intent-filter>
         <action android:name="android.intent.action.VIEW" />
         <action android:name="android.intent.action.EDIT" />
         <category android:name="android.intent.category.DEFAULT" />
         <data android:scheme="file"/>
+        <data
+            android:pathPattern=".*\.osz" />
       </intent-filter>
 
-      <intent-filter>
-        <data android:scheme="file" />
-        <action
-            android:name="android.intent.action.VIEW" />
-        <category
-            android:name="android.intent.category.DEFAULT" />
-        <data
-            android:mimeType="application/zip" />
-      </intent-filter>
-      
-      <intent-filter>
+      <!-- chrome -->
+      <!--intent-filter>
         <data
             android:mimeType="application/octet-stream"
             android:scheme="content"
             android:pathPattern=".*\.osz" />
-        <data
-            android:mimeType="application/zip"
-            android:scheme="content"
-            android:pathPattern=".*\.osz" />
-        <data
-            android:mimeType="application/x-zip-compressed"
-            android:scheme="content"
-            android:pathPattern=".*\.osz" />
-        <data
-            android:mimeType="application/octet-stream"
-            android:scheme="content"
-            android:pathPattern=".*\..*\.osz" />
-        <data
-            android:mimeType="application/zip"
-            android:scheme="content"
-            android:pathPattern=".*\..*\.osz" />
-        <data
-            android:mimeType="application/x-zip-compressed"
-            android:scheme="content"
-            android:pathPattern=".*\..*\.osz" />
-        <data
-            android:mimeType="application/octet-stream"
-            android:scheme="content"
-            android:pathPattern=".*\..*\..*\.osz" />
-        <data
-            android:mimeType="application/zip"
-            android:scheme="content"
-            android:pathPattern=".*\..*\..*\.osz" />
-        <data
-            android:mimeType="application/x-zip-compressed"
-            android:scheme="content"
-            android:pathPattern=".*\..*\..*\.osz" />
-        <data
-            android:mimeType="application/octet-stream"
-            android:scheme="content"
-            android:pathPattern=".*\..*\..*\..*\.osz" />
-        <data
-            android:mimeType="application/zip"
-            android:scheme="content"
-            android:pathPattern=".*\..*\..*\..*\.osz" />
-        <data
-            android:mimeType="application/x-zip-compressed"
-            android:scheme="content"
-            android:pathPattern=".*\..*\..*\..*\.osz" />
-        <data
-            android:mimeType="application/octet-stream"
-            android:scheme="content"
-            android:pathPattern=".*\..*\..*\..*\..*\.osz" />
-        <data
-            android:mimeType="application/zip"
-            android:scheme="content"
-            android:pathPattern=".*\..*\..*\..*\..*\.osz" />
-        <data
-            android:mimeType="application/x-zip-compressed"
-            android:scheme="content"
-            android:pathPattern=".*\..*\..*\..*\..*\.osz" />
         <action
             android:name="android.intent.action.VIEW" />
         <category
             android:name="android.intent.category.DEFAULT" />
         <category
             android:name="android.intent.category.BROWSABLE" />
-      </intent-filter>
+      </intent-filter-->
 
     </activity>
     
