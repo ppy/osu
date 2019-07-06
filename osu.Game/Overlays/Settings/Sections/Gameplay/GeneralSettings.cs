@@ -37,7 +37,7 @@ namespace osu.Game.Overlays.Settings.Sections.Gameplay
                 new SettingsCheckbox
                 {
                     LabelText = "Hide health bar if you can't fail",
-                    Bindable = config.GetBindable<bool>(OsuSetting.HideHealthBar),
+                    Bindable = config.GetBindable<bool>(OsuSetting.HideHealthBarWhenCantFail),
                 },
                 new SettingsCheckbox
                 {
