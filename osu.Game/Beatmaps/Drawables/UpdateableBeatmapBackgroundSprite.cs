@@ -38,10 +38,12 @@ namespace osu.Game.Beatmaps.Drawables
         protected override Drawable CreateDrawable(BeatmapInfo model)
         {
             var drawable = getDrawableForModel(model);
+
             drawable.RelativeSizeAxes = Axes.Both;
             drawable.Anchor = Anchor.Centre;
             drawable.Origin = Anchor.Centre;
             drawable.FillMode = FillMode.Fill;
+            drawable.OnLoadComplete += d => d.FadeInFromZero(400);
 
             return drawable;
         }
