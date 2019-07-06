@@ -24,7 +24,7 @@ namespace osu.Game.Rulesets.Mods
 
         public void ApplyToHUD(HUDOverlay overlay)
         {
-            hideHealthBar.BindValueChanged(v => healthDisplay.FadeTo(v.NewValue ? 0 : 1, 250, Easing.OutQuint), true);
+            hideHealthBar.BindValueChanged(v => overlay.HealthDisplay.FadeTo(v.NewValue ? 0 : 1, 250, Easing.OutQuint), true);
         }
     }
 }
