@@ -387,6 +387,7 @@ namespace osu.Game
             BeatmapManager.PresentImport = items => PresentBeatmap(items.First());
 
             ScoreManager.PostNotification = n => notifications?.Post(n);
+            ScoreManager.GetStableStorage = GetStorageForStableInstall;
             ScoreManager.PresentImport = items => PresentScore(items.First());
 
             Container logoContainer;
