@@ -5,6 +5,7 @@ using System;
 using System.Threading.Tasks;
 using Android.App;
 using osu.Game;
+using System.Collections.Generic;
 
 namespace osu.Android
 {
@@ -12,20 +13,23 @@ namespace osu.Android
     {
         public override Version AssemblyVersion => new Version(Application.Context.ApplicationContext.PackageManager.GetPackageInfo(Application.Context.ApplicationContext.PackageName, 0).VersionName);
 
-        private string fileToLoad;
-
         public OsuGameAndroid(params string[] args)
         {
-            fileToLoad = args?.Length > 0 ? args[0] : null;
+            
+        }
+
+        public List<string> FilesToImport
+        {
+            get;
+            set;
         }
 
         protected override void LoadComplete()
         {
             base.LoadComplete();
-
-            if(fileToLoad != null)
+            if(FilesToImport != null && FilesToImport.Count > 0)
             {
-                Task.Factory.StartNew(() => Import(fileToLoad), TaskCreationOptions.LongRunning);
+                Task.Factory.StartNew(() => Import(FilesToImport.ToArray()), TaskCreationOptions.LongRunning);
             }
         }
     }
