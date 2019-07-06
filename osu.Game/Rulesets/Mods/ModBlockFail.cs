@@ -5,14 +5,12 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Game.Configuration;
 using osu.Game.Screens.Play;
-using osu.Game.Screens.Play.HUD;
 
 namespace osu.Game.Rulesets.Mods
 {
     public abstract class ModBlockFail : Mod, IApplicableFailOverride, IApplicableToHUD, IReadFromConfig
     {
         private Bindable<bool> hideHealthBar;
-        private HealthDisplay healthDisplay;
 
         /// <summary>
         /// We never fail, 'yo.
@@ -26,7 +24,6 @@ namespace osu.Game.Rulesets.Mods
 
         public void ApplyToHUD(HUDOverlay overlay)
         {
-            healthDisplay = overlay.HealthDisplay;
             hideHealthBar.BindValueChanged(v => healthDisplay.FadeTo(v.NewValue ? 0 : 1, 250, Easing.OutQuint), true);
         }
     }
