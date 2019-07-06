@@ -77,7 +77,7 @@ namespace osu.Game.Configuration
             Set(OsuSetting.BlurLevel, 0, 0, 1, 0.01);
 
             Set(OsuSetting.ShowInterface, true);
-            Set(OsuSetting.HideHealthBar, true);
+            Set(OsuSetting.HideHealthBarWhenCantFail, true);
             Set(OsuSetting.KeyOverlay, false);
 
             Set(OsuSetting.FloatingComments, false);
@@ -132,7 +132,7 @@ namespace osu.Game.Configuration
         KeyOverlay,
         FloatingComments,
         ShowInterface,
-        HideHealthBar,
+        HideHealthBarWhenCantFail,
         MouseDisableButtons,
         MouseDisableWheel,
         AudioOffset,

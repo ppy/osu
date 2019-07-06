@@ -21,7 +21,7 @@ namespace osu.Game.Rulesets.Mods
 
         public void ReadFromConfig(OsuConfigManager config)
         {
-            hideHealthBar = config.GetBindable<bool>(OsuSetting.HideHealthBar);
+            hideHealthBar = config.GetBindable<bool>(OsuSetting.HideHealthBarWhenCantFail);
         }
 
         public void ApplyToHUD(HUDOverlay overlay)
