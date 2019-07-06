@@ -16,12 +16,11 @@ using osuTK.Graphics;
 namespace osu.Game.Tests.Visual.Menus
 {
     [TestFixture]
-    public class TestSceneIntroSequence : OsuTestScene
+    public class TestSceneIntro : OsuTestScene
     {
         public override IReadOnlyList<Type> RequiredTypes => new[]
         {
             typeof(OsuLogo),
-            typeof(Intro),
             typeof(StartupScreen),
             typeof(OsuScreen)
         };
@@ -29,7 +28,7 @@ namespace osu.Game.Tests.Visual.Menus
         [Cached]
         private OsuLogo logo;
 
-        public TestSceneIntroSequence()
+        public TestSceneIntro()
         {
             var rateAdjustClock = new StopwatchClock(true);
             var framedClock = new FramedClock(rateAdjustClock);
