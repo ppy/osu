@@ -6,6 +6,7 @@ using Android.Content.PM;
 using Android.OS;
 using Android.Views;
 using Android.Util;
+using Android.Net;
 using Android.Content;
 using osu.Framework.Android;
 
@@ -27,7 +28,11 @@ namespace osu.Android
             if (Intent.Action != null
                 && Intent.Action.Equals("android.intent.action.VIEW"))
             {
-                return Intent.Data.Path;
+                Uri uri = Intent.Data;
+                if (ContentResolver.SchemeFile.Equals(uri.Scheme))
+                {
+                    return uri.Path;
+                }
             }
             return null;
         }

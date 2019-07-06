@@ -32,8 +32,8 @@
             android:name="android.intent.category.LAUNCHER" />
       </intent-filter>
 
-      <!-- firefox and fileexplorer -->
-      <!--intent-filter>
+      <!-- firefox and file explorer -->
+      <intent-filter>
         <action
             android:name="android.intent.action.VIEW" />
         <category
@@ -49,9 +49,9 @@
         <data
             android:mimeType="application/octet-stream"
             android:scheme="file" />
-      </intent-filter-->
+      </intent-filter>
 
-      <!-- only qq -->
+      <!-- qq -->
       <intent-filter>
         <action android:name="android.intent.action.VIEW" />
         <action android:name="android.intent.action.EDIT" />
@@ -62,6 +62,10 @@
       </intent-filter>
 
       <!-- chrome -->
+      <!--
+      chrome uses content:// to share files, but it's hard to get the real path of the shared file,
+      we can use ContentResolver to open an input stream, but now osu only support import osz using file path
+      -->
       <!--intent-filter>
         <data
             android:mimeType="application/octet-stream"
