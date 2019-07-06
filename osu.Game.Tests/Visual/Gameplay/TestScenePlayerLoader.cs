@@ -37,6 +37,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         public void TestBlockLoadViaMouseMovement()
         {
             AddStep("load dummy beatmap", () => stack.Push(loader = new TestPlayerLoader(() => new TestPlayer(false, false))));
+            AddUntilStep("wait for current", () => loader.IsCurrentScreen());
             AddRepeatStep("move mouse", () => InputManager.MoveMouseTo(loader.VisualSettings.ScreenSpaceDrawQuad.TopLeft + (loader.VisualSettings.ScreenSpaceDrawQuad.BottomRight - loader.VisualSettings.ScreenSpaceDrawQuad.TopLeft) * RNG.NextSingle()), 20);
             AddAssert("loader still active", () => loader.IsCurrentScreen());
             AddUntilStep("loads after idle", () => !loader.IsCurrentScreen());
