@@ -33,13 +33,18 @@ namespace osu.Game.Screens.Menu
 
         protected override BackgroundScreen CreateBackground() => new BackgroundScreenBlack();
 
+        private readonly BindableDouble exitingVolumeFade = new BindableDouble(1);
+
+        [Resolved]
+        private AudioManager audio { get; set; }
+
         private Bindable<bool> menuVoice;
         private Bindable<bool> menuMusic;
         private Track track;
         private WorkingBeatmap introBeatmap;
 
         [BackgroundDependencyLoader]
-        private void load(AudioManager audio, OsuConfigManager config, BeatmapManager beatmaps, Framework.Game game)
+        private void load(OsuConfigManager config, BeatmapManager beatmaps, Framework.Game game)
         {
             menuVoice = config.GetBindable<bool>(OsuSetting.MenuVoice);
             menuMusic = config.GetBindable<bool>(OsuSetting.MenuMusic);
@@ -86,6 +91,7 @@ namespace osu.Game.Screens.Menu
             if (!resuming)
             {
                 Beatmap.Value = introBeatmap;
+                introBeatmap = null;
 
                 if (menuVoice.Value)
                     welcome.Play();
@@ -94,7 +100,10 @@ namespace osu.Game.Screens.Menu
                 {
                     // Only start the current track if it is the menu music. A beatmap's track is started when entering the Main Manu.
                     if (menuMusic.Value)
+                    {
                         track.Start();
+                        track = null;
+                    }
 
                     LoadComponentAsync(mainMenu = new MainMenu());
 
@@ -157,7 +166,8 @@ namespace osu.Game.Screens.Menu
             else
                 fadeOutTime = 500;
 
-            Scheduler.AddDelayed(this.Exit, fadeOutTime);
+            audio.AddAdjustment(AdjustableProperty.Volume, exitingVolumeFade);
+            this.TransformBindableTo(exitingVolumeFade, 0, fadeOutTime).OnComplete(_ => this.Exit());
 
             //don't want to fade out completely else we will stop running updates.
             Game.FadeTo(0.01f, fadeOutTime);
