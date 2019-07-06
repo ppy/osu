@@ -25,6 +25,8 @@ namespace osu.Game.Beatmaps.Drawables
             set => base.Masking = value;
         }
 
+        protected override double TransformDuration => 400;
+
         public UpdateableBeatmapSetCover(BeatmapSetCoverType coverType = BeatmapSetCoverType.Cover)
         {
             this.coverType = coverType;
