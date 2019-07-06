@@ -4,10 +4,12 @@
 using System;
 using System.Collections.Generic;
 using NUnit.Framework;
+using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Timing;
+using osu.Game.Screens;
 using osu.Game.Screens.Menu;
 using osuTK.Graphics;
 
@@ -19,12 +21,16 @@ namespace osu.Game.Tests.Visual.Menus
         public override IReadOnlyList<Type> RequiredTypes => new[]
         {
             typeof(OsuLogo),
+            typeof(Intro),
+            typeof(StartupScreen),
+            typeof(OsuScreen)
         };
+
+        [Cached]
+        private OsuLogo logo;
 
         public TestSceneIntroSequence()
         {
-            OsuLogo logo;
-
             var rateAdjustClock = new StopwatchClock(true);
             var framedClock = new FramedClock(rateAdjustClock);
             framedClock.ProcessFrame();
@@ -40,14 +46,17 @@ namespace osu.Game.Tests.Visual.Menus
                         RelativeSizeAxes = Axes.Both,
                         Colour = Color4.Black,
                     },
+                    new OsuScreenStack(new Intro())
+                    {
+                        RelativeSizeAxes = Axes.Both,
+                    },
                     logo = new OsuLogo
                     {
                         Anchor = Anchor.Centre,
-                    }
+                    },
                 }
             });
 
-            AddStep(@"Restart", logo.PlayIntro);
             AddSliderStep("Playback speed", 0.0, 2.0, 1, v => rateAdjustClock.Rate = v);
         }
     }
