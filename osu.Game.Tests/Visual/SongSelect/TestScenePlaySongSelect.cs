@@ -300,10 +300,7 @@ namespace osu.Game.Tests.Visual.SongSelect
                 },
                 Beatmaps = beatmaps,
                 DateAdded = DateTimeOffset.UtcNow,
-                OnlineInfo = new BeatmapSetOnlineInfo
-                {
-                    BPM = bpm,
-                }
+                BPM = bpm,
             };
         }
     }
