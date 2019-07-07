@@ -52,11 +52,6 @@ namespace osu.Game.Beatmaps
         public string Preview { get; set; }
 
         /// <summary>
-        /// The beats per minute of this beatmap set's song.
-        /// </summary>
-        public double BPM { get; set; }
-
-        /// <summary>
         /// The amount of plays this beatmap set has.
         /// </summary>
         public int PlayCount { get; set; }

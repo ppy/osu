@@ -96,11 +96,11 @@ namespace osu.Game.Tests.Visual.Online
                         FavouriteCount = 456,
                         Submitted = DateTime.Now,
                         Ranked = DateTime.Now,
-                        BPM = 111,
                         HasVideo = true,
                         HasStoryboard = true,
                         Covers = new BeatmapSetOnlineCovers(),
                     },
+                    BPM = 111,
                     Metrics = new BeatmapSetMetrics { Ratings = Enumerable.Range(0, 11).ToArray() },
                     Beatmaps = new List<BeatmapInfo>
                     {
@@ -169,11 +169,11 @@ namespace osu.Game.Tests.Visual.Online
                         FavouriteCount = 456,
                         Submitted = DateTime.Now,
                         Ranked = DateTime.Now,
-                        BPM = 111,
                         HasVideo = true,
                         HasStoryboard = true,
                         Covers = new BeatmapSetOnlineCovers(),
                     },
+                    BPM = 111,
                     Metrics = new BeatmapSetMetrics { Ratings = Enumerable.Range(0, 11).ToArray() },
                     Beatmaps = new List<BeatmapInfo>
                     {

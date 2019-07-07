@@ -35,6 +35,11 @@ namespace osu.Game.Beatmaps
         [NotMapped]
         public BeatmapSetMetrics Metrics { get; set; }
 
+        /// <summary>
+        /// The beats per minute of this beatmap set's song.
+        /// </summary>
+        public double BPM { get; set; }
+
         public double MaxStarDifficulty => Beatmaps?.Max(b => b.StarDifficulty) ?? 0;
 
         public double MaxLength => Beatmaps?.Max(b => b.OnlineInfo.Length) ?? 0;

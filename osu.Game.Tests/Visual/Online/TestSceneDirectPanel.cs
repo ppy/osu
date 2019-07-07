@@ -47,11 +47,11 @@ namespace osu.Game.Tests.Visual.Online
                 Preview = @"https://b.ppy.sh/preview/12345.mp3",
                 PlayCount = 123,
                 FavouriteCount = 456,
-                BPM = 111,
                 HasVideo = true,
                 HasStoryboard = true,
                 Covers = new BeatmapSetOnlineCovers(),
             },
+            BPM = 111,
             Beatmaps = new List<BeatmapInfo>
             {
                 new BeatmapInfo
