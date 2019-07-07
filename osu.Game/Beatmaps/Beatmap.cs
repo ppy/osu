@@ -8,6 +8,7 @@ using System.Linq;
 using osu.Game.Beatmaps.ControlPoints;
 using Newtonsoft.Json;
 using osu.Game.IO.Serialization.Converters;
+using osu.Game.Rulesets.Objects.Types;
 
 namespace osu.Game.Beatmaps
 {
@@ -60,5 +61,16 @@ namespace osu.Game.Beatmaps
     public class Beatmap : Beatmap<HitObject>
     {
         public new Beatmap Clone() => (Beatmap)base.Clone();
+    }
+
+    public static class BeatmapExtensions
+    {
+        public static double CalculateLength(this IBeatmap b)
+        {
+            HitObject lastObject = b.HitObjects.LastOrDefault();
+            var endTime = (lastObject as IHasEndTime)?.EndTime ?? lastObject?.StartTime ?? 0;
+
+            return endTime - b.HitObjects.FirstOrDefault()?.StartTime ?? 0;
+        }
     }
 }
