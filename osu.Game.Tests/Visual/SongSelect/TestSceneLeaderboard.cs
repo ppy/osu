@@ -42,8 +42,8 @@ namespace osu.Game.Tests.Visual.SongSelect
             AddStep(@"No supporter", () => leaderboard.SetRetrievalState(PlaceholderState.NotSupporter));
             AddStep(@"Not logged in", () => leaderboard.SetRetrievalState(PlaceholderState.NotLoggedIn));
             AddStep(@"Unavailable", () => leaderboard.SetRetrievalState(PlaceholderState.Unavailable));
-            AddStep(@"Ranked beatmap", rankedBeatmap);
-            AddStep(@"Pending beatmap", pendingBeatmap);
+            foreach (BeatmapSetOnlineStatus status in Enum.GetValues(typeof(BeatmapSetOnlineStatus)))
+                AddStep($"{status} beatmap", () => showBeatmapWithStatus(status));
         }
 
         private void newScores()
@@ -235,21 +235,12 @@ namespace osu.Game.Tests.Visual.SongSelect
             leaderboard.Scores = scores;
         }
 
-        private void rankedBeatmap()
+        private void showBeatmapWithStatus(BeatmapSetOnlineStatus status)
         {
             leaderboard.Beatmap = new BeatmapInfo
             {
                 OnlineBeatmapID = 1113057,
-                Status = BeatmapSetOnlineStatus.Ranked,
-            };
-        }
-
-        private void pendingBeatmap()
-        {
-            leaderboard.Beatmap = new BeatmapInfo
-            {
-                OnlineBeatmapID = 1113057,
-                Status = BeatmapSetOnlineStatus.Pending,
+                Status = status,
             };
         }
 
