@@ -131,7 +131,8 @@ namespace osu.Game.Screens.Menu
         {
             base.LoadComplete();
 
-            Scheduler.AddDelayed(updateAmplitudes, time_between_updates, true);
+            var delayed = Scheduler.AddDelayed(updateAmplitudes, time_between_updates, true);
+            delayed.PerformRepeatCatchUpExecutions = false;
         }
 
         protected override void Update()

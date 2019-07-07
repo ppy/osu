@@ -498,6 +498,9 @@ namespace osu.Game.Screens.Play
 
             GameplayClockContainer.Restart();
             GameplayClockContainer.FadeInFromZero(750, Easing.OutQuint);
+
+            foreach (var mod in Mods.Value.OfType<IApplicableToHUD>())
+                mod.ApplyToHUD(HUDOverlay);
         }
 
         public override void OnSuspending(IScreen next)
