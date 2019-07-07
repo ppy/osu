@@ -261,8 +261,10 @@ namespace osu.Game
         /// </summary>
         public void PresentScore(ScoreInfo score)
         {
-            var databasedScore = ScoreManager.GetScore(score);
-            var databasedScoreInfo = databasedScore.ScoreInfo;
+            // The given ScoreInfo may have missing properties if it was retrieved from online data. Re-retrieve it from the database
+            // to ensure all the required data for presenting a replay are present.
+            var databasedScoreInfo = ScoreManager.Query(s => s.OnlineScoreID == score.OnlineScoreID);
+            var databasedScore = ScoreManager.GetScore(databasedScoreInfo);
 
             if (databasedScore.Replay == null)
             {
@@ -295,6 +297,10 @@ namespace osu.Game
             var nextBeatmap = beatmap.NewValue;
             if (nextBeatmap?.Track != null)
                 nextBeatmap.Track.Completed += currentTrackCompleted;
+
+            beatmap.OldValue?.Dispose();
+
+            nextBeatmap?.LoadBeatmapAsync();
         }
 
         private void currentTrackCompleted()
@@ -381,6 +387,7 @@ namespace osu.Game
             BeatmapManager.PresentImport = items => PresentBeatmap(items.First());
 
             ScoreManager.PostNotification = n => notifications?.Post(n);
+            ScoreManager.GetStableStorage = GetStorageForStableInstall;
             ScoreManager.PresentImport = items => PresentScore(items.First());
 
             Container logoContainer;

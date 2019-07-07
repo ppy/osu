@@ -127,7 +127,11 @@ namespace osu.Game.Screens.Play
                     Child = new LocalSkinOverrideContainer(working.Skin)
                     {
                         RelativeSizeAxes = Axes.Both,
-                        Child = DrawableRuleset
+                        Children = new Drawable[]
+                        {
+                            DrawableRuleset,
+                            new ComboEffects(ScoreProcessor)
+                        }
                     }
                 },
                 new BreakOverlay(working.Beatmap.BeatmapInfo.LetterboxInBreaks, ScoreProcessor)
@@ -494,6 +498,9 @@ namespace osu.Game.Screens.Play
 
             GameplayClockContainer.Restart();
             GameplayClockContainer.FadeInFromZero(750, Easing.OutQuint);
+
+            foreach (var mod in Mods.Value.OfType<IApplicableToHUD>())
+                mod.ApplyToHUD(HUDOverlay);
         }
 
         public override void OnSuspending(IScreen next)
