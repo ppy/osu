@@ -111,20 +111,10 @@ namespace osu.Game.Screens.Select.Leaderboards
                 return null;
             }
 
-            if (Beatmap?.OnlineBeatmapID == null)
+            if (Beatmap?.OnlineBeatmapID == null || Beatmap?.Status <= BeatmapSetOnlineStatus.Pending)
             {
                 PlaceholderState = PlaceholderState.Unavailable;
                 return null;
-            }
-
-            switch (Beatmap?.Status)
-            {
-                case BeatmapSetOnlineStatus.Graveyard:
-                case BeatmapSetOnlineStatus.None:
-                case BeatmapSetOnlineStatus.Pending:
-                case BeatmapSetOnlineStatus.WIP:
-                    PlaceholderState = PlaceholderState.Unavailable;
-                    return null;
             }
 
             if (!api.LocalUser.Value.IsSupporter && (Scope != BeatmapLeaderboardScope.Global || filterMods))
