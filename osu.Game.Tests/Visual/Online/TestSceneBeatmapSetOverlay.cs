@@ -32,7 +32,7 @@ namespace osu.Game.Tests.Visual.Online
             typeof(BasicStats),
             typeof(BeatmapPicker),
             typeof(Details),
-            typeof(DownloadButton),
+            typeof(HeaderDownloadButton),
             typeof(FavouriteButton),
             typeof(Header),
             typeof(HeaderButton),

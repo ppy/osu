@@ -129,7 +129,7 @@ namespace osu.Desktop.Updater
                     Activated = () =>
                     {
                         updateManager.PrepareUpdateAsync()
-                                     .ContinueWith(_ => Schedule(() => game.GracefullyExit()));
+                                     .ContinueWith(_ => updateManager.Schedule(() => game.GracefullyExit()));
                         return true;
                     }
                 };
