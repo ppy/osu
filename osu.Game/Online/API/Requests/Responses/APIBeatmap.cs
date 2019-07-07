@@ -71,6 +71,7 @@ namespace osu.Game.Online.API.Requests.Responses
                 StarDifficulty = starDifficulty,
                 OnlineBeatmapID = OnlineBeatmapID,
                 Version = version,
+                Length = length,
                 Status = Status,
                 BeatmapSet = set,
                 Metrics = metrics,
@@ -85,7 +86,6 @@ namespace osu.Game.Online.API.Requests.Responses
                 {
                     PlayCount = playCount,
                     PassCount = passCount,
-                    Length = length,
                     CircleCount = circleCount,
                     SliderCount = sliderCount,
                 },

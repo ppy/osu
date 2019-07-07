@@ -108,6 +108,7 @@ namespace osu.Game.Tests.Visual.Online
                         {
                             StarDifficulty = 9.99,
                             Version = @"TEST",
+                            Length = 456000,
                             Ruleset = maniaRuleset,
                             BaseDifficulty = new BeatmapDifficulty
                             {
@@ -118,7 +119,6 @@ namespace osu.Game.Tests.Visual.Online
                             },
                             OnlineInfo = new BeatmapOnlineInfo
                             {
-                                Length = 456000,
                                 CircleCount = 111,
                                 SliderCount = 12,
                                 PlayCount = 222,
@@ -181,6 +181,7 @@ namespace osu.Game.Tests.Visual.Online
                         {
                             StarDifficulty = 5.67,
                             Version = @"ANOTHER TEST",
+                            Length = 123000,
                             Ruleset = taikoRuleset,
                             BaseDifficulty = new BeatmapDifficulty
                             {
@@ -191,7 +192,6 @@ namespace osu.Game.Tests.Visual.Online
                             },
                             OnlineInfo = new BeatmapOnlineInfo
                             {
-                                Length = 123000,
                                 CircleCount = 123,
                                 SliderCount = 45,
                                 PlayCount = 567,

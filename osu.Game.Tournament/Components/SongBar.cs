@@ -159,7 +159,7 @@ namespace osu.Game.Tournament.Components
             }
 
             var bpm = beatmap.BeatmapSet.BPM;
-            var length = beatmap.OnlineInfo.Length;
+            var length = beatmap.Length;
             string hardRockExtra = "";
             string srExtra = "";
 

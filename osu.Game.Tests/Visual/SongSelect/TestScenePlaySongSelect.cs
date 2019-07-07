@@ -275,14 +275,11 @@ namespace osu.Game.Tests.Visual.SongSelect
                     OnlineBeatmapID = beatmapId,
                     Path = "normal.osu",
                     Version = $"{beatmapId} (length {TimeSpan.FromMilliseconds(length):m\\:ss})",
+                    Length = length,
                     BaseDifficulty = new BeatmapDifficulty
                     {
                         OverallDifficulty = 3.5f,
                     },
-                    OnlineInfo = new BeatmapOnlineInfo
-                    {
-                        Length = length,
-                    }
                 });
             }
 
