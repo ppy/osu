@@ -168,7 +168,7 @@ namespace osu.Game.Screens.Edit
 
             menuBar.Mode.ValueChanged += onModeChanged;
 
-            host.Exiting += onQuittingGame;
+            host.Exiting += onExitingGame;
 
             bottomBackground.Colour = colours.Gray2;
         }
@@ -256,7 +256,7 @@ namespace osu.Game.Screens.Edit
                 }
             }
 
-            host.Exiting -= onQuittingGame;
+            host.Exiting -= onExitingGame;
 
             return base.OnExiting(next);
         }
@@ -295,6 +295,6 @@ namespace osu.Game.Screens.Edit
                 clock.SeekForward(!clock.IsRunning, amount);
         }
 
-        private bool onQuittingGame() => isExitingGame = true;
+        private bool onExitingGame() => isExitingGame = true;
     }
 }
