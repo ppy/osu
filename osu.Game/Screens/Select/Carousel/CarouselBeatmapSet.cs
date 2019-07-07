@@ -51,6 +51,9 @@ namespace osu.Game.Screens.Select.Carousel
                 case SortMode.BPM:
                     return BeatmapSet.OnlineInfo.BPM.CompareTo(otherSet.BeatmapSet.OnlineInfo.BPM);
 
+                case SortMode.Length:
+                    return BeatmapSet.MaxLength.CompareTo(otherSet.BeatmapSet.MaxLength);
+
                 case SortMode.Difficulty:
                     return BeatmapSet.MaxStarDifficulty.CompareTo(otherSet.BeatmapSet.MaxStarDifficulty);
             }

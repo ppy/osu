@@ -37,6 +37,8 @@ namespace osu.Game.Beatmaps
 
         public double MaxStarDifficulty => Beatmaps?.Max(b => b.StarDifficulty) ?? 0;
 
+        public double MaxLength => Beatmaps?.Max(b => b.OnlineInfo.Length) ?? 0;
+
         [NotMapped]
         public bool DeletePending { get; set; }
 
