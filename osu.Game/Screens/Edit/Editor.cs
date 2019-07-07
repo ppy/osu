@@ -168,6 +168,8 @@ namespace osu.Game.Screens.Edit
 
             menuBar.Mode.ValueChanged += onModeChanged;
 
+            host.Exiting += onQuittingGame;
+
             bottomBackground.Colour = colours.Gray2;
         }
 
@@ -235,15 +237,26 @@ namespace osu.Game.Screens.Edit
             Beatmap.Value.Track?.Stop();
         }
 
+        private bool isExitingGame = false;
+
         public override bool OnExiting(IScreen next)
         {
             Background.FadeColour(Color4.White, 500);
 
             if (Beatmap.Value.Track != null)
             {
-                Beatmap.Value.Track.Tempo.Value = 1;
-                Beatmap.Value.Track.Start();
+                if (isExitingGame)
+                {
+                    Beatmap.Value.Track.Stop();
+                }
+                else
+                {
+                    Beatmap.Value.Track.Tempo.Value = 1;
+                    Beatmap.Value.Track.Start();
+                }
             }
+
+            host.Exiting -= onQuittingGame;
 
             return base.OnExiting(next);
         }
@@ -281,5 +294,7 @@ namespace osu.Game.Screens.Edit
             else
                 clock.SeekForward(!clock.IsRunning, amount);
         }
+
+        private bool onQuittingGame() => isExitingGame = true;
     }
 }
