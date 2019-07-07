@@ -280,11 +280,14 @@ namespace osu.Game.Screens.Multi
 
                 if (track != null)
                 {
-                    track.RestartPoint = Beatmap.Value.Metadata.PreviewTime;
                     track.Looping = true;
 
                     if (!track.IsRunning)
+                    {
+                        track.Stop();
+                        track.RestartPoint = Beatmap.Value.Metadata.PreviewTime != -1 ? Beatmap.Value.Metadata.PreviewTime : 0.4f * track.Length;
                         track.Restart();
+                    }
                 }
             }
             else

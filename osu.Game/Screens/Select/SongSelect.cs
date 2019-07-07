@@ -572,7 +572,8 @@ namespace osu.Game.Screens.Select
 
             if (!track.IsRunning || restart)
             {
-                track.RestartPoint = Beatmap.Value.Metadata.PreviewTime;
+                track.Stop();
+                track.RestartPoint = Beatmap.Value.Metadata.PreviewTime != -1 ? Beatmap.Value.Metadata.PreviewTime : 0.4f * track.Length;
                 track.Restart();
             }
         }
