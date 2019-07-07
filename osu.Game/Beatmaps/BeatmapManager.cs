@@ -303,11 +303,7 @@ namespace osu.Game.Beatmaps
                     beatmap.BeatmapInfo.Ruleset = ruleset;
                     // TODO: this should be done in a better place once we actually need to dynamically update it.
                     beatmap.BeatmapInfo.StarDifficulty = ruleset?.CreateInstance().CreateDifficultyCalculator(new DummyConversionBeatmap(beatmap)).Calculate().StarRating ?? 0;
-
-                    beatmap.BeatmapInfo.OnlineInfo = new BeatmapOnlineInfo
-                    {
-                        Length = beatmap.CalculateLength(),
-                    };
+                    beatmap.BeatmapInfo.Length = beatmap.CalculateLength();
 
                     beatmapInfos.Add(beatmap.BeatmapInfo);
                 }
