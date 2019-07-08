@@ -10,6 +10,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.MathUtils;
 using osu.Game.Graphics;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays.BeatmapSet.Scores;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu.Mods;
@@ -165,6 +166,29 @@ namespace osu.Game.Tests.Visual.Online
                 },
             };
 
+            var myBestScore = new APILegacyUserTopScoreInfo
+            {
+                Score = new APILegacyScoreInfo
+                {
+                    User = new User
+                    {
+                        Id = 7151382,
+                        Username = @"Mayuri Hana",
+                        Country = new Country
+                        {
+                            FullName = @"Thailand",
+                            FlagName = @"TH",
+                        },
+                    },
+                    Rank = ScoreRank.D,
+                    PP = 160,
+                    MaxCombo = 1234,
+                    TotalScore = 123456,
+                    Accuracy = 0.6543,
+                },
+                Position = 1337,
+            };
+
             foreach (var s in scores)
             {
                 s.Statistics.Add(HitResult.Great, RNG.Next(2000));
@@ -173,9 +197,18 @@ namespace osu.Game.Tests.Visual.Online
                 s.Statistics.Add(HitResult.Miss, RNG.Next(2000));
             }
 
-            AddStep("Load all scores", () => scoresContainer.Scores = scores);
-            AddStep("Load null scores", () => scoresContainer.Scores = null);
+            AddStep("Load all scores", () =>
+            {
+                scoresContainer.Scores = scores;
+                scoresContainer.UserScore = myBestScore;
+            });
+            AddStep("Load null scores", () =>
+            {
+                scoresContainer.Scores = null;
+                scoresContainer.UserScore = null;
+            });
             AddStep("Load only one score", () => scoresContainer.Scores = new[] { scores.First() });
+            AddStep("Add my best score", () => scoresContainer.UserScore = myBestScore);
         }
 
         [BackgroundDependencyLoader]
