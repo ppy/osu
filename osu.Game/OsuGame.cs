@@ -282,7 +282,6 @@ namespace osu.Game
 
             performFromMainMenu(() =>
             {
-                Ruleset.Value = databasedScoreInfo.Ruleset;
                 Beatmap.Value = BeatmapManager.GetWorkingBeatmap(databasedBeatmap);
 
                 menuScreen.Push(new ReplayPlayerLoader(databasedScore));
