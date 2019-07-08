@@ -1,32 +1,33 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
 using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Game.Rulesets.Mods;
+using osu.Game.Scoring;
 
 namespace osu.Game.Screens.Play
 {
     public class ReplayPlayerLoader : PlayerLoader
     {
-        private readonly IReadOnlyList<Mod> mods;
+        private readonly Bindable<IReadOnlyList<Mod>> mods;
 
-        public ReplayPlayerLoader(Func<Player> player, IReadOnlyList<Mod> mods)
-            : base(player)
+        public ReplayPlayerLoader(Score score, IReadOnlyList<Mod> mods)
+            : base(() => new ReplayPlayer(score))
         {
-            this.mods = mods;
+            this.mods = new Bindable<IReadOnlyList<Mod>>(mods);
         }
-
-        private DependencyContainer dependencies;
 
         protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
         {
-            dependencies = new DependencyContainer(parent);
-            dependencies.Cache(new Bindable<IReadOnlyList<Mod>>(mods));
+            var dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
+            dependencies.Cache(mods);
 
-            return base.CreateChildDependencies(dependencies);
+            // Overwrite the global mods here for use in the mod hud.
+            Mods.Value = mods.Value;
+
+            return dependencies;
         }
     }
 }
