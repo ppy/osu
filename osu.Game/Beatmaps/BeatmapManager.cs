@@ -272,7 +272,10 @@ namespace osu.Game.Beatmaps
                 Beatmaps = new List<BeatmapInfo>(),
                 Metadata = beatmap.Metadata,
                 DateAdded = DateTimeOffset.UtcNow,
-                BPM = beatmap.ControlPointInfo.BPMMode,
+                OnlineInfo = new BeatmapSetOnlineInfo
+                {
+                    BPM = beatmap.ControlPointInfo.BPMMode,
+                }
             };
         }
 
