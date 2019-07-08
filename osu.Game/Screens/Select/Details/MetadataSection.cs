@@ -8,34 +8,15 @@ using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Online.Chat;
 using osuTK;
-using osuTK.Graphics;
 
 namespace osu.Game.Screens.Select.Details
 {
-    public class MetadataSection : FillFlowContainer
+    public abstract class MetadataSection : FillFlowContainer
     {
         private readonly float transitionDuration;
         private readonly MetadataType type;
-        private readonly OsuSpriteText header;
-        private readonly LinkFlowContainer linkFlow;
-
-        public Color4 TextColour
-        {
-            get => linkFlow.Colour;
-            set => linkFlow.Colour = value;
-        }
-
-        public Color4 HeaderColour
-        {
-            get => header.Colour;
-            set => header.Colour = value;
-        }
-
-        public MarginPadding HeaderMargin
-        {
-            get => header.Margin;
-            set => header.Margin = value;
-        }
+        protected readonly OsuSpriteText Header;
+        protected readonly LinkFlowContainer LinkFlow;
 
         public string Text
         {
@@ -48,12 +29,12 @@ namespace osu.Game.Screens.Select.Details
                 }
 
                 this.FadeIn(transitionDuration);
-                linkFlow.Clear();
+                LinkFlow.Clear();
                 addMetadataLinks(value, type);
             }
         }
 
-        public MetadataSection(MetadataType type, float transitionDuration)
+        protected MetadataSection(MetadataType type, float transitionDuration)
         {
             this.type = type;
             this.transitionDuration = transitionDuration;
@@ -63,14 +44,14 @@ namespace osu.Game.Screens.Select.Details
             Spacing = new Vector2(5f);
             InternalChildren = new Drawable[]
             {
-                header = new OsuSpriteText
+                Header = new OsuSpriteText
                 {
                     Text = type.ToString(),
                     Font = OsuFont.GetFont(size: 14, weight: FontWeight.Bold),
                     Shadow = false,
                     Margin = new MarginPadding { Top = 5 },
                 },
-                linkFlow = new LinkFlowContainer(s => s.Font = s.Font.With(size: 14))
+                LinkFlow = new LinkFlowContainer(s => s.Font = s.Font.With(size: 14))
                 {
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
@@ -84,15 +65,15 @@ namespace osu.Game.Screens.Select.Details
             {
                 case MetadataType.Tags:
                     foreach (string individualTag in text.Split(' '))
-                        linkFlow.AddLink(individualTag + " ", null, LinkAction.OpenTextSearch, individualTag, "Open search");
+                        LinkFlow.AddLink(individualTag + " ", null, LinkAction.OpenTextSearch, individualTag, "Open search");
                     break;
 
                 case MetadataType.Source:
-                    linkFlow.AddLink(text, null, LinkAction.OpenTextSearch, text, "Open search");
+                    LinkFlow.AddLink(text, null, LinkAction.OpenTextSearch, text, "Open search");
                     break;
 
                 case MetadataType.Description:
-                    linkFlow.AddText(text);
+                    LinkFlow.AddText(text);
                     break;
             }
         }

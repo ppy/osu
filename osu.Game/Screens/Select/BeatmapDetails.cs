@@ -62,7 +62,6 @@ namespace osu.Game.Screens.Select
 
         public BeatmapDetails()
         {
-            Color4 linkColour = Color4.White.Opacity(0.75f);
             Children = new Drawable[]
             {
                 new Box
@@ -128,18 +127,9 @@ namespace osu.Game.Screens.Select
                                         Margin = new MarginPadding { Top = spacing * 2 },
                                         Children = new[]
                                         {
-                                            description = new MetadataSection(MetadataType.Description, transition_duration)
-                                            {
-                                                TextColour = linkColour,
-                                            },
-                                            source = new MetadataSection(MetadataType.Source, transition_duration)
-                                            {
-                                                TextColour = linkColour,
-                                            },
-                                            tags = new MetadataSection(MetadataType.Tags, transition_duration)
-                                            {
-                                                TextColour = linkColour,
-                                            },
+                                            description = new DetailsMetadataSection(MetadataType.Description),
+                                            source = new DetailsMetadataSection(MetadataType.Source),
+                                            tags = new DetailsMetadataSection(MetadataType.Tags),
                                         },
                                     },
                                 },
@@ -281,6 +271,15 @@ namespace osu.Game.Screens.Select
             }
 
             loading.Hide();
+        }
+
+        private class DetailsMetadataSection : MetadataSection
+        {
+            public DetailsMetadataSection(MetadataType type)
+                : base(type, transition_duration)
+            {
+                LinkFlow.Colour = Color4.White.Opacity(0.75f);
+            }
         }
 
         private class DetailBox : Container

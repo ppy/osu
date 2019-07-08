@@ -24,7 +24,7 @@ namespace osu.Game.Overlays.BeatmapSet
 
         private readonly Box successRateBackground;
         private readonly SuccessRate successRate;
-        private readonly MetadataSection source, tags, description;
+        private readonly InfoMetadataSection source, tags, description;
         public readonly Bindable<BeatmapSetInfo> BeatmapSet = new Bindable<BeatmapSetInfo>();
 
         public BeatmapInfo Beatmap
@@ -66,10 +66,7 @@ namespace osu.Game.Overlays.BeatmapSet
                             Child = new Container
                             {
                                 RelativeSizeAxes = Axes.Both,
-                                Child = description = new MetadataSection(MetadataType.Description, transition_duration)
-                                {
-                                    HeaderMargin = new MarginPadding { Top = 20 },
-                                },
+                                Child = description = new InfoMetadataSection(MetadataType.Description),
                             },
                         },
                         new Container
@@ -88,14 +85,8 @@ namespace osu.Game.Overlays.BeatmapSet
                                 LayoutDuration = transition_duration,
                                 Children = new[]
                                 {
-                                    source = new MetadataSection(MetadataType.Source, transition_duration)
-                                    {
-                                        HeaderMargin = new MarginPadding { Top = 20 },
-                                    },
-                                    tags = new MetadataSection(MetadataType.Tags, transition_duration)
-                                    {
-                                        HeaderMargin = new MarginPadding { Top = 20 },
-                                    },
+                                    source = new InfoMetadataSection(MetadataType.Source),
+                                    tags = new InfoMetadataSection(MetadataType.Tags),
                                 },
                             },
                         },
@@ -136,6 +127,21 @@ namespace osu.Game.Overlays.BeatmapSet
             source.HeaderColour = colours.Gray5;
             tags.HeaderColour = colours.Gray5;
             description.HeaderColour = colours.Gray5;
+        }
+
+        private class InfoMetadataSection : MetadataSection
+        {
+            public Color4 HeaderColour
+            {
+                get => Header.Colour;
+                set => Header.Colour = value;
+            }
+
+            public InfoMetadataSection(MetadataType type)
+                : base(type, transition_duration)
+            {
+                Header.Margin = new MarginPadding { Top = 20 };
+            }
         }
     }
 }
