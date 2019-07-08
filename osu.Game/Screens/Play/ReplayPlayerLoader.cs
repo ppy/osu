@@ -3,7 +3,6 @@
 
 using System.Collections.Generic;
 using osu.Framework.Allocation;
-using osu.Framework.Bindables;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Scoring;
 
