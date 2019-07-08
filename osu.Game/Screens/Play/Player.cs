@@ -362,7 +362,12 @@ namespace osu.Game.Screens.Play
             storyboard.Masking = true;
 
             if (asyncLoad)
-                LoadComponentAsync(storyboard, StoryboardContainer.Add);
+                LoadComponentAsync(storyboard, c =>
+                {
+                    // Since the storyboard was loaded before it can be added to the draw hierarchy, manually set the clock for it here.
+                    c.Clock = GameplayClockContainer.GameplayClock;
+                    StoryboardContainer.Add(c);
+                });
             else
                 StoryboardContainer.Add(storyboard);
         }
