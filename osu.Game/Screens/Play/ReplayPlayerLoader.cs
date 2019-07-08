@@ -11,21 +11,20 @@ namespace osu.Game.Screens.Play
 {
     public class ReplayPlayerLoader : PlayerLoader
     {
-        private readonly Bindable<IReadOnlyList<Mod>> mods;
+        private readonly IReadOnlyList<Mod> mods;
 
         public ReplayPlayerLoader(Score score)
             : base(() => new ReplayPlayer(score))
         {
-            mods = new Bindable<IReadOnlyList<Mod>>(score.ScoreInfo.Mods);
+            mods = score.ScoreInfo.Mods;
         }
 
         protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
         {
             var dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
-            dependencies.Cache(mods);
 
             // Overwrite the global mods here for use in the mod hud.
-            Mods.Value = mods.Value;
+            Mods.Value = mods;
 
             return dependencies;
         }
