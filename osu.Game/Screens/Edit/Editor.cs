@@ -243,21 +243,6 @@ namespace osu.Game.Screens.Edit
         {
             Background.FadeColour(Color4.White, 500);
 
-            if (Beatmap.Value.Track != null)
-            {
-                if (isExitingGame)
-                {
-                    Beatmap.Value.Track.Stop();
-                }
-                else
-                {
-                    Beatmap.Value.Track.Tempo.Value = 1;
-                    Beatmap.Value.Track.Start();
-                }
-            }
-
-            host.Exiting -= onExitingGame;
-
             return base.OnExiting(next);
         }
 

@@ -66,6 +66,8 @@ namespace osu.Game.Overlays
         /// </summary>
         public Func<float> GetToolbarHeight;
 
+        public bool UserRequestedPause { get; private set; }
+
         public MusicController()
         {
             Width = 400;
@@ -286,6 +288,8 @@ namespace osu.Game.Overlays
                     next(true);
                 return;
             }
+
+            UserRequestedPause = track.IsRunning;
 
             if (track.IsRunning)
                 track.Stop();
