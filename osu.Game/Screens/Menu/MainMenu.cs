@@ -120,7 +120,7 @@ namespace osu.Game.Screens.Menu
             var track = Beatmap.Value.Track;
             var metadata = Beatmap.Value.Metadata;
 
-            if (last is Intro && track != null)
+            if (last is Intro && track != null && !Game.MusicController.UserRequestedPause)
             {
                 if (!track.IsRunning)
                 {
@@ -189,6 +189,8 @@ namespace osu.Game.Screens.Menu
 
             //we may have consumed our preloaded instance, so let's make another.
             preloadSongSelect();
+
+            ResumeIfNoUserPauseRequested();
         }
 
         public override bool OnExiting(IScreen next)
