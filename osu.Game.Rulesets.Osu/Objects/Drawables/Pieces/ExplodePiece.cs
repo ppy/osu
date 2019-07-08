@@ -27,5 +27,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
                 Alpha = 0.2f,
             }, s => s.GetTexture("Play/osu/hitcircle") == null);
         }
+
+        public bool HasImplementation => ((SkinnableDrawable)Child).HasImplementation;
     }
 }

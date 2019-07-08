@@ -92,5 +92,7 @@ namespace osu.Game.Skinning
             else
                 ClearInternal();
         }
+
+        public bool HasImplementation => Drawable != null;
     }
 }

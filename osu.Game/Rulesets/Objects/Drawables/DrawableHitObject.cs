@@ -138,6 +138,13 @@ namespace osu.Game.Rulesets.Objects.Drawables
             State.TriggerChange();
         }
 
+        protected override void SkinChanged(ISkinSource skin, bool allowFallback)
+        {
+            base.SkinChanged(skin, allowFallback);
+            if (IsLoaded)
+                State.TriggerChange();
+        }
+
         protected abstract void UpdateState(ArmedState state);
 
         /// <summary>

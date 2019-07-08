@@ -29,6 +29,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                 ShakeDuration = 30,
                 RelativeSizeAxes = Axes.Both
             });
+
             Alpha = 0;
         }
 
