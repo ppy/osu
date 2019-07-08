@@ -64,14 +64,13 @@ namespace osu.Game.Rulesets.Osu.Mods
                 case DrawableSlider slider:
                     ApplyTraceableState(slider.HeadCircle, state);
                     slider.Body.AccentColour = Color4.Transparent;
-
+                    slider.Body.BorderColour = slider.HeadCircle.AccentColour;
                     break;
 
                 case DrawableSpinner spinner:
                     spinner.Disc.Hide();
                     //spinner.Ticks.Hide(); // do they contribute to the theme? debatable
                     spinner.Background.Hide();
-
                     break;
             }
         }
