@@ -18,9 +18,8 @@ namespace osu.Game.Screens.Play
 
         protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
         {
-            var dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
+            var dependencies = base.CreateChildDependencies(parent);
 
-            // Overwrite the global mods here for use in the mod hud.
             Mods.Value = scoreInfo.Mods;
             Ruleset.Value = scoreInfo.Ruleset;
 
