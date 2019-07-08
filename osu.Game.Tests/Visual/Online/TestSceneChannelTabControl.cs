@@ -70,7 +70,7 @@ namespace osu.Game.Tests.Visual.Online
             });
 
             channelTabControl.OnRequestLeave += channel => channelTabControl.RemoveChannel(channel);
-            channelTabControl.Current.ValueChanged += channel => currentText.Text = "Currently selected channel: " + channel.NewValue.ToString();
+            channelTabControl.Current.ValueChanged += channel => currentText.Text = "Currently selected channel: " + channel.NewValue;
 
             AddStep("Add random private channel", addRandomPrivateChannel);
             AddAssert("There is only one channels", () => channelTabControl.Items.Count() == 2);
