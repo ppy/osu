@@ -13,10 +13,10 @@ namespace osu.Game.Screens.Play
     {
         private readonly Bindable<IReadOnlyList<Mod>> mods;
 
-        public ReplayPlayerLoader(Score score, IReadOnlyList<Mod> mods)
+        public ReplayPlayerLoader(Score score)
             : base(() => new ReplayPlayer(score))
         {
-            this.mods = new Bindable<IReadOnlyList<Mod>>(mods);
+            mods = new Bindable<IReadOnlyList<Mod>>(score.ScoreInfo.Mods);
         }
 
         protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
