@@ -291,7 +291,7 @@ namespace osu.Game.Screens.Select
                     {
                         Name = "Length",
                         Icon = FontAwesome.Regular.Clock,
-                        Content = TimeSpan.FromMilliseconds(b.CalculateLength()).ToString(@"m\:ss"),
+                        Content = TimeSpan.FromMilliseconds(b.BeatmapInfo.Length).ToString(@"m\:ss"),
                     }));
 
                     labels.Add(new InfoLabel(new BeatmapStatistic
