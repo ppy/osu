@@ -29,6 +29,9 @@ namespace osu.Game.Screens.Select
                 beatmap = value;
                 Leaderboard.Beatmap = beatmap?.BeatmapInfo;
                 Details.Beatmap = beatmap?.BeatmapInfo;
+
+                // Hide detail area if no beatamps available (DummyWorkingBeatmap)
+                this.FadeTo(beatmap is DummyWorkingBeatmap ? 0 : 1);
             }
         }
 
