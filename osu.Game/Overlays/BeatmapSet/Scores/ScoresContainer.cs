@@ -14,6 +14,7 @@ using osuTK;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Game.Scoring;
+using osu.Game.Online.API.Requests.Responses;
 
 namespace osu.Game.Overlays.BeatmapSet.Scores
 {
@@ -25,7 +26,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
         private readonly Box background;
         private readonly ScoreTable scoreTable;
 
-        private readonly DrawableTopScore topScore;
+        private readonly FillFlowContainer topScoresContainer;
         private readonly LoadingAnimation loadingAnimation;
 
         [Resolved]
@@ -54,7 +55,13 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                     Margin = new MarginPadding { Vertical = spacing },
                     Children = new Drawable[]
                     {
-                        topScore = new DrawableTopScore(),
+                        topScoresContainer = new FillFlowContainer
+                        {
+                            RelativeSizeAxes = Axes.X,
+                            AutoSizeAxes = Axes.Y,
+                            Direction = FillDirection.Vertical,
+                            Spacing = new Vector2(0, 5),
+                        },
                         scoreTable = new ScoreTable
                         {
                             Anchor = Anchor.TopCentre,
@@ -97,6 +104,20 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
             }
         }
 
+        private APILegacyUserTopScoreInfo userScore;
+
+        public APILegacyUserTopScoreInfo UserScore
+        {
+            get => userScore;
+            set
+            {
+                getScoresRequest?.Cancel();
+                userScore = value;
+
+                updateDisplay();
+            }
+        }
+
         private BeatmapInfo beatmap;
 
         public BeatmapInfo Beatmap
@@ -114,7 +135,12 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                 loading = true;
 
                 getScoresRequest = new GetScoresRequest(beatmap, beatmap.Ruleset);
-                getScoresRequest.Success += r => Schedule(() => Scores = r.Scores);
+                getScoresRequest.Success += r => Schedule(() =>
+                {
+                    scores = r.Scores;
+                    userScore = r.UserScore;
+                    updateDisplay();
+                });
                 api.Queue(getScoresRequest);
             }
         }
@@ -122,17 +148,18 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
         private void updateDisplay()
         {
             loading = false;
+            topScoresContainer.Clear();
 
             scoreTable.Scores = scores?.Count > 1 ? scores : new List<ScoreInfo>();
             scoreTable.FadeTo(scores?.Count > 1 ? 1 : 0);
 
             if (scores?.Any() == true)
             {
-                topScore.Score = scores.FirstOrDefault();
-                topScore.Show();
+                topScoresContainer.Add(new DrawableTopScore(scores.FirstOrDefault()));
+
+                if (userScore != null && userScore.Position != 1)
+                    topScoresContainer.Add(new DrawableTopScore(userScore.Score, userScore.Position));
             }
-            else
-                topScore.Hide();
         }
 
         protected override void Dispose(bool isDisposing)
