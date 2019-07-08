@@ -48,7 +48,7 @@ namespace osu.Game.Tests.Visual.UserInterface
                 },
             };
 
-            breadcrumbs.Current.ValueChanged += screen => titleText.Text = $"Changed to {screen.NewValue.ToString()}";
+            breadcrumbs.Current.ValueChanged += screen => titleText.Text = $"Changed to {screen.NewValue}";
             breadcrumbs.Current.TriggerChange();
 
             waitForCurrent();
