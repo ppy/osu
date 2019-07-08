@@ -49,7 +49,7 @@ namespace osu.Game.Screens.Select.Carousel
                     return otherSet.BeatmapSet.DateAdded.CompareTo(BeatmapSet.DateAdded);
 
                 case SortMode.BPM:
-                    return BeatmapSet.BPM.CompareTo(otherSet.BeatmapSet.BPM);
+                    return BeatmapSet.OnlineInfo.BPM.CompareTo(otherSet.BeatmapSet.OnlineInfo.BPM);
 
                 case SortMode.Length:
                     return BeatmapSet.MaxLength.CompareTo(otherSet.BeatmapSet.MaxLength);
