@@ -52,7 +52,7 @@ namespace osu.Game.Beatmaps
         public BeatmapOnlineInfo OnlineInfo { get; set; }
 
         /// <summary>
-        /// The length in milliseconds of this beatmap's song.
+        /// The playable length of this beatmap.
         /// </summary>
         public double Length { get; set; }
 
