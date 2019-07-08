@@ -168,6 +168,8 @@ namespace osu.Game.Screens.Edit
 
             menuBar.Mode.ValueChanged += onModeChanged;
 
+            host.Exiting += onExitingGame;
+
             bottomBackground.Colour = colours.Gray2;
         }
 
@@ -235,6 +237,8 @@ namespace osu.Game.Screens.Edit
             Beatmap.Value.Track?.Stop();
         }
 
+        private bool isExitingGame = false;
+
         public override bool OnExiting(IScreen next)
         {
             Background.FadeColour(Color4.White, 500);
@@ -275,5 +279,7 @@ namespace osu.Game.Screens.Edit
             else
                 clock.SeekForward(!clock.IsRunning, amount);
         }
+
+        private bool onExitingGame() => isExitingGame = true;
     }
 }
