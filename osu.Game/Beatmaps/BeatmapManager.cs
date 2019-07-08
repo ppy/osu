@@ -23,6 +23,7 @@ using osu.Game.IO.Archives;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Game.Rulesets;
+using osu.Game.Rulesets.Objects.Types;
 
 namespace osu.Game.Beatmaps
 {
@@ -302,7 +303,7 @@ namespace osu.Game.Beatmaps
                     beatmap.BeatmapInfo.Ruleset = ruleset;
                     // TODO: this should be done in a better place once we actually need to dynamically update it.
                     beatmap.BeatmapInfo.StarDifficulty = ruleset?.CreateInstance().CreateDifficultyCalculator(new DummyConversionBeatmap(beatmap)).Calculate().StarRating ?? 0;
-                    beatmap.BeatmapInfo.Length = beatmap.CalculateLength();
+                    beatmap.BeatmapInfo.Length = calculateLength(beatmap);
                     beatmap.BeatmapInfo.BPM = beatmap.ControlPointInfo.BPMMode;
 
                     beatmapInfos.Add(beatmap.BeatmapInfo);
@@ -310,6 +311,14 @@ namespace osu.Game.Beatmaps
             }
 
             return beatmapInfos;
+        }
+
+        private double calculateLength(IBeatmap b)
+        {
+            var lastObject = b.HitObjects.LastOrDefault();
+            var endTime = (lastObject as IHasEndTime)?.EndTime ?? lastObject?.StartTime ?? 0;
+
+            return endTime - b.HitObjects.FirstOrDefault()?.StartTime ?? 0;
         }
 
         /// <summary>
