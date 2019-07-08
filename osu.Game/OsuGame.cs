@@ -285,7 +285,7 @@ namespace osu.Game
                 Ruleset.Value = databasedScoreInfo.Ruleset;
                 Beatmap.Value = BeatmapManager.GetWorkingBeatmap(databasedBeatmap);
 
-                menuScreen.Push(new ReplayPlayerLoader(databasedScore, databasedScoreInfo.Mods));
+                menuScreen.Push(new ReplayPlayerLoader(databasedScore));
             }, $"watch {databasedScoreInfo}", bypassScreenAllowChecks: true);
         }
 
