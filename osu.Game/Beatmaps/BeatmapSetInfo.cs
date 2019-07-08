@@ -45,6 +45,11 @@ namespace osu.Game.Beatmaps
         /// </summary>
         public double MaxLength => Beatmaps?.Max(b => b.Length) ?? 0;
 
+        /// <summary>
+        /// The maximum BPM of all beatmaps in this set.
+        /// </summary>
+        public double MaxBPM => Beatmaps?.Max(b => b.BPM) ?? 0;
+
         [NotMapped]
         public bool DeletePending { get; set; }
 

@@ -271,11 +271,7 @@ namespace osu.Game.Beatmaps
                 OnlineBeatmapSetID = beatmap.BeatmapInfo.BeatmapSet?.OnlineBeatmapSetID,
                 Beatmaps = new List<BeatmapInfo>(),
                 Metadata = beatmap.Metadata,
-                DateAdded = DateTimeOffset.UtcNow,
-                OnlineInfo = new BeatmapSetOnlineInfo
-                {
-                    BPM = beatmap.ControlPointInfo.BPMMode,
-                }
+                DateAdded = DateTimeOffset.UtcNow
             };
         }
 
@@ -307,6 +303,7 @@ namespace osu.Game.Beatmaps
                     // TODO: this should be done in a better place once we actually need to dynamically update it.
                     beatmap.BeatmapInfo.StarDifficulty = ruleset?.CreateInstance().CreateDifficultyCalculator(new DummyConversionBeatmap(beatmap)).Calculate().StarRating ?? 0;
                     beatmap.BeatmapInfo.Length = beatmap.CalculateLength();
+                    beatmap.BeatmapInfo.BPM = beatmap.ControlPointInfo.BPMMode;
 
                     beatmapInfos.Add(beatmap.BeatmapInfo);
                 }

@@ -56,6 +56,11 @@ namespace osu.Game.Beatmaps
         /// </summary>
         public double Length { get; set; }
 
+        /// <summary>
+        /// The most common BPM of this beatmap.
+        /// </summary>
+        public double BPM { get; set; }
+
         public string Path { get; set; }
 
         [JsonProperty("file_sha2")]
