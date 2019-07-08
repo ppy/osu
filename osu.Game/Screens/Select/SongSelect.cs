@@ -426,6 +426,8 @@ namespace osu.Game.Screens.Select
         {
             base.OnEntering(last);
 
+            ResumeIfNoUserPauseRequested();
+
             this.FadeInFromZero(250);
             FilterControl.Activate();
         }

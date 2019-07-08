@@ -239,12 +239,6 @@ namespace osu.Game.Screens.Edit
         {
             Background.FadeColour(Color4.White, 500);
 
-            if (Beatmap.Value.Track != null)
-            {
-                Beatmap.Value.Track.Tempo.Value = 1;
-                Beatmap.Value.Track.Start();
-            }
-
             return base.OnExiting(next);
         }
 
