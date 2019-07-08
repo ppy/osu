@@ -9,7 +9,7 @@ using osu.Game.Database;
 namespace osu.Game.Migrations
 {
     [DbContext(typeof(OsuDbContext))]
-    [Migration("20190707172237_AddBPMAndLengthColumns")]
+    [Migration("20190708070844_AddBPMAndLengthColumns")]
     partial class AddBPMAndLengthColumns
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -46,6 +46,8 @@ namespace osu.Game.Migrations
                         .ValueGeneratedOnAdd();
 
                     b.Property<int>("AudioLeadIn");
+
+                    b.Property<double>("BPM");
 
                     b.Property<int>("BaseDifficultyID");
 
@@ -169,8 +171,6 @@ namespace osu.Game.Migrations
                 {
                     b.Property<int>("ID")
                         .ValueGeneratedOnAdd();
-
-                    b.Property<double>("BPM");
 
                     b.Property<DateTimeOffset>("DateAdded");
 

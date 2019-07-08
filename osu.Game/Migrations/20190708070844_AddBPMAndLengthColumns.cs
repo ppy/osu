@@ -8,7 +8,7 @@ namespace osu.Game.Migrations
         {
             migrationBuilder.AddColumn<double>(
                 name: "BPM",
-                table: "BeatmapSetInfo",
+                table: "BeatmapInfo",
                 nullable: false,
                 defaultValue: 0.0);
 
@@ -23,7 +23,7 @@ namespace osu.Game.Migrations
         {
             migrationBuilder.DropColumn(
                 name: "BPM",
-                table: "BeatmapSetInfo");
+                table: "BeatmapInfo");
 
             migrationBuilder.DropColumn(
                 name: "Length",
