@@ -45,6 +45,8 @@ namespace osu.Game.Migrations
 
                     b.Property<int>("AudioLeadIn");
 
+                    b.Property<double>("BPM");
+
                     b.Property<int>("BaseDifficultyID");
 
                     b.Property<int>("BeatDivisor");
@@ -167,8 +169,6 @@ namespace osu.Game.Migrations
                 {
                     b.Property<int>("ID")
                         .ValueGeneratedOnAdd();
-
-                    b.Property<double>("BPM");
 
                     b.Property<DateTimeOffset>("DateAdded");
 
