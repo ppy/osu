@@ -23,7 +23,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
         private readonly ScoreTable scoreTable;
 
         private readonly FillFlowContainer topScoresContainer;
-        private readonly ContentContainer resizableContainer;
+        private readonly ContentContainer contentContainer;
         private readonly LoadingContainer loadingContainer;
 
         public ScoresContainer()
@@ -49,36 +49,33 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                             RelativeSizeAxes = Axes.X,
                             Masking = true,
                         },
-                        resizableContainer = new ContentContainer
+                        contentContainer = new ContentContainer
                         {
                             RelativeSizeAxes = Axes.X,
                             Masking = true,
-                            Children = new Drawable[]
+                            Child = new FillFlowContainer
                             {
-                                new FillFlowContainer
+                                Anchor = Anchor.TopCentre,
+                                Origin = Anchor.TopCentre,
+                                RelativeSizeAxes = Axes.X,
+                                AutoSizeAxes = Axes.Y,
+                                Width = 0.95f,
+                                Direction = FillDirection.Vertical,
+                                Spacing = new Vector2(0, spacing),
+                                Padding = new MarginPadding { Vertical = padding },
+                                Children = new Drawable[]
                                 {
-                                    Anchor = Anchor.TopCentre,
-                                    Origin = Anchor.TopCentre,
-                                    RelativeSizeAxes = Axes.X,
-                                    AutoSizeAxes = Axes.Y,
-                                    Width = 0.95f,
-                                    Direction = FillDirection.Vertical,
-                                    Spacing = new Vector2(0, spacing),
-                                    Padding = new MarginPadding { Vertical = padding },
-                                    Children = new Drawable[]
+                                    topScoresContainer = new FillFlowContainer
                                     {
-                                        topScoresContainer = new FillFlowContainer
-                                        {
-                                            RelativeSizeAxes = Axes.X,
-                                            AutoSizeAxes = Axes.Y,
-                                            Direction = FillDirection.Vertical,
-                                            Spacing = new Vector2(0, 5),
-                                        },
-                                        scoreTable = new ScoreTable
-                                        {
-                                            Anchor = Anchor.TopCentre,
-                                            Origin = Anchor.TopCentre,
-                                        }
+                                        RelativeSizeAxes = Axes.X,
+                                        AutoSizeAxes = Axes.Y,
+                                        Direction = FillDirection.Vertical,
+                                        Spacing = new Vector2(0, 5),
+                                    },
+                                    scoreTable = new ScoreTable
+                                    {
+                                        Anchor = Anchor.TopCentre,
+                                        Origin = Anchor.TopCentre,
                                     }
                                 },
                             }
@@ -103,20 +100,21 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
             get => loading;
             set
             {
-                if (loading == value)
-                    return;
-
                 loading = value;
 
                 if (value)
                 {
                     loadingContainer.Show();
-                    resizableContainer.Hide();
+                    contentContainer.Hide();
                 }
                 else
                 {
                     loadingContainer.Hide();
-                    resizableContainer.Show();
+
+                    if (scores == null || scores?.Scores.Count < 1)
+                        contentContainer.Hide();
+                    else
+                        contentContainer.Show();
                 }
             }
         }
@@ -171,14 +169,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                 if (State.Value == Visibility.Hidden)
                     return;
 
-                float height = 0;
-
-                foreach (var c in Children)
-                {
-                    height += c.Height;
-                }
-
-                maxHeight = height;
+                maxHeight = Child.DrawHeight;
 
                 this.ResizeHeightTo(maxHeight, duration, Easing.OutQuint);
             }
