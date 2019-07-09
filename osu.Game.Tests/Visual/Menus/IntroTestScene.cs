@@ -53,7 +53,9 @@ namespace osu.Game.Tests.Visual.Menus
 
             AddStep("restart sequence", () =>
             {
+                logo.FinishTransforms();
                 introStack?.Expire();
+
                 Add(introStack = new OsuScreenStack(CreateScreen())
                 {
                     RelativeSizeAxes = Axes.Both,
