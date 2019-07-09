@@ -278,6 +278,7 @@ namespace osu.Game.Screens.Select
             public DetailsMetadataSection(MetadataType type)
                 : base(type)
             {
+                Alpha = 0;
                 LinkFlow.Colour = Color4.White.Opacity(0.75f);
             }
         }
