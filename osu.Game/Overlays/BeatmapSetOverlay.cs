@@ -98,11 +98,7 @@ namespace osu.Game.Overlays
             scores.Loading = true;
 
             getScoresRequest = new GetScoresRequest(b, b.Ruleset);
-            getScoresRequest.Success += r => Schedule(() =>
-            {
-                scores.Scores = r;
-                scores.Loading = false;
-            });
+            getScoresRequest.Success += r => Schedule(() => scores.Scores = r);
             api.Queue(getScoresRequest);
         }
 

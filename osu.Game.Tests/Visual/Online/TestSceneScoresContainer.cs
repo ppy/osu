@@ -243,6 +243,7 @@ namespace osu.Game.Tests.Visual.Online
                 allScores.UserScore = myBestScore;
                 scoresContainer.Scores = allScores;
             });
+            AddStep("Trigger loading", () => scoresContainer.Loading = !scoresContainer.Loading);
         }
 
         [BackgroundDependencyLoader]

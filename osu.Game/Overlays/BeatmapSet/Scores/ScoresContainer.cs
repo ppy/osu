@@ -17,13 +17,14 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
     public class ScoresContainer : CompositeDrawable
     {
         private const int spacing = 15;
-        private const int fade_duration = 200;
+        private const int padding = 20;
 
         private readonly Box background;
         private readonly ScoreTable scoreTable;
 
         private readonly FillFlowContainer topScoresContainer;
-        private readonly LoadingAnimation loadingAnimation;
+        private readonly ContentContainer resizableContainer;
+        private readonly LoadingContainer loadingContainer;
 
         public ScoresContainer()
         {
@@ -38,53 +39,85 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                 },
                 new FillFlowContainer
                 {
-                    Anchor = Anchor.TopCentre,
-                    Origin = Anchor.TopCentre,
-                    RelativeSizeAxes = Axes.X,
-                    AutoSizeAxes = Axes.Y,
-                    Width = 0.95f,
                     Direction = FillDirection.Vertical,
-                    Spacing = new Vector2(0, spacing),
-                    Margin = new MarginPadding { Vertical = spacing },
+                    AutoSizeAxes = Axes.Y,
+                    RelativeSizeAxes = Axes.X,
                     Children = new Drawable[]
                     {
-                        topScoresContainer = new FillFlowContainer
+                        loadingContainer = new LoadingContainer
                         {
                             RelativeSizeAxes = Axes.X,
-                            AutoSizeAxes = Axes.Y,
-                            Direction = FillDirection.Vertical,
-                            Spacing = new Vector2(0, 5),
+                            Masking = true,
                         },
-                        scoreTable = new ScoreTable
+                        resizableContainer = new ContentContainer
                         {
-                            Anchor = Anchor.TopCentre,
-                            Origin = Anchor.TopCentre,
-                        }
+                            RelativeSizeAxes = Axes.X,
+                            Masking = true,
+                            Children = new Drawable[]
+                            {
+                                new FillFlowContainer
+                                {
+                                    Anchor = Anchor.TopCentre,
+                                    Origin = Anchor.TopCentre,
+                                    RelativeSizeAxes = Axes.X,
+                                    AutoSizeAxes = Axes.Y,
+                                    Width = 0.95f,
+                                    Direction = FillDirection.Vertical,
+                                    Spacing = new Vector2(0, spacing),
+                                    Padding = new MarginPadding { Vertical = padding },
+                                    Children = new Drawable[]
+                                    {
+                                        topScoresContainer = new FillFlowContainer
+                                        {
+                                            RelativeSizeAxes = Axes.X,
+                                            AutoSizeAxes = Axes.Y,
+                                            Direction = FillDirection.Vertical,
+                                            Spacing = new Vector2(0, 5),
+                                        },
+                                        scoreTable = new ScoreTable
+                                        {
+                                            Anchor = Anchor.TopCentre,
+                                            Origin = Anchor.TopCentre,
+                                        }
+                                    }
+                                },
+                            }
+                        },
                     }
-                },
-                loadingAnimation = new LoadingAnimation
-                {
-                    Alpha = 0,
-                    Margin = new MarginPadding(20),
-                },
+                }
             };
+
+            Loading = true;
         }
 
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
             background.Colour = colours.Gray2;
-            updateDisplay();
         }
+
+        private bool loading;
 
         public bool Loading
         {
+            get => loading;
             set
             {
-                loadingAnimation.FadeTo(value ? 1 : 0, fade_duration);
+                if (loading == value)
+                    return;
+
+                loading = value;
 
                 if (value)
-                    Scores = null;
+                {
+                    loadingContainer.Show();
+                    resizableContainer.Hide();
+                }
+                else
+                {
+                    loadingContainer.Hide();
+                    resizableContainer.Show();
+                }
             }
         }
 
@@ -116,6 +149,63 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
 
                 if (userScore != null && userScore.Position != 1)
                     topScoresContainer.Add(new DrawableTopScore(userScore.Score, userScore.Position));
+            }
+
+            Loading = false;
+        }
+
+        private class ContentContainer : VisibilityContainer
+        {
+            private const int duration = 300;
+
+            private float maxHeight;
+
+            protected override void PopIn() => this.ResizeHeightTo(maxHeight, duration, Easing.OutQuint);
+
+            protected override void PopOut() => this.ResizeHeightTo(0, duration, Easing.OutQuint);
+
+            protected override void UpdateAfterChildren()
+            {
+                base.UpdateAfterChildren();
+
+                if (State.Value == Visibility.Hidden)
+                    return;
+
+                float height = 0;
+
+                foreach (var c in Children)
+                {
+                    height += c.Height;
+                }
+
+                maxHeight = height;
+
+                this.ResizeHeightTo(maxHeight, duration, Easing.OutQuint);
+            }
+        }
+
+        private class LoadingContainer : VisibilityContainer
+        {
+            private const int duration = 300;
+            private const int height = 50;
+
+            private readonly LoadingAnimation loadingAnimation;
+
+            public LoadingContainer()
+            {
+                Child = loadingAnimation = new LoadingAnimation();
+            }
+
+            protected override void PopIn()
+            {
+                this.ResizeHeightTo(height, duration, Easing.OutQuint);
+                loadingAnimation.Show();
+            }
+
+            protected override void PopOut()
+            {
+                this.ResizeHeightTo(0, duration, Easing.OutQuint);
+                loadingAnimation.Hide();
             }
         }
     }
