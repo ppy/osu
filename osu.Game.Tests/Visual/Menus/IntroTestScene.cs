@@ -20,7 +20,6 @@ namespace osu.Game.Tests.Visual.Menus
     {
         public override IReadOnlyList<Type> RequiredTypes => new[]
         {
-            typeof(OsuLogo),
             typeof(StartupScreen),
             typeof(IntroScreen),
             typeof(OsuScreen),
