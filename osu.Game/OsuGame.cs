@@ -215,10 +215,10 @@ namespace osu.Game
         public void ShowBeatmap(int beatmapId) => beatmapSetOverlay.FetchAndShowBeatmap(beatmapId);
 
         /// <summary>
-        /// Shows a search term through the direct overlay.
+        /// Opens the direct overlay and sets the search text.
         /// </summary>
         /// <param name="searchText">The text to search for.</param>
-        public void ShowDirectTextSearch(string searchText) => direct.ShowTextSearch(searchText);
+        public void ShowDirectWithSearch(string searchText) => direct.ShowWithSearch(searchText);
 
         /// <summary>
         /// Present a beatmap at song select immediately.

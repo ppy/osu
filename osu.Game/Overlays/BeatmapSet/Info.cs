@@ -22,10 +22,9 @@ namespace osu.Game.Overlays.BeatmapSet
         private const float metadata_width = 225;
         private const float spacing = 20;
 
+        public readonly Bindable<BeatmapSetInfo> BeatmapSet = new Bindable<BeatmapSetInfo>();
         private readonly Box successRateBackground;
         private readonly SuccessRate successRate;
-        private readonly InfoMetadataSection source, tags, description;
-        public readonly Bindable<BeatmapSetInfo> BeatmapSet = new Bindable<BeatmapSetInfo>();
 
         public BeatmapInfo Beatmap
         {
@@ -35,6 +34,7 @@ namespace osu.Game.Overlays.BeatmapSet
 
         public Info()
         {
+            InfoMetadataSection source, tags;
             RelativeSizeAxes = Axes.X;
             Height = 220;
             Masking = true;
@@ -66,7 +66,7 @@ namespace osu.Game.Overlays.BeatmapSet
                             Child = new Container
                             {
                                 RelativeSizeAxes = Axes.Both,
-                                Child = description = new InfoMetadataSection(MetadataType.Description),
+                                Child = new InfoMetadataSection(MetadataType.Description),
                             },
                         },
                         new Container
@@ -124,23 +124,20 @@ namespace osu.Game.Overlays.BeatmapSet
         private void load(OsuColour colours)
         {
             successRateBackground.Colour = colours.GrayE;
-            source.HeaderColour = colours.Gray5;
-            tags.HeaderColour = colours.Gray5;
-            description.HeaderColour = colours.Gray5;
         }
 
         private class InfoMetadataSection : MetadataSection
         {
-            public Color4 HeaderColour
-            {
-                get => Header.Colour;
-                set => Header.Colour = value;
-            }
-
             public InfoMetadataSection(MetadataType type)
-                : base(type, transition_duration)
+                : base(type)
             {
                 Header.Margin = new MarginPadding { Top = 20 };
+            }
+
+            [BackgroundDependencyLoader]
+            private void load(OsuColour colours)
+            {
+                Header.Colour = colours.Gray5;
             }
         }
     }

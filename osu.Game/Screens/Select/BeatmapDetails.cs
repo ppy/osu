@@ -276,7 +276,7 @@ namespace osu.Game.Screens.Select
         private class DetailsMetadataSection : MetadataSection
         {
             public DetailsMetadataSection(MetadataType type)
-                : base(type, transition_duration)
+                : base(type)
             {
                 LinkFlow.Colour = Color4.White.Opacity(0.75f);
             }

@@ -13,7 +13,7 @@ namespace osu.Game.Screens.Select.Details
 {
     public abstract class MetadataSection : FillFlowContainer
     {
-        private readonly float transitionDuration;
+        private const float transition_duration = 250;
         private readonly MetadataType type;
         protected readonly OsuSpriteText Header;
         protected readonly LinkFlowContainer LinkFlow;
@@ -24,20 +24,19 @@ namespace osu.Game.Screens.Select.Details
             {
                 if (string.IsNullOrEmpty(value))
                 {
-                    this.FadeOut(transitionDuration);
+                    this.FadeOut(transition_duration);
                     return;
                 }
 
-                this.FadeIn(transitionDuration);
+                this.FadeIn(transition_duration);
                 LinkFlow.Clear();
                 addMetadataLinks(value, type);
             }
         }
 
-        protected MetadataSection(MetadataType type, float transitionDuration)
+        protected MetadataSection(MetadataType type)
         {
             this.type = type;
-            this.transitionDuration = transitionDuration;
 
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
@@ -65,11 +64,11 @@ namespace osu.Game.Screens.Select.Details
             {
                 case MetadataType.Tags:
                     foreach (string individualTag in text.Split(' '))
-                        LinkFlow.AddLink(individualTag + " ", null, LinkAction.OpenTextSearch, individualTag, "Open search");
+                        LinkFlow.AddLink(individualTag + " ", null, LinkAction.OpenDirectWithSearch, individualTag, "Open search");
                     break;
 
                 case MetadataType.Source:
-                    LinkFlow.AddLink(text, null, LinkAction.OpenTextSearch, text, "Open search");
+                    LinkFlow.AddLink(text, null, LinkAction.OpenDirectWithSearch, text, "Open search");
                     break;
 
                 case MetadataType.Description:

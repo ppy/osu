@@ -128,8 +128,8 @@ namespace osu.Game.Graphics.Containers
                                 game?.ShowUser(userId);
                             break;
 
-                        case LinkAction.OpenTextSearch:
-                            game?.ShowDirectTextSearch(linkArgument);
+                        case LinkAction.OpenDirectWithSearch:
+                            game?.ShowDirectWithSearch(linkArgument);
                             break;
 
                         default:

@@ -160,6 +160,12 @@ namespace osu.Game.Overlays
             updateResultCounts();
         }
 
+        public void ShowWithSearch(string searchText)
+        {
+            currentQuery.Value = searchText;
+            Show();
+        }
+
         [BackgroundDependencyLoader]
         private void load(OsuColour colours, RulesetStore rulesets, PreviewTrackManager previewTrackManager)
         {
@@ -285,12 +291,6 @@ namespace osu.Game.Overlays
         }
 
         private int distinctCount(List<string> list) => list.Distinct().ToArray().Length;
-
-        public void ShowTextSearch(string searchText)
-        {
-            currentQuery.Value = searchText;
-            Show();
-        }
 
         public class ResultCounts
         {
