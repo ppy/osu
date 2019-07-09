@@ -35,6 +35,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Bindings;
+using osu.Game.Scoring;
 
 namespace osu.Game.Screens.Select
 {
@@ -215,7 +216,7 @@ namespace osu.Game.Screens.Select
         }
 
         [BackgroundDependencyLoader(true)]
-        private void load(BeatmapManager beatmaps, AudioManager audio, DialogOverlay dialog, OsuColour colours, SkinManager skins)
+        private void load(BeatmapManager beatmaps, AudioManager audio, DialogOverlay dialog, OsuColour colours, SkinManager skins, ScoreManager scores)
         {
             mods.BindTo(Mods);
 
@@ -252,7 +253,7 @@ namespace osu.Game.Screens.Select
                     if (!beatmaps.GetAllUsableBeatmapSets().Any() && beatmaps.StableInstallationAvailable)
                         dialogOverlay.Push(new ImportFromStablePopup(() =>
                         {
-                            Task.Run(beatmaps.ImportFromStableAsync);
+                            Task.Run(beatmaps.ImportFromStableAsync).ContinueWith(_ => scores.ImportFromStableAsync(), TaskContinuationOptions.OnlyOnRanToCompletion);
                             Task.Run(skins.ImportFromStableAsync);
                         }));
                 });

@@ -18,6 +18,7 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Input;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Screens.Menu;
 using osu.Game.Screens.Play.HUD;
@@ -52,6 +53,8 @@ namespace osu.Game.Screens.Play
         private Task loadTask;
 
         private InputManager inputManager;
+
+        private IdleTracker idleTracker;
 
         public PlayerLoader(Func<Player> createPlayer)
         {
@@ -93,7 +96,8 @@ namespace osu.Game.Screens.Play
                         VisualSettings = new VisualSettings(),
                         new InputSettings()
                     }
-                }
+                },
+                idleTracker = new IdleTracker(750)
             });
 
             loadNewPlayer();
@@ -193,7 +197,7 @@ namespace osu.Game.Screens.Play
         // Here because IsHovered will not update unless we do so.
         public override bool HandlePositionalInput => true;
 
-        private bool readyForPush => player.LoadState == LoadState.Ready && IsHovered && GetContainingInputManager()?.DraggedDrawable == null;
+        private bool readyForPush => player.LoadState == LoadState.Ready && (IsHovered || idleTracker.IsIdle.Value) && inputManager?.DraggedDrawable == null;
 
         private void pushWhenLoaded()
         {
