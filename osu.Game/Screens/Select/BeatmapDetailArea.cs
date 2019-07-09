@@ -30,7 +30,7 @@ namespace osu.Game.Screens.Select
                 Leaderboard.Beatmap = beatmap?.BeatmapInfo;
                 Details.Beatmap = beatmap?.BeatmapInfo;
 
-                this.FadeTo(beatmap is DummyWorkingBeatmap ? 0 : 1);
+                this.FadeTo(beatmap is DummyWorkingBeatmap ? 0 : 1, 200);
             }
         }
 
