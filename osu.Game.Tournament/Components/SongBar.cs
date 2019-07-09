@@ -180,7 +180,7 @@ namespace osu.Game.Tournament.Components
 
             panelContents.Children = new Drawable[]
             {
-                new DiffPiece(("Length", TimeSpan.FromSeconds(length).ToString(@"mm\:ss")))
+                new DiffPiece(("Length", TimeSpan.FromMilliseconds(length).ToString(@"mm\:ss")))
                 {
                     Anchor = Anchor.CentreLeft,
                     Origin = Anchor.BottomLeft,

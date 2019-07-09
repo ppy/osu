@@ -41,7 +41,7 @@ namespace osu.Game.Beatmaps
         public double MaxStarDifficulty => Beatmaps?.Max(b => b.StarDifficulty) ?? 0;
 
         /// <summary>
-        /// The maximum playable length of all beatmaps in this set.
+        /// The maximum playable length in milliseconds of all beatmaps in this set.
         /// </summary>
         public double MaxLength => Beatmaps?.Max(b => b.Length) ?? 0;
 
