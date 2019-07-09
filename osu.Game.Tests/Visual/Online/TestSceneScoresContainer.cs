@@ -3,12 +3,10 @@
 
 using System;
 using System.Collections.Generic;
-using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.MathUtils;
-using osu.Game.Graphics;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays.BeatmapSet.Scores;
 using osu.Game.Rulesets.Mods;
@@ -16,6 +14,7 @@ using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring;
 using osu.Game.Users;
+using osuTK.Graphics;
 
 namespace osu.Game.Tests.Visual.Online
 {
@@ -44,7 +43,11 @@ namespace osu.Game.Tests.Visual.Online
                 Width = 0.8f,
                 Children = new Drawable[]
                 {
-                    background = new Box { RelativeSizeAxes = Axes.Both },
+                    background = new Box
+                    {
+                        RelativeSizeAxes = Axes.Both,
+                        Colour = Color4.Black,
+                    },
                     scoresContainer = new ScoresContainer(),
                 }
             };
@@ -244,12 +247,6 @@ namespace osu.Game.Tests.Visual.Online
                 scoresContainer.Scores = allScores;
             });
             AddStep("Trigger loading", () => scoresContainer.Loading = !scoresContainer.Loading);
-        }
-
-        [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
-        {
-            background.Colour = colours.Gray2;
         }
     }
 }
