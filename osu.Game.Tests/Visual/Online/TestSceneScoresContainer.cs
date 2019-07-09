@@ -29,8 +29,6 @@ namespace osu.Game.Tests.Visual.Online
             typeof(ScoreTableRowBackground),
         };
 
-        private readonly Box background;
-
         public TestSceneScoresContainer()
         {
             ScoresContainer scoresContainer;
@@ -43,7 +41,7 @@ namespace osu.Game.Tests.Visual.Online
                 Width = 0.8f,
                 Children = new Drawable[]
                 {
-                    background = new Box
+                    new Box
                     {
                         RelativeSizeAxes = Axes.Both,
                         Colour = Color4.Black,
