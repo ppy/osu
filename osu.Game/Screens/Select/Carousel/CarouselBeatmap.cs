@@ -49,11 +49,7 @@ namespace osu.Game.Screens.Select.Carousel
                     return Beatmap.StarDifficulty.CompareTo(otherBeatmap.Beatmap.StarDifficulty);
 
                 case SortMode.Length:
-                    // Length comparing must be in seconds
-                    if (TimeSpan.FromMilliseconds(Beatmap.Length).Seconds != TimeSpan.FromMilliseconds(otherBeatmap.Beatmap.Length).Seconds)
-                        return Beatmap.Length.CompareTo(otherBeatmap.Beatmap.Length);
-
-                    goto case SortMode.Difficulty;
+                    return Beatmap.Length.CompareTo(otherBeatmap.Beatmap.Length);
             }
         }
 
