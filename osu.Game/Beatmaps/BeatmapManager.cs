@@ -315,10 +315,15 @@ namespace osu.Game.Beatmaps
 
         private double calculateLength(IBeatmap b)
         {
-            var lastObject = b.HitObjects.LastOrDefault();
-            var endTime = (lastObject as IHasEndTime)?.EndTime ?? lastObject?.StartTime ?? 0;
+            if (!b.HitObjects.Any())
+                return 0;
 
-            return endTime - b.HitObjects.FirstOrDefault()?.StartTime ?? 0;
+            var lastObject = b.HitObjects.Last();
+
+            double endTime = (lastObject as IHasEndTime)?.EndTime ?? lastObject.StartTime;
+            double startTime = b.HitObjects.First().StartTime;
+
+            return endTime - startTime;
         }
 
         /// <summary>
