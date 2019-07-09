@@ -45,7 +45,15 @@ namespace osu.Game.Screens
         private OsuScreen loadableScreen;
         private ShaderPrecompiler precompiler;
 
-        protected virtual OsuScreen CreateLoadableScreen() => showDisclaimer ? (OsuScreen)new Disclaimer() : new Intro();
+        protected virtual OsuScreen CreateLoadableScreen()
+        {
+            if (showDisclaimer)
+                return new Disclaimer(getIntroSequence());
+
+            return getIntroSequence();
+        }
+
+        private IntroScreen getIntroSequence() => new IntroCircles();
 
         protected virtual ShaderPrecompiler CreateShaderPrecompiler() => new ShaderPrecompiler();
 
