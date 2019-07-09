@@ -59,10 +59,6 @@ namespace osu.Game.Graphics.Containers
         /// <summary>
         /// Creates a new <see cref="UserDimContainer"/>.
         /// </summary>
-        /// <remarks>
-        /// While both backgrounds and storyboards allow user dim levels to be applied, storyboards can be toggled via <see cref="ShowStoryboard"/>
-        /// and can cause backgrounds to become hidden via <see cref="StoryboardReplacesBackground"/>. Storyboards are also currently unable to be blurred.
-        /// </remarks>
         public UserDimContainer()
         {
             AddInternal(DimContainer = new Container { RelativeSizeAxes = Axes.Both });
@@ -112,6 +108,10 @@ namespace osu.Game.Graphics.Containers
         /// <summary>
         /// Apply non-dim related settings to the background, such as hiding and blurring.
         /// </summary>
+        /// <remarks>
+        /// While both backgrounds and storyboards allow user dim levels to be applied, storyboards can be toggled via <see cref="ShowStoryboard"/>
+        /// and can cause backgrounds to become hidden via <see cref="StoryboardReplacesBackground"/>. Storyboards are also currently unable to be blurred.
+        /// </remarks>
         protected virtual void ApplyFade()
         {
             // The background needs to be hidden in the case of it being replaced by the storyboard
