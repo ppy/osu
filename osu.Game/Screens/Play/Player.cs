@@ -26,7 +26,7 @@ using osu.Game.Rulesets.UI;
 using osu.Game.Scoring;
 using osu.Game.Screens.Ranking;
 using osu.Game.Skinning;
-using osu.Game.Storyboards.Drawables;
+using osu.Game.Storyboards;
 using osu.Game.Users;
 
 namespace osu.Game.Screens.Play
@@ -109,7 +109,7 @@ namespace osu.Game.Screens.Play
             sampleRestart = audio.Samples.Get(@"Gameplay/restart");
 
             mouseWheelDisabled = config.GetBindable<bool>(OsuSetting.MouseDisableWheel);
-            showStoryboard = config.GetBindable<bool>(OsuSetting.ShowStoryboard);
+            config.GetBindable<bool>(OsuSetting.ShowStoryboard);
 
             ScoreProcessor = DrawableRuleset.CreateScoreProcessor();
             ScoreProcessor.Mods.BindTo(Mods);
@@ -121,7 +121,7 @@ namespace osu.Game.Screens.Play
 
             GameplayClockContainer.Children = new[]
             {
-                StoryboardContainer = CreateStoryboardContainer(),
+                StoryboardContainer = CreateStoryboardContainer(Beatmap.Value.Storyboard),
                 new ScalingContainer(ScalingMode.Gameplay)
                 {
                     Child = new LocalSkinOverrideContainer(working.Skin)
@@ -198,9 +198,6 @@ namespace osu.Game.Screens.Play
 
             // bind clock into components that require it
             DrawableRuleset.IsPaused.BindTo(GameplayClockContainer.IsPaused);
-
-            // load storyboard as part of player's load if we can
-            initializeStoryboard(false);
 
             // Bind ScoreProcessor to ourselves
             ScoreProcessor.AllJudged += onCompletion;
@@ -336,41 +333,14 @@ namespace osu.Game.Screens.Play
 
         #region Storyboard
 
-        private DrawableStoryboard storyboard;
-        protected UserDimContainer StoryboardContainer { get; private set; }
+        protected StoryboardContainer StoryboardContainer { get; private set; }
 
-        protected virtual UserDimContainer CreateStoryboardContainer() => new UserDimContainer(true)
+        protected virtual StoryboardContainer CreateStoryboardContainer(Storyboard storyboard) => new StoryboardContainer(storyboard)
         {
             RelativeSizeAxes = Axes.Both,
             Alpha = 1,
             EnableUserDim = { Value = true }
         };
-
-        private Bindable<bool> showStoryboard;
-
-        private void initializeStoryboard(bool asyncLoad)
-        {
-            if (StoryboardContainer == null || storyboard != null)
-                return;
-
-            if (!showStoryboard.Value)
-                return;
-
-            var beatmap = Beatmap.Value;
-
-            storyboard = beatmap.Storyboard.CreateDrawable();
-            storyboard.Masking = true;
-
-            if (asyncLoad)
-                LoadComponentAsync(storyboard, c =>
-                {
-                    // Since the storyboard was loaded before it can be added to the draw hierarchy, manually set the clock for it here.
-                    c.Clock = GameplayClockContainer.GameplayClock;
-                    StoryboardContainer.Add(c);
-                });
-            else
-                StoryboardContainer.Add(storyboard);
-        }
 
         #endregion
 
@@ -490,8 +460,6 @@ namespace osu.Game.Screens.Play
                 .ScaleTo(1, 750, Easing.OutQuint)
                 .Delay(250)
                 .FadeIn(250);
-
-            showStoryboard.ValueChanged += _ => initializeStoryboard(true);
 
             Background.EnableUserDim.Value = true;
             Background.BlurAmount.Value = 0;
