@@ -17,20 +17,17 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
     public class ScoresContainer : CompositeDrawable
     {
         private const int spacing = 15;
-        private const int padding = 20;
+        private const int fade_duration = 200;
 
         private readonly Box background;
         private readonly ScoreTable scoreTable;
-
         private readonly FillFlowContainer topScoresContainer;
-        private readonly ContentContainer contentContainer;
-        private readonly LoadingContainer loadingContainer;
+        private readonly LoadingAnimation loadingAnimation;
 
         public ScoresContainer()
         {
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
-
             InternalChildren = new Drawable[]
             {
                 background = new Box
@@ -39,83 +36,53 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                 },
                 new FillFlowContainer
                 {
-                    Direction = FillDirection.Vertical,
-                    AutoSizeAxes = Axes.Y,
+                    Anchor = Anchor.TopCentre,
+                    Origin = Anchor.TopCentre,
                     RelativeSizeAxes = Axes.X,
+                    AutoSizeAxes = Axes.Y,
+                    Width = 0.95f,
+                    Direction = FillDirection.Vertical,
+                    Spacing = new Vector2(0, spacing),
+                    Margin = new MarginPadding { Vertical = spacing },
                     Children = new Drawable[]
                     {
-                        loadingContainer = new LoadingContainer
+                        topScoresContainer = new FillFlowContainer
                         {
                             RelativeSizeAxes = Axes.X,
-                            Masking = true,
+                            AutoSizeAxes = Axes.Y,
+                            Direction = FillDirection.Vertical,
+                            Spacing = new Vector2(0, 5),
                         },
-                        contentContainer = new ContentContainer
+                        scoreTable = new ScoreTable
                         {
-                            RelativeSizeAxes = Axes.X,
-                            Masking = true,
-                            Child = new FillFlowContainer
-                            {
-                                Anchor = Anchor.TopCentre,
-                                Origin = Anchor.TopCentre,
-                                RelativeSizeAxes = Axes.X,
-                                AutoSizeAxes = Axes.Y,
-                                Width = 0.95f,
-                                Direction = FillDirection.Vertical,
-                                Spacing = new Vector2(0, spacing),
-                                Padding = new MarginPadding { Vertical = padding },
-                                Children = new Drawable[]
-                                {
-                                    topScoresContainer = new FillFlowContainer
-                                    {
-                                        RelativeSizeAxes = Axes.X,
-                                        AutoSizeAxes = Axes.Y,
-                                        Direction = FillDirection.Vertical,
-                                        Spacing = new Vector2(0, 5),
-                                    },
-                                    scoreTable = new ScoreTable
-                                    {
-                                        Anchor = Anchor.TopCentre,
-                                        Origin = Anchor.TopCentre,
-                                    }
-                                },
-                            }
-                        },
+                            Anchor = Anchor.TopCentre,
+                            Origin = Anchor.TopCentre,
+                        }
                     }
-                }
+                },
+                loadingAnimation = new LoadingAnimation
+                {
+                    Alpha = 0,
+                    Margin = new MarginPadding(20),
+                },
             };
-
-            Loading = true;
         }
 
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
             background.Colour = colours.Gray2;
+            updateDisplay();
         }
-
-        private bool loading;
 
         public bool Loading
         {
-            get => loading;
             set
             {
-                loading = value;
+                loadingAnimation.FadeTo(value ? 1 : 0, fade_duration);
 
                 if (value)
-                {
-                    loadingContainer.Show();
-                    contentContainer.Hide();
-                }
-                else
-                {
-                    loadingContainer.Hide();
-
-                    if (scores == null || scores?.Scores.Count < 1)
-                        contentContainer.Hide();
-                    else
-                        contentContainer.Show();
-                }
+                    Scores = null;
             }
         }
 
@@ -139,7 +106,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
             scoreTable.Scores = scores?.Scores.Count > 1 ? scores.Scores : new List<APILegacyScoreInfo>();
             scoreTable.FadeTo(scores?.Scores.Count > 1 ? 1 : 0);
 
-            if (scores?.Scores.Any() == true)
+            if (scores?.Scores.Any() ?? false)
             {
                 topScoresContainer.Add(new DrawableTopScore(scores.Scores.FirstOrDefault()));
 
@@ -147,56 +114,6 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
 
                 if (userScore != null && userScore.Position != 1)
                     topScoresContainer.Add(new DrawableTopScore(userScore.Score, userScore.Position));
-            }
-
-            Loading = false;
-        }
-
-        private class ContentContainer : VisibilityContainer
-        {
-            private const int duration = 300;
-
-            private float maxHeight;
-
-            protected override void PopIn() => this.ResizeHeightTo(maxHeight, duration, Easing.OutQuint);
-
-            protected override void PopOut() => this.ResizeHeightTo(0, duration, Easing.OutQuint);
-
-            protected override void UpdateAfterChildren()
-            {
-                base.UpdateAfterChildren();
-
-                if (State.Value == Visibility.Hidden)
-                    return;
-
-                maxHeight = Child.DrawHeight;
-
-                this.ResizeHeightTo(maxHeight, duration, Easing.OutQuint);
-            }
-        }
-
-        private class LoadingContainer : VisibilityContainer
-        {
-            private const int duration = 300;
-            private const int height = 50;
-
-            private readonly LoadingAnimation loadingAnimation;
-
-            public LoadingContainer()
-            {
-                Child = loadingAnimation = new LoadingAnimation();
-            }
-
-            protected override void PopIn()
-            {
-                this.ResizeHeightTo(height, duration, Easing.OutQuint);
-                loadingAnimation.Show();
-            }
-
-            protected override void PopOut()
-            {
-                this.ResizeHeightTo(0, duration, Easing.OutQuint);
-                loadingAnimation.Hide();
             }
         }
     }

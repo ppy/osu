@@ -28,7 +28,12 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
         private readonly SpriteText date;
         private readonly UpdateableFlag flag;
 
-        public TopScoreUserSection(int position)
+        public int ScorePosition
+        {
+            set => rankText.Text = $"#{value}";
+        }
+
+        public TopScoreUserSection()
         {
             AutoSizeAxes = Axes.Both;
 
@@ -52,7 +57,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                             {
                                 Anchor = Anchor.Centre,
                                 Origin = Anchor.Centre,
-                                Text = $"#{position.ToString()}",
+                                Text = $"#1",
                                 Font = OsuFont.GetFont(size: 30, weight: FontWeight.Bold, italics: true)
                             },
                             rank = new UpdateableRank(ScoreRank.D)
