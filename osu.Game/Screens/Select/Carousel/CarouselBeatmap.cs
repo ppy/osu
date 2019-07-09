@@ -47,9 +47,6 @@ namespace osu.Game.Screens.Select.Carousel
                     if (ruleset != 0) return ruleset;
 
                     return Beatmap.StarDifficulty.CompareTo(otherBeatmap.Beatmap.StarDifficulty);
-
-                case SortMode.Length:
-                    return Beatmap.Length.CompareTo(otherBeatmap.Beatmap.Length);
             }
         }
 
