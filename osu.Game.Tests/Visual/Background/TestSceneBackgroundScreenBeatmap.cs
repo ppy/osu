@@ -28,6 +28,7 @@ using osu.Game.Screens.Backgrounds;
 using osu.Game.Screens.Play;
 using osu.Game.Screens.Play.PlayerSettings;
 using osu.Game.Screens.Select;
+using osu.Game.Storyboards;
 using osu.Game.Tests.Resources;
 using osu.Game.Users;
 using osuTK;
@@ -333,9 +334,9 @@ namespace osu.Game.Tests.Visual.Background
         {
             protected override BackgroundScreen CreateBackground() => new FadeAccessibleBackground(Beatmap.Value);
 
-            protected override UserDimContainer CreateStoryboardContainer()
+            protected override StoryboardContainer CreateStoryboardContainer(Storyboard storyboard)
             {
-                return new TestUserDimContainer(true)
+                return new TestStoryboardContainer
                 {
                     RelativeSizeAxes = Axes.Both,
                     Alpha = 1,
@@ -343,7 +344,7 @@ namespace osu.Game.Tests.Visual.Background
                 };
             }
 
-            public UserDimContainer CurrentStoryboardContainer => StoryboardContainer;
+            public TestStoryboardContainer CurrentStoryboardContainer => (TestStoryboardContainer)StoryboardContainer;
 
             // Whether or not the player should be allowed to load.
             public bool BlockLoad;
@@ -357,9 +358,9 @@ namespace osu.Game.Tests.Visual.Background
             {
             }
 
-            public bool IsStoryboardVisible() => ((TestUserDimContainer)CurrentStoryboardContainer).CurrentAlpha == 1;
+            public bool IsStoryboardVisible() => CurrentStoryboardContainer.CurrentAlpha == 1;
 
-            public bool IsStoryboardInvisible() => ((TestUserDimContainer)CurrentStoryboardContainer).CurrentAlpha <= 1;
+            public bool IsStoryboardInvisible() => CurrentStoryboardContainer.CurrentAlpha <= 1;
 
             [BackgroundDependencyLoader]
             private void load(OsuConfigManager config, CancellationToken token)
@@ -408,15 +409,20 @@ namespace osu.Game.Tests.Visual.Background
             }
         }
 
+        private class TestStoryboardContainer : StoryboardContainer
+        {
+            public float CurrentAlpha => DimContainer.Alpha;
+
+            public TestStoryboardContainer()
+                : base(new Storyboard())
+            {
+            }
+        }
+
         private class TestUserDimContainer : UserDimContainer
         {
             public Color4 CurrentColour => DimContainer.Colour;
             public float CurrentAlpha => DimContainer.Alpha;
-
-            public TestUserDimContainer(bool isStoryboard = false)
-                : base(isStoryboard)
-            {
-            }
         }
     }
 }

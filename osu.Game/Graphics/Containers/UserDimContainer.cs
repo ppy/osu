@@ -16,11 +16,10 @@ namespace osu.Game.Graphics.Containers
 {
     /// <summary>
     /// A container that applies user-configured visual settings to its contents.
-    /// This container specifies behavior that applies to both Storyboards and Backgrounds.
     /// </summary>
     public class UserDimContainer : Container
     {
-        private const float background_fade_duration = 800;
+        protected const float BACKGROUND_FADE_DURATION = 800;
 
         /// <summary>
         /// Whether or not user-configured dim levels should be applied to the container.
@@ -40,17 +39,15 @@ namespace osu.Game.Graphics.Containers
         /// </remarks>
         public readonly Bindable<float> BlurAmount = new Bindable<float>();
 
-        private Bindable<double> userDimLevel { get; set; }
+        protected Bindable<double> UserDimLevel { get; private set; }
 
-        private Bindable<double> userBlurLevel { get; set; }
-
-        private Bindable<bool> showStoryboard { get; set; }
+        protected Bindable<bool> ShowStoryboard { get; private set; }
 
         protected Container DimContainer { get; }
 
         protected override Container<Drawable> Content => DimContainer;
 
-        private readonly bool isStoryboard;
+        private Bindable<double> userBlurLevel { get; set; }
 
         /// <summary>
         /// As an optimisation, we add the two blur portions to be applied rather than actually applying two separate blurs.
@@ -62,15 +59,12 @@ namespace osu.Game.Graphics.Containers
         /// <summary>
         /// Creates a new <see cref="UserDimContainer"/>.
         /// </summary>
-        /// <param name="isStoryboard"> Whether or not this instance contains a storyboard.
         /// <remarks>
-        /// While both backgrounds and storyboards allow user dim levels to be applied, storyboards can be toggled via <see cref="showStoryboard"/>
+        /// While both backgrounds and storyboards allow user dim levels to be applied, storyboards can be toggled via <see cref="ShowStoryboard"/>
         /// and can cause backgrounds to become hidden via <see cref="StoryboardReplacesBackground"/>. Storyboards are also currently unable to be blurred.
         /// </remarks>
-        /// </param>
-        public UserDimContainer(bool isStoryboard = false)
+        public UserDimContainer()
         {
-            this.isStoryboard = isStoryboard;
             AddInternal(DimContainer = new Container { RelativeSizeAxes = Axes.Both });
         }
 
@@ -97,16 +91,16 @@ namespace osu.Game.Graphics.Containers
         [BackgroundDependencyLoader]
         private void load(OsuConfigManager config)
         {
-            userDimLevel = config.GetBindable<double>(OsuSetting.DimLevel);
+            UserDimLevel = config.GetBindable<double>(OsuSetting.DimLevel);
             userBlurLevel = config.GetBindable<double>(OsuSetting.BlurLevel);
-            showStoryboard = config.GetBindable<bool>(OsuSetting.ShowStoryboard);
+            ShowStoryboard = config.GetBindable<bool>(OsuSetting.ShowStoryboard);
 
             EnableUserDim.ValueChanged += _ => updateVisuals();
-            userDimLevel.ValueChanged += _ => updateVisuals();
-            userBlurLevel.ValueChanged += _ => updateVisuals();
-            showStoryboard.ValueChanged += _ => updateVisuals();
+            UserDimLevel.ValueChanged += _ => updateVisuals();
+            ShowStoryboard.ValueChanged += _ => updateVisuals();
             StoryboardReplacesBackground.ValueChanged += _ => updateVisuals();
             BlurAmount.ValueChanged += _ => updateVisuals();
+            userBlurLevel.ValueChanged += _ => updateVisuals();
         }
 
         protected override void LoadComplete()
@@ -115,21 +109,21 @@ namespace osu.Game.Graphics.Containers
             updateVisuals();
         }
 
+        /// <summary>
+        /// Apply non-dim related settings to the background, such as hiding and blurring.
+        /// </summary>
+        protected virtual void ApplyFade()
+        {
+            // The background needs to be hidden in the case of it being replaced by the storyboard
+            DimContainer.FadeTo(ShowStoryboard.Value && StoryboardReplacesBackground.Value ? 0 : 1, BACKGROUND_FADE_DURATION, Easing.OutQuint);
+            Background?.BlurTo(blurTarget, BACKGROUND_FADE_DURATION, Easing.OutQuint);
+        }
+
         private void updateVisuals()
         {
-            if (isStoryboard)
-            {
-                DimContainer.FadeTo(!showStoryboard.Value || userDimLevel.Value == 1 ? 0 : 1, background_fade_duration, Easing.OutQuint);
-            }
-            else
-            {
-                // The background needs to be hidden in the case of it being replaced by the storyboard
-                DimContainer.FadeTo(showStoryboard.Value && StoryboardReplacesBackground.Value ? 0 : 1, background_fade_duration, Easing.OutQuint);
+            ApplyFade();
 
-                Background?.BlurTo(blurTarget, background_fade_duration, Easing.OutQuint);
-            }
-
-            DimContainer.FadeColour(EnableUserDim.Value ? OsuColour.Gray(1 - (float)userDimLevel.Value) : Color4.White, background_fade_duration, Easing.OutQuint);
+            DimContainer.FadeColour(EnableUserDim.Value ? OsuColour.Gray(1 - (float)UserDimLevel.Value) : Color4.White, BACKGROUND_FADE_DURATION, Easing.OutQuint);
         }
     }
 }
