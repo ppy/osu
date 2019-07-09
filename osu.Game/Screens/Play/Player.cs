@@ -76,6 +76,15 @@ namespace osu.Game.Screens.Play
 
         protected GameplayClockContainer GameplayClockContainer { get; private set; }
 
+        protected StoryboardContainer StoryboardContainer { get; private set; }
+
+        protected virtual StoryboardContainer CreateStoryboardContainer(Storyboard storyboard) => new StoryboardContainer(storyboard)
+        {
+            RelativeSizeAxes = Axes.Both,
+            Alpha = 1,
+            EnableUserDim = { Value = true }
+        };
+
         [Cached]
         [Cached(Type = typeof(IBindable<IReadOnlyList<Mod>>))]
         protected new readonly Bindable<IReadOnlyList<Mod>> Mods = new Bindable<IReadOnlyList<Mod>>(Array.Empty<Mod>());
@@ -330,19 +339,6 @@ namespace osu.Game.Screens.Play
         protected override bool OnScroll(ScrollEvent e) => mouseWheelDisabled.Value && !GameplayClockContainer.IsPaused.Value;
 
         protected virtual Results CreateResults(ScoreInfo score) => new SoloResults(score);
-
-        #region Storyboard
-
-        protected StoryboardContainer StoryboardContainer { get; private set; }
-
-        protected virtual StoryboardContainer CreateStoryboardContainer(Storyboard storyboard) => new StoryboardContainer(storyboard)
-        {
-            RelativeSizeAxes = Axes.Both,
-            Alpha = 1,
-            EnableUserDim = { Value = true }
-        };
-
-        #endregion
 
         #region Fail Logic
 

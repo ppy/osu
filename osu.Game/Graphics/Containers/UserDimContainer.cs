@@ -106,7 +106,7 @@ namespace osu.Game.Graphics.Containers
         }
 
         /// <summary>
-        /// Apply non-dim related settings to the background, such as hiding and blurring.
+        /// Apply non-dim related settings to the content, such as hiding and blurring.
         /// </summary>
         /// <remarks>
         /// While both backgrounds and storyboards allow user dim levels to be applied, storyboards can be toggled via <see cref="ShowStoryboard"/>
