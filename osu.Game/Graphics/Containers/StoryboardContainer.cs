@@ -35,7 +35,7 @@ namespace osu.Game.Graphics.Containers
 
         protected override void ApplyFade()
         {
-            // Storyboards cannot be blurred, so we should just hide the storyboard if it gets toggled.
+            // Storyboards cannot be blurred, so just hide the storyboard if it gets toggled.
             DimContainer.FadeTo(!ShowStoryboard.Value || UserDimLevel.Value == 1 ? 0 : 1, BACKGROUND_FADE_DURATION, Easing.OutQuint);
         }
 
