@@ -57,7 +57,6 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                             {
                                 Anchor = Anchor.Centre,
                                 Origin = Anchor.Centre,
-                                Text = $"#1",
                                 Font = OsuFont.GetFont(size: 30, weight: FontWeight.Bold, italics: true)
                             },
                             rank = new UpdateableRank(ScoreRank.D)
