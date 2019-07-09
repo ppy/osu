@@ -17,11 +17,11 @@ using osu.Game.Overlays.BeatmapSet;
 using osu.Game.Overlays.BeatmapSet.Scores;
 using osu.Game.Rulesets;
 using osuTK;
+
 namespace osu.Game.Overlays
 {
     public class BeatmapSetOverlay : FullscreenOverlay
     {
-        private const int fade_duration = 300;
         public const float X_PADDING = 40;
         public const float TOP_PADDING = 25;
         public const float RIGHT_WIDTH = 275;
