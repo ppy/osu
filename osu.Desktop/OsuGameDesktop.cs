@@ -71,7 +71,7 @@ namespace osu.Desktop
 
             switch (newScreen)
             {
-                case Intro _:
+                case IntroScreen _:
                 case MainMenu _:
                     versionManager?.Show();
                     break;
