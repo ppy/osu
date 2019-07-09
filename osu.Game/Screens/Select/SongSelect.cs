@@ -87,6 +87,9 @@ namespace osu.Game.Screens.Select
 
         private readonly Bindable<RulesetInfo> decoupledRuleset = new Bindable<RulesetInfo>();
 
+        [Resolved]
+        private MusicController musicController { get; set; }
+
         [Cached]
         [Cached(Type = typeof(IBindable<IReadOnlyList<Mod>>))]
         private readonly Bindable<IReadOnlyList<Mod>> mods = new Bindable<IReadOnlyList<Mod>>(Array.Empty<Mod>()); // Bound to the game's mods, but is not reset on exiting
@@ -426,8 +429,6 @@ namespace osu.Game.Screens.Select
         {
             base.OnEntering(last);
 
-            ResumeIfNoUserPauseRequested();
-
             this.FadeInFromZero(250);
             FilterControl.Activate();
         }
@@ -572,7 +573,7 @@ namespace osu.Game.Screens.Select
         {
             Track track = Beatmap.Value.Track;
 
-            if (!track.IsRunning || restart)
+            if ((!track.IsRunning || restart) && !musicController.UserRequestedPause)
             {
                 track.RestartPoint = Beatmap.Value.Metadata.PreviewTime;
                 track.Restart();

@@ -50,7 +50,7 @@ namespace osu.Game.Screens
 
         public virtual bool CursorVisible => true;
 
-        protected new OsuGame Game => base.Game as OsuGame;
+        protected new OsuGameBase Game => base.Game as OsuGameBase;
 
         /// <summary>
         /// The <see cref="UserActivity"/> to set the user's activity automatically to when this screen is entered
@@ -177,15 +177,6 @@ namespace osu.Game.Screens
         {
             if (api != null)
                 api.Activity.Value = activity;
-        }
-
-        protected void ResumeIfNoUserPauseRequested()
-        {
-            if (Beatmap.Value.Track != null && !Game.MusicController.UserRequestedPause)
-            {
-                Beatmap.Value.Track.Tempo.Value = 1;
-                Beatmap.Value.Track.Start();
-            }
         }
 
         /// <summary>
