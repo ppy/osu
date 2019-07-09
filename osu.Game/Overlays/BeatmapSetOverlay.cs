@@ -31,7 +31,7 @@ namespace osu.Game.Overlays
         protected readonly Header Header;
 
         private RulesetStore rulesets;
-        private ScoresContainer scores;
+        private readonly ScoresContainer scores;
         private GetScoresRequest getScoresRequest;
 
         private readonly Bindable<BeatmapSetInfo> beatmapSet = new Bindable<BeatmapSetInfo>();
