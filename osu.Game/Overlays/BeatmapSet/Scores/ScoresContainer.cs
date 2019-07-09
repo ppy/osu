@@ -5,15 +5,11 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
-using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
-using osu.Game.Online.API;
-using osu.Game.Online.API.Requests;
 using osuTK;
 using System.Collections.Generic;
 using System.Linq;
-using osu.Game.Scoring;
 using osu.Game.Online.API.Requests.Responses;
 
 namespace osu.Game.Overlays.BeatmapSet.Scores
@@ -28,9 +24,6 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
 
         private readonly FillFlowContainer topScoresContainer;
         private readonly LoadingAnimation loadingAnimation;
-
-        [Resolved]
-        private IAPIProvider api { get; set; }
 
         public ScoresContainer()
         {
@@ -72,7 +65,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                 loadingAnimation = new LoadingAnimation
                 {
                     Alpha = 0,
-                    Margin = new MarginPadding(20)
+                    Margin = new MarginPadding(20),
                 },
             };
         }
@@ -84,87 +77,46 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
             updateDisplay();
         }
 
-        private bool loading
+        public bool Loading
         {
-            set => loadingAnimation.FadeTo(value ? 1 : 0, fade_duration);
+            set
+            {
+                loadingAnimation.FadeTo(value ? 1 : 0, fade_duration);
+
+                if (value)
+                    Scores = null;
+            }
         }
 
-        private GetScoresRequest getScoresRequest;
-        private IReadOnlyList<ScoreInfo> scores;
+        private APILegacyScores scores;
 
-        public IReadOnlyList<ScoreInfo> Scores
+        public APILegacyScores Scores
         {
             get => scores;
             set
             {
-                getScoresRequest?.Cancel();
                 scores = value;
 
                 updateDisplay();
             }
         }
 
-        private APILegacyUserTopScoreInfo userScore;
-
-        public APILegacyUserTopScoreInfo UserScore
-        {
-            get => userScore;
-            set
-            {
-                getScoresRequest?.Cancel();
-                userScore = value;
-
-                updateDisplay();
-            }
-        }
-
-        private BeatmapInfo beatmap;
-
-        public BeatmapInfo Beatmap
-        {
-            get => beatmap;
-            set
-            {
-                beatmap = value;
-
-                Scores = null;
-
-                if (beatmap?.OnlineBeatmapID.HasValue != true)
-                    return;
-
-                loading = true;
-
-                getScoresRequest = new GetScoresRequest(beatmap, beatmap.Ruleset);
-                getScoresRequest.Success += r => Schedule(() =>
-                {
-                    scores = r.Scores;
-                    userScore = r.UserScore;
-                    updateDisplay();
-                });
-                api.Queue(getScoresRequest);
-            }
-        }
-
         private void updateDisplay()
         {
-            loading = false;
             topScoresContainer.Clear();
 
-            scoreTable.Scores = scores?.Count > 1 ? scores : new List<ScoreInfo>();
-            scoreTable.FadeTo(scores?.Count > 1 ? 1 : 0);
+            scoreTable.Scores = scores?.Scores.Count > 1 ? scores.Scores : new List<APILegacyScoreInfo>();
+            scoreTable.FadeTo(scores?.Scores.Count > 1 ? 1 : 0);
 
-            if (scores?.Any() == true)
+            if (scores?.Scores.Any() == true)
             {
-                topScoresContainer.Add(new DrawableTopScore(scores.FirstOrDefault()));
+                topScoresContainer.Add(new DrawableTopScore(scores.Scores.FirstOrDefault()));
+
+                var userScore = scores.UserScore;
 
                 if (userScore != null && userScore.Position != 1)
                     topScoresContainer.Add(new DrawableTopScore(userScore.Score, userScore.Position));
             }
-        }
-
-        protected override void Dispose(bool isDisposing)
-        {
-            getScoresRequest?.Cancel();
         }
     }
 }

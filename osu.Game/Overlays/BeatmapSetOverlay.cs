@@ -11,6 +11,7 @@ using osu.Framework.Input.Events;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
+using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Game.Overlays.BeatmapSet;
 using osu.Game.Overlays.BeatmapSet.Scores;
@@ -30,8 +31,13 @@ namespace osu.Game.Overlays
         protected readonly Header Header;
 
         private RulesetStore rulesets;
+        private ScoresContainer scores;
+        private GetScoresRequest getScoresRequest;
 
         private readonly Bindable<BeatmapSetInfo> beatmapSet = new Bindable<BeatmapSetInfo>();
+
+        [Resolved]
+        private IAPIProvider api { get; set; }
 
         // receive input outside our bounds so we can trigger a close event on ourselves.
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => true;
@@ -40,7 +46,6 @@ namespace osu.Game.Overlays
         {
             OsuScrollContainer scroll;
             Info info;
-            ScoresContainer scores;
 
             Children = new Drawable[]
             {
@@ -74,10 +79,31 @@ namespace osu.Game.Overlays
             Header.Picker.Beatmap.ValueChanged += b =>
             {
                 info.Beatmap = b.NewValue;
-                scores.Beatmap = b.NewValue;
+                getScores(b.NewValue);
 
                 scroll.ScrollToStart();
             };
+        }
+
+        private void getScores(BeatmapInfo b)
+        {
+            getScoresRequest?.Cancel();
+
+            if (b?.OnlineBeatmapID.HasValue != true)
+            {
+                scores.Scores = null;
+                return;
+            }
+
+            scores.Loading = true;
+
+            getScoresRequest = new GetScoresRequest(b, b.Ruleset);
+            getScoresRequest.Success += r => Schedule(() =>
+            {
+                scores.Scores = r;
+                scores.Loading = false;
+            });
+            api.Queue(getScoresRequest);
         }
 
         [BackgroundDependencyLoader]
