@@ -11,6 +11,7 @@ using osu.Framework.Graphics.Shapes;
 using osu.Framework.Timing;
 using osu.Game.Screens;
 using osu.Game.Screens.Menu;
+using osuTK;
 using osuTK.Graphics;
 
 namespace osu.Game.Tests.Visual.Menus
@@ -45,13 +46,15 @@ namespace osu.Game.Tests.Visual.Menus
                         RelativeSizeAxes = Axes.Both,
                         Colour = Color4.Black,
                     },
-                    new OsuScreenStack(new Intro())
+                    new OsuScreenStack(new IntroCircles())
                     {
                         RelativeSizeAxes = Axes.Both,
                     },
                     logo = new OsuLogo
                     {
-                        Anchor = Anchor.Centre,
+                        Alpha = 0,
+                        RelativePositionAxes = Axes.Both,
+                        Position = new Vector2(0.5f),
                     },
                 }
             });
