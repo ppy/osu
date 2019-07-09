@@ -55,6 +55,8 @@ namespace osu.Game.Overlays
         private Container dragContainer;
         private Container playerContainer;
 
+        public bool UserRequestedPause { get; private set; }
+
         [Resolved]
         private Bindable<WorkingBeatmap> beatmap { get; set; }
 
@@ -65,8 +67,6 @@ namespace osu.Game.Overlays
         /// Provide a source for the toolbar height.
         /// </summary>
         public Func<float> GetToolbarHeight;
-
-        public bool UserRequestedPause { get; private set; }
 
         public MusicController()
         {

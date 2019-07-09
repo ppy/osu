@@ -42,6 +42,9 @@ namespace osu.Game.Screens.Menu
         [Resolved]
         private GameHost host { get; set; }
 
+        [Resolved]
+        private MusicController musicController { get; set; }
+
         private BackgroundScreenDefault background;
 
         protected override BackgroundScreen CreateBackground() => background;
@@ -120,15 +123,6 @@ namespace osu.Game.Screens.Menu
             var track = Beatmap.Value.Track;
             var metadata = Beatmap.Value.Metadata;
 
-            if (last is Intro && track != null && !Game.MusicController.UserRequestedPause)
-            {
-                if (!track.IsRunning)
-                {
-                    track.Seek(metadata.PreviewTime != -1 ? metadata.PreviewTime : 0.4f * track.Length);
-                    track.Start();
-                }
-            }
-
             Beatmap.ValueChanged += beatmap_ValueChanged;
         }
 
@@ -190,7 +184,11 @@ namespace osu.Game.Screens.Menu
             //we may have consumed our preloaded instance, so let's make another.
             preloadSongSelect();
 
-            ResumeIfNoUserPauseRequested();
+            if (Beatmap.Value.Track != null && !musicController.UserRequestedPause)
+            {
+                Beatmap.Value.Track.Tempo.Value = 1;
+                Beatmap.Value.Track.Start();
+            }
         }
 
         public override bool OnExiting(IScreen next)

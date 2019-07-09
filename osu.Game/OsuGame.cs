@@ -306,7 +306,7 @@ namespace osu.Game
         private void currentTrackCompleted()
         {
             if (!Beatmap.Value.Track.Looping && !Beatmap.Disabled)
-                MusicController.NextTrack();
+                musicController.NextTrack();
         }
 
         #endregion
@@ -484,7 +484,7 @@ namespace osu.Game
                 Origin = Anchor.TopRight,
             }, rightFloatingOverlayContent.Add, true);
 
-            loadComponentSingleFile(MusicController = new MusicController
+            loadComponentSingleFile(musicController = new MusicController
             {
                 GetToolbarHeight = () => ToolbarOffset,
                 Anchor = Anchor.TopRight,
@@ -752,7 +752,7 @@ namespace osu.Game
 
         private ScalingContainer screenContainer;
 
-        public MusicController MusicController { get; private set; }
+        private MusicController musicController;
 
         protected override bool OnExiting()
         {
