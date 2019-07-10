@@ -10,6 +10,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Events;
 using osu.Framework.Input.States;
 using osu.Framework.Platform;
@@ -244,12 +245,13 @@ namespace osu.Game.Tests.Visual.Background
             player.ReplacesBackground.Value = false;
             player.CurrentStoryboardContainer.Add(new OsuSpriteText
             {
-                Size = new Vector2(250, 50),
+                Size = new Vector2(500, 50),
                 Alpha = 1,
-                Colour = Color4.Tomato,
+                Colour = Color4.White,
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
                 Text = "THIS IS A STORYBOARD",
+                Font = new FontUsage(size: 50)
             });
         });
 
