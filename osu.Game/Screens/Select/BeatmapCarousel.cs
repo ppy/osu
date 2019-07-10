@@ -11,7 +11,6 @@ using osu.Game.Configuration;
 using osuTK.Input;
 using osu.Framework.MathUtils;
 using System.Diagnostics;
-using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Caching;
@@ -64,35 +63,29 @@ namespace osu.Game.Screens.Select
         public IEnumerable<BeatmapSetInfo> BeatmapSets
         {
             get => beatmapSets.Select(g => g.BeatmapSet);
-            set => loadBeatmapSets(() => value);
+            set => loadBeatmapSets(value);
         }
 
-        public void LoadBeatmapSetsFromManager(BeatmapManager manager) => loadBeatmapSets(manager.GetAllUsableBeatmapSetsEnumerable);
-
-        private void loadBeatmapSets(Func<IEnumerable<BeatmapSetInfo>> beatmapSets)
+        private void loadBeatmapSets(IEnumerable<BeatmapSetInfo> beatmapSets)
         {
             CarouselRoot newRoot = new CarouselRoot(this);
 
-            Task.Run(() =>
-            {
-                beatmapSets().Select(createCarouselSet).Where(g => g != null).ForEach(newRoot.AddChild);
-                newRoot.Filter(activeCriteria);
+            beatmapSets.Select(createCarouselSet).Where(g => g != null).ForEach(newRoot.AddChild);
+            newRoot.Filter(activeCriteria);
 
-                // preload drawables as the ctor overhead is quite high currently.
-                var _ = newRoot.Drawables;
-            }).ContinueWith(_ => Schedule(() =>
-            {
-                root = newRoot;
-                scrollableContent.Clear(false);
-                itemsCache.Invalidate();
-                scrollPositionCache.Invalidate();
+            // preload drawables as the ctor overhead is quite high currently.
+            var _ = newRoot.Drawables;
 
-                Schedule(() =>
-                {
-                    BeatmapSetsChanged?.Invoke();
-                    BeatmapSetsLoaded = true;
-                });
-            }));
+            root = newRoot;
+            scrollableContent.Clear(false);
+            itemsCache.Invalidate();
+            scrollPositionCache.Invalidate();
+
+            Schedule(() =>
+            {
+                BeatmapSetsChanged?.Invoke();
+                BeatmapSetsLoaded = true;
+            });
         }
 
         private readonly List<float> yPositions = new List<float>();
@@ -125,13 +118,15 @@ namespace osu.Game.Screens.Select
         }
 
         [BackgroundDependencyLoader(permitNulls: true)]
-        private void load(OsuConfigManager config)
+        private void load(OsuConfigManager config, BeatmapManager beatmaps)
         {
             config.BindWith(OsuSetting.RandomSelectAlgorithm, RandomAlgorithm);
             config.BindWith(OsuSetting.SongSelectRightMouseScroll, RightClickScrollingEnabled);
 
             RightClickScrollingEnabled.ValueChanged += enabled => RightMouseScrollbar = enabled.NewValue;
             RightClickScrollingEnabled.TriggerChange();
+
+            loadBeatmapSets(beatmaps.GetAllUsableBeatmapSetsEnumerable());
         }
 
         public void RemoveBeatmapSet(BeatmapSetInfo beatmapSet)
@@ -148,40 +143,37 @@ namespace osu.Game.Screens.Select
             });
         }
 
-        public void UpdateBeatmapSet(BeatmapSetInfo beatmapSet)
+        public void UpdateBeatmapSet(BeatmapSetInfo beatmapSet) => Schedule(() =>
         {
-            Schedule(() =>
+            int? previouslySelectedID = null;
+            CarouselBeatmapSet existingSet = beatmapSets.FirstOrDefault(b => b.BeatmapSet.ID == beatmapSet.ID);
+
+            // If the selected beatmap is about to be removed, store its ID so it can be re-selected if required
+            if (existingSet?.State?.Value == CarouselItemState.Selected)
+                previouslySelectedID = selectedBeatmap?.Beatmap.ID;
+
+            var newSet = createCarouselSet(beatmapSet);
+
+            if (existingSet != null)
+                root.RemoveChild(existingSet);
+
+            if (newSet == null)
             {
-                int? previouslySelectedID = null;
-                CarouselBeatmapSet existingSet = beatmapSets.FirstOrDefault(b => b.BeatmapSet.ID == beatmapSet.ID);
-
-                // If the selected beatmap is about to be removed, store its ID so it can be re-selected if required
-                if (existingSet?.State?.Value == CarouselItemState.Selected)
-                    previouslySelectedID = selectedBeatmap?.Beatmap.ID;
-
-                var newSet = createCarouselSet(beatmapSet);
-
-                if (existingSet != null)
-                    root.RemoveChild(existingSet);
-
-                if (newSet == null)
-                {
-                    itemsCache.Invalidate();
-                    return;
-                }
-
-                root.AddChild(newSet);
-
-                applyActiveCriteria(false, false);
-
-                //check if we can/need to maintain our current selection.
-                if (previouslySelectedID != null)
-                    select((CarouselItem)newSet.Beatmaps.FirstOrDefault(b => b.Beatmap.ID == previouslySelectedID) ?? newSet);
-
                 itemsCache.Invalidate();
-                Schedule(() => BeatmapSetsChanged?.Invoke());
-            });
-        }
+                return;
+            }
+
+            root.AddChild(newSet);
+
+            applyActiveCriteria(false, false);
+
+            //check if we can/need to maintain our current selection.
+            if (previouslySelectedID != null)
+                select((CarouselItem)newSet.Beatmaps.FirstOrDefault(b => b.Beatmap.ID == previouslySelectedID) ?? newSet);
+
+            itemsCache.Invalidate();
+            Schedule(() => BeatmapSetsChanged?.Invoke());
+        });
 
         /// <summary>
         /// Selects a given beatmap on the carousel.

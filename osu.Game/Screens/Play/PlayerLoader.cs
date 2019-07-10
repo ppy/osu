@@ -18,6 +18,7 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Input;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Screens.Menu;
 using osu.Game.Screens.Play.HUD;
@@ -52,6 +53,8 @@ namespace osu.Game.Screens.Play
         private Task loadTask;
 
         private InputManager inputManager;
+
+        private IdleTracker idleTracker;
 
         public PlayerLoader(Func<Player> createPlayer)
         {
@@ -93,7 +96,8 @@ namespace osu.Game.Screens.Play
                         VisualSettings = new VisualSettings(),
                         new InputSettings()
                     }
-                }
+                },
+                idleTracker = new IdleTracker(750)
             });
 
             loadNewPlayer();
@@ -193,7 +197,7 @@ namespace osu.Game.Screens.Play
         // Here because IsHovered will not update unless we do so.
         public override bool HandlePositionalInput => true;
 
-        private bool readyForPush => player.LoadState == LoadState.Ready && IsHovered && GetContainingInputManager()?.DraggedDrawable == null;
+        private bool readyForPush => player.LoadState == LoadState.Ready && (IsHovered || idleTracker.IsIdle.Value) && inputManager?.DraggedDrawable == null;
 
         private void pushWhenLoaded()
         {
@@ -247,6 +251,7 @@ namespace osu.Game.Screens.Play
 
         public override void OnSuspending(IScreen next)
         {
+            BackgroundBrightnessReduction = false;
             base.OnSuspending(next);
             cancelLoad();
         }
@@ -258,6 +263,7 @@ namespace osu.Game.Screens.Play
             cancelLoad();
 
             Background.EnableUserDim.Value = false;
+            BackgroundBrightnessReduction = false;
 
             return base.OnExiting(next);
         }
@@ -270,6 +276,22 @@ namespace osu.Game.Screens.Play
             {
                 // if the player never got pushed, we should explicitly dispose it.
                 loadTask?.ContinueWith(_ => player.Dispose());
+            }
+        }
+
+        private bool backgroundBrightnessReduction;
+
+        protected bool BackgroundBrightnessReduction
+        {
+            get => backgroundBrightnessReduction;
+            set
+            {
+                if (value == backgroundBrightnessReduction)
+                    return;
+
+                backgroundBrightnessReduction = value;
+
+                Background.FadeColour(OsuColour.Gray(backgroundBrightnessReduction ? 0.8f : 1), 200);
             }
         }
 
@@ -287,12 +309,16 @@ namespace osu.Game.Screens.Play
                 // Preview user-defined background dim and blur when hovered on the visual settings panel.
                 Background.EnableUserDim.Value = true;
                 Background.BlurAmount.Value = 0;
+
+                BackgroundBrightnessReduction = false;
             }
             else
             {
                 // Returns background dim and blur to the values specified by PlayerLoader.
                 Background.EnableUserDim.Value = false;
                 Background.BlurAmount.Value = BACKGROUND_BLUR;
+
+                BackgroundBrightnessReduction = true;
             }
         }
 

@@ -15,11 +15,10 @@ using osu.Game.IO.Archives;
 using osu.Game.Screens.Backgrounds;
 using osuTK;
 using osuTK.Graphics;
-using osu.Game.Overlays;
 
 namespace osu.Game.Screens.Menu
 {
-    public class Intro : OsuScreen
+    public class Intro : StartupScreen
     {
         private const string menu_music_beatmap_hash = "3c8b1fcc9434dbb29e2fb613d3b9eada9d7bb6c125ceb32396c3b53437280c83";
 
@@ -32,12 +31,12 @@ namespace osu.Game.Screens.Menu
         private SampleChannel welcome;
         private SampleChannel seeya;
 
-        public override bool HideOverlaysOnEnter => true;
-        public override OverlayActivation InitialOverlayActivationMode => OverlayActivation.Disabled;
-
-        public override bool CursorVisible => false;
-
         protected override BackgroundScreen CreateBackground() => new BackgroundScreenBlack();
+
+        private readonly BindableDouble exitingVolumeFade = new BindableDouble(1);
+
+        [Resolved]
+        private AudioManager audio { get; set; }
 
         private Bindable<bool> menuVoice;
         private Bindable<bool> menuMusic;
@@ -45,7 +44,7 @@ namespace osu.Game.Screens.Menu
         private WorkingBeatmap introBeatmap;
 
         [BackgroundDependencyLoader]
-        private void load(AudioManager audio, OsuConfigManager config, BeatmapManager beatmaps, Framework.Game game)
+        private void load(OsuConfigManager config, BeatmapManager beatmaps, Framework.Game game)
         {
             menuVoice = config.GetBindable<bool>(OsuSetting.MenuVoice);
             menuMusic = config.GetBindable<bool>(OsuSetting.MenuMusic);
@@ -92,6 +91,7 @@ namespace osu.Game.Screens.Menu
             if (!resuming)
             {
                 Beatmap.Value = introBeatmap;
+                introBeatmap = null;
 
                 if (menuVoice.Value)
                     welcome.Play();
@@ -100,7 +100,10 @@ namespace osu.Game.Screens.Menu
                 {
                     // Only start the current track if it is the menu music. A beatmap's track is started when entering the Main Manu.
                     if (menuMusic.Value)
+                    {
                         track.Start();
+                        track = null;
+                    }
 
                     LoadComponentAsync(mainMenu = new MainMenu());
 
@@ -163,9 +166,10 @@ namespace osu.Game.Screens.Menu
             else
                 fadeOutTime = 500;
 
-            Scheduler.AddDelayed(this.Exit, fadeOutTime);
+            audio.AddAdjustment(AdjustableProperty.Volume, exitingVolumeFade);
+            this.TransformBindableTo(exitingVolumeFade, 0, fadeOutTime).OnComplete(_ => this.Exit());
 
-            //don't want to fade out completely else we will stop running updates and shit will hit the fan.
+            //don't want to fade out completely else we will stop running updates.
             Game.FadeTo(0.01f, fadeOutTime);
 
             base.OnResuming(last);

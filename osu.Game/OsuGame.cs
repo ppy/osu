@@ -29,6 +29,7 @@ using osu.Framework.Threading;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
+using osu.Game.Graphics.UserInterface;
 using osu.Game.Input;
 using osu.Game.Overlays.Notifications;
 using osu.Game.Screens.Play;
@@ -82,6 +83,7 @@ namespace osu.Game
         private OsuScreenStack screenStack;
         private VolumeOverlay volume;
         private OsuLogo osuLogo;
+        private BackButton backButton;
 
         private MainMenu menuScreen;
         private Intro introScreen;
@@ -181,9 +183,11 @@ namespace osu.Game
             configSkin.ValueChanged += skinId => SkinManager.CurrentSkinInfo.Value = SkinManager.Query(s => s.ID == skinId.NewValue) ?? SkinInfo.Default;
             configSkin.TriggerChange();
 
-            LocalConfig.BindWith(OsuSetting.VolumeInactive, userInactiveVolume);
-
             IsActive.BindValueChanged(active => updateActiveState(active.NewValue), true);
+
+            Audio.AddAdjustment(AdjustableProperty.Volume, inactiveVolumeFade);
+
+            Beatmap.BindValueChanged(beatmapChanged, true);
         }
 
         private ExternalLinkOpener externalLinkOpener;
@@ -263,8 +267,10 @@ namespace osu.Game
         /// </summary>
         public void PresentScore(ScoreInfo score)
         {
-            var databasedScore = ScoreManager.GetScore(score);
-            var databasedScoreInfo = databasedScore.ScoreInfo;
+            // The given ScoreInfo may have missing properties if it was retrieved from online data. Re-retrieve it from the database
+            // to ensure all the required data for presenting a replay are present.
+            var databasedScoreInfo = ScoreManager.Query(s => s.OnlineScoreID == score.OnlineScoreID);
+            var databasedScore = ScoreManager.GetScore(databasedScoreInfo);
 
             if (databasedScore.Replay == null)
             {
@@ -282,13 +288,32 @@ namespace osu.Game
 
             performFromMainMenu(() =>
             {
-                Ruleset.Value = databasedScoreInfo.Ruleset;
                 Beatmap.Value = BeatmapManager.GetWorkingBeatmap(databasedBeatmap);
-                Mods.Value = databasedScoreInfo.Mods;
 
-                menuScreen.Push(new PlayerLoader(() => new ReplayPlayer(databasedScore)));
+                menuScreen.Push(new ReplayPlayerLoader(databasedScore));
             }, $"watch {databasedScoreInfo}", bypassScreenAllowChecks: true);
         }
+
+        #region Beatmap jukebox progression
+
+        private void beatmapChanged(ValueChangedEvent<WorkingBeatmap> beatmap)
+        {
+            var nextBeatmap = beatmap.NewValue;
+            if (nextBeatmap?.Track != null)
+                nextBeatmap.Track.Completed += currentTrackCompleted;
+
+            beatmap.OldValue?.Dispose();
+
+            nextBeatmap?.LoadBeatmapAsync();
+        }
+
+        private void currentTrackCompleted()
+        {
+            if (!Beatmap.Value.Track.Looping && !Beatmap.Disabled)
+                musicController.NextTrack();
+        }
+
+        #endregion
 
         private ScheduledDelegate performFromMainMenuTask;
 
@@ -366,6 +391,7 @@ namespace osu.Game
             BeatmapManager.PresentImport = items => PresentBeatmap(items.First());
 
             ScoreManager.PostNotification = n => notifications?.Post(n);
+            ScoreManager.GetStableStorage = GetStorageForStableInstall;
             ScoreManager.PresentImport = items => PresentScore(items.First());
 
             Container logoContainer;
@@ -386,6 +412,16 @@ namespace osu.Game
                     Children = new Drawable[]
                     {
                         screenStack = new OsuScreenStack { RelativeSizeAxes = Axes.Both },
+                        backButton = new BackButton
+                        {
+                            Anchor = Anchor.BottomLeft,
+                            Origin = Anchor.BottomLeft,
+                            Action = () =>
+                            {
+                                if ((screenStack.CurrentScreen as IOsuScreen)?.AllowBackButton == true)
+                                    screenStack.Exit();
+                            }
+                        },
                         logoContainer = new Container { RelativeSizeAxes = Axes.Both },
                     }
                 },
@@ -452,7 +488,7 @@ namespace osu.Game
                 Origin = Anchor.TopRight,
             }, rightFloatingOverlayContent.Add, true);
 
-            loadComponentSingleFile(new MusicController
+            loadComponentSingleFile(musicController = new MusicController
             {
                 GetToolbarHeight = () => ToolbarOffset,
                 Anchor = Anchor.TopRight,
@@ -694,22 +730,14 @@ namespace osu.Game
 
         #region Inactive audio dimming
 
-        private readonly BindableDouble userInactiveVolume = new BindableDouble();
-
         private readonly BindableDouble inactiveVolumeFade = new BindableDouble();
 
         private void updateActiveState(bool isActive)
         {
             if (isActive)
-            {
-                this.TransformBindableTo(inactiveVolumeFade, 1, 500, Easing.OutQuint)
-                    .Finally(_ => Audio.RemoveAdjustment(AdjustableProperty.Volume, inactiveVolumeFade)); //wait for the transition to finish to remove the inactive audio adjustment
-            }
+                this.TransformBindableTo(inactiveVolumeFade, 1, 400, Easing.OutQuint);
             else
-            {
-                Audio.AddAdjustment(AdjustableProperty.Volume, inactiveVolumeFade);
-                this.TransformBindableTo(inactiveVolumeFade, userInactiveVolume.Value, 1500, Easing.OutSine);
-            }
+                this.TransformBindableTo(inactiveVolumeFade, LocalConfig.Get<double>(OsuSetting.VolumeInactive), 4000, Easing.OutQuint);
         }
 
         #endregion
@@ -725,7 +753,10 @@ namespace osu.Game
         private Container topMostOverlayContent;
 
         private FrameworkConfigManager frameworkConfig;
+
         private ScalingContainer screenContainer;
+
+        private MusicController musicController;
 
         protected override bool OnExiting()
         {
@@ -787,6 +818,11 @@ namespace osu.Game
                     CloseAllOverlays();
                 else
                     Toolbar.Show();
+
+                if (newOsuScreen.AllowBackButton)
+                    backButton.Show();
+                else
+                    backButton.Hide();
             }
         }
 
