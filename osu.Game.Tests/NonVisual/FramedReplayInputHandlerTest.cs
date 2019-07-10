@@ -278,6 +278,7 @@ namespace osu.Game.Tests.NonVisual
             public TestInputHandler(Replay replay)
                 : base(replay)
             {
+                FrameAccuratePlayback = true;
             }
 
             protected override double AllowedImportantTimeSpan => 1000;
