@@ -28,7 +28,9 @@ namespace osu.Game.Overlays
         protected readonly Header Header;
 
         private RulesetStore rulesets;
-        private readonly ScoresContainer scores;
+
+        private readonly ScoresContainer scoreContainer;
+
         private GetScoresRequest getScoresRequest;
 
         private readonly Bindable<BeatmapSetInfo> beatmapSet = new Bindable<BeatmapSetInfo>();
@@ -63,7 +65,7 @@ namespace osu.Game.Overlays
                         {
                             Header = new Header(),
                             info = new Info(),
-                            scores = new ScoresContainer(),
+                            scoreContainer = new ScoresContainer(),
                         },
                     },
                 },
@@ -81,23 +83,24 @@ namespace osu.Game.Overlays
             };
         }
 
-        private void getScores(BeatmapInfo b)
+        private void getScores(BeatmapInfo beatmap)
         {
             getScoresRequest?.Cancel();
+            getScoresRequest = null;
 
-            if (b?.OnlineBeatmapID.HasValue != true)
+            if (beatmap?.OnlineBeatmapID.HasValue != true)
             {
-                scores.Scores = null;
+                scoreContainer.Scores = null;
                 return;
             }
 
-            scores.Loading = true;
+            scoreContainer.Loading = true;
 
-            getScoresRequest = new GetScoresRequest(b, b.Ruleset);
-            getScoresRequest.Success += r => Schedule(() =>
+            getScoresRequest = new GetScoresRequest(beatmap, beatmap.Ruleset);
+            getScoresRequest.Success += scores => Schedule(() =>
             {
-                scores.Scores = r;
-                scores.Loading = false;
+                scoreContainer.Scores = scores;
+                scoreContainer.Loading = false;
             });
             api.Queue(getScoresRequest);
         }
