@@ -34,7 +34,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
                 StarRating = skills.Single().DifficultyValue() * star_scaling_factor,
                 Mods = mods,
                 // Todo: This int cast is temporary to achieve 1:1 results with osu!stable, and should be removed in the future
-                GreatHitWindow = (int)(beatmap.HitObjects.First().HitWindows.Great / 2) / clockRate,
+                GreatHitWindow = ((int)(beatmap.HitObjects.First().HitWindows.Great / 2) - 0.5) / clockRate,
                 MaxCombo = beatmap.HitObjects.Count(h => h is Hit),
                 Skills = skills
             };
