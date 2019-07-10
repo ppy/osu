@@ -20,6 +20,7 @@ using osu.Game.Database;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Overlays;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Scoring;
@@ -71,7 +72,7 @@ namespace osu.Game.Tests.Visual.Background
             Dependencies.Cache(rulesets = new RulesetStore(factory));
             Dependencies.Cache(manager = new BeatmapManager(LocalStorage, factory, rulesets, null, audio, host, Beatmap.Default));
             Dependencies.Cache(new OsuConfigManager(LocalStorage));
-
+            Dependencies.Cache(new MusicController());
             manager.Import(TestResources.GetTestBeatmapForImport()).Wait();
 
             Beatmap.SetDefault();
