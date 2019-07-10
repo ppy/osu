@@ -18,8 +18,6 @@ using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Drawables;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
-using osu.Game.Rulesets.Objects;
-using osu.Game.Rulesets.Objects.Types;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Effects;
@@ -289,14 +287,11 @@ namespace osu.Game.Screens.Select
 
                 if (b?.HitObjects?.Any() == true)
                 {
-                    HitObject lastObject = b.HitObjects.LastOrDefault();
-                    double endTime = (lastObject as IHasEndTime)?.EndTime ?? lastObject?.StartTime ?? 0;
-
                     labels.Add(new InfoLabel(new BeatmapStatistic
                     {
                         Name = "Length",
                         Icon = FontAwesome.Regular.Clock,
-                        Content = TimeSpan.FromMilliseconds(endTime - b.HitObjects.First().StartTime).ToString(@"m\:ss"),
+                        Content = TimeSpan.FromMilliseconds(b.BeatmapInfo.Length).ToString(@"m\:ss"),
                     }));
 
                     labels.Add(new InfoLabel(new BeatmapStatistic
