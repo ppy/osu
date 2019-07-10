@@ -238,7 +238,13 @@ namespace osu.Game.Screens.Edit
         public override bool OnExiting(IScreen next)
         {
             Background.FadeColour(Color4.White, 500);
-            Beatmap.Value.Track?.Stop();
+
+            if (Beatmap.Value.Track != null)
+            {
+                Beatmap.Value.Track.Tempo.Value = 1;
+                Beatmap.Value.Track.Stop();
+            }
+
             return base.OnExiting(next);
         }
 
