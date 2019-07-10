@@ -45,9 +45,9 @@ namespace osu.Game.Input.Bindings
             new KeyBinding(InputKey.Enter, GlobalAction.Select),
             new KeyBinding(InputKey.KeypadEnter, GlobalAction.Select),
 
-            new KeyBinding(InputKey.F5, GlobalAction.MusicPrev),
-            new KeyBinding(InputKey.F6, GlobalAction.MusicNext),
-            new KeyBinding(InputKey.X, GlobalAction.MusicPlay),
+            new KeyBinding(InputKey.F1, GlobalAction.MusicPrev),
+            new KeyBinding(InputKey.F5, GlobalAction.MusicNext),
+            new KeyBinding(InputKey.F3, GlobalAction.MusicPlay),
         };
 
         public IEnumerable<KeyBinding> InGameKeyBindings => new[]
