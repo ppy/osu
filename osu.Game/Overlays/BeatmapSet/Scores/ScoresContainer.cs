@@ -11,6 +11,9 @@ using osuTK;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Game.Online.API.Requests.Responses;
+using osu.Game.Beatmaps;
+using osu.Game.Online.API;
+using osu.Game.Online.API.Requests;
 
 namespace osu.Game.Overlays.BeatmapSet.Scores
 {
@@ -23,6 +26,40 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
         private readonly ScoreTable scoreTable;
         private readonly FillFlowContainer topScoresContainer;
         private readonly LoadingAnimation loadingAnimation;
+
+        [Resolved]
+        private IAPIProvider api { get; set; }
+
+        private GetScoresRequest getScoresRequest;
+
+        private APILegacyScores scores;
+
+        protected APILegacyScores Scores
+        {
+            get => scores;
+            set
+            {
+                scores = value;
+
+                updateDisplay();
+            }
+        }
+
+        private BeatmapInfo beatmap;
+
+        public BeatmapInfo Beatmap
+        {
+            get => beatmap;
+            set
+            {
+                if (beatmap == value)
+                    return;
+
+                beatmap = value;
+
+                getScores(beatmap);
+            }
+        }
 
         public ScoresContainer()
         {
@@ -75,7 +112,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
             updateDisplay();
         }
 
-        public bool Loading
+        private bool loading
         {
             set
             {
@@ -86,17 +123,26 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
             }
         }
 
-        private APILegacyScores scores;
-
-        public APILegacyScores Scores
+        private void getScores(BeatmapInfo beatmap)
         {
-            get => scores;
-            set
-            {
-                scores = value;
+            getScoresRequest?.Cancel();
+            getScoresRequest = null;
 
-                updateDisplay();
+            if (beatmap?.OnlineBeatmapID.HasValue != true)
+            {
+                Scores = null;
+                return;
             }
+
+            loading = true;
+
+            getScoresRequest = new GetScoresRequest(beatmap, beatmap.Ruleset);
+            getScoresRequest.Success += scores => Schedule(() =>
+            {
+                Scores = scores;
+                loading = false;
+            });
+            api.Queue(getScoresRequest);
         }
 
         private void updateDisplay()

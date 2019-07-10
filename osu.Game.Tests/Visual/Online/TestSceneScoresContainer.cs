@@ -31,7 +31,7 @@ namespace osu.Game.Tests.Visual.Online
 
         public TestSceneScoresContainer()
         {
-            ScoresContainer scoresContainer;
+            TestScoresContainer scoresContainer;
 
             Child = new Container
             {
@@ -46,7 +46,7 @@ namespace osu.Game.Tests.Visual.Online
                         RelativeSizeAxes = Axes.Both,
                         Colour = Color4.Black,
                     },
-                    scoresContainer = new ScoresContainer(),
+                    scoresContainer = new TestScoresContainer(),
                 }
             };
 
@@ -244,6 +244,14 @@ namespace osu.Game.Tests.Visual.Online
                 allScores.UserScore = myBestScore;
                 scoresContainer.Scores = allScores;
             });
+        }
+
+        private class TestScoresContainer : ScoresContainer
+        {
+            public new APILegacyScores Scores
+            {
+                set => base.Scores = value;
+            }
         }
     }
 }
