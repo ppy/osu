@@ -78,12 +78,7 @@ namespace osu.Game.Screens.Play
 
         protected StoryboardContainer StoryboardContainer { get; private set; }
 
-        protected virtual StoryboardContainer CreateStoryboardContainer(Storyboard storyboard) => new StoryboardContainer(storyboard)
-        {
-            RelativeSizeAxes = Axes.Both,
-            Alpha = 1,
-            EnableUserDim = { Value = true }
-        };
+        protected virtual StoryboardContainer CreateStoryboardContainer(Storyboard storyboard) => new StoryboardContainer(storyboard) { RelativeSizeAxes = Axes.Both };
 
         [Cached]
         [Cached(Type = typeof(IBindable<IReadOnlyList<Mod>>))]

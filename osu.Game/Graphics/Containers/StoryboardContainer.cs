@@ -19,6 +19,8 @@ namespace osu.Game.Graphics.Containers
         public StoryboardContainer(Storyboard storyboard)
         {
             this.storyboard = storyboard;
+            EnableUserDim.Default = true;
+            EnableUserDim.Value = true;
         }
 
         [BackgroundDependencyLoader]
@@ -29,13 +31,12 @@ namespace osu.Game.Graphics.Containers
 
         protected override void LoadComplete()
         {
-            ShowStoryboard.ValueChanged += _ => initializeStoryboard(true);
+            ShowStoryboard.BindValueChanged(_ => initializeStoryboard(true), true);
             base.LoadComplete();
         }
 
         protected override void ApplyFade()
         {
-            // Storyboards cannot be blurred, so just hide the storyboard if it gets toggled.
             DimContainer.FadeTo(!ShowStoryboard.Value || UserDimLevel.Value == 1 ? 0 : 1, BACKGROUND_FADE_DURATION, Easing.OutQuint);
         }
 
