@@ -42,8 +42,8 @@ namespace osu.Game.Screens.Menu
         [Resolved]
         private GameHost host { get; set; }
 
-        [Resolved]
-        private MusicController musicController { get; set; }
+        [Resolved(canBeNull: true)]
+        private MusicController music { get; set; }
 
         private BackgroundScreenDefault background;
 
@@ -193,7 +193,7 @@ namespace osu.Game.Screens.Menu
             //we may have consumed our preloaded instance, so let's make another.
             preloadSongSelect();
 
-            if (Beatmap.Value.Track != null && !musicController.IsUserPaused)
+            if (Beatmap.Value.Track != null && music?.IsUserPaused != true)
                 Beatmap.Value.Track.Start();
         }
 

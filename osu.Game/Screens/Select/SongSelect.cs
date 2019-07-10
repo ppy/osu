@@ -87,8 +87,8 @@ namespace osu.Game.Screens.Select
 
         private readonly Bindable<RulesetInfo> decoupledRuleset = new Bindable<RulesetInfo>();
 
-        [Resolved]
-        private MusicController musicController { get; set; }
+        [Resolved(canBeNull: true)]
+        private MusicController music { get; set; }
 
         [Cached]
         [Cached(Type = typeof(IBindable<IReadOnlyList<Mod>>))]
@@ -573,7 +573,7 @@ namespace osu.Game.Screens.Select
         {
             Track track = Beatmap.Value.Track;
 
-            if ((!track.IsRunning || restart) && !musicController.IsUserPaused)
+            if ((!track.IsRunning || restart) && music?.IsUserPaused != true)
             {
                 track.RestartPoint = Beatmap.Value.Metadata.PreviewTime;
                 track.Restart();
