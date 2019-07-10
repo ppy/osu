@@ -573,7 +573,7 @@ namespace osu.Game.Screens.Select
         {
             Track track = Beatmap.Value.Track;
 
-            if ((!track.IsRunning || restart) && !musicController.UserRequestedPause)
+            if ((!track.IsRunning || restart) && !musicController.IsUserPaused)
             {
                 track.RestartPoint = Beatmap.Value.Metadata.PreviewTime;
                 track.Restart();

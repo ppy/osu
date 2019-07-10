@@ -193,7 +193,7 @@ namespace osu.Game.Screens.Menu
             //we may have consumed our preloaded instance, so let's make another.
             preloadSongSelect();
 
-            if (Beatmap.Value.Track != null && !musicController.UserRequestedPause)
+            if (Beatmap.Value.Track != null && !musicController.IsUserPaused)
                 Beatmap.Value.Track.Start();
         }
 
