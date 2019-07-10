@@ -194,4 +194,3 @@ namespace osu.Game.Rulesets.UI
         public ReplayInputHandler ReplayInputHandler { get; set; }
     }
 }
-

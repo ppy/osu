@@ -35,7 +35,7 @@ namespace osu.Game.Skinning
             this.audio = audio;
         }
 
-        public void Play() => InternalChildren.OfType<DrawableSample>()?.ForEach(c =>
+        public void Play() => InternalChildren.OfType<DrawableSample>().ForEach(c =>
         {
             if (c.AggregateVolume.Value > 0)
                 c.Play();
