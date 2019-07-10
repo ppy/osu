@@ -16,6 +16,7 @@ using osu.Framework.Platform;
 using osu.Framework.Screens;
 using osu.Game.Beatmaps;
 using osu.Game.Database;
+using osu.Game.Overlays;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu;
@@ -96,6 +97,7 @@ namespace osu.Game.Tests.Visual.SongSelect
 
             Dependencies.Cache(rulesets = new RulesetStore(factory));
             Dependencies.Cache(manager = new BeatmapManager(LocalStorage, factory, rulesets, null, audio, host, defaultBeatmap = Beatmap.Default));
+            Dependencies.Cache(new MusicController());
 
             Beatmap.SetDefault();
         }
