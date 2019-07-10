@@ -194,10 +194,7 @@ namespace osu.Game.Screens.Menu
             preloadSongSelect();
 
             if (Beatmap.Value.Track != null && !musicController.UserRequestedPause)
-            {
-                Beatmap.Value.Track.Tempo.Value = 1;
                 Beatmap.Value.Track.Start();
-            }
         }
 
         public override bool OnExiting(IScreen next)
