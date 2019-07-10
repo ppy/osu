@@ -9,7 +9,7 @@ using osu.Game.Rulesets.Replays;
 namespace osu.Game.Tests.NonVisual
 {
     [TestFixture]
-    public class FramedReplayinputHandlerTest
+    public class FramedReplayInputHandlerTest
     {
         private Replay replay;
         private TestInputHandler handler;
