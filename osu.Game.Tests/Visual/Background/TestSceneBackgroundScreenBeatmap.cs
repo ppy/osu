@@ -334,15 +334,7 @@ namespace osu.Game.Tests.Visual.Background
         {
             protected override BackgroundScreen CreateBackground() => new FadeAccessibleBackground(Beatmap.Value);
 
-            protected override StoryboardContainer CreateStoryboardContainer(Storyboard storyboard)
-            {
-                return new TestStoryboardContainer
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    Alpha = 1,
-                    EnableUserDim = { Value = true }
-                };
-            }
+            protected override StoryboardContainer CreateStoryboardContainer(Storyboard storyboard) => new TestStoryboardContainer { RelativeSizeAxes = Axes.Both };
 
             public TestStoryboardContainer CurrentStoryboardContainer => (TestStoryboardContainer)StoryboardContainer;
 
