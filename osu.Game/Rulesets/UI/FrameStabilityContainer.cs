@@ -15,7 +15,7 @@ namespace osu.Game.Rulesets.UI
     /// A container which consumes a parent gameplay clock and standardises frame counts for children.
     /// Will ensure a minimum of 40 frames per clock second is maintained, regardless of any system lag or seeks.
     /// </summary>
-    public class FrameStabilityContainer : Container, IHasReplayHandler
+    public class FrameStabilityContainer : AudioContainer, IHasReplayHandler
     {
         private readonly double gameplayStartTime;
 
@@ -70,6 +70,8 @@ namespace osu.Game.Rulesets.UI
         /// </summary>
         private bool validState;
 
+        private bool catchingUp;
+
         protected override bool RequiresChildrenUpdate => base.RequiresChildrenUpdate && validState;
 
         private bool isAttached => ReplayInputHandler != null;
@@ -85,9 +87,22 @@ namespace osu.Game.Rulesets.UI
 
             int loops = 0;
 
+            if (!catchingUp)
+            {
+                Volume.Value = 1;
+                Alpha = 1;
+            }
+
             while (validState && requireMoreUpdateLoops && loops++ < MaxCatchUpFrames)
             {
                 updateClock();
+
+                // intentionally only done in the "becomes true" direction inside the loop to avoid flip-flopping during catch-up.
+                if (catchingUp)
+                {
+                    Volume.Value = 0;
+                    Alpha = 0.2f;
+                }
 
                 if (validState)
                 {
@@ -105,6 +120,7 @@ namespace osu.Game.Rulesets.UI
                 setClock(); // LoadComplete may not be run yet, but we still want the clock.
 
             validState = true;
+            catchingUp = false;
 
             manualClock.Rate = parentGameplayClock.Rate;
             manualClock.IsRunning = parentGameplayClock.IsRunning;
@@ -128,6 +144,7 @@ namespace osu.Game.Rulesets.UI
                     manualClock.CurrentTime = newProposedTime = Math.Min(gameplayStartTime, newProposedTime);
                 else if (Math.Abs(manualClock.CurrentTime - newProposedTime) > sixty_frame_time * 1.2f)
                 {
+                    catchingUp = true;
                     newProposedTime = newProposedTime > manualClock.CurrentTime
                         ? Math.Min(newProposedTime, manualClock.CurrentTime + sixty_frame_time)
                         : Math.Max(newProposedTime, manualClock.CurrentTime - sixty_frame_time);
@@ -177,3 +194,4 @@ namespace osu.Game.Rulesets.UI
         public ReplayInputHandler ReplayInputHandler { get; set; }
     }
 }
+
