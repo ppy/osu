@@ -110,8 +110,7 @@ namespace osu.Game.Screens.Select.Options
                 HotKey = hotkey
             };
 
-            buttonsContainer.Add(button);
-            buttonsContainer.SetLayoutPosition(button, depth);
+            buttonsContainer.Insert((int)depth, button);
         }
     }
 }

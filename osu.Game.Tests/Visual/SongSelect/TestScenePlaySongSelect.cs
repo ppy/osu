@@ -133,6 +133,9 @@ namespace osu.Game.Tests.Visual.SongSelect
             AddStep(@"Sort by Artist", delegate { songSelect.FilterControl.Sort = SortMode.Artist; });
             AddStep(@"Sort by Title", delegate { songSelect.FilterControl.Sort = SortMode.Title; });
             AddStep(@"Sort by Author", delegate { songSelect.FilterControl.Sort = SortMode.Author; });
+            AddStep(@"Sort by DateAdded", delegate { songSelect.FilterControl.Sort = SortMode.DateAdded; });
+            AddStep(@"Sort by BPM", delegate { songSelect.FilterControl.Sort = SortMode.BPM; });
+            AddStep(@"Sort by Length", delegate { songSelect.FilterControl.Sort = SortMode.Length; });
             AddStep(@"Sort by Difficulty", delegate { songSelect.FilterControl.Sort = SortMode.Difficulty; });
         }
 
@@ -265,16 +268,21 @@ namespace osu.Game.Tests.Visual.SongSelect
             {
                 int beatmapId = setId * 10 + i;
 
+                int length = RNG.Next(30000, 200000);
+                double bpm = RNG.NextSingle(80, 200);
+
                 beatmaps.Add(new BeatmapInfo
                 {
                     Ruleset = getRuleset(),
                     OnlineBeatmapID = beatmapId,
                     Path = "normal.osu",
-                    Version = $"{beatmapId}",
+                    Version = $"{beatmapId} (length {TimeSpan.FromMilliseconds(length):m\\:ss}, bpm {bpm:0.#})",
+                    Length = length,
+                    BPM = bpm,
                     BaseDifficulty = new BeatmapDifficulty
                     {
                         OverallDifficulty = 3.5f,
-                    }
+                    },
                 });
             }
 
@@ -286,10 +294,11 @@ namespace osu.Game.Tests.Visual.SongSelect
                 {
                     // Create random metadata, then we can check if sorting works based on these
                     Artist = "Some Artist " + RNG.Next(0, 9),
-                    Title = $"Some Song (set id {setId})",
+                    Title = $"Some Song (set id {setId}, max bpm {beatmaps.Max(b => b.BPM):0.#})",
                     AuthorString = "Some Guy " + RNG.Next(0, 9),
                 },
-                Beatmaps = beatmaps
+                Beatmaps = beatmaps,
+                DateAdded = DateTimeOffset.UtcNow,
             };
         }
     }

@@ -203,8 +203,13 @@ namespace osu.Game.Online.Leaderboards
 
         public void APIStateChanged(IAPIProvider api, APIState state)
         {
-            if (state == APIState.Online)
-                UpdateScores();
+            switch (state)
+            {
+                case APIState.Online:
+                case APIState.Offline:
+                    UpdateScores();
+                    break;
+            }
         }
 
         protected void UpdateScores()
