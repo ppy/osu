@@ -30,9 +30,9 @@ namespace osu.Game.Screens.Backgrounds
         /// </summary>
         public readonly Bindable<float> BlurAmount = new Bindable<float>();
 
-        private readonly UserDimContainer fadeContainer;
+        private readonly DimmableBackgroundContainer fadeContainer;
 
-        protected virtual UserDimContainer CreateFadeContainer() => new UserDimContainer { RelativeSizeAxes = Axes.Both };
+        protected virtual DimmableBackgroundContainer CreateFadeContainer() => new DimmableBackgroundContainer() { RelativeSizeAxes = Axes.Both };
 
         public BackgroundScreenBeatmap(WorkingBeatmap beatmap = null)
         {

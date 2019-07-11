@@ -243,7 +243,7 @@ namespace osu.Game.Tests.Visual.Background
         {
             player.StoryboardEnabled.Value = false;
             player.ReplacesBackground.Value = false;
-            player.CurrentStoryboardContainer.Add(new OsuSpriteText
+            player.CurrentDimmableStoryboardContainer.Add(new OsuSpriteText
             {
                 Size = new Vector2(500, 50),
                 Alpha = 1,
@@ -336,9 +336,9 @@ namespace osu.Game.Tests.Visual.Background
         {
             protected override BackgroundScreen CreateBackground() => new FadeAccessibleBackground(Beatmap.Value);
 
-            protected override StoryboardContainer CreateStoryboardContainer(Storyboard storyboard) => new TestStoryboardContainer { RelativeSizeAxes = Axes.Both };
+            protected override DimmableStoryboardContainer CreateStoryboardContainer(Storyboard storyboard) => new TestDimmableStoryboardContainer { RelativeSizeAxes = Axes.Both };
 
-            public TestStoryboardContainer CurrentStoryboardContainer => (TestStoryboardContainer)StoryboardContainer;
+            public TestDimmableStoryboardContainer CurrentDimmableStoryboardContainer => (TestDimmableStoryboardContainer)DimmableStoryboardContainer;
 
             // Whether or not the player should be allowed to load.
             public bool BlockLoad;
@@ -352,9 +352,9 @@ namespace osu.Game.Tests.Visual.Background
             {
             }
 
-            public bool IsStoryboardVisible() => CurrentStoryboardContainer.CurrentAlpha == 1;
+            public bool IsStoryboardVisible() => CurrentDimmableStoryboardContainer.CurrentAlpha == 1;
 
-            public bool IsStoryboardInvisible() => CurrentStoryboardContainer.CurrentAlpha <= 1;
+            public bool IsStoryboardInvisible() => CurrentDimmableStoryboardContainer.CurrentAlpha <= 1;
 
             [BackgroundDependencyLoader]
             private void load(OsuConfigManager config, CancellationToken token)
@@ -387,7 +387,7 @@ namespace osu.Game.Tests.Visual.Background
 
         private class FadeAccessibleBackground : BackgroundScreenBeatmap
         {
-            protected override UserDimContainer CreateFadeContainer() => fadeContainer = new TestUserDimContainer { RelativeSizeAxes = Axes.Both };
+            protected override DimmableBackgroundContainer CreateFadeContainer() => fadeContainer = new TestDimmableBackgroundContainer { RelativeSizeAxes = Axes.Both };
 
             public Color4 CurrentColour => fadeContainer.CurrentColour;
 
@@ -395,7 +395,7 @@ namespace osu.Game.Tests.Visual.Background
 
             public Vector2 CurrentBlur => Background.BlurSigma;
 
-            private TestUserDimContainer fadeContainer;
+            private TestDimmableBackgroundContainer fadeContainer;
 
             public FadeAccessibleBackground(WorkingBeatmap beatmap)
                 : base(beatmap)
@@ -403,17 +403,17 @@ namespace osu.Game.Tests.Visual.Background
             }
         }
 
-        private class TestStoryboardContainer : StoryboardContainer
+        private class TestDimmableStoryboardContainer : DimmableStoryboardContainer
         {
             public float CurrentAlpha => DimContainer.Alpha;
 
-            public TestStoryboardContainer()
+            public TestDimmableStoryboardContainer()
                 : base(new Storyboard())
             {
             }
         }
 
-        private class TestUserDimContainer : UserDimContainer
+        private class TestDimmableBackgroundContainer : DimmableBackgroundContainer
         {
             public Color4 CurrentColour => DimContainer.Colour;
             public float CurrentAlpha => DimContainer.Alpha;

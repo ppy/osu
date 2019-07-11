@@ -11,16 +11,14 @@ namespace osu.Game.Graphics.Containers
     /// <summary>
     /// A container that handles <see cref="Storyboard"/> loading, as well as applies user-specified visual settings to it.
     /// </summary>
-    public class StoryboardContainer : UserDimContainer
+    public class DimmableStoryboardContainer : UserDimContainer
     {
         private readonly Storyboard storyboard;
         private DrawableStoryboard drawableStoryboard;
 
-        public StoryboardContainer(Storyboard storyboard)
+        public DimmableStoryboardContainer(Storyboard storyboard)
         {
             this.storyboard = storyboard;
-            EnableUserDim.Default = true;
-            EnableUserDim.Value = true;
         }
 
         [BackgroundDependencyLoader]
