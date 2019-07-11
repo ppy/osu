@@ -22,10 +22,6 @@ namespace osu.Game.Graphics.Containers
         /// </remarks>
         public readonly Bindable<float> BlurAmount = new Bindable<float>();
 
-        private Bindable<double> userBlurLevel { get; set; }
-
-        private Background background;
-
         public Background Background
         {
             get => background;
@@ -35,6 +31,10 @@ namespace osu.Game.Graphics.Containers
                 background.BlurTo(blurTarget, 0, Easing.OutQuint);
             }
         }
+
+        private Bindable<double> userBlurLevel { get; set; }
+
+        private Background background;
 
         public override void Add(Drawable drawable)
         {
