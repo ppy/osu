@@ -97,16 +97,16 @@ namespace osu.Game.Overlays
         }
 
         /// <summary>
-        /// Displays the given <see cref="OsdToast"/> as parameter on the OSD
+        /// Displays the given <see cref="Toast"/> as parameter on the OSD
         /// </summary>
         /// <param name="toast"></param>
-        public void Display(OsdToast toast)
+        public void Display(Toast toast)
         {
             box.Child = toast;
             DisplayTemporarily(box);
         }
 
-        private void displayTrackedSettingChange(SettingDescription description) => Schedule(() => Display(new OsdTrackedSettingToast(description)));
+        private void displayTrackedSettingChange(SettingDescription description) => Schedule(() => Display(new TrackedSettingToast(description)));
 
         private TransformSequence<Drawable> fadeIn;
         private ScheduledDelegate fadeOut;
