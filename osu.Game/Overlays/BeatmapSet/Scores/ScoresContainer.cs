@@ -32,19 +32,6 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
 
         private GetScoresRequest getScoresRequest;
 
-        private APILegacyScores scores;
-
-        protected APILegacyScores Scores
-        {
-            get => scores;
-            set
-            {
-                scores = value;
-
-                updateDisplay();
-            }
-        }
-
         private BeatmapInfo beatmap;
 
         public BeatmapInfo Beatmap
@@ -58,6 +45,19 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                 beatmap = value;
 
                 getScores(beatmap);
+            }
+        }
+
+        private APILegacyScores scores;
+
+        protected APILegacyScores Scores
+        {
+            get => scores;
+            set
+            {
+                scores = value;
+
+                updateDisplay();
             }
         }
 
