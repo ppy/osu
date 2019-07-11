@@ -1,19 +1,19 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osuTK.Graphics;
 
 namespace osu.Game.Overlays.OSD
 {
-    public class OsdToast : Container
+    public class Toast : Container
     {
         private readonly Container content;
         protected override Container<Drawable> Content => content;
 
-        public OsdToast()
+        public Toast()
         {
             Anchor = Anchor.Centre;
             Origin = Anchor.Centre;

@@ -7,6 +7,7 @@ using osu.Framework.Configuration;
 using osu.Framework.Configuration.Tracking;
 using osu.Framework.Graphics;
 using osu.Game.Overlays;
+using osu.Game.Overlays.OSD;
 
 namespace osu.Game.Tests.Visual.UserInterface
 {
@@ -22,7 +23,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             osd.BeginTracking(this, config);
             Add(osd);
 
-            AddStep("Display empty osd toast", () => osd.Display(new Overlays.OSD.OsdToast()));
+            AddStep("Display empty osd toast", () => osd.Display(new Toast()));
             AddRepeatStep("Change toggle (no bind)", () => config.ToggleSetting(TestConfigSetting.ToggleSettingNoKeybind), 2);
             AddRepeatStep("Change toggle (with bind)", () => config.ToggleSetting(TestConfigSetting.ToggleSettingWithKeybind), 2);
             AddRepeatStep("Change enum (no bind)", () => config.IncrementEnumSetting(TestConfigSetting.EnumSettingNoKeybind), 3);

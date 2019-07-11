@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using osu.Framework.Allocation;
 using osu.Framework.Configuration.Tracking;
 using osu.Framework.Extensions.Color4Extensions;
@@ -13,13 +14,12 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osuTK;
 using osuTK.Graphics;
-using System;
 
 namespace osu.Game.Overlays.OSD
 {
-    public class OsdTrackedSettingToast : OsdToast
+    public class TrackedSettingToast : Toast
     {
-        public OsdTrackedSettingToast(SettingDescription description)
+        public TrackedSettingToast(SettingDescription description)
         {
             SpriteText textLine2;
             FillFlowContainer<OptionLight> optionLights;
