@@ -28,11 +28,6 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
         private readonly SpriteText date;
         private readonly UpdateableFlag flag;
 
-        public int ScorePosition
-        {
-            set => rankText.Text = $"#{value}";
-        }
-
         public TopScoreUserSection()
         {
             AutoSizeAxes = Axes.Both;
@@ -50,14 +45,13 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                         Origin = Anchor.Centre,
                         AutoSizeAxes = Axes.Both,
                         Direction = FillDirection.Vertical,
-                        Spacing = new Vector2(0, 3),
                         Children = new Drawable[]
                         {
                             rankText = new OsuSpriteText
                             {
                                 Anchor = Anchor.Centre,
                                 Origin = Anchor.Centre,
-                                Font = OsuFont.GetFont(size: 30, weight: FontWeight.Bold, italics: true)
+                                Font = OsuFont.GetFont(size: 24, weight: FontWeight.Bold, italics: true)
                             },
                             rank = new UpdateableRank(ScoreRank.D)
                             {
@@ -122,6 +116,11 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
         private void load(OsuColour colours)
         {
             rankText.Colour = colours.Yellow;
+        }
+
+        public int ScorePosition
+        {
+            set => rankText.Text = $"#{value}";
         }
 
         /// <summary>
