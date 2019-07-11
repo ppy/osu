@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.ComponentModel;
 using Newtonsoft.Json;
 
 namespace osu.Game.Beatmaps
@@ -72,14 +73,65 @@ namespace osu.Game.Beatmaps
         public BeatmapSetOnlineAvailability Availability { get; set; }
 
         /// <summary>
-        /// Beatmap set's song genre.
+        /// The song genre of this beatmap set.
         /// </summary>
         public BeatmapSetOnlineGenre Genre { get; set; }
 
         /// <summary>
-        /// Beatmap set's song language.
+        /// The song language of this beatmap set.
         /// </summary>
         public BeatmapSetOnlineLanguage Language { get; set; }
+    }
+
+    public enum BeatmapSetOnlineGenre
+    {
+        [Description("Any")]
+        Any = 0,
+
+        [Description("Unspecified")]
+        Unspecified = 1,
+
+        [Description("Video Game")]
+        VideoGame = 2,
+
+        [Description("Anime")]
+        Anime = 3,
+
+        [Description("Rock")]
+        Rock = 4,
+
+        [Description("Pop")]
+        Pop = 5,
+
+        [Description("Other")]
+        Other = 6,
+
+        [Description("Novelty")]
+        Novelty = 7,
+
+        // genre_id 8 doesn't exist
+
+        [Description("Hip-Hop")]
+        HipHop = 9,
+
+        [Description("Electronic")]
+        Electronic = 10
+    }
+
+    public enum BeatmapSetOnlineLanguage
+    {
+        Any,
+        Other,
+        English,
+        Japanese,
+        Chinese,
+        Instrumental,
+        Korean,
+        French,
+        German,
+        Swedish,
+        Spanish,
+        Italian
     }
 
     public class BeatmapSetOnlineCovers
