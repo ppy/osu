@@ -48,6 +48,12 @@ namespace osu.Game.Screens.Select.Carousel
                 case SortMode.DateAdded:
                     return otherSet.BeatmapSet.DateAdded.CompareTo(BeatmapSet.DateAdded);
 
+                case SortMode.BPM:
+                    return BeatmapSet.MaxBPM.CompareTo(otherSet.BeatmapSet.MaxBPM);
+
+                case SortMode.Length:
+                    return BeatmapSet.MaxLength.CompareTo(otherSet.BeatmapSet.MaxLength);
+
                 case SortMode.Difficulty:
                     return BeatmapSet.MaxStarDifficulty.CompareTo(otherSet.BeatmapSet.MaxStarDifficulty);
             }
