@@ -23,7 +23,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             osd.BeginTracking(this, config);
             Add(osd);
 
-            AddStep("Display empty osd toast", () => osd.Display(new Toast()));
+            AddStep("Display empty osd toast", () => osd.Display(new EmptyToast()));
             AddRepeatStep("Change toggle (no bind)", () => config.ToggleSetting(TestConfigSetting.ToggleSettingNoKeybind), 2);
             AddRepeatStep("Change toggle (with bind)", () => config.ToggleSetting(TestConfigSetting.ToggleSettingWithKeybind), 2);
             AddRepeatStep("Change enum (no bind)", () => config.IncrementEnumSetting(TestConfigSetting.EnumSettingNoKeybind), 3);
@@ -86,6 +86,10 @@ namespace osu.Game.Tests.Visual.UserInterface
             Setting2,
             Setting3,
             Setting4
+        }
+
+        private class EmptyToast : Toast
+        {
         }
 
         private class TestOnScreenDisplay : OnScreenDisplay
