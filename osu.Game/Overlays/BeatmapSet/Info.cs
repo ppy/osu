@@ -3,6 +3,7 @@
 
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -132,12 +133,8 @@ namespace osu.Game.Overlays.BeatmapSet
             {
                 source.Text = b.NewValue?.Metadata.Source ?? string.Empty;
                 tags.Text = b.NewValue?.Metadata.Tags ?? string.Empty;
-
-                var genreId = b.NewValue?.OnlineInfo.Genre ?? BeatmapSetOnlineGenre.Unspecified;
-                genre.Text = genreId.ToString();
-
-                var languageId = b.NewValue?.OnlineInfo.Language ?? BeatmapSetOnlineLanguage.Other;
-                language.Text = languageId.ToString();
+                genre.Text = (b.NewValue?.OnlineInfo.Genre ?? BeatmapSetOnlineGenre.Unspecified).GetDescription();
+                language.Text = (b.NewValue?.OnlineInfo.Language ?? BeatmapSetOnlineLanguage.Other).ToString();
             };
         }
 
