@@ -36,7 +36,7 @@ namespace osu.Game.Overlays.BeatmapSet
 
         public Info()
         {
-            MetadataSection source, tags;
+            MetadataSection source, tags, genre, language;
             RelativeSizeAxes = Axes.X;
             Height = 220;
             Masking = true;
@@ -88,6 +88,19 @@ namespace osu.Game.Overlays.BeatmapSet
                                 Children = new[]
                                 {
                                     source = new MetadataSection("Source"),
+                                    new FillFlowContainer
+                                    {
+                                        RelativeSizeAxes = Axes.X,
+                                        AutoSizeAxes = Axes.Y,
+                                        Direction = FillDirection.Horizontal,
+                                        Width = 0.5f,
+                                        FillMode = FillMode.Fit,
+                                        Children = new Drawable[]
+                                        {
+                                            genre = new MetadataSection("Genre"),
+                                            language = new MetadataSection("Language"),
+                                        }
+                                    },
                                     tags = new MetadataSection("Tags"),
                                 },
                             },
@@ -119,6 +132,12 @@ namespace osu.Game.Overlays.BeatmapSet
             {
                 source.Text = b.NewValue?.Metadata.Source ?? string.Empty;
                 tags.Text = b.NewValue?.Metadata.Tags ?? string.Empty;
+
+                var genreId = b.NewValue?.OnlineInfo.Genre ?? BeatmapSetOnlineGenre.Unspecified;
+                genre.Text = genreId.ToString();
+
+                var languageId = b.NewValue?.OnlineInfo.Language ?? BeatmapSetOnlineLanguage.Other;
+                language.Text = languageId.ToString();
             };
         }
 

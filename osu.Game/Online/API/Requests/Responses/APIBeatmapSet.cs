@@ -66,6 +66,12 @@ namespace osu.Game.Online.API.Requests.Responses
         [JsonProperty(@"availability")]
         private BeatmapSetOnlineAvailability availability { get; set; }
 
+        [JsonProperty(@"genre_id")]
+        private BeatmapSetOnlineGenre genre { get; set; }
+
+        [JsonProperty(@"language_id")]
+        private BeatmapSetOnlineLanguage language { get; set; }
+
         [JsonProperty(@"beatmaps")]
         private IEnumerable<APIBeatmap> beatmaps { get; set; }
 
@@ -91,6 +97,8 @@ namespace osu.Game.Online.API.Requests.Responses
                     Ranked = ranked,
                     LastUpdated = lastUpdated,
                     Availability = availability,
+                    Genre = genre,
+                    Language = language
                 },
                 Beatmaps = beatmaps?.Select(b => b.ToBeatmap(rulesets)).ToList(),
             };
