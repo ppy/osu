@@ -18,6 +18,8 @@ namespace osu.Game.Overlays.OSD
             Anchor = Anchor.Centre;
             Origin = Anchor.Centre;
             Width = 240;
+
+            // A toast's height is decided (and transformed) by the containing OnScreenDisplay.
             RelativeSizeAxes = Axes.Y;
 
             InternalChildren = new Drawable[]
