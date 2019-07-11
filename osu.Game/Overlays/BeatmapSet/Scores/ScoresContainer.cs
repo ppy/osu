@@ -114,13 +114,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
 
         private bool loading
         {
-            set
-            {
-                loadingAnimation.FadeTo(value ? 1 : 0, fade_duration);
-
-                if (value)
-                    Scores = null;
-            }
+            set => loadingAnimation.FadeTo(value ? 1 : 0, fade_duration);
         }
 
         private void getScores(BeatmapInfo beatmap)
@@ -128,11 +122,10 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
             getScoresRequest?.Cancel();
             getScoresRequest = null;
 
+            Scores = null;
+
             if (beatmap?.OnlineBeatmapID.HasValue != true)
-            {
-                Scores = null;
                 return;
-            }
 
             loading = true;
 
