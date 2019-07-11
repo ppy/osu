@@ -3,10 +3,8 @@
 
 using System.Collections.Generic;
 using NUnit.Framework;
-using osu.Framework.Allocation;
 using osu.Game.Beatmaps;
 using osu.Game.Overlays;
-using osu.Game.Rulesets;
 
 namespace osu.Game.Tests.Visual.Online
 {
@@ -14,7 +12,6 @@ namespace osu.Game.Tests.Visual.Online
     public class TestSceneDirectOverlay : OsuTestScene
     {
         private DirectOverlay direct;
-        private RulesetStore rulesets;
 
         protected override void LoadComplete()
         {
@@ -25,18 +22,11 @@ namespace osu.Game.Tests.Visual.Online
 
             AddStep(@"toggle", direct.ToggleVisibility);
             AddStep(@"result counts", () => direct.ResultAmounts = new DirectOverlay.ResultCounts(1, 4, 13));
-        }
-
-        [BackgroundDependencyLoader]
-        private void load(RulesetStore rulesets)
-        {
-            this.rulesets = rulesets;
+            AddStep(@"trigger disabled", () => Ruleset.Disabled = !Ruleset.Disabled);
         }
 
         private void newBeatmaps()
         {
-            var ruleset = rulesets.GetRuleset(0);
-
             direct.BeatmapSets = new[]
             {
                 new BeatmapSetInfo
@@ -65,7 +55,7 @@ namespace osu.Game.Tests.Visual.Online
                     {
                         new BeatmapInfo
                         {
-                            Ruleset = ruleset,
+                            Ruleset = Ruleset.Value,
                             StarDifficulty = 5.35f,
                             Metadata = new BeatmapMetadata(),
                         },
@@ -97,7 +87,7 @@ namespace osu.Game.Tests.Visual.Online
                     {
                         new BeatmapInfo
                         {
-                            Ruleset = ruleset,
+                            Ruleset = Ruleset.Value,
                             StarDifficulty = 5.81f,
                             Metadata = new BeatmapMetadata(),
                         },
@@ -129,23 +119,23 @@ namespace osu.Game.Tests.Visual.Online
                     {
                         new BeatmapInfo
                         {
-                            Ruleset = ruleset,
+                            Ruleset = Ruleset.Value,
                             StarDifficulty = 0.9f,
                             Metadata = new BeatmapMetadata(),
                         },
                         new BeatmapInfo
                         {
-                            Ruleset = ruleset,
+                            Ruleset = Ruleset.Value,
                             StarDifficulty = 1.1f,
                         },
                         new BeatmapInfo
                         {
-                            Ruleset = ruleset,
+                            Ruleset = Ruleset.Value,
                             StarDifficulty = 2.02f,
                         },
                         new BeatmapInfo
                         {
-                            Ruleset = ruleset,
+                            Ruleset = Ruleset.Value,
                             StarDifficulty = 3.49f,
                         },
                     },
@@ -176,43 +166,43 @@ namespace osu.Game.Tests.Visual.Online
                     {
                         new BeatmapInfo
                         {
-                            Ruleset = ruleset,
+                            Ruleset = Ruleset.Value,
                             StarDifficulty = 1.26f,
                             Metadata = new BeatmapMetadata(),
                         },
                         new BeatmapInfo
                         {
-                            Ruleset = ruleset,
+                            Ruleset = Ruleset.Value,
                             StarDifficulty = 2.01f,
                         },
                         new BeatmapInfo
                         {
-                            Ruleset = ruleset,
+                            Ruleset = Ruleset.Value,
                             StarDifficulty = 2.87f,
                         },
                         new BeatmapInfo
                         {
-                            Ruleset = ruleset,
+                            Ruleset = Ruleset.Value,
                             StarDifficulty = 3.76f,
                         },
                         new BeatmapInfo
                         {
-                            Ruleset = ruleset,
+                            Ruleset = Ruleset.Value,
                             StarDifficulty = 3.93f,
                         },
                         new BeatmapInfo
                         {
-                            Ruleset = ruleset,
+                            Ruleset = Ruleset.Value,
                             StarDifficulty = 4.37f,
                         },
                         new BeatmapInfo
                         {
-                            Ruleset = ruleset,
+                            Ruleset = Ruleset.Value,
                             StarDifficulty = 5.13f,
                         },
                         new BeatmapInfo
                         {
-                            Ruleset = ruleset,
+                            Ruleset = Ruleset.Value,
                             StarDifficulty = 5.42f,
                         },
                     },

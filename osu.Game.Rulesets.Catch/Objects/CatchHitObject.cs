@@ -14,6 +14,8 @@ namespace osu.Game.Rulesets.Catch.Objects
 
         public float X { get; set; }
 
+        public double TimePreempt = 1000;
+
         public int IndexInBeatmap { get; set; }
 
         public virtual FruitVisualRepresentation VisualRepresentation => (FruitVisualRepresentation)(ComboIndex % 4);
@@ -53,6 +55,8 @@ namespace osu.Game.Rulesets.Catch.Objects
         protected override void ApplyDefaultsToSelf(ControlPointInfo controlPointInfo, BeatmapDifficulty difficulty)
         {
             base.ApplyDefaultsToSelf(controlPointInfo, difficulty);
+
+            TimePreempt = (float)BeatmapDifficulty.DifficultyRange(difficulty.ApproachRate, 1800, 1200, 450);
 
             Scale = 1.0f - 0.7f * (difficulty.CircleSize - 5) / 5;
         }
