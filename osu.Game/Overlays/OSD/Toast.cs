@@ -8,12 +8,12 @@ using osuTK.Graphics;
 
 namespace osu.Game.Overlays.OSD
 {
-    public class Toast : Container
+    public abstract class Toast : Container
     {
         private readonly Container content;
         protected override Container<Drawable> Content => content;
 
-        public Toast()
+        protected Toast()
         {
             Anchor = Anchor.Centre;
             Origin = Anchor.Centre;
