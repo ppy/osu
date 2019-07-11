@@ -72,7 +72,7 @@ namespace osu.Game.Online.API.Requests.Responses
                 StarDifficulty = starDifficulty,
                 OnlineBeatmapID = OnlineBeatmapID,
                 Version = version,
-                Length = TimeSpan.FromSeconds(length).Milliseconds,
+                Length = TimeSpan.FromSeconds(length).TotalMilliseconds,
                 Status = Status,
                 BeatmapSet = set,
                 Metrics = metrics,

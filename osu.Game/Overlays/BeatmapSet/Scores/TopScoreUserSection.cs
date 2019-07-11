@@ -39,19 +39,28 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                 Spacing = new Vector2(10, 0),
                 Children = new Drawable[]
                 {
-                    rankText = new OsuSpriteText
+                    new FillFlowContainer
                     {
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
-                        Text = "#1",
-                        Font = OsuFont.GetFont(size: 30, weight: FontWeight.Bold, italics: true)
-                    },
-                    rank = new UpdateableRank(ScoreRank.D)
-                    {
-                        Anchor = Anchor.Centre,
-                        Origin = Anchor.Centre,
-                        Size = new Vector2(40),
-                        FillMode = FillMode.Fit,
+                        AutoSizeAxes = Axes.Both,
+                        Direction = FillDirection.Vertical,
+                        Children = new Drawable[]
+                        {
+                            rankText = new OsuSpriteText
+                            {
+                                Anchor = Anchor.Centre,
+                                Origin = Anchor.Centre,
+                                Font = OsuFont.GetFont(size: 24, weight: FontWeight.Bold, italics: true)
+                            },
+                            rank = new UpdateableRank(ScoreRank.D)
+                            {
+                                Anchor = Anchor.Centre,
+                                Origin = Anchor.Centre,
+                                Size = new Vector2(40),
+                                FillMode = FillMode.Fit,
+                            },
+                        }
                     },
                     avatar = new UpdateableAvatar(hideImmediately: true)
                     {
@@ -107,6 +116,11 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
         private void load(OsuColour colours)
         {
             rankText.Colour = colours.Yellow;
+        }
+
+        public int ScorePosition
+        {
+            set => rankText.Text = $"#{value}";
         }
 
         /// <summary>
