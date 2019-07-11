@@ -32,7 +32,7 @@ namespace osu.Game.Screens.Backgrounds
 
         private readonly DimmableBackgroundContainer fadeContainer;
 
-        protected virtual DimmableBackgroundContainer CreateFadeContainer() => new DimmableBackgroundContainer() { RelativeSizeAxes = Axes.Both };
+        protected virtual DimmableBackgroundContainer CreateFadeContainer() => new DimmableBackgroundContainer { RelativeSizeAxes = Axes.Both };
 
         public BackgroundScreenBeatmap(WorkingBeatmap beatmap = null)
         {
