@@ -70,6 +70,16 @@ namespace osu.Game.Beatmaps
         /// The availability of this beatmap set.
         /// </summary>
         public BeatmapSetOnlineAvailability Availability { get; set; }
+
+        /// <summary>
+        /// Beatmap set's song genre.
+        /// </summary>
+        public BeatmapSetOnlineGenre Genre { get; set; }
+
+        /// <summary>
+        /// Beatmap set's song language.
+        /// </summary>
+        public BeatmapSetOnlineLanguage Language { get; set; }
     }
 
     public class BeatmapSetOnlineCovers
