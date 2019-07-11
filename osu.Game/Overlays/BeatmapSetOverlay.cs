@@ -21,12 +21,9 @@ namespace osu.Game.Overlays
 {
     public class BeatmapSetOverlay : FullscreenOverlay
     {
-        private const int fade_duration = 300;
-
         public const float X_PADDING = 40;
         public const float TOP_PADDING = 25;
         public const float RIGHT_WIDTH = 275;
-
         protected readonly Header Header;
 
         private RulesetStore rulesets;
@@ -40,7 +37,7 @@ namespace osu.Game.Overlays
         {
             OsuScrollContainer scroll;
             Info info;
-            ScoresContainer scores;
+            ScoresContainer scoreContainer;
 
             Children = new Drawable[]
             {
@@ -62,7 +59,7 @@ namespace osu.Game.Overlays
                         {
                             Header = new Header(),
                             info = new Info(),
-                            scores = new ScoresContainer(),
+                            scoreContainer = new ScoresContainer(),
                         },
                     },
                 },
@@ -74,7 +71,7 @@ namespace osu.Game.Overlays
             Header.Picker.Beatmap.ValueChanged += b =>
             {
                 info.Beatmap = b.NewValue;
-                scores.Beatmap = b.NewValue;
+                scoreContainer.Beatmap = b.NewValue;
 
                 scroll.ScrollToStart();
             };
@@ -101,6 +98,7 @@ namespace osu.Game.Overlays
         public void FetchAndShowBeatmap(int beatmapId)
         {
             beatmapSet.Value = null;
+
             var req = new GetBeatmapSetRequest(beatmapId, BeatmapSetLookupType.BeatmapId);
             req.Success += res =>
             {
@@ -108,15 +106,18 @@ namespace osu.Game.Overlays
                 Header.Picker.Beatmap.Value = Header.BeatmapSet.Value.Beatmaps.First(b => b.OnlineBeatmapID == beatmapId);
             };
             API.Queue(req);
+
             Show();
         }
 
         public void FetchAndShowBeatmapSet(int beatmapSetId)
         {
             beatmapSet.Value = null;
+
             var req = new GetBeatmapSetRequest(beatmapSetId);
             req.Success += res => beatmapSet.Value = res.ToBeatmapSet(rulesets);
             API.Queue(req);
+
             Show();
         }
 

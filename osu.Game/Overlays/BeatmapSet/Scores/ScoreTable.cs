@@ -59,7 +59,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                 Content = null;
                 backgroundFlow.Clear();
 
-                if (value == null || !value.Any())
+                if (value?.Any() != true)
                     return;
 
                 for (int i = 0; i < value.Count; i++)
