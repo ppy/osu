@@ -8,7 +8,6 @@ using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
 using osuTK;
-using System.Collections.Generic;
 using System.Linq;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Beatmaps;
@@ -48,16 +47,34 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
             }
         }
 
-        private APILegacyScores scores;
-
         protected APILegacyScores Scores
         {
-            get => scores;
             set
             {
-                scores = value;
+                Schedule(() =>
+                {
+                    loading = false;
 
-                updateDisplay();
+                    topScoresContainer.Clear();
+
+                    if (value?.Scores.Any() != true)
+                    {
+                        scoreTable.Scores = null;
+                        scoreTable.Hide();
+                        return;
+                    }
+
+                    scoreTable.Scores = value.Scores;
+                    scoreTable.Show();
+
+                    var topScore = value.Scores.First();
+                    var userScore = value.UserScore;
+
+                    topScoresContainer.Add(new DrawableTopScore(topScore));
+
+                    if (userScore != null && userScore.Score.OnlineScoreID != topScore.OnlineScoreID)
+                        topScoresContainer.Add(new DrawableTopScore(userScore.Score, userScore.Position));
+                });
             }
         }
 
@@ -109,7 +126,6 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
         private void load(OsuColour colours)
         {
             background.Colour = colours.Gray2;
-            updateDisplay();
         }
 
         private bool loading
@@ -125,35 +141,15 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
             Scores = null;
 
             if (beatmap?.OnlineBeatmapID.HasValue != true)
+            {
+                loading = false;
                 return;
-
-            loading = true;
+            }
 
             getScoresRequest = new GetScoresRequest(beatmap, beatmap.Ruleset);
-            getScoresRequest.Success += scores => Schedule(() =>
-            {
-                Scores = scores;
-                loading = false;
-            });
+            getScoresRequest.Success += scores => Scores = scores;
             api.Queue(getScoresRequest);
-        }
-
-        private void updateDisplay()
-        {
-            topScoresContainer.Clear();
-
-            scoreTable.Scores = scores?.Scores.Count > 1 ? scores.Scores : new List<APILegacyScoreInfo>();
-            scoreTable.FadeTo(scores?.Scores.Count > 1 ? 1 : 0);
-
-            if (scores?.Scores.Any() ?? false)
-            {
-                topScoresContainer.Add(new DrawableTopScore(scores.Scores.FirstOrDefault()));
-
-                var userScore = scores.UserScore;
-
-                if (userScore != null && userScore.Position != 1)
-                    topScoresContainer.Add(new DrawableTopScore(userScore.Score, userScore.Position));
-            }
+            loading = true;
         }
     }
 }
