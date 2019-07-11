@@ -76,9 +76,9 @@ namespace osu.Game.Screens.Play
 
         protected GameplayClockContainer GameplayClockContainer { get; private set; }
 
-        protected StoryboardContainer StoryboardContainer { get; private set; }
+        protected DimmableStoryboardContainer DimmableStoryboardContainer { get; private set; }
 
-        protected virtual StoryboardContainer CreateStoryboardContainer(Storyboard storyboard) => new StoryboardContainer(storyboard) { RelativeSizeAxes = Axes.Both };
+        protected virtual DimmableStoryboardContainer CreateStoryboardContainer(Storyboard storyboard) => new DimmableStoryboardContainer(storyboard) { RelativeSizeAxes = Axes.Both };
 
         [Cached]
         [Cached(Type = typeof(IBindable<IReadOnlyList<Mod>>))]
@@ -124,7 +124,7 @@ namespace osu.Game.Screens.Play
 
             GameplayClockContainer.Children = new[]
             {
-                StoryboardContainer = CreateStoryboardContainer(Beatmap.Value.Storyboard),
+                DimmableStoryboardContainer = CreateStoryboardContainer(Beatmap.Value.Storyboard),
                 new ScalingContainer(ScalingMode.Gameplay)
                 {
                     Child = new LocalSkinOverrideContainer(working.Skin)
@@ -455,7 +455,7 @@ namespace osu.Game.Screens.Play
             Background.BlurAmount.Value = 0;
 
             Background.StoryboardReplacesBackground.BindTo(storyboardReplacesBackground);
-            StoryboardContainer.StoryboardReplacesBackground.BindTo(storyboardReplacesBackground);
+            DimmableStoryboardContainer.StoryboardReplacesBackground.BindTo(storyboardReplacesBackground);
 
             storyboardReplacesBackground.Value = Beatmap.Value.Storyboard.ReplacesBackground && Beatmap.Value.Storyboard.HasDrawable;
 
