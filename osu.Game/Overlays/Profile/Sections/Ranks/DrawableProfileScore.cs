@@ -49,8 +49,7 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
                 Font = OsuFont.GetFont(size: 11, weight: FontWeight.Regular, italics: true)
             };
 
-            RightFlowContainer.Add(text);
-            RightFlowContainer.SetLayoutPosition(text, 1);
+            RightFlowContainer.Insert(1, text);
 
             LeftFlowContainer.Add(new BeatmapMetadataContainer(Score.Beatmap));
             LeftFlowContainer.Add(new DrawableDate(Score.Date));
