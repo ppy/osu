@@ -35,13 +35,13 @@ namespace osu.Game.Overlays.Profile.Header.Components
                 LineColour = colours.Yellow,
             };
 
-            User.BindValueChanged(user => UpdateTime(user.NewValue), true);
+            User.BindValueChanged(user => updateTime(user.NewValue?.Statistics), true);
         }
 
-        public void UpdateTime(User user)
+        private void updateTime(UserStatistics statistics)
         {
-            TooltipText = (user?.Statistics?.PlayTime ?? 0) / 3600 + " hours";
-            info.Content = formatTime(user?.Statistics?.PlayTime);
+            TooltipText = (statistics?.PlayTime ?? 0) / 3600 + " hours";
+            info.Content = formatTime(statistics?.PlayTime);
         }
 
         private string formatTime(int? secondsNull)

@@ -133,15 +133,13 @@ namespace osu.Game.Overlays
                     if (sec != null)
                     {
                         sec.User.Value = user;
+                        sec.Ruleset.BindTo(Header.Ruleset);
 
                         sectionsContainer.Add(sec);
                         tabs.AddItem(sec);
                     }
                 }
             }
-
-            foreach (var section in sections)
-                section.Ruleset.BindTo(Header.Ruleset);
         }
 
         private class ProfileTabControl : OverlayTabControl<ProfileSection>

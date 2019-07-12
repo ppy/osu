@@ -22,6 +22,7 @@ namespace osu.Game.Overlays.Profile.Header
         private const float avatar_size = 110;
 
         public readonly Bindable<User> User = new Bindable<User>();
+        public readonly Bindable<UserStatistics> Statistics = new Bindable<UserStatistics>();
 
         private SupporterIcon supporterTag;
         private UpdateableAvatar avatar;
@@ -160,6 +161,7 @@ namespace osu.Game.Overlays.Profile.Header
             };
 
             User.BindValueChanged(user => updateUser(user.NewValue));
+            Statistics.BindValueChanged(statistics => updateStatistics(statistics.NewValue));
         }
 
         private void updateUser(User user)
@@ -173,10 +175,10 @@ namespace osu.Game.Overlays.Profile.Header
             titleText.Text = user?.Title ?? string.Empty;
             titleText.Colour = OsuColour.FromHex(user?.Colour ?? "fff");
 
-            UpdateStatistics(user?.Statistics);
+            updateStatistics(user?.Statistics);
         }
 
-        public void UpdateStatistics(UserStatistics statistics)
+        private void updateStatistics(UserStatistics statistics)
         {
             userStats.Clear();
 

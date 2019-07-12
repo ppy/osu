@@ -21,7 +21,7 @@ namespace osu.Game.Overlays.Profile
 {
     public class ProfileHeader : OverlayHeader
     {
-        public Bindable<User> User = new Bindable<User>();
+        private readonly Bindable<UserStatistics> statistics = new Bindable<UserStatistics>();
 
         [Resolved]
         private RulesetStore rulesets { get; set; }
@@ -32,11 +32,12 @@ namespace osu.Game.Overlays.Profile
         private GetUserRequest userRequest;
 
         private UserCoverBackground coverContainer;
-        private TopHeaderContainer topHeaderContainer;
         private CentreHeaderContainer centreHeaderContainer;
         private DetailHeaderContainer detailHeaderContainer;
         private DimmedLoadingAnimation loadingAnimation;
         private ProfileRulesetSelector rulesetSelector;
+
+        public Bindable<User> User = new Bindable<User>();
 
         public Bindable<RulesetInfo> Ruleset
         {
@@ -45,7 +46,7 @@ namespace osu.Game.Overlays.Profile
 
         public ProfileHeader()
         {
-            User.ValueChanged += e => updateDisplay(e.NewValue);
+            User.ValueChanged += e => updateUser(e.NewValue);
 
             TabControl.AddItem("Info");
             TabControl.AddItem("Modding");
@@ -90,20 +91,21 @@ namespace osu.Game.Overlays.Profile
                     Direction = FillDirection.Vertical,
                     Children = new Drawable[]
                     {
-                        topHeaderContainer = new TopHeaderContainer
+                        new TopHeaderContainer
                         {
                             RelativeSizeAxes = Axes.X,
                             User = { BindTarget = User },
+                            Statistics = { BindTarget = statistics }
                         },
                         centreHeaderContainer = new CentreHeaderContainer
                         {
                             RelativeSizeAxes = Axes.X,
                             User = { BindTarget = User },
+                            Statistics = { BindTarget = statistics }
                         },
                         detailHeaderContainer = new DetailHeaderContainer
                         {
                             RelativeSizeAxes = Axes.X,
-                            User = { BindTarget = User },
                         },
                         new MedalHeaderContainer
                         {
@@ -121,39 +123,36 @@ namespace osu.Game.Overlays.Profile
             }
         };
 
-        public void UpdateStatistics(User user)
-        {
-            topHeaderContainer.UpdateStatistics(user.Statistics);
-            centreHeaderContainer.UpdateStatistics(user.Statistics);
-            detailHeaderContainer.UpdateDisplay(user);
-        }
-
         protected override ScreenTitle CreateTitle() => new ProfileHeaderTitle();
 
-        private void updateDisplay(User user)
+        private void updateUser(User user)
         {
             coverContainer.User = user;
+
+            detailHeaderContainer.User.Value = user;
 
             Add(rulesetSelector = new ProfileRulesetSelector
             {
                 Anchor = Anchor.TopRight,
                 Origin = Anchor.TopRight,
-                Margin = new MarginPadding { Top = 100, Right = 30 }
+                Margin = new MarginPadding { Top = 100, Right = 30 },
             });
 
             rulesetSelector.SetDefaultRuleset(rulesets.GetRuleset(user.PlayMode ?? "osu"));
             rulesetSelector.SelectDefaultRuleset();
+
             rulesetSelector.Current.BindValueChanged(rulesetChanged);
         }
 
-        private void rulesetChanged(ValueChangedEvent<RulesetInfo> r)
+        private void rulesetChanged(ValueChangedEvent<RulesetInfo> ruleset)
         {
             loadingAnimation.Show();
 
-            userRequest = new GetUserRequest(User.Value.Id, r.NewValue);
+            userRequest = new GetUserRequest(User.Value.Id, ruleset.NewValue);
             userRequest.Success += user =>
             {
-                UpdateStatistics(user);
+                statistics.Value = user.Statistics;
+                detailHeaderContainer.User.Value = user;
                 loadingAnimation.Hide();
             };
             api.Queue(userRequest);

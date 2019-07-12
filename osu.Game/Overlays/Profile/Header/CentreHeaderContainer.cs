@@ -18,6 +18,7 @@ namespace osu.Game.Overlays.Profile.Header
     {
         public readonly BindableBool DetailsVisible = new BindableBool(true);
         public readonly Bindable<User> User = new Bindable<User>();
+        public readonly Bindable<UserStatistics> Statistics = new Bindable<UserStatistics>();
 
         private OverlinedInfoContainer hiddenDetailGlobal;
         private OverlinedInfoContainer hiddenDetailCountry;
@@ -91,7 +92,6 @@ namespace osu.Game.Overlays.Profile.Header
                             Anchor = Anchor.CentreRight,
                             Origin = Anchor.CentreRight,
                             Size = new Vector2(40),
-                            User = { BindTarget = User }
                         },
                         expandedDetailContainer = new Container
                         {
@@ -103,7 +103,6 @@ namespace osu.Game.Overlays.Profile.Header
                             Child = progressBar = new LevelProgressBar
                             {
                                 RelativeSizeAxes = Axes.Both,
-                                User = { BindTarget = User }
                             }
                         },
                         hiddenDetailContainer = new FillFlowContainer
@@ -140,10 +139,11 @@ namespace osu.Game.Overlays.Profile.Header
                 expandedDetailContainer.FadeTo(visible.NewValue ? 1 : 0, 200, Easing.OutQuint);
             });
 
-            User.BindValueChanged(user => UpdateStatistics(user.NewValue?.Statistics));
+            User.BindValueChanged(user => updateStatistics(user.NewValue?.Statistics));
+            Statistics.BindValueChanged(statistics => updateStatistics(statistics.NewValue));
         }
 
-        public void UpdateStatistics(UserStatistics statistics)
+        private void updateStatistics(UserStatistics statistics)
         {
             hiddenDetailGlobal.Content = statistics?.Ranks.Global?.ToString("\\##,##0") ?? "-";
             hiddenDetailCountry.Content = statistics?.Ranks.Country?.ToString("\\##,##0") ?? "-";
