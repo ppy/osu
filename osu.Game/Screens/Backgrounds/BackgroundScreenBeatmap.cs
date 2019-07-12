@@ -18,6 +18,11 @@ namespace osu.Game.Screens.Backgrounds
 {
     public class BackgroundScreenBeatmap : BackgroundScreen
     {
+        /// <summary>
+        /// The amount of blur to apply when full user blur is requested.
+        /// </summary>
+        public const float USER_BLUR_FACTOR = 25;
+
         protected Background Background;
 
         private WorkingBeatmap beatmap;
@@ -154,7 +159,7 @@ namespace osu.Game.Screens.Backgrounds
             /// As an optimisation, we add the two blur portions to be applied rather than actually applying two separate blurs.
             /// </summary>
             private Vector2 blurTarget => EnableUserDim.Value
-                ? new Vector2(BlurAmount.Value + (float)userBlurLevel.Value * 25)
+                ? new Vector2(BlurAmount.Value + (float)userBlurLevel.Value * USER_BLUR_FACTOR)
                 : new Vector2(BlurAmount.Value);
 
             [BackgroundDependencyLoader]
