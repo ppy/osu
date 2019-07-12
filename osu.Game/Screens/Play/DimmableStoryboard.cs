@@ -2,20 +2,21 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
+using osu.Game.Graphics.Containers;
 using osu.Game.Storyboards;
 using osu.Game.Storyboards.Drawables;
 
-namespace osu.Game.Graphics.Containers
+namespace osu.Game.Screens.Play
 {
     /// <summary>
     /// A container that handles <see cref="Storyboard"/> loading, as well as applies user-specified visual settings to it.
     /// </summary>
-    public class DimmableStoryboardContainer : UserDimContainer
+    public class DimmableStoryboard : UserDimContainer
     {
         private readonly Storyboard storyboard;
         private DrawableStoryboard drawableStoryboard;
 
-        public DimmableStoryboardContainer(Storyboard storyboard)
+        public DimmableStoryboard(Storyboard storyboard)
         {
             this.storyboard = storyboard;
         }

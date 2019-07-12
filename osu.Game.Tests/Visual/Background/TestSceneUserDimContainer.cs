@@ -38,7 +38,7 @@ using osuTK.Graphics;
 namespace osu.Game.Tests.Visual.Background
 {
     [TestFixture]
-    public class TestSceneBackgroundScreenBeatmap : ManualInputManagerTestScene
+    public class TestSceneUserDimContainer : ManualInputManagerTestScene
     {
         public override IReadOnlyList<Type> RequiredTypes => new[]
         {
@@ -243,7 +243,7 @@ namespace osu.Game.Tests.Visual.Background
         {
             player.StoryboardEnabled.Value = false;
             player.ReplacesBackground.Value = false;
-            player.CurrentDimmableStoryboardContainer.Add(new OsuSpriteText
+            player.DimmableStoryboard.Add(new OsuSpriteText
             {
                 Size = new Vector2(500, 50),
                 Alpha = 1,
@@ -336,9 +336,9 @@ namespace osu.Game.Tests.Visual.Background
         {
             protected override BackgroundScreen CreateBackground() => new FadeAccessibleBackground(Beatmap.Value);
 
-            protected override DimmableStoryboardContainer CreateStoryboardContainer(Storyboard storyboard) => new TestDimmableStoryboardContainer { RelativeSizeAxes = Axes.Both };
+            protected override DimmableStoryboard CreateStoryboardContainer(Storyboard storyboard) => new TestDimmableStoryboard { RelativeSizeAxes = Axes.Both };
 
-            public TestDimmableStoryboardContainer CurrentDimmableStoryboardContainer => (TestDimmableStoryboardContainer)DimmableStoryboardContainer;
+            public new TestDimmableStoryboard DimmableStoryboard => (TestDimmableStoryboard)base.DimmableStoryboard;
 
             // Whether or not the player should be allowed to load.
             public bool BlockLoad;
@@ -352,9 +352,9 @@ namespace osu.Game.Tests.Visual.Background
             {
             }
 
-            public bool IsStoryboardVisible() => CurrentDimmableStoryboardContainer.CurrentAlpha == 1;
+            public bool IsStoryboardVisible() => DimmableStoryboard.CurrentAlpha == 1;
 
-            public bool IsStoryboardInvisible() => CurrentDimmableStoryboardContainer.CurrentAlpha <= 1;
+            public bool IsStoryboardInvisible() => DimmableStoryboard.CurrentAlpha <= 1;
 
             [BackgroundDependencyLoader]
             private void load(OsuConfigManager config, CancellationToken token)
@@ -387,15 +387,15 @@ namespace osu.Game.Tests.Visual.Background
 
         private class FadeAccessibleBackground : BackgroundScreenBeatmap
         {
-            protected override DimmableBackgroundContainer CreateFadeContainer() => fadeContainer = new TestDimmableBackgroundContainer { RelativeSizeAxes = Axes.Both };
+            protected override DimmableBackground CreateFadeContainer() => dimmable = new TestDimmableBackground { RelativeSizeAxes = Axes.Both };
 
-            public Color4 CurrentColour => fadeContainer.CurrentColour;
+            public Color4 CurrentColour => dimmable.CurrentColour;
 
-            public float CurrentAlpha => fadeContainer.CurrentAlpha;
+            public float CurrentAlpha => dimmable.CurrentAlpha;
 
             public Vector2 CurrentBlur => Background.BlurSigma;
 
-            private TestDimmableBackgroundContainer fadeContainer;
+            private TestDimmableBackground dimmable;
 
             public FadeAccessibleBackground(WorkingBeatmap beatmap)
                 : base(beatmap)
@@ -403,17 +403,17 @@ namespace osu.Game.Tests.Visual.Background
             }
         }
 
-        private class TestDimmableStoryboardContainer : DimmableStoryboardContainer
+        private class TestDimmableStoryboard : DimmableStoryboard
         {
             public float CurrentAlpha => Content.Alpha;
 
-            public TestDimmableStoryboardContainer()
+            public TestDimmableStoryboard()
                 : base(new Storyboard())
             {
             }
         }
 
-        private class TestDimmableBackgroundContainer : DimmableBackgroundContainer
+        private class TestDimmableBackground : BackgroundScreenBeatmap.DimmableBackground
         {
             public Color4 CurrentColour => Content.Colour;
             public float CurrentAlpha => Content.Alpha;
