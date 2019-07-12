@@ -10,6 +10,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Events;
 using osu.Framework.Input.States;
 using osu.Framework.Platform;
@@ -36,7 +37,7 @@ using osuTK.Graphics;
 namespace osu.Game.Tests.Visual.Background
 {
     [TestFixture]
-    public class TestSceneBackgroundScreenBeatmap : ManualInputManagerTestScene
+    public class TestSceneUserDimContainer : ManualInputManagerTestScene
     {
         public override IReadOnlyList<Type> RequiredTypes => new[]
         {
@@ -137,14 +138,14 @@ namespace osu.Game.Tests.Visual.Background
                 player.StoryboardEnabled.Value = true;
             });
             waitForDim();
-            AddAssert("Background is invisible, storyboard is visible", () => songSelect.IsBackgroundInvisible() && player.IsStoryboardVisible());
+            AddAssert("Background is invisible, storyboard is visible", () => songSelect.IsBackgroundInvisible() && player.IsStoryboardVisible);
             AddStep("Storyboard Disabled", () =>
             {
                 player.ReplacesBackground.Value = false;
                 player.StoryboardEnabled.Value = false;
             });
             waitForDim();
-            AddAssert("Background is visible, storyboard is invisible", () => songSelect.IsBackgroundVisible() && player.IsStoryboardInvisible());
+            AddAssert("Background is visible, storyboard is invisible", () => songSelect.IsBackgroundVisible() && !player.IsStoryboardVisible);
         }
 
         /// <summary>
@@ -241,14 +242,15 @@ namespace osu.Game.Tests.Visual.Background
         {
             player.StoryboardEnabled.Value = false;
             player.ReplacesBackground.Value = false;
-            player.CurrentStoryboardContainer.Add(new OsuSpriteText
+            player.DimmableStoryboard.Add(new OsuSpriteText
             {
-                Size = new Vector2(250, 50),
+                Size = new Vector2(500, 50),
                 Alpha = 1,
-                Colour = Color4.Tomato,
+                Colour = Color4.White,
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
                 Text = "THIS IS A STORYBOARD",
+                Font = new FontUsage(size: 50)
             });
         });
 
@@ -300,7 +302,7 @@ namespace osu.Game.Tests.Visual.Background
 
             public bool IsBackgroundUndimmed() => ((FadeAccessibleBackground)Background).CurrentColour == Color4.White;
 
-            public bool IsUserBlurApplied() => ((FadeAccessibleBackground)Background).CurrentBlur == new Vector2((float)BlurLevel.Value * 25);
+            public bool IsUserBlurApplied() => ((FadeAccessibleBackground)Background).CurrentBlur == new Vector2((float)BlurLevel.Value * BackgroundScreenBeatmap.USER_BLUR_FACTOR);
 
             public bool IsUserBlurDisabled() => ((FadeAccessibleBackground)Background).CurrentBlur == new Vector2(0);
 
@@ -333,17 +335,7 @@ namespace osu.Game.Tests.Visual.Background
         {
             protected override BackgroundScreen CreateBackground() => new FadeAccessibleBackground(Beatmap.Value);
 
-            protected override UserDimContainer CreateStoryboardContainer()
-            {
-                return new TestUserDimContainer(true)
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    Alpha = 1,
-                    EnableUserDim = { Value = true }
-                };
-            }
-
-            public UserDimContainer CurrentStoryboardContainer => StoryboardContainer;
+            public new DimmableStoryboard DimmableStoryboard => base.DimmableStoryboard;
 
             // Whether or not the player should be allowed to load.
             public bool BlockLoad;
@@ -357,9 +349,7 @@ namespace osu.Game.Tests.Visual.Background
             {
             }
 
-            public bool IsStoryboardVisible() => ((TestUserDimContainer)CurrentStoryboardContainer).CurrentAlpha == 1;
-
-            public bool IsStoryboardInvisible() => ((TestUserDimContainer)CurrentStoryboardContainer).CurrentAlpha <= 1;
+            public bool IsStoryboardVisible => DimmableStoryboard.ContentDisplayed;
 
             [BackgroundDependencyLoader]
             private void load(OsuConfigManager config, CancellationToken token)
@@ -392,15 +382,15 @@ namespace osu.Game.Tests.Visual.Background
 
         private class FadeAccessibleBackground : BackgroundScreenBeatmap
         {
-            protected override UserDimContainer CreateFadeContainer() => fadeContainer = new TestUserDimContainer { RelativeSizeAxes = Axes.Both };
+            protected override DimmableBackground CreateFadeContainer() => dimmable = new TestDimmableBackground { RelativeSizeAxes = Axes.Both };
 
-            public Color4 CurrentColour => fadeContainer.CurrentColour;
+            public Color4 CurrentColour => dimmable.CurrentColour;
 
-            public float CurrentAlpha => fadeContainer.CurrentAlpha;
+            public float CurrentAlpha => dimmable.CurrentAlpha;
 
             public Vector2 CurrentBlur => Background.BlurSigma;
 
-            private TestUserDimContainer fadeContainer;
+            private TestDimmableBackground dimmable;
 
             public FadeAccessibleBackground(WorkingBeatmap beatmap)
                 : base(beatmap)
@@ -408,15 +398,10 @@ namespace osu.Game.Tests.Visual.Background
             }
         }
 
-        private class TestUserDimContainer : UserDimContainer
+        private class TestDimmableBackground : BackgroundScreenBeatmap.DimmableBackground
         {
-            public Color4 CurrentColour => DimContainer.Colour;
-            public float CurrentAlpha => DimContainer.Alpha;
-
-            public TestUserDimContainer(bool isStoryboard = false)
-                : base(isStoryboard)
-            {
-            }
+            public Color4 CurrentColour => Content.Colour;
+            public float CurrentAlpha => Content.Alpha;
         }
     }
 }
