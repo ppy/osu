@@ -29,7 +29,6 @@ using osu.Game.Screens.Backgrounds;
 using osu.Game.Screens.Play;
 using osu.Game.Screens.Play.PlayerSettings;
 using osu.Game.Screens.Select;
-using osu.Game.Storyboards;
 using osu.Game.Tests.Resources;
 using osu.Game.Users;
 using osuTK;
@@ -139,14 +138,14 @@ namespace osu.Game.Tests.Visual.Background
                 player.StoryboardEnabled.Value = true;
             });
             waitForDim();
-            AddAssert("Background is invisible, storyboard is visible", () => songSelect.IsBackgroundInvisible() && player.IsStoryboardVisible());
+            AddAssert("Background is invisible, storyboard is visible", () => songSelect.IsBackgroundInvisible() && player.IsStoryboardVisible);
             AddStep("Storyboard Disabled", () =>
             {
                 player.ReplacesBackground.Value = false;
                 player.StoryboardEnabled.Value = false;
             });
             waitForDim();
-            AddAssert("Background is visible, storyboard is invisible", () => songSelect.IsBackgroundVisible() && player.IsStoryboardInvisible());
+            AddAssert("Background is visible, storyboard is invisible", () => songSelect.IsBackgroundVisible() && !player.IsStoryboardVisible);
         }
 
         /// <summary>
@@ -336,9 +335,7 @@ namespace osu.Game.Tests.Visual.Background
         {
             protected override BackgroundScreen CreateBackground() => new FadeAccessibleBackground(Beatmap.Value);
 
-            protected override DimmableStoryboard CreateStoryboardContainer(Storyboard storyboard) => new TestDimmableStoryboard { RelativeSizeAxes = Axes.Both };
-
-            public new TestDimmableStoryboard DimmableStoryboard => (TestDimmableStoryboard)base.DimmableStoryboard;
+            public new DimmableStoryboard DimmableStoryboard => base.DimmableStoryboard;
 
             // Whether or not the player should be allowed to load.
             public bool BlockLoad;
@@ -352,9 +349,7 @@ namespace osu.Game.Tests.Visual.Background
             {
             }
 
-            public bool IsStoryboardVisible() => DimmableStoryboard.CurrentAlpha == 1;
-
-            public bool IsStoryboardInvisible() => DimmableStoryboard.CurrentAlpha <= 1;
+            public bool IsStoryboardVisible => DimmableStoryboard.ContentDisplayed;
 
             [BackgroundDependencyLoader]
             private void load(OsuConfigManager config, CancellationToken token)
@@ -399,16 +394,6 @@ namespace osu.Game.Tests.Visual.Background
 
             public FadeAccessibleBackground(WorkingBeatmap beatmap)
                 : base(beatmap)
-            {
-            }
-        }
-
-        private class TestDimmableStoryboard : DimmableStoryboard
-        {
-            public float CurrentAlpha => Content.Alpha;
-
-            public TestDimmableStoryboard()
-                : base(new Storyboard())
             {
             }
         }
