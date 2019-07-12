@@ -35,18 +35,25 @@ namespace osu.Game.Overlays.Profile
         private CentreHeaderContainer centreHeaderContainer;
         private DetailHeaderContainer detailHeaderContainer;
         private DimmedLoadingAnimation loadingAnimation;
-        private ProfileRulesetSelector rulesetSelector;
+        private readonly ProfileRulesetSelector rulesetSelector;
 
         public Bindable<User> User = new Bindable<User>();
 
         public Bindable<RulesetInfo> Ruleset
         {
-            get => rulesetSelector?.Current ?? new Bindable<RulesetInfo>();
+            get => rulesetSelector.Current;
         }
 
         public ProfileHeader()
         {
-            User.ValueChanged += e => updateUser(e.NewValue);
+            Add(rulesetSelector = new ProfileRulesetSelector
+            {
+                Anchor = Anchor.TopRight,
+                Origin = Anchor.TopRight,
+                Margin = new MarginPadding { Top = 100, Right = 30 },
+            });
+
+            User.BindValueChanged(user => userChanged(user.NewValue));
 
             TabControl.AddItem("Info");
             TabControl.AddItem("Modding");
@@ -125,18 +132,15 @@ namespace osu.Game.Overlays.Profile
 
         protected override ScreenTitle CreateTitle() => new ProfileHeaderTitle();
 
-        private void updateUser(User user)
+        private void userChanged(User user)
         {
+            rulesetSelector.Current.UnbindAll();
+
+            loadingAnimation.Hide();
+
             coverContainer.User = user;
 
             detailHeaderContainer.User.Value = user;
-
-            Add(rulesetSelector = new ProfileRulesetSelector
-            {
-                Anchor = Anchor.TopRight,
-                Origin = Anchor.TopRight,
-                Margin = new MarginPadding { Top = 100, Right = 30 },
-            });
 
             rulesetSelector.SetDefaultRuleset(rulesets.GetRuleset(user.PlayMode ?? "osu"));
             rulesetSelector.SelectDefaultRuleset();
