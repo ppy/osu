@@ -12,7 +12,6 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays.Profile.Header;
 using osu.Game.Users;
-using osuTK.Graphics;
 
 namespace osu.Game.Overlays.Profile
 {
@@ -25,8 +24,7 @@ namespace osu.Game.Overlays.Profile
         private TopHeaderContainer topHeaderContainer;
         private CentreHeaderContainer centreHeaderContainer;
         private DetailHeaderContainer detailHeaderContainer;
-        private LoadingAnimation loadingAnimation;
-        private Box fadeBox;
+        private DimmedLoadingAnimation loadingAnimation;
 
         private bool isLoading;
 
@@ -39,8 +37,6 @@ namespace osu.Game.Overlays.Profile
                     return;
 
                 isLoading = value;
-
-                fadeBox.FadeTo(value ? 1 : 0, 200, Easing.OutQuint);
 
                 if (value)
                     loadingAnimation.Show();
@@ -123,13 +119,7 @@ namespace osu.Game.Overlays.Profile
                         },
                     }
                 },
-                fadeBox = new Box
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    Colour = Color4.Black.Opacity(0.5f),
-                    Alpha = 0,
-                },
-                loadingAnimation = new LoadingAnimation()
+                loadingAnimation = new DimmedLoadingAnimation()
             }
         };
 
