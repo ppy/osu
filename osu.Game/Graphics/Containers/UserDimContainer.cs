@@ -31,16 +31,16 @@ namespace osu.Game.Graphics.Containers
 
         protected Bindable<bool> ShowStoryboard { get; private set; }
 
-        protected Container DimContainer { get; }
+        protected override Container<Drawable> Content => dimContent;
 
-        protected override Container<Drawable> Content => DimContainer;
+        private Container dimContent { get; }
 
         /// <summary>
         /// Creates a new <see cref="UserDimContainer"/>.
         /// </summary>
         protected UserDimContainer()
         {
-            AddInternal(DimContainer = new Container { RelativeSizeAxes = Axes.Both });
+            AddInternal(dimContent = new Container { RelativeSizeAxes = Axes.Both });
         }
 
         [BackgroundDependencyLoader]
@@ -62,19 +62,17 @@ namespace osu.Game.Graphics.Containers
         }
 
         /// <summary>
-        /// Apply non-dim related settings to the content, such as hiding and blurring.
+        /// Whether the content of this container should currently be visible.
         /// </summary>
-        /// <remarks>
-        /// While both backgrounds and storyboards allow user dim levels to be applied, storyboards can be toggled via <see cref="ShowStoryboard"/>
-        /// and can cause backgrounds to become hidden via <see cref="StoryboardReplacesBackground"/>. Storyboards are also currently unable to be blurred.
-        /// </remarks>
-        protected abstract void ApplyFade();
+        protected virtual bool ShowDimContent => true;
 
-        protected void UpdateVisuals()
+        /// <summary>
+        /// Should be invoked when any dependent dim level or user setting is changed and bring the visual state up-to-date.
+        /// </summary>
+        protected virtual void UpdateVisuals()
         {
-            ApplyFade();
-
-            DimContainer.FadeColour(EnableUserDim.Value ? OsuColour.Gray(1 - (float)UserDimLevel.Value) : Color4.White, BACKGROUND_FADE_DURATION, Easing.OutQuint);
+            dimContent.FadeTo(ShowDimContent ? 1 : 0, BACKGROUND_FADE_DURATION, Easing.OutQuint);
+            dimContent.FadeColour(EnableUserDim.Value ? OsuColour.Gray(1 - (float)UserDimLevel.Value) : Color4.White, BACKGROUND_FADE_DURATION, Easing.OutQuint);
         }
     }
 }

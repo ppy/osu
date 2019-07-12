@@ -55,14 +55,16 @@ namespace osu.Game.Graphics.Containers
         private void load(OsuConfigManager config)
         {
             userBlurLevel = config.GetBindable<double>(OsuSetting.BlurLevel);
-            BlurAmount.ValueChanged += _ => UpdateVisuals();
             userBlurLevel.ValueChanged += _ => UpdateVisuals();
+            BlurAmount.ValueChanged += _ => UpdateVisuals();
         }
 
-        protected override void ApplyFade()
+        protected override bool ShowDimContent => !ShowStoryboard.Value || !StoryboardReplacesBackground.Value; // The background needs to be hidden in the case of it being replaced by the storyboard
+
+        protected override void UpdateVisuals()
         {
-            // The background needs to be hidden in the case of it being replaced by the storyboard
-            DimContainer.FadeTo(ShowStoryboard.Value && StoryboardReplacesBackground.Value ? 0 : 1, BACKGROUND_FADE_DURATION, Easing.OutQuint);
+            base.UpdateVisuals();
+
             Background?.BlurTo(blurTarget, BACKGROUND_FADE_DURATION, Easing.OutQuint);
         }
     }

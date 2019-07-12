@@ -405,7 +405,7 @@ namespace osu.Game.Tests.Visual.Background
 
         private class TestDimmableStoryboardContainer : DimmableStoryboardContainer
         {
-            public float CurrentAlpha => DimContainer.Alpha;
+            public float CurrentAlpha => Content.Alpha;
 
             public TestDimmableStoryboardContainer()
                 : base(new Storyboard())
@@ -415,8 +415,8 @@ namespace osu.Game.Tests.Visual.Background
 
         private class TestDimmableBackgroundContainer : DimmableBackgroundContainer
         {
-            public Color4 CurrentColour => DimContainer.Colour;
-            public float CurrentAlpha => DimContainer.Alpha;
+            public Color4 CurrentColour => Content.Colour;
+            public float CurrentAlpha => Content.Alpha;
         }
     }
 }
