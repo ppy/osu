@@ -3,7 +3,6 @@
 
 using System.Linq;
 using osu.Framework.Allocation;
-using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -12,9 +11,7 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Online.API.Requests;
 using osu.Game.Overlays.Profile;
-using osu.Game.Overlays.Profile.Header.Components;
 using osu.Game.Overlays.Profile.Sections;
-using osu.Game.Rulesets;
 using osu.Game.Users;
 using osuTK;
 
@@ -28,20 +25,13 @@ namespace osu.Game.Overlays
         protected ProfileHeader Header;
         private ProfileSectionsContainer sectionsContainer;
         private ProfileTabControl tabs;
-        private ProfileRulesetSelector rulesetSelector;
-        private User currentUser;
 
         public const float CONTENT_X_MARGIN = 70;
-
-        [Resolved]
-        private RulesetStore rulesets { get; set; }
 
         public void ShowUser(long userId) => ShowUser(new User { Id = userId });
 
         public void ShowUser(User user, bool fetchOnline = true)
         {
-            currentUser = user;
-
             if (user == User.SYSTEM_USER)
                 return;
 
@@ -150,32 +140,8 @@ namespace osu.Game.Overlays
                 }
             }
 
-            Header.Add(rulesetSelector = new ProfileRulesetSelector
-            {
-                Anchor = Anchor.TopRight,
-                Origin = Anchor.TopRight,
-                Margin = new MarginPadding { Top = 100, Right = 30 }
-            });
-
-            rulesetSelector.SetDefaultRuleset(rulesets.GetRuleset(user.PlayMode ?? "osu"));
-            rulesetSelector.SelectDefaultRuleset();
-            rulesetSelector.Current.BindValueChanged(rulesetChanged);
-
-            foreach (var s in sections)
-                s.Ruleset.BindTo(rulesetSelector.Current);
-        }
-
-        private void rulesetChanged(ValueChangedEvent<RulesetInfo> r)
-        {
-            Header.IsLoading = true;
-
-            var statsReq = new GetUserRequest(currentUser.Id, r.NewValue);
-            statsReq.Success += user =>
-            {
-                Header.UpdateStatistics(user);
-                Header.IsLoading = false;
-            };
-            API.Queue(statsReq);
+            foreach (var section in sections)
+                section.Ruleset.BindTo(Header.Ruleset);
         }
 
         private class ProfileTabControl : OverlayTabControl<ProfileSection>

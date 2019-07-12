@@ -10,39 +10,37 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Online.API;
+using osu.Game.Online.API.Requests;
 using osu.Game.Overlays.Profile.Header;
+using osu.Game.Overlays.Profile.Header.Components;
+using osu.Game.Rulesets;
 using osu.Game.Users;
 
 namespace osu.Game.Overlays.Profile
 {
     public class ProfileHeader : OverlayHeader
     {
-        private UserCoverBackground coverContainer;
-
         public Bindable<User> User = new Bindable<User>();
 
+        [Resolved]
+        private RulesetStore rulesets { get; set; }
+
+        [Resolved]
+        private IAPIProvider api { get; set; }
+
+        private GetUserRequest userRequest;
+
+        private UserCoverBackground coverContainer;
         private TopHeaderContainer topHeaderContainer;
         private CentreHeaderContainer centreHeaderContainer;
         private DetailHeaderContainer detailHeaderContainer;
         private DimmedLoadingAnimation loadingAnimation;
+        private ProfileRulesetSelector rulesetSelector;
 
-        private bool isLoading;
-
-        public bool IsLoading
+        public Bindable<RulesetInfo> Ruleset
         {
-            get => isLoading;
-            set
-            {
-                if (isLoading == value)
-                    return;
-
-                isLoading = value;
-
-                if (value)
-                    loadingAnimation.Show();
-                else
-                    loadingAnimation.Hide();
-            }
+            get => rulesetSelector.Current;
         }
 
         public ProfileHeader()
@@ -132,7 +130,34 @@ namespace osu.Game.Overlays.Profile
 
         protected override ScreenTitle CreateTitle() => new ProfileHeaderTitle();
 
-        private void updateDisplay(User user) => coverContainer.User = user;
+        private void updateDisplay(User user)
+        {
+            coverContainer.User = user;
+
+            Add(rulesetSelector = new ProfileRulesetSelector
+            {
+                Anchor = Anchor.TopRight,
+                Origin = Anchor.TopRight,
+                Margin = new MarginPadding { Top = 100, Right = 30 }
+            });
+
+            rulesetSelector.SetDefaultRuleset(rulesets.GetRuleset(user.PlayMode ?? "osu"));
+            rulesetSelector.SelectDefaultRuleset();
+            rulesetSelector.Current.BindValueChanged(rulesetChanged);
+        }
+
+        private void rulesetChanged(ValueChangedEvent<RulesetInfo> r)
+        {
+            loadingAnimation.Show();
+
+            userRequest = new GetUserRequest(User.Value.Id, r.NewValue);
+            userRequest.Success += user =>
+            {
+                UpdateStatistics(user);
+                loadingAnimation.Hide();
+            };
+            api.Queue(userRequest);
+        }
 
         private class ProfileHeaderTitle : ScreenTitle
         {
