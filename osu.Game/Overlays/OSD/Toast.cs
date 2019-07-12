@@ -16,6 +16,8 @@ namespace osu.Game.Overlays.OSD
         private readonly Container content;
         protected override Container<Drawable> Content => content;
 
+        protected readonly OsuSpriteText ValueText;
+
         protected Toast(string description, string value, string keybinding)
         {
             Anchor = Anchor.Centre;
@@ -49,13 +51,13 @@ namespace osu.Game.Overlays.OSD
                     Origin = Anchor.TopCentre,
                     Text = description.ToUpperInvariant()
                 },
-                new OsuSpriteText
+                ValueText = new OsuSpriteText
                 {
                     Font = OsuFont.GetFont(size: 24, weight: FontWeight.Light),
                     Padding = new MarginPadding { Left = 10, Right = 10 },
                     Name = "Value",
                     Anchor = Anchor.Centre,
-                    Origin = Anchor.BottomCentre,
+                    Origin = Anchor.Centre,
                     Text = value
                 },
                 new OsuSpriteText

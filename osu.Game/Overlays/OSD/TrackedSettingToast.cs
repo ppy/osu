@@ -62,6 +62,8 @@ namespace osu.Game.Overlays.OSD
                     break;
             }
 
+            ValueText.Origin = optionCount > 0 ? Anchor.BottomCentre : Anchor.Centre;
+
             for (int i = 0; i < optionCount; i++)
             {
                 optionLights.Add(new OptionLight
