@@ -138,6 +138,8 @@ namespace osu.Game.Screens.Backgrounds
                 get => background;
                 set
                 {
+                    background?.Expire();
+
                     base.Add(background = value);
                     background.BlurTo(blurTarget, 0, Easing.OutQuint);
                 }
