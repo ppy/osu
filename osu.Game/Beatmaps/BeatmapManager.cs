@@ -181,19 +181,18 @@ namespace osu.Game.Beatmaps
 
             lock (workingCache)
             {
-                var cached = workingCache.FirstOrDefault(w => w.BeatmapInfo?.ID == beatmapInfo.ID);
+                var working = workingCache.FirstOrDefault(w => w.BeatmapInfo?.ID == beatmapInfo.ID);
 
-                if (cached != null)
-                    return cached;
+                if (working == null)
+                {
+                    if (beatmapInfo.Metadata == null)
+                        beatmapInfo.Metadata = beatmapInfo.BeatmapSet.Metadata;
 
-                if (beatmapInfo.Metadata == null)
-                    beatmapInfo.Metadata = beatmapInfo.BeatmapSet.Metadata;
-
-                WorkingBeatmap working = new BeatmapManagerWorkingBeatmap(Files.Store, new LargeTextureStore(host?.CreateTextureLoaderStore(Files.Store)), beatmapInfo, audioManager);
+                    workingCache.Add(working = new BeatmapManagerWorkingBeatmap(Files.Store,
+                        new LargeTextureStore(host?.CreateTextureLoaderStore(Files.Store)), beatmapInfo, audioManager));
+                }
 
                 previous?.TransferTo(working);
-                workingCache.Add(working);
-
                 return working;
             }
         }
