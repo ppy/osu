@@ -34,6 +34,9 @@ namespace osu.Game.Overlays.Music
         private FilterControl filter;
         private PlaylistList list;
 
+        [Resolved(canBeNull: true)]
+        private MusicController music { get; set; }
+
         [BackgroundDependencyLoader]
         private void load(OsuColour colours, Bindable<WorkingBeatmap> beatmap, BeatmapManager beatmaps)
         {
@@ -115,6 +118,8 @@ namespace osu.Game.Overlays.Music
                 beatmap.Value?.Track?.Seek(0);
                 return;
             }
+
+            music.IsUserPaused = false;
 
             beatmap.Value = beatmaps.GetWorkingBeatmap(set.Beatmaps.First());
             beatmap.Value.Track.Restart();

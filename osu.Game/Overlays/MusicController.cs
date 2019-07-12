@@ -55,7 +55,7 @@ namespace osu.Game.Overlays
         private Container dragContainer;
         private Container playerContainer;
 
-        public bool IsUserPaused { get; private set; }
+        public bool IsUserPaused { get; set; }
 
         [Resolved]
         private Bindable<WorkingBeatmap> beatmap { get; set; }
@@ -309,6 +309,8 @@ namespace osu.Game.Overlays
 
             if (playable != null)
             {
+                IsUserPaused = false;
+
                 beatmap.Value = beatmaps.GetWorkingBeatmap(playable.Beatmaps.First(), beatmap.Value);
                 beatmap.Value.Track.Restart();
             }
@@ -323,6 +325,8 @@ namespace osu.Game.Overlays
 
             if (playable != null)
             {
+                IsUserPaused = false;
+
                 beatmap.Value = beatmaps.GetWorkingBeatmap(playable.Beatmaps.First(), beatmap.Value);
                 beatmap.Value.Track.Restart();
             }
