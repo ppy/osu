@@ -18,10 +18,6 @@ namespace osu.Game.Graphics.Containers
         public DimmableStoryboardContainer(Storyboard storyboard)
         {
             this.storyboard = storyboard;
-
-            // Storyboards current do not get used in scenarios without user dim, so default to enabled here.
-            EnableUserDim.Default = true;
-            EnableUserDim.Value = true;
         }
 
         [BackgroundDependencyLoader]
