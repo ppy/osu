@@ -1,5 +1,5 @@
 <p align="center">
-  <img width="256" height="256" src="assets/lazer.png">
+  <img width="500" height="500" src="assets/lazer.png">
 </p>
 
 # osu!
