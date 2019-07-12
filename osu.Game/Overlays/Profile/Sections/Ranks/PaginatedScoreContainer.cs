@@ -41,6 +41,8 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
 
         private void rulesetChanged(ValueChangedEvent<RulesetInfo> r)
         {
+            request?.Cancel();
+
             VisiblePages = 0;
             ItemsContainer.Clear();
 
