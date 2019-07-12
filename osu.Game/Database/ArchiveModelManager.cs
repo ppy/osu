@@ -1,4 +1,4 @@
-﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
@@ -114,7 +114,8 @@ namespace osu.Game.Database
 
                     lock (imported)
                     {
-                        imported.Add(model);
+                        if (model != null)
+                            imported.Add(model);
                         current++;
 
                         notification.Text = $"Imported {current} of {paths.Length} {HumanisedModelName}s";
@@ -140,7 +141,7 @@ namespace osu.Game.Database
             {
                 notification.CompletionText = imported.Count == 1
                     ? $"Imported {imported.First()}!"
-                    : $"Imported {current} {HumanisedModelName}s!";
+                    : $"Imported {imported.Count} {HumanisedModelName}s!";
 
                 if (imported.Count > 0 && PresentImport != null)
                 {
@@ -176,7 +177,7 @@ namespace osu.Game.Database
             // TODO: Add a check to prevent files from storage to be deleted.
             try
             {
-                if (import != null && File.Exists(path))
+                if (import != null && File.Exists(path) && ShouldDeleteArchive(path))
                     File.Delete(path);
             }
             catch (Exception e)
@@ -207,7 +208,7 @@ namespace osu.Game.Database
             {
                 model = CreateModel(archive);
 
-                if (model == null) return null;
+                if (model == null) return Task.FromResult<TModel>(null);
 
                 model.Hash = computeHash(archive);
             }
@@ -499,6 +500,18 @@ namespace osu.Game.Database
         protected virtual string ImportFromStablePath => null;
 
         /// <summary>
+        /// Select paths to import from stable. Default implementation iterates all directories in <see cref="ImportFromStablePath"/>.
+        /// </summary>
+        protected virtual IEnumerable<string> GetStableImportPaths(Storage stableStoage) => stableStoage.GetDirectories(ImportFromStablePath);
+
+        /// <summary>
+        /// Whether this specified path should be removed after successful import.
+        /// </summary>
+        /// <param name="path">The path for consideration. May be a file or a directory.</param>
+        /// <returns>Whether to perform deletion.</returns>
+        protected virtual bool ShouldDeleteArchive(string path) => false;
+
+        /// <summary>
         /// This is a temporary method and will likely be replaced by a full-fledged (and more correctly placed) migration process in the future.
         /// </summary>
         public Task ImportFromStableAsync()
@@ -518,7 +531,7 @@ namespace osu.Game.Database
                 return Task.CompletedTask;
             }
 
-            return Task.Run(async () => await Import(stable.GetDirectories(ImportFromStablePath).Select(f => stable.GetFullPath(f)).ToArray()));
+            return Task.Run(async () => await Import(GetStableImportPaths(GetStableStorage()).Select(f => stable.GetFullPath(f)).ToArray()));
         }
 
         #endregion
