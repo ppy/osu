@@ -90,6 +90,10 @@ namespace osu.Game.Tests.Visual.UserInterface
 
         private class EmptyToast : Toast
         {
+            public EmptyToast()
+                : base("", "", "")
+            {
+            }
         }
 
         private class TestOnScreenDisplay : OnScreenDisplay

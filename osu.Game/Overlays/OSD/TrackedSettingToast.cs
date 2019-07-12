@@ -9,9 +9,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
-using osu.Framework.Graphics.Sprites;
 using osu.Game.Graphics;
-using osu.Game.Graphics.Sprites;
 using osuTK;
 using osuTK.Graphics;
 
@@ -20,54 +18,28 @@ namespace osu.Game.Overlays.OSD
     public class TrackedSettingToast : Toast
     {
         public TrackedSettingToast(SettingDescription description)
+            : base(description.Name, description.Value, description.Shortcut)
         {
-            SpriteText textLine2;
             FillFlowContainer<OptionLight> optionLights;
 
             Children = new Drawable[]
             {
-                new OsuSpriteText
-                {
-                    Padding = new MarginPadding(10),
-                    Font = OsuFont.GetFont(size: 14, weight: FontWeight.Black),
-                    Spacing = new Vector2(1, 0),
-                    Anchor = Anchor.TopCentre,
-                    Origin = Anchor.TopCentre,
-                    Text = description.Name.ToUpperInvariant()
-                },
-                textLine2 = new OsuSpriteText
-                {
-                    Font = OsuFont.GetFont(size: 24, weight: FontWeight.Light),
-                    Padding = new MarginPadding { Left = 10, Right = 10 },
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.BottomCentre,
-                    Text = description.Value
-                },
                 new FillFlowContainer
                 {
-                    Anchor = Anchor.BottomCentre,
-                    Origin = Anchor.BottomCentre,
-                    AutoSizeAxes = Axes.Both,
+                    Anchor = Anchor.TopCentre,
+                    Origin = Anchor.TopCentre,
                     Direction = FillDirection.Vertical,
+                    Margin = new MarginPadding { Top = 70 },
                     Children = new Drawable[]
                     {
                         optionLights = new FillFlowContainer<OptionLight>
                         {
-                            Padding = new MarginPadding { Top = 20, Bottom = 5 },
+                            Padding = new MarginPadding { Bottom = 5 },
                             Spacing = new Vector2(5, 0),
                             Direction = FillDirection.Horizontal,
                             Anchor = Anchor.TopCentre,
                             Origin = Anchor.TopCentre,
                             AutoSizeAxes = Axes.Both
-                        },
-                        new OsuSpriteText
-                        {
-                            Anchor = Anchor.TopCentre,
-                            Origin = Anchor.TopCentre,
-                            Margin = new MarginPadding { Bottom = 15 },
-                            Font = OsuFont.GetFont(size: 12, weight: FontWeight.Bold),
-                            Alpha = 0.3f,
-                            Text = string.IsNullOrEmpty(description.Shortcut) ? "NO KEY BOUND" : description.Shortcut.ToUpperInvariant()
                         },
                     }
                 }
@@ -89,9 +61,6 @@ namespace osu.Game.Overlays.OSD
                     selectedOption = Convert.ToInt32(description.RawValue);
                     break;
             }
-
-            textLine2.Origin = optionCount > 0 ? Anchor.BottomCentre : Anchor.Centre;
-            textLine2.Y = optionCount > 0 ? 0 : 5;
 
             for (int i = 0; i < optionCount; i++)
             {
