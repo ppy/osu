@@ -39,10 +39,7 @@ namespace osu.Game.Overlays.Profile
 
         public Bindable<User> User = new Bindable<User>();
 
-        public Bindable<RulesetInfo> Ruleset
-        {
-            get => rulesetSelector.Current;
-        }
+        public Bindable<RulesetInfo> Ruleset => rulesetSelector.Current;
 
         public ProfileHeader()
         {
