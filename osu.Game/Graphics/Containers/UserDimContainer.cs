@@ -20,7 +20,7 @@ namespace osu.Game.Graphics.Containers
         /// <summary>
         /// Whether or not user-configured dim levels should be applied to the container.
         /// </summary>
-        public readonly Bindable<bool> EnableUserDim = new Bindable<bool>();
+        public readonly Bindable<bool> EnableUserDim = new Bindable<bool>(true);
 
         /// <summary>
         /// Whether or not the storyboard loaded should completely hide the background behind it.
