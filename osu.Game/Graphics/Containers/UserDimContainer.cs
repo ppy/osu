@@ -27,6 +27,11 @@ namespace osu.Game.Graphics.Containers
         /// </summary>
         public readonly Bindable<bool> StoryboardReplacesBackground = new Bindable<bool>();
 
+        /// <summary>
+        /// Whether the content of this container is currently being displayed.
+        /// </summary>
+        public bool ContentDisplayed { get; private set; }
+
         protected Bindable<double> UserDimLevel { get; private set; }
 
         protected Bindable<bool> ShowStoryboard { get; private set; }
@@ -71,7 +76,9 @@ namespace osu.Game.Graphics.Containers
         /// </summary>
         protected virtual void UpdateVisuals()
         {
-            dimContent.FadeTo(ShowDimContent ? 1 : 0, BACKGROUND_FADE_DURATION, Easing.OutQuint);
+            ContentDisplayed = ShowDimContent;
+
+            dimContent.FadeTo((ContentDisplayed) ? 1 : 0, BACKGROUND_FADE_DURATION, Easing.OutQuint);
             dimContent.FadeColour(EnableUserDim.Value ? OsuColour.Gray(1 - (float)UserDimLevel.Value) : Color4.White, BACKGROUND_FADE_DURATION, Easing.OutQuint);
         }
     }

@@ -26,7 +26,6 @@ using osu.Game.Rulesets.UI;
 using osu.Game.Scoring;
 using osu.Game.Screens.Ranking;
 using osu.Game.Skinning;
-using osu.Game.Storyboards;
 using osu.Game.Users;
 
 namespace osu.Game.Screens.Play
@@ -78,8 +77,6 @@ namespace osu.Game.Screens.Play
 
         protected DimmableStoryboard DimmableStoryboard { get; private set; }
 
-        protected virtual DimmableStoryboard CreateStoryboardContainer(Storyboard storyboard) => new DimmableStoryboard(storyboard) { RelativeSizeAxes = Axes.Both };
-
         [Cached]
         [Cached(Type = typeof(IBindable<IReadOnlyList<Mod>>))]
         protected new readonly Bindable<IReadOnlyList<Mod>> Mods = new Bindable<IReadOnlyList<Mod>>(Array.Empty<Mod>());
@@ -124,7 +121,7 @@ namespace osu.Game.Screens.Play
 
             GameplayClockContainer.Children = new[]
             {
-                DimmableStoryboard = CreateStoryboardContainer(Beatmap.Value.Storyboard),
+                DimmableStoryboard = new DimmableStoryboard(Beatmap.Value.Storyboard) { RelativeSizeAxes = Axes.Both },
                 new ScalingContainer(ScalingMode.Gameplay)
                 {
                     Child = new LocalSkinOverrideContainer(working.Skin)
