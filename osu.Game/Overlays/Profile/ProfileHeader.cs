@@ -41,7 +41,7 @@ namespace osu.Game.Overlays.Profile
 
         public Bindable<RulesetInfo> Ruleset
         {
-            get => rulesetSelector.Current;
+            get => rulesetSelector?.Current ?? new Bindable<RulesetInfo>();
         }
 
         public ProfileHeader()
