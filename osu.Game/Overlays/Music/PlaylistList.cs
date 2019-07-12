@@ -85,10 +85,7 @@ namespace osu.Game.Overlays.Music
 
             private void addBeatmapSet(BeatmapSetInfo obj) => Schedule(() =>
             {
-                var newItem = new PlaylistItem(obj) { OnSelect = set => Selected?.Invoke(set) };
-
-                items.Add(newItem);
-                items.SetLayoutPosition(newItem, items.Count - 1);
+                items.Insert(items.Count - 1, new PlaylistItem(obj) { OnSelect = set => Selected?.Invoke(set) });
             });
 
             private void removeBeatmapSet(BeatmapSetInfo obj) => Schedule(() =>
