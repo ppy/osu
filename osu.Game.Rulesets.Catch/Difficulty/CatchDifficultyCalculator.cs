@@ -46,6 +46,20 @@ namespace osu.Game.Rulesets.Catch.Difficulty
             };
         }
 
+        protected override List<double> CreateStrainsStarRatings(IBeatmap beatmap, Mod[] mods, Skill[] skills, double clockRate)
+        {
+            if (beatmap.HitObjects.Count == 0)
+                return new List<double>();
+
+            List<double> starRating = new List<double>();
+            foreach (double s in skills[0].StrainPeaks)
+            {
+                starRating.Add(Math.Sqrt(s) * star_scaling_factor);
+            }
+
+            return starRating;
+        }
+
         protected override IEnumerable<DifficultyHitObject> CreateDifficultyHitObjects(IBeatmap beatmap, double clockRate)
         {
             float halfCatchWidth;
