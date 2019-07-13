@@ -10,8 +10,6 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
-using osu.Game.Online.API;
-using osu.Game.Online.API.Requests;
 using osu.Game.Overlays.Profile.Header;
 using osu.Game.Overlays.Profile.Header.Components;
 using osu.Game.Rulesets;
@@ -26,20 +24,28 @@ namespace osu.Game.Overlays.Profile
         [Resolved]
         private RulesetStore rulesets { get; set; }
 
-        [Resolved]
-        private IAPIProvider api { get; set; }
-
-        private GetUserRequest userRequest;
-
         private UserCoverBackground coverContainer;
         private CentreHeaderContainer centreHeaderContainer;
         private DetailHeaderContainer detailHeaderContainer;
         private DimmedLoadingAnimation loadingAnimation;
+        private MedalHeaderContainer medalHeaderContainer;
+        private BottomHeaderContainer bottomHeaderContainer;
         private readonly ProfileRulesetSelector rulesetSelector;
 
         public Bindable<User> User = new Bindable<User>();
 
         public Bindable<RulesetInfo> Ruleset => rulesetSelector.Current;
+
+        public bool Loading
+        {
+            set
+            {
+                if (value)
+                    loadingAnimation.Show();
+                else
+                    loadingAnimation.Hide();
+            }
+        }
 
         public ProfileHeader()
         {
@@ -50,7 +56,7 @@ namespace osu.Game.Overlays.Profile
                 Margin = new MarginPadding { Top = 100, Right = 30 },
             });
 
-            User.BindValueChanged(user => userChanged(user.NewValue));
+            User.BindValueChanged(userChanged);
 
             TabControl.AddItem("Info");
             TabControl.AddItem("Modding");
@@ -111,15 +117,13 @@ namespace osu.Game.Overlays.Profile
                         {
                             RelativeSizeAxes = Axes.X,
                         },
-                        new MedalHeaderContainer
+                        medalHeaderContainer = new MedalHeaderContainer
                         {
                             RelativeSizeAxes = Axes.X,
-                            User = { BindTarget = User },
                         },
-                        new BottomHeaderContainer
+                        bottomHeaderContainer = new BottomHeaderContainer
                         {
                             RelativeSizeAxes = Axes.X,
-                            User = { BindTarget = User },
                         },
                     }
                 },
@@ -129,34 +133,22 @@ namespace osu.Game.Overlays.Profile
 
         protected override ScreenTitle CreateTitle() => new ProfileHeaderTitle();
 
-        private void userChanged(User user)
+        private void userChanged(ValueChangedEvent<User> user)
         {
-            rulesetSelector.Current.UnbindAll();
+            detailHeaderContainer.User.Value = user.NewValue;
 
-            loadingAnimation.Hide();
-
-            coverContainer.User = user;
-
-            detailHeaderContainer.User.Value = user;
-
-            rulesetSelector.SetDefaultRuleset(rulesets.GetRuleset(user.PlayMode ?? "osu"));
-            rulesetSelector.SelectDefaultRuleset();
-
-            rulesetSelector.Current.BindValueChanged(rulesetChanged);
-        }
-
-        private void rulesetChanged(ValueChangedEvent<RulesetInfo> ruleset)
-        {
-            loadingAnimation.Show();
-
-            userRequest = new GetUserRequest(User.Value.Id, ruleset.NewValue);
-            userRequest.Success += user =>
+            if (user.OldValue?.Id == user.NewValue.Id)
             {
-                statistics.Value = user.Statistics;
-                detailHeaderContainer.User.Value = user;
-                loadingAnimation.Hide();
-            };
-            api.Queue(userRequest);
+                statistics.Value = user.NewValue.Statistics;
+                return;
+            }
+
+            coverContainer.User = user.NewValue;
+            medalHeaderContainer.User.Value = user.NewValue;
+            bottomHeaderContainer.User.Value = user.NewValue;
+
+            rulesetSelector.SetDefaultRuleset(rulesets.GetRuleset(user.NewValue.PlayMode ?? "osu"));
+            rulesetSelector.SelectDefaultRuleset();
         }
 
         private class ProfileHeaderTitle : ScreenTitle

@@ -3,6 +3,7 @@
 
 using System.Linq;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -12,6 +13,7 @@ using osu.Game.Graphics.Containers;
 using osu.Game.Online.API.Requests;
 using osu.Game.Overlays.Profile;
 using osu.Game.Overlays.Profile.Sections;
+using osu.Game.Rulesets;
 using osu.Game.Users;
 using osuTK;
 
@@ -19,6 +21,8 @@ namespace osu.Game.Overlays
 {
     public class UserProfileOverlay : FullscreenOverlay
     {
+        public const float CONTENT_X_MARGIN = 70;
+
         private ProfileSection lastSection;
         private ProfileSection[] sections;
         private GetUserRequest userReq;
@@ -26,7 +30,8 @@ namespace osu.Game.Overlays
         private ProfileSectionsContainer sectionsContainer;
         private ProfileTabControl tabs;
 
-        public const float CONTENT_X_MARGIN = 70;
+        private Bindable<RulesetInfo> displayedRuleset;
+        private Bindable<User> displayedUser;
 
         public void ShowUser(long userId) => ShowUser(new User { Id = userId });
 
@@ -37,10 +42,12 @@ namespace osu.Game.Overlays
 
             Show();
 
-            if (user.Id == Header?.User.Value?.Id)
+            if (user.Id == displayedUser?.Value?.Id)
                 return;
 
             userReq?.Cancel();
+            displayedRuleset = new Bindable<RulesetInfo>();
+            displayedUser = new Bindable<User>();
             Clear();
             lastSection = null;
 
@@ -71,7 +78,10 @@ namespace osu.Game.Overlays
 
             Add(sectionsContainer = new ProfileSectionsContainer
             {
-                ExpandableHeader = Header = new ProfileHeader(),
+                ExpandableHeader = Header = new ProfileHeader
+                {
+                    User = { BindTarget = displayedUser },
+                },
                 FixedHeader = tabs,
                 HeaderBackground = new Box
                 {
@@ -107,38 +117,69 @@ namespace osu.Game.Overlays
 
             if (fetchOnline)
             {
-                userReq = new GetUserRequest(user.Id);
-                userReq.Success += userLoadComplete;
-                API.Queue(userReq);
+                fetchOnlineUser(user.Id);
             }
             else
             {
-                userReq = null;
                 userLoadComplete(user);
             }
 
             sectionsContainer.ScrollToTop();
         }
 
+        private void onRulesetChanged(RulesetInfo ruleset)
+        {
+            if (displayedUser.Value != null)
+            {
+                Header.Loading = true;
+                fetchOnlineUser(displayedUser.Value.Id, ruleset);
+            }
+        }
+
+        private void fetchOnlineUser(long userId, RulesetInfo ruleset = null)
+        {
+            userReq?.Cancel();
+
+            userReq = new GetUserRequest(userId, ruleset);
+            userReq.Success += userLoadComplete;
+            API.Queue(userReq);
+        }
+
         private void userLoadComplete(User user)
         {
-            Header.User.Value = user;
-
-            if (user.ProfileOrder != null)
+            // If new user has been loaded
+            if (displayedUser.Value?.Id != user.Id)
             {
-                foreach (string id in user.ProfileOrder)
+                if (user.ProfileOrder != null)
                 {
-                    var sec = sections.FirstOrDefault(s => s.Identifier == id);
-
-                    if (sec != null)
+                    foreach (string id in user.ProfileOrder)
                     {
-                        sec.User.Value = user;
-                        sec.Ruleset.BindTo(Header.Ruleset);
+                        var sec = sections.FirstOrDefault(s => s.Identifier == id);
 
-                        sectionsContainer.Add(sec);
-                        tabs.AddItem(sec);
+                        if (sec != null)
+                        {
+                            sec.User.Value = user;
+
+                            sectionsContainer.Add(sec);
+                            tabs.AddItem(sec);
+                        }
                     }
                 }
+
+                // Allows change without triggering
+                displayedRuleset.UnbindAll();
+
+                displayedUser.Value = user;
+                displayedRuleset.BindTo(Header.Ruleset);
+                displayedRuleset.BindValueChanged(ruleset => onRulesetChanged(ruleset.NewValue));
+
+                foreach (var sec in sections)
+                    sec.Ruleset.BindTo(displayedRuleset);
+            }
+            else
+            {
+                Header.Loading = false;
+                displayedUser.Value = user;
             }
         }
 
