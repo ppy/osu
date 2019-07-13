@@ -40,6 +40,20 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
             };
         }
 
+        protected override List<double> CreateStrainsStarRatings(IBeatmap beatmap, Mod[] mods, Skill[] skills, double clockRate)
+        {
+            if (beatmap.HitObjects.Count == 0)
+                return new List<double>();
+
+            List<double> starRating = new List<double>();
+            foreach (double s in skills.Single().StrainPeaks)
+            {
+                starRating.Add(s * star_scaling_factor);
+            }
+
+            return starRating;
+        }
+
         protected override IEnumerable<DifficultyHitObject> CreateDifficultyHitObjects(IBeatmap beatmap, double clockRate)
         {
             for (int i = 1; i < beatmap.HitObjects.Count; i++)
