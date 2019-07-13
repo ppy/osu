@@ -107,6 +107,7 @@ namespace osu.Game.Tests.Visual.Online
 
             AddStep("Hide", profile.Hide);
             AddStep("Show without reload", profile.Show);
+            AddStep("Trigger header loading", () => profile.Header.Loading = !profile.Header.Loading);
         }
 
         private class TestUserProfileOverlay : UserProfileOverlay

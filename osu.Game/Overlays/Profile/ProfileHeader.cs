@@ -36,11 +36,19 @@ namespace osu.Game.Overlays.Profile
 
         public Bindable<RulesetInfo> Ruleset => rulesetSelector.Current;
 
+        private bool loading;
+
         public bool Loading
         {
+            get => loading;
             set
             {
-                if (value)
+                if (loading == value)
+                    return;
+
+                loading = value;
+
+                if (loading)
                     loadingAnimation.Show();
                 else
                     loadingAnimation.Hide();
@@ -137,18 +145,18 @@ namespace osu.Game.Overlays.Profile
         {
             detailHeaderContainer.User.Value = user.NewValue;
 
-            if (user.OldValue?.Id == user.NewValue.Id)
+            // If new user has been loaded
+            if (user.OldValue?.Id != user.NewValue.Id)
             {
-                statistics.Value = user.NewValue.Statistics;
-                return;
+                coverContainer.User = user.NewValue;
+                medalHeaderContainer.User.Value = user.NewValue;
+                bottomHeaderContainer.User.Value = user.NewValue;
+
+                rulesetSelector.SetDefaultRuleset(rulesets.GetRuleset(user.NewValue.PlayMode ?? "osu"));
+                rulesetSelector.SelectDefaultRuleset();
             }
-
-            coverContainer.User = user.NewValue;
-            medalHeaderContainer.User.Value = user.NewValue;
-            bottomHeaderContainer.User.Value = user.NewValue;
-
-            rulesetSelector.SetDefaultRuleset(rulesets.GetRuleset(user.NewValue.PlayMode ?? "osu"));
-            rulesetSelector.SelectDefaultRuleset();
+            else
+                statistics.Value = user.NewValue.Statistics;
         }
 
         private class ProfileHeaderTitle : ScreenTitle

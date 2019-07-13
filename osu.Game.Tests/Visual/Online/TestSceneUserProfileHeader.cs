@@ -76,6 +76,8 @@ namespace osu.Game.Tests.Visual.Online
                 Country = new Country { FullName = @"Japan", FlagName = @"JP" },
                 CoverUrl = @"https://osu.ppy.sh/images/headers/profile-covers/c6.jpg"
             });
+
+            AddStep("Trigger loading", () => header.Loading = !header.Loading);
         }
 
         private void addOnlineStep(string name, User fallback)
