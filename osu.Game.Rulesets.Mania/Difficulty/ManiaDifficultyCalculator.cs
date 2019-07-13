@@ -42,7 +42,22 @@ namespace osu.Game.Rulesets.Mania.Difficulty
             };
         }
 
-        private double difficultyValue(Skill[] skills)
+        protected override List<double> CreateStrainsStarRatings(IBeatmap beatmap, Mod[] mods, Skill[] skills, double clockRate)
+        {
+            if (beatmap.HitObjects.Count == 0)
+                return new List<double>();
+
+            List<double> starRating = new List<double>();
+            List<double> aggregatePeaks = preprocess(skills);
+            foreach (double peak in aggregatePeaks)
+            {
+                starRating.Add(peak * star_scaling_factor);
+            }
+
+            return starRating;
+        }
+
+        private List<double> preprocess(Skill[] skills)
         {
             // Preprocess the strains to find the maximum overall + individual (aggregate) strain from each section
             var overall = skills.OfType<Overall>().Single();
@@ -58,6 +73,13 @@ namespace osu.Game.Rulesets.Mania.Difficulty
                         aggregatePeaks[i] = aggregate;
                 }
             }
+
+            return aggregatePeaks;
+        }
+
+        private double difficultyValue(Skill[] skills)
+        {
+            var aggregatePeaks = preprocess(skills);
 
             aggregatePeaks.Sort((a, b) => b.CompareTo(a)); // Sort from highest to lowest strain.
 
