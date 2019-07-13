@@ -154,6 +154,11 @@ namespace osu.Game.Tests.NonVisual
                 throw new NotImplementedException();
             }
 
+            protected override List<double> CreateStrainsStarRatings(IBeatmap beatmap, Mod[] mods, Skill[] skills, double clockRate)
+            {
+                throw new NotImplementedException();
+            }
+
             protected override IEnumerable<DifficultyHitObject> CreateDifficultyHitObjects(IBeatmap beatmap, double clockRate)
             {
                 throw new NotImplementedException();

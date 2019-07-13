@@ -52,6 +52,7 @@ namespace osu.Game.Rulesets.Catch.Difficulty
                 return new List<double>();
 
             List<double> starRating = new List<double>();
+
             foreach (double s in skills[0].StrainPeaks)
             {
                 starRating.Add(Math.Sqrt(s) * star_scaling_factor);

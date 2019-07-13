@@ -94,7 +94,7 @@ namespace osu.Game.Rulesets.Difficulty
             }
         }
 
-        private Skill[] calculate(IBeatmap beatmap, Mod[] mods, double clockRate)
+        private Skill[] calculate(IBeatmap beatmap, double clockRate)
         {
             var skills = CreateSkills(beatmap);
 
@@ -134,14 +134,14 @@ namespace osu.Game.Rulesets.Difficulty
 
         private DifficultyAttributes calculateDifficulty(IBeatmap beatmap, Mod[] mods, double clockRate)
         {
-            var skills = calculate(beatmap, mods, clockRate);
+            var skills = calculate(beatmap, clockRate);
 
             return CreateDifficultyAttributes(beatmap, mods, skills, clockRate);
         }
 
         private List<double> calculateStrains(IBeatmap beatmap, Mod[] mods, double clockRate)
         {
-            var skills = calculate(beatmap, mods, clockRate);
+            var skills = calculate(beatmap, clockRate);
 
             return CreateStrainsStarRatings(beatmap, mods, skills, clockRate);
         }
@@ -202,7 +202,8 @@ namespace osu.Game.Rulesets.Difficulty
         /// <param name="clockRate">The rate at which the gameplay clock is run at.</param>
         protected abstract DifficultyAttributes CreateDifficultyAttributes(IBeatmap beatmap, Mod[] mods, Skill[] skills, double clockRate);
 
-        /// Creates <see cref="DifficultyAttributes"/> to describe beatmap's calculated difficulty through the beatmap.
+        /// <summary>
+        /// Creates list of strains calculated to star ratings to describe beatmap's calculated difficulty through the beatmap.
         /// </summary>
         /// <param name="beatmap">The <see cref="IBeatmap"/> whose difficulty was calculated.</param>
         /// <param name="mods">The <see cref="Mod"/>s that difficulty was calculated with.</param>

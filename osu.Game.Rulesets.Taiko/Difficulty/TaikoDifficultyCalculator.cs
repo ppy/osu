@@ -46,6 +46,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
                 return new List<double>();
 
             List<double> starRating = new List<double>();
+
             foreach (double s in skills.Single().StrainPeaks)
             {
                 starRating.Add(s * star_scaling_factor);

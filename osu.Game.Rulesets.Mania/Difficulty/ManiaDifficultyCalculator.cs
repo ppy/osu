@@ -49,6 +49,7 @@ namespace osu.Game.Rulesets.Mania.Difficulty
 
             List<double> starRating = new List<double>();
             List<double> aggregatePeaks = preprocess(skills);
+
             foreach (double peak in aggregatePeaks)
             {
                 starRating.Add(peak * star_scaling_factor);

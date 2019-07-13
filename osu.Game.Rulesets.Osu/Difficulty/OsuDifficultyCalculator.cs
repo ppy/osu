@@ -61,19 +61,22 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 return new List<double>();
 
             List<double> aimRating = new List<double>();
+
             foreach (double aim in skills[0].StrainPeaks)
             {
                 aimRating.Add(Math.Sqrt(aim) * difficulty_multiplier);
             }
 
             List<double> speedRating = new List<double>();
+
             foreach (double speed in skills[1].StrainPeaks)
             {
                 speedRating.Add(Math.Sqrt(speed) * difficulty_multiplier);
             }
 
             List<double> starRating = new List<double>();
-            for (int i=0; i< skills[0].StrainPeaks.Count; i++)
+
+            for (int i = 0; i < skills[0].StrainPeaks.Count; i++)
             {
                 starRating.Add(aimRating[i] + speedRating[i] + Math.Abs(aimRating[i] - speedRating[i]) / 2);
             }
