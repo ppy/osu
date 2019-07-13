@@ -55,6 +55,32 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             };
         }
 
+        protected override List<double> CreateStrainsStarRatings(IBeatmap beatmap, Mod[] mods, Skill[] skills, double clockRate)
+        {
+            if (beatmap.HitObjects.Count == 0)
+                return new List<double>();
+
+            List<double> aimRating = new List<double>();
+            foreach (double aim in skills[0].StrainPeaks)
+            {
+                aimRating.Add(Math.Sqrt(aim) * difficulty_multiplier);
+            }
+
+            List<double> speedRating = new List<double>();
+            foreach (double speed in skills[1].StrainPeaks)
+            {
+                speedRating.Add(Math.Sqrt(speed) * difficulty_multiplier);
+            }
+
+            List<double> starRating = new List<double>();
+            for (int i=0; i< skills[0].StrainPeaks.Count; i++)
+            {
+                starRating.Add(aimRating[i] + speedRating[i] + Math.Abs(aimRating[i] - speedRating[i]) / 2);
+            }
+
+            return starRating;
+        }
+
         protected override IEnumerable<DifficultyHitObject> CreateDifficultyHitObjects(IBeatmap beatmap, double clockRate)
         {
             // The first jump is formed by the first two hitobjects of the map.

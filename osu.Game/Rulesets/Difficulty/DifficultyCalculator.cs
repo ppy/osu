@@ -52,7 +52,7 @@ namespace osu.Game.Rulesets.Difficulty
         /// </summary>
         /// <param name="mods">The mods that should be applied to the beatmap.</param>
         /// <returns>A structure describing the difficulty of the beatmap.</returns>
-        public IReadOnlyList<double> CalculateStrains(params Mod[] mods)
+        public List<double> CalculateStrains(params Mod[] mods)
         {
             mods = mods.Select(m => m.CreateCopy()).ToArray();
 
@@ -83,7 +83,7 @@ namespace osu.Game.Rulesets.Difficulty
         /// Calculates strains in the beatmap using all mod combinations applicable to the beatmap.
         /// </summary>
         /// <returns>A collection of structures describing the difficulty of the beatmap for each mod combination.</returns>
-        public IEnumerable<IReadOnlyList<double>> CalculateAllStrains()
+        public IEnumerable<List<double>> CalculateAllStrains()
         {
             foreach (var combination in CreateDifficultyAdjustmentModCombinations())
             {
@@ -139,7 +139,7 @@ namespace osu.Game.Rulesets.Difficulty
             return CreateDifficultyAttributes(beatmap, mods, skills, clockRate);
         }
 
-        private IReadOnlyList<double> calculateStrains(IBeatmap beatmap, Mod[] mods, double clockRate)
+        private List<double> calculateStrains(IBeatmap beatmap, Mod[] mods, double clockRate)
         {
             var skills = calculate(beatmap, mods, clockRate);
 
@@ -208,7 +208,7 @@ namespace osu.Game.Rulesets.Difficulty
         /// <param name="mods">The <see cref="Mod"/>s that difficulty was calculated with.</param>
         /// <param name="skills">The skills which processed the beatmap.</param>
         /// <param name="clockRate">The rate at which the gameplay clock is run at.</param>
-        protected abstract IReadOnlyList<double> CreateStrainsStarRatings(IBeatmap beatmap, Mod[] mods, Skill[] skills, double clockRate);
+        protected abstract List<double> CreateStrainsStarRatings(IBeatmap beatmap, Mod[] mods, Skill[] skills, double clockRate);
 
         /// <summary>
         /// Enumerates <see cref="DifficultyHitObject"/>s to be processed from <see cref="HitObject"/>s in the <see cref="IBeatmap"/>.
