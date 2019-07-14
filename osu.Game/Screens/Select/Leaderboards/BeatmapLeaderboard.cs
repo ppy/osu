@@ -9,6 +9,7 @@ using osu.Framework.Bindables;
 using osu.Game.Beatmaps;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Leaderboards;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
@@ -18,6 +19,8 @@ namespace osu.Game.Screens.Select.Leaderboards
 {
     public class BeatmapLeaderboard : Leaderboard<BeatmapLeaderboardScope, ScoreInfo>
     {
+        public Bindable<APILegacyUserTopScoreInfo> TopScore = new Bindable<APILegacyUserTopScoreInfo>();
+
         public Action<ScoreInfo> ScoreSelected;
 
         private BeatmapInfo beatmap;
@@ -133,7 +136,11 @@ namespace osu.Game.Screens.Select.Leaderboards
 
             var req = new GetScoresRequest(Beatmap, ruleset.Value ?? Beatmap.Ruleset, Scope, requestMods);
 
-            req.Success += r => scoresCallback?.Invoke(r.Scores);
+            req.Success += r =>
+            {
+                scoresCallback?.Invoke(r.Scores);
+                TopScore.Value = r.UserScore;
+            };
 
             return req;
         }

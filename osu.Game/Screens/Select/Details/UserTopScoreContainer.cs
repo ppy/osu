@@ -13,13 +13,13 @@ namespace osu.Game.Screens.Select.Details
 {
     public class UserTopScoreContainer : VisibilityContainer
     {
-        private const int height = 110;
+        private const int height = 90;
         private const int duration = 300;
 
         private readonly Container contentContainer;
         private readonly Container scoreContainer;
 
-        public Bindable<APILegacyUserTopScoreInfo> TopScore = new Bindable<APILegacyUserTopScoreInfo>();
+        public Bindable<APILegacyUserTopScoreInfo> Score = new Bindable<APILegacyUserTopScoreInfo>();
 
         protected override bool StartHidden => true;
 
@@ -37,13 +37,13 @@ namespace osu.Game.Screens.Select.Details
                     Origin = Anchor.BottomCentre,
                     Height = height,
                     RelativeSizeAxes = Axes.X,
-                    Padding = new MarginPadding { Vertical = 10 },
                     Children = new Drawable[]
                     {
                         new OsuSpriteText
                         {
                             Anchor = Anchor.TopCentre,
                             Origin = Anchor.TopCentre,
+                            Margin = new MarginPadding { Top = 5 },
                             Text = @"your personal best".ToUpper(),
                             Font = OsuFont.GetFont(size: 15, weight: FontWeight.Bold),
                         },
@@ -58,7 +58,7 @@ namespace osu.Game.Screens.Select.Details
                 }
             };
 
-            TopScore.BindValueChanged((score) => onScoreChanged(score.NewValue));
+            Score.BindValueChanged((score) => onScoreChanged(score.NewValue));
         }
 
         private void onScoreChanged(APILegacyUserTopScoreInfo score)
@@ -66,7 +66,10 @@ namespace osu.Game.Screens.Select.Details
             scoreContainer.Clear();
 
             if (score != null)
+            {
                 scoreContainer.Add(new LeaderboardScore(score.Score, score.Position));
+                Show();
+            }
         }
 
         protected override void PopIn()
