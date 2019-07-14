@@ -43,8 +43,9 @@ namespace osu.Game.Tests.Visual.SongSelect
             });
 
             AddStep(@"Trigger visibility", topScoreContainer.ToggleVisibility);
-            AddStep(@"Add score", () => topScoreContainer.TopScore.Value = scores[0]);
-            AddStep(@"Add another score", () => topScoreContainer.TopScore.Value = scores[1]);
+            AddStep(@"Add score(rank 999)", () => topScoreContainer.TopScore.Value = scores[0]);
+            AddStep(@"Add score(rank 110000)", () => topScoreContainer.TopScore.Value = scores[1]);
+            AddStep(@"Add score(rank 22333)", () => topScoreContainer.TopScore.Value = scores[2]);
             AddStep(@"Add null score", () => topScoreContainer.TopScore.Value = null);
 
             scores = new APILegacyUserTopScoreInfo[]
@@ -88,6 +89,27 @@ namespace osu.Game.Tests.Visual.SongSelect
                             {
                                 FullName = @"Brazil",
                                 FlagName = @"BR",
+                            },
+                        },
+                    }
+                },
+                new APILegacyUserTopScoreInfo
+                {
+                    Position = 22333,
+                    Score = new APILegacyScoreInfo
+                    {
+                        Rank = ScoreRank.S,
+                        Accuracy = 1,
+                        MaxCombo = 244,
+                        TotalScore = 1707827,
+                        User = new User
+                        {
+                            Id = 1541390,
+                            Username = @"Toukai",
+                            Country = new Country
+                            {
+                                FullName = @"Canada",
+                                FlagName = @"CA",
                             },
                         },
                     }
