@@ -5,19 +5,18 @@ using System;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Beatmaps;
+using osu.Game.Screens.Select.Details;
 using osu.Game.Screens.Select.Leaderboards;
 
 namespace osu.Game.Screens.Select
 {
     public class BeatmapDetailArea : Container
     {
-        private const float details_padding = 10;
-
-        private readonly Container content;
-        protected override Container<Drawable> Content => content;
+        private const float padding = 10;
 
         public readonly BeatmapDetails Details;
         public readonly BeatmapLeaderboard Leaderboard;
+        public readonly UserTopScoreContainer TopScore;
 
         private WorkingBeatmap beatmap;
 
@@ -34,7 +33,7 @@ namespace osu.Game.Screens.Select
 
         public BeatmapDetailArea()
         {
-            AddRangeInternal(new Drawable[]
+            Children = new Drawable[]
             {
                 new BeatmapDetailAreaTabControl
                 {
@@ -58,33 +57,44 @@ namespace osu.Game.Screens.Select
                         }
                     },
                 },
-                content = new Container
+                new GridContainer
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Padding = new MarginPadding { Top = BeatmapDetailAreaTabControl.HEIGHT },
+                    Margin = new MarginPadding { Top = BeatmapDetailAreaTabControl.HEIGHT },
+                    RowDimensions = new Dimension[]
+                    {
+                        new Dimension(GridSizeMode.Distributed),
+                        new Dimension(GridSizeMode.AutoSize),
+                    },
+                    Content = new[]
+                    {
+                        new Drawable[]
+                        {
+                            new Container
+                            {
+                                RelativeSizeAxes = Axes.Both,
+                                Children = new Drawable[]
+                                {
+                                    Details = new BeatmapDetails
+                                    {
+                                        RelativeSizeAxes = Axes.Both,
+                                        Alpha = 0,
+                                        Padding = new MarginPadding { Vertical = padding },
+                                    },
+                                    Leaderboard = new BeatmapLeaderboard
+                                    {
+                                        RelativeSizeAxes = Axes.Both,
+                                    }
+                                }
+                            }
+                        },
+                        new Drawable[]
+                        {
+                            TopScore = new UserTopScoreContainer(),
+                        }
+                    },
                 },
-            });
-
-            AddRange(new Drawable[]
-            {
-                Details = new BeatmapDetails
-                {
-                    RelativeSizeAxes = Axes.X,
-                    Alpha = 0,
-                    Margin = new MarginPadding { Top = details_padding },
-                },
-                Leaderboard = new BeatmapLeaderboard
-                {
-                    RelativeSizeAxes = Axes.Both,
-                }
-            });
-        }
-
-        protected override void UpdateAfterChildren()
-        {
-            base.UpdateAfterChildren();
-
-            Details.Height = Math.Min(DrawHeight - details_padding * 3 - BeatmapDetailAreaTabControl.HEIGHT, 450);
+            };
         }
     }
 }
