@@ -58,7 +58,7 @@ namespace osu.Game.Screens.Select.Details
                 }
             };
 
-            Score.BindValueChanged((score) => onScoreChanged(score.NewValue));
+            Score.BindValueChanged(score => onScoreChanged(score.NewValue));
         }
 
         private void onScoreChanged(APILegacyUserTopScoreInfo score)
