@@ -13,7 +13,7 @@ namespace osu.Game.Screens.Select.Details
 {
     public class UserTopScoreContainer : VisibilityContainer
     {
-        private const int height = 150;
+        private const int height = 110;
         private const int duration = 300;
 
         private readonly Container contentContainer;
@@ -37,6 +37,7 @@ namespace osu.Game.Screens.Select.Details
                     Origin = Anchor.BottomCentre,
                     Height = height,
                     RelativeSizeAxes = Axes.X,
+                    Padding = new MarginPadding { Vertical = 10 },
                     Children = new Drawable[]
                     {
                         new OsuSpriteText
