@@ -1,10 +1,10 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Beatmaps;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Screens.Select.Details;
 using osu.Game.Screens.Select.Leaderboards;
 
@@ -28,6 +28,7 @@ namespace osu.Game.Screens.Select
                 beatmap = value;
                 Leaderboard.Beatmap = beatmap?.BeatmapInfo;
                 Details.Beatmap = beatmap?.BeatmapInfo;
+                TopScore.Hide();
             }
         }
 
@@ -57,43 +58,50 @@ namespace osu.Game.Screens.Select
                         }
                     },
                 },
-                new GridContainer
+                new Container
                 {
+                    Padding = new MarginPadding { Top = BeatmapDetailAreaTabControl.HEIGHT, Bottom = padding },
                     RelativeSizeAxes = Axes.Both,
-                    Margin = new MarginPadding { Top = BeatmapDetailAreaTabControl.HEIGHT },
-                    RowDimensions = new Dimension[]
+                    Child = new GridContainer
                     {
-                        new Dimension(GridSizeMode.Distributed),
-                        new Dimension(GridSizeMode.AutoSize),
-                    },
-                    Content = new[]
-                    {
-                        new Drawable[]
+                        RelativeSizeAxes = Axes.Both,
+                        RowDimensions = new Dimension[]
                         {
-                            new Container
+                            new Dimension(GridSizeMode.Distributed),
+                            new Dimension(GridSizeMode.AutoSize),
+                        },
+                        Content = new[]
+                        {
+                            new Drawable[]
                             {
-                                RelativeSizeAxes = Axes.Both,
-                                Children = new Drawable[]
+                                new Container
                                 {
-                                    Details = new BeatmapDetails
+                                    RelativeSizeAxes = Axes.Both,
+                                    Children = new Drawable[]
                                     {
-                                        RelativeSizeAxes = Axes.Both,
-                                        Alpha = 0,
-                                        Padding = new MarginPadding { Vertical = padding },
-                                    },
-                                    Leaderboard = new BeatmapLeaderboard
-                                    {
-                                        RelativeSizeAxes = Axes.Both,
+                                        Details = new BeatmapDetails
+                                        {
+                                            RelativeSizeAxes = Axes.Both,
+                                            Alpha = 0,
+                                            Padding = new MarginPadding { Top = padding },
+                                        },
+                                        Leaderboard = new BeatmapLeaderboard
+                                        {
+                                            RelativeSizeAxes = Axes.Both,
+                                        }
                                     }
+                                }
+                            },
+                            new Drawable[]
+                            {
+                                TopScore = new UserTopScoreContainer
+                                {
+                                    Score = { BindTarget = Leaderboard.TopScore }
                                 }
                             }
                         },
-                        new Drawable[]
-                        {
-                            TopScore = new UserTopScoreContainer(),
-                        }
                     },
-                },
+                }
             };
         }
     }
