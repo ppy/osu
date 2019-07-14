@@ -42,7 +42,7 @@ namespace osu.Game.Tests.Visual.Online
         [Test]
         public void TestLoading()
         {
-            AddStep("loading", () => setCovers(null));
+            setCovers(null);
         }
 
         [Test]
