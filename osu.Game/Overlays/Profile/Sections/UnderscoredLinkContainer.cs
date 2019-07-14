@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -16,6 +17,8 @@ namespace osu.Game.Overlays.Profile.Sections
         private const int duration = 200;
         private readonly Container underscore;
         private readonly FillFlowContainer<OsuSpriteText> textContent;
+
+        protected OsuGame Game;
 
         protected Action ClickAction;
 
@@ -57,6 +60,12 @@ namespace osu.Game.Overlays.Profile.Sections
                     },
                 },
             };
+        }
+
+        [BackgroundDependencyLoader(true)]
+        private void load(OsuGame game)
+        {
+            Game = game;
         }
 
         protected override bool OnHover(HoverEvent e)
