@@ -75,7 +75,7 @@ namespace osu.Game.Overlays.Music
             [BackgroundDependencyLoader]
             private void load(BeatmapManager beatmaps, IBindable<WorkingBeatmap> beatmap)
             {
-                beatmaps.GetAllUsableBeatmapSets().ForEach(b => addBeatmapSet(b, false));
+                beatmaps.GetAllUsableBeatmapSets().ForEach(addBeatmapSet);
                 beatmaps.ItemAdded += addBeatmapSet;
                 beatmaps.ItemRemoved += removeBeatmapSet;
 
@@ -83,15 +83,9 @@ namespace osu.Game.Overlays.Music
                 beatmapBacking.ValueChanged += _ => updateSelectedSet();
             }
 
-            private void addBeatmapSet(BeatmapSetInfo obj, bool existing) => Schedule(() =>
+            private void addBeatmapSet(BeatmapSetInfo obj) => Schedule(() =>
             {
-                if (existing)
-                    return;
-
-                var newItem = new PlaylistItem(obj) { OnSelect = set => Selected?.Invoke(set) };
-
-                items.Add(newItem);
-                items.SetLayoutPosition(newItem, items.Count - 1);
+                items.Insert(items.Count - 1, new PlaylistItem(obj) { OnSelect = set => Selected?.Invoke(set) });
             });
 
             private void removeBeatmapSet(BeatmapSetInfo obj) => Schedule(() =>

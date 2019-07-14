@@ -23,7 +23,7 @@ namespace osu.Game.Online.Leaderboards
     {
         private const double fade_duration = 300;
 
-        private readonly ScrollContainer scrollContainer;
+        private readonly OsuScrollContainer scrollContainer;
         private readonly Container placeholderContainer;
 
         private FillFlowContainer<LeaderboardScore> scrollFlow;
@@ -203,8 +203,13 @@ namespace osu.Game.Online.Leaderboards
 
         public void APIStateChanged(IAPIProvider api, APIState state)
         {
-            if (state == APIState.Online)
-                UpdateScores();
+            switch (state)
+            {
+                case APIState.Online:
+                case APIState.Offline:
+                    UpdateScores();
+                    break;
+            }
         }
 
         protected void UpdateScores()
@@ -230,12 +235,6 @@ namespace osu.Game.Online.Leaderboards
 
                 if (getScoresRequest == null)
                     return;
-
-                if (api?.IsLoggedIn != true)
-                {
-                    PlaceholderState = PlaceholderState.NotLoggedIn;
-                    return;
-                }
 
                 getScoresRequest.Failure += e => Schedule(() =>
                 {

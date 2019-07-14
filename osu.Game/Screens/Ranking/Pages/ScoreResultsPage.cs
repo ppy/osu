@@ -33,9 +33,12 @@ namespace osu.Game.Screens.Ranking.Pages
         private Container scoreContainer;
         private ScoreCounter scoreCounter;
 
+        private readonly ScoreInfo score;
+
         public ScoreResultsPage(ScoreInfo score, WorkingBeatmap beatmap)
             : base(score, beatmap)
         {
+            this.score = score;
         }
 
         private FillFlowContainer<DrawableScoreStatistic> statisticsContainer;
@@ -74,7 +77,7 @@ namespace osu.Game.Screens.Ranking.Pages
                             RelativeSizeAxes = Axes.X,
                             Height = user_header_height,
                         },
-                        new DrawableRank(Score.Rank)
+                        new UpdateableRank(Score.Rank)
                         {
                             Anchor = Anchor.TopCentre,
                             Origin = Anchor.TopCentre,
@@ -163,9 +166,16 @@ namespace osu.Game.Screens.Ranking.Pages
                             Direction = FillDirection.Horizontal,
                             LayoutDuration = 200,
                             LayoutEasing = Easing.OutQuint
-                        }
-                    }
-                }
+                        },
+                    },
+                },
+                new ReplayDownloadButton(score)
+                {
+                    Anchor = Anchor.BottomCentre,
+                    Origin = Anchor.BottomCentre,
+                    Margin = new MarginPadding { Bottom = 10 },
+                    Size = new Vector2(50, 30),
+                },
             };
 
             statisticsContainer.ChildrenEnumerable = Score.Statistics.OrderByDescending(p => p.Key).Select(s => new DrawableScoreStatistic(s));

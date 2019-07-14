@@ -49,8 +49,7 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
                 Font = OsuFont.GetFont(size: 11, weight: FontWeight.Regular, italics: true)
             };
 
-            RightFlowContainer.Add(text);
-            RightFlowContainer.SetLayoutPosition(text, 1);
+            RightFlowContainer.Insert(1, text);
 
             LeftFlowContainer.Add(new BeatmapMetadataContainer(Score.Beatmap));
             LeftFlowContainer.Add(new DrawableDate(Score.Date));
@@ -59,7 +58,7 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
                 modsContainer.Add(new ModIcon(mod) { Scale = new Vector2(0.5f) });
         }
 
-        protected override Drawable CreateLeftVisual() => new DrawableRank(Score.Rank)
+        protected override Drawable CreateLeftVisual() => new UpdateableRank(Score.Rank)
         {
             RelativeSizeAxes = Axes.Y,
             Width = 60,
