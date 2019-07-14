@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -20,20 +21,20 @@ namespace osu.Game.Tests.Visual.Online
             typeof(BeatmapSetCover),
         };
 
-        private readonly UpdateableBeatmapSetCover cover, card, list;
+        private readonly FillFlowContainer coversContainer;
 
         public TestSceneUpdateableBeatmapSetCover()
         {
-            Child = new FillFlowContainer
+            Child = coversContainer = new FillFlowContainer
             {
                 RelativeSizeAxes = Axes.Both,
                 Direction = FillDirection.Vertical,
                 Spacing = new Vector2(10),
                 Children = new[]
                 {
-                    cover = new UpdateableBeatmapSetCover(BeatmapSetCoverType.Cover) { Size = new Vector2(400), Masking = true, },
-                    card = new UpdateableBeatmapSetCover(BeatmapSetCoverType.Card) { Size = new Vector2(400, 200), Masking = true, },
-                    list = new UpdateableBeatmapSetCover(BeatmapSetCoverType.List) { Size = new Vector2(600, 150), Masking = true, },
+                    new TestUpdateableBeatmapSetCover(BeatmapSetCoverType.Cover),
+                    new TestUpdateableBeatmapSetCover(BeatmapSetCoverType.Card),
+                    new TestUpdateableBeatmapSetCover(BeatmapSetCoverType.List),
                 }
             };
         }
@@ -41,34 +42,61 @@ namespace osu.Game.Tests.Visual.Online
         [Test]
         public void TestLoading()
         {
-            AddStep("loading", () => setBeatmap(null));
+            AddStep("loading", () => setCovers(null));
         }
 
         [Test]
         public void TestLocal()
         {
-            AddStep("loading", () =>
+            setCovers(new BeatmapSetInfo
             {
-                setBeatmap(new BeatmapSetInfo
+                OnlineInfo = new BeatmapSetOnlineInfo
                 {
-                    OnlineInfo = new BeatmapSetOnlineInfo
+                    Covers = new BeatmapSetOnlineCovers
                     {
-                        Covers = new BeatmapSetOnlineCovers
-                        {
-                            Cover = "https://assets.ppy.sh/beatmaps/241526/covers/cover@2x.jpg?1521086997",
-                            Card = "https://assets.ppy.sh/beatmaps/241526/covers/card@2x.jpg?1521086997",
-                            List = "https://assets.ppy.sh/beatmaps/241526/covers/list@2x.jpg?1521086997",
-                        }
+                        Cover = "https://assets.ppy.sh/beatmaps/241526/covers/cover@2x.jpg?1521086997",
+                        Card = "https://assets.ppy.sh/beatmaps/241526/covers/card@2x.jpg?1521086997",
+                        List = "https://assets.ppy.sh/beatmaps/241526/covers/list@2x.jpg?1521086997",
                     }
-                });
+                }
             });
         }
 
-        private void setBeatmap(BeatmapSetInfo setInfo)
+        private void setCovers(BeatmapSetInfo setInfo)
         {
-            cover.BeatmapSet = setInfo;
-            card.BeatmapSet = setInfo;
-            list.BeatmapSet = setInfo;
+            // easy way to retrieve the covers
+            foreach (var cover in coversContainer.Children.OfType<TestUpdateableBeatmapSetCover>())
+            {
+                var coverType = cover.CoverType.ToString().ToLower();
+                AddStep($"set beatmap for {coverType}", () => cover.BeatmapSet = setInfo);
+                AddAssert($"is beatmap set for {coverType}", () => cover.BeatmapSet == setInfo);
+            }
+        }
+
+        private class TestUpdateableBeatmapSetCover : UpdateableBeatmapSetCover
+        {
+            public readonly BeatmapSetCoverType CoverType;
+
+            public TestUpdateableBeatmapSetCover(BeatmapSetCoverType coverType)
+                : base(coverType)
+            {
+                CoverType = coverType;
+
+                switch (coverType)
+                {
+                    case BeatmapSetCoverType.Cover:
+                        Size = new Vector2(400);
+                        break;
+
+                    case BeatmapSetCoverType.Card:
+                        Size = new Vector2(400, 200);
+                        break;
+
+                    case BeatmapSetCoverType.List:
+                        Size = new Vector2(600, 150);
+                        break;
+                }
+            }
         }
     }
 }
