@@ -102,7 +102,7 @@ Note that while we already have certain standards in place, nothing is set in st
 
 For those interested, we love to reward quality contributions via [bounties](https://docs.google.com/spreadsheets/d/1jNXfj_S3Pb5PErA-czDdC9DUu4IgUbe1Lt8E7CYUJuE/view?&rm=minimal#gid=523803337), paid out via paypal or osu! supporter tags. Don't hesitate to [request a bounty](https://docs.google.com/forms/d/e/1FAIpQLSet_8iFAgPMG526pBZ2Kic6HSh7XPM3fE8xPcnWNkMzINDdYg/viewform) for your work on this project.
 
-For those interested how far the project is, osu!lazer has [tentative to-do list](to-do list.md).
+For those interested how far the project is, osu!lazer has [tentative to-do list](https://github.com/ppy/osu/blob/master/to-do%20list.md).
 
 ## Licence
 
