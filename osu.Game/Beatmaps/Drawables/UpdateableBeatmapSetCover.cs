@@ -19,17 +19,13 @@ namespace osu.Game.Beatmaps.Drawables
             set => Model = value;
         }
 
-        public new bool Masking
-        {
-            get => base.Masking;
-            set => base.Masking = value;
-        }
-
         protected override double TransformDuration => 400;
 
         public UpdateableBeatmapSetCover(BeatmapSetCoverType coverType = BeatmapSetCoverType.Cover)
         {
             this.coverType = coverType;
+
+            Masking = true;
 
             AddInternal(new Box
             {
