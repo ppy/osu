@@ -16,11 +16,10 @@ namespace osu.Game.Tests.Visual.SongSelect
 {
     public class TestSceneUserTopScore : OsuTestScene
     {
-        private readonly UserTopScoreContainer topScoreContainer;
-        private readonly APILegacyUserTopScoreInfo[] scores;
-
         public TestSceneUserTopScore()
         {
+            UserTopScoreContainer topScoreContainer;
+
             Add(new Container
             {
                 Origin = Anchor.BottomCentre,
@@ -42,13 +41,7 @@ namespace osu.Game.Tests.Visual.SongSelect
                 }
             });
 
-            AddStep(@"Trigger visibility", topScoreContainer.ToggleVisibility);
-            AddStep(@"Add score(rank 999)", () => topScoreContainer.Score.Value = scores[0]);
-            AddStep(@"Add score(rank 110000)", () => topScoreContainer.Score.Value = scores[1]);
-            AddStep(@"Add score(rank 22333)", () => topScoreContainer.Score.Value = scores[2]);
-            AddStep(@"Add null score", () => topScoreContainer.Score.Value = null);
-
-            scores = new APILegacyUserTopScoreInfo[]
+            APILegacyUserTopScoreInfo[] scores = new[]
             {
                 new APILegacyUserTopScoreInfo
                 {
@@ -115,6 +108,12 @@ namespace osu.Game.Tests.Visual.SongSelect
                     }
                 }
             };
+
+            AddStep(@"Trigger visibility", topScoreContainer.ToggleVisibility);
+            AddStep(@"Add score(rank 999)", () => topScoreContainer.Score.Value = scores[0]);
+            AddStep(@"Add score(rank 110000)", () => topScoreContainer.Score.Value = scores[1]);
+            AddStep(@"Add score(rank 22333)", () => topScoreContainer.Score.Value = scores[2]);
+            AddStep(@"Add null score", () => topScoreContainer.Score.Value = null);
         }
     }
 }

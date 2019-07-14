@@ -4,7 +4,6 @@
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Beatmaps;
-using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Screens.Select.Details;
 using osu.Game.Screens.Select.Leaderboards;
 
@@ -65,7 +64,7 @@ namespace osu.Game.Screens.Select
                     Child = new GridContainer
                     {
                         RelativeSizeAxes = Axes.Both,
-                        RowDimensions = new Dimension[]
+                        RowDimensions = new[]
                         {
                             new Dimension(GridSizeMode.Distributed),
                             new Dimension(GridSizeMode.AutoSize),
