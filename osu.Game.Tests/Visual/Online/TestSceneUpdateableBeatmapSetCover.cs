@@ -69,7 +69,7 @@ namespace osu.Game.Tests.Visual.Online
             {
                 var coverType = cover.CoverType.ToString().ToLower();
                 AddStep($"set beatmap for {coverType}", () => cover.BeatmapSet = setInfo);
-                AddAssert($"is beatmap set for {coverType}", () => cover.BeatmapSet == setInfo);
+                AddUntilStep($"is beatmap set for {coverType}", () => cover.BeatmapSet == setInfo);
             }
         }
 
