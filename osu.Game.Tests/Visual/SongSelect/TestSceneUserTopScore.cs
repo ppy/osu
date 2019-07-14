@@ -43,8 +43,9 @@ namespace osu.Game.Tests.Visual.SongSelect
             });
 
             AddStep(@"Trigger visibility", topScoreContainer.ToggleVisibility);
-            AddStep(@"Add score", () => topScoreContainer.TopScore = scores[0]);
-            AddStep(@"Add another score", () => topScoreContainer.TopScore = scores[1]);
+            AddStep(@"Add score", () => topScoreContainer.TopScore.Value = scores[0]);
+            AddStep(@"Add another score", () => topScoreContainer.TopScore.Value = scores[1]);
+            AddStep(@"Add null score", () => topScoreContainer.TopScore.Value = null);
 
             scores = new APILegacyUserTopScoreInfo[]
             {
