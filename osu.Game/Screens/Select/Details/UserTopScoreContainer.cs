@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics;
@@ -18,14 +19,7 @@ namespace osu.Game.Screens.Select.Details
         private readonly Container contentContainer;
         private readonly Container scoreContainer;
 
-        public APILegacyUserTopScoreInfo TopScore
-        {
-            set
-            {
-                scoreContainer.Clear();
-                scoreContainer.Add(new LeaderboardScore(value.Score, value.Position));
-            }
-        }
+        public Bindable<APILegacyUserTopScoreInfo> TopScore = new Bindable<APILegacyUserTopScoreInfo>();
 
         protected override bool StartHidden => true;
 
@@ -62,6 +56,16 @@ namespace osu.Game.Screens.Select.Details
                     }
                 }
             };
+
+            TopScore.BindValueChanged((score) => onScoreChanged(score.NewValue));
+        }
+
+        private void onScoreChanged(APILegacyUserTopScoreInfo score)
+        {
+            scoreContainer.Clear();
+
+            if (score != null)
+                scoreContainer.Add(new LeaderboardScore(score.Score, score.Position));
         }
 
         protected override void PopIn()
