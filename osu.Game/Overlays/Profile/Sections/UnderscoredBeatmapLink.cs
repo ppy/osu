@@ -1,7 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using osu.Framework.Allocation;
 using osu.Game.Beatmaps;
 
 namespace osu.Game.Overlays.Profile.Sections
@@ -15,15 +14,16 @@ namespace osu.Game.Overlays.Profile.Sections
             this.beatmap = beatmap;
         }
 
-        [BackgroundDependencyLoader(true)]
-        private void load(BeatmapSetOverlay beatmapSetOverlay)
+        protected override void LoadComplete()
         {
+            base.LoadComplete();
+
             ClickAction = () =>
             {
-                if (beatmap.OnlineBeatmapID != null)
-                    beatmapSetOverlay?.FetchAndShowBeatmap(beatmap.OnlineBeatmapID.Value);
-                else if (beatmap.BeatmapSet?.OnlineBeatmapSetID != null)
-                    beatmapSetOverlay?.FetchAndShowBeatmapSet(beatmap.BeatmapSet.OnlineBeatmapSetID.Value);
+                var beatmapId = beatmap.OnlineBeatmapID;
+
+                if (beatmapId.HasValue)
+                    Game?.ShowBeatmap(beatmapId.Value);
             };
         }
     }

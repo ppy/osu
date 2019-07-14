@@ -1,8 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using osu.Framework.Allocation;
-
 namespace osu.Game.Overlays.Profile.Sections
 {
     public class UnderscoredUserLink : UnderscoredLinkContainer
@@ -14,10 +12,11 @@ namespace osu.Game.Overlays.Profile.Sections
             this.userId = userId;
         }
 
-        [BackgroundDependencyLoader(true)]
-        private void load(UserProfileOverlay userProfileOverlay)
+        protected override void LoadComplete()
         {
-            ClickAction = () => userProfileOverlay?.ShowUser(userId);
+            base.LoadComplete();
+
+            ClickAction = () => Game?.ShowUser(userId);
         }
     }
 }
