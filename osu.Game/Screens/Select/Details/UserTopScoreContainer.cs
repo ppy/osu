@@ -63,13 +63,14 @@ namespace osu.Game.Screens.Select.Details
 
         private void onScoreChanged(APILegacyUserTopScoreInfo score)
         {
-            scoreContainer.Clear();
-
             if (score != null)
             {
+                scoreContainer.Clear();
                 scoreContainer.Add(new LeaderboardScore(score.Score, score.Position));
                 Show();
             }
+            else
+                Hide();
         }
 
         protected override void PopIn()

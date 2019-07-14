@@ -41,7 +41,7 @@ namespace osu.Game.Tests.Visual.SongSelect
                 }
             });
 
-            APILegacyUserTopScoreInfo[] scores = new[]
+            var scores = new APILegacyUserTopScoreInfo[]
             {
                 new APILegacyUserTopScoreInfo
                 {
