@@ -15,23 +15,17 @@ using osu.Game.Graphics.Containers;
 using osu.Game.Online.API;
 using osuTK;
 using osuTK.Graphics;
-using osu.Game.Overlays;
 using osu.Game.Users;
 
 namespace osu.Game.Screens.Menu
 {
-    public class Disclaimer : OsuScreen
+    public class Disclaimer : StartupScreen
     {
         private Intro intro;
         private SpriteIcon icon;
         private Color4 iconColour;
         private LinkFlowContainer textFlow;
         private LinkFlowContainer supportFlow;
-
-        public override bool HideOverlaysOnEnter => true;
-        public override OverlayActivation InitialOverlayActivationMode => OverlayActivation.Disabled;
-
-        public override bool CursorVisible => false;
 
         private Drawable heart;
 

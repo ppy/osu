@@ -6,6 +6,8 @@
 	<string>sh.ppy.osulazer</string>
 	<key>CFBundleName</key>
 	<string>osu!</string>
+	<key>CFBundleDisplayName</key>
+	<string>osu!</string>
 	<key>CFBundleShortVersionString</key>
 	<string>0.1</string>
 	<key>CFBundleVersion</key>

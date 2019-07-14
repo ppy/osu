@@ -12,12 +12,14 @@ using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
+using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Screens.Multi.Components;
 using osu.Game.Users;
+using osu.Game.Users.Drawables;
 using osuTK;
 using osuTK.Graphics;
 
@@ -226,7 +228,7 @@ namespace osu.Game.Screens.Multi.Lounge.Components
             {
                 Padding = new MarginPadding { Horizontal = 10 };
 
-                InternalChild = new ScrollContainer
+                InternalChild = new OsuScrollContainer
                 {
                     RelativeSizeAxes = Axes.Both,
                     Child = fill = new FillFlowContainer

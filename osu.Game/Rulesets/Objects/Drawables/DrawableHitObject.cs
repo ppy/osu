@@ -33,7 +33,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
 
         protected SkinnableSound Samples;
 
-        protected virtual IEnumerable<SampleInfo> GetSamples() => HitObject.Samples;
+        protected virtual IEnumerable<HitSampleInfo> GetSamples() => HitObject.Samples;
 
         private readonly Lazy<List<DrawableHitObject>> nestedHitObjects = new Lazy<List<DrawableHitObject>>();
         public IEnumerable<DrawableHitObject> NestedHitObjects => nestedHitObjects.IsValueCreated ? nestedHitObjects.Value : Enumerable.Empty<DrawableHitObject>();
@@ -77,15 +77,11 @@ namespace osu.Game.Rulesets.Objects.Drawables
 
         private bool judgementOccurred;
 
-        public bool Interactive = true;
-        public override bool HandleNonPositionalInput => Interactive;
-        public override bool HandlePositionalInput => Interactive;
-
         public override bool RemoveWhenNotAlive => false;
         public override bool RemoveCompletedTransforms => false;
         protected override bool RequiresChildrenUpdate => true;
 
-        public override bool IsPresent => base.IsPresent || State.Value == ArmedState.Idle && Clock?.CurrentTime >= LifetimeStart;
+        public override bool IsPresent => base.IsPresent || (State.Value == ArmedState.Idle && Clock?.CurrentTime >= LifetimeStart);
 
         public readonly Bindable<ArmedState> State = new Bindable<ArmedState>();
 
@@ -108,7 +104,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
 
             var samples = GetSamples().ToArray();
 
-            if (samples.Any())
+            if (samples.Length > 0)
             {
                 if (HitObject.SampleControlPoint == null)
                     throw new ArgumentNullException(nameof(HitObject.SampleControlPoint), $"{nameof(HitObject)}s must always have an attached {nameof(HitObject.SampleControlPoint)}."
@@ -167,6 +163,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
                 {
                     OnRevertResult?.Invoke(this, Result);
 
+                    Result.TimeOffset = 0;
                     Result.Type = HitResult.None;
                     State.Value = ArmedState.Idle;
                 }
@@ -243,6 +240,10 @@ namespace osu.Game.Rulesets.Objects.Drawables
         /// <returns>Whether a scoring result has occurred from this <see cref="DrawableHitObject"/> or any nested <see cref="DrawableHitObject"/>.</returns>
         protected bool UpdateResult(bool userTriggered)
         {
+            // It's possible for input to get into a bad state when rewinding gameplay, so results should not be processed
+            if (Time.Elapsed < 0)
+                return false;
+
             judgementOccurred = false;
 
             if (AllJudged)

@@ -1,4 +1,4 @@
-﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
@@ -9,6 +9,7 @@ using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
+using osu.Framework.MathUtils;
 using osu.Framework.Screens;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu;
@@ -16,21 +17,31 @@ using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring;
 using osu.Game.Screens;
 using osu.Game.Screens.Play;
-using osu.Game.Tests.Beatmaps;
+using osu.Game.Screens.Play.PlayerSettings;
 
 namespace osu.Game.Tests.Visual.Gameplay
 {
     public class TestScenePlayerLoader : ManualInputManagerTestScene
     {
-        private PlayerLoader loader;
+        private TestPlayerLoader loader;
         private OsuScreenStack stack;
 
         [SetUp]
         public void Setup() => Schedule(() =>
         {
             InputManager.Child = stack = new OsuScreenStack { RelativeSizeAxes = Axes.Both };
-            Beatmap.Value = new TestWorkingBeatmap(new TestBeatmap(new OsuRuleset().RulesetInfo), Clock);
+            Beatmap.Value = CreateWorkingBeatmap(new OsuRuleset().RulesetInfo);
         });
+
+        [Test]
+        public void TestBlockLoadViaMouseMovement()
+        {
+            AddStep("load dummy beatmap", () => stack.Push(loader = new TestPlayerLoader(() => new TestPlayer(false, false))));
+            AddUntilStep("wait for current", () => loader.IsCurrentScreen());
+            AddRepeatStep("move mouse", () => InputManager.MoveMouseTo(loader.VisualSettings.ScreenSpaceDrawQuad.TopLeft + (loader.VisualSettings.ScreenSpaceDrawQuad.BottomRight - loader.VisualSettings.ScreenSpaceDrawQuad.TopLeft) * RNG.NextSingle()), 20);
+            AddAssert("loader still active", () => loader.IsCurrentScreen());
+            AddUntilStep("loads after idle", () => !loader.IsCurrentScreen());
+        }
 
         [Test]
         public void TestLoadContinuation()
@@ -38,13 +49,13 @@ namespace osu.Game.Tests.Visual.Gameplay
             Player player = null;
             SlowLoadPlayer slowPlayer = null;
 
-            AddStep("load dummy beatmap", () => stack.Push(loader = new PlayerLoader(() => player = new TestPlayer(false, false))));
+            AddStep("load dummy beatmap", () => stack.Push(loader = new TestPlayerLoader(() => player = new TestPlayer(false, false))));
             AddUntilStep("wait for current", () => loader.IsCurrentScreen());
             AddStep("mouse in centre", () => InputManager.MoveMouseTo(loader.ScreenSpaceDrawQuad.Centre));
             AddUntilStep("wait for player to be current", () => player.IsCurrentScreen());
             AddStep("load slow dummy beatmap", () =>
             {
-                stack.Push(loader = new PlayerLoader(() => slowPlayer = new SlowLoadPlayer(false, false)));
+                stack.Push(loader = new TestPlayerLoader(() => slowPlayer = new SlowLoadPlayer(false, false)));
                 Scheduler.AddDelayed(() => slowPlayer.AllowLoad.Set(), 5000);
             });
 
@@ -62,7 +73,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddStep("load player", () =>
             {
                 Mods.Value = new[] { gameMod = new TestMod() };
-                stack.Push(loader = new PlayerLoader(() => player = new TestPlayer()));
+                stack.Push(loader = new TestPlayerLoader(() => player = new TestPlayer()));
             });
 
             AddUntilStep("wait for loader to become current", () => loader.IsCurrentScreen());
@@ -84,6 +95,16 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddAssert("game mods not applied", () => gameMod.Applied == false);
             AddAssert("player has different mods", () => playerMod1 != playerMod2);
             AddAssert("player mods applied", () => playerMod2.Applied);
+        }
+
+        private class TestPlayerLoader : PlayerLoader
+        {
+            public new VisualSettings VisualSettings => base.VisualSettings;
+
+            public TestPlayerLoader(Func<Player> createPlayer)
+                : base(createPlayer)
+            {
+            }
         }
 
         private class TestMod : Mod, IApplicableToScoreProcessor

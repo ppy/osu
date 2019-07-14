@@ -51,7 +51,7 @@ namespace osu.Game.Overlays
                     RelativeSizeAxes = Axes.Both,
                     Colour = colour.PurpleDarkAlternative,
                 },
-                new ScrollContainer
+                new OsuScrollContainer
                 {
                     RelativeSizeAxes = Axes.Both,
                     ScrollbarVisible = false,
@@ -76,7 +76,7 @@ namespace osu.Game.Overlays
                 },
             };
 
-            sampleBack = audio.Sample.Get(@"UI/generic-select-soft");
+            sampleBack = audio.Samples.Get(@"UI/generic-select-soft");
 
             header.Current.BindTo(Current);
 
@@ -92,7 +92,7 @@ namespace osu.Game.Overlays
         public void ShowListing()
         {
             Current.Value = null;
-            State = Visibility.Visible;
+            Show();
         }
 
         /// <summary>
@@ -106,7 +106,7 @@ namespace osu.Game.Overlays
             if (build == null) throw new ArgumentNullException(nameof(build));
 
             Current.Value = build;
-            State = Visibility.Visible;
+            Show();
         }
 
         public void ShowBuild([NotNull] string updateStream, [NotNull] string version)
@@ -123,7 +123,7 @@ namespace osu.Game.Overlays
                     ShowBuild(build);
             });
 
-            State = Visibility.Visible;
+            Show();
         }
 
         public override bool OnPressed(GlobalAction action)
@@ -133,7 +133,7 @@ namespace osu.Game.Overlays
                 case GlobalAction.Back:
                     if (Current.Value == null)
                     {
-                        State = Visibility.Hidden;
+                        Hide();
                     }
                     else
                     {

@@ -27,6 +27,7 @@ namespace osu.Game.Overlays.Direct
         private const float height = 70;
 
         private FillFlowContainer statusContainer;
+        protected PanelDownloadButton DownloadButton;
         private PlayButton playButton;
         private Box progressBar;
 
@@ -149,7 +150,7 @@ namespace osu.Game.Overlays.Direct
                                     Anchor = Anchor.CentreRight,
                                     Origin = Anchor.CentreRight,
                                     AutoSizeAxes = Axes.Both,
-                                    Child = new DownloadButton(SetInfo)
+                                    Child = DownloadButton = new PanelDownloadButton(SetInfo)
                                     {
                                         Size = new Vector2(height - vertical_padding * 3),
                                         Margin = new MarginPadding { Left = vertical_padding * 2, Right = vertical_padding },
