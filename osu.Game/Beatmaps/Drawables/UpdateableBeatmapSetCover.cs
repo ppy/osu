@@ -30,24 +30,22 @@ namespace osu.Game.Beatmaps.Drawables
         public UpdateableBeatmapSetCover(BeatmapSetCoverType coverType = BeatmapSetCoverType.Cover)
         {
             this.coverType = coverType;
-        }
 
-        protected override Drawable CreateDrawable(BeatmapSetInfo setInfo)
-        {
-            if (setInfo != null)
-                return new BeatmapSetCover(setInfo, coverType)
-                {
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
-                    RelativeSizeAxes = Axes.Both,
-                    FillMode = FillMode.Fill,
-                };
-
-            return new Box
+            AddInternal(new Box
             {
                 RelativeSizeAxes = Axes.Both,
                 Colour = ColourInfo.GradientVertical(OsuColour.Gray(0.2f), OsuColour.Gray(0.1f)),
-            };
+            });
         }
+
+        protected override Drawable CreateDrawable(BeatmapSetInfo setInfo) => setInfo != null
+            ? new BeatmapSetCover(setInfo, coverType)
+            {
+                Anchor = Anchor.Centre,
+                Origin = Anchor.Centre,
+                RelativeSizeAxes = Axes.Both,
+                FillMode = FillMode.Fill,
+            }
+            : null;
     }
 }
