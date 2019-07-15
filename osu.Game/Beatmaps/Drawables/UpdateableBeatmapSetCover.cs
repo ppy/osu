@@ -11,7 +11,7 @@ namespace osu.Game.Beatmaps.Drawables
 {
     public class UpdateableBeatmapSetCover : ModelBackedDrawable<BeatmapSetInfo>
     {
-        private readonly BeatmapSetCoverType coverType;
+        protected readonly BeatmapSetCoverType CoverType;
 
         public BeatmapSetInfo BeatmapSet
         {
@@ -21,9 +21,9 @@ namespace osu.Game.Beatmaps.Drawables
 
         protected override double TransformDuration => 400;
 
-        public UpdateableBeatmapSetCover(BeatmapSetCoverType coverType = BeatmapSetCoverType.Cover)
+        public UpdateableBeatmapSetCover(BeatmapSetCoverType type = BeatmapSetCoverType.Cover)
         {
-            this.coverType = coverType;
+            CoverType = type;
 
             Masking = true;
 
@@ -35,7 +35,7 @@ namespace osu.Game.Beatmaps.Drawables
         }
 
         protected override Drawable CreateDrawable(BeatmapSetInfo setInfo) => setInfo != null
-            ? new BeatmapSetCover(setInfo, coverType)
+            ? new BeatmapSetCover(setInfo, CoverType)
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,

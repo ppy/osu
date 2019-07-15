@@ -39,16 +39,17 @@ namespace osu.Game.Tests.Visual.Online
             };
         }
 
-        [Test]
-        public void TestLoading()
+        [SetUp]
+        public void SetUp()
         {
-            setCovers(null);
+            foreach (var cover in coversContainer.Children.OfType<TestUpdateableBeatmapSetCover>())
+                cover.BeatmapSet = null;
         }
 
         [Test]
         public void TestLocal()
         {
-            setCovers(new BeatmapSetInfo
+            var setInfo = new BeatmapSetInfo
             {
                 OnlineInfo = new BeatmapSetOnlineInfo
                 {
@@ -59,29 +60,26 @@ namespace osu.Game.Tests.Visual.Online
                         List = "https://assets.ppy.sh/beatmaps/241526/covers/list@2x.jpg?1521086997",
                     }
                 }
-            });
-        }
+            };
 
-        private void setCovers(BeatmapSetInfo setInfo)
-        {
-            // easy way to retrieve the covers
             foreach (var cover in coversContainer.Children.OfType<TestUpdateableBeatmapSetCover>())
             {
                 var coverType = cover.CoverType.ToString().ToLower();
                 AddStep($"set beatmap for {coverType}", () => cover.BeatmapSet = setInfo);
-                AddUntilStep($"is beatmap set for {coverType}", () => cover.BeatmapSet == setInfo);
+                AddUntilStep($"wait until {coverType} drawable is displayed", () => cover.DisplayedDrawable is BeatmapSetCover);
+                AddAssert($"verify {coverType} drawable has correct beatmapset", () => (cover.DisplayedDrawable as BeatmapSetCover)?.BeatmapSet == setInfo);
+                AddAssert($"verify {coverType} drawable has correct type", () => (cover.DisplayedDrawable as BeatmapSetCover)?.CoverType == cover.CoverType);
             }
         }
 
         private class TestUpdateableBeatmapSetCover : UpdateableBeatmapSetCover
         {
-            public readonly BeatmapSetCoverType CoverType;
+            public new BeatmapSetCoverType CoverType => base.CoverType;
+            public new Drawable DisplayedDrawable => base.DisplayedDrawable;
 
             public TestUpdateableBeatmapSetCover(BeatmapSetCoverType coverType)
                 : base(coverType)
             {
-                CoverType = coverType;
-
                 switch (coverType)
                 {
                     case BeatmapSetCoverType.Cover:
