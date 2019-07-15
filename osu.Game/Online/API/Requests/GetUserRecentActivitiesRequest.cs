@@ -10,14 +10,16 @@ namespace osu.Game.Online.API.Requests
     {
         private readonly long userId;
         private readonly int offset;
+        private readonly int limit;
 
-        public GetUserRecentActivitiesRequest(long userId, int offset = 0)
+        public GetUserRecentActivitiesRequest(long userId, int offset = 0, int limit = 5)
         {
             this.userId = userId;
             this.offset = offset;
+            this.limit = limit;
         }
 
-        protected override string Target => $"users/{userId}/recent_activity?offset={offset}";
+        protected override string Target => $"users/{userId}/recent_activity?offset={offset}&limit={limit}";
     }
 
     public enum RecentActivityType

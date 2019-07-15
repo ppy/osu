@@ -11,17 +11,19 @@ namespace osu.Game.Online.API.Requests
     {
         private readonly long userId;
         private readonly int offset;
+        private readonly int limit;
         private readonly BeatmapSetType type;
 
-        public GetUserBeatmapsRequest(long userId, BeatmapSetType type, int offset = 0)
+        public GetUserBeatmapsRequest(long userId, BeatmapSetType type, int offset = 0, int limit = 6)
         {
             this.userId = userId;
             this.offset = offset;
+            this.limit = limit;
             this.type = type;
         }
 
         // ReSharper disable once ImpureMethodCallOnReadonlyValueField
-        protected override string Target => $@"users/{userId}/beatmapsets/{type.ToString().Underscore()}?offset={offset}";
+        protected override string Target => $@"users/{userId}/beatmapsets/{type.ToString().Underscore()}?offset={offset}&limit={limit}";
     }
 
     public enum BeatmapSetType
