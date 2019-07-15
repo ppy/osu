@@ -216,6 +216,7 @@ namespace osu.Game.Screens.Select
             }
 
             BeatmapDetails.Leaderboard.ScoreSelected += s => this.Push(new SoloResults(s));
+            BeatmapDetails.TopScore.ScoreSelected += s => this.Push(new SoloResults(s));
         }
 
         [BackgroundDependencyLoader(true)]

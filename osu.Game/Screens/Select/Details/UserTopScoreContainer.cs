@@ -8,6 +8,8 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Leaderboards;
+using osu.Game.Scoring;
+using System;
 
 namespace osu.Game.Screens.Select.Details
 {
@@ -20,6 +22,8 @@ namespace osu.Game.Screens.Select.Details
         private readonly Container scoreContainer;
 
         public Bindable<APILegacyUserTopScoreInfo> Score = new Bindable<APILegacyUserTopScoreInfo>();
+
+        public Action<ScoreInfo> ScoreSelected;
 
         protected override bool StartHidden => true;
 
@@ -66,7 +70,10 @@ namespace osu.Game.Screens.Select.Details
             if (score != null)
             {
                 scoreContainer.Clear();
-                scoreContainer.Add(new LeaderboardScore(score.Score, score.Position));
+                scoreContainer.Add(new LeaderboardScore(score.Score, score.Position)
+                {
+                    Action = () => ScoreSelected?.Invoke(score.Score)
+                });
                 Show();
             }
             else
