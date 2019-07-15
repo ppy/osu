@@ -30,8 +30,8 @@ namespace osu.Game.Overlays
         private ProfileSectionsContainer sectionsContainer;
         private ProfileTabControl tabs;
 
-        private Bindable<RulesetInfo> displayedRuleset;
         private Bindable<User> displayedUser;
+        private Bindable<UserStatistics> statistics;
 
         public void ShowUser(long userId) => ShowUser(new User { Id = userId });
 
@@ -46,9 +46,9 @@ namespace osu.Game.Overlays
                 return;
 
             userReq?.Cancel();
-            displayedRuleset = new Bindable<RulesetInfo>();
-            displayedUser = new Bindable<User>();
             Clear();
+            displayedUser = new Bindable<User>();
+            statistics = new Bindable<UserStatistics>();
             lastSection = null;
 
             sections = new ProfileSection[]
@@ -81,6 +81,7 @@ namespace osu.Game.Overlays
                 ExpandableHeader = Header = new ProfileHeader
                 {
                     User = { BindTarget = displayedUser },
+                    Statistics = { BindTarget = statistics },
                 },
                 FixedHeader = tabs,
                 HeaderBackground = new Box
@@ -147,7 +148,7 @@ namespace osu.Game.Overlays
 
         private void userLoadComplete(User user)
         {
-            // If new user has been loaded
+            // New user has been loaded
             if (displayedUser.Value?.Id != user.Id)
             {
                 if (user.ProfileOrder != null)
@@ -166,20 +167,16 @@ namespace osu.Game.Overlays
                     }
                 }
 
-                // Allows change without triggering
-                displayedRuleset.UnbindAll();
-
                 displayedUser.Value = user;
-                displayedRuleset.BindTo(Header.Ruleset);
-                displayedRuleset.BindValueChanged(ruleset => onRulesetChanged(ruleset.NewValue));
+                Header.Ruleset.BindValueChanged(ruleset => onRulesetChanged(ruleset.NewValue));
 
                 foreach (var sec in sections)
-                    sec.Ruleset.BindTo(displayedRuleset);
+                    sec.Ruleset.BindTo(Header.Ruleset);
             }
             else
             {
                 Header.Loading = false;
-                displayedUser.Value = user;
+                statistics.Value = user.Statistics;
             }
         }
 

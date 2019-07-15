@@ -13,7 +13,7 @@ namespace osu.Game.Overlays.Profile.Header.Components
 {
     public class OverlinedTotalPlayTime : CompositeDrawable, IHasTooltip
     {
-        public readonly Bindable<User> User = new Bindable<User>();
+        public readonly Bindable<UserStatistics> Statistics = new Bindable<UserStatistics>();
 
         public string TooltipText { get; set; }
 
@@ -35,7 +35,7 @@ namespace osu.Game.Overlays.Profile.Header.Components
                 LineColour = colours.Yellow,
             };
 
-            User.BindValueChanged(user => updateTime(user.NewValue?.Statistics), true);
+            Statistics.BindValueChanged(statistics => updateTime(statistics.NewValue), true);
         }
 
         private void updateTime(UserStatistics statistics)

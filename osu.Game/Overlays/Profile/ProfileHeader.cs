@@ -19,20 +19,14 @@ namespace osu.Game.Overlays.Profile
 {
     public class ProfileHeader : OverlayHeader
     {
-        private readonly Bindable<UserStatistics> statistics = new Bindable<UserStatistics>();
-
-        [Resolved]
-        private RulesetStore rulesets { get; set; }
-
         private UserCoverBackground coverContainer;
         private CentreHeaderContainer centreHeaderContainer;
         private DetailHeaderContainer detailHeaderContainer;
         private DimmedLoadingAnimation loadingAnimation;
-        private MedalHeaderContainer medalHeaderContainer;
-        private BottomHeaderContainer bottomHeaderContainer;
         private readonly ProfileRulesetSelector rulesetSelector;
 
         public Bindable<User> User = new Bindable<User>();
+        public Bindable<UserStatistics> Statistics = new Bindable<UserStatistics>();
 
         public Bindable<RulesetInfo> Ruleset => rulesetSelector.Current;
 
@@ -62,6 +56,7 @@ namespace osu.Game.Overlays.Profile
                 Anchor = Anchor.TopRight,
                 Origin = Anchor.TopRight,
                 Margin = new MarginPadding { Top = 100, Right = 30 },
+                User = { BindTarget = User }
             });
 
             User.BindValueChanged(userChanged);
@@ -113,25 +108,29 @@ namespace osu.Game.Overlays.Profile
                         {
                             RelativeSizeAxes = Axes.X,
                             User = { BindTarget = User },
-                            Statistics = { BindTarget = statistics }
+                            Statistics = { BindTarget = Statistics },
                         },
                         centreHeaderContainer = new CentreHeaderContainer
                         {
                             RelativeSizeAxes = Axes.X,
                             User = { BindTarget = User },
-                            Statistics = { BindTarget = statistics }
+                            Statistics = { BindTarget = Statistics },
                         },
                         detailHeaderContainer = new DetailHeaderContainer
                         {
                             RelativeSizeAxes = Axes.X,
+                            User = { BindTarget = User },
+                            Statistics = { BindTarget = Statistics },
                         },
-                        medalHeaderContainer = new MedalHeaderContainer
+                        new MedalHeaderContainer
                         {
                             RelativeSizeAxes = Axes.X,
+                            User = { BindTarget = User },
                         },
-                        bottomHeaderContainer = new BottomHeaderContainer
+                        new BottomHeaderContainer
                         {
                             RelativeSizeAxes = Axes.X,
+                            User = { BindTarget = User },
                         },
                     }
                 },
@@ -143,20 +142,8 @@ namespace osu.Game.Overlays.Profile
 
         private void userChanged(ValueChangedEvent<User> user)
         {
-            detailHeaderContainer.User.Value = user.NewValue;
-
-            // If new user has been loaded
-            if (user.OldValue?.Id != user.NewValue.Id)
-            {
-                coverContainer.User = user.NewValue;
-                medalHeaderContainer.User.Value = user.NewValue;
-                bottomHeaderContainer.User.Value = user.NewValue;
-
-                rulesetSelector.SetDefaultRuleset(rulesets.GetRuleset(user.NewValue.PlayMode ?? "osu"));
-                rulesetSelector.SelectDefaultRuleset();
-            }
-            else
-                statistics.Value = user.NewValue.Statistics;
+            coverContainer.User = user.NewValue;
+            Statistics.Value = user.NewValue?.Statistics;
         }
 
         private class ProfileHeaderTitle : ScreenTitle

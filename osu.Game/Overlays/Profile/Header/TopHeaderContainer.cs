@@ -174,8 +174,6 @@ namespace osu.Game.Overlays.Profile.Header
             supporterTag.SupportLevel = user?.SupportLevel ?? 0;
             titleText.Text = user?.Title ?? string.Empty;
             titleText.Colour = OsuColour.FromHex(user?.Colour ?? "fff");
-
-            updateStatistics(user?.Statistics);
         }
 
         private void updateStatistics(UserStatistics statistics)

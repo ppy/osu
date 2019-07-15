@@ -22,8 +22,6 @@ namespace osu.Game.Overlays.Profile.Header
 
         private OverlinedInfoContainer hiddenDetailGlobal;
         private OverlinedInfoContainer hiddenDetailCountry;
-        private LevelProgressBar progressBar;
-        private LevelBadge levelBadge;
 
         public CentreHeaderContainer()
         {
@@ -87,11 +85,12 @@ namespace osu.Game.Overlays.Profile.Header
                     Margin = new MarginPadding { Right = UserProfileOverlay.CONTENT_X_MARGIN },
                     Children = new Drawable[]
                     {
-                        levelBadge = new LevelBadge
+                        new LevelBadge
                         {
                             Anchor = Anchor.CentreRight,
                             Origin = Anchor.CentreRight,
                             Size = new Vector2(40),
+                            Statistics = { BindTarget = Statistics },
                         },
                         expandedDetailContainer = new Container
                         {
@@ -100,9 +99,10 @@ namespace osu.Game.Overlays.Profile.Header
                             Width = 200,
                             Height = 6,
                             Margin = new MarginPadding { Right = 50 },
-                            Child = progressBar = new LevelProgressBar
+                            Child = new LevelProgressBar
                             {
                                 RelativeSizeAxes = Axes.Both,
+                                Statistics = { BindTarget = Statistics },
                             }
                         },
                         hiddenDetailContainer = new FillFlowContainer
@@ -139,7 +139,6 @@ namespace osu.Game.Overlays.Profile.Header
                 expandedDetailContainer.FadeTo(visible.NewValue ? 1 : 0, 200, Easing.OutQuint);
             });
 
-            User.BindValueChanged(user => updateStatistics(user.NewValue?.Statistics));
             Statistics.BindValueChanged(statistics => updateStatistics(statistics.NewValue));
         }
 
@@ -147,8 +146,6 @@ namespace osu.Game.Overlays.Profile.Header
         {
             hiddenDetailGlobal.Content = statistics?.Ranks.Global?.ToString("\\##,##0") ?? "-";
             hiddenDetailCountry.Content = statistics?.Ranks.Country?.ToString("\\##,##0") ?? "-";
-            progressBar.UpdateProgress(statistics);
-            levelBadge.UpdateLevel(statistics);
         }
     }
 }

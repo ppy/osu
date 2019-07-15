@@ -27,6 +27,7 @@ namespace osu.Game.Overlays.Profile.Header
         private FillFlowContainer fillFlow;
 
         public readonly Bindable<User> User = new Bindable<User>();
+        public readonly Bindable<UserStatistics> Statistics = new Bindable<UserStatistics>();
 
         private bool expanded = true;
 
@@ -92,7 +93,7 @@ namespace osu.Game.Overlays.Profile.Header
                                     {
                                         new OverlinedTotalPlayTime
                                         {
-                                            User = { BindTarget = User }
+                                            Statistics = { BindTarget = Statistics },
                                         },
                                         medalInfo = new OverlinedInfoContainer
                                         {
@@ -134,7 +135,7 @@ namespace osu.Game.Overlays.Profile.Header
                                 new RankGraph
                                 {
                                     RelativeSizeAxes = Axes.Both,
-                                    User = { BindTarget = User }
+                                    Statistics = { BindTarget = Statistics },
                                 },
                                 new FillFlowContainer
                                 {
@@ -164,19 +165,24 @@ namespace osu.Game.Overlays.Profile.Header
                 },
             };
 
-            User.BindValueChanged(user => updateDisplay(user.NewValue));
+            User.BindValueChanged(user => onUserUpdate(user.NewValue));
+            Statistics.BindValueChanged(statistics => onStatisticsUpdate(statistics.NewValue));
         }
 
-        private void updateDisplay(User user)
+        private void onUserUpdate(User user)
         {
             medalInfo.Content = user?.Achievements?.Length.ToString() ?? "0";
-            ppInfo.Content = user?.Statistics?.PP?.ToString("#,##0") ?? "0";
+        }
+
+        private void onStatisticsUpdate(UserStatistics statistics)
+        {
+            ppInfo.Content = statistics?.PP?.ToString("#,##0") ?? "0";
 
             foreach (var scoreRankInfo in scoreRankInfos)
-                scoreRankInfo.Value.RankCount = user?.Statistics?.GradesCount[scoreRankInfo.Key] ?? 0;
+                scoreRankInfo.Value.RankCount = statistics?.GradesCount[scoreRankInfo.Key] ?? 0;
 
-            detailGlobalRank.Content = user?.Statistics?.Ranks.Global?.ToString("\\##,##0") ?? "-";
-            detailCountryRank.Content = user?.Statistics?.Ranks.Country?.ToString("\\##,##0") ?? "-";
+            detailGlobalRank.Content = statistics?.Ranks.Global?.ToString("\\##,##0") ?? "-";
+            detailCountryRank.Content = statistics?.Ranks.Country?.ToString("\\##,##0") ?? "-";
         }
 
         private class ScoreRankInfo : CompositeDrawable

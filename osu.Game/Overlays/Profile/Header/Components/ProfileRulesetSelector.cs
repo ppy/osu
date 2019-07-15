@@ -2,11 +2,13 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.UserInterface;
 using osu.Game.Graphics;
 using osu.Game.Rulesets;
+using osu.Game.Users;
 using osuTK;
 using osuTK.Graphics;
 
@@ -16,11 +18,15 @@ namespace osu.Game.Overlays.Profile.Header.Components
     {
         private Color4 accentColour = Color4.White;
 
+        public Bindable<User> User = new Bindable<User>();
+
         public ProfileRulesetSelector()
         {
             TabContainer.Masking = false;
             TabContainer.Spacing = new Vector2(10, 0);
             AutoSizeAxes = Axes.Both;
+
+            User.BindValueChanged(onUserChanged);
         }
 
         [BackgroundDependencyLoader]
@@ -30,6 +36,12 @@ namespace osu.Game.Overlays.Profile.Header.Components
 
             foreach (TabItem<RulesetInfo> tabItem in TabContainer)
                 ((ProfileRulesetTabItem)tabItem).AccentColour = accentColour;
+        }
+
+        private void onUserChanged(ValueChangedEvent<User> user)
+        {
+            SetDefaultRuleset(Rulesets.GetRuleset(user.NewValue.PlayMode ?? "osu"));
+            SelectDefaultRuleset();
         }
 
         public void SetDefaultRuleset(RulesetInfo ruleset)

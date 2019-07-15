@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
@@ -15,6 +16,8 @@ namespace osu.Game.Overlays.Profile.Header.Components
 {
     public class LevelBadge : CompositeDrawable, IHasTooltip
     {
+        public readonly Bindable<UserStatistics> Statistics = new Bindable<UserStatistics>();
+
         public string TooltipText { get; }
 
         private OsuSpriteText levelText;
@@ -42,9 +45,11 @@ namespace osu.Game.Overlays.Profile.Header.Components
                     Font = OsuFont.GetFont(size: 20)
                 }
             };
+
+            Statistics.BindValueChanged(statistics => updateStatistics(statistics.NewValue));
         }
 
-        public void UpdateLevel(UserStatistics statistics)
+        private void updateStatistics(UserStatistics statistics)
         {
             levelText.Text = statistics?.Level.Current.ToString() ?? "0";
         }
