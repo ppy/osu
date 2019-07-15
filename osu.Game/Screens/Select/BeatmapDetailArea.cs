@@ -12,6 +12,7 @@ namespace osu.Game.Screens.Select
     public class BeatmapDetailArea : Container
     {
         private const float details_padding = 10;
+        private const float fade_duration = 200;
 
         private readonly Container content;
         protected override Container<Drawable> Content => content;
@@ -26,12 +27,25 @@ namespace osu.Game.Screens.Select
             get => beatmap;
             set
             {
-                beatmap = value;
-                Leaderboard.Beatmap = beatmap?.BeatmapInfo;
-                Details.Beatmap = beatmap?.BeatmapInfo;
+                beatmap = value is DummyWorkingBeatmap ? null : value;
 
-                this.FadeTo(beatmap is DummyWorkingBeatmap ? 0 : 1, 200);
+                if (beatmap != null)
+                {
+                    updateComponents();
+                    this.FadeIn(fade_duration);
+                }
+                else
+                {
+                    this.FadeOut(fade_duration)
+                        .OnComplete(_ => updateComponents());
+                }
             }
+        }
+
+        private void updateComponents()
+        {
+            Leaderboard.Beatmap = beatmap?.BeatmapInfo;
+            Details.Beatmap = beatmap?.BeatmapInfo;
         }
 
         public BeatmapDetailArea()
