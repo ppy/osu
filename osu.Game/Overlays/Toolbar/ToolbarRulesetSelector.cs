@@ -73,7 +73,7 @@ namespace osu.Game.Overlays.Toolbar
         {
             foreach (var tabItem in TabContainer)
             {
-                if (tabItem.Value == Current.Value)
+                if (tabItem.Value.Equals(Current.Value))
                 {
                     ModeButtonLine.MoveToX(tabItem.DrawPosition.X, !hasInitialPosition ? 0 : 200, Easing.OutQuint);
                     break;
