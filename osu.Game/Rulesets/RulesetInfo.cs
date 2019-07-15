@@ -24,6 +24,8 @@ namespace osu.Game.Rulesets
 
         public bool Equals(RulesetInfo other) => other != null && ID == other.ID && Available == other.Available && Name == other.Name && InstantiationInfo == other.InstantiationInfo;
 
+        public override bool Equals(object obj) => obj is RulesetInfo rulesetInfo && Equals(rulesetInfo);
+
         [SuppressMessage("ReSharper", "NonReadonlyMemberInGetHashCode")]
         public override int GetHashCode()
         {
