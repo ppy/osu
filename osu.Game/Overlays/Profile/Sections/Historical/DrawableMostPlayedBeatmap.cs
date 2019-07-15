@@ -19,13 +19,12 @@ namespace osu.Game.Overlays.Profile.Sections.Historical
 {
     public class DrawableMostPlayedBeatmap : OsuHoverContainer
     {
-        private readonly OsuSpriteText mapperText;
         private readonly Box background;
         private const int cover_width = 100;
         private const int corner_radius = 10;
         private readonly SpriteIcon icon;
         private readonly OsuSpriteText playCountText;
-        private readonly UnderscoredUserLink mapper;
+        private readonly LinkFlowContainer mapper;
 
         protected override IEnumerable<Drawable> EffectTargets => new[] { background };
 
@@ -71,54 +70,24 @@ namespace osu.Game.Overlays.Profile.Sections.Historical
                                     Padding = new MarginPadding { Left = 15, Right = 20 },
                                     Children = new Drawable[]
                                     {
-                                        new UnderscoredBeatmapLink(beatmap)
+                                        new MostPlayedBeatmapMetadataContainer(beatmap)
                                         {
                                             Anchor = Anchor.CentreLeft,
                                             Origin = Anchor.BottomLeft,
                                             Margin = new MarginPadding { Bottom = 2 },
-                                            Text = new[]
-                                            {
-                                                new OsuSpriteText
-                                                {
-                                                    Text = new LocalisedString((
-                                                        $"{beatmap.Metadata.TitleUnicode ?? beatmap.Metadata.Title} [{beatmap.Version}] ",
-                                                        $"{beatmap.Metadata.Title ?? beatmap.Metadata.TitleUnicode} [{beatmap.Version}] ")),
-                                                    Font = OsuFont.GetFont(size: 20, weight: FontWeight.Bold)
-                                                },
-                                                new OsuSpriteText
-                                                {
-                                                    Text = "by " + new LocalisedString((beatmap.Metadata.ArtistUnicode, beatmap.Metadata.Artist)),
-                                                    Font = OsuFont.GetFont(size: 20, weight: FontWeight.Regular)
-                                                },
-                                            }
                                         },
-                                        new FillFlowContainer
+                                        mapper = new LinkFlowContainer(t => t.Font = OsuFont.GetFont(size: 15, weight: FontWeight.Regular))
                                         {
-                                            AutoSizeAxes = Axes.Both,
                                             Anchor = Anchor.CentreLeft,
                                             Origin = Anchor.TopLeft,
+                                            AutoSizeAxes = Axes.Both,
                                             Direction = FillDirection.Horizontal,
                                             Margin = new MarginPadding { Top = 2 },
-                                            Children = new Drawable[]
-                                            {
-                                                mapperText = new OsuSpriteText
-                                                {
-                                                    Text = "mapped by ",
-                                                    Font = OsuFont.GetFont(size: 15, weight: FontWeight.Regular),
-                                                },
-                                                mapper = new UnderscoredUserLink(beatmap.Metadata.Author.Id)
-                                                {
-                                                    Text = new[]
-                                                    {
-                                                        new OsuSpriteText
-                                                        {
-                                                            Text = beatmap.Metadata.Author.Username,
-                                                            Font = OsuFont.GetFont(size: 15, weight: FontWeight.Bold),
-                                                        }
-                                                    }
-                                                },
-                                            }
-                                        },
+                                        }.With(d =>
+                                        {
+                                            d.AddText("mapped by ");
+                                            d.AddUserLink(beatmap.Metadata.Author);
+                                        }),
                                         new FillFlowContainer
                                         {
                                             Anchor = Anchor.CentreRight,
@@ -157,8 +126,32 @@ namespace osu.Game.Overlays.Profile.Sections.Historical
         {
             IdleColour = colors.GreySeafoam;
             HoverColour = colors.GreySeafoamLight;
-            mapperText.Colour = mapper.Colour = colors.GreySeafoamLighter;
+            mapper.Colour = colors.GreySeafoamLighter;
             icon.Colour = playCountText.Colour = colors.Yellow;
+        }
+
+        private class MostPlayedBeatmapMetadataContainer : BeatmapMetadataContainer
+        {
+            public MostPlayedBeatmapMetadataContainer(BeatmapInfo beatmap)
+                : base(beatmap)
+            {
+            }
+
+            protected override Drawable[] CreateText(BeatmapInfo beatmap) => new Drawable[]
+            {
+                new OsuSpriteText
+                {
+                    Text = new LocalisedString((
+                        $"{beatmap.Metadata.TitleUnicode ?? beatmap.Metadata.Title} [{beatmap.Version}] ",
+                        $"{beatmap.Metadata.Title ?? beatmap.Metadata.TitleUnicode} [{beatmap.Version}] ")),
+                    Font = OsuFont.GetFont(size: 20, weight: FontWeight.Bold)
+                },
+                new OsuSpriteText
+                {
+                    Text = "by " + new LocalisedString((beatmap.Metadata.ArtistUnicode, beatmap.Metadata.Artist)),
+                    Font = OsuFont.GetFont(size: 20, weight: FontWeight.Regular)
+                },
+            };
         }
     }
 }
