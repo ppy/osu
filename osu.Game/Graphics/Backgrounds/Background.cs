@@ -63,7 +63,7 @@ namespace osu.Game.Graphics.Backgrounds
                 });
             }
 
-            bufferedContainer.BlurTo(newBlurSigma, duration, easing);
+            bufferedContainer?.BlurTo(newBlurSigma, duration, easing);
         }
     }
 }
