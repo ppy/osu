@@ -14,9 +14,9 @@ using osu.Game.Users;
 
 namespace osu.Game.Tests.Visual.SongSelect
 {
-    public class TestSceneUserTopScore : OsuTestScene
+    public class TestSceneUserTopScoreContainer : OsuTestScene
     {
-        public TestSceneUserTopScore()
+        public TestSceneUserTopScoreContainer()
         {
             UserTopScoreContainer topScoreContainer;
 
