@@ -18,7 +18,7 @@ namespace osu.Game.Online.API.Requests
             this.userId = userId;
             this.type = type;
             this.offset = offset;
-            this.offset = limit;
+            this.limit = limit;
         }
 
         // ReSharper disable once ImpureMethodCallOnReadonlyValueField
