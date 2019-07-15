@@ -77,7 +77,7 @@ namespace osu.Game.Overlays.Profile.Header.Components
                 return;
             }
 
-            int[] userRanks = statistics?.RankHistory?.Data ?? new[] { statistics.Ranks.Global.Value };
+            int[] userRanks = statistics.RankHistory?.Data ?? new[] { statistics.Ranks.Global.Value };
             ranks = userRanks.Select((x, index) => new KeyValuePair<int, int>(index, x)).Where(x => x.Value != 0).ToArray();
 
             if (ranks.Length > 1)

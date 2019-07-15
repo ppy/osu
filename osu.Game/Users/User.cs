@@ -159,10 +159,7 @@ namespace osu.Game.Users
         }
 
         [JsonProperty(@"rankHistory")]
-        private RankHistoryData rankHistory
-        {
-            set { Statistics.RankHistory = value; }
-        }
+        private RankHistoryData rankHistory => Statistics.RankHistory;
 
         [JsonProperty("badges")]
         public Badge[] Badges;
