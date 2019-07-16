@@ -3,6 +3,7 @@
 
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Input;
 using osu.Framework.Input.Events;
 using osuTK;
 using osuTK.Input;
@@ -14,6 +15,8 @@ namespace osu.Game.Graphics.UserInterface
         protected virtual bool AllowCommit => false;
 
         public override bool HandleLeftRightArrows => false;
+
+        private InputManager inputManager;
 
         public SearchTextBox()
         {
@@ -31,6 +34,21 @@ namespace osu.Game.Graphics.UserInterface
             });
 
             PlaceholderText = "type to search";
+        }
+
+        protected override void LoadComplete()
+        {
+            inputManager = GetContainingInputManager();
+            base.LoadComplete();
+        }
+
+        protected override bool HandleAction(PlatformAction action)
+        {
+            // Allow shift-delete to be handled locally
+            if (inputManager.CurrentState.Keyboard.ShiftPressed && action.ActionType == PlatformActionType.CharNext && action.ActionMethod == PlatformActionMethod.Delete)
+                return false;
+
+            return base.HandleAction(action);
         }
 
         protected override bool OnKeyDown(KeyDownEvent e)
