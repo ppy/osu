@@ -162,7 +162,7 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
             private readonly TrailPart[] parts = new TrailPart[max_sprites];
             private Vector2 size;
 
-            private readonly VertexBatch<TexturedTrailVertex> vertexBatch = new QuadBatch<TexturedTrailVertex>(max_sprites, 1);
+            private readonly CustomBatch vertexBatch = new CustomBatch(max_sprites, 1);
 
             public TrailDrawNode(CursorTrail source)
                 : base(source)
@@ -197,20 +197,14 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
                 for (int i = 0; i < parts.Length; ++i)
                 {
                     Vector2 pos = parts[i].Position;
-                    float localTime = parts[i].Time;
+                    vertexBatch.DrawTime = parts[i].Time;
 
                     DrawQuad(
                         texture,
                         new Quad(pos.X - size.X / 2, pos.Y - size.Y / 2, size.X, size.Y),
                         DrawColourInfo.Colour,
                         null,
-                        v => vertexBatch.Add(new TexturedTrailVertex
-                        {
-                            Position = v.Position,
-                            TexturePosition = v.TexturePosition,
-                            Time = localTime + 1,
-                            Colour = v.Colour,
-                        }));
+                        vertexBatch.AddAction);
                 }
 
                 shader.Unbind();
@@ -221,6 +215,27 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
                 base.Dispose(isDisposing);
 
                 vertexBatch.Dispose();
+            }
+
+            private class CustomBatch : QuadBatch<TexturedTrailVertex>
+            {
+                public new readonly Action<TexturedVertex2D> AddAction;
+
+                public float DrawTime;
+
+                public CustomBatch(int size, int maxBuffers)
+                    : base(size, maxBuffers)
+                {
+                    AddAction = add;
+                }
+
+                private void add(TexturedVertex2D vertex) => Add(new TexturedTrailVertex
+                {
+                    Position = vertex.Position,
+                    TexturePosition = vertex.TexturePosition,
+                    Time = DrawTime + 1,
+                    Colour = vertex.Colour,
+                });
             }
         }
 
