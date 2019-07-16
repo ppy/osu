@@ -20,6 +20,8 @@ namespace osu.Game.Screens.Select
         public readonly BeatmapDetails Details;
         public readonly BeatmapLeaderboard Leaderboard;
 
+        private bool isDummy => beatmap is DummyWorkingBeatmap;
+
         private WorkingBeatmap beatmap;
 
         public WorkingBeatmap Beatmap
@@ -27,25 +29,26 @@ namespace osu.Game.Screens.Select
             get => beatmap;
             set
             {
-                beatmap = value is DummyWorkingBeatmap ? null : value;
+                beatmap = value;
 
-                if (beatmap != null)
-                {
-                    updateComponents();
-                    this.FadeIn(fade_duration);
-                }
-                else
+                if (isDummy)
                 {
                     this.FadeOut(fade_duration)
                         .OnComplete(_ => updateComponents());
+                }
+                else
+                {
+                    updateComponents();
+                    this.FadeIn(fade_duration);
                 }
             }
         }
 
         private void updateComponents()
         {
-            Leaderboard.Beatmap = beatmap?.BeatmapInfo;
-            Details.Beatmap = beatmap?.BeatmapInfo;
+            var beatmapInfo = isDummy ? null : beatmap?.BeatmapInfo;
+            Leaderboard.Beatmap = beatmapInfo;
+            Details.Beatmap = beatmapInfo;
         }
 
         public BeatmapDetailArea()
