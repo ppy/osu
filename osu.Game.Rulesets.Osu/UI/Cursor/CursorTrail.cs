@@ -162,7 +162,7 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
             private readonly TrailPart[] parts = new TrailPart[max_sprites];
             private Vector2 size;
 
-            private readonly CustomBatch vertexBatch = new CustomBatch(max_sprites, 1);
+            private readonly TrailBatch vertexBatch = new TrailBatch(max_sprites, 1);
 
             public TrailDrawNode(CursorTrail source)
                 : base(source)
@@ -196,8 +196,9 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
 
                 for (int i = 0; i < parts.Length; ++i)
                 {
-                    Vector2 pos = parts[i].Position;
                     vertexBatch.DrawTime = parts[i].Time;
+
+                    Vector2 pos = parts[i].Position;
 
                     DrawQuad(
                         texture,
@@ -217,25 +218,23 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
                 vertexBatch.Dispose();
             }
 
-            private class CustomBatch : QuadBatch<TexturedTrailVertex>
+            // Todo: This shouldn't exist, but is currently used to reduce allocations by caching variable-capturing closures.
+            private class TrailBatch : QuadBatch<TexturedTrailVertex>
             {
                 public new readonly Action<TexturedVertex2D> AddAction;
-
                 public float DrawTime;
 
-                public CustomBatch(int size, int maxBuffers)
+                public TrailBatch(int size, int maxBuffers)
                     : base(size, maxBuffers)
                 {
-                    AddAction = add;
+                    AddAction = v => Add(new TexturedTrailVertex
+                    {
+                        Position = v.Position,
+                        TexturePosition = v.TexturePosition,
+                        Time = DrawTime + 1,
+                        Colour = v.Colour,
+                    });
                 }
-
-                private void add(TexturedVertex2D vertex) => Add(new TexturedTrailVertex
-                {
-                    Position = vertex.Position,
-                    TexturePosition = vertex.TexturePosition,
-                    Time = DrawTime + 1,
-                    Colour = vertex.Colour,
-                });
             }
         }
 
