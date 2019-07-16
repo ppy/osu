@@ -18,7 +18,7 @@ namespace osu.Game.Overlays.Profile.Header.Components
     {
         private Color4 accentColour = Color4.White;
 
-        public Bindable<User> User = new Bindable<User>();
+        public readonly Bindable<User> User = new Bindable<User>();
 
         public ProfileRulesetSelector()
         {

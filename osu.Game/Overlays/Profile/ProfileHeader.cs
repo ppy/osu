@@ -25,8 +25,8 @@ namespace osu.Game.Overlays.Profile
         private DimmedLoadingAnimation loadingAnimation;
         private readonly ProfileRulesetSelector rulesetSelector;
 
-        public Bindable<User> User = new Bindable<User>();
-        public Bindable<UserStatistics> Statistics = new Bindable<UserStatistics>();
+        public readonly Bindable<User> User = new Bindable<User>();
+        public readonly Bindable<UserStatistics> Statistics = new Bindable<UserStatistics>();
 
         public Bindable<RulesetInfo> Ruleset => rulesetSelector.Current;
 

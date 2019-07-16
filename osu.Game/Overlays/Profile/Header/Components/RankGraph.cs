@@ -31,7 +31,7 @@ namespace osu.Game.Overlays.Profile.Header.Components
 
         private KeyValuePair<int, int>[] ranks;
         private int dayIndex;
-        public Bindable<UserStatistics> Statistics = new Bindable<UserStatistics>();
+        public readonly Bindable<UserStatistics> Statistics = new Bindable<UserStatistics>();
 
         public RankGraph()
         {
