@@ -103,7 +103,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
             if (Attributes.GreatHitWindow <= 0)
                 return 0;
 
-            double predictedHitWindow = 200 / Attributes.StarRating;
+            double predictedHitWindow = Math.Pow(0.9, Attributes.StarRating) * 50;
 
             // Lots of arbitrary values from testing.
             // Considering to use derivation from perfect accuracy in a probabilistic manner - assume normal distribution
