@@ -81,8 +81,14 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
             if (Attributes.MaxCombo > 0)
                 strainValue *= Math.Min(Math.Pow(Score.MaxCombo, 0.5) / Math.Pow(Attributes.MaxCombo, 0.5), 1.0);
 
-            if (mods.Any(m => m is ModHidden))
-                strainValue *= 1.025;
+            if (mods.Any(m => m is ModHidden)) {
+                if (mods.Any(m => m is ModEasy))
+                    strainValue *= 1.01;
+                else if (mods.Any(m => m is ModHardRock))
+                    strainValue *= 1.04;
+                else
+                    strainValue *= 1.025;
+            }
 
             if (mods.Any(m => m is ModFlashlight<TaikoHitObject>))
                 // Apply length bonus again if flashlight is on simply because it becomes a lot harder on longer maps.
@@ -97,9 +103,11 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
             if (Attributes.GreatHitWindow <= 0)
                 return 0;
 
+            double predictedHitWindow = 200 / Attributes.StarRating;
+
             // Lots of arbitrary values from testing.
             // Considering to use derivation from perfect accuracy in a probabilistic manner - assume normal distribution
-            double accValue = Math.Pow(150.0 / Attributes.GreatHitWindow, 1.1) * Math.Pow(Score.Accuracy, 15) * 22.0;
+            double accValue = predictedHitWindow / Attributes.GreatHitWindow * Math.Pow(150.0 / Attributes.GreatHitWindow, 1.1) * Math.Pow(Score.Accuracy, 15) * 22.0;
 
             // Bonus for many hitcircles - it's harder to keep good accuracy up for longer
             accValue *= Math.Min(1.15, Math.Pow(totalHits / 1500.0, 0.3));

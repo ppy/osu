@@ -2,11 +2,9 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Linq;
 using System.Collections.Generic;
 using osu.Game.Rulesets.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Difficulty.Skills;
-using osu.Game.Rulesets.Taiko.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Taiko.Objects;
 
 namespace osu.Game.Rulesets.Taiko.Difficulty.Skills
@@ -16,16 +14,17 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Skills
         protected override double SkillMultiplier => 1;
         protected override double StrainDecayBase => strainDecay * 0.3;
 
-        private const int maxPatternLength = 15;
+        private const int max_pattern_length = 15;
 
         private double strainDecay = 1.0;
 
         private string lastNotes = "";
-        // Pattern occurences. An optimization is possible using bitarrays instead of strings.
-        private Dictionary<string, int>[] patternOccur = new Dictionary<string, int>[2] { new Dictionary<string, int>(), new Dictionary<string, int>() };
 
-        private double[] previousDeltas = new double[maxPatternLength];
-        private int noteNum = 0;
+        // Pattern occurences. An optimization is possible using bitarrays instead of strings.
+        private readonly Dictionary<string, int>[] patternOccur = new Dictionary<string, int>[] { new Dictionary<string, int>(), new Dictionary<string, int>() };
+
+        private readonly double[] previousDeltas = new double[max_pattern_length];
+        private int noteNum;
 
         protected override double StrainValueOf(DifficultyHitObject current)
         {
@@ -41,15 +40,18 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Skills
 
             double deltaSum = current.DeltaTime;
             int deltaCount = 1;
-            for (var i = 1; i < maxPatternLength; i++)
+
+            for (var i = 1; i < max_pattern_length; i++)
             {
                 if (previousDeltas[i - 1] != 0.0)
                 {
                     deltaCount++;
                     deltaSum += previousDeltas[i - 1];
                 }
+
                 previousDeltas[i] = previousDeltas[i - 1];
             }
+
             previousDeltas[0] = current.DeltaTime;
 
             // Use last N notes instead of last 1 note for determining pattern speed. Especially affects 1/8 doubles. TODO account more for recent notes?
@@ -64,7 +66,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Skills
                 patternsEndingWithSameNoteType[lastNotes.Substring(lastNotes.Length - i)] = noteNum;
 
             // Forget oldest note
-            if (lastNotes.Length == maxPatternLength)
+            if (lastNotes.Length == max_pattern_length)
                 lastNotes = lastNotes.Substring(1);
             // Remember latest note
             lastNotes += isRim ? 'k' : 'd';
@@ -82,14 +84,16 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Skills
                 var pattern = lastNotes.Substring(lastNotes.Length - i);
 
                 // How well is the pattern remembered
-                double[] memory = new double[2] { 0.0, 0.0 };
-                for (var j = 0; j < 2; j++) {
+                double[] memory = new double[2];
+
+                for (var j = 0; j < 2; j++)
+                {
                     int n = 0;
                     patternOccur[j].TryGetValue(pattern, out n);
                     memory[j] = Math.Pow(0.99, noteNum - n);
                 }
 
-                double[] weight = new double[2] { 0.0, 0.0 };
+                double[] weight = new double[2];
                 for (var j = 0; j < 2; j++)
                     weight[j] = Math.Pow(1.1, i) * Math.Pow(memory[j], 5);
 
