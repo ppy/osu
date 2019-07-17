@@ -23,34 +23,25 @@ namespace osu.Game.Overlays
     {
         public const float CONTENT_X_MARGIN = 70;
 
+        protected ProfileHeader Header;
+
         private ProfileSection lastSection;
         private ProfileSection[] sections;
         private GetUserRequest userReq;
-        protected ProfileHeader Header;
         private ProfileSectionsContainer sectionsContainer;
         private ProfileTabControl tabs;
 
-        private Bindable<User> displayedUser;
-        private Bindable<UserStatistics> statistics;
+        [Resolved]
+        private RulesetStore rulesets { get; set; }
 
-        public void ShowUser(long userId) => ShowUser(new User { Id = userId });
+        private readonly Bindable<User> displayedUser = new Bindable<User>();
+        private readonly Bindable<RulesetInfo> displayedRuleset = new Bindable<RulesetInfo>();
 
-        public void ShowUser(User user, bool fetchOnline = true)
+        private readonly Bindable<UserStatistics> statistics = new Bindable<UserStatistics>();
+
+        [BackgroundDependencyLoader]
+        private void load()
         {
-            if (user == User.SYSTEM_USER)
-                return;
-
-            Show();
-
-            if (user.Id == displayedUser?.Value?.Id)
-                return;
-
-            userReq?.Cancel();
-            Clear();
-            displayedUser = new Bindable<User>();
-            statistics = new Bindable<UserStatistics>();
-            lastSection = null;
-
             sections = new ProfileSection[]
             {
                 //new AboutSection(),
@@ -62,34 +53,46 @@ namespace osu.Game.Overlays
                 new KudosuSection()
             };
 
-            tabs = new ProfileTabControl
+            AddRange(new Drawable[]
             {
-                RelativeSizeAxes = Axes.X,
-                Anchor = Anchor.TopCentre,
-                Origin = Anchor.TopCentre,
-                Height = 30
-            };
-
-            Add(new Box
-            {
-                RelativeSizeAxes = Axes.Both,
-                Colour = OsuColour.Gray(0.1f)
-            });
-
-            Add(sectionsContainer = new ProfileSectionsContainer
-            {
-                ExpandableHeader = Header = new ProfileHeader
+                new Box
                 {
-                    User = { BindTarget = displayedUser },
-                    Statistics = { BindTarget = statistics },
+                    RelativeSizeAxes = Axes.Both,
+                    Colour = OsuColour.Gray(0.1f)
                 },
-                FixedHeader = tabs,
-                HeaderBackground = new Box
+                sectionsContainer = new ProfileSectionsContainer
                 {
-                    Colour = OsuColour.Gray(34),
-                    RelativeSizeAxes = Axes.Both
-                },
+                    ExpandableHeader = Header = new ProfileHeader
+                    {
+                        User = { BindTarget = displayedUser },
+                        Statistics = { BindTarget = statistics },
+                    },
+                    FixedHeader = tabs = new ProfileTabControl
+                    {
+                        RelativeSizeAxes = Axes.X,
+                        Anchor = Anchor.TopCentre,
+                        Origin = Anchor.TopCentre,
+                        Height = 30
+                    },
+                    HeaderBackground = new Box
+                    {
+                        Colour = OsuColour.Gray(34),
+                        RelativeSizeAxes = Axes.Both
+                    },
+                }
             });
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            foreach (var sec in sections)
+            {
+                sec.Ruleset.BindTo(displayedRuleset);
+                sec.User.BindTo(displayedUser);
+            }
+
             sectionsContainer.SelectedSection.ValueChanged += section =>
             {
                 if (lastSection != section.NewValue)
@@ -116,41 +119,23 @@ namespace osu.Game.Overlays
                 }
             };
 
-            if (fetchOnline)
+            displayedRuleset.ValueChanged += r =>
             {
-                fetchOnlineUser(user.Id);
-            }
-            else
+                if (Header != null)
+                    Header.Ruleset.Value = r.NewValue;
+            };
+
+            displayedUser.ValueChanged += u =>
             {
-                userLoadComplete(user);
-            }
+                lastSection = null;
 
-            sectionsContainer.ScrollToTop();
-        }
+                sectionsContainer.Clear(false);
+                tabs.Clear();
 
-        private void onRulesetChanged(RulesetInfo ruleset)
-        {
-            if (displayedUser.Value != null)
-            {
-                Header.Loading = true;
-                fetchOnlineUser(displayedUser.Value.Id, ruleset);
-            }
-        }
+                var user = u.NewValue;
 
-        private void fetchOnlineUser(long userId, RulesetInfo ruleset = null)
-        {
-            userReq?.Cancel();
+                if (user == null) return;
 
-            userReq = new GetUserRequest(userId, ruleset);
-            userReq.Success += userLoadComplete;
-            API.Queue(userReq);
-        }
-
-        private void userLoadComplete(User user)
-        {
-            // New user has been loaded
-            if (displayedUser.Value?.Id != user.Id)
-            {
                 if (user.ProfileOrder != null)
                 {
                     foreach (string id in user.ProfileOrder)
@@ -166,18 +151,64 @@ namespace osu.Game.Overlays
                         }
                     }
                 }
+            };
 
-                displayedUser.Value = user;
-                Header.Ruleset.BindValueChanged(ruleset => onRulesetChanged(ruleset.NewValue));
+            Header.Ruleset.ValueChanged += headerRulesetChanged;
+        }
 
-                foreach (var sec in sections)
-                    sec.Ruleset.BindTo(Header.Ruleset);
-            }
+        public void ShowUser(long userId) => ShowUser(new User { Id = userId });
+
+        public void ShowUser(User user, bool fetchOnline = true)
+        {
+            if (user == User.SYSTEM_USER)
+                return;
+
+            Show();
+
+            if (user.Id == displayedUser.Value?.Id)
+                return;
+
+            if (fetchOnline)
+                fetchOnlineUser(user.Id);
             else
-            {
-                Header.Loading = false;
-                statistics.Value = user.Statistics;
-            }
+                userLoadComplete(user);
+
+            sectionsContainer.ScrollToTop();
+        }
+
+        private void fetchOnlineUser(long userId, RulesetInfo ruleset = null)
+        {
+            Header.Loading = true;
+
+            userReq?.Cancel();
+
+            if (userId != displayedUser.Value?.Id)
+                displayedUser.Value = null;
+            displayedRuleset.Value = ruleset;
+
+            userReq = new GetUserRequest(userId, ruleset);
+            userReq.Success += userLoadComplete;
+            API.Queue(userReq);
+        }
+
+        private void userLoadComplete(User user)
+        {
+            displayedUser.Value = user;
+            if (displayedRuleset.Value == null)
+                displayedRuleset.Value = user.GetDefaultRuleset(rulesets);
+            statistics.Value = user.Statistics;
+
+            Header.Loading = false;
+        }
+
+        private void headerRulesetChanged(ValueChangedEvent<RulesetInfo> ruleset)
+        {
+            if (displayedUser.Value == null || ruleset.NewValue == null) return;
+
+            // avoid feedback from ruleset selector on initial update.
+            if (ruleset.NewValue.Equals(displayedRuleset.Value)) return;
+
+            fetchOnlineUser(displayedUser.Value.Id, ruleset.NewValue);
         }
 
         private class ProfileTabControl : OverlayTabControl<ProfileSection>

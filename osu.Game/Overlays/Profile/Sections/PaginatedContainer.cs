@@ -25,9 +25,11 @@ namespace osu.Game.Overlays.Profile.Sections
 
         protected readonly Bindable<User> User = new Bindable<User>();
 
-        protected IAPIProvider Api;
-        protected APIRequest RetrievalRequest;
-        protected RulesetStore Rulesets;
+        [Resolved]
+        protected RulesetStore Rulesets { get; private set; }
+
+        [Resolved]
+        protected IAPIProvider API { get; private set; }
 
         protected PaginatedContainer(Bindable<User> user, string header, string missing)
         {
@@ -68,14 +70,10 @@ namespace osu.Game.Overlays.Profile.Sections
             };
         }
 
-        [BackgroundDependencyLoader]
-        private void load(IAPIProvider api, RulesetStore rulesets)
+        protected override void LoadComplete()
         {
-            Api = api;
-            Rulesets = rulesets;
-
-            User.ValueChanged += onUserChanged;
-            User.TriggerChange();
+            base.LoadComplete();
+            User.BindValueChanged(onUserChanged, true);
         }
 
         private void onUserChanged(ValueChangedEvent<User> e)

@@ -85,7 +85,7 @@ namespace osu.Game.Tests.Visual.Online
             AddStep("Show null dummy", () => profile.ShowUser(new User
             {
                 Username = @"Null",
-                Id = 1,
+                Id = 0,
             }, false));
 
             AddStep("Show ppy", () => profile.ShowUser(new User

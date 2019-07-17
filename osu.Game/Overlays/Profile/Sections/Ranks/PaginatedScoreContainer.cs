@@ -47,7 +47,8 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
             ItemsContainer.Clear();
 
             MoreButton.IsLoading = true;
-            ShowMore();
+            if (r.NewValue != null)
+                ShowMore();
         }
 
         protected override void ShowMore()
@@ -91,7 +92,7 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
                 });
             });
 
-            Api.Queue(request);
+            API.Queue(request);
         }
 
         protected override void Dispose(bool isDisposing)

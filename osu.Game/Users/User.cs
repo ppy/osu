@@ -6,10 +6,11 @@ using System.ComponentModel;
 using System.Linq;
 using Newtonsoft.Json;
 using osu.Framework.Bindables;
+using osu.Game.Rulesets;
 
 namespace osu.Game.Users
 {
-    public class User
+    public class User : IEquatable<User>
     {
         [JsonProperty(@"id")]
         public long Id = 1;
@@ -131,6 +132,9 @@ namespace osu.Game.Users
         [JsonProperty(@"playmode")]
         public string PlayMode;
 
+        public RulesetInfo GetDefaultRuleset(RulesetStore rulesets) =>
+            rulesets.GetRuleset(PlayMode ?? "osu");
+
         [JsonProperty(@"profile_order")]
         public string[] ProfileOrder;
 
@@ -180,6 +184,8 @@ namespace osu.Game.Users
         }
 
         public override string ToString() => Username;
+
+        public bool Equals(User other) => Id == other?.Id;
 
         /// <summary>
         /// A user instance for displaying locally created system messages.

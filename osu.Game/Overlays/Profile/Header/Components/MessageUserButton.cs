@@ -52,8 +52,16 @@ namespace osu.Game.Overlays.Profile.Header.Components
                 userOverlay?.Hide();
                 chatOverlay?.Show();
             };
+        }
 
-            User.ValueChanged += e => Content.Alpha = !e.NewValue.PMFriendsOnly && apiProvider.LocalUser.Value.Id != e.NewValue.Id ? 1 : 0;
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            User.BindValueChanged(e =>
+            {
+                Content.Alpha = e.NewValue != null && !e.NewValue.PMFriendsOnly && apiProvider.LocalUser.Value.Id != e.NewValue.Id ? 1 : 0;
+            });
         }
     }
 }

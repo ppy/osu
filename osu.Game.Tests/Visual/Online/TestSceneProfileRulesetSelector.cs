@@ -34,7 +34,6 @@ namespace osu.Game.Tests.Visual.Online
             AddStep("set mania as default", () => selector.SetDefaultRuleset(new ManiaRuleset().RulesetInfo));
             AddStep("set taiko as default", () => selector.SetDefaultRuleset(new TaikoRuleset().RulesetInfo));
             AddStep("set catch as default", () => selector.SetDefaultRuleset(new CatchRuleset().RulesetInfo));
-            AddStep("select default ruleset", selector.SelectDefaultRuleset);
         }
     }
 }

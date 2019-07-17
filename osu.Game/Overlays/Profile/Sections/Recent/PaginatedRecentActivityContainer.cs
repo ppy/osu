@@ -42,7 +42,7 @@ namespace osu.Game.Overlays.Profile.Sections.Recent
                 }
             });
 
-            Api.Queue(request);
+            API.Queue(request);
         }
 
         protected override void Dispose(bool isDisposing)

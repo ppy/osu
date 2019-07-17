@@ -25,8 +25,6 @@ namespace osu.Game.Overlays.Profile.Header.Components
             TabContainer.Masking = false;
             TabContainer.Spacing = new Vector2(10, 0);
             AutoSizeAxes = Axes.Both;
-
-            User.BindValueChanged(onUserChanged);
         }
 
         [BackgroundDependencyLoader]
@@ -38,30 +36,22 @@ namespace osu.Game.Overlays.Profile.Header.Components
                 ((ProfileRulesetTabItem)tabItem).AccentColour = accentColour;
         }
 
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            User.BindValueChanged(onUserChanged, true);
+        }
+
         private void onUserChanged(ValueChangedEvent<User> user)
         {
-            SetDefaultRuleset(Rulesets.GetRuleset(user.NewValue.PlayMode ?? "osu"));
-            SelectDefaultRuleset();
+            SetDefaultRuleset(Rulesets.GetRuleset(user.NewValue?.PlayMode ?? "osu"));
         }
 
         public void SetDefaultRuleset(RulesetInfo ruleset)
         {
-            // Todo: This method shouldn't exist, but bindables don't provide the concept of observing a change to the default value
             foreach (TabItem<RulesetInfo> tabItem in TabContainer)
                 ((ProfileRulesetTabItem)tabItem).IsDefault = ((ProfileRulesetTabItem)tabItem).Value.ID == ruleset.ID;
-        }
-
-        public void SelectDefaultRuleset()
-        {
-            // Todo: This method shouldn't exist, but bindables don't provide the concept of observing a change to the default value
-            foreach (TabItem<RulesetInfo> tabItem in TabContainer)
-            {
-                if (((ProfileRulesetTabItem)tabItem).IsDefault)
-                {
-                    Current.Value = ((ProfileRulesetTabItem)tabItem).Value;
-                    return;
-                }
-            }
         }
 
         protected override TabItem<RulesetInfo> CreateTabItem(RulesetInfo value) => new ProfileRulesetTabItem(value)

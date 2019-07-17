@@ -66,7 +66,8 @@ namespace osu.Game.Overlays.Profile.Header
 
         private void updateDisplay(User user)
         {
-            var badges = user.Badges;
+            var badges = user?.Badges;
+
             badgeFlowContainer.Clear();
 
             if (badges?.Length > 0)

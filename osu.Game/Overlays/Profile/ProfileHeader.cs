@@ -28,7 +28,7 @@ namespace osu.Game.Overlays.Profile
         public readonly Bindable<User> User = new Bindable<User>();
         public readonly Bindable<UserStatistics> Statistics = new Bindable<UserStatistics>();
 
-        public Bindable<RulesetInfo> Ruleset => rulesetSelector.Current;
+        public readonly Bindable<RulesetInfo> Ruleset = new Bindable<RulesetInfo>();
 
         private bool loading;
 
@@ -56,7 +56,7 @@ namespace osu.Game.Overlays.Profile
                 Anchor = Anchor.TopRight,
                 Origin = Anchor.TopRight,
                 Margin = new MarginPadding { Top = 100, Right = 30 },
-                User = { BindTarget = User }
+                User = { BindTarget = User },
             });
 
             User.BindValueChanged(userChanged);
@@ -71,6 +71,13 @@ namespace osu.Game.Overlays.Profile
         private void load(OsuColour colours)
         {
             TabControl.AccentColour = colours.Seafoam;
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            rulesetSelector.Current.BindTo(Ruleset);
         }
 
         protected override Drawable CreateBackground() =>

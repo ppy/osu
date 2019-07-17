@@ -51,7 +51,7 @@ namespace osu.Game.Overlays.Profile.Sections.Beatmaps
                 }
             });
 
-            Api.Queue(request);
+            API.Queue(request);
         }
 
         protected override void Dispose(bool isDisposing)
