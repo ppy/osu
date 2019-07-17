@@ -68,7 +68,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
 
         private double computeStrainValue()
         {
-            double strainValue = Math.Pow(1.0 * Math.Max(1.0, Attributes.StarRating / 0.0075) - 4.0, 2.53) / 100000.0;
+            double strainValue = Math.Pow(Math.Max(1.0, Attributes.StarRating / 0.0075) - 4.0, 2.53) / 100000.0;
 
             // Longer maps are worth more
             double lengthBonus = 1 + 0.1f * Math.Min(1.0, totalHits / 1500.0);
@@ -104,8 +104,8 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
             // Bonus for many hitcircles - it's harder to keep good accuracy up for longer
             accValue *= Math.Min(1.15, Math.Pow(totalHits / 1500.0, 0.3));
 
-			// Scale with difficulty to tie better into std's pp system
-			return accValue * Math.Pow(1.3, Attributes.StarRating) / 10.0;
+            // Scale with difficulty to tie better into std's pp system
+            return accValue * Math.Pow(1.3, Attributes.StarRating) / 10.0;
         }
 
         private int totalHits => countGreat + countGood + countMeh + countMiss;
