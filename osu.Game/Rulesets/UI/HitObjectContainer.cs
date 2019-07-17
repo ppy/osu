@@ -37,8 +37,8 @@ namespace osu.Game.Rulesets.UI
             if (!(e.Child is DrawableHitObject hitObject))
                 return;
 
-            if (e.Kind == LifetimeBoundaryKind.End && e.Direction == LifetimeBoundaryCrossingDirection.Forward
-                || e.Kind == LifetimeBoundaryKind.Start && e.Direction == LifetimeBoundaryCrossingDirection.Backward)
+            if ((e.Kind == LifetimeBoundaryKind.End && e.Direction == LifetimeBoundaryCrossingDirection.Forward)
+                || (e.Kind == LifetimeBoundaryKind.Start && e.Direction == LifetimeBoundaryCrossingDirection.Backward))
             {
                 hitObject.OnKilled();
             }
