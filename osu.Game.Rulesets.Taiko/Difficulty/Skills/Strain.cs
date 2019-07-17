@@ -32,6 +32,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Skills
             // Sliders and spinners are optional to hit and thus are ignored
             if (!(current.LastObject is Hit))
                 return 0.0;
+
             // Decay known patterns
             noteNum++;
 
@@ -40,9 +41,9 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Skills
 
             double deltaSum = current.DeltaTime;
             int deltaCount = 1;
-            for(var i = 1; i < maxPatternLength; i++)
+            for (var i = 1; i < maxPatternLength; i++)
             {
-                if(previousDeltas[i - 1] != 0.0)
+                if (previousDeltas[i - 1] != 0.0)
                 {
                     deltaCount++;
                     deltaSum += previousDeltas[i - 1];
@@ -59,11 +60,11 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Skills
             // Remember patterns
             bool isRim = current.LastObject is RimHit;
             var patternsEndingWithSameNoteType = patternOccur[isRim ? 1 : 0];
-            for(var i = 1; i < lastNotes.Length; i++)
+            for (var i = 1; i < lastNotes.Length; i++)
                 patternsEndingWithSameNoteType[lastNotes.Substring(lastNotes.Length - i)] = noteNum;
 
             // Forget oldest note
-            if(lastNotes.Length == maxPatternLength)
+            if (lastNotes.Length == maxPatternLength)
                 lastNotes = lastNotes.Substring(1);
             // Remember latest note
             lastNotes += isRim ? 'k' : 'd';
@@ -76,24 +77,24 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Skills
             double chanceError = 0.0, chanceTotal = 0.0;
             bool isRim = current.LastObject is RimHit;
 
-            for(var i = 1; i < lastNotes.Length; i++)
+            for (var i = 1; i < lastNotes.Length; i++)
             {
                 var pattern = lastNotes.Substring(lastNotes.Length - i);
 
                 // How well is the pattern remembered
                 double[] memory = new double[2] { 0.0, 0.0 };
-                for(var j = 0; j < 2; j++) {
+                for (var j = 0; j < 2; j++) {
                     int n = 0;
                     patternOccur[j].TryGetValue(pattern, out n);
                     memory[j] = Math.Pow(0.99, noteNum - n);
                 }
 
                 double[] weight = new double[2] { 0.0, 0.0 };
-                for(var j = 0; j < 2; j++)
+                for (var j = 0; j < 2; j++)
                     weight[j] = Math.Pow(1.1, i) * Math.Pow(memory[j], 5);
 
                 // Only account for this if we remember something
-                if(memory[0] + memory[1] != 0.0)
+                if (memory[0] + memory[1] != 0.0)
                 {
                     chanceError += weight[isRim ? 0 : 1] * memory[isRim ? 0 : 1] / (memory[0] + memory[1]);
                     chanceTotal += weight[0] + weight[1];
@@ -101,7 +102,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Skills
             }
 
             // If we don't remember any patterns, chances are 50/50
-            if(chanceTotal == 0.0)
+            if (chanceTotal == 0.0)
             {
                 chanceTotal = 1.0;
                 chanceError = 0.5;
