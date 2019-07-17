@@ -7,7 +7,6 @@ using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.TypeExtensions;
-using osu.Framework.Graphics;
 using osu.Framework.Graphics.Primitives;
 using osu.Game.Audio;
 using osu.Game.Graphics;
@@ -202,12 +201,13 @@ namespace osu.Game.Rulesets.Objects.Drawables
         protected virtual double InitialLifetimeOffset => 10000;
 
         /// <summary>
-        /// Will called at least once after the <see cref="Drawable.LifetimeEnd"/> of this <see cref="DrawableHitObject"/> has been passed.
+        /// Will be called at least once after this <see cref="DrawableHitObject"/> has become not alive.
         /// </summary>
-        internal void OnLifetimeEnd()
+        public virtual void OnKilled()
         {
             foreach (var nested in NestedHitObjects)
-                nested.OnLifetimeEnd();
+                nested.OnKilled();
+
             UpdateResult(false);
         }
 
