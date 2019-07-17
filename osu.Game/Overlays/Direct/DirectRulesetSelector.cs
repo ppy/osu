@@ -32,7 +32,7 @@ namespace osu.Game.Overlays.Direct
         {
             base.LoadComplete();
 
-            Current.BindDisabledChanged(value => SelectedTab.FadeColour(value ? Color4.DarkGray : Color4.White, 200, Easing.OutQuint));
+            Current.BindDisabledChanged(value => SelectedTab.FadeColour(value ? Color4.DarkGray : Color4.White, 200, Easing.OutQuint), true);
         }
 
         protected override TabItem<RulesetInfo> CreateTabItem(RulesetInfo value) => new DirectRulesetTabItem(value);
