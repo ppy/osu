@@ -2,6 +2,8 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Linq;
+using System.Collections.Generic;
 using osu.Game.Rulesets.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Difficulty.Skills;
 using osu.Game.Rulesets.Taiko.Difficulty.Preprocessing;
@@ -11,85 +13,101 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Skills
 {
     public class Strain : Skill
     {
-        private const double rhythm_change_base_threshold = 0.2;
-        private const double rhythm_change_base = 2.0;
-
         protected override double SkillMultiplier => 1;
-        protected override double StrainDecayBase => 0.3;
+        protected override double StrainDecayBase => strainDecay * 0.3;
+		
+		private const int maxPatternLength = 15;
 
-        private ColourSwitch lastColourSwitch = ColourSwitch.None;
+		private double strainDecay = 1.0;
+		
+		private string lastNotes = "";
+		// Pattern occurences. An optimization is possible using bitarrays instead of strings.
+		private Dictionary<string, int>[] patternOccur = new Dictionary<string, int>[2] { new Dictionary<string, int>(), new Dictionary<string, int>() };
 
-        private int sameColourCount = 1;
+		private double[] previousDeltas = new double[maxPatternLength];
+		private int noteNum = 0;
 
         protected override double StrainValueOf(DifficultyHitObject current)
         {
-            double addition = 1;
+            // Sliders and spinners are optional to hit and thus are ignored
+            if (!(current.LastObject is Hit))
+				return 0.0;
+			// Decay known patterns
+			noteNum++;
 
-            // We get an extra addition if we are not a slider or spinner
-            if (current.LastObject is Hit && current.BaseObject is Hit && current.DeltaTime < 1000)
-            {
-                if (hasColourChange(current))
-                    addition += 0.75;
+			// Arbitrary values found by analyzing top plays of different people
+            double addition = 1.9 + 2.5 * colourChangeDifficulty(current);
 
-                if (hasRhythmChange(current))
-                    addition += 1;
-            }
-            else
-            {
-                lastColourSwitch = ColourSwitch.None;
-                sameColourCount = 1;
-            }
+			double deltaSum = current.DeltaTime;
+			int deltaCount = 1;
+			for(var i = 1; i < maxPatternLength; i++)
+			{
+				if(previousDeltas[i - 1] != 0.0)
+				{
+					deltaCount++;
+					deltaSum += previousDeltas[i - 1];
+				}
+				previousDeltas[i] = previousDeltas[i - 1];
+			}
+			previousDeltas[0] = current.DeltaTime;
 
-            double additionFactor = 1;
+			// Use last N notes instead of last 1 note for determining pattern speed. Especially affects 1/8 doubles. TODO account more for recent notes?
+			var normalizedDelta = deltaSum / deltaCount;
+			// Overwrite current.DeltaTime with normalizedDelta in Skill's strainDecay function
+			strainDecay = Math.Pow(Math.Pow(0.3, normalizedDelta / 1000.0), 1000.0 / Math.Max(current.DeltaTime, 1.0));
 
-            // Scale the addition factor linearly from 0.4 to 1 for DeltaTime from 0 to 50
-            if (current.DeltaTime < 50)
-                additionFactor = 0.4 + 0.6 * current.DeltaTime / 50;
+			// Remember patterns
+			bool isRim = current.LastObject is RimHit;
+			var patternsEndingWithSameNoteType = patternOccur[isRim ? 1 : 0];
+			for(var i = 1; i < lastNotes.Length; i++)
+				patternsEndingWithSameNoteType[lastNotes.Substring(lastNotes.Length - i)] = noteNum;
 
-            return additionFactor * addition;
+			// Forget oldest note
+			if(lastNotes.Length == maxPatternLength)
+				lastNotes = lastNotes.Substring(1);
+			// Remember latest note
+			lastNotes += isRim ? 'k' : 'd';
+			
+            return addition;
         }
 
-        private bool hasRhythmChange(DifficultyHitObject current)
+        private double colourChangeDifficulty(DifficultyHitObject current)
         {
-            // We don't want a division by zero if some random mapper decides to put two HitObjects at the same time.
-            if (current.DeltaTime == 0 || Previous.Count == 0 || Previous[0].DeltaTime == 0)
-                return false;
+			double chanceError = 0.0, chanceTotal = 0.0;
+			bool isRim = current.LastObject is RimHit;
 
-            double timeElapsedRatio = Math.Max(Previous[0].DeltaTime / current.DeltaTime, current.DeltaTime / Previous[0].DeltaTime);
+			for(var i = 1; i < lastNotes.Length; i++)
+			{
+				var pattern = lastNotes.Substring(lastNotes.Length - i);
 
-            if (timeElapsedRatio >= 8)
-                return false;
+				// How well is the pattern remembered
+				double[] memory = new double[2] { 0.0, 0.0 };
+				for(var j = 0; j < 2; j++) {
+					int n = 0;
+					patternOccur[j].TryGetValue(pattern, out n);
+					memory[j] = Math.Pow(0.99, noteNum - n);
+				}
 
-            double difference = Math.Log(timeElapsedRatio, rhythm_change_base) % 1.0;
+				double[] weight = new double[2] { 0.0, 0.0 };
+				for(var j = 0; j < 2; j++)
+					weight[j] = Math.Pow(1.1, i) * Math.Pow(memory[j], 5);
 
-            return difference > rhythm_change_base_threshold && difference < 1 - rhythm_change_base_threshold;
-        }
+				// Only account for this if we remember something
+				if(memory[0] + memory[1] != 0.0)
+				{
+					chanceError += weight[isRim ? 0 : 1] * memory[isRim ? 0 : 1] / (memory[0] + memory[1]);
+					chanceTotal += weight[0] + weight[1];
+				}
+			}
 
-        private bool hasColourChange(DifficultyHitObject current)
-        {
-            var taikoCurrent = (TaikoDifficultyHitObject)current;
+			// If we don't remember any patterns, chances are 50/50
+			if(chanceTotal == 0.0)
+			{
+				chanceTotal = 1.0;
+				chanceError = 0.5;
+			}
 
-            if (!taikoCurrent.HasTypeChange)
-            {
-                sameColourCount++;
-                return false;
-            }
-
-            var oldColourSwitch = lastColourSwitch;
-            var newColourSwitch = sameColourCount % 2 == 0 ? ColourSwitch.Even : ColourSwitch.Odd;
-
-            lastColourSwitch = newColourSwitch;
-            sameColourCount = 1;
-
-            // We only want a bonus if the parity of the color switch changes
-            return oldColourSwitch != ColourSwitch.None && oldColourSwitch != newColourSwitch;
-        }
-
-        private enum ColourSwitch
-        {
-            None,
-            Even,
-            Odd
+			return Math.Max(0, Math.Pow(chanceError / chanceTotal, 1.4));
         }
     }
 }
