@@ -88,7 +88,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Skills
 
                 for (var j = 0; j < 2; j++)
                 {
-                    int n = 0;
+                    int n;
                     patternOccur[j].TryGetValue(pattern, out n);
                     memory[j] = Math.Pow(0.99, noteNum - n);
                 }
