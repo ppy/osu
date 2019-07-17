@@ -221,11 +221,9 @@ namespace osu.Game.Screens.Select
         [BackgroundDependencyLoader(true)]
         private void load(BeatmapManager beatmaps, AudioManager audio, DialogOverlay dialog, OsuColour colours, SkinManager skins, ScoreManager scores)
         {
-            mods.BindTo(Mods);
-
             if (Footer != null)
             {
-                Footer.AddButton(new FooterButtonMods(mods), ModSelect);
+                Footer.AddButton(new FooterButtonMods { Current = mods }, ModSelect);
                 Footer.AddButton(new FooterButtonRandom { Action = triggerRandom });
                 Footer.AddButton(new FooterButtonOptions(), BeatmapOptions);
 
@@ -261,6 +259,13 @@ namespace osu.Game.Screens.Select
                         }));
                 });
             }
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            mods.BindTo(Mods);
         }
 
         private DependencyContainer dependencies;
