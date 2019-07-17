@@ -15,11 +15,11 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Skills
     {
         protected override double SkillMultiplier => 1;
         protected override double StrainDecayBase => strainDecay * 0.3;
-        
+
         private const int maxPatternLength = 15;
 
         private double strainDecay = 1.0;
-        
+
         private string lastNotes = "";
         // Pattern occurences. An optimization is possible using bitarrays instead of strings.
         private Dictionary<string, int>[] patternOccur = new Dictionary<string, int>[2] { new Dictionary<string, int>(), new Dictionary<string, int>() };
@@ -67,7 +67,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Skills
                 lastNotes = lastNotes.Substring(1);
             // Remember latest note
             lastNotes += isRim ? 'k' : 'd';
-            
+
             return addition;
         }
 
