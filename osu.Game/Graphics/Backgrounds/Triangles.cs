@@ -249,7 +249,7 @@ namespace osu.Game.Graphics.Backgrounds
             {
                 base.Dispose(isDisposing);
 
-                vertexBatch.Dispose();
+                vertexBatch?.Dispose();
             }
         }
 
