@@ -112,6 +112,7 @@
     <PackageReference Include="SharpRaven" Version="2.4.0" />
     <PackageReference Include="System.ComponentModel.Annotations" Version="4.5.0" />
     <PackageReference Include="ppy.osu.Framework.NativeLibs" Version="2019.307.0" ExcludeAssets="all" />
+    <!--Workaround for https://github.com/ppy/osu/issues/5392-->
     <PackageReference Include="System.Threading.Tasks.Extensions" Version="4.5.0" />
   </ItemGroup>
 </Project>
