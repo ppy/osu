@@ -19,8 +19,8 @@ namespace osu.Game.Overlays.Profile.Sections
         protected BeatmapMetadataContainer(BeatmapInfo beatmap)
         {
             this.beatmap = beatmap;
+
             AutoSizeAxes = Axes.Both;
-            TooltipText = $"{beatmap.Metadata.Artist} - {beatmap.Metadata.Title}";
         }
 
         [BackgroundDependencyLoader(true)]
