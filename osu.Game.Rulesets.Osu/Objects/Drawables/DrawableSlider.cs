@@ -156,6 +156,12 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             }
         }
 
+        public override void OnKilled()
+        {
+            base.OnKilled();
+            Body.RecyclePath();
+        }
+
         protected override void SkinChanged(ISkinSource skin, bool allowFallback)
         {
             base.SkinChanged(skin, allowFallback);
