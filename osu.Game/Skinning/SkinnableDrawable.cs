@@ -84,7 +84,6 @@ namespace osu.Game.Skinning
                 scaling.Invalidate();
                 Drawable.Origin = Anchor.Centre;
                 Drawable.Anchor = Anchor.Centre;
-
                 InternalChild = Drawable;
             }
             else
@@ -97,21 +96,31 @@ namespace osu.Game.Skinning
 
             if (!scaling.IsValid)
             {
-                if (Drawable != null && confineMode != ConfineMode.NoScaling && (!isDefault || ApplySizeRestrictionsToDefault))
+                try
                 {
-                    bool applyScaling = confineMode == ConfineMode.ScaleToFit ||
-                                        (confineMode == ConfineMode.ScaleDownToFit && (Drawable.DrawSize.X > DrawSize.X || Drawable.DrawSize.Y > DrawSize.Y));
+                    if (Drawable == null || (isDefault && !ApplySizeRestrictionsToDefault)) return;
 
-                    if (applyScaling)
+                    switch (confineMode)
                     {
-                        Drawable.RelativeSizeAxes = Axes.Both;
-                        Drawable.Size = Vector2.One;
-                        Drawable.Scale = Vector2.One;
-                        Drawable.FillMode = FillMode.Fit;
-                    }
-                }
+                        case ConfineMode.NoScaling:
+                            return;
 
-                scaling.Validate();
+                        case ConfineMode.ScaleDownToFit:
+                            if (Drawable.DrawSize.X <= DrawSize.X && Drawable.DrawSize.Y <= DrawSize.Y)
+                                return;
+
+                            break;
+                    }
+
+                    Drawable.RelativeSizeAxes = Axes.Both;
+                    Drawable.Size = Vector2.One;
+                    Drawable.Scale = Vector2.One;
+                    Drawable.FillMode = FillMode.Fit;
+                }
+                finally
+                {
+                    scaling.Validate();
+                }
             }
         }
     }
