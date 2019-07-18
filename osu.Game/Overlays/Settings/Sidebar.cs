@@ -44,11 +44,8 @@ namespace osu.Game.Overlays.Settings
 
             foreach (var button in TabContainer.Children)
             {
-                if (button == null)
-                    continue;
-
-                (button as SidebarButton).OnHoverAction += queueExpandIfHovering;
-                (button as SidebarButton).OnHoverLostAction += tab =>
+                ((SidebarButton)button).OnHoverAction += queueExpandIfHovering;
+                ((SidebarButton)button).OnHoverLostAction += tab =>
                 {
                     if (hoveredButton == button)
                         cancelExpandEvent();
