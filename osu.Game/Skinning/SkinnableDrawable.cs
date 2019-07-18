@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using osu.Framework.Caching;
 using osu.Framework.Graphics;
 using osuTK;
 
@@ -55,6 +56,10 @@ namespace osu.Game.Skinning
 
         private readonly Func<string, T> createDefault;
 
+        private readonly Cached scaling = new Cached();
+
+        private bool isDefault;
+
         protected virtual T CreateDefault(string name) => createDefault(name);
 
         /// <summary>
@@ -66,7 +71,7 @@ namespace osu.Game.Skinning
         {
             Drawable = skin.GetDrawableComponent(componentName);
 
-            bool isDefault = false;
+            isDefault = false;
 
             if (Drawable == null && allowFallback)
             {
@@ -76,7 +81,23 @@ namespace osu.Game.Skinning
 
             if (Drawable != null)
             {
-                if (confineMode != ConfineMode.NoScaling && (!isDefault || ApplySizeRestrictionsToDefault))
+                scaling.Invalidate();
+                Drawable.Origin = Anchor.Centre;
+                Drawable.Anchor = Anchor.Centre;
+
+                InternalChild = Drawable;
+            }
+            else
+                ClearInternal();
+        }
+
+        protected override void Update()
+        {
+            base.Update();
+
+            if (!scaling.IsValid)
+            {
+                if (Drawable != null && confineMode != ConfineMode.NoScaling && (!isDefault || ApplySizeRestrictionsToDefault))
                 {
                     bool applyScaling = confineMode == ConfineMode.ScaleToFit ||
                                         (confineMode == ConfineMode.ScaleDownToFit && (Drawable.DrawSize.X > DrawSize.X || Drawable.DrawSize.Y > DrawSize.Y));
@@ -90,13 +111,8 @@ namespace osu.Game.Skinning
                     }
                 }
 
-                Drawable.Origin = Anchor.Centre;
-                Drawable.Anchor = Anchor.Centre;
-
-                InternalChild = Drawable;
+                scaling.Validate();
             }
-            else
-                ClearInternal();
         }
     }
 
