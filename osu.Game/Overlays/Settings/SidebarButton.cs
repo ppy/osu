@@ -1,7 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
 using osuTK;
 using osuTK.Graphics;
 using osu.Framework.Allocation;
@@ -13,63 +12,35 @@ using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Events;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
+using System;
 using osu.Game.Graphics.UserInterface;
 
 namespace osu.Game.Overlays.Settings
 {
-    public class SidebarButton : Button
+    public class SidebarButton : TabItem<SettingsSection>
     {
-        private readonly SpriteIcon drawableIcon;
-        private readonly SpriteText headerText;
         private readonly Box selectionIndicator;
+        private readonly Box background;
         private readonly Container text;
-        public new Action<SettingsSection> Action;
 
-        private SettingsSection section;
+        public Action<SidebarButton> OnHoverAction;
+        public Action<SidebarButton> OnHoverLostAction;
 
-        public SettingsSection Section
+        public SidebarButton(SettingsSection section)
+            : base(section)
         {
-            get => section;
-            set
-            {
-                section = value;
-                headerText.Text = value.Header;
-                drawableIcon.Icon = value.Icon;
-            }
-        }
-
-        private bool selected;
-
-        public bool Selected
-        {
-            get => selected;
-            set
-            {
-                selected = value;
-
-                if (selected)
-                {
-                    selectionIndicator.FadeIn(50);
-                    text.FadeColour(Color4.White, 50);
-                }
-                else
-                {
-                    selectionIndicator.FadeOut(50);
-                    text.FadeColour(OsuColour.Gray(0.6f), 50);
-                }
-            }
-        }
-
-        public SidebarButton()
-        {
-            BackgroundColour = OsuColour.Gray(60);
-            Background.Alpha = 0;
-
             Height = Sidebar.DEFAULT_WIDTH;
             RelativeSizeAxes = Axes.X;
+            Masking = true;
 
-            AddRange(new Drawable[]
+            Children = new Drawable[]
             {
+                background = new Box
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Colour = OsuColour.Gray(60),
+                    Alpha = 0,
+                },
                 text = new Container
                 {
                     Width = Sidebar.DEFAULT_WIDTH,
@@ -77,17 +48,19 @@ namespace osu.Game.Overlays.Settings
                     Colour = OsuColour.Gray(0.6f),
                     Children = new Drawable[]
                     {
-                        headerText = new OsuSpriteText
+                        new OsuSpriteText
                         {
                             Position = new Vector2(Sidebar.DEFAULT_WIDTH + 10, 0),
                             Anchor = Anchor.CentreLeft,
                             Origin = Anchor.CentreLeft,
+                            Text = section.Header,
                         },
-                        drawableIcon = new SpriteIcon
+                        new SpriteIcon
                         {
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
                             Size = new Vector2(20),
+                            Icon = section.Icon,
                         },
                     }
                 },
@@ -100,7 +73,7 @@ namespace osu.Game.Overlays.Settings
                     Origin = Anchor.CentreRight,
                 },
                 new HoverClickSounds(HoverSampleSet.Loud),
-            });
+            };
         }
 
         [BackgroundDependencyLoader]
@@ -109,22 +82,30 @@ namespace osu.Game.Overlays.Settings
             selectionIndicator.Colour = colours.Yellow;
         }
 
-        protected override bool OnClick(ClickEvent e)
-        {
-            Action?.Invoke(section);
-            return base.OnClick(e);
-        }
-
         protected override bool OnHover(HoverEvent e)
         {
-            Background.FadeTo(0.4f, 200);
+            background.FadeTo(0.4f, 200);
+            OnHoverAction.Invoke(this);
             return base.OnHover(e);
         }
 
         protected override void OnHoverLost(HoverLostEvent e)
         {
-            Background.FadeTo(0, 200);
+            background.FadeTo(0, 200);
+            OnHoverLostAction.Invoke(this);
             base.OnHoverLost(e);
+        }
+
+        protected override void OnActivated()
+        {
+            selectionIndicator.FadeIn(50);
+            text.FadeColour(Color4.White, 50);
+        }
+
+        protected override void OnDeactivated()
+        {
+            selectionIndicator.FadeOut(50);
+            text.FadeColour(OsuColour.Gray(0.6f), 50);
         }
     }
 }

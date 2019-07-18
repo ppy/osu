@@ -1,91 +1,56 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
-using System.Linq;
-using osu.Framework;
-using osuTK;
-using osuTK.Graphics;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Shapes;
-using osu.Framework.Input.Events;
 using osu.Framework.Threading;
-using osu.Game.Graphics.Containers;
 using osu.Game.Overlays.Toolbar;
+using osu.Framework.Graphics.UserInterface;
 
 namespace osu.Game.Overlays.Settings
 {
-    public class Sidebar : Container<SidebarButton>, IStateful<ExpandedState>
+    public class Sidebar : TabControl<SettingsSection>
     {
-        private readonly FillFlowContainer<SidebarButton> content;
         public const float DEFAULT_WIDTH = ToolbarButton.WIDTH;
         public const int EXPANDED_WIDTH = 200;
 
-        public event Action<ExpandedState> StateChanged;
-
-        protected override Container<SidebarButton> Content => content;
+        protected override Dropdown<SettingsSection> CreateDropdown() => null;
 
         public Sidebar()
         {
-            RelativeSizeAxes = Axes.Y;
-            InternalChildren = new Drawable[]
+            AutoSizeAxes = Axes.Y;
+            Width = DEFAULT_WIDTH;
+
+            Current.BindValueChanged(tab => cancelExpandEvent());
+        }
+
+        protected override TabItem<SettingsSection> CreateTabItem(SettingsSection value) => new SidebarButton(value);
+
+        protected override TabFillFlowContainer CreateTabFlow() => new TabFillFlowContainer
+        {
+            AutoSizeAxes = Axes.Y,
+            RelativeSizeAxes = Axes.X,
+            Direction = FillDirection.Vertical,
+            AllowMultiline = true,
+        };
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            foreach (var button in TabContainer.Children)
             {
-                new Box
+                (button as SidebarButton).OnHoverAction += tab => queueExpandIfHovering(tab);
+                (button as SidebarButton).OnHoverLostAction += tab =>
                 {
-                    Colour = Color4.Black,
-                    RelativeSizeAxes = Axes.Both,
-                },
-                new SidebarScrollContainer
-                {
-                    Children = new[]
-                    {
-                        content = new FillFlowContainer<SidebarButton>
-                        {
-                            Origin = Anchor.CentreLeft,
-                            Anchor = Anchor.CentreLeft,
-                            AutoSizeAxes = Axes.Y,
-                            RelativeSizeAxes = Axes.X,
-                            Direction = FillDirection.Vertical,
-                        }
-                    }
-                },
-            };
+                    if (hoveredButton == button)
+                        cancelExpandEvent();
+                };
+            }
         }
 
         private ScheduledDelegate expandEvent;
         private ExpandedState state;
-
-        protected override bool OnHover(HoverEvent e)
-        {
-            queueExpandIfHovering();
-            return true;
-        }
-
-        protected override void OnHoverLost(HoverLostEvent e)
-        {
-            expandEvent?.Cancel();
-            lastHoveredButton = null;
-            State = ExpandedState.Contracted;
-
-            base.OnHoverLost(e);
-        }
-
-        protected override bool OnMouseMove(MouseMoveEvent e)
-        {
-            queueExpandIfHovering();
-            return base.OnMouseMove(e);
-        }
-
-        private class SidebarScrollContainer : OsuScrollContainer
-        {
-            public SidebarScrollContainer()
-            {
-                Content.Anchor = Anchor.CentreLeft;
-                Content.Origin = Anchor.CentreLeft;
-                RelativeSizeAxes = Axes.Both;
-            }
-        }
 
         public ExpandedState State
         {
@@ -101,28 +66,25 @@ namespace osu.Game.Overlays.Settings
                 switch (state)
                 {
                     default:
-                        this.ResizeTo(new Vector2(DEFAULT_WIDTH, Height), 500, Easing.OutQuint);
+                        this.ResizeWidthTo(DEFAULT_WIDTH, 500, Easing.OutQuint);
                         break;
 
                     case ExpandedState.Expanded:
-                        this.ResizeTo(new Vector2(EXPANDED_WIDTH, Height), 500, Easing.OutQuint);
+                        this.ResizeWidthTo(EXPANDED_WIDTH, 500, Easing.OutQuint);
                         break;
                 }
-
-                StateChanged?.Invoke(State);
             }
         }
 
-        private Drawable lastHoveredButton;
+        private SidebarButton lastHoveredButton;
+        private SidebarButton hoveredButton;
 
-        private Drawable hoveredButton => content.Children.FirstOrDefault(c => c.IsHovered);
-
-        private void queueExpandIfHovering()
+        private void queueExpandIfHovering(SidebarButton button)
         {
+            hoveredButton = button;
+
             // only expand when we hover a different button.
             if (lastHoveredButton == hoveredButton) return;
-
-            if (!IsHovered) return;
 
             if (State != ExpandedState.Expanded)
             {
@@ -131,6 +93,13 @@ namespace osu.Game.Overlays.Settings
             }
 
             lastHoveredButton = hoveredButton;
+        }
+
+        private void cancelExpandEvent()
+        {
+            expandEvent?.Cancel();
+            lastHoveredButton = null;
+            State = ExpandedState.Contracted;
         }
     }
 

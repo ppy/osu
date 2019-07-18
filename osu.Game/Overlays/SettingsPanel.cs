@@ -33,9 +33,9 @@ namespace osu.Game.Overlays
         protected override Container<Drawable> Content => ContentContainer;
 
         protected Sidebar Sidebar;
-        private SidebarButton selectedSidebarButton;
 
         protected SettingsSectionsContainer SectionsContainer;
+        private SettingsSection lastSection;
 
         private SearchTextBox searchTextBox;
 
@@ -100,13 +100,35 @@ namespace osu.Game.Overlays
 
             if (showSidebar)
             {
-                AddInternal(Sidebar = new Sidebar { Width = sidebar_width });
+                AddInternal(new SidebarScrollContainer
+                {
+                    Child = Sidebar = new Sidebar()
+                });
 
                 SectionsContainer.SelectedSection.ValueChanged += section =>
                 {
-                    selectedSidebarButton.Selected = false;
-                    selectedSidebarButton = Sidebar.Children.Single(b => b.Section == section.NewValue);
-                    selectedSidebarButton.Selected = true;
+                    if (lastSection != section.NewValue)
+                    {
+                        lastSection = section.NewValue;
+                        Sidebar.Current.Value = lastSection;
+                    }
+                };
+
+                Sidebar.Current.ValueChanged += section =>
+                {
+                    if (lastSection == null)
+                    {
+                        lastSection = SectionsContainer.Children.FirstOrDefault();
+                        if (lastSection != null)
+                            Sidebar.Current.Value = lastSection;
+                        return;
+                    }
+
+                    if (lastSection != section.NewValue)
+                    {
+                        lastSection = section.NewValue;
+                        SectionsContainer.ScrollTo(lastSection);
+                    }
                 };
             }
 
@@ -120,25 +142,7 @@ namespace osu.Game.Overlays
             SectionsContainer.Add(section);
 
             if (Sidebar != null)
-            {
-                var button = new SidebarButton
-                {
-                    Section = section,
-                    Action = s =>
-                    {
-                        SectionsContainer.ScrollTo(s);
-                        Sidebar.State = ExpandedState.Contracted;
-                    },
-                };
-
-                Sidebar.Add(button);
-
-                if (selectedSidebarButton == null)
-                {
-                    selectedSidebarButton = Sidebar.Children.First();
-                    selectedSidebarButton.Selected = true;
-                }
-            }
+                Sidebar.AddItem(section);
         }
 
         protected virtual Drawable CreateHeader() => new Container();
@@ -216,6 +220,29 @@ namespace osu.Game.Overlays
 
                 // no null check because the usage of this class is strict
                 HeaderBackground.Alpha = -ExpandableHeader.Y / ExpandableHeader.LayoutSize.Y * 0.5f;
+            }
+        }
+
+        private class SidebarScrollContainer : OsuScrollContainer
+        {
+            public SidebarScrollContainer()
+            {
+                RelativeSizeAxes = Axes.Y;
+                AutoSizeAxes = Axes.X;
+
+                Content.RelativeSizeAxes = Axes.None;
+                Content.AutoSizeAxes = Axes.Both;
+                Content.Anchor = Anchor.CentreLeft;
+                Content.Origin = Anchor.CentreLeft;
+
+                AddInternal(new Box
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Colour = Color4.Black,
+                    Depth = 1,
+                });
+
+                ScrollbarVisible = false;
             }
         }
     }
