@@ -49,7 +49,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Skills
             previousDeltas[noteType][0] = current.DeltaTime;
 
             // Use last N notes instead of last 1 note for determining pattern speed. Especially affects 1/8 doubles.
-            double normalizedDelta = deltaSum / deltaCount;
+            double normalizedDelta = Math.Max(deltaSum / deltaCount, 45); //Limit speed to 333bpm monocolor streams
 
             // Overwrite current.DeltaTime with normalizedDelta in Skill's strainDecay function
             strainDecay = Math.Pow(Math.Pow(0.3, normalizedDelta / 1000.0), 1000.0 / Math.Max(current.DeltaTime, 1.0));
