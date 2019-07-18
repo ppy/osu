@@ -13,7 +13,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
     {
         public const float DEFAULT_BORDER_SIZE = 1;
 
-        private readonly SliderPath path;
+        private SliderPath path;
+
         protected Path Path => path;
 
         public float PathRadius
@@ -75,6 +76,22 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
         protected SliderBody()
         {
             InternalChild = path = new SliderPath();
+        }
+
+        /// <summary>
+        /// Initialises a new <see cref="SliderPath"/>, releasing all resources retained by the old one.
+        /// </summary>
+        public void RecyclePath()
+        {
+            InternalChild = path = new SliderPath
+            {
+                Position = path.Position,
+                PathRadius = path.PathRadius,
+                AccentColour = path.AccentColour,
+                BorderColour = path.BorderColour,
+                BorderSize = path.BorderSize,
+                Vertices = path.Vertices
+            };
         }
 
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => path.ReceivePositionalInputAt(screenSpacePos);
