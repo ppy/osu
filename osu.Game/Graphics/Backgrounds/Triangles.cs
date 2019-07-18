@@ -137,11 +137,13 @@ namespace osu.Game.Graphics.Backgrounds
             }
         }
 
+        protected int AimCount;
+
         private void addTriangles(bool randomY)
         {
-            int aimTriangleCount = (int)(DrawWidth * DrawHeight * 0.002f / (triangleScale * triangleScale) * SpawnRatio);
+            AimCount = (int)(DrawWidth * DrawHeight * 0.002f / (triangleScale * triangleScale) * SpawnRatio);
 
-            for (int i = 0; i < aimTriangleCount - parts.Count; i++)
+            for (int i = 0; i < AimCount - parts.Count; i++)
                 parts.Add(createTriangle(randomY));
         }
 
@@ -190,11 +192,12 @@ namespace osu.Game.Graphics.Backgrounds
             private readonly List<TriangleParticle> parts = new List<TriangleParticle>();
             private Vector2 size;
 
-            private readonly LinearBatch<TexturedVertex2D> vertexBatch = new LinearBatch<TexturedVertex2D>(100 * 3, 10, PrimitiveType.Triangles);
+            private readonly LinearBatch<TexturedVertex2D> vertexBatch;
 
             public TrianglesDrawNode(Triangles source)
                 : base(source)
             {
+                vertexBatch = new LinearBatch<TexturedVertex2D>(source.AimCount * 3, 2, PrimitiveType.Triangles);
             }
 
             public override void ApplyState()
