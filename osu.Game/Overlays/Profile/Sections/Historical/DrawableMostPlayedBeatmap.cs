@@ -14,34 +14,45 @@ using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osuTK;
 using System.Collections.Generic;
+using osu.Framework.Graphics.Cursor;
 
 namespace osu.Game.Overlays.Profile.Sections.Historical
 {
     public class DrawableMostPlayedBeatmap : OsuHoverContainer
     {
-        private readonly Box background;
         private const int cover_width = 100;
         private const int corner_radius = 10;
-        private readonly SpriteIcon icon;
-        private readonly OsuSpriteText playCountText;
-        private readonly LinkFlowContainer mapper;
+
+        private readonly BeatmapInfo beatmap;
+        private readonly int playCount;
+
+        private Box background;
 
         protected override IEnumerable<Drawable> EffectTargets => new[] { background };
 
         public DrawableMostPlayedBeatmap(BeatmapInfo beatmap, int playCount)
         {
+            this.beatmap = beatmap;
+            this.playCount = playCount;
             Enabled.Value = true; //manually enabled, because we have no action
 
             RelativeSizeAxes = Axes.X;
-            Height = 60;
+            AutoSizeAxes = Axes.Y;
+
             Masking = true;
             CornerRadius = corner_radius;
+        }
+
+        [BackgroundDependencyLoader]
+        private void load(OsuColour colours)
+        {
+            IdleColour = colours.GreySeafoam;
+            HoverColour = colours.GreySeafoamLight;
+
             Children = new Drawable[]
             {
                 new UpdateableBeatmapSetCover
                 {
-                    Anchor = Anchor.CentreLeft,
-                    Origin = Anchor.CentreLeft,
                     RelativeSizeAxes = Axes.Y,
                     Width = cover_width,
                     BeatmapSet = beatmap.BeatmapSet,
@@ -49,69 +60,53 @@ namespace osu.Game.Overlays.Profile.Sections.Historical
                 },
                 new Container
                 {
-                    RelativeSizeAxes = Axes.Both,
+                    RelativeSizeAxes = Axes.X,
+                    AutoSizeAxes = Axes.Y,
                     Padding = new MarginPadding { Left = cover_width - corner_radius },
                     Children = new Drawable[]
                     {
                         new Container
                         {
-                            RelativeSizeAxes = Axes.Both,
+                            RelativeSizeAxes = Axes.X,
+                            AutoSizeAxes = Axes.Y,
                             Masking = true,
                             CornerRadius = corner_radius,
                             Children = new Drawable[]
                             {
-                                background = new Box
-                                {
-                                    RelativeSizeAxes = Axes.Both,
-                                },
+                                background = new Box { RelativeSizeAxes = Axes.Both },
                                 new Container
                                 {
-                                    RelativeSizeAxes = Axes.Both,
-                                    Padding = new MarginPadding { Left = 15, Right = 20 },
+                                    RelativeSizeAxes = Axes.X,
+                                    AutoSizeAxes = Axes.Y,
+                                    Padding = new MarginPadding(10),
                                     Children = new Drawable[]
                                     {
-                                        new MostPlayedBeatmapMetadataContainer(beatmap)
-                                        {
-                                            Anchor = Anchor.CentreLeft,
-                                            Origin = Anchor.BottomLeft,
-                                            Margin = new MarginPadding { Bottom = 2 },
-                                        },
-                                        mapper = new LinkFlowContainer(t => t.Font = OsuFont.GetFont(size: 15, weight: FontWeight.Regular))
-                                        {
-                                            Anchor = Anchor.CentreLeft,
-                                            Origin = Anchor.TopLeft,
-                                            AutoSizeAxes = Axes.Both,
-                                            Direction = FillDirection.Horizontal,
-                                            Margin = new MarginPadding { Top = 2 },
-                                        }.With(d =>
-                                        {
-                                            d.AddText("mapped by ");
-                                            d.AddUserLink(beatmap.Metadata.Author);
-                                        }),
                                         new FillFlowContainer
                                         {
-                                            Anchor = Anchor.CentreRight,
-                                            Origin = Anchor.CentreRight,
+                                            Anchor = Anchor.CentreLeft,
+                                            Origin = Anchor.CentreLeft,
                                             AutoSizeAxes = Axes.Both,
-                                            Direction = FillDirection.Horizontal,
+                                            Direction = FillDirection.Vertical,
                                             Children = new Drawable[]
                                             {
-                                                icon = new SpriteIcon
+                                                new MostPlayedBeatmapMetadataContainer(beatmap),
+                                                new LinkFlowContainer(t => t.Font = OsuFont.GetFont(size: 12, weight: FontWeight.Regular))
                                                 {
-                                                    Icon = FontAwesome.Solid.CaretRight,
-                                                    Origin = Anchor.Centre,
-                                                    Anchor = Anchor.Centre,
-                                                    Size = new Vector2(20),
-                                                },
-                                                playCountText = new OsuSpriteText
+                                                    AutoSizeAxes = Axes.Both,
+                                                    Direction = FillDirection.Horizontal,
+                                                    Colour = colours.GreySeafoamLighter
+                                                }.With(d =>
                                                 {
-                                                    Origin = Anchor.Centre,
-                                                    Anchor = Anchor.Centre,
-                                                    Text = playCount.ToString(),
-                                                    Font = OsuFont.GetFont(size: 30, weight: FontWeight.Regular, fixedWidth: true),
-                                                },
+                                                    d.AddText("mapped by ");
+                                                    d.AddUserLink(beatmap.Metadata.Author);
+                                                }),
                                             }
-                                        }
+                                        },
+                                        new PlayCountText(playCount)
+                                        {
+                                            Anchor = Anchor.CentreRight,
+                                            Origin = Anchor.CentreRight
+                                        },
                                     }
                                 },
                             }
@@ -119,15 +114,6 @@ namespace osu.Game.Overlays.Profile.Sections.Historical
                     }
                 }
             };
-        }
-
-        [BackgroundDependencyLoader]
-        private void load(OsuColour colors)
-        {
-            IdleColour = colors.GreySeafoam;
-            HoverColour = colors.GreySeafoamLight;
-            mapper.Colour = colors.GreySeafoamLighter;
-            icon.Colour = playCountText.Colour = colors.Yellow;
         }
 
         private class MostPlayedBeatmapMetadataContainer : BeatmapMetadataContainer
@@ -144,14 +130,55 @@ namespace osu.Game.Overlays.Profile.Sections.Historical
                     Text = new LocalisedString((
                         $"{beatmap.Metadata.TitleUnicode ?? beatmap.Metadata.Title} [{beatmap.Version}] ",
                         $"{beatmap.Metadata.Title ?? beatmap.Metadata.TitleUnicode} [{beatmap.Version}] ")),
-                    Font = OsuFont.GetFont(size: 20, weight: FontWeight.Bold)
+                    Font = OsuFont.GetFont(weight: FontWeight.Bold)
                 },
                 new OsuSpriteText
                 {
                     Text = "by " + new LocalisedString((beatmap.Metadata.ArtistUnicode, beatmap.Metadata.Artist)),
-                    Font = OsuFont.GetFont(size: 20, weight: FontWeight.Regular)
+                    Font = OsuFont.GetFont(weight: FontWeight.Regular)
                 },
             };
+        }
+
+        private class PlayCountText : CompositeDrawable, IHasTooltip
+        {
+            public string TooltipText => "times played";
+
+            public PlayCountText(int playCount)
+            {
+                AutoSizeAxes = Axes.Both;
+
+                InternalChild = new FillFlowContainer
+                {
+                    Anchor = Anchor.CentreRight,
+                    Origin = Anchor.CentreRight,
+                    AutoSizeAxes = Axes.Both,
+                    Spacing = new Vector2(5, 0),
+                    Children = new Drawable[]
+                    {
+                        new SpriteIcon
+                        {
+                            Origin = Anchor.Centre,
+                            Anchor = Anchor.Centre,
+                            Size = new Vector2(12),
+                            Icon = FontAwesome.Solid.Play,
+                        },
+                        new OsuSpriteText
+                        {
+                            Origin = Anchor.Centre,
+                            Anchor = Anchor.Centre,
+                            Text = playCount.ToString(),
+                            Font = OsuFont.GetFont(size: 20, weight: FontWeight.Regular),
+                        },
+                    }
+                };
+            }
+
+            [BackgroundDependencyLoader]
+            private void load(OsuColour colours)
+            {
+                Colour = colours.Yellow;
+            }
         }
     }
 }
