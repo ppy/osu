@@ -9,5 +9,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
     {
         public double GreatHitWindow;
         public int MaxCombo;
+		public double ReadingStrain;
+		public double SpeedStrain;
     }
 }

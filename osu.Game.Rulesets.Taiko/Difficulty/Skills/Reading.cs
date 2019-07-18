@@ -9,10 +9,10 @@ using osu.Game.Rulesets.Taiko.Objects;
 
 namespace osu.Game.Rulesets.Taiko.Difficulty.Skills
 {
-    public class Strain : Skill
+    public class Reading : Skill
     {
         protected override double SkillMultiplier => 1;
-        protected override double StrainDecayBase => strainDecay * 0.3;
+        protected override double StrainDecayBase => strainDecay * 1.0;
 
         private const int max_pattern_length = 15;
 
@@ -22,31 +22,37 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Skills
 
         // Pattern occurences. An optimization is possible using bitarrays instead of strings.
         private readonly Dictionary<string, int>[] patternOccur = new Dictionary<string, int>[] { new Dictionary<string, int>(), new Dictionary<string, int>() };
+        private readonly Dictionary<string, int>[] patternCount = new Dictionary<string, int>[] { new Dictionary<string, int>(), new Dictionary<string, int>() };
 
         private readonly double[] previousDeltas = new double[max_pattern_length];
         private int noteNum;
 
+		// Only nerfs super repeating patterns
+		private double repetitionNerf = 1.0;
+
         protected override double StrainValueOf(DifficultyHitObject current)
         {
             // Sliders and spinners are optional to hit and thus are ignored
-            if (!(current.LastObject is Hit))
+            if (!(current.BaseObject is Hit))
                 return 0.0;
 
             // Decay known patterns
             noteNum++;
+            bool isRim = current.BaseObject is RimHit;
 
             // Arbitrary values found by analyzing top plays of different people
-            double addition = 1.9 + 2.5 * colourChangeDifficulty(current);
+            var colorDiff = colourChangeDifficulty(current);
 
             double deltaSum = current.DeltaTime;
-            int deltaCount = 1;
+            double deltaCount = 1;
 
             for (var i = 1; i < max_pattern_length; i++)
             {
                 if (previousDeltas[i - 1] != 0.0)
                 {
-                    deltaCount++;
-                    deltaSum += previousDeltas[i - 1];
+                    double weight = Math.Pow(0.9, i);
+                    deltaCount += weight;
+                    deltaSum += previousDeltas[i - 1] * weight;
                 }
 
                 previousDeltas[i] = previousDeltas[i - 1];
@@ -54,30 +60,41 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Skills
 
             previousDeltas[0] = current.DeltaTime;
 
-            // Use last N notes instead of last 1 note for determining pattern speed. Especially affects 1/8 doubles. TODO account more for recent notes?
+            // Use last N notes instead of last 1 note for determining pattern speed. Especially affects 1/8 doubles.
             var normalizedDelta = deltaSum / deltaCount;
+
             // Overwrite current.DeltaTime with normalizedDelta in Skill's strainDecay function
             strainDecay = Math.Pow(Math.Pow(0.3, normalizedDelta / 1000.0), 1000.0 / Math.Max(current.DeltaTime, 1.0));
 
             // Remember patterns
-            bool isRim = current.LastObject is RimHit;
-            var patternsEndingWithSameNoteType = patternOccur[isRim ? 1 : 0];
-            for (var i = 1; i < lastNotes.Length; i++)
-                patternsEndingWithSameNoteType[lastNotes.Substring(lastNotes.Length - i)] = noteNum;
+            var occurForThisType = patternOccur[isRim ? 1 : 0];
+            var countForThisType = patternCount[isRim ? 1 : 0];
+
+            for (var i = 1; i < lastNotes.Length; i++) {
+                var pattern = lastNotes.Substring(lastNotes.Length - i);
+                occurForThisType[pattern] = noteNum;
+                int count;
+                countForThisType.TryGetValue(pattern, out count);
+                countForThisType[pattern] = count + 1;
+            }
 
             // Forget oldest note
             if (lastNotes.Length == max_pattern_length)
                 lastNotes = lastNotes.Substring(1);
+
             // Remember latest note
             lastNotes += isRim ? 'k' : 'd';
+			repetitionNerf = Math.Min(Math.Max(repetitionNerf * 25 * colorDiff, 1 / 25), 1.0);
+            double addition = (0.4 + 8.0 * colorDiff) * 0.56 * repetitionNerf;
 
-            return addition;
+            return Math.Pow(addition, 1.1);
         }
 
         private double colourChangeDifficulty(DifficultyHitObject current)
         {
             double chanceError = 0.0, chanceTotal = 0.0;
-            bool isRim = current.LastObject is RimHit;
+            double freqRating = 1.0;
+            bool isRim = current.BaseObject is RimHit;
 
             for (var i = 1; i < lastNotes.Length; i++)
             {
@@ -85,10 +102,12 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Skills
 
                 // How well is the pattern remembered
                 double[] memory = new double[2];
+                int[] count = new int[2];
 
                 for (var j = 0; j < 2; j++)
                 {
                     int n;
+                    patternCount[j].TryGetValue(pattern, out count[j]);
                     patternOccur[j].TryGetValue(pattern, out n);
                     memory[j] = Math.Pow(0.99, noteNum - n);
                 }
@@ -103,16 +122,20 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Skills
                     chanceError += weight[isRim ? 0 : 1] * memory[isRim ? 0 : 1] / (memory[0] + memory[1]);
                     chanceTotal += weight[0] + weight[1];
                 }
+
+                // If a pattern is frequent, nerf it even if it's unpredictable in the current circumstances
+				var of = freqRating;
+                freqRating *= 1.1 - Math.Pow(1.0 + Math.Pow(1.6, i) / 16000, Math.Min(34, count[isRim ? 1 : 0])) / 10;
             }
 
-            // If we don't remember any patterns, chances are 50/50
+            // If we don't remember anything, chances are 50/50
             if (chanceTotal == 0.0)
             {
                 chanceTotal = 1.0;
                 chanceError = 0.5;
             }
 
-            return Math.Max(0, Math.Pow(chanceError / chanceTotal, 1.4));
+            return Math.Max(0, Math.Pow(chanceError / chanceTotal, 1.4) * (0.5 + 0.5 * Math.Pow(Math.Max(0, freqRating), 1.5)));
         }
     }
 }
