@@ -26,7 +26,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             this.repeatPoint = repeatPoint;
             this.drawableSlider = drawableSlider;
 
-            Size = new Vector2(45 * repeatPoint.Scale);
+            Size = new Vector2(OsuHitObject.OBJECT_RADIUS * 2 * repeatPoint.Scale);
 
             Blending = BlendingMode.Additive;
             Origin = Anchor.Centre;
@@ -36,7 +36,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                 new SkinnableDrawable("Play/osu/reversearrow", _ => new SpriteIcon
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Icon = FontAwesome.Solid.ChevronRight
+                    Icon = FontAwesome.Solid.ChevronRight,
+                    Size = new Vector2(0.35f)
                 })
             };
         }
