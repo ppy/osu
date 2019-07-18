@@ -14,7 +14,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
     {
         public RingPiece()
         {
-            Size = new Vector2(128);
+            Size = new Vector2(OsuHitObject.OBJECT_RADIUS * 2);
 
             Anchor = Anchor.Centre;
             Origin = Anchor.Centre;
@@ -35,7 +35,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
                         RelativeSizeAxes = Axes.Both
                     }
                 }
-            });
+            }, confineMode: ConfineMode.NoScaling);
         }
     }
 }
