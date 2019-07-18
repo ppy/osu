@@ -101,7 +101,7 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
                             },
                         },
                     }
-                }, restrictSize: false)
+                })
                 {
                     Origin = Anchor.Centre,
                     Anchor = Anchor.Centre,
