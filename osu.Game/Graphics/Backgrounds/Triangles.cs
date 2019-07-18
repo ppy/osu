@@ -192,12 +192,11 @@ namespace osu.Game.Graphics.Backgrounds
             private readonly List<TriangleParticle> parts = new List<TriangleParticle>();
             private Vector2 size;
 
-            private readonly LinearBatch<TexturedVertex2D> vertexBatch;
+            private LinearBatch<TexturedVertex2D> vertexBatch;
 
             public TrianglesDrawNode(Triangles source)
                 : base(source)
             {
-                vertexBatch = new LinearBatch<TexturedVertex2D>(source.AimCount * 3, 2, PrimitiveType.Triangles);
             }
 
             public override void ApplyState()
@@ -214,6 +213,9 @@ namespace osu.Game.Graphics.Backgrounds
 
             public override void Draw(Action<TexturedVertex2D> vertexAction)
             {
+                if (vertexBatch == null && Source.AimCount > 0)
+                    vertexBatch = new LinearBatch<TexturedVertex2D>(Source.AimCount * 3, 2, PrimitiveType.Triangles);
+
                 base.Draw(vertexAction);
 
                 shader.Bind();
