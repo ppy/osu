@@ -140,9 +140,7 @@ namespace osu.Game.Overlays
         protected void AddSection(SettingsSection section)
         {
             SectionsContainer.Add(section);
-
-            if (Sidebar != null)
-                Sidebar.AddItem(section);
+            Sidebar?.AddItem(section);
         }
 
         protected virtual Drawable CreateHeader() => new Container();

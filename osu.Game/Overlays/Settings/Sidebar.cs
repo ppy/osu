@@ -6,6 +6,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Threading;
 using osu.Game.Overlays.Toolbar;
 using osu.Framework.Graphics.UserInterface;
+using System.Linq;
 
 namespace osu.Game.Overlays.Settings
 {
@@ -38,9 +39,12 @@ namespace osu.Game.Overlays.Settings
         {
             base.LoadComplete();
 
+            if (!TabContainer.Children.Any())
+                return;
+
             foreach (var button in TabContainer.Children)
             {
-                (button as SidebarButton).OnHoverAction += tab => queueExpandIfHovering(tab);
+                (button as SidebarButton).OnHoverAction += queueExpandIfHovering;
                 (button as SidebarButton).OnHoverLostAction += tab =>
                 {
                     if (hoveredButton == button)
