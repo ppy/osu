@@ -19,7 +19,6 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
     public class ScoresContainer : CompositeDrawable
     {
         private const int spacing = 15;
-        private const int fade_duration = 200;
 
         private readonly Box background;
         private readonly ScoreTable scoreTable;
@@ -53,8 +52,6 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
             {
                 Schedule(() =>
                 {
-                    loading = false;
-
                     topScoresContainer.Clear();
 
                     if (value?.Scores.Any() != true)
@@ -128,13 +125,10 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
             background.Colour = colours.Gray2;
         }
 
-        private bool loading
-        {
-            set => loadingAnimation.FadeTo(value ? 1 : 0, fade_duration);
-        }
-
         private void getScores(BeatmapInfo beatmap)
         {
+            loadingAnimation.Show();
+
             getScoresRequest?.Cancel();
             getScoresRequest = null;
 
@@ -142,14 +136,17 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
 
             if (beatmap?.OnlineBeatmapID.HasValue != true)
             {
-                loading = false;
+                loadingAnimation.Hide();
                 return;
             }
 
             getScoresRequest = new GetScoresRequest(beatmap, beatmap.Ruleset);
-            getScoresRequest.Success += scores => Scores = scores;
+            getScoresRequest.Success += scores =>
+            {
+                loadingAnimation.Hide();
+                Scores = scores;
+            };
             api.Queue(getScoresRequest);
-            loading = true;
         }
     }
 }
