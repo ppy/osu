@@ -92,6 +92,7 @@ namespace osu.Game.Overlays.BeatmapSet
                                 cover = new UpdateableBeatmapSetCover
                                 {
                                     RelativeSizeAxes = Axes.Both,
+                                    Masking = true,
                                 },
                                 new Box
                                 {
