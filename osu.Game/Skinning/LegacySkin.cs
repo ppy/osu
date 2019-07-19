@@ -95,7 +95,6 @@ namespace osu.Game.Skinning
         public override Texture GetTexture(string componentName)
         {
             float ratio = 2;
-
             var texture = Textures.Get($"{componentName}@2x");
 
             if (texture == null)
@@ -105,7 +104,19 @@ namespace osu.Game.Skinning
             }
 
             if (texture != null)
-                texture.ScaleAdjust = ratio / 0.72f; // brings sizing roughly in-line with stable
+            {
+                texture.ScaleAdjust = ratio;
+
+                switch (componentName)
+                {
+                    case "cursormiddle":
+                    case "cursortrail":
+                    case "cursor":
+                        // apply inverse of adjustment in OsuPlayfieldAdjustmentContainer for non-gameplay-scale textures.
+                        texture.ScaleAdjust *= 1.6f;
+                        break;
+                }
+            }
 
             return texture;
         }
