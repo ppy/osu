@@ -38,14 +38,18 @@ namespace osu.Game.Beatmaps.Drawables
             });
         }
 
-        protected override Drawable CreateDrawable(BeatmapSetInfo setInfo) => setInfo != null
-            ? new BeatmapSetCover(setInfo, CoverType)
+        protected override Drawable CreateDrawable(BeatmapSetInfo setInfo)
+        {
+            if (setInfo == null)
+                return null;
+
+            return new BeatmapSetCover(setInfo, CoverType)
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
                 RelativeSizeAxes = Axes.Both,
                 FillMode = FillMode.Fill,
-            }
-            : null;
+            };
+        }
     }
 }
