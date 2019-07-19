@@ -43,7 +43,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Skills
             // Sliders and spinners are optional to hit and thus are ignored
             if (!(current.BaseObject is Hit) || current.DeltaTime <= 0.0)
             {
-                strainDecay = float.Epsilon;
+                strainDecay = 0.1;
                 sameColourCount = 0;
                 return 0.0;
             }
