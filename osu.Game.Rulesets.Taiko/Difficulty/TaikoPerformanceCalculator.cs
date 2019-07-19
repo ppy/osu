@@ -108,11 +108,11 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
             if (Attributes.GreatHitWindow <= 0)
                 return 0;
 
-            double predictedHitWindow = Math.Pow(0.9, Attributes.StarRating) * 50;
+            double predictedHitWindow = Math.Pow(0.9, Attributes.StarRating) * 55;
 
             // Lots of arbitrary values from testing.
             // Considering to use derivation from perfect accuracy in a probabilistic manner - assume normal distribution
-            double accValue = predictedHitWindow / Attributes.GreatHitWindow * Math.Pow(150.0 / Attributes.GreatHitWindow, 1.1) * Math.Pow(Score.Accuracy, 15) * 22.0;
+            double accValue = Math.Pow(predictedHitWindow / Attributes.GreatHitWindow, 0.6) * Math.Pow(150.0 / Attributes.GreatHitWindow, 1.1) * Math.Pow(Score.Accuracy, 15) * 22.0;
 
             // Bonus for many hitcircles - it's harder to keep good accuracy up for longer
             accValue *= Math.Min(1.15, Math.Pow(totalHits / 1500.0, 0.3));

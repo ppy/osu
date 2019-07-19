@@ -44,6 +44,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Skills
             if (!(current.BaseObject is Hit) || current.DeltaTime <= 0.0)
             {
                 strainDecay = float.Epsilon;
+                sameColourCount = 0;
                 return 0.0;
             }
 
