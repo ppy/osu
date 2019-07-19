@@ -169,6 +169,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                          .FadeOut(100);
 
                     explode.FadeIn(flash_in);
+                    explodeContainer.ScaleTo(1.5f, 400, Easing.OutQuad);
 
                     using (BeginDelayedSequence(flash_in, true))
                     {
@@ -178,7 +179,6 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                         number.FadeOut();
 
                         this.FadeOut(800);
-                        explodeContainer.ScaleTo(1.5f, 400, Easing.OutQuad);
                     }
 
                     Expire();
