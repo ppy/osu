@@ -72,7 +72,7 @@ namespace osu.Game.Rulesets.Objects.Legacy
                 else if (type.HasFlag(ConvertHitObjectType.Slider))
                 {
                     PathType pathType = PathType.Catmull;
-                    double length = 0;
+                    double? length = null;
 
                     string[] pointSplit = split[5].Split('|');
 
@@ -130,7 +130,11 @@ namespace osu.Game.Rulesets.Objects.Legacy
                     repeatCount = Math.Max(0, repeatCount - 1);
 
                     if (split.Length > 7)
+                    {
                         length = Math.Max(0, Parsing.ParseDouble(split[7]));
+                        if (length == 0)
+                            length = null;
+                    }
 
                     if (split.Length > 10)
                         readCustomSampleBanks(split[10], bankInfo);
@@ -291,7 +295,8 @@ namespace osu.Game.Rulesets.Objects.Legacy
         /// <param name="repeatCount">The slider repeat count.</param>
         /// <param name="nodeSamples">The samples to be played when the slider nodes are hit. This includes the head and tail of the slider.</param>
         /// <returns>The hit object.</returns>
-        protected abstract HitObject CreateSlider(Vector2 position, bool newCombo, int comboOffset, Vector2[] controlPoints, double length, PathType pathType, int repeatCount, List<List<HitSampleInfo>> nodeSamples);
+        protected abstract HitObject CreateSlider(Vector2 position, bool newCombo, int comboOffset, Vector2[] controlPoints, double? length, PathType pathType, int repeatCount,
+                                                  List<List<HitSampleInfo>> nodeSamples);
 
         /// <summary>
         /// Creates a legacy Spinner-type hit object.
