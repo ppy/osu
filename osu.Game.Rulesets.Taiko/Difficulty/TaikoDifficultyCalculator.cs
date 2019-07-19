@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Game.Beatmaps;
@@ -17,7 +18,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
 {
     public class TaikoDifficultyCalculator : DifficultyCalculator
     {
-        private const double star_scaling_factor = 0.0425;
+        private const double star_scaling_factor = 0.028;
 
         public TaikoDifficultyCalculator(Ruleset ruleset, WorkingBeatmap beatmap)
             : base(ruleset, beatmap)
@@ -29,10 +30,15 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
             if (beatmap.HitObjects.Count == 0)
                 return new TaikoDifficultyAttributes { Mods = mods, Skills = skills };
 
+            // Scale it to stay somewhat consistent with how it used to be
+            var readingRating = Math.Pow(Math.Pow(skills[0].DifficultyValue() * star_scaling_factor, 1.2) / 3.6, 0.5) * 3.6;
+            var speedRating = skills[1].DifficultyValue() * star_scaling_factor;
             return new TaikoDifficultyAttributes
             {
-                StarRating = skills.Single().DifficultyValue() * star_scaling_factor,
+                StarRating = readingRating + speedRating,
                 Mods = mods,
+                ReadingStrain = readingRating,
+                SpeedStrain = speedRating,
                 // Todo: This int cast is temporary to achieve 1:1 results with osu!stable, and should be removed in the future
                 GreatHitWindow = (int)(beatmap.HitObjects.First().HitWindows.Great / 2) / clockRate,
                 MaxCombo = beatmap.HitObjects.Count(h => h is Hit),
@@ -46,7 +52,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
                 yield return new TaikoDifficultyHitObject(beatmap.HitObjects[i], beatmap.HitObjects[i - 1], clockRate);
         }
 
-        protected override Skill[] CreateSkills(IBeatmap beatmap) => new Skill[] { new Strain() };
+        protected override Skill[] CreateSkills(IBeatmap beatmap) => new Skill[] { new Reading(), new Speed() };
 
         protected override Mod[] DifficultyAdjustmentMods => new Mod[]
         {
