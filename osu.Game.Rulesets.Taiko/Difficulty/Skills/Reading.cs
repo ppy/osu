@@ -6,13 +6,14 @@ using System.Collections.Generic;
 using osu.Game.Rulesets.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Difficulty.Skills;
 using osu.Game.Rulesets.Taiko.Objects;
+using osu.Game.Rulesets.Taiko.Difficulty.Preprocessing;
 
 namespace osu.Game.Rulesets.Taiko.Difficulty.Skills
 {
     public class Reading : Skill
     {
         protected override double SkillMultiplier => 1;
-        protected override double StrainDecayBase => strainDecay * 1.0;
+        protected override double StrainDecayBase => strainDecay;
 
         private const int max_pattern_length = 15;
 
@@ -27,14 +28,25 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Skills
         private readonly double[] previousDeltas = new double[max_pattern_length];
         private int noteNum;
 
-		// Only nerfs super repeating patterns
-		private double repetitionNerf = 1.0;
+        // Only nerfs super repeating patterns
+        private double repetitionNerf = 1.0;
+        
+        
+        private const double rhythm_change_base_threshold = 0.2;
+        private const double rhythm_change_base = 2.0;
+
+        private ColourSwitch lastColourSwitch = ColourSwitch.None;
+
+        private int sameColourCount = 1;
 
         protected override double StrainValueOf(DifficultyHitObject current)
         {
             // Sliders and spinners are optional to hit and thus are ignored
-            if (!(current.BaseObject is Hit))
+            if (!(current.BaseObject is Hit) || current.DeltaTime <= 0.0)
+            {
+                strainDecay = 0.000000000000000001;
                 return 0.0;
+            }
 
             // Decay known patterns
             noteNum++;
@@ -70,7 +82,8 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Skills
             var occurForThisType = patternOccur[isRim ? 1 : 0];
             var countForThisType = patternCount[isRim ? 1 : 0];
 
-            for (var i = 1; i < lastNotes.Length; i++) {
+            for (var i = 1; i < lastNotes.Length; i++)
+            {
                 var pattern = lastNotes.Substring(lastNotes.Length - i);
                 occurForThisType[pattern] = noteNum;
                 int count;
@@ -84,8 +97,8 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Skills
 
             // Remember latest note
             lastNotes += isRim ? 'k' : 'd';
-			repetitionNerf = Math.Min(Math.Max(repetitionNerf * 25 * colorDiff, 1 / 25), 1.0);
-            double addition = (0.4 + 8.0 * colorDiff) * 0.56 * repetitionNerf;
+            repetitionNerf = Math.Min(Math.Max(repetitionNerf * 25 * colorDiff, 1 / 25), 1.0);
+            double addition = (0.4 + 8.0 * colorDiff) * /*0.56 **/0.68 * repetitionNerf;
 
             return Math.Pow(addition, 1.1);
         }
@@ -124,7 +137,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Skills
                 }
 
                 // If a pattern is frequent, nerf it even if it's unpredictable in the current circumstances
-				var of = freqRating;
+                var of = freqRating;
                 freqRating *= 1.1 - Math.Pow(1.0 + Math.Pow(1.6, i) / 16000, Math.Min(34, count[isRim ? 1 : 0])) / 10;
             }
 
@@ -135,7 +148,35 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Skills
                 chanceError = 0.5;
             }
 
-            return Math.Max(0, Math.Pow(chanceError / chanceTotal, 1.4) * (0.5 + 0.5 * Math.Pow(Math.Max(0, freqRating), 1.5)));
+            return Math.Max(0, Math.Pow(chanceError / chanceTotal, hasColourChangeLegacy(current) ? 1.4 : 1.7) * (0.5 + 0.5 * Math.Pow(Math.Max(0, freqRating), 1.5)));
+        }
+        
+        // Keep this, because it determines general predictability
+        private bool hasColourChangeLegacy(DifficultyHitObject current)
+        {
+            var taikoCurrent = (TaikoDifficultyHitObject)current;
+
+            if (!taikoCurrent.HasTypeChange)
+            {
+                sameColourCount++;
+                return false;
+            }
+
+            var oldColourSwitch = lastColourSwitch;
+            var newColourSwitch = sameColourCount % 2 == 0 ? ColourSwitch.Even : ColourSwitch.Odd;
+
+            lastColourSwitch = newColourSwitch;
+            sameColourCount = 1;
+
+            // We only want a bonus if the parity of the color switch changes
+            return oldColourSwitch != ColourSwitch.None && oldColourSwitch != newColourSwitch;
+        }
+
+        private enum ColourSwitch
+        {
+            None,
+            Even,
+            Odd
         }
     }
 }

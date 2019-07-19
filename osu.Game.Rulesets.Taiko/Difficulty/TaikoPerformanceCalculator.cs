@@ -82,15 +82,15 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
                 strainValue *= Math.Min(Math.Pow(Score.MaxCombo, 0.5) / Math.Pow(Attributes.MaxCombo, 0.5), 1.0);
 
             if (mods.Any(m => m is ModFlashlight<TaikoHitObject>))
-			{
+            {
                 // Apply length bonus again if flashlight is on simply because it becomes a lot harder on longer maps.
-				if (mods.Any(m => m is ModHidden))
-					strainValue *= 1.07 * lengthBonus;
-				else
-					strainValue *= 1.05 * lengthBonus;
-		    }
-			else if (mods.Any(m => m is ModHidden))
-			{
+                if (mods.Any(m => m is ModHidden))
+                    strainValue *= 1.07 * lengthBonus;
+                else
+                    strainValue *= 1.05 * lengthBonus;
+            }
+            else if (mods.Any(m => m is ModHidden))
+            {
                 if (mods.Any(m => m is ModEasy))
                     strainValue *= 1.015;
                 else if (mods.Any(m => m is ModHardRock))
