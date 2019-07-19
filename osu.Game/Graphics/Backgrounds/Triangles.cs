@@ -213,10 +213,13 @@ namespace osu.Game.Graphics.Backgrounds
 
             public override void Draw(Action<TexturedVertex2D> vertexAction)
             {
-                if (vertexBatch == null && Source.AimCount > 0)
-                    vertexBatch = new LinearBatch<TexturedVertex2D>(Source.AimCount * 3, 2, PrimitiveType.Triangles);
-
                 base.Draw(vertexAction);
+
+                if (vertexBatch == null || vertexBatch.Size != Source.AimCount * 6)
+                {
+                    vertexBatch?.Dispose();
+                    vertexBatch = new LinearBatch<TexturedVertex2D>(Source.AimCount * 6, 1, PrimitiveType.Triangles);
+                }
 
                 shader.Bind();
 
