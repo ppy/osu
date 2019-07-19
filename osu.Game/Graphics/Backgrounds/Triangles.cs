@@ -8,7 +8,6 @@ using osuTK.Graphics;
 using System;
 using osu.Framework.Graphics.Shaders;
 using osu.Framework.Graphics.Textures;
-using osuTK.Graphics.ES30;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.Allocation;
@@ -192,7 +191,7 @@ namespace osu.Game.Graphics.Backgrounds
             private readonly List<TriangleParticle> parts = new List<TriangleParticle>();
             private Vector2 size;
 
-            private LinearBatch<TexturedVertex2D> vertexBatch;
+            private TriangleBatch<TexturedVertex2D> vertexBatch;
 
             public TrianglesDrawNode(Triangles source)
                 : base(source)
@@ -215,10 +214,10 @@ namespace osu.Game.Graphics.Backgrounds
             {
                 base.Draw(vertexAction);
 
-                if (vertexBatch == null || vertexBatch.Size != Source.AimCount * 6)
+                if (vertexBatch == null || vertexBatch.Size != Source.AimCount)
                 {
                     vertexBatch?.Dispose();
-                    vertexBatch = new LinearBatch<TexturedVertex2D>(Source.AimCount * 6, 1, PrimitiveType.Triangles);
+                    vertexBatch = new TriangleBatch<TexturedVertex2D>(Source.AimCount, 1);
                 }
 
                 shader.Bind();
