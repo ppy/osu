@@ -96,8 +96,8 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Skills
 
             // Remember latest note
             lastNotes += isRim ? 'k' : 'd';
-            repetitionNerf = Math.Min(Math.Max(repetitionNerf * 25 * colorDiff, 1 / 25), 1.0);
-            double addition = (0.4 + 8.0 * colorDiff) * /*0.56 **/0.68 * repetitionNerf;
+            repetitionNerf = Math.Min(Math.Max(repetitionNerf * 25.0 * colorDiff, 1.0 / 25.0), 1.0);
+            double addition = 0.272 + 5.44 * colorDiff * repetitionNerf;
 
             return Math.Pow(addition, 1.1);
         }
