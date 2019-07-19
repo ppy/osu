@@ -22,8 +22,8 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Skills
         private string lastNotes = "";
 
         // Pattern occurences. An optimization is possible using bitarrays instead of strings.
-        private readonly Dictionary<string, int>[] patternOccur = new Dictionary<string, int>[] { new Dictionary<string, int>(), new Dictionary<string, int>() };
-        private readonly Dictionary<string, int>[] patternCount = new Dictionary<string, int>[] { new Dictionary<string, int>(), new Dictionary<string, int>() };
+        private readonly Dictionary<string, int>[] patternOccur = { new Dictionary<string, int>(), new Dictionary<string, int>() };
+        private readonly Dictionary<string, int>[] patternCount = { new Dictionary<string, int>(), new Dictionary<string, int>() };
 
         private readonly double[] previousDeltas = new double[max_pattern_length];
         private int noteNum;
@@ -43,7 +43,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Skills
             // Sliders and spinners are optional to hit and thus are ignored
             if (!(current.BaseObject is Hit) || current.DeltaTime <= 0.0)
             {
-                strainDecay = 0.000000000000000001;
+                strainDecay = float.Epsilon;
                 return 0.0;
             }
 
@@ -136,7 +136,6 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Skills
                 }
 
                 // If a pattern is frequent, nerf it even if it's unpredictable in the current circumstances
-                var of = freqRating;
                 freqRating *= 1.1 - Math.Pow(1.0 + Math.Pow(1.6, i) / 16000, Math.Min(34, count[isRim ? 1 : 0])) / 10;
             }
 

@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Collections.Generic;
 using osu.Game.Rulesets.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Difficulty.Skills;
 using osu.Game.Rulesets.Taiko.Objects;
@@ -18,15 +17,15 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Skills
 
         private double strainDecay = 0.3;
 
-        readonly double[] strain = new double[2];
-        private readonly double[][] previousDeltas = new double[][] { new double[max_pattern_length], new double[max_pattern_length] };
+        private readonly double[] strain = new double[2];
+        private readonly double[][] previousDeltas = { new double[max_pattern_length], new double[max_pattern_length] };
 
         protected override double StrainValueOf(DifficultyHitObject current)
         {
             // Sliders and spinners are optional to hit and thus are ignored
             if (!(current.BaseObject is Hit) || current.DeltaTime <= 0.0)
             {
-                strainDecay = 0.000000000000000001;
+                strainDecay = float.Epsilon;
                 return 0.0;
             }
 
