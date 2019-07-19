@@ -70,9 +70,9 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Skills
 
             // Overwrite current.DeltaTime with normalizedDelta in Skill's strainDecay function
             strainDecay = Math.Pow(Math.Pow(0.5, normalizedDelta / 1000.0), 1000.0 / Math.Max(current.DeltaTime, 1.0)) * 0.3;
-            
+
             var monoNerf = 1.0;
-            
+
             if(sameColourCount > min_mono_nerf)
                 monoNerf = Math.Pow(0.98, Math.Min(sameColourCount, max_mono_nerf) - min_mono_nerf);
 
