@@ -101,11 +101,10 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
                             },
                         },
                     }
-                })
+                }, confineMode: ConfineMode.NoScaling)
                 {
                     Origin = Anchor.Centre,
                     Anchor = Anchor.Centre,
-                    RelativeSizeAxes = Axes.Both,
                 }
             };
 
