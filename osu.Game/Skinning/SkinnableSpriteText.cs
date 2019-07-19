@@ -6,7 +6,7 @@ using osu.Framework.Graphics.Sprites;
 
 namespace osu.Game.Skinning
 {
-    public class SkinnableSpriteText : SkinnableDrawable<SpriteText>, IHasText
+    public class SkinnableSpriteText : SkinnableDrawable, IHasText
     {
         public SkinnableSpriteText(string name, Func<string, SpriteText> defaultImplementation, Func<ISkinSource, bool> allowFallback = null, ConfineMode confineMode = ConfineMode.ScaleDownToFit)
             : base(name, defaultImplementation, allowFallback, confineMode)
