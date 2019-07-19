@@ -49,7 +49,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Skills
 
             for (var i = 1; i < max_pattern_length; i++)
             {
-                for(var j = 0; j < 2; ++j)
+                for (var j = 0; j < 2; ++j)
                 {
                     if (previousDeltas[j == 1 ? noteType : 2][i - 1] != 0.0)
                     {
@@ -57,6 +57,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Skills
                         deltaCount += weight;
                         deltaSum += previousDeltas[j == 1 ? noteType : 2][i - 1] * weight;
                     }
+
                     previousDeltas[noteType][i] = previousDeltas[noteType][i - 1];
                 }
             }
@@ -73,7 +74,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Skills
 
             var monoNerf = 1.0;
 
-            if(sameColourCount > min_mono_nerf)
+            if (sameColourCount > min_mono_nerf)
                 monoNerf = Math.Pow(0.98, Math.Min(sameColourCount, max_mono_nerf) - min_mono_nerf);
 
             return 71.0 / normalizedDelta * monoNerf;
