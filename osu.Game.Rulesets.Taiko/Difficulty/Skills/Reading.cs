@@ -30,8 +30,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Skills
 
         // Only nerfs super repeating patterns
         private double repetitionNerf = 1.0;
-        
-        
+
         private const double rhythm_change_base_threshold = 0.2;
         private const double rhythm_change_base = 2.0;
 
@@ -150,7 +149,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Skills
 
             return Math.Max(0, Math.Pow(chanceError / chanceTotal, hasColourChangeLegacy(current) ? 1.4 : 1.7) * (0.5 + 0.5 * Math.Pow(Math.Max(0, freqRating), 1.5)));
         }
-        
+
         // Keep this, because it determines general predictability
         private bool hasColourChangeLegacy(DifficultyHitObject current)
         {
