@@ -13,8 +13,8 @@ namespace osu.Game.Online.API.Requests
 
         private readonly BeatmapSetType type;
 
-        public GetUserBeatmapsRequest(long userId, BeatmapSetType type, int offset = 0, int limit = 6)
-            : base(offset, limit)
+        public GetUserBeatmapsRequest(long userId, BeatmapSetType type, int page = 0, int itemsPerPage = 6)
+            : base(page, itemsPerPage)
         {
             this.userId = userId;
             this.type = type;

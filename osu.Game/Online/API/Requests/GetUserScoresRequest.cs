@@ -11,8 +11,8 @@ namespace osu.Game.Online.API.Requests
         private readonly long userId;
         private readonly ScoreType type;
 
-        public GetUserScoresRequest(long userId, ScoreType type, int offset = 0, int limit = 5)
-            : base(offset, limit)
+        public GetUserScoresRequest(long userId, ScoreType type, int page = 0, int itemsPerPage = 5)
+            : base(page, itemsPerPage)
         {
             this.userId = userId;
             this.type = type;
