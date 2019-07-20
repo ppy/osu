@@ -118,7 +118,7 @@ namespace osu.Game.Users
         public int PostCount;
 
         [JsonProperty(@"follower_count")]
-        public int[] FollowerCount;
+        public int FollowerCount;
 
         [JsonProperty]
         private string[] playstyle
@@ -147,19 +147,19 @@ namespace osu.Game.Users
         }
 
         [JsonProperty(@"favourite_beatmapset_count")]
-        public int[] FavouriteBeatmapsetCount;
+        public int FavouriteBeatmapsetCount;
 
         [JsonProperty(@"graveyard_beatmapset_count")]
-        public int[] GraveyardBeatmapsetCount;
+        public int GraveyardBeatmapsetCount;
 
         [JsonProperty(@"loved_beatmapset_count")]
-        public int[] LovedBeatmapsetCount;
+        public int LovedBeatmapsetCount;
 
         [JsonProperty(@"ranked_and_approved_beatmapset_count")]
-        public int[] RankedAndApprovedBeatmapsetCount;
+        public int RankedAndApprovedBeatmapsetCount;
 
         [JsonProperty(@"unranked_beatmapset_count")]
-        public int[] UnrankedBeatmapsetCount;
+        public int UnrankedBeatmapsetCount;
 
         [JsonProperty(@"statistics")]
         public UserStatistics Statistics;

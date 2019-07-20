@@ -76,23 +76,23 @@ namespace osu.Game.Overlays.Profile.Sections.Beatmaps
             switch (type)
             {
                 case BeatmapSetType.Favourite:
-                    count.Value = User.Value.FavouriteBeatmapsetCount[0];
+                    count.Value = User.Value.FavouriteBeatmapsetCount;
                     break;
 
                 case BeatmapSetType.Graveyard:
-                    count.Value = User.Value.GraveyardBeatmapsetCount[0];
+                    count.Value = User.Value.GraveyardBeatmapsetCount;
                     break;
 
                 case BeatmapSetType.Loved:
-                    count.Value = User.Value.LovedBeatmapsetCount[0];
+                    count.Value = User.Value.LovedBeatmapsetCount;
                     break;
 
                 case BeatmapSetType.RankedAndApproved:
-                    count.Value = User.Value.RankedAndApprovedBeatmapsetCount[0];
+                    count.Value = User.Value.RankedAndApprovedBeatmapsetCount;
                     break;
 
                 case BeatmapSetType.Unranked:
-                    count.Value = User.Value.UnrankedBeatmapsetCount[0];
+                    count.Value = User.Value.UnrankedBeatmapsetCount;
                     break;
             }
         }
