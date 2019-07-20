@@ -22,15 +22,17 @@ namespace osu.Game.Rulesets
         {
             AppDomain.CurrentDomain.AssemblyResolve += currentDomain_AssemblyResolve;
 
-            foreach (string file in Directory.GetFiles(Environment.CurrentDirectory, $"{ruleset_library_prefix}.*.dll")
-                                             .Where(f => !Path.GetFileName(f).Contains("Tests")))
-                loadRulesetFromFile(file);
+            // On android in release configuration assemblies are loaded from the apk directly into memory.
+            // We cannot read assemblies from cwd, so should check loaded assemblies instead.
+            loadFromAppDomain();
+
+            loadFromDisk();
         }
 
         public RulesetStore(IDatabaseContextFactory factory)
             : base(factory)
         {
-            AddMissingRulesets();
+            addMissingRulesets();
         }
 
         /// <summary>
@@ -50,13 +52,13 @@ namespace osu.Game.Rulesets
         /// <summary>
         /// All available rulesets.
         /// </summary>
-        public IEnumerable<RulesetInfo> AvailableRulesets;
+        public IEnumerable<RulesetInfo> AvailableRulesets { get; private set; }
 
         private static Assembly currentDomain_AssemblyResolve(object sender, ResolveEventArgs args) => loaded_assemblies.Keys.FirstOrDefault(a => a.FullName == args.Name);
 
         private const string ruleset_library_prefix = "osu.Game.Rulesets";
 
-        protected void AddMissingRulesets()
+        private void addMissingRulesets()
         {
             using (var usage = ContextFactory.GetForWrite())
             {
@@ -111,6 +113,34 @@ namespace osu.Game.Rulesets
             }
         }
 
+        private static void loadFromAppDomain()
+        {
+            foreach (var ruleset in AppDomain.CurrentDomain.GetAssemblies())
+            {
+                string rulesetName = ruleset.GetName().Name;
+
+                if (!rulesetName.StartsWith(ruleset_library_prefix, StringComparison.InvariantCultureIgnoreCase) || ruleset.GetName().Name.Contains("Tests"))
+                    continue;
+
+                addRuleset(ruleset);
+            }
+        }
+
+        private static void loadFromDisk()
+        {
+            try
+            {
+                string[] files = Directory.GetFiles(Environment.CurrentDirectory, $"{ruleset_library_prefix}.*.dll");
+
+                foreach (string file in files.Where(f => !Path.GetFileName(f).Contains("Tests")))
+                    loadRulesetFromFile(file);
+            }
+            catch
+            {
+                Logger.Log($"Could not load rulesets from directory {Environment.CurrentDirectory}");
+            }
+        }
+
         private static void loadRulesetFromFile(string file)
         {
             var filename = Path.GetFileNameWithoutExtension(file);
@@ -120,12 +150,26 @@ namespace osu.Game.Rulesets
 
             try
             {
-                var assembly = Assembly.LoadFrom(file);
-                loaded_assemblies[assembly] = assembly.GetTypes().First(t => t.IsPublic && t.IsSubclassOf(typeof(Ruleset)));
+                addRuleset(Assembly.LoadFrom(file));
             }
             catch (Exception e)
             {
                 Logger.Error(e, $"Failed to load ruleset {filename}");
+            }
+        }
+
+        private static void addRuleset(Assembly assembly)
+        {
+            if (loaded_assemblies.ContainsKey(assembly))
+                return;
+
+            try
+            {
+                loaded_assemblies[assembly] = assembly.GetTypes().First(t => t.IsPublic && t.IsSubclassOf(typeof(Ruleset)));
+            }
+            catch (Exception e)
+            {
+                Logger.Error(e, $"Failed to add ruleset {assembly}");
             }
         }
     }

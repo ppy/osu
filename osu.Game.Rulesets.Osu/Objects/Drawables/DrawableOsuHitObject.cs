@@ -18,6 +18,9 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
     {
         private readonly ShakeContainer shakeContainer;
 
+        // Must be set to update IsHovered as it's used in relax mdo to detect osu hit objects.
+        public override bool HandlePositionalInput => true;
+
         protected DrawableOsuHitObject(OsuHitObject hitObject)
             : base(hitObject)
         {
@@ -26,6 +29,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                 ShakeDuration = 30,
                 RelativeSizeAxes = Axes.Both
             });
+
             Alpha = 0;
         }
 
@@ -34,6 +38,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         protected override void AddInternal(Drawable drawable) => shakeContainer.Add(drawable);
         protected override void ClearInternal(bool disposeChildren = true) => shakeContainer.Clear(disposeChildren);
         protected override bool RemoveInternal(Drawable drawable) => shakeContainer.Remove(drawable);
+
+        protected sealed override double InitialLifetimeOffset => HitObject.TimePreempt;
 
         protected sealed override void UpdateState(ArmedState state)
         {

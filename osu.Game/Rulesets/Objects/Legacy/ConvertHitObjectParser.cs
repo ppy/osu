@@ -72,7 +72,7 @@ namespace osu.Game.Rulesets.Objects.Legacy
                 else if (type.HasFlag(ConvertHitObjectType.Slider))
                 {
                     PathType pathType = PathType.Catmull;
-                    double length = 0;
+                    double? length = null;
 
                     string[] pointSplit = split[5].Split('|');
 
@@ -130,7 +130,11 @@ namespace osu.Game.Rulesets.Objects.Legacy
                     repeatCount = Math.Max(0, repeatCount - 1);
 
                     if (split.Length > 7)
+                    {
                         length = Math.Max(0, Parsing.ParseDouble(split[7]));
+                        if (length == 0)
+                            length = null;
+                    }
 
                     if (split.Length > 10)
                         readCustomSampleBanks(split[10], bankInfo);
@@ -180,7 +184,7 @@ namespace osu.Game.Rulesets.Objects.Legacy
                     }
 
                     // Generate the final per-node samples
-                    var nodeSamples = new List<List<SampleInfo>>(nodes);
+                    var nodeSamples = new List<List<HitSampleInfo>>(nodes);
                     for (int i = 0; i < nodes; i++)
                         nodeSamples.Add(convertSoundType(nodeSoundTypes[i], nodeBankInfos[i]));
 
@@ -291,7 +295,8 @@ namespace osu.Game.Rulesets.Objects.Legacy
         /// <param name="repeatCount">The slider repeat count.</param>
         /// <param name="nodeSamples">The samples to be played when the slider nodes are hit. This includes the head and tail of the slider.</param>
         /// <returns>The hit object.</returns>
-        protected abstract HitObject CreateSlider(Vector2 position, bool newCombo, int comboOffset, Vector2[] controlPoints, double length, PathType pathType, int repeatCount, List<List<SampleInfo>> nodeSamples);
+        protected abstract HitObject CreateSlider(Vector2 position, bool newCombo, int comboOffset, Vector2[] controlPoints, double? length, PathType pathType, int repeatCount,
+                                                  List<List<HitSampleInfo>> nodeSamples);
 
         /// <summary>
         /// Creates a legacy Spinner-type hit object.
@@ -312,14 +317,14 @@ namespace osu.Game.Rulesets.Objects.Legacy
         /// <param name="endTime">The hold end time.</param>
         protected abstract HitObject CreateHold(Vector2 position, bool newCombo, int comboOffset, double endTime);
 
-        private List<SampleInfo> convertSoundType(LegacySoundType type, SampleBankInfo bankInfo)
+        private List<HitSampleInfo> convertSoundType(LegacySoundType type, SampleBankInfo bankInfo)
         {
             // Todo: This should return the normal SampleInfos if the specified sample file isn't found, but that's a pretty edge-case scenario
             if (!string.IsNullOrEmpty(bankInfo.Filename))
             {
-                return new List<SampleInfo>
+                return new List<HitSampleInfo>
                 {
-                    new FileSampleInfo
+                    new FileHitSampleInfo
                     {
                         Filename = bankInfo.Filename,
                         Volume = bankInfo.Volume
@@ -327,12 +332,12 @@ namespace osu.Game.Rulesets.Objects.Legacy
                 };
             }
 
-            var soundTypes = new List<SampleInfo>
+            var soundTypes = new List<HitSampleInfo>
             {
-                new LegacySampleInfo
+                new LegacyHitSampleInfo
                 {
                     Bank = bankInfo.Normal,
-                    Name = SampleInfo.HIT_NORMAL,
+                    Name = HitSampleInfo.HIT_NORMAL,
                     Volume = bankInfo.Volume,
                     CustomSampleBank = bankInfo.CustomSampleBank
                 }
@@ -340,10 +345,10 @@ namespace osu.Game.Rulesets.Objects.Legacy
 
             if (type.HasFlag(LegacySoundType.Finish))
             {
-                soundTypes.Add(new LegacySampleInfo
+                soundTypes.Add(new LegacyHitSampleInfo
                 {
                     Bank = bankInfo.Add,
-                    Name = SampleInfo.HIT_FINISH,
+                    Name = HitSampleInfo.HIT_FINISH,
                     Volume = bankInfo.Volume,
                     CustomSampleBank = bankInfo.CustomSampleBank
                 });
@@ -351,10 +356,10 @@ namespace osu.Game.Rulesets.Objects.Legacy
 
             if (type.HasFlag(LegacySoundType.Whistle))
             {
-                soundTypes.Add(new LegacySampleInfo
+                soundTypes.Add(new LegacyHitSampleInfo
                 {
                     Bank = bankInfo.Add,
-                    Name = SampleInfo.HIT_WHISTLE,
+                    Name = HitSampleInfo.HIT_WHISTLE,
                     Volume = bankInfo.Volume,
                     CustomSampleBank = bankInfo.CustomSampleBank
                 });
@@ -362,10 +367,10 @@ namespace osu.Game.Rulesets.Objects.Legacy
 
             if (type.HasFlag(LegacySoundType.Clap))
             {
-                soundTypes.Add(new LegacySampleInfo
+                soundTypes.Add(new LegacyHitSampleInfo
                 {
                     Bank = bankInfo.Add,
-                    Name = SampleInfo.HIT_CLAP,
+                    Name = HitSampleInfo.HIT_CLAP,
                     Volume = bankInfo.Volume,
                     CustomSampleBank = bankInfo.CustomSampleBank
                 });
@@ -387,7 +392,7 @@ namespace osu.Game.Rulesets.Objects.Legacy
             public SampleBankInfo Clone() => (SampleBankInfo)MemberwiseClone();
         }
 
-        private class LegacySampleInfo : SampleInfo
+        private class LegacyHitSampleInfo : HitSampleInfo
         {
             public int CustomSampleBank
             {
@@ -399,7 +404,7 @@ namespace osu.Game.Rulesets.Objects.Legacy
             }
         }
 
-        private class FileSampleInfo : SampleInfo
+        private class FileHitSampleInfo : HitSampleInfo
         {
             public string Filename;
 

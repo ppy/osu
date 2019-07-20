@@ -10,7 +10,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Graphics;
 using osu.Game.Online.Chat;
-using osu.Game.Users;
+using osu.Game.Users.Drawables;
 using osuTK;
 
 namespace osu.Game.Overlays.Chat.Tabs
@@ -25,7 +25,7 @@ namespace osu.Game.Overlays.Chat.Tabs
             if (value.Type != ChannelType.PM)
                 throw new ArgumentException("Argument value needs to have the targettype user!");
 
-            Avatar avatar;
+            DrawableAvatar avatar;
 
             AddRange(new Drawable[]
             {
@@ -48,7 +48,7 @@ namespace osu.Game.Overlays.Chat.Tabs
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
                             Masking = true,
-                            Child = new DelayedLoadWrapper(avatar = new Avatar(value.Users.First())
+                            Child = new DelayedLoadWrapper(avatar = new DrawableAvatar(value.Users.First())
                             {
                                 RelativeSizeAxes = Axes.Both,
                                 OpenOnClick = { Value = false },

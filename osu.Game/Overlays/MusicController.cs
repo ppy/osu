@@ -55,6 +55,8 @@ namespace osu.Game.Overlays
         private Container dragContainer;
         private Container playerContainer;
 
+        public bool IsUserPaused { get; private set; }
+
         [Resolved]
         private Bindable<WorkingBeatmap> beatmap { get; set; }
 
@@ -70,9 +72,6 @@ namespace osu.Game.Overlays
         {
             Width = 400;
             Margin = new MarginPadding(10);
-
-            // required to let MusicController handle beatmap cycling.
-            AlwaysPresent = true;
         }
 
         [BackgroundDependencyLoader]
@@ -160,7 +159,7 @@ namespace osu.Game.Overlays
                                                     Origin = Anchor.Centre,
                                                     Scale = new Vector2(1.4f),
                                                     IconScale = new Vector2(1.4f),
-                                                    Action = play,
+                                                    Action = togglePause,
                                                     Icon = FontAwesome.Regular.PlayCircle,
                                                 },
                                                 nextButton = new MusicIconButton
@@ -221,15 +220,9 @@ namespace osu.Game.Overlays
             beatmapSets.Insert(index, beatmapSetInfo);
         }
 
-        private void handleBeatmapAdded(BeatmapSetInfo obj, bool existing)
-        {
-            if (existing)
-                return;
+        private void handleBeatmapAdded(BeatmapSetInfo set) => Schedule(() => beatmapSets.Add(set));
 
-            Schedule(() => beatmapSets.Add(obj));
-        }
-
-        private void handleBeatmapRemoved(BeatmapSetInfo obj) => Schedule(() => beatmapSets.RemoveAll(s => s.ID == obj.ID));
+        private void handleBeatmapRemoved(BeatmapSetInfo set) => Schedule(() => beatmapSets.RemoveAll(s => s.ID == set.ID));
 
         protected override void LoadComplete()
         {
@@ -262,6 +255,12 @@ namespace osu.Game.Overlays
         {
             base.Update();
 
+            if (pendingBeatmapSwitch != null)
+            {
+                pendingBeatmapSwitch();
+                pendingBeatmapSwitch = null;
+            }
+
             var track = current?.TrackLoaded ?? false ? current.Track : null;
 
             if (track?.IsDummyDevice == false)
@@ -279,7 +278,7 @@ namespace osu.Game.Overlays
             }
         }
 
-        private void play()
+        private void togglePause()
         {
             var track = current?.Track;
 
@@ -291,9 +290,15 @@ namespace osu.Game.Overlays
             }
 
             if (track.IsRunning)
+            {
+                IsUserPaused = true;
                 track.Stop();
+            }
             else
+            {
                 track.Start();
+                IsUserPaused = false;
+            }
         }
 
         private void prev()
@@ -349,18 +354,11 @@ namespace osu.Game.Overlays
 
                     direction = last > next ? TransformDirection.Prev : TransformDirection.Next;
                 }
-
-                //current.Track.Completed -= currentTrackCompleted;
             }
-
-            current = beatmap.NewValue;
-
-            if (current != null)
-                current.Track.Completed += currentTrackCompleted;
 
             progressBar.CurrentTime = 0;
 
-            updateDisplay(current, direction);
+            updateDisplay(current = beatmap.NewValue, direction);
             updateAudioAdjustments();
 
             queuedDirection = null;
@@ -378,21 +376,12 @@ namespace osu.Game.Overlays
                 mod.ApplyToClock(track);
         }
 
-        private void currentTrackCompleted() => Schedule(() =>
-        {
-            if (!current.Track.Looping && !beatmap.Disabled && beatmapSets.Any())
-                next();
-        });
-
-        private ScheduledDelegate pendingBeatmapSwitch;
+        private Action pendingBeatmapSwitch;
 
         private void updateDisplay(WorkingBeatmap beatmap, TransformDirection direction)
         {
-            //we might be off-screen when this update comes in.
-            //rather than Scheduling, manually handle this to avoid possible memory contention.
-            pendingBeatmapSwitch?.Cancel();
-
-            pendingBeatmapSwitch = Schedule(delegate
+            // avoid using scheduler as our scheduler may not be run for a long time, holding references to beatmaps.
+            pendingBeatmapSwitch = delegate
             {
                 // todo: this can likely be replaced with WorkingBeatmap.GetBeatmapAsync()
                 Task.Run(() =>
@@ -432,7 +421,7 @@ namespace osu.Game.Overlays
 
                     playerContainer.Add(newBackground);
                 });
-            });
+            };
         }
 
         protected override void PopIn()
@@ -446,10 +435,6 @@ namespace osu.Game.Overlays
         protected override void PopOut()
         {
             base.PopOut();
-
-            // This is here mostly as a performance fix.
-            // If the playlist is not hidden it will update children even when the music controller is hidden (due to AlwaysPresent).
-            playlist.Hide();
 
             this.FadeOut(transition_length, Easing.OutQuint);
             dragContainer.ScaleTo(0.9f, transition_length, Easing.OutQuint);
@@ -548,5 +533,10 @@ namespace osu.Game.Overlays
                 return base.OnDragEnd(e);
             }
         }
+
+        /// <summary>
+        /// Play the next random or playlist track.
+        /// </summary>
+        public void NextTrack() => next();
     }
 }

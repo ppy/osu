@@ -9,7 +9,7 @@ using osu.Game.Database;
 
 namespace osu.Game.Beatmaps
 {
-    public class BeatmapSetInfo : IHasPrimaryKey, IHasFiles<BeatmapSetFileInfo>, ISoftDelete
+    public class BeatmapSetInfo : IHasPrimaryKey, IHasFiles<BeatmapSetFileInfo>, ISoftDelete, IEquatable<BeatmapSetInfo>
     {
         public int ID { get; set; }
 
@@ -35,7 +35,20 @@ namespace osu.Game.Beatmaps
         [NotMapped]
         public BeatmapSetMetrics Metrics { get; set; }
 
+        /// <summary>
+        /// The maximum star difficulty of all beatmaps in this set.
+        /// </summary>
         public double MaxStarDifficulty => Beatmaps?.Max(b => b.StarDifficulty) ?? 0;
+
+        /// <summary>
+        /// The maximum playable length in milliseconds of all beatmaps in this set.
+        /// </summary>
+        public double MaxLength => Beatmaps?.Max(b => b.Length) ?? 0;
+
+        /// <summary>
+        /// The maximum BPM of all beatmaps in this set.
+        /// </summary>
+        public double MaxBPM => Beatmaps?.Max(b => b.BPM) ?? 0;
 
         [NotMapped]
         public bool DeletePending { get; set; }
@@ -49,5 +62,7 @@ namespace osu.Game.Beatmaps
         public override string ToString() => Metadata?.ToString() ?? base.ToString();
 
         public bool Protected { get; set; }
+
+        public bool Equals(BeatmapSetInfo other) => OnlineBeatmapSetID == other?.OnlineBeatmapSetID;
     }
 }

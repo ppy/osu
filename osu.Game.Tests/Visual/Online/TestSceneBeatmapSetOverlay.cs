@@ -19,7 +19,7 @@ namespace osu.Game.Tests.Visual.Online
     [TestFixture]
     public class TestSceneBeatmapSetOverlay : OsuTestScene
     {
-        private readonly BeatmapSetOverlay overlay;
+        private readonly TestBeatmapSetOverlay overlay;
 
         public override IReadOnlyList<Type> RequiredTypes => new[]
         {
@@ -32,28 +32,29 @@ namespace osu.Game.Tests.Visual.Online
             typeof(BasicStats),
             typeof(BeatmapPicker),
             typeof(Details),
-            typeof(DownloadButton),
+            typeof(HeaderDownloadButton),
             typeof(FavouriteButton),
             typeof(Header),
             typeof(HeaderButton),
             typeof(Info),
             typeof(PreviewButton),
             typeof(SuccessRate),
+            typeof(BeatmapAvailability),
         };
 
-        private RulesetInfo maniaRuleset;
         private RulesetInfo taikoRuleset;
+        private RulesetInfo maniaRuleset;
 
         public TestSceneBeatmapSetOverlay()
         {
-            Add(overlay = new BeatmapSetOverlay());
+            Add(overlay = new TestBeatmapSetOverlay());
         }
 
         [BackgroundDependencyLoader]
         private void load(RulesetStore rulesets)
         {
-            maniaRuleset = rulesets.GetRuleset(3);
             taikoRuleset = rulesets.GetRuleset(1);
+            maniaRuleset = rulesets.GetRuleset(3);
         }
 
         [Test]
@@ -75,159 +76,53 @@ namespace osu.Game.Tests.Visual.Online
             {
                 overlay.ShowBeatmapSet(new BeatmapSetInfo
                 {
+                    OnlineBeatmapSetID = 1235,
                     Metadata = new BeatmapMetadata
                     {
-                        Title = @"Lachryma <Re:Queen’M>",
-                        Artist = @"Kaneko Chiharu",
-                        Source = @"SOUND VOLTEX III GRAVITY WARS",
-                        Tags = @"sdvx grace the 5th kac original song contest konami bemani",
+                        Title = @"an awesome beatmap",
+                        Artist = @"naru narusegawa",
+                        Source = @"hinata sou",
+                        Tags = @"test tag tag more tag",
                         Author = new User
                         {
-                            Username = @"Fresh Chicken",
-                            Id = 3984370,
+                            Username = @"BanchoBot",
+                            Id = 3,
                         },
                     },
                     OnlineInfo = new BeatmapSetOnlineInfo
                     {
-                        Preview = @"https://b.ppy.sh/preview/415886.mp3",
-                        PlayCount = 681380,
-                        FavouriteCount = 356,
-                        Submitted = new DateTime(2016, 2, 10),
-                        Ranked = new DateTime(2016, 6, 19),
-                        Status = BeatmapSetOnlineStatus.Ranked,
-                        BPM = 236,
+                        Preview = @"https://b.ppy.sh/preview/12345.mp3",
+                        PlayCount = 123,
+                        FavouriteCount = 456,
+                        Submitted = DateTime.Now,
+                        Ranked = DateTime.Now,
+                        BPM = 111,
                         HasVideo = true,
-                        Covers = new BeatmapSetOnlineCovers
-                        {
-                            Cover = @"https://assets.ppy.sh/beatmaps/415886/covers/cover.jpg?1465651778",
-                        },
+                        HasStoryboard = true,
+                        Covers = new BeatmapSetOnlineCovers(),
                     },
                     Metrics = new BeatmapSetMetrics { Ratings = Enumerable.Range(0, 11).ToArray() },
                     Beatmaps = new List<BeatmapInfo>
                     {
                         new BeatmapInfo
                         {
-                            StarDifficulty = 1.36,
-                            Version = @"BASIC",
+                            StarDifficulty = 9.99,
+                            Version = @"TEST",
+                            Length = 456000,
                             Ruleset = maniaRuleset,
                             BaseDifficulty = new BeatmapDifficulty
                             {
-                                CircleSize = 4,
-                                DrainRate = 6.5f,
-                                OverallDifficulty = 6.5f,
-                                ApproachRate = 5,
+                                CircleSize = 1,
+                                DrainRate = 2.3f,
+                                OverallDifficulty = 4.5f,
+                                ApproachRate = 6,
                             },
                             OnlineInfo = new BeatmapOnlineInfo
                             {
-                                Length = 115000,
-                                CircleCount = 265,
-                                SliderCount = 71,
-                                PlayCount = 47906,
-                                PassCount = 19899,
-                            },
-                            Metrics = new BeatmapMetrics
-                            {
-                                Fails = Enumerable.Range(1, 100).Select(i => i % 12 - 6).ToArray(),
-                                Retries = Enumerable.Range(-2, 100).Select(i => i % 12 - 6).ToArray(),
-                            },
-                        },
-                        new BeatmapInfo
-                        {
-                            StarDifficulty = 2.22,
-                            Version = @"NOVICE",
-                            Ruleset = maniaRuleset,
-                            BaseDifficulty = new BeatmapDifficulty
-                            {
-                                CircleSize = 4,
-                                DrainRate = 7,
-                                OverallDifficulty = 7,
-                                ApproachRate = 5,
-                            },
-                            OnlineInfo = new BeatmapOnlineInfo
-                            {
-                                Length = 118000,
-                                CircleCount = 592,
-                                SliderCount = 62,
-                                PlayCount = 162021,
-                                PassCount = 72116,
-                            },
-                            Metrics = new BeatmapMetrics
-                            {
-                                Fails = Enumerable.Range(1, 100).Select(i => i % 12 - 6).ToArray(),
-                                Retries = Enumerable.Range(-2, 100).Select(i => i % 12 - 6).ToArray(),
-                            },
-                        },
-                        new BeatmapInfo
-                        {
-                            StarDifficulty = 3.49,
-                            Version = @"ADVANCED",
-                            Ruleset = maniaRuleset,
-                            BaseDifficulty = new BeatmapDifficulty
-                            {
-                                CircleSize = 4,
-                                DrainRate = 7.5f,
-                                OverallDifficulty = 7.5f,
-                                ApproachRate = 5,
-                            },
-                            OnlineInfo = new BeatmapOnlineInfo
-                            {
-                                Length = 118000,
-                                CircleCount = 1042,
-                                SliderCount = 79,
-                                PlayCount = 225178,
-                                PassCount = 73001,
-                            },
-                            Metrics = new BeatmapMetrics
-                            {
-                                Fails = Enumerable.Range(1, 100).Select(i => i % 12 - 6).ToArray(),
-                                Retries = Enumerable.Range(-2, 100).Select(i => i % 12 - 6).ToArray(),
-                            },
-                        },
-                        new BeatmapInfo
-                        {
-                            StarDifficulty = 4.24,
-                            Version = @"EXHAUST",
-                            Ruleset = maniaRuleset,
-                            BaseDifficulty = new BeatmapDifficulty
-                            {
-                                CircleSize = 4,
-                                DrainRate = 8,
-                                OverallDifficulty = 8,
-                                ApproachRate = 5,
-                            },
-                            OnlineInfo = new BeatmapOnlineInfo
-                            {
-                                Length = 118000,
-                                CircleCount = 1352,
-                                SliderCount = 69,
-                                PlayCount = 131545,
-                                PassCount = 42703,
-                            },
-                            Metrics = new BeatmapMetrics
-                            {
-                                Fails = Enumerable.Range(1, 100).Select(i => i % 12 - 6).ToArray(),
-                                Retries = Enumerable.Range(-2, 100).Select(i => i % 12 - 6).ToArray(),
-                            },
-                        },
-                        new BeatmapInfo
-                        {
-                            StarDifficulty = 5.26,
-                            Version = @"GRAVITY",
-                            Ruleset = maniaRuleset,
-                            BaseDifficulty = new BeatmapDifficulty
-                            {
-                                CircleSize = 4,
-                                DrainRate = 8.5f,
-                                OverallDifficulty = 8.5f,
-                                ApproachRate = 5,
-                            },
-                            OnlineInfo = new BeatmapOnlineInfo
-                            {
-                                Length = 118000,
-                                CircleCount = 1730,
-                                SliderCount = 115,
-                                PlayCount = 117673,
-                                PassCount = 24241,
+                                CircleCount = 111,
+                                SliderCount = 12,
+                                PlayCount = 222,
+                                PassCount = 21,
                             },
                             Metrics = new BeatmapMetrics
                             {
@@ -239,162 +134,68 @@ namespace osu.Game.Tests.Visual.Online
                 });
             });
 
-            AddStep(@"show second", () =>
+            downloadAssert(true);
+        }
+
+        [Test]
+        public void TestAvailability()
+        {
+            AddStep(@"show undownloadable", () =>
             {
                 overlay.ShowBeatmapSet(new BeatmapSetInfo
                 {
+                    OnlineBeatmapSetID = 1234,
                     Metadata = new BeatmapMetadata
                     {
-                        Title = @"Soumatou Labyrinth",
-                        Artist = @"Yunomi with Momobako&miko",
-                        Tags = @"mmbk.com yuzu__rinrin charlotte",
+                        Title = @"undownloadable beatmap",
+                        Artist = @"no one",
+                        Source = @"some source",
+                        Tags = @"another test tag tag more test tags",
                         Author = new User
                         {
-                            Username = @"komasy",
-                            Id = 1980256,
+                            Username = @"BanchoBot",
+                            Id = 3,
                         },
                     },
                     OnlineInfo = new BeatmapSetOnlineInfo
                     {
-                        Preview = @"https://b.ppy.sh/preview/625493.mp3",
-                        PlayCount = 22996,
-                        FavouriteCount = 58,
-                        Submitted = new DateTime(2016, 6, 11),
-                        Ranked = new DateTime(2016, 7, 12),
-                        Status = BeatmapSetOnlineStatus.Pending,
-                        BPM = 160,
-                        HasVideo = false,
-                        Covers = new BeatmapSetOnlineCovers
+                        Availability = new BeatmapSetOnlineAvailability
                         {
-                            Cover = @"https://assets.ppy.sh/beatmaps/625493/covers/cover.jpg?1499167472",
+                            DownloadDisabled = true,
+                            ExternalLink = "https://osu.ppy.sh",
                         },
+                        Preview = @"https://b.ppy.sh/preview/1234.mp3",
+                        PlayCount = 123,
+                        FavouriteCount = 456,
+                        Submitted = DateTime.Now,
+                        Ranked = DateTime.Now,
+                        BPM = 111,
+                        HasVideo = true,
+                        HasStoryboard = true,
+                        Covers = new BeatmapSetOnlineCovers(),
                     },
                     Metrics = new BeatmapSetMetrics { Ratings = Enumerable.Range(0, 11).ToArray() },
                     Beatmaps = new List<BeatmapInfo>
                     {
                         new BeatmapInfo
                         {
-                            StarDifficulty = 1.40,
-                            Version = @"yzrin's Kantan",
+                            StarDifficulty = 5.67,
+                            Version = @"ANOTHER TEST",
+                            Length = 123000,
                             Ruleset = taikoRuleset,
                             BaseDifficulty = new BeatmapDifficulty
                             {
-                                CircleSize = 2,
-                                DrainRate = 7,
-                                OverallDifficulty = 3,
-                                ApproachRate = 10,
+                                CircleSize = 9,
+                                DrainRate = 8,
+                                OverallDifficulty = 7,
+                                ApproachRate = 6,
                             },
                             OnlineInfo = new BeatmapOnlineInfo
                             {
-                                Length = 193000,
-                                CircleCount = 262,
-                                SliderCount = 0,
-                                PlayCount = 3952,
-                                PassCount = 1373,
-                            },
-                            Metrics = new BeatmapMetrics
-                            {
-                                Fails = Enumerable.Range(1, 100).Select(i => i % 12 - 6).ToArray(),
-                                Retries = Enumerable.Range(-2, 100).Select(i => i % 12 - 6).ToArray(),
-                            },
-                        },
-                        new BeatmapInfo
-                        {
-                            StarDifficulty = 2.23,
-                            Version = @"Futsuu",
-                            Ruleset = taikoRuleset,
-                            BaseDifficulty = new BeatmapDifficulty
-                            {
-                                CircleSize = 2,
-                                DrainRate = 6,
-                                OverallDifficulty = 4,
-                                ApproachRate = 10,
-                            },
-                            OnlineInfo = new BeatmapOnlineInfo
-                            {
-                                Length = 193000,
-                                CircleCount = 464,
-                                SliderCount = 0,
-                                PlayCount = 4833,
-                                PassCount = 920,
-                            },
-                            Metrics = new BeatmapMetrics
-                            {
-                                Fails = Enumerable.Range(1, 100).Select(i => i % 12 - 6).ToArray(),
-                                Retries = Enumerable.Range(-2, 100).Select(i => i % 12 - 6).ToArray(),
-                            },
-                        },
-                        new BeatmapInfo
-                        {
-                            StarDifficulty = 3.19,
-                            Version = @"Muzukashii",
-                            Ruleset = taikoRuleset,
-                            BaseDifficulty = new BeatmapDifficulty
-                            {
-                                CircleSize = 2,
-                                DrainRate = 6,
-                                OverallDifficulty = 5,
-                                ApproachRate = 10,
-                            },
-                            OnlineInfo = new BeatmapOnlineInfo
-                            {
-                                Length = 193000,
-                                CircleCount = 712,
-                                SliderCount = 0,
-                                PlayCount = 4405,
-                                PassCount = 854,
-                            },
-                            Metrics = new BeatmapMetrics
-                            {
-                                Fails = Enumerable.Range(1, 100).Select(i => i % 12 - 6).ToArray(),
-                                Retries = Enumerable.Range(-2, 100).Select(i => i % 12 - 6).ToArray(),
-                            },
-                        },
-                        new BeatmapInfo
-                        {
-                            StarDifficulty = 3.97,
-                            Version = @"Charlotte's Oni",
-                            Ruleset = taikoRuleset,
-                            BaseDifficulty = new BeatmapDifficulty
-                            {
-                                CircleSize = 5,
-                                DrainRate = 6,
-                                OverallDifficulty = 5.5f,
-                                ApproachRate = 10,
-                            },
-                            OnlineInfo = new BeatmapOnlineInfo
-                            {
-                                Length = 193000,
-                                CircleCount = 943,
-                                SliderCount = 0,
-                                PlayCount = 3950,
-                                PassCount = 693,
-                            },
-                            Metrics = new BeatmapMetrics
-                            {
-                                Fails = Enumerable.Range(1, 100).Select(i => i % 12 - 6).ToArray(),
-                                Retries = Enumerable.Range(-2, 100).Select(i => i % 12 - 6).ToArray(),
-                            },
-                        },
-                        new BeatmapInfo
-                        {
-                            StarDifficulty = 5.08,
-                            Version = @"Labyrinth Oni",
-                            Ruleset = taikoRuleset,
-                            BaseDifficulty = new BeatmapDifficulty
-                            {
-                                CircleSize = 5,
-                                DrainRate = 5,
-                                OverallDifficulty = 6,
-                                ApproachRate = 10,
-                            },
-                            OnlineInfo = new BeatmapOnlineInfo
-                            {
-                                Length = 193000,
-                                CircleCount = 1068,
-                                SliderCount = 0,
-                                PlayCount = 5856,
-                                PassCount = 1207,
+                                CircleCount = 123,
+                                SliderCount = 45,
+                                PlayCount = 567,
+                                PassCount = 89,
                             },
                             Metrics = new BeatmapMetrics
                             {
@@ -405,6 +206,8 @@ namespace osu.Game.Tests.Visual.Online
                     },
                 });
             });
+
+            downloadAssert(false);
         }
 
         [Test]
@@ -417,6 +220,16 @@ namespace osu.Game.Tests.Visual.Online
         public void TestShowWithNoReload()
         {
             AddStep(@"show without reload", overlay.Show);
+        }
+
+        private void downloadAssert(bool shown)
+        {
+            AddAssert($"is download button {(shown ? "shown" : "hidden")}", () => overlay.DownloadButtonsVisible == shown);
+        }
+
+        private class TestBeatmapSetOverlay : BeatmapSetOverlay
+        {
+            public bool DownloadButtonsVisible => Header.DownloadButtonsVisible;
         }
     }
 }

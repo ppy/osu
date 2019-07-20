@@ -37,7 +37,8 @@ namespace osu.Game.Rulesets.Objects.Legacy.Catch
             };
         }
 
-        protected override HitObject CreateSlider(Vector2 position, bool newCombo, int comboOffset, Vector2[] controlPoints, double length, PathType pathType, int repeatCount, List<List<SampleInfo>> nodeSamples)
+        protected override HitObject CreateSlider(Vector2 position, bool newCombo, int comboOffset, Vector2[] controlPoints, double? length, PathType pathType, int repeatCount,
+                                                  List<List<HitSampleInfo>> nodeSamples)
         {
             newCombo |= forceNewCombo;
             comboOffset += extraComboOffset;
