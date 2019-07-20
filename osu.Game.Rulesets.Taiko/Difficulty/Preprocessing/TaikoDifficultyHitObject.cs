@@ -10,6 +10,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing
     public class TaikoDifficultyHitObject : DifficultyHitObject
     {
         public readonly bool HasTypeChange;
+        public double RepetitionNerf = 1.0;
 
         public TaikoDifficultyHitObject(HitObject hitObject, HitObject lastObject, double clockRate)
             : base(hitObject, lastObject, clockRate)

@@ -30,9 +30,11 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
             if (beatmap.HitObjects.Count == 0)
                 return new TaikoDifficultyAttributes { Mods = mods, Skills = skills };
 
-            // Scale it to stay somewhat consistent with how it used to be
-            var readingRating = Math.Pow(Math.Pow(skills[0].DifficultyValue() * star_scaling_factor, 1.2) / 3.6, 0.5) * 3.6;
+            // Reading needs to be calculated first to detect easy patterns spam for speed.
+            // Scale it to stay somewhat consistent with how it used to be.
+            var readingRating = Math.Pow(skills[0].DifficultyValue() * star_scaling_factor + 1, 0.5) - 1;
             var speedRating = skills[1].DifficultyValue() * star_scaling_factor;
+
             return new TaikoDifficultyAttributes
             {
                 StarRating = readingRating + speedRating,

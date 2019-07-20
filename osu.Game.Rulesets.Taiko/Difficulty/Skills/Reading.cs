@@ -28,11 +28,10 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Skills
         private readonly double[] previousDeltas = new double[max_pattern_length];
         private int noteNum;
 
-        // Only nerfs super repeating patterns
-        private double repetitionNerf = 1.0;
-
         private const double rhythm_change_base_threshold = 0.2;
         private const double rhythm_change_base = 2.0;
+
+        private double repetitionNerf = 1.0;
 
         private ColourSwitch lastColourSwitch = ColourSwitch.None;
 
@@ -97,10 +96,12 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Skills
 
             // Remember latest note
             lastNotes += isRim ? 'k' : 'd';
-            repetitionNerf = Math.Min(Math.Max(repetitionNerf * 25.0 * colorDiff, 1.0 / 25.0), 1.0);
-            double addition = 0.272 + 5.44 * colorDiff * repetitionNerf;
+            var taikoCurrent = (TaikoDifficultyHitObject)current;
+            repetitionNerf = Math.Min(Math.Max(repetitionNerf * 25 * colorDiff, 1.0 / 25), 1.0);
+            taikoCurrent.RepetitionNerf = Math.Pow(repetitionNerf, 0.5);
+            double addition = 1.65 + 33 * colorDiff * taikoCurrent.RepetitionNerf;
 
-            return Math.Pow(addition, 1.1);
+            return addition;
         }
 
         private double colourChangeDifficulty(DifficultyHitObject current)
