@@ -7,23 +7,19 @@ using osu.Game.Online.API.Requests.Responses;
 
 namespace osu.Game.Online.API.Requests
 {
-    public class GetUserBeatmapsRequest : APIRequest<List<APIBeatmapSet>>
+    public class GetUserBeatmapsRequest : PaginatedAPIRequest<List<APIBeatmapSet>>
     {
         private readonly long userId;
-        private readonly int offset;
-        private readonly int limit;
         private readonly BeatmapSetType type;
 
-        public GetUserBeatmapsRequest(long userId, BeatmapSetType type, int offset = 0, int limit = 6)
+        public GetUserBeatmapsRequest(long userId, BeatmapSetType type, int page = 0, int itemsPerPage = 6)
+            : base(page, itemsPerPage)
         {
             this.userId = userId;
-            this.offset = offset;
-            this.limit = limit;
             this.type = type;
         }
 
-        // ReSharper disable once ImpureMethodCallOnReadonlyValueField
-        protected override string Target => $@"users/{userId}/beatmapsets/{type.ToString().Underscore()}?offset={offset}&limit={limit}";
+        protected override string Target => $@"users/{userId}/beatmapsets/{type.ToString().Underscore()}";
     }
 
     public enum BeatmapSetType

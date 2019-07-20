@@ -6,20 +6,17 @@ using osu.Game.Online.API.Requests.Responses;
 
 namespace osu.Game.Online.API.Requests
 {
-    public class GetUserRecentActivitiesRequest : APIRequest<List<APIRecentActivity>>
+    public class GetUserRecentActivitiesRequest : PaginatedAPIRequest<List<APIRecentActivity>>
     {
         private readonly long userId;
-        private readonly int offset;
-        private readonly int limit;
 
-        public GetUserRecentActivitiesRequest(long userId, int offset = 0, int limit = 5)
+        public GetUserRecentActivitiesRequest(long userId, int page = 0, int itemsPerPage = 5)
+            : base(page, itemsPerPage)
         {
             this.userId = userId;
-            this.offset = offset;
-            this.limit = limit;
         }
 
-        protected override string Target => $"users/{userId}/recent_activity?offset={offset}&limit={limit}";
+        protected override string Target => $"users/{userId}/recent_activity";
     }
 
     public enum RecentActivityType
