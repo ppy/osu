@@ -127,19 +127,15 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
 
         private void getScores(BeatmapInfo beatmap)
         {
-            loadingAnimation.Show();
-
             getScoresRequest?.Cancel();
             getScoresRequest = null;
 
             Scores = null;
 
             if (beatmap?.OnlineBeatmapID.HasValue != true)
-            {
-                loadingAnimation.Hide();
                 return;
-            }
 
+            loadingAnimation.Show();
             getScoresRequest = new GetScoresRequest(beatmap, beatmap.Ruleset);
             getScoresRequest.Success += scores =>
             {
