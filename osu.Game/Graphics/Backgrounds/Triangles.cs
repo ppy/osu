@@ -214,7 +214,7 @@ namespace osu.Game.Graphics.Backgrounds
             {
                 base.Draw(vertexAction);
 
-                if (vertexBatch == null || vertexBatch.Size != Source.AimCount)
+                if (vertexBatch == null || vertexBatch.Size != Source.AimCount && Source.AimCount > 0)
                 {
                     vertexBatch?.Dispose();
                     vertexBatch = new TriangleBatch<TexturedVertex2D>(Source.AimCount, 1);
