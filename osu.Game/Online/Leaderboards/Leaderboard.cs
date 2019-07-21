@@ -19,7 +19,8 @@ using osuTK.Graphics;
 
 namespace osu.Game.Online.Leaderboards
 {
-    public abstract class Leaderboard<TScope, ScoreInfo> : Container, IOnlineComponent
+    public abstract class Leaderboard<TScope, ScoreInfo> : Container, ILeaderboard, IOnlineComponent
+        where ScoreInfo : Scoring.ScoreInfo
     {
         private const double fade_duration = 300;
 
@@ -78,6 +79,8 @@ namespace osu.Game.Online.Leaderboards
                 }, (showScoresCancellationSource = new CancellationTokenSource()).Token));
             }
         }
+
+        IEnumerable<Scoring.ScoreInfo> ILeaderboard.Scores => Scores;
 
         protected virtual FillFlowContainer<LeaderboardScore> CreateScoreFlow()
             => new FillFlowContainer<LeaderboardScore>
