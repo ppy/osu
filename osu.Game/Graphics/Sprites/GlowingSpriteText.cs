@@ -12,7 +12,7 @@ namespace osu.Game.Graphics.Sprites
 {
     public class GlowingSpriteText : Container
     {
-        private readonly OsuSpriteText spriteText, glowingText;
+        private readonly OsuSpriteText spriteText, blurredText;
 
         private string text = string.Empty;
 
@@ -85,7 +85,7 @@ namespace osu.Game.Graphics.Sprites
                     Size = new Vector2(3f),
                     Children = new[]
                     {
-                        glowingText = new OsuSpriteText
+                        blurredText = new OsuSpriteText
                         {
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
