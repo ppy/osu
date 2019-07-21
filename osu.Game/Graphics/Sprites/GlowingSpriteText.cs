@@ -23,7 +23,7 @@ namespace osu.Game.Graphics.Sprites
                 text = value;
 
                 spriteText.Text = text;
-                glowingText.Text = text;
+                blurredText.Text = text;
             }
         }
 
@@ -37,7 +37,7 @@ namespace osu.Game.Graphics.Sprites
                 font = value.With(fixedWidth: true);
 
                 spriteText.Font = font;
-                glowingText.Font = font;
+                blurredText.Font = font;
             }
         }
 
@@ -51,7 +51,7 @@ namespace osu.Game.Graphics.Sprites
                 textSize = value;
 
                 spriteText.Size = textSize;
-                glowingText.Size = textSize;
+                blurredText.Size = textSize;
             }
         }
 
@@ -63,8 +63,8 @@ namespace osu.Game.Graphics.Sprites
 
         public ColourInfo GlowColour
         {
-            get => glowingText.Colour;
-            set => glowingText.Colour = value;
+            get => blurredText.Colour;
+            set => blurredText.Colour = value;
         }
 
         public GlowingSpriteText()
