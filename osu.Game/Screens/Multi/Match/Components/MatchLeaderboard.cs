@@ -33,7 +33,7 @@ namespace osu.Game.Screens.Multi.Match.Components
             }, true);
         }
 
-        protected override bool IsOnlineScope() => true;
+        protected override bool IsOnlineScope => true;
 
         protected override APIRequest FetchScores(Action<IEnumerable<APIRoomScoreInfo>> scoresCallback)
         {
