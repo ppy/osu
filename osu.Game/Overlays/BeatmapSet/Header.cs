@@ -246,6 +246,8 @@ namespace osu.Game.Overlays.BeatmapSet
                     onlineStatusPill.Status = setInfo.NewValue.OnlineInfo.Status;
 
                     downloadButtonsContainer.FadeIn(transition_duration);
+
+                    favouriteButton.Favourited.Value = setInfo.NewValue.OnlineInfo.HasFavourited;
                     favouriteButton.FadeIn(transition_duration);
 
                     updateDownloadButtons();
