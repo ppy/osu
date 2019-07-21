@@ -31,6 +31,9 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Skills
         private const double rhythm_change_base_threshold = 0.2;
         private const double rhythm_change_base = 2.0;
 
+        private const double slow_note_delta_min = 800.0;
+        private const double slow_note_delta_max = 2000.0;
+
         private double repetitionNerf = 1.0;
 
         private ColourSwitch lastColourSwitch = ColourSwitch.None;
@@ -96,10 +99,15 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Skills
 
             // Remember latest note
             lastNotes += isRim ? 'k' : 'd';
+
             var taikoCurrent = (TaikoDifficultyHitObject)current;
             repetitionNerf = Math.Min(Math.Max(repetitionNerf * 25 * colorDiff, 1.0 / 25), 1.0);
             taikoCurrent.RepetitionNerf = Math.Pow(repetitionNerf, 0.5);
+
             double addition = 1.65 + 33 * colorDiff * taikoCurrent.RepetitionNerf;
+
+            if (current.DeltaTime > slow_note_delta_min)
+                addition *= 0.9 - 0.9 * Math.Pow((Math.Min(current.DeltaTime, slow_note_delta_max) - slow_note_delta_min) / (slow_note_delta_max - slow_note_delta_min), 0.25) + 0.1;
 
             return addition;
         }
