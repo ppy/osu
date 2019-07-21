@@ -12,7 +12,6 @@ namespace osu.Game.Graphics.Sprites
 {
     public class GlowingSpriteText : Container
     {
-        private readonly BufferedContainer blurContainer;
         private readonly OsuSpriteText spriteText, glowingText;
 
         private string text = string.Empty;
@@ -75,7 +74,7 @@ namespace osu.Game.Graphics.Sprites
 
             Children = new Drawable[]
             {
-                blurContainer = new BufferedContainer
+                new BufferedContainer
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
