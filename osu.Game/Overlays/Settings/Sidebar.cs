@@ -22,7 +22,7 @@ namespace osu.Game.Overlays.Settings
             AutoSizeAxes = Axes.Y;
             Width = DEFAULT_WIDTH;
 
-            Current.BindValueChanged(tab => cancelExpandEvent());
+            Current.BindValueChanged(tab => contract());
         }
 
         protected override TabItem<SettingsSection> CreateTabItem(SettingsSection value) => new SidebarButton(value);
@@ -35,6 +35,8 @@ namespace osu.Game.Overlays.Settings
             AllowMultiline = true,
         };
 
+        private SidebarButton lastHoveredButton;
+
         protected override void LoadComplete()
         {
             base.LoadComplete();
@@ -44,11 +46,11 @@ namespace osu.Game.Overlays.Settings
 
             foreach (var button in TabContainer.Children)
             {
-                ((SidebarButton)button).OnHoverAction += queueExpandIfHovering;
-                ((SidebarButton)button).OnHoverLostAction += tab =>
+                ((SidebarButton)button).OnHoverAction += queueExpand;
+                ((SidebarButton)button).OnHoverLostAction += currentButton =>
                 {
-                    if (hoveredButton == button)
-                        cancelExpandEvent();
+                    if (currentButton == lastHoveredButton)
+                        contract();
                 };
             }
         }
@@ -61,8 +63,6 @@ namespace osu.Game.Overlays.Settings
             get => state;
             set
             {
-                expandEvent?.Cancel();
-
                 if (state == value) return;
 
                 state = value;
@@ -80,29 +80,20 @@ namespace osu.Game.Overlays.Settings
             }
         }
 
-        private SidebarButton lastHoveredButton;
-        private SidebarButton hoveredButton;
-
-        private void queueExpandIfHovering(SidebarButton button)
+        private void queueExpand(SidebarButton button)
         {
-            hoveredButton = button;
+            lastHoveredButton = button;
 
-            // only expand when we hover a different button.
-            if (lastHoveredButton == hoveredButton) return;
+            if (State == ExpandedState.Expanded)
+                return;
 
-            if (State != ExpandedState.Expanded)
-            {
-                expandEvent?.Cancel();
-                expandEvent = Scheduler.AddDelayed(() => State = ExpandedState.Expanded, 750);
-            }
-
-            lastHoveredButton = hoveredButton;
+            contract();
+            expandEvent = Scheduler.AddDelayed(() => State = ExpandedState.Expanded, 750);
         }
 
-        private void cancelExpandEvent()
+        private void contract()
         {
             expandEvent?.Cancel();
-            lastHoveredButton = null;
             State = ExpandedState.Contracted;
         }
     }
