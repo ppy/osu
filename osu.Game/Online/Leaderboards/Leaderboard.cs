@@ -194,7 +194,7 @@ namespace osu.Game.Online.Leaderboards
 
         private APIRequest getScoresRequest;
 
-        protected abstract bool IsOnlineScope();
+        protected abstract bool IsOnlineScope { get; }
 
         public void APIStateChanged(IAPIProvider api, APIState state)
         {
@@ -202,7 +202,7 @@ namespace osu.Game.Online.Leaderboards
             {
                 case APIState.Online:
                 case APIState.Offline:
-                    if (IsOnlineScope())
+                    if (IsOnlineScope)
                         UpdateScores();
 
                     break;
