@@ -10,6 +10,7 @@ using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Leaderboards;
 using osu.Game.Scoring;
 using System;
+using System.Threading;
 
 namespace osu.Game.Screens.Select.Details
 {
@@ -66,6 +67,8 @@ namespace osu.Game.Screens.Select.Details
             Score.BindValueChanged(onScoreChanged);
         }
 
+        private CancellationTokenSource loadScoreCancellation;
+
         private void onScoreChanged(ValueChangedEvent<APILegacyUserTopScoreInfo> score)
         {
             var newScore = score.NewValue;
@@ -76,12 +79,17 @@ namespace osu.Game.Screens.Select.Details
                 return;
             }
 
-            scoreContainer.Child = new LeaderboardScore(newScore.Score, newScore.Position)
+            scoreContainer.Clear();
+            loadScoreCancellation?.Cancel();
+
+            LoadComponentAsync(new LeaderboardScore(newScore.Score, newScore.Position)
             {
                 Action = () => ScoreSelected?.Invoke(newScore.Score)
-            };
-
-            Show();
+            }, drawableScore =>
+            {
+                scoreContainer.Child = drawableScore;
+                Show();
+            }, (loadScoreCancellation = new CancellationTokenSource()).Token);
         }
 
         protected override void PopIn()
