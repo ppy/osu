@@ -10,7 +10,6 @@ using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Osu.Objects.Drawables.Pieces;
 using osuTK;
 using osu.Game.Rulesets.Scoring;
-using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Osu.Objects.Drawables
 {
@@ -98,19 +97,14 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             positionBindable.BindTo(HitObject.PositionBindable);
             stackHeightBindable.BindTo(HitObject.StackHeightBindable);
             scaleBindable.BindTo(HitObject.ScaleBindable);
-        }
 
-        public override Color4 AccentColour
-        {
-            get => base.AccentColour;
-            set
+            AccentColour.BindValueChanged(colour =>
             {
-                base.AccentColour = value;
-                explode.Colour = AccentColour;
-                glow.Colour = AccentColour;
-                circle.Colour = AccentColour;
-                ApproachCircle.Colour = AccentColour;
-            }
+                explode.Colour = colour.NewValue;
+                glow.Colour = colour.NewValue;
+                circle.Colour = colour.NewValue;
+                ApproachCircle.Colour = colour.NewValue;
+            }, true);
         }
 
         protected override void CheckForResult(bool userTriggered, double timeOffset)

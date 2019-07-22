@@ -9,7 +9,6 @@ using osu.Framework.Bindables;
 using osu.Framework.Extensions.TypeExtensions;
 using osu.Framework.Graphics.Primitives;
 using osu.Game.Audio;
-using osu.Game.Graphics;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Scoring;
@@ -18,14 +17,14 @@ using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Objects.Drawables
 {
-    public abstract class DrawableHitObject : SkinReloadableDrawable, IHasAccentColour
+    public abstract class DrawableHitObject : SkinReloadableDrawable
     {
         public readonly HitObject HitObject;
 
         /// <summary>
         /// The colour used for various elements of this DrawableHitObject.
         /// </summary>
-        public virtual Color4 AccentColour { get; set; } = Color4.Gray;
+        public readonly Bindable<Color4> AccentColour = new Bindable<Color4>(Color4.Gray);
 
         // Todo: Rulesets should be overriding the resources instead, but we need to figure out where/when to apply overrides first
         protected virtual string SampleNamespace => null;
