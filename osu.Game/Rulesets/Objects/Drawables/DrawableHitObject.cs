@@ -7,7 +7,6 @@ using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.TypeExtensions;
-using osu.Framework.Graphics;
 using osu.Framework.Graphics.Primitives;
 using osu.Game.Audio;
 using osu.Game.Graphics;
@@ -179,6 +178,39 @@ namespace osu.Game.Rulesets.Objects.Drawables
             UpdateResult(false);
         }
 
+        private double? lifetimeStart;
+
+        public override double LifetimeStart
+        {
+            get => lifetimeStart ?? (HitObject.StartTime - InitialLifetimeOffset);
+            set
+            {
+                base.LifetimeStart = value;
+                lifetimeStart = value;
+            }
+        }
+
+        /// <summary>
+        /// A safe offset prior to the start time of <see cref="HitObject"/> at which this <see cref="DrawableHitObject"/> may begin displaying contents.
+        /// By default, <see cref="DrawableHitObject"/>s are assumed to display their contents within 10 seconds prior to the start time of <see cref="HitObject"/>.
+        /// </summary>
+        /// <remarks>
+        /// This is only used as an optimisation to delay the initial update of this <see cref="DrawableHitObject"/> and may be tuned more aggressively if required.
+        /// A more accurate <see cref="LifetimeStart"/> should be set inside <see cref="UpdateState"/> for an <see cref="ArmedState.Idle"/> state.
+        /// </remarks>
+        protected virtual double InitialLifetimeOffset => 10000;
+
+        /// <summary>
+        /// Will be called at least once after this <see cref="DrawableHitObject"/> has become not alive.
+        /// </summary>
+        public virtual void OnKilled()
+        {
+            foreach (var nested in NestedHitObjects)
+                nested.OnKilled();
+
+            UpdateResult(false);
+        }
+
         protected virtual void AddNested(DrawableHitObject h)
         {
             h.OnNewResult += (d, r) => OnNewResult?.Invoke(d, r);
@@ -221,16 +253,6 @@ namespace osu.Game.Rulesets.Objects.Drawables
             }
 
             OnNewResult?.Invoke(this, Result);
-        }
-
-        /// <summary>
-        /// Will called at least once after the <see cref="Drawable.LifetimeEnd"/> of this <see cref="DrawableHitObject"/> has been passed.
-        /// </summary>
-        internal void OnLifetimeEnd()
-        {
-            foreach (var nested in NestedHitObjects)
-                nested.OnLifetimeEnd();
-            UpdateResult(false);
         }
 
         /// <summary>
