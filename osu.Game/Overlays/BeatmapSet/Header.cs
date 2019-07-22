@@ -161,7 +161,8 @@ namespace osu.Game.Overlays.BeatmapSet
                                             Margin = new MarginPadding { Top = 10 },
                                             Children = new Drawable[]
                                             {
-                                                favouriteButton = new FavouriteButton(),
+                                                favouriteButton = new FavouriteButton
+                                                { BeatmapSet = { BindTarget = BeatmapSet } },
                                                 downloadButtonsContainer = new FillFlowContainer
                                                 {
                                                     RelativeSizeAxes = Axes.Both,
@@ -246,8 +247,6 @@ namespace osu.Game.Overlays.BeatmapSet
                     onlineStatusPill.Status = setInfo.NewValue.OnlineInfo.Status;
 
                     downloadButtonsContainer.FadeIn(transition_duration);
-
-                    favouriteButton.Favourited.Value = setInfo.NewValue.OnlineInfo.HasFavourited;
                     favouriteButton.FadeIn(transition_duration);
 
                     updateDownloadButtons();
