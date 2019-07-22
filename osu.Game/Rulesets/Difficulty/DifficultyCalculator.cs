@@ -19,7 +19,7 @@ namespace osu.Game.Rulesets.Difficulty
         /// <summary>
         /// The length of each strain section.
         /// </summary>
-        protected virtual int SectionLength => 400;
+        public virtual int SectionLength => 400;
 
         private readonly Ruleset ruleset;
         private readonly WorkingBeatmap beatmap;
