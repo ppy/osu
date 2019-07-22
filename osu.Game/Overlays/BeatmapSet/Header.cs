@@ -162,7 +162,9 @@ namespace osu.Game.Overlays.BeatmapSet
                                             Children = new Drawable[]
                                             {
                                                 favouriteButton = new FavouriteButton
-                                                { BeatmapSet = { BindTarget = BeatmapSet } },
+                                                {
+                                                    BeatmapSet = { BindTarget = BeatmapSet }
+                                                },
                                                 downloadButtonsContainer = new FillFlowContainer
                                                 {
                                                     RelativeSizeAxes = Axes.Both,
