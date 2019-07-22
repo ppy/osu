@@ -16,8 +16,9 @@ namespace osu.Game.Overlays.BeatmapSet.Buttons
 {
     public class FavouriteButton : HeaderButton
     {
-        private readonly Bindable<bool> favourited = new Bindable<bool>();
         public readonly Bindable<BeatmapSetInfo> BeatmapSet = new Bindable<BeatmapSetInfo>();
+
+        private readonly Bindable<bool> favourited = new Bindable<bool>();
 
         [BackgroundDependencyLoader]
         private void load()
