@@ -6,15 +6,22 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.IO.Stores;
 using osu.Game.Database;
+using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Rulesets.Objects.Drawables;
+using osu.Game.Rulesets.Objects.Types;
 using osuTK;
+using osuTK.Graphics;
 
 namespace osu.Game.Skinning
 {
@@ -36,6 +43,8 @@ namespace osu.Game.Skinning
         {
         }
 
+        private readonly bool hasHitCircle;
+
         protected LegacySkin(SkinInfo skin, IResourceStore<byte[]> storage, AudioManager audioManager, string filename)
             : base(skin)
         {
@@ -48,8 +57,6 @@ namespace osu.Game.Skinning
 
             Samples = audioManager.GetSampleStore(storage);
             Textures = new TextureStore(new TextureLoaderStore(storage));
-
-            bool hasHitCircle = false;
 
             using (var testStream = storage.GetStream("hitcircle"))
                 hasHitCircle |= testStream != null;
@@ -71,6 +78,12 @@ namespace osu.Game.Skinning
         {
             switch (componentName)
             {
+                case "Play/Osu/Objects/Drawables/MainCircle":
+                    if (!hasHitCircle)
+                        return null;
+
+                    return new LegacyMainCirclePiece();
+
                 case "Play/Miss":
                     componentName = "hit0";
                     break;
@@ -241,6 +254,64 @@ namespace osu.Game.Skinning
                     texture.ScaleAdjust = ratio;
 
                 return texture;
+            }
+        }
+
+        public class LegacyMainCirclePiece : CompositeDrawable
+        {
+            public LegacyMainCirclePiece()
+            {
+                Size = new Vector2(128);
+
+                Anchor = Anchor.Centre;
+                Origin = Anchor.Centre;
+            }
+
+            private readonly IBindable<ArmedState> state = new Bindable<ArmedState>();
+
+            private readonly Bindable<Color4> accentColour = new Bindable<Color4>();
+
+            [BackgroundDependencyLoader]
+            private void load(DrawableHitObject drawableObject, ISkinSource skin)
+            {
+                Sprite mainCircle;
+
+                InternalChildren = new Drawable[]
+                {
+                    mainCircle = new Sprite
+                    {
+                        Texture = skin.GetTexture("hitcircle"),
+                        Colour = drawableObject.AccentColour.Value
+                    },
+                    new SkinnableSpriteText("Play/osu/number-text", _ => new OsuSpriteText
+                    {
+                        Font = OsuFont.Numeric.With(size: 40),
+                        UseFullGlyphHeight = false,
+                    }, confineMode: ConfineMode.NoScaling)
+                    {
+                        Text = (((IHasComboInformation)drawableObject.HitObject).IndexInCurrentCombo + 1).ToString()
+                    },
+                    new Sprite { Texture = skin.GetTexture("hitcircleoverlay") }
+                };
+
+                state.BindTo(drawableObject.State);
+                state.BindValueChanged(updateState, true);
+
+                accentColour.BindTo(drawableObject.AccentColour);
+                accentColour.BindValueChanged(colour => mainCircle.Colour = colour.NewValue, true);
+            }
+
+            private void updateState(ValueChangedEvent<ArmedState> state)
+            {
+                const double legacy_fade_duration = 240;
+
+                switch (state.NewValue)
+                {
+                    case ArmedState.Hit:
+                        this.FadeOut(legacy_fade_duration, Easing.Out);
+                        this.ScaleTo(1.4f, legacy_fade_duration, Easing.Out);
+                        break;
+                }
             }
         }
     }
