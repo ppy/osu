@@ -42,7 +42,8 @@ namespace osu.Game.Screens.Select.Details
                 {
                     Anchor = Anchor.BottomLeft,
                     Origin = Anchor.BottomLeft,
-                    RelativeSizeAxes = Axes.Both,
+                    RelativeSizeAxes = Axes.X,
+                    Height = height,
                     Children = new Drawable[]
                     {
                         new OsuSpriteText
@@ -94,6 +95,10 @@ namespace osu.Game.Screens.Select.Details
 
         protected override void PopIn() => this.ResizeHeightTo(height, duration / 4f, Easing.OutQuint).OnComplete(_ => contentContainer.FadeIn(duration, Easing.OutQuint));
 
-        protected override void PopOut() => contentContainer.FadeOut(duration, Easing.OutQuint).OnComplete(_ => this.ResizeHeightTo(0));
+        protected override void PopOut()
+        {
+            this.ResizeHeightTo(0);
+            contentContainer.FadeOut(duration / 4f, Easing.OutQuint);
+        }
     }
 }
