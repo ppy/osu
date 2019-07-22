@@ -21,7 +21,7 @@ namespace osu.Game.Overlays.Profile.Sections.Kudosu
         private readonly CountSection avaliable;
 
         public KudosuInfo(Bindable<User> user)
-            : base (user, null, null)
+            : base(user, null, null)
         {
             Add(new FillFlowContainer
             {
