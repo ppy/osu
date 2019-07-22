@@ -34,8 +34,6 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         protected override void ClearInternal(bool disposeChildren = true) => shakeContainer.Clear(disposeChildren);
         protected override bool RemoveInternal(Drawable drawable) => shakeContainer.Remove(drawable);
 
-        protected override bool UseTransformStateManagement => true;
-
         protected sealed override double InitialLifetimeOffset => HitObject.TimePreempt;
 
         protected override void UpdateInitialTransforms() => this.FadeIn(HitObject.TimeFadeIn);

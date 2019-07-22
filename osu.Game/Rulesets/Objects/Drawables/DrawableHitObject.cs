@@ -143,7 +143,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
         /// Going forward, this is the preferred way of implementing <see cref="DrawableHitObject"/>s. Previous functionality
         /// is offered as a compatibility layer until all rulesets have been migrated across.
         /// </remarks>
-        protected virtual bool UseTransformStateManagement => false;
+        protected virtual bool UseTransformStateManagement => true;
 
         protected override void ClearInternal(bool disposeChildren = true) => throw new InvalidOperationException($"Should never clear a {nameof(DrawableHitObject)}");
 
