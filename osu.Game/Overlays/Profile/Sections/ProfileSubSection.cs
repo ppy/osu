@@ -13,12 +13,12 @@ namespace osu.Game.Overlays.Profile.Sections
 {
     public abstract class ProfileSubSection : FillFlowContainer
     {
-        private readonly Container content;
-
         protected readonly OsuSpriteText MissingText;
         protected readonly Bindable<User> User = new Bindable<User>();
 
         protected override Container<Drawable> Content => content;
+
+        private readonly Container content;
 
         protected ProfileSubSection(Bindable<User> user, string header, string missing)
         {
