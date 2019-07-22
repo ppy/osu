@@ -63,7 +63,7 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="ppy.osu.Game.Resources" Version="2019.702.0" />
-    <PackageReference Include="ppy.osu.Framework.Android" Version="2019.717.1" />
+    <PackageReference Include="ppy.osu.Framework.Android" Version="2019.719.0" />
     <!--Workaround for https://github.com/ppy/osu/issues/5392-->
     <PackageReference Include="System.Threading.Tasks.Extensions" Version="4.5.0" />
   </ItemGroup>
