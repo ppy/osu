@@ -9,50 +9,26 @@ using osuTK;
 
 namespace osu.Game.Graphics.Sprites
 {
-    public class GlowingSpriteText : Container
+    public class GlowingSpriteText : Container, IHasText
     {
         private readonly OsuSpriteText spriteText, blurredText;
 
-        private string text = string.Empty;
-
         public string Text
         {
-            get => text;
-            set
-            {
-                text = value;
-
-                spriteText.Text = text;
-                blurredText.Text = text;
-            }
+            get => spriteText.Text;
+            set => blurredText.Text = spriteText.Text = value;
         }
-
-        private FontUsage font = OsuFont.Default.With(fixedWidth: true);
-
+        
         public FontUsage Font
         {
-            get => font;
-            set
-            {
-                font = value.With(fixedWidth: true);
-
-                spriteText.Font = font;
-                blurredText.Font = font;
-            }
+            get => spriteText.Font;
+            set => blurredText.Font = spriteText.Font = value.With(fixedWidth: true);
         }
-
-        private Vector2 textSize;
 
         public Vector2 TextSize
         {
-            get => textSize;
-            set
-            {
-                textSize = value;
-
-                spriteText.Size = textSize;
-                blurredText.Size = textSize;
-            }
+            get => spriteText.Size;
+            set => blurredText.Size = spriteText.Size = value;
         }
 
         public ColourInfo TextColour
@@ -88,8 +64,6 @@ namespace osu.Game.Graphics.Sprites
                         {
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
-                            Font = font,
-                            Text = text,
                             Shadow = false,
                         },
                     },
@@ -98,8 +72,6 @@ namespace osu.Game.Graphics.Sprites
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
-                    Font = font,
-                    Text = text,
                     Shadow = false,
                 },
             };
