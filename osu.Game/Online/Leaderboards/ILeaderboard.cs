@@ -10,6 +10,8 @@ namespace osu.Game.Online.Leaderboards
     {
         IEnumerable<ScoreInfo> Scores { get; }
 
+        bool IsOnlineScope { get; }
+
         void RefreshScores();
     }
 }
