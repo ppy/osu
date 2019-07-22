@@ -21,7 +21,7 @@ namespace osu.Game.Overlays.Profile.Sections.Historical
     public class DrawableMostPlayedBeatmap : OsuHoverContainer
     {
         private const int cover_width = 100;
-        private const int corner_radius = 10;
+        private const int corner_radius = 6;
 
         private readonly BeatmapInfo beatmap;
         private readonly int playCount;
