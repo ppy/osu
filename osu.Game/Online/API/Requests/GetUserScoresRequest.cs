@@ -6,21 +6,19 @@ using osu.Game.Online.API.Requests.Responses;
 
 namespace osu.Game.Online.API.Requests
 {
-    public class GetUserScoresRequest : APIRequest<List<APILegacyScoreInfo>>
+    public class GetUserScoresRequest : PaginatedAPIRequest<List<APILegacyScoreInfo>>
     {
         private readonly long userId;
         private readonly ScoreType type;
-        private readonly int offset;
 
-        public GetUserScoresRequest(long userId, ScoreType type, int offset = 0)
+        public GetUserScoresRequest(long userId, ScoreType type, int page = 0, int itemsPerPage = 5)
+            : base(page, itemsPerPage)
         {
             this.userId = userId;
             this.type = type;
-            this.offset = offset;
         }
 
-        // ReSharper disable once ImpureMethodCallOnReadonlyValueField
-        protected override string Target => $@"users/{userId}/scores/{type.ToString().ToLowerInvariant()}?offset={offset}";
+        protected override string Target => $@"users/{userId}/scores/{type.ToString().ToLowerInvariant()}";
     }
 
     public enum ScoreType
