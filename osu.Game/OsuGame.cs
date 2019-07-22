@@ -249,7 +249,7 @@ namespace osu.Game
                 }
 
                 // Use first beatmap available for current ruleset, else switch ruleset.
-                var first = databasedSet.Beatmaps.Find(b => b.Ruleset == Ruleset.Value) ?? databasedSet.Beatmaps.First();
+                var first = databasedSet.Beatmaps.Find(b => b.Ruleset.Equals(Ruleset.Value)) ?? databasedSet.Beatmaps.First();
 
                 Ruleset.Value = first.Ruleset;
                 Beatmap.Value = BeatmapManager.GetWorkingBeatmap(first);
