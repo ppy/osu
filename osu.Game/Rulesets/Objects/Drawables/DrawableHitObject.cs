@@ -79,9 +79,11 @@ namespace osu.Game.Rulesets.Objects.Drawables
         public override bool RemoveCompletedTransforms => false;
         protected override bool RequiresChildrenUpdate => true;
 
-        public override bool IsPresent => base.IsPresent || (State.Value == ArmedState.Idle && Clock?.CurrentTime >= LifetimeStart);
+        public override bool IsPresent => base.IsPresent || (state.Value == ArmedState.Idle && Clock?.CurrentTime >= LifetimeStart);
 
         public readonly Bindable<ArmedState> State = new Bindable<ArmedState>();
+
+        private readonly Bindable<ArmedState> state = new Bindable<ArmedState>();
 
         protected DrawableHitObject(HitObject hitObject)
         {
@@ -122,21 +124,81 @@ namespace osu.Game.Rulesets.Objects.Drawables
         {
             base.LoadComplete();
 
-            State.ValueChanged += armed =>
+            state.BindValueChanged(armed =>
             {
-                UpdateState(armed.NewValue);
+                updateState(armed.NewValue);
 
                 // apply any custom state overrides
                 ApplyCustomUpdateState?.Invoke(this, armed.NewValue);
 
                 if (armed.NewValue == ArmedState.Hit)
                     PlaySamples();
-            };
-
-            State.TriggerChange();
+            }, true);
         }
 
-        protected abstract void UpdateState(ArmedState state);
+        protected virtual bool UseTransformStateManagement => false;
+
+        private void updateState(ArmedState state)
+        {
+            if (UseTransformStateManagement)
+            {
+                double transformTime = HitObject.StartTime - InitialLifetimeOffset;
+
+                base.ApplyTransformsAt(transformTime, true);
+                base.ClearTransformsAfter(transformTime, true);
+
+                using (BeginAbsoluteSequence(transformTime, true))
+                {
+                    UpdatePreemptState();
+
+                    var judgementOffset = Math.Min(HitObject.HitWindows?.HalfWindowFor(HitResult.Miss) ?? double.MaxValue, Result?.TimeOffset ?? 0);
+
+                    using (BeginDelayedSequence(InitialLifetimeOffset + judgementOffset, true))
+                    {
+                        UpdateCurrentState(state);
+                        State.Value = state;
+                    }
+                }
+            }
+            else
+            {
+                State.Value = state;
+            }
+
+            UpdateState(state);
+        }
+
+        protected override void SkinChanged(ISkinSource skin, bool allowFallback)
+        {
+            base.SkinChanged(skin, allowFallback);
+
+            if (HitObject is IHasComboInformation combo)
+                AccentColour.Value = skin.GetValue<SkinConfiguration, Color4?>(s => s.ComboColours.Count > 0 ? s.ComboColours[combo.ComboIndex % s.ComboColours.Count] : (Color4?)null) ?? Color4.White;
+        }
+
+        protected virtual void UpdatePreemptState()
+        {
+        }
+
+        protected virtual void UpdateCurrentState(ArmedState state)
+        {
+        }
+
+        public override void ClearTransformsAfter(double time, bool propagateChildren = false, string targetMember = null)
+        {
+            if (!UseTransformStateManagement)
+                base.ClearTransformsAfter(time, propagateChildren, targetMember);
+        }
+
+        public override void ApplyTransformsAt(double time, bool propagateChildren = false)
+        {
+            if (!UseTransformStateManagement)
+                base.ApplyTransformsAt(time, propagateChildren);
+        }
+
+        protected virtual void UpdateState(ArmedState state)
+        {
+        }
 
         /// <summary>
         /// Bind to apply a custom state which can override the default implementation.
@@ -163,7 +225,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
 
                     Result.TimeOffset = 0;
                     Result.Type = HitResult.None;
-                    State.Value = ArmedState.Idle;
+                    state.Value = ArmedState.Idle;
                 }
             }
         }
@@ -243,11 +305,11 @@ namespace osu.Game.Rulesets.Objects.Drawables
                     break;
 
                 case HitResult.Miss:
-                    State.Value = ArmedState.Miss;
+                    state.Value = ArmedState.Miss;
                     break;
 
                 default:
-                    State.Value = ArmedState.Hit;
+                    state.Value = ArmedState.Hit;
                     break;
             }
 
