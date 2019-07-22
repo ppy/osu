@@ -118,8 +118,6 @@ namespace osu.Game.Rulesets.Objects.Drawables
             }
         }
 
-        protected override void ClearInternal(bool disposeChildren = true) => throw new InvalidOperationException($"Should never clear a {nameof(DrawableHitObject)}");
-
         protected override void LoadComplete()
         {
             base.LoadComplete();
@@ -136,7 +134,18 @@ namespace osu.Game.Rulesets.Objects.Drawables
             }, true);
         }
 
+        #region State / Transform Management
+
+        /// <summary>
+        /// Enables automatic transform management of this hitobject. Implementation of transforms should be done in <see cref="UpdateInitialTransforms"/> and <see cref="UpdateStateTransforms"/> only. Rewinding and removing previous states is done automatically.
+        /// </summary>
+        /// <remarks>
+        /// Going forward, this is the preferred way of implementing <see cref="DrawableHitObject"/>s. Previous functionality
+        /// is offered as a compatibility layer until all rulesets have been migrated across.
+        /// </remarks>
         protected virtual bool UseTransformStateManagement => false;
+
+        protected override void ClearInternal(bool disposeChildren = true) => throw new InvalidOperationException($"Should never clear a {nameof(DrawableHitObject)}");
 
         private void updateState(ArmedState state)
         {
@@ -149,13 +158,13 @@ namespace osu.Game.Rulesets.Objects.Drawables
 
                 using (BeginAbsoluteSequence(transformTime, true))
                 {
-                    UpdatePreemptState();
+                    UpdateInitialTransforms();
 
                     var judgementOffset = Math.Min(HitObject.HitWindows?.HalfWindowFor(HitResult.Miss) ?? double.MaxValue, Result?.TimeOffset ?? 0);
 
                     using (BeginDelayedSequence(InitialLifetimeOffset + judgementOffset, true))
                     {
-                        UpdateCurrentState(state);
+                        UpdateStateTransforms(state);
                         State.Value = state;
                     }
                 }
@@ -168,19 +177,11 @@ namespace osu.Game.Rulesets.Objects.Drawables
             UpdateState(state);
         }
 
-        protected override void SkinChanged(ISkinSource skin, bool allowFallback)
-        {
-            base.SkinChanged(skin, allowFallback);
-
-            if (HitObject is IHasComboInformation combo)
-                AccentColour.Value = skin.GetValue<SkinConfiguration, Color4?>(s => s.ComboColours.Count > 0 ? s.ComboColours[combo.ComboIndex % s.ComboColours.Count] : (Color4?)null) ?? Color4.White;
-        }
-
-        protected virtual void UpdatePreemptState()
+        protected virtual void UpdateInitialTransforms()
         {
         }
 
-        protected virtual void UpdateCurrentState(ArmedState state)
+        protected virtual void UpdateStateTransforms(ArmedState state)
         {
         }
 
@@ -198,6 +199,16 @@ namespace osu.Game.Rulesets.Objects.Drawables
 
         protected virtual void UpdateState(ArmedState state)
         {
+        }
+
+        #endregion
+
+        protected override void SkinChanged(ISkinSource skin, bool allowFallback)
+        {
+            base.SkinChanged(skin, allowFallback);
+
+            if (HitObject is IHasComboInformation combo)
+                AccentColour.Value = skin.GetValue<SkinConfiguration, Color4?>(s => s.ComboColours.Count > 0 ? s.ComboColours[combo.ComboIndex % s.ComboColours.Count] : (Color4?)null) ?? Color4.White;
         }
 
         /// <summary>
