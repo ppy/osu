@@ -28,9 +28,6 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Skills
         private readonly double[] previousDeltas = new double[max_pattern_length];
         private int noteNum;
 
-        private const double rhythm_change_base_threshold = 0.2;
-        private const double rhythm_change_base = 2.0;
-
         private const double slow_note_delta_min = 800.0;
         private const double slow_note_delta_max = 2000.0;
 
