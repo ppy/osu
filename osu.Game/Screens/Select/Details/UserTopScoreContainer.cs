@@ -1,4 +1,4 @@
-﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Bindables;
@@ -47,8 +47,8 @@ namespace osu.Game.Screens.Select.Details
                     {
                         new OsuSpriteText
                         {
-                            Anchor = Anchor.TopLeft,
-                            Origin = Anchor.TopLeft,
+                            Anchor = Anchor.TopCentre,
+                            Origin = Anchor.TopCentre,
                             Margin = new MarginPadding { Top = 5 },
                             Text = @"your personal best".ToUpper(),
                             Font = OsuFont.GetFont(size: 15, weight: FontWeight.Bold),
