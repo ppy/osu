@@ -31,30 +31,31 @@ namespace osu.Game.Screens.Select.Details
         {
             RelativeSizeAxes = Axes.X;
             Height = height;
-            Anchor = Anchor.BottomCentre;
-            Origin = Anchor.BottomCentre;
+
+            Anchor = Anchor.BottomLeft;
+            Origin = Anchor.BottomLeft;
+
             Children = new Drawable[]
             {
                 contentContainer = new Container
                 {
-                    Anchor = Anchor.BottomCentre,
-                    Origin = Anchor.BottomCentre,
-                    Height = height,
-                    RelativeSizeAxes = Axes.X,
+                    Anchor = Anchor.BottomLeft,
+                    Origin = Anchor.BottomLeft,
+                    RelativeSizeAxes = Axes.Both,
                     Children = new Drawable[]
                     {
                         new OsuSpriteText
                         {
-                            Anchor = Anchor.TopCentre,
-                            Origin = Anchor.TopCentre,
+                            Anchor = Anchor.TopLeft,
+                            Origin = Anchor.TopLeft,
                             Margin = new MarginPadding { Top = 5 },
                             Text = @"your personal best".ToUpper(),
                             Font = OsuFont.GetFont(size: 15, weight: FontWeight.Bold),
                         },
                         scoreContainer = new Container
                         {
-                            Anchor = Anchor.BottomCentre,
-                            Origin = Anchor.BottomCentre,
+                            Anchor = Anchor.BottomLeft,
+                            Origin = Anchor.BottomLeft,
                             RelativeSizeAxes = Axes.X,
                             AutoSizeAxes = Axes.Y,
                         }
@@ -62,22 +63,25 @@ namespace osu.Game.Screens.Select.Details
                 }
             };
 
-            Score.BindValueChanged(score => onScoreChanged(score.NewValue));
+            Score.BindValueChanged(onScoreChanged);
         }
 
-        private void onScoreChanged(APILegacyUserTopScoreInfo score)
+        private void onScoreChanged(ValueChangedEvent<APILegacyUserTopScoreInfo> score)
         {
-            if (score != null)
+            var newScore = score.NewValue;
+
+            if (newScore == null)
             {
-                scoreContainer.Clear();
-                scoreContainer.Add(new LeaderboardScore(score.Score, score.Position)
-                {
-                    Action = () => ScoreSelected?.Invoke(score.Score)
-                });
-                Show();
-            }
-            else
                 Hide();
+                return;
+            }
+
+            scoreContainer.Child = new LeaderboardScore(newScore.Score, newScore.Position)
+            {
+                Action = () => ScoreSelected?.Invoke(newScore.Score)
+            };
+
+            Show();
         }
 
         protected override void PopIn()
