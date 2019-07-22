@@ -15,39 +15,32 @@ using osu.Framework.Allocation;
 
 namespace osu.Game.Overlays.Profile.Sections.Kudosu
 {
-    public class KudosuInfo : Container
+    public class KudosuInfo : ProfileSubSection
     {
-        private readonly Bindable<User> user = new Bindable<User>();
+        private readonly CountSection total;
+        private readonly CountSection avaliable;
 
         public KudosuInfo(Bindable<User> user)
+            : base (user, null, null)
         {
-            this.user.BindTo(user);
-            CountSection total;
-            CountSection avaliable;
-            RelativeSizeAxes = Axes.X;
-            AutoSizeAxes = Axes.Y;
-            Masking = true;
-            CornerRadius = 3;
-            Children = new Drawable[]
+            Add(new FillFlowContainer
             {
-                new FillFlowContainer
+                RelativeSizeAxes = Axes.X,
+                AutoSizeAxes = Axes.Y,
+                Direction = FillDirection.Horizontal,
+                Spacing = new Vector2(5, 0),
+                Children = new[]
                 {
-                    RelativeSizeAxes = Axes.X,
-                    AutoSizeAxes = Axes.Y,
-                    Direction = FillDirection.Horizontal,
-                    Spacing = new Vector2(5, 0),
-                    Children = new[]
-                    {
-                        total = new CountTotal(),
-                        avaliable = new CountAvailable()
-                    }
+                    total = new CountTotal(),
+                    avaliable = new CountAvailable()
                 }
-            };
-            this.user.ValueChanged += u =>
-            {
-                total.Count = u.NewValue?.Kudosu.Total ?? 0;
-                avaliable.Count = u.NewValue?.Kudosu.Available ?? 0;
-            };
+            });
+        }
+
+        protected override void OnUserChanged(ValueChangedEvent<User> user)
+        {
+            total.Count = user.NewValue?.Kudosu.Total ?? 0;
+            avaliable.Count = user.NewValue?.Kudosu.Available ?? 0;
         }
 
         protected override bool OnClick(ClickEvent e) => true;
