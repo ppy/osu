@@ -22,6 +22,7 @@ namespace osu.Game.Overlays.Profile.Sections.Historical
     {
         private const int cover_width = 100;
         private const int corner_radius = 6;
+        private const int height = 50;
 
         private readonly BeatmapInfo beatmap;
         private readonly int playCount;
@@ -37,7 +38,7 @@ namespace osu.Game.Overlays.Profile.Sections.Historical
             Enabled.Value = true; //manually enabled, because we have no action
 
             RelativeSizeAxes = Axes.X;
-            AutoSizeAxes = Axes.Y;
+            Height = height;
 
             Masking = true;
             CornerRadius = corner_radius;
@@ -60,15 +61,13 @@ namespace osu.Game.Overlays.Profile.Sections.Historical
                 },
                 new Container
                 {
-                    RelativeSizeAxes = Axes.X,
-                    AutoSizeAxes = Axes.Y,
+                    RelativeSizeAxes = Axes.Both,
                     Padding = new MarginPadding { Left = cover_width - corner_radius },
                     Children = new Drawable[]
                     {
                         new Container
                         {
-                            RelativeSizeAxes = Axes.X,
-                            AutoSizeAxes = Axes.Y,
+                            RelativeSizeAxes = Axes.Both,
                             Masking = true,
                             CornerRadius = corner_radius,
                             Children = new Drawable[]
@@ -76,8 +75,7 @@ namespace osu.Game.Overlays.Profile.Sections.Historical
                                 background = new Box { RelativeSizeAxes = Axes.Both },
                                 new Container
                                 {
-                                    RelativeSizeAxes = Axes.X,
-                                    AutoSizeAxes = Axes.Y,
+                                    RelativeSizeAxes = Axes.Both,
                                     Padding = new MarginPadding(10),
                                     Children = new Drawable[]
                                     {
