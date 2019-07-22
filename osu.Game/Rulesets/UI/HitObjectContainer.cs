@@ -34,8 +34,14 @@ namespace osu.Game.Rulesets.UI
 
         protected override void OnChildLifetimeBoundaryCrossed(LifetimeBoundaryCrossedEvent e)
         {
-            if (e.Kind == LifetimeBoundaryKind.End && e.Direction == LifetimeBoundaryCrossingDirection.Forward && e.Child is DrawableHitObject hitObject)
-                hitObject.OnLifetimeEnd();
+            if (!(e.Child is DrawableHitObject hitObject))
+                return;
+
+            if ((e.Kind == LifetimeBoundaryKind.End && e.Direction == LifetimeBoundaryCrossingDirection.Forward)
+                || (e.Kind == LifetimeBoundaryKind.Start && e.Direction == LifetimeBoundaryCrossingDirection.Backward))
+            {
+                hitObject.OnKilled();
+            }
         }
     }
 }

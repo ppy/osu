@@ -26,7 +26,6 @@ using osu.Game.Rulesets.UI;
 using osu.Game.Scoring;
 using osu.Game.Screens.Ranking;
 using osu.Game.Skinning;
-using osu.Game.Storyboards.Drawables;
 using osu.Game.Users;
 
 namespace osu.Game.Screens.Play
@@ -76,6 +75,8 @@ namespace osu.Game.Screens.Play
 
         protected GameplayClockContainer GameplayClockContainer { get; private set; }
 
+        protected DimmableStoryboard DimmableStoryboard { get; private set; }
+
         [Cached]
         [Cached(Type = typeof(IBindable<IReadOnlyList<Mod>>))]
         protected new readonly Bindable<IReadOnlyList<Mod>> Mods = new Bindable<IReadOnlyList<Mod>>(Array.Empty<Mod>());
@@ -109,7 +110,6 @@ namespace osu.Game.Screens.Play
             sampleRestart = audio.Samples.Get(@"Gameplay/restart");
 
             mouseWheelDisabled = config.GetBindable<bool>(OsuSetting.MouseDisableWheel);
-            showStoryboard = config.GetBindable<bool>(OsuSetting.ShowStoryboard);
 
             ScoreProcessor = DrawableRuleset.CreateScoreProcessor();
             ScoreProcessor.Mods.BindTo(Mods);
@@ -121,7 +121,7 @@ namespace osu.Game.Screens.Play
 
             GameplayClockContainer.Children = new[]
             {
-                StoryboardContainer = CreateStoryboardContainer(),
+                DimmableStoryboard = new DimmableStoryboard(Beatmap.Value.Storyboard) { RelativeSizeAxes = Axes.Both },
                 new ScalingContainer(ScalingMode.Gameplay)
                 {
                     Child = new LocalSkinOverrideContainer(working.Skin)
@@ -198,9 +198,6 @@ namespace osu.Game.Screens.Play
 
             // bind clock into components that require it
             DrawableRuleset.IsPaused.BindTo(GameplayClockContainer.IsPaused);
-
-            // load storyboard as part of player's load if we can
-            initializeStoryboard(false);
 
             // Bind ScoreProcessor to ourselves
             ScoreProcessor.AllJudged += onCompletion;
@@ -334,41 +331,6 @@ namespace osu.Game.Screens.Play
 
         protected virtual Results CreateResults(ScoreInfo score) => new SoloResults(score);
 
-        #region Storyboard
-
-        private DrawableStoryboard storyboard;
-        protected UserDimContainer StoryboardContainer { get; private set; }
-
-        protected virtual UserDimContainer CreateStoryboardContainer() => new UserDimContainer(true)
-        {
-            RelativeSizeAxes = Axes.Both,
-            Alpha = 1,
-            EnableUserDim = { Value = true }
-        };
-
-        private Bindable<bool> showStoryboard;
-
-        private void initializeStoryboard(bool asyncLoad)
-        {
-            if (StoryboardContainer == null || storyboard != null)
-                return;
-
-            if (!showStoryboard.Value)
-                return;
-
-            var beatmap = Beatmap.Value;
-
-            storyboard = beatmap.Storyboard.CreateDrawable();
-            storyboard.Masking = true;
-
-            if (asyncLoad)
-                LoadComponentAsync(storyboard, StoryboardContainer.Add);
-            else
-                StoryboardContainer.Add(storyboard);
-        }
-
-        #endregion
-
         #region Fail Logic
 
         protected FailOverlay FailOverlay { get; private set; }
@@ -486,13 +448,11 @@ namespace osu.Game.Screens.Play
                 .Delay(250)
                 .FadeIn(250);
 
-            showStoryboard.ValueChanged += _ => initializeStoryboard(true);
-
             Background.EnableUserDim.Value = true;
             Background.BlurAmount.Value = 0;
 
             Background.StoryboardReplacesBackground.BindTo(storyboardReplacesBackground);
-            StoryboardContainer.StoryboardReplacesBackground.BindTo(storyboardReplacesBackground);
+            DimmableStoryboard.StoryboardReplacesBackground.BindTo(storyboardReplacesBackground);
 
             storyboardReplacesBackground.Value = Beatmap.Value.Storyboard.ReplacesBackground && Beatmap.Value.Storyboard.HasDrawable;
 
