@@ -25,13 +25,5 @@ namespace osu.Game.Beatmaps.Formats
         {
             AddDecoder<Beatmap>(@"osu file format v", m => new LegacyDifficultyCalculatorBeatmapDecoder(int.Parse(m.Split('v').Last())));
         }
-
-        protected override TimingControlPoint CreateTimingControlPoint()
-            => new LegacyDifficultyCalculatorControlPoint();
-
-        private class LegacyDifficultyCalculatorControlPoint : TimingControlPoint
-        {
-            public override double BeatLength { get; set; } = 1000;
-        }
     }
 }
