@@ -1,4 +1,4 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Bindables;
@@ -17,7 +17,7 @@ namespace osu.Game.Screens.Select.Details
     public class UserTopScoreContainer : VisibilityContainer
     {
         private const int height = 90;
-        private const int duration = 300;
+        private const int duration = 800;
 
         private readonly Container contentContainer;
         private readonly Container scoreContainer;
@@ -92,16 +92,8 @@ namespace osu.Game.Screens.Select.Details
             }, (loadScoreCancellation = new CancellationTokenSource()).Token);
         }
 
-        protected override void PopIn()
-        {
-            this.ResizeHeightTo(height, duration, Easing.OutQuint);
-            contentContainer.FadeIn(duration, Easing.OutQuint);
-        }
+        protected override void PopIn() => this.ResizeHeightTo(height, duration / 4f, Easing.OutQuint).OnComplete(_ => contentContainer.FadeIn(duration, Easing.OutQuint));
 
-        protected override void PopOut()
-        {
-            this.ResizeHeightTo(0, duration, Easing.OutQuint);
-            contentContainer.FadeOut(duration, Easing.OutQuint);
-        }
+        protected override void PopOut() => contentContainer.FadeOut(duration, Easing.OutQuint).OnComplete(_ => this.ResizeHeightTo(0));
     }
 }
