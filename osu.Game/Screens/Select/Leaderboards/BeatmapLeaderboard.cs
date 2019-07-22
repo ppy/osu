@@ -86,6 +86,8 @@ namespace osu.Game.Screens.Select.Leaderboards
 
         protected override APIRequest FetchScores(Action<IEnumerable<ScoreInfo>> scoresCallback)
         {
+            TopScore.Value = null;
+
             if (Scope == BeatmapLeaderboardScope.Local)
             {
                 var scores = scoreManager
