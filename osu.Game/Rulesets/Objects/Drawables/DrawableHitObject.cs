@@ -137,6 +137,11 @@ namespace osu.Game.Rulesets.Objects.Drawables
         #region State / Transform Management
 
         /// <summary>
+        /// Bind to apply a custom state which can override the default implementation.
+        /// </summary>
+        public event Action<DrawableHitObject, ArmedState> ApplyCustomUpdateState;
+
+        /// <summary>
         /// Enables automatic transform management of this hitobject. Implementation of transforms should be done in <see cref="UpdateInitialTransforms"/> and <see cref="UpdateStateTransforms"/> only. Rewinding and removing previous states is done automatically.
         /// </summary>
         /// <remarks>
@@ -177,26 +182,45 @@ namespace osu.Game.Rulesets.Objects.Drawables
             UpdateState(state);
         }
 
+        /// <summary>
+        /// Apply (generally fade-in) transforms.
+        /// The local drawable hierarchy is recursively delayed to <see cref="LifetimeStart"/> for convenience.
+        /// </summary>
+        /// <remarks>
+        /// This is called once before every <see cref="UpdateStateTransforms"/>. This is to ensure a good state in the case
+        /// the <see cref="JudgementResult.TimeOffset"/> was negative and potentially altered the pre-hit transforms.
+        /// </remarks>
         protected virtual void UpdateInitialTransforms()
         {
         }
 
+        /// <summary>
+        /// Apply transforms based on the current <see cref="ArmedState"/>. Previous states are automatically cleared.
+        /// </summary>
+        /// <param name="state">The new armed state.</param>
         protected virtual void UpdateStateTransforms(ArmedState state)
         {
         }
 
         public override void ClearTransformsAfter(double time, bool propagateChildren = false, string targetMember = null)
         {
+            // When we are using automatic state menement, parent calls to this should be blocked for safety.
             if (!UseTransformStateManagement)
                 base.ClearTransformsAfter(time, propagateChildren, targetMember);
         }
 
         public override void ApplyTransformsAt(double time, bool propagateChildren = false)
         {
+            // When we are using automatic state menement, parent calls to this should be blocked for safety.
             if (!UseTransformStateManagement)
                 base.ApplyTransformsAt(time, propagateChildren);
         }
 
+        /// <summary>
+        /// Legacy method to handle state changes.
+        /// Should generally not be used when <see cref="UseTransformStateManagement"/> is true; use <see cref="UpdateStateTransforms"/> instead.
+        /// </summary>
+        /// <param name="state">The new armed state.</param>
         protected virtual void UpdateState(ArmedState state)
         {
         }
@@ -210,11 +234,6 @@ namespace osu.Game.Rulesets.Objects.Drawables
             if (HitObject is IHasComboInformation combo)
                 AccentColour.Value = skin.GetValue<SkinConfiguration, Color4?>(s => s.ComboColours.Count > 0 ? s.ComboColours[combo.ComboIndex % s.ComboColours.Count] : (Color4?)null) ?? Color4.White;
         }
-
-        /// <summary>
-        /// Bind to apply a custom state which can override the default implementation.
-        /// </summary>
-        public event Action<DrawableHitObject, ArmedState> ApplyCustomUpdateState;
 
         /// <summary>
         /// Plays all the hit sounds for this <see cref="DrawableHitObject"/>.
@@ -268,6 +287,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
         /// </summary>
         /// <remarks>
         /// This is only used as an optimisation to delay the initial update of this <see cref="DrawableHitObject"/> and may be tuned more aggressively if required.
+        /// It is indirectly used to decide the automatic transform offset provided to <see cref="UpdateInitialTransforms"/>.
         /// A more accurate <see cref="LifetimeStart"/> should be set inside <see cref="UpdateState"/> for an <see cref="ArmedState.Idle"/> state.
         /// </remarks>
         protected virtual double InitialLifetimeOffset => 10000;
