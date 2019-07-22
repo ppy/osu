@@ -38,7 +38,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
         protected sealed override double InitialLifetimeOffset => HitObject.TimePreempt;
 
-        protected override void UpdatePreemptState() => this.FadeIn(HitObject.TimeFadeIn);
+        protected override void UpdateInitialTransforms() => this.FadeIn(HitObject.TimeFadeIn);
 
         private OsuInputManager osuActionInputManager;
         internal OsuInputManager OsuActionInputManager => osuActionInputManager ?? (osuActionInputManager = GetContainingInputManager() as OsuInputManager);
