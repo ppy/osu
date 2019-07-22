@@ -18,7 +18,7 @@ namespace osu.Game.Graphics.Sprites
             get => spriteText.Text;
             set => blurredText.Text = spriteText.Text = value;
         }
-        
+
         public FontUsage Font
         {
             get => spriteText.Font;
