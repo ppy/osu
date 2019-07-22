@@ -120,7 +120,8 @@ namespace osu.Game.Screens.Select
                                     RelativeSizeAxes = Axes.X,
                                     Height = 24,
                                     Width = 0.5f,
-                                    AutoSort = true
+                                    AutoSort = true,
+                                    Current = { Value = GroupMode.Title }
                                 },
                                 //spriteText = new OsuSpriteText
                                 //{
@@ -139,6 +140,7 @@ namespace osu.Game.Screens.Select
                                     Width = 0.5f,
                                     Height = 24,
                                     AutoSort = true,
+                                    Current = { Value = SortMode.Title }
                                 }
                             }
                         },
