@@ -8,10 +8,19 @@ namespace osu.Game.Online.Leaderboards
 {
     public interface ILeaderboard
     {
+        /// <summary>
+        /// Contains a list of scores retrieved from the API or <see cref="ScoreManager"/>.
+        /// </summary>
         IEnumerable<ScoreInfo> Scores { get; }
 
+        /// <summary>
+        /// Whether the current scope requires online access.
+        /// </summary>
         bool IsOnlineScope { get; }
 
+        /// <summary>
+        /// Updates the scores shown on the leaderboard.
+        /// </summary>
         void RefreshScores();
     }
 }
