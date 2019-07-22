@@ -166,7 +166,7 @@ namespace osu.Game.Overlays.Profile.Sections.Historical
                             Origin = Anchor.Centre,
                             Anchor = Anchor.Centre,
                             Text = playCount.ToString(),
-                            Font = OsuFont.GetFont(size: 20, weight: FontWeight.Regular),
+                            Font = OsuFont.GetFont(size: 20, weight: FontWeight.Regular).With(fixedWidth: true),
                         },
                     }
                 };
