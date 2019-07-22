@@ -74,7 +74,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
             double lengthBonus = 1 + 0.1f * Math.Min(1.0, totalHits / 1500.0);
             strainValue *= lengthBonus;
 
-            if(Attributes.MaxCombo > 0)
+            if (Attributes.MaxCombo > 0)
                 strainValue *= Math.Min(Math.Pow((float)(Attributes.MaxCombo - countMiss) / Attributes.MaxCombo, 10), 1.0);
 
             // Penalize misses exponentially. This mainly fixes tag4 maps and the likes until a per-hitobject solution is available
@@ -98,8 +98,14 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
                     strainValue *= 1.025;
             }
 
+			double predictedHitWindow = Math.Pow(0.9, Attributes.StarRating) * 55;
+
             // Scale the speed value with accuracy _slightly_
-            return strainValue * Score.Accuracy;
+            strainValue *= Score.Accuracy;
+			// It is important to also consider accuracy difficulty when doing that
+			strainValue *= Math.Pow(predictedHitWindow / Attributes.GreatHitWindow, 0.1);
+
+			return strainValue;
         }
 
         private double computeAccuracyValue()
@@ -111,7 +117,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
 
             // Lots of arbitrary values from testing.
             // Considering to use derivation from perfect accuracy in a probabilistic manner - assume normal distribution
-            double accValue = Math.Pow(predictedHitWindow / Attributes.GreatHitWindow, 0.7) * Math.Pow(150.0 / Attributes.GreatHitWindow, 1.1) * Math.Pow(Score.Accuracy, 15) * 22.0;
+            double accValue = Math.Pow(predictedHitWindow / Attributes.GreatHitWindow, 0.5) * Math.Pow(150.0 / Attributes.GreatHitWindow, 1.1) * Math.Pow(Score.Accuracy, 15) * 22.0;
 
             // Bonus for many hitcircles - it's harder to keep good accuracy up for longer
             accValue *= Math.Min(1.15, Math.Pow(totalHits / 1500.0, 0.3));
