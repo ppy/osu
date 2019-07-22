@@ -12,7 +12,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Skills
 {
     public class Reading : Skill
     {
-        protected override double SkillMultiplier => 1;
+        protected override double SkillMultiplier => 1.0;
         protected override double StrainDecayBase => strainDecay;
 
         private const int max_pattern_length = 15;
@@ -35,6 +35,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Skills
 
         private ColourSwitch lastColourSwitch = ColourSwitch.None;
 
+        private int lastSameColourCount;
         private int sameColourCount = 1;
 
         protected override double StrainValueOf(DifficultyHitObject current)
@@ -43,6 +44,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Skills
             if (!(current.BaseObject is Hit) || current.DeltaTime <= 0.0)
             {
                 strainDecay = 0.1;
+                lastSameColourCount = sameColourCount;
                 sameColourCount = 0;
                 return 0.0;
             }
@@ -101,7 +103,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Skills
             repetitionNerf = Math.Min(Math.Max(repetitionNerf * 25 * colorDiff, 1.0 / 25), 1.0);
             taikoCurrent.RepetitionNerf = Math.Pow(repetitionNerf, 0.5);
 
-            double addition = 1.65 + 33 * colorDiff * taikoCurrent.RepetitionNerf;
+            double addition = 1.2375 + 24.75 * colorDiff * taikoCurrent.RepetitionNerf;
 
             if (current.DeltaTime > slow_note_delta_min)
                 addition *= 0.9 - 0.9 * Math.Pow((Math.Min(current.DeltaTime, slow_note_delta_max) - slow_note_delta_min) / (slow_note_delta_max - slow_note_delta_min), 0.25) + 0.1;
@@ -153,7 +155,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Skills
                 chanceError = 0.5;
             }
 
-            return Math.Max(0, Math.Pow(chanceError / chanceTotal, hasColourChangeLegacy(current) ? 1.4 : 1.7) * (0.5 + 0.5 * Math.Pow(Math.Max(0, freqRating), 1.5)));
+            return Math.Max(0, Math.Pow(chanceError / chanceTotal, hasColourChangeLegacy(current) ? (1.4 / (1.99 + Math.Pow(-0.99, Math.Min(10, lastSameColourCount)))) : 1.7) * (0.5 + 0.5 * Math.Pow(Math.Max(0, freqRating), 1.5)));
         }
 
         // Keep this, because it determines general predictability
@@ -171,6 +173,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Skills
             var newColourSwitch = sameColourCount % 2 == 0 ? ColourSwitch.Even : ColourSwitch.Odd;
 
             lastColourSwitch = newColourSwitch;
+            lastSameColourCount = sameColourCount;
             sameColourCount = 1;
 
             // We only want a bonus if the parity of the color switch changes

@@ -71,14 +71,11 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
             double strainValue = Math.Pow(Math.Max(1.0, Attributes.StarRating / 0.0075) - 4.0, 2.53) / 100000.0;
 
             // Longer maps are worth more
-            double lengthMultiplier = 1 + 0.1f * Math.Min(1.0, lengthBonus);
+            double lengthMultiplier = (0.8 + Math.Pow(lengthBonus, 0.5)) * 0.65;
             strainValue *= lengthMultiplier;
 
-            if (Attributes.MaxCombo > 0)
-                strainValue *= Math.Min(Math.Pow((float)(Attributes.MaxCombo - countMiss) / Attributes.MaxCombo, 10), 1.0);
-
-            // Penalize misses exponentially. This mainly fixes tag4 maps and the likes until a per-hitobject solution is available
-            strainValue *= Math.Pow(0.98, countMiss);
+            // Penalize misses. The shorter the map, the bigger miss penalty.
+            strainValue *= Math.Pow(0.96 / Math.Pow(1 / lengthBonus, 0.03), countMiss);
 
             if (mods.Any(m => m is ModFlashlight<TaikoHitObject>))
             {
@@ -116,7 +113,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
             double accValue = Math.Pow(predictedHitWindow / Attributes.GreatHitWindow, 0.5) * Math.Pow(150.0 / Attributes.GreatHitWindow, 1.1) * Math.Pow(Score.Accuracy, 15) * 22.0;
 
             // Bonus for many hitcircles - it's harder to keep good accuracy up for longer
-            accValue *= Math.Min(1.15, Math.Pow(lengthBonus, 0.3));
+            accValue *= Math.Pow(lengthBonus + 1, 0.3);
 
             // Scale with difficulty to tie better into std's pp system
             return accValue * Math.Pow(1.3, Attributes.StarRating) / 10.0;
@@ -124,6 +121,6 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
 
         private int totalHits => countGreat + countGood + countMeh + countMiss;
         private double predictedHitWindow => Math.Pow(0.9, Attributes.StarRating) * 55;
-        private double lengthBonus => totalHits / (Math.Pow(1.18, Attributes.StarRating + 1) * 777.0 - 916.86);
+        private double lengthBonus => Attributes.LengthBonus;
     }
 }

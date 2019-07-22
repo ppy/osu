@@ -11,5 +11,6 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
         public int MaxCombo;
         public double ReadingStrain;
         public double SpeedStrain;
+        public double LengthBonus;
     }
 }

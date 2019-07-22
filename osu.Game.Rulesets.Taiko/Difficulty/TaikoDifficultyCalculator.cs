@@ -35,12 +35,27 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
             var readingRating = Math.Pow(skills[0].DifficultyValue() * star_scaling_factor + 1, 0.5) - 1;
             var speedRating = skills[1].DifficultyValue() * star_scaling_factor;
 
+            var starRating = readingRating + speedRating;
+            var lengthBonus = 0.0;
+
+            for (var i = 0; i < skills[0].StrainPeaks.Count; i++)
+                lengthBonus += (skills[0].StrainPeaks[i] + skills[1].StrainPeaks[i]) * Math.Pow(1.0003, i);
+
+            // Average peak
+            lengthBonus /= skills[0].StrainPeaks.Count;
+            // Scale with object count
+            lengthBonus *= beatmap.HitObjects.Count(h => h is Hit);
+            // Reduce bonus if the object count is low for this SR
+            lengthBonus *= Math.Pow((beatmap.HitObjects.Count(h => h is Hit) / (Math.Pow(1.18, starRating + 1) * 777.0 - 916.86)), 0.8);
+            lengthBonus = Math.Pow(1 + Math.Min(4.0, lengthBonus / starRating / 16000.0), 0.5) - 0.5;
+
             return new TaikoDifficultyAttributes
             {
-                StarRating = readingRating + speedRating,
+                StarRating = starRating,
                 Mods = mods,
                 ReadingStrain = readingRating,
                 SpeedStrain = speedRating,
+                LengthBonus = lengthBonus,
                 // Todo: This int cast is temporary to achieve 1:1 results with osu!stable, and should be removed in the future
                 GreatHitWindow = ((int)(beatmap.HitObjects.First().HitWindows.Great / 2) - 0.5) / clockRate,
                 MaxCombo = beatmap.HitObjects.Count(h => h is Hit),
