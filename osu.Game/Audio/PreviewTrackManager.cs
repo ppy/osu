@@ -17,7 +17,7 @@ namespace osu.Game.Audio
 {
     public class PreviewTrackManager : Component
     {
-        private readonly BindableDouble muteBindable = new BindableDouble();
+        private readonly BindableDouble muteBindable = new BindableDouble(0.5); //Keep music playing in the background, but turned down
 
         private AudioManager audio;
         private PreviewTrackStore trackStore;
