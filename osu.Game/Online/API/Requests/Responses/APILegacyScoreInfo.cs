@@ -39,7 +39,7 @@ namespace osu.Game.Online.API.Requests.Responses
         }
 
         [JsonProperty(@"replay")]
-        public bool Replay { get; set; }
+        public bool? Replay { get; set; }
 
         [JsonProperty(@"created_at")]
         private DateTimeOffset date

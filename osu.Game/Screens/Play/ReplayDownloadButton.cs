@@ -23,7 +23,7 @@ namespace osu.Game.Screens.Play
                 if (State.Value == DownloadState.LocallyAvailable)
                     return ReplayAvailability.Local;
 
-                if (Model.Value is APILegacyScoreInfo apiScore && apiScore.Replay)
+                if (Model.Value is APILegacyScoreInfo apiScore && apiScore.Replay != null)
                     return ReplayAvailability.Online;
 
                 return ReplayAvailability.NotAvailable;
