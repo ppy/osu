@@ -35,7 +35,7 @@ namespace osu.Game.Overlays
         protected Sidebar Sidebar;
 
         protected SettingsSectionsContainer SectionsContainer;
-        private SettingsSection lastSection;
+        private SettingsSection selectedSection;
 
         private SearchTextBox searchTextBox;
 
@@ -104,37 +104,33 @@ namespace osu.Game.Overlays
                 {
                     Child = Sidebar = new Sidebar()
                 });
-
-                SectionsContainer.SelectedSection.ValueChanged += section =>
-                {
-                    if (lastSection != section.NewValue)
-                    {
-                        lastSection = section.NewValue;
-                        Sidebar.Current.Value = lastSection;
-                    }
-                };
-
-                Sidebar.Current.ValueChanged += section =>
-                {
-                    if (lastSection == null)
-                    {
-                        lastSection = SectionsContainer.Children.FirstOrDefault();
-                        if (lastSection != null)
-                            Sidebar.Current.Value = lastSection;
-                        return;
-                    }
-
-                    if (lastSection != section.NewValue)
-                    {
-                        lastSection = section.NewValue;
-                        SectionsContainer.ScrollTo(lastSection);
-                    }
-                };
             }
 
             searchTextBox.Current.ValueChanged += term => SectionsContainer.SearchContainer.SearchTerm = term.NewValue;
 
             CreateSections()?.ForEach(AddSection);
+
+            if (showSidebar)
+            {
+                selectedSection = SectionsContainer.Children.FirstOrDefault();
+
+                if (selectedSection != null)
+                    Sidebar.Current.Value = selectedSection;
+
+                SectionsContainer.SelectedSection.ValueChanged += section =>
+                {
+                    selectedSection = section.NewValue;
+                    Sidebar.Current.Value = selectedSection;
+                };
+
+                Sidebar.Current.ValueChanged += section =>
+                {
+                    if (selectedSection == section.NewValue)
+                        return;
+
+                    SectionsContainer.ScrollTo(section.NewValue);
+                };
+            }
         }
 
         protected void AddSection(SettingsSection section)
