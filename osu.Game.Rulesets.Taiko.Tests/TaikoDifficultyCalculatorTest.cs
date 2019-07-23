@@ -13,8 +13,8 @@ namespace osu.Game.Rulesets.Taiko.Tests
     {
         protected override string ResourceAssembly => "osu.Game.Rulesets.Taiko";
 
-        [TestCase(3.0926788406519266d, "diffcalc-test")]
-        [TestCase(3.0926788406519266d, "diffcalc-test-strong")]
+        [TestCase(3.0753386142348562d, "diffcalc-test")]
+        [TestCase(3.0753386142348562d, "diffcalc-test-strong")]
         public void Test(double expected, string name)
             => base.Test(expected, name);
 

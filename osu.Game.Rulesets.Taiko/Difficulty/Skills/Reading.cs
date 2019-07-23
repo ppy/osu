@@ -67,9 +67,10 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Skills
                     deltaCount += weight;
                     deltaSum += previousDeltas[i - 1] * weight;
                 }
-
-                previousDeltas[i] = previousDeltas[i - 1];
             }
+
+            for (var i = max_pattern_length - 1; i > 0; i--)
+                previousDeltas[i] = previousDeltas[i - 1];
 
             previousDeltas[0] = current.DeltaTime;
 
@@ -108,7 +109,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Skills
             if (current.DeltaTime > slow_note_delta_min)
                 addition *= 0.9 - 0.9 * Math.Pow((Math.Min(current.DeltaTime, slow_note_delta_max) - slow_note_delta_min) / (slow_note_delta_max - slow_note_delta_min), 0.25) + 0.1;
 
-            return addition;
+            return addition * 1.15;
         }
 
         private double colourChangeDifficulty(DifficultyHitObject current)

@@ -46,16 +46,19 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Skills
                         deltaCount += weight;
                         deltaSum += previousDeltas[j == 1 ? noteType : 2][i - 1] * weight;
                     }
-
-                    previousDeltas[noteType][i] = previousDeltas[noteType][i - 1];
                 }
+            }
+
+            for (var i = max_pattern_length - 1; i > 0; i--)
+            {
+                previousDeltas[noteType][i] = previousDeltas[noteType][i - 1];
+                previousDeltas[2][i] = previousDeltas[2][i - 1];
             }
 
             previousDeltas[noteType][0] = current.DeltaTime;
             previousDeltas[2][0] = current.DeltaTime;
 
             // Use last N notes instead of last 1 note for determining pattern speed. Especially affects 1/8 doubles.
-            // Limit speed to 333bpm monocolor streams. Usually patterns are mixed, shouldnt be a huge problem.
             double normalizedDelta = deltaSum / deltaCount;
 
             // Overwrite current.DeltaTime with normalizedDelta in Skill's strainDecay function
