@@ -13,7 +13,7 @@ using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
 
-namespace osu.Game.Rulesets.Difficulty.Utils
+namespace osu.Game.Rulesets.Difficulty
 {
     public class DifficultyGraphGenerator
     {
@@ -21,7 +21,7 @@ namespace osu.Game.Rulesets.Difficulty.Utils
         private readonly WorkingBeatmap beatmap;
         private readonly DifficultyCalculator difficultyCalculator;
 
-        protected DifficultyGraphGenerator(Ruleset ruleset, WorkingBeatmap beatmap, DifficultyCalculator difficultyCalculator)
+        public DifficultyGraphGenerator(Ruleset ruleset, WorkingBeatmap beatmap, DifficultyCalculator difficultyCalculator)
         {
             this.ruleset = ruleset;
             this.beatmap = beatmap;

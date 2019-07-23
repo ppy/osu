@@ -74,6 +74,8 @@ namespace osu.Game.Rulesets
 
         public abstract DifficultyCalculator CreateDifficultyCalculator(WorkingBeatmap beatmap);
 
+        public DifficultyGraphGenerator CreateDifficultyGraphGenerator(WorkingBeatmap beatmap) => new DifficultyGraphGenerator(this, beatmap, CreateDifficultyCalculator(beatmap));
+
         public virtual PerformanceCalculator CreatePerformanceCalculator(WorkingBeatmap beatmap, ScoreInfo score) => null;
 
         public virtual HitObjectComposer CreateHitObjectComposer() => null;
