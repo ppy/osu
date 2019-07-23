@@ -40,19 +40,27 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
             };
         }
 
-        protected override List<double> CreateStrainsStarRatings(IBeatmap beatmap, Mod[] mods, Skill[] skills, double clockRate)
+        protected override List<DifficultyAttributes> CreateDifficultyStrains(IBeatmap beatmap, Mod[] mods, Skill[] skills, double clockRate)
         {
             if (beatmap.HitObjects.Count == 0)
-                return new List<double>();
+                return new List<DifficultyAttributes>();
 
-            List<double> starRating = new List<double>();
+            List<DifficultyAttributes> attributes = new List<DifficultyAttributes>();
 
             foreach (double s in skills.Single().StrainPeaks)
             {
-                starRating.Add(s * star_scaling_factor);
+                attributes.Add(new TaikoDifficultyAttributes
+                {
+                    StarRating = s * star_scaling_factor,
+                    Mods = mods,
+                    // Todo: This int cast is temporary to achieve 1:1 results with osu!stable, and should be removed in the future
+                    GreatHitWindow = (int)(beatmap.HitObjects.First().HitWindows.Great / 2) / clockRate,
+                    MaxCombo = beatmap.HitObjects.Count(h => h is Hit),
+                    Skills = skills
+                });
             }
 
-            return starRating;
+            return attributes;
         }
 
         protected override IEnumerable<DifficultyHitObject> CreateDifficultyHitObjects(IBeatmap beatmap, double clockRate)
