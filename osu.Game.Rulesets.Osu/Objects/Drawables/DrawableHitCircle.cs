@@ -128,16 +128,16 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             ApplyResult(r => r.Type = result);
         }
 
-        protected override void UpdatePreemptState()
+        protected override void UpdateInitialTransforms()
         {
-            base.UpdatePreemptState();
+            base.UpdateInitialTransforms();
 
             ApproachCircle.FadeIn(Math.Min(HitObject.TimeFadeIn * 2, HitObject.TimePreempt));
             ApproachCircle.ScaleTo(1.1f, HitObject.TimePreempt);
             ApproachCircle.Expire(true);
         }
 
-        protected override void UpdateCurrentState(ArmedState state)
+        protected override void UpdateStateTransforms(ArmedState state)
         {
             glow.FadeOut(400);
 
