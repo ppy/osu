@@ -79,11 +79,11 @@ namespace osu.Game.Rulesets.Objects.Drawables
         public override bool RemoveCompletedTransforms => false;
         protected override bool RequiresChildrenUpdate => true;
 
-        public override bool IsPresent => base.IsPresent || (state.Value == ArmedState.Idle && Clock?.CurrentTime >= LifetimeStart);
-
-        public readonly Bindable<ArmedState> State = new Bindable<ArmedState>();
+        public override bool IsPresent => base.IsPresent || (State.Value == ArmedState.Idle && Clock?.CurrentTime >= LifetimeStart);
 
         private readonly Bindable<ArmedState> state = new Bindable<ArmedState>();
+
+        public IBindable<ArmedState> State => state;
 
         protected DrawableHitObject(HitObject hitObject)
         {
@@ -121,17 +121,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
         protected override void LoadComplete()
         {
             base.LoadComplete();
-
-            state.BindValueChanged(armed =>
-            {
-                updateState(armed.NewValue);
-
-                // apply any custom state overrides
-                ApplyCustomUpdateState?.Invoke(this, armed.NewValue);
-
-                if (armed.NewValue == ArmedState.Hit)
-                    PlaySamples();
-            }, true);
+            updateState(ArmedState.Idle, true);
         }
 
         #region State / Transform Management
@@ -152,8 +142,17 @@ namespace osu.Game.Rulesets.Objects.Drawables
 
         protected override void ClearInternal(bool disposeChildren = true) => throw new InvalidOperationException($"Should never clear a {nameof(DrawableHitObject)}");
 
-        private void updateState(ArmedState state)
+        private void updateState(ArmedState newState, bool force = false)
         {
+            if (State.Value == newState && !force)
+                return;
+
+            // apply any custom state overrides
+            ApplyCustomUpdateState?.Invoke(this, newState);
+
+            if (newState == ArmedState.Hit)
+                PlaySamples();
+
             if (UseTransformStateManagement)
             {
                 double transformTime = HitObject.StartTime - InitialLifetimeOffset;
@@ -169,17 +168,15 @@ namespace osu.Game.Rulesets.Objects.Drawables
 
                     using (BeginDelayedSequence(InitialLifetimeOffset + judgementOffset, true))
                     {
-                        UpdateStateTransforms(state);
-                        State.Value = state;
+                        UpdateStateTransforms(newState);
+                        state.Value = newState;
                     }
                 }
             }
             else
-            {
-                State.Value = state;
-            }
+                state.Value = newState;
 
-            UpdateState(state);
+            UpdateState(newState);
         }
 
         /// <summary>
@@ -255,7 +252,8 @@ namespace osu.Game.Rulesets.Objects.Drawables
 
                     Result.TimeOffset = 0;
                     Result.Type = HitResult.None;
-                    state.Value = ArmedState.Idle;
+
+                    updateState(ArmedState.Idle);
                 }
             }
         }
@@ -336,11 +334,11 @@ namespace osu.Game.Rulesets.Objects.Drawables
                     break;
 
                 case HitResult.Miss:
-                    state.Value = ArmedState.Miss;
+                    updateState(ArmedState.Miss);
                     break;
 
                 default:
-                    state.Value = ArmedState.Hit;
+                    updateState(ArmedState.Hit);
                     break;
             }
 
