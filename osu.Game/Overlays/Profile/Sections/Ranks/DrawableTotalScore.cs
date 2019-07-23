@@ -34,13 +34,14 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
         private readonly OsuSpriteText performanceValue;
         private readonly OsuSpriteText performance;
         private readonly OsuSpriteText version;
-        private readonly FillFlowContainer modsContainer;
         private readonly OsuSpriteText accuracyText;
 
         protected override IEnumerable<Drawable> EffectTargets => new[] { background };
 
         public DrawableTotalScore(ScoreInfo score)
         {
+            FillFlowContainer modsContainer;
+
             Score = score;
 
             Enabled.Value = true; //manually enabled, because we have no action

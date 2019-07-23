@@ -14,15 +14,13 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
 {
     public class PaginatedScoreContainer : PaginatedContainer
     {
-        private readonly bool includeWeight;
         private readonly ScoreType type;
         private GetUserScoresRequest request;
 
-        public PaginatedScoreContainer(ScoreType type, Bindable<User> user, string header, string missing, bool includeWeight = false)
+        public PaginatedScoreContainer(ScoreType type, Bindable<User> user, string header, string missing)
             : base(user, header, missing)
         {
             this.type = type;
-            this.includeWeight = includeWeight;
 
             ItemsPerPage = 5;
 
