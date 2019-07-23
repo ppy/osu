@@ -34,13 +34,14 @@ namespace osu.Game.Graphics.UserInterface
             PlaceholderText = "type to search";
         }
 
-        protected override bool HandleAction(PlatformAction action)
+        public override bool OnPressed(PlatformAction action)
         {
-            // Shift-delete is unnecessary for search inputs, so its propagated up the input queue.
+            // Shift-delete, used in MacOS for character deletion, is unnecessary here as arrow keys are blocked by HandleLeftRightArrows
+            // Avoid handling it here to allow other components to potentially consume the shortcut
             if (action.ActionType == PlatformActionType.CharNext && action.ActionMethod == PlatformActionMethod.Delete)
                 return false;
 
-            return base.HandleAction(action);
+            return base.OnPressed(action);
         }
 
         protected override bool OnKeyDown(KeyDownEvent e)
