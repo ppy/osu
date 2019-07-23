@@ -180,7 +180,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
         }
 
         /// <summary>
-        /// Apply (generally fade-in) transforms.
+        /// Apply (generally fade-in) transforms leading into the <see cref="HitObject"/> start time.
         /// The local drawable hierarchy is recursively delayed to <see cref="LifetimeStart"/> for convenience.
         /// </summary>
         /// <remarks>
@@ -201,14 +201,14 @@ namespace osu.Game.Rulesets.Objects.Drawables
 
         public override void ClearTransformsAfter(double time, bool propagateChildren = false, string targetMember = null)
         {
-            // When we are using automatic state menement, parent calls to this should be blocked for safety.
+            // When we are using automatic state management, parent calls to this should be blocked for safety.
             if (!UseTransformStateManagement)
                 base.ClearTransformsAfter(time, propagateChildren, targetMember);
         }
 
         public override void ApplyTransformsAt(double time, bool propagateChildren = false)
         {
-            // When we are using automatic state menement, parent calls to this should be blocked for safety.
+            // When we are using automatic state management, parent calls to this should be blocked for safety.
             if (!UseTransformStateManagement)
                 base.ApplyTransformsAt(time, propagateChildren);
         }
