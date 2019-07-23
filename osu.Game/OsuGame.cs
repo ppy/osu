@@ -20,6 +20,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using osu.Framework.Audio;
 using osu.Framework.Bindables;
+using osu.Framework.Development;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input;
@@ -153,7 +154,7 @@ namespace osu.Game
         {
             this.frameworkConfig = frameworkConfig;
 
-            if (!Host.IsPrimaryInstance)
+            if (!Host.IsPrimaryInstance && !DebugUtils.IsDebugBuild)
             {
                 Logger.Log(@"osu! does not support multiple running instances.", LoggingTarget.Runtime, LogLevel.Error);
                 Environment.Exit(0);
