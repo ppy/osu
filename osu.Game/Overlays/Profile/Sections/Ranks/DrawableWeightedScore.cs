@@ -23,8 +23,6 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
         [BackgroundDependencyLoader]
         private void load()
         {
-            double pp = Score.PP ?? 0;
-
             Accuracy.Origin = Anchor.BottomLeft;
             Accuracy.Margin = new MarginPadding { Bottom = 2 };
 
@@ -34,7 +32,7 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
                 Width = 50,
                 Child = new OsuSpriteText
                 {
-                    Text = $"{pp * weight:0}pp",
+                    Text = $"{Score.PP * weight:0}pp",
                     Font = OsuFont.GetFont(weight: FontWeight.Bold, italics: true),
                 }
             });
