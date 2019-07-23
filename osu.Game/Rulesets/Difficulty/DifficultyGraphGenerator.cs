@@ -7,10 +7,7 @@ using System.Linq;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Timing;
 using osu.Game.Beatmaps;
-using osu.Game.Rulesets.Difficulty.Preprocessing;
-using osu.Game.Rulesets.Difficulty.Skills;
 using osu.Game.Rulesets.Mods;
-using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
 
 namespace osu.Game.Rulesets.Difficulty
@@ -47,7 +44,7 @@ namespace osu.Game.Rulesets.Difficulty
             int currentSectionEnd = 0;
             int count = 0;
 
-            for(int i = 0; i < hitObjects.Count; i++)
+            for (int i = 0; i < hitObjects.Count; i++)
             {
                 var h = hitObjects[i];
 
@@ -61,13 +58,13 @@ namespace osu.Game.Rulesets.Difficulty
                     }
                     else
                     {
-                        if (hitObjects[i - 1] is IHasEndTime)
+                        if (hitObjects[i - 1] is IHasEndTime s)
                         {
-                            var s = hitObjects[i - 1] as IHasEndTime;
                             if (s.EndTime > firstSectionEnd + (currentSectionEnd - 1) * sectionLength)
                                 if (strains[currentSectionEnd] == 0)
                                     strains[currentSectionEnd] = strains[currentSectionEnd - 1];
                         }
+
                         strains[currentSectionEnd] = 0;
                     }
 

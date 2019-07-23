@@ -21,7 +21,7 @@ namespace osu.Game.Rulesets.Catch.Difficulty
     {
         private const double star_scaling_factor = 0.145;
 
-        protected override int SectionLength => 750;
+        public override int SectionLength => 750;
 
         public CatchDifficultyCalculator(Ruleset ruleset, WorkingBeatmap beatmap)
             : base(ruleset, beatmap)
