@@ -3,45 +3,48 @@
 
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Scoring;
 
 namespace osu.Game.Overlays.Profile.Sections.Ranks
 {
-    public class DrawablePerformanceScore : DrawableProfileScore
+    public class DrawableWeightedScore : DrawableTotalScore
     {
-        private readonly double? weight;
+        private readonly double weight;
 
-        public DrawablePerformanceScore(ScoreInfo score, double? weight = null)
+        public DrawableWeightedScore(ScoreInfo score, double weight)
             : base(score)
         {
             this.weight = weight;
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colour)
+        private void load()
         {
             double pp = Score.PP ?? 0;
-            RightFlowContainer.Add(new OsuSpriteText
-            {
-                Text = $"{pp:0}pp",
-                Anchor = Anchor.TopRight,
-                Origin = Anchor.TopRight,
-                Font = OsuFont.GetFont(size: 18, weight: FontWeight.Bold, italics: true)
-            });
 
-            if (weight.HasValue)
+            Accuracy.Origin = Anchor.BottomLeft;
+            Accuracy.Margin = new MarginPadding { Bottom = 2 };
+
+            Accuracy.Add(new Container
             {
-                RightFlowContainer.Add(new OsuSpriteText
+                AutoSizeAxes = Axes.Y,
+                Width = 50,
+                Child = new OsuSpriteText
                 {
-                    Text = $"weighted: {pp * weight:0}pp ({weight:P0})",
-                    Anchor = Anchor.TopRight,
-                    Origin = Anchor.TopRight,
-                    Colour = colour.GrayA,
-                    Font = OsuFont.GetFont(size: 11, weight: FontWeight.Regular, italics: true)
-                });
-            }
+                    Text = $"{pp * weight:0}pp",
+                    Font = OsuFont.GetFont(weight: FontWeight.Bold, italics: true),
+                }
+            });
+            InfoContainer.Add(new OsuSpriteText
+            {
+                Anchor = Anchor.CentreLeft,
+                Origin = Anchor.TopLeft,
+                Text = $"weighted {weight:P0}",
+                Font = OsuFont.GetFont(size: 14, weight: FontWeight.SemiBold),
+            });
         }
     }
 }

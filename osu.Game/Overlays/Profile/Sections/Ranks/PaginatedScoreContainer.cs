@@ -45,16 +45,16 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
                     return;
                 }
 
-                IEnumerable<DrawableProfileScore> drawableScores;
+                IEnumerable<DrawableTotalScore> drawableScores;
 
                 switch (type)
                 {
                     default:
-                        drawableScores = scores.Select(score => new DrawablePerformanceScore(score, includeWeight ? Math.Pow(0.95, ItemsContainer.Count) : (double?)null));
+                        drawableScores = scores.Select(score => new DrawableTotalScore(score));
                         break;
 
-                    case ScoreType.Recent:
-                        drawableScores = scores.Select(score => new DrawableTotalScore(score));
+                    case ScoreType.Best:
+                        drawableScores = scores.Select(score => new DrawableWeightedScore(score, Math.Pow(0.95, ItemsContainer.Count)));
                         break;
                 }
 
