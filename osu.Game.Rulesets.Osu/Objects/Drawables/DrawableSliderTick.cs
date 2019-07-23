@@ -34,14 +34,12 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                     RelativeSizeAxes = Axes.Both,
                     Origin = Anchor.Centre,
                     CornerRadius = Size.X / 2,
-
                     BorderThickness = 2,
                     BorderColour = Color4.White,
-
                     Child = new Box
                     {
                         RelativeSizeAxes = Axes.Both,
-                        Colour = AccentColour,
+                        Colour = AccentColour.Value,
                         Alpha = 0.3f,
                     }
                 }, restrictSize: false)

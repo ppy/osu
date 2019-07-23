@@ -143,7 +143,7 @@ namespace osu.Game.Rulesets.Mania.UI
         /// <param name="hitObject">The DrawableHitObject to add.</param>
         public override void Add(DrawableHitObject hitObject)
         {
-            hitObject.AccentColour = AccentColour;
+            hitObject.AccentColour.Value = AccentColour;
             hitObject.OnNewResult += OnNewResult;
 
             HitObjectContainer.Add(hitObject);
