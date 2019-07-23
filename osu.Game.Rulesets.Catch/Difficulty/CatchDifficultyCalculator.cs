@@ -46,19 +46,29 @@ namespace osu.Game.Rulesets.Catch.Difficulty
             };
         }
 
-        protected override List<double> CreateStrainsStarRatings(IBeatmap beatmap, Mod[] mods, Skill[] skills, double clockRate)
+        protected override List<DifficultyAttributes> CreateDifficultyStrains(IBeatmap beatmap, Mod[] mods, Skill[] skills, double clockRate)
         {
             if (beatmap.HitObjects.Count == 0)
-                return new List<double>();
+                return new List<DifficultyAttributes>();
 
-            List<double> starRating = new List<double>();
+            // this is the same as osu!, so there's potential to share the implementation... maybe
+            double preempt = BeatmapDifficulty.DifficultyRange(beatmap.BeatmapInfo.BaseDifficulty.ApproachRate, 1800, 1200, 450) / clockRate;
+
+            List<DifficultyAttributes> attributes = new List<DifficultyAttributes>();
 
             foreach (double s in skills[0].StrainPeaks)
             {
-                starRating.Add(Math.Sqrt(s) * star_scaling_factor);
+                attributes.Add(new CatchDifficultyAttributes
+                {
+                    StarRating = Math.Sqrt(s) * star_scaling_factor,
+                    Mods = mods,
+                    ApproachRate = preempt > 1200.0 ? -(preempt - 1800.0) / 120.0 : -(preempt - 1200.0) / 150.0 + 5.0,
+                    MaxCombo = beatmap.HitObjects.Count(h => h is Fruit) + beatmap.HitObjects.OfType<JuiceStream>().SelectMany(j => j.NestedHitObjects).Count(h => !(h is TinyDroplet)),
+                    Skills = skills
+                });
             }
 
-            return starRating;
+            return attributes;
         }
 
         protected override IEnumerable<DifficultyHitObject> CreateDifficultyHitObjects(IBeatmap beatmap, double clockRate)
