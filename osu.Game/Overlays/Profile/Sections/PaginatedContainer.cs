@@ -24,8 +24,8 @@ namespace osu.Game.Overlays.Profile.Sections
         protected APIRequest RetrievalRequest;
         protected RulesetStore Rulesets;
 
-        protected PaginatedContainer(Bindable<User> user, string header, string missing)
-            : base(user, header, missing)
+        protected PaginatedContainer(Bindable<User> user)
+            : base(user)
         {
             Add(new FillFlowContainer
             {

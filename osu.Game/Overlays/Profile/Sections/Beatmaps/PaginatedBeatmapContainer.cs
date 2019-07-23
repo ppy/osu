@@ -17,10 +17,12 @@ namespace osu.Game.Overlays.Profile.Sections.Beatmaps
         private readonly BeatmapSetType type;
         private GetUserBeatmapsRequest request;
 
-        public PaginatedBeatmapContainer(BeatmapSetType type, Bindable<User> user, string header, string missing = "None... yet.")
-            : base(user, header, missing)
+        public PaginatedBeatmapContainer(BeatmapSetType type, Bindable<User> user, string header)
+            : base(user)
         {
             this.type = type;
+            Header = header;
+            Missing = "None... yet.";
 
             ItemsPerPage = 6;
 

@@ -18,9 +18,43 @@ namespace osu.Game.Overlays.Profile.Sections
 
         protected override Container<Drawable> Content => content;
 
-        private readonly Container content;
+        protected virtual bool DisableHeader => false;
+        protected virtual bool DisableMissing => false;
 
-        protected ProfileSubSection(Bindable<User> user, string header, string missing)
+        private string header;
+        public string Header
+        {
+            get => header;
+            set
+            {
+                if (DisableHeader)
+                    return;
+
+                header = value;
+
+                headerDrawable.Text = header;
+            }
+        }
+
+        private string missing;
+        public string Missing
+        {
+            get => missing;
+            set
+            {
+                if (DisableMissing)
+                    return;
+
+                missing = value;
+
+                MissingText.Text = missing;
+            }
+        }
+
+        private readonly Container content;
+        private readonly OsuSpriteText headerDrawable;
+
+        protected ProfileSubSection(Bindable<User> user)
         {
             User.BindTo(user);
 
@@ -30,25 +64,28 @@ namespace osu.Game.Overlays.Profile.Sections
             Margin = new MarginPadding { Vertical = 10 };
             Spacing = new Vector2(0, 10);
 
-            InternalChildren = new Drawable[]
+            if (!DisableHeader)
             {
-                new OsuSpriteText
+                AddInternal(headerDrawable = new OsuSpriteText
                 {
-                    Text = header,
                     Font = OsuFont.GetFont(size: 20, weight: FontWeight.Bold),
-                },
-                content = new Container
-                {
-                    AutoSizeAxes = Axes.Y,
-                    RelativeSizeAxes = Axes.X,
-                },
-                MissingText = new OsuSpriteText
+                });
+            }
+
+            AddInternal(content = new Container
+            {
+                AutoSizeAxes = Axes.Y,
+                RelativeSizeAxes = Axes.X,
+            });
+
+            if (!DisableMissing)
+            {
+                content.Add(MissingText = new OsuSpriteText
                 {
                     Font = OsuFont.GetFont(size: 15),
-                    Text = missing,
                     Alpha = 0,
-                },
-            };
+                });
+            }
         }
 
         protected override void LoadComplete()

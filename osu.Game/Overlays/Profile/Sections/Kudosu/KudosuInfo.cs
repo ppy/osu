@@ -17,11 +17,14 @@ namespace osu.Game.Overlays.Profile.Sections.Kudosu
 {
     public class KudosuInfo : ProfileSubSection
     {
+        protected override bool DisableHeader => true;
+        protected override bool DisableMissing => true;
+
         private readonly CountSection total;
         private readonly CountSection avaliable;
 
         public KudosuInfo(Bindable<User> user)
-            : base(user, null, null)
+            : base(user)
         {
             Add(new FillFlowContainer
             {

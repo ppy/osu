@@ -12,11 +12,14 @@ namespace osu.Game.Overlays.Profile.Sections.Recent
 {
     public class PaginatedRecentActivityContainer : PaginatedContainer
     {
+        protected override bool DisableHeader => true;
+
         private GetUserRecentActivitiesRequest request;
 
-        public PaginatedRecentActivityContainer(Bindable<User> user, string header, string missing)
-            : base(user, header, missing)
+        public PaginatedRecentActivityContainer(Bindable<User> user)
+            : base(user)
         {
+            Missing = @"This user hasn't done anything notable recently!";
             ItemsPerPage = 5;
         }
 
