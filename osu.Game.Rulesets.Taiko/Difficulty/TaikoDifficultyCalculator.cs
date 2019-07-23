@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Game.Beatmaps;
@@ -47,15 +48,19 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
 
             List<DifficultyAttributes> attributes = new List<DifficultyAttributes>();
 
-            foreach (double s in skills.Single().StrainPeaks)
+            double sectionLength = SectionLength * clockRate;
+            // The first object doesn't generate a strain, so we begin with an incremented section end
+            double firstSectionEnd = Math.Ceiling(beatmap.HitObjects.First().StartTime / sectionLength) * sectionLength;
+
+            for (int i = 0; i < skills.Single().StrainPeaks.Count; i++)
             {
                 attributes.Add(new TaikoDifficultyAttributes
                 {
-                    StarRating = s * star_scaling_factor,
+                    StarRating = skills.Single().StrainPeaks[i] * star_scaling_factor,
                     Mods = mods,
                     // Todo: This int cast is temporary to achieve 1:1 results with osu!stable, and should be removed in the future
                     GreatHitWindow = (int)(beatmap.HitObjects.First().HitWindows.Great / 2) / clockRate,
-                    MaxCombo = beatmap.HitObjects.Count(h => h is Hit),
+                    MaxCombo = beatmap.HitObjects.Count(h => h is Hit & h.StartTime < firstSectionEnd + i * sectionLength),
                     Skills = skills
                 });
             }

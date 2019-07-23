@@ -65,12 +65,15 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             double hitWindowGreat = (int)(beatmap.HitObjects.First().HitWindows.Great / 2) / clockRate;
             double preempt = (int)BeatmapDifficulty.DifficultyRange(beatmap.BeatmapInfo.BaseDifficulty.ApproachRate, 1800, 1200, 450) / clockRate;
 
-            int maxCombo = beatmap.HitObjects.Count;
+            double sectionLength = SectionLength * clockRate;
+            // The first object doesn't generate a strain, so we begin with an incremented section end
+            double firstSectionEnd = Math.Ceiling(beatmap.HitObjects.First().StartTime / sectionLength) * sectionLength;
             // Add the ticks + tail of the slider. 1 is subtracted because the head circle would be counted twice (once for the slider itself in the line above)
-            maxCombo += beatmap.HitObjects.OfType<Slider>().Sum(s => s.NestedHitObjects.Count - 1);
+            //maxCombo += beatmap.HitObjects.OfType<Slider>().Sum(s => s.NestedHitObjects.Count - 1);
 
             for (int i = 0; i < skills[0].StrainPeaks.Count; i++)
             {
+                int maxComboSliders = beatmap.HitObjects.OfType<Slider>().ToList().FindAll(h => h.StartTime < firstSectionEnd + i * sectionLength).Sum(s => s.NestedHitObjects.Count - 1);
                 attributes.Add(new OsuDifficultyAttributes
                 {
                     StarRating = skills[0].StrainPeaks[i] + skills[1].StrainPeaks[i] + Math.Abs(skills[0].StrainPeaks[i] - skills[1].StrainPeaks[i]) / 2,
@@ -79,8 +82,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                     SpeedStrain = skills[1].StrainPeaks[i],
                     ApproachRate = preempt > 1200 ? (1800 - preempt) / 120 : (1200 - preempt) / 150 + 5,
                     OverallDifficulty = (80 - hitWindowGreat) / 6,
-                    //TO DO: maybe add incremental (not static) maxcombo
-                    MaxCombo = maxCombo,
+                    MaxCombo = beatmap.HitObjects.Count(h => h.StartTime < firstSectionEnd + i * sectionLength) + maxComboSliders,
                     Skills = skills
                 });
             }
