@@ -36,7 +36,7 @@ namespace osu.Game.Graphics.UserInterface
 
         protected override bool HandleAction(PlatformAction action)
         {
-            // Allow delete to be handled locally
+            // Shift-delete is unnecessary for search inputs, so its propagated up the input queue.
             if (action.ActionType == PlatformActionType.CharNext && action.ActionMethod == PlatformActionMethod.Delete)
                 return false;
 
