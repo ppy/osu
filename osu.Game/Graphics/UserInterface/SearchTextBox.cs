@@ -36,8 +36,9 @@ namespace osu.Game.Graphics.UserInterface
 
         public override bool OnPressed(PlatformAction action)
         {
-            // Shift-delete, used in MacOS for character deletion, is unnecessary here as arrow keys are blocked by HandleLeftRightArrows
-            // Avoid handling it here to allow other components to potentially consume the shortcut
+            // Shift+delete is handled via PlatformAction on macOS. this is not so useful in the context of a SearchTextBox
+            // as we do not allow arrow key navigation in the first place (ie. the care should always be at the end of text)
+            // Avoid handling it here to allow other components to potentially consume the shortcut.
             if (action.ActionType == PlatformActionType.CharNext && action.ActionMethod == PlatformActionMethod.Delete)
                 return false;
 
