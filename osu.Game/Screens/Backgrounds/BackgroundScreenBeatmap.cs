@@ -1,4 +1,4 @@
-﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
@@ -168,6 +168,12 @@ namespace osu.Game.Screens.Backgrounds
             private void load(OsuConfigManager config)
             {
                 userBlurLevel = config.GetBindable<double>(OsuSetting.BlurLevel);
+            }
+
+            protected override void LoadComplete()
+            {
+                base.LoadComplete();
+
                 userBlurLevel.ValueChanged += _ => UpdateVisuals();
                 BlurAmount.ValueChanged += _ => UpdateVisuals();
             }

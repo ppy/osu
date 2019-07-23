@@ -50,7 +50,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             {
                 Body = new SnakingSliderBody(s)
                 {
-                    PathRadius = s.Scale * 64,
+                    PathRadius = s.Scale * OsuHitObject.OBJECT_RADIUS,
                 },
                 ticks = new Container<DrawableSliderTick> { RelativeSizeAxes = Axes.Both },
                 repeatPoints = new Container<DrawableRepeatPoint> { RelativeSizeAxes = Axes.Both },
@@ -154,6 +154,12 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                     obj.RelativeAnchorPosition = childAnchorPosition;
                 Ball.RelativeAnchorPosition = childAnchorPosition;
             }
+        }
+
+        public override void OnKilled()
+        {
+            base.OnKilled();
+            Body.RecyclePath();
         }
 
         protected override void SkinChanged(ISkinSource skin, bool allowFallback)
