@@ -22,6 +22,7 @@ namespace osu.Game.Overlays.Profile.Sections
         protected virtual bool DisableMissing => false;
 
         private string header;
+
         public string Header
         {
             get => header;
@@ -37,6 +38,7 @@ namespace osu.Game.Overlays.Profile.Sections
         }
 
         private string missing;
+
         public string Missing
         {
             get => missing;
