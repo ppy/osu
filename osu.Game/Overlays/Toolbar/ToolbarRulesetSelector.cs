@@ -71,8 +71,11 @@ namespace osu.Game.Overlays.Toolbar
         // Scheduled to allow the flow layout to be computed before the line position is updated
         private void moveLineToCurrent() => ScheduleAfterChildren(() =>
         {
-            ModeButtonLine.MoveToX(SelectedTab.DrawPosition.X, !hasInitialPosition ? 0 : 200, Easing.OutQuint);
-            hasInitialPosition = true;
+            if (SelectedTab != null)
+            {
+                ModeButtonLine.MoveToX(SelectedTab.DrawPosition.X, !hasInitialPosition ? 0 : 200, Easing.OutQuint);
+                hasInitialPosition = true;
+            }
         });
 
         public override bool HandleNonPositionalInput => !Current.Disabled && base.HandleNonPositionalInput;
