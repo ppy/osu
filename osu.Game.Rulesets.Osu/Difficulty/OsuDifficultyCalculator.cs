@@ -55,33 +55,37 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             };
         }
 
-        protected override List<double> CreateStrainsStarRatings(IBeatmap beatmap, Mod[] mods, Skill[] skills, double clockRate)
+        protected override List<DifficultyAttributes> CreateDifficultyStrains(IBeatmap beatmap, Mod[] mods, Skill[] skills, double clockRate)
         {
             if (beatmap.HitObjects.Count == 0)
-                return new List<double>();
+                return new List<DifficultyAttributes>();
 
-            List<double> aimRating = new List<double>();
+            List<DifficultyAttributes> attributes = new List<DifficultyAttributes>();
 
-            foreach (double aim in skills[0].StrainPeaks)
-            {
-                aimRating.Add(Math.Sqrt(aim) * difficulty_multiplier);
-            }
+            double hitWindowGreat = (int)(beatmap.HitObjects.First().HitWindows.Great / 2) / clockRate;
+            double preempt = (int)BeatmapDifficulty.DifficultyRange(beatmap.BeatmapInfo.BaseDifficulty.ApproachRate, 1800, 1200, 450) / clockRate;
 
-            List<double> speedRating = new List<double>();
-
-            foreach (double speed in skills[1].StrainPeaks)
-            {
-                speedRating.Add(Math.Sqrt(speed) * difficulty_multiplier);
-            }
-
-            List<double> starRating = new List<double>();
+            int maxCombo = beatmap.HitObjects.Count;
+            // Add the ticks + tail of the slider. 1 is subtracted because the head circle would be counted twice (once for the slider itself in the line above)
+            maxCombo += beatmap.HitObjects.OfType<Slider>().Sum(s => s.NestedHitObjects.Count - 1);
 
             for (int i = 0; i < skills[0].StrainPeaks.Count; i++)
             {
-                starRating.Add(aimRating[i] + speedRating[i] + Math.Abs(aimRating[i] - speedRating[i]) / 2);
+                attributes.Add(new OsuDifficultyAttributes
+                {
+                    StarRating = skills[0].StrainPeaks[i] + skills[1].StrainPeaks[i] + Math.Abs(skills[0].StrainPeaks[i] - skills[1].StrainPeaks[i]) / 2,
+                    Mods = mods,
+                    AimStrain = skills[0].StrainPeaks[i],
+                    SpeedStrain = skills[1].StrainPeaks[i],
+                    ApproachRate = preempt > 1200 ? (1800 - preempt) / 120 : (1200 - preempt) / 150 + 5,
+                    OverallDifficulty = (80 - hitWindowGreat) / 6,
+                    //TO DO: maybe add incremental (not static) maxcombo
+                    MaxCombo = maxCombo,
+                    Skills = skills
+                });
             }
 
-            return starRating;
+            return attributes;
         }
 
         protected override IEnumerable<DifficultyHitObject> CreateDifficultyHitObjects(IBeatmap beatmap, double clockRate)
