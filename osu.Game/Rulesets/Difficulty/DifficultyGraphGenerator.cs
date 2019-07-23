@@ -11,6 +11,7 @@ using osu.Game.Rulesets.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Difficulty.Skills;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects;
+using osu.Game.Rulesets.Objects.Types;
 
 namespace osu.Game.Rulesets.Difficulty.Utils
 {
@@ -43,27 +44,41 @@ namespace osu.Game.Rulesets.Difficulty.Utils
 
             var hitObjects = playableBeatmap.HitObjects.OrderBy(h => h.StartTime).ToList();
             double firstSectionEnd = Math.Ceiling(playableBeatmap.HitObjects.First().StartTime / sectionLength) * sectionLength;
-            double currentSectionEnd = firstSectionEnd;
+            int currentSectionEnd = 0;
             int count = 0;
 
-            foreach(HitObject h in hitObjects)
+            for(int i = 0; i < hitObjects.Count; i++)
             {
-                while (h.StartTime > currentSectionEnd)
+                var h = hitObjects[i];
+
+                while (h.StartTime > firstSectionEnd + currentSectionEnd * sectionLength)
                 {
                     if (count > 0)
                     {
-                        if (strains[] = 0)
-                            strains[] = strains[-1];
+                        //check if safe
+                        if (strains[currentSectionEnd] == 0)
+                            strains[currentSectionEnd] = strains[currentSectionEnd - 1];
                     }
                     else
-                        strains[] = 0;
+                    {
+                        if (hitObjects[i - 1] is IHasEndTime)
+                        {
+                            var s = hitObjects[i - 1] as IHasEndTime;
+                            if (s.EndTime > firstSectionEnd + (currentSectionEnd - 1) * sectionLength)
+                                if (strains[currentSectionEnd] == 0)
+                                    strains[currentSectionEnd] = strains[currentSectionEnd - 1];
+                        }
+                        strains[currentSectionEnd] = 0;
+                    }
 
-                    currentSectionEnd += sectionLength;
+                    count = 0;
+                    currentSectionEnd++;
                 }
 
-                foreach (Skill s in skills)
-                    s.Process(h);
+                count++;
             }
+
+            return strains;
         }
     }
 }
