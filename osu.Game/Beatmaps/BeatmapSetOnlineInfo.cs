@@ -67,6 +67,11 @@ namespace osu.Game.Beatmaps
         public int FavouriteCount { get; set; }
 
         /// <summary>
+        /// Whether this beatmap set has been favourited by the current user.
+        /// </summary>
+        public bool HasFavourited { get; set; }
+
+        /// <summary>
         /// The availability of this beatmap set.
         /// </summary>
         public BeatmapSetOnlineAvailability Availability { get; set; }

@@ -29,6 +29,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                 ShakeDuration = 30,
                 RelativeSizeAxes = Axes.Both
             });
+
             Alpha = 0;
         }
 
@@ -37,6 +38,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         protected override void AddInternal(Drawable drawable) => shakeContainer.Add(drawable);
         protected override void ClearInternal(bool disposeChildren = true) => shakeContainer.Clear(disposeChildren);
         protected override bool RemoveInternal(Drawable drawable) => shakeContainer.Remove(drawable);
+
+        protected sealed override double InitialLifetimeOffset => HitObject.TimePreempt;
 
         protected sealed override void UpdateState(ArmedState state)
         {
