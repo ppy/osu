@@ -24,6 +24,13 @@ namespace osu.Game.Skinning
 
         protected IResourceStore<SampleChannel> Samples;
 
+        /// <summary>
+        /// On osu-stable, hitcircles have 5 pixels of transparent padding on each side to allow for shadows etc.
+        /// Their hittable area is 128px, but the actual circle portion is 118px.
+        /// We must account for some gameplay elements such as slider bodies, where this padding is not present.
+        /// </summary>
+        private const float legacy_circle_radius = 64 - 5;
+
         public LegacySkin(SkinInfo skin, IResourceStore<byte[]> storage, AudioManager audioManager)
             : this(skin, new LegacySkinResourceStore<SkinFileInfo>(skin, storage), audioManager, "skin.ini")
         {
@@ -41,6 +48,16 @@ namespace osu.Game.Skinning
 
             Samples = audioManager.GetSampleStore(storage);
             Textures = new TextureStore(new TextureLoaderStore(storage));
+
+            bool hasHitCircle = false;
+
+            using (var testStream = storage.GetStream("hitcircle"))
+                hasHitCircle |= testStream != null;
+
+            if (hasHitCircle)
+            {
+                Configuration.SliderPathRadius = legacy_circle_radius;
+            }
         }
 
         protected override void Dispose(bool isDisposing)
