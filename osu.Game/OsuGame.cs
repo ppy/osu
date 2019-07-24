@@ -394,6 +394,16 @@ namespace osu.Game
 
             AddRange(new Drawable[]
             {
+                backButton = new BackButton
+                {
+                    Anchor = Anchor.BottomLeft,
+                    Origin = Anchor.BottomLeft,
+                    Action = () =>
+                    {
+                        if ((screenStack.CurrentScreen as IOsuScreen)?.AllowBackButton == true)
+                            screenStack.Exit();
+                    }
+                },
                 new VolumeControlReceptor
                 {
                     RelativeSizeAxes = Axes.Both,
@@ -403,19 +413,10 @@ namespace osu.Game
                 screenContainer = new ScalingContainer(ScalingMode.ExcludeOverlays)
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Children = new Drawable[]
+                    Children = new[]
                     {
                         screenStack = new OsuScreenStack { RelativeSizeAxes = Axes.Both },
-                        backButton = new BackButton
-                        {
-                            Anchor = Anchor.BottomLeft,
-                            Origin = Anchor.BottomLeft,
-                            Action = () =>
-                            {
-                                if ((screenStack.CurrentScreen as IOsuScreen)?.AllowBackButton == true)
-                                    screenStack.Exit();
-                            }
-                        },
+                        backButton.CreateProxy(),
                         logoContainer = new Container { RelativeSizeAxes = Axes.Both },
                     }
                 },
