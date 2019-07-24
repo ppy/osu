@@ -13,38 +13,29 @@ using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Beatmaps;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
+using osu.Game.Screens.Select.Leaderboards;
+using osu.Framework.Bindables;
 
 namespace osu.Game.Overlays.BeatmapSet.Scores
 {
-    public class ScoresContainer : CompositeDrawable
+    public class ScoresContainer : Container
     {
         private const int spacing = 15;
 
-        private readonly Box background;
-        private readonly ScoreTable scoreTable;
-        private readonly FillFlowContainer topScoresContainer;
-        private readonly LoadingAnimation loadingAnimation;
+        public Bindable<BeatmapInfo> Beatmap = new Bindable<BeatmapInfo>();
+
+        private ScoreTable scoreTable;
+        private FillFlowContainer content;
+        private FillFlowContainer topScoresContainer;
+        private LoadingAnimation loadingAnimation;
+        private LeaderboardScopeSelector scopeSelector;
+
+        private GetScoresRequest getScoresRequest;
 
         [Resolved]
         private IAPIProvider api { get; set; }
 
-        private GetScoresRequest getScoresRequest;
-
-        private BeatmapInfo beatmap;
-
-        public BeatmapInfo Beatmap
-        {
-            get => beatmap;
-            set
-            {
-                if (beatmap == value)
-                    return;
-
-                beatmap = value;
-
-                getScores(beatmap);
-            }
-        }
+        protected override Container<Drawable> Content => content;
 
         protected APILegacyScores Scores
         {
@@ -79,64 +70,91 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
         {
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
-            InternalChildren = new Drawable[]
-            {
-                background = new Box
-                {
-                    RelativeSizeAxes = Axes.Both,
-                },
-                new FillFlowContainer
-                {
-                    Anchor = Anchor.TopCentre,
-                    Origin = Anchor.TopCentre,
-                    RelativeSizeAxes = Axes.X,
-                    AutoSizeAxes = Axes.Y,
-                    Width = 0.95f,
-                    Direction = FillDirection.Vertical,
-                    Spacing = new Vector2(0, spacing),
-                    Margin = new MarginPadding { Vertical = spacing },
-                    Children = new Drawable[]
-                    {
-                        topScoresContainer = new FillFlowContainer
-                        {
-                            RelativeSizeAxes = Axes.X,
-                            AutoSizeAxes = Axes.Y,
-                            Direction = FillDirection.Vertical,
-                            Spacing = new Vector2(0, 5),
-                        },
-                        scoreTable = new ScoreTable
-                        {
-                            Anchor = Anchor.TopCentre,
-                            Origin = Anchor.TopCentre,
-                        }
-                    }
-                },
-                loadingAnimation = new LoadingAnimation
-                {
-                    Alpha = 0,
-                    Margin = new MarginPadding(20),
-                },
-            };
         }
 
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
-            background.Colour = colours.Gray2;
+            AddRangeInternal(new Drawable[]
+            {
+                new Box
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Colour = colours.Gray2
+                },
+                content = new FillFlowContainer
+                {
+                    RelativeSizeAxes = Axes.X,
+                    AutoSizeAxes = Axes.Y,
+                    Direction = FillDirection.Vertical,
+                    Spacing = new Vector2(0, spacing),
+                    Margin = new MarginPadding { Vertical = spacing },
+                }
+            });
+
+            if (api.LocalUser.Value.IsSupporter)
+                Add(scopeSelector = new LeaderboardScopeSelector());
+
+            Add(new Container
+            {
+                AutoSizeAxes = Axes.Y,
+                RelativeSizeAxes = Axes.X,
+                Children = new Drawable[]
+                {
+                    new FillFlowContainer
+                    {
+                        Anchor = Anchor.TopCentre,
+                        Origin = Anchor.TopCentre,
+                        RelativeSizeAxes = Axes.X,
+                        AutoSizeAxes = Axes.Y,
+                        Width = 0.95f,
+                        Direction = FillDirection.Vertical,
+                        Spacing = new Vector2(0, spacing),
+                        Children = new Drawable[]
+                        {
+                            topScoresContainer = new FillFlowContainer
+                            {
+                                RelativeSizeAxes = Axes.X,
+                                AutoSizeAxes = Axes.Y,
+                                Direction = FillDirection.Vertical,
+                                Spacing = new Vector2(0, 5),
+                            },
+                            scoreTable = new ScoreTable
+                            {
+                                Anchor = Anchor.TopCentre,
+                                Origin = Anchor.TopCentre,
+                            }
+                        }
+                    },
+                    loadingAnimation = new LoadingAnimation
+                    {
+                        Alpha = 0,
+                    }
+                }
+            });
+
+            scopeSelector?.Current.BindValueChanged(scope => getScores(scope.NewValue));
+            Beatmap.BindValueChanged(_ =>
+            {
+                if (scopeSelector != null)
+                    scopeSelector.Current.Value = BeatmapLeaderboardScope.Global;
+
+                getScores();
+            });
         }
 
-        private void getScores(BeatmapInfo beatmap)
+        private void getScores(BeatmapLeaderboardScope scope = BeatmapLeaderboardScope.Global)
         {
             getScoresRequest?.Cancel();
             getScoresRequest = null;
 
             Scores = null;
 
-            if (beatmap?.OnlineBeatmapID.HasValue != true)
+            if (Beatmap.Value?.OnlineBeatmapID.HasValue != true)
                 return;
 
             loadingAnimation.Show();
-            getScoresRequest = new GetScoresRequest(beatmap, beatmap.Ruleset);
+            getScoresRequest = new GetScoresRequest(Beatmap.Value, Beatmap.Value.Ruleset, scope);
             getScoresRequest.Success += scores =>
             {
                 loadingAnimation.Hide();
