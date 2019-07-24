@@ -68,7 +68,7 @@ namespace osu.Game.Screens.Select
 
             SampleConfirm?.Play();
 
-            LoadComponentAsync(player = new PlayerLoader(() => new Player()), l =>
+            LoadComponentAsync(player = new PlayerLoader(() => new Player { Leaderboard = BeatmapDetails.Leaderboard }), l =>
             {
                 if (this.IsCurrentScreen()) this.Push(player);
             });

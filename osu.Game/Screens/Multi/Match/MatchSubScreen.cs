@@ -229,6 +229,7 @@ namespace osu.Game.Screens.Multi.Match
                 case GameTypeTimeshift _:
                     multiplayer?.Start(() => new TimeshiftPlayer(CurrentItem.Value)
                     {
+                        Leaderboard = leaderboard,
                         Exited = () => leaderboard.RefreshScores()
                     });
                     break;

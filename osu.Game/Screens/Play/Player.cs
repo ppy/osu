@@ -18,12 +18,14 @@ using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Graphics.Containers;
 using osu.Game.Online.API;
+using osu.Game.Online.Leaderboards;
 using osu.Game.Overlays;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.UI;
 using osu.Game.Scoring;
+using osu.Game.Screens.Play.HUD;
 using osu.Game.Screens.Ranking;
 using osu.Game.Skinning;
 using osu.Game.Users;
@@ -151,6 +153,7 @@ namespace osu.Game.Screens.Play
                     },
                     PlayerSettingsOverlay = { PlaybackSettings = { UserPlaybackRate = { BindTarget = GameplayClockContainer.UserPlaybackRate } } },
                     KeyCounter = { Visible = { BindTarget = DrawableRuleset.HasReplayLoaded } },
+                    InGameLeaderboard = { Leaderboard = leaderboard },
                     RequestSeek = GameplayClockContainer.Seek,
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre
@@ -194,7 +197,11 @@ namespace osu.Game.Screens.Play
                 failAnimation = new FailAnimation(DrawableRuleset) { OnComplete = onFailComplete, }
             };
 
-            DrawableRuleset.HasReplayLoaded.BindValueChanged(e => HUDOverlay.HoldToQuit.PauseOnFocusLost = !e.NewValue && PauseOnFocusLost, true);
+            DrawableRuleset.HasReplayLoaded.BindValueChanged(e =>
+            {
+                HUDOverlay.HoldToQuit.PauseOnFocusLost = !e.NewValue && PauseOnFocusLost;
+                HUDOverlay.InGameLeaderboard.PlayerUser = DrawableRuleset.ReplayScore?.ScoreInfo.User ?? api.LocalUser.Value;
+            }, true);
 
             // bind clock into components that require it
             DrawableRuleset.IsPaused.BindTo(GameplayClockContainer.IsPaused);
@@ -267,6 +274,26 @@ namespace osu.Game.Screens.Play
             if (!this.IsCurrentScreen()) return;
 
             this.Exit();
+        }
+
+        private ILeaderboard leaderboard;
+
+        /// <summary>
+        /// Sets a leaderboard for use inside <see cref="InGameLeaderboard"/>
+        /// </summary>
+        public ILeaderboard Leaderboard
+        {
+            get => leaderboard;
+            set
+            {
+                leaderboard = value;
+
+                if (leaderboard == null)
+                    return;
+
+                if (HUDOverlay != null)
+                    HUDOverlay.InGameLeaderboard.Leaderboard = leaderboard;
+            }
         }
 
         public void Restart()
