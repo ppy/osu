@@ -7,7 +7,6 @@ using System.Linq;
 using osu.Framework.Graphics;
 using osu.Framework.Input;
 using osu.Framework.Input.Bindings;
-using osu.Game.Graphics.UserInterface;
 
 namespace osu.Game.Input.Bindings
 {
@@ -56,11 +55,8 @@ namespace osu.Game.Input.Bindings
             new KeyBinding(new[] { InputKey.Control, InputKey.Minus }, GlobalAction.DecreaseScrollSpeed),
         };
 
-        /// <summary>
-        /// Make sure that the <see cref="OsuGame"/> handles global input first, and that <see cref="BackButton"/> handles global input last.
-        /// </summary>
         protected override IEnumerable<Drawable> KeyBindingInputQueue =>
-            (handler == null ? base.KeyBindingInputQueue : base.KeyBindingInputQueue.Prepend(handler)).OrderBy(d => d is BackButton);
+            handler == null ? base.KeyBindingInputQueue : base.KeyBindingInputQueue.Prepend(handler);
     }
 
     public enum GlobalAction
