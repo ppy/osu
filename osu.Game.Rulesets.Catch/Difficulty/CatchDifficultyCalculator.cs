@@ -67,7 +67,7 @@ namespace osu.Game.Rulesets.Catch.Difficulty
                     StarRating = Math.Sqrt(skills[0].StrainPeaks[i]) * star_scaling_factor,
                     Mods = mods,
                     ApproachRate = preempt > 1200.0 ? -(preempt - 1800.0) / 120.0 : -(preempt - 1200.0) / 150.0 + 5.0,
-                    MaxCombo = beatmap.HitObjects.Count(h => h is Fruit & h.StartTime < firstSectionEnd + i * sectionLength) + beatmap.HitObjects.OfType<JuiceStream>().ToList().FindAll(h => h.StartTime < firstSectionEnd + i * sectionLength).SelectMany(j => j.NestedHitObjects).Count(h => !(h is TinyDroplet)),
+                    MaxCombo = beatmap.HitObjects.Count(h => h is Fruit & (h.StartTime < firstSectionEnd + i * sectionLength)) + beatmap.HitObjects.OfType<JuiceStream>().ToList().FindAll(h => h.StartTime < firstSectionEnd + i * sectionLength).SelectMany(j => j.NestedHitObjects).Count(h => !(h is TinyDroplet)),
                     Skills = skills
                 });
             }
