@@ -41,41 +41,43 @@ namespace osu.Game.Rulesets.Difficulty
 
             var hitObjects = playableBeatmap.HitObjects.OrderBy(h => h.StartTime).ToList();
             double firstSectionEnd = Math.Ceiling(playableBeatmap.HitObjects.First().StartTime / sectionLength) * sectionLength;
-            int currentSectionEnd = 0;
+            int currentSection = 0;
             int count = 0;
 
             for (int i = 0; i < hitObjects.Count; i++)
             {
                 var h = hitObjects[i];
 
-                while (h.StartTime > firstSectionEnd + currentSectionEnd * sectionLength)
+                while (h.StartTime > firstSectionEnd + currentSection * sectionLength)
                 {
                     if (count > 0)
                     {
                         //check if safe
-                        if (strains[currentSectionEnd] == 0)
-                            strains[currentSectionEnd] = strains[currentSectionEnd - 1];
+                        if (strains[currentSection].StarRating == 0)
+                            strains[currentSection] = strains[currentSection - 1];
                     }
                     else
                     {
                         if (hitObjects[i - 1] is IHasEndTime s)
                         {
-                            if (s.EndTime > firstSectionEnd + (currentSectionEnd - 1) * sectionLength)
-                                if (strains[currentSectionEnd] == 0)
-                                    strains[currentSectionEnd] = strains[currentSectionEnd - 1];
+                            if (s.EndTime > firstSectionEnd + (currentSection - 1) * sectionLength)
+                                if (strains[currentSection].StarRating == 0)
+                                    strains[currentSection] = strains[currentSection - 1];
                         }
 
-                        strains[currentSectionEnd] = 0;
+                        strains[currentSection].StarRating = 0;
                     }
 
                     count = 0;
-                    currentSectionEnd++;
+                    currentSection++;
                 }
 
                 count++;
             }
 
-            return strains;
+            var returnList = new List<double>();
+            strains.ForEach(s => returnList.Add(s.StarRating));
+            return returnList;
         }
     }
 }
