@@ -3,12 +3,10 @@
 
 using System;
 using osuTK;
-using osuTK.Graphics;
 using osu.Framework.Graphics;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Scoring;
-using osu.Game.Skinning;
 
 namespace osu.Game.Rulesets.Catch.Objects.Drawable
 {
@@ -60,16 +58,11 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawable
                 ApplyResult(r => r.Type = CheckPosition.Invoke(HitObject) ? HitResult.Perfect : HitResult.Miss);
         }
 
-        protected override void SkinChanged(ISkinSource skin, bool allowFallback)
-        {
-            base.SkinChanged(skin, allowFallback);
-
-            if (HitObject is IHasComboInformation combo)
-                AccentColour = skin.GetValue<SkinConfiguration, Color4?>(s => s.ComboColours.Count > 0 ? s.ComboColours[combo.ComboIndex % s.ComboColours.Count] : (Color4?)null) ?? Color4.White;
-        }
+        protected override bool UseTransformStateManagement => false;
 
         protected override void UpdateState(ArmedState state)
         {
+            // TODO: update to use new state management.
             using (BeginAbsoluteSequence(HitObject.StartTime - HitObject.TimePreempt))
                 this.FadeIn(200);
 
