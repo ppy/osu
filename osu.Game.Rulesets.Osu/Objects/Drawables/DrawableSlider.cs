@@ -48,10 +48,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
             InternalChildren = new Drawable[]
             {
-                Body = new SnakingSliderBody(s)
-                {
-                    PathRadius = s.Scale * OsuHitObject.OBJECT_RADIUS,
-                },
+                Body = new SnakingSliderBody(s),
                 ticks = new Container<DrawableSliderTick> { RelativeSizeAxes = Axes.Both },
                 repeatPoints = new Container<DrawableRepeatPoint> { RelativeSizeAxes = Axes.Both },
                 Ball = new SliderBall(s, this)
@@ -162,6 +159,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             base.SkinChanged(skin, allowFallback);
 
             Body.BorderSize = skin.GetValue<SkinConfiguration, float?>(s => s.SliderBorderSize) ?? SliderBody.DEFAULT_BORDER_SIZE;
+            Body.PathRadius = slider.Scale * (skin.GetValue<SkinConfiguration, float?>(s => s.SliderPathRadius) ?? OsuHitObject.OBJECT_RADIUS);
+
             Body.AccentColour = skin.GetValue<SkinConfiguration, Color4?>(s => s.CustomColours.ContainsKey("SliderTrackOverride") ? s.CustomColours["SliderTrackOverride"] : (Color4?)null) ?? AccentColour.Value;
             Body.BorderColour = skin.GetValue<SkinConfiguration, Color4?>(s => s.CustomColours.ContainsKey("SliderBorder") ? s.CustomColours["SliderBorder"] : (Color4?)null) ?? Color4.White;
             Ball.AccentColour = skin.GetValue<SkinConfiguration, Color4?>(s => s.CustomColours.ContainsKey("SliderBall") ? s.CustomColours["SliderBall"] : (Color4?)null) ?? AccentColour.Value;
