@@ -58,8 +58,11 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
             HitObject = hitObject;
         }
 
+        protected override bool UseTransformStateManagement => false;
+
         protected override void UpdateState(ArmedState state)
         {
+            // TODO: update to use new state management.
             switch (state)
             {
                 case ArmedState.Miss:
