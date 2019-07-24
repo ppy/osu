@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
+using osu.Framework.Input.Events;
 using osu.Game.Graphics;
 using osu.Game.Online.Chat;
 
@@ -39,5 +40,7 @@ namespace osu.Game.Overlays.Chat.Tabs
                 Name = "+";
             }
         }
+
+        protected override bool OnMouseUp(MouseUpEvent e) => false;
     }
 }
