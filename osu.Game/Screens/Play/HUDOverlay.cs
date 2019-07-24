@@ -9,6 +9,8 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input.Events;
 using osu.Game.Configuration;
+using osu.Game.Graphics;
+using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Notifications;
@@ -35,8 +37,12 @@ namespace osu.Game.Screens.Play
         public readonly ModDisplay ModDisplay;
         public readonly HoldForMenuButton HoldToQuit;
         public readonly PlayerSettingsOverlay PlayerSettingsOverlay;
+        public readonly InGameLeaderboard InGameLeaderboard;
 
         public Bindable<bool> ShowHealthbar = new Bindable<bool>(true);
+
+        private Bindable<bool> alwaysShowLeaderboard;
+        private readonly OsuSpriteText alwaysShowLeaderboardText;
 
         private readonly ScoreProcessor scoreProcessor;
         private readonly DrawableRuleset drawableRuleset;
@@ -87,6 +93,7 @@ namespace osu.Game.Screens.Play
                     }
                 },
                 PlayerSettingsOverlay = CreatePlayerSettingsOverlay(),
+                InGameLeaderboard = CreateInGameLeaderboard(),
                 new FillFlowContainer
                 {
                     Anchor = Anchor.BottomRight,
@@ -99,9 +106,26 @@ namespace osu.Game.Screens.Play
                         KeyCounter = CreateKeyCounter(),
                         HoldToQuit = CreateHoldForMenuButton(),
                     }
+                },
+                new FillFlowContainer
+                {
+                    Anchor = Anchor.BottomLeft,
+                    Origin = Anchor.BottomLeft,
+                    Position = -new Vector2(5, TwoLayerButton.SIZE_RETRACTED.Y),
+                    AutoSizeAxes = Axes.Both,
+                    Direction = FillDirection.Vertical,
+                    Margin = new MarginPadding { Bottom = 30, Left = 20 },
+                    Spacing = new Vector2(5),
+                    Children = new Drawable[]
+                    {
+                        InGameLeaderboard = CreateInGameLeaderboard(),
+                        alwaysShowLeaderboardText = CreateAlwaysShowLeaderboardText(),
+                    }
                 }
             };
         }
+
+        //private bool onBreak;
 
         [BackgroundDependencyLoader(true)]
         private void load(OsuConfigManager config, NotificationOverlay notificationOverlay)
@@ -118,6 +142,24 @@ namespace osu.Game.Screens.Play
 
             showHud = config.GetBindable<bool>(OsuSetting.ShowInterface);
             showHud.BindValueChanged(visible => visibilityContainer.FadeTo(visible.NewValue ? 1 : 0, duration, easing), true);
+
+            alwaysShowLeaderboard = config.GetBindable<bool>(OsuSetting.AlwaysShowInGameLeaderboard);
+            alwaysShowLeaderboard.BindValueChanged(alwaysShow =>
+            {
+                if (alwaysShow.NewValue)
+                {
+                    alwaysShowLeaderboardText.Text = "The scoreboard will be visible at all times.";
+                    InGameLeaderboard.FadeIn(duration, easing);
+                }
+                else
+                {
+                    alwaysShowLeaderboardText.Text = "The scoreboard will be visible on breaks only.";
+                    //InGameLeaderboard.FadeTo(onBreak ? 1 : 0, duration, easing);
+                }
+
+                //if (onBreak)
+                //    alwaysShowLeaderboardText.FadeOutFromOne(1000, Easing.InQuint);
+            }, true);
 
             ShowHealthbar.BindValueChanged(healthBar =>
             {
@@ -182,14 +224,14 @@ namespace osu.Game.Screens.Play
         {
             if (e.Repeat) return false;
 
-            if (e.ShiftPressed)
+            if (e.Key == Key.Tab)
             {
-                switch (e.Key)
-                {
-                    case Key.Tab:
-                        showHud.Value = !showHud.Value;
-                        return true;
-                }
+                if (e.ShiftPressed)
+                    showHud.Value = !showHud.Value;
+                else if (!e.AltPressed && !e.ControlPressed)
+                    alwaysShowLeaderboard.Value = !alwaysShowLeaderboard.Value;
+
+                return true;
             }
 
             return base.OnKeyDown(e);
@@ -242,6 +284,21 @@ namespace osu.Game.Screens.Play
             RelativeSizeAxes = Axes.X,
         };
 
+        protected virtual InGameLeaderboard CreateInGameLeaderboard() => new InGameLeaderboard
+        {
+            Anchor = Anchor.BottomLeft,
+            Origin = Anchor.BottomLeft,
+            Width = 80,
+        };
+
+        protected virtual OsuSpriteText CreateAlwaysShowLeaderboardText() => new OsuSpriteText
+        {
+            Anchor = Anchor.BottomLeft,
+            Origin = Anchor.BottomLeft,
+            Font = OsuFont.GetFont(weight: FontWeight.Bold),
+            Alpha = 0,
+        };
+
         protected virtual HoldForMenuButton CreateHoldForMenuButton() => new HoldForMenuButton
         {
             Anchor = Anchor.BottomRight,
@@ -264,6 +321,8 @@ namespace osu.Game.Screens.Play
             AccuracyCounter?.Current.BindTo(processor.Accuracy);
             ComboCounter?.Current.BindTo(processor.Combo);
             HealthDisplay?.Current.BindTo(processor.Health);
+
+            InGameLeaderboard?.UserTotalScore.BindTo(processor.TotalScore);
 
             if (HealthDisplay is StandardHealthDisplay shd)
                 processor.NewJudgement += shd.Flash;
