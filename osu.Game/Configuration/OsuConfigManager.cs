@@ -78,6 +78,7 @@ namespace osu.Game.Configuration
 
             Set(OsuSetting.ShowInterface, true);
             Set(OsuSetting.ShowHealthDisplayWhenCantFail, true);
+            Set(OsuSetting.AlwaysShowInGameLeaderboard, false);
             Set(OsuSetting.KeyOverlay, false);
 
             Set(OsuSetting.FloatingComments, false);
@@ -133,6 +134,7 @@ namespace osu.Game.Configuration
         FloatingComments,
         ShowInterface,
         ShowHealthDisplayWhenCantFail,
+        AlwaysShowInGameLeaderboard,
         MouseDisableButtons,
         MouseDisableWheel,
         AudioOffset,

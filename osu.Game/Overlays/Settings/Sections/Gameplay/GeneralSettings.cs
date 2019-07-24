@@ -41,6 +41,11 @@ namespace osu.Game.Overlays.Settings.Sections.Gameplay
                 },
                 new SettingsCheckbox
                 {
+                    LabelText = "Always show in-game leaderboard",
+                    Bindable = config.GetBindable<bool>(OsuSetting.AlwaysShowInGameLeaderboard)
+                },
+                new SettingsCheckbox
+                {
                     LabelText = "Always show key overlay",
                     Bindable = config.GetBindable<bool>(OsuSetting.KeyOverlay)
                 },
