@@ -6,8 +6,8 @@ namespace osu.Game.Screens.Select.Leaderboards
     public enum BeatmapLeaderboardScope
     {
         Local,
-        Country,
         Global,
+        Country,
         Friend,
     }
 }
