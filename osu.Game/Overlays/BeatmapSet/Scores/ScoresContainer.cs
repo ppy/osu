@@ -15,6 +15,8 @@ using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Game.Screens.Select.Leaderboards;
 using osu.Framework.Bindables;
+using System.Collections.Generic;
+using osu.Game.Rulesets.Mods;
 
 namespace osu.Game.Overlays.BeatmapSet.Scores
 {
@@ -29,6 +31,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
         private FillFlowContainer topScoresContainer;
         private LoadingAnimation loadingAnimation;
         private LeaderboardScopeSelector scopeSelector;
+        private LeaderboardModSelector modSelector;
 
         private GetScoresRequest getScoresRequest;
 
@@ -93,7 +96,11 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
             });
 
             if (api.LocalUser.Value.IsSupporter)
-                Add(scopeSelector = new LeaderboardScopeSelector());
+                AddRange(new Drawable[]
+                {
+                    scopeSelector = new LeaderboardScopeSelector(),
+                    modSelector = new LeaderboardModSelector()
+                });
 
             Add(new Container
             {
@@ -133,17 +140,21 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                 }
             });
 
-            scopeSelector?.Current.BindValueChanged(scope => getScores(scope.NewValue));
-            Beatmap.BindValueChanged(_ =>
+            scopeSelector?.Current.BindValueChanged(scope => getScores(scope.NewValue, modSelector.SelectedMods.Value));
+            modSelector?.SelectedMods.BindValueChanged(mods => getScores(scopeSelector.Current.Value, mods.NewValue));
+            Beatmap.BindValueChanged(beatmap =>
             {
                 if (scopeSelector != null)
                     scopeSelector.Current.Value = BeatmapLeaderboardScope.Global;
+
+                if (modSelector != null)
+                    modSelector.ResetRuleset(beatmap.NewValue?.Ruleset);
 
                 getScores();
             });
         }
 
-        private void getScores(BeatmapLeaderboardScope scope = BeatmapLeaderboardScope.Global)
+        private void getScores(BeatmapLeaderboardScope scope = BeatmapLeaderboardScope.Global, IEnumerable<Mod> mods = null)
         {
             getScoresRequest?.Cancel();
             getScoresRequest = null;
@@ -154,7 +165,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                 return;
 
             loadingAnimation.Show();
-            getScoresRequest = new GetScoresRequest(Beatmap.Value, Beatmap.Value.Ruleset, scope);
+            getScoresRequest = new GetScoresRequest(Beatmap.Value, Beatmap.Value.Ruleset, scope, mods);
             getScoresRequest.Success += scores =>
             {
                 loadingAnimation.Hide();
