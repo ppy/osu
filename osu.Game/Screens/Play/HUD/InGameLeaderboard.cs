@@ -151,6 +151,9 @@ namespace osu.Game.Screens.Play.HUD
             {
                 for (int i = 0; i < orderedScores.Count - 1; i++)
                 {
+                    if (orderedScores[i] == UserScoreItem)
+                        continue;
+
                     int? topPosition = orderedScores[i].ScorePosition, bottomPosition = orderedScores[i + 1].ScorePosition;
 
                     if (!topPosition.HasValue || !bottomPosition.HasValue)
