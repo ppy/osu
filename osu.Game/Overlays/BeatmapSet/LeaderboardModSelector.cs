@@ -20,7 +20,7 @@ namespace osu.Game.Overlays.BeatmapSet
 {
     public class LeaderboardModSelector : Container
     {
-        public Bindable<IEnumerable<Mod>> SelectedMods = new Bindable<IEnumerable<Mod>>();
+        public readonly Bindable<IEnumerable<Mod>> SelectedMods = new Bindable<IEnumerable<Mod>>();
 
         private RulesetInfo ruleset = new RulesetInfo();
         private readonly FillFlowContainer<SelectableModIcon> modsContainer;
