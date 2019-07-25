@@ -52,6 +52,9 @@ namespace osu.Game.Screens.Play.HUD
 
                 leaderboardScores = leaderboard.Scores?.OrderByDescending(s => s.TotalScore).ToList();
 
+                if (leaderboardScores == null || !leaderboardScores.Any())
+                    return;
+
                 addLeaderboardScores();
 
                 if (leaderboard is BeatmapLeaderboard beatmapLeaderboard)
@@ -61,10 +64,7 @@ namespace osu.Game.Screens.Play.HUD
                 ScoresContainer.Add(UserScoreItem);
 
                 // set user score item position below everything at creation
-                var hasPositionScores = ScoresContainer.Where(i => i.ScorePosition.HasValue);
-
-                if (hasPositionScores.Any())
-                    ScoresContainer.SetLayoutPosition(UserScoreItem, hasPositionScores.Max(i => i.ScorePosition.Value) + 1);
+                ScoresContainer.SetLayoutPosition(UserScoreItem, ScoresContainer.Where(i => i.ScorePosition.HasValue).Max(i => i.ScorePosition.Value) + 1);
             }
         }
 
@@ -114,9 +114,6 @@ namespace osu.Game.Screens.Play.HUD
 
         private void addLeaderboardScores()
         {
-            if (leaderboardScores == null || !leaderboardScores.Any())
-                return;
-
             int count = leaderboardScores.Count;
 
             for (int i = 0; i < count; i++)
@@ -173,7 +170,7 @@ namespace osu.Game.Screens.Play.HUD
 
         private void updatePositions()
         {
-            if (leaderboardScores == null)
+            if (leaderboardScores == null || !leaderboardScores.Any())
                 return;
 
             reorderScores();
