@@ -42,6 +42,8 @@ namespace osu.Game.Screens.Play
 
         public Bindable<bool> ShowHealthbar = new Bindable<bool>(true);
 
+        public readonly IBindable<bool> IsBreakTime = new Bindable<bool>();
+
         private Bindable<bool> alwaysShowLeaderboard;
         private readonly OsuSpriteText leaderboardText;
 
@@ -125,7 +127,16 @@ namespace osu.Game.Screens.Play
             };
         }
 
-        //private bool onBreak;
+        private void updateLeaderboardState()
+        {
+            if (alwaysShowLeaderboard.Value)
+                return;
+
+            if (IsBreakTime.Value)
+                InGameLeaderboard.FadeIn(duration, easing);
+            else
+                InGameLeaderboard.FadeTo(0.001f, duration, easing); // we don't want to fade the leaderboard entirely else the leaderboard text will fall to the bottom
+        }
 
         [BackgroundDependencyLoader(true)]
         private void load(OsuConfigManager config, NotificationOverlay notificationOverlay)
@@ -143,6 +154,8 @@ namespace osu.Game.Screens.Play
             showHud = config.GetBindable<bool>(OsuSetting.ShowInterface);
             showHud.BindValueChanged(visible => visibilityContainer.FadeTo(visible.NewValue ? 1 : 0, duration, easing), true);
 
+            IsBreakTime.ValueChanged += _ => updateLeaderboardState();
+
             alwaysShowLeaderboard = config.GetBindable<bool>(OsuSetting.AlwaysShowInGameLeaderboard);
             alwaysShowLeaderboard.ValueChanged += alwaysShow =>
             {
@@ -151,17 +164,17 @@ namespace osu.Game.Screens.Play
 
                 if (alwaysShow.NewValue)
                     InGameLeaderboard.FadeIn(duration, easing);
-                //else
-                //    InGameLeaderboard.FadeTo(onBreak ? 1 : 0, duration, easing);
+                else
+                    updateLeaderboardState();
 
-                //if (onBreak)
-                //{
-                //    leaderboardText.Text = alwaysShow.NewValue
-                //        ? "The scoreboard will be shown at all times!"
-                //        : "The scoreboard will be hidden after this break ends!";
+                if (IsBreakTime.Value)
+                {
+                    leaderboardText.Text = alwaysShow.NewValue
+                        ? "The scoreboard will be shown at all times!"
+                        : "The scoreboard will be hidden after this break ends!";
 
-                //    leaderboardText.FadeOutFromOne(1000, Easing.InQuint);
-                //}
+                    leaderboardText.FadeOutFromOne(1000, Easing.InQuint);
+                }
             };
 
             ShowHealthbar.BindValueChanged(healthBar =>

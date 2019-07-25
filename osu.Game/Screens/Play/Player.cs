@@ -119,6 +119,8 @@ namespace osu.Game.Screens.Play
             if (!ScoreProcessor.Mode.Disabled)
                 config.BindWith(OsuSetting.ScoreDisplayMode, ScoreProcessor.Mode);
 
+            BreakOverlay breakOverlay;
+
             InternalChild = GameplayClockContainer = new GameplayClockContainer(working, Mods.Value, DrawableRuleset.GameplayStartTime);
 
             GameplayClockContainer.Children = new[]
@@ -136,7 +138,7 @@ namespace osu.Game.Screens.Play
                         }
                     }
                 },
-                new BreakOverlay(working.Beatmap.BeatmapInfo.LetterboxInBreaks, ScoreProcessor)
+                breakOverlay = new BreakOverlay(working.Beatmap.BeatmapInfo.LetterboxInBreaks, ScoreProcessor)
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
@@ -202,6 +204,9 @@ namespace osu.Game.Screens.Play
                 HUDOverlay.HoldToQuit.PauseOnFocusLost = !e.NewValue && PauseOnFocusLost;
                 HUDOverlay.InGameLeaderboard.PlayerUser = DrawableRuleset.ReplayScore?.ScoreInfo.User ?? api.LocalUser.Value;
             }, true);
+
+            // bind IsBreakTime to the hud for leaderboard visibility toggling.
+            HUDOverlay.IsBreakTime.BindTo(breakOverlay.IsBreakTime);
 
             // bind clock into components that require it
             DrawableRuleset.IsPaused.BindTo(GameplayClockContainer.IsPaused);
