@@ -43,9 +43,10 @@ namespace osu.Game.Screens.Select
     {
         private static readonly Vector2 wedged_container_size = new Vector2(0.5f, 245);
 
+        public const float FILTER_CONTROL_HEIGHT = 100;
+        public const float FOOTER_HEIGHT = 50;
         protected const float BACKGROUND_BLUR = 20;
         private const float left_area_padding = 20;
-        private const float filter_control_height = 100;
 
         public readonly FilterControl FilterControl;
 
@@ -122,7 +123,7 @@ namespace osu.Game.Screens.Select
                     Size = new Vector2(wedged_container_size.X, 1),
                     Padding = new MarginPadding
                     {
-                        Bottom = Footer.HEIGHT,
+                        Bottom = FOOTER_HEIGHT,
                         Top = wedged_container_size.Y + left_area_padding,
                         Left = left_area_padding,
                         Right = left_area_padding * 2,
@@ -153,8 +154,8 @@ namespace osu.Game.Screens.Select
                                 RelativeSizeAxes = Axes.Both,
                                 Padding = new MarginPadding
                                 {
-                                    Top = filter_control_height,
-                                    Bottom = Footer.HEIGHT
+                                    Top = FILTER_CONTROL_HEIGHT,
+                                    Bottom = FOOTER_HEIGHT
                                 },
                                 Child = Carousel = new BeatmapCarousel
                                 {
@@ -170,7 +171,7 @@ namespace osu.Game.Screens.Select
                             FilterControl = new FilterControl
                             {
                                 RelativeSizeAxes = Axes.X,
-                                Height = filter_control_height,
+                                Height = FILTER_CONTROL_HEIGHT,
                                 FilterChanged = c => Carousel.Filter(c),
                                 Background = { Width = 2 },
                                 Exit = () =>
@@ -209,7 +210,7 @@ namespace osu.Game.Screens.Select
                         Origin = Anchor.BottomLeft,
                         RelativeSizeAxes = Axes.X,
                         AutoSizeAxes = Axes.Y,
-                        Margin = new MarginPadding { Bottom = Footer.HEIGHT },
+                        Margin = new MarginPadding { Bottom = FOOTER_HEIGHT },
                         Children = new Drawable[]
                         {
                             BeatmapOptions = new BeatmapOptionsOverlay(),
@@ -221,7 +222,13 @@ namespace osu.Game.Screens.Select
                             }
                         }
                     },
-                    Footer = new Footer()
+                    Footer = new Footer
+                    {
+                        RelativeSizeAxes = Axes.X,
+                        Height = FOOTER_HEIGHT,
+                        Anchor = Anchor.BottomCentre,
+                        Origin = Anchor.BottomCentre,
+                    }
                 });
             }
 
