@@ -126,12 +126,12 @@ namespace osu.Game.Screens.Play
 
         private void updateBreakTimeBindable()
         {
-            foreach (var b in breaks)
+            for (int i = 0; i < breaks.Count; i++)
             {
-                if (!b.HasEffect)
+                if (!breaks[i].HasEffect)
                     continue;
 
-                if (Clock.CurrentTime >= b.StartTime && Clock.CurrentTime <= b.EndTime)
+                if (Clock.CurrentTime >= breaks[i].StartTime && Clock.CurrentTime <= breaks[i].EndTime)
                 {
                     isBreakTime.Value = true;
                     return;
