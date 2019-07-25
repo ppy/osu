@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -42,7 +43,7 @@ namespace osu.Game.Screens.Play
         public Bindable<bool> ShowHealthbar = new Bindable<bool>(true);
 
         private Bindable<bool> alwaysShowLeaderboard;
-        private readonly OsuSpriteText alwaysShowLeaderboardText;
+        private readonly OsuSpriteText leaderboardText;
 
         private readonly ScoreProcessor scoreProcessor;
         private readonly DrawableRuleset drawableRuleset;
@@ -119,7 +120,7 @@ namespace osu.Game.Screens.Play
                     Children = new Drawable[]
                     {
                         InGameLeaderboard = CreateInGameLeaderboard(),
-                        alwaysShowLeaderboardText = CreateAlwaysShowLeaderboardText(),
+                        leaderboardText = CreateLeaderboardText(),
                     }
                 }
             };
@@ -144,22 +145,25 @@ namespace osu.Game.Screens.Play
             showHud.BindValueChanged(visible => visibilityContainer.FadeTo(visible.NewValue ? 1 : 0, duration, easing), true);
 
             alwaysShowLeaderboard = config.GetBindable<bool>(OsuSetting.AlwaysShowInGameLeaderboard);
-            alwaysShowLeaderboard.BindValueChanged(alwaysShow =>
+            alwaysShowLeaderboard.ValueChanged += alwaysShow =>
             {
+                if (!InGameLeaderboard.ScoresContainer.Any())
+                    return;
+
                 if (alwaysShow.NewValue)
-                {
-                    alwaysShowLeaderboardText.Text = "The scoreboard will be visible at all times.";
                     InGameLeaderboard.FadeIn(duration, easing);
-                }
-                else
-                {
-                    alwaysShowLeaderboardText.Text = "The scoreboard will be visible on breaks only.";
-                    //InGameLeaderboard.FadeTo(onBreak ? 1 : 0, duration, easing);
-                }
+                //else
+                //    InGameLeaderboard.FadeTo(onBreak ? 1 : 0, duration, easing);
 
                 //if (onBreak)
-                //    alwaysShowLeaderboardText.FadeOutFromOne(1000, Easing.InQuint);
-            }, true);
+                //{
+                //    leaderboardText.Text = alwaysShow.NewValue
+                //        ? "The scoreboard will be shown at all times!"
+                //        : "The scoreboard will be hidden after this break ends!";
+
+                //    leaderboardText.FadeOutFromOne(1000, Easing.InQuint);
+                //}
+            };
 
             ShowHealthbar.BindValueChanged(healthBar =>
             {
@@ -191,6 +195,15 @@ namespace osu.Game.Screens.Play
             base.LoadComplete();
 
             replayLoaded.BindValueChanged(replayLoadedValueChanged, true);
+
+            if (InGameLeaderboard.ScoresContainer.Any())
+            {
+                leaderboardText.Text = "Hit <TAB> to toggle scoreboard!";
+                leaderboardText.FadeOutFromOne(1000, Easing.InQuint);
+
+                if (!alwaysShowLeaderboard.Value)
+                    InGameLeaderboard.FadeOut(1000, Easing.InQuint);
+            }
         }
 
         private void replayLoadedValueChanged(ValueChangedEvent<bool> e)
@@ -291,7 +304,7 @@ namespace osu.Game.Screens.Play
             Width = 80,
         };
 
-        protected virtual OsuSpriteText CreateAlwaysShowLeaderboardText() => new OsuSpriteText
+        protected virtual OsuSpriteText CreateLeaderboardText() => new OsuSpriteText
         {
             Anchor = Anchor.BottomLeft,
             Origin = Anchor.BottomLeft,
