@@ -395,16 +395,6 @@ namespace osu.Game
 
             AddRange(new Drawable[]
             {
-                backButton = new BackButton
-                {
-                    Anchor = Anchor.BottomLeft,
-                    Origin = Anchor.BottomLeft,
-                    Action = () =>
-                    {
-                        if ((screenStack.CurrentScreen as IOsuScreen)?.AllowBackButton == true)
-                            screenStack.Exit();
-                    }
-                },
                 new VolumeControlReceptor
                 {
                     RelativeSizeAxes = Axes.Both,
@@ -416,9 +406,26 @@ namespace osu.Game
                     RelativeSizeAxes = Axes.Both,
                     Children = new[]
                     {
-                        screenStack = new OsuScreenStack { RelativeSizeAxes = Axes.Both },
-                        backButton.CreateProxy(),
-                        logoContainer = new Container { RelativeSizeAxes = Axes.Both },
+                        backButton = new BackButton
+                        {
+                            Anchor = Anchor.BottomLeft,
+                            Origin = Anchor.BottomLeft,
+                            Action = () =>
+                            {
+                                if ((screenStack.CurrentScreen as IOsuScreen)?.AllowBackButton == true)
+                                    screenStack.Exit();
+                            }
+                        },
+                        new Container
+                        {
+                            RelativeSizeAxes = Axes.Both,
+                            Children = new[]
+                            {
+                                screenStack = new OsuScreenStack { RelativeSizeAxes = Axes.Both },
+                                backButton.CreateProxy(),
+                                logoContainer = new Container { RelativeSizeAxes = Axes.Both },
+                            }
+                        }
                     }
                 },
                 overlayContent = new Container { RelativeSizeAxes = Axes.Both },
