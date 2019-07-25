@@ -211,10 +211,10 @@ namespace osu.Game.Screens.Play
             if (InGameLeaderboard.ScoresContainer.Any())
             {
                 leaderboardText.Text = "Hit <TAB> to toggle scoreboard!";
-                leaderboardText.FadeOutFromOne(1000, Easing.InQuint);
+                leaderboardText.FadeOutFromOne(2000, Easing.InQuint);
 
                 if (!alwaysShowLeaderboard.Value)
-                    InGameLeaderboard.FadeOut(1000, Easing.InQuint);
+                    InGameLeaderboard.FadeOut(2000, Easing.InQuint);
             }
         }
 
