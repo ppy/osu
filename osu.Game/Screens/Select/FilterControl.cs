@@ -187,11 +187,5 @@ namespace osu.Game.Screens.Select
         }
 
         private void updateCriteria() => FilterChanged?.Invoke(CreateCriteria());
-
-        protected override bool OnMouseDown(MouseDownEvent e) => true;
-
-        protected override bool OnMouseMove(MouseMoveEvent e) => true;
-
-        protected override bool OnClick(ClickEvent e) => true;
     }
 }

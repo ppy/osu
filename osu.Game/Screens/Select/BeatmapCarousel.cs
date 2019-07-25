@@ -108,10 +108,12 @@ namespace osu.Game.Screens.Select
             root = new CarouselRoot(this);
             Child = new OsuContextMenuContainer
             {
+                Masking = false,
                 RelativeSizeAxes = Axes.X,
                 AutoSizeAxes = Axes.Y,
                 Child = scrollableContent = new Container<DrawableCarouselItem>
                 {
+                    Masking = false,
                     RelativeSizeAxes = Axes.X,
                 }
             };
@@ -424,7 +426,9 @@ namespace osu.Game.Screens.Select
             if (!scrollPositionCache.IsValid)
                 updateScrollPosition();
 
-            float drawHeight = DrawHeight;
+            // The draw positions of individual sets extend beyond the size of the carousel and into its parent
+            // As a result, this should use the Parent's draw height instead.
+            float drawHeight = Parent.DrawHeight;
 
             // Remove all items that should no longer be on-screen
             scrollableContent.RemoveAll(p => p.Y < Current - p.DrawHeight || p.Y > Current + drawHeight || !p.IsPresent);
@@ -432,9 +436,9 @@ namespace osu.Game.Screens.Select
             // Find index range of all items that should be on-screen
             Trace.Assert(Items.Count == yPositions.Count);
 
-            int firstIndex = yPositions.BinarySearch(Current - DrawableCarouselItem.MAX_HEIGHT);
+            int firstIndex = yPositions.BinarySearch(Current - DrawableCarouselItem.MAX_HEIGHT - Parent.Padding.Top);
             if (firstIndex < 0) firstIndex = ~firstIndex;
-            int lastIndex = yPositions.BinarySearch(Current + drawHeight);
+            int lastIndex = yPositions.BinarySearch(Current + drawHeight + Parent.Padding.Bottom);
             if (lastIndex < 0) lastIndex = ~lastIndex;
 
             int notVisibleCount = 0;
@@ -637,18 +641,19 @@ namespace osu.Game.Screens.Select
         /// the current scroll position.
         /// </summary>
         /// <param name="p">The item to be updated.</param>
-        /// <param name="halfHeight">Half the draw height of the carousel container.</param>
-        private void updateItem(DrawableCarouselItem p, float halfHeight)
+        /// <param name="parentHalfHeight">Half the draw height of the carousel container's parent.</param>
+        private void updateItem(DrawableCarouselItem p, float parentHalfHeight)
         {
             var height = p.IsPresent ? p.DrawHeight : 0;
 
-            float itemDrawY = p.Position.Y - Current + height / 2;
-            float dist = Math.Abs(1f - itemDrawY / halfHeight);
+            // The actual Y position of the item needs to be offset by any potential padding set by the container's parent.
+            float itemDrawY = p.Position.Y - Current + Parent.Padding.Top + height / 2;
+            float dist = Math.Abs(1f - itemDrawY / parentHalfHeight);
 
             // Setting the origin position serves as an additive position on top of potential
             // local transformation we may want to apply (e.g. when a item gets selected, we
             // may want to smoothly transform it leftwards.)
-            p.OriginPosition = new Vector2(-offsetX(dist, halfHeight), 0);
+            p.OriginPosition = new Vector2(-offsetX(dist, parentHalfHeight), 0);
 
             // We are applying a multiplicative alpha (which is internally done by nesting an
             // additional container and setting that container's alpha) such that we can
