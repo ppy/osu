@@ -129,19 +129,7 @@ namespace osu.Game.Skinning
             }
 
             if (texture != null)
-            {
                 texture.ScaleAdjust = ratio;
-
-                switch (componentName)
-                {
-                    case "cursormiddle":
-                    case "cursortrail":
-                    case "cursor":
-                        // apply inverse of adjustment in OsuPlayfieldAdjustmentContainer for non-gameplay-scale textures.
-                        texture.ScaleAdjust *= 1.6f;
-                        break;
-                }
-            }
 
             return texture;
         }
