@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using Humanizer;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -197,7 +198,7 @@ namespace osu.Game.Screens.Play.HUD
                 scorePosition = value;
 
                 if (scorePosition.HasValue)
-                    positionText.Text = $"#{scorePosition}";
+                    positionText.Text = $"#{scorePosition.Value.ToMetric(decimals: scorePosition < 100000 ? 1 : 0)}";
 
                 positionText.FadeTo(scorePosition.HasValue ? 1 : 0, 100);
                 positionPunctation.FadeTo(scorePosition.HasValue ? 1 : 0, 100);
