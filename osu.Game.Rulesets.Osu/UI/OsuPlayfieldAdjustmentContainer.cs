@@ -18,7 +18,7 @@ namespace osu.Game.Rulesets.Osu.UI
             Anchor = Anchor.Centre;
             Origin = Anchor.Centre;
 
-            Size = new Vector2(0.75f);
+            Size = new Vector2(0.8f);
 
             InternalChild = new Container
             {
