@@ -94,7 +94,6 @@ namespace osu.Game.Screens.Play
                     }
                 },
                 PlayerSettingsOverlay = CreatePlayerSettingsOverlay(),
-                InGameLeaderboard = CreateInGameLeaderboard(),
                 new FillFlowContainer
                 {
                     Anchor = Anchor.BottomRight,
