@@ -37,9 +37,8 @@ namespace osu.Game.Screens.Play
         public override bool RemoveCompletedTransforms => false;
 
         /// <summary>
-        /// Whether we are currently in the break time range.
+        /// Whether the gameplay is currently in a break.
         /// </summary>
-        public readonly BindableBool IsBreakTime = new BindableBool();
         public IBindable<bool> IsBreakTime => isBreakTime;
 
         private readonly BindableBool isBreakTime = new BindableBool();
