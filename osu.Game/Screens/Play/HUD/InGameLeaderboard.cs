@@ -20,10 +20,10 @@ namespace osu.Game.Screens.Play.HUD
 {
     public class InGameLeaderboard : CompositeDrawable
     {
-        protected readonly FillFlowContainer<InGameScoreItem> ScoresContainer;
+        public readonly FillFlowContainer<InGameScoreItem> ScoresContainer;
 
-        protected readonly InGameScoreItem UserScoreItem;
         public readonly BindableDouble UserTotalScore = new BindableDouble();
+        protected readonly InGameScoreItem UserScoreItem;
 
         private InGameScoreItem userBestScoreItem;
 
