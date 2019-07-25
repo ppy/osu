@@ -53,6 +53,8 @@ namespace osu.Game.Screens.Select
         public override bool HandleNonPositionalInput => AllowSelection;
         public override bool HandlePositionalInput => AllowSelection;
 
+        protected override bool ConfinePositionalInput => true;
+
         /// <summary>
         /// Whether carousel items have completed asynchronously loaded.
         /// </summary>
