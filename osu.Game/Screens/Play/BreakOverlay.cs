@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
+using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -30,6 +31,8 @@ namespace osu.Game.Screens.Play
             set
             {
                 breaks = value;
+                currentBreakIndex = 0;
+
                 initializeBreaks();
             }
         }
@@ -41,6 +44,7 @@ namespace osu.Game.Screens.Play
         /// </summary>
         public IBindable<bool> IsBreakTime => isBreakTime;
 
+        private int currentBreakIndex;
         private readonly BindableBool isBreakTime = new BindableBool();
 
         private readonly Container remainingTimeAdjustmentBox;
@@ -126,22 +130,30 @@ namespace osu.Game.Screens.Play
 
         private void updateBreakTimeBindable()
         {
-            if (breaks == null)
-                return;
-
-            for (int i = 0; i < breaks.Count; i++)
+            if (breaks == null || !breaks.Any())
             {
-                if (!breaks[i].HasEffect)
-                    continue;
-
-                if (Clock.CurrentTime >= breaks[i].StartTime && Clock.CurrentTime <= breaks[i].EndTime)
-                {
-                    isBreakTime.Value = true;
-                    return;
-                }
+                isBreakTime.Value = false;
+                return;
             }
 
-            isBreakTime.Value = false;
+            int indexDirection = Clock.CurrentTime < breaks[currentBreakIndex].StartTime ? -1 : (Clock.CurrentTime > breaks[currentBreakIndex].EndTime ? 1 : 0);
+
+            while (Clock.CurrentTime < breaks[currentBreakIndex].StartTime || Clock.CurrentTime > breaks[currentBreakIndex].EndTime)
+            {
+                currentBreakIndex += indexDirection;
+
+                if (currentBreakIndex < 0 || currentBreakIndex >= breaks.Count)
+                    break;
+            }
+
+            if (currentBreakIndex < 0 || currentBreakIndex >= breaks.Count)
+            {
+                isBreakTime.Value = false;
+                currentBreakIndex = 0;
+                return;
+            }
+
+            isBreakTime.Value = true;
         }
 
         private void initializeBreaks()
