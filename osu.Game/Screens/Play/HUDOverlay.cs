@@ -320,6 +320,7 @@ namespace osu.Game.Screens.Play
         {
             Anchor = Anchor.BottomLeft,
             Origin = Anchor.BottomLeft,
+            Margin = new MarginPadding { Left = 20 },
             Font = OsuFont.GetFont(weight: FontWeight.Bold),
             Alpha = 0,
         };
