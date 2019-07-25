@@ -41,6 +41,9 @@ namespace osu.Game.Screens.Play
         /// Whether we are currently in the break time range.
         /// </summary>
         public readonly BindableBool IsBreakTime = new BindableBool();
+        public IBindable<bool> IsBreakTime => isBreakTime;
+
+        private readonly BindableBool isBreakTime = new BindableBool();
 
         private readonly Container remainingTimeAdjustmentBox;
         private readonly Container remainingTimeBox;
