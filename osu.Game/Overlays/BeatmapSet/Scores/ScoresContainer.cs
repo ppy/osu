@@ -163,6 +163,16 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
             if (Beatmap.Value?.OnlineBeatmapID.HasValue != true)
                 return;
 
+            var status = Beatmap.Value?.Status;
+
+            bool hasNoLeaderboard = status == BeatmapSetOnlineStatus.Graveyard
+                || status == BeatmapSetOnlineStatus.None
+                || status == BeatmapSetOnlineStatus.Pending
+                || status == BeatmapSetOnlineStatus.WIP;
+
+            if (hasNoLeaderboard)
+                return;
+
             loadingAnimation.Show();
             getScoresRequest = new GetScoresRequest(Beatmap.Value, Beatmap.Value.Ruleset, scope, mods);
             getScoresRequest.Success += scores =>
