@@ -14,6 +14,7 @@ using osu.Game.Graphics.UserInterface;
 using osuTK.Graphics;
 using System;
 using System.Linq;
+using osu.Framework.Extensions.IEnumerableExtensions;
 
 namespace osu.Game.Overlays.BeatmapSet
 {
@@ -60,10 +61,8 @@ namespace osu.Game.Overlays.BeatmapSet
             modsContainer.Clear();
 
             foreach (var mod in ruleset.CreateInstance().GetAllMods())
-            {
                 if (mod.Ranked)
                     modsContainer.Add(new SelectableModIcon(mod));
-            }
 
             foreach (var mod in modsContainer)
                 mod.OnSelectionChanged += selectionChanged;
@@ -71,7 +70,7 @@ namespace osu.Game.Overlays.BeatmapSet
 
         private void selectionChanged(Mod mod, bool selected)
         {
-            var mods = SelectedMods.Value?.ToList() ?? new List<Mod>();
+            var mods = SelectedMods.Value.ToList();
 
             if (selected)
                 mods.Add(mod);
@@ -81,18 +80,14 @@ namespace osu.Game.Overlays.BeatmapSet
             SelectedMods.Value = mods;
         }
 
-        private void deselectAll()
-        {
-            foreach (var mod in modsContainer)
-                mod.Selected.Value = false;
-        }
+        private void deselectAll() => modsContainer.ForEach(mod => mod.Selected.Value = false);
 
         private class SelectableModIcon : Container
         {
             private const float mod_scale = 0.4f;
             private const int duration = 200;
 
-            public readonly BindableBool Selected = new BindableBool(false);
+            public readonly BindableBool Selected = new BindableBool();
             public Action<Mod, bool> OnSelectionChanged;
 
             private readonly ModIcon modIcon;
@@ -114,8 +109,7 @@ namespace osu.Game.Overlays.BeatmapSet
                     new HoverClickSounds()
                 };
 
-                Selected.BindValueChanged(_ => updateState());
-                Selected.TriggerChange();
+                Selected.BindValueChanged(_ => updateState(), true);
             }
 
             protected override bool OnClick(ClickEvent e)
