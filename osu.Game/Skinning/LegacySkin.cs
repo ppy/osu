@@ -6,9 +6,11 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.IO.Stores;
@@ -71,6 +73,12 @@ namespace osu.Game.Skinning
         {
             switch (componentName)
             {
+                case "osu/Game/Rulesets/Osu/UI/Cursor/OsuCursor":
+                    if (GetTexture("cursor") != null)
+                        return new LegacyCursor();
+
+                    break;
+
                 case "Play/Miss":
                     componentName = "hit0";
                     break;
@@ -241,6 +249,37 @@ namespace osu.Game.Skinning
                     texture.ScaleAdjust = ratio;
 
                 return texture;
+            }
+        }
+
+        public class LegacyCursor : CompositeDrawable
+        {
+            public LegacyCursor()
+            {
+                Size = new Vector2(50);
+
+                Anchor = Anchor.Centre;
+                Origin = Anchor.Centre;
+            }
+
+            [BackgroundDependencyLoader]
+            private void load(ISkinSource skin)
+            {
+                InternalChildren = new Drawable[]
+                {
+                    new Sprite
+                    {
+                        Texture = skin.GetTexture("cursormiddle"),
+                        Anchor = Anchor.Centre,
+                        Origin = Anchor.Centre,
+                    },
+                    new Sprite
+                    {
+                        Texture = skin.GetTexture("cursor"),
+                        Anchor = Anchor.Centre,
+                        Origin = Anchor.Centre,
+                    }
+                };
             }
         }
     }
