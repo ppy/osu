@@ -31,7 +31,7 @@ namespace osu.Game.Screens.Play
             set
             {
                 breaks = value;
-                currentBreakIndex = 0;
+                nearestBreakIndex = 0;
 
                 initializeBreaks();
             }
@@ -44,7 +44,7 @@ namespace osu.Game.Screens.Play
         /// </summary>
         public IBindable<bool> IsBreakTime => isBreakTime;
 
-        private int currentBreakIndex;
+        private int nearestBreakIndex;
         private readonly BindableBool isBreakTime = new BindableBool();
 
         private readonly Container remainingTimeAdjustmentBox;
@@ -136,24 +136,17 @@ namespace osu.Game.Screens.Play
                 return;
             }
 
-            int indexDirection = Clock.CurrentTime < breaks[currentBreakIndex].StartTime ? -1 : (Clock.CurrentTime > breaks[currentBreakIndex].EndTime ? 1 : 0);
+            while (nearestBreakIndex < breaks.Count - 1 && Clock.CurrentTime > breaks[nearestBreakIndex].EndTime)
+                nearestBreakIndex++;
 
-            while (Clock.CurrentTime < breaks[currentBreakIndex].StartTime || Clock.CurrentTime > breaks[currentBreakIndex].EndTime)
-            {
-                currentBreakIndex += indexDirection;
+            while (nearestBreakIndex > 0 && Clock.CurrentTime < breaks[nearestBreakIndex].StartTime)
+                nearestBreakIndex--;
 
-                if (currentBreakIndex < 0 || currentBreakIndex >= breaks.Count)
-                    break;
-            }
-
-            if (currentBreakIndex < 0 || currentBreakIndex >= breaks.Count)
-            {
-                isBreakTime.Value = false;
-                currentBreakIndex = 0;
-                return;
-            }
-
-            isBreakTime.Value = true;
+            // This ensures that IsBreakTime is generally consistent with the overlay's transforms during a break.
+            // If the overlay never shows (break.HasEffect is false), IsBreakTime should be false.
+            // We also assume that the overlay's fade out transform is "not break time".
+            var nearestBreak = breaks[nearestBreakIndex];
+            isBreakTime.Value = nearestBreak.HasEffect && Clock.CurrentTime >= nearestBreak.StartTime && Clock.CurrentTime <= nearestBreak.EndTime - fade_duration;
         }
 
         private void initializeBreaks()

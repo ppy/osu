@@ -1,8 +1,13 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Collections.Generic;
 using NUnit.Framework;
+using osu.Framework.Bindables;
+using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Sprites;
 using osu.Game.Beatmaps.Timing;
 using osu.Game.Screens.Play;
 
@@ -11,11 +16,30 @@ namespace osu.Game.Tests.Visual.Gameplay
     [TestFixture]
     public class TestSceneBreakOverlay : OsuTestScene
     {
+        public override IReadOnlyList<Type> RequiredTypes => new[]
+        {
+            typeof(BreakOverlay),
+        };
+
         private readonly BreakOverlay breakOverlay;
+        private readonly IBindable<bool> isBreakTimeBindable = new BindableBool();
 
         public TestSceneBreakOverlay()
         {
-            Child = breakOverlay = new BreakOverlay(true);
+            SpriteText breakTimeText;
+            Child = new FillFlowContainer
+            {
+                RelativeSizeAxes = Axes.Both,
+                Direction = FillDirection.Vertical,
+                Children = new Drawable[]
+                {
+                    breakTimeText = new SpriteText(),
+                    breakOverlay = new BreakOverlay(true)
+                }
+            };
+
+            isBreakTimeBindable.BindTo(breakOverlay.IsBreakTime);
+            isBreakTimeBindable.BindValueChanged(e => breakTimeText.Text = $"IsBreakTime: {e.NewValue}", true);
 
             AddStep("2s break", () => startBreak(2000));
             AddStep("5s break", () => startBreak(5000));
