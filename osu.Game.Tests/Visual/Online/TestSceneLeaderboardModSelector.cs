@@ -9,6 +9,8 @@ using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Mania;
 using osu.Game.Rulesets.Taiko;
 using osu.Game.Rulesets.Catch;
+using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Sprites;
 
 namespace osu.Game.Tests.Visual.Online
 {
@@ -22,11 +24,29 @@ namespace osu.Game.Tests.Visual.Online
         public TestSceneLeaderboardModSelector()
         {
             LeaderboardModSelector modSelector;
+            FillFlowContainer selectedMods;
+
+            Add(selectedMods = new FillFlowContainer
+            {
+                Anchor = Anchor.TopLeft,
+                Origin = Anchor.TopLeft,
+            });
 
             Add(modSelector = new LeaderboardModSelector
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
+            });
+
+            modSelector.SelectedMods.BindValueChanged(mods =>
+            {
+                selectedMods.Clear();
+
+                foreach (var mod in mods.NewValue)
+                    selectedMods.Add(new SpriteText
+                    {
+                        Text = mod.Acronym,
+                    });
             });
 
             AddStep("osu mods", () => modSelector.ResetRuleset(new OsuRuleset().RulesetInfo));
