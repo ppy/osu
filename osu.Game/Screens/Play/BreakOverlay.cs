@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
-using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -123,7 +122,24 @@ namespace osu.Game.Screens.Play
         {
             base.Update();
 
-            IsBreakTime.Value = breaks.Where(b => b.HasEffect).Any(b => Clock.CurrentTime >= b.StartTime && Clock.CurrentTime <= b.EndTime);
+            updateBreakTimeBindable();
+        }
+
+        private void updateBreakTimeBindable()
+        {
+            foreach (var b in breaks)
+            {
+                if (!b.HasEffect)
+                    continue;
+
+                if (Clock.CurrentTime >= b.StartTime && Clock.CurrentTime <= b.EndTime)
+                {
+                    isBreakTime.Value = true;
+                    return;
+                }
+            }
+
+            isBreakTime.Value = false;
         }
 
         private void initializeBreaks()
