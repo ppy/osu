@@ -33,7 +33,8 @@ namespace osu.Game.Overlays.BeatmapSet
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
                 AutoSizeAxes = Axes.Both,
-                Direction = FillDirection.Horizontal,
+                Direction = FillDirection.Full,
+                Spacing = new Vector2(4),
             };
         }
 
@@ -88,7 +89,7 @@ namespace osu.Game.Overlays.BeatmapSet
 
         private class SelectableModIcon : Container
         {
-            private const float modScale = 0.4f;
+            private const float mod_scale = 0.4f;
             private const int duration = 200;
 
             public readonly BindableBool Selected = new BindableBool(false);
@@ -101,14 +102,14 @@ namespace osu.Game.Overlays.BeatmapSet
             {
                 this.mod = mod;
 
-                Size = new Vector2(40);
+                AutoSizeAxes = Axes.Both;
                 Children = new Drawable[]
                 {
                     modIcon = new ModIcon(mod)
                     {
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
-                        Scale = new Vector2(modScale),
+                        Scale = new Vector2(mod_scale),
                     },
                     new HoverClickSounds()
                 };
