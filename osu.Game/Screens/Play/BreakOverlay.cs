@@ -2,7 +2,9 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
+using System.Linq;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -34,6 +36,11 @@ namespace osu.Game.Screens.Play
         }
 
         public override bool RemoveCompletedTransforms => false;
+
+        /// <summary>
+        /// Whether we are currently in the break time range.
+        /// </summary>
+        public readonly BindableBool IsBreakTime = new BindableBool();
 
         private readonly Container remainingTimeAdjustmentBox;
         private readonly Container remainingTimeBox;
@@ -107,6 +114,13 @@ namespace osu.Game.Screens.Play
         {
             base.LoadComplete();
             initializeBreaks();
+        }
+
+        protected override void Update()
+        {
+            base.Update();
+
+            IsBreakTime.Value = breaks.Where(b => b.HasEffect).Any(b => Clock.CurrentTime >= b.StartTime && Clock.CurrentTime <= b.EndTime);
         }
 
         private void initializeBreaks()
