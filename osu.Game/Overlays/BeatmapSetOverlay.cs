@@ -37,7 +37,6 @@ namespace osu.Game.Overlays
         {
             OsuScrollContainer scroll;
             Info info;
-            ScoresContainer scoreContainer;
 
             Children = new Drawable[]
             {
@@ -59,7 +58,7 @@ namespace osu.Game.Overlays
                         {
                             Header = new Header(),
                             info = new Info(),
-                            scoreContainer = new ScoresContainer
+                            new ScoresContainer
                             {
                                 Beatmap = { BindTarget = Header.Picker.Beatmap }
                             }

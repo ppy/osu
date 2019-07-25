@@ -41,19 +41,20 @@ namespace osu.Game.Overlays.BeatmapSet
         {
             SelectedMods.Value = new List<Mod>();
 
-            if (this.ruleset == ruleset)
+            if (ruleset == null)
+            {
+                this.ruleset = ruleset;
+                modsContainer.Clear();
+                return;
+            }
+
+            if (this.ruleset?.Equals(ruleset) ?? false)
             {
                 deselectAll();
                 return;
             }
 
             this.ruleset = ruleset;
-
-            if (ruleset == null)
-            {
-                modsContainer.Clear();
-                return;
-            }
 
             modsContainer.Clear();
 

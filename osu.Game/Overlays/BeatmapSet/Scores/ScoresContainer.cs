@@ -147,8 +147,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                 if (scopeSelector != null)
                     scopeSelector.Current.Value = BeatmapLeaderboardScope.Global;
 
-                if (modSelector != null)
-                    modSelector.ResetRuleset(beatmap.NewValue?.Ruleset);
+                modSelector?.ResetRuleset(beatmap.NewValue?.Ruleset);
 
                 getScores();
             });
