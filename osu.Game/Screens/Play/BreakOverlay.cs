@@ -126,6 +126,9 @@ namespace osu.Game.Screens.Play
 
         private void updateBreakTimeBindable()
         {
+            if (breaks == null)
+                return;
+
             for (int i = 0; i < breaks.Count; i++)
             {
                 if (!breaks[i].HasEffect)
