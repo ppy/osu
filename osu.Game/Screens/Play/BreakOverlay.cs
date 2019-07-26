@@ -144,19 +144,28 @@ namespace osu.Game.Screens.Play
                 return;
             }
 
-            var lastIndex = currentBreakIndex;
-            var lookupDirection = Clock.CurrentTime > breaks[lastIndex].EndTime ? 1 : (Clock.CurrentTime < breaks[lastIndex].StartTime ? -1 : 0);
+            var time = Clock.CurrentTime;
 
-            while (Clock.CurrentTime < breaks[currentBreakIndex].StartTime || Clock.CurrentTime > breaks[currentBreakIndex].EndTime)
+            if (time > breaks[currentBreakIndex].EndTime)
             {
-                currentBreakIndex += lookupDirection;
-
-                // restore index if out of bounds
-                if (currentBreakIndex < 0 || currentBreakIndex >= breaks.Count)
+                for (int i = currentBreakIndex; i < breaks.Count; i++)
                 {
-                    isBreakTime.Value = false;
-                    currentBreakIndex = lastIndex;
-                    return;
+                    if (time <= breaks[i].EndTime)
+                    {
+                        currentBreakIndex = i;
+                        break;
+                    }
+                }
+            }
+            else if (time < breaks[currentBreakIndex].StartTime)
+            {
+                for (int i = currentBreakIndex; i >= 0; i--)
+                {
+                    if (time >= breaks[i].StartTime)
+                    {
+                        currentBreakIndex = i;
+                        break;
+                    }
                 }
             }
 
@@ -164,7 +173,7 @@ namespace osu.Game.Screens.Play
             // If the current break doesn't have effects, IsBreakTime should be false.
             // We also assume that the overlay's fade out transform is "not break time".
             var currentBreak = breaks[currentBreakIndex];
-            isBreakTime.Value = currentBreak.HasEffect && Clock.CurrentTime <= currentBreak.EndTime - fade_duration;
+            isBreakTime.Value = currentBreak.HasEffect && time >= currentBreak.StartTime && time <= currentBreak.EndTime - fade_duration;
         }
 
         private void initializeBreaks()
