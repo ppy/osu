@@ -85,7 +85,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         private double fcProb;
         private bool lastScaled;
 
-        public const double MISS_STAR_RATING_INCREMENT = 0.1;
+        public const double MISS_STAR_RATING_INCREMENT_MULTIPLIER = 0.005;
+        public const double MISS_STAR_RATING_INCREMENT_EXPONENT = 1.5;
         public IList<double> MissCounts { get; private set; }
         public IList<double> ComboStarRatings { get; private set; }
 
@@ -217,7 +218,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             if (Math.Abs(difficultyPartialSums[first] - remainder) <= 1e-10)
             {
                 // remainder is the powDifficulty of the rest of the map after "last"
-                // if first and remainder are equal, the section has no notes, so return zero stars
+                // if first and remainder are equal, the section has no difficulty, so return zero stars
                 return 0;
             }
 
@@ -299,12 +300,12 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         /// <summary>
         /// The probability a player of the given skill passes a map of the given difficulty
         /// </summary>
-        private double passProbability(double skill, double difficulty) => Math.Exp(-Math.Pow(skill / difficulty, -starBonusK));
+        private double passProbability(double skill, double difficulty) => Math.Exp(-Math.Pow(Math.Max(0, difficulty) / Math.Max(1e-5, skill), starBonusK));
 
         /// <summary>
         /// The probability a player of the given skill passes a map of the given difficulty. Unlike passProbability, this gives an exponential relationship with skill and difficulty.
         /// </summary>
-        private double passProbFromPow(double powSkill, double powDifficulty) => Math.Exp(-powSkill * powDifficulty);
+        private double passProbFromPow(double powSkill, double powDifficulty) => Math.Exp(-Math.Min(1e100, powSkill) * Math.Max(0, powDifficulty)); // Math.Min forces 0 difficulty to beat 0 skill
 
         /// <summary>
         /// Player skill level that passes a map of the given difficulty with the given probability
@@ -338,7 +339,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
             for (int i = 0; i < difficulty_count; ++i)
             {
-                double missStars = stars - (i + 1) * MISS_STAR_RATING_INCREMENT;
+                double missStars = stars * (1 - Math.Pow((i + 1), MISS_STAR_RATING_INCREMENT_EXPONENT) * MISS_STAR_RATING_INCREMENT_MULTIPLIER);
 
                 // skill is the same skill who can FC a missStars map with same length as this one in 4 hours
                 double skill = starsToDifficulty(missStars) / targetFcDifficultyMultiplier;
@@ -358,7 +359,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
             var result = new double[powDifficulties.Count];
 
-            double powSkill = Math.Pow(skill, -starBonusK);
+            double powSkill = Math.Pow(Math.Max(skill, 1e-5), -starBonusK);
 
             for (int i = 0; i < powDifficulties.Count; ++i)
             {

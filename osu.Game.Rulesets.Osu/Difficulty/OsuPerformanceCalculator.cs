@@ -116,9 +116,11 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             return ret;
         }
 
+        // get star rating corresponding to miss count in miss count list
+        private double missStarRating(double sr, int i) => sr * (1 - Math.Pow((i + 1), Attributes.MissStarRatingExponent) * Attributes.MissStarRatingIncrement);
+
         private double interpMissCountStarRating(double sr, IList<double> values, int missCount)
         {
-            double increment = Attributes.MissStarRatingIncrement;
             double t;
 
             if (missCount == 0)
@@ -129,7 +131,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             if (missCount < values[0])
             {
-                return sr - increment * missCount / values[0];
+                t = missCount / values[0];
+
+                return sr * (1 - t) + missStarRating(sr, 0) * t;
             }
 
             for (int i = 0; i < values.Count; ++i)
@@ -142,20 +146,20 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                         continue;
                     }
 
-                    return sr - (i + 1) * increment;
+                    return missStarRating(sr, i);
                 }
 
                 if (i < values.Count - 1 && missCount < values[i + 1])
                 {
                     t = (missCount - values[i]) / (values[i + 1] - values[i]);
 
-                    return sr - (i + 1 + t) * increment;
+                    return missStarRating(sr, i) * (1 - t) + missStarRating(sr, i + 1) * t;
                 }
             }
 
             // more misses than max evaluated, interpolate to zero
             t = (missCount - values.Last()) / (beatmapMaxCombo - values.Last());
-            return (sr - values.Count * increment) * (1 - t);
+            return missStarRating(sr, values.Count - 1) * (1 - t);
         }
 
         private double computeAimValue(Dictionary<string, double> categoryRatings = null)

@@ -39,7 +39,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             IList<double> speedComboSr = speed.ComboStarRatings;
             IList<double> speedMissCounts = speed.MissCounts;
 
-            const double miss_sr_increment = OsuSkill.MISS_STAR_RATING_INCREMENT;
+            const double miss_sr_increment = OsuSkill.MISS_STAR_RATING_INCREMENT_MULTIPLIER;
+            const double miss_sr_exponent = OsuSkill.MISS_STAR_RATING_INCREMENT_EXPONENT;
 
             double aimRating = aim.Difficulty;
             double speedRating = speed.Difficulty;
@@ -58,6 +59,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 StarRating = starRating,
                 Mods = mods,
                 MissStarRatingIncrement = miss_sr_increment,
+                MissStarRatingExponent = miss_sr_exponent,
                 AimStrain = aimRating,
                 AimComboStarRatings = aimComboSr,
                 AimMissCounts = aimMissCounts,
