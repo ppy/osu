@@ -62,6 +62,10 @@ namespace osu.Game.Screens.Select
 
         public Footer()
         {
+            RelativeSizeAxes = Axes.X;
+            Height = HEIGHT;
+            Anchor = Anchor.BottomCentre;
+            Origin = Anchor.BottomCentre;
             Children = new Drawable[]
             {
                 new Box

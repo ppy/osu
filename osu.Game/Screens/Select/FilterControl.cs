@@ -21,6 +21,8 @@ namespace osu.Game.Screens.Select
 {
     public class FilterControl : Container
     {
+        public const float HEIGHT = 100;
+
         public Action<FilterCriteria> FilterChanged;
 
         private readonly OsuTabControl<SortMode> sortTabs;
