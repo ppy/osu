@@ -146,6 +146,16 @@ namespace osu.Game.Screens.Play
 
             var time = Clock.CurrentTime;
 
+            if (currentBreakIndex < breaks.Count - 1)
+            {
+                // Quick check if we're not in a break with our current index.
+                if (time > breaks[currentBreakIndex].EndTime && time < breaks[currentBreakIndex + 1].StartTime)
+                {
+                    isBreakTime.Value = false;
+                    return;
+                }
+            }
+
             if (time > breaks[currentBreakIndex].EndTime)
             {
                 for (int i = currentBreakIndex; i < breaks.Count; i++)
