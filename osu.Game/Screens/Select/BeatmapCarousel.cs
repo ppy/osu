@@ -342,13 +342,13 @@ namespace osu.Game.Screens.Select
         public bool AllowSelection = true;
 
         /// <summary>
-        /// The total height of the displayable portion of the Beatmap Carousel.
+        /// Half the height of the visible content.
         /// <remarks>
-        /// This is different from <see cref="ScrollContainer{T}.displayableContent"/>, since
+        /// This is different from the height of <see cref="ScrollContainer{T}.displayableContent"/>, since
         /// the beatmap carousel bleeds into the <see cref="FilterControl"/> and the <see cref="Footer"/>
         /// </remarks>
         /// </summary>
-        private float visibleHeight => DrawHeight + bleed_bottom + bleed_top;
+        private float visibleHalfHeight => (DrawHeight + bleed_bottom + bleed_top) / 2;
 
         /// <summary>
         /// The position of the lower visible bound with respect to the current scroll position.
@@ -508,9 +508,8 @@ namespace osu.Game.Screens.Select
 
             // Update externally controlled state of currently visible items
             // (e.g. x-offset and opacity).
-            float halfHeight = visibleHeight / 2;
             foreach (DrawableCarouselItem p in scrollableContent.Children)
-                updateItem(p, halfHeight);
+                updateItem(p);
         }
 
         protected override void Dispose(bool isDisposing)
@@ -564,7 +563,7 @@ namespace osu.Game.Screens.Select
 
             yPositions.Clear();
 
-            float currentY = visibleHeight / 2;
+            float currentY = visibleHalfHeight;
             DrawableCarouselBeatmapSet lastSet = null;
 
             scrollTarget = null;
@@ -617,7 +616,7 @@ namespace osu.Game.Screens.Select
                     currentY += d.DrawHeight + 5;
             }
 
-            currentY += visibleHeight / 2;
+            currentY += visibleHalfHeight;
             scrollableContent.Height = currentY;
 
             if (BeatmapSetsLoaded && (selectedBeatmapSet == null || selectedBeatmap == null || selectedBeatmapSet.State.Value != CarouselItemState.Selected))
@@ -658,16 +657,15 @@ namespace osu.Game.Screens.Select
         /// the current scroll position.
         /// </summary>
         /// <param name="p">The item to be updated.</param>
-        /// <param name="halfHeight">Half the draw height of the carousel container's parent.</param>
-        private void updateItem(DrawableCarouselItem p, float halfHeight)
+        private void updateItem(DrawableCarouselItem p)
         {
             float itemDrawY = p.Position.Y - visibleUpperBound + p.DrawHeight / 2;
-            float dist = Math.Abs(1f - itemDrawY / halfHeight);
+            float dist = Math.Abs(1f - itemDrawY / visibleHalfHeight);
 
             // Setting the origin position serves as an additive position on top of potential
             // local transformation we may want to apply (e.g. when a item gets selected, we
             // may want to smoothly transform it leftwards.)
-            p.OriginPosition = new Vector2(-offsetX(dist, halfHeight), 0);
+            p.OriginPosition = new Vector2(-offsetX(dist, visibleHalfHeight), 0);
 
             // We are applying a multiplicative alpha (which is internally done by nesting an
             // additional container and setting that container's alpha) such that we can
