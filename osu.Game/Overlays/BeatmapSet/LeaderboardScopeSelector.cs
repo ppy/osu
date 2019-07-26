@@ -61,7 +61,6 @@ namespace osu.Game.Overlays.BeatmapSet
             private readonly Box box;
 
             protected readonly OsuSpriteText Text;
-            protected readonly OsuSpriteText BoldText;
 
             public ScopeSelectorTabItem(BeatmapLeaderboardScope value)
                 : base(value)
@@ -76,18 +75,7 @@ namespace osu.Game.Overlays.BeatmapSet
                         Origin = Anchor.BottomCentre,
                         Anchor = Anchor.BottomCentre,
                         Text = value.GetDescription() + " Ranking",
-                        Font = OsuFont.GetFont(weight: FontWeight.Light),
-                        AlwaysPresent = true,
-                    },
-                    BoldText = new OsuSpriteText
-                    {
-                        Margin = new MarginPadding { Bottom = 8 },
-                        Origin = Anchor.BottomCentre,
-                        Anchor = Anchor.BottomCentre,
-                        Text = value.GetDescription() + " Ranking",
-                        Font = OsuFont.GetFont(weight: FontWeight.Black),
-                        Alpha = 0,
-                        AlwaysPresent = true,
+                        Font = OsuFont.GetFont(weight: FontWeight.Regular),
                     },
                     box = new Box
                     {
@@ -111,7 +99,7 @@ namespace osu.Game.Overlays.BeatmapSet
             {
                 Text.FadeColour(Color4.LightSkyBlue);
 
-                return true;
+                return base.OnHover(e);
             }
 
             protected override void OnHoverLost(HoverLostEvent e)
@@ -124,15 +112,13 @@ namespace osu.Game.Overlays.BeatmapSet
             protected override void OnActivated()
             {
                 box.ScaleTo(new Vector2(1f), transition_duration);
-                Text.FadeOut(transition_duration, Easing.OutQuint);
-                BoldText.FadeIn(transition_duration, Easing.OutQuint);
+                Text.Font = Text.Font.With(weight: FontWeight.Black);
             }
 
             protected override void OnDeactivated()
             {
                 box.ScaleTo(new Vector2(1f, 0f), transition_duration);
-                BoldText.FadeOut(transition_duration, Easing.OutQuint);
-                Text.FadeIn(transition_duration, Easing.OutQuint);
+                Text.Font = Text.Font.With(weight: FontWeight.Regular);
             }
         }
 
