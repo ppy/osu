@@ -158,25 +158,15 @@ namespace osu.Game.Screens.Play
 
             if (time > breaks[currentBreakIndex].EndTime)
             {
-                for (int i = currentBreakIndex; i < breaks.Count; i++)
-                {
-                    if (time <= breaks[i].EndTime)
-                    {
-                        currentBreakIndex = i;
+                for (; currentBreakIndex < breaks.Count; currentBreakIndex++)
+                    if (time <= breaks[currentBreakIndex].EndTime)
                         break;
-                    }
-                }
             }
             else if (time < breaks[currentBreakIndex].StartTime)
             {
-                for (int i = currentBreakIndex; i >= 0; i--)
-                {
-                    if (time >= breaks[i].StartTime)
-                    {
-                        currentBreakIndex = i;
+                for (; currentBreakIndex >= 0; currentBreakIndex--)
+                    if (time >= breaks[currentBreakIndex].StartTime)
                         break;
-                    }
-                }
             }
 
             // This ensures that IsBreakTime is generally consistent with the overlay's transforms during a break.
