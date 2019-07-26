@@ -96,7 +96,7 @@ namespace osu.Game.Screens.Ranking.Pages
                                 {
                                     RelativeSizeAxes = Axes.Both,
                                     Alpha = 0.5f,
-                                    Objects = Beatmap.Beatmap.HitObjects,
+                                    Strains = Score.Ruleset.CreateInstance().CreateDifficultyGraphGenerator(Beatmap).Calculate(),
                                 },
                                 scoreCounter = new SlowScoreCounter(6)
                                 {

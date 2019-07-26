@@ -72,8 +72,12 @@ namespace osu.Game.Tests.Visual.Gameplay
             for (double i = 0; i < 5000; i += RNG.NextDouble() * 10 + i / 1000)
                 objects.Add(new HitObject { StartTime = i });
 
+            List<double> strains = new List<double>();
+            for (double i = 0; i < 5000; i++)
+                strains.Add(RNG.NextDouble());
+
             progress.Objects = objects;
-            graph.Objects = objects;
+            graph.Strains = strains;
 
             progress.RequestSeek = pos => clock.Seek(pos);
         }

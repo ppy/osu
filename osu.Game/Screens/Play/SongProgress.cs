@@ -44,6 +44,8 @@ namespace osu.Game.Screens.Play
         {
             set
             {
+                objects = value;
+
                 info.StartTime = firstHitTime;
                 info.EndTime = lastHitTime;
 

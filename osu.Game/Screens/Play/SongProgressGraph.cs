@@ -3,9 +3,6 @@
 
 using System.Linq;
 using System.Collections.Generic;
-using System.Diagnostics;
-using osu.Game.Rulesets.Objects.Types;
-using osu.Game.Rulesets.Objects;
 
 namespace osu.Game.Screens.Play
 {
@@ -13,10 +10,7 @@ namespace osu.Game.Screens.Play
     {
         public IEnumerable<double> Strains
         {
-            set
-            {
-                Values = value.ToList();
-            }
+            set => Values = value.ToList();
         }
     }
 }
