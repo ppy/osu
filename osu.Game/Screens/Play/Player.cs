@@ -142,7 +142,7 @@ namespace osu.Game.Screens.Play
                 },
                 // display the cursor above some HUD elements.
                 DrawableRuleset.Cursor?.CreateProxy() ?? new Container(),
-                HUDOverlay = new HUDOverlay(ScoreProcessor, DrawableRuleset, Mods.Value)
+                HUDOverlay = new HUDOverlay(ScoreProcessor, DrawableRuleset, Mods.Value, working)
                 {
                     HoldToQuit =
                     {

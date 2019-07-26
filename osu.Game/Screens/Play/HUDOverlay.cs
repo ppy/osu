@@ -8,6 +8,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input.Events;
+using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays;
@@ -41,6 +42,7 @@ namespace osu.Game.Screens.Play
         private readonly ScoreProcessor scoreProcessor;
         private readonly DrawableRuleset drawableRuleset;
         private readonly IReadOnlyList<Mod> mods;
+        private readonly WorkingBeatmap beatmap;
 
         private Bindable<bool> showHud;
         private readonly Container visibilityContainer;
@@ -52,11 +54,12 @@ namespace osu.Game.Screens.Play
 
         private readonly Container topScoreContainer;
 
-        public HUDOverlay(ScoreProcessor scoreProcessor, DrawableRuleset drawableRuleset, IReadOnlyList<Mod> mods)
+        public HUDOverlay(ScoreProcessor scoreProcessor, DrawableRuleset drawableRuleset, IReadOnlyList<Mod> mods, WorkingBeatmap beatmap)
         {
             this.scoreProcessor = scoreProcessor;
             this.drawableRuleset = drawableRuleset;
             this.mods = mods;
+            this.beatmap = beatmap;
 
             RelativeSizeAxes = Axes.Both;
 
@@ -109,6 +112,7 @@ namespace osu.Game.Screens.Play
             BindProcessor(scoreProcessor);
             BindDrawableRuleset(drawableRuleset);
 
+            Progress.Strains = drawableRuleset.Ruleset.CreateDifficultyGraphGenerator(beatmap).Calculate();
             Progress.Objects = drawableRuleset.Objects;
             Progress.AllowSeeking = drawableRuleset.HasReplayLoaded.Value;
             Progress.RequestSeek = time => RequestSeek(time);
