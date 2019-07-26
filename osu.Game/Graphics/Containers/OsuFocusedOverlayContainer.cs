@@ -53,7 +53,13 @@ namespace osu.Game.Graphics.Containers
 
             samplePopIn = audio.Samples.Get(@"UI/overlay-pop-in");
             samplePopOut = audio.Samples.Get(@"UI/overlay-pop-out");
+        }
 
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            // This must be added after the base LoadComplete. The overlay may need to be hidden immediately if its disabled.
             State.ValueChanged += onStateChanged;
         }
 
