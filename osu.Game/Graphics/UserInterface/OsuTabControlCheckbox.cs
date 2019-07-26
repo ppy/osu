@@ -64,7 +64,7 @@ namespace osu.Game.Graphics.UserInterface
                     Direction = FillDirection.Horizontal,
                     Children = new Drawable[]
                     {
-                        text = new OsuSpriteText { Font = OsuFont.GetFont(size: 14, weight: FontWeight.Bold) },
+                        text = new OsuSpriteText { Font = OsuFont.GetFont(size: 14) },
                         icon = new SpriteIcon
                         {
                             Size = new Vector2(14),
@@ -84,7 +84,11 @@ namespace osu.Game.Graphics.UserInterface
                 }
             };
 
-            Current.ValueChanged += selected => { icon.Icon = selected.NewValue ? FontAwesome.Regular.CheckCircle : FontAwesome.Regular.Circle; };
+            Current.ValueChanged += selected =>
+            {
+                icon.Icon = selected.NewValue ? FontAwesome.Regular.CheckCircle : FontAwesome.Regular.Circle;
+                text.Font = text.Font.With(weight: selected.NewValue ? FontWeight.Bold : FontWeight.Medium);
+            };
         }
 
         [BackgroundDependencyLoader]
