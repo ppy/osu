@@ -56,8 +56,6 @@ namespace osu.Game.Screens.Select
         public override bool HandleNonPositionalInput => AllowSelection;
         public override bool HandlePositionalInput => AllowSelection;
 
-        protected override bool ConfinePositionalInput => true;
-
         /// <summary>
         /// Whether carousel items have completed asynchronously loaded.
         /// </summary>
@@ -344,10 +342,23 @@ namespace osu.Game.Screens.Select
         public bool AllowSelection = true;
 
         /// <summary>
-        /// The total bounds of what is displayable in the beatmap carousel.
-        /// 
+        /// The total height of the displayable portion of the Beatmap Carousel.
+        /// <remarks>
+        /// This is different from <see cref="ScrollContainer{T}.displayableContent"/>, since
+        /// the beatmap carousel bleeds into the <see cref="FilterControl"/> and the <see cref="Footer"/>
+        /// </remarks>
         /// </summary>
         private float visibleHeight => DrawHeight + bleed_bottom + bleed_top;
+
+        /// <summary>
+        /// The position of the lower visible bound with respect to the current scroll position.
+        /// </summary>
+        private float visibleBottomBound => Current + DrawHeight + bleed_bottom;
+
+        /// <summary>
+        /// The position of the upper visible bound with respect to the current scroll position.
+        /// </summary>
+        private float visibleUpperBound => Current - bleed_top;
 
         public void FlushPendingFilterOperations()
         {
@@ -425,6 +436,8 @@ namespace osu.Game.Screens.Select
             return true;
         }
 
+        protected override bool ReceiveSubTreePositionalInputAt(Vector2 screenSpacePos) => ReceivePositionalInputAt(screenSpacePos);
+
         protected override void Update()
         {
             base.Update();
@@ -436,14 +449,14 @@ namespace osu.Game.Screens.Select
                 updateScrollPosition();
 
             // Remove all items that should no longer be on-screen
-            scrollableContent.RemoveAll(p => p.Y < Current - p.DrawHeight || p.Y > Current + visibleHeight || !p.IsPresent);
+            scrollableContent.RemoveAll(p => p.Y < visibleUpperBound - p.DrawHeight || p.Y > visibleBottomBound || !p.IsPresent);
 
             // Find index range of all items that should be on-screen
             Trace.Assert(Items.Count == yPositions.Count);
 
-            int firstIndex = yPositions.BinarySearch(Current - DrawableCarouselItem.MAX_HEIGHT - bleed_top);
+            int firstIndex = yPositions.BinarySearch(visibleUpperBound - DrawableCarouselItem.MAX_HEIGHT);
             if (firstIndex < 0) firstIndex = ~firstIndex;
-            int lastIndex = yPositions.BinarySearch(Current + visibleHeight + bleed_bottom);
+            int lastIndex = yPositions.BinarySearch(visibleBottomBound);
             if (lastIndex < 0) lastIndex = ~lastIndex;
 
             int notVisibleCount = 0;
@@ -584,7 +597,6 @@ namespace osu.Game.Screens.Select
 
                             float? setY = null;
                             if (!d.IsLoaded || beatmap.Alpha == 0) // can't use IsPresent due to DrawableCarouselItem override.
-                                // ReSharper disable once PossibleNullReferenceException (resharper broken?)
                                 setY = lastSet.Y + lastSet.DrawHeight + 5;
 
                             if (d.IsLoaded)
@@ -649,9 +661,7 @@ namespace osu.Game.Screens.Select
         /// <param name="halfHeight">Half the draw height of the carousel container's parent.</param>
         private void updateItem(DrawableCarouselItem p, float halfHeight)
         {
-            var height = p.IsPresent ? p.DrawHeight : 0;
-
-            float itemDrawY = p.Position.Y + bleed_top - Current + height / 2;
+            float itemDrawY = p.Position.Y - visibleUpperBound + p.DrawHeight / 2;
             float dist = Math.Abs(1f - itemDrawY / halfHeight);
 
             // Setting the origin position serves as an additive position on top of potential

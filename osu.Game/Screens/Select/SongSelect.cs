@@ -42,7 +42,7 @@ namespace osu.Game.Screens.Select
     public abstract class SongSelect : OsuScreen, IKeyBindingHandler<GlobalAction>
     {
         private static readonly Vector2 wedged_container_size = new Vector2(0.5f, 245);
-        
+
         protected const float BACKGROUND_BLUR = 20;
         private const float left_area_padding = 20;
 
