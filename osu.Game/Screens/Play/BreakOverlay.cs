@@ -33,7 +33,7 @@ namespace osu.Game.Screens.Play
                 breaks = value;
 
                 // reset index in case the new breaks list is smaller than last one
-                currentBreakIndex = 0;
+                resetBreakIndex();
 
                 initializeBreaks();
             }
@@ -130,12 +130,17 @@ namespace osu.Game.Screens.Play
             updateBreakTimeBindable();
         }
 
+        private void resetBreakIndex()
+        {
+            isBreakTime.Value = false;
+            currentBreakIndex = 0;
+        }
+
         private void updateBreakTimeBindable()
         {
             if (breaks?.Any() != true)
             {
-                isBreakTime.Value = false;
-                currentBreakIndex = 0;
+                resetBreakIndex();
                 return;
             }
 
