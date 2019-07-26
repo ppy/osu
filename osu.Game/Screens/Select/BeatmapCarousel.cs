@@ -26,6 +26,9 @@ namespace osu.Game.Screens.Select
 {
     public class BeatmapCarousel : OsuScrollContainer
     {
+        private const float bleed_top = FilterControl.HEIGHT;
+        private const float bleed_bottom = Footer.HEIGHT;
+
         /// <summary>
         /// Triggered when the <see cref="BeatmapSets"/> loaded change and are completely loaded.
         /// </summary>
@@ -110,12 +113,10 @@ namespace osu.Game.Screens.Select
             root = new CarouselRoot(this);
             Child = new OsuContextMenuContainer
             {
-                Masking = false,
                 RelativeSizeAxes = Axes.X,
                 AutoSizeAxes = Axes.Y,
                 Child = scrollableContent = new Container<DrawableCarouselItem>
                 {
-                    Masking = false,
                     RelativeSizeAxes = Axes.X,
                 }
             };
@@ -342,6 +343,12 @@ namespace osu.Game.Screens.Select
 
         public bool AllowSelection = true;
 
+        /// <summary>
+        /// The total bounds of what is displayable in the beatmap carousel.
+        /// 
+        /// </summary>
+        private float visibleHeight => DrawHeight + bleed_bottom + bleed_top;
+
         public void FlushPendingFilterOperations()
         {
             if (PendingFilter?.Completed == false)
@@ -428,18 +435,15 @@ namespace osu.Game.Screens.Select
             if (!scrollPositionCache.IsValid)
                 updateScrollPosition();
 
-            // The draw positions of individual sets extend beyond the size of the carousel and into the footer and header.
-            float visibleHeight = DrawHeight + SongSelect.FOOTER_HEIGHT + SongSelect.FILTER_CONTROL_HEIGHT;
-
             // Remove all items that should no longer be on-screen
             scrollableContent.RemoveAll(p => p.Y < Current - p.DrawHeight || p.Y > Current + visibleHeight || !p.IsPresent);
 
             // Find index range of all items that should be on-screen
             Trace.Assert(Items.Count == yPositions.Count);
 
-            int firstIndex = yPositions.BinarySearch(Current - DrawableCarouselItem.MAX_HEIGHT - SongSelect.FILTER_CONTROL_HEIGHT);
+            int firstIndex = yPositions.BinarySearch(Current - DrawableCarouselItem.MAX_HEIGHT - bleed_top);
             if (firstIndex < 0) firstIndex = ~firstIndex;
-            int lastIndex = yPositions.BinarySearch(Current + visibleHeight + SongSelect.FOOTER_HEIGHT);
+            int lastIndex = yPositions.BinarySearch(Current + visibleHeight + bleed_bottom);
             if (lastIndex < 0) lastIndex = ~lastIndex;
 
             int notVisibleCount = 0;
@@ -547,7 +551,6 @@ namespace osu.Game.Screens.Select
 
             yPositions.Clear();
 
-            float visibleHeight = DrawHeight + SongSelect.FOOTER_HEIGHT + SongSelect.FILTER_CONTROL_HEIGHT;
             float currentY = visibleHeight / 2;
             DrawableCarouselBeatmapSet lastSet = null;
 
@@ -648,8 +651,7 @@ namespace osu.Game.Screens.Select
         {
             var height = p.IsPresent ? p.DrawHeight : 0;
 
-            // The actual Y position of the item needs to be offset by any potential padding set by the container's parent.
-            float itemDrawY = p.Position.Y + SongSelect.FILTER_CONTROL_HEIGHT - Current + height / 2;
+            float itemDrawY = p.Position.Y + bleed_top - Current + height / 2;
             float dist = Math.Abs(1f - itemDrawY / halfHeight);
 
             // Setting the origin position serves as an additive position on top of potential
