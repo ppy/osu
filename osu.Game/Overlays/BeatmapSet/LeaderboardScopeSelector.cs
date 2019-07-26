@@ -30,13 +30,9 @@ namespace osu.Game.Overlays.BeatmapSet
             AutoSizeAxes = Axes.Y;
             RelativeSizeAxes = Axes.X;
 
-            foreach (var scope in Enum.GetValues(typeof(BeatmapLeaderboardScope)))
-            {
-                if (scope is BeatmapLeaderboardScope.Local)
-                    continue;
-
-                AddItem((BeatmapLeaderboardScope)scope);
-            }
+            AddItem(BeatmapLeaderboardScope.Global);
+            AddItem(BeatmapLeaderboardScope.Country);
+            AddItem(BeatmapLeaderboardScope.Friend);
 
             AddInternal(new Line
             {

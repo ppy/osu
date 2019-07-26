@@ -78,8 +78,8 @@ namespace osu.Game.Screens.Select
     {
         Details,
         Local,
-        Global,
         Country,
+        Global,
         Friends
     }
 }
