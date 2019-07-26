@@ -27,13 +27,17 @@ namespace osu.Game.Tests.Visual.Gameplay
         public TestSceneBreakOverlay()
         {
             SpriteText breakTimeText;
-            Child = new FillFlowContainer
+            Child = new Container
             {
                 RelativeSizeAxes = Axes.Both,
-                Direction = FillDirection.Vertical,
                 Children = new Drawable[]
                 {
-                    breakTimeText = new SpriteText(),
+                    breakTimeText = new SpriteText
+                    {
+                        Anchor = Anchor.Centre,
+                        Origin = Anchor.Centre,
+                        Margin = new MarginPadding { Bottom = 35 },
+                    },
                     breakOverlay = new BreakOverlay(true)
                 }
             };
