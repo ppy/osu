@@ -59,7 +59,8 @@ namespace osu.Game.Graphics.Containers
         {
             base.LoadComplete();
 
-            // This must be added after the base LoadComplete. The overlay may need to be hidden immediately if its disabled.
+            // This must be added after the base LoadComplete. The overlay may need to be hidden immediately if its disabled,
+            // but the overlay doesn't get shown until after the stateChanged function from VisibilityContainer gets called.
             State.ValueChanged += onStateChanged;
         }
 
