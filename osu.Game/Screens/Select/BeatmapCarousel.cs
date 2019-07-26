@@ -81,7 +81,8 @@ namespace osu.Game.Screens.Select
             itemsCache.Invalidate();
             scrollPositionCache.Invalidate();
 
-            Schedule(() =>
+            // Run on late scheduler want to ensure this runs after all pending UpdateBeatmapSet / RemoveBeatmapSet operations are run.
+            SchedulerAfterChildren.Add(() =>
             {
                 BeatmapSetsChanged?.Invoke();
                 BeatmapSetsLoaded = true;
@@ -129,19 +130,16 @@ namespace osu.Game.Screens.Select
             loadBeatmapSets(beatmaps.GetAllUsableBeatmapSetsEnumerable());
         }
 
-        public void RemoveBeatmapSet(BeatmapSetInfo beatmapSet)
+        public void RemoveBeatmapSet(BeatmapSetInfo beatmapSet) => Schedule(() =>
         {
-            Schedule(() =>
-            {
-                var existingSet = beatmapSets.FirstOrDefault(b => b.BeatmapSet.ID == beatmapSet.ID);
+            var existingSet = beatmapSets.FirstOrDefault(b => b.BeatmapSet.ID == beatmapSet.ID);
 
-                if (existingSet == null)
-                    return;
+            if (existingSet == null)
+                return;
 
-                root.RemoveChild(existingSet);
-                itemsCache.Invalidate();
-            });
-        }
+            root.RemoveChild(existingSet);
+            itemsCache.Invalidate();
+        });
 
         public void UpdateBeatmapSet(BeatmapSetInfo beatmapSet) => Schedule(() =>
         {

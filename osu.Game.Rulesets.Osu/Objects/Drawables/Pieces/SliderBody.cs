@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Collections.Generic;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Lines;
@@ -75,22 +76,22 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
 
         protected SliderBody()
         {
-            InternalChild = path = new SliderPath();
+            RecyclePath();
         }
 
         /// <summary>
         /// Initialises a new <see cref="SliderPath"/>, releasing all resources retained by the old one.
         /// </summary>
-        public void RecyclePath()
+        public virtual void RecyclePath()
         {
             InternalChild = path = new SliderPath
             {
-                Position = path.Position,
-                PathRadius = path.PathRadius,
-                AccentColour = path.AccentColour,
-                BorderColour = path.BorderColour,
-                BorderSize = path.BorderSize,
-                Vertices = path.Vertices
+                Position = path?.Position ?? Vector2.Zero,
+                PathRadius = path?.PathRadius ?? 10,
+                AccentColour = path?.AccentColour ?? Color4.White,
+                BorderColour = path?.BorderColour ?? Color4.White,
+                BorderSize = path?.BorderSize ?? DEFAULT_BORDER_SIZE,
+                Vertices = path?.Vertices ?? Array.Empty<Vector2>()
             };
         }
 
