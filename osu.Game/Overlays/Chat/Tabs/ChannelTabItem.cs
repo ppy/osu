@@ -141,13 +141,15 @@ namespace osu.Game.Overlays.Chat.Tabs
 
         protected override bool OnMouseUp(MouseUpEvent e)
         {
-            if (e.Button == MouseButton.Middle)
+            switch (e.Button)
             {
-                CloseButton.Action();
-                return true;
-            }
+                case MouseButton.Middle:
+                    CloseButton.Click();
+                    return true;
 
-            return false;
+                default:
+                    return false;
+            }
         }
 
         [BackgroundDependencyLoader]
