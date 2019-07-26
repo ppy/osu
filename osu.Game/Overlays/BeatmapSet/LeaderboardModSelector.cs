@@ -15,6 +15,9 @@ using osuTK.Graphics;
 using System;
 using System.Linq;
 using osu.Framework.Extensions.IEnumerableExtensions;
+using osu.Framework.Graphics.Sprites;
+using osu.Framework.Allocation;
+using osu.Game.Graphics;
 
 namespace osu.Game.Overlays.BeatmapSet
 {
@@ -23,13 +26,13 @@ namespace osu.Game.Overlays.BeatmapSet
         public readonly Bindable<IEnumerable<Mod>> SelectedMods = new Bindable<IEnumerable<Mod>>();
 
         private RulesetInfo ruleset = new RulesetInfo();
-        private readonly FillFlowContainer<SelectableModIcon> modsContainer;
+        private readonly FillFlowContainer<ModButton> modsContainer;
 
         public LeaderboardModSelector()
         {
             AutoSizeAxes = Axes.Y;
             RelativeSizeAxes = Axes.X;
-            Child = modsContainer = new FillFlowContainer<SelectableModIcon>
+            Child = modsContainer = new FillFlowContainer<ModButton>
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
@@ -60,9 +63,11 @@ namespace osu.Game.Overlays.BeatmapSet
 
             modsContainer.Clear();
 
+            modsContainer.Add(new NoModButton());
+
             foreach (var mod in ruleset.CreateInstance().GetAllMods())
                 if (mod.Ranked)
-                    modsContainer.Add(new SelectableModIcon(mod));
+                    modsContainer.Add(new ModButton(mod));
 
             foreach (var mod in modsContainer)
                 mod.OnSelectionChanged += selectionChanged;
@@ -82,7 +87,7 @@ namespace osu.Game.Overlays.BeatmapSet
 
         private void deselectAll() => modsContainer.ForEach(mod => mod.Selected.Value = false);
 
-        private class SelectableModIcon : Container
+        private class ModButton : Container
         {
             private const float mod_scale = 0.4f;
             private const int duration = 200;
@@ -90,17 +95,17 @@ namespace osu.Game.Overlays.BeatmapSet
             public readonly BindableBool Selected = new BindableBool();
             public Action<Mod, bool> OnSelectionChanged;
 
-            private readonly ModIcon modIcon;
+            protected readonly ModIcon ModIcon;
             private readonly Mod mod;
 
-            public SelectableModIcon(Mod mod)
+            public ModButton(Mod mod)
             {
                 this.mod = mod;
 
                 AutoSizeAxes = Axes.Both;
                 Children = new Drawable[]
                 {
-                    modIcon = new ModIcon(mod)
+                    ModIcon = new ModIcon(mod)
                     {
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
@@ -132,7 +137,34 @@ namespace osu.Game.Overlays.BeatmapSet
                 updateState();
             }
 
-            private void updateState() => modIcon.FadeColour(Selected.Value || IsHovered ? Color4.White : Color4.Gray, duration, Easing.OutQuint);
+            private void updateState() => ModIcon.FadeColour(Selected.Value || IsHovered ? Color4.White : Color4.Gray, duration, Easing.OutQuint);
+        }
+
+        private class NoModButton : ModButton
+        {
+            public NoModButton()
+                : base(new NoMod())
+            {
+            }
+
+            [BackgroundDependencyLoader]
+            private void load(OsuColour colors)
+            {
+                ModIcon.IconColour = colors.Yellow;
+            }
+        }
+
+        private class NoMod : Mod
+        {
+            public override string Name => "NoMod";
+
+            public override string Acronym => "NM";
+
+            public override double ScoreMultiplier => 1;
+
+            public override IconUsage Icon => FontAwesome.Solid.Ban;
+
+            public override ModType Type => ModType.Custom;
         }
     }
 }
