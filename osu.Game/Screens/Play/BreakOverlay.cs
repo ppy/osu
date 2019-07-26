@@ -136,16 +136,11 @@ namespace osu.Game.Screens.Play
                 return;
             }
 
-            if (Clock.CurrentTime > breaks[nearestBreakIndex].EndTime)
-            {
-                while (nearestBreakIndex < breaks.Count - 1 && Clock.CurrentTime > breaks[nearestBreakIndex].EndTime)
-                    nearestBreakIndex++;
-            }
-            else
-            {
-                while (nearestBreakIndex > 0 && Clock.CurrentTime < breaks[nearestBreakIndex].StartTime)
-                    nearestBreakIndex--;
-            }
+            while (nearestBreakIndex < breaks.Count - 1 && Clock.CurrentTime > breaks[nearestBreakIndex].EndTime)
+                nearestBreakIndex++;
+
+            while (nearestBreakIndex > 0 && Clock.CurrentTime < breaks[nearestBreakIndex].StartTime)
+                nearestBreakIndex--;
 
             // This ensures that IsBreakTime is generally consistent with the overlay's transforms during a break.
             // If the overlay never shows (break.HasEffect is false), IsBreakTime should be false.
