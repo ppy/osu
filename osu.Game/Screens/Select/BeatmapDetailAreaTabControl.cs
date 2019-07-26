@@ -28,6 +28,8 @@ namespace osu.Game.Screens.Select
         private void invokeOnFilter()
         {
             OnFilter?.Invoke(tabs.Current.Value, modsCheckbox.Current.Value);
+
+            modsCheckbox.FadeTo(tabs.Current.Value == BeatmapDetailTab.Details ? 0 : 1, 200, Easing.OutQuint);
         }
 
         [BackgroundDependencyLoader]
