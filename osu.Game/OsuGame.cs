@@ -794,20 +794,20 @@ namespace osu.Game
 
         protected virtual void ScreenChanged(IScreen current, IScreen newScreen)
         {
-            switch (newScreen)
-            {
-                case Intro intro:
-                    introScreen = intro;
-                    break;
-
-                case MainMenu menu:
-                    menuScreen = menu;
-                    break;
-            }
-
             if (newScreen is IOsuScreen newOsuScreen)
             {
                 OverlayActivationMode.Value = newOsuScreen.InitialOverlayActivationMode;
+
+                switch (newOsuScreen)
+                {
+                    case Intro intro:
+                        introScreen = intro;
+                        break;
+
+                    case MainMenu menu:
+                        menuScreen = menu;
+                        break;
+                }
 
                 if (newOsuScreen.HideOverlaysOnEnter)
                     CloseAllOverlays();
