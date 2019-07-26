@@ -12,20 +12,13 @@ namespace osu.iOS
     [Register("AppDelegate")]
     public class AppDelegate : GameAppDelegate
     {
-        private OsuGameIOS IOSGame;
+        private OsuGameIOS game;
 
-        protected override Framework.Game CreateGame()
-        {
-            //Save OsuGameIOS for Import
-            IOSGame = new OsuGameIOS();
-            return IOSGame;
-        }
+        protected override Framework.Game CreateGame() => game = new OsuGameIOS();
 
         public override bool OpenUrl(UIApplication application, NSUrl url, string sourceApplication, NSObject annotation)
         {
-            //Open in Application
-            Task.Run(() => IOSGame.Import(url.Path));
-
+            Task.Run(() => game.Import(url.Path));
             return true;
         }
     }
