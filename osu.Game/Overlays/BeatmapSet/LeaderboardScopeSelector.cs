@@ -6,7 +6,6 @@ using osu.Game.Screens.Select.Leaderboards;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osuTK;
-using System;
 using osu.Game.Graphics.UserInterface;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics.Sprites;
