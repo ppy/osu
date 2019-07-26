@@ -132,7 +132,7 @@ namespace osu.Game.Screens.Play
 
         private void updateBreakTimeBindable()
         {
-            if (breaks == null || !breaks.Any())
+            if (breaks?.Any() != true)
             {
                 isBreakTime.Value = false;
                 currentBreakIndex = 0;
