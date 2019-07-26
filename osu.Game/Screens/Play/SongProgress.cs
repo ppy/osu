@@ -44,14 +44,17 @@ namespace osu.Game.Screens.Play
         {
             set
             {
-                graph.Objects = objects = value;
-
                 info.StartTime = firstHitTime;
                 info.EndTime = lastHitTime;
 
                 bar.StartTime = firstHitTime;
                 bar.EndTime = lastHitTime;
             }
+        }
+
+        public IEnumerable<double> Strains
+        {
+            set => graph.Strains = value;
         }
 
         private readonly BindableBool replayLoaded = new BindableBool();
