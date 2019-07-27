@@ -434,7 +434,7 @@ namespace osu.Game.Screens.Select
             return true;
         }
 
-        protected override bool ReceiveSubTreePositionalInputAt(Vector2 screenSpacePos) => ReceivePositionalInputAt(screenSpacePos);
+        protected override bool ReceivePositionalInputAtSubTree(Vector2 screenSpacePos) => ReceivePositionalInputAt(screenSpacePos);
 
         protected override void Update()
         {
