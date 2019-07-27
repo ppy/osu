@@ -161,7 +161,7 @@ namespace osu.Game.Screens.Play
                 while (time > breaks[currentBreakIndex].EndTime && currentBreakIndex < breaks.Count - 1)
                     currentBreakIndex++;
             }
-            else if (time < breaks[currentBreakIndex].StartTime)
+            else
             {
                 while (time < breaks[currentBreakIndex].StartTime && currentBreakIndex > 0)
                     currentBreakIndex--;
