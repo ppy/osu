@@ -153,11 +153,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
 
             Scores = null;
 
-            var status = Beatmap.Value?.Status;
-
-            bool hasNoLeaderboard = status == BeatmapSetOnlineStatus.Graveyard || status == BeatmapSetOnlineStatus.None || status == BeatmapSetOnlineStatus.Pending || status == BeatmapSetOnlineStatus.WIP;
-
-            if (Beatmap.Value?.OnlineBeatmapID.HasValue != true || hasNoLeaderboard)
+            if (Beatmap.Value?.OnlineBeatmapID == null || Beatmap.Value?.Status <= BeatmapSetOnlineStatus.Pending)
             {
                 scopeSelector.Hide();
                 modSelector.Hide();
