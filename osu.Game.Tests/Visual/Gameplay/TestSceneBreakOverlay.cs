@@ -3,11 +3,10 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using NUnit.Framework;
-using osu.Framework.Bindables;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Sprites;
+using osu.Framework.Timing;
 using osu.Game.Beatmaps.Timing;
 using osu.Game.Screens.Play;
 
@@ -21,96 +20,131 @@ namespace osu.Game.Tests.Visual.Gameplay
             typeof(BreakOverlay),
         };
 
-        private readonly BreakOverlay breakOverlay;
-        private readonly IBindable<bool> isBreakTimeBindable = new BindableBool();
+        private readonly BreakOverlay breakOverlay, manualBreakOverlay;
+        private readonly ManualClock manualClock = new ManualClock();
+
+        private readonly IReadOnlyList<BreakPeriod> testBreaks = new List<BreakPeriod>
+        {
+            new BreakPeriod
+            {
+                StartTime = 1000,
+                EndTime = 5000,
+            },
+            new BreakPeriod
+            {
+                StartTime = 6000,
+                EndTime = 13500,
+            },
+        };
 
         public TestSceneBreakOverlay()
         {
-            SpriteText breakTimeText;
-            Child = new Container
+            Add(breakOverlay = new BreakOverlay(true));
+            Add(manualBreakOverlay = new BreakOverlay(true)
             {
-                RelativeSizeAxes = Axes.Both,
-                Children = new Drawable[]
-                {
-                    breakTimeText = new SpriteText
-                    {
-                        Anchor = Anchor.Centre,
-                        Origin = Anchor.Centre,
-                        Margin = new MarginPadding { Bottom = 35 },
-                    },
-                    breakOverlay = new BreakOverlay(true)
-                }
-            };
-
-            isBreakTimeBindable.BindTo(breakOverlay.IsBreakTime);
-            isBreakTimeBindable.BindValueChanged(e => breakTimeText.Text = $"IsBreakTime: {e.NewValue}", true);
-
-            AddStep("2s break", () => startBreak(2000));
-            AddStep("5s break", () => startBreak(5000));
-            AddStep("10s break", () => startBreak(10000));
-            AddStep("15s break", () => startBreak(15000));
-            AddStep("2s, 2s", startMultipleBreaks);
-            AddStep("0.5s, 0.7s, 1s, 2s", startAnotherMultipleBreaks);
+                Alpha = 0,
+                Clock = new FramedClock(manualClock),
+            });
         }
 
-        private void startBreak(double duration)
+        [Test]
+        public void TestShowBreaks()
         {
-            breakOverlay.Breaks = new List<BreakPeriod>
+            loadClockStep(false);
+
+            addShowBreakStep(2);
+            addShowBreakStep(5);
+            addShowBreakStep(15);
+        }
+
+        [Test]
+        public void TestNoEffectsBreak()
+        {
+            var shortBreak = new BreakPeriod { EndTime = 500 };
+
+            loadClockStep(true);
+            AddStep("start short break", () => manualBreakOverlay.Breaks = new[] { shortBreak });
+
+            seekBreakStep("seek back to 0", 0, false);
+            addBreakSeeks(shortBreak, false);
+        }
+
+        [Test]
+        public void TestMultipleBreaks()
+        {
+            loadClockStep(true);
+            AddStep("start multiple breaks", () => manualBreakOverlay.Breaks = testBreaks);
+
+            seekBreakStep("seek back to 0", 0, false);
+            foreach (var b in testBreaks)
+                addBreakSeeks(b, false);
+        }
+
+        [Test]
+        public void TestRewindBreaks()
+        {
+            loadClockStep(true);
+            AddStep("start multiple breaks in rewind", () => manualBreakOverlay.Breaks = testBreaks);
+
+            seekBreakStep("seek back to 0", 0, false);
+            foreach (var b in testBreaks.Reverse())
+                addBreakSeeks(b, true);
+        }
+
+        [Test]
+        public void TestSkipBreaks()
+        {
+            loadClockStep(true);
+            AddStep("start multiple breaks with skipping", () => manualBreakOverlay.Breaks = testBreaks);
+
+            var b = testBreaks.Last();
+            seekBreakStep("seek back to 0", 0, false);
+            addBreakSeeks(b, false);
+        }
+
+        private void addShowBreakStep(double seconds)
+        {
+            AddStep($"show '{seconds}s' break", () => breakOverlay.Breaks = new List<BreakPeriod>
             {
                 new BreakPeriod
                 {
                     StartTime = Clock.CurrentTime,
-                    EndTime = Clock.CurrentTime + duration,
+                    EndTime = Clock.CurrentTime + seconds * 1000,
                 }
-            };
+            });
         }
 
-        private void startMultipleBreaks()
+        private void loadClockStep(bool loadManual)
         {
-            double currentTime = Clock.CurrentTime;
-
-            breakOverlay.Breaks = new List<BreakPeriod>
+            AddStep($"load {(loadManual ? "manual" : "normal")} clock", () =>
             {
-                new BreakPeriod
-                {
-                    StartTime = currentTime,
-                    EndTime = currentTime + 2000,
-                },
-                new BreakPeriod
-                {
-                    StartTime = currentTime + 4000,
-                    EndTime = currentTime + 6000,
-                }
-            };
+                breakOverlay.FadeTo(loadManual ? 0 : 1);
+                manualBreakOverlay.FadeTo(loadManual ? 1 : 0);
+            });
         }
 
-        private void startAnotherMultipleBreaks()
+        private void addBreakSeeks(BreakPeriod b, bool isReversed)
         {
-            double currentTime = Clock.CurrentTime;
-
-            breakOverlay.Breaks = new List<BreakPeriod>
+            if (isReversed)
             {
-                new BreakPeriod // Duration is less than 650 - too short to appear
-                {
-                    StartTime = currentTime,
-                    EndTime = currentTime + 500,
-                },
-                new BreakPeriod
-                {
-                    StartTime = currentTime + 1500,
-                    EndTime = currentTime + 2200,
-                },
-                new BreakPeriod
-                {
-                    StartTime = currentTime + 3200,
-                    EndTime = currentTime + 4200,
-                },
-                new BreakPeriod
-                {
-                    StartTime = currentTime + 5200,
-                    EndTime = currentTime + 7200,
-                }
-            };
+                seekBreakStep("seek to break after end", b.EndTime + 500, false);
+                seekBreakStep("seek to break end", b.EndTime, false);
+                seekBreakStep("seek to break middle", b.StartTime + b.Duration / 2, b.HasEffect);
+                seekBreakStep("seek to break start", b.StartTime, b.HasEffect);
+            }
+            else
+            {
+                seekBreakStep("seek to break start", b.StartTime, b.HasEffect);
+                seekBreakStep("seek to break middle", b.StartTime + b.Duration / 2, b.HasEffect);
+                seekBreakStep("seek to break end", b.EndTime, false);
+                seekBreakStep("seek to break after end", b.EndTime + 500, false);
+            }
+        }
+
+        private void seekBreakStep(string seekStepDescription, double time, bool onBreak)
+        {
+            AddStep(seekStepDescription, () => manualClock.CurrentTime = time);
+            AddAssert($"is{(!onBreak ? " not " : " ")}break time", () => manualBreakOverlay.IsBreakTime.Value == onBreak);
         }
     }
 }
