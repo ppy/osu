@@ -3,27 +3,22 @@
 
 using System.Collections.Generic;
 using osu.Game.Online.API.Requests.Responses;
-using osu.Game.Rulesets;
 
 namespace osu.Game.Online.API.Requests
 {
-    public class GetUserScoresRequest : APIRequest<List<APILegacyScoreInfo>>
+    public class GetUserScoresRequest : PaginatedAPIRequest<List<APILegacyScoreInfo>>
     {
         private readonly long userId;
         private readonly ScoreType type;
-        private readonly int offset;
-        private readonly RulesetInfo ruleset;
 
-        public GetUserScoresRequest(long userId, ScoreType type, int offset = 0, RulesetInfo ruleset = null)
+        public GetUserScoresRequest(long userId, ScoreType type, int page = 0, int itemsPerPage = 5)
+            : base(page, itemsPerPage)
         {
             this.userId = userId;
             this.type = type;
-            this.offset = offset;
-            this.ruleset = ruleset;
         }
 
-        // ReSharper disable once ImpureMethodCallOnReadonlyValueField
-        protected override string Target => $@"users/{userId}/scores/{type.ToString().ToLowerInvariant()}?offset={offset}{(ruleset != null ? "&mode=" + ruleset.ShortName : "")}";
+        protected override string Target => $@"users/{userId}/scores/{type.ToString().ToLowerInvariant()}";
     }
 
     public enum ScoreType
