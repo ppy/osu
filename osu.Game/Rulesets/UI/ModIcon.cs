@@ -12,7 +12,6 @@ using osu.Game.Graphics;
 using osu.Game.Rulesets.Mods;
 using osuTK;
 using osu.Framework.Bindables;
-using osu.Framework.Graphics.Colour;
 
 namespace osu.Game.Rulesets.UI
 {
@@ -29,12 +28,6 @@ namespace osu.Game.Rulesets.UI
         {
             get => modIcon.Icon;
             set => modIcon.Icon = value;
-        }
-
-        public ColourInfo IconColour
-        {
-            get => modIcon.Colour;
-            set => modIcon.Colour = value;
         }
 
         private readonly ModType type;
@@ -110,6 +103,7 @@ namespace osu.Game.Rulesets.UI
                 case ModType.Custom:
                     backgroundColour = colours.Gray6;
                     highlightedColour = colours.Gray7;
+                    modIcon.Colour = colours.Yellow;
                     break;
             }
 

@@ -16,8 +16,6 @@ using System;
 using System.Linq;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics.Sprites;
-using osu.Framework.Allocation;
-using osu.Game.Graphics;
 
 namespace osu.Game.Overlays.BeatmapSet
 {
@@ -63,7 +61,7 @@ namespace osu.Game.Overlays.BeatmapSet
 
             modsContainer.Clear();
 
-            modsContainer.Add(new NoModButton());
+            modsContainer.Add(new ModButton(new NoMod()));
 
             foreach (var mod in ruleset.CreateInstance().GetAllMods())
                 if (mod.Ranked)
@@ -87,7 +85,7 @@ namespace osu.Game.Overlays.BeatmapSet
 
         private void deselectAll() => modsContainer.ForEach(mod => mod.Selected.Value = false);
 
-        private class ModButton : Container
+        private class ModButton : ModIcon
         {
             private const float mod_scale = 0.4f;
             private const int duration = 200;
@@ -95,24 +93,15 @@ namespace osu.Game.Overlays.BeatmapSet
             public readonly BindableBool Selected = new BindableBool();
             public Action<Mod, bool> OnSelectionChanged;
 
-            protected readonly ModIcon ModIcon;
             private readonly Mod mod;
 
             public ModButton(Mod mod)
+                : base(mod)
             {
                 this.mod = mod;
 
-                AutoSizeAxes = Axes.Both;
-                Children = new Drawable[]
-                {
-                    ModIcon = new ModIcon(mod)
-                    {
-                        Anchor = Anchor.Centre,
-                        Origin = Anchor.Centre,
-                        Scale = new Vector2(mod_scale),
-                    },
-                    new HoverClickSounds()
-                };
+                Scale = new Vector2(mod_scale);
+                Add(new HoverClickSounds());
 
                 Selected.BindValueChanged(_ => updateState(), true);
             }
@@ -128,6 +117,7 @@ namespace osu.Game.Overlays.BeatmapSet
             protected override bool OnHover(HoverEvent e)
             {
                 updateState();
+
                 return base.OnHover(e);
             }
 
@@ -137,20 +127,9 @@ namespace osu.Game.Overlays.BeatmapSet
                 updateState();
             }
 
-            private void updateState() => ModIcon.FadeColour(Selected.Value || IsHovered ? Color4.White : Color4.Gray, duration, Easing.OutQuint);
-        }
-
-        private class NoModButton : ModButton
-        {
-            public NoModButton()
-                : base(new NoMod())
+            private void updateState()
             {
-            }
-
-            [BackgroundDependencyLoader]
-            private void load(OsuColour colors)
-            {
-                ModIcon.IconColour = colors.Yellow;
+                this.FadeColour(IsHovered || Selected.Value ? Color4.White : Color4.Gray, duration, Easing.OutQuint);
             }
         }
 
