@@ -53,7 +53,9 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
 
         protected override void ShowMore()
         {
-            request = new GetUserScoresRequest(User.Value.Id, type, VisiblePages++, ItemsPerPage);
+            request?.Cancel();
+
+            request = new GetUserScoresRequest(User.Value.Id, type, VisiblePages++, ItemsPerPage, Ruleset.Value);
             request.Success += scores => Schedule(() =>
             {
                 foreach (var s in scores)
