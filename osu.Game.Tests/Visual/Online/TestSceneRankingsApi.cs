@@ -50,6 +50,14 @@ namespace osu.Game.Tests.Visual.Online
                 api.Queue(request);
             });
 
+            AddStep("Get USA osu performance", () =>
+            {
+                request?.Cancel();
+                request = new GetRankingsPerformanceRequest(new OsuRuleset().RulesetInfo, country: "US");
+                request.Success += updateRankings;
+                api.Queue(request);
+            });
+
             AddStep("Get osu performance page 10", () =>
             {
                 request?.Cancel();

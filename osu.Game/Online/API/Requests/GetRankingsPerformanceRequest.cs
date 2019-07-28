@@ -12,11 +12,13 @@ namespace osu.Game.Online.API.Requests
     {
         private readonly RulesetInfo ruleset;
         private readonly int page;
+        private readonly string country;
 
-        public GetRankingsPerformanceRequest(RulesetInfo ruleset, int page = 0)
+        public GetRankingsPerformanceRequest(RulesetInfo ruleset, int page = 0, string country = null)
         {
             this.ruleset = ruleset;
             this.page = page;
+            this.country = country;
         }
 
         protected override WebRequest CreateWebRequest()
@@ -24,6 +26,9 @@ namespace osu.Game.Online.API.Requests
             var req = base.CreateWebRequest();
 
             req.AddParameter("page", page.ToString());
+
+            if (country != null)
+                req.AddParameter("country", country);
 
             return req;
         }
