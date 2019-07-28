@@ -63,9 +63,8 @@ namespace osu.Game.Tests.Visual.Gameplay
             var shortBreak = new BreakPeriod { EndTime = 500 };
 
             loadClockStep(true);
-            AddStep("start short break", () => manualBreakOverlay.Breaks = new[] { shortBreak });
+            loadBreaksStep("short break", new[] { shortBreak });
 
-            seekBreakStep("seek back to 0", 0, false);
             addBreakSeeks(shortBreak, false);
         }
 
@@ -73,9 +72,8 @@ namespace osu.Game.Tests.Visual.Gameplay
         public void TestMultipleBreaks()
         {
             loadClockStep(true);
-            AddStep("start multiple breaks", () => manualBreakOverlay.Breaks = testBreaks);
+            loadBreaksStep("multiple breaks", testBreaks);
 
-            seekBreakStep("seek back to 0", 0, false);
             foreach (var b in testBreaks)
                 addBreakSeeks(b, false);
         }
@@ -84,9 +82,8 @@ namespace osu.Game.Tests.Visual.Gameplay
         public void TestRewindBreaks()
         {
             loadClockStep(true);
-            AddStep("start multiple breaks in rewind", () => manualBreakOverlay.Breaks = testBreaks);
+            loadBreaksStep("multiple breaks", testBreaks);
 
-            seekBreakStep("seek back to 0", 0, false);
             foreach (var b in testBreaks.Reverse())
                 addBreakSeeks(b, true);
         }
@@ -95,10 +92,9 @@ namespace osu.Game.Tests.Visual.Gameplay
         public void TestSkipBreaks()
         {
             loadClockStep(true);
-            AddStep("start multiple breaks with skipping", () => manualBreakOverlay.Breaks = testBreaks);
+            loadBreaksStep("multiple breaks", testBreaks);
 
             var b = testBreaks.Last();
-            seekBreakStep("seek back to 0", 0, false);
             addBreakSeeks(b, false);
         }
 
@@ -121,6 +117,12 @@ namespace osu.Game.Tests.Visual.Gameplay
                 breakOverlay.FadeTo(loadManual ? 0 : 1);
                 manualBreakOverlay.FadeTo(loadManual ? 1 : 0);
             });
+        }
+
+        private void loadBreaksStep(string breakDescription, IReadOnlyList<BreakPeriod> breaks)
+        {
+            AddStep($"load {breakDescription}", () => manualBreakOverlay.Breaks = breaks);
+            seekBreakStep("seek back to 0", 0, false);
         }
 
         private void addBreakSeeks(BreakPeriod b, bool isReversed)
