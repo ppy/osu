@@ -102,6 +102,8 @@ namespace osu.Game.Overlays.Chat.Tabs
                             Anchor = Anchor.CentreLeft,
                             Text = value.ToString(),
                             Font = OsuFont.GetFont(size: 18, weight: FontWeight.Bold)
+                            Width = 115f,
+                            Truncate = true,
                         },
                         CloseButton = new TabCloseButton
                         {

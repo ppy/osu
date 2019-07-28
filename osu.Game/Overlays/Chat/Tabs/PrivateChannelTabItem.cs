@@ -65,6 +65,8 @@ namespace osu.Game.Overlays.Chat.Tabs
 
             Text.X = ChatOverlay.TAB_AREA_HEIGHT;
             TextBold.X = ChatOverlay.TAB_AREA_HEIGHT;
+
+            Text.Width = 100f;
         }
 
         protected override bool ShowCloseOnHover => false;
