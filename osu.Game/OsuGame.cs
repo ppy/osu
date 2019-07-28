@@ -404,8 +404,9 @@ namespace osu.Game
                 screenContainer = new ScalingContainer(ScalingMode.ExcludeOverlays)
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Children = new[]
+                    Children = new Drawable[]
                     {
+                        screenStack = new OsuScreenStack { RelativeSizeAxes = Axes.Both },
                         backButton = new BackButton
                         {
                             Anchor = Anchor.BottomLeft,
@@ -416,8 +417,6 @@ namespace osu.Game
                                     screenStack.Exit();
                             }
                         },
-                        screenStack = new OsuScreenStack { RelativeSizeAxes = Axes.Both },
-                        backButton.CreateProxy(),
                         logoContainer = new Container { RelativeSizeAxes = Axes.Both },
                     }
                 },
