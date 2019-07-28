@@ -1,7 +1,8 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
+using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -18,11 +19,11 @@ namespace osu.Game.Screens.Play
         private const float remaining_time_container_max_size = 0.3f;
         private const int vertical_margin = 25;
 
-        private List<BreakPeriod> breaks;
-
         private readonly Container fadeContainer;
 
-        public List<BreakPeriod> Breaks
+        private IReadOnlyList<BreakPeriod> breaks;
+
+        public IReadOnlyList<BreakPeriod> Breaks
         {
             get => breaks;
             set
@@ -40,13 +41,7 @@ namespace osu.Game.Screens.Play
         private readonly BreakInfo info;
         private readonly BreakArrows breakArrows;
 
-        public BreakOverlay(bool letterboxing, ScoreProcessor scoreProcessor)
-            : this(letterboxing)
-        {
-            bindProcessor(scoreProcessor);
-        }
-
-        public BreakOverlay(bool letterboxing)
+        public BreakOverlay(bool letterboxing, ScoreProcessor scoreProcessor = null)
         {
             RelativeSizeAxes = Axes.Both;
             Child = fadeContainer = new Container
@@ -98,6 +93,14 @@ namespace osu.Game.Screens.Play
                     }
                 }
             };
+
+            if (scoreProcessor != null) bindProcessor(scoreProcessor);
+        }
+
+        [BackgroundDependencyLoader(true)]
+        private void load(GameplayClock clock)
+        {
+            if (clock != null) Clock = clock;
         }
 
         protected override void LoadComplete()

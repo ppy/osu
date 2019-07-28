@@ -1,10 +1,10 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using OpenTK;
-using OpenTK.Graphics;
+using osuTK;
+using osuTK.Graphics;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Skinning;
 
@@ -14,7 +14,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
     {
         public RingPiece()
         {
-            Size = new Vector2(128);
+            Size = new Vector2(OsuHitObject.OBJECT_RADIUS * 2);
 
             Anchor = Anchor.Centre;
             Origin = Anchor.Centre;

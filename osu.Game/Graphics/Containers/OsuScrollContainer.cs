@@ -1,14 +1,18 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
+using osu.Framework.Allocation;
+using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Input.EventArgs;
-using osu.Framework.Input.States;
-using OpenTK.Input;
+using osu.Framework.Graphics.Shapes;
+using osu.Framework.Input.Events;
+using osuTK;
+using osuTK.Graphics;
+using osuTK.Input;
 
 namespace osu.Game.Graphics.Containers
 {
-    public class OsuScrollContainer : ScrollContainer
+    public class OsuScrollContainer : ScrollContainer<Drawable>
     {
         /// <summary>
         /// Allows controlling the scroll bar from any position in the container using the right mouse button.
@@ -21,7 +25,7 @@ namespace osu.Game.Graphics.Containers
         /// </summary>
         public double DistanceDecayOnRightMouseScrollbar = 0.02;
 
-        private bool shouldPerformRightMouseScroll(InputState state) => RightMouseScrollbar && state.Mouse.IsPressed(MouseButton.Right);
+        private bool shouldPerformRightMouseScroll(MouseButtonEvent e) => RightMouseScrollbar && e.Button == MouseButton.Right;
 
         private void scrollToRelative(float value) => ScrollTo(Clamp((value - Scrollbar.DrawSize[ScrollDim] / 2) / Scrollbar.Size[ScrollDim]), true, DistanceDecayOnRightMouseScrollbar);
 
@@ -29,40 +33,45 @@ namespace osu.Game.Graphics.Containers
 
         protected override bool IsDragging => base.IsDragging || mouseScrollBarDragging;
 
-        protected override bool OnMouseDown(InputState state, MouseDownEventArgs args)
+        public OsuScrollContainer(Direction scrollDirection = Direction.Vertical)
+            : base(scrollDirection)
         {
-            if (shouldPerformRightMouseScroll(state))
+        }
+
+        protected override bool OnMouseDown(MouseDownEvent e)
+        {
+            if (shouldPerformRightMouseScroll(e))
             {
-                scrollToRelative(state.Mouse.Position[ScrollDim]);
+                scrollToRelative(e.MousePosition[ScrollDim]);
                 return true;
             }
 
-            return base.OnMouseDown(state, args);
+            return base.OnMouseDown(e);
         }
 
-        protected override bool OnDrag(InputState state)
+        protected override bool OnDrag(DragEvent e)
         {
             if (mouseScrollBarDragging)
             {
-                scrollToRelative(state.Mouse.Position[ScrollDim]);
+                scrollToRelative(e.MousePosition[ScrollDim]);
                 return true;
             }
 
-            return base.OnDrag(state);
+            return base.OnDrag(e);
         }
 
-        protected override bool OnDragStart(InputState state)
+        protected override bool OnDragStart(DragStartEvent e)
         {
-            if (shouldPerformRightMouseScroll(state))
+            if (shouldPerformRightMouseScroll(e))
             {
                 mouseScrollBarDragging = true;
                 return true;
             }
 
-            return base.OnDragStart(state);
+            return base.OnDragStart(e);
         }
 
-        protected override bool OnDragEnd(InputState state)
+        protected override bool OnDragEnd(DragEndEvent e)
         {
             if (mouseScrollBarDragging)
             {
@@ -70,7 +79,89 @@ namespace osu.Game.Graphics.Containers
                 return true;
             }
 
-            return base.OnDragEnd(state);
+            return base.OnDragEnd(e);
+        }
+
+        protected override ScrollbarContainer CreateScrollbar(Direction direction) => new OsuScrollbar(direction);
+
+        protected class OsuScrollbar : ScrollbarContainer
+        {
+            private const float dim_size = 10;
+
+            private Color4 hoverColour;
+            private Color4 defaultColour;
+            private Color4 highlightColour;
+
+            private readonly Box box;
+
+            public OsuScrollbar(Direction scrollDir)
+                : base(scrollDir)
+            {
+                Blending = BlendingMode.Additive;
+
+                CornerRadius = 5;
+
+                const float margin = 3;
+
+                Margin = new MarginPadding
+                {
+                    Left = scrollDir == Direction.Vertical ? margin : 0,
+                    Right = scrollDir == Direction.Vertical ? margin : 0,
+                    Top = scrollDir == Direction.Horizontal ? margin : 0,
+                    Bottom = scrollDir == Direction.Horizontal ? margin : 0,
+                };
+
+                Masking = true;
+                Child = box = new Box { RelativeSizeAxes = Axes.Both };
+
+                ResizeTo(1);
+            }
+
+            [BackgroundDependencyLoader]
+            private void load(OsuColour colours)
+            {
+                Colour = defaultColour = colours.Gray8;
+                hoverColour = colours.GrayF;
+                highlightColour = colours.Green;
+            }
+
+            public override void ResizeTo(float val, int duration = 0, Easing easing = Easing.None)
+            {
+                Vector2 size = new Vector2(dim_size)
+                {
+                    [(int)ScrollDirection] = val
+                };
+                this.ResizeTo(size, duration, easing);
+            }
+
+            protected override bool OnHover(HoverEvent e)
+            {
+                this.FadeColour(hoverColour, 100);
+                return true;
+            }
+
+            protected override void OnHoverLost(HoverLostEvent e)
+            {
+                this.FadeColour(defaultColour, 100);
+            }
+
+            protected override bool OnMouseDown(MouseDownEvent e)
+            {
+                if (!base.OnMouseDown(e)) return false;
+
+                //note that we are changing the colour of the box here as to not interfere with the hover effect.
+                box.FadeColour(highlightColour, 100);
+                return true;
+            }
+
+            protected override bool OnMouseUp(MouseUpEvent e)
+            {
+                if (e.Button != MouseButton.Left) return false;
+
+                box.FadeColour(Color4.White, 100);
+
+                return base.OnMouseUp(e);
+            }
         }
     }
 }

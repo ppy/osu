@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using osu.Framework;
@@ -9,16 +9,16 @@ using osu.Framework.Audio.Sample;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
-using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
-using OpenTK;
-using OpenTK.Graphics;
-using OpenTK.Input;
+using osuTK;
+using osuTK.Graphics;
+using osuTK.Input;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Game.Graphics.Containers;
 using osu.Framework.Audio.Track;
-using osu.Framework.Input.EventArgs;
-using osu.Framework.Input.States;
+using osu.Framework.Graphics.Effects;
+using osu.Framework.Graphics.Sprites;
+using osu.Framework.Input.Events;
 using osu.Game.Beatmaps.ControlPoints;
 
 namespace osu.Game.Screens.Menu
@@ -49,7 +49,7 @@ namespace osu.Game.Screens.Menu
 
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => box.ReceivePositionalInputAt(screenSpacePos);
 
-        public Button(string text, string sampleName, FontAwesome symbol, Color4 colour, Action clickAction = null, float extraWidth = 0, Key triggerKey = Key.Unknown)
+        public Button(string text, string sampleName, IconUsage symbol, Color4 colour, Action clickAction = null, float extraWidth = 0, Key triggerKey = Key.Unknown)
         {
             this.sampleName = sampleName;
             this.clickAction = clickAction;
@@ -64,6 +64,8 @@ namespace osu.Game.Screens.Menu
             {
                 box = new Container
                 {
+                    // box needs to be always present to ensure the button is always sized correctly for flow
+                    AlwaysPresent = true,
                     Masking = true,
                     MaskingSmoothness = 2,
                     EdgeEffect = new EdgeEffectParameters
@@ -119,7 +121,6 @@ namespace osu.Game.Screens.Menu
                             AllowMultiline = false,
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
-                            TextSize = 16,
                             Position = new Vector2(0, 35),
                             Text = text
                         }
@@ -151,7 +152,7 @@ namespace osu.Game.Screens.Menu
             rightward = !rightward;
         }
 
-        protected override bool OnHover(InputState state)
+        protected override bool OnHover(HoverEvent e)
         {
             if (State != ButtonState.Expanded) return true;
 
@@ -167,7 +168,7 @@ namespace osu.Game.Screens.Menu
             return true;
         }
 
-        protected override void OnHoverLost(InputState state)
+        protected override void OnHoverLost(HoverLostEvent e)
         {
             icon.ClearTransforms();
             icon.RotateTo(0, 500, Easing.Out);
@@ -181,35 +182,35 @@ namespace osu.Game.Screens.Menu
         [BackgroundDependencyLoader]
         private void load(AudioManager audio)
         {
-            sampleHover = audio.Sample.Get(@"Menu/button-hover");
+            sampleHover = audio.Samples.Get(@"Menu/button-hover");
             if (!string.IsNullOrEmpty(sampleName))
-                sampleClick = audio.Sample.Get($@"Menu/{sampleName}");
+                sampleClick = audio.Samples.Get($@"Menu/{sampleName}");
         }
 
-        protected override bool OnMouseDown(InputState state, MouseDownEventArgs args)
+        protected override bool OnMouseDown(MouseDownEvent e)
         {
             boxHoverLayer.FadeTo(0.1f, 1000, Easing.OutQuint);
-            return base.OnMouseDown(state, args);
+            return base.OnMouseDown(e);
         }
 
-        protected override bool OnMouseUp(InputState state, MouseUpEventArgs args)
+        protected override bool OnMouseUp(MouseUpEvent e)
         {
             boxHoverLayer.FadeTo(0, 1000, Easing.OutQuint);
-            return base.OnMouseUp(state, args);
+            return base.OnMouseUp(e);
         }
 
-        protected override bool OnClick(InputState state)
+        protected override bool OnClick(ClickEvent e)
         {
             trigger();
             return true;
         }
 
-        protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
+        protected override bool OnKeyDown(KeyDownEvent e)
         {
-            if (args.Repeat || state.Keyboard.ControlPressed || state.Keyboard.ShiftPressed || state.Keyboard.AltPressed)
+            if (e.Repeat || e.ControlPressed || e.ShiftPressed || e.AltPressed)
                 return false;
 
-            if (triggerKey == args.Key && triggerKey != Key.Unknown)
+            if (triggerKey == e.Key && triggerKey != Key.Unknown)
             {
                 trigger();
                 return true;
@@ -244,7 +245,7 @@ namespace osu.Game.Screens.Menu
 
         public ButtonState State
         {
-            get { return state; }
+            get => state;
 
             set
             {
@@ -262,6 +263,7 @@ namespace osu.Game.Screens.Menu
                                 box.ScaleTo(new Vector2(0, 1), 500, Easing.OutExpo);
                                 this.FadeOut(500);
                                 break;
+
                             case 1:
                                 box.ScaleTo(new Vector2(0, 1), 400, Easing.InSine);
                                 this.FadeOut(800);
@@ -269,11 +271,13 @@ namespace osu.Game.Screens.Menu
                         }
 
                         break;
+
                     case ButtonState.Expanded:
                         const int expand_duration = 500;
                         box.ScaleTo(new Vector2(1, 1), expand_duration, Easing.OutExpo);
                         this.FadeIn(expand_duration / 6f);
                         break;
+
                     case ButtonState.Exploded:
                         const int explode_duration = 200;
                         box.ScaleTo(new Vector2(2, 1), explode_duration, Easing.OutExpo);
@@ -296,10 +300,12 @@ namespace osu.Game.Screens.Menu
                     case ButtonSystemState.Initial:
                         State = ButtonState.Contracted;
                         break;
+
                     case ButtonSystemState.EnteringMode:
                         ContractStyle = 1;
                         State = ButtonState.Contracted;
                         break;
+
                     default:
                         if (value == VisibleState)
                             State = ButtonState.Expanded;

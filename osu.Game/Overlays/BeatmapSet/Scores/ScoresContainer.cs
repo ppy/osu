@@ -1,103 +1,90 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
-using OpenTK;
+using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Shapes;
+using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
-using osu.Game.Online.API.Requests;
-using System.Collections.Generic;
+using osuTK;
 using System.Linq;
-using osu.Framework.Allocation;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Beatmaps;
 using osu.Game.Online.API;
-using osu.Game.Online.API.Requests.Responses;
+using osu.Game.Online.API.Requests;
 
 namespace osu.Game.Overlays.BeatmapSet.Scores
 {
-    public class ScoresContainer : Container
+    public class ScoresContainer : CompositeDrawable
     {
         private const int spacing = 15;
-        private const int fade_duration = 200;
 
-        private readonly FillFlowContainer flow;
-        private readonly DrawableTopScore topScore;
+        private readonly Box background;
+        private readonly ScoreTable scoreTable;
+        private readonly FillFlowContainer topScoresContainer;
         private readonly LoadingAnimation loadingAnimation;
 
-        private bool loading
-        {
-            set => loadingAnimation.FadeTo(value ? 1 : 0, fade_duration);
-        }
-
-        private IEnumerable<APIScore> scores;
-        private BeatmapInfo beatmap;
-
-        public IEnumerable<APIScore> Scores
-        {
-            get { return scores; }
-            set
-            {
-                getScoresRequest?.Cancel();
-                scores = value;
-
-                updateDisplay();
-            }
-        }
+        [Resolved]
+        private IAPIProvider api { get; set; }
 
         private GetScoresRequest getScoresRequest;
-        private APIAccess api;
+
+        private BeatmapInfo beatmap;
 
         public BeatmapInfo Beatmap
         {
             get => beatmap;
             set
             {
-                beatmap = value;
-
-                Scores = null;
-
-                if (beatmap?.OnlineBeatmapID.HasValue != true)
+                if (beatmap == value)
                     return;
 
-                loading = true;
+                beatmap = value;
 
-                getScoresRequest = new GetScoresRequest(beatmap, beatmap.Ruleset);
-                getScoresRequest.Success += r => Schedule(() => Scores = r.Scores);
-                api.Queue(getScoresRequest);
+                getScores(beatmap);
             }
         }
 
-        private void updateDisplay()
+        protected APILegacyScores Scores
         {
-            loading = false;
-
-            var scoreCount = scores?.Count() ?? 0;
-
-            if (scoreCount == 0)
+            set
             {
-                topScore.Hide();
-                flow.Clear();
-                return;
+                Schedule(() =>
+                {
+                    topScoresContainer.Clear();
+
+                    if (value?.Scores.Any() != true)
+                    {
+                        scoreTable.Scores = null;
+                        scoreTable.Hide();
+                        return;
+                    }
+
+                    scoreTable.Scores = value.Scores;
+                    scoreTable.Show();
+
+                    var topScore = value.Scores.First();
+                    var userScore = value.UserScore;
+
+                    topScoresContainer.Add(new DrawableTopScore(topScore));
+
+                    if (userScore != null && userScore.Score.OnlineScoreID != topScore.OnlineScoreID)
+                        topScoresContainer.Add(new DrawableTopScore(userScore.Score, userScore.Position));
+                });
             }
-
-            topScore.Score = scores.FirstOrDefault();
-            topScore.Show();
-
-            flow.Clear();
-
-            if (scoreCount < 2)
-                return;
-
-            for (int i = 1; i < scoreCount; i++)
-                flow.Add(new DrawableScore(i, scores.ElementAt(i)));
         }
 
         public ScoresContainer()
         {
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
-            Children = new Drawable[]
+            InternalChildren = new Drawable[]
             {
+                background = new Box
+                {
+                    RelativeSizeAxes = Axes.Both,
+                },
                 new FillFlowContainer
                 {
                     Anchor = Anchor.TopCentre,
@@ -110,34 +97,52 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                     Margin = new MarginPadding { Vertical = spacing },
                     Children = new Drawable[]
                     {
-                        topScore = new DrawableTopScore(),
-                        flow = new FillFlowContainer
+                        topScoresContainer = new FillFlowContainer
                         {
                             RelativeSizeAxes = Axes.X,
                             AutoSizeAxes = Axes.Y,
                             Direction = FillDirection.Vertical,
-                            Spacing = new Vector2(0, 1),
+                            Spacing = new Vector2(0, 5),
                         },
+                        scoreTable = new ScoreTable
+                        {
+                            Anchor = Anchor.TopCentre,
+                            Origin = Anchor.TopCentre,
+                        }
                     }
                 },
                 loadingAnimation = new LoadingAnimation
                 {
                     Alpha = 0,
-                    Margin = new MarginPadding(20)
+                    Margin = new MarginPadding(20),
                 },
             };
         }
 
         [BackgroundDependencyLoader]
-        private void load(APIAccess api)
+        private void load(OsuColour colours)
         {
-            this.api = api;
-            updateDisplay();
+            background.Colour = colours.Gray2;
         }
 
-        protected override void Dispose(bool isDisposing)
+        private void getScores(BeatmapInfo beatmap)
         {
             getScoresRequest?.Cancel();
+            getScoresRequest = null;
+
+            Scores = null;
+
+            if (beatmap?.OnlineBeatmapID.HasValue != true)
+                return;
+
+            loadingAnimation.Show();
+            getScoresRequest = new GetScoresRequest(beatmap, beatmap.Ruleset);
+            getScoresRequest.Success += scores =>
+            {
+                loadingAnimation.Hide();
+                Scores = scores;
+            };
+            api.Queue(getScoresRequest);
         }
     }
 }

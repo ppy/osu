@@ -1,16 +1,17 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
-using OpenTK;
-using OpenTK.Graphics;
+using osuTK;
+using osuTK.Graphics;
 using osu.Framework.Graphics;
-using osu.Framework.Input.States;
+using osu.Framework.Graphics.Sprites;
+using osu.Framework.Input.Events;
 
 namespace osu.Game.Graphics.UserInterface
 {
     public class IconButton : OsuAnimatedButton
     {
-        public const float BUTTON_SIZE = 30;
+        public const float DEFAULT_BUTTON_SIZE = 30;
 
         private Color4? iconColour;
 
@@ -19,7 +20,7 @@ namespace osu.Game.Graphics.UserInterface
         /// </summary>
         public Color4 IconColour
         {
-            get { return iconColour ?? Color4.White; }
+            get => iconColour ?? Color4.White;
             set
             {
                 iconColour = value;
@@ -34,17 +35,17 @@ namespace osu.Game.Graphics.UserInterface
         /// </summary>
         public Color4 IconHoverColour
         {
-            get { return iconHoverColour ?? IconColour; }
-            set { iconHoverColour = value; }
+            get => iconHoverColour ?? IconColour;
+            set => iconHoverColour = value;
         }
 
         /// <summary>
         /// The icon.
         /// </summary>
-        public FontAwesome Icon
+        public IconUsage Icon
         {
-            get { return icon.Icon; }
-            set { icon.Icon = value; }
+            get => icon.Icon;
+            set => icon.Icon = value;
         }
 
         /// <summary>
@@ -52,29 +53,15 @@ namespace osu.Game.Graphics.UserInterface
         /// </summary>
         public Vector2 IconScale
         {
-            get { return icon.Scale; }
-            set { icon.Scale = value; }
-        }
-
-        /// <summary>
-        /// The size of the <see cref="IconButton"/> while it is not being pressed.
-        /// </summary>
-        public Vector2 ButtonSize
-        {
-            get => Content.Size;
-            set
-            {
-                Content.RelativeSizeAxes = Axes.None;
-                Content.Size = value;
-            }
+            get => icon.Scale;
+            set => icon.Scale = value;
         }
 
         private readonly SpriteIcon icon;
 
         public IconButton()
         {
-            AutoSizeAxes = Axes.Both;
-            ButtonSize = new Vector2(BUTTON_SIZE);
+            Size = new Vector2(DEFAULT_BUTTON_SIZE);
 
             Add(icon = new SpriteIcon
             {
@@ -84,16 +71,16 @@ namespace osu.Game.Graphics.UserInterface
             });
         }
 
-        protected override bool OnHover(InputState state)
+        protected override bool OnHover(HoverEvent e)
         {
             icon.FadeColour(IconHoverColour, 500, Easing.OutQuint);
-            return base.OnHover(state);
+            return base.OnHover(e);
         }
 
-        protected override void OnHoverLost(InputState state)
+        protected override void OnHoverLost(HoverLostEvent e)
         {
             icon.FadeColour(IconColour, 500, Easing.OutQuint);
-            base.OnHoverLost(state);
+            base.OnHoverLost(e);
         }
     }
 }
