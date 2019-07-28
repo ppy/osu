@@ -8,7 +8,7 @@ using System.Collections.Generic;
 
 namespace osu.Game.Online.API.Requests
 {
-    public class GetRankingsPerformanceRequest : APIRequest<List<APIUser>>
+    public class GetRankingsPerformanceRequest : APIRequest<List<APIUserPerformanceRankings>>
     {
         private readonly RulesetInfo ruleset;
         private readonly int page;

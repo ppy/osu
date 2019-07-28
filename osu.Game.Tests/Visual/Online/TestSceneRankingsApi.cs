@@ -31,10 +31,8 @@ namespace osu.Game.Tests.Visual.Online
             {
                 Anchor = Anchor.TopLeft,
                 Origin = Anchor.TopLeft,
-                RelativeSizeAxes = Axes.X,
-                AutoSizeAxes = Axes.Y,
-                Direction = FillDirection.Full,
-                Spacing = new Vector2(10, 5),
+                AutoSizeAxes = Axes.Both,
+                Direction = FillDirection.Vertical,
             });
         }
 
@@ -99,12 +97,12 @@ namespace osu.Game.Tests.Visual.Online
             });
         }
 
-        private void updateRankings(List<APIUser> rankings)
+        private void updateRankings(List<APIUserPerformanceRankings> rankings)
         {
             usersContainer.Clear();
             rankings.ForEach(r => usersContainer.Add(new OsuSpriteText
             {
-                Text = $"{r.User.Username}"
+                Text = $"{r.User.Username}, Accuracy: {r.Accuracy}, Play Count: {r.PlayCount}, Performance: {r.PP}, SS: {r.GradesCount.SS}, S: {r.GradesCount.S}, A: {r.GradesCount.A}"
             }));
         }
     }
