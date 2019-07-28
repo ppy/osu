@@ -29,7 +29,6 @@ namespace osu.Game.Overlays.Chat.Tabs
         public override bool IsRemovable => !Pinned;
 
         protected readonly SpriteText Text;
-        protected readonly SpriteText TextBold;
         protected readonly ClickableContainer CloseButton;
         private readonly Box box;
         private readonly Box highlightBox;
@@ -92,16 +91,7 @@ namespace osu.Game.Overlays.Chat.Tabs
                             Origin = Anchor.CentreLeft,
                             Anchor = Anchor.CentreLeft,
                             Text = value.ToString(),
-                            Font = OsuFont.GetFont(size: 18)
-                        },
-                        TextBold = new OsuSpriteText
-                        {
-                            Alpha = 0,
-                            Margin = new MarginPadding(5),
-                            Origin = Anchor.CentreLeft,
-                            Anchor = Anchor.CentreLeft,
-                            Text = value.ToString(),
-                            Font = OsuFont.GetFont(size: 18, weight: FontWeight.Bold)
+                            Font = OsuFont.GetFont(size: 18),
                             Width = 115f,
                             Truncate = true,
                         },
@@ -124,6 +114,8 @@ namespace osu.Game.Overlays.Chat.Tabs
         protected virtual IconUsage DisplayIcon => FontAwesome.Solid.Hashtag;
 
         protected virtual bool ShowCloseOnHover => true;
+
+        protected virtual bool IsBoldWhenActive => true;
 
         protected override bool OnHover(HoverEvent e)
         {
@@ -205,8 +197,10 @@ namespace osu.Game.Overlays.Chat.Tabs
             box.FadeColour(BackgroundActive, TRANSITION_LENGTH, Easing.OutQuint);
             highlightBox.FadeIn(TRANSITION_LENGTH, Easing.OutQuint);
 
-            Text.FadeOut(TRANSITION_LENGTH, Easing.OutQuint);
-            TextBold.FadeIn(TRANSITION_LENGTH, Easing.OutQuint);
+            if (IsBoldWhenActive)
+            {
+                Text.Font = Text.Font.With(weight: FontWeight.Bold);
+            }
         }
 
         protected virtual void FadeInactive()
@@ -218,8 +212,7 @@ namespace osu.Game.Overlays.Chat.Tabs
             box.FadeColour(BackgroundInactive, TRANSITION_LENGTH, Easing.OutQuint);
             highlightBox.FadeOut(TRANSITION_LENGTH, Easing.OutQuint);
 
-            Text.FadeIn(TRANSITION_LENGTH, Easing.OutQuint);
-            TextBold.FadeOut(TRANSITION_LENGTH, Easing.OutQuint);
+            Text.Font = Text.Font.With(weight: FontWeight.Medium);
         }
 
         protected override void OnActivated() => updateState();
