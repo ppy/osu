@@ -1,5 +1,5 @@
-// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
 using System.Linq;
@@ -26,8 +26,7 @@ namespace osu.Game.Rulesets.Difficulty
             Ruleset = ruleset;
             Score = score;
 
-            beatmap.Mods.Value = score.Mods;
-            Beatmap = beatmap.GetPlayableBeatmap(ruleset.RulesetInfo);
+            Beatmap = beatmap.GetPlayableBeatmap(ruleset.RulesetInfo, score.Mods);
 
             Attributes = ruleset.CreateDifficultyCalculator(beatmap).Calculate(score.Mods);
 

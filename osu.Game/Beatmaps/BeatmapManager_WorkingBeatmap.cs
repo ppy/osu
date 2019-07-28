@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using System.IO;
@@ -20,13 +20,12 @@ namespace osu.Game.Beatmaps
         protected class BeatmapManagerWorkingBeatmap : WorkingBeatmap
         {
             private readonly IResourceStore<byte[]> store;
-            private readonly AudioManager audioManager;
 
-            public BeatmapManagerWorkingBeatmap(IResourceStore<byte[]> store, BeatmapInfo beatmapInfo, AudioManager audioManager)
-                : base(beatmapInfo)
+            public BeatmapManagerWorkingBeatmap(IResourceStore<byte[]> store, TextureStore textureStore, BeatmapInfo beatmapInfo, AudioManager audioManager)
+                : base(beatmapInfo, audioManager)
             {
                 this.store = store;
-                this.audioManager = audioManager;
+                this.textureStore = textureStore;
             }
 
             protected override IBeatmap GetBeatmap()
@@ -42,9 +41,11 @@ namespace osu.Game.Beatmaps
                 }
             }
 
-            private string getPathForFile(string filename) => BeatmapSetInfo.Files.First(f => string.Equals(f.Filename, filename, StringComparison.InvariantCultureIgnoreCase)).FileInfo.StoragePath;
+            private string getPathForFile(string filename) => BeatmapSetInfo.Files.FirstOrDefault(f => string.Equals(f.Filename, filename, StringComparison.InvariantCultureIgnoreCase))?.FileInfo.StoragePath;
 
-            private LargeTextureStore textureStore;
+            private TextureStore textureStore;
+
+            private ITrackStore trackStore;
 
             protected override bool BackgroundStillValid(Texture b) => false; // bypass lazy logic. we want to return a new background each time for refcounting purposes.
 
@@ -55,7 +56,7 @@ namespace osu.Game.Beatmaps
 
                 try
                 {
-                    return (textureStore ?? (textureStore = new LargeTextureStore(new TextureLoaderStore(store)))).Get(getPathForFile(Metadata.BackgroundFile));
+                    return textureStore.Get(getPathForFile(Metadata.BackgroundFile));
                 }
                 catch
                 {
@@ -67,13 +68,20 @@ namespace osu.Game.Beatmaps
             {
                 try
                 {
-                    var trackData = store.GetStream(getPathForFile(Metadata.AudioFile));
-                    return trackData == null ? null : new TrackBass(trackData);
+                    return (trackStore ?? (trackStore = AudioManager.GetTrackStore(store))).Get(getPathForFile(Metadata.AudioFile));
                 }
                 catch
                 {
                     return null;
                 }
+            }
+
+            public override void RecycleTrack()
+            {
+                base.RecycleTrack();
+
+                trackStore?.Dispose();
+                trackStore = null;
             }
 
             public override void TransferTo(WorkingBeatmap other)
@@ -100,6 +108,7 @@ namespace osu.Game.Beatmaps
             protected override Storyboard GetStoryboard()
             {
                 Storyboard storyboard;
+
                 try
                 {
                     using (var stream = new StreamReader(store.GetStream(getPathForFile(BeatmapInfo.Path))))
@@ -130,9 +139,10 @@ namespace osu.Game.Beatmaps
             protected override Skin GetSkin()
             {
                 Skin skin;
+
                 try
                 {
-                    skin = new LegacyBeatmapSkin(BeatmapInfo, store, audioManager);
+                    skin = new LegacyBeatmapSkin(BeatmapInfo, store, AudioManager);
                 }
                 catch (Exception e)
                 {

@@ -1,9 +1,10 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
 using osu.Game.Graphics;
 using osu.Framework.Graphics.Colour;
+using osu.Framework.Graphics.Sprites;
 
 namespace osu.Game.Overlays.Notifications
 {
@@ -11,7 +12,7 @@ namespace osu.Game.Overlays.Notifications
     {
         public ProgressCompletionNotification()
         {
-            Icon = FontAwesome.fa_check;
+            Icon = FontAwesome.Solid.Check;
         }
 
         [BackgroundDependencyLoader]

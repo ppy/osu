@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Shapes;
@@ -44,17 +44,14 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             RelativeSizeAxes = Axes.Y;
             Width = tracker_width;
 
-            InternalChildren = new[]
+            AddInternal(Tracker = new Box
             {
-                Tracker = new Box
-                {
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
-                    RelativeSizeAxes = Axes.Both,
-                    EdgeSmoothness = new Vector2(0.5f, 0),
-                    Alpha = 0.75f
-                }
-            };
+                Anchor = Anchor.Centre,
+                Origin = Anchor.Centre,
+                RelativeSizeAxes = Axes.Both,
+                EdgeSmoothness = new Vector2(0.5f, 0),
+                Alpha = 0.75f
+            });
         }
 
         protected override void UpdateState(ArmedState state)

@@ -1,14 +1,14 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
-using osu.Framework.Configuration;
-using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Online.API.Requests;
 using osu.Game.Users;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using osu.Framework.Bindables;
+using osu.Framework.Graphics;
 
 namespace osu.Game.Overlays.Profile.Sections.Ranks
 {
@@ -31,9 +31,7 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
 
         protected override void ShowMore()
         {
-            base.ShowMore();
-
-            request = new GetUserScoresRequest(User.Value.Id, type, VisiblePages++ * ItemsPerPage);
+            request = new GetUserScoresRequest(User.Value.Id, type, VisiblePages++, ItemsPerPage);
             request.Success += scores => Schedule(() =>
             {
                 foreach (var s in scores)
@@ -41,8 +39,8 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
 
                 if (!scores.Any() && VisiblePages == 1)
                 {
-                    ShowMoreButton.Hide();
-                    ShowMoreLoading.Hide();
+                    MoreButton.Hide();
+                    MoreButton.IsLoading = false;
                     MissingText.Show();
                     return;
                 }
@@ -54,6 +52,7 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
                     default:
                         drawableScores = scores.Select(score => new DrawablePerformanceScore(score, includeWeight ? Math.Pow(0.95, ItemsContainer.Count) : (double?)null));
                         break;
+
                     case ScoreType.Recent:
                         drawableScores = scores.Select(score => new DrawableTotalScore(score));
                         break;
@@ -62,8 +61,8 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
                 LoadComponentsAsync(drawableScores, s =>
                 {
                     MissingText.Hide();
-                    ShowMoreButton.FadeTo(scores.Count == ItemsPerPage ? 1 : 0);
-                    ShowMoreLoading.Hide();
+                    MoreButton.FadeTo(scores.Count == ItemsPerPage ? 1 : 0);
+                    MoreButton.IsLoading = false;
 
                     ItemsContainer.AddRange(s);
                 });

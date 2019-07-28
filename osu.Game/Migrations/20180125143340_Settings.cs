@@ -16,7 +16,7 @@ namespace osu.Game.Migrations
                 {
                     ID = table.Column<int>(type: "INTEGER", nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
-                    Key = table.Column<int>(type: "INTEGER", nullable: false),
+                    Key = table.Column<int>(type: "TEXT", nullable: false),
                     RulesetID = table.Column<int>(type: "INTEGER", nullable: true),
                     Value = table.Column<string>(type: "TEXT", nullable: true),
                     Variant = table.Column<int>(type: "INTEGER", nullable: true)

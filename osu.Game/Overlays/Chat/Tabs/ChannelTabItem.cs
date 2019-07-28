@@ -1,11 +1,12 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
@@ -15,6 +16,7 @@ using osu.Game.Graphics.Sprites;
 using osu.Game.Online.Chat;
 using osuTK;
 using osuTK.Graphics;
+using osuTK.Input;
 
 namespace osu.Game.Overlays.Chat.Tabs
 {
@@ -90,7 +92,7 @@ namespace osu.Game.Overlays.Chat.Tabs
                             Origin = Anchor.CentreLeft,
                             Anchor = Anchor.CentreLeft,
                             Text = value.ToString(),
-                            TextSize = 18,
+                            Font = OsuFont.GetFont(size: 18)
                         },
                         TextBold = new OsuSpriteText
                         {
@@ -99,8 +101,7 @@ namespace osu.Game.Overlays.Chat.Tabs
                             Origin = Anchor.CentreLeft,
                             Anchor = Anchor.CentreLeft,
                             Text = value.ToString(),
-                            Font = @"Exo2.0-Bold",
-                            TextSize = 18,
+                            Font = OsuFont.GetFont(size: 18, weight: FontWeight.Bold)
                         },
                         CloseButton = new TabCloseButton
                         {
@@ -118,7 +119,7 @@ namespace osu.Game.Overlays.Chat.Tabs
             };
         }
 
-        protected virtual FontAwesome DisplayIcon => FontAwesome.fa_hashtag;
+        protected virtual IconUsage DisplayIcon => FontAwesome.Solid.Hashtag;
 
         protected virtual bool ShowCloseOnHover => true;
 
@@ -127,7 +128,7 @@ namespace osu.Game.Overlays.Chat.Tabs
             if (IsRemovable && ShowCloseOnHover)
                 CloseButton.FadeIn(200, Easing.OutQuint);
 
-            if (!Active)
+            if (!Active.Value)
                 box.FadeColour(backgroundHover, TRANSITION_LENGTH, Easing.OutQuint);
             return true;
         }
@@ -136,6 +137,19 @@ namespace osu.Game.Overlays.Chat.Tabs
         {
             CloseButton.FadeOut(200, Easing.OutQuint);
             updateState();
+        }
+
+        protected override bool OnMouseUp(MouseUpEvent e)
+        {
+            switch (e.Button)
+            {
+                case MouseButton.Middle:
+                    CloseButton.Click();
+                    return true;
+
+                default:
+                    return false;
+            }
         }
 
         [BackgroundDependencyLoader]
@@ -158,7 +172,7 @@ namespace osu.Game.Overlays.Chat.Tabs
 
         private void updateState()
         {
-            if (Active)
+            if (Active.Value)
                 FadeActive();
             else
                 FadeInactive();

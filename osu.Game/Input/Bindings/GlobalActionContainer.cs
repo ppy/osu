@@ -1,5 +1,5 @@
-// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -39,7 +39,7 @@ namespace osu.Game.Input.Bindings
             new KeyBinding(InputKey.F4, GlobalAction.ToggleMute),
 
             new KeyBinding(InputKey.Escape, GlobalAction.Back),
-            new KeyBinding(InputKey.MouseButton1, GlobalAction.Back),
+            new KeyBinding(InputKey.ExtraMouseButton1, GlobalAction.Back),
 
             new KeyBinding(InputKey.Space, GlobalAction.Select),
             new KeyBinding(InputKey.Enter, GlobalAction.Select),
@@ -50,6 +50,7 @@ namespace osu.Game.Input.Bindings
         {
             new KeyBinding(InputKey.Space, GlobalAction.SkipCutscene),
             new KeyBinding(InputKey.Tilde, GlobalAction.QuickRetry),
+            new KeyBinding(new[] { InputKey.Control, InputKey.Tilde }, GlobalAction.QuickExit),
             new KeyBinding(new[] { InputKey.Control, InputKey.Plus }, GlobalAction.IncreaseScrollSpeed),
             new KeyBinding(new[] { InputKey.Control, InputKey.Minus }, GlobalAction.DecreaseScrollSpeed),
         };
@@ -62,31 +63,41 @@ namespace osu.Game.Input.Bindings
     {
         [Description("Toggle chat overlay")]
         ToggleChat,
+
         [Description("Toggle social overlay")]
         ToggleSocial,
+
         [Description("Reset input settings")]
         ResetInputSettings,
+
         [Description("Toggle toolbar")]
         ToggleToolbar,
+
         [Description("Toggle settings")]
         ToggleSettings,
+
         [Description("Toggle osu!direct")]
         ToggleDirect,
+
         [Description("Increase volume")]
         IncreaseVolume,
+
         [Description("Decrease volume")]
         DecreaseVolume,
+
         [Description("Toggle mute")]
         ToggleMute,
 
         // In-Game Keybindings
         [Description("Skip cutscene")]
         SkipCutscene,
+
         [Description("Quick retry (hold)")]
         QuickRetry,
 
         [Description("Take screenshot")]
         TakeScreenshot,
+
         [Description("Toggle gameplay mouse buttons")]
         ToggleGameplayMouseButtons,
 
@@ -101,5 +112,8 @@ namespace osu.Game.Input.Bindings
 
         [Description("Select")]
         Select,
+
+        [Description("Quick exit (Hold)")]
+        QuickExit,
     }
 }

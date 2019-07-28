@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using osu.Game.Database;
 
@@ -48,6 +48,7 @@ namespace osu.Game.Beatmaps
                 return mid + (max - mid) * (difficulty - 5) / 5;
             if (difficulty < 5)
                 return mid - (mid - min) * (5 - difficulty) / 5;
+
             return mid;
         }
 

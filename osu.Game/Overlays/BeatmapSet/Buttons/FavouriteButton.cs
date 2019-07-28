@@ -1,11 +1,13 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
-using osu.Framework.Configuration;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Graphics.Sprites;
+using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Backgrounds;
 using osuTK;
@@ -14,7 +16,9 @@ namespace osu.Game.Overlays.BeatmapSet.Buttons
 {
     public class FavouriteButton : HeaderButton
     {
-        public readonly Bindable<bool> Favourited = new Bindable<bool>();
+        public readonly Bindable<BeatmapSetInfo> BeatmapSet = new Bindable<BeatmapSetInfo>();
+
+        private readonly Bindable<bool> favourited = new Bindable<bool>();
 
         [BackgroundDependencyLoader]
         private void load()
@@ -47,27 +51,33 @@ namespace osu.Game.Overlays.BeatmapSet.Buttons
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
-                    Icon = FontAwesome.fa_heart_o,
+                    Icon = FontAwesome.Regular.Heart,
                     Size = new Vector2(18),
                     Shadow = false,
                 },
             });
 
-            Favourited.ValueChanged += value =>
+            BeatmapSet.BindValueChanged(setInfo =>
             {
-                if (value)
+                if (setInfo.NewValue?.OnlineInfo?.HasFavourited == null)
+                    return;
+
+                favourited.Value = setInfo.NewValue.OnlineInfo.HasFavourited;
+            });
+
+            favourited.ValueChanged += favourited =>
+            {
+                if (favourited.NewValue)
                 {
                     pink.FadeIn(200);
-                    icon.Icon = FontAwesome.fa_heart;
+                    icon.Icon = FontAwesome.Solid.Heart;
                 }
                 else
                 {
                     pink.FadeOut(200);
-                    icon.Icon = FontAwesome.fa_heart_o;
+                    icon.Icon = FontAwesome.Regular.Heart;
                 }
             };
-
-            Action = () => Favourited.Value = !Favourited.Value;
         }
 
         protected override void UpdateAfterChildren()

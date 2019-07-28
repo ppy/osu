@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System.Linq;
 using osu.Framework.Graphics;
@@ -11,7 +11,8 @@ using osuTK.Graphics;
 using osu.Game.Graphics;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Allocation;
-using osu.Framework.Configuration;
+using osu.Framework.Bindables;
+using osu.Framework.Graphics.Sprites;
 using osu.Game.Screens.Ranking;
 using osu.Game.Rulesets.Scoring;
 
@@ -42,7 +43,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         private Color4 normalColour;
         private Color4 completeColour;
 
-        public DrawableSpinner(Spinner s) : base(s)
+        public DrawableSpinner(Spinner s)
+            : base(s)
         {
             Origin = Anchor.Centre;
             Position = s.Position;
@@ -75,7 +77,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
                             Size = new Vector2(48),
-                            Icon = FontAwesome.fa_asterisk,
+                            Icon = FontAwesome.Solid.Asterisk,
                             Shadow = false,
                         },
                     }
@@ -130,7 +132,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             circle.Colour = colours.BlueDark;
             glow.Colour = colours.BlueDark;
 
-            positionBindable.BindValueChanged(v => Position = v);
+            positionBindable.BindValueChanged(pos => Position = pos.NewValue);
             positionBindable.BindTo(HitObject.PositionBindable);
         }
 
@@ -194,9 +196,9 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             symbol.RotateTo(Disc.Rotation / 2, 500, Easing.OutQuint);
         }
 
-        protected override void UpdatePreemptState()
+        protected override void UpdateInitialTransforms()
         {
-            base.UpdatePreemptState();
+            base.UpdateInitialTransforms();
 
             circleContainer.ScaleTo(Spinner.Scale * 0.3f);
             circleContainer.ScaleTo(Spinner.Scale, HitObject.TimePreempt / 1.4f, Easing.OutQuint);
@@ -211,7 +213,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                 .ScaleTo(1, 500, Easing.OutQuint);
         }
 
-        protected override void UpdateCurrentState(ArmedState state)
+        protected override void UpdateStateTransforms(ArmedState state)
         {
             var sequence = this.Delay(Spinner.Duration).FadeOut(160);
 
@@ -220,9 +222,11 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                 case ArmedState.Idle:
                     Expire(true);
                     break;
+
                 case ArmedState.Hit:
                     sequence.ScaleTo(Scale * 1.2f, 320, Easing.Out);
                     break;
+
                 case ArmedState.Miss:
                     sequence.ScaleTo(Scale * 0.8f, 320, Easing.In);
                     break;

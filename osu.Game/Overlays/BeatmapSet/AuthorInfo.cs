@@ -1,17 +1,17 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics.Sprites;
-using osu.Game.Users;
+using osu.Game.Users.Drawables;
 using osuTK;
 using osuTK.Graphics;
-using osu.Framework.Allocation;
-using osu.Game.Graphics.Containers;
-using osu.Framework.Graphics.Cursor;
+using osu.Framework.Graphics.Effects;
+using osu.Framework.Graphics.Sprites;
+using osu.Game.Graphics;
 
 namespace osu.Game.Overlays.BeatmapSet
 {
@@ -20,17 +20,17 @@ namespace osu.Game.Overlays.BeatmapSet
         private const float height = 50;
 
         private readonly UpdateableAvatar avatar;
-        private readonly ClickableArea clickableArea;
         private readonly FillFlowContainer fields;
 
         private BeatmapSetInfo beatmapSet;
 
         public BeatmapSetInfo BeatmapSet
         {
-            get { return beatmapSet; }
+            get => beatmapSet;
             set
             {
                 if (value == beatmapSet) return;
+
                 beatmapSet = value;
 
                 updateDisplay();
@@ -49,8 +49,8 @@ namespace osu.Game.Overlays.BeatmapSet
 
             fields.Children = new Drawable[]
             {
-                new Field("mapped by", BeatmapSet.Metadata.Author.Username, @"Exo2.0-RegularItalic"),
-                new Field("submitted on", online.Submitted.ToString(@"MMMM d, yyyy"), @"Exo2.0-Bold")
+                new Field("mapped by", BeatmapSet.Metadata.Author.Username, OsuFont.GetFont(weight: FontWeight.Regular, italics: true)),
+                new Field("submitted on", online.Submitted.ToString(@"MMMM d, yyyy"), OsuFont.GetFont(weight: FontWeight.Bold))
                 {
                     Margin = new MarginPadding { Top = 5 },
                 },
@@ -58,11 +58,11 @@ namespace osu.Game.Overlays.BeatmapSet
 
             if (online.Ranked.HasValue)
             {
-                fields.Add(new Field("ranked on", online.Ranked.Value.ToString(@"MMMM d, yyyy"), @"Exo2.0-Bold"));
+                fields.Add(new Field("ranked on", online.Ranked.Value.ToString(@"MMMM d, yyyy"), OsuFont.GetFont(weight: FontWeight.Bold)));
             }
             else if (online.LastUpdated.HasValue)
             {
-                fields.Add(new Field("last updated on", online.LastUpdated.Value.ToString(@"MMMM d, yyyy"), @"Exo2.0-Bold"));
+                fields.Add(new Field("last updated on", online.LastUpdated.Value.ToString(@"MMMM d, yyyy"), OsuFont.GetFont(weight: FontWeight.Bold)));
             }
         }
 
@@ -73,7 +73,7 @@ namespace osu.Game.Overlays.BeatmapSet
 
             Children = new Drawable[]
             {
-                clickableArea = new ClickableArea
+                new Container
                 {
                     AutoSizeAxes = Axes.Both,
                     CornerRadius = 3,
@@ -100,20 +100,14 @@ namespace osu.Game.Overlays.BeatmapSet
             };
         }
 
-        [BackgroundDependencyLoader(true)]
-        private void load(UserProfileOverlay profile)
+        private void load()
         {
-            clickableArea.Action = () =>
-            {
-                if (avatar.User != null) profile?.ShowUser(avatar.User);
-            };
-
             updateDisplay();
         }
 
         private class Field : FillFlowContainer
         {
-            public Field(string first, string second, string secondFont)
+            public Field(string first, string second, FontUsage secondFont)
             {
                 AutoSizeAxes = Axes.Both;
                 Direction = FillDirection.Horizontal;
@@ -123,21 +117,15 @@ namespace osu.Game.Overlays.BeatmapSet
                     new OsuSpriteText
                     {
                         Text = $"{first} ",
-                        TextSize = 13,
+                        Font = OsuFont.GetFont(size: 13)
                     },
                     new OsuSpriteText
                     {
                         Text = second,
-                        TextSize = 13,
-                        Font = secondFont,
+                        Font = secondFont.With(size: 13)
                     },
                 };
             }
-        }
-
-        private class ClickableArea : OsuClickableContainer, IHasTooltip
-        {
-            public string TooltipText => @"View Profile";
         }
     }
 }

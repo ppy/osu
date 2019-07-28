@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using osu.Framework.Caching;
@@ -7,6 +7,7 @@ using osuTK.Graphics;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics;
 
@@ -77,11 +78,12 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables.Pieces
 
         public Color4 AccentColour
         {
-            get { return accentColour; }
+            get => accentColour;
             set
             {
                 if (accentColour == value)
                     return;
+
                 accentColour = value;
 
                 updateAccentColour();
@@ -90,7 +92,7 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables.Pieces
 
         public bool Hitting
         {
-            get { return hitting; }
+            get => hitting;
             set
             {
                 hitting = value;
@@ -143,6 +145,7 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables.Pieces
             const float animation_length = 50;
 
             Foreground.ClearTransforms(false, nameof(Foreground.Colour));
+
             if (hitting)
             {
                 // wait for the next sync point

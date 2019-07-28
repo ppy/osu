@@ -1,7 +1,8 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -21,14 +22,15 @@ namespace osu.Game.Skinning
     {
         protected TextureStore Textures;
 
-        protected SampleManager Samples;
+        protected IResourceStore<SampleChannel> Samples;
 
         public LegacySkin(SkinInfo skin, IResourceStore<byte[]> storage, AudioManager audioManager)
             : this(skin, new LegacySkinResourceStore<SkinFileInfo>(skin, storage), audioManager, "skin.ini")
         {
         }
 
-        protected LegacySkin(SkinInfo skin, IResourceStore<byte[]> storage, AudioManager audioManager, string filename) : base(skin)
+        protected LegacySkin(SkinInfo skin, IResourceStore<byte[]> storage, AudioManager audioManager, string filename)
+            : base(skin)
         {
             Stream stream = storage.GetStream(filename);
             if (stream != null)
@@ -37,8 +39,15 @@ namespace osu.Game.Skinning
             else
                 Configuration = new SkinConfiguration();
 
-            Samples = audioManager.GetSampleManager(storage);
+            Samples = audioManager.GetSampleStore(storage);
             Textures = new TextureStore(new TextureLoaderStore(storage));
+        }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+            Textures?.Dispose();
+            Samples?.Dispose();
         }
 
         public override Drawable GetDrawableComponent(string componentName)
@@ -48,20 +57,34 @@ namespace osu.Game.Skinning
                 case "Play/Miss":
                     componentName = "hit0";
                     break;
+
                 case "Play/Meh":
                     componentName = "hit50";
                     break;
+
                 case "Play/Good":
                     componentName = "hit100";
                     break;
+
                 case "Play/Great":
                     componentName = "hit300";
                     break;
+
                 case "Play/osu/number-text":
-                    return !hasFont(Configuration.HitCircleFont) ? null : new LegacySpriteText(Textures, Configuration.HitCircleFont) { Scale = new Vector2(0.96f) };
+                    return !hasFont(Configuration.HitCircleFont)
+                        ? null
+                        : new LegacySpriteText(Textures, Configuration.HitCircleFont)
+                        {
+                            Scale = new Vector2(0.96f),
+                            // Spacing value was reverse-engineered from the ratio of the rendered sprite size in the visual inspector vs the actual texture size
+                            Spacing = new Vector2(-Configuration.HitCircleOverlap * 0.89f, 0)
+                        };
             }
 
-            var texture = GetTexture(componentName);
+            // temporary allowance is given for skins the fact that stable handles non-animatable items such as hitcircles (incorrectly)
+            // by (incorrectly) displaying the first frame of animation rather than the non-animated version.
+            // users have used this to "hide" certain elements like hit300.
+            var texture = GetTexture($"{componentName}-0") ?? GetTexture(componentName);
 
             if (texture == null)
                 return null;
@@ -74,6 +97,7 @@ namespace osu.Game.Skinning
             float ratio = 2;
 
             var texture = Textures.Get($"{componentName}@2x");
+
             if (texture == null)
             {
                 ratio = 1;
@@ -101,9 +125,10 @@ namespace osu.Game.Skinning
                 bool hasExtension = filename.Contains('.');
 
                 string lastPiece = filename.Split('/').Last();
+                var legacyName = filename.StartsWith("Gameplay/taiko/") ? "taiko-" + lastPiece : lastPiece;
 
-                var file = source.Files.FirstOrDefault(f =>
-                    string.Equals(hasExtension ? f.Filename : Path.ChangeExtension(f.Filename, null), lastPiece, StringComparison.InvariantCultureIgnoreCase));
+                var file = source.Files.Find(f =>
+                    string.Equals(hasExtension ? f.Filename : Path.ChangeExtension(f.Filename, null), legacyName, StringComparison.InvariantCultureIgnoreCase));
                 return file?.FileInfo.StoragePath;
             }
 
@@ -118,6 +143,8 @@ namespace osu.Game.Skinning
                 string path = getPathForFile(name);
                 return path == null ? null : underlyingStore.GetStream(path);
             }
+
+            public IEnumerable<string> GetAvailableResources() => source.Files.Select(f => f.Filename);
 
             byte[] IResourceStore<byte[]>.Get(string name) => GetAsync(name).Result;
 
@@ -175,6 +202,7 @@ namespace osu.Game.Skinning
                 float ratio = 36;
 
                 var texture = textures.Get($"{textureName}@2x");
+
                 if (texture == null)
                 {
                     ratio = 18;
