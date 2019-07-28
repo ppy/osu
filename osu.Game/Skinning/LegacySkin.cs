@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Animations;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.IO.Stores;
@@ -52,22 +53,29 @@ namespace osu.Game.Skinning
 
         public override Drawable GetDrawableComponent(string componentName)
         {
+            bool animatable = false;
+            (bool looping, double frametime) animationData = (false, 1000 / 60d);
+
             switch (componentName)
             {
                 case "Play/Miss":
                     componentName = "hit0";
+                    animatable = true;
                     break;
 
                 case "Play/Meh":
                     componentName = "hit50";
+                    animatable = true;
                     break;
 
                 case "Play/Good":
                     componentName = "hit100";
+                    animatable = true;
                     break;
 
                 case "Play/Great":
                     componentName = "hit300";
+                    animatable = true;
                     break;
 
                 case "Play/osu/number-text":
@@ -81,15 +89,31 @@ namespace osu.Game.Skinning
                         };
             }
 
-            // temporary allowance is given for skins the fact that stable handles non-animatable items such as hitcircles (incorrectly)
-            // by (incorrectly) displaying the first frame of animation rather than the non-animated version.
-            // users have used this to "hide" certain elements like hit300.
-            var texture = GetTexture($"{componentName}-0") ?? GetTexture(componentName);
+            var texture = GetTexture($"{componentName}-0");
 
-            if (texture == null)
-                return null;
+            if (texture != null && animatable)
+            {
+                var animation = new TextureAnimation { DefaultFrameLength = animationData.frametime };
 
-            return new Sprite { Texture = texture };
+                for (int i = 1; texture != null; i++)
+                {
+                    animation.AddFrame(texture);
+                    texture = GetTexture($"{componentName}-{i}");
+                }
+
+                animation.Repeat = animationData.looping;
+
+                return animation;
+            }
+            else
+            {
+                texture = GetTexture(componentName);
+
+                if (texture == null)
+                    return null;
+
+                return new Sprite { Texture = texture };
+            }
         }
 
         public override Texture GetTexture(string componentName)
