@@ -1,14 +1,17 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Threading;
+using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
-using osu.Framework.Configuration;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Platform;
@@ -42,15 +45,17 @@ namespace osu.Game.Skinning
                     CurrentSkinInfo.Value = SkinInfo.Default;
             };
 
-            CurrentSkinInfo.ValueChanged += info => CurrentSkin.Value = getSkin(info);
+            CurrentSkinInfo.ValueChanged += skin => CurrentSkin.Value = getSkin(skin.NewValue);
             CurrentSkin.ValueChanged += skin =>
             {
-                if (skin.SkinInfo != CurrentSkinInfo.Value)
+                if (skin.NewValue.SkinInfo != CurrentSkinInfo.Value)
                     throw new InvalidOperationException($"Setting {nameof(CurrentSkin)}'s value directly is not supported. Use {nameof(CurrentSkinInfo)} instead.");
 
                 SourceChanged?.Invoke();
             };
         }
+
+        protected override bool ShouldDeleteArchive(string path) => Path.GetExtension(path)?.ToLowerInvariant() == ".osk";
 
         /// <summary>
         /// Returns a list of all usable <see cref="SkinInfo"/>s. Includes the special default skin plus all skins from <see cref="GetAllUserSkins"/>.
@@ -71,11 +76,12 @@ namespace osu.Game.Skinning
 
         protected override SkinInfo CreateModel(ArchiveReader archive) => new SkinInfo { Name = archive.Name };
 
-        protected override void Populate(SkinInfo model, ArchiveReader archive)
+        protected override async Task Populate(SkinInfo model, ArchiveReader archive, CancellationToken cancellationToken = default)
         {
-            base.Populate(model, archive);
+            await base.Populate(model, archive, cancellationToken);
 
             Skin reference = getSkin(model);
+
             if (!string.IsNullOrEmpty(reference.Configuration.SkinInfo.Name))
             {
                 model.Name = reference.Configuration.SkinInfo.Name;
@@ -116,8 +122,6 @@ namespace osu.Game.Skinning
 
         public SampleChannel GetSample(string sampleName) => CurrentSkin.Value.GetSample(sampleName);
 
-        public TValue GetValue<TConfiguration, TValue>(Func<TConfiguration, TValue> query) where TConfiguration : SkinConfiguration where TValue : class => CurrentSkin.Value.GetValue(query);
-
-        public TValue? GetValue<TConfiguration, TValue>(Func<TConfiguration, TValue?> query) where TConfiguration : SkinConfiguration where TValue : struct => CurrentSkin.Value.GetValue(query);
+        public TValue GetValue<TConfiguration, TValue>(Func<TConfiguration, TValue> query) where TConfiguration : SkinConfiguration => CurrentSkin.Value.GetValue(query);
     }
 }

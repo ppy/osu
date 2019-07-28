@@ -1,9 +1,10 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osuTK.Graphics;
 
@@ -22,6 +23,7 @@ namespace osu.Game.Beatmaps.Drawables
             {
                 if (status == value)
                     return;
+
                 status = value;
 
                 Alpha = value == BeatmapSetOnlineStatus.None ? 0 : 1;
@@ -31,8 +33,8 @@ namespace osu.Game.Beatmaps.Drawables
 
         public float TextSize
         {
-            get => statusText.TextSize;
-            set => statusText.TextSize = value;
+            get => statusText.Font.Size;
+            set => statusText.Font = statusText.Font.With(size: value);
         }
 
         public MarginPadding TextPadding
@@ -58,7 +60,7 @@ namespace osu.Game.Beatmaps.Drawables
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
-                    Font = @"Exo2.0-Bold",
+                    Font = OsuFont.GetFont(weight: FontWeight.Bold)
                 },
             };
 

@@ -1,15 +1,15 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.UserInterface;
-using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.Chat;
 using osuTK;
-using osu.Framework.Configuration;
 using System;
 using System.Linq;
+using osu.Framework.Bindables;
+using osu.Framework.Graphics.Sprites;
 
 namespace osu.Game.Overlays.Chat.Tabs
 {
@@ -31,14 +31,14 @@ namespace osu.Game.Overlays.Chat.Tabs
 
             AddInternal(new SpriteIcon
             {
-                Icon = FontAwesome.fa_comments,
+                Icon = FontAwesome.Solid.Comments,
                 Anchor = Anchor.CentreLeft,
                 Origin = Anchor.CentreLeft,
                 Size = new Vector2(20),
                 Margin = new MarginPadding(10),
             });
 
-            AddTabItem(selectorTab = new ChannelSelectorTabItem(new Channel { Name = "+" }));
+            AddTabItem(selectorTab = new ChannelSelectorTabItem());
 
             ChannelSelectorActive.BindTo(selectorTab.Active);
         }
@@ -49,6 +49,8 @@ namespace osu.Game.Overlays.Chat.Tabs
                 // performTabSort might've made selectorTab's position wonky, fix it
                 TabContainer.SetLayoutPosition(selectorTab, float.MaxValue);
 
+            ((ChannelTabItem)item).OnRequestClose += tabCloseRequested;
+
             base.AddTabItem(item, addToDropdown);
         }
 
@@ -57,9 +59,10 @@ namespace osu.Game.Overlays.Chat.Tabs
             switch (value.Type)
             {
                 default:
-                    return new ChannelTabItem(value) { OnRequestClose = tabCloseRequested };
+                    return new ChannelTabItem(value);
+
                 case ChannelType.PM:
-                    return new PrivateChannelTabItem(value) { OnRequestClose = tabCloseRequested };
+                    return new PrivateChannelTabItem(value);
             }
         }
 
@@ -94,13 +97,12 @@ namespace osu.Game.Overlays.Chat.Tabs
         {
             if (tab is ChannelSelectorTabItem)
             {
-                tab.Active.Toggle();
+                tab.Active.Value = true;
                 return;
             }
 
-            selectorTab.Active.Value = false;
-
             base.SelectTab(tab);
+            selectorTab.Active.Value = false;
         }
 
         private void tabCloseRequested(TabItem<Channel> tab)
@@ -111,7 +113,7 @@ namespace osu.Game.Overlays.Chat.Tabs
             if (tab == SelectedTab && totalTabs > 1)
                 // Select the tab after tab-to-be-removed's index, or the tab before if current == last
                 SelectTab(TabContainer[currentIndex == totalTabs ? currentIndex - 1 : currentIndex + 1]);
-            else if (totalTabs == 1 && !selectorTab.Active)
+            else if (totalTabs == 1 && !selectorTab.Active.Value)
                 // Open channel selection overlay if all channel tabs will be closed after removing this tab
                 SelectTab(selectorTab);
 

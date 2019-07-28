@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using osu.Framework;
@@ -45,7 +45,7 @@ namespace osu.Game.Rulesets.Edit
         /// </summary>
         public readonly DrawableHitObject HitObject;
 
-        protected override bool ShouldBeAlive => HitObject.IsAlive && HitObject.IsPresent || State == SelectionState.Selected;
+        protected override bool ShouldBeAlive => (HitObject.IsAlive && HitObject.IsPresent) || State == SelectionState.Selected;
         public override bool HandlePositionalInput => ShouldBeAlive;
         public override bool RemoveWhenNotAlive => false;
 
@@ -68,20 +68,25 @@ namespace osu.Game.Rulesets.Edit
             get => state;
             set
             {
-                if (state == value) return;
+                if (state == value)
+                    return;
 
                 state = value;
+
                 switch (state)
                 {
                     case SelectionState.Selected:
                         Show();
                         Selected?.Invoke(this);
                         break;
+
                     case SelectionState.NotSelected:
                         Hide();
                         Deselected?.Invoke(this);
                         break;
                 }
+
+                StateChanged?.Invoke(state);
             }
         }
 

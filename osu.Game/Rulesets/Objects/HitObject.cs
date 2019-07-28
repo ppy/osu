@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
 using Newtonsoft.Json;
@@ -29,7 +29,7 @@ namespace osu.Game.Rulesets.Objects
         /// </summary>
         public virtual double StartTime { get; set; }
 
-        private List<SampleInfo> samples;
+        private List<HitSampleInfo> samples;
 
         /// <summary>
         /// The samples to be played when this hit object is hit.
@@ -38,9 +38,9 @@ namespace osu.Game.Rulesets.Objects
         /// and can be treated as the default samples for the hit object.
         /// </para>
         /// </summary>
-        public List<SampleInfo> Samples
+        public List<HitSampleInfo> Samples
         {
-            get => samples ?? (samples = new List<SampleInfo>());
+            get => samples ?? (samples = new List<HitSampleInfo>());
             set => samples = value;
         }
 
@@ -52,8 +52,6 @@ namespace osu.Game.Rulesets.Objects
         /// </summary>
         [JsonIgnore]
         public bool Kiai { get; private set; }
-
-        private float overallDifficulty = BeatmapDifficulty.DEFAULT_DIFFICULTY;
 
         /// <summary>
         /// The hit windows for this <see cref="HitObject"/>.
@@ -115,7 +113,7 @@ namespace osu.Game.Rulesets.Objects
         /// Creates the <see cref="HitWindows"/> for this <see cref="HitObject"/>.
         /// This can be null to indicate that the <see cref="HitObject"/> has no <see cref="HitWindows"/>.
         /// <para>
-        /// This will only be invoked if <see cref="HitWindows"/> hasn't been set externally (e.g. from a <see cref="BeatmapConverter"/>.
+        /// This will only be invoked if <see cref="HitWindows"/> hasn't been set externally (e.g. from a <see cref="BeatmapConverter{T}"/>.
         /// </para>
         /// </summary>
         protected virtual HitWindows CreateHitWindows() => new HitWindows();

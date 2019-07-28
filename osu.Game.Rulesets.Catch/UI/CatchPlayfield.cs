@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using osu.Framework.Graphics;
@@ -10,7 +10,6 @@ using osu.Game.Rulesets.Catch.Objects.Drawable;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.UI.Scrolling;
-using osuTK;
 
 namespace osu.Game.Rulesets.Catch.UI
 {
@@ -20,33 +19,24 @@ namespace osu.Game.Rulesets.Catch.UI
 
         internal readonly CatcherArea CatcherArea;
 
-        public CatchPlayfield(BeatmapDifficulty difficulty, Func<CatchHitObject, DrawableHitObject<CatchHitObject>> getVisualRepresentation)
+        public CatchPlayfield(BeatmapDifficulty difficulty, Func<CatchHitObject, DrawableHitObject<CatchHitObject>> createDrawableRepresentation)
         {
             Container explodingFruitContainer;
 
-            Anchor = Anchor.TopCentre;
-            Origin = Anchor.TopCentre;
-
-            Size = new Vector2(0.86f); // matches stable's vertical offset for catcher plate
-
-            InternalChild = new PlayfieldAdjustmentContainer
+            InternalChildren = new Drawable[]
             {
-                RelativeSizeAxes = Axes.Both,
-                Children = new Drawable[]
+                explodingFruitContainer = new Container
                 {
-                    explodingFruitContainer = new Container
-                    {
-                        RelativeSizeAxes = Axes.Both,
-                    },
-                    CatcherArea = new CatcherArea(difficulty)
-                    {
-                        GetVisualRepresentation = getVisualRepresentation,
-                        ExplodingFruitTarget = explodingFruitContainer,
-                        Anchor = Anchor.BottomLeft,
-                        Origin = Anchor.TopLeft,
-                    },
-                    HitObjectContainer
-                }
+                    RelativeSizeAxes = Axes.Both,
+                },
+                CatcherArea = new CatcherArea(difficulty)
+                {
+                    CreateDrawableRepresentation = createDrawableRepresentation,
+                    ExplodingFruitTarget = explodingFruitContainer,
+                    Anchor = Anchor.BottomLeft,
+                    Origin = Anchor.TopLeft,
+                },
+                HitObjectContainer
             };
         }
 

@@ -1,5 +1,5 @@
-// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
@@ -55,7 +55,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Spinners.Components
 
             PositionBindable.BindValueChanged(_ => updatePosition(), true);
             StackHeightBindable.BindValueChanged(_ => updatePosition());
-            ScaleBindable.BindValueChanged(v => ring.Scale = new Vector2(v), true);
+            ScaleBindable.BindValueChanged(scale => ring.Scale = new Vector2(scale.NewValue), true);
         }
 
         private void updatePosition() => Position = spinner.Position;

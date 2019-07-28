@@ -1,14 +1,14 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
-using osu.Framework.Configuration;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.MathUtils;
+using osu.Framework.Graphics.Sprites;
 using osu.Game.Configuration;
-using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Skinning;
 using osuTK;
@@ -21,9 +21,9 @@ namespace osu.Game.Overlays.Settings.Sections
 
         public override string Header => "Skin";
 
-        public override FontAwesome Icon => FontAwesome.fa_paint_brush;
+        public override IconUsage Icon => FontAwesome.Solid.PaintBrush;
 
-        private readonly Bindable<SkinInfo> dropdownBindable = new Bindable<SkinInfo>();
+        private readonly Bindable<SkinInfo> dropdownBindable = new Bindable<SkinInfo> { Default = SkinInfo.Default };
         private readonly Bindable<int> configBindable = new Bindable<int>();
 
         private static readonly SkinInfo random_skin_info = new RandomSkinInfo();
@@ -57,6 +57,16 @@ namespace osu.Game.Overlays.Settings.Sections
                     LabelText = "Adjust gameplay cursor size based on current beatmap",
                     Bindable = config.GetBindable<bool>(OsuSetting.AutoCursorSize)
                 },
+                new SettingsCheckbox
+                {
+                    LabelText = "Beatmap skins",
+                    Bindable = config.GetBindable<bool>(OsuSetting.BeatmapSkins)
+                },
+                new SettingsCheckbox
+                {
+                    LabelText = "Beatmap hitsounds",
+                    Bindable = config.GetBindable<bool>(OsuSetting.BeatmapHitsounds)
+                },
             };
 
             skins.ItemAdded += itemAdded;
@@ -73,13 +83,13 @@ namespace osu.Game.Overlays.Settings.Sections
             if (skinDropdown.Items.All(s => s.ID != configBindable.Value))
                 configBindable.Value = 0;
 
-            configBindable.BindValueChanged(v => dropdownBindable.Value = skinDropdown.Items.Single(s => s.ID == v), true);
-            dropdownBindable.BindValueChanged(v =>
+            configBindable.BindValueChanged(id => dropdownBindable.Value = skinDropdown.Items.Single(s => s.ID == id.NewValue), true);
+            dropdownBindable.BindValueChanged(skin =>
             {
                 if (v == random_skin_info)
                     randomizeSkin();
                 else
-                    configBindable.Value = v?.ID ?? 0;
+                    configBindable.Value = skin.NewValue.ID ?? 0;
             });
         }
 
@@ -98,7 +108,7 @@ namespace osu.Game.Overlays.Settings.Sections
             resetSkinButtons();
         });
 
-        private void itemAdded(SkinInfo s, bool existing, bool silent)
+        private void itemAdded(SkinInfo s)
         {
             if (existing)
                 return;
@@ -133,7 +143,7 @@ namespace osu.Game.Overlays.Settings.Sections
 
         private class SkinSettingsDropdown : SettingsDropdown<SkinInfo>
         {
-            protected override OsuDropdown<SkinInfo> CreateDropdown() => new SkinDropdownControl { Items = Items };
+            protected override OsuDropdown<SkinInfo> CreateDropdown() => new SkinDropdownControl();
 
             private class SkinDropdownControl : DropdownControl
             {

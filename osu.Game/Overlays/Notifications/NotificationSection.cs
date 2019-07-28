@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using System.Collections.Generic;
@@ -17,10 +17,7 @@ namespace osu.Game.Overlays.Notifications
 {
     public class NotificationSection : AlwaysUpdateFillFlowContainer<Drawable>
     {
-        private OsuSpriteText titleText;
-        private OsuSpriteText countText;
-
-        private ClearAllButton clearButton;
+        private OsuSpriteText countDrawable;
 
         private FlowContainer<Notification> notifications;
 
@@ -29,34 +26,19 @@ namespace osu.Game.Overlays.Notifications
 
         public void Add(Notification notification, float position)
         {
-            notifications.Add(notification);
-            notifications.SetLayoutPosition(notification, position);
+            notifications.Insert((int)position, notification);
         }
 
         public IEnumerable<Type> AcceptTypes;
 
-        private string clearText;
+        private readonly string clearButtonText;
 
-        public string ClearText
+        private readonly string titleText;
+
+        public NotificationSection(string title, string clearButtonText)
         {
-            get { return clearText; }
-            set
-            {
-                clearText = value;
-                if (clearButton != null) clearButton.Text = clearText;
-            }
-        }
-
-        private string title;
-
-        public string Title
-        {
-            get { return title; }
-            set
-            {
-                title = value;
-                if (titleText != null) titleText.Text = title.ToUpperInvariant();
-            }
+            this.clearButtonText = clearButtonText;
+            titleText = title;
         }
 
         [BackgroundDependencyLoader]
@@ -82,9 +64,9 @@ namespace osu.Game.Overlays.Notifications
                     AutoSizeAxes = Axes.Y,
                     Children = new Drawable[]
                     {
-                        clearButton = new ClearAllButton
+                        new ClearAllButton
                         {
-                            Text = clearText,
+                            Text = clearButtonText,
                             Anchor = Anchor.TopRight,
                             Origin = Anchor.TopRight,
                             Action = clearAll
@@ -99,16 +81,16 @@ namespace osu.Game.Overlays.Notifications
                             AutoSizeAxes = Axes.Both,
                             Children = new Drawable[]
                             {
-                                titleText = new OsuSpriteText
+                                new OsuSpriteText
                                 {
-                                    Text = title.ToUpperInvariant(),
-                                    Font = @"Exo2.0-Black",
+                                    Text = titleText.ToUpperInvariant(),
+                                    Font = OsuFont.GetFont(weight: FontWeight.Black)
                                 },
-                                countText = new OsuSpriteText
+                                countDrawable = new OsuSpriteText
                                 {
                                     Text = "3",
                                     Colour = colours.Yellow,
-                                    Font = @"Exo2.0-Black",
+                                    Font = OsuFont.GetFont(weight: FontWeight.Black)
                                 },
                             }
                         },
@@ -134,7 +116,7 @@ namespace osu.Game.Overlays.Notifications
         {
             base.Update();
 
-            countText.Text = notifications.Children.Count(c => c.Alpha > 0.99f).ToString();
+            countDrawable.Text = notifications.Children.Count(c => c.Alpha > 0.99f).ToString();
         }
 
         private class ClearAllButton : OsuClickableContainer
@@ -153,8 +135,8 @@ namespace osu.Game.Overlays.Notifications
 
             public string Text
             {
-                get { return text.Text; }
-                set { text.Text = value.ToUpperInvariant(); }
+                get => text.Text;
+                set => text.Text = value.ToUpperInvariant();
             }
         }
 

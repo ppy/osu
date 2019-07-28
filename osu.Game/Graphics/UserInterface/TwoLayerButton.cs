@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -12,6 +12,7 @@ using osu.Game.Graphics.Containers;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Framework.Audio.Track;
 using System;
+using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Events;
 
@@ -48,11 +49,7 @@ namespace osu.Game.Graphics.UserInterface
 
         public override Anchor Origin
         {
-            get
-            {
-                return base.Origin;
-            }
-
+            get => base.Origin;
             set
             {
                 base.Origin = value;
@@ -153,20 +150,14 @@ namespace osu.Game.Graphics.UserInterface
             };
         }
 
-        public FontAwesome Icon
+        public IconUsage Icon
         {
-            set
-            {
-                bouncingIcon.Icon = value;
-            }
+            set => bouncingIcon.Icon = value;
         }
 
         public string Text
         {
-            set
-            {
-                text.Text = value;
-            }
+            set => text.Text = value;
         }
 
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => IconLayer.ReceivePositionalInputAt(screenSpacePos) || TextLayer.ReceivePositionalInputAt(screenSpacePos);
@@ -174,7 +165,8 @@ namespace osu.Game.Graphics.UserInterface
         protected override bool OnHover(HoverEvent e)
         {
             this.ResizeTo(SIZE_EXTENDED, transform_time, Easing.OutElastic);
-            IconLayer.FadeColour(HoverColour, transform_time, Easing.OutElastic);
+
+            IconLayer.FadeColour(HoverColour, transform_time / 2f, Easing.OutQuint);
 
             bouncingIcon.ScaleTo(1.1f, transform_time, Easing.OutElastic);
 
@@ -183,16 +175,13 @@ namespace osu.Game.Graphics.UserInterface
 
         protected override void OnHoverLost(HoverLostEvent e)
         {
-            this.ResizeTo(SIZE_RETRACTED, transform_time, Easing.OutElastic);
-            IconLayer.FadeColour(TextLayer.Colour, transform_time, Easing.OutElastic);
+            this.ResizeTo(SIZE_RETRACTED, transform_time, Easing.Out);
+            IconLayer.FadeColour(TextLayer.Colour, transform_time, Easing.Out);
 
-            bouncingIcon.ScaleTo(1, transform_time, Easing.OutElastic);
+            bouncingIcon.ScaleTo(1, transform_time, Easing.Out);
         }
 
-        protected override bool OnMouseDown(MouseDownEvent e)
-        {
-            return true;
-        }
+        protected override bool OnMouseDown(MouseDownEvent e) => true;
 
         protected override bool OnClick(ClickEvent e)
         {
@@ -217,7 +206,10 @@ namespace osu.Game.Graphics.UserInterface
 
             private readonly SpriteIcon icon;
 
-            public FontAwesome Icon { set { icon.Icon = value; } }
+            public IconUsage Icon
+            {
+                set => icon.Icon = value;
+            }
 
             public BouncingIcon()
             {

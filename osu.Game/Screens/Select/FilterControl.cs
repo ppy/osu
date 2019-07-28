@@ -1,11 +1,11 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using osuTK;
 using osuTK.Graphics;
 using osu.Framework.Allocation;
-using osu.Framework.Configuration;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.UserInterface;
@@ -14,7 +14,6 @@ using osu.Game.Graphics.UserInterface;
 using osu.Game.Screens.Select.Filter;
 using Container = osu.Framework.Graphics.Containers.Container;
 using osu.Framework.Graphics.Shapes;
-using osu.Framework.Input.Events;
 using osu.Game.Configuration;
 using osu.Game.Rulesets;
 
@@ -22,6 +21,8 @@ namespace osu.Game.Screens.Select
 {
     public class FilterControl : Container
     {
+        public const float HEIGHT = 100;
+
         public Action<FilterCriteria> FilterChanged;
 
         private readonly OsuTabControl<SortMode> sortTabs;
@@ -32,7 +33,7 @@ namespace osu.Game.Screens.Select
 
         public SortMode Sort
         {
-            get { return sort; }
+            get => sort;
             set
             {
                 if (sort != value)
@@ -47,7 +48,7 @@ namespace osu.Game.Screens.Select
 
         public GroupMode Group
         {
-            get { return group; }
+            get => group;
             set
             {
                 if (group != value)
@@ -63,7 +64,7 @@ namespace osu.Game.Screens.Select
             Group = group,
             Sort = sort,
             SearchText = searchTextBox.Text,
-            AllowConvertedBeatmaps = showConverted,
+            AllowConvertedBeatmaps = showConverted.Value,
             Ruleset = ruleset.Value
         };
 
@@ -120,7 +121,8 @@ namespace osu.Game.Screens.Select
                                     RelativeSizeAxes = Axes.X,
                                     Height = 24,
                                     Width = 0.5f,
-                                    AutoSort = true
+                                    AutoSort = true,
+                                    Current = { Value = GroupMode.Title }
                                 },
                                 //spriteText = new OsuSpriteText
                                 //{
@@ -139,6 +141,7 @@ namespace osu.Game.Screens.Select
                                     Width = 0.5f,
                                     Height = 24,
                                     AutoSort = true,
+                                    Current = { Value = SortMode.Title }
                                 }
                             }
                         },
@@ -146,12 +149,12 @@ namespace osu.Game.Screens.Select
                 }
             };
 
-            searchTextBox.Current.ValueChanged += t => FilterChanged?.Invoke(CreateCriteria());
+            searchTextBox.Current.ValueChanged += _ => FilterChanged?.Invoke(CreateCriteria());
 
             groupTabs.PinItem(GroupMode.All);
             groupTabs.PinItem(GroupMode.RecentlyPlayed);
-            groupTabs.Current.ValueChanged += val => Group = val;
-            sortTabs.Current.ValueChanged += val => Sort = val;
+            groupTabs.Current.ValueChanged += group => Group = group.NewValue;
+            sortTabs.Current.ValueChanged += sort => Sort = sort.NewValue;
         }
 
         public void Deactivate()
@@ -178,18 +181,12 @@ namespace osu.Game.Screens.Select
             sortTabs.AccentColour = colours.GreenLight;
 
             showConverted = config.GetBindable<bool>(OsuSetting.ShowConvertedBeatmaps);
-            showConverted.ValueChanged += val => updateCriteria();
+            showConverted.ValueChanged += _ => updateCriteria();
 
             ruleset.BindTo(parentRuleset);
             ruleset.BindValueChanged(_ => updateCriteria(), true);
         }
 
         private void updateCriteria() => FilterChanged?.Invoke(CreateCriteria());
-
-        protected override bool OnMouseDown(MouseDownEvent e) => true;
-
-        protected override bool OnMouseMove(MouseMoveEvent e) => true;
-
-        protected override bool OnClick(ClickEvent e) => true;
     }
 }
