@@ -15,7 +15,7 @@ namespace osu.Game.Online.API.Requests
         private readonly string country;
         private readonly UserRankingsType type;
 
-        public GetUserRankingsRequest(RulesetInfo ruleset, UserRankingsType type = UserRankingsType.Performance, int page = 0, string country = null)
+        public GetUserRankingsRequest(RulesetInfo ruleset, UserRankingsType type = UserRankingsType.Performance, int page = 1, string country = null)
         {
             this.type = type;
             this.ruleset = ruleset;

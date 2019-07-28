@@ -13,7 +13,6 @@ using System.Collections.Generic;
 using osu.Game.Rulesets.Mania;
 using osu.Game.Rulesets.Taiko;
 using osu.Game.Rulesets.Catch;
-using System;
 
 namespace osu.Game.Tests.Visual.Online
 {
