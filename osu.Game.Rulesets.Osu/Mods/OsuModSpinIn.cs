@@ -1,95 +1,86 @@
-// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using osu.Framework.Extensions.IEnumerableExtensions;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
-using osu.Game.Graphics;
+using osu.Framework.Graphics.Sprites;
+using osu.Game.Configuration;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Objects.Drawables;
-using OpenTK;
+using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Mods
 {
-    public class OsuModSpinIn : Mod, IApplicableToDrawableHitObjects
+    public class OsuModSpinIn : Mod, IApplicableToDrawableHitObjects, IReadFromConfig
     {
         public override string Name => "Spin In";
-        public override string ShortenedName => "SI";
-        public override FontAwesome Icon => FontAwesome.fa_rotate_right;
+        public override string Acronym => "SI";
+        public override IconUsage Icon => FontAwesome.Solid.Undo;
         public override ModType Type => ModType.Fun;
         public override string Description => "Circles spin in. No approach circles.";
         public override double ScoreMultiplier => 1;
         public override Type[] IncompatibleMods => new[] { typeof(OsuModHidden) };
 
         private const int rotate_offset = 360;
-        private const float rotate_starting_width = 2.0f;
+        private const float rotate_starting_width = 2;
 
+        private Bindable<bool> increaseFirstObjectVisibility = new Bindable<bool>();
+
+        public void ReadFromConfig(OsuConfigManager config)
+        {
+            increaseFirstObjectVisibility = config.GetBindable<bool>(OsuSetting.IncreaseFirstObjectVisibility);
+        }
 
         public void ApplyToDrawableHitObjects(IEnumerable<DrawableHitObject> drawables)
         {
-            foreach (var drawable in drawables)
+            foreach (var drawable in drawables.Skip(increaseFirstObjectVisibility.Value ? 1 : 0))
             {
-                // Need to add custom update in order to disable fade
-                drawable.ApplyCustomUpdateState += ApplyZoomState;
+                switch (drawable)
+                {
+                    case DrawableSpinner _:
+                        continue;
+
+                    default:
+                        drawable.ApplyCustomUpdateState += applyZoomState;
+                        break;
+                }
             }
         }
 
-        protected void ApplyZoomState(DrawableHitObject drawable, ArmedState state)
+        private void applyZoomState(DrawableHitObject drawable, ArmedState state)
         {
-            if (!(drawable is DrawableOsuHitObject)) return;
-            if (state != ArmedState.Idle) return;
-
             var h = (OsuHitObject)drawable.HitObject;
-
-            var appearTime = h.StartTime - h.TimePreempt + 1;
-            var moveDuration = h.TimePreempt - 1;
 
             switch (drawable)
             {
                 case DrawableHitCircle circle:
-                    // Disable Fade
-                    circle.Transforms
-                          .Where(t => t.TargetMember == "Alpha")
-                          .ForEach(t => circle.RemoveTransform(t));
-
-                    using (circle.BeginAbsoluteSequence(appearTime, true))
-                    {
-                        var origScale = drawable.Scale;
-                        var origRotate = circle.Rotation;
-
-                        circle
-                            .RotateTo(origRotate+rotate_offset)
-                            .RotateTo(origRotate, moveDuration, Easing.InOutSine)
-                            .ScaleTo(origScale * new Vector2(rotate_starting_width, 0))
-                            .ScaleTo(origScale, moveDuration, Easing.InOutSine)
-                            .FadeTo(1);
-                    }
-
-                    using (circle.ApproachCircle.BeginAbsoluteSequence(appearTime, true))
+                    using (circle.BeginAbsoluteSequence(h.StartTime - h.TimePreempt, true))
                     {
                         circle.ApproachCircle.Hide();
+
+                        circle.RotateTo(rotate_offset).Then().RotateTo(0, h.TimePreempt, Easing.InOutSine);
+                        circle.ScaleTo(new Vector2(rotate_starting_width, 0)).Then().ScaleTo(1, h.TimePreempt, Easing.InOutSine);
+
+                        // bypass fade in.
+                        if (state == ArmedState.Idle)
+                            circle.FadeIn();
                     }
 
                     break;
 
                 case DrawableSlider slider:
-                    // Disable fade
-                    slider.Transforms
-                          .Where(t => t.TargetMember == "Alpha")
-                          .ForEach(t => slider.RemoveTransform(t));
-
-                    using (slider.BeginAbsoluteSequence(appearTime, true))
+                    using (slider.BeginAbsoluteSequence(h.StartTime - h.TimePreempt))
                     {
-                        var origScale = slider.Scale;
+                        slider.ScaleTo(0).Then().ScaleTo(1, h.TimePreempt, Easing.InOutSine);
 
-                        slider
-                            .ScaleTo(0)
-                            .ScaleTo(origScale, moveDuration, Easing.InOutSine)
-                            .FadeTo(1);
+                        // bypass fade in.
+                        if (state == ArmedState.Idle)
+                            slider.FadeIn();
                     }
 
                     break;
