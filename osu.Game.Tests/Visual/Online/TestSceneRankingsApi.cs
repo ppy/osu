@@ -50,6 +50,22 @@ namespace osu.Game.Tests.Visual.Online
                 api.Queue(request);
             });
 
+            AddStep("Get osu performance page 10", () =>
+            {
+                request?.Cancel();
+                request = new GetRankingsPerformanceRequest(new OsuRuleset().RulesetInfo, 10);
+                request.Success += updateRankings;
+                api.Queue(request);
+            });
+
+            AddStep("Get osu performance page 100", () =>
+            {
+                request?.Cancel();
+                request = new GetRankingsPerformanceRequest(new OsuRuleset().RulesetInfo, 100);
+                request.Success += updateRankings;
+                api.Queue(request);
+            });
+
             AddStep("Get mania performance", () =>
             {
                 request?.Cancel();
@@ -75,12 +91,12 @@ namespace osu.Game.Tests.Visual.Online
             });
         }
 
-        private void updateRankings(List<APIPerformanceRankings> rankings)
+        private void updateRankings(List<APIUser> rankings)
         {
             usersContainer.Clear();
             rankings.ForEach(r => usersContainer.Add(new OsuSpriteText
             {
-                Text = r.User.Username
+                Text = $"{r.User.Username}"
             }));
         }
     }
