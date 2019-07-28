@@ -62,11 +62,9 @@ namespace osu.Game.Overlays.Chat.Tabs
             });
 
             avatar.OnLoadComplete += d => d.FadeInFromZero(300, Easing.OutQuint);
-
-            Text.X = ChatOverlay.TAB_AREA_HEIGHT;
-
-            Text.Width = 100f;
         }
+
+        protected override float LeftTextPadding => base.LeftTextPadding + ChatOverlay.TAB_AREA_HEIGHT;
 
         protected override bool ShowCloseOnHover => false;
 
