@@ -17,8 +17,6 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
 {
     public class SliderBall : CircularContainer, ISliderProgress, IRequireHighFrequencyMousePosition
     {
-        private const float width = 128;
-
         private Color4 accentColour = Color4.Black;
 
         public Func<OsuAction?> GetInitialHitAction;
@@ -57,8 +55,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
                 {
                     Origin = Anchor.Centre,
                     Anchor = Anchor.Centre,
-                    Width = width,
-                    Height = width,
+                    Width = OsuHitObject.OBJECT_RADIUS * 2,
+                    Height = OsuHitObject.OBJECT_RADIUS * 2,
                     Alpha = 0,
                     Child = new SkinnableDrawable("Play/osu/sliderfollowcircle", _ => new CircularContainer
                     {
@@ -84,8 +82,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
                     Alpha = 1,
                     Child = new Container
                     {
-                        Width = width,
-                        Height = width,
+                        Width = OsuHitObject.OBJECT_RADIUS * 2,
+                        Height = OsuHitObject.OBJECT_RADIUS * 2,
                         // TODO: support skin filename animation (sliderb0, sliderb1...)
                         Child = new SkinnableDrawable("Play/osu/sliderb", _ => new CircularContainer
                         {

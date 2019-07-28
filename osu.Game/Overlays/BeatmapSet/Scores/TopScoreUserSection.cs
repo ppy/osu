@@ -62,7 +62,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                             },
                         }
                     },
-                    avatar = new UpdateableAvatar(hideImmediately: true)
+                    avatar = new UpdateableAvatar
                     {
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
@@ -99,7 +99,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                                 Origin = Anchor.CentreLeft,
                                 Font = OsuFont.GetFont(size: 15, weight: FontWeight.Bold)
                             },
-                            flag = new UpdateableFlag(hideImmediately: true)
+                            flag = new UpdateableFlag
                             {
                                 Anchor = Anchor.CentreLeft,
                                 Origin = Anchor.CentreLeft,
