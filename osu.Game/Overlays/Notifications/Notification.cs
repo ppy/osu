@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using osu.Framework.Allocation;
@@ -7,11 +7,13 @@ using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Effects;
 using osu.Game.Graphics;
-using OpenTK;
-using OpenTK.Graphics;
+using osuTK;
+using osuTK.Graphics;
 using osu.Framework.Graphics.Shapes;
-using osu.Framework.Input.States;
+using osu.Framework.Graphics.Sprites;
+using osu.Framework.Input.Events;
 using osu.Game.Graphics.Containers;
 
 namespace osu.Game.Overlays.Notifications
@@ -118,19 +120,19 @@ namespace osu.Game.Overlays.Notifications
             });
         }
 
-        protected override bool OnHover(InputState state)
+        protected override bool OnHover(HoverEvent e)
         {
             closeButton.FadeIn(75);
-            return base.OnHover(state);
+            return base.OnHover(e);
         }
 
-        protected override void OnHoverLost(InputState state)
+        protected override void OnHoverLost(HoverLostEvent e)
         {
             closeButton.FadeOut(75);
-            base.OnHoverLost(state);
+            base.OnHoverLost(e);
         }
 
-        protected override bool OnClick(InputState state)
+        protected override bool OnClick(ClickEvent e)
         {
             if (Activated?.Invoke() ?? true)
                 Close();
@@ -151,6 +153,7 @@ namespace osu.Game.Overlays.Notifications
         public virtual void Close()
         {
             if (WasClosed) return;
+
             WasClosed = true;
 
             Closed?.Invoke();
@@ -173,7 +176,7 @@ namespace osu.Game.Overlays.Notifications
                     {
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
-                        Icon = FontAwesome.fa_times_circle,
+                        Icon = FontAwesome.Solid.TimesCircle,
                         Size = new Vector2(20),
                     }
                 };
@@ -185,16 +188,16 @@ namespace osu.Game.Overlays.Notifications
                 hoverColour = colours.Yellow;
             }
 
-            protected override bool OnHover(InputState state)
+            protected override bool OnHover(HoverEvent e)
             {
                 this.FadeColour(hoverColour, 200);
-                return base.OnHover(state);
+                return base.OnHover(e);
             }
 
-            protected override void OnHoverLost(InputState state)
+            protected override void OnHoverLost(HoverLostEvent e)
             {
                 this.FadeColour(OsuColour.Gray(0.2f), 200);
-                base.OnHoverLost(state);
+                base.OnHoverLost(e);
             }
         }
 
@@ -205,7 +208,7 @@ namespace osu.Game.Overlays.Notifications
 
             public bool Pulsate
             {
-                get { return pulsate; }
+                get => pulsate;
                 set
                 {
                     if (pulsate == value) return;

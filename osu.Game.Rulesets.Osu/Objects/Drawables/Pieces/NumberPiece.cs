@@ -1,25 +1,26 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Sprites;
+using osu.Framework.Graphics.Effects;
 using osu.Game.Graphics.Sprites;
-using OpenTK.Graphics;
+using osuTK.Graphics;
 using osu.Framework.Graphics.Shapes;
+using osu.Game.Graphics;
 using osu.Game.Skinning;
 
 namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
 {
     public class NumberPiece : Container
     {
-        private readonly SpriteText number;
+        private readonly SkinnableSpriteText number;
 
         public string Text
         {
-            get { return number.Text; }
-            set { number.Text = value; }
+            get => number.Text;
+            set => number.Text = value;
         }
 
         public NumberPiece()
@@ -41,15 +42,13 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
                     },
                     Child = new Box()
                 }, s => s.GetTexture("Play/osu/hitcircle") == null),
-                number = new OsuSpriteText
+                number = new SkinnableSpriteText("Play/osu/number-text", _ => new OsuSpriteText
                 {
-                    Text = @"1",
-                    Font = @"Venera",
+                    Font = OsuFont.Numeric.With(size: 40),
                     UseFullGlyphHeight = false,
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
-                    TextSize = 40,
-                    Alpha = 1
+                }, restrictSize: false)
+                {
+                    Text = @"1"
                 }
             };
         }

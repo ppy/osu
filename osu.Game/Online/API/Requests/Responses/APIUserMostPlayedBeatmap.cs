@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using Newtonsoft.Json;
 using osu.Game.Beatmaps;
@@ -10,16 +10,16 @@ namespace osu.Game.Online.API.Requests.Responses
     public class APIUserMostPlayedBeatmap
     {
         [JsonProperty("beatmap_id")]
-        public int BeatmapID;
+        public int BeatmapID { get; set; }
 
         [JsonProperty("count")]
-        public int PlayCount;
+        public int PlayCount { get; set; }
 
         [JsonProperty]
-        private BeatmapInfo beatmap;
+        private BeatmapInfo beatmap { get; set; }
 
         [JsonProperty]
-        private APIBeatmapSet beatmapSet;
+        private APIBeatmapSet beatmapSet { get; set; }
 
         public BeatmapInfo GetBeatmapInfo(RulesetStore rulesets)
         {

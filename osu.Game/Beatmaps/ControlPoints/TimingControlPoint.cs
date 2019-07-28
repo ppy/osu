@@ -1,12 +1,13 @@
-// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
-using OpenTK;
+using System;
+using osuTK;
 using osu.Game.Beatmaps.Timing;
 
 namespace osu.Game.Beatmaps.ControlPoints
 {
-    public class TimingControlPoint : ControlPoint
+    public class TimingControlPoint : ControlPoint, IEquatable<TimingControlPoint>
     {
         /// <summary>
         /// The time signature at this control point.
@@ -16,7 +17,7 @@ namespace osu.Game.Beatmaps.ControlPoints
         /// <summary>
         /// The beat length at this control point.
         /// </summary>
-        public double BeatLength
+        public virtual double BeatLength
         {
             get => beatLength;
             set => beatLength = MathHelper.Clamp(value, 6, 60000);
@@ -24,10 +25,8 @@ namespace osu.Game.Beatmaps.ControlPoints
 
         private double beatLength = 1000;
 
-        public override bool EquivalentTo(ControlPoint other)
-            => base.EquivalentTo(other)
-               && other is TimingControlPoint timing
-               && TimeSignature.Equals(timing.TimeSignature)
-               && BeatLength.Equals(timing.BeatLength);
+        public bool Equals(TimingControlPoint other)
+            => base.Equals(other)
+               && TimeSignature == other?.TimeSignature && beatLength.Equals(other.beatLength);
     }
 }

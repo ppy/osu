@@ -1,23 +1,25 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Graphics.Sprites;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
-using OpenTK;
+using osuTK;
 
 namespace osu.Game.Overlays.Notifications
 {
     public class SimpleNotification : Notification
     {
         private string text = string.Empty;
+
         public string Text
         {
-            get { return text; }
+            get => text;
             set
             {
                 text = value;
@@ -25,10 +27,11 @@ namespace osu.Game.Overlays.Notifications
             }
         }
 
-        private FontAwesome icon = FontAwesome.fa_info_circle;
-        public FontAwesome Icon
+        private IconUsage icon = FontAwesome.Solid.InfoCircle;
+
+        public IconUsage Icon
         {
-            get { return icon; }
+            get => icon;
             set
             {
                 icon = value;
@@ -59,7 +62,7 @@ namespace osu.Game.Overlays.Notifications
                 }
             });
 
-            Content.Add(textDrawable = new OsuTextFlowContainer(t => t.TextSize = 14)
+            Content.Add(textDrawable = new OsuTextFlowContainer(t => t.Font = t.Font.With(size: 14))
             {
                 Colour = OsuColour.Gray(128),
                 AutoSizeAxes = Axes.Y,
@@ -76,11 +79,7 @@ namespace osu.Game.Overlays.Notifications
 
         public override bool Read
         {
-            get
-            {
-                return base.Read;
-            }
-
+            get => base.Read;
             set
             {
                 if (value == base.Read) return;

@@ -1,25 +1,28 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using System.Linq;
 using osu.Framework.MathUtils;
 using osu.Game.Beatmaps;
+using osu.Game.Replays;
+using osu.Game.Rulesets.Catch.Beatmaps;
 using osu.Game.Rulesets.Catch.Objects;
 using osu.Game.Rulesets.Catch.UI;
 using osu.Game.Rulesets.Replays;
-using osu.Game.Users;
 
 namespace osu.Game.Rulesets.Catch.Replays
 {
-    internal class CatchAutoGenerator : AutoGenerator<CatchHitObject>
+    internal class CatchAutoGenerator : AutoGenerator
     {
         public const double RELEASE_DELAY = 20;
 
-        public CatchAutoGenerator(Beatmap<CatchHitObject> beatmap)
+        public new CatchBeatmap Beatmap => (CatchBeatmap)base.Beatmap;
+
+        public CatchAutoGenerator(IBeatmap beatmap)
             : base(beatmap)
         {
-            Replay = new Replay { User = new User { Username = @"Autoplay" } };
+            Replay = new Replay();
         }
 
         protected Replay Replay;
@@ -40,10 +43,13 @@ namespace osu.Game.Rulesets.Catch.Replays
                 float positionChange = Math.Abs(lastPosition - h.X);
                 double timeAvailable = h.StartTime - lastTime;
 
-                //So we can either make it there without a dash or not.
-                double speedRequired = positionChange / timeAvailable;
+                // So we can either make it there without a dash or not.
+                // If positionChange is 0, we don't need to move, so speedRequired should also be 0 (could be NaN if timeAvailable is 0 too)
+                // The case where positionChange > 0 and timeAvailable == 0 results in PositiveInfinity which provides expected beheaviour.
+                double speedRequired = positionChange == 0 ? 0 : positionChange / timeAvailable;
 
-                bool dashRequired = speedRequired > movement_speed && h.StartTime != 0;
+                bool dashRequired = speedRequired > movement_speed;
+                bool impossibleJump = speedRequired > movement_speed * 2;
 
                 // todo: get correct catcher size, based on difficulty CS.
                 const float catcher_width_half = CatcherArea.CATCHER_SIZE / CatchPlayfield.BASE_WIDTH * 0.3f * 0.5f;
@@ -56,9 +62,8 @@ namespace osu.Game.Rulesets.Catch.Replays
                     return;
                 }
 
-                if (h is Banana)
+                if (impossibleJump)
                 {
-                    // auto bananas unrealistically warp to catch 100% combo.
                     Replay.Frames.Add(new CatchReplayFrame(h.StartTime, h.X));
                 }
                 else if (h.HyperDash)

@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using osu.Framework.Extensions.Color4Extensions;
@@ -7,11 +7,12 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics;
-using OpenTK;
+using osuTK;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Allocation;
-using osu.Framework.Configuration;
-using osu.Framework.Input.States;
+using osu.Framework.Bindables;
+using osu.Framework.Input.Events;
+using osu.Game.Rulesets;
 
 namespace osu.Game.Overlays.Toolbar
 {
@@ -22,7 +23,8 @@ namespace osu.Game.Overlays.Toolbar
 
         public Action OnHome;
 
-        private readonly ToolbarUserArea userArea;
+        private ToolbarUserButton userButton;
+        private ToolbarRulesetSelector rulesetSelector;
 
         protected override bool BlockPositionalInput => false;
 
@@ -34,6 +36,13 @@ namespace osu.Game.Overlays.Toolbar
         private readonly Bindable<OverlayActivation> overlayActivationMode = new Bindable<OverlayActivation>(OverlayActivation.All);
 
         public Toolbar()
+        {
+            RelativeSizeAxes = Axes.X;
+            Size = new Vector2(1, HEIGHT);
+        }
+
+        [BackgroundDependencyLoader(true)]
+        private void load(OsuGame osuGame, Bindable<RulesetInfo> parentRuleset)
         {
             Children = new Drawable[]
             {
@@ -50,7 +59,7 @@ namespace osu.Game.Overlays.Toolbar
                         {
                             Action = () => OnHome?.Invoke()
                         },
-                        new ToolbarRulesetSelector()
+                        rulesetSelector = new ToolbarRulesetSelector()
                     }
                 },
                 new FillFlowContainer
@@ -62,31 +71,28 @@ namespace osu.Game.Overlays.Toolbar
                     AutoSizeAxes = Axes.X,
                     Children = new Drawable[]
                     {
+                        new ToolbarChangelogButton(),
                         new ToolbarDirectButton(),
                         new ToolbarChatButton(),
                         new ToolbarSocialButton(),
                         new ToolbarMusicButton(),
                         //new ToolbarButton
                         //{
-                        //    Icon = FontAwesome.fa_search
+                        //    Icon = FontAwesome.Solid.search
                         //},
-                        userArea = new ToolbarUserArea(),
+                        userButton = new ToolbarUserButton(),
                         new ToolbarNotificationButton(),
                     }
                 }
             };
 
-            RelativeSizeAxes = Axes.X;
-            Size = new Vector2(1, HEIGHT);
-        }
+            // Bound after the selector is added to the hierarchy to give it a chance to load the available rulesets
+            rulesetSelector.Current.BindTo(parentRuleset);
 
-        [BackgroundDependencyLoader(true)]
-        private void load(OsuGame osuGame)
-        {
-            StateChanged += visibility =>
+            State.ValueChanged += visibility =>
             {
-                if (overlayActivationMode == OverlayActivation.Disabled)
-                    State = Visibility.Hidden;
+                if (overlayActivationMode.Value == OverlayActivation.Disabled)
+                    Hide();
             };
 
             if (osuGame != null)
@@ -121,14 +127,14 @@ namespace osu.Game.Overlays.Toolbar
                 };
             }
 
-            protected override bool OnHover(InputState state)
+            protected override bool OnHover(HoverEvent e)
             {
                 solidBackground.FadeTo(alpha_hovering, transition_time, Easing.OutQuint);
                 gradientBackground.FadeIn(transition_time, Easing.OutQuint);
                 return true;
             }
 
-            protected override void OnHoverLost(InputState state)
+            protected override void OnHoverLost(HoverLostEvent e)
             {
                 solidBackground.FadeTo(alpha_normal, transition_time, Easing.OutQuint);
                 gradientBackground.FadeOut(transition_time, Easing.OutQuint);
@@ -143,7 +149,7 @@ namespace osu.Game.Overlays.Toolbar
 
         protected override void PopOut()
         {
-            userArea?.LoginOverlay.Hide();
+            userButton?.StateContainer.Hide();
 
             this.MoveToY(-DrawSize.Y, transition_time, Easing.OutQuint);
             this.FadeOut(transition_time);

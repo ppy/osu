@@ -1,9 +1,9 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
-using OpenTK;
-using OpenTK.Graphics;
-using OpenTK.Input;
+using osuTK;
+using osuTK.Graphics;
+using osuTK.Input;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
@@ -13,8 +13,8 @@ using osu.Game.Rulesets.UI;
 using System;
 using System.Linq;
 using osu.Framework.Graphics.Cursor;
-using osu.Framework.Input.EventArgs;
-using osu.Framework.Input.States;
+using osu.Framework.Input.Events;
+using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
 
 namespace osu.Game.Overlays.Mods
@@ -81,6 +81,7 @@ namespace osu.Game.Overlays.Mods
                 backgroundIcon.RotateTo(-rotate_angle * direction, mod_switch_duration, mod_switch_easing);
 
                 backgroundIcon.Icon = modAfter.Icon;
+
                 using (BeginDelayedSequence(mod_switch_duration, true))
                 {
                     foregroundIcon
@@ -107,10 +108,11 @@ namespace osu.Game.Overlays.Mods
 
         public Color4 SelectedColour
         {
-            get { return selectedColour; }
+            get => selectedColour;
             set
             {
                 if (value == selectedColour) return;
+
                 selectedColour = value;
                 if (Selected) foregroundIcon.Colour = value;
             }
@@ -121,7 +123,7 @@ namespace osu.Game.Overlays.Mods
 
         public Mod Mod
         {
-            get { return mod; }
+            get => mod;
             set
             {
                 mod = value;
@@ -138,6 +140,7 @@ namespace osu.Game.Overlays.Mods
                 }
 
                 createIcons();
+
                 if (Mods.Length > 0)
                 {
                     displayMod(Mods[0]);
@@ -149,24 +152,25 @@ namespace osu.Game.Overlays.Mods
 
         public virtual Mod SelectedMod => Mods.ElementAtOrDefault(selectedIndex);
 
-        protected override bool OnMouseDown(InputState state, MouseDownEventArgs args)
+        protected override bool OnMouseDown(MouseDownEvent e)
         {
             scaleContainer.ScaleTo(0.9f, 800, Easing.Out);
-            return base.OnMouseDown(state, args);
+            return base.OnMouseDown(e);
         }
 
-        protected override bool OnMouseUp(InputState state, MouseUpEventArgs args)
+        protected override bool OnMouseUp(MouseUpEvent e)
         {
             scaleContainer.ScaleTo(1, 500, Easing.OutElastic);
 
             // only trigger the event if we are inside the area of the button
-            if (Contains(ToScreenSpace(state.Mouse.Position - Position)))
+            if (Contains(e.ScreenSpaceMousePosition))
             {
-                switch (args.Button)
+                switch (e.Button)
                 {
                     case MouseButton.Left:
                         SelectNext(1);
                         break;
+
                     case MouseButton.Right:
                         SelectNext(-1);
                         break;
@@ -218,6 +222,7 @@ namespace osu.Game.Overlays.Mods
         private void createIcons()
         {
             iconsContainer.Clear();
+
             if (Mods.Length > 1)
             {
                 iconsContainer.AddRange(new[]
@@ -276,7 +281,7 @@ namespace osu.Game.Overlays.Mods
                     Y = 75,
                     Origin = Anchor.TopCentre,
                     Anchor = Anchor.TopCentre,
-                    TextSize = 18,
+                    Font = OsuFont.GetFont(size: 18)
                 },
                 new HoverClickSounds()
             };

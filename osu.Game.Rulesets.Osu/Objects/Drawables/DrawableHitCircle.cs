@@ -1,13 +1,15 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
+using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Osu.Objects.Drawables.Pieces;
-using OpenTK;
+using osuTK;
 using osu.Game.Rulesets.Scoring;
-using OpenTK.Graphics;
 
 namespace osu.Game.Rulesets.Osu.Objects.Drawables
 {
@@ -21,59 +23,88 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         private readonly NumberPiece number;
         private readonly GlowPiece glow;
 
+        private readonly IBindable<Vector2> positionBindable = new Bindable<Vector2>();
+        private readonly IBindable<int> stackHeightBindable = new Bindable<int>();
+        private readonly IBindable<float> scaleBindable = new Bindable<float>();
+
+        public OsuAction? HitAction => circle.HitAction;
+
+        private readonly Container explodeContainer;
+
+        private readonly Container scaleContainer;
+
         public DrawableHitCircle(HitCircle h)
             : base(h)
         {
             Origin = Anchor.Centre;
 
             Position = HitObject.StackedPosition;
-            Scale = new Vector2(h.Scale);
 
             InternalChildren = new Drawable[]
             {
-                glow = new GlowPiece(),
-                circle = new CirclePiece
+                scaleContainer = new Container
                 {
-                    Hit = () =>
+                    RelativeSizeAxes = Axes.Both,
+                    Origin = Anchor.Centre,
+                    Anchor = Anchor.Centre,
+                    Child = explodeContainer = new Container
                     {
-                        if (AllJudged)
-                            return false;
+                        RelativeSizeAxes = Axes.Both,
+                        Origin = Anchor.Centre,
+                        Anchor = Anchor.Centre,
+                        Children = new Drawable[]
+                        {
+                            glow = new GlowPiece(),
+                            circle = new CirclePiece
+                            {
+                                Hit = () =>
+                                {
+                                    if (AllJudged)
+                                        return false;
 
-                        UpdateResult(true);
-                        return true;
-                    },
+                                    UpdateResult(true);
+                                    return true;
+                                },
+                            },
+                            number = new NumberPiece
+                            {
+                                Text = (HitObject.IndexInCurrentCombo + 1).ToString(),
+                            },
+                            ring = new RingPiece(),
+                            flash = new FlashPiece(),
+                            explode = new ExplodePiece(),
+                            ApproachCircle = new ApproachCircle
+                            {
+                                Alpha = 0,
+                                Scale = new Vector2(4),
+                            }
+                        }
+                    }
                 },
-                number = new NumberPiece
-                {
-                    Text = (HitObject.IndexInCurrentCombo + 1).ToString(),
-                },
-                ring = new RingPiece(),
-                flash = new FlashPiece(),
-                explode = new ExplodePiece(),
-                ApproachCircle = new ApproachCircle
-                {
-                    Alpha = 0,
-                    Scale = new Vector2(4),
-                }
             };
 
             //may not be so correct
             Size = circle.DrawSize;
-
-            HitObject.PositionChanged += _ => Position = HitObject.StackedPosition;
         }
 
-        public override Color4 AccentColour
+        [BackgroundDependencyLoader]
+        private void load()
         {
-            get { return base.AccentColour; }
-            set
+            positionBindable.BindValueChanged(_ => Position = HitObject.StackedPosition);
+            stackHeightBindable.BindValueChanged(_ => Position = HitObject.StackedPosition);
+            scaleBindable.BindValueChanged(scale => scaleContainer.Scale = new Vector2(scale.NewValue), true);
+
+            positionBindable.BindTo(HitObject.PositionBindable);
+            stackHeightBindable.BindTo(HitObject.StackHeightBindable);
+            scaleBindable.BindTo(HitObject.ScaleBindable);
+
+            AccentColour.BindValueChanged(colour =>
             {
-                base.AccentColour = value;
-                explode.Colour = AccentColour;
-                glow.Colour = AccentColour;
-                circle.Colour = AccentColour;
-                ApproachCircle.Colour = AccentColour;
-            }
+                explode.Colour = colour.NewValue;
+                glow.Colour = colour.NewValue;
+                circle.Colour = colour.NewValue;
+                ApproachCircle.Colour = colour.NewValue;
+            }, true);
         }
 
         protected override void CheckForResult(bool userTriggered, double timeOffset)
@@ -87,6 +118,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             }
 
             var result = HitObject.HitWindows.ResultFor(timeOffset);
+
             if (result == HitResult.None)
             {
                 Shake(Math.Abs(timeOffset) - HitObject.HitWindows.HalfWindowFor(HitResult.Miss));
@@ -96,15 +128,16 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             ApplyResult(r => r.Type = result);
         }
 
-        protected override void UpdatePreemptState()
+        protected override void UpdateInitialTransforms()
         {
-            base.UpdatePreemptState();
+            base.UpdateInitialTransforms();
 
             ApproachCircle.FadeIn(Math.Min(HitObject.TimeFadeIn * 2, HitObject.TimePreempt));
             ApproachCircle.ScaleTo(1.1f, HitObject.TimePreempt);
+            ApproachCircle.Expire(true);
         }
 
-        protected override void UpdateCurrentState(ArmedState state)
+        protected override void UpdateStateTransforms(ArmedState state)
         {
             glow.FadeOut(400);
 
@@ -115,14 +148,18 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
                     Expire(true);
 
+                    circle.HitAction = null;
+
                     // override lifetime end as FadeIn may have been changed externally, causing out expiration to be too early.
                     LifetimeEnd = HitObject.StartTime + HitObject.HitWindows.HalfWindowFor(HitResult.Miss);
                     break;
+
                 case ArmedState.Miss:
                     ApproachCircle.FadeOut(50);
                     this.FadeOut(100);
                     Expire();
                     break;
+
                 case ArmedState.Hit:
                     ApproachCircle.FadeOut(50);
 
@@ -140,8 +177,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                         circle.FadeOut();
                         number.FadeOut();
 
-                        this.FadeOut(800)
-                            .ScaleTo(Scale * 1.5f, 400, Easing.OutQuad);
+                        this.FadeOut(800);
+                        explodeContainer.ScaleTo(1.5f, 400, Easing.OutQuad);
                     }
 
                     Expire();

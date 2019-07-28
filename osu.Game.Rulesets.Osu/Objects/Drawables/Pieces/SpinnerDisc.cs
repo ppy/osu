@@ -1,13 +1,13 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Input.States;
+using osu.Framework.Input.Events;
 using osu.Game.Graphics;
-using OpenTK;
-using OpenTK.Graphics;
+using osuTK;
+using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
 {
@@ -17,8 +17,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
 
         public Color4 AccentColour
         {
-            get { return background.AccentColour; }
-            set { background.AccentColour = value; }
+            get => background.AccentColour;
+            set => background.AccentColour = value;
         }
 
         private readonly SpinnerBackground background;
@@ -43,12 +43,14 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => true;
 
         private bool tracking;
+
         public bool Tracking
         {
-            get { return tracking; }
+            get => tracking;
             set
             {
                 if (value == tracking) return;
+
                 tracking = value;
 
                 background.FadeTo(tracking ? tracking_alpha : idle_alpha, 100);
@@ -56,22 +58,24 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
         }
 
         private bool complete;
+
         public bool Complete
         {
-            get { return complete; }
+            get => complete;
             set
             {
                 if (value == complete) return;
+
                 complete = value;
 
                 updateCompleteTick();
             }
         }
 
-        protected override bool OnMouseMove(InputState state)
+        protected override bool OnMouseMove(MouseMoveEvent e)
         {
-            mousePosition = Parent.ToLocalSpace(state.Mouse.NativeState.Position);
-            return base.OnMouseMove(state);
+            mousePosition = Parent.ToLocalSpace(e.ScreenSpaceMousePosition);
+            return base.OnMouseMove(e);
         }
 
         private Vector2 mousePosition;
