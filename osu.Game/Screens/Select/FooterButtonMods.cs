@@ -9,18 +9,25 @@ using osu.Game.Rulesets.Mods;
 using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
+using osu.Framework.Graphics.UserInterface;
 using osu.Game.Graphics;
 using osuTK;
 using osuTK.Input;
 
 namespace osu.Game.Screens.Select
 {
-    public class FooterButtonMods : FooterButton
+    public class FooterButtonMods : FooterButton, IHasCurrentValue<IReadOnlyList<Mod>>
     {
-        public FooterButtonMods(Bindable<IReadOnlyList<Mod>> mods)
+        public Bindable<IReadOnlyList<Mod>> Current
         {
-            FooterModDisplay modDisplay;
+            get => modDisplay.Current;
+            set => modDisplay.Current = value;
+        }
 
+        private readonly FooterModDisplay modDisplay;
+
+        public FooterButtonMods()
+        {
             Add(new Container
             {
                 Anchor = Anchor.CentreLeft,
@@ -33,9 +40,6 @@ namespace osu.Game.Screens.Select
                 AutoSizeAxes = Axes.Both,
                 Margin = new MarginPadding { Left = 70 }
             });
-
-            if (mods != null)
-                modDisplay.Current = mods;
         }
 
         [BackgroundDependencyLoader]

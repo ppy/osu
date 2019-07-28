@@ -39,21 +39,30 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                 Spacing = new Vector2(10, 0),
                 Children = new Drawable[]
                 {
-                    rankText = new OsuSpriteText
+                    new FillFlowContainer
                     {
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
-                        Text = "#1",
-                        Font = OsuFont.GetFont(size: 30, weight: FontWeight.Bold, italics: true)
+                        AutoSizeAxes = Axes.Both,
+                        Direction = FillDirection.Vertical,
+                        Children = new Drawable[]
+                        {
+                            rankText = new OsuSpriteText
+                            {
+                                Anchor = Anchor.Centre,
+                                Origin = Anchor.Centre,
+                                Font = OsuFont.GetFont(size: 24, weight: FontWeight.Bold, italics: true)
+                            },
+                            rank = new UpdateableRank(ScoreRank.D)
+                            {
+                                Anchor = Anchor.Centre,
+                                Origin = Anchor.Centre,
+                                Size = new Vector2(40),
+                                FillMode = FillMode.Fit,
+                            },
+                        }
                     },
-                    rank = new UpdateableRank(ScoreRank.D)
-                    {
-                        Anchor = Anchor.Centre,
-                        Origin = Anchor.Centre,
-                        Size = new Vector2(40),
-                        FillMode = FillMode.Fit,
-                    },
-                    avatar = new UpdateableAvatar(hideImmediately: true)
+                    avatar = new UpdateableAvatar
                     {
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
@@ -90,7 +99,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                                 Origin = Anchor.CentreLeft,
                                 Font = OsuFont.GetFont(size: 15, weight: FontWeight.Bold)
                             },
-                            flag = new UpdateableFlag(hideImmediately: true)
+                            flag = new UpdateableFlag
                             {
                                 Anchor = Anchor.CentreLeft,
                                 Origin = Anchor.CentreLeft,
@@ -107,6 +116,11 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
         private void load(OsuColour colours)
         {
             rankText.Colour = colours.Yellow;
+        }
+
+        public int ScorePosition
+        {
+            set => rankText.Text = $"#{value}";
         }
 
         /// <summary>

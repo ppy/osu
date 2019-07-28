@@ -70,7 +70,7 @@ namespace osu.Game.Rulesets.Mania.Tests
                 AutoSizeAxes = Axes.Both,
                 Child = new NoteContainer(direction, $"note {identifier}, scrolling {direction.ToString().ToLowerInvariant()}")
                 {
-                    Child = hitObject = new DrawableNote(note) { AccentColour = Color4.OrangeRed }
+                    Child = hitObject = new DrawableNote(note) { AccentColour = { Value = Color4.OrangeRed } }
                 }
             };
         }
@@ -88,7 +88,7 @@ namespace osu.Game.Rulesets.Mania.Tests
                     Child = hitObject = new DrawableHoldNote(note)
                     {
                         RelativeSizeAxes = Axes.Both,
-                        AccentColour = Color4.OrangeRed,
+                        AccentColour = { Value = Color4.OrangeRed },
                     }
                 }
             };
