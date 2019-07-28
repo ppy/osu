@@ -21,7 +21,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         };
 
         private readonly BreakOverlay breakOverlay, manualBreakOverlay;
-        private readonly ManualClock manualClock = new ManualClock();
+        private readonly ManualClock manualClock;
 
         private readonly IReadOnlyList<BreakPeriod> testBreaks = new List<BreakPeriod>
         {
@@ -43,7 +43,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             Add(manualBreakOverlay = new BreakOverlay(true)
             {
                 Alpha = 0,
-                Clock = new FramedClock(manualClock),
+                Clock = new FramedClock(manualClock = new ManualClock()),
             });
         }
 
@@ -94,8 +94,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             loadClockStep(true);
             loadBreaksStep("multiple breaks", testBreaks);
 
-            var b = testBreaks.Last();
-            addBreakSeeks(b, false);
+            addBreakSeeks(testBreaks.Last(), false);
         }
 
         private void addShowBreakStep(double seconds)
