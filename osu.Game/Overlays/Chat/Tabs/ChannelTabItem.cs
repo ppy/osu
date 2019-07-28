@@ -205,10 +205,7 @@ namespace osu.Game.Overlays.Chat.Tabs
             box.FadeColour(BackgroundActive, TRANSITION_LENGTH, Easing.OutQuint);
             highlightBox.FadeIn(TRANSITION_LENGTH, Easing.OutQuint);
 
-            if (IsBoldWhenActive)
-            {
-                Text.Font = Text.Font.With(weight: FontWeight.Bold);
-            }
+            if (IsBoldWhenActive) Text.Font = Text.Font.With(weight: FontWeight.Bold);
         }
 
         protected virtual void FadeInactive()
