@@ -416,16 +416,9 @@ namespace osu.Game
                                     screenStack.Exit();
                             }
                         },
-                        new Container
-                        {
-                            RelativeSizeAxes = Axes.Both,
-                            Children = new[]
-                            {
-                                screenStack = new OsuScreenStack { RelativeSizeAxes = Axes.Both },
-                                backButton.CreateProxy(),
-                                logoContainer = new Container { RelativeSizeAxes = Axes.Both },
-                            }
-                        }
+                        screenStack = new OsuScreenStack { RelativeSizeAxes = Axes.Both },
+                        backButton.CreateProxy(),
+                        logoContainer = new Container { RelativeSizeAxes = Axes.Both },
                     }
                 },
                 overlayContent = new Container { RelativeSizeAxes = Axes.Both },
