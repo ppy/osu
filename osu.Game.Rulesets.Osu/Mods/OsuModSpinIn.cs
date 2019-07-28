@@ -24,7 +24,9 @@ namespace osu.Game.Rulesets.Osu.Mods
         public override ModType Type => ModType.Fun;
         public override string Description => "Circles spin in. No approach circles.";
         public override double ScoreMultiplier => 1;
-        public override Type[] IncompatibleMods => new[] { typeof(OsuModHidden) };
+
+        // todo: this mod should be able to be compatible with hidden with a bit of further implementation.
+        public override Type[] IncompatibleMods => new[] { typeof(OsuModeObjectScaleTween), typeof(OsuModHidden) };
 
         private const int rotate_offset = 360;
         private const float rotate_starting_width = 2;
