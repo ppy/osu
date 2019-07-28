@@ -5,7 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
-using osu.Framework.Graphics;
+using osu.Framework.Bindables;
 using osu.Framework.Timing;
 using osu.Game.Beatmaps.Timing;
 using osu.Game.Screens.Play;
@@ -20,8 +20,9 @@ namespace osu.Game.Tests.Visual.Gameplay
             typeof(BreakOverlay),
         };
 
-        private readonly BreakOverlay breakOverlay, manualBreakOverlay;
         private readonly ManualClock manualClock;
+        private readonly BreakOverlay breakOverlay;
+        private readonly TestBreakOverlay manualBreakOverlay;
 
         private readonly IReadOnlyList<BreakPeriod> testBreaks = new List<BreakPeriod>
         {
@@ -40,7 +41,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         public TestSceneBreakOverlay()
         {
             Add(breakOverlay = new BreakOverlay(true));
-            Add(manualBreakOverlay = new BreakOverlay(true)
+            Add(manualBreakOverlay = new TestBreakOverlay(true)
             {
                 Alpha = 0,
                 Clock = new FramedClock(manualClock = new ManualClock()),
@@ -146,6 +147,25 @@ namespace osu.Game.Tests.Visual.Gameplay
         {
             AddStep(seekStepDescription, () => manualClock.CurrentTime = time);
             AddAssert($"is{(!onBreak ? " not " : " ")}break time", () => manualBreakOverlay.IsBreakTime.Value == onBreak);
+        }
+
+        private class TestBreakOverlay : BreakOverlay
+        {
+            public new IBindable<bool> IsBreakTime
+            {
+                get
+                {
+                    // Manually call the update function as it might take up to 2 frames for an automatic update to happen
+                    Update();
+
+                    return base.IsBreakTime;
+                }
+            }
+
+            public TestBreakOverlay(bool letterboxing)
+                : base(letterboxing)
+            {
+            }
         }
     }
 }
