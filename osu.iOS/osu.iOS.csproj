@@ -19,12 +19,6 @@
   <ItemGroup>
     <None Include="Info.plist" />
     <None Include="Entitlements.plist" />
-    <None Include="libbass_fx.a">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="libbass.a">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Application.cs" />
@@ -81,6 +75,13 @@
     <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\iPhoneSettings3x.png" />
     <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\iPhoneSpotlight2x.png" />
     <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\iPhoneSpotlight3x.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <NativeReference Include="lib\*.a">
+      <Kind>Static</Kind>
+      <SmartLink>False</SmartLink>
+      <ForceLoad>True</ForceLoad>
+    </NativeReference>
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\iOS\Xamarin.iOS.CSharp.targets" />
   <Import Project="..\packages\NETStandard.Library.2.0.0\build\netstandard2.0\NETStandard.Library.targets" Condition="Exists('..\packages\NETStandard.Library.2.0.0\build\netstandard2.0\NETStandard.Library.targets')" />

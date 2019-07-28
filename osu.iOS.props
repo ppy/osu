@@ -3,7 +3,8 @@
     <ProjectTypeGuids>{FEACFBD2-3405-455C-9665-78FE426C6842};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <IPhoneResourcePrefix>Resources</IPhoneResourcePrefix>
     <RestoreProjectStyle>PackageReference</RestoreProjectStyle>
-    <DefaultMtouchExtraArgs>--nolinkaway -gcc_flags "-lstdc++ -framework AudioToolbox -framework SystemConfiguration -framework CFNetwork -framework Accelerate</DefaultMtouchExtraArgs>
+    <DefaultMtouchExtraArgs>--nolinkaway</DefaultMtouchExtraArgs>
+    <DefaultMtouchGccFlags>-lstdc++ -framework AudioToolbox -framework SystemConfiguration -framework CFNetwork -framework Accelerate</DefaultMtouchGccFlags>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|iPhoneSimulator' ">
     <DebugSymbols>true</DebugSymbols>
@@ -24,7 +25,7 @@
     <DeviceSpecificBuild>false</DeviceSpecificBuild>
     <MtouchVerbosity></MtouchVerbosity>
     <LangVersion>Default</LangVersion>
-    <MtouchExtraArgs>$(DefaultMtouchExtraArgs) -force_load $(OutputPath)\libbass.a -force_load $(OutputPath)\libbass_fx.a"</MtouchExtraArgs>
+    <MtouchExtraArgs>$(DefaultMtouchExtraArgs) -gcc_flags "$(DefaultMtouchGccFlags)"</MtouchExtraArgs>
     <OptimizePNGs>false</OptimizePNGs>
     <MtouchI18n>cjk,mideast,other,rare,west</MtouchI18n>
   </PropertyGroup>
@@ -44,7 +45,7 @@
     <MtouchHttpClientHandler>NSUrlSessionHandler</MtouchHttpClientHandler>
     <MtouchVerbosity></MtouchVerbosity>
     <LangVersion>Default</LangVersion>
-    <MtouchExtraArgs>$(DefaultMtouchExtraArgs) -force_load $(OutputPath)\libbass.a -force_load $(OutputPath)\libbass_fx.a"</MtouchExtraArgs>
+    <MtouchExtraArgs>$(DefaultMtouchExtraArgs) -gcc_flags "$(DefaultMtouchGccFlags)"</MtouchExtraArgs>
     <OptimizePNGs>false</OptimizePNGs>
     <MtouchI18n>cjk,mideast,other,rare,west</MtouchI18n>
   </PropertyGroup>
@@ -62,7 +63,7 @@
     <MtouchHttpClientHandler>NSUrlSessionHandler</MtouchHttpClientHandler>
     <MtouchVerbosity></MtouchVerbosity>
     <LangVersion>Default</LangVersion>
-    <MtouchExtraArgs>$(DefaultMtouchExtraArgs) -force_load $(OutputPath)\libbass.a -force_load $(OutputPath)\libbass_fx.a"</MtouchExtraArgs>
+    <MtouchExtraArgs>$(DefaultMtouchExtraArgs) -gcc_flags "$(DefaultMtouchGccFlags)"</MtouchExtraArgs>
     <OptimizePNGs>false</OptimizePNGs>
     <MtouchI18n>cjk,mideast,other,rare,west</MtouchI18n>
   </PropertyGroup>
@@ -86,7 +87,7 @@
     <MtouchHttpClientHandler>NSUrlSessionHandler</MtouchHttpClientHandler>
     <MtouchVerbosity></MtouchVerbosity>
     <LangVersion>Default</LangVersion>
-    <MtouchExtraArgs>$(DefaultMtouchExtraArgs) -force_load $(OutputPath)\libbass.a -force_load $(OutputPath)\libbass_fx.a"</MtouchExtraArgs>
+    <MtouchExtraArgs>$(DefaultMtouchExtraArgs) -gcc_flags "$(DefaultMtouchGccFlags)"</MtouchExtraArgs>
     <OptimizePNGs>false</OptimizePNGs>
     <MtouchI18n>cjk,mideast,other,rare,west</MtouchI18n>
   </PropertyGroup>

@@ -4,7 +4,6 @@
 using System.Threading.Tasks;
 using Foundation;
 using osu.Framework.iOS;
-using osu.Game;
 using UIKit;
 
 namespace osu.iOS
