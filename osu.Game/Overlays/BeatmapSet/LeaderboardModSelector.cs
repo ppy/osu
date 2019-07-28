@@ -22,8 +22,8 @@ namespace osu.Game.Overlays.BeatmapSet
     public class LeaderboardModSelector : Container
     {
         public readonly Bindable<IEnumerable<Mod>> SelectedMods = new Bindable<IEnumerable<Mod>>();
+        public readonly Bindable<RulesetInfo> Ruleset = new Bindable<RulesetInfo>();
 
-        private RulesetInfo ruleset = new RulesetInfo();
         private readonly FillFlowContainer<ModButton> modsContainer;
 
         public LeaderboardModSelector()
@@ -38,32 +38,22 @@ namespace osu.Game.Overlays.BeatmapSet
                 Direction = FillDirection.Full,
                 Spacing = new Vector2(4),
             };
+
+            Ruleset.BindValueChanged(onRulesetChanged);
         }
 
-        public void ResetRuleset(RulesetInfo ruleset)
+        private void onRulesetChanged(ValueChangedEvent<RulesetInfo> ruleset)
         {
             SelectedMods.Value = new List<Mod>();
 
-            if (ruleset is null)
-            {
-                this.ruleset = null;
-                modsContainer.Clear();
-                return;
-            }
-
-            if (this.ruleset?.Equals(ruleset) ?? false)
-            {
-                deselectAll();
-                return;
-            }
-
-            this.ruleset = ruleset;
-
             modsContainer.Clear();
+
+            if (ruleset.NewValue == null)
+                return;
 
             modsContainer.Add(new ModButton(new NoMod()));
 
-            foreach (var mod in ruleset.CreateInstance().GetAllMods())
+            foreach (var mod in ruleset.NewValue.CreateInstance().GetAllMods())
                 if (mod.Ranked)
                     modsContainer.Add(new ModButton(mod));
 
@@ -83,7 +73,7 @@ namespace osu.Game.Overlays.BeatmapSet
             SelectedMods.Value = mods;
         }
 
-        private void deselectAll() => modsContainer.ForEach(mod => mod.Selected.Value = false);
+        public void DeselectAll() => modsContainer.ForEach(mod => mod.Selected.Value = false);
 
         private class ModButton : ModIcon
         {
@@ -93,31 +83,28 @@ namespace osu.Game.Overlays.BeatmapSet
             public readonly BindableBool Selected = new BindableBool();
             public Action<Mod, bool> OnSelectionChanged;
 
-            private readonly Mod mod;
-
             public ModButton(Mod mod)
                 : base(mod)
             {
-                this.mod = mod;
-
                 Scale = new Vector2(mod_scale);
                 Add(new HoverClickSounds());
 
-                Selected.BindValueChanged(_ => updateState(), true);
+                Selected.BindValueChanged(selected =>
+                {
+                    updateState();
+                    OnSelectionChanged?.Invoke(mod, selected.NewValue);
+                }, true);
             }
 
             protected override bool OnClick(ClickEvent e)
             {
                 Selected.Value = !Selected.Value;
-                OnSelectionChanged?.Invoke(mod, Selected.Value);
-
                 return base.OnClick(e);
             }
 
             protected override bool OnHover(HoverEvent e)
             {
                 updateState();
-
                 return base.OnHover(e);
             }
 

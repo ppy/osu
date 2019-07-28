@@ -49,10 +49,11 @@ namespace osu.Game.Tests.Visual.Online
                     });
             });
 
-            AddStep("osu mods", () => modSelector.ResetRuleset(new OsuRuleset().RulesetInfo));
-            AddStep("mania mods", () => modSelector.ResetRuleset(new ManiaRuleset().RulesetInfo));
-            AddStep("taiko mods", () => modSelector.ResetRuleset(new TaikoRuleset().RulesetInfo));
-            AddStep("catch mods", () => modSelector.ResetRuleset(new CatchRuleset().RulesetInfo));
+            AddStep("osu mods", () => modSelector.Ruleset.Value = new OsuRuleset().RulesetInfo);
+            AddStep("mania mods", () => modSelector.Ruleset.Value = new ManiaRuleset().RulesetInfo);
+            AddStep("taiko mods", () => modSelector.Ruleset.Value = new TaikoRuleset().RulesetInfo);
+            AddStep("catch mods", () => modSelector.Ruleset.Value = new CatchRuleset().RulesetInfo);
+            AddStep("Deselect all", () => modSelector.DeselectAll());
         }
     }
 }

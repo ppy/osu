@@ -17,6 +17,7 @@ using osu.Game.Screens.Select.Leaderboards;
 using osu.Framework.Bindables;
 using System.Collections.Generic;
 using osu.Game.Rulesets.Mods;
+using osu.Game.Rulesets;
 
 namespace osu.Game.Overlays.BeatmapSet.Scores
 {
@@ -25,6 +26,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
         private const int spacing = 15;
 
         public readonly Bindable<BeatmapInfo> Beatmap = new Bindable<BeatmapInfo>();
+        private readonly Bindable<RulesetInfo> ruleset = new Bindable<RulesetInfo>();
 
         private readonly Box background;
         private readonly ScoreTable scoreTable;
@@ -87,7 +89,10 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                     Children = new Drawable[]
                     {
                         scopeSelector = new LeaderboardScopeSelector(),
-                        modSelector = new LeaderboardModSelector(),
+                        modSelector = new LeaderboardModSelector
+                        {
+                            Ruleset = { BindTarget = ruleset }
+                        },
                         new Container
                         {
                             AutoSizeAxes = Axes.Y,
@@ -134,7 +139,13 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
             Beatmap.BindValueChanged(beatmap =>
             {
                 scopeSelector.Current.Value = BeatmapLeaderboardScope.Global;
-                modSelector.ResetRuleset(beatmap.NewValue?.Ruleset);
+
+                var beatmapRuleset = beatmap.NewValue?.Ruleset;
+
+                if (modSelector.Ruleset.Value?.Equals(beatmapRuleset) ?? false)
+                    modSelector.DeselectAll();
+                else
+                    ruleset.Value = beatmapRuleset;
 
                 getScores();
             });
