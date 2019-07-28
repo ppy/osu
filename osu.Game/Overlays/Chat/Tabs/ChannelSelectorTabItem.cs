@@ -24,6 +24,7 @@ namespace osu.Game.Overlays.Chat.Tabs
             Icon.Alpha = 0;
 
             Text.Font = Text.Font.With(size: 45);
+            Text.Truncate = false;
         }
 
         [BackgroundDependencyLoader]

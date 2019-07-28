@@ -87,12 +87,16 @@ namespace osu.Game.Overlays.Chat.Tabs
                         },
                         Text = new OsuSpriteText
                         {
-                            Margin = new MarginPadding(5),
                             Origin = Anchor.CentreLeft,
                             Anchor = Anchor.CentreLeft,
                             Text = value.ToString(),
                             Font = OsuFont.GetFont(size: 18),
-                            Width = 115f,
+                            Padding = new MarginPadding(5)
+                            {
+                                Left = LeftTextPadding,
+                                Right = RightTextPadding,
+                            },
+                            RelativeSizeAxes = Axes.X,
                             Truncate = true,
                         },
                         CloseButton = new TabCloseButton
@@ -110,6 +114,10 @@ namespace osu.Game.Overlays.Chat.Tabs
                 },
             };
         }
+
+        protected virtual float LeftTextPadding => 5;
+
+        protected virtual float RightTextPadding => IsRemovable ? 40 : 5;
 
         protected virtual IconUsage DisplayIcon => FontAwesome.Solid.Hashtag;
 
