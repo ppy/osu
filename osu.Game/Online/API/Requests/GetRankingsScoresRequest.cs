@@ -8,13 +8,13 @@ using System.Collections.Generic;
 
 namespace osu.Game.Online.API.Requests
 {
-    public class GetRankingsPerformanceRequest : APIRequest<List<APIUserRankings>>
+    public class GetRankingsScoresRequest : APIRequest<List<APIUserRankings>>
     {
         private readonly RulesetInfo ruleset;
         private readonly int page;
         private readonly string country;
 
-        public GetRankingsPerformanceRequest(RulesetInfo ruleset, int page = 0, string country = null)
+        public GetRankingsScoresRequest(RulesetInfo ruleset, int page = 0, string country = null)
         {
             this.ruleset = ruleset;
             this.page = page;
@@ -33,6 +33,6 @@ namespace osu.Game.Online.API.Requests
             return req;
         }
 
-        protected override string Target => $"rankings/{ruleset.ShortName}/performance";
+        protected override string Target => $"rankings/{ruleset.ShortName}/score";
     }
 }

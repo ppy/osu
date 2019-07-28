@@ -6,7 +6,7 @@ using osu.Game.Users;
 
 namespace osu.Game.Online.API.Requests.Responses
 {
-    public class APIUserPerformanceRankings : UserStatistics
+    public class APIUserRankings : UserStatistics
     {
         [JsonProperty]
         public User User;
