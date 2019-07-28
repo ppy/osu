@@ -8,14 +8,16 @@ using System.Collections.Generic;
 
 namespace osu.Game.Online.API.Requests
 {
-    public class GetRankingsScoresRequest : APIRequest<List<APIUserRankings>>
+    public class GetUserRankingsRequest : APIRequest<List<APIUserRankings>>
     {
         private readonly RulesetInfo ruleset;
         private readonly int page;
         private readonly string country;
+        private readonly UserRankingsType type;
 
-        public GetRankingsScoresRequest(RulesetInfo ruleset, int page = 0, string country = null)
+        public GetUserRankingsRequest(RulesetInfo ruleset, UserRankingsType type = UserRankingsType.Performance, int page = 0, string country = null)
         {
+            this.type = type;
             this.ruleset = ruleset;
             this.page = page;
             this.country = country;
@@ -33,6 +35,12 @@ namespace osu.Game.Online.API.Requests
             return req;
         }
 
-        protected override string Target => $"rankings/{ruleset.ShortName}/score";
+        protected override string Target => $"rankings/{ruleset.ShortName}/{type.ToString().ToLowerInvariant()}";
+    }
+
+    public enum UserRankingsType
+    {
+        Performance,
+        Score
     }
 }

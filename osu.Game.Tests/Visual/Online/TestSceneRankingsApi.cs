@@ -13,6 +13,7 @@ using System.Collections.Generic;
 using osu.Game.Rulesets.Mania;
 using osu.Game.Rulesets.Taiko;
 using osu.Game.Rulesets.Catch;
+using System;
 
 namespace osu.Game.Tests.Visual.Online
 {
@@ -22,8 +23,7 @@ namespace osu.Game.Tests.Visual.Online
         private IAPIProvider api { get; set; }
 
         private readonly FillFlowContainer usersContainer;
-        private GetRankingsPerformanceRequest performanceRequest;
-        private GetRankingsScoresRequest scoresRequest;
+        private GetUserRankingsRequest request;
 
         public TestSceneRankingsApi()
         {
@@ -42,65 +42,58 @@ namespace osu.Game.Tests.Visual.Online
 
             AddStep("Get osu performance", () =>
             {
-                scoresRequest?.Cancel();
-                performanceRequest?.Cancel();
-                performanceRequest = new GetRankingsPerformanceRequest(new OsuRuleset().RulesetInfo);
-                performanceRequest.Success += updatePerformanceRankings;
-                api.Queue(performanceRequest);
+                request?.Cancel();
+                request = new GetUserRankingsRequest(new OsuRuleset().RulesetInfo);
+                request.Success += updatePerformanceRankings;
+                api.Queue(request);
             });
 
             AddStep("Get USA osu performance", () =>
             {
-                scoresRequest?.Cancel();
-                performanceRequest?.Cancel();
-                performanceRequest = new GetRankingsPerformanceRequest(new OsuRuleset().RulesetInfo, country: "US");
-                performanceRequest.Success += updatePerformanceRankings;
-                api.Queue(performanceRequest);
+                request?.Cancel();
+                request = new GetUserRankingsRequest(new OsuRuleset().RulesetInfo, country: "US");
+                request.Success += updatePerformanceRankings;
+                api.Queue(request);
             });
 
             AddStep("Get osu performance page 100", () =>
             {
-                scoresRequest?.Cancel();
-                performanceRequest?.Cancel();
-                performanceRequest = new GetRankingsPerformanceRequest(new OsuRuleset().RulesetInfo, 100);
-                performanceRequest.Success += updatePerformanceRankings;
-                api.Queue(performanceRequest);
+                request?.Cancel();
+                request = new GetUserRankingsRequest(new OsuRuleset().RulesetInfo, page: 100);
+                request.Success += updatePerformanceRankings;
+                api.Queue(request);
             });
 
             AddStep("Get mania performance", () =>
             {
-                scoresRequest?.Cancel();
-                performanceRequest?.Cancel();
-                performanceRequest = new GetRankingsPerformanceRequest(new ManiaRuleset().RulesetInfo);
-                performanceRequest.Success += updatePerformanceRankings;
-                api.Queue(performanceRequest);
+                request?.Cancel();
+                request = new GetUserRankingsRequest(new ManiaRuleset().RulesetInfo);
+                request.Success += updatePerformanceRankings;
+                api.Queue(request);
             });
 
             AddStep("Get taiko performance", () =>
             {
-                scoresRequest?.Cancel();
-                performanceRequest?.Cancel();
-                performanceRequest = new GetRankingsPerformanceRequest(new TaikoRuleset().RulesetInfo);
-                performanceRequest.Success += updatePerformanceRankings;
-                api.Queue(performanceRequest);
+                request?.Cancel();
+                request = new GetUserRankingsRequest(new TaikoRuleset().RulesetInfo);
+                request.Success += updatePerformanceRankings;
+                api.Queue(request);
             });
 
             AddStep("Get catch performance", () =>
             {
-                scoresRequest?.Cancel();
-                performanceRequest?.Cancel();
-                performanceRequest = new GetRankingsPerformanceRequest(new CatchRuleset().RulesetInfo);
-                performanceRequest.Success += updatePerformanceRankings;
-                api.Queue(performanceRequest);
+                request?.Cancel();
+                request = new GetUserRankingsRequest(new CatchRuleset().RulesetInfo);
+                request.Success += updatePerformanceRankings;
+                api.Queue(request);
             });
 
             AddStep("Get mania scores for BY", () =>
             {
-                scoresRequest?.Cancel();
-                performanceRequest?.Cancel();
-                scoresRequest = new GetRankingsScoresRequest(new ManiaRuleset().RulesetInfo, country: "BY");
-                scoresRequest.Success += updateScoreRankings;
-                api.Queue(scoresRequest);
+                request?.Cancel();
+                request = new GetUserRankingsRequest(new ManiaRuleset().RulesetInfo, UserRankingsType.Score, country: "BY");
+                request.Success += updateScoreRankings;
+                api.Queue(request);
             });
         }
 
