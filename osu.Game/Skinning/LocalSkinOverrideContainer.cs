@@ -34,7 +34,7 @@ namespace osu.Game.Skinning
         public Drawable GetDrawableComponent(string componentName)
         {
             Drawable sourceDrawable;
-            if (beatmapSkins.Value && (sourceDrawable = skin.GetDrawableComponent(componentName)) != null)
+            if (beatmapSkins.Value && (sourceDrawable = skin?.GetDrawableComponent(componentName)) != null)
                 return sourceDrawable;
 
             return fallbackSource?.GetDrawableComponent(componentName);
@@ -43,7 +43,7 @@ namespace osu.Game.Skinning
         public Texture GetTexture(string componentName)
         {
             Texture sourceTexture;
-            if (beatmapSkins.Value && (sourceTexture = skin.GetTexture(componentName)) != null)
+            if (beatmapSkins.Value && (sourceTexture = skin?.GetTexture(componentName)) != null)
                 return sourceTexture;
 
             return fallbackSource.GetTexture(componentName);
@@ -52,7 +52,7 @@ namespace osu.Game.Skinning
         public SampleChannel GetSample(string sampleName)
         {
             SampleChannel sourceChannel;
-            if (beatmapHitsounds.Value && (sourceChannel = skin.GetSample(sampleName)) != null)
+            if (beatmapHitsounds.Value && (sourceChannel = skin?.GetSample(sampleName)) != null)
                 return sourceChannel;
 
             return fallbackSource?.GetSample(sampleName);

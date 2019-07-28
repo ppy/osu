@@ -51,7 +51,6 @@ namespace osu.Game.Online.Leaderboards
 
                 loading.Hide();
 
-                // schedule because we may not be loaded yet (LoadComponentAsync complains).
                 showScoresDelegate?.Cancel();
                 showScoresCancellationSource?.Cancel();
 
@@ -61,28 +60,22 @@ namespace osu.Game.Online.Leaderboards
                 // ensure placeholder is hidden when displaying scores
                 PlaceholderState = PlaceholderState.Successful;
 
-                scrollFlow = CreateScoreFlow();
-                scrollFlow.ChildrenEnumerable = scores.Select((s, index) => CreateDrawableScore(s, index + 1));
+                var sf = CreateScoreFlow();
+                sf.ChildrenEnumerable = scores.Select((s, index) => CreateDrawableScore(s, index + 1));
 
-                if (!IsLoaded)
-                    showScoresDelegate = Schedule(showScores);
-                else
-                    showScores();
-
-                void showScores() => LoadComponentAsync(scrollFlow, _ =>
+                // schedule because we may not be loaded yet (LoadComponentAsync complains).
+                showScoresDelegate = Schedule(() => LoadComponentAsync(sf, _ =>
                 {
-                    scrollContainer.Add(scrollFlow);
+                    scrollContainer.Add(scrollFlow = sf);
 
                     int i = 0;
 
                     foreach (var s in scrollFlow.Children)
-                    {
                         using (s.BeginDelayedSequence(i++ * 50, true))
                             s.Show();
-                    }
 
                     scrollContainer.ScrollTo(0f, false);
-                }, (showScoresCancellationSource = new CancellationTokenSource()).Token);
+                }, (showScoresCancellationSource = new CancellationTokenSource()).Token));
             }
         }
 
@@ -201,10 +194,19 @@ namespace osu.Game.Online.Leaderboards
 
         private APIRequest getScoresRequest;
 
+        protected abstract bool IsOnlineScope { get; }
+
         public void APIStateChanged(IAPIProvider api, APIState state)
         {
-            if (state == APIState.Online)
-                UpdateScores();
+            switch (state)
+            {
+                case APIState.Online:
+                case APIState.Offline:
+                    if (IsOnlineScope)
+                        UpdateScores();
+
+                    break;
+            }
         }
 
         protected void UpdateScores()

@@ -50,7 +50,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             {
                 Body = new SnakingSliderBody(s)
                 {
-                    PathRadius = s.Scale * 64,
+                    PathRadius = s.Scale * OsuHitObject.OBJECT_RADIUS,
                 },
                 ticks = new Container<DrawableSliderTick> { RelativeSizeAxes = Axes.Both },
                 repeatPoints = new Container<DrawableRepeatPoint> { RelativeSizeAxes = Axes.Both },
@@ -114,20 +114,15 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             pathBindable.BindTo(slider.PathBindable);
 
             pathBindable.BindValueChanged(_ => Body.Refresh());
-        }
 
-        public override Color4 AccentColour
-        {
-            get => base.AccentColour;
-            set
+            AccentColour.BindValueChanged(colour =>
             {
-                base.AccentColour = value;
-                Body.AccentColour = AccentColour;
-                Ball.AccentColour = AccentColour;
+                Body.AccentColour = colour.NewValue;
+                Ball.AccentColour = colour.NewValue;
 
                 foreach (var drawableHitObject in NestedHitObjects)
-                    drawableHitObject.AccentColour = AccentColour;
-            }
+                    drawableHitObject.AccentColour.Value = colour.NewValue;
+            }, true);
         }
 
         public readonly Bindable<bool> Tracking = new Bindable<bool>();
@@ -156,14 +151,20 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             }
         }
 
+        public override void OnKilled()
+        {
+            base.OnKilled();
+            Body.RecyclePath();
+        }
+
         protected override void SkinChanged(ISkinSource skin, bool allowFallback)
         {
             base.SkinChanged(skin, allowFallback);
 
             Body.BorderSize = skin.GetValue<SkinConfiguration, float?>(s => s.SliderBorderSize) ?? SliderBody.DEFAULT_BORDER_SIZE;
-            Body.AccentColour = skin.GetValue<SkinConfiguration, Color4?>(s => s.CustomColours.ContainsKey("SliderTrackOverride") ? s.CustomColours["SliderTrackOverride"] : (Color4?)null) ?? AccentColour;
+            Body.AccentColour = skin.GetValue<SkinConfiguration, Color4?>(s => s.CustomColours.ContainsKey("SliderTrackOverride") ? s.CustomColours["SliderTrackOverride"] : (Color4?)null) ?? AccentColour.Value;
             Body.BorderColour = skin.GetValue<SkinConfiguration, Color4?>(s => s.CustomColours.ContainsKey("SliderBorder") ? s.CustomColours["SliderBorder"] : (Color4?)null) ?? Color4.White;
-            Ball.AccentColour = skin.GetValue<SkinConfiguration, Color4?>(s => s.CustomColours.ContainsKey("SliderBall") ? s.CustomColours["SliderBall"] : (Color4?)null) ?? AccentColour;
+            Ball.AccentColour = skin.GetValue<SkinConfiguration, Color4?>(s => s.CustomColours.ContainsKey("SliderBall") ? s.CustomColours["SliderBall"] : (Color4?)null) ?? AccentColour.Value;
         }
 
         protected override void CheckForResult(bool userTriggered, double timeOffset)
@@ -189,7 +190,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             });
         }
 
-        protected override void UpdateCurrentState(ArmedState state)
+        protected override void UpdateStateTransforms(ArmedState state)
         {
             Ball.FadeIn();
             Ball.ScaleTo(HitObject.Scale);

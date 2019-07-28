@@ -35,15 +35,15 @@ namespace osu.Game.Beatmaps.Drawables
         protected override DelayedLoadWrapper CreateDelayedLoadWrapper(Func<Drawable> createContentFunc, double timeBeforeLoad)
             => new DelayedLoadUnloadWrapper(createContentFunc, timeBeforeLoad, UnloadDelay);
 
+        protected override double TransformDuration => 400;
+
         protected override Drawable CreateDrawable(BeatmapInfo model)
         {
-            Drawable drawable = getDrawableForModel(model);
-
+            var drawable = getDrawableForModel(model);
             drawable.RelativeSizeAxes = Axes.Both;
             drawable.Anchor = Anchor.Centre;
             drawable.Origin = Anchor.Centre;
             drawable.FillMode = FillMode.Fill;
-            drawable.OnLoadComplete += d => d.FadeInFromZero(400);
 
             return drawable;
         }
