@@ -37,7 +37,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                 {
                     RelativeSizeAxes = Axes.Both,
                     Icon = FontAwesome.Solid.ChevronRight
-                }, restrictSize: false)
+                })
             };
         }
 
