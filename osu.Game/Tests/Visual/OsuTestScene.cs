@@ -15,6 +15,7 @@ using osu.Framework.Platform;
 using osu.Framework.Testing;
 using osu.Framework.Timing;
 using osu.Game.Beatmaps;
+using osu.Game.Database;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Tests.Beatmaps;
@@ -43,6 +44,9 @@ namespace osu.Game.Tests.Visual
         private readonly Lazy<Storage> localStorage;
         protected Storage LocalStorage => localStorage.Value;
 
+        private readonly Lazy<DatabaseContextFactory> contextFactory;
+        protected DatabaseContextFactory ContextFactory => contextFactory.Value;
+
         protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
         {
             // This is the earliest we can get OsuGameBase, which is used by the dummy working beatmap to find textures
@@ -59,6 +63,14 @@ namespace osu.Game.Tests.Visual
         protected OsuTestScene()
         {
             localStorage = new Lazy<Storage>(() => new NativeStorage($"{GetType().Name}-{Guid.NewGuid()}"));
+            contextFactory = new Lazy<DatabaseContextFactory>(() =>
+            {
+                var factory = new DatabaseContextFactory(LocalStorage);
+                factory.ResetDatabase();
+                using (var usage = factory.Get())
+                    usage.Migrate();
+                return factory;
+            });
         }
 
         [Resolved]
@@ -84,6 +96,9 @@ namespace osu.Game.Tests.Visual
 
             if (beatmap?.Value.TrackLoaded == true)
                 beatmap.Value.Track.Stop();
+
+            if (contextFactory.IsValueCreated)
+                contextFactory.Value.ResetDatabase();
 
             if (localStorage.IsValueCreated)
             {
