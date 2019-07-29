@@ -45,7 +45,7 @@ namespace osu.Game.Tests.Visual.Menus
             AddUntilStep("wait for load", () => osuGame.IsLoaded);
             AddUntilStep("wait for main menu", () =>
             {
-                var current = osuGame.ScreenStack?.CurrentScreen;
+                var current = osuGame.ScreenStack.CurrentScreen;
 
                 switch (current)
                 {
@@ -69,7 +69,7 @@ namespace osu.Game.Tests.Visual.Menus
         {
             TestSongSelect songSelect = null;
 
-            AddStep("Push songselect", () => osuGame.ScreenStack.Push(songSelect = new TestSongSelect()));
+            AddStep("Push song select", () => osuGame.ScreenStack.Push(songSelect = new TestSongSelect()));
             AddUntilStep("Wait for song select", () => songSelect.IsCurrentScreen());
             AddStep("Show mods overlay", () => songSelect.ModSelectOverlay.Show());
             AddAssert("Overlay was shown", () => songSelect.ModSelectOverlay.State.Value == Visibility.Visible);
@@ -83,7 +83,7 @@ namespace osu.Game.Tests.Visual.Menus
         {
             TestSongSelect songSelect = null;
 
-            AddStep("Push songselect", () => osuGame.ScreenStack.Push(songSelect = new TestSongSelect()));
+            AddStep("Push song select", () => osuGame.ScreenStack.Push(songSelect = new TestSongSelect()));
             AddUntilStep("Wait for song select", () => songSelect.IsCurrentScreen());
             AddStep("Show mods overlay", () => songSelect.ModSelectOverlay.Show());
             AddAssert("Overlay was shown", () => songSelect.ModSelectOverlay.State.Value == Visibility.Visible);
@@ -102,8 +102,8 @@ namespace osu.Game.Tests.Visual.Menus
         {
             Screens.Multi.Multiplayer multiplayer = null;
 
-            AddStep("Push songselect", () => osuGame.ScreenStack.Push(multiplayer = new Screens.Multi.Multiplayer()));
-            AddUntilStep("Wait for song select", () => multiplayer.IsCurrentScreen());
+            AddStep("Push multiplayer", () => osuGame.ScreenStack.Push(multiplayer = new Screens.Multi.Multiplayer()));
+            AddUntilStep("Wait for multiplayer", () => multiplayer.IsCurrentScreen());
             exitViaEscapeAndConfirm();
         }
 
@@ -112,8 +112,8 @@ namespace osu.Game.Tests.Visual.Menus
         {
             Screens.Multi.Multiplayer multiplayer = null;
 
-            AddStep("Push songselect", () => osuGame.ScreenStack.Push(multiplayer = new Screens.Multi.Multiplayer()));
-            AddUntilStep("Wait for song select", () => multiplayer.IsCurrentScreen());
+            AddStep("Push multiplayer", () => osuGame.ScreenStack.Push(multiplayer = new Screens.Multi.Multiplayer()));
+            AddUntilStep("Wait for multiplayer", () => multiplayer.IsCurrentScreen());
 
             exitViaBackButtonAndConfirm();
         }
