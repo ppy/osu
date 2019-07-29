@@ -23,7 +23,8 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
                 },
                 new SettingsEnumDropdown<MainMenuBackgroundMode>
                 {
-                    LabelText = "Main menu background"
+                    LabelText = "Main menu background",
+                    Bindable = config.GetBindable<MainMenuBackgroundMode>(OsuSetting.MenuBackgroundMode)
                 }
             };
         }

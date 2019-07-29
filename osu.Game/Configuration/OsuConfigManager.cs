@@ -6,6 +6,7 @@ using osu.Framework.Configuration.Tracking;
 using osu.Framework.Extensions;
 using osu.Framework.Platform;
 using osu.Game.Overlays;
+using osu.Game.Overlays.Settings.Sections.Graphics;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Screens.Select;
 
@@ -71,6 +72,7 @@ namespace osu.Game.Configuration
             Set(OsuSetting.CursorRotation, true);
 
             Set(OsuSetting.MenuParallax, true);
+            Set(OsuSetting.MenuBackgroundMode, MainMenuBackgroundMode.Default);
 
             // Gameplay
             Set(OsuSetting.DimLevel, 0.3, 0, 1, 0.01);
@@ -141,6 +143,7 @@ namespace osu.Game.Configuration
         MenuVoice,
         CursorRotation,
         MenuParallax,
+        MenuBackgroundMode,
         BeatmapDetailTab,
         Username,
         ReleaseStream,
