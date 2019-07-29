@@ -84,6 +84,8 @@ namespace osu.Game
         protected OsuScreenStack ScreenStack;
         protected BackButton BackButton;
 
+        private BackButton.BackButtonReceptor backButtonReceptor;
+
         private VolumeOverlay volume;
         private OsuLogo osuLogo;
 
@@ -407,8 +409,9 @@ namespace osu.Game
                     RelativeSizeAxes = Axes.Both,
                     Children = new Drawable[]
                     {
+                        backButtonReceptor = new BackButton.BackButtonReceptor(),
                         ScreenStack = new OsuScreenStack { RelativeSizeAxes = Axes.Both },
-                        BackButton = new BackButton
+                        BackButton = new BackButton(backButtonReceptor)
                         {
                             Anchor = Anchor.BottomLeft,
                             Origin = Anchor.BottomLeft,
