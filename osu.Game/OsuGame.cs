@@ -589,7 +589,7 @@ namespace osu.Game
         {
             int recentLogCount = 0;
 
-            const double debounce = 5000;
+            const double debounce = 60000;
 
             Logger.NewEntry += entry =>
             {
