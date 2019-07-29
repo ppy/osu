@@ -13,11 +13,9 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Skills
     public class Reading : Skill
     {
         protected override double SkillMultiplier => 1.0;
-        protected override double StrainDecayBase => strainDecay;
+        protected override double StrainDecayBase => 0.3;
 
         private const int max_pattern_length = 15;
-
-        private double strainDecay = 1.0;
 
         private string lastNotes = "";
 
@@ -25,7 +23,6 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Skills
         private readonly Dictionary<string, int>[] patternOccur = { new Dictionary<string, int>(), new Dictionary<string, int>() };
         private readonly Dictionary<string, int>[] patternCount = { new Dictionary<string, int>(), new Dictionary<string, int>() };
 
-        private readonly double[] previousDeltas = new double[max_pattern_length];
         private int noteNum;
 
         private const double slow_note_delta_min = 800.0;
@@ -43,7 +40,6 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Skills
             // Sliders and spinners are optional to hit and thus are ignored
             if (!(current.BaseObject is Hit) || current.DeltaTime <= 0.0)
             {
-                strainDecay = 0.1;
                 lastSameColourCount = sameColourCount;
                 sameColourCount = 0;
                 return 0.0;
@@ -53,32 +49,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Skills
             noteNum++;
             bool isRim = current.BaseObject is RimHit;
 
-            // Arbitrary values found by analyzing top plays of different people
             var colorDiff = colourChangeDifficulty(current);
-
-            double deltaSum = current.DeltaTime;
-            double deltaCount = 1;
-
-            for (var i = 1; i < max_pattern_length; i++)
-            {
-                if (previousDeltas[i - 1] != 0.0)
-                {
-                    double weight = Math.Pow(0.9, i);
-                    deltaCount += weight;
-                    deltaSum += previousDeltas[i - 1] * weight;
-                }
-            }
-
-            for (var i = max_pattern_length - 1; i > 0; i--)
-                previousDeltas[i] = previousDeltas[i - 1];
-
-            previousDeltas[0] = current.DeltaTime;
-
-            // Use last N notes instead of last 1 note for determining pattern speed. Especially affects 1/8 doubles.
-            var normalizedDelta = deltaSum / deltaCount;
-
-            // Overwrite current.DeltaTime with normalizedDelta in Skill's strainDecay function
-            strainDecay = Math.Pow(Math.Pow(0.3, normalizedDelta / 1000.0), 1000.0 / Math.Max(current.DeltaTime, 1.0));
 
             // Remember patterns
             var occurForThisType = patternOccur[isRim ? 1 : 0];

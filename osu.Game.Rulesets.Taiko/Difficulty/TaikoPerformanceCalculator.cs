@@ -71,11 +71,11 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
             double strainValue = Math.Pow(Math.Max(1.0, Attributes.StarRating / 0.0075) - 4.0, 2.53) / 100000.0;
 
             // Longer maps are worth more
-            double lengthMultiplier = (0.8 + Math.Pow(lengthBonus, 0.5)) * 0.65;
+            double lengthMultiplier = 0.8 + 0.75 * (Math.Pow(lengthBonus + 1, 0.5) - 1);
             strainValue *= lengthMultiplier;
 
             // Penalize misses. The shorter the map, the bigger miss penalty.
-            strainValue *= Math.Pow(0.96 / Math.Pow(1 / lengthBonus, 0.03), countMiss);
+            strainValue *= Math.Pow(0.985 / Math.Pow(1 / lengthBonus, 0.01), countMiss);
 
             if (mods.Any(m => m is ModFlashlight<TaikoHitObject>))
             {
