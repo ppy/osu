@@ -23,7 +23,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         public DrawableSliderTick(SliderTick sliderTick)
             : base(sliderTick)
         {
-            Size = new Vector2(16) * sliderTick.Scale;
+            Size = new Vector2(16 * sliderTick.Scale);
             Origin = Anchor.Centre;
 
             InternalChildren = new Drawable[]
@@ -42,7 +42,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                         Colour = AccentColour.Value,
                         Alpha = 0.3f,
                     }
-                }, restrictSize: false)
+                })
             };
         }
 
