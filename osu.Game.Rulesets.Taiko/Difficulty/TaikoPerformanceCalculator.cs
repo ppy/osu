@@ -110,7 +110,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
 
             // Lots of arbitrary values from testing.
             // Considering to use derivation from perfect accuracy in a probabilistic manner - assume normal distribution
-            double accValue = Math.Pow(predictedHitWindow / Attributes.GreatHitWindow, 0.5) * Math.Pow(150.0 / Attributes.GreatHitWindow, 1.1) * Math.Pow(Score.Accuracy, 15) * 22.0;
+            double accValue = Math.Pow(predictedHitWindow / Attributes.GreatHitWindow, 0.2) * Math.Pow(150.0 / Attributes.GreatHitWindow, 1.1) * Math.Pow(Score.Accuracy, 15) * 22.0;
 
             // Bonus for many hitcircles - it's harder to keep good accuracy up for longer
             accValue *= Math.Pow(lengthBonus + 1, 0.3);
