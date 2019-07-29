@@ -11,6 +11,8 @@ namespace osu.Game.Rulesets.Osu.Mods
         public override string Acronym => "TD";
         public override double ScoreMultiplier => 1;
 
+        public override ModType Type => ModType.System;
+
         public override bool Ranked => true;
     }
 }

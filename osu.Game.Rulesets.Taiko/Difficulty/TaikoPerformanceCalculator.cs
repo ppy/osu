@@ -68,7 +68,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
 
         private double computeStrainValue()
         {
-            double strainValue = Math.Pow(Math.Max(1.0, Attributes.StarRating / 0.0075) - 4.0, 2.53) / 100000.0;
+            double strainValue = Math.Pow(Math.Max(1.0, Attributes.StarRating / 0.0075), 2.53) / 100000.0;
 
             // Longer maps are worth more
             double lengthMultiplier = 0.8 + 0.75 * (Math.Pow(lengthBonus + 1, 0.5) - 1);
