@@ -38,7 +38,7 @@ namespace osu.Game.Skinning
 
         private void onChange() =>
             // schedule required to avoid calls after disposed.
-            // note that this has the side-effect of components only performance a skin change when they are alive.
+            // note that this has the side-effect of components only performing a skin change when they are alive.
             Scheduler.AddOnce(() => SkinChanged(skin, allowDefaultFallback));
 
         protected override void LoadAsyncComplete()

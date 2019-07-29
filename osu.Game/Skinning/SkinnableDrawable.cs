@@ -1,4 +1,4 @@
-﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
@@ -8,23 +8,13 @@ using osuTK;
 
 namespace osu.Game.Skinning
 {
-    public class SkinnableDrawable : SkinnableDrawable<Drawable>
-    {
-        public SkinnableDrawable(string name, Func<string, Drawable> defaultImplementation, Func<ISkinSource, bool> allowFallback = null, ConfineMode confineMode = ConfineMode.ScaleDownToFit)
-            : base(name, defaultImplementation, allowFallback, confineMode)
-        {
-        }
-    }
-
     /// <summary>
     /// A drawable which can be skinned via an <see cref="ISkinSource"/>.
     /// </summary>
-    /// <typeparam name="T">The type of drawable.</typeparam>
-    public class SkinnableDrawable<T> : SkinReloadableDrawable
-        where T : Drawable
+    public class SkinnableDrawable : SkinReloadableDrawable
     {
         /// <summary>
-        /// The displayed component. May or may not be a type-<typeparamref name="T"/> member.
+        /// The displayed component.
         /// </summary>
         protected Drawable Drawable { get; private set; }
 
@@ -39,7 +29,7 @@ namespace osu.Game.Skinning
         /// <param name="defaultImplementation">A function to create the default skin implementation of this element.</param>
         /// <param name="allowFallback">A conditional to decide whether to allow fallback to the default implementation if a skinned element is not present.</param>
         /// <param name="confineMode">How (if at all) the <see cref="Drawable"/> should be resize to fit within our own bounds.</param>
-        public SkinnableDrawable(string name, Func<string, T> defaultImplementation, Func<ISkinSource, bool> allowFallback = null, ConfineMode confineMode = ConfineMode.ScaleDownToFit)
+        public SkinnableDrawable(string name, Func<string, Drawable> defaultImplementation, Func<ISkinSource, bool> allowFallback = null, ConfineMode confineMode = ConfineMode.ScaleDownToFit)
             : this(name, allowFallback, confineMode)
         {
             createDefault = defaultImplementation;
@@ -54,13 +44,13 @@ namespace osu.Game.Skinning
             RelativeSizeAxes = Axes.Both;
         }
 
-        private readonly Func<string, T> createDefault;
+        private readonly Func<string, Drawable> createDefault;
 
         private readonly Cached scaling = new Cached();
 
         private bool isDefault;
 
-        protected virtual T CreateDefault(string name) => createDefault(name);
+        protected virtual Drawable CreateDefault(string name) => createDefault(name);
 
         /// <summary>
         /// Whether to apply size restrictions (specified via <see cref="confineMode"/>) to the default implementation.

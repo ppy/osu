@@ -123,7 +123,7 @@ namespace osu.Game.Screens.Menu
             var track = Beatmap.Value.Track;
             var metadata = Beatmap.Value.Metadata;
 
-            if (last is Intro && track != null)
+            if (last is IntroScreen && track != null)
             {
                 if (!track.IsRunning)
                 {

@@ -21,7 +21,6 @@ namespace osu.Game.Screens.Menu
 {
     public class Disclaimer : StartupScreen
     {
-        private Intro intro;
         private SpriteIcon icon;
         private Color4 iconColour;
         private LinkFlowContainer textFlow;
@@ -32,10 +31,13 @@ namespace osu.Game.Screens.Menu
         private const float icon_y = -85;
         private const float icon_size = 30;
 
+        private readonly OsuScreen nextScreen;
+
         private readonly Bindable<User> currentUser = new Bindable<User>();
 
-        public Disclaimer()
+        public Disclaimer(OsuScreen nextScreen = null)
         {
+            this.nextScreen = nextScreen;
             ValidForResume = false;
         }
 
@@ -146,7 +148,8 @@ namespace osu.Game.Screens.Menu
         protected override void LoadComplete()
         {
             base.LoadComplete();
-            LoadComponentAsync(intro = new Intro());
+            if (nextScreen != null)
+                LoadComponentAsync(nextScreen);
         }
 
         public override void OnEntering(IScreen last)
@@ -170,7 +173,7 @@ namespace osu.Game.Screens.Menu
                 .Then(5500)
                 .FadeOut(250)
                 .ScaleTo(0.9f, 250, Easing.InQuint)
-                .Finally(d => this.Push(intro));
+                .Finally(d => this.Push(nextScreen));
         }
     }
 }
