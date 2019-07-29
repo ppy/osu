@@ -148,12 +148,6 @@ namespace osu.Game.Rulesets.Objects.Drawables
             if (State.Value == newState && !force)
                 return;
 
-            // apply any custom state overrides
-            ApplyCustomUpdateState?.Invoke(this, newState);
-
-            if (newState == ArmedState.Hit)
-                PlaySamples();
-
             if (UseTransformStateManagement)
             {
                 double transformTime = HitObject.StartTime - InitialLifetimeOffset;
@@ -178,6 +172,12 @@ namespace osu.Game.Rulesets.Objects.Drawables
                 state.Value = newState;
 
             UpdateState(newState);
+
+            // apply any custom state overrides
+            ApplyCustomUpdateState?.Invoke(this, newState);
+
+            if (newState == ArmedState.Hit)
+                PlaySamples();
         }
 
         /// <summary>
