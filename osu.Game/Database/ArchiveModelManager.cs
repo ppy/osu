@@ -253,7 +253,7 @@ namespace osu.Game.Database
                 using (Stream s = reader.GetStream(file))
                     s.CopyTo(hashable);
 
-            return hashable.ComputeSHA2Hash();
+            return hashable.Length > 0 ? hashable.ComputeSHA2Hash() : null;
         }
 
         /// <summary>
