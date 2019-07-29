@@ -55,17 +55,19 @@ namespace osu.Game.Rulesets.Osu.Tests
 
             circle.ApplyDefaults(new ControlPointInfo(), new BeatmapDifficulty { CircleSize = circleSize });
 
-            var drawable = new TestDrawableHitCircle(circle, auto)
-            {
-                Anchor = Anchor.Centre,
-                Depth = depthIndex++
-            };
+            var drawable = CreateDrawableHitCircle(circle, auto);
 
             foreach (var mod in Mods.Value.OfType<IApplicableToDrawableHitObjects>())
                 mod.ApplyToDrawableHitObjects(new[] { drawable });
 
             return drawable;
         }
+
+        protected virtual TestDrawableHitCircle CreateDrawableHitCircle(HitCircle circle, bool auto) => new TestDrawableHitCircle(circle, auto)
+        {
+            Anchor = Anchor.Centre,
+            Depth = depthIndex++
+        };
 
         private Drawable testStream(float circleSize, bool auto = false)
         {
