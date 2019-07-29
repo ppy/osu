@@ -133,7 +133,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             base.UpdateInitialTransforms();
 
             ApproachCircle.FadeIn(Math.Min(HitObject.TimeFadeIn * 2, HitObject.TimePreempt));
-            ApproachCircle.ScaleTo(1.1f, HitObject.TimePreempt);
+            ApproachCircle.ScaleTo(1f, HitObject.TimePreempt);
             ApproachCircle.Expire(true);
         }
 
