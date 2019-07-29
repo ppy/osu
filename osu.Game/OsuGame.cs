@@ -87,7 +87,8 @@ namespace osu.Game
         private BackButton backButton;
 
         private MainMenu menuScreen;
-        private Intro introScreen;
+
+        private IntroScreen introScreen;
 
         private Bindable<int> configRuleset;
 
@@ -589,7 +590,7 @@ namespace osu.Game
         {
             int recentLogCount = 0;
 
-            const double debounce = 5000;
+            const double debounce = 60000;
 
             Logger.NewEntry += entry =>
             {
@@ -761,7 +762,7 @@ namespace osu.Game
             if (introScreen == null)
                 return true;
 
-            if (!introScreen.DidLoadMenu || !(screenStack.CurrentScreen is Intro))
+            if (!introScreen.DidLoadMenu || !(screenStack.CurrentScreen is IntroScreen))
             {
                 Scheduler.Add(introScreen.MakeCurrent);
                 return true;
@@ -796,7 +797,7 @@ namespace osu.Game
         {
             switch (newScreen)
             {
-                case Intro intro:
+                case IntroScreen intro:
                     introScreen = intro;
                     break;
 
