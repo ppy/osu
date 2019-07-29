@@ -17,6 +17,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Objects.Drawables
 {
+    [Cached(typeof(DrawableHitObject))]
     public abstract class DrawableHitObject : SkinReloadableDrawable
     {
         public readonly HitObject HitObject;
