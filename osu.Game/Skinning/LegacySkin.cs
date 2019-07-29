@@ -54,28 +54,33 @@ namespace osu.Game.Skinning
         public override Drawable GetDrawableComponent(string componentName)
         {
             bool animatable = false;
-            (bool looping, double frametime) animationData = (false, 1000 / 60d);
+            bool looping = true;
+            const double frametime = 1000 / 60d;
 
             switch (componentName)
             {
                 case "Play/Miss":
                     componentName = "hit0";
                     animatable = true;
+                    looping = false;
                     break;
 
                 case "Play/Meh":
                     componentName = "hit50";
                     animatable = true;
+                    looping = false;
                     break;
 
                 case "Play/Good":
                     componentName = "hit100";
                     animatable = true;
+                    looping = false;
                     break;
 
                 case "Play/Great":
                     componentName = "hit300";
                     animatable = true;
+                    looping = false;
                     break;
 
                 case "Play/osu/number-text":
@@ -93,7 +98,7 @@ namespace osu.Game.Skinning
 
             if (texture != null && animatable)
             {
-                var animation = new TextureAnimation { DefaultFrameLength = animationData.frametime };
+                var animation = new TextureAnimation { DefaultFrameLength = frametime };
 
                 for (int i = 1; texture != null; i++)
                 {
@@ -101,7 +106,9 @@ namespace osu.Game.Skinning
                     texture = GetTexture($"{componentName}-{i}");
                 }
 
-                animation.Repeat = animationData.looping;
+                // This comment can be removed once we have components which are looping
+                // ReSharper disable once ConditionIsAlwaysTrueOrFalse
+                animation.Repeat = looping;
 
                 return animation;
             }
@@ -109,10 +116,7 @@ namespace osu.Game.Skinning
             {
                 texture = GetTexture(componentName);
 
-                if (texture == null)
-                    return null;
-
-                return new Sprite { Texture = texture };
+                return texture == null ? null : new Sprite { Texture = texture };
             }
         }
 
