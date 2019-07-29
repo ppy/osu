@@ -81,10 +81,11 @@ namespace osu.Game
 
         public readonly Bindable<OverlayActivation> OverlayActivationMode = new Bindable<OverlayActivation>();
 
-        private OsuScreenStack screenStack;
+        protected OsuScreenStack ScreenStack;
+        protected BackButton BackButton;
+
         private VolumeOverlay volume;
         private OsuLogo osuLogo;
-        private BackButton backButton;
 
         private MainMenu menuScreen;
         private Intro introScreen;
@@ -325,7 +326,7 @@ namespace osu.Game
             performFromMainMenuTask?.Cancel();
 
             // if the current screen does not allow screen changing, give the user an option to try again later.
-            if (!bypassScreenAllowChecks && (screenStack.CurrentScreen as IOsuScreen)?.AllowExternalScreenChange == false)
+            if (!bypassScreenAllowChecks && (ScreenStack.CurrentScreen as IOsuScreen)?.AllowExternalScreenChange == false)
             {
                 notifications.Post(new SimpleNotification
                 {
@@ -343,7 +344,7 @@ namespace osu.Game
             CloseAllOverlays(false);
 
             // we may already be at the target screen type.
-            if (targetScreen != null && screenStack.CurrentScreen?.GetType() == targetScreen)
+            if (targetScreen != null && ScreenStack.CurrentScreen?.GetType() == targetScreen)
             {
                 action();
                 return;
@@ -406,15 +407,15 @@ namespace osu.Game
                     RelativeSizeAxes = Axes.Both,
                     Children = new Drawable[]
                     {
-                        screenStack = new OsuScreenStack { RelativeSizeAxes = Axes.Both },
-                        backButton = new BackButton
+                        ScreenStack = new OsuScreenStack { RelativeSizeAxes = Axes.Both },
+                        BackButton = new BackButton
                         {
                             Anchor = Anchor.BottomLeft,
                             Origin = Anchor.BottomLeft,
                             Action = () =>
                             {
-                                if ((screenStack.CurrentScreen as IOsuScreen)?.AllowBackButton == true)
-                                    screenStack.Exit();
+                                if ((ScreenStack.CurrentScreen as IOsuScreen)?.AllowBackButton == true)
+                                    ScreenStack.Exit();
                             }
                         },
                         logoContainer = new Container { RelativeSizeAxes = Axes.Both },
@@ -427,15 +428,15 @@ namespace osu.Game
                 idleTracker
             });
 
-            screenStack.ScreenPushed += screenPushed;
-            screenStack.ScreenExited += screenExited;
+            ScreenStack.ScreenPushed += screenPushed;
+            ScreenStack.ScreenExited += screenExited;
 
             loadComponentSingleFile(osuLogo, logo =>
             {
                 logoContainer.Add(logo);
 
                 // Loader has to be created after the logo has finished loading as Loader performs logo transformations on entering.
-                screenStack.Push(new Loader
+                ScreenStack.Push(new Loader
                 {
                     RelativeSizeAxes = Axes.Both
                 });
@@ -755,13 +756,13 @@ namespace osu.Game
 
         protected override bool OnExiting()
         {
-            if (screenStack.CurrentScreen is Loader)
+            if (ScreenStack.CurrentScreen is Loader)
                 return false;
 
             if (introScreen == null)
                 return true;
 
-            if (!introScreen.DidLoadMenu || !(screenStack.CurrentScreen is Intro))
+            if (!introScreen.DidLoadMenu || !(ScreenStack.CurrentScreen is Intro))
             {
                 Scheduler.Add(introScreen.MakeCurrent);
                 return true;
@@ -789,7 +790,7 @@ namespace osu.Game
             screenContainer.Padding = new MarginPadding { Top = ToolbarOffset };
             overlayContent.Padding = new MarginPadding { Top = ToolbarOffset };
 
-            MenuCursorContainer.CanShowCursor = (screenStack.CurrentScreen as IOsuScreen)?.CursorVisible ?? false;
+            MenuCursorContainer.CanShowCursor = (ScreenStack.CurrentScreen as IOsuScreen)?.CursorVisible ?? false;
         }
 
         protected virtual void ScreenChanged(IScreen current, IScreen newScreen)
@@ -815,9 +816,9 @@ namespace osu.Game
                     Toolbar.Show();
 
                 if (newOsuScreen.AllowBackButton)
-                    backButton.Show();
+                    BackButton.Show();
                 else
-                    backButton.Hide();
+                    BackButton.Hide();
             }
         }
 
