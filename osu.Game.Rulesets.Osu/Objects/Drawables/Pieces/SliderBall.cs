@@ -4,7 +4,6 @@
 using System;
 using System.Linq;
 using osu.Framework.Allocation;
-using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -57,7 +56,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
                     {
                         RelativeSizeAxes = Axes.Both,
                         // TODO: support skin filename animation (sliderb0, sliderb1...)
-                        Child = new SkinnableDrawable("Play/osu/sliderb", _ => new DefaultSliderBall()),
+                        Child = new SkinnableDrawable("Play/osu/sliderball", _ => new DefaultSliderBall()),
                     }
                 }
             };
@@ -204,10 +203,6 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
 
         public class DefaultSliderBall : CompositeDrawable
         {
-            private readonly Bindable<Color4> accentColour = new Bindable<Color4>();
-
-            private Drawable drawableBall;
-
             [BackgroundDependencyLoader]
             private void load(DrawableHitObject drawableObject, ISkinSource skin)
             {
@@ -225,15 +220,13 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
                     BorderThickness = 10,
                     BorderColour = Color4.White,
                     Alpha = 1,
-                    Child = drawableBall = new Box
+                    Child = new Box
                     {
                         RelativeSizeAxes = Axes.Both,
+                        Colour = Color4.White,
                         Alpha = 0.4f,
                     }
                 };
-
-                accentColour.BindTo(drawableObject.AccentColour);
-                accentColour.BindValueChanged(colour => drawableBall.Colour = colour.NewValue, true);
             }
         }
     }
