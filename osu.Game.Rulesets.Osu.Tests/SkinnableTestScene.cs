@@ -16,29 +16,14 @@ namespace osu.Game.Rulesets.Osu.Tests
 {
     public abstract class SkinnableTestScene : OsuGridTestScene
     {
-        private static Skin getSkinFromResources(SkinManager skins, string name)
-        {
-            using (var storage = new DllResourceStore("osu.Game.Rulesets.Osu.Tests.dll"))
-            {
-                var tempName = Path.GetTempFileName();
-
-                File.Delete(tempName);
-                Directory.CreateDirectory(tempName);
-
-                var files = storage.GetAvailableResources().Where(f => f.StartsWith($"Resources/{name}"));
-
-                foreach (var file in files)
-                    using (var stream = storage.GetStream(file))
-                    using (var newFile = File.Create(Path.Combine(tempName, Path.GetFileName(file))))
-                        stream.CopyTo(newFile);
-
-                return skins.GetSkin(skins.Import(tempName).Result);
-            }
-        }
-
         private Skin metricsSkin;
         private Skin defaultSkin;
         private Skin specialSkin;
+
+        protected SkinnableTestScene()
+            : base(2, 2)
+        {
+        }
 
         [BackgroundDependencyLoader]
         private void load(AudioManager audio)
@@ -58,9 +43,24 @@ namespace osu.Game.Rulesets.Osu.Tests
             Cell(3).Child = new LocalSkinOverrideContainer(specialSkin) { RelativeSizeAxes = Axes.Both }.WithChild(creationFunction());
         }
 
-        protected SkinnableTestScene()
-            : base(2, 2)
+        private static Skin getSkinFromResources(SkinManager skins, string name)
         {
+            using (var storage = new DllResourceStore("osu.Game.Rulesets.Osu.Tests.dll"))
+            {
+                var tempName = Path.GetTempFileName();
+
+                File.Delete(tempName);
+                Directory.CreateDirectory(tempName);
+
+                var files = storage.GetAvailableResources().Where(f => f.StartsWith($"Resources/{name}"));
+
+                foreach (var file in files)
+                    using (var stream = storage.GetStream(file))
+                    using (var newFile = File.Create(Path.Combine(tempName, Path.GetFileName(file))))
+                        stream.CopyTo(newFile);
+
+                return skins.GetSkin(skins.Import(tempName).Result);
+            }
         }
     }
 }
