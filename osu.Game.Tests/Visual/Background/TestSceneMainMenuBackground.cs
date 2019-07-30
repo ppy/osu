@@ -3,8 +3,8 @@
 
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Sprites;
 using osu.Game.Graphics;
+using osu.Game.Graphics.Sprites;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Settings.Sections.Graphics;
 using osu.Game.Screens;
@@ -42,9 +42,9 @@ namespace osu.Game.Tests.Visual.Background
 
         private class TestBackgroundScreen : BackgroundScreenDefault
         {
-            private SpriteText userState;
-            private SpriteText modeState;
-            private SpriteText updateNotification;
+            private OsuSpriteText userState;
+            private OsuSpriteText modeState;
+            private OsuSpriteText updateNotification;
 
             public TestBackgroundScreen()
             {
@@ -72,12 +72,12 @@ namespace osu.Game.Tests.Visual.Background
                     Margin = new MarginPadding { Left = 100 },
                     Children = new Drawable[]
                     {
-                        userState = new SpriteText(),
-                        modeState = new SpriteText()
+                        userState = new OsuSpriteText(),
+                        modeState = new OsuSpriteText(),
                     }
                 });
 
-                AddInternal(updateNotification = new SpriteText
+                AddInternal(updateNotification = new OsuSpriteText
                 {
                     Anchor = Anchor.BottomCentre,
                     Origin = Anchor.BottomCentre,

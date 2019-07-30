@@ -66,7 +66,7 @@ namespace osu.Game.Screens.Backgrounds
         private void onUserChanged(ValueChangedEvent<User> user)
         {
             if (BackgroundMode.Value != MainMenuBackgroundMode.Default && user.OldValue?.IsSupporter != user.NewValue?.IsSupporter &&
-                (BackgroundMode.Value != MainMenuBackgroundMode.Skin | skinHasBackground))
+                ((BackgroundMode.Value != MainMenuBackgroundMode.Skin) | skinHasBackground))
                 UpdateBackground();
         }
 
