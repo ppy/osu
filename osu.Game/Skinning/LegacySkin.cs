@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Graphics;
@@ -15,6 +16,7 @@ using osu.Framework.IO.Stores;
 using osu.Game.Database;
 using osu.Game.Graphics.Sprites;
 using osuTK;
+using osuTK.Graphics;
 
 namespace osu.Game.Skinning
 {
@@ -71,6 +73,12 @@ namespace osu.Game.Skinning
         {
             switch (componentName)
             {
+                case "Play/osu/sliderball":
+                    if (GetTexture("sliderb") != null)
+                        return new LegacySliderBall();
+
+                    break;
+
                 case "Play/Miss":
                     componentName = "hit0";
                     break;
@@ -107,6 +115,16 @@ namespace osu.Game.Skinning
                 return null;
 
             return new Sprite { Texture = texture };
+        }
+
+        public class LegacySliderBall : Sprite
+        {
+            [BackgroundDependencyLoader]
+            private void load(ISkinSource skin)
+            {
+                Texture = skin.GetTexture("sliderb");
+                Colour = skin.GetValue<SkinConfiguration, Color4?>(s => s.CustomColours.ContainsKey("SliderBall") ? s.CustomColours["SliderBall"] : (Color4?)null) ?? Color4.White;
+            }
         }
 
         public override Texture GetTexture(string componentName)
