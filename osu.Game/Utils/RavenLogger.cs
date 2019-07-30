@@ -37,24 +37,27 @@ namespace osu.Game.Utils
 
                 if (exception != null)
                 {
-                    if (exception is IOException ioe)
+                    switch (exception)
                     {
-                        // disk full exceptions, see https://stackoverflow.com/a/9294382
-                        const int hr_error_handle_disk_full = unchecked((int)0x80070027);
-                        const int hr_error_disk_full = unchecked((int)0x80070070);
+                        case IOException ioe:
+                            // disk full exceptions, see https://stackoverflow.com/a/9294382
+                            const int hr_error_handle_disk_full = unchecked((int)0x80070027);
+                            const int hr_error_disk_full = unchecked((int)0x80070070);
 
-                        if (ioe.HResult == hr_error_handle_disk_full || ioe.HResult == hr_error_disk_full)
-                            return;
-                    }
-
-                    if (exception is WebException we)
-                    {
-                        switch (we.Status)
-                        {
-                            // more statuses may need to be blocked as we come across them.
-                            case WebExceptionStatus.Timeout:
+                            if (ioe.HResult == hr_error_handle_disk_full || ioe.HResult == hr_error_disk_full)
                                 return;
-                        }
+
+                            break;
+
+                        case WebException we:
+                            switch (we.Status)
+                            {
+                                // more statuses may need to be blocked as we come across them.
+                                case WebExceptionStatus.Timeout:
+                                    return;
+                            }
+
+                            break;
                     }
 
                     // since we let unhandled exceptions go ignored at times, we want to ensure they don't get submitted on subsequent reports.
