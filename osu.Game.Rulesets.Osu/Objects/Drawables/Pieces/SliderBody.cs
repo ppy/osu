@@ -18,7 +18,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
 
         protected Path Path => path;
 
-        public float PathRadius
+        public virtual float PathRadius
         {
             get => path.PathRadius;
             set => path.PathRadius = value;

@@ -15,7 +15,6 @@ using osu.Framework.MathUtils;
 using osu.Framework.Platform;
 using osu.Framework.Screens;
 using osu.Game.Beatmaps;
-using osu.Game.Database;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu;
@@ -35,7 +34,6 @@ namespace osu.Game.Tests.Visual.SongSelect
         private RulesetStore rulesets;
 
         private WorkingBeatmap defaultBeatmap;
-        private DatabaseContextFactory factory;
 
         public override IReadOnlyList<Type> RequiredTypes => new[]
         {
@@ -74,28 +72,11 @@ namespace osu.Game.Tests.Visual.SongSelect
 
         private TestSongSelect songSelect;
 
-        protected override void Dispose(bool isDisposing)
-        {
-            factory.ResetDatabase();
-            base.Dispose(isDisposing);
-        }
-
         [BackgroundDependencyLoader]
         private void load(GameHost host, AudioManager audio)
         {
-            factory = new DatabaseContextFactory(LocalStorage);
-            factory.ResetDatabase();
-
-            using (var usage = factory.Get())
-                usage.Migrate();
-
-            factory.ResetDatabase();
-
-            using (var usage = factory.Get())
-                usage.Migrate();
-
-            Dependencies.Cache(rulesets = new RulesetStore(factory));
-            Dependencies.Cache(manager = new BeatmapManager(LocalStorage, factory, rulesets, null, audio, host, defaultBeatmap = Beatmap.Default));
+            Dependencies.Cache(rulesets = new RulesetStore(ContextFactory));
+            Dependencies.Cache(manager = new BeatmapManager(LocalStorage, ContextFactory, rulesets, null, audio, host, defaultBeatmap = Beatmap.Default));
 
             Beatmap.SetDefault();
         }
