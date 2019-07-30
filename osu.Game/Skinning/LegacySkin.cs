@@ -78,7 +78,7 @@ namespace osu.Game.Skinning
         {
             switch (componentName)
             {
-                case "Play/Osu/Objects/Drawables/MainCircle":
+                case "Play/osu/hitcircle":
                     if (!hasHitCircle)
                         return null;
 
