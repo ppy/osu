@@ -51,7 +51,7 @@ namespace osu.Game.Tests.Visual.Menus
                 switch (current)
                 {
                     case null:
-                    case Intro _:
+                    case IntroScreen _:
                     case Disclaimer _:
                         return false;
 
