@@ -255,19 +255,32 @@ namespace osu.Game.Skinning
             {
                 InternalChildren = new Drawable[]
                 {
-                    new Sprite
+                    new NonPlayfieldSprite
                     {
                         Texture = skin.GetTexture("cursormiddle"),
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
                     },
-                    new Sprite
+                    new NonPlayfieldSprite
                     {
                         Texture = skin.GetTexture("cursor"),
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
                     }
                 };
+            }
+        }
+
+        private class NonPlayfieldSprite : Sprite
+        {
+            public override Texture Texture
+            {
+                get => base.Texture;
+                set
+                {
+                    value.ScaleAdjust *= 2f;
+                    base.Texture = value;
+                }
             }
         }
     }
