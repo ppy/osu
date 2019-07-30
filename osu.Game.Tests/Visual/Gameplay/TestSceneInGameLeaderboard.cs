@@ -40,6 +40,9 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddSliderStep("set player score", 50, 5000000, 1222333, v => playerScore.Value = v);
         }
 
+        [SetUp]
+        public void SetUp() => leaderboard.ClearScores();
+
         [Test]
         public void TestPlayerScore()
         {
@@ -66,6 +69,8 @@ namespace osu.Game.Tests.Visual.Gameplay
 
         private class TestInGameLeaderboard : InGameLeaderboard
         {
+            public void ClearScores() => ScoresContainer.RemoveAll(s => s.User.Username != PlayerUser.Username);
+
             public bool CheckPositionByUsername(string username, int? estimatedPosition)
             {
                 var scoreItem = ScoresContainer.Where(i => i.User.Username == username).FirstOrDefault();
