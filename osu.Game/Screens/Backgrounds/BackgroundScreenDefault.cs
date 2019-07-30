@@ -9,8 +9,10 @@ using osu.Framework.Threading;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Graphics.Backgrounds;
+using osu.Game.Online.API;
 using osu.Game.Overlays.Settings.Sections.Graphics;
 using osu.Game.Skinning;
+using osu.Game.Users;
 
 namespace osu.Game.Screens.Backgrounds
 {
@@ -24,16 +26,19 @@ namespace osu.Game.Screens.Backgrounds
         private string backgroundName => $@"Menu/menu-background-{currentDisplay % background_count + 1}";
 
         private Bindable<Skin> skin;
+        private Bindable<User> user;
         private readonly Bindable<WorkingBeatmap> beatmap = new Bindable<WorkingBeatmap>();
         private readonly Bindable<MainMenuBackgroundMode> backgroundMode = new Bindable<MainMenuBackgroundMode>();
 
         [BackgroundDependencyLoader]
-        private void load(SkinManager skinManager, OsuConfigManager config, Bindable<WorkingBeatmap> workingBeatmap)
+        private void load(IAPIProvider api, SkinManager skinManager, OsuConfigManager config, Bindable<WorkingBeatmap> workingBeatmap)
         {
             skin = skinManager.CurrentSkin.GetBoundCopy();
             beatmap.BindTo(workingBeatmap);
+            user = api.LocalUser.GetBoundCopy();
             config.BindWith(OsuSetting.MenuBackgroundMode, backgroundMode);
 
+            user.ValueChanged += _ => Next();
             skin.ValueChanged += _ => Next();
             backgroundMode.ValueChanged += _ => Next();
             beatmap.ValueChanged += _ => Next();
@@ -64,21 +69,26 @@ namespace osu.Game.Screens.Backgrounds
         {
             Background newBackground;
 
-            switch (backgroundMode.Value)
+            if (user.Value?.IsSupporter ?? false)
             {
-                default:
-                case MainMenuBackgroundMode.Default:
-                    newBackground = new Background(backgroundName);
-                    break;
+                switch (backgroundMode.Value)
+                {
+                    default:
+                    case MainMenuBackgroundMode.Default:
+                        newBackground = new Background(backgroundName);
+                        break;
 
-                case MainMenuBackgroundMode.Skin:
-                    newBackground = new SkinnedBackground(skin.Value, backgroundName);
-                    break;
+                    case MainMenuBackgroundMode.Skin:
+                        newBackground = new SkinnedBackground(skin.Value, backgroundName);
+                        break;
 
-                case MainMenuBackgroundMode.Beatmap:
-                    newBackground = new BeatmapBackground(beatmap.Value, backgroundName);
-                    break;
+                    case MainMenuBackgroundMode.Beatmap:
+                        newBackground = new BeatmapBackground(beatmap.Value, backgroundName);
+                        break;
+                }
             }
+            else
+                newBackground = new Background(backgroundName);
 
             newBackground.Depth = currentDisplay;
 
