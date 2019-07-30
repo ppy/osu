@@ -4,6 +4,8 @@
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Game.Configuration;
+using osu.Game.Online.API;
+using osu.Game.Users;
 
 namespace osu.Game.Overlays.Settings.Sections.Graphics
 {
@@ -11,8 +13,10 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
     {
         protected override string Header => "User Interface";
 
+        private SettingsEnumDropdown<MainMenuBackgroundMode> backgroundDropdown;
+
         [BackgroundDependencyLoader]
-        private void load(OsuConfigManager config)
+        private void load(IAPIProvider api, OsuConfigManager config)
         {
             Children = new Drawable[]
             {
@@ -21,12 +25,25 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
                     LabelText = "Parallax",
                     Bindable = config.GetBindable<bool>(OsuSetting.MenuParallax)
                 },
-                new SettingsEnumDropdown<MainMenuBackgroundMode>
+                backgroundDropdown = new SettingsEnumDropdown<MainMenuBackgroundMode>
                 {
                     LabelText = "Main menu background",
                     Bindable = config.GetBindable<MainMenuBackgroundMode>(OsuSetting.MenuBackgroundMode)
                 }
             };
+
+            api.LocalUser.BindValueChanged(user => onUserChanged(user.NewValue), true);
+        }
+
+        private void onUserChanged(User user)
+        {
+            if ((!user?.IsSupporter) ?? true)
+            {
+                backgroundDropdown.Bindable.Value = MainMenuBackgroundMode.Default;
+                backgroundDropdown.Bindable.Disabled = true;
+            }
+            else
+                backgroundDropdown.Bindable.Disabled = false;
         }
     }
 

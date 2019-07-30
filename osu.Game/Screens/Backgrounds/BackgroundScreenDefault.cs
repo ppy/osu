@@ -24,18 +24,15 @@ namespace osu.Game.Screens.Backgrounds
 
         private string backgroundName => $@"Menu/menu-background-{currentDisplay % background_count + 1}";
 
-        private Bindable<User> user;
         private Bindable<Skin> skin;
         private readonly Bindable<MainMenuBackgroundMode> backgroundMode = new Bindable<MainMenuBackgroundMode>();
 
         [BackgroundDependencyLoader]
-        private void load(IAPIProvider api, SkinManager skinManager, OsuConfigManager config)
+        private void load(SkinManager skinManager, OsuConfigManager config)
         {
-            user = api.LocalUser.GetBoundCopy();
             skin = skinManager.CurrentSkin.GetBoundCopy();
             config.BindWith(OsuSetting.MenuBackgroundMode, backgroundMode);
 
-            user.ValueChanged += _ => Next();
             skin.ValueChanged += _ => Next();
             backgroundMode.ValueChanged += _ => Next();
 
@@ -65,7 +62,7 @@ namespace osu.Game.Screens.Backgrounds
         {
             Background newBackground;
 
-            if (backgroundMode.Value == MainMenuBackgroundMode.Skin && (user.Value?.IsSupporter ?? false))
+            if (backgroundMode.Value == MainMenuBackgroundMode.Skin)
                 newBackground = new SkinnedBackground(skin.Value, backgroundName);
             else
                 newBackground = new Background(backgroundName);
