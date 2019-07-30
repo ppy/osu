@@ -40,20 +40,30 @@ namespace osu.Game.Screens.Play
             LayoutEasing = Easing.OutQuint;
         }
 
-        public void AddRealTimePlayer(BindableDouble currentScore, User user = null)
+        /// <summary>
+        /// Adds a real-time player score item whose score is updated via a <see cref="BindableDouble"/>.
+        /// </summary>
+        /// <param name="currentScore">The bindable current score of the player.</param>
+        /// <param name="user">The player user.</param>
+        /// <returns>Returns the drawable score item of that player.</returns>
+        public InGameScoreItem AddRealTimePlayer(BindableDouble currentScore, User user = null)
         {
             if (currentScore == null)
-                return;
+                return null;
 
             var scoreItem = addScore(currentScore.Value, user);
             currentScore.ValueChanged += s => scoreItem.TotalScore = s.NewValue;
+
+            return scoreItem;
         }
 
-        public void AddScore(ScoreInfo score, int? position = null)
-        {
-            if (score != null)
-                addScore(score.TotalScore, score.User, position);
-        }
+        /// <summary>
+        /// Adds a score item based off a <see cref="ScoreInfo"/> with an initial position.
+        /// </summary>
+        /// <param name="score">The score info to use for this item.</param>
+        /// <param name="position">The initial position of this item.</param>
+        /// <returns>Returns the drawable score item of that player.</returns>
+        public InGameScoreItem AddScore(ScoreInfo score, int? position = null) => score != null ? addScore(score.TotalScore, score.User, position) : null;
 
         private int maxPosition => this.Where(i => i.ScorePosition.HasValue).Max(i => i.ScorePosition) ?? 0;
 
