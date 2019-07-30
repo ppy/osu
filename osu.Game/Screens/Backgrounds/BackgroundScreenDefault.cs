@@ -6,8 +6,10 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.MathUtils;
 using osu.Framework.Threading;
+using osu.Game.Configuration;
 using osu.Game.Graphics.Backgrounds;
 using osu.Game.Online.API;
+using osu.Game.Overlays.Settings.Sections.Graphics;
 using osu.Game.Skinning;
 using osu.Game.Users;
 
@@ -24,15 +26,18 @@ namespace osu.Game.Screens.Backgrounds
 
         private Bindable<User> user;
         private Bindable<Skin> skin;
+        private readonly Bindable<MainMenuBackgroundMode> backgroundMode = new Bindable<MainMenuBackgroundMode>();
 
         [BackgroundDependencyLoader]
-        private void load(IAPIProvider api, SkinManager skinManager)
+        private void load(IAPIProvider api, SkinManager skinManager, OsuConfigManager config)
         {
             user = api.LocalUser.GetBoundCopy();
             skin = skinManager.CurrentSkin.GetBoundCopy();
+            config.BindWith(OsuSetting.MenuBackgroundMode, backgroundMode);
 
             user.ValueChanged += _ => Next();
             skin.ValueChanged += _ => Next();
+            backgroundMode.ValueChanged += _ => Next();
 
             currentDisplay = RNG.Next(0, background_count);
 
@@ -60,7 +65,7 @@ namespace osu.Game.Screens.Backgrounds
         {
             Background newBackground;
 
-            if (user.Value?.IsSupporter ?? false)
+            if (backgroundMode.Value == MainMenuBackgroundMode.Skin && (user.Value?.IsSupporter ?? false))
                 newBackground = new SkinnedBackground(skin.Value, backgroundName);
             else
                 newBackground = new Background(backgroundName);
