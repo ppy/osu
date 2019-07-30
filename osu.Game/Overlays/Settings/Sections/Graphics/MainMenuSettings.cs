@@ -2,8 +2,11 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Game.Configuration;
+using osu.Game.Online.API;
+using osu.Game.Users;
 
 namespace osu.Game.Overlays.Settings.Sections.Graphics
 {
@@ -11,8 +14,10 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
     {
         protected override string Header => "User Interface";
 
+        private SettingsEnumDropdown<MainMenuBackgroundMode> backgroundDropdown;
+
         [BackgroundDependencyLoader]
-        private void load(OsuConfigManager config)
+        private void load(IAPIProvider api, OsuConfigManager config)
         {
             Children = new Drawable[]
             {
@@ -21,12 +26,19 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
                     LabelText = "Parallax",
                     Bindable = config.GetBindable<bool>(OsuSetting.MenuParallax)
                 },
-                new SettingsEnumDropdown<MainMenuBackgroundMode>
+                backgroundDropdown = new SettingsEnumDropdown<MainMenuBackgroundMode>
                 {
                     LabelText = "Main menu background",
                     Bindable = config.GetBindable<MainMenuBackgroundMode>(OsuSetting.MenuBackgroundMode)
                 }
             };
+
+            api.LocalUser.BindValueChanged(onUserChanged, true);
+        }
+
+        private void onUserChanged(ValueChangedEvent<User> user)
+        {
+            backgroundDropdown.Bindable.Disabled = (!user.NewValue?.IsSupporter) ?? true;
         }
     }
 
