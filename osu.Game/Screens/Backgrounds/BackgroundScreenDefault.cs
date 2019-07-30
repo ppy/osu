@@ -70,12 +70,14 @@ namespace osu.Game.Screens.Backgrounds
                 case MainMenuBackgroundMode.Default:
                     newBackground = new Background(backgroundName);
                     break;
+
                 case MainMenuBackgroundMode.Skin:
                     newBackground = new SkinnedBackground(skin.Value, backgroundName);
                     break;
+
                 case MainMenuBackgroundMode.Beatmap:
                     newBackground = new BeatmapBackground(beatmap.Value, backgroundName);
-                break;
+                    break;
             }
 
             newBackground.Depth = currentDisplay;
