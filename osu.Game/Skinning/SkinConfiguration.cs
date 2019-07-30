@@ -27,6 +27,8 @@ namespace osu.Game.Skinning
 
         public float? SliderBorderSize { get; set; }
 
+        public float? SliderPathRadius { get; set; }
+
         public bool? CursorExpand { get; set; } = true;
     }
 }
