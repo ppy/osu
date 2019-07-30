@@ -365,7 +365,8 @@ namespace osu.Game.Skinning
                 get => base.Texture;
                 set
                 {
-                    value.ScaleAdjust *= 2f;
+                    if (value != null)
+                        value.ScaleAdjust *= 2f;
                     base.Texture = value;
                 }
             }
