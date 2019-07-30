@@ -291,6 +291,8 @@ namespace osu.Game.Skinning
                     new NonPlayfieldSprite
                     {
                         Texture = skin.GetTexture("cursor"),
+                        Anchor = Anchor.Centre,
+                        Origin = Anchor.Centre,
                     }
                 };
             }
