@@ -1,7 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using Humanizer;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
@@ -14,6 +13,7 @@ using osu.Game.Graphics.Sprites;
 using osu.Game.Online.Leaderboards;
 using osu.Game.Scoring;
 using osu.Game.Users.Drawables;
+using osu.Game.Utils;
 using osuTK;
 using osuTK.Graphics;
 
@@ -132,7 +132,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
             {
                 avatar.User = value.User;
                 flag.Country = value.User.Country;
-                date.Text = $@"achieved {value.Date.Humanize()}";
+                date.Text = $@"achieved {HumanizerUtils.Humanize(value.Date)}";
 
                 usernameText.Clear();
                 usernameText.AddUserLink(value.User);
