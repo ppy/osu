@@ -274,11 +274,11 @@ namespace osu.Game.Skinning
             [BackgroundDependencyLoader]
             private void load(DrawableHitObject drawableObject, ISkinSource skin)
             {
-                Sprite mainCircle;
+                Sprite hitCircleSprite;
 
                 InternalChildren = new Drawable[]
                 {
-                    mainCircle = new Sprite
+                    hitCircleSprite = new Sprite
                     {
                         Texture = skin.GetTexture("hitcircle"),
                         Colour = drawableObject.AccentColour.Value
@@ -298,7 +298,7 @@ namespace osu.Game.Skinning
                 state.BindValueChanged(updateState, true);
 
                 accentColour.BindTo(drawableObject.AccentColour);
-                accentColour.BindValueChanged(colour => mainCircle.Colour = colour.NewValue, true);
+                accentColour.BindValueChanged(colour => hitCircleSprite.Colour = colour.NewValue, true);
             }
 
             private void updateState(ValueChangedEvent<ArmedState> state)
