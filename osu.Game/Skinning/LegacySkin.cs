@@ -78,6 +78,12 @@ namespace osu.Game.Skinning
         {
             switch (componentName)
             {
+                case "Play/osu/cursor":
+                    if (GetTexture("cursor") != null)
+                        return new LegacyCursor();
+
+                    return null;
+
                 case "Play/osu/sliderball":
                     if (GetTexture("sliderb") != null)
                         return new LegacySliderBall();
@@ -150,19 +156,7 @@ namespace osu.Game.Skinning
             }
 
             if (texture != null)
-            {
                 texture.ScaleAdjust = ratio;
-
-                switch (componentName)
-                {
-                    case "cursormiddle":
-                    case "cursortrail":
-                    case "cursor":
-                        // apply inverse of adjustment in OsuPlayfieldAdjustmentContainer for non-gameplay-scale textures.
-                        texture.ScaleAdjust *= 1.6f;
-                        break;
-                }
-            }
 
             return texture;
         }
@@ -273,14 +267,42 @@ namespace osu.Game.Skinning
             }
         }
 
+        public class LegacyCursor : CompositeDrawable
+        {
+            public LegacyCursor()
+            {
+                Size = new Vector2(50);
+
+                Anchor = Anchor.Centre;
+                Origin = Anchor.Centre;
+            }
+
+            [BackgroundDependencyLoader]
+            private void load(ISkinSource skin)
+            {
+                InternalChildren = new Drawable[]
+                {
+                    new NonPlayfieldSprite
+                    {
+                        Texture = skin.GetTexture("cursormiddle"),
+                        Anchor = Anchor.Centre,
+                        Origin = Anchor.Centre,
+                    },
+                    new NonPlayfieldSprite
+                    {
+                        Texture = skin.GetTexture("cursor"),
+                        Anchor = Anchor.Centre,
+                        Origin = Anchor.Centre,
+                    }
+                };
+            }
+        }
+
         public class LegacyMainCirclePiece : CompositeDrawable
         {
             public LegacyMainCirclePiece()
             {
                 Size = new Vector2(128);
-
-                Anchor = Anchor.Centre;
-                Origin = Anchor.Centre;
             }
 
             private readonly IBindable<ArmedState> state = new Bindable<ArmedState>();
@@ -334,6 +356,20 @@ namespace osu.Game.Skinning
                         this.FadeOut(legacy_fade_duration, Easing.Out);
                         this.ScaleTo(1.4f, legacy_fade_duration, Easing.Out);
                         break;
+                }
+            }
+        }
+
+        private class NonPlayfieldSprite : Sprite
+        {
+            public override Texture Texture
+            {
+                get => base.Texture;
+                set
+                {
+                    if (value != null)
+                        value.ScaleAdjust *= 2f;
+                    base.Texture = value;
                 }
             }
         }
