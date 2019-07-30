@@ -18,7 +18,8 @@ namespace osu.Game.Rulesets.Osu.UI
             Anchor = Anchor.Centre;
             Origin = Anchor.Centre;
 
-            Size = new Vector2(0.75f);
+            // Calculated from osu!stable as 512 (default gamefield size) / 640 (default window size)
+            Size = new Vector2(0.8f);
 
             InternalChild = new Container
             {
