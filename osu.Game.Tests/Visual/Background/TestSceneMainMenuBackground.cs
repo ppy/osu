@@ -53,7 +53,6 @@ namespace osu.Game.Tests.Visual.Background
                 };
 
                 AddInternal(mc);
-                
 
                 mc.Show();
             }
