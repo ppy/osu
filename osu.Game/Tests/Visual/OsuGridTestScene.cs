@@ -5,7 +5,7 @@ using osu.Framework.Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 
-namespace osu.Game.Tests.Visual.UserInterface
+namespace osu.Game.Tests.Visual
 {
     /// <summary>
     /// An abstract test case which exposes small cells arranged in a grid.
