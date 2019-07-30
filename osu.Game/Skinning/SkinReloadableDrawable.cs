@@ -1,4 +1,4 @@
-﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
@@ -36,12 +36,15 @@ namespace osu.Game.Skinning
             skin.SourceChanged += onChange;
         }
 
-        private void onChange() => SkinChanged(skin, allowDefaultFallback);
+        private void onChange() =>
+            // schedule required to avoid calls after disposed.
+            // note that this has the side-effect of components only performing a skin change when they are alive.
+            Scheduler.AddOnce(() => SkinChanged(skin, allowDefaultFallback));
 
         protected override void LoadAsyncComplete()
         {
             base.LoadAsyncComplete();
-            onChange();
+            SkinChanged(skin, allowDefaultFallback);
         }
 
         /// <summary>
