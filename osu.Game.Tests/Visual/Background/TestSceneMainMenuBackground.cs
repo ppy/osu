@@ -4,11 +4,13 @@
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
+using osu.Game.Graphics;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Settings.Sections.Graphics;
 using osu.Game.Screens;
 using osu.Game.Screens.Backgrounds;
 using osu.Game.Users;
+using osuTK.Graphics;
 
 namespace osu.Game.Tests.Visual.Background
 {
@@ -43,6 +45,7 @@ namespace osu.Game.Tests.Visual.Background
         {
             private SpriteText userState;
             private SpriteText modeState;
+            private SpriteText updateNotification;
 
             public TestBackgroundScreen()
             {
@@ -75,6 +78,17 @@ namespace osu.Game.Tests.Visual.Background
                     }
                 });
 
+                AddInternal(updateNotification = new SpriteText
+                {
+                    Anchor = Anchor.BottomCentre,
+                    Origin = Anchor.BottomCentre,
+                    Margin = new MarginPadding { Bottom = 100 },
+                    Text = "Background has been updated",
+                    Colour = Color4.Red,
+                    Font = OsuFont.GetFont(size: 40),
+                    Alpha = 0,
+                });
+
                 User.BindValueChanged(user => updateUserState(user.NewValue), true);
                 BackgroundMode.BindValueChanged(mode => updateModeState(mode.NewValue), true);
             }
@@ -82,6 +96,13 @@ namespace osu.Game.Tests.Visual.Background
             private void updateUserState(User user) => userState.Text = "user state: " + ((user?.IsSupporter ?? false) ? "supporter" : "unSupporter");
 
             private void updateModeState(MainMenuBackgroundMode mode) => modeState.Text = $"mode state: {mode}";
+
+            public override void UpdateBackground()
+            {
+                base.UpdateBackground();
+
+                updateNotification.FadeIn().Then().Delay(500).Then().FadeOut(500);
+            }
         }
     }
 }

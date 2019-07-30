@@ -92,7 +92,7 @@ namespace osu.Game.Screens.Backgrounds
 
         private ScheduledDelegate nextTask;
 
-        public void UpdateBackground()
+        public virtual void UpdateBackground()
         {
             nextTask?.Cancel();
             nextTask = Scheduler.AddDelayed(() => { LoadComponentAsync(createBackground(), display); }, 100);
