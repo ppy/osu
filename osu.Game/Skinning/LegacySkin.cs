@@ -78,11 +78,17 @@ namespace osu.Game.Skinning
         {
             switch (componentName)
             {
-                case "Play/osu/hitcircle":
-                    if (!hasHitCircle)
-                        return null;
+                case "Play/osu/sliderball":
+                    if (GetTexture("sliderb") != null)
+                        return new LegacySliderBall();
 
-                    return new LegacyMainCirclePiece();
+                    return null;
+
+                case "Play/osu/hitcircle":
+                    if (hasHitCircle)
+                        return new LegacyMainCirclePiece();
+
+                    return null;
 
                 case "Play/Miss":
                     componentName = "hit0";
@@ -120,6 +126,16 @@ namespace osu.Game.Skinning
                 return null;
 
             return new Sprite { Texture = texture };
+        }
+
+        public class LegacySliderBall : Sprite
+        {
+            [BackgroundDependencyLoader]
+            private void load(ISkinSource skin)
+            {
+                Texture = skin.GetTexture("sliderb");
+                Colour = skin.GetValue<SkinConfiguration, Color4?>(s => s.CustomColours.ContainsKey("SliderBall") ? s.CustomColours["SliderBall"] : (Color4?)null) ?? Color4.White;
+            }
         }
 
         public override Texture GetTexture(string componentName)
