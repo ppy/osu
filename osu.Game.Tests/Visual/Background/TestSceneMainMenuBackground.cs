@@ -2,6 +2,8 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Sprites;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Settings.Sections.Graphics;
 using osu.Game.Screens;
@@ -23,7 +25,7 @@ namespace osu.Game.Tests.Visual.Background
 
             AddStep("Trigger background update", () => background.UpdateBackground());
             AddStep("Default Mode", () => background.BackgroundMode.Value = MainMenuBackgroundMode.Default);
-            AddStep("Skin Mode", () => background.BackgroundMode.Value = MainMenuBackgroundMode.Skin);
+            AddStep("Skin Mode (skin with no bg)", () => background.BackgroundMode.Value = MainMenuBackgroundMode.Skin);
             AddStep("Beatmap Mode", () => background.BackgroundMode.Value = MainMenuBackgroundMode.Beatmap);
             AddStep("User change(not supporter)", () => background.User.Value = new User
             {
@@ -39,6 +41,9 @@ namespace osu.Game.Tests.Visual.Background
 
         private class TestBackgroundScreen : BackgroundScreenDefault
         {
+            private SpriteText userState;
+            private SpriteText modeState;
+
             public TestBackgroundScreen()
             {
                 var mc = new MusicController
@@ -48,9 +53,36 @@ namespace osu.Game.Tests.Visual.Background
                 };
 
                 AddInternal(mc);
+                
 
                 mc.Show();
             }
+
+            protected override void LoadComplete()
+            {
+                base.LoadComplete();
+
+                AddInternal(new FillFlowContainer
+                {
+                    Anchor = Anchor.CentreLeft,
+                    Origin = Anchor.CentreLeft,
+                    AutoSizeAxes = Axes.Both,
+                    Direction = FillDirection.Vertical,
+                    Margin = new MarginPadding { Left = 100 },
+                    Children = new Drawable[]
+                    {
+                        userState = new SpriteText(),
+                        modeState = new SpriteText()
+                    }
+                });
+
+                User.BindValueChanged(user => updateUserState(user.NewValue), true);
+                BackgroundMode.BindValueChanged(mode => updateModeState(mode.NewValue), true);
+            }
+
+            private void updateUserState(User user) => userState.Text = "user state: " + ((user?.IsSupporter ?? false) ? "supporter" : "unSupporter");
+
+            private void updateModeState(MainMenuBackgroundMode mode) => modeState.Text = $"mode state: {mode}";
         }
     }
 }
