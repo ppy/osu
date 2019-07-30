@@ -4,11 +4,9 @@
 using osuTK;
 using osuTK.Graphics;
 using osu.Framework.Allocation;
-using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Platform;
 using osu.Framework.Screens;
-using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Overlays;
@@ -131,8 +129,6 @@ namespace osu.Game.Screens.Menu
                     track.Start();
                 }
             }
-
-            Beatmap.ValueChanged += beatmap_ValueChanged;
         }
 
         protected override void LogoArriving(OsuLogo logo, bool resuming)
@@ -164,14 +160,6 @@ namespace osu.Game.Screens.Menu
             seq.OnAbort(_ => buttons.SetOsuLogo(null));
         }
 
-        private void beatmap_ValueChanged(ValueChangedEvent<WorkingBeatmap> e)
-        {
-            if (!this.IsCurrentScreen())
-                return;
-
-            ((BackgroundScreenDefault)Background).Next();
-        }
-
         public override void OnSuspending(IScreen next)
         {
             base.OnSuspending(next);
@@ -188,7 +176,7 @@ namespace osu.Game.Screens.Menu
         {
             base.OnResuming(last);
 
-            (Background as BackgroundScreenDefault)?.Next();
+            (Background as BackgroundScreenDefault)?.UpdateBackground();
 
             //we may have consumed our preloaded instance, so let's make another.
             preloadSongSelect();
