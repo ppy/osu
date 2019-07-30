@@ -50,11 +50,11 @@ namespace osu.Game.Tests.Visual.Menus
 
                 Add(osuGame);
             });
-            AddUntilStep("wait for load and menu is current", () => osuGame.IsLoaded && osuGame.ScreenStack.CurrentScreen is MainMenu);
+            AddUntilStep("Wait for main menu", () => osuGame.IsLoaded && osuGame.ScreenStack.CurrentScreen is MainMenu);
         }
 
         [Test]
-        public void TestExitingSongSelectWithEscape()
+        public void TestExitSongSelectWithEscape()
         {
             TestSongSelect songSelect = null;
 
@@ -67,7 +67,7 @@ namespace osu.Game.Tests.Visual.Menus
         }
 
         [Test]
-        public void TestExitingSongSelectWithClick()
+        public void TestExitSongSelectWithClick()
         {
             TestSongSelect songSelect = null;
 
