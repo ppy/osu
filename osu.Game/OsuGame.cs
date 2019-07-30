@@ -84,8 +84,6 @@ namespace osu.Game
         protected OsuScreenStack ScreenStack;
         protected BackButton BackButton;
 
-        private BackButton.BackButtonReceptor backButtonReceptor;
-
         private VolumeOverlay volume;
         private OsuLogo osuLogo;
 
@@ -393,6 +391,7 @@ namespace osu.Game
             ScoreManager.PresentImport = items => PresentScore(items.First());
 
             Container logoContainer;
+            BackButton.Receptor receptor;
 
             dependencies.CacheAs(idleTracker = new GameIdleTracker(6000));
 
@@ -409,9 +408,9 @@ namespace osu.Game
                     RelativeSizeAxes = Axes.Both,
                     Children = new Drawable[]
                     {
-                        backButtonReceptor = new BackButton.BackButtonReceptor(),
+                        receptor = new BackButton.Receptor(),
                         ScreenStack = new OsuScreenStack { RelativeSizeAxes = Axes.Both },
-                        BackButton = new BackButton(backButtonReceptor)
+                        BackButton = new BackButton(receptor)
                         {
                             Anchor = Anchor.BottomLeft,
                             Origin = Anchor.BottomLeft,

@@ -16,9 +16,9 @@ namespace osu.Game.Graphics.UserInterface
 
         private readonly TwoLayerButton button;
 
-        public BackButton(BackButtonReceptor receptor)
+        public BackButton(Receptor receptor)
         {
-            receptor.OnBackPressed += () => Action.Invoke();
+            receptor.OnBackPressed = () => Action.Invoke();
 
             Size = TwoLayerButton.SIZE_EXTENDED;
 
@@ -51,7 +51,7 @@ namespace osu.Game.Graphics.UserInterface
             button.FadeOut(400, Easing.OutQuint);
         }
 
-        public class BackButtonReceptor : Drawable, IKeyBindingHandler<GlobalAction>
+        public class Receptor : Drawable, IKeyBindingHandler<GlobalAction>
         {
             public Action OnBackPressed;
 
