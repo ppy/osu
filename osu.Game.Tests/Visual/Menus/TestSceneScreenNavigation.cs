@@ -20,49 +20,37 @@ using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.Menus
 {
-    public class TestSceneExitingScreens : ManualInputManagerTestScene
+    public class TestSceneScreenNavigation : ManualInputManagerTestScene
     {
-        private readonly TestOsuGame osuGame = new TestOsuGame();
+        private GameHost gameHost;
+        private TestOsuGame osuGame;
 
         [BackgroundDependencyLoader]
         private void load(GameHost gameHost)
         {
-            osuGame.SetHost(gameHost);
+            this.gameHost = gameHost;
 
-            Children = new Drawable[]
+            Child = new Box
             {
-                new Box
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    Colour = Color4.Black,
-                },
-                osuGame
+                RelativeSizeAxes = Axes.Both,
+                Colour = Color4.Black,
             };
         }
 
         [SetUpSteps]
         public void SetUpSteps()
         {
-            AddUntilStep("wait for load", () => osuGame.IsLoaded);
-            AddUntilStep("exit to main menu", () =>
+            AddStep("Create new game instance", () =>
             {
-                var current = osuGame.ScreenStack.CurrentScreen;
+                if (osuGame != null)
+                    Remove(osuGame);
 
-                switch (current)
-                {
-                    case null:
-                    case IntroScreen _:
-                    case Disclaimer _:
-                        return false;
+                osuGame = new TestOsuGame();
+                osuGame.SetHost(gameHost);
 
-                    case MainMenu _:
-                        return true;
-
-                    default:
-                        current.Exit();
-                        return false;
-                }
+                Add(osuGame);
             });
+            AddUntilStep("wait for load and menu is current", () => osuGame.IsLoaded && osuGame.ScreenStack.CurrentScreen is MainMenu);
         }
 
         [Test]
