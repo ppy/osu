@@ -281,7 +281,9 @@ namespace osu.Game.Skinning
                     hitCircleSprite = new Sprite
                     {
                         Texture = skin.GetTexture("hitcircle"),
-                        Colour = drawableObject.AccentColour.Value
+                        Colour = drawableObject.AccentColour.Value,
+                        Anchor = Anchor.Centre,
+                        Origin = Anchor.Centre,
                     },
                     new SkinnableSpriteText("Play/osu/number-text", _ => new OsuSpriteText
                     {
@@ -291,7 +293,12 @@ namespace osu.Game.Skinning
                     {
                         Text = (((IHasComboInformation)drawableObject.HitObject).IndexInCurrentCombo + 1).ToString()
                     },
-                    new Sprite { Texture = skin.GetTexture("hitcircleoverlay") }
+                    new Sprite
+                    {
+                        Texture = skin.GetTexture("hitcircleoverlay"),
+                        Anchor = Anchor.Centre,
+                        Origin = Anchor.Centre,
+                    }
                 };
 
                 state.BindTo(drawableObject.State);
