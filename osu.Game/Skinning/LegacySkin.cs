@@ -73,7 +73,7 @@ namespace osu.Game.Skinning
         {
             switch (componentName)
             {
-                case "osu/Game/Rulesets/Osu/UI/Cursor/OsuCursor":
+                case "Play/osu/cursor":
                     if (GetTexture("cursor") != null)
                         return new LegacyCursor();
 
