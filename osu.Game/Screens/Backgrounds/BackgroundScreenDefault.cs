@@ -8,10 +8,8 @@ using osu.Framework.MathUtils;
 using osu.Framework.Threading;
 using osu.Game.Configuration;
 using osu.Game.Graphics.Backgrounds;
-using osu.Game.Online.API;
 using osu.Game.Overlays.Settings.Sections.Graphics;
 using osu.Game.Skinning;
-using osu.Game.Users;
 
 namespace osu.Game.Screens.Backgrounds
 {
@@ -62,10 +60,19 @@ namespace osu.Game.Screens.Backgrounds
         {
             Background newBackground;
 
-            if (backgroundMode.Value == MainMenuBackgroundMode.Skin)
-                newBackground = new SkinnedBackground(skin.Value, backgroundName);
-            else
-                newBackground = new Background(backgroundName);
+            switch (backgroundMode.Value)
+            {
+                default:
+                case MainMenuBackgroundMode.Default:
+                    newBackground = new Background(backgroundName);
+                    break;
+                case MainMenuBackgroundMode.Skin:
+                    newBackground = new SkinnedBackground(skin.Value, backgroundName);
+                    break;
+                case MainMenuBackgroundMode.Beatmap:
+                    newBackground = new SkinnedBackground(skin.Value, backgroundName);
+                    break;
+            }
 
             newBackground.Depth = currentDisplay;
 
