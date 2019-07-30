@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Game.Configuration;
 using osu.Game.Online.API;
@@ -32,12 +33,12 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
                 }
             };
 
-            api.LocalUser.BindValueChanged(user => onUserChanged(user.NewValue), true);
+            api.LocalUser.BindValueChanged(onUserChanged, true);
         }
 
-        private void onUserChanged(User user)
+        private void onUserChanged(ValueChangedEvent<User> user)
         {
-            if ((!user?.IsSupporter) ?? true)
+            if ((!user.NewValue?.IsSupporter) ?? true)
             {
                 backgroundDropdown.Bindable.Value = MainMenuBackgroundMode.Default;
                 backgroundDropdown.Bindable.Disabled = true;
