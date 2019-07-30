@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Net;
 using System.Threading.Tasks;
 using osu.Framework.Logging;
 using SharpRaven;
@@ -44,6 +45,16 @@ namespace osu.Game.Utils
 
                         if (ioe.HResult == hr_error_handle_disk_full || ioe.HResult == hr_error_disk_full)
                             return;
+                    }
+
+                    if (exception is WebException we)
+                    {
+                        switch (we.Status)
+                        {
+                            // more statuses may need to be blocked as we come across them.
+                            case WebExceptionStatus.Timeout:
+                                return;
+                        }
                     }
 
                     // since we let unhandled exceptions go ignored at times, we want to ensure they don't get submitted on subsequent reports.
