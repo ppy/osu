@@ -147,6 +147,8 @@ namespace osu.Game.Tests.Visual.Gameplay
             private readonly ManualClock manualClock;
             private IFrameBasedClock originalClock;
 
+            public new int CurrentBreakIndex => base.CurrentBreakIndex;
+
             public double ManualClockTime
             {
                 get => manualClock.CurrentTime;
