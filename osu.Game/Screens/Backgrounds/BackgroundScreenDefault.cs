@@ -6,6 +6,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.MathUtils;
 using osu.Framework.Threading;
+using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Graphics.Backgrounds;
 using osu.Game.Overlays.Settings.Sections.Graphics;
@@ -23,16 +24,19 @@ namespace osu.Game.Screens.Backgrounds
         private string backgroundName => $@"Menu/menu-background-{currentDisplay % background_count + 1}";
 
         private Bindable<Skin> skin;
+        private readonly Bindable<WorkingBeatmap> beatmap = new Bindable<WorkingBeatmap>();
         private readonly Bindable<MainMenuBackgroundMode> backgroundMode = new Bindable<MainMenuBackgroundMode>();
 
         [BackgroundDependencyLoader]
-        private void load(SkinManager skinManager, OsuConfigManager config)
+        private void load(SkinManager skinManager, OsuConfigManager config, Bindable<WorkingBeatmap> workingBeatmap)
         {
             skin = skinManager.CurrentSkin.GetBoundCopy();
+            beatmap.BindTo(workingBeatmap);
             config.BindWith(OsuSetting.MenuBackgroundMode, backgroundMode);
 
             skin.ValueChanged += _ => Next();
             backgroundMode.ValueChanged += _ => Next();
+            beatmap.ValueChanged += _ => Next();
 
             currentDisplay = RNG.Next(0, background_count);
 
@@ -70,8 +74,8 @@ namespace osu.Game.Screens.Backgrounds
                     newBackground = new SkinnedBackground(skin.Value, backgroundName);
                     break;
                 case MainMenuBackgroundMode.Beatmap:
-                    newBackground = new SkinnedBackground(skin.Value, backgroundName);
-                    break;
+                    newBackground = new BeatmapBackground(beatmap.Value, backgroundName);
+                break;
             }
 
             newBackground.Depth = currentDisplay;
@@ -93,6 +97,23 @@ namespace osu.Game.Screens.Backgrounds
             private void load()
             {
                 Sprite.Texture = skin.GetTexture("menu-background") ?? Sprite.Texture;
+            }
+        }
+
+        private class BeatmapBackground : Background
+        {
+            private readonly WorkingBeatmap beatmap;
+
+            public BeatmapBackground(WorkingBeatmap beatmap, string fallbackTextureName)
+                : base(fallbackTextureName)
+            {
+                this.beatmap = beatmap;
+            }
+
+            [BackgroundDependencyLoader]
+            private void load()
+            {
+                Sprite.Texture = beatmap?.Background ?? Sprite.Texture;
             }
         }
     }
