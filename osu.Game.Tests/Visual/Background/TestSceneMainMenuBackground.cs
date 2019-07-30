@@ -25,7 +25,6 @@ namespace osu.Game.Tests.Visual.Background
                 RelativeSizeAxes = Axes.Both,
             };
 
-            AddStep("Trigger background update", () => background.UpdateBackground());
             AddStep("Default Mode", () => background.BackgroundMode.Value = MainMenuBackgroundMode.Default);
             AddStep("Skin Mode (skin with no bg)", () => background.BackgroundMode.Value = MainMenuBackgroundMode.Skin);
             AddStep("Beatmap Mode", () => background.BackgroundMode.Value = MainMenuBackgroundMode.Beatmap);
@@ -97,10 +96,9 @@ namespace osu.Game.Tests.Visual.Background
 
             private void updateModeState(MainMenuBackgroundMode mode) => modeState.Text = $"mode state: {mode}";
 
-            public override void UpdateBackground()
+            protected override void UpdateBackground()
             {
                 base.UpdateBackground();
-
                 updateNotification.FadeIn().Then().Delay(500).Then().FadeOut(500);
             }
         }

@@ -176,8 +176,6 @@ namespace osu.Game.Screens.Menu
         {
             base.OnResuming(last);
 
-            (Background as BackgroundScreenDefault)?.UpdateBackground();
-
             //we may have consumed our preloaded instance, so let's make another.
             preloadSongSelect();
 

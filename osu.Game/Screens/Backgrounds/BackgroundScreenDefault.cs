@@ -65,8 +65,8 @@ namespace osu.Game.Screens.Backgrounds
 
         private void onUserChanged(ValueChangedEvent<User> user)
         {
-            if (BackgroundMode.Value != MainMenuBackgroundMode.Default && user.OldValue?.IsSupporter != user.NewValue?.IsSupporter
-                && (BackgroundMode.Value != MainMenuBackgroundMode.Skin | skinHasBackground))
+            if (BackgroundMode.Value != MainMenuBackgroundMode.Default && user.OldValue?.IsSupporter != user.NewValue?.IsSupporter &&
+                (BackgroundMode.Value != MainMenuBackgroundMode.Skin | skinHasBackground))
                 UpdateBackground();
         }
 
@@ -92,7 +92,7 @@ namespace osu.Game.Screens.Backgrounds
 
         private ScheduledDelegate nextTask;
 
-        public virtual void UpdateBackground()
+        protected virtual void UpdateBackground()
         {
             nextTask?.Cancel();
             nextTask = Scheduler.AddDelayed(() => { LoadComponentAsync(createBackground(), display); }, 100);
