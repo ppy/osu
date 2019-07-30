@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
@@ -43,7 +44,7 @@ namespace osu.Game.Tests.Visual.Menus
         public void SetUpSteps()
         {
             AddUntilStep("wait for load", () => osuGame.IsLoaded);
-            AddUntilStep("wait for main menu", () =>
+            AddUntilStep("exit to main menu", () =>
             {
                 var current = osuGame.ScreenStack.CurrentScreen;
 
@@ -69,8 +70,7 @@ namespace osu.Game.Tests.Visual.Menus
         {
             TestSongSelect songSelect = null;
 
-            AddStep("Push song select", () => osuGame.ScreenStack.Push(songSelect = new TestSongSelect()));
-            AddUntilStep("Wait for song select", () => songSelect.IsCurrentScreen());
+            pushAndConfirm(() => songSelect = new TestSongSelect(), "song select");
             AddStep("Show mods overlay", () => songSelect.ModSelectOverlay.Show());
             AddAssert("Overlay was shown", () => songSelect.ModSelectOverlay.State.Value == Visibility.Visible);
             AddStep("Press escape", () => pressAndRelease(Key.Escape));
@@ -83,8 +83,7 @@ namespace osu.Game.Tests.Visual.Menus
         {
             TestSongSelect songSelect = null;
 
-            AddStep("Push song select", () => osuGame.ScreenStack.Push(songSelect = new TestSongSelect()));
-            AddUntilStep("Wait for song select", () => songSelect.IsCurrentScreen());
+            pushAndConfirm(() => songSelect = new TestSongSelect(), "song select");
             AddStep("Show mods overlay", () => songSelect.ModSelectOverlay.Show());
             AddAssert("Overlay was shown", () => songSelect.ModSelectOverlay.State.Value == Visibility.Visible);
             AddStep("Move mouse to backButton", () => InputManager.MoveMouseTo(osuGame.BackButton));
@@ -100,22 +99,22 @@ namespace osu.Game.Tests.Visual.Menus
         [Test]
         public void TestExitMultiWithEscape()
         {
-            Screens.Multi.Multiplayer multiplayer = null;
-
-            AddStep("Push multiplayer", () => osuGame.ScreenStack.Push(multiplayer = new Screens.Multi.Multiplayer()));
-            AddUntilStep("Wait for multiplayer", () => multiplayer.IsCurrentScreen());
+            pushAndConfirm(() => new Screens.Multi.Multiplayer(), "multiplayer");
             exitViaEscapeAndConfirm();
         }
 
         [Test]
         public void TestExitMultiWithBackButton()
         {
-            Screens.Multi.Multiplayer multiplayer = null;
-
-            AddStep("Push multiplayer", () => osuGame.ScreenStack.Push(multiplayer = new Screens.Multi.Multiplayer()));
-            AddUntilStep("Wait for multiplayer", () => multiplayer.IsCurrentScreen());
-
+            pushAndConfirm(() => new Screens.Multi.Multiplayer(), "multiplayer");
             exitViaBackButtonAndConfirm();
+        }
+
+        private void pushAndConfirm(Func<Screen> newScreen, string screenName)
+        {
+            Screen screen = null;
+            AddStep($"Push new {screenName}", () => osuGame.ScreenStack.Push(screen = newScreen()));
+            AddUntilStep($"Wait for new {screenName}", () => screen.IsCurrentScreen());
         }
 
         private void exitViaEscapeAndConfirm()

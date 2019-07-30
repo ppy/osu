@@ -22,7 +22,7 @@ namespace osu.Game.Tests.Visual.UserInterface
         public TestSceneBackButton()
         {
             BackButton button;
-            BackButton.BackButtonReceptor receptor = new BackButton.BackButtonReceptor();
+            BackButton.Receptor receptor = new BackButton.Receptor();
 
             Child = new Container
             {
