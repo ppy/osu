@@ -6,6 +6,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Textures;
 using osu.Game.Skinning;
+using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
 {
@@ -24,7 +25,26 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
         [BackgroundDependencyLoader]
         private void load(TextureStore textures)
         {
-            Child = new SkinnableSprite("Play/osu/approachcircle");
+            Child = new SkinnableApproachCircle();
+        }
+
+        private class SkinnableApproachCircle : SkinnableSprite
+        {
+            public SkinnableApproachCircle()
+                : base("Play/osu/approachcircle")
+            {
+            }
+
+            protected override Drawable CreateDefault(string name)
+            {
+                var drawable = base.CreateDefault(name);
+
+                // account for the sprite being used for the default approach circle being taken from stable,
+                // when hitcircles have 5px padding on each size. this should be removed if we update the sprite.
+                drawable.Scale = new Vector2(128 / 118f);
+
+                return drawable;
+            }
         }
     }
 }
