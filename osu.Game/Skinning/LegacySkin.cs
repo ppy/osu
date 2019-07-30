@@ -87,7 +87,7 @@ namespace osu.Game.Skinning
                 case "Play/osu/hitcircle":
                     if (hasHitCircle)
                         return new LegacyMainCirclePiece();
-                    
+
                     return null;
 
                 case "Play/Miss":
