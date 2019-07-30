@@ -1,4 +1,4 @@
-﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
@@ -52,11 +52,7 @@ namespace osu.Desktop
 
             if (!noVersionOverlay)
             {
-                LoadComponentAsync(versionManager = new VersionManager { Depth = int.MinValue }, v =>
-                {
-                    Add(v);
-                    v.Show();
-                });
+                LoadComponentAsync(versionManager = new VersionManager { Depth = int.MinValue }, Add);
 
                 if (RuntimeInfo.OS == RuntimeInfo.Platform.Windows)
                     Add(new SquirrelUpdateManager());
