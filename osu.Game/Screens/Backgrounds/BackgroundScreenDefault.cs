@@ -59,52 +59,35 @@ namespace osu.Game.Screens.Backgrounds
             currentDisplay++;
         }
 
-        private void onUserChanged(ValueChangedEvent<User> user)
-        {
-            if (BackgroundMode.Value == MainMenuBackgroundMode.Default)
-                return;
-
-            if (user.OldValue?.IsSupporter == user.NewValue?.IsSupporter)
-                return;
-
-            UpdateBackground();
-        }
-
         private Texture skinBackground(Skin skin) => skin.GetTexture("menu-background");
 
         private bool skinHasBackground => skin.Value.GetTexture("menu-background") != null;
 
+        private void onUserChanged(ValueChangedEvent<User> user)
+        {
+            if (BackgroundMode.Value != MainMenuBackgroundMode.Default && user.OldValue?.IsSupporter != user.NewValue?.IsSupporter
+                && (BackgroundMode.Value != MainMenuBackgroundMode.Skin | skinHasBackground))
+                UpdateBackground();
+        }
+
         private void onSkinChanged(ValueChangedEvent<Skin> skin)
         {
-            if (BackgroundMode.Value != MainMenuBackgroundMode.Skin)
-                return;
-
-            if ((!User.Value?.IsSupporter) ?? true)
-                return;
-
-            if (skinBackground(skin.OldValue) == skinBackground(skin.NewValue))
-                return;
-
-            UpdateBackground();
+            if ((User.Value?.IsSupporter ?? false) && BackgroundMode.Value == MainMenuBackgroundMode.Skin && skinBackground(skin.OldValue) != skinBackground(skin.NewValue))
+                UpdateBackground();
         }
 
         private void onBeatmapChanged(ValueChangedEvent<WorkingBeatmap> beatmap)
         {
-            if (BackgroundMode.Value == MainMenuBackgroundMode.Skin && skinHasBackground)
-                return;
-
-            UpdateBackground();
+            if (!((User.Value?.IsSupporter ?? true) && BackgroundMode.Value == MainMenuBackgroundMode.Skin && skinHasBackground))
+                UpdateBackground();
         }
 
         private void onModeChanged(ValueChangedEvent<MainMenuBackgroundMode> mode)
         {
-            if (mode.OldValue == MainMenuBackgroundMode.Default && mode.NewValue == MainMenuBackgroundMode.Skin && !skinHasBackground)
-                return;
-
-            if (mode.OldValue == MainMenuBackgroundMode.Skin && mode.NewValue == MainMenuBackgroundMode.Default && !skinHasBackground)
-                return;
-
-            UpdateBackground();
+            if (((User.Value?.IsSupporter) ?? false)
+                && (!(mode.OldValue == MainMenuBackgroundMode.Default && mode.NewValue == MainMenuBackgroundMode.Skin && !skinHasBackground)
+                    & !(mode.OldValue == MainMenuBackgroundMode.Skin && mode.NewValue == MainMenuBackgroundMode.Default && !skinHasBackground)))
+                UpdateBackground();
         }
 
         private ScheduledDelegate nextTask;
