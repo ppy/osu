@@ -5,14 +5,13 @@ using System;
 using System.Collections.Generic;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Game.Tests.Visual;
 using osu.Game.Tournament.Components;
 using osu.Game.Tournament.Models;
 using osu.Game.Tournament.Screens.Ladder.Components;
 
 namespace osu.Game.Tournament.Tests.Components
 {
-    public class TestSceneDrawableTournamentMatch : OsuTestScene
+    public class TestSceneDrawableTournamentMatch : TournamentTestScene
     {
         public override IReadOnlyList<Type> RequiredTypes => new[]
         {
