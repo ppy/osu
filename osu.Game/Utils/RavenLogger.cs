@@ -46,7 +46,7 @@ namespace osu.Game.Utils
                         return;
 
                     lastException = exception;
-                    queuePendingTask(raven.CaptureAsync(new SentryEvent(exception)));
+                    queuePendingTask(raven.CaptureAsync(new SentryEvent(exception) { Message = entry.Message }));
                 }
                 else
                     raven.AddTrail(new Breadcrumb(entry.Target.ToString(), BreadcrumbType.Navigation) { Message = entry.Message });
