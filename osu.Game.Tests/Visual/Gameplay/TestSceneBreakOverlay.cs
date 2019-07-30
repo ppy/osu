@@ -87,7 +87,12 @@ namespace osu.Game.Tests.Visual.Gameplay
             setClock(true);
             loadBreaksStep("multiple breaks", testBreaks);
 
-            addBreakSeeks(testBreaks.Last(), false);
+            seekAndAssertBreak("seek to break start", testBreaks[1].StartTime, true);
+            AddAssert("is skipped to break #2", () => breakOverlay.CurrentBreakIndex == 1);
+
+            seekAndAssertBreak("seek to break middle", testBreaks[1].StartTime + testBreaks[1].Duration / 2, true);
+            seekAndAssertBreak("seek to break end", testBreaks[1].EndTime, false);
+            seekAndAssertBreak("seek to break after end", testBreaks[1].EndTime + 500, false);
         }
 
         private void addShowBreakStep(double seconds)
