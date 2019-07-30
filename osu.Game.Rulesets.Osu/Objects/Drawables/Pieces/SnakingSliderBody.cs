@@ -24,6 +24,20 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
         public double? SnakedStart { get; private set; }
         public double? SnakedEnd { get; private set; }
 
+        public override float PathRadius
+        {
+            get => base.PathRadius;
+            set
+            {
+                if (base.PathRadius == value)
+                    return;
+
+                base.PathRadius = value;
+
+                Refresh();
+            }
+        }
+
         public override Vector2 PathOffset => snakedPathOffset;
 
         /// <summary>
