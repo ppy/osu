@@ -20,7 +20,7 @@ namespace osu.Game.Rulesets.Taiko.Tests
         [NonParallelizable]
         [TestCase("basic")]
         [TestCase("slider-generating-drumroll")]
-        public new void Test(string name)
+        public void Test(string name)
         {
             base.Test(name);
         }
