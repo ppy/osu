@@ -90,9 +90,11 @@ namespace osu.Game.Screens.Play
             var orderedByScore = this.OrderByDescending(i => i.TotalScore).ToList();
             var orderedPositions = this.OrderByDescending(i => i.ScorePosition.HasValue).ThenBy(i => i.ScorePosition).Select(i => i.ScorePosition).ToList();
 
+            var newDeclaredPosition = maxPosition + 1;
+
             for (int i = 0; i < Count; i++)
             {
-                int newPosition = orderedPositions[i] ?? maxPosition + 1;
+                int newPosition = orderedPositions[i] ?? newDeclaredPosition;
 
                 SetLayoutPosition(orderedByScore[i], newPosition);
                 orderedByScore[i].ScorePosition = DeclareNewPosition ? newPosition : orderedPositions[i];
