@@ -217,10 +217,6 @@ namespace osu.Game.Rulesets.Scoring
         private double baseScore;
         private double bonusScore;
 
-        protected ScoreProcessor()
-        {
-        }
-
         public ScoreProcessor(DrawableRuleset<TObject> drawableRuleset)
         {
             Debug.Assert(base_portion + combo_portion == 1.0);
