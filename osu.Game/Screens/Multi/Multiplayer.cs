@@ -34,6 +34,8 @@ namespace osu.Game.Screens.Multi
 
         public override bool DisallowExternalBeatmapRulesetChanges => true;
 
+        protected virtual bool RequireOnline => true;
+
         private readonly MultiplayerWaveContainer waves;
 
         private readonly OsuButton createButton;
@@ -166,7 +168,7 @@ namespace osu.Game.Screens.Multi
 
         public void APIStateChanged(IAPIProvider api, APIState state)
         {
-            if (state != APIState.Online)
+            if (RequireOnline && state != APIState.Online)
                 forcefullyExit();
         }
 

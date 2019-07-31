@@ -5,17 +5,23 @@ using System;
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
+using osu.Framework.Audio;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Logging;
 using osu.Framework.Platform;
 using osu.Framework.Screens;
 using osu.Framework.Testing;
+using osu.Game.Beatmaps;
+using osu.Game.Configuration;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays.Mods;
+using osu.Game.Rulesets;
 using osu.Game.Screens;
 using osu.Game.Screens.Menu;
 using osu.Game.Screens.Select;
+using osu.Game.Tests.Resources;
 using osuTK;
 using osuTK.Graphics;
 using osuTK.Input;
@@ -27,7 +33,7 @@ namespace osu.Game.Tests.Visual.Menus
         private GameHost gameHost;
         private TestOsuGame osuGame;
 
-        private Vector2 backButtonPosition => osuGame.ToScreenSpace(new Vector2(0, osuGame.LayoutRectangle.Bottom));
+        private Vector2 backButtonPosition => osuGame.ToScreenSpace(new Vector2(25, osuGame.LayoutRectangle.Bottom - 25));
 
         [BackgroundDependencyLoader]
         private void load(GameHost gameHost)
@@ -55,7 +61,8 @@ namespace osu.Game.Tests.Visual.Menus
                 Add(osuGame);
             });
             AddUntilStep("Wait for load", () => osuGame.IsLoaded);
-            AddUntilStep("Wait for main menu", () => osuGame.ScreenStack.CurrentScreen is MainMenu);
+            AddUntilStep("Wait for intro", () => osuGame.ScreenStack.CurrentScreen is IntroScreen);
+            AddUntilStep("Wait for main menu", () => osuGame.ScreenStack.CurrentScreen is MainMenu menu && menu.IsLoaded);
         }
 
         [Test]
@@ -79,7 +86,7 @@ namespace osu.Game.Tests.Visual.Menus
             pushAndConfirm(() => songSelect = new TestSongSelect(), "song select");
             AddStep("Show mods overlay", () => songSelect.ModSelectOverlay.Show());
             AddAssert("Overlay was shown", () => songSelect.ModSelectOverlay.State.Value == Visibility.Visible);
-            AddStep("Move mouse to backButton", () => InputManager.MoveMouseTo(osuGame.BackButton));
+            AddStep("Move mouse to backButton", () => InputManager.MoveMouseTo(backButtonPosition));
 
             // BackButton handles hover using its child button, so this checks whether or not any of BackButton's children are hovered.
             AddUntilStep("Back button is hovered", () => InputManager.HoveredDrawables.Any(d => d.Parent == osuGame.BackButton));
@@ -92,22 +99,28 @@ namespace osu.Game.Tests.Visual.Menus
         [Test]
         public void TestExitMultiWithEscape()
         {
-            pushAndConfirm(() => new Screens.Multi.Multiplayer(), "multiplayer");
+            pushAndConfirm(() => new TestMultiplayer(), "multiplayer");
             exitViaEscapeAndConfirm();
         }
 
         [Test]
         public void TestExitMultiWithBackButton()
         {
-            pushAndConfirm(() => new Screens.Multi.Multiplayer(), "multiplayer");
+            pushAndConfirm(() => new TestMultiplayer(), "multiplayer");
             exitViaBackButtonAndConfirm();
         }
 
         private void pushAndConfirm(Func<Screen> newScreen, string screenName)
         {
             Screen screen = null;
-            AddStep($"Push new {screenName}", () => osuGame.ScreenStack.Push(screen = newScreen()));
-            AddUntilStep($"Wait for new {screenName}", () => osuGame.ScreenStack.CurrentScreen == screen);
+            AddStep($"Push new {screenName}", () =>
+            {
+                if (screenName == "song select")
+                    Logger.Log("fuck");
+                
+                osuGame.ScreenStack.Push(screen = newScreen());
+            });
+            AddUntilStep($"Wait for new {screenName}", () => osuGame.ScreenStack.CurrentScreen == screen && screen.IsLoaded);
         }
 
         private void exitViaEscapeAndConfirm()
@@ -118,7 +131,7 @@ namespace osu.Game.Tests.Visual.Menus
 
         private void exitViaBackButtonAndConfirm()
         {
-            AddStep("Move mouse to backButton", () => InputManager.MoveMouseTo(osuGame.BackButton));
+            AddStep("Move mouse to backButton", () => InputManager.MoveMouseTo(backButtonPosition));
             AddStep("Click back button", () => InputManager.Click(MouseButton.Left));
             AddUntilStep("Wait for main menu", () => osuGame.ScreenStack.CurrentScreen is MainMenu);
         }
@@ -141,6 +154,11 @@ namespace osu.Game.Tests.Visual.Menus
         private class TestSongSelect : PlaySongSelect
         {
             public ModSelectOverlay ModSelectOverlay => ModSelect;
+        }
+
+        private class TestMultiplayer : Screens.Multi.Multiplayer
+        {
+            protected override bool RequireOnline => false;
         }
 
         private class TestLoader : Loader
