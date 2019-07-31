@@ -115,7 +115,6 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             AccentColour.BindValueChanged(colour =>
             {
                 Body.AccentColour = colour.NewValue;
-                Ball.AccentColour = colour.NewValue;
 
                 foreach (var drawableHitObject in NestedHitObjects)
                     drawableHitObject.AccentColour.Value = colour.NewValue;
@@ -166,7 +165,6 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
             Body.AccentColour = skin.GetValue<SkinConfiguration, Color4?>(s => s.CustomColours.ContainsKey("SliderTrackOverride") ? s.CustomColours["SliderTrackOverride"] : (Color4?)null) ?? AccentColour.Value;
             Body.BorderColour = skin.GetValue<SkinConfiguration, Color4?>(s => s.CustomColours.ContainsKey("SliderBorder") ? s.CustomColours["SliderBorder"] : (Color4?)null) ?? Color4.White;
-            Ball.AccentColour = skin.GetValue<SkinConfiguration, Color4?>(s => s.CustomColours.ContainsKey("SliderBall") ? s.CustomColours["SliderBall"] : (Color4?)null) ?? AccentColour.Value;
         }
 
         private void updatePathRadius() => Body.PathRadius = slider.Scale * sliderPathRadius;
