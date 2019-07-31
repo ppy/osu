@@ -28,9 +28,9 @@ namespace osu.Game.Tests.Beatmaps
 
         protected abstract string ResourceAssembly { get; }
 
-        protected void Test(string name)
+        protected void Test(string name, params Type[] mods)
         {
-            var ourResult = convert(name);
+            var ourResult = convert(name, mods.Select(m => (Mod)Activator.CreateInstance(m)).ToArray());
             var expectedResult = read(name);
 
             Assert.Multiple(() =>
@@ -92,7 +92,7 @@ namespace osu.Game.Tests.Beatmaps
             });
         }
 
-        private ConvertResult convert(string name)
+        private ConvertResult convert(string name, Mod[] mods)
         {
             var beatmap = getBeatmap(name);
 
@@ -110,7 +110,7 @@ namespace osu.Game.Tests.Beatmaps
                 }
             };
 
-            working.GetPlayableBeatmap(rulesetInstance.RulesetInfo, Array.Empty<Mod>());
+            working.GetPlayableBeatmap(rulesetInstance.RulesetInfo, mods);
 
             return new ConvertResult
             {

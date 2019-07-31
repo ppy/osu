@@ -20,7 +20,7 @@ namespace osu.Game.Rulesets.Mania.Tests
         protected override string ResourceAssembly => "osu.Game.Rulesets.Mania";
 
         [TestCase("basic")]
-        public new void Test(string name)
+        public void Test(string name)
         {
             base.Test(name);
         }
