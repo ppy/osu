@@ -31,7 +31,7 @@ namespace osu.Game.Tests.Visual.Background
             };
 
             AddStep("Default Mode", () => background.BackgroundMode.Value = MainMenuBackgroundMode.Default);
-            AddStep("Skin Mode (skin with no bg)", () => background.BackgroundMode.Value = MainMenuBackgroundMode.Skin);
+            AddStep("Skin Mode", () => background.BackgroundMode.Value = MainMenuBackgroundMode.Skin);
             AddStep("Beatmap Mode", () => background.BackgroundMode.Value = MainMenuBackgroundMode.Beatmap);
             AddStep("Change user(not supporter)", () => background.User.Value = new User
             {
