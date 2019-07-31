@@ -316,7 +316,7 @@ namespace osu.Game.Screens.Menu
                             logoDelayedAction = Scheduler.AddDelayed(() =>
                             {
                                 if (impact)
-                                    logo.Impact();
+                                    logo?.Impact();
 
                                 game?.Toolbar.Show();
                             }, 200);

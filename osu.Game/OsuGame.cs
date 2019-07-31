@@ -105,6 +105,8 @@ namespace osu.Game
 
         private readonly List<OverlayContainer> visibleBlockingOverlays = new List<OverlayContainer>();
 
+        protected virtual Loader CreateLoader() => new Loader();
+
         public OsuGame(string[] args = null)
         {
             this.args = args;
@@ -439,10 +441,7 @@ namespace osu.Game
                 logoContainer.Add(logo);
 
                 // Loader has to be created after the logo has finished loading as Loader performs logo transformations on entering.
-                ScreenStack.Push(new Loader
-                {
-                    RelativeSizeAxes = Axes.Both
-                });
+                ScreenStack.Push(CreateLoader().With(l => l.RelativeSizeAxes = Axes.Both));
             });
 
             loadComponentSingleFile(Toolbar = new Toolbar

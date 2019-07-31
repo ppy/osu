@@ -13,8 +13,10 @@ using osu.Framework.Screens;
 using osu.Framework.Testing;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays.Mods;
+using osu.Game.Screens;
 using osu.Game.Screens.Menu;
 using osu.Game.Screens.Select;
+using osuTK;
 using osuTK.Graphics;
 using osuTK.Input;
 
@@ -24,6 +26,8 @@ namespace osu.Game.Tests.Visual.Menus
     {
         private GameHost gameHost;
         private TestOsuGame osuGame;
+
+        private Vector2 backButtonPosition => osuGame.ToScreenSpace(new Vector2(0, osuGame.LayoutRectangle.Bottom));
 
         [BackgroundDependencyLoader]
         private void load(GameHost gameHost)
@@ -50,7 +54,8 @@ namespace osu.Game.Tests.Visual.Menus
 
                 Add(osuGame);
             });
-            AddUntilStep("Wait for main menu", () => osuGame.IsLoaded && osuGame.ScreenStack.CurrentScreen is MainMenu);
+            AddUntilStep("Wait for load", () => osuGame.IsLoaded);
+            AddUntilStep("Wait for main menu", () => osuGame.ScreenStack.CurrentScreen is MainMenu);
         }
 
         [Test]
@@ -80,7 +85,7 @@ namespace osu.Game.Tests.Visual.Menus
             AddUntilStep("Back button is hovered", () => InputManager.HoveredDrawables.Any(d => d.Parent == osuGame.BackButton));
 
             AddStep("Click back button", () => InputManager.Click(MouseButton.Left));
-            AddAssert("Overlay was hidden", () => songSelect.ModSelectOverlay.State.Value == Visibility.Hidden);
+            AddUntilStep("Overlay was hidden", () => songSelect.ModSelectOverlay.State.Value == Visibility.Hidden);
             exitViaBackButtonAndConfirm();
         }
 
@@ -102,7 +107,7 @@ namespace osu.Game.Tests.Visual.Menus
         {
             Screen screen = null;
             AddStep($"Push new {screenName}", () => osuGame.ScreenStack.Push(screen = newScreen()));
-            AddUntilStep($"Wait for new {screenName}", () => screen.IsCurrentScreen());
+            AddUntilStep($"Wait for new {screenName}", () => osuGame.ScreenStack.CurrentScreen == screen);
         }
 
         private void exitViaEscapeAndConfirm()
@@ -129,11 +134,23 @@ namespace osu.Game.Tests.Visual.Menus
             public new ScreenStack ScreenStack => base.ScreenStack;
 
             public new BackButton BackButton => base.BackButton;
+
+            protected override Loader CreateLoader() => new TestLoader();
         }
 
         private class TestSongSelect : PlaySongSelect
         {
             public ModSelectOverlay ModSelectOverlay => ModSelect;
+        }
+
+        private class TestLoader : Loader
+        {
+            protected override ShaderPrecompiler CreateShaderPrecompiler() => new TestShaderPrecompiler();
+
+            private class TestShaderPrecompiler : ShaderPrecompiler
+            {
+                protected override bool AllLoaded => true;
+            }
         }
     }
 }
