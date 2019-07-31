@@ -90,6 +90,14 @@ namespace osu.Game.Beatmaps
         }
 
         /// <summary>
+        /// Creates a <see cref="IBeatmapConverter"/> to convert a <see cref="IBeatmap"/> for a specified <see cref="Ruleset"/>.
+        /// </summary>
+        /// <param name="beatmap">The <see cref="IBeatmap"/> to be converted.</param>
+        /// <param name="ruleset">The <see cref="Ruleset"/> for which <paramref name="beatmap"/> should be converted.</param>
+        /// <returns>The applicable <see cref="IBeatmapConverter"/>.</returns>
+        protected virtual IBeatmapConverter CreateBeatmapConverter(IBeatmap beatmap, Ruleset ruleset) => ruleset.CreateBeatmapConverter(beatmap);
+
+        /// <summary>
         /// Constructs a playable <see cref="IBeatmap"/> from <see cref="Beatmap"/> using the applicable converters for a specific <see cref="RulesetInfo"/>.
         /// <para>
         /// The returned <see cref="IBeatmap"/> is in a playable state - all <see cref="HitObject"/> and <see cref="BeatmapDifficulty"/> <see cref="Mod"/>s
@@ -104,7 +112,7 @@ namespace osu.Game.Beatmaps
         {
             var rulesetInstance = ruleset.CreateInstance();
 
-            IBeatmapConverter converter = rulesetInstance.CreateBeatmapConverter(Beatmap);
+            IBeatmapConverter converter = CreateBeatmapConverter(Beatmap, rulesetInstance);
 
             // Check if the beatmap can be converted
             if (!converter.CanConvert)
