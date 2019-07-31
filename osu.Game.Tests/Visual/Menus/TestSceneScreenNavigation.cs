@@ -5,7 +5,6 @@ using System;
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
-using osu.Framework.Audio;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -13,15 +12,12 @@ using osu.Framework.Logging;
 using osu.Framework.Platform;
 using osu.Framework.Screens;
 using osu.Framework.Testing;
-using osu.Game.Beatmaps;
-using osu.Game.Configuration;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Overlays;
 using osu.Game.Overlays.Mods;
-using osu.Game.Rulesets;
 using osu.Game.Screens;
 using osu.Game.Screens.Menu;
 using osu.Game.Screens.Select;
-using osu.Game.Tests.Resources;
 using osuTK;
 using osuTK.Graphics;
 using osuTK.Input;
@@ -34,6 +30,8 @@ namespace osu.Game.Tests.Visual.Menus
         private TestOsuGame osuGame;
 
         private Vector2 backButtonPosition => osuGame.ToScreenSpace(new Vector2(25, osuGame.LayoutRectangle.Bottom - 25));
+
+        private Vector2 optionsButtonPosition => osuGame.ToScreenSpace(new Vector2(25, 25));
 
         [BackgroundDependencyLoader]
         private void load(GameHost gameHost)
@@ -110,6 +108,17 @@ namespace osu.Game.Tests.Visual.Menus
             exitViaBackButtonAndConfirm();
         }
 
+        [Test]
+        public void TestOpenOptionsAndExitWithEscape()
+        {
+            AddStep("Enter menu", () => pressAndRelease(Key.Enter));
+            AddStep("Move mouse to options overlay", () => InputManager.MoveMouseTo(optionsButtonPosition));
+            AddStep("Click options overlay", () => InputManager.Click(MouseButton.Left));
+            AddAssert("Options overlay was opened", () => osuGame.Settings.State.Value == Visibility.Visible);
+            AddStep("Hide options overlay using escape", () => pressAndRelease(Key.Escape));
+            AddAssert("Options overlay was closed", () => osuGame.Settings.State.Value == Visibility.Hidden);
+        }
+
         private void pushAndConfirm(Func<Screen> newScreen, string screenName)
         {
             Screen screen = null;
@@ -117,7 +126,7 @@ namespace osu.Game.Tests.Visual.Menus
             {
                 if (screenName == "song select")
                     Logger.Log("fuck");
-                
+
                 osuGame.ScreenStack.Push(screen = newScreen());
             });
             AddUntilStep($"Wait for new {screenName}", () => osuGame.ScreenStack.CurrentScreen == screen && screen.IsLoaded);
@@ -147,6 +156,8 @@ namespace osu.Game.Tests.Visual.Menus
             public new ScreenStack ScreenStack => base.ScreenStack;
 
             public new BackButton BackButton => base.BackButton;
+
+            public new SettingsPanel Settings => base.Settings;
 
             protected override Loader CreateLoader() => new TestLoader();
         }
