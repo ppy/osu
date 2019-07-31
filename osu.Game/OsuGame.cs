@@ -307,8 +307,11 @@ namespace osu.Game
             if (nextBeatmap?.Track != null)
                 nextBeatmap.Track.Completed += currentTrackCompleted;
 
-            beatmap.OldValue?.Dispose();
+            var oldBeatmap = beatmap.OldValue;
+            if (oldBeatmap?.Track != null)
+                oldBeatmap.Track.Completed -= currentTrackCompleted;
 
+            oldBeatmap?.Dispose();
             nextBeatmap?.LoadBeatmapAsync();
         }
 
