@@ -82,7 +82,10 @@ namespace osu.Game
         public readonly Bindable<OverlayActivation> OverlayActivationMode = new Bindable<OverlayActivation>();
 
         protected OsuScreenStack ScreenStack;
+
         protected BackButton BackButton;
+
+        protected SettingsPanel Settings;
 
         private VolumeOverlay volume;
         private OsuLogo osuLogo;
@@ -96,8 +99,6 @@ namespace osu.Game
         private Bindable<int> configSkin;
 
         private readonly string[] args;
-
-        private SettingsPanel settings;
 
         private readonly List<OverlayContainer> overlays = new List<OverlayContainer>();
 
@@ -483,7 +484,7 @@ namespace osu.Game
             loadComponentSingleFile(social = new SocialOverlay(), overlayContent.Add, true);
             loadComponentSingleFile(channelManager = new ChannelManager(), AddInternal, true);
             loadComponentSingleFile(chatOverlay = new ChatOverlay(), overlayContent.Add, true);
-            loadComponentSingleFile(settings = new SettingsOverlay { GetToolbarHeight = () => ToolbarOffset }, leftFloatingOverlayContent.Add, true);
+            loadComponentSingleFile(Settings = new SettingsOverlay { GetToolbarHeight = () => ToolbarOffset }, leftFloatingOverlayContent.Add, true);
             var changelogOverlay = loadComponentSingleFile(new ChangelogOverlay(), overlayContent.Add, true);
             loadComponentSingleFile(userProfile = new UserProfileOverlay(), overlayContent.Add, true);
             loadComponentSingleFile(beatmapSetOverlay = new BeatmapSetOverlay(), overlayContent.Add, true);
@@ -514,7 +515,7 @@ namespace osu.Game
 
             Add(externalLinkOpener = new ExternalLinkOpener());
 
-            var singleDisplaySideOverlays = new OverlayContainer[] { settings, notifications };
+            var singleDisplaySideOverlays = new OverlayContainer[] { Settings, notifications };
             overlays.AddRange(singleDisplaySideOverlays);
 
             foreach (var overlay in singleDisplaySideOverlays)
@@ -567,7 +568,7 @@ namespace osu.Game
             {
                 float offset = 0;
 
-                if (settings.State.Value == Visibility.Visible)
+                if (Settings.State.Value == Visibility.Visible)
                     offset += ToolbarButton.WIDTH / 2;
                 if (notifications.State.Value == Visibility.Visible)
                     offset -= ToolbarButton.WIDTH / 2;
@@ -575,7 +576,7 @@ namespace osu.Game
                 screenContainer.MoveToX(offset, SettingsPanel.TRANSITION_LENGTH, Easing.OutQuint);
             }
 
-            settings.State.ValueChanged += _ => updateScreenOffset();
+            Settings.State.ValueChanged += _ => updateScreenOffset();
             notifications.State.ValueChanged += _ => updateScreenOffset();
         }
 
@@ -720,7 +721,7 @@ namespace osu.Game
                     return true;
 
                 case GlobalAction.ToggleSettings:
-                    settings.ToggleVisibility();
+                    Settings.ToggleVisibility();
                     return true;
 
                 case GlobalAction.ToggleDirect:
