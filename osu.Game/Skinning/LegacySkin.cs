@@ -140,7 +140,7 @@ namespace osu.Game.Skinning
 
             if (texture != null && animatable)
             {
-                var animation = new TextureAnimation { DefaultFrameLength = frametime };
+                var animation = new TextureAnimation { DefaultFrameLength = frametime, AutoSizeAxes = Axes.None };
 
                 for (int i = 1; texture != null; i++)
                 {
