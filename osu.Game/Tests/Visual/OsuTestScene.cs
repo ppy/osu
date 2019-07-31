@@ -16,6 +16,7 @@ using osu.Framework.Testing;
 using osu.Framework.Timing;
 using osu.Game.Beatmaps;
 using osu.Game.Database;
+using osu.Game.Online.API;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Tests.Beatmaps;
@@ -47,6 +48,12 @@ namespace osu.Game.Tests.Visual
         private readonly Lazy<DatabaseContextFactory> contextFactory;
         protected DatabaseContextFactory ContextFactory => contextFactory.Value;
 
+        /// <summary>
+        /// Whether this test scene requires API access
+        /// Setting this will cache an actual <see cref="APIAccess"/>.
+        /// </summary>
+        protected virtual bool RequiresAPIAccess => false;
+
         protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
         {
             // This is the earliest we can get OsuGameBase, which is used by the dummy working beatmap to find textures
@@ -57,7 +64,17 @@ namespace osu.Game.Tests.Visual
                 Default = working
             };
 
-            return Dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
+            Dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
+
+            if (!RequiresAPIAccess)
+            {
+                var dummyAPI = new DummyAPIAccess();
+
+                Dependencies.CacheAs<IAPIProvider>(dummyAPI);
+                Add(dummyAPI);
+            }
+
+            return Dependencies;
         }
 
         protected OsuTestScene()
