@@ -45,6 +45,7 @@ namespace osu.Game.Overlays.Profile.Header
             };
 
             User.BindValueChanged(onUserChanged);
+            Hide();
         }
 
         private void onUserChanged(ValueChangedEvent<User> user)
