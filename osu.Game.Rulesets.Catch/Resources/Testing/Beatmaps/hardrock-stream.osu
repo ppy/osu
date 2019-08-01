@@ -1,75 +1,18 @@
 osu file format v14
 
 [General]
-AudioFilename: audio.mp3
-AudioLeadIn: 0
-PreviewTime: 53483
-Countdown: 0
-SampleSet: Soft
 StackLeniency: 0.4
 Mode: 0
-LetterboxInBreaks: 0
-WidescreenStoryboard: 0
-
-[Editor]
-Bookmarks: 369,1680,12172,22664,33155,43647,54139,64631,75123,85614,96106,103975,114467,124959,135287
-DistanceSpacing: 1
-BeatDivisor: 4
-GridSize: 8
-TimelineZoom: 2.899999
-
-[Metadata]
-Title:Silhouette
-TitleUnicode:シルエット
-Artist:KANA-BOON
-ArtistUnicode:KANA-BOON
-Creator:Nevo
-Version:lit120's Hard
-Source:NARUTO-ナルト-疾風伝
-Tags:shippuuden shipuuden shippuden nine tails opening 16 kage cut ver version naotoshi nao tomori shunao shogunmoon sotarks pika [[pika]] frostwich lit120 shiratoi armin a_r_m_i_n
-BeatmapID:1653115
-BeatmapSetID:780952
 
 [Difficulty]
-HPDrainRate:6
 CircleSize:4
 OverallDifficulty:7
 ApproachRate:8
 SliderMultiplier:1.6
 SliderTickRate:1
 
-[Events]
-//Background and Video events
-0,0,"OSpGdEP.png",0,0
-//Break Periods
-//Storyboard Layer 0 (Background)
-//Storyboard Layer 1 (Fail)
-//Storyboard Layer 2 (Pass)
-//Storyboard Layer 3 (Foreground)
-//Storyboard Sound Samples
-
 [TimingPoints]
 369,327.868852459016,4,2,2,32,1,0
-1680,-100,4,2,2,42,0,0
-6926,-100,4,2,2,52,0,0
-11844,-100,4,2,2,5,0,0
-12172,-100,4,2,2,62,0,0
-22664,-100,4,2,2,52,0,0
-43647,-100,4,2,2,52,0,0
-53483,-100,4,2,2,32,0,0
-54139,-100,4,2,2,72,0,1
-96106,-100,4,2,2,52,0,0
-103975,-100,4,2,2,82,0,1
-124959,-100,4,2,2,62,0,0
-130205,-100,4,2,2,72,0,0
-132991,-100,4,2,2,82,0,0
-
-
-[Colours]
-Combo1 : 154,53,255
-Combo2 : 253,211,47
-Combo3 : 86,168,250
-Combo4 : 192,192,192
 
 [HitObjects]
 258,189,369,1,0,0:0:0:0:
