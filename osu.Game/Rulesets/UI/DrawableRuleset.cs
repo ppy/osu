@@ -278,7 +278,7 @@ namespace osu.Game.Rulesets.UI
             if (mods == null)
                 return;
 
-            foreach (var mod in mods.OfType<IApplicableToBeatmap<TObject>>())
+            foreach (var mod in mods.OfType<IApplicableToBeatmap>())
                 mod.ApplyToBeatmap(Beatmap);
         }
 
