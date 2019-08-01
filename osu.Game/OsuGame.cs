@@ -318,7 +318,7 @@ namespace osu.Game
 
         private void currentTrackCompleted()
         {
-            if (!Beatmap.Value.Track.Looping && !Beatmap.Disabled && musicController.IsLoaded)
+            if (!Beatmap.Value.Track.Looping && !Beatmap.Disabled)
                 musicController.NextTrack();
         }
 

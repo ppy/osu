@@ -8,11 +8,11 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
-using osu.Framework.Logging;
 using osu.Framework.Platform;
 using osu.Framework.Screens;
 using osu.Framework.Testing;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Online.API;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Mods;
 using osu.Game.Screens;
@@ -111,6 +111,7 @@ namespace osu.Game.Tests.Visual.Menus
         [Test]
         public void TestOpenOptionsAndExitWithEscape()
         {
+            AddUntilStep("Wait for options to load", () => osuGame.Settings.IsLoaded);
             AddStep("Enter menu", () => pressAndRelease(Key.Enter));
             AddStep("Move mouse to options overlay", () => InputManager.MoveMouseTo(optionsButtonPosition));
             AddStep("Click options overlay", () => InputManager.Click(MouseButton.Left));
@@ -122,13 +123,7 @@ namespace osu.Game.Tests.Visual.Menus
         private void pushAndConfirm(Func<Screen> newScreen, string screenName)
         {
             Screen screen = null;
-            AddStep($"Push new {screenName}", () =>
-            {
-                if (screenName == "song select")
-                    Logger.Log("fuck");
-
-                osuGame.ScreenStack.Push(screen = newScreen());
-            });
+            AddStep($"Push new {screenName}", () => osuGame.ScreenStack.Push(screen = newScreen()));
             AddUntilStep($"Wait for new {screenName}", () => osuGame.ScreenStack.CurrentScreen == screen && screen.IsLoaded);
         }
 
@@ -160,6 +155,21 @@ namespace osu.Game.Tests.Visual.Menus
             public new SettingsPanel Settings => base.Settings;
 
             protected override Loader CreateLoader() => new TestLoader();
+
+            private DependencyContainer dependencies;
+
+            private DummyAPIAccess dummyAPI;
+
+            protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent) =>
+                dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
+
+            protected override void LoadComplete()
+            {
+                base.LoadComplete();
+                dependencies.CacheAs<IAPIProvider>(dummyAPI = new DummyAPIAccess());
+
+                dummyAPI.Login("Rhythm Champion", "osu!");
+            }
         }
 
         private class TestSongSelect : PlaySongSelect
