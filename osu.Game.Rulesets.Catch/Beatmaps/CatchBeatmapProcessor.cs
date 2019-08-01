@@ -11,7 +11,6 @@ using osu.Game.Rulesets.Objects.Types;
 using osuTK;
 using osu.Game.Rulesets.Catch.MathUtils;
 using osu.Game.Rulesets.Mods;
-using osu.Game.Rulesets.Objects;
 
 namespace osu.Game.Rulesets.Catch.Beatmaps
 {
@@ -50,8 +49,10 @@ namespace osu.Game.Rulesets.Catch.Beatmaps
             float? lastPosition = null;
             double lastStartTime = 0;
 
-            foreach (var obj in beatmap.HitObjects)
+            foreach (var obj in beatmap.HitObjects.OfType<CatchHitObject>())
             {
+                obj.XOffset = 0;
+
                 switch (obj)
                 {
                     case Fruit fruit:
@@ -62,7 +63,7 @@ namespace osu.Game.Rulesets.Catch.Beatmaps
                     case BananaShower bananaShower:
                         foreach (var banana in bananaShower.NestedHitObjects.OfType<Banana>())
                         {
-                            banana.X = (float)rng.NextDouble();
+                            banana.XOffset = (float)rng.NextDouble();
                             rng.Next(); // osu!stable retrieved a random banana type
                             rng.Next(); // osu!stable retrieved a random banana rotation
                             rng.Next(); // osu!stable retrieved a random banana colour
@@ -75,10 +76,9 @@ namespace osu.Game.Rulesets.Catch.Beatmaps
                         {
                             var hitObject = (CatchHitObject)nested;
                             if (hitObject is TinyDroplet)
-                                hitObject.X += rng.Next(-20, 20) / CatchPlayfield.BASE_WIDTH;
+                                hitObject.XOffset = MathHelper.Clamp(rng.Next(-20, 20) / CatchPlayfield.BASE_WIDTH, -hitObject.X, 1 - hitObject.X);
                             else if (hitObject is Droplet)
                                 rng.Next(); // osu!stable retrieved a random droplet rotation
-                            hitObject.X = MathHelper.Clamp(hitObject.X, 0, 1);
                         }
 
                         break;
@@ -86,7 +86,7 @@ namespace osu.Game.Rulesets.Catch.Beatmaps
             }
         }
 
-        private static void applyHardRockOffset(HitObject hitObject, ref float? lastPosition, ref double lastStartTime, FastRandom rng)
+        private static void applyHardRockOffset(CatchHitObject hitObject, ref float? lastPosition, ref double lastStartTime, FastRandom rng)
         {
             if (hitObject is JuiceStream stream)
             {
@@ -98,42 +98,40 @@ namespace osu.Game.Rulesets.Catch.Beatmaps
             if (!(hitObject is Fruit))
                 return;
 
-            var catchObject = (CatchHitObject)hitObject;
-
-            float position = catchObject.X;
+            float offsetPosition = hitObject.X;
             double startTime = hitObject.StartTime;
 
             if (lastPosition == null)
             {
-                lastPosition = position;
+                lastPosition = offsetPosition;
                 lastStartTime = startTime;
 
                 return;
             }
 
-            float positionDiff = position - lastPosition.Value;
+            float positionDiff = offsetPosition - lastPosition.Value;
             double timeDiff = startTime - lastStartTime;
 
             if (timeDiff > 1000)
             {
-                lastPosition = position;
+                lastPosition = offsetPosition;
                 lastStartTime = startTime;
                 return;
             }
 
             if (positionDiff == 0)
             {
-                applyRandomOffset(ref position, timeDiff / 4d, rng);
-                catchObject.X = position;
+                applyRandomOffset(ref offsetPosition, timeDiff / 4d, rng);
+                hitObject.XOffset = hitObject.X - offsetPosition;
                 return;
             }
 
             if (Math.Abs(positionDiff * CatchPlayfield.BASE_WIDTH) < timeDiff / 3d)
-                applyOffset(ref position, positionDiff);
+                applyOffset(ref offsetPosition, positionDiff);
 
-            catchObject.X = position;
+            hitObject.XOffset = hitObject.X - offsetPosition;
 
-            lastPosition = position;
+            lastPosition = offsetPosition;
             lastStartTime = startTime;
         }
 
