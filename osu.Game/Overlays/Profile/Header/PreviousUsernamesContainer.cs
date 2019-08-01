@@ -25,11 +25,12 @@ namespace osu.Game.Overlays.Profile.Header
 
         public readonly Bindable<User> User = new Bindable<User>();
 
-        private readonly HoverIconContainer hoverIcon;
         private readonly ContentContainer contentContainer;
 
         public PreviousUsernamesContainer()
         {
+            HoverIconContainer hoverIcon;
+
             AutoSizeAxes = Axes.Y;
             Width = width;
             Children = new Drawable[]
@@ -56,7 +57,7 @@ namespace osu.Game.Overlays.Profile.Header
 
             if (usernames.Any())
             {
-                var amount = usernames.Count();
+                var amount = usernames.Length;
 
                 for (int i = 0; i < amount; i++)
                 {

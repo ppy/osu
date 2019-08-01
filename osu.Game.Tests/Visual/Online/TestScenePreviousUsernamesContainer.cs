@@ -40,7 +40,7 @@ namespace osu.Game.Tests.Visual.Online
 
             AddStep("four usernames", () => user.Value = new User
             {
-                PreviousUsernames = new[] { "ihavenoidea", "howcani", "makethistext" , "anylonger" },
+                PreviousUsernames = new[] { "ihavenoidea", "howcani", "makethistext", "anylonger" },
             });
 
             AddStep("no username", () => user.Value = new User
