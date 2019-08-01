@@ -21,7 +21,7 @@ namespace osu.Game.Overlays.Profile.Header
         private const int duration = 200;
         private const int margin = 10;
         private const int width = 350;
-        private const int move_offset = 30;
+        private const int move_offset = 20;
 
         public readonly Bindable<User> User = new Bindable<User>();
 
@@ -163,7 +163,7 @@ namespace osu.Game.Overlays.Profile.Header
                 AutoSizeAxes = Axes.Both;
                 Child = new SpriteIcon
                 {
-                    Margin = new MarginPadding(margin) { Top = 7 },
+                    Margin = new MarginPadding(margin) { Top = 6 },
                     Size = new Vector2(20),
                     Icon = FontAwesome.Solid.IdCard,
                 };
