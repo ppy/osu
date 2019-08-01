@@ -74,10 +74,12 @@ namespace osu.Game.Rulesets.Catch.Beatmaps
                     case JuiceStream juiceStream:
                         foreach (var nested in juiceStream.NestedHitObjects)
                         {
-                            var hitObject = (CatchHitObject)nested;
-                            if (hitObject is TinyDroplet)
-                                hitObject.XOffset = MathHelper.Clamp(rng.Next(-20, 20) / CatchPlayfield.BASE_WIDTH, -hitObject.X, 1 - hitObject.X);
-                            else if (hitObject is Droplet)
+                            var catchObject = (CatchHitObject)nested;
+                            catchObject.XOffset = 0;
+
+                            if (catchObject is TinyDroplet)
+                                catchObject.XOffset = MathHelper.Clamp(rng.Next(-20, 20) / CatchPlayfield.BASE_WIDTH, -catchObject.X, 1 - catchObject.X);
+                            else if (catchObject is Droplet)
                                 rng.Next(); // osu!stable retrieved a random droplet rotation
                         }
 
