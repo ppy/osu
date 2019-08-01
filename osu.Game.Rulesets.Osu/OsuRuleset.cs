@@ -109,7 +109,7 @@ namespace osu.Game.Rulesets.Osu
                     {
                         new OsuModHardRock(),
                         new MultiMod(new OsuModSuddenDeath(), new OsuModPerfect()),
-                        new MultiMod(new OsuModDoubleTime(), new OsuModNightcore()),
+                        new MultiMod(new OsuModQuickTime(), new OsuModDoubleTime(), new OsuModNightcore()),
                         new OsuModHidden(),
                         new MultiMod(new OsuModFlashlight(), new OsuModBlinds()),
                     };
