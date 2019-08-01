@@ -8,6 +8,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Lines;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Events;
+using osu.Framework.Threading;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.Objects;
@@ -27,7 +28,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
         [Resolved]
         private OsuColour colours { get; set; }
 
-        protected IBindable<WorkingBeatmap> Beatmap = new Bindable<WorkingBeatmap>();
+        private readonly IBindable<WorkingBeatmap> beatmap = new Bindable<WorkingBeatmap>();
 
         public PathControlPointPiece(Slider slider, int index)
         {
@@ -58,7 +59,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
         [BackgroundDependencyLoader]
         private void load(IBindable<WorkingBeatmap> beatmap)
         {
-            Beatmap.BindTo(beatmap);
+            this.beatmap.BindTo(beatmap);
         }
 
         protected override void Update()
@@ -84,6 +85,8 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
 
         protected override bool OnDragStart(DragStartEvent e) => true;
 
+        private ScheduledDelegate sliderUpdateDebounce;
+
         protected override bool OnDrag(DragEvent e)
         {
             var newControlPoints = slider.Path.ControlPoints.ToArray();
@@ -108,7 +111,8 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
 
             slider.Path = new SliderPath(slider.Path.Type, newControlPoints);
 
-            slider.ApplyDefaults(Beatmap.Value.Beatmap.ControlPointInfo, Beatmap.Value.BeatmapInfo.BaseDifficulty);
+            sliderUpdateDebounce?.Cancel();
+            sliderUpdateDebounce = Schedule(() => slider.ApplyDefaults(beatmap.Value.Beatmap.ControlPointInfo, beatmap.Value.BeatmapInfo.BaseDifficulty));
 
             return true;
         }

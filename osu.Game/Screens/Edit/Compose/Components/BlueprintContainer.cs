@@ -84,6 +84,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
             refreshTool();
 
             var blueprint = composer.CreateBlueprintFor(hitObject);
+
             if (blueprint == null)
                 return;
 

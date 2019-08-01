@@ -33,7 +33,7 @@ namespace osu.Game.Rulesets.Osu.Objects
 
         public Vector2 StackedPositionAt(double t) => StackedPosition + this.CurvePositionAt(t);
 
-        public Action OnTicksRegenerated;
+        public Action OnRegenerated;
 
         public override int ComboIndex
         {
@@ -227,7 +227,7 @@ namespace osu.Game.Rulesets.Osu.Objects
                 }
             }
 
-            OnTicksRegenerated?.Invoke();
+            OnRegenerated?.Invoke();
         }
 
         private List<HitSampleInfo> getNodeSamples(int nodeIndex) =>

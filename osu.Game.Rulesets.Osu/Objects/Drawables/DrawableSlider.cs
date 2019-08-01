@@ -10,6 +10,7 @@ using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Threading;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Osu.Configuration;
 using osu.Game.Rulesets.Scoring;
@@ -85,26 +86,13 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                 AddNested(drawableRepeatPoint);
             }
 
-            slider.OnTicksRegenerated += generateDrawableTicks;
-        }
+            ScheduledDelegate tickGenerationDebounce = null;
 
-        private void generateDrawableTicks()
-        {
-            foreach (var tick in ticks)
+            slider.OnRegenerated += () =>
             {
-                components.Remove(tick);
-                RemoveNested(tick);
-            }
-
-            ticks.Clear();
-
-            foreach (var tick in slider.NestedHitObjects.OfType<SliderTick>())
-            {
-                var drawableTick = new DrawableSliderTick(tick) { Position = tick.Position - slider.Position };
-                ticks.Add(drawableTick);
-                components.Add(drawableTick);
-                AddNested(drawableTick);
-            }
+                tickGenerationDebounce?.Cancel();
+                tickGenerationDebounce = Schedule(generateDrawableTicks);
+            };
         }
 
         [BackgroundDependencyLoader]
@@ -136,6 +124,10 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         }
 
         public readonly Bindable<bool> Tracking = new Bindable<bool>();
+
+        public Drawable ProxiedLayer => HeadCircle.ApproachCircle;
+
+        public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => Body.ReceivePositionalInputAt(screenSpacePos);
 
         protected override void Update()
         {
@@ -177,7 +169,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             sliderPathRadius = skin.GetValue<SkinConfiguration, float?>(s => s.SliderPathRadius) ?? OsuHitObject.OBJECT_RADIUS;
             updatePathRadius();
 
-            Body.AccentColour = skin.GetValue<SkinConfiguration, Color4?>(s => s.CustomColours.ContainsKey("SliderTrackOverride") ? s.CustomColours["SliderTrackOverride"] : (Color4?)null) ?? AccentColour.Value;
+            Body.AccentColour = skin.GetValue<SkinConfiguration, Color4?>(s => s.CustomColours.ContainsKey("SliderTrackOverride") ? s.CustomColours["SliderTrackOverride"] : (Color4?)null)
+                                ?? AccentColour.Value;
             Body.BorderColour = skin.GetValue<SkinConfiguration, Color4?>(s => s.CustomColours.ContainsKey("SliderBorder") ? s.CustomColours["SliderBorder"] : (Color4?)null) ?? Color4.White;
         }
 
@@ -231,8 +224,23 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             Expire(true);
         }
 
-        public Drawable ProxiedLayer => HeadCircle.ApproachCircle;
+        private void generateDrawableTicks()
+        {
+            foreach (var tick in ticks)
+            {
+                components.Remove(tick);
+                RemoveNested(tick);
+            }
 
-        public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => Body.ReceivePositionalInputAt(screenSpacePos);
+            ticks.Clear();
+
+            foreach (var tick in slider.NestedHitObjects.OfType<SliderTick>())
+            {
+                var drawableTick = new DrawableSliderTick(tick) { Position = tick.Position - slider.Position };
+                ticks.Add(drawableTick);
+                components.Add(drawableTick);
+                AddNested(drawableTick);
+            }
+        }
     }
 }
