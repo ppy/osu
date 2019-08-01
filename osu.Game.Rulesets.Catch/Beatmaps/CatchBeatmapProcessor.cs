@@ -122,14 +122,14 @@ namespace osu.Game.Rulesets.Catch.Beatmaps
             if (positionDiff == 0)
             {
                 applyRandomOffset(ref offsetPosition, timeDiff / 4d, rng);
-                hitObject.XOffset = hitObject.X - offsetPosition;
+                hitObject.XOffset = offsetPosition - hitObject.X;
                 return;
             }
 
             if (Math.Abs(positionDiff * CatchPlayfield.BASE_WIDTH) < timeDiff / 3d)
                 applyOffset(ref offsetPosition, positionDiff);
 
-            hitObject.XOffset = hitObject.X - offsetPosition;
+            hitObject.XOffset = offsetPosition - hitObject.X;
 
             lastPosition = offsetPosition;
             lastStartTime = startTime;
