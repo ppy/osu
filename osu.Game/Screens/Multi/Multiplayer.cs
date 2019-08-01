@@ -34,8 +34,6 @@ namespace osu.Game.Screens.Multi
 
         public override bool DisallowExternalBeatmapRulesetChanges => true;
 
-        protected virtual bool RequireOnline => true;
-
         private readonly MultiplayerWaveContainer waves;
 
         private readonly OsuButton createButton;
