@@ -31,6 +31,7 @@ namespace osu.Game.Screens.Backgrounds
         public Bindable<Skin> Skin = new Bindable<Skin>();
 
         private readonly Bindable<WorkingBeatmap> beatmap = new Bindable<WorkingBeatmap>();
+        private WorkingBeatmap currentBeatmap;
 
         [BackgroundDependencyLoader]
         private void load(IAPIProvider api, SkinManager skinManager, OsuConfigManager config, Bindable<WorkingBeatmap> workingBeatmap)
@@ -79,7 +80,10 @@ namespace osu.Game.Screens.Backgrounds
         private void onBeatmapChanged(ValueChangedEvent<WorkingBeatmap> beatmap)
         {
             if (!((User.Value?.IsSupporter ?? true) && BackgroundMode.Value == MainMenuBackgroundMode.Skin && SkinHasBackground))
+            {
                 UpdateBackground();
+                currentBeatmap = beatmap.NewValue;
+            }
         }
 
         private void onModeChanged(ValueChangedEvent<MainMenuBackgroundMode> mode)
@@ -87,6 +91,14 @@ namespace osu.Game.Screens.Backgrounds
             if (((User.Value?.IsSupporter) ?? false)
                 && (!(mode.OldValue == MainMenuBackgroundMode.Default && mode.NewValue == MainMenuBackgroundMode.Skin && !SkinHasBackground)
                     & !(mode.OldValue == MainMenuBackgroundMode.Skin && mode.NewValue == MainMenuBackgroundMode.Default && !SkinHasBackground)))
+                UpdateBackground();
+        }
+
+        public void Next()
+        {
+            if (BackgroundMode.Value == MainMenuBackgroundMode.Default ||
+                (BackgroundMode.Value == MainMenuBackgroundMode.Skin && !SkinHasBackground) ||
+                (BackgroundMode.Value == MainMenuBackgroundMode.Beatmap && beatmap.Value != currentBeatmap))
                 UpdateBackground();
         }
 

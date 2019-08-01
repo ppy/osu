@@ -30,6 +30,7 @@ namespace osu.Game.Tests.Visual.Background
                 RelativeSizeAxes = Axes.Both,
             };
 
+            AddStep("Force background update", () => background.Next());
             AddStep("Default Mode", () => background.BackgroundMode.Value = MainMenuBackgroundMode.Default);
             AddStep("Skin Mode", () => background.BackgroundMode.Value = MainMenuBackgroundMode.Skin);
             AddStep("Beatmap Mode", () => background.BackgroundMode.Value = MainMenuBackgroundMode.Beatmap);
