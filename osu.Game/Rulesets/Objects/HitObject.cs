@@ -3,6 +3,7 @@
 
 using System.Collections.Generic;
 using Newtonsoft.Json;
+using osu.Framework.Lists;
 using osu.Game.Audio;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
@@ -58,7 +59,8 @@ namespace osu.Game.Rulesets.Objects
         /// </summary>
         public HitWindows HitWindows { get; set; }
 
-        private readonly List<HitObject> nestedHitObjects = new List<HitObject>();
+        private readonly SortedList<HitObject> nestedHitObjects
+            = new SortedList<HitObject>(new ComparisonComparer<HitObject>((a, b) => a.StartTime.CompareTo(b.StartTime)));
 
         [JsonIgnore]
         public IReadOnlyList<HitObject> NestedHitObjects => nestedHitObjects;
@@ -79,8 +81,6 @@ namespace osu.Game.Rulesets.Objects
 
             CreateNestedHitObjects();
 
-            nestedHitObjects.Sort((h1, h2) => h1.StartTime.CompareTo(h2.StartTime));
-
             foreach (var h in nestedHitObjects)
             {
                 h.HitWindows = HitWindows;
@@ -94,6 +94,7 @@ namespace osu.Game.Rulesets.Objects
 
             if (HitWindows == null)
                 HitWindows = CreateHitWindows();
+
             HitWindows?.SetDifficulty(difficulty.OverallDifficulty);
         }
 

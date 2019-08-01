@@ -28,6 +28,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
         public readonly SnakingSliderBody Body;
         public readonly SliderBall Ball;
+        private readonly Container<DrawableSliderTick> ticks;
 
         private readonly IBindable<Vector2> positionBindable = new Bindable<Vector2>();
         private readonly IBindable<float> scaleBindable = new Bindable<float>();
@@ -43,7 +44,6 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
             Position = s.StackedPosition;
 
-            Container<DrawableSliderTick> ticks;
             Container<DrawableRepeatPoint> repeatPoints;
 
             InternalChildren = new Drawable[]
@@ -74,14 +74,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             AddNested(TailCircle);
             components.Add(TailCircle);
 
-            foreach (var tick in s.NestedHitObjects.OfType<SliderTick>())
-            {
-                var drawableTick = new DrawableSliderTick(tick) { Position = tick.Position - s.Position };
-
-                ticks.Add(drawableTick);
-                components.Add(drawableTick);
-                AddNested(drawableTick);
-            }
+            generateDrawableTicks();
 
             foreach (var repeatPoint in s.NestedHitObjects.OfType<RepeatPoint>())
             {
@@ -90,6 +83,27 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                 repeatPoints.Add(drawableRepeatPoint);
                 components.Add(drawableRepeatPoint);
                 AddNested(drawableRepeatPoint);
+            }
+
+            slider.OnTicksRegenerated += generateDrawableTicks;
+        }
+
+        private void generateDrawableTicks()
+        {
+            foreach (var tick in ticks)
+            {
+                components.Remove(tick);
+                RemoveNested(tick);
+            }
+
+            ticks.Clear();
+
+            foreach (var tick in slider.NestedHitObjects.OfType<SliderTick>())
+            {
+                var drawableTick = new DrawableSliderTick(tick) { Position = tick.Position - slider.Position };
+                ticks.Add(drawableTick);
+                components.Add(drawableTick);
+                AddNested(drawableTick);
             }
         }
 

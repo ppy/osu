@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using osuTK;
 using osu.Game.Rulesets.Objects.Types;
 using System.Collections.Generic;
@@ -31,6 +32,8 @@ namespace osu.Game.Rulesets.Osu.Objects
         public override Vector2 EndPosition => endPositionCache.IsValid ? endPositionCache.Value : endPositionCache.Value = Position + this.CurvePositionAt(1);
 
         public Vector2 StackedPositionAt(double t) => StackedPosition + this.CurvePositionAt(t);
+
+        public Action OnTicksRegenerated;
 
         public override int ComboIndex
         {
@@ -223,6 +226,8 @@ namespace osu.Game.Rulesets.Osu.Objects
                         break;
                 }
             }
+
+            OnTicksRegenerated?.Invoke();
         }
 
         private List<HitSampleInfo> getNodeSamples(int nodeIndex) =>

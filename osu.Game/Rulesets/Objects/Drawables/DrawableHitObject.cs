@@ -311,6 +311,8 @@ namespace osu.Game.Rulesets.Objects.Drawables
             nestedHitObjects.Value.Add(h);
         }
 
+        protected void RemoveNested(DrawableHitObject h) => nestedHitObjects.Value.Remove(h);
+
         /// <summary>
         /// Applies the <see cref="Result"/> of this <see cref="DrawableHitObject"/>, notifying responders such as
         /// the <see cref="ScoreProcessor"/> of the <see cref="JudgementResult"/>.

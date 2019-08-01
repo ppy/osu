@@ -2,11 +2,13 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Lines;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Events;
+using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Osu.Objects;
@@ -24,6 +26,8 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
 
         [Resolved]
         private OsuColour colours { get; set; }
+
+        protected IBindable<WorkingBeatmap> Beatmap = new Bindable<WorkingBeatmap>();
 
         public PathControlPointPiece(Slider slider, int index)
         {
@@ -49,6 +53,12 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
                     Child = new Box { RelativeSizeAxes = Axes.Both }
                 }
             };
+        }
+
+        [BackgroundDependencyLoader]
+        private void load(IBindable<WorkingBeatmap> beatmap)
+        {
+            Beatmap.BindTo(beatmap);
         }
 
         protected override void Update()
@@ -97,6 +107,8 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
                 newControlPoints[index - 1] = newControlPoints[index];
 
             slider.Path = new SliderPath(slider.Path.Type, newControlPoints);
+
+            slider.ApplyDefaults(Beatmap.Value.Beatmap.ControlPointInfo, Beatmap.Value.BeatmapInfo.BaseDifficulty);
 
             return true;
         }
