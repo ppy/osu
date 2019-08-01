@@ -97,14 +97,14 @@ namespace osu.Game.Tests.Visual.Menus
         [Test]
         public void TestExitMultiWithEscape()
         {
-            pushAndConfirm(() => new TestMultiplayer(), "multiplayer");
+            pushAndConfirm(() => new Screens.Multi.Multiplayer(), "multiplayer");
             exitViaEscapeAndConfirm();
         }
 
         [Test]
         public void TestExitMultiWithBackButton()
         {
-            pushAndConfirm(() => new TestMultiplayer(), "multiplayer");
+            pushAndConfirm(() => new Screens.Multi.Multiplayer(), "multiplayer");
             exitViaBackButtonAndConfirm();
         }
 
@@ -175,11 +175,6 @@ namespace osu.Game.Tests.Visual.Menus
         private class TestSongSelect : PlaySongSelect
         {
             public ModSelectOverlay ModSelectOverlay => ModSelect;
-        }
-
-        private class TestMultiplayer : Screens.Multi.Multiplayer
-        {
-            protected override bool RequireOnline => false;
         }
 
         private class TestLoader : Loader
