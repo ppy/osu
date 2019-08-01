@@ -118,6 +118,7 @@ namespace osu.Game.Rulesets.Objects
                 if (d >= length - minDistanceFromEnd)
                     break;
 
+                // Always generate ticks from the start of the path rather than the span to ensure that ticks in repeat spans are positioned identically to those in non-repeat spans
                 var pathProgress = d / length;
                 var timeProgress = reversed ? 1 - pathProgress : pathProgress;
 
