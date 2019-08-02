@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using NUnit.Framework;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Rulesets.Edit;
@@ -31,24 +32,84 @@ namespace osu.Game.Rulesets.Osu.Tests
 
         private readonly DrawableSlider drawableObject;
 
+        private TestSliderSelectionBlueprint blueprint;
+
+        private readonly Slider slider;
+
+        private readonly Vector2 startPosition = new Vector2(256, 192);
+
+        private readonly SliderPath startPath = new SliderPath(PathType.Bezier, new[]
+        {
+            Vector2.Zero,
+            new Vector2(150, 150),
+            new Vector2(300, 0)
+        });
+
         public TestSceneSliderSelectionBlueprint()
         {
-            var slider = new Slider
+            slider = new Slider
             {
-                Position = new Vector2(256, 192),
-                Path = new SliderPath(PathType.Bezier, new[]
-                {
-                    Vector2.Zero,
-                    new Vector2(150, 150),
-                    new Vector2(300, 0)
-                })
+                Position = startPosition,
+                Path = startPath
             };
 
-            slider.ApplyDefaults(new ControlPointInfo(), new BeatmapDifficulty { CircleSize = 2 });
+            applyDefaults();
 
             Add(drawableObject = new DrawableSlider(slider));
         }
 
-        protected override SelectionBlueprint CreateBlueprint() => new SliderSelectionBlueprint(drawableObject);
+        [SetUp]
+        public void SetUp()
+        {
+            Schedule(() =>
+            {
+                slider.Position = startPosition;
+                slider.Path = startPath;
+
+                applyDefaults();
+            });
+        }
+
+        [Test]
+        public void TestModifyPointRegeneratesCircles()
+        {
+            bool regenerated = false;
+
+            AddStep("Modify sliderpath", () =>
+            {
+                regenerated = false;
+                slider.OnRegenerated += () => regenerated = true;
+
+                slider.Path = new SliderPath(PathType.Bezier, new[]
+                {
+                    Vector2.Zero,
+                    new Vector2(-150, -150),
+                    new Vector2(300, 0)
+                });
+
+                applyDefaults();
+            });
+
+            AddAssert("Nested objects were regenerated", () => regenerated);
+
+            AddStep("Move slider", () => slider.Position = new Vector2(192, 256));
+
+            // The blueprint needed to be regenerated as well, so this checks that the new blueprint tracks the new headcircle position.
+            AddAssert("Slider head blueprint tracks object", () => blueprint.HeadBlueprint.Position == drawableObject.HeadCircle.Position);
+        }
+
+        private void applyDefaults() => slider.ApplyDefaults(new ControlPointInfo(), new BeatmapDifficulty { CircleSize = 2 });
+
+        protected override SelectionBlueprint CreateBlueprint() => blueprint = new TestSliderSelectionBlueprint(drawableObject);
+
+        private class TestSliderSelectionBlueprint : SliderSelectionBlueprint
+        {
+            public new SliderCircleSelectionBlueprint HeadBlueprint => base.HeadBlueprint;
+
+            public TestSliderSelectionBlueprint(DrawableSlider slider)
+                : base(slider)
+            {
+            }
+        }
     }
 }
