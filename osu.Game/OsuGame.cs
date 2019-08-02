@@ -91,7 +91,7 @@ namespace osu.Game
 
         private IntroScreen introScreen;
 
-        private bool loaded = false;
+        private bool loaded;
 
         private Bindable<int> configRuleset;
 
@@ -193,8 +193,6 @@ namespace osu.Game
             Audio.AddAdjustment(AdjustableProperty.Volume, inactiveVolumeFade);
 
             Beatmap.BindValueChanged(beatmapChanged, true);
-
-            loaded = true;
         }
 
         private ExternalLinkOpener externalLinkOpener;
@@ -202,6 +200,7 @@ namespace osu.Game
         public void HandleUrl(string url)
         {
             Logger.Log($"Request to handle url: {url}");
+
             if (loaded)
             {
                 Action showNotImplementedError = () => notifications?.Post(new SimpleNotification
@@ -402,6 +401,8 @@ namespace osu.Game
 
         protected override void LoadComplete()
         {
+            loaded = false;
+
             base.LoadComplete();
 
             // The next time this is updated is in UpdateAfterChildren, which occurs too late and results
@@ -597,6 +598,7 @@ namespace osu.Game
 
             settings.State.ValueChanged += _ => updateScreenOffset();
             notifications.State.ValueChanged += _ => updateScreenOffset();
+            loaded = true;
         }
 
         public class GameIdleTracker : IdleTracker
