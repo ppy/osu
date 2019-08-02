@@ -10,7 +10,7 @@ using osu.Game.Rulesets.Mania.Beatmaps;
 
 namespace osu.Game.Rulesets.Mania.Mods
 {
-    public class ManiaModMirror : Mod, IApplicableToBeatmap<ManiaHitObject>
+    public class ManiaModMirror : Mod, IApplicableToBeatmap
     {
         public override string Name => "Mirror";
         public override string Acronym => "MR";
@@ -18,7 +18,7 @@ namespace osu.Game.Rulesets.Mania.Mods
         public override double ScoreMultiplier => 1;
         public override bool Ranked => true;
 
-        public void ApplyToBeatmap(Beatmap<ManiaHitObject> beatmap)
+        public void ApplyToBeatmap(IBeatmap beatmap)
         {
             var availableColumns = ((ManiaBeatmap)beatmap).TotalColumns;
 
