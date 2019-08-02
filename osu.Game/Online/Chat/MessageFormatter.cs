@@ -100,7 +100,7 @@ namespace osu.Game.Online.Chat
             }
         }
 
-        public static LinkDetails getLinkDetails(string url)
+        public static LinkDetails GetLinkDetails(string url)
         {
             var args = url.Split(new[] { '/' }, StringSplitOptions.RemoveEmptyEntries);
             args[0] = args[0].TrimEnd(':');
