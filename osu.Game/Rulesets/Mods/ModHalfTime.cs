@@ -17,7 +17,7 @@ namespace osu.Game.Rulesets.Mods
         public override string Description => "Less zoom...";
         public override bool Ranked => true;
 
-        public override Type[] IncompatibleMods => base.IncompatibleMods.Append(typeof(ModDoubleTime)).ToArray();
+        public override Type[] IncompatibleMods => base.IncompatibleMods.Append(typeof(ModQuickTime)).Append(typeof(ModDoubleTime)).ToArray();
 
         protected override double RateAdjust => 0.75;
     }

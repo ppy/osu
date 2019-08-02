@@ -17,7 +17,7 @@ namespace osu.Game.Rulesets.Mods
         public override string Description => "Zoooooooooom...";
         public override bool Ranked => true;
 
-        public override Type[] IncompatibleMods => base.IncompatibleMods.Append(typeof(ModHalfTime)).ToArray();
+        public override Type[] IncompatibleMods => base.IncompatibleMods.Append(typeof(ModSlowTime)).Append(typeof(ModHalfTime)).ToArray();
 
         protected override double RateAdjust => 1.5;
     }
