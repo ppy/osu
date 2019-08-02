@@ -52,6 +52,8 @@ namespace osu.Game.Tests.Visual.Online
             {
                 PreviousUsernames = new string[0],
             });
+
+            AddStep("null user", () => user.Value = null);
         }
     }
 }
