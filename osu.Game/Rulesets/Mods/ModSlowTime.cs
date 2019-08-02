@@ -7,22 +7,22 @@ using osu.Framework.Graphics.Sprites;
 
 namespace osu.Game.Rulesets.Mods
 {
-    public abstract class ModQuickTime : ModTimeAdjust, IApplicableToClock
+    public abstract class ModSlowTime : ModTimeAdjust, IApplicableToClock
     {
-        public override string Name => "Quick Time";
+        public override string Name => "Slow Time";
 
-        public override string Acronym => "QT";
+        public override string Acronym => "ST";
 
-        public override IconUsage Icon => FontAwesome.Solid.ArrowUp;
+        public override IconUsage Icon => FontAwesome.Solid.ArrowDown;
 
-        public override ModType Type => ModType.DifficultyIncrease;
+        public override ModType Type => ModType.DifficultyReduction;
 
-        public override string Description => "Zoom.";
+        public override string Description => "slow.";
 
         public override bool Ranked => true;
 
         public override Type[] IncompatibleMods => base.IncompatibleMods.Append(typeof(ModHalfTime)).ToArray();
 
-        protected override double RateAdjust => 1.25;
+        protected override double RateAdjust => 0.9;
     }
 }

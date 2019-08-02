@@ -77,7 +77,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
         protected override Mod[] DifficultyAdjustmentMods => new Mod[]
         {
+            new OsuModQuickTime(),
             new OsuModDoubleTime(),
+            new OsuModSlowTime(),
             new OsuModHalfTime(),
             new OsuModEasy(),
             new OsuModHardRock(),
