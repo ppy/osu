@@ -86,52 +86,7 @@ namespace osu.Game.Graphics.Containers
             {
                 RelativeSizeAxes = Axes.Both,
                 TooltipText = tooltipText ?? (url != text ? url : string.Empty),
-                Action = action ?? (() =>
-                {
-                    switch (linkType)
-                    {
-                        case LinkAction.OpenBeatmap:
-                            // TODO: proper query params handling
-                            if (linkArgument != null && int.TryParse(linkArgument.Contains('?') ? linkArgument.Split('?')[0] : linkArgument, out int beatmapId))
-                                game?.ShowBeatmap(beatmapId);
-                            break;
-
-                        case LinkAction.OpenBeatmapSet:
-                            if (int.TryParse(linkArgument, out int setId))
-                                game?.ShowBeatmapSet(setId);
-                            break;
-
-                        case LinkAction.OpenChannel:
-                            try
-                            {
-                                channelManager?.OpenChannel(linkArgument);
-                            }
-                            catch (ChannelNotFoundException)
-                            {
-                                Logger.Log($"The requested channel \"{linkArgument}\" does not exist");
-                            }
-
-                            break;
-
-                        case LinkAction.OpenEditorTimestamp:
-                        case LinkAction.JoinMultiplayerMatch:
-                        case LinkAction.Spectate:
-                            showNotImplementedError?.Invoke();
-                            break;
-
-                        case LinkAction.External:
-                            game?.OpenUrlExternally(url);
-                            break;
-
-                        case LinkAction.OpenUserProfile:
-                            if (long.TryParse(linkArgument, out long userId))
-                                game?.ShowUser(userId);
-                            break;
-
-                        default:
-                            throw new NotImplementedException($"This {nameof(LinkAction)} ({linkType.ToString()}) is missing an associated action.");
-                    }
-                }),
+                Action = action ?? (() => LinkUtils.HandleLink(url, linkType, linkArgument, game, channelManager, showNotImplementedError)),
             });
 
             return drawables;

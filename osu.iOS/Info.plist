@@ -107,5 +107,19 @@
 			</array>
 		</dict>
 	</array>
+	<key>UIFileSharingEnabled</key>
+	<true/>
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>osu</string>
+				<string>osump</string>
+			</array>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+		</dict>
+	</array>
 </dict>
 </plist>
