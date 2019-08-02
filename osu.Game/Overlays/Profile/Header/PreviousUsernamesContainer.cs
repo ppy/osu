@@ -16,12 +16,12 @@ using System.Linq;
 
 namespace osu.Game.Overlays.Profile.Header
 {
-    public class PreviousUsernamesContainer : Container
+    public class PreviousUsernamesContainer : CompositeDrawable
     {
         private const int duration = 200;
         private const int margin = 10;
-        private const int width = 350;
-        private const int move_offset = 20;
+        private const int width = 310;
+        private const int move_offset = 15;
 
         public readonly Bindable<User> User = new Bindable<User>();
 
@@ -33,43 +33,35 @@ namespace osu.Game.Overlays.Profile.Header
 
             AutoSizeAxes = Axes.Y;
             Width = width;
-            Children = new Drawable[]
+
+            AddRangeInternal(new Drawable[]
             {
                 contentContainer = new ContentContainer(),
                 hoverIcon = new HoverIconContainer(),
-            };
+            });
 
             hoverIcon.ActivateHover += () =>
             {
                 contentContainer.Show();
                 this.MoveToY(-move_offset, duration, Easing.OutQuint);
             };
+        }
 
-            User.BindValueChanged(onUserChanged);
-            Hide();
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+            User.BindValueChanged(onUserChanged, true);
         }
 
         private void onUserChanged(ValueChangedEvent<User> user)
         {
-            contentContainer.Clear();
+            contentContainer.Text = string.Empty;
 
-            var usernames = user.NewValue.PreviousUsernames;
+            var usernames = user.NewValue?.PreviousUsernames;
 
-            if (usernames.Any())
+            if (usernames?.Any() ?? false)
             {
-                var amount = usernames.Length;
-
-                for (int i = 0; i < amount; i++)
-                {
-                    string text = (i + 1 == amount) ? usernames[i] : $@"{usernames[i]},";
-
-                    contentContainer.Usernames.AddText(new SpriteText
-                    {
-                        Font = OsuFont.GetFont(weight: FontWeight.Bold, italics: true),
-                        Text = text,
-                    });
-                }
-
+                contentContainer.Text = string.Join(", ", usernames);
                 Show();
                 return;
             }
@@ -86,11 +78,15 @@ namespace osu.Game.Overlays.Profile.Header
 
         private class ContentContainer : VisibilityContainer
         {
-            private const int header_height = 25;
-            private const int content_padding = 60;
+            private const int header_height = 20;
+            private const int content_padding = 40;
 
-            public readonly TextFlowContainer Usernames;
+            public string Text
+            {
+                set => usernames.Text = value;
+            }
 
+            private readonly TextFlowContainer usernames;
             private readonly Box background;
 
             public ContentContainer()
@@ -126,16 +122,16 @@ namespace osu.Game.Overlays.Profile.Header
                                         Origin = Anchor.BottomLeft,
                                         Padding = new MarginPadding { Left = content_padding },
                                         Text = @"formerly known as",
-                                        Font = OsuFont.GetFont(size: 14, italics: true)
+                                        Font = OsuFont.GetFont(size: 10, italics: true)
                                     }
                                 }
                             },
-                            Usernames = new TextFlowContainer
+                            usernames = new TextFlowContainer(s => s.Font = OsuFont.GetFont(size: 12, weight: FontWeight.Bold, italics: true))
                             {
                                 RelativeSizeAxes = Axes.X,
                                 AutoSizeAxes = Axes.Y,
                                 Direction = FillDirection.Full,
-                                Spacing = new Vector2(5, 5),
+                                Spacing = new Vector2(0, 5),
                                 Padding = new MarginPadding { Left = content_padding, Bottom = margin },
                             },
                         }
@@ -148,8 +144,6 @@ namespace osu.Game.Overlays.Profile.Header
             {
                 background.Colour = colours.GreySeafoamDarker;
             }
-
-            public override void Clear(bool disposeChildren) => Usernames.Clear(disposeChildren);
 
             protected override void PopIn() => this.FadeIn(duration, Easing.OutQuint);
 
@@ -166,7 +160,7 @@ namespace osu.Game.Overlays.Profile.Header
                 Child = new SpriteIcon
                 {
                     Margin = new MarginPadding(margin) { Top = 6 },
-                    Size = new Vector2(20),
+                    Size = new Vector2(15),
                     Icon = FontAwesome.Solid.IdCard,
                 };
             }
