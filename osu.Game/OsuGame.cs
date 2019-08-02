@@ -43,6 +43,7 @@ using osu.Game.Scoring;
 using osu.Game.Screens.Select;
 using osu.Game.Utils;
 using LogLevel = osu.Framework.Logging.LogLevel;
+using static osu.Game.Online.Chat.MessageFormatter;
 
 namespace osu.Game
 {
@@ -89,6 +90,8 @@ namespace osu.Game
         private MainMenu menuScreen;
 
         private IntroScreen introScreen;
+
+        private bool loaded = false;
 
         private Bindable<int> configRuleset;
 
@@ -190,9 +193,28 @@ namespace osu.Game
             Audio.AddAdjustment(AdjustableProperty.Volume, inactiveVolumeFade);
 
             Beatmap.BindValueChanged(beatmapChanged, true);
+
+            loaded = true;
         }
 
         private ExternalLinkOpener externalLinkOpener;
+
+        public void HandleUrl(string url)
+        {
+            Logger.Log($"Request to handle url: {url}");
+            if (loaded)
+            {
+                Action showNotImplementedError = () => notifications?.Post(new SimpleNotification
+                {
+                    Text = @"This link type is not yet supported!",
+                    Icon = FontAwesome.Solid.LifeRing,
+                });
+                LinkDetails linkDetails = getLinkDetails(url);
+                Schedule(() => LinkUtils.HandleLink(url, linkDetails.Action, linkDetails.Argument, this, channelManager, showNotImplementedError));
+            }
+            else
+                Scheduler.AddDelayed(() => HandleUrl(url), 1000);
+        }
 
         public void OpenUrlExternally(string url)
         {
