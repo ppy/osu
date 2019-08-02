@@ -40,11 +40,12 @@ namespace osu.Game.Rulesets.Difficulty
                 return new List<double>();
 
             var hitObjects = playableBeatmap.HitObjects.OrderBy(h => h.StartTime).ToList();
+            //maybe expose it form DifficultyCalculator
             double firstSectionEnd = Math.Ceiling(playableBeatmap.HitObjects.First().StartTime / sectionLength) * sectionLength;
             int currentSection = 0;
             int count = 0;
 
-            for (int i = 0; i < hitObjects.Count; i++)
+            for (int i = 0; i < hitObjects.Count && currentSection < strains.Count; i++)
             {
                 var h = hitObjects[i];
 
@@ -52,20 +53,37 @@ namespace osu.Game.Rulesets.Difficulty
                 {
                     if (count > 0)
                     {
-                        //check if safe
+                        
                         if (strains[currentSection].StarRating == 0)
-                            strains[currentSection] = strains[currentSection - 1];
+                        {
+                            if (currentSection > 0)
+                            {
+                                strains[currentSection].StarRating = strains[currentSection - 1].StarRating;
+                            }
+                            else
+                            {
+                                strains[currentSection].StarRating = strains.Max(s => s.StarRating) / 2;
+                            }
+                        }
+                            
                     }
                     else
                     {
                         if (hitObjects[i - 1] is IHasEndTime s)
                         {
                             if (s.EndTime > firstSectionEnd + (currentSection - 1) * sectionLength)
+                            {
+                                //maybe do this without if
                                 if (strains[currentSection].StarRating == 0)
                                     strains[currentSection] = strains[currentSection - 1];
+                            }
+                            else
+                                strains[currentSection].StarRating = 0;
                         }
-
-                        strains[currentSection].StarRating = 0;
+                        else
+                        {
+                            strains[currentSection].StarRating = 0;
+                        }
                     }
 
                     count = 0;
