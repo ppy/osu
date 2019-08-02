@@ -49,11 +49,10 @@ namespace osu.Game.Rulesets.Difficulty
             {
                 var h = hitObjects[i];
 
-                while (h.StartTime > firstSectionEnd + currentSection * sectionLength)
+                while (h.StartTime > firstSectionEnd + currentSection * sectionLength && currentSection < strains.Count)
                 {
                     if (count > 0)
                     {
-                        
                         if (strains[currentSection].StarRating == 0)
                         {
                             if (currentSection > 0)
@@ -65,7 +64,6 @@ namespace osu.Game.Rulesets.Difficulty
                                 strains[currentSection].StarRating = strains.Max(s => s.StarRating) / 2;
                             }
                         }
-                            
                     }
                     else
                     {

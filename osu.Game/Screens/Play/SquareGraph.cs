@@ -158,7 +158,7 @@ namespace osu.Game.Screens.Play
         {
             var newValues = new List<double>();
 
-            if (values == null)
+            if (!values.Any())
             {
                 for (float i = 0; i < ColumnCount; i++)
                     newValues.Add(0);
