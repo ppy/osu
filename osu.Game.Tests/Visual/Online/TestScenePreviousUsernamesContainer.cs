@@ -2,8 +2,11 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using NUnit.Framework;
+using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
+using osu.Game.Online.API;
+using osu.Game.Online.API.Requests;
 using osu.Game.Overlays.Profile.Header;
 using osu.Game.Users;
 
@@ -12,10 +15,13 @@ namespace osu.Game.Tests.Visual.Online
     [TestFixture]
     public class TestScenePreviousUsernamesContainer : OsuTestScene
     {
+        [Resolved]
+        private IAPIProvider api { get; set; }
+
+        private readonly Bindable<User> user = new Bindable<User>();
+
         public TestScenePreviousUsernamesContainer()
         {
-            Bindable<User> user = new Bindable<User>();
-
             Child = new PreviousUsernamesContainer
             {
                 Anchor = Anchor.Centre,
@@ -54,6 +60,18 @@ namespace osu.Game.Tests.Visual.Online
             });
 
             AddStep("null user", () => user.Value = null);
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            AddStep("online user (Angelsim)", () =>
+            {
+                var request = new GetUserRequest(1777162);
+                request.Success += user => this.user.Value = user;
+                api.Queue(request);
+            });
         }
     }
 }
