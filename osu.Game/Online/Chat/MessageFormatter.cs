@@ -78,7 +78,7 @@ namespace osu.Game.Online.Chat
                     //since we just changed the line display text, offset any already processed links.
                     result.Links.ForEach(l => l.Index -= l.Index > index ? m.Length - displayText.Length : 0);
 
-                    var details = getLinkDetails(linkText);
+                    var details = GetLinkDetails(linkText);
                     result.Links.Add(new Link(linkText, index, displayText.Length, linkActionOverride ?? details.Action, details.Argument));
 
                     //adjust the offset for processing the current matches group.
@@ -95,7 +95,7 @@ namespace osu.Game.Online.Chat
                 var link = m.Groups["link"].Value;
                 var indexLength = link.Length;
 
-                var details = getLinkDetails(link);
+                var details = GetLinkDetails(link);
                 result.Links.Add(new Link(link, index, indexLength, details.Action, details.Argument));
             }
         }

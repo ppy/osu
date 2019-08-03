@@ -208,7 +208,7 @@ namespace osu.Game
                     Text = @"This link type is not yet supported!",
                     Icon = FontAwesome.Solid.LifeRing,
                 });
-                LinkDetails linkDetails = getLinkDetails(url);
+                LinkDetails linkDetails = GetLinkDetails(url);
                 Schedule(() => LinkUtils.HandleLink(url, linkDetails.Action, linkDetails.Argument, this, channelManager, showNotImplementedError));
             }
             else
