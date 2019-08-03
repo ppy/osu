@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Net;
 using System.Net.Http;
+using System.Net.NetworkInformation;
 using System.Threading;
 using Newtonsoft.Json.Linq;
 using osu.Framework.Bindables;
@@ -39,7 +40,7 @@ namespace osu.Game.Online.API
 
         public Bindable<UserActivity> Activity { get; } = new Bindable<UserActivity>();
 
-        protected bool HasLogin => authentication.Token.Value != null || (!string.IsNullOrEmpty(ProvidedUsername) && !string.IsNullOrEmpty(password));
+        protected bool HasLogin => authentication.Token.Value != null || !string.IsNullOrEmpty(ProvidedUsername) && !string.IsNullOrEmpty(password);
 
         private readonly CancellationTokenSource cancellationToken = new CancellationTokenSource();
 
@@ -249,6 +250,9 @@ namespace osu.Game.Online.API
         {
             try
             {
+                if (!NetworkInterface.GetIsNetworkAvailable())
+                    return false;
+
                 req.Perform(this);
 
                 //we could still be in initialisation, at which point we don't want to say we're Online yet.
