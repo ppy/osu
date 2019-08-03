@@ -29,7 +29,7 @@ namespace osu.Game.Tests.Visual.Online
                 User = { BindTarget = user },
             };
 
-            User[] users = new[]
+            User[] users =
             {
                 new User { PreviousUsernames = new[] { "username1" } },
                 new User { PreviousUsernames = new[] { "longusername", "longerusername" } },
