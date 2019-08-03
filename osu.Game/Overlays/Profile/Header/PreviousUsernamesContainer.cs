@@ -25,7 +25,9 @@ namespace osu.Game.Overlays.Profile.Header
 
         public readonly Bindable<User> User = new Bindable<User>();
 
-        private readonly ContentContainer contentContainer;
+        private readonly TextFlowContainer text;
+        private readonly Box background;
+        private readonly SpriteText header;
 
         public PreviousUsernamesContainer()
         {
@@ -33,18 +35,68 @@ namespace osu.Game.Overlays.Profile.Header
 
             AutoSizeAxes = Axes.Y;
             Width = width;
+            Masking = true;
+            CornerRadius = 5;
 
             AddRangeInternal(new Drawable[]
             {
-                contentContainer = new ContentContainer(),
-                hoverIcon = new HoverIconContainer(),
+                background = new Box
+                {
+                    RelativeSizeAxes = Axes.Both,
+                },
+                new GridContainer
+                {
+                    AutoSizeAxes = Axes.Y,
+                    RelativeSizeAxes = Axes.X,
+                    RowDimensions = new[]
+                    {
+                        new Dimension(GridSizeMode.AutoSize),
+                        new Dimension(GridSizeMode.AutoSize)
+                    },
+                    ColumnDimensions = new[]
+                    {
+                        new Dimension(GridSizeMode.AutoSize),
+                        new Dimension(GridSizeMode.Distributed)
+                    },
+                    Content = new[]
+                    {
+                        new Drawable[]
+                        {
+                            hoverIcon = new HoverIconContainer(),
+                            header = new SpriteText
+                            {
+                                Anchor = Anchor.BottomLeft,
+                                Origin = Anchor.BottomLeft,
+                                Text = @"formerly known as",
+                                Font = OsuFont.GetFont(size: 10, italics: true)
+                            }
+                        },
+                        new Drawable[]
+                        {
+                            new Container
+                            {
+                                RelativeSizeAxes = Axes.Both,
+                            },
+                            text = new TextFlowContainer(s => s.Font = OsuFont.GetFont(size: 12, weight: FontWeight.Bold, italics: true))
+                            {
+                                RelativeSizeAxes = Axes.X,
+                                AutoSizeAxes = Axes.Y,
+                                Direction = FillDirection.Full,
+                                Margin = new MarginPadding { Bottom = margin, Top = margin / 2 }
+                            }
+                        }
+                    }
+                }
             });
 
-            hoverIcon.ActivateHover += () =>
-            {
-                contentContainer.Show();
-                this.MoveToY(-move_offset, duration, Easing.OutQuint);
-            };
+            hoverIcon.ActivateHover += showContent;
+            hideContent();
+        }
+
+        [BackgroundDependencyLoader]
+        private void load(OsuColour colours)
+        {
+            background.Colour = colours.GreySeafoamDarker;
         }
 
         protected override void LoadComplete()
@@ -55,13 +107,13 @@ namespace osu.Game.Overlays.Profile.Header
 
         private void onUserChanged(ValueChangedEvent<User> user)
         {
-            contentContainer.Text = string.Empty;
+            text.Text = string.Empty;
 
             var usernames = user.NewValue?.PreviousUsernames;
 
             if (usernames?.Any() ?? false)
             {
-                contentContainer.Text = string.Join(", ", usernames);
+                text.Text = string.Join(", ", usernames);
                 Show();
                 return;
             }
@@ -72,82 +124,23 @@ namespace osu.Game.Overlays.Profile.Header
         protected override void OnHoverLost(HoverLostEvent e)
         {
             base.OnHoverLost(e);
-            contentContainer.Hide();
-            this.MoveToY(0, duration, Easing.OutQuint);
+            hideContent();
         }
 
-        private class ContentContainer : VisibilityContainer
+        private void showContent()
         {
-            private const int header_height = 20;
-            private const int content_padding = 40;
+            text.FadeIn(duration, Easing.OutQuint);
+            header.FadeIn(duration, Easing.OutQuint);
+            background.FadeIn(duration, Easing.OutQuint);
+            this.MoveToY(-move_offset, duration, Easing.OutQuint);
+        }
 
-            public string Text
-            {
-                set => usernames.Text = value;
-            }
-
-            private readonly TextFlowContainer usernames;
-            private readonly Box background;
-
-            public ContentContainer()
-            {
-                AutoSizeAxes = Axes.Y;
-                RelativeSizeAxes = Axes.X;
-                Masking = true;
-                AlwaysPresent = true;
-                CornerRadius = 5;
-                Children = new Drawable[]
-                {
-                    background = new Box
-                    {
-                        RelativeSizeAxes = Axes.Both,
-                    },
-                    new FillFlowContainer
-                    {
-                        RelativeSizeAxes = Axes.X,
-                        AutoSizeAxes = Axes.Y,
-                        Direction = FillDirection.Vertical,
-                        Spacing = new Vector2(0, 5),
-                        Children = new Drawable[]
-                        {
-                            new Container
-                            {
-                                RelativeSizeAxes = Axes.X,
-                                Height = header_height,
-                                Children = new Drawable[]
-                                {
-                                    new SpriteText
-                                    {
-                                        Anchor = Anchor.BottomLeft,
-                                        Origin = Anchor.BottomLeft,
-                                        Padding = new MarginPadding { Left = content_padding },
-                                        Text = @"formerly known as",
-                                        Font = OsuFont.GetFont(size: 10, italics: true)
-                                    }
-                                }
-                            },
-                            usernames = new TextFlowContainer(s => s.Font = OsuFont.GetFont(size: 12, weight: FontWeight.Bold, italics: true))
-                            {
-                                RelativeSizeAxes = Axes.X,
-                                AutoSizeAxes = Axes.Y,
-                                Direction = FillDirection.Full,
-                                Spacing = new Vector2(0, 5),
-                                Padding = new MarginPadding { Left = content_padding, Bottom = margin },
-                            },
-                        }
-                    }
-                };
-            }
-
-            [BackgroundDependencyLoader]
-            private void load(OsuColour colours)
-            {
-                background.Colour = colours.GreySeafoamDarker;
-            }
-
-            protected override void PopIn() => this.FadeIn(duration, Easing.OutQuint);
-
-            protected override void PopOut() => this.FadeOut(duration, Easing.OutQuint);
+        private void hideContent()
+        {
+            text.FadeOut(duration, Easing.OutQuint);
+            header.FadeOut(duration, Easing.OutQuint);
+            background.FadeOut(duration, Easing.OutQuint);
+            this.MoveToY(0, duration, Easing.OutQuint);
         }
 
         private class HoverIconContainer : Container
@@ -159,7 +152,7 @@ namespace osu.Game.Overlays.Profile.Header
                 AutoSizeAxes = Axes.Both;
                 Child = new SpriteIcon
                 {
-                    Margin = new MarginPadding(margin) { Top = 6 },
+                    Margin = new MarginPadding { Top = 6, Left = margin, Right = margin * 2 },
                     Size = new Vector2(15),
                     Icon = FontAwesome.Solid.IdCard,
                 };

@@ -29,37 +29,22 @@ namespace osu.Game.Tests.Visual.Online
                 User = { BindTarget = user },
             };
 
-            AddStep("single username", () => user.Value = new User
+            User[] users = new[]
             {
-                PreviousUsernames = new[] { "username1" },
-            });
+                new User { PreviousUsernames = new[] { "username1" } },
+                new User { PreviousUsernames = new[] { "longusername", "longerusername" } },
+                new User { PreviousUsernames = new[] { "test", "angelsim", "verylongusername" } },
+                new User { PreviousUsernames = new[] { "ihavenoidea", "howcani", "makethistext", "anylonger" } },
+                new User { PreviousUsernames = new string[0] },
+                null
+            };
 
-            AddStep("two usernames", () => user.Value = new User
-            {
-                PreviousUsernames = new[] { "longusername", "longerusername" },
-            });
-
-            AddStep("three usernames", () => user.Value = new User
-            {
-                PreviousUsernames = new[] { "test", "angelsim", "verylongusername" },
-            });
-
-            AddStep("four usernames", () => user.Value = new User
-            {
-                PreviousUsernames = new[] { "ihavenoidea", "howcani", "makethistext", "anylonger" },
-            });
-
-            AddStep("many usernames", () => user.Value = new User
-            {
-                PreviousUsernames = new[] { "ihavenoidea", "howcani", "makethistext", "anylonger", "but", "ican", "try", "tomake", "this" },
-            });
-
-            AddStep("no username", () => user.Value = new User
-            {
-                PreviousUsernames = new string[0],
-            });
-
-            AddStep("null user", () => user.Value = null);
+            AddStep("single username", () => user.Value = users[0]);
+            AddStep("two usernames", () => user.Value = users[1]);
+            AddStep("three usernames", () => user.Value = users[2]);
+            AddStep("four usernames", () => user.Value = users[3]);
+            AddStep("no username", () => user.Value = users[4]);
+            AddStep("null user", () => user.Value = users[5]);
         }
 
         protected override void LoadComplete()
