@@ -12,6 +12,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.IO.Stores;
 using osu.Game.Beatmaps;
+using osu.Game.IO;
 
 namespace osu.Game.Audio
 {
@@ -29,7 +30,7 @@ namespace osu.Game.Audio
         {
             // this is a temporary solution to get around muting ourselves.
             // todo: update this once we have a BackgroundTrackManager or similar.
-            trackStore = new PreviewTrackStore(new OnlineStore());
+            trackStore = new PreviewTrackStore(new OsuPreviewTrackCachedOnlineStore());
 
             audio.AddItem(trackStore);
             trackStore.AddAdjustment(AdjustableProperty.Volume, audio.VolumeTrack);
@@ -105,6 +106,11 @@ namespace osu.Game.Audio
             }
 
             protected override Track GetTrack() => trackManager.Get($"https://b.ppy.sh/preview/{beatmapSetInfo?.OnlineBeatmapSetID}.mp3");
+        }
+
+        private class OsuPreviewTrackCachedOnlineStore : OsuCachedOnlineStore
+        {
+            protected override string CachePath => Path.Combine(base.CachePath, nameof(PreviewTrackManager));
         }
 
         private class PreviewTrackStore : AudioCollectionManager<AdjustableAudioComponent>, ITrackStore
