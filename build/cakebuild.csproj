@@ -5,7 +5,7 @@
     <TargetFrameworks>netcoreapp2.0</TargetFrameworks>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Cake" Version="0.30.0" />
-    <PackageReference Include="Cake.CoreCLR" Version="0.30.0" />
+    <PackageReference Include="Cake" Version="0.34.1" />
+    <PackageReference Include="Cake.CoreCLR" Version="0.34.1" />
   </ItemGroup>
 </Project>

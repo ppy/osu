@@ -35,7 +35,7 @@ namespace osu.Game.Screens.Select
         private readonly MetadataSection description, source, tags;
         private readonly Container failRetryContainer;
         private readonly FailRetryGraph failRetryGraph;
-        private readonly DimmedLoadingAnimation loading;
+        private readonly DimmedLoadingLayer loading;
 
         private IAPIProvider api;
 
@@ -156,7 +156,7 @@ namespace osu.Game.Screens.Select
                         },
                     },
                 },
-                loading = new DimmedLoadingAnimation(),
+                loading = new DimmedLoadingLayer(),
             };
         }
 

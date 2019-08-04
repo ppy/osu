@@ -3,6 +3,8 @@
 
 using System;
 using System.Collections.Generic;
+using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.MathUtils;
@@ -20,25 +22,38 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
         private double animDuration;
 
+        private readonly SkinnableDrawable scaleContainer;
+
         public DrawableRepeatPoint(RepeatPoint repeatPoint, DrawableSlider drawableSlider)
             : base(repeatPoint)
         {
             this.repeatPoint = repeatPoint;
             this.drawableSlider = drawableSlider;
 
-            Size = new Vector2(45 * repeatPoint.Scale);
+            Size = new Vector2(OsuHitObject.OBJECT_RADIUS * 2);
 
             Blending = BlendingMode.Additive;
             Origin = Anchor.Centre;
 
-            InternalChildren = new Drawable[]
+            InternalChild = scaleContainer = new SkinnableDrawable("Play/osu/reversearrow", _ => new SpriteIcon
             {
-                new SkinnableDrawable("Play/osu/reversearrow", _ => new SpriteIcon
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    Icon = FontAwesome.Solid.ChevronRight
-                }, restrictSize: false)
+                RelativeSizeAxes = Axes.Both,
+                Icon = FontAwesome.Solid.ChevronRight,
+                Size = new Vector2(0.35f)
+            }, confineMode: ConfineMode.NoScaling)
+            {
+                Anchor = Anchor.Centre,
+                Origin = Anchor.Centre,
             };
+        }
+
+        private readonly IBindable<float> scaleBindable = new Bindable<float>();
+
+        [BackgroundDependencyLoader]
+        private void load()
+        {
+            scaleBindable.BindValueChanged(scale => scaleContainer.Scale = new Vector2(scale.NewValue), true);
+            scaleBindable.BindTo(HitObject.ScaleBindable);
         }
 
         protected override void CheckForResult(bool userTriggered, double timeOffset)

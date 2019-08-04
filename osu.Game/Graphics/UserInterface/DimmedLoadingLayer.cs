@@ -9,13 +9,13 @@ using osu.Framework.Extensions.Color4Extensions;
 
 namespace osu.Game.Graphics.UserInterface
 {
-    public class DimmedLoadingAnimation : VisibilityContainer
+    public class DimmedLoadingLayer : VisibilityContainer
     {
         private const float transition_duration = 250;
 
         private readonly LoadingAnimation loading;
 
-        public DimmedLoadingAnimation()
+        public DimmedLoadingLayer()
         {
             RelativeSizeAxes = Axes.Both;
             Children = new Drawable[]

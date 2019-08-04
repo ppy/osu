@@ -3,13 +3,15 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using osuTK;
 
 namespace osu.Game.Rulesets.Objects
 {
     public static class SliderEventGenerator
     {
-        public static IEnumerable<SliderEventDescriptor> Generate(double startTime, double spanDuration, double velocity, double tickDistance, double totalDistance, int spanCount, double? legacyLastTickOffset)
+        public static IEnumerable<SliderEventDescriptor> Generate(double startTime, double spanDuration, double velocity, double tickDistance, double totalDistance, int spanCount,
+                                                                  double? legacyLastTickOffset)
         {
             // A very lenient maximum length of a slider for ticks to be generated.
             // This exists for edge cases such as /b/1573664 where the beatmap has been edited by the user, and should never be reached in normal usage.
@@ -36,23 +38,16 @@ namespace osu.Game.Rulesets.Objects
                     var spanStartTime = startTime + span * spanDuration;
                     var reversed = span % 2 == 1;
 
-                    for (var d = tickDistance; d <= length; d += tickDistance)
+                    var ticks = generateTicks(span, spanStartTime, spanDuration, reversed, length, tickDistance, minDistanceFromEnd);
+
+                    if (reversed)
                     {
-                        if (d >= length - minDistanceFromEnd)
-                            break;
-
-                        var pathProgress = d / length;
-                        var timeProgress = reversed ? 1 - pathProgress : pathProgress;
-
-                        yield return new SliderEventDescriptor
-                        {
-                            Type = SliderEventType.Tick,
-                            SpanIndex = span,
-                            SpanStartTime = spanStartTime,
-                            Time = spanStartTime + timeProgress * spanDuration,
-                            PathProgress = pathProgress,
-                        };
+                        // For repeat spans, ticks are returned in reverse-StartTime order, which is undesirable for some rulesets
+                        ticks = ticks.Reverse();
                     }
+
+                    foreach (var e in ticks)
+                        yield return e;
 
                     if (span < spanCount - 1)
                     {
@@ -102,6 +97,40 @@ namespace osu.Game.Rulesets.Objects
                 Time = startTime + totalDuration,
                 PathProgress = spanCount % 2,
             };
+        }
+
+        /// <summary>
+        /// Generates the ticks for a span of the slider.
+        /// </summary>
+        /// <param name="spanIndex">The span index.</param>
+        /// <param name="spanStartTime">The start time of the span.</param>
+        /// <param name="spanDuration">The duration of the span.</param>
+        /// <param name="reversed">Whether the span is reversed.</param>
+        /// <param name="length">The length of the path.</param>
+        /// <param name="tickDistance">The distance between each tick.</param>
+        /// <param name="minDistanceFromEnd">The distance from the end of the path at which ticks are not allowed to be added.</param>
+        /// <returns>A <see cref="SliderEventDescriptor"/> for each tick. If <paramref name="reversed"/> is true, the ticks will be returned in reverse-StartTime order.</returns>
+        private static IEnumerable<SliderEventDescriptor> generateTicks(int spanIndex, double spanStartTime, double spanDuration, bool reversed, double length, double tickDistance,
+                                                                        double minDistanceFromEnd)
+        {
+            for (var d = tickDistance; d <= length; d += tickDistance)
+            {
+                if (d >= length - minDistanceFromEnd)
+                    break;
+
+                // Always generate ticks from the start of the path rather than the span to ensure that ticks in repeat spans are positioned identically to those in non-repeat spans
+                var pathProgress = d / length;
+                var timeProgress = reversed ? 1 - pathProgress : pathProgress;
+
+                yield return new SliderEventDescriptor
+                {
+                    Type = SliderEventType.Tick,
+                    SpanIndex = spanIndex,
+                    SpanStartTime = spanStartTime,
+                    Time = spanStartTime + timeProgress * spanDuration,
+                    PathProgress = pathProgress,
+                };
+            }
         }
     }
 

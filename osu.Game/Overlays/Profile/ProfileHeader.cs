@@ -22,7 +22,7 @@ namespace osu.Game.Overlays.Profile
         private UserCoverBackground coverContainer;
         private CentreHeaderContainer centreHeaderContainer;
         private DetailHeaderContainer detailHeaderContainer;
-        private DimmedLoadingAnimation loadingAnimation;
+        private DimmedLoadingLayer loadingAnimation;
         private readonly ProfileRulesetSelector rulesetSelector;
 
         public readonly Bindable<User> User = new Bindable<User>();
@@ -141,7 +141,7 @@ namespace osu.Game.Overlays.Profile
                         },
                     }
                 },
-                loadingAnimation = new DimmedLoadingAnimation()
+                loadingAnimation = new DimmedLoadingLayer()
             }
         };
 
