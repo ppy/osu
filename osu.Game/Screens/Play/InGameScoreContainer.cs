@@ -126,8 +126,8 @@ namespace osu.Game.Screens.Play
                 if (scorePosition.HasValue)
                     positionText.Text = $"#{scorePosition.Value.ToMetric(decimals: scorePosition < 100000 ? 1 : 0)}";
 
-                positionText.FadeTo(scorePosition.HasValue ? 1 : 0, 100);
-                positionSymbol.FadeTo(scorePosition.HasValue ? 1 : 0, 100);
+                positionText.FadeTo(scorePosition.HasValue ? 1 : 0);
+                positionSymbol.FadeTo(scorePosition.HasValue ? 1 : 0);
             }
         }
 
