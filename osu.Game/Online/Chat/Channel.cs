@@ -163,6 +163,9 @@ namespace osu.Game.Online.Chat
             PendingMessageResolved?.Invoke(echo, final);
         }
 
+        /// <summary>
+        /// Clears all messages from the channel. Triggers the <see cref="MessagesCleared"/> event.
+        /// </summary>
         public void ClearMessages()
         {
             Messages.Clear();
