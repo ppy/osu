@@ -9,6 +9,7 @@ using osu.Game.Rulesets.Catch;
 using osu.Game.Rulesets.Mania;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Taiko;
+using osu.Game.Users;
 
 namespace osu.Game.Tests.Visual.Online
 {
@@ -34,7 +35,12 @@ namespace osu.Game.Tests.Visual.Online
             AddStep("set mania as default", () => selector.SetDefaultRuleset(new ManiaRuleset().RulesetInfo));
             AddStep("set taiko as default", () => selector.SetDefaultRuleset(new TaikoRuleset().RulesetInfo));
             AddStep("set catch as default", () => selector.SetDefaultRuleset(new CatchRuleset().RulesetInfo));
-            AddStep("select default ruleset", selector.SelectDefaultRuleset);
+
+            AddStep("User with osu as default", () => selector.User.Value = new User { PlayMode = "osu" });
+            AddStep("User with mania as default", () => selector.User.Value = new User { PlayMode = "mania" });
+            AddStep("User with taiko as default", () => selector.User.Value = new User { PlayMode = "taiko" });
+            AddStep("User with catch as default", () => selector.User.Value = new User { PlayMode = "fruits" });
+            AddStep("null user", () => selector.User.Value = null);
         }
     }
 }
