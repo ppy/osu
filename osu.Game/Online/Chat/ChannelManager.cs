@@ -213,7 +213,6 @@ namespace osu.Game.Online.Chat
                     PostMessage(content, true);
                     break;
 
-                case "p":
                 case "part":
                     LeaveChannel(target);
                     break;
