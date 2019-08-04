@@ -12,6 +12,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Cursor;
 using osu.Game.Online.Chat;
+using osu.Framework.Extensions.IEnumerableExtensions;
 
 namespace osu.Game.Overlays.Chat
 {
@@ -57,6 +58,7 @@ namespace osu.Game.Overlays.Chat
 
             Channel.NewMessagesArrived += newMessagesArrived;
             Channel.MessageRemoved += messageRemoved;
+            Channel.MessagesCleared += messagesCleared;
             Channel.PendingMessageResolved += pendingMessageResolved;
         }
 
@@ -72,6 +74,7 @@ namespace osu.Game.Overlays.Chat
 
             Channel.NewMessagesArrived -= newMessagesArrived;
             Channel.MessageRemoved -= messageRemoved;
+            Channel.MessagesCleared -= messagesCleared;
             Channel.PendingMessageResolved -= pendingMessageResolved;
         }
 
@@ -116,6 +119,11 @@ namespace osu.Game.Overlays.Chat
         private void messageRemoved(Message removed)
         {
             ChatLineFlow.Children.FirstOrDefault(c => c.Message == removed)?.FadeColour(Color4.Red, 400).FadeOut(600).Expire();
+        }
+
+        private void messagesCleared()
+        {
+            ChatLineFlow.Children.ForEach(c => c.FadeOut(300).Expire());
         }
 
         private void scrollToEnd() => ScheduleAfterChildren(() => scroll.ScrollToEnd());

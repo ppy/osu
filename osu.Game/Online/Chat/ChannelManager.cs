@@ -213,6 +213,10 @@ namespace osu.Game.Online.Chat
                     PostMessage(content, true);
                     break;
 
+                case "clear":
+                    target.ClearMessages();
+                    break;
+
                 case "help":
                     target.AddNewMessages(new InfoMessage("Supported commands: /help, /me [action]"));
                     break;

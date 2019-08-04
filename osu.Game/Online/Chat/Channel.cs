@@ -32,7 +32,7 @@ namespace osu.Game.Online.Chat
         }
 
         /// <summary>
-        /// Contains all the messages send in the channel.
+        /// Contains all the messages sent in the channel.
         /// </summary>
         public readonly SortedList<Message> Messages = new SortedList<Message>(Comparer<Message>.Default);
 
@@ -55,6 +55,11 @@ namespace osu.Game.Online.Chat
         /// An event that fires when a pending message gets removed.
         /// </summary>
         public event Action<Message> MessageRemoved;
+
+        /// <summary>
+        /// An event that fires when all messages are cleared.
+        /// </summary>
+        public event Action MessagesCleared;
 
         public bool ReadOnly => false; //todo not yet used.
 
@@ -156,6 +161,12 @@ namespace osu.Game.Online.Chat
 
             Messages.Add(final);
             PendingMessageResolved?.Invoke(echo, final);
+        }
+
+        public void ClearMessages()
+        {
+            Messages.Clear();
+            MessagesCleared?.Invoke();
         }
 
         private void purgeOldMessages()
