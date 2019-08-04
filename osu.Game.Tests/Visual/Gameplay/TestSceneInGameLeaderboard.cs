@@ -78,7 +78,7 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             public bool CheckPositionByUsername(string username, int? estimatedPosition)
             {
-                var scoreItem = ScoresContainer.Where(i => i.User.Username == username).FirstOrDefault();
+                var scoreItem = ScoresContainer.FirstOrDefault(i => i.User.Username == username);
 
                 return scoreItem != null && scoreItem.ScorePosition == estimatedPosition;
             }
