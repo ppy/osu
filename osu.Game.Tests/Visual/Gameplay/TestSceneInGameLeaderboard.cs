@@ -75,6 +75,11 @@ namespace osu.Game.Tests.Visual.Gameplay
         private class TestInGameLeaderboard : InGameLeaderboard
         {
             public void ClearScores() => ScoresContainer.RemoveAll(s => s.User.Username != PlayerUser.Username);
+            public int? PlayerPosition
+            {
+                get => PlayerScoreItem.ScorePosition;
+                set => PlayerScoreItem.ScorePosition = value;
+            }
 
             public bool CheckPositionByUsername(string username, int? estimatedPosition)
             {
