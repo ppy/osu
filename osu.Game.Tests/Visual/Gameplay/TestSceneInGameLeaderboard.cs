@@ -41,7 +41,12 @@ namespace osu.Game.Tests.Visual.Gameplay
         }
 
         [SetUp]
-        public void SetUp() => leaderboard.ClearScores();
+        public void SetUp()
+        {
+            leaderboard.ClearScores();
+            leaderboard.PlayerPosition = 1;
+            playerScore.Value = 1222333;
+        }
 
         [Test]
         public void TestPlayerScore()
