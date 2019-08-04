@@ -22,7 +22,7 @@ namespace osu.Game.Screens.Play
         /// Called once an item's score has changed.
         /// Useful for doing calculations on what score to show or hide next. (scrolling system)
         /// </summary>
-        public event Action OnScoreChange;
+        public Action OnScoreChange;
 
         /// <summary>
         /// Whether to declare a new position for un-positioned players.
