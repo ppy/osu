@@ -118,7 +118,7 @@ namespace osu.Game.Users
         public int PostCount;
 
         [JsonProperty(@"follower_count")]
-        public int[] FollowerCount;
+        public int FollowerCount;
 
         [JsonProperty]
         private string[] playstyle

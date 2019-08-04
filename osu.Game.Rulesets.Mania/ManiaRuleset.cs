@@ -13,7 +13,6 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Bindings;
 using osu.Game.Graphics;
-using osu.Game.Rulesets.Mania.Objects;
 using osu.Game.Rulesets.Mania.Replays;
 using osu.Game.Rulesets.Replays.Types;
 using osu.Game.Beatmaps.Legacy;
@@ -154,7 +153,7 @@ namespace osu.Game.Rulesets.Mania
                 case ModType.Fun:
                     return new Mod[]
                     {
-                        new MultiMod(new ModWindUp<ManiaHitObject>(), new ModWindDown<ManiaHitObject>())
+                        new MultiMod(new ModWindUp(), new ModWindDown())
                     };
 
                 default:

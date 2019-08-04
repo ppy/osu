@@ -17,6 +17,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Objects.Drawables
 {
+    [Cached(typeof(DrawableHitObject))]
     public abstract class DrawableHitObject : SkinReloadableDrawable
     {
         public readonly HitObject HitObject;
@@ -81,7 +82,9 @@ namespace osu.Game.Rulesets.Objects.Drawables
 
         public override bool IsPresent => base.IsPresent || (State.Value == ArmedState.Idle && Clock?.CurrentTime >= LifetimeStart);
 
-        public readonly Bindable<ArmedState> State = new Bindable<ArmedState>();
+        private readonly Bindable<ArmedState> state = new Bindable<ArmedState>();
+
+        public IBindable<ArmedState> State => state;
 
         protected DrawableHitObject(HitObject hitObject)
         {
@@ -116,32 +119,119 @@ namespace osu.Game.Rulesets.Objects.Drawables
             }
         }
 
-        protected override void ClearInternal(bool disposeChildren = true) => throw new InvalidOperationException($"Should never clear a {nameof(DrawableHitObject)}");
-
         protected override void LoadComplete()
         {
             base.LoadComplete();
-
-            State.ValueChanged += armed =>
-            {
-                UpdateState(armed.NewValue);
-
-                // apply any custom state overrides
-                ApplyCustomUpdateState?.Invoke(this, armed.NewValue);
-
-                if (armed.NewValue == ArmedState.Hit)
-                    PlaySamples();
-            };
-
-            State.TriggerChange();
+            updateState(ArmedState.Idle, true);
         }
 
-        protected abstract void UpdateState(ArmedState state);
+        #region State / Transform Management
 
         /// <summary>
         /// Bind to apply a custom state which can override the default implementation.
         /// </summary>
         public event Action<DrawableHitObject, ArmedState> ApplyCustomUpdateState;
+
+        /// <summary>
+        /// Enables automatic transform management of this hitobject. Implementation of transforms should be done in <see cref="UpdateInitialTransforms"/> and <see cref="UpdateStateTransforms"/> only. Rewinding and removing previous states is done automatically.
+        /// </summary>
+        /// <remarks>
+        /// Going forward, this is the preferred way of implementing <see cref="DrawableHitObject"/>s. Previous functionality
+        /// is offered as a compatibility layer until all rulesets have been migrated across.
+        /// </remarks>
+        protected virtual bool UseTransformStateManagement => true;
+
+        protected override void ClearInternal(bool disposeChildren = true) => throw new InvalidOperationException($"Should never clear a {nameof(DrawableHitObject)}");
+
+        private void updateState(ArmedState newState, bool force = false)
+        {
+            if (State.Value == newState && !force)
+                return;
+
+            if (UseTransformStateManagement)
+            {
+                double transformTime = HitObject.StartTime - InitialLifetimeOffset;
+
+                base.ApplyTransformsAt(transformTime, true);
+                base.ClearTransformsAfter(transformTime, true);
+
+                using (BeginAbsoluteSequence(transformTime, true))
+                {
+                    UpdateInitialTransforms();
+
+                    var judgementOffset = Math.Min(HitObject.HitWindows?.HalfWindowFor(HitResult.Miss) ?? double.MaxValue, Result?.TimeOffset ?? 0);
+
+                    using (BeginDelayedSequence(InitialLifetimeOffset + judgementOffset, true))
+                    {
+                        UpdateStateTransforms(newState);
+                        state.Value = newState;
+                    }
+                }
+            }
+            else
+                state.Value = newState;
+
+            UpdateState(newState);
+
+            // apply any custom state overrides
+            ApplyCustomUpdateState?.Invoke(this, newState);
+
+            if (newState == ArmedState.Hit)
+                PlaySamples();
+        }
+
+        /// <summary>
+        /// Apply (generally fade-in) transforms leading into the <see cref="HitObject"/> start time.
+        /// The local drawable hierarchy is recursively delayed to <see cref="LifetimeStart"/> for convenience.
+        /// </summary>
+        /// <remarks>
+        /// This is called once before every <see cref="UpdateStateTransforms"/>. This is to ensure a good state in the case
+        /// the <see cref="JudgementResult.TimeOffset"/> was negative and potentially altered the pre-hit transforms.
+        /// </remarks>
+        protected virtual void UpdateInitialTransforms()
+        {
+        }
+
+        /// <summary>
+        /// Apply transforms based on the current <see cref="ArmedState"/>. Previous states are automatically cleared.
+        /// </summary>
+        /// <param name="state">The new armed state.</param>
+        protected virtual void UpdateStateTransforms(ArmedState state)
+        {
+        }
+
+        public override void ClearTransformsAfter(double time, bool propagateChildren = false, string targetMember = null)
+        {
+            // When we are using automatic state management, parent calls to this should be blocked for safety.
+            if (!UseTransformStateManagement)
+                base.ClearTransformsAfter(time, propagateChildren, targetMember);
+        }
+
+        public override void ApplyTransformsAt(double time, bool propagateChildren = false)
+        {
+            // When we are using automatic state management, parent calls to this should be blocked for safety.
+            if (!UseTransformStateManagement)
+                base.ApplyTransformsAt(time, propagateChildren);
+        }
+
+        /// <summary>
+        /// Legacy method to handle state changes.
+        /// Should generally not be used when <see cref="UseTransformStateManagement"/> is true; use <see cref="UpdateStateTransforms"/> instead.
+        /// </summary>
+        /// <param name="state">The new armed state.</param>
+        protected virtual void UpdateState(ArmedState state)
+        {
+        }
+
+        #endregion
+
+        protected override void SkinChanged(ISkinSource skin, bool allowFallback)
+        {
+            base.SkinChanged(skin, allowFallback);
+
+            if (HitObject is IHasComboInformation combo)
+                AccentColour.Value = skin.GetValue<SkinConfiguration, Color4?>(s => s.ComboColours.Count > 0 ? s.ComboColours[combo.ComboIndex % s.ComboColours.Count] : (Color4?)null) ?? Color4.White;
+        }
 
         /// <summary>
         /// Plays all the hit sounds for this <see cref="DrawableHitObject"/>.
@@ -163,7 +253,8 @@ namespace osu.Game.Rulesets.Objects.Drawables
 
                     Result.TimeOffset = 0;
                     Result.Type = HitResult.None;
-                    State.Value = ArmedState.Idle;
+
+                    updateState(ArmedState.Idle);
                 }
             }
         }
@@ -195,6 +286,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
         /// </summary>
         /// <remarks>
         /// This is only used as an optimisation to delay the initial update of this <see cref="DrawableHitObject"/> and may be tuned more aggressively if required.
+        /// It is indirectly used to decide the automatic transform offset provided to <see cref="UpdateInitialTransforms"/>.
         /// A more accurate <see cref="LifetimeStart"/> should be set inside <see cref="UpdateState"/> for an <see cref="ArmedState.Idle"/> state.
         /// </remarks>
         protected virtual double InitialLifetimeOffset => 10000;
@@ -243,11 +335,11 @@ namespace osu.Game.Rulesets.Objects.Drawables
                     break;
 
                 case HitResult.Miss:
-                    State.Value = ArmedState.Miss;
+                    updateState(ArmedState.Miss);
                     break;
 
                 default:
-                    State.Value = ArmedState.Hit;
+                    updateState(ArmedState.Hit);
                     break;
             }
 
