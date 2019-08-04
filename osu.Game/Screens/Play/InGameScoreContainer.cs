@@ -61,19 +61,18 @@ namespace osu.Game.Screens.Play
         /// Adds a score item based off a <see cref="ScoreInfo"/> with an initial position.
         /// </summary>
         /// <param name="score">The score info to use for this item.</param>
-        /// <param name="position">The initial position of this item.</param>
+        /// <param name="initialPosition">The initial position of this item.</param>
         /// <returns>Returns the drawable score item of that player.</returns>
-        public InGameScoreItem AddScore(ScoreInfo score, int? position = null) => score != null ? addScore(score.TotalScore, score.User, position) : null;
+        public InGameScoreItem AddScore(ScoreInfo score, int? initialPosition = null) => score != null ? addScore(score.TotalScore, score.User, initialPosition) : null;
 
         private int maxPosition => this.Where(i => i.ScorePosition.HasValue).Max(i => i.ScorePosition) ?? 0;
 
         private InGameScoreItem addScore(double totalScore, User user = null, int? position = null)
         {
-            var scoreItem = new InGameScoreItem
+            var scoreItem = new InGameScoreItem(position)
             {
                 User = user,
                 TotalScore = totalScore,
-                ScorePosition = position,
                 OnScoreChange = updateScores,
             };
 
@@ -117,6 +116,7 @@ namespace osu.Game.Screens.Play
         public Action OnScoreChange;
 
         private int? scorePosition;
+        public int? InitialPosition;
 
         public int? ScorePosition
         {
@@ -159,7 +159,7 @@ namespace osu.Game.Screens.Play
             }
         }
 
-        public InGameScoreItem()
+        public InGameScoreItem(int? initialPosition)
         {
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
@@ -219,6 +219,8 @@ namespace osu.Game.Screens.Play
                     },
                 },
             };
+
+            InitialPosition = ScorePosition = initialPosition;
         }
 
         [BackgroundDependencyLoader]
