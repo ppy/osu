@@ -65,7 +65,7 @@ namespace osu.Game.Screens.Play
         /// <returns>Returns the drawable score item of that player.</returns>
         public InGameScoreItem AddScore(ScoreInfo score, int? initialPosition = null) => score != null ? addScore(score.TotalScore, score.User, initialPosition) : null;
 
-        private int maxPosition => this.Where(i => i.ScorePosition.HasValue).Max(i => i.ScorePosition) ?? 0;
+        private int maxPosition => this.Max(i => this.Any(item => item.InitialPosition.HasValue) ? i.InitialPosition : i.ScorePosition) ?? 0;
 
         private InGameScoreItem addScore(double totalScore, User user = null, int? position = null)
         {
@@ -87,13 +87,11 @@ namespace osu.Game.Screens.Play
         private void reorderPositions()
         {
             var orderedByScore = this.OrderByDescending(i => i.TotalScore).ToList();
-            var orderedPositions = this.OrderByDescending(i => i.ScorePosition.HasValue).ThenBy(i => i.ScorePosition).Select(i => i.ScorePosition).ToList();
-
-            var newDeclaredPosition = maxPosition + 1;
+            var orderedPositions = this.Select(i => this.Any(item => item.InitialPosition.HasValue) ? i.InitialPosition : i.ScorePosition).OrderByDescending(p => p.HasValue).ThenBy(p => p).ToList();
 
             for (int i = 0; i < Count; i++)
             {
-                int newPosition = orderedPositions[i] ?? newDeclaredPosition;
+                int newPosition = orderedPositions[i] ?? maxPosition + 1;
 
                 SetLayoutPosition(orderedByScore[i], newPosition);
                 orderedByScore[i].ScorePosition = DeclareNewPosition ? newPosition : orderedPositions[i];
