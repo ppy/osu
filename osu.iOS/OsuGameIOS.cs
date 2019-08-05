@@ -3,12 +3,14 @@
 
 using System;
 using Foundation;
+using osu.Framework.Platform;
 using osu.Game;
 
 namespace osu.iOS
 {
     public class OsuGameIOS : OsuGame
     {
+        public override Storage GetStorageForStableInstall() => Storage;
         public override Version AssemblyVersion => new Version(NSBundle.MainBundle.InfoDictionary["CFBundleVersion"].ToString());
     }
 }

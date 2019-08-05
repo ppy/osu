@@ -91,8 +91,6 @@ namespace osu.Game
 
         private IntroScreen introScreen;
 
-        private bool loaded;
-
         private Bindable<int> configRuleset;
 
         private Bindable<int> configSkin;
@@ -201,18 +199,15 @@ namespace osu.Game
         {
             Logger.Log($"Request to handle url: {url}");
 
-            if (loaded)
+            Action showNotImplementedError = () => notifications?.Post(new SimpleNotification
             {
-                Action showNotImplementedError = () => notifications?.Post(new SimpleNotification
-                {
-                    Text = @"This link type is not yet supported!",
-                    Icon = FontAwesome.Solid.LifeRing,
-                });
-                LinkDetails linkDetails = GetLinkDetails(url);
-                Schedule(() => LinkUtils.HandleLink(url, linkDetails.Action, linkDetails.Argument, this, channelManager, showNotImplementedError));
-            }
-            else
-                Scheduler.AddDelayed(() => HandleUrl(url), 1000);
+                Text = @"This link type is not yet supported!",
+                Icon = FontAwesome.Solid.LifeRing,
+            });
+
+            LinkDetails linkDetails = GetLinkDetails(url);
+
+            Schedule(() => LinkUtils.HandleLink(url, linkDetails.Action, linkDetails.Argument, this, channelManager, showNotImplementedError));
         }
 
         public void OpenUrlExternally(string url)
@@ -403,8 +398,6 @@ namespace osu.Game
 
         protected override void LoadComplete()
         {
-            loaded = false;
-
             base.LoadComplete();
 
             // The next time this is updated is in UpdateAfterChildren, which occurs too late and results
@@ -600,7 +593,6 @@ namespace osu.Game
 
             settings.State.ValueChanged += _ => updateScreenOffset();
             notifications.State.ValueChanged += _ => updateScreenOffset();
-            loaded = true;
         }
 
         public class GameIdleTracker : IdleTracker
