@@ -109,7 +109,7 @@ namespace osu.Game.Rulesets.Objects
         protected void AddNested(HitObject hitObject) => nestedHitObjects.Add(hitObject);
 
         /// <summary>
-        /// Removes a <see cref="HitObject"/>s from this object's <see cref="NestedHitObjects"/>.
+        /// Removes all <see cref="HitObject"/>s from this object's <see cref="NestedHitObjects"/> that matches the predicate.
         /// </summary>
         /// <param name="predicate">The predicate the <see cref="HitObject"/> must match to be removed.</param>
         protected void RemoveAllFromNested(Predicate<HitObject> predicate) => nestedHitObjects.RemoveAll(predicate);
