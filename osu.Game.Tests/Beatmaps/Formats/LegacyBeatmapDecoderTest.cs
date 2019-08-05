@@ -482,5 +482,22 @@ namespace osu.Game.Tests.Beatmaps.Formats
                 Assert.AreEqual(hitObjects[0].Samples[0].Bank, hitObjects[0].Samples[1].Bank);
             }
         }
+
+        [Test]
+        public void TestDecodeInvalidEvents()
+        {
+            using (var normalResStream = TestResources.OpenResource("Soleily - Renatus (Gamu) [Insane].osu"))
+            using (var normalStream = new StreamReader(normalResStream))
+            using (var resStream = TestResources.OpenResource("invalid-events.osu"))
+            using (var stream = new StreamReader(resStream))
+            {
+                var decoder = Decoder.GetDecoder<Beatmap>(stream);
+                var goodBeatmap = decoder.Decode(normalStream);
+                Beatmap badBeatmap = null;
+
+                Assert.DoesNotThrow(() => badBeatmap = decoder.Decode(stream));
+                Assert.AreEqual(goodBeatmap.HitObjects.Count, badBeatmap.HitObjects.Count);
+            }
+        }
     }
 }
