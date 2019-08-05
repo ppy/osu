@@ -4,13 +4,16 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using Newtonsoft.Json;
 using NUnit.Framework;
-using osu.Framework.Extensions.IEnumerableExtensions;
+using osu.Framework.Audio.Track;
+using osu.Framework.Graphics.Textures;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Formats;
 using osu.Game.Rulesets;
+using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects;
 
 namespace osu.Game.Tests.Beatmaps
@@ -24,8 +27,6 @@ namespace osu.Game.Tests.Beatmaps
         private const string expected_conversion_suffix = "-expected-conversion";
 
         protected abstract string ResourceAssembly { get; }
-
-        protected IBeatmapConverter Converter { get; private set; }
 
         protected void Test(string name)
         {
@@ -98,26 +99,33 @@ namespace osu.Game.Tests.Beatmaps
             var rulesetInstance = CreateRuleset();
             beatmap.BeatmapInfo.Ruleset = beatmap.BeatmapInfo.RulesetID == rulesetInstance.RulesetInfo.ID ? rulesetInstance.RulesetInfo : new RulesetInfo();
 
-            Converter = rulesetInstance.CreateBeatmapConverter(beatmap);
+            var converterResult = new Dictionary<HitObject, IEnumerable<HitObject>>();
 
-            var result = new ConvertResult();
-
-            Converter.ObjectConverted += (orig, converted) =>
+            var working = new ConversionWorkingBeatmap(beatmap)
             {
-                converted.ForEach(h => h.ApplyDefaults(beatmap.ControlPointInfo, beatmap.BeatmapInfo.BaseDifficulty));
-
-                var mapping = CreateConvertMapping();
-                mapping.StartTime = orig.StartTime;
-
-                foreach (var obj in converted)
-                    mapping.Objects.AddRange(CreateConvertValue(obj));
-                result.Mappings.Add(mapping);
+                ConversionGenerated = (o, r, c) =>
+                {
+                    converterResult[o] = r;
+                    OnConversionGenerated(o, r, c);
+                }
             };
 
-            IBeatmap convertedBeatmap = Converter.Convert();
-            rulesetInstance.CreateBeatmapProcessor(convertedBeatmap)?.PostProcess();
+            working.GetPlayableBeatmap(rulesetInstance.RulesetInfo, Array.Empty<Mod>());
 
-            return result;
+            return new ConvertResult
+            {
+                Mappings = converterResult.Select(r =>
+                {
+                    var mapping = CreateConvertMapping(r.Key);
+                    mapping.StartTime = r.Key.StartTime;
+                    mapping.Objects.AddRange(r.Value.SelectMany(CreateConvertValue));
+                    return mapping;
+                }).ToList()
+            };
+        }
+
+        protected virtual void OnConversionGenerated(HitObject original, IEnumerable<HitObject> result, IBeatmapConverter beatmapConverter)
+        {
         }
 
         private ConvertResult read(string name)
@@ -154,7 +162,7 @@ namespace osu.Game.Tests.Beatmaps
         /// This should be used to validate the integrity of the conversion process after a conversion has occurred.
         /// </para>
         /// </summary>
-        protected virtual TConvertMapping CreateConvertMapping() => new TConvertMapping();
+        protected virtual TConvertMapping CreateConvertMapping(HitObject source) => new TConvertMapping();
 
         /// <summary>
         /// Creates the conversion value for a <see cref="HitObject"/>. A conversion value stores information about the converted <see cref="HitObject"/>.
@@ -175,6 +183,32 @@ namespace osu.Game.Tests.Beatmaps
         {
             [JsonProperty]
             public List<TConvertMapping> Mappings = new List<TConvertMapping>();
+        }
+
+        private class ConversionWorkingBeatmap : WorkingBeatmap
+        {
+            public Action<HitObject, IEnumerable<HitObject>, IBeatmapConverter> ConversionGenerated;
+
+            private readonly IBeatmap beatmap;
+
+            public ConversionWorkingBeatmap(IBeatmap beatmap)
+                : base(beatmap.BeatmapInfo, null)
+            {
+                this.beatmap = beatmap;
+            }
+
+            protected override IBeatmap GetBeatmap() => beatmap;
+
+            protected override Texture GetBackground() => throw new NotImplementedException();
+
+            protected override Track GetTrack() => throw new NotImplementedException();
+
+            protected override IBeatmapConverter CreateBeatmapConverter(IBeatmap beatmap, Ruleset ruleset)
+            {
+                var converter = base.CreateBeatmapConverter(beatmap, ruleset);
+                converter.ObjectConverted += (orig, converted) => ConversionGenerated?.Invoke(orig, converted, converter);
+                return converter;
+            }
         }
     }
 
