@@ -23,10 +23,7 @@ namespace osu.Game.Rulesets.Osu.Tests
         [TestCase("slider-ticks")]
         [TestCase("repeat-slider")]
         [TestCase("uneven-repeat-slider")]
-        public new void Test(string name)
-        {
-            base.Test(name);
-        }
+        public void Test(string name) => base.Test(name);
 
         protected override IEnumerable<ConvertValue> CreateConvertValue(HitObject hitObject)
         {
