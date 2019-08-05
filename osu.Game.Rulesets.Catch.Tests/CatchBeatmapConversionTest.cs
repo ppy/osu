@@ -26,10 +26,7 @@ namespace osu.Game.Rulesets.Catch.Tests
         [TestCase("hardrock-stream", new[] { typeof(CatchModHardRock) })]
         [TestCase("hardrock-repeat-slider", new[] { typeof(CatchModHardRock) })]
         [TestCase("hardrock-spinner", new[] { typeof(CatchModHardRock) })]
-        public new void Test(string name, params Type[] mods)
-        {
-            base.Test(name, mods);
-        }
+        public new void Test(string name, params Type[] mods) => base.Test(name, mods);
 
         protected override IEnumerable<ConvertValue> CreateConvertValue(HitObject hitObject)
         {
