@@ -319,8 +319,8 @@ namespace osu.Game.Rulesets.Objects.Drawables
         /// <summary>
         /// Removes a <see cref="DrawableHitObject"/> from this object's <see cref="NestedHitObjects"/>.
         /// </summary>
-        /// <param name="h">The <see cref="DrawableHitObject"/> to remove.</param>
-        protected void RemoveNested(DrawableHitObject h) => nestedHitObjects.Value.Remove(h);
+        /// <param name="predicate">The predicate the <see cref="DrawableHitObject"/> must match to be removed.</param>
+        protected void RemoveAllFromNested(Predicate<DrawableHitObject> predicate) => nestedHitObjects.Value.RemoveAll(predicate);
 
         /// <summary>
         /// Applies the <see cref="Result"/> of this <see cref="DrawableHitObject"/>, notifying responders such as

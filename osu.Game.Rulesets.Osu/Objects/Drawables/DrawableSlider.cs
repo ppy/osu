@@ -219,12 +219,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
         private void generateDrawableTicks()
         {
-            foreach (var tick in ticks)
-            {
-                components.Remove(tick);
-                RemoveNested(tick);
-            }
-
+            components.RemoveAll(d => d is DrawableSliderTick);
+            RemoveAllFromNested(d => d is DrawableSliderTick);
             ticks.Clear();
 
             foreach (var tick in slider.NestedHitObjects.OfType<SliderTick>())

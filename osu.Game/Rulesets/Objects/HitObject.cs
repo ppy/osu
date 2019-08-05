@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Collections.Generic;
 using Newtonsoft.Json;
 using osu.Game.Audio;
@@ -110,8 +111,8 @@ namespace osu.Game.Rulesets.Objects
         /// <summary>
         /// Removes a <see cref="HitObject"/>s from this object's <see cref="NestedHitObjects"/>.
         /// </summary>
-        /// <param name="hitObject">The <see cref="HitObject"/> to remove.</param>
-        protected void RemoveNested(HitObject hitObject) => nestedHitObjects.Remove(hitObject);
+        /// <param name="predicate">The predicate the <see cref="HitObject"/> must match to be removed.</param>
+        protected void RemoveAllFromNested(Predicate<HitObject> predicate) => nestedHitObjects.RemoveAll(predicate);
 
         /// <summary>
         /// Creates the <see cref="Judgement"/> that represents the scoring information for this <see cref="HitObject"/>.
