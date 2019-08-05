@@ -33,6 +33,9 @@ namespace osu.Game.Rulesets.Osu.Objects
 
         public Vector2 StackedPositionAt(double t) => StackedPosition + this.CurvePositionAt(t);
 
+        /// <summary>
+        /// Invoked when a change in this <see cref="Slider"/> occurs that requires all <see cref="SliderTick"/>s to be recalculated.
+        /// </summary>
         public Action OnTicksRegenerated;
 
         public override int ComboIndex
@@ -66,7 +69,17 @@ namespace osu.Game.Rulesets.Osu.Objects
             {
                 PathBindable.Value = value;
 
-                regenerateSliderTicks();
+                RemoveAllNested(d => d is SliderTick);
+
+                foreach (var e in
+                    SliderEventGenerator.Generate(StartTime, SpanDuration, Velocity, TickDistance, Path.Distance, this.SpanCount(), LegacyLastTickOffset))
+                {
+                    if (e.Type == SliderEventType.Tick)
+                        addNestedTick(e);
+                }
+
+                OnTicksRegenerated?.Invoke();
+
                 endPositionCache.Invalidate();
             }
         }
@@ -141,20 +154,6 @@ namespace osu.Game.Rulesets.Osu.Objects
 
         public HitCircle HeadCircle;
         public SliderTailCircle TailCircle;
-
-        private void regenerateSliderTicks()
-        {
-            RemoveAllNested(d => d is SliderTick);
-
-            foreach (var e in
-                SliderEventGenerator.Generate(StartTime, SpanDuration, Velocity, TickDistance, Path.Distance, this.SpanCount(), LegacyLastTickOffset))
-            {
-                if (e.Type == SliderEventType.Tick)
-                    addNestedTick(e);
-            }
-
-            OnTicksRegenerated?.Invoke();
-        }
 
         protected override void ApplyDefaultsToSelf(ControlPointInfo controlPointInfo, BeatmapDifficulty difficulty)
         {

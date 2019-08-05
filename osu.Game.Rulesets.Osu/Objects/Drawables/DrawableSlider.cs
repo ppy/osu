@@ -10,7 +10,6 @@ using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Threading;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Osu.Configuration;
 using osu.Game.Rulesets.Scoring;
@@ -86,13 +85,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                 AddNested(drawableRepeatPoint);
             }
 
-            ScheduledDelegate tickGenerationDebounce = null;
-
-            slider.OnTicksRegenerated += () =>
-            {
-                tickGenerationDebounce?.Cancel();
-                tickGenerationDebounce = Schedule(generateDrawableTicks);
-            };
+            slider.OnTicksRegenerated += generateDrawableTicks;
         }
 
         [BackgroundDependencyLoader]
