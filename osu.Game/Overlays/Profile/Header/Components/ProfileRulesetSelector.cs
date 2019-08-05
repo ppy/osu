@@ -40,12 +40,7 @@ namespace osu.Game.Overlays.Profile.Header.Components
         {
             base.LoadComplete();
 
-            User.BindValueChanged(onUserChanged, true);
-        }
-
-        private void onUserChanged(ValueChangedEvent<User> user)
-        {
-            SetDefaultRuleset(Rulesets.GetRuleset(user.NewValue?.PlayMode ?? "osu"));
+            User.BindValueChanged(u => SetDefaultRuleset(Rulesets.GetRuleset(u.NewValue?.PlayMode ?? "osu")), true);
         }
 
         public void SetDefaultRuleset(RulesetInfo ruleset)
