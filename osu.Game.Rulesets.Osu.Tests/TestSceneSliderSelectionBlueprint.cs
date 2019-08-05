@@ -78,7 +78,7 @@ namespace osu.Game.Rulesets.Osu.Tests
             AddStep("Modify sliderpath", () =>
             {
                 regenerated = false;
-                slider.OnRegenerated += () => regenerated = true;
+                slider.OnTicksRegenerated += () => regenerated = true;
 
                 slider.Path = new SliderPath(PathType.Bezier, new[]
                 {

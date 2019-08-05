@@ -8,7 +8,6 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Lines;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Events;
-using osu.Framework.Threading;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.Objects;
@@ -85,8 +84,6 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
 
         protected override bool OnDragStart(DragStartEvent e) => true;
 
-        private ScheduledDelegate sliderUpdateDebounce;
-
         protected override bool OnDrag(DragEvent e)
         {
             var newControlPoints = slider.Path.ControlPoints.ToArray();
@@ -110,9 +107,6 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
                 newControlPoints[index - 1] = newControlPoints[index];
 
             slider.Path = new SliderPath(slider.Path.Type, newControlPoints);
-
-            sliderUpdateDebounce?.Cancel();
-            sliderUpdateDebounce = Schedule(() => slider.ApplyDefaults(beatmap.Value.Beatmap.ControlPointInfo, beatmap.Value.BeatmapInfo.BaseDifficulty));
 
             return true;
         }

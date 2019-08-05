@@ -33,7 +33,7 @@ namespace osu.Game.Rulesets.Osu.Objects
 
         public Vector2 StackedPositionAt(double t) => StackedPosition + this.CurvePositionAt(t);
 
-        public Action OnRegenerated;
+        public Action OnTicksRegenerated;
 
         public override int ComboIndex
         {
@@ -65,6 +65,8 @@ namespace osu.Game.Rulesets.Osu.Objects
             set
             {
                 PathBindable.Value = value;
+
+                regenerateSliderTicks();
                 endPositionCache.Invalidate();
             }
         }
@@ -140,6 +142,20 @@ namespace osu.Game.Rulesets.Osu.Objects
         public HitCircle HeadCircle;
         public SliderTailCircle TailCircle;
 
+        private void regenerateSliderTicks()
+        {
+            RemoveAllNested(d => d is SliderTick);
+
+            foreach (var e in
+                SliderEventGenerator.Generate(StartTime, SpanDuration, Velocity, TickDistance, Path.Distance, this.SpanCount(), LegacyLastTickOffset))
+            {
+                if (e.Type == SliderEventType.Tick)
+                    addNestedTick(e);
+            }
+
+            OnTicksRegenerated?.Invoke();
+        }
+
         protected override void ApplyDefaultsToSelf(ControlPointInfo controlPointInfo, BeatmapDifficulty difficulty)
         {
             base.ApplyDefaultsToSelf(controlPointInfo, difficulty);
@@ -160,31 +176,10 @@ namespace osu.Game.Rulesets.Osu.Objects
             foreach (var e in
                 SliderEventGenerator.Generate(StartTime, SpanDuration, Velocity, TickDistance, Path.Distance, this.SpanCount(), LegacyLastTickOffset))
             {
-                var firstSample = Samples.Find(s => s.Name == HitSampleInfo.HIT_NORMAL)
-                                  ?? Samples.FirstOrDefault(); // TODO: remove this when guaranteed sort is present for samples (https://github.com/ppy/osu/issues/1933)
-                var sampleList = new List<HitSampleInfo>();
-
-                if (firstSample != null)
-                    sampleList.Add(new HitSampleInfo
-                    {
-                        Bank = firstSample.Bank,
-                        Volume = firstSample.Volume,
-                        Name = @"slidertick",
-                    });
-
                 switch (e.Type)
                 {
                     case SliderEventType.Tick:
-                        AddNested(new SliderTick
-                        {
-                            SpanIndex = e.SpanIndex,
-                            SpanStartTime = e.SpanStartTime,
-                            StartTime = e.Time,
-                            Position = Position + Path.PositionAt(e.PathProgress),
-                            StackHeight = StackHeight,
-                            Scale = Scale,
-                            Samples = sampleList
-                        });
+                        addNestedTick(e);
                         break;
 
                     case SliderEventType.Head:
@@ -226,8 +221,32 @@ namespace osu.Game.Rulesets.Osu.Objects
                         break;
                 }
             }
+        }
 
-            OnRegenerated?.Invoke();
+        private void addNestedTick(SliderEventDescriptor eventDescriptor)
+        {
+            var firstSample = Samples.Find(s => s.Name == HitSampleInfo.HIT_NORMAL)
+                              ?? Samples.FirstOrDefault(); // TODO: remove this when guaranteed sort is present for samples (https://github.com/ppy/osu/issues/1933)
+            var sampleList = new List<HitSampleInfo>();
+
+            if (firstSample != null)
+                sampleList.Add(new HitSampleInfo
+                {
+                    Bank = firstSample.Bank,
+                    Volume = firstSample.Volume,
+                    Name = @"slidertick",
+                });
+
+            AddNested(new SliderTick
+            {
+                SpanIndex = eventDescriptor.SpanIndex,
+                SpanStartTime = eventDescriptor.SpanStartTime,
+                StartTime = eventDescriptor.Time,
+                Position = Position + Path.PositionAt(eventDescriptor.PathProgress),
+                StackHeight = StackHeight,
+                Scale = Scale,
+                Samples = sampleList
+            });
         }
 
         private List<HitSampleInfo> getNodeSamples(int nodeIndex) =>

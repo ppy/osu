@@ -88,7 +88,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
             ScheduledDelegate tickGenerationDebounce = null;
 
-            slider.OnRegenerated += () =>
+            slider.OnTicksRegenerated += () =>
             {
                 tickGenerationDebounce?.Cancel();
                 tickGenerationDebounce = Schedule(generateDrawableTicks);
@@ -237,6 +237,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             foreach (var tick in slider.NestedHitObjects.OfType<SliderTick>())
             {
                 var drawableTick = new DrawableSliderTick(tick) { Position = tick.Position - slider.Position };
+
                 ticks.Add(drawableTick);
                 components.Add(drawableTick);
                 AddNested(drawableTick);
