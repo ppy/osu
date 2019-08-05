@@ -150,7 +150,7 @@ namespace osu.Game.Beatmaps
             processor?.PostProcess();
 
             foreach (var mod in mods.OfType<IApplicableToBeatmap>())
-                mod.ApplyToBeatmap(Beatmap);
+                mod.ApplyToBeatmap(converted);
 
             return converted;
         }
