@@ -328,7 +328,9 @@ namespace osu.Game
             if (nextBeatmap?.Track != null)
                 nextBeatmap.Track.Completed += currentTrackCompleted;
 
-            beatmap.OldValue?.Dispose();
+            using (var oldBeatmap = beatmap.OldValue)
+                if (oldBeatmap?.Track != null)
+                    oldBeatmap.Track.Completed -= currentTrackCompleted;
 
             nextBeatmap?.LoadBeatmapAsync();
         }
