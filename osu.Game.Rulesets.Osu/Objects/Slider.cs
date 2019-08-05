@@ -71,8 +71,7 @@ namespace osu.Game.Rulesets.Osu.Objects
 
                 RemoveAllFromNested(d => d is SliderTick);
 
-                foreach (var e in
-                    SliderEventGenerator.Generate(StartTime, SpanDuration, Velocity, TickDistance, Path.Distance, this.SpanCount(), LegacyLastTickOffset))
+                foreach (var e in generateDescriptors())
                 {
                     if (e.Type == SliderEventType.Tick)
                         addNestedTick(e);
@@ -168,12 +167,14 @@ namespace osu.Game.Rulesets.Osu.Objects
             TickDistance = scoringDistance / difficulty.SliderTickRate * TickDistanceMultiplier;
         }
 
+        private IEnumerable<SliderEventDescriptor> generateDescriptors() =>
+            SliderEventGenerator.Generate(StartTime, SpanDuration, Velocity, TickDistance, Path.Distance, this.SpanCount(), LegacyLastTickOffset);
+
         protected override void CreateNestedHitObjects()
         {
             base.CreateNestedHitObjects();
 
-            foreach (var e in
-                SliderEventGenerator.Generate(StartTime, SpanDuration, Velocity, TickDistance, Path.Distance, this.SpanCount(), LegacyLastTickOffset))
+            foreach (var e in generateDescriptors())
             {
                 switch (e.Type)
                 {
