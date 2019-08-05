@@ -20,10 +20,7 @@ namespace osu.Game.Rulesets.Mania.Tests
         protected override string ResourceAssembly => "osu.Game.Rulesets.Mania";
 
         [TestCase("basic")]
-        public void Test(string name)
-        {
-            base.Test(name);
-        }
+        public void Test(string name) => base.Test(name);
 
         protected override IEnumerable<ConvertValue> CreateConvertValue(HitObject hitObject)
         {
