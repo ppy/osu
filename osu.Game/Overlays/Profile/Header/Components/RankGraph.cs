@@ -68,7 +68,7 @@ namespace osu.Game.Overlays.Profile.Header.Components
         {
             base.LoadComplete();
 
-            Statistics.BindValueChanged(statistics => updateStatistics(statistics.NewValue));
+            Statistics.BindValueChanged(statistics => updateStatistics(statistics.NewValue), true);
         }
 
         private void updateStatistics(UserStatistics statistics)
