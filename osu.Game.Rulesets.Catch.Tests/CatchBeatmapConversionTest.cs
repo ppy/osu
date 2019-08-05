@@ -22,10 +22,7 @@ namespace osu.Game.Rulesets.Catch.Tests
         [TestCase("spinner")]
         [TestCase("spinner-and-circles")]
         [TestCase("slider")]
-        public new void Test(string name)
-        {
-            base.Test(name);
-        }
+        public void Test(string name) => base.Test(name);
 
         protected override IEnumerable<ConvertValue> CreateConvertValue(HitObject hitObject)
         {
