@@ -53,7 +53,7 @@ namespace osu.Game.Rulesets.Osu.Tests
                 Path = startPath
             };
 
-            applyDefaults();
+            slider.ApplyDefaults(new ControlPointInfo(), new BeatmapDifficulty { CircleSize = 2 });
 
             Add(drawableObject = new DrawableSlider(slider));
         }
@@ -65,8 +65,6 @@ namespace osu.Game.Rulesets.Osu.Tests
             {
                 slider.Position = startPosition;
                 slider.Path = startPath;
-
-                applyDefaults();
             });
         }
 
@@ -86,19 +84,16 @@ namespace osu.Game.Rulesets.Osu.Tests
                     new Vector2(-150, -150),
                     new Vector2(300, 0)
                 });
-
-                applyDefaults();
             });
 
             AddAssert("Nested objects were regenerated", () => regenerated);
 
             AddStep("Move slider", () => slider.Position = new Vector2(192, 256));
 
-            // The blueprint needed to be regenerated as well, so this checks that the new blueprint tracks the new headcircle position.
+            // We should have only regenerated the ticks and nothing else, so check that the selection blueprint is still attached to the head circle.
+            AddAssert("Selection blueprint attatched to drawable", () => blueprint.HeadBlueprint.HitObject.HitObject == slider.HeadCircle);
             AddAssert("Slider head blueprint tracks object", () => blueprint.HeadBlueprint.Position == drawableObject.HeadCircle.Position);
         }
-
-        private void applyDefaults() => slider.ApplyDefaults(new ControlPointInfo(), new BeatmapDifficulty { CircleSize = 2 });
 
         protected override SelectionBlueprint CreateBlueprint() => blueprint = new TestSliderSelectionBlueprint(drawableObject);
 
