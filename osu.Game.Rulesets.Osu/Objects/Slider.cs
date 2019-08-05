@@ -69,7 +69,8 @@ namespace osu.Game.Rulesets.Osu.Objects
             {
                 PathBindable.Value = value;
 
-                RemoveAllNested(d => d is SliderTick);
+                foreach (var tick in NestedHitObjects.OfType<SliderTick>())
+                    RemoveNested(tick);
 
                 foreach (var e in
                     SliderEventGenerator.Generate(StartTime, SpanDuration, Velocity, TickDistance, Path.Distance, this.SpanCount(), LegacyLastTickOffset))

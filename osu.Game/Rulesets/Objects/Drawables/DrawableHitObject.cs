@@ -302,6 +302,11 @@ namespace osu.Game.Rulesets.Objects.Drawables
             UpdateResult(false);
         }
 
+        /// <summary>
+        /// Adds a <see cref="DrawableHitObject"/> to this object's <see cref="NestedHitObjects"/>,
+        /// allowing events that affect this object to propagate to it.
+        /// </summary>
+        /// <param name="h">The <see cref="DrawableHitObject"/> to add.</param>
         protected virtual void AddNested(DrawableHitObject h)
         {
             h.OnNewResult += (d, r) => OnNewResult?.Invoke(d, r);
@@ -311,6 +316,10 @@ namespace osu.Game.Rulesets.Objects.Drawables
             nestedHitObjects.Value.Add(h);
         }
 
+        /// <summary>
+        /// Removes a <see cref="DrawableHitObject"/> from this object's <see cref="NestedHitObjects"/>.
+        /// </summary>
+        /// <param name="h">The <see cref="DrawableHitObject"/> to remove.</param>
         protected void RemoveNested(DrawableHitObject h) => nestedHitObjects.Value.Remove(h);
 
         /// <summary>
