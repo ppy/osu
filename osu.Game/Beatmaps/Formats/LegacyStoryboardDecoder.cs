@@ -10,6 +10,7 @@ using osuTK;
 using osuTK.Graphics;
 using osu.Framework.Graphics;
 using osu.Framework.IO.File;
+using osu.Framework.Logging;
 using osu.Game.Storyboards;
 
 namespace osu.Game.Beatmaps.Formats
@@ -83,7 +84,7 @@ namespace osu.Game.Beatmaps.Formats
 
                 EventType type;
                 if (!Enum.TryParse(split[0], out type))
-                    throw new InvalidDataException($@"Unknown event type {split[0]}");
+                    Logger.Log($"A storyboard event could not be parsed and will be ignored: {split[0]}", LoggingTarget.Runtime, LogLevel.Important);
 
                 switch (type)
                 {
