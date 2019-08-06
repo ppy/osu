@@ -222,6 +222,7 @@ namespace osu.Game.Online.Chat
                     }
 
                     var channel = availableChannels.Where(c => c.Name == content || c.Name == $"#{content}").FirstOrDefault();
+                    
                     if (channel == null)
                     {
                         target.AddNewMessages(new ErrorMessage($"Channel '{content}' not found."));
