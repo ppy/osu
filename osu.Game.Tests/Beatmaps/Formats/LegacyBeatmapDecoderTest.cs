@@ -486,12 +486,13 @@ namespace osu.Game.Tests.Beatmaps.Formats
         [Test]
         public void TestDecodeInvalidEvents()
         {
+            var decoder = new LegacyBeatmapDecoder { ApplyOffsets = false };
+
             using (var normalResStream = TestResources.OpenResource("Soleily - Renatus (Gamu) [Insane].osu"))
             using (var normalStream = new StreamReader(normalResStream))
             using (var resStream = TestResources.OpenResource("invalid-events.osu"))
             using (var stream = new StreamReader(resStream))
             {
-                var decoder = Decoder.GetDecoder<Beatmap>(stream);
                 var goodBeatmap = decoder.Decode(normalStream);
                 Beatmap badBeatmap = null;
 
