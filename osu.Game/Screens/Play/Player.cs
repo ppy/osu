@@ -255,7 +255,7 @@ namespace osu.Game.Screens.Play
         private void performImmediateExit()
         {
             // if a restart has been requested, cancel any pending completion (user has shown intent to restart).
-            onCompletionEvent?.Cancel();
+            pushResults?.Cancel();
 
             ValidForResume = false;
 
@@ -279,12 +279,12 @@ namespace osu.Game.Screens.Play
             performImmediateExit();
         }
 
-        private ScheduledDelegate onCompletionEvent;
+        private ScheduledDelegate pushResults;
 
         private void onCompletion()
         {
             // Only show the completion screen if the player hasn't failed
-            if (ScoreProcessor.HasFailed || onCompletionEvent != null)
+            if (ScoreProcessor.HasFailed || pushResults != null)
                 return;
 
             ValidForResume = false;
@@ -293,7 +293,7 @@ namespace osu.Game.Screens.Play
 
             using (BeginDelayedSequence(1000))
             {
-                onCompletionEvent = Schedule(delegate
+                pushResults = Schedule(delegate
                 {
                     if (!this.IsCurrentScreen()) return;
 
@@ -465,10 +465,10 @@ namespace osu.Game.Screens.Play
 
         public override bool OnExiting(IScreen next)
         {
-            if (onCompletionEvent != null && !onCompletionEvent.Cancelled && !onCompletionEvent.Completed)
+            if (pushResults != null && !pushResults.Cancelled && !pushResults.Completed)
                 // proceed to result screen if beatmap already finished playing
             {
-                onCompletionEvent.RunTask();
+                pushResults.RunTask();
                 return true;
             }
 
