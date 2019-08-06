@@ -17,7 +17,9 @@ namespace osu.Game.Screens.Select
 {
     public class FooterButton : OsuClickableContainer
     {
-        private static readonly Vector2 shearing = new Vector2(0.15f, 0);
+        public static readonly float SHEAR_WIDTH = 7.5f;
+
+        protected static readonly Vector2 SHEARING = new Vector2(SHEAR_WIDTH / Footer.HEIGHT, 0);
 
         public string Text
         {
@@ -59,16 +61,16 @@ namespace osu.Game.Screens.Select
         private readonly Box box;
         private readonly Box light;
 
-        public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => box.ReceivePositionalInputAt(screenSpacePos);
-
         public FooterButton()
         {
             AutoSizeAxes = Axes.Both;
+            Shear = SHEARING;
             Children = new Drawable[]
             {
                 TextContainer = new Container
                 {
-                    Size = new Vector2(100, 50),
+                    Size = new Vector2(100 - SHEAR_WIDTH, 50),
+                    Shear = -SHEARING,
                     Child = SpriteText = new OsuSpriteText
                     {
                         Anchor = Anchor.Centre,
@@ -78,14 +80,12 @@ namespace osu.Game.Screens.Select
                 box = new Box
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Shear = shearing,
                     EdgeSmoothness = new Vector2(2, 0),
                     Colour = Color4.White,
                     Alpha = 0,
                 },
                 light = new Box
                 {
-                    Shear = shearing,
                     Height = 4,
                     EdgeSmoothness = new Vector2(2, 0),
                     RelativeSizeAxes = Axes.X,
