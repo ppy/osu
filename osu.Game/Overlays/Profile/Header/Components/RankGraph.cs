@@ -56,14 +56,19 @@ namespace osu.Game.Overlays.Profile.Header.Components
             };
 
             graph.OnBallMove += i => dayIndex = i;
-
-            Statistics.BindValueChanged(statistics => updateStatistics(statistics.NewValue));
         }
 
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
             graph.LineColour = colours.Yellow;
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            Statistics.BindValueChanged(statistics => updateStatistics(statistics.NewValue), true);
         }
 
         private void updateStatistics(UserStatistics statistics)
