@@ -494,9 +494,8 @@ namespace osu.Game.Tests.Beatmaps.Formats
             using (var stream = new StreamReader(resStream))
             {
                 var goodBeatmap = decoder.Decode(normalStream);
-                Beatmap badBeatmap = null;
+                var badBeatmap = decoder.Decode(stream);
 
-                Assert.DoesNotThrow(() => badBeatmap = decoder.Decode(stream));
                 Assert.AreEqual(goodBeatmap.HitObjects.Count, badBeatmap.HitObjects.Count);
             }
         }
