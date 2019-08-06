@@ -55,15 +55,6 @@ namespace osu.Game.Graphics.Containers
             samplePopOut = audio.Samples.Get(@"UI/overlay-pop-out");
         }
 
-        protected override void LoadComplete()
-        {
-            base.LoadComplete();
-
-            // This must be added after the base LoadComplete, since onStateChanged contains logic that
-            // must be run after other state change logic has been completed.
-            State.ValueChanged += onStateChanged;
-        }
-
         /// <summary>
         /// Whether mouse input should be blocked screen-wide while this overlay is visible.
         /// Performing mouse actions outside of the valid extents will hide the overlay.
@@ -101,8 +92,10 @@ namespace osu.Game.Graphics.Containers
 
         public bool OnReleased(GlobalAction action) => false;
 
-        private void onStateChanged(ValueChangedEvent<Visibility> state)
+        protected override void UpdateState(ValueChangedEvent<Visibility> state)
         {
+            base.UpdateState(state);
+
             switch (state.NewValue)
             {
                 case Visibility.Visible:
