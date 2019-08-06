@@ -488,17 +488,16 @@ namespace osu.Game.Tests.Beatmaps.Formats
         {
             var decoder = new LegacyBeatmapDecoder { ApplyOffsets = false };
 
-            using (var normalResStream = TestResources.OpenResource("Soleily - Renatus (Gamu) [Insane].osu"))
-            using (var normalStream = new StreamReader(normalResStream))
-            using (var resStream = TestResources.OpenResource("invalid-events.osu"))
-            using (var stream = new StreamReader(resStream))
+            using (var goodResStream = TestResources.OpenResource("valid-events.osu"))
+            using (var goodStream = new StreamReader(goodResStream))
+            using (var badResStream = TestResources.OpenResource("invalid-events.osu"))
+            using (var badStream = new StreamReader(badResStream))
             {
-                var goodBeatmap = decoder.Decode(normalStream);
-                var badBeatmap = decoder.Decode(stream);
+                var goodBeatmap = decoder.Decode(goodStream);
+                var badBeatmap = decoder.Decode(badStream);
 
                 Assert.AreEqual(goodBeatmap.Breaks[0].Duration, badBeatmap.Breaks[0].Duration);
                 Assert.AreEqual(goodBeatmap.Metadata.BackgroundFile, badBeatmap.Metadata.BackgroundFile);
-                Assert.AreEqual(goodBeatmap.HitObjects.Count, badBeatmap.HitObjects.Count);
             }
         }
     }
