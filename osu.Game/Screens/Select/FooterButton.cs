@@ -67,16 +67,6 @@ namespace osu.Game.Screens.Select
             Shear = SHEARING;
             Children = new Drawable[]
             {
-                TextContainer = new Container
-                {
-                    Size = new Vector2(100 - SHEAR_WIDTH, 50),
-                    Shear = -SHEARING,
-                    Child = SpriteText = new OsuSpriteText
-                    {
-                        Anchor = Anchor.Centre,
-                        Origin = Anchor.Centre,
-                    }
-                },
                 box = new Box
                 {
                     RelativeSizeAxes = Axes.Both,
@@ -89,6 +79,16 @@ namespace osu.Game.Screens.Select
                     Height = 4,
                     EdgeSmoothness = new Vector2(2, 0),
                     RelativeSizeAxes = Axes.X,
+                },
+                TextContainer = new Container
+                {
+                    Size = new Vector2(100 - SHEAR_WIDTH, 50),
+                    Shear = -SHEARING,
+                    Child = SpriteText = new OsuSpriteText
+                    {
+                        Anchor = Anchor.Centre,
+                        Origin = Anchor.Centre,
+                    }
                 },
             };
         }
