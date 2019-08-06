@@ -20,10 +20,7 @@ namespace osu.Game.Rulesets.Mania.Tests
         protected override string ResourceAssembly => "osu.Game.Rulesets.Mania";
 
         [TestCase("basic")]
-        public new void Test(string name)
-        {
-            base.Test(name);
-        }
+        public void Test(string name) => base.Test(name);
 
         protected override IEnumerable<ConvertValue> CreateConvertValue(HitObject hitObject)
         {
@@ -35,9 +32,35 @@ namespace osu.Game.Rulesets.Mania.Tests
             };
         }
 
-        protected override ManiaConvertMapping CreateConvertMapping() => new ManiaConvertMapping(Converter);
+        private readonly Dictionary<HitObject, RngSnapshot> rngSnapshots = new Dictionary<HitObject, RngSnapshot>();
+
+        protected override void OnConversionGenerated(HitObject original, IEnumerable<HitObject> result, IBeatmapConverter beatmapConverter)
+        {
+            base.OnConversionGenerated(original, result, beatmapConverter);
+
+            rngSnapshots[original] = new RngSnapshot(beatmapConverter);
+        }
+
+        protected override ManiaConvertMapping CreateConvertMapping(HitObject source) => new ManiaConvertMapping(rngSnapshots[source]);
 
         protected override Ruleset CreateRuleset() => new ManiaRuleset();
+    }
+
+    public class RngSnapshot
+    {
+        public readonly uint RandomW;
+        public readonly uint RandomX;
+        public readonly uint RandomY;
+        public readonly uint RandomZ;
+
+        public RngSnapshot(IBeatmapConverter converter)
+        {
+            var maniaConverter = (ManiaBeatmapConverter)converter;
+            RandomW = maniaConverter.Random.W;
+            RandomX = maniaConverter.Random.X;
+            RandomY = maniaConverter.Random.Y;
+            RandomZ = maniaConverter.Random.Z;
+        }
     }
 
     public class ManiaConvertMapping : ConvertMapping<ConvertValue>, IEquatable<ManiaConvertMapping>
@@ -51,13 +74,12 @@ namespace osu.Game.Rulesets.Mania.Tests
         {
         }
 
-        public ManiaConvertMapping(IBeatmapConverter converter)
+        public ManiaConvertMapping(RngSnapshot snapshot)
         {
-            var maniaConverter = (ManiaBeatmapConverter)converter;
-            RandomW = maniaConverter.Random.W;
-            RandomX = maniaConverter.Random.X;
-            RandomY = maniaConverter.Random.Y;
-            RandomZ = maniaConverter.Random.Z;
+            RandomW = snapshot.RandomW;
+            RandomX = snapshot.RandomX;
+            RandomY = snapshot.RandomY;
+            RandomZ = snapshot.RandomZ;
         }
 
         public bool Equals(ManiaConvertMapping other) => other != null && RandomW == other.RandomW && RandomX == other.RandomX && RandomY == other.RandomY && RandomZ == other.RandomZ;
