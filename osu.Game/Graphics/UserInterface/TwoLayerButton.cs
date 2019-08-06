@@ -29,9 +29,9 @@ namespace osu.Game.Graphics.UserInterface
         private const int transform_time = 600;
         private const int pulse_length = 250;
 
-        private const float SHEAR_WIDTH = 5f;
+        private const float shear_width = 5f;
 
-        private static readonly Vector2 shearing = new Vector2(SHEAR_WIDTH / Footer.HEIGHT, 0);
+        private static readonly Vector2 shearing = new Vector2(shear_width / Footer.HEIGHT, 0);
 
         public static readonly Vector2 SIZE_EXTENDED = new Vector2(140, 50);
         public static readonly Vector2 SIZE_RETRACTED = new Vector2(100, 50);
