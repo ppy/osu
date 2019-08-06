@@ -496,6 +496,8 @@ namespace osu.Game.Tests.Beatmaps.Formats
                 var goodBeatmap = decoder.Decode(normalStream);
                 var badBeatmap = decoder.Decode(stream);
 
+                Assert.AreEqual(goodBeatmap.Breaks[0].Duration, badBeatmap.Breaks[0].Duration);
+                Assert.AreEqual(goodBeatmap.Metadata.BackgroundFile, badBeatmap.Metadata.BackgroundFile);
                 Assert.AreEqual(goodBeatmap.HitObjects.Count, badBeatmap.HitObjects.Count);
             }
         }
