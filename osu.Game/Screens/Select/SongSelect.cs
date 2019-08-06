@@ -121,7 +121,7 @@ namespace osu.Game.Screens.Select
                     Size = new Vector2(wedged_container_size.X, 1),
                     Padding = new MarginPadding
                     {
-                        Bottom = 50,
+                        Bottom = Footer.HEIGHT,
                         Top = wedged_container_size.Y + left_area_padding,
                         Left = left_area_padding,
                         Right = left_area_padding * 2,
@@ -147,20 +147,29 @@ namespace osu.Game.Screens.Select
                         Width = 0.5f,
                         Children = new Drawable[]
                         {
-                            Carousel = new BeatmapCarousel
+                            new Container
                             {
-                                Masking = false,
                                 RelativeSizeAxes = Axes.Both,
-                                Size = new Vector2(1 - wedged_container_size.X, 1),
-                                Anchor = Anchor.CentreRight,
-                                Origin = Anchor.CentreRight,
-                                SelectionChanged = updateSelectedBeatmap,
-                                BeatmapSetsChanged = carouselBeatmapsLoaded,
+                                Padding = new MarginPadding
+                                {
+                                    Top = FilterControl.HEIGHT,
+                                    Bottom = Footer.HEIGHT
+                                },
+                                Child = Carousel = new BeatmapCarousel
+                                {
+                                    Masking = false,
+                                    RelativeSizeAxes = Axes.Both,
+                                    Size = new Vector2(1 - wedged_container_size.X, 1),
+                                    Anchor = Anchor.CentreRight,
+                                    Origin = Anchor.CentreRight,
+                                    SelectionChanged = updateSelectedBeatmap,
+                                    BeatmapSetsChanged = carouselBeatmapsLoaded,
+                                },
                             },
                             FilterControl = new FilterControl
                             {
                                 RelativeSizeAxes = Axes.X,
-                                Height = 100,
+                                Height = FilterControl.HEIGHT,
                                 FilterChanged = c => Carousel.Filter(c),
                                 Background = { Width = 2 },
                                 Exit = () =>
