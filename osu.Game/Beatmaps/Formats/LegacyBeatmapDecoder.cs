@@ -293,7 +293,7 @@ namespace osu.Game.Beatmaps.Formats
 
             if (!Enum.TryParse(split[0], out type))
             {
-                Logger.Log($"A beatmap event could not be parsed and will be ignored: {split[0]}", LoggingTarget.Runtime, LogLevel.Important);
+                Logger.Log($"A beatmap {type} event could not be parsed and will be ignored: {split[0]}", LoggingTarget.Runtime, LogLevel.Important);
                 return;
             }
 
