@@ -255,7 +255,7 @@ namespace osu.Game.Screens.Play
         private void performImmediateExit()
         {
             // if a restart has been requested, cancel any pending completion (user has shown intent to restart).
-            onCompletionEvent = null;
+            onCompletionEvent?.Cancel();
 
             ValidForResume = false;
 
@@ -275,12 +275,8 @@ namespace osu.Game.Screens.Play
 
             sampleRestart?.Play();
 
-            // if a restart has been requested, cancel any pending completion (user has shown intent to restart).
-            onCompletionEvent = null;
-
-            ValidForResume = false;
             RestartRequested?.Invoke();
-            this.Exit();
+            performImmediateExit();
         }
 
         private ScheduledDelegate onCompletionEvent;
@@ -306,8 +302,6 @@ namespace osu.Game.Screens.Play
                         scoreManager.Import(score).Wait();
 
                     this.Push(CreateResults(score));
-
-                    onCompletionEvent = null;
                 });
             }
         }
@@ -471,9 +465,9 @@ namespace osu.Game.Screens.Play
 
         public override bool OnExiting(IScreen next)
         {
-            if (onCompletionEvent != null)
+            if (onCompletionEvent != null && !onCompletionEvent.Cancelled && !onCompletionEvent.Completed)
+                // proceed to result screen if beatmap already finished playing
             {
-                // Proceed to result screen if beatmap already finished playing
                 onCompletionEvent.RunTask();
                 return true;
             }
