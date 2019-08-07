@@ -217,9 +217,7 @@ namespace osu.Game.Rulesets.Scoring
         private double baseScore;
         private double bonusScore;
 
-        protected ScoreProcessor()
-        {
-        }
+        private double scoreMultiplier = 1;
 
         public ScoreProcessor(DrawableRuleset<TObject> drawableRuleset)
         {
@@ -239,6 +237,15 @@ namespace osu.Game.Rulesets.Scoring
             }
 
             Mode.ValueChanged += _ => updateScore();
+            Mods.ValueChanged += mods =>
+            {
+                scoreMultiplier = 1;
+
+                foreach (var m in mods.NewValue)
+                    scoreMultiplier *= m.ScoreMultiplier;
+
+                updateScore();
+            };
         }
 
         /// <summary>
@@ -388,7 +395,7 @@ namespace osu.Game.Rulesets.Scoring
             if (rollingMaxBaseScore != 0)
                 Accuracy.Value = baseScore / rollingMaxBaseScore;
 
-            TotalScore.Value = getScore(Mode.Value);
+            TotalScore.Value = getScore(Mode.Value) * scoreMultiplier;
         }
 
         private double getScore(ScoringMode mode)

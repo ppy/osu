@@ -106,7 +106,11 @@ namespace osu.Game.Rulesets.UI
                     modIcon.Colour = colours.Yellow;
                     break;
             }
+        }
 
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
             Highlighted.BindValueChanged(highlighted => background.Colour = highlighted.NewValue ? highlightedColour : backgroundColour, true);
         }
     }

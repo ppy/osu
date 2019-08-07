@@ -109,8 +109,6 @@ namespace osu.Game.Rulesets.UI
 
             Beatmap = (Beatmap<TObject>)workingBeatmap.GetPlayableBeatmap(ruleset.RulesetInfo, mods);
 
-            applyBeatmapMods(mods);
-
             KeyBindingInputManager = CreateInputManager();
             playfield = new Lazy<Playfield>(CreatePlayfield);
 
@@ -268,19 +266,6 @@ namespace osu.Game.Rulesets.UI
         protected abstract Playfield CreatePlayfield();
 
         public override ScoreProcessor CreateScoreProcessor() => new ScoreProcessor<TObject>(this);
-
-        /// <summary>
-        /// Applies the active mods to the Beatmap.
-        /// </summary>
-        /// <param name="mods"></param>
-        private void applyBeatmapMods(IReadOnlyList<Mod> mods)
-        {
-            if (mods == null)
-                return;
-
-            foreach (var mod in mods.OfType<IApplicableToBeatmap<TObject>>())
-                mod.ApplyToBeatmap(Beatmap);
-        }
 
         /// <summary>
         /// Applies the active mods to this DrawableRuleset.

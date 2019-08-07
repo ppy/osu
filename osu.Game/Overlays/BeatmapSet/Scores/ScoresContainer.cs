@@ -133,9 +133,20 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                     }
                 }
             };
+        }
 
-            scopeSelector.Current.BindValueChanged(scope => getScores(scope.NewValue, modSelector.SelectedMods.Value));
-            modSelector.SelectedMods.BindValueChanged(mods => getScores(scopeSelector.Current.Value, mods.NewValue));
+        [BackgroundDependencyLoader]
+        private void load(OsuColour colours)
+        {
+            background.Colour = colours.Gray2;
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            scopeSelector.Current.BindValueChanged(scope => getScores(scope.NewValue, modSelector.SelectedMods.Value), true);
+            modSelector.SelectedMods.BindValueChanged(mods => getScores(scopeSelector.Current.Value, mods.NewValue), true);
             Beatmap.BindValueChanged(beatmap =>
             {
                 scopeSelector.Current.Value = BeatmapLeaderboardScope.Global;
@@ -148,13 +159,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                     ruleset.Value = beatmapRuleset;
 
                 getScores();
-            });
-        }
-
-        [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
-        {
-            background.Colour = colours.Gray2;
+            }, true);
         }
 
         private void getScores(BeatmapLeaderboardScope scope = BeatmapLeaderboardScope.Global, IEnumerable<Mod> mods = null)
@@ -164,7 +169,10 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
 
             Scores = null;
 
-            if (Beatmap.Value?.OnlineBeatmapID == null || Beatmap.Value?.Status <= BeatmapSetOnlineStatus.Pending)
+            if (Beatmap.Value == null)
+                return;
+
+            if (!Beatmap.Value.OnlineBeatmapID.HasValue || Beatmap.Value.Status <= BeatmapSetOnlineStatus.Pending)
             {
                 scopeSelector.Hide();
                 modSelector.Hide();
