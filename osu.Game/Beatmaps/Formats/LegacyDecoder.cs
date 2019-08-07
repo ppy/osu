@@ -43,7 +43,14 @@ namespace osu.Game.Beatmaps.Formats
                     continue;
                 }
 
-                ParseLine(output, section, line);
+                try
+                {
+                    ParseLine(output, section, line);
+                }
+                catch (Exception e)
+                {
+                    Logger.Log($"Failed to process line \"{line}\" into {output}", LoggingTarget.Runtime, LogLevel.Important);
+                }
             }
         }
 
