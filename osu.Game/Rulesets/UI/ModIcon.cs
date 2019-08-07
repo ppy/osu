@@ -11,11 +11,14 @@ using osu.Framework.Graphics.Sprites;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.Mods;
 using osuTK;
+using osu.Framework.Bindables;
 
 namespace osu.Game.Rulesets.UI
 {
     public class ModIcon : Container, IHasTooltip
     {
+        public readonly BindableBool Highlighted = new BindableBool();
+
         private readonly SpriteIcon modIcon;
         private readonly SpriteIcon background;
 
@@ -96,27 +99,19 @@ namespace osu.Game.Rulesets.UI
                     backgroundColour = colours.Pink;
                     highlightedColour = colours.PinkLight;
                     break;
-            }
 
-            applyStyle();
-        }
-
-        private bool highlighted;
-
-        public bool Highlighted
-        {
-            get => highlighted;
-
-            set
-            {
-                highlighted = value;
-                applyStyle();
+                case ModType.Custom:
+                    backgroundColour = colours.Gray6;
+                    highlightedColour = colours.Gray7;
+                    modIcon.Colour = colours.Yellow;
+                    break;
             }
         }
 
-        private void applyStyle()
+        protected override void LoadComplete()
         {
-            background.Colour = highlighted ? highlightedColour : backgroundColour;
+            base.LoadComplete();
+            Highlighted.BindValueChanged(highlighted => background.Colour = highlighted.NewValue ? highlightedColour : backgroundColour, true);
         }
     }
 }
