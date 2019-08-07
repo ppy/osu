@@ -84,7 +84,7 @@ namespace osu.Game.Beatmaps.Formats
 
                 EventType type;
                 if (!Enum.TryParse(split[0], out type))
-                    Logger.Log($"A storyboard {type} event could not be parsed and will be ignored: {split[0]}", LoggingTarget.Runtime, LogLevel.Important);
+                    Logger.Log($"Unknown storyboard event of type {split[0]} could not be parsed and will be ignored.", LoggingTarget.Runtime, LogLevel.Important);
 
                 switch (type)
                 {
