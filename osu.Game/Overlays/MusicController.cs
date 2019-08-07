@@ -316,10 +316,6 @@ namespace osu.Game.Overlays
 
         private void next(bool instant = false)
         {
-            // beatmapSets doesn't get populated until loading has completed.
-            if (!IsLoaded)
-                return;
-
             if (!instant)
                 queuedDirection = TransformDirection.Next;
 

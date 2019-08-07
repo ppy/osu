@@ -51,7 +51,10 @@ namespace osu.Game.Tests.Visual.Menus
             AddStep("Create new game instance", () =>
             {
                 if (osuGame != null)
+                {
                     Remove(osuGame);
+                    osuGame.Dispose();
+                }
 
                 osuGame = new TestOsuGame();
                 osuGame.SetHost(gameHost);
