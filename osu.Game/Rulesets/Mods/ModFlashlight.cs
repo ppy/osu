@@ -193,6 +193,12 @@ namespace osu.Game.Rulesets.Mods
 
                     shader.Unbind();
                 }
+
+                protected override void Dispose(bool isDisposing)
+                {
+                    base.Dispose(isDisposing);
+                    quadBatch?.Dispose();
+                }
             }
         }
     }
