@@ -76,9 +76,9 @@ namespace osu.Game.Graphics.Containers
         /// </summary>
         protected virtual void UpdateVisuals()
         {
-            ContentDisplayed = ShowDimContent;
+            ContentDisplayed = !EnableUserDim.Value || ShowDimContent;
 
-            dimContent.FadeTo((ContentDisplayed) ? 1 : 0, BACKGROUND_FADE_DURATION, Easing.OutQuint);
+            dimContent.FadeTo(ContentDisplayed ? 1 : 0, BACKGROUND_FADE_DURATION, Easing.OutQuint);
             dimContent.FadeColour(EnableUserDim.Value ? OsuColour.Gray(1 - (float)UserDimLevel.Value) : Color4.White, BACKGROUND_FADE_DURATION, Easing.OutQuint);
         }
     }
