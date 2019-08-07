@@ -6,6 +6,7 @@ using osu.Framework.Graphics;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Osu.Objects;
+using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Beatmaps
 {
@@ -208,12 +209,17 @@ namespace osu.Game.Rulesets.Osu.Beatmaps
                     if (beatmap.HitObjects[j].StartTime - stackThreshold > startTime)
                         break;
 
+                    // The start position of the hitobject, or the position at the end of the path if the hitobject is a slider
+                    Vector2 position2 = currHitObject is Slider currSlider
+                        ? currSlider.Position + currSlider.Path.PositionAt(1)
+                        : currHitObject.Position;
+
                     if (Vector2Extensions.Distance(beatmap.HitObjects[j].Position, currHitObject.Position) < stack_distance)
                     {
                         currHitObject.StackHeight++;
                         startTime = (beatmap.HitObjects[j] as IHasEndTime)?.EndTime ?? beatmap.HitObjects[j].StartTime;
                     }
-                    else if (Vector2Extensions.Distance(beatmap.HitObjects[j].Position, currHitObject.EndPosition) < stack_distance)
+                    else if (Vector2Extensions.Distance(beatmap.HitObjects[j].Position, position2) < stack_distance)
                     {
                         //Case for sliders - bump notes down and right, rather than up and left.
                         sliderStack++;
