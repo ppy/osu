@@ -19,7 +19,7 @@ namespace osu.Game.Screens.Select
     {
         public static readonly float SHEAR_WIDTH = 7.5f;
 
-        protected static readonly Vector2 SHEARING = new Vector2(SHEAR_WIDTH / Footer.HEIGHT, 0);
+        protected static readonly Vector2 SHEAR = new Vector2(SHEAR_WIDTH / Footer.HEIGHT, 0);
 
         public string Text
         {
@@ -64,7 +64,7 @@ namespace osu.Game.Screens.Select
         public FooterButton()
         {
             AutoSizeAxes = Axes.Both;
-            Shear = SHEARING;
+            Shear = SHEAR;
             Children = new Drawable[]
             {
                 box = new Box
@@ -83,7 +83,7 @@ namespace osu.Game.Screens.Select
                 TextContainer = new Container
                 {
                     Size = new Vector2(100 - SHEAR_WIDTH, 50),
-                    Shear = -SHEARING,
+                    Shear = -SHEAR,
                     Child = SpriteText = new OsuSpriteText
                     {
                         Anchor = Anchor.Centre,
