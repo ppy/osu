@@ -17,6 +17,6 @@ namespace osu.Game.Online.API.Requests
             this.ruleset = ruleset;
         }
 
-        protected override string Target => userId.HasValue ? (ruleset != null ? $@"users/{userId}/{ruleset.ShortName}" : $@"users/{userId}") : @"me";
+        protected override string Target => userId.HasValue ? $@"users/{userId}/{ruleset?.ShortName}" : $@"me/{ruleset?.ShortName}";
     }
 }
