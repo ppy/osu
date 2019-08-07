@@ -49,7 +49,7 @@ namespace osu.Game.Beatmaps.Formats
                 }
                 catch (Exception e)
                 {
-                    Logger.Log($"Failed to process line \"{line}\" into {output}", LoggingTarget.Runtime, LogLevel.Important);
+                    Logger.Log($"Failed to process line \"{line}\" into {output}: {e.Message}", LoggingTarget.Runtime, LogLevel.Important);
                 }
             }
         }
