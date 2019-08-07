@@ -3,9 +3,7 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text.RegularExpressions;
-using osu.Framework.Logging;
 
 namespace osu.Game.Online.Chat
 {
@@ -289,55 +287,5 @@ namespace osu.Game.Online.Chat
         }
 
         public int CompareTo(Link otherLink) => Index > otherLink.Index ? 1 : -1;
-    }
-
-    public static class LinkUtils
-    {
-        public static void HandleLink(string url, LinkAction linkType, string linkArgument, OsuGame game, ChannelManager channelManager = null, Action showNotImplementedError = null)
-        {
-            switch (linkType)
-            {
-                case LinkAction.OpenBeatmap:
-                    // TODO: proper query params handling
-                    if (linkArgument != null && int.TryParse(linkArgument.Contains('?') ? linkArgument.Split('?')[0] : linkArgument, out int beatmapId))
-                        game?.ShowBeatmap(beatmapId);
-                    break;
-
-                case LinkAction.OpenBeatmapSet:
-                    if (int.TryParse(linkArgument, out int setId))
-                        game?.ShowBeatmapSet(setId);
-                    break;
-
-                case LinkAction.OpenChannel:
-                    try
-                    {
-                        channelManager?.OpenChannel(linkArgument);
-                    }
-                    catch (ChannelNotFoundException)
-                    {
-                        Logger.Log($"The requested channel \"{linkArgument}\" does not exist");
-                    }
-
-                    break;
-
-                case LinkAction.OpenEditorTimestamp:
-                case LinkAction.JoinMultiplayerMatch:
-                case LinkAction.Spectate:
-                    showNotImplementedError?.Invoke();
-                    break;
-
-                case LinkAction.External:
-                    game?.OpenUrlExternally(url);
-                    break;
-
-                case LinkAction.OpenUserProfile:
-                    if (long.TryParse(linkArgument, out long userId))
-                        game?.ShowUser(userId);
-                    break;
-
-                default:
-                    throw new NotImplementedException($"This {nameof(LinkAction)} ({linkType.ToString()}) is missing an associated action.");
-            }
-        }
     }
 }

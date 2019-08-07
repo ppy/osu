@@ -195,19 +195,66 @@ namespace osu.Game
 
         private ExternalLinkOpener externalLinkOpener;
 
-        public void HandleUrl(string url)
+        public void HandleLink(string url, LinkAction linkType, string linkArgument)
         {
-            Logger.Log($"Request to handle url: {url}");
-
             Action showNotImplementedError = () => notifications?.Post(new SimpleNotification
             {
                 Text = @"This link type is not yet supported!",
                 Icon = FontAwesome.Solid.LifeRing,
             });
 
+            switch (linkType)
+            {
+                case LinkAction.OpenBeatmap:
+                    // TODO: proper query params handling
+                    if (linkArgument != null && int.TryParse(linkArgument.Contains('?') ? linkArgument.Split('?')[0] : linkArgument, out int beatmapId))
+                        ShowBeatmap(beatmapId);
+                    break;
+
+                case LinkAction.OpenBeatmapSet:
+                    if (int.TryParse(linkArgument, out int setId))
+                        ShowBeatmapSet(setId);
+                    break;
+
+                case LinkAction.OpenChannel:
+                    try
+                    {
+                        channelManager.OpenChannel(linkArgument);
+                    }
+                    catch (ChannelNotFoundException)
+                    {
+                        Logger.Log($"The requested channel \"{linkArgument}\" does not exist");
+                    }
+
+                    break;
+
+                case LinkAction.OpenEditorTimestamp:
+                case LinkAction.JoinMultiplayerMatch:
+                case LinkAction.Spectate:
+                    showNotImplementedError?.Invoke();
+                    break;
+
+                case LinkAction.External:
+                    OpenUrlExternally(url);
+                    break;
+
+                case LinkAction.OpenUserProfile:
+                    if (long.TryParse(linkArgument, out long userId))
+                        ShowUser(userId);
+                    break;
+
+                default:
+                    throw new NotImplementedException($"This {nameof(LinkAction)} ({linkType.ToString()}) is missing an associated action.");
+            }
+        }
+
+        public void HandleUrl(string url)
+        {
+            Logger.Log($"Request to handle url: {url}");
+
             LinkDetails linkDetails = GetLinkDetails(url);
 
-            Schedule(() => LinkUtils.HandleLink(url, linkDetails.Action, linkDetails.Argument, this, channelManager, showNotImplementedError));
+            Schedule(() => HandleLink(url, linkDetails.Action, linkDetails.Argument));
         }
 
         public void OpenUrlExternally(string url)
