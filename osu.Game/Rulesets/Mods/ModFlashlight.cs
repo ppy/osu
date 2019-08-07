@@ -155,12 +155,13 @@ namespace osu.Game.Rulesets.Mods
                 private Vector2 flashlightSize;
                 private float flashlightDim;
 
-                private readonly VertexBatch<PositionAndColourVertex> quadBatch = new QuadBatch<PositionAndColourVertex>(1, 1);
                 private readonly Action<TexturedVertex2D> addAction;
 
                 public FlashlightDrawNode(Flashlight source)
                     : base(source)
                 {
+                    var quadBatch = new QuadBatch<PositionAndColourVertex>(1, 1);
+
                     addAction = v => quadBatch.Add(new PositionAndColourVertex
                     {
                         Position = v.Position,
