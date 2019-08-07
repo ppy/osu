@@ -211,14 +211,14 @@ namespace osu.Game.Rulesets.Osu.Beatmaps
                     if (Vector2Extensions.Distance(beatmap.HitObjects[j].Position, currHitObject.Position) < stack_distance)
                     {
                         currHitObject.StackHeight++;
-                        startTime = (beatmap.HitObjects[j] as IHasEndTime)?.EndTime ?? beatmap.HitObjects[i].StartTime;
+                        startTime = (beatmap.HitObjects[j] as IHasEndTime)?.EndTime ?? beatmap.HitObjects[j].StartTime;
                     }
                     else if (Vector2Extensions.Distance(beatmap.HitObjects[j].Position, currHitObject.EndPosition) < stack_distance)
                     {
                         //Case for sliders - bump notes down and right, rather than up and left.
                         sliderStack++;
                         beatmap.HitObjects[j].StackHeight -= sliderStack;
-                        startTime = (beatmap.HitObjects[j] as IHasEndTime)?.EndTime ?? beatmap.HitObjects[i].StartTime;
+                        startTime = (beatmap.HitObjects[j] as IHasEndTime)?.EndTime ?? beatmap.HitObjects[j].StartTime;
                     }
                 }
             }
