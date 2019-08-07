@@ -8,8 +8,6 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics.Sprites;
 using System.Collections.Generic;
 using osu.Framework.Graphics;
-using osu.Game.Overlays;
-using osu.Game.Overlays.Notifications;
 using osu.Game.Users;
 
 namespace osu.Game.Graphics.Containers
