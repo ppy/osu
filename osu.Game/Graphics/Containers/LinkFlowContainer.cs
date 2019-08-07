@@ -22,21 +22,12 @@ namespace osu.Game.Graphics.Containers
         }
 
         private OsuGame game;
-        private ChannelManager channelManager;
-        private Action showNotImplementedError;
 
         [BackgroundDependencyLoader(true)]
-        private void load(OsuGame game, NotificationOverlay notifications, ChannelManager channelManager)
+        private void load(OsuGame game)
         {
             // will be null in tests
             this.game = game;
-            this.channelManager = channelManager;
-
-            showNotImplementedError = () => notifications?.Post(new SimpleNotification
-            {
-                Text = @"This link type is not yet supported!",
-                Icon = FontAwesome.Solid.LifeRing,
-            });
         }
 
         public void AddLinks(string text, List<Link> links)
