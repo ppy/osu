@@ -4,6 +4,7 @@
 using System;
 using Newtonsoft.Json;
 using osu.Game.Scoring;
+using static osu.Game.Users.User;
 
 namespace osu.Game.Users
 {
@@ -113,5 +114,7 @@ namespace osu.Game.Users
             [JsonProperty(@"country")]
             public int? Country;
         }
+
+        public RankHistoryData RankHistory;
     }
 }
