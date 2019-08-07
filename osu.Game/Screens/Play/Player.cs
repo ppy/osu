@@ -52,6 +52,7 @@ namespace osu.Game.Screens.Play
         public bool HasFailed { get; private set; }
 
         private Bindable<bool> mouseWheelDisabled;
+        private Bindable<bool> lightenDuringBreaks;
 
         private readonly Bindable<bool> storyboardReplacesBackground = new Bindable<bool>();
 
@@ -65,6 +66,8 @@ namespace osu.Game.Screens.Play
         private IAPIProvider api;
 
         private SampleChannel sampleRestart;
+
+        private BreakOverlay breakOverlay;
 
         protected ScoreProcessor ScoreProcessor { get; private set; }
         protected DrawableRuleset DrawableRuleset { get; private set; }
@@ -134,7 +137,7 @@ namespace osu.Game.Screens.Play
                         }
                     }
                 },
-                new BreakOverlay(working.Beatmap.BeatmapInfo.LetterboxInBreaks, ScoreProcessor)
+                breakOverlay = new BreakOverlay(working.Beatmap.BeatmapInfo.LetterboxInBreaks, ScoreProcessor)
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
@@ -194,6 +197,10 @@ namespace osu.Game.Screens.Play
                 failAnimation = new FailAnimation(DrawableRuleset) { OnComplete = onFailComplete, }
             };
 
+            lightenDuringBreaks = config.GetBindable<bool>(OsuSetting.LightenDuringBreaks);
+            lightenDuringBreaks.ValueChanged += _ => updateUserDimState();
+            breakOverlay.IsBreakTime.ValueChanged += _ => updateUserDimState();
+
             DrawableRuleset.HasReplayLoaded.BindValueChanged(e => HUDOverlay.HoldToQuit.PauseOnFocusLost = !e.NewValue && PauseOnFocusLost, true);
 
             // bind clock into components that require it
@@ -251,6 +258,8 @@ namespace osu.Game.Screens.Play
 
             return working;
         }
+
+        private void updateUserDimState() => DimmableStoryboard.EnableUserDim.Value = Background.EnableUserDim.Value = !lightenDuringBreaks.Value || !breakOverlay.IsBreakTime.Value;
 
         private void performImmediateExit()
         {
