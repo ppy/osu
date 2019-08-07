@@ -19,10 +19,9 @@ namespace osu.Game.Tests.Visual.Online
 
         public TestSceneLeaderboardScopeSelector()
         {
-            LeaderboardScopeSelector selector;
             Bindable<BeatmapLeaderboardScope> scope = new Bindable<BeatmapLeaderboardScope>();
 
-            Add(selector = new LeaderboardScopeSelector
+            Add(new LeaderboardScopeSelector
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
