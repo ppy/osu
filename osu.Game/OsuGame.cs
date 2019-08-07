@@ -231,7 +231,7 @@ namespace osu.Game
                 case LinkAction.OpenEditorTimestamp:
                 case LinkAction.JoinMultiplayerMatch:
                 case LinkAction.Spectate:
-                    showNotImplementedError?.Invoke();
+                    showNotImplementedError.Invoke();
                     break;
 
                 case LinkAction.External:
