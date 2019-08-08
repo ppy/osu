@@ -40,7 +40,8 @@ namespace osu.Game.Screens.Play
                 isBreakTime.Value = false;
                 CurrentBreakIndex = 0;
 
-                initializeBreaks();
+                if (IsLoaded)
+                    initializeBreaks();
             }
         }
 
@@ -162,8 +163,6 @@ namespace osu.Game.Screens.Play
 
         private void initializeBreaks()
         {
-            if (!IsLoaded) return; // we need a clock.
-
             FinishTransforms(true);
             Scheduler.CancelDelayedTasks();
 
