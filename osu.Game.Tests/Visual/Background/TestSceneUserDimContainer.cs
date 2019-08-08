@@ -91,7 +91,8 @@ namespace osu.Game.Tests.Visual.Background
             });
             userDimAndBlurApplied(true, true);
             AddStep("Stop background preview", () => InputManager.MoveMouseTo(playerLoader.ScreenPos));
-            userDimAndBlurApplied(false, false, true);
+            waitForDimAndBlur();
+            AddAssert("Screen is undimmed and unblurred", () => songSelect.IsBackgroundUndimmed() && playerLoader.IsBlurCorrect());
         }
 
         /// <summary>
@@ -186,8 +187,8 @@ namespace osu.Game.Tests.Visual.Background
             var results = new FadeAccessibleResults(new ScoreInfo { User = new User { Username = "osu!" } });
             AddStep("Transition to Results", () => player.Push(results));
             AddUntilStep("Wait for results is current", results.IsCurrentScreen);
-            AddAssert("Background retained from song select", () => songSelect.IsBackgroundCurrent());
-            userDimAndBlurApplied(false, false, true);
+            waitForDimAndBlur();
+            AddAssert("Screen is undimmed, original background retained", () => songSelect.IsBackgroundUndimmed() && songSelect.IsBackgroundCurrent() && results.IsBlurCorrect());
         }
 
         /// <summary>
@@ -212,7 +213,8 @@ namespace osu.Game.Tests.Visual.Background
             AddStep("Resume PlayerLoader", () => player.Restart());
             userDimAndBlurApplied(true, true);
             AddStep("Move mouse to center of screen", () => InputManager.MoveMouseTo(playerLoader.ScreenPos));
-            userDimAndBlurApplied(false, false, true);
+            waitForDimAndBlur();
+            AddAssert("Screen is undimmed and unblurred", () => songSelect.IsBackgroundUndimmed() && playerLoader.IsBlurCorrect());
         }
 
         private void userDimAndBlurApplied(bool dimApplied, bool blurApplied, bool blurCorrect = false)
