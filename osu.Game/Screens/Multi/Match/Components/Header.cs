@@ -57,7 +57,7 @@ namespace osu.Game.Screens.Multi.Match.Components
                         new Box
                         {
                             RelativeSizeAxes = Axes.Both,
-                            Colour = ColourInfo.GradientVertical(Color4.Black.Opacity(0.4f), Color4.Black.Opacity(0.6f)),
+                            Colour = ColourInfo.GradientVertical(Color4.Black.Opacity(0.7f), Color4.Black.Opacity(0.8f)),
                         },
                         beatmapPanel = new MatchBeatmapPanel
                         {
