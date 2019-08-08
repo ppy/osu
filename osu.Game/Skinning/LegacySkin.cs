@@ -6,15 +6,23 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.IO.Stores;
 using osu.Game.Database;
+using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Rulesets.Objects.Drawables;
+using osu.Game.Rulesets.Objects.Types;
+using osu.Game.Rulesets.UI;
 using osuTK;
+using osuTK.Graphics;
 
 namespace osu.Game.Skinning
 {
@@ -36,6 +44,8 @@ namespace osu.Game.Skinning
         {
         }
 
+        private readonly bool hasHitCircle;
+
         protected LegacySkin(SkinInfo skin, IResourceStore<byte[]> storage, AudioManager audioManager, string filename)
             : base(skin)
         {
@@ -48,8 +58,6 @@ namespace osu.Game.Skinning
 
             Samples = audioManager.GetSampleStore(storage);
             Textures = new TextureStore(new TextureLoaderStore(storage));
-
-            bool hasHitCircle = false;
 
             using (var testStream = storage.GetStream("hitcircle"))
                 hasHitCircle |= testStream != null;
@@ -71,6 +79,24 @@ namespace osu.Game.Skinning
         {
             switch (componentName)
             {
+                case "Play/osu/cursor":
+                    if (GetTexture("cursor") != null)
+                        return new LegacyCursor();
+
+                    return null;
+
+                case "Play/osu/sliderball":
+                    if (GetTexture("sliderb") != null)
+                        return new LegacySliderBall();
+
+                    return null;
+
+                case "Play/osu/hitcircle":
+                    if (hasHitCircle)
+                        return new LegacyMainCirclePiece();
+
+                    return null;
+
                 case "Play/Miss":
                     componentName = "hit0";
                     break;
@@ -109,6 +135,16 @@ namespace osu.Game.Skinning
             return new Sprite { Texture = texture };
         }
 
+        public class LegacySliderBall : Sprite
+        {
+            [BackgroundDependencyLoader]
+            private void load(ISkinSource skin)
+            {
+                Texture = skin.GetTexture("sliderb");
+                Colour = skin.GetValue<SkinConfiguration, Color4?>(s => s.CustomColours.ContainsKey("SliderBall") ? s.CustomColours["SliderBall"] : (Color4?)null) ?? Color4.White;
+            }
+        }
+
         public override Texture GetTexture(string componentName)
         {
             float ratio = 2;
@@ -121,19 +157,7 @@ namespace osu.Game.Skinning
             }
 
             if (texture != null)
-            {
                 texture.ScaleAdjust = ratio;
-
-                switch (componentName)
-                {
-                    case "cursormiddle":
-                    case "cursortrail":
-                    case "cursor":
-                        // apply inverse of adjustment in OsuPlayfieldAdjustmentContainer for non-gameplay-scale textures.
-                        texture.ScaleAdjust *= 1.6f;
-                        break;
-                }
-            }
 
             return texture;
         }
@@ -241,6 +265,118 @@ namespace osu.Game.Skinning
                     texture.ScaleAdjust = ratio;
 
                 return texture;
+            }
+        }
+
+        public class LegacyCursor : CompositeDrawable
+        {
+            public LegacyCursor()
+            {
+                Size = new Vector2(50);
+
+                Anchor = Anchor.Centre;
+                Origin = Anchor.Centre;
+            }
+
+            [BackgroundDependencyLoader]
+            private void load(ISkinSource skin)
+            {
+                InternalChildren = new Drawable[]
+                {
+                    new NonPlayfieldSprite
+                    {
+                        Texture = skin.GetTexture("cursormiddle"),
+                        Anchor = Anchor.Centre,
+                        Origin = Anchor.Centre,
+                    },
+                    new NonPlayfieldSprite
+                    {
+                        Texture = skin.GetTexture("cursor"),
+                        Anchor = Anchor.Centre,
+                        Origin = Anchor.Centre,
+                    }
+                };
+            }
+        }
+
+        public class LegacyMainCirclePiece : CompositeDrawable
+        {
+            public LegacyMainCirclePiece()
+            {
+                Size = new Vector2(128);
+            }
+
+            private readonly IBindable<ArmedState> state = new Bindable<ArmedState>();
+
+            private readonly Bindable<Color4> accentColour = new Bindable<Color4>();
+
+            [BackgroundDependencyLoader]
+            private void load(DrawableHitObject drawableObject, ISkinSource skin)
+            {
+                Sprite hitCircleSprite;
+
+                InternalChildren = new Drawable[]
+                {
+                    hitCircleSprite = new Sprite
+                    {
+                        Texture = skin.GetTexture("hitcircle"),
+                        Colour = drawableObject.AccentColour.Value,
+                        Anchor = Anchor.Centre,
+                        Origin = Anchor.Centre,
+                    },
+                    new SkinnableSpriteText("Play/osu/number-text", _ => new OsuSpriteText
+                    {
+                        Font = OsuFont.Numeric.With(size: 40),
+                        UseFullGlyphHeight = false,
+                    }, confineMode: ConfineMode.NoScaling)
+                    {
+                        Text = (((IHasComboInformation)drawableObject.HitObject).IndexInCurrentCombo + 1).ToString()
+                    },
+                    new Sprite
+                    {
+                        Texture = skin.GetTexture("hitcircleoverlay"),
+                        Anchor = Anchor.Centre,
+                        Origin = Anchor.Centre,
+                    }
+                };
+
+                state.BindTo(drawableObject.State);
+                state.BindValueChanged(updateState, true);
+
+                accentColour.BindTo(drawableObject.AccentColour);
+                accentColour.BindValueChanged(colour => hitCircleSprite.Colour = colour.NewValue, true);
+            }
+
+            private void updateState(ValueChangedEvent<ArmedState> state)
+            {
+                const double legacy_fade_duration = 240;
+
+                switch (state.NewValue)
+                {
+                    case ArmedState.Hit:
+                        this.FadeOut(legacy_fade_duration, Easing.Out);
+                        this.ScaleTo(1.4f, legacy_fade_duration, Easing.Out);
+                        break;
+                }
+            }
+        }
+
+        /// <summary>
+        /// A sprite which is displayed within the playfield, but historically was not considered part of the playfield.
+        /// Performs scale adjustment to undo the scale applied by <see cref="PlayfieldAdjustmentContainer"/> (osu! ruleset specifically).
+        /// </summary>
+        private class NonPlayfieldSprite : Sprite
+        {
+            public override Texture Texture
+            {
+                get => base.Texture;
+                set
+                {
+                    if (value != null)
+                        // stable "magic ratio". see OsuPlayfieldAdjustmentContainer for full explanation.
+                        value.ScaleAdjust *= 1.6f;
+                    base.Texture = value;
+                }
             }
         }
     }

@@ -118,7 +118,7 @@ namespace osu.Game.Users
         public int PostCount;
 
         [JsonProperty(@"follower_count")]
-        public int[] FollowerCount;
+        public int FollowerCount;
 
         [JsonProperty]
         private string[] playstyle
@@ -159,7 +159,10 @@ namespace osu.Game.Users
         }
 
         [JsonProperty(@"rankHistory")]
-        public RankHistoryData RankHistory;
+        private RankHistoryData rankHistory
+        {
+            set => Statistics.RankHistory = value;
+        }
 
         [JsonProperty("badges")]
         public Badge[] Badges;

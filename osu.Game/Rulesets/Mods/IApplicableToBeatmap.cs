@@ -2,21 +2,18 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Game.Beatmaps;
-using osu.Game.Rulesets.Objects;
 
 namespace osu.Game.Rulesets.Mods
 {
     /// <summary>
-    /// Interface for a <see cref="Mod"/> that applies changes to a <see cref="Beatmap"/>
-    /// after conversion and post-processing has completed.
+    /// Interface for a <see cref="Mod"/> that applies changes to a <see cref="Beatmap"/> after conversion and post-processing has completed.
     /// </summary>
-    public interface IApplicableToBeatmap<TObject> : IApplicableMod
-        where TObject : HitObject
+    public interface IApplicableToBeatmap : IApplicableMod
     {
         /// <summary>
-        /// Applies this <see cref="IApplicableToBeatmap{TObject}"/> to a <see cref="Beatmap{TObject}"/>.
+        /// Applies this <see cref="IApplicableToBeatmap"/> to an <see cref="IBeatmap"/>.
         /// </summary>
-        /// <param name="beatmap">The <see cref="Beatmap{TObject}"/> to apply to.</param>
-        void ApplyToBeatmap(Beatmap<TObject> beatmap);
+        /// <param name="beatmap">The <see cref="IBeatmap"/> to apply to.</param>
+        void ApplyToBeatmap(IBeatmap beatmap);
     }
 }
