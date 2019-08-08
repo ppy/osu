@@ -8,15 +8,20 @@ using osu.Game.Online.Multiplayer;
 using osu.Game.Screens.Multi.Match.Components;
 using osu.Framework.Graphics;
 using osu.Framework.MathUtils;
+using osu.Game.Audio;
+using osu.Framework.Allocation;
 
 namespace osu.Game.Tests.Visual.Multiplayer
 {
-    public class TestSceneMatchBeatmapPanel : MultiplayerTestScene
+    public class TestSceneMatchBeatmapPanel : MultiplayerTestScene, IPreviewTrackOwner
     {
         public override IReadOnlyList<Type> RequiredTypes => new[]
         {
             typeof(MatchBeatmapPanel)
         };
+
+        [Resolved]
+        private PreviewTrackManager trackManager { get; set; }
 
         public TestSceneMatchBeatmapPanel()
         {
@@ -26,15 +31,29 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 Origin = Anchor.Centre,
             });
 
-            var playlist = Room.Playlist;
+            Room.Playlist.Add(new PlaylistItem { Beatmap = new BeatmapInfo { OnlineBeatmapID = 1763072 } });
+            Room.Playlist.Add(new PlaylistItem { Beatmap = new BeatmapInfo { OnlineBeatmapID = 2101557 } });
+            Room.Playlist.Add(new PlaylistItem { Beatmap = new BeatmapInfo { OnlineBeatmapID = 1973466 } });
+            Room.Playlist.Add(new PlaylistItem { Beatmap = new BeatmapInfo { OnlineBeatmapID = 2109801 } });
+            Room.Playlist.Add(new PlaylistItem { Beatmap = new BeatmapInfo { OnlineBeatmapID = 1922035 } });
+        }
 
-            playlist.Add(new PlaylistItem { Beatmap = new BeatmapInfo { OnlineBeatmapID = 1763072 } });
-            playlist.Add(new PlaylistItem { Beatmap = new BeatmapInfo { OnlineBeatmapID = 2101557 } });
-            playlist.Add(new PlaylistItem { Beatmap = new BeatmapInfo { OnlineBeatmapID = 1973466 } });
-            playlist.Add(new PlaylistItem { Beatmap = new BeatmapInfo { OnlineBeatmapID = 2109801 } });
-            playlist.Add(new PlaylistItem { Beatmap = new BeatmapInfo { OnlineBeatmapID = 1922035 } });
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
 
-            AddStep("Select random beatmap", () => Room.CurrentItem.Value = playlist[RNG.Next(playlist.Count)]);
+            AddStep("Select random beatmap", () =>
+            {
+                Room.CurrentItem.Value = Room.Playlist[RNG.Next(Room.Playlist.Count)];
+                trackManager.StopAnyPlaying(this);
+            });
+        }
+
+        protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
+        {
+            var dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
+            dependencies.CacheAs<IPreviewTrackOwner>(this);
+            return dependencies;
         }
     }
 }
