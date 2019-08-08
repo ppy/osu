@@ -29,6 +29,10 @@ namespace osu.Game.Screens.Multi.Match.Components
 
         public Action RequestBeatmapSelection;
 
+        public BindableBool ShowBeatmapPanel = new BindableBool();
+
+        private MatchBeatmapPanel beatmapPanel;
+
         public Header()
         {
             RelativeSizeAxes = Axes.X;
@@ -55,6 +59,12 @@ namespace osu.Game.Screens.Multi.Match.Components
                             RelativeSizeAxes = Axes.Both,
                             Colour = ColourInfo.GradientVertical(Color4.Black.Opacity(0.4f), Color4.Black.Opacity(0.6f)),
                         },
+                        beatmapPanel = new MatchBeatmapPanel
+                        {
+                            Anchor = Anchor.CentreRight,
+                            Origin = Anchor.CentreRight,
+                            Margin = new MarginPadding { Right = 100 },
+                        }
                     }
                 },
                 new Box
@@ -112,6 +122,12 @@ namespace osu.Game.Screens.Multi.Match.Components
             CurrentItem.BindValueChanged(item => modDisplay.Current.Value = item.NewValue?.RequiredMods?.ToArray() ?? Array.Empty<Mod>(), true);
 
             beatmapButton.Action = () => RequestBeatmapSelection?.Invoke();
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+            ShowBeatmapPanel.BindValueChanged(value => beatmapPanel.FadeTo(value.NewValue ? 1 : 0, 200, Easing.OutQuint), true);
         }
 
         private class BeatmapSelectButton : HeaderButton

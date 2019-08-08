@@ -148,12 +148,14 @@ namespace osu.Game.Screens.Multi.Match
 
                 if (tab.NewValue is SettingsMatchPage)
                 {
+                    header.ShowBeatmapPanel.Value = false;
                     settings.Show();
                     info.FadeOut(fade_duration, Easing.OutQuint);
                     bottomRow.FadeOut(fade_duration, Easing.OutQuint);
                 }
                 else
                 {
+                    header.ShowBeatmapPanel.Value = true;
                     settings.Hide();
                     info.FadeIn(fade_duration, Easing.OutQuint);
                     bottomRow.FadeIn(fade_duration, Easing.OutQuint);
