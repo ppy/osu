@@ -154,9 +154,6 @@ namespace osu.Game.Screens.Play
                     CurrentBreakIndex--;
             }
 
-            // This ensures that IsBreakTime is generally consistent with the overlay's transforms during a break.
-            // If the current break doesn't have effects, IsBreakTime should be false.
-            // We also assume that the overlay's fade out transform is "not break time".
             var currentBreak = breaks[CurrentBreakIndex];
             isBreakTime.Value = currentBreak.HasEffect && currentBreak.Contains(time);
         }
