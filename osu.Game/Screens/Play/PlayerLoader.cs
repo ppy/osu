@@ -263,6 +263,7 @@ namespace osu.Game.Screens.Play
             cancelLoad();
 
             Background.EnableUserDim.Value = false;
+            Background.EnableUserBlur.Value = false;
             BackgroundBrightnessReduction = false;
 
             return base.OnExiting(next);
@@ -308,6 +309,7 @@ namespace osu.Game.Screens.Play
             {
                 // Preview user-defined background dim and blur when hovered on the visual settings panel.
                 Background.EnableUserDim.Value = true;
+                Background.EnableUserBlur.Value = true;
                 Background.BlurAmount.Value = 0;
 
                 BackgroundBrightnessReduction = false;
@@ -316,6 +318,7 @@ namespace osu.Game.Screens.Play
             {
                 // Returns background dim and blur to the values specified by PlayerLoader.
                 Background.EnableUserDim.Value = false;
+                Background.EnableUserBlur.Value = false;
                 Background.BlurAmount.Value = BACKGROUND_BLUR;
 
                 BackgroundBrightnessReduction = true;
