@@ -36,6 +36,8 @@ namespace osu.Game.Graphics.Containers
 
         protected Bindable<bool> ShowStoryboard { get; private set; }
 
+        protected double DimLevel => EnableUserDim.Value ? UserDimLevel.Value : 0;
+
         protected override Container<Drawable> Content => dimContent;
 
         private Container dimContent { get; }
@@ -69,7 +71,7 @@ namespace osu.Game.Graphics.Containers
         /// <summary>
         /// Whether the content of this container should currently be visible.
         /// </summary>
-        protected virtual bool ShowDimContent => !EnableUserDim.Value;
+        protected virtual bool ShowDimContent => true;
 
         /// <summary>
         /// Should be invoked when any dependent dim level or user setting is changed and bring the visual state up-to-date.
@@ -79,7 +81,7 @@ namespace osu.Game.Graphics.Containers
             ContentDisplayed = ShowDimContent;
 
             dimContent.FadeTo(ContentDisplayed ? 1 : 0, BACKGROUND_FADE_DURATION, Easing.OutQuint);
-            dimContent.FadeColour(EnableUserDim.Value ? OsuColour.Gray(1 - (float)UserDimLevel.Value) : Color4.White, BACKGROUND_FADE_DURATION, Easing.OutQuint);
+            dimContent.FadeColour(OsuColour.Gray(1 - (float)DimLevel), BACKGROUND_FADE_DURATION, Easing.OutQuint);
         }
     }
 }
