@@ -213,7 +213,6 @@ namespace osu.Game.Online.Chat
                     PostMessage(content, true);
                     break;
 
-                case "j":
                 case "join":
                     if (string.IsNullOrWhiteSpace(content))
                     {
