@@ -206,6 +206,8 @@ namespace osu.Game.Screens.Multi.Match
 
             if (e.NewValue?.Ruleset != null)
                 Ruleset.Value = e.NewValue.Ruleset;
+
+            trackManager.StopAnyPlaying(this);
         }
 
         /// <summary>
