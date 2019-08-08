@@ -19,6 +19,7 @@ namespace osu.Game.Screens.Multi.Match.Components
         private RulesetStore rulesets { get; set; }
 
         private GetBeatmapSetRequest request;
+        private DirectGridPanel panel;
 
         public MatchBeatmapPanel()
         {
@@ -30,16 +31,23 @@ namespace osu.Game.Screens.Multi.Match.Components
         {
             CurrentItem.BindValueChanged(item =>
             {
+                request?.Cancel();
+
+                if (panel != null)
+                {
+                    panel.FadeOut(200);
+                    panel.Expire();
+                    panel = null;
+                }
+
                 var onlineId = item.NewValue?.Beatmap.OnlineBeatmapID ?? 0;
 
                 if (onlineId != 0)
                 {
-                    request?.Cancel();
                     request = new GetBeatmapSetRequest(onlineId, BeatmapSetLookupType.BeatmapId);
                     request.Success += beatmap =>
                     {
-                        ClearInternal();
-                        var panel = new DirectGridPanel(beatmap.ToBeatmapSet(rulesets));
+                        panel = new DirectGridPanel(beatmap.ToBeatmapSet(rulesets));
                         LoadComponentAsync(panel, p => { AddInternal(panel); });
                     };
                     api.Queue(request);
