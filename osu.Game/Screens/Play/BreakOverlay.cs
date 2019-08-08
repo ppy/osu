@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
-using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -138,7 +137,7 @@ namespace osu.Game.Screens.Play
 
         private void updateBreakTimeBindable()
         {
-            if (breaks?.Any() != true)
+            if (breaks == null || breaks.Count == 0)
                 return;
 
             var time = Clock.CurrentTime;
