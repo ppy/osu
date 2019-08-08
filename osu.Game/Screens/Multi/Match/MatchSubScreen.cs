@@ -231,6 +231,8 @@ namespace osu.Game.Screens.Multi.Match
 
         private void onStart()
         {
+            trackManager.StopAnyPlaying(this);
+
             switch (type.Value)
             {
                 default:
