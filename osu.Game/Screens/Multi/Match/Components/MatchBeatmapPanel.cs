@@ -39,7 +39,8 @@ namespace osu.Game.Screens.Multi.Match.Components
                     request.Success += beatmap =>
                     {
                         ClearInternal();
-                        AddInternal(new DirectGridPanel(beatmap.ToBeatmapSet(rulesets)));
+                        var panel = new DirectGridPanel(beatmap.ToBeatmapSet(rulesets));
+                        LoadComponentAsync(panel, p => { AddInternal(panel); });
                     };
                     api.Queue(request);
                 }
