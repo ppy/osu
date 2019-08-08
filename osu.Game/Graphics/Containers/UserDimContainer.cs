@@ -6,7 +6,6 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Configuration;
-using osuTK.Graphics;
 
 namespace osu.Game.Graphics.Containers
 {
