@@ -32,6 +32,11 @@ namespace osu.Game.Screens.Backgrounds
         /// </summary>
         public readonly Bindable<bool> EnableUserDim = new Bindable<bool>();
 
+        /// <summary>
+        /// Whether or not user blur settings should be applied to this Background.
+        /// </summary>
+        public readonly Bindable<bool> EnableUserBlur = new Bindable<bool>();
+
         public readonly Bindable<bool> StoryboardReplacesBackground = new Bindable<bool>();
 
         /// <summary>
@@ -48,6 +53,7 @@ namespace osu.Game.Screens.Backgrounds
             Beatmap = beatmap;
 
             InternalChild = dimmable = CreateFadeContainer();
+            dimmable.EnableUserBlur.BindTo(EnableUserBlur);
             dimmable.EnableUserDim.BindTo(EnableUserDim);
             dimmable.BlurAmount.BindTo(BlurAmount);
         }
@@ -126,6 +132,11 @@ namespace osu.Game.Screens.Backgrounds
         public class DimmableBackground : UserDimContainer
         {
             /// <summary>
+            /// Whether or not user blur settings should be applied to this Background.
+            /// </summary>
+            public readonly Bindable<bool> EnableUserBlur = new Bindable<bool>(true);
+
+            /// <summary>
             /// The amount of blur to be applied to the background in addition to user-specified blur.
             /// </summary>
             /// <remarks>
@@ -160,7 +171,7 @@ namespace osu.Game.Screens.Backgrounds
             /// <summary>
             /// As an optimisation, we add the two blur portions to be applied rather than actually applying two separate blurs.
             /// </summary>
-            private Vector2 blurTarget => EnableUserDim.Value
+            private Vector2 blurTarget => EnableUserBlur.Value
                 ? new Vector2(BlurAmount.Value + (float)userBlurLevel.Value * USER_BLUR_FACTOR)
                 : new Vector2(BlurAmount.Value);
 
@@ -174,6 +185,7 @@ namespace osu.Game.Screens.Backgrounds
             {
                 base.LoadComplete();
 
+                EnableUserBlur.ValueChanged += _ => UpdateVisuals();
                 userBlurLevel.ValueChanged += _ => UpdateVisuals();
                 BlurAmount.ValueChanged += _ => UpdateVisuals();
             }

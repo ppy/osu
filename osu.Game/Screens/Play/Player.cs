@@ -444,6 +444,7 @@ namespace osu.Game.Screens.Play
                 .FadeIn(250);
 
             Background.EnableUserDim.Value = true;
+            Background.EnableUserBlur.Value = true;
             Background.BlurAmount.Value = 0;
 
             Background.StoryboardReplacesBackground.BindTo(storyboardReplacesBackground);
@@ -502,6 +503,7 @@ namespace osu.Game.Screens.Play
             this.FadeOut(fadeOutDuration);
 
             Background.EnableUserDim.Value = false;
+            Background.EnableUserBlur.Value = false;
             storyboardReplacesBackground.Value = false;
         }
 
