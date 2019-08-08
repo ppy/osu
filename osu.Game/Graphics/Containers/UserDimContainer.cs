@@ -69,7 +69,7 @@ namespace osu.Game.Graphics.Containers
         /// <summary>
         /// Whether the content of this container should currently be visible.
         /// </summary>
-        protected virtual bool ShowDimContent => true;
+        protected virtual bool ShowDimContent => !EnableUserDim.Value;
 
         /// <summary>
         /// Should be invoked when any dependent dim level or user setting is changed and bring the visual state up-to-date.
