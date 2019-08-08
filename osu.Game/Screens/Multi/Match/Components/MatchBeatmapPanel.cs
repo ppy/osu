@@ -30,12 +30,12 @@ namespace osu.Game.Screens.Multi.Match.Components
         {
             CurrentItem.BindValueChanged(item =>
             {
-                var id = item.NewValue?.Beatmap.OnlineBeatmapID ?? 0;
+                var onlineId = item.NewValue?.Beatmap.OnlineBeatmapID ?? 0;
 
-                if (id != 0)
+                if (onlineId != 0)
                 {
                     request?.Cancel();
-                    request = new GetBeatmapSetRequest(id, BeatmapSetLookupType.BeatmapId);
+                    request = new GetBeatmapSetRequest(onlineId, BeatmapSetLookupType.BeatmapId);
                     request.Success += beatmap =>
                     {
                         ClearInternal();
