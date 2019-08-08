@@ -7,6 +7,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Screens;
+using osu.Game.Audio;
 using osu.Game.Beatmaps;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Multiplayer.GameTypes;
@@ -18,7 +19,7 @@ using PlaylistItem = osu.Game.Online.Multiplayer.PlaylistItem;
 
 namespace osu.Game.Screens.Multi.Match
 {
-    public class MatchSubScreen : MultiplayerSubScreen
+    public class MatchSubScreen : MultiplayerSubScreen, IPreviewTrackOwner
     {
         public override bool DisallowExternalBeatmapRulesetChanges => true;
 
@@ -43,6 +44,9 @@ namespace osu.Game.Screens.Multi.Match
 
         [Resolved]
         private BeatmapManager beatmapManager { get; set; }
+
+        [Resolved]
+        private PreviewTrackManager trackManager { get; set; }
 
         [Resolved(CanBeNull = true)]
         private OsuGame game { get; set; }
@@ -184,6 +188,8 @@ namespace osu.Game.Screens.Multi.Match
 
             Mods.Value = Array.Empty<Mod>();
 
+            trackManager.StopAnyPlaying(this);
+
             return base.OnExiting(next);
         }
 
@@ -235,6 +241,13 @@ namespace osu.Game.Screens.Multi.Match
                     });
                     break;
             }
+        }
+
+        protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
+        {
+            var dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
+            dependencies.CacheAs<IPreviewTrackOwner>(this);
+            return dependencies;
         }
 
         protected override void Dispose(bool isDisposing)
