@@ -216,7 +216,7 @@ namespace osu.Game.Rulesets.Objects.Legacy
             }
 
             if (result == null)
-                throw new InvalidDataException($"Unknown hit object type: {type}");
+                throw new InvalidDataException($"Unknown hit object type: {split[3]}");
 
             result.StartTime = startTime;
 
