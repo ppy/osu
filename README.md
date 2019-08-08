@@ -34,7 +34,7 @@ If you are not interested in developing the game, you can still consume our [bin
 | ------------- | ------------- |
 
 - **Linux** users are recommended to self-compile until we have official deployment in place.
-- **iOS** users can join the [TestFlight beta program](https://t.co/PasE1zrHhw) (note that due to high demand this is regularly full).
+- **iOS** users can join the [TestFlight beta program](https://testflight.apple.com/join/2tLcjWlF) (note that due to high demand this is regularly full).
 - **Android** users can self-compile, and expect a public beta soon.
 
 If your platform is not listed above, there is still a chance you can manually build it by following the instructions below.
