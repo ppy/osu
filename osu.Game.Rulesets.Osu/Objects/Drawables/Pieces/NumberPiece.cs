@@ -46,7 +46,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
                 {
                     Font = OsuFont.Numeric.With(size: 40),
                     UseFullGlyphHeight = false,
-                }, restrictSize: false)
+                }, confineMode: ConfineMode.NoScaling)
                 {
                     Text = @"1"
                 }
