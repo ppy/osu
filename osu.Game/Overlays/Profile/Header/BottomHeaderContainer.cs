@@ -4,7 +4,6 @@
 using System;
 using System.Linq;
 using osu.Framework.Allocation;
-using osu.Framework.Bindables;
 using osu.Framework.Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -18,10 +17,8 @@ using osuTK.Graphics;
 
 namespace osu.Game.Overlays.Profile.Header
 {
-    public class BottomHeaderContainer : CompositeDrawable
+    public class BottomHeaderContainer : UserBindingComponent
     {
-        public readonly Bindable<User> User = new Bindable<User>();
-
         private LinkFlowContainer topLinkContainer;
         private LinkFlowContainer bottomLinkContainer;
 
@@ -66,11 +63,9 @@ namespace osu.Game.Overlays.Profile.Header
                     }
                 }
             };
-
-            User.BindValueChanged(user => updateDisplay(user.NewValue));
         }
 
-        private void updateDisplay(User user)
+        protected override void UpdateUser(User user)
         {
             topLinkContainer.Clear();
             bottomLinkContainer.Clear();

@@ -19,15 +19,13 @@ namespace osu.Game.Overlays.Profile
     {
         private UserCoverBackground coverContainer;
 
-        public Bindable<User> User = new Bindable<User>();
+        public readonly Bindable<User> User = new Bindable<User>();
 
         private CentreHeaderContainer centreHeaderContainer;
         private DetailHeaderContainer detailHeaderContainer;
 
         public ProfileHeader()
         {
-            User.BindValueChanged(e => updateDisplay(e.NewValue), true);
-
             TabControl.AddItem("Info");
             TabControl.AddItem("Modding");
 
@@ -38,6 +36,12 @@ namespace osu.Game.Overlays.Profile
         private void load(OsuColour colours)
         {
             TabControl.AccentColour = colours.Seafoam;
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+            User.BindValueChanged(e => updateDisplay(e.NewValue), true);
         }
 
         protected override Drawable CreateBackground() =>

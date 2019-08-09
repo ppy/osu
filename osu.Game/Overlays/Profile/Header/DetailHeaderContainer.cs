@@ -3,7 +3,6 @@
 
 using System.Collections.Generic;
 using osu.Framework.Allocation;
-using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -17,7 +16,7 @@ using osuTK;
 
 namespace osu.Game.Overlays.Profile.Header
 {
-    public class DetailHeaderContainer : CompositeDrawable
+    public class DetailHeaderContainer : UserBindingComponent
     {
         private readonly Dictionary<ScoreRank, ScoreRankInfo> scoreRankInfos = new Dictionary<ScoreRank, ScoreRankInfo>();
         private OverlinedInfoContainer medalInfo;
@@ -26,8 +25,6 @@ namespace osu.Game.Overlays.Profile.Header
         private OverlinedInfoContainer detailCountryRank;
         private FillFlowContainer fillFlow;
         private RankGraph rankGraph;
-
-        public readonly Bindable<User> User = new Bindable<User>();
 
         private bool expanded = true;
 
@@ -57,8 +54,6 @@ namespace osu.Game.Overlays.Profile.Header
         private void load(OsuColour colours)
         {
             AutoSizeAxes = Axes.Y;
-
-            User.ValueChanged += e => updateDisplay(e.NewValue);
 
             InternalChildren = new Drawable[]
             {
@@ -168,7 +163,7 @@ namespace osu.Game.Overlays.Profile.Header
             };
         }
 
-        private void updateDisplay(User user)
+        protected override void UpdateUser(User user)
         {
             medalInfo.Content = user?.Achievements?.Length.ToString() ?? "0";
             ppInfo.Content = user?.Statistics?.PP?.ToString("#,##0") ?? "0";

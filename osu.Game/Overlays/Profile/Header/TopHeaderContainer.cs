@@ -3,7 +3,6 @@
 
 using System;
 using osu.Framework.Allocation;
-using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -17,11 +16,9 @@ using osuTK;
 
 namespace osu.Game.Overlays.Profile.Header
 {
-    public class TopHeaderContainer : CompositeDrawable
+    public class TopHeaderContainer : UserBindingComponent
     {
         private const float avatar_size = 110;
-
-        public readonly Bindable<User> User = new Bindable<User>();
 
         private SupporterIcon supporterTag;
         private UpdateableAvatar avatar;
@@ -158,11 +155,9 @@ namespace osu.Game.Overlays.Profile.Header
                     Spacing = new Vector2(0, 2)
                 }
             };
-
-            User.BindValueChanged(user => updateUser(user.NewValue), true);
         }
 
-        private void updateUser(User user)
+        protected override void UpdateUser(User user)
         {
             avatar.User = user;
             usernameText.Text = user?.Username ?? string.Empty;

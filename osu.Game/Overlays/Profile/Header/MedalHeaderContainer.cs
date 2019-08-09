@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
-using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
@@ -16,18 +15,15 @@ using osuTK.Graphics;
 
 namespace osu.Game.Overlays.Profile.Header
 {
-    public class MedalHeaderContainer : CompositeDrawable
+    public class MedalHeaderContainer : UserBindingComponent
     {
         private FillFlowContainer badgeFlowContainer;
-
-        public readonly Bindable<User> User = new Bindable<User>();
 
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
             Alpha = 0;
             AutoSizeAxes = Axes.Y;
-            User.ValueChanged += e => updateDisplay(e.NewValue);
 
             InternalChildren = new Drawable[]
             {
@@ -64,7 +60,7 @@ namespace osu.Game.Overlays.Profile.Header
             };
         }
 
-        private void updateDisplay(User user)
+        protected override void UpdateUser(User user)
         {
             var badges = user.Badges;
             badgeFlowContainer.Clear();
