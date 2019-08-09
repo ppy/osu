@@ -8,7 +8,7 @@ namespace osu.Game.Online.Chat
         public ErrorMessage(string message)
             : base(message)
         {
-            Sender.Colour = @"ff0000";
+            // todo: this should likely be styled differently in the future.
         }
     }
 }

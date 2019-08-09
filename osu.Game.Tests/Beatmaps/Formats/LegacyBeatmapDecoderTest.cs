@@ -482,5 +482,17 @@ namespace osu.Game.Tests.Beatmaps.Formats
                 Assert.AreEqual(hitObjects[0].Samples[0].Bank, hitObjects[0].Samples[1].Bank);
             }
         }
+
+        [Test]
+        public void TestInvalidEventStillPasses()
+        {
+            var decoder = new LegacyBeatmapDecoder { ApplyOffsets = false };
+
+            using (var badResStream = TestResources.OpenResource("invalid-events.osu"))
+            using (var badStream = new StreamReader(badResStream))
+            {
+                Assert.DoesNotThrow(() => decoder.Decode(badStream));
+            }
+        }
     }
 }
