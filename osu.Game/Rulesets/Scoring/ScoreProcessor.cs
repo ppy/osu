@@ -95,7 +95,7 @@ namespace osu.Game.Rulesets.Scoring
         /// <summary>
         /// Whether this ScoreProcessor has already triggered the failed state.
         /// </summary>
-        public virtual bool HasFailed { get; protected set; }
+        public virtual bool HasFailed { get; private set; }
 
         /// <summary>
         /// The default conditions for failing.
