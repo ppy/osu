@@ -309,7 +309,6 @@ namespace osu.Game.Rulesets.Scoring
         }
 
         private readonly Dictionary<HitResult, int> scoreResultCounts = new Dictionary<HitResult, int>();
-        private Judgement hasFailedAtJudgement;
 
         /// <summary>
         /// Applies the score change of a <see cref="JudgementResult"/> to this <see cref="ScoreProcessor"/>.
@@ -317,17 +316,13 @@ namespace osu.Game.Rulesets.Scoring
         /// <param name="result">The <see cref="JudgementResult"/> to apply.</param>
         protected virtual void ApplyResult(JudgementResult result)
         {
-            if (HasFailed)
-            {
-                if (hasFailedAtJudgement == null)
-                    hasFailedAtJudgement = result.Judgement;
-
-                return;
-            }
-
             result.ComboAtJudgement = Combo.Value;
             result.HighestComboAtJudgement = HighestCombo.Value;
             result.HealthAtJudgement = Health.Value;
+            result.FailedAtJudgement = HasFailed;
+
+            if (HasFailed)
+                return;
 
             JudgedHits++;
 
@@ -371,20 +366,14 @@ namespace osu.Game.Rulesets.Scoring
         /// <param name="result">The judgement scoring result.</param>
         protected virtual void RevertResult(JudgementResult result)
         {
-            if (HasFailed)
-            {
-                if (hasFailedAtJudgement == result.Judgement)
-                {
-                    hasFailedAtJudgement = null;
-                    HasFailed = false;
-                }
-
-                return;
-            }
-
             Combo.Value = result.ComboAtJudgement;
             HighestCombo.Value = result.HighestComboAtJudgement;
             Health.Value = result.HealthAtJudgement;
+
+            // Todo: Revert HasFailed state with proper player support
+
+            if (result.FailedAtJudgement)
+                return;
 
             JudgedHits--;
 
