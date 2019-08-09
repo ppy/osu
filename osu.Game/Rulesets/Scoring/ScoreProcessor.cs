@@ -193,7 +193,7 @@ namespace osu.Game.Rulesets.Scoring
                 score.Statistics[result] = GetStatistic(result);
         }
 
-        protected abstract int GetStatistic(HitResult result);
+        public abstract int GetStatistic(HitResult result);
 
         public abstract double GetStandardisedScore();
     }
@@ -421,7 +421,7 @@ namespace osu.Game.Rulesets.Scoring
             }
         }
 
-        protected override int GetStatistic(HitResult result) => scoreResultCounts.GetOrDefault(result);
+        public override int GetStatistic(HitResult result) => scoreResultCounts.GetOrDefault(result);
 
         public override double GetStandardisedScore() => getScore(ScoringMode.Standardised);
 
