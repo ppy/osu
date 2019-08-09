@@ -35,6 +35,11 @@ namespace osu.Game.Screens.Backgrounds
         public readonly Bindable<bool> StoryboardReplacesBackground = new Bindable<bool>();
 
         /// <summary>
+        /// The amount of dim to be applied in addition to user-specified dim.
+        /// </summary>
+        public readonly Bindable<float> DimAmount = new Bindable<float>();
+
+        /// <summary>
         /// The amount of blur to be applied in addition to user-specified blur.
         /// </summary>
         public readonly Bindable<float> BlurAmount = new Bindable<float>();
@@ -50,6 +55,7 @@ namespace osu.Game.Screens.Backgrounds
             InternalChild = dimmable = CreateFadeContainer();
             dimmable.EnableUserDim.BindTo(EnableUserDim);
             dimmable.BlurAmount.BindTo(BlurAmount);
+            dimmable.DimAmount.BindTo(DimAmount);
         }
 
         [BackgroundDependencyLoader]
