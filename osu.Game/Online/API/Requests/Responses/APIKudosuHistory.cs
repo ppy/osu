@@ -11,7 +11,7 @@ namespace osu.Game.Online.API.Requests.Responses
         [JsonProperty("id")]
         public int ID;
 
-        [JsonProperty("createdAt")]
+        [JsonProperty("created_at")]
         public DateTimeOffset CreatedAt;
 
         [JsonProperty("amount")]
