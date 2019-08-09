@@ -313,6 +313,9 @@ namespace osu.Game.Rulesets.Scoring
         /// <summary>
         /// Applies the score change of a <see cref="JudgementResult"/> to this <see cref="ScoreProcessor"/>.
         /// </summary>
+        /// <remarks>
+        /// Any changes applied via this method can be reverted via <see cref="RevertResult"/>.
+        /// </remarks>
         /// <param name="result">The <see cref="JudgementResult"/> to apply.</param>
         protected virtual void ApplyResult(JudgementResult result)
         {
@@ -361,7 +364,7 @@ namespace osu.Game.Rulesets.Scoring
         }
 
         /// <summary>
-        /// Reverts the score change of a <see cref="JudgementResult"/> that was applied to this <see cref="ScoreProcessor"/>.
+        /// Reverts the score change of a <see cref="JudgementResult"/> that was applied to this <see cref="ScoreProcessor"/> via <see cref="ApplyResult"/>.
         /// </summary>
         /// <param name="result">The judgement scoring result.</param>
         protected virtual void RevertResult(JudgementResult result)
