@@ -42,7 +42,7 @@ namespace osu.Game.Overlays.News
             [BackgroundDependencyLoader]
             private void load(TextureStore textures)
             {
-                Texture = textures.Get(@"Headers/changelog"); //using changelog bg until corresponding osu-resources pr is merged.
+                Texture = textures.Get(@"Headers/news");
             }
         }
 
@@ -60,6 +60,8 @@ namespace osu.Game.Overlays.News
                 Title = "News";
                 IsReadingArticle = false;
             }
+
+            protected override Drawable CreateIcon() => new ScreenTitleIcon(@"Icons/news");
 
             [BackgroundDependencyLoader]
             private void load(OsuColour colours)
