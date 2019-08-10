@@ -18,7 +18,7 @@ namespace osu.Game.Graphics.UserInterface
     {
         private const float circle_allowance = 0.8f;
 
-        private string icon;
+        private readonly string icon;
 
         public ScreenTitleIcon(string icon)
         {
