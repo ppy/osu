@@ -141,6 +141,7 @@ namespace osu.Game.Screens.Select
             private readonly RulesetInfo ruleset;
 
             public BufferedWedgeInfo(WorkingBeatmap beatmap, RulesetInfo userRuleset)
+                : base(pixelSnapping: true)
             {
                 this.beatmap = beatmap;
                 ruleset = userRuleset ?? beatmap.BeatmapInfo.Ruleset;
@@ -152,7 +153,6 @@ namespace osu.Game.Screens.Select
                 var beatmapInfo = beatmap.BeatmapInfo;
                 var metadata = beatmapInfo.Metadata ?? beatmap.BeatmapSetInfo?.Metadata ?? new BeatmapMetadata();
 
-                PixelSnapping = true;
                 CacheDrawnFrameBuffer = true;
                 RelativeSizeAxes = Axes.Both;
 

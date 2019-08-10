@@ -48,10 +48,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
             InternalChildren = new Drawable[]
             {
-                Body = new SnakingSliderBody(s)
-                {
-                    PathRadius = s.Scale * OsuHitObject.OBJECT_RADIUS,
-                },
+                Body = new SnakingSliderBody(s),
                 ticks = new Container<DrawableSliderTick> { RelativeSizeAxes = Axes.Both },
                 repeatPoints = new Container<DrawableRepeatPoint> { RelativeSizeAxes = Axes.Both },
                 Ball = new SliderBall(s, this)
@@ -105,7 +102,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             positionBindable.BindValueChanged(_ => Position = HitObject.StackedPosition);
             scaleBindable.BindValueChanged(scale =>
             {
-                Body.PathRadius = scale.NewValue * 64;
+                updatePathRadius();
                 Ball.Scale = new Vector2(scale.NewValue);
             });
 
@@ -118,7 +115,6 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             AccentColour.BindValueChanged(colour =>
             {
                 Body.AccentColour = colour.NewValue;
-                Ball.AccentColour = colour.NewValue;
 
                 foreach (var drawableHitObject in NestedHitObjects)
                     drawableHitObject.AccentColour.Value = colour.NewValue;
@@ -157,15 +153,21 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             Body.RecyclePath();
         }
 
+        private float sliderPathRadius;
+
         protected override void SkinChanged(ISkinSource skin, bool allowFallback)
         {
             base.SkinChanged(skin, allowFallback);
 
             Body.BorderSize = skin.GetValue<SkinConfiguration, float?>(s => s.SliderBorderSize) ?? SliderBody.DEFAULT_BORDER_SIZE;
+            sliderPathRadius = skin.GetValue<SkinConfiguration, float?>(s => s.SliderPathRadius) ?? OsuHitObject.OBJECT_RADIUS;
+            updatePathRadius();
+
             Body.AccentColour = skin.GetValue<SkinConfiguration, Color4?>(s => s.CustomColours.ContainsKey("SliderTrackOverride") ? s.CustomColours["SliderTrackOverride"] : (Color4?)null) ?? AccentColour.Value;
             Body.BorderColour = skin.GetValue<SkinConfiguration, Color4?>(s => s.CustomColours.ContainsKey("SliderBorder") ? s.CustomColours["SliderBorder"] : (Color4?)null) ?? Color4.White;
-            Ball.AccentColour = skin.GetValue<SkinConfiguration, Color4?>(s => s.CustomColours.ContainsKey("SliderBall") ? s.CustomColours["SliderBall"] : (Color4?)null) ?? AccentColour.Value;
         }
+
+        private void updatePathRadius() => Body.PathRadius = slider.Scale * sliderPathRadius;
 
         protected override void CheckForResult(bool userTriggered, double timeOffset)
         {
