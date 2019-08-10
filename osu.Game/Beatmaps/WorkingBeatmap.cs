@@ -247,7 +247,7 @@ namespace osu.Game.Beatmaps
 
             // cancelling the beatmap load is safe for now since the retrieval is a synchronous
             // operation. if we add an async retrieval method this may need to be reconsidered.
-            beatmapCancellation.Cancel();
+            beatmapCancellation?.Cancel();
             total_count.Value--;
         }
 

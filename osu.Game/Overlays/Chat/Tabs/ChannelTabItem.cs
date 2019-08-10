@@ -16,6 +16,7 @@ using osu.Game.Graphics.Sprites;
 using osu.Game.Online.Chat;
 using osuTK;
 using osuTK.Graphics;
+using osuTK.Input;
 
 namespace osu.Game.Overlays.Chat.Tabs
 {
@@ -136,6 +137,19 @@ namespace osu.Game.Overlays.Chat.Tabs
         {
             CloseButton.FadeOut(200, Easing.OutQuint);
             updateState();
+        }
+
+        protected override bool OnMouseUp(MouseUpEvent e)
+        {
+            switch (e.Button)
+            {
+                case MouseButton.Middle:
+                    CloseButton.Click();
+                    return true;
+
+                default:
+                    return false;
+            }
         }
 
         [BackgroundDependencyLoader]

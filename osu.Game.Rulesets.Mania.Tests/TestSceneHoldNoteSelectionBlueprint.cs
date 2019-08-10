@@ -36,7 +36,7 @@ namespace osu.Game.Rulesets.Mania.Tests
                 Child = drawableObject = new DrawableHoldNote(holdNote)
                 {
                     Height = 300,
-                    AccentColour = OsuColour.Gray(0.3f)
+                    AccentColour = { Value = OsuColour.Gray(0.3f) }
                 }
             };
         }

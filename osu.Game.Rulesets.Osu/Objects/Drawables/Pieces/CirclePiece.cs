@@ -21,7 +21,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
 
         public CirclePiece()
         {
-            Size = new Vector2((float)OsuHitObject.OBJECT_RADIUS * 2);
+            Size = new Vector2(OsuHitObject.OBJECT_RADIUS * 2);
             Masking = true;
             CornerRadius = Size.X / 2;
 

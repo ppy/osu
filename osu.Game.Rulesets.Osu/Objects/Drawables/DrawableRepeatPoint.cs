@@ -47,7 +47,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                 ApplyResult(r => r.Type = drawableSlider.Tracking.Value ? HitResult.Great : HitResult.Miss);
         }
 
-        protected override void UpdatePreemptState()
+        protected override void UpdateInitialTransforms()
         {
             animDuration = Math.Min(150, repeatPoint.SpanDuration / 2);
 
@@ -57,7 +57,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             );
         }
 
-        protected override void UpdateCurrentState(ArmedState state)
+        protected override void UpdateStateTransforms(ArmedState state)
         {
             switch (state)
             {

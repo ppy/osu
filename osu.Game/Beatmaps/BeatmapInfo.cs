@@ -51,6 +51,16 @@ namespace osu.Game.Beatmaps
         [NotMapped]
         public BeatmapOnlineInfo OnlineInfo { get; set; }
 
+        /// <summary>
+        /// The playable length in milliseconds of this beatmap.
+        /// </summary>
+        public double Length { get; set; }
+
+        /// <summary>
+        /// The most common BPM of this beatmap.
+        /// </summary>
+        public double BPM { get; set; }
+
         public string Path { get; set; }
 
         [JsonProperty("file_sha2")]

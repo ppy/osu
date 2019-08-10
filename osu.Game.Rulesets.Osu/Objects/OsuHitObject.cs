@@ -12,7 +12,7 @@ namespace osu.Game.Rulesets.Osu.Objects
 {
     public abstract class OsuHitObject : HitObject, IHasComboInformation, IHasPosition
     {
-        public const double OBJECT_RADIUS = 64;
+        public const float OBJECT_RADIUS = 64;
 
         public double TimePreempt = 600;
         public double TimeFadeIn = 400;

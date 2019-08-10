@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Collections.Generic;
 using NUnit.Framework;
 using osu.Game.Replays;
@@ -9,7 +10,7 @@ using osu.Game.Rulesets.Replays;
 namespace osu.Game.Tests.NonVisual
 {
     [TestFixture]
-    public class FramedReplayinputHandlerTest
+    public class FramedReplayInputHandlerTest
     {
         private Replay replay;
         private TestInputHandler handler;
@@ -160,10 +161,7 @@ namespace osu.Game.Tests.NonVisual
         [Test]
         public void TestRewindInsideImportantSection()
         {
-            // fast forward to important section
-            while (handler.SetFrameFromTime(3000) != null)
-            {
-            }
+            fastForwardToPoint(3000);
 
             setTime(4000, 4000);
             confirmCurrentFrame(4);
@@ -205,10 +203,7 @@ namespace osu.Game.Tests.NonVisual
         [Test]
         public void TestRewindOutOfImportantSection()
         {
-            // fast forward to important section
-            while (handler.SetFrameFromTime(3500) != null)
-            {
-            }
+            fastForwardToPoint(3500);
 
             confirmCurrentFrame(3);
             confirmNextFrame(4);
@@ -225,6 +220,15 @@ namespace osu.Game.Tests.NonVisual
             setTime(2800, 2800);
             confirmCurrentFrame(3);
             confirmNextFrame(2);
+        }
+
+        private void fastForwardToPoint(double destination)
+        {
+            for (int i = 0; i < 1000; i++)
+                if (handler.SetFrameFromTime(destination) == null)
+                    return;
+
+            throw new TimeoutException("Seek was never fulfilled");
         }
 
         private void setTime(double set, double? expect)
@@ -274,6 +278,7 @@ namespace osu.Game.Tests.NonVisual
             public TestInputHandler(Replay replay)
                 : base(replay)
             {
+                FrameAccuratePlayback = true;
             }
 
             protected override double AllowedImportantTimeSpan => 1000;

@@ -138,6 +138,12 @@ namespace osu.Game.Rulesets.Osu
                         new MultiMod(new ModWindUp<OsuHitObject>(), new ModWindDown<OsuHitObject>()),
                     };
 
+                case ModType.System:
+                    return new Mod[]
+                    {
+                        new OsuModTouchDevice(),
+                    };
+
                 default:
                     return new Mod[] { };
             }

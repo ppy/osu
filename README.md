@@ -1,5 +1,5 @@
 <p align="center">
-  <img width="256" height="256" src="assets/lazer.png">
+  <img width="500px" src="assets/lazer.png">
 </p>
 
 # osu!
@@ -100,7 +100,7 @@ Before starting, please make sure you are familiar with the [development and tes
 
 Note that while we already have certain standards in place, nothing is set in stone. If you have an issue with the way code is structured; with any libraries we are using; with any processes involved with contributing, *please* bring it up. We welcome all feedback so we can make contributing to this project as pain-free as possible.
 
-For those interested, we love to reward quality contributions via bounties, paid out via paypal or osu! supporter tags. Don't hesitate to [request a bounty](https://docs.google.com/forms/d/e/1FAIpQLSet_8iFAgPMG526pBZ2Kic6HSh7XPM3fE8xPcnWNkMzINDdYg/viewform) for your work on this project.
+For those interested, we love to reward quality contributions via [bounties](https://docs.google.com/spreadsheets/d/1jNXfj_S3Pb5PErA-czDdC9DUu4IgUbe1Lt8E7CYUJuE/view?&rm=minimal#gid=523803337), paid out via paypal or osu! supporter tags. Don't hesitate to [request a bounty](https://docs.google.com/forms/d/e/1FAIpQLSet_8iFAgPMG526pBZ2Kic6HSh7XPM3fE8xPcnWNkMzINDdYg/viewform) for your work on this project.
 
 ## Licence
 

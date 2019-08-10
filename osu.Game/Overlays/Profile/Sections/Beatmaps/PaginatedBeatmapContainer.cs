@@ -29,7 +29,7 @@ namespace osu.Game.Overlays.Profile.Sections.Beatmaps
 
         protected override void ShowMore()
         {
-            request = new GetUserBeatmapsRequest(User.Value.Id, type, VisiblePages++ * ItemsPerPage);
+            request = new GetUserBeatmapsRequest(User.Value.Id, type, VisiblePages++, ItemsPerPage);
             request.Success += sets => Schedule(() =>
             {
                 MoreButton.FadeTo(sets.Count == ItemsPerPage ? 1 : 0);
