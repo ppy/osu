@@ -1,10 +1,12 @@
 ﻿using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
 using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
+using System;
 
 namespace osu.Game.Overlays.News
 {
@@ -14,15 +16,46 @@ namespace osu.Game.Overlays.News
 
         private NewsHeaderTitle title;
 
+        public readonly Bindable<string> Current = new Bindable<string>(null);
+
+        public Action ShowFrontPage;
+
         public NewsHeader()
         {
             TabControl.AddItem(front_page_string);
+
+            TabControl.Current.ValueChanged += e =>
+            {
+                if (e.NewValue == front_page_string)
+                    ShowFrontPage?.Invoke();
+            };
+
+            Current.ValueChanged += showArticle;
         }
 
         [BackgroundDependencyLoader]
         private void load(OsuColour colour)
         {
             TabControl.AccentColour = colour.Violet;
+        }
+
+        private void showArticle(ValueChangedEvent<string> e)
+        {
+            if (e.OldValue != null)
+                TabControl.RemoveItem(e.OldValue);
+
+            if (e.NewValue != null)
+            {
+                TabControl.AddItem(e.NewValue);
+                TabControl.Current.Value = e.NewValue;
+
+                title.IsReadingArticle = true;
+            }
+            else
+            {
+                TabControl.Current.Value = front_page_string;
+                title.IsReadingArticle = false;
+            }
         }
 
         protected override Drawable CreateBackground() => new NewsHeaderBackground();
@@ -52,7 +85,7 @@ namespace osu.Game.Overlays.News
 
             public bool IsReadingArticle
             {
-                set => Section =  value ? article_string : front_page_string;
+                set => Section = value ? article_string : front_page_string;
             }
 
             public NewsHeaderTitle()

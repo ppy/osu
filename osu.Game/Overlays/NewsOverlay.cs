@@ -1,4 +1,5 @@
 ﻿using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -11,6 +12,8 @@ namespace osu.Game.Overlays
     public class NewsOverlay : FullscreenOverlay
     {
         private NewsHeader header;
+
+        public readonly Bindable<string> Current = new Bindable<string>(null);
 
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
@@ -37,6 +40,16 @@ namespace osu.Game.Overlays
                     },
                 },
             };
+
+            header.Current.BindTo(Current);
+            header.ShowFrontPage = ShowFrontPage;
+            Current.TriggerChange();
+        }
+
+        public void ShowFrontPage()
+        {
+            Current.Value = null;
+            Show();
         }
     }
 }
