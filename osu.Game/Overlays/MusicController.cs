@@ -565,7 +565,7 @@ namespace osu.Game.Overlays
         {
             if (beatmap.Disabled) return false;
 
-            play();
+            togglePause();
             return true;
         }
 
