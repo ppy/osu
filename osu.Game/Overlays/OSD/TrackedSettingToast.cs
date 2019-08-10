@@ -17,6 +17,8 @@ namespace osu.Game.Overlays.OSD
 {
     public class TrackedSettingToast : Toast
     {
+        private const int lights_bottom_margin = 40;
+
         public TrackedSettingToast(SettingDescription description)
             : base(description.Name, description.Value, description.Shortcut)
         {
@@ -24,17 +26,16 @@ namespace osu.Game.Overlays.OSD
 
             Children = new Drawable[]
             {
-                new FillFlowContainer
+                new Container
                 {
-                    Anchor = Anchor.TopCentre,
-                    Origin = Anchor.TopCentre,
-                    Direction = FillDirection.Vertical,
-                    Margin = new MarginPadding { Top = 70 },
+                    Anchor = Anchor.BottomCentre,
+                    Origin = Anchor.BottomCentre,
+                    Margin = new MarginPadding { Bottom = lights_bottom_margin },
                     Children = new Drawable[]
                     {
                         optionLights = new FillFlowContainer<OptionLight>
                         {
-                            Padding = new MarginPadding { Bottom = 5 },
+                            Margin = new MarginPadding { Bottom = 5 },
                             Spacing = new Vector2(5, 0),
                             Direction = FillDirection.Horizontal,
                             Anchor = Anchor.TopCentre,

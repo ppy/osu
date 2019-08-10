@@ -55,6 +55,8 @@ namespace osu.Game.Overlays
         private Container dragContainer;
         private Container playerContainer;
 
+        public bool IsUserPaused { get; private set; }
+
         [Resolved]
         private Bindable<WorkingBeatmap> beatmap { get; set; }
 
@@ -157,7 +159,7 @@ namespace osu.Game.Overlays
                                                     Origin = Anchor.Centre,
                                                     Scale = new Vector2(1.4f),
                                                     IconScale = new Vector2(1.4f),
-                                                    Action = play,
+                                                    Action = togglePause,
                                                     Icon = FontAwesome.Regular.PlayCircle,
                                                 },
                                                 nextButton = new MusicIconButton
@@ -276,7 +278,7 @@ namespace osu.Game.Overlays
             }
         }
 
-        private void play()
+        private void togglePause()
         {
             var track = current?.Track;
 
@@ -288,9 +290,15 @@ namespace osu.Game.Overlays
             }
 
             if (track.IsRunning)
+            {
+                IsUserPaused = true;
                 track.Stop();
+            }
             else
+            {
                 track.Start();
+                IsUserPaused = false;
+            }
         }
 
         private void prev()

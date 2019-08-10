@@ -34,14 +34,12 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                     RelativeSizeAxes = Axes.Both,
                     Origin = Anchor.Centre,
                     CornerRadius = Size.X / 2,
-
                     BorderThickness = 2,
                     BorderColour = Color4.White,
-
                     Child = new Box
                     {
                         RelativeSizeAxes = Axes.Both,
-                        Colour = AccentColour,
+                        Colour = AccentColour.Value,
                         Alpha = 0.3f,
                     }
                 }, restrictSize: false)
@@ -54,13 +52,13 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                 ApplyResult(r => r.Type = Tracking ? HitResult.Great : HitResult.Miss);
         }
 
-        protected override void UpdatePreemptState()
+        protected override void UpdateInitialTransforms()
         {
             this.FadeOut().FadeIn(ANIM_DURATION);
             this.ScaleTo(0.5f).ScaleTo(1f, ANIM_DURATION * 4, Easing.OutElasticHalf);
         }
 
-        protected override void UpdateCurrentState(ArmedState state)
+        protected override void UpdateStateTransforms(ArmedState state)
         {
             switch (state)
             {

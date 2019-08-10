@@ -65,6 +65,7 @@ namespace osu.Game.Overlays.OSD
                     Anchor = Anchor.BottomCentre,
                     Origin = Anchor.BottomCentre,
                     Name = "Shortcut",
+                    Alpha = 0.3f,
                     Margin = new MarginPadding { Bottom = 15 },
                     Font = OsuFont.GetFont(size: 12, weight: FontWeight.Bold),
                     Text = string.IsNullOrEmpty(keybinding) ? "NO KEY BOUND" : keybinding.ToUpperInvariant()

@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Graphics;
 using osu.Game.Rulesets.Objects.Types;
 using osuTK;
 
@@ -78,8 +79,11 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
             slider.Path.GetPathToProgress(CurrentCurve, 0, 1);
             SetVertices(CurrentCurve);
 
-            // The body is sized to the full path size to avoid excessive autosize computations
+            // Force the body to be the final path size to avoid excessive autosize computations
+            Path.AutoSizeAxes = Axes.Both;
             Size = Path.Size;
+
+            updatePathSize();
 
             snakedPosition = Path.PositionInBoundingBox(Vector2.Zero);
             snakedPathOffset = Path.PositionInBoundingBox(Path.Vertices[0]);
@@ -91,6 +95,19 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
             SnakedEnd = null;
 
             setRange(lastSnakedStart, lastSnakedEnd);
+        }
+
+        public override void RecyclePath()
+        {
+            base.RecyclePath();
+            updatePathSize();
+        }
+
+        private void updatePathSize()
+        {
+            // Force the path to its final size to avoid excessive framebuffer resizes
+            Path.AutoSizeAxes = Axes.None;
+            Path.Size = Size;
         }
 
         private void setRange(double p0, double p1)
