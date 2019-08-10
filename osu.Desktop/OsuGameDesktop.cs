@@ -1,4 +1,4 @@
-﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
@@ -38,9 +38,9 @@ namespace osu.Desktop
                 if (Host is DesktopGameHost desktopHost)
                     return new StableStorage(desktopHost);
             }
-            catch (Exception e)
+            catch (Exception)
             {
-                Logger.Error(e, "Error while searching for stable install");
+                Logger.Log("Could not find a stable install", LoggingTarget.Runtime, LogLevel.Important);
             }
 
             return null;
@@ -52,11 +52,7 @@ namespace osu.Desktop
 
             if (!noVersionOverlay)
             {
-                LoadComponentAsync(versionManager = new VersionManager { Depth = int.MinValue }, v =>
-                {
-                    Add(v);
-                    v.Show();
-                });
+                LoadComponentAsync(versionManager = new VersionManager { Depth = int.MinValue }, Add);
 
                 if (RuntimeInfo.OS == RuntimeInfo.Platform.Windows)
                     Add(new SquirrelUpdateManager());
@@ -71,7 +67,7 @@ namespace osu.Desktop
 
             switch (newScreen)
             {
-                case Intro _:
+                case IntroScreen _:
                 case MainMenu _:
                     versionManager?.Show();
                     break;

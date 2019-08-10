@@ -41,7 +41,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Connections
                     Anchor = Anchor.Centre,
                     Alpha = 0.5f,
                 }
-            }, restrictSize: false);
+            }, confineMode: ConfineMode.NoScaling);
         }
     }
 }

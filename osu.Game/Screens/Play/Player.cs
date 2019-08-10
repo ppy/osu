@@ -66,6 +66,8 @@ namespace osu.Game.Screens.Play
 
         private SampleChannel sampleRestart;
 
+        private BreakOverlay breakOverlay;
+
         protected ScoreProcessor ScoreProcessor { get; private set; }
         protected DrawableRuleset DrawableRuleset { get; private set; }
 
@@ -134,7 +136,7 @@ namespace osu.Game.Screens.Play
                         }
                     }
                 },
-                new BreakOverlay(working.Beatmap.BeatmapInfo.LetterboxInBreaks, ScoreProcessor)
+                breakOverlay = new BreakOverlay(working.Beatmap.BeatmapInfo.LetterboxInBreaks, ScoreProcessor)
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
@@ -255,7 +257,7 @@ namespace osu.Game.Screens.Play
         private void performImmediateExit()
         {
             // if a restart has been requested, cancel any pending completion (user has shown intent to restart).
-            onCompletionEvent = null;
+            completionProgressDelegate?.Cancel();
 
             ValidForResume = false;
 
@@ -275,20 +277,16 @@ namespace osu.Game.Screens.Play
 
             sampleRestart?.Play();
 
-            // if a restart has been requested, cancel any pending completion (user has shown intent to restart).
-            onCompletionEvent = null;
-
-            ValidForResume = false;
             RestartRequested?.Invoke();
-            this.Exit();
+            performImmediateExit();
         }
 
-        private ScheduledDelegate onCompletionEvent;
+        private ScheduledDelegate completionProgressDelegate;
 
         private void onCompletion()
         {
             // Only show the completion screen if the player hasn't failed
-            if (ScoreProcessor.HasFailed || onCompletionEvent != null)
+            if (ScoreProcessor.HasFailed || completionProgressDelegate != null)
                 return;
 
             ValidForResume = false;
@@ -297,7 +295,7 @@ namespace osu.Game.Screens.Play
 
             using (BeginDelayedSequence(1000))
             {
-                onCompletionEvent = Schedule(delegate
+                completionProgressDelegate = Schedule(delegate
                 {
                     if (!this.IsCurrentScreen()) return;
 
@@ -306,8 +304,6 @@ namespace osu.Game.Screens.Play
                         scoreManager.Import(score).Wait();
 
                     this.Push(CreateResults(score));
-
-                    onCompletionEvent = null;
                 });
             }
         }
@@ -417,8 +413,7 @@ namespace osu.Game.Screens.Play
             PauseOverlay.Hide();
 
             // breaks and time-based conditions may allow instant resume.
-            double time = GameplayClockContainer.GameplayClock.CurrentTime;
-            if (Beatmap.Value.Beatmap.Breaks.Any(b => b.Contains(time)) || time < Beatmap.Value.Beatmap.HitObjects.First().StartTime)
+            if (breakOverlay.IsBreakTime.Value || GameplayClockContainer.GameplayClock.CurrentTime < Beatmap.Value.Beatmap.HitObjects.First().StartTime)
                 completeResume();
             else
                 DrawableRuleset.RequestResume(completeResume);
@@ -471,10 +466,10 @@ namespace osu.Game.Screens.Play
 
         public override bool OnExiting(IScreen next)
         {
-            if (onCompletionEvent != null)
+            if (completionProgressDelegate != null && !completionProgressDelegate.Cancelled && !completionProgressDelegate.Completed)
             {
-                // Proceed to result screen if beatmap already finished playing
-                onCompletionEvent.RunTask();
+                // proceed to result screen if beatmap already finished playing
+                completionProgressDelegate.RunTask();
                 return true;
             }
 

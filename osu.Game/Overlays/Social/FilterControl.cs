@@ -12,6 +12,7 @@ namespace osu.Game.Overlays.Social
     {
         protected override Color4 BackgroundColour => OsuColour.FromHex(@"47253a");
         protected override SocialSortCriteria DefaultTab => SocialSortCriteria.Rank;
+        protected override SortDirection DefaultCategory => SortDirection.Ascending;
 
         public FilterControl()
         {

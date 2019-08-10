@@ -17,7 +17,6 @@ using osu.Framework.Platform;
 using osu.Framework.Screens;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
-using osu.Game.Database;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
@@ -51,26 +50,14 @@ namespace osu.Game.Tests.Visual.Background
         private DummySongSelect songSelect;
         private TestPlayerLoader playerLoader;
         private TestPlayer player;
-        private DatabaseContextFactory factory;
         private BeatmapManager manager;
         private RulesetStore rulesets;
 
         [BackgroundDependencyLoader]
         private void load(GameHost host, AudioManager audio)
         {
-            factory = new DatabaseContextFactory(LocalStorage);
-            factory.ResetDatabase();
-
-            using (var usage = factory.Get())
-                usage.Migrate();
-
-            factory.ResetDatabase();
-
-            using (var usage = factory.Get())
-                usage.Migrate();
-
-            Dependencies.Cache(rulesets = new RulesetStore(factory));
-            Dependencies.Cache(manager = new BeatmapManager(LocalStorage, factory, rulesets, null, audio, host, Beatmap.Default));
+            Dependencies.Cache(rulesets = new RulesetStore(ContextFactory));
+            Dependencies.Cache(manager = new BeatmapManager(LocalStorage, ContextFactory, rulesets, null, audio, host, Beatmap.Default));
             Dependencies.Cache(new OsuConfigManager(LocalStorage));
 
             manager.Import(TestResources.GetTestBeatmapForImport()).Wait();
