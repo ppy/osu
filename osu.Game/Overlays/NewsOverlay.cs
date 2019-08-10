@@ -15,7 +15,7 @@ namespace osu.Game.Overlays
                 new Box
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Colour = colours.PurpleLightAlternative
+                    Colour = colours.PurpleDarkAlternative
                 }
             };
         }
