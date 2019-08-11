@@ -49,7 +49,7 @@ namespace osu.Game.Tests.Visual.Online
             api.Logout();
             api.LocalUser.BindValueChanged(user => { userPanelArea.Child = new UserPanel(user.NewValue) { Width = 200 }; }, true);
 
-            AddStep("show", () => accountCreation.State = Visibility.Visible);
+            AddStep("show", () => accountCreation.Show());
             AddStep("logout", () => api.Logout());
         }
     }

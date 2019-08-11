@@ -3,6 +3,7 @@
 
 using NUnit.Framework;
 using osu.Framework.Allocation;
+using osu.Framework.Audio;
 using osu.Framework.Audio.Track;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Audio;
@@ -10,6 +11,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Rulesets.Osu;
 using osuTK.Graphics;
 
 namespace osu.Game.Tests.Visual.Editor
@@ -20,9 +22,9 @@ namespace osu.Game.Tests.Visual.Editor
         private WorkingBeatmap waveformBeatmap;
 
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(AudioManager audio)
         {
-            waveformBeatmap = new WaveformTestBeatmap();
+            waveformBeatmap = new WaveformTestBeatmap(audio);
         }
 
         [TestCase(1f)]
@@ -91,7 +93,7 @@ namespace osu.Game.Tests.Visual.Editor
                     Child = graph = new TestWaveformGraph
                     {
                         RelativeSizeAxes = Axes.Both,
-                        Waveform = new DummyWorkingBeatmap().Waveform,
+                        Waveform = CreateWorkingBeatmap(new OsuRuleset().RulesetInfo).Waveform,
                     },
                 };
             });

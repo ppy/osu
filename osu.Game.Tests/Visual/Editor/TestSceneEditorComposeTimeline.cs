@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using NUnit.Framework;
 using osu.Framework.Allocation;
+using osu.Framework.Audio;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -30,9 +31,9 @@ namespace osu.Game.Tests.Visual.Editor
         };
 
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(AudioManager audio)
         {
-            Beatmap.Value = new WaveformTestBeatmap();
+            Beatmap.Value = new WaveformTestBeatmap(audio);
 
             Children = new Drawable[]
             {

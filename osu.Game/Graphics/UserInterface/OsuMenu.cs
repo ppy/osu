@@ -11,6 +11,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Events;
+using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osuTK;
 
@@ -46,6 +47,8 @@ namespace osu.Game.Graphics.UserInterface
 
         protected override DrawableMenuItem CreateDrawableMenuItem(MenuItem item) => new DrawableOsuMenuItem(item);
 
+        protected override ScrollContainer<Drawable> CreateScrollContainer(Direction direction) => new OsuScrollContainer(direction);
+
         protected override Menu CreateSubMenu() => new OsuMenu(Direction.Vertical)
         {
             Anchor = Direction == Direction.Horizontal ? Anchor.BottomLeft : Anchor.TopRight
@@ -71,8 +74,8 @@ namespace osu.Game.Graphics.UserInterface
             [BackgroundDependencyLoader]
             private void load(AudioManager audio)
             {
-                sampleHover = audio.Sample.Get(@"UI/generic-hover");
-                sampleClick = audio.Sample.Get(@"UI/generic-select");
+                sampleHover = audio.Samples.Get(@"UI/generic-hover");
+                sampleClick = audio.Samples.Get(@"UI/generic-select");
 
                 BackgroundColour = Color4.Transparent;
                 BackgroundColourHover = OsuColour.FromHex(@"172023");

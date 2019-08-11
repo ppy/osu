@@ -1,4 +1,4 @@
-﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 using NUnit.Framework;
@@ -10,7 +10,6 @@ using osu.Framework.Graphics.Shapes;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Rulesets.Osu.Objects;
-using osu.Game.Tests.Beatmaps;
 using osuTK;
 using osuTK.Graphics;
 
@@ -48,7 +47,7 @@ namespace osu.Game.Tests.Visual.Editor
                 }
             };
 
-            Beatmap.Value = new TestWorkingBeatmap(testBeatmap, Clock);
+            Beatmap.Value = CreateWorkingBeatmap(testBeatmap);
 
             Child = new TimingPointVisualiser(testBeatmap, 5000) { Clock = Clock };
         }

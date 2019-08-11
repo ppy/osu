@@ -97,7 +97,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddStep("Show overlay", () => pauseOverlay.Show());
 
             AddStep("Press select", () => press(GlobalAction.Select));
-            AddAssert("Overlay still open", () => pauseOverlay.State == Visibility.Visible);
+            AddAssert("Overlay still open", () => pauseOverlay.State.Value == Visibility.Visible);
 
             AddStep("Hide overlay", () => pauseOverlay.Hide());
         }
@@ -237,7 +237,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             });
 
             AddAssert("Action was triggered", () => triggered);
-            AddAssert("Overlay is closed", () => pauseOverlay.State == Visibility.Hidden);
+            AddAssert("Overlay is closed", () => pauseOverlay.State.Value == Visibility.Hidden);
         }
 
         /// <summary>
@@ -272,7 +272,7 @@ namespace osu.Game.Tests.Visual.Gameplay
 
                 return triggered;
             });
-            AddAssert("Overlay is closed", () => pauseOverlay.State == Visibility.Hidden);
+            AddAssert("Overlay is closed", () => pauseOverlay.State.Value == Visibility.Hidden);
         }
 
         private void press(Key key)

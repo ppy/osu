@@ -4,12 +4,10 @@
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Testing;
-using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Screens.Play;
-using osu.Game.Tests.Beatmaps;
 
 namespace osu.Game.Tests.Visual
 {
@@ -39,15 +37,13 @@ namespace osu.Game.Tests.Visual
             AddUntilStep("player loaded", () => Player.IsLoaded && Player.Alpha == 1);
         }
 
-        protected virtual IBeatmap CreateBeatmap(Ruleset ruleset) => new TestBeatmap(ruleset.RulesetInfo);
-
         protected virtual bool AllowFail => false;
 
         private void loadPlayer()
         {
-            var beatmap = CreateBeatmap(ruleset);
+            var beatmap = CreateBeatmap(ruleset.RulesetInfo);
 
-            Beatmap.Value = new TestWorkingBeatmap(beatmap, Clock);
+            Beatmap.Value = CreateWorkingBeatmap(beatmap);
 
             if (!AllowFail)
                 Mods.Value = new[] { ruleset.GetAllMods().First(m => m is ModNoFail) };
