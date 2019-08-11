@@ -7,6 +7,8 @@ using osu.Framework.Graphics.Shapes;
 using osu.Game.Rulesets.Judgements;
 using osuTK.Graphics;
 using osuTK;
+using osu.Framework.Graphics.Sprites;
+using System.Collections.Generic;
 
 namespace osu.Game.Screens.Play.HUD
 {
@@ -17,16 +19,31 @@ namespace osu.Game.Screens.Play.HUD
         private const int spacing = 3;
 
         private readonly bool mirrored;
+        private readonly SpriteIcon arrow;
+        private readonly List<double> judgementOffsets = new List<double>();
 
         public AccuracyBar(bool mirrored = false)
         {
             this.mirrored = mirrored;
 
             Size = new Vector2(bar_width, bar_height);
-            Child = new Box
+
+            Children = new Drawable[]
             {
-                RelativeSizeAxes = Axes.Both,
-                Colour = Color4.White,
+                new Box
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Colour = Color4.White,
+                },
+                arrow = new SpriteIcon
+                {
+                    Anchor = mirrored ? Anchor.CentreLeft : Anchor.CentreRight,
+                    Origin = mirrored ? Anchor.CentreRight : Anchor.CentreLeft,
+                    X = mirrored ? -spacing : spacing,
+                    RelativePositionAxes = Axes.Y,
+                    Icon = mirrored ? FontAwesome.Solid.ChevronRight : FontAwesome.Solid.ChevronLeft,
+                    Size = new Vector2(10),
+                }
             };
         }
 
@@ -34,20 +51,22 @@ namespace osu.Game.Screens.Play.HUD
         {
             Container judgementLine;
 
-            Add(judgementLine = CreateJudgementLine(judgement.TimeOffset));
+            Add(judgementLine = CreateJudgementLine(judgement));
 
             judgementLine.FadeOut(5000, Easing.OutQuint);
             judgementLine.Expire();
+
+            arrow.MoveToY(calculateArrowPosition(judgement) / bar_height, 500, Easing.OutQuint);
         }
 
-        protected virtual Container CreateJudgementLine(double offset) => new CircularContainer
+        protected virtual Container CreateJudgementLine(JudgementResult judgement) => new CircularContainer
         {
             Anchor = mirrored ? Anchor.CentreRight : Anchor.CentreLeft,
             Origin = mirrored ? Anchor.CentreLeft : Anchor.CentreRight,
             Masking = true,
             Size = new Vector2(10, 2),
             RelativePositionAxes = Axes.Y,
-            Y = (float)offset / bar_height,
+            Y = (float)judgement.TimeOffset / bar_height,
             X = mirrored ? spacing : -spacing,
             Child = new Box
             {
@@ -55,5 +74,20 @@ namespace osu.Game.Screens.Play.HUD
                 Colour = Color4.White,
             }
         };
+
+        private float calculateArrowPosition(JudgementResult judgement)
+        {
+            if (judgementOffsets.Count > 5)
+                judgementOffsets.RemoveAt(0);
+
+            judgementOffsets.Add(judgement.TimeOffset);
+
+            double offsets = 0;
+
+            foreach (var offset in judgementOffsets)
+                offsets += offset;
+
+            return (float)offsets / judgementOffsets.Count;
+        }
     }
 }
