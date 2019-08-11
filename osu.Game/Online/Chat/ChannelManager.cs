@@ -4,12 +4,10 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Logging;
-using osu.Game.Beatmaps;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Game.Overlays.Chat.Tabs;
@@ -34,7 +32,6 @@ namespace osu.Game.Online.Chat
 
         private readonly BindableList<Channel> availableChannels = new BindableList<Channel>();
         private readonly BindableList<Channel> joinedChannels = new BindableList<Channel>();
-        private readonly Bindable<WorkingBeatmap> currentBeatmap = new Bindable<WorkingBeatmap>();
 
         /// <summary>
         /// The currently opened channel
@@ -62,12 +59,12 @@ namespace osu.Game.Online.Chat
             HighPollRate.BindValueChanged(enabled => TimeBetweenPolls = enabled.NewValue ? 1000 : 6000, true);
         }
 
-            /// <summary>
-            /// Opens a channel or switches to the channel if already opened.
-            /// </summary>
-            /// <exception cref="ChannelNotFoundException">If the name of the specifed channel was not found this exception will be thrown.</exception>
-            /// <param name="name"></param>
-            public void OpenChannel(string name)
+        /// <summary>
+        /// Opens a channel or switches to the channel if already opened.
+        /// </summary>
+        /// <exception cref="ChannelNotFoundException">If the name of the specifed channel was not found this exception will be thrown.</exception>
+        /// <param name="name"></param>
+        public void OpenChannel(string name)
         {
             if (name == null)
                 throw new ArgumentNullException(nameof(name));
@@ -101,25 +98,6 @@ namespace osu.Game.Online.Chat
         /// Ensure we run post actions in sequence, once at a time.
         /// </summary>
         private readonly Queue<Action> postQueue = new Queue<Action>();
-
-        public string ProcessInlineCommands(string text) {
-
-            return Regex.Replace(text, @"\$[a-zA-Z0-9]+", delegate(Match match) {
-                string cmd = match.Value.Substring(1, match.Value.Length - 1);
-                switch (cmd) {
-                    case "np":
-                        BeatmapInfo beatmapInfo = currentBeatmap.Value.Beatmap.BeatmapInfo;
-                        return String.Format("({0} - {1} mapped by {2})[https://osu.ppy.sh/b/{3}]", beatmapInfo.Metadata.Artist, beatmapInfo.Metadata.Title, beatmapInfo.Metadata.Author, beatmapInfo.OnlineBeatmapID);
-
-                    case "pp":
-                        if(api.LocalUser != null)
-                            return api.LocalUser.Value.Statistics.PP.ToString();
-                        return text;
-                    default:
-                        return match.Value;
-                }
-            });
-        }
 
         /// <summary>
         /// Posts a message to the currently opened channel.
@@ -256,12 +234,6 @@ namespace osu.Game.Online.Chat
 
                 case "help":
                     target.AddNewMessages(new InfoMessage("Supported commands: /help, /me [action], /join [channel]"));
-                    break;
-
-                case "np":
-                    BeatmapInfo beatmapInfo = currentBeatmap.Value.Beatmap.BeatmapInfo;
-                    string beatmapLink = String.Format("({0} - {1} mapped by {2})[https://osu.ppy.sh/b/{3}]", beatmapInfo.Metadata.Artist, beatmapInfo.Metadata.Title, beatmapInfo.Metadata.Author, beatmapInfo.OnlineBeatmapID);
-                    target.AddNewMessages(new InfoMessage(String.Format("Now playing command :) {0}", beatmapLink)));
                     break;
 
                 default:
@@ -474,10 +446,9 @@ namespace osu.Game.Online.Chat
         }
 
         [BackgroundDependencyLoader]
-        private void load(IAPIProvider api, Bindable<WorkingBeatmap> beatmap)
+        private void load(IAPIProvider api)
         {
             this.api = api;
-            this.currentBeatmap.BindTo(beatmap);
         }
     }
 
