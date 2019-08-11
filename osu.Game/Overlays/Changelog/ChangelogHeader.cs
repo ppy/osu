@@ -121,7 +121,7 @@ namespace osu.Game.Overlays.Changelog
                 AccentColour = colours.Violet;
             }
 
-            protected override Drawable CreateIcon() => new ScreenTitleIcon(@"Icons/changelog");
+            protected override Drawable CreateIcon() => new ScreenTitleTextureIcon(@"Icons/changelog");
         }
     }
 }
