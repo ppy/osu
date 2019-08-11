@@ -41,14 +41,19 @@ namespace osu.Game.Screens.Backgrounds
             User = api.LocalUser.GetBoundCopy();
             config.BindWith(OsuSetting.MenuBackgroundMode, BackgroundMode);
 
-            User.BindValueChanged(onUserChanged);
-            Skin.BindValueChanged(onSkinChanged);
-            beatmap.BindValueChanged(onBeatmapChanged);
-            BackgroundMode.BindValueChanged(onModeChanged);
-
             currentDisplay = RNG.Next(0, background_count);
 
             display(createBackground());
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            User.BindValueChanged(onUserChanged, true);
+            Skin.BindValueChanged(onSkinChanged, true);
+            beatmap.BindValueChanged(onBeatmapChanged, true);
+            BackgroundMode.BindValueChanged(onModeChanged, true);
         }
 
         private void display(Background newBackground)
