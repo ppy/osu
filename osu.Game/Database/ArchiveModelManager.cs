@@ -31,10 +31,21 @@ namespace osu.Game.Database
     /// </summary>
     /// <typeparam name="TModel">The model type.</typeparam>
     /// <typeparam name="TFileModel">The associated file join type.</typeparam>
-    public abstract class ArchiveModelManager<TModel, TFileModel> : ArchiveModelManager, ICanAcceptFiles, IModelManager<TModel>
+    public abstract class ArchiveModelManager<TModel, TFileModel> : ICanAcceptFiles, IModelManager<TModel>
         where TModel : class, IHasFiles<TFileModel>, IHasPrimaryKey, ISoftDelete
         where TFileModel : INamedFileInfo, new()
     {
+        private const int import_queue_request_concurrency = 1;
+
+        /// <summary>
+        /// A singleton scheduler shared by all <see cref="ArchiveModelManager{TModel,TFileModel}"/>.
+        /// </summary>
+        /// <remarks>
+        /// This scheduler generally performs IO and CPU intensive work so concurrency is limited harshly.
+        /// It is mainly being used as a queue mechanism for large imports.
+        /// </remarks>
+        private static readonly ThreadedTaskScheduler import_scheduler = new ThreadedTaskScheduler(import_queue_request_concurrency, nameof(ArchiveModelManager<TModel, TFileModel>));
+
         /// <summary>
         /// Set an endpoint for notifications to be posted to.
         /// </summary>
@@ -336,7 +347,7 @@ namespace osu.Game.Database
 
             flushEvents(true);
             return item;
-        }, cancellationToken, TaskCreationOptions.HideScheduler, IMPORT_SCHEDULER).Unwrap();
+        }, cancellationToken, TaskCreationOptions.HideScheduler, import_scheduler).Unwrap();
 
         /// <summary>
         /// Perform an update of the specified item.
@@ -645,19 +656,5 @@ namespace osu.Game.Database
         }
 
         #endregion
-    }
-
-    public abstract class ArchiveModelManager
-    {
-        private const int import_queue_request_concurrency = 1;
-
-        /// <summary>
-        /// A singleton scheduler shared by all <see cref="ArchiveModelManager{TModel,TFileModel}"/>.
-        /// </summary>
-        /// <remarks>
-        /// This scheduler generally performs IO and CPU intensive work so concurrency is limited harshly.
-        /// It is mainly being used as a queue mechanism for large imports.
-        /// </remarks>
-        protected static readonly ThreadedTaskScheduler IMPORT_SCHEDULER = new ThreadedTaskScheduler(import_queue_request_concurrency, nameof(ArchiveModelManager));
     }
 }

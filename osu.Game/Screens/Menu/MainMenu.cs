@@ -14,7 +14,6 @@ using osu.Game.Graphics.Containers;
 using osu.Game.Overlays;
 using osu.Game.Screens.Backgrounds;
 using osu.Game.Screens.Charts;
-using osu.Game.Screens.Direct;
 using osu.Game.Screens.Edit;
 using osu.Game.Screens.Multi;
 using osu.Game.Screens.Select;
@@ -65,7 +64,6 @@ namespace osu.Game.Screens.Menu
                         buttons = new ButtonSystem
                         {
                             OnChart = delegate { this.Push(new ChartListing()); },
-                            OnDirect = delegate { this.Push(new OnlineListing()); },
                             OnEdit = delegate { this.Push(new Editor()); },
                             OnSolo = onSolo,
                             OnMulti = delegate { this.Push(new Multiplayer()); },
