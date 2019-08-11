@@ -16,7 +16,7 @@ using osu.Framework.Allocation;
 
 namespace osu.Game.Screens.Play.HUD
 {
-    public class AccuracyBar : Container
+    public class HitErrorDisplay : Container
     {
         private const int bar_width = 5;
         private const int bar_height = 250;
@@ -31,7 +31,7 @@ namespace osu.Game.Screens.Play.HUD
         private readonly SpriteIcon arrow;
         private readonly List<double> judgementOffsets = new List<double>();
 
-        public AccuracyBar(bool mirrored = false)
+        public HitErrorDisplay(bool mirrored = false)
         {
             this.mirrored = mirrored;
 
