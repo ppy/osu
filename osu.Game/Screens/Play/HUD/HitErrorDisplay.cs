@@ -13,12 +13,14 @@ using osu.Game.Rulesets.Objects;
 using osu.Game.Beatmaps;
 using osu.Framework.Bindables;
 using osu.Framework.Allocation;
+using osu.Framework.Graphics.Colour;
+using osu.Framework.Extensions.Color4Extensions;
 
 namespace osu.Game.Screens.Play.HUD
 {
     public class HitErrorDisplay : Container
     {
-        private const int bar_width = 5;
+        private const int bar_width = 4;
         private const int bar_height = 250;
         private const int spacing = 3;
 
@@ -39,10 +41,43 @@ namespace osu.Game.Screens.Play.HUD
 
             Children = new Drawable[]
             {
-                new Box
+                new FillFlowContainer
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Colour = Color4.White,
+                    Direction = FillDirection.Vertical,
+                    Children = new Drawable[]
+                    {
+                        new Box
+                        {
+                            RelativeSizeAxes = Axes.Both,
+                            Colour = ColourInfo.GradientVertical(Color4.Black.Opacity(0), Color4.Orange),
+                            Height = 0.3f
+                        },
+                        new Box
+                        {
+                            RelativeSizeAxes = Axes.Both,
+                            Colour = Color4.Green,
+                            Height = 0.15f
+                        },
+                        new Box
+                        {
+                            RelativeSizeAxes = Axes.Both,
+                            Colour = Color4.Blue,
+                            Height = 0.1f
+                        },
+                        new Box
+                        {
+                            RelativeSizeAxes = Axes.Both,
+                            Colour = Color4.Green,
+                            Height = 0.15f
+                        },
+                        new Box
+                        {
+                            RelativeSizeAxes = Axes.Both,
+                            Colour = ColourInfo.GradientVertical(Color4.Orange, Color4.Black.Opacity(0)),
+                            Height = 0.3f
+                        }
+                    }
                 },
                 arrow = new SpriteIcon
                 {
