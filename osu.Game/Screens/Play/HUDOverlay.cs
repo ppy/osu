@@ -264,9 +264,7 @@ namespace osu.Game.Screens.Play
         {
             Anchor = mirrored ? Anchor.CentreRight : Anchor.CentreLeft,
             Origin = mirrored ? Anchor.CentreRight : Anchor.CentreLeft,
-            AutoSizeAxes = Axes.X,
-            Height = 300,
-            Margin = new MarginPadding { Horizontal = 20 }
+            Margin = new MarginPadding { Horizontal = 30 }
         };
 
         protected virtual PlayerSettingsOverlay CreatePlayerSettingsOverlay() => new PlayerSettingsOverlay();
