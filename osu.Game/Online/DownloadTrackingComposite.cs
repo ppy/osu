@@ -48,20 +48,22 @@ namespace osu.Game.Online
                     attachDownload(manager.GetExistingDownload(modelInfo.NewValue));
             }, true);
 
-            manager.DownloadBegan += download =>
-            {
-                if (download.Model.Equals(Model.Value))
-                    attachDownload(download);
-            };
-
-            manager.DownloadFailed += download =>
-            {
-                if (download.Model.Equals(Model.Value))
-                    attachDownload(null);
-            };
-
+            manager.DownloadBegan += downloadBegan;
+            manager.DownloadFailed += downloadFailed;
             manager.ItemAdded += itemAdded;
             manager.ItemRemoved += itemRemoved;
+        }
+
+        private void downloadBegan(ArchiveDownloadRequest<TModel> request)
+        {
+            if (request.Model.Equals(Model.Value))
+                attachDownload(request);
+        }
+
+        private void downloadFailed(ArchiveDownloadRequest<TModel> request)
+        {
+            if (request.Model.Equals(Model.Value))
+                attachDownload(null);
         }
 
         private ArchiveDownloadRequest<TModel> attachedRequest;
@@ -126,8 +128,10 @@ namespace osu.Game.Online
 
             if (manager != null)
             {
-                manager.DownloadBegan -= attachDownload;
+                manager.DownloadBegan -= downloadBegan;
+                manager.DownloadFailed -= downloadFailed;
                 manager.ItemAdded -= itemAdded;
+                manager.ItemRemoved -= itemRemoved;
             }
 
             State.UnbindAll();
