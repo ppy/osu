@@ -149,7 +149,7 @@ namespace osu.Game.Tests.Visual.Background
         }
 
         /// <summary>
-        /// Check if the <see cref="UserDimContainer"/> is properly accepting user-defined visual changes in background at all.
+        /// Ensure <see cref="UserDimContainer"/> is properly accepting user-defined visual changes for a background.
         /// </summary>
         [Test]
         public void DisableUserDimBackgroundTest()
@@ -166,7 +166,7 @@ namespace osu.Game.Tests.Visual.Background
         }
 
         /// <summary>
-        /// Check if the <see cref="UserDimContainer"/> is properly accepting user-defined visual changes in storyboard at all.
+        /// Ensure <see cref="UserDimContainer"/> is properly accepting user-defined visual changes for a storyboard.
         /// </summary>
         [Test]
         public void DisableUserDimStoryboardTest()
