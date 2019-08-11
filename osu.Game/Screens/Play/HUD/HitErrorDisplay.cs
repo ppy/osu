@@ -99,6 +99,9 @@ namespace osu.Game.Screens.Play.HUD
 
         public void OnNewJudgement(JudgementResult judgement)
         {
+            if (!judgement.IsHit)
+                return;
+
             Container judgementLine;
 
             Add(judgementLine = CreateJudgementLine(judgement));
