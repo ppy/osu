@@ -191,7 +191,7 @@ namespace osu.Game.Graphics.Backgrounds
             private readonly List<TriangleParticle> parts = new List<TriangleParticle>();
             private Vector2 size;
 
-            private TriangleBatch<TexturedVertex2D> vertexBatch;
+            private QuadBatch<TexturedVertex2D> vertexBatch;
 
             public TrianglesDrawNode(Triangles source)
                 : base(source)
@@ -217,7 +217,7 @@ namespace osu.Game.Graphics.Backgrounds
                 if (Source.AimCount > 0 && (vertexBatch == null || vertexBatch.Size != Source.AimCount))
                 {
                     vertexBatch?.Dispose();
-                    vertexBatch = new TriangleBatch<TexturedVertex2D>(Source.AimCount, 1);
+                    vertexBatch = new QuadBatch<TexturedVertex2D>(Source.AimCount, 1);
                 }
 
                 shader.Bind();
