@@ -179,7 +179,7 @@ namespace osu.Game.Overlays.Profile.Header
             detailGlobalRank.Content = user?.Statistics?.Ranks.Global?.ToString("\\##,##0") ?? "-";
             detailCountryRank.Content = user?.Statistics?.Ranks.Country?.ToString("\\##,##0") ?? "-";
 
-            rankGraph.User.Value = user;
+            rankGraph.Statistics.Value = user?.Statistics;
         }
 
         private class ScoreRankInfo : CompositeDrawable
