@@ -93,8 +93,8 @@ namespace osu.Game.Screens.Select
         }
 
         private readonly List<float> yPositions = new List<float>();
-        private Cached itemsCache = new Cached();
-        private Cached scrollPositionCache = new Cached();
+        private readonly Cached itemsCache = new Cached();
+        private readonly Cached scrollPositionCache = new Cached();
 
         private readonly Container<DrawableCarouselItem> scrollableContent;
 
