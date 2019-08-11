@@ -4,7 +4,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -34,7 +33,7 @@ namespace osu.Game.Online.Chat
 
         private readonly BindableList<Channel> availableChannels = new BindableList<Channel>();
         private readonly BindableList<Channel> joinedChannels = new BindableList<Channel>();
-        private readonly Bindable<WorkingBeatmap> currentBeatmap = new Bindable<WorkingBeatmap>();
+        private readonly IBindable<WorkingBeatmap> currentBeatmap = new Bindable<WorkingBeatmap>();
 
         /// <summary>
         /// The currently opened channel
@@ -101,28 +100,6 @@ namespace osu.Game.Online.Chat
         /// Ensure we run post actions in sequence, once at a time.
         /// </summary>
         private readonly Queue<Action> postQueue = new Queue<Action>();
-
-        /// <summary>
-        /// Scans for inline commands of the form $cmd and returns the newly processed text
-        /// </summary>
-        public string ProcessInlineCommands(string text) {
-
-            return Regex.Replace(text, @"\$[a-zA-Z0-9]+", delegate(Match match) {
-                string cmd = match.Value.Substring(1, match.Value.Length - 1);
-                switch (cmd) {
-                    case "np":
-                        BeatmapInfo beatmapInfo = currentBeatmap.Value.Beatmap.BeatmapInfo;
-                        return String.Format("({0} - {1} mapped by {2})[https://osu.ppy.sh/b/{3}]", beatmapInfo.Metadata.Artist, beatmapInfo.Metadata.Title, beatmapInfo.Metadata.Author, beatmapInfo.OnlineBeatmapID);
-
-                    case "pp":
-                        if(api.LocalUser != null)
-                            return api.LocalUser.Value.Statistics.PP.ToString();
-                        return text;
-                    default:
-                        return match.Value;
-                }
-            });
-        }
 
         /// <summary>
         /// Posts a message to the currently opened channel.
@@ -263,8 +240,7 @@ namespace osu.Game.Online.Chat
 
                 case "np":
                     BeatmapInfo beatmapInfo = currentBeatmap.Value.Beatmap.BeatmapInfo;
-                    string beatmapLink = String.Format("({0} - {1} mapped by {2})[https://osu.ppy.sh/b/{3}]", beatmapInfo.Metadata.Artist, beatmapInfo.Metadata.Title, beatmapInfo.Metadata.Author, beatmapInfo.OnlineBeatmapID);
-                    target.AddNewMessages(new InfoMessage(String.Format("Now playing command :) {0}", beatmapLink)));
+                    PostMessage($"is playing [https://osu.ppy.sh/b/{beatmapInfo.OnlineBeatmapID} {beatmapInfo.ToString()}]");
                     break;
 
                 default:

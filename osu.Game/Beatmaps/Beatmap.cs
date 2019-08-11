@@ -60,7 +60,5 @@ namespace osu.Game.Beatmaps
     public class Beatmap : Beatmap<HitObject>
     {
         public new Beatmap Clone() => (Beatmap)base.Clone();
-
-        public override string ToString() => BeatmapInfo?.ToString() ?? base.ToString();
     }
 }

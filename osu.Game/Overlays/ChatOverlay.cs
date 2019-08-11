@@ -39,6 +39,8 @@ namespace osu.Game.Overlays
 
         private FocusedTextBox textbox;
 
+        private MessagePreprocessor messagePreprocessor;
+
         private const int transition_length = 500;
 
         public const float DEFAULT_HEIGHT = 0.4f;
@@ -71,8 +73,9 @@ namespace osu.Game.Overlays
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuConfigManager config, OsuColour colours, ChannelManager channelManager)
+        private void load(OsuConfigManager config, OsuColour colours, ChannelManager channelManager, MessagePreprocessor messagePreprocessor)
         {
+            this.messagePreprocessor = messagePreprocessor;
             const float padding = 5;
 
             Children = new Drawable[]
@@ -425,10 +428,9 @@ namespace osu.Game.Overlays
 
             if (text[0] == '/')
                 channelManager.PostCommand(text.Substring(1));
-            else {
-                text = channelManager.ProcessInlineCommands(text);
-                channelManager.PostMessage(text);
-            }
+            else
+                channelManager.PostMessage(messagePreprocessor.PreProcess(text));
+
             textbox.Text = string.Empty;
         }
 

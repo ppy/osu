@@ -58,6 +58,8 @@ namespace osu.Game
 
         private ChannelManager channelManager;
 
+        private MessagePreprocessor messagePreprocessor;
+
         private NotificationOverlay notifications;
 
         private DirectOverlay direct;
@@ -482,6 +484,7 @@ namespace osu.Game
             loadComponentSingleFile(direct = new DirectOverlay(), overlayContent.Add, true);
             loadComponentSingleFile(social = new SocialOverlay(), overlayContent.Add, true);
             loadComponentSingleFile(channelManager = new ChannelManager(), AddInternal, true);
+            loadComponentSingleFile(messagePreprocessor = new MessagePreprocessor(), AddInternal, true);
             loadComponentSingleFile(chatOverlay = new ChatOverlay(), overlayContent.Add, true);
             loadComponentSingleFile(settings = new SettingsOverlay { GetToolbarHeight = () => ToolbarOffset }, leftFloatingOverlayContent.Add, true);
             var changelogOverlay = loadComponentSingleFile(new ChangelogOverlay(), overlayContent.Add, true);
