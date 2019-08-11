@@ -106,7 +106,7 @@ namespace osu.Game.Screens.Play.HUD
 
             Add(judgementLine = CreateJudgementLine(judgement));
 
-            judgementLine.FadeOut(5000, Easing.OutQuint);
+            judgementLine.FadeOut(10000, Easing.OutQuint);
             judgementLine.Expire();
 
             arrow.MoveToY(getRelativeJudgementPosition(calculateArrowPosition(judgement)), 500, Easing.OutQuint);
