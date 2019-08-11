@@ -8,6 +8,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.UserInterface;
+using osu.Game.Beatmaps;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays.Chat;
 using osuTK.Graphics;
@@ -20,6 +21,8 @@ namespace osu.Game.Online.Chat
     public class StandAloneChatDisplay : CompositeDrawable
     {
         public readonly Bindable<Channel> Channel = new Bindable<Channel>();
+
+        private Bindable<WorkingBeatmap> current_beatmap = new Bindable<WorkingBeatmap>();
 
         public Action Exit;
 
@@ -74,8 +77,9 @@ namespace osu.Game.Online.Chat
         }
 
         [BackgroundDependencyLoader(true)]
-        private void load(ChannelManager manager)
+        private void load(ChannelManager manager, Bindable<WorkingBeatmap> beatmap)
         {
+            current_beatmap = beatmap;
             if (ChannelManager == null)
                 ChannelManager = manager;
         }
@@ -89,9 +93,10 @@ namespace osu.Game.Online.Chat
 
             if (text[0] == '/')
                 ChannelManager?.PostCommand(text.Substring(1), Channel.Value);
-            else
+            else {
+                text = ChannelManager?.ProcessInlineCommands(text);
                 ChannelManager?.PostMessage(text, target: Channel.Value);
-
+            }
             textbox.Text = string.Empty;
         }
 
