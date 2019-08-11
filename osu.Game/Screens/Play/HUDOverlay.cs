@@ -35,6 +35,8 @@ namespace osu.Game.Screens.Play
         public readonly ModDisplay ModDisplay;
         public readonly HoldForMenuButton HoldToQuit;
         public readonly PlayerSettingsOverlay PlayerSettingsOverlay;
+        public readonly AccuracyBar LeftAccuracyBar;
+        public readonly AccuracyBar RightAccuracyBar;
 
         public Bindable<bool> ShowHealthbar = new Bindable<bool>(true);
 
@@ -84,6 +86,8 @@ namespace osu.Game.Screens.Play
                         HealthDisplay = CreateHealthDisplay(),
                         Progress = CreateProgress(),
                         ModDisplay = CreateModsContainer(),
+                        LeftAccuracyBar = CreateAccuracyBar(false),
+                        RightAccuracyBar = CreateAccuracyBar(),
                     }
                 },
                 PlayerSettingsOverlay = CreatePlayerSettingsOverlay(),
@@ -256,6 +260,15 @@ namespace osu.Game.Screens.Play
             Margin = new MarginPadding { Top = 20, Right = 10 },
         };
 
+        protected virtual AccuracyBar CreateAccuracyBar(bool mirrored = true) => new AccuracyBar(mirrored)
+        {
+            Anchor = mirrored ? Anchor.CentreRight : Anchor.CentreLeft,
+            Origin = mirrored ? Anchor.CentreRight : Anchor.CentreLeft,
+            AutoSizeAxes = Axes.X,
+            Height = 300,
+            Margin = new MarginPadding { Horizontal = 20 }
+        };
+
         protected virtual PlayerSettingsOverlay CreatePlayerSettingsOverlay() => new PlayerSettingsOverlay();
 
         protected virtual void BindProcessor(ScoreProcessor processor)
@@ -264,6 +277,12 @@ namespace osu.Game.Screens.Play
             AccuracyCounter?.Current.BindTo(processor.Accuracy);
             ComboCounter?.Current.BindTo(processor.Combo);
             HealthDisplay?.Current.BindTo(processor.Health);
+
+            if (LeftAccuracyBar != null)
+                processor.NewJudgement += LeftAccuracyBar.OnNewJudgement;
+
+            if (RightAccuracyBar != null)
+                processor.NewJudgement += RightAccuracyBar.OnNewJudgement;
 
             if (HealthDisplay is StandardHealthDisplay shd)
                 processor.NewJudgement += shd.Flash;
