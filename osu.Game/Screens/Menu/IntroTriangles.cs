@@ -1,4 +1,4 @@
-﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
@@ -104,14 +104,14 @@ namespace osu.Game.Screens.Menu
                 LoadComponentAsync(new TrianglesIntroSequence(logo, background)
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Clock = new FramedClock(track),
+                    Clock = new FramedClock(menuMusic.Value ? track : null),
                     LoadMenu = LoadMenu
                 }, t =>
                 {
                     AddInternal(t);
                     welcome?.Play();
 
-                    // Only start the current track if it is the menu music. A beatmap's track is started when entering the Main Manu.
+                    // Only start the current track if it is the menu music. A beatmap's track is started when entering the Main Menu.
                     if (menuMusic.Value)
                         track.Start();
                 });
