@@ -35,8 +35,8 @@ namespace osu.Game.Screens.Play
         public readonly ModDisplay ModDisplay;
         public readonly HoldForMenuButton HoldToQuit;
         public readonly PlayerSettingsOverlay PlayerSettingsOverlay;
-        public readonly AccuracyBar LeftAccuracyBar;
-        public readonly AccuracyBar RightAccuracyBar;
+        public readonly HitErrorDisplay LeftHitErrorDisplay;
+        public readonly HitErrorDisplay RightHitErrorDisplay;
 
         public Bindable<bool> ShowHealthbar = new Bindable<bool>(true);
 
@@ -86,8 +86,8 @@ namespace osu.Game.Screens.Play
                         HealthDisplay = CreateHealthDisplay(),
                         Progress = CreateProgress(),
                         ModDisplay = CreateModsContainer(),
-                        LeftAccuracyBar = CreateAccuracyBar(false),
-                        RightAccuracyBar = CreateAccuracyBar(),
+                        LeftHitErrorDisplay = CreateAccuracyBar(false),
+                        RightHitErrorDisplay = CreateAccuracyBar(),
                     }
                 },
                 PlayerSettingsOverlay = CreatePlayerSettingsOverlay(),
@@ -260,7 +260,7 @@ namespace osu.Game.Screens.Play
             Margin = new MarginPadding { Top = 20, Right = 10 },
         };
 
-        protected virtual AccuracyBar CreateAccuracyBar(bool mirrored = true) => new AccuracyBar(mirrored)
+        protected virtual HitErrorDisplay CreateAccuracyBar(bool mirrored = true) => new HitErrorDisplay(mirrored)
         {
             Anchor = mirrored ? Anchor.CentreRight : Anchor.CentreLeft,
             Origin = mirrored ? Anchor.CentreRight : Anchor.CentreLeft,
@@ -276,16 +276,16 @@ namespace osu.Game.Screens.Play
             ComboCounter?.Current.BindTo(processor.Combo);
             HealthDisplay?.Current.BindTo(processor.Health);
 
-            if (LeftAccuracyBar != null)
+            if (LeftHitErrorDisplay != null)
             {
-                processor.NewJudgement += LeftAccuracyBar.OnNewJudgement;
-                LeftAccuracyBar.HitWindows = processor.CreateHitWindows();
+                processor.NewJudgement += LeftHitErrorDisplay.OnNewJudgement;
+                LeftHitErrorDisplay.HitWindows = processor.CreateHitWindows();
             }
 
-            if (RightAccuracyBar != null)
+            if (RightHitErrorDisplay != null)
             {
-                processor.NewJudgement += RightAccuracyBar.OnNewJudgement;
-                RightAccuracyBar.HitWindows = processor.CreateHitWindows();
+                processor.NewJudgement += RightHitErrorDisplay.OnNewJudgement;
+                RightHitErrorDisplay.HitWindows = processor.CreateHitWindows();
             }
 
             if (HealthDisplay is StandardHealthDisplay shd)
