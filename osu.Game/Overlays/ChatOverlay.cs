@@ -425,9 +425,10 @@ namespace osu.Game.Overlays
 
             if (text[0] == '/')
                 channelManager.PostCommand(text.Substring(1));
-            else
+            else {
+                text = channelManager.ProcessInlineCommands(text);
                 channelManager.PostMessage(text);
-
+            }
             textbox.Text = string.Empty;
         }
 
