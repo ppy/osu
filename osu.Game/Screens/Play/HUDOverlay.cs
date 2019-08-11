@@ -277,10 +277,16 @@ namespace osu.Game.Screens.Play
             HealthDisplay?.Current.BindTo(processor.Health);
 
             if (LeftAccuracyBar != null)
+            {
                 processor.NewJudgement += LeftAccuracyBar.OnNewJudgement;
+                LeftAccuracyBar.HitWindows = processor.CreateHitWindows();
+            }
 
             if (RightAccuracyBar != null)
+            {
                 processor.NewJudgement += RightAccuracyBar.OnNewJudgement;
+                RightAccuracyBar.HitWindows = processor.CreateHitWindows();
+            }
 
             if (HealthDisplay is StandardHealthDisplay shd)
                 processor.NewJudgement += shd.Flash;

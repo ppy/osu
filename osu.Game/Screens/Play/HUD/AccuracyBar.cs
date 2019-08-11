@@ -9,6 +9,10 @@ using osuTK.Graphics;
 using osuTK;
 using osu.Framework.Graphics.Sprites;
 using System.Collections.Generic;
+using osu.Game.Rulesets.Objects;
+using osu.Game.Beatmaps;
+using osu.Framework.Bindables;
+using osu.Framework.Allocation;
 
 namespace osu.Game.Screens.Play.HUD
 {
@@ -17,6 +21,11 @@ namespace osu.Game.Screens.Play.HUD
         private const int bar_width = 5;
         private const int bar_height = 250;
         private const int spacing = 3;
+
+        public HitWindows HitWindows { get; set; }
+
+        [Resolved]
+        private Bindable<WorkingBeatmap> beatmap { get; set; }
 
         private readonly bool mirrored;
         private readonly SpriteIcon arrow;
@@ -47,6 +56,12 @@ namespace osu.Game.Screens.Play.HUD
             };
         }
 
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+            HitWindows.SetDifficulty(beatmap.Value.BeatmapInfo.BaseDifficulty.OverallDifficulty);
+        }
+
         public void OnNewJudgement(JudgementResult judgement)
         {
             Container judgementLine;
@@ -56,7 +71,7 @@ namespace osu.Game.Screens.Play.HUD
             judgementLine.FadeOut(5000, Easing.OutQuint);
             judgementLine.Expire();
 
-            arrow.MoveToY(calculateArrowPosition(judgement) / bar_height, 500, Easing.OutQuint);
+            arrow.MoveToY(getRelativeJudgementPosition(calculateArrowPosition(judgement)), 500, Easing.OutQuint);
         }
 
         protected virtual Container CreateJudgementLine(JudgementResult judgement) => new CircularContainer
@@ -66,7 +81,7 @@ namespace osu.Game.Screens.Play.HUD
             Masking = true,
             Size = new Vector2(10, 2),
             RelativePositionAxes = Axes.Y,
-            Y = (float)judgement.TimeOffset / bar_height,
+            Y = getRelativeJudgementPosition(judgement.TimeOffset),
             X = mirrored ? spacing : -spacing,
             Child = new Box
             {
@@ -75,7 +90,9 @@ namespace osu.Game.Screens.Play.HUD
             }
         };
 
-        private float calculateArrowPosition(JudgementResult judgement)
+        private float getRelativeJudgementPosition(double value) => (float)(value / HitWindows.Miss);
+
+        private double calculateArrowPosition(JudgementResult judgement)
         {
             if (judgementOffsets.Count > 5)
                 judgementOffsets.RemoveAt(0);
@@ -87,7 +104,7 @@ namespace osu.Game.Screens.Play.HUD
             foreach (var offset in judgementOffsets)
                 offsets += offset;
 
-            return (float)offsets / judgementOffsets.Count;
+            return offsets / judgementOffsets.Count;
         }
     }
 }
