@@ -19,7 +19,7 @@ namespace osu.Game.Rulesets.UI.Scrolling
         [Resolved]
         private IScrollingInfo scrollingInfo { get; set; }
 
-        private Cached initialStateCache = new Cached();
+        private readonly Cached initialStateCache = new Cached();
 
         public ScrollingHitObjectContainer()
         {
