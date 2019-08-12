@@ -7,6 +7,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Input;
 using osu.Framework.Input.Events;
+using osu.Framework.MathUtils;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Osu.Objects;
@@ -48,7 +49,14 @@ namespace osu.Game.Rulesets.Osu.Mods
 
             protected override bool OnMouseMove(MouseMoveEvent e)
             {
-                FlashlightPosition = e.MousePosition;
+                const double follow_delay = 120;
+
+                var position = FlashlightPosition;
+                var destination = e.MousePosition;
+
+                FlashlightPosition = Interpolation.ValueAt(
+                    MathHelper.Clamp(Clock.ElapsedFrameTime, 0, follow_delay), position, destination, 0, follow_delay, Easing.Out);
+
                 return base.OnMouseMove(e);
             }
 

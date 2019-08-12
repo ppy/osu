@@ -1,9 +1,11 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
+
 namespace osu.Game.Beatmaps.ControlPoints
 {
-    public class EffectControlPoint : ControlPoint
+    public class EffectControlPoint : ControlPoint, IEquatable<EffectControlPoint>
     {
         /// <summary>
         /// Whether this control point enables Kiai mode.
@@ -15,10 +17,8 @@ namespace osu.Game.Beatmaps.ControlPoints
         /// </summary>
         public bool OmitFirstBarLine;
 
-        public override bool EquivalentTo(ControlPoint other)
-            => base.EquivalentTo(other)
-               && other is EffectControlPoint effect
-               && KiaiMode.Equals(effect.KiaiMode)
-               && OmitFirstBarLine.Equals(effect.OmitFirstBarLine);
+        public bool Equals(EffectControlPoint other)
+            => base.Equals(other)
+               && KiaiMode == other?.KiaiMode && OmitFirstBarLine == other.OmitFirstBarLine;
     }
 }

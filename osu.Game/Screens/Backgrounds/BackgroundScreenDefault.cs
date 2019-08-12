@@ -18,7 +18,7 @@ namespace osu.Game.Screens.Backgrounds
         private Background background;
 
         private int currentDisplay;
-        private const int background_count = 5;
+        private const int background_count = 7;
 
         private string backgroundName => $@"Menu/menu-background-{currentDisplay % background_count + 1}";
 

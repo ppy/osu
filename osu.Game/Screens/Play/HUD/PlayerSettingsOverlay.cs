@@ -46,7 +46,7 @@ namespace osu.Game.Screens.Play.HUD
                 }
             };
 
-            State = Visibility.Visible;
+            Show();
         }
 
         protected override void PopIn() => this.FadeIn(fade_duration);

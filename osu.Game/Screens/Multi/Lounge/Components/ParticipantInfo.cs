@@ -8,7 +8,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
-using osu.Game.Users;
+using osu.Game.Users.Drawables;
 using osuTK;
 
 namespace osu.Game.Screens.Multi.Lounge.Components
@@ -79,7 +79,7 @@ namespace osu.Game.Screens.Multi.Lounge.Components
                     hostText.AddText("hosted by ");
                     hostText.AddUserLink(host.NewValue, s => s.Font = s.Font.With(Typeface.Exo, weight: FontWeight.Bold, italics: true));
 
-                    flagContainer.Child = new DrawableFlag(host.NewValue.Country) { RelativeSizeAxes = Axes.Both };
+                    flagContainer.Child = new UpdateableFlag(host.NewValue.Country) { RelativeSizeAxes = Axes.Both };
                 }
             }, true);
 

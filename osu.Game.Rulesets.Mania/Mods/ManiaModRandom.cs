@@ -13,7 +13,7 @@ using osu.Game.Rulesets.Mods;
 
 namespace osu.Game.Rulesets.Mania.Mods
 {
-    public class ManiaModRandom : Mod, IApplicableToBeatmap<ManiaHitObject>
+    public class ManiaModRandom : Mod, IApplicableToBeatmap
     {
         public override string Name => "Random";
         public override string Acronym => "RD";
@@ -22,7 +22,7 @@ namespace osu.Game.Rulesets.Mania.Mods
         public override string Description => @"Shuffle around the keys!";
         public override double ScoreMultiplier => 1;
 
-        public void ApplyToBeatmap(Beatmap<ManiaHitObject> beatmap)
+        public void ApplyToBeatmap(IBeatmap beatmap)
         {
             var availableColumns = ((ManiaBeatmap)beatmap).TotalColumns;
             var shuffledColumns = Enumerable.Range(0, availableColumns).OrderBy(item => RNG.Next()).ToList();

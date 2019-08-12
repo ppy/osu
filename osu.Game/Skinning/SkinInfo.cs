@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using osu.Game.Configuration;
 using osu.Game.Database;
 
 namespace osu.Game.Skinning
@@ -18,6 +19,8 @@ namespace osu.Game.Skinning
         public string Creator { get; set; }
 
         public List<SkinFileInfo> Files { get; set; }
+
+        public List<DatabasedSetting> Settings { get; set; }
 
         public bool DeletePending { get; set; }
 

@@ -18,6 +18,8 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
 {
     public class OsuCursor : SkinReloadableDrawable
     {
+        private const float size = 28;
+
         private bool cursorExpand;
 
         private Bindable<double> cursorScale;
@@ -30,7 +32,8 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
         public OsuCursor()
         {
             Origin = Anchor.Centre;
-            Size = new Vector2(28);
+
+            Size = new Vector2(size);
         }
 
         protected override void SkinChanged(ISkinSource skin, bool allowFallback)
@@ -46,66 +49,10 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
                 RelativeSizeAxes = Axes.Both,
                 Origin = Anchor.Centre,
                 Anchor = Anchor.Centre,
-                Child = scaleTarget = new SkinnableDrawable("cursor", _ => new CircularContainer
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    Masking = true,
-                    BorderThickness = Size.X / 6,
-                    BorderColour = Color4.White,
-                    EdgeEffect = new EdgeEffectParameters
-                    {
-                        Type = EdgeEffectType.Shadow,
-                        Colour = Color4.Pink.Opacity(0.5f),
-                        Radius = 5,
-                    },
-                    Children = new Drawable[]
-                    {
-                        new Box
-                        {
-                            RelativeSizeAxes = Axes.Both,
-                            Alpha = 0,
-                            AlwaysPresent = true,
-                        },
-                        new CircularContainer
-                        {
-                            Origin = Anchor.Centre,
-                            Anchor = Anchor.Centre,
-                            RelativeSizeAxes = Axes.Both,
-                            Masking = true,
-                            BorderThickness = Size.X / 3,
-                            BorderColour = Color4.White.Opacity(0.5f),
-                            Children = new Drawable[]
-                            {
-                                new Box
-                                {
-                                    RelativeSizeAxes = Axes.Both,
-                                    Alpha = 0,
-                                    AlwaysPresent = true,
-                                },
-                            },
-                        },
-                        new CircularContainer
-                        {
-                            Origin = Anchor.Centre,
-                            Anchor = Anchor.Centre,
-                            RelativeSizeAxes = Axes.Both,
-                            Scale = new Vector2(0.1f),
-                            Masking = true,
-                            Children = new Drawable[]
-                            {
-                                new Box
-                                {
-                                    RelativeSizeAxes = Axes.Both,
-                                    Colour = Color4.White,
-                                },
-                            },
-                        },
-                    }
-                }, restrictSize: false)
+                Child = scaleTarget = new SkinnableDrawable("Play/osu/cursor", _ => new DefaultCursor(), confineMode: ConfineMode.NoScaling)
                 {
                     Origin = Anchor.Centre,
                     Anchor = Anchor.Centre,
-                    RelativeSizeAxes = Axes.Both,
                 }
             };
 
@@ -145,5 +92,76 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
         }
 
         public void Contract() => expandTarget.ScaleTo(released_scale, 100, Easing.OutQuad);
+
+        private class DefaultCursor : CompositeDrawable
+        {
+            public DefaultCursor()
+            {
+                RelativeSizeAxes = Axes.Both;
+
+                Anchor = Anchor.Centre;
+                Origin = Anchor.Centre;
+
+                InternalChildren = new Drawable[]
+                {
+                    new CircularContainer
+                    {
+                        RelativeSizeAxes = Axes.Both,
+                        Masking = true,
+                        BorderThickness = size / 6,
+                        BorderColour = Color4.White,
+                        EdgeEffect = new EdgeEffectParameters
+                        {
+                            Type = EdgeEffectType.Shadow,
+                            Colour = Color4.Pink.Opacity(0.5f),
+                            Radius = 5,
+                        },
+                        Children = new Drawable[]
+                        {
+                            new Box
+                            {
+                                RelativeSizeAxes = Axes.Both,
+                                Alpha = 0,
+                                AlwaysPresent = true,
+                            },
+                            new CircularContainer
+                            {
+                                Origin = Anchor.Centre,
+                                Anchor = Anchor.Centre,
+                                RelativeSizeAxes = Axes.Both,
+                                Masking = true,
+                                BorderThickness = size / 3,
+                                BorderColour = Color4.White.Opacity(0.5f),
+                                Children = new Drawable[]
+                                {
+                                    new Box
+                                    {
+                                        RelativeSizeAxes = Axes.Both,
+                                        Alpha = 0,
+                                        AlwaysPresent = true,
+                                    },
+                                },
+                            },
+                            new CircularContainer
+                            {
+                                Origin = Anchor.Centre,
+                                Anchor = Anchor.Centre,
+                                RelativeSizeAxes = Axes.Both,
+                                Scale = new Vector2(0.1f),
+                                Masking = true,
+                                Children = new Drawable[]
+                                {
+                                    new Box
+                                    {
+                                        RelativeSizeAxes = Axes.Both,
+                                        Colour = Color4.White,
+                                    },
+                                },
+                            },
+                        }
+                    }
+                };
+            }
+        }
     }
 }

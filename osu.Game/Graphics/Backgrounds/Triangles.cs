@@ -8,7 +8,6 @@ using osuTK.Graphics;
 using System;
 using osu.Framework.Graphics.Shaders;
 using osu.Framework.Graphics.Textures;
-using osuTK.Graphics.ES30;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.Allocation;
@@ -137,11 +136,13 @@ namespace osu.Game.Graphics.Backgrounds
             }
         }
 
+        protected int AimCount;
+
         private void addTriangles(bool randomY)
         {
-            int aimTriangleCount = (int)(DrawWidth * DrawHeight * 0.002f / (triangleScale * triangleScale) * SpawnRatio);
+            AimCount = (int)(DrawWidth * DrawHeight * 0.002f / (triangleScale * triangleScale) * SpawnRatio);
 
-            for (int i = 0; i < aimTriangleCount - parts.Count; i++)
+            for (int i = 0; i < AimCount - parts.Count; i++)
                 parts.Add(createTriangle(randomY));
         }
 
@@ -190,7 +191,7 @@ namespace osu.Game.Graphics.Backgrounds
             private readonly List<TriangleParticle> parts = new List<TriangleParticle>();
             private Vector2 size;
 
-            private readonly LinearBatch<TexturedVertex2D> vertexBatch = new LinearBatch<TexturedVertex2D>(100 * 3, 10, PrimitiveType.Triangles);
+            private QuadBatch<TexturedVertex2D> vertexBatch;
 
             public TrianglesDrawNode(Triangles source)
                 : base(source)
@@ -213,8 +214,13 @@ namespace osu.Game.Graphics.Backgrounds
             {
                 base.Draw(vertexAction);
 
+                if (Source.AimCount > 0 && (vertexBatch == null || vertexBatch.Size != Source.AimCount))
+                {
+                    vertexBatch?.Dispose();
+                    vertexBatch = new QuadBatch<TexturedVertex2D>(Source.AimCount, 1);
+                }
+
                 shader.Bind();
-                texture.TextureGL.Bind();
 
                 Vector2 localInflationAmount = edge_smoothness * DrawInfo.MatrixInverse.ExtractScale().Xy;
 
@@ -231,7 +237,8 @@ namespace osu.Game.Graphics.Backgrounds
                     ColourInfo colourInfo = DrawColourInfo.Colour;
                     colourInfo.ApplyChild(particle.Colour);
 
-                    texture.DrawTriangle(
+                    DrawTriangle(
+                        texture,
                         triangle,
                         colourInfo,
                         null,
@@ -246,7 +253,7 @@ namespace osu.Game.Graphics.Backgrounds
             {
                 base.Dispose(isDisposing);
 
-                vertexBatch.Dispose();
+                vertexBatch?.Dispose();
             }
         }
 

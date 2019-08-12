@@ -65,7 +65,7 @@ namespace osu.Game.Tests.Chat
         }
 
         [Test]
-        public void TestCaseInsensitiveLinks()
+        public void TestInsensitiveLinks()
         {
             Message result = MessageFormatter.FormatMessage(new Message { Content = "look: http://puu.sh/7Ggh8xcC6/asf0asd9876.NEF" });
 
