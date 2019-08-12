@@ -15,7 +15,7 @@ namespace osu.Game.Graphics.UserInterface
     {
         public const float ICON_WIDTH = ICON_SIZE + icon_spacing;
 
-        protected const float ICON_SIZE = 25;
+        public const float ICON_SIZE = 25;
 
         private SpriteIcon iconSprite;
         private readonly OsuSpriteText titleText, pageText;
