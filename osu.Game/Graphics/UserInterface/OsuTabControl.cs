@@ -31,6 +31,8 @@ namespace osu.Game.Graphics.UserInterface
         protected virtual float StripWidth() => TabContainer.Children.Sum(c => c.IsPresent ? c.DrawWidth + TabContainer.Spacing.X : 0) - TabContainer.Spacing.X;
         protected virtual float StripHeight() => 1;
 
+        protected virtual bool AddAllItemsIfEnum => true;
+
         private static bool isEnumType => typeof(T).IsEnum;
 
         public OsuTabControl()
@@ -45,7 +47,7 @@ namespace osu.Game.Graphics.UserInterface
                 Colour = Color4.White.Opacity(0),
             });
 
-            if (isEnumType)
+            if (isEnumType && AddAllItemsIfEnum)
                 foreach (var val in (T[])Enum.GetValues(typeof(T)))
                     AddItem(val);
         }
