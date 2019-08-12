@@ -75,7 +75,7 @@ namespace osu.Game.Screens.Play
             return base.Invalidate(invalidation, source, shallPropagate);
         }
 
-        private Cached layout = new Cached();
+        private readonly Cached layout = new Cached();
         private ScheduledDelegate scheduledCreate;
 
         protected override void Update()

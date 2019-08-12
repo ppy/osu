@@ -256,6 +256,9 @@ namespace osu.Game.Overlays
                 loadedChannels.Add(loaded);
                 LoadComponentAsync(loaded, l =>
                 {
+                    if (currentChannel.Value != e.NewValue)
+                        return;
+
                     loading.Hide();
 
                     currentChannelContainer.Clear(false);
@@ -381,7 +384,18 @@ namespace osu.Game.Overlays
             foreach (Channel channel in channels)
             {
                 ChannelTabControl.RemoveChannel(channel);
-                loadedChannels.Remove(loadedChannels.Find(c => c.Channel == channel));
+
+                var loaded = loadedChannels.Find(c => c.Channel == channel);
+
+                if (loaded != null)
+                {
+                    loadedChannels.Remove(loaded);
+
+                    // Because the container is only cleared in the async load callback of a new channel, it is forcefully cleared
+                    // to ensure that the previous channel doesn't get updated after it's disposed
+                    currentChannelContainer.Remove(loaded);
+                    loaded.Dispose();
+                }
             }
         }
 
