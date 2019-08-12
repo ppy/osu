@@ -6,7 +6,6 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Configuration;
-using osuTK.Graphics;
 
 namespace osu.Game.Graphics.Containers
 {
@@ -35,6 +34,8 @@ namespace osu.Game.Graphics.Containers
         protected Bindable<double> UserDimLevel { get; private set; }
 
         protected Bindable<bool> ShowStoryboard { get; private set; }
+
+        protected double DimLevel => EnableUserDim.Value ? UserDimLevel.Value : 0;
 
         protected override Container<Drawable> Content => dimContent;
 
@@ -78,8 +79,8 @@ namespace osu.Game.Graphics.Containers
         {
             ContentDisplayed = ShowDimContent;
 
-            dimContent.FadeTo((ContentDisplayed) ? 1 : 0, BACKGROUND_FADE_DURATION, Easing.OutQuint);
-            dimContent.FadeColour(EnableUserDim.Value ? OsuColour.Gray(1 - (float)UserDimLevel.Value) : Color4.White, BACKGROUND_FADE_DURATION, Easing.OutQuint);
+            dimContent.FadeTo(ContentDisplayed ? 1 : 0, BACKGROUND_FADE_DURATION, Easing.OutQuint);
+            dimContent.FadeColour(OsuColour.Gray(1 - (float)DimLevel), BACKGROUND_FADE_DURATION, Easing.OutQuint);
         }
     }
 }
