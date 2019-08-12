@@ -106,7 +106,6 @@ namespace osu.Game.Tests.Visual.UserInterface
             public LengthyToast()
                 : base("Toast with a very very very long text", "A very very very very very very long text also", "A very very very very very long shortcut")
             {
-
             }
         }
 
