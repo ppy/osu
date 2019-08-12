@@ -119,14 +119,14 @@ namespace osu.Game.Tests.Visual.Background
         {
             performFullSetup();
             createFakeStoryboard();
-            AddStep("Storyboard Enabled", () =>
+            AddStep("Enable Storyboard", () =>
             {
                 player.ReplacesBackground.Value = true;
                 player.StoryboardEnabled.Value = true;
             });
             waitForDim();
             AddAssert("Background is invisible, storyboard is visible", () => songSelect.IsBackgroundInvisible() && player.IsStoryboardVisible);
-            AddStep("Storyboard Disabled", () =>
+            AddStep("Disable Storyboard", () =>
             {
                 player.ReplacesBackground.Value = false;
                 player.StoryboardEnabled.Value = false;
@@ -149,7 +149,7 @@ namespace osu.Game.Tests.Visual.Background
         }
 
         /// <summary>
-        /// Check if the <see cref="UserDimContainer"/> is properly accepting user-defined visual changes in background at all.
+        /// Ensure <see cref="UserDimContainer"/> is properly accepting user-defined visual changes for a background.
         /// </summary>
         [Test]
         public void DisableUserDimBackgroundTest()
@@ -157,32 +157,32 @@ namespace osu.Game.Tests.Visual.Background
             performFullSetup();
             waitForDim();
             AddAssert("Screen is dimmed and blur applied", () => songSelect.IsBackgroundDimmed() && songSelect.IsUserBlurApplied());
-            AddStep("EnableUserDim disabled", () => songSelect.DimEnabled.Value = false);
+            AddStep("Enable user dim", () => songSelect.DimEnabled.Value = false);
             waitForDim();
             AddAssert("Screen is undimmed and user blur removed", () => songSelect.IsBackgroundUndimmed() && songSelect.IsUserBlurDisabled());
-            AddStep("EnableUserDim enabled", () => songSelect.DimEnabled.Value = true);
+            AddStep("Disable user dim", () => songSelect.DimEnabled.Value = true);
             waitForDim();
             AddAssert("Screen is dimmed and blur applied", () => songSelect.IsBackgroundDimmed() && songSelect.IsUserBlurApplied());
         }
 
         /// <summary>
-        /// Check if the <see cref="UserDimContainer"/> is properly accepting user-defined visual changes in storyboard at all.
+        /// Ensure <see cref="UserDimContainer"/> is properly accepting user-defined visual changes for a storyboard.
         /// </summary>
         [Test]
         public void DisableUserDimStoryboardTest()
         {
             performFullSetup();
             createFakeStoryboard();
-            AddStep("Storyboard Enabled", () =>
+            AddStep("Enable Storyboard", () =>
             {
                 player.ReplacesBackground.Value = true;
                 player.StoryboardEnabled.Value = true;
             });
-            AddStep("EnableUserDim enabled", () => player.DimmableStoryboard.EnableUserDim.Value = true);
+            AddStep("Enable user dim", () => player.DimmableStoryboard.EnableUserDim.Value = true);
             AddStep("Set dim level to 1", () => songSelect.DimLevel.Value = 1f);
             waitForDim();
             AddAssert("Storyboard is invisible", () => !player.IsStoryboardVisible);
-            AddStep("EnableUserDim disabled", () => player.DimmableStoryboard.EnableUserDim.Value = false);
+            AddStep("Disable user dim", () => player.DimmableStoryboard.EnableUserDim.Value = false);
             waitForDim();
             AddAssert("Storyboard is visible", () => player.IsStoryboardVisible);
         }
