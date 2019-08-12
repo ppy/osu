@@ -40,15 +40,15 @@ namespace osu.Game.Screens.Multi.Match.Components
                     panel = null;
                 }
 
-                var onlineId = item.NewValue?.Beatmap.OnlineBeatmapID ?? 0;
+                var onlineId = item.NewValue?.Beatmap.OnlineBeatmapID;
 
-                if (onlineId != 0)
+                if (onlineId.HasValue)
                 {
-                    request = new GetBeatmapSetRequest(onlineId, BeatmapSetLookupType.BeatmapId);
+                    request = new GetBeatmapSetRequest(onlineId.Value, BeatmapSetLookupType.BeatmapId);
                     request.Success += beatmap =>
                     {
                         panel = new DirectGridPanel(beatmap.ToBeatmapSet(rulesets));
-                        LoadComponentAsync(panel, p => { AddInternal(panel); });
+                        LoadComponentAsync(panel, p => { AddInternal(p); });
                     };
                     api.Queue(request);
                 }
