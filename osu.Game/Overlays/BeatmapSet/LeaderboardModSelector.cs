@@ -92,11 +92,16 @@ namespace osu.Game.Overlays.BeatmapSet
             {
                 Scale = new Vector2(mod_scale);
                 Add(new HoverClickSounds());
+            }
+
+            protected override void LoadComplete()
+            {
+                base.LoadComplete();
 
                 Selected.BindValueChanged(selected =>
                 {
                     updateState();
-                    OnSelectionChanged?.Invoke(mod, selected.NewValue);
+                    OnSelectionChanged?.Invoke(Mod, selected.NewValue);
                 }, true);
             }
 
@@ -120,7 +125,12 @@ namespace osu.Game.Overlays.BeatmapSet
 
             private void updateState()
             {
-                this.FadeColour(IsHovered || Selected.Value ? Color4.White : Color4.Gray, duration, Easing.OutQuint);
+                Highlighted.Value = (IsHovered || Selected.Value) ? true : false;
+            }
+
+            protected override void OnHighlightedChange(ValueChangedEvent<bool> highlighted)
+            {
+                this.FadeColour(highlighted.NewValue ? Color4.White : Color4.Gray, duration, Easing.OutQuint);
             }
         }
 
