@@ -46,7 +46,7 @@ namespace osu.Game.Screens.Multi.Match
         private BeatmapManager beatmapManager { get; set; }
 
         [Resolved]
-        private PreviewTrackManager trackManager { get; set; }
+        private PreviewTrackManager previewTrackManager { get; set; }
 
         [Resolved(CanBeNull = true)]
         private OsuGame game { get; set; }
@@ -188,7 +188,7 @@ namespace osu.Game.Screens.Multi.Match
 
             Mods.Value = Array.Empty<Mod>();
 
-            trackManager.StopAnyPlaying(this);
+            previewTrackManager.StopAnyPlaying(this);
 
             return base.OnExiting(next);
         }
@@ -207,7 +207,7 @@ namespace osu.Game.Screens.Multi.Match
             if (e.NewValue?.Ruleset != null)
                 Ruleset.Value = e.NewValue.Ruleset;
 
-            trackManager.StopAnyPlaying(this);
+            previewTrackManager.StopAnyPlaying(this);
         }
 
         /// <summary>
@@ -233,7 +233,7 @@ namespace osu.Game.Screens.Multi.Match
 
         private void onStart()
         {
-            trackManager.StopAnyPlaying(this);
+            previewTrackManager.StopAnyPlaying(this);
 
             switch (type.Value)
             {
