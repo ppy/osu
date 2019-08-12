@@ -62,6 +62,14 @@ namespace osu.Game.Rulesets.Catch.MathUtils
         public int Next(int lowerBound, int upperBound) => (int)(lowerBound + NextDouble() * (upperBound - lowerBound));
 
         /// <summary>
+        /// Generates a random integer value within the range [<paramref name="lowerBound"/>, <paramref name="upperBound"/>).
+        /// </summary>
+        /// <param name="lowerBound">The lower bound of the range.</param>
+        /// <param name="upperBound">The upper bound of the range.</param>
+        /// <returns>The random value.</returns>
+        public int Next(double lowerBound, double upperBound) => (int)(lowerBound + NextDouble() * (upperBound - lowerBound));
+
+        /// <summary>
         /// Generates a random double value within the range [0, 1).
         /// </summary>
         /// <returns>The random value.</returns>
