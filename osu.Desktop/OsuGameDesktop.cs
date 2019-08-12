@@ -1,4 +1,4 @@
-﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
@@ -7,7 +7,6 @@ using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 using osu.Desktop.Overlays;
-using osu.Framework.Graphics.Containers;
 using osu.Framework.Platform;
 using osu.Game;
 using osuTK.Input;
@@ -39,9 +38,9 @@ namespace osu.Desktop
                 if (Host is DesktopGameHost desktopHost)
                     return new StableStorage(desktopHost);
             }
-            catch (Exception e)
+            catch (Exception)
             {
-                Logger.Error(e, "Error while searching for stable install");
+                Logger.Log("Could not find a stable install", LoggingTarget.Runtime, LogLevel.Important);
             }
 
             return null;
@@ -53,11 +52,7 @@ namespace osu.Desktop
 
             if (!noVersionOverlay)
             {
-                LoadComponentAsync(versionManager = new VersionManager { Depth = int.MinValue }, v =>
-                {
-                    Add(v);
-                    v.State = Visibility.Visible;
-                });
+                LoadComponentAsync(versionManager = new VersionManager { Depth = int.MinValue }, Add);
 
                 if (RuntimeInfo.OS == RuntimeInfo.Platform.Windows)
                     Add(new SquirrelUpdateManager());
@@ -72,15 +67,13 @@ namespace osu.Desktop
 
             switch (newScreen)
             {
-                case Intro _:
+                case IntroScreen _:
                 case MainMenu _:
-                    if (versionManager != null)
-                        versionManager.State = Visibility.Visible;
+                    versionManager?.Show();
                     break;
 
                 default:
-                    if (versionManager != null)
-                        versionManager.State = Visibility.Hidden;
+                    versionManager?.Hide();
                     break;
             }
         }

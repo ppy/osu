@@ -30,6 +30,7 @@ namespace osu.Game.Graphics.UserInterface
             Height = 40;
             TextContainer.Height = 0.5f;
             CornerRadius = 5;
+            LengthLimit = 1000;
 
             Current.DisabledChanged += disabled => { Alpha = disabled ? 0.3f : 1; };
         }

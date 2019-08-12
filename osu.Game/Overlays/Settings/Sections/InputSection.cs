@@ -12,7 +12,7 @@ namespace osu.Game.Overlays.Settings.Sections
         public override string Header => "Input";
         public override IconUsage Icon => FontAwesome.Regular.Keyboard;
 
-        public InputSection(KeyBindingOverlay keyConfig)
+        public InputSection(KeyBindingPanel keyConfig)
         {
             Children = new Drawable[]
             {

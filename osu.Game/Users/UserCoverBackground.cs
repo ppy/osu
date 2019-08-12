@@ -21,31 +21,45 @@ namespace osu.Game.Users
             set => Model = value;
         }
 
-        [Resolved]
-        private LargeTextureStore textures { get; set; }
+        protected override Drawable CreateDrawable(User user) => new Cover(user);
 
-        protected override Drawable CreateDrawable(User user)
+        private class Cover : CompositeDrawable
         {
-            if (user == null)
+            private readonly User user;
+
+            public Cover(User user)
             {
-                return new Box
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    Colour = ColourInfo.GradientVertical(Color4.Black.Opacity(0.1f), Color4.Black.Opacity(0.75f))
-                };
+                this.user = user;
+
+                RelativeSizeAxes = Axes.Both;
             }
-            else
+
+            [BackgroundDependencyLoader]
+            private void load(LargeTextureStore textures)
             {
-                var sprite = new Sprite
+                if (user == null)
                 {
-                    RelativeSizeAxes = Axes.Both,
-                    Texture = textures.Get(user.CoverUrl),
-                    FillMode = FillMode.Fill,
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre
-                };
-                sprite.OnLoadComplete += d => d.FadeInFromZero(400);
-                return sprite;
+                    InternalChild = new Box
+                    {
+                        RelativeSizeAxes = Axes.Both,
+                        Colour = ColourInfo.GradientVertical(Color4.Black.Opacity(0.1f), Color4.Black.Opacity(0.75f))
+                    };
+                }
+                else
+                    InternalChild = new Sprite
+                    {
+                        RelativeSizeAxes = Axes.Both,
+                        Texture = textures.Get(user.CoverUrl),
+                        FillMode = FillMode.Fill,
+                        Anchor = Anchor.Centre,
+                        Origin = Anchor.Centre
+                    };
+            }
+
+            protected override void LoadComplete()
+            {
+                base.LoadComplete();
+                this.FadeInFromZero(400);
             }
         }
     }

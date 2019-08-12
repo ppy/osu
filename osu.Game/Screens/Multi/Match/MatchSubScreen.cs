@@ -195,6 +195,7 @@ namespace osu.Game.Screens.Multi.Match
 
             Beatmap.Value = beatmapManager.GetWorkingBeatmap(localBeatmap);
             Mods.Value = e.NewValue?.RequiredMods?.ToArray() ?? Array.Empty<Mod>();
+
             if (e.NewValue?.Ruleset != null)
                 Ruleset.Value = e.NewValue.Ruleset;
         }
@@ -202,7 +203,7 @@ namespace osu.Game.Screens.Multi.Match
         /// <summary>
         /// Handle the case where a beatmap is imported (and can be used by this match).
         /// </summary>
-        private void beatmapAdded(BeatmapSetInfo model, bool existing) => Schedule(() =>
+        private void beatmapAdded(BeatmapSetInfo model) => Schedule(() =>
         {
             if (Beatmap.Value != beatmapManager.DefaultBeatmap)
                 return;

@@ -24,13 +24,11 @@ namespace osu.Game.Overlays.Profile.Sections.Historical
 
         protected override void ShowMore()
         {
-            base.ShowMore();
-
-            request = new GetUserMostPlayedBeatmapsRequest(User.Value.Id, VisiblePages++ * ItemsPerPage);
+            request = new GetUserMostPlayedBeatmapsRequest(User.Value.Id, VisiblePages++, ItemsPerPage);
             request.Success += beatmaps => Schedule(() =>
             {
-                ShowMoreButton.FadeTo(beatmaps.Count == ItemsPerPage ? 1 : 0);
-                ShowMoreLoading.Hide();
+                MoreButton.FadeTo(beatmaps.Count == ItemsPerPage ? 1 : 0);
+                MoreButton.IsLoading = false;
 
                 if (!beatmaps.Any() && VisiblePages == 1)
                 {
@@ -42,7 +40,7 @@ namespace osu.Game.Overlays.Profile.Sections.Historical
 
                 foreach (var beatmap in beatmaps)
                 {
-                    ItemsContainer.Add(new DrawableMostPlayedRow(beatmap.GetBeatmapInfo(Rulesets), beatmap.PlayCount));
+                    ItemsContainer.Add(new DrawableMostPlayedBeatmap(beatmap.GetBeatmapInfo(Rulesets), beatmap.PlayCount));
                 }
             });
 

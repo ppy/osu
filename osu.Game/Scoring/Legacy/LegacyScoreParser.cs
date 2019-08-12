@@ -80,6 +80,9 @@ namespace osu.Game.Scoring.Legacy
                 else if (version >= 20121008)
                     scoreInfo.OnlineScoreID = sr.ReadInt32();
 
+                if (scoreInfo.OnlineScoreID <= 0)
+                    scoreInfo.OnlineScoreID = null;
+
                 if (compressedReplay?.Length > 0)
                 {
                     using (var replayInStream = new MemoryStream(compressedReplay))
@@ -136,9 +139,9 @@ namespace osu.Game.Scoring.Legacy
                         score.Rank = score.Mods.Any(m => m is ModHidden || m is ModFlashlight) ? ScoreRank.XH : ScoreRank.X;
                     else if (ratio300 > 0.9 && ratio50 <= 0.01 && countMiss == 0)
                         score.Rank = score.Mods.Any(m => m is ModHidden || m is ModFlashlight) ? ScoreRank.SH : ScoreRank.S;
-                    else if (ratio300 > 0.8 && countMiss == 0 || ratio300 > 0.9)
+                    else if ((ratio300 > 0.8 && countMiss == 0) || ratio300 > 0.9)
                         score.Rank = ScoreRank.A;
-                    else if (ratio300 > 0.7 && countMiss == 0 || ratio300 > 0.8)
+                    else if ((ratio300 > 0.7 && countMiss == 0) || ratio300 > 0.8)
                         score.Rank = ScoreRank.B;
                     else if (ratio300 > 0.6)
                         score.Rank = ScoreRank.C;
@@ -159,9 +162,9 @@ namespace osu.Game.Scoring.Legacy
                         score.Rank = score.Mods.Any(m => m is ModHidden || m is ModFlashlight) ? ScoreRank.XH : ScoreRank.X;
                     else if (ratio300 > 0.9 && ratio50 <= 0.01 && countMiss == 0)
                         score.Rank = score.Mods.Any(m => m is ModHidden || m is ModFlashlight) ? ScoreRank.SH : ScoreRank.S;
-                    else if (ratio300 > 0.8 && countMiss == 0 || ratio300 > 0.9)
+                    else if ((ratio300 > 0.8 && countMiss == 0) || ratio300 > 0.9)
                         score.Rank = ScoreRank.A;
-                    else if (ratio300 > 0.7 && countMiss == 0 || ratio300 > 0.8)
+                    else if ((ratio300 > 0.7 && countMiss == 0) || ratio300 > 0.8)
                         score.Rank = ScoreRank.B;
                     else if (ratio300 > 0.6)
                         score.Rank = ScoreRank.C;
