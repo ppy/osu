@@ -25,6 +25,9 @@ namespace osu.Game.Graphics.Containers
         /// <summary>
         /// The dim offset to be applied to the container in addition to user-specified dim.
         /// </summary>
+        /// <remarks>
+        /// Used in the player component where a temporary offset must be applied in breaks to lighten the content.
+        /// </remarks>
         public readonly Bindable<float> DimOffset = new Bindable<float>();
 
         /// <summary>
