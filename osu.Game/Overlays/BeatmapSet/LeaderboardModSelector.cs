@@ -84,7 +84,11 @@ namespace osu.Game.Overlays.BeatmapSet
         protected override bool OnHover(HoverEvent e)
         {
             if (!SelectedMods.Value.Any())
-                dehighlightAll();
+                modsContainer.ForEach(button =>
+                {
+                    if (!button.IsHovered)
+                        button.Highlighted.Value = false;
+                });
 
             return base.OnHover(e);
         }
@@ -98,15 +102,6 @@ namespace osu.Game.Overlays.BeatmapSet
         }
 
         public void DeselectAll() => modsContainer.ForEach(mod => mod.Selected.Value = false);
-
-        private void dehighlightAll()
-        {
-            modsContainer.ForEach(button =>
-            {
-                if (!button.IsHovered)
-                    button.Highlighted.Value = false;
-            });
-        }
 
         private class ModButton : ModIcon
         {
