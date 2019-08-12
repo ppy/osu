@@ -19,7 +19,7 @@ using osu.Framework.Graphics.Sprites;
 
 namespace osu.Game.Overlays.BeatmapSet
 {
-    public class LeaderboardModSelector : Container
+    public class LeaderboardModSelector : CompositeDrawable
     {
         public readonly Bindable<IEnumerable<Mod>> SelectedMods = new Bindable<IEnumerable<Mod>>();
         public readonly Bindable<RulesetInfo> Ruleset = new Bindable<RulesetInfo>();
@@ -30,7 +30,7 @@ namespace osu.Game.Overlays.BeatmapSet
         {
             AutoSizeAxes = Axes.Y;
             RelativeSizeAxes = Axes.X;
-            Child = modsContainer = new FillFlowContainer<ModButton>
+            InternalChild = modsContainer = new FillFlowContainer<ModButton>
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
