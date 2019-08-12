@@ -57,12 +57,13 @@ namespace osu.Game.Overlays.BeatmapSet
 
             modsContainer.Add(new ModButton(new NoMod()));
 
-            foreach (var mod in ruleset.NewValue.CreateInstance().GetAllMods())
+            ruleset.NewValue.CreateInstance().GetAllMods().ForEach(mod =>
+            {
                 if (mod.Ranked)
                     modsContainer.Add(new ModButton(mod));
+            });
 
-            foreach (var mod in modsContainer)
-                mod.OnSelectionChanged += selectionChanged;
+            modsContainer.ForEach(button => button.OnSelectionChanged += selectionChanged);
         }
 
         private void selectionChanged(Mod mod, bool selected)
@@ -74,10 +75,38 @@ namespace osu.Game.Overlays.BeatmapSet
             else
                 mods.Remove(mod);
 
+            if (!mods.Any() && !IsHovered)
+                modsContainer.ForEach(button => button.Highlighted.Value = true);
+
             SelectedMods.Value = mods;
         }
 
+        protected override bool OnHover(HoverEvent e)
+        {
+            if (!SelectedMods.Value.Any())
+                dehighlightAll();
+
+            return base.OnHover(e);
+        }
+
+        protected override void OnHoverLost(HoverLostEvent e)
+        {
+            base.OnHoverLost(e);
+
+            if (!SelectedMods.Value.Any())
+                modsContainer.ForEach(mod => mod.Highlighted.Value = true);
+        }
+
         public void DeselectAll() => modsContainer.ForEach(mod => mod.Selected.Value = false);
+
+        private void dehighlightAll()
+        {
+            modsContainer.ForEach(button =>
+            {
+                if (!button.IsHovered)
+                    button.Highlighted.Value = false;
+            });
+        }
 
         private class ModButton : ModIcon
         {
@@ -98,11 +127,13 @@ namespace osu.Game.Overlays.BeatmapSet
             {
                 base.LoadComplete();
 
+                Highlighted.Value = true;
+
                 Selected.BindValueChanged(selected =>
                 {
                     updateState();
                     OnSelectionChanged?.Invoke(Mod, selected.NewValue);
-                }, true);
+                });
             }
 
             protected override bool OnClick(ClickEvent e)
