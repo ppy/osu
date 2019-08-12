@@ -29,19 +29,21 @@ namespace osu.Game.Rulesets.Osu.Mods
         private OsuInputManager inputManager;
 
         private List<OsuReplayFrame> replayFrames;
-        private int frameIndex;
+
+        private int currentFrame;
 
         public void Update(Playfield playfield)
         {
-            // If we are on the last replay frame, no need to do anything
-            if (frameIndex == replayFrames.Count - 1) return;
+            if (currentFrame == replayFrames.Count - 1) return;
 
-            // Check if we are closer to the next replay frame then the current one
-            if (Math.Abs(replayFrames[frameIndex].Time - playfield.Time.Current) >= Math.Abs(replayFrames[frameIndex + 1].Time - playfield.Time.Current))
+            double time = playfield.Time.Current;
+
+            // Very naive implementation of autopilot based on proximity to replay frames.
+            // TODO: this needs to be based on user interactions to better match stable (pausing until judgement is registered).
+            if (Math.Abs(replayFrames[currentFrame + 1].Time - time) <= Math.Abs(replayFrames[currentFrame].Time - time))
             {
-                // If we are, move to the next frame, and update the mouse position
-                frameIndex++;
-                new MousePositionAbsoluteInput { Position = playfield.ToScreenSpace(replayFrames[frameIndex].Position) }.Apply(inputManager.CurrentState, inputManager);
+                currentFrame++;
+                new MousePositionAbsoluteInput { Position = playfield.ToScreenSpace(replayFrames[currentFrame].Position) }.Apply(inputManager.CurrentState, inputManager);
             }
 
             // TODO: Implement the functionality to automatically spin spinners
