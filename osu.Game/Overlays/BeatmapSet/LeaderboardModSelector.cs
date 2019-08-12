@@ -38,8 +38,12 @@ namespace osu.Game.Overlays.BeatmapSet
                 Direction = FillDirection.Full,
                 Spacing = new Vector2(4),
             };
+        }
 
-            Ruleset.BindValueChanged(onRulesetChanged);
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+            Ruleset.BindValueChanged(onRulesetChanged, true);
         }
 
         private void onRulesetChanged(ValueChangedEvent<RulesetInfo> ruleset)
