@@ -28,8 +28,7 @@ namespace osu.Game.Overlays.BeatmapSet
 
         public LeaderboardModSelector()
         {
-            AutoSizeAxes = Axes.Y;
-            RelativeSizeAxes = Axes.X;
+            AutoSizeAxes = Axes.Both;
             InternalChild = modsContainer = new FillFlowContainer<ModButton>
             {
                 Anchor = Anchor.Centre,
@@ -151,10 +150,7 @@ namespace osu.Game.Overlays.BeatmapSet
                 updateState();
             }
 
-            private void updateState()
-            {
-                Highlighted.Value = (IsHovered || Selected.Value) ? true : false;
-            }
+            private void updateState() => Highlighted.Value = IsHovered || Selected.Value;
 
             protected override void OnHighlightedChange(ValueChangedEvent<bool> highlighted)
             {
