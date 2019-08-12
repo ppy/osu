@@ -18,7 +18,7 @@ namespace osu.Game.Overlays.BeatmapSet
 {
     public class LeaderboardScopeSelector : PageTabControl<BeatmapLeaderboardScope>
     {
-        protected override bool AddAllItemsIfEnum => false;
+        protected override bool AddEnumEntriesAutomatically => false;
 
         protected override Dropdown<BeatmapLeaderboardScope> CreateDropdown() => null;
 
