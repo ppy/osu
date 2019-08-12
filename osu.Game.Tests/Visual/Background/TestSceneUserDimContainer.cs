@@ -195,11 +195,11 @@ namespace osu.Game.Tests.Visual.Background
         {
             performFullSetup();
             AddStep("Set user dim level to 0.5", () => songSelect.DimLevel.Value = 0.5f);
-            AddStep("Set dim amount to -0.7", () => songSelect.DimAmount.Value = -0.7f);
+            AddStep("Set dim offset to -0.7", () => songSelect.DimOffset.Value = -0.7f);
             waitForDim();
             AddAssert("Screen is undimmed", () => songSelect.IsBackgroundUndimmed());
             AddStep("EnableUserDim disabled", () => songSelect.DimEnabled.Value = false);
-            AddStep("Set dim amount to 0.3", () => songSelect.DimAmount.Value = 0.3f);
+            AddStep("Set dim offset to 0.3", () => songSelect.DimOffset.Value = 0.3f);
             waitForDim();
             AddAssert("Screen is dimmed", () => songSelect.IsBackgroundDimmed());
         }
@@ -308,12 +308,12 @@ namespace osu.Game.Tests.Visual.Background
             {
                 FadeAccessibleBackground background = new FadeAccessibleBackground(Beatmap.Value);
                 DimEnabled.BindTo(background.EnableUserDim);
-                DimAmount.BindTo(background.DimAmount);
+                DimOffset.BindTo(background.DimOffset);
                 return background;
             }
 
             public readonly Bindable<bool> DimEnabled = new Bindable<bool>();
-            public readonly Bindable<float> DimAmount = new Bindable<float>();
+            public readonly Bindable<float> DimOffset = new Bindable<float>();
             public readonly Bindable<double> DimLevel = new Bindable<double>();
             public readonly Bindable<double> BlurLevel = new Bindable<double>();
 

@@ -23,9 +23,9 @@ namespace osu.Game.Graphics.Containers
         public readonly Bindable<bool> EnableUserDim = new Bindable<bool>(true);
 
         /// <summary>
-        /// The amount of dim to be applied to the container in addition to user-specified dim.
+        /// The dim offset to be applied to the container in addition to user-specified dim.
         /// </summary>
-        public readonly Bindable<float> DimAmount = new Bindable<float>();
+        public readonly Bindable<float> DimOffset = new Bindable<float>();
 
         /// <summary>
         /// Whether or not the storyboard loaded should completely hide the background behind it.
@@ -41,7 +41,7 @@ namespace osu.Game.Graphics.Containers
 
         protected Bindable<bool> ShowStoryboard { get; private set; }
 
-        protected double DimLevel => DimAmount.Value + (EnableUserDim.Value ? UserDimLevel.Value : 0);
+        protected double DimLevel => DimOffset.Value + (EnableUserDim.Value ? UserDimLevel.Value : 0);
 
         protected override Container<Drawable> Content => dimContent;
 
@@ -63,7 +63,7 @@ namespace osu.Game.Graphics.Containers
 
             EnableUserDim.ValueChanged += _ => UpdateVisuals();
             UserDimLevel.ValueChanged += _ => UpdateVisuals();
-            DimAmount.ValueChanged += _ => UpdateVisuals();
+            DimOffset.ValueChanged += _ => UpdateVisuals();
             ShowStoryboard.ValueChanged += _ => UpdateVisuals();
             StoryboardReplacesBackground.ValueChanged += _ => UpdateVisuals();
         }
