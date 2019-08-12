@@ -69,7 +69,7 @@ namespace osu.Game.Overlays.BeatmapSet
                         Margin = new MarginPadding { Bottom = 8 },
                         Origin = Anchor.BottomCentre,
                         Anchor = Anchor.BottomCentre,
-                        Text = value.GetDescription() + " Ranking",
+                        Text = value.GetDescription(),
                         Font = OsuFont.GetFont(weight: FontWeight.Regular),
                     },
                     box = new Box
