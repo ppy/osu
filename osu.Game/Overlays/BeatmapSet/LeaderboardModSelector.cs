@@ -76,7 +76,7 @@ namespace osu.Game.Overlays.BeatmapSet
                 mods.Remove(mod);
 
             if (!mods.Any() && !IsHovered)
-                modsContainer.ForEach(button => button.Highlighted.Value = true);
+                highlightAll();
 
             SelectedMods.Value = mods;
         }
@@ -98,10 +98,12 @@ namespace osu.Game.Overlays.BeatmapSet
             base.OnHoverLost(e);
 
             if (!SelectedMods.Value.Any())
-                modsContainer.ForEach(mod => mod.Highlighted.Value = true);
+                highlightAll();
         }
 
         public void DeselectAll() => modsContainer.ForEach(mod => mod.Selected.Value = false);
+
+        private void highlightAll() => modsContainer.ForEach(mod => mod.Highlighted.Value = true);
 
         private class ModButton : ModIcon
         {
