@@ -96,7 +96,7 @@ namespace osu.Game.Overlays.Mods
                 }
             }
 
-            foregroundIcon.Highlighted = Selected;
+            foregroundIcon.Highlighted.Value = Selected;
 
             SelectionChanged?.Invoke(SelectedMod);
             return true;
