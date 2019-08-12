@@ -39,6 +39,12 @@ namespace osu.Game.Overlays.BeatmapSet
             });
         }
 
+        [BackgroundDependencyLoader]
+        private void load(OsuColour colours)
+        {
+            AccentColour = colours.Blue;
+        }
+
         protected override TabFillFlowContainer CreateTabFlow() => new TabFillFlowContainer
         {
             Anchor = Anchor.BottomCentre,
@@ -57,15 +63,9 @@ namespace osu.Game.Overlays.BeatmapSet
                 Text.Font = OsuFont.GetFont(size: 16);
             }
 
-            [BackgroundDependencyLoader]
-            private void load(OsuColour colours)
-            {
-                BoxColour = colours.Blue;
-            }
-
             protected override bool OnHover(HoverEvent e)
             {
-                Text.FadeColour(BoxColour);
+                Text.FadeColour(AccentColour);
 
                 return base.OnHover(e);
             }
