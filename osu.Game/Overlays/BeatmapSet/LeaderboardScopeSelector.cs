@@ -19,7 +19,7 @@ namespace osu.Game.Overlays.BeatmapSet
     public class LeaderboardScopeSelector : PageTabControl<BeatmapLeaderboardScope>
     {
         protected override bool AddEnumEntriesAutomatically => false;
-        
+
         protected override Dropdown<BeatmapLeaderboardScope> CreateDropdown() => null;
 
         protected override TabItem<BeatmapLeaderboardScope> CreateTabItem(BeatmapLeaderboardScope value) => new ScopeSelectorTabItem(value);
@@ -38,7 +38,7 @@ namespace osu.Game.Overlays.BeatmapSet
                 Origin = Anchor.BottomCentre,
             });
         }
-        
+
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
@@ -54,7 +54,7 @@ namespace osu.Game.Overlays.BeatmapSet
             Direction = FillDirection.Horizontal,
             Spacing = new Vector2(20, 0),
         };
-        
+
         private class ScopeSelectorTabItem : PageTabItem
         {
             public ScopeSelectorTabItem(BeatmapLeaderboardScope value)
@@ -84,14 +84,14 @@ namespace osu.Game.Overlays.BeatmapSet
             {
                 RelativeSizeAxes = Axes.X;
                 Size = new Vector2(0.8f, 1.5f);
-                
+
                 ColumnDimensions = new[]
                 {
                     new Dimension(),
                     new Dimension(mode: GridSizeMode.Relative, size: 0.4f),
                     new Dimension(),
                 };
-                
+
                 Content = new[]
                 {
                     new Drawable[]
