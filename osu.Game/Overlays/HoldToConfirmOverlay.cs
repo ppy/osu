@@ -2,6 +2,8 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
+using osu.Framework.Audio;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics.Containers;
@@ -16,6 +18,11 @@ namespace osu.Game.Overlays
     public abstract class HoldToConfirmOverlay : HoldToConfirmContainer
     {
         private Box overlay;
+
+        private readonly BindableDouble audioVolume = new BindableDouble(1);
+
+        [Resolved]
+        private AudioManager audio { get; set; }
 
         [BackgroundDependencyLoader]
         private void load()
@@ -33,7 +40,19 @@ namespace osu.Game.Overlays
                 }
             };
 
-            Progress.ValueChanged += p => overlay.Alpha = (float)p.NewValue;
+            Progress.ValueChanged += p =>
+            {
+                audioVolume.Value = 1 - p.NewValue;
+                overlay.Alpha = (float)p.NewValue;
+            };
+
+            audio.Tracks.AddAdjustment(AdjustableProperty.Volume, audioVolume);
+        }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            audio.Tracks.RemoveAdjustment(AdjustableProperty.Volume, audioVolume);
+            base.Dispose(isDisposing);
         }
     }
 }

@@ -7,6 +7,7 @@ using osu.Framework.Graphics.Sprites;
 using osu.Framework.Screens;
 using osu.Game.Graphics;
 using osu.Game.Screens.Play;
+using osu.Game.Users;
 using osuTK.Input;
 
 namespace osu.Game.Screens.Select
@@ -17,6 +18,8 @@ namespace osu.Game.Screens.Select
         private OsuScreen player;
 
         public override bool AllowExternalScreenChange => true;
+
+        protected override UserActivity InitialActivity => new UserActivity.ChoosingBeatmap();
 
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)

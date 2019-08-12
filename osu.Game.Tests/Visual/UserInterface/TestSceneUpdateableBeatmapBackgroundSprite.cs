@@ -9,6 +9,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Drawables;
+using osu.Game.Graphics.Containers;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Game.Rulesets;
@@ -32,7 +33,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             this.api = api;
             this.rulesets = rulesets;
 
-            testBeatmap = ImportBeatmapTest.LoadOszIntoOsu(osu);
+            testBeatmap = ImportBeatmapTest.LoadOszIntoOsu(osu).Result;
         }
 
         [Test]
@@ -92,13 +93,13 @@ namespace osu.Game.Tests.Visual.UserInterface
         public void TestUnloadAndReload()
         {
             var backgrounds = new List<TestUpdateableBeatmapBackgroundSprite>();
-            ScrollContainer scrollContainer = null;
+            OsuScrollContainer scrollContainer = null;
 
             AddStep("create backgrounds hierarchy", () =>
             {
                 FillFlowContainer backgroundFlow;
 
-                Child = scrollContainer = new ScrollContainer
+                Child = scrollContainer = new OsuScrollContainer
                 {
                     Size = new Vector2(500),
                     Child = backgroundFlow = new FillFlowContainer

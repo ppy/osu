@@ -9,11 +9,6 @@ namespace osu.Game.Beatmaps
     public class BeatmapOnlineInfo
     {
         /// <summary>
-        /// The length in milliseconds of this beatmap's song.
-        /// </summary>
-        public double Length { get; set; }
-
-        /// <summary>
         /// The amount of circles in this beatmap.
         /// </summary>
         public int CircleCount { get; set; }

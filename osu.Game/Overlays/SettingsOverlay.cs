@@ -9,6 +9,7 @@ using osu.Game.Overlays.Settings.Sections;
 using osuTK.Graphics;
 using System.Collections.Generic;
 using System.Linq;
+using osu.Framework.Bindables;
 
 namespace osu.Game.Overlays
 {
@@ -37,23 +38,23 @@ namespace osu.Game.Overlays
         {
         }
 
-        public override bool AcceptsFocus => subPanels.All(s => s.State != Visibility.Visible);
+        public override bool AcceptsFocus => subPanels.All(s => s.State.Value != Visibility.Visible);
 
         private T createSubPanel<T>(T subPanel)
             where T : SettingsSubPanel
         {
             subPanel.Depth = 1;
             subPanel.Anchor = Anchor.TopRight;
-            subPanel.StateChanged += subPanelStateChanged;
+            subPanel.State.ValueChanged += subPanelStateChanged;
 
             subPanels.Add(subPanel);
 
             return subPanel;
         }
 
-        private void subPanelStateChanged(Visibility visibility)
+        private void subPanelStateChanged(ValueChangedEvent<Visibility> state)
         {
-            switch (visibility)
+            switch (state.NewValue)
             {
                 case Visibility.Visible:
                     Background.FadeTo(0.9f, 300, Easing.OutQuint);
@@ -73,7 +74,7 @@ namespace osu.Game.Overlays
             }
         }
 
-        protected override float ExpandedPosition => subPanels.Any(s => s.State == Visibility.Visible) ? -WIDTH : base.ExpandedPosition;
+        protected override float ExpandedPosition => subPanels.Any(s => s.State.Value == Visibility.Visible) ? -WIDTH : base.ExpandedPosition;
 
         [BackgroundDependencyLoader]
         private void load()

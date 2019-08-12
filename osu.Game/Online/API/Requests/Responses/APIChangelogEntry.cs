@@ -36,7 +36,7 @@ namespace osu.Game.Online.API.Requests.Responses
         public string MessageHtml { get; set; }
 
         [JsonProperty("major")]
-        public bool? Major { get; set; }
+        public bool Major { get; set; }
 
         [JsonProperty("created_at")]
         public DateTimeOffset? CreatedAt { get; set; }

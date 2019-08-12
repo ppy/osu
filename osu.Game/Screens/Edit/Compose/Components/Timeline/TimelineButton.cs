@@ -31,14 +31,14 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             InternalChild = button = new TimelineIconButton { Action = () => Action?.Invoke() };
 
             button.Enabled.BindTo(Enabled);
-            Width = button.ButtonSize.X;
+            Width = button.Width;
         }
 
         protected override void Update()
         {
             base.Update();
 
-            button.ButtonSize = new Vector2(button.ButtonSize.X, DrawHeight);
+            button.Size = new Vector2(button.Width, DrawHeight);
         }
 
         private class TimelineIconButton : IconButton

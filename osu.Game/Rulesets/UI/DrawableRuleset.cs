@@ -53,7 +53,7 @@ namespace osu.Game.Rulesets.UI
         /// <summary>
         /// The playfield.
         /// </summary>
-        public Playfield Playfield => playfield.Value;
+        public override Playfield Playfield => playfield.Value;
 
         /// <summary>
         /// Place to put drawables above hit objects but below UI.
@@ -108,8 +108,6 @@ namespace osu.Game.Rulesets.UI
             RelativeSizeAxes = Axes.Both;
 
             Beatmap = (Beatmap<TObject>)workingBeatmap.GetPlayableBeatmap(ruleset.RulesetInfo, mods);
-
-            applyBeatmapMods(mods);
 
             KeyBindingInputManager = CreateInputManager();
             playfield = new Lazy<Playfield>(CreatePlayfield);
@@ -270,19 +268,6 @@ namespace osu.Game.Rulesets.UI
         public override ScoreProcessor CreateScoreProcessor() => new ScoreProcessor<TObject>(this);
 
         /// <summary>
-        /// Applies the active mods to the Beatmap.
-        /// </summary>
-        /// <param name="mods"></param>
-        private void applyBeatmapMods(IReadOnlyList<Mod> mods)
-        {
-            if (mods == null)
-                return;
-
-            foreach (var mod in mods.OfType<IApplicableToBeatmap<TObject>>())
-                mod.ApplyToBeatmap(Beatmap);
-        }
-
-        /// <summary>
         /// Applies the active mods to this DrawableRuleset.
         /// </summary>
         /// <param name="mods">The <see cref="Mod"/>s to apply.</param>
@@ -341,6 +326,11 @@ namespace osu.Game.Rulesets.UI
         /// Whether the game is paused. Used to block user input.
         /// </summary>
         public readonly BindableBool IsPaused = new BindableBool();
+
+        /// <summary>
+        /// The playfield.
+        /// </summary>
+        public abstract Playfield Playfield { get; }
 
         /// <summary>
         /// The frame-stable clock which is being used for playfield display.
