@@ -32,7 +32,7 @@ namespace osu.Game.Overlays.BeatmapSet
             AddItem(BeatmapLeaderboardScope.Country);
             AddItem(BeatmapLeaderboardScope.Friend);
 
-            AddInternal(new Line
+            AddInternal(new GradientLine
             {
                 Anchor = Anchor.BottomCentre,
                 Origin = Anchor.BottomCentre,
@@ -78,19 +78,20 @@ namespace osu.Game.Overlays.BeatmapSet
             }
         }
 
-        private class Line : GridContainer
+        private class GradientLine : GridContainer
         {
-            public Line()
+            public GradientLine()
             {
-                Height = 1;
                 RelativeSizeAxes = Axes.X;
-                Width = 0.8f;
+                Size = new Vector2(0.8f, 1.5f);
+
                 ColumnDimensions = new[]
                 {
                     new Dimension(),
                     new Dimension(mode: GridSizeMode.Relative, size: 0.4f),
                     new Dimension(),
                 };
+
                 Content = new[]
                 {
                     new Drawable[]
