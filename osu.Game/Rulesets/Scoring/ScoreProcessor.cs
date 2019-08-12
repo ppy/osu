@@ -40,7 +40,7 @@ namespace osu.Game.Rulesets.Scoring
         /// <summary>
         /// Additional conditions on top of <see cref="DefaultFailCondition"/> that cause a failing state.
         /// </summary>
-        public event Func<ScoreProcessor, bool> FailConditions;
+        public event Func<ScoreProcessor, JudgementResult, bool> FailConditions;
 
         /// <summary>
         /// The current total score.
@@ -151,12 +151,12 @@ namespace osu.Game.Rulesets.Scoring
         /// This can only ever notify subscribers once.
         /// </para>
         /// </summary>
-        protected void UpdateFailed()
+        protected void UpdateFailed(JudgementResult result)
         {
             if (HasFailed)
                 return;
 
-            if (!DefaultFailCondition && FailConditions?.Invoke(this) != true)
+            if (!DefaultFailCondition && FailConditions?.Invoke(this, result) != true)
                 return;
 
             if (Failed?.Invoke() != false)
@@ -217,9 +217,7 @@ namespace osu.Game.Rulesets.Scoring
         private double baseScore;
         private double bonusScore;
 
-        protected ScoreProcessor()
-        {
-        }
+        private double scoreMultiplier = 1;
 
         public ScoreProcessor(DrawableRuleset<TObject> drawableRuleset)
         {
@@ -239,6 +237,15 @@ namespace osu.Game.Rulesets.Scoring
             }
 
             Mode.ValueChanged += _ => updateScore();
+            Mods.ValueChanged += mods =>
+            {
+                scoreMultiplier = 1;
+
+                foreach (var m in mods.NewValue)
+                    scoreMultiplier *= m.ScoreMultiplier;
+
+                updateScore();
+            };
         }
 
         /// <summary>
@@ -287,7 +294,7 @@ namespace osu.Game.Rulesets.Scoring
             ApplyResult(result);
             updateScore();
 
-            UpdateFailed();
+            UpdateFailed(result);
             NotifyNewJudgement(result);
         }
 
@@ -306,6 +313,9 @@ namespace osu.Game.Rulesets.Scoring
         /// <summary>
         /// Applies the score change of a <see cref="JudgementResult"/> to this <see cref="ScoreProcessor"/>.
         /// </summary>
+        /// <remarks>
+        /// Any changes applied via this method can be reverted via <see cref="RevertResult"/>.
+        /// </remarks>
         /// <param name="result">The <see cref="JudgementResult"/> to apply.</param>
         protected virtual void ApplyResult(JudgementResult result)
         {
@@ -350,7 +360,7 @@ namespace osu.Game.Rulesets.Scoring
         }
 
         /// <summary>
-        /// Reverts the score change of a <see cref="JudgementResult"/> that was applied to this <see cref="ScoreProcessor"/>.
+        /// Reverts the score change of a <see cref="JudgementResult"/> that was applied to this <see cref="ScoreProcessor"/> via <see cref="ApplyResult"/>.
         /// </summary>
         /// <param name="result">The judgement scoring result.</param>
         protected virtual void RevertResult(JudgementResult result)
@@ -388,7 +398,7 @@ namespace osu.Game.Rulesets.Scoring
             if (rollingMaxBaseScore != 0)
                 Accuracy.Value = baseScore / rollingMaxBaseScore;
 
-            TotalScore.Value = getScore(Mode.Value);
+            TotalScore.Value = getScore(Mode.Value) * scoreMultiplier;
         }
 
         private double getScore(ScoringMode mode)

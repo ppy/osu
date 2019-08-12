@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading;
 using Microsoft.EntityFrameworkCore.Storage;
 using osu.Framework.Platform;
+using osu.Framework.Statistics;
 
 namespace osu.Game.Database
 {
@@ -31,11 +32,20 @@ namespace osu.Game.Database
             recycleThreadContexts();
         }
 
+        private static readonly GlobalStatistic<int> reads = GlobalStatistics.Get<int>("Database", "Get (Read)");
+        private static readonly GlobalStatistic<int> writes = GlobalStatistics.Get<int>("Database", "Get (Write)");
+        private static readonly GlobalStatistic<int> commits = GlobalStatistics.Get<int>("Database", "Commits");
+        private static readonly GlobalStatistic<int> rollbacks = GlobalStatistics.Get<int>("Database", "Rollbacks");
+
         /// <summary>
         /// Get a context for the current thread for read-only usage.
         /// If a <see cref="DatabaseWriteUsage"/> is in progress, the existing write-safe context will be returned.
         /// </summary>
-        public OsuDbContext Get() => threadContexts.Value;
+        public OsuDbContext Get()
+        {
+            reads.Value++;
+            return threadContexts.Value;
+        }
 
         /// <summary>
         /// Request a context for write usage. Can be consumed in a nested fashion (and will return the same underlying context).
@@ -45,6 +55,7 @@ namespace osu.Game.Database
         /// <returns>A usage containing a usable context.</returns>
         public DatabaseWriteUsage GetForWrite(bool withTransaction = true)
         {
+            writes.Value++;
             Monitor.Enter(writeLock);
             OsuDbContext context;
 
@@ -90,9 +101,15 @@ namespace osu.Game.Database
                 if (usages == 0)
                 {
                     if (currentWriteDidError)
+                    {
+                        rollbacks.Value++;
                         currentWriteTransaction?.Rollback();
+                    }
                     else
+                    {
+                        commits.Value++;
                         currentWriteTransaction?.Commit();
+                    }
 
                     if (currentWriteDidWrite || currentWriteDidError)
                     {

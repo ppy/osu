@@ -74,22 +74,18 @@ namespace osu.Game.Overlays.Chat
             }
         }
 
+        private bool senderHasBackground => !string.IsNullOrEmpty(message.Sender.Colour);
+
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
             customUsernameColour = colours.ChatBlue;
-        }
-
-        private bool senderHasBackground => !string.IsNullOrEmpty(message.Sender.Colour);
-
-        protected override void LoadComplete()
-        {
-            base.LoadComplete();
 
             bool hasBackground = senderHasBackground;
 
             Drawable effectedUsername = username = new OsuSpriteText
             {
+                Shadow = false,
                 Colour = hasBackground ? customUsernameColour : username_colours[message.Sender.Id % username_colours.Length],
                 Font = OsuFont.GetFont(size: TextSize, weight: FontWeight.Bold, italics: true)
             };
@@ -138,6 +134,7 @@ namespace osu.Game.Overlays.Chat
                     {
                         timestamp = new OsuSpriteText
                         {
+                            Shadow = false,
                             Anchor = Anchor.CentreLeft,
                             Origin = Anchor.CentreLeft,
                             Font = OsuFont.GetFont(size: TextSize * 0.75f, weight: FontWeight.SemiBold, fixedWidth: true)
@@ -160,6 +157,8 @@ namespace osu.Game.Overlays.Chat
                     {
                         contentFlow = new LinkFlowContainer(t =>
                         {
+                            t.Shadow = false;
+
                             if (Message.IsAction)
                             {
                                 t.Font = OsuFont.GetFont(italics: true);
@@ -179,6 +178,11 @@ namespace osu.Game.Overlays.Chat
             };
 
             updateMessageContent();
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
             FinishTransforms(true);
         }
 

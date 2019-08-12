@@ -5,7 +5,6 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Game.Rulesets.Catch.Objects.Drawable.Pieces;
 using osuTK;
-using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Catch.Objects.Drawable
 {
@@ -27,16 +26,8 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawable
         private void load()
         {
             AddInternal(pulp = new Pulp { Size = Size });
-        }
 
-        public override Color4 AccentColour
-        {
-            get => base.AccentColour;
-            set
-            {
-                base.AccentColour = value;
-                pulp.AccentColour = AccentColour;
-            }
+            AccentColour.BindValueChanged(colour => { pulp.AccentColour = colour.NewValue; }, true);
         }
     }
 }

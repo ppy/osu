@@ -82,13 +82,7 @@ namespace osu.Game.Overlays.Settings.Sections
 
         private void itemRemoved(SkinInfo s) => Schedule(() => skinDropdown.Items = skinDropdown.Items.Where(i => i.ID != s.ID).ToArray());
 
-        private void itemAdded(SkinInfo s, bool existing)
-        {
-            if (existing)
-                return;
-
-            Schedule(() => skinDropdown.Items = skinDropdown.Items.Append(s).ToArray());
-        }
+        private void itemAdded(SkinInfo s) => Schedule(() => skinDropdown.Items = skinDropdown.Items.Append(s).ToArray());
 
         protected override void Dispose(bool isDisposing)
         {
@@ -108,11 +102,13 @@ namespace osu.Game.Overlays.Settings.Sections
 
         private class SkinSettingsDropdown : SettingsDropdown<SkinInfo>
         {
-            protected override OsuDropdown<SkinInfo> CreateDropdown() => new SkinDropdownControl { Items = Items };
+            protected override OsuDropdown<SkinInfo> CreateDropdown() => new SkinDropdownControl();
 
             private class SkinDropdownControl : DropdownControl
             {
                 protected override string GenerateItemText(SkinInfo item) => item.ToString();
+
+                protected override DropdownMenu CreateMenu() => base.CreateMenu().With(m => m.MaxHeight = 200);
             }
         }
     }

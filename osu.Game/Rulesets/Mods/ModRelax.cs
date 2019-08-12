@@ -7,7 +7,7 @@ using osu.Game.Graphics;
 
 namespace osu.Game.Rulesets.Mods
 {
-    public abstract class ModRelax : Mod
+    public abstract class ModRelax : ModBlockFail
     {
         public override string Name => "Relax";
         public override string Acronym => "RX";

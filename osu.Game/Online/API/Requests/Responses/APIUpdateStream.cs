@@ -45,7 +45,7 @@ namespace osu.Game.Online.API.Requests.Responses
                     case "cuttingedge":
                         return new Color4(238, 170, 0, 255);
 
-                    case "lazer":
+                    case OsuGameBase.CLIENT_STREAM_NAME:
                         return new Color4(237, 18, 33, 255);
 
                     case "web":

@@ -17,13 +17,13 @@ namespace osu.Game.Tests.Visual.Menus
         {
             typeof(ToolbarButton),
             typeof(ToolbarRulesetSelector),
-            typeof(ToolbarRulesetButton),
+            typeof(ToolbarRulesetTabButton),
             typeof(ToolbarNotificationButton),
         };
 
         public TestSceneToolbar()
         {
-            var toolbar = new Toolbar { State = Visibility.Visible };
+            var toolbar = new Toolbar { State = { Value = Visibility.Visible } };
             ToolbarNotificationButton notificationButton = null;
 
             AddStep("create toolbar", () =>

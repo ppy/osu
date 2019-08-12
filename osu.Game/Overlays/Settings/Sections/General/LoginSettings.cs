@@ -97,7 +97,7 @@ namespace osu.Game.Overlays.Settings.Sections.General
                     {
                         new LoadingAnimation
                         {
-                            State = Visibility.Visible,
+                            State = { Value = Visibility.Visible },
                             Anchor = Anchor.TopCentre,
                             Origin = Anchor.TopCentre,
                         },
@@ -154,8 +154,9 @@ namespace osu.Game.Overlays.Settings.Sections.General
                     };
 
                     panel.Status.BindTo(api.LocalUser.Value.Status);
+                    panel.Activity.BindTo(api.LocalUser.Value.Activity);
 
-                    dropdown.Current.ValueChanged += action =>
+                    dropdown.Current.BindValueChanged(action =>
                     {
                         switch (action.NewValue)
                         {
@@ -178,9 +179,7 @@ namespace osu.Game.Overlays.Settings.Sections.General
                                 api.Logout();
                                 break;
                         }
-                    };
-                    dropdown.Current.TriggerChange();
-
+                    }, true);
                     break;
             }
 
@@ -320,7 +319,7 @@ namespace osu.Game.Overlays.Settings.Sections.General
                     BackgroundColour = colours.Gray3;
                 }
 
-                protected override DrawableMenuItem CreateDrawableMenuItem(MenuItem item) => new DrawableUserDropdownMenuItem(item);
+                protected override DrawableDropdownMenuItem CreateDrawableDropdownMenuItem(MenuItem item) => new DrawableUserDropdownMenuItem(item);
 
                 private class DrawableUserDropdownMenuItem : DrawableOsuDropdownMenuItem
                 {

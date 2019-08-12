@@ -31,7 +31,7 @@ namespace osu.Game.Graphics.Containers
         {
             if (AutoSizeAxes != Axes.None)
             {
-                content.RelativeSizeAxes = RelativeSizeAxes;
+                content.RelativeSizeAxes = (Axes.Both & ~AutoSizeAxes);
                 content.AutoSizeAxes = AutoSizeAxes;
             }
 
