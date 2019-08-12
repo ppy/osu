@@ -21,7 +21,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         };
 
         [Resolved]
-        private PreviewTrackManager trackManager { get; set; }
+        private PreviewTrackManager previewTrackManager { get; set; }
 
         public TestSceneMatchBeatmapPanel()
         {
@@ -45,7 +45,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             AddStep("Select random beatmap", () =>
             {
                 Room.CurrentItem.Value = Room.Playlist[RNG.Next(Room.Playlist.Count)];
-                trackManager.StopAnyPlaying(this);
+                previewTrackManager.StopAnyPlaying(this);
             });
         }
 
