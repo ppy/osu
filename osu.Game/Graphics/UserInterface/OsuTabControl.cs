@@ -31,7 +31,10 @@ namespace osu.Game.Graphics.UserInterface
         protected virtual float StripWidth() => TabContainer.Children.Sum(c => c.IsPresent ? c.DrawWidth + TabContainer.Spacing.X : 0) - TabContainer.Spacing.X;
         protected virtual float StripHeight() => 1;
 
-        protected virtual bool AddAllItemsIfEnum => true;
+        /// <summary>
+        /// Whether entries should be automatically populated if <see cref="T"/> is an <see cref="Enum"/> type.
+        /// </summary>
+        protected virtual bool AddEnumEntriesAutomatically => true;
 
         private static bool isEnumType => typeof(T).IsEnum;
 
@@ -47,7 +50,7 @@ namespace osu.Game.Graphics.UserInterface
                 Colour = Color4.White.Opacity(0),
             });
 
-            if (isEnumType && AddAllItemsIfEnum)
+            if (isEnumType && AddEnumEntriesAutomatically)
                 foreach (var val in (T[])Enum.GetValues(typeof(T)))
                     AddItem(val);
         }
