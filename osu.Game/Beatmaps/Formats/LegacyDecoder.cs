@@ -36,7 +36,7 @@ namespace osu.Game.Beatmaps.Formats
                 {
                     if (!Enum.TryParse(line.Substring(1, line.Length - 2), out section))
                     {
-                        Logger.Log($"Unknown section \"{line}\" in {output}");
+                        Logger.Log($"Unknown section \"{line}\" in \"{output}\"");
                         section = Section.None;
                     }
 
@@ -49,7 +49,7 @@ namespace osu.Game.Beatmaps.Formats
                 }
                 catch (Exception e)
                 {
-                    Logger.Error(e, $"Failed to process line \"{line}\" into {output}");
+                    Logger.Log($"Failed to process line \"{line}\" into \"{output}\": {e.Message}", LoggingTarget.Runtime, LogLevel.Important);
                 }
             }
         }
