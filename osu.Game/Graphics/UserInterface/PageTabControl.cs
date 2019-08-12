@@ -32,6 +32,12 @@ namespace osu.Game.Graphics.UserInterface
 
             protected readonly SpriteText Text;
 
+            protected Color4 BoxColour
+            {
+                get => box.Colour;
+                set => box.Colour = value;
+            }
+
             public PageTabItem(T value)
                 : base(value)
             {
@@ -66,7 +72,7 @@ namespace osu.Game.Graphics.UserInterface
             [BackgroundDependencyLoader]
             private void load(OsuColour colours)
             {
-                box.Colour = colours.Yellow;
+                BoxColour = colours.Yellow;
             }
 
             protected override bool OnHover(HoverEvent e)
