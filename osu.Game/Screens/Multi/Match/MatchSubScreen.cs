@@ -150,20 +150,12 @@ namespace osu.Game.Screens.Multi.Match
             {
                 const float fade_duration = 500;
 
-                if (tab.NewValue is SettingsMatchPage)
-                {
-                    header.ShowBeatmapPanel.Value = false;
-                    settings.Show();
-                    info.FadeOut(fade_duration, Easing.OutQuint);
-                    bottomRow.FadeOut(fade_duration, Easing.OutQuint);
-                }
-                else
-                {
-                    header.ShowBeatmapPanel.Value = true;
-                    settings.Hide();
-                    info.FadeIn(fade_duration, Easing.OutQuint);
-                    bottomRow.FadeIn(fade_duration, Easing.OutQuint);
-                }
+                var settingsDisplayed = tab.NewValue is SettingsMatchPage;
+
+                header.ShowBeatmapPanel.Value = !settingsDisplayed;
+                settings.State.Value = settingsDisplayed ? Visibility.Visible : Visibility.Hidden;
+                info.FadeTo(settingsDisplayed ? 0 : 1, fade_duration, Easing.OutQuint);
+                bottomRow.FadeTo(settingsDisplayed ? 0 : 1, fade_duration, Easing.OutQuint);
             }, true);
 
             chat.Exit += () =>
