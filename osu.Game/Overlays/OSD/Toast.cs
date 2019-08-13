@@ -13,22 +13,30 @@ namespace osu.Game.Overlays.OSD
 {
     public abstract class Toast : Container
     {
+        private const int toast_minimum_width = 240;
+
         private readonly Container content;
         protected override Container<Drawable> Content => content;
 
         protected readonly OsuSpriteText ValueText;
 
-        protected Toast(string description, string value, string keybinding)
+        protected Toast(string description, string value, string shortcut)
         {
             Anchor = Anchor.Centre;
             Origin = Anchor.Centre;
-            Width = 240;
 
             // A toast's height is decided (and transformed) by the containing OnScreenDisplay.
             RelativeSizeAxes = Axes.Y;
+            AutoSizeAxes = Axes.X;
 
             InternalChildren = new Drawable[]
             {
+                new Container //this container exists just to set a minimum width for the toast
+                {
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    Width = toast_minimum_width
+                },
                 new Box
                 {
                     RelativeSizeAxes = Axes.Both,
@@ -68,7 +76,7 @@ namespace osu.Game.Overlays.OSD
                     Alpha = 0.3f,
                     Margin = new MarginPadding { Bottom = 15 },
                     Font = OsuFont.GetFont(size: 12, weight: FontWeight.Bold),
-                    Text = string.IsNullOrEmpty(keybinding) ? "NO KEY BOUND" : keybinding.ToUpperInvariant()
+                    Text = string.IsNullOrEmpty(shortcut) ? "NO KEY BOUND" : shortcut.ToUpperInvariant()
                 },
             };
         }
