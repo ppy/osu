@@ -197,8 +197,11 @@ namespace osu.Game.Overlays
         {
             base.Dispose(isDisposing);
 
-            beatmaps.ItemAdded -= handleBeatmapAdded;
-            beatmaps.ItemRemoved -= handleBeatmapRemoved;
+            if (beatmaps != null)
+            {
+                beatmaps.ItemAdded -= handleBeatmapAdded;
+                beatmaps.ItemRemoved -= handleBeatmapRemoved;
+            }
         }
     }
 
