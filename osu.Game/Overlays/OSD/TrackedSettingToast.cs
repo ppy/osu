@@ -66,12 +66,7 @@ namespace osu.Game.Overlays.OSD
             ValueText.Origin = optionCount > 0 ? Anchor.BottomCentre : Anchor.Centre;
 
             for (int i = 0; i < optionCount; i++)
-            {
-                optionLights.Add(new OptionLight
-                {
-                    Glowing = i == selectedOption
-                });
-            }
+                optionLights.Add(new OptionLight { Glowing = i == selectedOption });
         }
 
         private class OptionLight : Container
@@ -109,20 +104,6 @@ namespace osu.Game.Overlays.OSD
                 }
             }
 
-            private void updateGlow()
-            {
-                if (glowing)
-                {
-                    fill.FadeColour(glowingColour, transition_speed, Easing.OutQuint);
-                    FadeEdgeEffectTo(glow_strength, transition_speed, Easing.OutQuint);
-                }
-                else
-                {
-                    FadeEdgeEffectTo(0, transition_speed, Easing.OutQuint);
-                    fill.FadeColour(idleColour, transition_speed, Easing.OutQuint);
-                }
-            }
-
             [BackgroundDependencyLoader]
             private void load(OsuColour colours)
             {
@@ -146,6 +127,20 @@ namespace osu.Game.Overlays.OSD
             {
                 updateGlow();
                 FinishTransforms(true);
+            }
+
+            private void updateGlow()
+            {
+                if (glowing)
+                {
+                    fill.FadeColour(glowingColour, transition_speed, Easing.OutQuint);
+                    FadeEdgeEffectTo(glow_strength, transition_speed, Easing.OutQuint);
+                }
+                else
+                {
+                    FadeEdgeEffectTo(0, transition_speed, Easing.OutQuint);
+                    fill.FadeColour(idleColour, transition_speed, Easing.OutQuint);
+                }
             }
         }
     }
