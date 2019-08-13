@@ -7,7 +7,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
-using osu.Game.Overlays.Profile.Header;
+using osu.Game.Overlays.Profile.Header.Components;
 using osu.Game.Users;
 
 namespace osu.Game.Tests.Visual.Online
