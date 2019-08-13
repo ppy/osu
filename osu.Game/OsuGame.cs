@@ -301,7 +301,7 @@ namespace osu.Game
             }, $"watch {databasedScoreInfo}", bypassScreenAllowChecks: true);
         }
 
-        #region Beatmap jukebox progression
+        #region Beatmap progression
 
         private void beatmapChanged(ValueChangedEvent<WorkingBeatmap> beatmap)
         {

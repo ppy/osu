@@ -124,13 +124,13 @@ namespace osu.Game.Input.Bindings
         QuickExit,
 
         // Game-wide beatmap jukebox keybindings
-        [Description("Jukebox next track")]
+        [Description("Next track")]
         MusicNext,
 
-        [Description("Jukebox previous track")]
+        [Description("Previous track")]
         MusicPrev,
 
-        [Description("Jukebox play / pause current track")]
+        [Description("Play / pause")]
         MusicPlay,
     }
 }
