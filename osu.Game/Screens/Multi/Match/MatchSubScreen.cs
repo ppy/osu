@@ -177,9 +177,7 @@ namespace osu.Game.Screens.Multi.Match
         public override bool OnExiting(IScreen next)
         {
             RoomManager?.PartRoom();
-
             Mods.Value = Array.Empty<Mod>();
-
             previewTrackManager.StopAnyPlaying(this);
 
             return base.OnExiting(next);
