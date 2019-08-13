@@ -7,8 +7,11 @@ using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
+using osu.Framework.Input.Bindings;
 using osu.Framework.Threading;
 using osu.Game.Beatmaps;
+using osu.Game.Input.Bindings;
+using osu.Game.Overlays.OSD;
 using osu.Game.Rulesets.Mods;
 
 namespace osu.Game.Overlays
@@ -16,7 +19,7 @@ namespace osu.Game.Overlays
     /// <summary>
     /// Handles playback of the global music track.
     /// </summary>
-    public class MusicController : Component
+    public class MusicController : Component, IKeyBindingHandler<GlobalAction>
     {
         [Resolved]
         private BeatmapManager beatmaps { get; set; }
@@ -36,6 +39,9 @@ namespace osu.Game.Overlays
 
         [Resolved]
         private IBindable<IReadOnlyList<Mod>> mods { get; set; }
+
+        [Resolved(canBeNull: true)]
+        private OnScreenDisplay onScreenDisplay { get; set; }
 
         [BackgroundDependencyLoader]
         private void load()
@@ -58,10 +64,16 @@ namespace osu.Game.Overlays
         /// <param name="beatmapSetInfo">The beatmap to move.</param>
         /// <param name="index">The new position.</param>
         public void ChangeBeatmapSetPosition(BeatmapSetInfo beatmapSetInfo, int index)
+
         {
             beatmapSets.Remove(beatmapSetInfo);
             beatmapSets.Insert(index, beatmapSetInfo);
         }
+
+        /// <summary>
+        /// Returns whether the current beatmap track is playing.
+        /// </summary>
+        public bool IsPlaying => beatmap.Value.Track.IsRunning;
 
         private void handleBeatmapAdded(BeatmapSetInfo set) =>
             Schedule(() => beatmapSets.Add(set));
@@ -84,15 +96,17 @@ namespace osu.Game.Overlays
         /// <summary>
         /// Toggle pause / play.
         /// </summary>
-        public void TogglePause()
+        public bool TogglePause()
         {
             var track = current?.Track;
 
             if (track == null)
             {
-                if (!beatmap.Disabled)
-                    next(true);
-                return;
+                if (beatmap.Disabled)
+                    return false;
+
+                next(true);
+                return true;
             }
 
             if (track.IsRunning)
@@ -105,12 +119,14 @@ namespace osu.Game.Overlays
                 track.Start();
                 IsUserPaused = false;
             }
+
+            return true;
         }
 
         /// <summary>
         /// Play the previous track.
         /// </summary>
-        public void PrevTrack()
+        public bool PrevTrack()
         {
             queuedDirection = TrackChangeDirection.Prev;
 
@@ -121,15 +137,19 @@ namespace osu.Game.Overlays
                 if (beatmap is Bindable<WorkingBeatmap> working)
                     working.Value = beatmaps.GetWorkingBeatmap(playable.Beatmaps.First(), beatmap.Value);
                 beatmap.Value.Track.Restart();
+
+                return true;
             }
+
+            return false;
         }
 
         /// <summary>
         /// Play the next random or playlist track.
         /// </summary>
-        public void NextTrack() => next();
+        public bool NextTrack() => next();
 
-        private void next(bool instant = false)
+        private bool next(bool instant = false)
         {
             if (!instant)
                 queuedDirection = TrackChangeDirection.Next;
@@ -141,7 +161,10 @@ namespace osu.Game.Overlays
                 if (beatmap is Bindable<WorkingBeatmap> working)
                     working.Value = beatmaps.GetWorkingBeatmap(playable.Beatmaps.First(), beatmap.Value);
                 beatmap.Value.Track.Restart();
+                return true;
             }
+
+            return false;
         }
 
         private WorkingBeatmap current;
@@ -199,6 +222,41 @@ namespace osu.Game.Overlays
 
             beatmaps.ItemAdded -= handleBeatmapAdded;
             beatmaps.ItemRemoved -= handleBeatmapRemoved;
+        }
+
+        public bool OnPressed(GlobalAction action)
+        {
+            switch (action)
+            {
+                case GlobalAction.MusicPlay:
+                    if (TogglePause())
+                        onScreenDisplay?.Display(new MusicControllerToast(IsPlaying ? "Play track" : "Pause track"));
+                    return true;
+
+                case GlobalAction.MusicNext:
+                    if (NextTrack())
+                        onScreenDisplay?.Display(new MusicControllerToast("Next track"));
+
+                    return true;
+
+                case GlobalAction.MusicPrev:
+                    if (PrevTrack())
+                        onScreenDisplay?.Display(new MusicControllerToast("Previous track"));
+
+                    return true;
+            }
+
+            return false;
+        }
+
+        public bool OnReleased(GlobalAction action) => false;
+
+        public class MusicControllerToast : Toast
+        {
+            public MusicControllerToast(string action)
+                : base("Music Playback", action, string.Empty)
+            {
+            }
         }
     }
 
