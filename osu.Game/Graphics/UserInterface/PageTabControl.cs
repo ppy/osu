@@ -24,13 +24,31 @@ namespace osu.Game.Graphics.UserInterface
             Height = 30;
         }
 
-        public class PageTabItem : TabItem<T>
+        [BackgroundDependencyLoader]
+        private void load(OsuColour colours)
+        {
+            AccentColour = colours.Yellow;
+        }
+
+        public class PageTabItem : TabItem<T>, IHasAccentColour
         {
             private const float transition_duration = 100;
 
             private readonly Box box;
 
             protected readonly SpriteText Text;
+
+            private Color4 accentColour;
+
+            public Color4 AccentColour
+            {
+                get => accentColour;
+                set
+                {
+                    accentColour = value;
+                    box.Colour = accentColour;
+                }
+            }
 
             public PageTabItem(T value)
                 : base(value)
@@ -61,12 +79,6 @@ namespace osu.Game.Graphics.UserInterface
                 };
 
                 Active.BindValueChanged(active => Text.Font = Text.Font.With(Typeface.Exo, weight: active.NewValue ? FontWeight.Bold : FontWeight.Medium), true);
-            }
-
-            [BackgroundDependencyLoader]
-            private void load(OsuColour colours)
-            {
-                box.Colour = colours.Yellow;
             }
 
             protected override bool OnHover(HoverEvent e)
