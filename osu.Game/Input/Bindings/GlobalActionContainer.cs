@@ -127,7 +127,7 @@ namespace osu.Game.Input.Bindings
         [Description("Quick exit (Hold)")]
         QuickExit,
 
-        // Game-wide beatmap jukebox keybindings
+        // Game-wide beatmap msi ccotolle keybindings
         [Description("Next track")]
         MusicNext,
 
