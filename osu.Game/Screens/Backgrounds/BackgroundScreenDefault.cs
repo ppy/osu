@@ -25,6 +25,11 @@ namespace osu.Game.Screens.Backgrounds
         private Bindable<User> user;
         private Bindable<Skin> skin;
 
+        public BackgroundScreenDefault(bool animateOnEnter = true)
+            : base(animateOnEnter)
+        {
+        }
+
         [BackgroundDependencyLoader]
         private void load(IAPIProvider api, SkinManager skinManager)
         {

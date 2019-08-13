@@ -7,6 +7,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Screens;
+using osu.Game.Audio;
 using osu.Game.Beatmaps;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Multiplayer.GameTypes;
@@ -18,7 +19,8 @@ using PlaylistItem = osu.Game.Online.Multiplayer.PlaylistItem;
 
 namespace osu.Game.Screens.Multi.Match
 {
-    public class MatchSubScreen : MultiplayerSubScreen
+    [Cached(typeof(IPreviewTrackOwner))]
+    public class MatchSubScreen : MultiplayerSubScreen, IPreviewTrackOwner
     {
         public override bool DisallowExternalBeatmapRulesetChanges => true;
 
@@ -43,6 +45,9 @@ namespace osu.Game.Screens.Multi.Match
 
         [Resolved]
         private BeatmapManager beatmapManager { get; set; }
+
+        [Resolved]
+        private PreviewTrackManager previewTrackManager { get; set; }
 
         [Resolved(CanBeNull = true)]
         private OsuGame game { get; set; }
@@ -146,18 +151,12 @@ namespace osu.Game.Screens.Multi.Match
             {
                 const float fade_duration = 500;
 
-                if (tab.NewValue is SettingsMatchPage)
-                {
-                    settings.Show();
-                    info.FadeOut(fade_duration, Easing.OutQuint);
-                    bottomRow.FadeOut(fade_duration, Easing.OutQuint);
-                }
-                else
-                {
-                    settings.Hide();
-                    info.FadeIn(fade_duration, Easing.OutQuint);
-                    bottomRow.FadeIn(fade_duration, Easing.OutQuint);
-                }
+                var settingsDisplayed = tab.NewValue is SettingsMatchPage;
+
+                header.ShowBeatmapPanel.Value = !settingsDisplayed;
+                settings.State.Value = settingsDisplayed ? Visibility.Visible : Visibility.Hidden;
+                info.FadeTo(settingsDisplayed ? 0 : 1, fade_duration, Easing.OutQuint);
+                bottomRow.FadeTo(settingsDisplayed ? 0 : 1, fade_duration, Easing.OutQuint);
             }, true);
 
             chat.Exit += () =>
@@ -179,8 +178,8 @@ namespace osu.Game.Screens.Multi.Match
         public override bool OnExiting(IScreen next)
         {
             RoomManager?.PartRoom();
-
             Mods.Value = Array.Empty<Mod>();
+            previewTrackManager.StopAnyPlaying(this);
 
             return base.OnExiting(next);
         }
@@ -198,6 +197,8 @@ namespace osu.Game.Screens.Multi.Match
 
             if (e.NewValue?.Ruleset != null)
                 Ruleset.Value = e.NewValue.Ruleset;
+
+            previewTrackManager.StopAnyPlaying(this);
         }
 
         /// <summary>
@@ -223,6 +224,8 @@ namespace osu.Game.Screens.Multi.Match
 
         private void onStart()
         {
+            previewTrackManager.StopAnyPlaying(this);
+
             switch (type.Value)
             {
                 default:
