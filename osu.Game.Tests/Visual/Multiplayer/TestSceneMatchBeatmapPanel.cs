@@ -13,6 +13,7 @@ using osu.Framework.Allocation;
 
 namespace osu.Game.Tests.Visual.Multiplayer
 {
+    [Cached(typeof(IPreviewTrackOwner))]
     public class TestSceneMatchBeatmapPanel : MultiplayerTestScene, IPreviewTrackOwner
     {
         public override IReadOnlyList<Type> RequiredTypes => new[]
@@ -47,13 +48,6 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 Room.CurrentItem.Value = Room.Playlist[RNG.Next(Room.Playlist.Count)];
                 previewTrackManager.StopAnyPlaying(this);
             });
-        }
-
-        protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
-        {
-            var dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
-            dependencies.CacheAs<IPreviewTrackOwner>(this);
-            return dependencies;
         }
     }
 }
