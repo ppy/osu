@@ -9,6 +9,8 @@ using osu.Framework.Graphics.Shaders;
 using osu.Game.Screens.Menu;
 using osuTK;
 using osu.Framework.Screens;
+using osu.Game.Configuration;
+using IntroSequence = osu.Game.Configuration.IntroSequence;
 
 namespace osu.Game.Screens
 {
@@ -45,6 +47,8 @@ namespace osu.Game.Screens
         private OsuScreen loadableScreen;
         private ShaderPrecompiler precompiler;
 
+        private IntroSequence introSequence;
+
         protected virtual OsuScreen CreateLoadableScreen()
         {
             if (showDisclaimer)
@@ -53,7 +57,17 @@ namespace osu.Game.Screens
             return getIntroSequence();
         }
 
-        private IntroScreen getIntroSequence() => new IntroCircles();
+        private IntroScreen getIntroSequence()
+        {
+            switch (introSequence)
+            {
+                case IntroSequence.Circles:
+                    return new IntroCircles();
+
+                default:
+                    return new IntroTriangles();
+            }
+        }
 
         protected virtual ShaderPrecompiler CreateShaderPrecompiler() => new ShaderPrecompiler();
 
@@ -79,9 +93,10 @@ namespace osu.Game.Screens
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuGameBase game)
+        private void load(OsuGameBase game, OsuConfigManager config)
         {
             showDisclaimer = game.IsDeployedBuild;
+            introSequence = config.Get<IntroSequence>(OsuSetting.IntroSequence);
         }
 
         /// <summary>

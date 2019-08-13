@@ -303,7 +303,7 @@ namespace osu.Game
             }, $"watch {databasedScoreInfo}", bypassScreenAllowChecks: true);
         }
 
-        #region Beatmap jukebox progression
+        #region Beatmap progression
 
         private void beatmapChanged(ValueChangedEvent<WorkingBeatmap> beatmap)
         {
@@ -472,6 +472,8 @@ namespace osu.Game
             loadComponentSingleFile(volume = new VolumeOverlay(), leftFloatingOverlayContent.Add);
             loadComponentSingleFile(new OnScreenDisplay(), Add, true);
 
+            loadComponentSingleFile(musicController = new MusicController(), Add, true);
+
             loadComponentSingleFile(notifications = new NotificationOverlay
             {
                 GetToolbarHeight = () => ToolbarOffset,
@@ -498,7 +500,7 @@ namespace osu.Game
                 Origin = Anchor.TopRight,
             }, rightFloatingOverlayContent.Add, true);
 
-            loadComponentSingleFile(musicController = new MusicController
+            loadComponentSingleFile(new NowPlayingOverlay
             {
                 GetToolbarHeight = () => ToolbarOffset,
                 Anchor = Anchor.TopRight,
