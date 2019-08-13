@@ -31,7 +31,7 @@ namespace osu.Game.Overlays.Profile.Header.Components
 
         private KeyValuePair<int, int>[] ranks;
         private int dayIndex;
-        public Bindable<User> User = new Bindable<User>();
+        public readonly Bindable<UserStatistics> Statistics = new Bindable<UserStatistics>();
 
         public RankGraph()
         {
@@ -56,8 +56,6 @@ namespace osu.Game.Overlays.Profile.Header.Components
             };
 
             graph.OnBallMove += i => dayIndex = i;
-
-            User.ValueChanged += userChanged;
         }
 
         [BackgroundDependencyLoader]
@@ -66,18 +64,25 @@ namespace osu.Game.Overlays.Profile.Header.Components
             graph.LineColour = colours.Yellow;
         }
 
-        private void userChanged(ValueChangedEvent<User> e)
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            Statistics.BindValueChanged(statistics => updateStatistics(statistics.NewValue), true);
+        }
+
+        private void updateStatistics(UserStatistics statistics)
         {
             placeholder.FadeIn(fade_duration, Easing.Out);
 
-            if (e.NewValue?.Statistics?.Ranks.Global == null)
+            if (statistics?.Ranks.Global == null)
             {
                 graph.FadeOut(fade_duration, Easing.Out);
                 ranks = null;
                 return;
             }
 
-            int[] userRanks = e.NewValue.RankHistory?.Data ?? new[] { e.NewValue.Statistics.Ranks.Global.Value };
+            int[] userRanks = statistics.RankHistory?.Data ?? new[] { statistics.Ranks.Global.Value };
             ranks = userRanks.Select((x, index) => new KeyValuePair<int, int>(index, x)).Where(x => x.Value != 0).ToArray();
 
             if (ranks.Length > 1)
@@ -191,7 +196,7 @@ namespace osu.Game.Overlays.Profile.Header.Components
             }
         }
 
-        public string TooltipText => User.Value?.Statistics?.Ranks.Global == null ? "" : $"#{ranks[dayIndex].Value:#,##0}|{ranked_days - ranks[dayIndex].Key + 1}";
+        public string TooltipText => Statistics.Value?.Ranks.Global == null ? "" : $"#{ranks[dayIndex].Value:#,##0}|{ranked_days - ranks[dayIndex].Key + 1}";
 
         public ITooltip GetCustomTooltip() => new RankGraphTooltip();
 
