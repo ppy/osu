@@ -24,8 +24,8 @@ namespace osu.Game.Graphics.UserInterface
 
             Child = button = new TwoLayerButton
             {
-                Anchor = Anchor.CentreLeft,
-                Origin = Anchor.CentreLeft,
+                Anchor = Anchor.TopLeft,
+                Origin = Anchor.TopLeft,
                 Text = @"back",
                 Icon = OsuIcon.LeftCircle,
                 Action = () => Action?.Invoke()
