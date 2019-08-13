@@ -25,11 +25,11 @@ namespace osu.Game.Screens.Multi.Match.Components
     {
         public const float HEIGHT = 200;
 
-        public MatchTabControl Tabs;
+        public readonly BindableBool ShowBeatmapPanel = new BindableBool();
+
+        public MatchTabControl Tabs { get; private set; }
 
         public Action RequestBeatmapSelection;
-
-        public BindableBool ShowBeatmapPanel = new BindableBool();
 
         private MatchBeatmapPanel beatmapPanel;
 
