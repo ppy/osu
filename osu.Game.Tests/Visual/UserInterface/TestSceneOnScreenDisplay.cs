@@ -24,6 +24,11 @@ namespace osu.Game.Tests.Visual.UserInterface
             Add(osd);
 
             AddStep("Display empty osd toast", () => osd.Display(new EmptyToast()));
+            AddAssert("Toast width is 240", () => osd.Child.Width == 240);
+
+            AddStep("Display toast with lengthy text", () => osd.Display(new LengthyToast()));
+            AddAssert("Toast width is greater than 240", () => osd.Child.Width > 240);
+
             AddRepeatStep("Change toggle (no bind)", () => config.ToggleSetting(TestConfigSetting.ToggleSettingNoKeybind), 2);
             AddRepeatStep("Change toggle (with bind)", () => config.ToggleSetting(TestConfigSetting.ToggleSettingWithKeybind), 2);
             AddRepeatStep("Change enum (no bind)", () => config.IncrementEnumSetting(TestConfigSetting.EnumSettingNoKeybind), 3);
@@ -92,6 +97,14 @@ namespace osu.Game.Tests.Visual.UserInterface
         {
             public EmptyToast()
                 : base("", "", "")
+            {
+            }
+        }
+
+        private class LengthyToast : Toast
+        {
+            public LengthyToast()
+                : base("Toast with a very very very long text", "A very very very very very very long text also", "A very very very very very long shortcut")
             {
             }
         }
