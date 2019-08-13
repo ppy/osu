@@ -68,8 +68,6 @@ namespace osu.Game
 
         private BeatmapSetOverlay beatmapSetOverlay;
 
-        private OnScreenDisplay osd;
-
         [Cached]
         private readonly ScreenshotManager screenshotManager = new ScreenshotManager();
 
@@ -469,7 +467,7 @@ namespace osu.Game
             });
 
             loadComponentSingleFile(volume = new VolumeOverlay(), leftFloatingOverlayContent.Add);
-            loadComponentSingleFile(osd = new OnScreenDisplay(), Add, true);
+            loadComponentSingleFile(new OnScreenDisplay(), Add, true);
 
             loadComponentSingleFile(musicController = new MusicController(), Add, true);
 
@@ -733,27 +731,6 @@ namespace osu.Game
 
                 case GlobalAction.ToggleGameplayMouseButtons:
                     LocalConfig.Set(OsuSetting.MouseDisableButtons, !LocalConfig.Get<bool>(OsuSetting.MouseDisableButtons));
-                    return true;
-
-                case GlobalAction.MusicPlay:
-                    if (!musicController.IsLoaded) return true;
-
-                    if (musicController.PlayTrack())
-                        osd.Display(new Overlays.OSD.MusicControllerToast(musicController.IsPlaying ? "Play track" : "Pause track"));
-                    return true;
-
-                case GlobalAction.MusicNext:
-                    if (!musicController.IsLoaded) return true;
-
-                    if (musicController.NextTrack())
-                        osd.Display(new Overlays.OSD.MusicControllerToast("Next track"));
-                    return true;
-
-                case GlobalAction.MusicPrev:
-                    if (!musicController.IsLoaded) return true;
-
-                    if (musicController.PreviousTrack())
-                        osd.Display(new Overlays.OSD.MusicControllerToast("Previous track"));
                     return true;
             }
 
