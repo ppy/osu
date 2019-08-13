@@ -20,6 +20,7 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Objects.Types;
+using osu.Game.Rulesets.UI;
 using osuTK;
 using osuTK.Graphics;
 
@@ -360,6 +361,10 @@ namespace osu.Game.Skinning
             }
         }
 
+        /// <summary>
+        /// A sprite which is displayed within the playfield, but historically was not considered part of the playfield.
+        /// Performs scale adjustment to undo the scale applied by <see cref="PlayfieldAdjustmentContainer"/> (osu! ruleset specifically).
+        /// </summary>
         private class NonPlayfieldSprite : Sprite
         {
             public override Texture Texture
@@ -368,7 +373,8 @@ namespace osu.Game.Skinning
                 set
                 {
                     if (value != null)
-                        value.ScaleAdjust *= 2f;
+                        // stable "magic ratio". see OsuPlayfieldAdjustmentContainer for full explanation.
+                        value.ScaleAdjust *= 1.6f;
                     base.Texture = value;
                 }
             }

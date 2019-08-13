@@ -15,10 +15,10 @@ namespace osu.Game.Storyboards
         public IEnumerable<TypedCommand> Commands => commands.OrderBy(c => c.StartTime);
         public bool HasCommands => commands.Count > 0;
 
-        private Cached<double> startTimeBacking;
+        private readonly Cached<double> startTimeBacking = new Cached<double>();
         public double StartTime => startTimeBacking.IsValid ? startTimeBacking : startTimeBacking.Value = HasCommands ? commands.Min(c => c.StartTime) : double.MinValue;
 
-        private Cached<double> endTimeBacking;
+        private readonly Cached<double> endTimeBacking = new Cached<double>();
         public double EndTime => endTimeBacking.IsValid ? endTimeBacking : endTimeBacking.Value = HasCommands ? commands.Max(c => c.EndTime) : double.MaxValue;
 
         public T StartValue => HasCommands ? commands.OrderBy(c => c.StartTime).First().StartValue : default;
