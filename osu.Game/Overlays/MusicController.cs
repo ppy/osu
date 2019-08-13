@@ -64,7 +64,6 @@ namespace osu.Game.Overlays
         /// <param name="beatmapSetInfo">The beatmap to move.</param>
         /// <param name="index">The new position.</param>
         public void ChangeBeatmapSetPosition(BeatmapSetInfo beatmapSetInfo, int index)
-
         {
             beatmapSets.Remove(beatmapSetInfo);
             beatmapSets.Insert(index, beatmapSetInfo);
