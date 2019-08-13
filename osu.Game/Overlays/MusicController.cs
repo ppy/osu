@@ -1,4 +1,4 @@
-﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
@@ -96,6 +96,7 @@ namespace osu.Game.Overlays
         /// <summary>
         /// Toggle pause / play.
         /// </summary>
+        /// <returns>Whether the operation was successful.</returns>
         public bool TogglePause()
         {
             var track = current?.Track;
@@ -126,6 +127,7 @@ namespace osu.Game.Overlays
         /// <summary>
         /// Play the previous track.
         /// </summary>
+        /// <returns>Whether the operation was successful.</returns>
         public bool PrevTrack()
         {
             queuedDirection = TrackChangeDirection.Prev;
@@ -147,6 +149,7 @@ namespace osu.Game.Overlays
         /// <summary>
         /// Play the next random or playlist track.
         /// </summary>
+        /// <returns>Whether the operation was successful.</returns>
         public bool NextTrack() => next();
 
         private bool next(bool instant = false)
@@ -220,8 +223,11 @@ namespace osu.Game.Overlays
         {
             base.Dispose(isDisposing);
 
-            beatmaps.ItemAdded -= handleBeatmapAdded;
-            beatmaps.ItemRemoved -= handleBeatmapRemoved;
+            if (beatmaps != null)
+            {
+                beatmaps.ItemAdded -= handleBeatmapAdded;
+                beatmaps.ItemRemoved -= handleBeatmapRemoved;
+            }
         }
 
         public bool OnPressed(GlobalAction action)
