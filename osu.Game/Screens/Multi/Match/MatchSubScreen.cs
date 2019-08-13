@@ -19,6 +19,7 @@ using PlaylistItem = osu.Game.Online.Multiplayer.PlaylistItem;
 
 namespace osu.Game.Screens.Multi.Match
 {
+    [Cached(typeof(IPreviewTrackOwner))]
     public class MatchSubScreen : MultiplayerSubScreen, IPreviewTrackOwner
     {
         public override bool DisallowExternalBeatmapRulesetChanges => true;
@@ -235,13 +236,6 @@ namespace osu.Game.Screens.Multi.Match
                     });
                     break;
             }
-        }
-
-        protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
-        {
-            var dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
-            dependencies.CacheAs<IPreviewTrackOwner>(this);
-            return dependencies;
         }
 
         protected override void Dispose(bool isDisposing)
