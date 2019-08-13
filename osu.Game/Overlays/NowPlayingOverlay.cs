@@ -247,13 +247,6 @@ namespace osu.Game.Overlays
             }
         }
 
-        protected override void Dispose(bool isDisposing)
-        {
-            base.Dispose(isDisposing);
-
-            musicController.TrackChanged -= trackChanged;
-        }
-
         private Action pendingBeatmapSwitch;
 
         private void trackChanged(WorkingBeatmap beatmap, TrackChangeDirection direction = TrackChangeDirection.None)
@@ -311,6 +304,14 @@ namespace osu.Game.Overlays
             prevButton.Enabled.Value = !disabled;
             nextButton.Enabled.Value = !disabled;
             playlistButton.Enabled.Value = !disabled;
+        }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+
+            if (musicController != null)
+                musicController.TrackChanged -= trackChanged;
         }
 
         private class MusicIconButton : IconButton
