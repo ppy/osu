@@ -1,4 +1,4 @@
-﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
@@ -63,6 +63,11 @@ namespace osu.Game.Overlays
             beatmapSets.Insert(index, beatmapSetInfo);
         }
 
+        /// <summary>
+        /// Returns whether the current beatmap track is playing.
+        /// </summary>
+        public bool IsPlaying => beatmap.Value.Track.IsRunning;
+
         private void handleBeatmapAdded(BeatmapSetInfo set) =>
             Schedule(() => beatmapSets.Add(set));
 
@@ -84,15 +89,18 @@ namespace osu.Game.Overlays
         /// <summary>
         /// Toggle pause / play.
         /// </summary>
-        public void TogglePause()
+        /// <returns>Whether the operation was successful.</returns>
+        public bool TogglePause()
         {
             var track = current?.Track;
 
             if (track == null)
             {
-                if (!beatmap.Disabled)
-                    next(true);
-                return;
+                if (beatmap.Disabled)
+                    return false;
+
+                next(true);
+                return true;
             }
 
             if (track.IsRunning)
@@ -105,12 +113,15 @@ namespace osu.Game.Overlays
                 track.Start();
                 IsUserPaused = false;
             }
+
+            return true;
         }
 
         /// <summary>
         /// Play the previous track.
         /// </summary>
-        public void PrevTrack()
+        /// <returns>Whether the operation was successful.</returns>
+        public bool PrevTrack()
         {
             queuedDirection = TrackChangeDirection.Prev;
 
@@ -121,15 +132,20 @@ namespace osu.Game.Overlays
                 if (beatmap is Bindable<WorkingBeatmap> working)
                     working.Value = beatmaps.GetWorkingBeatmap(playable.Beatmaps.First(), beatmap.Value);
                 beatmap.Value.Track.Restart();
+
+                return true;
             }
+
+            return false;
         }
 
         /// <summary>
         /// Play the next random or playlist track.
         /// </summary>
-        public void NextTrack() => next();
+        /// <returns>Whether the operation was successful.</returns>
+        public bool NextTrack() => next();
 
-        private void next(bool instant = false)
+        private bool next(bool instant = false)
         {
             if (!instant)
                 queuedDirection = TrackChangeDirection.Next;
@@ -141,7 +157,10 @@ namespace osu.Game.Overlays
                 if (beatmap is Bindable<WorkingBeatmap> working)
                     working.Value = beatmaps.GetWorkingBeatmap(playable.Beatmaps.First(), beatmap.Value);
                 beatmap.Value.Track.Restart();
+                return true;
             }
+
+            return false;
         }
 
         private WorkingBeatmap current;
