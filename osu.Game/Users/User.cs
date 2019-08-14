@@ -21,6 +21,9 @@ namespace osu.Game.Users
         [JsonProperty(@"username")]
         public string Username;
 
+        [JsonProperty(@"previous_usernames")]
+        public string[] PreviousUsernames;
+
         [JsonProperty(@"country")]
         public Country Country;
 
@@ -193,6 +196,7 @@ namespace osu.Game.Users
         public static readonly User SYSTEM_USER = new User
         {
             Username = "system",
+            Colour = @"9c0101",
             Id = 0
         };
 
