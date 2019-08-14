@@ -47,7 +47,7 @@ namespace osu.Game.Overlays
                             Colour = Color4.Black,
                             Alpha = 0.6f,
                         },
-                        new Container
+                        new TabbableContentContainer
                         {
                             RelativeSizeAxes = Axes.X,
                             AutoSizeAxes = Axes.Y,
