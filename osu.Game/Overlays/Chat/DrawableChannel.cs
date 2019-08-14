@@ -30,27 +30,24 @@ namespace osu.Game.Overlays.Chat
         [BackgroundDependencyLoader]
         private void load()
         {
-            Children = new Drawable[]
+            Child = new OsuContextMenuContainer
             {
-                new OsuContextMenuContainer
+                RelativeSizeAxes = Axes.Both,
+                Masking = true,
+                Child = scroll = new OsuScrollContainer
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Masking = true,
-                    Child = scroll = new OsuScrollContainer
+                    // Some chat lines have effects that slightly protrude to the bottom,
+                    // which we do not want to mask away, hence the padding.
+                    Padding = new MarginPadding { Bottom = 5 },
+                    Child = ChatLineFlow = new ChatLineContainer
                     {
-                        RelativeSizeAxes = Axes.Both,
-                        // Some chat lines have effects that slightly protrude to the bottom,
-                        // which we do not want to mask away, hence the padding.
-                        Padding = new MarginPadding { Bottom = 5 },
-                        Child = ChatLineFlow = new ChatLineContainer
-                        {
-                            Padding = new MarginPadding { Left = 20, Right = 20 },
-                            RelativeSizeAxes = Axes.X,
-                            AutoSizeAxes = Axes.Y,
-                            Direction = FillDirection.Vertical,
-                        }
-                    },
-                }
+                        Padding = new MarginPadding { Left = 20, Right = 20 },
+                        RelativeSizeAxes = Axes.X,
+                        AutoSizeAxes = Axes.Y,
+                        Direction = FillDirection.Vertical,
+                    }
+                },
             };
 
             newMessagesArrived(Channel.Messages);
