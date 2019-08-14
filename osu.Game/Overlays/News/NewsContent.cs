@@ -8,7 +8,7 @@ namespace osu.Game.Overlays.News
 {
     public abstract class NewsContent : FillFlowContainer
     {
-        public NewsContent()
+        protected NewsContent()
         {
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;

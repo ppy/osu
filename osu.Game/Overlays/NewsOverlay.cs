@@ -15,6 +15,8 @@ namespace osu.Game.Overlays
     public class NewsOverlay : FullscreenOverlay
     {
         private NewsHeader header;
+
+        //ReSharper disable NotAccessedField.Local
         private Container<NewsContent> content;
 
         public readonly Bindable<string> Current = new Bindable<string>(null);
@@ -39,11 +41,11 @@ namespace osu.Game.Overlays
                         Direction = FillDirection.Vertical,
                         Children = new Drawable[]
                         {
-                            header = new NewsHeader()
+                            header = new NewsHeader
                             {
                                 ShowFrontPage = ShowFrontPage
                             },
-                            content = new Container<NewsContent>()
+                            content = new Container<NewsContent>
                             {
                                 RelativeSizeAxes = Axes.X,
                                 AutoSizeAxes = Axes.Y,
