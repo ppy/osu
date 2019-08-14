@@ -145,7 +145,7 @@ namespace osu.Game.Tests.Visual.Menus
             confirmAtMainMenu();
         }
 
-        private void confirmAtMainMenu() => AddUntilStep("Wait for main menu", () => osuGame.ScreenStack.CurrentScreen is MainMenu);
+        private void confirmAtMainMenu() => AddUntilStep("Wait for main menu", () => osuGame.ScreenStack.CurrentScreen is MainMenu menu && menu.IsLoaded);
 
         private void pressAndRelease(Key key)
         {
