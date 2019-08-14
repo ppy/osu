@@ -61,6 +61,6 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="ppy.osu.Game.Resources" Version="2019.809.0" />
-    <PackageReference Include="ppy.osu.Framework.Android" Version="2019.813.0" />
+    <PackageReference Include="ppy.osu.Framework.Android" Version="2019.814.0" />
   </ItemGroup>
 </Project>
