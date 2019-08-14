@@ -20,7 +20,7 @@ namespace osu.Game.Input.Bindings
                 handler = game;
         }
 
-        public override IEnumerable<KeyBinding> DefaultKeyBindings => GlobalKeyBindings.Concat(InGameKeyBindings);
+        public override IEnumerable<KeyBinding> DefaultKeyBindings => GlobalKeyBindings.Concat(InGameKeyBindings).Concat(AudioControlKeyBindings);
 
         public IEnumerable<KeyBinding> GlobalKeyBindings => new[]
         {
@@ -32,11 +32,6 @@ namespace osu.Game.Input.Bindings
             new KeyBinding(new[] { InputKey.Control, InputKey.Alt, InputKey.R }, GlobalAction.ResetInputSettings),
             new KeyBinding(new[] { InputKey.Control, InputKey.T }, GlobalAction.ToggleToolbar),
             new KeyBinding(new[] { InputKey.Control, InputKey.O }, GlobalAction.ToggleSettings),
-            new KeyBinding(InputKey.Up, GlobalAction.IncreaseVolume),
-            new KeyBinding(InputKey.MouseWheelUp, GlobalAction.IncreaseVolume),
-            new KeyBinding(InputKey.Down, GlobalAction.DecreaseVolume),
-            new KeyBinding(InputKey.MouseWheelDown, GlobalAction.DecreaseVolume),
-            new KeyBinding(InputKey.F4, GlobalAction.ToggleMute),
 
             new KeyBinding(InputKey.Escape, GlobalAction.Back),
             new KeyBinding(InputKey.ExtraMouseButton1, GlobalAction.Back),
@@ -53,6 +48,22 @@ namespace osu.Game.Input.Bindings
             new KeyBinding(new[] { InputKey.Control, InputKey.Tilde }, GlobalAction.QuickExit),
             new KeyBinding(new[] { InputKey.Control, InputKey.Plus }, GlobalAction.IncreaseScrollSpeed),
             new KeyBinding(new[] { InputKey.Control, InputKey.Minus }, GlobalAction.DecreaseScrollSpeed),
+        };
+
+        public IEnumerable<KeyBinding> AudioControlKeyBindings => new[]
+        {
+            new KeyBinding(InputKey.Up, GlobalAction.IncreaseVolume),
+            new KeyBinding(InputKey.MouseWheelUp, GlobalAction.IncreaseVolume),
+            new KeyBinding(InputKey.Down, GlobalAction.DecreaseVolume),
+            new KeyBinding(InputKey.MouseWheelDown, GlobalAction.DecreaseVolume),
+            new KeyBinding(InputKey.F4, GlobalAction.ToggleMute),
+
+            new KeyBinding(InputKey.TrackPrevious, GlobalAction.MusicPrev),
+            new KeyBinding(InputKey.F1, GlobalAction.MusicPrev),
+            new KeyBinding(InputKey.TrackNext, GlobalAction.MusicNext),
+            new KeyBinding(InputKey.F5, GlobalAction.MusicNext),
+            new KeyBinding(InputKey.PlayPause, GlobalAction.MusicPlay),
+            new KeyBinding(InputKey.F3, GlobalAction.MusicPlay)
         };
 
         protected override IEnumerable<Drawable> KeyBindingInputQueue =>
@@ -115,5 +126,15 @@ namespace osu.Game.Input.Bindings
 
         [Description("Quick exit (Hold)")]
         QuickExit,
+
+        // Game-wide beatmap msi ccotolle keybindings
+        [Description("Next track")]
+        MusicNext,
+
+        [Description("Previous track")]
+        MusicPrev,
+
+        [Description("Play / pause")]
+        MusicPlay,
     }
 }
