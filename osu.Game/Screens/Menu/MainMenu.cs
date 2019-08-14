@@ -14,7 +14,6 @@ using osu.Game.Graphics.Containers;
 using osu.Game.Overlays;
 using osu.Game.Screens.Backgrounds;
 using osu.Game.Screens.Charts;
-using osu.Game.Screens.Direct;
 using osu.Game.Screens.Edit;
 using osu.Game.Screens.Multi;
 using osu.Game.Screens.Select;
@@ -42,6 +41,9 @@ namespace osu.Game.Screens.Menu
         [Resolved]
         private GameHost host { get; set; }
 
+        [Resolved(canBeNull: true)]
+        private MusicController music { get; set; }
+
         private BackgroundScreenDefault background;
 
         protected override BackgroundScreen CreateBackground() => background;
@@ -62,7 +64,6 @@ namespace osu.Game.Screens.Menu
                         buttons = new ButtonSystem
                         {
                             OnChart = delegate { this.Push(new ChartListing()); },
-                            OnDirect = delegate { this.Push(new OnlineListing()); },
                             OnEdit = delegate { this.Push(new Editor()); },
                             OnSolo = onSolo,
                             OnMulti = delegate { this.Push(new Multiplayer()); },
@@ -120,7 +121,7 @@ namespace osu.Game.Screens.Menu
             var track = Beatmap.Value.Track;
             var metadata = Beatmap.Value.Metadata;
 
-            if (last is Intro && track != null)
+            if (last is IntroScreen && track != null)
             {
                 if (!track.IsRunning)
                 {
@@ -189,6 +190,9 @@ namespace osu.Game.Screens.Menu
 
             //we may have consumed our preloaded instance, so let's make another.
             preloadSongSelect();
+
+            if (Beatmap.Value.Track != null && music?.IsUserPaused != true)
+                Beatmap.Value.Track.Start();
         }
 
         public override bool OnExiting(IScreen next)

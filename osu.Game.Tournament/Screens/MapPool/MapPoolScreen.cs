@@ -47,8 +47,8 @@ namespace osu.Game.Tournament.Screens.MapPool
                 mapFlows = new FillFlowContainer<FillFlowContainer<TournamentBeatmapPanel>>
                 {
                     Y = 100,
-                    Spacing = new Vector2(10, 20),
-                    Padding = new MarginPadding(50),
+                    Spacing = new Vector2(10, 10),
+                    Padding = new MarginPadding(25),
                     Direction = FillDirection.Vertical,
                     RelativeSizeAxes = Axes.Both,
                 },
@@ -218,7 +218,7 @@ namespace osu.Game.Tournament.Screens.MapPool
                     {
                         mapFlows.Add(currentFlow = new FillFlowContainer<TournamentBeatmapPanel>
                         {
-                            Spacing = new Vector2(10, 20),
+                            Spacing = new Vector2(10, 5),
                             Direction = FillDirection.Full,
                             RelativeSizeAxes = Axes.X,
                             AutoSizeAxes = Axes.Y

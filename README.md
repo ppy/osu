@@ -1,5 +1,5 @@
 <p align="center">
-  <img width="256" height="256" src="assets/lazer.png">
+  <img width="500px" src="assets/lazer.png">
 </p>
 
 # osu!
@@ -19,8 +19,9 @@ Detailed changelogs are published on the [official osu! site](https://osu.ppy.sh
 ## Requirements
 
 - A desktop platform with the [.NET Core SDK 2.2](https://www.microsoft.com/net/learn/get-started) or higher installed.
+- When running on linux, please have a system-wide ffmpeg installation available to support video decoding.
+- When running on Windows 7 or 8.1, **[additional prerequisites](https://docs.microsoft.com/en-us/dotnet/core/windows-prerequisites?tabs=netcore2x)** may be required to correctly run .NET Core applications if your operating system is not up-to-date with the latest service packs.
 - When working with the codebase, we recommend using an IDE with intellisense and syntax highlighting, such as [Visual Studio 2017+](https://visualstudio.microsoft.com/vs/), [Jetbrains Rider](https://www.jetbrains.com/rider/) or [Visual Studio Code](https://code.visualstudio.com/).
-- Note that there are **[additional requirements for Windows 7 and Windows 8.1](https://docs.microsoft.com/en-us/dotnet/core/windows-prerequisites?tabs=netcore2x)** which you may need to manually install if your operating system is not up-to-date.
 
 ## Running osu!
 
@@ -34,7 +35,7 @@ If you are not interested in developing the game, you can still consume our [bin
 | ------------- | ------------- |
 
 - **Linux** users are recommended to self-compile until we have official deployment in place.
-- **iOS** users can join the [TestFlight beta program](https://t.co/PasE1zrHhw) (note that due to high demand this is regularly full).
+- **iOS** users can join the [TestFlight beta program](https://testflight.apple.com/join/2tLcjWlF) (note that due to high demand this is regularly full).
 - **Android** users can self-compile, and expect a public beta soon.
 
 If your platform is not listed above, there is still a chance you can manually build it by following the instructions below.
@@ -100,7 +101,7 @@ Before starting, please make sure you are familiar with the [development and tes
 
 Note that while we already have certain standards in place, nothing is set in stone. If you have an issue with the way code is structured; with any libraries we are using; with any processes involved with contributing, *please* bring it up. We welcome all feedback so we can make contributing to this project as pain-free as possible.
 
-For those interested, we love to reward quality contributions via bounties, paid out via paypal or osu! supporter tags. Don't hesitate to [request a bounty](https://docs.google.com/forms/d/e/1FAIpQLSet_8iFAgPMG526pBZ2Kic6HSh7XPM3fE8xPcnWNkMzINDdYg/viewform) for your work on this project.
+For those interested, we love to reward quality contributions via [bounties](https://docs.google.com/spreadsheets/d/1jNXfj_S3Pb5PErA-czDdC9DUu4IgUbe1Lt8E7CYUJuE/view?&rm=minimal#gid=523803337), paid out via paypal or osu! supporter tags. Don't hesitate to [request a bounty](https://docs.google.com/forms/d/e/1FAIpQLSet_8iFAgPMG526pBZ2Kic6HSh7XPM3fE8xPcnWNkMzINDdYg/viewform) for your work on this project.
 
 ## Licence
 

@@ -22,7 +22,7 @@ namespace osu.Game.Overlays.Profile.Sections.Recent
 
         protected override void ShowMore()
         {
-            request = new GetUserRecentActivitiesRequest(User.Value.Id, VisiblePages++ * ItemsPerPage);
+            request = new GetUserRecentActivitiesRequest(User.Value.Id, VisiblePages++, ItemsPerPage);
             request.Success += activities => Schedule(() =>
             {
                 MoreButton.FadeTo(activities.Count == ItemsPerPage ? 1 : 0);
