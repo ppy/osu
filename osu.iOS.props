@@ -3,7 +3,8 @@
     <ProjectTypeGuids>{FEACFBD2-3405-455C-9665-78FE426C6842};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <IPhoneResourcePrefix>Resources</IPhoneResourcePrefix>
     <RestoreProjectStyle>PackageReference</RestoreProjectStyle>
-    <DefaultMtouchExtraArgs>--nolinkaway -gcc_flags "-lstdc++ -framework AudioToolbox -framework SystemConfiguration -framework CFNetwork -framework Accelerate</DefaultMtouchExtraArgs>
+    <DefaultMtouchExtraArgs>--nolinkaway</DefaultMtouchExtraArgs>
+    <DefaultMtouchGccFlags>-lstdc++ -lbz2 -framework AudioToolbox -framework AVFoundation -framework CoreMedia -framework VideoToolbox -framework SystemConfiguration -framework CFNetwork -framework Accelerate</DefaultMtouchGccFlags>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|iPhoneSimulator' ">
     <DebugSymbols>true</DebugSymbols>
@@ -24,7 +25,7 @@
     <DeviceSpecificBuild>false</DeviceSpecificBuild>
     <MtouchVerbosity></MtouchVerbosity>
     <LangVersion>Default</LangVersion>
-    <MtouchExtraArgs>$(DefaultMtouchExtraArgs) -force_load $(OutputPath)\libbass.a -force_load $(OutputPath)\libbass_fx.a"</MtouchExtraArgs>
+    <MtouchExtraArgs>$(DefaultMtouchExtraArgs) -gcc_flags "$(DefaultMtouchGccFlags)"</MtouchExtraArgs>
     <OptimizePNGs>false</OptimizePNGs>
     <MtouchI18n>cjk,mideast,other,rare,west</MtouchI18n>
   </PropertyGroup>
@@ -44,7 +45,7 @@
     <MtouchHttpClientHandler>NSUrlSessionHandler</MtouchHttpClientHandler>
     <MtouchVerbosity></MtouchVerbosity>
     <LangVersion>Default</LangVersion>
-    <MtouchExtraArgs>$(DefaultMtouchExtraArgs) -force_load $(OutputPath)\libbass.a -force_load $(OutputPath)\libbass_fx.a"</MtouchExtraArgs>
+    <MtouchExtraArgs>$(DefaultMtouchExtraArgs) -gcc_flags "$(DefaultMtouchGccFlags)"</MtouchExtraArgs>
     <OptimizePNGs>false</OptimizePNGs>
     <MtouchI18n>cjk,mideast,other,rare,west</MtouchI18n>
   </PropertyGroup>
@@ -62,7 +63,7 @@
     <MtouchHttpClientHandler>NSUrlSessionHandler</MtouchHttpClientHandler>
     <MtouchVerbosity></MtouchVerbosity>
     <LangVersion>Default</LangVersion>
-    <MtouchExtraArgs>$(DefaultMtouchExtraArgs) -force_load $(OutputPath)\libbass.a -force_load $(OutputPath)\libbass_fx.a"</MtouchExtraArgs>
+    <MtouchExtraArgs>$(DefaultMtouchExtraArgs) -gcc_flags "$(DefaultMtouchGccFlags)"</MtouchExtraArgs>
     <OptimizePNGs>false</OptimizePNGs>
     <MtouchI18n>cjk,mideast,other,rare,west</MtouchI18n>
   </PropertyGroup>
@@ -86,10 +87,22 @@
     <MtouchHttpClientHandler>NSUrlSessionHandler</MtouchHttpClientHandler>
     <MtouchVerbosity></MtouchVerbosity>
     <LangVersion>Default</LangVersion>
-    <MtouchExtraArgs>$(DefaultMtouchExtraArgs) -force_load $(OutputPath)\libbass.a -force_load $(OutputPath)\libbass_fx.a"</MtouchExtraArgs>
+    <MtouchExtraArgs>$(DefaultMtouchExtraArgs) -gcc_flags "$(DefaultMtouchGccFlags)"</MtouchExtraArgs>
     <OptimizePNGs>false</OptimizePNGs>
     <MtouchI18n>cjk,mideast,other,rare,west</MtouchI18n>
   </PropertyGroup>
+  <ItemGroup>
+    <NativeReference Include="$(OutputPath)\libbass.a;$(OutputPath)\libbass_fx.a">
+      <Kind>Static</Kind>
+      <SmartLink>False</SmartLink>
+      <ForceLoad>True</ForceLoad>
+    </NativeReference>
+    <NativeReference Include="$(OutputPath)\libavcodec.a;$(OutputPath)\libavdevice.a;$(OutputPath)\libavfilter.a;$(OutputPath)\libavformat.a;$(OutputPath)\libavutil.a;$(OutputPath)\libswresample.a;$(OutputPath)\libswscale.a">
+      <Kind>Static</Kind>
+      <SmartLink>False</SmartLink>
+      <ForceLoad>True</ForceLoad>
+    </NativeReference>
+  </ItemGroup>
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Xml" />
@@ -104,13 +117,13 @@
     <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="2.2.1" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite.Core" Version="2.2.1" />
     <PackageReference Include="Newtonsoft.Json" Version="12.0.1" />
-    <PackageReference Include="ppy.osu.Game.Resources" Version="2019.702.0" />
-    <PackageReference Include="ppy.osu.Framework" Version="2019.730.0" />
-    <PackageReference Include="ppy.osu.Framework.iOS" Version="2019.730.0" />
+    <PackageReference Include="ppy.osu.Game.Resources" Version="2019.809.0" />
+    <PackageReference Include="ppy.osu.Framework" Version="2019.814.0" />
+    <PackageReference Include="ppy.osu.Framework.iOS" Version="2019.814.0" />
     <PackageReference Include="SharpCompress" Version="0.22.0" />
     <PackageReference Include="NUnit" Version="3.11.0" />
     <PackageReference Include="SharpRaven" Version="2.4.0" />
     <PackageReference Include="System.ComponentModel.Annotations" Version="4.5.0" />
-    <PackageReference Include="ppy.osu.Framework.NativeLibs" Version="2019.307.0" ExcludeAssets="all" />
+    <PackageReference Include="ppy.osu.Framework.NativeLibs" Version="2019.813.0" ExcludeAssets="all" />
   </ItemGroup>
 </Project>
