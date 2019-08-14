@@ -113,20 +113,22 @@ namespace osu.Game.Rulesets.Taiko.Replays
                 else
                     throw new InvalidOperationException("Unknown hit object type.");
 
+                TaikoHitObject nextHitObject;
                 if (i < Beatmap.HitObjects.Count - 1)
+                    nextHitObject = Beatmap.HitObjects[i + 1];
+                else
+                    nextHitObject = null;
+
+                bool canDelayKeyUp = nextHitObject != null && nextHitObject.StartTime > endTime + KEY_UP_DELAY;
+
+                if (canDelayKeyUp)
+                    Frames.Add(new TaikoReplayFrame(endTime + KEY_UP_DELAY));
+
+                if (nextHitObject != null)
                 {
-                    var nextHitObject = Beatmap.HitObjects[i + 1];
-
-                    if (nextHitObject.StartTime > endTime + KEY_UP_DELAY)
-                        Frames.Add(new TaikoReplayFrame(endTime + KEY_UP_DELAY));
-
                     double waitTime = nextHitObject.StartTime - 1000;
                     if (waitTime > endTime)
                         Frames.Add(new TaikoReplayFrame(waitTime));
-                }
-                else
-                {
-                    Frames.Add(new TaikoReplayFrame(endTime + KEY_UP_DELAY));
                 }
 
                 hitButton = !hitButton;
