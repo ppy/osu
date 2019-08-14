@@ -231,6 +231,9 @@ namespace osu.Game.Overlays
 
         public bool OnPressed(GlobalAction action)
         {
+            if (beatmap.Disabled)
+                return false;
+
             switch (action)
             {
                 case GlobalAction.MusicPlay:
