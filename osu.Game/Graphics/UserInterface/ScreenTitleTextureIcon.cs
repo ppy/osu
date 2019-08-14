@@ -12,17 +12,17 @@ using osuTK;
 namespace osu.Game.Graphics.UserInterface
 {
     /// <summary>
-    /// A custom icon class for use with <see cref="ScreenTitle.CreateIcon()"/>
+    /// A custom icon class for use with <see cref="ScreenTitle.CreateIcon()"/> based off a texture resource.
     /// </summary>
-    public class ScreenTitleIcon : CompositeDrawable
+    public class ScreenTitleTextureIcon : CompositeDrawable
     {
         private const float circle_allowance = 0.8f;
 
-        private readonly string icon;
+        private readonly string textureName;
 
-        public ScreenTitleIcon(string icon)
+        public ScreenTitleTextureIcon(string textureName)
         {
-            this.icon = icon;
+            this.textureName = textureName;
         }
 
         [BackgroundDependencyLoader]
@@ -44,7 +44,7 @@ namespace osu.Game.Graphics.UserInterface
                         new Sprite
                         {
                             RelativeSizeAxes = Axes.Both,
-                            Texture = textures.Get(icon),
+                            Texture = textures.Get(textureName),
                             Size = new Vector2(circle_allowance),
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
