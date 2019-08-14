@@ -15,6 +15,7 @@ namespace osu.Game.Overlays
     public class NewsOverlay : FullscreenOverlay
     {
         private NewsHeader header;
+        private Container<NewsContent> content;
 
         public readonly Bindable<string> Current = new Bindable<string>(null);
 
@@ -39,13 +40,20 @@ namespace osu.Game.Overlays
                         Children = new Drawable[]
                         {
                             header = new NewsHeader()
+                            {
+                                ShowFrontPage = ShowFrontPage
+                            },
+                            content = new Container<NewsContent>()
+                            {
+                                RelativeSizeAxes = Axes.X,
+                                AutoSizeAxes = Axes.Y,
+                            }
                         },
                     },
                 },
             };
 
             header.Current.BindTo(Current);
-            header.ShowFrontPage = ShowFrontPage;
             Current.TriggerChange();
         }
 

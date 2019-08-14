@@ -97,7 +97,7 @@ namespace osu.Game.Overlays.News
                 IsReadingArticle = false;
             }
 
-            protected override Drawable CreateIcon() => new ScreenTitleIcon(@"Icons/news");
+            protected override Drawable CreateIcon() => new ScreenTitleTextureIcon(@"Icons/news");
 
             [BackgroundDependencyLoader]
             private void load(OsuColour colours)
