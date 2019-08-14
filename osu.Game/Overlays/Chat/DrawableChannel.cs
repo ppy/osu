@@ -32,16 +32,16 @@ namespace osu.Game.Overlays.Chat
         {
             Children = new Drawable[]
             {
-                scroll = new OsuScrollContainer
+                new OsuContextMenuContainer
                 {
                     RelativeSizeAxes = Axes.Both,
-                    // Some chat lines have effects that slightly protrude to the bottom,
-                    // which we do not want to mask away, hence the padding.
-                    Padding = new MarginPadding { Bottom = 5 },
-                    Child = new OsuContextMenuContainer
+                    Masking = true,
+                    Child = scroll = new OsuScrollContainer
                     {
-                        RelativeSizeAxes = Axes.X,
-                        AutoSizeAxes = Axes.Y,
+                        RelativeSizeAxes = Axes.Both,
+                        // Some chat lines have effects that slightly protrude to the bottom,
+                        // which we do not want to mask away, hence the padding.
+                        Padding = new MarginPadding { Bottom = 5 },
                         Child = ChatLineFlow = new ChatLineContainer
                         {
                             Padding = new MarginPadding { Left = 20, Right = 20 },
