@@ -98,13 +98,12 @@ namespace osu.Game.Screens.Edit.Setup.Components.LabelledComponents
                                     Colour = Color4.White,
                                     Font = OsuFont.GetFont(size: default_label_text_size, weight: FontWeight.Bold),
                                 },
-                                textBox = new OsuTextBox
+                                textBox = new RoundedTextBox
                                 {
                                     Anchor = Anchor.TopLeft,
                                     Origin = Anchor.TopLeft,
                                     RelativeSizeAxes = Axes.Both,
                                     Height = 1,
-                                    CornerRadius = corner_radius,
                                 },
                             },
                         },
@@ -120,10 +119,18 @@ namespace osu.Game.Screens.Edit.Setup.Components.LabelledComponents
             textBox.OnCommit += OnCommit;
         }
 
-        [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
+        private class RoundedTextBox : OsuTextBox
         {
-            textBox.BorderColour = colours.Blue;
+            public RoundedTextBox()
+            {
+                CornerRadius = corner_radius;
+            }
+
+            [BackgroundDependencyLoader]
+            private void load(OsuColour colours)
+            {
+                BorderColour = colours.Blue;
+            }
         }
     }
 }
