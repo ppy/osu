@@ -117,7 +117,7 @@ namespace osu.Game.Rulesets.Taiko.Replays
                 {
                     var nextHitObject = Beatmap.HitObjects[i + 1];
 
-                    if (!(nextHitObject.StartTime < endTime + KEY_UP_DELAY))
+                    if (nextHitObject.StartTime > endTime + KEY_UP_DELAY)
                         Frames.Add(new TaikoReplayFrame(endTime + KEY_UP_DELAY));
 
                     double waitTime = nextHitObject.StartTime - 1000;
