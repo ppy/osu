@@ -17,7 +17,7 @@ namespace osu.Game.Tests.Visual.Menus
         {
             typeof(ToolbarButton),
             typeof(ToolbarRulesetSelector),
-            typeof(ToolbarRulesetButton),
+            typeof(ToolbarRulesetTabButton),
             typeof(ToolbarNotificationButton),
         };
 

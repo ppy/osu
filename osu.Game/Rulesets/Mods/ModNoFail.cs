@@ -7,7 +7,7 @@ using osu.Game.Graphics;
 
 namespace osu.Game.Rulesets.Mods
 {
-    public abstract class ModNoFail : Mod, IApplicableFailOverride
+    public abstract class ModNoFail : ModBlockFail
     {
         public override string Name => "No Fail";
         public override string Acronym => "NF";
@@ -17,10 +17,5 @@ namespace osu.Game.Rulesets.Mods
         public override double ScoreMultiplier => 0.5;
         public override bool Ranked => true;
         public override Type[] IncompatibleMods => new[] { typeof(ModRelax), typeof(ModSuddenDeath), typeof(ModAutoplay) };
-
-        /// <summary>
-        /// We never fail, 'yo.
-        /// </summary>
-        public bool AllowFail => false;
     }
 }

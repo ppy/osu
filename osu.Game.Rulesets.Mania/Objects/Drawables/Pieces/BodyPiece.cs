@@ -100,7 +100,7 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables.Pieces
             }
         }
 
-        private Cached subtractionCache = new Cached();
+        private readonly Cached subtractionCache = new Cached();
 
         public override bool Invalidate(Invalidation invalidation = Invalidation.All, Drawable source = null, bool shallPropagate = true)
         {

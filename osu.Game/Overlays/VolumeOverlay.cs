@@ -102,6 +102,10 @@ namespace osu.Game.Overlays
                 case GlobalAction.DecreaseVolume:
                     if (State.Value == Visibility.Hidden)
                         Show();
+                    else if (volumeMeterMusic.IsHovered)
+                        volumeMeterMusic.Decrease(amount, isPrecise);
+                    else if (volumeMeterEffect.IsHovered)
+                        volumeMeterEffect.Decrease(amount, isPrecise);
                     else
                         volumeMeterMaster.Decrease(amount, isPrecise);
                     return true;
@@ -109,6 +113,10 @@ namespace osu.Game.Overlays
                 case GlobalAction.IncreaseVolume:
                     if (State.Value == Visibility.Hidden)
                         Show();
+                    else if (volumeMeterMusic.IsHovered)
+                        volumeMeterMusic.Increase(amount, isPrecise);
+                    else if (volumeMeterEffect.IsHovered)
+                        volumeMeterEffect.Increase(amount, isPrecise);
                     else
                         volumeMeterMaster.Increase(amount, isPrecise);
                     return true;
