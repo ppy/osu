@@ -203,6 +203,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             float relativeCircleScale = Spinner.Scale * circle.DrawHeight / mainContainer.DrawHeight;
             Disc.ScaleTo(relativeCircleScale + (1 - relativeCircleScale) * Progress, 200, Easing.OutQuint);
 
+            spinRate.Value = (spmCounter.SpinsPerMinute / 180) * Progress;
+
             symbol.RotateTo(Disc.Rotation / 2, 500, Easing.OutQuint);
         }
 
