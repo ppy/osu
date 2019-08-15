@@ -11,10 +11,13 @@ using osuTK.Graphics;
 using osu.Game.Graphics;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Allocation;
+using osu.Framework.Audio;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics.Sprites;
+using osu.Game.Audio;
 using osu.Game.Screens.Ranking;
 using osu.Game.Rulesets.Scoring;
+using osu.Game.Skinning;
 
 namespace osu.Game.Rulesets.Osu.Objects.Drawables
 {
@@ -40,6 +43,9 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
         private readonly IBindable<Vector2> positionBindable = new Bindable<Vector2>();
 
+        private readonly SkinnableSound spinSound;
+        private readonly BindableDouble spinRate = new BindableDouble();
+
         private Color4 normalColour;
         private Color4 completeColour;
 
@@ -58,6 +64,10 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
             InternalChildren = new Drawable[]
             {
+                spinSound = new SkinnableSound(new SampleInfo("spinnerspin"))
+                {
+                    Looping = true,
+                },
                 circleContainer = new Container
                 {
                     AutoSizeAxes = Axes.Both,
@@ -200,6 +210,9 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         {
             base.UpdateInitialTransforms();
 
+            spinSound.AddAdjustment(AdjustableProperty.Frequency, spinRate);
+            spinSound.Play();
+
             circleContainer.ScaleTo(Spinner.Scale * 0.3f);
             circleContainer.ScaleTo(Spinner.Scale, HitObject.TimePreempt / 1.4f, Easing.OutQuint);
 
@@ -231,6 +244,15 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                     sequence.ScaleTo(Scale * 0.8f, 320, Easing.In);
                     break;
             }
+
+            Schedule(() =>
+            {
+                if (State.Value != ArmedState.Idle)
+                {
+                    RemoveInternal(spinSound);
+                    spinSound.Dispose();
+                }
+            });
 
             Expire();
         }
