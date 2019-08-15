@@ -115,7 +115,7 @@ namespace osu.Game.Rulesets.Taiko.Replays
 
                 TaikoHitObject nextHitObject = i < Beatmap.HitObjects.Count - 1 ? Beatmap.HitObjects[i + 1] : null;
 
-                bool canDelayKeyUp = nextHitObject != null && nextHitObject.StartTime > endTime + KEY_UP_DELAY;
+                bool canDelayKeyUp = nextHitObject == null || nextHitObject.StartTime > endTime + KEY_UP_DELAY;
 
                 if (canDelayKeyUp)
                     Frames.Add(new TaikoReplayFrame(endTime + KEY_UP_DELAY));
