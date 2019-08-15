@@ -64,7 +64,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
             InternalChildren = new Drawable[]
             {
-                spinSound = new SkinnableSound(new SampleInfo("spinnerspin"))
+                spinningSample = new SkinnableSound(new SampleInfo("spinnerspin"))
                 {
                     Looping = true,
                 },
