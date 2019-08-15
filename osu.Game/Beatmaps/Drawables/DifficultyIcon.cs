@@ -23,7 +23,7 @@ namespace osu.Game.Beatmaps.Drawables
     {
         private readonly RulesetInfo ruleset;
 
-        public DifficultyIcon(BeatmapInfo beatmap, RulesetInfo ruleset = null, Boolean shouldShowTooltip = false)
+        public DifficultyIcon(BeatmapInfo beatmap, RulesetInfo ruleset = null, bool shouldShowTooltip = true)
             : base(beatmap)
         {
             if (beatmap == null)
@@ -38,89 +38,6 @@ namespace osu.Game.Beatmaps.Drawables
         public string TooltipText { get; set; }
 
         public ITooltip GetCustomTooltip() => new DifficultyIconTooltip(AccentColour);
-
-        public class DifficultyIconTooltip : VisibilityContainer, ITooltip
-        {
-            private readonly OsuSpriteText difficultyName, starRating;
-            private readonly Box background;
-
-            public string TooltipText { get; set; }
-
-            public DifficultyIconTooltip(Color4 accentColour)
-            {
-                AutoSizeAxes = Axes.Both;
-                Masking = true;
-                CornerRadius = 5;
-
-                Children = new Drawable[]
-                {
-                    background = new Box
-                    {
-                        RelativeSizeAxes = Axes.Both
-                    },
-                    new FillFlowContainer
-                    {
-                        AutoSizeAxes = Axes.Both,
-                        Direction = FillDirection.Vertical,
-                        Padding = new MarginPadding(10),
-                        Children = new Drawable[]
-                        {
-                            difficultyName = new OsuSpriteText
-                            {
-                                Anchor = Anchor.Centre,
-                                Origin = Anchor.Centre,
-                                Font = OsuFont.GetFont(size: 16, weight: FontWeight.Bold),
-                            },
-                            new FillFlowContainer
-                            {
-                                AutoSizeAxes = Axes.Both,
-                                Anchor = Anchor.Centre,
-                                Origin = Anchor.Centre,
-                                Direction = FillDirection.Horizontal,
-                                Children = new Drawable[]
-                                {
-                                    starRating = new OsuSpriteText
-                                    {
-                                        Anchor = Anchor.Centre,
-                                        Origin = Anchor.Centre,
-                                        Font = OsuFont.GetFont(size: 16, weight: FontWeight.Regular),
-                                        Colour = accentColour
-                                    },
-                                    new SpriteIcon
-                                    {
-                                        Anchor = Anchor.Centre,
-                                        Origin = Anchor.Centre,
-                                        Margin = new MarginPadding { Left = 4 },
-                                        Icon = FontAwesome.Solid.Star,
-                                        Size = new Vector2(12),
-                                        Colour = accentColour,
-                                    },
-                                }
-                            }
-                        }
-                    }
-                };
-            }
-
-            [BackgroundDependencyLoader]
-            private void load(OsuColour colours)
-            {
-                background.Colour = colours.GreyCarmineDark;
-            }
-
-            public void Refresh()
-            {
-                var info = TooltipText.Split('$');
-                difficultyName.Text = info[0];
-                starRating.Text = info[1];
-            }
-
-            public void Move(Vector2 pos) => Position = pos;
-
-            protected override void PopIn() => this.FadeIn(200, Easing.OutQuint);
-
-            protected override void PopOut() => this.FadeOut(200, Easing.OutQuint);
-        }
 
         [BackgroundDependencyLoader]
         private void load()
@@ -155,6 +72,88 @@ namespace osu.Game.Beatmaps.Drawables
                     Icon = ruleset?.CreateInstance().CreateIcon() ?? new SpriteIcon { Icon = FontAwesome.Regular.QuestionCircle }
                 }
             };
+        }
+
+        private class DifficultyIconTooltip : VisibilityContainer, ITooltip
+        {
+            private readonly OsuSpriteText difficultyName, starRating;
+            private readonly Box background;
+
+            public string TooltipText { get; set; }
+
+            public DifficultyIconTooltip(Color4 difficultyColour)
+            {
+                AutoSizeAxes = Axes.Both;
+                Masking = true;
+                CornerRadius = 5;
+
+                Children = new Drawable[]
+                {
+                    background = new Box
+                    {
+                        RelativeSizeAxes = Axes.Both
+                    },
+                    new FillFlowContainer
+                    {
+                        AutoSizeAxes = Axes.Both,
+                        Direction = FillDirection.Vertical,
+                        Padding = new MarginPadding(10),
+                        Children = new Drawable[]
+                        {
+                            difficultyName = new OsuSpriteText
+                            {
+                                Anchor = Anchor.Centre,
+                                Origin = Anchor.Centre,
+                                Font = OsuFont.GetFont(size: 16, weight: FontWeight.Bold),
+                            },
+                            new FillFlowContainer
+                            {
+                                AutoSizeAxes = Axes.Both,
+                                Anchor = Anchor.Centre,
+                                Origin = Anchor.Centre,
+                                Direction = FillDirection.Horizontal,
+                                Colour = difficultyColour,
+                                Children = new Drawable[]
+                                {
+                                    starRating = new OsuSpriteText
+                                    {
+                                        Anchor = Anchor.Centre,
+                                        Origin = Anchor.Centre,
+                                        Font = OsuFont.GetFont(size: 16, weight: FontWeight.Regular),
+                                    },
+                                    new SpriteIcon
+                                    {
+                                        Anchor = Anchor.Centre,
+                                        Origin = Anchor.Centre,
+                                        Margin = new MarginPadding { Left = 4 },
+                                        Icon = FontAwesome.Solid.Star,
+                                        Size = new Vector2(12),
+                                    },
+                                }
+                            }
+                        }
+                    }
+                };
+            }
+
+            [BackgroundDependencyLoader]
+            private void load(OsuColour colours)
+            {
+                background.Colour = colours.GreyCarmineDark;
+            }
+
+            public void Refresh()
+            {
+                var info = TooltipText.Split('$');
+                difficultyName.Text = info[0];
+                starRating.Text = info[1];
+            }
+
+            public void Move(Vector2 pos) => Position = pos;
+
+            protected override void PopIn() => this.FadeIn(200, Easing.OutQuint);
+
+            protected override void PopOut() => this.FadeOut(200, Easing.OutQuint);
         }
     }
 }
