@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using osu.Framework.Graphics;
 using osu.Game.Graphics;
+using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Screens.Menu;
 
@@ -12,7 +13,11 @@ namespace osu.Game.Tests.Visual.UserInterface
 {
     public class TestSceneHoldToConfirmOverlay : OsuTestScene
     {
-        public override IReadOnlyList<Type> RequiredTypes => new[] { typeof(ExitConfirmOverlay) };
+        public override IReadOnlyList<Type> RequiredTypes => new[]
+        {
+            typeof(ExitConfirmOverlay),
+            typeof(HoldToConfirmContainer),
+        };
 
         public TestSceneHoldToConfirmOverlay()
         {
