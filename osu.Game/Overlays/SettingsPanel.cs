@@ -60,9 +60,9 @@ namespace osu.Game.Overlays
         [BackgroundDependencyLoader]
         private void load()
         {
-            InternalChild = new EdgeSnappingContainer
+            InternalChild = new SafeAreaContainer
             {
-                SnappedEdges = Edges.Bottom,
+                SafeAreaOverrideEdges = Edges.Bottom,
                 RelativeSizeAxes = Axes.Both,
                 Child = ContentContainer = new Container
                 {

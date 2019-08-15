@@ -79,10 +79,10 @@ namespace osu.Game.Screens.Select
         {
             Children = new Drawable[]
             {
-                new EdgeSnappingContainer
+                new SafeAreaContainer
                 {
                     RelativeSizeAxes = Axes.Both,
-                    SnappedEdges = Edges.Horizontal,
+                    SafeAreaOverrideEdges = Edges.Horizontal,
                     Child = Background = new Box
                     {
                         Colour = Color4.Black,

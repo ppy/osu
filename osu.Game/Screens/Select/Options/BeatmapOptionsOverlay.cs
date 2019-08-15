@@ -63,12 +63,12 @@ namespace osu.Game.Screens.Select.Options
 
             Children = new Drawable[]
             {
-                new EdgeSnappingContainer
+                new SafeAreaContainer
                 {
                     RelativeSizeAxes = Axes.Both,
                     Origin = Anchor.BottomLeft,
                     Anchor = Anchor.BottomLeft,
-                    SnappedEdges = Edges.Horizontal,
+                    SafeAreaOverrideEdges = Edges.Horizontal,
                     Child = holder = new Box
                     {
                         Origin = Anchor.BottomLeft,

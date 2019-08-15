@@ -31,9 +31,9 @@ namespace osu.Game.Overlays.Settings
             RelativeSizeAxes = Axes.Y;
             InternalChildren = new Drawable[]
             {
-                new EdgeSnappingContainer
+                new SafeAreaContainer
                 {
-                    SnappedEdges = Edges.Left | Edges.Bottom | Edges.Top,
+                    SafeAreaOverrideEdges = Edges.Left | Edges.Bottom | Edges.Top,
                     RelativeSizeAxes = Axes.Both,
                     Child = new Box
                     {

@@ -31,9 +31,9 @@ namespace osu.Game.Screens
 
         private void initializeStack()
         {
-            InternalChild = new EdgeSnappingContainer
+            InternalChild = new SafeAreaContainer
             {
-                SnappedEdges = Edges.All,
+                SafeAreaOverrideEdges = Edges.All,
                 RelativeSizeAxes = Axes.Both,
                 Child = parallaxContainer = new ParallaxContainer
                 {

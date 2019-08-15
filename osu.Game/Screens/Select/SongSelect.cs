@@ -100,9 +100,9 @@ namespace osu.Game.Screens.Select
 
             AddRangeInternal(new Drawable[]
             {
-                new EdgeSnappingContainer
+                new SafeAreaContainer
                 {
-                    SnappedEdges = Edges.All,
+                    SafeAreaOverrideEdges = Edges.All,
                     RelativeSizeAxes = Axes.Both,
                     Child = new ParallaxContainer
                     {
@@ -148,53 +148,49 @@ namespace osu.Game.Screens.Select
                     Width = 2, //avoid horizontal masking so the panels don't clip when screen stack is pushed.
                     Children = new Drawable[]
                     {
-                        new EdgeSnappingContainer
+                        new SafeAreaContainer
                         {
                             RelativeSizeAxes = Axes.Both,
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
                             Width = 0.5f,
-                            SnappedEdges = Edges.Horizontal, // vertical snapping will have no effect as the parent container is masking
-                            Child = Carousel = new BeatmapCarousel
+                            SafeAreaOverrideEdges = Edges.Horizontal,
+                            Children = new Drawable[]
                             {
-                                RelativeSizeAxes = Axes.Both,
-                                Padding = new MarginPadding
+                                new Container
                                 {
-                                    Top = FilterControl.HEIGHT,
-                                    Bottom = Footer.HEIGHT
-                                },
-                                Child = Carousel = new BeatmapCarousel
-                                {
-                                    Masking = false,
                                     RelativeSizeAxes = Axes.Both,
-                                    Size = new Vector2(1 - wedged_container_size.X, 1),
-                                    Anchor = Anchor.CentreRight,
-                                    Origin = Anchor.CentreRight,
-                                    SelectionChanged = updateSelectedBeatmap,
-                                    BeatmapSetsChanged = carouselBeatmapsLoaded,
+                                    Padding = new MarginPadding
+                                    {
+                                        Top = FilterControl.HEIGHT,
+                                        Bottom = Footer.HEIGHT
+                                    },
+                                    Child = Carousel = new BeatmapCarousel
+                                    {
+                                        Masking = false,
+                                        RelativeSizeAxes = Axes.Both,
+                                        Size = new Vector2(1 - wedged_container_size.X, 1),
+                                        Anchor = Anchor.CentreRight,
+                                        Origin = Anchor.CentreRight,
+                                        SelectionChanged = updateSelectedBeatmap,
+                                        BeatmapSetsChanged = carouselBeatmapsLoaded,
+                                    },
                                 },
-                            },
+                            }
                         },
                         FilterControl = new FilterControl
                         {
                             RelativeSizeAxes = Axes.X,
                             Anchor = Anchor.TopCentre,
                             Origin = Anchor.TopCentre,
-                            Height = 100,
                             Width = 0.5f,
+                            Height = FilterControl.HEIGHT,
                             FilterChanged = c => Carousel.Filter(c),
                             Background = { Width = 2 },
                             Exit = () =>
                             {
-                                RelativeSizeAxes = Axes.X,
-                                Height = FilterControl.HEIGHT,
-                                FilterChanged = c => Carousel.Filter(c),
-                                Background = { Width = 2 },
-                                Exit = () =>
-                                {
-                                    if (this.IsCurrentScreen())
-                                        this.Exit();
-                                },
+                                if (this.IsCurrentScreen())
+                                    this.Exit();
                             },
                         },
                     },

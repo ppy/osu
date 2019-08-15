@@ -68,9 +68,9 @@ namespace osu.Game.Screens.Select
             Origin = Anchor.BottomCentre;
             Children = new Drawable[]
             {
-                new EdgeSnappingContainer
+                new SafeAreaContainer
                 {
-                    SnappedEdges = Edges.Left | Edges.Right | Edges.Bottom,
+                    SafeAreaOverrideEdges = Edges.Left | Edges.Right | Edges.Bottom,
                     RelativeSizeAxes = Axes.Both,
                     Child = new Box
                     {
@@ -79,9 +79,9 @@ namespace osu.Game.Screens.Select
                         Colour = Color4.Black.Opacity(0.5f),
                     }
                 },
-                new EdgeSnappingContainer
+                new SafeAreaContainer
                 {
-                    SnappedEdges = Edges.Horizontal,
+                    SafeAreaOverrideEdges = Edges.Horizontal,
                     RelativeSizeAxes = Axes.X,
                     Child = modeLight = new Box
                     {

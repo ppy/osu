@@ -14,7 +14,7 @@ using osu.Game.Screens.Play.Break;
 
 namespace osu.Game.Screens.Play
 {
-    public class BreakOverlay : EdgeSnappingContainer
+    public class BreakOverlay : SafeAreaContainer
     {
         /// <summary>
         /// The duration of the break overlay fading.
@@ -64,7 +64,7 @@ namespace osu.Game.Screens.Play
         public BreakOverlay(bool letterboxing, ScoreProcessor scoreProcessor = null)
         {
             RelativeSizeAxes = Axes.Both;
-            SnappedEdges = Edges.All;
+            SafeAreaOverrideEdges = Edges.All;
 
             Child = fadeContainer = new Container
             {

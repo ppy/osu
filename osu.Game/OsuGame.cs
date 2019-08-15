@@ -416,7 +416,6 @@ namespace osu.Game
                 new SafeAreaContainer
                 {
                     RelativeSizeAxes = Axes.Both,
-                    SafeEdges = Edges.All,
                     Children = new Drawable[]
                     {
                         screenContainer = new ScalingContainer(ScalingMode.ExcludeOverlays)

@@ -40,10 +40,10 @@ namespace osu.Game.Overlays
 
             AddRange(new Drawable[]
             {
-                new EdgeSnappingContainer
+                new SafeAreaContainer
                 {
                     RelativeSizeAxes = Axes.Both,
-                    SnappedEdges = Edges.All,
+                    SafeAreaOverrideEdges = Edges.All,
                     Child = new Box
                     {
                         RelativeSizeAxes = Axes.Y,

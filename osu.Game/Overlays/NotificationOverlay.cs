@@ -37,10 +37,10 @@ namespace osu.Game.Overlays
 
             Children = new Drawable[]
             {
-                new EdgeSnappingContainer
+                new SafeAreaContainer
                 {
                     RelativeSizeAxes = Axes.Both,
-                    SnappedEdges = Edges.Right | Edges.Bottom,
+                    SafeAreaOverrideEdges = Edges.Right | Edges.Bottom,
                     Child = new Box
                     {
                         RelativeSizeAxes = Axes.Both,

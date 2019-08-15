@@ -65,10 +65,10 @@ namespace osu.Game.Screens.Play
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
-            Child = new EdgeSnappingContainer
+            Child = new SafeAreaContainer
             {
                 RelativeSizeAxes = Axes.Both,
-                SnappedEdges = Edges.All,
+                SafeAreaOverrideEdges = Edges.All,
                 Children = new Drawable[]
                 {
                     new Box

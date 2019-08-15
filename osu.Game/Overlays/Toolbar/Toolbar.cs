@@ -100,14 +100,14 @@ namespace osu.Game.Overlays.Toolbar
                 overlayActivationMode.BindTo(osuGame.OverlayActivationMode);
         }
 
-        public class ToolbarBackground : EdgeSnappingContainer
+        public class ToolbarBackground : SafeAreaContainer
         {
             private readonly Box solidBackground;
             private readonly Box gradientBackground;
 
             public ToolbarBackground()
             {
-                SnappedEdges = Edges.Left | Edges.Top | Edges.Right;
+                SafeAreaOverrideEdges = Edges.Left | Edges.Top | Edges.Right;
                 RelativeSizeAxes = Axes.Both;
                 Children = new Drawable[]
                 {

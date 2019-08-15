@@ -52,16 +52,16 @@ namespace osu.Game.Screens.Menu
         [BackgroundDependencyLoader(true)]
         private void load(DirectOverlay direct, SettingsOverlay settings)
         {
-            var edgeSnappingContainer = new EdgeSnappingContainer
+            var safeAreaContainer = new SafeAreaContainer
             {
-                SnappedEdges = Edges.All,
+                SafeAreaOverrideEdges = Edges.All,
                 RelativeSizeAxes = Axes.Both
             };
 
             if (host.CanExit)
-                edgeSnappingContainer.Add(new ExitConfirmOverlay { Action = this.Exit });
+                safeAreaContainer.Add(new ExitConfirmOverlay { Action = this.Exit });
 
-            edgeSnappingContainer.AddRange(new Drawable[]
+            safeAreaContainer.AddRange(new Drawable[]
             {
                 new ParallaxContainer
                 {
@@ -81,7 +81,7 @@ namespace osu.Game.Screens.Menu
                 sideFlashes = new MenuSideFlashes(),
             });
 
-            InternalChild = edgeSnappingContainer;
+            InternalChild = safeAreaContainer;
 
             buttons.StateChanged += state =>
             {
