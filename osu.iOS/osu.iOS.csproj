@@ -11,25 +11,6 @@
   </PropertyGroup>
   <Import Project="..\osu.iOS.props" />
   <ItemGroup>
-    <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\Contents.json" />
-    <ImageAsset Include="Assets.xcassets\Contents.json" />
-    <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\Icon-App-20x20%402x.png" />
-    <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\Icon-App-20x20%403x.png" />
-    <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\Icon-App-29x29%402x.png" />
-    <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\Icon-App-29x29%403x.png" />
-    <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\Icon-App-40x40%402x.png" />
-    <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\Icon-App-40x40%403x.png" />
-    <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\Icon-App-60x60%402x.png" />
-    <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\Icon-App-60x60%403x.png" />
-    <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\Icon-App-20x20%401x.png" />
-    <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\Icon-App-29x29%401x.png" />
-    <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\Icon-App-40x40%401x.png" />
-    <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\Icon-App-76x76%401x.png" />
-    <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\Icon-App-76x76%402x.png" />
-    <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\Icon-App-83.5x83.5%402x.png" />
-    <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\ItunesArtwork%402x.png" />
-  </ItemGroup>
-  <ItemGroup>
     <Folder Include="Resources\" />
   </ItemGroup>
   <ItemGroup>
@@ -38,12 +19,6 @@
   <ItemGroup>
     <None Include="Info.plist" />
     <None Include="Entitlements.plist" />
-    <None Include="libbass_fx.a">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="libbass.a">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Application.cs" />
@@ -78,6 +53,28 @@
   <ItemGroup>
     <ITunesArtwork Include="iTunesArtwork" />
     <ITunesArtwork Include="iTunesArtwork%402x" />
+  </ItemGroup>
+  <ItemGroup>
+    <ImageAsset Include="Assets.xcassets\Contents.json" />
+    <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\Contents.json" />
+    <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\iOSAppStore.png" />
+    <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\iPadApp1x.png" />
+    <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\iPadApp2x.png" />
+    <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\iPadNotification1x.png" />
+    <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\iPadNotification2x.png" />
+    <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\iPadProApp2x.png" />
+    <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\iPadSettings1x.png" />
+    <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\iPadSettings2x.png" />
+    <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\iPadSpotlight1x.png" />
+    <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\iPadSpotlight2x.png" />
+    <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\iPhoneApp2x.png" />
+    <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\iPhoneApp3x.png" />
+    <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\iPhoneNotification2x.png" />
+    <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\iPhoneNotification3x.png" />
+    <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\iPhoneSettings2x.png" />
+    <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\iPhoneSettings3x.png" />
+    <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\iPhoneSpotlight2x.png" />
+    <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\iPhoneSpotlight3x.png" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\iOS\Xamarin.iOS.CSharp.targets" />
   <Import Project="..\packages\NETStandard.Library.2.0.0\build\netstandard2.0\NETStandard.Library.targets" Condition="Exists('..\packages\NETStandard.Library.2.0.0\build\netstandard2.0\NETStandard.Library.targets')" />

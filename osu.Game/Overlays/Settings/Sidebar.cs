@@ -89,6 +89,7 @@ namespace osu.Game.Overlays.Settings
                 Content.Anchor = Anchor.CentreLeft;
                 Content.Origin = Anchor.CentreLeft;
                 RelativeSizeAxes = Axes.Both;
+                ScrollbarVisible = false;
             }
         }
 

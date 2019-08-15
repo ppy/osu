@@ -14,7 +14,6 @@ using osu.Game.Graphics.Containers;
 using osu.Game.Overlays;
 using osu.Game.Screens.Backgrounds;
 using osu.Game.Screens.Charts;
-using osu.Game.Screens.Direct;
 using osu.Game.Screens.Edit;
 using osu.Game.Screens.Multi;
 using osu.Game.Screens.Select;
@@ -24,7 +23,9 @@ namespace osu.Game.Screens.Menu
 {
     public class MainMenu : OsuScreen
     {
-        private ButtonSystem buttons;
+        public const float FADE_IN_DURATION = 300;
+
+        public const float FADE_OUT_DURATION = 400;
 
         public override bool HideOverlaysOnEnter => buttons == null || buttons.State == ButtonSystemState.Initial;
 
@@ -36,8 +37,13 @@ namespace osu.Game.Screens.Menu
 
         private MenuSideFlashes sideFlashes;
 
+        private ButtonSystem buttons;
+
         [Resolved]
         private GameHost host { get; set; }
+
+        [Resolved(canBeNull: true)]
+        private MusicController music { get; set; }
 
         private BackgroundScreenDefault background;
 
@@ -65,7 +71,6 @@ namespace osu.Game.Screens.Menu
                         buttons = new ButtonSystem
                         {
                             OnChart = delegate { this.Push(new ChartListing()); },
-                            OnDirect = delegate { this.Push(new OnlineListing()); },
                             OnEdit = delegate { this.Push(new Editor()); },
                             OnSolo = onSolo,
                             OnMulti = delegate { this.Push(new Multiplayer()); },
@@ -125,7 +130,7 @@ namespace osu.Game.Screens.Menu
             var track = Beatmap.Value.Track;
             var metadata = Beatmap.Value.Metadata;
 
-            if (last is Intro && track != null)
+            if (last is IntroScreen && track != null)
             {
                 if (!track.IsRunning)
                 {
@@ -150,12 +155,10 @@ namespace osu.Game.Screens.Menu
             {
                 buttons.State = ButtonSystemState.TopLevel;
 
-                const float length = 300;
+                this.FadeIn(FADE_IN_DURATION, Easing.OutQuint);
+                this.MoveTo(new Vector2(0, 0), FADE_IN_DURATION, Easing.OutQuint);
 
-                this.FadeIn(length, Easing.OutQuint);
-                this.MoveTo(new Vector2(0, 0), length, Easing.OutQuint);
-
-                sideFlashes.Delay(length).FadeIn(64, Easing.InQuint);
+                sideFlashes.Delay(FADE_IN_DURATION).FadeIn(64, Easing.InQuint);
             }
         }
 
@@ -180,12 +183,10 @@ namespace osu.Game.Screens.Menu
         {
             base.OnSuspending(next);
 
-            const float length = 400;
-
             buttons.State = ButtonSystemState.EnteringMode;
 
-            this.FadeOut(length, Easing.InSine);
-            this.MoveTo(new Vector2(-800, 0), length, Easing.InSine);
+            this.FadeOut(FADE_OUT_DURATION, Easing.InSine);
+            this.MoveTo(new Vector2(-800, 0), FADE_OUT_DURATION, Easing.InSine);
 
             sideFlashes.FadeOut(64, Easing.OutQuint);
         }
@@ -198,6 +199,9 @@ namespace osu.Game.Screens.Menu
 
             //we may have consumed our preloaded instance, so let's make another.
             preloadSongSelect();
+
+            if (Beatmap.Value.Track != null && music?.IsUserPaused != true)
+                Beatmap.Value.Track.Start();
         }
 
         public override bool OnExiting(IScreen next)

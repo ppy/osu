@@ -10,6 +10,8 @@ using osu.Game.Online.Leaderboards;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.UI;
 using osu.Game.Scoring;
+using osu.Game.Beatmaps;
+using osu.Framework.Localisation;
 
 namespace osu.Game.Overlays.Profile.Sections.Ranks
 {
@@ -49,10 +51,9 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
                 Font = OsuFont.GetFont(size: 11, weight: FontWeight.Regular, italics: true)
             };
 
-            RightFlowContainer.Add(text);
-            RightFlowContainer.SetLayoutPosition(text, 1);
+            RightFlowContainer.Insert(1, text);
 
-            LeftFlowContainer.Add(new BeatmapMetadataContainer(Score.Beatmap));
+            LeftFlowContainer.Add(new ProfileScoreBeatmapMetadataContainer(Score.Beatmap));
             LeftFlowContainer.Add(new DrawableDate(Score.Date));
 
             foreach (Mod mod in Score.Mods)
@@ -65,5 +66,30 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
             Width = 60,
             FillMode = FillMode.Fit,
         };
+
+        private class ProfileScoreBeatmapMetadataContainer : BeatmapMetadataContainer
+        {
+            public ProfileScoreBeatmapMetadataContainer(BeatmapInfo beatmap)
+                : base(beatmap)
+            {
+            }
+
+            protected override Drawable[] CreateText(BeatmapInfo beatmap) => new Drawable[]
+            {
+                new OsuSpriteText
+                {
+                    Text = new LocalisedString((
+                        $"{beatmap.Metadata.TitleUnicode ?? beatmap.Metadata.Title} [{beatmap.Version}] ",
+                        $"{beatmap.Metadata.Title ?? beatmap.Metadata.TitleUnicode} [{beatmap.Version}] ")),
+                    Font = OsuFont.GetFont(size: 15, weight: FontWeight.SemiBold, italics: true)
+                },
+                new OsuSpriteText
+                {
+                    Text = new LocalisedString((beatmap.Metadata.ArtistUnicode, beatmap.Metadata.Artist)),
+                    Padding = new MarginPadding { Top = 3 },
+                    Font = OsuFont.GetFont(size: 12, weight: FontWeight.Regular, italics: true)
+                },
+            };
+        }
     }
 }

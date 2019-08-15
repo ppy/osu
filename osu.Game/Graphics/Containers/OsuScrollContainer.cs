@@ -27,11 +27,12 @@ namespace osu.Game.Graphics.Containers
 
         private bool shouldPerformRightMouseScroll(MouseButtonEvent e) => RightMouseScrollbar && e.Button == MouseButton.Right;
 
-        private void scrollToRelative(float value) => ScrollTo(Clamp((value - Scrollbar.DrawSize[ScrollDim] / 2) / Scrollbar.Size[ScrollDim]), true, DistanceDecayOnRightMouseScrollbar);
+        private void scrollFromMouseEvent(MouseEvent e) =>
+            ScrollTo(Clamp(ToLocalSpace(e.ScreenSpaceMousePosition)[ScrollDim] / DrawSize[ScrollDim]) * Content.DrawSize[ScrollDim], true, DistanceDecayOnRightMouseScrollbar);
 
-        private bool mouseScrollBarDragging;
+        private bool rightMouseDragging;
 
-        protected override bool IsDragging => base.IsDragging || mouseScrollBarDragging;
+        protected override bool IsDragging => base.IsDragging || rightMouseDragging;
 
         public OsuScrollContainer(Direction scrollDirection = Direction.Vertical)
             : base(scrollDirection)
@@ -42,7 +43,7 @@ namespace osu.Game.Graphics.Containers
         {
             if (shouldPerformRightMouseScroll(e))
             {
-                scrollToRelative(e.MousePosition[ScrollDim]);
+                scrollFromMouseEvent(e);
                 return true;
             }
 
@@ -51,9 +52,9 @@ namespace osu.Game.Graphics.Containers
 
         protected override bool OnDrag(DragEvent e)
         {
-            if (mouseScrollBarDragging)
+            if (rightMouseDragging)
             {
-                scrollToRelative(e.MousePosition[ScrollDim]);
+                scrollFromMouseEvent(e);
                 return true;
             }
 
@@ -64,7 +65,7 @@ namespace osu.Game.Graphics.Containers
         {
             if (shouldPerformRightMouseScroll(e))
             {
-                mouseScrollBarDragging = true;
+                rightMouseDragging = true;
                 return true;
             }
 
@@ -73,9 +74,9 @@ namespace osu.Game.Graphics.Containers
 
         protected override bool OnDragEnd(DragEndEvent e)
         {
-            if (mouseScrollBarDragging)
+            if (rightMouseDragging)
             {
-                mouseScrollBarDragging = false;
+                rightMouseDragging = false;
                 return true;
             }
 
