@@ -143,7 +143,7 @@ namespace osu.Game.Overlays.Direct
             var icons = new List<DifficultyIcon>();
 
             foreach (var b in SetInfo.Beatmaps.OrderBy(beatmap => beatmap.StarDifficulty))
-                icons.Add(new DifficultyIcon(b, null, true));
+                icons.Add(new DifficultyIcon(b));
 
             return icons;
         }
