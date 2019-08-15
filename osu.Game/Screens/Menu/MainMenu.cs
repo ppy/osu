@@ -17,6 +17,7 @@ using osu.Game.Screens.Charts;
 using osu.Game.Screens.Edit;
 using osu.Game.Screens.Multi;
 using osu.Game.Screens.Select;
+using osu.Framework.Graphics.Containers;
 
 namespace osu.Game.Screens.Menu
 {
@@ -51,10 +52,16 @@ namespace osu.Game.Screens.Menu
         [BackgroundDependencyLoader(true)]
         private void load(DirectOverlay direct, SettingsOverlay settings)
         {
-            if (host.CanExit)
-                AddInternal(new ExitConfirmOverlay { Action = this.Exit });
+            var safeAreaContainer = new SafeAreaContainer
+            {
+                SafeAreaOverrideEdges = Edges.All,
+                RelativeSizeAxes = Axes.Both
+            };
 
-            AddRangeInternal(new Drawable[]
+            if (host.CanExit)
+                safeAreaContainer.Add(new ExitConfirmOverlay { Action = this.Exit });
+
+            safeAreaContainer.AddRange(new Drawable[]
             {
                 new ParallaxContainer
                 {
@@ -73,6 +80,8 @@ namespace osu.Game.Screens.Menu
                 },
                 sideFlashes = new MenuSideFlashes(),
             });
+
+            InternalChild = safeAreaContainer;
 
             buttons.StateChanged += state =>
             {

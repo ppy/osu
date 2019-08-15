@@ -79,11 +79,16 @@ namespace osu.Game.Screens.Select
         {
             Children = new Drawable[]
             {
-                Background = new Box
+                new SafeAreaContainer
                 {
-                    Colour = Color4.Black,
-                    Alpha = 0.8f,
                     RelativeSizeAxes = Axes.Both,
+                    SafeAreaOverrideEdges = Edges.Horizontal,
+                    Child = Background = new Box
+                    {
+                        Colour = Color4.Black,
+                        Alpha = 0.8f,
+                        RelativeSizeAxes = Axes.Both,
+                    },
                 },
                 new Container
                 {

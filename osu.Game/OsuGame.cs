@@ -413,29 +413,36 @@ namespace osu.Game
                     ActionRequested = action => volume.Adjust(action),
                     ScrollActionRequested = (action, amount, isPrecise) => volume.Adjust(action, amount, isPrecise),
                 },
-                screenContainer = new ScalingContainer(ScalingMode.ExcludeOverlays)
+                new SafeAreaContainer
                 {
                     RelativeSizeAxes = Axes.Both,
                     Children = new Drawable[]
                     {
-                        screenStack = new OsuScreenStack { RelativeSizeAxes = Axes.Both },
-                        backButton = new BackButton
+                        screenContainer = new ScalingContainer(ScalingMode.ExcludeOverlays)
                         {
-                            Anchor = Anchor.BottomLeft,
-                            Origin = Anchor.BottomLeft,
-                            Action = () =>
+                            RelativeSizeAxes = Axes.Both,
+                            Children = new Drawable[]
                             {
-                                if ((screenStack.CurrentScreen as IOsuScreen)?.AllowBackButton == true)
-                                    screenStack.Exit();
+                                screenStack = new OsuScreenStack { RelativeSizeAxes = Axes.Both },
+                                backButton = new BackButton
+                                {
+                                    Anchor = Anchor.BottomLeft,
+                                    Origin = Anchor.BottomLeft,
+                                    Action = () =>
+                                    {
+                                        if ((screenStack.CurrentScreen as IOsuScreen)?.AllowBackButton == true)
+                                            screenStack.Exit();
+                                    }
+                                },
+                                logoContainer = new Container { RelativeSizeAxes = Axes.Both },
                             }
                         },
-                        logoContainer = new Container { RelativeSizeAxes = Axes.Both },
+                        overlayContent = new Container { RelativeSizeAxes = Axes.Both },
+                        rightFloatingOverlayContent = new Container { RelativeSizeAxes = Axes.Both },
+                        leftFloatingOverlayContent = new Container { RelativeSizeAxes = Axes.Both },
+                        topMostOverlayContent = new Container { RelativeSizeAxes = Axes.Both },
                     }
                 },
-                overlayContent = new Container { RelativeSizeAxes = Axes.Both },
-                rightFloatingOverlayContent = new Container { RelativeSizeAxes = Axes.Both },
-                leftFloatingOverlayContent = new Container { RelativeSizeAxes = Axes.Both },
-                topMostOverlayContent = new Container { RelativeSizeAxes = Axes.Both },
                 idleTracker
             });
 

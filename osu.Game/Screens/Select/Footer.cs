@@ -68,17 +68,27 @@ namespace osu.Game.Screens.Select
             Origin = Anchor.BottomCentre;
             Children = new Drawable[]
             {
-                new Box
+                new SafeAreaContainer
                 {
+                    SafeAreaOverrideEdges = Edges.Left | Edges.Right | Edges.Bottom,
                     RelativeSizeAxes = Axes.Both,
-                    Size = Vector2.One,
-                    Colour = Color4.Black.Opacity(0.5f),
+                    Child = new Box
+                    {
+                        RelativeSizeAxes = Axes.Both,
+                        Size = Vector2.One,
+                        Colour = Color4.Black.Opacity(0.5f),
+                    }
                 },
-                modeLight = new Box
+                new SafeAreaContainer
                 {
+                    SafeAreaOverrideEdges = Edges.Horizontal,
                     RelativeSizeAxes = Axes.X,
-                    Height = 3,
-                    Position = new Vector2(0, -3),
+                    Child = modeLight = new Box
+                    {
+                        RelativeSizeAxes = Axes.X,
+                        Height = 3,
+                        Position = new Vector2(0, -3),
+                    }
                 },
                 new FillFlowContainer
                 {
