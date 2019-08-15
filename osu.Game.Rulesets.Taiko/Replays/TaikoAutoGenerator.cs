@@ -113,11 +113,7 @@ namespace osu.Game.Rulesets.Taiko.Replays
                 else
                     throw new InvalidOperationException("Unknown hit object type.");
 
-                TaikoHitObject nextHitObject;
-                if (i < Beatmap.HitObjects.Count - 1)
-                    nextHitObject = Beatmap.HitObjects[i + 1];
-                else
-                    nextHitObject = null;
+                TaikoHitObject nextHitObject = i < Beatmap.HitObjects.Count - 1 ? Beatmap.HitObjects[i + 1] : null;
 
                 bool canDelayKeyUp = nextHitObject != null && nextHitObject.StartTime > endTime + KEY_UP_DELAY;
 
