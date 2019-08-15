@@ -7,6 +7,7 @@ using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
+using osu.Framework.Bindables;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Game.Audio;
 
@@ -35,6 +36,8 @@ namespace osu.Game.Skinning
             this.audio = audio;
         }
 
+        public bool Looping;
+
         public void Play() => channels?.ForEach(c => c.Play());
 
         public void AddAdjustment(AdjustableProperty type, BindableDouble adjustBindable) => channels?.ForEach(c => c.AddAdjustment(type, adjustBindable));
@@ -60,6 +63,7 @@ namespace osu.Game.Skinning
                 if (ch == null)
                     continue;
 
+                ch.Looping = Looping;
                 ch.Volume.Value = info.Volume / 100.0;
                 return ch;
             }
