@@ -24,6 +24,11 @@ namespace osu.Game.Rulesets.UI
         /// </summary>
         public int MaxCatchUpFrames { get; set; } = 5;
 
+        /// <summary>
+        /// Whether to enable frame-stable playback.
+        /// </summary>
+        internal bool FrameStablePlayback = true;
+
         [Cached]
         public GameplayClock GameplayClock { get; }
 
@@ -113,6 +118,9 @@ namespace osu.Game.Rulesets.UI
 
             try
             {
+                if (!FrameStablePlayback)
+                    manualClock.CurrentTime = newProposedTime;
+
                 if (firstConsumption)
                 {
                     // On the first update, frame-stability seeking would result in unexpected/unwanted behaviour.
