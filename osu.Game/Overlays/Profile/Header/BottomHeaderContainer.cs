@@ -138,6 +138,9 @@ namespace osu.Game.Overlays.Profile.Header
 
         private void tryAddInfo(IconUsage icon, string content, string link = null)
         {
+            // newlines could be contained in API returned user content.
+            content = content?.Replace("\n", " ");
+
             if (string.IsNullOrEmpty(content)) return;
 
             bottomLinkContainer.AddIcon(icon, text =>
