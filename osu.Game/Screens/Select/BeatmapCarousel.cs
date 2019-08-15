@@ -710,10 +710,9 @@ namespace osu.Game.Screens.Select
                         rightMouseScrollBlocked = true;
                         return false;
                     }
-
-                    rightMouseScrollBlocked = false;
                 }
 
+                rightMouseScrollBlocked = false;
                 return base.OnMouseDown(e);
             }
 
