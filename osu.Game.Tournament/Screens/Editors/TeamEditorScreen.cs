@@ -231,7 +231,7 @@ namespace osu.Game.Tournament.Screens.Editors
                                 AutoSizeAxes = Axes.Both,
                                 Children = new Drawable[]
                                 {
-                                    new SettingsTextBox
+                                    new SettingsNumberBox
                                     {
                                         LabelText = "User ID",
                                         RelativeSizeAxes = Axes.None,

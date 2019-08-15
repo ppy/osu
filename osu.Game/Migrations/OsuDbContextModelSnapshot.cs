@@ -45,6 +45,8 @@ namespace osu.Game.Migrations
 
                     b.Property<int>("AudioLeadIn");
 
+                    b.Property<double>("BPM");
+
                     b.Property<int>("BaseDifficultyID");
 
                     b.Property<int>("BeatDivisor");
@@ -60,6 +62,8 @@ namespace osu.Game.Migrations
                     b.Property<string>("Hash");
 
                     b.Property<bool>("Hidden");
+
+                    b.Property<double>("Length");
 
                     b.Property<bool>("LetterboxInBreaks");
 

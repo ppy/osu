@@ -94,6 +94,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
 
         protected override void UpdateState(ArmedState state)
         {
+            // TODO: update to use new state management.
             var circlePiece = MainPiece as CirclePiece;
             circlePiece?.FlashBox.FinishTransforms();
 

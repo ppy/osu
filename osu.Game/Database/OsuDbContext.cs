@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.Logging;
 using osu.Framework.Logging;
+using osu.Framework.Statistics;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.IO;
@@ -34,10 +35,15 @@ namespace osu.Game.Database
 
         private static readonly Lazy<OsuDbLoggerFactory> logger = new Lazy<OsuDbLoggerFactory>(() => new OsuDbLoggerFactory());
 
+        private static readonly GlobalStatistic<int> contexts = GlobalStatistics.Get<int>("Database", "Contexts");
+
         static OsuDbContext()
         {
             // required to initialise native SQLite libraries on some platforms.
             SQLitePCL.Batteries_V2.Init();
+
+            // https://github.com/aspnet/EntityFrameworkCore/issues/9994#issuecomment-508588678
+            SQLitePCL.raw.sqlite3_config(2 /*SQLITE_CONFIG_MULTITHREAD*/);
         }
 
         /// <summary>
@@ -76,6 +82,8 @@ namespace osu.Game.Database
                 connection.Close();
                 throw;
             }
+
+            contexts.Value++;
         }
 
         ~OsuDbContext()
@@ -83,6 +91,20 @@ namespace osu.Game.Database
             // DbContext does not contain a finalizer (https://github.com/aspnet/EntityFrameworkCore/issues/8872)
             // This is used to clean up previous contexts when fresh contexts are exposed via DatabaseContextFactory
             Dispose();
+        }
+
+        private bool isDisposed;
+
+        public override void Dispose()
+        {
+            if (isDisposed) return;
+
+            isDisposed = true;
+
+            base.Dispose();
+
+            contexts.Value--;
+            GC.SuppressFinalize(this);
         }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)

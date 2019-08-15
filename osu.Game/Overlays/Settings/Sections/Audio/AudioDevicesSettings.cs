@@ -73,7 +73,7 @@ namespace osu.Game.Overlays.Settings.Sections.Audio
 
         private class AudioDeviceSettingsDropdown : SettingsDropdown<string>
         {
-            protected override OsuDropdown<string> CreateDropdown() => new AudioDeviceDropdownControl { Items = Items };
+            protected override OsuDropdown<string> CreateDropdown() => new AudioDeviceDropdownControl();
 
             private class AudioDeviceDropdownControl : DropdownControl
             {

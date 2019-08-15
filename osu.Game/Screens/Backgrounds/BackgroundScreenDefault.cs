@@ -18,12 +18,17 @@ namespace osu.Game.Screens.Backgrounds
         private Background background;
 
         private int currentDisplay;
-        private const int background_count = 5;
+        private const int background_count = 7;
 
         private string backgroundName => $@"Menu/menu-background-{currentDisplay % background_count + 1}";
 
         private Bindable<User> user;
         private Bindable<Skin> skin;
+
+        public BackgroundScreenDefault(bool animateOnEnter = true)
+            : base(animateOnEnter)
+        {
+        }
 
         [BackgroundDependencyLoader]
         private void load(IAPIProvider api, SkinManager skinManager)

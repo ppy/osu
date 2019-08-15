@@ -12,7 +12,7 @@ namespace osu.Game.Screens.Select
         public ImportFromStablePopup(Action importFromStable)
         {
             HeaderText = @"You have no beatmaps!";
-            BodyText = "An existing copy of osu! was found, though.\nWould you like to import your beatmaps (and skins)?";
+            BodyText = "An existing copy of osu! was found, though.\nWould you like to import your beatmaps, skins and scores?";
 
             Icon = FontAwesome.Solid.Plane;
 

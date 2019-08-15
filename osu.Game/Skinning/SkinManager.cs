@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading;
@@ -44,7 +45,7 @@ namespace osu.Game.Skinning
                     CurrentSkinInfo.Value = SkinInfo.Default;
             };
 
-            CurrentSkinInfo.ValueChanged += skin => CurrentSkin.Value = getSkin(skin.NewValue);
+            CurrentSkinInfo.ValueChanged += skin => CurrentSkin.Value = GetSkin(skin.NewValue);
             CurrentSkin.ValueChanged += skin =>
             {
                 if (skin.NewValue.SkinInfo != CurrentSkinInfo.Value)
@@ -53,6 +54,8 @@ namespace osu.Game.Skinning
                 SourceChanged?.Invoke();
             };
         }
+
+        protected override bool ShouldDeleteArchive(string path) => Path.GetExtension(path)?.ToLowerInvariant() == ".osk";
 
         /// <summary>
         /// Returns a list of all usable <see cref="SkinInfo"/>s. Includes the special default skin plus all skins from <see cref="GetAllUserSkins"/>.
@@ -77,7 +80,7 @@ namespace osu.Game.Skinning
         {
             await base.Populate(model, archive, cancellationToken);
 
-            Skin reference = getSkin(model);
+            Skin reference = GetSkin(model);
 
             if (!string.IsNullOrEmpty(reference.Configuration.SkinInfo.Name))
             {
@@ -96,7 +99,7 @@ namespace osu.Game.Skinning
         /// </summary>
         /// <param name="skinInfo">The skin to lookup.</param>
         /// <returns>A <see cref="Skin"/> instance correlating to the provided <see cref="SkinInfo"/>.</returns>
-        private Skin getSkin(SkinInfo skinInfo)
+        public Skin GetSkin(SkinInfo skinInfo)
         {
             if (skinInfo == SkinInfo.Default)
                 return new DefaultSkin();

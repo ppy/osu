@@ -6,8 +6,6 @@ using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Sprites;
-using osu.Framework.Graphics.Textures;
 using osu.Framework.Input.Bindings;
 using osu.Framework.MathUtils;
 using osu.Game.Beatmaps;
@@ -141,7 +139,7 @@ namespace osu.Game.Rulesets.Catch.UI
             [BackgroundDependencyLoader]
             private void load()
             {
-                Children = new Drawable[]
+                Children = new[]
                 {
                     caughtFruit = new Container<DrawableHitObject>
                     {
@@ -212,7 +210,7 @@ namespace osu.Game.Rulesets.Catch.UI
                 Scheduler.AddDelayed(beginTrail, HyperDashing ? 25 : 50);
             }
 
-            private Sprite createCatcherSprite() => new CatcherSprite();
+            private Drawable createCatcherSprite() => new CatcherSprite();
 
             /// <summary>
             /// Add a caught fruit to the catcher's stack.
@@ -443,23 +441,6 @@ namespace osu.Game.Rulesets.Catch.UI
                 fruit.FadeOut(750);
 
                 fruit.Expire();
-            }
-
-            private class CatcherSprite : Sprite
-            {
-                public CatcherSprite()
-                {
-                    Size = new Vector2(CATCHER_SIZE);
-
-                    // Sets the origin roughly to the centre of the catcher's plate to allow for correct scaling.
-                    OriginPosition = new Vector2(-0.02f, 0.06f) * CATCHER_SIZE;
-                }
-
-                [BackgroundDependencyLoader]
-                private void load(TextureStore textures)
-                {
-                    Texture = textures.Get(@"Play/Catch/fruit-catcher-idle");
-                }
             }
         }
     }

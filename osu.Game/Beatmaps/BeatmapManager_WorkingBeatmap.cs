@@ -41,7 +41,7 @@ namespace osu.Game.Beatmaps
                 }
             }
 
-            private string getPathForFile(string filename) => BeatmapSetInfo.Files.First(f => string.Equals(f.Filename, filename, StringComparison.InvariantCultureIgnoreCase)).FileInfo.StoragePath;
+            private string getPathForFile(string filename) => BeatmapSetInfo.Files.FirstOrDefault(f => string.Equals(f.Filename, filename, StringComparison.InvariantCultureIgnoreCase))?.FileInfo.StoragePath;
 
             private TextureStore textureStore;
 

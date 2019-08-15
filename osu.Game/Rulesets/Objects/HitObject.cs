@@ -29,7 +29,7 @@ namespace osu.Game.Rulesets.Objects
         /// </summary>
         public virtual double StartTime { get; set; }
 
-        private List<SampleInfo> samples;
+        private List<HitSampleInfo> samples;
 
         /// <summary>
         /// The samples to be played when this hit object is hit.
@@ -38,9 +38,9 @@ namespace osu.Game.Rulesets.Objects
         /// and can be treated as the default samples for the hit object.
         /// </para>
         /// </summary>
-        public List<SampleInfo> Samples
+        public List<HitSampleInfo> Samples
         {
-            get => samples ?? (samples = new List<SampleInfo>());
+            get => samples ?? (samples = new List<HitSampleInfo>());
             set => samples = value;
         }
 

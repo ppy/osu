@@ -72,18 +72,30 @@ namespace osu.Game.Overlays.Profile.Header
                                 new FillFlowContainer
                                 {
                                     AutoSizeAxes = Axes.Both,
-                                    Direction = FillDirection.Horizontal,
+                                    Direction = FillDirection.Vertical,
                                     Children = new Drawable[]
                                     {
-                                        usernameText = new OsuSpriteText
+                                        new FillFlowContainer
                                         {
-                                            Font = OsuFont.GetFont(size: 24, weight: FontWeight.Regular)
+                                            AutoSizeAxes = Axes.Both,
+                                            Direction = FillDirection.Horizontal,
+                                            Children = new Drawable[]
+                                            {
+                                                usernameText = new OsuSpriteText
+                                                {
+                                                    Font = OsuFont.GetFont(size: 24, weight: FontWeight.Regular)
+                                                },
+                                                openUserExternally = new ExternalLinkButton
+                                                {
+                                                    Margin = new MarginPadding { Left = 5 },
+                                                    Anchor = Anchor.CentreLeft,
+                                                    Origin = Anchor.CentreLeft,
+                                                },
+                                            }
                                         },
-                                        openUserExternally = new ExternalLinkButton
+                                        titleText = new OsuSpriteText
                                         {
-                                            Margin = new MarginPadding { Left = 5 },
-                                            Anchor = Anchor.CentreLeft,
-                                            Origin = Anchor.CentreLeft,
+                                            Font = OsuFont.GetFont(size: 18, weight: FontWeight.Regular)
                                         },
                                     }
                                 },
@@ -95,10 +107,6 @@ namespace osu.Game.Overlays.Profile.Header
                                     AutoSizeAxes = Axes.Both,
                                     Children = new Drawable[]
                                     {
-                                        titleText = new OsuSpriteText
-                                        {
-                                            Font = OsuFont.GetFont(size: 18, weight: FontWeight.Regular)
-                                        },
                                         supporterTag = new SupporterIcon
                                         {
                                             Height = 20,
@@ -111,10 +119,11 @@ namespace osu.Game.Overlays.Profile.Header
                                             Margin = new MarginPadding { Top = 10 },
                                             Colour = colours.GreySeafoamLighter,
                                         },
-                                        new Container
+                                        new FillFlowContainer
                                         {
                                             AutoSizeAxes = Axes.Both,
                                             Margin = new MarginPadding { Top = 5 },
+                                            Direction = FillDirection.Horizontal,
                                             Children = new Drawable[]
                                             {
                                                 userFlag = new UpdateableFlag
@@ -125,7 +134,7 @@ namespace osu.Game.Overlays.Profile.Header
                                                 userCountryText = new OsuSpriteText
                                                 {
                                                     Font = OsuFont.GetFont(size: 17.5f, weight: FontWeight.Regular),
-                                                    Margin = new MarginPadding { Left = 40 },
+                                                    Margin = new MarginPadding { Left = 10 },
                                                     Origin = Anchor.CentreLeft,
                                                     Anchor = Anchor.CentreLeft,
                                                     Colour = colours.GreySeafoamLighter,

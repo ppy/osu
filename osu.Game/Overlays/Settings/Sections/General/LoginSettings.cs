@@ -319,7 +319,7 @@ namespace osu.Game.Overlays.Settings.Sections.General
                     BackgroundColour = colours.Gray3;
                 }
 
-                protected override DrawableMenuItem CreateDrawableMenuItem(MenuItem item) => new DrawableUserDropdownMenuItem(item);
+                protected override DrawableDropdownMenuItem CreateDrawableDropdownMenuItem(MenuItem item) => new DrawableUserDropdownMenuItem(item);
 
                 private class DrawableUserDropdownMenuItem : DrawableOsuDropdownMenuItem
                 {

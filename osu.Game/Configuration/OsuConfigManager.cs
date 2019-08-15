@@ -77,6 +77,7 @@ namespace osu.Game.Configuration
             Set(OsuSetting.BlurLevel, 0, 0, 1, 0.01);
 
             Set(OsuSetting.ShowInterface, true);
+            Set(OsuSetting.ShowHealthDisplayWhenCantFail, true);
             Set(OsuSetting.KeyOverlay, false);
 
             Set(OsuSetting.FloatingComments, false);
@@ -104,6 +105,8 @@ namespace osu.Game.Configuration
             Set(OsuSetting.ScalingPositionY, 0.5f, 0f, 1f);
 
             Set(OsuSetting.UIScale, 1f, 0.8f, 1.6f, 0.01f);
+
+            Set(OsuSetting.IntroSequence, IntroSequence.Triangles);
         }
 
         public OsuConfigManager(Storage storage)
@@ -131,6 +134,7 @@ namespace osu.Game.Configuration
         KeyOverlay,
         FloatingComments,
         ShowInterface,
+        ShowHealthDisplayWhenCantFail,
         MouseDisableButtons,
         MouseDisableWheel,
         AudioOffset,
@@ -165,6 +169,7 @@ namespace osu.Game.Configuration
         ScalingPositionY,
         ScalingSizeX,
         ScalingSizeY,
-        UIScale
+        UIScale,
+        IntroSequence
     }
 }

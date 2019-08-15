@@ -3,6 +3,7 @@
 
 using System.Collections.Generic;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -15,25 +16,44 @@ namespace osu.Game.Screens.Play
 {
     public class BreakOverlay : Container
     {
-        private const double fade_duration = BreakPeriod.MIN_BREAK_DURATION / 2;
+        /// <summary>
+        /// The duration of the break overlay fading.
+        /// </summary>
+        public const double BREAK_FADE_DURATION = BreakPeriod.MIN_BREAK_DURATION / 2;
+
         private const float remaining_time_container_max_size = 0.3f;
         private const int vertical_margin = 25;
 
-        private List<BreakPeriod> breaks;
-
         private readonly Container fadeContainer;
 
-        public List<BreakPeriod> Breaks
+        private IReadOnlyList<BreakPeriod> breaks;
+
+        public IReadOnlyList<BreakPeriod> Breaks
         {
             get => breaks;
             set
             {
                 breaks = value;
-                initializeBreaks();
+
+                // reset index in case the new breaks list is smaller than last one
+                isBreakTime.Value = false;
+                CurrentBreakIndex = 0;
+
+                if (IsLoaded)
+                    initializeBreaks();
             }
         }
 
         public override bool RemoveCompletedTransforms => false;
+
+        /// <summary>
+        /// Whether the gameplay is currently in a break.
+        /// </summary>
+        public IBindable<bool> IsBreakTime => isBreakTime;
+
+        protected int CurrentBreakIndex;
+
+        private readonly BindableBool isBreakTime = new BindableBool();
 
         private readonly Container remainingTimeAdjustmentBox;
         private readonly Container remainingTimeBox;
@@ -109,10 +129,36 @@ namespace osu.Game.Screens.Play
             initializeBreaks();
         }
 
+        protected override void Update()
+        {
+            base.Update();
+            updateBreakTimeBindable();
+        }
+
+        private void updateBreakTimeBindable()
+        {
+            if (breaks == null || breaks.Count == 0)
+                return;
+
+            var time = Clock.CurrentTime;
+
+            if (time > breaks[CurrentBreakIndex].EndTime)
+            {
+                while (time > breaks[CurrentBreakIndex].EndTime && CurrentBreakIndex < breaks.Count - 1)
+                    CurrentBreakIndex++;
+            }
+            else
+            {
+                while (time < breaks[CurrentBreakIndex].StartTime && CurrentBreakIndex > 0)
+                    CurrentBreakIndex--;
+            }
+
+            var currentBreak = breaks[CurrentBreakIndex];
+            isBreakTime.Value = currentBreak.HasEffect && currentBreak.Contains(time);
+        }
+
         private void initializeBreaks()
         {
-            if (!IsLoaded) return; // we need a clock.
-
             FinishTransforms(true);
             Scheduler.CancelDelayedTasks();
 
@@ -125,25 +171,25 @@ namespace osu.Game.Screens.Play
 
                 using (BeginAbsoluteSequence(b.StartTime, true))
                 {
-                    fadeContainer.FadeIn(fade_duration);
-                    breakArrows.Show(fade_duration);
+                    fadeContainer.FadeIn(BREAK_FADE_DURATION);
+                    breakArrows.Show(BREAK_FADE_DURATION);
 
                     remainingTimeAdjustmentBox
-                        .ResizeWidthTo(remaining_time_container_max_size, fade_duration, Easing.OutQuint)
-                        .Delay(b.Duration - fade_duration)
+                        .ResizeWidthTo(remaining_time_container_max_size, BREAK_FADE_DURATION, Easing.OutQuint)
+                        .Delay(b.Duration - BREAK_FADE_DURATION)
                         .ResizeWidthTo(0);
 
                     remainingTimeBox
-                        .ResizeWidthTo(0, b.Duration - fade_duration)
+                        .ResizeWidthTo(0, b.Duration - BREAK_FADE_DURATION)
                         .Then()
                         .ResizeWidthTo(1);
 
                     remainingTimeCounter.CountTo(b.Duration).CountTo(0, b.Duration);
 
-                    using (BeginDelayedSequence(b.Duration - fade_duration, true))
+                    using (BeginDelayedSequence(b.Duration - BREAK_FADE_DURATION, true))
                     {
-                        fadeContainer.FadeOut(fade_duration);
-                        breakArrows.Hide(fade_duration);
+                        fadeContainer.FadeOut(BREAK_FADE_DURATION);
+                        breakArrows.Hide(BREAK_FADE_DURATION);
                     }
                 }
             }

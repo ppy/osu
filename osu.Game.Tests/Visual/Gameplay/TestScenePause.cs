@@ -138,6 +138,22 @@ namespace osu.Game.Tests.Visual.Gameplay
         }
 
         [Test]
+        public void TestExitViaHoldToExit()
+        {
+            AddStep("exit", () =>
+            {
+                InputManager.MoveMouseTo(Player.HUDOverlay.HoldToQuit.First(c => c is HoldToConfirmContainer));
+                InputManager.PressButton(MouseButton.Left);
+            });
+
+            confirmPaused();
+
+            AddStep("release", () => InputManager.ReleaseButton(MouseButton.Left));
+
+            exitAndConfirm();
+        }
+
+        [Test]
         public void TestExitFromPause()
         {
             pauseAndConfirm();

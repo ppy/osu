@@ -34,7 +34,7 @@ namespace osu.Game.Tournament.Screens.TeamIntro
                     RelativeSizeAxes = Axes.Both,
                     Loop = true,
                 },
-                new TournamentLogo(),
+                new TournamentLogo(false),
                 mainContainer = new Container
                 {
                     RelativeSizeAxes = Axes.Both,

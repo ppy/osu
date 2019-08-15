@@ -212,6 +212,12 @@ namespace osu.Game.Screens.Multi
 
         public override bool OnExiting(IScreen next)
         {
+            if (screenStack.CurrentScreen != null && !(screenStack.CurrentScreen is LoungeSubScreen))
+            {
+                screenStack.Exit();
+                return true;
+            }
+
             waves.Hide();
 
             this.Delay(WaveContainer.DISAPPEAR_DURATION).FadeOut();
@@ -257,7 +263,7 @@ namespace osu.Game.Screens.Multi
         private void subScreenChanged(IScreen newScreen)
         {
             updatePollingRate(isIdle.Value);
-            createButton.FadeTo(newScreen is MatchSubScreen ? 0 : 1, 200);
+            createButton.FadeTo(newScreen is LoungeSubScreen ? 1 : 0, 200);
 
             updateTrack();
         }

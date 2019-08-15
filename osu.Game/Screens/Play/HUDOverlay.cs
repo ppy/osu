@@ -23,7 +23,8 @@ namespace osu.Game.Screens.Play
 {
     public class HUDOverlay : Container
     {
-        private const int duration = 100;
+        private const int duration = 250;
+        private const Easing easing = Easing.OutQuint;
 
         public readonly KeyCounterDisplay KeyCounter;
         public readonly RollingCounter<int> ComboCounter;
@@ -34,6 +35,8 @@ namespace osu.Game.Screens.Play
         public readonly ModDisplay ModDisplay;
         public readonly HoldForMenuButton HoldToQuit;
         public readonly PlayerSettingsOverlay PlayerSettingsOverlay;
+
+        public Bindable<bool> ShowHealthbar = new Bindable<bool>(true);
 
         private readonly ScoreProcessor scoreProcessor;
         private readonly DrawableRuleset drawableRuleset;
@@ -46,6 +49,8 @@ namespace osu.Game.Screens.Play
         private static bool hasShownNotificationOnce;
 
         public Action<double> RequestSeek;
+
+        private readonly Container topScoreContainer;
 
         public HUDOverlay(ScoreProcessor scoreProcessor, DrawableRuleset drawableRuleset, IReadOnlyList<Mod> mods)
         {
@@ -62,11 +67,10 @@ namespace osu.Game.Screens.Play
                     RelativeSizeAxes = Axes.Both,
                     Children = new Drawable[]
                     {
-                        new Container
+                        topScoreContainer = new Container
                         {
                             Anchor = Anchor.TopCentre,
                             Origin = Anchor.TopCentre,
-                            Y = 30,
                             AutoSizeAxes = Axes.Both,
                             AutoSizeDuration = 200,
                             AutoSizeEasing = Easing.Out,
@@ -113,8 +117,21 @@ namespace osu.Game.Screens.Play
             ModDisplay.Current.Value = mods;
 
             showHud = config.GetBindable<bool>(OsuSetting.ShowInterface);
-            showHud.ValueChanged += visible => visibilityContainer.FadeTo(visible.NewValue ? 1 : 0, duration);
-            showHud.TriggerChange();
+            showHud.BindValueChanged(visible => visibilityContainer.FadeTo(visible.NewValue ? 1 : 0, duration, easing), true);
+
+            ShowHealthbar.BindValueChanged(healthBar =>
+            {
+                if (healthBar.NewValue)
+                {
+                    HealthDisplay.FadeIn(duration, easing);
+                    topScoreContainer.MoveToY(30, duration, easing);
+                }
+                else
+                {
+                    HealthDisplay.FadeOut(duration, easing);
+                    topScoreContainer.MoveToY(0, duration, easing);
+                }
+            }, true);
 
             if (!showHud.Value && !hasShownNotificationOnce)
             {

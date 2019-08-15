@@ -76,7 +76,12 @@ namespace osu.Game.Graphics.UserInterface
             {
                 Masking = true,
                 RelativeSizeAxes = Axes.Both,
-                Child = path = new SmoothPath { RelativeSizeAxes = Axes.Both, PathRadius = 1 }
+                Child = path = new SmoothPath
+                {
+                    AutoSizeAxes = Axes.None,
+                    RelativeSizeAxes = Axes.Both,
+                    PathRadius = 1
+                }
             });
         }
 
@@ -88,7 +93,7 @@ namespace osu.Game.Graphics.UserInterface
             return base.Invalidate(invalidation, source, shallPropagate);
         }
 
-        private Cached pathCached = new Cached();
+        private readonly Cached pathCached = new Cached();
 
         protected override void Update()
         {

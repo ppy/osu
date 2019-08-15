@@ -66,24 +66,64 @@ namespace osu.Game.Overlays
                 }
             };
 
-            Header.Tabs.Current.ValueChanged += _ => Scheduler.AddOnce(updateSearch);
+            Header.Tabs.Current.ValueChanged += _ => queueUpdate();
 
-            Filter.Tabs.Current.ValueChanged += _ => Scheduler.AddOnce(updateSearch);
+            Filter.Tabs.Current.ValueChanged += _ => queueUpdate();
 
             Filter.DisplayStyleControl.DisplayStyle.ValueChanged += style => recreatePanels(style.NewValue);
-            Filter.DisplayStyleControl.Dropdown.Current.ValueChanged += _ => Scheduler.AddOnce(updateSearch);
+            Filter.DisplayStyleControl.Dropdown.Current.ValueChanged += _ => queueUpdate();
 
+            currentQuery.BindTo(Filter.Search.Current);
             currentQuery.ValueChanged += query =>
             {
                 queryChangedDebounce?.Cancel();
 
                 if (string.IsNullOrEmpty(query.NewValue))
-                    Scheduler.AddOnce(updateSearch);
+                    queueUpdate();
                 else
                     queryChangedDebounce = Scheduler.AddDelayed(updateSearch, 500);
             };
+        }
 
-            currentQuery.BindTo(Filter.Search.Current);
+        private APIRequest getUsersRequest;
+
+        private readonly Bindable<string> currentQuery = new Bindable<string>();
+
+        private ScheduledDelegate queryChangedDebounce;
+
+        private void queueUpdate() => Scheduler.AddOnce(updateSearch);
+
+        private void updateSearch()
+        {
+            queryChangedDebounce?.Cancel();
+
+            if (!IsLoaded)
+                return;
+
+            Users = null;
+            clearPanels();
+            loading.Hide();
+            getUsersRequest?.Cancel();
+
+            if (API?.IsLoggedIn != true)
+                return;
+
+            switch (Header.Tabs.Current.Value)
+            {
+                case SocialTab.Friends:
+                    var friendRequest = new GetFriendsRequest(); // TODO filter arguments?
+                    friendRequest.Success += updateUsers;
+                    API.Queue(getUsersRequest = friendRequest);
+                    break;
+
+                default:
+                    var userRequest = new GetUsersRequest(); // TODO filter arguments!
+                    userRequest.Success += response => updateUsers(response.Select(r => r.User));
+                    API.Queue(getUsersRequest = userRequest);
+                    break;
+            }
+
+            loading.Show();
         }
 
         private void recreatePanels(PanelDisplayStyle displayStyle)
@@ -133,45 +173,6 @@ namespace osu.Game.Overlays
             });
         }
 
-        private APIRequest getUsersRequest;
-
-        private readonly Bindable<string> currentQuery = new Bindable<string>();
-
-        private ScheduledDelegate queryChangedDebounce;
-
-        private void updateSearch()
-        {
-            queryChangedDebounce?.Cancel();
-
-            if (!IsLoaded)
-                return;
-
-            Users = null;
-            clearPanels();
-            loading.Hide();
-            getUsersRequest?.Cancel();
-
-            if (API?.IsLoggedIn != true)
-                return;
-
-            switch (Header.Tabs.Current.Value)
-            {
-                case SocialTab.Friends:
-                    var friendRequest = new GetFriendsRequest(); // TODO filter arguments?
-                    friendRequest.Success += updateUsers;
-                    API.Queue(getUsersRequest = friendRequest);
-                    break;
-
-                default:
-                    var userRequest = new GetUsersRequest(); // TODO filter arguments!
-                    userRequest.Success += response => updateUsers(response.Select(r => r.User));
-                    API.Queue(getUsersRequest = userRequest);
-                    break;
-            }
-
-            loading.Show();
-        }
-
         private void updateUsers(IEnumerable<User> newUsers)
         {
             Users = newUsers;
@@ -193,7 +194,7 @@ namespace osu.Game.Overlays
             switch (state)
             {
                 case APIState.Online:
-                    Scheduler.AddOnce(updateSearch);
+                    queueUpdate();
                     break;
 
                 default:

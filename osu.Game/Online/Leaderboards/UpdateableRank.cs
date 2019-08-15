@@ -22,10 +22,8 @@ namespace osu.Game.Online.Leaderboards
 
         protected override Drawable CreateDrawable(ScoreRank rank) => new DrawableRank(rank)
         {
-            RelativeSizeAxes = Axes.Both,
             Anchor = Anchor.Centre,
             Origin = Anchor.Centre,
-            FillMode = FillMode.Fit,
         };
     }
 }
