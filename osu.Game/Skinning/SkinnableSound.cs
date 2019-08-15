@@ -37,6 +37,8 @@ namespace osu.Game.Skinning
 
         public void Play() => channels?.ForEach(c => c.Play());
 
+        public void AddAdjustment(AdjustableProperty type, BindableDouble adjustBindable) => channels?.ForEach(c => c.AddAdjustment(type, adjustBindable));
+
         public override bool IsPresent => false; // We don't need to receive updates.
 
         protected override void SkinChanged(ISkinSource skin, bool allowFallback)
