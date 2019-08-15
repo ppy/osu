@@ -115,7 +115,7 @@ namespace osu.Game.Screens.Select
             InternalChild = new OsuContextMenuContainer
             {
                 RelativeSizeAxes = Axes.Both,
-                Child = scroll = new OsuScrollContainer
+                Child = scroll = new CarouselScrollContainer
                 {
                     Masking = false,
                     RelativeSizeAxes = Axes.Both,
@@ -692,6 +692,37 @@ namespace osu.Game.Screens.Select
                     carousel.SelectNextRandom();
                 else
                     base.PerformSelection();
+            }
+        }
+
+        private class CarouselScrollContainer : OsuScrollContainer
+        {
+            private bool rightMouseScrollBlocked;
+
+            protected override bool OnMouseDown(MouseDownEvent e)
+            {
+                if (e.Button == MouseButton.Right)
+                {
+                    // we need to block right click absolute scrolling when hovering a carousel item so context menus can display.
+                    // this can be reconsidered when we have an alternative to right click scrolling.
+                    if (GetContainingInputManager().HoveredDrawables.OfType<DrawableCarouselItem>().Any())
+                    {
+                        rightMouseScrollBlocked = true;
+                        return false;
+                    }
+
+                    rightMouseScrollBlocked = false;
+                }
+
+                return base.OnMouseDown(e);
+            }
+
+            protected override bool OnDragStart(DragStartEvent e)
+            {
+                if (rightMouseScrollBlocked)
+                    return false;
+
+                return base.OnDragStart(e);
             }
         }
     }
