@@ -43,7 +43,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
         private readonly IBindable<Vector2> positionBindable = new Bindable<Vector2>();
 
-        private readonly SkinnableSound spinSound;
+        private readonly SkinnableSound spinningSample;
         private readonly BindableDouble spinRate = new BindableDouble();
 
         private Color4 normalColour;
@@ -212,8 +212,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         {
             base.UpdateInitialTransforms();
 
-            spinSound.AddAdjustment(AdjustableProperty.Frequency, spinRate);
-            spinSound.Play();
+            spinningSample.AddAdjustment(AdjustableProperty.Frequency, spinRate);
+            spinningSample.Play();
 
             circleContainer.ScaleTo(Spinner.Scale * 0.3f);
             circleContainer.ScaleTo(Spinner.Scale, HitObject.TimePreempt / 1.4f, Easing.OutQuint);
@@ -251,8 +251,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             {
                 if (State.Value != ArmedState.Idle)
                 {
-                    RemoveInternal(spinSound);
-                    spinSound.Dispose();
+                    RemoveInternal(spinningSample);
+                    spinningSample.Dispose();
                 }
             });
 
