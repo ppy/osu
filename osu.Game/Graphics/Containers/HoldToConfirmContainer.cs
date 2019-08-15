@@ -12,7 +12,7 @@ namespace osu.Game.Graphics.Containers
     {
         public Action Action;
 
-        private const int activate_delay = 400;
+        private const int activate_delay = 200;
         private const int fadeout_delay = 200;
 
         private bool fired;
