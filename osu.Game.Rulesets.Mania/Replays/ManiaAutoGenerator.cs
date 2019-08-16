@@ -81,19 +81,18 @@ namespace osu.Game.Rulesets.Mania.Replays
             for (int i = 0; i < Beatmap.HitObjects.Count; i++)
             {
                 var currentObject = Beatmap.HitObjects[i];
+                var nextObjectInTheSameColumn = getNextObjectInTheSameColumn(i);
 
                 double endTime = (currentObject as IHasEndTime)?.EndTime ?? currentObject.StartTime;
-
-                var nextObjectInTheSameColumn = getNextObjectInTheSameColumn(i);
 
                 bool canDelayKeyUp = nextObjectInTheSameColumn == null ||
                                      nextObjectInTheSameColumn.StartTime > endTime + KEY_UP_DELAY;
 
-                double releaseDelay = canDelayKeyUp ? RELEASE_DELAY : nextObjectInTheSameColumn.StartTime - endTime - 1;
+                double calculatedDelay = canDelayKeyUp ? RELEASE_DELAY : (nextObjectInTheSameColumn.StartTime - endTime) * 0.9;
 
                 yield return new HitPoint { Time = currentObject.StartTime, Column = currentObject.Column };
 
-                yield return new ReleasePoint { Time = endTime + releaseDelay, Column = currentObject.Column };
+                yield return new ReleasePoint { Time = endTime + calculatedDelay, Column = currentObject.Column };
             }
 
             ManiaHitObject getNextObjectInTheSameColumn(int currentIndex)
