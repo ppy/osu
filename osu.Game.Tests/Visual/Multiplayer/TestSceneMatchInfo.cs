@@ -21,7 +21,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             typeof(Info),
             typeof(HeaderButton),
             typeof(ReadyButton),
-            typeof(ViewBeatmapButton)
+            typeof(MatchBeatmapPanel)
         };
 
         [BackgroundDependencyLoader]
