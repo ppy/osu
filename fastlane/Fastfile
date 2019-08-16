@@ -1,5 +1,39 @@
 update_fastlane
 
+platform :android do
+desc 'Deploy to play store'
+  lane :beta do |options|
+    # update csproj version
+    update_version(options)
+
+    build(
+      build_configuration: 'Release', 
+    )
+
+    client = HTTPClient.new
+    changelog = client.get_content 'https://gist.githubusercontent.com/peppy/ab89c29dcc0dce95f39eb218e8fad197/raw'
+    changelog.gsub!('$BUILD_ID', options[:build])
+  end
+
+  desc 'Compile the project'
+  lane :build do
+    nuget_restore(
+      project_path: 'osu.Android.sln'
+    )
+
+    souyuz(
+      solution_path: 'osu.Android.sln',
+      platform: "android",
+    )
+  end
+
+  lane :update_version do |options|
+    options[:plist_path] = '../osu.iOS/Info.plist'
+    app_version(options)
+  end
+
+end
+
 platform :ios do
   desc 'Deploy to testflight'
   lane :beta do |options|
