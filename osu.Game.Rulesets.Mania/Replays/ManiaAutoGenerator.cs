@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using osu.Game.Replays;
 using osu.Game.Rulesets.Mania.Beatmaps;
+using osu.Game.Rulesets.Mania.Objects;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Replays;
 
@@ -77,10 +78,35 @@ namespace osu.Game.Rulesets.Mania.Replays
 
         private IEnumerable<IActionPoint> generateActionPoints()
         {
-            foreach (var obj in Beatmap.HitObjects)
+            for (int i = 0; i < Beatmap.HitObjects.Count; i++)
             {
-                yield return new HitPoint { Time = obj.StartTime, Column = obj.Column };
-                yield return new ReleasePoint { Time = ((obj as IHasEndTime)?.EndTime ?? obj.StartTime) + RELEASE_DELAY, Column = obj.Column };
+                var currentObject = Beatmap.HitObjects[i];
+
+                double endTime = (currentObject as IHasEndTime)?.EndTime ?? currentObject.StartTime;
+
+                var nextObjectInTheSameColumn = getNextObjectInTheSameColumn(i);
+
+                bool canDelayKeyUp = nextObjectInTheSameColumn == null ||
+                                     nextObjectInTheSameColumn.StartTime > endTime + KEY_UP_DELAY;
+
+                double releaseDelay = canDelayKeyUp ? RELEASE_DELAY : nextObjectInTheSameColumn.StartTime - endTime - 1;
+
+                yield return new HitPoint { Time = currentObject.StartTime, Column = currentObject.Column };
+
+                yield return new ReleasePoint { Time = endTime + releaseDelay, Column = currentObject.Column };
+            }
+
+            ManiaHitObject getNextObjectInTheSameColumn(int currentIndex)
+            {
+                int desiredColumn = Beatmap.HitObjects[currentIndex++].Column;
+
+                for (; currentIndex < Beatmap.HitObjects.Count; currentIndex++)
+                {
+                    if (Beatmap.HitObjects[currentIndex].Column == desiredColumn)
+                        return Beatmap.HitObjects[currentIndex];
+                }
+
+                return null;
             }
         }
 
