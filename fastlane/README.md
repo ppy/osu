@@ -16,21 +16,6 @@ or alternatively using `brew cask install fastlane`
 
 # Available Actions
 ## iOS
-### ios testflight_prune_dry
-```
-fastlane ios testflight_prune_dry
-```
-
-### ios testflight_prune
-```
-fastlane ios testflight_prune
-```
-
-### ios update_version
-```
-fastlane ios update_version
-```
-
 ### ios beta
 ```
 fastlane ios beta
@@ -46,6 +31,21 @@ Compile the project
 fastlane ios provision
 ```
 Install provisioning profiles using match
+### ios update_version
+```
+fastlane ios update_version
+```
+
+### ios testflight_prune_dry
+```
+fastlane ios testflight_prune_dry
+```
+
+### ios testflight_prune
+```
+fastlane ios testflight_prune
+```
+
 
 ----
 
