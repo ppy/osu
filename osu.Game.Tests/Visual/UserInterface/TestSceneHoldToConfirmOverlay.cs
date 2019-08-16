@@ -13,6 +13,8 @@ namespace osu.Game.Tests.Visual.UserInterface
 {
     public class TestSceneHoldToConfirmOverlay : OsuTestScene
     {
+        protected override double TimePerAction => 100; // required for the early exit test, since hold-to-confirm delay is 200ms
+
         public override IReadOnlyList<Type> RequiredTypes => new[]
         {
             typeof(ExitConfirmOverlay),
