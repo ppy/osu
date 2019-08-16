@@ -86,7 +86,7 @@ namespace osu.Game.Rulesets.Mania.Replays
                 double endTime = (currentObject as IHasEndTime)?.EndTime ?? currentObject.StartTime;
 
                 bool canDelayKeyUp = nextObjectInTheSameColumn == null ||
-                                     nextObjectInTheSameColumn.StartTime > endTime + KEY_UP_DELAY;
+                                     nextObjectInTheSameColumn.StartTime > endTime + RELEASE_DELAY;
 
                 double calculatedDelay = canDelayKeyUp ? RELEASE_DELAY : (nextObjectInTheSameColumn.StartTime - endTime) * 0.9;
 
