@@ -27,7 +27,7 @@ namespace osu.Game.Tests.Visual.Gameplay
                 RelativeSizeAxes = Axes.Both,
                 Clock = new FramedOffsetClock(Clock)
                 {
-                    Offset = -Clock.CurrentTime,
+                    Offset = -(Clock?.CurrentTime ?? 0),
                 },
                 Children = new Drawable[]
                 {
