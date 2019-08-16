@@ -118,9 +118,6 @@ namespace osu.Game.Rulesets.UI
 
             try
             {
-                if (!FrameStablePlayback)
-                    manualClock.CurrentTime = newProposedTime;
-
                 if (firstConsumption)
                 {
                     // On the first update, frame-stability seeking would result in unexpected/unwanted behaviour.
@@ -141,7 +138,7 @@ namespace osu.Game.Rulesets.UI
                         : Math.Max(newProposedTime, manualClock.CurrentTime - sixty_frame_time);
                 }
 
-                if (!isAttached)
+                if (!isAttached || !FrameStablePlayback)
                 {
                     manualClock.CurrentTime = newProposedTime;
                 }
