@@ -124,7 +124,6 @@ namespace osu.Game.Rulesets.UI
                     requireMoreUpdateLoops = false;
                     return;
                 }
-
                 else if (firstConsumption)
                 {
                     // On the first update, frame-stability seeking would result in unexpected/unwanted behaviour.
