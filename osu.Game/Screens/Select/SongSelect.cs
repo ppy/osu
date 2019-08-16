@@ -157,7 +157,6 @@ namespace osu.Game.Screens.Select
                                 },
                                 Child = Carousel = new BeatmapCarousel
                                 {
-                                    Masking = false,
                                     RelativeSizeAxes = Axes.Both,
                                     Size = new Vector2(1 - wedged_container_size.X, 1),
                                     Anchor = Anchor.CentreRight,
