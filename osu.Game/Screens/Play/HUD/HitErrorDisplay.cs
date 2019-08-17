@@ -16,6 +16,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics.Colour;
 using osu.Game.Graphics;
 using osu.Framework.Extensions.Color4Extensions;
+using System.Linq;
 
 namespace osu.Game.Screens.Play.HUD
 {
@@ -29,6 +30,9 @@ namespace osu.Game.Screens.Play.HUD
 
         [Resolved]
         private Bindable<WorkingBeatmap> beatmap { get; set; }
+
+        [Resolved]
+        private OsuColour colours { get; set; }
 
         private readonly bool mirrored;
         private readonly SpriteIcon arrow;
@@ -60,48 +64,44 @@ namespace osu.Game.Screens.Play.HUD
             };
         }
 
-        [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
+        protected override void LoadComplete()
         {
+            base.LoadComplete();
+            HitWindows.SetDifficulty(beatmap.Value.BeatmapInfo.BaseDifficulty.OverallDifficulty);
+
             bar.AddRange(new Drawable[]
             {
                 new Box
                 {
                     RelativeSizeAxes = Axes.Both,
                     Colour = ColourInfo.GradientVertical(colours.Yellow.Opacity(0), colours.Yellow),
-                    Height = 0.3f
+                    Height = (float)((HitWindows.Meh - HitWindows.Good) / (HitWindows.Meh * 2))
                 },
                 new Box
                 {
                     RelativeSizeAxes = Axes.Both,
                     Colour = colours.Green,
-                    Height = 0.15f
+                    Height = (float)((HitWindows.Good - HitWindows.Great) / (HitWindows.Meh * 2))
                 },
                 new Box
                 {
                     RelativeSizeAxes = Axes.Both,
                     Colour = colours.BlueLight,
-                    Height = 0.1f
+                    Height = (float)(HitWindows.Great / HitWindows.Meh)
                 },
                 new Box
                 {
                     RelativeSizeAxes = Axes.Both,
                     Colour = colours.Green,
-                    Height = 0.15f
+                    Height = (float)((HitWindows.Good - HitWindows.Great) / (HitWindows.Meh * 2))
                 },
                 new Box
                 {
                     RelativeSizeAxes = Axes.Both,
                     Colour = ColourInfo.GradientVertical(colours.Yellow, colours.Yellow.Opacity(0)),
-                    Height = 0.3f
+                    Height = (float)((HitWindows.Meh - HitWindows.Good) / (HitWindows.Meh * 2))
                 }
             });
-        }
-
-        protected override void LoadComplete()
-        {
-            base.LoadComplete();
-            HitWindows.SetDifficulty(beatmap.Value.BeatmapInfo.BaseDifficulty.OverallDifficulty);
         }
 
         public void OnNewJudgement(JudgementResult judgement)
@@ -135,7 +135,7 @@ namespace osu.Game.Screens.Play.HUD
             }
         };
 
-        private float getRelativeJudgementPosition(double value) => (float)(value / HitWindows.Miss);
+        private float getRelativeJudgementPosition(double value) => (float)(value / HitWindows.Meh);
 
         private double calculateArrowPosition(JudgementResult judgement)
         {
@@ -144,12 +144,7 @@ namespace osu.Game.Screens.Play.HUD
 
             judgementOffsets.Add(judgement.TimeOffset);
 
-            double offsets = 0;
-
-            foreach (var offset in judgementOffsets)
-                offsets += offset;
-
-            return offsets / judgementOffsets.Count;
+            return judgementOffsets.Average();
         }
     }
 }
