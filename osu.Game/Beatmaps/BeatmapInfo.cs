@@ -129,6 +129,7 @@ namespace osu.Game.Beatmaps
         /// </summary>
         public List<ScoreInfo> Scores { get; set; }
 
+        [JsonIgnore]
         public DifficultyRating DifficultyRating
         {
             get
