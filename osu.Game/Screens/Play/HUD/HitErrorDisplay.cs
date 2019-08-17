@@ -14,14 +14,15 @@ using osu.Game.Beatmaps;
 using osu.Framework.Bindables;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics.Colour;
+using osu.Game.Graphics;
 using osu.Framework.Extensions.Color4Extensions;
 
 namespace osu.Game.Screens.Play.HUD
 {
     public class HitErrorDisplay : Container
     {
-        private const int bar_width = 4;
-        private const int bar_height = 250;
+        private const int bar_width = 3;
+        private const int bar_height = 200;
         private const int spacing = 3;
 
         public HitWindows HitWindows { get; set; }
@@ -31,6 +32,7 @@ namespace osu.Game.Screens.Play.HUD
 
         private readonly bool mirrored;
         private readonly SpriteIcon arrow;
+        private readonly FillFlowContainer bar;
         private readonly List<double> judgementOffsets = new List<double>();
 
         public HitErrorDisplay(bool mirrored = false)
@@ -41,43 +43,10 @@ namespace osu.Game.Screens.Play.HUD
 
             Children = new Drawable[]
             {
-                new FillFlowContainer
+                bar = new FillFlowContainer
                 {
                     RelativeSizeAxes = Axes.Both,
                     Direction = FillDirection.Vertical,
-                    Children = new Drawable[]
-                    {
-                        new Box
-                        {
-                            RelativeSizeAxes = Axes.Both,
-                            Colour = ColourInfo.GradientVertical(Color4.Black.Opacity(0), Color4.Orange),
-                            Height = 0.3f
-                        },
-                        new Box
-                        {
-                            RelativeSizeAxes = Axes.Both,
-                            Colour = Color4.Green,
-                            Height = 0.15f
-                        },
-                        new Box
-                        {
-                            RelativeSizeAxes = Axes.Both,
-                            Colour = Color4.Blue,
-                            Height = 0.1f
-                        },
-                        new Box
-                        {
-                            RelativeSizeAxes = Axes.Both,
-                            Colour = Color4.Green,
-                            Height = 0.15f
-                        },
-                        new Box
-                        {
-                            RelativeSizeAxes = Axes.Both,
-                            Colour = ColourInfo.GradientVertical(Color4.Orange, Color4.Black.Opacity(0)),
-                            Height = 0.3f
-                        }
-                    }
                 },
                 arrow = new SpriteIcon
                 {
@@ -86,9 +55,47 @@ namespace osu.Game.Screens.Play.HUD
                     X = mirrored ? -spacing : spacing,
                     RelativePositionAxes = Axes.Y,
                     Icon = mirrored ? FontAwesome.Solid.ChevronRight : FontAwesome.Solid.ChevronLeft,
-                    Size = new Vector2(10),
+                    Size = new Vector2(8),
                 }
             };
+        }
+
+        [BackgroundDependencyLoader]
+        private void load(OsuColour colours)
+        {
+            bar.AddRange(new Drawable[]
+            {
+                new Box
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Colour = ColourInfo.GradientVertical(colours.Yellow.Opacity(0), colours.Yellow),
+                    Height = 0.3f
+                },
+                new Box
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Colour = colours.Green,
+                    Height = 0.15f
+                },
+                new Box
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Colour = colours.BlueLight,
+                    Height = 0.1f
+                },
+                new Box
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Colour = colours.Green,
+                    Height = 0.15f
+                },
+                new Box
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Colour = ColourInfo.GradientVertical(colours.Yellow, colours.Yellow.Opacity(0)),
+                    Height = 0.3f
+                }
+            });
         }
 
         protected override void LoadComplete()
@@ -117,7 +124,7 @@ namespace osu.Game.Screens.Play.HUD
             Anchor = mirrored ? Anchor.CentreRight : Anchor.CentreLeft,
             Origin = mirrored ? Anchor.CentreLeft : Anchor.CentreRight,
             Masking = true,
-            Size = new Vector2(10, 2),
+            Size = new Vector2(8, 2),
             RelativePositionAxes = Axes.Y,
             Y = getRelativeJudgementPosition(judgement.TimeOffset),
             X = mirrored ? spacing : -spacing,
