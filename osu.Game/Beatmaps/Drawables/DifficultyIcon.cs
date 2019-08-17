@@ -19,15 +19,17 @@ using osuTK.Graphics;
 
 namespace osu.Game.Beatmaps.Drawables
 {
-    public class DifficultyIcon : DifficultyColouredContainer, IHasCustomTooltip
+    public class DifficultyIcon : Container, IHasCustomTooltip
     {
+        private readonly BeatmapInfo beatmap;
         private readonly RulesetInfo ruleset;
 
         public DifficultyIcon(BeatmapInfo beatmap, RulesetInfo ruleset = null, bool shouldShowTooltip = true)
-            : base(beatmap)
         {
             if (beatmap == null)
                 throw new ArgumentNullException(nameof(beatmap));
+
+            this.beatmap = beatmap;
 
             this.ruleset = ruleset ?? beatmap.Ruleset;
             TooltipText = shouldShowTooltip ? $"{beatmap.Version}${beatmap.StarDifficulty:0.##}" : String.Empty;
@@ -40,7 +42,7 @@ namespace osu.Game.Beatmaps.Drawables
         public ITooltip GetCustomTooltip() => new DifficultyIconTooltip(AccentColour);
 
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(OsuColour colours)
         {
             Children = new Drawable[]
             {
@@ -60,7 +62,7 @@ namespace osu.Game.Beatmaps.Drawables
                     Child = new Box
                     {
                         RelativeSizeAxes = Axes.Both,
-                        Colour = AccentColour,
+                        Colour = colours.ForDifficultyRating(beatmap.DifficultyRating),
                     },
                 },
                 new ConstrainedIconContainer
