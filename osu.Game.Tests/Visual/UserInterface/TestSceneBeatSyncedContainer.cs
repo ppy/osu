@@ -3,6 +3,7 @@
 
 using System;
 using NUnit.Framework;
+using osu.Framework.Allocation;
 using osu.Framework.Audio.Track;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
@@ -22,30 +23,36 @@ namespace osu.Game.Tests.Visual.UserInterface
     [TestFixture]
     public class TestSceneBeatSyncedContainer : OsuTestScene
     {
-        private readonly MusicController mc;
+        private readonly NowPlayingOverlay np;
+
+        [Cached]
+        private MusicController musicController = new MusicController();
 
         public TestSceneBeatSyncedContainer()
         {
             Clock = new FramedClock();
             Clock.ProcessFrame();
 
-            Add(new BeatContainer
+            AddRange(new Drawable[]
             {
-                Anchor = Anchor.BottomCentre,
-                Origin = Anchor.BottomCentre,
-            });
-
-            Add(mc = new MusicController
-            {
-                Origin = Anchor.TopRight,
-                Anchor = Anchor.TopRight,
+                musicController,
+                new BeatContainer
+                {
+                    Anchor = Anchor.BottomCentre,
+                    Origin = Anchor.BottomCentre,
+                },
+                np = new NowPlayingOverlay
+                {
+                    Origin = Anchor.TopRight,
+                    Anchor = Anchor.TopRight,
+                }
             });
         }
 
         protected override void LoadComplete()
         {
             base.LoadComplete();
-            mc.ToggleVisibility();
+            np.ToggleVisibility();
         }
 
         private class BeatContainer : BeatSyncedContainer
