@@ -32,14 +32,17 @@ namespace osu.Game.Beatmaps.Drawables
             this.beatmap = beatmap;
 
             this.ruleset = ruleset ?? beatmap.Ruleset;
-            TooltipText = shouldShowTooltip ? $"{beatmap.Version}${beatmap.StarDifficulty:0.##}" : String.Empty;
+            if (shouldShowTooltip)
+                TooltipContent = beatmap;
 
             Size = new Vector2(20);
         }
 
         public string TooltipText { get; set; }
 
-        public ITooltip GetCustomTooltip() => new DifficultyIconTooltip(AccentColour);
+        public ITooltip GetCustomTooltip() => new DifficultyIconTooltip();
+
+        public object TooltipContent { get; set; }
 
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
@@ -81,9 +84,14 @@ namespace osu.Game.Beatmaps.Drawables
             private readonly OsuSpriteText difficultyName, starRating;
             private readonly Box background;
 
-            public string TooltipText { get; set; }
+            private readonly FillFlowContainer difficultyFlow;
 
-            public DifficultyIconTooltip(Color4 difficultyColour)
+            public string TooltipText
+            {
+                set { }
+            }
+
+            public DifficultyIconTooltip()
             {
                 AutoSizeAxes = Axes.Both;
                 Masking = true;
@@ -108,13 +116,12 @@ namespace osu.Game.Beatmaps.Drawables
                                 Origin = Anchor.Centre,
                                 Font = OsuFont.GetFont(size: 16, weight: FontWeight.Bold),
                             },
-                            new FillFlowContainer
+                            difficultyFlow = new FillFlowContainer
                             {
                                 AutoSizeAxes = Axes.Both,
                                 Anchor = Anchor.Centre,
                                 Origin = Anchor.Centre,
                                 Direction = FillDirection.Horizontal,
-                                Colour = difficultyColour,
                                 Children = new Drawable[]
                                 {
                                     starRating = new OsuSpriteText
@@ -138,17 +145,29 @@ namespace osu.Game.Beatmaps.Drawables
                 };
             }
 
+            private OsuColour colours;
+
             [BackgroundDependencyLoader]
             private void load(OsuColour colours)
             {
+                this.colours = colours;
                 background.Colour = colours.GreyCarmineDark;
+            }
+
+            public bool SetContent(object content)
+            {
+                if (!(content is BeatmapInfo beatmap))
+                    return false;
+
+                difficultyName.Text = beatmap.Version;
+                starRating.Text = $"{beatmap.StarDifficulty:0.##}";
+                difficultyFlow.Colour = colours.ForDifficultyRating(beatmap.DifficultyRating);
+
+                return true;
             }
 
             public void Refresh()
             {
-                var info = TooltipText.Split('$');
-                difficultyName.Text = info[0];
-                starRating.Text = info[1];
             }
 
             public void Move(Vector2 pos) => Position = pos;
