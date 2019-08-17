@@ -22,6 +22,7 @@ namespace osu.Game.Screens.Play.HUD
 {
     public class HitErrorDisplay : Container
     {
+        private const int stored_judgements_amount = 5;
         private const int bar_width = 3;
         private const int bar_height = 200;
         private const int spacing = 3;
@@ -104,19 +105,19 @@ namespace osu.Game.Screens.Play.HUD
             });
         }
 
-        public void OnNewJudgement(JudgementResult judgement)
+        public void OnNewJudgement(JudgementResult newJudgement)
         {
-            if (!judgement.IsHit)
+            if (!newJudgement.IsHit)
                 return;
 
             Container judgementLine;
 
-            Add(judgementLine = CreateJudgementLine(judgement));
+            Add(judgementLine = CreateJudgementLine(newJudgement));
 
             judgementLine.FadeOut(10000, Easing.OutQuint);
             judgementLine.Expire();
 
-            arrow.MoveToY(getRelativeJudgementPosition(calculateArrowPosition(judgement)), 500, Easing.OutQuint);
+            arrow.MoveToY(getRelativeJudgementPosition(calculateArrowPosition(newJudgement)), 500, Easing.OutQuint);
         }
 
         protected virtual Container CreateJudgementLine(JudgementResult judgement) => new CircularContainer
@@ -137,12 +138,12 @@ namespace osu.Game.Screens.Play.HUD
 
         private float getRelativeJudgementPosition(double value) => (float)(value / HitWindows.Meh);
 
-        private double calculateArrowPosition(JudgementResult judgement)
+        private double calculateArrowPosition(JudgementResult newJudgement)
         {
-            if (judgementOffsets.Count > 5)
+            if (judgementOffsets.Count > stored_judgements_amount)
                 judgementOffsets.RemoveAt(0);
 
-            judgementOffsets.Add(judgement.TimeOffset);
+            judgementOffsets.Add(newJudgement.TimeOffset);
 
             return judgementOffsets.Average();
         }
