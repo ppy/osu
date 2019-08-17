@@ -106,6 +106,8 @@ namespace osu.Game.Beatmaps.Drawables
                     new FillFlowContainer
                     {
                         AutoSizeAxes = Axes.Both,
+                        AutoSizeDuration = 200,
+                        AutoSizeEasing = Easing.OutQuint,
                         Direction = FillDirection.Vertical,
                         Padding = new MarginPadding(10),
                         Children = new Drawable[]
