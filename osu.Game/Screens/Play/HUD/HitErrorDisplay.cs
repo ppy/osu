@@ -21,10 +21,11 @@ using osu.Game.Configuration;
 
 namespace osu.Game.Screens.Play.HUD
 {
-    public class HitErrorDisplay : Container
+    public class HitErrorDisplay : CompositeDrawable
     {
         private const int stored_judgements_amount = 5;
         private const int bar_width = 3;
+        private const int judgement_line_width = 8;
         private const int bar_height = 200;
         private const int spacing = 3;
 
@@ -36,36 +37,57 @@ namespace osu.Game.Screens.Play.HUD
         [Resolved]
         private OsuColour colours { get; set; }
 
-        private readonly bool mirrored;
         private readonly SpriteIcon arrow;
         private readonly FillFlowContainer bar;
+        private readonly Container judgementsContainer;
         private readonly Queue<double> judgementOffsets = new Queue<double>();
 
         private readonly Bindable<ScoreMeterType> type = new Bindable<ScoreMeterType>();
 
-        public HitErrorDisplay(bool mirrored = false)
+        public HitErrorDisplay(bool reversed = false)
         {
-            this.mirrored = mirrored;
+            AutoSizeAxes = Axes.Both;
 
-            Size = new Vector2(bar_width, bar_height);
-
-            Children = new Drawable[]
+            AddInternal(new FillFlowContainer
             {
-                bar = new FillFlowContainer
+                AutoSizeAxes = Axes.X,
+                Height = bar_height,
+                Direction = FillDirection.Horizontal,
+                Spacing = new Vector2(spacing, 0),
+                Children = new Drawable[]
                 {
-                    RelativeSizeAxes = Axes.Both,
-                    Direction = FillDirection.Vertical,
-                },
-                arrow = new SpriteIcon
-                {
-                    Anchor = mirrored ? Anchor.CentreLeft : Anchor.CentreRight,
-                    Origin = mirrored ? Anchor.CentreRight : Anchor.CentreLeft,
-                    X = mirrored ? -spacing : spacing,
-                    RelativePositionAxes = Axes.Y,
-                    Icon = mirrored ? FontAwesome.Solid.ChevronRight : FontAwesome.Solid.ChevronLeft,
-                    Size = new Vector2(8),
+                    judgementsContainer = new Container
+                    {
+                        Anchor = reversed ? Anchor.CentreRight : Anchor.CentreLeft,
+                        Origin = reversed ? Anchor.CentreRight : Anchor.CentreLeft,
+                        Width = judgement_line_width,
+                        RelativeSizeAxes = Axes.Y,
+                    },
+                    bar = new FillFlowContainer
+                    {
+                        Anchor = reversed ? Anchor.CentreRight : Anchor.CentreLeft,
+                        Origin = reversed ? Anchor.CentreRight : Anchor.CentreLeft,
+                        Width = bar_width,
+                        RelativeSizeAxes = Axes.Y,
+                        Direction = FillDirection.Vertical,
+                    },
+                    new Container
+                    {
+                        Anchor = reversed ? Anchor.CentreRight : Anchor.CentreLeft,
+                        Origin = reversed ? Anchor.CentreRight : Anchor.CentreLeft,
+                        AutoSizeAxes = Axes.X,
+                        RelativeSizeAxes = Axes.Y,
+                        Child = arrow = new SpriteIcon
+                        {
+                            Anchor = Anchor.Centre,
+                            Origin = Anchor.Centre,
+                            RelativePositionAxes = Axes.Y,
+                            Icon = reversed ? FontAwesome.Solid.ChevronRight : FontAwesome.Solid.ChevronLeft,
+                            Size = new Vector2(8),
+                        }
+                    },
                 }
-            };
+            });
         }
 
         [BackgroundDependencyLoader]
@@ -136,7 +158,7 @@ namespace osu.Game.Screens.Play.HUD
 
             Container judgementLine;
 
-            Add(judgementLine = CreateJudgementLine(newJudgement));
+            judgementsContainer.Add(judgementLine = CreateJudgementLine(newJudgement));
 
             judgementLine.FadeOut(10000, Easing.OutQuint);
             judgementLine.Expire();
@@ -146,13 +168,13 @@ namespace osu.Game.Screens.Play.HUD
 
         protected virtual Container CreateJudgementLine(JudgementResult judgement) => new CircularContainer
         {
-            Anchor = mirrored ? Anchor.CentreRight : Anchor.CentreLeft,
-            Origin = mirrored ? Anchor.CentreLeft : Anchor.CentreRight,
+            Anchor = Anchor.Centre,
+            Origin = Anchor.Centre,
             Masking = true,
-            Size = new Vector2(8, 2),
+            RelativeSizeAxes = Axes.X,
+            Height = 2,
             RelativePositionAxes = Axes.Y,
             Y = getRelativeJudgementPosition(judgement.TimeOffset),
-            X = mirrored ? spacing : -spacing,
             Child = new Box
             {
                 RelativeSizeAxes = Axes.Both,

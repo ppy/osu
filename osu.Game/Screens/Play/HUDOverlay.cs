@@ -86,8 +86,8 @@ namespace osu.Game.Screens.Play
                         HealthDisplay = CreateHealthDisplay(),
                         Progress = CreateProgress(),
                         ModDisplay = CreateModsContainer(),
-                        LeftHitErrorDisplay = CreateAccuracyBar(false),
-                        RightHitErrorDisplay = CreateAccuracyBar(),
+                        LeftHitErrorDisplay = CreateHitErrorDisplay(false),
+                        RightHitErrorDisplay = CreateHitErrorDisplay(),
                     }
                 },
                 PlayerSettingsOverlay = CreatePlayerSettingsOverlay(),
@@ -260,11 +260,11 @@ namespace osu.Game.Screens.Play
             Margin = new MarginPadding { Top = 20, Right = 10 },
         };
 
-        protected virtual HitErrorDisplay CreateAccuracyBar(bool mirrored = true) => new HitErrorDisplay(mirrored)
+        protected virtual HitErrorDisplay CreateHitErrorDisplay(bool reversed = true) => new HitErrorDisplay(reversed)
         {
-            Anchor = mirrored ? Anchor.CentreRight : Anchor.CentreLeft,
-            Origin = mirrored ? Anchor.CentreRight : Anchor.CentreLeft,
-            Margin = new MarginPadding { Horizontal = 30 }
+            Anchor = reversed ? Anchor.CentreRight : Anchor.CentreLeft,
+            Origin = reversed ? Anchor.CentreRight : Anchor.CentreLeft,
+            Margin = new MarginPadding { Horizontal = 20 }
         };
 
         protected virtual PlayerSettingsOverlay CreatePlayerSettingsOverlay() => new PlayerSettingsOverlay();
