@@ -27,6 +27,9 @@ namespace osu.Game.Screens.Play.HUD
         private const int bar_width = 3;
         private const int judgement_line_width = 8;
         private const int bar_height = 200;
+        private const int fade_duration = 200;
+        private const int arrow_move_duration = 500;
+        private const int judgement_life_time = 10000;
         private const int spacing = 3;
 
         public HitWindows HitWindows { get; set; }
@@ -152,11 +155,11 @@ namespace osu.Game.Screens.Play.HUD
             switch (type.NewValue)
             {
                 case ScoreMeterType.None:
-                    this.FadeOut(200, Easing.OutQuint);
+                    this.FadeOut(fade_duration, Easing.OutQuint);
                     break;
 
                 case ScoreMeterType.HitError:
-                    this.FadeIn(200, Easing.OutQuint);
+                    this.FadeIn(fade_duration, Easing.OutQuint);
                     break;
             }
         }
@@ -166,14 +169,13 @@ namespace osu.Game.Screens.Play.HUD
             if (!newJudgement.IsHit)
                 return;
 
-            Container judgementLine;
+            var judgementLine = CreateJudgementLine(newJudgement);
 
-            judgementsContainer.Add(judgementLine = CreateJudgementLine(newJudgement));
+            judgementsContainer.Add(judgementLine);
 
-            judgementLine.FadeOut(10000, Easing.OutQuint);
-            judgementLine.Expire();
+            judgementLine.FadeOut(judgement_life_time, Easing.OutQuint).Expire();
 
-            arrow.MoveToY(calculateArrowPosition(newJudgement), 500, Easing.OutQuint);
+            arrow.MoveToY(calculateArrowPosition(newJudgement), arrow_move_duration, Easing.OutQuint);
         }
 
         protected virtual Container CreateJudgementLine(JudgementResult judgement) => new CircularContainer
