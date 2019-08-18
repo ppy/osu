@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input.Events;
@@ -276,17 +277,16 @@ namespace osu.Game.Screens.Play
             ComboCounter?.Current.BindTo(processor.Combo);
             HealthDisplay?.Current.BindTo(processor.Health);
 
-            if (LeftHitErrorDisplay != null)
-            {
-                processor.NewJudgement += LeftHitErrorDisplay.OnNewJudgement;
-                LeftHitErrorDisplay.HitWindows = processor.CreateHitWindows();
-            }
+            var hitWindows = processor.CreateHitWindows();
 
-            if (RightHitErrorDisplay != null)
+            visibilityContainer.ForEach(drawable =>
             {
-                processor.NewJudgement += RightHitErrorDisplay.OnNewJudgement;
-                RightHitErrorDisplay.HitWindows = processor.CreateHitWindows();
-            }
+                if (drawable is HitErrorDisplay)
+                {
+                    processor.NewJudgement += (drawable as HitErrorDisplay).OnNewJudgement;
+                    (drawable as HitErrorDisplay).HitWindows = hitWindows;
+                }
+            });
 
             if (HealthDisplay is StandardHealthDisplay shd)
                 processor.NewJudgement += shd.Flash;
