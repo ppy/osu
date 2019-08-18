@@ -7,6 +7,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Online.API.Requests.Responses;
+using osu.Game.Online.API.Requests;
 using osu.Game.Online.Chat;
 
 namespace osu.Game.Overlays.Profile.Sections.Kudosu
@@ -51,6 +52,45 @@ namespace osu.Game.Overlays.Profile.Sections.Kudosu
             AutoSizeAxes = Axes.X,
         };
 
-        private MessageFormatter.MessageFormatterResult createMessage() => MessageFormatter.FormatText($@"{historyItem.Amount}");
+        private MessageFormatter.MessageFormatterResult createMessage()
+        {
+            string postLinkTemplate() => $"[{historyItem.Post.Url} {historyItem.Post.Title}]";
+            string userLinkTemplate() => $"[{historyItem.Giver?.Url} {historyItem.Giver?.Username}]";
+
+            string message;
+
+            switch (historyItem.Action)
+            {
+                case KudosuAction.Give:
+                    message = $"Received {historyItem.Amount} kudosu from {userLinkTemplate()} for a post at {postLinkTemplate()}";
+                    break;
+
+                case KudosuAction.VoteGive:
+                    message = $"Received {historyItem.Amount} kudosu from obtaining votes in modding post of {postLinkTemplate()}";
+                    break;
+
+                case KudosuAction.Reset:
+                    message = $"Kudosu reset by {userLinkTemplate()} for the post {postLinkTemplate()}";
+                    break;
+
+                case KudosuAction.VoteReset:
+                    message = $"Lost {historyItem.Amount} kudosu from losing votes in modding post of {postLinkTemplate()}";
+                    break;
+
+                case KudosuAction.DenyKudosuReset:
+                    message = $"Denied {historyItem.Amount} kudosu from modding post {postLinkTemplate()}";
+                    break;
+
+                case KudosuAction.Revoke:
+                    message = $"Denied kudosu by {userLinkTemplate()} for the post {postLinkTemplate()}";
+                    break;
+
+                default:
+                    message = string.Empty;
+                    break;
+            }
+
+            return MessageFormatter.FormatText(message);
+        }
     }
 }
