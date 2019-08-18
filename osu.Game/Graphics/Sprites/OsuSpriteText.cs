@@ -9,12 +9,10 @@ namespace osu.Game.Graphics.Sprites
 {
     public class OsuSpriteText : SpriteText
     {
-        public const float FONT_SIZE = 16;
-
         public OsuSpriteText()
         {
             Shadow = true;
-            TextSize = FONT_SIZE;
+            Font = OsuFont.Default;
         }
     }
 

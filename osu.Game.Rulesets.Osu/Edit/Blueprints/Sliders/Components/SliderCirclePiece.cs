@@ -2,7 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
-using osu.Framework.Configuration;
+using osu.Framework.Bindables;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Osu.Edit.Blueprints.HitCircles.Components;
 using osu.Game.Rulesets.Osu.Objects;
@@ -37,6 +37,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
                 case SliderPosition.Start:
                     Position = slider.StackedPosition + slider.Path.PositionAt(0);
                     break;
+
                 case SliderPosition.End:
                     Position = slider.StackedPosition + slider.Path.PositionAt(1);
                     break;

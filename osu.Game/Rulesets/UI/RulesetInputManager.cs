@@ -3,7 +3,7 @@
 
 using System.Linq;
 using osu.Framework.Allocation;
-using osu.Framework.Configuration;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input;
@@ -11,7 +11,6 @@ using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
 using osu.Framework.Input.StateChanges.Events;
 using osu.Framework.Input.States;
-using osu.Framework.Timing;
 using osu.Game.Configuration;
 using osu.Game.Input.Bindings;
 using osu.Game.Input.Handlers;
@@ -35,11 +34,21 @@ namespace osu.Game.Rulesets.UI
 
         protected readonly KeyBindingContainer<T> KeyBindingContainer;
 
-        protected override Container<Drawable> Content => KeyBindingContainer;
+        protected override Container<Drawable> Content => content;
+
+        private readonly Container content;
 
         protected RulesetInputManager(RulesetInfo ruleset, int variant, SimultaneousBindingMode unique)
         {
-            InternalChild = KeyBindingContainer = CreateKeyBindingContainer(ruleset, variant, unique);
+            InternalChild = KeyBindingContainer =
+                CreateKeyBindingContainer(ruleset, variant, unique)
+                    .WithChild(content = new Container { RelativeSizeAxes = Axes.Both });
+        }
+
+        [BackgroundDependencyLoader(true)]
+        private void load(OsuConfigManager config)
+        {
+            mouseDisabled = config.GetBindable<bool>(OsuSetting.MouseDisableButtons);
         }
 
         #region Action mapping (for replays)
@@ -83,120 +92,9 @@ namespace osu.Game.Rulesets.UI
 
         #endregion
 
-        #region Clock control
-
-        private ManualClock clock;
-        private IFrameBasedClock parentClock;
-
-        protected override void LoadComplete()
-        {
-            base.LoadComplete();
-
-            //our clock will now be our parent's clock, but we want to replace this to allow manual control.
-            parentClock = Clock;
-
-            ProcessCustomClock = false;
-            Clock = new FramedClock(clock = new ManualClock
-            {
-                CurrentTime = parentClock.CurrentTime,
-                Rate = parentClock.Rate,
-            });
-        }
-
-        /// <summary>
-        /// Whether we are running up-to-date with our parent clock.
-        /// If not, we will need to keep processing children until we catch up.
-        /// </summary>
-        private bool requireMoreUpdateLoops;
-
-        /// <summary>
-        /// Whether we are in a valid state (ie. should we keep processing children frames).
-        /// This should be set to false when the replay is, for instance, waiting for future frames to arrive.
-        /// </summary>
-        private bool validState;
-
-        protected override bool RequiresChildrenUpdate => base.RequiresChildrenUpdate && validState;
-
-        private bool isAttached => replayInputHandler != null && !UseParentInput;
-
-        private const int max_catch_up_updates_per_frame = 50;
-
-        public override bool UpdateSubTree()
-        {
-            requireMoreUpdateLoops = true;
-            validState = true;
-
-            int loops = 0;
-
-            while (validState && requireMoreUpdateLoops && loops++ < max_catch_up_updates_per_frame)
-            {
-                if (!base.UpdateSubTree())
-                    return false;
-
-                UpdateSubTreeMasking(this, ScreenSpaceDrawQuad.AABBFloat);
-
-                if (isAttached)
-                {
-                    // When handling replay input, we need to consider the possibility of fast-forwarding, which may cause the clock to be updated
-                    // to a point very far into the future, then playing a frame at that time. In such a case, lifetime MUST be updated before
-                    // input is handled. This is why base.Update is not called from the derived Update when handling replay input, and is instead
-                    // called manually at the correct time here.
-                    base.Update();
-                }
-            }
-
-            return true;
-        }
-
-        protected override void Update()
-        {
-            if (parentClock == null) return;
-
-            clock.Rate = parentClock.Rate;
-            clock.IsRunning = parentClock.IsRunning;
-
-            if (!isAttached)
-            {
-                clock.CurrentTime = parentClock.CurrentTime;
-            }
-            else
-            {
-                double? newTime = replayInputHandler.SetFrameFromTime(parentClock.CurrentTime);
-
-                if (newTime == null)
-                {
-                    // we shouldn't execute for this time value. probably waiting on more replay data.
-                    validState = false;
-                    return;
-                }
-
-                clock.CurrentTime = newTime.Value;
-            }
-
-            requireMoreUpdateLoops = clock.CurrentTime != parentClock.CurrentTime;
-
-            // The manual clock time has changed in the above code. The framed clock now needs to be updated
-            // to ensure that the its time is valid for our children before input is processed
-            Clock.ProcessFrame();
-
-            if (!isAttached)
-            {
-                // For non-replay input handling, this provides equivalent input ordering as if Update was not overridden
-                base.Update();
-            }
-        }
-
-        #endregion
-
         #region Setting application (disables etc.)
 
         private Bindable<bool> mouseDisabled;
-
-        [BackgroundDependencyLoader]
-        private void load(OsuConfigManager config)
-        {
-            mouseDisabled = config.GetBindable<bool>(OsuSetting.MouseDisableButtons);
-        }
 
         protected override bool Handle(UIEvent e)
         {
@@ -205,12 +103,16 @@ namespace osu.Game.Rulesets.UI
                 case MouseDownEvent mouseDown when mouseDown.Button == MouseButton.Left || mouseDown.Button == MouseButton.Right:
                     if (mouseDisabled.Value)
                         return false;
+
                     break;
+
                 case MouseUpEvent mouseUp:
                     if (!CurrentState.Mouse.IsPressed(mouseUp.Button))
                         return false;
+
                     break;
             }
+
             return base.Handle(e);
         }
 
@@ -218,18 +120,19 @@ namespace osu.Game.Rulesets.UI
 
         #region Key Counter Attachment
 
-        public void Attach(KeyCounterCollection keyCounter)
+        public void Attach(KeyCounterDisplay keyCounter)
         {
             var receptor = new ActionReceptor(keyCounter);
-            Add(receptor);
-            keyCounter.SetReceptor(receptor);
 
+            KeyBindingContainer.Add(receptor);
+
+            keyCounter.SetReceptor(receptor);
             keyCounter.AddRange(KeyBindingContainer.DefaultKeyBindings.Select(b => b.GetAction<T>()).Distinct().Select(b => new KeyCounterAction<T>(b)));
         }
 
-        public class ActionReceptor : KeyCounterCollection.Receptor, IKeyBindingHandler<T>
+        public class ActionReceptor : KeyCounterDisplay.Receptor, IKeyBindingHandler<T>
         {
-            public ActionReceptor(KeyCounterCollection target)
+            public ActionReceptor(KeyCounterDisplay target)
                 : base(target)
             {
             }
@@ -262,12 +165,12 @@ namespace osu.Game.Rulesets.UI
     }
 
     /// <summary>
-    /// Supports attaching a <see cref="KeyCounterCollection"/>.
+    /// Supports attaching a <see cref="KeyCounterDisplay"/>.
     /// Keys will be populated automatically and a receptor will be injected inside.
     /// </summary>
     public interface ICanAttachKeyCounter
     {
-        void Attach(KeyCounterCollection keyCounter);
+        void Attach(KeyCounterDisplay keyCounter);
     }
 
     public class RulesetInputManagerInputState<T> : InputState

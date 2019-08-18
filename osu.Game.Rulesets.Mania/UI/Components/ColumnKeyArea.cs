@@ -2,11 +2,12 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
-using osu.Framework.Configuration;
+using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Bindings;
 using osu.Game.Graphics;
@@ -64,11 +65,11 @@ namespace osu.Game.Rulesets.Mania.UI.Components
             };
 
             direction.BindTo(scrollingInfo.Direction);
-            direction.BindValueChanged(direction =>
+            direction.BindValueChanged(dir =>
             {
                 gradient.Colour = ColourInfo.GradientVertical(
-                    direction == ScrollingDirection.Up ? Color4.Black : Color4.Black.Opacity(0),
-                    direction == ScrollingDirection.Up ? Color4.Black.Opacity(0) : Color4.Black);
+                    dir.NewValue == ScrollingDirection.Up ? Color4.Black : Color4.Black.Opacity(0),
+                    dir.NewValue == ScrollingDirection.Up ? Color4.Black.Opacity(0) : Color4.Black);
             }, true);
         }
 
@@ -87,6 +88,7 @@ namespace osu.Game.Rulesets.Mania.UI.Components
             {
                 if (accentColour == value)
                     return;
+
                 accentColour = value;
 
                 updateColours();

@@ -2,7 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
-using osu.Framework.Configuration;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Lists;
 using osu.Game.Configuration;
@@ -20,9 +20,15 @@ namespace osu.Game.Tests.Visual
     {
         public SortedList<MultiplierControlPoint> ControlPoints => scrollingInfo.Algorithm.ControlPoints;
 
-        public ScrollVisualisationMethod ScrollAlgorithm { set => scrollingInfo.Algorithm.Algorithm = value; }
+        public ScrollVisualisationMethod ScrollAlgorithm
+        {
+            set => scrollingInfo.Algorithm.Algorithm = value;
+        }
 
-        public double TimeRange { set => scrollingInfo.TimeRange.Value = value; }
+        public double TimeRange
+        {
+            set => scrollingInfo.TimeRange.Value = value;
+        }
 
         public IScrollingInfo ScrollingInfo => scrollingInfo;
 
@@ -68,9 +74,11 @@ namespace osu.Game.Tests.Visual
                         case ScrollVisualisationMethod.Constant:
                             implementation = new ConstantScrollAlgorithm();
                             break;
+
                         case ScrollVisualisationMethod.Overlapping:
                             implementation = new OverlappingScrollAlgorithm(ControlPoints);
                             break;
+
                         case ScrollVisualisationMethod.Sequential:
                             implementation = new SequentialScrollAlgorithm(ControlPoints);
                             break;

@@ -2,6 +2,8 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
+using System.Linq;
+using osu.Framework.Bindables;
 using osu.Framework.Configuration;
 using osu.Game.Rulesets;
 
@@ -18,6 +20,8 @@ namespace osu.Game.Configuration
 
         private readonly RulesetInfo ruleset;
 
+        private readonly bool legacySettingsExist;
+
         protected DatabasedConfigManager(SettingsStore settings, RulesetInfo ruleset = null, int? variant = null)
         {
             this.settings = settings;
@@ -25,6 +29,7 @@ namespace osu.Game.Configuration
             this.variant = variant;
 
             databasedSettings = settings.Query(ruleset?.ID, variant);
+            legacySettingsExist = databasedSettings.Any(s => int.TryParse(s.Key, out var _));
 
             InitialiseDefaults();
         }
@@ -42,7 +47,19 @@ namespace osu.Game.Configuration
         {
             base.AddBindable(lookup, bindable);
 
-            var setting = databasedSettings.Find(s => (int)s.Key == (int)(object)lookup);
+            if (legacySettingsExist)
+            {
+                var legacySetting = databasedSettings.Find(s => s.Key == ((int)(object)lookup).ToString());
+
+                if (legacySetting != null)
+                {
+                    bindable.Parse(legacySetting.Value);
+                    settings.Delete(legacySetting);
+                }
+            }
+
+            var setting = databasedSettings.Find(s => s.Key == lookup.ToString());
+
             if (setting != null)
             {
                 bindable.Parse(setting.Value);
@@ -51,7 +68,7 @@ namespace osu.Game.Configuration
             {
                 settings.Update(setting = new DatabasedSetting
                 {
-                    Key = lookup,
+                    Key = lookup.ToString(),
                     Value = bindable.Value,
                     RulesetID = ruleset?.ID,
                     Variant = variant,
@@ -60,9 +77,9 @@ namespace osu.Game.Configuration
                 databasedSettings.Add(setting);
             }
 
-            bindable.ValueChanged += v =>
+            bindable.ValueChanged += b =>
             {
-                setting.Value = v;
+                setting.Value = b.NewValue;
                 settings.Update(setting);
             };
         }

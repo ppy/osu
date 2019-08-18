@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
-using osu.Framework.Configuration;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input;
 using osu.Framework.Input.Bindings;
@@ -51,7 +51,7 @@ namespace osu.Game.Graphics
             screenshotFormat = config.GetBindable<ScreenshotFormat>(OsuSetting.ScreenshotFormat);
             captureMenuCursor = config.GetBindable<bool>(OsuSetting.ScreenshotCaptureMenuCursor);
 
-            shutter = audio.Sample.Get("UI/shutter");
+            shutter = audio.Samples.Get("UI/shutter");
         }
 
         public bool OnPressed(GlobalAction action)
@@ -92,7 +92,8 @@ namespace osu.Game.Graphics
 
             using (var image = await host.TakeScreenshotAsync())
             {
-                Interlocked.Decrement(ref screenShotTasks);
+                if (Interlocked.Decrement(ref screenShotTasks) == 0 && cursorVisibility.Value == false)
+                    cursorVisibility.Value = true;
 
                 var fileName = getFileName();
                 if (fileName == null) return;
@@ -104,9 +105,11 @@ namespace osu.Game.Graphics
                     case ScreenshotFormat.Png:
                         image.SaveAsPng(stream);
                         break;
+
                     case ScreenshotFormat.Jpg:
                         image.SaveAsJpeg(stream);
                         break;
+
                     default:
                         throw new ArgumentOutOfRangeException(nameof(screenshotFormat));
                 }
@@ -122,14 +125,6 @@ namespace osu.Game.Graphics
                 });
             }
         });
-
-        protected override void Update()
-        {
-            base.Update();
-
-            if (cursorVisibility == false && Interlocked.CompareExchange(ref screenShotTasks, 0, 0) == 0)
-                cursorVisibility.Value = true;
-        }
 
         private string getFileName()
         {

@@ -3,11 +3,13 @@
 
 using System;
 using System.Collections.Generic;
+using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Sprites;
 using osu.Framework.MathUtils;
 using osu.Game.Rulesets.Objects.Drawables;
 using osuTK;
-using osu.Game.Graphics;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Skinning;
 
@@ -20,34 +22,47 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
         private double animDuration;
 
+        private readonly SkinnableDrawable scaleContainer;
+
         public DrawableRepeatPoint(RepeatPoint repeatPoint, DrawableSlider drawableSlider)
             : base(repeatPoint)
         {
             this.repeatPoint = repeatPoint;
             this.drawableSlider = drawableSlider;
 
-            Size = new Vector2(45 * repeatPoint.Scale);
+            Size = new Vector2(OsuHitObject.OBJECT_RADIUS * 2);
 
             Blending = BlendingMode.Additive;
             Origin = Anchor.Centre;
 
-            InternalChildren = new Drawable[]
+            InternalChild = scaleContainer = new SkinnableDrawable("Play/osu/reversearrow", _ => new SpriteIcon
             {
-                new SkinnableDrawable("Play/osu/reversearrow", _ => new SpriteIcon
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    Icon = FontAwesome.fa_chevron_right
-                }, restrictSize: false)
+                RelativeSizeAxes = Axes.Both,
+                Icon = FontAwesome.Solid.ChevronRight,
+                Size = new Vector2(0.35f)
+            }, confineMode: ConfineMode.NoScaling)
+            {
+                Anchor = Anchor.Centre,
+                Origin = Anchor.Centre,
             };
+        }
+
+        private readonly IBindable<float> scaleBindable = new Bindable<float>();
+
+        [BackgroundDependencyLoader]
+        private void load()
+        {
+            scaleBindable.BindValueChanged(scale => scaleContainer.Scale = new Vector2(scale.NewValue), true);
+            scaleBindable.BindTo(HitObject.ScaleBindable);
         }
 
         protected override void CheckForResult(bool userTriggered, double timeOffset)
         {
             if (repeatPoint.StartTime <= Time.Current)
-                ApplyResult(r => r.Type = drawableSlider.Tracking ? HitResult.Great : HitResult.Miss);
+                ApplyResult(r => r.Type = drawableSlider.Tracking.Value ? HitResult.Great : HitResult.Miss);
         }
 
-        protected override void UpdatePreemptState()
+        protected override void UpdateInitialTransforms()
         {
             animDuration = Math.Min(150, repeatPoint.SpanDuration / 2);
 
@@ -57,16 +72,18 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             );
         }
 
-        protected override void UpdateCurrentState(ArmedState state)
+        protected override void UpdateStateTransforms(ArmedState state)
         {
             switch (state)
             {
                 case ArmedState.Idle:
                     this.Delay(HitObject.TimePreempt).FadeOut();
                     break;
+
                 case ArmedState.Miss:
                     this.FadeOut(animDuration);
                     break;
+
                 case ArmedState.Hit:
                     this.FadeOut(animDuration, Easing.OutQuint)
                         .ScaleTo(Scale * 1.5f, animDuration, Easing.Out);

@@ -32,6 +32,8 @@ namespace osu.Game.Overlays.Chat.Selection
         private readonly SearchTextBox search;
         private readonly SearchContainer<ChannelSection> sectionsFlow;
 
+        protected override bool DimMainContent => false;
+
         public Action<Channel> OnRequestJoin;
         public Action<Channel> OnRequestLeave;
 
@@ -110,7 +112,7 @@ namespace osu.Game.Overlays.Chat.Selection
                                 new OsuSpriteText
                                 {
                                     Text = @"Chat Channels",
-                                    TextSize = 20,
+                                    Font = OsuFont.GetFont(size: 20),
                                     Shadow = false,
                                 },
                                 search = new HeaderSearchTextBox
@@ -125,7 +127,7 @@ namespace osu.Game.Overlays.Chat.Selection
                 },
             };
 
-            search.Current.ValueChanged += newValue => sectionsFlow.SearchTerm = newValue;
+            search.Current.ValueChanged += term => sectionsFlow.SearchTerm = term.NewValue;
         }
 
         public void UpdateAvailableChannels(IEnumerable<Channel> channels)
@@ -190,8 +192,12 @@ namespace osu.Game.Overlays.Chat.Selection
 
         private class HeaderSearchTextBox : SearchTextBox
         {
-            protected override Color4 BackgroundFocused => Color4.Black.Opacity(0.2f);
-            protected override Color4 BackgroundUnfocused => Color4.Black.Opacity(0.2f);
+            [BackgroundDependencyLoader]
+            private void load()
+            {
+                BackgroundFocused = Color4.Black.Opacity(0.2f);
+                BackgroundUnfocused = Color4.Black.Opacity(0.2f);
+            }
         }
     }
 }

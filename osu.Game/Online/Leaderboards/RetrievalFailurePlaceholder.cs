@@ -3,8 +3,8 @@
 
 using System;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Events;
-using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osuTK;
 
@@ -41,7 +41,7 @@ namespace osu.Game.Online.Leaderboards
                     Action = () => Action?.Invoke(),
                     Child = icon = new SpriteIcon
                     {
-                        Icon = FontAwesome.fa_refresh,
+                        Icon = FontAwesome.Solid.Sync,
                         Size = new Vector2(TEXT_SIZE),
                         Shadow = true,
                     },

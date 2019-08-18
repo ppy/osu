@@ -7,8 +7,8 @@ using System.Linq;
 using osu.Framework.Graphics;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Extensions.IEnumerableExtensions;
-using osu.Framework.Configuration;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Mods;
@@ -57,12 +57,24 @@ namespace osu.Game.Rulesets.UI
             hitObjectContainerLazy = new Lazy<HitObjectContainer>(CreateHitObjectContainer);
         }
 
-        private WorkingBeatmap beatmap;
+        [Resolved]
+        private IBindable<WorkingBeatmap> beatmap { get; set; }
+
+        [Resolved]
+        private IReadOnlyList<Mod> mods { get; set; }
 
         [BackgroundDependencyLoader]
-        private void load(IBindable<WorkingBeatmap> beatmap)
+        private void load()
         {
-            this.beatmap = beatmap.Value;
+            Cursor = CreateCursor();
+
+            if (Cursor != null)
+            {
+                // initial showing of the cursor will be handed by MenuCursorContainer (via DrawableRuleset's IProvideCursor implementation).
+                Cursor.Hide();
+
+                AddInternal(Cursor);
+            }
         }
 
         /// <summary>
@@ -81,6 +93,17 @@ namespace osu.Game.Rulesets.UI
         /// </summary>
         /// <param name="h">The DrawableHitObject to remove.</param>
         public virtual bool Remove(DrawableHitObject h) => HitObjectContainer.Remove(h);
+
+        /// <summary>
+        /// The cursor currently being used by this <see cref="Playfield"/>. May be null if no cursor is provided.
+        /// </summary>
+        public GameplayCursorContainer Cursor { get; private set; }
+
+        /// <summary>
+        /// Provide an optional cursor which is to be used for gameplay.
+        /// </summary>
+        /// <returns>The cursor, or null if a cursor is not rqeuired.</returns>
+        protected virtual GameplayCursorContainer CreateCursor() => null;
 
         /// <summary>
         /// Registers a <see cref="Playfield"/> as a nested <see cref="Playfield"/>.
@@ -107,7 +130,7 @@ namespace osu.Game.Rulesets.UI
             base.Update();
 
             if (beatmap != null)
-                foreach (var mod in beatmap.Mods.Value)
+                foreach (var mod in mods)
                     if (mod is IUpdatableByPlayfield updatable)
                         updatable.Update(this);
         }

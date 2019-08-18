@@ -5,11 +5,12 @@ using System;
 using System.Linq;
 using osu.Framework;
 using osu.Framework.Allocation;
-using osu.Framework.Configuration;
+using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Events;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Drawables;
@@ -33,12 +34,14 @@ namespace osu.Game.Overlays.BeatmapSet
         public readonly Bindable<BeatmapInfo> Beatmap = new Bindable<BeatmapInfo>();
 
         private BeatmapSetInfo beatmapSet;
+
         public BeatmapSetInfo BeatmapSet
         {
-            get { return beatmapSet; }
+            get => beatmapSet;
             set
             {
                 if (value == beatmapSet) return;
+
                 beatmapSet = value;
 
                 updateDisplay();
@@ -107,15 +110,13 @@ namespace osu.Game.Overlays.BeatmapSet
                                 {
                                     Anchor = Anchor.BottomLeft,
                                     Origin = Anchor.BottomLeft,
-                                    TextSize = 20,
-                                    Font = @"Exo2.0-Bold",
+                                    Font = OsuFont.GetFont(size: 20, weight: FontWeight.Bold)
                                 },
                                 starRating = new OsuSpriteText
                                 {
                                     Anchor = Anchor.BottomLeft,
                                     Origin = Anchor.BottomLeft,
-                                    TextSize = 13,
-                                    Font = @"Exo2.0-Bold",
+                                    Font = OsuFont.GetFont(size: 13, weight: FontWeight.Bold),
                                     Text = "Star Difficulty",
                                     Alpha = 0,
                                     Margin = new MarginPadding { Bottom = 1 },
@@ -130,8 +131,8 @@ namespace osu.Game.Overlays.BeatmapSet
                             Margin = new MarginPadding { Top = 5 },
                             Children = new[]
                             {
-                                plays = new Statistic(FontAwesome.fa_play_circle),
-                                favourites = new Statistic(FontAwesome.fa_heart),
+                                plays = new Statistic(FontAwesome.Solid.PlayCircle),
+                                favourites = new Statistic(FontAwesome.Solid.Heart),
                             },
                         },
                     },
@@ -140,7 +141,7 @@ namespace osu.Game.Overlays.BeatmapSet
 
             Beatmap.ValueChanged += b =>
             {
-                showBeatmap(b);
+                showBeatmap(b.NewValue);
                 updateDifficultyButtons();
             };
         }
@@ -196,12 +197,14 @@ namespace osu.Game.Overlays.BeatmapSet
             public event Action<DifficultySelectorState> StateChanged;
 
             private DifficultySelectorState state;
+
             public DifficultySelectorState State
             {
-                get { return state; }
+                get => state;
                 set
                 {
                     if (value == state) return;
+
                     state = value;
 
                     StateChanged?.Invoke(State);
@@ -279,9 +282,10 @@ namespace osu.Game.Overlays.BeatmapSet
             private readonly OsuSpriteText text;
 
             private int value;
+
             public int Value
             {
-                get { return value; }
+                get => value;
                 set
                 {
                     this.value = value;
@@ -289,7 +293,7 @@ namespace osu.Game.Overlays.BeatmapSet
                 }
             }
 
-            public Statistic(FontAwesome icon)
+            public Statistic(IconUsage icon)
             {
                 AutoSizeAxes = Axes.Both;
                 Direction = FillDirection.Horizontal;
@@ -309,8 +313,7 @@ namespace osu.Game.Overlays.BeatmapSet
                     {
                         Anchor = Anchor.CentreLeft,
                         Origin = Anchor.CentreLeft,
-                        Font = @"Exo2.0-SemiBoldItalic",
-                        TextSize = 14,
+                        Font = OsuFont.GetFont(size: 14, weight: FontWeight.SemiBold, italics: true)
                     },
                 };
             }

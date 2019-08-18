@@ -3,7 +3,7 @@
 
 using System;
 using osu.Framework.Allocation;
-using osu.Framework.Configuration;
+using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
@@ -12,12 +12,14 @@ using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
+using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Screens.Multi.Components;
 using osu.Game.Users;
+using osu.Game.Users.Drawables;
 using osuTK;
 using osuTK.Graphics;
 
@@ -96,8 +98,8 @@ namespace osu.Game.Screens.Multi.Lounge.Components
                                                     {
                                                         Anchor = Anchor.BottomLeft,
                                                         Origin = Anchor.BottomLeft,
-                                                        TextSize = 30,
-                                                        Current = Name
+                                                        Font = OsuFont.GetFont(size: 30),
+                                                        Current = RoomName
                                                     },
                                                 },
                                             },
@@ -135,8 +137,7 @@ namespace osu.Game.Screens.Multi.Lounge.Components
                                                         AutoSizeAxes = Axes.Both,
                                                         Child = new StatusText
                                                         {
-                                                            TextSize = 14,
-                                                            Font = @"Exo2.0-Bold",
+                                                            Font = OsuFont.GetFont(weight: FontWeight.Bold, size: 14),
                                                         }
                                                     },
                                                     beatmapTypeInfo = new BeatmapTypeInfo(),
@@ -192,7 +193,7 @@ namespace osu.Game.Screens.Multi.Lounge.Components
             }
             else
             {
-                status.Value = Status;
+                status.Value = Status.Value;
 
                 participantCount.FadeIn(transition_duration);
                 beatmapTypeInfo.FadeIn(transition_duration);
@@ -215,7 +216,7 @@ namespace osu.Game.Screens.Multi.Lounge.Components
             [BackgroundDependencyLoader]
             private void load()
             {
-                status.BindValueChanged(s => Text = s.Message, true);
+                status.BindValueChanged(s => Text = s.NewValue.Message, true);
             }
         }
 
@@ -227,7 +228,7 @@ namespace osu.Game.Screens.Multi.Lounge.Components
             {
                 Padding = new MarginPadding { Horizontal = 10 };
 
-                InternalChild = new ScrollContainer
+                InternalChild = new OsuScrollContainer
                 {
                     RelativeSizeAxes = Axes.Both,
                     Child = fill = new FillFlowContainer
@@ -247,7 +248,7 @@ namespace osu.Game.Screens.Multi.Lounge.Components
             }
 
             [Resolved]
-            private APIAccess api { get; set; }
+            private IAPIProvider api { get; set; }
 
             private GetRoomScoresRequest request;
 
@@ -259,6 +260,7 @@ namespace osu.Game.Screens.Multi.Lounge.Components
 
                 // nice little progressive fade
                 int time = 500;
+
                 foreach (var c in fill.Children)
                 {
                     c.Delay(500 - time).FadeOut(time, Easing.Out);

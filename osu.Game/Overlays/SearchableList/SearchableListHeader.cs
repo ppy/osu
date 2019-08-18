@@ -9,6 +9,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Graphics.Sprites;
 
 namespace osu.Game.Overlays.SearchableList
 {
@@ -19,7 +20,7 @@ namespace osu.Game.Overlays.SearchableList
         protected abstract Color4 BackgroundColour { get; }
         protected abstract T DefaultTab { get; }
         protected abstract Drawable CreateHeaderText();
-        protected abstract FontAwesome Icon { get; }
+        protected abstract IconUsage Icon { get; }
 
         protected SearchableListHeader()
         {

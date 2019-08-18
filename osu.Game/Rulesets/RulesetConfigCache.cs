@@ -2,7 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Collections.Generic;
+using System.Collections.Concurrent;
 using osu.Framework.Graphics;
 using osu.Game.Configuration;
 using osu.Game.Rulesets.Configuration;
@@ -15,7 +15,7 @@ namespace osu.Game.Rulesets
     /// </summary>
     public class RulesetConfigCache : Component
     {
-        private readonly Dictionary<int, IRulesetConfigManager> configCache = new Dictionary<int, IRulesetConfigManager>();
+        private readonly ConcurrentDictionary<int, IRulesetConfigManager> configCache = new ConcurrentDictionary<int, IRulesetConfigManager>();
         private readonly SettingsStore settingsStore;
 
         public RulesetConfigCache(SettingsStore settingsStore)
@@ -34,10 +34,7 @@ namespace osu.Game.Rulesets
             if (ruleset.RulesetInfo.ID == null)
                 throw new InvalidOperationException("The provided ruleset doesn't have a valid id.");
 
-            if (configCache.TryGetValue(ruleset.RulesetInfo.ID.Value, out var existing))
-                return existing;
-
-            return configCache[ruleset.RulesetInfo.ID.Value] = ruleset.CreateConfig(settingsStore);
+            return configCache.GetOrAdd(ruleset.RulesetInfo.ID.Value, _ => ruleset.CreateConfig(settingsStore));
         }
     }
 }

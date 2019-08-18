@@ -4,26 +4,27 @@
 using osu.Framework.Audio.Track;
 using osu.Framework.Graphics.Textures;
 using osu.Game.Beatmaps;
-using osu.Game.Rulesets;
 
 namespace osu.Game.Tests.Beatmaps
 {
     public class TestWorkingBeatmap : WorkingBeatmap
     {
-        public TestWorkingBeatmap(RulesetInfo ruleset)
-            : this(new TestBeatmap(ruleset))
-        {
-        }
+        private readonly IBeatmap beatmap;
 
+        /// <summary>
+        /// Create an instance which provides the <see cref="IBeatmap"/> when requested.
+        /// </summary>
+        /// <param name="beatmap">The beatmap</param>
         public TestWorkingBeatmap(IBeatmap beatmap)
-            : base(beatmap.BeatmapInfo)
+            : base(beatmap.BeatmapInfo, null)
         {
             this.beatmap = beatmap;
         }
 
-        private readonly IBeatmap beatmap;
         protected override IBeatmap GetBeatmap() => beatmap;
+
         protected override Texture GetBackground() => null;
+
         protected override Track GetTrack() => null;
     }
 }

@@ -35,9 +35,10 @@ namespace osu.Game.Graphics.UserInterface
         public virtual string TooltipText { get; private set; }
 
         private Color4 accentColour;
+
         public Color4 AccentColour
         {
-            get { return accentColour; }
+            get => accentColour;
             set
             {
                 accentColour = value;
@@ -79,23 +80,20 @@ namespace osu.Game.Graphics.UserInterface
                 new HoverClickSounds()
             };
 
-            Current.DisabledChanged += disabled =>
-            {
-                Alpha = disabled ? 0.3f : 1;
-            };
+            Current.DisabledChanged += disabled => { Alpha = disabled ? 0.3f : 1; };
         }
 
         [BackgroundDependencyLoader]
         private void load(AudioManager audio, OsuColour colours)
         {
-            sample = audio.Sample.Get(@"UI/sliderbar-notch");
+            sample = audio.Samples.Get(@"UI/sliderbar-notch");
             AccentColour = colours.Pink;
         }
 
         protected override void LoadComplete()
         {
             base.LoadComplete();
-            CurrentNumber.BindValueChanged(updateTooltipText, true);
+            CurrentNumber.BindValueChanged(current => updateTooltipText(current.NewValue), true);
         }
 
         protected override bool OnHover(HoverEvent e)
@@ -205,6 +203,7 @@ namespace osu.Game.Graphics.UserInterface
         private int findPrecision(decimal d)
         {
             int precision = 0;
+
             while (d != Math.Round(d))
             {
                 d *= 10;

@@ -4,7 +4,9 @@
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Events;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
@@ -28,26 +30,26 @@ namespace osu.Game.Screens.Select.Options
 
         public Color4 ButtonColour
         {
-            get { return background.Colour; }
-            set { background.Colour = value; }
+            get => background.Colour;
+            set => background.Colour = value;
         }
 
-        public FontAwesome Icon
+        public IconUsage Icon
         {
-            get { return iconText.Icon; }
-            set { iconText.Icon = value; }
+            get => iconText.Icon;
+            set => iconText.Icon = value;
         }
 
         public string FirstLineText
         {
-            get { return firstLine.Text; }
-            set { firstLine.Text = value; }
+            get => firstLine.Text;
+            set => firstLine.Text = value;
         }
 
         public string SecondLineText
         {
-            get { return secondLine.Text; }
-            set { secondLine.Text = value; }
+            get => secondLine.Text;
+            set => secondLine.Text = value;
         }
 
         public Key? HotKey;
@@ -140,7 +142,7 @@ namespace osu.Game.Screens.Select.Options
                             Anchor = Anchor.TopCentre,
                             Size = new Vector2(30),
                             Shadow = true,
-                            Icon = FontAwesome.fa_close,
+                            Icon = FontAwesome.Solid.TimesCircle,
                             Margin = new MarginPadding
                             {
                                 Bottom = 5,
@@ -150,14 +152,14 @@ namespace osu.Game.Screens.Select.Options
                         {
                             Origin = Anchor.TopCentre,
                             Anchor = Anchor.TopCentre,
-                            Font = @"Exo2.0-Bold",
+                            Font = OsuFont.GetFont(weight: FontWeight.Bold),
                             Text = @"",
                         },
                         secondLine = new OsuSpriteText
                         {
                             Origin = Anchor.TopCentre,
                             Anchor = Anchor.TopCentre,
-                            Font = @"Exo2.0-Bold",
+                            Font = OsuFont.GetFont(weight: FontWeight.Bold),
                             Text = @"",
                         },
                     },

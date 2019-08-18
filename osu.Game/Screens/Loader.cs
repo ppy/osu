@@ -9,21 +9,14 @@ using osu.Framework.Graphics.Shaders;
 using osu.Game.Screens.Menu;
 using osuTK;
 using osu.Framework.Screens;
-using osu.Game.Overlays;
+using osu.Game.Configuration;
+using IntroSequence = osu.Game.Configuration.IntroSequence;
 
 namespace osu.Game.Screens
 {
-    public class Loader : OsuScreen
+    public class Loader : StartupScreen
     {
         private bool showDisclaimer;
-
-        public override bool HideOverlaysOnEnter => true;
-
-        public override OverlayActivation InitialOverlayActivationMode => OverlayActivation.Disabled;
-
-        public override bool CursorVisible => false;
-
-        protected override bool AllowBackButton => false;
 
         public Loader()
         {
@@ -36,6 +29,7 @@ namespace osu.Game.Screens
 
             logo.BeatMatching = false;
             logo.Triangles = false;
+            logo.RelativePositionAxes = Axes.None;
             logo.Origin = Anchor.BottomRight;
             logo.Anchor = Anchor.BottomRight;
             logo.Position = new Vector2(-40);
@@ -53,7 +47,27 @@ namespace osu.Game.Screens
         private OsuScreen loadableScreen;
         private ShaderPrecompiler precompiler;
 
-        protected virtual OsuScreen CreateLoadableScreen() => showDisclaimer ? (OsuScreen)new Disclaimer() : new Intro();
+        private IntroSequence introSequence;
+
+        protected virtual OsuScreen CreateLoadableScreen()
+        {
+            if (showDisclaimer)
+                return new Disclaimer(getIntroSequence());
+
+            return getIntroSequence();
+        }
+
+        private IntroScreen getIntroSequence()
+        {
+            switch (introSequence)
+            {
+                case IntroSequence.Circles:
+                    return new IntroCircles();
+
+                default:
+                    return new IntroTriangles();
+            }
+        }
 
         protected virtual ShaderPrecompiler CreateShaderPrecompiler() => new ShaderPrecompiler();
 
@@ -79,9 +93,10 @@ namespace osu.Game.Screens
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuGameBase game)
+        private void load(OsuGameBase game, OsuConfigManager config)
         {
             showDisclaimer = game.IsDeployedBuild;
+            introSequence = config.Get<IntroSequence>(OsuSetting.IntroSequence);
         }
 
         /// <summary>
@@ -89,7 +104,7 @@ namespace osu.Game.Screens
         /// </summary>
         public class ShaderPrecompiler : Drawable
         {
-            private readonly List<Shader> loadTargets = new List<Shader>();
+            private readonly List<IShader> loadTargets = new List<IShader>();
 
             public bool FinishedCompiling { get; private set; }
 
@@ -106,7 +121,7 @@ namespace osu.Game.Screens
                 loadTargets.Add(manager.Load(VertexShaderDescriptor.TEXTURE_3, FragmentShaderDescriptor.TEXTURE));
             }
 
-            protected virtual bool AllLoaded => loadTargets.All(s => s.Loaded);
+            protected virtual bool AllLoaded => loadTargets.All(s => s.IsLoaded);
 
             protected override void Update()
             {

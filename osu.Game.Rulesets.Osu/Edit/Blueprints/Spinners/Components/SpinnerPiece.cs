@@ -55,7 +55,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Spinners.Components
 
             PositionBindable.BindValueChanged(_ => updatePosition(), true);
             StackHeightBindable.BindValueChanged(_ => updatePosition());
-            ScaleBindable.BindValueChanged(v => ring.Scale = new Vector2(v), true);
+            ScaleBindable.BindValueChanged(scale => ring.Scale = new Vector2(scale.NewValue), true);
         }
 
         private void updatePosition() => Position = spinner.Position;

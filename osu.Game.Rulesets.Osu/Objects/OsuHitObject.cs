@@ -1,7 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using osu.Framework.Configuration;
+using osu.Framework.Bindables;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Objects;
 using osuTK;
@@ -12,7 +12,7 @@ namespace osu.Game.Rulesets.Osu.Objects
 {
     public abstract class OsuHitObject : HitObject, IHasComboInformation, IHasPosition
     {
-        public const double OBJECT_RADIUS = 64;
+        public const float OBJECT_RADIUS = 64;
 
         public double TimePreempt = 600;
         public double TimeFadeIn = 400;
@@ -21,7 +21,7 @@ namespace osu.Game.Rulesets.Osu.Objects
 
         public virtual Vector2 Position
         {
-            get => PositionBindable;
+            get => PositionBindable.Value;
             set => PositionBindable.Value = value;
         }
 
@@ -38,7 +38,7 @@ namespace osu.Game.Rulesets.Osu.Objects
 
         public int StackHeight
         {
-            get => StackHeightBindable;
+            get => StackHeightBindable.Value;
             set => StackHeightBindable.Value = value;
         }
 
@@ -50,7 +50,7 @@ namespace osu.Game.Rulesets.Osu.Objects
 
         public float Scale
         {
-            get => ScaleBindable;
+            get => ScaleBindable.Value;
             set => ScaleBindable.Value = value;
         }
 
@@ -69,7 +69,7 @@ namespace osu.Game.Rulesets.Osu.Objects
             base.ApplyDefaultsToSelf(controlPointInfo, difficulty);
 
             TimePreempt = (float)BeatmapDifficulty.DifficultyRange(difficulty.ApproachRate, 1800, 1200, 450);
-            TimeFadeIn = (float)BeatmapDifficulty.DifficultyRange(difficulty.ApproachRate, 1200, 800, 300);
+            TimeFadeIn = 400; // as per osu-stable
 
             Scale = (1.0f - 0.7f * (difficulty.CircleSize - 5) / 5) / 2;
         }

@@ -4,6 +4,7 @@
 using osuTK.Graphics;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.MathUtils;
 using osu.Game.Rulesets.Mania.Objects.Drawables;
@@ -43,7 +44,7 @@ namespace osu.Game.Rulesets.Mania.UI
                 EdgeEffect = new EdgeEffectParameters
                 {
                     Type = EdgeEffectType.Glow,
-                    Colour = Interpolation.ValueAt(0.1f, judgedObject.AccentColour, Color4.White, 0, 1),
+                    Colour = Interpolation.ValueAt(0.1f, judgedObject.AccentColour.Value, Color4.White, 0, 1),
                     Radius = 100,
                 },
                 Child = new Box

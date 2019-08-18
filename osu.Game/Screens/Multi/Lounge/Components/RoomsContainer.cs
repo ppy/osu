@@ -5,7 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
-using osu.Framework.Configuration;
+using osu.Framework.Bindables;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -109,7 +109,7 @@ namespace osu.Game.Screens.Multi.Lounge.Components
         private void updateSorting()
         {
             foreach (var room in roomFlow)
-                roomFlow.SetLayoutPosition(room, room.Room.Position);
+                roomFlow.SetLayoutPosition(room, room.Room.Position.Value);
         }
 
         private void selectRoom(Room room)

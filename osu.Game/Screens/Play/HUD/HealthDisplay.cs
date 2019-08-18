@@ -1,7 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using osu.Framework.Configuration;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics.Containers;
 
 namespace osu.Game.Screens.Play.HUD
@@ -16,7 +16,7 @@ namespace osu.Game.Screens.Play.HUD
 
         protected HealthDisplay()
         {
-            Current.ValueChanged += newValue => SetHealth((float)newValue);
+            Current.ValueChanged += health => SetHealth((float)health.NewValue);
         }
 
         protected abstract void SetHealth(float value);

@@ -2,7 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using osu.Game.Graphics;
+using osu.Framework.Graphics.Sprites;
 using osu.Game.Overlays.Dialog;
 
 namespace osu.Game.Overlays.Chat
@@ -14,7 +14,7 @@ namespace osu.Game.Overlays.Chat
             HeaderText = "Just checking...";
             BodyText = $"You are about to leave osu! and open the following link in a web browser:\n\n{url}";
 
-            Icon = FontAwesome.fa_warning;
+            Icon = FontAwesome.Solid.ExclamationTriangle;
 
             Buttons = new PopupDialogButton[]
             {

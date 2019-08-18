@@ -10,12 +10,14 @@ namespace osu.Game.Overlays.Settings
     {
         private OsuCheckbox checkbox;
 
+        private string labelText;
+
         protected override Drawable CreateControl() => checkbox = new OsuCheckbox();
 
         public override string LabelText
         {
-            get { return checkbox.LabelText; }
-            set { checkbox.LabelText = value; }
+            get => labelText;
+            set => checkbox.LabelText = labelText = value;
         }
     }
 }

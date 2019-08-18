@@ -3,7 +3,6 @@
 
 using osuTK;
 using osu.Game.Beatmaps;
-using osu.Game.Rulesets.Osu.Objects;
 using System;
 using System.Collections.Generic;
 using osu.Game.Replays;
@@ -12,7 +11,7 @@ using osu.Game.Rulesets.Replays;
 
 namespace osu.Game.Rulesets.Osu.Replays
 {
-    public abstract class OsuAutoGeneratorBase : AutoGenerator<OsuHitObject>
+    public abstract class OsuAutoGeneratorBase : AutoGenerator
     {
         #region Constants
 
@@ -20,6 +19,7 @@ namespace osu.Game.Rulesets.Osu.Replays
         /// Constants (for spinners).
         /// </summary>
         protected static readonly Vector2 SPINNER_CENTRE = OsuPlayfield.BASE_SIZE / 2;
+
         protected const float SPIN_RADIUS = 50;
 
         /// <summary>
@@ -34,7 +34,7 @@ namespace osu.Game.Rulesets.Osu.Replays
         protected Replay Replay;
         protected List<ReplayFrame> Frames => Replay.Frames;
 
-        protected OsuAutoGeneratorBase(Beatmap<OsuHitObject> beatmap)
+        protected OsuAutoGeneratorBase(IBeatmap beatmap)
             : base(beatmap)
         {
             Replay = new Replay();
@@ -46,6 +46,7 @@ namespace osu.Game.Rulesets.Osu.Replays
         #endregion
 
         #region Utilities
+
         protected double ApplyModsToTime(double v) => v;
         protected double ApplyModsToRate(double v) => v;
 

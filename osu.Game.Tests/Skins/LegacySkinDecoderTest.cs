@@ -18,6 +18,7 @@ namespace osu.Game.Tests.Skins
         public void TestDecodeSkinColours(bool hasColours)
         {
             var decoder = new LegacySkinDecoder();
+
             using (var resStream = TestResources.OpenResource(hasColours ? "skin.ini" : "skin-empty.ini"))
             using (var stream = new StreamReader(resStream))
             {

@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using osu.Framework.Graphics.Sprites;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Replays;
@@ -11,25 +12,25 @@ using osu.Game.Scoring;
 
 namespace osu.Game.Rulesets.Mods
 {
-    public abstract class ModAutoplay<T> : ModAutoplay, IApplicableToRulesetContainer<T>
+    public abstract class ModAutoplay<T> : ModAutoplay, IApplicableToDrawableRuleset<T>
         where T : HitObject
     {
-        protected virtual Score CreateReplayScore(Beatmap<T> beatmap) => new Score { Replay = new Replay() };
-
-        public override bool HasImplementation => GetType().GenericTypeArguments.Length == 0;
-
-        public virtual void ApplyToRulesetContainer(RulesetContainer<T> rulesetContainer) => rulesetContainer.SetReplayScore(CreateReplayScore(rulesetContainer.Beatmap));
+        public virtual void ApplyToDrawableRuleset(DrawableRuleset<T> drawableRuleset) => drawableRuleset.SetReplayScore(CreateReplayScore(drawableRuleset.Beatmap));
     }
 
     public abstract class ModAutoplay : Mod, IApplicableFailOverride
     {
         public override string Name => "Autoplay";
         public override string Acronym => "AT";
-        public override FontAwesome Icon => FontAwesome.fa_osu_mod_auto;
+        public override IconUsage Icon => OsuIcon.ModAuto;
         public override ModType Type => ModType.Automation;
         public override string Description => "Watch a perfect automated play through the song.";
         public override double ScoreMultiplier => 1;
         public bool AllowFail => false;
         public override Type[] IncompatibleMods => new[] { typeof(ModRelax), typeof(ModSuddenDeath), typeof(ModNoFail) };
+
+        public override bool HasImplementation => GetType().GenericTypeArguments.Length == 0;
+
+        public virtual Score CreateReplayScore(IBeatmap beatmap) => new Score { Replay = new Replay() };
     }
 }

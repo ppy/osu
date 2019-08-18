@@ -6,10 +6,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using osu.Framework.Allocation;
-using osu.Framework.Configuration;
+using osu.Framework.Bindables;
 using osu.Framework.Logging;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
+using osu.Game.Overlays.Chat.Tabs;
 using osu.Game.Users;
 
 namespace osu.Game.Online.Chat
@@ -55,7 +56,7 @@ namespace osu.Game.Online.Chat
         {
             CurrentChannel.ValueChanged += currentChannelChanged;
 
-            HighPollRate.BindValueChanged(high => TimeBetweenPolls = high ? 1000 : 6000, true);
+            HighPollRate.BindValueChanged(enabled => TimeBetweenPolls = enabled.NewValue ? 1000 : 6000, true);
         }
 
         /// <summary>
@@ -80,11 +81,18 @@ namespace osu.Game.Online.Chat
             if (user == null)
                 throw new ArgumentNullException(nameof(user));
 
+            if (user.Id == api.LocalUser.Value.Id)
+                return;
+
             CurrentChannel.Value = JoinedChannels.FirstOrDefault(c => c.Type == ChannelType.PM && c.Users.Count == 1 && c.Users.Any(u => u.Id == user.Id))
                                    ?? new Channel(user);
         }
 
-        private void currentChannelChanged(Channel channel) => JoinChannel(channel);
+        private void currentChannelChanged(ValueChangedEvent<Channel> e)
+        {
+            if (!(e.NewValue is ChannelSelectorTabItem.ChannelSelectorTabChannel))
+                JoinChannel(e.NewValue);
+        }
 
         /// <summary>
         /// Ensure we run post actions in sequence, once at a time.
@@ -131,7 +139,7 @@ namespace osu.Game.Online.Chat
                 target.AddLocalEcho(message);
 
                 // if this is a PM and the first message, we need to do a special request to create the PM channel
-                if (target.Type == ChannelType.PM && !target.Joined)
+                if (target.Type == ChannelType.PM && !target.Joined.Value)
                 {
                     var createNewPrivateMessageRequest = new CreateNewPrivateMessageRequest(target.Users.First(), message);
 
@@ -205,8 +213,27 @@ namespace osu.Game.Online.Chat
                     PostMessage(content, true);
                     break;
 
+                case "join":
+                    if (string.IsNullOrWhiteSpace(content))
+                    {
+                        target.AddNewMessages(new ErrorMessage("Usage: /join [channel]"));
+                        break;
+                    }
+
+                    var channel = availableChannels.Where(c => c.Name == content || c.Name == $"#{content}").FirstOrDefault();
+
+                    if (channel == null)
+                    {
+                        target.AddNewMessages(new ErrorMessage($"Channel '{content}' not found."));
+                        break;
+                    }
+
+                    JoinChannel(channel);
+                    CurrentChannel.Value = channel;
+                    break;
+
                 case "help":
-                    target.AddNewMessages(new InfoMessage("Supported commands: /help, /me [action]"));
+                    target.AddNewMessages(new InfoMessage("Supported commands: /help, /me [action], /join [channel]"));
                     break;
 
                 default:
@@ -331,7 +358,7 @@ namespace osu.Game.Online.Chat
                     switch (channel.Type)
                     {
                         case ChannelType.Public:
-                            var req = new JoinChannelRequest(channel, api.LocalUser);
+                            var req = new JoinChannelRequest(channel, api.LocalUser.Value);
                             req.Success += () => JoinChannel(channel, true);
                             req.Failure += ex => LeaveChannel(channel);
                             api.Queue(req);
@@ -363,7 +390,7 @@ namespace osu.Game.Online.Chat
 
             if (channel.Joined.Value)
             {
-                api.Queue(new LeaveChannelRequest(channel, api.LocalUser));
+                api.Queue(new LeaveChannelRequest(channel, api.LocalUser.Value));
                 channel.Joined.Value = false;
             }
         }

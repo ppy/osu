@@ -1,9 +1,9 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using osu.Game.Graphics;
 using System;
 using Newtonsoft.Json;
+using osu.Framework.Graphics.Sprites;
 using osu.Game.IO.Serialization;
 
 namespace osu.Game.Rulesets.Mods
@@ -28,7 +28,7 @@ namespace osu.Game.Rulesets.Mods
         /// The icon of this mod.
         /// </summary>
         [JsonIgnore]
-        public virtual FontAwesome Icon => FontAwesome.fa_question;
+        public virtual IconUsage Icon => FontAwesome.Solid.Question;
 
         /// <summary>
         /// The type of this mod.
@@ -65,5 +65,12 @@ namespace osu.Game.Rulesets.Mods
         /// </summary>
         [JsonIgnore]
         public virtual Type[] IncompatibleMods => new Type[] { };
+
+        /// <summary>
+        /// Creates a copy of this <see cref="Mod"/> initialised to a default state.
+        /// </summary>
+        public virtual Mod CreateCopy() => (Mod)Activator.CreateInstance(GetType());
+
+        public bool Equals(IMod other) => GetType() == other?.GetType();
     }
 }

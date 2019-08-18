@@ -9,6 +9,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input;
 using osu.Framework.Input.Events;
 using osu.Framework.Platform;
@@ -107,7 +108,7 @@ namespace osu.Game.Graphics.UserInterface
 
             public CapsWarning()
             {
-                Icon = FontAwesome.fa_warning;
+                Icon = FontAwesome.Solid.ExclamationTriangle;
             }
 
             [BackgroundDependencyLoader]

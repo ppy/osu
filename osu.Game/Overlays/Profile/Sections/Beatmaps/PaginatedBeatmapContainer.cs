@@ -2,7 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Linq;
-using osu.Framework.Configuration;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Game.Online.API.Requests;
 using osu.Game.Overlays.Direct;
@@ -29,13 +29,11 @@ namespace osu.Game.Overlays.Profile.Sections.Beatmaps
 
         protected override void ShowMore()
         {
-            base.ShowMore();
-
-            request = new GetUserBeatmapsRequest(User.Value.Id, type, VisiblePages++ * ItemsPerPage);
+            request = new GetUserBeatmapsRequest(User.Value.Id, type, VisiblePages++, ItemsPerPage);
             request.Success += sets => Schedule(() =>
             {
-                ShowMoreButton.FadeTo(sets.Count == ItemsPerPage ? 1 : 0);
-                ShowMoreLoading.Hide();
+                MoreButton.FadeTo(sets.Count == ItemsPerPage ? 1 : 0);
+                MoreButton.IsLoading = false;
 
                 if (!sets.Any() && VisiblePages == 1)
                 {

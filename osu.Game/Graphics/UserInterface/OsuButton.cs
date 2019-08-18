@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Shapes;
@@ -46,13 +47,13 @@ namespace osu.Game.Graphics.UserInterface
                 new HoverClickSounds(HoverSampleSet.Loud),
             });
 
-            Enabled.ValueChanged += enabled_ValueChanged;
+            Enabled.ValueChanged += enabledChanged;
             Enabled.TriggerChange();
         }
 
-        private void enabled_ValueChanged(bool enabled)
+        private void enabledChanged(ValueChangedEvent<bool> e)
         {
-            this.FadeColour(enabled ? Color4.White : Color4.Gray, 200, Easing.OutQuint);
+            this.FadeColour(e.NewValue ? Color4.White : Color4.Gray, 200, Easing.OutQuint);
         }
 
         protected override bool OnHover(HoverEvent e)
@@ -84,7 +85,7 @@ namespace osu.Game.Graphics.UserInterface
             Depth = -1,
             Origin = Anchor.Centre,
             Anchor = Anchor.Centre,
-            Font = @"Exo2.0-Bold",
+            Font = OsuFont.GetFont(weight: FontWeight.Bold)
         };
     }
 }

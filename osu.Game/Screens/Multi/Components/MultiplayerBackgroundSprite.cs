@@ -9,6 +9,13 @@ namespace osu.Game.Screens.Multi.Components
 {
     public class MultiplayerBackgroundSprite : MultiplayerComposite
     {
+        private readonly BeatmapSetCoverType beatmapSetCoverType;
+
+        public MultiplayerBackgroundSprite(BeatmapSetCoverType beatmapSetCoverType = BeatmapSetCoverType.Cover)
+        {
+            this.beatmapSetCoverType = beatmapSetCoverType;
+        }
+
         [BackgroundDependencyLoader]
         private void load()
         {
@@ -16,9 +23,9 @@ namespace osu.Game.Screens.Multi.Components
 
             InternalChild = sprite = CreateBackgroundSprite();
 
-            CurrentItem.BindValueChanged(i => sprite.Beatmap.Value = i?.Beatmap, true);
+            CurrentItem.BindValueChanged(item => sprite.Beatmap.Value = item.NewValue?.Beatmap, true);
         }
 
-        protected virtual UpdateableBeatmapBackgroundSprite CreateBackgroundSprite() => new UpdateableBeatmapBackgroundSprite { RelativeSizeAxes = Axes.Both };
+        protected virtual UpdateableBeatmapBackgroundSprite CreateBackgroundSprite() => new UpdateableBeatmapBackgroundSprite(beatmapSetCoverType) { RelativeSizeAxes = Axes.Both };
     }
 }

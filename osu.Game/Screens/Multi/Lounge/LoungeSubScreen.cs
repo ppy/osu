@@ -2,11 +2,12 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
-using osu.Framework.Configuration;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input.Events;
 using osu.Framework.Screens;
+using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Overlays.SearchableList;
@@ -43,7 +44,7 @@ namespace osu.Game.Screens.Multi.Lounge
                             Width = 0.55f,
                             Children = new Drawable[]
                             {
-                                new ScrollContainer
+                                new OsuScrollContainer
                                 {
                                     RelativeSizeAxes = Axes.Both,
                                     ScrollbarOverlapsContent = false,
@@ -105,6 +106,14 @@ namespace osu.Game.Screens.Multi.Lounge
         {
             base.OnSuspending(next);
             Filter.Search.HoldFocus = false;
+        }
+
+        public override void OnResuming(IScreen last)
+        {
+            base.OnResuming(last);
+
+            if (currentRoom.Value?.RoomID.Value == null)
+                currentRoom.Value = new Room();
         }
 
         private void joinRequested(Room room)

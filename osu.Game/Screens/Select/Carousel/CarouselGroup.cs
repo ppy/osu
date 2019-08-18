@@ -49,7 +49,7 @@ namespace osu.Game.Screens.Select.Carousel
 
         public virtual void AddChild(CarouselItem i)
         {
-            i.State.ValueChanged += v => ChildItemStateChanged(i, v);
+            i.State.ValueChanged += state => ChildItemStateChanged(i, state.NewValue);
             i.ChildID = ++currentChildID;
             InternalChildren.Add(i);
         }
@@ -58,18 +58,19 @@ namespace osu.Game.Screens.Select.Carousel
         {
             if (items != null) InternalChildren = items;
 
-            State.ValueChanged += v =>
+            State.ValueChanged += state =>
             {
-                switch (v)
+                switch (state.NewValue)
                 {
                     case CarouselItemState.Collapsed:
                     case CarouselItemState.NotSelected:
                         InternalChildren.ForEach(c => c.State.Value = CarouselItemState.Collapsed);
                         break;
+
                     case CarouselItemState.Selected:
                         InternalChildren.ForEach(c =>
                         {
-                            if (c.State == CarouselItemState.Collapsed) c.State.Value = CarouselItemState.NotSelected;
+                            if (c.State.Value == CarouselItemState.Collapsed) c.State.Value = CarouselItemState.NotSelected;
                         });
                         break;
                 }
@@ -96,6 +97,7 @@ namespace osu.Game.Screens.Select.Carousel
                 foreach (var b in InternalChildren)
                 {
                     if (item == b) continue;
+
                     b.State.Value = CarouselItemState.NotSelected;
                 }
 

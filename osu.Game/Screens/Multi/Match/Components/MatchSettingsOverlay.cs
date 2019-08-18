@@ -4,12 +4,13 @@
 using System;
 using Humanizer;
 using osu.Framework.Allocation;
-using osu.Framework.Configuration;
+using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics;
+using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.Multiplayer;
@@ -91,7 +92,7 @@ namespace osu.Game.Screens.Multi.Match.Components
                         {
                             new Drawable[]
                             {
-                                new ScrollContainer
+                                new OsuScrollContainer
                                 {
                                     Padding = new MarginPadding
                                     {
@@ -148,7 +149,7 @@ namespace osu.Game.Screens.Multi.Match.Components
                                                                     },
                                                                     typeLabel = new OsuSpriteText
                                                                     {
-                                                                        TextSize = 14,
+                                                                        Font = OsuFont.GetFont(size: 14),
                                                                         Colour = colours.Yellow
                                                                     },
                                                                 },
@@ -264,12 +265,12 @@ namespace osu.Game.Screens.Multi.Match.Components
                     processingOverlay = new ProcessingOverlay { Alpha = 0 }
                 };
 
-                TypePicker.Current.BindValueChanged(t => typeLabel.Text = t?.Name ?? string.Empty, true);
-                Name.BindValueChanged(n => NameField.Text = n, true);
-                Availability.BindValueChanged(a => AvailabilityPicker.Current.Value = a, true);
-                Type.BindValueChanged(t => TypePicker.Current.Value = t, true);
-                MaxParticipants.BindValueChanged(m => MaxParticipantsField.Text = m?.ToString(), true);
-                Duration.BindValueChanged(d => DurationField.Current.Value = d, true);
+                TypePicker.Current.BindValueChanged(type => typeLabel.Text = type.NewValue?.Name ?? string.Empty, true);
+                RoomName.BindValueChanged(name => NameField.Text = name.NewValue, true);
+                Availability.BindValueChanged(availability => AvailabilityPicker.Current.Value = availability.NewValue, true);
+                Type.BindValueChanged(type => TypePicker.Current.Value = type.NewValue, true);
+                MaxParticipants.BindValueChanged(count => MaxParticipantsField.Text = count.NewValue?.ToString(), true);
+                Duration.BindValueChanged(duration => DurationField.Current.Value = duration.NewValue, true);
             }
 
             protected override void Update()
@@ -285,7 +286,7 @@ namespace osu.Game.Screens.Multi.Match.Components
             {
                 hideError();
 
-                Name.Value = NameField.Text;
+                RoomName.Value = NameField.Text;
                 Availability.Value = AvailabilityPicker.Current.Value;
                 Type.Value = TypePicker.Current.Value;
 
@@ -296,7 +297,7 @@ namespace osu.Game.Screens.Multi.Match.Components
 
                 Duration.Value = DurationField.Current.Value;
 
-                manager?.CreateRoom(currentRoom, onSuccess, onError);
+                manager?.CreateRoom(currentRoom.Value, onSuccess, onError);
 
                 processingOverlay.Show();
             }
@@ -316,8 +317,12 @@ namespace osu.Game.Screens.Multi.Match.Components
 
         private class SettingsTextBox : OsuTextBox
         {
-            protected override Color4 BackgroundUnfocused => Color4.Black;
-            protected override Color4 BackgroundFocused => Color4.Black;
+            [BackgroundDependencyLoader]
+            private void load()
+            {
+                BackgroundUnfocused = Color4.Black;
+                BackgroundFocused = Color4.Black;
+            }
         }
 
         private class SettingsNumberTextBox : SettingsTextBox
@@ -327,8 +332,12 @@ namespace osu.Game.Screens.Multi.Match.Components
 
         private class SettingsPasswordTextBox : OsuPasswordTextBox
         {
-            protected override Color4 BackgroundUnfocused => Color4.Black;
-            protected override Color4 BackgroundFocused => Color4.Black;
+            [BackgroundDependencyLoader]
+            private void load()
+            {
+                BackgroundUnfocused = Color4.Black;
+                BackgroundFocused = Color4.Black;
+            }
         }
 
         private class SectionContainer : FillFlowContainer<Section>
@@ -364,8 +373,7 @@ namespace osu.Game.Screens.Multi.Match.Components
                     {
                         new OsuSpriteText
                         {
-                            TextSize = 12,
-                            Font = @"Exo2.0-Bold",
+                            Font = OsuFont.GetFont(weight: FontWeight.Bold, size: 12),
                             Text = title.ToUpper(),
                         },
                         content = new Container

@@ -10,12 +10,15 @@ using System.Linq;
 using osu.Framework.Graphics;
 using osu.Game.Replays;
 using osu.Game.Rulesets.Objects.Types;
+using osu.Game.Rulesets.Osu.Beatmaps;
 using osu.Game.Rulesets.Scoring;
 
 namespace osu.Game.Rulesets.Osu.Replays
 {
     public class OsuAutoGenerator : OsuAutoGeneratorBase
     {
+        public new OsuBeatmap Beatmap => (OsuBeatmap)base.Beatmap;
+
         #region Parameters
 
         /// <summary>
@@ -42,7 +45,7 @@ namespace osu.Game.Rulesets.Osu.Replays
 
         #region Construction / Initialisation
 
-        public OsuAutoGenerator(Beatmap<OsuHitObject> beatmap)
+        public OsuAutoGenerator(IBeatmap beatmap)
             : base(beatmap)
         {
             // Already superhuman, but still somewhat realistic
@@ -196,6 +199,7 @@ namespace osu.Game.Rulesets.Osu.Replays
 
             // Wait until Auto could "see and react" to the next note.
             double waitTime = h.StartTime - Math.Max(0.0, h.TimePreempt - reactionTime);
+
             if (waitTime > lastFrame.Time)
             {
                 lastFrame = new OsuReplayFrame(waitTime, lastFrame.Position) { Actions = lastFrame.Actions };
@@ -209,7 +213,7 @@ namespace osu.Game.Rulesets.Osu.Replays
             // Only "snap" to hitcircles if they are far enough apart. As the time between hitcircles gets shorter the snapping threshold goes up.
             if (timeDifference > 0 && // Sanity checks
                 ((lastPosition - targetPos).Length > h.Radius * (1.5 + 100.0 / timeDifference) || // Either the distance is big enough
-                timeDifference >= 266)) // ... or the beats are slow enough to tap anyway.
+                 timeDifference >= 266)) // ... or the beats are slow enough to tap anyway.
             {
                 // Perform eased movement
                 for (double time = lastFrame.Time + FrameDelay; time < h.StartTime; time += FrameDelay)
@@ -289,7 +293,6 @@ namespace osu.Game.Rulesets.Osu.Replays
             {
                 // We add intermediate frames for spinning / following a slider here.
                 case Spinner spinner:
-                {
                     Vector2 difference = startPosition - SPINNER_CENTRE;
 
                     float radius = difference.Length;
@@ -312,9 +315,8 @@ namespace osu.Game.Rulesets.Osu.Replays
 
                     endFrame.Position = endPosition;
                     break;
-                }
+
                 case Slider slider:
-                {
                     for (double j = FrameDelay; j < slider.Duration; j += FrameDelay)
                     {
                         Vector2 pos = slider.StackedPositionAt(j / slider.Duration);
@@ -323,7 +325,6 @@ namespace osu.Game.Rulesets.Osu.Replays
 
                     AddFrameToReplay(new OsuReplayFrame(slider.EndTime, new Vector2(slider.StackedEndPosition.X, slider.StackedEndPosition.Y), action));
                     break;
-                }
             }
 
             // We only want to let go of our button if we are at the end of the current replay. Otherwise something is still going on after us so we need to keep the button pressed!

@@ -4,12 +4,13 @@
 using System;
 using osu.Framework;
 using osu.Framework.Allocation;
-using osu.Framework.Configuration;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input.Events;
 using osu.Framework.Timing;
 using osu.Game.Beatmaps;
+using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Screens.Edit.Compose;
 using osuTK;
@@ -75,6 +76,7 @@ namespace osu.Game.Rulesets.Edit
             {
                 if (state == value)
                     return;
+
                 state = value;
 
                 if (state == PlacementState.Shown)
@@ -107,7 +109,8 @@ namespace osu.Game.Rulesets.Edit
         }
 
         /// <summary>
-        /// Invokes <see cref="HitObject.ApplyDefaults"/>, refreshing <see cref="HitObject.NestedHitObjects"/> and parameters for the <see cref="HitObject"/>.
+        /// Invokes <see cref="Objects.HitObject.ApplyDefaults(ControlPointInfo,BeatmapDifficulty)"/>,
+        /// refreshing <see cref="Objects.HitObject.NestedHitObjects"/> and parameters for the <see cref="HitObject"/>.
         /// </summary>
         protected void ApplyDefaultsToHitObject() => HitObject.ApplyDefaults(beatmap.Value.Beatmap.ControlPointInfo, beatmap.Value.Beatmap.BeatmapInfo.BaseDifficulty);
 
@@ -121,8 +124,10 @@ namespace osu.Game.Rulesets.Edit
             {
                 case ScrollEvent _:
                     return false;
+
                 case MouseEvent _:
                     return true;
+
                 default:
                     return false;
             }

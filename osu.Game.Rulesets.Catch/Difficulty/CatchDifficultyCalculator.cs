@@ -7,6 +7,7 @@ using System.Linq;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Catch.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Catch.Difficulty.Skills;
+using osu.Game.Rulesets.Catch.Mods;
 using osu.Game.Rulesets.Catch.Objects;
 using osu.Game.Rulesets.Catch.UI;
 using osu.Game.Rulesets.Difficulty;
@@ -22,19 +23,15 @@ namespace osu.Game.Rulesets.Catch.Difficulty
 
         protected override int SectionLength => 750;
 
-        private readonly float halfCatchWidth;
-
         public CatchDifficultyCalculator(Ruleset ruleset, WorkingBeatmap beatmap)
             : base(ruleset, beatmap)
         {
-            var catcher = new CatcherArea.Catcher(beatmap.BeatmapInfo.BaseDifficulty);
-            halfCatchWidth = catcher.CatchWidth * 0.5f;
         }
 
         protected override DifficultyAttributes CreateDifficultyAttributes(IBeatmap beatmap, Mod[] mods, Skill[] skills, double clockRate)
         {
             if (beatmap.HitObjects.Count == 0)
-                return new CatchDifficultyAttributes { Mods = mods };
+                return new CatchDifficultyAttributes { Mods = mods, Skills = skills };
 
             // this is the same as osu!, so there's potential to share the implementation... maybe
             double preempt = BeatmapDifficulty.DifficultyRange(beatmap.BeatmapInfo.BaseDifficulty.ApproachRate, 1800, 1200, 450) / clockRate;
@@ -44,43 +41,51 @@ namespace osu.Game.Rulesets.Catch.Difficulty
                 StarRating = Math.Sqrt(skills[0].DifficultyValue()) * star_scaling_factor,
                 Mods = mods,
                 ApproachRate = preempt > 1200.0 ? -(preempt - 1800.0) / 120.0 : -(preempt - 1200.0) / 150.0 + 5.0,
-                MaxCombo = beatmap.HitObjects.Count(h => h is Fruit) + beatmap.HitObjects.OfType<JuiceStream>().SelectMany(j => j.NestedHitObjects).Count(h => !(h is TinyDroplet))
+                MaxCombo = beatmap.HitObjects.Count(h => h is Fruit) + beatmap.HitObjects.OfType<JuiceStream>().SelectMany(j => j.NestedHitObjects).Count(h => !(h is TinyDroplet)),
+                Skills = skills
             };
         }
 
         protected override IEnumerable<DifficultyHitObject> CreateDifficultyHitObjects(IBeatmap beatmap, double clockRate)
         {
+            float halfCatchWidth;
+
+            using (var catcher = new CatcherArea.Catcher(beatmap.BeatmapInfo.BaseDifficulty))
+            {
+                halfCatchWidth = catcher.CatchWidth * 0.5f;
+                halfCatchWidth *= 0.8f; // We're only using 80% of the catcher's width to simulate imperfect gameplay.
+            }
+
             CatchHitObject lastObject = null;
 
-            foreach (var hitObject in beatmap.HitObjects.OfType<CatchHitObject>())
+            // In 2B beatmaps, it is possible that a normal Fruit is placed in the middle of a JuiceStream.
+            foreach (var hitObject in beatmap.HitObjects
+                                             .SelectMany(obj => obj is JuiceStream stream ? stream.NestedHitObjects : new[] { obj })
+                                             .Cast<CatchHitObject>()
+                                             .OrderBy(x => x.StartTime))
             {
-                if (lastObject == null)
-                {
-                    lastObject = hitObject;
+                // We want to only consider fruits that contribute to the combo.
+                if (hitObject is BananaShower || hitObject is TinyDroplet)
                     continue;
-                }
 
-                switch (hitObject)
-                {
-                    // We want to only consider fruits that contribute to the combo. Droplets are addressed as accuracy and spinners are not relevant for "skill" calculations.
-                    case Fruit fruit:
-                        yield return new CatchDifficultyHitObject(fruit, lastObject, clockRate, halfCatchWidth);
-                        lastObject = hitObject;
-                        break;
-                    case JuiceStream _:
-                        foreach (var nested in hitObject.NestedHitObjects.OfType<CatchHitObject>().Where(o => !(o is TinyDroplet)))
-                        {
-                            yield return new CatchDifficultyHitObject(nested, lastObject, clockRate, halfCatchWidth);
-                            lastObject = nested;
-                        }
-                        break;
-                }
+                if (lastObject != null)
+                    yield return new CatchDifficultyHitObject(hitObject, lastObject, clockRate, halfCatchWidth);
+
+                lastObject = hitObject;
             }
         }
 
         protected override Skill[] CreateSkills(IBeatmap beatmap) => new Skill[]
         {
             new Movement(),
+        };
+
+        protected override Mod[] DifficultyAdjustmentMods => new Mod[]
+        {
+            new CatchModDoubleTime(),
+            new CatchModHalfTime(),
+            new CatchModHardRock(),
+            new CatchModEasy(),
         };
     }
 }

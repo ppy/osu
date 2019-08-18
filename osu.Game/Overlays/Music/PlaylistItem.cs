@@ -50,12 +50,14 @@ namespace osu.Game.Overlays.Music
         }
 
         private bool selected;
+
         public bool Selected
         {
-            get { return selected; }
+            get => selected;
             set
             {
                 if (value == selected) return;
+
                 selected = value;
 
                 FinishTransforms(true);
@@ -100,7 +102,7 @@ namespace osu.Game.Overlays.Music
             titleBind = localisation.GetLocalisedString(new LocalisedString((metadata.TitleUnicode, metadata.Title)));
             artistBind = localisation.GetLocalisedString(new LocalisedString((metadata.ArtistUnicode, metadata.Artist)));
 
-            artistBind.BindValueChanged(newText => recreateText(), true);
+            artistBind.BindValueChanged(_ => recreateText(), true);
         }
 
         private void recreateText()
@@ -108,16 +110,11 @@ namespace osu.Game.Overlays.Music
             text.Clear();
 
             //space after the title to put a space between the title and artist
-            titleSprites = text.AddText(titleBind.Value + @"  ", sprite =>
-            {
-                sprite.TextSize = 16;
-                sprite.Font = @"Exo2.0-Regular";
-            }).OfType<SpriteText>();
+            titleSprites = text.AddText(titleBind.Value + @"  ", sprite => sprite.Font = OsuFont.GetFont(weight: FontWeight.Regular)).OfType<SpriteText>();
 
             text.AddText(artistBind.Value, sprite =>
             {
-                sprite.TextSize = 14;
-                sprite.Font = @"Exo2.0-Bold";
+                sprite.Font = OsuFont.GetFont(size: 14, weight: FontWeight.Bold);
                 sprite.Colour = artistColour;
                 sprite.Padding = new MarginPadding { Top = 1 };
             });
@@ -147,7 +144,7 @@ namespace osu.Game.Overlays.Music
 
         public bool MatchingFilter
         {
-            get { return matching; }
+            get => matching;
             set
             {
                 if (matching == value) return;
@@ -158,6 +155,8 @@ namespace osu.Game.Overlays.Music
             }
         }
 
+        public bool FilteringActive { get; set; }
+
         private class PlaylistItemHandle : SpriteIcon
         {
             public PlaylistItemHandle()
@@ -165,7 +164,7 @@ namespace osu.Game.Overlays.Music
                 Anchor = Anchor.TopLeft;
                 Origin = Anchor.TopLeft;
                 Size = new Vector2(12);
-                Icon = FontAwesome.fa_bars;
+                Icon = FontAwesome.Solid.Bars;
                 Alpha = 0f;
                 Margin = new MarginPadding { Left = 5, Top = 2 };
             }

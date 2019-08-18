@@ -10,7 +10,8 @@ namespace osu.Game.Screens.Play
     {
         public T Action { get; }
 
-        public KeyCounterAction(T action) : base($"B{(int)(object)action + 1}")
+        public KeyCounterAction(T action)
+            : base($"B{(int)(object)action + 1}")
         {
             Action = action;
         }

@@ -2,7 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
-using osu.Framework.Configuration;
+using osu.Framework.Bindables;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Events;
@@ -26,9 +26,9 @@ namespace osu.Game.Screens.Multi.Match.Components
         [BackgroundDependencyLoader]
         private void load()
         {
-            roomId.BindValueChanged(v =>
+            roomId.BindValueChanged(id =>
             {
-                if (v.HasValue)
+                if (id.NewValue.HasValue)
                 {
                     Items.ForEach(t => t.Enabled.Value = !(t is SettingsMatchPage));
                     Current.Value = new RoomMatchPage();
@@ -51,13 +51,14 @@ namespace osu.Game.Screens.Multi.Match.Components
                 : base(value)
             {
                 enabled.BindTo(value.Enabled);
-                enabled.BindValueChanged(v => Colour = v ? Color4.White : Color4.Gray);
+                enabled.BindValueChanged(enabled => Colour = enabled.NewValue ? Color4.White : Color4.Gray, true);
             }
 
             protected override bool OnClick(ClickEvent e)
             {
                 if (!enabled.Value)
                     return true;
+
                 return base.OnClick(e);
             }
         }

@@ -20,12 +20,10 @@ namespace osu.Game.Screens.Select
         public readonly BeatmapLeaderboard Leaderboard;
 
         private WorkingBeatmap beatmap;
+
         public WorkingBeatmap Beatmap
         {
-            get
-            {
-                return beatmap;
-            }
+            get => beatmap;
             set
             {
                 beatmap = value;
@@ -43,6 +41,8 @@ namespace osu.Game.Screens.Select
                     RelativeSizeAxes = Axes.X,
                     OnFilter = (tab, mods) =>
                     {
+                        Leaderboard.FilterMods = mods;
+
                         switch (tab)
                         {
                             case BeatmapDetailTab.Details:

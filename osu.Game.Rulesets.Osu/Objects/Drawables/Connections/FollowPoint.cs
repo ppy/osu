@@ -6,6 +6,7 @@ using osuTK.Graphics;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Skinning;
 
@@ -40,7 +41,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Connections
                     Anchor = Anchor.Centre,
                     Alpha = 0.5f,
                 }
-            }, restrictSize: false);
+            }, confineMode: ConfineMode.NoScaling);
         }
     }
 }

@@ -37,7 +37,7 @@ namespace osu.Game.Graphics.UserInterface
         [BackgroundDependencyLoader]
         private void load(AudioManager audio)
         {
-            sampleHover = audio.Sample.Get($@"UI/generic-hover{SampleSet.GetDescription()}");
+            sampleHover = audio.Samples.Get($@"UI/generic-hover{SampleSet.GetDescription()}");
         }
     }
 
@@ -45,8 +45,10 @@ namespace osu.Game.Graphics.UserInterface
     {
         [Description("")]
         Loud,
+
         [Description("-soft")]
         Normal,
+
         [Description("-softer")]
         Soft
     }

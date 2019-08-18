@@ -16,6 +16,7 @@ namespace osu.Game.Beatmaps
         where T : HitObject
     {
         private event Action<HitObject, IEnumerable<HitObject>> ObjectConverted;
+
         event Action<HitObject, IEnumerable<HitObject>> IBeatmapConverter.ObjectConverted
         {
             add => ObjectConverted += value;
@@ -97,7 +98,7 @@ namespace osu.Game.Beatmaps
         protected abstract IEnumerable<Type> ValidConversionTypes { get; }
 
         /// <summary>
-        /// Creates the <see cref="Beatmap{T}"/> that will be returned by this <see cref="BeatmapProcessor{T}"/>.
+        /// Creates the <see cref="Beatmap{T}"/> that will be returned by this <see cref="BeatmapProcessor"/>.
         /// </summary>
         protected virtual Beatmap<T> CreateBeatmap() => new Beatmap<T>();
 

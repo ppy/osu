@@ -2,7 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Graphics;
-using osu.Game.Graphics;
+using osu.Framework.Graphics.Sprites;
 using osu.Game.Overlays.Settings.Sections.Audio;
 
 namespace osu.Game.Overlays.Settings.Sections
@@ -10,7 +10,7 @@ namespace osu.Game.Overlays.Settings.Sections
     public class AudioSection : SettingsSection
     {
         public override string Header => "Audio";
-        public override FontAwesome Icon => FontAwesome.fa_volume_up;
+        public override IconUsage Icon => FontAwesome.Solid.VolumeUp;
 
         public AudioSection()
         {

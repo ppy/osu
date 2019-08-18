@@ -100,6 +100,7 @@ namespace osu.Game.Screens.Edit.Compose
             };
 
             var ruleset = Beatmap.Value.BeatmapInfo.Ruleset?.CreateInstance();
+
             if (ruleset == null)
             {
                 Logger.Log("Beatmap doesn't have a ruleset assigned.");
@@ -108,6 +109,7 @@ namespace osu.Game.Screens.Edit.Compose
             }
 
             composer = ruleset.CreateHitObjectComposer();
+
             if (composer == null)
             {
                 Logger.Log($"Ruleset {ruleset.Description} doesn't support hitobject composition.");

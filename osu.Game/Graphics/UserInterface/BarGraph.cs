@@ -17,16 +17,15 @@ namespace osu.Game.Graphics.UserInterface
         public float? MaxValue { get; set; }
 
         private BarDirection direction = BarDirection.BottomToTop;
+
         public new BarDirection Direction
         {
-            get
-            {
-                return direction;
-            }
+            get => direction;
             set
             {
                 direction = value;
                 base.Direction = direction.HasFlag(BarDirection.Horizontal) ? FillDirection.Vertical : FillDirection.Horizontal;
+
                 foreach (var bar in Children)
                 {
                     bar.Size = direction.HasFlag(BarDirection.Horizontal) ? new Vector2(1, 1.0f / Children.Count) : new Vector2(1.0f / Children.Count, 1);
@@ -43,6 +42,7 @@ namespace osu.Game.Graphics.UserInterface
             set
             {
                 List<Bar> bars = Children.ToList();
+
                 foreach (var bar in value.Select((length, index) => new { Value = length, Bar = bars.Count > index ? bars[index] : null }))
                 {
                     float length = MaxValue ?? value.Max();
@@ -69,6 +69,7 @@ namespace osu.Game.Graphics.UserInterface
                         });
                     }
                 }
+
                 //I'm using ToList() here because Where() returns an Enumerable which can change it's elements afterwards
                 RemoveRange(Children.Where((bar, index) => index >= value.Count()).ToList());
             }

@@ -1,8 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using osu.Framework;
 using osu.Framework.Allocation;
-using osu.Framework.Graphics;
 using osu.Framework.Platform;
 using osu.Game.Configuration;
 
@@ -15,19 +15,20 @@ namespace osu.Game.Overlays.Settings.Sections.General
         [BackgroundDependencyLoader]
         private void load(Storage storage, OsuConfigManager config)
         {
-            Children = new Drawable[]
+            Add(new SettingsEnumDropdown<ReleaseStream>
             {
-                new SettingsEnumDropdown<ReleaseStream>
-                {
-                    LabelText = "Release stream",
-                    Bindable = config.GetBindable<ReleaseStream>(OsuSetting.ReleaseStream),
-                },
-                new SettingsButton
+                LabelText = "Release stream",
+                Bindable = config.GetBindable<ReleaseStream>(OsuSetting.ReleaseStream),
+            });
+
+            if (RuntimeInfo.IsDesktop)
+            {
+                Add(new SettingsButton
                 {
                     Text = "Open osu! folder",
                     Action = storage.OpenInNativeExplorer,
-                }
-            };
+                });
+            }
         }
     }
 }

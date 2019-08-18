@@ -4,6 +4,7 @@
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Graphics.Sprites;
 using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
 using osuTK;
@@ -90,8 +91,8 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                                             {
                                                 RelativeSizeAxes = Axes.Y,
                                                 Height = 0.5f,
-                                                Icon = FontAwesome.fa_search_plus,
-                                                Action = () => timeline.Zoom++
+                                                Icon = FontAwesome.Solid.SearchPlus,
+                                                Action = () => changeZoom(1)
                                             },
                                             new TimelineButton
                                             {
@@ -99,8 +100,8 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                                                 Origin = Anchor.BottomLeft,
                                                 RelativeSizeAxes = Axes.Y,
                                                 Height = 0.5f,
-                                                Icon = FontAwesome.fa_search_minus,
-                                                Action = () => timeline.Zoom--
+                                                Icon = FontAwesome.Solid.SearchMinus,
+                                                Action = () => changeZoom(-1)
                                             },
                                         }
                                     }
@@ -124,5 +125,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
             timeline.WaveformVisible.BindTo(waveformCheckbox.Current);
         }
+
+        private void changeZoom(float change) => timeline.Zoom += change;
     }
 }

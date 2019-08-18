@@ -1,57 +1,132 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using osu.Framework.Allocation;
 using osu.Framework.Extensions;
+using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Sprites;
-using osu.Framework.Graphics.Textures;
+using osu.Framework.Graphics.Shapes;
+using osu.Game.Graphics;
+using osu.Game.Graphics.Backgrounds;
+using osu.Game.Graphics.Sprites;
 using osu.Game.Scoring;
+using osuTK;
+using osuTK.Graphics;
 
 namespace osu.Game.Online.Leaderboards
 {
-    public class DrawableRank : Container
+    public class DrawableRank : CompositeDrawable
     {
-        private readonly Sprite rankSprite;
-        private TextureStore textures;
-
-        public ScoreRank Rank { get; private set; }
+        private readonly ScoreRank rank;
 
         public DrawableRank(ScoreRank rank)
         {
-            Rank = rank;
+            this.rank = rank;
 
-            Children = new Drawable[]
+            RelativeSizeAxes = Axes.Both;
+            FillMode = FillMode.Fit;
+            FillAspectRatio = 2;
+
+            var rankColour = getRankColour();
+            InternalChild = new DrawSizePreservingFillContainer
             {
-                rankSprite = new Sprite
+                TargetDrawSize = new Vector2(64, 32),
+                Strategy = DrawSizePreservationStrategy.Minimum,
+                Child = new CircularContainer
                 {
+                    Masking = true,
                     RelativeSizeAxes = Axes.Both,
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
-                    FillMode = FillMode.Fit
-                },
+                    Children = new Drawable[]
+                    {
+                        new Box
+                        {
+                            RelativeSizeAxes = Axes.Both,
+                            Colour = rankColour,
+                        },
+                        new Triangles
+                        {
+                            RelativeSizeAxes = Axes.Both,
+                            ColourDark = rankColour.Darken(0.1f),
+                            ColourLight = rankColour.Lighten(0.1f),
+                            Velocity = 0.25f,
+                        },
+                        new OsuSpriteText
+                        {
+                            Anchor = Anchor.Centre,
+                            Origin = Anchor.Centre,
+                            Spacing = new Vector2(-3, 0),
+                            Padding = new MarginPadding { Top = 5 },
+                            Colour = getRankNameColour(),
+                            Font = OsuFont.GetFont(Typeface.Venera, 25),
+                            Text = getRankName(),
+                            ShadowColour = Color4.Black.Opacity(0.3f),
+                            ShadowOffset = new Vector2(0, 0.08f),
+                            Shadow = true,
+                        },
+                    }
+                }
             };
         }
 
-        [BackgroundDependencyLoader]
-        private void load(TextureStore textures)
+        private string getRankName() => rank.GetDescription().TrimEnd('+');
+
+        /// <summary>
+        ///  Retrieves the grade background colour.
+        /// </summary>
+        private Color4 getRankColour()
         {
-            this.textures = textures;
-            updateTexture();
+            switch (rank)
+            {
+                case ScoreRank.XH:
+                case ScoreRank.X:
+                    return OsuColour.FromHex(@"ce1c9d");
+
+                case ScoreRank.SH:
+                case ScoreRank.S:
+                    return OsuColour.FromHex(@"00a8b5");
+
+                case ScoreRank.A:
+                    return OsuColour.FromHex(@"7cce14");
+
+                case ScoreRank.B:
+                    return OsuColour.FromHex(@"e3b130");
+
+                case ScoreRank.C:
+                    return OsuColour.FromHex(@"f18252");
+
+                default:
+                    return OsuColour.FromHex(@"e95353");
+            }
         }
 
-        private void updateTexture()
+        /// <summary>
+        ///  Retrieves the grade text colour.
+        /// </summary>
+        private ColourInfo getRankNameColour()
         {
-            rankSprite.Texture = textures.Get($@"Grades/{Rank.GetDescription()}");
-        }
+            switch (rank)
+            {
+                case ScoreRank.XH:
+                case ScoreRank.SH:
+                    return ColourInfo.GradientVertical(Color4.White, OsuColour.FromHex("afdff0"));
 
-        public void UpdateRank(ScoreRank newRank)
-        {
-            Rank = newRank;
+                case ScoreRank.X:
+                case ScoreRank.S:
+                    return ColourInfo.GradientVertical(OsuColour.FromHex(@"ffe7a8"), OsuColour.FromHex(@"ffb800"));
 
-            if (LoadState >= LoadState.Ready)
-                updateTexture();
+                case ScoreRank.A:
+                    return OsuColour.FromHex(@"275227");
+
+                case ScoreRank.B:
+                    return OsuColour.FromHex(@"553a2b");
+
+                case ScoreRank.C:
+                    return OsuColour.FromHex(@"473625");
+
+                default:
+                    return OsuColour.FromHex(@"512525");
+            }
         }
     }
 }

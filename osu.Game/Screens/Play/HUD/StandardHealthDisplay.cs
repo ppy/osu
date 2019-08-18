@@ -6,6 +6,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Effects;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.Judgements;
 using osuTK;
@@ -44,18 +45,20 @@ namespace osu.Game.Screens.Play.HUD
 
         public Color4 AccentColour
         {
-            get { return fill.Colour; }
-            set { fill.Colour = value; }
+            get => fill.Colour;
+            set => fill.Colour = value;
         }
 
         private Color4 glowColour;
+
         public Color4 GlowColour
         {
-            get { return glowColour; }
+            get => glowColour;
             set
             {
                 if (glowColour == value)
                     return;
+
                 glowColour = value;
 
                 fill.EdgeEffect = new EdgeEffectParameters

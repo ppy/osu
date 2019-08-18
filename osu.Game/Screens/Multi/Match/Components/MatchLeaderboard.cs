@@ -4,7 +4,7 @@
 using System;
 using System.Collections.Generic;
 using osu.Framework.Allocation;
-using osu.Framework.Configuration;
+using osu.Framework.Bindables;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Game.Online.API.Requests.Responses;
@@ -25,13 +25,15 @@ namespace osu.Game.Screens.Multi.Match.Components
         {
             roomId.BindValueChanged(id =>
             {
-                if (id == null)
+                if (id.NewValue == null)
                     return;
 
                 Scores = null;
                 UpdateScores();
             }, true);
         }
+
+        protected override bool IsOnlineScope => true;
 
         protected override APIRequest FetchScores(Action<IEnumerable<APIRoomScoreInfo>> scoresCallback)
         {

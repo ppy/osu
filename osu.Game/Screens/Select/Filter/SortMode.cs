@@ -9,18 +9,25 @@ namespace osu.Game.Screens.Select.Filter
     {
         [Description("Artist")]
         Artist,
+
         [Description("Author")]
         Author,
+
         [Description("BPM")]
         BPM,
+
         [Description("Date Added")]
         DateAdded,
+
         [Description("Difficulty")]
         Difficulty,
+
         [Description("Length")]
         Length,
+
         [Description("Rank Achieved")]
         RankAchieved,
+
         [Description("Title")]
         Title
     }

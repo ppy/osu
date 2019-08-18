@@ -3,7 +3,7 @@
 
 using osu.Framework.Allocation;
 using osu.Framework.Audio.Track;
-using osu.Framework.Configuration;
+using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Audio;
@@ -49,13 +49,13 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             // We don't want the centre marker to scroll
             AddInternal(new CentreMarker());
 
-            WaveformVisible.ValueChanged += visible => waveform.FadeTo(visible ? 1 : 0, 200, Easing.OutQuint);
+            WaveformVisible.ValueChanged += visible => waveform.FadeTo(visible.NewValue ? 1 : 0, 200, Easing.OutQuint);
 
             Beatmap.BindTo(beatmap);
             Beatmap.BindValueChanged(b =>
             {
-                waveform.Waveform = b.Waveform;
-                track = b.Track;
+                waveform.Waveform = b.NewValue.Waveform;
+                track = b.NewValue.Track;
             }, true);
         }
 

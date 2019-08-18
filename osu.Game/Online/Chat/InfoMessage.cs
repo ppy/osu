@@ -10,7 +10,8 @@ namespace osu.Game.Online.Chat
     {
         private static int infoID = -1;
 
-        public InfoMessage(string message) : base(infoID--)
+        public InfoMessage(string message)
+            : base(infoID--)
         {
             Timestamp = DateTimeOffset.Now;
             Content = message;

@@ -3,48 +3,59 @@
 
 using osuTK;
 using osuTK.Graphics;
-using osuTK.Input;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
-using osu.Framework.Input.Events;
+using osu.Framework.Platform;
 using osu.Framework.Screens;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
+using osu.Game.Overlays;
 using osu.Game.Screens.Backgrounds;
 using osu.Game.Screens.Charts;
-using osu.Game.Screens.Direct;
 using osu.Game.Screens.Edit;
 using osu.Game.Screens.Multi;
 using osu.Game.Screens.Select;
-using osu.Game.Screens.Tournament;
 
 namespace osu.Game.Screens.Menu
 {
     public class MainMenu : OsuScreen
     {
-        private readonly ButtonSystem buttons;
+        public const float FADE_IN_DURATION = 300;
 
-        public override bool HideOverlaysOnEnter => buttons.State == ButtonSystemState.Initial;
+        public const float FADE_OUT_DURATION = 400;
 
-        protected override bool AllowBackButton => buttons.State != ButtonSystemState.Initial;
+        public override bool HideOverlaysOnEnter => buttons == null || buttons.State == ButtonSystemState.Initial;
+
+        public override bool AllowBackButton => false;
 
         public override bool AllowExternalScreenChange => true;
 
         private Screen songSelect;
 
-        private readonly MenuSideFlashes sideFlashes;
+        private MenuSideFlashes sideFlashes;
 
-        protected override BackgroundScreen CreateBackground() => new BackgroundScreenDefault();
+        private ButtonSystem buttons;
 
-        public MainMenu()
+        [Resolved]
+        private GameHost host { get; set; }
+
+        [Resolved(canBeNull: true)]
+        private MusicController music { get; set; }
+
+        private BackgroundScreenDefault background;
+
+        protected override BackgroundScreen CreateBackground() => background;
+
+        [BackgroundDependencyLoader(true)]
+        private void load(DirectOverlay direct, SettingsOverlay settings)
         {
-            InternalChildren = new Drawable[]
+            if (host.CanExit)
+                AddInternal(new ExitConfirmOverlay { Action = this.Exit });
+
+            AddRangeInternal(new Drawable[]
             {
-                new ExitConfirmOverlay
-                {
-                    Action = this.Exit,
-                },
                 new ParallaxContainer
                 {
                     ParallaxAmount = 0.01f,
@@ -53,16 +64,15 @@ namespace osu.Game.Screens.Menu
                         buttons = new ButtonSystem
                         {
                             OnChart = delegate { this.Push(new ChartListing()); },
-                            OnDirect = delegate {this.Push(new OnlineListing()); },
-                            OnEdit = delegate {this.Push(new Editor()); },
+                            OnEdit = delegate { this.Push(new Editor()); },
                             OnSolo = onSolo,
-                            OnMulti = delegate {this.Push(new Multiplayer()); },
+                            OnMulti = delegate { this.Push(new Multiplayer()); },
                             OnExit = this.Exit,
                         }
                     }
                 },
                 sideFlashes = new MenuSideFlashes(),
-            };
+            });
 
             buttons.StateChanged += state =>
             {
@@ -72,22 +82,17 @@ namespace osu.Game.Screens.Menu
                     case ButtonSystemState.Exit:
                         Background.FadeColour(Color4.White, 500, Easing.OutSine);
                         break;
+
                     default:
                         Background.FadeColour(OsuColour.Gray(0.8f), 500, Easing.OutSine);
                         break;
                 }
             };
-        }
 
-        [BackgroundDependencyLoader(true)]
-        private void load(OsuGame game = null)
-        {
-            if (game != null)
-            {
-                buttons.OnSettings = game.ToggleSettings;
-                buttons.OnDirect = game.ToggleDirect;
-            }
+            buttons.OnSettings = () => settings?.ToggleVisibility();
+            buttons.OnDirect = () => direct?.ToggleVisibility();
 
+            LoadComponentAsync(background = new BackgroundScreenDefault());
             preloadSongSelect();
         }
 
@@ -99,7 +104,7 @@ namespace osu.Game.Screens.Menu
 
         public void LoadToSolo() => Schedule(onSolo);
 
-        private void onSolo() =>this.Push(consumeSongSelect());
+        private void onSolo() => this.Push(consumeSongSelect());
 
         private Screen consumeSongSelect()
         {
@@ -116,7 +121,7 @@ namespace osu.Game.Screens.Menu
             var track = Beatmap.Value.Track;
             var metadata = Beatmap.Value.Metadata;
 
-            if (last is Intro && track != null)
+            if (last is IntroScreen && track != null)
             {
                 if (!track.IsRunning)
                 {
@@ -141,23 +146,23 @@ namespace osu.Game.Screens.Menu
             {
                 buttons.State = ButtonSystemState.TopLevel;
 
-                const float length = 300;
+                this.FadeIn(FADE_IN_DURATION, Easing.OutQuint);
+                this.MoveTo(new Vector2(0, 0), FADE_IN_DURATION, Easing.OutQuint);
 
-                this.FadeIn(length, Easing.OutQuint);
-                this.MoveTo(new Vector2(0, 0), length, Easing.OutQuint);
-
-                sideFlashes.Delay(length).FadeIn(64, Easing.InQuint);
+                sideFlashes.Delay(FADE_IN_DURATION).FadeIn(64, Easing.InQuint);
             }
         }
 
         protected override void LogoSuspending(OsuLogo logo)
         {
-            logo.FadeOut(300, Easing.InSine)
-                .ScaleTo(0.2f, 300, Easing.InSine)
-                .OnComplete(l => buttons.SetOsuLogo(null));
+            var seq = logo.FadeOut(300, Easing.InSine)
+                          .ScaleTo(0.2f, 300, Easing.InSine);
+
+            seq.OnComplete(_ => buttons.SetOsuLogo(null));
+            seq.OnAbort(_ => buttons.SetOsuLogo(null));
         }
 
-        private void beatmap_ValueChanged(WorkingBeatmap newValue)
+        private void beatmap_ValueChanged(ValueChangedEvent<WorkingBeatmap> e)
         {
             if (!this.IsCurrentScreen())
                 return;
@@ -169,12 +174,10 @@ namespace osu.Game.Screens.Menu
         {
             base.OnSuspending(next);
 
-            const float length = 400;
-
             buttons.State = ButtonSystemState.EnteringMode;
 
-            this.FadeOut(length, Easing.InSine);
-            this.MoveTo(new Vector2(-800, 0), length, Easing.InSine);
+            this.FadeOut(FADE_OUT_DURATION, Easing.InSine);
+            this.MoveTo(new Vector2(-800, 0), FADE_OUT_DURATION, Easing.InSine);
 
             sideFlashes.FadeOut(64, Easing.OutQuint);
         }
@@ -183,10 +186,13 @@ namespace osu.Game.Screens.Menu
         {
             base.OnResuming(last);
 
-            ((BackgroundScreenDefault)Background).Next();
+            (Background as BackgroundScreenDefault)?.Next();
 
             //we may have consumed our preloaded instance, so let's make another.
             preloadSongSelect();
+
+            if (Beatmap.Value.Track != null && music?.IsUserPaused != true)
+                Beatmap.Value.Track.Start();
         }
 
         public override bool OnExiting(IScreen next)
@@ -194,17 +200,6 @@ namespace osu.Game.Screens.Menu
             buttons.State = ButtonSystemState.Exit;
             this.FadeOut(3000);
             return base.OnExiting(next);
-        }
-
-        protected override bool OnKeyDown(KeyDownEvent e)
-        {
-            if (!e.Repeat && e.ControlPressed && e.ShiftPressed && e.Key == Key.D)
-            {
-               this.Push(new Drawings());
-                return true;
-            }
-
-            return base.OnKeyDown(e);
         }
     }
 }

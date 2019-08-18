@@ -5,7 +5,7 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 using osu.Framework.Allocation;
-using osu.Framework.Configuration;
+using osu.Framework.Bindables;
 using osu.Framework.Logging;
 using osu.Game.Beatmaps;
 using osu.Game.Online;
@@ -30,7 +30,7 @@ namespace osu.Game.Screens.Multi
         private Bindable<FilterCriteria> currentFilter { get; set; }
 
         [Resolved]
-        private APIAccess api { get; set; }
+        private IAPIProvider api { get; set; }
 
         [Resolved]
         private RulesetStore rulesets { get; set; }
@@ -56,7 +56,7 @@ namespace osu.Game.Screens.Multi
 
         public void CreateRoom(Room room, Action<Room> onSuccess = null, Action<string> onError = null)
         {
-            room.Host.Value = api.LocalUser;
+            room.Host.Value = api.LocalUser.Value;
 
             var req = new CreateRoomRequest(room);
 
@@ -171,7 +171,7 @@ namespace osu.Game.Screens.Multi
         /// <summary>
         /// Adds a <see cref="Room"/> to the list of available rooms.
         /// </summary>
-        /// <param name="room">The <see cref="Room"/> to add.<</param>
+        /// <param name="room">The <see cref="Room"/> to add.</param>
         private void addRoom(Room room)
         {
             var existing = rooms.FirstOrDefault(e => e.RoomID.Value == room.RoomID.Value);

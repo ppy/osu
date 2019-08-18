@@ -5,6 +5,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Screens;
 using osu.Game.Graphics;
@@ -30,7 +31,7 @@ namespace osu.Game.Overlays
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours, APIAccess api)
+        private void load(OsuColour colours, IAPIProvider api)
         {
             api.Register(this);
 
@@ -96,17 +97,19 @@ namespace osu.Game.Overlays
             this.FadeOut(100);
         }
 
-        public void APIStateChanged(APIAccess api, APIState state)
+        public void APIStateChanged(IAPIProvider api, APIState state)
         {
             switch (state)
             {
                 case APIState.Offline:
                 case APIState.Failing:
                     break;
+
                 case APIState.Connecting:
                     break;
+
                 case APIState.Online:
-                    State = Visibility.Hidden;
+                    Hide();
                     break;
             }
         }

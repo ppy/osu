@@ -22,7 +22,7 @@ namespace osu.Game.Screens.Select
 
         public string SearchText
         {
-            get { return searchText; }
+            get => searchText;
             set
             {
                 searchText = value;

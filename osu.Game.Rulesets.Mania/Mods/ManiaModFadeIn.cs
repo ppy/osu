@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using osu.Framework.Graphics.Sprites;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.Mania.Objects;
 using osu.Game.Rulesets.Mods;
@@ -12,7 +13,7 @@ namespace osu.Game.Rulesets.Mania.Mods
     {
         public override string Name => "Fade In";
         public override string Acronym => "FI";
-        public override FontAwesome Icon => FontAwesome.fa_osu_mod_hidden;
+        public override IconUsage Icon => OsuIcon.ModHidden;
         public override ModType Type => ModType.DifficultyIncrease;
         public override string Description => @"Keys appear out of nowhere!";
         public override double ScoreMultiplier => 1;

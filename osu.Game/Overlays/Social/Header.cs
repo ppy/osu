@@ -9,6 +9,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics;
 using osu.Framework.Allocation;
 using System.ComponentModel;
+using osu.Framework.Graphics.Sprites;
 
 namespace osu.Game.Overlays.Social
 {
@@ -19,7 +20,7 @@ namespace osu.Game.Overlays.Social
         protected override Color4 BackgroundColour => OsuColour.FromHex(@"38202e");
 
         protected override SocialTab DefaultTab => SocialTab.AllPlayers;
-        protected override FontAwesome Icon => FontAwesome.fa_users;
+        protected override IconUsage Icon => FontAwesome.Solid.Users;
 
         protected override Drawable CreateHeaderText()
         {
@@ -32,13 +33,12 @@ namespace osu.Game.Overlays.Social
                     new OsuSpriteText
                     {
                         Text = "social ",
-                        TextSize = 25,
+                        Font = OsuFont.GetFont(size: 25),
                     },
                     browser = new OsuSpriteText
                     {
                         Text = "browser",
-                        TextSize = 25,
-                        Font = @"Exo2.0-Light",
+                        Font = OsuFont.GetFont(size: 25, weight: FontWeight.Light),
                     },
                 },
             };
@@ -55,6 +55,7 @@ namespace osu.Game.Overlays.Social
     {
         [Description("All Players")]
         AllPlayers,
+
         [Description("Friends")]
         Friends,
         //[Description("Team Members")]

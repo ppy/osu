@@ -2,9 +2,10 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
-using osu.Framework.Configuration;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Events;
 using osu.Game.Audio;
 using osu.Game.Beatmaps;
@@ -24,10 +25,11 @@ namespace osu.Game.Overlays.Direct
 
         public BeatmapSetInfo BeatmapSet
         {
-            get { return beatmapSet; }
+            get => beatmapSet;
             set
             {
                 if (value == beatmapSet) return;
+
                 beatmapSet = value;
 
                 Preview?.Stop();
@@ -72,7 +74,7 @@ namespace osu.Game.Overlays.Direct
                     Origin = Anchor.Centre,
                     FillMode = FillMode.Fit,
                     RelativeSizeAxes = Axes.Both,
-                    Icon = FontAwesome.fa_play,
+                    Icon = FontAwesome.Solid.Play,
                 },
                 loadingAnimation = new LoadingAnimation
                 {
@@ -112,12 +114,12 @@ namespace osu.Game.Overlays.Direct
             base.OnHoverLost(e);
         }
 
-        private void playingStateChanged(bool playing)
+        private void playingStateChanged(ValueChangedEvent<bool> e)
         {
-            icon.Icon = playing ? FontAwesome.fa_stop : FontAwesome.fa_play;
-            icon.FadeColour(playing || IsHovered ? hoverColour : Color4.White, 120, Easing.InOutQuint);
+            icon.Icon = e.NewValue ? FontAwesome.Solid.Stop : FontAwesome.Solid.Play;
+            icon.FadeColour(e.NewValue || IsHovered ? hoverColour : Color4.White, 120, Easing.InOutQuint);
 
-            if (playing)
+            if (e.NewValue)
             {
                 if (BeatmapSet == null)
                 {
@@ -127,7 +129,7 @@ namespace osu.Game.Overlays.Direct
 
                 if (Preview != null)
                 {
-                    Preview.Start();
+                    attemptStart();
                     return;
                 }
 
@@ -144,8 +146,8 @@ namespace osu.Game.Overlays.Direct
                     preview.Stopped += () => Playing.Value = false;
 
                     // user may have changed their mind.
-                    if (Playing)
-                        preview.Start();
+                    if (Playing.Value)
+                        attemptStart();
                 });
             }
             else
@@ -153,6 +155,12 @@ namespace osu.Game.Overlays.Direct
                 Preview?.Stop();
                 loading = false;
             }
+        }
+
+        private void attemptStart()
+        {
+            if (Preview?.Start() != true)
+                Playing.Value = false;
         }
 
         protected override void Dispose(bool isDisposing)

@@ -15,7 +15,7 @@ namespace osu.Game.Screens.Multi.Components
         private const float height = 30;
         private const float transition_duration = 100;
 
-        private Container rulesetContainer;
+        private Container drawableRuleset;
 
         public ModeTypeInfo()
         {
@@ -35,7 +35,7 @@ namespace osu.Game.Screens.Multi.Components
                 LayoutDuration = 100,
                 Children = new[]
                 {
-                    rulesetContainer = new Container
+                    drawableRuleset = new Container
                     {
                         AutoSizeAxes = Axes.Both,
                     },
@@ -46,20 +46,20 @@ namespace osu.Game.Screens.Multi.Components
                 },
             };
 
-            CurrentItem.BindValueChanged(updateBeatmap, true);
+            CurrentItem.BindValueChanged(item => updateBeatmap(item.NewValue), true);
 
-            Type.BindValueChanged(v => gameTypeContainer.Child = new DrawableGameType(v) { Size = new Vector2(height) }, true);
+            Type.BindValueChanged(type => gameTypeContainer.Child = new DrawableGameType(type.NewValue) { Size = new Vector2(height) }, true);
         }
 
         private void updateBeatmap(PlaylistItem item)
         {
             if (item?.Beatmap != null)
             {
-                rulesetContainer.FadeIn(transition_duration);
-                rulesetContainer.Child = new DifficultyIcon(item.Beatmap, item.Ruleset) { Size = new Vector2(height) };
+                drawableRuleset.FadeIn(transition_duration);
+                drawableRuleset.Child = new DifficultyIcon(item.Beatmap, item.Ruleset) { Size = new Vector2(height) };
             }
             else
-                rulesetContainer.FadeOut(transition_duration);
+                drawableRuleset.FadeOut(transition_duration);
         }
     }
 }

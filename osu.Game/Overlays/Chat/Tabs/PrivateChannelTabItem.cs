@@ -7,26 +7,25 @@ using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Sprites;
 using osu.Game.Graphics;
-using osu.Game.Graphics.Sprites;
 using osu.Game.Online.Chat;
-using osu.Game.Users;
+using osu.Game.Users.Drawables;
 using osuTK;
 
 namespace osu.Game.Overlays.Chat.Tabs
 {
     public class PrivateChannelTabItem : ChannelTabItem
     {
-        private readonly OsuSpriteText username;
-        private readonly Avatar avatarContainer;
-
-        protected override FontAwesome DisplayIcon => FontAwesome.fa_at;
+        protected override IconUsage DisplayIcon => FontAwesome.Solid.At;
 
         public PrivateChannelTabItem(Channel value)
             : base(value)
         {
             if (value.Type != ChannelType.PM)
                 throw new ArgumentException("Argument value needs to have the targettype user!");
+
+            DrawableAvatar avatar;
 
             AddRange(new Drawable[]
             {
@@ -49,11 +48,10 @@ namespace osu.Game.Overlays.Chat.Tabs
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
                             Masking = true,
-                            Child = new DelayedLoadWrapper(new Avatar(value.Users.First())
+                            Child = new DelayedLoadWrapper(avatar = new DrawableAvatar(value.Users.First())
                             {
                                 RelativeSizeAxes = Axes.Both,
                                 OpenOnClick = { Value = false },
-                                OnLoadComplete = d => d.FadeInFromZero(300, Easing.OutQuint),
                             })
                             {
                                 RelativeSizeAxes = Axes.Both,
@@ -63,9 +61,10 @@ namespace osu.Game.Overlays.Chat.Tabs
                 },
             });
 
-            Text.X = ChatOverlay.TAB_AREA_HEIGHT;
-            TextBold.X = ChatOverlay.TAB_AREA_HEIGHT;
+            avatar.OnLoadComplete += d => d.FadeInFromZero(300, Easing.OutQuint);
         }
+
+        protected override float LeftTextPadding => base.LeftTextPadding + ChatOverlay.TAB_AREA_HEIGHT;
 
         protected override bool ShowCloseOnHover => false;
 

@@ -28,7 +28,7 @@ namespace osu.Game.Graphics.UserInterface
         /// <param name="leading">How many leading zeroes the counter will have.</param>
         public ScoreCounter(uint leading = 0)
         {
-            DisplayedCountSpriteText.FixedWidth = true;
+            DisplayedCountSpriteText.Font = DisplayedCountSpriteText.Font.With(fixedWidth: true);
             LeadingZeroes = leading;
         }
 
@@ -52,7 +52,7 @@ namespace osu.Game.Graphics.UserInterface
 
         public override void Increment(double amount)
         {
-            Current.Value = Current + amount;
+            Current.Value = Current.Value + amount;
         }
     }
 }

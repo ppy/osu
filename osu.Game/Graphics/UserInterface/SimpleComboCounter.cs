@@ -33,7 +33,7 @@ namespace osu.Game.Graphics.UserInterface
 
         public override void Increment(int amount)
         {
-            Current.Value = Current + amount;
+            Current.Value = Current.Value + amount;
         }
     }
 }

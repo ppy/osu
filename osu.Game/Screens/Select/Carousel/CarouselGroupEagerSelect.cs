@@ -13,9 +13,9 @@ namespace osu.Game.Screens.Select.Carousel
     {
         public CarouselGroupEagerSelect()
         {
-            State.ValueChanged += v =>
+            State.ValueChanged += state =>
             {
-                if (v == CarouselItemState.Selected)
+                if (state.NewValue == CarouselItemState.Selected)
                     attemptSelection();
             };
         }
@@ -69,6 +69,7 @@ namespace osu.Game.Screens.Select.Carousel
                 case CarouselItemState.Selected:
                     updateSelected(item);
                     break;
+
                 case CarouselItemState.NotSelected:
                 case CarouselItemState.Collapsed:
                     attemptSelection();
@@ -81,10 +82,10 @@ namespace osu.Game.Screens.Select.Carousel
             if (filteringChildren) return;
 
             // we only perform eager selection if we are a currently selected group.
-            if (State != CarouselItemState.Selected) return;
+            if (State.Value != CarouselItemState.Selected) return;
 
             // we only perform eager selection if none of our children are in a selected state already.
-            if (Children.Any(i => i.State == CarouselItemState.Selected)) return;
+            if (Children.Any(i => i.State.Value == CarouselItemState.Selected)) return;
 
             PerformSelection();
         }
@@ -92,8 +93,8 @@ namespace osu.Game.Screens.Select.Carousel
         protected virtual void PerformSelection()
         {
             CarouselItem nextToSelect =
-                Children.Skip(lastSelectedIndex).FirstOrDefault(i => !i.Filtered) ??
-                Children.Reverse().Skip(InternalChildren.Count - lastSelectedIndex).FirstOrDefault(i => !i.Filtered);
+                Children.Skip(lastSelectedIndex).FirstOrDefault(i => !i.Filtered.Value) ??
+                Children.Reverse().Skip(InternalChildren.Count - lastSelectedIndex).FirstOrDefault(i => !i.Filtered.Value);
 
             if (nextToSelect != null)
                 nextToSelect.State.Value = CarouselItemState.Selected;

@@ -28,8 +28,7 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
                 Text = $"{pp:0}pp",
                 Anchor = Anchor.TopRight,
                 Origin = Anchor.TopRight,
-                TextSize = 18,
-                Font = "Exo2.0-BoldItalic",
+                Font = OsuFont.GetFont(size: 18, weight: FontWeight.Bold, italics: true)
             });
 
             if (weight.HasValue)
@@ -40,8 +39,7 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
                     Anchor = Anchor.TopRight,
                     Origin = Anchor.TopRight,
                     Colour = colour.GrayA,
-                    TextSize = 11,
-                    Font = "Exo2.0-RegularItalic",
+                    Font = OsuFont.GetFont(size: 11, weight: FontWeight.Regular, italics: true)
                 });
             }
         }

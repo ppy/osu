@@ -3,9 +3,13 @@
 
 using System;
 using Humanizer;
+using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Screens;
+using osu.Game.Beatmaps;
 using osu.Game.Online.Multiplayer;
+using osu.Game.Rulesets.Mods;
 using osu.Game.Screens.Multi;
 
 namespace osu.Game.Screens.Select
@@ -16,6 +20,12 @@ namespace osu.Game.Screens.Select
 
         public string ShortTitle => "song selection";
         public override string Title => ShortTitle.Humanize();
+
+        [Resolved(typeof(Room))]
+        protected Bindable<PlaylistItem> CurrentItem { get; private set; }
+
+        [Resolved]
+        private BeatmapManager beatmaps { get; set; }
 
         public MatchSongSelect()
         {
@@ -31,7 +41,7 @@ namespace osu.Game.Screens.Select
                 RulesetID = Ruleset.Value.ID ?? 0
             };
 
-            item.RequiredMods.AddRange(SelectedMods.Value);
+            item.RequiredMods.AddRange(Mods.Value);
 
             Selected?.Invoke(item);
 
@@ -43,10 +53,21 @@ namespace osu.Game.Screens.Select
 
         public override bool OnExiting(IScreen next)
         {
+            if (base.OnExiting(next))
+                return true;
+
+            if (CurrentItem.Value != null)
+            {
+                Ruleset.Value = CurrentItem.Value.Ruleset;
+                Beatmap.Value = beatmaps.GetWorkingBeatmap(CurrentItem.Value.Beatmap);
+                Mods.Value = CurrentItem.Value.RequiredMods?.ToArray() ?? Array.Empty<Mod>();
+            }
+
             Beatmap.Disabled = true;
             Ruleset.Disabled = true;
+            Mods.Disabled = true;
 
-            return base.OnExiting(next);
+            return false;
         }
 
         public override void OnEntering(IScreen last)
@@ -55,6 +76,7 @@ namespace osu.Game.Screens.Select
 
             Beatmap.Disabled = false;
             Ruleset.Disabled = false;
+            Mods.Disabled = false;
         }
     }
 }

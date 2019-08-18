@@ -1,6 +1,6 @@
 clone_depth: 1
 version: '{branch}-{build}'
-image: Visual Studio 2017
+image: Previous Visual Studio 2017
 test: off
 install:
   - cmd: git submodule update --init --recursive --depth=5

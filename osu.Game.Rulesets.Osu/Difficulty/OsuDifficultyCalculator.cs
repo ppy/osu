@@ -35,10 +35,12 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         {
         }
 
-        protected override DifficultyAttributes Calculate(IBeatmap beatmap, Mod[] mods, double clockRate)
+        protected DifficultyAttributes Calculate(IBeatmap beatmap, Mod[] mods, double clockRate)
         {
             var hitObjectsNoSpinner = beatmap.HitObjects.Where(obj => !(obj is Spinner))
                                                         .Select(obj => (OsuHitObject)obj).ToList();
+            if (beatmap.HitObjects.Count == 0)
+                return new OsuDifficultyAttributes { Mods = mods};
 
             (var strainHistory, var maxTapStrain) = calculateTapStrain(hitObjectsNoSpinner, clockRate);
             double tapDiff = maxTapStrain.Average();

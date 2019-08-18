@@ -8,6 +8,7 @@ using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Screens;
 using osu.Game.Graphics.Containers;
@@ -15,7 +16,6 @@ using osu.Game.Screens.Backgrounds;
 using osuTK;
 using osuTK.Graphics;
 using osu.Game.Graphics;
-using osu.Game.Graphics.UserInterface;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Scoring;
@@ -24,6 +24,8 @@ namespace osu.Game.Screens.Ranking
 {
     public abstract class Results : OsuScreen
     {
+        protected const float BACKGROUND_BLUR = 20;
+
         private Container circleOuterBackground;
         private Container circleOuter;
         private Container circleInner;
@@ -37,8 +39,6 @@ namespace osu.Game.Screens.Ranking
         protected readonly ScoreInfo Score;
 
         private Container currentPage;
-
-        private static readonly Vector2 background_blur = new Vector2(20);
 
         protected override BackgroundScreen CreateBackground() => new BackgroundScreenBeatmap(Beatmap.Value);
 
@@ -58,7 +58,7 @@ namespace osu.Game.Screens.Ranking
         public override void OnEntering(IScreen last)
         {
             base.OnEntering(last);
-            (Background as BackgroundScreenBeatmap)?.BlurTo(background_blur, 2500, Easing.OutQuint);
+            ((BackgroundScreenBeatmap)Background).BlurAmount.Value = BACKGROUND_BLUR;
             Background.ScaleTo(1.1f, transition_time, Easing.OutQuint);
 
             allCircles.ForEach(c =>
@@ -190,45 +190,43 @@ namespace osu.Game.Screens.Ranking
                                 },
                                 new OsuSpriteText
                                 {
+                                    Anchor = Anchor.CentreLeft,
+                                    Origin = Anchor.BottomCentre,
                                     Text = $"{Score.MaxCombo}x",
-                                    TextSize = 40,
                                     RelativePositionAxes = Axes.X,
-                                    Font = @"Exo2.0-Bold",
+                                    Font = OsuFont.GetFont(weight: FontWeight.Bold, size: 40),
                                     X = 0.1f,
                                     Colour = colours.BlueDarker,
-                                    Anchor = Anchor.CentreLeft,
-                                    Origin = Anchor.BottomCentre,
                                 },
                                 new OsuSpriteText
                                 {
+                                    Anchor = Anchor.CentreLeft,
+                                    Origin = Anchor.TopCentre,
                                     Text = "max combo",
-                                    TextSize = 20,
+                                    Font = OsuFont.GetFont(size: 20),
                                     RelativePositionAxes = Axes.X,
                                     X = 0.1f,
                                     Colour = colours.Gray6,
-                                    Anchor = Anchor.CentreLeft,
-                                    Origin = Anchor.TopCentre,
                                 },
                                 new OsuSpriteText
                                 {
-                                    Text = $"{Score.Accuracy:P2}",
-                                    TextSize = 40,
-                                    RelativePositionAxes = Axes.X,
-                                    Font = @"Exo2.0-Bold",
-                                    X = 0.9f,
-                                    Colour = colours.BlueDarker,
                                     Anchor = Anchor.CentreLeft,
                                     Origin = Anchor.BottomCentre,
+                                    Text = $"{Score.Accuracy:P2}",
+                                    Font = OsuFont.GetFont(weight: FontWeight.Bold, size: 40),
+                                    RelativePositionAxes = Axes.X,
+                                    X = 0.9f,
+                                    Colour = colours.BlueDarker,
                                 },
                                 new OsuSpriteText
                                 {
+                                    Anchor = Anchor.CentreLeft,
+                                    Origin = Anchor.TopCentre,
                                     Text = "accuracy",
-                                    TextSize = 20,
+                                    Font = OsuFont.GetFont(size: 20),
                                     RelativePositionAxes = Axes.X,
                                     X = 0.9f,
                                     Colour = colours.Gray6,
-                                    Anchor = Anchor.CentreLeft,
-                                    Origin = Anchor.TopCentre,
                                 },
                             }
                         },
@@ -255,28 +253,25 @@ namespace osu.Game.Screens.Ranking
                             }
                         }
                     }
-                },
-                new BackButton
-                {
-                    Anchor = Anchor.BottomLeft,
-                    Origin = Anchor.BottomLeft,
-                    Action = this.Exit
-                },
+                }
             };
 
-            foreach (var t in CreateResultPages())
-                modeChangeButtons.AddItem(t);
-            modeChangeButtons.Current.Value = modeChangeButtons.Items.FirstOrDefault();
+            var pages = CreateResultPages();
 
-            modeChangeButtons.Current.BindValueChanged(m =>
+            foreach (var p in pages)
+                modeChangeButtons.AddItem(p);
+
+            modeChangeButtons.Current.Value = pages.FirstOrDefault();
+
+            modeChangeButtons.Current.BindValueChanged(page =>
             {
                 currentPage?.FadeOut();
                 currentPage?.Expire();
 
-                currentPage = m?.CreatePage();
+                currentPage = page.NewValue?.CreatePage();
 
                 if (currentPage != null)
-                    circleInner.Add(currentPage);
+                    LoadComponentAsync(currentPage, circleInner.Add);
             }, true);
         }
 

@@ -32,6 +32,11 @@ namespace osu.Game.Rulesets.Judgements
         public int MaxNumericResult => NumericResultFor(MaxResult);
 
         /// <summary>
+        /// The health increase for the maximum achievable result.
+        /// </summary>
+        public double MaxHealthIncrease => HealthIncreaseFor(MaxResult);
+
+        /// <summary>
         /// Retrieves the numeric score representation of a <see cref="HitResult"/>.
         /// </summary>
         /// <param name="result">The <see cref="HitResult"/> to find the numeric score representation for.</param>
@@ -58,5 +63,7 @@ namespace osu.Game.Rulesets.Judgements
         /// <param name="result">The <see cref="JudgementResult"/> to find the numeric health increase for.</param>
         /// <returns>The numeric health increase of <paramref name="result"/>.</returns>
         public double HealthIncreaseFor(JudgementResult result) => HealthIncreaseFor(result.Type);
+
+        public override string ToString() => $"AffectsCombo:{AffectsCombo} MaxResult:{MaxResult} MaxScore:{MaxNumericResult}";
     }
 }

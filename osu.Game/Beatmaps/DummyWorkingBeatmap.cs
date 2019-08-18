@@ -3,7 +3,9 @@
 
 using System;
 using System.Collections.Generic;
+using osu.Framework.Audio;
 using osu.Framework.Audio.Track;
+using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics.Textures;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Difficulty;
@@ -15,9 +17,9 @@ namespace osu.Game.Beatmaps
 {
     public class DummyWorkingBeatmap : WorkingBeatmap
     {
-        private readonly OsuGameBase game;
+        private readonly TextureStore textures;
 
-        public DummyWorkingBeatmap(OsuGameBase game = null)
+        public DummyWorkingBeatmap(AudioManager audio, TextureStore textures)
             : base(new BeatmapInfo
             {
                 Metadata = new BeatmapMetadata
@@ -26,18 +28,23 @@ namespace osu.Game.Beatmaps
                     Title = "no beatmaps available!"
                 },
                 BeatmapSet = new BeatmapSetInfo(),
-                BaseDifficulty = new BeatmapDifficulty(),
+                BaseDifficulty = new BeatmapDifficulty
+                {
+                    DrainRate = 0,
+                    CircleSize = 0,
+                    OverallDifficulty = 0,
+                },
                 Ruleset = new DummyRulesetInfo()
-            })
+            }, audio)
         {
-            this.game = game;
+            this.textures = textures;
         }
 
         protected override IBeatmap GetBeatmap() => new Beatmap();
 
-        protected override Texture GetBackground() => game?.Textures.Get(@"Backgrounds/bg4");
+        protected override Texture GetBackground() => textures?.Get(@"Backgrounds/bg4");
 
-        protected override Track GetTrack() => new TrackVirtual { Length = 1000 };
+        protected override Track GetTrack() => GetVirtualTrack();
 
         private class DummyRulesetInfo : RulesetInfo
         {
@@ -47,14 +54,14 @@ namespace osu.Game.Beatmaps
             {
                 public override IEnumerable<Mod> GetModsFor(ModType type) => new Mod[] { };
 
-                public override RulesetContainer CreateRulesetContainerWith(WorkingBeatmap beatmap)
+                public override DrawableRuleset CreateDrawableRulesetWith(WorkingBeatmap beatmap, IReadOnlyList<Mod> mods)
                 {
                     throw new NotImplementedException();
                 }
 
                 public override IBeatmapConverter CreateBeatmapConverter(IBeatmap beatmap) => new DummyBeatmapConverter { Beatmap = beatmap };
 
-                public override LegacyDifficultyCalculator CreateDifficultyCalculator(WorkingBeatmap beatmap) => null;
+                public override DifficultyCalculator CreateDifficultyCalculator(WorkingBeatmap beatmap) => null;
 
                 public override string Description => "dummy";
 
@@ -68,9 +75,18 @@ namespace osu.Game.Beatmaps
                 private class DummyBeatmapConverter : IBeatmapConverter
                 {
                     public event Action<HitObject, IEnumerable<HitObject>> ObjectConverted;
+
                     public IBeatmap Beatmap { get; set; }
+
                     public bool CanConvert => true;
-                    public IBeatmap Convert() => Beatmap;
+
+                    public IBeatmap Convert()
+                    {
+                        foreach (var obj in Beatmap.HitObjects)
+                            ObjectConverted?.Invoke(obj, obj.Yield());
+
+                        return Beatmap;
+                    }
                 }
             }
         }
