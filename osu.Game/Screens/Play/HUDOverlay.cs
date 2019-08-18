@@ -283,8 +283,8 @@ namespace osu.Game.Screens.Play
             {
                 if (drawable is HitErrorDisplay)
                 {
-                    processor.NewJudgement += (drawable as HitErrorDisplay).OnNewJudgement;
-                    (drawable as HitErrorDisplay).HitWindows = hitWindows;
+                    processor.NewJudgement += ((HitErrorDisplay)drawable).OnNewJudgement;
+                    ((HitErrorDisplay)drawable).HitWindows = hitWindows;
                 }
             });
 
