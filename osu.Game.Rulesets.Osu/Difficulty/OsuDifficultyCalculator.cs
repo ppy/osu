@@ -35,7 +35,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         {
         }
 
-        protected DifficultyAttributes Calculate(IBeatmap beatmap, Mod[] mods, double clockRate)
+
+        protected override DifficultyAttributes Calculate(IBeatmap beatmap, Mod[] mods, double clockRate)
         {
             var hitObjectsNoSpinner = beatmap.HitObjects.Where(obj => !(obj is Spinner))
                                                         .Select(obj => (OsuHitObject)obj).ToList();

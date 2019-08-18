@@ -44,7 +44,7 @@ namespace osu.Game.Rulesets.Difficulty
             var clock = new StopwatchClock();
             mods.OfType<IApplicableToClock>().ForEach(m => m.ApplyToClock(clock));
 
-            return calculate(playableBeatmap, mods, clock.Rate);
+            return Calculate(playableBeatmap, mods, clock.Rate);
         }
 
         /// <summary>
@@ -62,7 +62,7 @@ namespace osu.Game.Rulesets.Difficulty
             }
         }
 
-        private DifficultyAttributes calculate(IBeatmap beatmap, Mod[] mods, double clockRate)
+        protected virtual DifficultyAttributes Calculate(IBeatmap beatmap, Mod[] mods, double clockRate)
         {
             var skills = CreateSkills(beatmap);
 
