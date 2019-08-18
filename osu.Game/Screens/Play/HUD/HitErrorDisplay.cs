@@ -145,6 +145,7 @@ namespace osu.Game.Screens.Play.HUD
                 case ScoreMeterType.None:
                     this.FadeOut(200, Easing.OutQuint);
                     break;
+
                 case ScoreMeterType.HitError:
                     this.FadeIn(200, Easing.OutQuint);
                     break;
