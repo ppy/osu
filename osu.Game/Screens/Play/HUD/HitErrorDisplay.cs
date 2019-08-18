@@ -38,7 +38,7 @@ namespace osu.Game.Screens.Play.HUD
         private readonly bool mirrored;
         private readonly SpriteIcon arrow;
         private readonly FillFlowContainer bar;
-        private readonly List<double> judgementOffsets = new List<double>();
+        private readonly Queue<double> judgementOffsets = new Queue<double>();
 
         public HitErrorDisplay(bool mirrored = false)
         {
@@ -117,7 +117,7 @@ namespace osu.Game.Screens.Play.HUD
             judgementLine.FadeOut(10000, Easing.OutQuint);
             judgementLine.Expire();
 
-            arrow.MoveToY(getRelativeJudgementPosition(calculateArrowPosition(newJudgement)), 500, Easing.OutQuint);
+            arrow.MoveToY(calculateArrowPosition(newJudgement), 500, Easing.OutQuint);
         }
 
         protected virtual Container CreateJudgementLine(JudgementResult judgement) => new CircularContainer
@@ -138,14 +138,14 @@ namespace osu.Game.Screens.Play.HUD
 
         private float getRelativeJudgementPosition(double value) => (float)(value / HitWindows.Meh);
 
-        private double calculateArrowPosition(JudgementResult newJudgement)
+        private float calculateArrowPosition(JudgementResult newJudgement)
         {
             if (judgementOffsets.Count > stored_judgements_amount)
-                judgementOffsets.RemoveAt(0);
+                judgementOffsets.Dequeue();
 
-            judgementOffsets.Add(newJudgement.TimeOffset);
+            judgementOffsets.Enqueue(newJudgement.TimeOffset);
 
-            return judgementOffsets.Average();
+            return getRelativeJudgementPosition(judgementOffsets.Average());
         }
     }
 }
