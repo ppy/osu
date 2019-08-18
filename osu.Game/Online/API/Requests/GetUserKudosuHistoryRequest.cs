@@ -18,4 +18,14 @@ namespace osu.Game.Online.API.Requests
 
         protected override string Target => $"users/{userId}/kudosu";
     }
+
+    public enum KudosuAction
+    {
+        Give,
+        VoteGive,
+        Reset,
+        VoteReset,
+        DenyKudosuReset,
+        Revoke,
+    }
 }
