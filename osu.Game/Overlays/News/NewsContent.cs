@@ -13,7 +13,7 @@ namespace osu.Game.Overlays.News
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
             Direction = FillDirection.Vertical;
-            Padding = new MarginPadding { Bottom = 100 };
+            Padding = new MarginPadding { Bottom = 100, Top = 20, Horizontal = 50 };
         }
     }
 }
