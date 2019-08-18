@@ -107,35 +107,44 @@ namespace osu.Game.Screens.Play.HUD
                 {
                     RelativeSizeAxes = Axes.Both,
                     Colour = ColourInfo.GradientVertical(colours.Yellow.Opacity(0), colours.Yellow),
-                    Height = (float)((HitWindows.Meh - HitWindows.Good) / (HitWindows.Meh * 2))
+                    Height = (float)((getMehHitWindows() - HitWindows.Good) / (getMehHitWindows() * 2))
                 },
                 new Box
                 {
                     RelativeSizeAxes = Axes.Both,
                     Colour = colours.Green,
-                    Height = (float)((HitWindows.Good - HitWindows.Great) / (HitWindows.Meh * 2))
+                    Height = (float)((HitWindows.Good - HitWindows.Great) / (getMehHitWindows() * 2))
                 },
                 new Box
                 {
                     RelativeSizeAxes = Axes.Both,
                     Colour = colours.BlueLight,
-                    Height = (float)(HitWindows.Great / HitWindows.Meh)
+                    Height = (float)(HitWindows.Great / getMehHitWindows())
                 },
                 new Box
                 {
                     RelativeSizeAxes = Axes.Both,
                     Colour = colours.Green,
-                    Height = (float)((HitWindows.Good - HitWindows.Great) / (HitWindows.Meh * 2))
+                    Height = (float)((HitWindows.Good - HitWindows.Great) / (getMehHitWindows() * 2))
                 },
                 new Box
                 {
                     RelativeSizeAxes = Axes.Both,
                     Colour = ColourInfo.GradientVertical(colours.Yellow, colours.Yellow.Opacity(0)),
-                    Height = (float)((HitWindows.Meh - HitWindows.Good) / (HitWindows.Meh * 2))
+                    Height = (float)((getMehHitWindows() - HitWindows.Good) / (getMehHitWindows() * 2))
                 }
             });
 
             type.BindValueChanged(onTypeChanged, true);
+        }
+
+        private double getMehHitWindows()
+        {
+            // In case if ruleset has no Meh hit windows (like Taiko)
+            if (HitWindows.Meh == 0)
+                return HitWindows.Good + 40;
+
+            return HitWindows.Meh;
         }
 
         private void onTypeChanged(ValueChangedEvent<ScoreMeterType> type)
@@ -183,7 +192,7 @@ namespace osu.Game.Screens.Play.HUD
             }
         };
 
-        private float getRelativeJudgementPosition(double value) => (float)(value / HitWindows.Meh);
+        private float getRelativeJudgementPosition(double value) => (float)(value / getMehHitWindows());
 
         private float calculateArrowPosition(JudgementResult newJudgement)
         {
