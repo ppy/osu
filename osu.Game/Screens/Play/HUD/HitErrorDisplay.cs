@@ -17,6 +17,7 @@ using osu.Framework.Graphics.Colour;
 using osu.Game.Graphics;
 using osu.Framework.Extensions.Color4Extensions;
 using System.Linq;
+using osu.Game.Configuration;
 
 namespace osu.Game.Screens.Play.HUD
 {
@@ -39,6 +40,8 @@ namespace osu.Game.Screens.Play.HUD
         private readonly SpriteIcon arrow;
         private readonly FillFlowContainer bar;
         private readonly Queue<double> judgementOffsets = new Queue<double>();
+
+        private readonly Bindable<ScoreMeterType> type = new Bindable<ScoreMeterType>();
 
         public HitErrorDisplay(bool mirrored = false)
         {
@@ -63,6 +66,12 @@ namespace osu.Game.Screens.Play.HUD
                     Size = new Vector2(8),
                 }
             };
+        }
+
+        [BackgroundDependencyLoader]
+        private void load(OsuConfigManager config)
+        {
+            config.BindWith(OsuSetting.ScoreMeter, type);
         }
 
         protected override void LoadComplete()
@@ -103,6 +112,21 @@ namespace osu.Game.Screens.Play.HUD
                     Height = (float)((HitWindows.Meh - HitWindows.Good) / (HitWindows.Meh * 2))
                 }
             });
+
+            type.BindValueChanged(onTypeChanged, true);
+        }
+
+        private void onTypeChanged(ValueChangedEvent<ScoreMeterType> type)
+        {
+            switch (type.NewValue)
+            {
+                case ScoreMeterType.None:
+                    this.FadeOut(200, Easing.OutQuint);
+                    break;
+                case ScoreMeterType.HitError:
+                    this.FadeIn(200, Easing.OutQuint);
+                    break;
+            }
         }
 
         public void OnNewJudgement(JudgementResult newJudgement)
