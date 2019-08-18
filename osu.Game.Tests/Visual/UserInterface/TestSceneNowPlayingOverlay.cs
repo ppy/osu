@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using NUnit.Framework;
+using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Timing;
 using osu.Game.Overlays;
@@ -9,22 +10,27 @@ using osu.Game.Overlays;
 namespace osu.Game.Tests.Visual.UserInterface
 {
     [TestFixture]
-    public class TestSceneMusicController : OsuTestScene
+    public class TestSceneNowPlayingOverlay : OsuTestScene
     {
-        public TestSceneMusicController()
+        [Cached]
+        private MusicController musicController = new MusicController();
+
+        public TestSceneNowPlayingOverlay()
         {
             Clock = new FramedClock();
 
-            var mc = new MusicController
+            var np = new NowPlayingOverlay
             {
                 Origin = Anchor.Centre,
                 Anchor = Anchor.Centre
             };
-            Add(mc);
 
-            AddStep(@"show", () => mc.Show());
+            Add(musicController);
+            Add(np);
+
+            AddStep(@"show", () => np.Show());
             AddToggleStep(@"toggle beatmap lock", state => Beatmap.Disabled = state);
-            AddStep(@"show", () => mc.Hide());
+            AddStep(@"show", () => np.Hide());
         }
     }
 }
