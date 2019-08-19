@@ -13,6 +13,7 @@ using osu.Game.Rulesets.Osu.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Osu.Difficulty.Skills;
 using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Rulesets.Osu.Objects;
+using osu.Game.Rulesets.Osu.Difficulty.MathUtil;
 using MathNet.Numerics;
 using MathNet.Numerics.LinearAlgebra;
 
@@ -26,7 +27,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         private const double tpPrecision = 1e-8;
 
         private const double aimMultiplier = 0.585;
-        private const double tapMultiplier = 0.768;
+        private const double tapMultiplier = 0.778;
         private const double srExponent = 0.85;
 
 
@@ -51,10 +52,11 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             double tapSR = tapMultiplier * Math.Pow(tapDiff, srExponent);
             double aimSR = aimMultiplier * Math.Pow(aimDiff, srExponent);
+            double sr = Mean.PowerMean(tapSR, aimSR, 7) * 1.069;
 
             return new OsuDifficultyAttributes
             {
-                StarRating = 5,
+                StarRating = sr,
                 Mods = mods,
                 AimStrain = aimSR,
                 SpeedStrain = tapSR,
@@ -100,7 +102,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 var obj3 = i < hitObjects.Count - 1 ? hitObjects[i+1] : null;
                 var tapStrain = strainHistory[i];
 
-                movements.Add(new OsuMovement(obj0, obj1, obj2, obj3, clockRate));
+                movements.Add(new OsuMovement(obj0, obj1, obj2, obj3, tapStrain, clockRate));
             }
 
             return movements;

@@ -8,7 +8,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.MathUtil
     {
         public Mean()
         {
-
         }
 
         public static double PowerMean(double x, double y, double i)
