@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using osu.Game.Replays;
 using osu.Game.Rulesets.Mania.Beatmaps;
-using osu.Game.Rulesets.Mania.Objects;
+using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Replays;
 
@@ -81,7 +81,7 @@ namespace osu.Game.Rulesets.Mania.Replays
             for (int i = 0; i < Beatmap.HitObjects.Count; i++)
             {
                 var currentObject = Beatmap.HitObjects[i];
-                var nextObjectInTheSameColumn = getNextObjectInTheSameColumn(i);
+                var nextObjectInTheSameColumn = GetNextObject(i);
 
                 double endTime = (currentObject as IHasEndTime)?.EndTime ?? currentObject.StartTime;
 
@@ -94,19 +94,19 @@ namespace osu.Game.Rulesets.Mania.Replays
 
                 yield return new ReleasePoint { Time = endTime + calculatedDelay, Column = currentObject.Column };
             }
+        }
 
-            ManiaHitObject getNextObjectInTheSameColumn(int currentIndex)
+        protected override HitObject GetNextObject(int currentIndex)
+        {
+            int desiredColumn = Beatmap.HitObjects[currentIndex++].Column;
+
+            for (; currentIndex < Beatmap.HitObjects.Count; currentIndex++)
             {
-                int desiredColumn = Beatmap.HitObjects[currentIndex++].Column;
-
-                for (; currentIndex < Beatmap.HitObjects.Count; currentIndex++)
-                {
-                    if (Beatmap.HitObjects[currentIndex].Column == desiredColumn)
-                        return Beatmap.HitObjects[currentIndex];
-                }
-
-                return null;
+                if (Beatmap.HitObjects[currentIndex].Column == desiredColumn)
+                    return Beatmap.HitObjects[currentIndex];
             }
+
+            return null;
         }
 
         private interface IActionPoint
