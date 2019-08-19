@@ -10,6 +10,7 @@ using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Taiko.Objects;
 using osu.Game.Rulesets.Replays;
 using osu.Game.Rulesets.Taiko.Beatmaps;
+using osu.Game.Rulesets.Objects;
 
 namespace osu.Game.Rulesets.Taiko.Replays
 {
@@ -113,16 +114,17 @@ namespace osu.Game.Rulesets.Taiko.Replays
                 else
                     throw new InvalidOperationException("Unknown hit object type.");
 
-                TaikoHitObject nextHitObject = i < Beatmap.HitObjects.Count - 1 ? Beatmap.HitObjects[i + 1] : null;
+                var nextHitObject = GetNextObject(i);
 
                 bool canDelayKeyUp = nextHitObject == null || nextHitObject.StartTime > endTime + KEY_UP_DELAY;
 
-                if (canDelayKeyUp)
-                    Frames.Add(new TaikoReplayFrame(endTime + KEY_UP_DELAY));
+                double calculatedDelay = canDelayKeyUp ? KEY_UP_DELAY : nextHitObject.StartTime - endTime;
 
-                if (nextHitObject != null)
+                Frames.Add(new TaikoReplayFrame(endTime + calculatedDelay));
+
+                if (i < Beatmap.HitObjects.Count - 1)
                 {
-                    double waitTime = nextHitObject.StartTime - 1000;
+                    double waitTime = Beatmap.HitObjects[i + 1].StartTime - 1000;
                     if (waitTime > endTime)
                         Frames.Add(new TaikoReplayFrame(waitTime));
                 }
@@ -131,6 +133,20 @@ namespace osu.Game.Rulesets.Taiko.Replays
             }
 
             return Replay;
+        }
+
+        protected override HitObject GetNextObject(int currentIndex)
+        {
+            Type desiredType = Beatmap.HitObjects[currentIndex++].GetType();
+
+            for (; currentIndex < Beatmap.HitObjects.Count; currentIndex++)
+            {
+                var currentObj = Beatmap.HitObjects[currentIndex];
+                if (currentObj.GetType().Equals(desiredType) || currentObj is DrumRoll)
+                    return Beatmap.HitObjects[currentIndex];
+            }
+
+            return null;
         }
     }
 }
