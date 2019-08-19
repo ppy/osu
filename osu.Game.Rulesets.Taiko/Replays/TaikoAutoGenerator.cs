@@ -143,7 +143,7 @@ namespace osu.Game.Rulesets.Taiko.Replays
             {
                 var currentObj = Beatmap.HitObjects[currentIndex];
                 if (currentObj.GetType().Equals(desiredType) ||
-                    currentObj is DrumRoll || currentObj is Swell) // It's best to unpress any remaining keys before DrumRoll or Swell
+                    currentObj is DrumRoll || currentObj is Swell) // Unpress all keys before DrumRoll or Swell
                     return Beatmap.HitObjects[currentIndex];
             }
 
