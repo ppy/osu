@@ -1,4 +1,4 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
@@ -92,8 +92,20 @@ namespace osu.Game.Skinning
                     return null;
 
                 case "Play/osu/sliderball":
-                    if (GetTexture("sliderb") != null)
-                        return new LegacySliderBall();
+                    var sliderBallContent = getAnimation("sliderb", true, true, "");
+
+                    if (sliderBallContent != null)
+                    {
+                        var size = sliderBallContent.Size;
+
+                        sliderBallContent.RelativeSizeAxes = Axes.Both;
+                        sliderBallContent.Size = Vector2.One;
+
+                        return new LegacySliderBall(sliderBallContent)
+                        {
+                            Size = size
+                        };
+                    }
 
                     return null;
 
@@ -167,16 +179,6 @@ namespace osu.Game.Skinning
             }
 
             return (texture = GetTexture(componentName)) == null ? null : new Sprite { Texture = texture };
-        }
-
-        public class LegacySliderBall : Sprite
-        {
-            [BackgroundDependencyLoader]
-            private void load(ISkinSource skin)
-            {
-                Texture = skin.GetTexture("sliderb");
-                Colour = skin.GetValue<SkinConfiguration, Color4?>(s => s.CustomColours.ContainsKey("SliderBall") ? s.CustomColours["SliderBall"] : (Color4?)null) ?? Color4.White;
-            }
         }
 
         public override Texture GetTexture(string componentName)
@@ -330,6 +332,20 @@ namespace osu.Game.Skinning
                         Origin = Anchor.Centre,
                     }
                 };
+            }
+        }
+
+        public class LegacySliderBall : CompositeDrawable
+        {
+            public LegacySliderBall(Drawable content)
+            {
+                InternalChild = content;
+            }
+
+            [BackgroundDependencyLoader]
+            private void load(ISkinSource skin)
+            {
+                Colour = skin.GetValue<SkinConfiguration, Color4?>(s => s.CustomColours.ContainsKey("SliderBall") ? s.CustomColours["SliderBall"] : (Color4?)null) ?? Color4.White;
             }
         }
 
