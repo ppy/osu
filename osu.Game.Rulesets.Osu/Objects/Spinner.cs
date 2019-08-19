@@ -27,7 +27,7 @@ namespace osu.Game.Rulesets.Osu.Objects
             SpinsRequired = (int)(Duration / 1000 * BeatmapDifficulty.DifficultyRange(difficulty.OverallDifficulty, 3, 5, 7.5));
 
             // spinning doesn't match 1:1 with stable, so let's fudge them easier for the time being.
-            SpinsRequired = (int)Math.Max(1, SpinsRequired * 0.6);
+            SpinsRequired = (int)Math.Max(1, SpinsRequired * 0.7925);
         }
 
         public override Judgement CreateJudgement() => new OsuJudgement();
