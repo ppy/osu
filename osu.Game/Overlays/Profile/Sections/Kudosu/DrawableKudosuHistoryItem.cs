@@ -54,7 +54,7 @@ namespace osu.Game.Overlays.Profile.Sections.Kudosu
 
         private MessageFormatter.MessageFormatterResult createMessage()
         {
-            string postLinkTemplate() => $"[{historyItem.Post.Url} {historyItem.Post.Title}]";
+            string postLinkTemplate() => $"({historyItem.Post.Title})[{historyItem.Post.Url}]";
             string userLinkTemplate() => $"[{historyItem.Giver?.Url} {historyItem.Giver?.Username}]";
 
             string message;
