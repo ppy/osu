@@ -153,7 +153,7 @@ namespace osu.Game.Beatmaps.Drawables
             private void load(OsuColour colours)
             {
                 this.colours = colours;
-                background.Colour = colours.GreyCarmineDark;
+                background.Colour = colours.Gray3;
             }
 
             public bool SetContent(object content)
