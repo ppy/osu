@@ -116,7 +116,7 @@ namespace osu.Game.Screens.Play.HitErrorDisplay
                     Colour = colours.Green,
                     Height = (float)((HitWindows.Good - HitWindows.Great) / (maxHitWindows * 2))
                 }
-            });;
+            });
 
             if (HitWindows.Meh != 0)
                 bar.Add(new Box
