@@ -1,4 +1,4 @@
-﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
@@ -102,6 +102,10 @@ namespace osu.Game.Skinning
 
                     return null;
 
+                case "Play/osu/sliderfollowcircle":
+                    animatable = true;
+                    break;
+
                 case "Play/Miss":
                     componentName = "hit0";
                     animatable = true;
@@ -149,8 +153,6 @@ namespace osu.Game.Skinning
                     texture = GetTexture($"{componentName}-{i}");
                 }
 
-                // This comment can be removed once we have components which are looping
-                // ReSharper disable once ConditionIsAlwaysTrueOrFalse
                 animation.Repeat = looping;
 
                 return animation;
