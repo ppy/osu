@@ -363,7 +363,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
                 return false;
 
             foreach (var d in NestedHitObjects)
-                judgementOccurred |= d.UpdateResult(userTriggered);
+                JudgementOccurred |= userTriggered ? d.UpdateResult(true) : d.JudgementOccurred;
 
             if (JudgementOccurred || Judged)
                 return JudgementOccurred;
