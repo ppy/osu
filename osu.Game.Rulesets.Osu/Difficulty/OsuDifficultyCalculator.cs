@@ -25,7 +25,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         private const double tpMax = 100;
         private const double tpPrecision = 1e-8;
 
-        private const double aimMultiplier = 0.618;
+        private const double aimMultiplier = 0.585;
         private const double tapMultiplier = 0.768;
         private const double srExponent = 0.85;
 
@@ -89,6 +89,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
         private List<OsuMovement> createMovements(List<OsuHitObject> hitObjects, double clockRate, List<Vector<double>> strainHistory)
         {
+            OsuMovement.Initialize();
             var movements = new List<OsuMovement>();
 
             for (int i = 1; i < hitObjects.Count; i++)
@@ -96,9 +97,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 var obj0 = i > 1 ? hitObjects[i-2] : null;
                 var obj1 = hitObjects[i-1];
                 var obj2 = hitObjects[i];
+                var obj3 = i < hitObjects.Count - 1 ? hitObjects[i+1] : null;
                 var tapStrain = strainHistory[i];
 
-                movements.Add(new OsuMovement(obj0, obj1, obj2, clockRate));
+                movements.Add(new OsuMovement(obj0, obj1, obj2, obj3, clockRate));
             }
 
             return movements;
