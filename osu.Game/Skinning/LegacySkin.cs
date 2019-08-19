@@ -1,4 +1,4 @@
-﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
@@ -142,28 +142,31 @@ namespace osu.Game.Skinning
                         };
             }
 
+            return getAnimation(componentName, animatable, looping);
+        }
+
+        private Drawable getAnimation(string componentName, bool animatable, bool looping, string animationSeparator = "-")
+        {
             Texture texture;
 
-            if (animatable && (texture = GetTexture($"{componentName}-0")) != null)
+            Texture getFrameTexture(int frame) => GetTexture($"{componentName}{animationSeparator}{frame}");
+
+            if (animatable && (texture = getFrameTexture(0)) != null)
             {
                 var animation = new TextureAnimation { DefaultFrameLength = default_frame_time };
 
                 for (int i = 1; texture != null; i++)
                 {
                     animation.AddFrame(texture);
-                    texture = GetTexture($"{componentName}-{i}");
+                    texture = getFrameTexture(i);
                 }
 
                 animation.Repeat = looping;
 
                 return animation;
             }
-            else
-            {
-                texture = GetTexture(componentName);
 
-                return texture == null ? null : new Sprite { Texture = texture };
-            }
+            return (texture = GetTexture(componentName)) == null ? null : new Sprite { Texture = texture };
         }
 
         public class LegacySliderBall : Sprite
