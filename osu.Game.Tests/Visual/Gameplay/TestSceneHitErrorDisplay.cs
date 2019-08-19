@@ -13,6 +13,7 @@ using System.Collections.Generic;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Scoring;
 using osu.Framework.MathUtils;
+using osu.Framework.Graphics;
 
 namespace osu.Game.Tests.Visual.Gameplay
 {
@@ -95,7 +96,11 @@ namespace osu.Game.Tests.Visual.Gameplay
         private void recreateDisplay(HitWindows hitWindows, float overallDifficulty)
         {
             Clear();
-            Add(display = new DefaultHitErrorDisplay(overallDifficulty, hitWindows));
+            Add(display = new DefaultHitErrorDisplay(overallDifficulty, hitWindows)
+            {
+                Anchor = Anchor.Centre,
+                Origin = Anchor.Centre,
+            });
         }
 
         private void newJudgement(float offset = 0)
