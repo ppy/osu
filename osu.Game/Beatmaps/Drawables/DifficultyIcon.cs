@@ -9,6 +9,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
+using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Rulesets;
 using osuTK;
@@ -16,15 +17,17 @@ using osuTK.Graphics;
 
 namespace osu.Game.Beatmaps.Drawables
 {
-    public class DifficultyIcon : DifficultyColouredContainer
+    public class DifficultyIcon : Container
     {
+        private readonly BeatmapInfo beatmap;
         private readonly RulesetInfo ruleset;
 
         public DifficultyIcon(BeatmapInfo beatmap, RulesetInfo ruleset = null)
-            : base(beatmap)
         {
             if (beatmap == null)
                 throw new ArgumentNullException(nameof(beatmap));
+
+            this.beatmap = beatmap;
 
             this.ruleset = ruleset ?? beatmap.Ruleset;
 
@@ -32,7 +35,7 @@ namespace osu.Game.Beatmaps.Drawables
         }
 
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(OsuColour colours)
         {
             Children = new Drawable[]
             {
@@ -52,7 +55,7 @@ namespace osu.Game.Beatmaps.Drawables
                     Child = new Box
                     {
                         RelativeSizeAxes = Axes.Both,
-                        Colour = AccentColour,
+                        Colour = colours.ForDifficultyRating(beatmap.DifficultyRating),
                     },
                 },
                 new ConstrainedIconContainer
