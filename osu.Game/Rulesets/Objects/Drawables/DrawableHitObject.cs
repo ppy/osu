@@ -74,7 +74,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
         /// </summary>
         public JudgementResult Result { get; private set; }
 
-        private bool judgementOccurred;
+        internal bool JudgementOccurred;
 
         public override bool RemoveWhenNotAlive => false;
         public override bool RemoveCompletedTransforms => false;
@@ -323,7 +323,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
             if (!Result.HasResult)
                 throw new InvalidOperationException($"{GetType().ReadableName()} applied a {nameof(JudgementResult)} but did not update {nameof(JudgementResult.Type)}.");
 
-            judgementOccurred = true;
+            JudgementOccurred = true;
 
             // Ensure that the judgement is given a valid time offset, because this may not get set by the caller
             var endTime = (HitObject as IHasEndTime)?.EndTime ?? HitObject.StartTime;
@@ -357,7 +357,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
             if (Time.Elapsed < 0)
                 return false;
 
-            judgementOccurred = false;
+            JudgementOccurred = false;
 
             if (AllJudged)
                 return false;
@@ -365,13 +365,13 @@ namespace osu.Game.Rulesets.Objects.Drawables
             foreach (var d in NestedHitObjects)
                 judgementOccurred |= d.UpdateResult(userTriggered);
 
-            if (judgementOccurred || Judged)
-                return judgementOccurred;
+            if (JudgementOccurred || Judged)
+                return JudgementOccurred;
 
             var endTime = (HitObject as IHasEndTime)?.EndTime ?? HitObject.StartTime;
             CheckForResult(userTriggered, Time.Current - endTime);
 
-            return judgementOccurred;
+            return JudgementOccurred;
         }
 
         /// <summary>
