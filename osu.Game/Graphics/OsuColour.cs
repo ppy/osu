@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using osu.Game.Beatmaps;
 using osuTK.Graphics;
 
 namespace osu.Game.Graphics
@@ -34,6 +35,31 @@ namespace osu.Game.Graphics
                         Convert.ToByte(hex.Substring(2, 2), 16),
                         Convert.ToByte(hex.Substring(4, 2), 16),
                         255);
+            }
+        }
+
+        public Color4 ForDifficultyRating(DifficultyRating difficulty)
+        {
+            switch (difficulty)
+            {
+                case DifficultyRating.Easy:
+                    return Green;
+
+                default:
+                case DifficultyRating.Normal:
+                    return Blue;
+
+                case DifficultyRating.Hard:
+                    return Yellow;
+
+                case DifficultyRating.Insane:
+                    return Pink;
+
+                case DifficultyRating.Expert:
+                    return Purple;
+
+                case DifficultyRating.ExpertPlus:
+                    return Gray0;
             }
         }
 
