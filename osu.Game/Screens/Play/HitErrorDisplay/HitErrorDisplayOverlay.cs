@@ -9,6 +9,7 @@ using osu.Framework.Bindables;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Framework.Extensions.IEnumerableExtensions;
+using osu.Game.Rulesets.Objects;
 
 namespace osu.Game.Screens.Play.HitErrorDisplay
 {
@@ -18,29 +19,18 @@ namespace osu.Game.Screens.Play.HitErrorDisplay
         private const int margin = 10;
 
         private readonly Bindable<ScoreMeterType> type = new Bindable<ScoreMeterType>();
+        private readonly HitWindows hitWindows;
+        private readonly ScoreProcessor processor;
+        private readonly float overallDifficulty;
 
         public HitErrorDisplayOverlay(ScoreProcessor processor, WorkingBeatmap workingBeatmap)
         {
-            float overallDifficulty = workingBeatmap.BeatmapInfo.BaseDifficulty.OverallDifficulty;
+            this.processor = processor;
+
+            overallDifficulty = workingBeatmap.BeatmapInfo.BaseDifficulty.OverallDifficulty;
+            hitWindows = processor.CreateHitWindows();
 
             RelativeSizeAxes = Axes.Both;
-            Children = new[]
-            {
-                new DefaultHitErrorDisplay(overallDifficulty, processor.CreateHitWindows())
-                {
-                    Margin = new MarginPadding { Left = margin },
-                    Anchor = Anchor.CentreLeft,
-                    Origin = Anchor.CentreLeft,
-                },
-                new DefaultHitErrorDisplay(overallDifficulty, processor.CreateHitWindows(), true)
-                {
-                    Margin = new MarginPadding { Right = margin },
-                    Anchor = Anchor.CentreRight,
-                    Origin = Anchor.CentreRight,
-                },
-            };
-
-            Children.ForEach(t => processor.NewJudgement += t.OnNewJudgement);
         }
 
         [BackgroundDependencyLoader]
@@ -57,16 +47,50 @@ namespace osu.Game.Screens.Play.HitErrorDisplay
 
         private void onTypeChanged(ValueChangedEvent<ScoreMeterType> type)
         {
+            clear();
+
             switch (type.NewValue)
             {
                 case ScoreMeterType.None:
-                    InternalChildren.ForEach(t => t.FadeOut(fade_duration, Easing.OutQuint));
                     break;
 
-                default:
-                    InternalChildren.ForEach(t => t.FadeIn(fade_duration, Easing.OutQuint));
+                case ScoreMeterType.HitErrorBoth:
+                    createNew();
+                    createNew(true);
+                    break;
+
+                case ScoreMeterType.HitErrorLeft:
+                    createNew();
+                    break;
+
+                case ScoreMeterType.HitErrorRight:
+                    createNew(true);
                     break;
             }
+        }
+
+        private void clear()
+        {
+            Children.ForEach(t =>
+            {
+                processor.NewJudgement -= t.OnNewJudgement;
+                t.FadeOut(fade_duration, Easing.OutQuint).Expire();
+            });
+        }
+
+        private void createNew(bool reversed = false)
+        {
+            var display = new DefaultHitErrorDisplay(overallDifficulty, hitWindows, reversed)
+            {
+                Margin = new MarginPadding(margin),
+                Anchor = reversed ? Anchor.CentreRight : Anchor.CentreLeft,
+                Origin = reversed ? Anchor.CentreRight : Anchor.CentreLeft,
+                Alpha = 0,
+            };
+
+            processor.NewJudgement += display.OnNewJudgement;
+            Add(display);
+            display.FadeInFromZero(fade_duration, Easing.OutQuint);
         }
     }
 }

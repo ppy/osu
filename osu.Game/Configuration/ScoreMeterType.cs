@@ -10,7 +10,13 @@ namespace osu.Game.Configuration
         [Description("None")]
         None,
 
-        [Description("Hit Error")]
-        HitError
+        [Description("Hit Error (left)")]
+        HitErrorLeft,
+
+        [Description("Hit Error (right)")]
+        HitErrorRight,
+
+        [Description("Hit Error (both)")]
+        HitErrorBoth,
     }
 }
