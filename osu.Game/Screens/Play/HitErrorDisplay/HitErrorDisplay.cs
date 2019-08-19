@@ -10,16 +10,13 @@ using osuTK;
 using osu.Framework.Graphics.Sprites;
 using System.Collections.Generic;
 using osu.Game.Rulesets.Objects;
-using osu.Game.Beatmaps;
-using osu.Framework.Bindables;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics.Colour;
 using osu.Game.Graphics;
 using osu.Framework.Extensions.Color4Extensions;
 using System.Linq;
-using osu.Game.Configuration;
 
-namespace osu.Game.Screens.Play.HUD
+namespace osu.Game.Screens.Play.HitErrorDisplay
 {
     public class HitErrorDisplay : CompositeDrawable
     {
@@ -27,29 +24,24 @@ namespace osu.Game.Screens.Play.HUD
         private const int bar_width = 3;
         private const int judgement_line_width = 8;
         private const int bar_height = 200;
-        private const int fade_duration = 200;
         private const int arrow_move_duration = 500;
         private const int judgement_life_time = 10000;
         private const int spacing = 3;
 
-        public HitWindows HitWindows { get; set; }
-
-        [Resolved]
-        private Bindable<WorkingBeatmap> beatmap { get; set; }
-
-        [Resolved]
-        private OsuColour colours { get; set; }
-
+        private readonly HitWindows hitWindows;
         private readonly SpriteIcon arrow;
         private readonly FillFlowContainer bar;
         private readonly Container judgementsContainer;
         private readonly Queue<double> judgementOffsets = new Queue<double>();
 
-        private readonly Bindable<ScoreMeterType> type = new Bindable<ScoreMeterType>();
-
-        public HitErrorDisplay(bool reversed = false)
+        public HitErrorDisplay(float overallDifficulty, HitWindows hitWindows, bool reversed = false)
         {
+            this.hitWindows = hitWindows;
+            hitWindows.SetDifficulty(overallDifficulty);
+
             AutoSizeAxes = Axes.Both;
+            Anchor = reversed ? Anchor.CentreRight : Anchor.CentreLeft;
+            Origin = reversed ? Anchor.CentreRight : Anchor.CentreLeft;
 
             AddInternal(new FillFlowContainer
             {
@@ -94,74 +86,50 @@ namespace osu.Game.Screens.Play.HUD
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuConfigManager config)
+        private void load(OsuColour colours)
         {
-            config.BindWith(OsuSetting.ScoreMeter, type);
-        }
-
-        protected override void LoadComplete()
-        {
-            base.LoadComplete();
-            HitWindows.SetDifficulty(beatmap.Value.BeatmapInfo.BaseDifficulty.OverallDifficulty);
-
             bar.AddRange(new Drawable[]
             {
                 new Box
                 {
                     RelativeSizeAxes = Axes.Both,
                     Colour = ColourInfo.GradientVertical(colours.Yellow.Opacity(0), colours.Yellow),
-                    Height = (float)((getMehHitWindows() - HitWindows.Good) / (getMehHitWindows() * 2))
+                    Height = (float)((getMehHitWindows() - hitWindows.Good) / (getMehHitWindows() * 2))
                 },
                 new Box
                 {
                     RelativeSizeAxes = Axes.Both,
                     Colour = colours.Green,
-                    Height = (float)((HitWindows.Good - HitWindows.Great) / (getMehHitWindows() * 2))
+                    Height = (float)((hitWindows.Good - hitWindows.Great) / (getMehHitWindows() * 2))
                 },
                 new Box
                 {
                     RelativeSizeAxes = Axes.Both,
                     Colour = colours.BlueLight,
-                    Height = (float)(HitWindows.Great / getMehHitWindows())
+                    Height = (float)(hitWindows.Great / getMehHitWindows())
                 },
                 new Box
                 {
                     RelativeSizeAxes = Axes.Both,
                     Colour = colours.Green,
-                    Height = (float)((HitWindows.Good - HitWindows.Great) / (getMehHitWindows() * 2))
+                    Height = (float)((hitWindows.Good - hitWindows.Great) / (getMehHitWindows() * 2))
                 },
                 new Box
                 {
                     RelativeSizeAxes = Axes.Both,
                     Colour = ColourInfo.GradientVertical(colours.Yellow, colours.Yellow.Opacity(0)),
-                    Height = (float)((getMehHitWindows() - HitWindows.Good) / (getMehHitWindows() * 2))
+                    Height = (float)((getMehHitWindows() - hitWindows.Good) / (getMehHitWindows() * 2))
                 }
             });
-
-            type.BindValueChanged(onTypeChanged, true);
         }
 
         private double getMehHitWindows()
         {
             // In case if ruleset has no Meh hit windows (like Taiko)
-            if (HitWindows.Meh == 0)
-                return HitWindows.Good + 40;
+            if (hitWindows.Meh == 0)
+                return hitWindows.Good + 40;
 
-            return HitWindows.Meh;
-        }
-
-        private void onTypeChanged(ValueChangedEvent<ScoreMeterType> type)
-        {
-            switch (type.NewValue)
-            {
-                case ScoreMeterType.None:
-                    this.FadeOut(fade_duration, Easing.OutQuint);
-                    break;
-
-                case ScoreMeterType.HitError:
-                    this.FadeIn(fade_duration, Easing.OutQuint);
-                    break;
-            }
+            return hitWindows.Meh;
         }
 
         public void OnNewJudgement(JudgementResult newJudgement)

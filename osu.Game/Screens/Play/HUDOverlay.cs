@@ -36,8 +36,6 @@ namespace osu.Game.Screens.Play
         public readonly ModDisplay ModDisplay;
         public readonly HoldForMenuButton HoldToQuit;
         public readonly PlayerSettingsOverlay PlayerSettingsOverlay;
-        public readonly HitErrorDisplay LeftHitErrorDisplay;
-        public readonly HitErrorDisplay RightHitErrorDisplay;
 
         public Bindable<bool> ShowHealthbar = new Bindable<bool>(true);
 
@@ -87,8 +85,6 @@ namespace osu.Game.Screens.Play
                         HealthDisplay = CreateHealthDisplay(),
                         Progress = CreateProgress(),
                         ModDisplay = CreateModsContainer(),
-                        LeftHitErrorDisplay = CreateHitErrorDisplay(false),
-                        RightHitErrorDisplay = CreateHitErrorDisplay(),
                     }
                 },
                 PlayerSettingsOverlay = CreatePlayerSettingsOverlay(),
@@ -261,13 +257,6 @@ namespace osu.Game.Screens.Play
             Margin = new MarginPadding { Top = 20, Right = 10 },
         };
 
-        protected virtual HitErrorDisplay CreateHitErrorDisplay(bool reversed = true) => new HitErrorDisplay(reversed)
-        {
-            Anchor = reversed ? Anchor.CentreRight : Anchor.CentreLeft,
-            Origin = reversed ? Anchor.CentreRight : Anchor.CentreLeft,
-            Margin = new MarginPadding { Horizontal = 20 }
-        };
-
         protected virtual PlayerSettingsOverlay CreatePlayerSettingsOverlay() => new PlayerSettingsOverlay();
 
         protected virtual void BindProcessor(ScoreProcessor processor)
@@ -276,17 +265,6 @@ namespace osu.Game.Screens.Play
             AccuracyCounter?.Current.BindTo(processor.Accuracy);
             ComboCounter?.Current.BindTo(processor.Combo);
             HealthDisplay?.Current.BindTo(processor.Health);
-
-            var hitWindows = processor.CreateHitWindows();
-
-            visibilityContainer.ForEach(drawable =>
-            {
-                if (drawable is HitErrorDisplay)
-                {
-                    processor.NewJudgement += ((HitErrorDisplay)drawable).OnNewJudgement;
-                    ((HitErrorDisplay)drawable).HitWindows = hitWindows;
-                }
-            });
 
             if (HealthDisplay is StandardHealthDisplay shd)
                 processor.NewJudgement += shd.Flash;
