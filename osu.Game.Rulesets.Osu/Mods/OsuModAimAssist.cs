@@ -23,8 +23,8 @@ namespace osu.Game.Rulesets.Osu.Mods
         public override double ScoreMultiplier => 1;
         public override Type[] IncompatibleMods => new[] { typeof(OsuModAutopilot), typeof(OsuModAutoplay), typeof(OsuModWiggle), typeof(OsuModTransform) };
 
-        private HashSet<DrawableOsuHitObject> movingObjects = new HashSet<DrawableOsuHitObject>();
-        private int updateCounter = 0;
+        private readonly HashSet<DrawableOsuHitObject> movingObjects = new HashSet<DrawableOsuHitObject>();
+        private int updateCounter;
 
         public void Update(Playfield playfield)
         {
@@ -36,7 +36,9 @@ namespace osu.Game.Rulesets.Osu.Mods
             {
                 // ... every 500th cursor update iteration
                 // (lower -> potential lags ; higher -> easier to miss if cursor too fast)
-                if (updateCounter++ < 500) return;
+                if (updateCounter++ < 500)
+                    return;
+
                 updateCounter = 0;
 
                 // First move objects to new destination, then remove them from movingObjects set if they're too old
@@ -45,11 +47,13 @@ namespace osu.Game.Rulesets.Osu.Mods
                     var currentTime = playfield.Clock.CurrentTime;
                     var h = d.HitObject;
                     d.ClearTransforms();
+
                     switch (d)
                     {
                         case DrawableHitCircle circle:
-                            d.MoveTo(drawableCursor.DrawPosition, Math.Max(0, h.StartTime - currentTime));
+                            circle.MoveTo(drawableCursor.DrawPosition, Math.Max(0, h.StartTime - currentTime));
                             return currentTime > h.StartTime;
+
                         case DrawableSlider slider:
 
                             // Move slider to cursor
@@ -59,11 +63,13 @@ namespace osu.Game.Rulesets.Osu.Mods
                             // Move slider so that sliderball stays on the cursor
                             else
                                 d.MoveTo(drawableCursor.DrawPosition - slider.Ball.DrawPosition, Math.Max(0, h.StartTime - currentTime));
-                            return currentTime > (h as IHasEndTime).EndTime - 50;
-                        case DrawableSpinner spinner:
+                            return currentTime > (h as IHasEndTime)?.EndTime - 50;
+
+                        case DrawableSpinner _:
                             // TODO
                             return true;
                     }
+
                     return true; // never happens(?)
                 });
             };
@@ -79,6 +85,7 @@ namespace osu.Game.Rulesets.Osu.Mods
         {
             if (!(drawable is DrawableOsuHitObject d))
                 return;
+
             var h = d.HitObject;
             using (d.BeginAbsoluteSequence(h.StartTime - h.TimePreempt))
                 movingObjects.Add(d);
