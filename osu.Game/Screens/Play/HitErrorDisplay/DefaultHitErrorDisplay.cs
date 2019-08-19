@@ -32,12 +32,14 @@ namespace osu.Game.Screens.Play.HitErrorDisplay
         private readonly FillFlowContainer bar;
         private readonly Container judgementsContainer;
         private readonly Queue<double> judgementOffsets = new Queue<double>();
+        private readonly double maxHitWindows;
 
         public DefaultHitErrorDisplay(float overallDifficulty, HitWindows hitWindows, bool reversed = false)
             : base(overallDifficulty, hitWindows)
         {
-            AutoSizeAxes = Axes.Both;
+            maxHitWindows = HitWindows.Meh == 0 ? HitWindows.Good : HitWindows.Meh;
 
+            AutoSizeAxes = Axes.Both;
             AddInternal(new FillFlowContainer
             {
                 AutoSizeAxes = Axes.X,
@@ -83,48 +85,52 @@ namespace osu.Game.Screens.Play.HitErrorDisplay
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
-            bar.AddRange(new Drawable[]
-            {
-                new Box
+            Box topGreenBox;
+            Box bottomGreenBox;
+
+            if (HitWindows.Meh != 0)
+                bar.Add(new Box
                 {
                     RelativeSizeAxes = Axes.Both,
                     Colour = ColourInfo.GradientVertical(colours.Yellow.Opacity(0), colours.Yellow),
-                    Height = (float)((getMehHitWindows() - HitWindows.Good) / (getMehHitWindows() * 2))
-                },
-                new Box
+                    Height = (float)((maxHitWindows - HitWindows.Good) / (maxHitWindows * 2))
+                });
+
+            bar.AddRange(new Drawable[]
+            {
+                topGreenBox = new Box
                 {
                     RelativeSizeAxes = Axes.Both,
                     Colour = colours.Green,
-                    Height = (float)((HitWindows.Good - HitWindows.Great) / (getMehHitWindows() * 2))
+                    Height = (float)((HitWindows.Good - HitWindows.Great) / (maxHitWindows * 2))
                 },
                 new Box
                 {
                     RelativeSizeAxes = Axes.Both,
                     Colour = colours.BlueLight,
-                    Height = (float)(HitWindows.Great / getMehHitWindows())
+                    Height = (float)(HitWindows.Great / maxHitWindows)
                 },
-                new Box
+                bottomGreenBox = new Box
                 {
                     RelativeSizeAxes = Axes.Both,
                     Colour = colours.Green,
-                    Height = (float)((HitWindows.Good - HitWindows.Great) / (getMehHitWindows() * 2))
-                },
-                new Box
+                    Height = (float)((HitWindows.Good - HitWindows.Great) / (maxHitWindows * 2))
+                }
+            });;
+
+            if (HitWindows.Meh != 0)
+                bar.Add(new Box
                 {
                     RelativeSizeAxes = Axes.Both,
                     Colour = ColourInfo.GradientVertical(colours.Yellow, colours.Yellow.Opacity(0)),
-                    Height = (float)((getMehHitWindows() - HitWindows.Good) / (getMehHitWindows() * 2))
-                }
-            });
-        }
+                    Height = (float)((maxHitWindows - HitWindows.Good) / (maxHitWindows * 2))
+                });
 
-        private double getMehHitWindows()
-        {
-            // In case if ruleset has no Meh hit windows (like Taiko)
             if (HitWindows.Meh == 0)
-                return HitWindows.Good + 40;
-
-            return HitWindows.Meh;
+            {
+                topGreenBox.Colour = ColourInfo.GradientVertical(colours.Green.Opacity(0), colours.Green);
+                bottomGreenBox.Colour = ColourInfo.GradientVertical(colours.Green, colours.Green.Opacity(0));
+            }
         }
 
         public override void OnNewJudgement(JudgementResult newJudgement)
@@ -157,7 +163,7 @@ namespace osu.Game.Screens.Play.HitErrorDisplay
             }
         };
 
-        private float getRelativeJudgementPosition(double value) => (float)(value / getMehHitWindows());
+        private float getRelativeJudgementPosition(double value) => (float)(value / maxHitWindows);
 
         private float calculateArrowPosition(JudgementResult newJudgement)
         {

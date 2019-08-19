@@ -14,6 +14,8 @@ using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Scoring;
 using osu.Framework.MathUtils;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Sprites;
 
 namespace osu.Game.Tests.Visual.Gameplay
 {
@@ -95,7 +97,24 @@ namespace osu.Game.Tests.Visual.Gameplay
 
         private void recreateDisplay(HitWindows hitWindows, float overallDifficulty)
         {
+            hitWindows.SetDifficulty(overallDifficulty);
+
             Clear();
+
+            Add(new FillFlowContainer
+            {
+                Anchor = Anchor.CentreLeft,
+                Origin = Anchor.CentreLeft,
+                Direction = FillDirection.Vertical,
+                AutoSizeAxes = Axes.Both,
+                Children = new[]
+                {
+                    new SpriteText { Text = $@"Great: {hitWindows.Great}" },
+                    new SpriteText { Text = $@"Good: {hitWindows.Good}" },
+                    new SpriteText { Text = $@"Meh: {hitWindows.Meh}" },
+                }
+            });
+
             Add(display = new DefaultHitErrorDisplay(overallDifficulty, hitWindows)
             {
                 Anchor = Anchor.Centre,
