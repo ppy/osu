@@ -1,4 +1,4 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
@@ -76,11 +76,12 @@ namespace osu.Game.Skinning
             Samples?.Dispose();
         }
 
+        private const double default_frame_time = 1000 / 60d;
+
         public override Drawable GetDrawableComponent(string componentName)
         {
             bool animatable = false;
             bool looping = true;
-            const double frametime = 1000 / 60d;
 
             switch (componentName)
             {
@@ -145,7 +146,7 @@ namespace osu.Game.Skinning
 
             if (texture != null && animatable)
             {
-                var animation = new TextureAnimation { DefaultFrameLength = frametime };
+                var animation = new TextureAnimation { DefaultFrameLength = default_frame_time };
 
                 for (int i = 1; texture != null; i++)
                 {
