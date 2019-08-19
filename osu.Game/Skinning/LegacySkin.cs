@@ -142,9 +142,9 @@ namespace osu.Game.Skinning
                         };
             }
 
-            var texture = GetTexture($"{componentName}-0");
+            Texture texture;
 
-            if (texture != null && animatable)
+            if (animatable && (texture = GetTexture($"{componentName}-0")) != null)
             {
                 var animation = new TextureAnimation { DefaultFrameLength = default_frame_time };
 
