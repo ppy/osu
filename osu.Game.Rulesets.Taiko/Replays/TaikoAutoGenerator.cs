@@ -114,7 +114,7 @@ namespace osu.Game.Rulesets.Taiko.Replays
                 else
                     throw new InvalidOperationException("Unknown hit object type.");
 
-                var nextHitObject = GetNextObject(i);
+                var nextHitObject = GetNextObject(i); // Get the next object that requires pressing the same button
 
                 bool canDelayKeyUp = nextHitObject == null || nextHitObject.StartTime > endTime + KEY_UP_DELAY;
 
@@ -142,7 +142,7 @@ namespace osu.Game.Rulesets.Taiko.Replays
             for (; currentIndex < Beatmap.HitObjects.Count; currentIndex++)
             {
                 var currentObj = Beatmap.HitObjects[currentIndex];
-                if (currentObj.GetType().Equals(desiredType) ||
+                if (currentObj.GetType() == desiredType ||
                     currentObj is DrumRoll || currentObj is Swell) // Unpress all keys before DrumRoll or Swell
                     return Beatmap.HitObjects[currentIndex];
             }
