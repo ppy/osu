@@ -37,8 +37,6 @@ namespace osu.Game.Screens.Play.HitErrorDisplay
             : base(overallDifficulty, hitWindows)
         {
             AutoSizeAxes = Axes.Both;
-            Anchor = reversed ? Anchor.CentreRight : Anchor.CentreLeft;
-            Origin = reversed ? Anchor.CentreRight : Anchor.CentreLeft;
 
             AddInternal(new FillFlowContainer
             {

@@ -9,7 +9,6 @@ using osu.Framework.Bindables;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Framework.Extensions.IEnumerableExtensions;
-using System.Linq;
 
 namespace osu.Game.Screens.Play.HitErrorDisplay
 {
@@ -29,11 +28,15 @@ namespace osu.Game.Screens.Play.HitErrorDisplay
             {
                 new DefaultHitErrorDisplay(overallDifficulty, processor.CreateHitWindows())
                 {
-                    Margin = new MarginPadding { Left = margin }
+                    Margin = new MarginPadding { Left = margin },
+                    Anchor = Anchor.CentreLeft,
+                    Origin = Anchor.CentreLeft,
                 },
                 new DefaultHitErrorDisplay(overallDifficulty, processor.CreateHitWindows(), true)
                 {
-                    Margin = new MarginPadding { Right = margin }
+                    Margin = new MarginPadding { Right = margin },
+                    Anchor = Anchor.CentreRight,
+                    Origin = Anchor.CentreRight,
                 },
             };
 
