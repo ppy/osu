@@ -27,11 +27,11 @@ namespace osu.Game.Screens.Play.HitErrorDisplay
             RelativeSizeAxes = Axes.Both;
             Children = new[]
             {
-                new HitErrorDisplay(overallDifficulty, processor.CreateHitWindows())
+                new DefaultHitErrorDisplay(overallDifficulty, processor.CreateHitWindows())
                 {
                     Margin = new MarginPadding { Left = margin }
                 },
-                new HitErrorDisplay(overallDifficulty, processor.CreateHitWindows(), true)
+                new DefaultHitErrorDisplay(overallDifficulty, processor.CreateHitWindows(), true)
                 {
                     Margin = new MarginPadding { Right = margin }
                 },
