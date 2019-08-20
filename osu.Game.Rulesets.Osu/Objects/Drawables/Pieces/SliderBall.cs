@@ -174,9 +174,11 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
             var newPos = slider.CurvePositionAt(completionProgress);
 
             var diff = lastPosition.HasValue ? lastPosition.Value - newPos : newPos - slider.CurvePositionAt(completionProgress + 0.01f);
+            if (diff == Vector2.Zero)
+                return;
 
             Position = newPos;
-            Rotation = 90 + (float)(-Math.Atan2(diff.X, diff.Y) * 180 / Math.PI);
+            Rotation = -90 + (float)(-Math.Atan2(diff.X, diff.Y) * 180 / Math.PI);
 
             lastPosition = newPos;
         }
