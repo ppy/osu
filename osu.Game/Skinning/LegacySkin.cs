@@ -151,22 +151,33 @@ namespace osu.Game.Skinning
 
             Texture getFrameTexture(int frame) => GetTexture($"{componentName}{animationSeparator}{frame}");
 
-            if (animatable && (texture = getFrameTexture(0)) != null)
+            TextureAnimation animation = null;
+
+            if (animatable)
             {
-                var animation = new TextureAnimation { DefaultFrameLength = default_frame_time };
-
-                for (int i = 1; texture != null; i++)
+                for (int i = 0;; i++)
                 {
+                    if ((texture = getFrameTexture(i)) == null)
+                        break;
+
+                    if (animation == null)
+                        animation = new TextureAnimation
+                        {
+                            DefaultFrameLength = default_frame_time,
+                            Repeat = looping
+                        };
+
                     animation.AddFrame(texture);
-                    texture = getFrameTexture(i);
                 }
-
-                animation.Repeat = looping;
-
-                return animation;
             }
 
-            return (texture = GetTexture(componentName)) == null ? null : new Sprite { Texture = texture };
+            if (animation != null)
+                return animation;
+
+            if ((texture = GetTexture(componentName)) != null)
+                return new Sprite { Texture = texture };
+
+            return null;
         }
 
         public class LegacySliderBall : Sprite
