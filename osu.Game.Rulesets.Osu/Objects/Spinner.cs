@@ -7,6 +7,8 @@ using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Osu.Judgements;
+using osu.Game.Rulesets.Osu.Replays;
+using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Objects
 {
@@ -28,6 +30,15 @@ namespace osu.Game.Rulesets.Osu.Objects
 
             // spinning doesn't match 1:1 with stable, so let's fudge them easier for the time being.
             SpinsRequired = (int)Math.Max(1, SpinsRequired * 0.6);
+        }
+
+        protected override void CreateNestedHitObjects()
+        {
+            base.CreateNestedHitObjects();
+
+            var maximumSpins = OsuAutoGeneratorBase.SPIN_RADIUS * (Duration / 1000) / MathHelper.TwoPi;
+            for (int i = 0; i < maximumSpins; i++)
+                AddNested(new SpinnerTick());
         }
 
         public override Judgement CreateJudgement() => new OsuJudgement();
