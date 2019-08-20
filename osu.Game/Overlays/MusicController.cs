@@ -93,6 +93,15 @@ namespace osu.Game.Overlays
         }
 
         /// <summary>
+        /// Start playing the current track (if not already playing).
+        /// </summary>
+        public void Play()
+        {
+            if (!IsPlaying)
+                TogglePause();
+        }
+
+        /// <summary>
         /// Toggle pause / play.
         /// </summary>
         /// <returns>Whether the operation was successful.</returns>
