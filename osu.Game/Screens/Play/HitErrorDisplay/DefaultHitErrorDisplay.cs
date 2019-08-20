@@ -29,7 +29,7 @@ namespace osu.Game.Screens.Play.HitErrorDisplay
         private const int spacing = 3;
 
         private readonly SpriteIcon arrow;
-        private readonly FillFlowContainer bar;
+        private readonly FillFlowContainer<Box> bar;
         private readonly Container judgementsContainer;
         private readonly Queue<double> judgementOffsets = new Queue<double>();
         private readonly double maxHitWindows;
@@ -55,7 +55,7 @@ namespace osu.Game.Screens.Play.HitErrorDisplay
                         Width = judgement_line_width,
                         RelativeSizeAxes = Axes.Y,
                     },
-                    bar = new FillFlowContainer
+                    bar = new FillFlowContainer<Box>
                     {
                         Anchor = reversed ? Anchor.CentreRight : Anchor.CentreLeft,
                         Origin = reversed ? Anchor.CentreRight : Anchor.CentreLeft,
@@ -85,53 +85,38 @@ namespace osu.Game.Screens.Play.HitErrorDisplay
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
-            Box topGreenBox;
-            Box bottomGreenBox;
-
             if (HitWindows.Meh != 0)
-                bar.Add(new Box
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    Colour = ColourInfo.GradientVertical(colours.Yellow.Opacity(0), colours.Yellow),
-                    Height = (float)((maxHitWindows - HitWindows.Good) / (maxHitWindows * 2))
-                });
-
-            bar.AddRange(new Drawable[]
             {
-                topGreenBox = new Box
+                bar.AddRange(new[]
                 {
-                    RelativeSizeAxes = Axes.Both,
-                    Colour = colours.Green,
-                    Height = (float)((HitWindows.Good - HitWindows.Great) / (maxHitWindows * 2))
-                },
-                new Box
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    Colour = colours.BlueLight,
-                    Height = (float)(HitWindows.Great / maxHitWindows)
-                },
-                bottomGreenBox = new Box
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    Colour = colours.Green,
-                    Height = (float)((HitWindows.Good - HitWindows.Great) / (maxHitWindows * 2))
-                }
-            });
-
-            if (HitWindows.Meh != 0)
-                bar.Add(new Box
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    Colour = ColourInfo.GradientVertical(colours.Yellow, colours.Yellow.Opacity(0)),
-                    Height = (float)((maxHitWindows - HitWindows.Good) / (maxHitWindows * 2))
+                    createColoredPiece(ColourInfo.GradientVertical(colours.Yellow.Opacity(0), colours.Yellow),
+                        (maxHitWindows - HitWindows.Good) / (maxHitWindows * 2)),
+                    createColoredPiece(colours.Green, (HitWindows.Good - HitWindows.Great) / (maxHitWindows * 2)),
+                    createColoredPiece(colours.BlueLight, HitWindows.Great / maxHitWindows),
+                    createColoredPiece(colours.Green, (HitWindows.Good - HitWindows.Great) / (maxHitWindows * 2)),
+                    createColoredPiece(ColourInfo.GradientVertical(colours.Yellow, colours.Yellow.Opacity(0)),
+                        (maxHitWindows - HitWindows.Good) / (maxHitWindows * 2))
                 });
-
-            if (HitWindows.Meh == 0)
+            }
+            else
             {
-                topGreenBox.Colour = ColourInfo.GradientVertical(colours.Green.Opacity(0), colours.Green);
-                bottomGreenBox.Colour = ColourInfo.GradientVertical(colours.Green, colours.Green.Opacity(0));
+                bar.AddRange(new[]
+                {
+                    createColoredPiece(ColourInfo.GradientVertical(colours.Green.Opacity(0), colours.Green),
+                        (HitWindows.Good - HitWindows.Great) / (maxHitWindows * 2)),
+                    createColoredPiece(colours.BlueLight, HitWindows.Great / maxHitWindows),
+                    createColoredPiece(ColourInfo.GradientVertical(colours.Green, colours.Green.Opacity(0)),
+                        (HitWindows.Good - HitWindows.Great) / (maxHitWindows * 2)),
+                });
             }
         }
+
+        private Box createColoredPiece(ColourInfo colour, double height) => new Box
+        {
+            RelativeSizeAxes = Axes.Both,
+            Colour = colour,
+            Height = (float)height
+        };
 
         public override void OnNewJudgement(JudgementResult newJudgement)
         {
