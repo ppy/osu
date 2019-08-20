@@ -20,12 +20,15 @@ namespace osu.Game.Screens.Play.HitErrorDisplay
 {
     public class BarHitErrorDisplay : HitErrorDisplay
     {
+        /// <summary>
+        /// The amount of <see cref="JudgementResult"/> which will be stored to calculate arrow position.
+        /// </summary>
         private const int stored_judgements_amount = 5;
-        private const int bar_width = 3;
+        private const int judgement_fade_duration = 10000;
+        private const int arrow_move_duration = 500;
         private const int judgement_line_width = 8;
         private const int bar_height = 200;
-        private const int arrow_move_duration = 500;
-        private const int judgement_life_time = 10000;
+        private const int bar_width = 3;
         private const int spacing = 3;
 
         private readonly SpriteIcon arrow;
@@ -127,7 +130,7 @@ namespace osu.Game.Screens.Play.HitErrorDisplay
 
             judgementsContainer.Add(judgementLine);
 
-            judgementLine.FadeOut(judgement_life_time, Easing.OutQuint).Expire();
+            judgementLine.FadeOut(judgement_fade_duration, Easing.OutQuint).Expire();
 
             arrow.MoveToY(calculateArrowPosition(newJudgement), arrow_move_duration, Easing.OutQuint);
         }
