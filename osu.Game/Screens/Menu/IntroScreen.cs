@@ -30,14 +30,14 @@ namespace osu.Game.Screens.Menu
 
         private LeasedBindable<WorkingBeatmap> beatmap;
 
-        public new Bindable<WorkingBeatmap> Beatmap { get => beatmap; }
+        public new Bindable<WorkingBeatmap> Beatmap => beatmap;
 
         protected override BackgroundScreen CreateBackground() => new BackgroundScreenBlack();
 
         [BackgroundDependencyLoader]
         private void load(OsuConfigManager config, BeatmapManager beatmaps, Framework.Game game)
         {
-            //we take a lease on the beatmap bindable to prevent music playback from changing / pausing music during intros, as it is causing weird interactions with certains intros 
+            // we take a lease on the beatmap bindable to prevent music playback from changing / pausing during intros, as it is causing weird interactions with certains intros.
             beatmap = base.Beatmap.BeginLease(false);
 
             menuVoice = config.GetBindable<bool>(OsuSetting.MenuVoice);
@@ -115,7 +115,7 @@ namespace osu.Game.Screens.Menu
         protected void LoadMenu()
         {
             DidLoadMenu = true;
-            beatmap.Return(); //we return the lease to the beatmap bindable as we're pushing the main menu.
+            beatmap.Return();
 
             this.Push(mainMenu);
         }
