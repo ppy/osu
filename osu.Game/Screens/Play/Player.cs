@@ -24,7 +24,6 @@ using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.UI;
 using osu.Game.Scoring;
-using osu.Game.Screens.Play.HitErrorDisplay;
 using osu.Game.Screens.Ranking;
 using osu.Game.Skinning;
 using osu.Game.Users;
@@ -73,8 +72,6 @@ namespace osu.Game.Screens.Play
         protected DrawableRuleset DrawableRuleset { get; private set; }
 
         protected HUDOverlay HUDOverlay { get; private set; }
-
-        protected HitErrorDisplayOverlay HitErrorDisplayOverlay { get; private set; }
 
         public bool LoadedBeatmapSuccessfully => DrawableRuleset?.Objects.Any() == true;
 
@@ -160,7 +157,6 @@ namespace osu.Game.Screens.Play
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre
                 },
-                HitErrorDisplayOverlay = new HitErrorDisplayOverlay(ScoreProcessor, working),
                 new SkipOverlay(DrawableRuleset.GameplayStartTime)
                 {
                     RequestSeek = GameplayClockContainer.Seek

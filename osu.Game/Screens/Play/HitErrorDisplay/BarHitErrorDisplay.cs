@@ -34,8 +34,8 @@ namespace osu.Game.Screens.Play.HitErrorDisplay
         private readonly Queue<double> judgementOffsets = new Queue<double>();
         private readonly double maxHitWindows;
 
-        public BarHitErrorDisplay(float overallDifficulty, HitWindows hitWindows, bool reversed = false)
-            : base(overallDifficulty, hitWindows)
+        public BarHitErrorDisplay(HitWindows hitWindows, bool reversed = false)
+            : base(hitWindows)
         {
             maxHitWindows = HitWindows.Meh == 0 ? HitWindows.Good : HitWindows.Meh;
 

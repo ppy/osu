@@ -115,7 +115,7 @@ namespace osu.Game.Tests.Visual.Gameplay
                 }
             });
 
-            Add(display = new BarHitErrorDisplay(overallDifficulty, hitWindows)
+            Add(display = new BarHitErrorDisplay(hitWindows)
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
