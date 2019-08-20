@@ -54,7 +54,7 @@ namespace osu.Game.Overlays.Profile.Sections.Kudosu
             {
                 case KudosuAction.VoteGive:
                 case KudosuAction.Give:
-                    linkFlowContainer.AddText($@"Received ");
+                    linkFlowContainer.AddText(@"Received ");
                     addKudosuPart();
                     addMainPart();
                     addPostPart();
@@ -66,14 +66,14 @@ namespace osu.Game.Overlays.Profile.Sections.Kudosu
                     break;
 
                 case KudosuAction.VoteReset:
-                    linkFlowContainer.AddText($@"Lost ");
+                    linkFlowContainer.AddText(@"Lost ");
                     addKudosuPart();
                     addMainPart();
                     addPostPart();
                     break;
 
                 case KudosuAction.DenyKudosuReset:
-                    linkFlowContainer.AddText($@"Denied ");
+                    linkFlowContainer.AddText(@"Denied ");
                     addKudosuPart();
                     addMainPart();
                     addPostPart();
@@ -113,27 +113,27 @@ namespace osu.Game.Overlays.Profile.Sections.Kudosu
             switch (historyItem.Action)
             {
                 case KudosuAction.Give:
-                    message = $" from {userLinkTemplate()} for a post at ";
+                    message = $@" from {userLinkTemplate()} for a post at ";
                     break;
 
                 case KudosuAction.VoteGive:
-                    message = $" from obtaining votes in modding post of ";
+                    message = @" from obtaining votes in modding post of ";
                     break;
 
                 case KudosuAction.Reset:
-                    message = $"Kudosu reset by {userLinkTemplate()} for the post ";
+                    message = $@"Kudosu reset by {userLinkTemplate()} for the post ";
                     break;
 
                 case KudosuAction.VoteReset:
-                    message = $" from losing votes in modding post of ";
+                    message = @" from losing votes in modding post of ";
                     break;
 
                 case KudosuAction.DenyKudosuReset:
-                    message = $" from modding post ";
+                    message = @" from modding post ";
                     break;
 
                 case KudosuAction.Revoke:
-                    message = $"Denied kudosu by {userLinkTemplate()} for the post ";
+                    message = $@"Denied kudosu by {userLinkTemplate()} for the post ";
                     break;
 
                 default:
