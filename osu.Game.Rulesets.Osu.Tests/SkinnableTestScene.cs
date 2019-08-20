@@ -60,12 +60,8 @@ namespace osu.Game.Rulesets.Osu.Tests
                 {
                     var match = Regex.Match(componentName, "-([0-9]*)");
 
-                    if (match.Length > 0)
-                    {
-                        var number = int.Parse(match.Groups[1].Value);
-                        if (number < 60)
-                            return base.GetTexture(componentName.Replace($"-{number}", $"-{number % 2}"));
-                    }
+                    if (match.Length > 0 && int.TryParse(match.Groups[1].Value, out var number) && number < 60)
+                        return base.GetTexture(componentName.Replace($"-{number}", $"-{number % 2}"));
                 }
 
                 return base.GetTexture(componentName);
