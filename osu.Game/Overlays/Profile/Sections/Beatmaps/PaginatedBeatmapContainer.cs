@@ -46,8 +46,11 @@ namespace osu.Game.Overlays.Profile.Sections.Beatmaps
                     if (!s.OnlineBeatmapSetID.HasValue)
                         continue;
 
-                    var panel = new DirectGridPanel(s.ToBeatmapSet(Rulesets));
-                    ItemsContainer.Add(panel);
+                    ItemsContainer.Add(new DirectGridPanel(s.ToBeatmapSet(Rulesets))
+                    {
+                        Anchor = Anchor.TopCentre,
+                        Origin = Anchor.TopCentre,
+                    });
                 }
             });
 
