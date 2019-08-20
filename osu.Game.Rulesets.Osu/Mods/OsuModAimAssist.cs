@@ -24,38 +24,46 @@ namespace osu.Game.Rulesets.Osu.Mods
         public override double ScoreMultiplier => 1;
         public override Type[] IncompatibleMods => new[] { typeof(OsuModAutopilot), typeof(OsuModAutoplay), typeof(OsuModWiggle), typeof(OsuModTransform) };
 
-        private readonly HashSet<DrawableOsuHitObject> movingObjects = new HashSet<DrawableOsuHitObject>();
+        private readonly List<DrawableOsuHitObject> movingObjects = new List<DrawableOsuHitObject>();
 
         public void Update(Playfield playfield)
         {
-            var drawableCursor = playfield.Cursor.ActiveCursor;
+            var cursorPos = playfield.Cursor.ActiveCursor.DrawPosition;
 
-            // Avoid crowded judgment displays and hide follow points
+            // Avoid relocating judgment displays and hide follow points
             playfield.DisplayJudgements.Value = false;
             (playfield as OsuPlayfield)?.ConnectionLayer.Hide();
 
-            // First move objects to new destination, then remove them from movingObjects set if they're too old
-            movingObjects.RemoveWhere(d =>
+            // First move objects to new destination, then remove them from movingObjects list if they're too old
+            movingObjects.RemoveAll(d =>
             {
-                var currentTime = playfield.Clock.CurrentTime;
                 var h = d.HitObject;
+                var currentTime = playfield.Clock.CurrentTime;
+                var endTime = (h as IHasEndTime)?.EndTime ?? h.StartTime;
+                d.ClearTransforms();
 
                 switch (d)
                 {
                     case DrawableHitCircle circle:
-                        circle.MoveTo(drawableCursor.DrawPosition, Math.Max(0, h.StartTime - currentTime - 10));
-                        return currentTime > h.StartTime;
+
+                        // 10ms earlier on the note to reduce chance of missing when clicking early / cursor moves fast
+                        circle.MoveTo(cursorPos, Math.Max(0, endTime - currentTime - 10));
+                        return currentTime > endTime;
 
                     case DrawableSlider slider:
 
                         // Move slider to cursor
                         if (currentTime < h.StartTime)
-                            d.MoveTo(drawableCursor.DrawPosition, Math.Max(0, h.StartTime - currentTime - 10));
-
+                        {
+                            slider.MoveTo(cursorPos, Math.Max(0, h.StartTime - currentTime - 10));
+                            return false;
+                        }
                         // Move slider so that sliderball stays on the cursor
                         else
-                            d.MoveTo(drawableCursor.DrawPosition - slider.Ball.DrawPosition);
-                        return currentTime > (h as IHasEndTime)?.EndTime;
+                        {
+                            slider.MoveTo(cursorPos - slider.Ball.DrawPosition);
+                            return currentTime > endTime;
+                        }
 
                     case DrawableSpinner _:
                         // TODO
@@ -75,14 +83,15 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         private void drawableOnApplyCustomUpdateState(DrawableHitObject drawable, ArmedState state)
         {
-            if (drawable is DrawableOsuHitObject d)
-                movingObjects.Add(d);
+            if (drawable is DrawableOsuHitObject hitobject)
+                movingObjects.Add(hitobject);
         }
     }
 
     /*
      * TODOs
-     *  - remove object timing glitches / artifacts
+     *  - fix sliders reappearing at original position after their EndTime (see https://puu.sh/E7zT4/111cf9cdc8.gif)
+     *  - relocate / hide slider headcircle's explosion, flash, ...
      *  - automate spinners
      *  - combine with OsuModRelax (?)
      *
