@@ -43,6 +43,7 @@ namespace osu.Game.Skinning
         public LegacySkin(SkinInfo skin, IResourceStore<byte[]> storage, AudioManager audioManager)
             : this(skin, new LegacySkinResourceStore<SkinFileInfo>(skin, storage), audioManager, "skin.ini")
         {
+            if (!Configuration.CustomColours.ContainsKey("SliderBall")) Configuration.CustomColours["SliderBall"] = new Color4(2, 170, 255, 255);
         }
 
         private readonly bool hasHitCircle;
@@ -347,7 +348,7 @@ namespace osu.Game.Skinning
             [BackgroundDependencyLoader]
             private void load(ISkinSource skin, DrawableHitObject drawableObject)
             {
-                Colour = skin.GetValue<SkinConfiguration, Color4?>(s => s.CustomColours.ContainsKey("SliderBall") ? s.CustomColours["SliderBall"] : (Color4?)null) ?? Color4.White;
+                animationContent.Colour = skin.GetValue<SkinConfiguration, Color4?>(s => s.CustomColours.ContainsKey("SliderBall") ? s.CustomColours["SliderBall"] : (Color4?)null) ?? Color4.White;
 
                 InternalChildren = new[]
                 {
