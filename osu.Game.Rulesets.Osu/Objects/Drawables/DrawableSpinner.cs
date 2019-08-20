@@ -225,6 +225,12 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
                 tick.HasBonusPoints = Progress >= 1 && i > Spinner.SpinsRequired;
 
+                if (tick.HasBonusPoints)
+                    bonusCounter
+                        .TransformTextTo($"{(i - Spinner.SpinsRequired) * 1000}")
+                        .FadeOutFromOne(1500)
+                        .ScaleTo(1.5f).ScaleTo(1f, 1000, Easing.OutQuint);
+
                 tick.TriggerResult(HitResult.Great);
             }
 
