@@ -50,37 +50,45 @@ namespace osu.Game.Overlays.Profile.Sections.Kudosu
         {
             date.Colour = colours.GreySeafoamLighter;
 
+            string userLinkTemplate() => $"[{historyItem.Giver?.Url} {historyItem.Giver?.Username}]";
+
             switch (historyItem.Action)
             {
                 case KudosuAction.VoteGive:
+                    linkFlowContainer.AddText(@"Received ");
+                    addKudosuPart();
+                    addMainPart($@" from {userLinkTemplate()} for a post at ");
+                    addPostPart();
+                    break;
+
                 case KudosuAction.Give:
                     linkFlowContainer.AddText(@"Received ");
                     addKudosuPart();
-                    addMainPart();
+                    addMainPart(@" from obtaining votes in modding post of ");
                     addPostPart();
                     break;
 
                 case KudosuAction.Reset:
-                    addMainPart();
+                    addMainPart($@"Kudosu reset by {userLinkTemplate()} for the post ");
                     addPostPart();
                     break;
 
                 case KudosuAction.VoteReset:
                     linkFlowContainer.AddText(@"Lost ");
                     addKudosuPart();
-                    addMainPart();
+                    addMainPart(@" from losing votes in modding post of ");
                     addPostPart();
                     break;
 
                 case KudosuAction.DenyKudosuReset:
                     linkFlowContainer.AddText(@"Denied ");
                     addKudosuPart();
-                    addMainPart();
+                    addMainPart(@" from modding post ");
                     addPostPart();
                     break;
 
                 case KudosuAction.Revoke:
-                    addMainPart();
+                    addMainPart($@"Denied kudosu by {userLinkTemplate()} for the post ");
                     addPostPart();
                     break;
             }
@@ -95,53 +103,13 @@ namespace osu.Game.Overlays.Profile.Sections.Kudosu
             });
         }
 
-        private void addMainPart()
+        private void addMainPart(string text)
         {
-            var text = createMessage();
+            var formatted = MessageFormatter.FormatText(text);
 
-            linkFlowContainer.AddLinks(text.Text, text.Links);
+            linkFlowContainer.AddLinks(formatted.Text, formatted.Links);
         }
 
         private void addPostPart() => linkFlowContainer.AddLink(historyItem.Post.Title, historyItem.Post.Url);
-
-        private MessageFormatter.MessageFormatterResult createMessage()
-        {
-            string userLinkTemplate() => $"[{historyItem.Giver?.Url} {historyItem.Giver?.Username}]";
-
-            string message;
-
-            switch (historyItem.Action)
-            {
-                case KudosuAction.Give:
-                    message = $@" from {userLinkTemplate()} for a post at ";
-                    break;
-
-                case KudosuAction.VoteGive:
-                    message = @" from obtaining votes in modding post of ";
-                    break;
-
-                case KudosuAction.Reset:
-                    message = $@"Kudosu reset by {userLinkTemplate()} for the post ";
-                    break;
-
-                case KudosuAction.VoteReset:
-                    message = @" from losing votes in modding post of ";
-                    break;
-
-                case KudosuAction.DenyKudosuReset:
-                    message = @" from modding post ";
-                    break;
-
-                case KudosuAction.Revoke:
-                    message = $@"Denied kudosu by {userLinkTemplate()} for the post ";
-                    break;
-
-                default:
-                    message = string.Empty;
-                    break;
-            }
-
-            return MessageFormatter.FormatText(message);
-        }
     }
 }
