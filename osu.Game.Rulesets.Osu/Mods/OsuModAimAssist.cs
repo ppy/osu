@@ -10,6 +10,7 @@ using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Osu.Objects.Drawables;
 using osu.Game.Rulesets.UI;
+using osu.Game.Rulesets.Osu.UI;
 
 namespace osu.Game.Rulesets.Osu.Mods
 {
@@ -29,8 +30,9 @@ namespace osu.Game.Rulesets.Osu.Mods
         {
             var drawableCursor = playfield.Cursor.ActiveCursor;
 
-            // Avoid crowded judgment displays
+            // Avoid crowded judgment displays and hide follow points
             playfield.DisplayJudgements.Value = false;
+            (playfield as OsuPlayfield)?.ConnectionLayer.Hide();
 
             // First move objects to new destination, then remove them from movingObjects set if they're too old
             movingObjects.RemoveWhere(d =>
@@ -81,10 +83,8 @@ namespace osu.Game.Rulesets.Osu.Mods
     /*
      * TODOs
      *  - remove object timing glitches / artifacts
-     *  - remove FollowPoints
      *  - automate spinners
      *  - combine with OsuModRelax (?)
-     *  - must be some way to make this more effictient
      *
      */
 }

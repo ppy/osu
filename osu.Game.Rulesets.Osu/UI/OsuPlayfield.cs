@@ -20,7 +20,7 @@ namespace osu.Game.Rulesets.Osu.UI
     {
         private readonly ApproachCircleProxyContainer approachCircles;
         private readonly JudgementContainer<DrawableOsuJudgement> judgementLayer;
-        private readonly ConnectionRenderer<OsuHitObject> connectionLayer;
+        public readonly ConnectionRenderer<OsuHitObject> ConnectionLayer;
 
         public static readonly Vector2 BASE_SIZE = new Vector2(512, 384);
 
@@ -30,7 +30,7 @@ namespace osu.Game.Rulesets.Osu.UI
         {
             InternalChildren = new Drawable[]
             {
-                connectionLayer = new FollowPointRenderer
+                ConnectionLayer = new FollowPointRenderer
                 {
                     RelativeSizeAxes = Axes.Both,
                     Depth = 2,
@@ -81,7 +81,7 @@ namespace osu.Game.Rulesets.Osu.UI
 
         public override void PostProcess()
         {
-            connectionLayer.HitObjects = HitObjectContainer.Objects.Select(d => d.HitObject).OfType<OsuHitObject>();
+            ConnectionLayer.HitObjects = HitObjectContainer.Objects.Select(d => d.HitObject).OfType<OsuHitObject>();
         }
 
         private void onNewResult(DrawableHitObject judgedObject, JudgementResult result)
