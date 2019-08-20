@@ -80,7 +80,7 @@ namespace osu.Game.Screens.Play.HitErrorDisplay
 
         private void createNew(bool reversed = false)
         {
-            var display = new DefaultHitErrorDisplay(overallDifficulty, hitWindows, reversed)
+            var display = new BarHitErrorDisplay(overallDifficulty, hitWindows, reversed)
             {
                 Margin = new MarginPadding(margin),
                 Anchor = reversed ? Anchor.CentreRight : Anchor.CentreLeft,

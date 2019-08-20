@@ -18,7 +18,7 @@ using System.Linq;
 
 namespace osu.Game.Screens.Play.HitErrorDisplay
 {
-    public class DefaultHitErrorDisplay : HitErrorDisplay
+    public class BarHitErrorDisplay : HitErrorDisplay
     {
         private const int stored_judgements_amount = 5;
         private const int bar_width = 3;
@@ -34,7 +34,7 @@ namespace osu.Game.Screens.Play.HitErrorDisplay
         private readonly Queue<double> judgementOffsets = new Queue<double>();
         private readonly double maxHitWindows;
 
-        public DefaultHitErrorDisplay(float overallDifficulty, HitWindows hitWindows, bool reversed = false)
+        public BarHitErrorDisplay(float overallDifficulty, HitWindows hitWindows, bool reversed = false)
             : base(overallDifficulty, hitWindows)
         {
             maxHitWindows = HitWindows.Meh == 0 ? HitWindows.Good : HitWindows.Meh;
