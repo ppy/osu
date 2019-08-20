@@ -60,7 +60,7 @@ namespace osu.Game.Skinning
             Samples = audioManager.GetSampleStore(storage);
             Textures = new TextureStore(new TextureLoaderStore(storage));
 
-            using (var testStream = storage.GetStream("hitcircle"))
+            using (var testStream = storage.GetStream("hitcircle@2x") ?? storage.GetStream("hitcircle"))
                 hasHitCircle |= testStream != null;
 
             if (hasHitCircle)
