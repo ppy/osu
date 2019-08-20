@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using osu.Framework.Extensions;
 using osu.Framework.Graphics;
 using osu.Game.Rulesets.Judgements;
@@ -21,19 +22,13 @@ namespace osu.Game.Rulesets.Osu.Tests
 
         public TestSceneDrawableJudgement()
         {
-            foreach (HitResult result in Enum.GetValues(typeof(HitResult)))
-            {
-                JudgementResult judgement = new JudgementResult(null)
-                {
-                    Type = result,
-                };
-
-                AddStep("Show " + result.GetDescription(), () => SetContents(() => new DrawableOsuJudgement(judgement, null)
-                {
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
-                }));
-            }
+            foreach (HitResult result in Enum.GetValues(typeof(HitResult)).OfType<HitResult>().Skip(1))
+                AddStep("Show " + result.GetDescription(), () => SetContents(() =>
+                    new DrawableOsuJudgement(new JudgementResult(null) { Type = result }, null)
+                    {
+                        Anchor = Anchor.Centre,
+                        Origin = Anchor.Centre,
+                    }));
         }
     }
 }
