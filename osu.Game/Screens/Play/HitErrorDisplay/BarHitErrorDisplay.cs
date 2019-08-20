@@ -24,6 +24,7 @@ namespace osu.Game.Screens.Play.HitErrorDisplay
         /// The amount of <see cref="JudgementResult"/> which will be stored to calculate arrow position.
         /// </summary>
         private const int stored_judgements_amount = 5;
+
         private const int judgement_fade_duration = 10000;
         private const int arrow_move_duration = 500;
         private const int judgement_line_width = 8;
