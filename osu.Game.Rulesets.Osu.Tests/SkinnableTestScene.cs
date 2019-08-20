@@ -2,12 +2,12 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.IO;
-using System.Linq;
+using System.Text.RegularExpressions;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Textures;
 using osu.Framework.IO.Stores;
 using osu.Game.Skinning;
 using osu.Game.Tests.Visual;
@@ -28,11 +28,11 @@ namespace osu.Game.Rulesets.Osu.Tests
         [BackgroundDependencyLoader]
         private void load(AudioManager audio)
         {
-            var skins = new SkinManager(LocalStorage, ContextFactory, null, audio);
+            var dllStore = new DllResourceStore("osu.Game.Rulesets.Osu.Tests.dll");
 
-            metricsSkin = getSkinFromResources(skins, "metrics_skin");
-            defaultSkin = getSkinFromResources(skins, "default_skin");
-            specialSkin = getSkinFromResources(skins, "special_skin");
+            metricsSkin = new TestLegacySkin(new SkinInfo(), new NamespacedResourceStore<byte[]>(dllStore, "Resources/metrics_skin"), audio, true);
+            defaultSkin = new TestLegacySkin(new SkinInfo(), new NamespacedResourceStore<byte[]>(dllStore, "Resources/default_skin"), audio, false);
+            specialSkin = new TestLegacySkin(new SkinInfo(), new NamespacedResourceStore<byte[]>(dllStore, "Resources/special_skin"), audio, true);
         }
 
         public void SetContents(Func<Drawable> creationFunction)
@@ -43,23 +43,28 @@ namespace osu.Game.Rulesets.Osu.Tests
             Cell(3).Child = new LocalSkinOverrideContainer(specialSkin) { RelativeSizeAxes = Axes.Both }.WithChild(creationFunction());
         }
 
-        private static Skin getSkinFromResources(SkinManager skins, string name)
+        private class TestLegacySkin : LegacySkin
         {
-            using (var storage = new DllResourceStore("osu.Game.Rulesets.Osu.Tests.dll"))
+            private readonly bool extrapolateAnimations;
+
+            public TestLegacySkin(SkinInfo skin, IResourceStore<byte[]> storage, AudioManager audioManager, bool extrapolateAnimations)
+                : base(skin, storage, audioManager, "skin.ini")
             {
-                var tempName = Path.GetTempFileName();
+                this.extrapolateAnimations = extrapolateAnimations;
+            }
 
-                File.Delete(tempName);
-                Directory.CreateDirectory(tempName);
+            public override Texture GetTexture(string componentName)
+            {
+                // extrapolate frames to test longer animations
+                if (extrapolateAnimations)
+                {
+                    var match = Regex.Match(componentName, "-([0-9]*)");
 
-                var files = storage.GetAvailableResources().Where(f => f.StartsWith($"Resources/{name}"));
+                    if (match.Length > 0 && int.TryParse(match.Groups[1].Value, out var number) && number < 60)
+                        return base.GetTexture(componentName.Replace($"-{number}", $"-{number % 2}"));
+                }
 
-                foreach (var file in files)
-                    using (var stream = storage.GetStream(file))
-                    using (var newFile = File.Create(Path.Combine(tempName, Path.GetFileName(file))))
-                        stream.CopyTo(newFile);
-
-                return skins.GetSkin(skins.Import(tempName).Result);
+                return base.GetTexture(componentName);
             }
         }
     }
