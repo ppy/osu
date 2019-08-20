@@ -12,49 +12,100 @@ using osu.Game.Online.Chat;
 
 namespace osu.Game.Overlays.Profile.Sections.Kudosu
 {
-    public class DrawableKudosuHistoryItem : DrawableProfileRow
+    public class DrawableKudosuHistoryItem : CompositeDrawable
     {
+        private const int height = 25;
+
+        [Resolved]
+        private OsuColour colours { get; set; }
+
         private readonly APIKudosuHistory historyItem;
-        private LinkFlowContainer content;
+        private readonly LinkFlowContainer linkFlowContainer;
+        private readonly DrawableDate date;
 
         public DrawableKudosuHistoryItem(APIKudosuHistory historyItem)
         {
             this.historyItem = historyItem;
+
+            Height = height;
+            RelativeSizeAxes = Axes.X;
+            AddRangeInternal(new Drawable[]
+            {
+                linkFlowContainer = new LinkFlowContainer
+                {
+                    Anchor = Anchor.CentreLeft,
+                    Origin = Anchor.CentreLeft,
+                    AutoSizeAxes = Axes.Both,
+                },
+                date = new DrawableDate(historyItem.CreatedAt)
+                {
+                    Anchor = Anchor.CentreRight,
+                    Origin = Anchor.CentreRight,
+                }
+            });
         }
 
         [BackgroundDependencyLoader]
         private void load()
         {
-            LeftFlowContainer.Padding = new MarginPadding { Left = 10 };
+            date.Colour = colours.GreySeafoamLighter;
 
-            LeftFlowContainer.Add(content = new LinkFlowContainer
+            switch (historyItem.Action)
             {
-                AutoSizeAxes = Axes.Y,
-                RelativeSizeAxes = Axes.X,
-            });
+                case KudosuAction.VoteGive:
+                case KudosuAction.Give:
+                    linkFlowContainer.AddText($@"Received ");
+                    addKudosuPart();
+                    addMainPart();
+                    addPostPart();
+                    break;
 
-            RightFlowContainer.Add(new DrawableDate(historyItem.CreatedAt)
-            {
-                Font = OsuFont.GetFont(size: 13),
-                Colour = OsuColour.Gray(0xAA),
-                Anchor = Anchor.TopRight,
-                Origin = Anchor.TopRight,
-            });
+                case KudosuAction.Reset:
+                    addMainPart();
+                    addPostPart();
+                    break;
 
-            var formatted = createMessage();
+                case KudosuAction.VoteReset:
+                    linkFlowContainer.AddText($@"Lost ");
+                    addKudosuPart();
+                    addMainPart();
+                    addPostPart();
+                    break;
 
-            content.AddLinks(formatted.Text, formatted.Links);
+                case KudosuAction.DenyKudosuReset:
+                    linkFlowContainer.AddText($@"Denied ");
+                    addKudosuPart();
+                    addMainPart();
+                    addPostPart();
+                    break;
+
+                case KudosuAction.Revoke:
+                    addMainPart();
+                    addPostPart();
+                    break;
+            }
         }
 
-        protected override Drawable CreateLeftVisual() => new Container
+        private void addKudosuPart()
         {
-            RelativeSizeAxes = Axes.Y,
-            AutoSizeAxes = Axes.X,
-        };
+            linkFlowContainer.AddText($@"{historyItem.Amount} kudosu", t =>
+            {
+                t.Font = t.Font.With(italics: true);
+                t.Colour = colours.Blue;
+            });
+        }
+
+        private void addMainPart()
+        {
+            var text = createMessage();
+
+            linkFlowContainer.AddLinks(text.Text, text.Links);
+        }
+
+        private void addPostPart() => linkFlowContainer.AddLink(historyItem.Post.Title, historyItem.Post.Url);
 
         private MessageFormatter.MessageFormatterResult createMessage()
         {
-            string postLinkTemplate() => $"[{historyItem.Post.Url} {historyItem.Post.Title}]";
             string userLinkTemplate() => $"[{historyItem.Giver?.Url} {historyItem.Giver?.Username}]";
 
             string message;
@@ -62,27 +113,27 @@ namespace osu.Game.Overlays.Profile.Sections.Kudosu
             switch (historyItem.Action)
             {
                 case KudosuAction.Give:
-                    message = $"Received {historyItem.Amount} kudosu from {userLinkTemplate()} for a post at {postLinkTemplate()}";
+                    message = $" from {userLinkTemplate()} for a post at ";
                     break;
 
                 case KudosuAction.VoteGive:
-                    message = $"Received {historyItem.Amount} kudosu from obtaining votes in modding post of {postLinkTemplate()}";
+                    message = $" from obtaining votes in modding post of ";
                     break;
 
                 case KudosuAction.Reset:
-                    message = $"Kudosu reset by {userLinkTemplate()} for the post {postLinkTemplate()}";
+                    message = $"Kudosu reset by {userLinkTemplate()} for the post ";
                     break;
 
                 case KudosuAction.VoteReset:
-                    message = $"Lost {historyItem.Amount} kudosu from losing votes in modding post of {postLinkTemplate()}";
+                    message = $" from losing votes in modding post of ";
                     break;
 
                 case KudosuAction.DenyKudosuReset:
-                    message = $"Denied {historyItem.Amount} kudosu from modding post {postLinkTemplate()}";
+                    message = $" from modding post ";
                     break;
 
                 case KudosuAction.Revoke:
-                    message = $"Denied kudosu by {userLinkTemplate()} for the post {postLinkTemplate()}";
+                    message = $"Denied kudosu by {userLinkTemplate()} for the post ";
                     break;
 
                 default:
