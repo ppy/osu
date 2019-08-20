@@ -337,15 +337,32 @@ namespace osu.Game.Skinning
 
         public class LegacySliderBall : CompositeDrawable
         {
-            public LegacySliderBall(Drawable content)
+            private readonly Drawable animationContent;
+
+            public LegacySliderBall(Drawable animationContent)
             {
-                InternalChild = content;
+                this.animationContent = animationContent;
             }
 
             [BackgroundDependencyLoader]
-            private void load(ISkinSource skin)
+            private void load(ISkinSource skin, DrawableHitObject drawableObject)
             {
                 Colour = skin.GetValue<SkinConfiguration, Color4?>(s => s.CustomColours.ContainsKey("SliderBall") ? s.CustomColours["SliderBall"] : (Color4?)null) ?? Color4.White;
+
+                InternalChildren = new[]
+                {
+                    new Sprite
+                    {
+                        Texture = skin.GetTexture("sliderb-nd"),
+                        Colour = new Color4(5, 5, 5, 255),
+                    },
+                    animationContent,
+                    new Sprite
+                    {
+                        Texture = skin.GetTexture("sliderb-spec"),
+                        Blending = BlendingMode.Additive,
+                    },
+                };
             }
         }
 
