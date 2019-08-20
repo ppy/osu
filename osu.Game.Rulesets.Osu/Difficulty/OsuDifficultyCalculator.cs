@@ -4,6 +4,11 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+
+using MathNet.Numerics;
+using MathNet.Numerics.LinearAlgebra;
+using MathNet.Numerics.RootFinding;
+
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Difficulty;
 using osu.Game.Rulesets.Difficulty.Preprocessing;
@@ -14,8 +19,7 @@ using osu.Game.Rulesets.Osu.Difficulty.Skills;
 using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Difficulty.MathUtil;
-using MathNet.Numerics;
-using MathNet.Numerics.LinearAlgebra;
+
 
 namespace osu.Game.Rulesets.Osu.Difficulty
 {
@@ -54,15 +58,23 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             double aimSR = aimMultiplier * Math.Pow(aimDiff, srExponent);
             double sr = Mean.PowerMean(tapSR, aimSR, 7) * 1.069;
 
+            // Todo: These int casts are temporary to achieve 1:1 results with osu!stable, and should be removed in the future
+            double hitWindowGreat = (int)(beatmap.HitObjects.First().HitWindows.Great / 2) / clockRate;
+            double preempt = (int)BeatmapDifficulty.DifficultyRange(beatmap.BeatmapInfo.BaseDifficulty.ApproachRate, 1800, 1200, 450) / clockRate;
+
+            int maxCombo = beatmap.HitObjects.Count;
+            // Add the ticks + tail of the slider. 1 is subtracted because the head circle would be counted twice (once for the slider itself in the line above)
+            maxCombo += beatmap.HitObjects.OfType<Slider>().Sum(s => s.NestedHitObjects.Count - 1);
+
             return new OsuDifficultyAttributes
             {
                 StarRating = sr,
                 Mods = mods,
                 AimStrain = aimSR,
                 SpeedStrain = tapSR,
-                ApproachRate = 5,
-                OverallDifficulty = 5,
-                MaxCombo = 333
+                ApproachRate = preempt > 1200 ? (1800 - preempt) / 120 : (1200 - preempt) / 150 + 5,
+                OverallDifficulty = (80 - hitWindowGreat) / 6,
+                MaxCombo = maxCombo
             };
         }
 
@@ -120,27 +132,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             if (fcProbabilityTPMax <= probabilityThreshold)
                 return tpMax;
 
-            double tpLeft = tpMin;
-            double tpRight = tpMax;
-            double tpMid = (tpLeft + tpRight) / 2;
-            double tpDiff = tpMax - tpMin;
+            Func<double, double> fcProbMinusThreshold = tp => calculateFCProbability(movements, tp) - probabilityThreshold;
 
-            while (tpDiff >= tpPrecision)
-            {
-                double probabilityTPMid = calculateFCProbability(movements, tpMid);
+            return Brent.FindRoot(fcProbMinusThreshold, tpMin, tpMax, tpPrecision);
 
-                if (probabilityTPMid == probabilityThreshold)
-                    return tpMid;
-                else if (probabilityTPMid > probabilityThreshold)
-                    tpRight = tpMid;
-                else
-                    tpLeft = tpMid;
-
-                tpDiff = tpRight - tpLeft;
-                tpMid = (tpLeft + tpRight) / 2;
-            }
-
-            return tpMid;
 
         }
 
@@ -150,28 +145,13 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             foreach (OsuMovement movement in movements)
             {
-
-                double hitProbability = calculateHitProbability(movement.D, movement.MT, tp);
+                double hitProbability = FittsLaw.CalculateHitProbability(movement.D, movement.MT, tp);
                 fcProbability *= hitProbability;
             }
             return fcProbability;
         }
 
-        private double calculateHitProbability(double d, double mt, double tp)
-        {
-            if (d == 0)
-                return 1.0;
-
-            if (mt * tp > 100)
-                return 1.0;
-
-            if (mt <= 0)
-                return 0.0;
-
-            return SpecialFunctions.Erf(2.066 / d * (Math.Pow(2,(mt*tp))-1) / Math.Sqrt(2));
-        }
-
-
+        
         //protected override DifficultyAttributes CreateDifficultyAttributes(IBeatmap beatmap, Mod[] mods, Skill[] skills, double clockRate)
         //{
         //    if (beatmap.HitObjects.Count == 0)
