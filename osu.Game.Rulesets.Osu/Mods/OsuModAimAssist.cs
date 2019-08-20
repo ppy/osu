@@ -15,7 +15,7 @@ namespace osu.Game.Rulesets.Osu.Mods
 {
     internal class OsuModAimAssist : Mod, IApplicableToDrawableHitObjects, IUpdatableByPlayfield
     {
-        public override string Name => "AimAssist";
+        public override string Name => "Aim Assist";
         public override string Acronym => "AA";
         public override IconUsage Icon => FontAwesome.Solid.MousePointer;
         public override ModType Type => ModType.Fun;
@@ -24,55 +24,45 @@ namespace osu.Game.Rulesets.Osu.Mods
         public override Type[] IncompatibleMods => new[] { typeof(OsuModAutopilot), typeof(OsuModAutoplay), typeof(OsuModWiggle), typeof(OsuModTransform) };
 
         private readonly HashSet<DrawableOsuHitObject> movingObjects = new HashSet<DrawableOsuHitObject>();
-        private int updateCounter;
 
         public void Update(Playfield playfield)
         {
+            var drawableCursor = playfield.Cursor.ActiveCursor;
+
             // Avoid crowded judgment displays
             playfield.DisplayJudgements.Value = false;
 
-            // Object destination updated when cursor updates
-            playfield.Cursor.ActiveCursor.OnUpdate += drawableCursor =>
+            // First move objects to new destination, then remove them from movingObjects set if they're too old
+            movingObjects.RemoveWhere(d =>
             {
-                // ... every 500th cursor update iteration
-                // (lower -> potential lags ; higher -> easier to miss if cursor too fast)
-                if (updateCounter++ < 500)
-                    return;
+                var currentTime = playfield.Clock.CurrentTime;
+                var h = d.HitObject;
 
-                updateCounter = 0;
-
-                // First move objects to new destination, then remove them from movingObjects set if they're too old
-                movingObjects.RemoveWhere(d =>
+                switch (d)
                 {
-                    var currentTime = playfield.Clock.CurrentTime;
-                    var h = d.HitObject;
-                    d.ClearTransforms();
+                    case DrawableHitCircle circle:
+                        circle.MoveTo(drawableCursor.DrawPosition, Math.Max(0, h.StartTime - currentTime - 10));
+                        return currentTime > h.StartTime;
 
-                    switch (d)
-                    {
-                        case DrawableHitCircle circle:
-                            circle.MoveTo(drawableCursor.DrawPosition, Math.Max(0, h.StartTime - currentTime));
-                            return currentTime > h.StartTime;
+                    case DrawableSlider slider:
 
-                        case DrawableSlider slider:
+                        // Move slider to cursor
+                        if (currentTime < h.StartTime)
+                            d.MoveTo(drawableCursor.DrawPosition, Math.Max(0, h.StartTime - currentTime - 10));
 
-                            // Move slider to cursor
-                            if (currentTime < h.StartTime)
-                                d.MoveTo(drawableCursor.DrawPosition, Math.Max(0, h.StartTime - currentTime));
+                        // Move slider so that sliderball stays on the cursor
+                        else
+                            d.MoveTo(drawableCursor.DrawPosition - slider.Ball.DrawPosition);
+                        return currentTime > (h as IHasEndTime)?.EndTime;
 
-                            // Move slider so that sliderball stays on the cursor
-                            else
-                                d.MoveTo(drawableCursor.DrawPosition - slider.Ball.DrawPosition, Math.Max(0, h.StartTime - currentTime));
-                            return currentTime > (h as IHasEndTime)?.EndTime - 50;
+                    case DrawableSpinner _:
+                        // TODO
+                        return true;
 
-                        case DrawableSpinner _:
-                            // TODO
-                            return true;
-                    }
-
-                    return true; // never happens(?)
-                });
-            };
+                    default:
+                        return true;
+                }
+            });
         }
 
         public void ApplyToDrawableHitObjects(IEnumerable<DrawableHitObject> drawables)
@@ -83,11 +73,7 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         private void drawableOnApplyCustomUpdateState(DrawableHitObject drawable, ArmedState state)
         {
-            if (!(drawable is DrawableOsuHitObject d))
-                return;
-
-            var h = d.HitObject;
-            using (d.BeginAbsoluteSequence(h.StartTime - h.TimePreempt))
+            if (drawable is DrawableOsuHitObject d)
                 movingObjects.Add(d);
         }
     }
@@ -96,7 +82,7 @@ namespace osu.Game.Rulesets.Osu.Mods
      * TODOs
      *  - remove object timing glitches / artifacts
      *  - remove FollowPoints
-     *  - automate sliders
+     *  - automate spinners
      *  - combine with OsuModRelax (?)
      *  - must be some way to make this more effictient
      *
