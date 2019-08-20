@@ -57,14 +57,14 @@ namespace osu.Game.Overlays.Profile.Sections.Kudosu
                 case KudosuAction.VoteGive:
                     linkFlowContainer.AddText(@"Received ");
                     addKudosuPart();
-                    addMainPart($@" from {userLinkTemplate()} for a post at ");
+                    addMainPart(@" from obtaining votes in modding post of ");
                     addPostPart();
                     break;
 
                 case KudosuAction.Give:
                     linkFlowContainer.AddText(@"Received ");
                     addKudosuPart();
-                    addMainPart(@" from obtaining votes in modding post of ");
+                    addMainPart($@" from {userLinkTemplate()} for a post at ");
                     addPostPart();
                     break;
 
