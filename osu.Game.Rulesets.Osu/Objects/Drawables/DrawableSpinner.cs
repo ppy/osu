@@ -12,7 +12,9 @@ using osu.Game.Graphics;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics.Sprites;
+using osu.Game.Graphics.Sprites;
 using osu.Game.Screens.Ranking;
 using osu.Game.Rulesets.Scoring;
 
@@ -21,6 +23,9 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
     public class DrawableSpinner : DrawableOsuHitObject
     {
         protected readonly Spinner Spinner;
+
+        private readonly Container<DrawableSpinnerTick> ticks;
+        private readonly OsuSpriteText bonusCounter;
 
         public readonly SpinnerDisc Disc;
         public readonly SpinnerTicks Ticks;
@@ -58,6 +63,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
             InternalChildren = new Drawable[]
             {
+                ticks = new Container<DrawableSpinnerTick>(),
                 circleContainer = new Container
                 {
                     AutoSizeAxes = Axes.Both,
@@ -115,8 +121,24 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                     Origin = Anchor.Centre,
                     Y = 120,
                     Alpha = 0
+                },
+                bonusCounter = new OsuSpriteText
+                {
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    Y = -120,
+                    Font = OsuFont.Numeric.With(size: 24),
+                    Alpha = 0,
                 }
             };
+
+            foreach (var tick in Spinner.NestedHitObjects.OfType<SpinnerTick>())
+            {
+                var drawableTick = new DrawableSpinnerTick(tick);
+
+                ticks.Add(drawableTick);
+                AddNested(drawableTick);
+            }
         }
 
         [BackgroundDependencyLoader]
@@ -182,6 +204,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             base.Update();
         }
 
+        private int currentSpins;
+
         protected override void UpdateAfterChildren()
         {
             base.UpdateAfterChildren();
@@ -189,6 +213,22 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             circle.Rotation = Disc.Rotation;
             Ticks.Rotation = Disc.Rotation;
             spmCounter.SetRotation(Disc.RotationAbsolute);
+
+            var newSpins = (int)(Disc.RotationAbsolute / 360) - currentSpins;
+
+            for (int i = currentSpins; i < currentSpins + newSpins; i++)
+            {
+                if (i < 0 || i >= ticks.Count)
+                    break;
+
+                var tick = ticks[i];
+
+                tick.HasBonusPoints = Progress >= 1 && i > Spinner.SpinsRequired;
+
+                tick.TriggerResult(HitResult.Great);
+            }
+
+            currentSpins += newSpins;
 
             float relativeCircleScale = Spinner.Scale * circle.DrawHeight / mainContainer.DrawHeight;
             Disc.ScaleTo(relativeCircleScale + (1 - relativeCircleScale) * Progress, 200, Easing.OutQuint);
@@ -231,6 +271,9 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                     sequence.ScaleTo(Scale * 0.8f, 320, Easing.In);
                     break;
             }
+
+            if (state != ArmedState.Idle)
+                Schedule(() => NestedHitObjects.Where(t => !t.IsHit).OfType<DrawableSpinnerTick>().ForEach(t => t.TriggerResult(HitResult.Miss)));
 
             Expire();
         }
