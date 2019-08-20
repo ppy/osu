@@ -53,7 +53,7 @@ namespace osu.Game.Tests.Visual.Online
             background.Colour = colours.GreySeafoam;
         }
 
-        private IEnumerable<APIKudosuHistory> items = new[]
+        private readonly IEnumerable<APIKudosuHistory> items = new[]
         {
             new APIKudosuHistory
             {
