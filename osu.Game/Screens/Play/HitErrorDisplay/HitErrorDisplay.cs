@@ -11,10 +11,9 @@ namespace osu.Game.Screens.Play.HitErrorDisplay
     {
         protected readonly HitWindows HitWindows;
 
-        protected HitErrorDisplay(float overallDifficulty, HitWindows hitWindows)
+        protected HitErrorDisplay(HitWindows hitWindows)
         {
             HitWindows = hitWindows;
-            HitWindows.SetDifficulty(overallDifficulty);
         }
 
         public abstract void OnNewJudgement(JudgementResult newJudgement);

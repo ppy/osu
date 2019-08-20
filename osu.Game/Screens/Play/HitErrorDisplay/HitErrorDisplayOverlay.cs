@@ -21,22 +21,18 @@ namespace osu.Game.Screens.Play.HitErrorDisplay
         private readonly Bindable<ScoreMeterType> type = new Bindable<ScoreMeterType>();
         private readonly HitWindows hitWindows;
         private readonly ScoreProcessor processor;
-        private readonly float overallDifficulty;
 
-        public HitErrorDisplayOverlay(ScoreProcessor processor, WorkingBeatmap workingBeatmap)
+        public HitErrorDisplayOverlay(ScoreProcessor processor)
         {
             this.processor = processor;
-
-            overallDifficulty = workingBeatmap.BeatmapInfo.BaseDifficulty.OverallDifficulty;
             hitWindows = processor.CreateHitWindows();
-
-            RelativeSizeAxes = Axes.Both;
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuConfigManager config)
+        private void load(OsuConfigManager config, Bindable<WorkingBeatmap> workingBeatmap)
         {
             config.BindWith(OsuSetting.ScoreMeter, type);
+            hitWindows.SetDifficulty(workingBeatmap.Value.BeatmapInfo.BaseDifficulty.OverallDifficulty);
         }
 
         protected override void LoadComplete()
@@ -80,7 +76,7 @@ namespace osu.Game.Screens.Play.HitErrorDisplay
 
         private void createNew(bool reversed = false)
         {
-            var display = new BarHitErrorDisplay(overallDifficulty, hitWindows, reversed)
+            var display = new BarHitErrorDisplay(hitWindows, reversed)
             {
                 Margin = new MarginPadding(margin),
                 Anchor = reversed ? Anchor.CentreRight : Anchor.CentreLeft,
