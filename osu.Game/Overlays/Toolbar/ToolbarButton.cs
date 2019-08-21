@@ -79,7 +79,7 @@ namespace osu.Game.Overlays.Toolbar
                 {
                     RelativeSizeAxes = Axes.Both,
                     Colour = OsuColour.Gray(80).Opacity(180),
-                    Blending = BlendingMode.Additive,
+                    Blending = BlendingParameters.Additive,
                     Alpha = 0,
                 },
                 Flow = new FillFlowContainer
