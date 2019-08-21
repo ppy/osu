@@ -14,7 +14,6 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics.Colour;
 using osu.Game.Graphics;
 using osu.Framework.Extensions.Color4Extensions;
-using System.Linq;
 
 namespace osu.Game.Screens.Play.HitErrorDisplay
 {
@@ -154,7 +153,7 @@ namespace osu.Game.Screens.Play.HitErrorDisplay
 
         private float getRelativeJudgementPosition(double value) => (float)(value / maxHitWindows);
 
-        private double sum = 0;
+        private double sum;
 
         private float calculateArrowPosition(JudgementResult newJudgement)
         {
