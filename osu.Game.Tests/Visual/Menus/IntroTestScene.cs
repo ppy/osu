@@ -8,6 +8,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Screens;
+using osu.Game.Configuration;
 using osu.Game.Screens;
 using osu.Game.Screens.Menu;
 using osuTK;
@@ -29,10 +30,10 @@ namespace osu.Game.Tests.Visual.Menus
         [Cached]
         private OsuLogo logo;
 
+        private ScreenStack introStack;
+
         protected IntroTestScene()
         {
-            Drawable introStack = null;
-
             Children = new Drawable[]
             {
                 new Box
@@ -49,7 +50,22 @@ namespace osu.Game.Tests.Visual.Menus
                     Position = new Vector2(0.5f),
                 }
             };
+        }
 
+        [BackgroundDependencyLoader]
+        private void load(OsuConfigManager config)
+        {
+            var introMusic = config.GetBindable<bool>(OsuSetting.MenuMusic);
+            introMusic.Value = true;
+
+            runAndWait();
+
+            AddToggleStep("disable intro music", val => introMusic.Value = false);
+            runAndWait();
+        }
+
+        private void runAndWait()
+        {
             AddStep("restart sequence", () =>
             {
                 logo.FinishTransforms();
@@ -62,6 +78,8 @@ namespace osu.Game.Tests.Visual.Menus
                     RelativeSizeAxes = Axes.Both,
                 });
             });
+
+            AddUntilStep("at main menu", () => introStack.CurrentScreen is MainMenu);
         }
 
         protected abstract IScreen CreateScreen();

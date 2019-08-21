@@ -101,19 +101,20 @@ namespace osu.Game.Screens.Menu
 
                 PrepareMenuLoad();
 
+                var clock = new DecoupleableInterpolatingFramedClock { IsCoupled = false };
+                if (menuMusic.Value)
+                    clock.ChangeSource(track);
+
                 LoadComponentAsync(new TrianglesIntroSequence(logo, background)
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Clock = new FramedClock(menuMusic.Value ? track : null),
+                    Clock = clock,
                     LoadMenu = LoadMenu
                 }, t =>
                 {
                     AddInternal(t);
                     welcome?.Play();
-
-                    // Only start the current track if it is the menu music. A beatmap's track is started when entering the Main Menu.
-                    if (menuMusic.Value)
-                        track.Start();
+                    clock.Start();
                 });
             }
         }
