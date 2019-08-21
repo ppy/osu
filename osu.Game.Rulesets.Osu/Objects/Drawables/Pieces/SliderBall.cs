@@ -30,7 +30,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
             this.drawableSlider = drawableSlider;
             this.slider = slider;
 
-            Blending = BlendingMode.Additive;
+            Blending = BlendingParameters.Additive;
             Origin = Anchor.Centre;
 
             Size = new Vector2(OsuHitObject.OBJECT_RADIUS * 2);
@@ -200,7 +200,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
                     Masking = true,
                     BorderThickness = 5,
                     BorderColour = Color4.Orange,
-                    Blending = BlendingMode.Additive,
+                    Blending = BlendingParameters.Additive,
                     Child = new Box
                     {
                         Colour = Color4.Orange,
