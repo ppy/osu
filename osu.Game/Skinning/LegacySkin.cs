@@ -15,6 +15,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.IO.Stores;
+using osu.Framework.Text;
 using osu.Game.Database;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
@@ -234,37 +235,50 @@ namespace osu.Game.Skinning
 
         private class LegacySpriteText : OsuSpriteText
         {
-            private readonly TextureStore textures;
-            private readonly string font;
+            private readonly LegacyGlyphStore glyphStore;
 
             public LegacySpriteText(TextureStore textures, string font)
             {
-                this.textures = textures;
-                this.font = font;
-
                 Shadow = false;
                 UseFullGlyphHeight = false;
+
+                Font = new FontUsage(font, 16);
+                glyphStore = new LegacyGlyphStore(textures);
             }
 
-            protected override Texture GetTextureForCharacter(char c)
+            protected override TextBuilder CreateTextBuilder(ITexturedGlyphLookupStore store) => base.CreateTextBuilder(glyphStore);
+
+            private class LegacyGlyphStore : ITexturedGlyphLookupStore
             {
-                string textureName = $"{font}-{c}";
+                private readonly TextureStore textures;
 
-                // Approximate value that brings character sizing roughly in-line with stable
-                float ratio = 36;
-
-                var texture = textures.Get($"{textureName}@2x");
-
-                if (texture == null)
+                public LegacyGlyphStore(TextureStore textures)
                 {
-                    ratio = 18;
-                    texture = textures.Get(textureName);
+                    this.textures = textures;
                 }
 
-                if (texture != null)
-                    texture.ScaleAdjust = ratio;
+                public ITexturedCharacterGlyph Get(string fontName, char character)
+                {
+                    string textureName = $"{fontName}-{character}";
 
-                return texture;
+                    // Approximate value that brings character sizing roughly in-line with stable
+                    float ratio = 36;
+
+                    var texture = textures.Get($"{textureName}@2x");
+
+                    if (texture == null)
+                    {
+                        ratio = 18;
+                        texture = textures.Get(textureName);
+                    }
+
+                    if (texture != null)
+                        texture.ScaleAdjust = ratio;
+
+                    return new TexturedCharacterGlyph(new CharacterGlyph(character, 0, 0, texture?.Width ?? 0, null), texture, 1f / ratio);
+                }
+
+                public Task<ITexturedCharacterGlyph> GetAsync(string fontName, char character) => Task.Run(() => Get(fontName, character));
             }
         }
 
