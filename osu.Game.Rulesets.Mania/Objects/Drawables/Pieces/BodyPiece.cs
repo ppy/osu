@@ -26,14 +26,14 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables.Pieces
 
         public BodyPiece()
         {
-            Blending = BlendingMode.Additive;
+            Blending = BlendingParameters.Additive;
 
             Children = new[]
             {
                 Background = new Box { RelativeSizeAxes = Axes.Both },
                 Foreground = new BufferedContainer
                 {
-                    Blending = BlendingMode.Additive,
+                    Blending = BlendingParameters.Additive,
                     RelativeSizeAxes = Axes.Both,
                     CacheDrawnFrameBuffer = true,
                     Children = new Drawable[]
