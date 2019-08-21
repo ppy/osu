@@ -55,7 +55,6 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
                     Child = new Container
                     {
                         RelativeSizeAxes = Axes.Both,
-                        // TODO: support skin filename animation (sliderb0, sliderb1...)
                         Child = new SkinnableDrawable("Play/osu/sliderball", _ => new DefaultSliderBall()),
                     }
                 }
@@ -168,9 +167,20 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
             return action == OsuAction.LeftButton || action == OsuAction.RightButton;
         }
 
+        private Vector2? lastPosition;
+
         public void UpdateProgress(double completionProgress)
         {
-            Position = slider.CurvePositionAt(completionProgress);
+            var newPos = slider.CurvePositionAt(completionProgress);
+
+            var diff = lastPosition.HasValue ? lastPosition.Value - newPos : newPos - slider.CurvePositionAt(completionProgress + 0.01f);
+            if (diff == Vector2.Zero)
+                return;
+
+            Position = newPos;
+            Rotation = -90 + (float)(-Math.Atan2(diff.X, diff.Y) * 180 / Math.PI);
+
+            lastPosition = newPos;
         }
 
         private class FollowCircleContainer : Container
