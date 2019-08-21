@@ -35,7 +35,7 @@ namespace osu.Game.Screens.Play.HitErrorDisplay
         private readonly SpriteIcon arrow;
         private readonly FillFlowContainer<Box> bar;
         private readonly Container judgementsContainer;
-        private readonly Queue<double> judgementOffsets = new Queue<double>();
+        private readonly List<double> judgementOffsets = new List<double>();
         private readonly double maxHitWindows;
 
         public BarHitErrorDisplay(HitWindows hitWindows, bool reversed = false)
@@ -154,14 +154,23 @@ namespace osu.Game.Screens.Play.HitErrorDisplay
 
         private float getRelativeJudgementPosition(double value) => (float)(value / maxHitWindows);
 
+        private double sum = 0;
+
         private float calculateArrowPosition(JudgementResult newJudgement)
         {
+            var offset = newJudgement.TimeOffset;
+
+            sum += offset;
+
+            judgementOffsets.Add(offset);
+
             if (judgementOffsets.Count > stored_judgements_amount)
-                judgementOffsets.Dequeue();
+            {
+                sum -= judgementOffsets[0];
+                judgementOffsets.RemoveAt(0);
+            }
 
-            judgementOffsets.Enqueue(newJudgement.TimeOffset);
-
-            return getRelativeJudgementPosition(judgementOffsets.Average());
+            return getRelativeJudgementPosition(sum / stored_judgements_amount);
         }
     }
 }
