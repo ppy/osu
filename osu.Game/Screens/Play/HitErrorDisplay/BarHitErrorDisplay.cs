@@ -14,6 +14,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics.Colour;
 using osu.Game.Graphics;
 using osu.Framework.Extensions.Color4Extensions;
+using System.Linq;
 
 namespace osu.Game.Screens.Play.HitErrorDisplay
 {
@@ -153,21 +154,17 @@ namespace osu.Game.Screens.Play.HitErrorDisplay
 
         private float getRelativeJudgementPosition(double value) => (float)(value / maxHitWindows);
 
-        private double sum;
-
         private float calculateArrowPosition(JudgementResult newJudgement)
         {
-            var offset = newJudgement.TimeOffset;
+            judgementOffsets.Add(newJudgement.TimeOffset);
 
-            sum += offset;
+            if (judgementOffsets.Count < stored_judgements_amount)
+                return getRelativeJudgementPosition(judgementOffsets.Average());
 
-            judgementOffsets.Add(offset);
+            double sum = 0;
 
-            if (judgementOffsets.Count > stored_judgements_amount)
-            {
-                sum -= judgementOffsets[0];
-                judgementOffsets.RemoveAt(0);
-            }
+            for (int i = judgementOffsets.Count - stored_judgements_amount; i < judgementOffsets.Count; i++)
+                sum += judgementOffsets[i];
 
             return getRelativeJudgementPosition(sum / stored_judgements_amount);
         }
