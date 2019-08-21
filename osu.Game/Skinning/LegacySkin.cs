@@ -1,4 +1,4 @@
-﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
@@ -317,7 +317,7 @@ namespace osu.Game.Skinning
                     if (texture == null)
                         return null;
 
-                    return new TexturedCharacterGlyph(new CharacterGlyph(character, 0, 0, texture?.Width ?? 0, null), texture, 1f / texture.ScaleAdjust);
+                    return new TexturedCharacterGlyph(new CharacterGlyph(character, 0, 0, texture.Width, null), texture, 1f / texture.ScaleAdjust);
                 }
 
                 public Task<ITexturedCharacterGlyph> GetAsync(string fontName, char character) => Task.Run(() => Get(fontName, character));
