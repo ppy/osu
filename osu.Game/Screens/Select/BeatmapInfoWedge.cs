@@ -402,31 +402,35 @@ namespace osu.Game.Screens.Select
                 }
             }
 
-            private class DifficultyColourBar : DifficultyColouredContainer
+            private class DifficultyColourBar : Container
             {
+                private readonly BeatmapInfo beatmap;
+
                 public DifficultyColourBar(BeatmapInfo beatmap)
-                    : base(beatmap)
                 {
+                    this.beatmap = beatmap;
                 }
 
                 [BackgroundDependencyLoader]
-                private void load()
+                private void load(OsuColour colours)
                 {
                     const float full_opacity_ratio = 0.7f;
+
+                    var difficultyColour = colours.ForDifficultyRating(beatmap.DifficultyRating);
 
                     Children = new Drawable[]
                     {
                         new Box
                         {
                             RelativeSizeAxes = Axes.Both,
-                            Colour = AccentColour,
+                            Colour = difficultyColour,
                             Width = full_opacity_ratio,
                         },
                         new Box
                         {
                             RelativeSizeAxes = Axes.Both,
                             RelativePositionAxes = Axes.Both,
-                            Colour = AccentColour,
+                            Colour = difficultyColour,
                             Alpha = 0.5f,
                             X = full_opacity_ratio,
                             Width = 1 - full_opacity_ratio,
