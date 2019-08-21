@@ -380,7 +380,7 @@ namespace osu.Game.Skinning
                     new Sprite
                     {
                         Texture = skin.GetTexture("sliderb-spec"),
-                        Blending = BlendingMode.Additive,
+                        Blending = BlendingParameters.Additive,
                     },
                 };
             }
