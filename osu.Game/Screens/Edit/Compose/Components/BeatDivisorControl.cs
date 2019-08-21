@@ -360,7 +360,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
                             Origin = Anchor.BottomCentre,
                             Anchor = Anchor.BottomCentre,
                             Colour = ColourInfo.GradientVertical(Color4.White.Opacity(0.2f), Color4.White),
-                            Blending = BlendingMode.Additive,
+                            Blending = BlendingParameters.Additive,
                         },
                         new EquilateralTriangle
                         {

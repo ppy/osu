@@ -32,7 +32,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
             Size = new Vector2(OsuHitObject.OBJECT_RADIUS * 2);
 
-            Blending = BlendingMode.Additive;
+            Blending = BlendingParameters.Additive;
             Origin = Anchor.Centre;
 
             InternalChild = scaleContainer = new SkinnableDrawable("Play/osu/reversearrow", _ => new SpriteIcon

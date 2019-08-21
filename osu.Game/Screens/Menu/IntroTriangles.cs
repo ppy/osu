@@ -296,7 +296,7 @@ namespace osu.Game.Screens.Menu
                 {
                     Colour = Color4.White;
                     RelativeSizeAxes = Axes.Both;
-                    Blending = BlendingMode.Additive;
+                    Blending = BlendingParameters.Additive;
                 }
 
                 protected override void LoadComplete()
@@ -399,11 +399,11 @@ namespace osu.Game.Screens.Menu
                                 Origin = Anchor.Centre,
                                 Colour = Color4.Black,
                                 Size = new Vector2(size - 5),
-                                Blending = BlendingMode.None,
+                                Blending = BlendingParameters.None,
                             });
                         }
 
-                        Blending = BlendingMode.Additive;
+                        Blending = BlendingParameters.Additive;
                         CacheDrawnFrameBuffer = true;
                     }
                 }

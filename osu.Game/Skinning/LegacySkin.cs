@@ -1,4 +1,4 @@
-﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
@@ -16,6 +16,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.IO.Stores;
+using osu.Framework.Text;
 using osu.Game.Database;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
@@ -148,7 +149,7 @@ namespace osu.Game.Skinning
                 case "Play/osu/number-text":
                     return !hasFont(Configuration.HitCircleFont)
                         ? null
-                        : new LegacySpriteText(Textures, Configuration.HitCircleFont)
+                        : new LegacySpriteText(this, Configuration.HitCircleFont)
                         {
                             Scale = new Vector2(0.96f),
                             // Spacing value was reverse-engineered from the ratio of the rendered sprite size in the visual inspector vs the actual texture size
@@ -283,37 +284,43 @@ namespace osu.Game.Skinning
 
         private class LegacySpriteText : OsuSpriteText
         {
-            private readonly TextureStore textures;
-            private readonly string font;
+            private readonly LegacyGlyphStore glyphStore;
 
-            public LegacySpriteText(TextureStore textures, string font)
+            public LegacySpriteText(ISkin skin, string font)
             {
-                this.textures = textures;
-                this.font = font;
-
                 Shadow = false;
                 UseFullGlyphHeight = false;
+
+                Font = new FontUsage(font, OsuFont.DEFAULT_FONT_SIZE);
+                glyphStore = new LegacyGlyphStore(skin);
             }
 
-            protected override Texture GetTextureForCharacter(char c)
+            protected override TextBuilder CreateTextBuilder(ITexturedGlyphLookupStore store) => base.CreateTextBuilder(glyphStore);
+
+            private class LegacyGlyphStore : ITexturedGlyphLookupStore
             {
-                string textureName = $"{font}-{c}";
+                private readonly ISkin skin;
 
-                // Approximate value that brings character sizing roughly in-line with stable
-                float ratio = 36;
-
-                var texture = textures.Get($"{textureName}@2x");
-
-                if (texture == null)
+                public LegacyGlyphStore(ISkin skin)
                 {
-                    ratio = 18;
-                    texture = textures.Get(textureName);
+                    this.skin = skin;
                 }
 
-                if (texture != null)
-                    texture.ScaleAdjust = ratio;
+                public ITexturedCharacterGlyph Get(string fontName, char character)
+                {
+                    var texture = skin.GetTexture($"{fontName}-{character}");
 
-                return texture;
+                    if (texture != null)
+                        // Approximate value that brings character sizing roughly in-line with stable
+                        texture.ScaleAdjust *= 18;
+
+                    if (texture == null)
+                        return null;
+
+                    return new TexturedCharacterGlyph(new CharacterGlyph(character, 0, 0, texture.Width, null), texture, 1f / texture.ScaleAdjust);
+                }
+
+                public Task<ITexturedCharacterGlyph> GetAsync(string fontName, char character) => Task.Run(() => Get(fontName, character));
             }
         }
 
@@ -373,7 +380,7 @@ namespace osu.Game.Skinning
                     new Sprite
                     {
                         Texture = skin.GetTexture("sliderb-spec"),
-                        Blending = BlendingMode.Additive,
+                        Blending = BlendingParameters.Additive,
                     },
                 };
             }

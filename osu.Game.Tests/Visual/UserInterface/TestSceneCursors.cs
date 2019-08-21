@@ -249,7 +249,7 @@ namespace osu.Game.Tests.Visual.UserInterface
                     Size = new Vector2(50);
                     Masking = true;
 
-                    Blending = BlendingMode.Additive;
+                    Blending = BlendingParameters.Additive;
                     Alpha = 0.5f;
 
                     Child = new Box { RelativeSizeAxes = Axes.Both };
