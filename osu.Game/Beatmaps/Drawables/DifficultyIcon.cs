@@ -86,11 +86,6 @@ namespace osu.Game.Beatmaps.Drawables
 
             private readonly FillFlowContainer difficultyFlow;
 
-            public string TooltipText
-            {
-                set { }
-            }
-
             public DifficultyIconTooltip()
             {
                 AutoSizeAxes = Axes.Both;
@@ -166,10 +161,6 @@ namespace osu.Game.Beatmaps.Drawables
                 difficultyFlow.Colour = colours.ForDifficultyRating(beatmap.DifficultyRating);
 
                 return true;
-            }
-
-            public void Refresh()
-            {
             }
 
             public void Move(Vector2 pos) => Position = pos;
