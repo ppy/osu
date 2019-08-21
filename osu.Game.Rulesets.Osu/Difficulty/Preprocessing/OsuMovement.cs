@@ -103,10 +103,11 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
         private const double tRatioThreshold = 1.4;
         private const double correction0Still = 0.2;
 
+        public double RawMT { get; private set; }
         public double D { get; private set; }
         public double MT { get; private set; }
 
-        
+
         public OsuMovement(OsuHitObject obj0, OsuHitObject obj1, OsuHitObject obj2, OsuHitObject obj3,
                            Vector<double> tapStrain, double clockRate)
         {
@@ -117,6 +118,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
             double t12 = (obj2.StartTime - obj1.StartTime) / clockRate / 1000.0;
             double ip12 = FittsLaw.CalculateIP(d12, t12);
 
+            RawMT = t12;
 
             var s01 = Vector<double>.Build.Dense(2);
             var s23 = Vector<double>.Build.Dense(2);

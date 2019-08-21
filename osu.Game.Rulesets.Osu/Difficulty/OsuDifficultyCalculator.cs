@@ -40,14 +40,19 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             if (beatmap.HitObjects.Count == 0)
                 return new OsuDifficultyAttributes { Mods = mods};
 
+            double mapLength = (beatmap.HitObjects.Last().StartTime - beatmap.HitObjects.First().StartTime) / 1000;
+
             (var strainHistory, var maxTapStrain) = calculateTapStrain(hitObjectsNoSpinner, clockRate);
             double tapDiff = maxTapStrain.Average();
 
             IEnumerable<OsuMovement> movements = Aim.CreateMovements(hitObjectsNoSpinner, clockRate, strainHistory);
-            double aimDiff = Aim.CalculateThroughput(movements);
+
+            double aimDiff = Aim.CalculateFCProbTP(movements);
+            double fcTimeAimDiff = Aim.CalculateFCTimeTP(movements, mapLength);
 
             double tapSR = tapMultiplier * Math.Pow(tapDiff, srExponent);
             double aimSR = aimMultiplier * Math.Pow(aimDiff, srExponent);
+            double fcTimeAimSR = aimMultiplier * Math.Pow(fcTimeAimDiff, srExponent);
             double sr = Mean.PowerMean(tapSR, aimSR, 7) * 1.069;
 
             // Todo: These int casts are temporary to achieve 1:1 results with osu!stable, and should be removed in the future
@@ -63,6 +68,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 StarRating = sr,
                 Mods = mods,
                 AimStrain = aimSR,
+                FcTimeAimSR = fcTimeAimSR,
                 SpeedStrain = tapSR,
                 ApproachRate = preempt > 1200 ? (1800 - preempt) / 120 : (1200 - preempt) / 150 + 5,
                 OverallDifficulty = (80 - hitWindowGreat) / 6,

@@ -68,9 +68,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             double accuracyValue = computeAccuracyValue();
             double totalValue =
                 Math.Pow(
-                    Math.Pow(aimValue, 1.1f) +
-                    Math.Pow(speedValue, 1.1f) +
-                    Math.Pow(accuracyValue, 1.1f), 1.0f / 1.1f
+                    Math.Pow(aimValue, 2f) +
+                    Math.Pow(speedValue, 2f) +
+                    Math.Pow(accuracyValue, 2f), 1.0f / 2f
                 ) * multiplier;
 
             if (categoryRatings != null)
@@ -88,12 +88,12 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
         private double computeAimValue()
         {
-            double rawAim = Attributes.AimStrain;
+            double rawAim = Attributes.FcTimeAimSR;
 
             if (mods.Any(m => m is OsuModTouchDevice))
                 rawAim = Math.Pow(rawAim, 0.8);
 
-            double aimValue = Math.Pow(5.0f * Math.Max(1.0f, rawAim / 0.0675f) - 4.0f, 3.0f) / 100000.0f;
+            double aimValue = Math.Pow(37 * rawAim, 3.0f) / 100000.0f * 1.6;
 
             // Longer maps are worth more
             double lengthBonus = 0.95f + 0.4f * Math.Min(1.0f, totalHits / 2000.0f) +
@@ -143,7 +143,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
         private double computeSpeedValue()
         {
-            double speedValue = Math.Pow(5.0f * Math.Max(1.0f, Attributes.SpeedStrain / 0.0675f) - 4.0f, 3.0f) / 100000.0f;
+            double speedValue = Math.Pow(37 * Attributes.SpeedStrain, 3.0f) / 100000.0f * 1.6;
 
             // Longer maps are worth more
             speedValue *= 0.95f + 0.4f * Math.Min(1.0f, totalHits / 2000.0f) +
@@ -190,7 +190,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             // Lots of arbitrary values from testing.
             // Considering to use derivation from perfect accuracy in a probabilistic manner - assume normal distribution
-            double accuracyValue = Math.Pow(1.52163f, Attributes.OverallDifficulty) * Math.Pow(betterAccuracyPercentage, 24) * 2.83f;
+            double accuracyValue = Math.Pow(1.52163f, Attributes.OverallDifficulty) * Math.Pow(betterAccuracyPercentage, 24) * 2.5;
 
             // Bonus for many hitcircles - it's harder to keep good accuracy up for longer
             accuracyValue *= Math.Min(1.15f, Math.Pow(amountHitObjectsWithAccuracy / 1000.0f, 0.3f));

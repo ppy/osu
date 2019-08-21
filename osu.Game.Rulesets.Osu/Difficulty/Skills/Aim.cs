@@ -13,7 +13,7 @@ using osu.Game.Rulesets.Difficulty.Skills;
 using osu.Game.Rulesets.Osu.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Difficulty.MathUtil;
-
+using System.Linq;
 
 namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 {
@@ -23,6 +23,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
     public class Aim : Skill
     {
         private const double probabilityThreshold = 0.02;
+        private const double timeThreshold = 3600;
         private const double tpMin = 0.1;
         private const double tpMax = 100;
         private const double tpPrecision = 1e-8;
@@ -46,33 +47,65 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             return movements;
         }
 
-        public static double CalculateThroughput(IEnumerable<OsuMovement> movements)
+        public static double CalculateFCProbTP(IEnumerable<OsuMovement> movements)
         {
-            double fcProbabilityTPMin = calculateFCProbability(movements, tpMin);
+            double fcProbabilityTPMin = calculateFCProb(movements, tpMin);
 
             if (fcProbabilityTPMin >= probabilityThreshold)
                 return tpMin;
 
-            double fcProbabilityTPMax = calculateFCProbability(movements, tpMax);
+            double fcProbabilityTPMax = calculateFCProb(movements, tpMax);
 
             if (fcProbabilityTPMax <= probabilityThreshold)
                 return tpMax;
 
-            Func<double, double> fcProbMinusThreshold = tp => calculateFCProbability(movements, tp) - probabilityThreshold;
+            Func<double, double> fcProbMinusThreshold = tp => calculateFCProb(movements, tp) - probabilityThreshold;
             return Brent.FindRoot(fcProbMinusThreshold, tpMin, tpMax, tpPrecision);
         }
 
-        private static double calculateFCProbability(IEnumerable<OsuMovement> movements, double tp)
+        public static double CalculateFCTimeTP(IEnumerable<OsuMovement> movements, double mapLength)
         {
-            double fcProbability = 1;
+            
+            double maxFCTime = calculateFCTime(movements, mapLength, tpMin);
+
+            if (maxFCTime <= timeThreshold)
+                return tpMin;
+
+            double minFCTime = calculateFCTime(movements, mapLength, tpMax);
+
+            if (minFCTime >= timeThreshold)
+                return tpMax;
+
+            Func<double, double> fcTimeMinusThreshold = tp => calculateFCTime(movements, mapLength, tp) - timeThreshold;
+            return Brent.FindRoot(fcTimeMinusThreshold, tpMin, tpMax, tpPrecision);
+
+        }
+
+        private static double calculateFCProb(IEnumerable<OsuMovement> movements, double tp)
+        {
+            double fcProb = 1;
 
             foreach (OsuMovement movement in movements)
             {
-                double hitProbability = FittsLaw.CalculateHitProbability(movement.D, movement.MT, tp);
-                fcProbability *= hitProbability;
+                double hitProb = FittsLaw.CalculateHitProb(movement.D, movement.MT, tp);
+                fcProb *= hitProb;
             }
-            return fcProbability;
+            return fcProb;
         }
+
+        private static double calculateFCTime(IEnumerable<OsuMovement> movements, double mapLength, double tp)
+        {
+            double fcTime = 0;
+
+            foreach (OsuMovement movement in movements)
+            {
+                double hitProb = FittsLaw.CalculateHitProb(movement.D, movement.MT, tp);
+                fcTime = (fcTime + movement.RawMT) / hitProb;
+            }
+
+            return fcTime;
+        }
+
 
 
         protected override double SkillMultiplier => throw new NotImplementedException();

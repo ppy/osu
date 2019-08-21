@@ -16,7 +16,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.MathUtil
             return Math.Log(relativeD + 1, 2) / mt;
         }
 
-        public static double CalculateHitProbability(double d, double mt, double tp)
+        public static double CalculateHitProb(double d, double mt, double tp)
         {
             if (d == 0)
                 return 1.0;
