@@ -28,7 +28,6 @@ desc 'Deploy to play store'
   end
 
   lane :update_version do |options|
-    options[:plist_path] = '../osu.iOS/Info.plist'
     app_version(options)
   end
 
