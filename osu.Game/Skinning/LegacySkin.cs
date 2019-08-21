@@ -1,4 +1,4 @@
-﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
@@ -11,6 +11,7 @@ using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Animations;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
@@ -76,8 +77,13 @@ namespace osu.Game.Skinning
             Samples?.Dispose();
         }
 
+        private const double default_frame_time = 1000 / 60d;
+
         public override Drawable GetDrawableComponent(string componentName)
         {
+            bool animatable = false;
+            bool looping = true;
+
             switch (componentName)
             {
                 case "Play/osu/cursor":
@@ -98,20 +104,32 @@ namespace osu.Game.Skinning
 
                     return null;
 
+                case "Play/osu/sliderfollowcircle":
+                    animatable = true;
+                    break;
+
                 case "Play/Miss":
                     componentName = "hit0";
+                    animatable = true;
+                    looping = false;
                     break;
 
                 case "Play/Meh":
                     componentName = "hit50";
+                    animatable = true;
+                    looping = false;
                     break;
 
                 case "Play/Good":
                     componentName = "hit100";
+                    animatable = true;
+                    looping = false;
                     break;
 
                 case "Play/Great":
                     componentName = "hit300";
+                    animatable = true;
+                    looping = false;
                     break;
 
                 case "Play/osu/number-text":
@@ -125,15 +143,42 @@ namespace osu.Game.Skinning
                         };
             }
 
-            // temporary allowance is given for skins the fact that stable handles non-animatable items such as hitcircles (incorrectly)
-            // by (incorrectly) displaying the first frame of animation rather than the non-animated version.
-            // users have used this to "hide" certain elements like hit300.
-            var texture = GetTexture($"{componentName}-0") ?? GetTexture(componentName);
+            return getAnimation(componentName, animatable, looping);
+        }
 
-            if (texture == null)
-                return null;
+        private Drawable getAnimation(string componentName, bool animatable, bool looping, string animationSeparator = "-")
+        {
+            Texture texture;
 
-            return new Sprite { Texture = texture };
+            Texture getFrameTexture(int frame) => GetTexture($"{componentName}{animationSeparator}{frame}");
+
+            TextureAnimation animation = null;
+
+            if (animatable)
+            {
+                for (int i = 0;; i++)
+                {
+                    if ((texture = getFrameTexture(i)) == null)
+                        break;
+
+                    if (animation == null)
+                        animation = new TextureAnimation
+                        {
+                            DefaultFrameLength = default_frame_time,
+                            Repeat = looping
+                        };
+
+                    animation.AddFrame(texture);
+                }
+            }
+
+            if (animation != null)
+                return animation;
+
+            if ((texture = GetTexture(componentName)) != null)
+                return new Sprite { Texture = texture };
+
+            return null;
         }
 
         public class LegacySliderBall : Sprite
