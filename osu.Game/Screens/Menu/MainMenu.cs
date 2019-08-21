@@ -104,13 +104,10 @@ namespace osu.Game.Screens.Menu
 
         public void LoadToSolo() => Schedule(onSolo);
 
-        private void onSolo() => this.Push(consumeSongSelect());
-
-        private Screen consumeSongSelect()
+        private void onSolo()
         {
-            var s = songSelect;
+            this.Push(songSelect);
             songSelect = null;
-            return s;
         }
 
         public override void OnEntering(IScreen last)
