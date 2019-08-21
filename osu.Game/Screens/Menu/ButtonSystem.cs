@@ -1,9 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using osu.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
@@ -27,6 +24,9 @@ using osu.Game.Overlays.Notifications;
 using osuTK;
 using osuTK.Graphics;
 using osuTK.Input;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace osu.Game.Screens.Menu
 {
@@ -240,6 +240,7 @@ namespace osu.Game.Screens.Menu
         private ButtonSystemState state = ButtonSystemState.Initial;
 
         public override bool HandleNonPositionalInput => state != ButtonSystemState.Exit;
+
         public override bool HandlePositionalInput => state != ButtonSystemState.Exit;
 
         public ButtonSystemState State
@@ -299,7 +300,7 @@ namespace osu.Game.Screens.Menu
                 case ButtonSystemState.Play:
                     switch (lastState)
                     {
-                        case ButtonSystemState.TopLevel: // coming from toplevel to play
+                        case ButtonSystemState.TopLevel: // coming from top level to play
                             break;
 
                         case ButtonSystemState.Initial:

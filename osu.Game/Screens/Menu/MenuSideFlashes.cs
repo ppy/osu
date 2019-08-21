@@ -1,9 +1,9 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using osuTK.Graphics;
 using osu.Framework.Allocation;
 using osu.Framework.Audio.Track;
+using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
@@ -12,11 +12,10 @@ using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
-using osu.Game.Skinning;
 using osu.Game.Online.API;
+using osu.Game.Skinning;
 using osu.Game.Users;
-using System;
-using osu.Framework.Bindables;
+using osuTK.Graphics;
 
 namespace osu.Game.Screens.Menu
 {
@@ -67,6 +66,7 @@ namespace osu.Game.Screens.Menu
                     RelativeSizeAxes = Axes.Y,
                     Width = box_width * 2,
                     Height = 1.5f,
+
                     // align off-screen to make sure our edges don't become visible during parallax.
                     X = -box_width,
                     Alpha = 0,
@@ -102,7 +102,7 @@ namespace osu.Game.Screens.Menu
 
         private void flash(Drawable d, double beatLength, bool kiai, TrackAmplitudes amplitudes)
         {
-            d.FadeTo(Math.Max(0, ((d.Equals(leftBox) ? amplitudes.LeftChannel : amplitudes.RightChannel) - amplitude_dead_zone) / (kiai ? kiai_multiplier : alpha_multiplier)), box_fade_in_time)
+            d.FadeTo(System.Math.Max(0, ((d.Equals(leftBox) ? amplitudes.LeftChannel : amplitudes.RightChannel) - amplitude_dead_zone) / (kiai ? kiai_multiplier : alpha_multiplier)), box_fade_in_time)
              .Then()
              .FadeOut(beatLength, Easing.In);
         }

@@ -5,9 +5,9 @@ using osu.Framework.Allocation;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Audio.Track;
 using osu.Framework.Bindables;
-using osu.Framework.Screens;
 using osu.Framework.Graphics;
 using osu.Framework.MathUtils;
+using osu.Framework.Screens;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.IO.Archives;
@@ -61,8 +61,8 @@ namespace osu.Game.Screens.Menu
                 welcome = samples.Get(@"welcome");
         }
 
-        private const double delay_step_one = 2300;
-        private const double delay_step_two = 600;
+        private const int delay_step_one = 2300;
+        private const int delay_step_two = 600;
 
         protected override void LogoArriving(OsuLogo logo, bool resuming)
         {
@@ -77,7 +77,7 @@ namespace osu.Game.Screens.Menu
 
                 Scheduler.AddDelayed(delegate
                 {
-                    // Only start the current track if it is the menu music. A beatmap's track is started when entering the Main Manu.
+                    // Only start the current track if it is the menu music. A beatmap's track is started when entering the Main Menu.
                     if (menuMusic.Value)
                     {
                         track.Restart();

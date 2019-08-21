@@ -1,13 +1,13 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
 using osu.Framework;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics;
 using osuTK;
+using System;
 
 namespace osu.Game.Screens.Menu
 {
@@ -20,7 +20,7 @@ namespace osu.Game.Screens.Menu
         private readonly ButtonAreaBackground buttonAreaBackground;
         private Visibility state;
 
-        public const float BUTTON_AREA_HEIGHT = 100;
+        public const int BUTTON_AREA_HEIGHT = 100;
 
         public ButtonArea()
         {
@@ -72,6 +72,7 @@ namespace osu.Game.Screens.Menu
         public Visibility State
         {
             get => state;
+
             set
             {
                 if (value == state) return;
@@ -104,6 +105,7 @@ namespace osu.Game.Screens.Menu
             public ButtonAreaBackgroundState State
             {
                 get => state;
+
                 set
                 {
                     if (value == state) return;

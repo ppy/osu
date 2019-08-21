@@ -1,7 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
@@ -20,11 +19,12 @@ using osu.Game.Graphics.Containers;
 using osuTK;
 using osuTK.Graphics;
 using osuTK.Input;
+using System;
 
 namespace osu.Game.Screens.Menu
 {
     /// <summary>
-    /// osu! logo and its attachments (pulsing, visualiser etc.)
+    /// osu! logo and its attachments (pulsing, visualizer etc.)
     /// </summary>
     public class OsuLogo : BeatSyncedContainer
     {
@@ -229,7 +229,7 @@ namespace osu.Game.Screens.Menu
         }
 
         /// <summary>
-        /// Schedule a new extenral animation. Handled queueing and finishing previous animations in a sane way.
+        /// Schedule a new external animation. Handled queuing and finishing previous animations in a sane way.
         /// </summary>
         /// <param name="action">The animation to be performed</param>
         /// <param name="waitForPrevious">If true, the new animation is delayed until all previous transforms finish. If false, existing transformed are cleared.</param>

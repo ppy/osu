@@ -59,7 +59,8 @@ namespace osu.Game.Screens.Menu
         {
             this.FadeIn(300);
 
-            double fadeOutTime = EXIT_DELAY;
+            int fadeOutTime = EXIT_DELAY;
+
             //we also handle the exit transition.
             if (menuVoice.Value)
                 seeya.Play();
@@ -109,7 +110,9 @@ namespace osu.Game.Screens.Menu
 
         protected void PrepareMenuLoad()
         {
-            LoadComponentAsync(mainMenu = new MainMenu());
+            mainMenu = new MainMenu();
+
+            LoadComponentAsync(mainMenu);
         }
 
         protected void LoadMenu()

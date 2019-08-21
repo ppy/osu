@@ -1,8 +1,9 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using osuTK;
-using osuTK.Graphics;
+using osu.Framework.Allocation;
+using osu.Framework.Bindables;
+using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Batches;
 using osu.Framework.Graphics.Colour;
@@ -12,13 +13,12 @@ using osu.Framework.Graphics.Shaders;
 using osu.Framework.Graphics.Textures;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
-using osu.Game.Skinning;
 using osu.Game.Online.API;
+using osu.Game.Skinning;
 using osu.Game.Users;
+using osuTK;
+using osuTK.Graphics;
 using System;
-using osu.Framework.Allocation;
-using osu.Framework.Bindables;
-using osu.Framework.Extensions.Color4Extensions;
 
 namespace osu.Game.Screens.Menu
 {
@@ -32,29 +32,29 @@ namespace osu.Game.Screens.Menu
         private const int index_change = 5;
 
         /// <summary>
-        /// The maximum length of each bar in the visualiser. Will be reduced when kiai is not activated.
+        /// The maximum length of each bar in the visualizer. Will be reduced when kiai is not activated.
         /// </summary>
-        private const float bar_length = 600;
+        private const int bar_length = 600;
 
         /// <summary>
-        /// The number of bars in one rotation of the visualiser.
+        /// The number of bars in one rotation of the visualizer.
         /// </summary>
         private const int bars_per_visualiser = 200;
 
         /// <summary>
         /// How many times we should stretch around the circumference (overlapping overselves).
         /// </summary>
-        private const float visualiser_rounds = 5;
+        private const int visualiser_rounds = 5;
 
         /// <summary>
-        /// How much should each bar go down each milisecond (based on a full bar).
+        /// How much should each bar go down each millisecond (based on a full bar).
         /// </summary>
         private const float decay_per_milisecond = 0.0024f;
 
         /// <summary>
         /// Number of milliseconds between each amplitude update.
         /// </summary>
-        private const float time_between_updates = 50;
+        private const int time_between_updates = 50;
 
         /// <summary>
         /// The minimum amplitude to show a bar.
@@ -161,7 +161,7 @@ namespace osu.Game.Screens.Menu
             private IShader shader;
             private Texture texture;
 
-            //Asuming the logo is a circle, we don't need a second dimension.
+            //Assuming the logo is a circle, we don't need a second dimension.
             private float size;
 
             private Color4 colour;
@@ -208,12 +208,15 @@ namespace osu.Game.Screens.Menu
                             float rotation = MathHelper.DegreesToRadians(i / (float)bars_per_visualiser * 360 + j * 360 / visualiser_rounds);
                             float rotationCos = (float)Math.Cos(rotation);
                             float rotationSin = (float)Math.Sin(rotation);
+
                             //taking the cos and sin to the 0..1 range
                             var barPosition = new Vector2(rotationCos / 2 + 0.5f, rotationSin / 2 + 0.5f) * size;
 
                             var barSize = new Vector2(size * (float)Math.Sqrt(2 * (1 - Math.Cos(MathHelper.DegreesToRadians(360f / bars_per_visualiser)))) / 2f, bar_length * audioData[i]);
+
                             //The distance between the position and the sides of the bar.
                             var bottomOffset = new Vector2(-rotationSin * barSize.X / 2, rotationCos * barSize.X / 2);
+
                             //The distance between the bottom side of the bar and the top side.
                             var amplitudeOffset = new Vector2(rotationCos * barSize.Y, rotationSin * barSize.Y);
 
@@ -230,6 +233,7 @@ namespace osu.Game.Screens.Menu
                                 colourInfo,
                                 null,
                                 vertexBatch.AddAction,
+
                                 //barSize by itself will make it smooth more in the X axis than in the Y axis, this reverts that.
                                 Vector2.Divide(inflation, barSize.Yx));
                         }

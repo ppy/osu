@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using osuTK;
-using osuTK.Graphics;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -17,14 +15,16 @@ using osu.Game.Screens.Charts;
 using osu.Game.Screens.Edit;
 using osu.Game.Screens.Multi;
 using osu.Game.Screens.Select;
+using osuTK;
+using osuTK.Graphics;
 
 namespace osu.Game.Screens.Menu
 {
     public class MainMenu : OsuScreen
     {
-        public const float FADE_IN_DURATION = 300;
+        public const int FADE_IN_DURATION = 300;
 
-        public const float FADE_OUT_DURATION = 400;
+        public const int FADE_OUT_DURATION = 400;
 
         public override bool HideOverlaysOnEnter => buttons == null || buttons.State == ButtonSystemState.Initial;
 
@@ -104,13 +104,10 @@ namespace osu.Game.Screens.Menu
 
         public void LoadToSolo() => Schedule(onSolo);
 
-        private void onSolo() => this.Push(consumeSongSelect());
-
-        private Screen consumeSongSelect()
+        private void onSolo()
         {
-            var s = songSelect;
+            this.Push(songSelect);
             songSelect = null;
-            return s;
         }
 
         public override void OnEntering(IScreen last)
