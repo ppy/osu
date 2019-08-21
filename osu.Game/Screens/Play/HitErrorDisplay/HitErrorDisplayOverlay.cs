@@ -8,7 +8,6 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
-using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Game.Rulesets.Objects;
 
 namespace osu.Game.Screens.Play.HitErrorDisplay
@@ -21,6 +20,9 @@ namespace osu.Game.Screens.Play.HitErrorDisplay
         private readonly Bindable<ScoreMeterType> type = new Bindable<ScoreMeterType>();
         private readonly HitWindows hitWindows;
         private readonly ScoreProcessor processor;
+
+        private BarHitErrorDisplay leftDisplay;
+        private BarHitErrorDisplay rightDisplay;
 
         public HitErrorDisplayOverlay(ScoreProcessor processor)
         {
@@ -43,38 +45,69 @@ namespace osu.Game.Screens.Play.HitErrorDisplay
 
         private void onTypeChanged(ValueChangedEvent<ScoreMeterType> type)
         {
-            clear();
-
             switch (type.NewValue)
             {
                 case ScoreMeterType.None:
+                    removeLeftDisplay();
+                    removeRightDisplay();
                     break;
 
                 case ScoreMeterType.HitErrorBoth:
-                    createNew();
-                    createNew(true);
+                    addLeftDisplay();
+                    addRightDisplay();
                     break;
 
                 case ScoreMeterType.HitErrorLeft:
-                    createNew();
+                    addLeftDisplay();
+                    removeRightDisplay();
                     break;
 
                 case ScoreMeterType.HitErrorRight:
-                    createNew(true);
+                    addRightDisplay();
+                    removeLeftDisplay();
                     break;
             }
         }
 
-        private void clear()
+        private void addLeftDisplay()
         {
-            Children.ForEach(t =>
-            {
-                processor.NewJudgement -= t.OnNewJudgement;
-                t.FadeOut(fade_duration, Easing.OutQuint).Expire();
-            });
+            if (leftDisplay != null)
+                return;
+
+            leftDisplay = createNew();
         }
 
-        private void createNew(bool reversed = false)
+        private void addRightDisplay()
+        {
+            if (rightDisplay != null)
+                return;
+
+            rightDisplay = createNew(true);
+        }
+
+        private void removeRightDisplay()
+        {
+            if (rightDisplay == null)
+                return;
+
+            processor.NewJudgement -= rightDisplay.OnNewJudgement;
+
+            rightDisplay.FadeOut(fade_duration, Easing.OutQuint).Expire();
+            rightDisplay = null;
+        }
+
+        private void removeLeftDisplay()
+        {
+            if (leftDisplay == null)
+                return;
+
+            processor.NewJudgement -= leftDisplay.OnNewJudgement;
+
+            leftDisplay.FadeOut(fade_duration, Easing.OutQuint).Expire();
+            leftDisplay = null;
+        }
+
+        private BarHitErrorDisplay createNew(bool reversed = false)
         {
             var display = new BarHitErrorDisplay(hitWindows, reversed)
             {
@@ -87,6 +120,7 @@ namespace osu.Game.Screens.Play.HitErrorDisplay
             processor.NewJudgement += display.OnNewJudgement;
             Add(display);
             display.FadeInFromZero(fade_duration, Easing.OutQuint);
+            return display;
         }
     }
 }
