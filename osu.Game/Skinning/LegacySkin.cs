@@ -1,4 +1,4 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
@@ -43,6 +43,8 @@ namespace osu.Game.Skinning
         public LegacySkin(SkinInfo skin, IResourceStore<byte[]> storage, AudioManager audioManager)
             : this(skin, new LegacySkinResourceStore<SkinFileInfo>(skin, storage), audioManager, "skin.ini")
         {
+            // defaults should only be applied for non-beatmap skins (which are parsed via this constructor).
+            if (!Configuration.CustomColours.ContainsKey("SliderBall")) Configuration.CustomColours["SliderBall"] = new Color4(2, 170, 255, 255);
         }
 
         private readonly bool hasHitCircle;
@@ -92,8 +94,20 @@ namespace osu.Game.Skinning
                     return null;
 
                 case "Play/osu/sliderball":
-                    if (GetTexture("sliderb") != null)
-                        return new LegacySliderBall();
+                    var sliderBallContent = getAnimation("sliderb", true, true, "");
+
+                    if (sliderBallContent != null)
+                    {
+                        var size = sliderBallContent.Size;
+
+                        sliderBallContent.RelativeSizeAxes = Axes.Both;
+                        sliderBallContent.Size = Vector2.One;
+
+                        return new LegacySliderBall(sliderBallContent)
+                        {
+                            Size = size
+                        };
+                    }
 
                     return null;
 
@@ -178,16 +192,6 @@ namespace osu.Game.Skinning
                 return new Sprite { Texture = texture };
 
             return null;
-        }
-
-        public class LegacySliderBall : Sprite
-        {
-            [BackgroundDependencyLoader]
-            private void load(ISkinSource skin)
-            {
-                Texture = skin.GetTexture("sliderb");
-                Colour = skin.GetValue<SkinConfiguration, Color4?>(s => s.CustomColours.ContainsKey("SliderBall") ? s.CustomColours["SliderBall"] : (Color4?)null) ?? Color4.White;
-            }
         }
 
         public override Texture GetTexture(string componentName)
@@ -340,6 +344,37 @@ namespace osu.Game.Skinning
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
                     }
+                };
+            }
+        }
+
+        public class LegacySliderBall : CompositeDrawable
+        {
+            private readonly Drawable animationContent;
+
+            public LegacySliderBall(Drawable animationContent)
+            {
+                this.animationContent = animationContent;
+            }
+
+            [BackgroundDependencyLoader]
+            private void load(ISkinSource skin, DrawableHitObject drawableObject)
+            {
+                animationContent.Colour = skin.GetValue<SkinConfiguration, Color4?>(s => s.CustomColours.ContainsKey("SliderBall") ? s.CustomColours["SliderBall"] : (Color4?)null) ?? Color4.White;
+
+                InternalChildren = new[]
+                {
+                    new Sprite
+                    {
+                        Texture = skin.GetTexture("sliderb-nd"),
+                        Colour = new Color4(5, 5, 5, 255),
+                    },
+                    animationContent,
+                    new Sprite
+                    {
+                        Texture = skin.GetTexture("sliderb-spec"),
+                        Blending = BlendingMode.Additive,
+                    },
                 };
             }
         }
