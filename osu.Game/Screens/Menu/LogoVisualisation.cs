@@ -76,7 +76,7 @@ namespace osu.Game.Screens.Menu
         public LogoVisualisation()
         {
             texture = Texture.WhitePixel;
-            Blending = BlendingMode.Additive;
+            Blending = BlendingParameters.Additive;
         }
 
         [BackgroundDependencyLoader]

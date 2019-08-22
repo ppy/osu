@@ -63,6 +63,15 @@ namespace osu.Game.Rulesets.UI
         public override GameplayClock FrameStableClock => frameStabilityContainer.GameplayClock;
 
         /// <summary>
+        /// Whether to enable frame-stable playback.
+        /// </summary>
+        internal bool FrameStablePlayback
+        {
+            get => frameStabilityContainer.FrameStablePlayback;
+            set => frameStabilityContainer.FrameStablePlayback = value;
+        }
+
+        /// <summary>
         /// Invoked when a <see cref="JudgementResult"/> has been applied by a <see cref="DrawableHitObject"/>.
         /// </summary>
         public event Action<JudgementResult> OnNewResult;
@@ -108,8 +117,6 @@ namespace osu.Game.Rulesets.UI
             RelativeSizeAxes = Axes.Both;
 
             Beatmap = (Beatmap<TObject>)workingBeatmap.GetPlayableBeatmap(ruleset.RulesetInfo, mods);
-
-            applyBeatmapMods(mods);
 
             KeyBindingInputManager = CreateInputManager();
             playfield = new Lazy<Playfield>(CreatePlayfield);
@@ -268,19 +275,6 @@ namespace osu.Game.Rulesets.UI
         protected abstract Playfield CreatePlayfield();
 
         public override ScoreProcessor CreateScoreProcessor() => new ScoreProcessor<TObject>(this);
-
-        /// <summary>
-        /// Applies the active mods to the Beatmap.
-        /// </summary>
-        /// <param name="mods"></param>
-        private void applyBeatmapMods(IReadOnlyList<Mod> mods)
-        {
-            if (mods == null)
-                return;
-
-            foreach (var mod in mods.OfType<IApplicableToBeatmap<TObject>>())
-                mod.ApplyToBeatmap(Beatmap);
-        }
 
         /// <summary>
         /// Applies the active mods to this DrawableRuleset.

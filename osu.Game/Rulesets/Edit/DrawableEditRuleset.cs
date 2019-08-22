@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Linq;
+using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Beatmaps;
@@ -57,7 +58,12 @@ namespace osu.Game.Rulesets.Edit
             this.drawableRuleset = drawableRuleset;
 
             InternalChild = drawableRuleset;
+        }
 
+        [BackgroundDependencyLoader]
+        private void load()
+        {
+            drawableRuleset.FrameStablePlayback = false;
             Playfield.DisplayJudgements.Value = false;
         }
 

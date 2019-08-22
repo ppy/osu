@@ -254,7 +254,7 @@ namespace osu.Game.Graphics.UserInterface
             colourContainer.Add(flash);
 
             flash.Colour = ButtonColour;
-            flash.Blending = BlendingMode.Additive;
+            flash.Blending = BlendingParameters.Additive;
             flash.Alpha = 0.3f;
             flash.FadeOutFromOne(click_duration);
             flash.Expire();
