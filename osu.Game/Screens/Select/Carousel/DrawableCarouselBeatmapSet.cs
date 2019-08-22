@@ -98,6 +98,7 @@ namespace osu.Game.Screens.Select.Carousel
                                 new FillFlowContainer<FilterableDifficultyIcon>
                                 {
                                     AutoSizeAxes = Axes.Both,
+                                    Spacing = new Vector2(3),
                                     Children = ((CarouselBeatmapSet)Item).Beatmaps.Select(b => new FilterableDifficultyIcon(b)).ToList()
                                 },
                             }
