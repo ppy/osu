@@ -142,9 +142,9 @@ namespace osu.Game.Overlays.Direct
             };
         }
 
-        protected List<Drawable> GetDifficultyChildren()
+        protected List<DifficultyIcon> GetDifficultyIcons()
         {
-            var children = new List<Drawable>();
+            var icons = new List<DifficultyIcon>();
 
             if (SetInfo.Beatmaps.Count > maximum_difficulty_icons)
             {
@@ -152,14 +152,14 @@ namespace osu.Game.Overlays.Direct
                 {
                     List<BeatmapInfo> list;
                     if ((list = SetInfo.Beatmaps.FindAll(b => b.Ruleset.Equals(ruleset))).Count > 0)
-                        children.Add(new DifficultyIconWithCounter(list, ruleset, this is DirectListPanel ? Color4.White : Color4.Black));
+                        icons.Add(new DifficultyIconWithCounter(list, ruleset, this is DirectListPanel ? Color4.White : Color4.Black));
                 }
             }
             else
                 foreach (var b in SetInfo.Beatmaps.OrderBy(beatmap => beatmap.StarDifficulty))
-                    children.Add(new DifficultyIcon(b));
+                    icons.Add(new DifficultyIcon(b));
 
-            return children;
+            return icons;
         }
 
         protected Drawable CreateBackground() => new UpdateableBeatmapSetCover
