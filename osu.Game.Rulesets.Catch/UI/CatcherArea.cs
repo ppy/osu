@@ -201,7 +201,7 @@ namespace osu.Game.Rulesets.Catch.UI
                 additive.Scale = Scale;
                 additive.Colour = HyperDashing ? Color4.Red : Color4.White;
                 additive.RelativePositionAxes = RelativePositionAxes;
-                additive.Blending = BlendingMode.Additive;
+                additive.Blending = BlendingParameters.Additive;
 
                 AdditiveTarget.Add(additive);
 
