@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
+using MathNet.Numerics;
 using MathNet.Numerics.Interpolation;
 
 using osu.Game.Beatmaps;
@@ -22,8 +23,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         public new OsuDifficultyAttributes Attributes => (OsuDifficultyAttributes)base.Attributes;
 
         private const double totalValueExponent = 1.5;
+        private const double fcBuffFactor = 0.1;
 
         private readonly int countHitCircles;
+        private readonly int countSliders;
         private readonly int beatmapMaxCombo;
 
         private Mod[] mods;
@@ -39,6 +42,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             : base(ruleset, beatmap, score)
         {
             countHitCircles = Beatmap.HitObjects.Count(h => h is HitCircle);
+            countSliders = Beatmap.HitObjects.Count(h => h is Slider);
 
             beatmapMaxCombo = Beatmap.HitObjects.Count;
             // Add the ticks + tail of the slider. 1 is subtracted because the "headcircle" would be counted twice (once for the slider itself in the line above)
@@ -93,32 +97,37 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
         private double computeAimValue()
         {
-            double tp;
+            // Guess the number of misaims from combo
+            int effectiveMissCount = Math.Max(countMiss, (int)(Math.Floor(0.9 * beatmapMaxCombo / scoreMaxCombo)));
 
-            if (countMiss == 0)
+            // Get player's throughput. Interpolate if there are misses.
+            double tp;
+            if (effectiveMissCount == 0)
                 tp = Attributes.missTPs[0];
             else
-                tp = LinearSpline.InterpolateSorted(Attributes.missCounts, Attributes.missTPs).Interpolate(countMiss);
-            
-
-
+                tp = LinearSpline.InterpolateSorted(Attributes.missCounts, Attributes.missTPs)
+                                      .Interpolate(effectiveMissCount);
 
             if (mods.Any(m => m is OsuModTouchDevice))
                 tp = Math.Pow(tp, 0.8);
 
-            double aimValue = Math.Pow(tp, 2.55) * 0.18;
+            double aimValue = Math.Pow(tp, 2.55) * 0.17;
 
-
-            double approachRateFactor = 1.0f;
-
-            if (Attributes.ApproachRate > 10.33f)
-                approachRateFactor += 0.3f * (Attributes.ApproachRate - 10.33f);
-            else if (Attributes.ApproachRate < 8.0f)
+            // Buff full combo scores
+            double fcness;
+            if (effectiveMissCount > 0)
+                fcness = 0;
+            else if (countSliders == 0)
+                fcness = 1;
+            else
             {
-                approachRateFactor += 0.01f * (8.0f - Attributes.ApproachRate);
+                // assuming missing slider tails because we cannot differentiate a slider break
+                // near the beginning/end from a number of missed slider tails
+                double sliderTailMissingRate = (double)(beatmapMaxCombo - scoreMaxCombo) / countSliders;
+                fcness = 2 - 2 * SpecialFunctions.Logistic(sliderTailMissingRate * 50) ;
             }
+            aimValue *= 1 + fcness * fcBuffFactor;
 
-            aimValue *= approachRateFactor;
 
             // We want to give more reward for lower AR when it comes to aim and HD. This nerfs high AR and buffs lower AR.
             if (mods.Any(h => h is OsuModHidden))
@@ -153,14 +162,13 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             // Penalize misses exponentially. This mainly fixes tag4 maps and the likes until a per-hitobject solution is available
             speedValue *= Math.Pow(0.97f, countMiss);
 
-            // Combo scaling
-            if (beatmapMaxCombo > 0)
-                speedValue *= Math.Min(Math.Pow(scoreMaxCombo, 0.8f) / Math.Pow(beatmapMaxCombo, 0.8f), 1.0f);
+            //// Combo scaling
+            //if (beatmapMaxCombo > 0)
+            //    speedValue *= Math.Min(Math.Pow(scoreMaxCombo, 0.8f) / Math.Pow(beatmapMaxCombo, 0.8f), 1.0f);
 
             double approachRateFactor = 1.0f;
             if (Attributes.ApproachRate > 10.33f)
                 approachRateFactor += 0.3f * (Attributes.ApproachRate - 10.33f);
-
             speedValue *= approachRateFactor;
 
             if (mods.Any(m => m is OsuModHidden))
