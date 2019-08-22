@@ -150,7 +150,7 @@ namespace osu.Game.Graphics.Cursor
                             },
                             AdditiveLayer = new Sprite
                             {
-                                Blending = BlendingMode.Additive,
+                                Blending = BlendingParameters.Additive,
                                 Colour = colour.Pink,
                                 Alpha = 0,
                                 Texture = textures.Get(@"Cursor/menu-cursor-additive"),

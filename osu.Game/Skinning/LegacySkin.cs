@@ -1,4 +1,4 @@
-﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
@@ -11,10 +11,12 @@ using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Animations;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.IO.Stores;
+using osu.Framework.Text;
 using osu.Game.Database;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
@@ -42,6 +44,8 @@ namespace osu.Game.Skinning
         public LegacySkin(SkinInfo skin, IResourceStore<byte[]> storage, AudioManager audioManager)
             : this(skin, new LegacySkinResourceStore<SkinFileInfo>(skin, storage), audioManager, "skin.ini")
         {
+            // defaults should only be applied for non-beatmap skins (which are parsed via this constructor).
+            if (!Configuration.CustomColours.ContainsKey("SliderBall")) Configuration.CustomColours["SliderBall"] = new Color4(2, 170, 255, 255);
         }
 
         private readonly bool hasHitCircle;
@@ -59,7 +63,7 @@ namespace osu.Game.Skinning
             Samples = audioManager.GetSampleStore(storage);
             Textures = new TextureStore(new TextureLoaderStore(storage));
 
-            using (var testStream = storage.GetStream("hitcircle"))
+            using (var testStream = storage.GetStream("hitcircle@2x") ?? storage.GetStream("hitcircle"))
                 hasHitCircle |= testStream != null;
 
             if (hasHitCircle)
@@ -75,8 +79,13 @@ namespace osu.Game.Skinning
             Samples?.Dispose();
         }
 
+        private const double default_frame_time = 1000 / 60d;
+
         public override Drawable GetDrawableComponent(string componentName)
         {
+            bool animatable = false;
+            bool looping = true;
+
             switch (componentName)
             {
                 case "Play/osu/cursor":
@@ -86,8 +95,20 @@ namespace osu.Game.Skinning
                     return null;
 
                 case "Play/osu/sliderball":
-                    if (GetTexture("sliderb") != null)
-                        return new LegacySliderBall();
+                    var sliderBallContent = getAnimation("sliderb", true, true, "");
+
+                    if (sliderBallContent != null)
+                    {
+                        var size = sliderBallContent.Size;
+
+                        sliderBallContent.RelativeSizeAxes = Axes.Both;
+                        sliderBallContent.Size = Vector2.One;
+
+                        return new LegacySliderBall(sliderBallContent)
+                        {
+                            Size = size
+                        };
+                    }
 
                     return null;
 
@@ -97,26 +118,38 @@ namespace osu.Game.Skinning
 
                     return null;
 
+                case "Play/osu/sliderfollowcircle":
+                    animatable = true;
+                    break;
+
                 case "Play/Miss":
                     componentName = "hit0";
+                    animatable = true;
+                    looping = false;
                     break;
 
                 case "Play/Meh":
                     componentName = "hit50";
+                    animatable = true;
+                    looping = false;
                     break;
 
                 case "Play/Good":
                     componentName = "hit100";
+                    animatable = true;
+                    looping = false;
                     break;
 
                 case "Play/Great":
                     componentName = "hit300";
+                    animatable = true;
+                    looping = false;
                     break;
 
                 case "Play/osu/number-text":
                     return !hasFont(Configuration.HitCircleFont)
                         ? null
-                        : new LegacySpriteText(Textures, Configuration.HitCircleFont)
+                        : new LegacySpriteText(this, Configuration.HitCircleFont)
                         {
                             Scale = new Vector2(0.96f),
                             // Spacing value was reverse-engineered from the ratio of the rendered sprite size in the visual inspector vs the actual texture size
@@ -124,25 +157,42 @@ namespace osu.Game.Skinning
                         };
             }
 
-            // temporary allowance is given for skins the fact that stable handles non-animatable items such as hitcircles (incorrectly)
-            // by (incorrectly) displaying the first frame of animation rather than the non-animated version.
-            // users have used this to "hide" certain elements like hit300.
-            var texture = GetTexture($"{componentName}-0") ?? GetTexture(componentName);
-
-            if (texture == null)
-                return null;
-
-            return new Sprite { Texture = texture };
+            return getAnimation(componentName, animatable, looping);
         }
 
-        public class LegacySliderBall : Sprite
+        private Drawable getAnimation(string componentName, bool animatable, bool looping, string animationSeparator = "-")
         {
-            [BackgroundDependencyLoader]
-            private void load(ISkinSource skin)
+            Texture texture;
+
+            Texture getFrameTexture(int frame) => GetTexture($"{componentName}{animationSeparator}{frame}");
+
+            TextureAnimation animation = null;
+
+            if (animatable)
             {
-                Texture = skin.GetTexture("sliderb");
-                Colour = skin.GetValue<SkinConfiguration, Color4?>(s => s.CustomColours.ContainsKey("SliderBall") ? s.CustomColours["SliderBall"] : (Color4?)null) ?? Color4.White;
+                for (int i = 0;; i++)
+                {
+                    if ((texture = getFrameTexture(i)) == null)
+                        break;
+
+                    if (animation == null)
+                        animation = new TextureAnimation
+                        {
+                            DefaultFrameLength = default_frame_time,
+                            Repeat = looping
+                        };
+
+                    animation.AddFrame(texture);
+                }
             }
+
+            if (animation != null)
+                return animation;
+
+            if ((texture = GetTexture(componentName)) != null)
+                return new Sprite { Texture = texture };
+
+            return null;
         }
 
         public override Texture GetTexture(string componentName)
@@ -234,37 +284,43 @@ namespace osu.Game.Skinning
 
         private class LegacySpriteText : OsuSpriteText
         {
-            private readonly TextureStore textures;
-            private readonly string font;
+            private readonly LegacyGlyphStore glyphStore;
 
-            public LegacySpriteText(TextureStore textures, string font)
+            public LegacySpriteText(ISkin skin, string font)
             {
-                this.textures = textures;
-                this.font = font;
-
                 Shadow = false;
                 UseFullGlyphHeight = false;
+
+                Font = new FontUsage(font, OsuFont.DEFAULT_FONT_SIZE);
+                glyphStore = new LegacyGlyphStore(skin);
             }
 
-            protected override Texture GetTextureForCharacter(char c)
+            protected override TextBuilder CreateTextBuilder(ITexturedGlyphLookupStore store) => base.CreateTextBuilder(glyphStore);
+
+            private class LegacyGlyphStore : ITexturedGlyphLookupStore
             {
-                string textureName = $"{font}-{c}";
+                private readonly ISkin skin;
 
-                // Approximate value that brings character sizing roughly in-line with stable
-                float ratio = 36;
-
-                var texture = textures.Get($"{textureName}@2x");
-
-                if (texture == null)
+                public LegacyGlyphStore(ISkin skin)
                 {
-                    ratio = 18;
-                    texture = textures.Get(textureName);
+                    this.skin = skin;
                 }
 
-                if (texture != null)
-                    texture.ScaleAdjust = ratio;
+                public ITexturedCharacterGlyph Get(string fontName, char character)
+                {
+                    var texture = skin.GetTexture($"{fontName}-{character}");
 
-                return texture;
+                    if (texture != null)
+                        // Approximate value that brings character sizing roughly in-line with stable
+                        texture.ScaleAdjust *= 18;
+
+                    if (texture == null)
+                        return null;
+
+                    return new TexturedCharacterGlyph(new CharacterGlyph(character, 0, 0, texture.Width, null), texture, 1f / texture.ScaleAdjust);
+                }
+
+                public Task<ITexturedCharacterGlyph> GetAsync(string fontName, char character) => Task.Run(() => Get(fontName, character));
             }
         }
 
@@ -295,6 +351,37 @@ namespace osu.Game.Skinning
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
                     }
+                };
+            }
+        }
+
+        public class LegacySliderBall : CompositeDrawable
+        {
+            private readonly Drawable animationContent;
+
+            public LegacySliderBall(Drawable animationContent)
+            {
+                this.animationContent = animationContent;
+            }
+
+            [BackgroundDependencyLoader]
+            private void load(ISkinSource skin, DrawableHitObject drawableObject)
+            {
+                animationContent.Colour = skin.GetValue<SkinConfiguration, Color4?>(s => s.CustomColours.ContainsKey("SliderBall") ? s.CustomColours["SliderBall"] : (Color4?)null) ?? Color4.White;
+
+                InternalChildren = new[]
+                {
+                    new Sprite
+                    {
+                        Texture = skin.GetTexture("sliderb-nd"),
+                        Colour = new Color4(5, 5, 5, 255),
+                    },
+                    animationContent,
+                    new Sprite
+                    {
+                        Texture = skin.GetTexture("sliderb-spec"),
+                        Blending = BlendingParameters.Additive,
+                    },
                 };
             }
         }
