@@ -55,16 +55,8 @@ namespace osu.Game.Skinning
             foreach (var lookup in info.LookupNames)
             {
                 var ch = getSampleFunction($"Gameplay/{lookup}");
-
                 if (ch == null)
-                {
-                    // Try fallback to non-bank samples.
-                    var bank = lookup.Split('/').Last().Split('-')[0] + '-';
-                    ch = getSampleFunction($"Gameplay/{lookup.Replace(bank, "")}");
-
-                    if (ch == null)
-                        continue;
-                }
+                    continue;
 
                 ch.Volume.Value = info.Volume / 100.0;
                 return ch;
