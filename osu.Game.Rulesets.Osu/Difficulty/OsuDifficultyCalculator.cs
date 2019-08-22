@@ -45,14 +45,16 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             (var strainHistory, var maxTapStrain) = calculateTapStrain(hitObjectsNoSpinner, clockRate);
             double tapDiff = maxTapStrain.Average();
 
-            IEnumerable<OsuMovement> movements = Aim.CreateMovements(hitObjectsNoSpinner, clockRate, strainHistory);
+            IList<OsuMovement> movements = Aim.CreateMovements(hitObjectsNoSpinner, clockRate, strainHistory);
 
             double aimDiff = Aim.CalculateFCProbTP(movements);
-            double fcTimeAimDiff = Aim.CalculateFCTimeTP(movements, mapLength);
+            double fcTimeTP = Aim.CalculateFCTimeTP(movements, mapLength);
+
+            (double[] missTPs, double[] missCounts) = Aim.CalculateMissTPsMissCounts(movements, fcTimeTP);
 
             double tapSR = tapMultiplier * Math.Pow(tapDiff, srExponent);
             double aimSR = aimMultiplier * Math.Pow(aimDiff, srExponent);
-            double fcTimeAimSR = aimMultiplier * Math.Pow(fcTimeAimDiff, srExponent);
+            double fcTimeAimSR = aimMultiplier * Math.Pow(fcTimeTP, srExponent);
             double sr = Mean.PowerMean(tapSR, aimSR, 7) * 1.069;
 
             // Todo: These int casts are temporary to achieve 1:1 results with osu!stable, and should be removed in the future
@@ -69,6 +71,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 Mods = mods,
                 AimStrain = aimSR,
                 FcTimeAimSR = fcTimeAimSR,
+                missTPs = missTPs,
+                missCounts = missCounts,
                 SpeedStrain = tapSR,
                 ApproachRate = preempt > 1200 ? (1800 - preempt) / 120 : (1200 - preempt) / 150 + 5,
                 OverallDifficulty = (80 - hitWindowGreat) / 6,

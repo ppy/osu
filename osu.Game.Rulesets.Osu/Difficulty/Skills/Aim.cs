@@ -28,6 +28,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         private const double tpMax = 100;
         private const double tpPrecision = 1e-8;
 
+        private const int difficultyCount = 20;
+
         public static List<OsuMovement> CreateMovements(List<OsuHitObject> hitObjects, double clockRate, List<Vector<double>> strainHistory)
         {
             OsuMovement.Initialize();
@@ -80,6 +82,56 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             return Brent.FindRoot(fcTimeMinusThreshold, tpMin, tpMax, tpPrecision);
 
         }
+
+        /// <summary>
+        /// Calculate miss count for a list of throughputs (used to evaluate miss count of plays).
+        /// </summary>
+        public static (double[], double[]) CalculateMissTPsMissCounts(IList<OsuMovement> movements, double fcTimeTP)
+        {
+            double[] missTPs = new double[difficultyCount];
+            double[] missCounts = new double[difficultyCount];
+            double fcProb = calculateFCProb(movements, fcTimeTP);
+
+            for (int i = 0; i < difficultyCount; i++)
+            {
+                double missTP = fcTimeTP * (1 - Math.Pow(i, 1.5) * 0.005);
+                double[] missProbs = getMissProbs(movements, missTP);
+                missTPs[i] = missTP;
+                missCounts[i] = getMissCount(fcProb, missProbs);
+            }
+            return (missTPs, missCounts);
+        }
+
+
+        /// <summary>
+        /// Calculate the probability of missing each note given a skill level.
+        /// </summary>
+        private static double[] getMissProbs(IList<OsuMovement> movements, double tp)
+        {
+            // slider breaks should be a miss :( -- joz, 2019
+            var missProbs = new double[movements.Count];
+
+            for (int i = 0; i < movements.Count; ++i)
+            {
+                var movement = movements[i];
+                missProbs[i] = 1 - FittsLaw.CalculateHitProb(movement.D, movement.MT, tp);
+            }
+
+            return missProbs;
+        }
+
+        /// <summary>
+        /// Find first miss count achievable with at least probability p
+        /// </summary>
+        private static double getMissCount(double p, double[] missProbabilities)
+        {
+            var distribution = new PoissonBinomial(missProbabilities);
+
+            Func<double, double> cdfMinusProb = missCount => distribution.Cdf(missCount) - p;
+            return Brent.FindRoot(cdfMinusProb, -100, 1000);
+        }
+
+
 
         private static double calculateFCProb(IEnumerable<OsuMovement> movements, double tp)
         {

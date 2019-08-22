@@ -9,6 +9,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty
     {
         public double AimStrain;
         public double FcTimeAimSR;
+        public double[] missTPs;
+        public double[] missCounts;
         public double SpeedStrain;
         public double ApproachRate;
         public double OverallDifficulty;

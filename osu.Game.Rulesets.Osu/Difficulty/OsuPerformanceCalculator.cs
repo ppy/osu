@@ -4,6 +4,9 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+
+using MathNet.Numerics.Interpolation;
+
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Difficulty;
 using osu.Game.Rulesets.Mods;
@@ -17,6 +20,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty
     public class OsuPerformanceCalculator : PerformanceCalculator
     {
         public new OsuDifficultyAttributes Attributes => (OsuDifficultyAttributes)base.Attributes;
+
+        private const double totalValueExponent = 1.5;
 
         private readonly int countHitCircles;
         private readonly int beatmapMaxCombo;
@@ -68,9 +73,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             double accuracyValue = computeAccuracyValue();
             double totalValue =
                 Math.Pow(
-                    Math.Pow(aimValue, 2f) +
-                    Math.Pow(speedValue, 2f) +
-                    Math.Pow(accuracyValue, 2f), 1.0f / 2f
+                    Math.Pow(aimValue, totalValueExponent) +
+                    Math.Pow(speedValue, totalValueExponent) +
+                    Math.Pow(accuracyValue, totalValueExponent), 1 / totalValueExponent
                 ) * multiplier;
 
             if (categoryRatings != null)
@@ -88,25 +93,21 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
         private double computeAimValue()
         {
-            double rawAim = Attributes.FcTimeAimSR;
+            double tp;
+
+            if (countMiss == 0)
+                tp = Attributes.missTPs[0];
+            else
+                tp = LinearSpline.InterpolateSorted(Attributes.missCounts, Attributes.missTPs).Interpolate(countMiss);
+            
+
+
 
             if (mods.Any(m => m is OsuModTouchDevice))
-                rawAim = Math.Pow(rawAim, 0.8);
+                tp = Math.Pow(tp, 0.8);
 
-            double aimValue = Math.Pow(37 * rawAim, 3.0f) / 100000.0f * 1.6;
+            double aimValue = Math.Pow(tp, 2.55) * 0.18;
 
-            // Longer maps are worth more
-            double lengthBonus = 0.95f + 0.4f * Math.Min(1.0f, totalHits / 2000.0f) +
-                                 (totalHits > 2000 ? Math.Log10(totalHits / 2000.0f) * 0.5f : 0.0f);
-
-            aimValue *= lengthBonus;
-
-            // Penalize misses exponentially. This mainly fixes tag4 maps and the likes until a per-hitobject solution is available
-            aimValue *= Math.Pow(0.97f, countMiss);
-
-            // Combo scaling
-            if (beatmapMaxCombo > 0)
-                aimValue *= Math.Min(Math.Pow(scoreMaxCombo, 0.8f) / Math.Pow(beatmapMaxCombo, 0.8f), 1.0f);
 
             double approachRateFactor = 1.0f;
 
