@@ -37,7 +37,7 @@ namespace osu.Game.Screens.Select
 
             if (removeAutoModOnResume)
             {
-                Type autoType = Ruleset.Value.CreateInstance().GetAutoplayMod().GetType();
+                var autoType = Ruleset.Value.CreateInstance().GetAutoplayMod().GetType();
                 ModSelect.DeselectTypes(new[] { autoType }, true);
                 removeAutoModOnResume = false;
             }
