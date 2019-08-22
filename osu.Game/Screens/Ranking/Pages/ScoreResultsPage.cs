@@ -346,7 +346,7 @@ namespace osu.Game.Screens.Ranking.Pages
                 title.Colour = artist.Colour = colours.BlueDarker;
                 versionMapper.Colour = colours.Gray8;
 
-                var creator = beatmap.Metadata.Author?.Username;
+                string creator = beatmap.Metadata.Author?.Username;
 
                 if (!string.IsNullOrEmpty(creator))
                 {

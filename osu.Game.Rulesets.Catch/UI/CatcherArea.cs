@@ -247,10 +247,10 @@ namespace osu.Game.Rulesets.Catch.UI
                 float halfCatchWidth = CatchWidth * 0.5f;
 
                 // this stuff wil disappear once we move fruit to non-relative coordinate space in the future.
-                var catchObjectPosition = fruit.X * CatchPlayfield.BASE_WIDTH;
-                var catcherPosition = Position.X * CatchPlayfield.BASE_WIDTH;
+                float catchObjectPosition = fruit.X * CatchPlayfield.BASE_WIDTH;
+                float catcherPosition = Position.X * CatchPlayfield.BASE_WIDTH;
 
-                var validCatch =
+                bool validCatch =
                     catchObjectPosition >= catcherPosition - halfCatchWidth &&
                     catchObjectPosition <= catcherPosition + halfCatchWidth;
 
@@ -368,7 +368,7 @@ namespace osu.Game.Rulesets.Catch.UI
 
                 if (currentDirection == 0) return;
 
-                var direction = Math.Sign(currentDirection);
+                int direction = Math.Sign(currentDirection);
 
                 double dashModifier = Dashing ? 1 : 0.5;
                 double speed = BASE_SPEED * dashModifier * hyperDashModifier;
@@ -421,7 +421,7 @@ namespace osu.Game.Rulesets.Catch.UI
 
             public void Explode(DrawableHitObject fruit)
             {
-                var originalX = fruit.X * Scale.X;
+                float originalX = fruit.X * Scale.X;
 
                 if (ExplodingFruitTarget != null)
                 {

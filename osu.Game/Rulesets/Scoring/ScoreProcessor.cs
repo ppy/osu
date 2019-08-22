@@ -241,7 +241,7 @@ namespace osu.Game.Rulesets.Scoring
             {
                 scoreMultiplier = 1;
 
-                foreach (var m in mods.NewValue)
+                foreach (Mod m in mods.NewValue)
                     scoreMultiplier *= m.ScoreMultiplier;
 
                 updateScore();

@@ -64,8 +64,8 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                     scoreTable.Scores = value.Scores;
                     scoreTable.Show();
 
-                    var topScore = value.Scores.First();
-                    var userScore = value.UserScore;
+                    APILegacyScoreInfo topScore = value.Scores.First();
+                    APILegacyUserTopScoreInfo userScore = value.UserScore;
 
                     topScoresContainer.Add(new DrawableTopScore(topScore));
 

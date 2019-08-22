@@ -56,8 +56,8 @@ namespace osu.Game.Tournament.IPC
                         using (var stream = stable.GetStream(file_ipc_filename))
                         using (var sr = new StreamReader(stream))
                         {
-                            var beatmapId = int.Parse(sr.ReadLine());
-                            var mods = int.Parse(sr.ReadLine());
+                            int beatmapId = int.Parse(sr.ReadLine());
+                            int mods = int.Parse(sr.ReadLine());
 
                             if (lastBeatmapId != beatmapId)
                             {

@@ -54,14 +54,14 @@ namespace osu.Game.Online.Chat
 
             foreach (Match m in regex.Matches(result.Text, startIndex))
             {
-                var index = m.Index - captureOffset;
+                int index = m.Index - captureOffset;
 
-                var displayText = string.Format(display,
+                string displayText = string.Format(display,
                     m.Groups[0],
                     m.Groups.Count > 1 ? m.Groups[1].Value : "",
                     m.Groups.Count > 2 ? m.Groups[2].Value : "").Trim();
 
-                var linkText = string.Format(link,
+                string linkText = string.Format(link,
                     m.Groups[0],
                     m.Groups.Count > 1 ? m.Groups[1].Value : "",
                     m.Groups.Count > 2 ? m.Groups[2].Value : "").Trim();
@@ -89,9 +89,9 @@ namespace osu.Game.Online.Chat
         {
             foreach (Match m in regex.Matches(result.Text, startIndex))
             {
-                var index = m.Index;
-                var link = m.Groups["link"].Value;
-                var indexLength = link.Length;
+                int index = m.Index;
+                string link = m.Groups["link"].Value;
+                int indexLength = link.Length;
 
                 var details = getLinkDetails(link);
                 result.Links.Add(new Link(link, index, indexLength, details.Action, details.Argument));
@@ -100,7 +100,7 @@ namespace osu.Game.Online.Chat
 
         private static LinkDetails getLinkDetails(string url)
         {
-            var args = url.Split(new[] { '/' }, StringSplitOptions.RemoveEmptyEntries);
+            string[] args = url.Split(new[] { '/' }, StringSplitOptions.RemoveEmptyEntries);
             args[0] = args[0].TrimEnd(':');
 
             switch (args[0])
@@ -203,7 +203,7 @@ namespace osu.Game.Online.Chat
             // handle channels
             handleMatches(channel_regex, "{0}", "osu://chan/{0}", result, startIndex, LinkAction.OpenChannel);
 
-            var empty = "";
+            string empty = "";
             while (space-- > 0)
                 empty += "\0";
 

@@ -62,7 +62,7 @@ namespace osu.Game.Beatmaps.Formats
 
         protected override void ParseLine(Beatmap beatmap, Section section, string line)
         {
-            var strippedLine = StripComments(line);
+            string strippedLine = StripComments(line);
 
             switch (section)
             {

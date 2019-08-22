@@ -139,9 +139,9 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
 
                 nextTick?.TriggerResult(HitResult.Great);
 
-                var numHits = ticks.Count(r => r.IsHit);
+                int numHits = ticks.Count(r => r.IsHit);
 
-                var completion = (float)numHits / HitObject.RequiredHits;
+                float completion = (float)numHits / HitObject.RequiredHits;
 
                 expandingRing
                     .FadeTo(expandingRing.Alpha + MathHelper.Clamp(completion / 16, 0.1f, 0.6f), 50)
@@ -225,7 +225,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             if (Time.Current < HitObject.StartTime)
                 return false;
 
-            var isCentre = action == TaikoAction.LeftCentre || action == TaikoAction.RightCentre;
+            bool isCentre = action == TaikoAction.LeftCentre || action == TaikoAction.RightCentre;
 
             // Ensure alternating centre and rim hits
             if (lastWasCentre == isCentre)

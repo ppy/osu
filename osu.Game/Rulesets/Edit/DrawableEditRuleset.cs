@@ -72,7 +72,7 @@ namespace osu.Game.Rulesets.Edit
             var tObject = (TObject)hitObject;
 
             // Add to beatmap, preserving sorting order
-            var insertionIndex = beatmap.HitObjects.FindLastIndex(h => h.StartTime <= hitObject.StartTime);
+            int insertionIndex = beatmap.HitObjects.FindLastIndex(h => h.StartTime <= hitObject.StartTime);
             beatmap.HitObjects.Insert(insertionIndex + 1, tObject);
 
             // Process object

@@ -65,7 +65,7 @@ namespace osu.Game.Beatmaps.Formats
 
         private void handleEvents(string line)
         {
-            var depth = 0;
+            int depth = 0;
 
             while (line.StartsWith(" ", StringComparison.Ordinal) || line.StartsWith("_", StringComparison.Ordinal))
             {
@@ -90,11 +90,11 @@ namespace osu.Game.Beatmaps.Formats
                 {
                     case EventType.Sprite:
                     {
-                        var layer = parseLayer(split[1]);
+                        string layer = parseLayer(split[1]);
                         var origin = parseOrigin(split[2]);
-                        var path = cleanFilename(split[3]);
-                        var x = float.Parse(split[4], NumberFormatInfo.InvariantInfo);
-                        var y = float.Parse(split[5], NumberFormatInfo.InvariantInfo);
+                        string path = cleanFilename(split[3]);
+                        float x = float.Parse(split[4], NumberFormatInfo.InvariantInfo);
+                        float y = float.Parse(split[5], NumberFormatInfo.InvariantInfo);
                         storyboardSprite = new StoryboardSprite(path, origin, new Vector2(x, y));
                         storyboard.GetLayer(layer).Add(storyboardSprite);
                         break;
@@ -102,13 +102,13 @@ namespace osu.Game.Beatmaps.Formats
 
                     case EventType.Animation:
                     {
-                        var layer = parseLayer(split[1]);
+                        string layer = parseLayer(split[1]);
                         var origin = parseOrigin(split[2]);
-                        var path = cleanFilename(split[3]);
-                        var x = float.Parse(split[4], NumberFormatInfo.InvariantInfo);
-                        var y = float.Parse(split[5], NumberFormatInfo.InvariantInfo);
-                        var frameCount = int.Parse(split[6]);
-                        var frameDelay = double.Parse(split[7], NumberFormatInfo.InvariantInfo);
+                        string path = cleanFilename(split[3]);
+                        float x = float.Parse(split[4], NumberFormatInfo.InvariantInfo);
+                        float y = float.Parse(split[5], NumberFormatInfo.InvariantInfo);
+                        int frameCount = int.Parse(split[6]);
+                        double frameDelay = double.Parse(split[7], NumberFormatInfo.InvariantInfo);
                         var loopType = split.Length > 8 ? (AnimationLoopType)Enum.Parse(typeof(AnimationLoopType), split[8]) : AnimationLoopType.LoopForever;
                         storyboardSprite = new StoryboardAnimation(path, origin, new Vector2(x, y), frameCount, frameDelay, loopType);
                         storyboard.GetLayer(layer).Add(storyboardSprite);
@@ -117,10 +117,10 @@ namespace osu.Game.Beatmaps.Formats
 
                     case EventType.Sample:
                     {
-                        var time = double.Parse(split[1], CultureInfo.InvariantCulture);
-                        var layer = parseLayer(split[2]);
-                        var path = cleanFilename(split[3]);
-                        var volume = split.Length > 4 ? float.Parse(split[4], CultureInfo.InvariantCulture) : 100;
+                        double time = double.Parse(split[1], CultureInfo.InvariantCulture);
+                        string layer = parseLayer(split[2]);
+                        string path = cleanFilename(split[3]);
+                        float volume = split.Length > 4 ? float.Parse(split[4], CultureInfo.InvariantCulture) : 100;
                         storyboard.GetLayer(layer).Add(new StoryboardSample(path, time, volume));
                         break;
                     }
@@ -131,24 +131,24 @@ namespace osu.Game.Beatmaps.Formats
                 if (depth < 2)
                     timelineGroup = storyboardSprite?.TimelineGroup;
 
-                var commandType = split[0];
+                string commandType = split[0];
 
                 switch (commandType)
                 {
                     case "T":
                     {
-                        var triggerName = split[1];
-                        var startTime = split.Length > 2 ? double.Parse(split[2], CultureInfo.InvariantCulture) : double.MinValue;
-                        var endTime = split.Length > 3 ? double.Parse(split[3], CultureInfo.InvariantCulture) : double.MaxValue;
-                        var groupNumber = split.Length > 4 ? int.Parse(split[4]) : 0;
+                        string triggerName = split[1];
+                        double startTime = split.Length > 2 ? double.Parse(split[2], CultureInfo.InvariantCulture) : double.MinValue;
+                        double endTime = split.Length > 3 ? double.Parse(split[3], CultureInfo.InvariantCulture) : double.MaxValue;
+                        int groupNumber = split.Length > 4 ? int.Parse(split[4]) : 0;
                         timelineGroup = storyboardSprite?.AddTrigger(triggerName, startTime, endTime, groupNumber);
                     }
                         break;
 
                     case "L":
                     {
-                        var startTime = double.Parse(split[1], CultureInfo.InvariantCulture);
-                        var loopCount = int.Parse(split[2]);
+                        double startTime = double.Parse(split[1], CultureInfo.InvariantCulture);
+                        int loopCount = int.Parse(split[2]);
                         timelineGroup = storyboardSprite?.AddLoop(startTime, loopCount);
                     }
                         break;
@@ -158,52 +158,52 @@ namespace osu.Game.Beatmaps.Formats
                         if (string.IsNullOrEmpty(split[3]))
                             split[3] = split[2];
 
-                        var easing = (Easing)int.Parse(split[1]);
-                        var startTime = double.Parse(split[2], CultureInfo.InvariantCulture);
-                        var endTime = double.Parse(split[3], CultureInfo.InvariantCulture);
+                        Easing easing = (Easing)int.Parse(split[1]);
+                        double startTime = double.Parse(split[2], CultureInfo.InvariantCulture);
+                        double endTime = double.Parse(split[3], CultureInfo.InvariantCulture);
 
                         switch (commandType)
                         {
                             case "F":
                             {
-                                var startValue = float.Parse(split[4], CultureInfo.InvariantCulture);
-                                var endValue = split.Length > 5 ? float.Parse(split[5], CultureInfo.InvariantCulture) : startValue;
+                                float startValue = float.Parse(split[4], CultureInfo.InvariantCulture);
+                                float endValue = split.Length > 5 ? float.Parse(split[5], CultureInfo.InvariantCulture) : startValue;
                                 timelineGroup?.Alpha.Add(easing, startTime, endTime, startValue, endValue);
                             }
                                 break;
 
                             case "S":
                             {
-                                var startValue = float.Parse(split[4], CultureInfo.InvariantCulture);
-                                var endValue = split.Length > 5 ? float.Parse(split[5], CultureInfo.InvariantCulture) : startValue;
+                                float startValue = float.Parse(split[4], CultureInfo.InvariantCulture);
+                                float endValue = split.Length > 5 ? float.Parse(split[5], CultureInfo.InvariantCulture) : startValue;
                                 timelineGroup?.Scale.Add(easing, startTime, endTime, new Vector2(startValue), new Vector2(endValue));
                             }
                                 break;
 
                             case "V":
                             {
-                                var startX = float.Parse(split[4], CultureInfo.InvariantCulture);
-                                var startY = float.Parse(split[5], CultureInfo.InvariantCulture);
-                                var endX = split.Length > 6 ? float.Parse(split[6], CultureInfo.InvariantCulture) : startX;
-                                var endY = split.Length > 7 ? float.Parse(split[7], CultureInfo.InvariantCulture) : startY;
+                                float startX = float.Parse(split[4], CultureInfo.InvariantCulture);
+                                float startY = float.Parse(split[5], CultureInfo.InvariantCulture);
+                                float endX = split.Length > 6 ? float.Parse(split[6], CultureInfo.InvariantCulture) : startX;
+                                float endY = split.Length > 7 ? float.Parse(split[7], CultureInfo.InvariantCulture) : startY;
                                 timelineGroup?.Scale.Add(easing, startTime, endTime, new Vector2(startX, startY), new Vector2(endX, endY));
                             }
                                 break;
 
                             case "R":
                             {
-                                var startValue = float.Parse(split[4], CultureInfo.InvariantCulture);
-                                var endValue = split.Length > 5 ? float.Parse(split[5], CultureInfo.InvariantCulture) : startValue;
+                                float startValue = float.Parse(split[4], CultureInfo.InvariantCulture);
+                                float endValue = split.Length > 5 ? float.Parse(split[5], CultureInfo.InvariantCulture) : startValue;
                                 timelineGroup?.Rotation.Add(easing, startTime, endTime, MathHelper.RadiansToDegrees(startValue), MathHelper.RadiansToDegrees(endValue));
                             }
                                 break;
 
                             case "M":
                             {
-                                var startX = float.Parse(split[4], CultureInfo.InvariantCulture);
-                                var startY = float.Parse(split[5], CultureInfo.InvariantCulture);
-                                var endX = split.Length > 6 ? float.Parse(split[6], CultureInfo.InvariantCulture) : startX;
-                                var endY = split.Length > 7 ? float.Parse(split[7], CultureInfo.InvariantCulture) : startY;
+                                float startX = float.Parse(split[4], CultureInfo.InvariantCulture);
+                                float startY = float.Parse(split[5], CultureInfo.InvariantCulture);
+                                float endX = split.Length > 6 ? float.Parse(split[6], CultureInfo.InvariantCulture) : startX;
+                                float endY = split.Length > 7 ? float.Parse(split[7], CultureInfo.InvariantCulture) : startY;
                                 timelineGroup?.X.Add(easing, startTime, endTime, startX, endX);
                                 timelineGroup?.Y.Add(easing, startTime, endTime, startY, endY);
                             }
@@ -211,28 +211,28 @@ namespace osu.Game.Beatmaps.Formats
 
                             case "MX":
                             {
-                                var startValue = float.Parse(split[4], CultureInfo.InvariantCulture);
-                                var endValue = split.Length > 5 ? float.Parse(split[5], CultureInfo.InvariantCulture) : startValue;
+                                float startValue = float.Parse(split[4], CultureInfo.InvariantCulture);
+                                float endValue = split.Length > 5 ? float.Parse(split[5], CultureInfo.InvariantCulture) : startValue;
                                 timelineGroup?.X.Add(easing, startTime, endTime, startValue, endValue);
                             }
                                 break;
 
                             case "MY":
                             {
-                                var startValue = float.Parse(split[4], CultureInfo.InvariantCulture);
-                                var endValue = split.Length > 5 ? float.Parse(split[5], CultureInfo.InvariantCulture) : startValue;
+                                float startValue = float.Parse(split[4], CultureInfo.InvariantCulture);
+                                float endValue = split.Length > 5 ? float.Parse(split[5], CultureInfo.InvariantCulture) : startValue;
                                 timelineGroup?.Y.Add(easing, startTime, endTime, startValue, endValue);
                             }
                                 break;
 
                             case "C":
                             {
-                                var startRed = float.Parse(split[4], CultureInfo.InvariantCulture);
-                                var startGreen = float.Parse(split[5], CultureInfo.InvariantCulture);
-                                var startBlue = float.Parse(split[6], CultureInfo.InvariantCulture);
-                                var endRed = split.Length > 7 ? float.Parse(split[7], CultureInfo.InvariantCulture) : startRed;
-                                var endGreen = split.Length > 8 ? float.Parse(split[8], CultureInfo.InvariantCulture) : startGreen;
-                                var endBlue = split.Length > 9 ? float.Parse(split[9], CultureInfo.InvariantCulture) : startBlue;
+                                float startRed = float.Parse(split[4], CultureInfo.InvariantCulture);
+                                float startGreen = float.Parse(split[5], CultureInfo.InvariantCulture);
+                                float startBlue = float.Parse(split[6], CultureInfo.InvariantCulture);
+                                float endRed = split.Length > 7 ? float.Parse(split[7], CultureInfo.InvariantCulture) : startRed;
+                                float endGreen = split.Length > 8 ? float.Parse(split[8], CultureInfo.InvariantCulture) : startGreen;
+                                float endBlue = split.Length > 9 ? float.Parse(split[9], CultureInfo.InvariantCulture) : startBlue;
                                 timelineGroup?.Colour.Add(easing, startTime, endTime,
                                     new Color4(startRed / 255f, startGreen / 255f, startBlue / 255f, 1),
                                     new Color4(endRed / 255f, endGreen / 255f, endBlue / 255f, 1));
@@ -241,12 +241,13 @@ namespace osu.Game.Beatmaps.Formats
 
                             case "P":
                             {
-                                var type = split[4];
+                                string type = split[4];
 
                                 switch (type)
                                 {
                                     case "A":
-                                        timelineGroup?.BlendingParameters.Add(easing, startTime, endTime, BlendingParameters.Additive, startTime == endTime ? BlendingParameters.Additive : BlendingParameters.Inherit);
+                                        timelineGroup?.BlendingParameters.Add(easing, startTime, endTime, BlendingParameters.Additive,
+                                            startTime == endTime ? BlendingParameters.Additive : BlendingParameters.Inherit);
                                         break;
 
                                     case "H":

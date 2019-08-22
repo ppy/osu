@@ -61,7 +61,7 @@ namespace osu.Game.Online.API.Requests
             query.Append($@"type={scope.ToString().ToLowerInvariant()}");
             query.Append($@"&mode={ruleset.ShortName}");
 
-            foreach (var mod in mods)
+            foreach (Mod mod in mods)
                 query.Append($@"&mods[]={mod.Acronym}");
 
             return query.ToString();

@@ -57,7 +57,7 @@ namespace osu.Game.Rulesets.Mania.Edit.Blueprints
 
         protected override bool OnDrag(DragEvent e)
         {
-            var result = base.OnDrag(e);
+            bool result = base.OnDrag(e);
 
             ScreenSpaceDragPosition = e.ScreenSpaceMousePosition;
             DragPosition = HitObject.ToLocalSpace(e.ScreenSpaceMousePosition);

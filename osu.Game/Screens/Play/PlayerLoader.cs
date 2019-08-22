@@ -121,7 +121,7 @@ namespace osu.Game.Screens.Play
 
         private void loadNewPlayer()
         {
-            var restartCount = player?.RestartCount + 1 ?? 0;
+            int restartCount = player?.RestartCount + 1 ?? 0;
 
             player = createPlayer();
             player.RestartCount = restartCount;

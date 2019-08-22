@@ -91,7 +91,7 @@ namespace osu.Game.Overlays
         {
             if (configManager == null) throw new ArgumentNullException(nameof(configManager));
 
-            if (!trackedConfigManagers.TryGetValue((source, configManager), out var existing))
+            if (!trackedConfigManagers.TryGetValue((source, configManager), out TrackedSettings existing))
                 return;
 
             existing.Unload();

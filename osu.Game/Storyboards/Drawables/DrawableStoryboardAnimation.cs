@@ -67,11 +67,11 @@ namespace osu.Game.Storyboards.Drawables
         [BackgroundDependencyLoader]
         private void load(IBindable<WorkingBeatmap> beatmap, TextureStore textureStore)
         {
-            for (var frame = 0; frame < Animation.FrameCount; frame++)
+            for (int frame = 0; frame < Animation.FrameCount; frame++)
             {
-                var framePath = Animation.Path.Replace(".", frame + ".");
+                string framePath = Animation.Path.Replace(".", frame + ".");
 
-                var path = beatmap.Value.BeatmapSetInfo.Files.Find(f => f.Filename.Equals(framePath, StringComparison.InvariantCultureIgnoreCase))?.FileInfo.StoragePath;
+                string path = beatmap.Value.BeatmapSetInfo.Files.Find(f => f.Filename.Equals(framePath, StringComparison.InvariantCultureIgnoreCase))?.FileInfo.StoragePath;
                 if (path == null)
                     continue;
 

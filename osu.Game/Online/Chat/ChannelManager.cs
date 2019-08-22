@@ -197,7 +197,7 @@ namespace osu.Game.Online.Chat
             if (target == null)
                 return;
 
-            var parameters = text.Split(new[] { ' ' }, 2);
+            string[] parameters = text.Split(new[] { ' ' }, 2);
             string command = parameters[0];
             string content = parameters.Length == 2 ? parameters[1] : string.Empty;
 
@@ -254,7 +254,7 @@ namespace osu.Game.Online.Chat
         {
             var req = new ListChannelsRequest();
 
-            var joinDefaults = JoinedChannels.Count == 0;
+            bool joinDefaults = JoinedChannels.Count == 0;
 
             req.Success += channels =>
             {
@@ -325,7 +325,7 @@ namespace osu.Game.Online.Chat
 
                 // if we're using a channel object from the server, we want to remove ourselves from the users list.
                 // this is because we check the first user in the channel to display a name/icon on tabs for now.
-                var foundSelf = found.Users.FirstOrDefault(u => u.Id == api.LocalUser.Value.Id);
+                User foundSelf = found.Users.FirstOrDefault(u => u.Id == api.LocalUser.Value.Id);
                 if (foundSelf != null)
                     found.Users.Remove(foundSelf);
             }

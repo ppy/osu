@@ -158,8 +158,8 @@ namespace osu.Game.Tournament.Components
                 return;
             }
 
-            var bpm = beatmap.BeatmapSet.OnlineInfo.BPM;
-            var length = beatmap.Length;
+            double bpm = beatmap.BeatmapSet.OnlineInfo.BPM;
+            double length = beatmap.Length;
             string hardRockExtra = "";
             string srExtra = "";
 
@@ -228,9 +228,9 @@ namespace osu.Game.Tournament.Components
                     s.Font = OsuFont.GetFont(weight: FontWeight.Bold, size: 15);
                 }
 
-                for (var i = 0; i < tuples.Length; i++)
+                for (int i = 0; i < tuples.Length; i++)
                 {
-                    var tuple = tuples[i];
+                    (string heading, string content) tuple = tuples[i];
 
                     if (i > 0)
                     {

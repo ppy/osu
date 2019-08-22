@@ -15,7 +15,7 @@ namespace osu.Game.Tests.Resources
 
         public static string GetTestBeatmapForImport()
         {
-            var temp = Path.GetTempFileName() + ".osz";
+            string temp = Path.GetTempFileName() + ".osz";
 
             using (var stream = GetTestBeatmapStream())
             using (var newFile = File.Create(temp))

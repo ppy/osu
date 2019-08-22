@@ -367,7 +367,7 @@ namespace osu.Game.Overlays.Mods
         {
             if (e.NewValue == null) return;
 
-            var instance = e.NewValue.CreateInstance();
+            Ruleset instance = e.NewValue.CreateInstance();
 
             foreach (var section in ModSectionsContainer.Children)
                 section.Mods = instance.GetModsFor(section.ModType);
@@ -391,10 +391,10 @@ namespace osu.Game.Overlays.Mods
 
         private void updateMods()
         {
-            var multiplier = 1.0;
-            var ranked = true;
+            double multiplier = 1.0;
+            bool ranked = true;
 
-            foreach (var mod in SelectedMods.Value)
+            foreach (Mod mod in SelectedMods.Value)
             {
                 multiplier *= mod.ScoreMultiplier;
                 ranked &= mod.Ranked;

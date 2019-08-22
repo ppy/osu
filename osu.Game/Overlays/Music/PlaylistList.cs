@@ -131,7 +131,7 @@ namespace osu.Game.Overlays.Music
             protected override bool OnDragEnd(DragEndEvent e)
             {
                 nativeDragPosition = e.ScreenSpaceMousePosition;
-                var handled = draggedItem != null || base.OnDragEnd(e);
+                bool handled = draggedItem != null || base.OnDragEnd(e);
                 draggedItem = null;
 
                 return handled;
@@ -161,7 +161,7 @@ namespace osu.Game.Overlays.Music
                     if (Current <= 0)
                         return;
 
-                    var power = Math.Min(max_power, Math.Abs(start_offset - localPos.Y));
+                    double power = Math.Min(max_power, Math.Abs(start_offset - localPos.Y));
                     ScrollBy(-(float)Math.Pow(exp_base, power));
                 }
                 else if (localPos.Y > DrawHeight - start_offset)
@@ -169,7 +169,7 @@ namespace osu.Game.Overlays.Music
                     if (IsScrolledToEnd())
                         return;
 
-                    var power = Math.Min(max_power, Math.Abs(DrawHeight - start_offset - localPos.Y));
+                    double power = Math.Min(max_power, Math.Abs(DrawHeight - start_offset - localPos.Y));
                     ScrollBy((float)Math.Pow(exp_base, power));
                 }
             }

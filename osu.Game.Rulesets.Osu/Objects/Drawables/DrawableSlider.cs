@@ -176,10 +176,10 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
             ApplyResult(r =>
             {
-                var judgementsCount = NestedHitObjects.Count();
-                var judgementsHit = NestedHitObjects.Count(h => h.IsHit);
+                int judgementsCount = NestedHitObjects.Count();
+                int judgementsHit = NestedHitObjects.Count(h => h.IsHit);
 
-                var hitFraction = (double)judgementsHit / judgementsCount;
+                double hitFraction = (double)judgementsHit / judgementsCount;
 
                 if (hitFraction == 1 && HeadCircle.Result.Type == HitResult.Great)
                     r.Type = HitResult.Great;

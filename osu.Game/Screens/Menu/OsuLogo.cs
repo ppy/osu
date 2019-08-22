@@ -229,7 +229,7 @@ namespace osu.Game.Screens.Menu
         }
 
         /// <summary>
-        /// Schedule a new extenral animation. Handled queueing and finishing previous animations in a sane way.
+        /// Schedule a new external animation. Handled queuing and finishing previous animations in a sane way.
         /// </summary>
         /// <param name="action">The animation to be performed</param>
         /// <param name="waitForPrevious">If true, the new animation is delayed until all previous transforms finish. If false, existing transformed are cleared.</param>
@@ -272,7 +272,7 @@ namespace osu.Game.Screens.Menu
 
             lastBeatIndex = beatIndex;
 
-            var beatLength = timingPoint.BeatLength;
+            double beatLength = timingPoint.BeatLength;
 
             float amplitudeAdjust = Math.Min(1, 0.4f + amplitudes.Maximum);
 
@@ -329,7 +329,7 @@ namespace osu.Game.Screens.Menu
 
             if (Beatmap.Value.Track.IsRunning)
             {
-                var maxAmplitude = lastBeatIndex >= 0 ? Beatmap.Value.Track.CurrentAmplitudes.Maximum : 0;
+                float maxAmplitude = lastBeatIndex >= 0 ? Beatmap.Value.Track.CurrentAmplitudes.Maximum : 0;
                 logoAmplitudeContainer.ScaleTo(1 - Math.Max(0, maxAmplitude - scale_adjust_cutoff) * 0.04f, 75, Easing.OutQuint);
 
                 if (maxAmplitude > velocity_adjust_cutoff)

@@ -29,7 +29,7 @@ namespace osu.Game.Configuration
             this.variant = variant;
 
             databasedSettings = settings.Query(ruleset?.ID, variant);
-            legacySettingsExist = databasedSettings.Any(s => int.TryParse(s.Key, out var _));
+            legacySettingsExist = databasedSettings.Any(s => int.TryParse(s.Key, out int _));
 
             InitialiseDefaults();
         }

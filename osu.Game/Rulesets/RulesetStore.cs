@@ -67,7 +67,7 @@ namespace osu.Game.Rulesets
                 var instances = loaded_assemblies.Values.Select(r => (Ruleset)Activator.CreateInstance(r, (RulesetInfo)null)).ToList();
 
                 //add all legacy modes in correct order
-                foreach (var r in instances.Where(r => r.LegacyID != null).OrderBy(r => r.LegacyID))
+                foreach (Ruleset r in instances.Where(r => r.LegacyID != null).OrderBy(r => r.LegacyID))
                 {
                     if (context.RulesetInfo.SingleOrDefault(rsi => rsi.ID == r.RulesetInfo.ID) == null)
                         context.RulesetInfo.Add(r.RulesetInfo);
@@ -76,14 +76,14 @@ namespace osu.Game.Rulesets
                 context.SaveChanges();
 
                 //add any other modes
-                foreach (var r in instances.Where(r => r.LegacyID == null))
+                foreach (Ruleset r in instances.Where(r => r.LegacyID == null))
                     if (context.RulesetInfo.FirstOrDefault(ri => ri.InstantiationInfo == r.RulesetInfo.InstantiationInfo) == null)
                         context.RulesetInfo.Add(r.RulesetInfo);
 
                 context.SaveChanges();
 
                 //perform a consistency check
-                foreach (var r in context.RulesetInfo)
+                foreach (RulesetInfo r in context.RulesetInfo)
                 {
                     try
                     {
@@ -143,7 +143,7 @@ namespace osu.Game.Rulesets
 
         private static void loadRulesetFromFile(string file)
         {
-            var filename = Path.GetFileNameWithoutExtension(file);
+            string filename = Path.GetFileNameWithoutExtension(file);
 
             if (loaded_assemblies.Values.Any(t => t.Namespace == filename))
                 return;

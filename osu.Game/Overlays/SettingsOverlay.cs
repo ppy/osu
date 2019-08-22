@@ -79,7 +79,7 @@ namespace osu.Game.Overlays
         [BackgroundDependencyLoader]
         private void load()
         {
-            foreach (var s in subPanels)
+            foreach (SettingsSubPanel s in subPanels)
                 ContentContainer.Add(s);
         }
     }

@@ -282,7 +282,7 @@ namespace osu.Game.Beatmaps
         {
             var beatmapInfos = new List<BeatmapInfo>();
 
-            foreach (var name in reader.Filenames.Where(f => f.EndsWith(".osu")))
+            foreach (string name in reader.Filenames.Where(f => f.EndsWith(".osu")))
             {
                 using (var raw = reader.GetStream(name))
                 using (var ms = new MemoryStream()) //we need a memory stream so we can seek

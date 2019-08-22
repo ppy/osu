@@ -140,7 +140,7 @@ namespace osu.Game.Screens.Play
             if (breaks == null || breaks.Count == 0)
                 return;
 
-            var time = Clock.CurrentTime;
+            double time = Clock.CurrentTime;
 
             if (time > breaks[CurrentBreakIndex].EndTime)
             {
@@ -164,7 +164,7 @@ namespace osu.Game.Screens.Play
 
             if (breaks == null) return; //we need breaks.
 
-            foreach (var b in breaks)
+            foreach (BreakPeriod b in breaks)
             {
                 if (!b.HasEffect)
                     continue;

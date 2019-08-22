@@ -49,7 +49,7 @@ namespace osu.Game.IO.Serialization.Converters
             {
                 var itemReader = tok.CreateReader();
 
-                var typeName = lookupTable[(int)tok["type"]];
+                string typeName = lookupTable[(int)tok["type"]];
                 var instance = (T)Activator.CreateInstance(Type.GetType(typeName));
                 serializer.Populate(itemReader, instance);
 
@@ -66,12 +66,12 @@ namespace osu.Game.IO.Serialization.Converters
             var lookupTable = new List<string>();
             var objects = new List<JObject>();
 
-            foreach (var item in list)
+            foreach (T item in list)
             {
                 var type = item.GetType();
                 var assemblyName = type.Assembly.GetName();
 
-                var typeString = $"{type.FullName}, {assemblyName.Name}";
+                string typeString = $"{type.FullName}, {assemblyName.Name}";
                 if (requiresTypeVersion)
                     typeString += $", {assemblyName.Version}";
 

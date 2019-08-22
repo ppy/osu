@@ -21,7 +21,7 @@ namespace osu.Desktop
         public static int Main(string[] args)
         {
             // Back up the cwd before DesktopGameHost changes it
-            var cwd = Environment.CurrentDirectory;
+            string cwd = Environment.CurrentDirectory;
 
             using (DesktopGameHost host = Host.GetSuitableHost(@"osu", true))
             {
@@ -35,7 +35,7 @@ namespace osu.Desktop
                         // Restore the cwd so relative paths given at the command line work correctly
                         Directory.SetCurrentDirectory(cwd);
 
-                        foreach (var file in args)
+                        foreach (string file in args)
                         {
                             Console.WriteLine(@"Importing {0}", file);
                             if (!importer.ImportAsync(Path.GetFullPath(file)).Wait(3000))

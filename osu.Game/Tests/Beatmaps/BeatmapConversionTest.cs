@@ -133,7 +133,7 @@ namespace osu.Game.Tests.Beatmaps
             using (var resStream = openResource($"{resource_namespace}.{name}{expected_conversion_suffix}.json"))
             using (var reader = new StreamReader(resStream))
             {
-                var contents = reader.ReadToEnd();
+                string contents = reader.ReadToEnd();
                 return JsonConvert.DeserializeObject<ConvertResult>(contents);
             }
         }
@@ -151,7 +151,7 @@ namespace osu.Game.Tests.Beatmaps
 
         private Stream openResource(string name)
         {
-            var localPath = Path.GetDirectoryName(Uri.UnescapeDataString(new UriBuilder(Assembly.GetExecutingAssembly().CodeBase).Path));
+            string localPath = Path.GetDirectoryName(Uri.UnescapeDataString(new UriBuilder(Assembly.GetExecutingAssembly().CodeBase).Path));
             return Assembly.LoadFrom(Path.Combine(localPath, $"{ResourceAssembly}.dll")).GetManifestResourceStream($@"{ResourceAssembly}.Resources.{name}");
         }
 

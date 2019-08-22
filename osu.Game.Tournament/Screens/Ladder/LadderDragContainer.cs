@@ -32,7 +32,7 @@ namespace osu.Game.Tournament.Screens.Ladder
 
         protected override bool OnScroll(ScrollEvent e)
         {
-            var newScale = MathHelper.Clamp(scale + e.ScrollDelta.Y / 15 * scale, min_scale, max_scale);
+            float newScale = MathHelper.Clamp(scale + e.ScrollDelta.Y / 15 * scale, min_scale, max_scale);
 
             this.MoveTo(target = target - e.MousePosition * (newScale - scale), 2000, Easing.OutQuint);
             this.ScaleTo(scale = newScale, 2000, Easing.OutQuint);

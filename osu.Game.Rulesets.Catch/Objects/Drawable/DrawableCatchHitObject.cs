@@ -66,7 +66,7 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawable
             using (BeginAbsoluteSequence(HitObject.StartTime - HitObject.TimePreempt))
                 this.FadeIn(200);
 
-            var endTime = (HitObject as IHasEndTime)?.EndTime ?? HitObject.StartTime;
+            double endTime = (HitObject as IHasEndTime)?.EndTime ?? HitObject.StartTime;
 
             using (BeginAbsoluteSequence(endTime, true))
             {

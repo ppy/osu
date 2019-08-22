@@ -87,7 +87,7 @@ namespace osu.Game.Overlays.Mods
         {
             if (ToggleKeys != null)
             {
-                var index = Array.IndexOf(ToggleKeys, e.Key);
+                int index = Array.IndexOf(ToggleKeys, e.Key);
                 if (index > -1 && index < buttons.Length)
                     buttons[index].SelectNext(e.ShiftPressed ? -1 : 1);
             }
@@ -111,7 +111,7 @@ namespace osu.Game.Overlays.Mods
                 Mod selected = button.SelectedMod;
                 if (selected == null) continue;
 
-                foreach (var type in modTypes)
+                foreach (Type type in modTypes)
                     if (type.IsInstanceOfType(selected))
                     {
                         if (immediate)
