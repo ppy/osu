@@ -27,5 +27,10 @@ namespace osu.Game.Online.API.Requests
         VoteReset,
         DenyKudosuReset,
         Revoke,
+        AllowKudosuGive,
+        DeleteReset,
+        RestoreGive,
+        RecalculateGive,
+        RecalculateReset
     }
 }
