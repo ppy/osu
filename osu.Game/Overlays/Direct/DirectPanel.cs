@@ -151,8 +151,8 @@ namespace osu.Game.Overlays.Direct
                 foreach (var ruleset in rulesetStore.AvailableRulesets.OrderBy(r => r.ID))
                 {
                     List<BeatmapInfo> list;
-                    if ((list = SetInfo.Beatmaps.FindAll(b => b.Ruleset == ruleset)).Any())
-                        children.Add(new DifficultyIconWithCounter(ruleset, list, this is DirectGridPanel ? Color4.Black : Color4.White));
+                    if ((list = SetInfo.Beatmaps.FindAll(b => b.Ruleset.Equals(ruleset))).Count > 0)
+                        children.Add(new DifficultyIconWithCounter(list, ruleset, this is DirectListPanel ? Color4.White : Color4.Black));
                 }
             }
             else

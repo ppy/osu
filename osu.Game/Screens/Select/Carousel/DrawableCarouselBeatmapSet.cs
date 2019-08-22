@@ -99,11 +99,11 @@ namespace osu.Game.Screens.Select.Carousel
                                     TextPadding = new MarginPadding { Horizontal = 8, Vertical = 2 },
                                     Status = beatmapSet.Status
                                 },
-                                new FillFlowContainer
+                                new FillFlowContainer<DifficultyIcon>
                                 {
                                     AutoSizeAxes = Axes.Both,
                                     Spacing = new Vector2(3),
-                                    Children = getDifficulties(),
+                                    Children = getDifficultyIcons(),
                                 },
                             }
                         }
@@ -114,23 +114,23 @@ namespace osu.Game.Screens.Select.Carousel
 
         private const int maximum_difficulty_icons = 18;
 
-        private List<Drawable> getDifficulties()
+        private List<DifficultyIcon> getDifficultyIcons()
         {
             var beatmaps = ((CarouselBeatmapSet)Item).Beatmaps.ToList();
-            var drawables = new List<Drawable>();
+            var icons = new List<DifficultyIcon>();
 
             if (beatmaps.Count > maximum_difficulty_icons)
             {
                 foreach (var ruleset in rulesets.AvailableRulesets.OrderBy(r => r.ID))
                 {
                     List<CarouselBeatmap> list;
-                    if ((list = beatmaps.FindAll(b => b.Beatmap.Ruleset.ID == ruleset.ID)).Any())
-                        drawables.Add(new FilterableDifficultyIconWithCounter(ruleset, list));
+                    if ((list = beatmaps.FindAll(b => b.Beatmap.Ruleset.Equals(ruleset))).Count > 0)
+                        icons.Add(new FilterableDifficultyIconWithCounter(list, ruleset));
                 }
             }
-            else beatmaps.ForEach(b => drawables.Add(new FilterableDifficultyIcon(b)));
+            else beatmaps.ForEach(b => icons.Add(new FilterableDifficultyIcon(b)));
 
-            return drawables;
+            return icons;
         }
 
         public MenuItem[] ContextMenuItems
@@ -235,8 +235,8 @@ namespace osu.Game.Screens.Select.Carousel
         {
             private readonly List<CarouselBeatmap> beatmaps;
 
-            public FilterableDifficultyIconWithCounter(RulesetInfo ruleset, List<CarouselBeatmap> beatmaps)
-                : base(ruleset, beatmaps.Select(b => b.Beatmap).ToList(), Color4.White)
+            public FilterableDifficultyIconWithCounter(List<CarouselBeatmap> beatmaps, RulesetInfo ruleset)
+                : base(beatmaps.Select(b => b.Beatmap).ToList(), ruleset, Color4.White)
             {
                 this.beatmaps = beatmaps;
             }
@@ -252,8 +252,9 @@ namespace osu.Game.Screens.Select.Carousel
             {
                 var filteredList = beatmaps.FindAll(b => !b.Filtered.Value);
 
-                this.FadeTo(filteredList.Any() ? 1 : 0.1f, 100);
-                Beatmaps = (filteredList.Any() ? filteredList.Select(b => b.Beatmap).ToList() : beatmaps.Select(b => b.Beatmap).ToList());
+                var hasFiltered = filteredList.Count > 0;
+                this.FadeTo(hasFiltered ? 1 : 0.1f, 100);
+                Beatmaps = hasFiltered ? filteredList.Select(b => b.Beatmap).ToList() : beatmaps.Select(b => b.Beatmap).ToList();
             }
         }
     }
