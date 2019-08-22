@@ -80,6 +80,9 @@ namespace osu.Game.Scoring.Legacy
                 else if (version >= 20121008)
                     scoreInfo.OnlineScoreID = sr.ReadInt32();
 
+                if (scoreInfo.OnlineScoreID <= 0)
+                    scoreInfo.OnlineScoreID = null;
+
                 if (compressedReplay?.Length > 0)
                 {
                     using (var replayInStream = new MemoryStream(compressedReplay))

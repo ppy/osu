@@ -18,9 +18,6 @@ namespace osu.Game.Tests.Visual.UserInterface
     [TestFixture]
     public class TestSceneNotificationOverlay : OsuTestScene
     {
-        private readonly NotificationOverlay manager;
-        private readonly List<ProgressNotification> progressingNotifications = new List<ProgressNotification>();
-
         public override IReadOnlyList<Type> RequiredTypes => new[]
         {
             typeof(NotificationSection),
@@ -31,25 +28,33 @@ namespace osu.Game.Tests.Visual.UserInterface
             typeof(Notification)
         };
 
-        public TestSceneNotificationOverlay()
+        private NotificationOverlay notificationOverlay;
+
+        private readonly List<ProgressNotification> progressingNotifications = new List<ProgressNotification>();
+
+        private SpriteText displayedCount;
+
+        [SetUp]
+        public void SetUp() => Schedule(() =>
         {
             progressingNotifications.Clear();
 
-            Content.Add(manager = new NotificationOverlay
+            Content.Children = new Drawable[]
             {
-                Anchor = Anchor.TopRight,
-                Origin = Anchor.TopRight
-            });
+                notificationOverlay = new NotificationOverlay
+                {
+                    Anchor = Anchor.TopRight,
+                    Origin = Anchor.TopRight
+                },
+                displayedCount = new OsuSpriteText()
+            };
 
-            SpriteText displayedCount = new OsuSpriteText();
+            notificationOverlay.UnreadCount.ValueChanged += count => { displayedCount.Text = $"displayed count: {count.NewValue}"; };
+        });
 
-            Content.Add(displayedCount);
-
-            void setState(Visibility state) => AddStep(state.ToString(), () => manager.State.Value = state);
-            void checkProgressingCount(int expected) => AddAssert($"progressing count is {expected}", () => progressingNotifications.Count == expected);
-
-            manager.UnreadCount.ValueChanged += count => { displayedCount.Text = $"displayed count: {count.NewValue}"; };
-
+        [Test]
+        public void TestBasicFlow()
+        {
             setState(Visibility.Visible);
             AddStep(@"simple #1", sendHelloNotification);
             AddStep(@"simple #2", sendAmazingNotification);
@@ -61,6 +66,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             setState(Visibility.Hidden);
 
             AddRepeatStep(@"add many simple", sendManyNotifications, 3);
+
             AddWaitStep("wait some", 5);
 
             checkProgressingCount(0);
@@ -69,18 +75,122 @@ namespace osu.Game.Tests.Visual.UserInterface
 
             checkProgressingCount(1);
 
-            AddAssert("Displayed count is 33", () => manager.UnreadCount.Value == 33);
+            checkDisplayedCount(33);
 
             AddWaitStep("wait some", 10);
 
             checkProgressingCount(0);
-
-            setState(Visibility.Visible);
-
-            //AddStep(@"barrage", () => sendBarrage());
         }
 
-        private void sendBarrage(int remaining = 10)
+        [Test]
+        public void TestImportantWhileClosed()
+        {
+            AddStep(@"simple #1", sendHelloNotification);
+
+            AddAssert("Is visible", () => notificationOverlay.State.Value == Visibility.Visible);
+
+            checkDisplayedCount(1);
+
+            AddStep(@"progress #1", sendUploadProgress);
+            AddStep(@"progress #2", sendDownloadProgress);
+
+            checkProgressingCount(2);
+            checkDisplayedCount(3);
+        }
+
+        [Test]
+        public void TestUnimportantWhileClosed()
+        {
+            AddStep(@"background #1", sendBackgroundNotification);
+
+            AddAssert("Is not visible", () => notificationOverlay.State.Value == Visibility.Hidden);
+
+            checkDisplayedCount(1);
+
+            AddStep(@"background progress #1", sendBackgroundUploadProgress);
+
+            AddWaitStep("wait some", 5);
+
+            checkProgressingCount(0);
+
+            checkDisplayedCount(2);
+
+            AddStep(@"simple #1", sendHelloNotification);
+
+            checkDisplayedCount(3);
+        }
+
+        [Test]
+        public void TestSpam()
+        {
+            setState(Visibility.Visible);
+            AddRepeatStep("send barrage", sendBarrage, 10);
+        }
+
+        protected override void Update()
+        {
+            base.Update();
+
+            progressingNotifications.RemoveAll(n => n.State == ProgressNotificationState.Completed);
+
+            if (progressingNotifications.Count(n => n.State == ProgressNotificationState.Active) < 3)
+            {
+                var p = progressingNotifications.Find(n => n.State == ProgressNotificationState.Queued);
+
+                if (p != null)
+                    p.State = ProgressNotificationState.Active;
+            }
+
+            foreach (var n in progressingNotifications.FindAll(n => n.State == ProgressNotificationState.Active))
+            {
+                if (n.Progress < 1)
+                    n.Progress += (float)(Time.Elapsed / 400) * RNG.NextSingle();
+                else
+                    n.State = ProgressNotificationState.Completed;
+            }
+        }
+
+        private void checkDisplayedCount(int expected) =>
+            AddAssert($"Displayed count is {expected}", () => notificationOverlay.UnreadCount.Value == expected);
+
+        private void sendDownloadProgress()
+        {
+            var n = new ProgressNotification
+            {
+                Text = @"Downloading Haitai...",
+                CompletionText = "Downloaded Haitai!",
+            };
+            notificationOverlay.Post(n);
+            progressingNotifications.Add(n);
+        }
+
+        private void sendUploadProgress()
+        {
+            var n = new ProgressNotification
+            {
+                Text = @"Uploading to BSS...",
+                CompletionText = "Uploaded to BSS!",
+            };
+            notificationOverlay.Post(n);
+            progressingNotifications.Add(n);
+        }
+
+        private void sendBackgroundUploadProgress()
+        {
+            var n = new BackgroundProgressNotification
+            {
+                Text = @"Uploading to BSS...",
+                CompletionText = "Uploaded to BSS!",
+            };
+            notificationOverlay.Post(n);
+            progressingNotifications.Add(n);
+        }
+
+        private void setState(Visibility state) => AddStep(state.ToString(), () => notificationOverlay.State.Value = state);
+
+        private void checkProgressingCount(int expected) => AddAssert($"progressing count is {expected}", () => progressingNotifications.Count == expected);
+
+        private void sendBarrage()
         {
             switch (RNG.Next(0, 4))
             {
@@ -100,69 +210,37 @@ namespace osu.Game.Tests.Visual.UserInterface
                     sendDownloadProgress();
                     break;
             }
-
-            if (remaining > 0)
-                Scheduler.AddDelayed(() => sendBarrage(remaining - 1), 80);
-        }
-
-        protected override void Update()
-        {
-            base.Update();
-
-            progressingNotifications.RemoveAll(n => n.State == ProgressNotificationState.Completed);
-
-            if (progressingNotifications.Count(n => n.State == ProgressNotificationState.Active) < 3)
-            {
-                var p = progressingNotifications.Find(n => n.State == ProgressNotificationState.Queued);
-                if (p != null)
-                    p.State = ProgressNotificationState.Active;
-            }
-
-            foreach (var n in progressingNotifications.FindAll(n => n.State == ProgressNotificationState.Active))
-            {
-                if (n.Progress < 1)
-                    n.Progress += (float)(Time.Elapsed / 400) * RNG.NextSingle();
-                else
-                    n.State = ProgressNotificationState.Completed;
-            }
-        }
-
-        private void sendDownloadProgress()
-        {
-            var n = new ProgressNotification
-            {
-                Text = @"Downloading Haitai...",
-                CompletionText = "Downloaded Haitai!",
-            };
-            manager.Post(n);
-            progressingNotifications.Add(n);
-        }
-
-        private void sendUploadProgress()
-        {
-            var n = new ProgressNotification
-            {
-                Text = @"Uploading to BSS...",
-                CompletionText = "Uploaded to BSS!",
-            };
-            manager.Post(n);
-            progressingNotifications.Add(n);
         }
 
         private void sendAmazingNotification()
         {
-            manager.Post(new SimpleNotification { Text = @"You are amazing" });
+            notificationOverlay.Post(new SimpleNotification { Text = @"You are amazing" });
         }
 
         private void sendHelloNotification()
         {
-            manager.Post(new SimpleNotification { Text = @"Welcome to osu!. Enjoy your stay!" });
+            notificationOverlay.Post(new SimpleNotification { Text = @"Welcome to osu!. Enjoy your stay!" });
+        }
+
+        private void sendBackgroundNotification()
+        {
+            notificationOverlay.Post(new BackgroundNotification { Text = @"Welcome to osu!. Enjoy your stay!" });
         }
 
         private void sendManyNotifications()
         {
             for (int i = 0; i < 10; i++)
-                manager.Post(new SimpleNotification { Text = @"Spam incoming!!" });
+                notificationOverlay.Post(new SimpleNotification { Text = @"Spam incoming!!" });
+        }
+
+        private class BackgroundNotification : SimpleNotification
+        {
+            public override bool IsImportant => false;
+        }
+
+        private class BackgroundProgressNotification : ProgressNotification
+        {
+            public override bool IsImportant => false;
         }
     }
 }

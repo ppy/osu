@@ -10,6 +10,7 @@ using osu.Game.Beatmaps;
 using osu.Game.Overlays.Direct;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Osu;
+using osu.Game.Users;
 using osuTK;
 
 namespace osu.Game.Tests.Visual.Online
@@ -23,18 +24,55 @@ namespace osu.Game.Tests.Visual.Online
             typeof(IconPill)
         };
 
-        private RulesetStore rulesets;
+        private BeatmapSetInfo getUndownloadableBeatmapSet(RulesetInfo ruleset) => new BeatmapSetInfo
+        {
+            OnlineBeatmapSetID = 123,
+            Metadata = new BeatmapMetadata
+            {
+                Title = "undownloadable beatmap",
+                Artist = "test",
+                Source = "more tests",
+                Author = new User
+                {
+                    Username = "BanchoBot",
+                    Id = 3,
+                },
+            },
+            OnlineInfo = new BeatmapSetOnlineInfo
+            {
+                Availability = new BeatmapSetOnlineAvailability
+                {
+                    DownloadDisabled = true,
+                },
+                Preview = @"https://b.ppy.sh/preview/12345.mp3",
+                PlayCount = 123,
+                FavouriteCount = 456,
+                BPM = 111,
+                HasVideo = true,
+                HasStoryboard = true,
+                Covers = new BeatmapSetOnlineCovers(),
+            },
+            Beatmaps = new List<BeatmapInfo>
+            {
+                new BeatmapInfo
+                {
+                    Ruleset = ruleset,
+                    Version = "Test",
+                    StarDifficulty = 6.42,
+                }
+            }
+        };
 
         [BackgroundDependencyLoader]
-        private void load(RulesetStore rulesets)
+        private void load()
         {
-            this.rulesets = rulesets;
+            var ruleset = new OsuRuleset().RulesetInfo;
 
-            var beatmap = CreateWorkingBeatmap(new OsuRuleset().RulesetInfo);
-            beatmap.BeatmapSetInfo.OnlineInfo.HasVideo = true;
-            beatmap.BeatmapSetInfo.OnlineInfo.HasStoryboard = true;
+            var normal = CreateWorkingBeatmap(ruleset).BeatmapSetInfo;
+            normal.OnlineInfo.HasVideo = true;
+            normal.OnlineInfo.HasStoryboard = true;
 
-            var manydiffBeatmap = createTestBeatmapSetWithManyDifficulties();
+            var undownloadable = getUndownloadableBeatmapSet(ruleset);
 
             Child = new BasicScrollContainer
             {
@@ -43,52 +81,18 @@ namespace osu.Game.Tests.Visual.Online
                 {
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
-                    Direction = FillDirection.Full,
+                    Direction = FillDirection.Vertical,
                     Padding = new MarginPadding(20),
                     Spacing = new Vector2(0, 20),
                     Children = new Drawable[]
                     {
-                        new DirectGridPanel(beatmap.BeatmapSetInfo),
-                        new DirectGridPanel(manydiffBeatmap),
-                        new DirectListPanel(beatmap.BeatmapSetInfo),
-                        new DirectListPanel(manydiffBeatmap),
-                    }
+                        new DirectGridPanel(normal),
+                        new DirectListPanel(normal),
+                        new DirectGridPanel(undownloadable),
+                        new DirectListPanel(undownloadable),
+                    },
                 },
             };
-        }
-
-        private BeatmapSetInfo createTestBeatmapSetWithManyDifficulties()
-        {
-            var toReturn = new BeatmapSetInfo
-            {
-                OnlineBeatmapSetID = 1,
-                Metadata = new BeatmapMetadata
-                {
-                    Artist = "peppy",
-                    Title = "test set!",
-                    AuthorString = "peppy",
-                },
-                OnlineInfo = new BeatmapSetOnlineInfo { Covers = new BeatmapSetOnlineCovers { Cover = "" }, },
-                Beatmaps = new List<BeatmapInfo>(),
-            };
-
-            for (int b = 1; b < 101; b++)
-            {
-                toReturn.Beatmaps.Add(new BeatmapInfo
-                {
-                    OnlineBeatmapID = b * 10,
-                    Path = $"extra{b}.osu",
-                    Version = $"Extra {b}",
-                    Ruleset = rulesets.GetRuleset(b % 4),
-                    StarDifficulty = 2 + b % 4 * 2,
-                    BaseDifficulty = new BeatmapDifficulty
-                    {
-                        OverallDifficulty = 3.5f,
-                    }
-                });
-            }
-
-            return toReturn;
         }
     }
 }

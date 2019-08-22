@@ -9,7 +9,7 @@ namespace osu.Game.Rulesets.Taiko.Tests.iOS
     {
         public static void Main(string[] args)
         {
-            UIApplication.Main(args, null, "AppDelegate");
+            UIApplication.Main(args, "GameUIApplication", "AppDelegate");
         }
     }
 }

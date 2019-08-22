@@ -4,7 +4,6 @@
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
-using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Events;
@@ -15,17 +14,6 @@ namespace osu.Game.Graphics.UserInterface
 {
     public class OsuCheckbox : Checkbox
     {
-        private Bindable<bool> bindable;
-
-        public Bindable<bool> Bindable
-        {
-            set
-            {
-                bindable = value;
-                Current.BindTo(bindable);
-            }
-        }
-
         public Color4 CheckedColor { get; set; } = Color4.Cyan;
         public Color4 UncheckedColor { get; set; } = Color4.White;
         public int FadeDuration { get; set; }
@@ -84,17 +72,11 @@ namespace osu.Game.Graphics.UserInterface
             Current.DisabledChanged += disabled => labelText.Alpha = Nub.Alpha = disabled ? 0.3f : 1;
         }
 
-        protected override void LoadComplete()
+        [BackgroundDependencyLoader]
+        private void load(AudioManager audio)
         {
-            base.LoadComplete();
-
-            Current.ValueChanged += enabled =>
-            {
-                if (enabled.NewValue)
-                    sampleChecked?.Play();
-                else
-                    sampleUnchecked?.Play();
-            };
+            sampleChecked = audio.Samples.Get(@"UI/check-on");
+            sampleUnchecked = audio.Samples.Get(@"UI/check-off");
         }
 
         protected override bool OnHover(HoverEvent e)
@@ -111,11 +93,13 @@ namespace osu.Game.Graphics.UserInterface
             base.OnHoverLost(e);
         }
 
-        [BackgroundDependencyLoader]
-        private void load(AudioManager audio)
+        protected override void OnUserChange(bool value)
         {
-            sampleChecked = audio.Samples.Get(@"UI/check-on");
-            sampleUnchecked = audio.Samples.Get(@"UI/check-off");
+            base.OnUserChange(value);
+            if (value)
+                sampleChecked?.Play();
+            else
+                sampleUnchecked?.Play();
         }
     }
 }

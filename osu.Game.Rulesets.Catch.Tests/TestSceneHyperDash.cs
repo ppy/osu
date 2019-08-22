@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using NUnit.Framework;
-using osu.Framework.Allocation;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Catch.Objects;
 using osu.Game.Tests.Visual;
@@ -17,8 +16,8 @@ namespace osu.Game.Rulesets.Catch.Tests
         {
         }
 
-        [BackgroundDependencyLoader]
-        private void load()
+        [Test]
+        public void TestHyperDash()
         {
             AddAssert("First note is hyperdash", () => Beatmap.Value.Beatmap.HitObjects[0] is Fruit f && f.HyperDash);
         }

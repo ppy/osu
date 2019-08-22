@@ -155,7 +155,7 @@ namespace osu.Game.Overlays.Direct
                                         },
                                     },
                                 },
-                                new DownloadButton(SetInfo)
+                                new PanelDownloadButton(SetInfo)
                                 {
                                     Size = new Vector2(50, 30),
                                     Margin = new MarginPadding(horizontal_padding),

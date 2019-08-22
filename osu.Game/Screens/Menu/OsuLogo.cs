@@ -124,7 +124,7 @@ namespace osu.Game.Screens.Menu
                                         {
                                             Anchor = Anchor.Centre,
                                             Origin = Anchor.Centre,
-                                            Blending = BlendingMode.Additive,
+                                            Blending = BlendingParameters.Additive,
                                             Alpha = 0
                                         }
                                     }
@@ -185,7 +185,7 @@ namespace osu.Game.Screens.Menu
                                                                 flashLayer = new Box
                                                                 {
                                                                     RelativeSizeAxes = Axes.Both,
-                                                                    Blending = BlendingMode.Additive,
+                                                                    Blending = BlendingParameters.Additive,
                                                                     Colour = Color4.White,
                                                                     Alpha = 0,
                                                                 },

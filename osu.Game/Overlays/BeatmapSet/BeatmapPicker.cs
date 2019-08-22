@@ -235,7 +235,7 @@ namespace osu.Game.Overlays.BeatmapSet
                             Colour = Color4.Black.Opacity(0.5f),
                         },
                     },
-                    icon = new DifficultyIcon(beatmap)
+                    icon = new DifficultyIcon(beatmap, shouldShowTooltip: false)
                     {
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,

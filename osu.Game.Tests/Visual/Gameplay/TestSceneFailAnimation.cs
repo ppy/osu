@@ -43,7 +43,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             protected override void LoadComplete()
             {
                 base.LoadComplete();
-                ScoreProcessor.FailConditions += _ => true;
+                ScoreProcessor.FailConditions += (_, __) => true;
             }
         }
     }

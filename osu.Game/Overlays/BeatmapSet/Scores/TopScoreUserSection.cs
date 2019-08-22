@@ -13,7 +13,7 @@ using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Online.Leaderboards;
 using osu.Game.Scoring;
-using osu.Game.Users;
+using osu.Game.Users.Drawables;
 using osuTK;
 using osuTK.Graphics;
 
@@ -22,11 +22,11 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
     public class TopScoreUserSection : CompositeDrawable
     {
         private readonly SpriteText rankText;
-        private readonly DrawableRank rank;
+        private readonly UpdateableRank rank;
         private readonly UpdateableAvatar avatar;
         private readonly LinkFlowContainer usernameText;
         private readonly SpriteText date;
-        private readonly DrawableFlag flag;
+        private readonly UpdateableFlag flag;
 
         public TopScoreUserSection()
         {
@@ -39,19 +39,28 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                 Spacing = new Vector2(10, 0),
                 Children = new Drawable[]
                 {
-                    rankText = new OsuSpriteText
+                    new FillFlowContainer
                     {
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
-                        Text = "#1",
-                        Font = OsuFont.GetFont(size: 30, weight: FontWeight.Bold, italics: true)
-                    },
-                    rank = new DrawableRank(ScoreRank.D)
-                    {
-                        Anchor = Anchor.Centre,
-                        Origin = Anchor.Centre,
-                        Size = new Vector2(40),
-                        FillMode = FillMode.Fit,
+                        AutoSizeAxes = Axes.Both,
+                        Direction = FillDirection.Vertical,
+                        Children = new Drawable[]
+                        {
+                            rankText = new OsuSpriteText
+                            {
+                                Anchor = Anchor.Centre,
+                                Origin = Anchor.Centre,
+                                Font = OsuFont.GetFont(size: 24, weight: FontWeight.Bold, italics: true)
+                            },
+                            rank = new UpdateableRank(ScoreRank.D)
+                            {
+                                Anchor = Anchor.Centre,
+                                Origin = Anchor.Centre,
+                                Size = new Vector2(40),
+                                FillMode = FillMode.Fit,
+                            },
+                        }
                     },
                     avatar = new UpdateableAvatar
                     {
@@ -67,6 +76,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                             Offset = new Vector2(0, 2),
                             Radius = 1,
                         },
+                        ShowGuestOnNull = false,
                     },
                     new FillFlowContainer
                     {
@@ -89,11 +99,12 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                                 Origin = Anchor.CentreLeft,
                                 Font = OsuFont.GetFont(size: 15, weight: FontWeight.Bold)
                             },
-                            flag = new DrawableFlag
+                            flag = new UpdateableFlag
                             {
                                 Anchor = Anchor.CentreLeft,
                                 Origin = Anchor.CentreLeft,
                                 Size = new Vector2(20, 13),
+                                ShowPlaceholderOnNull = false,
                             },
                         }
                     }
@@ -105,6 +116,11 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
         private void load(OsuColour colours)
         {
             rankText.Colour = colours.Yellow;
+        }
+
+        public int ScorePosition
+        {
+            set => rankText.Text = $"#{value}";
         }
 
         /// <summary>
@@ -121,7 +137,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                 usernameText.Clear();
                 usernameText.AddUserLink(value.User);
 
-                rank.UpdateRank(value.Rank);
+                rank.Rank = value.Rank;
             }
         }
     }

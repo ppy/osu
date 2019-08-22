@@ -22,7 +22,7 @@ namespace osu.Game.Rulesets.Taiko.Tests
         {
             typeof(InputDrum),
             typeof(DrumSampleMapping),
-            typeof(SampleInfo),
+            typeof(HitSampleInfo),
             typeof(SampleControlPoint)
         };
 

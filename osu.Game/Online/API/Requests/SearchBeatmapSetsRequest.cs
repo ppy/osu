@@ -27,24 +27,25 @@ namespace osu.Game.Online.API.Requests
         }
 
         // ReSharper disable once ImpureMethodCallOnReadonlyValueField
-        protected override string Target => $@"beatmapsets/search?q={query}&m={ruleset.ID ?? 0}&s={(int)searchCategory}&sort={sortCriteria.ToString().ToLowerInvariant()}_{directionString}";
+        protected override string Target => $@"beatmapsets/search?q={query}&m={ruleset.ID ?? 0}&s={searchCategory.ToString().ToLowerInvariant()}&sort={sortCriteria.ToString().ToLowerInvariant()}_{directionString}";
     }
 
     public enum BeatmapSearchCategory
     {
-        Any = 7,
+        Any,
 
-        [Description("Ranked & Approved")]
-        RankedApproved = 0,
-        Qualified = 3,
-        Loved = 8,
-        Favourites = 2,
+        [Description("Has Leaderboard")]
+        Leaderboard,
+        Ranked,
+        Qualified,
+        Loved,
+        Favourites,
 
         [Description("Pending & WIP")]
-        PendingWIP = 4,
-        Graveyard = 5,
+        Pending,
+        Graveyard,
 
         [Description("My Maps")]
-        MyMaps = 6,
+        Mine,
     }
 }

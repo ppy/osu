@@ -196,9 +196,9 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             symbol.RotateTo(Disc.Rotation / 2, 500, Easing.OutQuint);
         }
 
-        protected override void UpdatePreemptState()
+        protected override void UpdateInitialTransforms()
         {
-            base.UpdatePreemptState();
+            base.UpdateInitialTransforms();
 
             circleContainer.ScaleTo(Spinner.Scale * 0.3f);
             circleContainer.ScaleTo(Spinner.Scale, HitObject.TimePreempt / 1.4f, Easing.OutQuint);
@@ -213,7 +213,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                 .ScaleTo(1, 500, Easing.OutQuint);
         }
 
-        protected override void UpdateCurrentState(ArmedState state)
+        protected override void UpdateStateTransforms(ArmedState state)
         {
             var sequence = this.Delay(Spinner.Duration).FadeOut(160);
 

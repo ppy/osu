@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Bindables;
+using osu.Framework.Development;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.IO.Stores;
@@ -34,7 +35,6 @@ using osu.Game.Rulesets.Mods;
 using osu.Game.Scoring;
 using osu.Game.Skinning;
 using osuTK.Input;
-using DebugUtils = osu.Game.Utils.DebugUtils;
 
 namespace osu.Game
 {
@@ -97,7 +97,7 @@ namespace osu.Game
             get
             {
                 if (!IsDeployedBuild)
-                    return @"local " + (DebugUtils.IsDebug ? @"debug" : @"release");
+                    return @"local " + (DebugUtils.IsDebugBuild ? @"debug" : @"release");
 
                 var version = AssemblyVersion;
                 return $@"{version.Major}.{version.Minor}.{version.Build}";
@@ -154,6 +154,7 @@ namespace osu.Game
 
             Fonts.AddStore(new GlyphStore(Resources, @"Fonts/Venera"));
             Fonts.AddStore(new GlyphStore(Resources, @"Fonts/Venera-Light"));
+            Fonts.AddStore(new GlyphStore(Resources, @"Fonts/Venera-Medium"));
 
             runMigrations();
 
@@ -170,7 +171,7 @@ namespace osu.Game
             dependencies.Cache(FileStore = new FileStore(contextFactory, Host.Storage));
 
             // ordering is important here to ensure foreign keys rules are not broken in ModelStore.Cleanup()
-            dependencies.Cache(ScoreManager = new ScoreManager(RulesetStore, () => BeatmapManager, Host.Storage, contextFactory, Host));
+            dependencies.Cache(ScoreManager = new ScoreManager(RulesetStore, () => BeatmapManager, Host.Storage, API, contextFactory, Host));
             dependencies.Cache(BeatmapManager = new BeatmapManager(Host.Storage, contextFactory, RulesetStore, API, Audio, Host, defaultBeatmap));
 
             // this should likely be moved to ArchiveModelManager when another case appers where it is necessary
@@ -183,7 +184,7 @@ namespace osu.Game
             }
 
             BeatmapManager.ItemRemoved += i => ScoreManager.Delete(getBeatmapScores(i), true);
-            BeatmapManager.ItemAdded += (i, existing) => ScoreManager.Undelete(getBeatmapScores(i), true);
+            BeatmapManager.ItemAdded += i => ScoreManager.Undelete(getBeatmapScores(i), true);
 
             dependencies.Cache(KeyBindingStore = new KeyBindingStore(contextFactory, RulesetStore));
             dependencies.Cache(SettingsStore = new SettingsStore(contextFactory));
