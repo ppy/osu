@@ -52,8 +52,8 @@ namespace osu.Game.Screens.Select
             // Ctrl+Enter should start map with autoplay enabled.
             if (GetContainingInputManager().CurrentState?.Keyboard.ControlPressed == true)
             {
-                var auto = Ruleset.Value.CreateInstance().GetAutoplayMod();
-                var autoType = auto.GetType();
+                Rulesets.Mods.ModAutoplay auto = Ruleset.Value.CreateInstance().GetAutoplayMod();
+                System.Type autoType = auto.GetType();
 
                 var mods = Mods.Value;
 

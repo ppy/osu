@@ -187,7 +187,7 @@ namespace osu.Game.Tournament.Screens.Editors
 
                 public void CreateNew()
                 {
-                    var user = new User();
+                    User user = new User();
                     team.Players.Add(user);
                     flow.Add(new PlayerRow(team, user));
                 }

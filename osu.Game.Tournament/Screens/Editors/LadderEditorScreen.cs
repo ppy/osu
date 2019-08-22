@@ -60,7 +60,7 @@ namespace osu.Game.Tournament.Screens.Editors
                     }),
                     new OsuMenuItem("Reset teams", MenuItemType.Destructive, () =>
                     {
-                        foreach (var p in MatchesContainer)
+                        foreach (DrawableTournamentMatch p in MatchesContainer)
                             p.Match.Reset();
                     })
                 };
@@ -128,7 +128,7 @@ namespace osu.Game.Tournament.Screens.Editors
 
             protected override bool OnClick(ClickEvent e)
             {
-                var found = findTarget(e.CurrentState);
+                DrawableTournamentMatch found = findTarget(e.CurrentState);
 
                 if (found != null)
                 {

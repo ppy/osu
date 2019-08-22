@@ -149,7 +149,7 @@ namespace osu.Game.Graphics.UserInterface
             {
                 glowColour = value;
 
-                var effect = EdgeEffect;
+                EdgeEffectParameters effect = EdgeEffect;
                 effect.Colour = value;
                 EdgeEffect = effect;
             }

@@ -59,7 +59,7 @@ namespace osu.Game.Screens.Multi.Play
             if (!playlistItem.RequiredMods.All(m => Mods.Value.Any(m.Equals)))
                 throw new InvalidOperationException("Current Mods do not match PlaylistItem's RequiredMods");
 
-            var req = new CreateRoomScoreRequest(roomId.Value ?? 0, playlistItem.ID);
+            CreateRoomScoreRequest req = new CreateRoomScoreRequest(roomId.Value ?? 0, playlistItem.ID);
             req.Success += r => token = r.ID;
             req.Failure += e =>
             {
@@ -104,7 +104,7 @@ namespace osu.Game.Screens.Multi.Play
 
             Debug.Assert(token != null);
 
-            var request = new SubmitRoomScoreRequest(token.Value, roomId.Value ?? 0, playlistItem.ID, score);
+            SubmitRoomScoreRequest request = new SubmitRoomScoreRequest(token.Value, roomId.Value ?? 0, playlistItem.ID, score);
             request.Failure += e => Logger.Error(e, "Failed to submit score");
             api.Queue(request);
         }

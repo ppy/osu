@@ -74,9 +74,9 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             AddNested(TailCircle);
             components.Add(TailCircle);
 
-            foreach (var tick in s.NestedHitObjects.OfType<SliderTick>())
+            foreach (SliderTick tick in s.NestedHitObjects.OfType<SliderTick>())
             {
-                var drawableTick = new DrawableSliderTick(tick) { Position = tick.Position - s.Position };
+                DrawableSliderTick drawableTick = new DrawableSliderTick(tick) { Position = tick.Position - s.Position };
 
                 ticks.Add(drawableTick);
                 components.Add(drawableTick);
@@ -85,7 +85,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
             foreach (var repeatPoint in s.NestedHitObjects.OfType<RepeatPoint>())
             {
-                var drawableRepeatPoint = new DrawableRepeatPoint(repeatPoint, this) { Position = repeatPoint.Position - s.Position };
+                DrawableRepeatPoint drawableRepeatPoint = new DrawableRepeatPoint(repeatPoint, this) { Position = repeatPoint.Position - s.Position };
 
                 repeatPoints.Add(drawableRepeatPoint);
                 components.Add(drawableRepeatPoint);
@@ -131,16 +131,16 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
             double completionProgress = MathHelper.Clamp((Time.Current - slider.StartTime) / slider.Duration, 0, 1);
 
-            foreach (var c in components.OfType<ISliderProgress>()) c.UpdateProgress(completionProgress);
-            foreach (var c in components.OfType<ITrackSnaking>()) c.UpdateSnakingPosition(slider.Path.PositionAt(Body.SnakedStart ?? 0), slider.Path.PositionAt(Body.SnakedEnd ?? 0));
-            foreach (var t in components.OfType<IRequireTracking>()) t.Tracking = Ball.Tracking;
+            foreach (ISliderProgress c in components.OfType<ISliderProgress>()) c.UpdateProgress(completionProgress);
+            foreach (ITrackSnaking c in components.OfType<ITrackSnaking>()) c.UpdateSnakingPosition(slider.Path.PositionAt(Body.SnakedStart ?? 0), slider.Path.PositionAt(Body.SnakedEnd ?? 0));
+            foreach (IRequireTracking t in components.OfType<IRequireTracking>()) t.Tracking = Ball.Tracking;
 
             Size = Body.Size;
             OriginPosition = Body.PathOffset;
 
             if (DrawSize != Vector2.Zero)
             {
-                var childAnchorPosition = Vector2.Divide(OriginPosition, DrawSize);
+                Vector2 childAnchorPosition = Vector2.Divide(OriginPosition, DrawSize);
                 foreach (var obj in NestedHitObjects)
                     obj.RelativeAnchorPosition = childAnchorPosition;
                 Ball.RelativeAnchorPosition = childAnchorPosition;

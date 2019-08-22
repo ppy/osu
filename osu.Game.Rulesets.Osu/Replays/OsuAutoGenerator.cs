@@ -235,14 +235,14 @@ namespace osu.Game.Rulesets.Osu.Replays
         {
             // Time to insert the first frame which clicks the object
             // Here we mainly need to determine which button to use
-            var action = buttonIndex % 2 == 0 ? OsuAction.LeftButton : OsuAction.RightButton;
+            OsuAction action = buttonIndex % 2 == 0 ? OsuAction.LeftButton : OsuAction.RightButton;
 
-            var startFrame = new OsuReplayFrame(h.StartTime, new Vector2(startPosition.X, startPosition.Y), action);
+            OsuReplayFrame startFrame = new OsuReplayFrame(h.StartTime, new Vector2(startPosition.X, startPosition.Y), action);
 
             // TODO: Why do we delay 1 ms if the object is a spinner? There already is KEY_UP_DELAY from hEndTime.
             double hEndTime = ((h as IHasEndTime)?.EndTime ?? h.StartTime) + KEY_UP_DELAY;
             int endDelay = h is Spinner ? 1 : 0;
-            var endFrame = new OsuReplayFrame(hEndTime + endDelay, new Vector2(h.StackedEndPosition.X, h.StackedEndPosition.Y));
+            OsuReplayFrame endFrame = new OsuReplayFrame(hEndTime + endDelay, new Vector2(h.StackedEndPosition.X, h.StackedEndPosition.Y));
 
             // Decrement because we want the previous frame, not the next one
             int index = FindInsertionIndex(startFrame) - 1;
@@ -252,7 +252,7 @@ namespace osu.Game.Rulesets.Osu.Replays
             // Do we have a previous frame? No need to check for < replay.Count since we decremented!
             if (index >= 0)
             {
-                var previousFrame = (OsuReplayFrame)Frames[index];
+                OsuReplayFrame previousFrame = (OsuReplayFrame)Frames[index];
                 var previousActions = previousFrame.Actions;
 
                 // If a button is already held, then we simply alternate
@@ -275,7 +275,7 @@ namespace osu.Game.Rulesets.Osu.Replays
                     // After alternating we need to keep holding the other button in the future rather than the previous one.
                     for (int j = index + 1; j < Frames.Count; ++j)
                     {
-                        var frame = (OsuReplayFrame)Frames[j];
+                        OsuReplayFrame frame = (OsuReplayFrame)Frames[j];
 
                         // Don't affect frames which stop pressing a button!
                         if (j < Frames.Count - 1 || frame.Actions.SequenceEqual(previousActions))

@@ -377,8 +377,8 @@ namespace osu.Game.Screens.Select
         /// </summary>
         private void performUpdateSelected()
         {
-            var beatmap = beatmapNoDebounce;
-            var ruleset = rulesetNoDebounce;
+            BeatmapInfo beatmap = beatmapNoDebounce;
+            RulesetInfo ruleset = rulesetNoDebounce;
 
             selectionChangedDebounce?.Cancel();
 

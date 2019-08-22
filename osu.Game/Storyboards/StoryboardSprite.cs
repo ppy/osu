@@ -81,7 +81,7 @@ namespace osu.Game.Storyboards
         private void applyCommands<T>(Drawable drawable, IEnumerable<CommandTimeline<T>.TypedCommand> commands, DrawablePropertyInitializer<T> initializeProperty, DrawableTransformer<T> transform, bool alwaysInitialize = true)
             where T : struct
         {
-            var initialized = false;
+            bool initialized = false;
 
             foreach (var command in commands.OrderBy(l => l))
             {

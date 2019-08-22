@@ -41,7 +41,7 @@ namespace osu.Game.Rulesets.Osu.Scoring
         {
             base.ApplyResult(result);
 
-            var osuResult = (OsuJudgementResult)result;
+            OsuJudgementResult osuResult = (OsuJudgementResult)result;
 
             if (result.Type != HitResult.None)
                 comboResultCounts[osuResult.ComboType] = comboResultCounts.GetOrDefault(osuResult.ComboType) + 1;

@@ -13,7 +13,7 @@ namespace osu.Game.Rulesets.Osu.Edit
     {
         public override void HandleDrag(SelectionBlueprint blueprint, DragEvent dragEvent)
         {
-            foreach (var h in SelectedHitObjects.OfType<OsuHitObject>())
+            foreach (OsuHitObject h in SelectedHitObjects.OfType<OsuHitObject>())
             {
                 if (h is Spinner)
                 {

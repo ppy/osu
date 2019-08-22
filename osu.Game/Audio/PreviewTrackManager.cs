@@ -131,7 +131,7 @@ namespace osu.Game.Audio
 
                 if (string.IsNullOrEmpty(name)) return null;
 
-                var dataStream = store.GetStream(name);
+                Stream dataStream = store.GetStream(name);
 
                 if (dataStream == null)
                     return null;

@@ -129,7 +129,7 @@ namespace osu.Game.Graphics
         private string getFileName()
         {
             var dt = DateTime.Now;
-            var fileExt = screenshotFormat.ToString().ToLowerInvariant();
+            string fileExt = screenshotFormat.ToString().ToLowerInvariant();
 
             var withoutIndex = $"osu_{dt:yyyy-MM-dd_HH-mm-ss}.{fileExt}";
             if (!storage.Exists(withoutIndex))

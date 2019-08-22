@@ -92,7 +92,7 @@ namespace osu.Game.Graphics.UserInterface
 
         public void ReplayAnimation()
         {
-            var t = countStars;
+            float t = countStars;
             ResetCount();
             CountStars = t;
         }
@@ -122,7 +122,7 @@ namespace osu.Game.Graphics.UserInterface
         {
             int i = 0;
 
-            foreach (var star in stars.Children)
+            foreach (Star star in stars.Children)
             {
                 star.ClearTransforms(true);
 
