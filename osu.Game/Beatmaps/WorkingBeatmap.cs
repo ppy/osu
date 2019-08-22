@@ -83,7 +83,7 @@ namespace osu.Game.Beatmaps
         /// <returns>The absolute path of the output file.</returns>
         public string Save()
         {
-            var path = FileSafety.GetTempPath(Guid.NewGuid().ToString().Replace("-", string.Empty) + ".json");
+            string path = FileSafety.GetTempPath(Guid.NewGuid().ToString().Replace("-", string.Empty) + ".json");
             using (var sw = new StreamWriter(path))
                 sw.WriteLine(Beatmap.Serialize());
             return path;

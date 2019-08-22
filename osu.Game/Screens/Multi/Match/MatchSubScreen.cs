@@ -151,7 +151,7 @@ namespace osu.Game.Screens.Multi.Match
             {
                 const float fade_duration = 500;
 
-                var settingsDisplayed = tab.NewValue is SettingsMatchPage;
+                bool settingsDisplayed = tab.NewValue is SettingsMatchPage;
 
                 header.ShowBeatmapPanel.Value = !settingsDisplayed;
                 settings.State.Value = settingsDisplayed ? Visibility.Visible : Visibility.Hidden;

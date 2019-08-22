@@ -65,8 +65,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
 
         public void UpdateProgress(double completionProgress)
         {
-            var span = slider.SpanAt(completionProgress);
-            var spanProgress = slider.ProgressAt(completionProgress);
+            int span = slider.SpanAt(completionProgress);
+            double spanProgress = slider.ProgressAt(completionProgress);
 
             double start = 0;
             double end = SnakingIn.Value ? MathHelper.Clamp((Time.Current - (slider.StartTime - slider.TimePreempt)) / (slider.TimePreempt / 3), 0, 1) : 1;

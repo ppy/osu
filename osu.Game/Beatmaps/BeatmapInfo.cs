@@ -134,7 +134,7 @@ namespace osu.Game.Beatmaps
         {
             get
             {
-                var rating = StarDifficulty;
+                double rating = StarDifficulty;
 
                 if (rating < 2.0) return DifficultyRating.Easy;
                 if (rating < 2.7) return DifficultyRating.Normal;

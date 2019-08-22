@@ -28,7 +28,7 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Skills
         protected override double StrainValueOf(DifficultyHitObject current)
         {
             var maniaCurrent = (ManiaDifficultyHitObject)current;
-            var endTime = (maniaCurrent.BaseObject as HoldNote)?.EndTime ?? maniaCurrent.BaseObject.StartTime;
+            double endTime = (maniaCurrent.BaseObject as HoldNote)?.EndTime ?? maniaCurrent.BaseObject.StartTime;
 
             try
             {

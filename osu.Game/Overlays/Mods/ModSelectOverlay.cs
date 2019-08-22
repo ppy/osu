@@ -391,8 +391,8 @@ namespace osu.Game.Overlays.Mods
 
         private void updateMods()
         {
-            var multiplier = 1.0;
-            var ranked = true;
+            double multiplier = 1.0;
+            bool ranked = true;
 
             foreach (var mod in SelectedMods.Value)
             {

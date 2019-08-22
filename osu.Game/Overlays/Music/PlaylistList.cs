@@ -161,7 +161,7 @@ namespace osu.Game.Overlays.Music
                     if (Current <= 0)
                         return;
 
-                    var power = Math.Min(max_power, Math.Abs(start_offset - localPos.Y));
+                    double power = Math.Min(max_power, Math.Abs(start_offset - localPos.Y));
                     ScrollBy(-(float)Math.Pow(exp_base, power));
                 }
                 else if (localPos.Y > DrawHeight - start_offset)

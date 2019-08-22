@@ -62,7 +62,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             validActionPressed = HitActions.Contains(action);
 
             // Only count this as handled if the new judgement is a hit
-            var result = UpdateResult(true);
+            bool result = UpdateResult(true);
 
             if (IsHit)
                 HitAction = action;

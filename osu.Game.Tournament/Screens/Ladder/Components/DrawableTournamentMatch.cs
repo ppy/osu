@@ -247,8 +247,8 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
             {
                 foreach (var conditional in Match.ConditionalMatches)
                 {
-                    var team1Match = conditional.Acronyms.Contains(Match.Team1Acronym);
-                    var team2Match = conditional.Acronyms.Contains(Match.Team2Acronym);
+                    bool team1Match = conditional.Acronyms.Contains(Match.Team1Acronym);
+                    bool team2Match = conditional.Acronyms.Contains(Match.Team2Acronym);
 
                     if (team1Match && team2Match)
                         Match.Date.Value = conditional.Date.Value;

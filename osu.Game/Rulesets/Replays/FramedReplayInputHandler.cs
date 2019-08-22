@@ -130,7 +130,7 @@ namespace osu.Game.Rulesets.Replays
             {
                 // check if the next frame is valid for the current playback direction.
                 // validity is if the next frame is equal or "earlier"
-                var compare = time.CompareTo(NextFrame?.Time);
+                int compare = time.CompareTo(NextFrame?.Time);
 
                 if (compare == 0 || compare == currentDirection)
                 {

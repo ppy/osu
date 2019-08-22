@@ -21,7 +21,7 @@ namespace osu.Game.Storyboards
 
         public override IEnumerable<CommandTimeline<T>.TypedCommand> GetCommands<T>(CommandTimelineSelector<T> timelineSelector, double offset = 0)
         {
-            for (var loop = 0; loop < LoopCount; loop++)
+            for (int loop = 0; loop < LoopCount; loop++)
             {
                 var loopOffset = LoopStartTime + loop * CommandsDuration;
                 foreach (var command in base.GetCommands(timelineSelector, offset + loopOffset))

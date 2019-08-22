@@ -107,7 +107,7 @@ namespace osu.Game.Tournament.Screens.Gameplay.Components
             private void teamChanged(TournamentTeam team)
             {
                 var colour = teamColour == TeamColour.Red ? red : blue;
-                var flip = teamColour != TeamColour.Red;
+                bool flip = teamColour != TeamColour.Red;
 
                 InternalChildren = new Drawable[]
                 {

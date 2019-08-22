@@ -24,7 +24,7 @@ namespace osu.Game.Rulesets.UI.Scrolling.Algorithms
 
         public float GetLength(double startTime, double endTime, double timeRange, float scrollLength)
         {
-            var objectLength = relativePositionAtCached(endTime, timeRange) - relativePositionAtCached(startTime, timeRange);
+            double objectLength = relativePositionAtCached(endTime, timeRange) - relativePositionAtCached(startTime, timeRange);
             return (float)(objectLength * scrollLength);
         }
 

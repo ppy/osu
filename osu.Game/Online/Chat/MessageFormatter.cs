@@ -100,7 +100,7 @@ namespace osu.Game.Online.Chat
 
         private static LinkDetails getLinkDetails(string url)
         {
-            var args = url.Split(new[] { '/' }, StringSplitOptions.RemoveEmptyEntries);
+            string[] args = url.Split(new[] { '/' }, StringSplitOptions.RemoveEmptyEntries);
             args[0] = args[0].TrimEnd(':');
 
             switch (args[0])
@@ -203,7 +203,7 @@ namespace osu.Game.Online.Chat
             // handle channels
             handleMatches(channel_regex, "{0}", "osu://chan/{0}", result, startIndex, LinkAction.OpenChannel);
 
-            var empty = "";
+            string empty = "";
             while (space-- > 0)
                 empty += "\0";
 

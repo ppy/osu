@@ -219,9 +219,9 @@ namespace osu.Game.Scoring.Legacy
         {
             float lastTime = 0;
 
-            foreach (var l in reader.ReadToEnd().Split(','))
+            foreach (string l in reader.ReadToEnd().Split(','))
             {
-                var split = l.Split('|');
+                string[] split = l.Split('|');
 
                 if (split.Length < 4)
                     continue;
@@ -232,7 +232,7 @@ namespace osu.Game.Scoring.Legacy
                     continue;
                 }
 
-                var diff = Parsing.ParseFloat(split[0]);
+                float diff = Parsing.ParseFloat(split[0]);
                 lastTime += diff;
 
                 // Todo: At some point we probably want to rewind and play back the negative-time frames

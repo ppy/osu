@@ -247,10 +247,10 @@ namespace osu.Game.Rulesets.Catch.UI
                 float halfCatchWidth = CatchWidth * 0.5f;
 
                 // this stuff wil disappear once we move fruit to non-relative coordinate space in the future.
-                var catchObjectPosition = fruit.X * CatchPlayfield.BASE_WIDTH;
-                var catcherPosition = Position.X * CatchPlayfield.BASE_WIDTH;
+                float catchObjectPosition = fruit.X * CatchPlayfield.BASE_WIDTH;
+                float catcherPosition = Position.X * CatchPlayfield.BASE_WIDTH;
 
-                var validCatch =
+                bool validCatch =
                     catchObjectPosition >= catcherPosition - halfCatchWidth &&
                     catchObjectPosition <= catcherPosition + halfCatchWidth;
 

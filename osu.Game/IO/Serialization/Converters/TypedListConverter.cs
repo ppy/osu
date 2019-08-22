@@ -71,7 +71,7 @@ namespace osu.Game.IO.Serialization.Converters
                 var type = item.GetType();
                 var assemblyName = type.Assembly.GetName();
 
-                var typeString = $"{type.FullName}, {assemblyName.Name}";
+                string typeString = $"{type.FullName}, {assemblyName.Name}";
                 if (requiresTypeVersion)
                     typeString += $", {assemblyName.Version}";
 

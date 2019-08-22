@@ -52,7 +52,7 @@ namespace osu.Game.Skinning
 
         private SampleChannel loadChannel(ISampleInfo info, Func<string, SampleChannel> getSampleFunction)
         {
-            foreach (var lookup in info.LookupNames)
+            foreach (string lookup in info.LookupNames)
             {
                 var ch = getSampleFunction($"Gameplay/{lookup}");
                 if (ch == null)
