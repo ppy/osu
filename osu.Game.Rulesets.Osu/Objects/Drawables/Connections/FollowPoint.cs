@@ -36,12 +36,12 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Connections
                 Child = new Box
                 {
                     Size = new Vector2(width),
-                    Blending = BlendingMode.Additive,
+                    Blending = BlendingParameters.Additive,
                     Origin = Anchor.Centre,
                     Anchor = Anchor.Centre,
                     Alpha = 0.5f,
                 }
-            }, restrictSize: false);
+            }, confineMode: ConfineMode.NoScaling);
         }
     }
 }

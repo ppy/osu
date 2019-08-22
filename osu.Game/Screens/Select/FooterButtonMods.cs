@@ -32,6 +32,7 @@ namespace osu.Game.Screens.Select
             {
                 Anchor = Anchor.CentreLeft,
                 Origin = Anchor.CentreLeft,
+                Shear = -SHEAR,
                 Child = modDisplay = new FooterModDisplay
                 {
                     DisplayUnrankedText = false,

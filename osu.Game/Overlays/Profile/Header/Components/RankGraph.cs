@@ -31,7 +31,7 @@ namespace osu.Game.Overlays.Profile.Header.Components
 
         private KeyValuePair<int, int>[] ranks;
         private int dayIndex;
-        public Bindable<User> User = new Bindable<User>();
+        public readonly Bindable<UserStatistics> Statistics = new Bindable<UserStatistics>();
 
         public RankGraph()
         {
@@ -56,8 +56,6 @@ namespace osu.Game.Overlays.Profile.Header.Components
             };
 
             graph.OnBallMove += i => dayIndex = i;
-
-            User.ValueChanged += userChanged;
         }
 
         [BackgroundDependencyLoader]
@@ -66,18 +64,25 @@ namespace osu.Game.Overlays.Profile.Header.Components
             graph.LineColour = colours.Yellow;
         }
 
-        private void userChanged(ValueChangedEvent<User> e)
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            Statistics.BindValueChanged(statistics => updateStatistics(statistics.NewValue), true);
+        }
+
+        private void updateStatistics(UserStatistics statistics)
         {
             placeholder.FadeIn(fade_duration, Easing.Out);
 
-            if (e.NewValue?.Statistics?.Ranks.Global == null)
+            if (statistics?.Ranks.Global == null)
             {
                 graph.FadeOut(fade_duration, Easing.Out);
                 ranks = null;
                 return;
             }
 
-            int[] userRanks = e.NewValue.RankHistory?.Data ?? new[] { e.NewValue.Statistics.Ranks.Global.Value };
+            int[] userRanks = statistics.RankHistory?.Data ?? new[] { statistics.Ranks.Global.Value };
             ranks = userRanks.Select((x, index) => new KeyValuePair<int, int>(index, x)).Where(x => x.Value != 0).ToArray();
 
             if (ranks.Length > 1)
@@ -191,16 +196,29 @@ namespace osu.Game.Overlays.Profile.Header.Components
             }
         }
 
-        public string TooltipText => User.Value?.Statistics?.Ranks.Global == null ? "" : $"#{ranks[dayIndex].Value:#,##0}|{ranked_days - ranks[dayIndex].Key + 1}";
+        public object TooltipContent
+        {
+            get
+            {
+                if (Statistics.Value?.Ranks.Global == null)
+                    return null;
+
+                var days = ranked_days - ranks[dayIndex].Key + 1;
+
+                return new TooltipDisplayContent
+                {
+                    Rank = $"#{ranks[dayIndex].Value:#,##0}",
+                    Time = days == 0 ? "now" : $"{days} days ago"
+                };
+            }
+        }
 
         public ITooltip GetCustomTooltip() => new RankGraphTooltip();
 
-        public class RankGraphTooltip : VisibilityContainer, ITooltip
+        private class RankGraphTooltip : VisibilityContainer, ITooltip
         {
             private readonly OsuSpriteText globalRankingText, timeText;
             private readonly Box background;
-
-            public string TooltipText { get; set; }
 
             public RankGraphTooltip()
             {
@@ -255,11 +273,14 @@ namespace osu.Game.Overlays.Profile.Header.Components
                 background.Colour = colours.GreySeafoamDark;
             }
 
-            public void Refresh()
+            public bool SetContent(object content)
             {
-                var info = TooltipText.Split('|');
-                globalRankingText.Text = info[0];
-                timeText.Text = info[1] == "0" ? "now" : $"{info[1]} days ago";
+                if (!(content is TooltipDisplayContent info))
+                    return false;
+
+                globalRankingText.Text = info.Rank;
+                timeText.Text = info.Time;
+                return true;
             }
 
             private bool instantMove = true;
@@ -278,6 +299,12 @@ namespace osu.Game.Overlays.Profile.Header.Components
             protected override void PopIn() => this.FadeIn(200, Easing.OutQuint);
 
             protected override void PopOut() => this.FadeOut(200, Easing.OutQuint);
+        }
+
+        private class TooltipDisplayContent
+        {
+            public string Rank;
+            public string Time;
         }
     }
 }
