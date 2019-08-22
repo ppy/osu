@@ -212,7 +212,19 @@ namespace osu.Game.Skinning
             return texture;
         }
 
-        public override SampleChannel GetSample(string sampleName) => Samples.Get(sampleName);
+        public override SampleChannel GetSample(string sampleName)
+        {
+            var sample = Samples.Get(sampleName);
+
+            if (sample == null)
+            {
+                // Try fallback to non-bank samples.
+                var bank = sampleName.Split('/').Last().Split('-')[0] + '-';
+                sample = Samples.Get($"Gameplay/{sampleName.Replace(bank, "")}");
+            }
+
+            return sample;
+        }
 
         private bool hasFont(string fontName) => GetTexture($"{fontName}-0") != null;
 
