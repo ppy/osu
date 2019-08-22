@@ -36,7 +36,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
                 new TrianglesPiece
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Blending = BlendingMode.Additive,
+                    Blending = BlendingParameters.Additive,
                     Alpha = 0.5f,
                 }
             };

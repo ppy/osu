@@ -56,7 +56,7 @@ namespace osu.Game.Graphics.Sprites
                     BlurSigma = new Vector2(4),
                     CacheDrawnFrameBuffer = true,
                     RelativeSizeAxes = Axes.Both,
-                    Blending = BlendingMode.Additive,
+                    Blending = BlendingParameters.Additive,
                     Size = new Vector2(3f),
                     Children = new[]
                     {
