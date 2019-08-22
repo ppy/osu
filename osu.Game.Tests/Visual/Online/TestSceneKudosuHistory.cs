@@ -150,6 +150,86 @@ namespace osu.Game.Tests.Visual.Online
                     Username = @"Username6",
                     Url = @"https://osu.ppy.sh/u/1234"
                 }
+            },
+            new APIKudosuHistory
+            {
+                Amount = 11,
+                CreatedAt = new DateTimeOffset(new DateTime(2016, 6, 11)),
+                Action = KudosuAction.AllowKudosuGive,
+                Post = new APIKudosuHistory.ModdingPost
+                {
+                    Title = @"Random post 7",
+                    Url = @"https://osu.ppy.sh/b/1234",
+                },
+                Giver = new APIKudosuHistory.KudosuGiver
+                {
+                    Username = @"Username7",
+                    Url = @"https://osu.ppy.sh/u/1234"
+                }
+            },
+            new APIKudosuHistory
+            {
+                Amount = 24,
+                CreatedAt = new DateTimeOffset(new DateTime(2014, 6, 11)),
+                Action = KudosuAction.DeleteReset,
+                Post = new APIKudosuHistory.ModdingPost
+                {
+                    Title = @"Random post 8",
+                    Url = @"https://osu.ppy.sh/b/1234",
+                },
+                Giver = new APIKudosuHistory.KudosuGiver
+                {
+                    Username = @"Username8",
+                    Url = @"https://osu.ppy.sh/u/1234"
+                }
+            },
+            new APIKudosuHistory
+            {
+                Amount = 12,
+                CreatedAt = new DateTimeOffset(new DateTime(2016, 6, 11)),
+                Action = KudosuAction.RestoreGive,
+                Post = new APIKudosuHistory.ModdingPost
+                {
+                    Title = @"Random post 9",
+                    Url = @"https://osu.ppy.sh/b/1234",
+                },
+                Giver = new APIKudosuHistory.KudosuGiver
+                {
+                    Username = @"Username9",
+                    Url = @"https://osu.ppy.sh/u/1234"
+                }
+            },
+            new APIKudosuHistory
+            {
+                Amount = 2,
+                CreatedAt = new DateTimeOffset(new DateTime(2012, 6, 11)),
+                Action = KudosuAction.RecalculateGive,
+                Post = new APIKudosuHistory.ModdingPost
+                {
+                    Title = @"Random post 10",
+                    Url = @"https://osu.ppy.sh/b/1234",
+                },
+                Giver = new APIKudosuHistory.KudosuGiver
+                {
+                    Username = @"Username10",
+                    Url = @"https://osu.ppy.sh/u/1234"
+                }
+            },
+            new APIKudosuHistory
+            {
+                Amount = 32,
+                CreatedAt = new DateTimeOffset(new DateTime(2019, 8, 11)),
+                Action = KudosuAction.RecalculateReset,
+                Post = new APIKudosuHistory.ModdingPost
+                {
+                    Title = @"Random post 11",
+                    Url = @"https://osu.ppy.sh/b/1234",
+                },
+                Giver = new APIKudosuHistory.KudosuGiver
+                {
+                    Username = @"Username11",
+                    Url = @"https://osu.ppy.sh/u/1234"
+                }
             }
         };
     }

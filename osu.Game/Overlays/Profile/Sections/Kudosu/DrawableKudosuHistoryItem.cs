@@ -91,6 +91,41 @@ namespace osu.Game.Overlays.Profile.Sections.Kudosu
                     addMainPart($@"Denied kudosu by {userLinkTemplate()} for the post ");
                     addPostPart();
                     break;
+
+                case KudosuAction.AllowKudosuGive:
+                    linkFlowContainer.AddText(@"Received ");
+                    addKudosuPart();
+                    addMainPart(@" from kudosu deny repeal of modding post ");
+                    addPostPart();
+                    break;
+
+                case KudosuAction.DeleteReset:
+                    linkFlowContainer.AddText(@"Lost ");
+                    addKudosuPart();
+                    addMainPart(@" from modding post deletion of ");
+                    addPostPart();
+                    break;
+
+                case KudosuAction.RestoreGive:
+                    linkFlowContainer.AddText(@"Received ");
+                    addKudosuPart();
+                    addMainPart(@" from modding post restoration of ");
+                    addPostPart();
+                    break;
+
+                case KudosuAction.RecalculateGive:
+                    linkFlowContainer.AddText(@"Received ");
+                    addKudosuPart();
+                    addMainPart(@" from votes recalculation in modding post of ");
+                    addPostPart();
+                    break;
+
+                case KudosuAction.RecalculateReset:
+                    linkFlowContainer.AddText(@"Lost ");
+                    addKudosuPart();
+                    addMainPart(@" from votes recalculation in modding post of ");
+                    addPostPart();
+                    break;
             }
         }
 
