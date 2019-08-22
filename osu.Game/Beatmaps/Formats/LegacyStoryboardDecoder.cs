@@ -192,18 +192,18 @@ namespace osu.Game.Beatmaps.Formats
 
                             case "R":
                             {
-                                var startValue = float.Parse(split[4], CultureInfo.InvariantCulture);
-                                var endValue = split.Length > 5 ? float.Parse(split[5], CultureInfo.InvariantCulture) : startValue;
+                                float startValue = float.Parse(split[4], CultureInfo.InvariantCulture);
+                                float endValue = split.Length > 5 ? float.Parse(split[5], CultureInfo.InvariantCulture) : startValue;
                                 timelineGroup?.Rotation.Add(easing, startTime, endTime, MathHelper.RadiansToDegrees(startValue), MathHelper.RadiansToDegrees(endValue));
                             }
                                 break;
 
                             case "M":
                             {
-                                var startX = float.Parse(split[4], CultureInfo.InvariantCulture);
-                                var startY = float.Parse(split[5], CultureInfo.InvariantCulture);
-                                var endX = split.Length > 6 ? float.Parse(split[6], CultureInfo.InvariantCulture) : startX;
-                                var endY = split.Length > 7 ? float.Parse(split[7], CultureInfo.InvariantCulture) : startY;
+                                float startX = float.Parse(split[4], CultureInfo.InvariantCulture);
+                                float startY = float.Parse(split[5], CultureInfo.InvariantCulture);
+                                float endX = split.Length > 6 ? float.Parse(split[6], CultureInfo.InvariantCulture) : startX;
+                                float endY = split.Length > 7 ? float.Parse(split[7], CultureInfo.InvariantCulture) : startY;
                                 timelineGroup?.X.Add(easing, startTime, endTime, startX, endX);
                                 timelineGroup?.Y.Add(easing, startTime, endTime, startY, endY);
                             }
