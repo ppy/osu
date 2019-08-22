@@ -20,7 +20,7 @@ namespace osu.Game.Rulesets.Osu.UI
         [BackgroundDependencyLoader]
         private void load()
         {
-            var config = (OsuRulesetConfigManager)Config;
+            OsuRulesetConfigManager config = (OsuRulesetConfigManager)Config;
 
             Children = new Drawable[]
             {

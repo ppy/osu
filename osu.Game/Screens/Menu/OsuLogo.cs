@@ -272,7 +272,7 @@ namespace osu.Game.Screens.Menu
 
             lastBeatIndex = beatIndex;
 
-            var beatLength = timingPoint.BeatLength;
+            double beatLength = timingPoint.BeatLength;
 
             float amplitudeAdjust = Math.Min(1, 0.4f + amplitudes.Maximum);
 

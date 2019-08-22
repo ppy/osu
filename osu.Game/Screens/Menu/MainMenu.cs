@@ -108,7 +108,7 @@ namespace osu.Game.Screens.Menu
 
         private Screen consumeSongSelect()
         {
-            var s = songSelect;
+            Screen s = songSelect;
             songSelect = null;
             return s;
         }

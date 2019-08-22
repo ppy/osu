@@ -34,7 +34,7 @@ namespace osu.Game.Screens.Select
 
         protected override bool OnStart()
         {
-            var item = new PlaylistItem
+            PlaylistItem item = new PlaylistItem
             {
                 Beatmap = Beatmap.Value.BeatmapInfo,
                 Ruleset = Ruleset.Value,

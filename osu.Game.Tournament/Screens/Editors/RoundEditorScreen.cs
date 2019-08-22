@@ -240,7 +240,7 @@ namespace osu.Game.Tournament.Screens.Editors
                                 return;
                             }
 
-                            var req = new GetBeatmapRequest(new BeatmapInfo { OnlineBeatmapID = Model.ID });
+                            GetBeatmapRequest req = new GetBeatmapRequest(new BeatmapInfo { OnlineBeatmapID = Model.ID });
 
                             req.Success += res =>
                             {

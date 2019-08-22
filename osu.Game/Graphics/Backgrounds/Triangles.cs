@@ -228,7 +228,7 @@ namespace osu.Game.Graphics.Backgrounds
                 {
                     var offset = triangle_size * new Vector2(particle.Scale * 0.5f, particle.Scale * 0.866f);
 
-                    var triangle = new Triangle(
+                    Triangle triangle = new Triangle(
                         Vector2Extensions.Transform(particle.Position * size, DrawInfo.Matrix),
                         Vector2Extensions.Transform(particle.Position * size + offset, DrawInfo.Matrix),
                         Vector2Extensions.Transform(particle.Position * size + new Vector2(-offset.X, offset.Y), DrawInfo.Matrix)
