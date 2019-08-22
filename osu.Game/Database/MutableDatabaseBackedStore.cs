@@ -50,7 +50,7 @@ namespace osu.Game.Database
         /// <param name="item">The item to update.</param>
         public void Update(T item)
         {
-            using (DatabaseWriteUsage usage = ContextFactory.GetForWrite())
+            using (var usage = ContextFactory.GetForWrite())
                 usage.Context.Update(item);
 
             ItemRemoved?.Invoke(item);
@@ -131,15 +131,15 @@ namespace osu.Game.Database
         {
             using (var usage = ContextFactory.GetForWrite())
             {
-                OsuDbContext context = usage.Context;
+                var context = usage.Context;
 
-                IQueryable<T> lookup = context.Set<T>().Where(s => s.DeletePending);
+                var lookup = context.Set<T>().Where(s => s.DeletePending);
 
                 if (query != null) lookup = lookup.Where(query);
 
                 lookup = AddIncludesForDeletion(lookup);
 
-                List<T> purgeable = lookup.ToList();
+                var purgeable = lookup.ToList();
 
                 if (!purgeable.Any()) return;
 

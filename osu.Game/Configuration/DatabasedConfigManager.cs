@@ -58,7 +58,7 @@ namespace osu.Game.Configuration
                 }
             }
 
-            DatabasedSetting setting = databasedSettings.Find(s => s.Key == lookup.ToString());
+            var setting = databasedSettings.Find(s => s.Key == lookup.ToString());
 
             if (setting != null)
             {

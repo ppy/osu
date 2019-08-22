@@ -75,7 +75,7 @@ namespace osu.Game.Tournament.Screens.Editors
             Storage.ItemsAdded += items => items.ForEach(i => flow.Add(CreateDrawable(i)));
             Storage.ItemsRemoved += items => items.ForEach(i => flow.RemoveAll(d => d.Model == i));
 
-            foreach (TModel model in Storage)
+            foreach (var model in Storage)
                 flow.Add(CreateDrawable(model));
         }
 

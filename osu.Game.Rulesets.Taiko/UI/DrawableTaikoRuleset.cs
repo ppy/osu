@@ -68,7 +68,7 @@ namespace osu.Game.Rulesets.Taiko.UI
 
                 var currentPoint = timingPoints[currentIndex];
 
-                BarLine barLine = new BarLine
+                var barLine = new BarLine
                 {
                     StartTime = time,
                 };

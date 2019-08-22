@@ -25,13 +25,13 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             if (current.BaseObject is Spinner)
                 return 0;
 
-            OsuDifficultyHitObject osuCurrent = (OsuDifficultyHitObject)current;
+            var osuCurrent = (OsuDifficultyHitObject)current;
 
             double result = 0;
 
             if (Previous.Count > 0)
             {
-                OsuDifficultyHitObject osuPrevious = (OsuDifficultyHitObject)Previous[0];
+                var osuPrevious = (OsuDifficultyHitObject)Previous[0];
 
                 if (osuCurrent.Angle != null && osuCurrent.Angle.Value > angle_bonus_begin)
                 {

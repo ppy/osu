@@ -71,7 +71,7 @@ namespace osu.Game.Tournament.Screens.TeamWin
 
         private void update()
         {
-            TournamentMatch match = currentMatch.Value;
+            var match = currentMatch.Value;
 
             if (match.Winner == null)
             {

@@ -25,7 +25,7 @@ namespace osu.Game.Rulesets.Osu.Replays
         {
             get
             {
-                OsuReplayFrame frame = CurrentFrame;
+                var frame = CurrentFrame;
 
                 if (frame == null)
                     return null;

@@ -121,7 +121,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
 
             // Skip the head circle
             var scoringTimes = slider.NestedHitObjects.Skip(1).Select(t => t.StartTime);
-            foreach (double time in scoringTimes)
+            foreach (var time in scoringTimes)
                 computeVertex(time);
         }
 

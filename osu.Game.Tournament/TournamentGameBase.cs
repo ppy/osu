@@ -62,7 +62,7 @@ namespace osu.Game.Tournament
             windowSize = frameworkConfig.GetBindable<Size>(FrameworkSetting.WindowedSize);
             windowSize.BindValueChanged(size => ScheduleAfterChildren(() =>
             {
-                int minWidth = (int)(size.NewValue.Height / 9f * 16 + 400);
+                var minWidth = (int)(size.NewValue.Height / 9f * 16 + 400);
 
                 heightWarning.Alpha = size.NewValue.Width < minWidth ? 1 : 0;
             }), true);
@@ -146,10 +146,10 @@ namespace osu.Game.Tournament
             }
 
             // assign progressions
-            foreach (TournamentProgression pair in ladder.Progressions)
+            foreach (var pair in ladder.Progressions)
             {
-                TournamentMatch src = ladder.Matches.FirstOrDefault(p => p.ID == pair.SourceID);
-                TournamentMatch dest = ladder.Matches.FirstOrDefault(p => p.ID == pair.TargetID);
+                var src = ladder.Matches.FirstOrDefault(p => p.ID == pair.SourceID);
+                var dest = ladder.Matches.FirstOrDefault(p => p.ID == pair.TargetID);
 
                 if (src == null)
                     continue;
@@ -164,10 +164,10 @@ namespace osu.Game.Tournament
             }
 
             // link matches to rounds
-            foreach (TournamentRound round in ladder.Rounds)
+            foreach (var round in ladder.Rounds)
             foreach (var id in round.Matches)
             {
-                TournamentMatch found = ladder.Matches.FirstOrDefault(p => p.ID == id);
+                var found = ladder.Matches.FirstOrDefault(p => p.ID == id);
 
                 if (found != null)
                 {
@@ -192,8 +192,8 @@ namespace osu.Game.Tournament
         {
             bool addedInfo = false;
 
-            foreach (TournamentTeam t in ladder.Teams)
-            foreach (Users.User p in t.Players)
+            foreach (var t in ladder.Teams)
+            foreach (var p in t.Players)
                 if (string.IsNullOrEmpty(p.Username))
                 {
                     var req = new GetUserRequest(p.Id);
@@ -213,8 +213,8 @@ namespace osu.Game.Tournament
         {
             bool addedInfo = false;
 
-            foreach (TournamentRound r in ladder.Rounds)
-            foreach (RoundBeatmap b in r.Beatmaps)
+            foreach (var r in ladder.Rounds)
+            foreach (var b in r.Beatmaps)
                 if (b.BeatmapInfo == null)
                 {
                     var req = new GetBeatmapRequest(new BeatmapInfo { OnlineBeatmapID = b.ID });
@@ -237,15 +237,15 @@ namespace osu.Game.Tournament
 
         protected virtual void SaveChanges()
         {
-            foreach (TournamentRound r in ladder.Rounds)
+            foreach (var r in ladder.Rounds)
                 r.Matches = ladder.Matches.Where(p => p.Round.Value == r).Select(p => p.ID).ToList();
 
             ladder.Progressions = ladder.Matches.Where(p => p.Progression.Value != null).Select(p => new TournamentProgression(p.ID, p.Progression.Value.ID)).Concat(
                                             ladder.Matches.Where(p => p.LosersProgression.Value != null).Select(p => new TournamentProgression(p.ID, p.LosersProgression.Value.ID, true)))
                                         .ToList();
 
-            using (Stream stream = storage.GetStream(bracket_filename, FileAccess.Write, FileMode.Create))
-            using (StreamWriter sw = new StreamWriter(stream))
+            using (var stream = storage.GetStream(bracket_filename, FileAccess.Write, FileMode.Create))
+            using (var sw = new StreamWriter(stream))
             {
                 sw.Write(JsonConvert.SerializeObject(ladder,
                     new JsonSerializerSettings

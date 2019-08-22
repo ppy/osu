@@ -94,7 +94,7 @@ namespace osu.Game.Screens.Select.Carousel
             // ensure we are the only item selected
             if (value == CarouselItemState.Selected)
             {
-                foreach (CarouselItem b in InternalChildren)
+                foreach (var b in InternalChildren)
                 {
                     if (item == b) continue;
 

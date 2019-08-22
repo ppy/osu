@@ -51,7 +51,7 @@ namespace osu.Game.Graphics
         {
             updateTime();
 
-            TimeSpan diffToNow = DateTimeOffset.Now.Subtract(Date);
+            var diffToNow = DateTimeOffset.Now.Subtract(Date);
 
             double timeUntilNextUpdate = 1000;
 

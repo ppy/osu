@@ -479,7 +479,7 @@ namespace osu.Game.Database
         /// </summary>
         private List<TFileModel> createFileInfos(ArchiveReader reader, FileStore files)
         {
-            List<TFileModel> fileInfos = new List<TFileModel>();
+            var fileInfos = new List<TFileModel>();
 
             // import files to manager
             foreach (string file in reader.Filenames)
@@ -527,7 +527,7 @@ namespace osu.Game.Database
         /// </summary>
         public Task ImportFromStableAsync()
         {
-            Storage stable = GetStableStorage?.Invoke();
+            var stable = GetStableStorage?.Invoke();
 
             if (stable == null)
             {

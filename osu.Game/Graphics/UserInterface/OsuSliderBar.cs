@@ -162,10 +162,10 @@ namespace osu.Game.Graphics.UserInterface
                     TooltipText = floatValue.ToString("P0");
                 else
                 {
-                    decimal decimalPrecision = normalise((decimal)Convert.ChangeType(CurrentNumber.Precision, typeof(decimal)), max_decimal_digits);
+                    var decimalPrecision = normalise((decimal)Convert.ChangeType(CurrentNumber.Precision, typeof(decimal)), max_decimal_digits);
 
                     // Find the number of significant digits (we could have less than 5 after normalize())
-                    int significantDigits = findPrecision(decimalPrecision);
+                    var significantDigits = findPrecision(decimalPrecision);
 
                     TooltipText = floatValue.ToString($"N{significantDigits}");
                 }

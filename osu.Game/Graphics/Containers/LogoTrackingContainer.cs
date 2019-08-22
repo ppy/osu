@@ -107,7 +107,7 @@ namespace osu.Game.Graphics.Containers
 
                 if (duration != 0)
                 {
-                    double elapsedDuration = (Time.Current - (double)startTime);
+                    double elapsedDuration = (double)(Time.Current - startTime);
 
                     var amount = (float)Interpolation.ApplyEasing(easing, Math.Min(elapsedDuration / duration, 1));
 

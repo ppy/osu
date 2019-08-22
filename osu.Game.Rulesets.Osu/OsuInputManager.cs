@@ -50,7 +50,9 @@ namespace osu.Game.Rulesets.Osu
 
             protected override bool Handle(UIEvent e)
             {
-                return AllowUserPresses && base.Handle(e);
+                if (!AllowUserPresses) return false;
+
+                return base.Handle(e);
             }
         }
     }

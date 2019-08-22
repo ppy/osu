@@ -43,8 +43,8 @@ namespace osu.Game.Graphics.Cursor
         {
             if (dragRotationState != DragRotationState.NotDragging)
             {
-                Vector2 position = e.MousePosition;
-                float distance = Vector2Extensions.Distance(position, positionMouseDown);
+                var position = e.MousePosition;
+                var distance = Vector2Extensions.Distance(position, positionMouseDown);
 
                 // don't start rotating until we're moved a minimum distance away from the mouse down location,
                 // else it can have an annoying effect.
@@ -93,7 +93,7 @@ namespace osu.Game.Graphics.Cursor
 
         protected override bool OnMouseUp(MouseUpEvent e)
         {
-            if (!(e.IsPressed(MouseButton.Left) || e.IsPressed(MouseButton.Right)))
+            if (!e.IsPressed(MouseButton.Left) && !e.IsPressed(MouseButton.Right))
             {
                 activeCursor.AdditiveLayer.FadeOutFromOne(500, Easing.OutQuint);
                 activeCursor.ScaleTo(1, 500, Easing.OutElastic);

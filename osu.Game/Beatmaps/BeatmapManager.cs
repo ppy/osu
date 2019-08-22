@@ -280,13 +280,13 @@ namespace osu.Game.Beatmaps
         /// </summary>
         private List<BeatmapInfo> createBeatmapDifficulties(ArchiveReader reader)
         {
-            List<BeatmapInfo> beatmapInfos = new List<BeatmapInfo>();
+            var beatmapInfos = new List<BeatmapInfo>();
 
             foreach (var name in reader.Filenames.Where(f => f.EndsWith(".osu")))
             {
-                using (Stream raw = reader.GetStream(name))
-                using (MemoryStream ms = new MemoryStream()) //we need a memory stream so we can seek
-                using (StreamReader sr = new StreamReader(ms))
+                using (var raw = reader.GetStream(name))
+                using (var ms = new MemoryStream()) //we need a memory stream so we can seek
+                using (var sr = new StreamReader(ms))
                 {
                     raw.CopyTo(ms);
                     ms.Position = 0;

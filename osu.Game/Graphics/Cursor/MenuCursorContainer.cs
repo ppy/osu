@@ -55,7 +55,7 @@ namespace osu.Game.Graphics.Cursor
                 return;
             }
 
-            IProvideCursor newTarget = inputManager.HoveredDrawables.OfType<IProvideCursor>().FirstOrDefault(t => t.ProvidingUserCursor) ?? this;
+            var newTarget = inputManager.HoveredDrawables.OfType<IProvideCursor>().FirstOrDefault(t => t.ProvidingUserCursor) ?? this;
 
             if (currentTarget == newTarget)
                 return;

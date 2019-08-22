@@ -73,7 +73,7 @@ namespace osu.Game.Rulesets.Osu.UI
 
         private void addApproachCircleProxy(Drawable d)
         {
-            Drawable proxy = d.CreateProxy();
+            var proxy = d.CreateProxy();
             proxy.LifetimeStart = d.LifetimeStart;
             proxy.LifetimeEnd = d.LifetimeEnd;
             approachCircles.Add(proxy);
