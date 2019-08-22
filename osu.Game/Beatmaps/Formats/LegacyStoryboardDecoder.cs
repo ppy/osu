@@ -65,7 +65,7 @@ namespace osu.Game.Beatmaps.Formats
 
         private void handleEvents(string line)
         {
-            var depth = 0;
+            int depth = 0;
 
             while (line.StartsWith(" ", StringComparison.Ordinal) || line.StartsWith("_", StringComparison.Ordinal))
             {
@@ -147,8 +147,8 @@ namespace osu.Game.Beatmaps.Formats
 
                     case "L":
                     {
-                        var startTime = double.Parse(split[1], CultureInfo.InvariantCulture);
-                        var loopCount = int.Parse(split[2]);
+                        double startTime = double.Parse(split[1], CultureInfo.InvariantCulture);
+                        int loopCount = int.Parse(split[2]);
                         timelineGroup = storyboardSprite?.AddLoop(startTime, loopCount);
                     }
                         break;
@@ -158,9 +158,9 @@ namespace osu.Game.Beatmaps.Formats
                         if (string.IsNullOrEmpty(split[3]))
                             split[3] = split[2];
 
-                        var easing = (Easing)int.Parse(split[1]);
-                        var startTime = double.Parse(split[2], CultureInfo.InvariantCulture);
-                        var endTime = double.Parse(split[3], CultureInfo.InvariantCulture);
+                            Easing easing = (Easing)int.Parse(split[1]);
+                            double startTime = double.Parse(split[2], CultureInfo.InvariantCulture);
+                            double endTime = double.Parse(split[3], CultureInfo.InvariantCulture);
 
                         switch (commandType)
                         {
@@ -241,7 +241,7 @@ namespace osu.Game.Beatmaps.Formats
 
                             case "P":
                             {
-                                var type = split[4];
+                                string type = split[4];
 
                                 switch (type)
                                 {

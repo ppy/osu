@@ -203,7 +203,7 @@ namespace osu.Game.Overlays.Profile.Header.Components
                 if (Statistics.Value?.Ranks.Global == null)
                     return null;
 
-                var days = ranked_days - ranks[dayIndex].Key + 1;
+                int days = ranked_days - ranks[dayIndex].Key + 1;
 
                 return new TooltipDisplayContent
                 {

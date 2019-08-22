@@ -233,7 +233,7 @@ namespace osu.Game.Overlays.Volume
         {
             scrollAccumulation += delta * adjust_step * (isPrecise ? 0.1 : 1);
 
-            var precision = Bindable.Precision;
+            double precision = Bindable.Precision;
 
             while (Precision.AlmostBigger(Math.Abs(scrollAccumulation), precision))
             {

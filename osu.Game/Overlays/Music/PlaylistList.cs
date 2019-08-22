@@ -131,7 +131,7 @@ namespace osu.Game.Overlays.Music
             protected override bool OnDragEnd(DragEndEvent e)
             {
                 nativeDragPosition = e.ScreenSpaceMousePosition;
-                var handled = draggedItem != null || base.OnDragEnd(e);
+                bool handled = draggedItem != null || base.OnDragEnd(e);
                 draggedItem = null;
 
                 return handled;

@@ -367,7 +367,7 @@ namespace osu.Game.Database
             using (ContextFactory.GetForWrite())
             {
                 // re-fetch the model on the import context.
-                var foundModel = queryModel().Include(s => s.Files).ThenInclude(f => f.FileInfo).FirstOrDefault(s => s.ID == item.ID);
+                TModel foundModel = queryModel().Include(s => s.Files).ThenInclude(f => f.FileInfo).FirstOrDefault(s => s.ID == item.ID);
 
                 if (foundModel == null || foundModel.DeletePending) return false;
 
@@ -400,7 +400,7 @@ namespace osu.Game.Database
 
             using (ContextFactory.GetForWrite())
             {
-                foreach (var b in items)
+                foreach (TModel b in items)
                 {
                     if (notification.State == ProgressNotificationState.Cancelled)
                         // user requested abort
@@ -439,7 +439,7 @@ namespace osu.Game.Database
 
             using (ContextFactory.GetForWrite())
             {
-                foreach (var item in items)
+                foreach (TModel item in items)
                 {
                     if (notification.State == ProgressNotificationState.Cancelled)
                         // user requested abort
