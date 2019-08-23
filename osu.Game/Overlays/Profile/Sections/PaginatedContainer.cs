@@ -11,22 +11,25 @@ using osu.Game.Graphics.Sprites;
 using osu.Game.Online.API;
 using osu.Game.Rulesets;
 using osu.Game.Users;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace osu.Game.Overlays.Profile.Sections
 {
-    public abstract class PaginatedContainer : FillFlowContainer
+    public abstract class PaginatedContainer<T> : FillFlowContainer
     {
-        protected readonly FillFlowContainer ItemsContainer;
-        protected readonly ShowMoreButton MoreButton;
-        protected readonly OsuSpriteText MissingText;
+        private readonly ShowMoreButton moreButton;
+        private readonly OsuSpriteText missingText;
+        private APIRequest<List<T>> retrievalRequest;
+
+        [Resolved]
+        private IAPIProvider api { get; set; }
 
         protected int VisiblePages;
         protected int ItemsPerPage;
 
         protected readonly Bindable<User> User = new Bindable<User>();
-
-        protected IAPIProvider Api;
-        protected APIRequest RetrievalRequest;
+        protected readonly FillFlowContainer ItemsContainer;
         protected RulesetStore Rulesets;
 
         protected PaginatedContainer(Bindable<User> user, string header, string missing)
@@ -51,15 +54,15 @@ namespace osu.Game.Overlays.Profile.Sections
                     RelativeSizeAxes = Axes.X,
                     Spacing = new Vector2(0, 2),
                 },
-                MoreButton = new ShowMoreButton
+                moreButton = new ShowMoreButton
                 {
                     Anchor = Anchor.TopCentre,
                     Origin = Anchor.TopCentre,
                     Alpha = 0,
                     Margin = new MarginPadding { Top = 10 },
-                    Action = ShowMore,
+                    Action = showMore,
                 },
-                MissingText = new OsuSpriteText
+                missingText = new OsuSpriteText
                 {
                     Font = OsuFont.GetFont(size: 15),
                     Text = missing,
@@ -69,9 +72,8 @@ namespace osu.Game.Overlays.Profile.Sections
         }
 
         [BackgroundDependencyLoader]
-        private void load(IAPIProvider api, RulesetStore rulesets)
+        private void load(RulesetStore rulesets)
         {
-            Api = api;
             Rulesets = rulesets;
 
             User.ValueChanged += onUserChanged;
@@ -84,9 +86,51 @@ namespace osu.Game.Overlays.Profile.Sections
             ItemsContainer.Clear();
 
             if (e.NewValue != null)
-                ShowMore();
+                showMore();
         }
 
-        protected abstract void ShowMore();
+        private void showMore()
+        {
+            retrievalRequest = CreateRequest();
+            retrievalRequest.Success += items => UpdateItems(items);
+
+            api.Queue(retrievalRequest);
+        }
+
+        protected virtual void UpdateItems(List<T> items)
+        {
+            Schedule(() =>
+            {
+                moreButton.FadeTo(items.Count == ItemsPerPage ? 1 : 0);
+                moreButton.IsLoading = false;
+
+                if (!items.Any() && VisiblePages == 1)
+                {
+                    moreButton.Hide();
+                    moreButton.IsLoading = false;
+                    missingText.Show();
+                    return;
+                }
+
+                LoadComponentsAsync(items.Select(item => CreateDrawableItem(item)), i =>
+                {
+                    missingText.Hide();
+                    moreButton.FadeTo(items.Count == ItemsPerPage ? 1 : 0);
+                    moreButton.IsLoading = false;
+
+                    ItemsContainer.AddRange(i);
+                });
+            });
+        }
+
+        protected abstract APIRequest<List<T>> CreateRequest();
+
+        protected abstract Drawable CreateDrawableItem(T item);
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+            retrievalRequest?.Cancel();
+        }
     }
 }
