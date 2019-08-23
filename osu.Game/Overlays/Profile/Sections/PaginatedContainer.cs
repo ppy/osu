@@ -82,6 +82,8 @@ namespace osu.Game.Overlays.Profile.Sections
 
         private void onUserChanged(ValueChangedEvent<User> e)
         {
+            retrievalRequest?.Cancel();
+
             VisiblePages = 0;
             ItemsContainer.Clear();
 
@@ -92,7 +94,7 @@ namespace osu.Game.Overlays.Profile.Sections
         private void showMore()
         {
             retrievalRequest = CreateRequest();
-            retrievalRequest.Success += items => UpdateItems(items);
+            retrievalRequest.Success += UpdateItems;
 
             api.Queue(retrievalRequest);
         }
@@ -109,13 +111,13 @@ namespace osu.Game.Overlays.Profile.Sections
                     return;
                 }
 
-                LoadComponentsAsync(items.Select(item => CreateDrawableItem(item)), i =>
+                LoadComponentsAsync(items.Select(CreateDrawableItem), drawables =>
                 {
                     missingText.Hide();
                     moreButton.FadeTo(items.Count == ItemsPerPage ? 1 : 0);
                     moreButton.IsLoading = false;
 
-                    ItemsContainer.AddRange(i);
+                    ItemsContainer.AddRange(drawables);
                 });
             });
         }
