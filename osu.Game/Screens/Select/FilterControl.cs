@@ -29,40 +29,14 @@ namespace osu.Game.Screens.Select
 
         private readonly TabControl<GroupMode> groupTabs;
 
-        private SortMode sort = SortMode.Title;
+        public readonly Bindable<SortMode> SortMode = new Bindable<SortMode>(Filter.SortMode.Title);
 
-        public SortMode Sort
-        {
-            get => sort;
-            set
-            {
-                if (sort != value)
-                {
-                    sort = value;
-                    FilterChanged?.Invoke(CreateCriteria());
-                }
-            }
-        }
-
-        private GroupMode group = GroupMode.All;
-
-        public GroupMode Group
-        {
-            get => group;
-            set
-            {
-                if (group != value)
-                {
-                    group = value;
-                    FilterChanged?.Invoke(CreateCriteria());
-                }
-            }
-        }
+        public readonly Bindable<GroupMode> GroupMode = new Bindable<GroupMode>(Filter.GroupMode.All);
 
         public FilterCriteria CreateCriteria() => new FilterCriteria
         {
-            Group = group,
-            Sort = sort,
+            Group = GroupMode.Value,
+            Sort = SortMode.Value,
             SearchText = searchTextBox.Text,
             AllowConvertedBeatmaps = showConverted.Value,
             Ruleset = ruleset.Value
@@ -122,7 +96,7 @@ namespace osu.Game.Screens.Select
                                     Height = 24,
                                     Width = 0.5f,
                                     AutoSort = true,
-                                    Current = { Value = GroupMode.Title }
+                                    Current = GroupMode
                                 },
                                 //spriteText = new OsuSpriteText
                                 //{
@@ -141,7 +115,7 @@ namespace osu.Game.Screens.Select
                                     Width = 0.5f,
                                     Height = 24,
                                     AutoSort = true,
-                                    Current = { Value = SortMode.Title }
+                                    Current = SortMode
                                 }
                             }
                         },
@@ -151,10 +125,8 @@ namespace osu.Game.Screens.Select
 
             searchTextBox.Current.ValueChanged += _ => FilterChanged?.Invoke(CreateCriteria());
 
-            groupTabs.PinItem(GroupMode.All);
-            groupTabs.PinItem(GroupMode.RecentlyPlayed);
-            groupTabs.Current.ValueChanged += group => Group = group.NewValue;
-            sortTabs.Current.ValueChanged += sort => Sort = sort.NewValue;
+            groupTabs.PinItem(Filter.GroupMode.All);
+            groupTabs.PinItem(Filter.GroupMode.RecentlyPlayed);
         }
 
         public void Deactivate()
@@ -184,7 +156,15 @@ namespace osu.Game.Screens.Select
             showConverted.ValueChanged += _ => updateCriteria();
 
             ruleset.BindTo(parentRuleset);
-            ruleset.BindValueChanged(_ => updateCriteria(), true);
+            ruleset.BindValueChanged(_ => updateCriteria());
+
+            config.BindWith(OsuSetting.SelectGroupingMode, GroupMode);
+            config.BindWith(OsuSetting.SelectSortingMode, SortMode);
+
+            GroupMode.BindValueChanged(_ => updateCriteria());
+            SortMode.BindValueChanged(_ => updateCriteria());
+
+            updateCriteria();
         }
 
         private void updateCriteria() => FilterChanged?.Invoke(CreateCriteria());
