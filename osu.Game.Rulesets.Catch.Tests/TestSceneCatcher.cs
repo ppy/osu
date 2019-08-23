@@ -15,6 +15,7 @@ using osu.Framework.Graphics.Sprites;
 using osuTK.Graphics;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Graphics.Textures;
+using osu.Game.Audio;
 
 namespace osu.Game.Rulesets.Catch.Tests
 {
