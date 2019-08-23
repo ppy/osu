@@ -1,7 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
@@ -43,26 +42,19 @@ namespace osu.Game.Skinning
         {
             channels = hitSamples.Select(s =>
             {
-                var ch = loadChannel(s, skin.GetSample);
+                var ch = skin.GetSample(s);
+
                 if (ch == null && allowFallback)
-                    ch = loadChannel(s, audio.Samples.Get);
+                    if (s is HitSampleInfo hsi)
+                        ch = audio.Samples.Get(string.IsNullOrEmpty(hsi.Namespace)
+                            ? $"Gameplay/{hsi.Namespace}/{hsi.Bank}-{hsi.Name}"
+                            : $"Gameplay/{hsi.Bank}-{hsi.Name}");
+
+                if (ch != null)
+                    ch.Volume.Value = s.Volume / 100.0;
+
                 return ch;
             }).Where(c => c != null).ToArray();
-        }
-
-        private SampleChannel loadChannel(ISampleInfo info, Func<string, SampleChannel> getSampleFunction)
-        {
-            foreach (var lookup in info.LookupNames)
-            {
-                var ch = getSampleFunction($"Gameplay/{lookup}");
-                if (ch == null)
-                    continue;
-
-                ch.Volume.Value = info.Volume / 100.0;
-                return ch;
-            }
-
-            return null;
         }
 
         protected override void Dispose(bool isDisposing)
