@@ -92,7 +92,7 @@ namespace osu.Game.Rulesets.Catch.Tests
                 return null;
             }
 
-            public SampleChannel GetSample(string sampleName) =>
+            public SampleChannel GetSample(ISampleInfo sampleInfo) =>
                 throw new NotImplementedException();
 
             public Texture GetTexture(string componentName) =>
