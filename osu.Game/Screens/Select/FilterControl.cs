@@ -29,9 +29,9 @@ namespace osu.Game.Screens.Select
 
         private readonly TabControl<GroupMode> groupTabs;
 
-        public readonly Bindable<SortMode> SortMode = new Bindable<SortMode>(Filter.SortMode.Title);
+        public Bindable<SortMode> SortMode;
 
-        public readonly Bindable<GroupMode> GroupMode = new Bindable<GroupMode>(Filter.GroupMode.All);
+        public Bindable<GroupMode> GroupMode;
 
         public FilterCriteria CreateCriteria() => new FilterCriteria
         {
@@ -96,7 +96,6 @@ namespace osu.Game.Screens.Select
                                     Height = 24,
                                     Width = 0.5f,
                                     AutoSort = true,
-                                    Current = GroupMode
                                 },
                                 //spriteText = new OsuSpriteText
                                 //{
@@ -115,7 +114,6 @@ namespace osu.Game.Screens.Select
                                     Width = 0.5f,
                                     Height = 24,
                                     AutoSort = true,
-                                    Current = SortMode
                                 }
                             }
                         },
@@ -158,8 +156,11 @@ namespace osu.Game.Screens.Select
             ruleset.BindTo(parentRuleset);
             ruleset.BindValueChanged(_ => updateCriteria());
 
-            config.BindWith(OsuSetting.SelectGroupingMode, GroupMode);
-            config.BindWith(OsuSetting.SelectSortingMode, SortMode);
+            SortMode = config.GetBindable<SortMode>(OsuSetting.SelectSortingMode);
+            GroupMode = config.GetBindable<GroupMode>(OsuSetting.SelectGroupingMode);
+
+            sortTabs.Current.BindTo(SortMode);
+            groupTabs.Current.BindTo(GroupMode);
 
             GroupMode.BindValueChanged(_ => updateCriteria());
             SortMode.BindValueChanged(_ => updateCriteria());
