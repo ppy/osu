@@ -17,6 +17,13 @@ namespace osu.Game.Storyboards
 
         public int Volume { get; }
 
+        public IEnumerable<string> LookupNames => new[]
+        {
+            // Try first with the full name, then attempt with no path
+            Path,
+            System.IO.Path.ChangeExtension(Path, null),
+        };
+
         public StoryboardSampleInfo(string path, double time, int volume)
         {
             Path = path;
