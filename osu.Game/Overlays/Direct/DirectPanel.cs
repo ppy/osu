@@ -18,6 +18,7 @@ using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Drawables;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Rulesets;
 using osuTK;
 using osuTK.Graphics;
 
@@ -28,10 +29,12 @@ namespace osu.Game.Overlays.Direct
         public readonly BeatmapSetInfo SetInfo;
 
         private const double hover_transition_time = 400;
+        private const int maximum_difficulty_icons = 15;
 
         private Container content;
 
         private BeatmapSetOverlay beatmapSetOverlay;
+        private RulesetStore rulesets;
 
         public PreviewTrack Preview => PlayButton.Preview;
         public Bindable<bool> PreviewPlaying => PlayButton.Playing;
@@ -67,9 +70,10 @@ namespace osu.Game.Overlays.Direct
         };
 
         [BackgroundDependencyLoader(permitNulls: true)]
-        private void load(BeatmapManager beatmaps, OsuColour colours, BeatmapSetOverlay beatmapSetOverlay)
+        private void load(BeatmapManager beatmaps, OsuColour colours, BeatmapSetOverlay beatmapSetOverlay, RulesetStore rulesets)
         {
             this.beatmapSetOverlay = beatmapSetOverlay;
+            this.rulesets = rulesets;
 
             AddInternal(content = new Container
             {
@@ -142,8 +146,18 @@ namespace osu.Game.Overlays.Direct
         {
             var icons = new List<DifficultyIcon>();
 
-            foreach (var b in SetInfo.Beatmaps.OrderBy(beatmap => beatmap.StarDifficulty))
-                icons.Add(new DifficultyIcon(b));
+            if (SetInfo.Beatmaps.Count > maximum_difficulty_icons)
+            {
+                foreach (var ruleset in rulesets.AvailableRulesets)
+                {
+                    List<BeatmapInfo> list;
+                    if ((list = SetInfo.Beatmaps.FindAll(b => b.Ruleset.Equals(ruleset))).Count > 0)
+                        icons.Add(new GroupedDifficultyIcon(list, ruleset, this is DirectListPanel ? Color4.White : Color4.Black));
+                }
+            }
+            else
+                foreach (var b in SetInfo.Beatmaps.OrderBy(beatmap => beatmap.StarDifficulty))
+                    icons.Add(new DifficultyIcon(b));
 
             return icons;
         }
