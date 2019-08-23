@@ -74,19 +74,16 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             double aimValue = computeAimValue();
             double speedValue = computeSpeedValue();
-            double accuracyValue = computeAccuracyValue();
             double totalValue =
                 Math.Pow(
                     Math.Pow(aimValue, totalValueExponent) +
-                    Math.Pow(speedValue, totalValueExponent) +
-                    Math.Pow(accuracyValue, totalValueExponent), 1 / totalValueExponent
+                    Math.Pow(speedValue, totalValueExponent), 1 / totalValueExponent
                 ) * multiplier;
 
             if (categoryRatings != null)
             {
                 categoryRatings.Add("Aim", aimValue);
                 categoryRatings.Add("Speed", speedValue);
-                categoryRatings.Add("Accuracy", accuracyValue);
                 categoryRatings.Add("OD", Attributes.OverallDifficulty);
                 categoryRatings.Add("AR", Attributes.ApproachRate);
                 categoryRatings.Add("Max Combo", beatmapMaxCombo);
@@ -103,9 +100,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             // Get player's throughput. Interpolate if there are misses.
             double tp;
             if (effectiveMissCount == 0)
-                tp = Attributes.missTPs[0];
+                tp = Attributes.MissTPs[0];
             else
-                tp = LinearSpline.InterpolateSorted(Attributes.missCounts, Attributes.missTPs)
+                tp = LinearSpline.InterpolateSorted(Attributes.MissCounts, Attributes.MissTPs)
                                       .Interpolate(effectiveMissCount);
 
             if (mods.Any(m => m is OsuModTouchDevice))
@@ -153,63 +150,57 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
         private double computeSpeedValue()
         {
-            double speedValue = Math.Pow(37 * Attributes.SpeedStrain, 3.0f) / 100000.0f * 1.6;
+            // Treat 300 as 300, 100 as 200, 50 as 100
+            // add 1 to denominator so that later erf gives resonable result
+            double modifiedAcc;
+            if (countHitCircles > 0)
+                modifiedAcc = ((countGreat - (totalHits - countHitCircles)) * 3 + countGood * 2 + countMeh) /
+                              ((countHitCircles * 3) + 1);
+            else
+                modifiedAcc = 0;
+                
+            // Assume SS for non-stream parts
+            double accOnStreams = 1 - (1 - modifiedAcc) * countHitCircles / Attributes.StreamNoteCount;
 
-            // Longer maps are worth more
-            speedValue *= 0.95f + 0.4f * Math.Min(1.0f, totalHits / 2000.0f) +
-                          (totalHits > 2000 ? Math.Log10(totalHits / 2000.0f) * 0.5f : 0.0f);
+            // accOnStreams can be negative. The formula below ensures a positive acc while
+            // preserving the value when accOnStreams is close to 1
+            double accOnStreamsPositive = Math.Exp(accOnStreams - 1);
+
+            double urOnStreams = 10 * (80 - 6 * Attributes.OverallDifficulty) /
+                                 (Math.Sqrt(2) * SpecialFunctions.ErfInv(accOnStreamsPositive));
+
+            double mashLevel = SpecialFunctions.Logistic(((urOnStreams * Attributes.TapDiff) - 2700) / 600);
+            double accBuffLevel = (1 - SpecialFunctions.Logistic(((urOnStreams * Attributes.TapDiff) - 1000) / 500)) /
+                             SpecialFunctions.Logistic(1000.0 / 500);
+
+
+            double tapSkill = LinearSpline.InterpolateSorted(Attributes.MashLevels, Attributes.TapSkills)
+                              .Interpolate(mashLevel);
+
+            //Console.WriteLine(urOnStreams * Attributes.TapDiff);
+            //Console.WriteLine(mashLevel);
+            //Console.WriteLine(accBuffLevel);
+            //Console.WriteLine(tapSkill);
+
+            double tapValue = Math.Pow(tapSkill, 2.55) * 0.4;
+
+            // Buff high acc
+            tapValue *= 1 + Math.Pow(accBuffLevel, 2) * 0.7;
 
             // Penalize misses exponentially. This mainly fixes tag4 maps and the likes until a per-hitobject solution is available
-            speedValue *= Math.Pow(0.97f, countMiss);
+            tapValue *= Math.Pow(0.97f, countMiss);
 
-            //// Combo scaling
-            //if (beatmapMaxCombo > 0)
-            //    speedValue *= Math.Min(Math.Pow(scoreMaxCombo, 0.8f) / Math.Pow(beatmapMaxCombo, 0.8f), 1.0f);
 
             double approachRateFactor = 1.0f;
             if (Attributes.ApproachRate > 10.33f)
                 approachRateFactor += 0.3f * (Attributes.ApproachRate - 10.33f);
-            speedValue *= approachRateFactor;
+            tapValue *= approachRateFactor;
 
             if (mods.Any(m => m is OsuModHidden))
-                speedValue *= 1.0f + 0.04f * (12.0f - Attributes.ApproachRate);
+                tapValue *= 1.0f + 0.04f * (12.0f - Attributes.ApproachRate);
 
-            // Scale the speed value with accuracy _slightly_
-            speedValue *= 0.02f + accuracy;
-            // It is important to also consider accuracy difficulty when doing that
-            speedValue *= 0.96f + Math.Pow(Attributes.OverallDifficulty, 2) / 1600;
 
-            return speedValue;
-        }
-
-        private double computeAccuracyValue()
-        {
-            // This percentage only considers HitCircles of any value - in this part of the calculation we focus on hitting the timing hit window
-            double betterAccuracyPercentage;
-            int amountHitObjectsWithAccuracy = countHitCircles;
-
-            if (amountHitObjectsWithAccuracy > 0)
-                betterAccuracyPercentage = ((countGreat - (totalHits - amountHitObjectsWithAccuracy)) * 6 + countGood * 2 + countMeh) / (amountHitObjectsWithAccuracy * 6);
-            else
-                betterAccuracyPercentage = 0;
-
-            // It is possible to reach a negative accuracy with this formula. Cap it at zero - zero points
-            if (betterAccuracyPercentage < 0)
-                betterAccuracyPercentage = 0;
-
-            // Lots of arbitrary values from testing.
-            // Considering to use derivation from perfect accuracy in a probabilistic manner - assume normal distribution
-            double accuracyValue = Math.Pow(1.52163f, Attributes.OverallDifficulty) * Math.Pow(betterAccuracyPercentage, 24) * 2.5;
-
-            // Bonus for many hitcircles - it's harder to keep good accuracy up for longer
-            accuracyValue *= Math.Min(1.15f, Math.Pow(amountHitObjectsWithAccuracy / 1000.0f, 0.3f));
-
-            if (mods.Any(m => m is OsuModHidden))
-                accuracyValue *= 1.08f;
-            if (mods.Any(m => m is OsuModFlashlight))
-                accuracyValue *= 1.02f;
-
-            return accuracyValue;
+            return tapValue;
         }
 
         private double totalHits => countGreat + countGood + countMeh + countMiss;

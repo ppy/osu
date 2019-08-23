@@ -42,15 +42,20 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             double mapLength = (beatmap.HitObjects.Last().StartTime - beatmap.HitObjects.First().StartTime) / 1000;
 
-            (var strainHistory, var maxTapStrain) = calculateTapStrain(hitObjectsNoSpinner, clockRate);
-            double tapDiff = maxTapStrain.Average();
 
+            // Tap
+            (var tapDiff, var streamNoteCount, var mashLevels, var tapSkills, var strainHistory) =
+                Tap.CalculateTapAttributes(hitObjectsNoSpinner, clockRate);
+
+
+            // Aim
             IList<OsuMovement> movements = Aim.CreateMovements(hitObjectsNoSpinner, clockRate, strainHistory);
 
             double aimDiff = Aim.CalculateFCProbTP(movements);
             double fcTimeTP = Aim.CalculateFCTimeTP(movements, mapLength);
 
             (double[] missTPs, double[] missCounts) = Aim.CalculateMissTPsMissCounts(movements, fcTimeTP);
+            
 
             double tapSR = tapMultiplier * Math.Pow(tapDiff, srExponent);
             double aimSR = aimMultiplier * Math.Pow(aimDiff, srExponent);
@@ -69,37 +74,22 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             {
                 StarRating = sr,
                 Mods = mods,
-                AimStrain = aimSR,
+
+                TapSR = tapSR,
+                TapDiff = tapDiff,
+                StreamNoteCount = streamNoteCount,
+                MashLevels = mashLevels,
+                TapSkills = tapSkills,
+
+                AimSR = aimSR,
                 FcTimeAimSR = fcTimeAimSR,
-                missTPs = missTPs,
-                missCounts = missCounts,
-                SpeedStrain = tapSR,
+                MissTPs = missTPs,
+                MissCounts = missCounts,
+                
                 ApproachRate = preempt > 1200 ? (1800 - preempt) / 120 : (1200 - preempt) / 150 + 5,
                 OverallDifficulty = (80 - hitWindowGreat) / 6,
                 MaxCombo = maxCombo
             };
-        }
-
-        private (List<Vector<double>>, Vector<double>) calculateTapStrain(List<OsuHitObject> hitObjects, double clockRate)
-        {
-            var decayCoeffs = Vector<double>.Build.Dense(Generate.LinearSpaced(4, 1.7, -1.6)).PointwiseExp();
-            double prevTime = 0;
-            var currStrain = decayCoeffs * 0;
-            var maxStrain = decayCoeffs * 0;
-            var strainHistory = new List<Vector<double>>();
-
-            foreach (var obj in hitObjects)
-            {
-                double currTime = obj.StartTime / 1000.0;
-                currStrain = currStrain.PointwiseMultiply((-decayCoeffs * (currTime - prevTime) / clockRate).PointwiseExp());
-                maxStrain = maxStrain.PointwiseMaximum(currStrain);
-                strainHistory.Add(currStrain);
-
-                currStrain += decayCoeffs;
-                prevTime = currTime;
-            }
-
-            return (strainHistory, maxStrain);
         }
 
 
