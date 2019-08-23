@@ -154,20 +154,14 @@ namespace osu.Game.Graphics.Containers
 
         private class ScalingBackgroundScreen : BackgroundScreenDefault
         {
-            public override void OnEntering(IScreen last)
-            {
-                this.FadeInFromZero(4000, Easing.OutQuint);
-            }
+            public override void OnEntering(IScreen last) => this.FadeInFromZero(4000, Easing.OutQuint);
         }
 
         private class AlwaysInputContainer : Container
         {
             public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => true;
 
-            public AlwaysInputContainer()
-            {
-                RelativeSizeAxes = Axes.Both;
-            }
+            public AlwaysInputContainer() => RelativeSizeAxes = Axes.Both;
         }
     }
 }

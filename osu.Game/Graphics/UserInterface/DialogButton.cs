@@ -246,7 +246,7 @@ namespace osu.Game.Graphics.UserInterface
 
         private void flash()
         {
-            var flash = new Box
+            Box flash = new Box
             {
                 RelativeSizeAxes = Axes.Both
             };

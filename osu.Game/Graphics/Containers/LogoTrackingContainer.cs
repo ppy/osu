@@ -131,10 +131,7 @@ namespace osu.Game.Graphics.Containers
 
         private class InternalFacade : Facade
         {
-            public new void SetSize(Vector2 size)
-            {
-                base.SetSize(size);
-            }
+            public new void SetSize(Vector2 size) => base.SetSize(size);
         }
 
         /// <summary>
@@ -148,10 +145,7 @@ namespace osu.Game.Graphics.Containers
                 set => throw new InvalidOperationException($"Cannot set the Size of a {typeof(Facade)} outside of a {typeof(LogoTrackingContainer)}");
             }
 
-            protected void SetSize(Vector2 size)
-            {
-                base.Size = size;
-            }
+            protected void SetSize(Vector2 size) => base.Size = size;
         }
     }
 }

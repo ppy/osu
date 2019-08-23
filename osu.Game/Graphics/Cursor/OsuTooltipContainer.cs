@@ -78,10 +78,7 @@ namespace osu.Game.Graphics.Cursor
             }
 
             [BackgroundDependencyLoader]
-            private void load(OsuColour colour)
-            {
-                background.Colour = colour.Gray3;
-            }
+            private void load(OsuColour colour) => background.Colour = colour.Gray3;
 
             protected override void PopIn()
             {

@@ -95,6 +95,7 @@ namespace osu.Game.Graphics.Containers
 
             private readonly Box box;
 
+            private int FadeDuration = 100;
             public OsuScrollbar(Direction scrollDir)
                 : base(scrollDir)
             {
@@ -137,13 +138,13 @@ namespace osu.Game.Graphics.Containers
 
             protected override bool OnHover(HoverEvent e)
             {
-                this.FadeColour(hoverColour, 100);
+                this.FadeColour(hoverColour, FadeDuration);
                 return true;
             }
 
             protected override void OnHoverLost(HoverLostEvent e)
             {
-                this.FadeColour(defaultColour, 100);
+                this.FadeColour(defaultColour, FadeDuration);
             }
 
             protected override bool OnMouseDown(MouseDownEvent e)
@@ -151,7 +152,7 @@ namespace osu.Game.Graphics.Containers
                 if (!base.OnMouseDown(e)) return false;
 
                 //note that we are changing the colour of the box here as to not interfere with the hover effect.
-                box.FadeColour(highlightColour, 100);
+                box.FadeColour(highlightColour, FadeDuration);
                 return true;
             }
 
@@ -159,7 +160,7 @@ namespace osu.Game.Graphics.Containers
             {
                 if (e.Button != MouseButton.Left) return false;
 
-                box.FadeColour(Color4.White, 100);
+                box.FadeColour(Color4.White, FadeDuration);
 
                 return base.OnMouseUp(e);
             }
