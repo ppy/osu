@@ -1,7 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
+using System.Collections.Generic;
+using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
@@ -21,10 +22,22 @@ namespace osu.Game.Beatmaps.Drawables
 {
     public class DifficultyIcon : CompositeDrawable, IHasCustomTooltip
     {
-        private readonly BeatmapInfo beatmap;
-        private readonly RulesetInfo ruleset;
+        private BeatmapInfo beatmap;
 
         private readonly Container iconContainer;
+        private readonly Box iconBg;
+
+        protected BeatmapInfo Beatmap
+        {
+            get => beatmap;
+            set
+            {
+                beatmap = value;
+
+                if (IsLoaded)
+                    updateIconColour();
+            }
+        }
 
         /// <summary>
         /// Size of this difficulty icon.
@@ -37,15 +50,46 @@ namespace osu.Game.Beatmaps.Drawables
 
         public DifficultyIcon(BeatmapInfo beatmap, RulesetInfo ruleset = null, bool shouldShowTooltip = true)
         {
-            this.beatmap = beatmap ?? throw new ArgumentNullException(nameof(beatmap));
+            this.beatmap = beatmap;
 
-            this.ruleset = ruleset ?? beatmap.Ruleset;
             if (shouldShowTooltip)
                 TooltipContent = beatmap;
 
             AutoSizeAxes = Axes.Both;
 
-            InternalChild = iconContainer = new Container { Size = new Vector2(20f) };
+            InternalChild = iconContainer = new Container
+            {
+                Size = new Vector2(20f),
+                Children = new Drawable[]
+                {
+                    new CircularContainer
+                    {
+                        RelativeSizeAxes = Axes.Both,
+                        Scale = new Vector2(0.84f),
+                        Anchor = Anchor.Centre,
+                        Origin = Anchor.Centre,
+                        Masking = true,
+                        EdgeEffect = new EdgeEffectParameters
+                        {
+                            Colour = Color4.Black.Opacity(0.08f),
+                            Type = EdgeEffectType.Shadow,
+                            Radius = 5,
+                        },
+                        Child = iconBg = new Box
+                        {
+                            RelativeSizeAxes = Axes.Both,
+                        },
+                    },
+                    new ConstrainedIconContainer
+                    {
+                        Anchor = Anchor.Centre,
+                        Origin = Anchor.Centre,
+                        RelativeSizeAxes = Axes.Both,
+                        // the null coalesce here is only present to make unit tests work (ruleset dlls aren't copied correctly for testing at the moment)
+                        Icon = (ruleset ?? beatmap?.Ruleset)?.CreateInstance().CreateIcon() ?? new SpriteIcon { Icon = FontAwesome.Regular.QuestionCircle }
+                    }
+                }
+            };
         }
 
         public string TooltipText { get; set; }
@@ -54,40 +98,17 @@ namespace osu.Game.Beatmaps.Drawables
 
         public object TooltipContent { get; set; }
 
+        private OsuColour colours;
+
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
-            iconContainer.Children = new Drawable[]
-            {
-                new CircularContainer
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    Scale = new Vector2(0.84f),
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
-                    Masking = true,
-                    EdgeEffect = new EdgeEffectParameters
-                    {
-                        Colour = Color4.Black.Opacity(0.08f),
-                        Type = EdgeEffectType.Shadow,
-                        Radius = 5,
-                    },
-                    Child = new Box
-                    {
-                        RelativeSizeAxes = Axes.Both,
-                        Colour = colours.ForDifficultyRating(beatmap.DifficultyRating),
-                    },
-                },
-                new ConstrainedIconContainer
-                {
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
-                    RelativeSizeAxes = Axes.Both,
-                    // the null coalesce here is only present to make unit tests work (ruleset dlls aren't copied correctly for testing at the moment)
-                    Icon = ruleset?.CreateInstance().CreateIcon() ?? new SpriteIcon { Icon = FontAwesome.Regular.QuestionCircle }
-                }
-            };
+            this.colours = colours;
+
+            updateIconColour();
         }
+
+        private void updateIconColour() => iconBg.Colour = colours.ForDifficultyRating(beatmap.DifficultyRating);
 
         private class DifficultyIconTooltip : VisibilityContainer, ITooltip
         {
