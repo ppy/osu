@@ -13,6 +13,7 @@ using osu.Game.Rulesets;
 using osu.Game.Users;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 
 namespace osu.Game.Overlays.Profile.Sections
 {
@@ -21,6 +22,7 @@ namespace osu.Game.Overlays.Profile.Sections
         private readonly ShowMoreButton moreButton;
         private readonly OsuSpriteText missingText;
         private APIRequest<List<T>> retrievalRequest;
+        private CancellationTokenSource loadCancellation;
 
         [Resolved]
         private IAPIProvider api { get; set; }
@@ -82,6 +84,7 @@ namespace osu.Game.Overlays.Profile.Sections
 
         private void onUserChanged(ValueChangedEvent<User> e)
         {
+            loadCancellation?.Cancel();
             retrievalRequest?.Cancel();
 
             VisiblePages = 0;
@@ -93,6 +96,8 @@ namespace osu.Game.Overlays.Profile.Sections
 
         private void showMore()
         {
+            loadCancellation = new CancellationTokenSource();
+
             retrievalRequest = CreateRequest();
             retrievalRequest.Success += UpdateItems;
 
@@ -118,7 +123,7 @@ namespace osu.Game.Overlays.Profile.Sections
                     moreButton.IsLoading = false;
 
                     ItemsContainer.AddRange(drawables);
-                });
+                }, loadCancellation.Token);
             });
         }
 
