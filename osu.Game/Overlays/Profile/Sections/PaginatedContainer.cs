@@ -101,9 +101,6 @@ namespace osu.Game.Overlays.Profile.Sections
         {
             Schedule(() =>
             {
-                moreButton.FadeTo(items.Count == ItemsPerPage ? 1 : 0);
-                moreButton.IsLoading = false;
-
                 if (!items.Any() && VisiblePages == 1)
                 {
                     moreButton.Hide();
