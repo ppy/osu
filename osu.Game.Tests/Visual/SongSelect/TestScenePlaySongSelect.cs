@@ -111,13 +111,13 @@ namespace osu.Game.Tests.Visual.SongSelect
 
             AddAssert("random map selected", () => songSelect.CurrentBeatmap != defaultBeatmap);
 
-            AddStep(@"Sort by Artist", delegate { songSelect.FilterControl.Sort = SortMode.Artist; });
-            AddStep(@"Sort by Title", delegate { songSelect.FilterControl.Sort = SortMode.Title; });
-            AddStep(@"Sort by Author", delegate { songSelect.FilterControl.Sort = SortMode.Author; });
-            AddStep(@"Sort by DateAdded", delegate { songSelect.FilterControl.Sort = SortMode.DateAdded; });
-            AddStep(@"Sort by BPM", delegate { songSelect.FilterControl.Sort = SortMode.BPM; });
-            AddStep(@"Sort by Length", delegate { songSelect.FilterControl.Sort = SortMode.Length; });
-            AddStep(@"Sort by Difficulty", delegate { songSelect.FilterControl.Sort = SortMode.Difficulty; });
+            AddStep(@"Sort by Artist", delegate { songSelect.FilterControl.SortMode.Value = SortMode.Artist; });
+            AddStep(@"Sort by Title", delegate { songSelect.FilterControl.SortMode.Value = SortMode.Title; });
+            AddStep(@"Sort by Author", delegate { songSelect.FilterControl.SortMode.Value = SortMode.Author; });
+            AddStep(@"Sort by DateAdded", delegate { songSelect.FilterControl.SortMode.Value = SortMode.DateAdded; });
+            AddStep(@"Sort by BPM", delegate { songSelect.FilterControl.SortMode.Value = SortMode.BPM; });
+            AddStep(@"Sort by Length", delegate { songSelect.FilterControl.SortMode.Value = SortMode.Length; });
+            AddStep(@"Sort by Difficulty", delegate { songSelect.FilterControl.SortMode.Value = SortMode.Difficulty; });
         }
 
         [Test]
