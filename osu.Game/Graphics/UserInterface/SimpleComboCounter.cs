@@ -13,27 +13,15 @@ namespace osu.Game.Graphics.UserInterface
     {
         protected override double RollingDuration => 750;
 
-        public SimpleComboCounter()
-        {
-            Current.Value = DisplayedCount = 0;
-        }
+        public SimpleComboCounter() => Current.Value = DisplayedCount = 0;
 
         [BackgroundDependencyLoader]
         private void load(OsuColour colours) => AccentColour = colours.BlueLighter;
 
-        protected override string FormatCount(int count)
-        {
-            return $@"{count}x";
-        }
+        protected override string FormatCount(int count) => $@"{count}x";
 
-        protected override double GetProportionalDuration(int currentValue, int newValue)
-        {
-            return Math.Abs(currentValue - newValue) * RollingDuration * 100.0f;
-        }
+        protected override double GetProportionalDuration(int currentValue, int newValue) => Math.Abs(currentValue - newValue) * RollingDuration * 100.0f;
 
-        public override void Increment(int amount)
-        {
-            Current.Value = Current.Value + amount;
-        }
+        public override void Increment(int amount) => Current.Value = Current.Value + amount;
     }
 }
