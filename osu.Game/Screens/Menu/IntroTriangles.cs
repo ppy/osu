@@ -138,7 +138,7 @@ namespace osu.Game.Screens.Menu
 
             private RulesetFlow rulesets;
             private Container rulesetsScale;
-            private Drawable logoContainerSecondary;
+            private Container logoContainerSecondary;
             private Drawable lazerLogo;
 
             private GlitchingTriangles triangles;
@@ -158,7 +158,7 @@ namespace osu.Game.Screens.Menu
             {
                 this.game = game;
 
-                InternalChildren = new[]
+                InternalChildren = new Drawable[]
                 {
                     triangles = new GlitchingTriangles
                     {
@@ -277,7 +277,7 @@ namespace osu.Game.Screens.Menu
                     {
                         lazerLogo.FadeOut().OnComplete(_ =>
                         {
-                            lazerLogo.Expire();
+                            logoContainerSecondary.Remove(lazerLogo);
                             lazerLogo.Dispose(); // explicit disposal as we are pushing a new screen and the expire may not get run.
 
                             logo.FadeIn();
