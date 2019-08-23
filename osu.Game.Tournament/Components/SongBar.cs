@@ -230,7 +230,7 @@ namespace osu.Game.Tournament.Components
 
                 for (int i = 0; i < tuples.Length; i++)
                 {
-                    var tuple = tuples[i];
+                    (string heading, string content) tuple = tuples[i];
 
                     if (i > 0)
                     {

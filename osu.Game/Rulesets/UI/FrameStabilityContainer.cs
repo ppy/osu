@@ -114,7 +114,7 @@ namespace osu.Game.Rulesets.UI
             manualClock.Rate = parentGameplayClock.Rate;
             manualClock.IsRunning = parentGameplayClock.IsRunning;
 
-            var newProposedTime = parentGameplayClock.CurrentTime;
+            double newProposedTime = parentGameplayClock.CurrentTime;
 
             try
             {

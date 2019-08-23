@@ -639,7 +639,7 @@ namespace osu.Game.Database
 
             if (perform)
             {
-                foreach (var a in events)
+                foreach (Action a in events)
                     a.Invoke();
             }
 

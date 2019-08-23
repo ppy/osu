@@ -113,7 +113,7 @@ namespace osu.Game.Rulesets.Objects
         private static IEnumerable<SliderEventDescriptor> generateTicks(int spanIndex, double spanStartTime, double spanDuration, bool reversed, double length, double tickDistance,
                                                                         double minDistanceFromEnd)
         {
-            for (var d = tickDistance; d <= length; d += tickDistance)
+            for (double d = tickDistance; d <= length; d += tickDistance)
             {
                 if (d >= length - minDistanceFromEnd)
                     break;

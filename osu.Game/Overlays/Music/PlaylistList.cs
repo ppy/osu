@@ -169,7 +169,7 @@ namespace osu.Game.Overlays.Music
                     if (IsScrolledToEnd())
                         return;
 
-                    var power = Math.Min(max_power, Math.Abs(DrawHeight - start_offset - localPos.Y));
+                    double power = Math.Min(max_power, Math.Abs(DrawHeight - start_offset - localPos.Y));
                     ScrollBy((float)Math.Pow(exp_base, power));
                 }
             }

@@ -102,8 +102,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
             snakedPosition = Path.PositionInBoundingBox(Vector2.Zero);
             snakedPathOffset = Path.PositionInBoundingBox(Path.Vertices[0]);
 
-            var lastSnakedStart = SnakedStart ?? 0;
-            var lastSnakedEnd = SnakedEnd ?? 0;
+            double lastSnakedStart = SnakedStart ?? 0;
+            double lastSnakedEnd = SnakedEnd ?? 0;
 
             SnakedStart = null;
             SnakedEnd = null;

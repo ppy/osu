@@ -90,7 +90,7 @@ namespace osu.Game.Graphics
                 waitDelegate.Cancel();
             }
 
-            using (var image = await host.TakeScreenshotAsync())
+            using (Image<SixLabors.ImageSharp.PixelFormats.Rgba32> image = await host.TakeScreenshotAsync())
             {
                 if (Interlocked.Decrement(ref screenShotTasks) == 0 && cursorVisibility.Value == false)
                     cursorVisibility.Value = true;
@@ -128,7 +128,7 @@ namespace osu.Game.Graphics
 
         private string getFileName()
         {
-            var dt = DateTime.Now;
+            DateTime dt = DateTime.Now;
             string fileExt = screenshotFormat.ToString().ToLowerInvariant();
 
             string withoutIndex = $"osu_{dt:yyyy-MM-dd_HH-mm-ss}.{fileExt}";

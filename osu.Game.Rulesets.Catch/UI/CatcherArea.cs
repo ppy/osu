@@ -368,7 +368,7 @@ namespace osu.Game.Rulesets.Catch.UI
 
                 if (currentDirection == 0) return;
 
-                var direction = Math.Sign(currentDirection);
+                int direction = Math.Sign(currentDirection);
 
                 double dashModifier = Dashing ? 1 : 0.5;
                 double speed = BASE_SPEED * dashModifier * hyperDashModifier;
@@ -421,7 +421,7 @@ namespace osu.Game.Rulesets.Catch.UI
 
             public void Explode(DrawableHitObject fruit)
             {
-                var originalX = fruit.X * Scale.X;
+                float originalX = fruit.X * Scale.X;
 
                 if (ExplodingFruitTarget != null)
                 {

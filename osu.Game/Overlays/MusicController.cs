@@ -165,7 +165,7 @@ namespace osu.Game.Overlays
             if (!instant)
                 queuedDirection = TrackChangeDirection.Next;
 
-            var playable = beatmapSets.SkipWhile(i => i.ID != current.BeatmapSetInfo.ID).Skip(1).FirstOrDefault() ?? beatmapSets.FirstOrDefault();
+            BeatmapSetInfo playable = beatmapSets.SkipWhile(i => i.ID != current.BeatmapSetInfo.ID).Skip(1).FirstOrDefault() ?? beatmapSets.FirstOrDefault();
 
             if (playable != null)
             {
@@ -200,8 +200,8 @@ namespace osu.Game.Overlays
                 else
                 {
                     //figure out the best direction based on order in playlist.
-                    var last = beatmapSets.TakeWhile(b => b.ID != current.BeatmapSetInfo?.ID).Count();
-                    var next = beatmap.NewValue == null ? -1 : beatmapSets.TakeWhile(b => b.ID != beatmap.NewValue.BeatmapSetInfo?.ID).Count();
+                    int last = beatmapSets.TakeWhile(b => b.ID != current.BeatmapSetInfo?.ID).Count();
+                    int next = beatmap.NewValue == null ? -1 : beatmapSets.TakeWhile(b => b.ID != beatmap.NewValue.BeatmapSetInfo?.ID).Count();
 
                     direction = last > next ? TrackChangeDirection.Prev : TrackChangeDirection.Next;
                 }

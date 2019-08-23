@@ -159,7 +159,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
                 {
                     UpdateInitialTransforms();
 
-                    var judgementOffset = Math.Min(HitObject.HitWindows?.HalfWindowFor(HitResult.Miss) ?? double.MaxValue, Result?.TimeOffset ?? 0);
+                    double judgementOffset = Math.Min(HitObject.HitWindows?.HalfWindowFor(HitResult.Miss) ?? double.MaxValue, Result?.TimeOffset ?? 0);
 
                     using (BeginDelayedSequence(InitialLifetimeOffset + judgementOffset, true))
                     {
@@ -245,7 +245,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
 
             if (Result != null && Result.HasResult)
             {
-                var endTime = (HitObject as IHasEndTime)?.EndTime ?? HitObject.StartTime;
+                double endTime = (HitObject as IHasEndTime)?.EndTime ?? HitObject.StartTime;
 
                 if (Result.TimeOffset + endTime > Time.Current)
                 {
@@ -326,7 +326,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
             judgementOccurred = true;
 
             // Ensure that the judgement is given a valid time offset, because this may not get set by the caller
-            var endTime = (HitObject as IHasEndTime)?.EndTime ?? HitObject.StartTime;
+            double endTime = (HitObject as IHasEndTime)?.EndTime ?? HitObject.StartTime;
             Result.TimeOffset = Time.Current - endTime;
 
             switch (Result.Type)
@@ -368,7 +368,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
             if (judgementOccurred || Judged)
                 return judgementOccurred;
 
-            var endTime = (HitObject as IHasEndTime)?.EndTime ?? HitObject.StartTime;
+            double endTime = (HitObject as IHasEndTime)?.EndTime ?? HitObject.StartTime;
             CheckForResult(userTriggered, Time.Current - endTime);
 
             return judgementOccurred;

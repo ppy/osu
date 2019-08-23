@@ -163,7 +163,7 @@ namespace osu.Game
 
             if (args?.Length > 0)
             {
-                var paths = args.Where(a => !a.StartsWith(@"-")).ToArray();
+                string[] paths = args.Where(a => !a.StartsWith(@"-")).ToArray();
                 if (paths.Length > 0)
                     Task.Run(() => Import(paths));
             }
@@ -651,7 +651,7 @@ namespace osu.Game
             // we could avoid the need for scheduling altogether.
             Schedule(() =>
             {
-                var previousLoadStream = asyncLoadStream;
+                Task previousLoadStream = asyncLoadStream;
 
                 //chain with existing load stream
                 asyncLoadStream = Task.Run(async () =>

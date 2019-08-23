@@ -27,8 +27,8 @@ namespace osu.Game.Screens.Select.Details
 
                 metrics = value;
 
-                var retries = Metrics?.Retries ?? new int[0];
-                var fails = Metrics?.Fails ?? new int[0];
+                int[] retries = Metrics?.Retries ?? new int[0];
+                int[] fails = Metrics?.Fails ?? new int[0];
 
                 float maxValue = fails.Any() ? fails.Zip(retries, (fail, retry) => fail + retry).Max() : 0;
                 failGraph.MaxValue = maxValue;

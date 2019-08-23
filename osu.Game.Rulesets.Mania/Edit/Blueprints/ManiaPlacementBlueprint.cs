@@ -86,7 +86,7 @@ namespace osu.Game.Rulesets.Mania.Edit.Blueprints
 
             // If we're scrolling downwards, a position of 0 is actually further away from the hit target
             // so we need to flip the vertical coordinate in the hitobject container's space
-            var hitObjectPos = Column.HitObjectContainer.ToLocalSpace(applyPositionOffset(screenSpacePosition, false)).Y;
+            float hitObjectPos = Column.HitObjectContainer.ToLocalSpace(applyPositionOffset(screenSpacePosition, false)).Y;
             if (scrollingInfo.Direction.Value == ScrollingDirection.Down)
                 hitObjectPos = hitObjectContainer.DrawHeight - hitObjectPos;
 
@@ -98,7 +98,7 @@ namespace osu.Game.Rulesets.Mania.Edit.Blueprints
 
         protected float PositionAt(double time)
         {
-            var pos = scrollingInfo.Algorithm.PositionAt(time,
+            float pos = scrollingInfo.Algorithm.PositionAt(time,
                 EditorClock.CurrentTime,
                 scrollingInfo.TimeRange.Value,
                 Column.HitObjectContainer.DrawHeight);

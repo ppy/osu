@@ -24,7 +24,7 @@ namespace osu.Game.Rulesets.Mania.Mods
 
         public void ApplyToBeatmap(IBeatmap beatmap)
         {
-            var availableColumns = ((ManiaBeatmap)beatmap).TotalColumns;
+            int availableColumns = ((ManiaBeatmap)beatmap).TotalColumns;
             var shuffledColumns = Enumerable.Range(0, availableColumns).OrderBy(item => RNG.Next()).ToList();
 
             beatmap.HitObjects.OfType<ManiaHitObject>().ForEach(h => h.Column = shuffledColumns[h.Column]);

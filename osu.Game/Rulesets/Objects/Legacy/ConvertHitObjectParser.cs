@@ -74,7 +74,7 @@ namespace osu.Game.Rulesets.Objects.Legacy
                 string[] pointSplit = split[5].Split('|');
 
                 int pointCount = 1;
-                foreach (var t in pointSplit)
+                foreach (string t in pointSplit)
                     if (t.Length > 1)
                         pointCount++;
 

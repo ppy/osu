@@ -238,8 +238,8 @@ namespace osu.Game.Screens.Select
 
         private void updateMetrics()
         {
-            var hasRatings = beatmap?.BeatmapSet?.Metrics?.Ratings?.Any() ?? false;
-            var hasRetriesFails = (beatmap?.Metrics?.Retries?.Any() ?? false) && (beatmap?.Metrics.Fails?.Any() ?? false);
+            bool hasRatings = beatmap?.BeatmapSet?.Metrics?.Ratings?.Any() ?? false;
+            bool hasRetriesFails = (beatmap?.Metrics?.Retries?.Any() ?? false) && (beatmap?.Metrics.Fails?.Any() ?? false);
 
             if (hasRatings)
             {

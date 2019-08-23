@@ -219,7 +219,7 @@ namespace osu.Game.Overlays.Dialog
             if (e.Repeat) return false;
 
             // press button at number if 1-9 on number row or keypad are pressed
-            var k = e.Key;
+            Key k = e.Key;
 
             if (k >= Key.Number1 && k <= Key.Number9)
             {

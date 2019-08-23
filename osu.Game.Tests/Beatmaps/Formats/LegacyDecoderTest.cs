@@ -40,7 +40,7 @@ namespace osu.Game.Tests.Beatmaps.Formats
 
             protected override bool ShouldSkipLine(string line)
             {
-                var result = base.ShouldSkipLine(line);
+                bool result = base.ShouldSkipLine(line);
 
                 if (!result)
                     ParsedLines.Add(line);

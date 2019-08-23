@@ -39,9 +39,9 @@ namespace osu.Game.Scoring.Legacy
 
                 score.ScoreInfo = scoreInfo;
 
-                var version = sr.ReadInt32();
+                int version = sr.ReadInt32();
 
-                var workingBeatmap = GetBeatmap(sr.ReadString());
+                WorkingBeatmap workingBeatmap = GetBeatmap(sr.ReadString());
                 if (workingBeatmap is DummyWorkingBeatmap)
                     throw new BeatmapNotFoundException();
 
@@ -73,7 +73,7 @@ namespace osu.Game.Scoring.Legacy
 
                 scoreInfo.Date = sr.ReadDateTime();
 
-                var compressedReplay = sr.ReadByteArray();
+                byte[] compressedReplay = sr.ReadByteArray();
 
                 if (version >= 20140721)
                     scoreInfo.OnlineScoreID = sr.ReadInt64();

@@ -212,7 +212,7 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
         {
             if (Match.Round.Value == null) return;
 
-            var instaWinAmount = Match.Round.Value.BestOf.Value / 2;
+            int instaWinAmount = Match.Round.Value.BestOf.Value / 2;
 
             Match.Completed.Value = Match.Round.Value.BestOf.Value > 0
                                     && (Match.Team1Score.Value + Match.Team2Score.Value >= Match.Round.Value.BestOf.Value || Match.Team1Score.Value > instaWinAmount || Match.Team2Score.Value > instaWinAmount);

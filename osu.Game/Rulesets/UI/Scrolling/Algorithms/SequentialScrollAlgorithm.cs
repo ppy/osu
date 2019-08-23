@@ -48,10 +48,10 @@ namespace osu.Game.Rulesets.UI.Scrolling.Algorithms
                 var next = i < controlPoints.Count - 1 ? controlPoints[i + 1] : null;
 
                 // Duration of the current control point
-                var currentDuration = (next?.StartTime ?? double.PositiveInfinity) - current.StartTime;
+                double currentDuration = (next?.StartTime ?? double.PositiveInfinity) - current.StartTime;
 
                 // Figure out the length of control point
-                var currentLength = currentDuration / timeRange * current.Multiplier;
+                double currentLength = currentDuration / timeRange * current.Multiplier;
 
                 if (currentLength > length)
                 {
@@ -101,11 +101,11 @@ namespace osu.Game.Rulesets.UI.Scrolling.Algorithms
                     continue;
 
                 // Duration of the current control point
-                var currentDuration = (next?.StartTime ?? double.PositiveInfinity) - current.StartTime;
+                double currentDuration = (next?.StartTime ?? double.PositiveInfinity) - current.StartTime;
 
                 // We want to consider the minimal amount of time that this control point has affected,
                 // which may be either its duration, or the amount of time that has passed within it
-                var durationInCurrent = Math.Min(currentDuration, time - current.StartTime);
+                double durationInCurrent = Math.Min(currentDuration, time - current.StartTime);
 
                 // Figure out how much of the time range the duration represents, and adjust it by the speed multiplier
                 length += durationInCurrent / timeRange * current.Multiplier;

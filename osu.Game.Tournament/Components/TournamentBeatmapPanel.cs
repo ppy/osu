@@ -156,7 +156,7 @@ namespace osu.Game.Tournament.Components
 
         private void updateState()
         {
-            var found = currentMatch.Value.PicksBans.FirstOrDefault(p => p.BeatmapID == Beatmap.OnlineBeatmapID);
+            BeatmapChoice found = currentMatch.Value.PicksBans.FirstOrDefault(p => p.BeatmapID == Beatmap.OnlineBeatmapID);
 
             bool doFlash = found != choice;
             choice = found;

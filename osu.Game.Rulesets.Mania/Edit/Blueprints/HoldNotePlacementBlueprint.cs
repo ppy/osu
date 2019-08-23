@@ -55,7 +55,7 @@ namespace osu.Game.Rulesets.Mania.Edit.Blueprints
 
             if (PlacementBegun)
             {
-                var endTime = TimeAt(e.ScreenSpaceMousePosition);
+                double endTime = TimeAt(e.ScreenSpaceMousePosition);
 
                 HitObject.StartTime = endTime < originalStartTime ? endTime : originalStartTime;
                 HitObject.Duration = Math.Abs(endTime - originalStartTime);

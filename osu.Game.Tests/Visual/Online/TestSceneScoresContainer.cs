@@ -224,7 +224,7 @@ namespace osu.Game.Tests.Visual.Online
                 }
             };
 
-            foreach (var s in allScores.Scores)
+            foreach (APILegacyScoreInfo s in allScores.Scores)
             {
                 s.Statistics.Add(HitResult.Great, RNG.Next(2000));
                 s.Statistics.Add(HitResult.Good, RNG.Next(2000));

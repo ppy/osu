@@ -202,7 +202,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
             [BackgroundDependencyLoader]
             private void load()
             {
-                foreach (var t in availableDivisors)
+                foreach (int t in availableDivisors)
                 {
                     AddInternal(new Tick(t)
                     {

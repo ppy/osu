@@ -98,7 +98,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             var circlePiece = MainPiece as CirclePiece;
             circlePiece?.FlashBox.FinishTransforms();
 
-            var offset = !AllJudged ? 0 : Time.Current - HitObject.StartTime;
+            double offset = !AllJudged ? 0 : Time.Current - HitObject.StartTime;
 
             using (BeginDelayedSequence(HitObject.StartTime - Time.Current + offset, true))
             {

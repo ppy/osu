@@ -33,7 +33,7 @@ namespace osu.Game.Utils
             {
                 if (entry.Level < LogLevel.Verbose) return;
 
-                var exception = entry.Exception;
+                Exception exception = entry.Exception;
 
                 if (exception != null)
                 {

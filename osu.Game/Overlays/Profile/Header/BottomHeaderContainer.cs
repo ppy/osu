@@ -115,7 +115,7 @@ namespace osu.Game.Overlays.Profile.Header
 
             if (!string.IsNullOrEmpty(websiteWithoutProtcol))
             {
-                if (Uri.TryCreate(websiteWithoutProtcol, UriKind.Absolute, out var uri))
+                if (Uri.TryCreate(websiteWithoutProtcol, UriKind.Absolute, out Uri uri))
                 {
                     websiteWithoutProtcol = uri.Host + uri.PathAndQuery + uri.Fragment;
                     websiteWithoutProtcol = websiteWithoutProtcol.TrimEnd('/');
