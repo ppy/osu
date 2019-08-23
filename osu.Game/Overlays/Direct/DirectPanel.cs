@@ -34,7 +34,6 @@ namespace osu.Game.Overlays.Direct
         private Container content;
 
         private BeatmapSetOverlay beatmapSetOverlay;
-        private RulesetStore rulesets;
 
         public PreviewTrack Preview => PlayButton.Preview;
         public Bindable<bool> PreviewPlaying => PlayButton.Playing;
@@ -70,10 +69,9 @@ namespace osu.Game.Overlays.Direct
         };
 
         [BackgroundDependencyLoader(permitNulls: true)]
-        private void load(BeatmapManager beatmaps, OsuColour colours, BeatmapSetOverlay beatmapSetOverlay, RulesetStore rulesets)
+        private void load(BeatmapManager beatmaps, OsuColour colours, BeatmapSetOverlay beatmapSetOverlay)
         {
             this.beatmapSetOverlay = beatmapSetOverlay;
-            this.rulesets = rulesets;
 
             AddInternal(content = new Container
             {
@@ -148,12 +146,8 @@ namespace osu.Game.Overlays.Direct
 
             if (SetInfo.Beatmaps.Count > maximum_difficulty_icons)
             {
-                foreach (var ruleset in rulesets.AvailableRulesets)
-                {
-                    List<BeatmapInfo> list;
-                    if ((list = SetInfo.Beatmaps.FindAll(b => b.Ruleset.Equals(ruleset))).Count > 0)
-                        icons.Add(new GroupedDifficultyIcon(list, ruleset, this is DirectListPanel ? Color4.White : Color4.Black));
-                }
+                foreach (var ruleset in SetInfo.Beatmaps.Select(b => b.Ruleset).Distinct())
+                    icons.Add(new GroupedDifficultyIcon(SetInfo.Beatmaps.FindAll(b => b.Ruleset.Equals(ruleset)), ruleset, this is DirectListPanel ? Color4.White : Color4.Black));
             }
             else
                 foreach (var b in SetInfo.Beatmaps.OrderBy(beatmap => beatmap.StarDifficulty))

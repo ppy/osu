@@ -40,7 +40,7 @@ namespace osu.Game.Screens.Select.Carousel
         }
 
         [BackgroundDependencyLoader(true)]
-        private void load(BeatmapManager manager, BeatmapSetOverlay beatmapOverlay, DialogOverlay overlay, RulesetStore rulesets)
+        private void load(BeatmapManager manager, BeatmapSetOverlay beatmapOverlay, DialogOverlay overlay)
         {
             restoreHiddenRequested = s => s.Beatmaps.ForEach(manager.Restore);
             dialogOverlay = overlay;
@@ -100,7 +100,7 @@ namespace osu.Game.Screens.Select.Carousel
                                 {
                                     AutoSizeAxes = Axes.Both,
                                     Spacing = new Vector2(3),
-                                    Children = getDifficultyIcons(rulesets),
+                                    Children = getDifficultyIcons(),
                                 },
                             }
                         }
@@ -111,19 +111,15 @@ namespace osu.Game.Screens.Select.Carousel
 
         private const int maximum_difficulty_icons = 18;
 
-        private List<DifficultyIcon> getDifficultyIcons(RulesetStore rulesets)
+        private List<DifficultyIcon> getDifficultyIcons()
         {
             var beatmaps = ((CarouselBeatmapSet)Item).Beatmaps.ToList();
             var icons = new List<DifficultyIcon>();
 
             if (beatmaps.Count > maximum_difficulty_icons)
             {
-                foreach (var ruleset in rulesets.AvailableRulesets.OrderBy(r => r.ID))
-                {
-                    List<CarouselBeatmap> list;
-                    if ((list = beatmaps.FindAll(b => b.Beatmap.Ruleset.Equals(ruleset))).Count > 0)
-                        icons.Add(new FilterableGroupedDifficultyIcon(list, ruleset));
-                }
+                foreach (var ruleset in beatmaps.Select(b => b.Beatmap.Ruleset).Distinct())
+                    icons.Add(new FilterableGroupedDifficultyIcon(beatmaps.FindAll(b => b.Beatmap.Ruleset.Equals(ruleset)), ruleset));
             }
             else beatmaps.ForEach(b => icons.Add(new FilterableDifficultyIcon(b)));
 
