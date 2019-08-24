@@ -11,6 +11,12 @@ using osuTK.Graphics;
 
 namespace osu.Game.Beatmaps.Drawables
 {
+    /// <summary>
+    /// A difficulty icon that contains a counter on the right-side of it.
+    /// </summary>
+    /// <remarks>
+    /// Used in cases when there are too many difficulty icons to show.
+    /// </remarks>
     public class GroupedDifficultyIcon : DifficultyIcon
     {
         private readonly OsuSpriteText counter;
