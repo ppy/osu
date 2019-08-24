@@ -225,7 +225,7 @@ namespace osu.Game.Skinning
 
             if (sampleInfo is HitSampleInfo hsi)
                 // Try fallback to non-bank samples.
-                return Samples.Get($"{hsi.Name}");
+                return Samples.Get(hsi.Name);
 
             return null;
         }
