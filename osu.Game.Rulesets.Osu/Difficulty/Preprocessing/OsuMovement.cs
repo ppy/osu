@@ -23,7 +23,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
 
 
         private static readonly double[] ds0f = { 0, 0.5, 1, 1.5, 2, 2.5 };
-        private static readonly double[] ks0f = { -6, -6, -8, -9.5, -8.2, -8.2 };
+        private static readonly double[] ks0f = { -5.5, -5.5, -7.5, -10, -8.2, -8.2 };
         private static readonly double[,,] coeffs0f = new double[,,]  {{{-0.5 , -0.5 , -1   , -1.5 , -2   , -2   },
                                                                         { 0   ,  0   ,  0   ,  0   ,  0   ,  0   },
                                                                         { 1   ,  1   ,  1   ,  1   ,  1   ,  1   },
@@ -294,7 +294,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
                     ip01 = 0;
                 }
                 timeEarly = SpecialFunctions.Logistic((ip01 / ip12 - 0.6) * (-15)) *
-                            (1 / (1 / (t12 + 0.07) + t01Reciprocal)) * 0.12;
+                            (1 / (1 / (t12 + 0.07) + t01Reciprocal)) * 0.15;
 
                 double t23Reciprocal;
                 double ip23;
@@ -309,12 +309,18 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
                     ip23 = 0;
                 }
                 timeLate = SpecialFunctions.Logistic((ip23 / ip12 - 0.6) * (-15)) *
-                            (1 / (1 / (t12 + 0.07) + t23Reciprocal)) * 0.12;
+                            (1 / (1 / (t12 + 0.07) + t23Reciprocal)) * 0.15;
             }
 
+            // Correction #6 - Small circle bonus
+            //double smallCircleBonus = 0;
+            double smallCircleBonus = SpecialFunctions.Logistic((55 - 2 * obj2.Radius) / 2.0) * 0.1;
+
             // Apply the corrections
-            double d12WithCorrection = d12 * (1 + correction0 + correction3 + patternCorrection) * (1 + tapCorrection);
+            double d12WithCorrection = d12 * (1 + smallCircleBonus) * (1 + correction0 + correction3 + patternCorrection) *
+                                       (1 + tapCorrection);
             double t12WithCorrection = t12 + timeEarly + timeLate;
+
             this.D = d12WithCorrection;
             this.MT = t12WithCorrection;
         }
