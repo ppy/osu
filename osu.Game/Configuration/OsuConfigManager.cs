@@ -26,8 +26,8 @@ namespace osu.Game.Configuration
             Set(OsuSetting.DisplayStarsMinimum, 0.0, 0, 10, 0.1);
             Set(OsuSetting.DisplayStarsMaximum, 10.0, 0, 10, 0.1);
 
-            Set(OsuSetting.SelectGroupingMode, GroupMode.All);
-            Set(OsuSetting.SelectSortingMode, SortMode.Title);
+            Set(OsuSetting.SongSelectGroupingMode, GroupMode.All);
+            Set(OsuSetting.SongSelectSortingMode, SortMode.Title);
 
             Set(OsuSetting.RandomSelectAlgorithm, RandomSelectAlgorithm.RandomPermutation);
 
@@ -154,8 +154,8 @@ namespace osu.Game.Configuration
         SaveUsername,
         DisplayStarsMinimum,
         DisplayStarsMaximum,
-        SelectGroupingMode,
-        SelectSortingMode,
+        SongSelectGroupingMode,
+        SongSelectSortingMode,
         RandomSelectAlgorithm,
         ShowFpsDisplay,
         ChatDisplayHeight,

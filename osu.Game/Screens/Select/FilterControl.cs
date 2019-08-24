@@ -156,8 +156,8 @@ namespace osu.Game.Screens.Select
             ruleset.BindTo(parentRuleset);
             ruleset.BindValueChanged(_ => updateCriteria());
 
-            SortMode = config.GetBindable<SortMode>(OsuSetting.SelectSortingMode);
-            GroupMode = config.GetBindable<GroupMode>(OsuSetting.SelectGroupingMode);
+            SortMode = config.GetBindable<SortMode>(OsuSetting.SongSelectSortingMode);
+            GroupMode = config.GetBindable<GroupMode>(OsuSetting.SongSelectGroupingMode);
 
             sortTabs.Current.BindTo(SortMode);
             groupTabs.Current.BindTo(GroupMode);
