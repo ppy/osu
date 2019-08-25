@@ -25,7 +25,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
     public class OsuDifficultyCalculator : DifficultyCalculator
     {
         private const double aimMultiplier = 0.585;
-        private const double tapMultiplier = 0.778;
+        private const double tapMultiplier = 0.758;
         private const double srExponent = 0.85;
 
         public OsuDifficultyCalculator(Ruleset ruleset, WorkingBeatmap beatmap)
