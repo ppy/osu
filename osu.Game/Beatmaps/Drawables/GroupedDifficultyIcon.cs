@@ -19,46 +19,19 @@ namespace osu.Game.Beatmaps.Drawables
     /// </remarks>
     public class GroupedDifficultyIcon : DifficultyIcon
     {
-        private readonly OsuSpriteText counter;
-
-        private List<BeatmapInfo> beatmaps;
-
-        protected List<BeatmapInfo> Beatmaps
-        {
-            get => beatmaps;
-            set
-            {
-                beatmaps = value;
-
-                updateDisplay();
-            }
-        }
-
         public GroupedDifficultyIcon(List<BeatmapInfo> beatmaps, RulesetInfo ruleset, Color4 counterColour)
-            : base(null, ruleset, false)
+            : base(beatmaps.OrderBy(b => b.StarDifficulty).Last(), ruleset, false)
         {
-            this.beatmaps = beatmaps;
-
-            AddInternal(counter = new OsuSpriteText
+            AddInternal(new OsuSpriteText
             {
                 Anchor = Anchor.CentreRight,
                 Origin = Anchor.CentreRight,
                 Padding = new MarginPadding { Left = Size.X },
                 Margin = new MarginPadding { Left = 2, Right = 5 },
                 Font = OsuFont.GetFont(size: 14, weight: FontWeight.SemiBold),
+                Text = beatmaps.Count.ToString(),
                 Colour = counterColour,
             });
-
-            updateDisplay();
-        }
-
-        private void updateDisplay()
-        {
-            if (beatmaps == null || beatmaps.Count == 0)
-                return;
-
-            Beatmap = beatmaps.OrderBy(b => b.StarDifficulty).Last();
-            counter.Text = beatmaps.Count.ToString();
         }
     }
 }
