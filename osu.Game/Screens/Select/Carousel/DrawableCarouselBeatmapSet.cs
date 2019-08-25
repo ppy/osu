@@ -118,8 +118,8 @@ namespace osu.Game.Screens.Select.Carousel
 
             if (beatmaps.Count > maximum_difficulty_icons)
             {
-                foreach (var ruleset in beatmaps.Select(b => b.Beatmap.Ruleset).Distinct())
-                    icons.Add(new FilterableGroupedDifficultyIcon(beatmaps.FindAll(b => b.Beatmap.Ruleset.Equals(ruleset)), ruleset));
+                foreach (var group in beatmaps.GroupBy(b => b.Beatmap.Ruleset))
+                    icons.Add(new FilterableGroupedDifficultyIcon(group.ToList(), group.Key));
             }
             else beatmaps.ForEach(b => icons.Add(new FilterableDifficultyIcon(b)));
 
