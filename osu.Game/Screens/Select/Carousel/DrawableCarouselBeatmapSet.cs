@@ -100,7 +100,7 @@ namespace osu.Game.Screens.Select.Carousel
                                 {
                                     AutoSizeAxes = Axes.Both,
                                     Spacing = new Vector2(3),
-                                    Children = getDifficultyIcons(),
+                                    ChildrenEnumerable = getDifficultyIcons(),
                                 },
                             }
                         }
@@ -111,19 +111,13 @@ namespace osu.Game.Screens.Select.Carousel
 
         private const int maximum_difficulty_icons = 18;
 
-        private List<DifficultyIcon> getDifficultyIcons()
+        private IEnumerable<DifficultyIcon> getDifficultyIcons()
         {
             var beatmaps = ((CarouselBeatmapSet)Item).Beatmaps.ToList();
-            var icons = new List<DifficultyIcon>();
 
-            if (beatmaps.Count > maximum_difficulty_icons)
-            {
-                foreach (var group in beatmaps.GroupBy(b => b.Beatmap.Ruleset))
-                    icons.Add(new FilterableGroupedDifficultyIcon(group.ToList(), group.Key));
-            }
-            else beatmaps.ForEach(b => icons.Add(new FilterableDifficultyIcon(b)));
-
-            return icons;
+            return beatmaps.Count > maximum_difficulty_icons
+                ? (IEnumerable<DifficultyIcon>)beatmaps.GroupBy(b => b.Beatmap.Ruleset).Select(group => new FilterableGroupedDifficultyIcon(group.ToList(), group.Key))
+                : beatmaps.Select(b => new FilterableDifficultyIcon(b));
         }
 
         public MenuItem[] ContextMenuItems
