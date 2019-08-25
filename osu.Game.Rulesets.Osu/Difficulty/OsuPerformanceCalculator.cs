@@ -15,6 +15,7 @@ using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring;
+using osu.Game.Rulesets.Osu.Difficulty.MathUtil;
 
 namespace osu.Game.Rulesets.Osu.Difficulty
 {
@@ -64,7 +65,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 return 0;
 
             // Custom multipliers for NoFail and SpunOut.
-            double multiplier = 1.12f; // This is being adjusted to keep the final pp value scaled around what it used to be when changing things
+            double multiplier = 1.7; // This is being adjusted to keep the final pp value scaled around what it used to be when changing things
 
             if (mods.Any(m => m is OsuModNoFail))
                 multiplier *= 0.90f;
@@ -74,11 +75,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             double aimValue = computeAimValue();
             double speedValue = computeSpeedValue();
-            double totalValue =
-                Math.Pow(
-                    Math.Pow(aimValue, totalValueExponent) +
-                    Math.Pow(speedValue, totalValueExponent), 1 / totalValueExponent
-                ) * multiplier;
+            double totalValue = Mean.PowerMean(aimValue, speedValue, totalValueExponent) * multiplier;
 
             if (categoryRatings != null)
             {
@@ -170,22 +167,26 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                                  (Math.Sqrt(2) * SpecialFunctions.ErfInv(accOnStreamsPositive));
 
             double mashLevel = SpecialFunctions.Logistic(((urOnStreams * Attributes.TapDiff) - 2700) / 600);
-            double accBuffLevel = (1 - SpecialFunctions.Logistic(((urOnStreams * Attributes.TapDiff) - 1000) / 500)) /
-                             SpecialFunctions.Logistic(1000.0 / 500);
+            
 
 
             double tapSkill = LinearSpline.InterpolateSorted(Attributes.MashLevels, Attributes.TapSkills)
                               .Interpolate(mashLevel);
 
-            //Console.WriteLine(urOnStreams * Attributes.TapDiff);
-            //Console.WriteLine(mashLevel);
-            //Console.WriteLine(accBuffLevel);
-            //Console.WriteLine(tapSkill);
 
-            double tapValue = Math.Pow(tapSkill, 2.55) * 0.4;
+
+            double tapValue = Math.Pow(tapSkill, 2.55) * 0.37;
 
             // Buff high acc
-            tapValue *= 1 + Math.Pow(accBuffLevel, 2) * 0.7;
+            double accBuffLevel = (1 - SpecialFunctions.Logistic(((urOnStreams * Attributes.TapDiff) - 1000) / 500)) /
+                                  SpecialFunctions.Logistic(1000.0 / 500);
+            accBuffLevel = Math.Pow(accBuffLevel, 2) * 1.2;
+            tapValue *= 1 + accBuffLevel;
+
+            //Console.WriteLine(urOnStreams * Attributes.TapDiff);
+            //Console.WriteLine(mashLevel);
+            //Console.WriteLine(tapSkill);
+            //Console.WriteLine(accBuffLevel);
 
             // Penalize misses exponentially. This mainly fixes tag4 maps and the likes until a per-hitobject solution is available
             tapValue *= Math.Pow(0.97f, countMiss);

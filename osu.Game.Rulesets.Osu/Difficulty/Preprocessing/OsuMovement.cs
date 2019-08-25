@@ -23,19 +23,19 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
 
 
         private static readonly double[] ds0f = { 0, 0.5, 1, 1.5, 2, 2.5 };
-        private static readonly double[] ks0f = { -5.5, -5.5, -7.5, -10, -8.2, -8.2 };
+        private static readonly double[] ks0f = { -5.5, -5.5, -7.5, -7, -4.4, -4.4 };
         private static readonly double[,,] coeffs0f = new double[,,]  {{{-0.5 , -0.5 , -1   , -1.5 , -2   , -2   },
                                                                         { 0   ,  0   ,  0   ,  0   ,  0   ,  0   },
                                                                         { 1   ,  1   ,  1   ,  1   ,  1   ,  1   },
-                                                                        { 5   ,  5   ,  4   ,  2   ,  2   ,  2   }},
-                                                                       {{-0.35, -0.35, -0.7 , -1   , -1.4 , -1.4 },
-                                                                        { 0.35,  0.35,  0.7 ,  1   ,  1.4 ,  1.4 },
+                                                                        { 5   ,  5   ,  4   ,  1.5 ,  1   ,  1   }},
+                                                                       {{-0.35, -0.35, -0.7 , -0.75, -1   , -1   },
+                                                                        { 0.35,  0.35,  0.7 ,  1.5 ,  2   ,  2   },
                                                                         { 1   ,  1   ,  1   ,  1   ,  1   ,  1   },
-                                                                        { 0   ,  0   ,  1   ,  2   ,  2   ,  2   }},
-                                                                       {{-0.35, -0.35, -0.7 , -1   , -1.4 , -1.4 },
-                                                                        {-0.35, -0.35, -0.7 , -1   , -1.4 , -1.4 },
+                                                                        { 0   ,  0   ,  1   ,  1   ,  1   ,  1   }},
+                                                                       {{-0.35, -0.35, -0.7 , -0.75, -1   , -1   },
+                                                                        {-0.35, -0.35, -0.7 , -1.5 , -2   , -2   },
                                                                         { 1   ,  1   ,  1   ,  1   ,  1   ,  1   },
-                                                                        { 0   ,  0   ,  1   ,  2   ,  2   ,  2   }}};
+                                                                        { 0   ,  0   ,  1   ,  1   ,  1   ,  1   }}};
 
 
         private static readonly double[] ds0s = { 1, 1.5, 2.5, 4, 6, 8 };
@@ -260,7 +260,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
                                  Mean.PowerMean(d12, 1, 10) *
                                  Mean.PowerMean(d23, 1, 10);
                 patternCorrection = (SpecialFunctions.Logistic((gap - 0.75) * 8) - SpecialFunctions.Logistic(-6)) *
-                                     (1 - SpecialFunctions.Logistic((spacing - 3) * 4)) * 0.4;
+                                     (1 - SpecialFunctions.Logistic((spacing - 3) * 4)) * 0.6;
             }
 
             // Correction #4 - Tap Strain
