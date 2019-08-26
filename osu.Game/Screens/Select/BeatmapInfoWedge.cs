@@ -26,6 +26,7 @@ using osu.Framework.Localisation;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.UI;
+using osu.Game.Overlays.Direct;
 
 namespace osu.Game.Screens.Select
 {
@@ -131,6 +132,7 @@ namespace osu.Game.Screens.Select
             public OsuSpriteText TitleLabel { get; private set; }
             public OsuSpriteText ArtistLabel { get; private set; }
             public BeatmapSetOnlineStatusPill StatusPill { get; private set; }
+            public IconPill StoryboardPill { get; private set; }
             public FillFlowContainer MapperContainer { get; private set; }
             public FillFlowContainer InfoLabelContainer { get; private set; }
 
@@ -214,11 +216,16 @@ namespace osu.Game.Screens.Select
                         Name = "Topright-aligned metadata",
                         Anchor = Anchor.TopRight,
                         Origin = Anchor.TopRight,
-                        Direction = FillDirection.Vertical,
+                        Direction = FillDirection.Horizontal,
                         Margin = new MarginPadding { Top = 14, Left = 10, Right = 18, Bottom = 20 },
                         AutoSizeAxes = Axes.Both,
                         Children = new Drawable[]
                         {
+                            StoryboardPill = new IconPill(FontAwesome.Solid.Image)
+                            {
+                                IconSize = new Vector2(15),
+                                IconPadding = new MarginPadding(3)
+                            },
                             StatusPill = new BeatmapSetOnlineStatusPill
                             {
                                 TextSize = 11,
@@ -270,6 +277,9 @@ namespace osu.Game.Screens.Select
                 // no difficulty means it can't have a status to show
                 if (beatmapInfo.Version == null)
                     StatusPill.Hide();
+
+                if (!beatmap.Storyboard.HasDrawable)
+                    StoryboardPill.Hide();
             }
 
             private void setMetadata(string source)

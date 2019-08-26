@@ -18,6 +18,12 @@ namespace osu.Game.Overlays.Direct
             set => iconContainer.Size = value;
         }
 
+        public MarginPadding IconPadding
+        {
+            get => iconContainer.Padding;
+            set => iconContainer.Padding = value;
+        }
+
         private readonly Container iconContainer;
 
         public IconPill(IconUsage icon)
