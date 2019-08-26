@@ -62,6 +62,22 @@ namespace osu.Game.Rulesets.UI
 
         public override GameplayClock FrameStableClock => frameStabilityContainer.GameplayClock;
 
+        private bool frameStablePlayback = true;
+
+        /// <summary>
+        /// Whether to enable frame-stable playback.
+        /// </summary>
+        internal bool FrameStablePlayback
+        {
+            get => frameStablePlayback;
+            set
+            {
+                frameStablePlayback = false;
+                if (frameStabilityContainer != null)
+                    frameStabilityContainer.FrameStablePlayback = value;
+            }
+        }
+
         /// <summary>
         /// Invoked when a <see cref="JudgementResult"/> has been applied by a <see cref="DrawableHitObject"/>.
         /// </summary>
@@ -147,6 +163,7 @@ namespace osu.Game.Rulesets.UI
             {
                 frameStabilityContainer = new FrameStabilityContainer(GameplayStartTime)
                 {
+                    FrameStablePlayback = FrameStablePlayback,
                     Child = KeyBindingInputManager
                         .WithChild(CreatePlayfieldAdjustmentContainer()
                             .WithChild(Playfield)

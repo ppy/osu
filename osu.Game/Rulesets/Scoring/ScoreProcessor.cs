@@ -325,9 +325,6 @@ namespace osu.Game.Rulesets.Scoring
 
             JudgedHits++;
 
-            if (result.Type != HitResult.None)
-                scoreResultCounts[result.Type] = scoreResultCounts.GetOrDefault(result.Type) + 1;
-
             if (result.Judgement.AffectsCombo)
             {
                 switch (result.Type)
@@ -352,6 +349,9 @@ namespace osu.Game.Rulesets.Scoring
             }
             else
             {
+                if (result.HasResult)
+                    scoreResultCounts[result.Type] = scoreResultCounts.GetOrDefault(result.Type) + 1;
+
                 baseScore += result.Judgement.NumericResultFor(result);
                 rollingMaxBaseScore += result.Judgement.MaxNumericResult;
             }
@@ -371,9 +371,6 @@ namespace osu.Game.Rulesets.Scoring
 
             JudgedHits--;
 
-            if (result.Type != HitResult.None)
-                scoreResultCounts[result.Type] = scoreResultCounts.GetOrDefault(result.Type) - 1;
-
             if (result.Judgement.IsBonus)
             {
                 if (result.IsHit)
@@ -381,6 +378,9 @@ namespace osu.Game.Rulesets.Scoring
             }
             else
             {
+                if (result.HasResult)
+                    scoreResultCounts[result.Type] = scoreResultCounts.GetOrDefault(result.Type) - 1;
+
                 baseScore -= result.Judgement.NumericResultFor(result);
                 rollingMaxBaseScore -= result.Judgement.MaxNumericResult;
             }
@@ -398,7 +398,7 @@ namespace osu.Game.Rulesets.Scoring
             if (rollingMaxBaseScore != 0)
                 Accuracy.Value = baseScore / rollingMaxBaseScore;
 
-            TotalScore.Value = getScore(Mode.Value) * scoreMultiplier;
+            TotalScore.Value = getScore(Mode.Value);
         }
 
         private double getScore(ScoringMode mode)
@@ -407,11 +407,11 @@ namespace osu.Game.Rulesets.Scoring
             {
                 default:
                 case ScoringMode.Standardised:
-                    return max_score * (base_portion * baseScore / maxBaseScore + combo_portion * HighestCombo.Value / maxHighestCombo) + bonusScore;
+                    return (max_score * (base_portion * baseScore / maxBaseScore + combo_portion * HighestCombo.Value / maxHighestCombo) + bonusScore) * scoreMultiplier;
 
                 case ScoringMode.Classic:
                     // should emulate osu-stable's scoring as closely as we can (https://osu.ppy.sh/help/wiki/Score/ScoreV1)
-                    return bonusScore + baseScore * (1 + Math.Max(0, HighestCombo.Value - 1) / 25);
+                    return bonusScore + baseScore * ((1 + Math.Max(0, HighestCombo.Value - 1) * scoreMultiplier) / 25);
             }
         }
 

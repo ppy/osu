@@ -124,14 +124,12 @@ namespace osu.Game.Overlays.Profile.Sections
 
         private class ChevronIcon : SpriteIcon
         {
-            private const int bottom_margin = 2;
             private const int icon_size = 8;
 
             public ChevronIcon()
             {
                 Anchor = Anchor.Centre;
                 Origin = Anchor.Centre;
-                Margin = new MarginPadding { Bottom = bottom_margin };
                 Size = new Vector2(icon_size);
                 Icon = FontAwesome.Solid.ChevronDown;
             }
