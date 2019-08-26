@@ -45,6 +45,7 @@ namespace osu.Game.Rulesets.Osu
 
         private void sourceChanged()
         {
+            // these need to be lazy in order to ensure they aren't called before the dependencies have been loaded into our source.
             configuration = new Lazy<SkinConfiguration>(() =>
             {
                 var config = new SkinConfiguration();
