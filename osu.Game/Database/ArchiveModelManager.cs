@@ -1,4 +1,4 @@
-﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
@@ -31,10 +31,21 @@ namespace osu.Game.Database
     /// </summary>
     /// <typeparam name="TModel">The model type.</typeparam>
     /// <typeparam name="TFileModel">The associated file join type.</typeparam>
-    public abstract class ArchiveModelManager<TModel, TFileModel> : ArchiveModelManager, ICanAcceptFiles, IModelManager<TModel>
+    public abstract class ArchiveModelManager<TModel, TFileModel> : ICanAcceptFiles, IModelManager<TModel>
         where TModel : class, IHasFiles<TFileModel>, IHasPrimaryKey, ISoftDelete
         where TFileModel : INamedFileInfo, new()
     {
+        private const int import_queue_request_concurrency = 1;
+
+        /// <summary>
+        /// A singleton scheduler shared by all <see cref="ArchiveModelManager{TModel,TFileModel}"/>.
+        /// </summary>
+        /// <remarks>
+        /// This scheduler generally performs IO and CPU intensive work so concurrency is limited harshly.
+        /// It is mainly being used as a queue mechanism for large imports.
+        /// </remarks>
+        private static readonly ThreadedTaskScheduler import_scheduler = new ThreadedTaskScheduler(import_queue_request_concurrency, nameof(ArchiveModelManager<TModel, TFileModel>));
+
         /// <summary>
         /// Set an endpoint for notifications to be posted to.
         /// </summary>
@@ -114,7 +125,8 @@ namespace osu.Game.Database
 
                     lock (imported)
                     {
-                        imported.Add(model);
+                        if (model != null)
+                            imported.Add(model);
                         current++;
 
                         notification.Text = $"Imported {current} of {paths.Length} {HumanisedModelName}s";
@@ -140,7 +152,7 @@ namespace osu.Game.Database
             {
                 notification.CompletionText = imported.Count == 1
                     ? $"Imported {imported.First()}!"
-                    : $"Imported {current} {HumanisedModelName}s!";
+                    : $"Imported {imported.Count} {HumanisedModelName}s!";
 
                 if (imported.Count > 0 && PresentImport != null)
                 {
@@ -176,7 +188,7 @@ namespace osu.Game.Database
             // TODO: Add a check to prevent files from storage to be deleted.
             try
             {
-                if (import != null && File.Exists(path))
+                if (import != null && File.Exists(path) && ShouldDeleteArchive(path))
                     File.Delete(path);
             }
             catch (Exception e)
@@ -207,7 +219,7 @@ namespace osu.Game.Database
             {
                 model = CreateModel(archive);
 
-                if (model == null) return null;
+                if (model == null) return Task.FromResult<TModel>(null);
 
                 model.Hash = computeHash(archive);
             }
@@ -252,7 +264,7 @@ namespace osu.Game.Database
                 using (Stream s = reader.GetStream(file))
                     s.CopyTo(hashable);
 
-            return hashable.ComputeSHA2Hash();
+            return hashable.Length > 0 ? hashable.ComputeSHA2Hash() : null;
         }
 
         /// <summary>
@@ -335,7 +347,7 @@ namespace osu.Game.Database
 
             flushEvents(true);
             return item;
-        }, cancellationToken, TaskCreationOptions.HideScheduler, IMPORT_SCHEDULER).Unwrap();
+        }, cancellationToken, TaskCreationOptions.HideScheduler, import_scheduler).Unwrap();
 
         /// <summary>
         /// Perform an update of the specified item.
@@ -499,6 +511,18 @@ namespace osu.Game.Database
         protected virtual string ImportFromStablePath => null;
 
         /// <summary>
+        /// Select paths to import from stable. Default implementation iterates all directories in <see cref="ImportFromStablePath"/>.
+        /// </summary>
+        protected virtual IEnumerable<string> GetStableImportPaths(Storage stableStoage) => stableStoage.GetDirectories(ImportFromStablePath);
+
+        /// <summary>
+        /// Whether this specified path should be removed after successful import.
+        /// </summary>
+        /// <param name="path">The path for consideration. May be a file or a directory.</param>
+        /// <returns>Whether to perform deletion.</returns>
+        protected virtual bool ShouldDeleteArchive(string path) => false;
+
+        /// <summary>
         /// This is a temporary method and will likely be replaced by a full-fledged (and more correctly placed) migration process in the future.
         /// </summary>
         public Task ImportFromStableAsync()
@@ -518,7 +542,7 @@ namespace osu.Game.Database
                 return Task.CompletedTask;
             }
 
-            return Task.Run(async () => await Import(stable.GetDirectories(ImportFromStablePath).Select(f => stable.GetFullPath(f)).ToArray()));
+            return Task.Run(async () => await Import(GetStableImportPaths(GetStableStorage()).Select(f => stable.GetFullPath(f)).ToArray()));
         }
 
         #endregion
@@ -632,19 +656,5 @@ namespace osu.Game.Database
         }
 
         #endregion
-    }
-
-    public abstract class ArchiveModelManager
-    {
-        private const int import_queue_request_concurrency = 1;
-
-        /// <summary>
-        /// A singleton scheduler shared by all <see cref="ArchiveModelManager{TModel,TFileModel}"/>.
-        /// </summary>
-        /// <remarks>
-        /// This scheduler generally performs IO and CPU intensive work so concurrency is limited harshly.
-        /// It is mainly being used as a queue mechanism for large imports.
-        /// </remarks>
-        protected static readonly ThreadedTaskScheduler IMPORT_SCHEDULER = new ThreadedTaskScheduler(import_queue_request_concurrency, nameof(ArchiveModelManager));
     }
 }

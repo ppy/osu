@@ -92,7 +92,7 @@ namespace osu.Game.Screens.Menu
                         {
                             EdgeSmoothness = new Vector2(1.5f, 0),
                             RelativeSizeAxes = Axes.Both,
-                            Blending = BlendingMode.Additive,
+                            Blending = BlendingParameters.Additive,
                             Colour = Color4.White,
                             Alpha = 0,
                         },

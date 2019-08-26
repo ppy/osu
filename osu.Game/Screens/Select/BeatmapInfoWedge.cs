@@ -18,8 +18,6 @@ using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Drawables;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
-using osu.Game.Rulesets.Objects;
-using osu.Game.Rulesets.Objects.Types;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Effects;
@@ -143,6 +141,7 @@ namespace osu.Game.Screens.Select
             private readonly RulesetInfo ruleset;
 
             public BufferedWedgeInfo(WorkingBeatmap beatmap, RulesetInfo userRuleset)
+                : base(pixelSnapping: true)
             {
                 this.beatmap = beatmap;
                 ruleset = userRuleset ?? beatmap.BeatmapInfo.Ruleset;
@@ -154,7 +153,6 @@ namespace osu.Game.Screens.Select
                 var beatmapInfo = beatmap.BeatmapInfo;
                 var metadata = beatmapInfo.Metadata ?? beatmap.BeatmapSetInfo?.Metadata ?? new BeatmapMetadata();
 
-                PixelSnapping = true;
                 CacheDrawnFrameBuffer = true;
                 RelativeSizeAxes = Axes.Both;
 
@@ -289,14 +287,11 @@ namespace osu.Game.Screens.Select
 
                 if (b?.HitObjects?.Any() == true)
                 {
-                    HitObject lastObject = b.HitObjects.LastOrDefault();
-                    double endTime = (lastObject as IHasEndTime)?.EndTime ?? lastObject?.StartTime ?? 0;
-
                     labels.Add(new InfoLabel(new BeatmapStatistic
                     {
                         Name = "Length",
                         Icon = FontAwesome.Regular.Clock,
-                        Content = TimeSpan.FromMilliseconds(endTime - b.HitObjects.First().StartTime).ToString(@"m\:ss"),
+                        Content = TimeSpan.FromMilliseconds(b.BeatmapInfo.Length).ToString(@"m\:ss"),
                     }));
 
                     labels.Add(new InfoLabel(new BeatmapStatistic
@@ -407,31 +402,35 @@ namespace osu.Game.Screens.Select
                 }
             }
 
-            private class DifficultyColourBar : DifficultyColouredContainer
+            private class DifficultyColourBar : Container
             {
+                private readonly BeatmapInfo beatmap;
+
                 public DifficultyColourBar(BeatmapInfo beatmap)
-                    : base(beatmap)
                 {
+                    this.beatmap = beatmap;
                 }
 
                 [BackgroundDependencyLoader]
-                private void load()
+                private void load(OsuColour colours)
                 {
                     const float full_opacity_ratio = 0.7f;
+
+                    var difficultyColour = colours.ForDifficultyRating(beatmap.DifficultyRating);
 
                     Children = new Drawable[]
                     {
                         new Box
                         {
                             RelativeSizeAxes = Axes.Both,
-                            Colour = AccentColour,
+                            Colour = difficultyColour,
                             Width = full_opacity_ratio,
                         },
                         new Box
                         {
                             RelativeSizeAxes = Axes.Both,
                             RelativePositionAxes = Axes.Both,
-                            Colour = AccentColour,
+                            Colour = difficultyColour,
                             Alpha = 0.5f,
                             X = full_opacity_ratio,
                             Width = 1 - full_opacity_ratio,

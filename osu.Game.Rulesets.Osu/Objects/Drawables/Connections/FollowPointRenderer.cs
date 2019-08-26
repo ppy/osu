@@ -97,7 +97,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Connections
                             Position = pointStartPosition,
                             Rotation = rotation,
                             Alpha = 0,
-                            Scale = new Vector2(1.5f),
+                            Scale = new Vector2(1.5f * currHitObject.Scale),
                         });
 
                         HasFailed.BindValueChanged(_ => fp.Fail(), true);
@@ -105,7 +105,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Connections
                         using (fp.BeginAbsoluteSequence(fadeInTime))
                         {
                             fp.FadeIn(currHitObject.TimeFadeIn);
-                            fp.ScaleTo(1, currHitObject.TimeFadeIn, Easing.Out);
+                            fp.ScaleTo(currHitObject.Scale, currHitObject.TimeFadeIn, Easing.Out);
 
                             fp.MoveTo(pointEndPosition, currHitObject.TimeFadeIn, Easing.Out);
 

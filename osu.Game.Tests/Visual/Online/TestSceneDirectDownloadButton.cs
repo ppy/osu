@@ -20,7 +20,7 @@ namespace osu.Game.Tests.Visual.Online
     {
         public override IReadOnlyList<Type> RequiredTypes => new[]
         {
-            typeof(DownloadButton)
+            typeof(PanelDownloadButton)
         };
 
         private TestDownloadButton downloadButton;
@@ -143,7 +143,7 @@ namespace osu.Game.Tests.Visual.Online
             return beatmap;
         }
 
-        private class TestDownloadButton : DownloadButton
+        private class TestDownloadButton : PanelDownloadButton
         {
             public new bool DownloadEnabled => base.DownloadEnabled;
 

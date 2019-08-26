@@ -32,7 +32,7 @@ namespace osu.Game.Tests.Visual.Online
             typeof(BasicStats),
             typeof(BeatmapPicker),
             typeof(Details),
-            typeof(DownloadButton),
+            typeof(HeaderDownloadButton),
             typeof(FavouriteButton),
             typeof(Header),
             typeof(HeaderButton),
@@ -108,6 +108,7 @@ namespace osu.Game.Tests.Visual.Online
                         {
                             StarDifficulty = 9.99,
                             Version = @"TEST",
+                            Length = 456000,
                             Ruleset = maniaRuleset,
                             BaseDifficulty = new BeatmapDifficulty
                             {
@@ -118,7 +119,6 @@ namespace osu.Game.Tests.Visual.Online
                             },
                             OnlineInfo = new BeatmapOnlineInfo
                             {
-                                Length = 456000,
                                 CircleCount = 111,
                                 SliderCount = 12,
                                 PlayCount = 222,
@@ -134,6 +134,9 @@ namespace osu.Game.Tests.Visual.Online
                 });
             });
 
+            downloadAssert(true);
+
+            AddStep("show many difficulties", () => overlay.ShowBeatmapSet(createManyDifficultiesBeatmapSet()));
             downloadAssert(true);
         }
 
@@ -181,6 +184,7 @@ namespace osu.Game.Tests.Visual.Online
                         {
                             StarDifficulty = 5.67,
                             Version = @"ANOTHER TEST",
+                            Length = 123000,
                             Ruleset = taikoRuleset,
                             BaseDifficulty = new BeatmapDifficulty
                             {
@@ -191,7 +195,6 @@ namespace osu.Game.Tests.Visual.Online
                             },
                             OnlineInfo = new BeatmapOnlineInfo
                             {
-                                Length = 123000,
                                 CircleCount = 123,
                                 SliderCount = 45,
                                 PlayCount = 567,
@@ -220,6 +223,56 @@ namespace osu.Game.Tests.Visual.Online
         public void TestShowWithNoReload()
         {
             AddStep(@"show without reload", overlay.Show);
+        }
+
+        private BeatmapSetInfo createManyDifficultiesBeatmapSet()
+        {
+            var beatmaps = new List<BeatmapInfo>();
+
+            for (int i = 1; i < 41; i++)
+            {
+                beatmaps.Add(new BeatmapInfo
+                {
+                    OnlineBeatmapID = i * 10,
+                    Version = $"Test #{i}",
+                    Ruleset = Ruleset.Value,
+                    StarDifficulty = 2 + i * 0.1,
+                    BaseDifficulty = new BeatmapDifficulty
+                    {
+                        OverallDifficulty = 3.5f,
+                    },
+                    OnlineInfo = new BeatmapOnlineInfo(),
+                    Metrics = new BeatmapMetrics
+                    {
+                        Fails = Enumerable.Range(1, 100).Select(j => j % 12 - 6).ToArray(),
+                        Retries = Enumerable.Range(-2, 100).Select(j => j % 12 - 6).ToArray(),
+                    },
+                });
+            }
+
+            return new BeatmapSetInfo
+            {
+                OnlineBeatmapSetID = 123,
+                Metadata = new BeatmapMetadata
+                {
+                    Title = @"many difficulties beatmap",
+                    Artist = @"none",
+                    Author = new User
+                    {
+                        Username = @"BanchoBot",
+                        Id = 3,
+                    },
+                },
+                OnlineInfo = new BeatmapSetOnlineInfo
+                {
+                    Preview = @"https://b.ppy.sh/preview/123.mp3",
+                    HasVideo = true,
+                    HasStoryboard = true,
+                    Covers = new BeatmapSetOnlineCovers(),
+                },
+                Metrics = new BeatmapSetMetrics { Ratings = Enumerable.Range(0, 11).ToArray() },
+                Beatmaps = beatmaps,
+            };
         }
 
         private void downloadAssert(bool shown)

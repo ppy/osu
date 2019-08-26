@@ -1,4 +1,4 @@
-﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Graphics;
@@ -13,12 +13,12 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
     {
         public FlashPiece()
         {
-            Size = new Vector2(128);
+            Size = new Vector2(OsuHitObject.OBJECT_RADIUS * 2);
 
             Anchor = Anchor.Centre;
             Origin = Anchor.Centre;
 
-            Blending = BlendingMode.Additive;
+            Blending = BlendingParameters.Additive;
             Alpha = 0;
 
             Child = new SkinnableDrawable("Play/osu/hitcircle-flash", name => new CircularContainer
