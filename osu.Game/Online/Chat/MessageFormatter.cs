@@ -122,6 +122,7 @@ namespace osu.Game.Online.Chat
                                 return new LinkDetails(LinkAction.OpenBeatmapSet, args[3]);
 
                             case "u":
+                            case "users":
                                 return new LinkDetails(LinkAction.OpenUserProfile, args[3]);
                         }
                     }

@@ -19,6 +19,7 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays;
+using osu.Game.Rulesets;
 using osuTK;
 using osuTK.Graphics;
 
@@ -95,16 +96,28 @@ namespace osu.Game.Screens.Select.Carousel
                                     TextPadding = new MarginPadding { Horizontal = 8, Vertical = 2 },
                                     Status = beatmapSet.Status
                                 },
-                                new FillFlowContainer<FilterableDifficultyIcon>
+                                new FillFlowContainer<DifficultyIcon>
                                 {
                                     AutoSizeAxes = Axes.Both,
-                                    Children = ((CarouselBeatmapSet)Item).Beatmaps.Select(b => new FilterableDifficultyIcon(b)).ToList()
+                                    Spacing = new Vector2(3),
+                                    ChildrenEnumerable = getDifficultyIcons(),
                                 },
                             }
                         }
                     }
                 }
             };
+        }
+
+        private const int maximum_difficulty_icons = 18;
+
+        private IEnumerable<DifficultyIcon> getDifficultyIcons()
+        {
+            var beatmaps = ((CarouselBeatmapSet)Item).Beatmaps.ToList();
+
+            return beatmaps.Count > maximum_difficulty_icons
+                ? (IEnumerable<DifficultyIcon>)beatmaps.GroupBy(b => b.Beatmap.Ruleset).Select(group => new FilterableGroupedDifficultyIcon(group.ToList(), group.Key))
+                : beatmaps.Select(b => new FilterableDifficultyIcon(b));
         }
 
         public MenuItem[] ContextMenuItems
@@ -202,6 +215,19 @@ namespace osu.Game.Screens.Select.Carousel
                 filtered.BindTo(item.Filtered);
                 filtered.ValueChanged += isFiltered => Schedule(() => this.FadeTo(isFiltered.NewValue ? 0.1f : 1, 100));
                 filtered.TriggerChange();
+            }
+        }
+
+        public class FilterableGroupedDifficultyIcon : GroupedDifficultyIcon
+        {
+            public FilterableGroupedDifficultyIcon(List<CarouselBeatmap> items, RulesetInfo ruleset)
+                : base(items.Select(i => i.Beatmap).ToList(), ruleset, Color4.White)
+            {
+                items.ForEach(item => item.Filtered.ValueChanged += _ =>
+                {
+                    // for now, fade the whole group based on the ratio of hidden items.
+                    this.FadeTo(1 - 0.9f * ((float)items.Count(i => i.Filtered.Value) / items.Count), 100);
+                });
             }
         }
     }

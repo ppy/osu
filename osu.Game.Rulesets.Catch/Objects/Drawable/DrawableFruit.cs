@@ -81,7 +81,7 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawable
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
                     AccentColour = Color4.Red,
-                    Blending = BlendingMode.Additive,
+                    Blending = BlendingParameters.Additive,
                     Alpha = 0.5f,
                     Scale = new Vector2(1.333f)
                 });

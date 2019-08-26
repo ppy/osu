@@ -196,16 +196,29 @@ namespace osu.Game.Overlays.Profile.Header.Components
             }
         }
 
-        public string TooltipText => Statistics.Value?.Ranks.Global == null ? "" : $"#{ranks[dayIndex].Value:#,##0}|{ranked_days - ranks[dayIndex].Key + 1}";
+        public object TooltipContent
+        {
+            get
+            {
+                if (Statistics.Value?.Ranks.Global == null)
+                    return null;
+
+                var days = ranked_days - ranks[dayIndex].Key + 1;
+
+                return new TooltipDisplayContent
+                {
+                    Rank = $"#{ranks[dayIndex].Value:#,##0}",
+                    Time = days == 0 ? "now" : $"{days} days ago"
+                };
+            }
+        }
 
         public ITooltip GetCustomTooltip() => new RankGraphTooltip();
 
-        public class RankGraphTooltip : VisibilityContainer, ITooltip
+        private class RankGraphTooltip : VisibilityContainer, ITooltip
         {
             private readonly OsuSpriteText globalRankingText, timeText;
             private readonly Box background;
-
-            public string TooltipText { get; set; }
 
             public RankGraphTooltip()
             {
@@ -260,11 +273,14 @@ namespace osu.Game.Overlays.Profile.Header.Components
                 background.Colour = colours.GreySeafoamDark;
             }
 
-            public void Refresh()
+            public bool SetContent(object content)
             {
-                var info = TooltipText.Split('|');
-                globalRankingText.Text = info[0];
-                timeText.Text = info[1] == "0" ? "now" : $"{info[1]} days ago";
+                if (!(content is TooltipDisplayContent info))
+                    return false;
+
+                globalRankingText.Text = info.Rank;
+                timeText.Text = info.Time;
+                return true;
             }
 
             private bool instantMove = true;
@@ -283,6 +299,12 @@ namespace osu.Game.Overlays.Profile.Header.Components
             protected override void PopIn() => this.FadeIn(200, Easing.OutQuint);
 
             protected override void PopOut() => this.FadeOut(200, Easing.OutQuint);
+        }
+
+        private class TooltipDisplayContent
+        {
+            public string Rank;
+            public string Time;
         }
     }
 }

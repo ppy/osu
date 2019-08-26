@@ -138,8 +138,8 @@ namespace osu.Game.Screens.Menu
 
             private RulesetFlow rulesets;
             private Container rulesetsScale;
-            private Drawable logoContainerSecondary;
-            private Drawable logoContainer;
+            private Container logoContainerSecondary;
+            private Drawable lazerLogo;
 
             private GlitchingTriangles triangles;
 
@@ -158,7 +158,7 @@ namespace osu.Game.Screens.Menu
             {
                 this.game = game;
 
-                InternalChildren = new[]
+                InternalChildren = new Drawable[]
                 {
                     triangles = new GlitchingTriangles
                     {
@@ -191,7 +191,7 @@ namespace osu.Game.Screens.Menu
                         RelativeSizeAxes = Axes.Both,
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
-                        Child = logoContainer = new LazerLogo(textures.GetStream("Menu/logo-triangles.mp4"))
+                        Child = lazerLogo = new LazerLogo(textures.GetStream("Menu/logo-triangles.mp4"))
                         {
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
@@ -222,7 +222,7 @@ namespace osu.Game.Screens.Menu
                 const float scale_adjust = 0.8f;
 
                 rulesets.Hide();
-                logoContainer.Hide();
+                lazerLogo.Hide();
                 background.Hide();
 
                 using (BeginAbsoluteSequence(0, true))
@@ -269,14 +269,17 @@ namespace osu.Game.Screens.Menu
                         rulesets.FadeOut();
 
                         // matching flyte curve y = 0.25x^2 + (max(0, x - 0.7) / 0.3) ^ 5
-                        logoContainer.FadeIn().ScaleTo(scale_start).Then().Delay(logo_scale_duration * 0.7f).ScaleTo(scale_start - scale_adjust, logo_scale_duration * 0.3f, Easing.InQuint);
+                        lazerLogo.FadeIn().ScaleTo(scale_start).Then().Delay(logo_scale_duration * 0.7f).ScaleTo(scale_start - scale_adjust, logo_scale_duration * 0.3f, Easing.InQuint);
                         logoContainerSecondary.ScaleTo(scale_start).Then().ScaleTo(scale_start - scale_adjust * 0.25f, logo_scale_duration, Easing.InQuad);
                     }
 
                     using (BeginDelayedSequence(logo_2, true))
                     {
-                        logoContainer.FadeOut().OnComplete(_ =>
+                        lazerLogo.FadeOut().OnComplete(_ =>
                         {
+                            logoContainerSecondary.Remove(lazerLogo);
+                            lazerLogo.Dispose(); // explicit disposal as we are pushing a new screen and the expire may not get run.
+
                             logo.FadeIn();
                             background.FadeIn();
 
@@ -296,7 +299,7 @@ namespace osu.Game.Screens.Menu
                 {
                     Colour = Color4.White;
                     RelativeSizeAxes = Axes.Both;
-                    Blending = BlendingMode.Additive;
+                    Blending = BlendingParameters.Additive;
                 }
 
                 protected override void LoadComplete()
@@ -399,11 +402,11 @@ namespace osu.Game.Screens.Menu
                                 Origin = Anchor.Centre,
                                 Colour = Color4.Black,
                                 Size = new Vector2(size - 5),
-                                Blending = BlendingMode.None,
+                                Blending = BlendingParameters.None,
                             });
                         }
 
-                        Blending = BlendingMode.Additive;
+                        Blending = BlendingParameters.Additive;
                         CacheDrawnFrameBuffer = true;
                     }
                 }
