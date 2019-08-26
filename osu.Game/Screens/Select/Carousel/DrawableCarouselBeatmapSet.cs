@@ -224,8 +224,8 @@ namespace osu.Game.Screens.Select.Carousel
                 : base(items.Select(i => i.Beatmap).ToList(), ruleset, Color4.White)
             {
                 // for now, fade the whole group based on the ratio of hidden items.
-                items.ForEach(item => item.Filtered.BindValueChanged(_
-                    => this.FadeTo(1 - 0.9f * ((float)items.Count(i => i.Filtered.Value) / items.Count), 100), true));
+                items.ForEach(item => item.Filtered.BindValueChanged(_ =>
+                    this.FadeTo(1 - 0.9f * ((float)items.Count(i => i.Filtered.Value) / items.Count), 100), true));
             }
         }
     }
