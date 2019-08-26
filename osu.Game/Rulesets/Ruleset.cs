@@ -18,6 +18,7 @@ using osu.Game.Configuration;
 using osu.Game.Rulesets.Configuration;
 using osu.Game.Rulesets.Difficulty;
 using osu.Game.Scoring;
+using osu.Game.Skinning;
 
 namespace osu.Game.Rulesets
 {
@@ -43,6 +44,8 @@ namespace osu.Game.Rulesets
         public virtual IEnumerable<Mod> ConvertLegacyMods(LegacyMods mods) => new Mod[] { };
 
         public ModAutoplay GetAutoplayMod() => GetAllMods().OfType<ModAutoplay>().First();
+
+        public virtual ISkin CreateLegacySkinProvider(ISkinSource source) => null;
 
         protected Ruleset(RulesetInfo rulesetInfo = null)
         {

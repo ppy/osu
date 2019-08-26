@@ -60,7 +60,9 @@ namespace osu.Game.Screens.Play
         [Resolved]
         private ScoreManager scoreManager { get; set; }
 
-        private RulesetInfo ruleset;
+        private RulesetInfo rulesetInfo;
+
+        private Ruleset ruleset;
 
         private IAPIProvider api;
 
@@ -121,20 +123,29 @@ namespace osu.Game.Screens.Play
 
             InternalChild = GameplayClockContainer = new GameplayClockContainer(working, Mods.Value, DrawableRuleset.GameplayStartTime);
 
+            SkinProvidingContainer skinProvidingContainer = new BeatmapSkinProvidingContainer(working.Skin)
+            {
+                RelativeSizeAxes = Axes.Both,
+            };
+
             GameplayClockContainer.Children = new[]
             {
                 DimmableStoryboard = new DimmableStoryboard(Beatmap.Value.Storyboard) { RelativeSizeAxes = Axes.Both },
                 new ScalingContainer(ScalingMode.Gameplay)
                 {
-                    Child = new LocalSkinOverrideContainer(working.Skin)
-                    {
-                        RelativeSizeAxes = Axes.Both,
-                        Children = new Drawable[]
+                    Child = skinProvidingContainer.WithChild(
+                        // the skinProvidingContainer is used as the fallback source here to allow the ruleset-specific skin implementation
+                        // full access to all skin sources.
+                        new SkinProvidingContainer(ruleset.CreateLegacySkinProvider(skinProvidingContainer))
                         {
-                            DrawableRuleset,
-                            new ComboEffects(ScoreProcessor)
+                            RelativeSizeAxes = Axes.Both,
+                            Children = new Drawable[]
+                            {
+                                DrawableRuleset,
+                                new ComboEffects(ScoreProcessor)
+                            }
                         }
-                    }
+                    )
                 },
                 breakOverlay = new BreakOverlay(working.Beatmap.BeatmapInfo.LetterboxInBreaks, ScoreProcessor)
                 {
@@ -222,20 +233,20 @@ namespace osu.Game.Screens.Play
                 if (beatmap == null)
                     throw new InvalidOperationException("Beatmap was not loaded");
 
-                ruleset = Ruleset.Value ?? beatmap.BeatmapInfo.Ruleset;
-                var rulesetInstance = ruleset.CreateInstance();
+                rulesetInfo = Ruleset.Value ?? beatmap.BeatmapInfo.Ruleset;
+                ruleset = rulesetInfo.CreateInstance();
 
                 try
                 {
-                    DrawableRuleset = rulesetInstance.CreateDrawableRulesetWith(working, Mods.Value);
+                    DrawableRuleset = ruleset.CreateDrawableRulesetWith(working, Mods.Value);
                 }
                 catch (BeatmapInvalidForRulesetException)
                 {
                     // we may fail to create a DrawableRuleset if the beatmap cannot be loaded with the user's preferred ruleset
                     // let's try again forcing the beatmap's ruleset.
-                    ruleset = beatmap.BeatmapInfo.Ruleset;
-                    rulesetInstance = ruleset.CreateInstance();
-                    DrawableRuleset = rulesetInstance.CreateDrawableRulesetWith(Beatmap.Value, Mods.Value);
+                    rulesetInfo = beatmap.BeatmapInfo.Ruleset;
+                    ruleset = rulesetInfo.CreateInstance();
+                    DrawableRuleset = ruleset.CreateDrawableRulesetWith(Beatmap.Value, Mods.Value);
                 }
 
                 if (!DrawableRuleset.Objects.Any())
@@ -313,7 +324,7 @@ namespace osu.Game.Screens.Play
             var score = DrawableRuleset.ReplayScore?.ScoreInfo ?? new ScoreInfo
             {
                 Beatmap = Beatmap.Value.BeatmapInfo,
-                Ruleset = ruleset,
+                Ruleset = rulesetInfo,
                 Mods = Mods.Value.ToArray(),
                 User = api.LocalUser.Value,
             };
