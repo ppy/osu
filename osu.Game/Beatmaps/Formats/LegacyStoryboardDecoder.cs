@@ -246,7 +246,7 @@ namespace osu.Game.Beatmaps.Formats
                                 switch (type)
                                 {
                                     case "A":
-                                        timelineGroup?.BlendingMode.Add(easing, startTime, endTime, BlendingMode.Additive, startTime == endTime ? BlendingMode.Additive : BlendingMode.Inherit);
+                                        timelineGroup?.BlendingParameters.Add(easing, startTime, endTime, BlendingParameters.Additive, startTime == endTime ? BlendingParameters.Additive : BlendingParameters.Inherit);
                                         break;
 
                                     case "H":
