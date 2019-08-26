@@ -51,6 +51,12 @@ namespace osu.Game.Rulesets.Osu
                 var config = new SkinConfiguration();
                 if (hasHitCircle.Value)
                     config.SliderPathRadius = legacy_circle_radius;
+
+                // defaults should only be applied for non-beatmap skins (which are parsed via this constructor).
+                config.CustomColours["SliderBall"] =
+                    source.GetValue<SkinConfiguration, Color4?>(s => s.CustomColours.TryGetValue("SliderBall", out var val) ? val : (Color4?)null)
+                    ?? new Color4(2, 170, 255, 255);
+
                 return config;
             });
 
