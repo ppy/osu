@@ -98,12 +98,12 @@ namespace osu.Game.Rulesets.Mania.Replays
 
         protected override HitObject GetNextObject(int currentIndex)
         {
-            int desiredColumn = Beatmap.HitObjects[currentIndex++].Column;
+            int desiredColumn = Beatmap.HitObjects[currentIndex].Column;
 
-            for (; currentIndex < Beatmap.HitObjects.Count; currentIndex++)
+            for (int i = currentIndex + 1; i < Beatmap.HitObjects.Count; i++)
             {
-                if (Beatmap.HitObjects[currentIndex].Column == desiredColumn)
-                    return Beatmap.HitObjects[currentIndex];
+                if (Beatmap.HitObjects[i].Column == desiredColumn)
+                    return Beatmap.HitObjects[i];
             }
 
             return null;
