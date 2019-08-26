@@ -69,11 +69,7 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
                 Alpha = 0.2f;
         }
 
-        protected override void UpdateInitialTransforms()
-        {
-        }
-
-        protected override void UpdateStateTransforms(ArmedState state)
+        protected override void UpdateState(ArmedState state)
         {
         }
     }
