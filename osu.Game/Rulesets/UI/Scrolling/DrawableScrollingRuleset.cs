@@ -122,6 +122,9 @@ namespace osu.Game.Rulesets.UI.Scrolling
 
                 for (int i = 0; i < timingPoints.Count; i++)
                 {
+                    if (timingPoints[i].Time > lastObjectTime)
+                        break;
+
                     double endTime = i < timingPoints.Count - 1 ? timingPoints[i + 1].Time : lastObjectTime;
                     double duration = endTime - timingPoints[i].Time;
 
