@@ -93,27 +93,28 @@ namespace osu.Game.Rulesets.UI.Scrolling
 
         private void computeInitialStateRecursive(DrawableHitObject hitObject)
         {
-            hitObject.LifetimeStart = scrollingInfo.Algorithm.GetDisplayStartTime(hitObject.HitObject.StartTime, timeRange.Value);
+            double endTime = hitObject.HitObject.StartTime;
 
-            if (hitObject.HitObject is IHasEndTime endTime)
+            if (hitObject.HitObject is IHasEndTime e)
             {
-                hitObject.LifetimeEnd = scrollingInfo.Algorithm.TimeAt(scrollLength * safe_lifetime_end_multiplier, endTime.EndTime, timeRange.Value, scrollLength);
+                endTime = e.EndTime;
 
                 switch (direction.Value)
                 {
                     case ScrollingDirection.Up:
                     case ScrollingDirection.Down:
-                        hitObject.Height = scrollingInfo.Algorithm.GetLength(hitObject.HitObject.StartTime, endTime.EndTime, timeRange.Value, scrollLength);
+                        hitObject.Height = scrollingInfo.Algorithm.GetLength(hitObject.HitObject.StartTime, endTime, timeRange.Value, scrollLength);
                         break;
 
                     case ScrollingDirection.Left:
                     case ScrollingDirection.Right:
-                        hitObject.Width = scrollingInfo.Algorithm.GetLength(hitObject.HitObject.StartTime, endTime.EndTime, timeRange.Value, scrollLength);
+                        hitObject.Width = scrollingInfo.Algorithm.GetLength(hitObject.HitObject.StartTime, endTime, timeRange.Value, scrollLength);
                         break;
                 }
             }
-            else
-                hitObject.LifetimeEnd = scrollingInfo.Algorithm.TimeAt(scrollLength * safe_lifetime_end_multiplier, hitObject.HitObject.StartTime, timeRange.Value, scrollLength);
+
+            hitObject.LifetimeStart = scrollingInfo.Algorithm.GetDisplayStartTime(hitObject.HitObject.StartTime, timeRange.Value);
+            hitObject.LifetimeEnd = scrollingInfo.Algorithm.TimeAt(scrollLength * safe_lifetime_end_multiplier, endTime, timeRange.Value, scrollLength);
 
             foreach (var obj in hitObject.NestedHitObjects)
             {
