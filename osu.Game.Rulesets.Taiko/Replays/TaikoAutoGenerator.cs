@@ -137,14 +137,18 @@ namespace osu.Game.Rulesets.Taiko.Replays
 
         protected override HitObject GetNextObject(int currentIndex)
         {
-            Type desiredType = Beatmap.HitObjects[currentIndex++].GetType();
+            Type desiredType = Beatmap.HitObjects[currentIndex].GetType();
 
-            for (; currentIndex < Beatmap.HitObjects.Count; currentIndex++)
+            for (int i = currentIndex + 1; i < Beatmap.HitObjects.Count; i++)
             {
-                var currentObj = Beatmap.HitObjects[currentIndex];
+                var currentObj = Beatmap.HitObjects[i];
+
                 if (currentObj.GetType() == desiredType ||
-                    currentObj is DrumRoll || currentObj is Swell) // Unpress all keys before DrumRoll or Swell
-                    return Beatmap.HitObjects[currentIndex];
+                    // Un-press all keys before a DrumRoll or Swell
+                    currentObj is DrumRoll || currentObj is Swell)
+                {
+                    return Beatmap.HitObjects[i];
+                }
             }
 
             return null;
