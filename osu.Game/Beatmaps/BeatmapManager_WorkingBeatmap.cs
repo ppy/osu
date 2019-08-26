@@ -138,19 +138,15 @@ namespace osu.Game.Beatmaps
 
             protected override Skin GetSkin()
             {
-                Skin skin;
-
                 try
                 {
-                    skin = new LegacyBeatmapSkin(BeatmapInfo, store, AudioManager);
+                    return new LegacyBeatmapSkin(BeatmapInfo, store, AudioManager);
                 }
                 catch (Exception e)
                 {
                     Logger.Error(e, "Skin failed to load");
-                    skin = new DefaultSkin();
+                    return null;
                 }
-
-                return skin;
             }
         }
     }
