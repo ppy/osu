@@ -21,10 +21,6 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
         {
         }
 
-        protected override void UpdateState(ArmedState state)
-        {
-        }
-
         public override bool OnPressed(TaikoAction action) => false;
     }
 }
