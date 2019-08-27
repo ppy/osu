@@ -25,6 +25,11 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
         private const float target_ring_scale = 5f;
         private const float inner_ring_alpha = 0.65f;
 
+        /// <summary>
+        /// Offset away from the start time of the swell at which the ring starts appearing.
+        /// </summary>
+        private const double ring_appear_offset = 100;
+
         private readonly List<DrawableSwellTick> ticks = new List<DrawableSwellTick>();
 
         private readonly Container bodyContainer;
@@ -183,7 +188,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
         {
             base.UpdateInitialTransforms();
 
-            using (BeginAbsoluteSequence(HitObject.StartTime - 100, true))
+            using (BeginAbsoluteSequence(HitObject.StartTime - ring_appear_offset, true))
                 targetRing.ScaleTo(target_ring_scale, 400, Easing.OutQuint);
         }
 
@@ -220,7 +225,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             // Make the swell stop at the hit target
             X = Math.Max(0, X);
 
-            if (Time.Current >= HitObject.StartTime - 100)
+            if (Time.Current >= HitObject.StartTime - ring_appear_offset)
                 ProxyContent();
             else
                 UnproxyContent();
