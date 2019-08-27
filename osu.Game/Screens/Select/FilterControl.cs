@@ -29,14 +29,14 @@ namespace osu.Game.Screens.Select
 
         private readonly TabControl<GroupMode> groupTabs;
 
-        public Bindable<SortMode> SortMode;
+        private Bindable<SortMode> sortMode;
 
-        public Bindable<GroupMode> GroupMode;
+        private Bindable<GroupMode> groupMode;
 
         public FilterCriteria CreateCriteria() => new FilterCriteria
         {
-            Group = GroupMode.Value,
-            Sort = SortMode.Value,
+            Group = groupMode.Value,
+            Sort = sortMode.Value,
             SearchText = searchTextBox.Text,
             AllowConvertedBeatmaps = showConverted.Value,
             Ruleset = ruleset.Value
@@ -123,8 +123,8 @@ namespace osu.Game.Screens.Select
 
             searchTextBox.Current.ValueChanged += _ => FilterChanged?.Invoke(CreateCriteria());
 
-            groupTabs.PinItem(Filter.GroupMode.All);
-            groupTabs.PinItem(Filter.GroupMode.RecentlyPlayed);
+            groupTabs.PinItem(GroupMode.All);
+            groupTabs.PinItem(GroupMode.RecentlyPlayed);
         }
 
         public void Deactivate()
@@ -156,14 +156,14 @@ namespace osu.Game.Screens.Select
             ruleset.BindTo(parentRuleset);
             ruleset.BindValueChanged(_ => updateCriteria());
 
-            SortMode = config.GetBindable<SortMode>(OsuSetting.SongSelectSortingMode);
-            GroupMode = config.GetBindable<GroupMode>(OsuSetting.SongSelectGroupingMode);
+            sortMode = config.GetBindable<SortMode>(OsuSetting.SongSelectSortingMode);
+            groupMode = config.GetBindable<GroupMode>(OsuSetting.SongSelectGroupingMode);
 
-            sortTabs.Current.BindTo(SortMode);
-            groupTabs.Current.BindTo(GroupMode);
+            sortTabs.Current.BindTo(sortMode);
+            groupTabs.Current.BindTo(groupMode);
 
-            GroupMode.BindValueChanged(_ => updateCriteria());
-            SortMode.BindValueChanged(_ => updateCriteria());
+            groupMode.BindValueChanged(_ => updateCriteria());
+            sortMode.BindValueChanged(_ => updateCriteria());
 
             updateCriteria();
         }
