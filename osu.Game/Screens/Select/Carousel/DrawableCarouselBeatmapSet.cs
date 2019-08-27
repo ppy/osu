@@ -220,12 +220,23 @@ namespace osu.Game.Screens.Select.Carousel
 
         public class FilterableGroupedDifficultyIcon : GroupedDifficultyIcon
         {
+            private readonly List<CarouselBeatmap> items;
+
             public FilterableGroupedDifficultyIcon(List<CarouselBeatmap> items, RulesetInfo ruleset)
                 : base(items.Select(i => i.Beatmap).ToList(), ruleset, Color4.White)
             {
+                this.items = items;
+
+                foreach (var item in items)
+                    item.Filtered.BindValueChanged(_ => Scheduler.AddOnce(updateFilteredDisplay));
+
+                updateFilteredDisplay();
+            }
+
+            private void updateFilteredDisplay()
+            {
                 // for now, fade the whole group based on the ratio of hidden items.
-                items.ForEach(item => item.Filtered.BindValueChanged(_ =>
-                    this.FadeTo(1 - 0.9f * ((float)items.Count(i => i.Filtered.Value) / items.Count), 100), true));
+                this.FadeTo(1 - 0.9f * ((float)items.Count(i => i.Filtered.Value) / items.Count), 100);
             }
         }
     }
