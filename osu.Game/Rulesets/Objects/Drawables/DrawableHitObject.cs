@@ -132,15 +132,6 @@ namespace osu.Game.Rulesets.Objects.Drawables
         /// </summary>
         public event Action<DrawableHitObject, ArmedState> ApplyCustomUpdateState;
 
-        /// <summary>
-        /// Enables automatic transform management of this hitobject. Implementation of transforms should be done in <see cref="UpdateInitialTransforms"/> and <see cref="UpdateStateTransforms"/> only. Rewinding and removing previous states is done automatically.
-        /// </summary>
-        /// <remarks>
-        /// Going forward, this is the preferred way of implementing <see cref="DrawableHitObject"/>s. Previous functionality
-        /// is offered as a compatibility layer until all rulesets have been migrated across.
-        /// </remarks>
-        protected virtual bool UseTransformStateManagement => true;
-
         protected override void ClearInternal(bool disposeChildren = true) => throw new InvalidOperationException($"Should never clear a {nameof(DrawableHitObject)}");
 
         private void updateState(ArmedState newState, bool force = false)
@@ -148,30 +139,23 @@ namespace osu.Game.Rulesets.Objects.Drawables
             if (State.Value == newState && !force)
                 return;
 
-            if (UseTransformStateManagement)
+            double transformTime = HitObject.StartTime - InitialLifetimeOffset;
+
+            base.ApplyTransformsAt(transformTime, true);
+            base.ClearTransformsAfter(transformTime, true);
+
+            using (BeginAbsoluteSequence(transformTime, true))
             {
-                double transformTime = HitObject.StartTime - InitialLifetimeOffset;
+                UpdateInitialTransforms();
 
-                base.ApplyTransformsAt(transformTime, true);
-                base.ClearTransformsAfter(transformTime, true);
+                var judgementOffset = Math.Min(HitObject.HitWindows?.HalfWindowFor(HitResult.Miss) ?? double.MaxValue, Result?.TimeOffset ?? 0);
 
-                using (BeginAbsoluteSequence(transformTime, true))
+                using (BeginDelayedSequence(InitialLifetimeOffset + judgementOffset, true))
                 {
-                    UpdateInitialTransforms();
-
-                    var judgementOffset = Math.Min(HitObject.HitWindows?.HalfWindowFor(HitResult.Miss) ?? double.MaxValue, Result?.TimeOffset ?? 0);
-
-                    using (BeginDelayedSequence(InitialLifetimeOffset + judgementOffset, true))
-                    {
-                        UpdateStateTransforms(newState);
-                        state.Value = newState;
-                    }
+                    UpdateStateTransforms(newState);
+                    state.Value = newState;
                 }
             }
-            else
-                state.Value = newState;
-
-            UpdateState(newState);
 
             // apply any custom state overrides
             ApplyCustomUpdateState?.Invoke(this, newState);
@@ -202,24 +186,9 @@ namespace osu.Game.Rulesets.Objects.Drawables
 
         public override void ClearTransformsAfter(double time, bool propagateChildren = false, string targetMember = null)
         {
-            // When we are using automatic state management, parent calls to this should be blocked for safety.
-            if (!UseTransformStateManagement)
-                base.ClearTransformsAfter(time, propagateChildren, targetMember);
         }
 
         public override void ApplyTransformsAt(double time, bool propagateChildren = false)
-        {
-            // When we are using automatic state management, parent calls to this should be blocked for safety.
-            if (!UseTransformStateManagement)
-                base.ApplyTransformsAt(time, propagateChildren);
-        }
-
-        /// <summary>
-        /// Legacy method to handle state changes.
-        /// Should generally not be used when <see cref="UseTransformStateManagement"/> is true; use <see cref="UpdateStateTransforms"/> instead.
-        /// </summary>
-        /// <param name="state">The new armed state.</param>
-        protected virtual void UpdateState(ArmedState state)
         {
         }
 
@@ -287,7 +256,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
         /// <remarks>
         /// This is only used as an optimisation to delay the initial update of this <see cref="DrawableHitObject"/> and may be tuned more aggressively if required.
         /// It is indirectly used to decide the automatic transform offset provided to <see cref="UpdateInitialTransforms"/>.
-        /// A more accurate <see cref="LifetimeStart"/> should be set inside <see cref="UpdateState"/> for an <see cref="ArmedState.Idle"/> state.
+        /// A more accurate <see cref="LifetimeStart"/> should be set inside transform update functions for an <see cref="ArmedState.Idle"/> state.
         /// </remarks>
         protected virtual double InitialLifetimeOffset => 10000;
 
