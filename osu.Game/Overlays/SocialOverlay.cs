@@ -77,12 +77,12 @@ namespace osu.Game.Overlays
             currentQuery.BindTo(Filter.Search.Current);
             currentQuery.ValueChanged += query =>
             {
-                queryChangedDebounce?.Cancel();
+                Scheduler.CancelDelayedTasks();
 
                 if (string.IsNullOrEmpty(query.NewValue))
                     queueUpdate();
                 else
-                    queryChangedDebounce = Scheduler.AddDelayed(updateSearch, 500);
+                    Scheduler.AddDelayed(updateSearch, 500);
             };
         }
 
@@ -90,13 +90,11 @@ namespace osu.Game.Overlays
 
         private readonly Bindable<string> currentQuery = new Bindable<string>();
 
-        private ScheduledDelegate queryChangedDebounce;
-
         private void queueUpdate() => Scheduler.AddOnce(updateSearch);
 
         private void updateSearch()
         {
-            queryChangedDebounce?.Cancel();
+            Scheduler.CancelDelayedTasks();
 
             if (!IsLoaded)
                 return;
