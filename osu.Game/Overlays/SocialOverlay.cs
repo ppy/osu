@@ -16,6 +16,7 @@ using osu.Game.Overlays.SearchableList;
 using osu.Game.Overlays.Social;
 using osu.Game.Users;
 using osu.Framework.Threading;
+using System;
 
 namespace osu.Game.Overlays
 {
@@ -71,7 +72,7 @@ namespace osu.Game.Overlays
             Filter.Tabs.Current.ValueChanged += _ => queueUpdate();
 
             Filter.DisplayStyleControl.DisplayStyle.ValueChanged += style => recreatePanels(style.NewValue);
-            Filter.DisplayStyleControl.Dropdown.Current.ValueChanged += _ => queueUpdate();
+            Filter.DisplayStyleControl.Dropdown.Current.ValueChanged += _ => onDropdownChanged();
 
             currentQuery.BindTo(Filter.Search.Current);
             currentQuery.ValueChanged += query =>
@@ -175,9 +176,69 @@ namespace osu.Game.Overlays
 
         private void updateUsers(IEnumerable<User> newUsers)
         {
-            Users = newUsers;
+            var sortDirection = Filter.DisplayStyleControl.Dropdown.Current.Value;
+
+            IEnumerable<User> sortedUsers = newUsers;
+
+            switch (Filter.Tabs.Current.Value)
+            {
+                case SocialSortCriteria.Location:
+                    switch (sortDirection)
+                    {
+                        case SortDirection.Ascending:
+                            sortedUsers = newUsers.OrderBy(u => u.Country.FullName);
+                            break;
+
+                        case SortDirection.Descending:
+                            sortedUsers = newUsers.OrderByDescending(u => u.Country.FullName);
+                            break;
+                    }
+                    break;
+
+                case SocialSortCriteria.Name:
+                    switch (sortDirection)
+                    {
+                        case SortDirection.Ascending:
+                            sortedUsers = newUsers.OrderBy(u => u.Username);
+                            break;
+
+                        case SortDirection.Descending:
+                            sortedUsers = newUsers.OrderByDescending(u => u.Username);
+                            break;
+                    }
+                    break;
+
+                case SocialSortCriteria.Rank:
+                    if (newUsers.FirstOrDefault().Statistics != null)
+                    {
+                        switch (sortDirection)
+                        {
+                            case SortDirection.Ascending:
+                                sortedUsers = newUsers.OrderBy(u => u.Statistics?.Ranks.Global);
+                                break;
+
+                            case SortDirection.Descending:
+                                sortedUsers = newUsers.OrderByDescending(u => u.Statistics?.Ranks.Global);
+                                break;
+                        }
+                    }
+                    break;
+            }
+
+            Users = sortedUsers;
             loading.Hide();
             recreatePanels(Filter.DisplayStyleControl.DisplayStyle.Value);
+        }
+
+        private void onDropdownChanged()
+        {
+            if (Users == null)
+            {
+                queueUpdate();
+                return;
+            }
+
+            updateUsers(Users);
         }
 
         private void clearPanels()
