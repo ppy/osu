@@ -45,12 +45,11 @@ namespace osu.Game.Rulesets.Osu.Tests
 
         private Drawable createProvider(Skin skin, Func<Drawable> creationFunction)
         {
-            var mainProvider = new SkinProvidingContainer(skin) { RelativeSizeAxes = Axes.Both };
+            var mainProvider = new SkinProvidingContainer(skin);
 
             return mainProvider
                 .WithChild(new SkinProvidingContainer(Ruleset.Value.CreateInstance().CreateLegacySkinProvider(mainProvider))
                 {
-                    RelativeSizeAxes = Axes.Both,
                     Child = creationFunction()
                 });
         }
