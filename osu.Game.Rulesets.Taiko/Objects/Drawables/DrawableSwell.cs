@@ -179,26 +179,31 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             }
         }
 
-        protected override void UpdateState(ArmedState state)
+        protected override double InitialLifetimeOffset => 100;
+
+        protected override void UpdateInitialTransforms() => targetRing.ScaleTo(target_ring_scale, InitialLifetimeOffset * 4, Easing.OutQuint);
+
+        protected override void UpdateStateTransforms(ArmedState state)
         {
-            const float preempt = 100;
-            const float out_transition_time = 300;
+            const double transition_duration = 300;
 
             switch (state)
             {
                 case ArmedState.Idle:
                     UnproxyContent();
                     expandingRing.FadeTo(0);
-                    using (BeginAbsoluteSequence(HitObject.StartTime - preempt, true))
-                        targetRing.ScaleTo(target_ring_scale, preempt * 4, Easing.OutQuint);
                     break;
 
                 case ArmedState.Miss:
                 case ArmedState.Hit:
-                    this.FadeOut(out_transition_time, Easing.Out);
-                    bodyContainer.ScaleTo(1.4f, out_transition_time);
+                    using (BeginAbsoluteSequence(Time.Current, true))
+                    {
+                        this.FadeOut(transition_duration, Easing.Out);
+                        bodyContainer.ScaleTo(1.4f, transition_duration);
 
-                    Expire();
+                        Expire();
+                    }
+
                     break;
             }
         }
