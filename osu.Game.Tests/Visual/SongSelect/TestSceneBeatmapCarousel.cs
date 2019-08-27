@@ -516,6 +516,7 @@ namespace osu.Game.Tests.Visual.SongSelect
                     OnlineBeatmapID = b * 10,
                     Path = $"extra{b}.osu",
                     Version = $"Extra {b}",
+                    Ruleset = rulesets.GetRuleset((b - 1) % 4),
                     StarDifficulty = 2,
                     BaseDifficulty = new BeatmapDifficulty
                     {
