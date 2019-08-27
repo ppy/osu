@@ -16,6 +16,7 @@ using osu.Game.Overlays.SearchableList;
 using osu.Game.Overlays.Social;
 using osu.Game.Users;
 using osu.Framework.Threading;
+using System;
 
 namespace osu.Game.Overlays
 {
@@ -188,31 +189,11 @@ namespace osu.Game.Overlays
                 switch (Filter.Tabs.Current.Value)
                 {
                     case SocialSortCriteria.Location:
-                        switch (sortDirection)
-                        {
-                            case SortDirection.Ascending:
-                                sortedUsers = sortedUsers.OrderBy(u => u.Country.FullName);
-                                break;
-
-                            case SortDirection.Descending:
-                                sortedUsers = sortedUsers.OrderByDescending(u => u.Country.FullName);
-                                break;
-                        }
-
+                        sortedUsers = sortBy(sortedUsers, u => u.Country.FullName, sortDirection);
                         break;
 
                     case SocialSortCriteria.Name:
-                        switch (sortDirection)
-                        {
-                            case SortDirection.Ascending:
-                                sortedUsers = sortedUsers.OrderBy(u => u.Username);
-                                break;
-
-                            case SortDirection.Descending:
-                                sortedUsers = sortedUsers.OrderByDescending(u => u.Username);
-                                break;
-                        }
-
+                        sortedUsers = sortBy(sortedUsers, u => u.Username, sortDirection);
                         break;
                 }
             }
@@ -220,6 +201,9 @@ namespace osu.Game.Overlays
             Users = sortedUsers;
             recreatePanels(Filter.DisplayStyleControl.DisplayStyle.Value);
         }
+
+        private IEnumerable<User> sortBy<T>(IEnumerable<User> users, Func<User, T> condition, SortDirection sortDirection) =>
+            sortDirection == SortDirection.Ascending ? users.OrderBy(condition) : users.OrderByDescending(condition);
 
         private void onDropdownChanged()
         {
