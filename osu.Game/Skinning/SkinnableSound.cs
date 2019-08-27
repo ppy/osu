@@ -45,10 +45,9 @@ namespace osu.Game.Skinning
                 var ch = skin.GetSample(s);
 
                 if (ch == null && allowFallback)
-                    if (s is HitSampleInfo hsi)
-                        ch = audio.Samples.Get(string.IsNullOrEmpty(hsi.Namespace)
-                            ? $"Gameplay/{hsi.Namespace}/{hsi.Bank}-{hsi.Name}"
-                            : $"Gameplay/{hsi.Bank}-{hsi.Name}");
+                    foreach (var lookup in s.LookupNames)
+                        if ((ch = audio.Samples.Get($"Gameplay/{lookup}")) != null)
+                            break;
 
                 if (ch != null)
                     ch.Volume.Value = s.Volume / 100.0;
