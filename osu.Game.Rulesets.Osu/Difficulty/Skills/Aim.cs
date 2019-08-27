@@ -194,19 +194,22 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             return fcProb;
         }
 
-        // use dynamic programming to calculate expected fc time
+
+        // Uses dynamic programming to calculate expected fc time.
+        // The length of map is subtracted from the result so that the result is not
+        // broken for maps longer than (or close to) timeThreshold.
         private static double calculateFCTime(IEnumerable<OsuMovement> movements, double tp,
                                               double cheeseLevel = defaultCheeseLevel)
         {
             double fcTime = 0;
+            double mapLength = movements.Last().Time - movements.First().Time;
 
             foreach (OsuMovement movement in movements)
             {
                 double hitProb = calculateCheeseHitProb(movement, tp, cheeseLevel);
                 fcTime = (fcTime + movement.RawMT) / hitProb;
             }
-
-            return fcTime;
+            return fcTime - mapLength;
         }
 
         private static double calculateCheeseHitProb(OsuMovement movement, double tp, double cheeseLevel)

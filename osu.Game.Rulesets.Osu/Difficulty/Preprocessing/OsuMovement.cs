@@ -123,7 +123,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
             IP12 = FittsLaw.CalculateIP(d12, t12);
 
             RawMT = t12;
-            Time = obj2.StartTime;
+            Time = obj2.StartTime / 1000.0;
 
             var s01 = Vector<double>.Build.Dense(2);
             var s23 = Vector<double>.Build.Dense(2);
