@@ -17,6 +17,7 @@ using osu.Game.Overlays.Social;
 using osu.Game.Users;
 using osu.Framework.Threading;
 using System;
+using System.Threading;
 
 namespace osu.Game.Overlays
 {
@@ -92,6 +93,8 @@ namespace osu.Game.Overlays
 
         private void queueUpdate() => Scheduler.AddOnce(updateSearch);
 
+        private CancellationTokenSource loadCancellation;
+
         private void updateSearch()
         {
             Scheduler.CancelDelayedTasks();
@@ -132,6 +135,8 @@ namespace osu.Game.Overlays
                 return;
             }
 
+            loadCancellation = new CancellationTokenSource();
+
             var newPanels = new FillFlowContainer<SocialPanel>
             {
                 RelativeSizeAxes = Axes.X,
@@ -167,7 +172,7 @@ namespace osu.Game.Overlays
             {
                 loading.Hide();
                 ScrollFlow.Add(panels = newPanels);
-            });
+            }, loadCancellation.Token);
         }
 
         private void updateUsers(IEnumerable<User> newUsers)
@@ -211,6 +216,8 @@ namespace osu.Game.Overlays
         private void clearPanels()
         {
             loading.Show();
+
+            loadCancellation?.Cancel();
 
             if (panels != null)
             {
