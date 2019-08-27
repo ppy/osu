@@ -45,10 +45,10 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
             switch (type)
             {
                 default:
-                return new DrawablePerformanceScore(item, includeWeight ? Math.Pow(0.95, ItemsContainer.Count) : (double?)null);
+                    return new DrawablePerformanceScore(item, includeWeight ? Math.Pow(0.95, ItemsContainer.Count) : (double?)null);
 
                 case ScoreType.Recent:
-                return new DrawableTotalScore(item);
+                    return new DrawableTotalScore(item);
             }
         }
     }

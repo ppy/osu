@@ -116,7 +116,7 @@ namespace osu.Game.Overlays.Profile.Sections
                     return;
                 }
 
-                LoadComponentsAsync(items.Where(item => AllowCreate(item)).Select(CreateDrawableItem), drawables =>
+                LoadComponentsAsync(items.Where(AllowCreate).Select(CreateDrawableItem), drawables =>
                 {
                     missingText.Hide();
                     moreButton.FadeTo(items.Count == ItemsPerPage ? 1 : 0);
