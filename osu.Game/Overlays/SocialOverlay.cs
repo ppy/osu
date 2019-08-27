@@ -15,7 +15,6 @@ using osu.Game.Online.API.Requests;
 using osu.Game.Overlays.SearchableList;
 using osu.Game.Overlays.Social;
 using osu.Game.Users;
-using osu.Framework.Threading;
 using System;
 using System.Threading;
 
