@@ -184,33 +184,36 @@ namespace osu.Game.Overlays
 
             IEnumerable<User> sortedUsers = newUsers;
 
-            switch (Filter.Tabs.Current.Value)
+            if (sortedUsers.Any())
             {
-                case SocialSortCriteria.Location:
-                    switch (sortDirection)
-                    {
-                        case SortDirection.Ascending:
-                            sortedUsers = newUsers.OrderBy(u => u.Country.FullName);
-                            break;
+                switch (Filter.Tabs.Current.Value)
+                {
+                    case SocialSortCriteria.Location:
+                        switch (sortDirection)
+                        {
+                            case SortDirection.Ascending:
+                                sortedUsers = sortedUsers.OrderBy(u => u.Country.FullName);
+                                break;
 
-                        case SortDirection.Descending:
-                            sortedUsers = newUsers.OrderByDescending(u => u.Country.FullName);
-                            break;
-                    }
-                    break;
+                            case SortDirection.Descending:
+                                sortedUsers = sortedUsers.OrderByDescending(u => u.Country.FullName);
+                                break;
+                        }
+                        break;
 
-                case SocialSortCriteria.Name:
-                    switch (sortDirection)
-                    {
-                        case SortDirection.Ascending:
-                            sortedUsers = newUsers.OrderBy(u => u.Username);
-                            break;
+                    case SocialSortCriteria.Name:
+                        switch (sortDirection)
+                        {
+                            case SortDirection.Ascending:
+                                sortedUsers = sortedUsers.OrderBy(u => u.Username);
+                                break;
 
-                        case SortDirection.Descending:
-                            sortedUsers = newUsers.OrderByDescending(u => u.Username);
-                            break;
-                    }
-                    break;
+                            case SortDirection.Descending:
+                                sortedUsers = sortedUsers.OrderByDescending(u => u.Username);
+                                break;
+                        }
+                        break;
+                }
             }
 
             Users = sortedUsers;
