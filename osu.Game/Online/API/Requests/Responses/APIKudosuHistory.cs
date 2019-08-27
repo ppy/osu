@@ -15,6 +15,7 @@ namespace osu.Game.Online.API.Requests.Responses
         [JsonProperty("amount")]
         private int amount
         {
+            //We can receive negative values. However "action" is enough to build needed items
             set => Amount = Math.Abs(value);
         }
 
@@ -49,6 +50,7 @@ namespace osu.Game.Online.API.Requests.Responses
         {
             set
             {
+                //We will receive something like "foo.bar" or just "foo"
                 string parsed = value.Contains(".") ? value.Split('.')[0].Pascalize() + value.Split('.')[1].Pascalize() : value.Pascalize();
 
                 Action = (KudosuAction)Enum.Parse(typeof(KudosuAction), parsed);
