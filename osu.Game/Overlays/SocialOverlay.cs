@@ -211,22 +211,6 @@ namespace osu.Game.Overlays
                             break;
                     }
                     break;
-
-                case SocialSortCriteria.Rank:
-                    if (newUsers.FirstOrDefault().Statistics != null)
-                    {
-                        switch (sortDirection)
-                        {
-                            case SortDirection.Ascending:
-                                sortedUsers = newUsers.OrderBy(u => u.Statistics?.Ranks.Global);
-                                break;
-
-                            case SortDirection.Descending:
-                                sortedUsers = newUsers.OrderByDescending(u => u.Statistics?.Ranks.Global);
-                                break;
-                        }
-                    }
-                    break;
             }
 
             Users = sortedUsers;
