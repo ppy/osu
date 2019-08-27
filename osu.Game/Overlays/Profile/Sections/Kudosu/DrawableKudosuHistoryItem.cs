@@ -55,83 +55,67 @@ namespace osu.Game.Overlays.Profile.Sections.Kudosu
             switch (historyItem.Action)
             {
                 case KudosuAction.VoteGive:
-                    linkFlowContainer.AddText(@"Received ");
-                    addKudosuPart();
+                    addKudosuPart(@"Received");
                     addMainPart(@" from obtaining votes in modding post of ");
-                    addPostPart();
                     break;
 
                 case KudosuAction.Give:
-                    linkFlowContainer.AddText(@"Received ");
-                    addKudosuPart();
+                    addKudosuPart(@"Received");
                     addMainPart($@" from {userLinkTemplate()} for a post at ");
-                    addPostPart();
                     break;
 
                 case KudosuAction.Reset:
                     addMainPart($@"Kudosu reset by {userLinkTemplate()} for the post ");
-                    addPostPart();
                     break;
 
                 case KudosuAction.VoteReset:
-                    linkFlowContainer.AddText(@"Lost ");
-                    addKudosuPart();
+                    addKudosuPart(@"Lost");
                     addMainPart(@" from losing votes in modding post of ");
-                    addPostPart();
                     break;
 
                 case KudosuAction.DenyKudosuReset:
-                    linkFlowContainer.AddText(@"Denied ");
-                    addKudosuPart();
+                    addKudosuPart(@"Denied");
                     addMainPart(@" from modding post ");
-                    addPostPart();
                     break;
 
                 case KudosuAction.Revoke:
                     addMainPart($@"Denied kudosu by {userLinkTemplate()} for the post ");
-                    addPostPart();
                     break;
 
                 case KudosuAction.AllowKudosuGive:
-                    linkFlowContainer.AddText(@"Received ");
-                    addKudosuPart();
+                    addKudosuPart(@"Received");
                     addMainPart(@" from kudosu deny repeal of modding post ");
-                    addPostPart();
                     break;
 
                 case KudosuAction.DeleteReset:
-                    linkFlowContainer.AddText(@"Lost ");
-                    addKudosuPart();
+                    addKudosuPart(@"Lost");
                     addMainPart(@" from modding post deletion of ");
-                    addPostPart();
                     break;
 
                 case KudosuAction.RestoreGive:
-                    linkFlowContainer.AddText(@"Received ");
-                    addKudosuPart();
+                    addKudosuPart(@"Received");
                     addMainPart(@" from modding post restoration of ");
-                    addPostPart();
                     break;
 
                 case KudosuAction.RecalculateGive:
-                    linkFlowContainer.AddText(@"Received ");
-                    addKudosuPart();
+                    addKudosuPart(@"Received");
                     addMainPart(@" from votes recalculation in modding post of ");
-                    addPostPart();
                     break;
 
                 case KudosuAction.RecalculateReset:
-                    linkFlowContainer.AddText(@"Lost ");
-                    addKudosuPart();
+                    addKudosuPart(@"Lost");
                     addMainPart(@" from votes recalculation in modding post of ");
-                    addPostPart();
                     break;
             }
+
+            addPostPart();
         }
 
-        private void addKudosuPart()
+        private void addKudosuPart(string prefix)
         {
-            linkFlowContainer.AddText($@"{historyItem.Amount} kudosu", t =>
+            linkFlowContainer.AddText(prefix);
+
+            linkFlowContainer.AddText($@" {historyItem.Amount} kudosu", t =>
             {
                 t.Font = t.Font.With(italics: true);
                 t.Colour = colours.Blue;
