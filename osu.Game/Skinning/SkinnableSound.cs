@@ -37,7 +37,7 @@ namespace osu.Game.Skinning
 
         public void Play() => channels?.ForEach(c => c.Play());
 
-        public override bool IsPresent => false; // We don't need to receive updates.
+        public override bool IsPresent => Scheduler.HasPendingTasks;
 
         protected override void SkinChanged(ISkinSource skin, bool allowFallback)
         {
