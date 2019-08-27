@@ -53,7 +53,7 @@ namespace osu.Game.Rulesets.Catch.UI
                 if (lastPlateableFruit == null)
                     return;
 
-                // this is required to make this run after the last caught fruit runs UpdateState at least once.
+                // this is required to make this run after the last caught fruit runs updateState() at least once.
                 // TODO: find a better alternative
                 if (lastPlateableFruit.IsLoaded)
                     action();
