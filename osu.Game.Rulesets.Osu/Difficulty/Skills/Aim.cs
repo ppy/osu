@@ -136,7 +136,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             for (int i = 0; i < movements.Count; ++i)
             {
                 var movement = movements[i];
-                missProbs[i] = 1 - FittsLaw.CalculateHitProb(movement.D, movement.MT, tp);
+                missProbs[i] = 1 - calculateCheeseHitProb(movement, tp, defaultCheeseLevel);
             }
 
             return missProbs;
@@ -174,8 +174,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             {
                 double cheeseness = SpecialFunctions.Logistic((movement.IP12 / tp - 0.6) * 15) * movement.Cheesablility;
                 count += cheeseness;
-                //Console.Write(movement.Time + " ");
-                //Console.WriteLine(cheeseness.ToString("N4"));
             }
 
             return count;
