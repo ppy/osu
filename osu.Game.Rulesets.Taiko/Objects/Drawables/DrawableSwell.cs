@@ -179,9 +179,13 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             }
         }
 
-        protected override double InitialLifetimeOffset => 100;
+        protected override void UpdateInitialTransforms()
+        {
+            base.UpdateInitialTransforms();
 
-        protected override void UpdateInitialTransforms() => targetRing.ScaleTo(target_ring_scale, InitialLifetimeOffset * 4, Easing.OutQuint);
+            using (BeginAbsoluteSequence(HitObject.StartTime - 100, true))
+                targetRing.ScaleTo(target_ring_scale, 400, Easing.OutQuint);
+        }
 
         protected override void UpdateStateTransforms(ArmedState state)
         {
@@ -190,7 +194,6 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             switch (state)
             {
                 case ArmedState.Idle:
-                    UnproxyContent();
                     expandingRing.FadeTo(0);
                     break;
 
@@ -217,9 +220,10 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             // Make the swell stop at the hit target
             X = Math.Max(0, X);
 
-            double t = Math.Min(HitObject.StartTime, Time.Current);
-            if (t == HitObject.StartTime)
+            if (Time.Current >= HitObject.StartTime - 100)
                 ProxyContent();
+            else
+                UnproxyContent();
         }
 
         private bool? lastWasCentre;
