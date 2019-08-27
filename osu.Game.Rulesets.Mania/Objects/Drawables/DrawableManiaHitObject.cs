@@ -46,6 +46,8 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
             Anchor = Origin = e.NewValue == ScrollingDirection.Up ? Anchor.TopCentre : Anchor.BottomCentre;
         }
 
+        protected override void UpdateInitialTransforms() => this.FadeIn();
+
         protected override void UpdateStateTransforms(ArmedState state)
         {
             switch (state)
