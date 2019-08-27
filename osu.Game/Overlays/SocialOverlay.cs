@@ -16,7 +16,6 @@ using osu.Game.Overlays.SearchableList;
 using osu.Game.Overlays.Social;
 using osu.Game.Users;
 using osu.Framework.Threading;
-using System;
 
 namespace osu.Game.Overlays
 {
@@ -199,6 +198,7 @@ namespace osu.Game.Overlays
                                 sortedUsers = sortedUsers.OrderByDescending(u => u.Country.FullName);
                                 break;
                         }
+
                         break;
 
                     case SocialSortCriteria.Name:
@@ -212,6 +212,7 @@ namespace osu.Game.Overlays
                                 sortedUsers = sortedUsers.OrderByDescending(u => u.Username);
                                 break;
                         }
+
                         break;
                 }
             }
