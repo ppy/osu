@@ -116,7 +116,7 @@ namespace osu.Game.Overlays.Profile.Sections
                     return;
                 }
 
-                LoadComponentsAsync(items.Select(CreateDrawableItem), drawables =>
+                LoadComponentsAsync(items.Where(item => AllowCreate(item)).Select(CreateDrawableItem), drawables =>
                 {
                     missingText.Hide();
                     moreButton.FadeTo(items.Count == ItemsPerPage ? 1 : 0);
@@ -126,6 +126,13 @@ namespace osu.Game.Overlays.Profile.Sections
                 }, loadCancellation.Token);
             });
         }
+
+        /// <summary>
+        /// Used to check whether the item is suitable for drawable creation.
+        /// </summary>
+        /// <param name="item">An item to check</param>
+        /// <returns></returns>
+        protected virtual bool AllowCreate(T item) => true;
 
         protected abstract APIRequest<List<T>> CreateRequest();
 
