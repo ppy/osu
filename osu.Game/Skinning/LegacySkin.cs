@@ -156,6 +156,11 @@ namespace osu.Game.Skinning
                             // Spacing value was reverse-engineered from the ratio of the rendered sprite size in the visual inspector vs the actual texture size
                             Spacing = new Vector2(-Configuration.HitCircleOverlap * 0.89f, 0)
                         };
+
+                default:
+                    string lastPiece = componentName.Split('/').Last();
+                    componentName = componentName.StartsWith("Gameplay/taiko/") ? "taiko-" + lastPiece : lastPiece;
+                    break;
             }
 
             return getAnimation(componentName, animatable, looping);
@@ -242,11 +247,8 @@ namespace osu.Game.Skinning
             {
                 bool hasExtension = filename.Contains('.');
 
-                string lastPiece = filename.Split('/').Last();
-                var legacyName = filename.StartsWith("Gameplay/taiko/") ? "taiko-" + lastPiece : lastPiece;
-
                 var file = source.Files.Find(f =>
-                    string.Equals(hasExtension ? f.Filename : Path.ChangeExtension(f.Filename, null), legacyName, StringComparison.InvariantCultureIgnoreCase));
+                    string.Equals(hasExtension ? f.Filename : Path.ChangeExtension(f.Filename, null), filename, StringComparison.InvariantCultureIgnoreCase));
                 return file?.FileInfo.StoragePath;
             }
 
