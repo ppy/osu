@@ -47,19 +47,12 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             (var tapDiff, var streamNoteCount, var mashLevels, var tapSkills, var strainHistory) =
                 Tap.CalculateTapAttributes(hitObjectsNoSpinner, clockRate);
 
-
             // Aim
-            IList<OsuMovement> movements = Aim.CreateMovements(hitObjectsNoSpinner, clockRate, strainHistory);
-
-            double aimDiff = Aim.CalculateFCProbTP(movements);
-            double fcTimeTP = Aim.CalculateFCTimeTP(movements, mapLength);
-
-            (double[] missTPs, double[] missCounts) = Aim.CalculateMissTPsMissCounts(movements, fcTimeTP);
-            
+            (var aimDiff, var fcTimeTP, var missTPs, var missCounts, var cheeseNoteCount, var cheeseLevels, var cheeseFactors) =
+                Aim.CalculateAimAttributes(hitObjectsNoSpinner, clockRate, strainHistory);
 
             double tapSR = tapMultiplier * Math.Pow(tapDiff, srExponent);
             double aimSR = aimMultiplier * Math.Pow(aimDiff, srExponent);
-            double fcTimeAimSR = aimMultiplier * Math.Pow(fcTimeTP, srExponent);
             double sr = Mean.PowerMean(tapSR, aimSR, 7) * 1.069;
 
             // Todo: These int casts are temporary to achieve 1:1 results with osu!stable, and should be removed in the future
@@ -82,10 +75,13 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 TapSkills = tapSkills,
 
                 AimSR = aimSR,
-                FcTimeAimSR = fcTimeAimSR,
+                AimDiff = aimDiff,
                 MissTPs = missTPs,
                 MissCounts = missCounts,
-                
+                CheeseNoteCount = cheeseNoteCount,
+                CheeseLevels = cheeseLevels,
+                CheeseFactors = cheeseFactors,
+
                 ApproachRate = preempt > 1200 ? (1800 - preempt) / 120 : (1200 - preempt) / 150 + 5,
                 OverallDifficulty = (80 - hitWindowGreat) / 6,
                 MaxCombo = maxCombo

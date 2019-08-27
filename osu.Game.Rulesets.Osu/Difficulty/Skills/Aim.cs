@@ -28,9 +28,31 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         private const double tpMax = 100;
         private const double tpPrecision = 1e-8;
 
+        private const double defaultCheeseLevel = 0.3;
+        private const int cheeseLevelCount = 11;
+
         private const int difficultyCount = 20;
 
-        public static List<OsuMovement> CreateMovements(List<OsuHitObject> hitObjects, double clockRate, List<Vector<double>> strainHistory)
+
+        public static (double, double, double[], double[], double, double[], double[])
+            CalculateAimAttributes(List<OsuHitObject> hitObjects,
+                                   double clockRate,
+                                   List<Vector<double>> strainHistory)
+        {
+            IList<OsuMovement> movements = createMovements(hitObjects, clockRate, strainHistory);
+
+            double fcProbTP = calculateFCProbTP(movements);
+            double fcTimeTP = calculateFCTimeTP(movements);
+
+            (var missTPs, var missCounts) = calculateMissTPsMissCounts(movements, fcTimeTP);
+            (var cheeseLevels, var cheeseFactors) = calculateCheeseLevelsVSCheeseFactors(movements, fcProbTP);
+
+            double cheeseNoteCount = getCheeseNoteCount(movements, fcProbTP);
+
+            return (fcProbTP, fcTimeTP, missTPs, missCounts, cheeseNoteCount, cheeseLevels, cheeseFactors);
+        }
+
+        private static List<OsuMovement> createMovements(List<OsuHitObject> hitObjects, double clockRate, List<Vector<double>> strainHistory)
         {
             OsuMovement.Initialize();
             var movements = new List<OsuMovement>();
@@ -49,36 +71,36 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             return movements;
         }
 
-        public static double CalculateFCProbTP(IEnumerable<OsuMovement> movements)
+        private static double calculateFCProbTP(IEnumerable<OsuMovement> movements, double cheeseLevel = defaultCheeseLevel)
         {
-            double fcProbabilityTPMin = calculateFCProb(movements, tpMin);
+            double fcProbabilityTPMin = calculateFCProb(movements, tpMin, cheeseLevel);
 
             if (fcProbabilityTPMin >= probabilityThreshold)
                 return tpMin;
 
-            double fcProbabilityTPMax = calculateFCProb(movements, tpMax);
+            double fcProbabilityTPMax = calculateFCProb(movements, tpMax, cheeseLevel);
 
             if (fcProbabilityTPMax <= probabilityThreshold)
                 return tpMax;
 
-            Func<double, double> fcProbMinusThreshold = tp => calculateFCProb(movements, tp) - probabilityThreshold;
+            double fcProbMinusThreshold(double tp) => calculateFCProb(movements, tp, cheeseLevel) - probabilityThreshold;
             return Brent.FindRoot(fcProbMinusThreshold, tpMin, tpMax, tpPrecision);
         }
 
-        public static double CalculateFCTimeTP(IEnumerable<OsuMovement> movements, double mapLength)
+        private static double calculateFCTimeTP(IEnumerable<OsuMovement> movements)
         {
             
-            double maxFCTime = calculateFCTime(movements, mapLength, tpMin);
+            double maxFCTime = calculateFCTime(movements, tpMin);
 
             if (maxFCTime <= timeThreshold)
                 return tpMin;
 
-            double minFCTime = calculateFCTime(movements, mapLength, tpMax);
+            double minFCTime = calculateFCTime(movements, tpMax);
 
             if (minFCTime >= timeThreshold)
                 return tpMax;
 
-            Func<double, double> fcTimeMinusThreshold = tp => calculateFCTime(movements, mapLength, tp) - timeThreshold;
+            double fcTimeMinusThreshold(double tp) => calculateFCTime(movements, tp) - timeThreshold;
             return Brent.FindRoot(fcTimeMinusThreshold, tpMin, tpMax, tpPrecision);
 
         }
@@ -86,11 +108,11 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         /// <summary>
         /// Calculate miss count for a list of throughputs (used to evaluate miss count of plays).
         /// </summary>
-        public static (double[], double[]) CalculateMissTPsMissCounts(IList<OsuMovement> movements, double fcTimeTP)
+        private static (double[], double[]) calculateMissTPsMissCounts(IList<OsuMovement> movements, double fcTimeTP)
         {
             double[] missTPs = new double[difficultyCount];
             double[] missCounts = new double[difficultyCount];
-            double fcProb = calculateFCProb(movements, fcTimeTP);
+            double fcProb = calculateFCProb(movements, fcTimeTP, defaultCheeseLevel);
 
             for (int i = 0; i < difficultyCount; i++)
             {
@@ -131,34 +153,67 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             return Brent.FindRoot(cdfMinusProb, -100, 1000);
         }
 
+        private static (double[], double[]) calculateCheeseLevelsVSCheeseFactors(IList<OsuMovement> movements, double fcProbTP)
+        {
+            double[] cheeseLevels = new double[cheeseLevelCount];
+            double[] cheeseFactors = new double[cheeseLevelCount];
+
+            for (int i = 0; i < cheeseLevelCount; i++)
+            {
+                double cheeseLevel = (double)i / (cheeseLevelCount - 1);
+                cheeseLevels[i] = cheeseLevel;
+                cheeseFactors[i] = calculateFCProbTP(movements, cheeseLevel) / fcProbTP;
+            }
+            return (cheeseLevels, cheeseFactors);
+        }
+
+        private static double getCheeseNoteCount(IList<OsuMovement> movements, double tp)
+        {
+            double count = 0;
+            foreach (var movement in movements)
+            {
+                double cheeseness = SpecialFunctions.Logistic((movement.IP12 / tp - 0.6) * 15) * movement.Cheesablility;
+                count += cheeseness;
+                //Console.Write(movement.Time + " ");
+                //Console.WriteLine(cheeseness.ToString("N4"));
+            }
+
+            return count;
+        }
 
 
-        private static double calculateFCProb(IEnumerable<OsuMovement> movements, double tp)
+        private static double calculateFCProb(IEnumerable<OsuMovement> movements, double tp, double cheeseLevel)
         {
             double fcProb = 1;
 
             foreach (OsuMovement movement in movements)
             {
-                double hitProb = FittsLaw.CalculateHitProb(movement.D, movement.MT, tp);
+                double hitProb = calculateCheeseHitProb(movement, tp, cheeseLevel);
                 fcProb *= hitProb;
             }
             return fcProb;
         }
 
-        private static double calculateFCTime(IEnumerable<OsuMovement> movements, double mapLength, double tp)
+        // use dynamic programming to calculate expected fc time
+        private static double calculateFCTime(IEnumerable<OsuMovement> movements, double tp,
+                                              double cheeseLevel = defaultCheeseLevel)
         {
             double fcTime = 0;
 
             foreach (OsuMovement movement in movements)
             {
-                double hitProb = FittsLaw.CalculateHitProb(movement.D, movement.MT, tp);
+                double hitProb = calculateCheeseHitProb(movement, tp, cheeseLevel);
                 fcTime = (fcTime + movement.RawMT) / hitProb;
             }
 
             return fcTime;
         }
 
-
+        private static double calculateCheeseHitProb(OsuMovement movement, double tp, double cheeseLevel)
+        {
+            double cheeseMT = movement.MT * (1 + cheeseLevel * movement.CheesableRatio);
+            return FittsLaw.CalculateHitProb(movement.D, cheeseMT, tp);
+        }
 
         protected override double SkillMultiplier => throw new NotImplementedException();
         protected override double StrainDecayBase => throw new NotImplementedException();

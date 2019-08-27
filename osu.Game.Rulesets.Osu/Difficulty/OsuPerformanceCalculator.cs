@@ -99,8 +99,11 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             if (effectiveMissCount == 0)
                 tp = Attributes.MissTPs[0];
             else
+            {
                 tp = LinearSpline.InterpolateSorted(Attributes.MissCounts, Attributes.MissTPs)
-                                      .Interpolate(effectiveMissCount);
+                                 .Interpolate(effectiveMissCount);
+                tp = Math.Max(tp, 0);
+            }
 
             if (mods.Any(m => m is OsuModTouchDevice))
                 tp = Math.Pow(tp, 0.8);
@@ -137,10 +140,39 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                                 : 0.0f);
             }
 
-            // Scale the aim value with accuracy _slightly_
-            aimValue *= 0.5f + accuracy / 2.0f;
-            // It is important to also consider accuracy difficulty when doing that
-            aimValue *= 0.98f + Math.Pow(Attributes.OverallDifficulty, 2) / 2500;
+            // Treat 300 as 300, 100 as 200, 50 as 100
+            // add 1 to denominator so that later erf gives resonable result
+            double modifiedAcc;
+            if (countHitCircles > 0)
+                modifiedAcc = ((countGreat - (totalHits - countHitCircles)) * 3 + countGood * 2 + countMeh) /
+                              ((countHitCircles * 3) + 1);
+            else
+                modifiedAcc = 0;
+
+            // Assume SS for non-stream parts
+            double accOnCheeseNotes = 1 - (1 - modifiedAcc) * countHitCircles / Attributes.StreamNoteCount;
+
+            // accOnStreams can be negative. The formula below ensures a positive acc while
+            // preserving the value when accOnStreams is close to 1
+            double accOnCheeseNotesPositive = Math.Exp(accOnCheeseNotes - 1);
+
+            double urOnCheeseNotes = 10 * (80 - 6 * Attributes.OverallDifficulty) /
+                                 (Math.Sqrt(2) * SpecialFunctions.ErfInv(accOnCheeseNotesPositive));
+
+            double cheeseLevel = SpecialFunctions.Logistic(((urOnCheeseNotes * Attributes.AimDiff) - 2800) / 300);
+            
+            double cheeseFactor = LinearSpline.InterpolateSorted(Attributes.CheeseLevels, Attributes.CheeseFactors)
+                                  .Interpolate(cheeseLevel);
+
+            //Console.WriteLine(accOnCheeseNotes);
+            //Console.WriteLine(urOnCheeseNotes * Attributes.AimDiff);
+            //Console.WriteLine(cheeseLevel);
+
+            aimValue *= cheeseFactor;
+            //// Scale the aim value with accuracy _slightly_
+            //aimValue *= 0.5f + accuracy / 2.0f;
+            //// It is important to also consider accuracy difficulty when doing that
+            //aimValue *= 0.98f + Math.Pow(Attributes.OverallDifficulty, 2) / 2500;
 
             return aimValue;
         }

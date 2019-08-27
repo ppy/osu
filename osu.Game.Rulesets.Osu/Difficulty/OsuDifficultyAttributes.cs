@@ -14,9 +14,12 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         public double[] TapSkills;
 
         public double AimSR;
-        public double FcTimeAimSR;
+        public double AimDiff;
         public double[] MissTPs;
         public double[] MissCounts;
+        public double CheeseNoteCount;
+        public double[] CheeseLevels;
+        public double[] CheeseFactors;
 
         public double ApproachRate;
         public double OverallDifficulty;

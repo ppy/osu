@@ -106,6 +106,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
         public double RawMT { get; private set; }
         public double D { get; private set; }
         public double MT { get; private set; }
+        public double IP12 { get; private set; }
+        public double Cheesablility { get; private set; }
+        public double CheesableRatio { get; private set; }
+        public double Time { get; private set; }
 
 
         public OsuMovement(OsuHitObject obj0, OsuHitObject obj1, OsuHitObject obj2, OsuHitObject obj3,
@@ -116,9 +120,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
             var s12 = (pos2 - pos1) / (2 * obj2.Radius);
             double d12 = s12.L2Norm();
             double t12 = (obj2.StartTime - obj1.StartTime) / clockRate / 1000.0;
-            double ip12 = FittsLaw.CalculateIP(d12, t12);
+            IP12 = FittsLaw.CalculateIP(d12, t12);
 
             RawMT = t12;
+            Time = obj2.StartTime;
 
             var s01 = Vector<double>.Build.Dense(2);
             var s23 = Vector<double>.Build.Dense(2);
@@ -269,7 +274,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
 
             if (d12 > 0 && tapStrain != null)
             {
-                tapCorrection = SpecialFunctions.Logistic((tapStrain.Sum() / tapStrain.Count / ip12 - 1) * 15) * 0.2;
+                tapCorrection = SpecialFunctions.Logistic((tapStrain.Sum() / tapStrain.Count / IP12 - 1) * 15) * 0.2;
             }
 
             // Correction #5 - Cheesing
@@ -278,6 +283,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
             // cheesing and update MT accordingly.
             double timeEarly = 0;
             double timeLate = 0;
+            double cheesabilityEarly = 0;
+            double cheesabilityLate = 0;
 
             if (d12 > 0)
             {
@@ -293,8 +300,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
                     t01Reciprocal = 0;
                     ip01 = 0;
                 }
-                timeEarly = SpecialFunctions.Logistic((ip01 / ip12 - 0.6) * (-15)) *
-                            (1 / (1 / (t12 + 0.07) + t01Reciprocal)) * 0.15;
+                cheesabilityEarly = SpecialFunctions.Logistic((ip01 / IP12 - 0.6) * (-15)) * 0.5;
+                timeEarly = cheesabilityEarly * (1 / (1 / (t12 + 0.07) + t01Reciprocal)) ;
 
                 double t23Reciprocal;
                 double ip23;
@@ -308,8 +315,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
                     t23Reciprocal = 0;
                     ip23 = 0;
                 }
-                timeLate = SpecialFunctions.Logistic((ip23 / ip12 - 0.6) * (-15)) *
-                            (1 / (1 / (t12 + 0.07) + t23Reciprocal)) * 0.15;
+                cheesabilityLate = SpecialFunctions.Logistic((ip23 / IP12 - 0.6) * (-15)) * 0.5;
+                timeLate = cheesabilityLate * (1 / (1 / (t12 + 0.07) + t23Reciprocal));
             }
 
             // Correction #6 - Small circle bonus
@@ -319,10 +326,11 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
             // Apply the corrections
             double d12WithCorrection = d12 * (1 + smallCircleBonus) * (1 + correction0 + correction3 + patternCorrection) *
                                        (1 + tapCorrection);
-            double t12WithCorrection = t12 + timeEarly + timeLate;
 
-            this.D = d12WithCorrection;
-            this.MT = t12WithCorrection;
+            D = d12WithCorrection;
+            MT = t12;
+            Cheesablility = cheesabilityEarly + cheesabilityLate;
+            CheesableRatio = (timeEarly + timeLate) / t12;
         }
 
         public static void Initialize()
