@@ -15,6 +15,7 @@ using osu.Framework.MathUtils;
 using osu.Framework.Platform;
 using osu.Framework.Screens;
 using osu.Game.Beatmaps;
+using osu.Game.Configuration;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu;
@@ -79,7 +80,11 @@ namespace osu.Game.Tests.Visual.SongSelect
             Dependencies.Cache(manager = new BeatmapManager(LocalStorage, ContextFactory, rulesets, null, audio, host, defaultBeatmap = Beatmap.Default));
 
             Beatmap.SetDefault();
+
+            Dependencies.Cache(config = new OsuConfigManager(LocalStorage));
         }
+
+        private OsuConfigManager config;
 
         [SetUp]
         public virtual void SetUp() => Schedule(() =>
@@ -111,13 +116,15 @@ namespace osu.Game.Tests.Visual.SongSelect
 
             AddAssert("random map selected", () => songSelect.CurrentBeatmap != defaultBeatmap);
 
-            AddStep(@"Sort by Artist", delegate { songSelect.FilterControl.Sort = SortMode.Artist; });
-            AddStep(@"Sort by Title", delegate { songSelect.FilterControl.Sort = SortMode.Title; });
-            AddStep(@"Sort by Author", delegate { songSelect.FilterControl.Sort = SortMode.Author; });
-            AddStep(@"Sort by DateAdded", delegate { songSelect.FilterControl.Sort = SortMode.DateAdded; });
-            AddStep(@"Sort by BPM", delegate { songSelect.FilterControl.Sort = SortMode.BPM; });
-            AddStep(@"Sort by Length", delegate { songSelect.FilterControl.Sort = SortMode.Length; });
-            AddStep(@"Sort by Difficulty", delegate { songSelect.FilterControl.Sort = SortMode.Difficulty; });
+            var sortMode = config.GetBindable<SortMode>(OsuSetting.SongSelectSortingMode);
+
+            AddStep(@"Sort by Artist", delegate { sortMode.Value = SortMode.Artist; });
+            AddStep(@"Sort by Title", delegate { sortMode.Value = SortMode.Title; });
+            AddStep(@"Sort by Author", delegate { sortMode.Value = SortMode.Author; });
+            AddStep(@"Sort by DateAdded", delegate { sortMode.Value = SortMode.DateAdded; });
+            AddStep(@"Sort by BPM", delegate { sortMode.Value = SortMode.BPM; });
+            AddStep(@"Sort by Length", delegate { sortMode.Value = SortMode.Length; });
+            AddStep(@"Sort by Difficulty", delegate { sortMode.Value = SortMode.Difficulty; });
         }
 
         [Test]
