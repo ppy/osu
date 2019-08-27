@@ -53,9 +53,5 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
                 Alpha = 0.75f
             });
         }
-
-        protected override void UpdateState(ArmedState state)
-        {
-        }
     }
 }
