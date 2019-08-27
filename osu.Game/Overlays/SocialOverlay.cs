@@ -103,7 +103,6 @@ namespace osu.Game.Overlays
 
             Users = null;
             clearPanels();
-            loading.Hide();
             getUsersRequest?.Cancel();
 
             if (API?.IsLoggedIn != true)
@@ -131,8 +130,13 @@ namespace osu.Game.Overlays
         {
             clearPanels();
 
+            loading.Show();
+
             if (Users == null)
+            {
+                loading.Hide();
                 return;
+            }
 
             var newPanels = new FillFlowContainer<SocialPanel>
             {
@@ -167,15 +171,15 @@ namespace osu.Game.Overlays
 
             LoadComponentAsync(newPanels, f =>
             {
-                if (panels != null)
-                    ScrollFlow.Remove(panels);
-
+                loading.Hide();
                 ScrollFlow.Add(panels = newPanels);
             });
         }
 
         private void updateUsers(IEnumerable<User> newUsers)
         {
+            loading.Show();
+
             var sortDirection = Filter.DisplayStyleControl.Dropdown.Current.Value;
 
             IEnumerable<User> sortedUsers = newUsers;
@@ -226,7 +230,6 @@ namespace osu.Game.Overlays
             }
 
             Users = sortedUsers;
-            loading.Hide();
             recreatePanels(Filter.DisplayStyleControl.DisplayStyle.Value);
         }
 
