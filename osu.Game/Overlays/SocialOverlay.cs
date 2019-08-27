@@ -122,15 +122,11 @@ namespace osu.Game.Overlays
                     API.Queue(getUsersRequest = userRequest);
                     break;
             }
-
-            loading.Show();
         }
 
         private void recreatePanels(PanelDisplayStyle displayStyle)
         {
             clearPanels();
-
-            loading.Show();
 
             if (Users == null)
             {
@@ -178,8 +174,6 @@ namespace osu.Game.Overlays
 
         private void updateUsers(IEnumerable<User> newUsers)
         {
-            loading.Show();
-
             var sortDirection = Filter.DisplayStyleControl.Dropdown.Current.Value;
 
             IEnumerable<User> sortedUsers = newUsers;
@@ -218,6 +212,8 @@ namespace osu.Game.Overlays
 
         private void clearPanels()
         {
+            loading.Show();
+
             if (panels != null)
             {
                 panels.Expire();
