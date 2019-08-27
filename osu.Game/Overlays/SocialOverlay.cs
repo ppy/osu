@@ -73,7 +73,7 @@ namespace osu.Game.Overlays
             Filter.Tabs.Current.ValueChanged += _ => queueUpdate();
 
             Filter.DisplayStyleControl.DisplayStyle.ValueChanged += style => recreatePanels(style.NewValue);
-            Filter.DisplayStyleControl.Dropdown.Current.ValueChanged += _ => onDropdownChanged();
+            Filter.DisplayStyleControl.Dropdown.Current.ValueChanged += _ => updateUsers(Users);
 
             currentQuery.BindTo(Filter.Search.Current);
             currentQuery.ValueChanged += query =>
@@ -201,17 +201,6 @@ namespace osu.Game.Overlays
 
         private IEnumerable<User> sortBy<T>(IEnumerable<User> users, Func<User, T> condition, SortDirection sortDirection) =>
             sortDirection == SortDirection.Ascending ? users.OrderBy(condition) : users.OrderByDescending(condition);
-
-        private void onDropdownChanged()
-        {
-            if (Users == null)
-            {
-                queueUpdate();
-                return;
-            }
-
-            updateUsers(Users);
-        }
 
         private void clearPanels()
         {
