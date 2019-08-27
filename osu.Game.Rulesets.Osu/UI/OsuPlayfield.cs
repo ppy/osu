@@ -44,7 +44,6 @@ namespace osu.Game.Rulesets.Osu.UI
                 // Todo: Remove when hitobjects are properly pooled
                 new SkinProvidingContainer(null)
                 {
-                    RelativeSizeAxes = Axes.Both,
                     Child = HitObjectContainer,
                 },
                 approachCircles = new ApproachCircleProxyContainer

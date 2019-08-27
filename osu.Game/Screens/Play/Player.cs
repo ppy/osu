@@ -123,30 +123,53 @@ namespace osu.Game.Screens.Play
 
             InternalChild = GameplayClockContainer = new GameplayClockContainer(working, Mods.Value, DrawableRuleset.GameplayStartTime);
 
-            SkinProvidingContainer skinProvidingContainer = new BeatmapSkinProvidingContainer(working.Skin)
-            {
-                RelativeSizeAxes = Axes.Both,
-            };
+            addUnderlayComponents(GameplayClockContainer);
+            addGameplayComponents(GameplayClockContainer, working);
+            addOverlayComponents(GameplayClockContainer, working);
 
-            GameplayClockContainer.Children = new[]
+            DrawableRuleset.HasReplayLoaded.BindValueChanged(e => HUDOverlay.HoldToQuit.PauseOnFocusLost = !e.NewValue && PauseOnFocusLost, true);
+
+            // bind clock into components that require it
+            DrawableRuleset.IsPaused.BindTo(GameplayClockContainer.IsPaused);
+
+            // Bind ScoreProcessor to ourselves
+            ScoreProcessor.AllJudged += onCompletion;
+            ScoreProcessor.Failed += onFail;
+
+            foreach (var mod in Mods.Value.OfType<IApplicableToScoreProcessor>())
+                mod.ApplyToScoreProcessor(ScoreProcessor);
+        }
+
+        private void addUnderlayComponents(Container target)
+        {
+            target.Add(DimmableStoryboard = new DimmableStoryboard(Beatmap.Value.Storyboard) { RelativeSizeAxes = Axes.Both });
+        }
+
+        private void addGameplayComponents(Container target, WorkingBeatmap working)
+        {
+            var beatmapSkinProvider = new BeatmapSkinProvidingContainer(working.Skin);
+
+            // the beatmapSkinProvider is used as the fallback source here to allow the ruleset-specific skin implementation
+            // full access to all skin sources.
+            var rulesetSkinProvider = new SkinProvidingContainer(ruleset.CreateLegacySkinProvider(beatmapSkinProvider));
+
+            // load the skinning hierarchy first.
+            // this is intentionally done in two stages to ensure things are in a loaded state before exposing the ruleset to skin sources.
+            target.Add(new ScalingContainer(ScalingMode.Gameplay)
+                .WithChild(beatmapSkinProvider
+                    .WithChild(target = rulesetSkinProvider)));
+
+            target.AddRange(new Drawable[]
             {
-                DimmableStoryboard = new DimmableStoryboard(Beatmap.Value.Storyboard) { RelativeSizeAxes = Axes.Both },
-                new ScalingContainer(ScalingMode.Gameplay)
-                {
-                    Child = skinProvidingContainer.WithChild(
-                        // the skinProvidingContainer is used as the fallback source here to allow the ruleset-specific skin implementation
-                        // full access to all skin sources.
-                        new SkinProvidingContainer(ruleset.CreateLegacySkinProvider(skinProvidingContainer))
-                        {
-                            RelativeSizeAxes = Axes.Both,
-                            Children = new Drawable[]
-                            {
-                                DrawableRuleset,
-                                new ComboEffects(ScoreProcessor)
-                            }
-                        }
-                    )
-                },
+                DrawableRuleset,
+                new ComboEffects(ScoreProcessor)
+            });
+        }
+
+        private void addOverlayComponents(Container target, WorkingBeatmap working)
+        {
+            target.AddRange(new[]
+            {
                 breakOverlay = new BreakOverlay(working.Beatmap.BeatmapInfo.LetterboxInBreaks, ScoreProcessor)
                 {
                     Anchor = Anchor.Centre,
@@ -205,19 +228,7 @@ namespace osu.Game.Screens.Play
                     },
                 },
                 failAnimation = new FailAnimation(DrawableRuleset) { OnComplete = onFailComplete, }
-            };
-
-            DrawableRuleset.HasReplayLoaded.BindValueChanged(e => HUDOverlay.HoldToQuit.PauseOnFocusLost = !e.NewValue && PauseOnFocusLost, true);
-
-            // bind clock into components that require it
-            DrawableRuleset.IsPaused.BindTo(GameplayClockContainer.IsPaused);
-
-            // Bind ScoreProcessor to ourselves
-            ScoreProcessor.AllJudged += onCompletion;
-            ScoreProcessor.Failed += onFail;
-
-            foreach (var mod in Mods.Value.OfType<IApplicableToScoreProcessor>())
-                mod.ApplyToScoreProcessor(ScoreProcessor);
+            });
         }
 
         private WorkingBeatmap loadBeatmap()

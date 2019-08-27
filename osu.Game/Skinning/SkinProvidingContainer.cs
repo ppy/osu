@@ -32,6 +32,8 @@ namespace osu.Game.Skinning
         public SkinProvidingContainer(ISkin skin)
         {
             this.skin = skin;
+
+            RelativeSizeAxes = Axes.Both;
         }
 
         public Drawable GetDrawableComponent(string componentName)
