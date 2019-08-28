@@ -26,7 +26,7 @@ namespace osu.Game.Rulesets.Timing
         /// The base beat length to scale the <see cref="TimingPoint"/> provided multiplier relative to.
         /// </summary>
         /// <example>For a <see cref="BaseBeatLength"/> of 1000, a <see cref="TimingPoint"/> with a beat length of 500 will increase the multiplier by 2.</example>
-        public double BaseBeatLength = 1000;
+        public double BaseBeatLength = TimingControlPoint.DEFAULT_BEAT_LENGTH;
 
         /// <summary>
         /// The velocity multiplier.
