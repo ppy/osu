@@ -92,56 +92,42 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             Size = BaseSize * Parent.RelativeChildSize;
         }
 
-        protected override void UpdateState(ArmedState state)
+        protected override void UpdateStateTransforms(ArmedState state)
         {
-            // TODO: update to use new state management.
-            var circlePiece = MainPiece as CirclePiece;
-            circlePiece?.FlashBox.FinishTransforms();
-
-            var offset = !AllJudged ? 0 : Time.Current - HitObject.StartTime;
-
-            using (BeginDelayedSequence(HitObject.StartTime - Time.Current + offset, true))
+            switch (state)
             {
-                switch (State.Value)
-                {
-                    case ArmedState.Idle:
-                        validActionPressed = false;
+                case ArmedState.Idle:
+                    validActionPressed = false;
 
-                        UnproxyContent();
-                        this.Delay(HitObject.HitWindows.HalfWindowFor(HitResult.Miss)).Expire();
-                        break;
+                    UnproxyContent();
+                    this.Delay(HitObject.HitWindows.HalfWindowFor(HitResult.Miss)).Expire();
+                    break;
 
-                    case ArmedState.Miss:
-                        this.FadeOut(100)
-                            .Expire();
-                        break;
+                case ArmedState.Miss:
+                    this.FadeOut(100)
+                        .Expire();
+                    break;
 
-                    case ArmedState.Hit:
-                        // If we're far enough away from the left stage, we should bring outselves in front of it
-                        ProxyContent();
+                case ArmedState.Hit:
+                    // If we're far enough away from the left stage, we should bring outselves in front of it
+                    ProxyContent();
 
-                        var flash = circlePiece?.FlashBox;
+                    var flash = (MainPiece as CirclePiece)?.FlashBox;
+                    flash?.FadeTo(0.9f).FadeOut(300);
 
-                        if (flash != null)
-                        {
-                            flash.FadeTo(0.9f);
-                            flash.FadeOut(300);
-                        }
+                    const float gravity_time = 300;
+                    const float gravity_travel_height = 200;
 
-                        const float gravity_time = 300;
-                        const float gravity_travel_height = 200;
+                    this.ScaleTo(0.8f, gravity_time * 2, Easing.OutQuad);
 
-                        this.ScaleTo(0.8f, gravity_time * 2, Easing.OutQuad);
+                    this.MoveToY(-gravity_travel_height, gravity_time, Easing.Out)
+                        .Then()
+                        .MoveToY(gravity_travel_height * 2, gravity_time * 2, Easing.In);
 
-                        this.MoveToY(-gravity_travel_height, gravity_time, Easing.Out)
-                            .Then()
-                            .MoveToY(gravity_travel_height * 2, gravity_time * 2, Easing.In);
+                    this.FadeOut(800)
+                        .Expire();
 
-                        this.FadeOut(800)
-                            .Expire();
-
-                        break;
-                }
+                    break;
             }
         }
 

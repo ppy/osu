@@ -132,6 +132,8 @@ namespace osu.Game.Rulesets.Objects.Drawables
         /// </summary>
         public event Action<DrawableHitObject, ArmedState> ApplyCustomUpdateState;
 
+#pragma warning disable 618 // (legacy state management) - can be removed 20200227
+
         /// <summary>
         /// Enables automatic transform management of this hitobject. Implementation of transforms should be done in <see cref="UpdateInitialTransforms"/> and <see cref="UpdateStateTransforms"/> only. Rewinding and removing previous states is done automatically.
         /// </summary>
@@ -139,6 +141,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
         /// Going forward, this is the preferred way of implementing <see cref="DrawableHitObject"/>s. Previous functionality
         /// is offered as a compatibility layer until all rulesets have been migrated across.
         /// </remarks>
+        [Obsolete("Use UpdateInitialTransforms()/UpdateStateTransforms() instead")] // can be removed 20200227
         protected virtual bool UseTransformStateManagement => true;
 
         protected override void ClearInternal(bool disposeChildren = true) => throw new InvalidOperationException($"Should never clear a {nameof(DrawableHitObject)}");
@@ -219,9 +222,12 @@ namespace osu.Game.Rulesets.Objects.Drawables
         /// Should generally not be used when <see cref="UseTransformStateManagement"/> is true; use <see cref="UpdateStateTransforms"/> instead.
         /// </summary>
         /// <param name="state">The new armed state.</param>
+        [Obsolete("Use UpdateInitialTransforms()/UpdateStateTransforms() instead")] // can be removed 20200227
         protected virtual void UpdateState(ArmedState state)
         {
         }
+
+#pragma warning restore 618
 
         #endregion
 

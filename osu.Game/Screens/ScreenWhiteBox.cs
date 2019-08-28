@@ -95,7 +95,7 @@ namespace osu.Game.Screens
 
                             Colour = getColourFor(GetType()),
                             Alpha = 0.2f,
-                            Blending = BlendingMode.Additive,
+                            Blending = BlendingParameters.Additive,
                         },
                         textContainer = new FillFlowContainer
                         {
