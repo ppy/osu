@@ -49,8 +49,10 @@ namespace osu.Game.Skinning
         }
 
         public void Play() => channels?.ForEach(c => c.Play());
+        public void Stop() => channels?.ForEach(c => c.Stop());
 
         public void AddAdjustment(AdjustableProperty type, BindableDouble adjustBindable) => channels?.ForEach(c => c.AddAdjustment(type, adjustBindable));
+        public void RemoveAdjustment(AdjustableProperty type, BindableDouble adjustBindable) => channels?.ForEach(c => c.RemoveAdjustment(type, adjustBindable));
 
         public override bool IsPresent => Scheduler.HasPendingTasks;
 
