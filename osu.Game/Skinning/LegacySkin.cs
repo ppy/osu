@@ -17,6 +17,7 @@ using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.IO.Stores;
 using osu.Framework.Text;
+using osu.Game.Audio;
 using osu.Game.Database;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
@@ -179,7 +180,22 @@ namespace osu.Game.Skinning
             return texture;
         }
 
-        public override SampleChannel GetSample(string sampleName) => Samples.Get(getFallbackName(sampleName));
+        public override SampleChannel GetSample(ISampleInfo sampleInfo)
+        {
+            foreach (var lookup in sampleInfo.LookupNames)
+            {
+                var sample = Samples.Get(getFallbackName(lookup));
+
+                if (sample != null)
+                    return sample;
+            }
+
+            if (sampleInfo is HitSampleInfo hsi)
+                // Try fallback to non-bank samples.
+                return Samples.Get(hsi.Name);
+
+            return null;
+        }
 
         private bool hasFont(string fontName) => GetTexture($"{fontName}-0") != null;
 

@@ -37,18 +37,18 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
             base.UpdateItems(items);
         }
 
-        protected override APIRequest<List<APILegacyScoreInfo>> CreateRequest()
-            => new GetUserScoresRequest(User.Value.Id, type, VisiblePages++, ItemsPerPage);
+        protected override APIRequest<List<APILegacyScoreInfo>> CreateRequest() =>
+            new GetUserScoresRequest(User.Value.Id, type, VisiblePages++, ItemsPerPage);
 
-        protected override Drawable CreateDrawableItem(APILegacyScoreInfo item)
+        protected override Drawable CreateDrawableItem(APILegacyScoreInfo model)
         {
             switch (type)
             {
                 default:
-                    return new DrawablePerformanceScore(item, includeWeight ? Math.Pow(0.95, ItemsContainer.Count) : (double?)null);
+                    return new DrawablePerformanceScore(model, includeWeight ? Math.Pow(0.95, ItemsContainer.Count) : (double?)null);
 
                 case ScoreType.Recent:
-                    return new DrawableTotalScore(item);
+                    return new DrawableTotalScore(model);
             }
         }
     }
