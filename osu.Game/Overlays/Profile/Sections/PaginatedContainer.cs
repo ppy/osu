@@ -104,28 +104,25 @@ namespace osu.Game.Overlays.Profile.Sections
             api.Queue(retrievalRequest);
         }
 
-        protected virtual void UpdateItems(List<TModel> items)
+        protected virtual void UpdateItems(List<TModel> items) => Schedule(() =>
         {
-            Schedule(() =>
+            if (!items.Any() && VisiblePages == 1)
             {
-                if (!items.Any() && VisiblePages == 1)
-                {
-                    moreButton.Hide();
-                    moreButton.IsLoading = false;
-                    missingText.Show();
-                    return;
-                }
+                moreButton.Hide();
+                moreButton.IsLoading = false;
+                missingText.Show();
+                return;
+            }
 
-                LoadComponentsAsync(items.Select(CreateDrawableItem).Where(d => d != null), drawables =>
-                {
-                    missingText.Hide();
-                    moreButton.FadeTo(items.Count == ItemsPerPage ? 1 : 0);
-                    moreButton.IsLoading = false;
+            LoadComponentsAsync(items.Select(CreateDrawableItem).Where(d => d != null), drawables =>
+            {
+                missingText.Hide();
+                moreButton.FadeTo(items.Count == ItemsPerPage ? 1 : 0);
+                moreButton.IsLoading = false;
 
-                    ItemsContainer.AddRange(drawables);
-                }, loadCancellation.Token);
-            });
-        }
+                ItemsContainer.AddRange(drawables);
+            }, loadCancellation.Token);
+        });
 
         protected abstract APIRequest<List<TModel>> CreateRequest();
 
