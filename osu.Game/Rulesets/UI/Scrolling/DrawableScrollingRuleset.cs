@@ -113,7 +113,7 @@ namespace osu.Game.Rulesets.UI.Scrolling
         private void load()
         {
             double lastObjectTime = (Objects.LastOrDefault() as IHasEndTime)?.EndTime ?? Objects.LastOrDefault()?.StartTime ?? double.MaxValue;
-            double baseBeatLength = 1000;
+            double baseBeatLength = TimingControlPoint.DEFAULT_BEAT_LENGTH;
 
             if (RelativeScaleBeatLengths)
             {
