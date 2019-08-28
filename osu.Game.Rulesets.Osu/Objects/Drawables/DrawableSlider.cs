@@ -93,6 +93,13 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             }
         }
 
+        protected override void UpdateInitialTransforms()
+        {
+            base.UpdateInitialTransforms();
+
+            Body.FadeInFromZero(HitObject.TimeFadeIn);
+        }
+
         [BackgroundDependencyLoader]
         private void load()
         {

@@ -29,6 +29,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
         private readonly HitArea hitArea;
 
+        private readonly SkinnableDrawable mainContent;
+
         public DrawableHitCircle(HitCircle h)
             : base(h)
         {
@@ -56,7 +58,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                                 return true;
                             },
                         },
-                        new SkinnableDrawable("Play/osu/hitcircle", _ => new MainCirclePiece(HitObject.IndexInCurrentCombo)),
+                        mainContent = new SkinnableDrawable("Play/osu/hitcircle", _ => new MainCirclePiece(HitObject.IndexInCurrentCombo)),
                         ApproachCircle = new ApproachCircle
                         {
                             Alpha = 0,
@@ -107,6 +109,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         protected override void UpdateInitialTransforms()
         {
             base.UpdateInitialTransforms();
+
+            mainContent.FadeInFromZero(HitObject.TimeFadeIn);
 
             ApproachCircle.FadeIn(Math.Min(HitObject.TimeFadeIn * 2, HitObject.TimePreempt));
             ApproachCircle.ScaleTo(1f, HitObject.TimePreempt);
