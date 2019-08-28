@@ -12,9 +12,7 @@ using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Mods;
-using osu.Game.Screens.Play;
 using osuTK;
-using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.UI
 {
@@ -62,8 +60,6 @@ namespace osu.Game.Rulesets.UI
             RelativeSizeAxes = Axes.Both;
 
             hitObjectContainerLazy = new Lazy<HitObjectContainer>(CreateHitObjectContainer);
-
-            HasFailed.BindValueChanged(_ => fail());
         }
 
         [Resolved]
@@ -122,6 +118,7 @@ namespace osu.Game.Rulesets.UI
         protected void AddNested(Playfield otherPlayfield)
         {
             otherPlayfield.DisplayJudgements.BindTo(DisplayJudgements);
+            otherPlayfield.HasFailed.BindTo(HasFailed);
             nestedPlayfields.Value.Add(otherPlayfield);
         }
 
@@ -151,12 +148,5 @@ namespace osu.Game.Rulesets.UI
         /// Creates the container that will be used to contain the <see cref="DrawableHitObject"/>s.
         /// </summary>
         protected virtual HitObjectContainer CreateHitObjectContainer() => new HitObjectContainer();
-
-        private void fail()
-        {
-            HitObjectContainer.FlashColour(Color4.Red, 500);
-            HitObjectContainer.FadeOut(FailAnimation.FAIL_DURATION);
-            NestedPlayfields.ForEach(p => p.HasFailed.Value = true);
-        }
     }
 }
