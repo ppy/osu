@@ -10,7 +10,7 @@ using osu.Framework.Input.Bindings;
 
 namespace osu.Game.Input.Bindings
 {
-    public class GlobalActionContainer : DatabasedKeyBindingContainer<GlobalAction>, IHandleGlobalInput
+    public class GlobalActionContainer : DatabasedKeyBindingContainer<GlobalAction>, IHandleGlobalKeyboardInput
     {
         private readonly Drawable handler;
 
