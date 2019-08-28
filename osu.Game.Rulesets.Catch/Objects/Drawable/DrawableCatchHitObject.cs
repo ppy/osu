@@ -81,8 +81,6 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawable
                         break;
                 }
             }
-
-            base.UpdateState(state);
         }
     }
 }

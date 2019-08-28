@@ -201,8 +201,6 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
                     Expire();
                     break;
             }
-
-            base.UpdateState(state);
         }
 
         protected override void Update()

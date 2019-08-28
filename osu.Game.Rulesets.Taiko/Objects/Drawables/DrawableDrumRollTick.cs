@@ -47,8 +47,6 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
                     this.ScaleTo(0, 100, Easing.OutQuint).Expire();
                     break;
             }
-
-            base.UpdateState(state);
         }
 
         public override bool OnPressed(TaikoAction action) => UpdateResult(true);
