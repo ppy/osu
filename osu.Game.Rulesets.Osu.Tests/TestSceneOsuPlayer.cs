@@ -58,7 +58,7 @@ namespace osu.Game.Rulesets.Osu.Tests
                 if (firstObject == null)
                     return false;
 
-                var skinnable = firstObject?.ApproachCircle.Child as SkinnableDrawable;
+                var skinnable = firstObject.ApproachCircle.Child as SkinnableDrawable;
 
                 if (skin == null && skinnable?.Drawable is Sprite)
                     // check for default skin provider
