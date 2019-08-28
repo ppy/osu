@@ -153,6 +153,14 @@ namespace osu.Game.Rulesets.Objects.Drawables
             if (State.Value == newState && !force)
                 return;
 
+            state.Value = newState;
+
+            if (newState == ArmedState.Fail)
+            {
+                UpdateFailTransforms();
+                return;
+            }
+
             if (UseTransformStateManagement)
             {
                 double transformTime = HitObject.StartTime - InitialLifetimeOffset;
@@ -167,14 +175,9 @@ namespace osu.Game.Rulesets.Objects.Drawables
                     var judgementOffset = Math.Min(HitObject.HitWindows?.HalfWindowFor(HitResult.Miss) ?? double.MaxValue, Result?.TimeOffset ?? 0);
 
                     using (BeginDelayedSequence(InitialLifetimeOffset + judgementOffset, true))
-                    {
                         UpdateStateTransforms(newState);
-                        state.Value = newState;
-                    }
                 }
             }
-            else
-                state.Value = newState;
 
             UpdateState(newState);
 
@@ -203,6 +206,18 @@ namespace osu.Game.Rulesets.Objects.Drawables
         /// <param name="state">The new armed state.</param>
         protected virtual void UpdateStateTransforms(ArmedState state)
         {
+        }
+
+        /// <summary>
+        /// Apply transforms to perform fail animation on the hitobject. Called whenever this <see cref="DrawableHitObject"/> has been updated to a <see cref="ArmedState.Fail"/> state.
+        /// </summary>
+        protected virtual void UpdateFailTransforms()
+        {
+            this.FlashColour(Color4.Red, 500);
+            this.FadeOut(FailAnimation.FAIL_DURATION);
+            this.RotateTo(RNG.NextSingle(-90, 90), FailAnimation.FAIL_DURATION);
+            this.ScaleTo(Scale * 0.5f, FailAnimation.FAIL_DURATION);
+            this.MoveToOffset(new Vector2(0, 400), FailAnimation.FAIL_DURATION);
         }
 
         public override void ClearTransformsAfter(double time, bool propagateChildren = false, string targetMember = null)
