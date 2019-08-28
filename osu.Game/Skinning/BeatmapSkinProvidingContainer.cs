@@ -3,6 +3,7 @@
 
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Game.Audio;
 using osu.Game.Configuration;
 
 namespace osu.Game.Skinning
@@ -18,7 +19,7 @@ namespace osu.Game.Skinning
         protected override bool AllowConfigurationLookup => beatmapSkins.Value;
         protected override bool AllowDrawableLookup(string componentName) => beatmapSkins.Value;
         protected override bool AllowTextureLookup(string componentName) => beatmapSkins.Value;
-        protected override bool AllowSampleLookup(string componentName) => beatmapHitsounds.Value;
+        protected override bool AllowSampleLookup(ISampleInfo componentName) => beatmapHitsounds.Value;
 
         public BeatmapSkinProvidingContainer(ISkin skin)
             : base(skin)
