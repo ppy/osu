@@ -44,7 +44,7 @@ namespace osu.Game.Skinning
             {
                 looping = value;
 
-                channels.ForEach(c => c.Looping = looping);
+                channels?.ForEach(c => c.Looping = looping);
             }
         }
 
