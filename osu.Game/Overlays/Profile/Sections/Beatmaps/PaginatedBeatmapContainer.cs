@@ -31,12 +31,12 @@ namespace osu.Game.Overlays.Profile.Sections.Beatmaps
         protected override APIRequest<List<APIBeatmapSet>> CreateRequest() =>
             new GetUserBeatmapsRequest(User.Value.Id, type, VisiblePages++, ItemsPerPage);
 
-        protected override bool AllowCreate(APIBeatmapSet item) => item.OnlineBeatmapSetID.HasValue;
-
-        protected override Drawable CreateDrawableItem(APIBeatmapSet item) => new DirectGridPanel(item.ToBeatmapSet(Rulesets))
-        {
-            Anchor = Anchor.TopCentre,
-            Origin = Anchor.TopCentre,
-        };
+        protected override Drawable CreateDrawableItem(APIBeatmapSet item) => !item.OnlineBeatmapSetID.HasValue
+            ? null
+            : new DirectGridPanel(item.ToBeatmapSet(Rulesets))
+            {
+                Anchor = Anchor.TopCentre,
+                Origin = Anchor.TopCentre,
+            };
     }
 }
