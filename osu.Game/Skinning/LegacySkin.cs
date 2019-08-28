@@ -17,6 +17,7 @@ using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.IO.Stores;
 using osu.Framework.Text;
+using osu.Game.Audio;
 using osu.Game.Database;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
@@ -155,14 +156,53 @@ namespace osu.Game.Skinning
                             // Spacing value was reverse-engineered from the ratio of the rendered sprite size in the visual inspector vs the actual texture size
                             Spacing = new Vector2(-Configuration.HitCircleOverlap * 0.89f, 0)
                         };
-
-                default:
-                    string lastPiece = componentName.Split('/').Last();
-                    componentName = componentName.StartsWith("Gameplay/taiko/") ? "taiko-" + lastPiece : lastPiece;
-                    break;
             }
 
             return getAnimation(componentName, animatable, looping);
+        }
+
+        public override Texture GetTexture(string componentName)
+        {
+            componentName = getFallbackName(componentName);
+
+            float ratio = 2;
+            var texture = Textures.Get($"{componentName}@2x");
+
+            if (texture == null)
+            {
+                ratio = 1;
+                texture = Textures.Get(componentName);
+            }
+
+            if (texture != null)
+                texture.ScaleAdjust = ratio;
+
+            return texture;
+        }
+
+        public override SampleChannel GetSample(ISampleInfo sampleInfo)
+        {
+            foreach (var lookup in sampleInfo.LookupNames)
+            {
+                var sample = Samples.Get(getFallbackName(lookup));
+
+                if (sample != null)
+                    return sample;
+            }
+
+            if (sampleInfo is HitSampleInfo hsi)
+                // Try fallback to non-bank samples.
+                return Samples.Get(hsi.Name);
+
+            return null;
+        }
+
+        private bool hasFont(string fontName) => GetTexture($"{fontName}-0") != null;
+
+        private string getFallbackName(string componentName)
+        {
+            string lastPiece = componentName.Split('/').Last();
+            return componentName.StartsWith("Gameplay/taiko/") ? "taiko-" + lastPiece : lastPiece;
         }
 
         private Drawable getAnimation(string componentName, bool animatable, bool looping, string animationSeparator = "-")
@@ -199,27 +239,6 @@ namespace osu.Game.Skinning
 
             return null;
         }
-
-        public override Texture GetTexture(string componentName)
-        {
-            float ratio = 2;
-            var texture = Textures.Get($"{componentName}@2x");
-
-            if (texture == null)
-            {
-                ratio = 1;
-                texture = Textures.Get(componentName);
-            }
-
-            if (texture != null)
-                texture.ScaleAdjust = ratio;
-
-            return texture;
-        }
-
-        public override SampleChannel GetSample(string sampleName) => Samples.Get(sampleName);
-
-        private bool hasFont(string fontName) => GetTexture($"{fontName}-0") != null;
 
         protected class LegacySkinResourceStore<T> : IResourceStore<byte[]>
             where T : INamedFileInfo
