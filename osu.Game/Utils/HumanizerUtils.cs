@@ -10,27 +10,21 @@ namespace osu.Game.Utils
     public static class HumanizerUtils
     {
         /// <summary>
-        /// Humanizes a string using the system culture, then falls back if one cannot be found.
-        /// <remarks>
-        /// A localization lookup failure will throw an exception of type <see cref="ArgumentException"/>
-        /// </remarks>
+        /// Turns the current or provided date into a human readable sentence
         /// </summary>
-        /// <param name="dateTimeOffset">The time to humanize.</param>
-        /// <returns>A humanized string of the given time.</returns>
-        public static string Humanize(DateTimeOffset dateTimeOffset)
+        /// <param name="input">The date to be humanized</param>
+        /// <returns>distance of time in words</returns>
+        public static string Humanize(DateTimeOffset input)
         {
-            string offset;
-
+            // this works around https://github.com/xamarin/xamarin-android/issues/2012 and https://github.com/Humanizr/Humanizer/issues/690#issuecomment-368536282
             try
             {
-                offset = dateTimeOffset.Humanize();
+                return input.Humanize();
             }
             catch (ArgumentException)
             {
-                offset = dateTimeOffset.Humanize(culture: new CultureInfo("en-US"));
+                return input.Humanize(culture: new CultureInfo("en-US"));
             }
-
-            return offset;
         }
     }
 }
