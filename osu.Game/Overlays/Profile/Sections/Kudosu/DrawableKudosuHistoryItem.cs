@@ -50,85 +50,101 @@ namespace osu.Game.Overlays.Profile.Sections.Kudosu
         {
             date.Colour = colours.GreySeafoamLighter;
 
-            string userLinkTemplate() => $"[{historyItem.Giver?.Url} {historyItem.Giver?.Username}]";
+            string prefix = getPrefix(historyItem);
+            var formattedSource = MessageFormatter.FormatText(getSource(historyItem));
+
+            if (!string.IsNullOrEmpty(prefix))
+            {
+                linkFlowContainer.AddText(prefix);
+                linkFlowContainer.AddText($@" {historyItem.Amount} kudosu", t =>
+                {
+                    t.Font = t.Font.With(italics: true);
+                    t.Colour = colours.Blue;
+                });
+            }
+
+            linkFlowContainer.AddLinks(formattedSource.Text + " ", formattedSource.Links);
+            linkFlowContainer.AddLink(historyItem.Post.Title, historyItem.Post.Url);
+        }
+
+        private string getSource(APIKudosuHistory historyItem)
+        {
+            string userLink() => $"[{historyItem.Giver?.Url} {historyItem.Giver?.Username}]";
 
             switch (historyItem.Action)
             {
                 case KudosuAction.VoteGive:
-                    addKudosuPart(@"Received");
-                    addMainPart(@" from obtaining votes in modding post of ");
-                    break;
+                    return @" from obtaining votes in modding post of";
 
                 case KudosuAction.Give:
-                    addKudosuPart(@"Received");
-                    addMainPart($@" from {userLinkTemplate()} for a post at ");
-                    break;
+                    return $@" from {userLink()} for a post at";
 
                 case KudosuAction.Reset:
-                    addMainPart($@"Kudosu reset by {userLinkTemplate()} for the post ");
-                    break;
+                    return $@"Kudosu reset by {userLink()} for the post";
 
                 case KudosuAction.VoteReset:
-                    addKudosuPart(@"Lost");
-                    addMainPart(@" from losing votes in modding post of ");
-                    break;
+                    return @" from losing votes in modding post of";
 
                 case KudosuAction.DenyKudosuReset:
-                    addKudosuPart(@"Denied");
-                    addMainPart(@" from modding post ");
-                    break;
+                    return @" from modding post";
 
                 case KudosuAction.Revoke:
-                    addMainPart($@"Denied kudosu by {userLinkTemplate()} for the post ");
-                    break;
+                    return $@"Denied kudosu by {userLink()} for the post";
 
                 case KudosuAction.AllowKudosuGive:
-                    addKudosuPart(@"Received");
-                    addMainPart(@" from kudosu deny repeal of modding post ");
-                    break;
+                    return @" from kudosu deny repeal of modding post";
 
                 case KudosuAction.DeleteReset:
-                    addKudosuPart(@"Lost");
-                    addMainPart(@" from modding post deletion of ");
-                    break;
+                    return @" from modding post deletion of";
 
                 case KudosuAction.RestoreGive:
-                    addKudosuPart(@"Received");
-                    addMainPart(@" from modding post restoration of ");
-                    break;
+                    return @" from modding post restoration of";
 
                 case KudosuAction.RecalculateGive:
-                    addKudosuPart(@"Received");
-                    addMainPart(@" from votes recalculation in modding post of ");
-                    break;
+                    return @" from votes recalculation in modding post of";
 
                 case KudosuAction.RecalculateReset:
-                    addKudosuPart(@"Lost");
-                    addMainPart(@" from votes recalculation in modding post of ");
-                    break;
+                    return @" from votes recalculation in modding post of";
+
+                default:
+                    return @" from unknown event ";
             }
-
-            addPostPart();
         }
 
-        private void addKudosuPart(string prefix)
+        private string getPrefix(APIKudosuHistory historyItem)
         {
-            linkFlowContainer.AddText(prefix);
-
-            linkFlowContainer.AddText($@" {historyItem.Amount} kudosu", t =>
+            switch (historyItem.Action)
             {
-                t.Font = t.Font.With(italics: true);
-                t.Colour = colours.Blue;
-            });
+                case KudosuAction.VoteGive:
+                    return @"Received";
+
+                case KudosuAction.Give:
+                    return @"Received";
+
+                case KudosuAction.VoteReset:
+                    return @"Lost";
+
+                case KudosuAction.DenyKudosuReset:
+                    return @"Denied";
+
+                case KudosuAction.AllowKudosuGive:
+                    return @"Received";
+
+                case KudosuAction.DeleteReset:
+                    return @"Lost";
+
+                case KudosuAction.RestoreGive:
+                    return @"Received";
+
+                case KudosuAction.RecalculateGive:
+                    return @"Received";
+
+                case KudosuAction.RecalculateReset:
+                    return @"Lost";
+
+                default:
+                    return null;
+            }
         }
-
-        private void addMainPart(string text)
-        {
-            var formatted = MessageFormatter.FormatText(text);
-
-            linkFlowContainer.AddLinks(formatted.Text, formatted.Links);
-        }
-
-        private void addPostPart() => linkFlowContainer.AddLink(historyItem.Post.Title, historyItem.Post.Url);
     }
 }
