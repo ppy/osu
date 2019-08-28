@@ -338,7 +338,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
         /// <param name="application">The callback that applies changes to the <see cref="JudgementResult"/>.</param>
         protected void ApplyResult(Action<JudgementResult> application)
         {
-            // Judgement Results must not be applied if in a failing state
+            // TODO: Playfield.HasFailed should likely be checked here to allow reviving the hitobject
             if (State.Value == ArmedState.Fail)
                 return;
 
