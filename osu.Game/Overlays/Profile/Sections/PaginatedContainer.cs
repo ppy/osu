@@ -126,7 +126,7 @@ namespace osu.Game.Overlays.Profile.Sections
 
         protected abstract APIRequest<List<TModel>> CreateRequest();
 
-        protected abstract Drawable CreateDrawableItem(TModel item);
+        protected abstract Drawable CreateDrawableItem(TModel model);
 
         protected override void Dispose(bool isDisposing)
         {
