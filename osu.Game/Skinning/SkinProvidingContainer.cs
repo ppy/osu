@@ -7,6 +7,7 @@ using osu.Framework.Audio.Sample;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Textures;
+using osu.Game.Audio;
 
 namespace osu.Game.Skinning
 {
@@ -25,7 +26,7 @@ namespace osu.Game.Skinning
 
         protected virtual bool AllowTextureLookup(string componentName) => true;
 
-        protected virtual bool AllowSampleLookup(string componentName) => true;
+        protected virtual bool AllowSampleLookup(ISampleInfo componentName) => true;
 
         protected virtual bool AllowConfigurationLookup => true;
 
@@ -54,13 +55,13 @@ namespace osu.Game.Skinning
             return fallbackSource.GetTexture(componentName);
         }
 
-        public SampleChannel GetSample(string sampleName)
+        public SampleChannel GetSample(ISampleInfo sampleInfo)
         {
             SampleChannel sourceChannel;
-            if (AllowSampleLookup(sampleName) && (sourceChannel = skin?.GetSample(sampleName)) != null)
+            if (AllowSampleLookup(sampleInfo) && (sourceChannel = skin?.GetSample(sampleInfo)) != null)
                 return sourceChannel;
 
-            return fallbackSource?.GetSample(sampleName);
+            return fallbackSource?.GetSample(sampleInfo);
         }
 
         public TValue GetValue<TConfiguration, TValue>(Func<TConfiguration, TValue> query) where TConfiguration : SkinConfiguration

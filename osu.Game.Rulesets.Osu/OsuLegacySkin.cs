@@ -10,6 +10,7 @@ using osu.Framework.Graphics.Animations;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
+using osu.Game.Audio;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Rulesets.Objects.Drawables;
@@ -134,7 +135,7 @@ namespace osu.Game.Rulesets.Osu
 
         public Texture GetTexture(string componentName) => null;
 
-        public SampleChannel GetSample(string sampleName) => null;
+        public SampleChannel GetSample(ISampleInfo sample) => null;
 
         public TValue GetValue<TConfiguration, TValue>(Func<TConfiguration, TValue> query) where TConfiguration : SkinConfiguration
             => configuration.Value is TConfiguration conf ? query.Invoke(conf) : default;
