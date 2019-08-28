@@ -35,7 +35,18 @@ namespace osu.Game.Skinning
             this.audio = audio;
         }
 
-        public bool Looping;
+        private bool looping;
+
+        public bool Looping
+        {
+            get => looping;
+            set
+            {
+                looping = value;
+
+                channels.ForEach(c => c.Looping = looping);
+            }
+        }
 
         public void Play() => channels?.ForEach(c => c.Play());
 
