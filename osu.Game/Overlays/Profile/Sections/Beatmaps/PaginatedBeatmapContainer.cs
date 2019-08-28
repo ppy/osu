@@ -28,13 +28,15 @@ namespace osu.Game.Overlays.Profile.Sections.Beatmaps
             ItemsContainer.Spacing = new Vector2(panel_padding);
         }
 
-        protected override APIRequest<List<APIBeatmapSet>> CreateRequest()
-            => new GetUserBeatmapsRequest(User.Value.Id, type, VisiblePages++, ItemsPerPage);
+        protected override APIRequest<List<APIBeatmapSet>> CreateRequest() =>
+            new GetUserBeatmapsRequest(User.Value.Id, type, VisiblePages++, ItemsPerPage);
 
-        protected override Drawable CreateDrawableItem(APIBeatmapSet item) => new DirectGridPanel(item.ToBeatmapSet(Rulesets))
-        {
-            Anchor = Anchor.TopCentre,
-            Origin = Anchor.TopCentre,
-        };
+        protected override Drawable CreateDrawableItem(APIBeatmapSet model) => !model.OnlineBeatmapSetID.HasValue
+            ? null
+            : new DirectGridPanel(model.ToBeatmapSet(Rulesets))
+            {
+                Anchor = Anchor.TopCentre,
+                Origin = Anchor.TopCentre,
+            };
     }
 }

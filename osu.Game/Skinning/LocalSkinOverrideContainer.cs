@@ -8,6 +8,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Textures;
+using osu.Game.Audio;
 using osu.Game.Configuration;
 
 namespace osu.Game.Skinning
@@ -49,13 +50,13 @@ namespace osu.Game.Skinning
             return fallbackSource.GetTexture(componentName);
         }
 
-        public SampleChannel GetSample(string sampleName)
+        public SampleChannel GetSample(ISampleInfo sampleInfo)
         {
             SampleChannel sourceChannel;
-            if (beatmapHitsounds.Value && (sourceChannel = skin?.GetSample(sampleName)) != null)
+            if (beatmapHitsounds.Value && (sourceChannel = skin?.GetSample(sampleInfo)) != null)
                 return sourceChannel;
 
-            return fallbackSource?.GetSample(sampleName);
+            return fallbackSource?.GetSample(sampleInfo);
         }
 
         public TValue GetValue<TConfiguration, TValue>(Func<TConfiguration, TValue> query) where TConfiguration : SkinConfiguration

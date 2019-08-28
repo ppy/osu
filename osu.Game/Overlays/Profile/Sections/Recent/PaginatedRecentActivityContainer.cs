@@ -19,9 +19,9 @@ namespace osu.Game.Overlays.Profile.Sections.Recent
             ItemsPerPage = 5;
         }
 
-        protected override APIRequest<List<APIRecentActivity>> CreateRequest()
-            => new GetUserRecentActivitiesRequest(User.Value.Id, VisiblePages++, ItemsPerPage);
+        protected override APIRequest<List<APIRecentActivity>> CreateRequest() =>
+            new GetUserRecentActivitiesRequest(User.Value.Id, VisiblePages++, ItemsPerPage);
 
-        protected override Drawable CreateDrawableItem(APIRecentActivity item) => new DrawableRecentActivity(item);
+        protected override Drawable CreateDrawableItem(APIRecentActivity model) => new DrawableRecentActivity(model);
     }
 }

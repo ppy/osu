@@ -17,11 +17,11 @@ using System.Threading;
 
 namespace osu.Game.Overlays.Profile.Sections
 {
-    public abstract class PaginatedContainer<T> : FillFlowContainer
+    public abstract class PaginatedContainer<TModel> : FillFlowContainer
     {
         private readonly ShowMoreButton moreButton;
         private readonly OsuSpriteText missingText;
-        private APIRequest<List<T>> retrievalRequest;
+        private APIRequest<List<TModel>> retrievalRequest;
         private CancellationTokenSource loadCancellation;
 
         [Resolved]
@@ -104,32 +104,29 @@ namespace osu.Game.Overlays.Profile.Sections
             api.Queue(retrievalRequest);
         }
 
-        protected virtual void UpdateItems(List<T> items)
+        protected virtual void UpdateItems(List<TModel> items) => Schedule(() =>
         {
-            Schedule(() =>
+            if (!items.Any() && VisiblePages == 1)
             {
-                if (!items.Any() && VisiblePages == 1)
-                {
-                    moreButton.Hide();
-                    moreButton.IsLoading = false;
-                    missingText.Show();
-                    return;
-                }
+                moreButton.Hide();
+                moreButton.IsLoading = false;
+                missingText.Show();
+                return;
+            }
 
-                LoadComponentsAsync(items.Select(CreateDrawableItem), drawables =>
-                {
-                    missingText.Hide();
-                    moreButton.FadeTo(items.Count == ItemsPerPage ? 1 : 0);
-                    moreButton.IsLoading = false;
+            LoadComponentsAsync(items.Select(CreateDrawableItem).Where(d => d != null), drawables =>
+            {
+                missingText.Hide();
+                moreButton.FadeTo(items.Count == ItemsPerPage ? 1 : 0);
+                moreButton.IsLoading = false;
 
-                    ItemsContainer.AddRange(drawables);
-                }, loadCancellation.Token);
-            });
-        }
+                ItemsContainer.AddRange(drawables);
+            }, loadCancellation.Token);
+        });
 
-        protected abstract APIRequest<List<T>> CreateRequest();
+        protected abstract APIRequest<List<TModel>> CreateRequest();
 
-        protected abstract Drawable CreateDrawableItem(T item);
+        protected abstract Drawable CreateDrawableItem(TModel model);
 
         protected override void Dispose(bool isDisposing)
         {

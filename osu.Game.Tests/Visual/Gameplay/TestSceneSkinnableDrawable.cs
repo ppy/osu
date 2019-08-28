@@ -10,6 +10,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Textures;
+using osu.Game.Audio;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Skinning;
@@ -253,7 +254,7 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             public Texture GetTexture(string componentName) => throw new NotImplementedException();
 
-            public SampleChannel GetSample(string sampleName) => throw new NotImplementedException();
+            public SampleChannel GetSample(ISampleInfo sampleInfo) => throw new NotImplementedException();
 
             public TValue GetValue<TConfiguration, TValue>(Func<TConfiguration, TValue> query) where TConfiguration : SkinConfiguration => throw new NotImplementedException();
         }
@@ -264,7 +265,7 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             public Texture GetTexture(string componentName) => throw new NotImplementedException();
 
-            public SampleChannel GetSample(string sampleName) => throw new NotImplementedException();
+            public SampleChannel GetSample(ISampleInfo sampleInfo) => throw new NotImplementedException();
 
             public TValue GetValue<TConfiguration, TValue>(Func<TConfiguration, TValue> query) where TConfiguration : SkinConfiguration => throw new NotImplementedException();
         }
@@ -275,7 +276,7 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             public Texture GetTexture(string componentName) => throw new NotImplementedException();
 
-            public SampleChannel GetSample(string sampleName) => throw new NotImplementedException();
+            public SampleChannel GetSample(ISampleInfo sampleInfo) => throw new NotImplementedException();
 
             public TValue GetValue<TConfiguration, TValue>(Func<TConfiguration, TValue> query) where TConfiguration : SkinConfiguration => throw new NotImplementedException();
         }
