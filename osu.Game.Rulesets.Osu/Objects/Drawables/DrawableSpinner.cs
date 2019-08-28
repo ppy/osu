@@ -202,10 +202,10 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             Ticks.Rotation = Disc.Rotation;
             spmCounter.SetRotation(Disc.RotationAbsolute);
 
+            spinRate.Value = (spmCounter.SpinsPerMinute / 180) * Progress;
+
             float relativeCircleScale = Spinner.Scale * circle.DrawHeight / mainContainer.DrawHeight;
             Disc.ScaleTo(relativeCircleScale + (1 - relativeCircleScale) * Progress, 200, Easing.OutQuint);
-
-            spinRate.Value = (spmCounter.SpinsPerMinute / 180) * Progress;
 
             symbol.RotateTo(Disc.Rotation / 2, 500, Easing.OutQuint);
         }
@@ -251,10 +251,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             Schedule(() =>
             {
                 if (State.Value != ArmedState.Idle)
-                {
-                    RemoveInternal(spinningSample);
-                    spinningSample.Dispose();
-                }
+                    spinningSample.Stop();
             });
 
             Expire();
