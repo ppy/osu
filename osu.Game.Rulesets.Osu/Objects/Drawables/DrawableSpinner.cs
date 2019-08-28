@@ -43,12 +43,11 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
         private readonly IBindable<Vector2> positionBindable = new Bindable<Vector2>();
 
-        private readonly BindableDouble spinRate = new BindableDouble();
-
         private Color4 normalColour;
         private Color4 completeColour;
 
         private SkinnableSound spinningSample;
+        private BindableDouble spinRate;
 
         public DrawableSpinner(Spinner s)
             : base(s)
@@ -146,6 +145,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             {
                 Looping = true
             });
+            spinningSample.AddAdjustment(AdjustableProperty.Frequency, spinRate = new BindableDouble());
         }
 
         public float Progress => MathHelper.Clamp(Disc.RotationAbsolute / 360 / Spinner.SpinsRequired, 0, 1);
@@ -214,7 +214,6 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         {
             base.UpdateInitialTransforms();
 
-            spinningSample.AddAdjustment(AdjustableProperty.Frequency, spinRate);
             spinningSample.Play();
 
             circleContainer.ScaleTo(Spinner.Scale * 0.3f);
