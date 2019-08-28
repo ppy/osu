@@ -17,11 +17,11 @@ using System.Threading;
 
 namespace osu.Game.Overlays.Profile.Sections
 {
-    public abstract class PaginatedContainer<T> : FillFlowContainer
+    public abstract class PaginatedContainer<TModel> : FillFlowContainer
     {
         private readonly ShowMoreButton moreButton;
         private readonly OsuSpriteText missingText;
-        private APIRequest<List<T>> retrievalRequest;
+        private APIRequest<List<TModel>> retrievalRequest;
         private CancellationTokenSource loadCancellation;
 
         [Resolved]
@@ -104,7 +104,7 @@ namespace osu.Game.Overlays.Profile.Sections
             api.Queue(retrievalRequest);
         }
 
-        protected virtual void UpdateItems(List<T> items)
+        protected virtual void UpdateItems(List<TModel> items)
         {
             Schedule(() =>
             {
@@ -127,9 +127,9 @@ namespace osu.Game.Overlays.Profile.Sections
             });
         }
 
-        protected abstract APIRequest<List<T>> CreateRequest();
+        protected abstract APIRequest<List<TModel>> CreateRequest();
 
-        protected abstract Drawable CreateDrawableItem(T item);
+        protected abstract Drawable CreateDrawableItem(TModel item);
 
         protected override void Dispose(bool isDisposing)
         {
