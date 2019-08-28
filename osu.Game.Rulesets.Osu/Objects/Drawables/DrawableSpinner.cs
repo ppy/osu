@@ -43,11 +43,12 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
         private readonly IBindable<Vector2> positionBindable = new Bindable<Vector2>();
 
-        private readonly SkinnableSound spinningSample;
         private readonly BindableDouble spinRate = new BindableDouble();
 
         private Color4 normalColour;
         private Color4 completeColour;
+
+        private SkinnableSound spinningSample;
 
         public DrawableSpinner(Spinner s)
             : base(s)
@@ -64,10 +65,6 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
             InternalChildren = new Drawable[]
             {
-                spinningSample = new SkinnableSound(new SampleInfo("spinnerspin"))
-                {
-                    Looping = true,
-                },
                 circleContainer = new Container
                 {
                     AutoSizeAxes = Axes.Both,
@@ -144,6 +141,11 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
             positionBindable.BindValueChanged(pos => Position = pos.NewValue);
             positionBindable.BindTo(HitObject.PositionBindable);
+
+            AddInternal(spinningSample = new SkinnableSound(HitObject.SampleControlPoint.ApplyTo(new HitSampleInfo { Name = "spinnerspin" }))
+            {
+                Looping = true
+            });
         }
 
         public float Progress => MathHelper.Clamp(Disc.RotationAbsolute / 360 / Spinner.SpinsRequired, 0, 1);
