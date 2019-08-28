@@ -8,6 +8,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Extensions.TypeExtensions;
+using osu.Framework.Graphics;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.MathUtils;
 using osu.Game.Audio;
@@ -402,12 +403,12 @@ namespace osu.Game.Rulesets.Objects.Drawables
         protected virtual JudgementResult CreateResult(Judgement judgement) => new JudgementResult(judgement);
 
         /// <summary>
-        /// Applies the failing animation on this <see cref="DrawableHitObject"/>.
+        /// Updates state of this <see cref="DrawableHitObject"/> to a <see cref="ArmedState.Fail"/> state.
         /// </summary>
         public void Fail()
         {
             NestedHitObjects.ForEach(h => h.Fail());
-            State.Value = ArmedState.Fail;
+            updateState(ArmedState.Fail);
         }
     }
 
