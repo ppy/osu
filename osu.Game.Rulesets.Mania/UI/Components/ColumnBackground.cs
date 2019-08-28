@@ -42,7 +42,7 @@ namespace osu.Game.Rulesets.Mania.UI.Components
                     Name = "Background Gradient Overlay",
                     RelativeSizeAxes = Axes.Both,
                     Height = 0.5f,
-                    Blending = BlendingMode.Additive,
+                    Blending = BlendingParameters.Additive,
                     Alpha = 0
                 }
             };
