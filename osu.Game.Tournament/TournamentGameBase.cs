@@ -9,15 +9,20 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Shapes;
+using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Input;
 using osu.Framework.IO.Stores;
 using osu.Framework.Platform;
 using osu.Game.Beatmaps;
+using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API.Requests;
 using osu.Game.Tournament.IPC;
 using osu.Game.Tournament.Models;
+using osuTK.Graphics;
 using osuTK.Input;
 
 namespace osu.Game.Tournament
@@ -34,6 +39,8 @@ namespace osu.Game.Tournament
 
         private Bindable<Size> windowSize;
         private FileBasedIPC ipc;
+
+        private Drawable heightWarning;
 
         protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
         {
@@ -53,6 +60,12 @@ namespace osu.Game.Tournament
             this.storage = storage;
 
             windowSize = frameworkConfig.GetBindable<Size>(FrameworkSetting.WindowedSize);
+            windowSize.BindValueChanged(size => ScheduleAfterChildren(() =>
+            {
+                var minWidth = (int)(size.NewValue.Height / 9f * 16 + 400);
+
+                heightWarning.Alpha = size.NewValue.Width < minWidth ? 1 : 0;
+            }), true);
 
             readBracket();
 
@@ -61,16 +74,43 @@ namespace osu.Game.Tournament
             dependencies.CacheAs<MatchIPCInfo>(ipc = new FileBasedIPC());
             Add(ipc);
 
-            Add(new OsuButton
+            AddRange(new[]
             {
-                Text = "Save Changes",
-                Width = 140,
-                Height = 50,
-                Depth = float.MinValue,
-                Anchor = Anchor.BottomRight,
-                Origin = Anchor.BottomRight,
-                Padding = new MarginPadding(10),
-                Action = SaveChanges,
+                new OsuButton
+                {
+                    Text = "Save Changes",
+                    Width = 140,
+                    Height = 50,
+                    Depth = float.MinValue,
+                    Anchor = Anchor.BottomRight,
+                    Origin = Anchor.BottomRight,
+                    Padding = new MarginPadding(10),
+                    Action = SaveChanges,
+                },
+                heightWarning = new Container
+                {
+                    Masking = true,
+                    CornerRadius = 5,
+                    Depth = float.MinValue,
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    AutoSizeAxes = Axes.Both,
+                    Children = new Drawable[]
+                    {
+                        new Box
+                        {
+                            Colour = Color4.Red,
+                            RelativeSizeAxes = Axes.Both,
+                        },
+                        new SpriteText
+                        {
+                            Text = "Please make the window wider",
+                            Font = OsuFont.Default.With(weight: "bold"),
+                            Colour = Color4.White,
+                            Padding = new MarginPadding(20)
+                        }
+                    }
+                },
             });
         }
 
@@ -193,18 +233,6 @@ namespace osu.Game.Tournament
             MenuCursorContainer.Cursor.Alpha = 0;
 
             base.LoadComplete();
-        }
-
-        protected override void Update()
-        {
-            base.Update();
-            var minWidth = (int)(windowSize.Value.Height / 9f * 16 + 400);
-
-            if (windowSize.Value.Width < minWidth)
-            {
-                // todo: can be removed after ppy/osu-framework#1975
-                windowSize.Value = Host.Window.ClientSize = new Size(minWidth, windowSize.Value.Height);
-            }
         }
 
         protected virtual void SaveChanges()

@@ -20,6 +20,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using osu.Framework.Audio;
 using osu.Framework.Bindables;
+using osu.Framework.Development;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input;
@@ -86,7 +87,8 @@ namespace osu.Game
         private BackButton backButton;
 
         private MainMenu menuScreen;
-        private Intro introScreen;
+
+        private IntroScreen introScreen;
 
         private Bindable<int> configRuleset;
 
@@ -153,7 +155,7 @@ namespace osu.Game
         {
             this.frameworkConfig = frameworkConfig;
 
-            if (!Host.IsPrimaryInstance)
+            if (!Host.IsPrimaryInstance && !DebugUtils.IsDebugBuild)
             {
                 Logger.Log(@"osu! does not support multiple running instances.", LoggingTarget.Runtime, LogLevel.Error);
                 Environment.Exit(0);
@@ -248,7 +250,7 @@ namespace osu.Game
                 }
 
                 // Use first beatmap available for current ruleset, else switch ruleset.
-                var first = databasedSet.Beatmaps.Find(b => b.Ruleset == Ruleset.Value) ?? databasedSet.Beatmaps.First();
+                var first = databasedSet.Beatmaps.Find(b => b.Ruleset.Equals(Ruleset.Value)) ?? databasedSet.Beatmaps.First();
 
                 Ruleset.Value = first.Ruleset;
                 Beatmap.Value = BeatmapManager.GetWorkingBeatmap(first);
@@ -263,7 +265,16 @@ namespace osu.Game
         {
             // The given ScoreInfo may have missing properties if it was retrieved from online data. Re-retrieve it from the database
             // to ensure all the required data for presenting a replay are present.
-            var databasedScoreInfo = ScoreManager.Query(s => s.OnlineScoreID == score.OnlineScoreID);
+            var databasedScoreInfo = score.OnlineScoreID != null
+                ? ScoreManager.Query(s => s.OnlineScoreID == score.OnlineScoreID)
+                : ScoreManager.Query(s => s.Hash == score.Hash);
+
+            if (databasedScoreInfo == null)
+            {
+                Logger.Log("The requested score could not be found locally.", LoggingTarget.Information);
+                return;
+            }
+
             var databasedScore = ScoreManager.GetScore(databasedScoreInfo);
 
             if (databasedScore.Replay == null)
@@ -288,7 +299,7 @@ namespace osu.Game
             }, $"watch {databasedScoreInfo}", bypassScreenAllowChecks: true);
         }
 
-        #region Beatmap jukebox progression
+        #region Beatmap progression
 
         private void beatmapChanged(ValueChangedEvent<WorkingBeatmap> beatmap)
         {
@@ -296,7 +307,9 @@ namespace osu.Game
             if (nextBeatmap?.Track != null)
                 nextBeatmap.Track.Completed += currentTrackCompleted;
 
-            beatmap.OldValue?.Dispose();
+            using (var oldBeatmap = beatmap.OldValue)
+                if (oldBeatmap?.Track != null)
+                    oldBeatmap.Track.Completed -= currentTrackCompleted;
 
             nextBeatmap?.LoadBeatmapAsync();
         }
@@ -456,6 +469,8 @@ namespace osu.Game
             loadComponentSingleFile(volume = new VolumeOverlay(), leftFloatingOverlayContent.Add);
             loadComponentSingleFile(new OnScreenDisplay(), Add, true);
 
+            loadComponentSingleFile(musicController = new MusicController(), Add, true);
+
             loadComponentSingleFile(notifications = new NotificationOverlay
             {
                 GetToolbarHeight = () => ToolbarOffset,
@@ -482,7 +497,7 @@ namespace osu.Game
                 Origin = Anchor.TopRight,
             }, rightFloatingOverlayContent.Add, true);
 
-            loadComponentSingleFile(musicController = new MusicController
+            loadComponentSingleFile(new NowPlayingOverlay
             {
                 GetToolbarHeight = () => ToolbarOffset,
                 Anchor = Anchor.TopRight,
@@ -588,7 +603,7 @@ namespace osu.Game
         {
             int recentLogCount = 0;
 
-            const double debounce = 5000;
+            const double debounce = 60000;
 
             Logger.NewEntry += entry =>
             {
@@ -760,7 +775,7 @@ namespace osu.Game
             if (introScreen == null)
                 return true;
 
-            if (!introScreen.DidLoadMenu || !(screenStack.CurrentScreen is Intro))
+            if (!introScreen.DidLoadMenu || !(screenStack.CurrentScreen is IntroScreen))
             {
                 Scheduler.Add(introScreen.MakeCurrent);
                 return true;
@@ -795,7 +810,7 @@ namespace osu.Game
         {
             switch (newScreen)
             {
-                case Intro intro:
+                case IntroScreen intro:
                     introScreen = intro;
                     break;
 

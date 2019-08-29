@@ -26,6 +26,7 @@ namespace osu.Game.Overlays.SearchableList
 
         protected abstract Color4 BackgroundColour { get; }
         protected abstract T DefaultTab { get; }
+        protected abstract U DefaultCategory { get; }
         protected virtual Drawable CreateSupplementaryControls() => null;
 
         /// <summary>
@@ -109,6 +110,9 @@ namespace osu.Game.Overlays.SearchableList
 
             Tabs.Current.Value = DefaultTab;
             Tabs.Current.TriggerChange();
+
+            DisplayStyleControl.Dropdown.Current.Value = DefaultCategory;
+            DisplayStyleControl.Dropdown.Current.TriggerChange();
         }
 
         [BackgroundDependencyLoader]

@@ -78,10 +78,29 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
         public abstract bool OnPressed(TaikoAction action);
         public virtual bool OnReleased(TaikoAction action) => false;
 
+        public override double LifetimeStart
+        {
+            get => base.LifetimeStart;
+            set
+            {
+                base.LifetimeStart = value;
+                proxiedContent.LifetimeStart = value;
+            }
+        }
+
+        public override double LifetimeEnd
+        {
+            get => base.LifetimeEnd;
+            set
+            {
+                base.LifetimeEnd = value;
+                proxiedContent.LifetimeEnd = value;
+            }
+        }
+
         private class ProxiedContentContainer : Container
         {
-            public override double LifetimeStart => Parent?.LifetimeStart ?? base.LifetimeStart;
-            public override double LifetimeEnd => Parent?.LifetimeEnd ?? base.LifetimeEnd;
+            public override bool RemoveWhenNotAlive => false;
         }
     }
 

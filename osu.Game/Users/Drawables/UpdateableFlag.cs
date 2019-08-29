@@ -3,7 +3,6 @@
 
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Transforms;
 
 namespace osu.Game.Users.Drawables
 {
@@ -15,20 +14,15 @@ namespace osu.Game.Users.Drawables
             set => Model = value;
         }
 
-        protected override bool TransformImmediately { get; }
-
         /// <summary>
         /// Whether to show a place holder on null country.
         /// </summary>
         public bool ShowPlaceholderOnNull = true;
 
-        public UpdateableFlag(Country country = null, bool hideImmediately = false)
+        public UpdateableFlag(Country country = null)
         {
-            TransformImmediately = hideImmediately;
             Country = country;
         }
-
-        protected override TransformSequence<Drawable> ApplyHideTransforms(Drawable drawable) => TransformImmediately ? drawable?.FadeOut() : base.ApplyHideTransforms(drawable);
 
         protected override Drawable CreateDrawable(Country country)
         {
