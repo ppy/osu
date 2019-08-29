@@ -18,7 +18,9 @@ using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.UI;
+using osu.Game.Screens.Edit;
 using osu.Game.Screens.Edit.Components.RadioButtons;
+using osu.Game.Screens.Edit.Compose;
 using osu.Game.Screens.Edit.Compose.Components;
 
 namespace osu.Game.Rulesets.Edit
@@ -153,14 +155,6 @@ namespace osu.Game.Rulesets.Edit
         /// </summary>
         public virtual bool CursorInPlacementArea => DrawableRuleset.Playfield.ReceivePositionalInputAt(inputManager.CurrentState.Mouse.Position);
 
-        /// <summary>
-        /// Adds a <see cref="HitObject"/> to the <see cref="Beatmaps.Beatmap"/> and visualises it.
-        /// </summary>
-        /// <param name="hitObject">The <see cref="HitObject"/> to add.</param>
-        public void Add(HitObject hitObject) => blueprintContainer.AddBlueprintFor(DrawableRuleset.Add(hitObject));
-
-        public void Remove(HitObject hitObject) => blueprintContainer.RemoveBlueprintFor(DrawableRuleset.Remove(hitObject));
-
         internal abstract DrawableEditRuleset CreateDrawableRuleset();
 
         protected abstract IReadOnlyList<HitObjectCompositionTool> CompositionTools { get; }
@@ -177,17 +171,72 @@ namespace osu.Game.Rulesets.Edit
         public virtual SelectionHandler CreateSelectionHandler() => new SelectionHandler();
     }
 
-    public abstract class HitObjectComposer<TObject> : HitObjectComposer
+    [Cached(Type = typeof(IPlacementHandler))]
+    public abstract class HitObjectComposer<TObject> : HitObjectComposer, IPlacementHandler
         where TObject : HitObject
     {
+        private Beatmap<TObject> playableBeatmap;
+        private EditorBeatmap<TObject> editorBeatmap;
+        private IBeatmapProcessor beatmapProcessor;
+
         protected HitObjectComposer(Ruleset ruleset)
             : base(ruleset)
         {
+        }
+
+        protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
+        {
+            var workingBeatmap = parent.Get<IBindable<WorkingBeatmap>>();
+            playableBeatmap = (Beatmap<TObject>)workingBeatmap.Value.GetPlayableBeatmap(Ruleset.RulesetInfo, Array.Empty<Mod>());
+
+            beatmapProcessor = Ruleset.CreateBeatmapProcessor(playableBeatmap);
+
+            editorBeatmap = new EditorBeatmap<TObject>(playableBeatmap);
+            editorBeatmap.HitObjectAdded += addHitObject;
+            editorBeatmap.HitObjectRemoved += removeHitObject;
+
+            var dependencies = new DependencyContainer(parent);
+            dependencies.CacheAs<IEditorBeatmap>(editorBeatmap);
+            dependencies.CacheAs<IEditorBeatmap<TObject>>(editorBeatmap);
+
+            return base.CreateChildDependencies(dependencies);
+        }
+
+        private void addHitObject(HitObject hitObject)
+        {
+            beatmapProcessor?.PreProcess();
+            hitObject.ApplyDefaults(playableBeatmap.ControlPointInfo, playableBeatmap.BeatmapInfo.BaseDifficulty);
+            beatmapProcessor?.PostProcess();
+        }
+
+        private void removeHitObject(HitObject hitObject)
+        {
+            beatmapProcessor?.PreProcess();
+            beatmapProcessor?.PostProcess();
         }
 
         internal override DrawableEditRuleset CreateDrawableRuleset()
             => new DrawableEditRuleset<TObject>(CreateDrawableRuleset(Ruleset, Beatmap.Value, Array.Empty<Mod>()));
 
         protected abstract DrawableRuleset<TObject> CreateDrawableRuleset(Ruleset ruleset, WorkingBeatmap beatmap, IReadOnlyList<Mod> mods);
+
+        public void BeginPlacement(HitObject hitObject)
+        {
+        }
+
+        public void EndPlacement(HitObject hitObject) => editorBeatmap.Add(hitObject);
+
+        public void Delete(HitObject hitObject) => editorBeatmap.Remove(hitObject);
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+
+            if (editorBeatmap != null)
+            {
+                editorBeatmap.HitObjectAdded -= addHitObject;
+                editorBeatmap.HitObjectRemoved -= removeHitObject;
+            }
+        }
     }
 }

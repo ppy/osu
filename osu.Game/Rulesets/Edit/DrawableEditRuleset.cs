@@ -5,10 +5,9 @@ using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Objects;
-using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.UI;
+using osu.Game.Screens.Edit;
 
 namespace osu.Game.Rulesets.Edit
 {
@@ -25,20 +24,6 @@ namespace osu.Game.Rulesets.Edit
         {
             RelativeSizeAxes = Axes.Both;
         }
-
-        /// <summary>
-        /// Adds a <see cref="HitObject"/> to the <see cref="Beatmap"/> and displays a visual representation of it.
-        /// </summary>
-        /// <param name="hitObject">The <see cref="HitObject"/> to add.</param>
-        /// <returns>The visual representation of <paramref name="hitObject"/>.</returns>
-        internal abstract DrawableHitObject Add(HitObject hitObject);
-
-        /// <summary>
-        /// Removes a <see cref="HitObject"/> from the <see cref="Beatmap"/> and the display.
-        /// </summary>
-        /// <param name="hitObject">The <see cref="HitObject"/> to remove.</param>
-        /// <returns>The visual representation of the removed <paramref name="hitObject"/>.</returns>
-        internal abstract DrawableHitObject Remove(HitObject hitObject);
     }
 
     public class DrawableEditRuleset<TObject> : DrawableEditRuleset
@@ -48,10 +33,10 @@ namespace osu.Game.Rulesets.Edit
 
         public override PlayfieldAdjustmentContainer CreatePlayfieldAdjustmentContainer() => drawableRuleset.CreatePlayfieldAdjustmentContainer();
 
-        private Ruleset ruleset => drawableRuleset.Ruleset;
-        private Beatmap<TObject> beatmap => drawableRuleset.Beatmap;
-
         private readonly DrawableRuleset<TObject> drawableRuleset;
+
+        [Resolved]
+        private IEditorBeatmap<TObject> beatmap { get; set; }
 
         public DrawableEditRuleset(DrawableRuleset<TObject> drawableRuleset)
         {
@@ -67,50 +52,39 @@ namespace osu.Game.Rulesets.Edit
             Playfield.DisplayJudgements.Value = false;
         }
 
-        internal override DrawableHitObject Add(HitObject hitObject)
+        protected override void LoadComplete()
         {
-            var tObject = (TObject)hitObject;
+            base.LoadComplete();
 
-            // Add to beatmap, preserving sorting order
-            var insertionIndex = beatmap.HitObjects.FindLastIndex(h => h.StartTime <= hitObject.StartTime);
-            beatmap.HitObjects.Insert(insertionIndex + 1, tObject);
+            beatmap.HitObjectAdded += addHitObject;
+            beatmap.HitObjectRemoved += removeHitObject;
+        }
 
-            // Process object
-            var processor = ruleset.CreateBeatmapProcessor(beatmap);
-
-            processor?.PreProcess();
-            tObject.ApplyDefaults(beatmap.ControlPointInfo, beatmap.BeatmapInfo.BaseDifficulty);
-            processor?.PostProcess();
-
-            // Add visual representation
-            var drawableObject = drawableRuleset.CreateDrawableRepresentation(tObject);
+        private void addHitObject(HitObject hitObject)
+        {
+            var drawableObject = drawableRuleset.CreateDrawableRepresentation((TObject)hitObject);
 
             drawableRuleset.Playfield.Add(drawableObject);
             drawableRuleset.Playfield.PostProcess();
-
-            return drawableObject;
         }
 
-        internal override DrawableHitObject Remove(HitObject hitObject)
+        private void removeHitObject(HitObject hitObject)
         {
-            var tObject = (TObject)hitObject;
-
-            // Remove from beatmap
-            beatmap.HitObjects.Remove(tObject);
-
-            // Process the beatmap
-            var processor = ruleset.CreateBeatmapProcessor(beatmap);
-
-            processor?.PreProcess();
-            processor?.PostProcess();
-
-            // Remove visual representation
             var drawableObject = Playfield.AllHitObjects.Single(d => d.HitObject == hitObject);
 
             drawableRuleset.Playfield.Remove(drawableObject);
             drawableRuleset.Playfield.PostProcess();
+        }
 
-            return drawableObject;
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+
+            if (beatmap != null)
+            {
+                beatmap.HitObjectAdded -= addHitObject;
+                beatmap.HitObjectRemoved -= removeHitObject;
+            }
         }
     }
 }
