@@ -177,6 +177,7 @@ namespace osu.Game.Rulesets.Edit
     {
         private Beatmap<TObject> playableBeatmap;
         private EditorBeatmap<TObject> editorBeatmap;
+        private IBeatmapProcessor beatmapProcessor;
 
         protected HitObjectComposer(Ruleset ruleset)
             : base(ruleset)
@@ -187,6 +188,8 @@ namespace osu.Game.Rulesets.Edit
         {
             var workingBeatmap = parent.Get<IBindable<WorkingBeatmap>>();
             playableBeatmap = (Beatmap<TObject>)workingBeatmap.Value.GetPlayableBeatmap(Ruleset.RulesetInfo, Array.Empty<Mod>());
+
+            beatmapProcessor = Ruleset.CreateBeatmapProcessor(playableBeatmap);
 
             editorBeatmap = new EditorBeatmap<TObject>(playableBeatmap);
             editorBeatmap.HitObjectAdded += addHitObject;
@@ -201,19 +204,15 @@ namespace osu.Game.Rulesets.Edit
 
         private void addHitObject(HitObject hitObject)
         {
-            var processor = Ruleset.CreateBeatmapProcessor(playableBeatmap);
-
-            processor?.PreProcess();
+            beatmapProcessor?.PreProcess();
             hitObject.ApplyDefaults(playableBeatmap.ControlPointInfo, playableBeatmap.BeatmapInfo.BaseDifficulty);
-            processor?.PostProcess();
+            beatmapProcessor?.PostProcess();
         }
 
         private void removeHitObject(HitObject hitObject)
         {
-            var processor = Ruleset.CreateBeatmapProcessor(playableBeatmap);
-
-            processor?.PreProcess();
-            processor?.PostProcess();
+            beatmapProcessor?.PreProcess();
+            beatmapProcessor?.PostProcess();
         }
 
         internal override DrawableEditRuleset CreateDrawableRuleset()
