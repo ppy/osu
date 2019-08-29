@@ -14,6 +14,7 @@ using osu.Framework.Audio.Sample;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Textures;
+using osu.Framework.IO.Stores;
 using osu.Framework.Platform;
 using osu.Game.Audio;
 using osu.Game.Database;
@@ -25,6 +26,8 @@ namespace osu.Game.Skinning
     {
         private readonly AudioManager audio;
 
+        private readonly IResourceStore<byte[]> legacyDefaultResources;
+
         public readonly Bindable<Skin> CurrentSkin = new Bindable<Skin>(new DefaultSkin());
         public readonly Bindable<SkinInfo> CurrentSkinInfo = new Bindable<SkinInfo>(SkinInfo.Default) { Default = SkinInfo.Default };
 
@@ -34,10 +37,11 @@ namespace osu.Game.Skinning
 
         protected override string ImportFromStablePath => "Skins";
 
-        public SkinManager(Storage storage, DatabaseContextFactory contextFactory, IIpcHost importHost, AudioManager audio)
+        public SkinManager(Storage storage, DatabaseContextFactory contextFactory, IIpcHost importHost, AudioManager audio, IResourceStore<byte[]> legacyDefaultResources)
             : base(storage, contextFactory, new SkinStore(contextFactory, storage), importHost)
         {
             this.audio = audio;
+            this.legacyDefaultResources = legacyDefaultResources;
 
             ItemRemoved += removedInfo =>
             {
@@ -56,6 +60,9 @@ namespace osu.Game.Skinning
             };
         }
 
+        private Skin createIfNotExisting(SkinInfo skinInfo) =>
+            GetSkin(Query(s => s.Name == skinInfo.Name) ?? Import(skinInfo).Result);
+
         protected override bool ShouldDeleteArchive(string path) => Path.GetExtension(path)?.ToLowerInvariant() == ".osk";
 
         /// <summary>
@@ -66,6 +73,7 @@ namespace osu.Game.Skinning
         {
             var userSkins = GetAllUserSkins();
             userSkins.Insert(0, SkinInfo.Default);
+            userSkins.Insert(1, DefaultLegacySkin.Info);
             return userSkins;
         }
 
@@ -91,7 +99,7 @@ namespace osu.Game.Skinning
             else
             {
                 model.Name = model.Name.Replace(".osk", "");
-                model.Creator = "Unknown";
+                model.Creator = model.Creator ?? "Unknown";
             }
         }
 
@@ -102,8 +110,14 @@ namespace osu.Game.Skinning
         /// <returns>A <see cref="Skin"/> instance correlating to the provided <see cref="SkinInfo"/>.</returns>
         public Skin GetSkin(SkinInfo skinInfo)
         {
+            if (skinInfo == null)
+                return null;
+
             if (skinInfo == SkinInfo.Default)
                 return new DefaultSkin();
+
+            if (skinInfo == DefaultLegacySkin.Info)
+                return new DefaultLegacySkin(legacyDefaultResources, audio);
 
             return new LegacySkin(skinInfo, Files.Store, audio);
         }
