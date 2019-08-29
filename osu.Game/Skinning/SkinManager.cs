@@ -15,6 +15,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Platform;
+using osu.Game.Audio;
 using osu.Game.Database;
 using osu.Game.IO.Archives;
 
@@ -120,7 +121,7 @@ namespace osu.Game.Skinning
 
         public Texture GetTexture(string componentName) => CurrentSkin.Value.GetTexture(componentName);
 
-        public SampleChannel GetSample(string sampleName) => CurrentSkin.Value.GetSample(sampleName);
+        public SampleChannel GetSample(ISampleInfo sampleInfo) => CurrentSkin.Value.GetSample(sampleInfo);
 
         public TValue GetValue<TConfiguration, TValue>(Func<TConfiguration, TValue> query) where TConfiguration : SkinConfiguration => CurrentSkin.Value.GetValue(query);
     }
