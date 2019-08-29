@@ -11,36 +11,24 @@ using osu.Game.Screens.Edit;
 
 namespace osu.Game.Rulesets.Edit
 {
-    public abstract class DrawableEditRuleset : CompositeDrawable
-    {
-        /// <summary>
-        /// The <see cref="Playfield"/> contained by this <see cref="DrawableEditRuleset"/>.
-        /// </summary>
-        public abstract Playfield Playfield { get; }
-
-        public abstract PlayfieldAdjustmentContainer CreatePlayfieldAdjustmentContainer();
-
-        internal DrawableEditRuleset()
-        {
-            RelativeSizeAxes = Axes.Both;
-        }
-    }
-
-    public class DrawableEditRuleset<TObject> : DrawableEditRuleset
+    /// <summary>
+    /// A wrapper for a <see cref="DrawableRuleset{TObject}"/>. Handles adding visual representations of <see cref="HitObject"/>s to the underlying <see cref="DrawableRuleset{TObject}"/>.
+    /// </summary>
+    internal class DrawableEditRulesetWrapper<TObject> : CompositeDrawable
         where TObject : HitObject
     {
-        public override Playfield Playfield => drawableRuleset.Playfield;
-
-        public override PlayfieldAdjustmentContainer CreatePlayfieldAdjustmentContainer() => drawableRuleset.CreatePlayfieldAdjustmentContainer();
+        public Playfield Playfield => drawableRuleset.Playfield;
 
         private readonly DrawableRuleset<TObject> drawableRuleset;
 
         [Resolved]
         private IEditorBeatmap<TObject> beatmap { get; set; }
 
-        public DrawableEditRuleset(DrawableRuleset<TObject> drawableRuleset)
+        public DrawableEditRulesetWrapper(DrawableRuleset<TObject> drawableRuleset)
         {
             this.drawableRuleset = drawableRuleset;
+
+            RelativeSizeAxes = Axes.Both;
 
             InternalChild = drawableRuleset;
         }
@@ -75,6 +63,8 @@ namespace osu.Game.Rulesets.Edit
             drawableRuleset.Playfield.Remove(drawableObject);
             drawableRuleset.Playfield.PostProcess();
         }
+
+        public PlayfieldAdjustmentContainer CreatePlayfieldAdjustmentContainer() => drawableRuleset.CreatePlayfieldAdjustmentContainer();
 
         protected override void Dispose(bool isDisposing)
         {
