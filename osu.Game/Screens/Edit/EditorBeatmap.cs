@@ -45,6 +45,10 @@ namespace osu.Game.Screens.Edit
 
         public IBeatmap Clone() => (EditorBeatmap<T>)MemberwiseClone();
 
+        /// <summary>
+        /// Adds a <see cref="HitObject"/> to this <see cref="EditorBeatmap{T}"/>.
+        /// </summary>
+        /// <param name="hitObject">The <see cref="HitObject"/> to add.</param>
         public void Add(T hitObject)
         {
             // Preserve existing sorting order in the beatmap
@@ -54,14 +58,26 @@ namespace osu.Game.Screens.Edit
             HitObjectAdded?.Invoke(hitObject);
         }
 
+        /// <summary>
+        /// Removes a <see cref="HitObject"/> from this <see cref="EditorBeatmap{T}"/>.
+        /// </summary>
+        /// <param name="hitObject">The <see cref="HitObject"/> to add.</param>
         public void Remove(T hitObject)
         {
             if (beatmap.HitObjects.Remove(hitObject))
                 HitObjectRemoved?.Invoke(hitObject);
         }
 
+        /// <summary>
+        /// Adds a <see cref="HitObject"/> to this <see cref="EditorBeatmap{T}"/>.
+        /// </summary>
+        /// <param name="hitObject">The <see cref="HitObject"/> to add.</param>
         public void Add(HitObject hitObject) => Add((T)hitObject);
 
+        /// <summary>
+        /// Removes a <see cref="HitObject"/> from this <see cref="EditorBeatmap{T}"/>.
+        /// </summary>
+        /// <param name="hitObject">The <see cref="HitObject"/> to add.</param>
         public void Remove(HitObject hitObject) => Remove((T)hitObject);
     }
 }
