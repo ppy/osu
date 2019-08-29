@@ -61,7 +61,7 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables.Pieces
                 Name = "Top",
                 RelativeSizeAxes = Axes.Both,
                 Height = 0.5f,
-                Blending = BlendingMode.Additive,
+                Blending = BlendingParameters.Additive,
                 Colour = ColourInfo.GradientVertical(Color4.Transparent, Color4.White.Opacity(alpha))
             },
             new Box
@@ -71,7 +71,7 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables.Pieces
                 Origin = Anchor.BottomLeft,
                 RelativeSizeAxes = Axes.Both,
                 Height = 0.5f,
-                Blending = BlendingMode.Additive,
+                Blending = BlendingParameters.Additive,
                 Colour = ColourInfo.GradientVertical(Color4.White.Opacity(alpha), Color4.Transparent)
             }
         };

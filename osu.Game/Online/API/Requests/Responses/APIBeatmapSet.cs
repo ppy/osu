@@ -30,6 +30,9 @@ namespace osu.Game.Online.API.Requests.Responses
         [JsonProperty(@"preview_url")]
         private string preview { get; set; }
 
+        [JsonProperty(@"has_favourited")]
+        private bool hasFavourited { get; set; }
+
         [JsonProperty(@"play_count")]
         private int playCount { get; set; }
 
@@ -97,6 +100,7 @@ namespace osu.Game.Online.API.Requests.Responses
                     Ranked = ranked,
                     LastUpdated = lastUpdated,
                     Availability = availability,
+                    HasFavourited = hasFavourited,
                     Genre = genre,
                     Language = language
                 },

@@ -4,12 +4,10 @@
 using System;
 using System.Linq;
 using osu.Framework.Graphics.Sprites;
-using osu.Game.Rulesets.Objects;
 
 namespace osu.Game.Rulesets.Mods
 {
-    public class ModWindUp<T> : ModTimeRamp<T>
-        where T : HitObject
+    public class ModWindUp : ModTimeRamp
     {
         public override string Name => "Wind Up";
         public override string Acronym => "WU";
@@ -19,6 +17,6 @@ namespace osu.Game.Rulesets.Mods
 
         protected override double FinalRateAdjustment => 0.5;
 
-        public override Type[] IncompatibleMods => base.IncompatibleMods.Append(typeof(ModWindDown<T>)).ToArray();
+        public override Type[] IncompatibleMods => base.IncompatibleMods.Append(typeof(ModWindDown)).ToArray();
     }
 }

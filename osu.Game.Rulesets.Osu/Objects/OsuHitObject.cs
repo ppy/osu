@@ -12,7 +12,7 @@ namespace osu.Game.Rulesets.Osu.Objects
 {
     public abstract class OsuHitObject : HitObject, IHasComboInformation, IHasPosition
     {
-        public const double OBJECT_RADIUS = 64;
+        public const float OBJECT_RADIUS = 64;
 
         public double TimePreempt = 600;
         public double TimeFadeIn = 400;
@@ -69,7 +69,7 @@ namespace osu.Game.Rulesets.Osu.Objects
             base.ApplyDefaultsToSelf(controlPointInfo, difficulty);
 
             TimePreempt = (float)BeatmapDifficulty.DifficultyRange(difficulty.ApproachRate, 1800, 1200, 450);
-            TimeFadeIn = (float)BeatmapDifficulty.DifficultyRange(difficulty.ApproachRate, 1200, 800, 300);
+            TimeFadeIn = 400; // as per osu-stable
 
             Scale = (1.0f - 0.7f * (difficulty.CircleSize - 5) / 5) / 2;
         }

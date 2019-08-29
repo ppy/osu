@@ -12,14 +12,19 @@ namespace osu.Game.Rulesets.UI.Scrolling
 {
     public class ScrollingHitObjectContainer : HitObjectContainer
     {
-        private readonly IBindable<double> timeRange = new BindableDouble();
+        /// <summary>
+        /// A multiplier applied to the length of the scrolling area to determine a safe default lifetime end for hitobjects.
+        /// This is only used to limit the lifetime end within reason, as proper lifetime management should be implemented on hitobjects themselves.
+        /// </summary>
+        private const float safe_lifetime_end_multiplier = 2;
 
+        private readonly IBindable<double> timeRange = new BindableDouble();
         private readonly IBindable<ScrollingDirection> direction = new Bindable<ScrollingDirection>();
 
         [Resolved]
         private IScrollingInfo scrollingInfo { get; set; }
 
-        private Cached initialStateCache = new Cached();
+        private readonly Cached initialStateCache = new Cached();
 
         public ScrollingHitObjectContainer()
         {
@@ -88,23 +93,28 @@ namespace osu.Game.Rulesets.UI.Scrolling
 
         private void computeInitialStateRecursive(DrawableHitObject hitObject)
         {
-            hitObject.LifetimeStart = scrollingInfo.Algorithm.GetDisplayStartTime(hitObject.HitObject.StartTime, timeRange.Value);
+            double endTime = hitObject.HitObject.StartTime;
 
-            if (hitObject.HitObject is IHasEndTime endTime)
+            if (hitObject.HitObject is IHasEndTime e)
             {
+                endTime = e.EndTime;
+
                 switch (direction.Value)
                 {
                     case ScrollingDirection.Up:
                     case ScrollingDirection.Down:
-                        hitObject.Height = scrollingInfo.Algorithm.GetLength(hitObject.HitObject.StartTime, endTime.EndTime, timeRange.Value, scrollLength);
+                        hitObject.Height = scrollingInfo.Algorithm.GetLength(hitObject.HitObject.StartTime, endTime, timeRange.Value, scrollLength);
                         break;
 
                     case ScrollingDirection.Left:
                     case ScrollingDirection.Right:
-                        hitObject.Width = scrollingInfo.Algorithm.GetLength(hitObject.HitObject.StartTime, endTime.EndTime, timeRange.Value, scrollLength);
+                        hitObject.Width = scrollingInfo.Algorithm.GetLength(hitObject.HitObject.StartTime, endTime, timeRange.Value, scrollLength);
                         break;
                 }
             }
+
+            hitObject.LifetimeStart = scrollingInfo.Algorithm.GetDisplayStartTime(hitObject.HitObject.StartTime, timeRange.Value);
+            hitObject.LifetimeEnd = scrollingInfo.Algorithm.TimeAt(scrollLength * safe_lifetime_end_multiplier, endTime, timeRange.Value, scrollLength);
 
             foreach (var obj in hitObject.NestedHitObjects)
             {

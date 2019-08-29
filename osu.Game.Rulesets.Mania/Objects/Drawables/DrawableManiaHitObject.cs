@@ -45,20 +45,8 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
         {
             Anchor = Origin = e.NewValue == ScrollingDirection.Up ? Anchor.TopCentre : Anchor.BottomCentre;
         }
-    }
 
-    public abstract class DrawableManiaHitObject<TObject> : DrawableManiaHitObject
-        where TObject : ManiaHitObject
-    {
-        public new readonly TObject HitObject;
-
-        protected DrawableManiaHitObject(TObject hitObject)
-            : base(hitObject)
-        {
-            HitObject = hitObject;
-        }
-
-        protected override void UpdateState(ArmedState state)
+        protected override void UpdateStateTransforms(ArmedState state)
         {
             switch (state)
             {
@@ -70,6 +58,18 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
                     this.FadeOut(150, Easing.OutQuint).Expire();
                     break;
             }
+        }
+    }
+
+    public abstract class DrawableManiaHitObject<TObject> : DrawableManiaHitObject
+        where TObject : ManiaHitObject
+    {
+        public new readonly TObject HitObject;
+
+        protected DrawableManiaHitObject(TObject hitObject)
+            : base(hitObject)
+        {
+            HitObject = hitObject;
         }
     }
 }

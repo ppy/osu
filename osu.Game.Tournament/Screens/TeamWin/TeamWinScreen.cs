@@ -45,7 +45,7 @@ namespace osu.Game.Tournament.Screens.TeamWin
                     RelativeSizeAxes = Axes.Both,
                     Loop = true,
                 },
-                new TournamentLogo
+                new TournamentLogo(false)
                 {
                     Y = 40,
                 },

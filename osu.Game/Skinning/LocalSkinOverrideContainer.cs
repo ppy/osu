@@ -8,6 +8,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Textures;
+using osu.Game.Audio;
 using osu.Game.Configuration;
 
 namespace osu.Game.Skinning
@@ -34,7 +35,7 @@ namespace osu.Game.Skinning
         public Drawable GetDrawableComponent(string componentName)
         {
             Drawable sourceDrawable;
-            if (beatmapSkins.Value && (sourceDrawable = skin.GetDrawableComponent(componentName)) != null)
+            if (beatmapSkins.Value && (sourceDrawable = skin?.GetDrawableComponent(componentName)) != null)
                 return sourceDrawable;
 
             return fallbackSource?.GetDrawableComponent(componentName);
@@ -43,19 +44,19 @@ namespace osu.Game.Skinning
         public Texture GetTexture(string componentName)
         {
             Texture sourceTexture;
-            if (beatmapSkins.Value && (sourceTexture = skin.GetTexture(componentName)) != null)
+            if (beatmapSkins.Value && (sourceTexture = skin?.GetTexture(componentName)) != null)
                 return sourceTexture;
 
             return fallbackSource.GetTexture(componentName);
         }
 
-        public SampleChannel GetSample(string sampleName)
+        public SampleChannel GetSample(ISampleInfo sampleInfo)
         {
             SampleChannel sourceChannel;
-            if (beatmapHitsounds.Value && (sourceChannel = skin.GetSample(sampleName)) != null)
+            if (beatmapHitsounds.Value && (sourceChannel = skin?.GetSample(sampleInfo)) != null)
                 return sourceChannel;
 
-            return fallbackSource?.GetSample(sampleName);
+            return fallbackSource?.GetSample(sampleInfo);
         }
 
         public TValue GetValue<TConfiguration, TValue>(Func<TConfiguration, TValue> query) where TConfiguration : SkinConfiguration

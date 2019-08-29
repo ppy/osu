@@ -32,7 +32,7 @@ namespace osu.Game.Rulesets
         public RulesetStore(IDatabaseContextFactory factory)
             : base(factory)
         {
-            AddMissingRulesets();
+            addMissingRulesets();
         }
 
         /// <summary>
@@ -52,13 +52,13 @@ namespace osu.Game.Rulesets
         /// <summary>
         /// All available rulesets.
         /// </summary>
-        public IEnumerable<RulesetInfo> AvailableRulesets;
+        public IEnumerable<RulesetInfo> AvailableRulesets { get; private set; }
 
         private static Assembly currentDomain_AssemblyResolve(object sender, ResolveEventArgs args) => loaded_assemblies.Keys.FirstOrDefault(a => a.FullName == args.Name);
 
         private const string ruleset_library_prefix = "osu.Game.Rulesets";
 
-        protected void AddMissingRulesets()
+        private void addMissingRulesets()
         {
             using (var usage = ContextFactory.GetForWrite())
             {

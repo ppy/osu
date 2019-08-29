@@ -256,9 +256,12 @@ namespace osu.Game.Screens.Ranking
                 }
             };
 
-            foreach (var t in CreateResultPages())
-                modeChangeButtons.AddItem(t);
-            modeChangeButtons.Current.Value = modeChangeButtons.Items.FirstOrDefault();
+            var pages = CreateResultPages();
+
+            foreach (var p in pages)
+                modeChangeButtons.AddItem(p);
+
+            modeChangeButtons.Current.Value = pages.FirstOrDefault();
 
             modeChangeButtons.Current.BindValueChanged(page =>
             {
