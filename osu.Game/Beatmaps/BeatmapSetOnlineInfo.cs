@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.ComponentModel;
 using Newtonsoft.Json;
 
 namespace osu.Game.Beatmaps
