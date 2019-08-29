@@ -33,7 +33,7 @@ namespace osu.Game.Rulesets.Edit
 
         protected readonly Ruleset Ruleset;
 
-        private IBindable<WorkingBeatmap> workingBeatmap;
+        private IWorkingBeatmap workingBeatmap;
         private Beatmap<TObject> playableBeatmap;
         private EditorBeatmap<TObject> editorBeatmap;
         private IBeatmapProcessor beatmapProcessor;
@@ -55,7 +55,7 @@ namespace osu.Game.Rulesets.Edit
         {
             try
             {
-                drawableRulesetWrapper = new DrawableEditRulesetWrapper<TObject>(CreateDrawableRuleset(Ruleset, workingBeatmap.Value, Array.Empty<Mod>()))
+                drawableRulesetWrapper = new DrawableEditRulesetWrapper<TObject>(CreateDrawableRuleset(Ruleset, workingBeatmap, Array.Empty<Mod>()))
                 {
                     Clock = framedClock
                 };
@@ -122,8 +122,10 @@ namespace osu.Game.Rulesets.Edit
 
         protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
         {
-            workingBeatmap = parent.Get<IBindable<WorkingBeatmap>>().GetBoundCopy();
-            playableBeatmap = (Beatmap<TObject>)workingBeatmap.Value.GetPlayableBeatmap(Ruleset.RulesetInfo, Array.Empty<Mod>());
+            var parentWorkingBeatmap = parent.Get<IBindable<WorkingBeatmap>>().Value;
+
+            playableBeatmap = (Beatmap<TObject>)parentWorkingBeatmap.GetPlayableBeatmap(Ruleset.RulesetInfo, Array.Empty<Mod>());
+            workingBeatmap = new EditorWorkingBeatmap<TObject>(playableBeatmap, parentWorkingBeatmap);
 
             beatmapProcessor = Ruleset.CreateBeatmapProcessor(playableBeatmap);
 
@@ -178,7 +180,7 @@ namespace osu.Game.Rulesets.Edit
 
         protected abstract IReadOnlyList<HitObjectCompositionTool> CompositionTools { get; }
 
-        protected abstract DrawableRuleset<TObject> CreateDrawableRuleset(Ruleset ruleset, WorkingBeatmap beatmap, IReadOnlyList<Mod> mods);
+        protected abstract DrawableRuleset<TObject> CreateDrawableRuleset(Ruleset ruleset, IWorkingBeatmap beatmap, IReadOnlyList<Mod> mods);
 
         public void BeginPlacement(HitObject hitObject)
         {
