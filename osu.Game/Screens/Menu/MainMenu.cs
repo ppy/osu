@@ -108,7 +108,6 @@ namespace osu.Game.Screens.Menu
         {
             this.Push(songSelect);
             songSelect = null;
-
         }
 
         public override void OnEntering(IScreen last)
