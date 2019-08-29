@@ -60,7 +60,7 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawable
 
         protected sealed override double InitialLifetimeOffset => HitObject.TimePreempt;
 
-        protected override void UpdateInitialTransforms() => this.FadeIn(200);
+        protected override void UpdateInitialTransforms() => this.FadeInFromZero(200);
 
         protected override void UpdateStateTransforms(ArmedState state)
         {
