@@ -20,6 +20,7 @@ using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.UI;
 using osu.Game.Screens.Edit;
 using osu.Game.Screens.Edit.Components.RadioButtons;
+using osu.Game.Screens.Edit.Compose;
 using osu.Game.Screens.Edit.Compose.Components;
 
 namespace osu.Game.Rulesets.Edit
@@ -154,14 +155,6 @@ namespace osu.Game.Rulesets.Edit
         /// </summary>
         public virtual bool CursorInPlacementArea => DrawableRuleset.Playfield.ReceivePositionalInputAt(inputManager.CurrentState.Mouse.Position);
 
-        /// <summary>
-        /// Adds a <see cref="HitObject"/> to the <see cref="Beatmaps.Beatmap"/> and visualises it.
-        /// </summary>
-        /// <param name="hitObject">The <see cref="HitObject"/> to add.</param>
-        public void Add(HitObject hitObject) => blueprintContainer.AddBlueprintFor(DrawableRuleset.Add(hitObject));
-
-        public void Remove(HitObject hitObject) => blueprintContainer.RemoveBlueprintFor(DrawableRuleset.Remove(hitObject));
-
         internal abstract DrawableEditRuleset CreateDrawableRuleset();
 
         protected abstract IReadOnlyList<HitObjectCompositionTool> CompositionTools { get; }
@@ -178,9 +171,16 @@ namespace osu.Game.Rulesets.Edit
         public virtual SelectionHandler CreateSelectionHandler() => new SelectionHandler();
     }
 
-    public abstract class HitObjectComposer<TObject> : HitObjectComposer
+    [Cached(Type = typeof(IPlacementHandler))]
+    public abstract class HitObjectComposer<TObject> : HitObjectComposer, IPlacementHandler
         where TObject : HitObject
     {
+        private Beatmap<TObject> playableBeatmap;
+
+        [Cached]
+        [Cached(typeof(IEditorBeatmap))]
+        private EditorBeatmap<TObject> editorBeatmap;
+
         protected HitObjectComposer(Ruleset ruleset)
             : base(ruleset)
         {
@@ -189,19 +189,55 @@ namespace osu.Game.Rulesets.Edit
         protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
         {
             var workingBeatmap = parent.Get<IBindable<WorkingBeatmap>>();
-            var playableBeatmap = (Beatmap<TObject>)workingBeatmap.Value.GetPlayableBeatmap(Ruleset.RulesetInfo, Array.Empty<Mod>());
-            var editorBeatmap = new EditorBeatmap<TObject>(playableBeatmap);
+            playableBeatmap = (Beatmap<TObject>)workingBeatmap.Value.GetPlayableBeatmap(Ruleset.RulesetInfo, Array.Empty<Mod>());
 
-            var dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
-            dependencies.CacheAs(editorBeatmap);
-            dependencies.CacheAs<IEditorBeatmap>(editorBeatmap);
+            editorBeatmap = new EditorBeatmap<TObject>(playableBeatmap);
+            editorBeatmap.HitObjectAdded += addHitObject;
+            editorBeatmap.HitObjectRemoved += removeHitObject;
 
-            return dependencies;
+            return base.CreateChildDependencies(parent);
+        }
+
+        private void addHitObject(HitObject hitObject)
+        {
+            // Process object
+            var processor = Ruleset.CreateBeatmapProcessor(playableBeatmap);
+
+            processor?.PreProcess();
+            hitObject.ApplyDefaults(playableBeatmap.ControlPointInfo, playableBeatmap.BeatmapInfo.BaseDifficulty);
+            processor?.PostProcess();
+        }
+
+        private void removeHitObject(HitObject hitObject)
+        {
+            var processor = Ruleset.CreateBeatmapProcessor(playableBeatmap);
+
+            processor?.PreProcess();
+            processor?.PostProcess();
         }
 
         internal override DrawableEditRuleset CreateDrawableRuleset()
             => new DrawableEditRuleset<TObject>(CreateDrawableRuleset(Ruleset, Beatmap.Value, Array.Empty<Mod>()));
 
         protected abstract DrawableRuleset<TObject> CreateDrawableRuleset(Ruleset ruleset, WorkingBeatmap beatmap, IReadOnlyList<Mod> mods);
+
+        public void BeginPlacement(HitObject hitObject)
+        {
+        }
+
+        public void EndPlacement(HitObject hitObject) => editorBeatmap.Add(hitObject);
+
+        public void Delete(HitObject hitObject) => editorBeatmap.Remove(hitObject);
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+
+            if (editorBeatmap != null)
+            {
+                editorBeatmap.HitObjectAdded -= addHitObject;
+                editorBeatmap.HitObjectRemoved -= removeHitObject;
+            }
+        }
     }
 }
