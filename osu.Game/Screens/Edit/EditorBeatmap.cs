@@ -10,7 +10,7 @@ using osu.Game.Rulesets.Objects;
 
 namespace osu.Game.Screens.Edit
 {
-    public class EditorBeatmap<T> : IBeatmap<T>, IEditorBeatmap
+    public class EditorBeatmap<T> : IEditorBeatmap<T>
         where T : HitObject
     {
         public event Action<HitObject> HitObjectAdded;

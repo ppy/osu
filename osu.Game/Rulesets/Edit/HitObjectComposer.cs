@@ -176,9 +176,6 @@ namespace osu.Game.Rulesets.Edit
         where TObject : HitObject
     {
         private Beatmap<TObject> playableBeatmap;
-
-        [Cached]
-        [Cached(typeof(IEditorBeatmap))]
         private EditorBeatmap<TObject> editorBeatmap;
 
         protected HitObjectComposer(Ruleset ruleset)
@@ -195,7 +192,11 @@ namespace osu.Game.Rulesets.Edit
             editorBeatmap.HitObjectAdded += addHitObject;
             editorBeatmap.HitObjectRemoved += removeHitObject;
 
-            return base.CreateChildDependencies(parent);
+            var dependencies = new DependencyContainer(parent);
+            dependencies.CacheAs<IEditorBeatmap>(editorBeatmap);
+            dependencies.CacheAs<IEditorBeatmap<TObject>>(editorBeatmap);
+
+            return base.CreateChildDependencies(dependencies);
         }
 
         private void addHitObject(HitObject hitObject)
