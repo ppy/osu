@@ -18,6 +18,7 @@ using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.UI;
+using osu.Game.Screens.Edit;
 using osu.Game.Screens.Edit.Components.RadioButtons;
 using osu.Game.Screens.Edit.Compose.Components;
 
@@ -183,6 +184,19 @@ namespace osu.Game.Rulesets.Edit
         protected HitObjectComposer(Ruleset ruleset)
             : base(ruleset)
         {
+        }
+
+        protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
+        {
+            var workingBeatmap = parent.Get<IBindable<WorkingBeatmap>>();
+            var playableBeatmap = (Beatmap<TObject>)workingBeatmap.Value.GetPlayableBeatmap(Ruleset.RulesetInfo, Array.Empty<Mod>());
+            var editorBeatmap = new EditorBeatmap<TObject>(playableBeatmap);
+
+            var dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
+            dependencies.CacheAs(editorBeatmap);
+            dependencies.CacheAs<IEditorBeatmap>(editorBeatmap);
+
+            return dependencies;
         }
 
         internal override DrawableEditRuleset CreateDrawableRuleset()
