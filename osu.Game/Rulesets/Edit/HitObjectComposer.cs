@@ -30,7 +30,6 @@ namespace osu.Game.Rulesets.Edit
         where TObject : HitObject
     {
         protected IRulesetConfigManager Config { get; private set; }
-        protected DrawableEditRuleset DrawableRuleset { get; private set; }
 
         protected readonly Ruleset Ruleset;
 
@@ -39,6 +38,7 @@ namespace osu.Game.Rulesets.Edit
         private EditorBeatmap<TObject> editorBeatmap;
         private IBeatmapProcessor beatmapProcessor;
 
+        private DrawableEditRuleset<TObject> drawableRuleset;
         private BlueprintContainer blueprintContainer;
         private readonly List<Container> layerContainers = new List<Container>();
 
@@ -55,7 +55,7 @@ namespace osu.Game.Rulesets.Edit
         {
             try
             {
-                DrawableRuleset = new DrawableEditRuleset<TObject>(CreateDrawableRuleset(Ruleset, workingBeatmap.Value, Array.Empty<Mod>()))
+                drawableRuleset = new DrawableEditRuleset<TObject>(CreateDrawableRuleset(Ruleset, workingBeatmap.Value, Array.Empty<Mod>()))
                 {
                     Clock = framedClock
                 };
@@ -66,10 +66,10 @@ namespace osu.Game.Rulesets.Edit
                 return;
             }
 
-            var layerBelowRuleset = DrawableRuleset.CreatePlayfieldAdjustmentContainer();
+            var layerBelowRuleset = drawableRuleset.CreatePlayfieldAdjustmentContainer();
             layerBelowRuleset.Child = new EditorPlayfieldBorder { RelativeSizeAxes = Axes.Both };
 
-            var layerAboveRuleset = DrawableRuleset.CreatePlayfieldAdjustmentContainer();
+            var layerAboveRuleset = drawableRuleset.CreatePlayfieldAdjustmentContainer();
             layerAboveRuleset.Child = blueprintContainer = new BlueprintContainer();
 
             layerContainers.Add(layerBelowRuleset);
@@ -100,7 +100,7 @@ namespace osu.Game.Rulesets.Edit
                             Children = new Drawable[]
                             {
                                 layerBelowRuleset,
-                                DrawableRuleset,
+                                drawableRuleset,
                                 layerAboveRuleset
                             }
                         }
@@ -153,10 +153,10 @@ namespace osu.Game.Rulesets.Edit
 
             layerContainers.ForEach(l =>
             {
-                l.Anchor = DrawableRuleset.Playfield.Anchor;
-                l.Origin = DrawableRuleset.Playfield.Origin;
-                l.Position = DrawableRuleset.Playfield.Position;
-                l.Size = DrawableRuleset.Playfield.Size;
+                l.Anchor = drawableRuleset.Playfield.Anchor;
+                l.Origin = drawableRuleset.Playfield.Origin;
+                l.Position = drawableRuleset.Playfield.Position;
+                l.Size = drawableRuleset.Playfield.Size;
             });
         }
 
@@ -173,8 +173,8 @@ namespace osu.Game.Rulesets.Edit
             beatmapProcessor?.PostProcess();
         }
 
-        public override IEnumerable<DrawableHitObject> HitObjects => DrawableRuleset.Playfield.AllHitObjects;
-        public override bool CursorInPlacementArea => DrawableRuleset.Playfield.ReceivePositionalInputAt(inputManager.CurrentState.Mouse.Position);
+        public override IEnumerable<DrawableHitObject> HitObjects => drawableRuleset.Playfield.AllHitObjects;
+        public override bool CursorInPlacementArea => drawableRuleset.Playfield.ReceivePositionalInputAt(inputManager.CurrentState.Mouse.Position);
 
         protected abstract IReadOnlyList<HitObjectCompositionTool> CompositionTools { get; }
 
