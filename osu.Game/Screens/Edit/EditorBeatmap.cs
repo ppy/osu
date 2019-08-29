@@ -13,20 +13,8 @@ namespace osu.Game.Screens.Edit
     public class EditorBeatmap<T> : IBeatmap<T>, IEditorBeatmap
         where T : HitObject
     {
-        public event Action<T> HitObjectRemoved;
-        public event Action<T> HitObjectAdded;
-
-        event Action<HitObject> IEditorBeatmap.HitObjectAdded
-        {
-            add => HitObjectAdded += value;
-            remove => HitObjectAdded -= value;
-        }
-
-        event Action<HitObject> IEditorBeatmap.HitObjectRemoved
-        {
-            add => HitObjectRemoved += value;
-            remove => HitObjectRemoved -= value;
-        }
+        public event Action<HitObject> HitObjectAdded;
+        public event Action<HitObject> HitObjectRemoved;
 
         private readonly Beatmap<T> beatmap;
 
