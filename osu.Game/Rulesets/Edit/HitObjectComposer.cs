@@ -201,7 +201,6 @@ namespace osu.Game.Rulesets.Edit
 
         private void addHitObject(HitObject hitObject)
         {
-            // Process object
             var processor = Ruleset.CreateBeatmapProcessor(playableBeatmap);
 
             processor?.PreProcess();
