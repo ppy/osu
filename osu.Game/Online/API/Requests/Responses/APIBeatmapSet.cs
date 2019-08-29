@@ -69,10 +69,10 @@ namespace osu.Game.Online.API.Requests.Responses
         [JsonProperty(@"availability")]
         private BeatmapSetOnlineAvailability availability { get; set; }
 
-        [JsonProperty(@"genre_id")]
+        [JsonProperty(@"genre")]
         private BeatmapSetOnlineGenre genre { get; set; }
 
-        [JsonProperty(@"language_id")]
+        [JsonProperty(@"language")]
         private BeatmapSetOnlineLanguage language { get; set; }
 
         [JsonProperty(@"beatmaps")]

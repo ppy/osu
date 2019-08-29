@@ -176,8 +176,8 @@ namespace osu.Game.Tests.Visual.Online
                         HasVideo = true,
                         HasStoryboard = true,
                         Covers = new BeatmapSetOnlineCovers(),
-                        Language = BeatmapSetOnlineLanguage.English,
-                        Genre = BeatmapSetOnlineGenre.Rock,
+                        Language = new BeatmapSetOnlineLanguage { Id = 3, Name = "English" },
+                        Genre = new BeatmapSetOnlineGenre { Id = 4, Name = "Rock" },
                     },
                     Metrics = new BeatmapSetMetrics { Ratings = Enumerable.Range(0, 11).ToArray() },
                     Beatmaps = new List<BeatmapInfo>
