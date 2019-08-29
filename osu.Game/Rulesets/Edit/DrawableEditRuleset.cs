@@ -75,5 +75,16 @@ namespace osu.Game.Rulesets.Edit
             drawableRuleset.Playfield.Remove(drawableObject);
             drawableRuleset.Playfield.PostProcess();
         }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+
+            if (beatmap != null)
+            {
+                beatmap.HitObjectAdded -= addHitObject;
+                beatmap.HitObjectRemoved -= removeHitObject;
+            }
+        }
     }
 }
