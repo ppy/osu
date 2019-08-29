@@ -36,6 +36,8 @@ namespace osu.Game.Rulesets.Mania.UI
 
         public IEnumerable<BarLine> BarLines;
 
+        protected override bool RelativeScaleBeatLengths => true;
+
         protected new ManiaRulesetConfigManager Config => (ManiaRulesetConfigManager)base.Config;
 
         private readonly Bindable<ManiaScrollingDirection> configDirection = new Bindable<ManiaScrollingDirection>();
