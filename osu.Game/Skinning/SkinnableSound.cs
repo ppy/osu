@@ -85,7 +85,7 @@ namespace osu.Game.Skinning
                     ch.Volume.Value = s.Volume / 100.0;
 
                     foreach (var adjustment in adjustments)
-                        ch.AddAdjustment(adjust.Item1, adjust.Item2);
+                        ch.AddAdjustment(adjustment.Item1, adjustment.Item2);
                 }
 
                 return ch;
