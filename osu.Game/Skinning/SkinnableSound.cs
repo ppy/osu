@@ -15,6 +15,9 @@ namespace osu.Game.Skinning
     public class SkinnableSound : SkinReloadableDrawable
     {
         private readonly ISampleInfo[] hitSamples;
+
+        private readonly List<(AdjustableProperty, BindableDouble)> adjustments = new List<(AdjustableProperty, BindableDouble)>();
+
         private SampleChannel[] channels;
 
         private AudioManager audio;
@@ -51,8 +54,17 @@ namespace osu.Game.Skinning
         public void Play() => channels?.ForEach(c => c.Play());
         public void Stop() => channels?.ForEach(c => c.Stop());
 
-        public void AddAdjustment(AdjustableProperty type, BindableDouble adjustBindable) => channels?.ForEach(c => c.AddAdjustment(type, adjustBindable));
-        public void RemoveAdjustment(AdjustableProperty type, BindableDouble adjustBindable) => channels?.ForEach(c => c.RemoveAdjustment(type, adjustBindable));
+        public void AddAdjustment(AdjustableProperty type, BindableDouble adjustBindable)
+        {
+            adjustments.Add((type, adjustBindable));
+            channels?.ForEach(c => c.AddAdjustment(type, adjustBindable));
+        }
+
+        public void RemoveAdjustment(AdjustableProperty type, BindableDouble adjustBindable)
+        {
+            adjustments.Remove((type, adjustBindable));
+            channels?.ForEach(c => c.RemoveAdjustment(type, adjustBindable));
+        }
 
         public override bool IsPresent => Scheduler.HasPendingTasks;
 
@@ -71,6 +83,9 @@ namespace osu.Game.Skinning
                 {
                     ch.Looping = looping;
                     ch.Volume.Value = s.Volume / 100.0;
+
+                    foreach (var adjustment in adjustments)
+                        ch.AddAdjustment(adjust.Item1, adjust.Item2);
                 }
 
                 return ch;
