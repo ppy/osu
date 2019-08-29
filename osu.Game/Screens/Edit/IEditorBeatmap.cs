@@ -2,16 +2,35 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using osu.Game.Beatmaps;
+using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Objects;
 
 namespace osu.Game.Screens.Edit
 {
-    public interface IEditorBeatmap
+    /// <summary>
+    /// Interface for the <see cref="IBeatmap"/> contained by the see <see cref="HitObjectComposer"/>.
+    /// Children of <see cref="HitObjectComposer"/> may resolve the beatmap via <see cref="IEditorBeatmap"/> or <see cref="IEditorBeatmap{T}"/>.
+    /// </summary>
+    public interface IEditorBeatmap : IBeatmap
     {
+        /// <summary>
+        /// Invoked when a <see cref="HitObject"/> is added to this <see cref="IEditorBeatmap"/>.
+        /// </summary>
         event Action<HitObject> HitObjectAdded;
-        event Action<HitObject> HitObjectRemoved;
 
-        void Add(HitObject hitObject);
-        void Remove(HitObject hitObject);
+        /// <summary>
+        /// Invoked when a <see cref="HitObject"/> is removed from this <see cref="IEditorBeatmap"/>.
+        /// </summary>
+        event Action<HitObject> HitObjectRemoved;
+    }
+
+    /// <summary>
+    /// Interface for the <see cref="IBeatmap"/> contained by the see <see cref="HitObjectComposer"/>.
+    /// Children of <see cref="HitObjectComposer"/> may resolve the beatmap via <see cref="IEditorBeatmap"/> or <see cref="IEditorBeatmap{T}"/>.
+    /// </summary>
+    public interface IEditorBeatmap<out T> : IEditorBeatmap, IBeatmap<T>
+        where T : HitObject
+    {
     }
 }

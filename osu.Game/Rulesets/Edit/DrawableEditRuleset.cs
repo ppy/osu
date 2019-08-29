@@ -36,7 +36,7 @@ namespace osu.Game.Rulesets.Edit
         private readonly DrawableRuleset<TObject> drawableRuleset;
 
         [Resolved]
-        private EditorBeatmap<TObject> beatmap { get; set; }
+        private IEditorBeatmap<TObject> beatmap { get; set; }
 
         public DrawableEditRuleset(DrawableRuleset<TObject> drawableRuleset)
         {
