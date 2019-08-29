@@ -88,55 +88,16 @@ namespace osu.Game.Beatmaps
         public BeatmapSetOnlineLanguage Language { get; set; }
     }
 
-    public enum BeatmapSetOnlineGenre
+    public class BeatmapSetOnlineGenre
     {
-        [Description("Any")]
-        Any = 0,
-
-        [Description("Unspecified")]
-        Unspecified = 1,
-
-        [Description("Video Game")]
-        VideoGame = 2,
-
-        [Description("Anime")]
-        Anime = 3,
-
-        [Description("Rock")]
-        Rock = 4,
-
-        [Description("Pop")]
-        Pop = 5,
-
-        [Description("Other")]
-        Other = 6,
-
-        [Description("Novelty")]
-        Novelty = 7,
-
-        // genre_id 8 doesn't exist
-
-        [Description("Hip-Hop")]
-        HipHop = 9,
-
-        [Description("Electronic")]
-        Electronic = 10
+        public int Id { get; set; }
+        public string Name { get; set; }
     }
 
-    public enum BeatmapSetOnlineLanguage
+    public class BeatmapSetOnlineLanguage
     {
-        Any,
-        Other,
-        English,
-        Japanese,
-        Chinese,
-        Instrumental,
-        Korean,
-        French,
-        German,
-        Swedish,
-        Spanish,
-        Italian
+        public int Id { get; set; }
+        public string Name { get; set; }
     }
 
     public class BeatmapSetOnlineCovers
