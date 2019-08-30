@@ -13,6 +13,10 @@ using osu.Game.Storyboards;
 
 namespace osu.Game.Screens.Edit
 {
+    /// <summary>
+    /// Encapsulates a <see cref="WorkingBeatmap"/> while providing an overridden <see cref="Beatmap{TObject}"/>.
+    /// </summary>
+    /// <typeparam name="TObject"></typeparam>
     public class EditorWorkingBeatmap<TObject> : IWorkingBeatmap
         where TObject : HitObject
     {
