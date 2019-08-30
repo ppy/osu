@@ -1,11 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
@@ -14,11 +11,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.IO.Stores;
-using osu.Framework.Text;
 using osu.Game.Audio;
-using osu.Game.Database;
-using osu.Game.Graphics;
-using osu.Game.Graphics.Sprites;
 using osu.Game.Rulesets.UI;
 using osuTK;
 using osuTK.Graphics;
@@ -156,111 +149,6 @@ namespace osu.Game.Skinning
         {
             string lastPiece = componentName.Split('/').Last();
             return componentName.StartsWith("Gameplay/taiko/") ? "taiko-" + lastPiece : lastPiece;
-        }
-
-        protected class LegacySkinResourceStore<T> : IResourceStore<byte[]>
-            where T : INamedFileInfo
-        {
-            private readonly IHasFiles<T> source;
-            private readonly IResourceStore<byte[]> underlyingStore;
-
-            private string getPathForFile(string filename)
-            {
-                bool hasExtension = filename.Contains('.');
-
-                var file = source.Files.Find(f =>
-                    string.Equals(hasExtension ? f.Filename : Path.ChangeExtension(f.Filename, null), filename, StringComparison.InvariantCultureIgnoreCase));
-                return file?.FileInfo.StoragePath;
-            }
-
-            public LegacySkinResourceStore(IHasFiles<T> source, IResourceStore<byte[]> underlyingStore)
-            {
-                this.source = source;
-                this.underlyingStore = underlyingStore;
-            }
-
-            public Stream GetStream(string name)
-            {
-                string path = getPathForFile(name);
-                return path == null ? null : underlyingStore.GetStream(path);
-            }
-
-            public IEnumerable<string> GetAvailableResources() => source.Files.Select(f => f.Filename);
-
-            byte[] IResourceStore<byte[]>.Get(string name) => GetAsync(name).Result;
-
-            public Task<byte[]> GetAsync(string name)
-            {
-                string path = getPathForFile(name);
-                return path == null ? Task.FromResult<byte[]>(null) : underlyingStore.GetAsync(path);
-            }
-
-            #region IDisposable Support
-
-            private bool isDisposed;
-
-            protected virtual void Dispose(bool disposing)
-            {
-                if (!isDisposed)
-                {
-                    isDisposed = true;
-                }
-            }
-
-            ~LegacySkinResourceStore()
-            {
-                Dispose(false);
-            }
-
-            public void Dispose()
-            {
-                Dispose(true);
-                GC.SuppressFinalize(this);
-            }
-
-            #endregion
-        }
-
-        private class LegacySpriteText : OsuSpriteText
-        {
-            private readonly LegacyGlyphStore glyphStore;
-
-            public LegacySpriteText(ISkin skin, string font)
-            {
-                Shadow = false;
-                UseFullGlyphHeight = false;
-
-                Font = new FontUsage(font, OsuFont.DEFAULT_FONT_SIZE);
-                glyphStore = new LegacyGlyphStore(skin);
-            }
-
-            protected override TextBuilder CreateTextBuilder(ITexturedGlyphLookupStore store) => base.CreateTextBuilder(glyphStore);
-
-            private class LegacyGlyphStore : ITexturedGlyphLookupStore
-            {
-                private readonly ISkin skin;
-
-                public LegacyGlyphStore(ISkin skin)
-                {
-                    this.skin = skin;
-                }
-
-                public ITexturedCharacterGlyph Get(string fontName, char character)
-                {
-                    var texture = skin.GetTexture($"{fontName}-{character}");
-
-                    if (texture != null)
-                        // Approximate value that brings character sizing roughly in-line with stable
-                        texture.ScaleAdjust *= 18;
-
-                    if (texture == null)
-                        return null;
-
-                    return new TexturedCharacterGlyph(new CharacterGlyph(character, 0, 0, texture.Width, null), texture, 1f / texture.ScaleAdjust);
-                }
-
-                public Task<ITexturedCharacterGlyph> GetAsync(string fontName, char character) => Task.Run(() => Get(fontName, character));
-            }
         }
 
         public class LegacyCursor : CompositeDrawable
