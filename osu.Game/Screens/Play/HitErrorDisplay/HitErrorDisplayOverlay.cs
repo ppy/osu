@@ -18,10 +18,13 @@ namespace osu.Game.Screens.Play.HitErrorDisplay
         private const int margin = 10;
 
         private readonly Bindable<ScoreMeterType> type = new Bindable<ScoreMeterType>();
+
         private readonly HitWindows hitWindows;
+
         private readonly ScoreProcessor processor;
 
         private BarHitErrorDisplay leftDisplay;
+
         private BarHitErrorDisplay rightDisplay;
 
         public HitErrorDisplayOverlay(ScoreProcessor processor)
@@ -40,10 +43,10 @@ namespace osu.Game.Screens.Play.HitErrorDisplay
         protected override void LoadComplete()
         {
             base.LoadComplete();
-            type.BindValueChanged(onTypeChanged, true);
+            type.BindValueChanged(typeChanged, true);
         }
 
-        private void onTypeChanged(ValueChangedEvent<ScoreMeterType> type)
+        private void typeChanged(ValueChangedEvent<ScoreMeterType> type)
         {
             switch (type.NewValue)
             {
