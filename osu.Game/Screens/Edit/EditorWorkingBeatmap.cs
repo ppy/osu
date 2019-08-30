@@ -4,6 +4,7 @@
 using System.Collections.Generic;
 using osu.Framework.Audio.Track;
 using osu.Framework.Graphics.Textures;
+using osu.Framework.Graphics.Video;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
@@ -32,6 +33,8 @@ namespace osu.Game.Screens.Edit
         public IBeatmap Beatmap => workingBeatmap.Beatmap;
 
         public Texture Background => workingBeatmap.Background;
+
+        public VideoSprite Video => workingBeatmap.Video;
 
         public Track Track => workingBeatmap.Track;
 

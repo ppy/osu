@@ -129,6 +129,8 @@ namespace osu.Game.Migrations
 
                     b.Property<string>("BackgroundFile");
 
+                    b.Property<string>("VideoFile");
+
                     b.Property<int>("PreviewTime");
 
                     b.Property<string>("Source");
