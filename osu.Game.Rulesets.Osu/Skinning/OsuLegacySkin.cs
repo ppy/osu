@@ -84,7 +84,7 @@ namespace osu.Game.Rulesets.Osu.Skinning
                     return null;
 
                 case "Play/osu/cursor":
-                    if (GetTexture("cursor") != null)
+                    if (source.GetTexture("cursor") != null)
                         return new LegacyCursor();
 
                     return null;
