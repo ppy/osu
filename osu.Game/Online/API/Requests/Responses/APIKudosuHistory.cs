@@ -13,12 +13,6 @@ namespace osu.Game.Online.API.Requests.Responses
         public DateTimeOffset CreatedAt;
 
         [JsonProperty("amount")]
-        private int amount
-        {
-            //We can receive negative values. However "action" is enough to build needed items
-            set => Amount = Math.Abs(value);
-        }
-
         public int Amount;
 
         [JsonProperty("post")]
