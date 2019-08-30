@@ -54,10 +54,6 @@ namespace osu.Game.Skinning
 
             switch (componentName)
             {
-                case "Play/osu/sliderfollowcircle":
-                    animatable = true;
-                    break;
-
                 case "Play/Miss":
                     componentName = "hit0";
                     animatable = true;
