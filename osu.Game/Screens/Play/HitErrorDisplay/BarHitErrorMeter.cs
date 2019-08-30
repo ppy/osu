@@ -38,7 +38,7 @@ namespace osu.Game.Screens.Play.HitErrorDisplay
         private readonly List<double> judgementOffsets = new List<double>();
         private readonly double maxHitWindows;
 
-        public BarHitErrorMeter(HitWindows hitWindows, bool reversed = false)
+        public BarHitErrorMeter(HitWindows hitWindows, bool rightAligned = false)
             : base(hitWindows)
         {
             maxHitWindows = HitWindows.Meh == 0 ? HitWindows.Good : HitWindows.Meh;
@@ -54,23 +54,23 @@ namespace osu.Game.Screens.Play.HitErrorDisplay
                 {
                     judgementsContainer = new Container
                     {
-                        Anchor = reversed ? Anchor.CentreRight : Anchor.CentreLeft,
-                        Origin = reversed ? Anchor.CentreRight : Anchor.CentreLeft,
+                        Anchor = rightAligned ? Anchor.CentreRight : Anchor.CentreLeft,
+                        Origin = rightAligned ? Anchor.CentreRight : Anchor.CentreLeft,
                         Width = judgement_line_width,
                         RelativeSizeAxes = Axes.Y,
                     },
                     bar = new FillFlowContainer<Box>
                     {
-                        Anchor = reversed ? Anchor.CentreRight : Anchor.CentreLeft,
-                        Origin = reversed ? Anchor.CentreRight : Anchor.CentreLeft,
+                        Anchor = rightAligned ? Anchor.CentreRight : Anchor.CentreLeft,
+                        Origin = rightAligned ? Anchor.CentreRight : Anchor.CentreLeft,
                         Width = bar_width,
                         RelativeSizeAxes = Axes.Y,
                         Direction = FillDirection.Vertical,
                     },
                     new Container
                     {
-                        Anchor = reversed ? Anchor.CentreRight : Anchor.CentreLeft,
-                        Origin = reversed ? Anchor.CentreRight : Anchor.CentreLeft,
+                        Anchor = rightAligned ? Anchor.CentreRight : Anchor.CentreLeft,
+                        Origin = rightAligned ? Anchor.CentreRight : Anchor.CentreLeft,
                         AutoSizeAxes = Axes.X,
                         RelativeSizeAxes = Axes.Y,
                         Child = arrow = new SpriteIcon
@@ -78,7 +78,7 @@ namespace osu.Game.Screens.Play.HitErrorDisplay
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
                             RelativePositionAxes = Axes.Y,
-                            Icon = reversed ? FontAwesome.Solid.ChevronRight : FontAwesome.Solid.ChevronLeft,
+                            Icon = rightAligned ? FontAwesome.Solid.ChevronRight : FontAwesome.Solid.ChevronLeft,
                             Size = new Vector2(8),
                         }
                     },
