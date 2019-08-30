@@ -6,12 +6,12 @@ using osu.Game.Tests.Visual;
 
 namespace osu.Game.Rulesets.Osu.Tests
 {
-        [TestFixture]
-        public class TestSceneOsuPlayer : PlayerTestScene
+    [TestFixture]
+    public class TestSceneOsuPlayer : PlayerTestScene
+    {
+        public TestSceneOsuPlayer()
+            : base(new OsuRuleset())
         {
-            public TestSceneOsuPlayer()
-                : base(new OsuRuleset())
-            {
-            }
         }
+    }
 }
