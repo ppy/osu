@@ -59,6 +59,13 @@ namespace osu.Game.Screens.Play
                 AddInternal(video);
                 video.RelativeSizeAxes = Axes.Both;
             }
+
+            [BackgroundDependencyLoader]
+            private void load(GameplayClock clock)
+            {
+                if (clock != null)
+                    Clock = clock;
+            }
         }
     }
 }
