@@ -47,39 +47,24 @@ namespace osu.Game.Skinning
             Samples?.Dispose();
         }
 
-        public override Drawable GetDrawableComponent(string componentName)
+        public override Drawable GetDrawableComponent(ISkinComponent component)
         {
-            bool animatable = false;
-            bool looping = true;
-
-            switch (componentName)
+            switch (component.LookupName)
             {
                 case "Play/Miss":
-                    componentName = "hit0";
-                    animatable = true;
-                    looping = false;
-                    break;
+                    return this.GetAnimation("hit0", true, false);
 
                 case "Play/Meh":
-                    componentName = "hit50";
-                    animatable = true;
-                    looping = false;
-                    break;
+                    return this.GetAnimation("hit50", true, false);
 
                 case "Play/Good":
-                    componentName = "hit100";
-                    animatable = true;
-                    looping = false;
-                    break;
+                    return this.GetAnimation("hit100", true, false);
 
                 case "Play/Great":
-                    componentName = "hit300";
-                    animatable = true;
-                    looping = false;
-                    break;
+                    return this.GetAnimation("hit300", true, false);
             }
 
-            return this.GetAnimation(componentName, animatable, looping);
+            return this.GetAnimation(component.LookupName, false, false);
         }
 
         public override Texture GetTexture(string componentName)

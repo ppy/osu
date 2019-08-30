@@ -27,6 +27,8 @@ namespace osu.Game.Rulesets.Catch
         public override IBeatmapConverter CreateBeatmapConverter(IBeatmap beatmap) => new CatchBeatmapConverter(beatmap);
         public override IBeatmapProcessor CreateBeatmapProcessor(IBeatmap beatmap) => new CatchBeatmapProcessor(beatmap);
 
+        public const string SHORT_NAME = "catch";
+
         public override IEnumerable<KeyBinding> GetDefaultKeyBindings(int variant = 0) => new[]
         {
             new KeyBinding(InputKey.Z, CatchAction.MoveLeft),
@@ -117,7 +119,7 @@ namespace osu.Game.Rulesets.Catch
 
         public override string Description => "osu!catch";
 
-        public override string ShortName => "fruits";
+        public override string ShortName => SHORT_NAME;
 
         public override Drawable CreateIcon() => new SpriteIcon { Icon = OsuIcon.RulesetCatch };
 
