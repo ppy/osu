@@ -9,6 +9,7 @@ using osu.Game.Graphics.Containers;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.API.Requests;
 using osu.Game.Online.Chat;
+using System;
 
 namespace osu.Game.Overlays.Profile.Sections.Kudosu
 {
@@ -56,7 +57,7 @@ namespace osu.Game.Overlays.Profile.Sections.Kudosu
             if (!string.IsNullOrEmpty(prefix))
             {
                 linkFlowContainer.AddText(prefix);
-                linkFlowContainer.AddText($@" {historyItem.Amount} kudosu", t =>
+                linkFlowContainer.AddText($@" {Math.Abs(historyItem.Amount)} kudosu", t =>
                 {
                     t.Font = t.Font.With(italics: true);
                     t.Colour = colours.Blue;
