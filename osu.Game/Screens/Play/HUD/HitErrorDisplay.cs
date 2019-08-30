@@ -1,19 +1,18 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System.Linq;
-using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics;
-using osu.Game.Rulesets.Scoring;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.IEnumerableExtensions;
-using osu.Game.Beatmaps;
+using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Game.Configuration;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Objects;
+using osu.Game.Rulesets.Scoring;
+using osu.Game.Screens.Play.HUD.HitErrorMeters;
 
-namespace osu.Game.Screens.Play.HitErrorDisplay
+namespace osu.Game.Screens.Play.HUD
 {
     public class HitErrorDisplay : Container<HitErrorMeter>
     {
@@ -22,13 +21,17 @@ namespace osu.Game.Screens.Play.HitErrorDisplay
 
         private readonly Bindable<ScoreMeterType> type = new Bindable<ScoreMeterType>();
 
-        private HitWindows hitWindows;
+        private readonly HitWindows hitWindows;
 
         private readonly ScoreProcessor processor;
 
-        public HitErrorDisplay(ScoreProcessor processor)
+        public HitErrorDisplay(ScoreProcessor processor, HitWindows hitWindows)
         {
             this.processor = processor;
+            this.hitWindows = hitWindows;
+
+            RelativeSizeAxes = Axes.Both;
+
             processor.NewJudgement += onNewJudgement;
         }
 
@@ -45,10 +48,9 @@ namespace osu.Game.Screens.Play.HitErrorDisplay
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuConfigManager config, Bindable<WorkingBeatmap> workingBeatmap)
+        private void load(OsuConfigManager config)
         {
             config.BindWith(OsuSetting.ScoreMeter, type);
-            hitWindows = workingBeatmap.Value.Beatmap.HitObjects.First().HitWindows;
         }
 
         protected override void LoadComplete()

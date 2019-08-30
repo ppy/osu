@@ -5,7 +5,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Objects;
 
-namespace osu.Game.Screens.Play.HitErrorDisplay
+namespace osu.Game.Screens.Play.HUD.HitErrorMeters
 {
     public abstract class HitErrorMeter : CompositeDrawable
     {
