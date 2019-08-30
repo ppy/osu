@@ -28,12 +28,11 @@ namespace osu.Game.Tests.Visual.Gameplay
 
         private HitErrorMeter meter;
         private HitErrorMeter meter2;
+        private HitWindows hitWindows;
 
         public TestSceneBarHitErrorMeter()
         {
-            var hitWindows = new OsuHitWindows();
-
-            recreateDisplay(hitWindows, 5);
+            recreateDisplay(new OsuHitWindows(), 5);
 
             AddRepeatStep("New random judgement", () => newJudgement(), 40);
 
@@ -72,7 +71,9 @@ namespace osu.Game.Tests.Visual.Gameplay
 
         private void recreateDisplay(HitWindows hitWindows, float overallDifficulty)
         {
-            hitWindows.SetDifficulty(overallDifficulty);
+            this.hitWindows = hitWindows;
+
+            hitWindows?.SetDifficulty(overallDifficulty);
 
             Clear();
 
@@ -84,9 +85,9 @@ namespace osu.Game.Tests.Visual.Gameplay
                 AutoSizeAxes = Axes.Both,
                 Children = new[]
                 {
-                    new SpriteText { Text = $@"Great: {hitWindows.Great}" },
-                    new SpriteText { Text = $@"Good: {hitWindows.Good}" },
-                    new SpriteText { Text = $@"Meh: {hitWindows.Meh}" },
+                    new SpriteText { Text = $@"Great: {hitWindows?.Great}" },
+                    new SpriteText { Text = $@"Good: {hitWindows?.Good}" },
+                    new SpriteText { Text = $@"Meh: {hitWindows?.Meh}" },
                 }
             });
 
