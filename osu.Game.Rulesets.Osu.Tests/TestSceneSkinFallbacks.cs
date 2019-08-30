@@ -53,7 +53,7 @@ namespace osu.Game.Rulesets.Osu.Tests
         private void checkNextHitObject(string skin) =>
             AddUntilStep($"check skin from {skin}", () =>
             {
-                var firstObject = ((TestPlayer)Player).DrawableRuleset.Playfield.AllHitObjects.OfType<DrawableHitCircle>().FirstOrDefault();
+                var firstObject = ((TestPlayer)Player).DrawableRuleset.Playfield.HitObjectContainer.AliveObjects.OfType<DrawableHitCircle>().FirstOrDefault();
 
                 if (firstObject == null)
                     return false;
