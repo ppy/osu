@@ -44,7 +44,7 @@ namespace osu.Game.Online.API.Requests.Responses
         {
             set
             {
-                //We will receive something like "foo.bar" or just "foo"
+                //We will receive something like "event.action" or just "action"
                 string parsed = value.Contains(".") ? value.Split('.')[0].Pascalize() + value.Split('.')[1].Pascalize() : value.Pascalize();
 
                 Action = (KudosuAction)Enum.Parse(typeof(KudosuAction), parsed);
