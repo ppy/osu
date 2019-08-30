@@ -83,8 +83,6 @@ namespace osu.Game.Screens.Play
         protected DimmableStoryboard DimmableStoryboard { get; private set; }
         protected DimmableVideo DimmableVideo { get; private set; }
 
-        protected VideoSprite Video { get; private set; }
-
         [Cached]
         [Cached(Type = typeof(IBindable<IReadOnlyList<Mod>>))]
         protected new readonly Bindable<IReadOnlyList<Mod>> Mods = new Bindable<IReadOnlyList<Mod>>(Array.Empty<Mod>());
