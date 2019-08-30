@@ -10,6 +10,7 @@ using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.API.Requests;
 using osu.Game.Online.Chat;
 using System;
+using osuTK;
 
 namespace osu.Game.Overlays.Profile.Sections.Kudosu
 {
@@ -37,6 +38,7 @@ namespace osu.Game.Overlays.Profile.Sections.Kudosu
                     Anchor = Anchor.CentreLeft,
                     Origin = Anchor.CentreLeft,
                     AutoSizeAxes = Axes.Both,
+                    Spacing = new Vector2(3),
                 },
                 date = new DrawableDate(historyItem.CreatedAt)
                 {
@@ -57,7 +59,7 @@ namespace osu.Game.Overlays.Profile.Sections.Kudosu
             if (!string.IsNullOrEmpty(prefix))
             {
                 linkFlowContainer.AddText(prefix);
-                linkFlowContainer.AddText($@" {Math.Abs(historyItem.Amount)} kudosu", t =>
+                linkFlowContainer.AddText($@"{Math.Abs(historyItem.Amount)} kudosu", t =>
                 {
                     t.Font = t.Font.With(italics: true);
                     t.Colour = colours.Blue;
@@ -75,40 +77,40 @@ namespace osu.Game.Overlays.Profile.Sections.Kudosu
             switch (historyItem.Action)
             {
                 case KudosuAction.VoteGive:
-                    return @" from obtaining votes in modding post of";
+                    return @"from obtaining votes in modding post of";
 
                 case KudosuAction.Give:
-                    return $@" from {userLink()} for a post at";
+                    return $@"from {userLink()} for a post at";
 
                 case KudosuAction.Reset:
                     return $@"Kudosu reset by {userLink()} for the post";
 
                 case KudosuAction.VoteReset:
-                    return @" from losing votes in modding post of";
+                    return @"from losing votes in modding post of";
 
                 case KudosuAction.DenyKudosuReset:
-                    return @" from modding post";
+                    return @"from modding post";
 
                 case KudosuAction.Revoke:
                     return $@"Denied kudosu by {userLink()} for the post";
 
                 case KudosuAction.AllowKudosuGive:
-                    return @" from kudosu deny repeal of modding post";
+                    return @"from kudosu deny repeal of modding post";
 
                 case KudosuAction.DeleteReset:
-                    return @" from modding post deletion of";
+                    return @"from modding post deletion of";
 
                 case KudosuAction.RestoreGive:
-                    return @" from modding post restoration of";
+                    return @"from modding post restoration of";
 
                 case KudosuAction.RecalculateGive:
-                    return @" from votes recalculation in modding post of";
+                    return @"from votes recalculation in modding post of";
 
                 case KudosuAction.RecalculateReset:
-                    return @" from votes recalculation in modding post of";
+                    return @"from votes recalculation in modding post of";
 
                 default:
-                    return @" from unknown event ";
+                    return @"from unknown event";
             }
         }
 
