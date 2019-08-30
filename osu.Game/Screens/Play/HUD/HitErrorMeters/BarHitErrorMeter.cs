@@ -248,7 +248,7 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
 
         private float getRelativeJudgementPosition(double value) => (float)((value / maxHitWindow) + 1) / 2;
 
-        public class JudgementLine : CompositeDrawable
+        private class JudgementLine : CompositeDrawable
         {
             private const int judgement_fade_duration = 10000;
 
