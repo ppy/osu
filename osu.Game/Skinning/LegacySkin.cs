@@ -3,17 +3,12 @@
 
 using System.IO;
 using System.Linq;
-using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.IO.Stores;
 using osu.Game.Audio;
-using osu.Game.Rulesets.UI;
-using osuTK;
 using osuTK.Graphics;
 
 namespace osu.Game.Skinning
@@ -59,12 +54,6 @@ namespace osu.Game.Skinning
 
             switch (componentName)
             {
-                case "Play/osu/cursor":
-                    if (GetTexture("cursor") != null)
-                        return new LegacyCursor();
-
-                    return null;
-
                 case "Play/osu/sliderfollowcircle":
                     animatable = true;
                     break;
@@ -92,16 +81,6 @@ namespace osu.Game.Skinning
                     animatable = true;
                     looping = false;
                     break;
-
-                case "Play/osu/number-text":
-                    return !hasFont(Configuration.HitCircleFont)
-                        ? null
-                        : new LegacySpriteText(this, Configuration.HitCircleFont)
-                        {
-                            Scale = new Vector2(0.96f),
-                            // Spacing value was reverse-engineered from the ratio of the rendered sprite size in the visual inspector vs the actual texture size
-                            Spacing = new Vector2(-Configuration.HitCircleOverlap * 0.89f, 0)
-                        };
             }
 
             return this.GetAnimation(componentName, animatable, looping);
@@ -143,62 +122,10 @@ namespace osu.Game.Skinning
             return null;
         }
 
-        private bool hasFont(string fontName) => GetTexture($"{fontName}-0") != null;
-
         private string getFallbackName(string componentName)
         {
             string lastPiece = componentName.Split('/').Last();
             return componentName.StartsWith("Gameplay/taiko/") ? "taiko-" + lastPiece : lastPiece;
-        }
-
-        public class LegacyCursor : CompositeDrawable
-        {
-            public LegacyCursor()
-            {
-                Size = new Vector2(50);
-
-                Anchor = Anchor.Centre;
-                Origin = Anchor.Centre;
-            }
-
-            [BackgroundDependencyLoader]
-            private void load(ISkinSource skin)
-            {
-                InternalChildren = new Drawable[]
-                {
-                    new NonPlayfieldSprite
-                    {
-                        Texture = skin.GetTexture("cursormiddle"),
-                        Anchor = Anchor.Centre,
-                        Origin = Anchor.Centre,
-                    },
-                    new NonPlayfieldSprite
-                    {
-                        Texture = skin.GetTexture("cursor"),
-                        Anchor = Anchor.Centre,
-                        Origin = Anchor.Centre,
-                    }
-                };
-            }
-        }
-
-        /// <summary>
-        /// A sprite which is displayed within the playfield, but historically was not considered part of the playfield.
-        /// Performs scale adjustment to undo the scale applied by <see cref="PlayfieldAdjustmentContainer"/> (osu! ruleset specifically).
-        /// </summary>
-        private class NonPlayfieldSprite : Sprite
-        {
-            public override Texture Texture
-            {
-                get => base.Texture;
-                set
-                {
-                    if (value != null)
-                        // stable "magic ratio". see OsuPlayfieldAdjustmentContainer for full explanation.
-                        value.ScaleAdjust *= 1.6f;
-                    base.Texture = value;
-                }
-            }
         }
     }
 }
