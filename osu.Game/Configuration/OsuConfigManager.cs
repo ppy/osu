@@ -18,7 +18,7 @@ namespace osu.Game.Configuration
         {
             // UI/selection defaults
             Set(OsuSetting.Ruleset, 0, 0, int.MaxValue);
-            Set(OsuSetting.Skin, 0, 0, int.MaxValue);
+            Set(OsuSetting.Skin, 0, -1, int.MaxValue);
 
             Set(OsuSetting.BeatmapDetailTab, BeatmapDetailTab.Details);
 
@@ -83,6 +83,7 @@ namespace osu.Game.Configuration
             Set(OsuSetting.ShowInterface, true);
             Set(OsuSetting.ShowHealthDisplayWhenCantFail, true);
             Set(OsuSetting.KeyOverlay, false);
+            Set(OsuSetting.ScoreMeter, ScoreMeterType.HitErrorBoth);
 
             Set(OsuSetting.FloatingComments, false);
 
@@ -136,6 +137,7 @@ namespace osu.Game.Configuration
         BlurLevel,
         ShowStoryboard,
         KeyOverlay,
+        ScoreMeter,
         FloatingComments,
         ShowInterface,
         ShowHealthDisplayWhenCantFail,
