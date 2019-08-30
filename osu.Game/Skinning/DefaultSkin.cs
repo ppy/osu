@@ -1,4 +1,4 @@
-﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Audio.Sample;
@@ -16,7 +16,7 @@ namespace osu.Game.Skinning
             Configuration = new SkinConfiguration();
         }
 
-        public override Drawable GetDrawableComponent(string componentName) => null;
+        public override Drawable GetDrawableComponent(ISkinComponent component) => null;
 
         public override Texture GetTexture(string componentName) => null;
 
