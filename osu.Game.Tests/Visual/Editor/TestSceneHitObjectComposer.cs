@@ -16,15 +16,13 @@ using osu.Game.Rulesets.Osu.Edit;
 using osu.Game.Rulesets.Osu.Edit.Blueprints.HitCircles;
 using osu.Game.Rulesets.Osu.Edit.Blueprints.HitCircles.Components;
 using osu.Game.Rulesets.Osu.Objects;
-using osu.Game.Screens.Edit.Compose;
 using osu.Game.Screens.Edit.Compose.Components;
 using osuTK;
 
 namespace osu.Game.Tests.Visual.Editor
 {
     [TestFixture]
-    [Cached(Type = typeof(IPlacementHandler))]
-    public class TestSceneHitObjectComposer : OsuTestScene, IPlacementHandler
+    public class TestSceneHitObjectComposer : OsuTestScene
     {
         public override IReadOnlyList<Type> RequiredTypes => new[]
         {
@@ -38,8 +36,6 @@ namespace osu.Game.Tests.Visual.Editor
             typeof(HitCircleSelectionBlueprint),
             typeof(HitCirclePlacementBlueprint),
         };
-
-        private HitObjectComposer composer;
 
         [BackgroundDependencyLoader]
         private void load()
@@ -67,15 +63,7 @@ namespace osu.Game.Tests.Visual.Editor
             Dependencies.CacheAs<IAdjustableClock>(clock);
             Dependencies.CacheAs<IFrameBasedClock>(clock);
 
-            Child = composer = new OsuHitObjectComposer(new OsuRuleset());
+            Child = new OsuHitObjectComposer(new OsuRuleset());
         }
-
-        public void BeginPlacement(HitObject hitObject)
-        {
-        }
-
-        public void EndPlacement(HitObject hitObject) => composer.Add(hitObject);
-
-        public void Delete(HitObject hitObject) => composer.Remove(hitObject);
     }
 }
