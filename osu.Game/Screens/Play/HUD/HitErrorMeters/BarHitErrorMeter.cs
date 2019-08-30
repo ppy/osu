@@ -98,16 +98,16 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
                                 Y = -10,
                                 Size = new Vector2(10),
                                 Icon = FontAwesome.Solid.ShippingFast,
-                                Anchor = Anchor.y0 | alignment,
-                                Origin = Anchor.y0 | alignment,
+                                Anchor = Anchor.TopCentre,
+                                Origin = Anchor.TopCentre,
                             },
                             new SpriteIcon
                             {
                                 Y = 10,
                                 Size = new Vector2(10),
                                 Icon = FontAwesome.Solid.Bicycle,
-                                Anchor = Anchor.y2 | alignment,
-                                Origin = Anchor.y2 | alignment,
+                                Anchor = Anchor.BottomCentre,
+                                Origin = Anchor.BottomCentre,
                             }
                         }
                     },
