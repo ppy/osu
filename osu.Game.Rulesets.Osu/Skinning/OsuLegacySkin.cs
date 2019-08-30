@@ -59,6 +59,9 @@ namespace osu.Game.Rulesets.Osu.Skinning
         {
             switch (componentName)
             {
+                case "Play/osu/sliderfollowcircle":
+                    return this.GetAnimation(componentName, true, true);
+
                 case "Play/osu/sliderball":
                     var sliderBallContent = this.GetAnimation("sliderb", true, true, "");
 
