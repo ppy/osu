@@ -16,6 +16,6 @@ namespace osu.Game.Screens.Play.HitErrorDisplay
             HitWindows = hitWindows;
         }
 
-        public abstract void OnNewJudgement(JudgementResult newJudgement);
+        public abstract void OnNewJudgement(JudgementResult judgement);
     }
 }
