@@ -46,14 +46,6 @@ namespace osu.Game.Tests.Visual.Gameplay
         public void TestOsu()
         {
             AddStep("OD 1", () => recreateDisplay(new OsuHitWindows(), 1));
-            AddStep("OD 2", () => recreateDisplay(new OsuHitWindows(), 2));
-            AddStep("OD 3", () => recreateDisplay(new OsuHitWindows(), 3));
-            AddStep("OD 4", () => recreateDisplay(new OsuHitWindows(), 4));
-            AddStep("OD 5", () => recreateDisplay(new OsuHitWindows(), 5));
-            AddStep("OD 6", () => recreateDisplay(new OsuHitWindows(), 6));
-            AddStep("OD 7", () => recreateDisplay(new OsuHitWindows(), 7));
-            AddStep("OD 8", () => recreateDisplay(new OsuHitWindows(), 8));
-            AddStep("OD 9", () => recreateDisplay(new OsuHitWindows(), 9));
             AddStep("OD 10", () => recreateDisplay(new OsuHitWindows(), 10));
         }
 
@@ -61,14 +53,6 @@ namespace osu.Game.Tests.Visual.Gameplay
         public void TestTaiko()
         {
             AddStep("OD 1", () => recreateDisplay(new TaikoHitWindows(), 1));
-            AddStep("OD 2", () => recreateDisplay(new TaikoHitWindows(), 2));
-            AddStep("OD 3", () => recreateDisplay(new TaikoHitWindows(), 3));
-            AddStep("OD 4", () => recreateDisplay(new TaikoHitWindows(), 4));
-            AddStep("OD 5", () => recreateDisplay(new TaikoHitWindows(), 5));
-            AddStep("OD 6", () => recreateDisplay(new TaikoHitWindows(), 6));
-            AddStep("OD 7", () => recreateDisplay(new TaikoHitWindows(), 7));
-            AddStep("OD 8", () => recreateDisplay(new TaikoHitWindows(), 8));
-            AddStep("OD 9", () => recreateDisplay(new TaikoHitWindows(), 9));
             AddStep("OD 10", () => recreateDisplay(new TaikoHitWindows(), 10));
         }
 
@@ -76,14 +60,6 @@ namespace osu.Game.Tests.Visual.Gameplay
         public void TestMania()
         {
             AddStep("OD 1", () => recreateDisplay(new ManiaHitWindows(), 1));
-            AddStep("OD 2", () => recreateDisplay(new ManiaHitWindows(), 2));
-            AddStep("OD 3", () => recreateDisplay(new ManiaHitWindows(), 3));
-            AddStep("OD 4", () => recreateDisplay(new ManiaHitWindows(), 4));
-            AddStep("OD 5", () => recreateDisplay(new ManiaHitWindows(), 5));
-            AddStep("OD 6", () => recreateDisplay(new ManiaHitWindows(), 6));
-            AddStep("OD 7", () => recreateDisplay(new ManiaHitWindows(), 7));
-            AddStep("OD 8", () => recreateDisplay(new ManiaHitWindows(), 8));
-            AddStep("OD 9", () => recreateDisplay(new ManiaHitWindows(), 9));
             AddStep("OD 10", () => recreateDisplay(new ManiaHitWindows(), 10));
         }
 
@@ -91,14 +67,6 @@ namespace osu.Game.Tests.Visual.Gameplay
         public void TestCatch()
         {
             AddStep("OD 1", () => recreateDisplay(new CatchHitWindows(), 1));
-            AddStep("OD 2", () => recreateDisplay(new CatchHitWindows(), 2));
-            AddStep("OD 3", () => recreateDisplay(new CatchHitWindows(), 3));
-            AddStep("OD 4", () => recreateDisplay(new CatchHitWindows(), 4));
-            AddStep("OD 5", () => recreateDisplay(new CatchHitWindows(), 5));
-            AddStep("OD 6", () => recreateDisplay(new CatchHitWindows(), 6));
-            AddStep("OD 7", () => recreateDisplay(new CatchHitWindows(), 7));
-            AddStep("OD 8", () => recreateDisplay(new CatchHitWindows(), 8));
-            AddStep("OD 9", () => recreateDisplay(new CatchHitWindows(), 9));
             AddStep("OD 10", () => recreateDisplay(new CatchHitWindows(), 10));
         }
 
