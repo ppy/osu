@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -8,42 +9,46 @@ using osu.Game.Rulesets.Judgements;
 using osuTK.Graphics;
 using osuTK;
 using osu.Framework.Graphics.Sprites;
-using System.Collections.Generic;
 using osu.Game.Rulesets.Objects;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics.Colour;
 using osu.Game.Graphics;
 using osu.Framework.Extensions.Color4Extensions;
-using System.Linq;
 
 namespace osu.Game.Screens.Play.HitErrorDisplay
 {
     public class BarHitErrorMeter : HitErrorMeter
     {
-        /// <summary>
-        /// The amount of <see cref="JudgementResult"/> which will be stored to calculate arrow position.
-        /// </summary>
-        private const int stored_judgements_amount = 5;
+        private readonly bool rightAligned;
 
         private const int judgement_fade_duration = 10000;
-        private const int arrow_move_duration = 500;
+
+        private const int arrow_move_duration = 400;
+
         private const int judgement_line_width = 8;
+
         private const int bar_height = 200;
+
         private const int bar_width = 3;
+
         private const int spacing = 3;
 
         private readonly SpriteIcon arrow;
+
         private readonly FillFlowContainer<Box> bar;
+
         private readonly Container judgementsContainer;
-        private readonly List<double> judgementOffsets = new List<double>();
-        private readonly double maxHitWindows;
+
+        private readonly double maxHitWindow;
 
         public BarHitErrorMeter(HitWindows hitWindows, bool rightAligned = false)
             : base(hitWindows)
         {
-            maxHitWindows = HitWindows.Meh == 0 ? HitWindows.Good : HitWindows.Meh;
+            this.rightAligned = rightAligned;
+            maxHitWindow = Math.Max(Math.Max(HitWindows.Meh, HitWindows.Ok), HitWindows.Good);
 
             AutoSizeAxes = Axes.Both;
+
             AddInternal(new FillFlowContainer
             {
                 AutoSizeAxes = Axes.X,
@@ -75,9 +80,10 @@ namespace osu.Game.Screens.Play.HitErrorDisplay
                         RelativeSizeAxes = Axes.Y,
                         Child = arrow = new SpriteIcon
                         {
-                            Anchor = Anchor.Centre,
+                            Anchor = Anchor.TopCentre,
                             Origin = Anchor.Centre,
                             RelativePositionAxes = Axes.Y,
+                            Y = 0.5f,
                             Icon = rightAligned ? FontAwesome.Solid.ChevronRight : FontAwesome.Solid.ChevronLeft,
                             Size = new Vector2(8),
                         }
@@ -93,24 +99,20 @@ namespace osu.Game.Screens.Play.HitErrorDisplay
             {
                 bar.AddRange(new[]
                 {
-                    createColoredPiece(ColourInfo.GradientVertical(colours.Yellow.Opacity(0), colours.Yellow),
-                        (maxHitWindows - HitWindows.Good) / (maxHitWindows * 2)),
-                    createColoredPiece(colours.Green, (HitWindows.Good - HitWindows.Great) / (maxHitWindows * 2)),
-                    createColoredPiece(colours.BlueLight, HitWindows.Great / maxHitWindows),
-                    createColoredPiece(colours.Green, (HitWindows.Good - HitWindows.Great) / (maxHitWindows * 2)),
-                    createColoredPiece(ColourInfo.GradientVertical(colours.Yellow, colours.Yellow.Opacity(0)),
-                        (maxHitWindows - HitWindows.Good) / (maxHitWindows * 2))
+                    createColoredPiece(ColourInfo.GradientVertical(colours.Yellow.Opacity(0), colours.Yellow), (maxHitWindow - HitWindows.Good) / (maxHitWindow * 2)),
+                    createColoredPiece(colours.Green, (HitWindows.Good - HitWindows.Great) / (maxHitWindow * 2)),
+                    createColoredPiece(colours.BlueLight, HitWindows.Great / maxHitWindow),
+                    createColoredPiece(colours.Green, (HitWindows.Good - HitWindows.Great) / (maxHitWindow * 2)),
+                    createColoredPiece(ColourInfo.GradientVertical(colours.Yellow, colours.Yellow.Opacity(0)), (maxHitWindow - HitWindows.Good) / (maxHitWindow * 2))
                 });
             }
             else
             {
                 bar.AddRange(new[]
                 {
-                    createColoredPiece(ColourInfo.GradientVertical(colours.Green.Opacity(0), colours.Green),
-                        (HitWindows.Good - HitWindows.Great) / (maxHitWindows * 2)),
-                    createColoredPiece(colours.BlueLight, HitWindows.Great / maxHitWindows),
-                    createColoredPiece(ColourInfo.GradientVertical(colours.Green, colours.Green.Opacity(0)),
-                        (HitWindows.Good - HitWindows.Great) / (maxHitWindows * 2)),
+                    createColoredPiece(ColourInfo.GradientVertical(colours.Green.Opacity(0), colours.Green), (HitWindows.Good - HitWindows.Great) / (maxHitWindow * 2)),
+                    createColoredPiece(colours.BlueLight, HitWindows.Great / maxHitWindow),
+                    createColoredPiece(ColourInfo.GradientVertical(colours.Green, colours.Green.Opacity(0)), (HitWindows.Good - HitWindows.Great) / (maxHitWindow * 2)),
                 });
             }
         }
@@ -122,51 +124,54 @@ namespace osu.Game.Screens.Play.HitErrorDisplay
             Height = (float)height
         };
 
-        public override void OnNewJudgement(JudgementResult newJudgement)
+        private double floatingAverage;
+
+        public override void OnNewJudgement(JudgementResult judgement)
         {
-            if (!newJudgement.IsHit)
+            if (!judgement.IsHit)
                 return;
 
-            var judgementLine = CreateJudgementLine(newJudgement);
+            judgementsContainer.Add(new JudgementLine
+            {
+                Y = getRelativeJudgementPosition(judgement.TimeOffset),
+                Anchor = rightAligned ? Anchor.TopLeft : Anchor.TopRight,
+                Origin = rightAligned ? Anchor.TopLeft : Anchor.TopRight,
+            });
 
-            judgementsContainer.Add(judgementLine);
-
-            judgementLine.FadeOut(judgement_fade_duration, Easing.OutQuint).Expire();
-
-            arrow.MoveToY(calculateArrowPosition(newJudgement), arrow_move_duration, Easing.OutQuint);
+            arrow.MoveToY(getRelativeJudgementPosition(floatingAverage = floatingAverage * 0.9 + judgement.TimeOffset * 0.1)
+                , arrow_move_duration, Easing.Out);
         }
 
-        protected virtual Container CreateJudgementLine(JudgementResult judgement) => new CircularContainer
+        private float getRelativeJudgementPosition(double value) => (float)((value / maxHitWindow) + 1) / 2;
+
+        public class JudgementLine : CompositeDrawable
         {
-            Anchor = Anchor.Centre,
-            Origin = Anchor.Centre,
-            Masking = true,
-            RelativeSizeAxes = Axes.X,
-            Height = 2,
-            RelativePositionAxes = Axes.Y,
-            Y = getRelativeJudgementPosition(judgement.TimeOffset),
-            Child = new Box
+            public JudgementLine()
             {
-                RelativeSizeAxes = Axes.Both,
-                Colour = Color4.White,
+                RelativeSizeAxes = Axes.X;
+                RelativePositionAxes = Axes.Y;
+                Height = 2;
+
+                InternalChild = new CircularContainer
+                {
+                    Masking = true,
+                    RelativeSizeAxes = Axes.Both,
+                    Child = new Box
+                    {
+                        RelativeSizeAxes = Axes.Both,
+                        Colour = Color4.White,
+                    }
+                };
             }
-        };
 
-        private float getRelativeJudgementPosition(double value) => (float)(value / maxHitWindows);
+            protected override void LoadComplete()
+            {
+                base.LoadComplete();
 
-        private float calculateArrowPosition(JudgementResult newJudgement)
-        {
-            judgementOffsets.Add(newJudgement.TimeOffset);
-
-            if (judgementOffsets.Count < stored_judgements_amount)
-                return getRelativeJudgementPosition(judgementOffsets.Average());
-
-            double sum = 0;
-
-            for (int i = judgementOffsets.Count - stored_judgements_amount; i < judgementOffsets.Count; i++)
-                sum += judgementOffsets[i];
-
-            return getRelativeJudgementPosition(sum / stored_judgements_amount);
+                Width = 0;
+                this.ResizeWidthTo(1, 150, Easing.OutElasticHalf);
+                this.FadeTo(0.8f, 150).Then().FadeOut(judgement_fade_duration, Easing.OutQuint).Expire();
+            }
         }
     }
 }
