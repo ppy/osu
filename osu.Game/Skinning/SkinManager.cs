@@ -60,9 +60,6 @@ namespace osu.Game.Skinning
             };
         }
 
-        private Skin createIfNotExisting(SkinInfo skinInfo) =>
-            GetSkin(Query(s => s.Name == skinInfo.Name) ?? Import(skinInfo).Result);
-
         protected override bool ShouldDeleteArchive(string path) => Path.GetExtension(path)?.ToLowerInvariant() == ".osk";
 
         /// <summary>
@@ -110,9 +107,6 @@ namespace osu.Game.Skinning
         /// <returns>A <see cref="Skin"/> instance correlating to the provided <see cref="SkinInfo"/>.</returns>
         public Skin GetSkin(SkinInfo skinInfo)
         {
-            if (skinInfo == null)
-                return null;
-
             if (skinInfo == SkinInfo.Default)
                 return new DefaultSkin();
 
