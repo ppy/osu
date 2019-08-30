@@ -18,7 +18,7 @@ namespace osu.Game.Configuration
         {
             // UI/selection defaults
             Set(OsuSetting.Ruleset, 0, 0, int.MaxValue);
-            Set(OsuSetting.Skin, 0, 0, int.MaxValue);
+            Set(OsuSetting.Skin, 0, -1, int.MaxValue);
 
             Set(OsuSetting.BeatmapDetailTab, BeatmapDetailTab.Details);
 
