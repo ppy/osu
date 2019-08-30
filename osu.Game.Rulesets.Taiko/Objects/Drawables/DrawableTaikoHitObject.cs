@@ -78,8 +78,6 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
         public abstract bool OnPressed(TaikoAction action);
         public virtual bool OnReleased(TaikoAction action) => false;
 
-        protected override void UpdateInitialTransforms() => this.FadeIn();
-
         public override double LifetimeStart
         {
             get => base.LifetimeStart;

@@ -62,13 +62,21 @@ namespace osu.Game.Graphics.Containers
 
         protected override bool OnClick(ClickEvent e)
         {
-            if (!base.ReceivePositionalInputAt(e.ScreenSpaceMousePosition))
-            {
-                Hide();
-                return true;
-            }
+            closeIfOutside(e);
 
             return base.OnClick(e);
+        }
+
+        protected override bool OnDragEnd(DragEndEvent e)
+        {
+            closeIfOutside(e);
+            return base.OnDragEnd(e);
+        }
+
+        private void closeIfOutside(MouseEvent e)
+        {
+            if (!base.ReceivePositionalInputAt(e.ScreenSpaceMousePosition))
+                Hide();
         }
 
         public virtual bool OnPressed(GlobalAction action)
