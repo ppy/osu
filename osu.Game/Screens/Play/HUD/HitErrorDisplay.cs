@@ -63,6 +63,9 @@ namespace osu.Game.Screens.Play.HUD
         {
             Children.ForEach(c => c.FadeOut(fade_duration, Easing.OutQuint));
 
+            if (hitWindows == null)
+                return;
+
             switch (type.NewValue)
             {
                 case ScoreMeterType.HitErrorBoth:
