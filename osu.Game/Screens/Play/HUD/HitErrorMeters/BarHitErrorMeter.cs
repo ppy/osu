@@ -93,6 +93,22 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
                                 RelativeSizeAxes = Axes.Both,
                                 Height = 0.5f,
                             },
+                            new SpriteIcon
+                            {
+                                Y = -10,
+                                Size = new Vector2(10),
+                                Icon = FontAwesome.Solid.ShippingFast,
+                                Anchor = Anchor.y0 | alignment,
+                                Origin = Anchor.y0 | alignment,
+                            },
+                            new SpriteIcon
+                            {
+                                Y = 10,
+                                Size = new Vector2(10),
+                                Icon = FontAwesome.Solid.Bicycle,
+                                Anchor = Anchor.y2 | alignment,
+                                Origin = Anchor.y2 | alignment,
+                            }
                         }
                     },
                     new Container
@@ -144,8 +160,8 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
 
             // a little nub to mark the centre point.
             var centre = createColourBar(windows.Last().result, 0.01f);
-            centre.Anchor = centre.Origin = Anchor.y1 | alignment;
-            centre.Width = 1.5f;
+            centre.Anchor = centre.Origin = Anchor.y1 | (alignment == Anchor.x2 ? Anchor.x0 : Anchor.x2);
+            centre.Width = 2.5f;
             colourBars.Add(centre);
 
             Color4 getColour(HitResult result)
