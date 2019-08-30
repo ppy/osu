@@ -45,7 +45,7 @@ namespace osu.Game.Beatmaps
             background = new RecyclableLazy<Texture>(GetBackground, BackgroundStillValid);
             waveform = new RecyclableLazy<Waveform>(GetWaveform);
             storyboard = new RecyclableLazy<Storyboard>(GetStoryboard);
-            skin = new RecyclableLazy<Skin>(GetSkin);
+            skin = new RecyclableLazy<ISkin>(GetSkin);
 
             total_count.Value++;
         }
@@ -202,10 +202,10 @@ namespace osu.Game.Beatmaps
         private readonly RecyclableLazy<Storyboard> storyboard;
 
         public bool SkinLoaded => skin.IsResultAvailable;
-        public Skin Skin => skin.Value;
+        public ISkin Skin => skin.Value;
 
-        protected virtual Skin GetSkin() => new DefaultSkin();
-        private readonly RecyclableLazy<Skin> skin;
+        protected virtual ISkin GetSkin() => new DefaultSkin();
+        private readonly RecyclableLazy<ISkin> skin;
 
         /// <summary>
         /// Transfer pieces of a beatmap to a new one, where possible, to save on loading.

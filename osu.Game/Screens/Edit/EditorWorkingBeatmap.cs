@@ -39,7 +39,7 @@ namespace osu.Game.Screens.Edit
 
         public Storyboard Storyboard => workingBeatmap.Storyboard;
 
-        public Skin Skin => workingBeatmap.Skin;
+        public ISkin Skin => workingBeatmap.Skin;
 
         public IBeatmap GetPlayableBeatmap(RulesetInfo ruleset, IReadOnlyList<Mod> mods) => playableBeatmap;
     }
