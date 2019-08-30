@@ -1,7 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
+using System.Linq;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -11,15 +11,16 @@ using osuTK;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Rulesets.Objects;
 using osu.Framework.Allocation;
+using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics.Colour;
 using osu.Game.Graphics;
-using osu.Framework.Extensions.Color4Extensions;
+using osu.Game.Rulesets.Scoring;
 
 namespace osu.Game.Screens.Play.HitErrorDisplay
 {
     public class BarHitErrorMeter : HitErrorMeter
     {
-        private readonly bool rightAligned;
+        private readonly Anchor alignment;
 
         private const int judgement_fade_duration = 10000;
 
@@ -35,17 +36,17 @@ namespace osu.Game.Screens.Play.HitErrorDisplay
 
         private SpriteIcon arrow;
 
-        private FillFlowContainer<Box> colourBarFlow;
+        private Container colourBarsEarly;
+        private Container colourBarsLate;
 
         private Container judgementsContainer;
 
-        private readonly double maxHitWindow;
+        private double maxHitWindow;
 
         public BarHitErrorMeter(HitWindows hitWindows, bool rightAligned = false)
             : base(hitWindows)
         {
-            this.rightAligned = rightAligned;
-            maxHitWindow = Math.Max(Math.Max(HitWindows.Meh, HitWindows.Ok), HitWindows.Good);
+            alignment = rightAligned ? Anchor.x0 : Anchor.x2;
 
             AutoSizeAxes = Axes.Both;
         }
@@ -64,23 +65,40 @@ namespace osu.Game.Screens.Play.HitErrorDisplay
                 {
                     judgementsContainer = new Container
                     {
-                        Anchor = rightAligned ? Anchor.CentreLeft : Anchor.CentreRight,
-                        Origin = rightAligned ? Anchor.CentreLeft : Anchor.CentreRight,
+                        Anchor = Anchor.y1 | alignment,
+                        Origin = Anchor.y1 | alignment,
                         Width = judgement_line_width,
                         RelativeSizeAxes = Axes.Y,
                     },
-                    colourBarFlow = new FillFlowContainer<Box>
+                    colourBars = new Container
                     {
-                        Anchor = rightAligned ? Anchor.CentreLeft : Anchor.CentreRight,
-                        Origin = rightAligned ? Anchor.CentreLeft : Anchor.CentreRight,
                         Width = bar_width,
                         RelativeSizeAxes = Axes.Y,
-                        Direction = FillDirection.Vertical,
+                        Anchor = Anchor.y1 | alignment,
+                        Origin = Anchor.y1 | alignment,
+                        Children = new Drawable[]
+                        {
+                            colourBarsEarly = new Container
+                            {
+                                Anchor = Anchor.y1 | alignment,
+                                Origin = alignment,
+                                RelativeSizeAxes = Axes.Both,
+                                Height = 0.5f,
+                                Scale = new Vector2(1, -1),
+                            },
+                            colourBarsLate = new Container
+                            {
+                                Anchor = Anchor.y1 | alignment,
+                                Origin = alignment,
+                                RelativeSizeAxes = Axes.Both,
+                                Height = 0.5f,
+                            },
+                        }
                     },
                     new Container
                     {
-                        Anchor = rightAligned ? Anchor.CentreLeft : Anchor.CentreRight,
-                        Origin = rightAligned ? Anchor.CentreLeft : Anchor.CentreRight,
+                        Anchor = Anchor.y1 | alignment,
+                        Origin = Anchor.y1 | alignment,
                         AutoSizeAxes = Axes.X,
                         RelativeSizeAxes = Axes.Y,
                         Child = arrow = new SpriteIcon
@@ -89,53 +107,111 @@ namespace osu.Game.Screens.Play.HitErrorDisplay
                             Origin = Anchor.Centre,
                             RelativePositionAxes = Axes.Y,
                             Y = 0.5f,
-                            Icon = rightAligned ? FontAwesome.Solid.ChevronLeft : FontAwesome.Solid.ChevronRight,
+                            Icon = alignment == Anchor.x2 ? FontAwesome.Solid.ChevronRight : FontAwesome.Solid.ChevronLeft,
                             Size = new Vector2(8),
                         }
                     },
                 }
             };
 
-            if (HitWindows.Meh != 0)
-            {
-                colourBarFlow.AddRange(new[]
-                {
-                    createColoredPiece(ColourInfo.GradientVertical(colours.Yellow.Opacity(0), colours.Yellow), (maxHitWindow - HitWindows.Good) / (maxHitWindow * 2)),
-                    createColoredPiece(colours.Green, (HitWindows.Good - HitWindows.Great) / (maxHitWindow * 2)),
-                    createColoredPiece(colours.BlueLight, HitWindows.Great / maxHitWindow),
-                    createColoredPiece(colours.Green, (HitWindows.Good - HitWindows.Great) / (maxHitWindow * 2)),
-                    createColoredPiece(ColourInfo.GradientVertical(colours.Yellow, colours.Yellow.Opacity(0)), (maxHitWindow - HitWindows.Good) / (maxHitWindow * 2))
-                });
-            }
-            else
-            {
-                colourBarFlow.AddRange(new[]
-                {
-                    createColoredPiece(ColourInfo.GradientVertical(colours.Green.Opacity(0), colours.Green), (HitWindows.Good - HitWindows.Great) / (maxHitWindow * 2)),
-                    createColoredPiece(colours.BlueLight, HitWindows.Great / maxHitWindow),
-                    createColoredPiece(ColourInfo.GradientVertical(colours.Green, colours.Green.Opacity(0)), (HitWindows.Good - HitWindows.Great) / (maxHitWindow * 2)),
-                });
-            }
+            createColourBars(colours);
         }
 
         protected override void LoadComplete()
         {
             base.LoadComplete();
 
-            colourBarFlow.Height = 0;
-            colourBarFlow.ResizeHeightTo(1, 400, Easing.OutQuint);
+            colourBars.Height = 0;
+            colourBars.ResizeHeightTo(1, 800, Easing.OutQuint);
 
-            arrow.FadeInFromZero(400);
+            arrow.Alpha = 0.01f;
+            arrow.Delay(200).FadeInFromZero(600);
         }
 
-        private Box createColoredPiece(ColourInfo colour, double height) => new Box
+        private void createColourBars(OsuColour colours)
         {
-            RelativeSizeAxes = Axes.Both,
-            Colour = colour,
-            Height = (float)height
-        };
+            var windows = HitWindows.GetAllAvailableHalfWindows().ToArray();
+
+            maxHitWindow = windows.First().length;
+
+            for (var i = 0; i < windows.Length; i++)
+            {
+                var (result, length) = windows[i];
+
+                colourBarsEarly.Add(createColourBar(result, (float)(length / maxHitWindow), i == 0));
+                colourBarsLate.Add(createColourBar(result, (float)(length / maxHitWindow), i == 0));
+            }
+
+            // a little nub to mark the centre point.
+            var centre = createColourBar(windows.Last().result, 0.01f);
+            centre.Anchor = centre.Origin = Anchor.y1 | alignment;
+            centre.Width = 1.5f;
+            colourBars.Add(centre);
+
+            Color4 getColour(HitResult result)
+            {
+                switch (result)
+                {
+                    case HitResult.Meh:
+                        return colours.Yellow;
+
+                    case HitResult.Ok:
+                        return colours.Green;
+
+                    case HitResult.Good:
+                        return colours.GreenLight;
+
+                    case HitResult.Great:
+                        return colours.Blue;
+
+                    default:
+                        return colours.BlueLight;
+                }
+            }
+
+            Drawable createColourBar(HitResult result, float height, bool first = false)
+            {
+                var colour = getColour(result);
+
+                if (first)
+                {
+                    // the first bar needs gradient rendering.
+                    const float gradient_start = 0.8f;
+
+                    return new Container
+                    {
+                        RelativeSizeAxes = Axes.Both,
+                        Children = new Drawable[]
+                        {
+                            new Box
+                            {
+                                RelativeSizeAxes = Axes.Both,
+                                Colour = getColour(result),
+                                Height = height * gradient_start
+                            },
+                            new Box
+                            {
+                                RelativeSizeAxes = Axes.Both,
+                                RelativePositionAxes = Axes.Both,
+                                Colour = ColourInfo.GradientVertical(colour, colour.Opacity(0)),
+                                Y = gradient_start,
+                                Height = height * (1 - gradient_start)
+                            },
+                        }
+                    };
+                }
+
+                return new Box
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Colour = colour,
+                    Height = height
+                };
+            }
+        }
 
         private double floatingAverage;
+        private Container colourBars;
 
         public override void OnNewJudgement(JudgementResult judgement)
         {
@@ -145,11 +221,12 @@ namespace osu.Game.Screens.Play.HitErrorDisplay
             judgementsContainer.Add(new JudgementLine
             {
                 Y = getRelativeJudgementPosition(judgement.TimeOffset),
-                Anchor = rightAligned ? Anchor.TopRight : Anchor.TopLeft,
-                Origin = rightAligned ? Anchor.TopRight : Anchor.TopLeft,
+                Anchor = alignment == Anchor.x2 ? Anchor.x0 : Anchor.x2,
+                Origin = alignment == Anchor.x2 ? Anchor.x0 : Anchor.x2,
             });
 
-            arrow.MoveToY(getRelativeJudgementPosition(floatingAverage = floatingAverage * 0.9 + judgement.TimeOffset * 0.1)
+            arrow.MoveToY(
+                getRelativeJudgementPosition(floatingAverage = floatingAverage * 0.9 + judgement.TimeOffset * 0.1)
                 , arrow_move_duration, Easing.Out);
         }
 
@@ -180,6 +257,7 @@ namespace osu.Game.Screens.Play.HitErrorDisplay
                 base.LoadComplete();
 
                 Width = 0;
+
                 this.ResizeWidthTo(1, 150, Easing.OutElasticHalf);
                 this.FadeTo(0.8f, 150).Then().FadeOut(judgement_fade_duration, Easing.OutQuint).Expire();
             }
