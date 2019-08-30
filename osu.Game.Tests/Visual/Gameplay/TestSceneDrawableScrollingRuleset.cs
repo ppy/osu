@@ -174,7 +174,7 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             public override IEnumerable<Mod> GetModsFor(ModType type) => throw new NotImplementedException();
 
-            public override DrawableRuleset CreateDrawableRulesetWith(WorkingBeatmap beatmap, IReadOnlyList<Mod> mods) => new TestDrawableScrollingRuleset(this, beatmap, mods);
+            public override DrawableRuleset CreateDrawableRulesetWith(IWorkingBeatmap beatmap, IReadOnlyList<Mod> mods) => new TestDrawableScrollingRuleset(this, beatmap, mods);
 
             public override IBeatmapConverter CreateBeatmapConverter(IBeatmap beatmap) => new TestBeatmapConverter(beatmap);
 
@@ -193,7 +193,7 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             protected override ScrollVisualisationMethod VisualisationMethod => ScrollVisualisationMethod.Overlapping;
 
-            public TestDrawableScrollingRuleset(Ruleset ruleset, WorkingBeatmap beatmap, IReadOnlyList<Mod> mods)
+            public TestDrawableScrollingRuleset(Ruleset ruleset, IWorkingBeatmap beatmap, IReadOnlyList<Mod> mods)
                 : base(ruleset, beatmap, mods)
             {
                 TimeRange.Value = time_range;
