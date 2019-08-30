@@ -7,7 +7,6 @@ using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Taiko.Objects;
 using osu.Game.Rulesets.Mania.Objects;
 using osu.Game.Rulesets.Catch.Objects;
-using osu.Game.Screens.Play.HitErrorDisplay;
 using System;
 using System.Collections.Generic;
 using osu.Game.Rulesets.Judgements;
@@ -16,6 +15,7 @@ using osu.Framework.MathUtils;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
+using osu.Game.Screens.Play.HUD.HitErrorMeters;
 
 namespace osu.Game.Tests.Visual.Gameplay
 {
