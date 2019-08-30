@@ -10,6 +10,7 @@ using osu.Framework.Audio.Sample;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Video;
 using osu.Framework.Input.Events;
 using osu.Framework.Logging;
 using osu.Framework.Screens;
@@ -81,6 +82,8 @@ namespace osu.Game.Screens.Play
 
         protected DimmableStoryboard DimmableStoryboard { get; private set; }
 
+        protected VideoSprite Video { get; private set; }
+
         [Cached]
         [Cached(Type = typeof(IBindable<IReadOnlyList<Mod>>))]
         protected new readonly Bindable<IReadOnlyList<Mod>> Mods = new Bindable<IReadOnlyList<Mod>>(Array.Empty<Mod>());
@@ -143,6 +146,14 @@ namespace osu.Game.Screens.Play
         private void addUnderlayComponents(Container target)
         {
             target.Add(DimmableStoryboard = new DimmableStoryboard(Beatmap.Value.Storyboard) { RelativeSizeAxes = Axes.Both });
+
+            var video = Beatmap.Value.Video;
+
+            if (video != null)
+            {
+                target.Add(Video = video);
+                Video.RelativeSizeAxes = Axes.Both;
+            }
         }
 
         private void addGameplayComponents(Container target, WorkingBeatmap working)
