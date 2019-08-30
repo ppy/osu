@@ -35,18 +35,6 @@ namespace osu.Game.Screens.Play.HUD
             processor.NewJudgement += onNewJudgement;
         }
 
-        protected override void Dispose(bool isDisposing)
-        {
-            base.Dispose(isDisposing);
-            processor.NewJudgement -= onNewJudgement;
-        }
-
-        private void onNewJudgement(JudgementResult result)
-        {
-            foreach (var c in Children)
-                c.OnNewJudgement(result);
-        }
-
         [BackgroundDependencyLoader]
         private void load(OsuConfigManager config)
         {
@@ -57,6 +45,12 @@ namespace osu.Game.Screens.Play.HUD
         {
             base.LoadComplete();
             type.BindValueChanged(typeChanged, true);
+        }
+
+        private void onNewJudgement(JudgementResult result)
+        {
+            foreach (var c in Children)
+                c.OnNewJudgement(result);
         }
 
         private void typeChanged(ValueChangedEvent<ScoreMeterType> type)
@@ -95,6 +89,12 @@ namespace osu.Game.Screens.Play.HUD
 
             Add(display);
             display.FadeInFromZero(fade_duration, Easing.OutQuint);
+        }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+            processor.NewJudgement -= onNewJudgement;
         }
     }
 }
