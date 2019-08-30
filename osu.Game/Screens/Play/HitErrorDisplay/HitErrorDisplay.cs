@@ -1,13 +1,16 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Linq;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics;
 using osu.Game.Rulesets.Scoring;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
+using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Objects;
 
 namespace osu.Game.Screens.Play.HitErrorDisplay
@@ -19,25 +22,33 @@ namespace osu.Game.Screens.Play.HitErrorDisplay
 
         private readonly Bindable<ScoreMeterType> type = new Bindable<ScoreMeterType>();
 
-        private readonly HitWindows hitWindows;
+        private HitWindows hitWindows;
 
         private readonly ScoreProcessor processor;
-
-        private BarHitErrorMeter leftMeter;
-
-        private BarHitErrorMeter rightMeter;
 
         public HitErrorDisplay(ScoreProcessor processor)
         {
             this.processor = processor;
-            hitWindows = processor.CreateHitWindows();
+            processor.NewJudgement += onNewJudgement;
+        }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+            processor.NewJudgement -= onNewJudgement;
+        }
+
+        private void onNewJudgement(JudgementResult result)
+        {
+            foreach (var c in Children)
+                c.OnNewJudgement(result);
         }
 
         [BackgroundDependencyLoader]
         private void load(OsuConfigManager config, Bindable<WorkingBeatmap> workingBeatmap)
         {
             config.BindWith(OsuSetting.ScoreMeter, type);
-            hitWindows.SetDifficulty(workingBeatmap.Value.BeatmapInfo.BaseDifficulty.OverallDifficulty);
+            hitWindows = workingBeatmap.Value.Beatmap.HitObjects.First().HitWindows;
         }
 
         protected override void LoadComplete()
@@ -48,82 +59,37 @@ namespace osu.Game.Screens.Play.HitErrorDisplay
 
         private void typeChanged(ValueChangedEvent<ScoreMeterType> type)
         {
+            Children.ForEach(c => c.FadeOut(fade_duration, Easing.OutQuint));
+
             switch (type.NewValue)
             {
-                case ScoreMeterType.None:
-                    removeLeftDisplay();
-                    removeRightDisplay();
-                    break;
-
                 case ScoreMeterType.HitErrorBoth:
-                    addLeftDisplay();
-                    addRightDisplay();
+                    createBar(false);
+                    createBar(true);
                     break;
 
                 case ScoreMeterType.HitErrorLeft:
-                    addLeftDisplay();
-                    removeRightDisplay();
+                    createBar(false);
                     break;
 
                 case ScoreMeterType.HitErrorRight:
-                    addRightDisplay();
-                    removeLeftDisplay();
+                    createBar(true);
                     break;
             }
         }
 
-        private void addLeftDisplay()
+        private void createBar(bool rightAligned)
         {
-            if (leftMeter != null)
-                return;
-
-            leftMeter = createNew();
-        }
-
-        private void addRightDisplay()
-        {
-            if (rightMeter != null)
-                return;
-
-            rightMeter = createNew(true);
-        }
-
-        private void removeRightDisplay()
-        {
-            if (rightMeter == null)
-                return;
-
-            processor.NewJudgement -= rightMeter.OnNewJudgement;
-
-            rightMeter.FadeOut(fade_duration, Easing.OutQuint).Expire();
-            rightMeter = null;
-        }
-
-        private void removeLeftDisplay()
-        {
-            if (leftMeter == null)
-                return;
-
-            processor.NewJudgement -= leftMeter.OnNewJudgement;
-
-            leftMeter.FadeOut(fade_duration, Easing.OutQuint).Expire();
-            leftMeter = null;
-        }
-
-        private BarHitErrorMeter createNew(bool reversed = false)
-        {
-            var display = new BarHitErrorMeter(hitWindows, reversed)
+            var display = new BarHitErrorMeter(hitWindows, rightAligned)
             {
                 Margin = new MarginPadding(margin),
-                Anchor = reversed ? Anchor.CentreRight : Anchor.CentreLeft,
-                Origin = reversed ? Anchor.CentreRight : Anchor.CentreLeft,
+                Anchor = rightAligned ? Anchor.CentreRight : Anchor.CentreLeft,
+                Origin = rightAligned ? Anchor.CentreRight : Anchor.CentreLeft,
                 Alpha = 0,
             };
 
-            processor.NewJudgement += display.OnNewJudgement;
             Add(display);
             display.FadeInFromZero(fade_duration, Easing.OutQuint);
-            return display;
         }
     }
 }
