@@ -10,7 +10,6 @@ using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Animations;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
@@ -59,8 +58,6 @@ namespace osu.Game.Skinning
             Textures?.Dispose();
             Samples?.Dispose();
         }
-
-        private const double default_frame_time = 1000 / 60d;
 
         public override Drawable GetDrawableComponent(string componentName)
         {
@@ -114,7 +111,7 @@ namespace osu.Game.Skinning
                         };
             }
 
-            return getAnimation(componentName, animatable, looping);
+            return this.GetAnimation(componentName, animatable, looping);
         }
 
         public override Texture GetTexture(string componentName)
@@ -159,41 +156,6 @@ namespace osu.Game.Skinning
         {
             string lastPiece = componentName.Split('/').Last();
             return componentName.StartsWith("Gameplay/taiko/") ? "taiko-" + lastPiece : lastPiece;
-        }
-
-        private Drawable getAnimation(string componentName, bool animatable, bool looping, string animationSeparator = "-")
-        {
-            Texture texture;
-
-            Texture getFrameTexture(int frame) => GetTexture($"{componentName}{animationSeparator}{frame}");
-
-            TextureAnimation animation = null;
-
-            if (animatable)
-            {
-                for (int i = 0;; i++)
-                {
-                    if ((texture = getFrameTexture(i)) == null)
-                        break;
-
-                    if (animation == null)
-                        animation = new TextureAnimation
-                        {
-                            DefaultFrameLength = default_frame_time,
-                            Repeat = looping
-                        };
-
-                    animation.AddFrame(texture);
-                }
-            }
-
-            if (animation != null)
-                return animation;
-
-            if ((texture = GetTexture(componentName)) != null)
-                return new Sprite { Texture = texture };
-
-            return null;
         }
 
         protected class LegacySkinResourceStore<T> : IResourceStore<byte[]>
