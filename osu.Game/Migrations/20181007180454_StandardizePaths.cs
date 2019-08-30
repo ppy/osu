@@ -15,6 +15,7 @@ namespace osu.Game.Migrations
             migrationBuilder.Sql($"UPDATE `BeatmapInfo` SET `Path` = REPLACE(`Path`, '{windowsStyle}', '{standardized}')");
             migrationBuilder.Sql($"UPDATE `BeatmapMetadata` SET `AudioFile` = REPLACE(`AudioFile`, '{windowsStyle}', '{standardized}')");
             migrationBuilder.Sql($"UPDATE `BeatmapMetadata` SET `BackgroundFile` = REPLACE(`BackgroundFile`, '{windowsStyle}', '{standardized}')");
+            migrationBuilder.Sql($"UPDATE `BeatmapMetadata` SET `VideoFile` = REPLACE(`VideoFile`, '{windowsStyle}', '{standardized}')");
             migrationBuilder.Sql($"UPDATE `BeatmapSetFileInfo` SET `Filename` = REPLACE(`Filename`, '{windowsStyle}', '{standardized}')");
             migrationBuilder.Sql($"UPDATE `SkinFileInfo` SET `Filename` = REPLACE(`Filename`, '{windowsStyle}', '{standardized}')");
         }
