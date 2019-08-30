@@ -5,7 +5,7 @@ using osu.Game.Skinning;
 
 namespace osu.Game.Rulesets.Catch
 {
-    public class CatchSkinComponent : PlaySkinComponent<CatchSkinComponents>
+    public class CatchSkinComponent : GameplaySkinComponent<CatchSkinComponents>
     {
         public CatchSkinComponent(CatchSkinComponents component)
             : base(component)

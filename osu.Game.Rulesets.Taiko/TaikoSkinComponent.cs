@@ -5,7 +5,7 @@ using osu.Game.Skinning;
 
 namespace osu.Game.Rulesets.Taiko
 {
-    public class TaikoSkinComponent : PlaySkinComponent<TaikoSkinComponents>
+    public class TaikoSkinComponent : GameplaySkinComponent<TaikoSkinComponents>
     {
         public TaikoSkinComponent(TaikoSkinComponents component)
             : base(component)
