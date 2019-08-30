@@ -3,6 +3,7 @@
 
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Humanizer;
 using osu.Framework.Allocation;
@@ -32,6 +33,7 @@ namespace osu.Game.Overlays
         private readonly FillFlowContainer resultCountsContainer;
         private readonly OsuSpriteText resultCountsText;
         private FillFlowContainer<DirectPanel> panels;
+        private CancellationTokenSource loadCancellation;
 
         protected override Color4 BackgroundColour => OsuColour.FromHex(@"485e74");
         protected override Color4 TrianglesColourLight => OsuColour.FromHex(@"465b71");
@@ -181,6 +183,8 @@ namespace osu.Game.Overlays
 
         private void recreatePanels(PanelDisplayStyle displayStyle)
         {
+            loadCancellation?.Cancel();
+
             if (panels != null)
             {
                 panels.FadeOut(200);
@@ -213,11 +217,12 @@ namespace osu.Game.Overlays
                 })
             };
 
+            loadCancellation = new CancellationTokenSource();
+
             LoadComponentAsync(newPanels, p =>
             {
-                if (panels != null) ScrollFlow.Remove(panels);
-                ScrollFlow.Add(panels = newPanels);
-            });
+                ScrollFlow.Add(panels = p);
+            }, loadCancellation.Token);
         }
 
         protected override void PopIn()
@@ -241,6 +246,7 @@ namespace osu.Game.Overlays
             BeatmapSets = null;
             ResultAmounts = null;
 
+            loadCancellation?.Cancel();
             getSetsRequest?.Cancel();
 
             queryChangedDebounce?.Cancel();
