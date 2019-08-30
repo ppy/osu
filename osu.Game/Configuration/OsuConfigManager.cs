@@ -83,6 +83,7 @@ namespace osu.Game.Configuration
             Set(OsuSetting.ShowInterface, true);
             Set(OsuSetting.ShowHealthDisplayWhenCantFail, true);
             Set(OsuSetting.KeyOverlay, false);
+            Set(OsuSetting.ScoreMeter, ScoreMeterType.HitErrorBoth);
 
             Set(OsuSetting.FloatingComments, false);
 
@@ -136,6 +137,7 @@ namespace osu.Game.Configuration
         BlurLevel,
         ShowStoryboard,
         KeyOverlay,
+        ScoreMeter,
         FloatingComments,
         ShowInterface,
         ShowHealthDisplayWhenCantFail,
