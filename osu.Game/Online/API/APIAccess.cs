@@ -165,7 +165,7 @@ namespace osu.Game.Online.API
                         }
 
                         // The Success callback event is fired on the main thread, so we should wait for that to run before proceeding.
-                        // Without this, we will end up circulating this Connecting loop multiple times and queuing up many web requests
+                        // Without this, we will end up circulating this Connecting loop multiple times and queueing up many web requests
                         // before actually going online.
                         while (State > APIState.Offline && State < APIState.Online)
                             Thread.Sleep(500);
