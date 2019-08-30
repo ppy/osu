@@ -37,8 +37,8 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             AddRepeatStep("New random judgement", () => newJudgement(), 40);
 
-            AddRepeatStep("New max negative", () => newJudgement(-hitWindows.Meh), 20);
-            AddRepeatStep("New max positive", () => newJudgement(hitWindows.Meh), 20);
+            AddRepeatStep("New max negative", () => newJudgement(-hitWindows.HalfWindowFor(HitResult.Meh)), 20);
+            AddRepeatStep("New max positive", () => newJudgement(hitWindows.HalfWindowFor(HitResult.Meh)), 20);
             AddStep("New fixed judgement (50ms)", () => newJudgement(50));
         }
 
