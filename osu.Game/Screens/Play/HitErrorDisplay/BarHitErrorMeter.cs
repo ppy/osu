@@ -18,7 +18,7 @@ using System.Linq;
 
 namespace osu.Game.Screens.Play.HitErrorDisplay
 {
-    public class BarHitErrorDisplay : HitErrorDisplay
+    public class BarHitErrorMeter : HitErrorMeter
     {
         /// <summary>
         /// The amount of <see cref="JudgementResult"/> which will be stored to calculate arrow position.
@@ -38,7 +38,7 @@ namespace osu.Game.Screens.Play.HitErrorDisplay
         private readonly List<double> judgementOffsets = new List<double>();
         private readonly double maxHitWindows;
 
-        public BarHitErrorDisplay(HitWindows hitWindows, bool reversed = false)
+        public BarHitErrorMeter(HitWindows hitWindows, bool reversed = false)
             : base(hitWindows)
         {
             maxHitWindows = HitWindows.Meh == 0 ? HitWindows.Good : HitWindows.Meh;

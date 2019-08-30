@@ -15,7 +15,6 @@ using osu.Game.Overlays.Notifications;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.UI;
-using osu.Game.Screens.Play.HitErrorDisplay;
 using osu.Game.Screens.Play.HUD;
 using osuTK;
 using osuTK.Input;
@@ -34,7 +33,7 @@ namespace osu.Game.Screens.Play
         public readonly HealthDisplay HealthDisplay;
         public readonly SongProgress Progress;
         public readonly ModDisplay ModDisplay;
-        public readonly HitErrorDisplayOverlay HitErrorDisplayOverlay;
+        public readonly HitErrorDisplay.HitErrorDisplay HitErrorDisplay;
         public readonly HoldForMenuButton HoldToQuit;
         public readonly PlayerSettingsOverlay PlayerSettingsOverlay;
 
@@ -86,7 +85,7 @@ namespace osu.Game.Screens.Play
                         HealthDisplay = CreateHealthDisplay(),
                         Progress = CreateProgress(),
                         ModDisplay = CreateModsContainer(),
-                        HitErrorDisplayOverlay = CreateHitErrorDisplayOverlay(),
+                        HitErrorDisplay = CreateHitErrorDisplayOverlay(),
                     }
                 },
                 PlayerSettingsOverlay = CreatePlayerSettingsOverlay(),
@@ -259,7 +258,7 @@ namespace osu.Game.Screens.Play
             Margin = new MarginPadding { Top = 20, Right = 10 },
         };
 
-        protected virtual HitErrorDisplayOverlay CreateHitErrorDisplayOverlay() => new HitErrorDisplayOverlay(scoreProcessor)
+        protected virtual HitErrorDisplay.HitErrorDisplay CreateHitErrorDisplayOverlay() => new HitErrorDisplay.HitErrorDisplay(scoreProcessor)
         {
             RelativeSizeAxes = Axes.Both,
         };

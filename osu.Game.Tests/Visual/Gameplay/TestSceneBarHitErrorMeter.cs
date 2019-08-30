@@ -19,16 +19,16 @@ using osu.Framework.Graphics.Sprites;
 
 namespace osu.Game.Tests.Visual.Gameplay
 {
-    public class TestSceneHitErrorDisplay : OsuTestScene
+    public class TestSceneBarHitErrorMeter : OsuTestScene
     {
         public override IReadOnlyList<Type> RequiredTypes => new[]
         {
-            typeof(HitErrorDisplay),
+            typeof(HitErrorMeter),
         };
 
-        private HitErrorDisplay display;
+        private HitErrorMeter meter;
 
-        public TestSceneHitErrorDisplay()
+        public TestSceneBarHitErrorMeter()
         {
             recreateDisplay(new OsuHitWindows(), 5);
             AddStep("New random judgement", () => newJudgement());
@@ -115,7 +115,7 @@ namespace osu.Game.Tests.Visual.Gameplay
                 }
             });
 
-            Add(display = new BarHitErrorDisplay(hitWindows)
+            Add(meter = new BarHitErrorMeter(hitWindows)
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
@@ -124,7 +124,7 @@ namespace osu.Game.Tests.Visual.Gameplay
 
         private void newJudgement(float offset = 0)
         {
-            display?.OnNewJudgement(new JudgementResult(new Judgement())
+            meter?.OnNewJudgement(new JudgementResult(new Judgement())
             {
                 TimeOffset = offset == 0 ? RNG.Next(-70, 70) : offset,
                 Type = HitResult.Perfect,
