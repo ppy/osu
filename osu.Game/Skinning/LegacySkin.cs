@@ -9,6 +9,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.IO.Stores;
 using osu.Game.Audio;
+using osu.Game.Rulesets.Scoring;
 using osuTK.Graphics;
 
 namespace osu.Game.Skinning
@@ -49,19 +50,25 @@ namespace osu.Game.Skinning
 
         public override Drawable GetDrawableComponent(ISkinComponent component)
         {
-            switch (component.LookupName)
+            switch (component)
             {
-                case "Play/Miss":
-                    return this.GetAnimation("hit0", true, false);
+                case PlaySkinComponent<HitResult> resultComponent:
+                    switch (resultComponent.Component)
+                    {
+                        case HitResult.Miss:
+                            return this.GetAnimation("hit0", true, false);
 
-                case "Play/Meh":
-                    return this.GetAnimation("hit50", true, false);
+                        case HitResult.Meh:
+                            return this.GetAnimation("hit50", true, false);
 
-                case "Play/Good":
-                    return this.GetAnimation("hit100", true, false);
+                        case HitResult.Good:
+                            return this.GetAnimation("hit100", true, false);
 
-                case "Play/Great":
-                    return this.GetAnimation("hit300", true, false);
+                        case HitResult.Great:
+                            return this.GetAnimation("hit300", true, false);
+                    }
+
+                    break;
             }
 
             return this.GetAnimation(component.LookupName, false, false);
