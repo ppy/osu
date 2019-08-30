@@ -30,8 +30,14 @@ namespace osu.Game.Tests.Visual.Gameplay
 
         public TestSceneBarHitErrorMeter()
         {
-            recreateDisplay(new OsuHitWindows(), 5);
-            AddStep("New random judgement", () => newJudgement());
+            var hitWindows = new OsuHitWindows();
+
+            recreateDisplay(hitWindows, 5);
+
+            AddRepeatStep("New random judgement", () => newJudgement(), 40);
+
+            AddRepeatStep("New max negative", () => newJudgement(-hitWindows.Meh), 20);
+            AddRepeatStep("New max positive", () => newJudgement(hitWindows.Meh), 20);
             AddStep("New fixed judgement (50ms)", () => newJudgement(50));
         }
 
@@ -122,11 +128,11 @@ namespace osu.Game.Tests.Visual.Gameplay
             });
         }
 
-        private void newJudgement(float offset = 0)
+        private void newJudgement(double offset = 0)
         {
             meter?.OnNewJudgement(new JudgementResult(new Judgement())
             {
-                TimeOffset = offset == 0 ? RNG.Next(-70, 70) : offset,
+                TimeOffset = offset == 0 ? RNG.Next(-150, 150) : offset,
                 Type = HitResult.Perfect,
             });
         }
