@@ -16,7 +16,7 @@ namespace osu.Game.Skinning
         /// <summary>
         /// The displayed component.
         /// </summary>
-        protected Drawable Drawable { get; private set; }
+        public Drawable Drawable { get; private set; }
 
         private readonly string componentName;
 
