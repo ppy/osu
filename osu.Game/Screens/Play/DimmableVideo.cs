@@ -27,18 +27,18 @@ namespace osu.Game.Screens.Play
 
         protected override void LoadComplete()
         {
-            ShowStoryboard.BindValueChanged(_ => initializeVideo(true), true);
+            ShowVideo.BindValueChanged(_ => initializeVideo(true), true);
             base.LoadComplete();
         }
 
-        protected override bool ShowDimContent => ShowStoryboard.Value && DimLevel < 1;
+        protected override bool ShowDimContent => ShowVideo.Value && DimLevel < 1;
 
         private void initializeVideo(bool async)
         {
             if (drawableVideo != null)
                 return;
 
-            if (!ShowStoryboard.Value)
+            if (!ShowVideo.Value)
                 return;
 
             drawableVideo = new DrawableVideo(video);
