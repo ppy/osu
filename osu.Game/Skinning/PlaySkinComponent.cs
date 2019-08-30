@@ -11,7 +11,7 @@ namespace osu.Game.Skinning
 
         public PlaySkinComponent(T component)
         {
-            this.Component = component;
+            Component = component;
         }
 
         protected virtual string RulesetPrefix => string.Empty;
