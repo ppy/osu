@@ -106,8 +106,11 @@ namespace osu.Game.Screens.Menu
 
         private void onSolo()
         {
-            this.Push(songSelect);
-            songSelect = null;
+            using (var s = songSelect)
+            {
+                songSelect = null;
+                this.Push(s);
+            }
         }
 
         public override void OnEntering(IScreen last)
