@@ -25,19 +25,19 @@ namespace osu.Game.Screens.Play.HitErrorDisplay
 
         private const int arrow_move_duration = 400;
 
-        private const int judgement_line_width = 8;
+        private const int judgement_line_width = 6;
 
         private const int bar_height = 200;
 
-        private const int bar_width = 3;
+        private const int bar_width = 2;
 
-        private const int spacing = 3;
+        private const int spacing = 2;
 
-        private readonly SpriteIcon arrow;
+        private SpriteIcon arrow;
 
-        private readonly FillFlowContainer<Box> bar;
+        private FillFlowContainer<Box> colourBarFlow;
 
-        private readonly Container judgementsContainer;
+        private Container judgementsContainer;
 
         private readonly double maxHitWindow;
 
@@ -48,34 +48,39 @@ namespace osu.Game.Screens.Play.HitErrorDisplay
             maxHitWindow = Math.Max(Math.Max(HitWindows.Meh, HitWindows.Ok), HitWindows.Good);
 
             AutoSizeAxes = Axes.Both;
+        }
 
-            AddInternal(new FillFlowContainer
+        [BackgroundDependencyLoader]
+        private void load(OsuColour colours)
+        {
+            InternalChild = new FillFlowContainer
             {
                 AutoSizeAxes = Axes.X,
                 Height = bar_height,
                 Direction = FillDirection.Horizontal,
                 Spacing = new Vector2(spacing, 0),
+                Margin = new MarginPadding(2),
                 Children = new Drawable[]
                 {
                     judgementsContainer = new Container
                     {
-                        Anchor = rightAligned ? Anchor.CentreRight : Anchor.CentreLeft,
-                        Origin = rightAligned ? Anchor.CentreRight : Anchor.CentreLeft,
+                        Anchor = rightAligned ? Anchor.CentreLeft : Anchor.CentreRight,
+                        Origin = rightAligned ? Anchor.CentreLeft : Anchor.CentreRight,
                         Width = judgement_line_width,
                         RelativeSizeAxes = Axes.Y,
                     },
-                    bar = new FillFlowContainer<Box>
+                    colourBarFlow = new FillFlowContainer<Box>
                     {
-                        Anchor = rightAligned ? Anchor.CentreRight : Anchor.CentreLeft,
-                        Origin = rightAligned ? Anchor.CentreRight : Anchor.CentreLeft,
+                        Anchor = rightAligned ? Anchor.CentreLeft : Anchor.CentreRight,
+                        Origin = rightAligned ? Anchor.CentreLeft : Anchor.CentreRight,
                         Width = bar_width,
                         RelativeSizeAxes = Axes.Y,
                         Direction = FillDirection.Vertical,
                     },
                     new Container
                     {
-                        Anchor = rightAligned ? Anchor.CentreRight : Anchor.CentreLeft,
-                        Origin = rightAligned ? Anchor.CentreRight : Anchor.CentreLeft,
+                        Anchor = rightAligned ? Anchor.CentreLeft : Anchor.CentreRight,
+                        Origin = rightAligned ? Anchor.CentreLeft : Anchor.CentreRight,
                         AutoSizeAxes = Axes.X,
                         RelativeSizeAxes = Axes.Y,
                         Child = arrow = new SpriteIcon
@@ -84,20 +89,16 @@ namespace osu.Game.Screens.Play.HitErrorDisplay
                             Origin = Anchor.Centre,
                             RelativePositionAxes = Axes.Y,
                             Y = 0.5f,
-                            Icon = rightAligned ? FontAwesome.Solid.ChevronRight : FontAwesome.Solid.ChevronLeft,
+                            Icon = rightAligned ? FontAwesome.Solid.ChevronLeft : FontAwesome.Solid.ChevronRight,
                             Size = new Vector2(8),
                         }
                     },
                 }
-            });
-        }
+            };
 
-        [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
-        {
             if (HitWindows.Meh != 0)
             {
-                bar.AddRange(new[]
+                colourBarFlow.AddRange(new[]
                 {
                     createColoredPiece(ColourInfo.GradientVertical(colours.Yellow.Opacity(0), colours.Yellow), (maxHitWindow - HitWindows.Good) / (maxHitWindow * 2)),
                     createColoredPiece(colours.Green, (HitWindows.Good - HitWindows.Great) / (maxHitWindow * 2)),
@@ -108,13 +109,23 @@ namespace osu.Game.Screens.Play.HitErrorDisplay
             }
             else
             {
-                bar.AddRange(new[]
+                colourBarFlow.AddRange(new[]
                 {
                     createColoredPiece(ColourInfo.GradientVertical(colours.Green.Opacity(0), colours.Green), (HitWindows.Good - HitWindows.Great) / (maxHitWindow * 2)),
                     createColoredPiece(colours.BlueLight, HitWindows.Great / maxHitWindow),
                     createColoredPiece(ColourInfo.GradientVertical(colours.Green, colours.Green.Opacity(0)), (HitWindows.Good - HitWindows.Great) / (maxHitWindow * 2)),
                 });
             }
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            colourBarFlow.Height = 0;
+            colourBarFlow.ResizeHeightTo(1, 400, Easing.OutQuint);
+
+            arrow.FadeInFromZero(400);
         }
 
         private Box createColoredPiece(ColourInfo colour, double height) => new Box
@@ -134,8 +145,8 @@ namespace osu.Game.Screens.Play.HitErrorDisplay
             judgementsContainer.Add(new JudgementLine
             {
                 Y = getRelativeJudgementPosition(judgement.TimeOffset),
-                Anchor = rightAligned ? Anchor.TopLeft : Anchor.TopRight,
-                Origin = rightAligned ? Anchor.TopLeft : Anchor.TopRight,
+                Anchor = rightAligned ? Anchor.TopRight : Anchor.TopLeft,
+                Origin = rightAligned ? Anchor.TopRight : Anchor.TopLeft,
             });
 
             arrow.MoveToY(getRelativeJudgementPosition(floatingAverage = floatingAverage * 0.9 + judgement.TimeOffset * 0.1)

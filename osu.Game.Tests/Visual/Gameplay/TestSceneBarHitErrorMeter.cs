@@ -27,6 +27,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         };
 
         private HitErrorMeter meter;
+        private HitErrorMeter meter2;
 
         public TestSceneBarHitErrorMeter()
         {
@@ -109,8 +110,8 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             Add(new FillFlowContainer
             {
-                Anchor = Anchor.CentreLeft,
-                Origin = Anchor.CentreLeft,
+                Anchor = Anchor.Centre,
+                Origin = Anchor.Centre,
                 Direction = FillDirection.Vertical,
                 AutoSizeAxes = Axes.Both,
                 Children = new[]
@@ -121,20 +122,29 @@ namespace osu.Game.Tests.Visual.Gameplay
                 }
             });
 
-            Add(meter = new BarHitErrorMeter(hitWindows)
+            Add(meter = new BarHitErrorMeter(hitWindows, true)
             {
-                Anchor = Anchor.Centre,
-                Origin = Anchor.Centre,
+                Anchor = Anchor.CentreRight,
+                Origin = Anchor.CentreRight,
+            });
+
+            Add(meter2 = new BarHitErrorMeter(hitWindows, false)
+            {
+                Anchor = Anchor.CentreLeft,
+                Origin = Anchor.CentreLeft,
             });
         }
 
         private void newJudgement(double offset = 0)
         {
-            meter?.OnNewJudgement(new JudgementResult(new Judgement())
+            var judgement = new JudgementResult(new Judgement())
             {
                 TimeOffset = offset == 0 ? RNG.Next(-150, 150) : offset,
                 Type = HitResult.Perfect,
-            });
+            };
+
+            meter.OnNewJudgement(judgement);
+            meter2.OnNewJudgement(judgement);
         }
     }
 }
