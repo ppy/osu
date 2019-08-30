@@ -13,7 +13,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
         private const int mashLevelCount = 11;
 
-        private static readonly Vector<double> decayCoeffs = Vector<double>.Build.Dense(Generate.LinearSpaced(4, 1.7, -1.6))
+        private static readonly Vector<double> decayCoeffs = Vector<double>.Build.Dense(Generate.LinearSpaced(4, 1.7, -0.7))
                                                                                  .PointwiseExp();
 
 

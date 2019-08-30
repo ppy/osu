@@ -69,7 +69,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
                                                                         {2  , 2  , 2.5, 3.5, 3.5}}};
 
         private static readonly double[] ds3s = { 1, 1.5, 2.5, 4, 6, 8 };
-        private static readonly double[] ks3s = { -1.8, -1.8, -3, -5.4, -4.9 ,-4.9 };
+        private static readonly double[] ks3s = { -2, -2, -3, -5.4, -4.9 ,-4.9 };
         private static readonly double[,,] coeffs3s = new double[,,]  {{{-2  , -2  , -3  , -4  , -6  , -6  },
                                                                         { 0  ,  0  ,  0  ,  0  ,  0  ,  0  },
                                                                         { 1  ,  1  ,  1  ,  0  ,  0  ,  0  },
@@ -77,19 +77,19 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
                                                                        {{-1  , -1  , -1.5, -2  , -3  , -3  },
                                                                         { 1.4,  1.4,  2.1,  2  ,  3  ,  3  },
                                                                         { 1  ,  1  ,  1  ,  1  ,  1  ,  1  },
-                                                                        { 0  ,  0  ,  0.2,  0.4,  0.2,  0.2}},
+                                                                        { 0.4,  0.4,  0.2,  0.4,  0.2,  0.2}},
                                                                        {{-1  , -1  , -1.5, -2  , -3  , -3  },
                                                                         {-1.4, -1.4, -2.1, -2  , -3  , -3  },
                                                                         { 1  ,  1  ,  1  ,  1  ,  1  ,  1  },
-                                                                        { 0  ,  0  ,  0.2,  0.4,  0.2,  0.2}},
+                                                                        { 0.4,  0.4,  0.2,  0.4,  0.2,  0.2}},
                                                                        {{ 0  ,  0  ,  0  ,  0  ,  0  ,  0  },
                                                                         { 0  ,  0  ,  0  ,  0  ,  0  ,  0  },
                                                                         { 0  ,  0  ,  0  ,  0  ,  0  ,  0  },
-                                                                        { 2  ,  2  ,  1  ,  0.6,  0.6,  0.6}},
+                                                                        { 0  ,  0  ,  1  ,  0.6,  0.6,  0.6}},
                                                                        {{ 1  ,  1  ,  1.5,  2  ,  3  ,  3  },
                                                                         { 0  ,  0  ,  0  ,  0  ,  0  ,  0  },
                                                                         { 1  ,  1  ,  1  ,  1  ,  1  ,  1  },
-                                                                        {-1  , -1  , -0.6, -0.4, -0.3, -0.3}}};
+                                                                        { 0  ,  0  , -0.6, -0.4, -0.3, -0.3}}};
 
         private static LinearSpline k0fInterp;
         private static LinearSpline[,] coeffs0fInterps;
@@ -131,6 +131,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
             double d23 = 0;
             double t01 = 0;
             double t23 = 0;
+
+            double flowiness012 = 0;
+            double flowiness123 = 0;
             bool obj1InTheMiddle = false;
             bool obj2InTheMiddle = false;
 
@@ -186,6 +189,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
 
                         double correction0Flow = calcCorrection0Or3(d12, x0, y0, k0fInterp, coeffs0fInterps);
                         double correction0Snap = calcCorrection0Or3(d12, x0, y0, k0sInterp, coeffs0sInterps);
+
+                        flowiness012 = SpecialFunctions.Logistic((correction0Snap - correction0Flow - 0.05) * 20);
 
                         correction0 = Mean.PowerMean(correction0Flow, correction0Snap, -10);
                     }
@@ -246,6 +251,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
                         double correction3Flow = calcCorrection0Or3(d12, x3, y3, k3fInterp, coeffs3fInterps);
                         double correction3Snap = calcCorrection0Or3(d12, x3, y3, k3sInterp, coeffs3sInterps);
 
+                        flowiness123 = SpecialFunctions.Logistic((correction3Snap - correction3Flow - 0.05) * 20);
+
                         correction3 = Math.Max(Mean.PowerMean(correction3Flow, correction3Snap, -10) - 0.1, 0) * 0.5;
 
                     }
@@ -260,12 +267,11 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
 
             if (obj1InTheMiddle && obj2InTheMiddle)
             {
-                double gap = (s12 - s23 / 2 - s01 / 2).L2Norm();
-                double spacing = Mean.PowerMean(d01, 1, 10) *
-                                 Mean.PowerMean(d12, 1, 10) *
-                                 Mean.PowerMean(d23, 1, 10);
-                //patternCorrection = (SpecialFunctions.Logistic((gap - 0.75) * 8) - SpecialFunctions.Logistic(-6)) *
-                //                     (1 - SpecialFunctions.Logistic((spacing - 3) * 4)) * 0.6;
+                double gap = (s12 - s23 / 2 - s01 / 2).L2Norm() / (d12 + 0.1);
+                patternCorrection = (SpecialFunctions.Logistic((gap - 0.75) * 8) - SpecialFunctions.Logistic(-6)) *
+                                    SpecialFunctions.Logistic((d01 - 0.7) * 10) * SpecialFunctions.Logistic((d23 - 0.7) * 10) *
+                                    Mean.PowerMean(flowiness012, flowiness123, 2) * 0.6;
+                //patternCorrection = 0;
             }
 
             // Correction #4 - Tap Strain
