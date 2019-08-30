@@ -23,7 +23,9 @@ using osu.Game.Rulesets.Difficulty;
 using osu.Game.Rulesets.Osu.Beatmaps;
 using osu.Game.Rulesets.Osu.Configuration;
 using osu.Game.Rulesets.Osu.Difficulty;
+using osu.Game.Rulesets.Osu.Skinning;
 using osu.Game.Scoring;
+using osu.Game.Skinning;
 
 namespace osu.Game.Rulesets.Osu
 {
@@ -162,6 +164,8 @@ namespace osu.Game.Rulesets.Osu
         public override string ShortName => "osu";
 
         public override RulesetSettingsSubsection CreateSettings() => new OsuSettingsSubsection(this);
+
+        public override ISkin CreateLegacySkinProvider(ISkinSource source) => new OsuLegacySkin(source);
 
         public override int? LegacyID => 0;
 

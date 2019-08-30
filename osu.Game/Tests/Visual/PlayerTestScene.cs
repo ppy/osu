@@ -22,12 +22,13 @@ namespace osu.Game.Tests.Visual
             this.ruleset = ruleset;
         }
 
+        protected OsuConfigManager LocalConfig;
+
         [BackgroundDependencyLoader]
         private void load()
         {
-            OsuConfigManager manager;
-            Dependencies.Cache(manager = new OsuConfigManager(LocalStorage));
-            manager.GetBindable<double>(OsuSetting.DimLevel).Value = 1.0;
+            Dependencies.Cache(LocalConfig = new OsuConfigManager(LocalStorage));
+            LocalConfig.GetBindable<double>(OsuSetting.DimLevel).Value = 1.0;
         }
 
         [SetUpSteps]
