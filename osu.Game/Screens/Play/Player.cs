@@ -81,6 +81,7 @@ namespace osu.Game.Screens.Play
         protected GameplayClockContainer GameplayClockContainer { get; private set; }
 
         protected DimmableStoryboard DimmableStoryboard { get; private set; }
+        protected DimmableVideo DimmableVideo { get; private set; }
 
         protected VideoSprite Video { get; private set; }
 
@@ -146,14 +147,7 @@ namespace osu.Game.Screens.Play
         private void addUnderlayComponents(Container target)
         {
             target.Add(DimmableStoryboard = new DimmableStoryboard(Beatmap.Value.Storyboard) { RelativeSizeAxes = Axes.Both });
-
-            var video = Beatmap.Value.Video;
-
-            if (video != null)
-            {
-                target.Add(Video = video);
-                Video.RelativeSizeAxes = Axes.Both;
-            }
+            target.Add(DimmableVideo = new DimmableVideo(Beatmap.Value.Video) { RelativeSizeAxes = Axes.Both });
         }
 
         private void addGameplayComponents(Container target, WorkingBeatmap working)
