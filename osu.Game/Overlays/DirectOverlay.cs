@@ -238,7 +238,6 @@ namespace osu.Game.Overlays
 
         private readonly Bindable<string> currentQuery = new Bindable<string>(string.Empty);
 
-        private ScheduledDelegate queryChangedDebounce;
         private PreviewTrackManager previewTrackManager;
 
         private void queueUpdateSearch(bool queryTextChanged = false)
@@ -249,8 +248,8 @@ namespace osu.Game.Overlays
             loadCancellation?.Cancel();
             getSetsRequest?.Cancel();
 
-            queryChangedDebounce?.Cancel();
-            queryChangedDebounce = Scheduler.AddDelayed(updateSearch, queryTextChanged ? 500 : 100);
+            Scheduler.CancelDelayedTasks();
+            Scheduler.AddDelayed(updateSearch, queryTextChanged ? 500 : 100);
         }
 
         private void updateSearch()
