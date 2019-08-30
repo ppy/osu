@@ -22,8 +22,6 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
     {
         private readonly Anchor alignment;
 
-        private const int judgement_fade_duration = 10000;
-
         private const int arrow_move_duration = 400;
 
         private const int judgement_line_width = 6;
@@ -33,6 +31,8 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
         private const int bar_width = 2;
 
         private const int spacing = 2;
+
+        private const float chevron_size = 8;
 
         private SpriteIcon arrow;
 
@@ -99,7 +99,7 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
                     {
                         Anchor = Anchor.y1 | alignment,
                         Origin = Anchor.y1 | alignment,
-                        AutoSizeAxes = Axes.X,
+                        Width = chevron_size,
                         RelativeSizeAxes = Axes.Y,
                         Child = arrow = new SpriteIcon
                         {
@@ -108,7 +108,7 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
                             RelativePositionAxes = Axes.Y,
                             Y = 0.5f,
                             Icon = alignment == Anchor.x2 ? FontAwesome.Solid.ChevronRight : FontAwesome.Solid.ChevronLeft,
-                            Size = new Vector2(8),
+                            Size = new Vector2(chevron_size),
                         }
                     },
                 }
@@ -124,7 +124,7 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
             colourBars.Height = 0;
             colourBars.ResizeHeightTo(1, 800, Easing.OutQuint);
 
-            arrow.Alpha = 0.01f;
+            arrow.Alpha = 0;
             arrow.Delay(200).FadeInFromZero(600);
         }
 
@@ -234,11 +234,13 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
 
         public class JudgementLine : CompositeDrawable
         {
+            private const int judgement_fade_duration = 10000;
+
             public JudgementLine()
             {
                 RelativeSizeAxes = Axes.X;
                 RelativePositionAxes = Axes.Y;
-                Height = 2;
+                Height = 3;
 
                 InternalChild = new CircularContainer
                 {
@@ -258,7 +260,7 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
 
                 Width = 0;
 
-                this.ResizeWidthTo(1, 150, Easing.OutElasticHalf);
+                this.ResizeWidthTo(1, 200, Easing.OutElasticHalf);
                 this.FadeTo(0.8f, 150).Then().FadeOut(judgement_fade_duration, Easing.OutQuint).Expire();
             }
         }
