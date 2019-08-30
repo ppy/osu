@@ -15,6 +15,7 @@ using osu.Game.Overlays;
 
 namespace osu.Game.Graphics.Containers
 {
+    [Cached(typeof(IPreviewTrackOwner))]
     public abstract class OsuFocusedOverlayContainer : FocusedOverlayContainer, IPreviewTrackOwner, IKeyBindingHandler<GlobalAction>
     {
         private SampleChannel samplePopIn;
@@ -37,13 +38,6 @@ namespace osu.Game.Graphics.Containers
         private PreviewTrackManager previewTrackManager { get; set; }
 
         protected readonly Bindable<OverlayActivation> OverlayActivationMode = new Bindable<OverlayActivation>(OverlayActivation.All);
-
-        protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
-        {
-            var dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
-            dependencies.CacheAs<IPreviewTrackOwner>(this);
-            return dependencies;
-        }
 
         [BackgroundDependencyLoader(true)]
         private void load(AudioManager audio)
@@ -68,13 +62,21 @@ namespace osu.Game.Graphics.Containers
 
         protected override bool OnClick(ClickEvent e)
         {
-            if (!base.ReceivePositionalInputAt(e.ScreenSpaceMousePosition))
-            {
-                Hide();
-                return true;
-            }
+            closeIfOutside(e);
 
             return base.OnClick(e);
+        }
+
+        protected override bool OnDragEnd(DragEndEvent e)
+        {
+            closeIfOutside(e);
+            return base.OnDragEnd(e);
+        }
+
+        private void closeIfOutside(MouseEvent e)
+        {
+            if (!base.ReceivePositionalInputAt(e.ScreenSpaceMousePosition))
+                Hide();
         }
 
         public virtual bool OnPressed(GlobalAction action)

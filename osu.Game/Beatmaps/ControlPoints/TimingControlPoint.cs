@@ -14,6 +14,8 @@ namespace osu.Game.Beatmaps.ControlPoints
         /// </summary>
         public TimeSignatures TimeSignature = TimeSignatures.SimpleQuadruple;
 
+        public const double DEFAULT_BEAT_LENGTH = 1000;
+
         /// <summary>
         /// The beat length at this control point.
         /// </summary>
@@ -23,7 +25,7 @@ namespace osu.Game.Beatmaps.ControlPoints
             set => beatLength = MathHelper.Clamp(value, 6, 60000);
         }
 
-        private double beatLength = 1000;
+        private double beatLength = DEFAULT_BEAT_LENGTH;
 
         public bool Equals(TimingControlPoint other)
             => base.Equals(other)

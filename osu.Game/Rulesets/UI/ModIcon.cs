@@ -52,7 +52,6 @@ namespace osu.Game.Rulesets.UI
                     Anchor = Anchor.Centre,
                     Size = new Vector2(size),
                     Icon = OsuIcon.ModBg,
-                    Y = -6.5f,
                     Shadow = true,
                 },
                 modIcon = new SpriteIcon

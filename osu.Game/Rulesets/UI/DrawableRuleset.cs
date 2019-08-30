@@ -62,13 +62,20 @@ namespace osu.Game.Rulesets.UI
 
         public override GameplayClock FrameStableClock => frameStabilityContainer.GameplayClock;
 
+        private bool frameStablePlayback = true;
+
         /// <summary>
         /// Whether to enable frame-stable playback.
         /// </summary>
         internal bool FrameStablePlayback
         {
-            get => frameStabilityContainer.FrameStablePlayback;
-            set => frameStabilityContainer.FrameStablePlayback = value;
+            get => frameStablePlayback;
+            set
+            {
+                frameStablePlayback = false;
+                if (frameStabilityContainer != null)
+                    frameStabilityContainer.FrameStablePlayback = value;
+            }
         }
 
         /// <summary>
@@ -106,7 +113,7 @@ namespace osu.Game.Rulesets.UI
         /// <param name="ruleset">The ruleset being represented.</param>
         /// <param name="workingBeatmap">The beatmap to create the hit renderer for.</param>
         /// <param name="mods">The <see cref="Mod"/>s to apply.</param>
-        protected DrawableRuleset(Ruleset ruleset, WorkingBeatmap workingBeatmap, IReadOnlyList<Mod> mods)
+        protected DrawableRuleset(Ruleset ruleset, IWorkingBeatmap workingBeatmap, IReadOnlyList<Mod> mods)
             : base(ruleset)
         {
             if (workingBeatmap == null)
@@ -156,6 +163,7 @@ namespace osu.Game.Rulesets.UI
             {
                 frameStabilityContainer = new FrameStabilityContainer(GameplayStartTime)
                 {
+                    FrameStablePlayback = FrameStablePlayback,
                     Child = KeyBindingInputManager
                         .WithChild(CreatePlayfieldAdjustmentContainer()
                             .WithChild(Playfield)
