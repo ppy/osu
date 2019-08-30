@@ -82,6 +82,26 @@ namespace osu.Game.Rulesets.Osu.Skinning
                         return new LegacyMainCirclePiece();
 
                     return null;
+
+                case "Play/osu/cursor":
+                    if (GetTexture("cursor") != null)
+                        return new LegacyCursor();
+
+                    return null;
+
+                case "Play/osu/number-text":
+
+                    string font = GetValue<SkinConfiguration, string>(config => config.HitCircleFont);
+                    var overlap = GetValue<SkinConfiguration, float>(config => config.HitCircleOverlap);
+
+                    return !hasFont(font)
+                        ? null
+                        : new LegacySpriteText(this, font)
+                        {
+                            // Spacing value was reverse-engineered from the ratio of the rendered sprite size in the visual inspector vs the actual texture size
+                            Scale = new Vector2(0.96f),
+                            Spacing = new Vector2(-overlap * 0.89f, 0)
+                        };
             }
 
             return null;
@@ -93,5 +113,7 @@ namespace osu.Game.Rulesets.Osu.Skinning
 
         public TValue GetValue<TConfiguration, TValue>(Func<TConfiguration, TValue> query) where TConfiguration : SkinConfiguration
             => configuration.Value is TConfiguration conf ? query.Invoke(conf) : default;
+
+        private bool hasFont(string fontName) => GetTexture($"{fontName}-0") != null;
     }
 }
