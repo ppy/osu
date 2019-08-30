@@ -8,6 +8,7 @@ using osu.Framework.Graphics;
 using osu.Game.Rulesets.Mania.Objects.Drawables.Pieces;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input.Bindings;
+using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.UI.Scrolling;
 
@@ -102,6 +103,12 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
             // Make the body piece not lie under the head note
             bodyPiece.Y = (Direction.Value == ScrollingDirection.Up ? 1 : -1) * Head.Height / 2;
             bodyPiece.Height = DrawHeight - Head.Height / 2 + Tail.Height / 2;
+        }
+
+        protected override void UpdateStateTransforms(ArmedState state)
+        {
+            using (BeginDelayedSequence(HitObject.Duration, true))
+                base.UpdateStateTransforms(state);
         }
 
         protected void BeginHold()
