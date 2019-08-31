@@ -35,6 +35,9 @@ namespace osu.Game.Screens.Play
 
         private void initializeVideo(bool async)
         {
+            if (video == null)
+                return;
+
             if (drawableVideo != null)
                 return;
 
