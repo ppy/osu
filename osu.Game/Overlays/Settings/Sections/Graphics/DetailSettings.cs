@@ -24,7 +24,7 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
                 new SettingsCheckbox
                 {
                     LabelText = "Video",
-                    Bindable = config.GetBindable<bool>(OsuSetting.ShowVideo)
+                    Bindable = config.GetBindable<bool>(OsuSetting.ShowVideoBackground)
                 },
                 new SettingsCheckbox
                 {

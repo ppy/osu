@@ -50,7 +50,7 @@ namespace osu.Game.Screens.Play.PlayerSettings
             dimSliderBar.Bindable = config.GetBindable<double>(OsuSetting.DimLevel);
             blurSliderBar.Bindable = config.GetBindable<double>(OsuSetting.BlurLevel);
             showStoryboardToggle.Current = config.GetBindable<bool>(OsuSetting.ShowStoryboard);
-            showVideoToggle.Current = config.GetBindable<bool>(OsuSetting.ShowVideo);
+            showVideoToggle.Current = config.GetBindable<bool>(OsuSetting.ShowVideoBackground);
             beatmapSkinsToggle.Current = config.GetBindable<bool>(OsuSetting.BeatmapSkins);
             beatmapHitsoundsToggle.Current = config.GetBindable<bool>(OsuSetting.BeatmapHitsounds);
         }

@@ -56,7 +56,7 @@ namespace osu.Game.Graphics.Containers
         {
             UserDimLevel = config.GetBindable<double>(OsuSetting.DimLevel);
             ShowStoryboard = config.GetBindable<bool>(OsuSetting.ShowStoryboard);
-            ShowVideo = config.GetBindable<bool>(OsuSetting.ShowVideo);
+            ShowVideo = config.GetBindable<bool>(OsuSetting.ShowVideoBackground);
 
             EnableUserDim.ValueChanged += _ => UpdateVisuals();
             UserDimLevel.ValueChanged += _ => UpdateVisuals();
