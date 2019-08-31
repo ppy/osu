@@ -110,9 +110,9 @@ namespace osu.Game.Rulesets.Osu.Skinning
             return null;
         }
 
-        public Texture GetTexture(string componentName) => null;
+        public Texture GetTexture(string componentName) => source.GetTexture(componentName);
 
-        public SampleChannel GetSample(ISampleInfo sample) => null;
+        public SampleChannel GetSample(ISampleInfo sample) => source.GetSample(sample);
 
         public TValue GetValue<TConfiguration, TValue>(Func<TConfiguration, TValue> query) where TConfiguration : SkinConfiguration
             => configuration.Value is TConfiguration conf ? query.Invoke(conf) : default;
