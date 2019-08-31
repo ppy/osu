@@ -137,7 +137,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             //Console.WriteLine(urOnCheeseNotes * Attributes.AimDiff);
             //Console.WriteLine(cheeseLevel);
 
-            double aimValue = Math.Pow(tp * cheeseFactor, 2.55) * 0.182;
+            double aimValue = Math.Pow(tp * cheeseFactor, 2.55) * 0.176;
 
 
 
@@ -179,7 +179,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             //aimValue *= 0.98f + Math.Pow(Attributes.OverallDifficulty, 2) / 2500;
 
             double accLeniency = (80 - 6 * Attributes.OverallDifficulty) * Attributes.AimDiff / 300;
-            double accPenalty = (1 - accuracy) * Math.Pow(accLeniency, 2) * 1.5;
+            double accPenalty = (SpecialFunctions.Logistic((accuracy-0.94) * (-200.0/3)) - SpecialFunctions.Logistic(-4)) *
+                                Math.Pow(accLeniency, 2) * 0.2;
 
             aimValue *= Math.Exp(-accPenalty);
 
