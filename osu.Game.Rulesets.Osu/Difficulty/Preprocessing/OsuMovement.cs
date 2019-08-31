@@ -22,20 +22,20 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
         private const int numCoeffs = 4;
 
 
-        private static readonly double[] ds0f = { 0, 1, 1.5, 2, 2.5 };
-        private static readonly double[] ks0f = { -14, -7.7, -7, -4.4, -4.4 };
-        private static readonly double[,,] coeffs0f = new double[,,]  {{{ 0   , -1   , -1.5 , -2   , -2   },
-                                                                        { 0   ,  0   ,  0   ,  0   ,  0   },
-                                                                        { 1   ,  1   ,  1   ,  1   ,  1   },
-                                                                        { 6   ,  2.5 ,  1.5 ,  1   ,  1   }},
-                                                                       {{ 0   , -0.5 , -0.75, -1   , -1   },
-                                                                        { 0   ,  1   ,  1.5 ,  2   ,  2   },
-                                                                        { 1   ,  1   ,  1   ,  1   ,  1   },
-                                                                        { 3   ,  1.2 ,  1   ,  1   ,  1   }},
-                                                                       {{ 0   , -0.5 , -0.75, -1   , -1   },
-                                                                        { 0   , -1   , -1.5 , -2   , -2   },
-                                                                        { 1   ,  1   ,  1   ,  1   ,  1   },
-                                                                        { 3   ,  1.2 ,  1   ,  1   ,  1   }}};
+        private static readonly double[] ds0f = { 0, 1, 1.7, 2.3 };
+        private static readonly double[] ks0f = { -14, -9.5, -6, -2 };
+        private static readonly double[,,] coeffs0f = new double[,,]  {{{ 0   , -1   , -1.7 , -2   },
+                                                                        { 0   ,  0   ,  0   ,  0   },
+                                                                        { 1   ,  1   ,  1   ,  1   },
+                                                                        { 6   ,  3   ,  1.3 ,  1   }},
+                                                                       {{ 0   , -0.5 , -0.85, -1   },
+                                                                        { 0   ,  1   ,  1.7 ,  2   },
+                                                                        { 1   ,  1   ,  1   ,  1   },
+                                                                        { 3   ,  1.5 ,  1   ,  1   }},
+                                                                       {{ 0   , -0.5 , -0.85, -1   },
+                                                                        { 0   , -1   , -1.7 , -2   },
+                                                                        { 1   ,  1   ,  1   ,  1   },
+                                                                        { 3   ,  1.5 ,  1   ,  1   }}};
 
 
         private static readonly double[] ds0s = { 1, 1.5, 2.5, 4, 6, 8 };
