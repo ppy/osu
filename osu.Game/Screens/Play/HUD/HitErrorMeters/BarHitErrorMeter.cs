@@ -238,7 +238,7 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
             {
                 Y = getRelativeJudgementPosition(judgement.TimeOffset),
                 Anchor = alignment == Anchor.x2 ? Anchor.x0 : Anchor.x2,
-                Origin = alignment == Anchor.x2 ? Anchor.x0 : Anchor.x2,
+                Origin = Anchor.y1 | (alignment == Anchor.x2 ? Anchor.x0 : Anchor.x2),
             });
 
             arrow.MoveToY(
