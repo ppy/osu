@@ -27,7 +27,7 @@ namespace osu.Game.Beatmaps
         Texture Background { get; }
 
         /// <summary>
-        /// Retrieves the video file for this <see cref="WorkingBeatmap"/>.
+        /// Retrieves the video background file for this <see cref="WorkingBeatmap"/>.
         /// </summary>
         VideoSprite Video { get; }
 
