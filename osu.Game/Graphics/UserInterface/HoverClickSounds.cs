@@ -1,11 +1,13 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Extensions;
 using osu.Framework.Input.Events;
+using osuTK.Input;
 
 namespace osu.Game.Graphics.UserInterface
 {
@@ -16,16 +18,38 @@ namespace osu.Game.Graphics.UserInterface
     public class HoverClickSounds : HoverSounds
     {
         private SampleChannel sampleClick;
+        private readonly MouseButton[] buttons;
 
+        /// <summary>
+        /// Creates an instance that adds sounds on hover and left click only.
+        /// </summary>
+        /// <param name="sampleSet">Set of click samples to play.</param>
         public HoverClickSounds(HoverSampleSet sampleSet = HoverSampleSet.Normal)
-            : base(sampleSet)
+            : this(new[] { MouseButton.Left }, sampleSet)
         {
         }
 
-        protected override bool OnClick(ClickEvent e)
+        /// <summary>
+        /// Creates an instance that adds sounds on hover and on click for any of the buttons specified.
+        /// </summary>
+        /// <param name="buttons">Array of button codes which should trigger the click sound.</param>
+        /// <param name="sampleSet">Set of click samples to play.</param>
+        public HoverClickSounds(MouseButton[] buttons, HoverSampleSet sampleSet = HoverSampleSet.Normal)
+            : base(sampleSet)
         {
-            sampleClick?.Play();
-            return base.OnClick(e);
+            this.buttons = buttons;
+        }
+
+        protected override bool OnMouseUp(MouseUpEvent e)
+        {
+            var index = Array.IndexOf(buttons, e.Button);
+            bool shouldPlayEffect = index > -1 && index < buttons.Length;
+
+            // examine the button pressed first for short-circuiting
+            // in most usages it is more likely that another button was pressed than that the cursor left the drawable bounds
+            if (shouldPlayEffect && Contains(e.ScreenSpaceMousePosition))
+                sampleClick?.Play();
+            return base.OnMouseUp(e);
         }
 
         [BackgroundDependencyLoader]
