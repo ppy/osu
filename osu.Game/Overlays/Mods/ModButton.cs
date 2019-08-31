@@ -11,7 +11,6 @@ using osu.Game.Graphics.Sprites;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.UI;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Input.Events;
@@ -284,7 +283,7 @@ namespace osu.Game.Overlays.Mods
                     Anchor = Anchor.TopCentre,
                     Font = OsuFont.GetFont(size: 18)
                 },
-                new HoverMouseUpSounds(new List<MouseButton> { MouseButton.Left, MouseButton.Right })
+                new HoverClickSounds(new[] { MouseButton.Left, MouseButton.Right })
             };
 
             Mod = mod;
