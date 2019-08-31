@@ -212,7 +212,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
                         Anchor = Anchor.TopLeft,
                         Origin = Anchor.TopCentre,
                         RelativePositionAxes = Axes.X,
-                        Colour = beatDivisor.GetColourFor(t, colours),
+                        Colour = BindableBeatDivisor.GetColourFor(t, colours),
                         X = getMappedPosition(t)
                     });
                 }
