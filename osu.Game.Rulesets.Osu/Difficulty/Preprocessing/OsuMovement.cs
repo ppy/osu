@@ -189,10 +189,11 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
 
                         double correction0Flow = calcCorrection0Or3(d12, x0, y0, k0fInterp, coeffs0fInterps);
                         double correction0Snap = calcCorrection0Or3(d12, x0, y0, k0sInterp, coeffs0sInterps);
+                        double correction0Stop = calcCorrection0Stop(d12, x0, y0);
 
                         flowiness012 = SpecialFunctions.Logistic((correction0Snap - correction0Flow - 0.05) * 20);
 
-                        correction0 = Mean.PowerMean(correction0Flow, correction0Snap, -10);
+                        correction0 = Mean.PowerMean(new double[] { correction0Flow, correction0Snap, correction0Stop }, -10);
                     }
                 }
             }
@@ -386,5 +387,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
             return SpecialFunctions.Logistic(correction_raw);
         }
 
+        private static double calcCorrection0Stop(double d, double x, double y)
+        {
+            return SpecialFunctions.Logistic(10 * Math.Sqrt(x * x + y * y + 1) - 12);
+        }
     }
 }
