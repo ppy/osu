@@ -24,7 +24,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         public new OsuDifficultyAttributes Attributes => (OsuDifficultyAttributes)base.Attributes;
 
         private const double totalValueExponent = 1.5;
-        private const double fcBuffFactor = 0.1;
+        private const double fcBuffFactor = 0.05;
 
         private readonly int countHitCircles;
         private readonly int countSliders;
@@ -93,7 +93,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         {
 
             // Guess the number of misaims from combo
-            int effectiveMissCount = Math.Max(countMiss, (int)(Math.Floor(0.9 * beatmapMaxCombo / scoreMaxCombo)));
+            int effectiveMissCount = Math.Max(countMiss, (int)(Math.Floor((beatmapMaxCombo - 0.1 * countSliders) / scoreMaxCombo)));
 
             // Get player's throughput. Interpolate if there are misses.
             double tp;
@@ -137,7 +137,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             //Console.WriteLine(urOnCheeseNotes * Attributes.AimDiff);
             //Console.WriteLine(cheeseLevel);
 
-            double aimValue = Math.Pow(tp * cheeseFactor, 2.55) * 0.165;
+            double aimValue = Math.Pow(tp * cheeseFactor, 2.55) * 0.1729;
 
 
 
