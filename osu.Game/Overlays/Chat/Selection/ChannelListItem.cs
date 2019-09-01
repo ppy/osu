@@ -36,7 +36,7 @@ namespace osu.Game.Overlays.Chat.Selection
         private Color4 topicColour;
         private Color4 hoverColour;
 
-        public IEnumerable<string> FilterTerms => new[] { channel.Name };
+        public IEnumerable<string> FilterTerms => new[] { channel.Name, channel.Topic };
 
         public bool MatchingFilter
         {
