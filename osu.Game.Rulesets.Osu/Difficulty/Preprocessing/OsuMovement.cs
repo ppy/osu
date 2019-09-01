@@ -39,7 +39,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
 
 
         private static readonly double[] ds0s = { 1, 1.5, 2.5, 4, 6, 8 };
-        private static readonly double[] ks0s = { -1, -1, -3.9, -5, -3.7, -3.7 };
+        private static readonly double[] ks0s = { -1, -1, -3.9, -5.5, -3.7, -3.7 };
         private static readonly double[,,] coeffs0s = new double[,,]  {{{ 2   , 2   ,  3   ,  4   ,  6   ,  6   },
                                                                         { 0   , 0   ,  0   ,  0   ,  0   ,  0   },
                                                                         { 1   , 1   ,  1   ,  0   ,  0   ,  0   },
@@ -47,15 +47,15 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
                                                                        {{ 1.6 , 1.6 ,  1.8 ,  2   ,  3   ,  3   },
                                                                         { 2   , 2   ,  2.4 ,  4   ,  6   ,  6   },
                                                                         { 1   , 1   ,  1   ,  1   ,  1   ,  1   },
-                                                                        { 0   , 0   ,  0.3 ,  0.24,  0.16,  0.16}},
+                                                                        { 0   , 0   ,  0.3 ,  0.6 ,  0.16,  0.16}},
                                                                        {{ 1.6 , 1.6 ,  1.8 ,  2   ,  3   ,  3   },
                                                                         { 2   , 2   , -2.4 , -4   , -6   , -6   },
                                                                         { 1   , 1   ,  1   ,  1   ,  1   ,  1   },
-                                                                        { 0   , 0   ,  0.3 ,  0.24,  0.16,  0.16}},
+                                                                        { 0   , 0   ,  0.3 ,  0.6 ,  0.16,  0.16}},
                                                                        {{ 0   , 0   ,  0   , -1   , -1.5 , -1.5 },
                                                                         { 0   , 0   ,  0   ,  0   ,  0   ,  0   },
                                                                         { 1   , 1   ,  1   ,  1   ,  1   ,  1   },
-                                                                        { 0   , 0   , -0.7 , -0.24, -0.16, -0.16}}};
+                                                                        { 0   , 0   , -0.7 , -0.8 , -0.16, -0.16}}};
 
         private static readonly double[] ds3f = { 0, 1, 2, 3, 4 };
         private static readonly double[] ks3f = { -4, -4, -4.5, -2.5, -2.5 };
