@@ -229,7 +229,7 @@ namespace osu.Game.Screens.Menu
         }
 
         /// <summary>
-        /// Schedule a new extenral animation. Handled queueing and finishing previous animations in a sane way.
+        /// Schedule a new external animation. Handled queueing and finishing previous animations in a sane way.
         /// </summary>
         /// <param name="action">The animation to be performed</param>
         /// <param name="waitForPrevious">If true, the new animation is delayed until all previous transforms finish. If false, existing transformed are cleared.</param>
