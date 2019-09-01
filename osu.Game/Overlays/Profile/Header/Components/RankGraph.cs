@@ -283,9 +283,24 @@ namespace osu.Game.Overlays.Profile.Header.Components
                 return true;
             }
 
-            public void Move(Vector2 pos) => Position = pos;
+            private bool instantMove = true;
 
-            protected override void PopIn() => this.FadeIn(200, Easing.OutQuint);
+            public void Move(Vector2 pos)
+            {
+                if (instantMove)
+                {
+                    Position = pos;
+                    instantMove = false;
+                }
+                else
+                    this.MoveTo(pos, 200, Easing.OutQuint);
+            }
+
+            protected override void PopIn()
+            {
+                instantMove |= !IsPresent;
+                this.FadeIn(200, Easing.OutQuint);
+            }
 
             protected override void PopOut() => this.FadeOut(200, Easing.OutQuint);
         }
