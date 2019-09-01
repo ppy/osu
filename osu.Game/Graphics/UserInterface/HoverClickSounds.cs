@@ -21,23 +21,17 @@ namespace osu.Game.Graphics.UserInterface
         private readonly MouseButton[] buttons;
 
         /// <summary>
-        /// Creates an instance that adds sounds on hover and left click only.
-        /// </summary>
-        /// <param name="sampleSet">Set of click samples to play.</param>
-        public HoverClickSounds(HoverSampleSet sampleSet = HoverSampleSet.Normal)
-            : this(new[] { MouseButton.Left }, sampleSet)
-        {
-        }
-
-        /// <summary>
         /// Creates an instance that adds sounds on hover and on click for any of the buttons specified.
         /// </summary>
-        /// <param name="buttons">Array of button codes which should trigger the click sound.</param>
         /// <param name="sampleSet">Set of click samples to play.</param>
-        public HoverClickSounds(MouseButton[] buttons, HoverSampleSet sampleSet = HoverSampleSet.Normal)
+        /// <param name="buttons">
+        /// Array of button codes which should trigger the click sound.
+        /// If this optional parameter is omitted or set to <code>null</code>, the click sound will also be added on left click.
+        /// </param>
+        public HoverClickSounds(HoverSampleSet sampleSet = HoverSampleSet.Normal, MouseButton[] buttons = null)
             : base(sampleSet)
         {
-            this.buttons = buttons;
+            this.buttons = buttons ?? new[] { MouseButton.Left };
         }
 
         protected override bool OnMouseUp(MouseUpEvent e)
