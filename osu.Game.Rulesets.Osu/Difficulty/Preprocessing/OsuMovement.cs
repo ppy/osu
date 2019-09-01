@@ -39,7 +39,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
 
 
         private static readonly double[] ds0s = { 1, 1.5, 2.5, 4, 6, 8 };
-        private static readonly double[] ks0s = { -1, -1, -5.9, -5, -3.7, -3.7 };
+        private static readonly double[] ks0s = { -1, -1, -3.9, -5, -3.7, -3.7 };
         private static readonly double[,,] coeffs0s = new double[,,]  {{{ 2   , 2   ,  3   ,  4   ,  6   ,  6   },
                                                                         { 0   , 0   ,  0   ,  0   ,  0   ,  0   },
                                                                         { 1   , 1   ,  1   ,  0   ,  0   ,  0   },
@@ -55,7 +55,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
                                                                        {{ 0   , 0   ,  0   , -1   , -1.5 , -1.5 },
                                                                         { 0   , 0   ,  0   ,  0   ,  0   ,  0   },
                                                                         { 1   , 1   ,  1   ,  1   ,  1   ,  1   },
-                                                                        { 0   , 0   , -0.3 , -0.24, -0.16, -0.16}}};
+                                                                        { 0   , 0   , -0.7 , -0.24, -0.16, -0.16}}};
 
         private static readonly double[] ds3f = { 0, 1, 2, 3, 4 };
         private static readonly double[] ks3f = { -4, -4, -4.5, -2.5, -2.5 };
@@ -194,6 +194,13 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
                         flowiness012 = SpecialFunctions.Logistic((correction0Snap - correction0Flow - 0.05) * 20);
 
                         correction0 = Mean.PowerMean(new double[] { correction0Flow, correction0Snap, correction0Stop }, -10);
+
+                        //Console.Write(obj2.StartTime + " ");
+                        //Console.Write(correction0Flow.ToString("N3") + " ");
+                        //Console.Write(correction0Snap.ToString("N3") + " ");
+                        //Console.Write(correction0Stop.ToString("N3") + " ");
+                        //Console.Write(correction0.ToString("N3") + " ");
+                        //Console.WriteLine();
                     }
                 }
             }
