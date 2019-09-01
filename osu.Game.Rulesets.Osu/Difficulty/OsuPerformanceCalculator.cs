@@ -137,7 +137,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             //Console.WriteLine(urOnCheeseNotes * Attributes.AimDiff);
             //Console.WriteLine(cheeseLevel);
 
-            double aimValue = Math.Pow(tp * cheeseFactor, 2.55) * 0.176;
+            double aimValue = Math.Pow(tp * cheeseFactor, 2.55) * 0.165;
 
 
 
