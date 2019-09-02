@@ -3,6 +3,7 @@
 
 using System.Linq;
 using osu.Framework.Allocation;
+using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Testing;
 using osu.Game.Configuration;
 using osu.Game.Rulesets;
@@ -40,6 +41,8 @@ namespace osu.Game.Tests.Visual
 
         protected virtual bool AllowFail => false;
 
+        protected virtual bool Autoplay => false;
+
         private void loadPlayer()
         {
             var beatmap = CreateBeatmap(ruleset.RulesetInfo);
@@ -53,6 +56,16 @@ namespace osu.Game.Tests.Visual
             LoadScreen(Player);
         }
 
-        protected virtual Player CreatePlayer(Ruleset ruleset) => new TestPlayer(false, false);
+        protected virtual Player CreatePlayer(Ruleset ruleset)
+        {
+            if (Autoplay)
+            {
+                var mod = ruleset.GetAutoplayMod();
+                if (mod != null)
+                    Mods.Value = Mods.Value.Concat(mod.Yield()).ToArray();
+            }
+
+            return new TestPlayer(false, false);
+        }
     }
 }
