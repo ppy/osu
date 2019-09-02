@@ -2,7 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using Humanizer;
+using System.Linq;
 using Newtonsoft.Json;
 
 namespace osu.Game.Online.API.Requests.Responses
@@ -39,33 +39,45 @@ namespace osu.Game.Online.API.Requests.Responses
             public string Username;
         }
 
+        public KudosuSource Source;
+
+        public KudosuAction Action;
+
         [JsonProperty("action")]
         private string action
         {
             set
             {
-                //We will receive something like "event.action" or just "action"
-                string parsed = value.Contains(".") ? value.Split('.')[0].Pascalize() + value.Split('.')[1].Pascalize() : value.Pascalize();
+                // incoming action may contain a prefix. if it doesn't, it's a legacy forum event.
 
-                Action = (KudosuAction)Enum.Parse(typeof(KudosuAction), parsed);
+                string[] split = value.Split('.');
+
+                if (split.Length > 1)
+                    Enum.TryParse(split.First().Replace("_", ""), true, out Source);
+                else
+                    Source = KudosuSource.Forum;
+
+                Enum.TryParse(split.Last(), true, out Action);
             }
         }
+    }
 
-        public KudosuAction Action;
+    public enum KudosuSource
+    {
+        Unknown,
+        AllowKudosu,
+        Delete,
+        DenyKudosu,
+        Forum,
+        Recalculate,
+        Restore,
+        Vote
     }
 
     public enum KudosuAction
     {
-        AllowKudosuGive,
-        DeleteReset,
-        DenyKudosuReset,
-        ForumGive,
-        ForumReset,
-        ForumRevoke,
-        RecalculateGive,
-        RecalculateReset,
-        RestoreGive,
-        VoteGive,
-        VoteReset,
+        Give,
+        Reset,
+        Revoke,
     }
 }
