@@ -28,7 +28,7 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             AddStep("setup layout larger source", () =>
             {
-                Child = new LocalSkinOverrideContainer(new SizedSource(50))
+                Child = new SkinProvidingContainer(new SizedSource(50))
                 {
                     RelativeSizeAxes = Axes.Both,
                     Child = fill = new FillFlowContainer<ExposedSkinnableDrawable>
@@ -60,7 +60,7 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             AddStep("setup layout larger source", () =>
             {
-                Child = new LocalSkinOverrideContainer(new SizedSource(30))
+                Child = new SkinProvidingContainer(new SizedSource(30))
                 {
                     RelativeSizeAxes = Axes.Both,
                     Child = fill = new FillFlowContainer<ExposedSkinnableDrawable>
@@ -96,7 +96,7 @@ namespace osu.Game.Tests.Visual.Gameplay
                 Child = new SkinSourceContainer
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Child = new LocalSkinOverrideContainer(secondarySource)
+                    Child = new SkinProvidingContainer(secondarySource)
                     {
                         RelativeSizeAxes = Axes.Both,
                         Child = consumer = new SkinConsumer("test", name => new NamedBox("Default Implementation"), source => true)
@@ -121,7 +121,7 @@ namespace osu.Game.Tests.Visual.Gameplay
                 Child = new SkinSourceContainer
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Child = target = new LocalSkinOverrideContainer(secondarySource)
+                    Child = target = new SkinProvidingContainer(secondarySource)
                     {
                         RelativeSizeAxes = Axes.Both,
                     }

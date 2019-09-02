@@ -66,6 +66,19 @@ namespace osu.Game.Rulesets.Objects
         }
 
         /// <summary>
+        /// Retrieves a mapping of <see cref="HitResult"/>s to their half window timing for all allowed <see cref="HitResult"/>s.
+        /// </summary>
+        /// <returns></returns>
+        public IEnumerable<(HitResult result, double length)> GetAllAvailableHalfWindows()
+        {
+            for (var result = HitResult.Meh; result <= HitResult.Perfect; ++result)
+            {
+                if (IsHitResultAllowed(result))
+                    yield return (result, HalfWindowFor(result));
+            }
+        }
+
+        /// <summary>
         /// Check whether it is possible to achieve the provided <see cref="HitResult"/>.
         /// </summary>
         /// <param name="result">The result type to check.</param>

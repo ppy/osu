@@ -47,7 +47,7 @@ namespace osu.Game.Screens.Menu
         private const float visualiser_rounds = 5;
 
         /// <summary>
-        /// How much should each bar go down each milisecond (based on a full bar).
+        /// How much should each bar go down each millisecond (based on a full bar).
         /// </summary>
         private const float decay_per_milisecond = 0.0024f;
 
@@ -161,7 +161,7 @@ namespace osu.Game.Screens.Menu
             private IShader shader;
             private Texture texture;
 
-            //Asuming the logo is a circle, we don't need a second dimension.
+            //Assuming the logo is a circle, we don't need a second dimension.
             private float size;
 
             private Color4 colour;
