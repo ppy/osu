@@ -215,10 +215,6 @@ namespace osu.Game.Rulesets.UI
                 continueResume();
         }
 
-        public ResumeOverlay ResumeOverlay { get; private set; }
-
-        protected virtual ResumeOverlay CreateResumeOverlay() => null;
-
         /// <summary>
         /// Creates and adds the visual representation of a <see cref="TObject"/> to this <see cref="DrawableRuleset{TObject}"/>.
         /// </summary>
@@ -388,6 +384,13 @@ namespace osu.Game.Rulesets.UI
         /// The cursor being displayed by the <see cref="Playfield"/>. May be null if no cursor is provided.
         /// </summary>
         public abstract GameplayCursorContainer Cursor { get; }
+
+        /// <summary>
+        /// An optional overlay used when resuming gameplay from a paused state.
+        /// </summary>
+        public ResumeOverlay ResumeOverlay { get; protected set; }
+
+        protected virtual ResumeOverlay CreateResumeOverlay() => null;
 
         /// <summary>
         /// Sets a replay to be used, overriding local input.
