@@ -10,8 +10,8 @@ namespace osu.Game.Rulesets.Osu.Judgements
     {
         public ComboResult ComboType;
 
-        public OsuJudgementResult(Judgement judgement, HitWindows hitWindows)
-            : base(judgement, hitWindows)
+        public OsuJudgementResult(HitObject hitObject, Judgement judgement)
+            : base(hitObject, judgement)
         {
         }
     }
