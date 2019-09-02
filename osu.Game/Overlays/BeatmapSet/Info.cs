@@ -133,7 +133,7 @@ namespace osu.Game.Overlays.BeatmapSet
                 source.Text = b.NewValue?.Metadata.Source ?? string.Empty;
                 tags.Text = b.NewValue?.Metadata.Tags ?? string.Empty;
                 genre.Text = b.NewValue?.OnlineInfo?.Genre?.Name ?? "Unspecified";
-                language.Text = b.NewValue?.OnlineInfo?.Language?.Name ?? "Other";
+                language.Text = b.NewValue?.OnlineInfo?.Language?.Name ?? "Unspecified";
             };
         }
 
