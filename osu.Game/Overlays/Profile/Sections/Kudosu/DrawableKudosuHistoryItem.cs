@@ -51,91 +51,97 @@ namespace osu.Game.Overlays.Profile.Sections.Kudosu
         private void load()
         {
             date.Colour = colours.GreySeafoamLighter;
-
-            string prefix = getPrefix(historyItem);
-            var formattedSource = MessageFormatter.FormatText(getSource(historyItem));
-
-            if (!string.IsNullOrEmpty(prefix))
-            {
-                linkFlowContainer.AddText(prefix);
-                linkFlowContainer.AddText($@" {Math.Abs(historyItem.Amount)} kudosu ", t =>
-                {
-                    t.Font = t.Font.With(italics: true);
-                    t.Colour = colours.Blue;
-                });
-            }
-
+            var formattedSource = MessageFormatter.FormatText(getString(historyItem));
             linkFlowContainer.AddLinks(formattedSource.Text, formattedSource.Links);
-            linkFlowContainer.AddText(" ");
-            linkFlowContainer.AddLink(historyItem.Post.Title, historyItem.Post.Url);
         }
 
-        private string getSource(APIKudosuHistory historyItem)
+        private string getString(APIKudosuHistory item)
         {
-            string userLink() => $"[{historyItem.Giver?.Url} {historyItem.Giver?.Username}]";
+            string amount = $"{Math.Abs(item.Amount)} kudosu";
+            string post = $"[{item.Post.Title}]({item.Post.Url})";
 
-            switch (historyItem.Action)
+            switch (item.Source)
             {
-                case KudosuAction.VoteGive:
-                    return @"from obtaining votes in modding post of";
+                case KudosuSource.AllowKudosu:
+                    switch (item.Action)
+                    {
+                        case KudosuAction.Give:
+                            return $"Received {amount} from kudosu deny repeal of modding post {post}";
+                    }
 
-                case KudosuAction.ForumGive:
-                    return $@"from {userLink()} for a post at";
+                    break;
 
-                case KudosuAction.ForumReset:
-                    return $@"Kudosu reset by {userLink()} for the post";
+                case KudosuSource.DenyKudosu:
+                    switch (item.Action)
+                    {
+                        case KudosuAction.Reset:
+                            return $"Denied {amount} from modding post {post}";
+                    }
 
-                case KudosuAction.VoteReset:
-                    return @"from losing votes in modding post of";
+                    break;
 
-                case KudosuAction.DenyKudosuReset:
-                    return @"from modding post";
+                case KudosuSource.Delete:
+                    switch (item.Action)
+                    {
+                        case KudosuAction.Reset:
+                            return $"Lost {amount} from modding post deletion of {post}";
+                    }
 
-                case KudosuAction.ForumRevoke:
-                    return $@"Denied kudosu by {userLink()} for the post";
+                    break;
 
-                case KudosuAction.AllowKudosuGive:
-                    return @"from kudosu deny repeal of modding post";
+                case KudosuSource.Restore:
+                    switch (item.Action)
+                    {
+                        case KudosuAction.Give:
+                            return $"Received {amount} from modding post restoration of {post}";
+                    }
 
-                case KudosuAction.DeleteReset:
-                    return @"from modding post deletion of";
+                    break;
 
-                case KudosuAction.RestoreGive:
-                    return @"from modding post restoration of";
+                case KudosuSource.Vote:
+                    switch (item.Action)
+                    {
+                        case KudosuAction.Give:
+                            return $"Received {amount} from obtaining votes in modding post of {post}";
 
-                case KudosuAction.RecalculateGive:
-                    return @"from votes recalculation in modding post of";
+                        case KudosuAction.Reset:
+                            return $"Lost {amount} from losing votes in modding post of {post}";
+                    }
 
-                case KudosuAction.RecalculateReset:
-                    return @"from votes recalculation in modding post of";
+                    break;
 
-                default:
-                    return @"from unknown event";
+                case KudosuSource.Recalculate:
+                    switch (item.Action)
+                    {
+                        case KudosuAction.Give:
+                            return $"Received {amount} from votes recalculation in modding post of {post}";
+
+                        case KudosuAction.Reset:
+                            return $"Lost {amount} from votes recalculation in modding post of {post}";
+                    }
+
+                    break;
+
+                case KudosuSource.Forum:
+
+                    string giver = $"[{item.Giver?.Username}]({item.Giver?.Url})";
+
+                    switch (historyItem.Action)
+                    {
+                        case KudosuAction.Give:
+                            return $"Received {amount} from {giver} for a post at {post}";
+
+                        case KudosuAction.Reset:
+                            return $"Kudosu reset by {giver} for the post {post}";
+
+                        case KudosuAction.Revoke:
+                            return $"Denied kudosu by {giver} for the post {post}";
+                    }
+
+                    break;
             }
-        }
 
-        private string getPrefix(APIKudosuHistory historyItem)
-        {
-            switch (historyItem.Action)
-            {
-                case KudosuAction.VoteGive:
-                case KudosuAction.ForumGive:
-                case KudosuAction.AllowKudosuGive:
-                case KudosuAction.RestoreGive:
-                case KudosuAction.RecalculateGive:
-                    return @"Received";
-
-                case KudosuAction.DenyKudosuReset:
-                    return @"Denied";
-
-                case KudosuAction.DeleteReset:
-                case KudosuAction.VoteReset:
-                case KudosuAction.RecalculateReset:
-                    return @"Lost";
-
-                default:
-                    return null;
-            }
+            return $"Unknown event ({amount} change)";
         }
     }
 }
