@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using JetBrains.Annotations;
+using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Scoring;
 
@@ -20,6 +22,13 @@ namespace osu.Game.Rulesets.Judgements
         /// The <see cref="Judgement"/> which this <see cref="JudgementResult"/> applies for.
         /// </summary>
         public readonly Judgement Judgement;
+
+        /// <summary>
+        /// The <see cref="HitWindows"/> which the <see cref="HitObject"/> was judged against.
+        /// May be null to indicate that the timing error should not be displayed to the user.
+        /// </summary>
+        [CanBeNull]
+        public readonly HitWindows HitWindows;
 
         /// <summary>
         /// The offset from a perfect hit at which this <see cref="JudgementResult"/> occurred.
@@ -56,9 +65,12 @@ namespace osu.Game.Rulesets.Judgements
         /// Creates a new <see cref="JudgementResult"/>.
         /// </summary>
         /// <param name="judgement">The <see cref="Judgement"/> to refer to for scoring information.</param>
-        public JudgementResult(Judgement judgement)
+        /// <param name="hitWindows">The <see cref="HitWindows"/> which the <see cref="HitObject"/> was judged against.
+        /// May be null to indicate that the timing error should not be displayed to the user.</param>
+        public JudgementResult([NotNull] Judgement judgement, [CanBeNull] HitWindows hitWindows)
         {
             Judgement = judgement;
+            HitWindows = hitWindows;
         }
 
         public override string ToString() => $"{Type} (Score:{Judgement.NumericResultFor(this)} HP:{Judgement.HealthIncreaseFor(this)} {Judgement})";
