@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
+using JetBrains.Annotations;
 using Newtonsoft.Json;
 using osu.Game.Audio;
 using osu.Game.Beatmaps;
@@ -56,6 +57,7 @@ namespace osu.Game.Rulesets.Objects
         /// <summary>
         /// The hit windows for this <see cref="HitObject"/>.
         /// </summary>
+        [CanBeNull]
         public HitWindows HitWindows { get; set; }
 
         private readonly List<HitObject> nestedHitObjects = new List<HitObject>();
@@ -116,6 +118,7 @@ namespace osu.Game.Rulesets.Objects
         /// This will only be invoked if <see cref="HitWindows"/> hasn't been set externally (e.g. from a <see cref="BeatmapConverter{T}"/>.
         /// </para>
         /// </summary>
+        [CanBeNull]
         protected virtual HitWindows CreateHitWindows() => new HitWindows();
     }
 }
