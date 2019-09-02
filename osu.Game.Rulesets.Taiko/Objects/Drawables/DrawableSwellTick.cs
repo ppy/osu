@@ -14,7 +14,11 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
         {
         }
 
-        public void TriggerResult(HitResult type) => ApplyResult(r => r.Type = type);
+        public void TriggerResult(HitResult type)
+        {
+            HitObject.StartTime = Time.Current;
+            ApplyResult(r => r.Type = type);
+        }
 
         protected override void CheckForResult(bool userTriggered, double timeOffset)
         {
