@@ -99,7 +99,7 @@ namespace osu.Game.Rulesets.Osu.Skinning
 
                     return !hasFont(font)
                         ? null
-                        : new LegacySpriteText(this, font)
+                        : new LegacySpriteText(source, font)
                         {
                             // Spacing value was reverse-engineered from the ratio of the rendered sprite size in the visual inspector vs the actual texture size
                             Scale = new Vector2(0.96f),
@@ -110,13 +110,19 @@ namespace osu.Game.Rulesets.Osu.Skinning
             return null;
         }
 
-        public Texture GetTexture(string componentName) => null;
+        public Texture GetTexture(string componentName) => source.GetTexture(componentName);
 
-        public SampleChannel GetSample(ISampleInfo sample) => null;
+        public SampleChannel GetSample(ISampleInfo sample) => source.GetSample(sample);
 
         public TValue GetValue<TConfiguration, TValue>(Func<TConfiguration, TValue> query) where TConfiguration : SkinConfiguration
-            => configuration.Value is TConfiguration conf ? query.Invoke(conf) : default;
+        {
+            TValue val;
+            if (configuration.Value is TConfiguration conf && (val = query.Invoke(conf)) != null)
+                return val;
 
-        private bool hasFont(string fontName) => GetTexture($"{fontName}-0") != null;
+            return source.GetValue(query);
+        }
+
+        private bool hasFont(string fontName) => source.GetTexture($"{fontName}-0") != null;
     }
 }
