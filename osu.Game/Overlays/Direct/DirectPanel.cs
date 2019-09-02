@@ -35,7 +35,7 @@ namespace osu.Game.Overlays.Direct
         private BeatmapSetOverlay beatmapSetOverlay;
 
         public PreviewTrack Preview => PlayButton.Preview;
-        public Bindable<bool> PreviewPlaying => PlayButton.Playing;
+        public Bindable<bool> PreviewPlaying => PlayButton?.Playing;
 
         protected abstract PlayButton PlayButton { get; }
         protected abstract Box PreviewBar { get; }
