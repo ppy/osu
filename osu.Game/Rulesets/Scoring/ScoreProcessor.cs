@@ -90,7 +90,7 @@ namespace osu.Game.Rulesets.Scoring
         /// <summary>
         /// Whether all <see cref="Judgement"/>s have been processed.
         /// </summary>
-        protected virtual bool HasCompleted => false;
+        public virtual bool HasCompleted => false;
 
         /// <summary>
         /// Whether this ScoreProcessor has already triggered the failed state.
@@ -205,7 +205,7 @@ namespace osu.Game.Rulesets.Scoring
         private const double combo_portion = 0.7;
         private const double max_score = 1000000;
 
-        protected sealed override bool HasCompleted => JudgedHits == MaxHits;
+        public sealed override bool HasCompleted => JudgedHits == MaxHits;
 
         protected int MaxHits { get; private set; }
         protected int JudgedHits { get; private set; }
