@@ -23,7 +23,7 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
     {
         protected override string Header => "Layout";
 
-        private FillFlowContainer<SettingsSlider<float>> scalingSettings;
+        private FillFlowContainer<SettingsSlider<double>> scalingSettings;
 
         private Bindable<ScalingMode> scalingMode;
         private Bindable<Size> sizeFullscreen;
@@ -33,10 +33,10 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
         private SettingsDropdown<Size> resolutionDropdown;
         private SettingsDropdown<WindowMode> windowModeDropdown;
 
-        private Bindable<float> scalingPositionX;
-        private Bindable<float> scalingPositionY;
-        private Bindable<float> scalingSizeX;
-        private Bindable<float> scalingSizeY;
+        private Bindable<double> scalingPositionX;
+        private Bindable<double> scalingPositionY;
+        private Bindable<double> scalingSizeX;
+        private Bindable<double> scalingSizeY;
 
         private const int transition_duration = 400;
 
@@ -47,10 +47,10 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
 
             scalingMode = osuConfig.GetBindable<ScalingMode>(OsuSetting.Scaling);
             sizeFullscreen = config.GetBindable<Size>(FrameworkSetting.SizeFullscreen);
-            scalingSizeX = osuConfig.GetBindable<float>(OsuSetting.ScalingSizeX);
-            scalingSizeY = osuConfig.GetBindable<float>(OsuSetting.ScalingSizeY);
-            scalingPositionX = osuConfig.GetBindable<float>(OsuSetting.ScalingPositionX);
-            scalingPositionY = osuConfig.GetBindable<float>(OsuSetting.ScalingPositionY);
+            scalingSizeX = osuConfig.GetBindable<double>(OsuSetting.ScalingSizeX);
+            scalingSizeY = osuConfig.GetBindable<double>(OsuSetting.ScalingSizeY);
+            scalingPositionX = osuConfig.GetBindable<double>(OsuSetting.ScalingPositionX);
+            scalingPositionY = osuConfig.GetBindable<double>(OsuSetting.ScalingPositionY);
 
             if (host.Window != null)
                 windowModes.BindTo(host.Window.SupportedWindowModes);
@@ -70,11 +70,11 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y
                 },
-                new SettingsSlider<float, UIScaleSlider>
+                new SettingsSlider<double, UIScaleSlider>
                 {
                     LabelText = "UI Scaling",
                     TransferValueOnCommit = true,
-                    Bindable = osuConfig.GetBindable<float>(OsuSetting.UIScale),
+                    Bindable = osuConfig.GetBindable<double>(OsuSetting.UIScale),
                     KeyboardStep = 0.01f
                 },
                 new SettingsEnumDropdown<ScalingMode>
@@ -82,7 +82,7 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
                     LabelText = "Screen Scaling",
                     Bindable = osuConfig.GetBindable<ScalingMode>(OsuSetting.Scaling),
                 },
-                scalingSettings = new FillFlowContainer<SettingsSlider<float>>
+                scalingSettings = new FillFlowContainer<SettingsSlider<double>>
                 {
                     Direction = FillDirection.Vertical,
                     RelativeSizeAxes = Axes.X,
@@ -92,25 +92,25 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
                     Masking = true,
                     Children = new[]
                     {
-                        new SettingsSlider<float>
+                        new SettingsSlider<double>
                         {
                             LabelText = "Horizontal position",
                             Bindable = scalingPositionX,
                             KeyboardStep = 0.01f
                         },
-                        new SettingsSlider<float>
+                        new SettingsSlider<double>
                         {
                             LabelText = "Vertical position",
                             Bindable = scalingPositionY,
                             KeyboardStep = 0.01f
                         },
-                        new SettingsSlider<float>
+                        new SettingsSlider<double>
                         {
                             LabelText = "Horizontal scale",
                             Bindable = scalingSizeX,
                             KeyboardStep = 0.01f
                         },
-                        new SettingsSlider<float>
+                        new SettingsSlider<double>
                         {
                             LabelText = "Vertical scale",
                             Bindable = scalingSizeY,
@@ -176,7 +176,7 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
         /// </summary>
         /// <param name="bindable">The config bindable.</param>
         /// <returns>A bindable which will propagate updates with a delay.</returns>
-        private void bindPreviewEvent(Bindable<float> bindable)
+        private void bindPreviewEvent(Bindable<double> bindable)
         {
             bindable.ValueChanged += _ =>
             {
@@ -230,7 +230,7 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
             }
         }
 
-        private class UIScaleSlider : OsuSliderBar<float>
+        private class UIScaleSlider : OsuSliderBar<double>
         {
             public override string TooltipText => base.TooltipText + "x";
         }
