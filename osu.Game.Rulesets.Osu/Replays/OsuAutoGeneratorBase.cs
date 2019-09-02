@@ -29,11 +29,6 @@ namespace osu.Game.Rulesets.Osu.Replays
         /// </summary>
         protected readonly double FrameDelay;
 
-        /// <summary>
-        /// The <see cref="HitObject"/> hit windows.
-        /// </summary>
-        protected readonly HitWindows HitWindows;
-
         #endregion
 
         #region Construction / Initialisation
@@ -48,9 +43,6 @@ namespace osu.Game.Rulesets.Osu.Replays
 
             // We are using ApplyModsToRate and not ApplyModsToTime to counteract the speed up / slow down from HalfTime / DoubleTime so that we remain at a constant framerate of 60 fps.
             FrameDelay = ApplyModsToRate(1000.0 / 60.0);
-
-            HitWindows = new OsuHitWindows();
-            HitWindows.SetDifficulty(Beatmap.BeatmapInfo.BaseDifficulty.OverallDifficulty);
         }
 
         #endregion
