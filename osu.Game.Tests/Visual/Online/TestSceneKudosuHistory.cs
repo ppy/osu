@@ -10,7 +10,6 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics;
 using osu.Game.Online.API.Requests.Responses;
-using osu.Game.Online.API.Requests;
 using osu.Framework.Extensions.IEnumerableExtensions;
 
 namespace osu.Game.Tests.Visual.Online

@@ -53,4 +53,19 @@ namespace osu.Game.Online.API.Requests.Responses
 
         public KudosuAction Action;
     }
+
+    public enum KudosuAction
+    {
+        AllowKudosuGive,
+        DeleteReset,
+        DenyKudosuReset,
+        ForumGive,
+        ForumReset,
+        ForumRevoke,
+        RecalculateGive,
+        RecalculateReset,
+        RestoreGive,
+        VoteGive,
+        VoteReset,
+    }
 }
