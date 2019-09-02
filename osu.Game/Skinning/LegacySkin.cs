@@ -35,7 +35,7 @@ namespace osu.Game.Skinning
                 using (StreamReader reader = new StreamReader(stream))
                     Configuration = new LegacySkinDecoder().Decode(reader);
             else
-                Configuration = new SkinConfiguration();
+                Configuration = new DefaultSkinConfiguration();
 
             Samples = audioManager.GetSampleStore(storage);
             Textures = new TextureStore(new TextureLoaderStore(storage));

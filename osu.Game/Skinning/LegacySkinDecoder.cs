@@ -5,14 +5,14 @@ using osu.Game.Beatmaps.Formats;
 
 namespace osu.Game.Skinning
 {
-    public class LegacySkinDecoder : LegacyDecoder<SkinConfiguration>
+    public class LegacySkinDecoder : LegacyDecoder<DefaultSkinConfiguration>
     {
         public LegacySkinDecoder()
             : base(1)
         {
         }
 
-        protected override void ParseLine(SkinConfiguration skin, Section section, string line)
+        protected override void ParseLine(DefaultSkinConfiguration skin, Section section, string line)
         {
             line = StripComments(line);
 
