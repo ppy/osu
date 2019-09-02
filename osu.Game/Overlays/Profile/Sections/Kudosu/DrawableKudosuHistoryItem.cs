@@ -38,7 +38,7 @@ namespace osu.Game.Overlays.Profile.Sections.Kudosu
                     Anchor = Anchor.CentreLeft,
                     Origin = Anchor.CentreLeft,
                     AutoSizeAxes = Axes.Both,
-                    Spacing = new Vector2(3),
+                    Spacing = new Vector2(0, 3),
                 },
                 date = new DrawableDate(historyItem.CreatedAt)
                 {
@@ -59,14 +59,15 @@ namespace osu.Game.Overlays.Profile.Sections.Kudosu
             if (!string.IsNullOrEmpty(prefix))
             {
                 linkFlowContainer.AddText(prefix);
-                linkFlowContainer.AddText($@"{Math.Abs(historyItem.Amount)} kudosu", t =>
+                linkFlowContainer.AddText($@" {Math.Abs(historyItem.Amount)} kudosu ", t =>
                 {
                     t.Font = t.Font.With(italics: true);
                     t.Colour = colours.Blue;
                 });
             }
 
-            linkFlowContainer.AddLinks(formattedSource.Text + " ", formattedSource.Links);
+            linkFlowContainer.AddLinks(formattedSource.Text, formattedSource.Links);
+            linkFlowContainer.AddText(" ");
             linkFlowContainer.AddLink(historyItem.Post.Title, historyItem.Post.Url);
         }
 
