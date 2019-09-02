@@ -103,13 +103,13 @@ namespace osu.Game.Configuration
 
             Set(OsuSetting.Scaling, ScalingMode.Off);
 
-            Set(OsuSetting.ScalingSizeX, 0.8, 0.2, 1, 0.01);
-            Set(OsuSetting.ScalingSizeY, 0.8, 0.2, 1, 0.01);
+            Set(OsuSetting.ScalingSizeX, 0.8f, 0.2f, 1f, 0.01f);
+            Set(OsuSetting.ScalingSizeY, 0.8f, 0.2f, 1f, 0.01f);
 
-            Set(OsuSetting.ScalingPositionX, 0.5, 0, 1, 0.01);
-            Set(OsuSetting.ScalingPositionY, 0.5, 0, 1, 0.01);
+            Set(OsuSetting.ScalingPositionX, 0.5f, 0f, 1f, 0.01f);
+            Set(OsuSetting.ScalingPositionY, 0.5f, 0f, 1f, 0.01f);
 
-            Set(OsuSetting.UIScale, 1, 0.8, 1.6, 0.01);
+            Set(OsuSetting.UIScale, 1f, 0.8f, 1.6f, 0.01f);
 
             Set(OsuSetting.IntroSequence, IntroSequence.Triangles);
         }

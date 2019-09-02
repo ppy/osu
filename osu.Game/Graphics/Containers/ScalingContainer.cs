@@ -18,10 +18,10 @@ namespace osu.Game.Graphics.Containers
     /// </summary>
     public class ScalingContainer : Container
     {
-        private Bindable<double> sizeX;
-        private Bindable<double> sizeY;
-        private Bindable<double> posX;
-        private Bindable<double> posY;
+        private Bindable<float> sizeX;
+        private Bindable<float> sizeY;
+        private Bindable<float> posX;
+        private Bindable<float> posY;
 
         private readonly ScalingMode? targetMode;
 
@@ -57,7 +57,7 @@ namespace osu.Game.Graphics.Containers
         private class ScalingDrawSizePreservingFillContainer : DrawSizePreservingFillContainer
         {
             private readonly bool applyUIScale;
-            private Bindable<double> uiScale;
+            private Bindable<float> uiScale;
 
             public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => true;
 
@@ -71,15 +71,15 @@ namespace osu.Game.Graphics.Containers
             {
                 if (applyUIScale)
                 {
-                    uiScale = osuConfig.GetBindable<double>(OsuSetting.UIScale);
+                    uiScale = osuConfig.GetBindable<float>(OsuSetting.UIScale);
                     uiScale.BindValueChanged(scaleChanged, true);
                 }
             }
 
-            private void scaleChanged(ValueChangedEvent<double> args)
+            private void scaleChanged(ValueChangedEvent<float> args)
             {
-                this.ScaleTo(new Vector2((float)args.NewValue), 500, Easing.Out);
-                this.ResizeTo(new Vector2(1 / (float)args.NewValue), 500, Easing.Out);
+                this.ScaleTo(new Vector2(args.NewValue), 500, Easing.Out);
+                this.ResizeTo(new Vector2(1 / args.NewValue), 500, Easing.Out);
             }
         }
 
@@ -89,16 +89,16 @@ namespace osu.Game.Graphics.Containers
             scalingMode = config.GetBindable<ScalingMode>(OsuSetting.Scaling);
             scalingMode.ValueChanged += _ => updateSize();
 
-            sizeX = config.GetBindable<double>(OsuSetting.ScalingSizeX);
+            sizeX = config.GetBindable<float>(OsuSetting.ScalingSizeX);
             sizeX.ValueChanged += _ => updateSize();
 
-            sizeY = config.GetBindable<double>(OsuSetting.ScalingSizeY);
+            sizeY = config.GetBindable<float>(OsuSetting.ScalingSizeY);
             sizeY.ValueChanged += _ => updateSize();
 
-            posX = config.GetBindable<double>(OsuSetting.ScalingPositionX);
+            posX = config.GetBindable<float>(OsuSetting.ScalingPositionX);
             posX.ValueChanged += _ => updateSize();
 
-            posY = config.GetBindable<double>(OsuSetting.ScalingPositionY);
+            posY = config.GetBindable<float>(OsuSetting.ScalingPositionY);
             posY.ValueChanged += _ => updateSize();
         }
 
@@ -141,8 +141,8 @@ namespace osu.Game.Graphics.Containers
 
             bool scaling = targetMode == null || scalingMode.Value == targetMode;
 
-            var targetSize = scaling ? new Vector2((float)sizeX.Value, (float)sizeY.Value) : Vector2.One;
-            var targetPosition = scaling ? new Vector2((float)posX.Value, (float)posY.Value) * (Vector2.One - targetSize) : Vector2.Zero;
+            var targetSize = scaling ? new Vector2(sizeX.Value, sizeY.Value) : Vector2.One;
+            var targetPosition = scaling ? new Vector2(posX.Value, posY.Value) * (Vector2.One - targetSize) : Vector2.Zero;
             bool requiresMasking = scaling && targetSize != Vector2.One;
 
             if (requiresMasking)
