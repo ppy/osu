@@ -21,16 +21,16 @@ namespace osu.Game.Online.API.Requests
 
     public enum KudosuAction
     {
-        Give,
-        VoteGive,
-        Reset,
-        VoteReset,
-        DenyKudosuReset,
-        Revoke,
         AllowKudosuGive,
         DeleteReset,
-        RestoreGive,
+        DenyKudosuReset,
+        ForumGive,
+        ForumReset,
+        ForumRevoke,
         RecalculateGive,
-        RecalculateReset
+        RecalculateReset,
+        RestoreGive,
+        VoteGive,
+        VoteReset,
     }
 }

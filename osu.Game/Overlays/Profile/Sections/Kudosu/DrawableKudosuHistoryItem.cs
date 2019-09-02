@@ -80,10 +80,10 @@ namespace osu.Game.Overlays.Profile.Sections.Kudosu
                 case KudosuAction.VoteGive:
                     return @"from obtaining votes in modding post of";
 
-                case KudosuAction.Give:
+                case KudosuAction.ForumGive:
                     return $@"from {userLink()} for a post at";
 
-                case KudosuAction.Reset:
+                case KudosuAction.ForumReset:
                     return $@"Kudosu reset by {userLink()} for the post";
 
                 case KudosuAction.VoteReset:
@@ -92,7 +92,7 @@ namespace osu.Game.Overlays.Profile.Sections.Kudosu
                 case KudosuAction.DenyKudosuReset:
                     return @"from modding post";
 
-                case KudosuAction.Revoke:
+                case KudosuAction.ForumRevoke:
                     return $@"Denied kudosu by {userLink()} for the post";
 
                 case KudosuAction.AllowKudosuGive:
@@ -120,7 +120,7 @@ namespace osu.Game.Overlays.Profile.Sections.Kudosu
             switch (historyItem.Action)
             {
                 case KudosuAction.VoteGive:
-                case KudosuAction.Give:
+                case KudosuAction.ForumGive:
                 case KudosuAction.AllowKudosuGive:
                 case KudosuAction.RestoreGive:
                 case KudosuAction.RecalculateGive:

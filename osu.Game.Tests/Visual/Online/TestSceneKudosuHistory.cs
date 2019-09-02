@@ -75,7 +75,7 @@ namespace osu.Game.Tests.Visual.Online
             {
                 Amount = 5,
                 CreatedAt = new DateTimeOffset(new DateTime(2012, 10, 11)),
-                Action = KudosuAction.Give,
+                Action = KudosuAction.ForumGive,
                 Post = new APIKudosuHistory.ModdingPost
                 {
                     Title = @"Random post 2",
@@ -91,7 +91,7 @@ namespace osu.Game.Tests.Visual.Online
             {
                 Amount = 8,
                 CreatedAt = new DateTimeOffset(new DateTime(2013, 9, 11)),
-                Action = KudosuAction.Reset,
+                Action = KudosuAction.ForumReset,
                 Post = new APIKudosuHistory.ModdingPost
                 {
                     Title = @"Random post 3",
@@ -107,7 +107,7 @@ namespace osu.Game.Tests.Visual.Online
             {
                 Amount = 7,
                 CreatedAt = new DateTimeOffset(new DateTime(2014, 8, 11)),
-                Action = KudosuAction.Revoke,
+                Action = KudosuAction.ForumRevoke,
                 Post = new APIKudosuHistory.ModdingPost
                 {
                     Title = @"Random post 4",
