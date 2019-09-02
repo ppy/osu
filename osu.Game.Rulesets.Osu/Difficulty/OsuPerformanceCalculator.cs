@@ -137,25 +137,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             //Console.WriteLine(urOnCheeseNotes * Attributes.AimDiff);
             //Console.WriteLine(cheeseLevel);
 
-            double aimValue = Math.Pow(tp * cheeseFactor, 2.55) * 0.1729;
+            double aimValue = Math.Pow(tp * cheeseFactor, 2.55) * 0.1815;
 
-
-
-
-            // Buff full combo scores
-            double fcness;
-            if (effectiveMissCount > 0)
-                fcness = 0;
-            else if (countSliders == 0)
-                fcness = 1;
-            else
-            {
-                // assuming missing slider tails because we cannot differentiate a slider break
-                // near the beginning/end from a number of missed slider tails
-                double sliderTailMissingRate = (double)(beatmapMaxCombo - scoreMaxCombo) / countSliders;
-                fcness = 2 - 2 * SpecialFunctions.Logistic(sliderTailMissingRate * 50) ;
-            }
-            aimValue *= 1 + fcness * fcBuffFactor;
+            // penalize misses
+            aimValue *= Math.Pow(0.985, effectiveMissCount);
 
 
             // We want to give more reward for lower AR when it comes to aim and HD. This nerfs high AR and buffs lower AR.
