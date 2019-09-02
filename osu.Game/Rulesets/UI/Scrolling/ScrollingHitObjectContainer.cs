@@ -51,8 +51,13 @@ namespace osu.Game.Rulesets.UI.Scrolling
         public override bool Remove(DrawableHitObject hitObject)
         {
             var result = base.Remove(hitObject);
+
             if (result)
+            {
                 initialStateCache.Invalidate();
+                hitObjectInitialStateCache.Remove(hitObject);
+            }
+
             return result;
         }
 
