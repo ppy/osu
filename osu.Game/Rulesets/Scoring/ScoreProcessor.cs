@@ -90,7 +90,7 @@ namespace osu.Game.Rulesets.Scoring
         /// <summary>
         /// Whether all <see cref="Judgement"/>s have been processed.
         /// </summary>
-        protected virtual bool HasCompleted => false;
+        public virtual bool HasCompleted => false;
 
         /// <summary>
         /// Whether this ScoreProcessor has already triggered the failed state.
@@ -205,7 +205,7 @@ namespace osu.Game.Rulesets.Scoring
         private const double combo_portion = 0.7;
         private const double max_score = 1000000;
 
-        protected sealed override bool HasCompleted => JudgedHits == MaxHits;
+        public sealed override bool HasCompleted => JudgedHits == MaxHits;
 
         protected int MaxHits { get; private set; }
         protected int JudgedHits { get; private set; }
@@ -325,9 +325,6 @@ namespace osu.Game.Rulesets.Scoring
 
             JudgedHits++;
 
-            if (result.Type != HitResult.None)
-                scoreResultCounts[result.Type] = scoreResultCounts.GetOrDefault(result.Type) + 1;
-
             if (result.Judgement.AffectsCombo)
             {
                 switch (result.Type)
@@ -352,6 +349,9 @@ namespace osu.Game.Rulesets.Scoring
             }
             else
             {
+                if (result.HasResult)
+                    scoreResultCounts[result.Type] = scoreResultCounts.GetOrDefault(result.Type) + 1;
+
                 baseScore += result.Judgement.NumericResultFor(result);
                 rollingMaxBaseScore += result.Judgement.MaxNumericResult;
             }
@@ -371,9 +371,6 @@ namespace osu.Game.Rulesets.Scoring
 
             JudgedHits--;
 
-            if (result.Type != HitResult.None)
-                scoreResultCounts[result.Type] = scoreResultCounts.GetOrDefault(result.Type) - 1;
-
             if (result.Judgement.IsBonus)
             {
                 if (result.IsHit)
@@ -381,6 +378,9 @@ namespace osu.Game.Rulesets.Scoring
             }
             else
             {
+                if (result.HasResult)
+                    scoreResultCounts[result.Type] = scoreResultCounts.GetOrDefault(result.Type) - 1;
+
                 baseScore -= result.Judgement.NumericResultFor(result);
                 rollingMaxBaseScore -= result.Judgement.MaxNumericResult;
             }
