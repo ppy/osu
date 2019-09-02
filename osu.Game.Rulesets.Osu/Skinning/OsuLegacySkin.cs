@@ -115,7 +115,13 @@ namespace osu.Game.Rulesets.Osu.Skinning
         public SampleChannel GetSample(ISampleInfo sample) => source.GetSample(sample);
 
         public TValue GetValue<TConfiguration, TValue>(Func<TConfiguration, TValue> query) where TConfiguration : SkinConfiguration
-            => configuration.Value is TConfiguration conf ? query.Invoke(conf) : source.GetValue(query);
+        {
+            TValue val;
+            if (configuration.Value is TConfiguration conf && (val = query.Invoke(conf)) != null)
+                return val;
+
+            return source.GetValue(query);
+        }
 
         private bool hasFont(string fontName) => source.GetTexture($"{fontName}-0") != null;
     }
