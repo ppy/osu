@@ -16,7 +16,7 @@ namespace osu.Game.Skinning
     {
         private readonly ISampleInfo[] hitSamples;
 
-        private List<(AdjustableProperty, BindableDouble)> adjustments;
+        private List<(AdjustableProperty property, BindableDouble bindable)> adjustments;
 
         private SampleChannel[] channels;
 
@@ -88,7 +88,7 @@ namespace osu.Game.Skinning
 
                     if (adjustments != null)
                         foreach (var adjustment in adjustments)
-                            ch.AddAdjustment(adjustment.Item1, adjustment.Item2);
+                            ch.AddAdjustment(adjustment.property, adjustment.bindable);
                 }
 
                 return ch;
