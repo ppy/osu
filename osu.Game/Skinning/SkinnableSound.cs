@@ -54,6 +54,7 @@ namespace osu.Game.Skinning
         }
 
         public void Play() => channels?.ForEach(c => c.Play());
+
         public void Stop() => channels?.ForEach(c => c.Stop());
 
         public void AddAdjustment(AdjustableProperty type, BindableDouble adjustBindable)
