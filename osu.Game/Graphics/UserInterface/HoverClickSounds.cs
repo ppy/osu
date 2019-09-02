@@ -1,7 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
+using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
@@ -36,9 +36,7 @@ namespace osu.Game.Graphics.UserInterface
 
         protected override bool OnMouseUp(MouseUpEvent e)
         {
-            var index = Array.IndexOf(buttons, e.Button);
-            bool shouldPlayEffect = index > -1 && index < buttons.Length;
-
+            bool shouldPlayEffect = buttons.Contains(e.Button);
             // examine the button pressed first for short-circuiting
             // in most usages it is more likely that another button was pressed than that the cursor left the drawable bounds
             if (shouldPlayEffect && Contains(e.ScreenSpaceMousePosition))
