@@ -190,10 +190,11 @@ namespace osu.Game.Overlays.Direct
                     text = new OsuSpriteText { Font = OsuFont.GetFont(weight: FontWeight.SemiBold, italics: true) },
                     new SpriteIcon
                     {
+                        Anchor = Anchor.CentreLeft,
+                        Origin = Anchor.CentreLeft,
                         Icon = icon,
                         Shadow = true,
                         Size = new Vector2(14),
-                        Margin = new MarginPadding { Top = 1 },
                     },
                 };
 
