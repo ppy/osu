@@ -34,22 +34,22 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         private const int difficultyCount = 20;
 
 
-        public static (double, double, double[], double[], double, double[], double[])
+        public static (double, double, double[], double[], double[], double, double[], double[])
             CalculateAimAttributes(List<OsuHitObject> hitObjects,
                                    double clockRate,
                                    List<Vector<double>> strainHistory)
         {
-            IList<OsuMovement> movements = createMovements(hitObjects, clockRate, strainHistory);
+            List<OsuMovement> movements = createMovements(hitObjects, clockRate, strainHistory);
 
             double fcProbTP = calculateFCProbTP(movements);
             double fcTimeTP = calculateFCTimeTP(movements);
 
+            double[] comboTPs = calculateComboTps(movements);
             (var missTPs, var missCounts) = calculateMissTPsMissCounts(movements, fcTimeTP);
             (var cheeseLevels, var cheeseFactors) = calculateCheeseLevelsVSCheeseFactors(movements, fcProbTP);
-
             double cheeseNoteCount = getCheeseNoteCount(movements, fcProbTP);
 
-            return (fcProbTP, fcTimeTP, missTPs, missCounts, cheeseNoteCount, cheeseLevels, cheeseFactors);
+            return (fcProbTP, fcTimeTP, comboTPs, missTPs, missCounts, cheeseNoteCount, cheeseLevels, cheeseFactors);
         }
 
         private static List<OsuMovement> createMovements(List<OsuHitObject> hitObjects, double clockRate, List<Vector<double>> strainHistory)
@@ -185,6 +185,34 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             return count;
         }
 
+        private static double[] calculateComboTps(List<OsuMovement> movements)
+        {
+            double[] ComboTPs = new double[difficultyCount];
+
+            for (int i = 1; i <= difficultyCount; ++i)
+            {
+                ComboTPs[i - 1] = double.PositiveInfinity;
+
+                for (int j = 0; j <= difficultyCount - i; ++j)
+                {
+                    ComboTPs[i - 1] = Math.Min(ComboTPs[i - 1], calculateComboTPForPart(movements, i, j));
+                }
+            }
+
+            return ComboTPs;
+        }
+
+        private static double calculateComboTPForPart(List<OsuMovement> movements, int i, int j)
+        {
+            int start = movements.Count * j / difficultyCount;
+            int end = movements.Count * (j + i) / difficultyCount - 1;
+
+            double partTP = calculateFCTimeTP(movements.GetRange(start, end - start + 1));
+            //Console.WriteLine($"{start} {end} {partTP.ToString("N3")}");
+
+            return partTP;
+        }
+       
 
         private static double calculateFCProb(IEnumerable<OsuMovement> movements, double tp, double cheeseLevel)
         {

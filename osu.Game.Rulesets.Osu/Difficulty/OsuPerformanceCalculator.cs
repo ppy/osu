@@ -24,7 +24,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         public new OsuDifficultyAttributes Attributes => (OsuDifficultyAttributes)base.Attributes;
 
         private const double totalValueExponent = 1.5;
-        private const double fcBuffFactor = 0.05;
+        private const double comboWeight = 0.5;
+
 
         private readonly int countHitCircles;
         private readonly int countSliders;
@@ -95,19 +96,30 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             // Guess the number of misaims from combo
             int effectiveMissCount = Math.Max(countMiss, (int)(Math.Floor((beatmapMaxCombo - 0.1 * countSliders) / scoreMaxCombo)));
 
-            // Get player's throughput. Interpolate if there are misses.
-            double tp;
+
+            // Get player's throughput according to combo
+            int comboTPCount = Attributes.ComboTPs.Length;
+            var comboPercentages = Generate.LinearSpaced(comboTPCount, 1.0 / comboTPCount, 1);
+
+            double scoreComboPercentage = ((double)scoreMaxCombo) / beatmapMaxCombo;
+            double comboTP = LinearSpline.InterpolateSorted(comboPercentages, Attributes.ComboTPs)
+                             .Interpolate(scoreComboPercentage);
+
+
+            // Get player's throughput according to miss count
+            double missTP;
             if (effectiveMissCount == 0)
-                tp = Attributes.MissTPs[0];
+                missTP = Attributes.MissTPs[0];
             else
             {
-                tp = LinearSpline.InterpolateSorted(Attributes.MissCounts, Attributes.MissTPs)
+                missTP = LinearSpline.InterpolateSorted(Attributes.MissCounts, Attributes.MissTPs)
                                  .Interpolate(effectiveMissCount);
-                tp = Math.Max(tp, 0);
+                missTP = Math.Max(missTP, 0);
             }
 
-            if (mods.Any(m => m is OsuModTouchDevice))
-                tp = Math.Pow(tp, 0.8);
+            // Combine combo based throughput and miss count based throughput
+            double tp = Math.Pow(comboTP, comboWeight) * Math.Pow(missTP, 1 - comboWeight);
+
 
             // Scale tp according to cheese level and acc
             // Treat 300 as 300, 100 as 200, 50 as 100
@@ -133,15 +145,15 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             double cheeseFactor = LinearSpline.InterpolateSorted(Attributes.CheeseLevels, Attributes.CheeseFactors)
                                   .Interpolate(cheeseLevel);
-            //Console.WriteLine(accOnCheeseNotes);
-            //Console.WriteLine(urOnCheeseNotes * Attributes.AimDiff);
-            //Console.WriteLine(cheeseLevel);
 
-            double aimValue = Math.Pow(tp * cheeseFactor, 2.55) * 0.1815;
+
+            if (mods.Any(m => m is OsuModTouchDevice))
+                tp = Math.Pow(tp, 0.8);
+
+            double aimValue = tpToPP(tp * cheeseFactor);
 
             // penalize misses
             aimValue *= Math.Pow(0.985, effectiveMissCount);
-
 
             // We want to give more reward for lower AR when it comes to aim and HD. This nerfs high AR and buffs lower AR.
             if (mods.Any(h => h is OsuModHidden))
@@ -158,19 +170,12 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             }
 
 
-            //// Scale the aim value with accuracy _slightly_
-            //aimValue *= 0.5f + accuracy / 2.0f;
-            //// It is important to also consider accuracy difficulty when doing that
-            //aimValue *= 0.98f + Math.Pow(Attributes.OverallDifficulty, 2) / 2500;
-
+            // Scale the aim value with accuracy
             double accLeniency = (80 - 6 * Attributes.OverallDifficulty) * Attributes.AimDiff / 300;
             double accPenalty = (SpecialFunctions.Logistic((accuracy-0.94) * (-200.0/3)) - SpecialFunctions.Logistic(-4)) *
                                 Math.Pow(accLeniency, 2) * 0.2;
 
             aimValue *= Math.Exp(-accPenalty);
-
-            //Console.WriteLine(accLeniency);
-            //Console.WriteLine(accPenalty);
 
             return aimValue;
         }
@@ -213,14 +218,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             accBuffLevel = Math.Pow(accBuffLevel, 2) * 1.2;
             tapValue *= 1 + accBuffLevel;
 
-            //Console.WriteLine(urOnStreams * Attributes.TapDiff);
-            //Console.WriteLine(mashLevel);
-            //Console.WriteLine(tapSkill);
-            //Console.WriteLine(accBuffLevel);
-
             // Penalize misses exponentially. This mainly fixes tag4 maps and the likes until a per-hitobject solution is available
             tapValue *= Math.Pow(0.97f, countMiss);
-
 
             double approachRateFactor = 1.0f;
             if (Attributes.ApproachRate > 10.33f)
@@ -233,6 +232,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             return tapValue;
         }
+
+        private double tpToPP(double tp) => Math.Pow(tp, 2.55) * 0.1815;
 
         private double totalHits => countGreat + countGood + countMeh + countMiss;
         private double totalSuccessfulHits => countGreat + countGood + countMeh;

@@ -48,7 +48,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 Tap.CalculateTapAttributes(hitObjects, clockRate);
 
             // Aim
-            (var aimDiff, var fcTimeTP, var missTPs, var missCounts, var cheeseNoteCount, var cheeseLevels, var cheeseFactors) =
+            (var aimDiff, var fcTimeTP, var comboTPs, var missTPs, var missCounts, var cheeseNoteCount, var cheeseLevels, var cheeseFactors) =
                 Aim.CalculateAimAttributes(hitObjects, clockRate, strainHistory);
 
             double tapSR = tapMultiplier * Math.Pow(tapDiff, srExponent);
@@ -76,6 +76,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
                 AimSR = aimSR,
                 AimDiff = aimDiff,
+                ComboTPs = comboTPs,
                 MissTPs = missTPs,
                 MissCounts = missCounts,
                 CheeseNoteCount = cheeseNoteCount,
