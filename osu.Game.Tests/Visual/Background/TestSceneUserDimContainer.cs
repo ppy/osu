@@ -295,8 +295,8 @@ namespace osu.Game.Tests.Visual.Background
             }
 
             public readonly Bindable<bool> DimEnabled = new Bindable<bool>();
-            public readonly Bindable<double> DimLevel = new Bindable<double>();
-            public readonly Bindable<double> BlurLevel = new Bindable<double>();
+            public readonly Bindable<float> DimLevel = new Bindable<float>();
+            public readonly Bindable<float> BlurLevel = new Bindable<float>();
 
             public new BeatmapCarousel Carousel => base.Carousel;
 
@@ -307,11 +307,11 @@ namespace osu.Game.Tests.Visual.Background
                 config.BindWith(OsuSetting.BlurLevel, BlurLevel);
             }
 
-            public bool IsBackgroundDimmed() => ((FadeAccessibleBackground)Background).CurrentColour == OsuColour.Gray(1 - (float)DimLevel.Value);
+            public bool IsBackgroundDimmed() => ((FadeAccessibleBackground)Background).CurrentColour == OsuColour.Gray(1f - DimLevel.Value);
 
             public bool IsBackgroundUndimmed() => ((FadeAccessibleBackground)Background).CurrentColour == Color4.White;
 
-            public bool IsUserBlurApplied() => ((FadeAccessibleBackground)Background).CurrentBlur == new Vector2((float)BlurLevel.Value * BackgroundScreenBeatmap.USER_BLUR_FACTOR);
+            public bool IsUserBlurApplied() => ((FadeAccessibleBackground)Background).CurrentBlur == new Vector2(BlurLevel.Value * BackgroundScreenBeatmap.USER_BLUR_FACTOR);
 
             public bool IsUserBlurDisabled() => ((FadeAccessibleBackground)Background).CurrentBlur == new Vector2(0);
 
