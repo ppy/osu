@@ -19,16 +19,16 @@ namespace osu.Game.Rulesets.Judgements
         public HitResult Type;
 
         /// <summary>
-        /// The <see cref="Judgement"/> which this <see cref="JudgementResult"/> applies for.
+        /// The <see cref="HitObject"/> which was judged.
         /// </summary>
-        public readonly Judgement Judgement;
+        [NotNull]
+        public readonly HitObject HitObject;
 
         /// <summary>
-        /// The <see cref="HitWindows"/> which the <see cref="HitObject"/> was judged against.
-        /// May be null to indicate that the timing error should not be displayed to the user.
+        /// The <see cref="Judgement"/> which this <see cref="JudgementResult"/> applies for.
         /// </summary>
-        [CanBeNull]
-        public readonly HitWindows HitWindows;
+        [NotNull]
+        public readonly Judgement Judgement;
 
         /// <summary>
         /// The offset from a perfect hit at which this <see cref="JudgementResult"/> occurred.
@@ -64,13 +64,12 @@ namespace osu.Game.Rulesets.Judgements
         /// <summary>
         /// Creates a new <see cref="JudgementResult"/>.
         /// </summary>
+        /// <param name="hitObject">The <see cref="HitObject"/> which was judged.</param>
         /// <param name="judgement">The <see cref="Judgement"/> to refer to for scoring information.</param>
-        /// <param name="hitWindows">The <see cref="HitWindows"/> which the <see cref="HitObject"/> was judged against.
-        /// May be null to indicate that the timing error should not be displayed to the user.</param>
-        public JudgementResult([NotNull] Judgement judgement, [CanBeNull] HitWindows hitWindows)
+        public JudgementResult([NotNull] HitObject hitObject, [NotNull] Judgement judgement)
         {
+            HitObject = hitObject;
             Judgement = judgement;
-            HitWindows = hitWindows;
         }
 
         public override string ToString() => $"{Type} (Score:{Judgement.NumericResultFor(this)} HP:{Judgement.HealthIncreaseFor(this)} {Judgement})";

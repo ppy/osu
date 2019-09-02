@@ -6,7 +6,6 @@ using osu.Framework.Graphics;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Osu.Judgements;
 using osu.Game.Graphics.Containers;
-using osu.Game.Rulesets.Objects;
 
 namespace osu.Game.Rulesets.Osu.Objects.Drawables
 {
@@ -42,6 +41,6 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
         protected virtual void Shake(double maximumLength) => shakeContainer.Shake(maximumLength);
 
-        protected override JudgementResult CreateResult(Judgement judgement, HitWindows hitWindows) => new OsuJudgementResult(judgement, hitWindows);
+        protected override JudgementResult CreateResult(Judgement judgement) => new OsuJudgementResult(HitObject, judgement);
     }
 }
