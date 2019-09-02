@@ -111,19 +111,58 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
         public double CheesableRatio { get; private set; }
         public double Time { get; private set; }
 
+        /// <summary>
+        /// Extracts movement (only for the first object in a beatmap).
+        /// </summary>
+        public static List<OsuMovement> ExtractMovement(OsuHitObject obj)
+        {
+            var movement = GetEmptyMovement(obj.StartTime / 1000.0);
 
-        public OsuMovement(OsuHitObject obj0, OsuHitObject obj1, OsuHitObject obj2, OsuHitObject obj3,
+            var movementWithNested = new List<OsuMovement>() { movement };
+            // add zero difficulty movements corresponding to slider ticks/slider ends so combo is reflected properly
+            int extraNestedCount = obj.NestedHitObjects.Count - 1;
+
+            for (int i = 0; i < extraNestedCount; i++)
+            {
+                movementWithNested.Add(GetEmptyMovement(movement.Time));
+            }
+
+            return movementWithNested;
+        }
+
+        public static List<OsuMovement> ExtractMovement(OsuHitObject obj0, OsuHitObject obj1, OsuHitObject obj2, OsuHitObject obj3,
                            Vector<double> tapStrain, double clockRate)
         {
+            
+            var movement = new OsuMovement();
+
+            double t12 = (obj2.StartTime - obj1.StartTime) / clockRate / 1000.0;
+            movement.RawMT = t12;
+            movement.Time = obj2.StartTime / 1000.0;
+
+            if (obj2 is Spinner || obj1 is Spinner)
+            {
+                movement.IP12 = 0;
+                movement.D = 0;
+                movement.MT = 1;
+                movement.Cheesablility = 0;
+                movement.CheesableRatio = 0;
+                return new List<OsuMovement>() { movement };
+            }
+
+            if (obj0 is Spinner)
+                obj0 = null;
+
+            if (obj3 is Spinner)
+                obj3 = null;
+
             var pos1 = Vector<double>.Build.Dense(new[] {(double)obj1.Position.X, (double)obj1.Position.Y});
             var pos2 = Vector<double>.Build.Dense(new[] {(double)obj2.Position.X, (double)obj2.Position.Y});
             var s12 = (pos2 - pos1) / (2 * obj2.Radius);
             double d12 = s12.L2Norm();
-            double t12 = (obj2.StartTime - obj1.StartTime) / clockRate / 1000.0;
-            IP12 = FittsLaw.CalculateIP(d12, t12);
+            double IP12 = FittsLaw.CalculateIP(d12, t12);
 
-            RawMT = t12;
-            Time = obj2.StartTime / 1000.0;
+            movement.IP12 = IP12;
 
             var s01 = Vector<double>.Build.Dense(2);
             var s23 = Vector<double>.Build.Dense(2);
@@ -341,10 +380,36 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
             double d12WithCorrection = d12 * (1 + smallCircleBonus) * (1 + correction0 + correction3 + patternCorrection) *
                                        (1 + tapCorrection);
 
-            D = d12WithCorrection;
-            MT = t12;
-            Cheesablility = cheesabilityEarly + cheesabilityLate;
-            CheesableRatio = (timeEarly + timeLate) / t12;
+            movement.D = d12WithCorrection;
+            movement.MT = t12;
+            movement.Cheesablility = cheesabilityEarly + cheesabilityLate;
+            movement.CheesableRatio = (timeEarly + timeLate) / t12;
+
+            var movementWithNested = new List<OsuMovement>() { movement };
+
+            // add zero difficulty movements corresponding to slider ticks/slider ends so combo is reflected properly
+            int extraNestedCount = obj2.NestedHitObjects.Count - 1;
+
+            for (int i = 0; i < extraNestedCount; i++)
+            {
+                movementWithNested.Add(GetEmptyMovement(movement.Time));
+            }
+
+            return movementWithNested;
+        }
+
+        public static OsuMovement GetEmptyMovement(double time)
+        {
+            return new OsuMovement()
+            {
+                D = 0,
+                MT = 1,
+                CheesableRatio = 0,
+                Cheesablility = 0,
+                RawMT = 0,
+                IP12 = 0,
+                Time = time
+            };
         }
 
         public static void Initialize()

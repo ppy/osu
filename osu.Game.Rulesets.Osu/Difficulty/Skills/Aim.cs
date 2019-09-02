@@ -57,6 +57,13 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             OsuMovement.Initialize();
             var movements = new List<OsuMovement>();
 
+            if (hitObjects.Count == 0)
+                return movements;
+
+            // the first object
+            movements.AddRange(OsuMovement.ExtractMovement(hitObjects[0]));
+
+            // the rest
             for (int i = 1; i < hitObjects.Count; i++)
             {
                 var obj0 = i > 1 ? hitObjects[i - 2] : null;
@@ -65,9 +72,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
                 var obj3 = i < hitObjects.Count - 1 ? hitObjects[i + 1] : null;
                 var tapStrain = strainHistory[i];
 
-                movements.Add(new OsuMovement(obj0, obj1, obj2, obj3, tapStrain, clockRate));
+                movements.AddRange(OsuMovement.ExtractMovement(obj0, obj1, obj2, obj3, tapStrain, clockRate));
             }
-
             return movements;
         }
 

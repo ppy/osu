@@ -35,8 +35,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
         protected override DifficultyAttributes Calculate(IBeatmap beatmap, Mod[] mods, double clockRate)
         {
-            var hitObjectsNoSpinner = beatmap.HitObjects.Where(obj => !(obj is Spinner))
-                                                        .Select(obj => (OsuHitObject)obj).ToList();
+            var hitObjects = beatmap.HitObjects as List<OsuHitObject>;
+
             if (beatmap.HitObjects.Count == 0)
                 return new OsuDifficultyAttributes { Mods = mods};
 
@@ -45,11 +45,11 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             // Tap
             (var tapDiff, var streamNoteCount, var mashLevels, var tapSkills, var strainHistory) =
-                Tap.CalculateTapAttributes(hitObjectsNoSpinner, clockRate);
+                Tap.CalculateTapAttributes(hitObjects, clockRate);
 
             // Aim
             (var aimDiff, var fcTimeTP, var missTPs, var missCounts, var cheeseNoteCount, var cheeseLevels, var cheeseFactors) =
-                Aim.CalculateAimAttributes(hitObjectsNoSpinner, clockRate, strainHistory);
+                Aim.CalculateAimAttributes(hitObjects, clockRate, strainHistory);
 
             double tapSR = tapMultiplier * Math.Pow(tapDiff, srExponent);
             double aimSR = aimMultiplier * Math.Pow(aimDiff, srExponent);
