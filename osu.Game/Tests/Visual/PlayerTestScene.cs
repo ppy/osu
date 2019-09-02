@@ -52,12 +52,6 @@ namespace osu.Game.Tests.Visual
             if (!AllowFail)
                 Mods.Value = new[] { ruleset.GetAllMods().First(m => m is ModNoFail) };
 
-            Player = CreatePlayer(ruleset);
-            LoadScreen(Player);
-        }
-
-        protected virtual Player CreatePlayer(Ruleset ruleset)
-        {
             if (Autoplay)
             {
                 var mod = ruleset.GetAutoplayMod();
@@ -65,7 +59,10 @@ namespace osu.Game.Tests.Visual
                     Mods.Value = Mods.Value.Concat(mod.Yield()).ToArray();
             }
 
-            return new TestPlayer(false, false);
+            Player = CreatePlayer(ruleset);
+            LoadScreen(Player);
         }
+
+        protected virtual Player CreatePlayer(Ruleset ruleset) => new TestPlayer(false, false);
     }
 }
