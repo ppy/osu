@@ -58,8 +58,8 @@ namespace osu.Game.Configuration
             Set(OsuSetting.AudioOffset, 0, -500.0, 500.0, 1);
 
             // Input
-            Set(OsuSetting.MenuCursorSize, 1.0, 0.5f, 2, 0.01);
-            Set(OsuSetting.GameplayCursorSize, 1.0, 0.1f, 2, 0.01);
+            Set(OsuSetting.MenuCursorSize, 1.0f, 0.5f, 2f, 0.01f);
+            Set(OsuSetting.GameplayCursorSize, 1.0f, 0.1f, 2f, 0.01f);
             Set(OsuSetting.AutoCursorSize, false);
 
             Set(OsuSetting.MouseDisableButtons, false);
