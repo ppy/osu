@@ -28,13 +28,14 @@ namespace osu.Game.Overlays.Direct
         public readonly BeatmapSetInfo SetInfo;
 
         private const double hover_transition_time = 400;
+        private const int maximum_difficulty_icons = 15;
 
         private Container content;
 
         private BeatmapSetOverlay beatmapSetOverlay;
 
         public PreviewTrack Preview => PlayButton.Preview;
-        public Bindable<bool> PreviewPlaying => PlayButton.Playing;
+        public Bindable<bool> PreviewPlaying => PlayButton?.Playing;
 
         protected abstract PlayButton PlayButton { get; }
         protected abstract Box PreviewBar { get; }
@@ -138,12 +139,18 @@ namespace osu.Game.Overlays.Direct
             };
         }
 
-        protected List<DifficultyIcon> GetDifficultyIcons()
+        protected List<DifficultyIcon> GetDifficultyIcons(OsuColour colours)
         {
             var icons = new List<DifficultyIcon>();
 
-            foreach (var b in SetInfo.Beatmaps.OrderBy(beatmap => beatmap.StarDifficulty))
-                icons.Add(new DifficultyIcon(b));
+            if (SetInfo.Beatmaps.Count > maximum_difficulty_icons)
+            {
+                foreach (var ruleset in SetInfo.Beatmaps.Select(b => b.Ruleset).Distinct())
+                    icons.Add(new GroupedDifficultyIcon(SetInfo.Beatmaps.FindAll(b => b.Ruleset.Equals(ruleset)), ruleset, this is DirectListPanel ? Color4.White : colours.Gray5));
+            }
+            else
+                foreach (var b in SetInfo.Beatmaps.OrderBy(beatmap => beatmap.StarDifficulty))
+                    icons.Add(new DifficultyIcon(b));
 
             return icons;
         }

@@ -62,6 +62,22 @@ namespace osu.Game.Rulesets.UI
 
         public override GameplayClock FrameStableClock => frameStabilityContainer.GameplayClock;
 
+        private bool frameStablePlayback = true;
+
+        /// <summary>
+        /// Whether to enable frame-stable playback.
+        /// </summary>
+        internal bool FrameStablePlayback
+        {
+            get => frameStablePlayback;
+            set
+            {
+                frameStablePlayback = false;
+                if (frameStabilityContainer != null)
+                    frameStabilityContainer.FrameStablePlayback = value;
+            }
+        }
+
         /// <summary>
         /// Invoked when a <see cref="JudgementResult"/> has been applied by a <see cref="DrawableHitObject"/>.
         /// </summary>
@@ -97,7 +113,7 @@ namespace osu.Game.Rulesets.UI
         /// <param name="ruleset">The ruleset being represented.</param>
         /// <param name="workingBeatmap">The beatmap to create the hit renderer for.</param>
         /// <param name="mods">The <see cref="Mod"/>s to apply.</param>
-        protected DrawableRuleset(Ruleset ruleset, WorkingBeatmap workingBeatmap, IReadOnlyList<Mod> mods)
+        protected DrawableRuleset(Ruleset ruleset, IWorkingBeatmap workingBeatmap, IReadOnlyList<Mod> mods)
             : base(ruleset)
         {
             if (workingBeatmap == null)
@@ -147,6 +163,7 @@ namespace osu.Game.Rulesets.UI
             {
                 frameStabilityContainer = new FrameStabilityContainer(GameplayStartTime)
                 {
+                    FrameStablePlayback = FrameStablePlayback,
                     Child = KeyBindingInputManager
                         .WithChild(CreatePlayfieldAdjustmentContainer()
                             .WithChild(Playfield)
@@ -197,10 +214,6 @@ namespace osu.Game.Rulesets.UI
             else
                 continueResume();
         }
-
-        public ResumeOverlay ResumeOverlay { get; private set; }
-
-        protected virtual ResumeOverlay CreateResumeOverlay() => null;
 
         /// <summary>
         /// Creates and adds the visual representation of a <see cref="TObject"/> to this <see cref="DrawableRuleset{TObject}"/>.
@@ -371,6 +384,13 @@ namespace osu.Game.Rulesets.UI
         /// The cursor being displayed by the <see cref="Playfield"/>. May be null if no cursor is provided.
         /// </summary>
         public abstract GameplayCursorContainer Cursor { get; }
+
+        /// <summary>
+        /// An optional overlay used when resuming gameplay from a paused state.
+        /// </summary>
+        public ResumeOverlay ResumeOverlay { get; protected set; }
+
+        protected virtual ResumeOverlay CreateResumeOverlay() => null;
 
         /// <summary>
         /// Sets a replay to be used, overriding local input.
