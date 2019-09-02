@@ -16,7 +16,7 @@ namespace osu.Game.Skinning
     {
         private readonly ISampleInfo[] hitSamples;
 
-        private readonly List<(AdjustableProperty, BindableDouble)> adjustments = new List<(AdjustableProperty, BindableDouble)>();
+        private List<(AdjustableProperty, BindableDouble)> adjustments;
 
         private SampleChannel[] channels;
 
@@ -56,13 +56,15 @@ namespace osu.Game.Skinning
 
         public void AddAdjustment(AdjustableProperty type, BindableDouble adjustBindable)
         {
+            if (adjustments == null) adjustments = new List<(AdjustableProperty, BindableDouble)>();
+
             adjustments.Add((type, adjustBindable));
             channels?.ForEach(c => c.AddAdjustment(type, adjustBindable));
         }
 
         public void RemoveAdjustment(AdjustableProperty type, BindableDouble adjustBindable)
         {
-            adjustments.Remove((type, adjustBindable));
+            adjustments?.Remove((type, adjustBindable));
             channels?.ForEach(c => c.RemoveAdjustment(type, adjustBindable));
         }
 
@@ -84,8 +86,9 @@ namespace osu.Game.Skinning
                     ch.Looping = looping;
                     ch.Volume.Value = s.Volume / 100.0;
 
-                    foreach (var adjustment in adjustments)
-                        ch.AddAdjustment(adjustment.Item1, adjustment.Item2);
+                    if (adjustments != null)
+                        foreach (var adjustment in adjustments)
+                            ch.AddAdjustment(adjustment.Item1, adjustment.Item2);
                 }
 
                 return ch;
