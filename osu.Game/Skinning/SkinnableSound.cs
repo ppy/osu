@@ -45,6 +45,8 @@ namespace osu.Game.Skinning
             get => looping;
             set
             {
+                if (value == looping) return;
+
                 looping = value;
 
                 channels?.ForEach(c => c.Looping = looping);
