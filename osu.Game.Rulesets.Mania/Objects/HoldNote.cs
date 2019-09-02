@@ -5,6 +5,7 @@ using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Mania.Judgements;
+using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
 
 namespace osu.Game.Rulesets.Mania.Objects
@@ -99,5 +100,7 @@ namespace osu.Game.Rulesets.Mania.Objects
         }
 
         public override Judgement CreateJudgement() => new HoldNoteJudgement();
+
+        protected override HitWindows CreateHitWindows() => null;
     }
 }
