@@ -7,7 +7,9 @@ using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.TypeExtensions;
+using osu.Framework.Graphics;
 using osu.Framework.Graphics.Primitives;
+using osu.Framework.Threading;
 using osu.Game.Audio;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Objects.Types;
@@ -186,6 +188,8 @@ namespace osu.Game.Rulesets.Objects.Drawables
         /// <summary>
         /// Apply (generally fade-in) transforms leading into the <see cref="HitObject"/> start time.
         /// The local drawable hierarchy is recursively delayed to <see cref="LifetimeStart"/> for convenience.
+        ///
+        /// By default this will fade in the object from zero with no duration.
         /// </summary>
         /// <remarks>
         /// This is called once before every <see cref="UpdateStateTransforms"/>. This is to ensure a good state in the case
@@ -193,6 +197,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
         /// </remarks>
         protected virtual void UpdateInitialTransforms()
         {
+            this.FadeInFromZero();
         }
 
         /// <summary>
@@ -273,6 +278,14 @@ namespace osu.Game.Rulesets.Objects.Drawables
 
             UpdateResult(false);
         }
+
+        /// <summary>
+        /// Schedules an <see cref="Action"/> to this <see cref="DrawableHitObject"/>.
+        /// </summary>
+        /// <remarks>
+        /// Only provided temporarily until hitobject pooling is implemented.
+        /// </remarks>
+        protected internal new ScheduledDelegate Schedule(Action action) => base.Schedule(action);
 
         private double? lifetimeStart;
 
