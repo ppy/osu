@@ -17,16 +17,16 @@ namespace osu.Game.Overlays.Settings.Sections.Gameplay
         {
             Children = new Drawable[]
             {
-                new SettingsSlider<double>
+                new SettingsSlider<float>
                 {
                     LabelText = "Background dim",
-                    Bindable = config.GetBindable<double>(OsuSetting.DimLevel),
+                    Bindable = config.GetBindable<float>(OsuSetting.DimLevel),
                     KeyboardStep = 0.01f
                 },
-                new SettingsSlider<double>
+                new SettingsSlider<float>
                 {
                     LabelText = "Background blur",
-                    Bindable = config.GetBindable<double>(OsuSetting.BlurLevel),
+                    Bindable = config.GetBindable<float>(OsuSetting.BlurLevel),
                     KeyboardStep = 0.01f
                 },
                 new SettingsCheckbox

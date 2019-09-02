@@ -42,7 +42,7 @@ namespace osu.Game.Tests.Visual
 
             OsuConfigManager manager;
             Dependencies.Cache(manager = new OsuConfigManager(LocalStorage));
-            manager.GetBindable<double>(OsuSetting.DimLevel).Value = 1.0;
+            manager.GetBindable<float>(OsuSetting.DimLevel).Value = 1.0f;
         }
 
         protected abstract void AddCheckSteps();

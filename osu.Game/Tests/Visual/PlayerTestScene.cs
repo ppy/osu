@@ -29,7 +29,7 @@ namespace osu.Game.Tests.Visual
         private void load()
         {
             Dependencies.Cache(LocalConfig = new OsuConfigManager(LocalStorage));
-            LocalConfig.GetBindable<double>(OsuSetting.DimLevel).Value = 1.0;
+            LocalConfig.GetBindable<float>(OsuSetting.DimLevel).Value = 1.0f;
         }
 
         [SetUpSteps]

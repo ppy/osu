@@ -145,7 +145,7 @@ namespace osu.Game.Screens.Backgrounds
                 }
             }
 
-            private Bindable<double> userBlurLevel { get; set; }
+            private Bindable<float> userBlurLevel { get; set; }
 
             private Background background;
 
@@ -161,13 +161,13 @@ namespace osu.Game.Screens.Backgrounds
             /// As an optimisation, we add the two blur portions to be applied rather than actually applying two separate blurs.
             /// </summary>
             private Vector2 blurTarget => EnableUserDim.Value
-                ? new Vector2(BlurAmount.Value + (float)userBlurLevel.Value * USER_BLUR_FACTOR)
+                ? new Vector2(BlurAmount.Value + userBlurLevel.Value * USER_BLUR_FACTOR)
                 : new Vector2(BlurAmount.Value);
 
             [BackgroundDependencyLoader]
             private void load(OsuConfigManager config)
             {
-                userBlurLevel = config.GetBindable<double>(OsuSetting.BlurLevel);
+                userBlurLevel = config.GetBindable<float>(OsuSetting.BlurLevel);
             }
 
             protected override void LoadComplete()

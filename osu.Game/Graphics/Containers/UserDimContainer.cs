@@ -31,11 +31,11 @@ namespace osu.Game.Graphics.Containers
         /// </summary>
         public bool ContentDisplayed { get; private set; }
 
-        protected Bindable<double> UserDimLevel { get; private set; }
+        protected Bindable<float> UserDimLevel { get; private set; }
 
         protected Bindable<bool> ShowStoryboard { get; private set; }
 
-        protected double DimLevel => EnableUserDim.Value ? UserDimLevel.Value : 0;
+        protected float DimLevel => EnableUserDim.Value ? UserDimLevel.Value : 0f;
 
         protected override Container<Drawable> Content => dimContent;
 
@@ -52,7 +52,7 @@ namespace osu.Game.Graphics.Containers
         [BackgroundDependencyLoader]
         private void load(OsuConfigManager config)
         {
-            UserDimLevel = config.GetBindable<double>(OsuSetting.DimLevel);
+            UserDimLevel = config.GetBindable<float>(OsuSetting.DimLevel);
             ShowStoryboard = config.GetBindable<bool>(OsuSetting.ShowStoryboard);
 
             EnableUserDim.ValueChanged += _ => UpdateVisuals();

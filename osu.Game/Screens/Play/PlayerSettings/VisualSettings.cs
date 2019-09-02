@@ -12,8 +12,8 @@ namespace osu.Game.Screens.Play.PlayerSettings
     {
         protected override string Title => "Visual settings";
 
-        private readonly PlayerSliderBar<double> dimSliderBar;
-        private readonly PlayerSliderBar<double> blurSliderBar;
+        private readonly PlayerSliderBar<float> dimSliderBar;
+        private readonly PlayerSliderBar<float> blurSliderBar;
         private readonly PlayerCheckbox showStoryboardToggle;
         private readonly PlayerCheckbox beatmapSkinsToggle;
         private readonly PlayerCheckbox beatmapHitsoundsToggle;
@@ -26,12 +26,12 @@ namespace osu.Game.Screens.Play.PlayerSettings
                 {
                     Text = "Background dim:"
                 },
-                dimSliderBar = new PlayerSliderBar<double>(),
+                dimSliderBar = new PlayerSliderBar<float>(),
                 new OsuSpriteText
                 {
                     Text = "Background blur:"
                 },
-                blurSliderBar = new PlayerSliderBar<double>(),
+                blurSliderBar = new PlayerSliderBar<float>(),
                 new OsuSpriteText
                 {
                     Text = "Toggles:"
@@ -45,8 +45,8 @@ namespace osu.Game.Screens.Play.PlayerSettings
         [BackgroundDependencyLoader]
         private void load(OsuConfigManager config)
         {
-            dimSliderBar.Bindable = config.GetBindable<double>(OsuSetting.DimLevel);
-            blurSliderBar.Bindable = config.GetBindable<double>(OsuSetting.BlurLevel);
+            dimSliderBar.Bindable = config.GetBindable<float>(OsuSetting.DimLevel);
+            blurSliderBar.Bindable = config.GetBindable<float>(OsuSetting.BlurLevel);
             showStoryboardToggle.Current = config.GetBindable<bool>(OsuSetting.ShowStoryboard);
             beatmapSkinsToggle.Current = config.GetBindable<bool>(OsuSetting.BeatmapSkins);
             beatmapHitsoundsToggle.Current = config.GetBindable<bool>(OsuSetting.BeatmapHitsounds);
