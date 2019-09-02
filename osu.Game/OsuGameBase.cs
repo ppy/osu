@@ -158,7 +158,7 @@ namespace osu.Game
 
             runMigrations();
 
-            dependencies.Cache(SkinManager = new SkinManager(Host.Storage, contextFactory, Host, Audio));
+            dependencies.Cache(SkinManager = new SkinManager(Host.Storage, contextFactory, Host, Audio, new NamespacedResourceStore<byte[]>(Resources, "Skins/Legacy")));
             dependencies.CacheAs<ISkinSource>(SkinManager);
 
             API = new APIAccess(LocalConfig);
