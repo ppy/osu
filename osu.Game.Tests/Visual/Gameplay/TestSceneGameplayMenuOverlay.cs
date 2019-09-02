@@ -56,16 +56,13 @@ namespace osu.Game.Tests.Visual.Gameplay
                 pauseOverlay.Retries = failOverlay.Retries = retryCount;
             });
 
-            AddToggleStep("Toggle pause overlay", t => pauseOverlay.ToggleVisibility());
-            AddToggleStep("Toggle fail overlay", t => failOverlay.ToggleVisibility());
-
-            testHideResets();
-
             testEnterWithoutSelection();
             testKeyUpFromInitial();
             testKeyDownFromInitial();
             testKeyUpWrapping();
             testKeyDownWrapping();
+
+            testHideResets();
 
             testMouseSelectionAfterKeySelection();
             testKeySelectionAfterMouseSelection();
@@ -74,19 +71,6 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             testClickSelection();
             testEnterKeySelection();
-        }
-
-        /// <summary>
-        /// Test that hiding the overlay after hovering a button will reset the overlay to the initial state with no buttons selected.
-        /// </summary>
-        private void testHideResets()
-        {
-            AddStep("Show overlay", () => failOverlay.Show());
-
-            AddStep("Hover first button", () => InputManager.MoveMouseTo(failOverlay.Buttons.First()));
-            AddStep("Hide overlay", () => failOverlay.Hide());
-
-            AddAssert("Overlay state is reset", () => !failOverlay.Buttons.Any(b => b.Selected.Value));
         }
 
         /// <summary>
@@ -160,6 +144,19 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddAssert("First button selected", () => failOverlay.Buttons.First().Selected.Value);
 
             AddStep("Hide overlay", () => failOverlay.Hide());
+        }
+
+        /// <summary>
+        /// Test that hiding the overlay after hovering a button will reset the overlay to the initial state with no buttons selected.
+        /// </summary>
+        private void testHideResets()
+        {
+            AddStep("Show overlay", () => failOverlay.Show());
+
+            AddStep("Hover first button", () => InputManager.MoveMouseTo(failOverlay.Buttons.First()));
+            AddStep("Hide overlay", () => failOverlay.Hide());
+
+            AddAssert("Overlay state is reset", () => !failOverlay.Buttons.Any(b => b.Selected.Value));
         }
 
         /// <summary>
