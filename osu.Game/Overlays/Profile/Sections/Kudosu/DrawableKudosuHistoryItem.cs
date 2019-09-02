@@ -120,29 +120,17 @@ namespace osu.Game.Overlays.Profile.Sections.Kudosu
             switch (historyItem.Action)
             {
                 case KudosuAction.VoteGive:
-                    return @"Received";
-
                 case KudosuAction.Give:
+                case KudosuAction.AllowKudosuGive:
+                case KudosuAction.RestoreGive:
+                case KudosuAction.RecalculateGive:
                     return @"Received";
-
-                case KudosuAction.VoteReset:
-                    return @"Lost";
 
                 case KudosuAction.DenyKudosuReset:
                     return @"Denied";
 
-                case KudosuAction.AllowKudosuGive:
-                    return @"Received";
-
                 case KudosuAction.DeleteReset:
-                    return @"Lost";
-
-                case KudosuAction.RestoreGive:
-                    return @"Received";
-
-                case KudosuAction.RecalculateGive:
-                    return @"Received";
-
+                case KudosuAction.VoteReset:
                 case KudosuAction.RecalculateReset:
                     return @"Lost";
 
