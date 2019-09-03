@@ -22,7 +22,7 @@ namespace osu.Game.Rulesets.Catch.UI
         [BackgroundDependencyLoader]
         private void load()
         {
-            InternalChild = new SkinnableSprite(@"Play/Catch/fruit-catcher-idle")
+            InternalChild = new SkinnableSprite(new CatchSkinComponent(CatchSkinComponents.Catcher))
             {
                 RelativeSizeAxes = Axes.Both,
                 Anchor = Anchor.TopCentre,

@@ -58,7 +58,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                                 return true;
                             },
                         },
-                        mainContent = new SkinnableDrawable("Play/osu/hitcircle", _ => new MainCirclePiece(HitObject.IndexInCurrentCombo)),
+                        mainContent = new SkinnableDrawable(new OsuSkinComponent(OsuSkinComponents.HitCircle), _ => new MainCirclePiece(HitObject.IndexInCurrentCombo)),
                         ApproachCircle = new ApproachCircle
                         {
                             Alpha = 0,

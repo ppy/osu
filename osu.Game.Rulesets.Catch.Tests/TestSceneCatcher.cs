@@ -1,4 +1,4 @@
-﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 using NUnit.Framework;
@@ -82,9 +82,9 @@ namespace osu.Game.Rulesets.Catch.Tests
                 remove { }
             }
 
-            public Drawable GetDrawableComponent(string componentName)
+            public Drawable GetDrawableComponent(ISkinComponent component)
             {
-                switch (componentName)
+                switch (component.LookupName)
                 {
                     case "Play/Catch/fruit-catcher-idle":
                         return new CatcherCustomSkin();
