@@ -121,10 +121,11 @@ namespace osu.Game.Overlays.Chat.Selection
                             {
                                 new SpriteIcon
                                 {
+                                    Anchor = Anchor.CentreLeft,
+                                    Origin = Anchor.CentreLeft,
                                     Icon = FontAwesome.Solid.User,
                                     Size = new Vector2(text_size - 2),
                                     Shadow = false,
-                                    Margin = new MarginPadding { Top = 1 },
                                 },
                                 new OsuSpriteText
                                 {

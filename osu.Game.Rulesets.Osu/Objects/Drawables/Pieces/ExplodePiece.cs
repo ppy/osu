@@ -3,7 +3,6 @@
 
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Game.Skinning;
 using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
@@ -20,12 +19,12 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
             Blending = BlendingParameters.Additive;
             Alpha = 0;
 
-            Child = new SkinnableDrawable("Play/osu/hitcircle-explode", _ => new TrianglesPiece
+            Child = new TrianglesPiece
             {
                 Blending = BlendingParameters.Additive,
                 RelativeSizeAxes = Axes.Both,
                 Alpha = 0.2f,
-            }, s => s.GetTexture("Play/osu/hitcircle") == null);
+            };
         }
     }
 }
