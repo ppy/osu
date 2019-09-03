@@ -21,6 +21,8 @@ namespace osu.Game.Tests.Visual.Online
             newBeatmaps();
 
             AddStep(@"toggle", direct.ToggleVisibility);
+            AddStep(@"load 2-nd page results", () => direct.CurrentPage.Value = 2);
+            AddStep(@"load 1-st page results", () => direct.CurrentPage.Value = 1);
             AddStep(@"result counts", () => direct.ResultAmounts = new DirectOverlay.ResultCounts(1, 4, 13));
             AddStep(@"trigger disabled", () => Ruleset.Disabled = !Ruleset.Disabled);
         }

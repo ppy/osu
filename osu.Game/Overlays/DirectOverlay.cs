@@ -38,6 +38,8 @@ namespace osu.Game.Overlays
         protected override Color4 TrianglesColourLight => OsuColour.FromHex(@"465b71");
         protected override Color4 TrianglesColourDark => OsuColour.FromHex(@"3f5265");
 
+        public BindableInt CurrentPage = new BindableInt(1);
+
         protected override SearchableListHeader<DirectTab> CreateHeader() => new Header();
         protected override SearchableListFilterControl<DirectSortCriteria, BeatmapSearchCategory> CreateFilterControl() => new FilterControl();
 
@@ -158,6 +160,8 @@ namespace osu.Game.Overlays
                 queueUpdateSearch();
             };
 
+            CurrentPage.BindValueChanged(page => queueUpdateSearch(page: page.NewValue));
+
             updateResultCounts();
         }
 
@@ -240,7 +244,7 @@ namespace osu.Game.Overlays
 
         private PreviewTrackManager previewTrackManager;
 
-        private void queueUpdateSearch(bool queryTextChanged = false)
+        private void queueUpdateSearch(bool queryTextChanged = false, int page = 1)
         {
             BeatmapSets = null;
             ResultAmounts = null;
@@ -249,10 +253,10 @@ namespace osu.Game.Overlays
             getSetsRequest?.Cancel();
 
             Scheduler.CancelDelayedTasks();
-            Scheduler.AddDelayed(updateSearch, queryTextChanged ? 500 : 100);
+            Scheduler.AddDelayed(() => updateSearch(page), queryTextChanged ? 500 : 100);
         }
 
-        private void updateSearch()
+        private void updateSearch(int page)
         {
             if (!IsLoaded)
                 return;
@@ -268,8 +272,9 @@ namespace osu.Game.Overlays
             getSetsRequest = new SearchBeatmapSetsRequest(
                 currentQuery.Value,
                 ((FilterControl)Filter).Ruleset.Value,
-                searchCategory: Filter.DisplayStyleControl.Dropdown.Current.Value,
-                sortCriteria: Filter.Tabs.Current.Value); //todo: sort direction (?)
+                page,
+                Filter.DisplayStyleControl.Dropdown.Current.Value,
+                Filter.Tabs.Current.Value); //todo: sort direction (?)
 
             getSetsRequest.Success += response =>
             {
