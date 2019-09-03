@@ -14,7 +14,7 @@ namespace osu.Game.Online.Chat
         private static readonly Regex wiki_regex = new Regex(@"\[\[(?<text>[^\]]+)\]\]");
 
         // (test)[https://osu.ppy.sh/b/1234] -> test (https://osu.ppy.sh/b/1234)
-        private static readonly Regex old_link_regex = new Regex(@"\((?<text>[^\)]*)\)\[(?<url>[a-z]+://[^ ]+)\]");
+        private static readonly Regex old_link_regex = new Regex(@"\((?<text>(((?<=\\)[\(\)])|[^\(\)])*(((?<open>\()(((?<=\\)[\(\)])|[^\(\)])*)+((?<close-open>\))(((?<=\\)[\(\)])|[^\(\)])*)+)*(?(open)(?!)))\)\[(?<url>[a-z]+://[^ ]+)\]");
 
         // [https://osu.ppy.sh/b/1234 Beatmap [Hard] (poop)] -> Beatmap [hard] (poop) (https://osu.ppy.sh/b/1234)
         private static readonly Regex new_link_regex = new Regex(@"\[(?<url>[a-z]+://[^ ]+) (?<text>(((?<=\\)[\[\]])|[^\[\]])*(((?<open>\[)(((?<=\\)[\[\]])|[^\[\]])*)+((?<close-open>\])(((?<=\\)[\[\]])|[^\[\]])*)+)*(?(open)(?!)))\]");
@@ -194,7 +194,7 @@ namespace osu.Game.Online.Chat
             handleMatches(markdown_link_regex, "{1}", "{2}", result, startIndex, escapeChars: new[] { '[', ']' });
 
             // handle the ()[] link format
-            handleMatches(old_link_regex, "{1}", "{2}", result, startIndex);
+            handleMatches(old_link_regex, "{1}", "{2}", result, startIndex, escapeChars: new[] { '(', ')' });
 
             // handle wiki links
             handleMatches(wiki_regex, "{1}", "https://osu.ppy.sh/wiki/{1}", result, startIndex);
