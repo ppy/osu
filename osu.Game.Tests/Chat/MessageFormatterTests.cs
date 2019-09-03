@@ -180,6 +180,53 @@ namespace osu.Game.Tests.Chat
         }
 
         [Test]
+        public void TestMarkdownFormatLinkWithBalancedBrackets()
+        {
+            Message result = MessageFormatter.FormatMessage(new Message { Content = "This is a [tricky [one]](https://osu.ppy.sh)!" });
+
+            Assert.AreEqual("This is a tricky [one]!", result.DisplayContent);
+            Assert.AreEqual(1, result.Links.Count);
+            Assert.AreEqual("https://osu.ppy.sh", result.Links[0].Url);
+            Assert.AreEqual(10, result.Links[0].Index);
+            Assert.AreEqual(12, result.Links[0].Length);
+        }
+
+        [Test]
+        public void TestMarkdownFormatLinkWithEscapedBrackets()
+        {
+            Message result = MessageFormatter.FormatMessage(new Message { Content = "This is [another loose bracket \\]](https://osu.ppy.sh)." });
+
+            Assert.AreEqual("This is another loose bracket ].", result.DisplayContent);
+            Assert.AreEqual(1, result.Links.Count);
+            Assert.AreEqual("https://osu.ppy.sh", result.Links[0].Url);
+            Assert.AreEqual(8, result.Links[0].Index);
+            Assert.AreEqual(23, result.Links[0].Length);
+        }
+
+        [Test]
+        public void TestMarkdownFormatWithBackslashes()
+        {
+            Message result = MessageFormatter.FormatMessage(new Message { Content = "This link [should end with a backslash \\](https://osu.ppy.sh)." });
+            Assert.AreEqual("This link should end with a backslash \\.", result.DisplayContent);
+            Assert.AreEqual(1, result.Links.Count);
+            Assert.AreEqual("https://osu.ppy.sh", result.Links[0].Url);
+            Assert.AreEqual(10, result.Links[0].Index);
+            Assert.AreEqual(29, result.Links[0].Length);
+        }
+
+        [Test]
+        public void TestMarkdownFormatLinkWithEscapedAndBalancedBrackets()
+        {
+            Message result = MessageFormatter.FormatMessage(new Message { Content = "This is a [\\]super\\[\\[ tricky [one]](https://osu.ppy.sh)!" });
+
+            Assert.AreEqual("This is a ]super[[ tricky [one]!", result.DisplayContent);
+            Assert.AreEqual(1, result.Links.Count);
+            Assert.AreEqual("https://osu.ppy.sh", result.Links[0].Url);
+            Assert.AreEqual(10, result.Links[0].Index);
+            Assert.AreEqual(21, result.Links[0].Length);
+        }
+
+        [Test]
         public void TestChannelLink()
         {
             Message result = MessageFormatter.FormatMessage(new Message { Content = "This is an #english and #japanese." });

@@ -20,7 +20,7 @@ namespace osu.Game.Online.Chat
         private static readonly Regex new_link_regex = new Regex(@"\[(?<url>[a-z]+://[^ ]+) (?<text>(((?<=\\)[\[\]])|[^\[\]])*(((?<open>\[)(((?<=\\)[\[\]])|[^\[\]])*)+((?<close-open>\])(((?<=\\)[\[\]])|[^\[\]])*)+)*(?(open)(?!)))\]");
 
         // [test](https://osu.ppy.sh/b/1234) -> test (https://osu.ppy.sh/b/1234) aka correct markdown format
-        private static readonly Regex markdown_link_regex = new Regex(@"\[(?<text>[^\]]*)\]\((?<url>[a-z]+://[^ ]+)\)");
+        private static readonly Regex markdown_link_regex = new Regex(@"\[(?<text>(((?<=\\)[\[\]])|[^\[\]])*(((?<open>\[)(((?<=\\)[\[\]])|[^\[\]])*)+((?<close-open>\])(((?<=\\)[\[\]])|[^\[\]])*)+)*(?(open)(?!)))\]\((?<url>[a-z]+://[^ ]+)\)");
 
         // advanced, RFC-compatible regular expression that matches any possible URL, *but* allows certain invalid characters that are widely used
         // This is in the format (<required>, [optional]):
@@ -191,7 +191,7 @@ namespace osu.Game.Online.Chat
             handleMatches(new_link_regex, "{1}", "{2}", result, startIndex, escapeChars: new[] { '[', ']' });
 
             // handle the standard markdown []() format
-            handleMatches(markdown_link_regex, "{1}", "{2}", result, startIndex);
+            handleMatches(markdown_link_regex, "{1}", "{2}", result, startIndex, escapeChars: new[] { '[', ']' });
 
             // handle the ()[] link format
             handleMatches(old_link_regex, "{1}", "{2}", result, startIndex);
