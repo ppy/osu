@@ -63,6 +63,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             testKeyDownWrapping();
 
             testHideResets();
+            testInitialButtonHover();
 
             testMouseSelectionAfterKeySelection();
             testKeySelectionAfterMouseSelection();
@@ -157,6 +158,25 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddStep("Hide overlay", () => failOverlay.Hide());
 
             AddAssert("Overlay state is reset", () => !failOverlay.Buttons.Any(b => b.Selected.Value));
+        }
+
+        /// <summary>
+        /// Tests that entering menu with cursor initially on button selects it.
+        /// </summary>
+        private void testInitialButtonHover()
+        {
+            AddStep("Show overlay", () => pauseOverlay.Show());
+
+            var firstButton = pauseOverlay.Buttons.First();
+
+            AddStep("Hover first button", () => InputManager.MoveMouseTo(firstButton));
+
+            AddStep("Hide overlay", () => pauseOverlay.Hide());
+            AddStep("Show overlay", () => pauseOverlay.Show());
+
+            AddAssert("First button selected", () => firstButton.Selected.Value);
+
+            AddStep("Hide overlay", () => pauseOverlay.Hide());
         }
 
         /// <summary>
