@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects.Types;
@@ -38,7 +39,12 @@ namespace osu.Game.Rulesets.Osu.Mods
                 if ((osuHit.HitObject is IHasEndTime hasEnd && time > hasEnd.EndTime) || osuHit.IsHit)
                     continue;
 
-                requiresHit |= osuHit is DrawableHitCircle && osuHit.IsHovered && osuHit.HitObject.HitWindows.CanBeHit(relativetime);
+                if (osuHit is DrawableHitCircle && osuHit.IsHovered)
+                {
+                    Debug.Assert(osuHit.HitObject.HitWindows != null);
+                    requiresHit |= osuHit.HitObject.HitWindows.CanBeHit(relativetime);
+                }
+
                 requiresHold |= (osuHit is DrawableSlider slider && (slider.Ball.IsHovered || osuHit.IsHovered)) || osuHit is DrawableSpinner;
             }
 
