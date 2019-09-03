@@ -137,8 +137,8 @@ namespace osu.Game.Tests.Visual.Gameplay
         {
             public new Drawable Drawable => base.Drawable;
 
-            public ExposedSkinnableDrawable(string name, Func<string, Drawable> defaultImplementation, Func<ISkinSource, bool> allowFallback = null, ConfineMode confineMode = ConfineMode.ScaleDownToFit)
-                : base(name, defaultImplementation, allowFallback, confineMode)
+            public ExposedSkinnableDrawable(string name, Func<ISkinComponent, Drawable> defaultImplementation, Func<ISkinSource, bool> allowFallback = null, ConfineMode confineMode = ConfineMode.ScaleDownToFit)
+                : base(new TestSkinComponent(name), defaultImplementation, allowFallback, confineMode)
             {
             }
         }
@@ -206,8 +206,8 @@ namespace osu.Game.Tests.Visual.Gameplay
             public new Drawable Drawable => base.Drawable;
             public int SkinChangedCount { get; private set; }
 
-            public SkinConsumer(string name, Func<string, Drawable> defaultImplementation, Func<ISkinSource, bool> allowFallback = null)
-                : base(name, defaultImplementation, allowFallback)
+            public SkinConsumer(string name, Func<ISkinComponent, Drawable> defaultImplementation, Func<ISkinSource, bool> allowFallback = null)
+                : base(new TestSkinComponent(name), defaultImplementation, allowFallback)
             {
             }
 
@@ -243,8 +243,8 @@ namespace osu.Game.Tests.Visual.Gameplay
                 this.size = size;
             }
 
-            public Drawable GetDrawableComponent(string componentName) =>
-                componentName == "available"
+            public Drawable GetDrawableComponent(ISkinComponent componentName) =>
+                componentName.LookupName == "available"
                     ? new DrawWidthBox
                     {
                         Colour = Color4.Yellow,
@@ -261,7 +261,7 @@ namespace osu.Game.Tests.Visual.Gameplay
 
         private class SecondarySource : ISkin
         {
-            public Drawable GetDrawableComponent(string componentName) => new SecondarySourceBox();
+            public Drawable GetDrawableComponent(ISkinComponent componentName) => new SecondarySourceBox();
 
             public Texture GetTexture(string componentName) => throw new NotImplementedException();
 
@@ -272,13 +272,27 @@ namespace osu.Game.Tests.Visual.Gameplay
 
         private class SkinSourceContainer : Container, ISkin
         {
-            public Drawable GetDrawableComponent(string componentName) => new BaseSourceBox();
+            public Drawable GetDrawableComponent(ISkinComponent componentName) => new BaseSourceBox();
 
             public Texture GetTexture(string componentName) => throw new NotImplementedException();
 
             public SampleChannel GetSample(ISampleInfo sampleInfo) => throw new NotImplementedException();
 
             public TValue GetValue<TConfiguration, TValue>(Func<TConfiguration, TValue> query) where TConfiguration : SkinConfiguration => throw new NotImplementedException();
+        }
+
+        private class TestSkinComponent : ISkinComponent
+        {
+            private readonly string name;
+
+            public TestSkinComponent(string name)
+            {
+                this.name = name;
+            }
+
+            public string ComponentGroup => string.Empty;
+
+            public string LookupName => name;
         }
     }
 }
