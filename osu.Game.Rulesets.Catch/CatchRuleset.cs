@@ -27,7 +27,7 @@ namespace osu.Game.Rulesets.Catch
         public override IBeatmapConverter CreateBeatmapConverter(IBeatmap beatmap) => new CatchBeatmapConverter(beatmap);
         public override IBeatmapProcessor CreateBeatmapProcessor(IBeatmap beatmap) => new CatchBeatmapProcessor(beatmap);
 
-        public const string SHORT_NAME = "catch";
+        public const string SHORT_NAME = "fruits";
 
         public override IEnumerable<KeyBinding> GetDefaultKeyBindings(int variant = 0) => new[]
         {
