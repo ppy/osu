@@ -127,6 +127,7 @@ namespace osu.Game.Tests.Visual.Online
             addMessageWithChecks("is now playing [https://osu.ppy.sh/b/252238 IMAGE -MATERIAL- <Version 0>]", 1, true, expectedActions: LinkAction.OpenBeatmap);
             addMessageWithChecks("Let's (try)[https://osu.ppy.sh/home] [https://osu.ppy.sh/b/252238 multiple links] https://osu.ppy.sh/home", 3,
                 expectedActions: new[] { LinkAction.External, LinkAction.OpenBeatmap, LinkAction.External });
+            addMessageWithChecks("[https://osu.ppy.sh/home New link format with escaped [and \\[ paired] braces]", expectedActions: LinkAction.External);
             // note that there's 0 links here (they get removed if a channel is not found)
             addMessageWithChecks("#lobby or #osu would be blue (and work) in the ChatDisplay test (when a proper ChatOverlay is present).");
             addMessageWithChecks("I am important!", 0, false, true);
