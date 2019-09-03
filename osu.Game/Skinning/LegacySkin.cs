@@ -52,7 +52,7 @@ namespace osu.Game.Skinning
         {
             switch (component)
             {
-                case PlaySkinComponent<HitResult> resultComponent:
+                case GameplaySkinComponent<HitResult> resultComponent:
                     switch (resultComponent.Component)
                     {
                         case HitResult.Miss:
