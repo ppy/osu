@@ -14,7 +14,7 @@ namespace osu.Game.Skinning
     /// </summary>
     public interface ISkin
     {
-        Drawable GetDrawableComponent(string componentName);
+        Drawable GetDrawableComponent(ISkinComponent component);
 
         Texture GetTexture(string componentName);
 
