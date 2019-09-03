@@ -132,6 +132,42 @@ namespace osu.Game.Tests.Chat
         }
 
         [Test]
+        public void TestNewFormatLinkWithEscapedBrackets()
+        {
+            Message result = MessageFormatter.FormatMessage(new Message { Content = "This is a [https://osu.ppy.sh nasty link with escaped brackets: \\] and \\[]" });
+
+            Assert.AreEqual("This is a nasty link with escaped brackets: ] and [", result.DisplayContent);
+            Assert.AreEqual(1, result.Links.Count);
+            Assert.AreEqual("https://osu.ppy.sh", result.Links[0].Url);
+            Assert.AreEqual(10, result.Links[0].Index);
+            Assert.AreEqual(41, result.Links[0].Length);
+        }
+
+        [Test]
+        public void TestNewFormatLinkWithBackslashesInside()
+        {
+            Message result = MessageFormatter.FormatMessage(new Message { Content = "This is a [https://osu.ppy.sh link \\ with \\ backslashes \\]" });
+
+            Assert.AreEqual("This is a link \\ with \\ backslashes \\", result.DisplayContent);
+            Assert.AreEqual(1, result.Links.Count);
+            Assert.AreEqual("https://osu.ppy.sh", result.Links[0].Url);
+            Assert.AreEqual(10, result.Links[0].Index);
+            Assert.AreEqual(27, result.Links[0].Length);
+        }
+
+        [Test]
+        public void TestNewFormatLinkWithEscapedAndBalancedBrackets()
+        {
+            Message result = MessageFormatter.FormatMessage(new Message { Content = "This is a [https://osu.ppy.sh [link [with \\] too many brackets \\[ ]]]" });
+
+            Assert.AreEqual("This is a [link [with ] too many brackets [ ]]", result.DisplayContent);
+            Assert.AreEqual(1, result.Links.Count);
+            Assert.AreEqual("https://osu.ppy.sh", result.Links[0].Url);
+            Assert.AreEqual(10, result.Links[0].Index);
+            Assert.AreEqual(36, result.Links[0].Length);
+        }
+
+        [Test]
         public void TestMarkdownFormatLink()
         {
             Message result = MessageFormatter.FormatMessage(new Message { Content = "This is a [simple test](https://osu.ppy.sh)." });
