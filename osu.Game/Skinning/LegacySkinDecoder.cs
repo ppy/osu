@@ -38,7 +38,7 @@ namespace osu.Game.Skinning
                 }
 
                 if (!string.IsNullOrEmpty(pair.Key))
-                    skin.ConfigDictionary[$"{section}/{pair.Key}"] = pair.Value;
+                    skin.ConfigDictionary[pair.Key] = pair.Value;
             }
 
             base.ParseLine(skin, section, line);
