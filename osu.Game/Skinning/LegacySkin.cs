@@ -1,10 +1,12 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.IO.Stores;
@@ -47,6 +49,47 @@ namespace osu.Game.Skinning
             Textures?.Dispose();
             Samples?.Dispose();
         }
+
+        public override IBindable<TValue> GetConfig<TLookup, TValue>(TLookup lookup)
+        {
+            switch (lookup)
+            {
+                case GlobalSkinConfiguration global:
+                    switch (global)
+                    {
+                        case GlobalSkinConfiguration.ComboColours:
+                            return new Bindable<List<Color4>>(Configuration.ComboColours) as IBindable<TValue>;
+                    }
+
+                    break;
+
+                case GlobalSkinColour colour:
+                    return getCustomColour(colour.ToString()) as IBindable<TValue>;
+
+                case SkinCustomColourLookup customColour:
+                    return getCustomColour(customColour.Lookup.ToString()) as IBindable<TValue>;
+
+                default:
+                    try
+                    {
+                        if (Configuration.ConfigDictionary.TryGetValue(lookup.ToString(), out var val))
+                        {
+                            var bindable = new Bindable<TValue>();
+                            bindable.Parse(val);
+                            return bindable;
+                        }
+                    }
+                    catch
+                    {
+                    }
+
+                    break;
+            }
+
+            return null;
+        }
+
+        private IBindable<Color4> getCustomColour(string lookup) => Configuration.CustomColours.TryGetValue(lookup, out var col) ? new Bindable<Color4>(col) : null;
 
         public override Drawable GetDrawableComponent(ISkinComponent component)
         {
