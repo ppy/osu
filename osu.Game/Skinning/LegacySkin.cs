@@ -25,8 +25,6 @@ namespace osu.Game.Skinning
         public LegacySkin(SkinInfo skin, IResourceStore<byte[]> storage, AudioManager audioManager)
             : this(skin, new LegacySkinResourceStore<SkinFileInfo>(skin, storage), audioManager, "skin.ini")
         {
-            // defaults should only be applied for non-beatmap skins (which are parsed via this constructor).
-            if (!Configuration.CustomColours.ContainsKey("SliderBall")) Configuration.CustomColours["SliderBall"] = new Color4(2, 170, 255, 255);
         }
 
         protected LegacySkin(SkinInfo skin, IResourceStore<byte[]> storage, AudioManager audioManager, string filename)
