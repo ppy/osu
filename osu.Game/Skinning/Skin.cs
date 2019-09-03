@@ -1,4 +1,4 @@
-﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
@@ -15,7 +15,7 @@ namespace osu.Game.Skinning
 
         public virtual SkinConfiguration Configuration { get; protected set; }
 
-        public abstract Drawable GetDrawableComponent(string componentName);
+        public abstract Drawable GetDrawableComponent(ISkinComponent componentName);
 
         public abstract SampleChannel GetSample(ISampleInfo sampleInfo);
 

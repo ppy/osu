@@ -17,7 +17,7 @@ namespace osu.Game.Skinning
         private readonly Bindable<bool> beatmapHitsounds = new Bindable<bool>();
 
         protected override bool AllowConfigurationLookup => beatmapSkins.Value;
-        protected override bool AllowDrawableLookup(string componentName) => beatmapSkins.Value;
+        protected override bool AllowDrawableLookup(ISkinComponent component) => beatmapSkins.Value;
         protected override bool AllowTextureLookup(string componentName) => beatmapSkins.Value;
         protected override bool AllowSampleLookup(ISampleInfo componentName) => beatmapHitsounds.Value;
 

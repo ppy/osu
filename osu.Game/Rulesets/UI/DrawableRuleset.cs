@@ -13,6 +13,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
+using JetBrains.Annotations;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Input;
@@ -389,6 +390,28 @@ namespace osu.Game.Rulesets.UI
         /// An optional overlay used when resuming gameplay from a paused state.
         /// </summary>
         public ResumeOverlay ResumeOverlay { get; protected set; }
+
+        /// <summary>
+        /// Returns first available <see cref="HitWindows"/> provided by a <see cref="HitObject"/>.
+        /// </summary>
+        [CanBeNull]
+        public HitWindows FirstAvailableHitWindows
+        {
+            get
+            {
+                foreach (var h in Objects)
+                {
+                    if (h.HitWindows != null)
+                        return h.HitWindows;
+
+                    foreach (var n in h.NestedHitObjects)
+                        if (n.HitWindows != null)
+                            return n.HitWindows;
+                }
+
+                return null;
+            }
+        }
 
         protected virtual ResumeOverlay CreateResumeOverlay() => null;
 
