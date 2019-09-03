@@ -5,11 +5,11 @@ using System.Linq;
 
 namespace osu.Game.Skinning
 {
-    public class PlaySkinComponent<T> : ISkinComponent where T : struct
+    public class GameplaySkinComponent<T> : ISkinComponent where T : struct
     {
         public readonly T Component;
 
-        public PlaySkinComponent(T component)
+        public GameplaySkinComponent(T component)
         {
             Component = component;
         }
@@ -18,6 +18,6 @@ namespace osu.Game.Skinning
         protected virtual string ComponentName => Component.ToString();
 
         public string LookupName =>
-            string.Join("/", new[] { "Play", RulesetPrefix, ComponentName }.Where(s => !string.IsNullOrEmpty(s)));
+            string.Join("/", new[] { "Gameplay", RulesetPrefix, ComponentName }.Where(s => !string.IsNullOrEmpty(s)));
     }
 }

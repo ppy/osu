@@ -5,7 +5,7 @@ using osu.Game.Skinning;
 
 namespace osu.Game.Rulesets.Osu
 {
-    public class OsuSkinComponent : PlaySkinComponent<OsuSkinComponents>
+    public class OsuSkinComponent : GameplaySkinComponent<OsuSkinComponents>
     {
         public OsuSkinComponent(OsuSkinComponents component)
             : base(component)
