@@ -28,7 +28,7 @@ namespace osu.Game.Overlays.Direct
         public readonly BeatmapSetInfo SetInfo;
 
         private const double hover_transition_time = 400;
-        private const int maximum_difficulty_icons = 15;
+        private const int maximum_difficulty_icons = 10;
 
         private Container content;
 
