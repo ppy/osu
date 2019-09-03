@@ -25,7 +25,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
-                Texture = textures.Get("ring-glow"),
+                Texture = textures.Get("Gameplay/osu/ring-glow"),
                 Blending = BlendingParameters.Additive,
                 Alpha = 0.5f
             };
