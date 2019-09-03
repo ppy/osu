@@ -5,6 +5,5 @@ namespace osu.Game.Rulesets.Catch
 {
     public enum CatchSkinComponents
     {
-        Catcher
     }
 }
