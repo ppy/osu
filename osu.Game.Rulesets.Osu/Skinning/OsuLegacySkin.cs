@@ -55,14 +55,17 @@ namespace osu.Game.Rulesets.Osu.Skinning
             hasHitCircle = new Lazy<bool>(() => source.GetTexture("hitcircle") != null);
         }
 
-        public Drawable GetDrawableComponent(string componentName)
+        public Drawable GetDrawableComponent(ISkinComponent component)
         {
-            switch (componentName)
-            {
-                case "Play/osu/sliderfollowcircle":
-                    return this.GetAnimation(componentName, true, true);
+            if (!(component is OsuSkinComponent osuComponent))
+                return null;
 
-                case "Play/osu/sliderball":
+            switch (osuComponent.Component)
+            {
+                case OsuSkinComponents.SliderFollowCircle:
+                    return this.GetAnimation("sliderfollowcircle", true, true);
+
+                case OsuSkinComponents.SliderBall:
                     var sliderBallContent = this.GetAnimation("sliderb", true, true, "");
 
                     if (sliderBallContent != null)
@@ -80,20 +83,19 @@ namespace osu.Game.Rulesets.Osu.Skinning
 
                     return null;
 
-                case "Play/osu/hitcircle":
+                case OsuSkinComponents.HitCircle:
                     if (hasHitCircle.Value)
                         return new LegacyMainCirclePiece();
 
                     return null;
 
-                case "Play/osu/cursor":
+                case OsuSkinComponents.Cursor:
                     if (source.GetTexture("cursor") != null)
                         return new LegacyCursor();
 
                     return null;
 
-                case "Play/osu/number-text":
-
+                case OsuSkinComponents.HitCircleText:
                     string font = GetValue<SkinConfiguration, string>(config => config.HitCircleFont);
                     var overlap = GetValue<SkinConfiguration, float>(config => config.HitCircleOverlap);
 
@@ -115,7 +117,13 @@ namespace osu.Game.Rulesets.Osu.Skinning
         public SampleChannel GetSample(ISampleInfo sample) => source.GetSample(sample);
 
         public TValue GetValue<TConfiguration, TValue>(Func<TConfiguration, TValue> query) where TConfiguration : SkinConfiguration
-            => configuration.Value is TConfiguration conf ? query.Invoke(conf) : source.GetValue(query);
+        {
+            TValue val;
+            if (configuration.Value is TConfiguration conf && (val = query.Invoke(conf)) != null)
+                return val;
+
+            return source.GetValue(query);
+        }
 
         private bool hasFont(string fontName) => source.GetTexture($"{fontName}-0") != null;
     }

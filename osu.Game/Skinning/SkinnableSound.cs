@@ -6,6 +6,7 @@ using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
+using osu.Framework.Bindables;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Game.Audio;
 
@@ -14,6 +15,9 @@ namespace osu.Game.Skinning
     public class SkinnableSound : SkinReloadableDrawable
     {
         private readonly ISampleInfo[] hitSamples;
+
+        private List<(AdjustableProperty property, BindableDouble bindable)> adjustments;
+
         private SampleChannel[] channels;
 
         private AudioManager audio;
@@ -34,7 +38,38 @@ namespace osu.Game.Skinning
             this.audio = audio;
         }
 
+        private bool looping;
+
+        public bool Looping
+        {
+            get => looping;
+            set
+            {
+                if (value == looping) return;
+
+                looping = value;
+
+                channels?.ForEach(c => c.Looping = looping);
+            }
+        }
+
         public void Play() => channels?.ForEach(c => c.Play());
+
+        public void Stop() => channels?.ForEach(c => c.Stop());
+
+        public void AddAdjustment(AdjustableProperty type, BindableDouble adjustBindable)
+        {
+            if (adjustments == null) adjustments = new List<(AdjustableProperty, BindableDouble)>();
+
+            adjustments.Add((type, adjustBindable));
+            channels?.ForEach(c => c.AddAdjustment(type, adjustBindable));
+        }
+
+        public void RemoveAdjustment(AdjustableProperty type, BindableDouble adjustBindable)
+        {
+            adjustments?.Remove((type, adjustBindable));
+            channels?.ForEach(c => c.RemoveAdjustment(type, adjustBindable));
+        }
 
         public override bool IsPresent => Scheduler.HasPendingTasks;
 
@@ -50,7 +85,14 @@ namespace osu.Game.Skinning
                             break;
 
                 if (ch != null)
+                {
+                    ch.Looping = looping;
                     ch.Volume.Value = s.Volume / 100.0;
+
+                    if (adjustments != null)
+                        foreach (var adjustment in adjustments)
+                            ch.AddAdjustment(adjustment.property, adjustment.bindable);
+                }
 
                 return ch;
             }).Where(c => c != null).ToArray();

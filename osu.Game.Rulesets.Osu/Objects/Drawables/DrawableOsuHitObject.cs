@@ -41,6 +41,6 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
         protected virtual void Shake(double maximumLength) => shakeContainer.Shake(maximumLength);
 
-        protected override JudgementResult CreateResult(Judgement judgement) => new OsuJudgementResult(judgement);
+        protected override JudgementResult CreateResult(Judgement judgement) => new OsuJudgementResult(HitObject, judgement);
     }
 }
