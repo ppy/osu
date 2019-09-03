@@ -200,10 +200,6 @@ namespace osu.Game.Tests.Visual.Gameplay
                         break;
                 }
             }
-
-            protected override void UpdateState(ArmedState state)
-            {
-            }
         }
 
         private class TestDrawableHitObject : DrawableHitObject<HitObject>
@@ -215,10 +211,6 @@ namespace osu.Game.Tests.Visual.Gameplay
                 AutoSizeAxes = Axes.Both;
 
                 AddInternal(new Box { Size = new Vector2(75) });
-            }
-
-            protected override void UpdateState(ArmedState state)
-            {
             }
         }
     }

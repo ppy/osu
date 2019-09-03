@@ -30,7 +30,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
             this.drawableSlider = drawableSlider;
             this.slider = slider;
 
-            Blending = BlendingMode.Additive;
+            Blending = BlendingParameters.Additive;
             Origin = Anchor.Centre;
 
             Size = new Vector2(OsuHitObject.OBJECT_RADIUS * 2);
@@ -43,7 +43,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
                     Anchor = Anchor.Centre,
                     RelativeSizeAxes = Axes.Both,
                     Alpha = 0,
-                    Child = new SkinnableDrawable("Play/osu/sliderfollowcircle", _ => new DefaultFollowCircle()),
+                    Child = new SkinnableDrawable(new OsuSkinComponent(OsuSkinComponents.SliderFollowCircle), _ => new DefaultFollowCircle()),
                 },
                 new CircularContainer
                 {
@@ -55,7 +55,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
                     Child = new Container
                     {
                         RelativeSizeAxes = Axes.Both,
-                        Child = new SkinnableDrawable("Play/osu/sliderball", _ => new DefaultSliderBall()),
+                        Child = new SkinnableDrawable(new OsuSkinComponent(OsuSkinComponents.SliderBall), _ => new DefaultSliderBall()),
                     }
                 }
             };
@@ -200,7 +200,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
                     Masking = true,
                     BorderThickness = 5,
                     BorderColour = Color4.Orange,
-                    Blending = BlendingMode.Additive,
+                    Blending = BlendingParameters.Additive,
                     Child = new Box
                     {
                         Colour = Color4.Orange,
