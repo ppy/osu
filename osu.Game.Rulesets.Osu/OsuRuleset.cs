@@ -35,6 +35,8 @@ namespace osu.Game.Rulesets.Osu
         public override IBeatmapConverter CreateBeatmapConverter(IBeatmap beatmap) => new OsuBeatmapConverter(beatmap);
         public override IBeatmapProcessor CreateBeatmapProcessor(IBeatmap beatmap) => new OsuBeatmapProcessor(beatmap);
 
+        public const string SHORT_NAME = "osu";
+
         public override IEnumerable<KeyBinding> GetDefaultKeyBindings(int variant = 0) => new[]
         {
             new KeyBinding(InputKey.Z, OsuAction.LeftButton),
@@ -161,7 +163,7 @@ namespace osu.Game.Rulesets.Osu
 
         public override string Description => "osu!";
 
-        public override string ShortName => "osu";
+        public override string ShortName => SHORT_NAME;
 
         public override RulesetSettingsSubsection CreateSettings() => new OsuSettingsSubsection(this);
 

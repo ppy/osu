@@ -90,7 +90,7 @@ namespace osu.Game.Rulesets.Scoring
         /// <summary>
         /// Whether all <see cref="Judgement"/>s have been processed.
         /// </summary>
-        protected virtual bool HasCompleted => false;
+        public virtual bool HasCompleted => false;
 
         /// <summary>
         /// Whether this ScoreProcessor has already triggered the failed state.
@@ -205,7 +205,7 @@ namespace osu.Game.Rulesets.Scoring
         private const double combo_portion = 0.7;
         private const double max_score = 1000000;
 
-        protected sealed override bool HasCompleted => JudgedHits == MaxHits;
+        public sealed override bool HasCompleted => JudgedHits == MaxHits;
 
         protected int MaxHits { get; private set; }
         protected int JudgedHits { get; private set; }
@@ -275,7 +275,7 @@ namespace osu.Game.Rulesets.Scoring
                 if (judgement == null)
                     return;
 
-                var result = CreateResult(judgement);
+                var result = CreateResult(obj, judgement);
                 if (result == null)
                     throw new InvalidOperationException($"{GetType().ReadableName()} must provide a {nameof(JudgementResult)} through {nameof(CreateResult)}.");
 
@@ -441,8 +441,9 @@ namespace osu.Game.Rulesets.Scoring
         /// <summary>
         /// Creates the <see cref="JudgementResult"/> that represents the scoring result for a <see cref="HitObject"/>.
         /// </summary>
+        /// <param name="hitObject">The <see cref="HitObject"/> which was judged.</param>
         /// <param name="judgement">The <see cref="Judgement"/> that provides the scoring information.</param>
-        protected virtual JudgementResult CreateResult(Judgement judgement) => new JudgementResult(judgement);
+        protected virtual JudgementResult CreateResult(HitObject hitObject, Judgement judgement) => new JudgementResult(hitObject, judgement);
     }
 
     public enum ScoringMode

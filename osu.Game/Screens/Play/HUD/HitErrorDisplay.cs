@@ -49,6 +49,9 @@ namespace osu.Game.Screens.Play.HUD
 
         private void onNewJudgement(JudgementResult result)
         {
+            if (result.HitObject.HitWindows == null)
+                return;
+
             foreach (var c in Children)
                 c.OnNewJudgement(result);
         }
