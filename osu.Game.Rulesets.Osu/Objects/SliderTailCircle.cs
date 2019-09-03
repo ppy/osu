@@ -23,5 +23,7 @@ namespace osu.Game.Rulesets.Osu.Objects
         }
 
         public override Judgement CreateJudgement() => new OsuSliderTailJudgement();
+
+        protected override HitWindows CreateHitWindows() => null;
     }
 }
