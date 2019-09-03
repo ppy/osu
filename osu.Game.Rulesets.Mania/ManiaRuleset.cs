@@ -35,6 +35,8 @@ namespace osu.Game.Rulesets.Mania
         public override IBeatmapConverter CreateBeatmapConverter(IBeatmap beatmap) => new ManiaBeatmapConverter(beatmap);
         public override PerformanceCalculator CreatePerformanceCalculator(WorkingBeatmap beatmap, ScoreInfo score) => new ManiaPerformanceCalculator(this, beatmap, score);
 
+        public const string SHORT_NAME = "mania";
+
         public override HitObjectComposer CreateHitObjectComposer() => new ManiaHitObjectComposer(this);
 
         public override IEnumerable<Mod> ConvertLegacyMods(LegacyMods mods)
@@ -163,7 +165,7 @@ namespace osu.Game.Rulesets.Mania
 
         public override string Description => "osu!mania";
 
-        public override string ShortName => "mania";
+        public override string ShortName => SHORT_NAME;
 
         public override Drawable CreateIcon() => new SpriteIcon { Icon = OsuIcon.RulesetMania };
 

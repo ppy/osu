@@ -49,7 +49,7 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
                 RelativeSizeAxes = Axes.Both,
                 Origin = Anchor.Centre,
                 Anchor = Anchor.Centre,
-                Child = scaleTarget = new SkinnableDrawable("Play/osu/cursor", _ => new DefaultCursor(), confineMode: ConfineMode.NoScaling)
+                Child = scaleTarget = new SkinnableDrawable(new OsuSkinComponent(OsuSkinComponents.Cursor), _ => new DefaultCursor(), confineMode: ConfineMode.NoScaling)
                 {
                     Origin = Anchor.Centre,
                     Anchor = Anchor.Centre,
