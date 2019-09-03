@@ -38,7 +38,7 @@ namespace osu.Game.Overlays
         protected override Color4 TrianglesColourLight => OsuColour.FromHex(@"465b71");
         protected override Color4 TrianglesColourDark => OsuColour.FromHex(@"3f5265");
 
-        public BindableInt CurrentPage = new BindableInt(1);
+        public readonly BindableInt CurrentPage = new BindableInt(1);
 
         protected override SearchableListHeader<DirectTab> CreateHeader() => new Header();
         protected override SearchableListFilterControl<DirectSortCriteria, BeatmapSearchCategory> CreateFilterControl() => new FilterControl();
