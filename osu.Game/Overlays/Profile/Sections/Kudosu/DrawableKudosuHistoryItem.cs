@@ -53,12 +53,12 @@ namespace osu.Game.Overlays.Profile.Sections.Kudosu
             date.Colour = colours.GreySeafoamLighter;
             var formattedSource = MessageFormatter.FormatText(getString(historyItem));
             linkFlowContainer.AddLinks(formattedSource.Text, formattedSource.Links);
+            linkFlowContainer.AddLink(historyItem.Post.Title, historyItem.Post.Url);
         }
 
         private string getString(APIKudosuHistory item)
         {
             string amount = $"{Math.Abs(item.Amount)} kudosu";
-            string post = $"[{item.Post.Title}]({item.Post.Url})";
 
             switch (item.Source)
             {
@@ -66,7 +66,7 @@ namespace osu.Game.Overlays.Profile.Sections.Kudosu
                     switch (item.Action)
                     {
                         case KudosuAction.Give:
-                            return $"Received {amount} from kudosu deny repeal of modding post {post}";
+                            return $"Received {amount} from kudosu deny repeal of modding post ";
                     }
 
                     break;
@@ -75,7 +75,7 @@ namespace osu.Game.Overlays.Profile.Sections.Kudosu
                     switch (item.Action)
                     {
                         case KudosuAction.Reset:
-                            return $"Denied {amount} from modding post {post}";
+                            return $"Denied {amount} from modding post ";
                     }
 
                     break;
@@ -84,7 +84,7 @@ namespace osu.Game.Overlays.Profile.Sections.Kudosu
                     switch (item.Action)
                     {
                         case KudosuAction.Reset:
-                            return $"Lost {amount} from modding post deletion of {post}";
+                            return $"Lost {amount} from modding post deletion of ";
                     }
 
                     break;
@@ -93,7 +93,7 @@ namespace osu.Game.Overlays.Profile.Sections.Kudosu
                     switch (item.Action)
                     {
                         case KudosuAction.Give:
-                            return $"Received {amount} from modding post restoration of {post}";
+                            return $"Received {amount} from modding post restoration of ";
                     }
 
                     break;
@@ -102,10 +102,10 @@ namespace osu.Game.Overlays.Profile.Sections.Kudosu
                     switch (item.Action)
                     {
                         case KudosuAction.Give:
-                            return $"Received {amount} from obtaining votes in modding post of {post}";
+                            return $"Received {amount} from obtaining votes in modding post of ";
 
                         case KudosuAction.Reset:
-                            return $"Lost {amount} from losing votes in modding post of {post}";
+                            return $"Lost {amount} from losing votes in modding post of ";
                     }
 
                     break;
@@ -114,10 +114,10 @@ namespace osu.Game.Overlays.Profile.Sections.Kudosu
                     switch (item.Action)
                     {
                         case KudosuAction.Give:
-                            return $"Received {amount} from votes recalculation in modding post of {post}";
+                            return $"Received {amount} from votes recalculation in modding post of ";
 
                         case KudosuAction.Reset:
-                            return $"Lost {amount} from votes recalculation in modding post of {post}";
+                            return $"Lost {amount} from votes recalculation in modding post of ";
                     }
 
                     break;
@@ -129,13 +129,13 @@ namespace osu.Game.Overlays.Profile.Sections.Kudosu
                     switch (historyItem.Action)
                     {
                         case KudosuAction.Give:
-                            return $"Received {amount} from {giver} for a post at {post}";
+                            return $"Received {amount} from {giver} for a post at ";
 
                         case KudosuAction.Reset:
-                            return $"Kudosu reset by {giver} for the post {post}";
+                            return $"Kudosu reset by {giver} for the post ";
 
                         case KudosuAction.Revoke:
-                            return $"Denied kudosu by {giver} for the post {post}";
+                            return $"Denied kudosu by {giver} for the post ";
                     }
 
                     break;
