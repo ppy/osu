@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Diagnostics;
 using System.Linq;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.IEnumerableExtensions;
@@ -209,6 +210,8 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
 
             protected override void CheckForResult(bool userTriggered, double timeOffset)
             {
+                Debug.Assert(HitObject.HitWindows != null);
+
                 // Factor in the release lenience
                 timeOffset /= release_window_lenience;
 

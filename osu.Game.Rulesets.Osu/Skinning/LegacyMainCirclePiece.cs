@@ -42,7 +42,7 @@ namespace osu.Game.Rulesets.Osu.Skinning
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
                 },
-                new SkinnableSpriteText("Play/osu/number-text", _ => new OsuSpriteText
+                new SkinnableSpriteText(new OsuSkinComponent(OsuSkinComponents.HitCircleText), _ => new OsuSpriteText
                 {
                     Font = OsuFont.Numeric.With(size: 40),
                     UseFullGlyphHeight = false,

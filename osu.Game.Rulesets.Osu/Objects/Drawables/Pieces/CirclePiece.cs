@@ -31,7 +31,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
-                    Texture = textures.Get(@"Play/osu/disc"),
+                    Texture = textures.Get(@"Gameplay/osu/disc"),
                 },
                 new TrianglesPiece
                 {
