@@ -220,6 +220,7 @@ namespace osu.Game.Overlays
 
             LoadComponentAsync(newPanels, p =>
             {
+                if (panels != null) ScrollFlow.Remove(panels);
                 ScrollFlow.Add(panels = p);
             }, loadCancellation.Token);
         }
