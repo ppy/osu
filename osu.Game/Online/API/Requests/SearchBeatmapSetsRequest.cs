@@ -29,7 +29,6 @@ namespace osu.Game.Online.API.Requests
             this.direction = direction;
         }
 
-        // ReSharper disable once ImpureMethodCallOnReadonlyValueField
         protected override string Target => @"beatmapsets/search";
 
         protected override WebRequest CreateWebRequest()
