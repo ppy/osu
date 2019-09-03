@@ -6,6 +6,7 @@ using System.Globalization;
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Audio.Sample;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -137,7 +138,8 @@ namespace osu.Game.Tests.Visual.Gameplay
         {
             public new Drawable Drawable => base.Drawable;
 
-            public ExposedSkinnableDrawable(string name, Func<ISkinComponent, Drawable> defaultImplementation, Func<ISkinSource, bool> allowFallback = null, ConfineMode confineMode = ConfineMode.ScaleDownToFit)
+            public ExposedSkinnableDrawable(string name, Func<ISkinComponent, Drawable> defaultImplementation, Func<ISkinSource, bool> allowFallback = null,
+                                            ConfineMode confineMode = ConfineMode.ScaleDownToFit)
                 : base(new TestSkinComponent(name), defaultImplementation, allowFallback, confineMode)
             {
             }
@@ -256,7 +258,7 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             public SampleChannel GetSample(ISampleInfo sampleInfo) => throw new NotImplementedException();
 
-            public TValue GetValue<TConfiguration, TValue>(Func<TConfiguration, TValue> query) where TConfiguration : SkinConfiguration => throw new NotImplementedException();
+            public IBindable<TValue> GetConfig<TLookup, TValue>(TLookup lookup) => throw new NotImplementedException();
         }
 
         private class SecondarySource : ISkin
@@ -267,7 +269,7 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             public SampleChannel GetSample(ISampleInfo sampleInfo) => throw new NotImplementedException();
 
-            public TValue GetValue<TConfiguration, TValue>(Func<TConfiguration, TValue> query) where TConfiguration : SkinConfiguration => throw new NotImplementedException();
+            public IBindable<TValue> GetConfig<TLookup, TValue>(TLookup lookup) => throw new NotImplementedException();
         }
 
         private class SkinSourceContainer : Container, ISkin
@@ -278,7 +280,7 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             public SampleChannel GetSample(ISampleInfo sampleInfo) => throw new NotImplementedException();
 
-            public TValue GetValue<TConfiguration, TValue>(Func<TConfiguration, TValue> query) where TConfiguration : SkinConfiguration => throw new NotImplementedException();
+            public IBindable<TValue> GetConfig<TLookup, TValue>(TLookup lookup) => throw new NotImplementedException();
         }
 
         private class TestSkinComponent : ISkinComponent
