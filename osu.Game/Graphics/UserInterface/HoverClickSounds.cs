@@ -36,11 +36,9 @@ namespace osu.Game.Graphics.UserInterface
 
         protected override bool OnMouseUp(MouseUpEvent e)
         {
-            bool shouldPlayEffect = buttons.Contains(e.Button);
-            // examine the button pressed first for short-circuiting
-            // in most usages it is more likely that another button was pressed than that the cursor left the drawable bounds
-            if (shouldPlayEffect && Contains(e.ScreenSpaceMousePosition))
+            if (buttons.Contains(e.Button) && Contains(e.ScreenSpaceMousePosition))
                 sampleClick?.Play();
+
             return base.OnMouseUp(e);
         }
 
