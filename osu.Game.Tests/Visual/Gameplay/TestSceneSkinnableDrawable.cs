@@ -5,6 +5,7 @@ using System;
 using System.Globalization;
 using System.Linq;
 using NUnit.Framework;
+using osu.Framework.Allocation;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -131,6 +132,48 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddStep("add permissive", () => target.Add(consumer = new SkinConsumer("test", name => new NamedBox("Default Implementation"), source => true)));
             AddAssert("consumer using override source", () => consumer.Drawable is SecondarySourceBox);
             AddAssert("skinchanged only called once", () => consumer.SkinChangedCount == 1);
+        }
+
+        [Test]
+        public void TestSwitchOff()
+        {
+            SkinConsumer consumer = null;
+            SwitchableSkinProvidingContainer target = null;
+
+            AddStep("setup layout", () =>
+            {
+                Child = new SkinSourceContainer
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Child = target = new SwitchableSkinProvidingContainer(new SecondarySource())
+                    {
+                        RelativeSizeAxes = Axes.Both,
+                    }
+                };
+            });
+
+            AddStep("add permissive", () => target.Add(consumer = new SkinConsumer("test", name => new NamedBox("Default Implementation"), source => true)));
+            AddAssert("consumer using override source", () => consumer.Drawable is SecondarySourceBox);
+            AddStep("disable", () => target.Disable());
+            AddAssert("consumer using base source", () => consumer.Drawable is BaseSourceBox);
+        }
+
+        private class SwitchableSkinProvidingContainer : SkinProvidingContainer
+        {
+            private bool allow = true;
+
+            protected override bool AllowDrawableLookup(ISkinComponent component) => allow;
+
+            public void Disable()
+            {
+                allow = false;
+                TriggerSourceChanged();
+            }
+
+            public SwitchableSkinProvidingContainer(ISkin skin)
+                : base(skin)
+            {
+            }
         }
 
         private class ExposedSkinnableDrawable : SkinnableDrawable
@@ -270,7 +313,8 @@ namespace osu.Game.Tests.Visual.Gameplay
             public TValue GetValue<TConfiguration, TValue>(Func<TConfiguration, TValue> query) where TConfiguration : SkinConfiguration => throw new NotImplementedException();
         }
 
-        private class SkinSourceContainer : Container, ISkin
+        [Cached(typeof(ISkinSource))]
+        private class SkinSourceContainer : Container, ISkinSource
         {
             public Drawable GetDrawableComponent(ISkinComponent componentName) => new BaseSourceBox();
 
@@ -279,6 +323,8 @@ namespace osu.Game.Tests.Visual.Gameplay
             public SampleChannel GetSample(ISampleInfo sampleInfo) => throw new NotImplementedException();
 
             public TValue GetValue<TConfiguration, TValue>(Func<TConfiguration, TValue> query) where TConfiguration : SkinConfiguration => throw new NotImplementedException();
+
+            public event Action SourceChanged;
         }
 
         private class TestSkinComponent : ISkinComponent
