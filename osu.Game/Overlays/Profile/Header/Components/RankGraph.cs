@@ -296,16 +296,11 @@ namespace osu.Game.Overlays.Profile.Header.Components
                     this.MoveTo(pos, 200, Easing.OutQuint);
             }
 
-            public void Refresh()
+            protected override void PopIn()
             {
+                instantMove |= !IsPresent;
+                this.FadeIn(200, Easing.OutQuint);
             }
-
-            public string TooltipText
-            {
-                set => throw new InvalidOperationException();
-            }
-
-            protected override void PopIn() => this.FadeIn(200, Easing.OutQuint);
 
             protected override void PopOut() => this.FadeOut(200, Easing.OutQuint);
         }

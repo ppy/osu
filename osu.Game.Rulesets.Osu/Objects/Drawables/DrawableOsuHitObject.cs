@@ -36,13 +36,11 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
         protected sealed override double InitialLifetimeOffset => HitObject.TimePreempt;
 
-        protected override void UpdateInitialTransforms() => this.FadeIn(HitObject.TimeFadeIn);
-
         private OsuInputManager osuActionInputManager;
         internal OsuInputManager OsuActionInputManager => osuActionInputManager ?? (osuActionInputManager = GetContainingInputManager() as OsuInputManager);
 
         protected virtual void Shake(double maximumLength) => shakeContainer.Shake(maximumLength);
 
-        protected override JudgementResult CreateResult(Judgement judgement) => new OsuJudgementResult(judgement);
+        protected override JudgementResult CreateResult(Judgement judgement) => new OsuJudgementResult(HitObject, judgement);
     }
 }

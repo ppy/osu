@@ -32,7 +32,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             Size = new Vector2(OsuHitObject.OBJECT_RADIUS * 2);
             Origin = Anchor.Centre;
 
-            InternalChild = scaleContainer = new SkinnableDrawable("Play/osu/sliderscorepoint", _ => new CircularContainer
+            InternalChild = scaleContainer = new SkinnableDrawable(new OsuSkinComponent(OsuSkinComponents.SliderScorePoint), _ => new CircularContainer
             {
                 Masking = true,
                 Origin = Anchor.Centre,
