@@ -57,8 +57,9 @@ namespace osu.Game.Graphics.Backgrounds
 
                 AddInternal(bufferedContainer = new BufferedContainer
                 {
-                    CacheDrawnFrameBuffer = true,
                     RelativeSizeAxes = Axes.Both,
+                    CacheDrawnFrameBuffer = true,
+                    RedrawOnScale = false,
                     Child = Sprite
                 });
             }
