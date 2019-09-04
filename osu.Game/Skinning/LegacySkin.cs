@@ -4,6 +4,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using JetBrains.Annotations;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Bindables;
@@ -18,8 +19,10 @@ namespace osu.Game.Skinning
 {
     public class LegacySkin : Skin
     {
+        [CanBeNull]
         protected TextureStore Textures;
 
+        [CanBeNull]
         protected IResourceStore<SampleChannel> Samples;
 
         public LegacySkin(SkinInfo skin, IResourceStore<byte[]> storage, AudioManager audioManager)
@@ -37,8 +40,11 @@ namespace osu.Game.Skinning
             else
                 Configuration = new DefaultSkinConfiguration();
 
-            Samples = audioManager?.GetSampleStore(storage);
-            Textures = new TextureStore(new TextureLoaderStore(storage));
+            if (storage != null)
+            {
+                Samples = audioManager?.GetSampleStore(storage);
+                Textures = new TextureStore(new TextureLoaderStore(storage));
+            }
         }
 
         protected override void Dispose(bool isDisposing)
@@ -125,12 +131,12 @@ namespace osu.Game.Skinning
             componentName = getFallbackName(componentName);
 
             float ratio = 2;
-            var texture = Textures.Get($"{componentName}@2x");
+            var texture = Textures?.Get($"{componentName}@2x");
 
             if (texture == null)
             {
                 ratio = 1;
-                texture = Textures.Get(componentName);
+                texture = Textures?.Get(componentName);
             }
 
             if (texture != null)
@@ -143,7 +149,7 @@ namespace osu.Game.Skinning
         {
             foreach (var lookup in sampleInfo.LookupNames)
             {
-                var sample = Samples.Get(getFallbackName(lookup));
+                var sample = Samples?.Get(getFallbackName(lookup));
 
                 if (sample != null)
                     return sample;
@@ -151,7 +157,7 @@ namespace osu.Game.Skinning
 
             if (sampleInfo is HitSampleInfo hsi)
                 // Try fallback to non-bank samples.
-                return Samples.Get(hsi.Name);
+                return Samples?.Get(hsi.Name);
 
             return null;
         }
