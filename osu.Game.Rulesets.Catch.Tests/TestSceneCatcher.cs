@@ -82,11 +82,11 @@ namespace osu.Game.Rulesets.Catch.Tests
                 remove { }
             }
 
-            public Drawable GetDrawableComponent(string componentName)
+            public Drawable GetDrawableComponent(ISkinComponent component)
             {
-                switch (componentName)
+                switch (component.LookupName)
                 {
-                    case "Play/Catch/fruit-catcher-idle":
+                    case "Gameplay/Catch/fruit-catcher-idle":
                         return new CatcherCustomSkin();
                 }
 
