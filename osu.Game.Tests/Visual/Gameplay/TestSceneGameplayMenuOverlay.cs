@@ -3,8 +3,8 @@
 
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Linq;
+using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -16,7 +16,7 @@ using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.Gameplay
 {
-    [Description("player pause/fail screens")]
+    [System.ComponentModel.Description("player pause/fail screens")]
     public class TestSceneGameplayMenuOverlay : ManualInputManagerTestScene
     {
         public override IReadOnlyList<Type> RequiredTypes => new[] { typeof(FailOverlay), typeof(PauseOverlay) };
@@ -55,29 +55,13 @@ namespace osu.Game.Tests.Visual.Gameplay
                 retryCount++;
                 pauseOverlay.Retries = failOverlay.Retries = retryCount;
             });
-
-            testEnterWithoutSelection();
-            testKeyUpFromInitial();
-            testKeyDownFromInitial();
-            testKeyUpWrapping();
-            testKeyDownWrapping();
-
-            testHideResets();
-            testInitialButtonHover();
-
-            testMouseSelectionAfterKeySelection();
-            testKeySelectionAfterMouseSelection();
-
-            testMouseDeselectionResets();
-
-            testClickSelection();
-            testEnterKeySelection();
         }
 
         /// <summary>
         /// Tests that pressing enter after an overlay shows doesn't trigger an event because a selection hasn't occurred.
         /// </summary>
-        private void testEnterWithoutSelection()
+        [Test]
+        public void TestEnterWithoutSelection()
         {
             AddStep("Show overlay", () => pauseOverlay.Show());
 
@@ -90,7 +74,8 @@ namespace osu.Game.Tests.Visual.Gameplay
         /// <summary>
         /// Tests that pressing the up arrow from the initial state selects the last button.
         /// </summary>
-        private void testKeyUpFromInitial()
+        [Test]
+        public void TestKeyUpFromInitial()
         {
             AddStep("Show overlay", () => pauseOverlay.Show());
 
@@ -103,7 +88,8 @@ namespace osu.Game.Tests.Visual.Gameplay
         /// <summary>
         /// Tests that pressing the down arrow from the initial state selects the first button.
         /// </summary>
-        private void testKeyDownFromInitial()
+        [Test]
+        public void TestKeyDownFromInitial()
         {
             AddStep("Show overlay", () => pauseOverlay.Show());
 
@@ -116,7 +102,8 @@ namespace osu.Game.Tests.Visual.Gameplay
         /// <summary>
         /// Tests that pressing the up arrow repeatedly causes the selected button to wrap correctly.
         /// </summary>
-        private void testKeyUpWrapping()
+        [Test]
+        public void TestKeyUpWrapping()
         {
             AddStep("Show overlay", () => failOverlay.Show());
 
@@ -133,7 +120,8 @@ namespace osu.Game.Tests.Visual.Gameplay
         /// <summary>
         /// Tests that pressing the down arrow repeatedly causes the selected button to wrap correctly.
         /// </summary>
-        private void testKeyDownWrapping()
+        [Test]
+        public void TestKeyDownWrapping()
         {
             AddStep("Show overlay", () => failOverlay.Show());
 
@@ -150,7 +138,8 @@ namespace osu.Game.Tests.Visual.Gameplay
         /// <summary>
         /// Test that hiding the overlay after hovering a button will reset the overlay to the initial state with no buttons selected.
         /// </summary>
-        private void testHideResets()
+        [Test]
+        public void TestHideResets()
         {
             AddStep("Show overlay", () => failOverlay.Show());
 
@@ -163,7 +152,8 @@ namespace osu.Game.Tests.Visual.Gameplay
         /// <summary>
         /// Tests that entering menu with cursor initially on button selects it.
         /// </summary>
-        private void testInitialButtonHover()
+        [Test]
+        public void TestInitialButtonHover()
         {
             AddStep("Show overlay", () => pauseOverlay.Show());
 
@@ -182,7 +172,8 @@ namespace osu.Game.Tests.Visual.Gameplay
         /// <summary>
         /// Tests that hovering a button that was previously selected with the keyboard correctly selects the new button and deselects the previous button.
         /// </summary>
-        private void testMouseSelectionAfterKeySelection()
+        [Test]
+        public void TestMouseSelectionAfterKeySelection()
         {
             AddStep("Show overlay", () => pauseOverlay.Show());
 
@@ -199,7 +190,8 @@ namespace osu.Game.Tests.Visual.Gameplay
         /// <summary>
         /// Tests that pressing a key after selecting a button with a hover event correctly selects a new button and deselects the previous button.
         /// </summary>
-        private void testKeySelectionAfterMouseSelection()
+        [Test]
+        public void TestKeySelectionAfterMouseSelection()
         {
             AddStep("Show overlay", () =>
             {
@@ -220,7 +212,8 @@ namespace osu.Game.Tests.Visual.Gameplay
         /// <summary>
         /// Tests that deselecting with the mouse by losing hover will reset the overlay to the initial state.
         /// </summary>
-        private void testMouseDeselectionResets()
+        [Test]
+        public void TestMouseDeselectionResets()
         {
             AddStep("Show overlay", () => pauseOverlay.Show());
 
@@ -237,7 +230,8 @@ namespace osu.Game.Tests.Visual.Gameplay
         /// <summary>
         /// Tests that clicking on a button correctly causes a click event for that button.
         /// </summary>
-        private void testClickSelection()
+        [Test]
+        public void TestClickSelection()
         {
             AddStep("Show overlay", () => pauseOverlay.Show());
 
@@ -260,7 +254,8 @@ namespace osu.Game.Tests.Visual.Gameplay
         /// <summary>
         /// Tests that pressing the enter key with a button selected correctly causes a click event for that button.
         /// </summary>
-        private void testEnterKeySelection()
+        [Test]
+        public void TestEnterKeySelection()
         {
             AddStep("Show overlay", () => pauseOverlay.Show());
 
