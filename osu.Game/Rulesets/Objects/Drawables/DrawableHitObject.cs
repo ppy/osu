@@ -7,7 +7,9 @@ using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.TypeExtensions;
+using osu.Framework.Graphics;
 using osu.Framework.Graphics.Primitives;
+using osu.Framework.Threading;
 using osu.Game.Audio;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Objects.Types;
@@ -132,6 +134,8 @@ namespace osu.Game.Rulesets.Objects.Drawables
         /// </summary>
         public event Action<DrawableHitObject, ArmedState> ApplyCustomUpdateState;
 
+#pragma warning disable 618 // (legacy state management) - can be removed 20200227
+
         /// <summary>
         /// Enables automatic transform management of this hitobject. Implementation of transforms should be done in <see cref="UpdateInitialTransforms"/> and <see cref="UpdateStateTransforms"/> only. Rewinding and removing previous states is done automatically.
         /// </summary>
@@ -139,6 +143,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
         /// Going forward, this is the preferred way of implementing <see cref="DrawableHitObject"/>s. Previous functionality
         /// is offered as a compatibility layer until all rulesets have been migrated across.
         /// </remarks>
+        [Obsolete("Use UpdateInitialTransforms()/UpdateStateTransforms() instead")] // can be removed 20200227
         protected virtual bool UseTransformStateManagement => true;
 
         protected override void ClearInternal(bool disposeChildren = true) => throw new InvalidOperationException($"Should never clear a {nameof(DrawableHitObject)}");
@@ -183,6 +188,8 @@ namespace osu.Game.Rulesets.Objects.Drawables
         /// <summary>
         /// Apply (generally fade-in) transforms leading into the <see cref="HitObject"/> start time.
         /// The local drawable hierarchy is recursively delayed to <see cref="LifetimeStart"/> for convenience.
+        ///
+        /// By default this will fade in the object from zero with no duration.
         /// </summary>
         /// <remarks>
         /// This is called once before every <see cref="UpdateStateTransforms"/>. This is to ensure a good state in the case
@@ -190,6 +197,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
         /// </remarks>
         protected virtual void UpdateInitialTransforms()
         {
+            this.FadeInFromZero();
         }
 
         /// <summary>
@@ -219,9 +227,12 @@ namespace osu.Game.Rulesets.Objects.Drawables
         /// Should generally not be used when <see cref="UseTransformStateManagement"/> is true; use <see cref="UpdateStateTransforms"/> instead.
         /// </summary>
         /// <param name="state">The new armed state.</param>
+        [Obsolete("Use UpdateInitialTransforms()/UpdateStateTransforms() instead")] // can be removed 20200227
         protected virtual void UpdateState(ArmedState state)
         {
         }
+
+#pragma warning restore 618
 
         #endregion
 
@@ -267,6 +278,14 @@ namespace osu.Game.Rulesets.Objects.Drawables
 
             UpdateResult(false);
         }
+
+        /// <summary>
+        /// Schedules an <see cref="Action"/> to this <see cref="DrawableHitObject"/>.
+        /// </summary>
+        /// <remarks>
+        /// Only provided temporarily until hitobject pooling is implemented.
+        /// </remarks>
+        protected internal new ScheduledDelegate Schedule(Action action) => base.Schedule(action);
 
         private double? lifetimeStart;
 
@@ -391,7 +410,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
         /// Creates the <see cref="JudgementResult"/> that represents the scoring result for this <see cref="DrawableHitObject"/>.
         /// </summary>
         /// <param name="judgement">The <see cref="Judgement"/> that provides the scoring information.</param>
-        protected virtual JudgementResult CreateResult(Judgement judgement) => new JudgementResult(judgement);
+        protected virtual JudgementResult CreateResult(Judgement judgement) => new JudgementResult(HitObject, judgement);
     }
 
     public abstract class DrawableHitObject<TObject> : DrawableHitObject
