@@ -18,6 +18,7 @@ using osu.Game.Configuration;
 using osu.Game.Rulesets.Configuration;
 using osu.Game.Rulesets.Difficulty;
 using osu.Game.Scoring;
+using osu.Game.Skinning;
 
 namespace osu.Game.Rulesets
 {
@@ -44,6 +45,8 @@ namespace osu.Game.Rulesets
 
         public ModAutoplay GetAutoplayMod() => GetAllMods().OfType<ModAutoplay>().First();
 
+        public virtual ISkin CreateLegacySkinProvider(ISkinSource source) => null;
+
         protected Ruleset(RulesetInfo rulesetInfo = null)
         {
             RulesetInfo = rulesetInfo ?? createRulesetInfo();
@@ -56,7 +59,7 @@ namespace osu.Game.Rulesets
         /// <param name="mods">The <see cref="Mod"/>s to apply.</param>
         /// <exception cref="BeatmapInvalidForRulesetException">Unable to successfully load the beatmap to be usable with this ruleset.</exception>
         /// <returns></returns>
-        public abstract DrawableRuleset CreateDrawableRulesetWith(WorkingBeatmap beatmap, IReadOnlyList<Mod> mods);
+        public abstract DrawableRuleset CreateDrawableRulesetWith(IWorkingBeatmap beatmap, IReadOnlyList<Mod> mods);
 
         /// <summary>
         /// Creates a <see cref="IBeatmapConverter"/> to convert a <see cref="IBeatmap"/> to one that is applicable for this <see cref="Ruleset"/>.

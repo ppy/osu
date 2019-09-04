@@ -1,7 +1,10 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
+using System.Linq;
 using osu.Framework.Allocation;
+using osu.Framework.Graphics;
 using osu.Game.Configuration;
 
 namespace osu.Game.Overlays.Settings.Sections.Audio
@@ -13,7 +16,7 @@ namespace osu.Game.Overlays.Settings.Sections.Audio
         [BackgroundDependencyLoader]
         private void load(OsuConfigManager config)
         {
-            Children = new[]
+            Children = new Drawable[]
             {
                 new SettingsCheckbox
                 {
@@ -24,6 +27,12 @@ namespace osu.Game.Overlays.Settings.Sections.Audio
                 {
                     LabelText = "osu! music theme",
                     Bindable = config.GetBindable<bool>(OsuSetting.MenuMusic)
+                },
+                new SettingsDropdown<IntroSequence>
+                {
+                    LabelText = "Intro sequence",
+                    Bindable = config.GetBindable<IntroSequence>(OsuSetting.IntroSequence),
+                    Items = Enum.GetValues(typeof(IntroSequence)).Cast<IntroSequence>()
                 },
             };
         }

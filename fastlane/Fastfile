@@ -1,22 +1,6 @@
 update_fastlane
 
-default_platform(:ios)
-
 platform :ios do
-  lane :testflight_prune_dry do
-    clean_testflight_testers(days_of_inactivity:45, dry_run: true)
-  end
-
-  # Specify a custom number for what's "inactive"
-  lane :testflight_prune do
-    clean_testflight_testers(days_of_inactivity: 45) # 120 days, so about 4 months
-  end
-
-  lane :update_version do |options|
-    options[:plist_path] = '../osu.iOS/Info.plist'
-    app_version(options)
-  end
-
   desc 'Deploy to testflight'
   lane :beta do |options|
     update_version(options)
@@ -61,5 +45,18 @@ platform :ios do
     end
 
     match(options)
+  end
+
+  lane :update_version do |options|
+    options[:plist_path] = '../osu.iOS/Info.plist'
+    app_version(options)
+  end
+
+  lane :testflight_prune_dry do
+    clean_testflight_testers(days_of_inactivity:45, dry_run: true)
+  end
+
+  lane :testflight_prune do
+    clean_testflight_testers(days_of_inactivity: 45)
   end
 end

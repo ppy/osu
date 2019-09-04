@@ -12,8 +12,10 @@ namespace osu.Game.Graphics.Containers
     {
         public Action Action;
 
-        private const int activate_delay = 400;
+        private const int default_activation_delay = 200;
         private const int fadeout_delay = 200;
+
+        private readonly double activationDelay;
 
         private bool fired;
         private bool confirming;
@@ -25,13 +27,22 @@ namespace osu.Game.Graphics.Containers
 
         public Bindable<double> Progress = new BindableDouble();
 
+        /// <summary>
+        /// Create a new instance.
+        /// </summary>
+        /// <param name="activationDelay">The time requried before an action is confirmed.</param>
+        protected HoldToConfirmContainer(double activationDelay = default_activation_delay)
+        {
+            this.activationDelay = activationDelay;
+        }
+
         protected void BeginConfirm()
         {
             if (confirming || (!AllowMultipleFires && fired)) return;
 
             confirming = true;
 
-            this.TransformBindableTo(Progress, 1, activate_delay * (1 - Progress.Value), Easing.Out).OnComplete(_ => Confirm());
+            this.TransformBindableTo(Progress, 1, activationDelay * (1 - Progress.Value), Easing.Out).OnComplete(_ => Confirm());
         }
 
         protected virtual void Confirm()
