@@ -19,23 +19,33 @@ using osuTK.Graphics;
 
 namespace osu.Game.Beatmaps.Drawables
 {
-    public class DifficultyIcon : Container, IHasCustomTooltip
+    public class DifficultyIcon : CompositeDrawable, IHasCustomTooltip
     {
         private readonly BeatmapInfo beatmap;
         private readonly RulesetInfo ruleset;
 
+        private readonly Container iconContainer;
+
+        /// <summary>
+        /// Size of this difficulty icon.
+        /// </summary>
+        public new Vector2 Size
+        {
+            get => iconContainer.Size;
+            set => iconContainer.Size = value;
+        }
+
         public DifficultyIcon(BeatmapInfo beatmap, RulesetInfo ruleset = null, bool shouldShowTooltip = true)
         {
-            if (beatmap == null)
-                throw new ArgumentNullException(nameof(beatmap));
-
-            this.beatmap = beatmap;
+            this.beatmap = beatmap ?? throw new ArgumentNullException(nameof(beatmap));
 
             this.ruleset = ruleset ?? beatmap.Ruleset;
             if (shouldShowTooltip)
                 TooltipContent = beatmap;
 
-            Size = new Vector2(20);
+            AutoSizeAxes = Axes.Both;
+
+            InternalChild = iconContainer = new Container { Size = new Vector2(20f) };
         }
 
         public string TooltipText { get; set; }
@@ -47,7 +57,7 @@ namespace osu.Game.Beatmaps.Drawables
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
-            Children = new Drawable[]
+            iconContainer.Children = new Drawable[]
             {
                 new CircularContainer
                 {
@@ -85,11 +95,6 @@ namespace osu.Game.Beatmaps.Drawables
             private readonly Box background;
 
             private readonly FillFlowContainer difficultyFlow;
-
-            public string TooltipText
-            {
-                set { }
-            }
 
             public DifficultyIconTooltip()
             {
@@ -166,10 +171,6 @@ namespace osu.Game.Beatmaps.Drawables
                 difficultyFlow.Colour = colours.ForDifficultyRating(beatmap.DifficultyRating);
 
                 return true;
-            }
-
-            public void Refresh()
-            {
             }
 
             public void Move(Vector2 pos) => Position = pos;

@@ -229,5 +229,7 @@ namespace osu.Game.Rulesets.Osu.Objects
             nodeIndex < NodeSamples.Count ? NodeSamples[nodeIndex] : Samples;
 
         public override Judgement CreateJudgement() => new OsuJudgement();
+
+        protected override HitWindows CreateHitWindows() => null;
     }
 }
