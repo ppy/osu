@@ -10,11 +10,11 @@ namespace osu.Game.Rulesets.Mods
 {
       public abstract class ModEnlargeCS : Mod, IApplicableToDifficulty 
       { 
-            public override string Name => "Enlarge circle size";
-            public override string Acronym => "EZ..?";
+            public override string Name => "Larger circle";
+            public override string Acronym => "LC";
             public override IconUsage Icon => OsuIcon.ModEasy;
             public override ModType Type => ModType.DifficultyReduction;
-            // public override double ScoreMultiplier => 0.5;
+            public override double ScoreMultiplier => 0.5;
             public override bool Ranked => true;
             public override Type[] IncompatibleMods => new[] { typeof(ModHardRock) };
 
