@@ -5,7 +5,7 @@ using osu.Game.Rulesets.Mods;
 
 namespace osu.Game.Rulesets.Osu.Mods
 {
-    public class OsuModEnlargeCS : ModEnlargeCS
+    public class OsuModLargerCircle : ModLargerCircle
     {
         public override string Description => @"Larger circles!";
     }
