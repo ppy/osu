@@ -76,8 +76,6 @@ namespace osu.Game.Rulesets.Objects.Drawables
         /// </summary>
         public JudgementResult Result { get; private set; }
 
-        private bool judgementOccurred;
-
         public override bool RemoveWhenNotAlive => false;
         public override bool RemoveCompletedTransforms => false;
         protected override bool RequiresChildrenUpdate => true;
@@ -342,8 +340,6 @@ namespace osu.Game.Rulesets.Objects.Drawables
             if (!Result.HasResult)
                 throw new InvalidOperationException($"{GetType().ReadableName()} applied a {nameof(JudgementResult)} but did not update {nameof(JudgementResult.Type)}.");
 
-            judgementOccurred = true;
-
             // Ensure that the judgement is given a valid time offset, because this may not get set by the caller
             var endTime = (HitObject as IHasEndTime)?.EndTime ?? HitObject.StartTime;
             Result.TimeOffset = Time.Current - endTime;
@@ -376,21 +372,13 @@ namespace osu.Game.Rulesets.Objects.Drawables
             if (Time.Elapsed < 0)
                 return false;
 
-            judgementOccurred = false;
-
-            if (AllJudged)
+            if (Judged)
                 return false;
-
-            foreach (var d in NestedHitObjects)
-                judgementOccurred |= d.UpdateResult(userTriggered);
-
-            if (judgementOccurred || Judged)
-                return judgementOccurred;
 
             var endTime = (HitObject as IHasEndTime)?.EndTime ?? HitObject.StartTime;
             CheckForResult(userTriggered, Time.Current - endTime);
 
-            return judgementOccurred;
+            return Judged;
         }
 
         /// <summary>
