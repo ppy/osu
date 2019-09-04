@@ -8,7 +8,7 @@ using osu.Game.Graphics;
 
 namespace osu.Game.Rulesets.Mods
 {
-      public abstract class ModEasy : Mod, IApplicableToDifficulty 
+      public abstract class ModEnlargeCS : Mod, IApplicableToDifficulty 
       { 
             public override string Name => "Enlarge circle size";
             public override string Acronym => "EZ..?";
