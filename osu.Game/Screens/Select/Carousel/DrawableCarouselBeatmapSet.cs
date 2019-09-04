@@ -146,6 +146,7 @@ namespace osu.Game.Screens.Select.Carousel
             public PanelBackground(WorkingBeatmap working)
             {
                 CacheDrawnFrameBuffer = true;
+                RedrawOnScale = false;
 
                 Children = new Drawable[]
                 {
