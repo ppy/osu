@@ -77,7 +77,8 @@ namespace osu.Game.Skinning
                                 val = val == "1" ? "true" : "false";
 
                             var bindable = new Bindable<TValue>();
-                            bindable.Parse(val);
+                            if (val != null)
+                                bindable.Parse(val);
                             return bindable;
                         }
                     }
