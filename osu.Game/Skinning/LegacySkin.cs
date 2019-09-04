@@ -30,14 +30,14 @@ namespace osu.Game.Skinning
         protected LegacySkin(SkinInfo skin, IResourceStore<byte[]> storage, AudioManager audioManager, string filename)
             : base(skin)
         {
-            Stream stream = storage.GetStream(filename);
+            Stream stream = storage?.GetStream(filename);
             if (stream != null)
                 using (StreamReader reader = new StreamReader(stream))
                     Configuration = new LegacySkinDecoder().Decode(reader);
             else
                 Configuration = new DefaultSkinConfiguration();
 
-            Samples = audioManager.GetSampleStore(storage);
+            Samples = audioManager?.GetSampleStore(storage);
             Textures = new TextureStore(new TextureLoaderStore(storage));
         }
 
@@ -72,6 +72,10 @@ namespace osu.Game.Skinning
                     {
                         if (Configuration.ConfigDictionary.TryGetValue(lookup.ToString(), out var val))
                         {
+                            // special case for handling skins which use 1 or 0 to signify a boolean state.
+                            if (typeof(TValue) == typeof(bool))
+                                val = val == "1" ? "true" : "false";
+
                             var bindable = new Bindable<TValue>();
                             bindable.Parse(val);
                             return bindable;
