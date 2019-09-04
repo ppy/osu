@@ -3,6 +3,7 @@
 
 using System;
 using System.Diagnostics.CodeAnalysis;
+using JetBrains.Annotations;
 using Newtonsoft.Json;
 
 namespace osu.Game.Rulesets
@@ -20,7 +21,13 @@ namespace osu.Game.Rulesets
         [JsonIgnore]
         public bool Available { get; set; }
 
-        public virtual Ruleset CreateInstance() => (Ruleset)Activator.CreateInstance(Type.GetType(InstantiationInfo), this);
+        [CanBeNull]
+        public virtual Ruleset CreateInstance()
+        {
+            if (!Available) return null;
+
+            return (Ruleset)Activator.CreateInstance(Type.GetType(InstantiationInfo), this);
+        }
 
         public bool Equals(RulesetInfo other) => other != null && ID == other.ID && Available == other.Available && Name == other.Name && InstantiationInfo == other.InstantiationInfo;
 
