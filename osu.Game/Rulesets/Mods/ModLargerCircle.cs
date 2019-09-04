@@ -12,7 +12,7 @@ namespace osu.Game.Rulesets.Mods
       { 
             public override string Name => "Larger circle";
             public override string Acronym => "LC";
-            public override IconUsage Icon => OsuIcon.ModEasy;
+            public override IconUsage Icon => FontAwesome.Solid.ChevronCircleUp;
             public override ModType Type => ModType.DifficultyReduction;
             public override double ScoreMultiplier => 0.5;
             public override bool Ranked => true;
