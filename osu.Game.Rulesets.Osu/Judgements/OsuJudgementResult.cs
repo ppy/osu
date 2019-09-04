@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Game.Rulesets.Judgements;
+using osu.Game.Rulesets.Objects;
 
 namespace osu.Game.Rulesets.Osu.Judgements
 {
@@ -9,8 +10,8 @@ namespace osu.Game.Rulesets.Osu.Judgements
     {
         public ComboResult ComboType;
 
-        public OsuJudgementResult(Judgement judgement)
-            : base(judgement)
+        public OsuJudgementResult(HitObject hitObject, Judgement judgement)
+            : base(hitObject, judgement)
         {
         }
     }

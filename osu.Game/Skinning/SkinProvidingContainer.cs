@@ -4,47 +4,52 @@
 using System;
 using osu.Framework.Allocation;
 using osu.Framework.Audio.Sample;
-using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Textures;
 using osu.Game.Audio;
-using osu.Game.Configuration;
 
 namespace osu.Game.Skinning
 {
     /// <summary>
-    /// A container which overrides existing skin options with beatmap-local values.
+    /// A container which adds a local <see cref="ISkinSource"/> to the hierarchy.
     /// </summary>
-    public class LocalSkinOverrideContainer : Container, ISkinSource
+    public class SkinProvidingContainer : Container, ISkinSource
     {
         public event Action SourceChanged;
-
-        private readonly Bindable<bool> beatmapSkins = new Bindable<bool>();
-        private readonly Bindable<bool> beatmapHitsounds = new Bindable<bool>();
 
         private readonly ISkin skin;
 
         private ISkinSource fallbackSource;
 
-        public LocalSkinOverrideContainer(ISkin skin)
+        protected virtual bool AllowDrawableLookup(ISkinComponent component) => true;
+
+        protected virtual bool AllowTextureLookup(string componentName) => true;
+
+        protected virtual bool AllowSampleLookup(ISampleInfo componentName) => true;
+
+        protected virtual bool AllowConfigurationLookup => true;
+
+        public SkinProvidingContainer(ISkin skin)
         {
             this.skin = skin;
+
+            RelativeSizeAxes = Axes.Both;
         }
 
-        public Drawable GetDrawableComponent(string componentName)
+        public Drawable GetDrawableComponent(ISkinComponent component)
         {
             Drawable sourceDrawable;
-            if (beatmapSkins.Value && (sourceDrawable = skin?.GetDrawableComponent(componentName)) != null)
+            if (AllowDrawableLookup(component) && (sourceDrawable = skin?.GetDrawableComponent(component)) != null)
                 return sourceDrawable;
 
-            return fallbackSource?.GetDrawableComponent(componentName);
+            return fallbackSource?.GetDrawableComponent(component);
         }
 
         public Texture GetTexture(string componentName)
         {
             Texture sourceTexture;
-            if (beatmapSkins.Value && (sourceTexture = skin?.GetTexture(componentName)) != null)
+            if (AllowTextureLookup(componentName) && (sourceTexture = skin?.GetTexture(componentName)) != null)
                 return sourceTexture;
 
             return fallbackSource.GetTexture(componentName);
@@ -53,7 +58,7 @@ namespace osu.Game.Skinning
         public SampleChannel GetSample(ISampleInfo sampleInfo)
         {
             SampleChannel sourceChannel;
-            if (beatmapHitsounds.Value && (sourceChannel = skin?.GetSample(sampleInfo)) != null)
+            if (AllowSampleLookup(sampleInfo) && (sourceChannel = skin?.GetSample(sampleInfo)) != null)
                 return sourceChannel;
 
             return fallbackSource?.GetSample(sampleInfo);
@@ -62,14 +67,13 @@ namespace osu.Game.Skinning
         public TValue GetValue<TConfiguration, TValue>(Func<TConfiguration, TValue> query) where TConfiguration : SkinConfiguration
         {
             TValue val;
-            if ((skin as Skin)?.Configuration is TConfiguration conf)
-                if (beatmapSkins.Value && (val = query.Invoke(conf)) != null)
-                    return val;
+            if (AllowConfigurationLookup && skin != null && (val = skin.GetValue(query)) != null)
+                return val;
 
             return fallbackSource == null ? default : fallbackSource.GetValue(query);
         }
 
-        private void onSourceChanged() => SourceChanged?.Invoke();
+        protected virtual void TriggerSourceChanged() => SourceChanged?.Invoke();
 
         protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
         {
@@ -77,17 +81,9 @@ namespace osu.Game.Skinning
 
             fallbackSource = dependencies.Get<ISkinSource>();
             if (fallbackSource != null)
-                fallbackSource.SourceChanged += onSourceChanged;
+                fallbackSource.SourceChanged += TriggerSourceChanged;
 
             dependencies.CacheAs<ISkinSource>(this);
-
-            var config = dependencies.Get<OsuConfigManager>();
-
-            config.BindWith(OsuSetting.BeatmapSkins, beatmapSkins);
-            config.BindWith(OsuSetting.BeatmapHitsounds, beatmapHitsounds);
-
-            beatmapSkins.BindValueChanged(_ => onSourceChanged());
-            beatmapHitsounds.BindValueChanged(_ => onSourceChanged());
 
             return dependencies;
         }
@@ -100,7 +96,7 @@ namespace osu.Game.Skinning
             base.Dispose(isDisposing);
 
             if (fallbackSource != null)
-                fallbackSource.SourceChanged -= onSourceChanged;
+                fallbackSource.SourceChanged -= TriggerSourceChanged;
         }
     }
 }
