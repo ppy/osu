@@ -76,12 +76,15 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             double aimValue = computeAimValue();
             double speedValue = computeSpeedValue();
-            double totalValue = Mean.PowerMean(aimValue, speedValue, totalValueExponent) * multiplier;
+            double accuracyValue = computeAccuracyValue();
+
+            double totalValue = Mean.PowerMean(new double[] { aimValue, speedValue, accuracyValue }, totalValueExponent) * multiplier;
 
             if (categoryRatings != null)
             {
                 categoryRatings.Add("Aim", aimValue);
                 categoryRatings.Add("Speed", speedValue);
+                categoryRatings.Add("Accuracy", accuracyValue);
                 categoryRatings.Add("OD", Attributes.OverallDifficulty);
                 categoryRatings.Add("AR", Attributes.ApproachRate);
                 categoryRatings.Add("Max Combo", beatmapMaxCombo);
@@ -170,10 +173,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             }
 
 
-            // Scale the aim value with accuracy
+            // Scale the aim value down slightly with accuracy
             double accLeniency = (80 - 6 * Attributes.OverallDifficulty) * Attributes.AimDiff / 300;
             double accPenalty = (SpecialFunctions.Logistic((accuracy-0.94) * (-200.0/3)) - SpecialFunctions.Logistic(-4)) *
-                                Math.Pow(accLeniency, 2) * 0.2;
+                                Math.Pow(accLeniency, 2) * 0.05;
 
             aimValue *= Math.Exp(-accPenalty);
 
@@ -212,11 +215,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             double tapValue = Math.Pow(tapSkill * 0.96, 2.55) * 0.37;
 
-            // Buff high acc
-            double accBuffLevel = (1 - SpecialFunctions.Logistic(((urOnStreams * Attributes.TapDiff) - 1000) / 500)) /
-                                  SpecialFunctions.Logistic(1000.0 / 500);
-            accBuffLevel = Math.Pow(accBuffLevel, 2) * 1.2;
-            tapValue *= 1 + accBuffLevel;
 
             // Penalize misses exponentially. This mainly fixes tag4 maps and the likes until a per-hitobject solution is available
             tapValue *= Math.Pow(0.97f, countMiss);
@@ -231,6 +229,50 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
 
             return tapValue;
+        }
+
+        private double computeAccuracyValue(Dictionary<string, double> categoryRatings = null)
+        {
+            double sigmaCircle = 0;
+            double sigmaSlider = 0;
+            double sigma = 0;
+
+            double zScore = 2.58f;
+            double sqrt2 = Math.Sqrt(2.0f);
+            double accMultiplier = 2000.0f;
+            double accScale = 1.14f;
+
+            // Slider sigma calculations
+            if (countSliders > 0)
+            {
+                double sliderConst = Math.Sqrt(2.0f / countSliders) * zScore;
+                double sliderProbability = (2.0f * accuracy + Math.Pow(sliderConst, 2.0f) - sliderConst * Math.Sqrt(4.0f * accuracy + Math.Pow(sliderConst, 2.0f) - 4.0f * Math.Pow(accuracy, 2.0f))) / (2.0f + 2.0f * Math.Pow(sliderConst, 2.0f));
+                sigmaSlider = (199.5f - 10.0f * Attributes.OverallDifficulty) / (sqrt2 * SpecialFunctions.ErfInv(sliderProbability));
+            }
+            
+
+            // Circle sigma calculations
+            if (countHitCircles > 0)
+            {
+                double circleConst = Math.Sqrt(2.0f / countHitCircles) * zScore;
+                double circleProbability = (2.0f * accuracy + Math.Pow(circleConst, 2.0f) - circleConst * Math.Sqrt(4.0f * accuracy + Math.Pow(circleConst, 2.0f) - 4.0f * Math.Pow(accuracy, 2.0f))) / (2.0f + 2.0f * Math.Pow(circleConst, 2.0f));
+                sigmaCircle = (79.5f - 6.0f * Attributes.OverallDifficulty) / (sqrt2 * SpecialFunctions.ErfInv(circleProbability));
+            }
+
+
+            if (sigmaSlider == 0)
+                sigma = sigmaCircle;
+            else if (sigmaCircle == 0)
+                sigma = sigmaSlider;
+            else
+                sigma = 2.0f / (1.0f / sigmaCircle + 1.0f / sigmaSlider);
+
+            double accValue = accMultiplier * Math.Pow(accScale, -sigma);
+
+            if (mods.Any(m => m is OsuModHidden))
+                accValue *= 1.1f;
+
+            return accValue;
         }
 
         private double tpToPP(double tp) => Math.Pow(tp, 2.55) * 0.1815;
