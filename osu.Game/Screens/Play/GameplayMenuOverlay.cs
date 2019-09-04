@@ -304,8 +304,6 @@ namespace osu.Game.Screens.Play
 
         private class Button : DialogButton
         {
-            protected override bool OnHover(HoverEvent e) => true;
-
             protected override bool OnMouseMove(MouseMoveEvent e)
             {
                 Selected.Value = true;
