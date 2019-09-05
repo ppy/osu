@@ -7,6 +7,7 @@ using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
@@ -135,6 +136,7 @@ namespace osu.Game.Rulesets.Osu.Tests
             public SampleChannel GetSample(ISampleInfo sampleInfo) => null;
 
             public TValue GetValue<TConfiguration, TValue>(Func<TConfiguration, TValue> query) where TConfiguration : SkinConfiguration => default;
+            public IBindable<TValue> GetConfig<TLookup, TValue>(TLookup lookup) => null;
 
             public event Action SourceChanged;
 
