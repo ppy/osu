@@ -182,7 +182,26 @@ namespace osu.Game
             // bind config int to database SkinInfo
             configSkin = LocalConfig.GetBindable<int>(OsuSetting.Skin);
             SkinManager.CurrentSkinInfo.ValueChanged += skin => configSkin.Value = skin.NewValue.ID;
-            configSkin.ValueChanged += skinId => SkinManager.CurrentSkinInfo.Value = SkinManager.Query(s => s.ID == skinId.NewValue) ?? SkinInfo.Default;
+            configSkin.ValueChanged += skinId =>
+            {
+                var skinInfo = SkinManager.Query(s => s.ID == skinId.NewValue);
+
+                if (skinInfo == null)
+                {
+                    switch (skinId.NewValue)
+                    {
+                        case -1:
+                            skinInfo = DefaultLegacySkin.Info;
+                            break;
+
+                        default:
+                            skinInfo = SkinInfo.Default;
+                            break;
+                    }
+                }
+
+                SkinManager.CurrentSkinInfo.Value = skinInfo;
+            };
             configSkin.TriggerChange();
 
             IsActive.BindValueChanged(active => updateActiveState(active.NewValue), true);
@@ -299,7 +318,7 @@ namespace osu.Game
             }, $"watch {databasedScoreInfo}", bypassScreenAllowChecks: true);
         }
 
-        #region Beatmap jukebox progression
+        #region Beatmap progression
 
         private void beatmapChanged(ValueChangedEvent<WorkingBeatmap> beatmap)
         {
@@ -307,7 +326,9 @@ namespace osu.Game
             if (nextBeatmap?.Track != null)
                 nextBeatmap.Track.Completed += currentTrackCompleted;
 
-            beatmap.OldValue?.Dispose();
+            using (var oldBeatmap = beatmap.OldValue)
+                if (oldBeatmap?.Track != null)
+                    oldBeatmap.Track.Completed -= currentTrackCompleted;
 
             nextBeatmap?.LoadBeatmapAsync();
         }
@@ -467,6 +488,8 @@ namespace osu.Game
             loadComponentSingleFile(volume = new VolumeOverlay(), leftFloatingOverlayContent.Add);
             loadComponentSingleFile(new OnScreenDisplay(), Add, true);
 
+            loadComponentSingleFile(musicController = new MusicController(), Add, true);
+
             loadComponentSingleFile(notifications = new NotificationOverlay
             {
                 GetToolbarHeight = () => ToolbarOffset,
@@ -493,7 +516,7 @@ namespace osu.Game
                 Origin = Anchor.TopRight,
             }, rightFloatingOverlayContent.Add, true);
 
-            loadComponentSingleFile(musicController = new MusicController
+            loadComponentSingleFile(new NowPlayingOverlay
             {
                 GetToolbarHeight = () => ToolbarOffset,
                 Anchor = Anchor.TopRight,

@@ -21,32 +21,38 @@ namespace osu.Game.Tests.Visual.Gameplay
         private readonly Container<DrawableStoryboard> storyboardContainer;
         private DrawableStoryboard storyboard;
 
+        [Cached]
+        private MusicController musicController = new MusicController();
+
         public TestSceneStoryboard()
         {
             Clock = new FramedClock();
 
-            Add(new Container
+            AddRange(new Drawable[]
             {
-                RelativeSizeAxes = Axes.Both,
-                Children = new Drawable[]
+                musicController,
+                new Container
                 {
-                    new Box
+                    RelativeSizeAxes = Axes.Both,
+                    Children = new Drawable[]
                     {
-                        RelativeSizeAxes = Axes.Both,
-                        Colour = Color4.Black,
-                    },
-                    storyboardContainer = new Container<DrawableStoryboard>
-                    {
-                        RelativeSizeAxes = Axes.Both,
+                        new Box
+                        {
+                            RelativeSizeAxes = Axes.Both,
+                            Colour = Color4.Black,
+                        },
+                        storyboardContainer = new Container<DrawableStoryboard>
+                        {
+                            RelativeSizeAxes = Axes.Both,
+                        },
                     },
                 },
-            });
-
-            Add(new MusicController
-            {
-                Origin = Anchor.TopRight,
-                Anchor = Anchor.TopRight,
-                State = { Value = Visibility.Visible },
+                new NowPlayingOverlay
+                {
+                    Origin = Anchor.TopRight,
+                    Anchor = Anchor.TopRight,
+                    State = { Value = Visibility.Visible },
+                }
             });
 
             AddStep("Restart", restart);
