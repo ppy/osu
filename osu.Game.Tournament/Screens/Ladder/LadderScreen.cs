@@ -88,7 +88,7 @@ namespace osu.Game.Tournament.Screens.Ladder
             };
         }
 
-        private Cached layout = new Cached();
+        private readonly Cached layout = new Cached();
 
         protected override void Update()
         {

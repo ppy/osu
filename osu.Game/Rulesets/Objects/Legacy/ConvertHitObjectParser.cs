@@ -10,7 +10,6 @@ using osu.Game.Beatmaps.Formats;
 using osu.Game.Audio;
 using System.Linq;
 using JetBrains.Annotations;
-using osu.Framework.Logging;
 using osu.Framework.MathUtils;
 
 namespace osu.Game.Rulesets.Objects.Legacy
@@ -41,208 +40,192 @@ namespace osu.Game.Rulesets.Objects.Legacy
         [CanBeNull]
         public override HitObject Parse(string text)
         {
-            try
+            string[] split = text.Split(',');
+
+            Vector2 pos = new Vector2((int)Parsing.ParseFloat(split[0], Parsing.MAX_COORDINATE_VALUE), (int)Parsing.ParseFloat(split[1], Parsing.MAX_COORDINATE_VALUE));
+
+            double startTime = Parsing.ParseDouble(split[2]) + Offset;
+
+            ConvertHitObjectType type = (ConvertHitObjectType)Parsing.ParseInt(split[3]);
+
+            int comboOffset = (int)(type & ConvertHitObjectType.ComboOffset) >> 4;
+            type &= ~ConvertHitObjectType.ComboOffset;
+
+            bool combo = type.HasFlag(ConvertHitObjectType.NewCombo);
+            type &= ~ConvertHitObjectType.NewCombo;
+
+            var soundType = (LegacySoundType)Parsing.ParseInt(split[4]);
+            var bankInfo = new SampleBankInfo();
+
+            HitObject result = null;
+
+            if (type.HasFlag(ConvertHitObjectType.Circle))
             {
-                string[] split = text.Split(',');
+                result = CreateHit(pos, combo, comboOffset);
 
-                Vector2 pos = new Vector2((int)Parsing.ParseFloat(split[0], Parsing.MAX_COORDINATE_VALUE), (int)Parsing.ParseFloat(split[1], Parsing.MAX_COORDINATE_VALUE));
+                if (split.Length > 5)
+                    readCustomSampleBanks(split[5], bankInfo);
+            }
+            else if (type.HasFlag(ConvertHitObjectType.Slider))
+            {
+                PathType pathType = PathType.Catmull;
+                double? length = null;
 
-                double startTime = Parsing.ParseDouble(split[2]) + Offset;
+                string[] pointSplit = split[5].Split('|');
 
-                ConvertHitObjectType type = (ConvertHitObjectType)Parsing.ParseInt(split[3]);
+                int pointCount = 1;
+                foreach (var t in pointSplit)
+                    if (t.Length > 1)
+                        pointCount++;
 
-                int comboOffset = (int)(type & ConvertHitObjectType.ComboOffset) >> 4;
-                type &= ~ConvertHitObjectType.ComboOffset;
+                var points = new Vector2[pointCount];
 
-                bool combo = type.HasFlag(ConvertHitObjectType.NewCombo);
-                type &= ~ConvertHitObjectType.NewCombo;
+                int pointIndex = 1;
 
-                var soundType = (LegacySoundType)Parsing.ParseInt(split[4]);
-                var bankInfo = new SampleBankInfo();
-
-                HitObject result = null;
-
-                if (type.HasFlag(ConvertHitObjectType.Circle))
+                foreach (string t in pointSplit)
                 {
-                    result = CreateHit(pos, combo, comboOffset);
-
-                    if (split.Length > 5)
-                        readCustomSampleBanks(split[5], bankInfo);
-                }
-                else if (type.HasFlag(ConvertHitObjectType.Slider))
-                {
-                    PathType pathType = PathType.Catmull;
-                    double? length = null;
-
-                    string[] pointSplit = split[5].Split('|');
-
-                    int pointCount = 1;
-                    foreach (var t in pointSplit)
-                        if (t.Length > 1)
-                            pointCount++;
-
-                    var points = new Vector2[pointCount];
-
-                    int pointIndex = 1;
-
-                    foreach (string t in pointSplit)
+                    if (t.Length == 1)
                     {
-                        if (t.Length == 1)
+                        switch (t)
                         {
-                            switch (t)
-                            {
-                                case @"C":
-                                    pathType = PathType.Catmull;
-                                    break;
-
-                                case @"B":
-                                    pathType = PathType.Bezier;
-                                    break;
-
-                                case @"L":
-                                    pathType = PathType.Linear;
-                                    break;
-
-                                case @"P":
-                                    pathType = PathType.PerfectCurve;
-                                    break;
-                            }
-
-                            continue;
-                        }
-
-                        string[] temp = t.Split(':');
-                        points[pointIndex++] = new Vector2((int)Parsing.ParseDouble(temp[0], Parsing.MAX_COORDINATE_VALUE), (int)Parsing.ParseDouble(temp[1], Parsing.MAX_COORDINATE_VALUE)) - pos;
-                    }
-
-                    // osu-stable special-cased colinear perfect curves to a CurveType.Linear
-                    bool isLinear(Vector2[] p) => Precision.AlmostEquals(0, (p[1].Y - p[0].Y) * (p[2].X - p[0].X) - (p[1].X - p[0].X) * (p[2].Y - p[0].Y));
-
-                    if (points.Length == 3 && pathType == PathType.PerfectCurve && isLinear(points))
-                        pathType = PathType.Linear;
-
-                    int repeatCount = Parsing.ParseInt(split[6]);
-
-                    if (repeatCount > 9000)
-                        throw new ArgumentOutOfRangeException(nameof(repeatCount), @"Repeat count is way too high");
-
-                    // osu-stable treated the first span of the slider as a repeat, but no repeats are happening
-                    repeatCount = Math.Max(0, repeatCount - 1);
-
-                    if (split.Length > 7)
-                    {
-                        length = Math.Max(0, Parsing.ParseDouble(split[7]));
-                        if (length == 0)
-                            length = null;
-                    }
-
-                    if (split.Length > 10)
-                        readCustomSampleBanks(split[10], bankInfo);
-
-                    // One node for each repeat + the start and end nodes
-                    int nodes = repeatCount + 2;
-
-                    // Populate node sample bank infos with the default hit object sample bank
-                    var nodeBankInfos = new List<SampleBankInfo>();
-                    for (int i = 0; i < nodes; i++)
-                        nodeBankInfos.Add(bankInfo.Clone());
-
-                    // Read any per-node sample banks
-                    if (split.Length > 9 && split[9].Length > 0)
-                    {
-                        string[] sets = split[9].Split('|');
-
-                        for (int i = 0; i < nodes; i++)
-                        {
-                            if (i >= sets.Length)
+                            case @"C":
+                                pathType = PathType.Catmull;
                                 break;
 
-                            SampleBankInfo info = nodeBankInfos[i];
-                            readCustomSampleBanks(sets[i], info);
-                        }
-                    }
-
-                    // Populate node sound types with the default hit object sound type
-                    var nodeSoundTypes = new List<LegacySoundType>();
-                    for (int i = 0; i < nodes; i++)
-                        nodeSoundTypes.Add(soundType);
-
-                    // Read any per-node sound types
-                    if (split.Length > 8 && split[8].Length > 0)
-                    {
-                        string[] adds = split[8].Split('|');
-
-                        for (int i = 0; i < nodes; i++)
-                        {
-                            if (i >= adds.Length)
+                            case @"B":
+                                pathType = PathType.Bezier;
                                 break;
 
-                            int sound;
-                            int.TryParse(adds[i], out sound);
-                            nodeSoundTypes[i] = (LegacySoundType)sound;
+                            case @"L":
+                                pathType = PathType.Linear;
+                                break;
+
+                            case @"P":
+                                pathType = PathType.PerfectCurve;
+                                break;
                         }
+
+                        continue;
                     }
 
-                    // Generate the final per-node samples
-                    var nodeSamples = new List<List<HitSampleInfo>>(nodes);
+                    string[] temp = t.Split(':');
+                    points[pointIndex++] = new Vector2((int)Parsing.ParseDouble(temp[0], Parsing.MAX_COORDINATE_VALUE), (int)Parsing.ParseDouble(temp[1], Parsing.MAX_COORDINATE_VALUE)) - pos;
+                }
+
+                // osu-stable special-cased colinear perfect curves to a CurveType.Linear
+                bool isLinear(Vector2[] p) => Precision.AlmostEquals(0, (p[1].Y - p[0].Y) * (p[2].X - p[0].X) - (p[1].X - p[0].X) * (p[2].Y - p[0].Y));
+
+                if (points.Length == 3 && pathType == PathType.PerfectCurve && isLinear(points))
+                    pathType = PathType.Linear;
+
+                int repeatCount = Parsing.ParseInt(split[6]);
+
+                if (repeatCount > 9000)
+                    throw new ArgumentOutOfRangeException(nameof(repeatCount), @"Repeat count is way too high");
+
+                // osu-stable treated the first span of the slider as a repeat, but no repeats are happening
+                repeatCount = Math.Max(0, repeatCount - 1);
+
+                if (split.Length > 7)
+                {
+                    length = Math.Max(0, Parsing.ParseDouble(split[7]));
+                    if (length == 0)
+                        length = null;
+                }
+
+                if (split.Length > 10)
+                    readCustomSampleBanks(split[10], bankInfo);
+
+                // One node for each repeat + the start and end nodes
+                int nodes = repeatCount + 2;
+
+                // Populate node sample bank infos with the default hit object sample bank
+                var nodeBankInfos = new List<SampleBankInfo>();
+                for (int i = 0; i < nodes; i++)
+                    nodeBankInfos.Add(bankInfo.Clone());
+
+                // Read any per-node sample banks
+                if (split.Length > 9 && split[9].Length > 0)
+                {
+                    string[] sets = split[9].Split('|');
+
                     for (int i = 0; i < nodes; i++)
-                        nodeSamples.Add(convertSoundType(nodeSoundTypes[i], nodeBankInfos[i]));
-
-                    result = CreateSlider(pos, combo, comboOffset, points, length, pathType, repeatCount, nodeSamples);
-
-                    // The samples are played when the slider ends, which is the last node
-                    result.Samples = nodeSamples[nodeSamples.Count - 1];
-                }
-                else if (type.HasFlag(ConvertHitObjectType.Spinner))
-                {
-                    double endTime = Math.Max(startTime, Parsing.ParseDouble(split[5]) + Offset);
-
-                    result = CreateSpinner(new Vector2(512, 384) / 2, combo, comboOffset, endTime);
-
-                    if (split.Length > 6)
-                        readCustomSampleBanks(split[6], bankInfo);
-                }
-                else if (type.HasFlag(ConvertHitObjectType.Hold))
-                {
-                    // Note: Hold is generated by BMS converts
-
-                    double endTime = Math.Max(startTime, Parsing.ParseDouble(split[2]));
-
-                    if (split.Length > 5 && !string.IsNullOrEmpty(split[5]))
                     {
-                        string[] ss = split[5].Split(':');
-                        endTime = Math.Max(startTime, Parsing.ParseDouble(ss[0]));
-                        readCustomSampleBanks(string.Join(":", ss.Skip(1)), bankInfo);
+                        if (i >= sets.Length)
+                            break;
+
+                        SampleBankInfo info = nodeBankInfos[i];
+                        readCustomSampleBanks(sets[i], info);
                     }
-
-                    result = CreateHold(pos, combo, comboOffset, endTime + Offset);
                 }
 
-                if (result == null)
+                // Populate node sound types with the default hit object sound type
+                var nodeSoundTypes = new List<LegacySoundType>();
+                for (int i = 0; i < nodes; i++)
+                    nodeSoundTypes.Add(soundType);
+
+                // Read any per-node sound types
+                if (split.Length > 8 && split[8].Length > 0)
                 {
-                    Logger.Log($"Unknown hit object type: {type}. Skipped.", level: LogLevel.Error);
-                    return null;
+                    string[] adds = split[8].Split('|');
+
+                    for (int i = 0; i < nodes; i++)
+                    {
+                        if (i >= adds.Length)
+                            break;
+
+                        int sound;
+                        int.TryParse(adds[i], out sound);
+                        nodeSoundTypes[i] = (LegacySoundType)sound;
+                    }
                 }
 
-                result.StartTime = startTime;
+                // Generate the final per-node samples
+                var nodeSamples = new List<List<HitSampleInfo>>(nodes);
+                for (int i = 0; i < nodes; i++)
+                    nodeSamples.Add(convertSoundType(nodeSoundTypes[i], nodeBankInfos[i]));
 
-                if (result.Samples.Count == 0)
-                    result.Samples = convertSoundType(soundType, bankInfo);
+                result = CreateSlider(pos, combo, comboOffset, points, length, pathType, repeatCount, nodeSamples);
 
-                FirstObject = false;
-
-                return result;
+                // The samples are played when the slider ends, which is the last node
+                result.Samples = nodeSamples[nodeSamples.Count - 1];
             }
-            catch (FormatException)
+            else if (type.HasFlag(ConvertHitObjectType.Spinner))
             {
-                Logger.Log("A hitobject could not be parsed correctly and will be ignored", LoggingTarget.Runtime, LogLevel.Important);
+                double endTime = Math.Max(startTime, Parsing.ParseDouble(split[5]) + Offset);
+
+                result = CreateSpinner(new Vector2(512, 384) / 2, combo, comboOffset, endTime);
+
+                if (split.Length > 6)
+                    readCustomSampleBanks(split[6], bankInfo);
             }
-            catch (OverflowException)
+            else if (type.HasFlag(ConvertHitObjectType.Hold))
             {
-                Logger.Log("A hitobject could not be parsed correctly and will be ignored", LoggingTarget.Runtime, LogLevel.Important);
+                // Note: Hold is generated by BMS converts
+
+                double endTime = Math.Max(startTime, Parsing.ParseDouble(split[2]));
+
+                if (split.Length > 5 && !string.IsNullOrEmpty(split[5]))
+                {
+                    string[] ss = split[5].Split(':');
+                    endTime = Math.Max(startTime, Parsing.ParseDouble(ss[0]));
+                    readCustomSampleBanks(string.Join(":", ss.Skip(1)), bankInfo);
+                }
+
+                result = CreateHold(pos, combo, comboOffset, endTime + Offset);
             }
 
-            return null;
+            if (result == null)
+                throw new InvalidDataException($"Unknown hit object type: {split[3]}");
+
+            result.StartTime = startTime;
+
+            if (result.Samples.Count == 0)
+                result.Samples = convertSoundType(soundType, bankInfo);
+
+            FirstObject = false;
+
+            return result;
         }
 
         private void readCustomSampleBanks(string str, SampleBankInfo bankInfo)

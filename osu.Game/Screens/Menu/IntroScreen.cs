@@ -28,11 +28,18 @@ namespace osu.Game.Screens.Menu
 
         private Bindable<bool> menuVoice;
 
+        private LeasedBindable<WorkingBeatmap> beatmap;
+
+        public new Bindable<WorkingBeatmap> Beatmap => beatmap;
+
         protected override BackgroundScreen CreateBackground() => new BackgroundScreenBlack();
 
         [BackgroundDependencyLoader]
         private void load(OsuConfigManager config, BeatmapManager beatmaps, Framework.Game game)
         {
+            // prevent user from changing beatmap while the intro is still runnning.
+            beatmap = base.Beatmap.BeginLease(false);
+
             menuVoice = config.GetBindable<bool>(OsuSetting.MenuVoice);
             seeya = audio.Samples.Get(@"seeya");
         }
@@ -107,6 +114,8 @@ namespace osu.Game.Screens.Menu
 
         protected void LoadMenu()
         {
+            beatmap.Return();
+
             DidLoadMenu = true;
             this.Push(mainMenu);
         }

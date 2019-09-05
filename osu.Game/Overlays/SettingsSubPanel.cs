@@ -57,7 +57,6 @@ namespace osu.Game.Overlays
                             {
                                 Anchor = Anchor.Centre,
                                 Origin = Anchor.Centre,
-                                Y = -15,
                                 Size = new Vector2(15),
                                 Shadow = true,
                                 Icon = FontAwesome.Solid.ChevronLeft

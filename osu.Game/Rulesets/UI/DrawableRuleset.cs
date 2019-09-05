@@ -13,10 +13,15 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
+using JetBrains.Annotations;
+using osu.Framework.Audio;
+using osu.Framework.Audio.Track;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics.Cursor;
+using osu.Framework.Graphics.Textures;
 using osu.Framework.Input;
 using osu.Framework.Input.Events;
+using osu.Framework.IO.Stores;
 using osu.Game.Configuration;
 using osu.Game.Graphics.Cursor;
 using osu.Game.Input.Handlers;
@@ -50,6 +55,10 @@ namespace osu.Game.Rulesets.UI
 
         private readonly Lazy<Playfield> playfield;
 
+        private TextureStore textureStore;
+
+        private ISampleStore sampleStore;
+
         /// <summary>
         /// The playfield.
         /// </summary>
@@ -61,6 +70,22 @@ namespace osu.Game.Rulesets.UI
         public Container Overlays { get; private set; }
 
         public override GameplayClock FrameStableClock => frameStabilityContainer.GameplayClock;
+
+        private bool frameStablePlayback = true;
+
+        /// <summary>
+        /// Whether to enable frame-stable playback.
+        /// </summary>
+        internal bool FrameStablePlayback
+        {
+            get => frameStablePlayback;
+            set
+            {
+                frameStablePlayback = false;
+                if (frameStabilityContainer != null)
+                    frameStabilityContainer.FrameStablePlayback = value;
+            }
+        }
 
         /// <summary>
         /// Invoked when a <see cref="JudgementResult"/> has been applied by a <see cref="DrawableHitObject"/>.
@@ -97,7 +122,7 @@ namespace osu.Game.Rulesets.UI
         /// <param name="ruleset">The ruleset being represented.</param>
         /// <param name="workingBeatmap">The beatmap to create the hit renderer for.</param>
         /// <param name="mods">The <see cref="Mod"/>s to apply.</param>
-        protected DrawableRuleset(Ruleset ruleset, WorkingBeatmap workingBeatmap, IReadOnlyList<Mod> mods)
+        protected DrawableRuleset(Ruleset ruleset, IWorkingBeatmap workingBeatmap, IReadOnlyList<Mod> mods)
             : base(ruleset)
         {
             if (workingBeatmap == null)
@@ -108,8 +133,6 @@ namespace osu.Game.Rulesets.UI
             RelativeSizeAxes = Axes.Both;
 
             Beatmap = (Beatmap<TObject>)workingBeatmap.GetPlayableBeatmap(ruleset.RulesetInfo, mods);
-
-            applyBeatmapMods(mods);
 
             KeyBindingInputManager = CreateInputManager();
             playfield = new Lazy<Playfield>(CreatePlayfield);
@@ -126,6 +149,18 @@ namespace osu.Game.Rulesets.UI
         protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
         {
             var dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
+
+            var resources = Ruleset.CreateReourceStore();
+
+            if (resources != null)
+            {
+                textureStore = new TextureStore(new TextureLoaderStore(new NamespacedResourceStore<byte[]>(resources, "Textures")));
+                textureStore.AddStore(dependencies.Get<TextureStore>());
+                dependencies.Cache(textureStore);
+
+                sampleStore = dependencies.Get<AudioManager>().GetSampleStore(new NamespacedResourceStore<byte[]>(resources, "Samples"));
+                dependencies.CacheAs(sampleStore);
+            }
 
             onScreenDisplay = dependencies.Get<OnScreenDisplay>();
 
@@ -149,6 +184,7 @@ namespace osu.Game.Rulesets.UI
             {
                 frameStabilityContainer = new FrameStabilityContainer(GameplayStartTime)
                 {
+                    FrameStablePlayback = FrameStablePlayback,
                     Child = KeyBindingInputManager
                         .WithChild(CreatePlayfieldAdjustmentContainer()
                             .WithChild(Playfield)
@@ -199,10 +235,6 @@ namespace osu.Game.Rulesets.UI
             else
                 continueResume();
         }
-
-        public ResumeOverlay ResumeOverlay { get; private set; }
-
-        protected virtual ResumeOverlay CreateResumeOverlay() => null;
 
         /// <summary>
         /// Creates and adds the visual representation of a <see cref="TObject"/> to this <see cref="DrawableRuleset{TObject}"/>.
@@ -268,19 +300,6 @@ namespace osu.Game.Rulesets.UI
         protected abstract Playfield CreatePlayfield();
 
         public override ScoreProcessor CreateScoreProcessor() => new ScoreProcessor<TObject>(this);
-
-        /// <summary>
-        /// Applies the active mods to the Beatmap.
-        /// </summary>
-        /// <param name="mods"></param>
-        private void applyBeatmapMods(IReadOnlyList<Mod> mods)
-        {
-            if (mods == null)
-                return;
-
-            foreach (var mod in mods.OfType<IApplicableToBeatmap<TObject>>())
-                mod.ApplyToBeatmap(Beatmap);
-        }
 
         /// <summary>
         /// Applies the active mods to this DrawableRuleset.
@@ -386,6 +405,35 @@ namespace osu.Game.Rulesets.UI
         /// The cursor being displayed by the <see cref="Playfield"/>. May be null if no cursor is provided.
         /// </summary>
         public abstract GameplayCursorContainer Cursor { get; }
+
+        /// <summary>
+        /// An optional overlay used when resuming gameplay from a paused state.
+        /// </summary>
+        public ResumeOverlay ResumeOverlay { get; protected set; }
+
+        /// <summary>
+        /// Returns first available <see cref="HitWindows"/> provided by a <see cref="HitObject"/>.
+        /// </summary>
+        [CanBeNull]
+        public HitWindows FirstAvailableHitWindows
+        {
+            get
+            {
+                foreach (var h in Objects)
+                {
+                    if (h.HitWindows != null)
+                        return h.HitWindows;
+
+                    foreach (var n in h.NestedHitObjects)
+                        if (n.HitWindows != null)
+                            return n.HitWindows;
+                }
+
+                return null;
+            }
+        }
+
+        protected virtual ResumeOverlay CreateResumeOverlay() => null;
 
         /// <summary>
         /// Sets a replay to be used, overriding local input.
