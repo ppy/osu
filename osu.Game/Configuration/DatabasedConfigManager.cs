@@ -43,12 +43,9 @@ namespace osu.Game.Configuration
         {
             lock (dirtySettings)
             {
-                if (dirtySettings.Count > 0)
-                {
-                    foreach (var setting in dirtySettings)
-                        settings.Update(setting);
-                    dirtySettings.Clear();
-                }
+                foreach (var setting in dirtySettings)
+                    settings.Update(setting);
+                dirtySettings.Clear();
             }
 
             return true;
