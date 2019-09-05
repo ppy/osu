@@ -25,7 +25,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
         private const double totalValueExponent = 1.5;
         private const double comboWeight = 0.5;
-
+        private const double skillToPPExponent = 2.55;
 
         private readonly int countHitCircles;
         private readonly int countSliders;
@@ -245,7 +245,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             double deviationOnCircles = (79.5 - 6 * Attributes.OverallDifficulty) /
                                         (Math.Sqrt(2) * SpecialFunctions.ErfInv(accOnCirclesPositive));
-            double deviationAccValue = Math.Pow(deviationOnCircles, -2.55) * 30000;
+            double deviationAccValue = Math.Pow(deviationOnCircles, -skillToPPExponent) * 30000;
 
             // apply a soft cap on accuracy value so that it will not skyrocket
             double adjustedDeviationAccValue = Math.Log(1 + deviationAccValue / softCap) * softCap;
@@ -270,9 +270,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             return modifiedAcc;
         }
 
-        private double tpToPP(double tp) => Math.Pow(tp, 2.55) * 0.1815;
+        private double tpToPP(double tp) => Math.Pow(tp, skillToPPExponent) * 0.1815;
 
-        private double tapSkillToPP(double tapSkill) => Math.Pow(tapSkill * 0.96, 2.55) * 0.37;
+        private double tapSkillToPP(double tapSkill) => Math.Pow(tapSkill * 0.96, skillToPPExponent) * 0.37;
 
         private double totalHits => countGreat + countGood + countMeh + countMiss;
         private double totalSuccessfulHits => countGreat + countGood + countMeh;
