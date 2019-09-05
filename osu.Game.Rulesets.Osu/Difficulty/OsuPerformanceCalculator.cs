@@ -234,7 +234,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         {
             double mapAimValue = tpToPP(Attributes.MissTPs[0]);
             double mapSpeedValue = tapSkillToPP(Attributes.TapDiff);
-            double softCap = Mean.PowerMean(mapAimValue, mapSpeedValue, 3) * 1.2;
+            double softCap = Mean.PowerMean(mapAimValue, mapSpeedValue, 3) * 1.3;
 
             double modifiedAcc = getModifiedAcc();
             double accOnCircles = 1 - (1 - modifiedAcc) * Beatmap.HitObjects.Count / countHitCircles;
@@ -245,7 +245,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             double deviationOnCircles = (79.5 - 6 * Attributes.OverallDifficulty) /
                                         (Math.Sqrt(2) * SpecialFunctions.ErfInv(accOnCirclesPositive));
-            double deviationAccValue = Math.Pow(deviationOnCircles, -skillToPPExponent) * 39334;
+            double deviationAccValue = Math.Pow(deviationOnCircles, -skillToPPExponent) * 50000;
 
             // apply a soft cap on accuracy value so that it will not skyrocket
             double adjustedDeviationAccValue = Math.Log(1 + deviationAccValue / softCap) * softCap;
@@ -253,7 +253,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             // another algorithm that only focuses on acc instead of acc and od
             double percentageAccValue = Math.Exp((accOnCircles - 1) * 20) * softCap;
 
-            return Math.Pow(adjustedDeviationAccValue, 0.4) * Math.Pow(percentageAccValue, 0.6);
+            double lengthFactor = SpecialFunctions.Logistic(Attributes.Length / 60.0f);
+
+            return Math.Pow(adjustedDeviationAccValue, 0.4) * Math.Pow(percentageAccValue, 0.6) * lengthFactor;
         }
 
         private double getModifiedAcc()

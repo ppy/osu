@@ -22,6 +22,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         public double[] CheeseLevels;
         public double[] CheeseFactors;
 
+        public double Length;
         public double ApproachRate;
         public double OverallDifficulty;
         public int MaxCombo;

@@ -41,8 +41,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             if (beatmap.HitObjects.Count == 0)
                 return new OsuDifficultyAttributes { Mods = mods};
 
-            double mapLength = (beatmap.HitObjects.Last().StartTime - beatmap.HitObjects.First().StartTime) / 1000;
-
+            double mapLength = (beatmap.HitObjects.Last().StartTime - beatmap.HitObjects.First().StartTime) / 1000 / clockRate;
 
             // Tap
             (var tapDiff, var streamNoteCount, var mashLevels, var tapSkills, var strainHistory) =
@@ -71,6 +70,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             {
                 StarRating = sr,
                 Mods = mods,
+                Length = mapLength,
 
                 TapSR = tapSR,
                 TapDiff = tapDiff,
