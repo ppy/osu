@@ -87,7 +87,7 @@ namespace osu.Game.Rulesets.Catch.Tests
             {
                 switch (component.LookupName)
                 {
-                    case "Gameplay/Catch/fruit-catcher-idle":
+                    case "Gameplay/catch/fruit-catcher-idle":
                         return new CatcherCustomSkin();
                 }
 
