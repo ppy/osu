@@ -57,7 +57,7 @@ namespace osu.Game.Rulesets.UI
 
         private TextureStore textureStore;
 
-        private ISampleStore sampleStore;
+        private ISampleStore localSampleStore;
 
         /// <summary>
         /// The playfield.
@@ -158,8 +158,8 @@ namespace osu.Game.Rulesets.UI
                 textureStore.AddStore(dependencies.Get<TextureStore>());
                 dependencies.Cache(textureStore);
 
-                sampleStore = dependencies.Get<AudioManager>().GetSampleStore(new NamespacedResourceStore<byte[]>(resources, "Samples"));
-                dependencies.CacheAs(sampleStore);
+                localSampleStore = dependencies.Get<AudioManager>().GetSampleStore(new NamespacedResourceStore<byte[]>(resources, "Samples"));
+                dependencies.CacheAs(new FallbackSampleStore(localSampleStore, dependencies.Get<ISampleStore>()));
             }
 
             onScreenDisplay = dependencies.Get<OnScreenDisplay>();
@@ -333,6 +333,8 @@ namespace osu.Game.Rulesets.UI
         protected override void Dispose(bool isDisposing)
         {
             base.Dispose(isDisposing);
+
+            localSampleStore?.Dispose();
 
             if (Config != null)
             {
