@@ -128,18 +128,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             double tp = Math.Pow(comboTP, comboWeight) * Math.Pow(missTP, 1 - comboWeight);
 
 
-            // Scale tp according to cheese level and acc
-            // Treat 300 as 300, 100 as 200, 50 as 100
-            // add 1 to denominator so that later erf gives resonable result
-            double modifiedAcc;
-            if (countHitCircles > 0)
-                modifiedAcc = ((countGreat - (totalHits - countHitCircles)) * 3 + countGood * 2 + countMeh) /
-                              ((countHitCircles * 3) + 1);
-            else
-                modifiedAcc = 0;
+            double modifiedAcc = getModifiedAcc();
 
             // Assume SS for non-stream parts
-            double accOnCheeseNotes = 1 - (1 - modifiedAcc) * countHitCircles / Attributes.StreamNoteCount;
+            double accOnCheeseNotes = 1 - (1 - modifiedAcc) * Math.Sqrt(countHitCircles / Attributes.CheeseNoteCount);
 
             // accOnStreams can be negative. The formula below ensures a positive acc while
             // preserving the value when accOnStreams is close to 1
@@ -148,7 +140,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             double urOnCheeseNotes = 10 * (80 - 6 * Attributes.OverallDifficulty) /
                                  (Math.Sqrt(2) * SpecialFunctions.ErfInv(accOnCheeseNotesPositive));
 
-            double cheeseLevel = SpecialFunctions.Logistic(((urOnCheeseNotes * Attributes.AimDiff) - 2800) / 300);
+            double cheeseLevel = SpecialFunctions.Logistic(((urOnCheeseNotes * Attributes.AimDiff) - 3600) / 1200);
 
             double cheeseFactor = LinearSpline.InterpolateSorted(Attributes.CheeseLevels, Attributes.CheeseFactors)
                                   .Interpolate(cheeseLevel);
