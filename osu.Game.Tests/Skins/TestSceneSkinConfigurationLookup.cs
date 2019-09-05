@@ -95,6 +95,25 @@ namespace osu.Game.Tests.Skins
             AddAssert("Check combo colours", () => requester.GetConfig<GlobalSkinConfiguration, List<Color4>>(GlobalSkinConfiguration.ComboColours)?.Value?.Count > 0);
         }
 
+        [Test]
+        public void TestWrongColourType()
+        {
+            AddStep("Add config colour", () => { source1.Configuration.CustomColours["Lookup"] = Color4.Red; });
+
+            AddAssert("perform incorrect lookup", () =>
+            {
+                try
+                {
+                    requester.GetConfig<SkinCustomColourLookup, int>(new SkinCustomColourLookup("Lookup"));
+                    return false;
+                }
+                catch
+                {
+                    return true;
+                }
+            });
+        }
+
         public enum LookupType
         {
             Test

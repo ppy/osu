@@ -62,16 +62,16 @@ namespace osu.Game.Skinning
                     switch (global)
                     {
                         case GlobalSkinConfiguration.ComboColours:
-                            return new Bindable<List<Color4>>(Configuration.ComboColours) as IBindable<TValue>;
+                            return SkinUtils.As<TValue>(new Bindable<List<Color4>>(Configuration.ComboColours));
                     }
 
                     break;
 
                 case GlobalSkinColour colour:
-                    return getCustomColour(colour.ToString()) as IBindable<TValue>;
+                    return SkinUtils.As<TValue>(getCustomColour(colour.ToString()));
 
                 case SkinCustomColourLookup customColour:
-                    return getCustomColour(customColour.Lookup.ToString()) as IBindable<TValue>;
+                    return SkinUtils.As<TValue>(getCustomColour(customColour.Lookup.ToString()));
 
                 default:
                     try

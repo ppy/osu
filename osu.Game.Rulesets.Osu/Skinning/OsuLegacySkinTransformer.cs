@@ -111,7 +111,7 @@ namespace osu.Game.Rulesets.Osu.Skinning
                     {
                         case OsuSkinConfiguration.SliderPathRadius:
                             if (hasHitCircle.Value)
-                                return new BindableFloat(legacy_circle_radius) as Bindable<TValue>;
+                                return SkinUtils.As<TValue>(new BindableFloat(legacy_circle_radius));
 
                             break;
                     }
