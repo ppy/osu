@@ -27,6 +27,8 @@ namespace osu.Game.Tests.Visual.Online
             typeof(Comments),
         };
 
+        protected override bool RequiresAPIAccess => true;
+
         protected override void LoadComplete()
         {
             base.LoadComplete();
