@@ -66,7 +66,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 return 0;
 
             // Custom multipliers for NoFail and SpunOut.
-            double multiplier = 1.7; // This is being adjusted to keep the final pp value scaled around what it used to be when changing things
+            double multiplier = 2; // This is being adjusted to keep the final pp value scaled around what it used to be when changing things
 
             if (mods.Any(m => m is OsuModNoFail))
                 multiplier *= 0.90f;
@@ -77,6 +77,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             double aimValue = computeAimValue();
             double speedValue = computeSpeedValue();
             double accuracyValue = computeAccuracyValue();
+
+            
+            //Console.WriteLine(accuracyValue);
+            //Console.WriteLine(adjustedAccuracyValue);
 
             double totalValue = Mean.PowerMean(new double[] { aimValue, speedValue, accuracyValue }, totalValueExponent) * multiplier;
 
@@ -176,7 +180,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             // Scale the aim value down slightly with accuracy
             double accLeniency = (80 - 6 * Attributes.OverallDifficulty) * Attributes.AimDiff / 300;
             double accPenalty = (SpecialFunctions.Logistic((accuracy-0.94) * (-200.0/3)) - SpecialFunctions.Logistic(-4)) *
-                                Math.Pow(accLeniency, 2) * 0.05;
+                                Math.Pow(accLeniency, 2) * 0.1;
 
             aimValue *= Math.Exp(-accPenalty);
 
@@ -185,15 +189,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
         private double computeSpeedValue()
         {
-            // Treat 300 as 300, 100 as 200, 50 as 100
-            // add 1 to denominator so that later erf gives resonable result
-            double modifiedAcc;
-            if (countHitCircles > 0)
-                modifiedAcc = ((countGreat - (totalHits - countHitCircles)) * 3 + countGood * 2 + countMeh) /
-                              ((countHitCircles * 3) + 1);
-            else
-                modifiedAcc = 0;
-                
+
+            double modifiedAcc = getModifiedAcc();
+
             // Assume SS for non-stream parts
             double accOnStreams = 1 - (1 - modifiedAcc) * countHitCircles / Attributes.StreamNoteCount;
 
@@ -206,15 +204,16 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             double mashLevel = SpecialFunctions.Logistic(((urOnStreams * Attributes.TapDiff) - 2700) / 600);
             
-
-
             double tapSkill = LinearSpline.InterpolateSorted(Attributes.MashLevels, Attributes.TapSkills)
                               .Interpolate(mashLevel);
 
+            double tapValue = tapSkillToPP(tapSkill);
 
-
-            double tapValue = Math.Pow(tapSkill * 0.96, 2.55) * 0.37;
-
+            // Buff high acc
+            double accBuffLevel = (1 - SpecialFunctions.Logistic(((urOnStreams * Attributes.TapDiff) - 1000) / 500)) /
+                                  SpecialFunctions.Logistic(1000.0 / 500);
+            accBuffLevel = Math.Pow(accBuffLevel, 2) * 1.2;
+            tapValue *= 1 + accBuffLevel;
 
             // Penalize misses exponentially. This mainly fixes tag4 maps and the likes until a per-hitobject solution is available
             tapValue *= Math.Pow(0.97f, countMiss);
@@ -231,51 +230,49 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             return tapValue;
         }
 
-        private double computeAccuracyValue(Dictionary<string, double> categoryRatings = null)
+        private double computeAccuracyValue()
         {
-            double sigmaCircle = 0;
-            double sigmaSlider = 0;
-            double sigma = 0;
+            double mapAimValue = tpToPP(Attributes.MissTPs[0]);
+            double mapSpeedValue = tapSkillToPP(Attributes.TapDiff);
+            double softCap = Mean.PowerMean(mapAimValue, mapSpeedValue, 3) * 1.2;
 
-            double zScore = 2.58f;
-            double sqrt2 = Math.Sqrt(2.0f);
-            double accMultiplier = 2000.0f;
-            double accScale = 1.14f;
+            double modifiedAcc = getModifiedAcc();
+            double accOnCircles = 1 - (1 - modifiedAcc) * Beatmap.HitObjects.Count / countHitCircles;
 
-            // Slider sigma calculations
-            if (countSliders > 0)
-            {
-                double sliderConst = Math.Sqrt(2.0f / countSliders) * zScore;
-                double sliderProbability = (2.0f * accuracy + Math.Pow(sliderConst, 2.0f) - sliderConst * Math.Sqrt(4.0f * accuracy + Math.Pow(sliderConst, 2.0f) - 4.0f * Math.Pow(accuracy, 2.0f))) / (2.0f + 2.0f * Math.Pow(sliderConst, 2.0f));
-                sigmaSlider = (199.5f - 10.0f * Attributes.OverallDifficulty) / (sqrt2 * SpecialFunctions.ErfInv(sliderProbability));
-            }
-            
+            // accOnCircles can be negative. The formula below ensures a positive acc while
+            // preserving the value when accOnCircles is close to 1
+            double accOnCirclesPositive = Math.Exp(accOnCircles - 1);
 
-            // Circle sigma calculations
+            double deviationOnCircles = (79.5 - 6 * Attributes.OverallDifficulty) /
+                                        (Math.Sqrt(2) * SpecialFunctions.ErfInv(accOnCirclesPositive));
+            double deviationAccValue = Math.Pow(deviationOnCircles, -2.55) * 30000;
+
+            // apply a soft cap on accuracy value so that it will not skyrocket
+            double adjustedDeviationAccValue = Math.Log(1 + deviationAccValue / softCap) * softCap;
+
+            // another algorithm that only focuses on acc instead of acc and od
+            double percentageAccValue = Math.Exp((accOnCircles - 1) * 20) * softCap;
+
+            return Math.Pow(adjustedDeviationAccValue, 0.4) * Math.Pow(percentageAccValue, 0.6);
+        }
+
+        private double getModifiedAcc()
+        {
+            // Treat 300 as 300, 100 as 200, 50 as 100
+            // add 1 to denominator so that later erf gives resonable result
+            double modifiedAcc;
             if (countHitCircles > 0)
-            {
-                double circleConst = Math.Sqrt(2.0f / countHitCircles) * zScore;
-                double circleProbability = (2.0f * accuracy + Math.Pow(circleConst, 2.0f) - circleConst * Math.Sqrt(4.0f * accuracy + Math.Pow(circleConst, 2.0f) - 4.0f * Math.Pow(accuracy, 2.0f))) / (2.0f + 2.0f * Math.Pow(circleConst, 2.0f));
-                sigmaCircle = (79.5f - 6.0f * Attributes.OverallDifficulty) / (sqrt2 * SpecialFunctions.ErfInv(circleProbability));
-            }
-
-
-            if (sigmaSlider == 0)
-                sigma = sigmaCircle;
-            else if (sigmaCircle == 0)
-                sigma = sigmaSlider;
+                modifiedAcc = ((countGreat - (totalHits - countHitCircles)) * 3 + countGood * 2 + countMeh) /
+                              ((countHitCircles + 1) * 3);
             else
-                sigma = 2.0f / (1.0f / sigmaCircle + 1.0f / sigmaSlider);
+                modifiedAcc = 0;
 
-            double accValue = accMultiplier * Math.Pow(accScale, -sigma);
-
-            if (mods.Any(m => m is OsuModHidden))
-                accValue *= 1.1f;
-
-            return accValue;
+            return modifiedAcc;
         }
 
         private double tpToPP(double tp) => Math.Pow(tp, 2.55) * 0.1815;
+
+        private double tapSkillToPP(double tapSkill) => Math.Pow(tapSkill * 0.96, 2.55) * 0.37;
 
         private double totalHits => countGreat + countGood + countMeh + countMiss;
         private double totalSuccessfulHits => countGreat + countGood + countMeh;
