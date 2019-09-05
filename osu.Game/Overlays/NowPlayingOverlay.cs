@@ -351,7 +351,6 @@ namespace osu.Game.Overlays
                 RelativeSizeAxes = Axes.Both;
 
                 CacheDrawnFrameBuffer = true;
-                RedrawOnScale = false;
 
                 Children = new Drawable[]
                 {
