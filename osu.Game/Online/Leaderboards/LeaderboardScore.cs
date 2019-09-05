@@ -193,6 +193,7 @@ namespace osu.Game.Online.Leaderboards
                                             GlowColour = OsuColour.FromHex(@"83ccfa"),
                                             Text = score.TotalScore.ToString(@"N0"),
                                             Font = OsuFont.Numeric.With(size: 23),
+                                            RedrawOnScale = false,
                                         },
                                         RankContainer = new Container
                                         {
@@ -338,6 +339,7 @@ namespace osu.Game.Online.Leaderboards
                             GlowColour = OsuColour.FromHex(@"83ccfa"),
                             Text = statistic.Value,
                             Font = OsuFont.GetFont(size: 17, weight: FontWeight.Bold),
+                            RedrawOnScale = false
                         },
                     },
                 };

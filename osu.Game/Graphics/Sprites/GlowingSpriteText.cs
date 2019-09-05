@@ -12,6 +12,7 @@ namespace osu.Game.Graphics.Sprites
     public class GlowingSpriteText : Container, IHasText
     {
         private readonly OsuSpriteText spriteText, blurredText;
+        private readonly BufferedContainer buffer;
 
         public string Text
         {
@@ -43,13 +44,19 @@ namespace osu.Game.Graphics.Sprites
             set => blurredText.Colour = value;
         }
 
+        public bool RedrawOnScale
+        {
+            get => buffer.RedrawOnScale;
+            set => buffer.RedrawOnScale = value;
+        }
+
         public GlowingSpriteText()
         {
             AutoSizeAxes = Axes.Both;
 
             Children = new Drawable[]
             {
-                new BufferedContainer
+                buffer = new BufferedContainer
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
