@@ -103,6 +103,10 @@ Note that while we already have certain standards in place, nothing is set in st
 
 For those interested, we love to reward quality contributions via [bounties](https://docs.google.com/spreadsheets/d/1jNXfj_S3Pb5PErA-czDdC9DUu4IgUbe1Lt8E7CYUJuE/view?&rm=minimal#gid=523803337), paid out via paypal or osu! supporter tags. Don't hesitate to [request a bounty](https://docs.google.com/forms/d/e/1FAIpQLSet_8iFAgPMG526pBZ2Kic6HSh7XPM3fE8xPcnWNkMzINDdYg/viewform) for your work on this project.
 
+## Community stuff
+
+We want to encourage you to create your stuff on top of Lazer code base. If you want to create custom ruleset (that's how we call game mode here), go check how do existing rulesets work and are built or head to [osu templates repository](https://github.com/ppy/osu-templates) for simple example ruleset and template of empty scrolling ruleset. If you want to create custom mod see how other mods work. 
+
 ## Licence
 
 The osu! client code and framework are licensed under the [MIT licence](https://opensource.org/licenses/MIT). Please see [the licence file](LICENCE) for more information. [tl;dr](https://tldrlegal.com/license/mit-license) you can do whatever you want as long as you include the original copyright and license notice in any copy of the software/source.
