@@ -90,9 +90,12 @@ namespace osu.Game.Configuration
             bindable.ValueChanged += b =>
             {
                 setting.Value = b.NewValue;
+
                 lock (dirtySettings)
+                {
                     if (!dirtySettings.Contains(setting))
                         dirtySettings.Add(setting);
+                }
             };
         }
     }
