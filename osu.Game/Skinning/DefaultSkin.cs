@@ -1,11 +1,13 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Collections.Generic;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Textures;
 using osu.Game.Audio;
+using osuTK.Graphics;
 
 namespace osu.Game.Skinning
 {
@@ -23,6 +25,21 @@ namespace osu.Game.Skinning
 
         public override SampleChannel GetSample(ISampleInfo sampleInfo) => null;
 
-        public override IBindable<TValue> GetConfig<TLookup, TValue>(TLookup lookup) => null;
+        public override IBindable<TValue> GetConfig<TLookup, TValue>(TLookup lookup)
+        {
+            switch (lookup)
+            {
+                case GlobalSkinConfiguration global:
+                    switch (global)
+                    {
+                        case GlobalSkinConfiguration.ComboColours:
+                            return SkinUtils.As<TValue>(new Bindable<List<Color4>>(Configuration.ComboColours));
+                    }
+
+                    break;
+            }
+
+            return null;
+        }
     }
 }
