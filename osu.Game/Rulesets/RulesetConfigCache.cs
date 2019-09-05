@@ -36,5 +36,13 @@ namespace osu.Game.Rulesets
 
             return configCache.GetOrAdd(ruleset.RulesetInfo.ID.Value, _ => ruleset.CreateConfig(settingsStore));
         }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+
+            foreach (var c in configCache.Values)
+                (c as IDisposable)?.Dispose();
+        }
     }
 }
