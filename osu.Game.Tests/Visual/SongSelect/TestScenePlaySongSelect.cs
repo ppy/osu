@@ -97,9 +97,9 @@ namespace osu.Game.Tests.Visual.SongSelect
         public void TestDummy()
         {
             createSongSelect();
-            AddAssert("dummy selected", () => songSelect.CurrentBeatmap == defaultBeatmap);
+            AddAssert("no beatmaps selected", () => songSelect.CurrentBeatmap == defaultBeatmap);
 
-            AddUntilStep("dummy shown on wedge", () => songSelect.CurrentBeatmapDetailsBeatmap == defaultBeatmap);
+            AddUntilStep("no beatmaps shown on wedge", () => songSelect.CurrentBeatmapDetailsBeatmap == defaultBeatmap);
 
             addManyTestMaps();
             AddWaitStep("wait for select", 3);
