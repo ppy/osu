@@ -41,6 +41,7 @@ namespace osu.Game.Rulesets
         {
             base.Dispose(isDisposing);
 
+            // ensures any potential database operations are finalised before game destruction.
             foreach (var c in configCache.Values)
                 (c as IDisposable)?.Dispose();
         }
