@@ -19,14 +19,13 @@ namespace osu.Game.Beatmaps
     {
         private readonly TextureStore textures;
 
+        protected virtual string Name => "dummy beatmap";
+        protected virtual string Description => "";
+
         public DummyWorkingBeatmap(AudioManager audio, TextureStore textures)
             : base(new BeatmapInfo
             {
-                Metadata = new BeatmapMetadata
-                {
-                    Artist = "please load a beatmap!",
-                    Title = "no beatmaps available!"
-                },
+                Metadata = new BeatmapMetadata(),
                 BeatmapSet = new BeatmapSetInfo(),
                 BaseDifficulty = new BeatmapDifficulty
                 {
@@ -37,6 +36,9 @@ namespace osu.Game.Beatmaps
                 Ruleset = new DummyRulesetInfo()
             }, audio)
         {
+            Metadata.Title = Name;
+            Metadata.Artist = Description;
+
             this.textures = textures;
         }
 
