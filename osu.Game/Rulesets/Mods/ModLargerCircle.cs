@@ -13,13 +13,13 @@ namespace osu.Game.Rulesets.Mods
         public override string Acronym => "LC";
         public override IconUsage Icon => FontAwesome.Solid.ChevronCircleUp;
         public override ModType Type => ModType.DifficultyReduction;
-        public override double ScoreMultiplier => 1.0;
+        public override double ScoreMultiplier => 0.75;
         public override bool Ranked => true;
         public override Type[] IncompatibleMods => new[] { typeof(ModHardRock) };
 
         public void ApplyToDifficulty(BeatmapDifficulty difficulty)
         {
-            const int ratio = 1;
+            const float ratio = 0.25f;
             difficulty.CircleSize *= ratio;
         }
     }
