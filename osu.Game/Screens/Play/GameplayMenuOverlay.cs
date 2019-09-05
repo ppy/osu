@@ -304,6 +304,9 @@ namespace osu.Game.Screens.Play
 
         private class Button : DialogButton
         {
+            // required to ensure keyboard navigation always starts from an extremity (unless the cursor is moved)
+            protected override bool OnHover(HoverEvent e) => true;
+
             protected override bool OnMouseMove(MouseMoveEvent e)
             {
                 Selected.Value = true;
