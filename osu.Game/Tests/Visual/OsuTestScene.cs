@@ -50,7 +50,7 @@ namespace osu.Game.Tests.Visual
         protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
         {
             // This is the earliest we can get OsuGameBase, which is used by the dummy working beatmap to find textures
-            var working = new DummyWorkingBeatmap(parent.Get<AudioManager>(), parent.Get<TextureStore>());
+            var working = new NoBeatmapsAvailableWorkingBeatmap(parent.Get<AudioManager>(), parent.Get<TextureStore>());
 
             beatmap = new OsuTestBeatmap(working)
             {
