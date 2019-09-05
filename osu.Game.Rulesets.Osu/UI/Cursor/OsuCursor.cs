@@ -10,6 +10,7 @@ using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
+using osu.Game.Rulesets.Osu.Skinning;
 using osu.Game.Skinning;
 using osuTK;
 using osuTK.Graphics;
@@ -38,7 +39,7 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
 
         protected override void SkinChanged(ISkinSource skin, bool allowFallback)
         {
-            cursorExpand = skin.GetValue<SkinConfiguration, bool>(s => s.CursorExpand ?? true);
+            cursorExpand = skin.GetConfig<OsuSkinConfiguration, bool>(OsuSkinConfiguration.CursorExpand)?.Value ?? true;
         }
 
         [BackgroundDependencyLoader]
