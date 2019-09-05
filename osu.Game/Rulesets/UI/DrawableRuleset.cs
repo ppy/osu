@@ -14,10 +14,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using JetBrains.Annotations;
+using osu.Framework.Audio;
+using osu.Framework.Audio.Track;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics.Cursor;
+using osu.Framework.Graphics.Textures;
 using osu.Framework.Input;
 using osu.Framework.Input.Events;
+using osu.Framework.IO.Stores;
 using osu.Game.Configuration;
 using osu.Game.Graphics.Cursor;
 using osu.Game.Input.Handlers;
@@ -50,6 +54,10 @@ namespace osu.Game.Rulesets.UI
         public override double GameplayStartTime => Objects.First().StartTime - 2000;
 
         private readonly Lazy<Playfield> playfield;
+
+        private TextureStore textureStore;
+
+        private ISampleStore sampleStore;
 
         /// <summary>
         /// The playfield.
@@ -141,6 +149,18 @@ namespace osu.Game.Rulesets.UI
         protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
         {
             var dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
+
+            var resources = Ruleset.CreateReourceStore();
+
+            if (resources != null)
+            {
+                textureStore = new TextureStore(new TextureLoaderStore(new NamespacedResourceStore<byte[]>(resources, "Textures")));
+                textureStore.AddStore(dependencies.Get<TextureStore>());
+                dependencies.Cache(textureStore);
+
+                sampleStore = dependencies.Get<AudioManager>().GetSampleStore(new NamespacedResourceStore<byte[]>(resources, "Samples"));
+                dependencies.CacheAs(sampleStore);
+            }
 
             onScreenDisplay = dependencies.Get<OnScreenDisplay>();
 
