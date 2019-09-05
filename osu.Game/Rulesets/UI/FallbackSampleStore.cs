@@ -46,7 +46,7 @@ namespace osu.Game.Rulesets.UI
         public void RemoveAdjustment(AdjustableProperty type, BindableDouble adjustBindable)
         {
             primary.RemoveAdjustment(type, adjustBindable);
-            primary.RemoveAdjustment(type, adjustBindable);
+            secondary.RemoveAdjustment(type, adjustBindable);
         }
 
         public BindableDouble Volume => primary.Volume;
