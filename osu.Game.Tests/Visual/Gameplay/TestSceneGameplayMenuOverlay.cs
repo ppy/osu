@@ -17,7 +17,7 @@ using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.Gameplay
 {
-    [System.ComponentModel.Description("player pause/fail screens")]
+    [Description("player pause/fail screens")]
     public class TestSceneGameplayMenuOverlay : ManualInputManagerTestScene
     {
         public override IReadOnlyList<Type> RequiredTypes => new[] { typeof(FailOverlay), typeof(PauseOverlay) };
@@ -152,7 +152,8 @@ namespace osu.Game.Tests.Visual.Gameplay
         }
 
         /// <summary>
-        /// Tests that entering menu with cursor initially on button selects it.
+        /// Tests that entering menu with cursor initially on button doesn't selects it immediately.
+        /// This is to allow for stable keyboard navigation.
         /// </summary>
         [Test]
         public void TestInitialButtonHover()
@@ -163,6 +164,10 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             AddStep("Hide overlay", () => pauseOverlay.Hide());
             showOverlay();
+
+            AddAssert("First button not selected", () => !getButton(0).Selected.Value);
+
+            AddStep("Move slightly", () => InputManager.MoveMouseTo(InputManager.CurrentState.Mouse.Position + new Vector2(1)));
 
             AddAssert("First button selected", () => getButton(0).Selected.Value);
         }
