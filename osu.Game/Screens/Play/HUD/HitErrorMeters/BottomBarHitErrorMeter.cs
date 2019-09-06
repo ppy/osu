@@ -152,7 +152,7 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
 
         private void createColourBars(OsuColour colours)
         {
-            var windows = HitWindows.GetAllAvailableHalfWindows().ToArray();
+            var windows = HitWindows.GetAllAvailableWindows().ToArray();
 
             maxHitWindow = windows.First().length;
 
