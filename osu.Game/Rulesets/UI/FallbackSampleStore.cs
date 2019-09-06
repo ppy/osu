@@ -23,12 +23,6 @@ namespace osu.Game.Rulesets.UI
             this.secondary = secondary;
         }
 
-        public void Dispose()
-        {
-            primary.Dispose();
-            secondary.Dispose();
-        }
-
         public SampleChannel Get(string name) => primary.Get(name) ?? secondary.Get(name);
 
         public Task<SampleChannel> GetAsync(string name) => primary.GetAsync(name) ?? secondary.GetAsync(name);
@@ -58,7 +52,15 @@ namespace osu.Game.Rulesets.UI
         public int PlaybackConcurrency
         {
             get => primary.PlaybackConcurrency;
-            set => primary.PlaybackConcurrency = value;
+            set
+            {
+                primary.PlaybackConcurrency = value;
+                secondary.PlaybackConcurrency = value;
+            }
+        }
+
+        public void Dispose()
+        {
         }
     }
 }
