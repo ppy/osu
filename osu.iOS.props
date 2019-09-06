@@ -113,7 +113,7 @@
     <Reference Include="System.Net.Http" />
   </ItemGroup>
   <ItemGroup Label="Package References">
-    <PackageReference Include="Humanizer" Version="2.5.16" />
+    <PackageReference Include="Humanizer" Version="2.7.2" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="2.2.1" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite.Core" Version="2.2.1" />
     <PackageReference Include="Newtonsoft.Json" Version="12.0.1" />
