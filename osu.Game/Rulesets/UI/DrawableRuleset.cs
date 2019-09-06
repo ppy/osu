@@ -11,10 +11,13 @@ using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading;
+using System.Threading.Tasks;
 using JetBrains.Annotations;
 using osu.Framework.Audio;
+using osu.Framework.Audio.Sample;
 using osu.Framework.Audio.Track;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics.Cursor;
@@ -462,6 +465,52 @@ namespace osu.Game.Rulesets.UI
     {
         public BeatmapInvalidForRulesetException(string text)
             : base(text)
+        {
+        }
+    }
+
+    /// <summary>
+    /// A sample store which adds a fallback source.
+    /// </summary>
+    /// <remarks>
+    /// This is a temporary implementation to workaround ISampleStore limitations.
+    /// </remarks>
+    public class FallbackSampleStore : ISampleStore
+    {
+        private readonly ISampleStore primary;
+        private readonly ISampleStore secondary;
+
+        public FallbackSampleStore(ISampleStore primary, ISampleStore secondary)
+        {
+            this.primary = primary;
+            this.secondary = secondary;
+        }
+
+        public SampleChannel Get(string name) => primary.Get(name) ?? secondary.Get(name);
+
+        public Task<SampleChannel> GetAsync(string name) => primary.GetAsync(name) ?? secondary.GetAsync(name);
+
+        public Stream GetStream(string name) => primary.GetStream(name) ?? secondary.GetStream(name);
+
+        public IEnumerable<string> GetAvailableResources() => throw new NotImplementedException();
+
+        public void AddAdjustment(AdjustableProperty type, BindableDouble adjustBindable) => throw new NotImplementedException();
+
+        public void RemoveAdjustment(AdjustableProperty type, BindableDouble adjustBindable) => throw new NotImplementedException();
+
+        public BindableDouble Volume => throw new NotImplementedException();
+
+        public BindableDouble Balance => throw new NotImplementedException();
+
+        public BindableDouble Frequency => throw new NotImplementedException();
+
+        public int PlaybackConcurrency
+        {
+            get => throw new NotImplementedException();
+            set => throw new NotImplementedException();
+        }
+
+        public void Dispose()
         {
         }
     }
