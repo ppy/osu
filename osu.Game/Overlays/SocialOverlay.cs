@@ -17,6 +17,7 @@ using osu.Game.Overlays.Social;
 using osu.Game.Users;
 using System;
 using System.Threading;
+using osu.Framework.Threading;
 
 namespace osu.Game.Overlays
 {
@@ -77,12 +78,12 @@ namespace osu.Game.Overlays
             currentQuery.BindTo(Filter.Search.Current);
             currentQuery.ValueChanged += query =>
             {
-                Scheduler.CancelDelayedTasks();
+                queryChangedDebounce?.Cancel();
 
                 if (string.IsNullOrEmpty(query.NewValue))
                     queueUpdate();
                 else
-                    Scheduler.AddDelayed(updateSearch, 500);
+                    queryChangedDebounce = Scheduler.AddDelayed(updateSearch, 500);
             };
         }
 
@@ -90,13 +91,15 @@ namespace osu.Game.Overlays
 
         private readonly Bindable<string> currentQuery = new Bindable<string>();
 
+        private ScheduledDelegate queryChangedDebounce;
+
         private void queueUpdate() => Scheduler.AddOnce(updateSearch);
 
         private CancellationTokenSource loadCancellation;
 
         private void updateSearch()
         {
-            Scheduler.CancelDelayedTasks();
+            queryChangedDebounce?.Cancel();
 
             if (!IsLoaded)
                 return;
@@ -169,6 +172,9 @@ namespace osu.Game.Overlays
 
             LoadComponentAsync(newPanels, f =>
             {
+                if (panels != null)
+                    ScrollFlow.Remove(panels);
+
                 loading.Hide();
                 ScrollFlow.Add(panels = newPanels);
             }, loadCancellation.Token);
