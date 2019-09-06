@@ -112,7 +112,7 @@ namespace osu.Game.Screens.Menu
             Color4 baseColour = colours.Blue;
 
             if (user.Value?.IsSupporter ?? false)
-                baseColour = skin.Value.GetValue<SkinConfiguration, Color4?>(s => s.CustomColours.ContainsKey("MenuGlow") ? s.CustomColours["MenuGlow"] : (Color4?)null) ?? baseColour;
+                baseColour = skin.Value.GetConfig<GlobalSkinColour, Color4>(GlobalSkinColour.MenuGlow)?.Value ?? baseColour;
 
             // linear colour looks better in this case, so let's use it for now.
             Color4 gradientDark = baseColour.Opacity(0).ToLinear();
