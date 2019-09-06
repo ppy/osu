@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Diagnostics;
 using System.Linq;
 using osu.Framework.Graphics;
 using osu.Game.Rulesets.Objects.Drawables;
@@ -34,6 +35,8 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
 
         protected override void CheckForResult(bool userTriggered, double timeOffset)
         {
+            Debug.Assert(HitObject.HitWindows != null);
+
             if (!userTriggered)
             {
                 if (!HitObject.HitWindows.CanBeHit(timeOffset))
@@ -94,13 +97,15 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
 
         protected override void UpdateStateTransforms(ArmedState state)
         {
+            Debug.Assert(HitObject.HitWindows != null);
+
             switch (state)
             {
                 case ArmedState.Idle:
                     validActionPressed = false;
 
                     UnproxyContent();
-                    this.Delay(HitObject.HitWindows.HalfWindowFor(HitResult.Miss)).Expire();
+                    this.Delay(HitObject.HitWindows.WindowFor(HitResult.Miss)).Expire();
                     break;
 
                 case ArmedState.Miss:

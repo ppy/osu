@@ -11,12 +11,20 @@ using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading;
+using System.Threading.Tasks;
+using JetBrains.Annotations;
+using osu.Framework.Audio;
+using osu.Framework.Audio.Sample;
+using osu.Framework.Audio.Track;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics.Cursor;
+using osu.Framework.Graphics.Textures;
 using osu.Framework.Input;
 using osu.Framework.Input.Events;
+using osu.Framework.IO.Stores;
 using osu.Game.Configuration;
 using osu.Game.Graphics.Cursor;
 using osu.Game.Input.Handlers;
@@ -49,6 +57,10 @@ namespace osu.Game.Rulesets.UI
         public override double GameplayStartTime => Objects.First().StartTime - 2000;
 
         private readonly Lazy<Playfield> playfield;
+
+        private TextureStore textureStore;
+
+        private ISampleStore localSampleStore;
 
         /// <summary>
         /// The playfield.
@@ -113,7 +125,7 @@ namespace osu.Game.Rulesets.UI
         /// <param name="ruleset">The ruleset being represented.</param>
         /// <param name="workingBeatmap">The beatmap to create the hit renderer for.</param>
         /// <param name="mods">The <see cref="Mod"/>s to apply.</param>
-        protected DrawableRuleset(Ruleset ruleset, WorkingBeatmap workingBeatmap, IReadOnlyList<Mod> mods)
+        protected DrawableRuleset(Ruleset ruleset, IWorkingBeatmap workingBeatmap, IReadOnlyList<Mod> mods)
             : base(ruleset)
         {
             if (workingBeatmap == null)
@@ -140,6 +152,18 @@ namespace osu.Game.Rulesets.UI
         protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
         {
             var dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
+
+            var resources = Ruleset.CreateReourceStore();
+
+            if (resources != null)
+            {
+                textureStore = new TextureStore(new TextureLoaderStore(new NamespacedResourceStore<byte[]>(resources, "Textures")));
+                textureStore.AddStore(dependencies.Get<TextureStore>());
+                dependencies.Cache(textureStore);
+
+                localSampleStore = dependencies.Get<AudioManager>().GetSampleStore(new NamespacedResourceStore<byte[]>(resources, "Samples"));
+                dependencies.CacheAs(new FallbackSampleStore(localSampleStore, dependencies.Get<ISampleStore>()));
+            }
 
             onScreenDisplay = dependencies.Get<OnScreenDisplay>();
 
@@ -214,10 +238,6 @@ namespace osu.Game.Rulesets.UI
             else
                 continueResume();
         }
-
-        public ResumeOverlay ResumeOverlay { get; private set; }
-
-        protected virtual ResumeOverlay CreateResumeOverlay() => null;
 
         /// <summary>
         /// Creates and adds the visual representation of a <see cref="TObject"/> to this <see cref="DrawableRuleset{TObject}"/>.
@@ -317,6 +337,8 @@ namespace osu.Game.Rulesets.UI
         {
             base.Dispose(isDisposing);
 
+            localSampleStore?.Dispose();
+
             if (Config != null)
             {
                 onScreenDisplay?.StopTracking(this, Config);
@@ -390,6 +412,35 @@ namespace osu.Game.Rulesets.UI
         public abstract GameplayCursorContainer Cursor { get; }
 
         /// <summary>
+        /// An optional overlay used when resuming gameplay from a paused state.
+        /// </summary>
+        public ResumeOverlay ResumeOverlay { get; protected set; }
+
+        /// <summary>
+        /// Returns first available <see cref="HitWindows"/> provided by a <see cref="HitObject"/>.
+        /// </summary>
+        [CanBeNull]
+        public HitWindows FirstAvailableHitWindows
+        {
+            get
+            {
+                foreach (var h in Objects)
+                {
+                    if (h.HitWindows != null)
+                        return h.HitWindows;
+
+                    foreach (var n in h.NestedHitObjects)
+                        if (n.HitWindows != null)
+                            return n.HitWindows;
+                }
+
+                return null;
+            }
+        }
+
+        protected virtual ResumeOverlay CreateResumeOverlay() => null;
+
+        /// <summary>
         /// Sets a replay to be used, overriding local input.
         /// </summary>
         /// <param name="replayScore">The replay, null for local input.</param>
@@ -414,6 +465,52 @@ namespace osu.Game.Rulesets.UI
     {
         public BeatmapInvalidForRulesetException(string text)
             : base(text)
+        {
+        }
+    }
+
+    /// <summary>
+    /// A sample store which adds a fallback source.
+    /// </summary>
+    /// <remarks>
+    /// This is a temporary implementation to workaround ISampleStore limitations.
+    /// </remarks>
+    public class FallbackSampleStore : ISampleStore
+    {
+        private readonly ISampleStore primary;
+        private readonly ISampleStore secondary;
+
+        public FallbackSampleStore(ISampleStore primary, ISampleStore secondary)
+        {
+            this.primary = primary;
+            this.secondary = secondary;
+        }
+
+        public SampleChannel Get(string name) => primary.Get(name) ?? secondary.Get(name);
+
+        public Task<SampleChannel> GetAsync(string name) => primary.GetAsync(name) ?? secondary.GetAsync(name);
+
+        public Stream GetStream(string name) => primary.GetStream(name) ?? secondary.GetStream(name);
+
+        public IEnumerable<string> GetAvailableResources() => throw new NotImplementedException();
+
+        public void AddAdjustment(AdjustableProperty type, BindableDouble adjustBindable) => throw new NotImplementedException();
+
+        public void RemoveAdjustment(AdjustableProperty type, BindableDouble adjustBindable) => throw new NotImplementedException();
+
+        public BindableDouble Volume => throw new NotImplementedException();
+
+        public BindableDouble Balance => throw new NotImplementedException();
+
+        public BindableDouble Frequency => throw new NotImplementedException();
+
+        public int PlaybackConcurrency
+        {
+            get => throw new NotImplementedException();
+            set => throw new NotImplementedException();
+        }
+
+        public void Dispose()
         {
         }
     }

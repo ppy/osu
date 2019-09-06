@@ -18,7 +18,7 @@ namespace osu.Game.Configuration
         {
             // UI/selection defaults
             Set(OsuSetting.Ruleset, 0, 0, int.MaxValue);
-            Set(OsuSetting.Skin, 0, 0, int.MaxValue);
+            Set(OsuSetting.Skin, 0, -1, int.MaxValue);
 
             Set(OsuSetting.BeatmapDetailTab, BeatmapDetailTab.Details);
 
@@ -31,7 +31,7 @@ namespace osu.Game.Configuration
 
             Set(OsuSetting.RandomSelectAlgorithm, RandomSelectAlgorithm.RandomPermutation);
 
-            Set(OsuSetting.ChatDisplayHeight, ChatOverlay.DEFAULT_HEIGHT, 0.2, 1);
+            Set(OsuSetting.ChatDisplayHeight, ChatOverlay.DEFAULT_HEIGHT, 0.2f, 1f);
 
             // Online settings
             Set(OsuSetting.Username, string.Empty);
@@ -58,8 +58,8 @@ namespace osu.Game.Configuration
             Set(OsuSetting.AudioOffset, 0, -500.0, 500.0, 1);
 
             // Input
-            Set(OsuSetting.MenuCursorSize, 1.0, 0.5f, 2, 0.01);
-            Set(OsuSetting.GameplayCursorSize, 1.0, 0.1f, 2, 0.01);
+            Set(OsuSetting.MenuCursorSize, 1.0f, 0.5f, 2f, 0.01f);
+            Set(OsuSetting.GameplayCursorSize, 1.0f, 0.1f, 2f, 0.01f);
             Set(OsuSetting.AutoCursorSize, false);
 
             Set(OsuSetting.MouseDisableButtons, false);
@@ -83,6 +83,7 @@ namespace osu.Game.Configuration
             Set(OsuSetting.ShowInterface, true);
             Set(OsuSetting.ShowHealthDisplayWhenCantFail, true);
             Set(OsuSetting.KeyOverlay, false);
+            Set(OsuSetting.ScoreMeter, ScoreMeterType.HitErrorBoth);
 
             Set(OsuSetting.FloatingComments, false);
 
@@ -136,6 +137,7 @@ namespace osu.Game.Configuration
         BlurLevel,
         ShowStoryboard,
         KeyOverlay,
+        ScoreMeter,
         FloatingComments,
         ShowInterface,
         ShowHealthDisplayWhenCantFail,

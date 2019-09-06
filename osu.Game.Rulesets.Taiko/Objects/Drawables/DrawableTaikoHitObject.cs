@@ -78,8 +78,6 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
         public abstract bool OnPressed(TaikoAction action);
         public virtual bool OnReleased(TaikoAction action) => false;
 
-        protected override void UpdateInitialTransforms() => this.FadeIn();
-
         public override double LifetimeStart
         {
             get => base.LifetimeStart;
@@ -145,7 +143,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
         // Normal and clap samples are handled by the drum
         protected override IEnumerable<HitSampleInfo> GetSamples() => HitObject.Samples.Where(s => s.Name != HitSampleInfo.HIT_NORMAL && s.Name != HitSampleInfo.HIT_CLAP);
 
-        protected override string SampleNamespace => "Taiko";
+        protected override string SampleNamespace => "taiko";
 
         protected virtual TaikoPiece CreateMainPiece() => new CirclePiece();
 
