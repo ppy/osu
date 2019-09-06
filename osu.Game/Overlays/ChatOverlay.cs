@@ -54,7 +54,7 @@ namespace osu.Game.Overlays
         private Box chatBackground;
         private Box tabBackground;
 
-        public Bindable<double> ChatHeight { get; set; }
+        public Bindable<float> ChatHeight { get; set; }
 
         private Container channelSelectionContainer;
         protected ChannelSelectionOverlay ChannelSelectionOverlay;
@@ -190,14 +190,13 @@ namespace osu.Game.Overlays
             ChannelSelectionOverlay.OnRequestJoin = channel => channelManager.JoinChannel(channel);
             ChannelSelectionOverlay.OnRequestLeave = channelManager.LeaveChannel;
 
-            ChatHeight = config.GetBindable<double>(OsuSetting.ChatDisplayHeight);
-            ChatHeight.ValueChanged += height =>
+            ChatHeight = config.GetBindable<float>(OsuSetting.ChatDisplayHeight);
+            ChatHeight.BindValueChanged(height =>
             {
-                chatContainer.Height = (float)height.NewValue;
-                channelSelectionContainer.Height = 1f - (float)height.NewValue;
-                tabBackground.FadeTo(height.NewValue == 1 ? 1 : 0.8f, 200);
-            };
-            ChatHeight.TriggerChange();
+                chatContainer.Height = height.NewValue;
+                channelSelectionContainer.Height = 1f - height.NewValue;
+                tabBackground.FadeTo(height.NewValue == 1f ? 1f : 0.8f, 200);
+            }, true);
 
             chatBackground.Colour = colours.ChatBlue;
 
@@ -273,7 +272,7 @@ namespace osu.Game.Overlays
             }
         }
 
-        private double startDragChatHeight;
+        private float startDragChatHeight;
         private bool isDragging;
 
         protected override bool OnDragStart(DragStartEvent e)
@@ -291,7 +290,7 @@ namespace osu.Game.Overlays
         {
             if (isDragging)
             {
-                double targetChatHeight = startDragChatHeight - (e.MousePosition.Y - e.MouseDownPosition.Y) / Parent.DrawSize.Y;
+                float targetChatHeight = startDragChatHeight - (e.MousePosition.Y - e.MouseDownPosition.Y) / Parent.DrawSize.Y;
 
                 // If the channel selection screen is shown, mind its minimum height
                 if (ChannelSelectionOverlay.State.Value == Visibility.Visible && targetChatHeight > 1f - channel_selection_min_height)
