@@ -52,6 +52,11 @@ namespace osu.Game.Rulesets.Judgements
         public double HealthAtJudgement { get; internal set; }
 
         /// <summary>
+        /// Whether the user was in a failed state prior to this <see cref="JudgementResult"/> occurring.
+        /// </summary>
+        public bool FailedAtJudgement { get; internal set; }
+
+        /// <summary>
         /// Whether a miss or hit occurred.
         /// </summary>
         public bool HasResult => Type > HitResult.None;

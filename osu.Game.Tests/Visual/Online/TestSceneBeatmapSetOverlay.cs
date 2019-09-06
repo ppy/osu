@@ -42,6 +42,8 @@ namespace osu.Game.Tests.Visual.Online
             typeof(BeatmapAvailability),
         };
 
+        protected override bool RequiresAPIAccess => true;
+
         private RulesetInfo taikoRuleset;
         private RulesetInfo maniaRuleset;
 
