@@ -107,7 +107,7 @@ namespace osu.Game.Screens.Play.HUD
         {
             var display = new BottomBarHitErrorMeter(hitWindows)
             {
-                Margin = new MarginPadding() { Bottom = 4 * margin },
+                Margin = new MarginPadding { Bottom = 4 * margin },
                 Anchor = Anchor.BottomCentre,
                 Origin = Anchor.BottomCentre,
                 Alpha = 0,
