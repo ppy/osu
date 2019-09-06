@@ -1,9 +1,9 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Threading.Tasks;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
@@ -29,34 +29,22 @@ namespace osu.Game.Rulesets.UI
 
         public Stream GetStream(string name) => primary.GetStream(name) ?? secondary.GetStream(name);
 
-        public IEnumerable<string> GetAvailableResources() => primary.GetAvailableResources().Concat(secondary.GetAvailableResources());
+        public IEnumerable<string> GetAvailableResources() => throw new NotImplementedException();
 
-        public void AddAdjustment(AdjustableProperty type, BindableDouble adjustBindable)
-        {
-            primary.AddAdjustment(type, adjustBindable);
-            secondary.AddAdjustment(type, adjustBindable);
-        }
+        public void AddAdjustment(AdjustableProperty type, BindableDouble adjustBindable) => throw new NotImplementedException();
 
-        public void RemoveAdjustment(AdjustableProperty type, BindableDouble adjustBindable)
-        {
-            primary.RemoveAdjustment(type, adjustBindable);
-            secondary.RemoveAdjustment(type, adjustBindable);
-        }
+        public void RemoveAdjustment(AdjustableProperty type, BindableDouble adjustBindable) => throw new NotImplementedException();
 
-        public BindableDouble Volume => primary.Volume;
+        public BindableDouble Volume => throw new NotImplementedException();
 
-        public BindableDouble Balance => primary.Balance;
+        public BindableDouble Balance => throw new NotImplementedException();
 
-        public BindableDouble Frequency => primary.Frequency;
+        public BindableDouble Frequency => throw new NotImplementedException();
 
         public int PlaybackConcurrency
         {
-            get => primary.PlaybackConcurrency;
-            set
-            {
-                primary.PlaybackConcurrency = value;
-                secondary.PlaybackConcurrency = value;
-            }
+            get => throw new NotImplementedException();
+            set => throw new NotImplementedException();
         }
 
         public void Dispose()
