@@ -313,5 +313,22 @@ namespace osu.Game.Screens.Play
                 return base.OnMouseMove(e);
             }
         }
+
+        [Resolved]
+        private GlobalActionContainer globalAction { get; set; }
+
+        protected override bool Handle(UIEvent e)
+        {
+            switch (e)
+            {
+                case ScrollEvent _:
+                    if (ReceivePositionalInputAt(e.ScreenSpaceMousePosition))
+                        return globalAction.TriggerEvent(e);
+
+                    break;
+            }
+
+            return base.Handle(e);
+        }
     }
 }
