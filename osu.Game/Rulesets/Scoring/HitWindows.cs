@@ -93,18 +93,7 @@ namespace osu.Game.Rulesets.Scoring
         /// </summary>
         /// <param name="result">The result type to check.</param>
         /// <returns>Whether the <see cref="HitResult"/> can be achieved.</returns>
-        public virtual bool IsHitResultAllowed(HitResult result)
-        {
-            switch (result)
-            {
-                case HitResult.Perfect:
-                case HitResult.Ok:
-                    return false;
-
-                default:
-                    return true;
-            }
-        }
+        public virtual bool IsHitResultAllowed(HitResult result) => true;
 
         /// <summary>
         /// Sets hit windows with values that correspond to a difficulty parameter.
