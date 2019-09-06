@@ -6,16 +6,27 @@
     <PlatformTarget>AnyCPU</PlatformTarget>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
+  <PropertyGroup Label="Nuget">
+    <Title>osu!</Title>
+    <PackageId>ppy.osu.Game</PackageId>
+    <Authors>ppy Pty Ltd</Authors>
+    <PackageLicenseUrl>https://github.com/ppy/osu/blob/master/LICENCE.md</PackageLicenseUrl>
+    <PackageProjectUrl>https://github.com/ppy/osu</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/ppy/osu</RepositoryUrl>
+    <PackageReleaseNotes>Automated release.</PackageReleaseNotes>
+    <copyright>Copyright (c) 2019 ppy Pty Ltd</copyright>
+    <PackageTags>osu game</PackageTags>
+  </PropertyGroup>
   <ItemGroup Label="Service">
     <Service Include="{82a7f48d-3b50-4b1e-b82e-3ada8210c358}" />
   </ItemGroup>
   <ItemGroup Label="Package References">
-    <PackageReference Include="Humanizer" Version="2.6.2" />
+    <PackageReference Include="Humanizer" Version="2.7.2" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="2.2.6" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite.Core" Version="2.2.6" />
     <PackageReference Include="Newtonsoft.Json" Version="12.0.2" />
-    <PackageReference Include="ppy.osu.Game.Resources" Version="2019.823.0" />
-    <PackageReference Include="ppy.osu.Framework" Version="2019.823.0" />
+    <PackageReference Include="ppy.osu.Game.Resources" Version="2019.904.0" />
+    <PackageReference Include="ppy.osu.Framework" Version="2019.905.0" />
     <PackageReference Include="SharpCompress" Version="0.24.0" />
     <PackageReference Include="NUnit" Version="3.12.0" />
     <PackageReference Include="SharpRaven" Version="2.4.0" />

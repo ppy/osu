@@ -53,4 +53,13 @@ namespace osu.Game.Beatmaps
         /// <returns>The shallow-cloned beatmap.</returns>
         IBeatmap Clone();
     }
+
+    public interface IBeatmap<out T> : IBeatmap
+        where T : HitObject
+    {
+        /// <summary>
+        /// The hitobjects contained by this beatmap.
+        /// </summary>
+        new IReadOnlyList<T> HitObjects { get; }
+    }
 }
