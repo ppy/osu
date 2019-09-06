@@ -23,7 +23,7 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
 
         private bool cursorExpand;
 
-        private Bindable<double> cursorScale;
+        private Bindable<float> cursorScale;
         private Bindable<bool> autoCursorScale;
         private readonly IBindable<WorkingBeatmap> beatmap = new Bindable<WorkingBeatmap>();
 
@@ -60,7 +60,7 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
             this.beatmap.BindTo(beatmap);
             this.beatmap.ValueChanged += _ => calculateScale();
 
-            cursorScale = config.GetBindable<double>(OsuSetting.GameplayCursorSize);
+            cursorScale = config.GetBindable<float>(OsuSetting.GameplayCursorSize);
             cursorScale.ValueChanged += _ => calculateScale();
 
             autoCursorScale = config.GetBindable<bool>(OsuSetting.AutoCursorSize);
@@ -71,12 +71,12 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
 
         private void calculateScale()
         {
-            float scale = (float)cursorScale.Value;
+            float scale = cursorScale.Value;
 
             if (autoCursorScale.Value && beatmap.Value != null)
             {
                 // if we have a beatmap available, let's get its circle size to figure out an automatic cursor scale modifier.
-                scale *= (float)(1 - 0.7 * (1 + beatmap.Value.BeatmapInfo.BaseDifficulty.CircleSize - BeatmapDifficulty.DEFAULT_DIFFICULTY) / BeatmapDifficulty.DEFAULT_DIFFICULTY);
+                scale *= 1f - 0.7f * (1f + beatmap.Value.BeatmapInfo.BaseDifficulty.CircleSize - BeatmapDifficulty.DEFAULT_DIFFICULTY) / BeatmapDifficulty.DEFAULT_DIFFICULTY;
             }
 
             scaleTarget.Scale = new Vector2(scale);
