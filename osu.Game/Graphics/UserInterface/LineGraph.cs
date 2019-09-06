@@ -93,7 +93,7 @@ namespace osu.Game.Graphics.UserInterface
             return base.Invalidate(invalidation, source, shallPropagate);
         }
 
-        private Cached pathCached = new Cached();
+        private readonly Cached pathCached = new Cached();
 
         protected override void Update()
         {

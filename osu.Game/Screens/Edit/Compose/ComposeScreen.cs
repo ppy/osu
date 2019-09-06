@@ -9,15 +9,13 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Logging;
 using osu.Game.Rulesets.Edit;
-using osu.Game.Rulesets.Objects;
 using osu.Game.Screens.Edit.Compose.Components;
 using osu.Game.Screens.Edit.Compose.Components.Timeline;
 using osuTK.Graphics;
 
 namespace osu.Game.Screens.Edit.Compose
 {
-    [Cached(Type = typeof(IPlacementHandler))]
-    public class ComposeScreen : EditorScreen, IPlacementHandler
+    public class ComposeScreen : EditorScreen
     {
         private const float vertical_margins = 10;
         private const float horizontal_margins = 20;
@@ -119,13 +117,5 @@ namespace osu.Game.Screens.Edit.Compose
 
             composerContainer.Child = composer;
         }
-
-        public void BeginPlacement(HitObject hitObject)
-        {
-        }
-
-        public void EndPlacement(HitObject hitObject) => composer.Add(hitObject);
-
-        public void Delete(HitObject hitObject) => composer.Remove(hitObject);
     }
 }

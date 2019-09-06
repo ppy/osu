@@ -98,7 +98,7 @@ namespace osu.Game.Graphics.Containers
             public OsuScrollbar(Direction scrollDir)
                 : base(scrollDir)
             {
-                Blending = BlendingMode.Additive;
+                Blending = BlendingParameters.Additive;
 
                 CornerRadius = 5;
 
