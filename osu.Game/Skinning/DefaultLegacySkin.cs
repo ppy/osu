@@ -3,6 +3,7 @@
 
 using osu.Framework.Audio;
 using osu.Framework.IO.Stores;
+using osuTK.Graphics;
 
 namespace osu.Game.Skinning
 {
@@ -11,6 +12,7 @@ namespace osu.Game.Skinning
         public DefaultLegacySkin(IResourceStore<byte[]> storage, AudioManager audioManager)
             : base(Info, storage, audioManager, string.Empty)
         {
+            Configuration.CustomColours["SliderBall"] = new Color4(2, 170, 255, 255);
         }
 
         public static SkinInfo Info { get; } = new SkinInfo
