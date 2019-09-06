@@ -5,7 +5,7 @@ using System.Linq;
 
 namespace osu.Game.Skinning
 {
-    public class GameplaySkinComponent<T> : ISkinComponent where T : struct
+    public class GameplaySkinComponent<T> : ISkinComponent
     {
         public readonly T Component;
 

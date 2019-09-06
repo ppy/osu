@@ -239,7 +239,11 @@ namespace osu.Game.Rulesets.Objects.Drawables
             base.SkinChanged(skin, allowFallback);
 
             if (HitObject is IHasComboInformation combo)
-                AccentColour.Value = skin.GetValue<SkinConfiguration, Color4?>(s => s.ComboColours.Count > 0 ? s.ComboColours[combo.ComboIndex % s.ComboColours.Count] : (Color4?)null) ?? Color4.White;
+            {
+                var comboColours = skin.GetConfig<GlobalSkinConfiguration, List<Color4>>(GlobalSkinConfiguration.ComboColours)?.Value;
+
+                AccentColour.Value = comboColours?.Count > 0 ? comboColours[combo.ComboIndex % comboColours.Count] : Color4.White;
+            }
         }
 
         /// <summary>

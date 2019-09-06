@@ -4,6 +4,7 @@
 using System;
 using osu.Framework.Allocation;
 using osu.Framework.Audio.Sample;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Textures;
@@ -64,13 +65,16 @@ namespace osu.Game.Skinning
             return fallbackSource?.GetSample(sampleInfo);
         }
 
-        public TValue GetValue<TConfiguration, TValue>(Func<TConfiguration, TValue> query) where TConfiguration : SkinConfiguration
+        public IBindable<TValue> GetConfig<TLookup, TValue>(TLookup lookup)
         {
-            TValue val;
-            if (AllowConfigurationLookup && skin != null && (val = skin.GetValue(query)) != null)
-                return val;
+            if (AllowConfigurationLookup && skin != null)
+            {
+                var bindable = skin.GetConfig<TLookup, TValue>(lookup);
+                if (bindable != null)
+                    return bindable;
+            }
 
-            return fallbackSource == null ? default : fallbackSource.GetValue(query);
+            return fallbackSource?.GetConfig<TLookup, TValue>(lookup);
         }
 
         protected virtual void TriggerSourceChanged() => SourceChanged?.Invoke();
