@@ -4,7 +4,7 @@
 using System;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Judgements;
-using osu.Game.Rulesets.Objects;
+using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.Taiko.Judgements;
 
 namespace osu.Game.Rulesets.Taiko.Objects

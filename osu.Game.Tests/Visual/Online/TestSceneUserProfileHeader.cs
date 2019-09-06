@@ -17,6 +17,8 @@ namespace osu.Game.Tests.Visual.Online
 {
     public class TestSceneUserProfileHeader : OsuTestScene
     {
+        protected override bool RequiresAPIAccess => true;
+
         public override IReadOnlyList<Type> RequiredTypes => new[]
         {
             typeof(ProfileHeader),

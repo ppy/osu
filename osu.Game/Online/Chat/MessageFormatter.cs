@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text.RegularExpressions;
 
 namespace osu.Game.Online.Chat
@@ -10,16 +11,16 @@ namespace osu.Game.Online.Chat
     public static class MessageFormatter
     {
         // [[Performance Points]] -> wiki:Performance Points (https://osu.ppy.sh/wiki/Performance_Points)
-        private static readonly Regex wiki_regex = new Regex(@"\[\[([^\]]+)\]\]");
+        private static readonly Regex wiki_regex = new Regex(@"\[\[(?<text>[^\]]+)\]\]");
 
         // (test)[https://osu.ppy.sh/b/1234] -> test (https://osu.ppy.sh/b/1234)
-        private static readonly Regex old_link_regex = new Regex(@"\(([^\)]*)\)\[([a-z]+://[^ ]+)\]");
+        private static readonly Regex old_link_regex = new Regex(@"\((?<text>(((?<=\\)[\(\)])|[^\(\)])*(((?<open>\()(((?<=\\)[\(\)])|[^\(\)])*)+((?<close-open>\))(((?<=\\)[\(\)])|[^\(\)])*)+)*(?(open)(?!)))\)\[(?<url>[a-z]+://[^ ]+)\]");
 
         // [https://osu.ppy.sh/b/1234 Beatmap [Hard] (poop)] -> Beatmap [hard] (poop) (https://osu.ppy.sh/b/1234)
-        private static readonly Regex new_link_regex = new Regex(@"\[([a-z]+://[^ ]+) ([^\[\]]*(((?<open>\[)[^\[\]]*)+((?<close-open>\])[^\[\]]*)+)*(?(open)(?!)))\]");
+        private static readonly Regex new_link_regex = new Regex(@"\[(?<url>[a-z]+://[^ ]+) (?<text>(((?<=\\)[\[\]])|[^\[\]])*(((?<open>\[)(((?<=\\)[\[\]])|[^\[\]])*)+((?<close-open>\])(((?<=\\)[\[\]])|[^\[\]])*)+)*(?(open)(?!)))\]");
 
         // [test](https://osu.ppy.sh/b/1234) -> test (https://osu.ppy.sh/b/1234) aka correct markdown format
-        private static readonly Regex markdown_link_regex = new Regex(@"\[([^\]]*)\]\(([a-z]+://[^ ]+)\)");
+        private static readonly Regex markdown_link_regex = new Regex(@"\[(?<text>(((?<=\\)[\[\]])|[^\[\]])*(((?<open>\[)(((?<=\\)[\[\]])|[^\[\]])*)+((?<close-open>\])(((?<=\\)[\[\]])|[^\[\]])*)+)*(?(open)(?!)))\]\((?<url>[a-z]+://[^ ]+)\)");
 
         // advanced, RFC-compatible regular expression that matches any possible URL, *but* allows certain invalid characters that are widely used
         // This is in the format (<required>, [optional]):
@@ -48,7 +49,7 @@ namespace osu.Game.Online.Chat
         // Unicode emojis
         private static readonly Regex emoji_regex = new Regex(@"(\uD83D[\uDC00-\uDE4F])");
 
-        private static void handleMatches(Regex regex, string display, string link, MessageFormatterResult result, int startIndex = 0, LinkAction? linkActionOverride = null)
+        private static void handleMatches(Regex regex, string display, string link, MessageFormatterResult result, int startIndex = 0, LinkAction? linkActionOverride = null, char[] escapeChars = null)
         {
             int captureOffset = 0;
 
@@ -58,15 +59,19 @@ namespace osu.Game.Online.Chat
 
                 var displayText = string.Format(display,
                     m.Groups[0],
-                    m.Groups.Count > 1 ? m.Groups[1].Value : "",
-                    m.Groups.Count > 2 ? m.Groups[2].Value : "").Trim();
+                    m.Groups["text"].Value,
+                    m.Groups["url"].Value).Trim();
 
                 var linkText = string.Format(link,
                     m.Groups[0],
-                    m.Groups.Count > 1 ? m.Groups[1].Value : "",
-                    m.Groups.Count > 2 ? m.Groups[2].Value : "").Trim();
+                    m.Groups["text"].Value,
+                    m.Groups["url"].Value).Trim();
 
                 if (displayText.Length == 0 || linkText.Length == 0) continue;
+
+                // Remove backslash escapes in front of the characters provided in escapeChars
+                if (escapeChars != null)
+                    displayText = escapeChars.Aggregate(displayText, (current, c) => current.Replace($"\\{c}", c.ToString()));
 
                 // Check for encapsulated links
                 if (result.Links.Find(l => (l.Index <= index && l.Index + l.Length >= index + m.Length) || (index <= l.Index && index + m.Length >= l.Index + l.Length)) == null)
@@ -183,13 +188,13 @@ namespace osu.Game.Online.Chat
             var result = new MessageFormatterResult(toFormat);
 
             // handle the [link display] format
-            handleMatches(new_link_regex, "{2}", "{1}", result, startIndex);
+            handleMatches(new_link_regex, "{1}", "{2}", result, startIndex, escapeChars: new[] { '[', ']' });
 
             // handle the standard markdown []() format
-            handleMatches(markdown_link_regex, "{1}", "{2}", result, startIndex);
+            handleMatches(markdown_link_regex, "{1}", "{2}", result, startIndex, escapeChars: new[] { '[', ']' });
 
             // handle the ()[] link format
-            handleMatches(old_link_regex, "{1}", "{2}", result, startIndex);
+            handleMatches(old_link_regex, "{1}", "{2}", result, startIndex, escapeChars: new[] { '(', ')' });
 
             // handle wiki links
             handleMatches(wiki_regex, "{1}", "https://osu.ppy.sh/wiki/{1}", result, startIndex);
