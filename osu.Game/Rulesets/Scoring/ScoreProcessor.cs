@@ -93,6 +93,11 @@ namespace osu.Game.Rulesets.Scoring
         public virtual bool HasCompleted => false;
 
         /// <summary>
+        /// The total number of judged <see cref="HitObject"/>s at the current point in time.
+        /// </summary>
+        public int JudgedHits { get; protected set; }
+
+        /// <summary>
         /// Whether this ScoreProcessor has already triggered the failed state.
         /// </summary>
         public virtual bool HasFailed { get; private set; }
@@ -141,6 +146,8 @@ namespace osu.Game.Rulesets.Scoring
             Combo.Value = 0;
             Rank.Value = ScoreRank.X;
             HighestCombo.Value = 0;
+
+            JudgedHits = 0;
 
             HasFailed = false;
         }
@@ -208,7 +215,6 @@ namespace osu.Game.Rulesets.Scoring
         public sealed override bool HasCompleted => JudgedHits == MaxHits;
 
         protected int MaxHits { get; private set; }
-        protected int JudgedHits { get; private set; }
 
         private double maxHighestCombo;
 
@@ -441,7 +447,6 @@ namespace osu.Game.Rulesets.Scoring
 
             base.Reset(storeResults);
 
-            JudgedHits = 0;
             baseScore = 0;
             rollingMaxBaseScore = 0;
             bonusScore = 0;

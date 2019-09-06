@@ -26,15 +26,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         {
             AddUntilStep("wait for fail", () => Player.HasFailed);
             AddUntilStep("wait for multiple judged objects", () => ((FailPlayer)Player).DrawableRuleset.Playfield.AllHitObjects.Count(h => h.AllJudged) > 1);
-            AddAssert("total judgements == 1", () =>
-            {
-                int count = 0;
-
-                foreach (var stat in (HitResult[])Enum.GetValues(typeof(HitResult)))
-                    count += ((FailPlayer)Player).ScoreProcessor.GetStatistic(stat);
-
-                return count == 1;
-            });
+            AddAssert("total judgements == 1", () => ((FailPlayer)Player).ScoreProcessor.JudgedHits == 1);
         }
 
         private class FailPlayer : ReplayPlayer
