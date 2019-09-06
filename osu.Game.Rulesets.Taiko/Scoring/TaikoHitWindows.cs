@@ -14,6 +14,19 @@ namespace osu.Game.Rulesets.Taiko.Scoring
             new DifficultyRange(HitResult.Miss, 135, 95, 70),
         };
 
+        public override bool IsHitResultAllowed(HitResult result)
+        {
+            switch (result)
+            {
+                case HitResult.Great:
+                case HitResult.Good:
+                case HitResult.Miss:
+                    return true;
+            }
+
+            return false;
+        }
+
         protected override DifficultyRange[] GetRanges() => taiko_ranges;
     }
 }

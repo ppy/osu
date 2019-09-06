@@ -15,6 +15,20 @@ namespace osu.Game.Rulesets.Osu.Scoring
             new DifficultyRange(HitResult.Miss, 200, 200, 200),
         };
 
+        public override bool IsHitResultAllowed(HitResult result)
+        {
+            switch (result)
+            {
+                case HitResult.Great:
+                case HitResult.Good:
+                case HitResult.Meh:
+                case HitResult.Miss:
+                    return true;
+            }
+
+            return false;
+        }
+
         protected override DifficultyRange[] GetRanges() => osu_ranges;
     }
 }
