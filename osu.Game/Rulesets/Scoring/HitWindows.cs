@@ -23,41 +23,11 @@ namespace osu.Game.Rulesets.Scoring
             new DifficultyRange(HitResult.Miss, 188, 173, 158),
         };
 
-        /// <summary>
-        /// Hit window for a <see cref="HitResult.Perfect"/> result.
-        /// </summary>
         private double perfect;
-
-        /// <summary>
-        /// Hit window for a <see cref="HitResult.Great"/> result.
-        /// </summary>
-        /// <remarks>
-        /// Note that this value includes both the early and late region.
-        /// </remarks>
         private double great;
-
-        /// <summary>
-        /// Hit window for a <see cref="HitResult.Good"/> result.
-        /// </summary>
         private double good;
-
-        /// <summary>
-        /// Hit window for an <see cref="HitResult.Ok"/> result.
-        /// </summary>
         private double ok;
-
-        /// <summary>
-        /// Hit window for a <see cref="HitResult.Meh"/> result.
-        /// </summary>
         private double meh;
-
-        /// <summary>
-        /// Hit window for a <see cref="HitResult.Miss"/> result.
-        /// </summary>
-        /// <remarks>
-        /// This miss window should determine how early a hit can be before it is considered for judgement (as opposed to being ignored as
-        /// "too far in the future). It should also define when a forced miss should be triggered (as a result of no user input in time).
-        /// </remarks>
         private double miss;
 
         /// <summary>
