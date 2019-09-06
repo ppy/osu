@@ -31,7 +31,7 @@ namespace osu.Game.Overlays.Chat
 
         protected virtual float MessagePadding => default_message_padding;
 
-        private const  float timestamp_padding = 70;
+        private const float timestamp_padding = 70;
 
         private const float default_horizontal_padding = 15;
 
