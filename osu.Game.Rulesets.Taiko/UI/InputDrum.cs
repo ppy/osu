@@ -108,7 +108,7 @@ namespace osu.Game.Rulesets.Taiko.UI
                         Origin = Anchor.Centre,
                         RelativeSizeAxes = Axes.Both,
                         Alpha = 0,
-                        Blending = BlendingMode.Additive,
+                        Blending = BlendingParameters.Additive,
                     },
                     centre = new Sprite
                     {
@@ -124,7 +124,7 @@ namespace osu.Game.Rulesets.Taiko.UI
                         RelativeSizeAxes = Axes.Both,
                         Size = new Vector2(0.7f),
                         Alpha = 0,
-                        Blending = BlendingMode.Additive
+                        Blending = BlendingParameters.Additive
                     }
                 };
             }
@@ -132,10 +132,10 @@ namespace osu.Game.Rulesets.Taiko.UI
             [BackgroundDependencyLoader]
             private void load(TextureStore textures, OsuColour colours)
             {
-                rim.Texture = textures.Get(@"Play/Taiko/taiko-drum-outer");
-                rimHit.Texture = textures.Get(@"Play/Taiko/taiko-drum-outer-hit");
-                centre.Texture = textures.Get(@"Play/Taiko/taiko-drum-inner");
-                centreHit.Texture = textures.Get(@"Play/Taiko/taiko-drum-inner-hit");
+                rim.Texture = textures.Get(@"Gameplay/taiko/taiko-drum-outer");
+                rimHit.Texture = textures.Get(@"Gameplay/taiko/taiko-drum-outer-hit");
+                centre.Texture = textures.Get(@"Gameplay/taiko/taiko-drum-inner");
+                centreHit.Texture = textures.Get(@"Gameplay/taiko/taiko-drum-inner-hit");
 
                 rimHit.Colour = colours.Blue;
                 centreHit.Colour = colours.Pink;

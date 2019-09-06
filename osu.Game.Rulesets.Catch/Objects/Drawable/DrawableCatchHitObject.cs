@@ -58,14 +58,12 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawable
                 ApplyResult(r => r.Type = CheckPosition.Invoke(HitObject) ? HitResult.Perfect : HitResult.Miss);
         }
 
-        protected override bool UseTransformStateManagement => false;
+        protected sealed override double InitialLifetimeOffset => HitObject.TimePreempt;
 
-        protected override void UpdateState(ArmedState state)
+        protected override void UpdateInitialTransforms() => this.FadeInFromZero(200);
+
+        protected override void UpdateStateTransforms(ArmedState state)
         {
-            // TODO: update to use new state management.
-            using (BeginAbsoluteSequence(HitObject.StartTime - HitObject.TimePreempt))
-                this.FadeIn(200);
-
             var endTime = (HitObject as IHasEndTime)?.EndTime ?? HitObject.StartTime;
 
             using (BeginAbsoluteSequence(endTime, true))
