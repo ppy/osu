@@ -101,7 +101,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
         private static LinearSpline[,] coeffs3sInterps;
 
         private const double tRatioThreshold = 1.4;
-        private const double correction0Still = 0.1;
+        private const double correction0Still = 0;
 
         public double RawMT { get; private set; }
         public double D { get; private set; }
