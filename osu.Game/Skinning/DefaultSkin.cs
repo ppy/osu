@@ -29,6 +29,8 @@ namespace osu.Game.Skinning
         {
             switch (lookup)
             {
+                // todo: this code is pulled from LegacySkin and should not exist.
+                // will likely change based on how databased storage of skin configuration goes.
                 case GlobalSkinConfiguration global:
                     switch (global)
                     {
