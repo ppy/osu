@@ -77,7 +77,17 @@ namespace osu.Game.Screens.Play.HUD
                 case ScoreMeterType.HitErrorRight:
                     createBar(true);
                     break;
+
+                case ScoreMeterType.HitErrorBottom:
+                    createBottomBar();
+                    break;
             }
+        }
+
+        private void displayMeter(HitErrorMeter meter)
+        {
+            Add(meter);
+            meter.FadeInFromZero(fade_duration, Easing.OutQuint);
         }
 
         private void createBar(bool rightAligned)
@@ -90,8 +100,20 @@ namespace osu.Game.Screens.Play.HUD
                 Alpha = 0,
             };
 
-            Add(display);
-            display.FadeInFromZero(fade_duration, Easing.OutQuint);
+            displayMeter(display);
+        }
+
+        private void createBottomBar()
+        {
+            var display = new BottomBarHitErrorMeter(hitWindows)
+            {
+                Margin = new MarginPadding() { Bottom = 4 * margin },
+                Anchor = Anchor.BottomCentre,
+                Origin = Anchor.BottomCentre,
+                Alpha = 0,
+            };
+
+            displayMeter(display);
         }
 
         protected override void Dispose(bool isDisposing)

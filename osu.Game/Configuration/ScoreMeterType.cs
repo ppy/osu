@@ -18,5 +18,8 @@ namespace osu.Game.Configuration
 
         [Description("Hit Error (both)")]
         HitErrorBoth,
+
+        [Description("Hit Error (bottom)")]
+        HitErrorBottom
     }
 }
