@@ -4,51 +4,61 @@
 using System;
 using System.Collections.Generic;
 using osu.Game.Beatmaps;
-using osu.Game.Rulesets.Scoring;
+using osu.Game.Rulesets.Objects;
 
-namespace osu.Game.Rulesets.Objects
+namespace osu.Game.Rulesets.Scoring
 {
+    /// <summary>
+    /// A structure containing timing data for hit window based gameplay.
+    /// </summary>
     public class HitWindows
     {
-        private static readonly IReadOnlyDictionary<HitResult, (double od0, double od5, double od10)> base_ranges = new Dictionary<HitResult, (double, double, double)>
+        private static readonly DifficultyRange[] base_ranges =
         {
-            { HitResult.Perfect, (44.8, 38.8, 27.8) },
-            { HitResult.Great, (128, 98, 68) },
-            { HitResult.Good, (194, 164, 134) },
-            { HitResult.Ok, (254, 224, 194) },
-            { HitResult.Meh, (302, 272, 242) },
-            { HitResult.Miss, (376, 346, 316) },
+            new DifficultyRange(HitResult.Perfect, 22.4D, 19.4D, 13.9D),
+            new DifficultyRange(HitResult.Great, 64, 49, 34),
+            new DifficultyRange(HitResult.Good, 97, 82, 67),
+            new DifficultyRange(HitResult.Ok, 127, 112, 97),
+            new DifficultyRange(HitResult.Meh, 151, 136, 121),
+            new DifficultyRange(HitResult.Miss, 188, 173, 158),
         };
 
         /// <summary>
         /// Hit window for a <see cref="HitResult.Perfect"/> result.
         /// </summary>
-        public double Perfect { get; protected set; }
+        private double perfect;
 
         /// <summary>
         /// Hit window for a <see cref="HitResult.Great"/> result.
         /// </summary>
-        public double Great { get; protected set; }
+        /// <remarks>
+        /// Note that this value includes both the early and late region.
+        /// </remarks>
+        private double great;
 
         /// <summary>
         /// Hit window for a <see cref="HitResult.Good"/> result.
         /// </summary>
-        public double Good { get; protected set; }
+        private double good;
 
         /// <summary>
         /// Hit window for an <see cref="HitResult.Ok"/> result.
         /// </summary>
-        public double Ok { get; protected set; }
+        private double ok;
 
         /// <summary>
         /// Hit window for a <see cref="HitResult.Meh"/> result.
         /// </summary>
-        public double Meh { get; protected set; }
+        private double meh;
 
         /// <summary>
         /// Hit window for a <see cref="HitResult.Miss"/> result.
         /// </summary>
-        public double Miss { get; protected set; }
+        /// <remarks>
+        /// This miss window should determine how early a hit can be before it is considered for judgement (as opposed to being ignored as
+        /// "too far in the future). It should also define when a forced miss should be triggered (as a result of no user input in time).
+        /// </remarks>
+        private double miss;
 
         /// <summary>
         /// Retrieves the <see cref="HitResult"/> with the largest hit window that produces a successful hit.
@@ -66,15 +76,15 @@ namespace osu.Game.Rulesets.Objects
         }
 
         /// <summary>
-        /// Retrieves a mapping of <see cref="HitResult"/>s to their half window timing for all allowed <see cref="HitResult"/>s.
+        /// Retrieves a mapping of <see cref="HitResult"/>s to their timing windows for all allowed <see cref="HitResult"/>s.
         /// </summary>
         /// <returns></returns>
-        public IEnumerable<(HitResult result, double length)> GetAllAvailableHalfWindows()
+        public IEnumerable<(HitResult result, double length)> GetAllAvailableWindows()
         {
             for (var result = HitResult.Meh; result <= HitResult.Perfect; ++result)
             {
                 if (IsHitResultAllowed(result))
-                    yield return (result, HalfWindowFor(result));
+                    yield return (result, WindowFor(result));
             }
         }
 
@@ -100,14 +110,39 @@ namespace osu.Game.Rulesets.Objects
         /// Sets hit windows with values that correspond to a difficulty parameter.
         /// </summary>
         /// <param name="difficulty">The parameter.</param>
-        public virtual void SetDifficulty(double difficulty)
+        public void SetDifficulty(double difficulty)
         {
-            Perfect = BeatmapDifficulty.DifficultyRange(difficulty, base_ranges[HitResult.Perfect]);
-            Great = BeatmapDifficulty.DifficultyRange(difficulty, base_ranges[HitResult.Great]);
-            Good = BeatmapDifficulty.DifficultyRange(difficulty, base_ranges[HitResult.Good]);
-            Ok = BeatmapDifficulty.DifficultyRange(difficulty, base_ranges[HitResult.Ok]);
-            Meh = BeatmapDifficulty.DifficultyRange(difficulty, base_ranges[HitResult.Meh]);
-            Miss = BeatmapDifficulty.DifficultyRange(difficulty, base_ranges[HitResult.Miss]);
+            foreach (var range in GetRanges())
+            {
+                var value = BeatmapDifficulty.DifficultyRange(difficulty, (range.Min, range.Average, range.Max));
+
+                switch (range.Result)
+                {
+                    case HitResult.Miss:
+                        miss = value;
+                        break;
+
+                    case HitResult.Meh:
+                        meh = value;
+                        break;
+
+                    case HitResult.Ok:
+                        ok = value;
+                        break;
+
+                    case HitResult.Good:
+                        good = value;
+                        break;
+
+                    case HitResult.Great:
+                        great = value;
+                        break;
+
+                    case HitResult.Perfect:
+                        perfect = value;
+                        break;
+                }
+            }
         }
 
         /// <summary>
@@ -121,7 +156,7 @@ namespace osu.Game.Rulesets.Objects
 
             for (var result = HitResult.Perfect; result >= HitResult.Miss; --result)
             {
-                if (IsHitResultAllowed(result) && timeOffset <= HalfWindowFor(result))
+                if (IsHitResultAllowed(result) && timeOffset <= WindowFor(result))
                     return result;
             }
 
@@ -129,32 +164,32 @@ namespace osu.Game.Rulesets.Objects
         }
 
         /// <summary>
-        /// Retrieves half the hit window for a <see cref="HitResult"/>.
-        /// This is useful if the hit window for one half of the hittable range of a <see cref="HitObject"/> is required.
+        /// Retrieves the hit window for a <see cref="HitResult"/>.
+        /// This is the number of +/- milliseconds allowed for the requested result (so the actual hittable range is double this).
         /// </summary>
         /// <param name="result">The expected <see cref="HitResult"/>.</param>
         /// <returns>One half of the hit window for <paramref name="result"/>.</returns>
-        public double HalfWindowFor(HitResult result)
+        public double WindowFor(HitResult result)
         {
             switch (result)
             {
                 case HitResult.Perfect:
-                    return Perfect / 2;
+                    return perfect;
 
                 case HitResult.Great:
-                    return Great / 2;
+                    return great;
 
                 case HitResult.Good:
-                    return Good / 2;
+                    return good;
 
                 case HitResult.Ok:
-                    return Ok / 2;
+                    return ok;
 
                 case HitResult.Meh:
-                    return Meh / 2;
+                    return meh;
 
                 case HitResult.Miss:
-                    return Miss / 2;
+                    return miss;
 
                 default:
                     throw new ArgumentException(nameof(result));
@@ -167,6 +202,30 @@ namespace osu.Game.Rulesets.Objects
         /// </summary>
         /// <param name="timeOffset">The time offset.</param>
         /// <returns>Whether the <see cref="HitObject"/> can be hit at any point in the future from this time offset.</returns>
-        public bool CanBeHit(double timeOffset) => timeOffset <= HalfWindowFor(LowestSuccessfulHitResult());
+        public bool CanBeHit(double timeOffset) => timeOffset <= WindowFor(LowestSuccessfulHitResult());
+
+        /// <summary>
+        /// Retrieve a valid list of <see cref="DifficultyRange"/>s representing hit windows.
+        /// Defaults are provided but can be overridden to customise for a ruleset.
+        /// </summary>
+        protected virtual DifficultyRange[] GetRanges() => base_ranges;
+    }
+
+    public struct DifficultyRange
+    {
+        public readonly HitResult Result;
+
+        public double Min;
+        public double Average;
+        public double Max;
+
+        public DifficultyRange(HitResult result, double min, double average, double max)
+        {
+            Result = result;
+
+            Min = min;
+            Average = average;
+            Max = max;
+        }
     }
 }

@@ -105,7 +105,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
                     validActionPressed = false;
 
                     UnproxyContent();
-                    this.Delay(HitObject.HitWindows.HalfWindowFor(HitResult.Miss)).Expire();
+                    this.Delay(HitObject.HitWindows.WindowFor(HitResult.Miss)).Expire();
                     break;
 
                 case ArmedState.Miss:
