@@ -14,13 +14,13 @@ using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
+using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.Taiko.Judgements;
 using osu.Game.Rulesets.Taiko.Objects;
 using osu.Game.Rulesets.Taiko.Objects.Drawables;
 using osu.Game.Rulesets.Taiko.UI;
 using osu.Game.Tests.Visual;
 using osuTK;
-using osu.Game.Rulesets.Scoring;
 
 namespace osu.Game.Rulesets.Taiko.Tests
 {

@@ -162,7 +162,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
                 {
                     UpdateInitialTransforms();
 
-                    var judgementOffset = Math.Min(HitObject.HitWindows?.HalfWindowFor(HitResult.Miss) ?? double.MaxValue, Result?.TimeOffset ?? 0);
+                    var judgementOffset = Math.Min(HitObject.HitWindows?.WindowFor(HitResult.Miss) ?? double.MaxValue, Result?.TimeOffset ?? 0);
 
                     using (BeginDelayedSequence(InitialLifetimeOffset + judgementOffset, true))
                     {
