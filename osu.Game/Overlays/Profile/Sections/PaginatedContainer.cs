@@ -11,25 +11,31 @@ using osu.Game.Graphics.Sprites;
 using osu.Game.Online.API;
 using osu.Game.Rulesets;
 using osu.Game.Users;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading;
 
 namespace osu.Game.Overlays.Profile.Sections
 {
-    public abstract class PaginatedContainer : FillFlowContainer
+    public abstract class PaginatedContainer<TModel> : FillFlowContainer
     {
-        protected readonly FillFlowContainer ItemsContainer;
-        protected readonly ShowMoreButton MoreButton;
-        protected readonly OsuSpriteText MissingText;
+        private readonly ShowMoreButton moreButton;
+        private readonly OsuSpriteText missingText;
+        private APIRequest<List<TModel>> retrievalRequest;
+        private CancellationTokenSource loadCancellation;
 
         protected int VisiblePages;
         protected int ItemsPerPage;
 
         protected readonly Bindable<User> User = new Bindable<User>();
 
+        protected readonly FillFlowContainer ItemsContainer;
+
         [Resolved]
         protected RulesetStore Rulesets { get; private set; }
 
         [Resolved]
-        protected IAPIProvider API { get; private set; }
+        private IAPIProvider api { get; set; }
 
         protected PaginatedContainer(Bindable<User> user, string header, string missing)
         {
@@ -53,7 +59,7 @@ namespace osu.Game.Overlays.Profile.Sections
                     RelativeSizeAxes = Axes.X,
                     Spacing = new Vector2(0, 2),
                 },
-                MoreButton = new ShowMoreButton
+                moreButton = new ShowMoreButton
                 {
                     Anchor = Anchor.TopCentre,
                     Origin = Anchor.TopCentre,
@@ -61,7 +67,7 @@ namespace osu.Game.Overlays.Profile.Sections
                     Margin = new MarginPadding { Top = 10 },
                     Action = ShowMore,
                 },
-                MissingText = new OsuSpriteText
+                missingText = new OsuSpriteText
                 {
                     Font = OsuFont.GetFont(size: 15),
                     Text = missing,
@@ -76,15 +82,63 @@ namespace osu.Game.Overlays.Profile.Sections
             User.BindValueChanged(onUserChanged, true);
         }
 
-        private void onUserChanged(ValueChangedEvent<User> e)
+        protected void ClearContent()
         {
+            loadCancellation?.Cancel();
+            retrievalRequest?.Cancel();
+
             VisiblePages = 0;
             ItemsContainer.Clear();
+
+            moreButton.IsLoading = true;
+        }
+
+        private void onUserChanged(ValueChangedEvent<User> e)
+        {
+            ClearContent();
 
             if (e.NewValue != null)
                 ShowMore();
         }
 
-        protected abstract void ShowMore();
+        protected void ShowMore()
+        {
+            loadCancellation = new CancellationTokenSource();
+
+            retrievalRequest = CreateRequest();
+            retrievalRequest.Success += UpdateItems;
+
+            api.Queue(retrievalRequest);
+        }
+
+        protected virtual void UpdateItems(List<TModel> items) => Schedule(() =>
+        {
+            if (!items.Any() && VisiblePages == 1)
+            {
+                moreButton.Hide();
+                moreButton.IsLoading = false;
+                missingText.Show();
+                return;
+            }
+
+            LoadComponentsAsync(items.Select(CreateDrawableItem).Where(d => d != null), drawables =>
+            {
+                missingText.Hide();
+                moreButton.FadeTo(items.Count == ItemsPerPage ? 1 : 0);
+                moreButton.IsLoading = false;
+
+                ItemsContainer.AddRange(drawables);
+            }, loadCancellation.Token);
+        });
+
+        protected abstract APIRequest<List<TModel>> CreateRequest();
+
+        protected abstract Drawable CreateDrawableItem(TModel model);
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+            retrievalRequest?.Cancel();
+        }
     }
 }
