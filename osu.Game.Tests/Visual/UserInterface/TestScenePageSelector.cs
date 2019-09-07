@@ -17,9 +17,7 @@ namespace osu.Game.Tests.Visual.UserInterface
 
         public TestScenePageSelector()
         {
-            PageSelector pageSelector;
-
-            Child = pageSelector = new PageSelector(10)
+            Child = new PageSelector(200)
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
