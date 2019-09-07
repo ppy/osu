@@ -17,7 +17,7 @@ using osuTK;
 
 namespace osu.Game.Overlays.Profile.Header
 {
-    public class DetailHeaderContainer : CompositeDrawable
+    public class DetailHeaderContainer : FullUserBindingComponent
     {
         private readonly Dictionary<ScoreRank, ScoreRankInfo> scoreRankInfos = new Dictionary<ScoreRank, ScoreRankInfo>();
         private OverlinedInfoContainer medalInfo;
@@ -25,9 +25,6 @@ namespace osu.Game.Overlays.Profile.Header
         private OverlinedInfoContainer detailGlobalRank;
         private OverlinedInfoContainer detailCountryRank;
         private FillFlowContainer fillFlow;
-
-        public readonly Bindable<User> User = new Bindable<User>();
-        public readonly Bindable<UserStatistics> Statistics = new Bindable<UserStatistics>();
 
         private bool expanded = true;
 
@@ -164,17 +161,14 @@ namespace osu.Game.Overlays.Profile.Header
                     }
                 },
             };
-
-            User.BindValueChanged(user => onUserUpdate(user.NewValue));
-            Statistics.BindValueChanged(statistics => onStatisticsUpdate(statistics.NewValue));
         }
 
-        private void onUserUpdate(User user)
+        protected override void UpdateUser(User user)
         {
             medalInfo.Content = user?.Achievements?.Length.ToString() ?? "0";
         }
 
-        private void onStatisticsUpdate(UserStatistics statistics)
+        protected override void UpdateStatistics(UserStatistics statistics)
         {
             ppInfo.Content = statistics?.PP?.ToString("#,##0") ?? "0";
 

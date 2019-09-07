@@ -4,7 +4,6 @@
 using System;
 using System.Linq;
 using osu.Framework.Allocation;
-using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -16,14 +15,12 @@ using osuTK;
 
 namespace osu.Game.Overlays.Profile.Header.Components
 {
-    public class PreviousUsernames : CompositeDrawable
+    public class PreviousUsernames : UserBindingComponent
     {
         private const int duration = 200;
         private const int margin = 10;
         private const int width = 310;
         private const int move_offset = 15;
-
-        public readonly Bindable<User> User = new Bindable<User>();
 
         private readonly TextFlowContainer text;
         private readonly Box background;
@@ -99,17 +96,11 @@ namespace osu.Game.Overlays.Profile.Header.Components
             background.Colour = colours.GreySeafoamDarker;
         }
 
-        protected override void LoadComplete()
-        {
-            base.LoadComplete();
-            User.BindValueChanged(onUserChanged, true);
-        }
-
-        private void onUserChanged(ValueChangedEvent<User> user)
+        protected override void UpdateUser(User user)
         {
             text.Text = string.Empty;
 
-            var usernames = user.NewValue?.PreviousUsernames;
+            var usernames = user?.PreviousUsernames;
 
             if (usernames?.Any() ?? false)
             {

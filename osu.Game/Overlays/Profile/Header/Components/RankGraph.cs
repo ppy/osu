@@ -5,7 +5,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
-using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
@@ -19,7 +18,7 @@ using osuTK;
 
 namespace osu.Game.Overlays.Profile.Header.Components
 {
-    public class RankGraph : Container, IHasCustomTooltip
+    public class RankGraph : StatisticsBindingComponent, IHasCustomTooltip
     {
         private const float secondary_textsize = 13;
         private const float padding = 10;
@@ -31,12 +30,11 @@ namespace osu.Game.Overlays.Profile.Header.Components
 
         private KeyValuePair<int, int>[] ranks;
         private int dayIndex;
-        public readonly Bindable<UserStatistics> Statistics = new Bindable<UserStatistics>();
 
         public RankGraph()
         {
             Padding = new MarginPadding { Vertical = padding };
-            Children = new Drawable[]
+            InternalChildren = new Drawable[]
             {
                 placeholder = new OsuSpriteText
                 {
@@ -64,14 +62,7 @@ namespace osu.Game.Overlays.Profile.Header.Components
             graph.LineColour = colours.Yellow;
         }
 
-        protected override void LoadComplete()
-        {
-            base.LoadComplete();
-
-            Statistics.BindValueChanged(statistics => updateStatistics(statistics.NewValue), true);
-        }
-
-        private void updateStatistics(UserStatistics statistics)
+        protected override void UpdateStatistics(UserStatistics statistics)
         {
             placeholder.FadeIn(fade_duration, Easing.Out);
 

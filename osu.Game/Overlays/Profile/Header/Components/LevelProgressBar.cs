@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
-using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
@@ -14,10 +13,8 @@ using osuTK.Graphics;
 
 namespace osu.Game.Overlays.Profile.Header.Components
 {
-    public class LevelProgressBar : CompositeDrawable, IHasTooltip
+    public class LevelProgressBar : StatisticsBindingComponent, IHasTooltip
     {
-        public readonly Bindable<UserStatistics> Statistics = new Bindable<UserStatistics>();
-
         public string TooltipText { get; }
 
         private Bar levelProgressBar;
@@ -52,11 +49,9 @@ namespace osu.Game.Overlays.Profile.Header.Components
                     Font = OsuFont.GetFont(size: 12, weight: FontWeight.Bold)
                 }
             };
-
-            Statistics.BindValueChanged(statistics => updateProgress(statistics.NewValue));
         }
 
-        private void updateProgress(UserStatistics statistics)
+        protected override void UpdateStatistics(UserStatistics statistics)
         {
             levelProgressBar.Length = statistics?.Level.Progress / 100f ?? 0;
             levelProgressText.Text = statistics?.Level.Progress.ToString("0'%'");

@@ -14,11 +14,10 @@ using osuTK;
 
 namespace osu.Game.Overlays.Profile.Header
 {
-    public class CentreHeaderContainer : CompositeDrawable
+    public class CentreHeaderContainer : StatisticsBindingComponent
     {
         public readonly BindableBool DetailsVisible = new BindableBool(true);
         public readonly Bindable<User> User = new Bindable<User>();
-        public readonly Bindable<UserStatistics> Statistics = new Bindable<UserStatistics>();
 
         private OverlinedInfoContainer hiddenDetailGlobal;
         private OverlinedInfoContainer hiddenDetailCountry;
@@ -138,11 +137,9 @@ namespace osu.Game.Overlays.Profile.Header
                 hiddenDetailContainer.FadeTo(visible.NewValue ? 0 : 1, 200, Easing.OutQuint);
                 expandedDetailContainer.FadeTo(visible.NewValue ? 1 : 0, 200, Easing.OutQuint);
             });
-
-            Statistics.BindValueChanged(statistics => updateStatistics(statistics.NewValue));
         }
 
-        private void updateStatistics(UserStatistics statistics)
+        protected override void UpdateStatistics(UserStatistics statistics)
         {
             hiddenDetailGlobal.Content = statistics?.Ranks.Global?.ToString("\\##,##0") ?? "-";
             hiddenDetailCountry.Content = statistics?.Ranks.Country?.ToString("\\##,##0") ?? "-";

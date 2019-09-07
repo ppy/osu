@@ -49,10 +49,14 @@ namespace osu.Game.Overlays.Profile.Header.Components
                     }
                 }
             };
-
-            User.BindValueChanged(user => updateFollowers(user.NewValue), true);
         }
 
-        private void updateFollowers(User user) => followerText.Text = user?.FollowerCount.ToString("#,##0");
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+            User.BindValueChanged(user => updateUser(user.NewValue), true);
+        }
+
+        private void updateUser(User user) => followerText.Text = user?.FollowerCount.ToString("#,##0");
     }
 }

@@ -2,19 +2,15 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
-using osu.Framework.Bindables;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
 using osu.Game.Graphics;
 using osu.Game.Users;
 
 namespace osu.Game.Overlays.Profile.Header.Components
 {
-    public class OverlinedTotalPlayTime : CompositeDrawable, IHasTooltip
+    public class OverlinedTotalPlayTime : StatisticsBindingComponent, IHasTooltip
     {
-        public readonly Bindable<UserStatistics> Statistics = new Bindable<UserStatistics>();
-
         public string TooltipText { get; set; }
 
         private OverlinedInfoContainer info;
@@ -34,11 +30,9 @@ namespace osu.Game.Overlays.Profile.Header.Components
                 Title = "Total Play Time",
                 LineColour = colours.Yellow,
             };
-
-            Statistics.BindValueChanged(statistics => updateTime(statistics.NewValue), true);
         }
 
-        private void updateTime(UserStatistics statistics)
+        protected override void UpdateStatistics(UserStatistics statistics)
         {
             TooltipText = (statistics?.PlayTime ?? 0) / 3600 + " hours";
             info.Content = formatTime(statistics?.PlayTime);
