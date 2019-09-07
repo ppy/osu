@@ -139,6 +139,7 @@ namespace osu.Game.Graphics.UserInterface
                     Add(background);
 
                 var drawableText = CreateText(text);
+
                 if (drawableText != null)
                 {
                     drawableText.Margin = new MarginPadding { Horizontal = margin };
