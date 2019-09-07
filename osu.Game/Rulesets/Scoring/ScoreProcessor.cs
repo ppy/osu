@@ -55,7 +55,7 @@ namespace osu.Game.Rulesets.Scoring
         /// <summary>
         /// The current health.
         /// </summary>
-        public readonly BindableDouble Health = new BindableDouble { MinValue = 0, MaxValue = 1 };
+        public readonly BindableDouble Health = new BindableDouble(1) { MinValue = 0, MaxValue = 1 };
 
         /// <summary>
         /// The current combo.
