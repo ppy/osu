@@ -69,6 +69,7 @@ namespace osu.Game.Rulesets.Catch.UI
 
                 caughtFruit.RelativePositionAxes = Axes.None;
                 caughtFruit.Position = new Vector2(MovableCatcher.ToLocalSpace(fruit.ScreenSpaceDrawQuad.Centre).X - MovableCatcher.DrawSize.X / 2, 0);
+                caughtFruit.IsOnPlate = true;
 
                 caughtFruit.Anchor = Anchor.TopCentre;
                 caughtFruit.Origin = Anchor.Centre;
@@ -384,6 +385,12 @@ namespace osu.Game.Rulesets.Catch.UI
                     X = hyperDashTargetPosition;
                     SetHyperDashState();
                 }
+
+                if (Clock.ElapsedFrameTime < 0)
+                {
+                    AdditiveTarget.RemoveAll(d => Clock.CurrentTime < d.LifetimeStart);
+                    caughtFruit.RemoveAll(d => d.HitObject.StartTime > Clock.CurrentTime);
+                }
             }
 
             /// <summary>
@@ -407,7 +414,7 @@ namespace osu.Game.Rulesets.Catch.UI
 
                     f.MoveToY(f.Y + 75, 750, Easing.InSine);
                     f.FadeOut(750);
-                    f.Expire();
+                    f.Expire(true);
                 }
             }
 
@@ -437,11 +444,11 @@ namespace osu.Game.Rulesets.Catch.UI
                     ExplodingFruitTarget.Add(fruit);
                 }
 
+                fruit.ClearTransforms();
                 fruit.MoveToY(fruit.Y - 50, 250, Easing.OutSine).Then().MoveToY(fruit.Y + 50, 500, Easing.InSine);
                 fruit.MoveToX(fruit.X + originalX * 6, 1000);
                 fruit.FadeOut(750);
-
-                fruit.Expire();
+                fruit.Expire(true);
             }
         }
     }

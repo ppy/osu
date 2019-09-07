@@ -50,6 +50,10 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawable
 
         public Func<CatchHitObject, bool> CheckPosition;
 
+        public bool IsOnPlate;
+
+        public override bool RemoveWhenNotAlive => IsOnPlate;
+
         protected override void CheckForResult(bool userTriggered, double timeOffset)
         {
             if (CheckPosition == null) return;
