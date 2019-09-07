@@ -11,6 +11,7 @@ using osu.Framework.Extensions.TypeExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.MathUtils;
+using osu.Framework.Threading;
 using osu.Game.Audio;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Objects.Types;
@@ -79,8 +80,6 @@ namespace osu.Game.Rulesets.Objects.Drawables
         /// </summary>
         public JudgementResult Result { get; private set; }
 
-        private bool judgementOccurred;
-
         public override bool RemoveWhenNotAlive => false;
         public override bool RemoveCompletedTransforms => false;
         protected override bool RequiresChildrenUpdate => true;
@@ -137,6 +136,8 @@ namespace osu.Game.Rulesets.Objects.Drawables
         /// </summary>
         public event Action<DrawableHitObject, ArmedState> ApplyCustomUpdateState;
 
+#pragma warning disable 618 // (legacy state management) - can be removed 20200227
+
         /// <summary>
         /// Enables automatic transform management of this hitobject. Implementation of transforms should be done in <see cref="UpdateInitialTransforms"/> and <see cref="UpdateStateTransforms"/> only. Rewinding and removing previous states is done automatically.
         /// </summary>
@@ -144,6 +145,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
         /// Going forward, this is the preferred way of implementing <see cref="DrawableHitObject"/>s. Previous functionality
         /// is offered as a compatibility layer until all rulesets have been migrated across.
         /// </remarks>
+        [Obsolete("Use UpdateInitialTransforms()/UpdateStateTransforms() instead")] // can be removed 20200227
         protected virtual bool UseTransformStateManagement => true;
 
         protected override void ClearInternal(bool disposeChildren = true) => throw new InvalidOperationException($"Should never clear a {nameof(DrawableHitObject)}");
@@ -172,7 +174,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
                 {
                     UpdateInitialTransforms();
 
-                    var judgementOffset = Math.Min(HitObject.HitWindows?.HalfWindowFor(HitResult.Miss) ?? double.MaxValue, Result?.TimeOffset ?? 0);
+                    var judgementOffset = Math.Min(HitObject.HitWindows?.WindowFor(HitResult.Miss) ?? double.MaxValue, Result?.TimeOffset ?? 0);
 
                     using (BeginDelayedSequence(InitialLifetimeOffset + judgementOffset, true))
                         UpdateStateTransforms(newState);
@@ -191,6 +193,8 @@ namespace osu.Game.Rulesets.Objects.Drawables
         /// <summary>
         /// Apply (generally fade-in) transforms leading into the <see cref="HitObject"/> start time.
         /// The local drawable hierarchy is recursively delayed to <see cref="LifetimeStart"/> for convenience.
+        ///
+        /// By default this will fade in the object from zero with no duration.
         /// </summary>
         /// <remarks>
         /// This is called once before every <see cref="UpdateStateTransforms"/>. This is to ensure a good state in the case
@@ -198,6 +202,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
         /// </remarks>
         protected virtual void UpdateInitialTransforms()
         {
+            this.FadeInFromZero();
         }
 
         /// <summary>
@@ -239,9 +244,12 @@ namespace osu.Game.Rulesets.Objects.Drawables
         /// Should generally not be used when <see cref="UseTransformStateManagement"/> is true; use <see cref="UpdateStateTransforms"/> instead.
         /// </summary>
         /// <param name="state">The new armed state.</param>
+        [Obsolete("Use UpdateInitialTransforms()/UpdateStateTransforms() instead")] // can be removed 20200227
         protected virtual void UpdateState(ArmedState state)
         {
         }
+
+#pragma warning restore 618
 
         #endregion
 
@@ -250,7 +258,11 @@ namespace osu.Game.Rulesets.Objects.Drawables
             base.SkinChanged(skin, allowFallback);
 
             if (HitObject is IHasComboInformation combo)
-                AccentColour.Value = skin.GetValue<SkinConfiguration, Color4?>(s => s.ComboColours.Count > 0 ? s.ComboColours[combo.ComboIndex % s.ComboColours.Count] : (Color4?)null) ?? Color4.White;
+            {
+                var comboColours = skin.GetConfig<GlobalSkinConfiguration, List<Color4>>(GlobalSkinConfiguration.ComboColours)?.Value;
+
+                AccentColour.Value = comboColours?.Count > 0 ? comboColours[combo.ComboIndex % comboColours.Count] : Color4.White;
+            }
         }
 
         /// <summary>
@@ -287,6 +299,14 @@ namespace osu.Game.Rulesets.Objects.Drawables
 
             UpdateResult(false);
         }
+
+        /// <summary>
+        /// Schedules an <see cref="Action"/> to this <see cref="DrawableHitObject"/>.
+        /// </summary>
+        /// <remarks>
+        /// Only provided temporarily until hitobject pooling is implemented.
+        /// </remarks>
+        protected internal new ScheduledDelegate Schedule(Action action) => base.Schedule(action);
 
         private double? lifetimeStart;
 
@@ -347,8 +367,6 @@ namespace osu.Game.Rulesets.Objects.Drawables
             if (!Result.HasResult)
                 throw new InvalidOperationException($"{GetType().ReadableName()} applied a {nameof(JudgementResult)} but did not update {nameof(JudgementResult.Type)}.");
 
-            judgementOccurred = true;
-
             // Ensure that the judgement is given a valid time offset, because this may not get set by the caller
             var endTime = (HitObject as IHasEndTime)?.EndTime ?? HitObject.StartTime;
             Result.TimeOffset = Time.Current - endTime;
@@ -381,21 +399,13 @@ namespace osu.Game.Rulesets.Objects.Drawables
             if (Time.Elapsed < 0)
                 return false;
 
-            judgementOccurred = false;
-
-            if (AllJudged)
+            if (Judged)
                 return false;
-
-            foreach (var d in NestedHitObjects)
-                judgementOccurred |= d.UpdateResult(userTriggered);
-
-            if (judgementOccurred || Judged)
-                return judgementOccurred;
 
             var endTime = (HitObject as IHasEndTime)?.EndTime ?? HitObject.StartTime;
             CheckForResult(userTriggered, Time.Current - endTime);
 
-            return judgementOccurred;
+            return Judged;
         }
 
         /// <summary>
@@ -415,7 +425,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
         /// Creates the <see cref="JudgementResult"/> that represents the scoring result for this <see cref="DrawableHitObject"/>.
         /// </summary>
         /// <param name="judgement">The <see cref="Judgement"/> that provides the scoring information.</param>
-        protected virtual JudgementResult CreateResult(Judgement judgement) => new JudgementResult(judgement);
+        protected virtual JudgementResult CreateResult(Judgement judgement) => new JudgementResult(HitObject, judgement);
 
         /// <summary>
         /// Updates state of this <see cref="DrawableHitObject"/> to a <see cref="ArmedState.Fail"/> state.

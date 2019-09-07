@@ -39,7 +39,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             ApplyResult(r => r.Type = HitResult.Great);
         }
 
-        protected override void UpdateState(ArmedState state)
+        protected override void UpdateStateTransforms(ArmedState state)
         {
             switch (state)
             {

@@ -14,12 +14,18 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
         {
         }
 
-        public void TriggerResult(HitResult type) => ApplyResult(r => r.Type = type);
+        protected override void UpdateInitialTransforms() => this.FadeOut();
+
+        public void TriggerResult(HitResult type)
+        {
+            HitObject.StartTime = Time.Current;
+            ApplyResult(r => r.Type = type);
+        }
 
         protected override void CheckForResult(bool userTriggered, double timeOffset)
         {
         }
-
+        
         public override bool OnPressed(TaikoAction action) => false;
     }
 }

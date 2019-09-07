@@ -121,7 +121,7 @@ namespace osu.Game.Beatmaps.Formats
                         var layer = parseLayer(split[2]);
                         var path = cleanFilename(split[3]);
                         var volume = split.Length > 4 ? float.Parse(split[4], CultureInfo.InvariantCulture) : 100;
-                        storyboard.GetLayer(layer).Add(new StoryboardSample(path, time, volume));
+                        storyboard.GetLayer(layer).Add(new StoryboardSampleInfo(path, time, (int)volume));
                         break;
                     }
                 }

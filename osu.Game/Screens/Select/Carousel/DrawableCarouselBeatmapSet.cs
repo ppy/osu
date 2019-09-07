@@ -146,6 +146,7 @@ namespace osu.Game.Screens.Select.Carousel
             public PanelBackground(WorkingBeatmap working)
             {
                 CacheDrawnFrameBuffer = true;
+                RedrawOnScale = false;
 
                 Children = new Drawable[]
                 {
@@ -220,14 +221,23 @@ namespace osu.Game.Screens.Select.Carousel
 
         public class FilterableGroupedDifficultyIcon : GroupedDifficultyIcon
         {
+            private readonly List<CarouselBeatmap> items;
+
             public FilterableGroupedDifficultyIcon(List<CarouselBeatmap> items, RulesetInfo ruleset)
                 : base(items.Select(i => i.Beatmap).ToList(), ruleset, Color4.White)
             {
-                items.ForEach(item => item.Filtered.ValueChanged += _ =>
-                {
-                    // for now, fade the whole group based on the ratio of hidden items.
-                    this.FadeTo(1 - 0.9f * ((float)items.Count(i => i.Filtered.Value) / items.Count), 100);
-                });
+                this.items = items;
+
+                foreach (var item in items)
+                    item.Filtered.BindValueChanged(_ => Scheduler.AddOnce(updateFilteredDisplay));
+
+                updateFilteredDisplay();
+            }
+
+            private void updateFilteredDisplay()
+            {
+                // for now, fade the whole group based on the ratio of hidden items.
+                this.FadeTo(1 - 0.9f * ((float)items.Count(i => i.Filtered.Value) / items.Count), 100);
             }
         }
     }
