@@ -1,5 +1,6 @@
 <Project>
   <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <OutputPath>bin\$(Configuration)</OutputPath>
     <WarningLevel>4</WarningLevel>
     <SchemaVersion>2.0</SchemaVersion>
