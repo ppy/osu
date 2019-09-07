@@ -3,7 +3,6 @@
 
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics;
-using osu.Game.Graphics.Containers;
 using osu.Framework.Bindables;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics.Shapes;
@@ -16,7 +15,7 @@ namespace osu.Game.Graphics.UserInterface
 {
     public class PageSelector : CompositeDrawable
     {
-        private BindableInt currentPage = new BindableInt(1);
+        public readonly BindableInt CurrentPage = new BindableInt();
 
         private readonly int maxPages;
         private readonly FillFlowContainer pillsFlow;
@@ -38,30 +37,47 @@ namespace osu.Game.Graphics.UserInterface
         {
             base.LoadComplete();
 
-            currentPage.BindValueChanged(page => redraw(page.NewValue), true);
+            CurrentPage.BindValueChanged(_ => redraw(), true);
         }
 
-        private void redraw(int newPage)
+        private void redraw()
         {
             pillsFlow.Clear();
 
-            for (int i = 1; i <= maxPages; i++)
+            if (CurrentPage.Value > 3)
+                addDrawablePage(1);
+
+            if (CurrentPage.Value > 4)
+                addPlaceholder();
+
+            for (int i = Math.Max(CurrentPage.Value - 2, 1); i <= Math.Min(CurrentPage.Value + 2, maxPages); i++)
             {
-                if (i == currentPage.Value)
+                if (i == CurrentPage.Value)
                     addCurrentPagePill();
                 else
-                    addPagePill(i);
+                    addDrawablePage(i);
             }
+
+            if (CurrentPage.Value + 2 < maxPages - 1)
+                addPlaceholder();
+
+            if (CurrentPage.Value + 2 < maxPages)
+                addDrawablePage(maxPages);
         }
 
-        private void addPagePill(int page)
+        private void addDrawablePage(int page)
         {
-            pillsFlow.Add(new Page(page.ToString(), () => currentPage.Value = page));
+            pillsFlow.Add(new Page(page.ToString(), () => CurrentPage.Value = page));
+        }
+
+        private void addPlaceholder()
+        {
+            pillsFlow.Add(new Placeholder());
         }
 
         private void addCurrentPagePill()
         {
-            pillsFlow.Add(new CurrentPage(currentPage.Value.ToString()));
+            pillsFlow.Add(new SelectedPage(CurrentPage.Value.ToString()));
         }
 
         private abstract class DrawablePage : CompositeDrawable
@@ -149,13 +165,13 @@ namespace osu.Game.Graphics.UserInterface
             };
         }
 
-        private class CurrentPage : DrawablePage
+        private class SelectedPage : DrawablePage
         {
             private SpriteText text;
 
             private Box background;
 
-            public CurrentPage(string text)
+            public SelectedPage(string text)
                 : base(text)
             {
             }
@@ -182,6 +198,29 @@ namespace osu.Game.Graphics.UserInterface
                 {
                     RelativeSizeAxes = Axes.Both,
                 }
+            };
+        }
+
+        private class Placeholder : DrawablePage
+        {
+            private SpriteText text;
+
+            public Placeholder()
+                : base("...")
+            {
+            }
+
+            [BackgroundDependencyLoader]
+            private void load(OsuColour colours)
+            {
+                text.Colour = colours.Seafoam;
+            }
+
+            protected override Drawable CreateContent() => text = new SpriteText
+            {
+                Anchor = Anchor.Centre,
+                Origin = Anchor.Centre,
+                Text = Text
             };
         }
     }
