@@ -25,17 +25,14 @@ namespace osu.Game.Tests.Visual.Online
             typeof(AccountCreationScreen),
         };
 
-        [Cached(typeof(IAPIProvider))]
-        private DummyAPIAccess api = new DummyAPIAccess();
+        private readonly Container userPanelArea;
 
         public TestSceneAccountCreationOverlay()
         {
-            Container userPanelArea;
             AccountCreationOverlay accountCreation;
 
             Children = new Drawable[]
             {
-                api,
                 accountCreation = new AccountCreationOverlay(),
                 userPanelArea = new Container
                 {
@@ -46,11 +43,16 @@ namespace osu.Game.Tests.Visual.Online
                 },
             };
 
+            AddStep("show", () => accountCreation.Show());
+        }
+
+        [BackgroundDependencyLoader]
+        private void load(IAPIProvider api)
+        {
             api.Logout();
             api.LocalUser.BindValueChanged(user => { userPanelArea.Child = new UserPanel(user.NewValue) { Width = 200 }; }, true);
 
-            AddStep("show", () => accountCreation.Show());
-            AddStep("logout", () => api.Logout());
+            AddStep("logout", api.Logout);
         }
     }
 }
