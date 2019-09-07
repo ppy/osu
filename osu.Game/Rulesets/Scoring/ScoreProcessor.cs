@@ -269,6 +269,8 @@ namespace osu.Game.Rulesets.Scoring
         /// <param name="beatmap">The <see cref="Beatmap{TObject}"/> to simulate.</param>
         protected virtual void SimulateAutoplay(Beatmap<TObject> beatmap)
         {
+            Reset(false);
+
             foreach (var obj in beatmap.HitObjects)
                 simulate(obj);
 
