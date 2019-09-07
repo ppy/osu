@@ -75,19 +75,15 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 multiplier *= 0.95f;
 
             double aimValue = computeAimValue();
-            double speedValue = computeSpeedValue();
+            double tapValue = computeTapValue();
             double accuracyValue = computeAccuracyValue();
 
-            
-            //Console.WriteLine(accuracyValue);
-            //Console.WriteLine(adjustedAccuracyValue);
-
-            double totalValue = Mean.PowerMean(new double[] { aimValue, speedValue, accuracyValue }, totalValueExponent) * multiplier;
+            double totalValue = Mean.PowerMean(new double[] { aimValue, tapValue, accuracyValue }, totalValueExponent) * multiplier;
 
             if (categoryRatings != null)
             {
                 categoryRatings.Add("Aim", aimValue);
-                categoryRatings.Add("Speed", speedValue);
+                categoryRatings.Add("Tap", tapValue);
                 categoryRatings.Add("Accuracy", accuracyValue);
                 categoryRatings.Add("OD", Attributes.OverallDifficulty);
                 categoryRatings.Add("AR", Attributes.ApproachRate);
@@ -179,7 +175,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             return aimValue;
         }
 
-        private double computeSpeedValue()
+        private double computeTapValue()
         {
 
             double modifiedAcc = getModifiedAcc();
