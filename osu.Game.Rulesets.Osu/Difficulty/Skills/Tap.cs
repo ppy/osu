@@ -110,7 +110,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
         private static double calculateMashNerfFactor(double relativeD, double mashLevel)
         {
-            double fullMashFactor = 0.6 + 0.4 * SpecialFunctions.Logistic(relativeD * 7 - 6);
+            double fullMashFactor = 0.8 + 0.2 * SpecialFunctions.Logistic(relativeD * 7 - 6);
             return mashLevel * fullMashFactor + (1 - mashLevel);
         }
 
