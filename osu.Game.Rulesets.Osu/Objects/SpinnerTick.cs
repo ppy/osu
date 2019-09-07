@@ -4,6 +4,7 @@
 using osu.Game.Audio;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Osu.Judgements;
+using osu.Game.Rulesets.Scoring;
 
 namespace osu.Game.Rulesets.Osu.Objects
 {
@@ -15,5 +16,7 @@ namespace osu.Game.Rulesets.Osu.Objects
         }
 
         public override Judgement CreateJudgement() => new OsuSpinnerTickJudgement();
+
+        protected override HitWindows CreateHitWindows() => null;
     }
 }
